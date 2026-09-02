@@ -801,3 +801,38 @@ Sessione grossa su richiesta dell'utente: analisi completa del progetto
   hitbox nei loop lenti di verifica non e' affidabile) ma e' coperta dai
   test unitari. Il nemico vero che la sfrutta arriva con US-011.
 - Prossima storia: US-011 (nemico base con telegrafia).
+
+[2026-09-02] US-011 — Nemico base con telegrafia
+
+- Cosa fatto:
+  - scripts/enemy.gd (CharacterBody2D): macchina a stati esplicita
+    IDLE / INSEGUIMENTO / ANTICIPO / ATTACCO / RECUPERO / STAGGER / MORTO.
+    IDLE->INSEGUIMENTO su raggio_aggro, ->ANTICIPO su raggio_attacco.
+    ANTICIPO = tell: tinta rossa + animazione "anticipo" (durata dal JSON,
+    nemico_base.anticipo, 4 frame a 8 fps); a fine animazione -> ATTACCO,
+    hitbox su hitbox_on/off, poi RECUPERO (recupero_s) -> IDLE.
+    PosturaComponent.postura_rotta -> STAGGER finche' vulnerabilita_finita.
+    StatsComponent.died -> _su_morte: emette morto(self), NON queue_free;
+    disattiva collisione e hurtbox, riproduce "death".
+  - scenes/enemy.tscn: AnimationMachine("nemico_base") + StatsComponent +
+    PosturaComponent + Hurtbox (layer 3) + Hitbox (mask 3). collision_layer 2.
+  - scenes/player.tscn: Player nel gruppo "player" (il nemico lo trova cosi').
+  - scenes/main.tscn: un'istanza di Enemy a (430,496), fuori dall'aggro
+    iniziale.
+  - data/balance.json: sezione nemico_base (raggi, danno, recupero, postura).
+    La durata del tell resta in animations.json.
+
+- Come verificato:
+  - 3 test in test_enemy.gd (74 totali): parte IDLE coi componenti,
+    morte -> segnale + nodo non distrutto, postura rotta -> STAGGER.
+  - A SCHERMO: il giocatore si avvicina, il nemico passa
+    INSEGUIMENTO -> ANTICIPO (screenshot: nemico tinto di rosso) -> ATTACCO
+    (fa 10 danni al giocatore) -> RECUPERO. Colpito dal giocatore perde hp;
+    portato a 0 va in MORTO, riproduce "death", resta nella scena, emette
+    "morto". Screenshot in user://us011/.
+  - validator 0.
+
+- Nota: con i placeholder il tell rosso e' un cambio di tinta sottile (il
+  corpo del nemico e' gia' rosso). L'arte vera lo rendera' netto; la meccanica
+  e la durata sono dati.
+- Prossima storia: US-014 (validator dei dati nei test).

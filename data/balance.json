@@ -58,5 +58,16 @@
       "durata_vulnerabile": 3.0,
       "recupero_al_secondo": 15
     }
+  },
+  "nemico_base": {
+    "_comment": "Nemico da banco di prova. La DURATA della fase di anticipo (il tell) NON e' qui: e' data/animations.json nemico_base.anticipo (4 frame a 8 fps). Qui raggi, danno e recupero. PLAUSIBILI, non bilanciati.",
+    "raggio_aggro": 140,
+    "raggio_attacco": 26,
+    "danno_attacco": 10,
+    "stagger_attacco": 8,
+    "angolo_arco": 90,
+    "raggio_arco": 24,
+    "recupero_s": 0.6,
+    "postura_massimo": 60
   }
 }

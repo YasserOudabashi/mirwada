@@ -185,8 +185,8 @@
       ],
       "priority": 12,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "scripts/enemy.gd (CharacterBody2D): macchina a stati IDLE/INSEGUIMENTO/ANTICIPO/ATTACCO/RECUPERO/STAGGER/MORTO. ANTICIPO = tell (tinta rossa + animazione anticipo, durata da animations.json nemico_base.anticipo); a fine animazione -> ATTACCO con hitbox su hitbox_on/off -> RECUPERO(recupero_s) -> IDLE. Monta StatsComponent + PosturaComponent (postura_rotta -> STAGGER). died -> emette morto(self) e NON queue_free, disattiva collisione/hurtbox, riproduce death. enemy.tscn + Player nel gruppo 'player' + un'istanza in main.tscn. balance.json sezione nemico_base (raggi/danno/recupero/postura; la durata del tell resta in animations.json). 3 test in test_enemy.gd (74 totali). VERIFICA A SCHERMO: INSEGUIMENTO->ANTICIPO(rosso)->ATTACCO(10 danni al giocatore)->RECUPERO; colpito perde hp, a 0 -> MORTO, death anim, resta in scena, segnale morto. validator 0."
     },
     {
       "id": "US-012",

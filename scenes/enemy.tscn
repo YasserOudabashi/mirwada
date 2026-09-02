@@ -1,9 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://c0play0mirwada"]
+[gd_scene load_steps=8 format=3 uid="uid://d0enemy0mirwada"]
 
-[ext_resource type="Script" path="res://scripts/player.gd" id="1_player"]
-[ext_resource type="Script" path="res://scripts/stats_component.gd" id="2_stats"]
-[ext_resource type="Script" path="res://scripts/game_camera.gd" id="3_camera"]
-[ext_resource type="Script" path="res://scripts/animation_machine.gd" id="4_anim"]
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/animation_machine.gd" id="2_anim"]
+[ext_resource type="Script" path="res://scripts/stats_component.gd" id="3_stats"]
+[ext_resource type="Script" path="res://scripts/postura_component.gd" id="4_postura"]
 [ext_resource type="Script" path="res://scripts/hurtbox.gd" id="5_hurtbox"]
 [ext_resource type="Script" path="res://scripts/hitbox.gd" id="6_hitbox"]
 
@@ -13,22 +13,24 @@ radius = 5.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_hurt"]
 radius = 7.0
 
-[node name="Player" type="CharacterBody2D" groups=["player"]]
-script = ExtResource("1_player")
+[node name="Enemy" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_enemy")
 
 [node name="AnimationMachine" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -8)
-script = ExtResource("4_anim")
+script = ExtResource("2_anim")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -4)
 shape = SubResource("CircleShape2D_body")
 
 [node name="StatsComponent" type="Node" parent="."]
-script = ExtResource("2_stats")
+script = ExtResource("3_stats")
 
-[node name="Camera2D" type="Camera2D" parent="."]
-script = ExtResource("3_camera")
+[node name="PosturaComponent" type="Node" parent="."]
+script = ExtResource("4_postura")
 
 [node name="Hurtbox" type="Area2D" parent="."]
 collision_layer = 4

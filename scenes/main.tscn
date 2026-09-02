@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://bsq0main0scen"]
+[gd_scene load_steps=4 format=3 uid="uid://bsq0main0scen"]
 
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://scripts/test_zone.gd" id="2_zone"]
+[ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="3_enemy"]
 
 [node name="Main" type="Node2D"]
 
@@ -10,3 +11,6 @@ script = ExtResource("2_zone")
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
 position = Vector2(320, 180)
+
+[node name="Enemy" parent="." instance=ExtResource("3_enemy")]
+position = Vector2(430, 496)
