@@ -436,8 +436,8 @@
       ],
       "priority": 24,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/balance.json: nuova sezione stats_base (velocita/difesa/evasione, non legate alla Sequenza). velocita alzata 90 -> 140 px/s (TODO aperto da US-004/005/006: a 90 ~7s per attraversare lo schermo). stats_component.gd: i 3 numeri hardcoded rimossi, configure_from_balance legge stats_base da GameData.get_balance; fallback ora const _FALLBACK unica e se GameData manca push_warning invece di partenza silenziosa. spiritualita_changed gia' aggiunto in US-017. 97 test (95 + 2: stats_base dai dati, _FALLBACK copre STAT_KEYS); i test che citavano 90 ora leggono l'atteso da balance.json (niente numero magico). validator exit 0. Il 'SCRIPT ERROR: Nonexistent float constructor' nella suite e' preesistente (verificato con git stash), non una regressione."
     },
     {
       "id": "US-025",

@@ -26,6 +26,15 @@ const STAT_KEYS: PackedStringArray = [
 ## Sequenza di partenza: 9 e' la piu' bassa, dove comincia ogni personaggio.
 const SEQUENZA_INIZIALE := 9
 
+## Valori di sola emergenza. Se un componente si configura senza che GameData
+## sia caricato non deve esplodere, ma NON sono i numeri di gioco: quelli
+## vivono in data/balance.json. Arrivare qui in partita e' un bug, per questo
+## configure_from_balance emette push_warning quando li usa.
+const _FALLBACK := {
+	"hp_max": 100.0, "spiritualita_max": 50.0,
+	"velocita": 90.0, "difesa": 0.0, "evasione": 0.0,
+}
+
 var _base: Dictionary = {}
 ## id del modificatore -> { nome_stat: delta }
 var _modifiers: Dictionary = {}
@@ -39,23 +48,35 @@ func _ready() -> void:
 		configure_from_balance(SEQUENZA_INIZIALE)
 
 
-## Valori base dalle curve di data/balance.json per una data Sequenza.
-## I fallback esistono solo perche' un componente non deve esplodere se i
-## dati non sono ancora caricati; non sono i numeri di gioco.
+## Valori base da data/balance.json: hp_max e spiritualita_max dalle curve per
+## Sequenza, velocita/difesa/evasione dalla sezione stats_base (non dipendono
+## dalla Sequenza). Se GameData non c'e' si parte dai _FALLBACK con un avviso:
+## non e' una condizione normale, i numeri di gioco stanno nei dati.
 func configure_from_balance(sequenza: int) -> void:
 	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
-	var hp_max: float = 100.0
-	var sp_max: float = 50.0
+	var hp_max: float = _FALLBACK["hp_max"]
+	var sp_max: float = _FALLBACK["spiritualita_max"]
+	var velocita: float = _FALLBACK["velocita"]
+	var difesa: float = _FALLBACK["difesa"]
+	var evasione: float = _FALLBACK["evasione"]
+
 	if gd != null:
 		hp_max = gd.call("curve_value", "hp_curve", sequenza, hp_max)
 		sp_max = gd.call("curve_value", "spiritualita_curve", sequenza, sp_max)
+		var sb: Dictionary = gd.call("get_balance", "stats_base")
+		velocita = float(sb.get("velocita", velocita))
+		difesa = float(sb.get("difesa", difesa))
+		evasione = float(sb.get("evasione", evasione))
+	else:
+		push_warning("[StatsComponent] GameData assente: statistiche dai valori "
+			+ "di emergenza, non da data/balance.json.")
 
 	_base = {
 		"hp_max": hp_max,
 		"spiritualita_max": sp_max,
-		"velocita": 90.0,
-		"difesa": 0.0,
-		"evasione": 0.0,
+		"velocita": velocita,
+		"difesa": difesa,
+		"evasione": evasione,
 	}
 	_hp = hp_max
 	_spiritualita = sp_max

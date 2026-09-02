@@ -12,6 +12,14 @@ func _make() -> Stats:
 	return s
 
 
+## Valore atteso di una stat di partenza, letto dagli stessi dati che il
+## componente usa: se balance.json cambia, il test cambia con lui.
+func _atteso(stat: String) -> float:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	var sb: Dictionary = gd.call("get_balance", "stats_base")
+	return float(sb.get(stat, 0.0))
+
+
 func test_baseline_viene_dai_dati() -> void:
 	var s: Stats = _make()
 	# hp_curve["9"] = 100, spiritualita_curve["9"] = 50 in data/balance.json.
@@ -30,11 +38,28 @@ func test_tutte_le_stat_richieste_esistono() -> void:
 	s.free()
 
 
+func test_stats_base_vengono_dai_dati() -> void:
+	# velocita/difesa/evasione non sono piu' hardcoded: la base deve
+	# combaciare con data/balance.json stats_base.
+	var s: Stats = _make()
+	assert_almost_eq(s.get_base("velocita"), _atteso("velocita"), "velocita base dai dati")
+	assert_almost_eq(s.get_base("difesa"), _atteso("difesa"), "difesa base dai dati")
+	assert_almost_eq(s.get_base("evasione"), _atteso("evasione"), "evasione base dai dati")
+	s.free()
+
+
+func test_fallback_copre_ogni_stat() -> void:
+	# Se GameData manca si parte dai _FALLBACK: devono coprire ogni STAT_KEYS,
+	# altrimenti un avvio senza dati lascerebbe una stat a zero in silenzio.
+	for key in Stats.STAT_KEYS:
+		assert_true(Stats._FALLBACK.has(key), "fallback copre '%s'" % key)
+
+
 func test_applicazione_di_un_modificatore() -> void:
 	var s: Stats = _make()
 	s.apply_modifier("buff_prova", {"hp_max": 50.0, "velocita": 10.0})
 	assert_almost_eq(s.get_stat("hp_max"), 150.0, "hp_max con modificatore")
-	assert_almost_eq(s.get_stat("velocita"), 100.0, "velocita con modificatore")
+	assert_almost_eq(s.get_stat("velocita"), _atteso("velocita") + 10.0, "velocita con modificatore")
 	assert_true(s.has_modifier("buff_prova"), "modificatore registrato")
 	# La base non e' stata toccata: il modificatore e' un layer sopra.
 	assert_almost_eq(s.get_base("hp_max"), 100.0, "base intatta")
@@ -136,5 +161,5 @@ func test_clear_modifiers() -> void:
 	s.apply_modifier("b", {"velocita": 20.0})
 	s.clear_modifiers()
 	assert_eq(s.modifier_ids().size(), 0, "nessun modificatore residuo")
-	assert_almost_eq(s.get_stat("velocita"), 90.0, "velocita tornata alla base")
+	assert_almost_eq(s.get_stat("velocita"), _atteso("velocita"), "velocita tornata alla base")
 	s.free()

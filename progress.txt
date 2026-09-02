@@ -994,3 +994,28 @@ sezione test aggiornata.
 - Fase 1: 21/26 story originali + tutte le 5 di risanamento ancora aperte
   (US-022..026). Mancano US-020 (tell sonoro nemici) e US-026 (CI, P2).
 - Prossima storia: US-020 (tell sonoro degli attacchi nemici).
+
+[2026-09-02] US-024 — Stats di partenza interamente da balance.json
+
+- Cosa fatto:
+  - data/balance.json: nuova sezione "stats_base" con velocita/difesa/evasione.
+    Non dipendono dalla Sequenza (hp_max e spiritualita_max si', quelli
+    restano sulle curve). velocita ALZATA da 90 a 140 px/s: a 90 servivano
+    ~7s per attraversare i 640px dello schermo, lento — era il TODO lasciato
+    aperto da US-004/005/006. PLAUSIBILE, non bilanciato.
+  - scripts/stats_component.gd: i tre numeri hardcoded (90/0/0, ex riga ~55-57)
+    RIMOSSI. configure_from_balance legge stats_base da GameData.get_balance.
+    I fallback sono ora una const _FALLBACK unica, e se GameData manca il
+    metodo emette push_warning invece di partire zitto con valori plausibili
+    (criterio esplicito).
+  - Segnale spiritualita_changed: gia' aggiunto in US-017 (lo chiedeva anche
+    US-024). Nessuna modifica, criterio gia' soddisfatto.
+- Come verificato: 97 test headless (95 + 2 nuovi in test_stats_component:
+  stats_base viene dai dati, _FALLBACK copre ogni STAT_KEYS). I test che
+  citavano velocita 90 ora leggono l'atteso da balance.json via GameData
+  (_atteso()), non piu' numero magico. validator exit 0 (8 warning
+  informativi preesistenti).
+- Note: il "SCRIPT ERROR: Nonexistent 'float' constructor" nel log della
+  suite e' PREESISTENTE (verificato con git stash), non una regressione:
+  e' un test che sonda di proposito un path con dato assente.
+- Prossima storia: US-022 (loader JSON robusto ai dati corrotti).
