@@ -134,6 +134,13 @@ L'audio NON e' un non-goal: e' un canale informativo del gioco (tell sonori,
 sussurri della follia, percezione per Sequenza) e ha il suo sistema
 data-driven in `data/audio.json`. Il doppiaggio si', quello resta fuori.
 
+## Repo
+
+https://github.com/YasserOudabashi/Sequenza (privata)
+
+Repo dedicata a questo progetto. Va aggiunta alla tabella "Repository che uso"
+in ~/.claude/CLAUDE.md, come prescrive quel file per ogni repo nuova.
+
 ## Nota IP
 
 Il sistema di riferimento è opera protetta di terzi. Progetto personale, non

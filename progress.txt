@@ -224,3 +224,22 @@ Formato di ogni sezione:
   confermare con l'utente. Richiederebbero python-docx.
 
 - Prossima storia: US-001.
+
+[SETUP-7] Repo dedicata: da IvanOstroumov/NightOwl a YasserOudabashi/Sequenza
+
+- Cosa fatto: il progetto era agganciato a IvanOstroumov/NightOwl, che NON e'
+  un repo dell'utente. Spostato su una repo dedicata, privata:
+  https://github.com/YasserOudabashi/Sequenza
+  Cambiato il remote origin e registrata la repo in CLAUDE.md (sezione Repo),
+  come prescrive il template di /nuovo-progetto.
+- Come verificato: git remote -v punta a Sequenza.git; validate_data.py esce 0.
+- Note ambiente: la repo NON e' stata creata da questa sessione e i commit NON
+  sono stati pushati. La GitHub App di Claude non e' installata sull'account
+  YasserOudabashi: da qui la lettura dei repo dell'utente da 403, il push da
+  403 e create_repository da "Resource not accessible by integration". Leggibile
+  era solo NightOwl, perche' pubblico e agganciato alla sessione.
+  Creazione della repo e push vanno fatti a mano dal PC dell'utente; la storia
+  completa e' stata consegnata come git bundle.
+  Da fare anche: aggiungere Sequenza alla tabella "Repository che uso" in
+  ~/.claude/CLAUDE.md.
+- Prossima storia: US-001.
