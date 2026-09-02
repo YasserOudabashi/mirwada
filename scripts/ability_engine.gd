@@ -21,7 +21,13 @@ const ERR_COOLDOWN := "in_cooldown"
 const ERR_SPIRITUALITA := "spiritualita_insufficiente"
 const ERR_NO_STATS := "caster_senza_stats"
 
+## Chiave "<instance_id>:<ability_id>" -> istante di fine in ms. Le voci dei
+## caster non piu' validi o gia' scadute vengono rimosse da sweep_cooldowns():
+## senza, una partita lunga accumulerebbe una voce per ogni entita' morta.
 var _cooldowns: Dictionary = {}
+const _SWEEP_OGNI_MS := 5000
+var _prossimo_sweep_ms: int = 0
+
 var _handlers: Dictionary = {}
 ## Effetti a tempo in corso. Una lista processata in _process invece di
 ## await su SceneTreeTimer: gli await lasciano timer appesi se la partita
@@ -148,6 +154,21 @@ func cooldown_left(caster: Node, ability_id: String) -> float:
 
 func clear_cooldowns() -> void:
 	_cooldowns.clear()
+
+
+func cooldown_entries() -> int:
+	return _cooldowns.size()
+
+
+## Rimuove le voci scadute e quelle dei caster non piu' esistenti. Pubblica:
+## i test la chiamano invece di aspettare l'intervallo di _process.
+func sweep_cooldowns() -> void:
+	var now: int = Time.get_ticks_msec()
+	for key in _cooldowns.keys():
+		var scaduta: bool = now >= int(_cooldowns[key])
+		var iid: int = str(key).get_slice(":", 0).to_int()
+		if scaduta or not is_instance_id_valid(iid):
+			_cooldowns.erase(key)
 
 
 func _start_cooldown(caster: Node, ability_id: String, seconds: float) -> void:
@@ -306,6 +327,10 @@ func _facing(origin: Node2D) -> Vector2:
 func _process(delta: float) -> void:
 	if not _pending.is_empty():
 		tick_effects(delta)
+	var now: int = Time.get_ticks_msec()
+	if now >= _prossimo_sweep_ms:
+		_prossimo_sweep_ms = now + _SWEEP_OGNI_MS
+		sweep_cooldowns()
 
 
 ## Avanza gli effetti a tempo. Pubblica di proposito: i test la chiamano con

@@ -210,6 +210,8 @@ func files_loaded() -> int:
 # --- Caricamento -------------------------------------------------------------
 
 func _load_pathways() -> void:
+	var visti_p: Dictionary = {}
+	var visti_s: Dictionary = {}
 	for path in _json_files_in(DIR_PATHWAYS):
 		var doc: Dictionary = _read_json(path)
 		if doc.is_empty():
@@ -219,6 +221,7 @@ func _load_pathways() -> void:
 			_fail(path, "manca il campo 'id'")
 			continue
 		_upsert(_pathways, pid, doc)
+		visti_p[pid] = true
 
 		for entry in _object_list(doc, "sequences", path):
 			var seq: Dictionary = entry
@@ -227,9 +230,13 @@ func _load_pathways() -> void:
 				_fail(path, "una sequenza non ha 'id'")
 				continue
 			_upsert(_sequences, sid, seq)
+			visti_s[sid] = true
+	_prune(_pathways, visti_p)
+	_prune(_sequences, visti_s)
 
 
 func _load_abilities() -> void:
+	var visti: Dictionary = {}
 	for path in _json_files_in(DIR_ABILITIES):
 		var doc: Dictionary = _read_json(path)
 		if doc.is_empty():
@@ -241,9 +248,12 @@ func _load_abilities() -> void:
 				_fail(path, "un'abilita' non ha 'id'")
 				continue
 			_upsert(_abilities, aid, ability)
+			visti[aid] = true
+	_prune(_abilities, visti)
 
 
 func _load_synergies() -> void:
+	var visti: Dictionary = {}
 	for path in _json_files_in(DIR_SYNERGIES):
 		var doc: Dictionary = _read_json(path)
 		if doc.is_empty():
@@ -255,6 +265,8 @@ func _load_synergies() -> void:
 				_fail(path, "una sinergia non ha 'id'")
 				continue
 			_upsert(_synergies, sid, syn)
+			visti[sid] = true
+	_prune(_synergies, visti)
 
 
 func _load_single(path: String, key: String, target: Dictionary, key_type: int) -> void:
@@ -283,6 +295,17 @@ func _upsert(index: Dictionary, id: String, fresh: Dictionary) -> void:
 		existing.merge(fresh, true)
 	else:
 		index[id] = fresh
+
+
+## Toglie dall'indice le voci che questo caricamento NON ha visto: un id
+## cancellato o rinominato nei JSON sparisce dopo un reload invece di restare
+## in memoria per sempre. Le voci ancora presenti non si toccano — _upsert ne
+## ha gia' aggiornato il contenuto sul posto, quindi i riferimenti tenuti dai
+## sistemi restano validi (il criterio di US-003).
+func _prune(index: Dictionary, visti: Dictionary) -> void:
+	for id in index.keys():
+		if not visti.has(id):
+			index.erase(id)
 
 
 func _json_files_in(dir_path: String) -> PackedStringArray:

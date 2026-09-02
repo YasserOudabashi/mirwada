@@ -316,3 +316,29 @@ func test_heal_con_bersaglio_non_self_non_cura_il_caster() -> void:
 		c, s, "test_ab")
 	assert_almost_eq(float(s.get("hp")), 65.0, "cura su self applicata")
 	_cleanup(c)
+
+
+func test_cooldown_di_caster_liberato_viene_purgato() -> void:
+	# US-023: _cooldowns non deve accumulare una voce per ogni entita' morta.
+	var e: Node = _engine()
+	e.call("clear_cooldowns")
+	var c: Node2D = _caster()
+	e.call("execute", "fool_velo_illusorio", c)
+	assert_eq(e.call("cooldown_entries"), 1, "una voce di cooldown")
+
+	_cleanup(c)  # il caster viene liberato mentre il suo cooldown e' attivo
+	e.call("sweep_cooldowns")
+	assert_eq(e.call("cooldown_entries"), 0, "voce del caster liberato rimossa")
+
+
+func test_cooldown_scaduto_viene_purgato_anche_con_caster_vivo() -> void:
+	var e: Node = _engine()
+	e.call("clear_cooldowns")
+	var vivo := Node.new()
+	Engine.get_main_loop().root.add_child(vivo)
+	# Voce con istante di fine nel passato remoto: scaduta, caster ancora vivo.
+	var cds: Dictionary = e.get("_cooldowns")
+	cds["%d:vecchia" % vivo.get_instance_id()] = 1
+	e.call("sweep_cooldowns")
+	assert_eq(e.call("cooldown_entries"), 0, "cooldown scaduto rimosso")
+	vivo.free()

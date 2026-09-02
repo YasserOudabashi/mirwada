@@ -64,3 +64,22 @@ func test_dati_ancora_integri_dopo_reload() -> void:
 	assert_true(gd.call("has_tag", "spirito"), "vocabolario dei tag dopo il reload")
 	assert_false((gd.call("get_primitive", "projectile") as Dictionary).is_empty(),
 		"registro delle primitive dopo il reload")
+
+
+func test_id_rimosso_dai_dati_sparisce_dopo_reload() -> void:
+	# US-023: un id che non e' piu' nei JSON non deve restare in memoria dopo
+	# un F5. Si simula iniettando un id fantasma nell'indice e ricaricando.
+	var gd: Node = _data()
+	var prima: int = gd.call("ability_count")
+	var abilities: Dictionary = gd.get("_abilities")
+	abilities["_fantasma_test"] = {"id": "_fantasma_test"}
+	assert_false((gd.call("get_ability", "_fantasma_test") as Dictionary).is_empty(),
+		"id fantasma presente prima del reload")
+
+	gd.call("reload")
+
+	assert_true((gd.call("get_ability", "_fantasma_test") as Dictionary).is_empty(),
+		"id fantasma potato: non era nei dati")
+	# E i dati veri sono intatti: stesso conteggio di prima dell'iniezione.
+	assert_eq(gd.call("ability_count"), prima, "le abilita' vere restano tutte")
+	assert_eq((gd.call("last_errors") as PackedStringArray).size(), 0, "nessun errore")

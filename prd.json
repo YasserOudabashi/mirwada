@@ -419,8 +419,8 @@
       ],
       "priority": 23,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ability_engine.gd: sweep_cooldowns() (pubblica, chiamata da _process ogni 5s) rimuove le voci di _cooldowns scadute o con caster non piu' valido (is_instance_id_valid sull'id nella chiave). cooldown_entries() per i test. game_data.gd: _prune(index, visti) - ogni _load_* raccoglie gli id visti su disco, _prune toglie dall'indice quelli spariti dai JSON: un id rinominato non resta in memoria dopo F5. Le voci sopravvissute non si toccano (_upsert aggiorna sul posto -> identita' dei riferimenti intatta, US-003). 107 test (104 + 3: 2 cooldown in test_ability_engine, 1 id fantasma in test_hot_reload); test_reload_conserva_l_identita ancora verde. validator exit 0."
     },
     {
       "id": "US-024",

@@ -1065,3 +1065,29 @@ sezione test aggiornata.
   _errors del singleton. I test ability_engine iniettano in _abilities via
   gd.get("_abilities") e ripuliscono con erase().
 - Prossima storia: US-023 (pulizia cooldown e indici).
+
+[2026-09-02] US-023 — Pulizia di cooldown e indici
+
+- Cosa fatto:
+  - scripts/ability_engine.gd: _cooldowns aveva una voce per ogni coppia
+    (caster, abilita') e non la toglieva mai -> una partita lunga accumulava
+    una voce per ogni entita' morta. sweep_cooldowns() (pubblica) rimuove le
+    voci scadute e quelle il cui caster non e' piu' valido
+    (is_instance_id_valid sull'id incapsulato nella chiave). Chiamata da
+    _process ogni _SWEEP_OGNI_MS (5s). cooldown_entries() accessorio per i test.
+  - scripts/game_data.gd: _prune(index, visti). Ogni _load_* raccoglie in un
+    Dictionary gli id effettivamente visti su disco, poi _prune toglie
+    dall'indice quelli non piu' presenti: un id cancellato/rinominato nei
+    JSON SPARISCE dopo F5 invece di restare in memoria. Le voci ancora
+    presenti NON si toccano: _upsert ne aggiorna il contenuto sul posto,
+    quindi l'identita' dei riferimenti tenuti dai sistemi resta (US-003).
+    _load_single fa gia' clear()+merge, non serve prune.
+- Come verificato: 107 test headless (104 + 3):
+  * test_ability_engine: cooldown di caster liberato purgato; cooldown
+    scaduto purgato anche con caster vivo.
+  * test_hot_reload: id fantasma iniettato nell'indice sparisce dopo reload,
+    i dati veri restano (stesso ability_count di prima dell'iniezione),
+    zero errori. test_reload_conserva_l_identita_dei_riferimenti ancora
+    verde: il prune non rompe l'identita' delle voci sopravvissute.
+  validator exit 0.
+- Prossima storia: US-025 (test onesti e non fragili).
