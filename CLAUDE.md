@@ -55,8 +55,8 @@ python tools/generate_placeholders.py
 # Rigenera la spina dorsale dei pathway (idempotente, preserva il lavoro fatto)
 python tools/generate_pathways.py
 
-# Test headless (da completare in US-016)
-# godot --headless --script tests/run_tests.gd
+# Test headless — esce 0 se tutto passa
+godot --headless --path . --script res://tests/run_tests.gd
 ```
 
 ## Struttura
@@ -90,7 +90,7 @@ progress.txt      memoria tra le iterazioni
 
 ## Fasi
 
-Fase corrente: **1 — Fondamenta** (21 story, vedi `prd.json`).
+Fase corrente: **1 — Fondamenta** (21 story, 6 chiuse, vedi `prd.json`).
 Le fasi 2-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
 genera con `/prd` **solo quando la precedente è chiusa**.
 

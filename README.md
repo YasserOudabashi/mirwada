@@ -6,8 +6,10 @@ Sequenze: 10 Pathway attivi (4 gruppi completi), 10 Sequenze ciascuno,
 
 ## Stato
 
-Fase 1 — Fondamenta. La spina dorsale dei dati e' completa; il codice di gioco
-non e' ancora iniziato.
+Fase 1 — Fondamenta, 6 story su 21 chiuse. Spina dorsale dei dati completa;
+caricatore, hot-reload, statistiche e motore delle abilita' funzionanti e
+coperti da 41 test headless. Movimento, camera e combattimento non ancora
+iniziati: richiedono verifica a schermo.
 
 ## Setup
 
@@ -15,6 +17,7 @@ Richiede Godot 4.x e Python 3 (solo per gli strumenti di dati).
 
 ```bash
 python tools/validate_data.py      # valida tutti i dati, esce 0 se ok
+godot --headless --path . --script res://tests/run_tests.gd   # test, esce 0 se ok
 python tools/generate_pathways.py  # rigenera la spina dorsale dei 10 pathway
 ```
 

@@ -268,3 +268,52 @@ Formato di ogni sezione:
     resa visiva della pixel art (nitidezza, scaling a interi) va confermata
     aprendo il progetto nell'editor.
 - Prossima storia: US-002.
+
+[2026-09-02] US-002, US-003, US-007, US-012, US-013
+
+- Cosa fatto: la spina dorsale del codice data-driven, cinque story.
+  US-002 GameData (autoload): carica 24 file e li espone come indici piatti
+    per id. Id ignoto -> {}, mai null, mai crash. Errori raccolti e stampati
+    con riga e messaggio del parser: mai fallimento silenzioso.
+  US-003 hot-reload con F5 in debug. _upsert aggiorna i Dictionary SUL POSTO,
+    quindi chi si e' tenuto un riferimento vede i valori nuovi.
+  US-007 StatsComponent: base + modificatori per id, valori iniziali dalle
+    curve di balance.json (non numeri nel codice).
+  US-012 AbilityEngine: cooldown e costo prima di eseguire, poi dispaccio su
+    tabella tipo->Callable. + primitiva projectile con nodo vero.
+  US-013 melee_arc, buff_stat, heal, dash.
+
+- Come verificato: 41 test headless, tutti passano, exit 0, zero leak.
+  `godot --headless --path . --script res://tests/run_tests.gd`
+  validate_data.py esce 0.
+
+- QUATTRO TRAPPOLE TROVATE ESEGUENDO, non leggendo. Valgono per tutte le
+  story successive, tenerle a mente:
+  1. Il progetto tratta come ERRORE l'inferenza di tipo da Variant:
+     `var x := dict[key]` non compila. Sempre il tipo esplicito.
+  2. NIENTE class_name sugli script che i test caricano: risolvere una
+     classe globale da uno script caricato a runtime dal runner manda
+     Godot 4.3 in STALLO, senza alcun messaggio. Usare preload.
+  3. Assegnare un'istanza gia' liberata a una variabile tipata Node e' un
+     errore che interrompe il ciclo a meta'. Leggere come Variant,
+     validare con is_instance_valid, poi tipare.
+  4. Gli autoload NON esistono dentro _init() di uno SceneTree script:
+     il runner aspetta un frame prima di partire.
+
+- DECISIONE: le scadenze degli effetti sono una lista processata in
+  _process, non await su SceneTreeTimer. Gli await lasciavano timer orfani
+  a fine suite e non erano testabili. tick_effects(delta) e' pubblica
+  apposta: i test simulano 8 secondi invece di aspettarli.
+
+- BUCO NEL PRD, da decidere: il criterio di US-013 cita fool_velo_illusorio,
+  che compone illusion + buff_stat, ma illusion non e' fra le 5 primitive
+  di questa fase. Risolto facendo distinguere al motore "non ancora
+  implementata" (avviso, prosegue) da "fuori registro" (errore). Il
+  criterio come scritto restava pero' ambiguo.
+
+- NON VERIFICATO A SCHERMO: sessione headless, nessuna finestra. Restano da
+  confermare nell'editor la resa della pixel art (US-001) e la pressione
+  fisica di F5 (US-003).
+
+- Prossima storia: US-004. Richiede verifica a schermo: farla con l'editor
+  aperto, non alla cieca.
