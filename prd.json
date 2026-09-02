@@ -67,8 +67,8 @@
       ],
       "priority": 4,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "scripts/player.gd + scenes/player.tscn + scenes/main.tscn. CharacterBody2D con Input.get_vector (diagonale gia' normalizzata), move_toward per accelerazione e attrito: mai velocity istantanea. Velocita' max da StatsComponent (balance.json); ACCELERAZIONE/ATTRITO costanti, il feel si tara con US-021. Sprite placeholder a 4 direzioni via region_rect sullo spritesheet, riga per direzione secondo animations.json.convenzioni.direzioni; obliquo riusa l'orizzontale. project.godot: sezione [input] con move_* su WASD (physical_keycode) + frecce, aggiunta a mano per non perdere i commenti (ProjectSettings.save() li cancella). VERIFICA A SCHERMO (finestra reale): screenshot per direzione, la tacca del placeholder segue l'input nelle 4 direzioni, velocity torna a 0 da fermo, nessuna deriva sugli assi opposti. 43/43 test, validator exit 0. APERTO: velocita' base 90 px/s troppo lenta, va alzata in US-024 quando diventa un dato."
     },
     {
       "id": "US-005",

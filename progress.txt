@@ -436,3 +436,61 @@ Sessione grossa su richiesta dell'utente: analisi completa del progetto
   la verifica a schermo resta mai fatta (US-004 con l'editor aperto).
 - Prossima storia: US-004 (invariata). Le story di risanamento US-022..026
   possono andare in coda alla fase o intrecciarsi (US-022 prima di US-015).
+
+[2026-09-02] US-004 — Movimento del giocatore a 8 direzioni
+
+- Cosa fatto:
+  - scripts/player.gd (CharacterBody2D): Input.get_vector sui 4 assi
+    move_left/right/up/down, che normalizza gia' la diagonale. Velocita' verso
+    il target con move_toward (accelerazione), verso zero con move_toward
+    (attrito): mai assegnazione diretta di velocity, quindi non e' istantanea.
+    ACCELERAZIONE/ATTRITO sono costanti dichiarate — il "feel" si tara con
+    US-021; la velocita' MAX viene da StatsComponent.get_stat("velocita"),
+    cioe' da balance.json.
+  - scenes/player.tscn: Player + Sprite2D (offset y -8, region_enabled) +
+    CollisionShape2D (cerchio r5, y -4, vicino ai piedi = origine
+    "piedi_centro" di animations.json) + StatsComponent.
+  - Sprite placeholder a 4 direzioni: _aggiorna_sprite() sceglie riga dello
+    spritesheet per direzione (down/up/left/right, ordine di
+    animations.json.convenzioni.direzioni) e ciclo di frame walk(6)/idle(4)
+    via region_rect. In obliquo vince l'orizzontale: nessuno sprite
+    diagonale, come da convenzione. E' throwaway: US-021 lo sostituisce con
+    la macchina data-driven che legge frames/fps dal JSON.
+  - project.godot: nuova sezione [input] con move_* su WASD (physical_keycode,
+    ok su tastiere non-QWERTY) + frecce. Aggiunta a mano preservando i
+    commenti: ProjectSettings.save() da script li avrebbe cancellati tutti.
+  - scenes/main.tscn: istanza di Player al centro del viewport (320,180).
+    Nessuna camera: a viewport 640x360 il centro e' gia' inquadrato. La
+    camera e' US-005.
+
+- Come verificato A SCHERMO (finestra reale, NON headless): script di verifica
+  usa e getta che carica main.tscn, preme ogni direzione ~0.7s e salva uno
+  screenshot per direzione. Osservato:
+  * la tacca di direzione del placeholder punta a destra/su/sinistra/giu'
+    coerentemente con l'input -> lo sguardo a 4 direzioni funziona;
+  * da fermo velocity torna a (0,0) -> l'attrito porta a zero;
+  * partito da (320,180), dopo right->up->left->down chiuso a (299,181.5):
+    gli assi si compensano, nessuna deriva anomala.
+  Screenshot in user://us004/ (app_userdata/Mirwada), non versionati.
+
+- Regressione: godot --headless --script res://tests/run_tests.gd -> 43/43.
+  python tools/validate_data.py -> exit 0 (8 warning informativi preesistenti).
+
+- Note ambiente:
+  - Eseguibile Godot: ./Godot_v4.3-stable_win64.exe/Godot_v4.3-stable_win64_console.exe
+    (la variante _console.exe stampa su stdout; l'altra e' muta). Cartella
+    gia' gitignorata.
+  - Screenshot da CLI: serve una FINESTRA. get_viewport().get_texture() e'
+    vuoto in --headless. Lo script di verifica gira senza --headless.
+  - ProjectSettings.save() riscrive project.godot da zero: cancella TUTTI i
+    commenti e omette i valori uguali al default (window/stretch/aspect="keep"
+    era sparito). Per toccare project.godot: Edit a mano, non lo script.
+
+- Resta aperto:
+  - velocita' base = 90 px/s (fallback hardcoded in stats_component.gd):
+    ~7s per attraversare lo schermo, troppo lenta. E' esattamente il numero
+    che US-024 deve spostare in balance.json — alzarlo li'.
+  - ACCELERAZIONE 1400 su vel_max 90 = spunto quasi istantaneo. Rivedere
+    quando la velocita' sara' un dato e ci sara' un tilemap per giudicare
+    il feel (dopo US-006).
+- Prossima storia: US-005 (camera con smoothing e limiti).
