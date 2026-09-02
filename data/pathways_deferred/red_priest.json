@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "id": "red_priest",
+  "name": "Red Priest",
+  "name_i18n": "pathway.red_priest",
+  "group": "calamity_of_destruction",
+  "god_title": "Red Priest",
+  "from_outer_deity": false,
+  "gameplay_verb": "Provocare, incendiare e orchestrare disastri artificiali",
+  "tags": [
+    "fuoco",
+    "guerra",
+    "trappola",
+    "provocazione"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "red_priest_9",
+      "name": "Hunter",
+      "name_i18n": "sequence.red_priest.9",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [],
+        "formula_id": "formula_red_priest_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "red_priest_8",
+      "name": "Provoker",
+      "name_i18n": "sequence.red_priest.8",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [],
+        "formula_id": "formula_red_priest_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "red_priest_7",
+      "name": "Pyromaniac",
+      "name_i18n": "sequence.red_priest.7",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [],
+        "formula_id": "formula_red_priest_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "red_priest_6",
+      "name": "Conspirer",
+      "name_i18n": "sequence.red_priest.6",
+      "tier": "mid",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [],
+        "formula_id": "formula_red_priest_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "red_priest_5",
+      "name": "Reaper",
+      "name_i18n": "sequence.red_priest.5",
+      "tier": "mid",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [],
+        "formula_id": "formula_red_priest_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "red_priest_4",
+      "name": "Iron-Blooded Knight",
+      "name_i18n": "sequence.red_priest.4",
+      "tier": "saint",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [],
+        "formula_id": "formula_red_priest_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "red_priest_3",
+      "name": "War Bishop",
+      "name_i18n": "sequence.red_priest.3",
+      "tier": "saint",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [],
+        "formula_id": "formula_red_priest_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "red_priest_2",
+      "name": "Weather Warlock",
+      "name_i18n": "sequence.red_priest.2",
+      "tier": "angel",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [],
+        "formula_id": "formula_red_priest_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "red_priest_1",
+      "name": "Conqueror",
+      "name_i18n": "sequence.red_priest.1",
+      "tier": "angel",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [],
+        "formula_id": "formula_red_priest_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "red_priest_0",
+      "name": "Red Priest",
+      "name_i18n": "sequence.red_priest.0",
+      "tier": "god",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [],
+        "formula_id": "formula_red_priest_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    }
+  ]
+}

@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "id": "door",
+  "name": "Door",
+  "name_i18n": "pathway.door",
+  "group": "lord_of_mysteries",
+  "god_title": "Door",
+  "from_outer_deity": false,
+  "gameplay_verb": "Attraversare lo spazio e replicare i poteri osservati",
+  "tags": [
+    "spazio",
+    "viaggio",
+    "stella",
+    "occultamento"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "door_9",
+      "name": "Apprentice",
+      "name_i18n": "sequence.door.9",
+      "tier": "low",
+      "concept": "Teletrasporti brevi a vista; apre serrature mistiche e passaggi bloccati.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [],
+        "formula_id": "formula_door_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "door_8",
+      "name": "Trickmaster",
+      "name_i18n": "sequence.door.8",
+      "tier": "low",
+      "concept": "Incantesimi di fuga e scambio di posizione con un bersaglio.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [],
+        "formula_id": "formula_door_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "door_7",
+      "name": "Astrologer",
+      "name_i18n": "sequence.door.7",
+      "tier": "low",
+      "concept": "Divinazione stellare che rivela percorsi nascosti sulla mappa.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [],
+        "formula_id": "formula_door_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "door_6",
+      "name": "Scribe",
+      "name_i18n": "sequence.door.6",
+      "tier": "mid",
+      "concept": "Registra un'abilita' osservata e la riproduce una volta.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [],
+        "formula_id": "formula_door_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "door_5",
+      "name": "Traveler",
+      "name_i18n": "sequence.door.5",
+      "tier": "mid",
+      "concept": "Viaggio nel mondo spirituale come scorciatoia tra zone lontane.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [],
+        "formula_id": "formula_door_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "door_4",
+      "name": "Secrets Sorcerer",
+      "name_i18n": "sequence.door.4",
+      "tier": "saint",
+      "concept": "Occultamento totale: sfugge al rilevamento anche mistico.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [],
+        "formula_id": "formula_door_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "door_3",
+      "name": "Wanderer",
+      "name_i18n": "sequence.door.3",
+      "tier": "saint",
+      "concept": "Teletrasporto a lunga distanza portando con se' alleati e pet.",
+      "stat_modifiers": {},
+      "abilities": [
+        "door_viaggio_lungo"
+      ],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [],
+        "formula_id": "formula_door_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "door_2",
+      "name": "Planeswalker",
+      "name_i18n": "sequence.door.2",
+      "tier": "angel",
+      "concept": "Apre porte stabili tra piani; replica abilita' che conosce senza registrarle.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [],
+        "formula_id": "formula_door_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "door_1",
+      "name": "Key of Stars",
+      "name_i18n": "sequence.door.1",
+      "tier": "angel",
+      "concept": "Chiavi che aprono qualunque cosa, compresi luoghi che non hanno una porta.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [],
+        "formula_id": "formula_door_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "door_0",
+      "name": "Door",
+      "name_i18n": "sequence.door.0",
+      "tier": "god",
+      "concept": "Passaggio senza limiti.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [],
+        "formula_id": "formula_door_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    }
+  ]
+}

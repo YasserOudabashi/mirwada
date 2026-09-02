@@ -1,0 +1,14 @@
+# Godot
+.godot/
+*.import
+export_presets.cfg
+build/
+export/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db

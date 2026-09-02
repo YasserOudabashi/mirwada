@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "id": "darkness",
+  "name": "Darkness",
+  "name_i18n": "pathway.darkness",
+  "group": "eternal_darkness",
+  "god_title": "Darkness",
+  "from_outer_deity": false,
+  "gameplay_verb": "Dominare la notte, le anime e il sonno; infliggere sfortuna",
+  "tags": [
+    "notte",
+    "anima",
+    "sonno",
+    "occultamento"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "darkness_9",
+      "name": "Sleepless",
+      "name_i18n": "sequence.darkness.9",
+      "tier": "low",
+      "concept": "Veglia perpetua: visione notturna, immunita' al sonno, forza al buio.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [],
+        "formula_id": "formula_darkness_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "darkness_8",
+      "name": "Midnight Poet",
+      "name_i18n": "sequence.darkness.8",
+      "tier": "low",
+      "concept": "Parole che deprimono desideri e umore nemico, riducendo aggressivita'.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [],
+        "formula_id": "formula_darkness_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "darkness_7",
+      "name": "Nightmare",
+      "name_i18n": "sequence.darkness.7",
+      "tier": "low",
+      "concept": "Entra negli incubi e infligge paura che disorienta i controlli nemici.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [],
+        "formula_id": "formula_darkness_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "darkness_6",
+      "name": "Soul Assurer",
+      "name_i18n": "sequence.darkness.6",
+      "tier": "mid",
+      "concept": "Pacifica anime inquiete e cura il danno spirituale degli alleati.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [],
+        "formula_id": "formula_darkness_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "darkness_5",
+      "name": "Spirit Warlock",
+      "name_i18n": "sequence.darkness.5",
+      "tier": "mid",
+      "concept": "Ospita spiriti maligni nel corpo e li scaglia come proiettili viventi.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [],
+        "formula_id": "formula_darkness_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "darkness_4",
+      "name": "Nightwatcher",
+      "name_i18n": "sequence.darkness.4",
+      "tier": "saint",
+      "concept": "Dominio della notte: statistiche raddoppiate al buio, oscurita' creabile.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [],
+        "formula_id": "formula_darkness_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "darkness_3",
+      "name": "Horror Bishop",
+      "name_i18n": "sequence.darkness.3",
+      "tier": "saint",
+      "concept": "Aura di terrore che rompe le formazioni nemiche e controlla il buio.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [],
+        "formula_id": "formula_darkness_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "darkness_2",
+      "name": "Servant of Concealment",
+      "name_i18n": "sequence.darkness.2",
+      "tier": "angel",
+      "concept": "Cancella cose e persone dalla percezione altrui, anche in pieno giorno.",
+      "stat_modifiers": {},
+      "abilities": [
+        "darkness_cancellazione"
+      ],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [],
+        "formula_id": "formula_darkness_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "darkness_1",
+      "name": "Knight of Misfortune",
+      "name_i18n": "sequence.darkness.1",
+      "tier": "angel",
+      "concept": "Infligge sfortuna cronica: i nemici falliscono, inciampano, si feriscono da soli.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [],
+        "formula_id": "formula_darkness_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "darkness_0",
+      "name": "Darkness",
+      "name_i18n": "sequence.darkness.0",
+      "tier": "god",
+      "concept": "La notte come dominio.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [],
+        "formula_id": "formula_darkness_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    }
+  ]
+}

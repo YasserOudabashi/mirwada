@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "_comment": "Abilita' del Pathway paragon.",
+  "abilities": [
+    {
+      "schema_version": 1,
+      "id": "paragon_costrutto_vivo",
+      "name_i18n": "ability.paragon.paragon_costrutto_vivo",
+      "sequence_id": "paragon_2",
+      "costo_spiritualita": 55,
+      "cooldown": 120.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "costrutto_animato",
+          "quantita": 2,
+          "durata": -1,
+          "comportamento": "difensivo"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "qualita_crafting",
+          "valore": 0.25,
+          "durata": -1,
+          "moltiplicativo": false
+        }
+      ],
+      "tag_sinergia": [
+        "scienza",
+        "invenzione",
+        "evocazione",
+        "crafting"
+      ],
+      "note": "STRESS TEST. Stessa primitiva summon di Death con parametri diversi: la prova che il registro chiuso funziona."
+    }
+  ]
+}

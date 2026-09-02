@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO dei 12 eventi che il motore sa tracciare. E' la versione RIDOTTA dell'Acting Method: invece di rilevare azioni arbitrarie descritte a parole, ogni azione di recitazione si esprime come contatore su uno di questi eventi con filtri. Costo di implementazione: un EventTracker generico (~1 story) invece di ~40 rilevatori speciali. Aggiungere un evento e' codice: richiede discussione esplicita.",
+  "events": {
+    "enemy_defeated": {
+      "descrizione": "Un nemico e' stato sconfitto dal giocatore.",
+      "filtri": ["tag_nemico", "sequenza_min", "senza_abilita", "tipo_arma", "senza_subire_danno"],
+      "misura": "conteggio"
+    },
+    "damage_dealt": {
+      "descrizione": "Danno inflitto dal giocatore.",
+      "filtri": ["tag_danno", "tag_bersaglio"],
+      "misura": "somma"
+    },
+    "damage_taken": {
+      "descrizione": "Danno subito dal giocatore.",
+      "filtri": ["tag_danno"],
+      "misura": "somma"
+    },
+    "damage_absorbed_for_ally": {
+      "descrizione": "Danno che sarebbe andato a un alleato o al pet e che il giocatore ha assorbito.",
+      "filtri": ["tipo_alleato"],
+      "misura": "somma"
+    },
+    "perfect_parry": {
+      "descrizione": "Parata eseguita nella finestra perfetta.",
+      "filtri": ["stesso_combattimento"],
+      "misura": "conteggio"
+    },
+    "ability_used": {
+      "descrizione": "Un'abilita' e' stata eseguita con successo.",
+      "filtri": ["ability_id", "tag_abilita"],
+      "misura": "conteggio"
+    },
+    "item_crafted": {
+      "descrizione": "Un oggetto e' stato prodotto (pozione, arma, congegno).",
+      "filtri": ["categoria", "qualita_min"],
+      "misura": "conteggio"
+    },
+    "npc_influenced": {
+      "descrizione": "Un NPC ha cambiato comportamento per azione del giocatore.",
+      "filtri": ["modo"],
+      "valori_modo": ["persuaso", "ingannato", "aiutato", "intimidito", "risparmiato"],
+      "misura": "conteggio"
+    },
+    "area_cleared": {
+      "descrizione": "Un'area ostile e' stata completata.",
+      "filtri": ["senza_alleati_caduti", "senza_abilita", "senza_uccidere"],
+      "misura": "conteggio"
+    },
+    "time_in_state": {
+      "descrizione": "Tempo cumulativo passato in uno stato.",
+      "filtri": ["stato"],
+      "valori_stato": ["notte", "meditazione", "trasformato", "in_ombra", "nel_mondo_spirituale"],
+      "misura": "secondi"
+    },
+    "ritual_completed": {
+      "descrizione": "Un rituale e' stato portato a termine senza interruzioni.",
+      "filtri": ["tipo_rituale"],
+      "misura": "conteggio"
+    },
+    "structure_destroyed": {
+      "descrizione": "Una struttura costruita dal giocatore e' stata persa o lasciata decadere.",
+      "filtri": ["volontario"],
+      "misura": "conteggio"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "synergy.schema.json",
+  "title": "Synergy",
+  "type": "object",
+  "required": ["schema_version", "id", "name_i18n", "richiede_tag", "fonti", "effetto", "scoperta"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "name_i18n": { "type": "string", "pattern": "^synergy\\." },
+    "richiede_tag": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "integer", "minimum": 1 }
+    },
+    "esclude_tag": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 1 }
+    },
+    "fonti": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "enum": ["abilita", "equipaggiamento", "pet", "stanza", "talento", "sequenza", "ingrediente"] },
+      "_comment": "minItems 2 e' deliberato: una sinergia che pesca da una sola categoria non attraversa i sistemi e viola il pilastro di design."
+    },
+    "effetto": {
+      "type": "object",
+      "required": ["tipo"],
+      "properties": {
+        "tipo": { "enum": ["aggiungi_abilita", "modifica_stat", "modifica_primitiva",
+                           "sblocca_ricetta", "modifica_follia", "modifica_qualita_crafting"] }
+      }
+    },
+    "anti": { "type": "boolean", "default": false },
+    "scoperta": { "enum": ["visibile", "nascosta", "lore"] },
+    "note": { "type": "string" }
+  }
+}

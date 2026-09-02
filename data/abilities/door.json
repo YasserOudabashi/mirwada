@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "_comment": "Abilita' del Pathway door.",
+  "abilities": [
+    {
+      "schema_version": 1,
+      "id": "door_viaggio_lungo",
+      "name_i18n": "ability.door.door_viaggio_lungo",
+      "sequence_id": "door_3",
+      "costo_spiritualita": 35,
+      "cooldown": 40.0,
+      "primitive": [
+        {
+          "tipo": "teleport",
+          "distanza": 999,
+          "richiede_visuale": false,
+          "porta_alleati": true
+        },
+        {
+          "tipo": "reveal_info",
+          "raggio": 15,
+          "categoria": "percorsi",
+          "durata": 8.0
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "viaggio",
+        "occultamento"
+      ],
+      "note": "STRESS TEST. Teletrasporto a lunga distanza con alleati e pet. Nessuna primitiva nuova."
+    }
+  ]
+}

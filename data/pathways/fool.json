@@ -1,0 +1,283 @@
+{
+  "schema_version": 1,
+  "id": "fool",
+  "name": "Fool",
+  "name_i18n": "pathway.fool",
+  "group": "lord_of_mysteries",
+  "god_title": "Fool",
+  "from_outer_deity": false,
+  "gameplay_verb": "Falsificare la realta' e controllare i nemici come marionette",
+  "tags": [
+    "inganno",
+    "spirito",
+    "destino",
+    "illusione"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "fool_9",
+      "name": "Seer",
+      "name_i18n": "sequence.fool.9",
+      "tier": "low",
+      "concept": "Divinazione col pendolo e lettura delle intenzioni nemiche. Nessuna offesa: il Seer osserva.",
+      "stat_modifiers": {
+        "spiritualita_max": 25,
+        "percezione": 0.1
+      },
+      "abilities": [
+        "fool_divinazione_pendolo",
+        "fool_velo_illusorio",
+        "fool_lettura_espressioni"
+      ],
+      "acting_actions": [
+        {
+          "id": "fool_9_predizione",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_divinazione_pendolo"
+          },
+          "target": 20,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool_9_predizione",
+          "descrizione": "Esegui 20 divinazioni"
+        },
+        {
+          "id": "fool_9_inganno",
+          "evento": "npc_influenced",
+          "filtri": {
+            "modo": "ingannato"
+          },
+          "target": 10,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool_9_inganno",
+          "descrizione": "Inganna 10 NPC facendogli cambiare comportamento"
+        },
+        {
+          "id": "fool_9_senza_sangue",
+          "evento": "area_cleared",
+          "filtri": {
+            "senza_uccidere": true
+          },
+          "target": 3,
+          "progresso": 0.4,
+          "ripetibile": false,
+          "descrizione_i18n": "acting.fool_9_senza_sangue",
+          "descrizione": "Completa 3 aree ostili senza uccidere nessuno"
+        }
+      ],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [
+          "sangue_di_gufo_lunare",
+          "polvere_di_specchio_incrinato",
+          "radice_di_veggente"
+        ],
+        "formula_id": "formula_fool_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "fool_8",
+      "name": "Clown",
+      "name_i18n": "sequence.fool.8",
+      "tier": "low",
+      "concept": "Destrezza acrobatica, travestimento, illusioni brevi per rompere l'aggro.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [],
+        "formula_id": "formula_fool_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "fool_7",
+      "name": "Magician",
+      "name_i18n": "sequence.fool.7",
+      "tier": "low",
+      "concept": "Illusioni solide che infliggono danno percepito; oggetti evocati dal nulla per un colpo.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [],
+        "formula_id": "formula_fool_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "fool_6",
+      "name": "Faceless",
+      "name_i18n": "sequence.fool.6",
+      "tier": "mid",
+      "concept": "Assume aspetto e voce di un NPC e ne eredita i permessi sociali: apre porte chiuse.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [],
+        "formula_id": "formula_fool_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "fool_5",
+      "name": "Marionettist",
+      "name_i18n": "sequence.fool.5",
+      "tier": "mid",
+      "concept": "Fili spirituali: controlla un nemico come marionetta e lo usa contro gli altri.",
+      "stat_modifiers": {},
+      "abilities": [
+        "fool_fili_marionetta"
+      ],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [],
+        "formula_id": "formula_fool_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "fool_4",
+      "name": "Bizarro Sorcerer",
+      "name_i18n": "sequence.fool.4",
+      "tier": "saint",
+      "concept": "Sostituisce se stesso con un oggetto a distanza; gioco di prestigio su scala di stanza.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [],
+        "formula_id": "formula_fool_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "fool_3",
+      "name": "Scholar of Yore",
+      "name_i18n": "sequence.fool.3",
+      "tier": "saint",
+      "concept": "Richiama dal passato una versione precedente di se' o di un oggetto distrutto.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [],
+        "formula_id": "formula_fool_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "fool_2",
+      "name": "Miracle Invoker",
+      "name_i18n": "sequence.fool.2",
+      "tier": "angel",
+      "concept": "Converte spiritualita' in eventi improbabili: il miracolo come risorsa spendibile.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [],
+        "formula_id": "formula_fool_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "fool_1",
+      "name": "Attendant of Mysteries",
+      "name_i18n": "sequence.fool.1",
+      "tier": "angel",
+      "concept": "Crea un'area di segretezza in cui la realta' locale puo' essere manomessa.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [],
+        "formula_id": "formula_fool_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "fool_0",
+      "name": "Fool",
+      "name_i18n": "sequence.fool.0",
+      "tier": "god",
+      "concept": "Falsifica la realta' su scala di mondo.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [],
+        "formula_id": "formula_fool_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    }
+  ]
+}

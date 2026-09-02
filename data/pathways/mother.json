@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "id": "mother",
+  "name": "Mother",
+  "name_i18n": "pathway.mother",
+  "group": "goddess_of_origin",
+  "god_title": "Mother",
+  "from_outer_deity": true,
+  "gameplay_verb": "Far crescere piante, curare e creare chimere",
+  "tags": [
+    "crescita",
+    "terra",
+    "guarigione",
+    "genetica"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "mother_9",
+      "name": "Planter",
+      "name_i18n": "sequence.mother.9",
+      "tier": "low",
+      "concept": "Coltiva e accelera la crescita delle piante; base del ciclo ingredienti.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [],
+        "formula_id": "formula_mother_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "mother_8",
+      "name": "Doctor",
+      "name_i18n": "sequence.mother.8",
+      "tier": "low",
+      "concept": "Cura le ferite e diagnostica veleni e maledizioni.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [],
+        "formula_id": "formula_mother_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "mother_7",
+      "name": "Harvest Priest",
+      "name_i18n": "sequence.mother.7",
+      "tier": "low",
+      "concept": "Benedice i raccolti e rigenera un'area viva intorno a se'.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [],
+        "formula_id": "formula_mother_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "mother_6",
+      "name": "Biologist",
+      "name_i18n": "sequence.mother.6",
+      "tier": "mid",
+      "concept": "Modifica le creature: innesti e primi ibridi.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [],
+        "formula_id": "formula_mother_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "mother_5",
+      "name": "Druid",
+      "name_i18n": "sequence.mother.5",
+      "tier": "mid",
+      "concept": "Comanda la vegetazione come arma e come terreno: terraforming tattico.",
+      "stat_modifiers": {},
+      "abilities": [
+        "mother_dominio_druidico"
+      ],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [],
+        "formula_id": "formula_mother_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "mother_4",
+      "name": "Classical Alchemist",
+      "name_i18n": "sequence.mother.4",
+      "tier": "saint",
+      "concept": "Alchimia della vita: omuncoli e materiali organici artificiali.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [],
+        "formula_id": "formula_mother_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "mother_3",
+      "name": "Pallbearer",
+      "name_i18n": "sequence.mother.3",
+      "tier": "saint",
+      "concept": "Drena forza vitale dai nemici e dall'ambiente, restituendola alla terra.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [],
+        "formula_id": "formula_mother_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "mother_2",
+      "name": "Desolate Matriarch",
+      "name_i18n": "sequence.mother.2",
+      "tier": "angel",
+      "concept": "Crea esseri viventi da zero: chimere su misura per il giocatore.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [],
+        "formula_id": "formula_mother_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "mother_1",
+      "name": "Naturewalker",
+      "name_i18n": "sequence.mother.1",
+      "tier": "angel",
+      "concept": "La natura risponde ai suoi comandi senza bisogno di rituali.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [],
+        "formula_id": "formula_mother_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "mother_0",
+      "name": "Mother",
+      "name_i18n": "sequence.mother.0",
+      "tier": "god",
+      "concept": "La terra come dominio.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [],
+        "formula_id": "formula_mother_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    }
+  ]
+}

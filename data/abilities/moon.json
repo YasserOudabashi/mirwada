@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "_comment": "Abilita' del Pathway moon.",
+  "abilities": [
+    {
+      "schema_version": 1,
+      "id": "moon_evocazione_remota",
+      "name_i18n": "ability.moon.moon_evocazione_remota",
+      "sequence_id": "moon_3",
+      "costo_spiritualita": 48,
+      "cooldown": 80.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "bestia_remota",
+          "quantita": 1,
+          "durata": 180.0,
+          "comportamento": "legame_pet"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "bond_pet",
+          "valore": 0.15,
+          "durata": 180.0,
+          "moltiplicativo": false
+        }
+      ],
+      "tag_sinergia": [
+        "bestia",
+        "evocazione",
+        "pozione",
+        "singolo"
+      ],
+      "costo_follia": 2.0,
+      "note": "STRESS TEST. Aggancio diretto al sistema pet tramite lo stat bond_pet."
+    }
+  ]
+}

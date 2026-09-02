@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "id": "error",
+  "name": "Error",
+  "name_i18n": "pathway.error",
+  "group": "lord_of_mysteries",
+  "god_title": "Error",
+  "from_outer_deity": false,
+  "gameplay_verb": "Rubare le abilita' altrui e sfruttare i buchi nelle regole",
+  "tags": [
+    "furto",
+    "inganno",
+    "tempo",
+    "parassita"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "error_9",
+      "name": "Marauder",
+      "name_i18n": "sequence.error.9",
+      "tier": "low",
+      "concept": "Scasso, furto da inventario nemico, colpo alle spalle con bonus se non visto.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [],
+        "formula_id": "formula_error_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "error_8",
+      "name": "Swindler",
+      "name_i18n": "sequence.error.8",
+      "tier": "low",
+      "concept": "Eloquenza e truffa: estrae denaro e informazioni dagli NPC senza combattere.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [],
+        "formula_id": "formula_error_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "error_7",
+      "name": "Cryptologist",
+      "name_i18n": "sequence.error.7",
+      "tier": "low",
+      "concept": "Decifra formule, sigilli e testi cifrati; ruba conoscenza invece di oggetti.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [],
+        "formula_id": "formula_error_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "error_6",
+      "name": "Prometheus",
+      "name_i18n": "sequence.error.6",
+      "tier": "mid",
+      "concept": "Ruba temporaneamente un'abilita' Beyonder appena vista e la usa una volta.",
+      "stat_modifiers": {},
+      "abilities": [
+        "error_furto_prometeo"
+      ],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [],
+        "formula_id": "formula_error_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "error_5",
+      "name": "Dream Stealer",
+      "name_i18n": "sequence.error.5",
+      "tier": "mid",
+      "concept": "Entra nei sogni per rubare ricordi e formule di pozione.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [],
+        "formula_id": "formula_error_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "error_4",
+      "name": "Parasite",
+      "name_i18n": "sequence.error.4",
+      "tier": "saint",
+      "concept": "Si attacca a un ospite: ne usa sensi, movimento e risorse restando nascosto.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [],
+        "formula_id": "formula_error_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "error_3",
+      "name": "Mentor of Deceit",
+      "name_i18n": "sequence.error.3",
+      "tier": "saint",
+      "concept": "Crea avatar autonomi che agiscono come lui; inganni a piu' livelli.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [],
+        "formula_id": "formula_error_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "error_2",
+      "name": "Trojan Horse of Destiny",
+      "name_i18n": "sequence.error.2",
+      "tier": "angel",
+      "concept": "Impianta un errore nel destino di un bersaglio: i suoi piani falliscono.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [],
+        "formula_id": "formula_error_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "error_1",
+      "name": "Worm of Time",
+      "name_i18n": "sequence.error.1",
+      "tier": "angel",
+      "concept": "Riavvolge brevi tratti di tempo in un raggio limitato.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [],
+        "formula_id": "formula_error_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "error_0",
+      "name": "Error",
+      "name_i18n": "sequence.error.0",
+      "tier": "god",
+      "concept": "Sfrutta i buchi nelle regole del mondo stesso.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [],
+        "formula_id": "formula_error_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    }
+  ]
+}

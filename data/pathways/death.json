@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "id": "death",
+  "name": "Death",
+  "name_i18n": "pathway.death",
+  "group": "eternal_darkness",
+  "god_title": "Death",
+  "from_outer_deity": false,
+  "gameplay_verb": "Evocare i morti e attraversare il mondo spirituale",
+  "tags": [
+    "morte",
+    "spirito",
+    "decadimento",
+    "non_morto"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "death_9",
+      "name": "Corpse Collector",
+      "name_i18n": "sequence.death.9",
+      "tier": "low",
+      "concept": "Resiste a freddo e decomposizione; vede dove sono morti di recente.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [],
+        "formula_id": "formula_death_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "death_8",
+      "name": "Gravedigger",
+      "name_i18n": "sequence.death.8",
+      "tier": "low",
+      "concept": "Rianima cadaveri semplici come alleati temporanei.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [],
+        "formula_id": "formula_death_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "death_7",
+      "name": "Spirit Medium",
+      "name_i18n": "sequence.death.7",
+      "tier": "low",
+      "concept": "Parla con i morti per ottenere informazioni non altrimenti accessibili.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [],
+        "formula_id": "formula_death_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "death_6",
+      "name": "Spirit Guide",
+      "name_i18n": "sequence.death.6",
+      "tier": "mid",
+      "concept": "Comanda spiriti e li scaglia; il primo vero potere offensivo del Pathway.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [],
+        "formula_id": "formula_death_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "death_5",
+      "name": "Gatekeeper",
+      "name_i18n": "sequence.death.5",
+      "tier": "mid",
+      "concept": "Apre passaggi verso il mondo spirituale, usabili per esplorare e fuggire.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [],
+        "formula_id": "formula_death_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "death_4",
+      "name": "Undying",
+      "name_i18n": "sequence.death.4",
+      "tier": "saint",
+      "concept": "Rigenerazione estrema: non muore facilmente, torna in piedi.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [],
+        "formula_id": "formula_death_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "death_3",
+      "name": "Ferryman",
+      "name_i18n": "sequence.death.3",
+      "tier": "saint",
+      "concept": "Uccide separando anima e corpo; traghetta anime come risorsa.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [],
+        "formula_id": "formula_death_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "death_2",
+      "name": "Death Consul",
+      "name_i18n": "sequence.death.2",
+      "tier": "angel",
+      "concept": "Eserciti di non-morti persistenti anche fuori dal combattimento.",
+      "stat_modifiers": {},
+      "abilities": [
+        "death_legione"
+      ],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [],
+        "formula_id": "formula_death_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "death_1",
+      "name": "Pale Emperor",
+      "name_i18n": "sequence.death.1",
+      "tier": "angel",
+      "concept": "Uccisione istantanea sotto soglia e resurrezione degli alleati.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [],
+        "formula_id": "formula_death_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "death_0",
+      "name": "Death",
+      "name_i18n": "sequence.death.0",
+      "tier": "god",
+      "concept": "Dominio sulla fine: la morte come autorita' sul mondo.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [],
+        "formula_id": "formula_death_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    }
+  ]
+}

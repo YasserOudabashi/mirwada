@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "id": "justiciar",
+  "name": "Justiciar",
+  "name_i18n": "pathway.justiciar",
+  "group": "the_anarchy",
+  "god_title": "Justiciar",
+  "from_outer_deity": true,
+  "gameplay_verb": "Imporre regole vincolanti e negare i poteri altrui",
+  "tags": [
+    "ordine",
+    "legge",
+    "giudizio",
+    "negazione"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "justiciar_9",
+      "name": "Arbiter",
+      "name_i18n": "sequence.justiciar.9",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [],
+        "formula_id": "formula_justiciar_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "justiciar_8",
+      "name": "Sheriff",
+      "name_i18n": "sequence.justiciar.8",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [],
+        "formula_id": "formula_justiciar_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "justiciar_7",
+      "name": "Interrogator",
+      "name_i18n": "sequence.justiciar.7",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [],
+        "formula_id": "formula_justiciar_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "justiciar_6",
+      "name": "Judge",
+      "name_i18n": "sequence.justiciar.6",
+      "tier": "mid",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [],
+        "formula_id": "formula_justiciar_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "justiciar_5",
+      "name": "Disciplinary Paladin",
+      "name_i18n": "sequence.justiciar.5",
+      "tier": "mid",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [],
+        "formula_id": "formula_justiciar_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "justiciar_4",
+      "name": "Imperative Mage",
+      "name_i18n": "sequence.justiciar.4",
+      "tier": "saint",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [],
+        "formula_id": "formula_justiciar_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "justiciar_3",
+      "name": "Chaos Hunter",
+      "name_i18n": "sequence.justiciar.3",
+      "tier": "saint",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [],
+        "formula_id": "formula_justiciar_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "justiciar_2",
+      "name": "Balancer",
+      "name_i18n": "sequence.justiciar.2",
+      "tier": "angel",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [],
+        "formula_id": "formula_justiciar_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "justiciar_1",
+      "name": "Hand of Order",
+      "name_i18n": "sequence.justiciar.1",
+      "tier": "angel",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [],
+        "formula_id": "formula_justiciar_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "justiciar_0",
+      "name": "Justiciar",
+      "name_i18n": "sequence.justiciar.0",
+      "tier": "god",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [],
+        "formula_id": "formula_justiciar_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "_comment": "Abilita' del Pathway error.",
+  "abilities": [
+    {
+      "schema_version": 1,
+      "id": "error_furto_prometeo",
+      "name_i18n": "ability.error.error_furto_prometeo",
+      "sequence_id": "error_6",
+      "costo_spiritualita": 25,
+      "cooldown": 30.0,
+      "primitive": [
+        {
+          "tipo": "steal",
+          "categoria": "abilita",
+          "durata_prestito": 30.0,
+          "probabilita": 0.75
+        }
+      ],
+      "tag_sinergia": [
+        "furto",
+        "inganno",
+        "singolo"
+      ],
+      "costo_follia": 1.5,
+      "note": "STRESS TEST. Ruba un'abilita' vista e la rende eseguibile. Richiede che AbilityEngine sappia eseguire un'abilita' non posseduta: nessuna primitiva nuova, ma una capacita' del motore da mettere nel PRD di fase 2."
+    }
+  ]
+}

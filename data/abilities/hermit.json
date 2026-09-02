@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "_comment": "Abilita' del Pathway hermit.",
+  "abilities": [
+    {
+      "schema_version": 1,
+      "id": "hermit_pergamena",
+      "name_i18n": "ability.hermit.hermit_pergamena",
+      "sequence_id": "hermit_6",
+      "costo_spiritualita": 20,
+      "cooldown": 5.0,
+      "primitive": [
+        {
+          "tipo": "reveal_info",
+          "raggio": 0,
+          "categoria": "abilita_memorizzata",
+          "durata": 0
+        }
+      ],
+      "tag_sinergia": [
+        "occulto",
+        "rituale",
+        "conoscenza",
+        "crafting"
+      ],
+      "note": "STRESS TEST — TROVATO UN LIMITE. La pergamena monouso non e' un'abilita': e' un OGGETTO che porta un ability_id e lo esegue al consumo. Non serve una primitiva nuova, serve che l'oggetto abbia un campo stored_ability_id e che l'inventario sappia invocarlo. Va aggiunto al PRD di fase 3, non al registro delle primitive."
+    }
+  ]
+}

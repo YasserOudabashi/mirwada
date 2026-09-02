@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "id": "paragon",
+  "name": "Paragon",
+  "name_i18n": "pathway.paragon",
+  "group": "demon_of_knowledge",
+  "god_title": "Paragon",
+  "from_outer_deity": false,
+  "gameplay_verb": "Costruire oggetti Beyonder e piegare le leggi fisiche",
+  "tags": [
+    "scienza",
+    "crafting",
+    "invenzione",
+    "conoscenza"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "paragon_9",
+      "name": "Savant",
+      "name_i18n": "sequence.paragon.9",
+      "tier": "low",
+      "concept": "Conoscenza scientifica: analizza oggetti e ne rivela le proprieta'.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [],
+        "formula_id": "formula_paragon_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "paragon_8",
+      "name": "Archaeologist",
+      "name_i18n": "sequence.paragon.8",
+      "tier": "low",
+      "concept": "Scava, identifica reperti e disinnesca trappole antiche.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [],
+        "formula_id": "formula_paragon_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "paragon_7",
+      "name": "Appraiser",
+      "name_i18n": "sequence.paragon.7",
+      "tier": "low",
+      "concept": "Valuta e identifica gli Oggetti Sigillati, rivelandone gli effetti collaterali.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [],
+        "formula_id": "formula_paragon_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "paragon_6",
+      "name": "Artisan",
+      "name_i18n": "sequence.paragon.6",
+      "tier": "mid",
+      "concept": "Costruisce armi e congegni Beyonder: il Pathway del crafting.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [],
+        "formula_id": "formula_paragon_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "paragon_5",
+      "name": "Astronomer",
+      "name_i18n": "sequence.paragon.5",
+      "tier": "mid",
+      "concept": "Strumenti ottici e mappe: previsione e ricognizione a distanza.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [],
+        "formula_id": "formula_paragon_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "paragon_4",
+      "name": "Alchemist",
+      "name_i18n": "sequence.paragon.4",
+      "tier": "saint",
+      "concept": "Trasmutazione dei materiali; alchimia applicata al crafting.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [],
+        "formula_id": "formula_paragon_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "paragon_3",
+      "name": "Arcane Scholar",
+      "name_i18n": "sequence.paragon.3",
+      "tier": "saint",
+      "concept": "Unisce scienza e misticismo: incisioni che funzionano su entrambi i piani.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [],
+        "formula_id": "formula_paragon_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "paragon_2",
+      "name": "Knowledge Magister",
+      "name_i18n": "sequence.paragon.2",
+      "tier": "angel",
+      "concept": "Infonde spirito negli oggetti creati: costrutti autonomi e permanenti.",
+      "stat_modifiers": {},
+      "abilities": [
+        "paragon_costrutto_vivo"
+      ],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [],
+        "formula_id": "formula_paragon_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "paragon_1",
+      "name": "Illuminator",
+      "name_i18n": "sequence.paragon.1",
+      "tier": "angel",
+      "concept": "Altera le leggi fisiche locali in un raggio.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [],
+        "formula_id": "formula_paragon_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "paragon_0",
+      "name": "Paragon",
+      "name_i18n": "sequence.paragon.0",
+      "tier": "god",
+      "concept": "La civilta' come dominio.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [],
+        "formula_id": "formula_paragon_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    }
+  ]
+}

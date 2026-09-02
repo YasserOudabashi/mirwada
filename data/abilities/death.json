@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "_comment": "Abilita' del Pathway death.",
+  "abilities": [
+    {
+      "schema_version": 1,
+      "id": "death_legione",
+      "name_i18n": "ability.death.death_legione",
+      "sequence_id": "death_2",
+      "costo_spiritualita": 50,
+      "cooldown": 90.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "non_morto_legionario",
+          "quantita": 8,
+          "durata": -1,
+          "comportamento": "aggressivo"
+        },
+        {
+          "tipo": "aura",
+          "raggio": 10,
+          "durata": -1,
+          "effetto": "comando_non_morti",
+          "tick_rate": 2.0,
+          "bersagli": "evocati"
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "non_morto",
+        "evocazione",
+        "area"
+      ],
+      "costo_follia": 4.0,
+      "note": "STRESS TEST. durata -1: evocazioni persistenti fuori dal combattimento. Il motore deve gestire entita' che sopravvivono al cambio di scena."
+    }
+  ]
+}

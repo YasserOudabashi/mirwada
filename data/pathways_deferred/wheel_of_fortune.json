@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "id": "wheel_of_fortune",
+  "name": "Wheel of Fortune",
+  "name_i18n": "pathway.wheel_of_fortune",
+  "group": "key_of_light",
+  "god_title": "Wheel of Fortune",
+  "from_outer_deity": false,
+  "gameplay_verb": "Manipolare probabilita' e destino in modo esplicito",
+  "tags": [
+    "probabilita'",
+    "destino",
+    "fortuna",
+    "disastro"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "wheel_of_fortune_9",
+      "name": "Monster",
+      "name_i18n": "sequence.wheel_of_fortune.9",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [],
+        "formula_id": "formula_wheel_of_fortune_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "wheel_of_fortune_8",
+      "name": "Robot",
+      "name_i18n": "sequence.wheel_of_fortune.8",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [],
+        "formula_id": "formula_wheel_of_fortune_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "wheel_of_fortune_7",
+      "name": "Lucky One",
+      "name_i18n": "sequence.wheel_of_fortune.7",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [],
+        "formula_id": "formula_wheel_of_fortune_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "wheel_of_fortune_6",
+      "name": "Calamity Priest",
+      "name_i18n": "sequence.wheel_of_fortune.6",
+      "tier": "mid",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [],
+        "formula_id": "formula_wheel_of_fortune_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "wheel_of_fortune_5",
+      "name": "Winner",
+      "name_i18n": "sequence.wheel_of_fortune.5",
+      "tier": "mid",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [],
+        "formula_id": "formula_wheel_of_fortune_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "wheel_of_fortune_4",
+      "name": "Misfortune Mage",
+      "name_i18n": "sequence.wheel_of_fortune.4",
+      "tier": "saint",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [],
+        "formula_id": "formula_wheel_of_fortune_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "wheel_of_fortune_3",
+      "name": "Chaoswalker",
+      "name_i18n": "sequence.wheel_of_fortune.3",
+      "tier": "saint",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [],
+        "formula_id": "formula_wheel_of_fortune_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "wheel_of_fortune_2",
+      "name": "Soothsayer",
+      "name_i18n": "sequence.wheel_of_fortune.2",
+      "tier": "angel",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [],
+        "formula_id": "formula_wheel_of_fortune_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "wheel_of_fortune_1",
+      "name": "Snake of Mercury",
+      "name_i18n": "sequence.wheel_of_fortune.1",
+      "tier": "angel",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [],
+        "formula_id": "formula_wheel_of_fortune_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "wheel_of_fortune_0",
+      "name": "Wheel of Fortune",
+      "name_i18n": "sequence.wheel_of_fortune.0",
+      "tier": "god",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [],
+        "formula_id": "formula_wheel_of_fortune_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    }
+  ]
+}

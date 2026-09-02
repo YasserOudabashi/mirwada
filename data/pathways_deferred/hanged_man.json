@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "id": "hanged_man",
+  "name": "Hanged Man",
+  "name_i18n": "pathway.hanged_man",
+  "group": "god_almighty",
+  "god_title": "Hanged Man",
+  "from_outer_deity": false,
+  "gameplay_verb": "Usare l'ombra come risorsa e ascoltare i sussurri nascosti",
+  "tags": [
+    "ombra",
+    "sangue",
+    "depravazione",
+    "sussurro"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "hanged_man_9",
+      "name": "Secrets Supplicant",
+      "name_i18n": "sequence.hanged_man.9",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [],
+        "formula_id": "formula_hanged_man_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "hanged_man_8",
+      "name": "Listener",
+      "name_i18n": "sequence.hanged_man.8",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [],
+        "formula_id": "formula_hanged_man_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "hanged_man_7",
+      "name": "Shadow Ascetic",
+      "name_i18n": "sequence.hanged_man.7",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [],
+        "formula_id": "formula_hanged_man_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "hanged_man_6",
+      "name": "Rose Bishop",
+      "name_i18n": "sequence.hanged_man.6",
+      "tier": "mid",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [],
+        "formula_id": "formula_hanged_man_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "hanged_man_5",
+      "name": "Shepherd",
+      "name_i18n": "sequence.hanged_man.5",
+      "tier": "mid",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [],
+        "formula_id": "formula_hanged_man_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "hanged_man_4",
+      "name": "Black Knight",
+      "name_i18n": "sequence.hanged_man.4",
+      "tier": "saint",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [],
+        "formula_id": "formula_hanged_man_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "hanged_man_3",
+      "name": "Trinity Templar",
+      "name_i18n": "sequence.hanged_man.3",
+      "tier": "saint",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [],
+        "formula_id": "formula_hanged_man_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "hanged_man_2",
+      "name": "Profane Presbyter",
+      "name_i18n": "sequence.hanged_man.2",
+      "tier": "angel",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [],
+        "formula_id": "formula_hanged_man_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "hanged_man_1",
+      "name": "Dark Angel",
+      "name_i18n": "sequence.hanged_man.1",
+      "tier": "angel",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [],
+        "formula_id": "formula_hanged_man_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "hanged_man_0",
+      "name": "Hanged Man",
+      "name_i18n": "sequence.hanged_man.0",
+      "tier": "god",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [],
+        "formula_id": "formula_hanged_man_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    }
+  ]
+}

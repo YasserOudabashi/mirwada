@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "id": "demoness",
+  "name": "Demoness",
+  "name_i18n": "pathway.demoness",
+  "group": "calamity_of_destruction",
+  "god_title": "Demoness",
+  "from_outer_deity": false,
+  "gameplay_verb": "Assassinare, maledire e scatenare disastri naturali",
+  "tags": [
+    "maledizione",
+    "specchio",
+    "disastro",
+    "agilita'"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "demoness_9",
+      "name": "Assassin",
+      "name_i18n": "sequence.demoness.9",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [],
+        "formula_id": "formula_demoness_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "demoness_8",
+      "name": "Instigator",
+      "name_i18n": "sequence.demoness.8",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [],
+        "formula_id": "formula_demoness_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "demoness_7",
+      "name": "Witch",
+      "name_i18n": "sequence.demoness.7",
+      "tier": "low",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [],
+        "formula_id": "formula_demoness_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "demoness_6",
+      "name": "Pleasure",
+      "name_i18n": "sequence.demoness.6",
+      "tier": "mid",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [],
+        "formula_id": "formula_demoness_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "demoness_5",
+      "name": "Affliction",
+      "name_i18n": "sequence.demoness.5",
+      "tier": "mid",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [],
+        "formula_id": "formula_demoness_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "demoness_4",
+      "name": "Despair",
+      "name_i18n": "sequence.demoness.4",
+      "tier": "saint",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [],
+        "formula_id": "formula_demoness_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "demoness_3",
+      "name": "Unaging",
+      "name_i18n": "sequence.demoness.3",
+      "tier": "saint",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [],
+        "formula_id": "formula_demoness_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "demoness_2",
+      "name": "Catastrophe",
+      "name_i18n": "sequence.demoness.2",
+      "tier": "angel",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [],
+        "formula_id": "formula_demoness_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "demoness_1",
+      "name": "Apocalypse",
+      "name_i18n": "sequence.demoness.1",
+      "tier": "angel",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [],
+        "formula_id": "formula_demoness_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "demoness_0",
+      "name": "Demoness",
+      "name_i18n": "sequence.demoness.0",
+      "tier": "god",
+      "concept": "",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [],
+        "formula_id": "formula_demoness_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    }
+  ]
+}

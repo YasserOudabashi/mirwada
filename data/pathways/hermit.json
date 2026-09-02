@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "id": "hermit",
+  "name": "Hermit",
+  "name_i18n": "pathway.hermit",
+  "group": "demon_of_knowledge",
+  "god_title": "Hermit",
+  "from_outer_deity": false,
+  "gameplay_verb": "Praticare magia rituale, pergamene e costellazioni",
+  "tags": [
+    "occulto",
+    "rituale",
+    "stella",
+    "divinazione"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "hermit_9",
+      "name": "Mystery Pryer",
+      "name_i18n": "sequence.hermit.9",
+      "tier": "low",
+      "concept": "Percepisce il misticismo e traccia rituali di base.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [],
+        "formula_id": "formula_hermit_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "hermit_8",
+      "name": "Melee Scholar",
+      "name_i18n": "sequence.hermit.8",
+      "tier": "low",
+      "concept": "Combatte applicando la conoscenza: sigilli incisi sull'arma in tempo reale.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [],
+        "formula_id": "formula_hermit_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "hermit_7",
+      "name": "Warlock",
+      "name_i18n": "sequence.hermit.7",
+      "tier": "low",
+      "concept": "Incantesimi tradizionali ed evocazione minore.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [],
+        "formula_id": "formula_hermit_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "hermit_6",
+      "name": "Scrolls Professor",
+      "name_i18n": "sequence.hermit.6",
+      "tier": "mid",
+      "concept": "Prepara pergamene monouso: magia precotta da spendere al momento giusto.",
+      "stat_modifiers": {},
+      "abilities": [
+        "hermit_pergamena"
+      ],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [],
+        "formula_id": "formula_hermit_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "hermit_5",
+      "name": "Constellations Master",
+      "name_i18n": "sequence.hermit.5",
+      "tier": "mid",
+      "concept": "Costellazioni: potenziamenti stellari legati alla posizione e all'ora.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [],
+        "formula_id": "formula_hermit_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "hermit_4",
+      "name": "Mysticologist",
+      "name_i18n": "sequence.hermit.4",
+      "tier": "saint",
+      "concept": "Crea incantesimi propri combinando conoscenze acquisite.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [],
+        "formula_id": "formula_hermit_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "hermit_3",
+      "name": "Clairvoyant",
+      "name_i18n": "sequence.hermit.3",
+      "tier": "saint",
+      "concept": "Vede e sente le esistenze nascoste, incluse quelle che non vogliono essere viste.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [],
+        "formula_id": "formula_hermit_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "hermit_2",
+      "name": "Sage",
+      "name_i18n": "sequence.hermit.2",
+      "tier": "angel",
+      "concept": "Drena potere direttamente dalla conoscenza mistica accumulata.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [],
+        "formula_id": "formula_hermit_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "hermit_1",
+      "name": "Knowledge Emperor",
+      "name_i18n": "sequence.hermit.1",
+      "tier": "angel",
+      "concept": "Legge e altera il destino tessuto di una persona.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [],
+        "formula_id": "formula_hermit_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "hermit_0",
+      "name": "Hermit",
+      "name_i18n": "sequence.hermit.0",
+      "tier": "god",
+      "concept": "L'occulto come dominio.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [],
+        "formula_id": "formula_hermit_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    }
+  ]
+}

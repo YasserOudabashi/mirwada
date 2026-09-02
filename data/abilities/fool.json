@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "_comment": "ESEMPIO DI RIFERIMENTO. Mostra come si compone un'abilita' dalle primitive senza scrivere codice. Le story di dati delle fasi successive devono imitare questo formato. Nota: nessuna di queste abilita' ha richiesto una primitiva nuova.",
+  "abilities": [
+    {
+      "schema_version": 1,
+      "id": "fool_divinazione_pendolo",
+      "name_i18n": "ability.fool.divinazione_pendolo",
+      "sequence_id": "fool_9",
+      "costo_spiritualita": 8,
+      "cooldown": 20.0,
+      "primitive": [
+        {
+          "tipo": "reveal_info",
+          "raggio": 30,
+          "categoria": "pericolo",
+          "durata": 10.0
+        }
+      ],
+      "tag_sinergia": [
+        "divinazione",
+        "destino",
+        "spirito",
+        "non_letale"
+      ],
+      "condizioni": [
+        {
+          "tipo": "acting_progress_min",
+          "valore": 0.1
+        }
+      ],
+      "note": "Abilita' di apertura del Pathway. Deliberatamente non offensiva: il Fool a Sequenza 9 non combatte, osserva."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_velo_illusorio",
+      "name_i18n": "ability.fool.velo_illusorio",
+      "sequence_id": "fool_9",
+      "costo_spiritualita": 12,
+      "cooldown": 6.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 4,
+          "durata": 8.0,
+          "potenza": 1,
+          "tipo_illusione": "copia_statica"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 0.15,
+          "durata": 8.0,
+          "moltiplicativo": false
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "inganno",
+        "occultamento",
+        "non_letale"
+      ],
+      "condizioni": [
+        {
+          "tipo": "acting_progress_min",
+          "valore": 0.3
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_lettura_espressioni",
+      "name_i18n": "ability.fool.lettura_espressioni",
+      "sequence_id": "fool_9",
+      "costo_spiritualita": 4,
+      "cooldown": 2.0,
+      "primitive": [
+        {
+          "tipo": "reveal_info",
+          "raggio": 8,
+          "categoria": "intenzione_nemico",
+          "durata": 5.0
+        }
+      ],
+      "tag_sinergia": [
+        "mente",
+        "analisi",
+        "inganno",
+        "singolo"
+      ],
+      "note": "Mostra il tell del prossimo attacco nemico. Aggancio diretto alla regola di telegrafia del combat."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_fili_marionetta",
+      "name_i18n": "ability.fool.fool_fili_marionetta",
+      "sequence_id": "fool_5",
+      "costo_spiritualita": 30,
+      "cooldown": 25.0,
+      "primitive": [
+        {
+          "tipo": "possess",
+          "durata": 12.0,
+          "soglia_resistenza": 4,
+          "controllo": "completo"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.3,
+          "durata": 12.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "spirito",
+        "controllo",
+        "singolo"
+      ],
+      "costo_follia": 2.0,
+      "note": "STRESS TEST. Marionettista: possess con soglia legata alla Sequenza del bersaglio. Nessuna primitiva nuova."
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ability.schema.json",
+  "title": "Ability",
+  "type": "object",
+  "required": ["schema_version", "id", "name_i18n", "sequence_id", "costo_spiritualita",
+               "cooldown", "primitive", "tag_sinergia"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "name_i18n": { "type": "string", "pattern": "^ability\\." },
+    "sequence_id": { "type": "string", "pattern": "^[a-z0-9_]+_[0-9]$" },
+    "costo_spiritualita": { "type": "number", "minimum": 0 },
+    "cooldown": { "type": "number", "minimum": 0 },
+    "costo_follia": { "type": "number", "minimum": 0, "default": 0 },
+    "primitive": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["tipo"],
+        "properties": { "tipo": { "type": "string" } }
+      }
+    },
+    "tag_sinergia": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "condizioni": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["tipo", "valore"],
+        "properties": {
+          "tipo": {
+            "enum": ["acting_progress_min", "madness_max", "madness_min", "e_notte",
+                     "fase_lunare", "foundation_min", "tier_min", "in_zona_tag"]
+          },
+          "valore": {}
+        }
+      }
+    },
+    "note": { "type": "string" }
+  }
+}

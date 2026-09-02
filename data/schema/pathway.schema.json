@@ -1,0 +1,253 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "pathway.schema.json",
+  "title": "Pathway",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "name",
+    "name_i18n",
+    "group",
+    "from_outer_deity",
+    "gameplay_verb",
+    "tags",
+    "sequences"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name_i18n": {
+      "type": "string",
+      "pattern": "^pathway\\.[a-z0-9_]+$"
+    },
+    "group": {
+      "enum": [
+        "lord_of_mysteries",
+        "god_almighty",
+        "eternal_darkness",
+        "calamity_of_destruction",
+        "demon_of_knowledge",
+        "key_of_light",
+        "goddess_of_origin",
+        "father_of_devils",
+        "the_anarchy"
+      ]
+    },
+    "god_title": {
+      "type": "string"
+    },
+    "from_outer_deity": {
+      "type": "boolean"
+    },
+    "gameplay_verb": {
+      "type": "string",
+      "minLength": 10
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "sequences": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "$ref": "#/definitions/sequence"
+      }
+    }
+  },
+  "definitions": {
+    "sequence": {
+      "type": "object",
+      "required": [
+        "sequence",
+        "id",
+        "name",
+        "name_i18n",
+        "tier",
+        "concept",
+        "stat_modifiers",
+        "abilities",
+        "acting_actions",
+        "potion",
+        "advancement_ritual",
+        "madness_on_force",
+        "notes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+_[0-9]$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name_i18n": {
+          "type": "string"
+        },
+        "tier": {
+          "enum": [
+            "low",
+            "mid",
+            "saint",
+            "angel",
+            "god"
+          ]
+        },
+        "stat_modifiers": {
+          "type": "object"
+        },
+        "abilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "acting_actions": {
+          "type": "array",
+          "_comment": "Versione RIDOTTA dell'Acting Method: ogni azione e' un contatore su uno dei 12 eventi di data/schema/tracked_events.json. Nessuna azione descritta solo a parole.",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "evento",
+              "filtri",
+              "target",
+              "progresso",
+              "ripetibile",
+              "descrizione_i18n"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "evento": {
+                "type": "string"
+              },
+              "filtri": {
+                "type": "object"
+              },
+              "target": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "progresso": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1
+              },
+              "ripetibile": {
+                "type": "boolean"
+              },
+              "descrizione_i18n": {
+                "type": "string"
+              },
+              "descrizione": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "potion": {
+          "type": "object",
+          "required": [
+            "characteristic_sequence",
+            "ingredients",
+            "formula_id"
+          ],
+          "properties": {
+            "characteristic_sequence": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9
+            },
+            "ingredients": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "formula_id": {
+              "type": "string"
+            }
+          }
+        },
+        "advancement_ritual": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "location_tags",
+                "moon_phase",
+                "sacrifices",
+                "sigils"
+              ],
+              "properties": {
+                "location_tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "moon_phase": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sacrifices": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "sigils": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "madness_on_force": {
+          "type": "number",
+          "minimum": 0
+        },
+        "notes": {
+          "type": "string"
+        },
+        "concept": {
+          "type": "string",
+          "minLength": 20,
+          "_comment": "Cosa fa il giocatore a questa Sequenza. E' la specifica da cui si scrivono le abilita'."
+        }
+      }
+    }
+  }
+}

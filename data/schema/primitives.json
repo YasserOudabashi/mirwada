@@ -1,0 +1,251 @@
+{
+  "schema_version": 1,
+  "_comment": "Registro CHIUSO delle primitive. Il codice implementa queste e solo queste. 28 attive + 3 differite = 31. Aggiungerne una richiede discussione esplicita: se un'abilita' sembra richiederne una nuova, quasi sempre significa che una primitiva esistente e' sottoparametrizzata.",
+  "primitives": {
+    "projectile": {
+      "params": [
+        "danno",
+        "velocita",
+        "gittata",
+        "pierce",
+        "tag_danno"
+      ]
+    },
+    "melee_arc": {
+      "params": [
+        "danno",
+        "angolo",
+        "raggio",
+        "stagger",
+        "tag_danno"
+      ]
+    },
+    "aura": {
+      "params": [
+        "raggio",
+        "durata",
+        "effetto",
+        "tick_rate",
+        "bersagli"
+      ]
+    },
+    "dot": {
+      "params": [
+        "danno_tick",
+        "tick_rate",
+        "durata",
+        "tag_danno"
+      ]
+    },
+    "heal": {
+      "params": [
+        "quantita",
+        "istantaneo",
+        "durata",
+        "bersaglio"
+      ]
+    },
+    "buff_stat": {
+      "params": [
+        "stat",
+        "valore",
+        "durata",
+        "moltiplicativo"
+      ]
+    },
+    "debuff_stat": {
+      "params": [
+        "stat",
+        "valore",
+        "durata",
+        "moltiplicativo"
+      ]
+    },
+    "dash": {
+      "params": [
+        "distanza",
+        "durata",
+        "invulnerabile",
+        "attraversa_nemici"
+      ]
+    },
+    "summon": {
+      "params": [
+        "entita_id",
+        "quantita",
+        "durata",
+        "comportamento"
+      ]
+    },
+    "illusion": {
+      "params": [
+        "raggio",
+        "durata",
+        "potenza",
+        "tipo"
+      ]
+    },
+    "mind_read": {
+      "params": [
+        "raggio",
+        "profondita",
+        "rivela"
+      ]
+    },
+    "teleport": {
+      "params": [
+        "distanza",
+        "richiede_visuale",
+        "porta_alleati"
+      ]
+    },
+    "shield": {
+      "params": [
+        "assorbimento",
+        "durata",
+        "riflette",
+        "tag_bloccati"
+      ]
+    },
+    "transform": {
+      "params": [
+        "forma_id",
+        "durata",
+        "costo_al_secondo"
+      ]
+    },
+    "chain": {
+      "params": [
+        "danno",
+        "rimbalzi",
+        "decadimento",
+        "tag_danno"
+      ]
+    },
+    "terrain_modify": {
+      "params": [
+        "tipo",
+        "raggio",
+        "durata",
+        "permanente"
+      ]
+    },
+    "possess": {
+      "params": [
+        "durata",
+        "soglia_resistenza",
+        "controllo"
+      ]
+    },
+    "curse": {
+      "params": [
+        "effetto",
+        "durata",
+        "condizione_rimozione"
+      ]
+    },
+    "reveal_info": {
+      "params": [
+        "raggio",
+        "categoria",
+        "durata"
+      ]
+    },
+    "probability_shift": {
+      "params": [
+        "evento",
+        "delta",
+        "durata",
+        "accumula"
+      ],
+      "deferred": true,
+      "_deferred_reason": "Nessuno dei 10 Pathway attivi la richiede (serviva a Tyrant / Wheel of Fortune / Justiciar). Non implementarla: usarla fa fallire il validator. Torna attiva se si riattivano quei Pathway."
+    },
+    "time_rewind": {
+      "params": [
+        "secondi",
+        "ripristina",
+        "costo_follia"
+      ]
+    },
+    "soul_detach": {
+      "params": [
+        "durata",
+        "vulnerabilita_corpo",
+        "velocita"
+      ]
+    },
+    "plant_growth": {
+      "params": [
+        "raggio",
+        "specie",
+        "velocita",
+        "persistente"
+      ]
+    },
+    "weather_control": {
+      "params": [
+        "tipo",
+        "intensita",
+        "raggio",
+        "durata"
+      ],
+      "deferred": true,
+      "_deferred_reason": "Nessuno dei 10 Pathway attivi la richiede (serviva a Tyrant / Wheel of Fortune / Justiciar). Non implementarla: usarla fa fallire il validator. Torna attiva se si riattivano quei Pathway."
+    },
+    "light_purify": {
+      "params": [
+        "raggio",
+        "potenza",
+        "riduce_sequenza"
+      ]
+    },
+    "shadow_meld": {
+      "params": [
+        "durata",
+        "velocita",
+        "richiede_ombra"
+      ]
+    },
+    "steal": {
+      "params": [
+        "categoria",
+        "durata_prestito",
+        "probabilita"
+      ]
+    },
+    "rule_bind": {
+      "params": [
+        "regola",
+        "penalita",
+        "durata",
+        "raggio"
+      ],
+      "deferred": true,
+      "_deferred_reason": "Nessuno dei 10 Pathway attivi la richiede (serviva a Tyrant / Wheel of Fortune / Justiciar). Non implementarla: usarla fa fallire il validator. Torna attiva se si riattivano quei Pathway."
+    },
+    "resurrect": {
+      "params": [
+        "bersaglio",
+        "hp_ripristinati",
+        "costo_follia",
+        "cooldown"
+      ]
+    },
+    "decay": {
+      "params": [
+        "danno",
+        "raggio",
+        "colpisce_oggetti",
+        "durata"
+      ]
+    },
+    "fear": {
+      "params": [
+        "raggio",
+        "durata",
+        "soglia_resistenza"
+      ]
+    }
+  }
+}

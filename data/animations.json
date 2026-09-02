@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "_comment": "Specifica delle animazioni, data-driven come tutto il resto. Il codice implementa una macchina a stati generica; questo file decide quanti frame, a che velocita', quali frame attivano la hitbox e quali emettono eventi. Cambiare il timing di un attacco NON richiede toccare il codice. Serve anche a due altre cose: e' l'input di tools/generate_placeholders.py, ed e' la specifica esatta da consegnare a un pixel artist.",
+  "convenzioni": {
+    "dimensione_frame": [
+      32,
+      32
+    ],
+    "direzioni": [
+      "down",
+      "up",
+      "left",
+      "right"
+    ],
+    "_comment_direzioni": "4 direzioni, non 8. Le diagonali riusano la direzione orizzontale: dimezza i frame da disegnare e nessuno se ne accorge in un top-down 2D. Decisione da prendere ORA perche' cambiarla dopo significa ridisegnare tutto.",
+    "origine": "piedi_centro",
+    "fps_default": 12
+  },
+  "personaggio": {
+    "idle": {
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "direzionale": true
+    },
+    "walk": {
+      "frames": 6,
+      "fps": 12,
+      "loop": true,
+      "direzionale": true,
+      "eventi": [
+        {
+          "frame": 1,
+          "evento": "footstep"
+        },
+        {
+          "frame": 4,
+          "evento": "footstep"
+        }
+      ]
+    },
+    "dash": {
+      "frames": 4,
+      "fps": 20,
+      "loop": false,
+      "direzionale": true,
+      "eventi": [
+        {
+          "frame": 0,
+          "evento": "sfx_dash"
+        }
+      ],
+      "iframe_da": 0,
+      "iframe_a": 2,
+      "_comment": "iframe_da/a definiscono la finestra di invulnerabilita' in FRAME, non in secondi: cosi' resta agganciata all'animazione anche se cambi gli fps."
+    },
+    "attack_light": {
+      "frames": 5,
+      "fps": 16,
+      "loop": false,
+      "direzionale": true,
+      "anticipo": [
+        0,
+        1
+      ],
+      "attivi": [
+        2
+      ],
+      "recupero": [
+        3,
+        4
+      ],
+      "eventi": [
+        {
+          "frame": 2,
+          "evento": "hitbox_on"
+        },
+        {
+          "frame": 3,
+          "evento": "hitbox_off"
+        }
+      ]
+    },
+    "attack_heavy": {
+      "frames": 8,
+      "fps": 14,
+      "loop": false,
+      "direzionale": true,
+      "anticipo": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "attivi": [
+        4,
+        5
+      ],
+      "recupero": [
+        6,
+        7
+      ],
+      "eventi": [
+        {
+          "frame": 0,
+          "evento": "tell_visivo"
+        },
+        {
+          "frame": 4,
+          "evento": "hitbox_on"
+        },
+        {
+          "frame": 6,
+          "evento": "hitbox_off"
+        }
+      ]
+    },
+    "parry": {
+      "frames": 4,
+      "fps": 18,
+      "loop": false,
+      "direzionale": true,
+      "finestra_perfetta": [
+        0,
+        1
+      ],
+      "_comment": "La parata perfetta e' i primi 2 frame su 4. A 18 fps sono ~111 ms: stretta ma leggibile. E' il numero piu' importante del combat, tienilo qui e non nel codice."
+    },
+    "hurt": {
+      "frames": 3,
+      "fps": 14,
+      "loop": false,
+      "direzionale": true
+    },
+    "death": {
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "direzionale": false
+    },
+    "cast": {
+      "frames": 6,
+      "fps": 12,
+      "loop": false,
+      "direzionale": true,
+      "eventi": [
+        {
+          "frame": 3,
+          "evento": "ability_release"
+        }
+      ]
+    },
+    "meditate": {
+      "frames": 6,
+      "fps": 4,
+      "loop": true,
+      "direzionale": false
+    }
+  },
+  "nemico_base": {
+    "idle": {
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "direzionale": true
+    },
+    "walk": {
+      "frames": 6,
+      "fps": 10,
+      "loop": true,
+      "direzionale": true
+    },
+    "anticipo": {
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "direzionale": true,
+      "eventi": [
+        {
+          "frame": 0,
+          "evento": "tell_audio"
+        },
+        {
+          "frame": 0,
+          "evento": "tell_visivo"
+        }
+      ],
+      "_comment": "Il tell parte al frame 0 dell'anticipo, non dell'attacco. E' cio' che rende il combattimento leggibile: il giocatore ha 4 frame per decidere."
+    },
+    "attack": {
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "direzionale": true,
+      "attivi": [
+        1
+      ],
+      "eventi": [
+        {
+          "frame": 1,
+          "evento": "hitbox_on"
+        },
+        {
+          "frame": 2,
+          "evento": "hitbox_off"
+        }
+      ],
+      "anticipo_in_stato": "anticipo",
+      "_comment": "L'anticipo e' uno stato di animazione separato (nemico_base.anticipo), non frame interni: cosi' la durata del tell si tara indipendentemente dalla velocita' del colpo."
+    },
+    "stagger": {
+      "frames": 4,
+      "fps": 12,
+      "loop": false,
+      "direzionale": true
+    },
+    "death": {
+      "frames": 6,
+      "fps": 10,
+      "loop": false,
+      "direzionale": false
+    }
+  },
+  "pet": {
+    "idle": {
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "direzionale": true
+    },
+    "walk": {
+      "frames": 6,
+      "fps": 12,
+      "loop": true,
+      "direzionale": true
+    },
+    "attack": {
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "direzionale": true,
+      "attivi": [
+        1
+      ],
+      "anticipo_in_stato": "idle",
+      "_comment": "Il pet non ha bisogno di un tell leggibile: e' un alleato, non una minaccia da schivare."
+    }
+  },
+  "budget_frame": {
+    "_comment": "Conteggio dei frame da disegnare, per capire quanto costa davvero l'arte. Un personaggio completo sono 43 frame x 4 direzioni dove serve. Un artista fa 30-60 frame di qualita' al giorno: e' l'unico numero che dice quanto durera' l'arte.",
+    "personaggio_completo": 156,
+    "nemico_completo": 98,
+    "pet_completo": 56,
+    "nota": "Ridurre a 4 direzioni invece di 8 dimezza questi numeri. E' gia' fatto nelle convenzioni."
+  }
+}

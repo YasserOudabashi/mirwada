@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "_comment": "Abilita' del Pathway darkness.",
+  "abilities": [
+    {
+      "schema_version": 1,
+      "id": "darkness_cancellazione",
+      "name_i18n": "ability.darkness.darkness_cancellazione",
+      "sequence_id": "darkness_2",
+      "costo_spiritualita": 45,
+      "cooldown": 60.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 8,
+          "durata": 20.0,
+          "potenza": 5,
+          "tipo_illusione": "cancellazione_percettiva"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "percezione",
+          "valore": -0.9,
+          "durata": 20.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "notte",
+        "occultamento",
+        "illusione",
+        "area"
+      ],
+      "costo_follia": 3.0,
+      "note": "STRESS TEST. Cancella cose e persone dalla percezione altrui. Risolto parametrizzando illusion con tipo_illusione, senza primitiva nuova."
+    }
+  ]
+}

@@ -1,0 +1,371 @@
+{
+  "project": "Sequenza",
+  "branchName": "ralph/fase-1-fondamenta",
+  "description": "Fase 1 - Fondamenta: movimento, combattimento base, caricamento dati data-driven, save versionato, 5 primitive di abilita'.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Setup progetto Godot e struttura cartelle",
+      "description": "Come sviluppatore, ho bisogno di un progetto Godot configurato per pixel art 32x32 cosi' che la resa visiva sia corretta fin dall'inizio.",
+      "acceptanceCriteria": [
+        "Progetto Godot 4.x che si apre senza errori",
+        "Risoluzione base 640x360, stretch 'viewport', filtro texture 'nearest'",
+        "Cartelle scenes/, scripts/, data/, assets/, tests/ presenti",
+        ".gitignore per Godot (.godot/, *.import, export)",
+        "Il progetto avvia una scena vuota senza errori in console"
+      ],
+      "priority": 1,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Caricatore dei dati JSON",
+      "description": "Come sviluppatore, ho bisogno di un singleton che carichi tutti i file in data/ cosi' che ogni sistema legga da un'unica fonte.",
+      "acceptanceCriteria": [
+        "Autoload GameData carica data/pathways/, data/abilities/, data/synergies/, data/tags.json, data/schema/primitives.json",
+        "API GameData.get_pathway(id), get_sequence(id), get_ability(id)",
+        "Errore esplicito in console su file malformato, mai fallimento silenzioso",
+        "Test headless: 22 pathway caricati, 220 sequenze totali verificate",
+        "Typecheck passa",
+        "Tests pass"
+      ],
+      "priority": 2,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Hot-reload dei dati in debug",
+      "description": "Come sviluppatore, voglio ricaricare i JSON con un tasto senza riavviare, per iterare sul bilanciamento in secondi.",
+      "acceptanceCriteria": [
+        "Tasto F5 in build di debug richiama GameData.reload()",
+        "Il ricaricamento non invalida i riferimenti gia' ottenuti dai sistemi attivi",
+        "Messaggio in console con numero di file ricaricati ed errori",
+        "Typecheck passa",
+        "Verifica a schermo documentata in progress.txt"
+      ],
+      "priority": 3,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Movimento del giocatore a 8 direzioni",
+      "description": "Come giocatore, voglio muovermi fluidamente in 8 direzioni cosi' che il controllo risulti immediato.",
+      "acceptanceCriteria": [
+        "CharacterBody2D con accelerazione e attrito, non velocita' istantanea",
+        "Input mappato su WASD e frecce",
+        "Velocita' diagonale normalizzata",
+        "Sprite placeholder 32x32 con direzione visibile",
+        "Typecheck passa",
+        "Verifica a schermo documentata in progress.txt"
+      ],
+      "priority": 4,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Camera con smoothing e limiti",
+      "description": "Come giocatore, voglio una camera che segua senza scatti e non mostri fuori mappa.",
+      "acceptanceCriteria": [
+        "Camera2D con position_smoothing attivo",
+        "Limiti configurabili per zona",
+        "Nessun tremolio su pixel a movimento diagonale",
+        "Typecheck passa",
+        "Verifica a schermo documentata in progress.txt"
+      ],
+      "priority": 5,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Tilemap e collisioni dell'area di test",
+      "description": "Come sviluppatore, ho bisogno di un'area di test giocabile per provare tutti i sistemi successivi.",
+      "acceptanceCriteria": [
+        "TileMapLayer con tileset placeholder 32x32",
+        "Livelli di collisione: pavimento, muro, ostacolo",
+        "Area di test ~40x30 tile con muri, un corridoio e una stanza",
+        "Il giocatore non attraversa i muri",
+        "Typecheck passa",
+        "Verifica a schermo documentata in progress.txt"
+      ],
+      "priority": 6,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Componente statistiche",
+      "description": "Come sviluppatore, ho bisogno di un componente riusabile di statistiche valido per giocatore e nemici.",
+      "acceptanceCriteria": [
+        "Nodo StatsComponent con hp, hp_max, spiritualita, spiritualita_max, velocita, difesa, evasione",
+        "Segnali hp_changed e died",
+        "Modificatori applicabili e rimovibili per id",
+        "Test headless su applicazione e rimozione dei modificatori",
+        "Typecheck passa",
+        "Tests pass"
+      ],
+      "priority": 7,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Attacco in mischia con arco",
+      "description": "Come giocatore, voglio colpire con un attacco che ha una forma visibile cosi' da capire cosa raggiungo.",
+      "acceptanceCriteria": [
+        "Attacco su input con arco di collisione nella direzione guardata",
+        "Frame di anticipo, attivi e recupero distinti e configurabili",
+        "Non si puo' attaccare durante il recupero",
+        "Feedback visivo dell'arco e hitstop breve al colpo",
+        "Typecheck passa",
+        "Verifica a schermo documentata in progress.txt"
+      ],
+      "priority": 8,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Schivata con frame di invulnerabilita'",
+      "description": "Come giocatore, voglio schivare gli attacchi con un dash che mi rende brevemente invulnerabile.",
+      "acceptanceCriteria": [
+        "Dash nella direzione di input con distanza e durata configurabili",
+        "Finestra di i-frame configurabile dentro il dash",
+        "Cooldown che impedisce lo spam",
+        "Indicatore visivo dello stato invulnerabile",
+        "Test headless: nessun danno ricevuto durante gli i-frame",
+        "Typecheck passa",
+        "Tests pass"
+      ],
+      "priority": 9,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "title": "Parata e rottura di postura",
+      "description": "Come giocatore, voglio parare gli attacchi e vedere premiato il tempismo.",
+      "acceptanceCriteria": [
+        "Parata tenuta riduce il danno, parata perfetta nella finestra iniziale lo annulla",
+        "Barra di postura sui nemici ridotta da colpi e parate perfette",
+        "A postura zero il nemico entra in stato vulnerabile per N secondi",
+        "Typecheck passa",
+        "Verifica a schermo documentata in progress.txt"
+      ],
+      "priority": 10,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-011",
+      "title": "Nemico base con telegrafia",
+      "description": "Come giocatore, voglio nemici i cui attacchi siano leggibili prima dell'impatto.",
+      "acceptanceCriteria": [
+        "Macchina a stati: idle, inseguimento, anticipo, attacco, recupero, morto",
+        "Fase di anticipo con tell visivo di durata configurabile",
+        "Il nemico usa StatsComponent e la barra di postura di US-010",
+        "Alla morte emette un segnale invece di distruggersi direttamente",
+        "Typecheck passa",
+        "Verifica a schermo documentata in progress.txt"
+      ],
+      "priority": 11,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-012",
+      "title": "Motore delle abilita' e primitiva projectile",
+      "description": "Come sviluppatore, ho bisogno del motore che legge un'abilita' dal JSON e la esegue, dimostrato sulla prima primitiva.",
+      "acceptanceCriteria": [
+        "AbilityEngine.execute(ability_id, caster) legge l'abilita' da GameData",
+        "Itera sull'array primitive ed esegue ognuna in ordine",
+        "Verifica costo di spiritualita' e cooldown prima dell'esecuzione",
+        "Primitiva projectile implementata con tutti i parametri di data/schema/primitives.json",
+        "Una primitiva sconosciuta produce errore esplicito, non un crash",
+        "Test headless: esecuzione abilita' di prova e verifica del costo scalato",
+        "Typecheck passa",
+        "Tests pass"
+      ],
+      "priority": 12,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-013",
+      "title": "Primitive melee_arc, buff_stat, heal, dash",
+      "description": "Come sviluppatore, voglio quattro primitive in piu' per provare che la composizione dal JSON funziona.",
+      "acceptanceCriteria": [
+        "Le quattro primitive implementate secondo i parametri di data/schema/primitives.json",
+        "buff_stat usa i modificatori per id di US-007 e si rimuove alla scadenza",
+        "L'abilita' fool_velo_illusorio con 2 primitive si esegue componendole correttamente",
+        "Test headless per ogni primitiva",
+        "Typecheck passa",
+        "Tests pass"
+      ],
+      "priority": 13,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-014",
+      "title": "Validator dei dati integrato nei test",
+      "description": "Come sviluppatore, voglio che i dati rotti facciano fallire i test cosi' che nessuna iterazione committi un JSON invalido.",
+      "acceptanceCriteria": [
+        "python tools/validate_data.py eseguito dalla suite di test",
+        "La suite fallisce se il validator esce con codice diverso da 0",
+        "README.md documenta come eseguirlo da solo",
+        "Typecheck passa",
+        "Tests pass"
+      ],
+      "priority": 14,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-015",
+      "title": "Salvataggio e caricamento versionati",
+      "description": "Come giocatore, voglio che i progressi persistano tra le sessioni senza rompersi agli aggiornamenti.",
+      "acceptanceCriteria": [
+        "Save JSON in user:// con campo schema_version",
+        "Serializza posizione, statistiche e tempo di gioco",
+        "Versione inferiore alla corrente passa da una funzione di migrazione",
+        "Un save corrotto produce errore gestito, mai crash",
+        "Test headless: salva, altera la versione, carica, verifica la migrazione",
+        "Typecheck passa",
+        "Tests pass"
+      ],
+      "priority": 15,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-016",
+      "title": "Infrastruttura dei test headless",
+      "description": "Come sviluppatore, voglio eseguire tutti i test da riga di comando senza aprire l'editor.",
+      "acceptanceCriteria": [
+        "Comando documentato che esegue l'intera suite senza finestra",
+        "Codice di uscita 0 al successo, diverso da 0 al fallimento",
+        "Almeno un test per GameData, StatsComponent, AbilityEngine, save/load",
+        "Comando annotato in CLAUDE.md di progetto e in README.md",
+        "Typecheck passa",
+        "Tests pass"
+      ],
+      "priority": 16,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-017",
+      "title": "HUD minimo",
+      "description": "Come giocatore, voglio vedere salute e spiritualita'.",
+      "acceptanceCriteria": [
+        "Barra hp e barra spiritualita' agganciate ai segnali di StatsComponent",
+        "Tutte le stringhe passano da chiavi i18n, nessun testo hardcoded",
+        "File di traduzione it e en presenti, anche se en incompleto",
+        "Typecheck passa",
+        "Verifica a schermo documentata in progress.txt"
+      ],
+      "priority": 17,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-018",
+      "title": "Scena di debug con manichino",
+      "description": "Come sviluppatore, voglio una scena dove provare rapidamente ogni sistema.",
+      "acceptanceCriteria": [
+        "Scena con giocatore, due nemici di US-011 e un manichino con hp infiniti",
+        "Pannello di debug con hp, spiritualita', cooldown e ultima primitiva eseguita",
+        "Tasti rapidi per eseguire ognuna delle 5 primitive",
+        "La scena non e' inclusa nell'export di release",
+        "Typecheck passa",
+        "Verifica a schermo documentata in progress.txt"
+      ],
+      "priority": 18,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-019",
+      "title": "Bus audio e feedback di colpo",
+      "description": "Come giocatore, voglio che colpire e venire colpito abbia un peso sonoro, cosi' che il combattimento si senta solido.",
+      "acceptanceCriteria": [
+        "Bus audio creati secondo data/audio.json: master, music, sfx, ambience, ui, whisper",
+        "AudioManager legge combat_feedback da data/audio.json e riproduce sfx, hitstop e shake INSIEME",
+        "hitstop e shake sono guidati dai dati, non hardcoded negli script di combattimento",
+        "parry_perfect suona e si sente distinto da parry_normal",
+        "Le opzioni di accessibilita' riduci_hitstop e disattiva_shake funzionano",
+        "Placeholder audio generati (bfxr o simili) accettabili: la story riguarda il sistema, non gli asset",
+        "Typecheck passa",
+        "Verifica a schermo documentata in progress.txt"
+      ],
+      "priority": 19,
+      "fase": 1,
+      "passes": false,
+      "notes": "Deliberatamente in fase 1 e non piu' avanti: il feedback di colpo e' meta' del feel di un action 2D, e tarare il combat senza audio significa tararlo due volte."
+    },
+    {
+      "id": "US-020",
+      "title": "Tell sonoro degli attacchi nemici",
+      "description": "Come giocatore, voglio riconoscere a orecchio il tipo di attacco in arrivo, cosi' da reagire anche a un nemico fuori schermo.",
+      "acceptanceCriteria": [
+        "La fase di anticipo di US-011 fa partire il tell da data/audio.json.telegraph",
+        "Le 5 categorie hanno suoni distinti e riconoscibili l'una dall'altra",
+        "anticipo_ms dei dati determina la durata reale della fase di anticipo",
+        "Con indicatore_visivo_tell attivo compare anche un segnale a schermo",
+        "Con indicatore_direzione_suono attivo compare un indicatore direzionale per i tell fuori schermo",
+        "Test: un nemico fuori dall'inquadratura produce comunque il tell",
+        "Typecheck passa",
+        "Verifica a schermo documentata in progress.txt"
+      ],
+      "priority": 20,
+      "fase": 1,
+      "passes": false,
+      "notes": "Requisito di leggibilita' del combattimento, non atmosfera. Senza questo, i nemici fuori schermo sono ingiusti."
+    },
+    {
+      "id": "US-021",
+      "title": "Macchina di animazione guidata dai dati",
+      "description": "Come sviluppatore, voglio che le animazioni e il timing degli attacchi vengano da data/animations.json, cosi' da poter tarare il combattimento senza toccare il codice.",
+      "acceptanceCriteria": [
+        "AnimatedSprite2D costruito a runtime dagli spritesheet in assets/placeholder/",
+        "AnimationStateMachine generica: legge frames, fps, loop, direzionale da data/animations.json",
+        "I frame di anticipo/attivi/recupero determinano l'apertura e chiusura reale della hitbox di US-008",
+        "Gli eventi per frame (footstep, tell_audio, tell_visivo, hitbox_on/off, ability_release) emettono segnali",
+        "iframe_da/iframe_a guidano l'invulnerabilita' del dash di US-009",
+        "finestra_perfetta guida la parata perfetta di US-010",
+        "Cambiare un fps o un indice di frame nel JSON cambia il gioco senza ricompilare",
+        "Test headless: coerenza tra frame dichiarati ed eventi emessi",
+        "Typecheck passa",
+        "Tests pass",
+        "Verifica a schermo documentata in progress.txt"
+      ],
+      "priority": 21,
+      "fase": 1,
+      "passes": false,
+      "notes": "Story chiave: sposta il timing del combat dai dati al posto del codice. E' cio' che permette di tarare il feel iterando in secondi invece che in minuti."
+    }
+  ]
+}

@@ -1,0 +1,719 @@
+{
+  "schema_version": 1,
+  "id": "twilight_giant",
+  "name": "Twilight Giant",
+  "name_i18n": "pathway.twilight_giant",
+  "group": "eternal_darkness",
+  "god_title": "Twilight Giant",
+  "from_outer_deity": false,
+  "gameplay_verb": "Combattere in prima linea con armi di luce e difesa assoluta",
+  "tags": [
+    "arma",
+    "difesa",
+    "luce",
+    "decadimento"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "twilight_giant_9",
+      "name": "Warrior",
+      "name_i18n": "sequence.twilight_giant.9",
+      "tier": "low",
+      "concept": "Maestria delle armi, forza e resistenza. Il combattente puro.",
+      "stat_modifiers": {
+        "hp_max": 20,
+        "forza": 0.1
+      },
+      "abilities": [
+        "tg_fendente_pesante",
+        "tg_stretta_ferrea"
+      ],
+      "acting_actions": [
+        {
+          "id": "tg_9_duello_puro",
+          "evento": "enemy_defeated",
+          "filtri": {
+            "senza_abilita": true
+          },
+          "target": 3,
+          "progresso": 0.35,
+          "ripetibile": false,
+          "descrizione_i18n": "acting.tg_9_duello_puro",
+          "descrizione": "Sconfiggi 3 nemici senza usare abilita' Beyonder"
+        },
+        {
+          "id": "tg_9_allenamento",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "fisico"
+          },
+          "target": 2000,
+          "progresso": 0.3,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_9_allenamento",
+          "descrizione": "Infliggi 2000 danni fisici"
+        },
+        {
+          "id": "tg_9_protettore",
+          "evento": "damage_absorbed_for_ally",
+          "filtri": {},
+          "target": 300,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_9_protettore",
+          "descrizione": "Assorbi 300 danni diretti agli alleati"
+        }
+      ],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [
+          "ferro_temperato",
+          "sangue_di_toro",
+          "radice_di_quercia"
+        ],
+        "formula_id": "formula_twilight_giant_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 1.0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "twilight_giant_8",
+      "name": "Pugilist",
+      "name_i18n": "sequence.twilight_giant.8",
+      "tier": "low",
+      "concept": "Combattimento a mani nude con contrattacco su parata perfetta.",
+      "stat_modifiers": {
+        "hp_max": 35,
+        "forza": 0.15,
+        "difesa": 0.05
+      },
+      "abilities": [
+        "tg_contrattacco",
+        "tg_carica_spalla"
+      ],
+      "acting_actions": [
+        {
+          "id": "tg_8_mani_nude",
+          "evento": "enemy_defeated",
+          "filtri": {
+            "tipo_arma": "nessuna"
+          },
+          "target": 5,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_8_mani_nude",
+          "descrizione": "Sconfiggi 5 nemici a mani nude"
+        },
+        {
+          "id": "tg_8_parate",
+          "evento": "perfect_parry",
+          "filtri": {
+            "stesso_combattimento": true
+          },
+          "target": 10,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_8_parate",
+          "descrizione": "10 parate perfette in un solo combattimento"
+        },
+        {
+          "id": "tg_8_incassa",
+          "evento": "damage_taken",
+          "filtri": {},
+          "target": 1500,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_8_incassa",
+          "descrizione": "Subisci 1500 danni senza morire"
+        }
+      ],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [
+          "osso_di_pugile",
+          "sale_di_roccia",
+          "estratto_di_muscolo"
+        ],
+        "formula_id": "formula_twilight_giant_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 2.4,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "twilight_giant_7",
+      "name": "Weapon Master",
+      "name_i18n": "sequence.twilight_giant.7",
+      "tier": "low",
+      "concept": "Padroneggia ogni arma; tecniche avanzate e combo estese.",
+      "stat_modifiers": {
+        "hp_max": 50,
+        "forza": 0.2,
+        "danno_arma": 0.1
+      },
+      "abilities": [
+        "tg_maestria_arma",
+        "tg_turbine",
+        "tg_lancio_preciso"
+      ],
+      "acting_actions": [
+        {
+          "id": "tg_7_tre_armi",
+          "evento": "enemy_defeated",
+          "filtri": {
+            "tipo_arma": "variato"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_7_tre_armi",
+          "descrizione": "Sconfiggi 15 nemici alternando tipi di arma"
+        },
+        {
+          "id": "tg_7_maestria",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "fisico"
+          },
+          "target": 8000,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_7_maestria",
+          "descrizione": "Infliggi 8000 danni fisici"
+        },
+        {
+          "id": "tg_7_pulizia",
+          "evento": "area_cleared",
+          "filtri": {
+            "senza_alleati_caduti": true
+          },
+          "target": 3,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_7_pulizia",
+          "descrizione": "Completa 3 aree senza perdere alleati"
+        }
+      ],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [
+          "acciaio_stellare",
+          "polvere_di_arena",
+          "tendine_di_lupo"
+        ],
+        "formula_id": "formula_twilight_giant_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 3.8,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "twilight_giant_6",
+      "name": "Dawn Paladin",
+      "name_i18n": "sequence.twilight_giant.6",
+      "tier": "mid",
+      "concept": "Crescita fisica e armatura di luce evocabile.",
+      "stat_modifiers": {
+        "hp_max": 80,
+        "forza": 0.3,
+        "difesa": 0.15
+      },
+      "abilities": [
+        "tg_armatura_alba",
+        "tg_crescita"
+      ],
+      "acting_actions": [
+        {
+          "id": "tg_6_alba",
+          "evento": "time_in_state",
+          "filtri": {
+            "stato": "trasformato"
+          },
+          "target": 600,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_6_alba",
+          "descrizione": "Resta trasformato per 10 minuti cumulativi"
+        },
+        {
+          "id": "tg_6_giuramento",
+          "evento": "npc_influenced",
+          "filtri": {
+            "modo": "aiutato"
+          },
+          "target": 8,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_6_giuramento",
+          "descrizione": "Aiuta 8 NPC in pericolo"
+        },
+        {
+          "id": "tg_6_luce",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "luce"
+          },
+          "target": 5000,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_6_luce",
+          "descrizione": "Infliggi 5000 danni di luce"
+        }
+      ],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [
+          "frammento_di_alba",
+          "oro_bianco",
+          "linfa_di_gigante"
+        ],
+        "formula_id": "formula_twilight_giant_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 5.2,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "twilight_giant_5",
+      "name": "Guardian",
+      "name_i18n": "sequence.twilight_giant.5",
+      "tier": "mid",
+      "concept": "Assorbe il danno diretto agli alleati; stance difensiva quasi inviolabile.",
+      "stat_modifiers": {
+        "hp_max": 130,
+        "forza": 0.35,
+        "difesa": 0.3
+      },
+      "abilities": [
+        "tg_scudo_del_compagno",
+        "tg_postura_inviolabile"
+      ],
+      "acting_actions": [
+        {
+          "id": "tg_5_scudo",
+          "evento": "damage_absorbed_for_ally",
+          "filtri": {},
+          "target": 5000,
+          "progresso": 0.5,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_5_scudo",
+          "descrizione": "Assorbi 5000 danni diretti agli alleati o al pet"
+        },
+        {
+          "id": "tg_5_nessun_caduto",
+          "evento": "area_cleared",
+          "filtri": {
+            "senza_alleati_caduti": true
+          },
+          "target": 8,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_5_nessun_caduto",
+          "descrizione": "Completa 8 aree senza perdere nessun alleato"
+        },
+        {
+          "id": "tg_5_incassa",
+          "evento": "damage_taken",
+          "filtri": {},
+          "target": 12000,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_5_incassa",
+          "descrizione": "Subisci 12000 danni senza morire"
+        }
+      ],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [
+          "scudo_fuso",
+          "cuore_di_montagna",
+          "resina_di_ferro"
+        ],
+        "formula_id": "formula_twilight_giant_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 6.6,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "twilight_giant_4",
+      "name": "Demon Hunter",
+      "name_i18n": "sequence.twilight_giant.4",
+      "tier": "saint",
+      "concept": "Concoction di potenziamento e caccia agli spiriti maligni.",
+      "stat_modifiers": {
+        "hp_max": 200,
+        "forza": 0.45,
+        "difesa": 0.35,
+        "velocita": 0.1
+      },
+      "abilities": [
+        "tg_concoction_potenziamento",
+        "tg_caccia_spirituale"
+      ],
+      "acting_actions": [
+        {
+          "id": "tg_4_purifica",
+          "evento": "enemy_defeated",
+          "filtri": {
+            "tag_nemico": "spirito"
+          },
+          "target": 30,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_4_purifica",
+          "descrizione": "Purifica 30 creature spirituali o non-morte"
+        },
+        {
+          "id": "tg_4_concoction",
+          "evento": "item_crafted",
+          "filtri": {
+            "categoria": "pozione",
+            "qualita_min": 2
+          },
+          "target": 10,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_4_concoction",
+          "descrizione": "Prepara 10 concoction di qualita' alta"
+        },
+        {
+          "id": "tg_4_caccia",
+          "evento": "enemy_defeated",
+          "filtri": {
+            "sequenza_min": 6
+          },
+          "target": 5,
+          "progresso": 0.3,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_4_caccia",
+          "descrizione": "Sconfiggi 5 Beyonder di Sequenza 6 o superiore"
+        }
+      ],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [
+          "cenere_di_spirito",
+          "argento_benedetto",
+          "fiele_di_demone"
+        ],
+        "formula_id": "formula_twilight_giant_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [
+          "altura",
+          "luogo_di_battaglia"
+        ],
+        "moon_phase": "alba",
+        "sacrifices": [
+          "arma_spezzata_di_un_nemico_ucciso"
+        ],
+        "sigils": [
+          "sigillo_del_guardiano"
+        ]
+      },
+      "madness_on_force": 8.0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "twilight_giant_3",
+      "name": "Silver Knight",
+      "name_i18n": "sequence.twilight_giant.3",
+      "tier": "saint",
+      "concept": "Arma di luce solida che purifica cio' che colpisce.",
+      "stat_modifiers": {
+        "hp_max": 300,
+        "forza": 0.6,
+        "difesa": 0.45
+      },
+      "abilities": [
+        "tg_lama_argentea",
+        "tg_giudizio_luminoso"
+      ],
+      "acting_actions": [
+        {
+          "id": "tg_3_giudizio",
+          "evento": "npc_influenced",
+          "filtri": {
+            "modo": "risparmiato"
+          },
+          "target": 10,
+          "progresso": 0.45,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_3_giudizio",
+          "descrizione": "Risparmia 10 nemici che si arrendono"
+        },
+        {
+          "id": "tg_3_lama",
+          "evento": "time_in_state",
+          "filtri": {
+            "stato": "trasformato"
+          },
+          "target": 1800,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_3_lama",
+          "descrizione": "Mantieni l'arma di luce attiva per 30 minuti cumulativi"
+        },
+        {
+          "id": "tg_3_purifica",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "luce",
+            "tag_bersaglio": "spirito"
+          },
+          "target": 20000,
+          "progresso": 0.3,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_3_purifica",
+          "descrizione": "Infliggi 20000 danni di luce a creature spirituali"
+        }
+      ],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [
+          "lama_di_luce_solidificata",
+          "platino_rituale",
+          "lacrima_di_paladino"
+        ],
+        "formula_id": "formula_twilight_giant_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [
+          "tempio_abbandonato",
+          "altura"
+        ],
+        "moon_phase": "alba",
+        "sacrifices": [
+          "armatura_indossata_per_100_battaglie"
+        ],
+        "sigils": [
+          "sigillo_del_guardiano",
+          "sigillo_argenteo"
+        ]
+      },
+      "madness_on_force": 9.4,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "twilight_giant_2",
+      "name": "Glory",
+      "name_i18n": "sequence.twilight_giant.2",
+      "tier": "angel",
+      "concept": "Luce del crepuscolo: infligge decadimento a materia e spirito.",
+      "stat_modifiers": {
+        "hp_max": 450,
+        "forza": 0.8,
+        "difesa": 0.55
+      },
+      "abilities": [
+        "tg_crepuscolo",
+        "tg_aura_declino"
+      ],
+      "acting_actions": [
+        {
+          "id": "tg_2_accetta_decadimento",
+          "evento": "structure_destroyed",
+          "filtri": {
+            "volontario": true
+          },
+          "target": 1,
+          "progresso": 0.55,
+          "ripetibile": false,
+          "descrizione_i18n": "acting.tg_2_accetta_decadimento",
+          "descrizione": "Lascia decadere volontariamente una struttura che avevi costruito"
+        },
+        {
+          "id": "tg_2_crepuscolo",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "tg_crepuscolo"
+          },
+          "target": 25,
+          "progresso": 0.3,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_2_crepuscolo",
+          "descrizione": "Usa il Crepuscolo 25 volte"
+        },
+        {
+          "id": "tg_2_declino",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "decadimento"
+          },
+          "target": 40000,
+          "progresso": 0.3,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_2_declino",
+          "descrizione": "Infliggi 40000 danni da decadimento"
+        }
+      ],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [
+          "polvere_di_crepuscolo",
+          "ossidiana_decaduta",
+          "ultimo_respiro"
+        ],
+        "formula_id": "formula_twilight_giant_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [
+          "rovina",
+          "luogo_in_decadenza"
+        ],
+        "moon_phase": "crepuscolo",
+        "sacrifices": [
+          "struttura_costruita_dal_giocatore"
+        ],
+        "sigils": [
+          "sigillo_del_declino"
+        ]
+      },
+      "madness_on_force": 10.8,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "twilight_giant_1",
+      "name": "Hand of God",
+      "name_i18n": "sequence.twilight_giant.1",
+      "tier": "angel",
+      "concept": "Forza divina applicata: rompe strutture e barriere.",
+      "stat_modifiers": {
+        "hp_max": 700,
+        "forza": 1.1,
+        "difesa": 0.7
+      },
+      "abilities": [
+        "tg_mano_divina",
+        "tg_spezza_barriera"
+      ],
+      "acting_actions": [
+        {
+          "id": "tg_1_angelo",
+          "evento": "enemy_defeated",
+          "filtri": {
+            "sequenza_min": 2
+          },
+          "target": 3,
+          "progresso": 0.55,
+          "ripetibile": false,
+          "descrizione_i18n": "acting.tg_1_angelo",
+          "descrizione": "Sconfiggi 3 Beyonder di Sequenza 2 o superiore"
+        },
+        {
+          "id": "tg_1_barriera",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "tg_spezza_barriera"
+          },
+          "target": 10,
+          "progresso": 0.3,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.tg_1_barriera",
+          "descrizione": "Apri 10 varchi in barriere considerate inviolabili"
+        },
+        {
+          "id": "tg_1_rituale",
+          "evento": "ritual_completed",
+          "filtri": {
+            "tipo_rituale": "avanzamento"
+          },
+          "target": 1,
+          "progresso": 0.3,
+          "ripetibile": false,
+          "descrizione_i18n": "acting.tg_1_rituale",
+          "descrizione": "Completa il rituale di Sequenza 1 senza interruzioni"
+        }
+      ],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [
+          "scheggia_divina",
+          "metallo_impossibile",
+          "voce_del_gigante"
+        ],
+        "formula_id": "formula_twilight_giant_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [
+          "vetta",
+          "luogo_di_massacro"
+        ],
+        "moon_phase": "eclissi",
+        "sacrifices": [
+          "ancora_del_giocatore"
+        ],
+        "sigils": [
+          "sigillo_del_declino",
+          "sigillo_della_mano"
+        ]
+      },
+      "madness_on_force": 12.2,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "twilight_giant_0",
+      "name": "Twilight Giant",
+      "name_i18n": "sequence.twilight_giant.0",
+      "tier": "god",
+      "concept": "Il crepuscolo come autorita'.",
+      "stat_modifiers": {
+        "hp_max": 1200,
+        "forza": 1.6,
+        "difesa": 1.0
+      },
+      "abilities": [
+        "tg_autorita_crepuscolo"
+      ],
+      "acting_actions": [
+        {
+          "id": "tg_0_unicita",
+          "evento": "enemy_defeated",
+          "filtri": {
+            "sequenza_min": 0
+          },
+          "target": 1,
+          "progresso": 1.0,
+          "ripetibile": false,
+          "descrizione_i18n": "acting.tg_0_unicita",
+          "descrizione": "Rivendica la Sequenza 0 sconfiggendo chi la occupa"
+        }
+      ],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [
+          "caratteristica_del_gigante",
+          "nucleo_del_crepuscolo",
+          "tempo_solidificato"
+        ],
+        "formula_id": "formula_twilight_giant_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [
+          "trono_del_gigante"
+        ],
+        "moon_phase": "eclissi",
+        "sacrifices": [
+          "il_detentore_precedente_della_sequenza_0"
+        ],
+        "sigils": [
+          "sigillo_dell_autorita"
+        ]
+      },
+      "madness_on_force": 13.6,
+      "notes": ""
+    }
+  ]
+}

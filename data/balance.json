@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "_comment": "Curve globali di bilanciamento. Tenute QUI e non sparse nelle abilita' perche' sono i numeri che cambieranno di piu' durante il playtest: devono essere modificabili in un file solo, con hot-reload. I numeri sono PLAUSIBILI, NON BILANCIATI: nessuno ha ancora giocato. Aspettati di riscriverli interamente.",
+  "sequence_gap": {
+    "_comment": "Il muro di Sequenza: un Beyonder molto piu' alto e' quasi immune. E' la meccanica che rende la coltivazione l'unica vera progressione. Moltiplicatore di danno in base a (sequenza_attaccante - sequenza_bersaglio); negativo = il bersaglio e' piu' alto.",
+    "-4": 0.02, "-3": 0.08, "-2": 0.25, "-1": 0.60,
+    "0": 1.00,
+    "1": 1.6, "2": 2.8, "3": 5.0, "4": 9.0
+  },
+  "hp_curve": { "9": 100, "8": 150, "7": 220, "6": 340, "5": 520, "4": 800, "3": 1300, "2": 2200, "1": 3800, "0": 7000 },
+  "spiritualita_curve": { "9": 50, "8": 75, "7": 110, "6": 170, "5": 260, "4": 400, "3": 620, "2": 980, "1": 1500, "0": 3000 },
+  "madness": {
+    "_comment": "Soglie degli effetti di follia. Non si azzera mai del tutto: la riduzione massima delle Ancore e' un cap, non un reset.",
+    "soglia_distorsioni": 15,
+    "soglia_abilita_autonome": 40,
+    "soglia_perdita_input": 70,
+    "soglia_mostro": 100,
+    "riduzione_max_ancore": 0.60,
+    "decadimento_naturale_al_minuto": 0.0
+  },
+  "foundation": {
+    "_comment": "Qualita' della progressione 0-100. Avanzare in fretta la abbassa. Fondamenta basse = tetto di potenza piu' basso e follia piu' rapida. E' la meccanica che punisce chi corre.",
+    "iniziale": 50,
+    "bonus_recitazione_completa": 8,
+    "malus_avanzamento_forzato": -25,
+    "moltiplicatore_stat_per_punto": 0.004,
+    "moltiplicatore_follia_a_fondamenta_zero": 2.5
+  },
+  "acting": {
+    "decadimento_azione_incoerente": 0.05,
+    "soglia_fallimento_abilita": 0.5,
+    "probabilita_attivazione_autonoma_sotto_soglia": 0.08
+  }
+}

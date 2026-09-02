@@ -1,0 +1,596 @@
+{
+  "schema_version": 1,
+  "_comment": "GOLD STANDARD. Pathway completo delle 10 Sequenze, dalla 9 alla 0, scritto interamente in dati: zero righe di codice dedicate al Twilight Giant. E' il modello che ogni story di dati delle fasi successive deve imitare. Nessuna abilita' qui ha richiesto una primitiva fuori dal registro.",
+  "abilities": [
+    {
+      "schema_version": 1,
+      "id": "tg_fendente_pesante",
+      "name_i18n": "ability.twilight_giant.tg_fendente_pesante",
+      "sequence_id": "twilight_giant_9",
+      "costo_spiritualita": 6,
+      "cooldown": 3.0,
+      "primitive": [
+        {
+          "tipo": "melee_arc",
+          "danno": 18,
+          "angolo": 90,
+          "raggio": 2.2,
+          "stagger": 25,
+          "tag_danno": "fisico"
+        }
+      ],
+      "tag_sinergia": [
+        "arma",
+        "forza",
+        "singolo"
+      ],
+      "note": "Colpo lento ad alto stagger. Insegna il ritmo anticipo/recupero fin dal primo minuto."
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_stretta_ferrea",
+      "name_i18n": "ability.twilight_giant.tg_stretta_ferrea",
+      "sequence_id": "twilight_giant_9",
+      "costo_spiritualita": 4,
+      "cooldown": 8.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.25,
+          "durata": 5.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "difesa",
+        "arma",
+        "forza"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_contrattacco",
+      "name_i18n": "ability.twilight_giant.tg_contrattacco",
+      "sequence_id": "twilight_giant_8",
+      "costo_spiritualita": 5,
+      "cooldown": 6.0,
+      "primitive": [
+        {
+          "tipo": "melee_arc",
+          "danno": 26,
+          "angolo": 60,
+          "raggio": 1.6,
+          "stagger": 45,
+          "tag_danno": "fisico"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 0.2,
+          "durata": 2.0,
+          "moltiplicativo": false
+        }
+      ],
+      "tag_sinergia": [
+        "arma",
+        "forza",
+        "difesa",
+        "singolo"
+      ],
+      "condizioni": [
+        {
+          "tipo": "acting_progress_min",
+          "valore": 0.2
+        }
+      ],
+      "note": "Progettata per essere usata subito dopo una parata perfetta (US-010). Aggancio diretto al combat."
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_carica_spalla",
+      "name_i18n": "ability.twilight_giant.tg_carica_spalla",
+      "sequence_id": "twilight_giant_8",
+      "costo_spiritualita": 7,
+      "cooldown": 7.0,
+      "primitive": [
+        {
+          "tipo": "dash",
+          "distanza": 4.0,
+          "durata": 0.25,
+          "invulnerabile": false,
+          "attraversa_nemici": false
+        },
+        {
+          "tipo": "melee_arc",
+          "danno": 14,
+          "angolo": 45,
+          "raggio": 1.4,
+          "stagger": 60,
+          "tag_danno": "fisico"
+        }
+      ],
+      "tag_sinergia": [
+        "forza",
+        "arma",
+        "agilita'"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_maestria_arma",
+      "name_i18n": "ability.twilight_giant.tg_maestria_arma",
+      "sequence_id": "twilight_giant_7",
+      "costo_spiritualita": 0,
+      "cooldown": 0.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "danno_arma",
+          "valore": 0.15,
+          "durata": -1,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "arma",
+        "forza"
+      ],
+      "note": "Passiva permanente (durata -1). Il motore deve gestire i buff senza scadenza."
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_turbine",
+      "name_i18n": "ability.twilight_giant.tg_turbine",
+      "sequence_id": "twilight_giant_7",
+      "costo_spiritualita": 14,
+      "cooldown": 10.0,
+      "primitive": [
+        {
+          "tipo": "melee_arc",
+          "danno": 16,
+          "angolo": 360,
+          "raggio": 2.6,
+          "stagger": 30,
+          "tag_danno": "fisico"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.15,
+          "durata": 1.5,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "arma",
+        "area",
+        "forza"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_lancio_preciso",
+      "name_i18n": "ability.twilight_giant.tg_lancio_preciso",
+      "sequence_id": "twilight_giant_7",
+      "costo_spiritualita": 8,
+      "cooldown": 4.0,
+      "primitive": [
+        {
+          "tipo": "projectile",
+          "danno": 22,
+          "velocita": 14,
+          "gittata": 9,
+          "pierce": 1,
+          "tag_danno": "fisico"
+        }
+      ],
+      "tag_sinergia": [
+        "arma",
+        "singolo"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_armatura_alba",
+      "name_i18n": "ability.twilight_giant.tg_armatura_alba",
+      "sequence_id": "twilight_giant_6",
+      "costo_spiritualita": 18,
+      "cooldown": 25.0,
+      "primitive": [
+        {
+          "tipo": "shield",
+          "assorbimento": 80,
+          "durata": 12.0,
+          "riflette": 0.0,
+          "tag_bloccati": [
+            "fisico",
+            "ombra"
+          ]
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.2,
+          "durata": 12.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "luce",
+        "difesa",
+        "arma"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_crescita",
+      "name_i18n": "ability.twilight_giant.tg_crescita",
+      "sequence_id": "twilight_giant_6",
+      "costo_spiritualita": 20,
+      "cooldown": 40.0,
+      "primitive": [
+        {
+          "tipo": "transform",
+          "forma_id": "tg_forma_gigante",
+          "durata": 15.0,
+          "costo_al_secondo": 1.5
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "forza",
+          "valore": 0.35,
+          "durata": 15.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "forza",
+        "luce",
+        "crescita"
+      ],
+      "condizioni": [
+        {
+          "tipo": "acting_progress_min",
+          "valore": 0.5
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_scudo_del_compagno",
+      "name_i18n": "ability.twilight_giant.tg_scudo_del_compagno",
+      "sequence_id": "twilight_giant_5",
+      "costo_spiritualita": 12,
+      "cooldown": 15.0,
+      "primitive": [
+        {
+          "tipo": "shield",
+          "assorbimento": 120,
+          "durata": 10.0,
+          "riflette": 0.15,
+          "tag_bloccati": [
+            "fisico",
+            "luce",
+            "ombra"
+          ],
+          "bersaglio": "alleato"
+        }
+      ],
+      "tag_sinergia": [
+        "difesa",
+        "luce",
+        "non_letale"
+      ],
+      "note": "Prende il danno diretto agli alleati e al pet. Sinergia esplicita col sistema pet."
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_postura_inviolabile",
+      "name_i18n": "ability.twilight_giant.tg_postura_inviolabile",
+      "sequence_id": "twilight_giant_5",
+      "costo_spiritualita": 16,
+      "cooldown": 30.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.7,
+          "durata": 6.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "velocita",
+          "valore": -0.5,
+          "durata": 6.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "aura",
+          "raggio": 3.0,
+          "durata": 6.0,
+          "effetto": "taunt",
+          "tick_rate": 1.0,
+          "bersagli": "nemici"
+        }
+      ],
+      "tag_sinergia": [
+        "difesa",
+        "arma",
+        "area"
+      ],
+      "note": "Trade-off esplicito: quasi invulnerabile ma quasi immobile. Il giocatore sceglie quando ancorarsi."
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_concoction_potenziamento",
+      "name_i18n": "ability.twilight_giant.tg_concoction_potenziamento",
+      "sequence_id": "twilight_giant_4",
+      "costo_spiritualita": 10,
+      "cooldown": 45.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "forza",
+          "valore": 0.3,
+          "durata": 20.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "velocita",
+          "valore": 0.2,
+          "durata": 20.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "heal",
+          "quantita": 40,
+          "istantaneo": true,
+          "durata": 0,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "pozione",
+        "forza",
+        "guarigione",
+        "crafting"
+      ],
+      "costo_follia": 0.5,
+      "note": "Primo aggancio duro tra Pathway e crafting: la concoction usa ingredienti dall'inventario."
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_caccia_spirituale",
+      "name_i18n": "ability.twilight_giant.tg_caccia_spirituale",
+      "sequence_id": "twilight_giant_4",
+      "costo_spiritualita": 14,
+      "cooldown": 8.0,
+      "primitive": [
+        {
+          "tipo": "melee_arc",
+          "danno": 45,
+          "angolo": 90,
+          "raggio": 2.4,
+          "stagger": 40,
+          "tag_danno": "luce"
+        },
+        {
+          "tipo": "light_purify",
+          "raggio": 2.4,
+          "potenza": 2,
+          "riduce_sequenza": false
+        }
+      ],
+      "tag_sinergia": [
+        "luce",
+        "purificazione",
+        "arma",
+        "spirito"
+      ],
+      "note": "Danno enormemente maggiore contro bersagli con tag 'spirito' o 'non_morto'."
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_lama_argentea",
+      "name_i18n": "ability.twilight_giant.tg_lama_argentea",
+      "sequence_id": "twilight_giant_3",
+      "costo_spiritualita": 22,
+      "cooldown": 20.0,
+      "primitive": [
+        {
+          "tipo": "transform",
+          "forma_id": "tg_arma_luce",
+          "durata": 25.0,
+          "costo_al_secondo": 1.0
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "danno_arma",
+          "valore": 0.5,
+          "durata": 25.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "luce",
+        "arma",
+        "purificazione"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_giudizio_luminoso",
+      "name_i18n": "ability.twilight_giant.tg_giudizio_luminoso",
+      "sequence_id": "twilight_giant_3",
+      "costo_spiritualita": 30,
+      "cooldown": 35.0,
+      "primitive": [
+        {
+          "tipo": "light_purify",
+          "raggio": 6.0,
+          "potenza": 4,
+          "riduce_sequenza": false
+        },
+        {
+          "tipo": "dot",
+          "danno_tick": 12,
+          "tick_rate": 1.0,
+          "durata": 6.0,
+          "tag_danno": "luce"
+        }
+      ],
+      "tag_sinergia": [
+        "luce",
+        "purificazione",
+        "area"
+      ],
+      "costo_follia": 1.0
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_crepuscolo",
+      "name_i18n": "ability.twilight_giant.tg_crepuscolo",
+      "sequence_id": "twilight_giant_2",
+      "costo_spiritualita": 40,
+      "cooldown": 60.0,
+      "primitive": [
+        {
+          "tipo": "decay",
+          "danno": 70,
+          "raggio": 7.0,
+          "colpisce_oggetti": true,
+          "durata": 10.0
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.4,
+          "durata": 10.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "decadimento",
+        "luce",
+        "area"
+      ],
+      "costo_follia": 3.0,
+      "note": "L'abilita' firma del Pathway. colpisce_oggetti True: degrada le strutture, comprese quelle costruite dal giocatore. Deve poter danneggiare la propria base."
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_aura_declino",
+      "name_i18n": "ability.twilight_giant.tg_aura_declino",
+      "sequence_id": "twilight_giant_2",
+      "costo_spiritualita": 25,
+      "cooldown": 45.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 5.0,
+          "durata": 15.0,
+          "effetto": "decadimento",
+          "tick_rate": 1.0,
+          "bersagli": "nemici"
+        }
+      ],
+      "tag_sinergia": [
+        "decadimento",
+        "area",
+        "luce"
+      ],
+      "costo_follia": 2.0
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_mano_divina",
+      "name_i18n": "ability.twilight_giant.tg_mano_divina",
+      "sequence_id": "twilight_giant_1",
+      "costo_spiritualita": 55,
+      "cooldown": 90.0,
+      "primitive": [
+        {
+          "tipo": "melee_arc",
+          "danno": 220,
+          "angolo": 120,
+          "raggio": 6.0,
+          "stagger": 999,
+          "tag_danno": "luce"
+        },
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "frantuma",
+          "raggio": 6.0,
+          "durata": 0,
+          "permanente": true
+        }
+      ],
+      "tag_sinergia": [
+        "forza",
+        "luce",
+        "area",
+        "arma"
+      ],
+      "costo_follia": 5.0,
+      "note": "permanente True: altera davvero la mappa. Aggancio a esplorazione e gating."
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_spezza_barriera",
+      "name_i18n": "ability.twilight_giant.tg_spezza_barriera",
+      "sequence_id": "twilight_giant_1",
+      "costo_spiritualita": 45,
+      "cooldown": 60.0,
+      "primitive": [
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "apre_varco",
+          "raggio": 3.0,
+          "durata": 0,
+          "permanente": true
+        },
+        {
+          "tipo": "light_purify",
+          "raggio": 3.0,
+          "potenza": 6,
+          "riduce_sequenza": true
+        }
+      ],
+      "tag_sinergia": [
+        "luce",
+        "purificazione",
+        "forza"
+      ],
+      "costo_follia": 4.0,
+      "note": "riduce_sequenza True: abbassa temporaneamente la Sequenza effettiva del bersaglio. Solo da Sequenza 1."
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_autorita_crepuscolo",
+      "name_i18n": "ability.twilight_giant.tg_autorita_crepuscolo",
+      "sequence_id": "twilight_giant_0",
+      "costo_spiritualita": 0,
+      "cooldown": 0.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 999,
+          "durata": -1,
+          "effetto": "autorita_decadimento",
+          "tick_rate": 5.0,
+          "bersagli": "mondo"
+        }
+      ],
+      "tag_sinergia": [
+        "decadimento",
+        "luce",
+        "dominio",
+        "area"
+      ],
+      "note": "Autorita' divina passiva e globale. Endgame: tutto cio' che il giocatore non protegge attivamente decade."
+    }
+  ]
+}

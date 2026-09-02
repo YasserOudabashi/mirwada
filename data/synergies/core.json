@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "_comment": "ESEMPI DI RIFERIMENTO. Ogni sinergia pesca da almeno 2 fonti diverse: e' il validator a imporlo, perche' una sinergia interna a un solo sistema non realizza il pilastro di design.",
+  "synergies": [
+    {
+      "schema_version": 1,
+      "id": "sinergia_inganno_probabilita",
+      "name_i18n": "synergy.inganno_probabilita",
+      "richiede_tag": { "inganno": 3, "probabilita'": 2 },
+      "fonti": ["abilita", "talento", "pet"],
+      "effetto": { "tipo": "aggiungi_abilita", "ability_id": "sinergia_colpo_del_caso" },
+      "scoperta": "nascosta",
+      "note": "Fool o Error combinati con un talento di fortuna e un pet a tema. Sinergia firma del gioco: da' un'abilita' che non appartiene a nessun Pathway."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_crescita_pozione",
+      "name_i18n": "synergy.crescita_pozione",
+      "richiede_tag": { "crescita": 2, "pozione": 2 },
+      "fonti": ["stanza", "ingrediente", "pet"],
+      "effetto": { "tipo": "modifica_qualita_crafting", "categoria": "pozioni", "delta": 0.20 },
+      "scoperta": "visibile",
+      "note": "Giardino + ingredienti coltivati + pet erbivoro. Sinergia introduttiva, deliberatamente visibile per insegnare il sistema."
+    },
+    {
+      "schema_version": 1,
+      "id": "anti_ordine_disordine",
+      "name_i18n": "synergy.anti_ordine_disordine",
+      "richiede_tag": { "ordine": 2, "disordine": 2 },
+      "fonti": ["abilita", "equipaggiamento"],
+      "effetto": { "tipo": "modifica_follia", "delta_al_minuto": 0.5 },
+      "anti": true,
+      "scoperta": "lore",
+      "note": "Justiciar e Black Emperor sono vicini nello stesso gruppo ma le loro autorita' si mordono. Portare entrambi i set di tag accelera la follia."
+    }
+  ]
+}

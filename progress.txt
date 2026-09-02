@@ -1,0 +1,160 @@
+# Sequenza — note tra sessioni
+
+Questo file e' la memoria del progetto tra un'iterazione di ralph e l'altra.
+Ogni iterazione APPENDE una sezione datata. Non riscrivere le sezioni vecchie.
+
+Formato di ogni sezione:
+  [AAAA-MM-GG] US-NNN — titolo
+  - Cosa fatto:
+  - Come verificato:
+  - Note ambiente (comandi, percorsi, problemi noti):
+  - Prossima storia:
+
+---
+
+[SETUP] Pacchetto iniziale
+
+- Cosa fatto: spina dorsale dati creata prima di ogni riga di codice di gioco.
+  22 pathway / 220 sequenze in data/pathways/, schemi in data/schema/,
+  registro chiuso di 31 primitive, vocabolario chiuso di 82 tag,
+  validator in tools/validate_data.py, PRD fase 1 e prd.json (18 story).
+- Come verificato: `python tools/validate_data.py` esce 0.
+  `python tools/generate_pathways.py` riporta 22 pathway / 220 sequenze.
+- Note ambiente:
+  - Il validator NON richiede pip install: i controlli sono espliciti.
+    Gli schemi in data/schema/ sono documentazione formale del formato.
+  - generate_pathways.py e' idempotente: preserva abilities, acting_actions
+    e potion gia' popolati. Si puo' rilanciare senza perdere lavoro.
+  - Engine assunto: Godot 4.x. Se si passa a Unity, va riscritto solo
+    006_PRD/prd-fase-1-fondamenta.md e il prd.json corrispondente.
+- Prossima storia: US-001.
+
+[SETUP-2] Riduzione a 10 Pathway + gold standard Twilight Giant
+
+- Cosa fatto:
+  - Scope ridotto da 22 a 10 Pathway scegliendo 4 GRUPPI COMPLETI
+    (Lord of Mysteries, Eternal Darkness, Demon of Knowledge, Goddess of
+    Origin). Criterio: il cambio di Pathway della fase 7 funziona solo tra
+    vicini dello stesso gruppo, quindi gruppi a meta' avrebbero rotto quel
+    sistema. I 12 differiti sono in data/pathways_deferred/, completi.
+  - Aggiunto il campo `concept` a tutte e 100 le Sequenze attive: una riga che
+    dichiara COSA FA IL GIOCATORE a quel livello. E' la specifica da cui si
+    scrivono le abilita'. Il validator lo esige non vuoto.
+  - Twilight Giant COMPLETO come gold standard: 20 abilita' dalla Sequenza 9
+    alla 0, modificatori, azioni di recitazione, ingredienti, rituali.
+    Zero righe di codice dedicate: e' la prova che l'architettura regge.
+  - 3 primitive marcate `deferred` (weather_control, probability_shift,
+    rule_bind): nessun Pathway attivo le richiede. Il validator RIFIUTA
+    un'abilita' che le usi. 28 attive su 31.
+  - Il validator ora verifica anche che i gruppi siano completi.
+- Come verificato: `python tools/validate_data.py` esce 0.
+  `python tools/generate_pathways.py` riporta 10 attivi / 100 sequenze.
+- Note ambiente: per riattivare un Pathway, spostare il file da
+  pathways_deferred/ a pathways/ e aggiornare ACTIVE in
+  tools/generate_pathways.py. Riattivare SEMPRE il gruppo intero, mai il
+  singolo Pathway: il validator fallisce sui gruppi incompleti.
+- Prossima storia: US-001.
+
+[SETUP-3] Acting Method ridotto + stress test primitive + balance.json
+
+- Cosa fatto:
+  - ENGINE DECISO: Godot 4.x. Motivo determinante: attrito di iterazione.
+    Niente compilazione C#, niente file .meta nei commit, hot-reload JSON
+    immediato. In un ciclo "scrivi -> verifica a schermo" ripetuto centinaia
+    di volte, l'attrito conta piu' della maturita' del tooling.
+  - ACTING METHOD, VERSIONE RIDOTTA (scelta dell'utente): creato
+    data/schema/tracked_events.json, vocabolario CHIUSO di 12 eventi.
+    Ogni azione di recitazione e' ora un contatore su un evento con filtri,
+    non una descrizione a parole. Costo: 1 story per un EventTracker generico
+    invece di ~40 rilevatori speciali.
+    Riscritte tutte le 31 azioni del Twilight Giant e le 3 del Fool.
+  - Il validator ora verifica: evento nel vocabolario, filtri ammessi per
+    quell'evento, target numerico presente, e che le azioni di una Sequenza
+    SOMMINO ad almeno 1.0 (altrimenti il giocatore resta bloccato per sempre
+    a quella Sequenza — bug che nessun test di gioco avrebbe trovato).
+  - STRESS TEST DEL REGISTRO: scritta un'abilita' di alta Sequenza per ognuno
+    dei 9 Pathway non implementati, scegliendo i casi piu' difficili.
+    Risultato: 12 primitive usate, ZERO fuori registro. Il vincolo delle 28
+    regge. Rischio chiuso.
+  - Il test ha pero' trovato 3 capacita' del MOTORE non coperte dal registro,
+    ora documentate in 006_PRD/design-pathways.md e inserite nella roadmap:
+    (1) eseguire un'abilita' non posseduta (Error), (2) oggetti con
+    stored_ability_id (Hermit), (3) evocazioni persistenti da serializzare
+    (Death, Paragon). Tutte e tre sarebbero emerse in fase 5 con il motore
+    gia' scritto.
+  - Creato data/balance.json: curve globali (muro di Sequenza, hp,
+    spiritualita', soglie di follia, fondamenta). I numeri sono PLAUSIBILI,
+    NON BILANCIATI. Vanno riscritti dopo il primo playtest.
+- Come verificato: python tools/validate_data.py esce 0. 32 abilita' totali,
+  10 pathway, 100 sequenze, 40 file di dati.
+- Note ambiente: aggiungere un evento a tracked_events.json e' CODICE, non
+  dati. Va discusso come per le primitive.
+- Prossima storia: US-001.
+
+[SETUP-4] Sistema audio
+
+- Cosa fatto:
+  - CORREZIONE DI UN BUCO DEL PIANO: l'audio era nei non-goals della fase 1,
+    ma design-pathways.md prometteva gia' i "sussurri della follia". Sistema
+    mai progettato, meccanica gia' promessa. Ora c'e' data/audio.json.
+  - L'audio in questo gioco NON e' decorazione, e' un canale informativo:
+    (1) tell sonori degli attacchi nemici, con anticipo_ms nei dati: permette
+        di reagire a un nemico fuori schermo. Requisito di leggibilita'.
+    (2) layer della follia su 4 soglie, con bus dedicato "whisper" separato
+        cosi' che l'accessibilita' lo silenzi senza toccare la meccanica.
+        A soglia 55 i sussurri usano i nomi degli NPC incontrati e delle
+        Ancore del giocatore.
+    (3) percezione per Sequenza: salendo si sentono layer nuovi e si rivelano
+        informazioni (spiriti, densita' mistica, segreti adiacenti).
+  - pathway_palette: 10 palette timbriche invece di ~200 suoni dedicati.
+    Stesso principio delle primitive applicato all'audio.
+  - Musica a LAYER per zona (base + stem su tensione/combat/boss): meno
+    minuti da comporre e nessun taglio brusco entrando in combattimento.
+    Rituale interrotto = taglio secco al silenzio.
+  - Due story aggiunte alla FASE 1 (US-019 bus audio + feedback di colpo,
+    US-020 tell sonori). In fase 1 e non piu' avanti perche' il feedback di
+    colpo e' meta' del feel di un action 2D: tarare il combat senza audio
+    significa tararlo due volte. Fase 1 passa da 18 a 20 story.
+  - Il validator verifica: palette presente per ogni Pathway attivo,
+    anticipo_ms > 0 su ogni tell, soglie di follia ordinate.
+- LIMITE DICHIARATO: non posso produrre audio. Il sistema lo progetto, i file
+  no. Per la fase 1 bfxr/sfxr/Chiptone bastano e sono lo stile giusto per la
+  pixel art. Per la fase 6 serve un musicista, o stem CC0 compatibili con la
+  struttura a layer. data/audio.json e' gia' la specifica da consegnargli.
+- Come verificato: python tools/validate_data.py esce 0.
+- Prossima storia: US-001.
+
+[SETUP-5] Animazioni data-driven + generatore di placeholder
+
+- Cosa fatto:
+  - data/animations.json: specifica delle animazioni per personaggio, nemico
+    e pet. Il TIMING DEL COMBAT vive qui, non negli script: frame di anticipo,
+    attivi, recupero, iframe del dash (iframe_da/iframe_a), finestra di parata
+    perfetta, eventi per frame (footstep, tell_audio, tell_visivo,
+    hitbox_on/off, ability_release).
+    Gli iframe sono espressi in FRAME e non in secondi, cosi' restano
+    agganciati all'animazione anche cambiando gli fps.
+  - DECISIONE IRREVERSIBILE PRESA: 4 direzioni, non 8. Le diagonali riusano
+    gli sprite orizzontali. Dimezza i frame da disegnare ed e' invisibile in
+    un top-down. Come i 32x32, cambiarla dopo significa ridisegnare tutto.
+  - tools/generate_placeholders.py: genera 324 frame PNG reali dalla
+    specifica, con bordi diagnostici (ROSSO hitbox attiva, GIALLO anticipo,
+    CIANO invulnerabile, VERDE parata perfetta, GRIGIO recupero) e numero di
+    frame leggibile. Serve a tarare il combat GUARDANDO lo schermo: per questo
+    scopo e' meglio dell'arte definitiva, che nasconde le fasi.
+    Verificato visivamente: attack_heavy mostra 4 gialli + 2 rossi + 2 grigi,
+    coerente con la specifica; dash mostra i frame 0-2 in ciano e il 3 no.
+  - US-021 aggiunta alla fase 1 (macchina di animazione data-driven).
+    Fase 1: 21 story.
+  - Il validator ora verifica: indici di frame esistenti, hitbox_on/hitbox_off
+    in pari (una hitbox che non si chiude resta attiva per sempre), e avvisa
+    sugli attacchi senza anticipo salvo dichiarazione anticipo_in_stato.
+- LIMITE DICHIARATO: non disegno pixel art. Le animazioni le programmo, i
+  disegni no. Le quattro strade per l'arte vera (pack CC0, pack a pagamento,
+  artista su commissione, impararla) sono in 006_PRD/prd-fase-1-fondamenta.md.
+  La decisione NON va presa adesso: va presa quando il gioco e' divertente
+  coi placeholder. Il budget si calcola dal budget_frame in animations.json:
+  156 frame per un personaggio completo, 30-60 al giorno per un artista.
+- Come verificato: validate_data.py esce 0, generate_placeholders.py produce
+  324 frame in assets/placeholder/.
+- Prossima storia: US-001.

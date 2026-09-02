@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "_comment": "Abilita' del Pathway mother.",
+  "abilities": [
+    {
+      "schema_version": 1,
+      "id": "mother_dominio_druidico",
+      "name_i18n": "ability.mother.mother_dominio_druidico",
+      "sequence_id": "mother_5",
+      "costo_spiritualita": 40,
+      "cooldown": 45.0,
+      "primitive": [
+        {
+          "tipo": "plant_growth",
+          "raggio": 9,
+          "specie": "rampicante_ostile",
+          "velocita": 3.0,
+          "persistente": true
+        },
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "terreno_vivo",
+          "raggio": 9,
+          "durata": 30.0,
+          "permanente": false
+        },
+        {
+          "tipo": "dot",
+          "danno_tick": 8,
+          "tick_rate": 1.0,
+          "durata": 30.0,
+          "tag_danno": "crescita"
+        }
+      ],
+      "tag_sinergia": [
+        "crescita",
+        "terra",
+        "area",
+        "disastro"
+      ],
+      "note": "STRESS TEST. Tre primitive composte per il terraforming tattico. Nessuna nuova."
+    }
+  ]
+}

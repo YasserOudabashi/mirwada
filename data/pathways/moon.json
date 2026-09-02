@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "id": "moon",
+  "name": "Moon",
+  "name_i18n": "pathway.moon",
+  "group": "goddess_of_origin",
+  "god_title": "Moon",
+  "from_outer_deity": true,
+  "gameplay_verb": "Domare bestie, evocare e distillare pozioni potenti",
+  "tags": [
+    "pozione",
+    "bestia",
+    "evocazione",
+    "sangue"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "moon_9",
+      "name": "Apothecary",
+      "name_i18n": "sequence.moon.9",
+      "tier": "low",
+      "concept": "Pozioni di base ed erboristeria: la porta d'ingresso all'alchimia.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 9,
+        "ingredients": [],
+        "formula_id": "formula_moon_9"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 8,
+      "id": "moon_8",
+      "name": "Beast Tamer",
+      "name_i18n": "sequence.moon.8",
+      "tier": "low",
+      "concept": "Doma le bestie: il primo pet permanente del gioco.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 8,
+        "ingredients": [],
+        "formula_id": "formula_moon_8"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 7,
+      "id": "moon_7",
+      "name": "Vampire",
+      "name_i18n": "sequence.moon.7",
+      "tier": "low",
+      "concept": "Drena sangue, rigenera e guadagna forza di notte.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 7,
+        "ingredients": [],
+        "formula_id": "formula_moon_7"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 6,
+      "id": "moon_6",
+      "name": "Potions Professor",
+      "name_i18n": "sequence.moon.6",
+      "tier": "mid",
+      "concept": "Pozioni avanzate con qualita' superiore e effetti combinati.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 6,
+        "ingredients": [],
+        "formula_id": "formula_moon_6"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 5,
+      "id": "moon_5",
+      "name": "Scarlet Scholar",
+      "name_i18n": "sequence.moon.5",
+      "tier": "mid",
+      "concept": "Sangue come materiale rituale: potenzia i rituali di avanzamento.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 5,
+        "ingredients": [],
+        "formula_id": "formula_moon_5"
+      },
+      "advancement_ritual": null,
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 4,
+      "id": "moon_4",
+      "name": "Shaman King",
+      "name_i18n": "sequence.moon.4",
+      "tier": "saint",
+      "concept": "Comanda branchi e spiriti bestiali; il pet acquisisce un branco.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 4,
+        "ingredients": [],
+        "formula_id": "formula_moon_4"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 3,
+      "id": "moon_3",
+      "name": "High Summoner",
+      "name_i18n": "sequence.moon.3",
+      "tier": "saint",
+      "concept": "Evoca creature da grande distanza, anche mai incontrate.",
+      "stat_modifiers": {},
+      "abilities": [
+        "moon_evocazione_remota"
+      ],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 3,
+        "ingredients": [],
+        "formula_id": "formula_moon_3"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 2,
+      "id": "moon_2",
+      "name": "Life-Giver",
+      "name_i18n": "sequence.moon.2",
+      "tier": "angel",
+      "concept": "Dona vita: crea creature durature che coltivano insieme al giocatore.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 2,
+        "ingredients": [],
+        "formula_id": "formula_moon_2"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 1,
+      "id": "moon_1",
+      "name": "Beauty Goddess",
+      "name_i18n": "sequence.moon.1",
+      "tier": "angel",
+      "concept": "Fascino assoluto: dominio sui viventi senza combattimento.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 1,
+        "ingredients": [],
+        "formula_id": "formula_moon_1"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    },
+    {
+      "sequence": 0,
+      "id": "moon_0",
+      "name": "Moon",
+      "name_i18n": "sequence.moon.0",
+      "tier": "god",
+      "concept": "La luna come dominio.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "acting_actions": [],
+      "potion": {
+        "characteristic_sequence": 0,
+        "ingredients": [],
+        "formula_id": "formula_moon_0"
+      },
+      "advancement_ritual": {
+        "location_tags": [],
+        "moon_phase": null,
+        "sacrifices": [],
+        "sigils": []
+      },
+      "madness_on_force": 0,
+      "notes": ""
+    }
+  ]
+}
