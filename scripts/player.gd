@@ -28,17 +28,24 @@ const FACING := {
 @onready var _stats: Node = $StatsComponent
 @onready var _anim: AnimatedSprite2D = $AnimationMachine
 @onready var _hitbox: Area2D = $Hitbox
+@onready var _hurtbox: Area2D = $Hurtbox
 
 var _dir_sguardo: String = "down"
 var _attaccando: bool = false
 var _in_hitstop: bool = false
 var _combat: Dictionary = {}
 
+var _dashing: bool = false
+var _dash_vel: Vector2 = Vector2.ZERO
+var _dash_left: float = 0.0
+var _dash_cd: float = 0.0
+
 
 func _ready() -> void:
 	_anim.call("configura", CATEGORIA_ANIM)
 	_anim.evento_frame.connect(_su_evento_anim)
 	_anim.animazione_finita.connect(_su_anim_finita)
+	_anim.finestra_cambiata.connect(_su_finestra_anim)
 	_hitbox.ha_colpito.connect(_su_colpo_inflitto)
 
 	var gd: Node = get_node_or_null("/root/GameData")
@@ -52,6 +59,20 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_dash_cd = maxf(_dash_cd - delta, 0.0)
+
+	if _dashing:
+		_dash_left -= delta
+		velocity = _dash_vel
+		move_and_slide()
+		if _dash_left <= 0.0:
+			_fine_dash()
+		return
+
+	if Input.is_action_just_pressed("schivata") and not _attaccando and _dash_cd <= 0.0:
+		start_dash({})
+		return
+
 	if Input.is_action_just_pressed("attacco") and not _attaccando:
 		_inizia_attacco()
 
@@ -80,6 +101,43 @@ func sta_attaccando() -> bool:
 	return _attaccando
 
 
+func sta_schivando() -> bool:
+	return _dashing
+
+
+func schivata_pronta() -> bool:
+	return _dash_cd <= 0.0
+
+
+## Entry point della schivata: lo usano sia l'input "schivata" sia la
+## primitiva "dash" di ability_engine (che cerca start_dash sul caster).
+func start_dash(spec: Dictionary) -> void:
+	if _dashing:
+		return
+	var b: Dictionary = _combat.get("schivata", {})
+	var distanza: float = float(spec.get("distanza", b.get("distanza", 96.0)))
+	var durata: float = maxf(float(spec.get("durata", b.get("durata", 0.18))), 0.01)
+	_dash_cd = float(spec.get("cooldown", b.get("cooldown", 0.6)))
+
+	var dir: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if dir == Vector2.ZERO:
+		dir = get_facing()
+	dir = dir.normalized()
+	_aggiorna_sguardo(dir)
+
+	_dashing = true
+	_dash_left = durata
+	_dash_vel = dir * (distanza / durata)
+	_anim.call("riproduci", "dash", _dir_sguardo)
+
+
+func _fine_dash() -> void:
+	_dashing = false
+	velocity = _dash_vel * 0.2  # un filo di scivolata all'uscita
+	_hurtbox.call("set_invulnerabile", false)
+	_anim.modulate = Color.WHITE
+
+
 func _inizia_attacco() -> void:
 	_attaccando = true
 	var facing: Vector2 = get_facing()
@@ -102,6 +160,14 @@ func _su_anim_finita(stato: String) -> void:
 	if stato == STATO_ATTACCO:
 		_attaccando = false
 		_hitbox.call("disattiva")
+
+
+## Finestre guidate dai frame di animations.json. "iframe": invulnerabilita'
+## del dash (US-009); l'indicatore visivo e' la tinta ciano dello sprite.
+func _su_finestra_anim(nome: String, attiva: bool) -> void:
+	if nome == "iframe":
+		_hurtbox.call("set_invulnerabile", attiva)
+		_anim.modulate = Color(0.55, 0.9, 1.0, 0.75) if attiva else Color.WHITE
 
 
 func _su_colpo_inflitto(_bersaglio: Node, _danno: float) -> void:
@@ -129,7 +195,7 @@ func _aggiorna_sguardo(input: Vector2) -> void:
 
 
 func _aggiorna_animazione() -> void:
-	if _attaccando:
+	if _attaccando or _dashing:
 		return
 	var stato: String = "walk" if velocity.length() > SOGLIA_MOTO else "idle"
 	_anim.call("riproduci", stato, _dir_sguardo)

@@ -61,23 +61,35 @@ func _physics_process(_delta: float) -> void:
 
 
 func _costruisci(angolo: float, raggio: float) -> void:
-	var punti: PackedVector2Array = [Vector2.ZERO]
-	var passi: int = 10
-	var mezza: float = deg_to_rad(angolo) * 0.5
+	var passi: int = 12
+	var mezza: float = deg_to_rad(clampf(angolo, 1.0, 360.0)) * 0.5
+	var arco: PackedVector2Array = []
 	for i in passi + 1:
 		var t: float = -mezza + (2.0 * mezza) * (float(i) / float(passi))
-		punti.append(Vector2(cos(t), sin(t)) * raggio)
+		arco.append(Vector2(cos(t), sin(t)) * raggio)
 
 	if _forma == null:
 		_forma = CollisionShape2D.new()
 		add_child(_forma)
-	var poly := ConvexPolygonShape2D.new()
-	poly.points = punti
-	_forma.shape = poly
+	# Un settore fino a ~180 gradi e' convesso col vertice al centro; oltre
+	# non lo e' piu' -> cerchio pieno. Cosi' anche gli attacchi ad ampio
+	# raggio dei nemici hanno una forma valida.
+	if angolo >= 180.0:
+		var c := CircleShape2D.new()
+		c.radius = raggio
+		_forma.shape = c
+	else:
+		var poly := ConvexPolygonShape2D.new()
+		var punti: PackedVector2Array = [Vector2.ZERO]
+		punti.append_array(arco)
+		poly.points = punti
+		_forma.shape = poly
 
 	if _grafica == null:
 		_grafica = Polygon2D.new()
 		_grafica.color = Color(1.0, 0.96, 0.7, 0.55)
 		_grafica.z_index = 5
 		add_child(_grafica)
-	_grafica.polygon = punti
+	var vis: PackedVector2Array = [Vector2.ZERO]
+	vis.append_array(arco)
+	_grafica.polygon = vis

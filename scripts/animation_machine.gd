@@ -15,6 +15,9 @@ extends AnimatedSprite2D
 signal evento_frame(nome: String)
 signal fase_cambiata(fase: String)
 signal animazione_finita(stato: String)
+## Emesso quando il frame corrente entra/esce dalla finestra iframe_da..a
+## (US-009) o da finestra_perfetta (US-010).
+signal finestra_cambiata(nome: String, attiva: bool)
 
 const AnimationSpec := preload("res://scripts/animation_spec.gd")
 const DIM := 32
@@ -24,6 +27,8 @@ var _stato: String = ""
 var _spec: RefCounted = null
 var _ultima_fase: String = ""
 var _ultimo_frame_visto: int = -1
+var _invuln_attiva: bool = false
+var _parata_attiva: bool = false
 
 
 ## Connette i segnali una volta sola. Chiamato da configura() e non da
@@ -117,6 +122,8 @@ func riproduci(stato: String, direzione: String = "down") -> void:
 	_spec = spec
 	_ultima_fase = ""
 	_ultimo_frame_visto = -1
+	_invuln_attiva = false
+	_parata_attiva = false
 	animation = chiave
 	frame = 0
 	play()
@@ -147,6 +154,15 @@ func _processa_frame(f: int) -> void:
 	if fase != _ultima_fase:
 		_ultima_fase = fase
 		fase_cambiata.emit(fase)
+
+	var invuln: bool = _spec.is_invulnerable_at(f)
+	if invuln != _invuln_attiva:
+		_invuln_attiva = invuln
+		finestra_cambiata.emit("iframe", invuln)
+	var parata: bool = _spec.is_perfect_parry_at(f)
+	if parata != _parata_attiva:
+		_parata_attiva = parata
+		finestra_cambiata.emit("parata_perfetta", parata)
 
 
 func _game_data() -> Node:

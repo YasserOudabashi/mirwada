@@ -40,6 +40,12 @@
       "angolo": 100,
       "raggio": 22
     },
-    "hitstop_ms": 70
+    "hitstop_ms": 70,
+    "schivata": {
+      "_comment": "La finestra di invulnerabilita' NON e' qui: sono i frame iframe_da/iframe_a di animations.json personaggio.dash. Qui distanza, durata e cooldown.",
+      "distanza": 96,
+      "durata": 0.18,
+      "cooldown": 0.6
+    }
   }
 }

@@ -66,6 +66,22 @@ func test_cambio_di_fase_del_combat() -> void:
 	m.free()
 
 
+func test_finestra_iframe_del_dash_segnalata() -> void:
+	var m: AnimatedSprite2D = _nuova()
+	Engine.get_main_loop().root.add_child(m)
+	var eventi: Array = []
+	m.finestra_cambiata.connect(func(nome: String, attiva: bool) -> void:
+		eventi.append([nome, attiva]))
+
+	m.call("riproduci", "dash", "left")  # animations.json: iframe 0..2
+	# frame 0 e' gia' dentro la finestra -> primo evento (iframe, true)
+	m.frame = 3  # fuori -> (iframe, false)
+
+	assert_true(eventi.has(["iframe", true]), "iframe apre entrando nel dash")
+	assert_true(eventi.has(["iframe", false]), "iframe chiude uscendo dalla finestra")
+	m.free()
+
+
 func test_spec_corrente_espone_le_finestre() -> void:
 	var m: AnimatedSprite2D = _nuova()
 	Engine.get_main_loop().root.add_child(m)

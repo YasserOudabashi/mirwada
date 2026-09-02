@@ -723,3 +723,43 @@ Sessione grossa su richiesta dell'utente: analisi completa del progetto
   (combat_feedback). L'arco vero (angolo, non cerchio) e' gia' un settore
   ConvexPolygonShape2D; melee_arc.gd della primitiva abilita' resta separato.
 - Prossima storia: US-009 (schivata con i-frame).
+
+[2026-09-02] US-009 — Schivata con frame di invulnerabilita'
+
+- Cosa fatto:
+  - animation_machine.gd: nuovo segnale finestra_cambiata(nome, attiva),
+    emesso quando il frame corrente entra/esce da iframe_da..a ("iframe") o
+    da finestra_perfetta ("parata_perfetta"). Simmetrico a fase_cambiata.
+    US-010 usera' lo stesso segnale per la parata.
+  - player.gd: start_dash(spec) — entry point condiviso fra l'input
+    "schivata" (Spazio / Shift sx) e la primitiva "dash" di ability_engine.
+    Direzione = input corrente o, se fermo, get_facing(). Durante il dash
+    velocity = _dash_vel (distanza/durata) e move_and_slide; il resto del
+    movimento e' bypassato. _dash_cd conta alla rovescia: niente spam.
+    finestra_cambiata("iframe") -> _hurtbox.set_invulnerabile() + tinta ciano
+    dello sprite come indicatore visivo. _fine_dash forza comunque
+    invulnerabile=false.
+  - project.godot: azione "schivata".
+  - data/balance.json combattimento.schivata: distanza/durata/cooldown.
+    La finestra di i-frame NON e' qui: sono i frame iframe_da/a di
+    animations.json personaggio.dash (0..2 su 4).
+  - hitbox.gd: settore >= 180 gradi ora diventa un CircleShape2D invece di
+    un ConvexPolygonShape2D concavo (che Godot rifiutava lasciando la hitbox
+    senza forma). Serve agli attacchi ad ampio raggio dei nemici.
+
+- Come verificato:
+  - A SCHERMO: dash dx ~99 px (distanza 96 da balance + scivolata), il
+    segnale iframe si apre, lo sprite si tinge di ciano (piu' il bordo ciano
+    del placeholder), premere di nuovo "schivata" durante il dash non fa
+    nulla e schivata_pronta() e' false subito dopo. i-frame reale: una
+    hitbox nemica da 25 danni toglie 25 hp a giocatore fermo, ZERO hp al
+    giocatore che la attraversa in dash mentre e' invulnerabile.
+    Screenshot in user://us009/.
+  - test_animation_machine.gd: 1 test nuovo (finestra_cambiata iframe).
+    65 test totali, validator 0.
+
+- GDSCRIPT, trappola nei test di verifica: una lambda cattura le variabili
+  locali PER VALORE — riassegnare una var esterna da dentro la lambda non si
+  propaga fuori. Usare un Dictionary (tipo riferimento) per raccogliere flag.
+
+- Prossima storia: US-010 (parata e rottura di postura).

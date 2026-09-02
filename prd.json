@@ -152,8 +152,8 @@
       ],
       "priority": 10,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "animation_machine.gd: nuovo segnale finestra_cambiata(nome,attiva) per iframe_da/a e finestra_perfetta (simmetrico a fase_cambiata). player.gd start_dash(spec): entry point condiviso input 'schivata' (Spazio/Shift) + primitiva dash. Durante il dash velocity=distanza/durata, resto del movimento bypassato; _dash_cd cooldown anti-spam. finestra_cambiata('iframe') -> hurtbox.set_invulnerabile + tinta ciano dello sprite (indicatore visivo). balance.json combattimento.schivata: distanza/durata/cooldown; la finestra i-frame resta in animations.json dash (frame 0..2). hitbox.gd: settore >=180 gradi -> CircleShape2D (il ConvexPolygonShape2D concavo veniva rifiutato). VERIFICA A SCHERMO: dash ~99px, segnale iframe + tinta ciano, re-input ignorato, cooldown non pronto subito; una hitbox nemica da 25 toglie 25 hp da fermo e 0 hp attraversandola in dash. 1 test nuovo (65 totali), validator 0."
     },
     {
       "id": "US-010",
