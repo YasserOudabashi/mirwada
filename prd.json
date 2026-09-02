@@ -204,8 +204,8 @@
       ],
       "priority": 12,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "scripts/ability_engine.gd, autoload. execute(id, caster) legge l'abilita' da GameData, controlla cooldown e costo PRIMA di eseguire, poi itera l'array primitive in ordine dispacciando su una tabella tipo->Callable: nessuna catena di if, aggiungere una primitiva e' una riga nella tabella. Esito sempre in un Dictionary {ok, reason, effects, warnings}, mai un'eccezione. Il costo non si scala se l'abilita' e' rifiutata: niente abilita' a meta'. projectile genera un vero Area2D (scripts/projectile.gd) con danno, velocita, gittata, pierce e tag_danno, autodistrutto a fine gittata. TRE ESITI DISTINTI per una primitiva, ed e' la parte importante: implementata -> eseguita; nel registro chiuso ma non ancora scritta -> warning e l'abilita' prosegue; FUORI dal registro -> push_error, e' un bug nei dati. Senza questa distinzione US-013 non era chiudibile."
     },
     {
       "id": "US-013",
@@ -221,8 +221,8 @@
       ],
       "priority": 13,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "melee_arc, buff_stat, heal e dash secondo i parametri di primitives.json. buff_stat usa i modificatori per id di US-007 con id '<abilita>:<stat>', cosi' riapplicare rinfresca invece di impilare; un moltiplicativo diventa il delta equivalente sulla base per restare rimovibile per id come gli altri. melee_arc filtra per angolo, non solo per raggio. dash consegna l'ordine al controller del caster (US-004/009): se non c'e', nessun crash. NOTA SUL CRITERIO: fool_velo_illusorio compone illusion + buff_stat, ma illusion NON e' fra le 5 primitive di questa fase. L'abilita' si esegue lo stesso: buff_stat viene applicato e illusion produce un avviso. E' il comportamento giusto, ma il criterio come scritto era ambiguo. Le scadenze sono una lista processata in _process, non await su SceneTreeTimer: gli await lasciavano 3 timer orfani a fine suite e non erano testabili. tick_effects(delta) e' pubblica apposta, cosi' i test simulano 8 secondi invece di aspettarli. 41 test, tutti passano."
     },
     {
       "id": "US-014",
