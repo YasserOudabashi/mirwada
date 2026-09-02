@@ -915,3 +915,29 @@ sezione test aggiornata.
   UI a libro di design-ui-libro.md, fase piu' avanti. Qui conta l'aggancio
   ai segnali e l'i18n.
 - Prossima storia: US-018 (scena di debug con manichino).
+
+[2026-09-02] US-018 — Scena di debug con manichino
+
+- Cosa fatto:
+  - scripts/ability_engine.gd: esegui_primitiva(tipo, prim, caster) —
+    esegue UNA primitiva saltando costo e cooldown (origine "debug:<tipo>").
+    Per la scena di debug e i test.
+  - scripts/dummy.gd + scenes/dummy.tscn: manichino Node2D con
+    StatsComponent + Hurtbox; _process rimette hp al massimo ogni frame
+    ("hp infiniti"). Conta i colpi ricevuti.
+  - scripts/debug_scene.gd + scenes/debug/debug_scene.tscn: TestZone +
+    Player + 2 Enemy + Dummy + HUD + un CanvasLayer con pannello (hp, sp,
+    cooldown dash, ultima primitiva, legenda tasti). Tasti 1-5 eseguono
+    projectile / melee_arc / buff_stat / heal / dash sul giocatore.
+  - NON in release: la scena vive sotto scenes/debug/ (i preset di export
+    devono escludere quella cartella — export_presets.cfg non e' ancora
+    committato) e in piu' _ready fa queue_free() se non OS.is_debug_build().
+
+- Come verificato:
+  - 3 test in test_debug_primitive.gd (90 totali): buff_stat/heal isolati,
+    primitiva ignota -> ok:false senza crash.
+  - A SCHERMO: la scena carica con giocatore + 2 nemici + manichino + HUD +
+    pannello. Premendo 1..5 le cinque primitive si eseguono in ordine
+    (pannello: "ultima primitiva" cambia; heal 50 -> 65). Il manichino
+    messo a 5 hp torna a 100 il frame dopo. Screenshot user://us018/.
+- Prossima storia: US-019 (bus audio e feedback di colpo).

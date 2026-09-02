@@ -1,0 +1,43 @@
+[gd_scene load_steps=7 format=3 uid="uid://c0dbgscene0mir"]
+
+[ext_resource type="Script" path="res://scripts/debug_scene.gd" id="1_dbg"]
+[ext_resource type="Script" path="res://scripts/test_zone.gd" id="2_zone"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="4_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/dummy.tscn" id="5_dummy"]
+[ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="6_hud"]
+
+[node name="DebugScene" type="Node2D"]
+script = ExtResource("1_dbg")
+
+[node name="TestZone" type="TileMapLayer" parent="."]
+script = ExtResource("2_zone")
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector2(240, 496)
+
+[node name="Enemy" parent="." instance=ExtResource("4_enemy")]
+position = Vector2(150, 430)
+
+[node name="Enemy2" parent="." instance=ExtResource("4_enemy")]
+position = Vector2(360, 560)
+
+[node name="Dummy" parent="." instance=ExtResource("5_dummy")]
+position = Vector2(330, 470)
+
+[node name="HUD" parent="." instance=ExtResource("6_hud")]
+
+[node name="Pannello" type="CanvasLayer" parent="."]
+
+[node name="Sfondo" type="ColorRect" parent="Pannello"]
+offset_left = 8.0
+offset_top = 70.0
+offset_right = 360.0
+offset_bottom = 160.0
+color = Color(0, 0, 0, 0.55)
+
+[node name="Testo" type="Label" parent="Pannello"]
+offset_left = 14.0
+offset_top = 74.0
+offset_right = 356.0
+offset_bottom = 156.0

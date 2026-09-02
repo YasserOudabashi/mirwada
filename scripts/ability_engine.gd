@@ -96,6 +96,17 @@ func execute(ability_id: String, caster: Node) -> Dictionary:
 	return result
 
 
+## Esegue UNA primitiva isolata, saltando costo e cooldown. Per la scena di
+## debug (US-018) e i test: NON e' un'abilita', l'origine e' "debug:<tipo>".
+func esegui_primitiva(tipo: String, prim: Dictionary, caster: Node) -> Dictionary:
+	if not _handlers.has(tipo):
+		return {"ok": false, "tipo": tipo, "reason": "primitiva non gestita"}
+	var stats: Node = find_stats(caster)
+	var effetto: Dictionary = (_handlers[tipo] as Callable).call(prim, caster, stats, "debug:" + tipo)
+	effetto["ok"] = true
+	return effetto
+
+
 ## Lo StatsComponent del caster: il nodo stesso se lo e', altrimenti un figlio.
 func find_stats(caster: Node) -> Node:
 	if caster == null:

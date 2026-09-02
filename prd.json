@@ -309,8 +309,8 @@
       ],
       "priority": 18,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ability_engine.esegui_primitiva(tipo,prim,caster): una primitiva isolata senza costo/cooldown (per debug e test). dummy.gd/dummy.tscn: manichino con StatsComponent+Hurtbox, _process rimette hp al max ('infiniti'). debug_scene.gd + scenes/debug/debug_scene.tscn: TestZone+Player+2 Enemy+Dummy+HUD+pannello (hp/sp/cooldown/ultima primitiva/legenda). Tasti 1-5 = projectile/melee_arc/buff_stat/heal/dash sul giocatore. NON in release: cartella scenes/debug/ (i preset di export la escludono) + queue_free se non is_debug_build. 3 test in test_debug_primitive.gd (90 totali). VERIFICA A SCHERMO: scena completa, tasti 1-5 eseguono le 5 primitive in ordine (pannello aggiornato, heal 50->65), il manichino a 5 hp torna a 100."
     },
     {
       "id": "US-019",
