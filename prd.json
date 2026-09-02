@@ -132,7 +132,7 @@
         "Typecheck passa",
         "Verifica a schermo documentata in progress.txt"
       ],
-      "priority": 8,
+      "priority": 9,
       "fase": 1,
       "passes": false,
       "notes": ""
@@ -150,7 +150,7 @@
         "Typecheck passa",
         "Tests pass"
       ],
-      "priority": 9,
+      "priority": 10,
       "fase": 1,
       "passes": false,
       "notes": ""
@@ -166,7 +166,7 @@
         "Typecheck passa",
         "Verifica a schermo documentata in progress.txt"
       ],
-      "priority": 10,
+      "priority": 11,
       "fase": 1,
       "passes": false,
       "notes": ""
@@ -183,7 +183,7 @@
         "Typecheck passa",
         "Verifica a schermo documentata in progress.txt"
       ],
-      "priority": 11,
+      "priority": 12,
       "fase": 1,
       "passes": false,
       "notes": ""
@@ -352,25 +352,41 @@
     },
     {
       "id": "US-021",
-      "title": "Macchina di animazione guidata dai dati",
-      "description": "Come sviluppatore, voglio che le animazioni e il timing degli attacchi vengano da data/animations.json, cosi' da poter tarare il combattimento senza toccare il codice.",
+      "title": "Macchina di animazione guidata dai dati (a): dati e AnimationSpec",
+      "description": "Come sviluppatore, voglio che GameData carichi data/animations.json e che una vista tipata esponga frame, fps, fasi del combat, eventi, finestre di i-frame e di parata perfetta, cosi' che il timing viva nei dati.",
       "acceptanceCriteria": [
-        "AnimatedSprite2D costruito a runtime dagli spritesheet in assets/placeholder/",
-        "AnimationStateMachine generica: legge frames, fps, loop, direzionale da data/animations.json",
-        "I frame di anticipo/attivi/recupero determinano l'apertura e chiusura reale della hitbox di US-008",
-        "Gli eventi per frame (footstep, tell_audio, tell_visivo, hitbox_on/off, ability_release) emettono segnali",
-        "iframe_da/iframe_a guidano l'invulnerabilita' del dash di US-009",
-        "finestra_perfetta guida la parata perfetta di US-010",
-        "Cambiare un fps o un indice di frame nel JSON cambia il gioco senza ricompilare",
-        "Test headless: coerenza tra frame dichiarati ed eventi emessi",
+        "GameData carica data/animations.json; get_animation(cat, nome), animation_convention(key), animation_categories(), animation_names(cat)",
+        "AnimationSpec (scripts/animation_spec.gd, RefCounted senza class_name): frame_count, fps, loops, is_directional, duration_sec",
+        "phase_of(frame) -> anticipo|attivi|recupero|'' ; events_at/has_event_at per gli eventi per frame",
+        "iframe_window()/is_invulnerable_at(frame) da iframe_da/iframe_a ; perfect_parry_frames()/is_perfect_parry_at(frame) da finestra_perfetta ; prefix_state() da anticipo_in_stato",
+        "Test headless: campi base, fasi di attack_light, eventi hitbox, i-frame del dash, finestra di parata, coerenza frame/eventi su tutte le animazioni",
+        "Typecheck passa",
+        "Tests pass"
+      ],
+      "priority": 7,
+      "fase": 1,
+      "passes": true,
+      "notes": "US-021 spezzata in due per la regola 'una story una iterazione' (scelta utente: 21 prima del combat). Questa e' la meta' dati, zero rendering. scripts/animation_spec.gd avvolge una voce di animations.json; GameData la carica come gli altri file (25 file totali ora, aggiornato test_hot_reload). TRAPPOLA: JSON legge i numeri come float, Array.has(int) su [0.0,1.0] da false -> AnimationSpec converte a int i frame di fase/parata. 11 test nuovi, 54 totali, validator exit 0. Manca la parte (b): US-021B."
+    },
+    {
+      "id": "US-021B",
+      "title": "Macchina di animazione guidata dai dati (b): rendering e segnali",
+      "description": "Come sviluppatore, voglio un AnimatedSprite2D costruito a runtime dagli spritesheet e una macchina a stati generica che riproduce le animazioni di AnimationSpec ed emette i segnali per frame.",
+      "acceptanceCriteria": [
+        "SpriteFrames costruito a runtime dagli spritesheet in assets/placeholder/ (una riga per direzione)",
+        "Nodo macchina di animazione generico: play(stato, direzione) legge frames/fps/loop/direzionale da AnimationSpec",
+        "Emette segnali per gli eventi per frame (footstep, tell_audio, tell_visivo, hitbox_on/off, ability_release) e per fase_cambiata / animazione_finita",
+        "Integrato nel player al posto di _aggiorna_sprite(): cambiare un fps o un indice nel JSON cambia la resa senza ricompilare",
+        "iframe_window e finestra_perfetta restano interrogabili dal nodo per US-009/US-010",
+        "Test headless: coerenza tra frame riprodotti e segnali emessi",
         "Typecheck passa",
         "Tests pass",
         "Verifica a schermo documentata in progress.txt"
       ],
-      "priority": 21,
+      "priority": 8,
       "fase": 1,
       "passes": false,
-      "notes": "Story chiave: sposta il timing del combat dai dati al posto del codice. E' cio' che permette di tarare il feel iterando in secondi invece che in minuti."
+      "notes": "Seconda meta' di US-021. Le hitbox di US-008 e gli i-frame di US-009 si agganciano ai segnali di questo nodo."
     },
     {
       "id": "US-022",

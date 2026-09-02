@@ -18,6 +18,12 @@ const DIR_SYNERGIES := "res://data/synergies"
 const PATH_TAGS := "res://data/tags.json"
 const PATH_BALANCE := "res://data/balance.json"
 const PATH_PRIMITIVES := "res://data/schema/primitives.json"
+const PATH_ANIMATIONS := "res://data/animations.json"
+
+## Categorie di animazione in animations.json (le stesse di
+## generate_placeholders.py). Le altre chiavi di primo livello
+## (convenzioni, budget_frame, _comment) non sono animazioni.
+const ANIM_CATEGORIES: PackedStringArray = ["personaggio", "nemico_base", "pet"]
 
 var _pathways: Dictionary = {}
 var _sequences: Dictionary = {}
@@ -26,6 +32,7 @@ var _synergies: Dictionary = {}
 var _tags: Dictionary = {}
 var _balance: Dictionary = {}
 var _primitives: Dictionary = {}
+var _animations: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -70,6 +77,7 @@ func load_all() -> void:
 	_load_single(PATH_TAGS, "tags", _tags)
 	_load_single(PATH_BALANCE, "hp_curve", _balance)
 	_load_single(PATH_PRIMITIVES, "primitives", _primitives)
+	_load_single(PATH_ANIMATIONS, "convenzioni", _animations)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -131,6 +139,42 @@ func curve_value(section: String, sequence: int, fallback: float) -> float:
 
 func tag_count() -> int:
 	return (_tags.get("tags", []) as Array).size()
+
+
+## --- Animazioni (data/animations.json) ---
+## Il codice implementa una macchina di stati generica; questo file decide
+## frame, fps, fasi del combat ed eventi. La vista tipata e' AnimationSpec
+## (scripts/animation_spec.gd), costruita su questi Dictionary.
+
+## Voce grezza per (categoria, nome), es. ("personaggio", "walk"). {} se
+## non esiste.
+func get_animation(categoria: String, nome: String) -> Dictionary:
+	var cat: Dictionary = _animations.get(categoria, {})
+	return cat.get(nome, {})
+
+
+## Valore di convenzioni.<key> (dimensione_frame, direzioni, fps_default...).
+func animation_convention(key: String) -> Variant:
+	var conv: Dictionary = _animations.get("convenzioni", {})
+	return conv.get(key, null)
+
+
+## Categorie effettivamente presenti nel file.
+func animation_categories() -> Array:
+	var out: Array = []
+	for c in ANIM_CATEGORIES:
+		if _animations.has(c):
+			out.append(c)
+	return out
+
+
+## Nomi delle animazioni di una categoria (esclude le chiavi di commento _*).
+func animation_names(categoria: String) -> Array:
+	var out: Array = []
+	for k in (_animations.get(categoria, {}) as Dictionary):
+		if not str(k).begins_with("_"):
+			out.append(k)
+	return out
 
 
 func pathway_ids() -> Array:

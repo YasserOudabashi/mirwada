@@ -6,12 +6,13 @@ Sequenze: 10 Pathway attivi (4 gruppi completi), 10 Sequenze ciascuno,
 
 ## Stato
 
-Fase 1 — Fondamenta, 9 story su 26 chiuse (21 originali + 5 di risanamento
-dall'audit del 2026-09-02). Spina dorsale dei dati completa; caricatore,
-hot-reload, statistiche e motore delle abilita' funzionanti e coperti da 43
-test headless. Movimento a 8 direzioni (US-004), camera con smoothing e
-limiti (US-005) e area di test con tilemap e collisioni (US-006) verificati
-a schermo. Combattimento non ancora iniziato.
+Fase 1 — Fondamenta, 10 story su 27 chiuse (21 originali, di cui US-021
+spezzata in a/b, + 5 di risanamento dall'audit del 2026-09-02). Spina
+dorsale dei dati completa; caricatore, hot-reload, statistiche, motore delle
+abilita' e vista dati delle animazioni coperti da 54 test headless.
+Movimento a 8 direzioni (US-004), camera con smoothing e limiti (US-005) e
+area di test con tilemap e collisioni (US-006) verificati a schermo.
+Combattimento non ancora iniziato.
 
 ## Setup
 

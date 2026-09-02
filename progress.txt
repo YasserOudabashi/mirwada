@@ -592,3 +592,46 @@ Sessione grossa su richiesta dell'utente: analisi completa del progetto
   chiuso.
 - Prossima storia: US-008 (attacco in mischia con arco). NB: US-007 gia'
   chiusa; l'ordine di priorita' salta a US-008.
+
+[2026-09-02] US-021 spezzata; US-021 (a) — dati e AnimationSpec
+
+- DECISIONE UTENTE: US-021 (macchina di animazione data-driven) va PRIMA del
+  blocco combat US-008..011, cosi' il timing degli attacchi nasce gia' nei
+  dati e non si riscrive. US-021 come scritta era pero' troppo grande per una
+  iterazione (GameData + builder SpriteFrames + macchina a stati + player +
+  segnali + test): spezzata in due nel prd.json.
+  * US-021 (priority 7, QUESTA) = meta' dati, zero rendering.
+  * US-021B (priority 8, nuova) = SpriteFrames a runtime + nodo macchina di
+    animazione che emette i segnali per frame, integrato nel player.
+  Le 4 story di combat sono passate a priority 9-12.
+
+- Cosa fatto (US-021 a):
+  - GameData carica data/animations.json come gli altri file singoli (ora
+    25 file, non 24). Nuove API: get_animation(cat, nome),
+    animation_convention(key), animation_categories(), animation_names(cat).
+    ANIM_CATEGORIES = ["personaggio","nemico_base","pet"], le stesse che
+    generate_placeholders.py conosce.
+  - scripts/animation_spec.gd: RefCounted (niente class_name) che avvolge una
+    voce di animations.json ed espone la vista tipata —
+    frame_count/fps/loops/is_directional/duration_sec, phase_of(frame) ->
+    anticipo|attivi|recupero|'', events_at/has_event_at, iframe_window()/
+    is_invulnerable_at(frame), perfect_parry_frames()/is_perfect_parry_at(frame),
+    prefix_state() (anticipo_in_stato). E' da qui che US-021B, US-008, US-009
+    e US-010 leggeranno il timing.
+
+- TRAPPOLA (vale per tutto il codice che legge numeri dal JSON): JSON.parse
+  legge OGNI numero come float. `[0.0, 1.0].has(1)` con 1 int restituisce
+  FALSE in Godot 4.3, e cosi' `Array == Array` fra float e int. AnimationSpec
+  converte a int i frame di fase e di parata prima di confrontarli. Stesso
+  problema che mordera' chiunque confronti un indice di frame letto dai dati.
+
+- Come verificato: 54 test headless (43 + 11 nuovi in test_animation_spec.gd:
+  campi base, fasi di attack_light, eventi hitbox, i-frame del dash, finestra
+  di parata, anticipo_in_stato, e una coerenza frame/eventi su TUTTE le
+  animazioni). validator exit 0. test_hot_reload aggiornato 24 -> 25 file
+  (era un numero magico, esattamente il tipo di fragilita' di US-025).
+  Nessuna verifica a schermo: US-021 (a) non tocca il rendering, quella parte
+  e' US-021B.
+
+- Prossima storia: US-021B (macchina di animazione e segnali, con verifica a
+  schermo), poi US-008.
