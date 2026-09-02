@@ -887,3 +887,31 @@ criterio (GameData, StatsComponent, AbilityEngine, save/load). README:
 sezione test aggiornata.
 
 - Prossima storia: US-017 (HUD minimo).
+
+[2026-09-02] US-017 — HUD minimo + i18n dal giorno 1
+
+- Cosa fatto:
+  - i18n: assets/i18n/strings.csv (keys,it,en) -> Godot genera
+    strings.it.translation / strings.en.translation (committati).
+    project.godot [internationalization]: translations + fallback "it".
+  - stats_component.gd: nuovo segnale spiritualita_changed(sp, sp_max),
+    simmetrico a hp_changed. Il setter emette solo su cambiamento reale.
+    (US-024 chiedeva questo segnale: gia' fatto qui.)
+  - scenes/hud.tscn + scripts/hud.gd (CanvasLayer): due ProgressBar +
+    Label, trova il giocatore nel gruppo "player", si aggancia a
+    hp_changed / spiritualita_changed. Ogni stringa da tr() — HUD_HP,
+    HUD_SPIRITUALITA, HUD_HP_VALORE ("{0} / {1}").
+  - HUD aggiunto a main.tscn.
+
+- Come verificato:
+  - 4 test in test_i18n_hud.gd (87 totali): locale it/en caricati e le
+    chiavi traducono, chiave ignota -> se stessa, stats emette
+    spiritualita_changed, la barra hp del HUD segue il segnale.
+  - A SCHERMO: "Salute 60 / 100" e "Spiritualità 30 / 50" con barre
+    riempite, testo italiano (locale di default), le barre calano quando il
+    giocatore subisce danno. Screenshot user://us017/.
+
+- Nota: stile del HUD spartano (ProgressBar di default). Lo stile vero e' la
+  UI a libro di design-ui-libro.md, fase piu' avanti. Qui conta l'aggancio
+  ai segnali e l'i18n.
+- Prossima storia: US-018 (scena di debug con manichino).

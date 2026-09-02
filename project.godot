@@ -34,6 +34,13 @@ window/size/window_height_override=720
 window/stretch/mode="viewport"
 window/stretch/aspect="keep"
 
+[internationalization]
+
+; i18n dal giorno 1 (CLAUDE.md): nessun testo hardcoded, nemmeno nell'HUD.
+; Le stringhe vivono in assets/i18n/strings.csv -> .translation generati.
+locale/translations=PackedStringArray("res://assets/i18n/strings.en.translation", "res://assets/i18n/strings.it.translation")
+locale/fallback="it"
+
 [input]
 
 ; WASD per posizione fisica (funziona anche su tastiere non-QWERTY),

@@ -14,6 +14,7 @@ extends Node
 ## dal runner manda Godot 4.3 in stallo senza alcun messaggio.
 
 signal hp_changed(hp: float, hp_max: float)
+signal spiritualita_changed(spiritualita: float, spiritualita_max: float)
 signal died
 
 ## Le statistiche modificabili. hp e spiritualita' correnti NON sono qui:
@@ -102,7 +103,12 @@ var spiritualita: float:
 	get:
 		return _spiritualita
 	set(value):
-		_spiritualita = clampf(value, 0.0, get_stat("spiritualita_max"))
+		var maximum: float = get_stat("spiritualita_max")
+		var clamped: float = clampf(value, 0.0, maximum)
+		if is_equal_approx(clamped, _spiritualita):
+			return
+		_spiritualita = clamped
+		spiritualita_changed.emit(_spiritualita, maximum)
 
 
 func is_dead() -> bool:

@@ -292,8 +292,8 @@
       ],
       "priority": 17,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "i18n dal giorno 1: assets/i18n/strings.csv -> strings.{it,en}.translation, project.godot [internationalization] con fallback 'it'. stats_component.gd: nuovo segnale spiritualita_changed (anche richiesto da US-024). scenes/hud.tscn + hud.gd (CanvasLayer): 2 ProgressBar + Label, trova il giocatore nel gruppo player e si aggancia a hp_changed/spiritualita_changed; ogni stringa da tr() (HUD_HP, HUD_SPIRITUALITA, HUD_HP_VALORE). HUD in main.tscn. 4 test in test_i18n_hud.gd (87 totali). VERIFICA A SCHERMO: 'Salute 60/100' e 'Spiritualita 30/50' con barre, testo italiano, le barre calano col danno. Stile spartano di proposito: quello vero e' la UI a libro."
     },
     {
       "id": "US-018",
