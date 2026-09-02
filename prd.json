@@ -259,8 +259,8 @@
       ],
       "priority": 15,
       "fase": 1,
-      "passes": false,
-      "notes": "Criteri di sicurezza aggiunti dal design-master.md (cap. 3.1) dopo l'audit del 2026-09-02."
+      "passes": true,
+      "notes": "scripts/save_system.gd (autoload SaveSystem): salva(slot,dati) assembla {schema_version,salvato_il,nome_personaggio,tempo_gioco,posizione,statistiche,evocazioni[]} e scrive tmp+rename_absolute ATOMICO. carica(slot) usa SOLO JSON.parse_string; radice non-oggetto -> errore; schema_version > VERSIONE_CORRENTE(2) -> rifiuto senza toccare il file; < -> catena _migra (1->2 aggiunge evocazioni:[]); ogni campo da _campo(typeof,default)/_posizione -> tipo sbagliato = default + warning, mai crash. File corrotto -> {ok:false}, stato_slot=CORROTTO, MAI cancellato; cancella() e' l'unica via esplicita. Lo slot evocazioni c'e' per i summon durata -1. scripts/game_state.gd (autoload GameState): tempo_gioco+nome_personaggio(def Enel), snapshot()/applica() col giocatore vivo, F9/F10 slot 0 in debug. 9 test in test_save_system.gd (83 totali). TRAPPOLA: un valore di enum non qualificato shadowa la costante Error OK -> Slot.OK rinominato VALIDO. Nessuna verifica a schermo richiesta."
     },
     {
       "id": "US-016",
@@ -276,8 +276,8 @@
       ],
       "priority": 16,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Gia' in piedi da US-002: tests/run_tests.gd esegue l'intera suite headless, exit 0 al successo / 1 al primo fallimento, comando in README.md e CLAUDE.md di progetto. Con test_save_system.gd (US-015) ora esistono test per tutti e 4 i sistemi del criterio: GameData, StatsComponent, AbilityEngine, save/load. README sezione test aggiornata. 83 test."
     },
     {
       "id": "US-017",

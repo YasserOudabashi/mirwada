@@ -848,3 +848,42 @@ Sessione grossa su richiesta dell'utente: analisi completa del progetto
   data/tags.json -> test_data_valida FALLISCE ("uscito con codice 1: 155
   errori...") e con lui i test che dipendono dai tag. Ripristinato.
 - Prossima storia: US-015 (salvataggio e caricamento versionati).
+
+[2026-09-02] US-015 + US-016 — salvataggio versionato, infrastruttura test
+
+US-015 — scripts/save_system.gd (autoload SaveSystem):
+- salva(slot, dati): assembla il doc {schema_version, salvato_il,
+  nome_personaggio, tempo_gioco, posizione [x,y], statistiche,
+  evocazioni []}, scrive su <slot>.json.tmp e poi rename_absolute atomico.
+  evocazioni: lo slot per i summon durata -1 c'e' anche se i summon non
+  esistono ancora (design-pathways.md).
+- carica(slot): SOLO JSON.parse_string. Radice non-oggetto -> errore.
+  schema_version > VERSIONE_CORRENTE (2) -> rifiuto, file non toccato.
+  < corrente -> catena _migra() (1->2 aggiunge evocazioni:[]).
+  Ogni campo passa da _campo(typeof, default) o _posizione(): tipo
+  sbagliato -> default sano + push_warning, mai crash.
+- file corrotto -> {ok:false, reason}, stato_slot() = CORROTTO, MAI
+  cancellato. cancella(slot) e' l'unica via, sempre esplicita.
+- scripts/game_state.gd (autoload GameState): tiene tempo_gioco e
+  nome_personaggio (default "Enel"), snapshot() raccoglie posizione e
+  hp/spiritualita' dal giocatore vivo, applica() li rimette. F9 salva /
+  F10 carica lo slot 0 in debug (finche' non c'e' la UI a libro).
+- 9 test in test_save_system.gd: round-trip, .tmp non residuo, json rotto
+  non cancella, versione futura rifiutata senza toccare il file,
+  migrazione da v1, campi non fidati -> default, slot vuoto, round-trip
+  via GameState. 83 test totali.
+- TRAPPOLA GDSCRIPT: un valore di enum (`enum Slot { ..., OK, ... }`) e'
+  accessibile anche NON qualificato e SHADOWA la costante Error `OK` (0).
+  `err != OK` diventava `err != Slot.OK` (1). Rinominato Slot.OK -> VALIDO.
+  Stesso rischio con `const OK := "..."`: rinominato in R_OK.
+- Nessuna verifica a schermo richiesta dai criteri. Boot headless col nuovo
+  autoload: nessun errore (gli "Unreferenced static string"/"Pages in use"
+  sono il rumore di Godot ucciso da `timeout`, non del codice).
+
+US-016 — infrastruttura test headless: era gia' quasi tutta in piedi
+(tests/run_tests.gd, exit 0/1, comando in README e CLAUDE.md). Con
+test_save_system.gd ora ci sono test per tutti e 4 i sistemi richiesti dal
+criterio (GameData, StatsComponent, AbilityEngine, save/load). README:
+sezione test aggiornata.
+
+- Prossima storia: US-017 (HUD minimo).
