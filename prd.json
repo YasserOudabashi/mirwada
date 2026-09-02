@@ -402,8 +402,8 @@
       ],
       "priority": 22,
       "fase": 1,
-      "passes": false,
-      "notes": "Dall'audit 2026-09-02: ~11 punti individuati (game_data.gd:108,115,128,133,169,171,184-186,199-201; ability_engine.gd:67,74-75). Vedi design-master.md cap. 3.2."
+      "passes": true,
+      "notes": "game_data.gd: helper _as_array/_object_list/_dict_or_empty/_array_or_empty/_num_or. _load_pathways/abilities/synergies iterano su _object_list (chiave-oggetto invece che lista -> errore + vuoto; elemento non-oggetto -> scartato uno a uno). _load_single ha un 4o arg key_type: chiave di forma sbagliata -> file scartato con errore. Tutti i getter con assegnazione tipata da JSON passano dagli helper: nessun crash. ability_engine.gd: _num/_flag su costo, cooldown e parametri delle 5 primitive (float({}) solleva 'Nonexistent constructor'); in execute() 'primitive' non-lista -> push_error+warning+abilita' senza effetti, elemento non-oggetto -> scartato con warning. DRIVE-BY: corretto test_i18n_hud (float(s.get('spiritualita_max')) su proprieta' inesistente -> il SCRIPT ERROR che sporcava ogni run). 5 fixture in tests/fixtures/. 104 test (95 + 7 in test_loader_robusto + 2 da US-024), validator exit 0."
     },
     {
       "id": "US-023",

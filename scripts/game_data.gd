@@ -76,11 +76,13 @@ func load_all() -> void:
 	_load_pathways()
 	_load_abilities()
 	_load_synergies()
-	_load_single(PATH_TAGS, "tags", _tags)
-	_load_single(PATH_BALANCE, "hp_curve", _balance)
-	_load_single(PATH_PRIMITIVES, "primitives", _primitives)
-	_load_single(PATH_ANIMATIONS, "convenzioni", _animations)
-	_load_single(PATH_AUDIO, "buses", _audio)
+	# L'ultimo argomento e' il tipo atteso per la chiave: un file in cui quella
+	# chiave ha la forma sbagliata viene scartato con un errore, non caricato.
+	_load_single(PATH_TAGS, "tags", _tags, TYPE_ARRAY)
+	_load_single(PATH_BALANCE, "hp_curve", _balance, TYPE_DICTIONARY)
+	_load_single(PATH_PRIMITIVES, "primitives", _primitives, TYPE_DICTIONARY)
+	_load_single(PATH_ANIMATIONS, "convenzioni", _animations, TYPE_DICTIONARY)
+	_load_single(PATH_AUDIO, "buses", _audio, TYPE_DICTIONARY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -116,32 +118,31 @@ func get_synergy(id: String) -> Dictionary:
 ## Definizione di una primitiva dal registro chiuso di data/schema/.
 ## Vuoto = primitiva inesistente: e' un errore di dati, non un caso da gestire.
 func get_primitive(tipo: String) -> Dictionary:
-	var registry: Dictionary = _primitives.get("primitives", {})
-	return registry.get(tipo, {})
+	var registry: Dictionary = _dict_or_empty(_primitives.get("primitives"))
+	return _dict_or_empty(registry.get(tipo))
 
 
 ## data/tags.json espone "tags" come ARRAY piatto di 82 stringhe, non come
 ## oggetto: e' un vocabolario chiuso, non una mappa di definizioni.
 func has_tag(tag: String) -> bool:
-	var vocab: Array = _tags.get("tags", [])
-	return vocab.has(tag)
+	return _array_or_empty(_tags.get("tags")).has(tag)
 
 
 ## Curve globali di bilanciamento. Tenute nei dati perche' sono i numeri
 ## destinati a cambiare di piu' durante il playtest.
 func get_balance(section: String) -> Dictionary:
-	return _balance.get(section, {})
+	return _dict_or_empty(_balance.get(section))
 
 
 ## Valore di una curva per Sequenza (9 = piu' bassa, 0 = Vero Dio).
 ## Le chiavi in JSON sono stringhe, non interi: da qui la conversione.
 func curve_value(section: String, sequence: int, fallback: float) -> float:
-	var curve: Dictionary = _balance.get(section, {})
-	return float(curve.get(str(sequence), fallback))
+	var curve: Dictionary = _dict_or_empty(_balance.get(section))
+	return _num_or(curve.get(str(sequence)), fallback)
 
 
 func tag_count() -> int:
-	return (_tags.get("tags", []) as Array).size()
+	return _array_or_empty(_tags.get("tags")).size()
 
 
 ## --- Animazioni (data/animations.json) ---
@@ -152,13 +153,13 @@ func tag_count() -> int:
 ## Voce grezza per (categoria, nome), es. ("personaggio", "walk"). {} se
 ## non esiste.
 func get_animation(categoria: String, nome: String) -> Dictionary:
-	var cat: Dictionary = _animations.get(categoria, {})
-	return cat.get(nome, {})
+	var cat: Dictionary = _dict_or_empty(_animations.get(categoria))
+	return _dict_or_empty(cat.get(nome))
 
 
 ## Valore di convenzioni.<key> (dimensione_frame, direzioni, fps_default...).
 func animation_convention(key: String) -> Variant:
-	var conv: Dictionary = _animations.get("convenzioni", {})
+	var conv: Dictionary = _dict_or_empty(_animations.get("convenzioni"))
 	return conv.get(key, null)
 
 
@@ -174,7 +175,7 @@ func animation_categories() -> Array:
 ## Nomi delle animazioni di una categoria (esclude le chiavi di commento _*).
 func animation_names(categoria: String) -> Array:
 	var out: Array = []
-	for k in (_animations.get(categoria, {}) as Dictionary):
+	for k in _dict_or_empty(_animations.get(categoria)):
 		if not str(k).begins_with("_"):
 			out.append(k)
 	return out
@@ -183,7 +184,7 @@ func animation_names(categoria: String) -> Array:
 ## --- Audio (data/audio.json) ---
 ## Sezione di primo livello: buses, combat_feedback, telegraph, accessibilita...
 func get_audio(sezione: String) -> Dictionary:
-	return _audio.get(sezione, {})
+	return _dict_or_empty(_audio.get(sezione))
 
 
 func pathway_ids() -> Array:
@@ -219,8 +220,7 @@ func _load_pathways() -> void:
 			continue
 		_upsert(_pathways, pid, doc)
 
-		var seqs: Array = doc.get("sequences", [])
-		for entry in seqs:
+		for entry in _object_list(doc, "sequences", path):
 			var seq: Dictionary = entry
 			var sid: String = str(seq.get("id", ""))
 			if sid.is_empty():
@@ -234,8 +234,7 @@ func _load_abilities() -> void:
 		var doc: Dictionary = _read_json(path)
 		if doc.is_empty():
 			continue
-		var list: Array = doc.get("abilities", [])
-		for entry in list:
+		for entry in _object_list(doc, "abilities", path):
 			var ability: Dictionary = entry
 			var aid: String = str(ability.get("id", ""))
 			if aid.is_empty():
@@ -249,8 +248,7 @@ func _load_synergies() -> void:
 		var doc: Dictionary = _read_json(path)
 		if doc.is_empty():
 			continue
-		var list: Array = doc.get("synergies", [])
-		for entry in list:
+		for entry in _object_list(doc, "synergies", path):
 			var syn: Dictionary = entry
 			var sid: String = str(syn.get("id", ""))
 			if sid.is_empty():
@@ -259,12 +257,17 @@ func _load_synergies() -> void:
 			_upsert(_synergies, sid, syn)
 
 
-func _load_single(path: String, key: String, target: Dictionary) -> void:
+func _load_single(path: String, key: String, target: Dictionary, key_type: int) -> void:
 	var doc: Dictionary = _read_json(path)
 	if doc.is_empty():
 		return
 	if not doc.has(key):
 		_fail(path, "manca la chiave '%s'" % key)
+		return
+	if typeof(doc[key]) != key_type:
+		_fail(path, "la chiave '%s' dovrebbe essere %s, e' %s: file scartato" % [
+			key, type_string(key_type), type_string(typeof(doc[key]))
+		])
 		return
 	# Sul posto, per non invalidare chi tiene gia' il riferimento.
 	target.clear()
@@ -327,3 +330,46 @@ func _read_json(path: String) -> Dictionary:
 
 func _fail(path: String, msg: String) -> void:
 	_errors.append("%s: %s" % [path, msg])
+
+
+# --- Coercizioni difensive -------------------------------------------------
+# I JSON restano in chiaro nell'export e chiunque puo' modificarli. Un file
+# sintatticamente valido ma strutturalmente storto (una lista dov'era atteso
+# un oggetto, un elemento non-oggetto in una lista) non deve mai arrivare a
+# un'assegnazione tipata: in GDScript e' un errore che interrompe il ciclo di
+# caricamento a meta'. Questi helper registrano l'anomalia — come _read_json —
+# e restituiscono un default sano, cosi' il resto dei dati si carica lo stesso.
+
+## container[key] come Array. Assente -> []. Presente ma non Array -> errore + [].
+func _as_array(container: Dictionary, key: String, where: String) -> Array:
+	if not container.has(key):
+		return []
+	var v: Variant = container[key]
+	if typeof(v) != TYPE_ARRAY:
+		_fail(where, "'%s' dovrebbe essere una lista, e' %s" % [key, type_string(typeof(v))])
+		return []
+	return v
+
+
+## Solo gli elementi-oggetto di container[key]. Registra un errore per ogni
+## elemento scartato perche' non e' un oggetto.
+func _object_list(container: Dictionary, key: String, where: String) -> Array:
+	var out: Array = []
+	for entry in _as_array(container, key, where):
+		if typeof(entry) != TYPE_DICTIONARY:
+			_fail(where, "'%s': elemento non-oggetto scartato (%s)" % [key, entry])
+			continue
+		out.append(entry)
+	return out
+
+
+static func _dict_or_empty(v: Variant) -> Dictionary:
+	return v if typeof(v) == TYPE_DICTIONARY else {}
+
+
+static func _array_or_empty(v: Variant) -> Array:
+	return v if typeof(v) == TYPE_ARRAY else []
+
+
+static func _num_or(v: Variant, fallback: float) -> float:
+	return v if (typeof(v) == TYPE_FLOAT or typeof(v) == TYPE_INT) else fallback

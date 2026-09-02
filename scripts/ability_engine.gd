@@ -64,14 +64,24 @@ func execute(ability_id: String, caster: Node) -> Dictionary:
 
 	# Il costo si paga PRIMA di eseguire, e se non basta non si esegue niente:
 	# meglio un'abilita' che non parte che una che parte a meta'.
-	var cost: float = float(ability.get("costo_spiritualita", 0.0))
+	var cost: float = _num(ability.get("costo_spiritualita"), 0.0)
 	if not stats.call("spend_spiritualita", cost):
 		result["reason"] = ERR_SPIRITUALITA
 		return result
 
-	_start_cooldown(caster, ability_id, float(ability.get("cooldown", 0.0)))
+	_start_cooldown(caster, ability_id, _num(ability.get("cooldown"), 0.0))
 
-	for entry in (ability.get("primitive", []) as Array):
+	var prim_list: Variant = ability.get("primitive", [])
+	if typeof(prim_list) != TYPE_ARRAY:
+		push_error("[AbilityEngine] %s: 'primitive' non e' una lista, abilita' senza effetti" % ability_id)
+		result["warnings"].append("'primitive' non e' una lista")
+		prim_list = []
+
+	for entry in prim_list:
+		if typeof(entry) != TYPE_DICTIONARY:
+			push_error("[AbilityEngine] %s: primitiva non-oggetto scartata (%s)" % [ability_id, entry])
+			result["warnings"].append("primitiva non-oggetto scartata")
+			continue
 		var prim: Dictionary = entry
 		var tipo: String = str(prim.get("tipo", ""))
 
@@ -153,12 +163,28 @@ func _key(caster: Node, ability_id: String) -> String:
 # --- Primitive ---------------------------------------------------------------
 # Ogni gestore riceve i parametri grezzi dal JSON e restituisce un record di
 # cio' che ha fatto. I default servono a non esplodere su un dato incompleto.
+#
+# I parametri arrivano da JSON in chiaro: un valore del tipo sbagliato non deve
+# arrivare a float()/int() (che sollevano "Nonexistent constructor" su un
+# Dictionary/Array). _num e _flag coercono con un default sano.
+
+static func _num(v: Variant, fallback: float) -> float:
+	var t: int = typeof(v)
+	if t == TYPE_FLOAT or t == TYPE_INT:
+		return v
+	if t == TYPE_STRING and (v as String).is_valid_float():
+		return float(v)
+	return fallback
+
+
+static func _flag(v: Variant, fallback: bool) -> bool:
+	return v if typeof(v) == TYPE_BOOL else fallback
 
 func _p_buff_stat(prim: Dictionary, _caster: Node, stats: Node, ability_id: String) -> Dictionary:
 	var stat: String = str(prim.get("stat", ""))
-	var valore: float = float(prim.get("valore", 0.0))
-	var durata: float = float(prim.get("durata", 0.0))
-	var moltiplicativo: bool = bool(prim.get("moltiplicativo", false))
+	var valore: float = _num(prim.get("valore"), 0.0)
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var moltiplicativo: bool = _flag(prim.get("moltiplicativo"), false)
 
 	# I modificatori sono additivi: un moltiplicativo diventa il delta
 	# equivalente sulla base, cosi' resta rimovibile per id come gli altri.
@@ -180,9 +206,9 @@ func _p_buff_stat(prim: Dictionary, _caster: Node, stats: Node, ability_id: Stri
 
 
 func _p_heal(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
-	var quantita: float = float(prim.get("quantita", 0.0))
-	var istantaneo: bool = bool(prim.get("istantaneo", true))
-	var durata: float = float(prim.get("durata", 0.0))
+	var quantita: float = _num(prim.get("quantita"), 0.0)
+	var istantaneo: bool = _flag(prim.get("istantaneo"), true)
+	var durata: float = _num(prim.get("durata"), 0.0)
 	var bersaglio: String = str(prim.get("bersaglio", "self"))
 
 	# Oggi e' risolvibile solo "self": il targeting di alleati e pet arriva
@@ -205,10 +231,10 @@ func _p_heal(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) 
 func _p_projectile(prim: Dictionary, caster: Node, _stats: Node, ability_id: String) -> Dictionary:
 	var spec: Dictionary = {
 		"tipo": "projectile",
-		"danno": float(prim.get("danno", 0.0)),
-		"velocita": float(prim.get("velocita", 200.0)),
-		"gittata": float(prim.get("gittata", 100.0)),
-		"pierce": int(prim.get("pierce", 0)),
+		"danno": _num(prim.get("danno"), 0.0),
+		"velocita": _num(prim.get("velocita"), 200.0),
+		"gittata": _num(prim.get("gittata"), 100.0),
+		"pierce": int(_num(prim.get("pierce"), 0.0)),
 		"tag_danno": prim.get("tag_danno", []),
 		"origine": ability_id,
 	}
@@ -219,10 +245,10 @@ func _p_projectile(prim: Dictionary, caster: Node, _stats: Node, ability_id: Str
 func _p_melee_arc(prim: Dictionary, caster: Node, _stats: Node, ability_id: String) -> Dictionary:
 	var spec: Dictionary = {
 		"tipo": "melee_arc",
-		"danno": float(prim.get("danno", 0.0)),
-		"angolo": float(prim.get("angolo", 90.0)),
-		"raggio": float(prim.get("raggio", 32.0)),
-		"stagger": float(prim.get("stagger", 0.0)),
+		"danno": _num(prim.get("danno"), 0.0),
+		"angolo": _num(prim.get("angolo"), 90.0),
+		"raggio": _num(prim.get("raggio"), 32.0),
+		"stagger": _num(prim.get("stagger"), 0.0),
 		"tag_danno": prim.get("tag_danno", []),
 		"origine": ability_id,
 	}
@@ -233,10 +259,10 @@ func _p_melee_arc(prim: Dictionary, caster: Node, _stats: Node, ability_id: Stri
 func _p_dash(prim: Dictionary, caster: Node, _stats: Node, _ability_id: String) -> Dictionary:
 	var spec: Dictionary = {
 		"tipo": "dash",
-		"distanza": float(prim.get("distanza", 64.0)),
-		"durata": float(prim.get("durata", 0.2)),
-		"invulnerabile": bool(prim.get("invulnerabile", false)),
-		"attraversa_nemici": bool(prim.get("attraversa_nemici", false)),
+		"distanza": _num(prim.get("distanza"), 64.0),
+		"durata": _num(prim.get("durata"), 0.2),
+		"invulnerabile": _flag(prim.get("invulnerabile"), false),
+		"attraversa_nemici": _flag(prim.get("attraversa_nemici"), false),
 	}
 	# Il movimento vero appartiene al controller del personaggio (US-004/009):
 	# qui si consegna l'ordine, chi sa muoversi lo esegue.

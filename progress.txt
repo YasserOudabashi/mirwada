@@ -1019,3 +1019,49 @@ sezione test aggiornata.
   suite e' PREESISTENTE (verificato con git stash), non una regressione:
   e' un test che sonda di proposito un path con dato assente.
 - Prossima storia: US-022 (loader JSON robusto ai dati corrotti).
+
+[2026-09-02] US-022 — Loader JSON robusto ai dati corrotti
+
+- Cosa fatto:
+  - scripts/game_data.gd: nuovi helper di coercizione difensiva (_as_array,
+    _object_list, _dict_or_empty, _array_or_empty, _num_or). Un JSON
+    sintatticamente valido ma strutturalmente storto non arriva piu' a
+    un'assegnazione tipata (in GDScript un errore che interrompe il ciclo di
+    caricamento a meta').
+    * _load_pathways/_load_abilities/_load_synergies iterano su _object_list:
+      'sequences'/'abilities'/'synergies' come oggetto invece che lista ->
+      errore + lista vuota; elemento non-oggetto -> errore + scartato uno a
+      uno, gli altri si caricano.
+    * _load_single ha un 4o argomento key_type: se la chiave attesa ha la
+      forma sbagliata (tags come oggetto, primitives come lista...) il file
+      e' SCARTATO con un errore, non caricato a meta'.
+    * i getter che facevano `var x: Dictionary = _dati.get(k, {})` (get_primitive,
+      has_tag, get_balance, curve_value, tag_count, get_animation,
+      animation_convention, animation_names, get_audio) ora passano da
+      _dict_or_empty/_array_or_empty/_num_or: nessun crash se il valore
+      interno fosse del tipo sbagliato.
+  - scripts/ability_engine.gd: helper _num (numero o fallback, accetta anche
+    stringhe numeriche) e _flag (bool o fallback). Il costo, il cooldown e
+    tutti i parametri delle 5 primitive passano da _num/_flag: `float({})`
+    solleva "Nonexistent constructor" e va evitato. In execute(): se
+    'primitive' non e' una lista -> push_error + warning + abilita' senza
+    effetti (non un crash); ogni elemento non-oggetto della lista -> scartato
+    con warning.
+  - tests/test_i18n_hud.gd: DRIVE-BY. `float(s.get("spiritualita_max"))`
+    chiamava Object.get() su una proprieta' inesistente -> null -> il
+    "SCRIPT ERROR: Nonexistent 'float' constructor" che sporcava OGNI run
+    della suite (segnalato in US-024). Corretto in s.get_stat(...). Ora la
+    suite gira pulita.
+  - 5 fixture in tests/fixtures/ (fuori da data/, non matchano test_*.gd):
+    radice_lista, sequences_oggetto, elementi_non_oggetto, tags_oggetto.
+
+- Come verificato: 104 test headless (95 + 7 nuovi in test_loader_robusto +
+  2 in test_stats_component da US-024). I 7 nuovi: radice non-oggetto,
+  lista attesa ma oggetto, elementi non-oggetto saltati uno a uno, single
+  file di forma sbagliata scartato, getter non esplodono su chiave ignota,
+  ability_engine con 'primitive' non-lista, ability_engine con costo di tipo
+  sbagliato. validator exit 0. Il SCRIPT ERROR nella suite e' sparito.
+- Note: i test che usano gli helper chiamano poi reload() per riazzerare
+  _errors del singleton. I test ability_engine iniettano in _abilities via
+  gd.get("_abilities") e ripuliscono con erase().
+- Prossima storia: US-023 (pulizia cooldown e indici).

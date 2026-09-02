@@ -1,0 +1,3 @@
+{
+  "abilities": ["una stringa", 42, { "id": "buona" }, [1, 2]]
+}

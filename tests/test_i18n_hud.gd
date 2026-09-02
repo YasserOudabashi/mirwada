@@ -29,7 +29,7 @@ func test_stats_emette_spiritualita_changed() -> void:
 	s.spiritualita_changed.connect(func(sp: float, _m: float) -> void: visti.append(sp))
 	s.spend_spiritualita(10.0)
 	assert_eq(visti.size(), 1, "un evento spiritualita_changed")
-	assert_almost_eq(visti[0], float(s.get("spiritualita_max")) - 10.0, "valore aggiornato")
+	assert_almost_eq(visti[0], s.get_stat("spiritualita_max") - 10.0, "valore aggiornato")
 	s.free()
 
 
