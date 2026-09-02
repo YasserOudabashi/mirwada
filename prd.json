@@ -50,8 +50,8 @@
       ],
       "priority": 3,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "F5 in _unhandled_key_input di GameData, protetto da OS.is_debug_build(): in release il tasto non fa nulla. reload() stampa file ricaricati e numero di errori. Il criterio 'non invalida i riferimenti' e' verificato sull'IDENTITA' con is_same(): dopo reload il Dictionary consegnato prima e' lo STESSO oggetto, aggiornato sul posto da _upsert. Testato anche che due reload di fila non gonfino gli indici (sarebbe inserimento invece di aggiornamento). 4 test, tutti passano. NON VERIFICATO A SCHERMO: sessione headless, la pressione fisica di F5 non e' stata provata. Da confermare nell'editor."
     },
     {
       "id": "US-004",

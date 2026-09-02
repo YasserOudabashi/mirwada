@@ -33,6 +33,30 @@ func _ready() -> void:
 	load_all()
 
 
+## F5 ricarica i dati a caldo. Solo in debug: in una build di release il
+## tasto non fa nulla e i file non sono nemmeno piu' su disco separati.
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not OS.is_debug_build():
+		return
+	var key := event as InputEventKey
+	if key == null or not key.pressed or key.echo:
+		return
+	if key.keycode == KEY_F5:
+		reload()
+		get_viewport().set_input_as_handled()
+
+
+## Ricarica da disco senza riavviare. I Dictionary gia' consegnati ai sistemi
+## restano gli stessi oggetti, con dentro i valori nuovi: nessun riferimento
+## si rompe. Vedi _upsert().
+func reload() -> void:
+	var before: int = _files_loaded
+	load_all()
+	print("[GameData] RELOAD: %d file ricaricati (prima erano %d), %d errori." % [
+		_files_loaded, before, _errors.size()
+	])
+
+
 ## Ricarica tutto da disco. Chiamabile a caldo: vedi US-003.
 func load_all() -> void:
 	_errors = PackedStringArray()
