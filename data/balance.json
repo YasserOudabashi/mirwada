@@ -46,6 +46,17 @@
       "distanza": 96,
       "durata": 0.18,
       "cooldown": 0.6
+    },
+    "parata": {
+      "_comment": "La finestra di parata perfetta NON e' qui: e' finestra_perfetta di animations.json personaggio.parry. Qui la riduzione del blocco tenuto e quanta postura toglie all'attaccante una parata perfetta.",
+      "riduzione_blocco": 0.5,
+      "danno_postura_parata_perfetta": 40
+    },
+    "postura": {
+      "_comment": "Guardia dei nemici (PosturaComponent). A zero il nemico e' vulnerabile per durata_vulnerabile secondi, poi torna piena. Fuori dalla rottura si ricarica di recupero_al_secondo dopo una breve pausa.",
+      "massimo": 100,
+      "durata_vulnerabile": 3.0,
+      "recupero_al_secondo": 15
     }
   }
 }

@@ -168,8 +168,8 @@
       ],
       "priority": 11,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "postura_component.gd (Node riusabile): erodi(q), a zero -> vulnerabile per durata_vulnerabile s (postura_rotta) poi torna piena, altrimenti ricarica; numeri da balance.json.combattimento.postura. hurtbox.gd: enum Parata{NESSUNA,BLOCCO,PERFETTA}; subisci() -> PERFETTA azzera danno+stagger e emette parata_riuscita(true,attaccante), BLOCCO riduce di riduzione_blocco; lo stagger di ogni colpo erode la PosturaComponent del bersaglio. player.gd: input 'parata' tenuto -> animazione parry, finestra_cambiata('parata_perfetta') alterna PERFETTA/BLOCCO sui frame finestra_perfetta [0,1] di animations.json; parata perfetta erode la postura dell'attaccante. project.godot azione parata; balance.json sezioni parata/postura. 7 test in test_postura.gd (71 totali). VERIFICA A SCHERMO: stato NESSUNA->PERFETTA->BLOCCO->NESSUNA tenendo il tasto, animazione parry col bordo verde della finestra perfetta, postura a zero -> vulnerabile -> recupero. La negazione danno via hitbox reale e' coperta dai test unitari (finestra ~0.11s, non centrabile nei loop di verifica). validator 0."
     },
     {
       "id": "US-011",

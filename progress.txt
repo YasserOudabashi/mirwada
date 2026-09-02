@@ -763,3 +763,41 @@ Sessione grossa su richiesta dell'utente: analisi completa del progetto
   propaga fuori. Usare un Dictionary (tipo riferimento) per raccogliere flag.
 
 - Prossima storia: US-010 (parata e rottura di postura).
+
+[2026-09-02] US-010 — Parata e rottura di postura
+
+- Cosa fatto:
+  - scripts/postura_component.gd (Node riusabile, lo montera' il nemico di
+    US-011): postura/postura_max, erodi(q), a zero -> vulnerabile per
+    durata_vulnerabile s (segnale postura_rotta), poi torna piena
+    (vulnerabilita_finita). Fuori dalla rottura si ricarica di
+    recupero_al_secondo dopo 0.8 s di pausa. Tutti i numeri da
+    balance.json.combattimento.postura.
+  - scripts/hurtbox.gd: enum Parata {NESSUNA, BLOCCO, PERFETTA}. subisci()
+    ora passa per la parata: PERFETTA -> danno e stagger a 0 + segnale
+    parata_riuscita(true, attaccante); BLOCCO -> danno * (1-riduzione) +
+    parata_riuscita(false, ...). Lo stagger di ogni colpo (non parato
+    perfetto) va sulla PosturaComponent del bersaglio via _cerca("erodi").
+    Rinominato _stats() -> _cerca(metodo) generico.
+  - scripts/player.gd: input "parata" (K / tasto dx mouse) TENUTO. Alla
+    pressione set_parata(BLOCCO) + animazione "parry"; finestra_cambiata
+    ("parata_perfetta") alterna PERFETTA/BLOCCO sui frame finestra_perfetta
+    [0,1] di animations.json. Al rilascio set_parata(NESSUNA). Su parata
+    perfetta erode la postura dell'attaccante di
+    danno_postura_parata_perfetta. Non si attacca/schiva mentre si para.
+  - project.godot: azione "parata". balance.json: sezioni parata e postura.
+
+- Come verificato:
+  - 7 test in test_postura.gd (71 totali): erodi, rottura + segnale,
+    recupero, parata perfetta annulla, blocco dimezza, stagger -> postura.
+  - A SCHERMO: tenendo "parata" lo stato passa NESSUNA -> PERFETTA (frame
+    iniziali) -> BLOCCO (finestra chiusa, guardia ancora su) -> NESSUNA al
+    rilascio; l'animazione e' "parry" e il placeholder mostra il bordo verde
+    (finestra perfetta). Postura erosa a zero -> vulnerabile -> recupero a
+    100. Screenshot in user://us010/. validator 0.
+
+- Note: la negazione/riduzione del danno via hitbox reale non e' stata
+  verificata a schermo (la finestra perfetta e' ~0.11 s e centrarci una
+  hitbox nei loop lenti di verifica non e' affidabile) ma e' coperta dai
+  test unitari. Il nemico vero che la sfrutta arriva con US-011.
+- Prossima storia: US-011 (nemico base con telegrafia).

@@ -25,6 +25,8 @@ const FACING := {
 	"left": Vector2.LEFT, "right": Vector2.RIGHT,
 }
 
+const Hurtbox := preload("res://scripts/hurtbox.gd")
+
 @onready var _stats: Node = $StatsComponent
 @onready var _anim: AnimatedSprite2D = $AnimationMachine
 @onready var _hitbox: Area2D = $Hitbox
@@ -40,6 +42,8 @@ var _dash_vel: Vector2 = Vector2.ZERO
 var _dash_left: float = 0.0
 var _dash_cd: float = 0.0
 
+var _parando: bool = false
+
 
 func _ready() -> void:
 	_anim.call("configura", CATEGORIA_ANIM)
@@ -47,6 +51,7 @@ func _ready() -> void:
 	_anim.animazione_finita.connect(_su_anim_finita)
 	_anim.finestra_cambiata.connect(_su_finestra_anim)
 	_hitbox.ha_colpito.connect(_su_colpo_inflitto)
+	_hurtbox.parata_riuscita.connect(_su_parata_riuscita)
 
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd != null:
@@ -69,11 +74,16 @@ func _physics_process(delta: float) -> void:
 			_fine_dash()
 		return
 
-	if Input.is_action_just_pressed("schivata") and not _attaccando and _dash_cd <= 0.0:
+	if Input.is_action_just_pressed("parata") and not _attaccando:
+		_inizia_parata()
+	elif Input.is_action_just_released("parata"):
+		_fine_parata()
+
+	if Input.is_action_just_pressed("schivata") and not _attaccando and not _parando and _dash_cd <= 0.0:
 		start_dash({})
 		return
 
-	if Input.is_action_just_pressed("attacco") and not _attaccando:
+	if Input.is_action_just_pressed("attacco") and not _attaccando and not _parando:
 		_inizia_attacco()
 
 	var input: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
@@ -168,6 +178,42 @@ func _su_finestra_anim(nome: String, attiva: bool) -> void:
 	if nome == "iframe":
 		_hurtbox.call("set_invulnerabile", attiva)
 		_anim.modulate = Color(0.55, 0.9, 1.0, 0.75) if attiva else Color.WHITE
+	elif nome == "parata_perfetta" and _parando:
+		_hurtbox.call("set_parata",
+			Hurtbox.Parata.PERFETTA if attiva else Hurtbox.Parata.BLOCCO)
+
+
+func _inizia_parata() -> void:
+	if _attaccando or _dashing or _parando:
+		return
+	_parando = true
+	_hurtbox.call("set_parata", Hurtbox.Parata.BLOCCO)
+	_anim.call("riproduci", "parry", _dir_sguardo)
+
+
+func _fine_parata() -> void:
+	_parando = false
+	_hurtbox.call("set_parata", Hurtbox.Parata.NESSUNA)
+
+
+## Parata riuscita: su parata perfetta si erode la postura dell'attaccante.
+func _su_parata_riuscita(perfetta: bool, attaccante: Node) -> void:
+	if not perfetta or attaccante == null:
+		return
+	var b: Dictionary = _combat.get("parata", {})
+	var danno_postura: float = float(b.get("danno_postura_parata_perfetta", 40.0))
+	var post: Node = _cerca_postura(attaccante)
+	if post != null:
+		post.call("erodi", danno_postura)
+
+
+func _cerca_postura(nodo: Node) -> Node:
+	if nodo.has_method("erodi"):
+		return nodo
+	for c in nodo.get_children():
+		if c.has_method("erodi"):
+			return c
+	return null
 
 
 func _su_colpo_inflitto(_bersaglio: Node, _danno: float) -> void:
@@ -195,7 +241,7 @@ func _aggiorna_sguardo(input: Vector2) -> void:
 
 
 func _aggiorna_animazione() -> void:
-	if _attaccando or _dashing:
+	if _attaccando or _dashing or _parando:
 		return
 	var stato: String = "walk" if velocity.length() > SOGLIA_MOTO else "idle"
 	_anim.call("riproduci", stato, _dir_sguardo)
