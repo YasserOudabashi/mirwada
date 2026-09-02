@@ -45,7 +45,8 @@ zero righe di codice dedicate (data/abilities/twilight_giant.json).
 ## Documenti
 
 - `CLAUDE.md` — regole di lavoro, comandi, decisioni prese
-- `006_PRD/prd-fase-1-fondamenta.md` — PRD della fase corrente
+- `006_PRD/prd-fase-2-pathway-core.md` — PRD della fase corrente
+- `006_PRD/prd-fase-1-fondamenta.md` — PRD della fase 1 (chiusa)
 - `006_PRD/design-master.md` — design doc master: baseline dell'audit, sicurezza, contratti, story per fase, decisioni aperte
 - `006_PRD/design-pathways.md` — perche' questi 10 Pathway, cosa si e' perso
 - `006_PRD/design-lore.md` — nome del gioco, protagonista, roster NPC

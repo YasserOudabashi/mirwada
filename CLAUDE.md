@@ -90,8 +90,15 @@ progress.txt      memoria tra le iterazioni
 
 ## Fasi
 
-Fase corrente: **1 — Fondamenta** (21 story, 6 chiuse, vedi `prd.json`).
-Le fasi 2-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
+Fase 1 — Fondamenta: **CHIUSA** (27 story, 112 test, CI). PRD storico in
+`006_PRD/prd-fase-1-fondamenta.md`.
+
+Fase corrente: **2 — Pathway Core**. PRD dettagliato:
+`006_PRD/prd-fase-2-pathway-core.md` (~31 story `US-2NN`). Da convertire in
+`prd.json` con `/ralph`. È il salto più rischioso: il criterio di uscita è
+il Twilight Giant eseguito dalla Sequenza 9 alla 5 con zero codice dedicato.
+
+Le fasi 3-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
 genera con `/prd` **solo quando la precedente è chiusa**.
 
 Punto di controllo del progetto: la **fase 5**. Se aggiungere i 9 Pathway

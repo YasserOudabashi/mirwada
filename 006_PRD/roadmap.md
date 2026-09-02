@@ -8,6 +8,11 @@ fase 6 significa scriverlo sulla base di ipotesi che le fasi 1-5 smentiranno.
 
 ## Fase 2 — Pathway core (~22 story)
 
+> **PRD generato il 2026-09-03**: `006_PRD/prd-fase-2-pathway-core.md`
+> (~31 story, non ~22: la stima non contava il blocco UI-libro / VFX / i18n
+> che `design-master.md` Appendice A colloca in fase 2). Questa sezione resta
+> come scaletta di riferimento; la verità è il PRD.
+
 Il salto piu' rischioso del progetto. Qui si scopre se l'architettura
 data-driven regge.
 
