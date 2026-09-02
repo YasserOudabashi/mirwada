@@ -1,0 +1,34 @@
+; Sequenza — configurazione di progetto
+;
+; Pixel art 32x32 su base 640x360 (20x11 tile abbondanti a schermo).
+; La risoluzione e' una decisione irreversibile presa in CLAUDE.md:
+; cambiarla dopo significa rifare ogni asset.
+
+config_version=5
+
+[application]
+
+config/name="Sequenza"
+config/description="Action-RPG 2D esplorativo con progressione a Pathway e Sequenze."
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+
+[display]
+
+; Viewport logico: e' questa la risoluzione in cui si ragiona.
+window/size/viewport_width=640
+window/size/viewport_height=360
+; Finestra reale all'avvio: 640x360 scalato x2, cosi' e' guardabile.
+window/size/window_width_override=1280
+window/size/window_height_override=720
+; "viewport" rende a 640x360 e poi scala l'immagine intera: i pixel
+; restano quadrati e nessun elemento si disallinea dalla griglia.
+window/stretch/mode="viewport"
+window/stretch/aspect="keep"
+
+[rendering]
+
+; 0 = Nearest. Senza questo la pixel art esce sfocata.
+textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

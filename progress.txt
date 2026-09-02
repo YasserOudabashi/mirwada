@@ -243,3 +243,28 @@ Formato di ogni sezione:
   Da fare anche: aggiungere Sequenza alla tabella "Repository che uso" in
   ~/.claude/CLAUDE.md.
 - Prossima storia: US-001.
+
+[2026-09-02] US-001 — Setup progetto Godot e struttura cartelle
+
+- Cosa fatto: creato project.godot (Godot 4.3), scenes/main.tscn come scena
+  vuota di avvio, cartelle scenes/ scripts/ tests/ (data/ e assets/ c'erano
+  gia'). Viewport 640x360 con stretch "viewport" e aspect "keep", finestra
+  reale 1280x720 cioe' il viewport x2, texture filter Nearest.
+  Il .gitignore per Godot era gia' nello starter, criterio soddisfatto.
+- Come verificato: NON leggendo il file scritto ma rileggendo le impostazioni
+  da ProjectSettings dentro il motore, con uno script SceneTree eseguito in
+  headless. Tutti e 10 i controlli OK, exit 0.
+  `godot --headless --path . --import` e `--quit`: exit 0, zero errori.
+- Note ambiente:
+  - Godot NON e' installato in questa sessione remota: e' stato scaricato il
+    binario 4.3-stable linux.x86_64 dalle release ufficiali. Su altra macchina
+    serve Godot 4.3 nel PATH.
+  - TRAPPOLA GDSCRIPT, vale per tutte le story successive: questo progetto
+    tratta come errore, non come warning, l'inferenza di tipo da un Variant.
+    `var x := dict[key]` NON compila ("The variable type is being inferred
+    from a Variant value... Warning treated as error"). Va scritto
+    `var x: TipoEsplicito = dict[key]`. Trovato eseguendo, non leggendo.
+  - Verifica a schermo NON fatta: sessione headless, nessuna finestra. La
+    resa visiva della pixel art (nitidezza, scaling a interi) va confermata
+    aprendo il progetto nell'editor.
+- Prossima storia: US-002.

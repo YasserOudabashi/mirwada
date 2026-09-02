@@ -17,8 +17,8 @@
       ],
       "priority": 1,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Godot 4.3. Verificato in headless rileggendo le impostazioni da ProjectSettings dentro il motore, non dal file: viewport 640x360, stretch viewport, default_texture_filter=0 (Nearest), le 5 cartelle presenti, main_scene caricabile. `godot --headless --path . --quit` esce 0 senza errori in console. Finestra reale 1280x720 (640x360 x2) cosi' e' guardabile all'avvio. Nota per chi scrive GDScript qui: il progetto tratta come ERRORE l'inferenza di tipo da Variant, quindi `var x := <espressione Variant>` non compila — annotare il tipo."
     },
     {
       "id": "US-002",
