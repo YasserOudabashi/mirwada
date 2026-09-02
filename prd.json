@@ -347,8 +347,8 @@
       ],
       "priority": 20,
       "fase": 1,
-      "passes": false,
-      "notes": "Requisito di leggibilita' del combattimento, non atmosfera. Senza questo, i nemici fuori schermo sono ingiusti."
+      "passes": true,
+      "notes": "audio_manager.gd: segnale tell_emesso(pos_mondo, categoria), carica audio.json.telegraph, tell(id, pos) -> durata_s. Il tell suona SEMPRE (non gated su visibilita', non silenziabile) e restituisce anticipo_ms/1000. 5 sfx placeholder sintetizzati distinti (sfx_tell_*). enemy.gd: ANTICIPO chiama _fai_partire_tell(), _physics_process conta _anticipo_left -> ATTACCO; RIMOSSO il trigger anim-finita (l'anim 'anticipo' e' cosmetica). balance.json.nemico_base.telegraph = 'wind_up_light'. tell_indicator.gd/.tscn (CanvasLayer+Control): anello colorato per categoria sul nemico inquadrato (indicatore_visivo_tell), freccia sul bordo per il nemico fuori schermo (indicatore_direzione_suono); opzioni rilette da audio.json.accessibilita. In main.tscn e debug_scene.tscn. validate_data.py: nemico_base.telegraph deve esistere in audio.json.telegraph. 112 test (108 + 4). A SCHERMO: anello ciano che sfuma, freccia rossa sul bordo verso la minaccia off-screen, nemico ANTICIPO con anello giallo. Screenshot user://us020/. NOTA: story sopra la norma (10 file, ~150 righe) - sistema nuovo coeso, non spezzabile in modo sensato."
     },
     {
       "id": "US-021",

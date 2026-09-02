@@ -346,12 +346,22 @@ def main():
                     f"Senza palette le abilita' di quel Pathway non hanno timbro.")
         # ogni categoria di tell deve avere un anticipo positivo, altrimenti
         # il suono arriva insieme al colpo e non serve a niente
+        telegraph_ids = set()
         for tid, t in audio.get("telegraph", {}).items():
             if tid.startswith("_"):
                 continue
+            telegraph_ids.add(tid)
             if not t.get("anticipo_ms", 0) > 0:
                 err(f"data/audio.json [telegraph.{tid}]: anticipo_ms deve essere > 0, "
                     f"altrimenti il tell suona insieme all'impatto ed e' inutile.")
+        # chi usa un tell deve puntare a un id che esiste: il nemico base ne
+        # ricava anche la durata reale della fase di anticipo (US-020)
+        balance = load_json(os.path.join(DATA, "balance.json"))
+        if balance:
+            nb_tell = balance.get("nemico_base", {}).get("telegraph")
+            if nb_tell is not None and nb_tell not in telegraph_ids:
+                err(f"data/balance.json [nemico_base.telegraph]: '{nb_tell}' non e' "
+                    f"un id di data/audio.json.telegraph ({sorted(telegraph_ids)}).")
         # le soglie di follia devono essere ordinate e coerenti con balance.json
         soglie = [x.get("madness_min", -1) for x in audio.get("madness_layer", {}).get("soglie", [])]
         if soglie != sorted(soglie):

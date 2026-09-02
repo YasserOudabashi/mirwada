@@ -15,6 +15,10 @@ extends Node
 ## NIENTE class_name: coerente col progetto.
 
 signal shake_richiesto(intensita: float)
+## Tell sonoro di un attacco nemico partito. posizione_mondo e categoria
+## servono all'indicatore visivo (US-020): chi non sente l'audio deve avere
+## lo stesso dato (che minaccia, da dove).
+signal tell_emesso(posizione_mondo: Vector2, categoria: String)
 
 const BUS_PADRE := {"master": "Master"}
 const SR := 22050
@@ -30,9 +34,17 @@ const SFX_SPEC := {
 	"sfx_dash": [440.0, 0.06, 0.25],
 	"sfx_hurt": [240.0, 0.12, 0.30],
 	"sfx_death": [70.0, 0.5, 0.20],
+	# Tell degli attacchi nemici (US-020). Le 5 categorie devono suonare
+	# nettamente diverse: freq, durata e rumore tutti distinti.
+	"sfx_tell_light": [880.0, 0.10, 0.15],
+	"sfx_tell_heavy": [150.0, 0.35, 0.25],
+	"sfx_tell_unblock": [330.0, 0.30, 0.85],
+	"sfx_tell_ranged": [560.0, 0.22, 0.05],
+	"sfx_tell_ritual": [110.0, 0.80, 0.10],
 }
 
 var _feedback: Dictionary = {}
+var _telegraph: Dictionary = {}
 var _acc: Dictionary = {}
 var _sfx_cache: Dictionary = {}
 var _pool: Array[AudioStreamPlayer] = []
@@ -47,6 +59,7 @@ func _ready() -> void:
 	if gd != null:
 		_costruisci_bus(gd.call("get_audio", "buses"))
 		_feedback = gd.call("get_audio", "combat_feedback")
+		_telegraph = gd.call("get_audio", "telegraph")
 		_acc = (gd.call("get_audio", "accessibilita") as Dictionary).duplicate(true)
 
 	for i in 6:
@@ -76,6 +89,21 @@ func feedback(nome: String) -> void:
 	var sh: float = float(fb.get("shake", 0.0))
 	if sh > 0.0 and not bool(_acc.get("disattiva_shake", false)):
 		shake_richiesto.emit(sh)
+
+
+## Tell sonoro di un attacco nemico, da data/audio.json.telegraph[id]. Suona
+## SEMPRE, che il nemico sia inquadrato o no: e' cosi' che il giocatore reagisce
+## a una minaccia fuori schermo (requisito di leggibilita', non atmosfera, non
+## silenziabile dalle opzioni audio). Restituisce la durata in secondi della
+## fase di anticipo: e' il tell a fissarla, non l'animazione.
+func tell(id: String, posizione_mondo: Vector2) -> float:
+	var t: Dictionary = _telegraph.get(id, {})
+	if t.is_empty():
+		push_warning("[AudioManager] telegraph senza voce '%s'" % id)
+		return 0.0
+	_suona(str(t.get("sfx", "")), 0.05)
+	tell_emesso.emit(posizione_mondo, str(t.get("categoria", "")))
+	return float(t.get("anticipo_ms", 0.0)) / 1000.0
 
 
 ## Opzioni di accessibilita' (riduci_hitstop, disattiva_shake,

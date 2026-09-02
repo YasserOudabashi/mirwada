@@ -995,6 +995,53 @@ sezione test aggiornata.
   (US-022..026). Mancano US-020 (tell sonoro nemici) e US-026 (CI, P2).
 - Prossima storia: US-020 (tell sonoro degli attacchi nemici).
 
+[2026-09-03] US-020 — Tell sonoro degli attacchi nemici
+
+- Cosa fatto:
+  - scripts/audio_manager.gd: nuovo segnale tell_emesso(pos_mondo, categoria),
+    carica audio.json.telegraph, metodo tell(id, pos_mondo) -> durata_s.
+    Il tell suona SEMPRE, a prescindere dall'inquadratura (non silenziabile
+    dalle opzioni audio: e' leggibilita', non atmosfera) e RESTITUISCE
+    anticipo_ms/1000: e' il tell a fissare la durata della fase di anticipo.
+    5 sfx placeholder sintetizzati distinti aggiunti a SFX_SPEC (sfx_tell_*):
+    freq/durata/rumore tutti diversi (light 880Hz corto, heavy 150Hz lungo,
+    unblock 330Hz rumorosissimo, ranged 560Hz, ritual 110Hz molto lungo).
+  - scripts/enemy.gd: entrando in ANTICIPO chiama _fai_partire_tell() (che
+    fa partire il tell e legge la durata) e ora _physics_process conta
+    _anticipo_left col delta -> ATTACCO. RIMOSSO il trigger
+    animazione_finita("anticipo") -> ATTACCO: l'anim 'anticipo' e' solo
+    cosmetica, la durata reale e' anticipo_ms. Quale tell usa il nemico e'
+    un dato: balance.json.nemico_base.telegraph = "wind_up_light".
+  - scripts/tell_indicator.gd + scenes/tell_indicator.tscn (CanvasLayer +
+    Control): ascolta tell_emesso e disegna, per DURATA 0.6s:
+    * nemico inquadrato + indicatore_visivo_tell -> anello che si stringe
+      sulla sua posizione, colore per categoria (schivabile giallo,
+      parabile ciano, solo_schivata rosso, coprirsi arancio, interrompere
+      magenta);
+    * nemico fuori schermo + indicatore_direzione_suono -> freccia sul
+      bordo schermo che punta verso la minaccia.
+    Le due opzioni si rileggono da audio.json.accessibilita a ogni tell.
+    Aggiunto a main.tscn e debug_scene.tscn.
+  - tools/validate_data.py: nemico_base.telegraph deve puntare a un id di
+    audio.json.telegraph (altrimenti il nemico non ha tell ne' durata).
+- Come verificato:
+  - 112 test headless (108 + 4): nemico fuori schermo produce comunque il
+    tell (tell_emesso scatta con una categoria); anticipo_ms fissa la durata
+    (300ms -> ANTICIPO a 0.2s, ATTACCO a 0.4s); l'indicatore scade da solo;
+    la freccia direzionale resta dentro lo schermo per ogni angolo.
+    validator exit 0.
+  - A SCHERMO (finestra reale, script usa e getta): tell on-screen -> anello
+    ciano che si espande e sfuma vicino al player; tell off-screen -> freccia
+    rossa sul bordo alto-destra verso la minaccia; nemico vero in ANTICIPO ->
+    tinta rossa (tell visivo US-011) + anello giallo (categoria schivabile).
+    Screenshot in user://us020/.
+- NOTA scope: story piu' grande della norma (10 file, ~150 righe di codice
+  di produzione) perche' introduce un sistema nuovo (tell audio + indicatore
+  visivo + indicatore direzionale + integrazione nel nemico). Coeso, il grosso
+  e' un file nuovo isolato (tell_indicator.gd). Non spezzata: e' l'ultima
+  story del blocco combat e i pezzi non hanno senso separati.
+- Prossima storia: US-026 (CI minima) — ultima della fase 1.
+
 [2026-09-02] US-024 — Stats di partenza interamente da balance.json
 
 - Cosa fatto:

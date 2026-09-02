@@ -26,6 +26,9 @@ var _bersaglio: Node2D = null
 var _cfg: Dictionary = {}
 var _dir_sguardo: String = "down"
 var _recupero_left: float = 0.0
+## Tempo rimasto nella fase di anticipo. La durata la fissa il tell sonoro
+## (audio.json.telegraph[...].anticipo_ms), non l'animazione: US-020.
+var _anticipo_left: float = 0.0
 
 
 func _ready() -> void:
@@ -76,7 +79,12 @@ func _physics_process(delta: float) -> void:
 			elif is_instance_valid(_bersaglio):
 				var v: float = _stats.get_stat("velocita")
 				velocity = global_position.direction_to(_bersaglio.global_position) * v
-		Stato.ANTICIPO, Stato.ATTACCO, Stato.STAGGER:
+		Stato.ANTICIPO:
+			velocity = Vector2.ZERO
+			_anticipo_left -= delta
+			if _anticipo_left <= 0.0:
+				_vai(Stato.ATTACCO)
+		Stato.ATTACCO, Stato.STAGGER:
 			velocity = Vector2.ZERO
 		Stato.RECUPERO:
 			velocity = Vector2.ZERO
@@ -97,6 +105,7 @@ func _vai(nuovo: int) -> void:
 		Stato.ANTICIPO:
 			_anim.modulate = Color(1.0, 0.5, 0.4)  # tell visivo
 			_anim.call("riproduci", "anticipo", _dir_sguardo)
+			_anticipo_left = _fai_partire_tell()
 		Stato.ATTACCO:
 			_anim.modulate = Color.WHITE
 			var facing: Vector2 = _vettore_sguardo()
@@ -124,14 +133,26 @@ func _su_evento_anim(nome: String) -> void:
 			_hitbox.call("disattiva")
 
 
+## Fa partire il tell sonoro dell'attacco e restituisce la durata della fase
+## di anticipo (in secondi). Quale tell usa e' un dato:
+## balance.json.nemico_base.telegraph -> audio.json.telegraph[id].
+func _fai_partire_tell() -> float:
+	var am: Node = get_node_or_null("/root/AudioManager")
+	var id: String = str(_cfg.get("telegraph", ""))
+	if am == null or id.is_empty():
+		return 0.5  # setup rotto (nessun AudioManager o telegraph): fallback
+	var dur: float = am.call("tell", id, global_position)
+	return dur if dur > 0.0 else 0.5
+
+
 func _su_anim_finita(stato_anim: String) -> void:
 	if _stato == Stato.MORTO:
 		return
-	match stato_anim:
-		"anticipo":
-			_vai(Stato.ATTACCO)
-		"attack":
-			_vai(Stato.RECUPERO)
+	# L'anticipo NON e' piu' guidato dall'animazione: la sua durata la fissa
+	# anticipo_ms del tell (US-020). L'anim 'anticipo' e' solo cosmetica e puo'
+	# finire prima o dopo la fase reale.
+	if stato_anim == "attack":
+		_vai(Stato.RECUPERO)
 
 
 func _su_colpo_inflitto(_bersaglio: Node, _danno: float) -> void:

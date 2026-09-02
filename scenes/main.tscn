@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://bsq0main0scen"]
+[gd_scene load_steps=6 format=3 uid="uid://bsq0main0scen"]
 
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://scripts/test_zone.gd" id="2_zone"]
 [ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="3_enemy"]
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="4_hud"]
+[ext_resource type="PackedScene" path="res://scenes/tell_indicator.tscn" id="5_tell"]
 
 [node name="Main" type="Node2D"]
 
@@ -17,3 +18,5 @@ position = Vector2(320, 180)
 position = Vector2(430, 496)
 
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
+
+[node name="TellIndicator" parent="." instance=ExtResource("5_tell")]

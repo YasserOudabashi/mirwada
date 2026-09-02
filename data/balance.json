@@ -65,7 +65,8 @@
     }
   },
   "nemico_base": {
-    "_comment": "Nemico da banco di prova. La DURATA della fase di anticipo (il tell) NON e' qui: e' data/animations.json nemico_base.anticipo (4 frame a 8 fps). Qui raggi, danno e recupero. PLAUSIBILI, non bilanciati.",
+    "_comment": "Nemico da banco di prova. La DURATA della fase di anticipo la fissa il tell in data/audio.json.telegraph[telegraph].anticipo_ms (US-020): l'animazione 'anticipo' e' solo cosmetica. Qui raggi, danno, recupero e quale tell usa. PLAUSIBILI, non bilanciati.",
+    "telegraph": "wind_up_light",
     "raggio_aggro": 140,
     "raggio_attacco": 26,
     "danno_attacco": 10,
