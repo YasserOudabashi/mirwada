@@ -1,0 +1,27 @@
+# I file di testo del progetto restano LF ovunque, anche su Windows.
+# Senza questo, git con autocrlf=true riscrive le terminazioni a ogni
+# checkout e stampa "LF will be replaced by CRLF" a ogni commit.
+* text=auto eol=lf
+
+# Sorgenti e dati: sempre LF.
+*.gd    text eol=lf
+*.gdshader text eol=lf
+*.tscn  text eol=lf
+*.tres  text eol=lf
+*.godot text eol=lf
+*.cfg   text eol=lf
+*.json  text eol=lf
+*.py    text eol=lf
+*.md    text eol=lf
+*.sh    text eol=lf
+
+# Binari: mai toccati da git.
+*.png   binary
+*.webp  binary
+*.svg   binary
+*.wav   binary
+*.ogg   binary
+*.mp3   binary
+*.ttf   binary
+*.otf   binary
+*.docx  binary
