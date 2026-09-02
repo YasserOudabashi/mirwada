@@ -1,8 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://bsq0main0scen"]
+[gd_scene load_steps=3 format=3 uid="uid://bsq0main0scen"]
 
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
+[ext_resource type="Script" path="res://scripts/test_zone.gd" id="2_zone"]
 
 [node name="Main" type="Node2D"]
+
+[node name="TestZone" type="TileMapLayer" parent="."]
+script = ExtResource("2_zone")
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
 position = Vector2(320, 180)

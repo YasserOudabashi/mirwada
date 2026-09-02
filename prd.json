@@ -100,8 +100,8 @@
       ],
       "priority": 6,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "tools/build_tileset.gd (one-shot) genera assets/placeholder/tileset.tres da tileset.png: un physics layer (collision_layer/mask 1), poligono pieno solo su muro (tile 1) e ostacolo (tile 2), pavimento e acqua senza collisione. Output committato. scripts/test_zone.gd (extends TileMapLayer) dipinge a runtime una griglia 40x30: bordo di muri, due muri interni con varco, pareti di corridoio, 7 ostacoli; poi sposta il giocatore alla cella di spawn e passa i limiti alla camera (apply_zone_limits di US-005). scenes/main.tscn: TestZone + Player. Nessun formato dati per le zone (regions.json e' fase 2): e' un banco di prova, lo schema e' codice di proposito. VERIFICA A SCHERMO: spinta contro i muri, x minima 37.0 (faccia 32 + raggio 5) e y minima 41.0 (32 + 5 + offset shape -4): collisione al pixel, il giocatore non attraversa. Screenshot mostrano bordo/muro interno/corridoio/stanze/ostacoli e il clamp della camera all'angolo. 43/43 test, validator exit 0. NB verifiche di movimento: i loop 'await process_frame' non sono N/60 s, servono loop lunghi."
     },
     {
       "id": "US-007",

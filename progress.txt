@@ -542,3 +542,53 @@ Sessione grossa su richiesta dell'utente: analisi completa del progetto
 - Resta aperto: i limiti di zona non hanno ancora un chiamante — arriva con
   US-006 (la zona di test). La velocita' 90 px/s resta lenta (US-024).
 - Prossima storia: US-006 (tilemap e collisioni dell'area di test).
+
+[2026-09-02] US-006 — Tilemap e collisioni dell'area di test
+
+- Cosa fatto:
+  - tools/build_tileset.gd (one-shot): costruisce assets/placeholder/tileset.tres
+    da tileset.png (4 tile: 0 pavimento, 1 muro, 2 ostacolo, 3 acqua). Un
+    solo physics layer (collision_layer/mask = 1); poligono di collisione a
+    tile pieno solo su muro e ostacolo. Output COMMITTATO, non rigenerato dal
+    motore. Va rilanciato solo se cambia tileset.png.
+  - scripts/test_zone.gd (extends TileMapLayer): dipinge a runtime bordo di
+    muri + due muri interni con varco + pareti di corridoio + 7 ostacoli
+    sparsi, su una griglia 40x30. Poi sposta il giocatore alla cella di
+    spawn (7,15) e passa alla camera i limiti della zona
+    (Rect2(0,0, 1280,960)) via apply_zone_limits di US-005.
+  - scenes/main.tscn: TestZone (TileMapLayer col nuovo script) + Player.
+  - Il formato dati delle zone vere (regions.json, design-world.md) NON e'
+    stato introdotto: qui e' un banco di prova per le story successive, non
+    contenuto di gioco. Lo schema in test_zone.gd e' volutamente codice.
+
+- Come verificato A SCHERMO (finestra reale): script usa e getta che carica
+  main.tscn e spinge il giocatore contro i muri con MOLTI frame (le prime
+  prove fallivano solo perche' 140 frame non bastavano ad arrivare al muro —
+  in finestra il loop gira piu' lento del previsto):
+  * spinta a sinistra -> x minima 37.0 = faccia del muro (x=32) + raggio (5):
+    collisione al pixel;
+  * spinta in alto -> y minima 41.0 = faccia (y=32) + raggio (5) + offset
+    del CollisionShape (-4): coerente;
+  * screenshot overview / contro_muro_sx / contro_muro_su: si leggono bordo,
+    muro interno con varco, corridoio, stanze, ostacoli; la camera si clampa
+    all'angolo della zona quando il giocatore e' nel corner.
+  Screenshot in user://us006/, non versionati.
+
+- Regressione: 43/43 test headless, validator exit 0.
+
+- Note ambiente:
+  - Pillow ora INSTALLATO (pip install pillow, 12.3.0): generate_placeholders.py
+    ora gira. Prima falliva con "Serve Pillow".
+  - Headless e finestra girano a cadenze diverse rispetto ai frame di idle:
+    `for i in N: await process_frame` NON e' N/60 secondi. Per le verifiche
+    di movimento servono loop generosi (300-400) o misurare a convergenza.
+  - I colori dei tile placeholder (pavimento marrone scuro, muro quasi nero,
+    ostacolo marrone) hanno POCO contrasto: la mappa si legge ma a fatica.
+    Migliorabile alzando il contrasto in generate_placeholders.py — non
+    blocca US-006, ma utile prima delle story di combattimento.
+
+- Resta aperto: contrasto tileset placeholder; velocita' 90 px/s (US-024);
+  i limiti di zona ora hanno un chiamante (test_zone), il TODO di US-005 e'
+  chiuso.
+- Prossima storia: US-008 (attacco in mischia con arco). NB: US-007 gia'
+  chiusa; l'ordine di priorita' salta a US-008.
