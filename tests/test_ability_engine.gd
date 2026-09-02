@@ -8,6 +8,15 @@ func _engine() -> Node:
 	return Engine.get_main_loop().root.get_node_or_null("AbilityEngine")
 
 
+## Setup comune (US-025): ogni test parte senza cooldown residui e senza
+## effetti a tempo in coda lasciati dal test precedente.
+func prepara() -> void:
+	var e: Node = _engine()
+	if e != null:
+		e.call("clear_cooldowns")
+		e.call("flush_effects")
+
+
 ## Caster minimo: un Node2D nell'albero con uno StatsComponent figlio.
 func _caster() -> Node2D:
 	var c := Node2D.new()
@@ -47,7 +56,6 @@ func test_caster_senza_stats_rifiutato() -> void:
 func test_costo_scalato_dalla_spiritualita() -> void:
 	var e: Node = _engine()
 	var c: Node2D = _caster()
-	e.call("clear_cooldowns")
 	var s: Node = c.get_node("Stats")
 	var prima: float = float(s.get("spiritualita"))
 
@@ -61,7 +69,6 @@ func test_costo_scalato_dalla_spiritualita() -> void:
 func test_spiritualita_insufficiente_non_esegue_nulla() -> void:
 	var e: Node = _engine()
 	var c: Node2D = _caster()
-	e.call("clear_cooldowns")
 	var s: Node = c.get_node("Stats")
 	s.set("spiritualita", 1.0)
 
@@ -77,7 +84,6 @@ func test_spiritualita_insufficiente_non_esegue_nulla() -> void:
 func test_cooldown_blocca_la_seconda_esecuzione() -> void:
 	var e: Node = _engine()
 	var c: Node2D = _caster()
-	e.call("clear_cooldowns")
 
 	var primo: Dictionary = e.call("execute", "fool_velo_illusorio", c)
 	assert_true(primo["ok"], "prima esecuzione riuscita")
@@ -97,7 +103,6 @@ func test_composizione_di_due_primitive() -> void:
 	# un AVVISO e lasciare proseguire, non far fallire l'abilita'.
 	var e: Node = _engine()
 	var c: Node2D = _caster()
-	e.call("clear_cooldowns")
 	var s: Node = c.get_node("Stats")
 
 	var r: Dictionary = e.call("execute", "fool_velo_illusorio", c)
@@ -118,12 +123,56 @@ func test_composizione_di_due_primitive() -> void:
 
 
 func test_primitiva_fuori_registro_e_errore() -> void:
+	# I TRE esiti di una primitiva vanno tenuti distinti. Qui: FUORI dal
+	# registro chiuso -> l'abilita' prosegue ma con un warning "fuori registro"
+	# (e' un bug nei dati). Ramo di execute() prima non coperto da nessun test.
 	var e: Node = _engine()
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	assert_true((gd.call("get_primitive", "primitiva_inventata_xyz") as Dictionary).is_empty(),
+		"la primitiva inventata non e' nel registro")
+
+	var abilities: Dictionary = gd.get("_abilities")
+	abilities["_ab_fuori_registro"] = {
+		"id": "_ab_fuori_registro", "costo_spiritualita": 0,
+		"primitive": [{"tipo": "primitiva_inventata_xyz"}],
+	}
 	var c: Node2D = _caster()
-	# Distinzione chiave: fuori dal registro chiuso = bug nei dati.
-	var vera: Dictionary = Engine.get_main_loop().root.get_node("GameData").call(
-		"get_primitive", "primitiva_inventata")
-	assert_true(vera.is_empty(), "la primitiva inventata non e' nel registro")
+	var r: Dictionary = e.call("execute", "_ab_fuori_registro", c)
+	assert_true(r["ok"], "l'abilita' prosegue, non crasha")
+	var visto := false
+	for w in (r["warnings"] as PackedStringArray):
+		if str(w).contains("fuori registro"):
+			visto = true
+	assert_true(visto, "warning 'primitiva fuori registro' emesso")
+	assert_eq((r["effects"] as Array).size(), 0, "nessun effetto per una primitiva fuori registro")
+
+	abilities.erase("_ab_fuori_registro")
+	_cleanup(c)
+
+
+func test_primitiva_nel_registro_ma_non_implementata_prosegue() -> void:
+	# L'altro esito: NEL registro chiuso ma senza handler -> warning "non
+	# implementata", l'abilita' prosegue. illusion e' esattamente questo caso.
+	var e: Node = _engine()
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	assert_false((gd.call("get_primitive", "illusion") as Dictionary).is_empty(),
+		"illusion e' nel registro")
+
+	var abilities: Dictionary = gd.get("_abilities")
+	abilities["_ab_non_impl"] = {
+		"id": "_ab_non_impl", "costo_spiritualita": 0,
+		"primitive": [{"tipo": "illusion"}],
+	}
+	var c: Node2D = _caster()
+	var r: Dictionary = e.call("execute", "_ab_non_impl", c)
+	assert_true(r["ok"], "prosegue")
+	var visto := false
+	for w in (r["warnings"] as PackedStringArray):
+		if str(w).contains("non implementata"):
+			visto = true
+	assert_true(visto, "warning 'non implementata'")
+
+	abilities.erase("_ab_non_impl")
 	_cleanup(c)
 
 
@@ -228,8 +277,6 @@ func test_tutte_e_cinque_le_primitive_sono_registrate() -> void:
 func test_buff_scade_dopo_la_durata() -> void:
 	var e: Node = _engine()
 	var c: Node2D = _caster()
-	e.call("clear_cooldowns")
-	e.call("flush_effects")
 	var s: Node = c.get_node("Stats")
 
 	e.call("execute", "fool_velo_illusorio", c)
@@ -248,7 +295,6 @@ func test_buff_scade_dopo_la_durata() -> void:
 func test_heal_nel_tempo() -> void:
 	var e: Node = _engine()
 	var c: Node2D = _caster()
-	e.call("flush_effects")
 	var s: Node = c.get_node("Stats")
 	s.set("hp", 40.0)
 
@@ -266,7 +312,6 @@ func test_heal_nel_tempo() -> void:
 func test_effetto_muore_col_bersaglio() -> void:
 	var e: Node = _engine()
 	var c: Node2D = _caster()
-	e.call("flush_effects")
 	var s: Node = c.get_node("Stats")
 	e.call("_p_buff_stat", {"stat": "difesa", "valore": 5.0, "durata": 5.0}, c, s, "ab")
 	assert_eq(e.call("pending_count"), 1, "scadenza in coda")
@@ -321,7 +366,6 @@ func test_heal_con_bersaglio_non_self_non_cura_il_caster() -> void:
 func test_cooldown_di_caster_liberato_viene_purgato() -> void:
 	# US-023: _cooldowns non deve accumulare una voce per ogni entita' morta.
 	var e: Node = _engine()
-	e.call("clear_cooldowns")
 	var c: Node2D = _caster()
 	e.call("execute", "fool_velo_illusorio", c)
 	assert_eq(e.call("cooldown_entries"), 1, "una voce di cooldown")
@@ -333,7 +377,6 @@ func test_cooldown_di_caster_liberato_viene_purgato() -> void:
 
 func test_cooldown_scaduto_viene_purgato_anche_con_caster_vivo() -> void:
 	var e: Node = _engine()
-	e.call("clear_cooldowns")
 	var vivo := Node.new()
 	Engine.get_main_loop().root.add_child(vivo)
 	# Voce con istante di fine nel passato remoto: scaduta, caster ancora vivo.

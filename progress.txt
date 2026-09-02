@@ -1091,3 +1091,41 @@ sezione test aggiornata.
     verde: il prune non rompe l'identita' delle voci sopravvissute.
   validator exit 0.
 - Prossima storia: US-025 (test onesti e non fragili).
+
+[2026-09-02] US-025 — Test onesti e non fragili
+
+- Cosa fatto:
+  1. test_game_data.test_ogni_abilita_riferita_esiste: la lista 'mancanti'
+     veniva costruita e MAI controllata (asseriva solo ability_count == 32).
+     Ora assert_eq(mancanti.size(), 0): ogni id di abilita' elencato da una
+     Sequenza deve risolvere. Stato attuale dei dati: 32 riferite = 32
+     caricate, 0 mancanti, 0 orfane (verificato). Il 32 magico e' sparito,
+     resta assert_gt(..., 0).
+  2. Ramo 'primitiva FUORI REGISTRO' di execute() prima non coperto: nuovo
+     test_primitiva_fuori_registro_e_errore inietta un'abilita' con una
+     primitiva inventata e verifica il warning "fuori registro" + abilita'
+     che prosegue senza effetti. Aggiunto anche il gemello
+     test_primitiva_nel_registro_ma_non_implementata_prosegue (illusion):
+     i tre esiti distinti ora hanno un test ciascuno.
+  3. Numeri magici -> derivati dai dati:
+     * test_vocabolario_dei_tag: non piu' `== 82`. Legge tags.json e verifica
+       che il loader abbia caricato TUTTE le voci. La guardia del vocabolario
+       chiuso e' passata al validator Python: nuovo check anti-duplicato in
+       validate_data.py (verificato: dup di 'acqua' -> exit 1).
+     * test_hot_reload.test_reload_riporta_conteggi_e_errori: non piu'
+       `files_loaded == 26` (si rompeva aggiungendo un JSON legittimo, gia'
+       toccato 24->25->26). Ora: > 0, stabile fra due reload, errori == 0.
+     * i conteggi 10/100 (pathway/sequenze) RESTANO fissi: hanno un commento
+       esplicito "e' lo scope deciso, cambiarlo e' un bug" — sono guardie
+       volute, non fragilita'.
+  4. run_tests.gd: se _discover() torna vuoto -> "NESSUN file di test
+     trovato" + quit(1) (prima: 0 test, falso verde). Anche total == 0 dopo
+     l'esecuzione -> quit(1). Verificato puntando il runner su tests/fixtures
+     (nessun test_*.gd): exit 1.
+  5. Setup comune AbilityEngine: il runner ora chiama suite.prepara() prima
+     di ogni test se esiste. test_ability_engine.prepara() fa clear_cooldowns
+     + flush_effects. Rimosse le ~8 chiamate esplicite ridondanti sparse nei
+     test.
+- Come verificato: 108 test headless tutti verdi, validator exit 0.
+  Il guard anti-0-test verificato a parte (exit 1).
+- Prossima storia: US-020 (tell sonoro degli attacchi nemici).

@@ -65,19 +65,21 @@ func test_ogni_abilita_riferita_esiste() -> void:
 	# perche' qui conta cosa e' finito davvero in memoria.
 	var gd: Node = _data()
 	var mancanti: PackedStringArray = []
+	var riferite: Dictionary = {}
 	for pid in gd.call("pathway_ids"):
 		var p: Dictionary = gd.call("get_pathway", pid)
 		for entry in (p.get("sequences", []) as Array):
 			var seq: Dictionary = entry
 			for aid in (seq.get("abilities", []) as Array):
-				var a: Dictionary = gd.call("get_ability", str(aid))
-				if a.is_empty():
+				riferite[str(aid)] = true
+				if (gd.call("get_ability", str(aid)) as Dictionary).is_empty():
 					mancanti.append(str(aid))
-	# Le abilita' non ancora scritte sono attese: solo il Twilight Giant e'
-	# completo. Il test verifica che quelle PRESENTI risolvano davvero.
-	var scritte: int = gd.call("ability_count")
-	assert_eq(scritte, 32, "abilita' effettivamente caricate")
-	assert_gt(float(scritte), 0.0, "almeno un'abilita' caricata")
+	# Ogni id elencato da una Sequenza DEVE risolvere. Se in futuro si aggiunge
+	# un riferimento senza scrivere l'abilita', questo test lo becca (prima la
+	# lista 'mancanti' veniva costruita e mai controllata).
+	assert_eq(mancanti.size(), 0, "abilita' riferite ma non caricate: %s" % [mancanti])
+	assert_gt(float(gd.call("ability_count")), 0.0, "almeno un'abilita' caricata")
+	assert_gt(float(riferite.size()), 0.0, "almeno un'abilita' riferita dalle Sequenze")
 
 
 func test_registro_delle_primitive() -> void:
@@ -92,5 +94,10 @@ func test_vocabolario_dei_tag() -> void:
 	var gd: Node = _data()
 	assert_true(gd.call("has_tag", "spirito"), "tag 'spirito' nel vocabolario")
 	assert_false(gd.call("has_tag", "tag_inventato_a_caso"), "tag inesistente rifiutato")
-	# Vocabolario CHIUSO: 82 voci. Se cresce senza una decisione, e' un bug.
-	assert_eq(gd.call("tag_count"), 82, "voci del vocabolario dei tag")
+	# Il loader ha caricato TUTTE le voci del file, non un sottoinsieme. Il
+	# numero e' derivato da tags.json, non scritto qui: che il vocabolario
+	# chiuso non cresca di nascosto lo controlla il validator Python.
+	var f := FileAccess.open("res://data/tags.json", FileAccess.READ)
+	var doc: Variant = JSON.parse_string(f.get_as_text())
+	f.close()
+	assert_eq(gd.call("tag_count"), (doc["tags"] as Array).size(), "tutte le voci di tags.json caricate")

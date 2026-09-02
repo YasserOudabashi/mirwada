@@ -80,6 +80,12 @@ def main():
     prim_params = {k: set(v.get("params", [])) for k, v in prim_doc["primitives"].items()}
     events = ev_doc["events"]
     valid_tags = set(tags_doc["tags"])
+    # Il vocabolario e' chiuso: un doppione e' un errore (di solito un
+    # copia-incolla), e maschererebbe il conteggio come guardia.
+    if len(tags_doc["tags"]) != len(valid_tags):
+        seen = set()
+        dups = sorted({t for t in tags_doc["tags"] if t in seen or seen.add(t)})
+        err(f"data/tags.json: tag duplicati nel vocabolario chiuso: {dups}")
     valid_damage_tags = set(dmg_doc["damage_tags"])
     valid_momenti = set(time_doc["momenti"])
     valid_fasi_lunari = set(time_doc["fasi_lunari"])

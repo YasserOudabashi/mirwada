@@ -50,10 +50,15 @@ func test_reload_non_duplica_nulla() -> void:
 
 
 func test_reload_riporta_conteggi_e_errori() -> void:
+	# Il conteggio esatto dei file e' fragile (aggiungere un JSON legittimo lo
+	# rompeva): quello che conta e' che il reload carichi qualcosa e non
+	# accumuli errori. Che nessun file sia fallito lo dice gia' errori == 0.
 	var gd: Node = _data()
+	var prima: int = gd.call("files_loaded")
 	gd.call("reload")
-	assert_eq(gd.call("files_loaded"), 26, "file ricaricati riportati")
-	assert_eq((gd.call("last_errors") as PackedStringArray).size(), 0, "errori riportati")
+	assert_gt(float(gd.call("files_loaded")), 0.0, "il reload ha caricato dei file")
+	assert_eq(gd.call("files_loaded"), prima, "stesso numero di file prima e dopo")
+	assert_eq((gd.call("last_errors") as PackedStringArray).size(), 0, "nessun errore di caricamento")
 
 
 func test_dati_ancora_integri_dopo_reload() -> void:

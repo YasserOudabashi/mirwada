@@ -454,8 +454,8 @@
       ],
       "priority": 25,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "1) test_ogni_abilita_riferita_esiste ora assert_eq(mancanti.size(), 0) (era variabile morta); stato dati: 32 riferite = 32 caricate, 0 mancanti. 2) ramo 'primitiva fuori registro' di execute() coperto da un test nuovo (inietta abilita' con primitiva inventata -> warning 'fuori registro'); aggiunto il gemello 'nel registro ma non implementata' (illusion). 3) numeri magici: test_vocabolario_dei_tag legge tags.json invece di '== 82' (guardia vocab chiuso spostata nel validator: nuovo check anti-duplicato); test_reload_riporta_conteggi non usa piu' 'files_loaded == 26' (>0, stabile, errori==0). I 10/100 pathway/sequenze restano fissi: guardie volute con commento. 4) run_tests.gd: _discover() vuoto o total==0 -> quit(1) (era falso verde), verificato puntandolo su tests/fixtures. 5) runner chiama suite.prepara() prima di ogni test; test_ability_engine.prepara() = clear_cooldowns + flush_effects, rimosse ~8 chiamate ridondanti. 108 test verdi, validator exit 0."
     },
     {
       "id": "US-026",

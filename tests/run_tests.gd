@@ -16,6 +16,11 @@ func _init() -> void:
 	await process_frame
 
 	var files: PackedStringArray = _discover()
+	if files.is_empty():
+		print("NESSUN file di test trovato in %s — la discovery e' rotta." % TESTS_DIR)
+		quit(1)
+		return
+
 	var total := 0
 	var failed := 0
 	var all_failures: PackedStringArray = []
@@ -36,6 +41,10 @@ func _init() -> void:
 				continue
 			total += 1
 			suite.failures = PackedStringArray()
+			# Setup comune opzionale: una suite che dichiara prepara() la fa
+			# eseguire prima di ogni suo test (stato pulito, US-025).
+			if suite.has_method("prepara"):
+				suite.call("prepara")
 			suite.call(mname)
 			var fails: PackedStringArray = suite.failures
 			if fails.is_empty():
@@ -48,6 +57,10 @@ func _init() -> void:
 					print("       %s" % f)
 
 	print("")
+	if total == 0:
+		print("0 test eseguiti: i file ci sono ma nessun metodo test_. Falso verde.")
+		quit(1)
+		return
 	if failed == 0:
 		print("%d test, tutti passati." % total)
 		quit(0)
