@@ -117,8 +117,8 @@
       ],
       "priority": 7,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "scripts/stats_component.gd. Due livelli: valore BASE per stat + modificatori registrati per id; l'effettivo e' base + somma. L'id permette di togliere esattamente il proprio contributo senza sapere nulla degli altri buff. Riapplicare lo stesso id sostituisce invece di sommare, cosi' un buff non si impila. hp e spiritualita' sono risorse separate dalle stat. I valori base vengono dalle curve di balance.json per Sequenza, non da numeri nel codice. GameData ora carica anche balance.json (curve_value). 11 test, tutti passano. TRAPPOLA: niente class_name su questo script — risolvere una classe globale da uno script caricato a runtime dal runner manda Godot 4.3 in stallo senza messaggi. I test usano preload."
     },
     {
       "id": "US-008",

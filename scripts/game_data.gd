@@ -16,6 +16,7 @@ const DIR_PATHWAYS := "res://data/pathways"
 const DIR_ABILITIES := "res://data/abilities"
 const DIR_SYNERGIES := "res://data/synergies"
 const PATH_TAGS := "res://data/tags.json"
+const PATH_BALANCE := "res://data/balance.json"
 const PATH_PRIMITIVES := "res://data/schema/primitives.json"
 
 var _pathways: Dictionary = {}
@@ -23,6 +24,7 @@ var _sequences: Dictionary = {}
 var _abilities: Dictionary = {}
 var _synergies: Dictionary = {}
 var _tags: Dictionary = {}
+var _balance: Dictionary = {}
 var _primitives: Dictionary = {}
 
 var _errors: PackedStringArray = []
@@ -66,6 +68,7 @@ func load_all() -> void:
 	_load_abilities()
 	_load_synergies()
 	_load_single(PATH_TAGS, "tags", _tags)
+	_load_single(PATH_BALANCE, "hp_curve", _balance)
 	_load_single(PATH_PRIMITIVES, "primitives", _primitives)
 
 	if _errors.is_empty():
@@ -111,6 +114,19 @@ func get_primitive(tipo: String) -> Dictionary:
 func has_tag(tag: String) -> bool:
 	var vocab: Array = _tags.get("tags", [])
 	return vocab.has(tag)
+
+
+## Curve globali di bilanciamento. Tenute nei dati perche' sono i numeri
+## destinati a cambiare di piu' durante il playtest.
+func get_balance(section: String) -> Dictionary:
+	return _balance.get(section, {})
+
+
+## Valore di una curva per Sequenza (9 = piu' bassa, 0 = Vero Dio).
+## Le chiavi in JSON sono stringhe, non interi: da qui la conversione.
+func curve_value(section: String, sequence: int, fallback: float) -> float:
+	var curve: Dictionary = _balance.get(section, {})
+	return float(curve.get(str(sequence), fallback))
 
 
 func tag_count() -> int:
