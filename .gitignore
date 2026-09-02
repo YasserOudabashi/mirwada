@@ -5,6 +5,13 @@ export_presets.cfg
 build/
 export/
 
+# Editor binario scaricato in locale, non versionato
+Godot_v*-stable_win64.exe/
+Godot_v*-stable_*/
+
+# Grafo graphify (rigenerabile con /graphify)
+graphify-out/
+
 # Python
 __pycache__/
 *.pyc

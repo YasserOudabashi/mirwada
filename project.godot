@@ -1,4 +1,4 @@
-; Sequenza — configurazione di progetto
+; Mirwada — configurazione di progetto
 ;
 ; Pixel art 32x32 su base 640x360 (20x11 tile abbondanti a schermo).
 ; La risoluzione e' una decisione irreversibile presa in CLAUDE.md:
@@ -8,7 +8,7 @@ config_version=5
 
 [application]
 
-config/name="Sequenza"
+config/name="Mirwada"
 config/description="Action-RPG 2D esplorativo con progressione a Pathway e Sequenze."
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")

@@ -1,4 +1,4 @@
-# Sequenza — CLAUDE.md di progetto
+# Mirwada — CLAUDE.md di progetto
 
 Action-RPG 2D esplorativo con sistema di progressione a Pathway/Sequenze.
 **10 Pathway attivi (4 gruppi completi), 100 Sequenze.**
@@ -136,10 +136,13 @@ data-driven in `data/audio.json`. Il doppiaggio si', quello resta fuori.
 
 ## Repo
 
-https://github.com/YasserOudabashi/Sequenza (privata)
+https://github.com/YasserOudabashi/mirwada (privata)
 
-Repo dedicata a questo progetto. Va aggiunta alla tabella "Repository che uso"
-in ~/.claude/CLAUDE.md, come prescrive quel file per ogni repo nuova.
+Repo dedicata a questo progetto, aggiunta alla tabella "Repository che uso"
+in ~/.claude/CLAUDE.md come prescrive quel file per ogni repo nuova.
+`Mirwada` è il nome del gioco; `Sequenza`/`Sequenze` nel resto dei documenti
+resta il termine di gameplay (lo scalino di progressione), non il titolo.
+Percorso locale: `D:\005-Friend\Ivan\MEgaProJect`.
 
 ## Nota IP
 

@@ -1,4 +1,4 @@
-# Sequenza
+# Mirwada
 
 Action-RPG 2D esplorativo top-down con sistema di progressione a Pathway e
 Sequenze: 10 Pathway attivi (4 gruppi completi), 10 Sequenze ciascuno,

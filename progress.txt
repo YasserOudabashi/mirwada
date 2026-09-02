@@ -1,4 +1,4 @@
-# Sequenza — note tra sessioni
+# Mirwada — note tra sessioni
 
 Questo file e' la memoria del progetto tra un'iterazione di ralph e l'altra.
 Ogni iterazione APPENDE una sezione datata. Non riscrivere le sezioni vecchie.
@@ -317,3 +317,36 @@ Formato di ogni sezione:
 
 - Prossima storia: US-004. Richiede verifica a schermo: farla con l'editor
   aperto, non alla cieca.
+
+[2026-09-02] SETUP-8 + naming — repo Mirwada, HEAD riparato, lore doc
+
+- Cosa fatto:
+  1. .git/HEAD era corrotto (conteneva il reflog, non un ref): HEAD detached
+     "points at nothing", git rev-parse HEAD -> 0000000. Nessun commit perso
+     (fsck: 0 dangling, tip db0b57a intatto, working tree identico).
+     Riparato con: git symbolic-ref HEAD refs/heads/<branch>.
+  2. Branch rinominato in `main` (era un nome di sessione claude/*).
+  3. Nome del gioco fissato: **Mirwada**. Rinominato SOLO il titolo in
+     project.godot (config/name), README.md h1, CLAUDE.md h1 + sezione Repo,
+     prd.json project, progress.txt h1. `Sequenza`/`Sequenze` come termine di
+     gameplay (lo scalino di progressione) NON e' toccato: non e' il titolo.
+  4. Repo dedicata creata: github.com/YasserOudabashi/mirwada (privata).
+     `origin` spostato da IvanOstroumov/NightOwl (vuoto, mai usato) a mirwada.
+     Primo push dei 9 commit. Aggiunta alla tabella repo in ~/.claude/CLAUDE.md.
+  5. .gitignore: escluso l'eseguibile Godot scaricato in locale
+     (Godot_v*-stable_win64.exe/) e graphify-out/.
+  6. Nuovo 006_PRD/design-lore.md: nomi di gioco, protagonista, NPC.
+     Protagonista: nome di default **Enel**, rinominabile dal giocatore alla
+     creazione personaggio. NPC: Mirco, Sidon + inventati. NESSUN CODICE:
+     i nomi vivono nei dati/i18n, che non esistono ancora (arrivano con la
+     fase NPC/dialoghi della roadmap). Per ora sono decisioni di design.
+
+- Come verificato: Godot 4.3 headless (eseguibile locale) -> 41/41 test
+  passano, exit 0. python tools/validate_data.py -> esce 0. graphify
+  rigenerato. git log -> 9 commit + 1, push ok.
+
+- Resta aperto: i18n dal giorno 1 e' una regola di CLAUDE.md ma NON esiste
+  ancora nessun file di locale; il primo testo UI arriva con US-017 (HUD).
+  La creazione personaggio (scelta nome protagonista) non ha una story:
+  agganciarla alla fase con NPC/dialoghi/salvataggio.
+- Prossima storia: US-004 (invariata).
