@@ -941,3 +941,56 @@ sezione test aggiornata.
     (pannello: "ultima primitiva" cambia; heal 50 -> 65). Il manichino
     messo a 5 hp torna a 100 il frame dopo. Screenshot user://us018/.
 - Prossima storia: US-019 (bus audio e feedback di colpo).
+
+[2026-09-02] US-019 — Bus audio e feedback di colpo
+
+- Cosa fatto:
+  - GameData carica data/audio.json (get_audio(sezione)). 26 file ora
+    (test_hot_reload aggiornato 25 -> 26).
+  - scripts/audio_manager.gd (autoload AudioManager):
+    * _costruisci_bus() crea master/music/sfx/ambience/ui/whisper da
+      audio.json.buses con volume e routing (parent -> Master).
+    * feedback(nome) legge audio.json.combat_feedback[nome] e fa partire
+      INSIEME: sfx (sul bus sfx, pitch random +-pitch_var), hitstop
+      (Engine.time_scale a 0.05 per hitstop_ms, in tempo reale via
+      Time.get_ticks_msec + ripristino in _process — NON await su timer,
+      che non scorre nei test), shake (segnale shake_richiesto se
+      shake > 0).
+    * accessibilita': imposta_accessibilita()/accessibilita(). riduci_hitstop
+      moltiplica l'hitstop per 0.35; disattiva_shake sopprime il segnale.
+    * SFX PLACEHOLDER SINTETIZZATI in codice (non posso produrre file):
+      _sintetizza(freq, durata, rumore) -> AudioStreamWAV, un burst con
+      inviluppo esponenziale. Frequenza diversa per categoria: parry_perfect
+      (1040 Hz, 0.26 s) suona davvero diverso da parry_normal (620, 0.09).
+      Si sostituiscono con file veri senza toccare il codice.
+  - scripts/game_camera.gd: shake a "trauma" agganciato a
+    AudioManager.shake_richiesto (accumula, decade, ampiezza col quadrato).
+    Usa offset, indipendente dal position_smoothing.
+  - player.gd: l'hitstop LOCALE e' stato RIMOSSO. Ora _su_colpo_inflitto ->
+    feedback("hit_light"), _su_danno_subito -> feedback("damage_taken"),
+    _su_parata_riuscita -> feedback("parry_perfect"|"parry_normal"),
+    start_dash -> feedback("dash"). data/balance.json: tolto hitstop_ms
+    (ora vive in audio.json, come chiedeva l'audit).
+  - enemy.gd: feedback("hit_light") quando piazza un colpo,
+    feedback("posture_break") sulla rottura di postura.
+
+- Come verificato:
+  - 5 test in test_audio.gd (95 totali): bus creati, feedback emette lo
+    shake col valore dei dati, disattiva_shake lo sopprime, l'hitstop
+    abbassa time_scale ed e' in corso subito dopo, voce ignota non esplode.
+  - A SCHERMO: colpendo un nemico -> shake_richiesto emesso, time_scale
+    scende a 0.05 (hitstop), offset camera fino a ~2.4 px poi decade.
+    Con disattiva_shake: 0 eventi shake. parry_perfect e parry_normal hanno
+    sfx e hitstop diversi nei dati. Screenshot user://us019/.
+
+- Nota: gli sfx sono sintetizzati, non file. Per la fase 6 servono file veri
+  (bfxr/sfxr per la fase 1, poi un musicista): audio.json e' gia' la
+  specifica, i nomi sfx_* sono i placeholder da rimpiazzare.
+- Nota cosmetica: il runner headless ora stampa "3 resources still in use at
+  exit" DOPO quit(0) — sono gli AudioStreamWAV sintetizzati, rilasciati in
+  ritardo rispetto al sottosistema risorse nella chiusura brusca del runner.
+  L'exit code resta 0 (verificato), i test passano, il gioco vero non e'
+  toccato. _exit_tree di AudioManager li azzera ma non anticipa abbastanza.
+- Fase 1: 21/26 story originali + tutte le 5 di risanamento ancora aperte
+  (US-022..026). Mancano US-020 (tell sonoro nemici) e US-026 (CI, P2).
+- Prossima storia: US-020 (tell sonoro degli attacchi nemici).

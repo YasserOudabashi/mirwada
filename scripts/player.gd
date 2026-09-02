@@ -9,8 +9,9 @@ extends CharacterBody2D
 ## L'attacco: l'input avvia l'animazione "attack_light"; la hitbox si apre e
 ## si chiude sugli eventi hitbox_on/hitbox_off che la macchina di animazione
 ## emette dai frame del JSON. Non si puo' ri-attaccare finche' l'animazione
-## non e' finita (quindi nemmeno durante il recupero). Danno, arco e hitstop
-## vengono da data/balance.json (sezione combattimento).
+## non e' finita (quindi nemmeno durante il recupero). Danno e arco vengono
+## da data/balance.json; sfx, hitstop e shake da AudioManager
+## (data/audio.json.combat_feedback), mai hardcoded qui.
 ##
 ## NIENTE class_name: coerente col resto del progetto.
 
@@ -34,7 +35,6 @@ const Hurtbox := preload("res://scripts/hurtbox.gd")
 
 var _dir_sguardo: String = "down"
 var _attaccando: bool = false
-var _in_hitstop: bool = false
 var _combat: Dictionary = {}
 
 var _dashing: bool = false
@@ -44,6 +44,8 @@ var _dash_cd: float = 0.0
 
 var _parando: bool = false
 
+@onready var _audio: Node = get_node_or_null("/root/AudioManager")
+
 
 func _ready() -> void:
 	_anim.call("configura", CATEGORIA_ANIM)
@@ -52,6 +54,7 @@ func _ready() -> void:
 	_anim.finestra_cambiata.connect(_su_finestra_anim)
 	_hitbox.ha_colpito.connect(_su_colpo_inflitto)
 	_hurtbox.parata_riuscita.connect(_su_parata_riuscita)
+	_hurtbox.colpito.connect(_su_danno_subito)
 
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd != null:
@@ -139,6 +142,8 @@ func start_dash(spec: Dictionary) -> void:
 	_dash_left = durata
 	_dash_vel = dir * (distanza / durata)
 	_anim.call("riproduci", "dash", _dir_sguardo)
+	if _audio != null:
+		_audio.call("feedback", "dash")
 
 
 func _fine_dash() -> void:
@@ -196,8 +201,12 @@ func _fine_parata() -> void:
 	_hurtbox.call("set_parata", Hurtbox.Parata.NESSUNA)
 
 
-## Parata riuscita: su parata perfetta si erode la postura dell'attaccante.
+## Parata riuscita: sfx/hitstop/shake distinti (parry_perfect suona diverso
+## da parry_normal, audio.json), e su parata perfetta si erode la postura
+## dell'attaccante.
 func _su_parata_riuscita(perfetta: bool, attaccante: Node) -> void:
+	if _audio != null:
+		_audio.call("feedback", "parry_perfect" if perfetta else "parry_normal")
 	if not perfetta or attaccante == null:
 		return
 	var b: Dictionary = _combat.get("parata", {})
@@ -216,19 +225,16 @@ func _cerca_postura(nodo: Node) -> Node:
 	return null
 
 
+## sfx + hitstop + shake del colpo inferto: tutto in AudioManager, dai dati
+## (audio.json.combat_feedback). Niente hitstop hardcoded qui.
 func _su_colpo_inflitto(_bersaglio: Node, _danno: float) -> void:
-	_hitstop()
+	if _audio != null:
+		_audio.call("feedback", "hit_light")
 
 
-func _hitstop() -> void:
-	if _in_hitstop:
-		return
-	_in_hitstop = true
-	var ms: float = float(_combat.get("hitstop_ms", 70.0))
-	Engine.time_scale = 0.05
-	await get_tree().create_timer(ms / 1000.0, true, false, true).timeout
-	Engine.time_scale = 1.0
-	_in_hitstop = false
+func _su_danno_subito(danno: float, _stagger: float, _da: Node) -> void:
+	if danno > 0.0 and _audio != null:
+		_audio.call("feedback", "damage_taken")
 
 
 ## La direzione dominante decide lo sprite. In obliquo vince l'orizzontale:

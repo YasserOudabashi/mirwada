@@ -52,7 +52,7 @@ func test_reload_non_duplica_nulla() -> void:
 func test_reload_riporta_conteggi_e_errori() -> void:
 	var gd: Node = _data()
 	gd.call("reload")
-	assert_eq(gd.call("files_loaded"), 25, "file ricaricati riportati")
+	assert_eq(gd.call("files_loaded"), 26, "file ricaricati riportati")
 	assert_eq((gd.call("last_errors") as PackedStringArray).size(), 0, "errori riportati")
 
 

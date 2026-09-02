@@ -43,6 +43,7 @@ func _ready() -> void:
 	_anim.call("configura", CATEGORIA_ANIM)
 	_anim.evento_frame.connect(_su_evento_anim)
 	_anim.animazione_finita.connect(_su_anim_finita)
+	_hitbox.ha_colpito.connect(_su_colpo_inflitto)
 	_stats.died.connect(_su_morte)
 	_postura.postura_rotta.connect(_su_postura_rotta)
 	_postura.vulnerabilita_finita.connect(func() -> void:
@@ -133,7 +134,16 @@ func _su_anim_finita(stato_anim: String) -> void:
 			_vai(Stato.RECUPERO)
 
 
+func _su_colpo_inflitto(_bersaglio: Node, _danno: float) -> void:
+	var am: Node = get_node_or_null("/root/AudioManager")
+	if am != null:
+		am.call("feedback", "hit_light")
+
+
 func _su_postura_rotta() -> void:
+	var am: Node = get_node_or_null("/root/AudioManager")
+	if am != null:
+		am.call("feedback", "posture_break")
 	if _stato != Stato.MORTO:
 		_vai(Stato.STAGGER)
 

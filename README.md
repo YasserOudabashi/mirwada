@@ -6,14 +6,15 @@ Sequenze: 10 Pathway attivi (4 gruppi completi), 10 Sequenze ciascuno,
 
 ## Stato
 
-Fase 1 — Fondamenta, 15 story su 27 chiuse (21 originali, di cui US-021
-spezzata in a/b, + 5 di risanamento dall'audit del 2026-09-02), 75 test
+Fase 1 — Fondamenta, 20 story su 27 chiuse (21 originali, di cui US-021
+spezzata in a/b, + 5 di risanamento dall'audit del 2026-09-02), 95 test
 headless. Fatto: caricatore + hot-reload dei dati, statistiche, motore
 delle abilita', macchina di animazione data-driven, movimento a 8 direzioni,
-camera, area di test con collisioni, e il ciclo di combattimento completo —
-attacco in mischia (US-008), schivata con i-frame (US-009), parata e postura
-(US-010), nemico con telegrafia (US-011). Il validator dei dati gira dentro
-la suite (US-014). Manca: save/load, HUD, scena di debug, audio.
+camera con shake, area di test con collisioni, ciclo di combattimento
+completo (attacco, schivata con i-frame, parata e postura, nemico con
+telegrafia), salvataggio versionato, HUD i18n, scena di debug, bus audio e
+feedback di colpo data-driven. Mancano: US-020 (tell sonoro nemici) e le 5
+story di risanamento US-022..026.
 
 ## Setup
 

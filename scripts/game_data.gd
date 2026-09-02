@@ -19,6 +19,7 @@ const PATH_TAGS := "res://data/tags.json"
 const PATH_BALANCE := "res://data/balance.json"
 const PATH_PRIMITIVES := "res://data/schema/primitives.json"
 const PATH_ANIMATIONS := "res://data/animations.json"
+const PATH_AUDIO := "res://data/audio.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -33,6 +34,7 @@ var _tags: Dictionary = {}
 var _balance: Dictionary = {}
 var _primitives: Dictionary = {}
 var _animations: Dictionary = {}
+var _audio: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -78,6 +80,7 @@ func load_all() -> void:
 	_load_single(PATH_BALANCE, "hp_curve", _balance)
 	_load_single(PATH_PRIMITIVES, "primitives", _primitives)
 	_load_single(PATH_ANIMATIONS, "convenzioni", _animations)
+	_load_single(PATH_AUDIO, "buses", _audio)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -175,6 +178,12 @@ func animation_names(categoria: String) -> Array:
 		if not str(k).begins_with("_"):
 			out.append(k)
 	return out
+
+
+## --- Audio (data/audio.json) ---
+## Sezione di primo livello: buses, combat_feedback, telegraph, accessibilita...
+func get_audio(sezione: String) -> Dictionary:
+	return _audio.get(sezione, {})
 
 
 func pathway_ids() -> Array:

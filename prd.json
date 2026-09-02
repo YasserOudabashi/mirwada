@@ -328,8 +328,8 @@
       ],
       "priority": 19,
       "fase": 1,
-      "passes": false,
-      "notes": "Deliberatamente in fase 1 e non piu' avanti: il feedback di colpo e' meta' del feel di un action 2D, e tarare il combat senza audio significa tararlo due volte."
+      "passes": true,
+      "notes": "GameData carica audio.json (get_audio). audio_manager.gd (autoload AudioManager): crea i bus master/music/sfx/ambience/ui/whisper da audio.json.buses; feedback(nome) fa partire INSIEME sfx (bus sfx, pitch random), hitstop (Engine.time_scale 0.05 per hitstop_ms in tempo reale via Time.get_ticks_msec + ripristino in _process, non await), shake (segnale shake_richiesto). accessibilita: riduci_hitstop *0.35, disattiva_shake sopprime lo shake. SFX placeholder SINTETIZZATI in codice (_sintetizza -> AudioStreamWAV burst): parry_perfect 1040Hz/0.26s vs parry_normal 620Hz/0.09s, distinti. game_camera.gd: shake a trauma agganciato a shake_richiesto (offset). player.gd: hitstop locale RIMOSSO, ora feedback() per colpo/danno/parata/dash; balance.json senza hitstop_ms. enemy.gd: feedback su colpo piazzato e rottura postura. 5 test in test_audio.gd (95 totali). VERIFICA A SCHERMO: colpo -> shake emesso, time_scale 0.05, offset camera ~2.4px decrescente; disattiva_shake -> 0 shake; parry_perfect != parry_normal nei dati. SFX sintetizzati, non file (audio.json e' la specifica per i file veri)."
     },
     {
       "id": "US-020",
