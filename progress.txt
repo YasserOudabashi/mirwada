@@ -679,3 +679,47 @@ Sessione grossa su richiesta dell'utente: analisi completa del progetto
 - Resta aperto: US-021 e' chiusa in entrambe le meta'. Le hitbox di US-008 e
   gli i-frame di US-009 si agganceranno ai segnali di AnimationMachine.
 - Prossima storia: US-008 (attacco in mischia con arco).
+
+[2026-09-02] US-008 — Attacco in mischia con arco
+
+- Cosa fatto:
+  - scripts/hurtbox.gd (Area2D generico, layer 3): zona vulnerabile. subisci()
+    instrada il danno sullo StatsComponent del genitore ed emette colpito().
+    set_invulnerabile() per gli i-frame di US-009 e la parata di US-010.
+    Ignora i colpi dal proprietario (niente autodanno).
+  - scripts/hitbox.gd (Area2D, mask 3): arco offensivo. attiva()/disattiva()
+    lo accendono; colpisce ogni hurtbox toccata UNA volta per attivazione.
+    Forma e grafica placeholder = settore circolare (angolo, raggio)
+    costruito a runtime, nella direzione guardata.
+  - scripts/player.gd: stato _attaccando. Input "attacco" -> _inizia_attacco()
+    orienta la hitbox e lancia l'animazione "attack_light". La hitbox si apre
+    su hitbox_on e si chiude su hitbox_off — eventi che AnimationMachine
+    emette DAI FRAME di animations.json (attack_light: anticipo [0,1],
+    attivi [2], recupero [3,4]). animazione_finita -> _attaccando=false:
+    non si ri-attacca finche' non e' finita, quindi nemmeno in recupero.
+    Hitstop: Engine.time_scale a 0.05 per hitstop_ms reali, poi ripristino.
+  - player.tscn: nodi Hurtbox e Hitbox.
+  - project.godot: azione "attacco" (J + tasto sx del mouse).
+  - data/balance.json: nuova sezione "combattimento" — danno/stagger/angolo/
+    raggio dell'attacco leggero + hitstop_ms. Il TIMING resta in
+    animations.json; qui solo i numeri che non sono timing.
+
+- Come verificato:
+  - A SCHERMO (finestra reale): manichino con StatsComponent+Hurtbox alla
+    destra del giocatore. Guarda a destra, attacca -> hp 100 -> 88 (danno 12,
+    esatto da balance.json), lo screenshot al frame "attivi" (bordo rosso del
+    placeholder) mostra l'arco a settore nella direzione guardata. Fasi viste
+    dall'animazione: anticipo -> attivi -> recupero. Ri-premere "attacco"
+    durante l'attacco non lo fa ripartire (hp scende di 12 una volta sola).
+    time_scale torna a 1 dopo l'hitstop. Screenshot in user://us008/.
+  - 4 test headless in test_combat.gd (64 totali): danno instradato,
+    invulnerabile annulla, niente autodanno, segnale colpito. validator 0.
+
+- Note ambiente: la finestra scorre piu' lenta di 60fps nei loop di verifica;
+  per vedere un attacco intero servono ~250 iterazioni di await process_frame,
+  non 40. L'hitstop allunga ancora la durata reale.
+
+- Resta aperto: hitstop e shake passeranno a data/audio.json con US-019
+  (combat_feedback). L'arco vero (angolo, non cerchio) e' gia' un settore
+  ConvexPolygonShape2D; melee_arc.gd della primitiva abilita' resta separato.
+- Prossima storia: US-009 (schivata con i-frame).

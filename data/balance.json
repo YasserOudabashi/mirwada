@@ -31,5 +31,15 @@
     "decadimento_azione_incoerente": 0.05,
     "soglia_fallimento_abilita": 0.5,
     "probabilita_attivazione_autonoma_sotto_soglia": 0.08
+  },
+  "combattimento": {
+    "_comment": "Numeri dell'attacco base del giocatore. Il TIMING (anticipo/attivi/recupero) NON e' qui: vive in data/animations.json personaggio.attack_light. Qui stanno solo danno, forma dell'arco e durata dell'hitstop. PLAUSIBILI, non bilanciati.",
+    "attacco_leggero": {
+      "danno": 12,
+      "stagger": 6,
+      "angolo": 100,
+      "raggio": 22
+    },
+    "hitstop_ms": 70
   }
 }

@@ -134,8 +134,8 @@
       ],
       "priority": 9,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "scripts/hurtbox.gd (Area2D layer 3: instrada il danno allo StatsComponent del genitore, set_invulnerabile per US-009/010, niente autodanno) + scripts/hitbox.gd (Area2D mask 3: settore circolare angolo/raggio costruito a runtime nella direzione guardata, colpisce ogni hurtbox una volta per attivazione). player.gd: input 'attacco' (J/mouse sx) lancia l'animazione attack_light; la hitbox si apre su hitbox_on e chiude su hitbox_off, eventi emessi da AnimationMachine dai frame di animations.json (anticipo [0,1]/attivi [2]/recupero [3,4]). Non si ri-attacca finche' animazione_finita: coperto anche il recupero. Hitstop via Engine.time_scale per hitstop_ms. balance.json nuova sezione combattimento (danno/stagger/angolo/raggio/hitstop_ms; il timing resta in animations.json). VERIFICA A SCHERMO: manichino subisce danno 12 esatto, arco a settore visibile nella direzione al frame attivi, re-input ignorato durante l'attacco, time_scale ripristinato. 4 test in test_combat.gd (64 totali), validator 0."
     },
     {
       "id": "US-009",
