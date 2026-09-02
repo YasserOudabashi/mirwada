@@ -245,18 +245,22 @@
       "title": "Salvataggio e caricamento versionati",
       "description": "Come giocatore, voglio che i progressi persistano tra le sessioni senza rompersi agli aggiornamenti.",
       "acceptanceCriteria": [
-        "Save JSON in user:// con campo schema_version",
-        "Serializza posizione, statistiche e tempo di gioco",
-        "Versione inferiore alla corrente passa da una funzione di migrazione",
-        "Un save corrotto produce errore gestito, mai crash",
-        "Test headless: salva, altera la versione, carica, verifica la migrazione",
+        "Save JSON in user://saves/ con campo schema_version",
+        "Serializza posizione, statistiche, tempo di gioco e nome del personaggio",
+        "Scrittura ATOMICA: file temporaneo + rename, mai scrittura diretta sul save (un crash a meta' non deve corrompere l'unico save)",
+        "Solo JSON.parse_string per il load: MAI bytes_to_var con allow_objects ne' ResourceLoader su file di save (vettori di esecuzione di codice da file manomesso)",
+        "Ogni campo del save e' NON FIDATO: typeof() con default sano su ogni valore letto; campo assente o di tipo sbagliato = errore gestito",
+        "Versione inferiore alla corrente passa da una catena di migrazioni esplicite; versione superiore = rifiuto gentile",
+        "Un save corrotto produce errore gestito e slot segnalato, mai crash e mai cancellazione silenziosa",
+        "Le evocazioni persistenti (summon durata -1) sono serializzabili (criterio da design-pathways.md)",
+        "Test headless: salva, altera la versione, carica, verifica la migrazione; salva, corrompi il file, carica, verifica l'errore gestito",
         "Typecheck passa",
         "Tests pass"
       ],
       "priority": 15,
       "fase": 1,
       "passes": false,
-      "notes": ""
+      "notes": "Criteri di sicurezza aggiunti dal design-master.md (cap. 3.1) dopo l'audit del 2026-09-02."
     },
     {
       "id": "US-016",
@@ -367,6 +371,90 @@
       "fase": 1,
       "passes": false,
       "notes": "Story chiave: sposta il timing del combat dai dati al posto del codice. E' cio' che permette di tarare il feel iterando in secondi invece che in minuti."
+    },
+    {
+      "id": "US-022",
+      "title": "Loader JSON robusto ai dati corrotti",
+      "description": "Come sviluppatore, voglio che un JSON sintatticamente valido ma strutturalmente sbagliato produca un errore gestito, non un crash: i dati sono in chiaro nell'export e chiunque puo' toccarli.",
+      "acceptanceCriteria": [
+        "Ogni assegnazione tipata su strutture lette dai JSON in game_data.gd e ability_engine.gd passa da un check typeof() con errore registrato e default sano (riusare il pattern di _read_json)",
+        "Un file dati con 'sequences' oggetto invece che array, o un elemento non-oggetto, produce errore in console e file scartato, mai crash",
+        "Test headless con almeno 3 JSON malformati strutturalmente (fixture in tests/)",
+        "last_errors() dei test asserito anche nel caso di errore, non solo == 0",
+        "Typecheck passa",
+        "Tests pass"
+      ],
+      "priority": 22,
+      "fase": 1,
+      "passes": false,
+      "notes": "Dall'audit 2026-09-02: ~11 punti individuati (game_data.gd:108,115,128,133,169,171,184-186,199-201; ability_engine.gd:67,74-75). Vedi design-master.md cap. 3.2."
+    },
+    {
+      "id": "US-023",
+      "title": "Pulizia di cooldown e indici",
+      "description": "Come sviluppatore, voglio che le strutture a crescita illimitata si puliscano da sole, cosi' che una sessione lunga non accumuli spazzatura.",
+      "acceptanceCriteria": [
+        "AbilityEngine purga le voci di _cooldowns dei caster non piu' validi (alla scadenza o con sweep periodico)",
+        "GameData.load_all() svuota gli indici prima di ricaricare: un id rinominato nei dati sparisce dopo F5 invece di restare in memoria",
+        "Il reload conserva comunque l'identita' dei riferimenti per i Dictionary ancora esistenti (criterio di US-003 intatto)",
+        "Test: id rimosso dai dati non e' piu' presente dopo reload; cooldown di un caster liberato non resta per sempre",
+        "Typecheck passa",
+        "Tests pass"
+      ],
+      "priority": 23,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-024",
+      "title": "Stats di partenza interamente da balance.json",
+      "description": "Come sviluppatore, voglio che velocita', difesa ed evasione di partenza vengano dai dati come hp e spiritualita', perche' 'i valori base vengono da balance.json' e' la regola dichiarata nel componente stesso.",
+      "acceptanceCriteria": [
+        "balance.json estende le curve (o una sezione stats_base) con velocita, difesa, evasione",
+        "stats_component.gd non contiene piu' i numeri hardcoded (oggi a riga ~55-57)",
+        "Aggiunto segnale spiritualita_changed simmetrico a hp_changed (l'HUD di US-017 non deve pollare)",
+        "Se GameData manca, il fallback emette push_warning invece di partire silenzioso con valori plausibili",
+        "Typecheck passa",
+        "Tests pass"
+      ],
+      "priority": 24,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-025",
+      "title": "Test onesti e non fragili",
+      "description": "Come sviluppatore, voglio che la suite asserisca cio' che dice di asserire e non si rompa aggiungendo un file di dati legittimo.",
+      "acceptanceCriteria": [
+        "test_ogni_abilita_riferita_esiste asserisce davvero la lista 'mancanti' (oggi variabile morta)",
+        "Il ramo 'primitiva fuori registro' di execute() e' eseguito da un test (oggi non coperto)",
+        "I conteggi attesi (file caricati, abilita', tag) sono derivati dai dati o tolleranti, non numeri magici 24/32/82",
+        "run_tests.gd esce con errore se scopre 0 test (oggi falso verde)",
+        "Ogni test di AbilityEngine parte da stato pulito (clear_cooldowns + flush_effects in un setup comune)",
+        "Typecheck passa",
+        "Tests pass"
+      ],
+      "priority": 25,
+      "fase": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-026",
+      "title": "CI minima",
+      "description": "Come sviluppatore, voglio che validator e test girino a ogni push, cosi' che i dati siano protetti da un automatismo e non dalla disciplina.",
+      "acceptanceCriteria": [
+        "Workflow GitHub Actions: python tools/validate_data.py + test headless Godot su push e PR",
+        "Il workflow fallisce se uno dei due esce diverso da 0",
+        "Badge o nota di stato nel README",
+        "Typecheck passa"
+      ],
+      "priority": 26,
+      "fase": 1,
+      "passes": false,
+      "notes": "P2: utile ma non blocca la fase. Richiede Godot headless in CI (scaricare l'eseguibile nel workflow)."
     }
   ]
 }

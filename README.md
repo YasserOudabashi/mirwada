@@ -6,10 +6,11 @@ Sequenze: 10 Pathway attivi (4 gruppi completi), 10 Sequenze ciascuno,
 
 ## Stato
 
-Fase 1 — Fondamenta, 6 story su 21 chiuse. Spina dorsale dei dati completa;
-caricatore, hot-reload, statistiche e motore delle abilita' funzionanti e
-coperti da 41 test headless. Movimento, camera e combattimento non ancora
-iniziati: richiedono verifica a schermo.
+Fase 1 — Fondamenta, 6 story su 26 chiuse (21 originali + 5 di risanamento
+dall'audit del 2026-09-02). Spina dorsale dei dati completa; caricatore,
+hot-reload, statistiche e motore delle abilita' funzionanti e coperti da 43
+test headless. Movimento, camera e combattimento non ancora iniziati:
+richiedono verifica a schermo.
 
 ## Setup
 
@@ -31,11 +32,18 @@ zero righe di codice dedicate (data/abilities/twilight_giant.json).
 
 - `CLAUDE.md` — regole di lavoro, comandi, decisioni prese
 - `006_PRD/prd-fase-1-fondamenta.md` — PRD della fase corrente
+- `006_PRD/design-master.md` — design doc master: baseline dell'audit, sicurezza, contratti, story per fase, decisioni aperte
 - `006_PRD/design-pathways.md` — perche' questi 10 Pathway, cosa si e' perso
+- `006_PRD/design-lore.md` — nome del gioco, protagonista, roster NPC
+- `006_PRD/design-world.md` — le 5 regioni, biomi, gating, tempo
+- `006_PRD/design-npc-quest.md` — NPC, dialoghi, fazioni, quest, tre atti e finali
+- `006_PRD/design-ui-libro.md` — la UI a libro: ogni schermata e' una pagina
+- `006_PRD/design-vfx.md` — identita' visiva delle abilita' (stile manhwa), 10 palette
 - `data/audio.json` — sistema audio data-driven (tell sonori, follia, palette)
 - `006_PRD/roadmap.md` — fasi 2-8
 - `prd.json` — story della fase corrente in formato ralph
 - `progress.txt` — memoria tra le sessioni
+- `docs/documentazione.py` — rigenera la documentazione docx; `diario.py` — diario del progetto
 
 ## Avvio del ciclo ralph
 

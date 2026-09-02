@@ -350,3 +350,89 @@ Formato di ogni sezione:
   La creazione personaggio (scelta nome protagonista) non ha una story:
   agganciarla alla fase con NPC/dialoghi/salvataggio.
 - Prossima storia: US-004 (invariata).
+
+[2026-09-02] AUDIT + DESIGN — risanamento, 5 design doc, docx
+
+Sessione grossa su richiesta dell'utente: analisi completa del progetto
+(pathway, conflitti, sicurezza) + design di NPC/mondo/biomi/UI/VFX.
+
+- Audit (3 passate parallele: codice, dati, documenti). Trovato e RISANATO
+  in questa sessione (commit "fix: risanamento dati e motore"):
+  1. melee_arc mai liberato -> vita 0.25s + queue_free, test.
+  2. heal ignorava il param bersaglio -> onorato, test.
+  3. tag_danno: i dati passano una STRINGA, gli script tipavano Array ->
+     crash latente al primo attacco reale. Contratto fissato a stringa +
+     NUOVO vocabolario chiuso data/schema/damage_tags.json (8 voci) validato
+     su tag_danno/tag_bloccati/filtri. Ha subito pescato "crescita" usato
+     come tag di danno in mother -> corretto in veleno.
+  4. Filtro sequenza_min RINOMINATO sequenza_bersaglio_max: la semantica era
+     invertita (0 = piu' forte) e l'EventTracker di fase 2 sarebbe nato rotto.
+  5. moon_phase mescolava momenti del giorno (alba, crepuscolo) e fasi lunari
+     (eclissi) -> NUOVO data/schema/time.json con i due assi separati
+     momento/fase_lunare; rituali del TG migrati; validator li valida.
+  6. 90 sequenze vuote passavano il validator (il check della somma era
+     bypassato da acting_actions:[]) -> flag "stub": true esplicito (89/100,
+     fool_9 completata con madness_on_force 1.0); le non-stub ora ESIGONO
+     acting_actions e madness_on_force > 0; rituali non-stub esigono
+     location_tags; somma progresso > 1.0 = warning.
+  7. Registro primitive: param "tipo" collidenti rinominati
+     (tipo_illusione/tipo_modifica/tipo_meteo), bersaglio aggiunto a shield;
+     il validator ora RIFIUTA parametri fuori registro (classe di bug
+     "danno silenziosamente a zero" chiusa).
+  8. Sinergie: errore su abilita' prodotta inesistente (stub esente:
+     sinergia_inganno_probabilita marcata stub), warning sulle irraggiungibili
+     coi pathway attivi (2 su 3 lo sono: gruppi differiti).
+  9. foundation senza floor -> minimo: 0 in balance.json.
+  10. generate_pathways.py: il merge perdeva i campi falsy a ogni
+      rigenerazione -> ora il vecchio file vince sempre; template aggiornato
+      (stub, momento/fase_lunare); docstring 22/220 stale corretta.
+      VERIFICATO: doppia rigenerazione = zero diff (hash identici).
+
+- Come verificato: python tools/validate_data.py -> 0 errori, 8 warning
+  informativi VOLUTI (5 somme TG > 1.0 da decidere in fase 5, conteggio
+  stub, 2 sinergie irraggiungibili). Godot 4.3 headless -> 43/43 test
+  (41 + 2 nuovi: vita del melee_arc, heal con bersaglio non-self).
+
+- Design: 5 documenti nuovi in 006_PRD/ (approvati come piano dall'utente,
+  deroga alla regola "niente PRD anticipati" dichiarata nel master):
+  * design-master.md — baseline onesta dall'audit, sicurezza del save
+    (atomico, mai bytes_to_var, campi non fidati -> criteri aggiunti a
+    US-015), matrice di proprieta' che scioglie le sovrapposizioni tra
+    pathway (mondo spirituale=Death, furto a 3 sapori, 4 fonti di evocazione),
+    riscrittura proposta di darkness_1 senza probability_shift, contratti
+    dei sistemi promessi (Ancore, strutture, stored_ability_id, valuta),
+    story per fase, decisioni aperte con raccomandazione.
+  * design-world.md — 5 regioni, UNA PER GRUPPO di pathway (Mirwada citta'
+    hub; Marche del Crepuscolo; Valle della Madre; Archivio Sepolto;
+    Frontiera delle Porte), vocabolario di 24 location_tags (gli 8 del TG
+    invariati), 6 modi di gating, tempo, densita' mistica, fast travel
+    come potere e mai come menu.
+  * design-npc-quest.md — roster 8 NPC formalizzato, dialoghi che riusano il
+    vocabolario condizioni delle abilita', quest = contatori EventTracker
+    travestiti (zero verbi nuovi), fazioni, tre atti agganciati ai tier,
+    tre finali (apoteosi/consumazione con eredita'/rinuncia).
+  * design-ui-libro.md — TUTTA la UI e' un libro diegetico: il libro E' il
+    salvataggio (scaffale=slot, frontespizio=creazione personaggio con
+    default Enel, la follia macchia le pagine), 8 tipi di pagina data-driven
+    in data/ui/book.json, colophon=impostazioni con le 6 opzioni
+    accessibilita' di audio.json, voltata_ms nei dati.
+  * design-vfx.md — stile manhwa (Legend of the Northern Blade) tradotto in
+    32x32: tratto a pennello, neri pieni, impact frame a inversione agganciati
+    agli hitstop_ms esistenti, distorsione disattivabile, 10 palette visive
+    SPECCHIO 1:1 di pathway_palette audio, VFX per PRIMITIVA (28 effetti,
+    non 200 sprite), vocabolario chiuso dei tratti. ability.schema.json NON
+    si tocca.
+
+- prd.json: fase 1 ora 26 story (aggiunte US-022 loader typeof, US-023 purge
+  cooldown/indici, US-024 stats da balance, US-025 test onesti, US-026 CI);
+  US-015 arricchita coi criteri di sicurezza del save.
+- Scaffolding docx creato (mancava dallo /nuovo-progetto): docs/documentazione.py
+  + diario.py, entrambi generano senza errori.
+- README: stato 6/26, indice documenti aggiornato coi 5 design doc.
+
+- Resta aperto: decisioni Appendice B del design-master (nomi regioni, libro
+  diegetico, antagonista, eredita', taglio story fase 5 in 3 per pathway);
+  le somme acting > 1.0 del TG da normalizzare o dichiarare volute (fase 5);
+  la verifica a schermo resta mai fatta (US-004 con l'editor aperto).
+- Prossima storia: US-004 (invariata). Le story di risanamento US-022..026
+  possono andare in coda alla fase o intrecciarsi (US-022 prima di US-015).
