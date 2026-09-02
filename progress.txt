@@ -635,3 +635,47 @@ Sessione grossa su richiesta dell'utente: analisi completa del progetto
 
 - Prossima storia: US-021B (macchina di animazione e segnali, con verifica a
   schermo), poi US-008.
+
+[2026-09-02] US-021B — macchina di animazione data-driven (b): rendering e segnali
+
+- Cosa fatto:
+  - scripts/animation_machine.gd (extends AnimatedSprite2D, niente class_name):
+    * configura(categoria) costruisce lo SpriteFrames a runtime dagli
+      spritesheet assets/placeholder/<cat>_<nome>.png. Una sotto-animazione
+      per direzione ("walk_down"..) sulle direzionali, una sola ("death")
+      sulle altre. fps/loop presi da AnimationSpec, cioe' dai dati.
+    * riproduci(stato, direzione) sceglie "<stato>_<dir>" o "<stato>";
+      stato inesistente = no-op, nessun crash.
+    * segnali: evento_frame(nome) per gli eventi per frame (hitbox_on/off,
+      footstep, tell_audio, tell_visivo, ability_release), fase_cambiata(fase)
+      al passaggio anticipo->attivi->recupero, animazione_finita(stato).
+    * spec_corrente() restituisce l'AnimationSpec dello stato in corso: da
+      qui US-009 leggera' iframe_window e US-010 finestra_perfetta.
+    * si riaggancia a GameData.data_reloaded: F5 ricostruisce lo SpriteFrames,
+      quindi cambiare un fps o un indice nel JSON e premere F5 cambia la resa
+      senza ricompilare.
+    * le connessioni dei segnali stanno in configura(), non in _ready(), cosi'
+      la macchina e' testabile fuori dall'albero.
+  - scripts/player.gd: _aggiorna_sprite() (region_rect a mano) SOSTITUITO da
+    _aggiorna_animazione() che chiama _anim.riproduci("walk"|"idle", dir).
+    Via le const TEX_IDLE/TEX_WALK/FRAMES_*/RIGA e _fase_anim.
+  - scenes/player.tscn: il nodo Sprite2D e' ora un AnimatedSprite2D
+    "AnimationMachine" con lo script, stesso offset (0,-8).
+
+- Come verificato:
+  * 6 test nuovi in test_animation_machine.gd (60 totali): SpriteFrames
+    costruito, conteggi frame/fps/loop dai dati, evento_frame emesso ai
+    frame giusti di attack_light, sequenza di fase anticipo->attivi->recupero,
+    spec_corrente espone la finestra i-frame del dash, stato ignoto no-op.
+  * A SCHERMO (finestra reale): camminando a destra i frame di walk_right
+    avanzano 0->1->2 (l'animazione gira davvero), cambiando input diventa
+    walk_up, da fermo torna a idle_up. Screenshot in user://us021b/.
+  * validator exit 0.
+
+- Note ambiente: nei test i frame si fanno avanzare a mano (m.frame = N):
+  AnimatedSprite2D avanza col suo timer interno in _process, che in headless
+  non scorre. Il setter di `frame` emette comunque frame_changed.
+
+- Resta aperto: US-021 e' chiusa in entrambe le meta'. Le hitbox di US-008 e
+  gli i-frame di US-009 si agganceranno ai segnali di AnimationMachine.
+- Prossima storia: US-008 (attacco in mischia con arco).

@@ -1,40 +1,31 @@
 extends CharacterBody2D
 ## Giocatore: movimento a 8 direzioni con accelerazione e attrito.
 ##
-## Gli sprite sono a 4 direzioni (data/animations.json, convenzioni.direzioni):
-## le diagonali riusano la direzione orizzontale. Questa e' una resa
-## placeholder minima — la macchina di animazione data-driven arriva con
-## US-021 e sostituira' _aggiorna_sprite() leggendo frames/fps dal JSON.
+## Le animazioni e il loro timing vengono da data/animations.json tramite
+## AnimationMachine (US-021B): questo script decide solo QUALE stato
+## ("walk"/"idle") e in quale delle 4 direzioni. Le diagonali riusano la
+## direzione orizzontale, come da convenzioni.direzioni.
 ##
 ## La velocita' massima viene da StatsComponent (quindi da data/balance.json).
-## Accelerazione e attrito sono ancora costanti: il loro posto nei dati e'
-## data/animations.json, ma il contratto per il "feel" lo fissa US-021.
+## Accelerazione e attrito sono ancora costanti: il "feel" si tara con la
+## fase di combattimento.
 ##
-## NIENTE class_name: coerente con gli altri script del progetto (vedi
-## stats_component.gd), evita lo stallo del runner dei test in Godot 4.3.
+## NIENTE class_name: coerente col resto del progetto.
 
 const ACCELERAZIONE := 1400.0
 const ATTRITO := 1600.0
 const SOGLIA_MOTO := 5.0
-
-## Riga dello spritesheet per direzione, ordine di data/animations.json.
-const RIGA := {"down": 0, "up": 1, "left": 2, "right": 3}
-
-const TEX_IDLE: Texture2D = preload("res://assets/placeholder/personaggio_idle.png")
-const TEX_WALK: Texture2D = preload("res://assets/placeholder/personaggio_walk.png")
-const FRAMES_IDLE := 4
-const FRAMES_WALK := 6
+const CATEGORIA_ANIM := "personaggio"
 
 @onready var _stats: Node = $StatsComponent
-@onready var _sprite: Sprite2D = $Sprite2D
+@onready var _anim: AnimatedSprite2D = $AnimationMachine
 
 var _dir_sguardo: String = "down"
-var _fase_anim: float = 0.0
 
 
 func _ready() -> void:
-	_sprite.region_enabled = true
-	_aggiorna_sprite(0.0)
+	_anim.call("configura", CATEGORIA_ANIM)
+	_anim.call("riproduci", "idle", _dir_sguardo)
 
 
 func _physics_process(delta: float) -> void:
@@ -49,7 +40,7 @@ func _physics_process(delta: float) -> void:
 		velocity = velocity.move_toward(Vector2.ZERO, ATTRITO * delta)
 
 	move_and_slide()
-	_aggiorna_sprite(delta)
+	_aggiorna_animazione()
 
 
 ## La direzione dominante decide lo sprite. In obliquo vince l'orizzontale:
@@ -61,17 +52,6 @@ func _aggiorna_sguardo(input: Vector2) -> void:
 		_dir_sguardo = "down" if input.y > 0.0 else "up"
 
 
-func _aggiorna_sprite(delta: float) -> void:
-	var in_moto: bool = velocity.length() > SOGLIA_MOTO
-	var tex: Texture2D = TEX_WALK if in_moto else TEX_IDLE
-	var n_frame: int = FRAMES_WALK if in_moto else FRAMES_IDLE
-
-	if in_moto:
-		_fase_anim += delta * 10.0
-	else:
-		_fase_anim = 0.0
-
-	var col: int = int(_fase_anim) % n_frame
-	var riga: int = RIGA[_dir_sguardo]
-	_sprite.texture = tex
-	_sprite.region_rect = Rect2(col * 32, riga * 32, 32, 32)
+func _aggiorna_animazione() -> void:
+	var stato: String = "walk" if velocity.length() > SOGLIA_MOTO else "idle"
+	_anim.call("riproduci", stato, _dir_sguardo)

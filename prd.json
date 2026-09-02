@@ -385,8 +385,8 @@
       ],
       "priority": 8,
       "fase": 1,
-      "passes": false,
-      "notes": "Seconda meta' di US-021. Le hitbox di US-008 e gli i-frame di US-009 si agganciano ai segnali di questo nodo."
+      "passes": true,
+      "notes": "scripts/animation_machine.gd (extends AnimatedSprite2D, niente class_name): configura(cat) costruisce lo SpriteFrames a runtime dagli spritesheet placeholder (una sotto-animazione per direzione sulle direzionali, una sola sulle altre; fps/loop da AnimationSpec). riproduci(stato,dir). Segnali evento_frame(nome) per gli eventi per frame, fase_cambiata(fase) su anticipo->attivi->recupero, animazione_finita(stato). spec_corrente() espone iframe_window/finestra_perfetta a US-009/US-010. Si riaggancia a data_reloaded: F5 ricostruisce lo SpriteFrames -> cambiare fps/indice nel JSON cambia la resa senza ricompilare. player.gd: _aggiorna_sprite() sostituito da _aggiorna_animazione(); player.tscn: Sprite2D -> AnimatedSprite2D. 6 test nuovi (60 totali). VERIFICA A SCHERMO: i frame di walk avanzano 0->1->2 camminando, cambia in walk_up, torna a idle da fermo. validator exit 0."
     },
     {
       "id": "US-022",
