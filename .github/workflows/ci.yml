@@ -1,0 +1,40 @@
+name: CI
+
+# Validator dei dati + suite headless a ogni push e PR. I dati JSON restano
+# protetti da un automatismo, non dalla disciplina di chi committa.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  valida-e-testa:
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: "4.3"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validator dei dati
+        run: python tools/validate_data.py
+
+      - name: Scarica Godot ${{ env.GODOT_VERSION }} headless
+        run: |
+          set -euo pipefail
+          base="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          curl -fsSL -o godot.zip "${base}/${file}.zip"
+          unzip -q godot.zip
+          sudo install -m 0755 "${file}" /usr/local/bin/godot
+          godot --version
+
+      - name: Import delle risorse
+        # L'import headless in 4.3 non sempre esce 0; il gate vero e' la suite.
+        run: timeout 120 godot --headless --path . --import || true
+
+      - name: Suite headless
+        run: godot --headless --path . --script res://tests/run_tests.gd

@@ -1,20 +1,25 @@
 # Mirwada
 
+[![CI](https://github.com/YasserOudabashi/mirwada/actions/workflows/ci.yml/badge.svg)](https://github.com/YasserOudabashi/mirwada/actions/workflows/ci.yml)
+
 Action-RPG 2D esplorativo top-down con sistema di progressione a Pathway e
 Sequenze: 10 Pathway attivi (4 gruppi completi), 10 Sequenze ciascuno,
 100 in totale. Altri 12 Pathway restano differiti in data/pathways_deferred/.
 
 ## Stato
 
-Fase 1 — Fondamenta, 20 story su 27 chiuse (21 originali, di cui US-021
-spezzata in a/b, + 5 di risanamento dall'audit del 2026-09-02), 95 test
-headless. Fatto: caricatore + hot-reload dei dati, statistiche, motore
-delle abilita', macchina di animazione data-driven, movimento a 8 direzioni,
+**Fase 1 — Fondamenta: chiusa.** 27 story (21 originali, di cui US-021
+spezzata in a/b, + 5 di risanamento dall'audit del 2026-09-02), 112 test
+headless, CI su ogni push. Fatto: caricatore + hot-reload dei dati robusto
+ai JSON corrotti, statistiche interamente da balance.json, motore delle
+abilita', macchina di animazione data-driven, movimento a 8 direzioni,
 camera con shake, area di test con collisioni, ciclo di combattimento
 completo (attacco, schivata con i-frame, parata e postura, nemico con
-telegrafia), salvataggio versionato, HUD i18n, scena di debug, bus audio e
-feedback di colpo data-driven. Mancano: US-020 (tell sonoro nemici) e le 5
-story di risanamento US-022..026.
+telegrafia e tell sonoro direzionale), salvataggio versionato, HUD i18n,
+scena di debug, bus audio e feedback di colpo data-driven.
+
+Il PRD della fase 2 (Pathway core) si genera con `/prd` — vedi
+`006_PRD/roadmap.md`.
 
 ## Setup
 
@@ -57,22 +62,17 @@ zero righe di codice dedicate (data/abilities/twilight_giant.json).
 ## Avvio del ciclo ralph
 
 ```bash
-bash ~/.claude/skills/ralph.sh 21 --fase 1 --test-cmd "python tools/validate_data.py"
+bash ~/.claude/skills/ralph.sh <N> --fase <F> --test-cmd "godot --headless --script tests/run_tests.gd"
 ```
 
-Prerequisiti: Docker Desktop attivo, `prd.json` presente in root.
+Prerequisiti: Docker Desktop attivo, `prd.json` presente in root con le story
+della fase da lavorare.
 
 **`--test-cmd` non e' opzionale in questo progetto.** ralph.sh rileva il
 comando di test da solo, ma il suo fallback quando non trova `package.json` e'
 `uv run pytest tests/ -v`: qui non c'e' ne' npm ne' pytest, quindi ogni
 iterazione fallirebbe la verifica dei test su un comando che non puo' passare.
+La suite headless include gia' `tools/validate_data.py`.
 
-Finche' US-016 (infrastruttura dei test headless) non e' chiusa, l'unico
-controllo reale sui dati e' il validator. Da US-016 in poi passare a:
-
-```bash
-bash ~/.claude/skills/ralph.sh 21 --fase 1 --test-cmd "godot --headless --script tests/run_tests.gd"
-```
-
-`21` e' il numero di story della fase 1: una story per iterazione. Un numero
-piu' basso lavora solo le prime N story in ordine di priorita'.
+`<N>` e' il numero di story da lavorare: una story per iterazione, in ordine
+di priorita'.

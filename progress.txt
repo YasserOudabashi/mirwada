@@ -1042,6 +1042,36 @@ sezione test aggiornata.
   story del blocco combat e i pezzi non hanno senso separati.
 - Prossima storia: US-026 (CI minima) — ultima della fase 1.
 
+[2026-09-03] US-026 — CI minima  → FASE 1 CHIUSA
+
+- Cosa fatto:
+  - .github/workflows/ci.yml: un job su push e pull_request.
+    1. actions/setup-python 3.12
+    2. python tools/validate_data.py (fallisce il job se esce != 0)
+    3. scarica Godot 4.3 headless dalle release ufficiali (sudo install in
+       /usr/local/bin/godot)
+    4. godot --headless --import (|| true: l'import 4.3 non sempre esce 0,
+       il gate vero e' la suite)
+    5. godot --headless --script res://tests/run_tests.gd (fallisce il job
+       se esce != 0)
+  - README: badge CI in cima, sezione Stato riscritta ("Fase 1 chiusa,
+    112 test, CI su ogni push"), sezione ralph ripulita dai riferimenti a
+    US-016 (chiusa da un pezzo).
+- Come verificato IN LOCALE (non posso far girare GitHub Actions da qui):
+  simulato il flusso della CI spostando via .godot/ (gitignorato, si
+  rigenera): `--import` esce 0 su checkout pulito, poi validator exit 0 e
+  112/112 test verdi. .godot ripristinato. NOTA: l'import rigenera i due
+  assets/i18n/*.translation con un header/hash diverso ma contenuto
+  identico (stessa dimensione) — sui CI non tocca il repo, in locale
+  ripristinati con git checkout.
+- FASE 1 — FONDAMENTA: CHIUSA. 27 story (21 originali con US-021 a/b +
+  US-022..026 di risanamento), 112 test headless, validator 0, CI.
+  Il PRD della fase 2 (Pathway core, ~22 story) si genera con /prd quando
+  si riprende — vedi 006_PRD/roadmap.md. Punto di controllo dell'intero
+  progetto: fase 5.
+- Prossima storia: nessuna in fase 1. Fase 2: generare il PRD con /prd,
+  poi convertirlo in prd.json con /ralph.
+
 [2026-09-02] US-024 — Stats di partenza interamente da balance.json
 
 - Cosa fatto:

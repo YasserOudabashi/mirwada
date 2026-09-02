@@ -469,8 +469,8 @@
       ],
       "priority": 26,
       "fase": 1,
-      "passes": false,
-      "notes": "P2: utile ma non blocca la fase. Richiede Godot headless in CI (scaricare l'eseguibile nel workflow)."
+      "passes": true,
+      "notes": ".github/workflows/ci.yml: job unico su push e PR - setup-python 3.12, python tools/validate_data.py (gate), download Godot 4.3 headless dalle release ufficiali, godot --import (|| true), godot --headless --script res://tests/run_tests.gd (gate). README: badge CI + Stato riscritto. Verificato in locale simulando il flusso CI (spostato via .godot/ gitignorato): --import esce 0 su checkout pulito, validator 0, 112/112 test. GitHub Actions non eseguibile da qui. FASE 1 CHIUSA."
     }
   ]
 }
