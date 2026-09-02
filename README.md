@@ -6,14 +6,14 @@ Sequenze: 10 Pathway attivi (4 gruppi completi), 10 Sequenze ciascuno,
 
 ## Stato
 
-Fase 1 — Fondamenta, 11 story su 27 chiuse (21 originali, di cui US-021
-spezzata in a/b, + 5 di risanamento dall'audit del 2026-09-02). Spina
-dorsale dei dati completa; caricatore, hot-reload, statistiche, motore delle
-abilita' e macchina di animazione data-driven coperti da 60 test headless.
-Movimento a 8 direzioni (US-004), camera con smoothing e limiti (US-005),
-area di test con tilemap e collisioni (US-006) e animazione del giocatore
-guidata da animations.json (US-021) verificati a schermo. Combattimento non
-ancora iniziato.
+Fase 1 — Fondamenta, 15 story su 27 chiuse (21 originali, di cui US-021
+spezzata in a/b, + 5 di risanamento dall'audit del 2026-09-02), 75 test
+headless. Fatto: caricatore + hot-reload dei dati, statistiche, motore
+delle abilita', macchina di animazione data-driven, movimento a 8 direzioni,
+camera, area di test con collisioni, e il ciclo di combattimento completo —
+attacco in mischia (US-008), schivata con i-frame (US-009), parata e postura
+(US-010), nemico con telegrafia (US-011). Il validator dei dati gira dentro
+la suite (US-014). Manca: save/load, HUD, scena di debug, audio.
 
 ## Setup
 
@@ -22,9 +22,13 @@ Richiede Godot 4.x e Python 3 (solo per gli strumenti di dati).
 
 ```bash
 python tools/validate_data.py      # valida tutti i dati, esce 0 se ok
-godot --headless --path . --script res://tests/run_tests.gd   # test, esce 0 se ok
+godot --headless --path . --script res://tests/run_tests.gd   # suite headless, esce 0 se ok
 python tools/generate_pathways.py  # rigenera la spina dorsale dei 10 pathway
 ```
+
+La suite headless include un test che esegue `tools/validate_data.py`: un
+dato rotto committato fa fallire i test, non solo il validator lanciato a
+mano. Esce 0 se tutto passa, 1 al primo fallimento.
 
 ## Architettura in una riga
 

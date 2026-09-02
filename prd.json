@@ -237,8 +237,8 @@
       ],
       "priority": 14,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "tests/test_data_valida.gd esegue tools/validate_data.py via OS.execute (python/python3/py) e fa fallire la suite se esce != 0, allegando l'output. Nessun Python -> push_warning e passa (macchina solo-Godot ok; la CI di US-026 avra' Python). README aggiornato. Verificato: 75 test verdi con dati integri; rotto data/tags.json di proposito -> test_data_valida FALLISCE con l'output del validator. run_tests.gd esce 0 al successo, 1 al primo fallimento (gia' cosi' da US-002)."
     },
     {
       "id": "US-015",

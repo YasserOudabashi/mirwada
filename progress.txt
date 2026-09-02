@@ -836,3 +836,15 @@ Sessione grossa su richiesta dell'utente: analisi completa del progetto
   corpo del nemico e' gia' rosso). L'arte vera lo rendera' netto; la meccanica
   e la durata sono dati.
 - Prossima storia: US-014 (validator dei dati nei test).
+
+[2026-09-02] US-014 — Validator dei dati integrato nei test
+
+- Cosa fatto: tests/test_data_valida.gd esegue tools/validate_data.py con
+  OS.execute (prova python, python3, py) e fa fallire la suite se esce != 0,
+  allegando l'output. Se nessun interprete Python c'e', push_warning e passa
+  (una macchina di solo-Godot non deve rompersi; la CI di US-026 avra' Python).
+  README: nota che la suite include il validator.
+- Come verificato: 75 test passano con dati integri. Rotto di proposito
+  data/tags.json -> test_data_valida FALLISCE ("uscito con codice 1: 155
+  errori...") e con lui i test che dipendono dai tag. Ripristinato.
+- Prossima storia: US-015 (salvataggio e caricamento versionati).
