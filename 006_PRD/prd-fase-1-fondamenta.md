@@ -47,7 +47,7 @@ un'unica fonte.
 - [ ] Autoload `GameData` che carica `data/pathways/`, `data/abilities/`, `data/synergies/`, `data/tags.json`, `data/schema/primitives.json`
 - [ ] API: `GameData.get_pathway(id)`, `get_sequence(id)`, `get_ability(id)`
 - [ ] Errore esplicito in console se un file è malformato (mai fallimento silenzioso)
-- [ ] Test headless: caricamento di tutti i 22 pathway, verifica di 220 sequenze
+- [ ] Test headless: caricamento di tutti i 10 pathway, verifica di 100 sequenze
 - [ ] Il typecheck/lint passa
 
 ### US-003: Hot-reload dei dati in debug

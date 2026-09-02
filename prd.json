@@ -12,7 +12,8 @@
         "Risoluzione base 640x360, stretch 'viewport', filtro texture 'nearest'",
         "Cartelle scenes/, scripts/, data/, assets/, tests/ presenti",
         ".gitignore per Godot (.godot/, *.import, export)",
-        "Il progetto avvia una scena vuota senza errori in console"
+        "Il progetto avvia una scena vuota senza errori in console",
+        "Typecheck passes"
       ],
       "priority": 1,
       "fase": 1,
@@ -27,7 +28,7 @@
         "Autoload GameData carica data/pathways/, data/abilities/, data/synergies/, data/tags.json, data/schema/primitives.json",
         "API GameData.get_pathway(id), get_sequence(id), get_ability(id)",
         "Errore esplicito in console su file malformato, mai fallimento silenzioso",
-        "Test headless: 22 pathway caricati, 220 sequenze totali verificate",
+        "Test headless: 10 pathway caricati, 100 sequenze totali verificate",
         "Typecheck passa",
         "Tests pass"
       ],
@@ -60,7 +61,7 @@
         "CharacterBody2D con accelerazione e attrito, non velocita' istantanea",
         "Input mappato su WASD e frecce",
         "Velocita' diagonale normalizzata",
-        "Sprite placeholder 32x32 con direzione visibile",
+        "Sprite placeholder 32x32 a 4 direzioni (down/up/left/right) secondo convenzioni.direzioni di data/animations.json: il movimento e' a 8 direzioni, gli sprite no — le diagonali riusano quelli orizzontali",
         "Typecheck passa",
         "Verifica a schermo documentata in progress.txt"
       ],

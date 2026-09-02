@@ -15,7 +15,7 @@ Richiede Godot 4.x e Python 3 (solo per gli strumenti di dati).
 
 ```bash
 python tools/validate_data.py      # valida tutti i dati, esce 0 se ok
-python tools/generate_pathways.py  # rigenera la spina dorsale dei 22 pathway
+python tools/generate_pathways.py  # rigenera la spina dorsale dei 10 pathway
 ```
 
 ## Architettura in una riga
@@ -37,7 +37,22 @@ zero righe di codice dedicate (data/abilities/twilight_giant.json).
 ## Avvio del ciclo ralph
 
 ```bash
-bash ~/.claude/skills/ralph.sh 5 --fase 1
+bash ~/.claude/skills/ralph.sh 21 --fase 1 --test-cmd "python tools/validate_data.py"
 ```
 
 Prerequisiti: Docker Desktop attivo, `prd.json` presente in root.
+
+**`--test-cmd` non e' opzionale in questo progetto.** ralph.sh rileva il
+comando di test da solo, ma il suo fallback quando non trova `package.json` e'
+`uv run pytest tests/ -v`: qui non c'e' ne' npm ne' pytest, quindi ogni
+iterazione fallirebbe la verifica dei test su un comando che non puo' passare.
+
+Finche' US-016 (infrastruttura dei test headless) non e' chiusa, l'unico
+controllo reale sui dati e' il validator. Da US-016 in poi passare a:
+
+```bash
+bash ~/.claude/skills/ralph.sh 21 --fase 1 --test-cmd "godot --headless --script tests/run_tests.gd"
+```
+
+`21` e' il numero di story della fase 1: una story per iterazione. Un numero
+piu' basso lavora solo le prime N story in ordine di priorita'.

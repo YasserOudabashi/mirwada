@@ -90,7 +90,7 @@ progress.txt      memoria tra le iterazioni
 
 ## Fasi
 
-Fase corrente: **1 — Fondamenta** (18 story, vedi `prd.json`).
+Fase corrente: **1 — Fondamenta** (21 story, vedi `prd.json`).
 Le fasi 2-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
 genera con `/prd` **solo quando la precedente è chiusa**.
 

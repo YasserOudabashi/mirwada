@@ -158,3 +158,69 @@ Formato di ogni sezione:
 - Come verificato: validate_data.py esce 0, generate_placeholders.py produce
   324 frame in assets/placeholder/.
 - Prossima storia: US-001.
+
+[SETUP-6] Allineamento 22->10 e correzione del comando ralph
+
+- Cosa fatto: audit dello starter contro le regole reali delle skill /prd e
+  /ralph e contro tools/ralph.sh. Trovati 7 residui della riduzione da 22 a 10
+  Pathway (SETUP-2) mai propagati fuori dai file di dati, piu' un errore nel
+  comando di avvio. Nessun dato toccato: solo prd.json, README, PRD e CLAUDE.md.
+
+  1. prd.json US-002: il criterio di accettazione chiedeva "22 pathway
+     caricati, 220 sequenze" su dati che ne contengono 10 e 100. Ralph avrebbe
+     scritto un test destinato a fallire e bruciato iterazioni a inseguirlo.
+     Corretto in 10/100. ERA BLOCCANTE.
+  2. prd.json US-001: unica story delle 21 senza "Typecheck passes", che la
+     skill /ralph impone su ogni story. Aggiunto.
+  3. 006_PRD/prd-fase-1-fondamenta.md riga 50: stesso residuo 22/220 del
+     punto 1, corretto in 10/100.
+  4. README: "rigenera la spina dorsale dei 22 pathway" -> 10. Verificato
+     contro l'output reale di generate_pathways.py (10 attivi / 100 sequenze).
+  5. README, comando ralph: mancava --test-cmd. ERA BLOCCANTE. ralph.sh
+     rileva il comando di test da solo, ma il fallback in assenza di
+     package.json e' "uv run pytest tests/ -v": questo progetto e' Godot +
+     GDScript, non ha ne' npm ne' pytest ne' cartella tests/, quindi ogni
+     iterazione avrebbe fallito la verifica su un comando impossibile da
+     soddisfare. Il comando corretto ora e' nel README, con la variante da
+     usare dopo US-016 e la spiegazione del perche'.
+  6. prd.json US-004: il titolo dice "8 direzioni" mentre CLAUDE.md e
+     animations.json fissano 4 direzioni. Non era una contraddizione reale
+     (movimento a 8, sprite a 4, le diagonali riusano gli orizzontali) ma il
+     criterio non lo diceva e ralph poteva generare 8 set di sprite. Criterio
+     riscritto con il rimando esplicito a convenzioni.direzioni.
+  7. CLAUDE.md: "Fase corrente: 1 (18 story)" -> 21. Le story sono passate da
+     18 a 21 in SETUP-4 (audio) e SETUP-5 (animazioni), il conteggio no.
+
+- Come verificato:
+  - python tools/validate_data.py esce 0, 0 warning 0 errori.
+  - python tools/generate_pathways.py riporta 10 attivi / 100 sequenze e NON
+    modifica alcun file (idempotenza verificata con diff sull'intero data/).
+  - prd.json riletto come JSON: 21 story, tutte passes=false, nessuna story
+    priva di "Typecheck passes", priority sequenziali 1-21.
+  - Cercati residui "22 pathway"/"220 sequenze" in tutto il repo: resta solo
+    design-pathways.md riga 90, che e' la tabella di confronto "22 vs 10" e
+    deve restare com'e'.
+  - Nessun file in data/ modificato da questa sessione.
+
+- Note ambiente:
+  - Primo commit del progetto: fino a ora lo starter non era mai stato
+    versionato. Questa sessione e' remota (container Linux), quindi ralph NON
+    e' stato lanciato: richiede Docker Desktop, che qui non esiste. Come da
+    prompt originale, il comando resta pronto nel README e va lanciato a mano.
+  - La skill ponytail in ~/.claude/skills/ponytail e' una CARTELLA VUOTA nel
+    repo claude-config: il contenuto (github.com/DietrichGebert/ponytail) non
+    e' mai stato committato. Stesso problema per agent-reach, book-to-skill e
+    shannon. Il regime ponytail resta comunque applicato perche' e' scritto
+    per esteso nella sezione 2 di questo CLAUDE.md.
+  - Incoerenza tra le skill dell'utente, non di questo progetto: la skill
+    /nuovo-progetto prescrive id story "US-1NN" con la prima cifra a indicare
+    la fase, ma ralph.sh filtra le fasi sul campo "fase": N, non sull'id.
+    Questo progetto usa US-001..US-021 + campo fase, che e' l'unico schema che
+    ralph.sh sappia effettivamente leggere. Da correggere nella skill.
+
+- Resta aperto: docs/documentazione.py e diario.py previsti dallo scaffolding
+  di /nuovo-progetto non sono presenti. Sembra una scelta (sono pensati per i
+  progetti DdC con documentazione normativa), non una dimenticanza. Da
+  confermare con l'utente. Richiederebbero python-docx.
+
+- Prossima storia: US-001.
