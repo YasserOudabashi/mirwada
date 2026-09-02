@@ -154,9 +154,11 @@ func test_heal_istantaneo() -> void:
 func test_projectile_generato_coi_parametri_giusti() -> void:
 	var e: Node = _engine()
 	var c: Node2D = _caster()
+	# tag_danno e' una STRINGA dal vocabolario chiuso data/schema/damage_tags.json,
+	# come nei dati veri: il tipo Array negli script era un bug latente.
 	var spec: Dictionary = e.call("_p_projectile",
 		{"danno": 12.0, "velocita": 260.0, "gittata": 180.0, "pierce": 2,
-		 "tag_danno": ["spirito"]},
+		 "tag_danno": "spirito"},
 		c, c.get_node("Stats"), "test_ab")
 
 	assert_eq(spec["tipo"], "projectile", "tipo del record")
@@ -273,3 +275,44 @@ func test_effetto_muore_col_bersaglio() -> void:
 	e.call("tick_effects", 1.0)
 	# Nessun crash e nessun riferimento appeso a un nodo liberato.
 	assert_eq(e.call("pending_count"), 0, "effetto rimosso col bersaglio")
+
+
+func test_melee_arc_si_libera_dopo_la_vita() -> void:
+	# Il bug: l'arco veniva aggiunto come figlio del caster e mai liberato.
+	var e: Node = _engine()
+	var c: Node2D = _caster()
+	e.call("_p_melee_arc", {"danno": 5.0, "angolo": 90.0, "raggio": 40.0},
+		c, c.get_node("Stats"), "test_vita")
+
+	var arc: Node = null
+	for n in c.get_children():
+		if n.get("origine") == "test_vita":
+			arc = n
+	assert_true(arc != null, "arco presente")
+	if arc != null:
+		arc.call("_process", 0.1)
+		assert_false(arc.is_queued_for_deletion(), "vivo entro la finestra")
+		arc.call("_process", 0.2)
+		assert_true(arc.is_queued_for_deletion(), "liberato oltre la finestra")
+	_cleanup(c)
+
+
+func test_heal_con_bersaglio_non_self_non_cura_il_caster() -> void:
+	# Il bug: il parametro "bersaglio" del registro era ignorato e la cura
+	# finiva sempre sul caster, anche quando i dati dicevano "alleato".
+	var e: Node = _engine()
+	var c: Node2D = _caster()
+	var s: Node = c.get_node("Stats")
+	s.set("hp", 40.0)
+
+	var spec: Dictionary = e.call("_p_heal",
+		{"quantita": 25.0, "istantaneo": true, "bersaglio": "alleato"},
+		c, s, "test_ab")
+	assert_false(spec["applied"], "bersaglio non risolvibile: cura non applicata")
+	assert_almost_eq(float(s.get("hp")), 40.0, "hp del caster intatti")
+
+	# "self" esplicito continua a funzionare come prima.
+	e.call("_p_heal", {"quantita": 25.0, "istantaneo": true, "bersaglio": "self"},
+		c, s, "test_ab")
+	assert_almost_eq(float(s.get("hp")), 65.0, "cura su self applicata")
+	_cleanup(c)

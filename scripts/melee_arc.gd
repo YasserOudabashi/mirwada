@@ -1,14 +1,20 @@
 extends Area2D
 ## Arco di mischia generato dalla primitiva "melee_arc".
 ##
-## Vive un solo frame di logica: la finestra attiva vera la decidera' la
-## macchina di animazione di US-021, che legge i frame da data/animations.json.
+## La finestra attiva vera la decidera' la macchina di animazione di US-021,
+## che legge i frame da data/animations.json. Fino ad allora il nodo vive
+## VITA_S secondi e poi si libera da solo: senza questa scadenza ogni attacco
+## lasciava un Area2D permanente sul caster.
+
+const VITA_S := 0.25
 
 var danno: float = 0.0
+var vita: float = VITA_S
 var angolo: float = 90.0
 var raggio: float = 32.0
 var stagger: float = 0.0
-var tag_danno: Array = []
+## Un tipo di danno per colpo, dal vocabolario chiuso data/schema/damage_tags.json.
+var tag_danno: String = ""
 var origine: String = ""
 
 var _direzione: Vector2 = Vector2.RIGHT
@@ -19,7 +25,7 @@ func setup(spec: Dictionary, direzione: Vector2) -> void:
 	angolo = float(spec.get("angolo", 90.0))
 	raggio = float(spec.get("raggio", 32.0))
 	stagger = float(spec.get("stagger", 0.0))
-	tag_danno = spec.get("tag_danno", [])
+	tag_danno = str(spec.get("tag_danno", ""))
 	origine = str(spec.get("origine", ""))
 	_direzione = direzione.normalized() if direzione.length() > 0.0 else Vector2.RIGHT
 	rotation = _direzione.angle()
@@ -29,6 +35,12 @@ func setup(spec: Dictionary, direzione: Vector2) -> void:
 	circle.radius = raggio
 	shape.shape = circle
 	add_child(shape)
+
+
+func _process(delta: float) -> void:
+	vita -= delta
+	if vita <= 0.0 and not is_queued_for_deletion():
+		queue_free()
 
 
 ## true se il bersaglio cade dentro l'arco. Il cerchio della collisione e'

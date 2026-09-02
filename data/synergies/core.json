@@ -10,7 +10,8 @@
       "fonti": ["abilita", "talento", "pet"],
       "effetto": { "tipo": "aggiungi_abilita", "ability_id": "sinergia_colpo_del_caso" },
       "scoperta": "nascosta",
-      "note": "Fool o Error combinati con un talento di fortuna e un pet a tema. Sinergia firma del gioco: da' un'abilita' che non appartiene a nessun Pathway."
+      "stub": true,
+      "note": "Fool o Error combinati con un talento di fortuna e un pet a tema. Sinergia firma del gioco: da' un'abilita' che non appartiene a nessun Pathway. STUB: 'sinergia_colpo_del_caso' non e' ancora scritta, e il tag probabilita' e' esclusivo del gruppo differito key_of_light. Story di fase 4."
     },
     {
       "schema_version": 1,

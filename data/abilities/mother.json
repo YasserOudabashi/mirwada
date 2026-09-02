@@ -29,7 +29,7 @@
           "danno_tick": 8,
           "tick_rate": 1.0,
           "durata": 30.0,
-          "tag_danno": "crescita"
+          "tag_danno": "veleno"
         }
       ],
       "tag_sinergia": [

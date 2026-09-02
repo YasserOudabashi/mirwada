@@ -388,7 +388,7 @@
           "id": "tg_4_caccia",
           "evento": "enemy_defeated",
           "filtri": {
-            "sequenza_min": 6
+            "sequenza_bersaglio_max": 6
           },
           "target": 5,
           "progresso": 0.3,
@@ -411,7 +411,8 @@
           "altura",
           "luogo_di_battaglia"
         ],
-        "moon_phase": "alba",
+        "momento": "alba",
+        "fase_lunare": null,
         "sacrifices": [
           "arma_spezzata_di_un_nemico_ucciso"
         ],
@@ -491,7 +492,8 @@
           "tempio_abbandonato",
           "altura"
         ],
-        "moon_phase": "alba",
+        "momento": "alba",
+        "fase_lunare": null,
         "sacrifices": [
           "armatura_indossata_per_100_battaglie"
         ],
@@ -571,7 +573,8 @@
           "rovina",
           "luogo_in_decadenza"
         ],
-        "moon_phase": "crepuscolo",
+        "momento": "crepuscolo",
+        "fase_lunare": null,
         "sacrifices": [
           "struttura_costruita_dal_giocatore"
         ],
@@ -603,7 +606,7 @@
           "id": "tg_1_angelo",
           "evento": "enemy_defeated",
           "filtri": {
-            "sequenza_min": 2
+            "sequenza_bersaglio_max": 2
           },
           "target": 3,
           "progresso": 0.55,
@@ -650,7 +653,8 @@
           "vetta",
           "luogo_di_massacro"
         ],
-        "moon_phase": "eclissi",
+        "momento": null,
+        "fase_lunare": "eclissi",
         "sacrifices": [
           "ancora_del_giocatore"
         ],
@@ -682,7 +686,7 @@
           "id": "tg_0_unicita",
           "evento": "enemy_defeated",
           "filtri": {
-            "sequenza_min": 0
+            "sequenza_bersaglio_max": 0
           },
           "target": 1,
           "progresso": 1.0,
@@ -704,7 +708,8 @@
         "location_tags": [
           "trono_del_gigante"
         ],
-        "moon_phase": "eclissi",
+        "momento": null,
+        "fase_lunare": "eclissi",
         "sacrifices": [
           "il_detentore_precedente_della_sequenza_0"
         ],

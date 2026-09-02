@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
-Genera i 22 file data/pathways/*.json con tutte e 220 le Sequenze.
+Genera la spina dorsale dei pathway: 10 attivi in data/pathways/ (100 Sequenze)
+e 12 differiti in data/pathways_deferred/.
 
 Esecuzione (dalla root del progetto):
     python tools/generate_pathways.py
 
-Idempotente per la struttura: NON sovrascrive i campi gia' popolati
-(abilities, acting_actions, potion) se il file esiste gia'. Serve per
+Idempotente: se il file esiste gia', ogni campo presente nel vecchio documento
+viene riportato TAL QUALE nel nuovo (anche se vuoto o a zero: un valore
+deliberato non si distingue da un default, quindi non si tocca). Serve per
 poter rigenerare la spina dorsale senza perdere il lavoro fatto.
 """
 
@@ -330,12 +332,16 @@ def build_pathway(pid, name, group, seq_names, verb, tags):
             },
             "advancement_ritual": None if seq_num > 4 else {
                 "location_tags": [],
-                "moon_phase": None,
+                "momento": None,
+                "fase_lunare": None,
                 "sacrifices": [],
                 "sigils": []
             },
             "madness_on_force": 0,
-            "notes": ""
+            "notes": "",
+            # Guscio dichiarato: il validator esenta gli stub dai controlli di
+            # completezza ma li conta. Va tolto quando la sequenza e' scritta.
+            "stub": True
         })
     return {
         "schema_version": 1,
@@ -352,7 +358,13 @@ def build_pathway(pid, name, group, seq_names, verb, tags):
 
 
 def merge_preserving(new_doc, old_doc):
-    """Riporta nel nuovo documento i campi gia' popolati nel vecchio."""
+    """Riporta nel nuovo documento i campi del vecchio, TAL QUALI.
+
+    Anche i valori vuoti o a zero: un "madness_on_force: 0" deliberato non e'
+    distinguibile da un default, quindi cio' che sta nel file vince sempre sul
+    template. La vecchia condizione "solo se popolato" perdeva silenziosamente
+    i campi falsy a ogni rigenerazione.
+    """
     old_seqs = {s["id"]: s for s in old_doc.get("sequences", [])}
     for seq in new_doc["sequences"]:
         old = old_seqs.get(seq["id"])
@@ -360,8 +372,14 @@ def merge_preserving(new_doc, old_doc):
             continue
         for field in ("stat_modifiers", "abilities", "acting_actions", "potion",
                       "advancement_ritual", "madness_on_force", "notes", "concept"):
-            if field in old and old[field] not in (None, [], {}, "", 0):
+            if field in old:
                 seq[field] = old[field]
+        # Il flag stub segue il vecchio file; se il vecchio non lo aveva, si
+        # deduce dallo stato reale (nessuna acting_action = guscio).
+        if "stub" in old:
+            seq["stub"] = old["stub"]
+        elif seq["acting_actions"]:
+            seq.pop("stub", None)
     return new_doc
 
 

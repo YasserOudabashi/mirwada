@@ -4,7 +4,8 @@
   "events": {
     "enemy_defeated": {
       "descrizione": "Un nemico e' stato sconfitto dal giocatore.",
-      "filtri": ["tag_nemico", "sequenza_min", "senza_abilita", "tipo_arma", "senza_subire_danno"],
+      "filtri": ["tag_nemico", "sequenza_bersaglio_max", "senza_abilita", "tipo_arma", "senza_subire_danno"],
+      "_comment_sequenza": "sequenza_bersaglio_max: N = conta solo bersagli con NUMERO di Sequenza <= N, cioe' potenza pari o superiore (0 e' il piu' forte). Il vecchio nome 'sequenza_min' leggeva al contrario e avrebbe fatto implementare l'EventTracker invertito.",
       "misura": "conteggio"
     },
     "damage_dealt": {

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO del tempo di gioco. Due assi separati: il momento del giorno (ciclo giorno/notte) e la fase lunare (ciclo lungo). I rituali di avanzamento usavano un solo campo 'moon_phase' che mescolava i due assi ('alba' non e' una fase lunare): da qui in poi ogni riferimento temporale dichiara l'asse giusto. 'eclissi' sta tra le fasi lunari come EVENTO RARO schedulato, non come tappa del ciclo regolare.",
+  "momenti": [
+    "alba",
+    "mezzogiorno",
+    "crepuscolo",
+    "notte_fonda"
+  ],
+  "fasi_lunari": [
+    "nuova",
+    "crescente",
+    "piena",
+    "calante",
+    "eclissi"
+  ]
+}

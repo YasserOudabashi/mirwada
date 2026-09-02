@@ -31,7 +31,8 @@
       },
       "advancement_ritual": null,
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 8,
@@ -50,7 +51,8 @@
       },
       "advancement_ritual": null,
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 7,
@@ -69,7 +71,8 @@
       },
       "advancement_ritual": null,
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 6,
@@ -88,7 +91,8 @@
       },
       "advancement_ritual": null,
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 5,
@@ -107,7 +111,8 @@
       },
       "advancement_ritual": null,
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 4,
@@ -126,12 +131,14 @@
       },
       "advancement_ritual": {
         "location_tags": [],
-        "moon_phase": null,
+        "momento": null,
+        "fase_lunare": null,
         "sacrifices": [],
         "sigils": []
       },
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 3,
@@ -150,12 +157,14 @@
       },
       "advancement_ritual": {
         "location_tags": [],
-        "moon_phase": null,
+        "momento": null,
+        "fase_lunare": null,
         "sacrifices": [],
         "sigils": []
       },
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 2,
@@ -176,12 +185,14 @@
       },
       "advancement_ritual": {
         "location_tags": [],
-        "moon_phase": null,
+        "momento": null,
+        "fase_lunare": null,
         "sacrifices": [],
         "sigils": []
       },
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 1,
@@ -200,12 +211,14 @@
       },
       "advancement_ritual": {
         "location_tags": [],
-        "moon_phase": null,
+        "momento": null,
+        "fase_lunare": null,
         "sacrifices": [],
         "sigils": []
       },
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 0,
@@ -224,12 +237,14 @@
       },
       "advancement_ritual": {
         "location_tags": [],
-        "moon_phase": null,
+        "momento": null,
+        "fase_lunare": null,
         "sacrifices": [],
         "sigils": []
       },
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     }
   ]
 }

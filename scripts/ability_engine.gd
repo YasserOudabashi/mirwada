@@ -172,6 +172,14 @@ func _p_heal(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) 
 	var quantita: float = float(prim.get("quantita", 0.0))
 	var istantaneo: bool = bool(prim.get("istantaneo", true))
 	var durata: float = float(prim.get("durata", 0.0))
+	var bersaglio: String = str(prim.get("bersaglio", "self"))
+
+	# Oggi e' risolvibile solo "self": il targeting di alleati e pet arriva
+	# con i loro sistemi. Un bersaglio diverso NON deve curare il caster per
+	# sbaglio: si registra l'esito e non si tocca nessuno.
+	if bersaglio != "self" and bersaglio != "":
+		return {"tipo": "heal", "quantita": quantita, "bersaglio": bersaglio,
+				"applied": false}
 
 	if istantaneo or durata <= 0.0:
 		stats.set("hp", float(stats.get("hp")) + quantita)

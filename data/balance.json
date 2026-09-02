@@ -21,6 +21,7 @@
   "foundation": {
     "_comment": "Qualita' della progressione 0-100. Avanzare in fretta la abbassa. Fondamenta basse = tetto di potenza piu' basso e follia piu' rapida. E' la meccanica che punisce chi corre.",
     "iniziale": 50,
+    "minimo": 0,
     "bonus_recitazione_completa": 8,
     "malus_avanzamento_forzato": -25,
     "moltiplicatore_stat_per_punto": 0.004,

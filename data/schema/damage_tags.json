@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO dei tag di danno. Vale per: tag_danno delle primitive (projectile, melee_arc, dot, chain), tag_bloccati di shield, e il filtro tag_danno delle acting_actions. Esiste per la stessa ragione di tags.json: senza registro, 'fisico' e 'materiale' coesisterebbero rompendo silenziosamente resistenze e recitazioni. Aggiungere una voce richiede discussione esplicita.",
+  "damage_tags": [
+    "decadimento",
+    "fisico",
+    "follia",
+    "fuoco",
+    "luce",
+    "ombra",
+    "spirito",
+    "veleno"
+  ]
+}

@@ -202,7 +202,8 @@
               "type": "object",
               "required": [
                 "location_tags",
-                "moon_phase",
+                "momento",
+                "fase_lunare",
                 "sacrifices",
                 "sigils"
               ],
@@ -213,11 +214,19 @@
                     "type": "string"
                   }
                 },
-                "moon_phase": {
+                "momento": {
                   "type": [
                     "string",
                     "null"
-                  ]
+                  ],
+                  "_comment": "Momento del giorno, vocabolario data/schema/time.json. Il vecchio campo unico 'moon_phase' mescolava momenti e fasi lunari."
+                },
+                "fase_lunare": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "_comment": "Fase lunare, vocabolario data/schema/time.json. 'eclissi' e' l'evento raro."
                 },
                 "sacrifices": {
                   "type": "array",
@@ -241,6 +250,10 @@
         },
         "notes": {
           "type": "string"
+        },
+        "stub": {
+          "type": "boolean",
+          "_comment": "Guscio dichiarato: il validator esenta la sequenza dai controlli di completezza (acting_actions, madness_on_force, rituale) ma la conta. Va tolto quando la sequenza viene scritta."
         },
         "concept": {
           "type": "string",

@@ -8,7 +8,8 @@ var danno: float = 0.0
 var velocita: float = 200.0
 var gittata: float = 100.0
 var pierce: int = 0
-var tag_danno: Array = []
+## Un tipo di danno per colpo, dal vocabolario chiuso data/schema/damage_tags.json.
+var tag_danno: String = ""
 var origine: String = ""
 
 var _direzione: Vector2 = Vector2.RIGHT
@@ -21,7 +22,7 @@ func setup(spec: Dictionary, posizione: Vector2, direzione: Vector2) -> void:
 	velocita = float(spec.get("velocita", 200.0))
 	gittata = float(spec.get("gittata", 100.0))
 	pierce = int(spec.get("pierce", 0))
-	tag_danno = spec.get("tag_danno", [])
+	tag_danno = str(spec.get("tag_danno", ""))
 	origine = str(spec.get("origine", ""))
 	global_position = posizione
 	_direzione = direzione.normalized() if direzione.length() > 0.0 else Vector2.RIGHT

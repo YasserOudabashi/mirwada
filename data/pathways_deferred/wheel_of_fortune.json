@@ -31,7 +31,8 @@
       },
       "advancement_ritual": null,
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 8,
@@ -50,7 +51,8 @@
       },
       "advancement_ritual": null,
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 7,
@@ -69,7 +71,8 @@
       },
       "advancement_ritual": null,
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 6,
@@ -88,7 +91,8 @@
       },
       "advancement_ritual": null,
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 5,
@@ -107,7 +111,8 @@
       },
       "advancement_ritual": null,
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 4,
@@ -131,7 +136,8 @@
         "sigils": []
       },
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 3,
@@ -155,7 +161,8 @@
         "sigils": []
       },
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 2,
@@ -179,7 +186,8 @@
         "sigils": []
       },
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 1,
@@ -203,7 +211,8 @@
         "sigils": []
       },
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     },
     {
       "sequence": 0,
@@ -227,7 +236,8 @@
         "sigils": []
       },
       "madness_on_force": 0,
-      "notes": ""
+      "notes": "",
+      "stub": true
     }
   ]
 }

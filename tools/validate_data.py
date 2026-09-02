@@ -66,15 +66,26 @@ def main():
     prim_doc = load_json(os.path.join(DATA, "schema", "primitives.json"))
     tags_doc = load_json(os.path.join(DATA, "tags.json"))
     ev_doc = load_json(os.path.join(DATA, "schema", "tracked_events.json"))
-    if prim_doc is None or tags_doc is None or ev_doc is None:
+    dmg_doc = load_json(os.path.join(DATA, "schema", "damage_tags.json"))
+    time_doc = load_json(os.path.join(DATA, "schema", "time.json"))
+    if None in (prim_doc, tags_doc, ev_doc, dmg_doc, time_doc):
         report()
         return 1
 
     all_primitives = set(prim_doc["primitives"].keys())
     primitives = {k for k, v in prim_doc["primitives"].items() if not v.get("deferred")}
     deferred_primitives = all_primitives - primitives
+    # Il registro dichiara i parametri di ogni primitiva: un nome sbagliato nei
+    # dati diventerebbe silenziosamente il default a runtime (danno a zero).
+    prim_params = {k: set(v.get("params", [])) for k, v in prim_doc["primitives"].items()}
     events = ev_doc["events"]
     valid_tags = set(tags_doc["tags"])
+    valid_damage_tags = set(dmg_doc["damage_tags"])
+    valid_momenti = set(time_doc["momenti"])
+    valid_fasi_lunari = set(time_doc["fasi_lunari"])
+    # Tag ottenibili nella build attiva: servono a segnalare le sinergie
+    # irraggiungibili (richiedono tag che nessun pathway attivo porta).
+    obtainable_tags = set()
 
     # --- pathway ---
     pdir = os.path.join(DATA, "pathways")
@@ -86,6 +97,7 @@ def main():
     sequence_ids = []
     ability_refs = []
     total_sequences = 0
+    stub_count = 0
 
     for fname in files:
         path = os.path.join(pdir, fname)
@@ -105,6 +117,7 @@ def main():
         for t in doc.get("tags", []):
             if t not in valid_tags:
                 err(f"{rel}: tag di pathway sconosciuto '{t}' (aggiungilo a data/tags.json o correggilo)")
+            obtainable_tags.add(t)
 
         seqs = doc.get("sequences", [])
         total_sequences += len(seqs)
@@ -130,12 +143,41 @@ def main():
                 err(f"{rel} [{sid}]: concept mancante o troppo vago. "
                     f"Ogni sequenza deve dichiarare COSA FA IL GIOCATORE a quel livello.")
 
+            # Una sequenza "stub" e' un guscio dichiarato: contenuto da scrivere,
+            # esente dai controlli di completezza. Senza il flag, una sequenza
+            # vuota passava la validazione E bloccava il giocatore per sempre.
+            stub = bool(seq.get("stub"))
+            if stub:
+                stub_count += 1
+                if seq.get("acting_actions"):
+                    err(f"{rel} [{sid}]: marcata stub ma ha acting_actions: togli il flag o svuotala")
+            else:
+                if not seq.get("acting_actions"):
+                    err(f"{rel} [{sid}]: nessuna acting_action e nessun flag stub: "
+                        f"il giocatore non ha un percorso di recitazione a questa Sequenza.")
+                if not seq.get("madness_on_force", 0) > 0:
+                    err(f"{rel} [{sid}]: madness_on_force deve essere > 0 su una sequenza non-stub: "
+                        f"forzare l'avanzamento non puo' essere gratis.")
+
             # rituale obbligatorio da Sequenza 4 in giu' (avanzamento da 5 in su)
             ritual = seq.get("advancement_ritual")
             if n <= 4 and ritual is None:
                 err(f"{rel} [{sid}]: advancement_ritual obbligatorio per Sequenza <= 4")
             if n > 4 and ritual is not None:
                 warn(f"{rel} [{sid}]: advancement_ritual presente sopra Sequenza 4 (inatteso ma non fatale)")
+            if isinstance(ritual, dict):
+                if "moon_phase" in ritual:
+                    err(f"{rel} [{sid}]: 'moon_phase' non esiste piu': usa 'momento' e/o "
+                        f"'fase_lunare' dal vocabolario di data/schema/time.json")
+                mom = ritual.get("momento")
+                if mom is not None and mom not in valid_momenti:
+                    err(f"{rel} [{sid}]: momento '{mom}' non nel vocabolario ({sorted(valid_momenti)})")
+                fase = ritual.get("fase_lunare")
+                if fase is not None and fase not in valid_fasi_lunari:
+                    err(f"{rel} [{sid}]: fase_lunare '{fase}' non nel vocabolario ({sorted(valid_fasi_lunari)})")
+                if not stub and not ritual.get("location_tags"):
+                    err(f"{rel} [{sid}]: rituale senza location_tags su una sequenza non-stub: "
+                        f"un rituale senza luogo non e' eseguibile.")
 
             for aid in seq.get("abilities", []):
                 ability_refs.append((rel, sid, aid))
@@ -154,15 +196,21 @@ def main():
                         f"Un evento nuovo e' CODICE: va discusso, non aggiunto di slancio.")
                 else:
                     allowed = set(events[ev].get("filtri", []))
-                    for f in act.get("filtri", {}):
+                    for f, fv in act.get("filtri", {}).items():
                         if f not in allowed:
                             err(f"{rel} [{sid}]: acting_action '{aid_act}': filtro '{f}' "
                                 f"non ammesso per l'evento '{ev}' (ammessi: {sorted(allowed)})")
+                        elif f == "tag_danno" and fv not in valid_damage_tags:
+                            err(f"{rel} [{sid}]: acting_action '{aid_act}': tag_danno '{fv}' "
+                                f"non nel vocabolario di data/schema/damage_tags.json")
                 if not act.get("target", 0) > 0:
                     err(f"{rel} [{sid}]: acting_action '{aid_act}' senza target numerico")
             if seq.get("acting_actions") and total_prog < 0.999:  # tolleranza virgola mobile
                 err(f"{rel} [{sid}]: le acting_actions sommano a {total_prog:.2f} < 1.0: "
                     f"il giocatore non puo' completare la recitazione e resta bloccato qui per sempre.")
+            if seq.get("acting_actions") and total_prog > 1.001:
+                warn(f"{rel} [{sid}]: le acting_actions sommano a {total_prog:.2f} > 1.0: "
+                     f"il surplus rende saltabile l'azione meno comoda. Se non e' voluto, riporta la somma a 1.0.")
 
         if sorted(seen_nums, reverse=True) != list(range(9, -1, -1)):
             err(f"{rel}: le sequenze non coprono esattamente 9..0 (trovate {sorted(seen_nums, reverse=True)})")
@@ -185,6 +233,9 @@ def main():
 
     if total_sequences != EXPECTED_PATHWAYS * EXPECTED_SEQUENCES_PER_PATHWAY:
         err(f"totale sequenze {total_sequences}, attese {EXPECTED_PATHWAYS * EXPECTED_SEQUENCES_PER_PATHWAY}")
+    if stub_count:
+        warn(f"{stub_count} sequenze su {total_sequences} sono stub dichiarati: "
+             f"contenuto ancora da scrivere (fase 5), non un errore.")
 
     for name, values in (("pathway", pathway_ids), ("sequenza", sequence_ids)):
         dupes = [k for k, v in Counter(values).items() if v > 1]
@@ -217,9 +268,25 @@ def main():
                     elif tipo not in primitives:
                         err(f"{rel} [{aid}]: primitiva sconosciuta '{tipo}'. "
                             f"Il registro e' chiuso: parametrizza una primitiva esistente.")
+                    else:
+                        # Un parametro fuori registro a runtime diventa il default
+                        # della primitiva: danno silenziosamente a zero.
+                        ignoti = set(p) - {"tipo"} - prim_params[tipo]
+                        if ignoti:
+                            err(f"{rel} [{aid}]: parametri non dichiarati per '{tipo}': "
+                                f"{sorted(ignoti)} (registro: {sorted(prim_params[tipo])})")
+                    td = p.get("tag_danno")
+                    if td is not None and td not in valid_damage_tags:
+                        err(f"{rel} [{aid}]: tag_danno '{td}' non nel vocabolario "
+                            f"di data/schema/damage_tags.json")
+                    for tb in p.get("tag_bloccati", []):
+                        if tb not in valid_damage_tags:
+                            err(f"{rel} [{aid}]: tag_bloccati contiene '{tb}', non nel "
+                                f"vocabolario di data/schema/damage_tags.json")
                 for t in ab.get("tag_sinergia", []):
                     if t not in valid_tags:
                         err(f"{rel} [{aid}]: tag sconosciuto '{t}'")
+                    obtainable_tags.add(t)
                 if not ab.get("tag_sinergia"):
                     err(f"{rel} [{aid}]: nessun tag_sinergia. Un'abilita' senza tag e' invisibile al motore delle sinergie.")
 
@@ -306,6 +373,18 @@ def main():
                 if len(set(syn.get("fonti", []))) < 2:
                     err(f"{rel} [{sid}]: una sinergia deve pescare da almeno 2 fonti diverse "
                         f"(pilastro di design: le sinergie attraversano i sistemi)")
+                # L'output della sinergia deve esistere: un'abilita' fantasma si
+                # scoprirebbe solo al momento in cui il giocatore la sblocca.
+                eff = syn.get("effetto", {})
+                if eff.get("tipo") == "aggiungi_abilita" and not syn.get("stub"):
+                    if eff.get("ability_id") not in ability_ids:
+                        err(f"{rel} [{sid}]: effetto aggiunge l'abilita' inesistente "
+                            f"'{eff.get('ability_id')}'. Scrivila, o marca la sinergia \"stub\": true.")
+                irraggiungibili = [t for t in syn.get("richiede_tag", {})
+                                   if t in valid_tags and t not in obtainable_tags]
+                if irraggiungibili:
+                    warn(f"{rel} [{sid}]: richiede i tag {irraggiungibili} che nessun pathway "
+                         f"attivo porta: sinergia irraggiungibile finche' il suo gruppo resta differito.")
 
     report()
     return 1 if errors else 0

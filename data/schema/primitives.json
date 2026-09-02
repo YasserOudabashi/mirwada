@@ -82,7 +82,7 @@
         "raggio",
         "durata",
         "potenza",
-        "tipo"
+        "tipo_illusione"
       ]
     },
     "mind_read": {
@@ -104,7 +104,8 @@
         "assorbimento",
         "durata",
         "riflette",
-        "tag_bloccati"
+        "tag_bloccati",
+        "bersaglio"
       ]
     },
     "transform": {
@@ -124,7 +125,7 @@
     },
     "terrain_modify": {
       "params": [
-        "tipo",
+        "tipo_modifica",
         "raggio",
         "durata",
         "permanente"
@@ -185,7 +186,7 @@
     },
     "weather_control": {
       "params": [
-        "tipo",
+        "tipo_meteo",
         "intensita",
         "raggio",
         "durata"
