@@ -34,8 +34,8 @@
       ],
       "priority": 2,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Autoload GameData in scripts/game_data.gd. Indici piatti per id (pathway, sequenze, abilita', sinergie) costruiti a caricamento: get_*() e' O(1) invece di scandire 42 file. Contratto: id ignoto restituisce {}, mai null, mai crash. Errori raccolti in una lista e stampati con push_error, con riga e messaggio del parser JSON: mai fallimento silenzioso. Verificato in headless: 23 file, 10 pathway, 100 sequenze, 32 abilita', 0 errori; 10 test passano. BUG TROVATO DAI TEST: data/tags.json espone 'tags' come ARRAY piatto di 82 stringhe, non come oggetto — has_tag() era scritto per un Dictionary e falliva. Corretto."
     },
     {
       "id": "US-003",

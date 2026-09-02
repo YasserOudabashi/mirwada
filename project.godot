@@ -13,6 +13,11 @@ config/description="Action-RPG 2D esplorativo con progressione a Pathway e Seque
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 
+[autoload]
+
+; Fonte unica dei dati. Deve stare prima di ogni sistema che li legge.
+GameData="*res://scripts/game_data.gd"
+
 [display]
 
 ; Viewport logico: e' questa la risoluzione in cui si ragiona.
