@@ -494,3 +494,51 @@ Sessione grossa su richiesta dell'utente: analisi completa del progetto
     quando la velocita' sara' un dato e ci sara' un tilemap per giudicare
     il feel (dopo US-006).
 - Prossima storia: US-005 (camera con smoothing e limiti).
+
+[2026-09-02] US-005 — Camera con smoothing e limiti
+
+- Cosa fatto:
+  - scripts/game_camera.gd (extends Camera2D): in _ready attiva
+    position_smoothing_enabled + position_smoothing_speed = 5.0.
+  - I LIMITI sono della ZONA, non della camera: apply_zone_limits(Rect2)
+    imposta limit_left/top/right/bottom dal rettangolo giocabile in
+    coordinate mondo; clear_zone_limits() li riapre (~infiniti). Sara' la
+    zona di US-006 a chiamarlo nel proprio _ready. Finche' nessuno lo fa,
+    la camera segue senza vincoli.
+  - scenes/player.tscn: aggiunto un Camera2D figlio del Player con questo
+    script.
+  - project.godot [rendering]: 2d/snap/snap_2d_transforms_to_pixel = true e
+    snap_2d_vertices_to_pixel = true. Vedi sotto.
+
+- IL TREMOLIO IN DIAGONALE (criterio esplicito di US-005): con la camera che
+  segue con smoothing la sua posizione e' frazionaria a ogni frame. Prima
+  dello snap, i pixel del mondo statico sfarfallavano fotogramma per
+  fotogramma durante il moto obliquo — verificato confrontando due frame
+  consecutivi (jitter_a/jitter_b): la griglia di riferimento appariva a
+  luminosita' e nitidezza diverse nei due frame. Con i due snap_2d_*_to_pixel
+  attivi i due frame consecutivi mostrano la griglia identica e nitida: il
+  tremolio sparisce. Con la pixel art e' anche la resa corretta (tutto resta
+  sulla griglia di pixel interi).
+
+- Come verificato A SCHERMO (finestra reale): script usa e getta che carica
+  main.tscn, aggiunge una griglia di punti in coordinate mondo (senza
+  riferimento fisso la camera che segue darebbe screenshot identici), poi:
+  * 6 screenshot durante un lungo moto in diagonale -> la griglia scorre,
+    il giocatore resta al centro: la camera segue;
+  * 2 frame consecutivi in moto -> griglia identica e pulita: niente jitter;
+  * apply_zone_limits(rettangolo stretto) + spinta contro il bordo ->
+    la camera si ferma al limite mentre il giocatore prosegue oltre
+    (i limiti vincolano la camera, non il giocatore): confermato, nello
+    screenshot zona_bordo_sx il giocatore e' nell'angolo e la camera e'
+    bloccata. Screenshot in user://us005/, non versionati.
+
+- Regressione: 43/43 test headless, validator exit 0.
+
+- Note ambiente: snap_2d_transforms_to_pixel puo' rendere "a scatti" uno
+  sprite che si muove lentamente. A 640x360 e' l'aspetto voluto. Se in
+  futuro desse fastidio su qualche elemento specifico, si disattiva per
+  quel CanvasItem con texture_filter/transform locali, non globalmente.
+
+- Resta aperto: i limiti di zona non hanno ancora un chiamante — arriva con
+  US-006 (la zona di test). La velocita' 90 px/s resta lenta (US-024).
+- Prossima storia: US-006 (tilemap e collisioni dell'area di test).

@@ -83,8 +83,8 @@
       ],
       "priority": 5,
       "fase": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "scripts/game_camera.gd (extends Camera2D): _ready attiva position_smoothing (speed 5.0). I limiti sono della ZONA: apply_zone_limits(Rect2 mondo) imposta limit_left/top/right/bottom, clear_zone_limits() li riapre — la zona di US-006 sara' il chiamante. Camera2D aggiunto a player.tscn. TREMOLIO IN DIAGONALE risolto con project.godot 2d/snap/snap_2d_transforms_to_pixel + snap_2d_vertices_to_pixel = true: la camera con smoothing ha posizione frazionaria ogni frame, senza snap i pixel del mondo statico sfarfallano. VERIFICA A SCHERMO: griglia di riferimento in coordinate mondo, 2 frame consecutivi in moto obliquo identici e nitidi (niente jitter), la camera segue nel lungo moto diagonale, e con apply_zone_limits si ferma al bordo mentre il giocatore prosegue oltre. 43/43 test, validator exit 0."
     },
     {
       "id": "US-006",

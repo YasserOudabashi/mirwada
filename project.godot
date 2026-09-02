@@ -68,3 +68,10 @@ move_right={
 textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+; Snap del rendering 2D alla griglia di pixel interi. Con la camera che
+; segue con smoothing la sua posizione e' frazionaria a ogni frame: senza
+; questo snap i pixel del mondo statico "sfarfallano" in diagonale (il
+; tremolio che US-005 vieta). Con la pixel art e' anche la resa voluta:
+; tutto resta sulla griglia.
+2d/snap/snap_2d_transforms_to_pixel=true
+2d/snap/snap_2d_vertices_to_pixel=true
