@@ -102,6 +102,7 @@ def main():
     pathway_ids = []
     sequence_ids = []
     ability_refs = []
+    potion_refs = []  # (rel, sid, seq_num, potion) delle Sequenze non-stub (US-208)
     total_sequences = 0
     stub_count = 0
 
@@ -187,6 +188,11 @@ def main():
 
             for aid in seq.get("abilities", []):
                 ability_refs.append((rel, sid, aid))
+
+            # US-208: le pozioni non-stub devono puntare a una formula valida
+            pot = seq.get("potion", {})
+            if not stub and pot.get("formula_id"):
+                potion_refs.append((rel, sid, n, pot))
 
             total_prog = 0.0
             for act in seq.get("acting_actions", []):
@@ -377,6 +383,36 @@ def main():
             if cs is not None and ("twilight_giant", cs) not in char_by_ps:
                 err(f"data/pathways/twilight_giant.json [{s.get('id')}]: manca la Caratteristica "
                     f"per characteristic_sequence {cs} in data/characteristics.json")
+
+    # --- formule delle pozioni (data/potions/formulas.json, US-208) ---
+    fdoc = load_json(os.path.join(DATA, "potions", "formulas.json"))
+    formulas = (fdoc or {}).get("formulas", {})
+    ingredient_vocab = set((fdoc or {}).get("ingredients", []))
+    for fid, f in formulas.items():
+        ingr = f.get("ingredients", [])
+        if not isinstance(ingr, list) or not ingr:
+            err(f"data/potions/formulas.json [{fid}]: ingredients deve essere una lista non vuota")
+            ingr = []
+        for ing in ingr:
+            if ing not in ingredient_vocab:
+                err(f"data/potions/formulas.json [{fid}]: ingrediente '{ing}' non nel vocabolario 'ingredients'")
+        sp = f.get("soglia_parziale")
+        if not isinstance(sp, int) or not (1 <= sp <= max(1, len(ingr))):
+            err(f"data/potions/formulas.json [{fid}]: soglia_parziale '{sp}' fuori da [1, {len(ingr)}]")
+        if not isinstance(f.get("penalita_parziale"), dict) or not f.get("penalita_parziale"):
+            err(f"data/potions/formulas.json [{fid}]: penalita_parziale mancante (una pozione parziale non e' gratis)")
+    for rel, sid, n, pot in potion_refs:
+        fid = pot.get("formula_id")
+        if fid not in formulas:
+            err(f"{rel} [{sid}]: potion.formula_id '{fid}' non risolve in data/potions/formulas.json")
+            continue
+        f = formulas[fid]
+        if f.get("characteristic_sequence") != n:
+            err(f"{rel} [{sid}]: la formula '{fid}' chiede characteristic_sequence "
+                f"{f.get('characteristic_sequence')}, ma la Sequenza e' {n}")
+        if pot.get("ingredients") and pot["ingredients"] != f.get("ingredients"):
+            err(f"{rel} [{sid}]: gli ingredienti inline della pozione non combaciano con quelli "
+                f"della formula '{fid}' (la formula e' la fonte)")
 
     # --- progressione (US-201) ---
     # Il Pathway di partenza vive nei dati, non nel codice (FR-1): qui si

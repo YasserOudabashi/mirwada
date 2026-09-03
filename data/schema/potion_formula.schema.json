@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "_comment": "Formato di data/potions/formulas.json. Il validator (tools/validate_data.py) fa i controlli espliciti.",
+  "top_level": {
+    "ingredients": "lista di string: vocabolario CHIUSO degli id ingrediente",
+    "formulas": "oggetto { formula_id: formula }"
+  },
+  "formula": {
+    "characteristic_sequence": "int 0-9: la Sequenza della Caratteristica Beyonder richiesta",
+    "ingredients": "lista di id ingrediente (tutti nel vocabolario 'ingredients')",
+    "soglia_parziale": "int >= 1: minimo di ingredienti per una pozione parziale; sotto soglia non si prepara",
+    "penalita_parziale": "oggetto: cosa costa una pozione parziale (es. follia_extra, qualita). Sempre esplicito, mai un valore silenzioso"
+  },
+  "regole_validator": [
+    "ogni potion.formula_id delle Sequenze non-stub risolve in formulas",
+    "ogni ingrediente di ogni formula e' nel vocabolario 'ingredients'",
+    "formula.characteristic_sequence coerente con la Sequenza che usa la formula",
+    "soglia_parziale fra 1 e len(ingredients)",
+    "penalita_parziale presente e non vuota"
+  ]
+}

@@ -1755,3 +1755,33 @@ sezione test aggiornata.
   possiede('char_twilight_giant_9') = true, il pickup sparisce. La
   collisione Area2D funziona.
 - Prossima storia: US-208 (formule delle pozioni e formule parziali).
+
+[2026-09-03] US-208 — Formule delle pozioni e formule parziali
+
+- Cosa fatto:
+  - data/potions/formulas.json + data/schema/potion_formula.schema.json.
+    Generato da TUTTE le Sequenze non-stub (script una tantum): 11 formule
+    (twilight_giant 9..0 + fool_9), 30 ingredienti.
+  - Struttura: 'ingredients' = vocabolario chiuso degli id ingrediente;
+    'formulas' = { formula_id: {characteristic_sequence, ingredients[],
+    soglia_parziale, penalita_parziale} }.
+  - soglia_parziale = len(ingredients) - 1: con 3 ingredienti se ne
+    possono usare 2 (pozione parziale), sotto no.
+  - penalita_parziale ESPLICITA nei dati {follia_extra: 2.0,
+    qualita: "instabile"}: mai un valore silenzioso. US-209 la applica.
+  - game_data.gd: _load_single(formulas), get_formula(id),
+    ingredient_ids(). 30 file caricati ora.
+  - Nessuna logica runtime (concoct e' US-209).
+  - validate_data.py: ogni potion.formula_id non-stub risolve; ogni
+    ingrediente e' nel vocabolario; formula.characteristic_sequence ==
+    numero della Sequenza; ingredienti inline == quelli della formula
+    (la formula e' la fonte); soglia_parziale in [1, len];
+    penalita_parziale non vuota.
+- Come verificato: 198 test headless (193 + 5 in test_potion_formulas.gd:
+  formule caricate, formula inesistente -> {}, vocabolario copre le
+  formule, soglia parziale coerente, ogni Sequenza del TG ha la sua
+  formula). validator exit 0. Nessuna regressione.
+- BUG PRESO DAL VALIDATOR: la prima generazione copriva solo il
+  twilight_giant; fool_9 (Sequenza non-stub da un vecchio audit) puntava
+  a formula_fool_9 inesistente. Rigenerato scandendo tutti i pathway.
+- Prossima storia: US-213 (Follia - statistica cumulativa con effetti a soglia).

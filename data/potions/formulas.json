@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "_comment": "Formule delle pozioni Beyonder (US-208). Ogni formula_id (referenziato da potion.formula_id nelle Sequenze non-stub) elenca la Caratteristica richiesta (characteristic_sequence) e gli ingredienti COMPLETI. soglia_parziale: numero minimo di ingredienti per una pozione PARZIALE (sotto soglia = non si prepara). penalita_parziale: cosa costa una pozione parziale, sempre esplicito. 'ingredients' e' il vocabolario chiuso degli ingredienti.",
+  "ingredients": [
+    "acciaio_stellare",
+    "argento_benedetto",
+    "caratteristica_del_gigante",
+    "cenere_di_spirito",
+    "cuore_di_montagna",
+    "estratto_di_muscolo",
+    "ferro_temperato",
+    "fiele_di_demone",
+    "frammento_di_alba",
+    "lacrima_di_paladino",
+    "lama_di_luce_solidificata",
+    "linfa_di_gigante",
+    "metallo_impossibile",
+    "nucleo_del_crepuscolo",
+    "oro_bianco",
+    "ossidiana_decaduta",
+    "osso_di_pugile",
+    "platino_rituale",
+    "polvere_di_arena",
+    "polvere_di_crepuscolo",
+    "polvere_di_specchio_incrinato",
+    "radice_di_quercia",
+    "radice_di_veggente",
+    "resina_di_ferro",
+    "sale_di_roccia",
+    "sangue_di_gufo_lunare",
+    "sangue_di_toro",
+    "scheggia_divina",
+    "scudo_fuso",
+    "tempo_solidificato",
+    "tendine_di_lupo",
+    "ultimo_respiro",
+    "voce_del_gigante"
+  ],
+  "formulas": {
+    "formula_fool_9": {
+      "characteristic_sequence": 9,
+      "ingredients": [
+        "sangue_di_gufo_lunare",
+        "polvere_di_specchio_incrinato",
+        "radice_di_veggente"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione fatta con ingredienti mancanti: piu' follia quando si beve e qualita' ridotta. Effetto esplicito nei dati, mai silenzioso."
+      }
+    },
+    "formula_twilight_giant_0": {
+      "characteristic_sequence": 0,
+      "ingredients": [
+        "caratteristica_del_gigante",
+        "nucleo_del_crepuscolo",
+        "tempo_solidificato"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione fatta con ingredienti mancanti: piu' follia quando si beve e qualita' ridotta. Effetto esplicito nei dati, mai silenzioso."
+      }
+    },
+    "formula_twilight_giant_1": {
+      "characteristic_sequence": 1,
+      "ingredients": [
+        "scheggia_divina",
+        "metallo_impossibile",
+        "voce_del_gigante"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione fatta con ingredienti mancanti: piu' follia quando si beve e qualita' ridotta. Effetto esplicito nei dati, mai silenzioso."
+      }
+    },
+    "formula_twilight_giant_2": {
+      "characteristic_sequence": 2,
+      "ingredients": [
+        "polvere_di_crepuscolo",
+        "ossidiana_decaduta",
+        "ultimo_respiro"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione fatta con ingredienti mancanti: piu' follia quando si beve e qualita' ridotta. Effetto esplicito nei dati, mai silenzioso."
+      }
+    },
+    "formula_twilight_giant_3": {
+      "characteristic_sequence": 3,
+      "ingredients": [
+        "lama_di_luce_solidificata",
+        "platino_rituale",
+        "lacrima_di_paladino"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione fatta con ingredienti mancanti: piu' follia quando si beve e qualita' ridotta. Effetto esplicito nei dati, mai silenzioso."
+      }
+    },
+    "formula_twilight_giant_4": {
+      "characteristic_sequence": 4,
+      "ingredients": [
+        "cenere_di_spirito",
+        "argento_benedetto",
+        "fiele_di_demone"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione fatta con ingredienti mancanti: piu' follia quando si beve e qualita' ridotta. Effetto esplicito nei dati, mai silenzioso."
+      }
+    },
+    "formula_twilight_giant_5": {
+      "characteristic_sequence": 5,
+      "ingredients": [
+        "scudo_fuso",
+        "cuore_di_montagna",
+        "resina_di_ferro"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione fatta con ingredienti mancanti: piu' follia quando si beve e qualita' ridotta. Effetto esplicito nei dati, mai silenzioso."
+      }
+    },
+    "formula_twilight_giant_6": {
+      "characteristic_sequence": 6,
+      "ingredients": [
+        "frammento_di_alba",
+        "oro_bianco",
+        "linfa_di_gigante"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione fatta con ingredienti mancanti: piu' follia quando si beve e qualita' ridotta. Effetto esplicito nei dati, mai silenzioso."
+      }
+    },
+    "formula_twilight_giant_7": {
+      "characteristic_sequence": 7,
+      "ingredients": [
+        "acciaio_stellare",
+        "polvere_di_arena",
+        "tendine_di_lupo"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione fatta con ingredienti mancanti: piu' follia quando si beve e qualita' ridotta. Effetto esplicito nei dati, mai silenzioso."
+      }
+    },
+    "formula_twilight_giant_8": {
+      "characteristic_sequence": 8,
+      "ingredients": [
+        "osso_di_pugile",
+        "sale_di_roccia",
+        "estratto_di_muscolo"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione fatta con ingredienti mancanti: piu' follia quando si beve e qualita' ridotta. Effetto esplicito nei dati, mai silenzioso."
+      }
+    },
+    "formula_twilight_giant_9": {
+      "characteristic_sequence": 9,
+      "ingredients": [
+        "ferro_temperato",
+        "sangue_di_toro",
+        "radice_di_quercia"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione fatta con ingredienti mancanti: piu' follia quando si beve e qualita' ridotta. Effetto esplicito nei dati, mai silenzioso."
+      }
+    }
+  }
+}

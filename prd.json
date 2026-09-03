@@ -281,8 +281,8 @@
       ],
       "priority": 14,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/potions/formulas.json (schema_version 1) + data/schema/potion_formula.schema.json. Generato da tutte le Sequenze non-stub: 11 formule (twilight_giant 9..0 + fool_9), 30 ingredienti. Struttura: 'ingredients' = vocabolario chiuso, 'formulas' = { formula_id: {characteristic_sequence, ingredients[], soglia_parziale, penalita_parziale} }. soglia_parziale = len(ingredients)-1 (con 3 ingredienti se ne possono usare 2, sotto no). penalita_parziale ESPLICITA nei dati {follia_extra: 2.0, qualita: instabile} - mai un valore silenzioso; US-209 la applica. GameData: _load_single(formulas), get_formula(id), ingredient_ids() (vocabolario). Nessuna logica runtime in questa story (concoct e' US-209). validate_data.py: ogni potion.formula_id non-stub risolve; ogni ingrediente di ogni formula e' nel vocabolario; formula.characteristic_sequence == numero della Sequenza; ingredienti inline della pozione == quelli della formula (la formula e' la fonte); soglia_parziale in [1, len]; penalita_parziale non vuota. 5 test in test_potion_formulas.gd (198 totali): formule caricate, formula inesistente -> {}, vocabolario copre le formule, soglia parziale coerente (< completo), ogni Sequenza del TG ha la sua formula. validator 0 (30 file), nessuna regressione."
     },
     {
       "id": "US-213",
