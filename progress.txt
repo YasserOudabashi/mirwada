@@ -2691,3 +2691,22 @@ sezione test aggiornata.
   in per_categoria come ogni item; ricchezza() = 0 a mani vuote, 30*1+4*50=230
   con due tagli). validator 0.
 - Prossima storia: US-306 (tag di inventario ed equip esposti per le sinergie).
+
+[2026-09-03] US-306 — Tag di inventario ed equip esposti per le sinergie
+
+- Inventory.tag_attivi() -> {tag: conteggio}: delega a Equipment.tag_attivi()
+  (i tag degli item INDOSSATI; i sigilli incastonati si aggiungeranno in
+  US-317). Gli item nello zaino NON contano - una sinergia e' cio' che
+  indossi. API di SOLA LETTURA: non conosce le sinergie, e' fase 4
+  (SynergySources, US-334) a comporla con pet/talenti/stanze e risolvere.
+- design-master.md cap. 5: nuovo bullet "Fonti di richiede_tag" - le 4
+  sorgenti (Inventory, PetSystem, TalentSystem, BaseSystem), ognuna con
+  tag_attivi() di sola lettura, sommate da SynergySources.
+- data/items/equip.json: aggiunto il tag 'guerra' a spada_ferrea e
+  corazza_cuoio (kit di ferro del guerriero) - serviva una coppia con tag
+  condiviso su slot diversi per il test.
+- Come verificato: 347 test headless (345 + 2 in test_inventory_tags.gd: un
+  equip nello zaino non produce tag / equipaggiato si', due equip con tag
+  'guerra' condiviso su slot diversi -> conteggio 2, smontarne uno -> 1).
+  validator 0.
+- Prossima storia: US-307 (pagina inventario del libro).

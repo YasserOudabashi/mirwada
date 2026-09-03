@@ -7,11 +7,17 @@
       "categoria": "equip",
       "name_i18n": "item.spada_ferrea",
       "descrizione_i18n": "item.spada_ferrea.desc",
-      "tag": ["arma", "forza"],
+      "tag": [
+        "arma",
+        "forza",
+        "guerra"
+      ],
       "impilabile": false,
       "valore": 40,
       "slot": "arma",
-      "stat_modifiers": { "forza": 0.1 },
+      "stat_modifiers": {
+        "forza": 0.1
+      },
       "slot_sigilli": 1
     },
     {
@@ -19,11 +25,16 @@
       "categoria": "equip",
       "name_i18n": "item.corazza_cuoio",
       "descrizione_i18n": "item.corazza_cuoio.desc",
-      "tag": ["difesa"],
+      "tag": [
+        "difesa",
+        "guerra"
+      ],
       "impilabile": false,
       "valore": 35,
       "slot": "armatura",
-      "stat_modifiers": { "difesa": 0.15 },
+      "stat_modifiers": {
+        "difesa": 0.15
+      },
       "slot_sigilli": 1
     },
     {
@@ -31,11 +42,16 @@
       "categoria": "equip",
       "name_i18n": "item.amuleto_lunare",
       "descrizione_i18n": "item.amuleto_lunare.desc",
-      "tag": ["luna", "spirito"],
+      "tag": [
+        "luna",
+        "spirito"
+      ],
       "impilabile": false,
       "valore": 60,
       "slot": "accessorio",
-      "stat_modifiers": { "spiritualita_max": 20 },
+      "stat_modifiers": {
+        "spiritualita_max": 20
+      },
       "slot_sigilli": 2
     },
     {
@@ -43,14 +59,24 @@
       "categoria": "equip",
       "name_i18n": "item.lama_del_pentimento",
       "descrizione_i18n": "item.lama_del_pentimento.desc",
-      "tag": ["arma", "sangue", "maledizione"],
+      "tag": [
+        "arma",
+        "sangue",
+        "maledizione"
+      ],
       "impilabile": false,
       "valore": 0,
       "slot": "arma",
-      "stat_modifiers": { "forza": 0.35, "difesa": -0.1 },
+      "stat_modifiers": {
+        "forza": 0.35,
+        "difesa": -0.1
+      },
       "slot_sigilli": 0,
       "sigillato": true,
-      "effetto_collaterale": { "tipo": "follia_al_secondo", "valore": 0.4 }
+      "effetto_collaterale": {
+        "tipo": "follia_al_secondo",
+        "valore": 0.4
+      }
     }
   ]
 }

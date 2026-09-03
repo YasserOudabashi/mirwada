@@ -140,6 +140,17 @@ func tutto() -> Dictionary:
 	return {"stack": _stack.duplicate(), "istanze": _istanze.duplicate(true)}
 
 
+## Tag di cio' che il giocatore PORTA ADDOSSO (US-306): equip indossato +
+## sigilli incastonati (US-317). Gli item nello zaino NON contano - una
+## sinergia e' cio' che indossi, non cio' che hai in tasca.
+##
+## API di SOLA LETTURA: non conosce le sinergie. E' fase 4 (SynergySources,
+## US-334) a comporla con pet, talenti e stanze e a risolvere le regole.
+func tag_attivi() -> Dictionary:
+	var eq: Node = get_node_or_null("/root/Equipment")
+	return eq.call("tag_attivi") if eq != null else {}
+
+
 ## Comodita' di sola lettura per la UI (US-305): valore totale delle valute.
 func ricchezza() -> int:
 	var gd: Node = _gd()

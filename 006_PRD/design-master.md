@@ -221,6 +221,12 @@ che poi si contraddicono.
   ...) guadagnati da dialoghi, libri, sinergie con `scoperta: "lore"`. Sono la
   moneta del gating dell'Archivio Sepolto e del fog of war del diagramma
   pathway.
+- **Fonti di `richiede_tag`** (fase 4): il motore delle sinergie compone i tag
+  attivi da cinque sorgenti, ognuna con `tag_attivi() -> {tag: conteggio}` di
+  sola lettura — `Inventory` (equip indossato + sigilli incastonati, US-306),
+  `PetSystem` (specie + comportamenti sbloccati), `TalentSystem` (`tag_grant`
+  dei talenti posseduti), `BaseSystem` (stanze costruite). `SynergySources.tag_sinergia_globali()`
+  (US-334) le somma; nessuna di esse conosce le sinergie.
 
 ---
 

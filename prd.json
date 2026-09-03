@@ -122,8 +122,8 @@
       ],
       "priority": 6,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Inventory.tag_attivi() -> {tag: conteggio}: delega a Equipment.tag_attivi() (tag degli item INDOSSATI; sigilli incastonati in US-317). Item nello zaino NON contano. SOLA LETTURA, non conosce le sinergie (fase 4 / SynergySources US-334 compone con pet/talenti/stanze). design-master.md cap.5: bullet Fonti di richiede_tag (Inventory/PetSystem/TalentSystem/BaseSystem, ognuna tag_attivi() di sola lettura). data/items/equip.json: tag guerra a spada_ferrea + corazza_cuoio (serviva una coppia con tag condiviso su slot diversi). 347 test headless (345+2 test_inventory_tags.gd), validator 0."
     },
     {
       "id": "US-307",
