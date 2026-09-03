@@ -103,8 +103,8 @@
       ],
       "priority": 5,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Autoload WorldState (scripts/world_state.gd), dopo GameState. _terrain_mods: Array di {tipo_modifica, posizione:[x,y], raggio}. registra_terreno (le duplicate esatte non si accumulano), terreni(), pulisci(), per_salvataggio/da_salvataggio (rilettura non fidata: voci malformate scartate una a una, raw non-oggetto -> lista vuota). SAVE: VERSIONE_CORRENTE 3->4, campo 'mondo' in salva()/_leggi_snapshot (_campo TYPE_DICTIONARY), _migra_3_a_4 aggiunge {terrain_mods:[]}. GameState.snapshot/applica agganciano WorldState come Progression. ability_engine._p_terrain_modify: permanente:true -> WorldState.registra_terreno alla posizione del caster (Node2D global_position); permanente:false + durata -> _pending {kind:terrain_temp} ancorata al caster, scade senza effetto (la modifica vera al tilemap e' fase 6). tick_effects: ancora generalizzata a e.has('caster') (aura + terrain_temp); flush_effects salta le entry senza 'stats'. validate_data.py: terrain_modify esige tipo_modifica non vuoto e permanente bool. 7 test in test_terrain_modify.gd (149 totali): registro, permanente nello stato del mondo, round-trip del save, temporanea scade, da_salvataggio scarta le malformate, migrazione v3->v4, execute(tg_spezza_barriera) compone terrain_modify+light_purify senza warning. validator 0, boot pulito, nessuna regressione (test_save_system e test_progression verdi con la catena 1->2->3->4). Primitive: 12 -> 13 su 28. US-203 (2a/2b/2c) chiusa."
     },
     {
       "id": "US-228",

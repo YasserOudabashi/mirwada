@@ -284,6 +284,12 @@ def main():
                                 f"{sorted(ignoti)} (registro: {sorted(prim_params[tipo])})")
                     if tipo == "transform" and p.get("forma_id"):
                         transform_forms.append((rel, aid, p.get("forma_id")))
+                    if tipo == "terrain_modify":
+                        if not isinstance(p.get("tipo_modifica"), str) or not p.get("tipo_modifica"):
+                            err(f"{rel} [{aid}]: terrain_modify senza tipo_modifica")
+                        if not isinstance(p.get("permanente"), bool):
+                            err(f"{rel} [{aid}]: terrain_modify.permanente deve essere true/false "
+                                f"(permanente decide se la modifica va nel save)")
                     td = p.get("tag_danno")
                     if td is not None and td not in valid_damage_tags:
                         err(f"{rel} [{aid}]: tag_danno '{td}' non nel vocabolario "

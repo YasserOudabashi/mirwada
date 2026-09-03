@@ -49,6 +49,7 @@ func _ready() -> void:
 		"debuff_stat": _p_debuff_stat,
 		"light_purify": _p_light_purify,
 		"transform": _p_transform,
+		"terrain_modify": _p_terrain_modify,
 	}
 
 
@@ -314,6 +315,40 @@ func _p_transform(prim: Dictionary, _caster: Node, stats: Node, ability_id: Stri
 	return rec
 
 
+## terrain_modify: con permanente:true incide la modifica nello stato del
+## mondo (WorldState), che la serializza nel save — un varco aperto resta
+## aperto (design-world.md cap. 4). Con permanente:false e' un effetto a
+## tempo sulla coda _pending. La modifica vera al tilemap la applichera' il
+## sistema del mondo di fase 6 leggendo WorldState.
+func _p_terrain_modify(prim: Dictionary, caster: Node, _stats: Node, _ability_id: String) -> Dictionary:
+	var tipo_modifica: String = str(prim.get("tipo_modifica", ""))
+	var raggio: float = _num(prim.get("raggio"), 0.0)
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var permanente: bool = _flag(prim.get("permanente"), false)
+
+	var pos: Vector2 = Vector2.ZERO
+	if caster is Node2D and (caster as Node2D).is_inside_tree():
+		pos = (caster as Node2D).global_position
+
+	var rec: Dictionary = {"tipo": "terrain_modify", "tipo_modifica": tipo_modifica,
+			"raggio": raggio, "durata": durata, "permanente": permanente,
+			"posizione": [pos.x, pos.y]}
+
+	if permanente:
+		var ws: Node = get_tree().root.get_node_or_null("WorldState")
+		if ws != null:
+			ws.call("registra_terreno", tipo_modifica, pos, raggio)
+			rec["applied"] = true
+		else:
+			rec["applied"] = false
+	else:
+		rec["applied"] = true
+		if durata > 0.0:
+			_pending.append({"kind": "terrain_temp", "caster": caster, "left": durata,
+					"tipo_modifica": tipo_modifica, "raggio": raggio})
+	return rec
+
+
 ## Annulla una trasformazione in corso "su richiesta". true se ce n'era una.
 func annulla_transform(ability_id: String) -> bool:
 	var mod_id: String = "transform:%s" % ability_id
@@ -530,7 +565,7 @@ func tick_effects(delta: float) -> void:
 		# un'istanza gia' liberata a una variabile Node e' un errore che
 		# interrompe il ciclo a meta' e lascia la coda sporca. L'ancora e' lo
 		# stats del bersaglio, o il caster per un'aura.
-		var raw: Variant = e["caster"] if kind == "aura" else e["stats"]
+		var raw: Variant = e["caster"] if e.has("caster") else e["stats"]
 		if not is_instance_valid(raw):
 			continue  # il bersaglio/caster non c'e' piu': l'effetto muore con lui
 		var anchor: Node = raw
@@ -584,7 +619,9 @@ func pending_count() -> int:
 func flush_effects() -> void:
 	for entry in _pending:
 		var e: Dictionary = entry
-		if str(e["kind"]) == "aura":
+		# Le entry ancorate al caster (aura, terrain_temp) non hanno un
+		# modificatore da togliere: si scartano e basta.
+		if not e.has("stats"):
 			continue
 		var raw: Variant = e["stats"]
 		if not is_instance_valid(raw):

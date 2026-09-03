@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 3
+const VERSIONE_CORRENTE := 4
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -56,6 +56,8 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		"evocazioni": (dati.get("evocazioni", []) as Array).duplicate(true),
 		# Pathway e Sequenza del giocatore (US-201). { pathway_id, sequence }.
 		"progressione": (dati.get("progressione", {}) as Dictionary).duplicate(true),
+		# Modifiche permanenti al terreno (US-203C). { terrain_mods: [...] }.
+		"mondo": (dati.get("mondo", {}) as Dictionary).duplicate(true),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -141,6 +143,8 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_1_a_2(doc)
 			2:
 				doc = _migra_2_a_3(doc)
+			3:
+				doc = _migra_3_a_4(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -165,6 +169,14 @@ func _migra_2_a_3(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v3 -> v4: lo stato del mondo (modifiche permanenti al terreno) non esisteva
+## (US-203C). Nessuna modifica pregressa: lista vuota.
+func _migra_3_a_4(doc: Dictionary) -> Dictionary:
+	if not doc.has("mondo"):
+		doc["mondo"] = {"terrain_mods": []}
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -177,6 +189,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"statistiche": _campo(raw, "statistiche", TYPE_DICTIONARY, {}),
 		"evocazioni": _campo(raw, "evocazioni", TYPE_ARRAY, []),
 		"progressione": _campo(raw, "progressione", TYPE_DICTIONARY, {}),
+		"mondo": _campo(raw, "mondo", TYPE_DICTIONARY, {}),
 	}
 
 

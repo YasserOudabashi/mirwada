@@ -1389,3 +1389,39 @@ sezione test aggiornata.
   (27 file). Nessuna regressione.
 - Primitive implementate: 11 -> 12 su 28.
 - Prossima storia: US-203C (terrain_modify + stato del mondo nel save).
+
+[2026-09-03] US-203C (2c) — terrain_modify + stato del mondo persistente
+
+- Cosa fatto:
+  - Autoload WorldState (scripts/world_state.gd), dopo GameState in
+    project.godot. _terrain_mods: Array di {tipo_modifica, posizione:[x,y],
+    raggio}. registra_terreno() (le duplicate esatte non si accumulano),
+    terreni(), pulisci(). per_salvataggio/da_salvataggio: rilettura NON
+    FIDATA - ogni voce validata con typeof(), le malformate scartate una a
+    una, raw non-oggetto -> lista vuota, mai crash. Stesso schema di
+    Progression (US-201).
+  - SAVE: SaveSystem VERSIONE_CORRENTE 3 -> 4. Campo "mondo" in salva() e
+    in _leggi_snapshot (_campo TYPE_DICTIONARY). _migra_3_a_4 aggiunge
+    {terrain_mods: []}. GameState.snapshot()/applica() agganciano
+    WorldState come gia' fanno con Progression.
+  - ability_engine._p_terrain_modify:
+    * permanente:true -> WorldState.registra_terreno(tipo, posizione del
+      caster, raggio). La modifica finisce nel save: un varco aperto resta
+      aperto (design-world.md cap. 4).
+    * permanente:false + durata > 0 -> _pending {kind:"terrain_temp"}
+      ancorata al caster, scade senza effetto. La modifica vera al tilemap
+      la applichera' il sistema del mondo di fase 6 leggendo WorldState.
+  - tick_effects: l'ancora dell'entry ora e' e["caster"] se c'e', altrimenti
+    e["stats"] (prima era gated solo su kind=="aura"; ora vale anche per
+    terrain_temp). flush_effects salta le entry senza "stats".
+  - validate_data.py: terrain_modify esige tipo_modifica non vuoto e
+    permanente bool (permanente decide se la modifica va nel save).
+- Come verificato: 149 test headless (142 + 7 in test_terrain_modify.gd:
+  registro, permanente nello stato del mondo alla posizione del caster,
+  round-trip del save, temporanea in coda che scade, da_salvataggio scarta
+  le voci malformate, migrazione v3->v4, execute(tg_spezza_barriera)
+  compone terrain_modify + light_purify senza warning). validator exit 0.
+  Boot pulito. Nessuna regressione: test_save_system e test_progression
+  verdi con la catena di migrazione 1->2->3->4.
+- Primitive implementate: 12 -> 13 su 28. US-203 (2a/2b/2c) CHIUSA.
+- Prossima storia: US-228 (riscrittura dati di darkness_1 senza probability_shift).
