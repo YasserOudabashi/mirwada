@@ -2175,3 +2175,49 @@ sezione test aggiornata.
   time_in_state 'trasformato', tipo_arma) - emessi a mano nel test, si
   popoleranno da soli quando quei sistemi esisteranno.
 - Prossima storia: US-220 (i18n reale) - inizio blocco I.
+
+[2026-09-03] US-220 — i18n reale (R-12): cataloghi delle stringhe dei dati
+
+- DUE sistemi i18n, ora distinti e documentati (CLAUDE.md nuova sez. "i18n"):
+  1. UI chrome (HUD): assets/i18n/strings.csv -> .translation, tr("HUD_..").
+     Invariato.
+  2. Stringhe DEI DATI: data/i18n/it.json + en.json, GameData.tr_data(key).
+- CONVENZIONE UNICA delle chiavi dei dati (prima ne convivevano tre):
+  <categoria>[.<pathway_id>].<local>
+  - il segmento pathway_id c'e' per sequence/ability/acting/characteristic/
+    form; assente per anchor/synergy e per 'pathway' stesso
+  - local = id verbatim (anchor/synergy meno il prefisso di tipo), numero per
+    sequence/characteristic
+  Le uniche divergenti erano acting.* (mancava il pathway: acting.tg_9_x ->
+  acting.twilight_giant.tg_9_x, 31 chiavi) e 3 abilita' del Fool che avevano
+  perso il prefisso id (ability.fool.divinazione_pendolo ->
+  ability.fool.fool_divinazione_pendolo). Riscritte dal tool nei file di dati.
+- tools/generate_i18n_stubs.py (nuovo): scandisce data/ (esclusi schema/,
+  i18n/, pathways_deferred/), riscrive le chiavi non canoniche sul posto,
+  rigenera i due cataloghi. Chiavi nuove: seed dal campo gemello in chiaro
+  (name/descrizione) se c'e', altrimenti stub "TODO <chiave>". Preserva le
+  traduzioni autoriali. --check per la CI/idempotenza (exit 1 se serve un run).
+  Risultato: it.json 195 chiavi, 141 reali (tutte le acting_actions + nomi di
+  Pathway/Sequenza dai campi in chiaro), 54 stub (abilita'/caratteristiche/
+  ancore/forme: non hanno testo in chiaro nei dati, traduzione da scrivere).
+  en.json: {} - incompleto per scelta, tr_data ricade su it.
+- GameData: _load_flat() per i cataloghi piatti {chiave: stringa};
+  tr_data(key, locale="") con fallback en->it->chiave (mai vuoto, mai crash);
+  has_translation(key) (false sugli stub "TODO "); i18n_keys().
+- validate_data.py: nuovo blocco R-12. Cammina data/ (stesso skip del tool),
+  raccoglie ogni *_i18n dei dati attivi, ERRORE se una chiave non ha voce in
+  it.json (col comando da lanciare). WARN su chiavi orfane in it.json e sul
+  conteggio stub (non e' un errore: e' lavoro di traduzione).
+- Come verificato: 272 test headless (267 + 5 in test_i18n_data.gd: catalogo
+  caricato, chiave presente traduce ed e' testo vero, chiave mancante ->
+  se stessa, fallback en->it, ogni *_i18n dei Pathway attivi risolve - lo
+  stesso invariante del validator dentro il motore). validate_data.py exit 0
+  (9 warning: gli 8 preesistenti + il conteggio stub). generate_i18n_stubs.py
+  --check exit 0 (idempotente). Nessuna verifica a schermo: tr_data non ha
+  ancora un consumatore visivo (la UI a libro e' US-221+); il HUD usa l'altro
+  sistema (tr()), test_i18n_hud verde.
+- Resta aperto: 54 stringhe da tradurre davvero (abilita'/caratteristiche/
+  ancore/forme). en.json e' vuoto: la traduzione inglese e' tutta da fare.
+  Entrambe sono lavoro di contenuto, non di codice - il validator le conta
+  come warning, non le pretende.
+- Prossima storia: US-221 (shell del libro - parte 1: controller e dati).

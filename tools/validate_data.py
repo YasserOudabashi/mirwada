@@ -571,6 +571,49 @@ def main():
                     warn(f"{rel} [{sid}]: richiede i tag {irraggiungibili} che nessun pathway "
                          f"attivo porta: sinergia irraggiungibile finche' il suo gruppo resta differito.")
 
+    # --- i18n dei dati (data/i18n/, US-220 / R-12) ---
+    # Ogni chiave *_i18n referenziata dai dati attivi deve avere una voce in
+    # data/i18n/it.json. Una chiave che punta nel vuoto e' testo mancante che
+    # si scoprirebbe solo a schermo. pathways_deferred/ e schema/ sono fuori
+    # scope (Pathway differiti / documentazione del formato).
+    i18n_it = load_json(os.path.join(DATA, "i18n", "it.json")) or {}
+    skip = {os.path.join(DATA, "schema"), os.path.join(DATA, "i18n"),
+            os.path.join(DATA, "pathways_deferred")}
+    referenced = {}  # chiave -> primo file che la usa
+
+    def walk_i18n(node, where):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                if k.endswith("_i18n") and isinstance(v, str):
+                    referenced.setdefault(v, where)
+                else:
+                    walk_i18n(v, where)
+        elif isinstance(node, list):
+            for x in node:
+                walk_i18n(x, where)
+
+    for dirpath, dirnames, filenames in os.walk(DATA):
+        if any(dirpath == s or dirpath.startswith(s + os.sep) for s in skip):
+            dirnames[:] = []
+            continue
+        for fn in sorted(filenames):
+            if fn.endswith(".json"):
+                p = os.path.join(dirpath, fn)
+                walk_i18n(load_json(p), os.path.relpath(p, ROOT).replace(os.sep, "/"))
+
+    for key, where in sorted(referenced.items()):
+        if key not in i18n_it:
+            err(f"{where}: chiave i18n '{key}' non ha una voce in data/i18n/it.json. "
+                f"Lancia: python tools/generate_i18n_stubs.py")
+    orphans = sorted(k for k in i18n_it if k not in referenced)
+    if orphans:
+        warn(f"data/i18n/it.json: {len(orphans)} chiavi non piu' referenziate dai dati "
+             f"(es. {orphans[0]}). Lancia generate_i18n_stubs.py per ripulire.")
+    stubs = sum(1 for v in i18n_it.values() if isinstance(v, str) and v.startswith("TODO "))
+    if stubs:
+        warn(f"data/i18n/it.json: {stubs}/{len(i18n_it)} stringhe ancora da tradurre "
+             f"(valore 'TODO ...'). Non e' un errore: e' lavoro di traduzione.")
+
     report()
     return 1 if errors else 0
 

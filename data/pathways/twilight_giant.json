@@ -39,7 +39,7 @@
           "target": 3,
           "progresso": 0.35,
           "ripetibile": false,
-          "descrizione_i18n": "acting.tg_9_duello_puro",
+          "descrizione_i18n": "acting.twilight_giant.tg_9_duello_puro",
           "descrizione": "Sconfiggi 3 nemici senza usare abilita' Beyonder"
         },
         {
@@ -51,7 +51,7 @@
           "target": 2000,
           "progresso": 0.3,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_9_allenamento",
+          "descrizione_i18n": "acting.twilight_giant.tg_9_allenamento",
           "descrizione": "Infliggi 2000 danni fisici"
         },
         {
@@ -61,7 +61,7 @@
           "target": 300,
           "progresso": 0.35,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_9_protettore",
+          "descrizione_i18n": "acting.twilight_giant.tg_9_protettore",
           "descrizione": "Assorbi 300 danni diretti agli alleati"
         }
       ],
@@ -104,7 +104,7 @@
           "target": 5,
           "progresso": 0.4,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_8_mani_nude",
+          "descrizione_i18n": "acting.twilight_giant.tg_8_mani_nude",
           "descrizione": "Sconfiggi 5 nemici a mani nude"
         },
         {
@@ -116,7 +116,7 @@
           "target": 10,
           "progresso": 0.35,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_8_parate",
+          "descrizione_i18n": "acting.twilight_giant.tg_8_parate",
           "descrizione": "10 parate perfette in un solo combattimento"
         },
         {
@@ -126,7 +126,7 @@
           "target": 1500,
           "progresso": 0.25,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_8_incassa",
+          "descrizione_i18n": "acting.twilight_giant.tg_8_incassa",
           "descrizione": "Subisci 1500 danni senza morire"
         }
       ],
@@ -170,7 +170,7 @@
           "target": 15,
           "progresso": 0.4,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_7_tre_armi",
+          "descrizione_i18n": "acting.twilight_giant.tg_7_tre_armi",
           "descrizione": "Sconfiggi 15 nemici alternando tipi di arma"
         },
         {
@@ -182,7 +182,7 @@
           "target": 8000,
           "progresso": 0.35,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_7_maestria",
+          "descrizione_i18n": "acting.twilight_giant.tg_7_maestria",
           "descrizione": "Infliggi 8000 danni fisici"
         },
         {
@@ -194,7 +194,7 @@
           "target": 3,
           "progresso": 0.25,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_7_pulizia",
+          "descrizione_i18n": "acting.twilight_giant.tg_7_pulizia",
           "descrizione": "Completa 3 aree senza perdere alleati"
         }
       ],
@@ -237,7 +237,7 @@
           "target": 600,
           "progresso": 0.4,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_6_alba",
+          "descrizione_i18n": "acting.twilight_giant.tg_6_alba",
           "descrizione": "Resta trasformato per 10 minuti cumulativi"
         },
         {
@@ -249,7 +249,7 @@
           "target": 8,
           "progresso": 0.35,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_6_giuramento",
+          "descrizione_i18n": "acting.twilight_giant.tg_6_giuramento",
           "descrizione": "Aiuta 8 NPC in pericolo"
         },
         {
@@ -261,7 +261,7 @@
           "target": 5000,
           "progresso": 0.25,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_6_luce",
+          "descrizione_i18n": "acting.twilight_giant.tg_6_luce",
           "descrizione": "Infliggi 5000 danni di luce"
         }
       ],
@@ -302,7 +302,7 @@
           "target": 5000,
           "progresso": 0.5,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_5_scudo",
+          "descrizione_i18n": "acting.twilight_giant.tg_5_scudo",
           "descrizione": "Assorbi 5000 danni diretti agli alleati o al pet"
         },
         {
@@ -314,7 +314,7 @@
           "target": 8,
           "progresso": 0.35,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_5_nessun_caduto",
+          "descrizione_i18n": "acting.twilight_giant.tg_5_nessun_caduto",
           "descrizione": "Completa 8 aree senza perdere nessun alleato"
         },
         {
@@ -324,7 +324,7 @@
           "target": 12000,
           "progresso": 0.25,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_5_incassa",
+          "descrizione_i18n": "acting.twilight_giant.tg_5_incassa",
           "descrizione": "Subisci 12000 danni senza morire"
         }
       ],
@@ -368,7 +368,7 @@
           "target": 30,
           "progresso": 0.4,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_4_purifica",
+          "descrizione_i18n": "acting.twilight_giant.tg_4_purifica",
           "descrizione": "Purifica 30 creature spirituali o non-morte"
         },
         {
@@ -381,7 +381,7 @@
           "target": 10,
           "progresso": 0.35,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_4_concoction",
+          "descrizione_i18n": "acting.twilight_giant.tg_4_concoction",
           "descrizione": "Prepara 10 concoction di qualita' alta"
         },
         {
@@ -393,7 +393,7 @@
           "target": 5,
           "progresso": 0.3,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_4_caccia",
+          "descrizione_i18n": "acting.twilight_giant.tg_4_caccia",
           "descrizione": "Sconfiggi 5 Beyonder di Sequenza 6 o superiore"
         }
       ],
@@ -449,7 +449,7 @@
           "target": 10,
           "progresso": 0.45,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_3_giudizio",
+          "descrizione_i18n": "acting.twilight_giant.tg_3_giudizio",
           "descrizione": "Risparmia 10 nemici che si arrendono"
         },
         {
@@ -461,7 +461,7 @@
           "target": 1800,
           "progresso": 0.35,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_3_lama",
+          "descrizione_i18n": "acting.twilight_giant.tg_3_lama",
           "descrizione": "Mantieni l'arma di luce attiva per 30 minuti cumulativi"
         },
         {
@@ -474,7 +474,7 @@
           "target": 20000,
           "progresso": 0.3,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_3_purifica",
+          "descrizione_i18n": "acting.twilight_giant.tg_3_purifica",
           "descrizione": "Infliggi 20000 danni di luce a creature spirituali"
         }
       ],
@@ -531,7 +531,7 @@
           "target": 1,
           "progresso": 0.55,
           "ripetibile": false,
-          "descrizione_i18n": "acting.tg_2_accetta_decadimento",
+          "descrizione_i18n": "acting.twilight_giant.tg_2_accetta_decadimento",
           "descrizione": "Lascia decadere volontariamente una struttura che avevi costruito"
         },
         {
@@ -543,7 +543,7 @@
           "target": 25,
           "progresso": 0.3,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_2_crepuscolo",
+          "descrizione_i18n": "acting.twilight_giant.tg_2_crepuscolo",
           "descrizione": "Usa il Crepuscolo 25 volte"
         },
         {
@@ -555,7 +555,7 @@
           "target": 40000,
           "progresso": 0.3,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_2_declino",
+          "descrizione_i18n": "acting.twilight_giant.tg_2_declino",
           "descrizione": "Infliggi 40000 danni da decadimento"
         }
       ],
@@ -611,7 +611,7 @@
           "target": 3,
           "progresso": 0.55,
           "ripetibile": false,
-          "descrizione_i18n": "acting.tg_1_angelo",
+          "descrizione_i18n": "acting.twilight_giant.tg_1_angelo",
           "descrizione": "Sconfiggi 3 Beyonder di Sequenza 2 o superiore"
         },
         {
@@ -623,7 +623,7 @@
           "target": 10,
           "progresso": 0.3,
           "ripetibile": true,
-          "descrizione_i18n": "acting.tg_1_barriera",
+          "descrizione_i18n": "acting.twilight_giant.tg_1_barriera",
           "descrizione": "Apri 10 varchi in barriere considerate inviolabili"
         },
         {
@@ -635,7 +635,7 @@
           "target": 1,
           "progresso": 0.3,
           "ripetibile": false,
-          "descrizione_i18n": "acting.tg_1_rituale",
+          "descrizione_i18n": "acting.twilight_giant.tg_1_rituale",
           "descrizione": "Completa il rituale di Sequenza 1 senza interruzioni"
         }
       ],
@@ -691,7 +691,7 @@
           "target": 1,
           "progresso": 1.0,
           "ripetibile": false,
-          "descrizione_i18n": "acting.tg_0_unicita",
+          "descrizione_i18n": "acting.twilight_giant.tg_0_unicita",
           "descrizione": "Rivendica la Sequenza 0 sconfiggendo chi la occupa"
         }
       ],

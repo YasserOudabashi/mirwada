@@ -26,6 +26,10 @@ const PATH_CHARACTERISTICS := "res://data/characteristics.json"
 const PATH_FORMULAS := "res://data/potions/formulas.json"
 const PATH_ANCHORS := "res://data/anchors.json"
 const PATH_STATUS := "res://data/status_effects.json"
+## Cataloghi di stringhe DEI DATI (US-220). Sistema separato dal tr() di Godot
+## (assets/i18n/strings.csv), che copre solo la UI chrome. Vedi CLAUDE.md.
+const PATH_I18N_IT := "res://data/i18n/it.json"
+const PATH_I18N_EN := "res://data/i18n/en.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -47,6 +51,8 @@ var _characteristics: Dictionary = {}
 var _formulas: Dictionary = {}
 var _anchors: Dictionary = {}
 var _statuses: Dictionary = {}
+var _i18n_it: Dictionary = {}
+var _i18n_en: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -101,6 +107,8 @@ func load_all() -> void:
 	_load_single(PATH_FORMULAS, "formulas", _formulas, TYPE_DICTIONARY)
 	_load_single(PATH_ANCHORS, "anchors", _anchors, TYPE_ARRAY)
 	_load_single(PATH_STATUS, "statuses", _statuses, TYPE_DICTIONARY)
+	_load_flat(PATH_I18N_IT, _i18n_it)
+	_load_flat(PATH_I18N_EN, _i18n_en)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -258,6 +266,31 @@ func get_status_effect(id: String) -> Dictionary:
 	return _dict_or_empty(_dict_or_empty(_statuses.get("statuses")).get(id))
 
 
+## --- Stringhe dei dati (data/i18n/, US-220) ---
+## Risolve una chiave *_i18n presa da un file di dati. Ordine: catalogo della
+## lingua richiesta -> catalogo italiano -> la chiave stessa (mai stringa
+## vuota, mai crash). locale "" = lingua corrente di TranslationServer.
+## NON usare per la UI chrome (HUD): quella passa da tr()/strings.csv.
+func tr_data(key: String, locale: String = "") -> String:
+	if key.is_empty():
+		return ""
+	var lang: String = locale if not locale.is_empty() else TranslationServer.get_locale()
+	if lang.begins_with("en") and _i18n_en.has(key):
+		return str(_i18n_en[key])
+	if _i18n_it.has(key):
+		return str(_i18n_it[key])
+	return key
+
+
+## true se la chiave ha una traduzione italiana vera (non uno stub "TODO ...").
+func has_translation(key: String) -> bool:
+	return _i18n_it.has(key) and not str(_i18n_it[key]).begins_with("TODO ")
+
+
+func i18n_keys() -> Array:
+	return _i18n_it.keys()
+
+
 ## La Caratteristica di quel (Pathway, Sequenza). {} se non esiste.
 func characteristic_for(pathway_id: String, sequence: int) -> Dictionary:
 	for c in _array_or_empty(_characteristics.get("characteristics")):
@@ -366,6 +399,17 @@ func _load_single(path: String, key: String, target: Dictionary, key_type: int) 
 	# Sul posto, per non invalidare chi tiene gia' il riferimento.
 	target.clear()
 	target.merge(doc, true)
+
+
+## Catalogo i18n: oggetto JSON piatto {chiave: stringa}. Radice non-oggetto o
+## file mancante -> catalogo vuoto (tr_data ricade sulla chiave), errore
+## registrato come per ogni altro file.
+func _load_flat(path: String, target: Dictionary) -> void:
+	var doc: Dictionary = _read_json(path)
+	target.clear()
+	for k in doc:
+		if typeof(doc[k]) == TYPE_STRING:
+			target[k] = doc[k]
 
 
 ## Sostituisce il contenuto di index[id] SENZA cambiare l'oggetto Dictionary,

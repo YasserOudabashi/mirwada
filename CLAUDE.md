@@ -132,6 +132,47 @@ codice dedicate**. È il modello da imitare per ogni story di dati.
   perfetta sono dati. Tarare il feel deve costare secondi, non ricompilazioni.
 - **i18n dal giorno 1**: nessun testo hardcoded, nemmeno nei placeholder.
 
+## i18n — due sistemi, una convenzione per le stringhe dei dati
+
+Il gioco ha **due** cataloghi di stringhe, per scopi diversi:
+
+1. **UI chrome** (HUD, etichette del motore): `assets/i18n/strings.csv` →
+   `.translation` compilati, risolti con `tr("HUD_...")` di Godot. Chiavi in
+   `SCREAMING_SNAKE`. Resta com'e'.
+2. **Stringhe dei dati** (nomi di Pathway/Sequenza/abilita', descrizioni delle
+   azioni di recitazione, Ancore, Caratteristiche, forme, sinergie):
+   `data/i18n/it.json` + `data/i18n/en.json`, risolti con
+   `GameData.tr_data(key)`. Le chiavi sono i valori dei campi `*_i18n` sparsi
+   nei file di `data/`.
+
+**Convenzione unica delle chiavi dei dati** (`US-220`), una sola forma:
+
+```
+<categoria>[.<pathway_id>].<local>
+```
+
+- `categoria`: `pathway` | `sequence` | `ability` | `acting` |
+  `characteristic` | `form` | `anchor` | `synergy`
+- `<pathway_id>` è presente per le entità che appartengono a un Pathway
+  (`sequence`, `ability`, `acting`, `characteristic`, `form`); **assente** per
+  le entità globali (`anchor`, `synergy`) e per `pathway` stesso
+- `local`: l'`id` dell'entità verbatim; il **numero** per `sequence` e
+  `characteristic`; per `pathway` è l'id del Pathway. Per `anchor`/`synergy`
+  si toglie il prefisso di tipo ridondante (`anchor_mirco` → `anchor.mirco`).
+
+Esempi: `pathway.twilight_giant`, `sequence.twilight_giant.9`,
+`ability.twilight_giant.tg_fendente_pesante`,
+`acting.twilight_giant.tg_9_duello_puro`, `anchor.mirco`,
+`synergy.inganno_probabilita`.
+
+`tools/generate_i18n_stubs.py` scandisce `data/` (esclusi `schema/`, `i18n/`,
+`pathways_deferred/`), **riscrive** le chiavi non canoniche nei file di dati,
+e rigenera i due cataloghi: le traduzioni autoriali si preservano, le chiavi
+nuove partono da un eventuale testo in chiaro già nei dati (campo gemello
+`name`/`descrizione`) o da uno stub `TODO <chiave>`. Il validator (`R-12`)
+dà **errore** se una chiave `*_i18n` dei dati attivi non ha voce in `it.json`.
+Riattivi un gruppo differito → rilancia il tool e traduci i nuovi stub.
+
 ## Non-goals
 
 Multiplayer, 3D, generazione procedurale del mondo, monetizzazione,

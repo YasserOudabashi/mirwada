@@ -556,8 +556,8 @@
       ],
       "priority": 27,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "DUE sistemi i18n distinti e documentati (CLAUDE.md nuova sez. 'i18n'): (1) UI chrome / HUD = assets/i18n/strings.csv -> .translation, tr('HUD_..'), invariato; (2) stringhe DEI DATI = data/i18n/it.json + en.json, GameData.tr_data(key). CONVENZIONE UNICA (prima tre): <categoria>[.<pathway_id>].<local> - pathway_id presente per sequence/ability/acting/characteristic/form, assente per anchor/synergy e per 'pathway'; local = id verbatim (anchor/synergy meno il prefisso di tipo) o numero per sequence/characteristic. Le divergenti erano solo acting.* (mancava il pathway: 31 chiavi tg + fool) e 3 abilita' Fool senza prefisso id: riscritte dal tool nei dati (diff pulito, solo le righe delle chiavi). tools/generate_i18n_stubs.py (nuovo): scandisce data/ (esclusi schema/, i18n/, pathways_deferred/), canonicalizza sul posto, rigenera i cataloghi; chiavi nuove seed dal campo gemello in chiaro (name/descrizione) o stub 'TODO <chiave>'; preserva le traduzioni autoriali; --check per CI/idempotenza. Risultato: it.json 195 chiavi, 141 reali (tutte le acting_actions + nomi Pathway/Sequenza), 54 stub (abilita'/caratteristiche/ancore/forme: nessun testo in chiaro nei dati). en.json {} incompleto per scelta, tr_data ricade su it. GameData: _load_flat(), tr_data(key, locale='') fallback en->it->chiave (mai vuoto/crash), has_translation(), i18n_keys(). validate_data.py: blocco R-12 - ERRORE se una *_i18n dei dati attivi non ha voce in it.json; WARN su orfane e sul conteggio stub. 272 test headless (267 + 5 in test_i18n_data.gd), validator exit 0 (9 warn: 8 preesistenti + stub count), --check exit 0. Nessuna verifica a schermo: tr_data non ha consumatore visivo finche' non c'e' la UI a libro (US-221+). Resta lavoro di traduzione (54 stringhe it + tutto l'inglese): warning, non preteso dal validator."
     },
     {
       "id": "US-221",

@@ -40,7 +40,7 @@
           "target": 20,
           "progresso": 0.25,
           "ripetibile": true,
-          "descrizione_i18n": "acting.fool_9_predizione",
+          "descrizione_i18n": "acting.fool.fool_9_predizione",
           "descrizione": "Esegui 20 divinazioni"
         },
         {
@@ -52,7 +52,7 @@
           "target": 10,
           "progresso": 0.35,
           "ripetibile": true,
-          "descrizione_i18n": "acting.fool_9_inganno",
+          "descrizione_i18n": "acting.fool.fool_9_inganno",
           "descrizione": "Inganna 10 NPC facendogli cambiare comportamento"
         },
         {
@@ -64,7 +64,7 @@
           "target": 3,
           "progresso": 0.4,
           "ripetibile": false,
-          "descrizione_i18n": "acting.fool_9_senza_sangue",
+          "descrizione_i18n": "acting.fool.fool_9_senza_sangue",
           "descrizione": "Completa 3 aree ostili senza uccidere nessuno"
         }
       ],

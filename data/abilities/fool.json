@@ -5,7 +5,7 @@
     {
       "schema_version": 1,
       "id": "fool_divinazione_pendolo",
-      "name_i18n": "ability.fool.divinazione_pendolo",
+      "name_i18n": "ability.fool.fool_divinazione_pendolo",
       "sequence_id": "fool_9",
       "costo_spiritualita": 8,
       "cooldown": 20.0,
@@ -34,7 +34,7 @@
     {
       "schema_version": 1,
       "id": "fool_velo_illusorio",
-      "name_i18n": "ability.fool.velo_illusorio",
+      "name_i18n": "ability.fool.fool_velo_illusorio",
       "sequence_id": "fool_9",
       "costo_spiritualita": 12,
       "cooldown": 6.0,
@@ -70,7 +70,7 @@
     {
       "schema_version": 1,
       "id": "fool_lettura_espressioni",
-      "name_i18n": "ability.fool.lettura_espressioni",
+      "name_i18n": "ability.fool.fool_lettura_espressioni",
       "sequence_id": "fool_9",
       "costo_spiritualita": 4,
       "cooldown": 2.0,
