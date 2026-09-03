@@ -1881,3 +1881,34 @@ sezione test aggiornata.
 - VERIFICA A SCHERMO (finestra reale): label nascosta / "solo forzando"
   con acting 0 / "Avanzamento pronto" + barra recitazione a 1.0 completa.
 - Prossima storia: US-214 (Layer audio della follia).
+
+[2026-09-03] US-214 — Layer audio della follia
+
+- audio_manager.gd: carica audio.json.madness_layer, si aggancia a
+  Madness.madness_changed -> aggiorna_follia(valore).
+  - _whisper: AudioStreamPlayer sul bus whisper. _soglia_follia_attiva(v)
+    = la soglia piu' alta con madness_min <= v. Il volume_db del bus
+    whisper e' quello della soglia (GUIDATO dalla follia, non fisso), il
+    detune diventa pitch_scale, il loop e' un wash sintetizzato per soglia
+    (amb_whisper_faint/words/names/chorus). Sotto la prima soglia -> bus
+    muto + whisper.stop().
+  - SOGLIA 80: duck_music_db -20 abbassa il bus music (base memorizzato in
+    _ready, ripristinato scendendo sotto 80).
+  - disattiva_sussurri (imposta_accessibilita) -> set_bus_mute(whisper)
+    SENZA toccare Madness; imposta_accessibilita riapplica al cambio.
+  - ONE-SHOT: _process, sopra one_shot_casuali.madness_min (25), timer
+    random in intervallo_secondi, poi tenta_one_shot() (pubblico) suona un
+    sfx casuale da one_shot_casuali.sfx. disattiva_sussurri li sopprime.
+  - SOGLIA 55: imposta_nomi_sussurro(nomi)/nomi_sussurro() - gancio per
+    NPC incontrati e Ancore (AnchorSystem US-216), fallback generico se
+    vuoto.
+  - 9 sfx nuovi in SFX_SPEC (4 one-shot + 4 wash), tutti sintetizzati
+    (US-019, niente file).
+- Come verificato: 227 test headless (221 + 6 in test_madness_audio.gd:
+  whisper muto sotto la prima soglia, volume guidato dalla follia (-24 a
+  35, -10 a 85), duck musica a 80 + ripristino, disattiva_sussurri
+  silenzia e resta muto, one-shot solo sopra 25 e soppressi da
+  disattiva_sussurri, nomi con fallback). validator 0.
+- Verifica all'orecchio non possibile (audio sintetizzato). Lo stato dei
+  bus (mute, volume_db, duck) e' coperto dai test.
+- Prossima storia: US-215 (Effetti visivi della follia).

@@ -41,6 +41,16 @@ const SFX_SPEC := {
 	"sfx_tell_unblock": [330.0, 0.30, 0.85],
 	"sfx_tell_ranged": [560.0, 0.22, 0.05],
 	"sfx_tell_ritual": [110.0, 0.80, 0.10],
+	# One-shot casuali della follia (US-214): suoni senza causa visibile.
+	"sfx_whisper_name": [430.0, 0.5, 0.4],
+	"sfx_step_behind": [90.0, 0.18, 0.6],
+	"sfx_door_close": [120.0, 0.3, 0.35],
+	"sfx_breath": [200.0, 0.6, 0.7],
+	# Wash dei sussurri per soglia di follia (loop sintetizzati).
+	"amb_whisper_faint": [70.0, 1.2, 0.85],
+	"amb_whisper_words": [90.0, 1.2, 0.8],
+	"amb_whisper_names": [110.0, 1.4, 0.75],
+	"amb_whisper_chorus": [140.0, 1.6, 0.7],
 }
 
 var _feedback: Dictionary = {}
@@ -53,6 +63,18 @@ var _pool_i: int = 0
 ## quelli non scorrono nel runner dei test e lasciano time_scale a 0.05.
 var _hitstop_fine_ms: int = 0
 
+## --- Layer audio della follia (US-214) ---
+var _madness_layer: Dictionary = {}
+var _whisper: AudioStreamPlayer = null
+var _music_db_base: float = 0.0
+var _music_ducked: bool = false
+var _one_shot_left: float = 0.0
+var _follia_corrente: float = 0.0
+## Nomi che i sussurri di soglia 55 pronunciano (NPC incontrati, Ancore).
+## Li popola AnchorSystem / il sistema NPC; se vuoto si usa un set generico.
+var _nomi_sussurro: Array = []
+const _NOMI_GENERICI := ["...", "torna", "sei qui", "non e' reale"]
+
 
 func _ready() -> void:
 	var gd: Node = get_node_or_null("/root/GameData")
@@ -61,12 +83,25 @@ func _ready() -> void:
 		_feedback = gd.call("get_audio", "combat_feedback")
 		_telegraph = gd.call("get_audio", "telegraph")
 		_acc = (gd.call("get_audio", "accessibilita") as Dictionary).duplicate(true)
+		_madness_layer = gd.call("get_audio", "madness_layer")
 
 	for i in 6:
 		var p := AudioStreamPlayer.new()
 		p.bus = "sfx" if AudioServer.get_bus_index("sfx") != -1 else "Master"
 		add_child(p)
 		_pool.append(p)
+
+	_whisper = AudioStreamPlayer.new()
+	_whisper.bus = "whisper" if AudioServer.get_bus_index("whisper") != -1 else "Master"
+	add_child(_whisper)
+	var mi: int = AudioServer.get_bus_index("music")
+	if mi != -1:
+		_music_db_base = AudioServer.get_bus_volume_db(mi)
+
+	var follia: Node = get_node_or_null("/root/Madness")
+	if follia != null and follia.has_signal("madness_changed"):
+		follia.madness_changed.connect(func(v: float, _s: int) -> void: aggiorna_follia(v))
+	_ripianifica_one_shot()
 
 
 # --- API -----------------------------------------------------------------
@@ -110,6 +145,8 @@ func tell(id: String, posizione_mondo: Vector2) -> float:
 ## disattiva_sussurri...). Le legge una UI di impostazioni, per ora l'API.
 func imposta_accessibilita(chiave: String, valore: Variant) -> void:
 	_acc[chiave] = valore
+	if chiave == "disattiva_sussurri":
+		aggiorna_follia(_follia_corrente)
 
 
 func accessibilita(chiave: String) -> Variant:
@@ -118,6 +155,88 @@ func accessibilita(chiave: String) -> Variant:
 
 func hitstop_in_corso() -> bool:
 	return Time.get_ticks_msec() < _hitstop_fine_ms
+
+
+# --- Layer audio della follia (US-214) --------------------------------------
+
+## Guida il bus "whisper" e il duck della musica dal valore di follia. La
+## MECCANICA non passa da qui: disattiva_sussurri silenzia solo l'audio.
+func aggiorna_follia(valore: float) -> void:
+	_follia_corrente = valore
+	var wi: int = AudioServer.get_bus_index("whisper")
+	if wi == -1:
+		return
+
+	var soglia: Dictionary = _soglia_follia_attiva(valore)
+	var silenzia: bool = bool(_acc.get("disattiva_sussurri", false))
+	AudioServer.set_bus_mute(wi, silenzia or soglia.is_empty())
+
+	if not soglia.is_empty():
+		AudioServer.set_bus_volume_db(wi, float(soglia.get("volume_db", -24.0)))
+		if _whisper != null:
+			_whisper.pitch_scale = 1.0 + float(soglia.get("detune", 0.0))
+			var loop_sfx: String = str(soglia.get("loop", "amb_whisper_faint"))
+			if not _whisper.playing or _whisper.get_meta("loop", "") != loop_sfx:
+				_whisper.stream = _stream_per(loop_sfx)
+				_whisper.set_meta("loop", loop_sfx)
+				_whisper.play()
+	elif _whisper != null:
+		_whisper.stop()
+
+	# Duck della musica alla soglia che lo dichiara (80).
+	var duck: float = float(soglia.get("duck_music_db", 0.0)) if not soglia.is_empty() else 0.0
+	_applica_duck(duck)
+
+
+func imposta_nomi_sussurro(nomi: Array) -> void:
+	_nomi_sussurro = nomi.duplicate()
+
+
+func nomi_sussurro() -> Array:
+	return _nomi_sussurro if not _nomi_sussurro.is_empty() else _NOMI_GENERICI
+
+
+## Un one-shot casuale della follia. Pubblico per i test.
+func tenta_one_shot() -> bool:
+	var spec: Dictionary = _madness_layer.get("one_shot_casuali", {})
+	if _follia_corrente < float(spec.get("madness_min", 25.0)):
+		return false
+	if bool(_acc.get("disattiva_sussurri", false)):
+		return false
+	var lista: Array = spec.get("sfx", [])
+	if lista.is_empty():
+		return false
+	_suona(str(lista[randi() % lista.size()]), 0.1)
+	return true
+
+
+func _soglia_follia_attiva(valore: float) -> Dictionary:
+	var scelta: Dictionary = {}
+	for s in _madness_layer.get("soglie", []):
+		if typeof(s) == TYPE_DICTIONARY and valore >= float((s as Dictionary).get("madness_min", 999.0)):
+			scelta = s
+	return scelta
+
+
+func _applica_duck(duck_db: float) -> void:
+	var mi: int = AudioServer.get_bus_index("music")
+	if mi == -1:
+		return
+	var vuole_duck: bool = duck_db < 0.0
+	if vuole_duck and not _music_ducked:
+		AudioServer.set_bus_volume_db(mi, _music_db_base + duck_db)
+		_music_ducked = true
+	elif not vuole_duck and _music_ducked:
+		AudioServer.set_bus_volume_db(mi, _music_db_base)
+		_music_ducked = false
+
+
+func _ripianifica_one_shot() -> void:
+	var spec: Dictionary = _madness_layer.get("one_shot_casuali", {})
+	var iv: Array = spec.get("intervallo_secondi", [45, 180])
+	var lo: float = float(iv[0]) if iv.size() > 0 else 45.0
+	var hi: float = float(iv[1]) if iv.size() > 1 else 180.0
+	_one_shot_left = randf_range(lo, hi)
 
 
 # --- Interno -----------------------------------------------------------
@@ -181,10 +300,17 @@ func _sintetizza(freq: float, durata: float, rumore: float) -> AudioStreamWAV:
 	return w
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _hitstop_fine_ms > 0 and Time.get_ticks_msec() >= _hitstop_fine_ms:
 		_hitstop_fine_ms = 0
 		Engine.time_scale = 1.0
+
+	# One-shot casuali della follia (US-214).
+	if _follia_corrente >= float((_madness_layer.get("one_shot_casuali", {}) as Dictionary).get("madness_min", 25.0)):
+		_one_shot_left -= delta
+		if _one_shot_left <= 0.0:
+			tenta_one_shot()
+			_ripianifica_one_shot()
 
 
 func _exit_tree() -> void:

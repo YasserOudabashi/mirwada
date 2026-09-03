@@ -367,8 +367,8 @@
       ],
       "priority": 18,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "audio_manager.gd: carica audio.json.madness_layer, si aggancia a Madness.madness_changed -> aggiorna_follia(valore). Player _whisper (AudioStreamPlayer sul bus whisper). _soglia_follia_attiva(v) = la soglia piu' alta con madness_min <= v; il volume_db del bus whisper e' quello della soglia (guidato dalla follia, non fisso), il detune diventa pitch_scale, il loop e' un wash sintetizzato per soglia (amb_whisper_*). Sotto la prima soglia -> bus muto + whisper.stop(). SOGLIA 80: duck_music_db -20 abbassa il bus music (base memorizzato in _ready, ripristinato quando si scende sotto 80). disattiva_sussurri (imposta_accessibilita) -> AudioServer.set_bus_mute(whisper) senza toccare Madness; il re-hook riapplica sul cambio dell'opzione. ONE-SHOT: _process, sopra one_shot_casuali.madness_min (25), timer random in intervallo_secondi, poi tenta_one_shot() (pubblico) suona un sfx casuale da one_shot_casuali.sfx; disattiva_sussurri li sopprime. SOGLIA 55: imposta_nomi_sussurro(nomi)/nomi_sussurro() - gancio per NPC/Ancore (AnchorSystem US-216), fallback a un set generico se vuoto. 9 sfx nuovi in SFX_SPEC (4 one-shot + 4 wash), tutti sintetizzati (US-019, niente file). 6 test in test_madness_audio.gd (227 totali): whisper muto sotto la prima soglia, volume guidato dalla follia (-24 a 35, -10 a 85), duck musica a 80 + ripristino, disattiva_sussurri silenzia e resta muto, one-shot solo sopra 25 e soppressi da disattiva_sussurri, nomi con fallback. validator 0, nessuna regressione. Verifica all'orecchio non possibile (audio sintetizzato); lo stato dei bus e' coperto dai test."
     },
     {
       "id": "US-215",
