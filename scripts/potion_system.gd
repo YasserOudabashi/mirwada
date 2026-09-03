@@ -247,6 +247,14 @@ func imposta_seed(s: int) -> void:
 	_rng.seed = s
 
 
+## Applica un esito di esperimento a comando (scena di debug, test).
+func forza_esito(nome: String) -> void:
+	var gd: Node = _gd()
+	var o: Dictionary = gd.call("experiment_outcomes").get(nome, {}) if gd != null else {}
+	_applica_esito(nome, o)
+	esperimento_fallito.emit(nome)
+
+
 func _fallimento(gd: Node) -> Dictionary:
 	var outcomes: Dictionary = gd.call("experiment_outcomes")
 	var mult: float = 1.0
@@ -298,9 +306,22 @@ func _applica_esito(nome: String, o: Dictionary) -> void:
 		_evoca_aberrazione(str(o["evoca"]))
 
 
-## Gancio per US-312: qui l'aberrazione e' un no-op documentato.
-func _evoca_aberrazione(_entita_id: String) -> void:
-	pass
+## US-312: l'esito peggiore di un esperimento. Evoca un'entita' ostile
+## TEMPORANEA (non entra nel save), aggiunge follia e degrada le fondamenta.
+## Numeri da balance.json.alchimia.
+func _evoca_aberrazione(entita_id: String) -> void:
+	var gd: Node = _gd()
+	var b: Dictionary = gd.call("get_balance", "alchimia") if gd != null else {}
+	var reg: Node = get_node_or_null("/root/SummonRegistry")
+	if reg != null:
+		reg.call("evoca_temporanea", entita_id, "ostile",
+			float(b.get("aberrazione_durata_s", 25.0)), float(b.get("aberrazione_hp", 30.0)))
+	var m: Node = get_node_or_null("/root/Madness")
+	if m != null:
+		m.call("add", float(b.get("follia_aberrazione", 12.0)), "aberrazione_alchemica")
+	var found: Node = get_node_or_null("/root/Foundation")
+	if found != null:
+		found.call("applica", float(b.get("malus_fondamenta_aberrazione", -15.0)), "aberrazione_alchemica")
 
 
 func _riduzione_rischio() -> float:

@@ -15,6 +15,8 @@ signal evocazione_rimossa(id: String)
 ## Array di { id: String, tipo: String, comportamento: String,
 ##            posizione: [x, y], hp: float }.
 var _summons: Array = []
+## Evocazioni temporanee (US-312): scadono in _process, mai serializzate.
+var _temporanee: Array = []
 var _prossimo: int = 1
 
 
@@ -28,6 +30,38 @@ func evoca(tipo: String, comportamento: String, posizione: Vector2, hp: float) -
 	})
 	evocazione_aggiunta.emit(id, tipo)
 	return id
+
+
+## Evocazione TEMPORANEA (US-312: l'aberrazione alchemica). Scade a tempo e
+## NON entra nel save: e' un incidente, non un potere. Restituisce l'id.
+func evoca_temporanea(tipo: String, comportamento: String, durata: float, hp: float = 10.0) -> String:
+	var id: String = "tmp_%d" % _prossimo
+	_prossimo += 1
+	_temporanee.append({
+		"id": id, "tipo": tipo, "comportamento": comportamento, "hp": hp,
+		"left": maxf(0.1, durata),
+	})
+	evocazione_aggiunta.emit(id, tipo)
+	return id
+
+
+func conta_temporanee() -> int:
+	return _temporanee.size()
+
+
+func temporanee() -> Array:
+	return _temporanee.duplicate(true)
+
+
+func _process(delta: float) -> void:
+	if _temporanee.is_empty():
+		return
+	for i in range(_temporanee.size() - 1, -1, -1):
+		_temporanee[i]["left"] = float(_temporanee[i]["left"]) - delta
+		if _temporanee[i]["left"] <= 0.0:
+			var id: String = str(_temporanee[i]["id"])
+			_temporanee.remove_at(i)
+			evocazione_rimossa.emit(id)
 
 
 func evocazioni() -> Array:
@@ -49,6 +83,7 @@ func rimuovi(id: String) -> bool:
 
 func pulisci() -> void:
 	_summons.clear()
+	_temporanee.clear()
 
 
 # --- Salvataggio ---------------------------------------------------------

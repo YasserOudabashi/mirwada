@@ -2824,3 +2824,23 @@ sezione test aggiornata.
   fallimento, ingredienti mancanti -> non consuma, follia alta -> esiti
   mostruosi piu' frequenti su 300 tiri). validator 0, i18n --check 0.
 - Prossima storia: US-312 (fallimenti mostruosi - l'aberrazione).
+
+[2026-09-04] US-312 — Fallimenti mostruosi: l'aberrazione
+
+- SummonRegistry: nuovo canale TEMPORANEO. evoca_temporanea(tipo,
+  comportamento, durata, hp) -> id ("tmp_N"); _temporanee: Array processata
+  in _process (scade a tempo, emette evocazione_rimossa). conta_temporanee(),
+  temporanee(). NON serializzata: per_salvataggio/da_salvataggio invariati.
+  pulisci() svuota anche le temporanee.
+- data/balance.json nuova sezione 'alchimia': aberrazione_hp 30,
+  aberrazione_durata_s 25, follia_aberrazione 12, malus_fondamenta_aberrazione -15.
+- PotionSystem._evoca_aberrazione(entita_id) (era il no-op gancio di US-311):
+  SummonRegistry.evoca_temporanea('aberrazione_alchemica','ostile',durata,hp)
+  + Madness.add(follia) + Foundation.applica(malus). Numeri da balance.json.
+  + forza_esito(nome): applica un esito di esperimento a comando (debug/test).
+- Come verificato: 369 test headless (366 + 3 in test_aberrazione.gd:
+  forza_esito('aberrazione') -> 1 evocazione temporanea 'ostile' + follia su
+  + fondamenta giu'; NON e' fra le persistenti / non entra nel save;
+  evoca_temporanea con durata 1s scade dopo 1.2s di _process). validator 0,
+  nessuna regressione (test_summon verde).
+- Prossima storia: US-313 (ricette leggendarie via conoscenza).

@@ -304,8 +304,8 @@
       ],
       "priority": 15,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "SummonRegistry: canale TEMPORANEO. evoca_temporanea(tipo,comportamento,durata,hp) -> id tmp_N; _temporanee processata in _process (scade, emette evocazione_rimossa); conta_temporanee/temporanee; NON serializzata; pulisci svuota anche queste. data/balance.json sezione alchimia (aberrazione_hp 30, durata 25s, follia 12, malus_fondamenta -15). PotionSystem._evoca_aberrazione (era il no-op di US-311): evoca_temporanea(aberrazione_alchemica,ostile) + Madness.add + Foundation.applica, numeri da balance. + forza_esito(nome) per debug/test. 369 test headless (366+3 test_aberrazione.gd), validator 0, nessuna regressione."
     },
     {
       "id": "US-313",
