@@ -720,8 +720,8 @@
       ],
       "priority": 35,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "book_overlay.gd agganciato a Madness.madness_changed, soglie da balance.json.madness (15/40). scenes/book_overlay.tscn: nodo Macchie (ColorRect + shader madness_vignette gia esistente US-215) sopra la pagina + NoteMargine (Label grafia rossa piccola). Soglia 15: bordi della pagina scuriti (intensita cresce con la follia) + respiro in _process. Soglia 40: nota a margine = i sussurri in forma SCRITTA (FR-8), testo da AudioManager.nomi_sussurro() + 3 frasi BOOK_MACCHIA_* in strings.csv. CONGELAMENTO se disattiva_sussurri O riduci_animazioni O toggle macchie_follia spento (a DUE livelli: book.json libro.macchie_follia AND SettingsStore video.macchie_follia): intensita fissa 0.22, niente respiro; la nota resta (testo). La follia non cambia. 318 test headless (313+5 test_book_macchie.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): a follia 75 bordi scuriti (~0.70 pulsante) + nota rossa; con disattiva_sussurri intensita fissa 0.22, follia resta 75. Screenshot user://us229. FASE 2 CHIUSA: 35/35."
     }
   ]
 }

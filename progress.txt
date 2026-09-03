@@ -2520,3 +2520,37 @@ sezione test aggiornata.
   fase arte). primitive_vfx copre le 15 implementate; le altre 13 attive
   arrivano coi loro handler in fase 5.
 - Prossima storia: US-229 (macchie di follia sulle pagine del libro).
+
+[2026-09-03] US-229 — Macchie di follia sulle pagine del libro (P2)
+
+- book_overlay.gd si aggancia a Madness.madness_changed. Soglie da
+  data/balance.json.madness (soglia_distorsioni 15, soglia_abilita_autonome 40).
+  * scenes/book_overlay.tscn: nodo Macchie (ColorRect + lo shader
+    madness_vignette.gdshader gia' esistente, US-215) sopra la pagina, e
+    NoteMargine (Label, grafia rossa piccola in basso a sinistra).
+  * soglia 15: i bordi della pagina si scuriscono (intensita cresce con la
+    follia), con un respiro sinusoidale in _process.
+  * soglia 40: compare una nota a margine - i sussurri in forma SCRITTA
+    (FR-8, equivalente visivo del layer audio di US-214). Il testo usa i
+    nomi di AudioManager.nomi_sussurro() (NPC/Ancore, fallback generico) e 3
+    frasi in strings.csv (BOOK_MACCHIA_1/2/3).
+  * CONGELAMENTO: se disattiva_sussurri O riduci_animazioni (AudioManager.
+    accessibilita) O il toggle 'macchie di follia' e' spento - interruttore
+    a DUE livelli: data/ui/book.json libro.macchie_follia AND
+    SettingsStore video.macchie_follia (US-225) - le macchie si fissano a uno
+    stato NEUTRO (intensita 0.22, niente respiro); la nota a margine resta
+    (e' testo, FR-8). La follia continua a salire e a fare danno: la
+    meccanica non cambia.
+- Come verificato: 318 test headless (313 + 5 in test_book_macchie.gd:
+  niente macchie a follia 0, bordi scuri sopra 15, nota a margine sopra 40,
+  il toggle dei dati congela (pagine pulite), disattiva_sussurri congela a
+  neutro ma NON azzera la follia). validator 0, i18n --check 0. VERIFICA A
+  SCHERMO (main.tscn): a follia 75 i bordi della pagina del diagramma sono
+  scuriti (intensita ~0.70, pulsante) + nota rossa "questa non e' la tua
+  grafia"; con disattiva_sussurri l'intensita si fissa a 0.22 e la follia
+  resta 75. Screenshot user://us229.
+- FASE 2 CHIUSA: 35/35 story. Il criterio di uscita (Twilight Giant dalla
+  Sequenza 9 alla 5 con zero codice dedicato) era gia' verificato in US-219;
+  il blocco UI-libro / VFX / i18n e' completo.
+- Prossima: generare il PRD di fase 3 con /prd (roadmap.md - sistemi di
+  supporto: inventario, alchimia, forgiatura, pet, base building, talenti).

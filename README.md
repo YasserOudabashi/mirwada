@@ -8,17 +8,22 @@ Sequenze: 10 Pathway attivi (4 gruppi completi), 10 Sequenze ciascuno,
 
 ## Stato
 
-**Fase 1 — Fondamenta: chiusa.** 27 story (21 originali, di cui US-021
-spezzata in a/b, + 5 di risanamento dall'audit del 2026-09-02), 112 test
-headless, CI su ogni push. Fatto: caricatore + hot-reload dei dati robusto
-ai JSON corrotti, statistiche interamente da balance.json, motore delle
-abilita', macchina di animazione data-driven, movimento a 8 direzioni,
-camera con shake, area di test con collisioni, ciclo di combattimento
-completo (attacco, schivata con i-frame, parata e postura, nemico con
-telegrafia e tell sonoro direzionale), salvataggio versionato, HUD i18n,
-scena di debug, bus audio e feedback di colpo data-driven.
+**Fase 1 — Fondamenta: chiusa.** 27 story, 112 test. Caricatore + hot-reload
+robusto ai JSON corrotti, statistiche da balance.json, motore delle abilita',
+animazione data-driven, movimento, camera, combattimento completo (attacco,
+schivata i-frame, parata/postura, nemico con telegrafia e tell sonoro),
+salvataggio versionato, HUD i18n, bus audio.
 
-Il PRD della fase 2 (Pathway core) si genera con `/prd` — vedi
+**Fase 2 — Pathway Core: chiusa.** 35 story, 318 test. Motore Pathway/Sequenza,
+Acting Method + EventTracker, Follia (layer audio, VFX, Ancore, rituali),
+pozioni e concoction, i18n reale dei dati (`data/i18n/`, `GameData.tr_data`),
+la **shell del libro** (ogni schermata e' una pagina: scaffale/salvataggi,
+frontespizio/creazione personaggio, diagramma dei Pathway con fog of war,
+colophon/impostazioni con `user://settings.json`), `data/vfx.json` + renderer
+VFX per primitiva con impact frame. Criterio di uscita (US-219): il Twilight
+Giant va dalla Sequenza 9 alla 5 con zero codice dedicato.
+
+Il PRD della fase 3 (sistemi di supporto) si genera con `/prd` — vedi
 `006_PRD/roadmap.md`.
 
 ## Setup

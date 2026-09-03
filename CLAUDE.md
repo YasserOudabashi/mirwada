@@ -93,12 +93,20 @@ progress.txt      memoria tra le iterazioni
 Fase 1 — Fondamenta: **CHIUSA** (27 story, 112 test, CI). PRD storico in
 `006_PRD/prd-fase-1-fondamenta.md`.
 
-Fase corrente: **2 — Pathway Core**. PRD dettagliato:
-`006_PRD/prd-fase-2-pathway-core.md` (~31 story `US-2NN`). Da convertire in
-`prd.json` con `/ralph`. È il salto più rischioso: il criterio di uscita è
-il Twilight Giant eseguito dalla Sequenza 9 alla 5 con zero codice dedicato.
+Fase 2 — Pathway Core: **CHIUSA** (35 story, 318 test). PRD in
+`006_PRD/prd-fase-2-pathway-core.md`. Criterio di uscita verificato in US-219:
+il Twilight Giant va dalla Sequenza 9 alla 5 con zero codice dedicato
+(verdetto in `progress.txt`). Include: motore Pathway/Sequenza, Acting Method
++ EventTracker, Follia (audio + VFX + Ancore), pozioni e rituali, i18n reale
+(`data/i18n/`, `tr_data`), shell del libro (ogni schermata e' una pagina:
+scaffale, frontespizio, diagramma con fog of war, colophon/impostazioni),
+`data/vfx.json` + renderer VFX per primitiva.
 
-Le fasi 3-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
+Fase corrente: **3 — Sistemi di supporto**. Scaletta in `006_PRD/roadmap.md`
+(inventario/equip, alchimia, forgiatura sigilli, pet, base building, talenti).
+PRD dettagliato da generare con `/prd`.
+
+Le fasi 4-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
 genera con `/prd` **solo quando la precedente è chiusa**.
 
 Punto di controllo del progetto: la **fase 5**. Se aggiungere i 9 Pathway

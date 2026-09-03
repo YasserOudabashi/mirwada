@@ -19,7 +19,16 @@ extends CanvasLayer
 @onready var _titolo: Label = $Pagina/Titolo
 @onready var _contenuto: MarginContainer = $Pagina/Contenuto
 @onready var _voltata: ColorRect = $Pagina/Voltata
+@onready var _macchie: ColorRect = $Pagina/Macchie
+@onready var _note: Label = $Pagina/NoteMargine
 @onready var _segnalibri: VBoxContainer = $Segnalibri
+
+## Soglie di follia (data/balance.json.madness). Le macchie del libro sono
+## l'equivalente scritto del layer audio dei sussurri (US-214 / FR-8).
+var _sog_bordi: float = 15.0
+var _sog_note: float = 40.0
+var _follia: float = 0.0
+var _t_macchie: float = 0.0
 
 ## Un tipo di pagina, una scena. Le pagine non ancora scritte ricadono su un
 ## placeholder. design-ui-libro.md: "il codice implementa un tipo di pagina per
@@ -52,6 +61,19 @@ func _ready() -> void:
 		_volta_ridotta_s = maxf(0.02, float(cfg.get("dissolvenza_ridotta_ms", 80)) / 1000.0)
 	_costruisci_segnalibri()
 
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd != null:
+		var m: Dictionary = gd.call("get_balance", "madness")
+		_sog_bordi = float(m.get("soglia_distorsioni", 15.0))
+		_sog_note = float(m.get("soglia_abilita_autonome", 40.0))
+	var mad: Node = get_node_or_null("/root/Madness")
+	if mad != null and mad.has_signal("madness_changed"):
+		mad.madness_changed.connect(func(v: float, _s: int) -> void:
+			_follia = v
+			_aggiorna_macchie())
+		_follia = float(mad.call("valore"))
+	_aggiorna_macchie()
+
 
 func _book() -> Node:
 	return get_node_or_null("/root/Book")
@@ -65,6 +87,7 @@ func _apri(pagina: String) -> void:
 	_volta_pagina = pagina
 	_swapped = true
 	_rendi(pagina)
+	_aggiorna_macchie()
 	_audio("sfx_apri")
 
 
@@ -85,6 +108,14 @@ func _volta(pagina: String) -> void:
 
 
 func _process(delta: float) -> void:
+	# respiro delle macchie di follia (US-229), solo se attive e non congelate
+	if visible and _macchie.material is ShaderMaterial and _macchie_abilitate() \
+			and not _macchie_congelate() and _follia >= _sog_bordi:
+		_t_macchie += delta
+		var base: float = _intensita_macchie()
+		var respiro: float = 1.0 + sin(_t_macchie * TAU * 0.15) * 0.18
+		(_macchie.material as ShaderMaterial).set_shader_parameter("intensita", clampf(base * respiro, 0.0, 1.0))
+
 	if _volta_left <= 0.0:
 		return
 	_volta_left = maxf(0.0, _volta_left - delta)
@@ -118,6 +149,7 @@ func _rendi(pagina: String) -> void:
 	var gd: Node = get_node_or_null("/root/GameData")
 	var nome: String = str(p.get("name_i18n", pagina))
 	_titolo.text = str(gd.call("tr_data", nome)) if gd != null else nome
+	_aggiorna_macchie()
 
 	for c in _contenuto.get_children():
 		_contenuto.remove_child(c)   # subito fuori: get_child(0) e' sempre la pagina viva
@@ -144,6 +176,63 @@ func _riga(testo: String) -> Label:
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	return l
+
+
+# --- Macchie di follia (US-229) --------------------------------------
+# I bordi delle pagine si scuriscono, compaiono note a margine in una grafia
+# non tua: la forma SCRITTA dei sussurri di US-214 (FR-8, ogni canale audio
+# ha l'equivalente visivo). Con disattiva_sussurri / riduci_animazioni / il
+# toggle 'macchie di follia' spento, le macchie si CONGELANO a uno stato
+# neutro. La follia continua a salire e a fare danno: non cambia la meccanica.
+
+func _aggiorna_macchie() -> void:
+	if _macchie == null:
+		return
+	var abilitate: bool = _macchie_abilitate()
+	var congelate: bool = _macchie_congelate()
+
+	var intensita: float = 0.0
+	if abilitate and _follia >= _sog_bordi:
+		intensita = 0.22 if congelate else _intensita_macchie()   # congelata = neutro fisso
+	if _macchie.material is ShaderMaterial:
+		(_macchie.material as ShaderMaterial).set_shader_parameter("intensita", intensita)
+
+	# le note a margine sono TESTO: restano leggibili anche congelate (FR-8)
+	if abilitate and _follia >= _sog_note:
+		_note.text = _nota_margine()
+		_note.visible = true
+	else:
+		_note.visible = false
+
+
+func _intensita_macchie() -> float:
+	var frazione: float = clampf((_follia - _sog_bordi) / maxf(1.0, 100.0 - _sog_bordi), 0.0, 1.0)
+	return lerpf(0.25, 0.85, frazione)
+
+
+func _macchie_abilitate() -> bool:
+	# interruttore dei dati (data/ui/book.json) AND opzione del colophon (US-225)
+	var b: Node = _book()
+	var da_dati: bool = bool(b.call("config", "macchie_follia", true)) if b != null else true
+	var ss: Node = get_node_or_null("/root/SettingsStore")
+	var da_opzioni: bool = bool(ss.call("get_val", "video", "macchie_follia", true)) if ss != null else true
+	return da_dati and da_opzioni
+
+
+func _macchie_congelate() -> bool:
+	var am: Node = get_node_or_null("/root/AudioManager")
+	if am == null:
+		return false
+	return bool(am.call("accessibilita", "disattiva_sussurri")) \
+		or bool(am.call("accessibilita", "riduci_animazioni"))
+
+
+func _nota_margine() -> String:
+	var am: Node = get_node_or_null("/root/AudioManager")
+	var nomi: Array = am.call("nomi_sussurro") if am != null else []
+	var nome: String = str(nomi[randi() % nomi.size()]) if not nomi.is_empty() else "qualcuno"
+	var chiave: String = ["BOOK_MACCHIA_1", "BOOK_MACCHIA_2", "BOOK_MACCHIA_3"][int(_follia / 20.0) % 3]
+	return tr(chiave).format([nome])
 
 
 func _costruisci_segnalibri() -> void:
