@@ -2480,3 +2480,43 @@ sezione test aggiornata.
   validator 0, i18n --check 0. Nessuna verifica a schermo: story di soli
   dati, il renderer e' US-227.
 - Prossima storia: US-227 (VFX delle primitive di fase 2 con impact frame).
+
+[2026-09-03] US-227 — VFX delle primitive di fase 2 con impact frame
+
+- Autoload Vfx (scripts/vfx.gd), dopo SettingsStore. Si aggancia a
+  AbilityEngine.ability_executed: per ogni primitiva dell'abilita' legge
+  data/vfx.json (get_primitive_vfx[tipo] + get_vfx_palette[pathway del
+  caster]) e riproduce lo sprite placeholder tinto col 'primario' della
+  palette, che sfuma su 'frames' frame. Primitiva senza voce primitive_vfx
+  -> saltata (le altre man mano).
+  * AGGANCIO AL TIMING: oggi l'esecuzione e' istantanea, il trigger e'
+    ability_executed; gioca_primitiva() e' pubblico cosi' quando ci sara'
+    l'animazione di lancio il player la chiamera' sull'evento
+    ability_release dei frame senza toccare vfx.gd.
+  * pathway del caster: player -> Progression.pathway(); altri -> palette
+    neutra (fallback nel colore).
+- scenes/vfx_overlay.tscn + scripts/vfx_overlay.gd (CanvasLayer layer 88,
+  sotto la follia). In main.tscn e debug_scene.tscn.
+  * IMPACT FRAME: sui colpi con impact_frame:true, un lampo bianco a schermo
+    per durata_frames/60 s (data/vfx.json.impact_frames, si tara con
+    hitstop_ms). Con riduci_flash -> un bordo bianco spesso 18px invece del
+    lampo: stessa informazione (colpo importante), niente lampeggio. FR-8.
+  * NERO DI SCENA: alpha 0.85 per nero_di_scena.durata_ms (250) sui trigger
+    dichiarati - abilita' di Sequenza <= 4 (parse di sequence_id in vfx.gd),
+    parry_perfect (player._su_parata_riuscita), posture_break
+    (enemy._su_postura_rotta), via Vfx.evento_combat(nome).
+  * Contatori in _process (come madness_overlay), non Tween.
+- Come verificato: 313 test headless (307 + 6 in test_vfx_render.gd: impact
+  frame durata finita, nero di scena durata finita, abilita' offensiva ->
+  impact frame, abilita' Seq 4 -> nero di scena, lo sprite placeholder
+  compare accanto al caster, riduci_flash non toglie l'informazione).
+  validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn, finestra
+  reale): eseguendo tg_fendente_pesante sul player lo schermo lampeggia
+  bianco (impact frame) e compare un blob dorato (palette twilight_giant);
+  eseguendo tg_caccia_spirituale a Seq 4 lo sfondo si mangia di nero;
+  con riduci_flash il lampo diventa un bordo bianco. Screenshot user://us227.
+- Resta aperto: il "lampo bianco" e' l'approssimazione placeholder
+  dell'inversione bianco/nero vera (serve uno shader/impact sprite disegnato,
+  fase arte). primitive_vfx copre le 15 implementate; le altre 13 attive
+  arrivano coi loro handler in fase 5.
+- Prossima storia: US-229 (macchie di follia sulle pagine del libro).

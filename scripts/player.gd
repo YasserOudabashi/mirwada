@@ -216,6 +216,9 @@ func _su_parata_riuscita(perfetta: bool, attaccante: Node) -> void:
 		_audio.call("feedback", "parry_perfect" if perfetta else "parry_normal")
 	if perfetta:
 		_traccia("perfect_parry", {})
+		var vfx: Node = get_node_or_null("/root/Vfx")
+		if vfx != null:
+			vfx.call("evento_combat", "parry_perfect")
 	if not perfetta or attaccante == null:
 		return
 	var b: Dictionary = _combat.get("parata", {})

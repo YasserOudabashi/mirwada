@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://bsq0main0scen"]
+[gd_scene load_steps=10 format=3 uid="uid://bsq0main0scen"]
 
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://scripts/test_zone.gd" id="2_zone"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/madness_overlay.tscn" id="6_madov"]
 [ext_resource type="PackedScene" path="res://scenes/perception_overlay.tscn" id="7_perov"]
 [ext_resource type="PackedScene" path="res://scenes/book_overlay.tscn" id="8_bookov"]
+[ext_resource type="PackedScene" path="res://scenes/vfx_overlay.tscn" id="9_vfxov"]
 
 [node name="Main" type="Node2D"]
 
@@ -29,3 +30,5 @@ position = Vector2(430, 496)
 [node name="PerceptionOverlay" parent="." instance=ExtResource("7_perov")]
 
 [node name="BookOverlay" parent="." instance=ExtResource("8_bookov")]
+
+[node name="VfxOverlay" parent="." instance=ExtResource("9_vfxov")]

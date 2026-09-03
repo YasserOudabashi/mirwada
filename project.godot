@@ -35,6 +35,7 @@ RitualSystem="*res://scripts/ritual_system.gd"
 PerceptionSystem="*res://scripts/perception_system.gd"
 KnowledgeStore="*res://scripts/knowledge_store.gd"
 SettingsStore="*res://scripts/settings_store.gd"
+Vfx="*res://scripts/vfx.gd"
 Book="*res://scripts/book.gd"
 
 [display]

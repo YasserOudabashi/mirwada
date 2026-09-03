@@ -701,8 +701,8 @@
       ],
       "priority": 34,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Autoload Vfx (scripts/vfx.gd) agganciato a AbilityEngine.ability_executed: per ogni primitiva legge data/vfx.json (get_primitive_vfx[tipo] + get_vfx_palette[pathway del caster]) e riproduce lo sprite placeholder tinto col primario, che sfuma su frames frame; primitiva senza voce -> saltata. Aggancio timing: esecuzione istantanea -> trigger ability_executed; gioca_primitiva() pubblico per spostarlo su ability_release quando ci sara l animazione di lancio. pathway: player -> Progression.pathway(); altri -> palette neutra. scenes/vfx_overlay.tscn + vfx_overlay.gd (CanvasLayer 88, sotto la follia), in main.tscn e debug_scene.tscn. IMPACT FRAME: lampo bianco a schermo per durata_frames/60 s (data/vfx.json.impact_frames, si tara con hitstop_ms); con riduci_flash -> bordo bianco 18px invece del lampo (stessa info, niente lampeggio, FR-8). NERO DI SCENA: alpha 0.85 per durata_ms sui trigger dichiarati - abilita Seq<=4 (parse sequence_id), parry_perfect (player), posture_break (enemy) via Vfx.evento_combat. Contatori in _process, non Tween. 313 test headless (307+6 test_vfx_render.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): tg_fendente_pesante -> lampo bianco + blob dorato (palette twilight_giant); tg_caccia_spirituale a Seq 4 -> sfondo nero; con riduci_flash il lampo diventa bordo. Screenshot user://us227. Resta: il lampo bianco approssima l inversione vera (serve shader/impact sprite, fase arte); primitive_vfx copre le 15 implementate."
     },
     {
       "id": "US-229",

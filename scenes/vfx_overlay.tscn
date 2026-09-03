@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://c0vfxoverlay0mir"]
+
+[ext_resource type="Script" path="res://scripts/vfx_overlay.gd" id="1_vov"]
+
+[node name="VfxOverlay" type="CanvasLayer"]
+layer = 88
+script = ExtResource("1_vov")
+
+[node name="Impatto" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Nero" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0)
+mouse_filter = 2

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://c0dbgscene0mir"]
+[gd_scene load_steps=12 format=3 uid="uid://c0dbgscene0mir"]
 
 [ext_resource type="Script" path="res://scripts/debug_scene.gd" id="1_dbg"]
 [ext_resource type="Script" path="res://scripts/test_zone.gd" id="2_zone"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://scenes/madness_overlay.tscn" id="8_madov"]
 [ext_resource type="PackedScene" path="res://scenes/perception_overlay.tscn" id="11_perov"]
 [ext_resource type="PackedScene" path="res://scenes/book_overlay.tscn" id="12_bookov"]
+[ext_resource type="PackedScene" path="res://scenes/vfx_overlay.tscn" id="13_vfxov"]
 
 [node name="DebugScene" type="Node2D"]
 script = ExtResource("1_dbg")
@@ -38,6 +39,8 @@ position = Vector2(330, 470)
 [node name="PerceptionOverlay" parent="." instance=ExtResource("11_perov")]
 
 [node name="BookOverlay" parent="." instance=ExtResource("12_bookov")]
+
+[node name="VfxOverlay" parent="." instance=ExtResource("13_vfxov")]
 
 [node name="Pannello" type="CanvasLayer" parent="."]
 

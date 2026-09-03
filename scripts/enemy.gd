@@ -166,6 +166,9 @@ func _su_postura_rotta() -> void:
 	var am: Node = get_node_or_null("/root/AudioManager")
 	if am != null:
 		am.call("feedback", "posture_break")
+	var vfx: Node = get_node_or_null("/root/Vfx")
+	if vfx != null:
+		vfx.call("evento_combat", "posture_break")
 	if _stato != Stato.MORTO:
 		_vai(Stato.STAGGER)
 
