@@ -2,3 +2,6 @@ keys,it,en
 HUD_HP,Salute,Health
 HUD_SPIRITUALITA,Spiritualità,Spirit
 HUD_HP_VALORE,{0} / {1},{0} / {1}
+HUD_RECITAZIONE,Recitazione,Acting
+HUD_AVANZAMENTO_PRONTO,Avanzamento pronto,Advancement ready
+HUD_AVANZAMENTO_FORZATO,Avanzamento solo forzando (fondamenta -25),Advancement only by forcing (foundation -25)

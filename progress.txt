@@ -1856,3 +1856,28 @@ sezione test aggiornata.
   Caratteristica -> concoct -> acting -> bevi -> avanzamento e' coperto
   end-to-end dai test headless (e sara' il cuore di US-219).
 - Prossima storia: US-212 (blocco dell'avanzamento sotto acting_progress 1.0).
+
+[2026-09-03] US-212 — Blocco dell'avanzamento sotto acting_progress 1.0
+
+- Il grosso della meccanica era gia' in US-209. US-212 aggiunge:
+  - PotionSystem.avanzamento_disponibile() (pozione per la Sequenza
+    corrente + Acting.e_completo) / avanzamento_forzabile() (pozione ma
+    acting < 1.0).
+  - HUD: hud.tscn riga "Recitazione" (barra 0-1) + label "Avanzamento".
+    hud.gd si aggancia a Acting.acting_progress_changed e a
+    PotionSystem.pozione_creata/bevuta; label nascosta senza pozione,
+    "Avanzamento pronto" con acting completo, "Avanzamento solo forzando
+    (fondamenta -25)" altrimenti.
+  - i18n: 3 chiavi nuove in strings.csv, .translation rigenerati (--import).
+- BUG TROVATO DALLA VERIFICA A SCHERMO: Acting emetteva
+  acting_progress_changed solo su _riparti/decadimento, NON all'arrivo di
+  un evento tracciato -> la HUD non si aggiornava mentre si recitava.
+  Corretto: _su_evento riemette il segnale per ogni evento che una
+  acting_action della Sequenza conta.
+- Come verificato: 221 test headless (214 + 7 in test_advancement_gate.gd:
+  stato senza pozione, solo-forzabile, disponibile, bere senza recitazione
+  non avanza, floor fondamenta a 0 forzando 5 volte (9->4), moltiplicatore
+  follia 1.0/1.75/2.5). validator 0.
+- VERIFICA A SCHERMO (finestra reale): label nascosta / "solo forzando"
+  con acting 0 / "Avanzamento pronto" + barra recitazione a 1.0 completa.
+- Prossima storia: US-214 (Layer audio della follia).

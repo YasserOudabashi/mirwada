@@ -61,6 +61,30 @@ func pozione_pronta() -> Dictionary:
 	return _pozione.duplicate(true)
 
 
+## true se c'e' una pozione per la Sequenza corrente e l'Acting e' completo:
+## si puo' avanzare per via normale (US-212).
+func avanzamento_disponibile() -> bool:
+	if not _pozione_valida_per_ora():
+		return false
+	var acting: Node = get_node_or_null("/root/Acting")
+	return acting != null and acting.call("e_completo")
+
+
+## true se c'e' la pozione ma l'Acting non e' completo: si puo' solo FORZARE.
+func avanzamento_forzabile() -> bool:
+	if not _pozione_valida_per_ora():
+		return false
+	var acting: Node = get_node_or_null("/root/Acting")
+	return acting == null or not acting.call("e_completo")
+
+
+func _pozione_valida_per_ora() -> bool:
+	if _pozione.is_empty():
+		return false
+	var prog: Node = get_node_or_null("/root/Progression")
+	return prog != null and int(_pozione.get("da_sequenza", -1)) == int(prog.call("sequence"))
+
+
 func scarta_pozione() -> void:
 	_pozione = {}
 

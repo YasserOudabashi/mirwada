@@ -109,7 +109,17 @@ func _su_evento(nome: String, _dati: Dictionary) -> void:
 		var quanto: float = _decadimento_incoerente()
 		if quanto > 0.0:
 			_decadimento += quanto
-			acting_progress_changed.emit(acting_progress())
+	# Ogni evento che una acting_action della Sequenza conta puo' aver
+	# cambiato il progresso: la HUD e i sistemi dipendenti devono saperlo.
+	if nome == "ability_used" or _evento_conta_per_la_sequenza(nome):
+		acting_progress_changed.emit(acting_progress())
+
+
+func _evento_conta_per_la_sequenza(nome: String) -> bool:
+	for azione in _azioni_correnti():
+		if str(azione.get("evento", "")) == nome:
+			return true
+	return false
 
 
 func _decadimento_incoerente() -> float:

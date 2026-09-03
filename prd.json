@@ -344,8 +344,8 @@
       ],
       "priority": 17,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Il grosso della meccanica era gia' in US-209 (bevi con acting incompleto = digerita male; forza=true = avanza con malus -25; Foundation.applica clampa a minimo 0; moltiplicatore_follia). US-212 aggiunge: PotionSystem.avanzamento_disponibile() (pozione per la Sequenza corrente + Acting.e_completo) e avanzamento_forzabile() (pozione ma acting < 1.0). HUD: hud.tscn nuova riga 'Recitazione' (barra 0-1) + label 'Avanzamento'; hud.gd si aggancia a Acting.acting_progress_changed e a PotionSystem.pozione_creata/pozione_bevuta; _aggiorna_avanzamento() -> label nascosta senza pozione, 'Avanzamento pronto' con acting completo, 'Avanzamento solo forzando (fondamenta -25)' altrimenti. i18n: 3 chiavi nuove in strings.csv (HUD_RECITAZIONE, HUD_AVANZAMENTO_PRONTO, HUD_AVANZAMENTO_FORZATO) + .translation rigenerati. BUG TROVATO DALLA VERIFICA A SCHERMO: Acting non emetteva acting_progress_changed quando arrivava un evento tracciato (solo su _riparti/decadimento) -> la HUD non si aggiornava. Corretto: _su_evento riemette il segnale per ogni evento che una acting_action della Sequenza conta. 7 test in test_advancement_gate.gd (221 totali): stato senza pozione, pozione+acting incompleto = solo forzabile, acting completo = disponibile, bere senza recitazione non avanza, floor fondamenta a 0 (anche forzando 5 volte 9->4), moltiplicatore follia 1.0/1.75/2.5. VERIFICA A SCHERMO (finestra reale): label nascosta senza pozione, 'solo forzando' con acting 0, 'Avanzamento pronto' + barra a 1.0 con recitazione completa. validator 0, nessuna regressione."
     },
     {
       "id": "US-214",
