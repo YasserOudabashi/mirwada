@@ -2650,3 +2650,31 @@ sezione test aggiornata.
   liberato a fine test (come test_progression) - un Node bare in gruppo
   'player' rompe test_i18n_hud/progression/vertical_slice che tipano Node2D.
 - Prossima storia: US-304 (stored_ability_id - consumo dall'inventario, P0).
+
+[2026-09-03] US-304 — stored_ability_id: consumo dall'inventario (P0)
+
+- Inventory.usa(instance_id, bersaglio := null) -> {ok, reason, risultato}:
+  se l'item ha stored_ability_id, chiama AbilityEngine.execute_stored(sab,
+  giocatore) (US-206, gia' pronto: nessun costo/cooldown/ownership) e SOLO su
+  risultato.ok consuma l'istanza (rimuovi_istanza). Item senza
+  stored_ability_id -> {ok:false, reason:"nessuna_abilita"}, non consumato,
+  nessun crash. Istanza assente / nessun giocatore / motore assente -> esiti
+  gestiti.
+- data/items/pergamene.json: nuova pergamena_hermit (stored_ability_id
+  hermit_pergamena). La note di stress test in data/abilities/hermit.json e'
+  RISOLTA: la pergamena e' un item, non serve una primitiva nuova. reveal_info
+  resta attiva-non-implementata: l'item funziona, il VFX arriva col Pathway
+  Hermit in fase 5.
+- i18n: 2 chiavi item.pergamena_hermit* tradotte.
+- Come verificato: 342 test headless (338 + 4 in test_stored_item.gd: usa
+  pergamena_vigore -> abilita' eseguita (risultato.ok) + consumata, seconda
+  usa sulla stessa istanza -> istanza_assente gestito, item equip senza
+  stored_ability_id -> nessuna_abilita gestito e non consumato, pergamena_hermit
+  -> ok (l'item funziona anche con la primitiva non ancora resa)). validator
+  0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): pergamena_vigore in
+  zaino -> usa() ok=true -> conta 1->0 (consumata) -> execute_stored esegue
+  tg_stretta_ferrea (buff_stat difesa moltiplicativo: invisibile a difesa
+  base 0 - quirk di buff_stat/balance, non del contratto). Il VFX placeholder
+  della primitiva (US-227) compare sul giocatore. Screenshot user://us304.
+  CONTRATTO P0 CHIUSO.
+- Prossima storia: US-305 (valuta come oggetto).

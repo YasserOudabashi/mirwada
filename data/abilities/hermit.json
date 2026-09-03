@@ -23,7 +23,7 @@
         "conoscenza",
         "crafting"
       ],
-      "note": "STRESS TEST — TROVATO UN LIMITE. La pergamena monouso non e' un'abilita': e' un OGGETTO che porta un ability_id e lo esegue al consumo. Non serve una primitiva nuova, serve che l'oggetto abbia un campo stored_ability_id e che l'inventario sappia invocarlo. Va aggiunto al PRD di fase 3, non al registro delle primitive."
+      "note": "RISOLTO (US-304): la pergamena e' l'item 'pergamena_hermit' in data/items/pergamene.json, con stored_ability_id -> questa abilita'. Inventory.usa() esegue l'abilita' via AbilityEngine.execute_stored (US-206) e consuma l'item. Nessuna primitiva nuova. reveal_info resta attiva-non-implementata: l'item funziona, il VFX/effetto arriva col Pathway Hermit in fase 5."
     }
   ]
 }

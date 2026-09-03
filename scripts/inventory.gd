@@ -77,6 +77,32 @@ func restituisci_istanza(instance_id: String, item_id: String) -> void:
 	item_aggiunto.emit(item_id, 1)
 
 
+## Usa un'istanza (US-304). Se l'item porta uno stored_ability_id, esegue
+## quell'abilita' come se il giocatore la possedesse (una volta, senza costo
+## ne' cooldown ne' controllo di ownership - il motore c'e' gia': US-206), poi
+## consuma l'item. Un item senza stored_ability_id -> esito gestito, non crash.
+##   -> { ok: bool, reason: String, risultato: Dictionary }
+func usa(instance_id: String, bersaglio: Node = null) -> Dictionary:
+	var inst: Dictionary = istanza(instance_id)
+	if inst.is_empty():
+		return {"ok": false, "reason": "istanza_assente", "risultato": {}}
+	var def: Dictionary = _def(str(inst.get("item_id", "")))
+	var sab: String = str(def.get("stored_ability_id", ""))
+	if sab.is_empty():
+		return {"ok": false, "reason": "nessuna_abilita", "risultato": {}}
+	var giocatore: Node = get_tree().get_first_node_in_group("player")
+	if giocatore == null:
+		return {"ok": false, "reason": "nessun_giocatore", "risultato": {}}
+	var eng: Node = get_node_or_null("/root/AbilityEngine")
+	if eng == null:
+		return {"ok": false, "reason": "motore_assente", "risultato": {}}
+	var r: Dictionary = eng.call("execute_stored", sab, giocatore)
+	if not bool(r.get("ok", false)):
+		return {"ok": false, "reason": str(r.get("reason", "esecuzione_fallita")), "risultato": r}
+	rimuovi_istanza(instance_id)   # consumo: 1 uso
+	return {"ok": true, "reason": "", "risultato": r}
+
+
 func conta(item_id: String) -> int:
 	if _def(item_id).get("impilabile", false):
 		return int(_stack.get(item_id, 0))

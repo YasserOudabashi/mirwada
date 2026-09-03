@@ -84,8 +84,8 @@
       ],
       "priority": 4,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Inventory.usa(instance_id, bersaglio) -> {ok, reason, risultato}: se l item ha stored_ability_id chiama AbilityEngine.execute_stored (US-206, gia pronto: nessun costo/cooldown/ownership) e SOLO su risultato.ok consuma l istanza. Item senza stored_ability_id -> nessuna_abilita, non consumato, nessun crash. Istanza assente/nessun giocatore/motore assente -> esiti gestiti. data/items/pergamene.json: nuova pergamena_hermit (stored hermit_pergamena); la note di stress test in hermit.json e RISOLTA (la pergamena e un item, niente primitiva nuova; reveal_info resta non-impl, l item funziona). 342 test headless (338+4 test_stored_item.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): pergamena_vigore -> usa() ok -> conta 1->0 -> execute_stored esegue tg_stretta_ferrea + VFX placeholder della primitiva sul giocatore. Screenshot user://us304. CONTRATTO P0 CHIUSO."
     },
     {
       "id": "US-305",

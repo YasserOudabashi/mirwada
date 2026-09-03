@@ -21,6 +21,16 @@
       "impilabile": false,
       "valore": 30,
       "stored_ability_id": "tg_armatura_alba"
+    },
+    {
+      "id": "pergamena_hermit",
+      "categoria": "pergamena",
+      "name_i18n": "item.pergamena_hermit",
+      "descrizione_i18n": "item.pergamena_hermit.desc",
+      "tag": ["occulto", "conoscenza", "rituale"],
+      "impilabile": false,
+      "valore": 35,
+      "stored_ability_id": "hermit_pergamena"
     }
   ]
 }
