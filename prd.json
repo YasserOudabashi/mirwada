@@ -179,8 +179,8 @@
       ],
       "priority": 9,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "execute_stored(stored_ability_id, consumer): esegue l'abilita' portata da un oggetto - come se il consumer la possedesse, UNA volta, SENZA costo di spiritualita' ne' cooldown, SENZA controllo di ownership (l'abilita' e' dell'oggetto). Il singolo uso lo garantisce l'inventario di fase 3 consumando l'oggetto, non il motore: una seconda chiamata riesce ancora. E' un percorso PARALLELO a execute() (non riusa grant_temporary): il motore delle primitive e' estratto in _esegui_primitive(ability, caster, stats, ability_id, result), condiviso dai due, mantiene i TRE esiti (implementata / nel registro non scritta / fuori registro). ERR_SCONOSCIUTA se l'abilita' non esiste, ERR_NO_STATS se il consumer non ha StatsComponent. Nessun sistema inventario: solo l'API. 5 test in test_stored_ability.gd (170 totali, abilita' finta iniettata in GameData._abilities): esegue senza costo, non avvia cooldown, ignora l'ownership (execute() normale rifiuterebbe con ERR_NON_POSSEDUTA), abilita' ignota -> errore gestito, consumer senza stats -> errore gestito. La refattorizzazione di execute() non rompe i 21 test di test_ability_engine. validator 0. BLOCCO A CHIUSO."
     },
     {
       "id": "US-210",

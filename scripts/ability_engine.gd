@@ -100,6 +100,49 @@ func execute(ability_id: String, caster: Node) -> Dictionary:
 
 	_start_cooldown(caster, ability_id, _num(ability.get("cooldown"), 0.0))
 
+	_esegui_primitive(ability, caster, stats, ability_id, result)
+
+	result["ok"] = true
+	result["reason"] = OK
+	ability_executed.emit(ability_id, caster, result)
+	return result
+
+
+## Esegue l'abilita' "portata da un oggetto" al consumo (US-206): come se il
+## consumer la possedesse, UNA volta, SENZA costo di spiritualita' ne'
+## cooldown (l'oggetto e' gia' il costo, e il sistema inventario di fase 3
+## garantisce il singolo uso consumando l'oggetto). Nessun controllo di
+## ownership: l'abilita' e' dell'oggetto, non del consumer. Percorso parallelo
+## a execute(), condivide solo il motore delle primitive.
+func execute_stored(stored_ability_id: String, consumer: Node) -> Dictionary:
+	var result: Dictionary = {
+		"ok": false, "reason": "", "effects": [], "warnings": PackedStringArray(),
+	}
+
+	var ability: Dictionary = _game_data().call("get_ability", stored_ability_id)
+	if ability.is_empty():
+		result["reason"] = ERR_SCONOSCIUTA
+		push_error("[AbilityEngine] execute_stored: abilita' inesistente '%s'" % stored_ability_id)
+		return result
+
+	var stats: Node = find_stats(consumer)
+	if stats == null:
+		result["reason"] = ERR_NO_STATS
+		push_error("[AbilityEngine] execute_stored: %s non ha uno StatsComponent" % consumer)
+		return result
+
+	_esegui_primitive(ability, consumer, stats, stored_ability_id, result)
+	result["ok"] = true
+	result["reason"] = OK
+	ability_executed.emit(stored_ability_id, consumer, result)
+	return result
+
+
+## Il motore delle primitive, condiviso da execute() e execute_stored():
+## itera l'array "primitive", dispaccia sulla tabella tipo->handler, e
+## distingue i TRE esiti (implementata / nel registro ma non scritta / fuori
+## registro). Riempie result["effects"] e result["warnings"].
+func _esegui_primitive(ability: Dictionary, caster: Node, stats: Node, ability_id: String, result: Dictionary) -> void:
 	var prim_list: Variant = ability.get("primitive", [])
 	if typeof(prim_list) != TYPE_ARRAY:
 		push_error("[AbilityEngine] %s: 'primitive' non e' una lista, abilita' senza effetti" % ability_id)
@@ -128,11 +171,6 @@ func execute(ability_id: String, caster: Node) -> Dictionary:
 		var handler: Callable = _handlers[tipo]
 		var effect: Dictionary = handler.call(prim, caster, stats, ability_id)
 		(result["effects"] as Array).append(effect)
-
-	result["ok"] = true
-	result["reason"] = OK
-	ability_executed.emit(ability_id, caster, result)
-	return result
 
 
 ## Esegue UNA primitiva isolata, saltando costo e cooldown. Per la scena di

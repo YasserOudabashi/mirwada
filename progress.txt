@@ -1551,3 +1551,34 @@ sezione test aggiornata.
   execute(death_legione) compone summon + aura -> 8 legionari persistenti).
   validator exit 0. Nessuna regressione.
 - Prossima storia: US-206 (hook stored_ability_id nel motore).
+
+[2026-09-03] US-206 — Hook stored_ability_id nel motore  -> BLOCCO A CHIUSO
+
+- Cosa fatto (scripts/ability_engine.gd):
+  - execute_stored(stored_ability_id, consumer): esegue l'abilita' portata
+    da un oggetto. Come se il consumer la possedesse, UNA volta, SENZA
+    costo di spiritualita' ne' cooldown, SENZA controllo di ownership
+    (l'abilita' e' dell'oggetto, non del consumer).
+  - Il "singolo uso" lo garantisce l'inventario di fase 3 consumando
+    l'oggetto, NON il motore: una seconda chiamata a execute_stored
+    riesce ancora (nessun cooldown, nessun tracking).
+  - PERCORSO PARALLELO a execute(), non riusa grant_temporary. Il motore
+    delle primitive e' estratto in _esegui_primitive(ability, caster,
+    stats, ability_id, result), condiviso da execute() e execute_stored():
+    stessa iterazione, stesso dispaccio, stessi TRE esiti (implementata /
+    nel registro non scritta / fuori registro).
+  - Errori gestiti: ERR_SCONOSCIUTA (abilita' inesistente), ERR_NO_STATS
+    (consumer senza StatsComponent). Mai un crash.
+  - Nessun sistema inventario in questa story: solo l'API.
+- Come verificato: 170 test headless (165 + 5 in test_stored_ability.gd,
+  con un'abilita' finta iniettata in GameData._abilities: esegue senza
+  costo di spiritualita', non avvia cooldown, ignora l'ownership -
+  execute() normale la rifiuterebbe con ERR_NON_POSSEDUTA - abilita'
+  ignota / consumer senza stats -> errore gestito). La refattorizzazione
+  di execute() NON rompe i 21 test di test_ability_engine. validator 0.
+- BLOCCO A (US-201..206 + US-228) CHIUSO. Le tre capacita' del motore
+  emerse dallo stress test ci sono tutte: abilita' non posseduta (US-204),
+  evocazioni persistenti (US-205), stored_ability_id (US-206).
+  Primitive implementate: 15 su 28 (shield, aura, dot, decay, debuff_stat,
+  light_purify, transform, terrain_modify, curse, summon + le 5 di fase 1).
+- Prossima storia: US-210 (EventTracker generico) - inizio blocco C.
