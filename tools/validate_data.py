@@ -571,6 +571,70 @@ def main():
                     warn(f"{rel} [{sid}]: richiede i tag {irraggiungibili} che nessun pathway "
                          f"attivo porta: sinergia irraggiungibile finche' il suo gruppo resta differito.")
 
+    # --- oggetti (data/items/, US-301) ---
+    ic_doc = load_json(os.path.join(DATA, "schema", "item_categories.json"))
+    item_categories = set((ic_doc or {}).get("item_categories", []))
+    es_doc = load_json(os.path.join(DATA, "schema", "equip_slots.json"))
+    equip_tipi = set((es_doc or {}).get("tipi", []))
+    idir = os.path.join(DATA, "items")
+    item_ids = set()
+    known_item_stats = {"hp_max", "spiritualita_max", "velocita", "difesa",
+                        "evasione", "precisione", "forza"}
+    if os.path.isdir(idir):
+        for fn in sorted(os.listdir(idir)):
+            if not fn.endswith(".json"):
+                continue
+            doc = load_json(os.path.join(idir, fn))
+            if doc is None:
+                continue
+            rel = f"data/items/{fn}"
+            for it in doc.get("items", []):
+                iid = it.get("id")
+                if iid in item_ids:
+                    err(f"{rel}: id item duplicato '{iid}'")
+                item_ids.add(iid)
+                cat = it.get("categoria")
+                if cat not in item_categories:
+                    err(f"{rel} [{iid}]: categoria '{cat}' non nel vocabolario chiuso "
+                        f"({sorted(item_categories)})")
+                if not isinstance(it.get("name_i18n"), str) or not it.get("name_i18n"):
+                    err(f"{rel} [{iid}]: name_i18n mancante")
+                for t in it.get("tag", []):
+                    if t not in valid_tags:
+                        err(f"{rel} [{iid}]: tag sconosciuto '{t}'")
+                if not isinstance(it.get("valore"), int) or it.get("valore", -1) < 0:
+                    err(f"{rel} [{iid}]: valore deve essere un intero >= 0")
+                if not isinstance(it.get("impilabile"), bool):
+                    err(f"{rel} [{iid}]: impilabile deve essere true/false")
+                if cat == "equip":
+                    if it.get("slot") not in equip_tipi:
+                        err(f"{rel} [{iid}]: slot '{it.get('slot')}' non in equip_slots.tipi "
+                            f"({sorted(equip_tipi)})")
+                    for k, v in (it.get("stat_modifiers") or {}).items():
+                        if k not in known_item_stats:
+                            err(f"{rel} [{iid}]: stat_modifiers ha una stat ignota '{k}'")
+                    if it.get("sigillato") and not it.get("effetto_collaterale"):
+                        err(f"{rel} [{iid}]: sigillato:true senza effetto_collaterale "
+                            f"(un Sigillato senza prezzo e' un bug di dati, US-318)")
+                sab = it.get("stored_ability_id")
+                if sab is not None and ability_ids and sab not in ability_ids:
+                    err(f"{rel} [{iid}]: stored_ability_id '{sab}' non risolve a un'abilita'")
+                eff = it.get("effetto")
+                if isinstance(eff, dict):
+                    et = eff.get("tipo")
+                    if et in deferred_primitives:
+                        err(f"{rel} [{iid}]: effetto usa la primitiva DIFFERITA '{et}'")
+                    elif et not in primitives:
+                        err(f"{rel} [{iid}]: effetto usa la primitiva sconosciuta '{et}'")
+    if len(item_ids) < 12:
+        err(f"data/items/: solo {len(item_ids)} item, attesi >= 12 che coprano le 7 categorie")
+    coperte = {it_cat for f in (os.listdir(idir) if os.path.isdir(idir) else [])
+               if f.endswith(".json")
+               for it_cat in [i.get("categoria") for i in (load_json(os.path.join(idir, f)) or {}).get("items", [])]}
+    for c in item_categories:
+        if c not in coperte:
+            warn(f"data/items/: nessun item di esempio per la categoria '{c}'")
+
     # --- libro / UI (data/ui/book.json, US-221) ---
     pt_doc = load_json(os.path.join(DATA, "schema", "page_types.json"))
     page_types = set((pt_doc or {}).get("page_types", []))

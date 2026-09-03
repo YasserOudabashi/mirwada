@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "_comment": "Pergamene: portano un'abilita' eseguibile al consumo (stored_ability_id, US-304) o insegnano una ricetta leggendaria (insegna_ricetta, US-313). Il motore c'e' gia': AbilityEngine.execute_stored (US-206).",
+  "items": [
+    {
+      "id": "pergamena_vigore",
+      "categoria": "pergamena",
+      "name_i18n": "item.pergamena_vigore",
+      "descrizione_i18n": "item.pergamena_vigore.desc",
+      "tag": ["occulto", "forza"],
+      "impilabile": false,
+      "valore": 25,
+      "stored_ability_id": "tg_stretta_ferrea"
+    },
+    {
+      "id": "pergamena_alba",
+      "categoria": "pergamena",
+      "name_i18n": "item.pergamena_alba",
+      "descrizione_i18n": "item.pergamena_alba.desc",
+      "tag": ["occulto", "luce"],
+      "impilabile": false,
+      "valore": 30,
+      "stored_ability_id": "tg_armatura_alba"
+    }
+  ]
+}

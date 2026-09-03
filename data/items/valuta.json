@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "_comment": "La valuta e' un item come ogni altro (design-master cap. 5): mai un campo speciale del giocatore. Inventory.ricchezza() (US-305) somma conta * valore su tutte le valute.",
+  "items": [
+    {
+      "id": "moneta_comune",
+      "categoria": "valuta",
+      "name_i18n": "item.moneta_comune",
+      "descrizione_i18n": "item.moneta_comune.desc",
+      "tag": [],
+      "impilabile": true,
+      "valore": 1
+    },
+    {
+      "id": "sigillo_reale",
+      "categoria": "valuta",
+      "name_i18n": "item.sigillo_reale",
+      "descrizione_i18n": "item.sigillo_reale.desc",
+      "tag": [],
+      "impilabile": true,
+      "valore": 50
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "_comment": "Consumabili: prodotti dall'alchimia (US-310). 'effetto' e' una primitiva implementata, eseguita bevendo. 'qualita' arriva dalla preparazione. nutre_pet:true fa avanzare il pet (US-324).",
+  "items": [
+    {
+      "id": "pozione_cura_minore",
+      "categoria": "consumabile",
+      "name_i18n": "item.pozione_cura_minore",
+      "descrizione_i18n": "item.pozione_cura_minore.desc",
+      "tag": ["pozione", "guarigione"],
+      "impilabile": true,
+      "valore": 12,
+      "effetto": { "tipo": "heal", "quantita": 25.0, "istantaneo": true }
+    },
+    {
+      "id": "elisir_del_vigore",
+      "categoria": "consumabile",
+      "name_i18n": "item.elisir_del_vigore",
+      "descrizione_i18n": "item.elisir_del_vigore.desc",
+      "tag": ["pozione", "forza"],
+      "impilabile": true,
+      "valore": 18,
+      "effetto": { "tipo": "buff_stat", "stat": "forza", "valore": 0.15, "durata": 20.0, "moltiplicativo": false }
+    },
+    {
+      "id": "pastura_spirituale",
+      "categoria": "consumabile",
+      "name_i18n": "item.pastura_spirituale",
+      "descrizione_i18n": "item.pastura_spirituale.desc",
+      "tag": ["spirito", "bestia"],
+      "impilabile": true,
+      "valore": 22,
+      "nutre_pet": true
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "_comment": "Sigilli come voci d'inventario. sigillo_ref -> data/sigils/ per la definizione di effetto/effetto_collaterale (US-315). Qui e' solo la voce che si tiene nello zaino e si incastona (US-317).",
+  "items": [
+    {
+      "id": "sigillo_forza_minore",
+      "categoria": "sigillo",
+      "name_i18n": "item.sigillo_forza_minore",
+      "descrizione_i18n": "item.sigillo_forza_minore.desc",
+      "tag": ["sigillo", "forza"],
+      "impilabile": false,
+      "valore": 20,
+      "sigillo_ref": "sig_forza_1"
+    },
+    {
+      "id": "sigillo_ombra_fame",
+      "categoria": "sigillo",
+      "name_i18n": "item.sigillo_ombra_fame",
+      "descrizione_i18n": "item.sigillo_ombra_fame.desc",
+      "tag": ["sigillo", "ombra"],
+      "impilabile": false,
+      "valore": 45,
+      "sigillo_ref": "sig_ombra_fame"
+    }
+  ]
+}

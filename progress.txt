@@ -2569,3 +2569,33 @@ sezione test aggiornata.
 - prd.json di fase 2 archiviato in archive/2026-09-03-fase-2-pathway-core/.
 - branchName: ralph/fase-3-sistemi-di-supporto.
 - Prossima storia: US-301 (vocabolario e schema degli item).
+
+[2026-09-03] US-301 — Vocabolario e schema degli item
+
+- data/schema/item_categories.json: vocabolario CHIUSO di 7 categorie
+  (ingrediente, equip, sigillo, pergamena, materiale, valuta, consumabile).
+- data/schema/equip_slots.json: 4 slot (arma, armatura, accessorio_1,
+  accessorio_2) + 3 tipi (arma, armatura, accessorio - il valore del campo
+  'slot' su un item; accessorio -> primo accessorio_N libero in US-303).
+- data/schema/item.schema.json: forma di data/items/*.json.
+- data/items/ (7 file, 20 item): ingredienti (2 coltivabili), equip (incl. 1
+  Sigillato con effetto_collaterale), materiali, pergamene (stored_ability_id
+  = tg_stretta_ferrea / tg_armatura_alba), sigilli (sigillo_ref -> data/sigils/
+  di US-315), valuta (2 tagli), consumabili (effetto = primitiva; 1 nutre_pet).
+- GameData: DIR_ITEMS, _load_items (come _load_abilities), get_item(id),
+  item_categories(), items_per_categoria(cat), item_ids(), equip_slots(),
+  equip_slot_tipi(). 41 file caricati.
+- validate_data.py: blocco item - id unici; categoria nel vocabolario; tag
+  nel vocabolario dei tag; valore int >= 0; impilabile bool; equip -> slot nei
+  tipi + stat_modifiers su stat note + sigillato:true richiede
+  effetto_collaterale (US-318); stored_ability_id risolve; effetto.tipo e' una
+  primitiva del registro (non differita); >= 12 item; warn se una categoria
+  non ha esempi.
+- i18n: 40 chiavi item.* tradotte a mano in it.json (243 chiavi totali).
+- Come verificato: 325 test headless (318 + 7 in test_items.gd: vocabolari
+  caricati, get_item + ignoto -> {}, ogni categoria ha un item, >= 12 item,
+  equip con slot e stat valide, pergamena con stored_ability che risolve,
+  ogni name_i18n/descrizione_i18n degli item risolve). validator 0,
+  generate_i18n_stubs.py --check 0. Nessuna verifica a schermo: story di
+  dati + loader.
+- Prossima storia: US-302 (autoload Inventory).

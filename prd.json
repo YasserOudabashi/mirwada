@@ -21,8 +21,8 @@
       ],
       "priority": 1,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/schema/item_categories.json (7 categorie chiuse), data/schema/equip_slots.json (4 slot + 3 tipi; accessorio -> primo accessorio_N libero), data/schema/item.schema.json. data/items/ 7 file 20 item su tutte le categorie (ingredienti coltivabili, 1 equip Sigillato con effetto_collaterale, pergamene stored_ability_id, sigilli sigillo_ref->data/sigils US-315, 2 valute, consumabili con effetto=primitiva). GameData: _load_items (come _load_abilities), get_item/item_categories/items_per_categoria/item_ids/equip_slots/equip_slot_tipi (41 file). validate_data.py: blocco item - id unici, categoria nel vocab, tag nel vocab tag, valore int>=0, impilabile bool, equip slot nei tipi + stat note + sigillato richiede effetto_collaterale, stored_ability_id risolve, effetto.tipo primitiva non differita, >=12 item. i18n: 40 chiavi item.* tradotte (243 totali). 325 test headless (318+7 test_items.gd), validator 0, i18n --check 0."
     },
     {
       "id": "US-302",

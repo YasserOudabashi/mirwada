@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "_comment": "Ingredienti: materia prima di alchimia (US-308+) e del giardino (US-328). Quelli coltivabile:true si possono piantare.",
+  "items": [
+    {
+      "id": "erba_lunare",
+      "categoria": "ingrediente",
+      "name_i18n": "item.erba_lunare",
+      "descrizione_i18n": "item.erba_lunare.desc",
+      "tag": ["luna", "crescita", "pozione"],
+      "impilabile": true,
+      "valore": 3,
+      "coltivabile": true
+    },
+    {
+      "id": "radice_crepuscolo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.radice_crepuscolo",
+      "descrizione_i18n": "item.radice_crepuscolo.desc",
+      "tag": ["decadimento", "ombra"],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "polvere_ossa",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_ossa",
+      "descrizione_i18n": "item.polvere_ossa.desc",
+      "tag": ["morte", "rituale"],
+      "impilabile": true,
+      "valore": 4
+    },
+    {
+      "id": "fungo_cavernicolo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.fungo_cavernicolo",
+      "descrizione_i18n": "item.fungo_cavernicolo.desc",
+      "tag": ["terra", "follia"],
+      "impilabile": true,
+      "valore": 2,
+      "coltivabile": true
+    }
+  ]
+}

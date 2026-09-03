@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO degli slot di equipaggiamento (US-301, usato da US-303). 'slots' = i punti di aggancio sul personaggio; 'tipi' = il valore del campo 'slot' su un item equip. 'accessorio' occupa il primo accessorio_N libero.",
+  "slots": ["arma", "armatura", "accessorio_1", "accessorio_2"],
+  "tipi": ["arma", "armatura", "accessorio"]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO delle categorie di oggetto (US-301). Ogni cosa che il giocatore raccoglie e' un item con una di queste categorie: non ci sono oggetti speciali nel codice. Una categoria nuova e' CODICE (un nuovo tipo di comportamento): va discussa, come le primitive e gli eventi tracciati.",
+  "item_categories": [
+    "ingrediente",
+    "equip",
+    "sigillo",
+    "pergamena",
+    "materiale",
+    "valuta",
+    "consumabile"
+  ]
+}

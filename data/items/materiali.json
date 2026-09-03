@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "_comment": "Materiali: input della forgiatura (US-316).",
+  "items": [
+    {
+      "id": "lingotto_ferro",
+      "categoria": "materiale",
+      "name_i18n": "item.lingotto_ferro",
+      "descrizione_i18n": "item.lingotto_ferro.desc",
+      "tag": ["crafting"],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "cuoio_conciato",
+      "categoria": "materiale",
+      "name_i18n": "item.cuoio_conciato",
+      "descrizione_i18n": "item.cuoio_conciato.desc",
+      "tag": ["crafting", "carne"],
+      "impilabile": true,
+      "valore": 6
+    },
+    {
+      "id": "cristallo_grezzo",
+      "categoria": "materiale",
+      "name_i18n": "item.cristallo_grezzo",
+      "descrizione_i18n": "item.cristallo_grezzo.desc",
+      "tag": ["crafting", "occulto"],
+      "impilabile": true,
+      "valore": 15
+    }
+  ]
+}
