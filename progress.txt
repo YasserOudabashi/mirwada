@@ -1996,3 +1996,38 @@ sezione test aggiornata.
   Ancore). validator 0. Nessuna regressione (test_madness verde: senza
   Ancore il buffering e' no-op).
 - Prossima storia: US-217 (Motore del rituale di avanzamento).
+
+[2026-09-03] US-217 — Motore del rituale di avanzamento
+
+- Autoload RitualSystem (scripts/ritual_system.gd), ultimo. Legge
+  advancement_ritual della Sequenza (formato gia' nei dati: location_tags,
+  momento, fase_lunare, sacrifices, sigils).
+  - Il mondo di fase 6 non c'e': imposta_luogo(tags) / imposta_tempo(
+    momento, fase_lunare) simulano; aggiungi_sigillo(id) e
+    fornisci_sacrificio(id) sono i ganci per i sistemi futuri (strutture
+    fase 3, boss fase 5); 'ancora_del_giocatore' passa da AnchorSystem.
+  - prerequisiti(rituale) -> {ok, mancanti[]}: elenca ogni tag/momento/
+    fase/sigillo/sacrificio mancante col prefisso.
+  - avvia(rituale): richiede prerequisiti E Acting.e_completo (come
+    l'avanzamento per pozione). Build = audio.json.music.rituale.
+    durata_build_secondi (45). _process conta alla rovescia -> _completa.
+  - interrompi(motivo): rituale abortito. Madness.add(balance.json.rituale.
+    penalita_follia_interruzione 15, NON bufferizzata) + Foundation
+    malus_fondamenta_interruzione (-8) + AudioManager.silenzio_secco(1.2)
+    (muta music/ambience/whisper per 1.2s, poi ripristina e ri-sincronizza
+    il whisper col valore di follia).
+  - _completa: consuma i sacrifici modellati (AnchorSystem.destroy sulla
+    prima Ancora attiva per 'ancora_del_giocatore'), Progression.avanza(),
+    Foundation +bonus_recitazione_completa.
+- AudioManager: silenzio_secco(durata_s) / silenzio_secco_attivo() nuovi.
+- SAVE: SaveSystem VERSIONE_CORRENTE 10 -> 11. Campo "rituale"
+  {sigilli, sacrifici_forniti}, _migra_10_a_11. GameState.snapshot/applica.
+- Come verificato: 248 test headless (242 + 6 in test_ritual.gd:
+  prerequisiti dal rituale reale di Seq 4 (mancanti elencati, poi tutti
+  soddisfatti), avvio richiede prereq + recitazione, completamento avanza
+  di Sequenza, interruzione fallisce con penalita' follia+fondamenta,
+  sacrificio dell'Ancora consumato, persistenza sigilli/sacrifici).
+  validator 0. Catena di migrazione 1->11 verde.
+- Verifica a schermo rimandata: nessuna UI di rituale finche' non c'e' la
+  UI a libro / il mondo di fase 6. Il motore e' coperto dai test.
+- Prossima storia: US-218B (integrazione combat: tag di danno, schivata/precisione).

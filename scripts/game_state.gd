@@ -70,6 +70,10 @@ func _ancore() -> Node:
 	return get_node_or_null("/root/AnchorSystem")
 
 
+func _rituale() -> Node:
+	return get_node_or_null("/root/RitualSystem")
+
+
 func salva_rapido() -> Dictionary:
 	return get_node("/root/SaveSystem").call("salva", SLOT_RAPIDO, snapshot())
 
@@ -98,6 +102,7 @@ func snapshot() -> Dictionary:
 		"follia": _follia().per_salvataggio() if _follia() != null else {},
 		"fondamenta": _fondamenta().per_salvataggio() if _fondamenta() != null else {},
 		"ancore": _ancore().per_salvataggio() if _ancore() != null else [],
+		"rituale": _rituale().per_salvataggio() if _rituale() != null else {},
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D:
@@ -133,6 +138,8 @@ func applica(dati: Dictionary) -> void:
 		_fondamenta().da_salvataggio(dati.get("fondamenta", {}))
 	if _ancore() != null:
 		_ancore().da_salvataggio(dati.get("ancore", []))
+	if _rituale() != null:
+		_rituale().da_salvataggio(dati.get("rituale", {}))
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D and dati.has("posizione"):
 		(p as Node2D).global_position = dati["posizione"]

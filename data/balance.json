@@ -42,6 +42,11 @@
     "nero_alpha": 0.85,
     "nero_alpha_statico": 0.3
   },
+  "rituale": {
+    "_comment": "Rituale di avanzamento delle Sequenze alte (US-217). La durata di build vive in audio.json.music.rituale.durata_build_secondi (45). Qui la penalita' di un rituale interrotto: follia + fondamenta.",
+    "penalita_follia_interruzione": 15,
+    "malus_fondamenta_interruzione": -8
+  },
   "foundation": {
     "_comment": "Qualita' della progressione 0-100. Avanzare in fretta la abbassa. Fondamenta basse = tetto di potenza piu' basso e follia piu' rapida. E' la meccanica che punisce chi corre.",
     "iniziale": 50,

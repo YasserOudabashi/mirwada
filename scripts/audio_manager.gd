@@ -192,6 +192,27 @@ func imposta_nomi_sussurro(nomi: Array) -> void:
 	_nomi_sussurro = nomi.duplicate()
 
 
+## Taglio secco al silenzio (US-217): un rituale interrotto muta music,
+## ambience e whisper per durata_s, poi li ripristina. Il silenzio
+## improvviso e' il momento piu' spaventoso che il gioco produce.
+var _silenzio_fino_ms: int = 0
+var _bus_mutati: PackedStringArray = []
+
+
+func silenzio_secco(durata_s: float) -> void:
+	_silenzio_fino_ms = Time.get_ticks_msec() + int(maxf(0.0, durata_s) * 1000.0)
+	_bus_mutati = PackedStringArray()
+	for nome in ["music", "ambience", "whisper"]:
+		var i: int = AudioServer.get_bus_index(nome)
+		if i != -1 and not AudioServer.is_bus_mute(i):
+			AudioServer.set_bus_mute(i, true)
+			_bus_mutati.append(nome)
+
+
+func silenzio_secco_attivo() -> bool:
+	return Time.get_ticks_msec() < _silenzio_fino_ms
+
+
 func nomi_sussurro() -> Array:
 	return _nomi_sussurro if not _nomi_sussurro.is_empty() else _NOMI_GENERICI
 
@@ -304,6 +325,16 @@ func _process(delta: float) -> void:
 	if _hitstop_fine_ms > 0 and Time.get_ticks_msec() >= _hitstop_fine_ms:
 		_hitstop_fine_ms = 0
 		Engine.time_scale = 1.0
+
+	# Fine del silenzio secco (US-217): ripristina i bus mutati.
+	if _silenzio_fino_ms > 0 and Time.get_ticks_msec() >= _silenzio_fino_ms:
+		_silenzio_fino_ms = 0
+		for nome in _bus_mutati:
+			var i: int = AudioServer.get_bus_index(nome)
+			if i != -1:
+				AudioServer.set_bus_mute(i, false)
+		_bus_mutati = PackedStringArray()
+		aggiorna_follia(_follia_corrente)  # ri-sincronizza il whisper con la follia
 
 	# One-shot casuali della follia (US-214).
 	if _follia_corrente >= float((_madness_layer.get("one_shot_casuali", {}) as Dictionary).get("madness_min", 25.0)):

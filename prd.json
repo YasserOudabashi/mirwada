@@ -451,8 +451,8 @@
       ],
       "priority": 22,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Autoload RitualSystem (scripts/ritual_system.gd), ultimo. Legge advancement_ritual della Sequenza (location_tags, momento, fase_lunare, sacrifices, sigils - formato gia' nei dati). Il mondo di fase 6 non c'e': imposta_luogo(tags)/imposta_tempo(momento, fase_lunare) simulano, aggiungi_sigillo(id) e fornisci_sacrificio(id) sono i ganci per i sistemi futuri (strutture=fase 3, boss=fase 5); 'ancora_del_giocatore' passa da AnchorSystem (>=1 attiva). prerequisiti(rituale) -> {ok, mancanti[]}: ogni tag/momento/fase/sigillo/sacrificio mancante e' elencato con prefisso. avvia(rituale): richiede prerequisiti E Acting.e_completo (come l'avanzamento per pozione). Fase di build = audio.json.music.rituale.durata_build_secondi (45); _process conta alla rovescia. interrompi(motivo): rituale abortito, Madness.add(balance.json.rituale.penalita_follia_interruzione 15, non bufferizzata) + Foundation malus_fondamenta_interruzione (-8) + AudioManager.silenzio_secco(1.2) (muta music/ambience/whisper per 1.2s poi ripristina e ri-sincronizza col valore di follia). _completa: consuma i sacrifici modellati (AnchorSystem.destroy sulla prima Ancora attiva per 'ancora_del_giocatore'), Progression.avanza(), Foundation +bonus. SAVE: schema_version 10->11, campo 'rituale' {sigilli, sacrifici_forniti}, _migra_10_a_11; GameState.snapshot/applica. AudioManager: silenzio_secco/silenzio_secco_attivo nuovi. 6 test in test_ritual.gd (248 totali): prerequisiti dal rituale reale di Seq 4 (mancanti elencati, poi tutti soddisfatti), avvio richiede prereq + recitazione, completamento avanza di Sequenza, interruzione fallisce con penalita' follia+fondamenta, sacrificio dell'Ancora consumato, persistenza sigilli/sacrifici. validator 0, nessuna regressione (catena migrazione 1->11 verde). Verifica a schermo rimandata: nessuna UI di rituale finche' non c'e' la UI a libro / il mondo di fase 6; il motore e' coperto dai test."
     },
     {
       "id": "US-218B",

@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 10
+const VERSIONE_CORRENTE := 11
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -70,6 +70,8 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		"fondamenta": (dati.get("fondamenta", {}) as Dictionary).duplicate(true),
 		# Ancore attive (US-216). Lista di id.
 		"ancore": (dati.get("ancore", []) as Array).duplicate(true),
+		# Sigilli e sacrifici del rituale (US-217). { sigilli, sacrifici_forniti }.
+		"rituale": (dati.get("rituale", {}) as Dictionary).duplicate(true),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -169,6 +171,8 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_8_a_9(doc)
 			9:
 				doc = _migra_9_a_10(doc)
+			10:
+				doc = _migra_10_a_11(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -245,6 +249,13 @@ func _migra_9_a_10(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v10 -> v11: sigilli e sacrifici del rituale (US-217).
+func _migra_10_a_11(doc: Dictionary) -> Dictionary:
+	if not doc.has("rituale"):
+		doc["rituale"] = {"sigilli": [], "sacrifici_forniti": []}
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -264,6 +275,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"follia": _campo(raw, "follia", TYPE_DICTIONARY, {}),
 		"fondamenta": _campo(raw, "fondamenta", TYPE_DICTIONARY, {}),
 		"ancore": _campo(raw, "ancore", TYPE_ARRAY, []),
+		"rituale": _campo(raw, "rituale", TYPE_DICTIONARY, {}),
 	}
 
 
