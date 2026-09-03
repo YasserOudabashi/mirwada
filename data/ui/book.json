@@ -6,7 +6,8 @@
     "dissolvenza_ridotta_ms": 80,
     "sfx_apri": "sfx_ui_book_open",
     "sfx_volta": "sfx_ui_page",
-    "macchie_follia": true
+    "macchie_follia": true,
+    "slot": 4
   },
   "pages": [
     { "id": "copertina",    "tipo": "menu_principale",       "name_i18n": "ui.page.copertina",    "ordine": 0 },

@@ -608,6 +608,9 @@ def main():
         lib = book.get("libro", {})
         if not isinstance(lib.get("voltata_ms"), int) or lib.get("voltata_ms", 0) <= 0:
             err("data/ui/book.json [libro]: voltata_ms dev'essere un intero > 0")
+        if not isinstance(lib.get("slot"), int) or not (1 <= lib.get("slot", 0) <= 12):
+            err("data/ui/book.json [libro]: slot dev'essere un intero in [1, 12] "
+                "(quanti tomi mostra lo scaffale, US-223)")
         # gioco.fase deve esistere: le pagine si sbloccano contro questo numero
         _bg = load_json(os.path.join(DATA, "balance.json"))
         if _bg and not isinstance(_bg.get("gioco", {}).get("fase"), int):

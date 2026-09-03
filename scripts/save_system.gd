@@ -134,6 +134,24 @@ func stato_slot(slot: int) -> int:
 	return Slot.VALIDO if typeof(parsed) == TYPE_DICTIONARY else Slot.CORROTTO
 
 
+## Anteprima per lo scaffale (US-223): stato + nome + tempo, SENZA applicare
+## nulla e senza migrare. Campi non fidati come ovunque nel save. Uno slot
+## corrotto torna { stato: CORROTTO } e non fa crashare la UI.
+func anteprima(slot: int) -> Dictionary:
+	var stato: int = stato_slot(slot)
+	var out: Dictionary = {"stato": stato, "nome_personaggio": "", "tempo_gioco": 0.0}
+	if stato != Slot.VALIDO:
+		return out
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(_percorso(slot)))
+	if typeof(parsed) == TYPE_DICTIONARY:
+		var d: Dictionary = parsed
+		if typeof(d.get("nome_personaggio")) == TYPE_STRING:
+			out["nome_personaggio"] = d["nome_personaggio"]
+		if typeof(d.get("tempo_gioco")) in [TYPE_FLOAT, TYPE_INT]:
+			out["tempo_gioco"] = float(d["tempo_gioco"])
+	return out
+
+
 func esiste(slot: int) -> bool:
 	return FileAccess.file_exists(_percorso(slot))
 

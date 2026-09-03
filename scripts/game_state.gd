@@ -12,8 +12,14 @@ extends Node
 const SLOT_RAPIDO := 0
 const NOME_DEFAULT := "Enel"
 
+signal partita_iniziata(nome: String)
+
 var nome_personaggio: String = NOME_DEFAULT
 var tempo_gioco: float = 0.0
+## false al boot (sei sul menu del libro), true dopo nuova_partita()/carica_slot().
+var _partita_attiva: bool = false
+## Slot su cui gira la partita corrente (-1 = nessuno).
+var _slot_corrente: int = -1
 
 
 func _process(delta: float) -> void:
@@ -75,14 +81,65 @@ func _rituale() -> Node:
 
 
 func salva_rapido() -> Dictionary:
-	return get_node("/root/SaveSystem").call("salva", SLOT_RAPIDO, snapshot())
+	return salva_slot(SLOT_RAPIDO)
 
 
 func carica_rapido() -> Dictionary:
-	var r: Dictionary = get_node("/root/SaveSystem").call("carica", SLOT_RAPIDO)
+	return carica_slot(SLOT_RAPIDO)
+
+
+## Salva la partita corrente sullo slot indicato (US-223).
+func salva_slot(slot: int) -> Dictionary:
+	var r: Dictionary = get_node("/root/SaveSystem").call("salva", slot, snapshot())
+	if r.get("ok", false):
+		_slot_corrente = slot
+	return r
+
+
+## Carica lo slot e applica lo stato. La partita diventa attiva (US-223).
+func carica_slot(slot: int) -> Dictionary:
+	var r: Dictionary = get_node("/root/SaveSystem").call("carica", slot)
 	if r.get("ok", false):
 		applica(r["dati"])
+		_partita_attiva = true
+		_slot_corrente = slot
+		partita_iniziata.emit(nome_personaggio)
 	return r
+
+
+## Creazione personaggio (US-223): fissa il nome, riparte da zero, salva sullo
+## slot scelto. Il Pathway/Sequenza di partenza vengono dai dati (Progression).
+func nuova_partita(nome: String, slot: int) -> Dictionary:
+	nome_personaggio = nome.strip_edges() if not nome.strip_edges().is_empty() else NOME_DEFAULT
+	tempo_gioco = 0.0
+	_partita_attiva = true
+	_slot_corrente = slot
+	partita_iniziata.emit(nome_personaggio)
+	return get_node("/root/SaveSystem").call("salva", slot, snapshot())
+
+
+func partita_in_corso() -> bool:
+	return _partita_attiva
+
+
+func nome_default() -> String:
+	return NOME_DEFAULT
+
+
+func slot_corrente() -> int:
+	return _slot_corrente
+
+
+## Lo scaffale segna quale tomo si sta per iniziare; il frontespizio lo legge.
+var _slot_scelto: int = 0
+
+
+func scegli_slot(slot: int) -> void:
+	_slot_scelto = slot
+
+
+func slot_scelto() -> int:
+	return _slot_scelto
 
 
 ## Raccoglie lo stato dal giocatore vivo. Se non c'e' un giocatore in scena,

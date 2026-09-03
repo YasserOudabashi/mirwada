@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://c0pgmenuprinc0mir"]
+
+[ext_resource type="Script" path="res://scripts/pages/page_menu_principale.gd" id="1_pmp"]
+
+[node name="PageMenuPrincipale" type="VBoxContainer"]
+anchors_preset = 8
+alignment = 1
+theme_override_constants/separation = 6
+script = ExtResource("1_pmp")

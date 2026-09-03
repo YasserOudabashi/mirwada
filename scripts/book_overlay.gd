@@ -17,9 +17,17 @@ extends CanvasLayer
 @onready var _sfondo: ColorRect = $Sfondo
 @onready var _pagina: ColorRect = $Pagina
 @onready var _titolo: Label = $Pagina/Titolo
-@onready var _corpo: Label = $Pagina/Corpo
+@onready var _contenuto: MarginContainer = $Pagina/Contenuto
 @onready var _voltata: ColorRect = $Pagina/Voltata
 @onready var _segnalibri: VBoxContainer = $Segnalibri
+
+## Un tipo di pagina, una scena. Le pagine non ancora scritte ricadono su un
+## placeholder. design-ui-libro.md: "il codice implementa un tipo di pagina per
+## ogni tipo del vocabolario chiuso".
+const PAGINE := {
+	"menu_principale": preload("res://scenes/pages/page_menu_principale.tscn"),
+	"creazione_personaggio": preload("res://scenes/pages/page_creazione_personaggio.tscn"),
+}
 
 var _volta_durata: float = 0.35
 var _volta_ridotta_s: float = 0.08
@@ -108,11 +116,31 @@ func _rendi(pagina: String) -> void:
 	var gd: Node = get_node_or_null("/root/GameData")
 	var nome: String = str(p.get("name_i18n", pagina))
 	_titolo.text = str(gd.call("tr_data", nome)) if gd != null else nome
-	if b.call("pagina_sbloccata", pagina):
-		# La pagina vera (rendering del contenuto) arriva con la sua story.
-		_corpo.text = "[ %s ]" % str(p.get("tipo", ""))
+
+	for c in _contenuto.get_children():
+		c.queue_free()
+
+	if not b.call("pagina_sbloccata", pagina):
+		_contenuto.add_child(_riga("· appunto a matita ·\nquesta pagina si aprira' piu' avanti"))
+		return
+
+	var scena: PackedScene = PAGINE.get(str(p.get("tipo", "")), null)
+	if scena != null:
+		var inst: Node = scena.instantiate()
+		_contenuto.add_child(inst)
+		if inst.has_method("aggiorna"):
+			inst.call("aggiorna")
 	else:
-		_corpo.text = "· appunto a matita ·\nquesta pagina si aprira' piu' avanti"
+		# tipo nel vocabolario ma pagina non ancora scritta: placeholder.
+		_contenuto.add_child(_riga("[ %s ]" % str(p.get("tipo", ""))))
+
+
+func _riga(testo: String) -> Label:
+	var l := Label.new()
+	l.text = testo
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	return l
 
 
 func _costruisci_segnalibri() -> void:
@@ -140,6 +168,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	if b == null or not b.call("e_aperto"):
 		return
 	if event.is_action_pressed("pagina_avanti"):
+		# alcune pagine (frontespizio: "conferma con la voltata") intercettano
+		# la voltata in avanti
+		var pag: Node = _contenuto.get_child(0) if _contenuto.get_child_count() > 0 else null
+		if pag != null and pag.has_method("intercetta_avanti") and bool(pag.call("intercetta_avanti")):
+			get_viewport().set_input_as_handled()
+			return
 		b.call("avanti")
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("pagina_indietro"):
@@ -171,7 +205,13 @@ func titolo() -> String:
 
 
 func corpo() -> String:
-	return _corpo.text
+	var out: PackedStringArray = []
+	for c in _contenuto.get_children():
+		if c is Label:
+			out.append((c as Label).text)
+		elif c.has_method("testo_visibile"):
+			out.append(str(c.call("testo_visibile")))
+	return "\n".join(out)
 
 
 func voltata_in_corso() -> bool:

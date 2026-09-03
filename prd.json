@@ -618,8 +618,8 @@
       ],
       "priority": 30,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Pagine vere: book_overlay.PAGINE={tipo:PackedScene}, _rendi() istanzia nel MarginContainer Contenuto e chiama aggiorna(); tipi senza scena -> placeholder, pagine bianche -> appunto a matita. scenes/pages/page_menu_principale.{tscn,gd}: un Button per slot (book.json libro.slot=4), SaveSystem.anteprima(slot) NUOVA (stato+nome+tempo senza applicare/migrare, non fidata): VUOTO->\"Tomo nuovo\"->scegli_slot+vai_a(frontespizio); VALIDO->\"<nome> - <tempo>\"->carica_slot->chiudi; CORROTTO->\"Tomo bruciato\" disabled (mai crash/cancellazione). page_creazione_personaggio.{tscn,gd}: partita non attiva -> LineEdit \"Enel\" (GameState.nome_default, design-lore) + \"Comincia\"; conferma()->nuova_partita(nome,slot); intercetta_avanti() = la voltata E conferma; partita attiva -> nome+Pathway(tr_data)+Sequenza+tier read-only. GameState: salva_slot/carica_slot, nuova_partita, partita_in_corso, scegli_slot/slot_scelto, nome_default, segnale partita_iniziata. i18n: stringhe di chrome del libro in assets/i18n/strings.csv + tr() (BOOK_*), tr_data resta per le identita' dei dati; .translation rigenerati. validator: libro.slot in [1,12]. 289 test headless (284+5 in test_page_scaffale.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): scaffale con 4 tomi (nuovo/\"Sidon - 0m\"/bruciato grigio/nuovo), frontespizio col campo \"Enel\" + \"Comincia\". Screenshot user://us223. Resta: nessun gating d'avvio \"apri prima il libro\" (fase 6)."
     },
     {
       "id": "US-224",

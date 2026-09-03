@@ -2327,3 +2327,44 @@ sezione test aggiornata.
   US-224 diagramma, US-225 colophon. La voltata e' un placeholder a fascia
   d'ombra: i 3-4 frame di curvatura disegnati arrivano con l'arte.
 - Prossima storia: US-223 (pagina scaffale + frontespizio / creazione personaggio).
+
+[2026-09-03] US-223 — Pagina scaffale (menu principale) e frontespizio
+
+- PAGINE VERE: il codice implementa un tipo di pagina per ogni tipo del
+  vocabolario. book_overlay.gd ora ha PAGINE = { tipo: PackedScene }; _rendi()
+  istanzia la scena nel MarginContainer 'Contenuto' e chiama aggiorna(); i
+  tipi senza scena ricadono sul placeholder '[ tipo ]', le pagine bianche
+  sull'appunto a matita. Corpo (Label) -> Contenuto (MarginContainer).
+- scenes/pages/page_menu_principale.{tscn,gd} (VBoxContainer): un Button per
+  slot (data/ui/book.json libro.slot = 4). SaveSystem.anteprima(slot) (NUOVO:
+  stato+nome+tempo senza applicare ne' migrare, campi non fidati):
+  VUOTO -> "Tomo nuovo" -> GameState.scegli_slot + Book.vai_a('frontespizio');
+  VALIDO -> "<nome> - <tempo>" -> GameState.carica_slot -> Book.chiudi;
+  CORROTTO -> "Tomo bruciato" disabled (US-015: mai crash, mai cancellato).
+  + "Torna alla partita" se partita_in_corso.
+- scenes/pages/page_creazione_personaggio.{tscn,gd}: partita NON attiva ->
+  LineEdit con "Enel" (GameState.nome_default(), design-lore) + "Comincia";
+  conferma() -> GameState.nuova_partita(nome, slot scelto) -> Book.chiudi.
+  intercetta_avanti(): la voltata in avanti (E) conferma ("si conferma con la
+  prima voltata"). Partita attiva -> mostra nome + Pathway (tr_data del
+  name_i18n) + Sequenza + tier, sola lettura.
+- GameState: salva_slot/carica_slot(slot) (generalizzano salva/carica_rapido),
+  nuova_partita(nome, slot), partita_in_corso(), slot_corrente(),
+  scegli_slot()/slot_scelto(), nome_default(), segnale partita_iniziata.
+- i18n: le stringhe di CHROME del libro (bottoni, inviti) vanno in
+  assets/i18n/strings.csv + tr() come l'HUD (BOOK_SCAFFALE_*, BOOK_FRONTESPIZIO_*),
+  NON in tr_data: quello resta per le identita' dei dati (titolo pagina,
+  nome Pathway). .translation rigenerati con --import.
+- validate_data.py: libro.slot intero in [1,12].
+- Come verificato: 289 test headless (284 + 5 in test_page_scaffale.gd: slot
+  vuoti = tomo nuovo, tomo corrotto = bruciato+disabled e il file non e'
+  toccato, tomo valido mostra il nome e carica, frontespizio parte da 'Enel'
+  e conferma scrive nome+save, a partita in corso mostra chi sei senza campo
+  nome). validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn finestra
+  reale): lo scaffale mostra 4 tomi (nuovo / "Sidon - 0m" / bruciato grigio /
+  nuovo); il frontespizio mostra il campo "Enel" selezionato + "Comincia".
+  Screenshot user://us223.
+- Resta aperto: il gioco boota ancora dritto in main.tscn con un player - non
+  c'e' un vero gating "prima apri il libro" (fase 6, flusso di avvio). La
+  pagina identita' e' minimale (nome/pathway/sequenza/tier).
+- Prossima storia: US-224 (pagina diagramma dei Pathway con fog of war).
