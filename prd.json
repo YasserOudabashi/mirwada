@@ -472,8 +472,8 @@
       ],
       "priority": 23,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "TAG DI DANNO nella pipeline: hitbox.attiva(danno, stagger, origine, tag_danno='') porta il tag; _physics_process passa {tag_danno} come 4o arg (dict) a hurtbox.subisci e ha_colpito(bersaglio, danno, tag) porta il tag. hurtbox.subisci(danno, stagger, da, extra={}) retrocompatibile: legge extra.tag_danno, lo passa a stats.assorbi_danno(danno, tag) (lo scudo con tag_bloccati ora blocca DAVVERO solo i tag elencati) e a colpito(danno, stagger, da, tag). player.gd: attacco_leggero.tag_danno='fisico' in balance.json; _su_colpo_inflitto/_su_danno_subito ricevono il tag e lo mettono negli eventi damage_dealt/damage_taken -> le acting_actions con filtro tag_danno si riempiono da combattimento reale. enemy.gd: attacco 'fisico'. TIRO DI SCHIVATA: prima del danno, prob = clamp(evasione_bersaglio - precisione_attaccante, 0, balance.json.combattimento.cap_schivata 0.85); su colpo mancato danno 0 + segnale schivato(da) + return (niente damage_taken). RNG per-hurtbox seedabile (set_rng) per replay/test deterministici. evasione e precisione (stat forward-looking di US-024/228) ora contano. Segnali colpito e ha_colpito estesi (+tag): aggiornati i callable a 3/4 arg in dummy.gd, test_combat.gd; le lambda a meno argomenti restano valide in Godot 4. 4 test in test_combat_integration.gd (252 totali): scudo blocca solo i tag elencati (fisico si', luce no), alta evasione (0.6) -> molti colpi mancati, precisione 0.9 vs evasione 0.5 -> prob 0 nessuna schivata, damage_dealt emesso col tag e filtrabile. TRAPPOLA RITROVATA: le lambda GDScript catturano le locali PER VALORE (US-009) - il test raccoglieva in un int, corretto con un Dictionary. validator 0, nessuna regressione."
     },
     {
       "id": "US-218C",

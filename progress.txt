@@ -2031,3 +2031,37 @@ sezione test aggiornata.
 - Verifica a schermo rimandata: nessuna UI di rituale finche' non c'e' la
   UI a libro / il mondo di fase 6. Il motore e' coperto dai test.
 - Prossima storia: US-218B (integrazione combat: tag di danno, schivata/precisione).
+
+[2026-09-03] US-218B — Integrazione combat: tag di danno, tiro di schivata e precisione
+
+- TAG DI DANNO nella pipeline:
+  - hitbox.attiva(danno, stagger, origine, tag_danno='') porta il tag;
+    _physics_process passa {tag_danno} come 4o arg (dict) a
+    hurtbox.subisci e ha_colpito(bersaglio, danno, tag) lo espone.
+  - hurtbox.subisci(danno, stagger, da, extra={}) retrocompatibile:
+    legge extra.tag_danno, lo passa a stats.assorbi_danno(danno, tag)
+    (lo scudo con tag_bloccati ora blocca DAVVERO solo i tag elencati) e
+    a colpito(danno, stagger, da, tag).
+  - player.gd: balance.json.combattimento.attacco_leggero.tag_danno =
+    'fisico'; _su_colpo_inflitto/_su_danno_subito ricevono il tag e lo
+    mettono negli eventi damage_dealt/damage_taken -> le acting_actions
+    con filtro tag_danno si riempiono da combattimento reale.
+  - enemy.gd: attacco 'fisico'.
+- TIRO DI SCHIVATA: prima del danno, prob = clamp(evasione_bersaglio -
+  precisione_attaccante, 0, balance.json.combattimento.cap_schivata 0.85).
+  Colpo mancato -> danno 0 + segnale schivato(da) + return (niente
+  damage_taken). RNG per-hurtbox seedabile (set_rng) per replay/test
+  deterministici. evasione e precisione (stat forward-looking di
+  US-024/228) ora contano davvero.
+- Segnali colpito e ha_colpito estesi (+tag): aggiornati i callable in
+  dummy.gd e test_combat.gd. Le lambda a meno argomenti restano valide
+  in Godot 4.
+- Come verificato: 252 test headless (248 + 4 in test_combat_integration.gd:
+  scudo blocca solo i tag elencati (fisico si', luce no), alta evasione
+  (0.6) -> molti colpi mancati su 200, precisione 0.9 vs evasione 0.5 ->
+  prob 0 e nessuna schivata, damage_dealt emesso col tag e filtrabile).
+  validator 0.
+- TRAPPOLA RITROVATA (gia' in US-009): le lambda GDScript catturano le
+  locali PER VALORE. Il test raccoglieva le schivate in un int -> restava
+  0. Corretto con un Dictionary (tipo riferimento).
+- Prossima storia: US-218C (sistema di status + campi d'area per aura/decay).

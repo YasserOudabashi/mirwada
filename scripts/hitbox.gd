@@ -12,11 +12,12 @@ extends Area2D
 ##
 ## NIENTE class_name: coerente col progetto.
 
-signal ha_colpito(bersaglio: Node, danno: float)
+signal ha_colpito(bersaglio: Node, danno: float, tag_danno: String)
 
 var _danno: float = 0.0
 var _stagger: float = 0.0
 var _origine: Node = null
+var _tag: String = ""
 var _colpiti: Array = []
 
 var _forma: CollisionShape2D
@@ -35,10 +36,11 @@ func configura(angolo: float, raggio: float) -> void:
 
 
 ## Accende la hitbox: da qui in avanti chi tocca viene colpito, una volta sola.
-func attiva(danno: float, stagger: float, origine: Node) -> void:
+func attiva(danno: float, stagger: float, origine: Node, tag_danno: String = "") -> void:
 	_danno = danno
 	_stagger = stagger
 	_origine = origine
+	_tag = tag_danno
 	_colpiti.clear()
 	monitoring = true
 	visible = true
@@ -56,8 +58,8 @@ func _physics_process(_delta: float) -> void:
 		if not a.has_method("subisci") or _colpiti.has(a):
 			continue
 		_colpiti.append(a)
-		a.call("subisci", _danno, _stagger, _origine)
-		ha_colpito.emit(a, _danno)
+		a.call("subisci", _danno, _stagger, _origine, {"tag_danno": _tag})
+		ha_colpito.emit(a, _danno, _tag)
 
 
 func _costruisci(angolo: float, raggio: float) -> void:

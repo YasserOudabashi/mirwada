@@ -128,7 +128,8 @@ func _su_evento_anim(nome: String) -> void:
 		"hitbox_on":
 			_hitbox.call("attiva",
 				float(_cfg.get("danno_attacco", 10.0)),
-				float(_cfg.get("stagger_attacco", 8.0)), self)
+				float(_cfg.get("stagger_attacco", 8.0)), self,
+				str(_cfg.get("tag_danno_attacco", "fisico")))
 		"hitbox_off":
 			_hitbox.call("disattiva")
 
@@ -155,7 +156,7 @@ func _su_anim_finita(stato_anim: String) -> void:
 		_vai(Stato.RECUPERO)
 
 
-func _su_colpo_inflitto(_bersaglio: Node, _danno: float) -> void:
+func _su_colpo_inflitto(_bersaglio: Node, _danno: float, _tag: String = "") -> void:
 	var am: Node = get_node_or_null("/root/AudioManager")
 	if am != null:
 		am.call("feedback", "hit_light")

@@ -68,8 +68,10 @@
       "danno": 12,
       "stagger": 6,
       "angolo": 100,
-      "raggio": 22
+      "raggio": 22,
+      "tag_danno": "fisico"
     },
+    "cap_schivata": 0.85,
     "schivata": {
       "_comment": "La finestra di invulnerabilita' NON e' qui: sono i frame iframe_da/iframe_a di animations.json personaggio.dash. Qui distanza, durata e cooldown.",
       "distanza": 96,

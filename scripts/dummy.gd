@@ -13,7 +13,7 @@ func _ready() -> void:
 	_stats.configure_from_balance(9)
 	var hb: Node = get_node_or_null("Hurtbox")
 	if hb != null and hb.has_signal("colpito"):
-		hb.colpito.connect(func(_d: float, _s: float, _da: Node) -> void:
+		hb.colpito.connect(func(_d: float, _s: float, _da: Node, _tag: String) -> void:
 			colpi_ricevuti += 1)
 
 

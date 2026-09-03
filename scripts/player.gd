@@ -172,7 +172,8 @@ func _su_evento_anim(nome: String) -> void:
 		"hitbox_on":
 			var arco: Dictionary = _combat.get("attacco_leggero", {})
 			_hitbox.call("attiva",
-				float(arco.get("danno", 12.0)), float(arco.get("stagger", 6.0)), self)
+				float(arco.get("danno", 12.0)), float(arco.get("stagger", 6.0)), self,
+				str(arco.get("tag_danno", "")))
 		"hitbox_off":
 			_hitbox.call("disattiva")
 
@@ -235,18 +236,18 @@ func _cerca_postura(nodo: Node) -> Node:
 
 ## sfx + hitstop + shake del colpo inferto: tutto in AudioManager, dai dati
 ## (audio.json.combat_feedback). Niente hitstop hardcoded qui.
-func _su_colpo_inflitto(_bersaglio: Node, danno: float) -> void:
+func _su_colpo_inflitto(_bersaglio: Node, danno: float, tag_danno: String = "") -> void:
 	if _audio != null:
 		_audio.call("feedback", "hit_light")
 	if danno > 0.0:
-		_traccia("damage_dealt", {"quantita": danno})
+		_traccia("damage_dealt", {"quantita": danno, "tag_danno": tag_danno})
 
 
-func _su_danno_subito(danno: float, _stagger: float, _da: Node) -> void:
+func _su_danno_subito(danno: float, _stagger: float, _da: Node, tag_danno: String = "") -> void:
 	if danno > 0.0 and _audio != null:
 		_audio.call("feedback", "damage_taken")
 	if danno > 0.0:
-		_traccia("damage_taken", {"quantita": danno})
+		_traccia("damage_taken", {"quantita": danno, "tag_danno": tag_danno})
 
 
 ## Inoltra un evento all'EventTracker (US-210B). Agganciato, non riscritto:

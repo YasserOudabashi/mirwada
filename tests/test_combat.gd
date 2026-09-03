@@ -45,7 +45,7 @@ func test_niente_autodanno() -> void:
 func test_segnale_colpito_emesso() -> void:
 	var e: Dictionary = _entita()
 	var visti: Array = []
-	e["hurtbox"].colpito.connect(func(d: float, s: float, _da: Node) -> void: visti.append([d, s]))
+	e["hurtbox"].colpito.connect(func(d: float, s: float, _da: Node, _tag: String) -> void: visti.append([d, s]))
 	e["hurtbox"].subisci(9.0, 3.0, null)
 	assert_eq(visti, [[9.0, 3.0]], "segnale colpito con danno e stagger")
 	e["host"].free()
