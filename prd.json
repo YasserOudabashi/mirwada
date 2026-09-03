@@ -434,6 +434,49 @@
       "notes": ""
     },
     {
+      "id": "US-218B",
+      "title": "Integrazione combat: tag di danno, tiro di schivata e precisione",
+      "description": "Come sviluppatore, voglio che il tag di danno viaggi lungo la pipeline di combattimento e che evasione/precisione decidano davvero se un colpo va a segno.",
+      "acceptanceCriteria": [
+        "hitbox porta il tag_danno fino a hurtbox.subisci (firma retrocompatibile: dict opzionale, i chiamanti a 3 argomenti restano validi)",
+        "hurtbox.subisci passa il tag a stats.assorbi_danno(danno, tag) e agli eventi damage_dealt/damage_taken - le acting_actions con filtro tag_danno si riempiono da combattimento reale",
+        "Lo scudo con tag_bloccati ora blocca solo i tag elencati (il tag non e' piu' '' non tipizzato)",
+        "Prima del danno: tiro di schivata, probabilita' = clamp(evasione_bersaglio - precisione_attaccante, 0, cap) con cap da balance.json.combattimento; schivato -> danno 0, segnale schivato(da)",
+        "Il tiro usa un RNG seedabile cosi' i test sono deterministici",
+        "Test headless: tag fisico assorbito da tag_bloccati [fisico] e tag luce no; alta evasione -> molti colpi mancati; precisione alta annulla l'evasione; damage_dealt emesso col tag",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 22,
+      "fase": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-218C",
+      "title": "Sistema di status sulle entita' + campi d'area per aura e decay",
+      "description": "Come sviluppatore, voglio che aura, curse e light_purify agiscano su status nominati con un tag (data-driven), e che aura/decay applichino l'effetto alle entita' nel raggio.",
+      "acceptanceCriteria": [
+        "data/status_effects.json + data/schema/status_effects.schema.json: ogni effetto (taunt, decadimento, sfortuna, autorita_decadimento) con tag, stat_modifiers opzionali (riusano i modificatori per id di US-007), durata_default",
+        "GameData carica status_effects.json; get_status_effect(id)",
+        "StatsComponent: applica_status(id, durata) / status_attivi() / rimuovi_status(id) / rimuovi_status_per_tag(tag); gli stat_modifiers dello status come modificatore per id 'status:<id>'",
+        "_p_aura e _p_curse applicano lo status 'effetto'; _p_light_purify rimuove anche gli status il cui tag matcha (torna 'per tag' come dice il PRD)",
+        "aura e decay con raggio > 0 generano un Area2D field (scripts/field.gd) figlio del caster che a ogni tick trova le hurtbox in raggio e applica danno (decay) o status (aura); si autodistrugge a fine durata, durata -1 finche' il caster e' valido",
+        "Il validator: ogni 'effetto' usato da aura/curse in data/abilities/ esiste in status_effects.json",
+        "Test headless: applica/rimuovi status, stat_modifiers dello status, light_purify per tag, un campo aura applica lo status a un bersaglio nel raggio e non a uno fuori",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 23,
+      "fase": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
       "id": "US-218",
       "title": "Percezione per Sequenza",
       "description": "Come giocatore, salendo di Sequenza voglio sentire e vedere cose che prima non c'erano: e' il radar dell'esplorazione.",
@@ -449,7 +492,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 22,
+      "priority": 24,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -469,7 +512,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 23,
+      "priority": 25,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -490,7 +533,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 24,
+      "priority": 26,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -511,7 +554,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 25,
+      "priority": 27,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -531,7 +574,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 26,
+      "priority": 28,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -552,7 +595,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 27,
+      "priority": 29,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -572,7 +615,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 28,
+      "priority": 30,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -592,7 +635,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 29,
+      "priority": 31,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -613,7 +656,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 30,
+      "priority": 32,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -635,7 +678,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 31,
+      "priority": 33,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -654,7 +697,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 32,
+      "priority": 34,
       "fase": 2,
       "passes": false,
       "notes": ""

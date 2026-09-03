@@ -1699,3 +1699,27 @@ sezione test aggiornata.
   schema_version arrivato a 6 (progressione, mondo, evocazioni gia'
   c'era, eventi, acting), catena di migrazione 1->6 completa e testata.
 - Prossima storia: US-207 (Caratteristica Beyonder come oggetto).
+
+[2026-09-03] ORDINE FINALE del prd.json + 2 story di sistema
+
+- Su richiesta dell'utente: ordine delle story sistemato UNA volta,
+  definitivo, non si tocca piu'. 34 story (era 32).
+- Aggiunte due story per i sistemi che il PRD IMPLICA e che finora erano
+  stati lasciati "registrati ma non applicati":
+  * US-218B (priority 22): tag di danno lungo la pipeline hitbox->hurtbox
+    ->assorbi_danno/eventi; tiro di schivata/precisione vero
+    (evasione - precisione vs cap). Fa funzionare shield.tag_bloccati,
+    i buff/debuff su evasione (fool_velo_illusorio, darkness_sfortuna),
+    i filtri tag_danno delle acting_actions.
+  * US-218C (priority 23): data/status_effects.json + schema + validator;
+    StatsComponent.applica_status/rimuovi_status_per_tag; aura/curse
+    applicano lo status 'effetto', light_purify rimuove per TAG (come
+    dice il PRD); Area2D field per aura/decay che applica nel raggio.
+- NUOVA REGOLA DI LAVORO (utente): quando una story richiede un sistema
+  di cui il PRD parla, si COSTRUISCE dentro quella story. Niente piu'
+  "documentato come non applicato". Gli stub gia' lasciati (aura tick,
+  light_purify d'area, tag di danno) sono coperti da US-218B/C.
+- Ordine da qui: 13 US-207, 14 US-208, 15 US-213, 16 US-209, 17 US-212,
+  18 US-214, 19 US-215, 20 US-216, 21 US-217, 22 US-218B, 23 US-218C,
+  24 US-218, 25 US-219, 26 US-220 ... 34 US-229.
+- Prossima storia: US-207 (Caratteristica Beyonder come oggetto).
