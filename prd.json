@@ -241,8 +241,8 @@
       ],
       "priority": 12,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Autoload Acting (scripts/acting.gd), dopo SummonRegistry. Legge le acting_actions della Sequenza corrente da Progression.sequence_data(). Contributo di un'azione = clampf((count_ora - baseline) / target, 0, 1) * progresso_dichiarato; baseline = conteggio EventTracker al momento dell'ingresso nella Sequenza (l'Acting riparte da zero a ogni avanzamento, _riparti() rileva le baseline). acting_progress() = clampf(somma dei contributi - _decadimento, 0, 1). ripetibile:false -> _latched: una volta raggiunto il target il contributo resta acquisito. DECADIMENTO: Acting ascolta EventTracker.evento_emesso; se nome=='ability_used' E la Sequenza ha un'acting_action con filtro senza_abilita:true (recita 'duello puro'), _decadimento += balance.json.acting.decadimento_azione_incoerente (0.05). e_completo() con tolleranza 0.9999 (0.35+0.30+0.35 in FP non fa 1.0). Segnale acting_progress_changed(valore). _riparti() su Progression.sequence_changed. SAVE: schema_version 5->6, campo 'acting' {decadimento, baseline, latched} - _migra_5_a_6; GameState.applica chiama Acting.da_salvataggio DOPO progressione ed eventi (legge Sequenza e conteggi). NB: gli emettitori di US-210B non popolano ancora i filtri ricchi (senza_abilita, tag_danno, ecc.): il test usa eventi costruiti a mano, US-219 chiudera' il cerchio. 6 test in test_acting.gd (187 totali): accumulo, frazione parziale, cap a 1.0, decadimento per abilita' incoerente, reset su avanzamento (le acting_actions di Seq 8 hanno filtri diversi), persistenza via GameState.snapshot/applica. validator 0, nessuna regressione (catena migrazione 1->6 verde)."
     },
     {
       "id": "US-212",

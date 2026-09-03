@@ -50,6 +50,10 @@ func _eventi() -> Node:
 	return get_node_or_null("/root/EventTracker")
 
 
+func _acting() -> Node:
+	return get_node_or_null("/root/Acting")
+
+
 func salva_rapido() -> Dictionary:
 	return get_node("/root/SaveSystem").call("salva", SLOT_RAPIDO, snapshot())
 
@@ -73,6 +77,7 @@ func snapshot() -> Dictionary:
 		"progressione": _progression().per_salvataggio() if _progression() != null else {},
 		"mondo": _world().per_salvataggio() if _world() != null else {},
 		"eventi": _eventi().per_salvataggio() if _eventi() != null else {},
+		"acting": _acting().per_salvataggio() if _acting() != null else {},
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D:
@@ -97,6 +102,9 @@ func applica(dati: Dictionary) -> void:
 		_summons().da_salvataggio(dati.get("evocazioni", []))
 	if _eventi() != null:
 		_eventi().da_salvataggio(dati.get("eventi", {}))
+	# Acting DOPO progressione ed eventi: legge la Sequenza e i conteggi.
+	if _acting() != null:
+		_acting().da_salvataggio(dati.get("acting", {}))
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D and dati.has("posizione"):
 		(p as Node2D).global_position = dati["posizione"]

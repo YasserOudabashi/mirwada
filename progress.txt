@@ -1648,3 +1648,39 @@ sezione test aggiornata.
   reale), damage_dealt/taken/perfect_parry dai gestori del player).
   validator exit 0. Boot pulito.
 - Prossima storia: US-211 (Acting Method - barra acting_progress).
+
+[2026-09-03] US-211 — Acting Method: la barra acting_progress
+
+- Cosa fatto:
+  - Autoload Acting (scripts/acting.gd), dopo SummonRegistry. Legge le
+    acting_actions della Sequenza corrente da Progression.sequence_data().
+  - Contributo di un'azione:
+      clampf((count_ora - baseline) / target, 0, 1) * progresso_dichiarato
+    baseline = conteggio EventTracker al momento dell'ingresso nella
+    Sequenza. _riparti() rileva le baseline: l'Acting riparte da ZERO a
+    ogni avanzamento (il log degli eventi NON si azzera, cambia la
+    baseline).
+  - acting_progress() = clampf(somma contributi - decadimento, 0, 1).
+    ripetibile:false -> _latched: raggiunto il target, il contributo resta
+    acquisito.
+  - DECADIMENTO: Acting ascolta EventTracker.evento_emesso. Se
+    nome=="ability_used" E la Sequenza ha un'acting_action con filtro
+    senza_abilita:true (si recita "duello puro"), _decadimento +=
+    balance.json.acting.decadimento_azione_incoerente (0.05).
+  - e_completo(): >= 0.9999 (0.35+0.30+0.35 in virgola mobile non fa
+    esattamente 1.0 - trovato dai test).
+  - Segnale acting_progress_changed(valore). _riparti() su
+    Progression.sequence_changed.
+  - SAVE: SaveSystem VERSIONE_CORRENTE 5 -> 6. Campo "acting"
+    {decadimento, baseline, latched}, _migra_5_a_6. GameState.applica()
+    chiama Acting.da_salvataggio DOPO progressione ed eventi (Acting legge
+    la Sequenza e i conteggi).
+- LIMITE: gli emettitori di US-210B non popolano ancora i filtri ricchi
+  (senza_abilita, tag_danno, tipo_arma). Il test usa eventi costruiti a
+  mano; US-219 (vertical slice) chiudera' il cerchio evento->acting.
+- Come verificato: 187 test headless (181 + 6 in test_acting.gd: accumulo
+  da eventi, frazione parziale (1/3 * 0.35), cap a 1.0, decadimento per
+  abilita' incoerente, reset su avanzamento (Seq 8 ha filtri diversi),
+  persistenza via GameState.snapshot/applica). validator exit 0. Nessuna
+  regressione (catena di migrazione 1->6 verde).
+- Prossima storia: US-212 (blocco dell'avanzamento sotto acting_progress 1.0).

@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 5
+const VERSIONE_CORRENTE := 6
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -60,6 +60,8 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		"mondo": (dati.get("mondo", {}) as Dictionary).duplicate(true),
 		# Log degli eventi tracciati per l'Acting (US-210). { log: [...] }.
 		"eventi": (dati.get("eventi", {}) as Dictionary).duplicate(true),
+		# Barra di recitazione della Sequenza corrente (US-211).
+		"acting": (dati.get("acting", {}) as Dictionary).duplicate(true),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -149,6 +151,8 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_3_a_4(doc)
 			4:
 				doc = _migra_4_a_5(doc)
+			5:
+				doc = _migra_5_a_6(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -189,6 +193,13 @@ func _migra_4_a_5(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v5 -> v6: la barra di recitazione (Acting) non esisteva (US-211).
+func _migra_5_a_6(doc: Dictionary) -> Dictionary:
+	if not doc.has("acting"):
+		doc["acting"] = {"decadimento": 0.0, "baseline": {}, "latched": {}}
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -203,6 +214,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"progressione": _campo(raw, "progressione", TYPE_DICTIONARY, {}),
 		"mondo": _campo(raw, "mondo", TYPE_DICTIONARY, {}),
 		"eventi": _campo(raw, "eventi", TYPE_DICTIONARY, {}),
+		"acting": _campo(raw, "acting", TYPE_DICTIONARY, {}),
 	}
 
 
