@@ -42,6 +42,14 @@ var _hp: float = 0.0
 var _spiritualita: float = 0.0
 var _dead: bool = false
 
+## Scudo (primitiva "shield", US-202): una riserva che assorbe il danno prima
+## degli hp. tag_bloccati vuoto = blocca ogni tipo di danno; altrimenti solo
+## i tag elencati. riflette e' la quota di danno assorbito rimandata al
+## mittente — registrata qui, applicata da chi conosce il mittente.
+var _scudo: float = 0.0
+var _scudo_riflette: float = 0.0
+var _scudo_tag_bloccati: Array = []
+
 
 func _ready() -> void:
 	if _base.is_empty():
@@ -81,6 +89,7 @@ func configure_from_balance(sequenza: int) -> void:
 	_hp = hp_max
 	_spiritualita = sp_max
 	_dead = false
+	azzera_scudo()
 
 
 # --- Lettura -----------------------------------------------------------------
@@ -134,6 +143,41 @@ var spiritualita: float:
 
 func is_dead() -> bool:
 	return _dead
+
+
+# --- Scudo (primitiva shield) ----------------------------------------------
+
+## Somma alla riserva di scudo. Riapplicare aggiorna riflette e tag_bloccati
+## con quelli dell'ultimo scudo: e' un rinforzo, non uno stack di regole.
+func aggiungi_scudo(assorbimento: float, riflette: float = 0.0, tag_bloccati: Array = []) -> void:
+	_scudo += maxf(assorbimento, 0.0)
+	_scudo_riflette = clampf(riflette, 0.0, 1.0)
+	_scudo_tag_bloccati = tag_bloccati.duplicate()
+
+
+func scudo() -> float:
+	return _scudo
+
+
+func azzera_scudo() -> void:
+	_scudo = 0.0
+	_scudo_riflette = 0.0
+	_scudo_tag_bloccati = []
+
+
+## Consuma lo scudo per primo e restituisce il danno RESIDUO da togliere agli
+## hp. Se lo scudo non copre quel tag di danno, non interviene. Chi infligge
+## il danno passa da qui prima di toccare gli hp (vedi hurtbox.gd).
+func assorbi_danno(danno: float, tag: String = "") -> float:
+	if danno <= 0.0 or _scudo <= 0.0:
+		return danno
+	# tag "" = danno non tipizzato (la pipeline di hurtbox non porta ancora il
+	# tag): lo scudo lo assorbe comunque. Con un tag esplicito, filtra.
+	if tag != "" and not _scudo_tag_bloccati.is_empty() and not _scudo_tag_bloccati.has(tag):
+		return danno
+	var assorbito: float = minf(danno, _scudo)
+	_scudo -= assorbito
+	return danno - assorbito
 
 
 ## true se la spesa e' andata a buon fine. false = spiritualita' insufficiente

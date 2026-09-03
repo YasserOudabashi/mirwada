@@ -1271,3 +1271,45 @@ sezione test aggiornata.
   di Godot ucciso da `timeout` a meta' shutdown (gia' notato in US-015),
   non del codice.
 - Prossima storia: US-202 (primitive shield, aura, dot, decay).
+
+[2026-09-03] US-202 — Primitive del Twilight Giant, parte 1 (shield, aura, dot, decay)
+
+- Cosa fatto:
+  - ability_engine.gd: 4 handler nuovi nella tabella _handlers.
+  - shield: la riserva vive in StatsComponent (_scudo + aggiungi_scudo,
+    scudo(), azzera_scudo(), assorbi_danno(danno, tag)). hurtbox.gd instrada
+    il danno da assorbi_danno PRIMA di toccare gli hp. _p_shield:
+    assorbimento/durata/riflette/tag_bloccati/bersaglio tutti letti;
+    riflette e tag_bloccati REGISTRATI ma non ancora enforced — riflette
+    serve chi conosce il mittente, il filtro per tag scatta quando
+    hurtbox.subisci portera' il tag_danno (oggi tag "" = danno non
+    tipizzato -> lo scudo assorbe comunque). durata: _pending
+    {kind:"scudo_expire"} -> azzera_scudo alla scadenza. bersaglio != self
+    -> applied:false, come _p_heal.
+  - dot: _pending {kind:"dot"} con accumulatore. danno_tick a ogni
+    tick_rate per durata. Il numero di tick per chiamata e' cappato a
+    min(delta, left): un tick_effects(100) su un dot da 6s non applica
+    100 tick.
+  - decay: _pending {kind:"decay"}. Il "danno" dichiarato e' il TOTALE,
+    spalmato sulla durata (come _p_heal nel tempo, di segno opposto).
+    raggio e colpisce_oggetti registrati; la query d'area sulle entita'
+    arriva con l'integrazione combat delle abilita'.
+  - aura: _pending {kind:"aura"} ancorata al CASTER (non allo stats).
+    durata -1 = persistente: non scade mai nel tempo, sopravvive al
+    combattimento; rimossa solo quando il caster non e' piu' valido.
+    Il tick dell'effetto (taunt, decadimento, autorita_decadimento) e'
+    registrato ma NON applicato: manca un sistema di status sulle entita'.
+  - tick_effects riscritto: match sul kind, ancora = e["caster"] per le
+    aure / e["stats"] per gli altri. flush_effects gestisce scudo_expire
+    e salta le aure.
+- Come verificato: 128 test headless (119 + 9 in test_primitive_tg1.gd:
+  4 primitive nel registro, shield assorbe/scade/bersaglio-non-self,
+  dot per tick, decay spalmato sulla durata, aura persistente muore col
+  caster, aura a tempo scade, composizione shield+buff_stat via
+  execute(tg_armatura_alba) senza warning). validator exit 0. Nessuna
+  regressione: le 119 preesistenti restano verdi (hurtbox instradato da
+  assorbi_danno resta identita' quando non c'e' scudo).
+- Conteggio primitive implementate: 5 -> 9 su 28.
+- Aperto: riflessione dello scudo e filtro per tag; il tick delle aure
+  (serve un sistema di status); la query d'area di decay/aura.
+- Prossima storia: US-203 (debuff_stat, light_purify, transform, terrain_modify).

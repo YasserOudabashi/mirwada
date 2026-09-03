@@ -42,6 +42,10 @@ func _ready() -> void:
 		"buff_stat": _p_buff_stat,
 		"heal": _p_heal,
 		"dash": _p_dash,
+		"shield": _p_shield,
+		"aura": _p_aura,
+		"dot": _p_dot,
+		"decay": _p_decay,
 	}
 
 
@@ -293,6 +297,86 @@ func _p_dash(prim: Dictionary, caster: Node, _stats: Node, _ability_id: String) 
 	return spec
 
 
+## shield: una riserva che assorbe danno prima degli hp e poi scade
+## (StatsComponent.aggiungi_scudo + hurtbox.gd). riflette e tag_bloccati sono
+## letti e registrati; riflette applicato da chi conosce il mittente, il
+## filtro per tag scatta quando la pipeline di danno portera' il tag.
+func _p_shield(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+	var assorbimento: float = _num(prim.get("assorbimento"), 0.0)
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var riflette: float = _num(prim.get("riflette"), 0.0)
+	var tag_bloccati: Array = prim.get("tag_bloccati", []) if typeof(prim.get("tag_bloccati")) == TYPE_ARRAY else []
+	var bersaglio: String = str(prim.get("bersaglio", "self"))
+
+	var rec: Dictionary = {"tipo": "shield", "assorbimento": assorbimento, "durata": durata,
+			"riflette": riflette, "tag_bloccati": tag_bloccati, "bersaglio": bersaglio}
+
+	# Come _p_heal: solo "self" e' risolvibile oggi. Un bersaglio diverso non
+	# deve scudare il caster per sbaglio.
+	if bersaglio != "self" and bersaglio != "":
+		rec["applied"] = false
+		return rec
+
+	stats.call("aggiungi_scudo", assorbimento, riflette, tag_bloccati)
+	rec["applied"] = true
+	if durata > 0.0:
+		_pending.append({"kind": "scudo_expire", "stats": stats, "left": durata})
+	return rec
+
+
+## dot: danno periodico su un bersaglio nel tempo. Usa la coda _pending, non
+## await (criterio). Bersaglio = lo stats risolto dal caster: l'abilita' che
+## porta il dot e' lanciata "su" quell'entita', come _p_heal/_p_buff_stat.
+func _p_dot(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+	var danno_tick: float = _num(prim.get("danno_tick"), 0.0)
+	var tick_rate: float = _num(prim.get("tick_rate"), 1.0)
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var tag_danno: Variant = prim.get("tag_danno", "")
+
+	if durata > 0.0 and tick_rate > 0.0 and stats != null:
+		_pending.append({"kind": "dot", "stats": stats, "danno_tick": danno_tick,
+				"tick_rate": tick_rate, "left": durata, "acc": 0.0})
+	return {"tipo": "dot", "danno_tick": danno_tick, "tick_rate": tick_rate,
+			"durata": durata, "tag_danno": tag_danno}
+
+
+## decay: danno d'area continuo per una durata. Il danno dichiarato e' il
+## totale, spalmato sulla durata (come _p_heal nel tempo, di segno opposto).
+## raggio e colpisce_oggetti sono registrati; la query d'area sulle entita'
+## arriva con l'integrazione combat delle abilita'.
+func _p_decay(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+	var danno: float = _num(prim.get("danno"), 0.0)
+	var raggio: float = _num(prim.get("raggio"), 0.0)
+	var colpisce_oggetti: bool = _flag(prim.get("colpisce_oggetti"), false)
+	var durata: float = _num(prim.get("durata"), 0.0)
+
+	if durata > 0.0 and stats != null:
+		_pending.append({"kind": "decay", "stats": stats, "rate": danno / durata,
+				"left": durata})
+	return {"tipo": "decay", "danno": danno, "raggio": raggio,
+			"colpisce_oggetti": colpisce_oggetti, "durata": durata}
+
+
+## aura: effetto persistente ancorato al caster, rimosso quando il caster non
+## e' piu' valido. durata -1 = permanente (sopravvive al combattimento). Il
+## tick dell'effetto (taunt, decadimento...) e' registrato ma non applicato:
+## non c'e' ancora un sistema di status sulle entita'.
+func _p_aura(prim: Dictionary, caster: Node, _stats: Node, _ability_id: String) -> Dictionary:
+	var raggio: float = _num(prim.get("raggio"), 0.0)
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var effetto: String = str(prim.get("effetto", ""))
+	var tick_rate: float = _num(prim.get("tick_rate"), 1.0)
+	var bersagli: String = str(prim.get("bersagli", ""))
+	var persistente: bool = durata < 0.0
+
+	if caster != null and (persistente or durata > 0.0):
+		_pending.append({"kind": "aura", "caster": caster, "left": maxf(durata, 0.0),
+				"persistente": persistente, "raggio": raggio, "effetto": effetto,
+				"tick_rate": tick_rate, "bersagli": bersagli})
+	return {"tipo": "aura", "raggio": raggio, "durata": durata, "effetto": effetto,
+			"tick_rate": tick_rate, "bersagli": bersagli, "persistente": persistente}
+
+
 # --- Spawn -------------------------------------------------------------------
 
 func _spawn_projectile(caster: Node, spec: Dictionary) -> bool:
@@ -339,22 +423,39 @@ func tick_effects(delta: float) -> void:
 	var superstiti: Array = []
 	for entry in _pending:
 		var e: Dictionary = entry
+		var kind: String = str(e["kind"])
 		# Va letto come Variant e validato PRIMA di tipare: assegnare
 		# un'istanza gia' liberata a una variabile Node e' un errore che
-		# interrompe il ciclo a meta' e lascia la coda sporca.
-		var raw: Variant = e["stats"]
+		# interrompe il ciclo a meta' e lascia la coda sporca. L'ancora e' lo
+		# stats del bersaglio, o il caster per un'aura.
+		var raw: Variant = e["caster"] if kind == "aura" else e["stats"]
 		if not is_instance_valid(raw):
-			continue  # il bersaglio non c'e' piu': l'effetto muore con lui
-		var stats: Node = raw
+			continue  # il bersaglio/caster non c'e' piu': l'effetto muore con lui
+		var anchor: Node = raw
 
-		var left: float = float(e["left"]) - delta
-		if str(e["kind"]) == "heal":
-			var quota: float = float(e["rate"]) * minf(delta, float(e["left"]))
-			stats.set("hp", float(stats.get("hp")) + quota)
+		var persistente: bool = e.get("persistente", false)
+		var left: float = float(e["left"])
+		if not persistente:
+			left -= delta
 
-		if left <= 0.0:
-			if str(e["kind"]) == "expire":
-				stats.call("remove_modifier", str(e["mod_id"]))
+		var span: float = minf(delta, float(e["left"]))
+		match kind:
+			"heal":
+				anchor.set("hp", float(anchor.get("hp")) + float(e["rate"]) * span)
+			"decay":
+				anchor.set("hp", float(anchor.get("hp")) - float(e["rate"]) * span)
+			"dot":
+				e["acc"] = float(e["acc"]) + span
+				while float(e["tick_rate"]) > 0.0 and float(e["acc"]) >= float(e["tick_rate"]):
+					e["acc"] = float(e["acc"]) - float(e["tick_rate"])
+					anchor.set("hp", float(anchor.get("hp")) - float(e["danno_tick"]))
+
+		if not persistente and left <= 0.0:
+			match kind:
+				"expire":
+					anchor.call("remove_modifier", str(e["mod_id"]))
+				"scudo_expire":
+					anchor.call("azzera_scudo")
 			continue
 
 		e["left"] = left
@@ -371,9 +472,15 @@ func pending_count() -> int:
 func flush_effects() -> void:
 	for entry in _pending:
 		var e: Dictionary = entry
+		if str(e["kind"]) == "aura":
+			continue
 		var raw: Variant = e["stats"]
-		if is_instance_valid(raw) and str(e["kind"]) == "expire":
+		if not is_instance_valid(raw):
+			continue
+		if str(e["kind"]) == "expire":
 			(raw as Node).call("remove_modifier", str(e["mod_id"]))
+		elif str(e["kind"]) == "scudo_expire":
+			(raw as Node).call("azzera_scudo")
 	_pending.clear()
 
 

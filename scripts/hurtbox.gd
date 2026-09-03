@@ -47,7 +47,11 @@ func subisci(danno: float, stagger: float, da: Node) -> void:
 
 	var stats: Node = _cerca("spend_spiritualita")
 	if stats != null and d > 0.0:
-		stats.set("hp", float(stats.get("hp")) - d)
+		# Lo scudo (primitiva shield) assorbe prima degli hp.
+		if stats.has_method("assorbi_danno"):
+			d = stats.call("assorbi_danno", d)
+		if d > 0.0:
+			stats.set("hp", float(stats.get("hp")) - d)
 
 	var postura: Node = _cerca("erodi")
 	if postura != null and s > 0.0:

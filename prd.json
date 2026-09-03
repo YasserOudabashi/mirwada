@@ -44,8 +44,8 @@
       ],
       "priority": 2,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "4 handler aggiunti alla tabella _handlers di ability_engine.gd. shield: StatsComponent._scudo (riserva che assorbe prima degli hp) + aggiungi_scudo/scudo/azzera_scudo/assorbi_danno; hurtbox.gd instrada il danno da assorbi_danno prima di toccare gli hp. riflette e tag_bloccati letti e registrati nell'effect dict, non ancora applicati (riflette serve il mittente; il filtro per tag scatta quando hurtbox.subisci portera' il tag_danno - oggi tag \"\" = non tipizzato, lo scudo assorbe comunque). durata via _pending {kind:scudo_expire}. bersaglio != self -> applied:false (come _p_heal). dot: _pending {kind:dot} con accumulatore, danno_tick ogni tick_rate, cap del numero di tick a min(delta,left) cosi' un tick_effects grosso non sovra-applica. decay: _pending {kind:decay}, danno totale spalmato sulla durata (come heal nel tempo, segno opposto); raggio/colpisce_oggetti registrati, query d'area rimandata all'integrazione combat. aura: _pending {kind:aura} ancorata al CASTER (non allo stats), durata -1 = persistente (non scade mai, sopravvive al combattimento), rimossa quando il caster non e' piu' valido; il tick dell'effetto (taunt/decadimento) e' registrato ma non applicato, manca un sistema di status sulle entita'. tick_effects riscritto con match sul kind e ancora = caster per le aure / stats per il resto. flush_effects gestisce scudo_expire, salta le aure. Nessuna primitiva fuori registro (shield/aura/dot/decay sono in primitives.json). 9 test in test_primitive_tg1.gd (128 totali), execute(tg_armatura_alba) compone shield+buff_stat senza warning. validator 0, nessuna regressione (le 128 verdi)."
     },
     {
       "id": "US-203",
