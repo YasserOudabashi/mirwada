@@ -1815,3 +1815,44 @@ sezione test aggiornata.
   riduci non va sotto 0, persistenza + migrazione v7->v8). validator 0.
   Nessuna regressione.
 - Prossima storia: US-209 (Concoction - preparare e bere la pozione).
+
+[2026-09-03] US-209 — Concoction: preparare e bere la pozione
+
+- Due autoload nuovi:
+  - Foundation (scripts/foundation.gd, dopo Madness): _valore da
+    balance.json.foundation.iniziale (50). applica(delta, sorgente) clamp
+    [minimo, 100]. costante(nome). moltiplicatore_follia() =
+    lerp(2.5, 1.0, valore/100): 1.0 a fondamenta piene, sale a 2.5 a zero.
+    balance.json.foundation: nuovo malus_digestione_difficile -10.
+  - PotionSystem (scripts/potion_system.gd, dopo Acting):
+    * concoct(formula_id, characteristic_id, ingredienti[]): valida
+      formula, coerenza Caratteristica (sequence == characteristic_sequence
+      della formula) e possesso (CharacteristicStore); conta gli
+      ingredienti RICHIESTI presenti fra quelli passati (distinti), sotto
+      soglia_parziale -> ingredienti_insufficienti (Caratteristica NON
+      consumata); parziale se < completo; consuma la Caratteristica e
+      tiene _pozione {formula_id, da_sequenza, parziale, penalita}.
+      Gli ingredienti sono un PARAMETRO, non un inventario: la raccolta
+      ingredienti e' fase 3 (Mother), non-goal di fase 2.
+    * bevi(forza=false): pozione per un'altra Sequenza -> rifiuto.
+      Acting.e_completo() -> avanza (Progression.avanza -> stat_modifiers
+      riapplicati, sequence_changed, Acting._riparti) + Foundation
+      +bonus_recitazione_completa; parziale -> Madness.add(follia_extra *
+      moltiplicatore_follia). Acting incompleto, forza=false -> DIGERITA
+      MALE: Foundation -malus_digestione_difficile, Madness.add(
+      madness_on_force * mult), nessun avanzamento, pozione sprecata.
+      forza=true (gancio per US-212): avanza comunque + Foundation
+      malus_avanzamento_forzato (-25) + follia pesante.
+- SAVE: SaveSystem VERSIONE_CORRENTE 8 -> 9. Campo "fondamenta" {valore},
+  _migra_8_a_9. GameState.snapshot/applica agganciano Foundation.
+- Come verificato: 214 test headless (204 + 10 in test_concoction.gd:
+  concoct completa/parziale/sotto-soglia/caratteristica incoerente/non
+  posseduta; bevi con acting completo avanza + reset acting + bonus
+  fondamenta; acting incompleto digerita male (fondamenta -10, follia su,
+  resta a Seq 9); forzato (fondamenta -25); pozione parziale penalizza la
+  follia; pozione per un'altra Sequenza rifiutata). validator 0.
+- VERIFICA A SCHERMO rimandata: non c'e' UI di pozioni finche' non arriva
+  la HUD di US-212 e la UI a libro di US-221. Il loop
+  Caratteristica -> concoct -> acting -> bevi -> avanzamento e' coperto
+  end-to-end dai test headless (e sara' il cuore di US-219).
+- Prossima storia: US-212 (blocco dell'avanzamento sotto acting_progress 1.0).

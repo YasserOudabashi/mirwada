@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 8
+const VERSIONE_CORRENTE := 9
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -66,6 +66,8 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		"caratteristiche": (dati.get("caratteristiche", []) as Array).duplicate(true),
 		# Follia cumulativa (US-213). { valore, log }.
 		"follia": (dati.get("follia", {}) as Dictionary).duplicate(true),
+		# Qualita' della progressione (US-209). { valore }.
+		"fondamenta": (dati.get("fondamenta", {}) as Dictionary).duplicate(true),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -161,6 +163,8 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_6_a_7(doc)
 			7:
 				doc = _migra_7_a_8(doc)
+			8:
+				doc = _migra_8_a_9(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -222,6 +226,14 @@ func _migra_7_a_8(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v8 -> v9: le fondamenta (US-209). Valore assente -> Foundation usa
+## l'iniziale dai dati al load.
+func _migra_8_a_9(doc: Dictionary) -> Dictionary:
+	if not doc.has("fondamenta"):
+		doc["fondamenta"] = {}
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -239,6 +251,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"acting": _campo(raw, "acting", TYPE_DICTIONARY, {}),
 		"caratteristiche": _campo(raw, "caratteristiche", TYPE_ARRAY, []),
 		"follia": _campo(raw, "follia", TYPE_DICTIONARY, {}),
+		"fondamenta": _campo(raw, "fondamenta", TYPE_DICTIONARY, {}),
 	}
 
 

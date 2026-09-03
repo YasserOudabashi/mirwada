@@ -26,7 +26,9 @@ WorldState="*res://scripts/world_state.gd"
 SummonRegistry="*res://scripts/summon_registry.gd"
 CharacteristicStore="*res://scripts/characteristic_store.gd"
 Madness="*res://scripts/madness.gd"
+Foundation="*res://scripts/foundation.gd"
 Acting="*res://scripts/acting.gd"
+PotionSystem="*res://scripts/potion_system.gd"
 AudioManager="*res://scripts/audio_manager.gd"
 
 [display]
