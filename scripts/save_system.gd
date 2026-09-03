@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 6
+const VERSIONE_CORRENTE := 7
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -62,6 +62,8 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		"eventi": (dati.get("eventi", {}) as Dictionary).duplicate(true),
 		# Barra di recitazione della Sequenza corrente (US-211).
 		"acting": (dati.get("acting", {}) as Dictionary).duplicate(true),
+		# Caratteristiche Beyonder raccolte (US-207). Lista di id.
+		"caratteristiche": (dati.get("caratteristiche", []) as Array).duplicate(true),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -153,6 +155,8 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_4_a_5(doc)
 			5:
 				doc = _migra_5_a_6(doc)
+			6:
+				doc = _migra_6_a_7(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -200,6 +204,13 @@ func _migra_5_a_6(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v6 -> v7: le Caratteristiche Beyonder raccolte (US-207). Lista vuota.
+func _migra_6_a_7(doc: Dictionary) -> Dictionary:
+	if not doc.has("caratteristiche"):
+		doc["caratteristiche"] = []
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -215,6 +226,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"mondo": _campo(raw, "mondo", TYPE_DICTIONARY, {}),
 		"eventi": _campo(raw, "eventi", TYPE_DICTIONARY, {}),
 		"acting": _campo(raw, "acting", TYPE_DICTIONARY, {}),
+		"caratteristiche": _campo(raw, "caratteristiche", TYPE_ARRAY, []),
 	}
 
 

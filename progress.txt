@@ -1723,3 +1723,35 @@ sezione test aggiornata.
   18 US-214, 19 US-215, 20 US-216, 21 US-217, 22 US-218B, 23 US-218C,
   24 US-218, 25 US-219, 26 US-220 ... 34 US-229.
 - Prossima storia: US-207 (Caratteristica Beyonder come oggetto).
+
+[2026-09-03] US-207 — Caratteristica Beyonder come oggetto
+
+- Cosa fatto:
+  - data/characteristics.json: 10 Caratteristiche del Twilight Giant, una
+    per Sequenza 9..0 (char_twilight_giant_N). + schema.
+  - game_data.gd: carica characteristics.json; get_characteristic(id),
+    characteristic_for(pathway_id, sequence).
+  - Autoload CharacteristicStore (scripts/characteristic_store.gd), dopo
+    SummonRegistry. _held: lista di id CON ripetizioni. aggiungi, consuma
+    (una occorrenza), possiede, conta(id?), posseduti, pulisci.
+    per_salvataggio/da_salvataggio non fidato (solo stringhe non vuote).
+  - SAVE: SaveSystem VERSIONE_CORRENTE 6 -> 7. Campo "caratteristiche"
+    (lista di id), _migra_6_a_7. GameState.snapshot/applica agganciano.
+  - DROP: balance.json.nemico_base.caratteristica {pathway_id, sequence,
+    probabilita}. Il nemico da banco lascia char_twilight_giant_9
+    GARANTITA (1.0). enemy.gd _lascia_caratteristica(): tiro vs
+    probabilita, GameData.characteristic_for, spawn di
+    scripts/characteristic_pickup.gd (Area2D a runtime come
+    projectile/melee_arc, rombo chiaro segnaposto). Raccolta su
+    body/area_entered del giocatore o via raccogli() pubblica ->
+    CharacteristicStore.aggiungi + queue_free; niente doppia raccolta.
+  - validate_data.py: id unici, pathway_id attivo, sequence 0-9,
+    name_i18n; nemico_base.caratteristica risolve; ogni
+    potion.characteristic_sequence non-stub del TG ha la sua Caratteristica.
+- Come verificato: 193 test headless (187 + 6 in test_characteristic.gd).
+  validator exit 0.
+- VERIFICA A SCHERMO (finestra reale): piazzata una Caratteristica davanti
+  al giocatore, spinto sopra -> store conta 0 -> 1,
+  possiede('char_twilight_giant_9') = true, il pickup sparisce. La
+  collisione Area2D funziona.
+- Prossima storia: US-208 (formule delle pozioni e formule parziali).

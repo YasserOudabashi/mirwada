@@ -22,6 +22,7 @@ const PATH_ANIMATIONS := "res://data/animations.json"
 const PATH_AUDIO := "res://data/audio.json"
 const PATH_FORMS := "res://data/forms.json"
 const PATH_TRACKED_EVENTS := "res://data/schema/tracked_events.json"
+const PATH_CHARACTERISTICS := "res://data/characteristics.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -39,6 +40,7 @@ var _animations: Dictionary = {}
 var _audio: Dictionary = {}
 var _forms: Dictionary = {}
 var _tracked_events: Dictionary = {}
+var _characteristics: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -89,6 +91,7 @@ func load_all() -> void:
 	_load_single(PATH_AUDIO, "buses", _audio, TYPE_DICTIONARY)
 	_load_single(PATH_FORMS, "forms", _forms, TYPE_DICTIONARY)
 	_load_single(PATH_TRACKED_EVENTS, "events", _tracked_events, TYPE_DICTIONARY)
+	_load_single(PATH_CHARACTERISTICS, "characteristics", _characteristics, TYPE_ARRAY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -209,6 +212,25 @@ func get_tracked_events() -> Dictionary:
 
 func get_tracked_event(nome: String) -> Dictionary:
 	return _dict_or_empty(get_tracked_events().get(nome))
+
+
+## --- Caratteristiche Beyonder (data/characteristics.json) ---
+func get_characteristic(id: String) -> Dictionary:
+	for c in _array_or_empty(_characteristics.get("characteristics")):
+		if typeof(c) == TYPE_DICTIONARY and str((c as Dictionary).get("id", "")) == id:
+			return c
+	return {}
+
+
+## La Caratteristica di quel (Pathway, Sequenza). {} se non esiste.
+func characteristic_for(pathway_id: String, sequence: int) -> Dictionary:
+	for c in _array_or_empty(_characteristics.get("characteristics")):
+		if typeof(c) != TYPE_DICTIONARY:
+			continue
+		var d: Dictionary = c
+		if str(d.get("pathway_id", "")) == pathway_id and int(d.get("sequence", -1)) == sequence:
+			return d
+	return {}
 
 
 func pathway_ids() -> Array:

@@ -340,6 +340,44 @@ def main():
         if fid not in forms:
             err(f"{rel} [{aid}]: transform punta a forma_id '{fid}' inesistente in data/forms.json")
 
+    # --- caratteristiche Beyonder (data/characteristics.json, US-207) ---
+    ch_doc = load_json(os.path.join(DATA, "characteristics.json"))
+    chars = (ch_doc or {}).get("characteristics", [])
+    char_ids = set()
+    char_by_ps = set()  # (pathway_id, sequence)
+    for c in chars:
+        cid = c.get("id")
+        if cid in char_ids:
+            err(f"data/characteristics.json: id duplicato '{cid}'")
+        char_ids.add(cid)
+        if c.get("pathway_id") not in pathway_ids:
+            err(f"data/characteristics.json [{cid}]: pathway_id '{c.get('pathway_id')}' non e' un Pathway attivo")
+        sq = c.get("sequence")
+        if not isinstance(sq, int) or not (0 <= sq <= 9):
+            err(f"data/characteristics.json [{cid}]: sequence '{sq}' fuori da [0, 9]")
+        if not isinstance(c.get("name_i18n"), str) or not c.get("name_i18n"):
+            err(f"data/characteristics.json [{cid}]: name_i18n mancante o vuoto")
+        char_by_ps.add((c.get("pathway_id"), sq))
+    # il nemico da banco deve poter lasciare una Caratteristica che esiste
+    _bal = load_json(os.path.join(DATA, "balance.json"))
+    if _bal:
+        nc = _bal.get("nemico_base", {}).get("caratteristica")
+        if isinstance(nc, dict):
+            if (nc.get("pathway_id"), nc.get("sequence")) not in char_by_ps:
+                err(f"data/balance.json [nemico_base.caratteristica]: nessuna Caratteristica "
+                    f"per ({nc.get('pathway_id')}, Seq {nc.get('sequence')}) in data/characteristics.json")
+    # ogni Sequenza non-stub in scope (twilight_giant) deve avere la sua Caratteristica
+    tg_path = os.path.join(pdir, "twilight_giant.json")
+    tg = load_json(tg_path)
+    if tg:
+        for s in tg.get("sequences", []):
+            if s.get("stub"):
+                continue
+            cs = s.get("potion", {}).get("characteristic_sequence")
+            if cs is not None and ("twilight_giant", cs) not in char_by_ps:
+                err(f"data/pathways/twilight_giant.json [{s.get('id')}]: manca la Caratteristica "
+                    f"per characteristic_sequence {cs} in data/characteristics.json")
+
     # --- progressione (US-201) ---
     # Il Pathway di partenza vive nei dati, non nel codice (FR-1): qui si
     # verifica che punti a un Pathway attivo e che la Sequenza sia valida.

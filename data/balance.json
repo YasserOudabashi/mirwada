@@ -80,6 +80,12 @@
     "angolo_arco": 90,
     "raggio_arco": 24,
     "recupero_s": 0.6,
-    "postura_massimo": 60
+    "postura_massimo": 60,
+    "caratteristica": {
+      "_comment": "Cosa lascia questo nemico alla morte (US-207). pathway_id + sequence individuano la Caratteristica in data/characteristics.json; probabilita 0-1 (1 = garantita). Il nemico da banco lascia una Caratteristica del Twilight Giant Sequenza 9, garantita, cosi' il loop di coltivazione e' testabile.",
+      "pathway_id": "twilight_giant",
+      "sequence": 9,
+      "probabilita": 1.0
+    }
   }
 }

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "_comment": "Formato di data/characteristics.json. Il validator (tools/validate_data.py) fa i controlli espliciti.",
+  "characteristic": {
+    "id": "string univoco, convenzione char_<pathway_id>_<sequence>",
+    "pathway_id": "string, deve esistere in data/pathways/",
+    "sequence": "int 0-9, la Sequenza del Beyonder che la lascia (0 = Vero Dio)",
+    "name_i18n": "string, chiave i18n del nome"
+  },
+  "regole_validator": [
+    "id univoco",
+    "pathway_id esiste fra i Pathway attivi",
+    "sequence in [0, 9]",
+    "name_i18n presente e non vuoto",
+    "esiste una characteristic per ogni potion.characteristic_sequence delle Sequenze non-stub in scope"
+  ]
+}

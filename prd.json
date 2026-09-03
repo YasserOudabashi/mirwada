@@ -262,8 +262,8 @@
       ],
       "priority": 13,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/characteristics.json (10 caratteristiche del Twilight Giant, una per Sequenza 9..0) + data/schema/characteristic.schema.json. GameData: _load_single(characteristics, TYPE_ARRAY), get_characteristic(id), characteristic_for(pathway_id, sequence). Autoload CharacteristicStore (scripts/characteristic_store.gd), dopo SummonRegistry: _held Array di id con ripetizioni, aggiungi/consuma (una occorrenza)/possiede/conta/posseduti/pulisci, per_salvataggio/da_salvataggio non fidato (solo stringhe non vuote). SAVE: schema_version 6->7, campo 'caratteristiche' (lista di id) in salva/_leggi_snapshot/_migra_6_a_7; GameState.snapshot/applica agganciano lo store. DROP: balance.json.nemico_base.caratteristica {pathway_id, sequence, probabilita} - il nemico da banco lascia char_twilight_giant_9 garantita. enemy.gd _lascia_caratteristica(): randf() vs probabilita, poi GameData.characteristic_for, poi spawn di scripts/characteristic_pickup.gd (Area2D costruita a runtime come projectile/melee_arc, rombo segnaposto). Il pickup si raccoglie su body/area_entered del giocatore o via raccogli() pubblica -> CharacteristicStore.aggiungi + queue_free, no doppia raccolta. validate_data.py: id unici, pathway_id attivo, sequence 0-9, name_i18n; nemico_base.caratteristica risolve; ogni potion.characteristic_sequence non-stub del TG ha la sua caratteristica. 6 test in test_characteristic.gd (193 totali): dati caricati, store, il nemico lascia il pickup alla morte (enemy.tscn reale), raccolta -> magazzino, persistenza via GameState, migrazione v6->v7, da_salvataggio non fidato. VERIFICA A SCHERMO (finestra reale): store 0 -> 1 camminando sul pickup, possiede('char_twilight_giant_9')=true, pickup rimosso dalla scena. validator 0, nessuna regressione."
     },
     {
       "id": "US-208",

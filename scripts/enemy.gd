@@ -182,7 +182,28 @@ func _su_morte() -> void:
 	var et: Node = get_node_or_null("/root/EventTracker")
 	if et != null:
 		et.call("emit_event", "enemy_defeated", {})
+	_lascia_caratteristica()
 	morto.emit(self)
+
+
+## US-207: alla morte, con la probabilita' dei dati, lascia a terra la
+## Caratteristica Beyonder del suo (Pathway, Sequenza).
+func _lascia_caratteristica() -> void:
+	var spec: Dictionary = _cfg.get("caratteristica", {})
+	if spec.is_empty():
+		return
+	if randf() > float(spec.get("probabilita", 0.0)):
+		return
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd == null:
+		return
+	var car: Dictionary = gd.call("characteristic_for",
+		str(spec.get("pathway_id", "")), int(spec.get("sequence", -1)))
+	if car.is_empty():
+		return
+	var pickup := preload("res://scripts/characteristic_pickup.gd").new()
+	get_parent().add_child(pickup)
+	pickup.call("setup", str(car.get("id", "")), global_position)
 
 
 func stato() -> String:

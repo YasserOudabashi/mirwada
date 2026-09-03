@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "_comment": "Caratteristiche Beyonder: cio' che un Beyonder lascia alla morte e che serve a preparare la pozione della Sequenza corrispondente (potion.characteristic_sequence). id, pathway_id e sequence sono dati; il validator li verifica contro data/pathways/. Una per (Pathway, Sequenza). Per ora solo il Twilight Giant, in scope per la fase 2.",
+  "characteristics": [
+    {
+      "id": "char_twilight_giant_9",
+      "pathway_id": "twilight_giant",
+      "sequence": 9,
+      "name_i18n": "characteristic.twilight_giant.9"
+    },
+    {
+      "id": "char_twilight_giant_8",
+      "pathway_id": "twilight_giant",
+      "sequence": 8,
+      "name_i18n": "characteristic.twilight_giant.8"
+    },
+    {
+      "id": "char_twilight_giant_7",
+      "pathway_id": "twilight_giant",
+      "sequence": 7,
+      "name_i18n": "characteristic.twilight_giant.7"
+    },
+    {
+      "id": "char_twilight_giant_6",
+      "pathway_id": "twilight_giant",
+      "sequence": 6,
+      "name_i18n": "characteristic.twilight_giant.6"
+    },
+    {
+      "id": "char_twilight_giant_5",
+      "pathway_id": "twilight_giant",
+      "sequence": 5,
+      "name_i18n": "characteristic.twilight_giant.5"
+    },
+    {
+      "id": "char_twilight_giant_4",
+      "pathway_id": "twilight_giant",
+      "sequence": 4,
+      "name_i18n": "characteristic.twilight_giant.4"
+    },
+    {
+      "id": "char_twilight_giant_3",
+      "pathway_id": "twilight_giant",
+      "sequence": 3,
+      "name_i18n": "characteristic.twilight_giant.3"
+    },
+    {
+      "id": "char_twilight_giant_2",
+      "pathway_id": "twilight_giant",
+      "sequence": 2,
+      "name_i18n": "characteristic.twilight_giant.2"
+    },
+    {
+      "id": "char_twilight_giant_1",
+      "pathway_id": "twilight_giant",
+      "sequence": 1,
+      "name_i18n": "characteristic.twilight_giant.1"
+    },
+    {
+      "id": "char_twilight_giant_0",
+      "pathway_id": "twilight_giant",
+      "sequence": 0,
+      "name_i18n": "characteristic.twilight_giant.0"
+    }
+  ]
+}
