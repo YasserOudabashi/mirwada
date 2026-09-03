@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 13
+const VERSIONE_CORRENTE := 14
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -289,6 +289,13 @@ func _migra_12_a_13(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v13 -> v14: l'equipaggiamento (US-303). Nessuno slot occupato.
+func _migra_13_a_14(doc: Dictionary) -> Dictionary:
+	if not doc.has("equipaggiamento"):
+		doc["equipaggiamento"] = {}
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -311,6 +318,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"rituale": _campo(raw, "rituale", TYPE_DICTIONARY, {}),
 		"conoscenza": _campo(raw, "conoscenza", TYPE_ARRAY, []),
 		"inventario": _campo(raw, "inventario", TYPE_DICTIONARY, {}),
+		"equipaggiamento": _campo(raw, "equipaggiamento", TYPE_DICTIONARY, {}),
 	}
 
 

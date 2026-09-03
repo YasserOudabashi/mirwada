@@ -63,8 +63,8 @@
       ],
       "priority": 3,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Autoload Equipment (scripts/equipment.gd) dopo Inventory. _slot: mount -> {instance_id, item_id}. Mount da equip_slots.json (arma/armatura/accessorio_1/accessorio_2); il campo slot dell item e un TIPO (arma/armatura/accessorio), _mount_per mappa accessorio -> primo accessorio_N libero. equipaggia(instance_id): solo categoria:equip; smonta il mount se pieno; Inventory.rimuovi_istanza; stat_modifiers come modificatore per id equip:<mount> (US-007) sullo StatsComponent. rimuovi_slot: remove_modifier + restituisci_istanza. equipaggiato/slot_pieni/tag_attivi (gancio US-306)/riapplica_al_giocatore (chiamata da player.gd _ready come Progression). SAVE 13->14 campo equipaggiamento, _migra_13_a_14, GameState.applica DOPO Inventory. da_salvataggio non fidato (mount non valido o item non-equip scartati) poi riapplica. 338 test headless (332+6 test_equipment.gd), validator 0, catena migrazione 1->14 verde."
     },
     {
       "id": "US-304",

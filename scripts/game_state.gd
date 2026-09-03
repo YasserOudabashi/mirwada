@@ -88,6 +88,10 @@ func _inventario() -> Node:
 	return get_node_or_null("/root/Inventory")
 
 
+func _equip() -> Node:
+	return get_node_or_null("/root/Equipment")
+
+
 func salva_rapido() -> Dictionary:
 	return salva_slot(SLOT_RAPIDO)
 
@@ -170,6 +174,7 @@ func snapshot() -> Dictionary:
 		"rituale": _rituale().per_salvataggio() if _rituale() != null else {},
 		"conoscenza": _conoscenza().per_salvataggio() if _conoscenza() != null else [],
 		"inventario": _inventario().per_salvataggio() if _inventario() != null else {},
+		"equipaggiamento": _equip().per_salvataggio() if _equip() != null else {},
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D:
@@ -211,6 +216,9 @@ func applica(dati: Dictionary) -> void:
 		_conoscenza().da_salvataggio(dati.get("conoscenza", []))
 	if _inventario() != null:
 		_inventario().da_salvataggio(dati.get("inventario", {}))
+	# Equipment DOPO Inventory: le istanze equipaggiate non sono nello zaino.
+	if _equip() != null:
+		_equip().da_salvataggio(dati.get("equipaggiamento", {}))
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D and dati.has("posizione"):
 		(p as Node2D).global_position = dati["posizione"]

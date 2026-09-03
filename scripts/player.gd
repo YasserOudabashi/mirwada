@@ -61,6 +61,9 @@ func _ready() -> void:
 	var prog: Node = get_node_or_null("/root/Progression")
 	if prog != null:
 		prog.call("riapplica_al_giocatore")
+	var equip: Node = get_node_or_null("/root/Equipment")
+	if equip != null:
+		equip.call("riapplica_al_giocatore")
 
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd != null:

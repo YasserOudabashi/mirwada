@@ -2621,3 +2621,32 @@ sezione test aggiornata.
   esplode, segnali, ricchezza (30*1 + 2*50 = 130), round-trip via GameState,
   da_salvataggio non fidato). validator 0, catena migrazione 1->13 verde.
 - Prossima storia: US-303 (equipaggiamento a slot).
+
+[2026-09-03] US-303 — Equipaggiamento a slot
+
+- Autoload Equipment (scripts/equipment.gd), dopo Inventory. _slot: mount ->
+  {instance_id, item_id}. Mount da data/schema/equip_slots.json (arma,
+  armatura, accessorio_1, accessorio_2); il campo 'slot' dell'item e' un TIPO
+  (arma/armatura/accessorio), _mount_per() mappa: accessorio -> primo
+  accessorio_N libero.
+  * equipaggia(instance_id): solo categoria:equip; smonta il mount se pieno;
+    Inventory.rimuovi_istanza (esce dallo zaino); applica stat_modifiers come
+    modificatore per id 'equip:<mount>' (US-007) sullo StatsComponent del
+    giocatore.
+  * rimuovi_slot(mount): remove_modifier + Inventory.restituisci_istanza.
+  * equipaggiato(mount), slot_pieni(), tag_attivi() (gancio US-306),
+    riapplica_al_giocatore() (chiamata da player.gd _ready, come Progression).
+- SAVE: VERSIONE_CORRENTE 13 -> 14. Campo "equipaggiamento" {mount ->
+  {instance_id, item_id}}, _migra_13_a_14. GameState.applica chiama
+  Equipment.da_salvataggio DOPO Inventory (le istanze equipaggiate non sono
+  nello zaino). da_salvataggio non fidato: mount non valido o item non-equip
+  scartati; poi riapplica_al_giocatore().
+- player.gd _ready: chiama anche Equipment.riapplica_al_giocatore().
+- Come verificato: 338 test headless (332 + 6 in test_equipment.gd: equipaggia
+  applica i modificatori + esce dallo zaino, rimuovi_slot li toglie e
+  restituisce, due accessori su slot diversi, instance_id inesistente ->
+  false, round-trip via GameState riapplica il modificatore, da_salvataggio
+  non fidato). validator 0, catena migrazione 1->14 verde. Player finto
+  liberato a fine test (come test_progression) - un Node bare in gruppo
+  'player' rompe test_i18n_hud/progression/vertical_slice che tipano Node2D.
+- Prossima storia: US-304 (stored_ability_id - consumo dall'inventario, P0).
