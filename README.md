@@ -54,6 +54,7 @@ zero righe di codice dedicate (data/abilities/twilight_giant.json).
 - `006_PRD/design-npc-quest.md` — NPC, dialoghi, fazioni, quest, tre atti e finali
 - `006_PRD/design-ui-libro.md` — la UI a libro: ogni schermata e' una pagina
 - `006_PRD/design-vfx.md` — identita' visiva delle abilita' (stile manhwa), 10 palette
+- `006_PRD/art-brief-gemini.md` — prompt pronti per generare concept/ritratti/UI con Gemini, con i limiti dichiarati
 - `data/audio.json` — sistema audio data-driven (tell sonori, follia, palette)
 - `006_PRD/roadmap.md` — fasi 2-8
 - `prd.json` — story della fase corrente in formato ralph
