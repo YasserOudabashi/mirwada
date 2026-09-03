@@ -184,6 +184,25 @@ func _su_morte() -> void:
 		et.call("emit_event", "enemy_defeated", {})
 	_lascia_caratteristica()
 	morto.emit(self)
+	_avvia_dissolvenza_cadavere()
+
+
+## US-214B: pulizia di default del cadavere. Il segnale 'morto' resta per chi
+## vuole gestirlo; se nessuno lo fa, il nemico morto sfuma e si libera invece
+## di restare a schermo identico a uno vivo. permanenza_s 0 = resta per sempre.
+func _avvia_dissolvenza_cadavere() -> void:
+	var c: Dictionary = _cfg.get("cadavere", {})
+	var permanenza: float = float(c.get("permanenza_s", 0.0))
+	var dissolvenza: float = float(c.get("dissolvenza_s", 1.0))
+	if permanenza <= 0.0:
+		return
+	var t := get_tree().create_timer(permanenza)
+	t.timeout.connect(func() -> void:
+		if not is_instance_valid(self) or _stato != Stato.MORTO:
+			return
+		var tw := create_tween()
+		tw.tween_property(_anim, "modulate:a", 0.0, maxf(dissolvenza, 0.05))
+		tw.tween_callback(queue_free))
 
 
 ## US-207: alla morte, con la probabilita' dei dati, lascia a terra la

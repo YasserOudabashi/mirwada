@@ -82,6 +82,11 @@
     "raggio_arco": 24,
     "recupero_s": 0.6,
     "postura_massimo": 60,
+    "cadavere": {
+      "_comment": "Pulizia di default del cadavere (US-214B). Il segnale 'morto' resta per chi vuole gestirlo (spawner, quest): questa e' solo la dissolvenza automatica se nessuno lo fa. permanenza_s: quanto resta intatto; dissolvenza_s: quanto ci mette a sfumare via prima di liberarsi. 0 = resta per sempre.",
+      "permanenza_s": 3.0,
+      "dissolvenza_s": 1.0
+    },
     "caratteristica": {
       "_comment": "Cosa lascia questo nemico alla morte (US-207). pathway_id + sequence individuano la Caratteristica in data/characteristics.json; probabilita 0-1 (1 = garantita). Il nemico da banco lascia una Caratteristica del Twilight Giant Sequenza 9, garantita, cosi' il loop di coltivazione e' testabile.",
       "pathway_id": "twilight_giant",

@@ -371,6 +371,27 @@
       "notes": "audio_manager.gd: carica audio.json.madness_layer, si aggancia a Madness.madness_changed -> aggiorna_follia(valore). Player _whisper (AudioStreamPlayer sul bus whisper). _soglia_follia_attiva(v) = la soglia piu' alta con madness_min <= v; il volume_db del bus whisper e' quello della soglia (guidato dalla follia, non fisso), il detune diventa pitch_scale, il loop e' un wash sintetizzato per soglia (amb_whisper_*). Sotto la prima soglia -> bus muto + whisper.stop(). SOGLIA 80: duck_music_db -20 abbassa il bus music (base memorizzato in _ready, ripristinato quando si scende sotto 80). disattiva_sussurri (imposta_accessibilita) -> AudioServer.set_bus_mute(whisper) senza toccare Madness; il re-hook riapplica sul cambio dell'opzione. ONE-SHOT: _process, sopra one_shot_casuali.madness_min (25), timer random in intervallo_secondi, poi tenta_one_shot() (pubblico) suona un sfx casuale da one_shot_casuali.sfx; disattiva_sussurri li sopprime. SOGLIA 55: imposta_nomi_sussurro(nomi)/nomi_sussurro() - gancio per NPC/Ancore (AnchorSystem US-216), fallback a un set generico se vuoto. 9 sfx nuovi in SFX_SPEC (4 one-shot + 4 wash), tutti sintetizzati (US-019, niente file). 6 test in test_madness_audio.gd (227 totali): whisper muto sotto la prima soglia, volume guidato dalla follia (-24 a 35, -10 a 85), duck musica a 80 + ripristino, disattiva_sussurri silenzia e resta muto, one-shot solo sopra 25 e soppressi da disattiva_sussurri, nomi con fallback. validator 0, nessuna regressione. Verifica all'orecchio non possibile (audio sintetizzato); lo stato dei bus e' coperto dai test."
     },
     {
+      "id": "US-214B",
+      "title": "Pulizia di default del cadavere del nemico",
+      "description": "Come giocatore, voglio che un nemico morto sfumi via invece di restare a schermo identico a uno vivo (buco visto in playtest: il segnale morto non ha consumatori).",
+      "acceptanceCriteria": [
+        "balance.json.nemico_base.cadavere {permanenza_s, dissolvenza_s}",
+        "enemy.gd alla morte: dopo aver emesso 'morto', se permanenza_s > 0 avvia un timer -> tween di modulate:a a 0 su dissolvenza_s -> queue_free",
+        "permanenza_s 0 = il cadavere resta (lo gestira' uno spawner/quest)",
+        "Il segnale 'morto' resta disponibile e viene emesso comunque prima della dissolvenza",
+        "Test headless: permanenza 0 resta, permanenza breve -> liberato, segnale emesso",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 19,
+      "fase": 2,
+      "passes": true,
+      "notes": "Buco segnalato dall'utente in playtest: enemy.gd (US-011) alla morte disattiva collision/hitbox/hurtbox, riproduce 'death' ed emette morto(self) ma NON si libera - e nessuno ascolta morto, quindi il cadavere restava a schermo congelato sul frame 5, identico a un nemico vivo. Aggiunto balance.json.nemico_base.cadavere {permanenza_s: 3.0, dissolvenza_s: 1.0}. enemy._avvia_dissolvenza_cadavere(): dopo morto.emit, se permanenza_s > 0 crea un SceneTreeTimer -> tween modulate:a -> queue_free. permanenza_s 0 = resta (per uno spawner/encounter di fase 6). Il segnale morto NON e' toccato: chi lo vuole lo riceve prima della dissolvenza. 3 test in test_corpse.gd (230 totali): permanenza 0 resta MORTO, permanenza breve -> liberato dopo permanenza+dissolvenza, segnale morto emesso. VERIFICA A SCHERMO: cadavere alpha 1.0 a t=0, 0.60 a t=3.4 (in dissolvenza), sparito a t=4.4. validator 0, nessuna regressione."
+    },
+    {
       "id": "US-215",
       "title": "Effetti visivi della follia",
       "description": "Come giocatore, voglio che la follia si veda a schermo, in modo leggibile e disattivabile per fotosensibilita'.",
@@ -385,7 +406,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 19,
+      "priority": 20,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -406,7 +427,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 20,
+      "priority": 21,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -428,7 +449,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 21,
+      "priority": 22,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -449,7 +470,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 22,
+      "priority": 23,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -471,7 +492,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 23,
+      "priority": 24,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -492,7 +513,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 24,
+      "priority": 25,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -512,7 +533,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 25,
+      "priority": 26,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -533,7 +554,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 26,
+      "priority": 27,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -554,7 +575,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 27,
+      "priority": 28,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -574,7 +595,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 28,
+      "priority": 29,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -595,7 +616,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 29,
+      "priority": 30,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -615,7 +636,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 30,
+      "priority": 31,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -635,7 +656,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 31,
+      "priority": 32,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -656,7 +677,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 32,
+      "priority": 33,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -678,7 +699,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 33,
+      "priority": 34,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -697,7 +718,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 34,
+      "priority": 35,
       "fase": 2,
       "passes": false,
       "notes": ""

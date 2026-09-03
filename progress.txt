@@ -1912,3 +1912,29 @@ sezione test aggiornata.
 - Verifica all'orecchio non possibile (audio sintetizzato). Lo stato dei
   bus (mute, volume_db, duck) e' coperto dai test.
 - Prossima storia: US-215 (Effetti visivi della follia).
+
+[2026-09-03] US-214B — Pulizia di default del cadavere del nemico
+
+- BUCO SEGNALATO DALL'UTENTE IN PLAYTEST: alla morte enemy.gd (US-011)
+  disattiva collision/hitbox/hurtbox, riproduce "death" ed emette
+  morto(self) ma NON si libera - e nessuno ascolta 'morto', quindi il
+  cadavere restava a schermo congelato sul frame 5, identico a un nemico
+  vivo.
+- Cosa fatto: balance.json.nemico_base.cadavere {permanenza_s: 3.0,
+  dissolvenza_s: 1.0}. enemy._avvia_dissolvenza_cadavere(): dopo
+  morto.emit, se permanenza_s > 0 -> SceneTreeTimer(permanenza) -> tween
+  di modulate:a a 0 su dissolvenza_s -> queue_free. permanenza_s 0 = il
+  cadavere resta (lo gestira' uno spawner/encounter di fase 6). Il
+  segnale 'morto' NON e' toccato: chi lo vuole lo riceve prima della
+  dissolvenza.
+- Come verificato: 230 test headless (227 + 3 in test_corpse.gd:
+  permanenza 0 -> resta MORTO, permanenza breve -> liberato dopo
+  permanenza+dissolvenza, segnale morto emesso comunque). validator 0.
+- VERIFICA A SCHERMO (finestra reale): cadavere a alpha 1.0 a t=0,
+  0.60 a t=3.4 (0.4s dentro la dissolvenza), sparito a t=4.4.
+- NOTA per l'utente sui numeri/mappa: i numeri 0-5 sugli sprite sono
+  l'indice del frame di animazione disegnato da generate_placeholders.py
+  (aiuto di debug, spariscono con l'arte vera); i bordi colorati =
+  hitbox/tell/iframe/parata. La mappa e' un banco di prova a placeholder
+  (test_zone.gd, 40x30 tile 32x32): il mondo disegnato e' fase 6.
+- Prossima storia: US-215 (Effetti visivi della follia).
