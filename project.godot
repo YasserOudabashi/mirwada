@@ -25,6 +25,7 @@ GameState="*res://scripts/game_state.gd"
 WorldState="*res://scripts/world_state.gd"
 SummonRegistry="*res://scripts/summon_registry.gd"
 CharacteristicStore="*res://scripts/characteristic_store.gd"
+Madness="*res://scripts/madness.gd"
 Acting="*res://scripts/acting.gd"
 AudioManager="*res://scripts/audio_manager.gd"
 

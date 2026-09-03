@@ -1785,3 +1785,33 @@ sezione test aggiornata.
   twilight_giant; fool_9 (Sequenza non-stub da un vecchio audit) puntava
   a formula_fool_9 inesistente. Rigenerato scandendo tutti i pathway.
 - Prossima storia: US-213 (Follia - statistica cumulativa con effetti a soglia).
+
+[2026-09-03] US-213 — Follia: statistica cumulativa con effetti a soglia
+
+- Cosa fatto:
+  - Autoload Madness (scripts/madness.gd), dopo CharacteristicStore.
+    _valore 0-100, _log delle sorgenti. add(quantita, sorgente) clampa
+    0-100 e registra; riduci(q, sorgente) = add(-q) (il CAP frazionario
+    delle Ancore, riduzione_max_ancore 0.60, lo applichera' AnchorSystem
+    in US-216 passando la quantita' gia' cappata).
+  - Soglie da balance.json.madness (fallback interni se manca):
+    15 distorsioni, 40 abilita' autonome, 70 perdita input, 100 mostro.
+    soglia_corrente() -> il VALORE della soglia raggiunta (0/15/40/70/100).
+    Segnale madness_changed(valore, soglia_attraversata) - soglia_attraversata
+    = -1 se non si e' cambiato banda.
+  - Abilita' autonome: _process, sopra soglia 40, ogni ~1s un tiro
+    tenta_abilita_autonoma() (pubblico per i test) con probabilita'
+    probabilita_attivazione_autonoma_sotto_soglia (0.08); sul colpo emette
+    abilita_autonoma(). Chi la casta e' compito di chi ascolta (US-215 o
+    l'integrazione).
+  - decadimento_naturale_al_minuto: rispettato in _process (oggi 0 -> no-op).
+  - perdita_input_attiva() (>= 70) e stato_mostro() (>= 100) come query;
+    l'effetto vero (input intermittente, game over) lo applica chi le legge.
+  - SAVE: SaveSystem VERSIONE_CORRENTE 7 -> 8. Campo "follia"
+    {valore, log}, _migra_7_a_8. GameState.snapshot/applica agganciano.
+- Come verificato: 204 test headless (198 + 6 in test_madness.gd: add +
+  log sorgente, clamp 0-100, soglie + segnale con la soglia attraversata,
+  abilita' autonoma solo sopra 40 (0 tiri sotto, qualcuno su 2000 sopra),
+  riduci non va sotto 0, persistenza + migrazione v7->v8). validator 0.
+  Nessuna regressione.
+- Prossima storia: US-209 (Concoction - preparare e bere la pozione).

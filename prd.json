@@ -302,8 +302,8 @@
       ],
       "priority": 15,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Autoload Madness (scripts/madness.gd), dopo CharacteristicStore. _valore 0-100, _log delle sorgenti. add(quantita, sorgente) clampa e registra; riduci(q) = add(-q) (il cap frazionario riduzione_max_ancore 0.60 lo applica AnchorSystem in US-216 passando la quantita' gia' cappata). Soglie da balance.json.madness (fallback interni): 15/40/70/100. soglia_corrente() -> il VALORE della soglia (0/15/40/70/100). Segnale madness_changed(valore, soglia_attraversata) con -1 se non cambia banda. ABILITA' AUTONOME: _process sopra soglia 40, ogni ~1s tenta_abilita_autonoma() (pubblico) con probabilita_attivazione_autonoma_sotto_soglia (0.08); sul colpo emette abilita_autonoma(). decadimento_naturale_al_minuto rispettato (0 -> no-op). perdita_input_attiva()/stato_mostro() come query. SAVE: schema_version 7->8, campo 'follia' {valore, log}, _migra_7_a_8; GameState.snapshot/applica. 6 test in test_madness.gd (204 totali): add+log, clamp 0-100, soglie+segnale, abilita' autonoma solo sopra 40 (0 tiri sotto / qualcuno su 2000 sopra), riduci non sotto 0, persistenza+migrazione v7->v8. validator 0, nessuna regressione."
     },
     {
       "id": "US-209",

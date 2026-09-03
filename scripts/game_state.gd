@@ -58,6 +58,10 @@ func _caratteristiche() -> Node:
 	return get_node_or_null("/root/CharacteristicStore")
 
 
+func _follia() -> Node:
+	return get_node_or_null("/root/Madness")
+
+
 func salva_rapido() -> Dictionary:
 	return get_node("/root/SaveSystem").call("salva", SLOT_RAPIDO, snapshot())
 
@@ -83,6 +87,7 @@ func snapshot() -> Dictionary:
 		"eventi": _eventi().per_salvataggio() if _eventi() != null else {},
 		"acting": _acting().per_salvataggio() if _acting() != null else {},
 		"caratteristiche": _caratteristiche().per_salvataggio() if _caratteristiche() != null else [],
+		"follia": _follia().per_salvataggio() if _follia() != null else {},
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D:
@@ -112,6 +117,8 @@ func applica(dati: Dictionary) -> void:
 		_acting().da_salvataggio(dati.get("acting", {}))
 	if _caratteristiche() != null:
 		_caratteristiche().da_salvataggio(dati.get("caratteristiche", []))
+	if _follia() != null:
+		_follia().da_salvataggio(dati.get("follia", {}))
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D and dati.has("posizione"):
 		(p as Node2D).global_position = dati["posizione"]

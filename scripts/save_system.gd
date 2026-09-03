@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 7
+const VERSIONE_CORRENTE := 8
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -64,6 +64,8 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		"acting": (dati.get("acting", {}) as Dictionary).duplicate(true),
 		# Caratteristiche Beyonder raccolte (US-207). Lista di id.
 		"caratteristiche": (dati.get("caratteristiche", []) as Array).duplicate(true),
+		# Follia cumulativa (US-213). { valore, log }.
+		"follia": (dati.get("follia", {}) as Dictionary).duplicate(true),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -157,6 +159,8 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_5_a_6(doc)
 			6:
 				doc = _migra_6_a_7(doc)
+			7:
+				doc = _migra_7_a_8(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -211,6 +215,13 @@ func _migra_6_a_7(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v7 -> v8: la follia (US-213). Un personaggio pre-follia parte da 0.
+func _migra_7_a_8(doc: Dictionary) -> Dictionary:
+	if not doc.has("follia"):
+		doc["follia"] = {"valore": 0.0, "log": []}
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -227,6 +238,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"eventi": _campo(raw, "eventi", TYPE_DICTIONARY, {}),
 		"acting": _campo(raw, "acting", TYPE_DICTIONARY, {}),
 		"caratteristiche": _campo(raw, "caratteristiche", TYPE_ARRAY, []),
+		"follia": _campo(raw, "follia", TYPE_DICTIONARY, {}),
 	}
 
 
