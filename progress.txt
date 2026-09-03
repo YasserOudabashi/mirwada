@@ -2844,3 +2844,21 @@ sezione test aggiornata.
   evoca_temporanea con durata 1s scade dopo 1.2s di _process). validator 0,
   nessuna regressione (test_summon verde).
 - Prossima storia: US-313 (ricette leggendarie via conoscenza).
+
+[2026-09-04] US-313 — Ricette leggendarie via conoscenza
+
+- PotionSystem.ricetta_nota() gia' gestiva le leggendarie: non nota_da_subito
+  -> serve il flag KnowledgeStore 'ricetta:<id>'.
+- Inventory.usa() esteso: se l'item ha 'insegna_ricetta', chiama
+  KnowledgeStore.impara('ricetta:<id>') e consuma. Controllato PRIMA di
+  stored_ability_id. Restituisce {ok:true, risultato:{ricetta_appresa:<id>}}.
+- data/items/pergamene.json: pergamena_ambrosia (insegna_ricetta ric_ambrosia).
+- validate_data.py: ogni insegna_ricetta risolve a una ricetta di tier
+  'leggendaria' (le base/avanzata non si insegnano con una pergamena).
+- test_items aggiornato: una pergamena ha stored_ability_id O insegna_ricetta.
+- i18n: 2 chiavi pergamena_ambrosia.
+- Come verificato: 372 test headless (369 + 3 in test_ricetta_leggendaria.gd:
+  leggendaria ignota non si prepara nemmeno con gli ingredienti, la pergamena
+  la insegna (flag + consumo), dopo averla appresa si prepara e produce
+  l'ambrosia). validator 0, i18n --check 0.
+- Prossima storia: US-314 (il ricettario nel libro).

@@ -48,9 +48,15 @@ func test_pergamena_ha_stored_ability_che_risolve() -> void:
 	var perg: Array = gd.call("items_per_categoria", "pergamena")
 	assert_gt(float(perg.size()), 0.0, "ci sono pergamene")
 	for it in perg:
-		var aid: String = str((it as Dictionary).get("stored_ability_id", ""))
-		assert_false(gd.call("get_ability", aid).is_empty(),
-			"%s: stored_ability_id '%s' risolve" % [(it as Dictionary).get("id"), aid])
+		var d: Dictionary = it
+		var aid: String = str(d.get("stored_ability_id", ""))
+		var ric: String = str(d.get("insegna_ricetta", ""))
+		# una pergamena porta un'abilita' OPPURE insegna una ricetta
+		if not aid.is_empty():
+			assert_false(gd.call("get_ability", aid).is_empty(),
+				"%s: stored_ability_id '%s' risolve" % [d.get("id"), aid])
+		else:
+			assert_false(ric.is_empty(), "%s: una pergamena ha stored_ability_id o insegna_ricetta" % d.get("id"))
 
 
 func test_ogni_name_i18n_degli_item_risolve() -> void:

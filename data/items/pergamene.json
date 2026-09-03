@@ -31,6 +31,16 @@
       "impilabile": false,
       "valore": 35,
       "stored_ability_id": "hermit_pergamena"
+    },
+    {
+      "id": "pergamena_ambrosia",
+      "categoria": "pergamena",
+      "name_i18n": "item.pergamena_ambrosia",
+      "descrizione_i18n": "item.pergamena_ambrosia.desc",
+      "tag": ["conoscenza", "pozione", "luna"],
+      "impilabile": false,
+      "valore": 120,
+      "insegna_ricetta": "ric_ambrosia"
     }
   ]
 }

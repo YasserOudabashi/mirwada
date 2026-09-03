@@ -323,8 +323,8 @@
       ],
       "priority": 16,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "PotionSystem.ricetta_nota() gia gestiva le leggendarie (serve il flag KnowledgeStore ricetta:<id>). Inventory.usa() esteso: se l item ha insegna_ricetta -> KnowledgeStore.impara(ricetta:<id>) + consuma (controllato PRIMA di stored_ability_id), risultato {ricetta_appresa:<id>}. data/items/pergamene.json: pergamena_ambrosia (insegna_ricetta ric_ambrosia). validate_data.py: ogni insegna_ricetta risolve a una ricetta tier leggendaria. test_items aggiornato (pergamena ha stored_ability_id O insegna_ricetta). 372 test headless (369+3 test_ricetta_leggendaria.gd), validator 0, i18n --check 0."
     },
     {
       "id": "US-314",

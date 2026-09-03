@@ -87,6 +87,16 @@ func usa(instance_id: String, bersaglio: Node = null) -> Dictionary:
 	if inst.is_empty():
 		return {"ok": false, "reason": "istanza_assente", "risultato": {}}
 	var def: Dictionary = _def(str(inst.get("item_id", "")))
+
+	# Pergamena che insegna una ricetta leggendaria (US-313).
+	var ric: String = str(def.get("insegna_ricetta", ""))
+	if not ric.is_empty():
+		var kn: Node = get_node_or_null("/root/KnowledgeStore")
+		if kn != null:
+			kn.call("impara", "ricetta:" + ric)
+		rimuovi_istanza(instance_id)
+		return {"ok": true, "reason": "", "risultato": {"ricetta_appresa": ric}}
+
 	var sab: String = str(def.get("stored_ability_id", ""))
 	if sab.is_empty():
 		return {"ok": false, "reason": "nessuna_abilita", "risultato": {}}

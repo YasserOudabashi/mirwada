@@ -621,6 +621,15 @@ def main():
                 sab = it.get("stored_ability_id")
                 if sab is not None and ability_ids and sab not in ability_ids:
                     err(f"{rel} [{iid}]: stored_ability_id '{sab}' non risolve a un'abilita'")
+                ins = it.get("insegna_ricetta")
+                if ins is not None:
+                    _r = load_json(os.path.join(DATA, "potions", "recipes.json")) or {}
+                    _rec = _r.get("recipes", {}).get(ins, {})
+                    if not _rec:
+                        err(f"{rel} [{iid}]: insegna_ricetta '{ins}' non risolve a una ricetta")
+                    elif _rec.get("tier") != "leggendaria":
+                        err(f"{rel} [{iid}]: insegna_ricetta '{ins}' non e' una ricetta 'leggendaria' "
+                            f"(le base/avanzata non si insegnano con una pergamena)")
                 eff = it.get("effetto")
                 if isinstance(eff, dict):
                     et = eff.get("tipo")
