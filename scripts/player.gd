@@ -213,6 +213,8 @@ func _fine_parata() -> void:
 func _su_parata_riuscita(perfetta: bool, attaccante: Node) -> void:
 	if _audio != null:
 		_audio.call("feedback", "parry_perfect" if perfetta else "parry_normal")
+	if perfetta:
+		_traccia("perfect_parry", {})
 	if not perfetta or attaccante == null:
 		return
 	var b: Dictionary = _combat.get("parata", {})
@@ -233,14 +235,26 @@ func _cerca_postura(nodo: Node) -> Node:
 
 ## sfx + hitstop + shake del colpo inferto: tutto in AudioManager, dai dati
 ## (audio.json.combat_feedback). Niente hitstop hardcoded qui.
-func _su_colpo_inflitto(_bersaglio: Node, _danno: float) -> void:
+func _su_colpo_inflitto(_bersaglio: Node, danno: float) -> void:
 	if _audio != null:
 		_audio.call("feedback", "hit_light")
+	if danno > 0.0:
+		_traccia("damage_dealt", {"quantita": danno})
 
 
 func _su_danno_subito(danno: float, _stagger: float, _da: Node) -> void:
 	if danno > 0.0 and _audio != null:
 		_audio.call("feedback", "damage_taken")
+	if danno > 0.0:
+		_traccia("damage_taken", {"quantita": danno})
+
+
+## Inoltra un evento all'EventTracker (US-210B). Agganciato, non riscritto:
+## i sistemi di combattimento restano ignari dell'Acting Method.
+func _traccia(evento: String, dati: Dictionary) -> void:
+	var et: Node = Engine.get_main_loop().root.get_node_or_null("EventTracker")
+	if et != null:
+		et.call("emit_event", evento, dati)
 
 
 ## La direzione dominante decide lo sprite. In obliquo vince l'orizzontale:

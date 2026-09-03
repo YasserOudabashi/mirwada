@@ -220,8 +220,8 @@
       ],
       "priority": 11,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Emettitori agganciati, non riscritti (~1-4 righe a file). player.gd: helper _traccia(evento, dati) -> Engine.get_main_loop().root.get_node_or_null('EventTracker').emit_event; _su_colpo_inflitto -> damage_dealt {quantita}; _su_danno_subito -> damage_taken {quantita}; _su_parata_riuscita(perfetta) -> perfect_parry solo se perfetta. enemy.gd _su_morte -> enemy_defeated {} (in fase 1 il nemico e' sempre ucciso dal giocatore). ability_engine.execute() su successo -> ability_used {ability_id}. I dati degli eventi sono MINIMI: i filtri ricchi delle acting_actions (senza_abilita, tipo_arma, sequenza_bersaglio, stesso_combattimento) non sono ancora popolati - servono contesto che il combat non ha (arma, Sequenza del nemico, sessione di combattimento). US-211 li testa con eventi costruiti a mano; US-219 rivelera' cosa serve arricchire per il loop reale. 3 test in test_event_emitters.gd (181 totali): ability_used (anche filtrato per id), enemy_defeated alla morte (enemy.tscn istanziata), damage_dealt/taken/perfect_parry dai gestori del player. REGRESSIONE TROVATA DAI TEST: istanziare player.tscn nei test lo mette nel gruppo 'player' e sporca test_i18n_hud/test_progression -> il test usa PlayerScript.new() e chiama i gestori (metodi puri) direttamente. validator 0."
     },
     {
       "id": "US-211",

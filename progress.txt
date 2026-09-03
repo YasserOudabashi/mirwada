@@ -1620,3 +1620,31 @@ sezione test aggiornata.
   errore gestito, persistenza nel save, migrazione v4->v5). validator
   exit 0. Nessuna regressione (catena di migrazione 1->5 verde).
 - Prossima storia: US-210B (emettitori nei sistemi di fase 1).
+
+[2026-09-03] US-210B — EventTracker: emettitori nei sistemi di fase 1
+
+- Cosa fatto (agganciati, non riscritti, ~1-4 righe a file):
+  - player.gd: helper _traccia(evento, dati) che inoltra a EventTracker
+    (via Engine.get_main_loop().root, non self, cosi' funziona anche su un
+    istanza fuori dall'albero). _su_colpo_inflitto -> damage_dealt
+    {quantita}; _su_danno_subito -> damage_taken {quantita};
+    _su_parata_riuscita(perfetta=true) -> perfect_parry.
+  - enemy.gd _su_morte -> enemy_defeated {} (in fase 1 il nemico e' sempre
+    ucciso dal giocatore).
+  - ability_engine.execute() su successo -> ability_used {ability_id}.
+- LIMITE: i dati degli eventi sono MINIMI. I filtri ricchi delle
+  acting_actions (senza_abilita, tipo_arma, sequenza_bersaglio,
+  stesso_combattimento) non sono ancora popolati: servono contesto che il
+  combat non ha (tipo d'arma, Sequenza del nemico, id della sessione di
+  combattimento). US-211 testa l'ActingComponent con eventi costruiti a
+  mano; US-219 (vertical slice) rivelera' cosa serve davvero arricchire.
+- REGRESSIONE TROVATA DAI TEST: la prima versione del test istanziava
+  player.tscn, che finisce nel gruppo "player" e ha fatto fallire
+  test_i18n_hud e test_progression (trovavano il player sbagliato). Il
+  test ora usa PlayerScript.new() e chiama i gestori (metodi puri)
+  direttamente, senza montare la scena.
+- Come verificato: 181 test headless (178 + 3 in test_event_emitters.gd:
+  ability_used anche filtrato per id, enemy_defeated alla morte (enemy.tscn
+  reale), damage_dealt/taken/perfect_parry dai gestori del player).
+  validator exit 0. Boot pulito.
+- Prossima storia: US-211 (Acting Method - barra acting_progress).

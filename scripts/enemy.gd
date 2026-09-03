@@ -178,6 +178,10 @@ func _su_morte() -> void:
 	_hurtbox.set_deferred("monitorable", false)
 	_anim.modulate = Color.WHITE
 	_anim.call("riproduci", "death", _dir_sguardo)
+	# US-210B: il nemico e' sempre sconfitto dal giocatore in fase 1.
+	var et: Node = get_node_or_null("/root/EventTracker")
+	if et != null:
+		et.call("emit_event", "enemy_defeated", {})
 	morto.emit(self)
 
 

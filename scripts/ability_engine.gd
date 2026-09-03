@@ -104,6 +104,10 @@ func execute(ability_id: String, caster: Node) -> Dictionary:
 
 	result["ok"] = true
 	result["reason"] = OK
+	# US-210B: un'abilita' eseguita con successo e' un evento tracciato.
+	var et: Node = get_tree().root.get_node_or_null("EventTracker")
+	if et != null:
+		et.call("emit_event", "ability_used", {"ability_id": ability_id})
 	ability_executed.emit(ability_id, caster, result)
 	return result
 
