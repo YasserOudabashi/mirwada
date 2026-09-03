@@ -2554,18 +2554,3 @@ sezione test aggiornata.
   il blocco UI-libro / VFX / i18n e' completo.
 - Prossima: generare il PRD di fase 3 con /prd (roadmap.md - sistemi di
   supporto: inventario, alchimia, forgiatura, pet, base building, talenti).
-
-[2026-09-03] RALPH-3 — Conversione PRD fase 3 -> prd.json
-
-- 006_PRD/prd-fase-3-sistemi-di-supporto.md convertito in prd.json (formato
-  del progetto: US-3NN + campo "fase": 3). 35 story, priority 1-35.
-- Ordine per dipendenze: Blocco A inventario (US-301..307, prio 1-7), poi
-  Blocco C sigilli/forgiatura (US-315/316/317/318, prio 8-11), poi B alchimia
-  (US-308/310..314, prio 12-17), D strutture (US-319/320, 18-19), E pet
-  (US-321..325, 20-24), F base building (US-326..329, 25-28), G talenti
-  (US-330..333, 29-32), H integrazione (US-334..336, 33-35).
-- US-309 (incisione sigilli, blocco B del PRD) FUSA in US-317 (blocco C):
-  erano la stessa story. Il PRD lo prevedeva.
-- prd.json di fase 2 archiviato in archive/2026-09-03-fase-2-pathway-core/.
-- branchName: ralph/fase-3-sistemi-di-supporto.
-- Prossima storia: US-301 (vocabolario e schema degli item).

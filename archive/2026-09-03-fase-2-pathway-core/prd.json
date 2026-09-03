@@ -1,0 +1,727 @@
+{
+  "project": "Mirwada",
+  "branchName": "ralph/fase-2-pathway-core",
+  "description": "Fase 2 - Pathway Core: accende il sistema di progressione a Pathway/Sequenze. Il salto piu' rischioso del progetto. Criterio di uscita: il Twilight Giant eseguito dalla Sequenza 9 alla 5 giocando, con zero codice dedicato (data/abilities/twilight_giant.json). PRD dettagliato: 006_PRD/prd-fase-2-pathway-core.md.",
+  "userStories": [
+    {
+      "id": "US-201",
+      "title": "Stato di progressione del giocatore",
+      "description": "Come sviluppatore, ho bisogno di un componente che tenga Pathway, Sequenza e tier del giocatore, cosi' che ogni sistema di fase 2 legga da un'unica fonte.",
+      "acceptanceCriteria": [
+        "Nodo/autoload ProgressionComponent (o estensione di GameState) con pathway_id, sequence (9->0), tier (derivato dai dati della Sequenza)",
+        "API di sola lettura: pathway(), sequence(), tier(), sequence_data()",
+        "stat_modifiers della Sequenza corrente applicati allo StatsComponent del giocatore via i modificatori per id di US-007 (id 'sequence:<n>'), rimossi e riapplicati a ogni avanzamento",
+        "Segnale sequence_changed(nuova, vecchia)",
+        "Nessun nome di Pathway/Sequenza hardcoded: solo pathway_id e chiavi i18n",
+        "schema_version del save incrementato; campo progressione {pathway_id, sequence} serializzato e riletto con typeof() + default sano",
+        "Catena di migrazione dal salvataggio di fase 1 (aggiunge progressione con Pathway di default e Sequenza 9)",
+        "Test headless: applicazione/rimozione degli stat_modifiers, round-trip del save, migrazione dalla versione di fase 1",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 1,
+      "fase": 2,
+      "passes": true,
+      "notes": "Autoload Progression (scripts/progression.gd), 2o nella lista dopo GameData. API di sola lettura pathway()/sequence()/tier()/sequence_data()/stat_modifiers(); mutazione configura(pathway_id,seq) (load/creazione/test) e avanza() (9->0, si ferma a 0). tier deriva da sequence_data().tier, mai calcolato. FR-1: nessun nome di Pathway nel codice - il default vive in data/balance.json [progressione].pathway_default (nuova sezione), risolto da _pathway_default(). stat_modifiers della Sequenza applicati allo StatsComponent del giocatore come modificatore per id 'sequence:<n>' (US-007): avanza() rimuove il vecchio e applica il nuovo. Il player e' in scena dopo gli autoload, quindi player.gd _ready chiama Progression.riapplica_al_giocatore(). Segnale sequence_changed(nuova,vecchia) emesso solo da avanza(), non da configura(). SAVE: VERSIONE_CORRENTE 2->3, campo 'progressione' {pathway_id,sequence} serializzato in salva() e riletto in _leggi_snapshot con _campo(TYPE_DICTIONARY,{}); _migra_2_a_3 aggiunge {pathway_id:'',sequence:9} - la migrazione non conosce nomi di Pathway, pathway_id vuoto -> Progression.da_salvataggio ricade sul default dei dati. da_salvataggio e' NON FIDATA (typeof + default, raw non-oggetto -> nessun crash). GameState.snapshot/applica agganciano Progression. validate_data.py: nuovo check pathway_default = Pathway attivo, sequenza_iniziale 0-9. 7 test in test_progression.gd (119 totali, era 112), validator exit 0, boot di main.tscn pulito. Nessuna verifica a schermo: story di sistema, l'effetto sul giocatore e' coperto dai test."
+    },
+    {
+      "id": "US-202",
+      "title": "Primitive del Twilight Giant - parte 1 (shield, aura, dot, decay)",
+      "description": "Come sviluppatore, voglio implementare le primitive difensive e di area che il Twilight Giant usa, secondo i parametri del registro chiuso.",
+      "acceptanceCriteria": [
+        "shield, aura, dot, decay implementate secondo data/schema/primitives.json (tutti i parametri dichiarati, bersaglio incluso)",
+        "dot e decay usano la lista di effetti a tempo di AbilityEngine (tick_effects), non await",
+        "aura e' un effetto persistente attaccato al caster, rimosso quando il caster non e' piu' valido",
+        "shield assorbe danno prima degli hp e si esaurisce/scade",
+        "Nessuna primitiva fuori dal registro; parametri non nel registro -> errore del motore (comportamento di US-022)",
+        "Test headless per ognuna",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 2,
+      "fase": 2,
+      "passes": true,
+      "notes": "4 handler aggiunti alla tabella _handlers di ability_engine.gd. shield: StatsComponent._scudo (riserva che assorbe prima degli hp) + aggiungi_scudo/scudo/azzera_scudo/assorbi_danno; hurtbox.gd instrada il danno da assorbi_danno prima di toccare gli hp. riflette e tag_bloccati letti e registrati nell'effect dict, non ancora applicati (riflette serve il mittente; il filtro per tag scatta quando hurtbox.subisci portera' il tag_danno - oggi tag \"\" = non tipizzato, lo scudo assorbe comunque). durata via _pending {kind:scudo_expire}. bersaglio != self -> applied:false (come _p_heal). dot: _pending {kind:dot} con accumulatore, danno_tick ogni tick_rate, cap del numero di tick a min(delta,left) cosi' un tick_effects grosso non sovra-applica. decay: _pending {kind:decay}, danno totale spalmato sulla durata (come heal nel tempo, segno opposto); raggio/colpisce_oggetti registrati, query d'area rimandata all'integrazione combat. aura: _pending {kind:aura} ancorata al CASTER (non allo stats), durata -1 = persistente (non scade mai, sopravvive al combattimento), rimossa quando il caster non e' piu' valido; il tick dell'effetto (taunt/decadimento) e' registrato ma non applicato, manca un sistema di status sulle entita'. tick_effects riscritto con match sul kind e ancora = caster per le aure / stats per il resto. flush_effects gestisce scudo_expire, salta le aure. Nessuna primitiva fuori registro (shield/aura/dot/decay sono in primitives.json). 9 test in test_primitive_tg1.gd (128 totali), execute(tg_armatura_alba) compone shield+buff_stat senza warning. validator 0, nessuna regressione (le 128 verdi)."
+    },
+    {
+      "id": "US-203",
+      "title": "Primitive del Twilight Giant - parte 2a (debuff_stat, light_purify)",
+      "description": "Come sviluppatore, voglio le primitive di alterazione delle statistiche e di purifica del Twilight Giant.",
+      "acceptanceCriteria": [
+        "debuff_stat speculare a buff_stat di US-013 (modificatori per id, moltiplicativo supportato); id separato '<abilita>:debuff:<stat>' cosi' buff e debuff sulla stessa stat coesistono",
+        "light_purify (params registro: raggio, potenza, riduce_sequenza) rimuove fino a potenza effetti negativi a tempo (dot, decay, debuff_stat) dal bersaglio; raggio e riduce_sequenza registrati",
+        "Nessuna primitiva fuori dal registro; parametri non nel registro -> errore del motore (US-022)",
+        "Test headless per ognuna, incluso il limite di potenza e il ripristino di una stat debuffata",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 3,
+      "fase": 2,
+      "passes": true,
+      "notes": "US-203 spezzata in 2a/2b/2c per la regola 'una story una iterazione' (precedente: US-021 a/b). Questa e' la meta' che non tocca ne' dati nuovi ne' il save. ability_engine.gd: _p_buff_stat e _p_debuff_stat ora chiamano _mod_stat condiviso (segno dal dato, non forzato; l'entry pending e' marcata debuff). _p_light_purify filtra _pending: rimuove kind dot/decay e le expire con debuff:true sullo stesso stats, fino a potenza, chiamando remove_modifier per i debuff. 'per tag' del PRD non ha un parametro nel registro -> purifica per numero. raggio/riduce_sequenza registrati, purifica d'area rimandata all'integrazione combat. 7 test in test_primitive_tg2.gd (135 totali), execute(tg_crepuscolo) compone decay+debuff_stat senza warning. validator 0. Primitive: 9 -> 11 su 28."
+    },
+    {
+      "id": "US-203B",
+      "title": "Primitive del Twilight Giant - parte 2b (transform + data/forms.json)",
+      "description": "Come sviluppatore, voglio la primitiva transform, che cambia forma al personaggio applicando i modificatori di una forma definita nei dati.",
+      "acceptanceCriteria": [
+        "data/forms.json + data/schema/forms.schema.json: ogni forma_id (tg_forma_gigante, tg_arma_luce, gia' referenziate da twilight_giant.json) con name_i18n e stat_modifiers (trade-off espliciti nei dati)",
+        "GameData carica forms.json; get_form(forma_id)",
+        "transform (params registro: forma_id, durata, costo_al_secondo) applica gli stat_modifiers della forma come modificatore per id 'transform:<ability_id>' (riusa i modificatori di US-007)",
+        "transform e' reversibile: si annulla alla scadenza (durata), su richiesta (annulla_transform), o quando costo_al_secondo esaurisce la spiritualita'",
+        "Il validator: ogni forma_id referenziato da un'abilita' esiste in forms.json; stat_modifiers su stat note",
+        "Test headless: applicazione degli stat_modifiers, annullamento su scadenza/richiesta, drenaggio di spiritualita'",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 4,
+      "fase": 2,
+      "passes": true,
+      "notes": "data/forms.json (schema_version 1) + data/schema/forms.schema.json. Due forme, quelle referenziate da twilight_giant.json: tg_forma_gigante (hp_max +120, difesa +0.25, velocita -35) e tg_arma_luce (velocita +45, evasione +0.15, hp_max -40). Numeri PLAUSIBILI non bilanciati, ogni forma ha un trade-off negativo (il validator lo esige). GameData: PATH_FORMS, _load_single(forms), get_form(forma_id) -> {} se ignoto (27 file caricati ora). ability_engine._p_transform: legge la forma da GameData, applica stat_modifiers come modificatore per id 'transform:<ability_id>' (US-007), _pending {kind:transform}. Reversibile in tre modi: durata (expire), annulla_transform(ability_id) pubblica, e drenaggio - costo_al_secondo sottrae spiritualita' a ogni tick e a 0 toglie la forma (entry persistente quando durata<=0). tick_effects: nuovo ramo transform + span=delta per le entry persistenti (prima minf(delta,left)=0 le bloccava). flush_effects toglie anche i transform. Forma ignota -> applied:false + push_error (il validator la intercetta a monte). validate_data.py: nuovo blocco forme - forma_id di ogni transform esiste, stat_modifiers oggetto non vuoto di stat note con almeno un trade-off negativo. 7 test in test_primitive_tg_transform.gd (142 totali), execute(tg_crescita) compone transform+buff_stat senza warning. validator 0, boot pulito. Primitive: 11 -> 12 su 28."
+    },
+    {
+      "id": "US-203C",
+      "title": "Primitive del Twilight Giant - parte 2c (terrain_modify + stato del mondo nel save)",
+      "description": "Come sviluppatore, voglio la primitiva terrain_modify, che con permanente:true incide una modifica del terreno nello stato del mondo persistente.",
+      "acceptanceCriteria": [
+        "Autoload WorldState (o estensione di GameState) con una lista terrain_mods {tipo_modifica, posizione, raggio}",
+        "terrain_modify (params registro: tipo_modifica, raggio, durata, permanente) con permanente:true registra la modifica in WorldState (varco aperto per sempre, design-world.md cap. 4); con permanente:false e' un effetto temporaneo sulla coda _pending",
+        "save schema_version incrementato; campo 'mondo' {terrain_mods} serializzato e riletto con typeof() + default; catena di migrazione dalla versione precedente",
+        "Test headless: permanente scrive in WorldState e sopravvive al round-trip del save; temporaneo scade; migrazione",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 5,
+      "fase": 2,
+      "passes": true,
+      "notes": "Autoload WorldState (scripts/world_state.gd), dopo GameState. _terrain_mods: Array di {tipo_modifica, posizione:[x,y], raggio}. registra_terreno (le duplicate esatte non si accumulano), terreni(), pulisci(), per_salvataggio/da_salvataggio (rilettura non fidata: voci malformate scartate una a una, raw non-oggetto -> lista vuota). SAVE: VERSIONE_CORRENTE 3->4, campo 'mondo' in salva()/_leggi_snapshot (_campo TYPE_DICTIONARY), _migra_3_a_4 aggiunge {terrain_mods:[]}. GameState.snapshot/applica agganciano WorldState come Progression. ability_engine._p_terrain_modify: permanente:true -> WorldState.registra_terreno alla posizione del caster (Node2D global_position); permanente:false + durata -> _pending {kind:terrain_temp} ancorata al caster, scade senza effetto (la modifica vera al tilemap e' fase 6). tick_effects: ancora generalizzata a e.has('caster') (aura + terrain_temp); flush_effects salta le entry senza 'stats'. validate_data.py: terrain_modify esige tipo_modifica non vuoto e permanente bool. 7 test in test_terrain_modify.gd (149 totali): registro, permanente nello stato del mondo, round-trip del save, temporanea scade, da_salvataggio scarta le malformate, migrazione v3->v4, execute(tg_spezza_barriera) compone terrain_modify+light_purify senza warning. validator 0, boot pulito, nessuna regressione (test_save_system e test_progression verdi con la catena 1->2->3->4). Primitive: 12 -> 13 su 28. US-203 (2a/2b/2c) chiusa."
+    },
+    {
+      "id": "US-228",
+      "title": "Riscrittura dati di darkness_1 senza probability_shift",
+      "description": "Come designer, voglio che darkness_1 (l'unica abilita' non-stub fuori dal Twilight Giant) non dipenda da una primitiva differita.",
+      "acceptanceCriteria": [
+        "darkness_1 riscritta con primitive attive: curse (effetto sfortuna, condizione_rimozione) + stack di debuff_stat su evasione/precisione + dot basso a tag follia (design-master cap. 4)",
+        "Il risultato percepito e' documentato nelle notes della story",
+        "probability_shift resta differita nel registro; il validator continua a rifiutare un'abilita' che la usi",
+        "curse implementata se non lo e' gia' (registro chiuso, parametri validati)",
+        "Il validator esce 0; nessuna abilita' attiva usa una primitiva differita",
+        "Test headless: darkness_1 si esegue componendo le primitive attive",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 6,
+      "fase": 2,
+      "passes": true,
+      "notes": "Non esisteva un'abilita' per darkness_1: la sequenza era uno stub con abilities:[]. Creata data/abilities/darkness.json > darkness_sfortuna_cronica (sequence_id darkness_1, costo 40, cd 30), aggiunta a darkness_1.abilities nel pathway (stub resta, come darkness_2 che gia' liste darkness_cancellazione). Primitive tutte ATTIVE: curse('sfortuna', condizione_rimozione 'purificazione') + debuff_stat moltiplicativo su evasione (-0.35) e velocita (-0.2) + dot basso (3/tick ogni 2s) a tag follia. debuff su evasione e precisione. FIXUP (feedback utente): precisione aggiunta come stat forward-looking (mira/critici, speculare a evasione) in STAT_KEYS + _FALLBACK + balance.json stats_base + known_stats del validator; nessun sistema di combattimento la legge ancora. probability_shift resta deferred in primitives.json; il check generico del validator (riga 271) rifiuta gia' un'abilita' che usi una primitiva differita, nessuna modifica al validator necessaria. curse implementata: _p_curse in ability_engine - non c'e' un sistema di status, quindi la maledizione e' un marcatore (modificatore per id 'curse:<ability_id>' senza delta) che scade a tempo (kind expire, debuff:true) ed e' tolto da light_purify; effetto e condizione_rimozione registrati per un futuro cleanse-per-condizione. Il 'danno' della sfortuna lo fanno le altre primitive, curse e' il contenitore concettuale. 4 test in test_darkness_1.gd (153 totali): curse attiva / probability_shift assente dall'abilita', curse marca+scade+purificabile, execute(darkness_sfortuna_cronica) compone 4 primitive attive senza warning. validator exit 0, nessuna abilita' attiva usa una differita. Primitive: 13 -> 14 su 28."
+    },
+    {
+      "id": "US-204",
+      "title": "AbilityEngine esegue un'abilita' non posseduta",
+      "description": "Come sviluppatore, voglio che il motore possa eseguire un ability_id che non appartiene al Pathway del giocatore, con una durata di prestito e una scadenza (capacita' richiesta dallo stress test - Error, Sequenza 6).",
+      "acceptanceCriteria": [
+        "AbilityEngine.grant_temporary(ability_id, caster, durata) registra un'abilita' prestata; execute() la accetta anche se non e' nel Pathway del caster",
+        "Alla scadenza (gestita da tick_effects) l'abilita' prestata sparisce; execute() di un'abilita' scaduta -> rifiuto gestito, non crash",
+        "Il prestito e' ispezionabile (granted_abilities(caster)) per la UI e i test",
+        "Nessun effetto sul flusso normale di execute() per le abilita' possedute",
+        "Test headless: concessione, esecuzione, scadenza, rifiuto dopo scadenza",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 7,
+      "fase": 2,
+      "passes": true,
+      "notes": "grant_temporary(ability_id, caster, durata) -> bool (false se l'abilita' non esiste): registra il prestito in _granted ('<iid>:<ability_id>' -> istante di fine ms, come _cooldowns) e accoda un _pending {kind:grant_expire, caster, key}. is_granted(caster, ability_id), granted_abilities(caster), clear_granted(). CONTESTO: execute() prima non aveva NESSUN gate di ownership - eseguiva qualunque abilita' esistente. US-204 aggiunge il gate ma SOLO per il giocatore: owned_abilities(caster) restituisce le abilita' delle Sequenze da 9 alla corrente del Pathway di Progression, e solo se il caster e' nel gruppo 'player' con un pathway attivo; per ogni altro caster (nemici, manichini, test) restituisce [] = 'ownership sconosciuta' e _puo_lanciare non pone limiti (flusso invariato, zero regressioni sui ~18 test che chiamano execute con caster generici). _puo_lanciare: posseduta OR prestata OR ownership sconosciuta. execute() di un'abilita' non posseduta ne' prestata -> ERR_NON_POSSEDUTA (nuova costante), rifiuto gestito. Scadenza gestita da tick_effects (ramo grant_expire -> _granted.erase) e da sweep (sweep_cooldowns ora fa _sweep su entrambi gli indici: voci scadute o caster liberato). flush_effects pulisce anche _granted. 6 test in test_ability_grant.gd (159 totali): registrazione+ispezione, abilita' inesistente, giocatore non lancia una non posseduta, prestito sblocca+scade+torna rifiutata, caster senza Pathway senza restrizioni, prestito muore col caster. validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-205",
+      "title": "Evocazioni persistenti serializzate",
+      "description": "Come sviluppatore, voglio che summon con durata: -1 crei entita' che sopravvivono al combattimento e al cambio scena, e che il save le ricostruisca.",
+      "acceptanceCriteria": [
+        "Primitiva summon implementata; durata: -1 = entita' persistente con entita_id che dichiara la fonte (cadavere/costrutto/pet/chimera)",
+        "Le evocazioni persistenti sono in un registro centrale (SummonRegistry o simile), non figlie della scena di combattimento",
+        "Il save serializza evocazioni[] (lo slot esiste gia' da US-015): {entita_id, tipo, posizione, hp}; al load le entita' sono ricreate",
+        "Un'evocazione la cui fonte non e' piu' valida non viene ricreata (errore gestito, non crash)",
+        "Test headless: summon persistente, round-trip del save, ricreazione, fonte mancante",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 8,
+      "fase": 2,
+      "passes": true,
+      "notes": "Autoload SummonRegistry (scripts/summon_registry.gd), dopo WorldState. _summons: Array di {id univoco 'sum_N', tipo (=entita_id), comportamento, posizione:[x,y], hp}. evoca()/evocazioni()/conta()/rimuovi()/pulisci(). per_salvataggio/da_salvataggio non fidato: un'evocazione senza 'tipo' valido (fonte persa) NON viene ricreata, push_warning, nessun crash; raw non-lista -> []. ability_engine._p_summon: durata < 0 -> per quantita volte reg.evoca(entita_id, comportamento, posizione del caster, hp 10 placeholder) - PERSISTENTI, nel registro centrale, MAI figlie della scena; durata > 0 -> _pending {kind:summon_temp} ancorata al caster che scade; entita_id vuoto -> applied:false. Lo slot 'evocazioni' del save esiste gia' da US-015 (schema v2): GameState.snapshot/applica ora lo riempiono da SummonRegistry invece di []. Nessun bump di schema_version. Lo spawn del Node vero e' fase 6 (non ci sono scene di entita'): 'ricreare' al load = ripopolare il registro (documentato). validate_data.py: summon esige entita_id non vuoto e durata != 0. 6 test in test_summon.gd (165 totali): registro, persistente nel registro e non in scena, temporanea scade, round-trip del save, fonte persa non ricreata, execute(death_legione) compone summon+aura (8 legionari). validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-206",
+      "title": "Hook stored_ability_id nel motore",
+      "description": "Come sviluppatore, voglio che il motore sappia eseguire un'abilita' 'portata da un oggetto' al consumo, cosi' che il sistema inventario di fase 3 ci si agganci senza riscrivere AbilityEngine.",
+      "acceptanceCriteria": [
+        "AbilityEngine.execute_stored(stored_ability_id, consumer) esegue l'abilita' come se il consumer la possedesse, una volta sola, senza costo di spiritualita'",
+        "Riusa grant_temporary di US-204 internamente dove ha senso, o e' un percorso parallelo documentato",
+        "Nessun sistema inventario in questa story: solo l'API e un test che la esercita con un ability_id finto",
+        "Test headless: esecuzione stored, singolo uso, ability_id ignoto -> errore gestito",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 9,
+      "fase": 2,
+      "passes": true,
+      "notes": "execute_stored(stored_ability_id, consumer): esegue l'abilita' portata da un oggetto - come se il consumer la possedesse, UNA volta, SENZA costo di spiritualita' ne' cooldown, SENZA controllo di ownership (l'abilita' e' dell'oggetto). Il singolo uso lo garantisce l'inventario di fase 3 consumando l'oggetto, non il motore: una seconda chiamata riesce ancora. E' un percorso PARALLELO a execute() (non riusa grant_temporary): il motore delle primitive e' estratto in _esegui_primitive(ability, caster, stats, ability_id, result), condiviso dai due, mantiene i TRE esiti (implementata / nel registro non scritta / fuori registro). ERR_SCONOSCIUTA se l'abilita' non esiste, ERR_NO_STATS se il consumer non ha StatsComponent. Nessun sistema inventario: solo l'API. 5 test in test_stored_ability.gd (170 totali, abilita' finta iniettata in GameData._abilities): esegue senza costo, non avvia cooldown, ignora l'ownership (execute() normale rifiuterebbe con ERR_NON_POSSEDUTA), abilita' ignota -> errore gestito, consumer senza stats -> errore gestito. La refattorizzazione di execute() non rompe i 21 test di test_ability_engine. validator 0. BLOCCO A CHIUSO."
+    },
+    {
+      "id": "US-210",
+      "title": "EventTracker generico - il tracker e i contatori",
+      "description": "Come sviluppatore, voglio un unico sistema che conti gli eventi di gioco filtrati, cosi' che le azioni di recitazione siano contatori sui 12 eventi tracciati e non 40 rilevatori speciali.",
+      "acceptanceCriteria": [
+        "Autoload EventTracker: emit_event(nome, dati) dove nome appartiene ai 12 di data/schema/tracked_events.json; evento fuori vocabolario -> push_error, non crash",
+        "count(evento, filtri) applica i filtri ammessi per quell'evento (suffisso _max -> <=, _min -> >=, booleano -> true, altrimenti uguaglianza); misura conteggio/somma/secondi dallo schema",
+        "GameData carica tracked_events.json (get_tracked_events / get_tracked_event)",
+        "Il log e' serializzato nel save (schema_version su, migrazione)",
+        "Test headless: emissione, filtri, evento fuori vocabolario, filtro non ammesso, persistenza, migrazione",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 10,
+      "fase": 2,
+      "passes": true,
+      "notes": "US-210 spezzata: 210 = il tracker (questa), 210B = gli emettitori nei sistemi di fase 1. scripts/event_tracker.gd, autoload dopo Progression. _log grezzo di {nome, dati}; count() filtra e aggrega alla lettura (misura dallo schema). Filtri per suffisso: _max/_min/booleano/uguaglianza. Evento o filtro fuori vocabolario -> push_error + 0/no-op, mai crash. GameData carica data/schema/tracked_events.json (28 file). SAVE: schema_version 4->5, campo 'eventi' {log:[]} in salva/_leggi_snapshot/_migra_4_a_5; GameState.snapshot/applica agganciano EventTracker. NB: il log cresce senza limite - come le acting_actions, e' un punto da rivedere (US-023 era su questo), ma l'Acting ha bisogno della storia. stesso_combattimento come filtro serve un concetto di sessione di combattimento che non esiste ancora: rimandato a quando ci sara'. 8 test in test_event_tracker.gd (178 totali). validator 0, nessuna regressione (catena di migrazione 1->5 verde)."
+    },
+    {
+      "id": "US-210B",
+      "title": "EventTracker - emettitori nei sistemi di fase 1",
+      "description": "Come sviluppatore, voglio che i sistemi di combattimento di fase 1 emettano gli eventi tracciati rilevanti, cosi' che l'Acting Method abbia dati veri su cui contare.",
+      "acceptanceCriteria": [
+        "ability_engine.execute() su successo -> emit_event('ability_used', {ability_id})",
+        "enemy.gd alla morte -> emit_event('enemy_defeated', {...}) con i campi disponibili (senza_abilita se ricavabile, ecc.)",
+        "hurtbox.gd (solo se il genitore e' il giocatore): danno subito -> emit_event('damage_taken', {quantita, tag_danno}); parata perfetta -> emit_event('perfect_parry')",
+        "hurtbox/hitbox lato attaccante giocatore -> emit_event('damage_dealt', {quantita, tag_danno})",
+        "Adattamento MINIMO: agganciare, non riscrivere",
+        "Test headless: un combattimento simulato produce i contatori attesi (enemy_defeated, damage_dealt, ...)",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 11,
+      "fase": 2,
+      "passes": true,
+      "notes": "Emettitori agganciati, non riscritti (~1-4 righe a file). player.gd: helper _traccia(evento, dati) -> Engine.get_main_loop().root.get_node_or_null('EventTracker').emit_event; _su_colpo_inflitto -> damage_dealt {quantita}; _su_danno_subito -> damage_taken {quantita}; _su_parata_riuscita(perfetta) -> perfect_parry solo se perfetta. enemy.gd _su_morte -> enemy_defeated {} (in fase 1 il nemico e' sempre ucciso dal giocatore). ability_engine.execute() su successo -> ability_used {ability_id}. I dati degli eventi sono MINIMI: i filtri ricchi delle acting_actions (senza_abilita, tipo_arma, sequenza_bersaglio, stesso_combattimento) non sono ancora popolati - servono contesto che il combat non ha (arma, Sequenza del nemico, sessione di combattimento). US-211 li testa con eventi costruiti a mano; US-219 rivelera' cosa serve arricchire per il loop reale. 3 test in test_event_emitters.gd (181 totali): ability_used (anche filtrato per id), enemy_defeated alla morte (enemy.tscn istanziata), damage_dealt/taken/perfect_parry dai gestori del player. REGRESSIONE TROVATA DAI TEST: istanziare player.tscn nei test lo mette nel gruppo 'player' e sporca test_i18n_hud/test_progression -> il test usa PlayerScript.new() e chiama i gestori (metodi puri) direttamente. validator 0."
+    },
+    {
+      "id": "US-211",
+      "title": "Acting Method - barra acting_progress",
+      "description": "Come giocatore, voglio che recitare il ruolo del mio Pathway riempia la barra di recitazione della Sequenza corrente.",
+      "acceptanceCriteria": [
+        "ActingComponent legge le acting_actions della Sequenza corrente da ProgressionComponent, e per ognuna calcola il progresso come min(1.0, EventTracker.count(...) / target) * progresso_dichiarato (ripetibile o una tantum secondo il dato)",
+        "acting_progress totale = somma dei contributi, cap a 1.0",
+        "Decadimento per azioni incoerenti: usare un'abilita' Beyonder mentre si recita 'duello puro' sottrae decadimento_azione_incoerente (balance.json.acting)",
+        "Segnale acting_progress_changed(valore); il progresso persiste nel save",
+        "All'avanzamento di Sequenza, acting_progress si azzera e riparte sulle acting_actions della nuova Sequenza",
+        "Test headless: accumulo da eventi, cap a 1.0, decadimento, reset su avanzamento",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 12,
+      "fase": 2,
+      "passes": true,
+      "notes": "Autoload Acting (scripts/acting.gd), dopo SummonRegistry. Legge le acting_actions della Sequenza corrente da Progression.sequence_data(). Contributo di un'azione = clampf((count_ora - baseline) / target, 0, 1) * progresso_dichiarato; baseline = conteggio EventTracker al momento dell'ingresso nella Sequenza (l'Acting riparte da zero a ogni avanzamento, _riparti() rileva le baseline). acting_progress() = clampf(somma dei contributi - _decadimento, 0, 1). ripetibile:false -> _latched: una volta raggiunto il target il contributo resta acquisito. DECADIMENTO: Acting ascolta EventTracker.evento_emesso; se nome=='ability_used' E la Sequenza ha un'acting_action con filtro senza_abilita:true (recita 'duello puro'), _decadimento += balance.json.acting.decadimento_azione_incoerente (0.05). e_completo() con tolleranza 0.9999 (0.35+0.30+0.35 in FP non fa 1.0). Segnale acting_progress_changed(valore). _riparti() su Progression.sequence_changed. SAVE: schema_version 5->6, campo 'acting' {decadimento, baseline, latched} - _migra_5_a_6; GameState.applica chiama Acting.da_salvataggio DOPO progressione ed eventi (legge Sequenza e conteggi). NB: gli emettitori di US-210B non popolano ancora i filtri ricchi (senza_abilita, tag_danno, ecc.): il test usa eventi costruiti a mano, US-219 chiudera' il cerchio. 6 test in test_acting.gd (187 totali): accumulo, frazione parziale, cap a 1.0, decadimento per abilita' incoerente, reset su avanzamento (le acting_actions di Seq 8 hanno filtri diversi), persistenza via GameState.snapshot/applica. validator 0, nessuna regressione (catena migrazione 1->6 verde)."
+    },
+    {
+      "id": "US-207",
+      "title": "Caratteristica Beyonder come oggetto",
+      "description": "Come giocatore, voglio raccogliere le Caratteristiche Beyonder che i nemici lasciano, cosi' da poterle usare per avanzare.",
+      "acceptanceCriteria": [
+        "data/schema/characteristic.schema.json + data/characteristics.json (o generazione dai dati di Pathway): entita' con id, pathway_id, sequence, name_i18n",
+        "Un nemico Beyonder alla morte puo' rilasciare una Caratteristica (probabilita' e Sequenza da balance.json / dal nemico); diventa una entita' raccoglibile a terra",
+        "Raccolta -> la Caratteristica entra in uno store del giocatore (characteristics_held[]), serializzato nel save con typeof()",
+        "Nessun nome hardcoded; il validator verifica pathway_id e sequence contro i dati di Pathway",
+        "Test headless: drop, raccolta, persistenza nel save",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 13,
+      "fase": 2,
+      "passes": true,
+      "notes": "data/characteristics.json (10 caratteristiche del Twilight Giant, una per Sequenza 9..0) + data/schema/characteristic.schema.json. GameData: _load_single(characteristics, TYPE_ARRAY), get_characteristic(id), characteristic_for(pathway_id, sequence). Autoload CharacteristicStore (scripts/characteristic_store.gd), dopo SummonRegistry: _held Array di id con ripetizioni, aggiungi/consuma (una occorrenza)/possiede/conta/posseduti/pulisci, per_salvataggio/da_salvataggio non fidato (solo stringhe non vuote). SAVE: schema_version 6->7, campo 'caratteristiche' (lista di id) in salva/_leggi_snapshot/_migra_6_a_7; GameState.snapshot/applica agganciano lo store. DROP: balance.json.nemico_base.caratteristica {pathway_id, sequence, probabilita} - il nemico da banco lascia char_twilight_giant_9 garantita. enemy.gd _lascia_caratteristica(): randf() vs probabilita, poi GameData.characteristic_for, poi spawn di scripts/characteristic_pickup.gd (Area2D costruita a runtime come projectile/melee_arc, rombo segnaposto). Il pickup si raccoglie su body/area_entered del giocatore o via raccogli() pubblica -> CharacteristicStore.aggiungi + queue_free, no doppia raccolta. validate_data.py: id unici, pathway_id attivo, sequence 0-9, name_i18n; nemico_base.caratteristica risolve; ogni potion.characteristic_sequence non-stub del TG ha la sua caratteristica. 6 test in test_characteristic.gd (193 totali): dati caricati, store, il nemico lascia il pickup alla morte (enemy.tscn reale), raccolta -> magazzino, persistenza via GameState, migrazione v6->v7, da_salvataggio non fidato. VERIFICA A SCHERMO (finestra reale): store 0 -> 1 camminando sul pickup, possiede('char_twilight_giant_9')=true, pickup rimosso dalla scena. validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-208",
+      "title": "Formule delle pozioni e formule parziali",
+      "description": "Come sviluppatore, voglio il sistema di formule delle pozioni, comprese le formule parziali (una pozione fatta con 3 ingredienti su 5).",
+      "acceptanceCriteria": [
+        "data/potions/formulas.json + schema: ogni formula_id (gia' referenziato da twilight_giant.json) elenca characteristic_sequence, ingredients[] completi, e la soglia minima di ingredienti per una formula parziale",
+        "Una formula parziale (3/5 ingredienti) produce una pozione con effetto collaterale/qualita' ridotta esplicito nei dati (mai un valore silenzioso)",
+        "Il validator: ogni potion.formula_id delle Sequenze non-stub risolve; ogni ingredient e' un id noto; characteristic_sequence coerente con la Sequenza della pozione",
+        "Test headless: formula completa vs parziale, formula inesistente -> errore",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 14,
+      "fase": 2,
+      "passes": true,
+      "notes": "data/potions/formulas.json (schema_version 1) + data/schema/potion_formula.schema.json. Generato da tutte le Sequenze non-stub: 11 formule (twilight_giant 9..0 + fool_9), 30 ingredienti. Struttura: 'ingredients' = vocabolario chiuso, 'formulas' = { formula_id: {characteristic_sequence, ingredients[], soglia_parziale, penalita_parziale} }. soglia_parziale = len(ingredients)-1 (con 3 ingredienti se ne possono usare 2, sotto no). penalita_parziale ESPLICITA nei dati {follia_extra: 2.0, qualita: instabile} - mai un valore silenzioso; US-209 la applica. GameData: _load_single(formulas), get_formula(id), ingredient_ids() (vocabolario). Nessuna logica runtime in questa story (concoct e' US-209). validate_data.py: ogni potion.formula_id non-stub risolve; ogni ingrediente di ogni formula e' nel vocabolario; formula.characteristic_sequence == numero della Sequenza; ingredienti inline della pozione == quelli della formula (la formula e' la fonte); soglia_parziale in [1, len]; penalita_parziale non vuota. 5 test in test_potion_formulas.gd (198 totali): formule caricate, formula inesistente -> {}, vocabolario copre le formule, soglia parziale coerente (< completo), ogni Sequenza del TG ha la sua formula. validator 0 (30 file), nessuna regressione."
+    },
+    {
+      "id": "US-213",
+      "title": "Follia - statistica cumulativa con effetti a soglia",
+      "description": "Come giocatore, voglio che la follia si accumuli da piu' sorgenti e produca effetti meccanici alle soglie di balance.json.",
+      "acceptanceCriteria": [
+        "MadnessComponent: valore 0->100, add(quantita', sorgente) con log della sorgente; non si azzera mai del tutto (riduzione_max_ancore e' un cap sulla riduzione, non un reset)",
+        "Sorgenti di fase 2: avanzamento forzato, sacrificio di un'Ancora, pozione parziale, permanenza nel mondo spirituale (gancio)",
+        "Effetti a soglia da balance.json.madness: 15 distorsioni, 40 abilita' autonome (probabilita' probabilita_attivazione_autonoma_sotto_soglia), 70 perdita di input intermittente, 100 stato mostro / game over per follia",
+        "decadimento_naturale_al_minuto (oggi 0) rispettato come dato",
+        "Segnale madness_changed(valore, soglia_attraversata); serializzato nel save",
+        "Test headless: accumulo, soglie, cap della riduzione, abilita' autonoma sotto soglia 40",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 15,
+      "fase": 2,
+      "passes": true,
+      "notes": "Autoload Madness (scripts/madness.gd), dopo CharacteristicStore. _valore 0-100, _log delle sorgenti. add(quantita, sorgente) clampa e registra; riduci(q) = add(-q) (il cap frazionario riduzione_max_ancore 0.60 lo applica AnchorSystem in US-216 passando la quantita' gia' cappata). Soglie da balance.json.madness (fallback interni): 15/40/70/100. soglia_corrente() -> il VALORE della soglia (0/15/40/70/100). Segnale madness_changed(valore, soglia_attraversata) con -1 se non cambia banda. ABILITA' AUTONOME: _process sopra soglia 40, ogni ~1s tenta_abilita_autonoma() (pubblico) con probabilita_attivazione_autonoma_sotto_soglia (0.08); sul colpo emette abilita_autonoma(). decadimento_naturale_al_minuto rispettato (0 -> no-op). perdita_input_attiva()/stato_mostro() come query. SAVE: schema_version 7->8, campo 'follia' {valore, log}, _migra_7_a_8; GameState.snapshot/applica. 6 test in test_madness.gd (204 totali): add+log, clamp 0-100, soglie+segnale, abilita' autonoma solo sopra 40 (0 tiri sotto / qualcuno su 2000 sopra), riduci non sotto 0, persistenza+migrazione v7->v8. validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-209",
+      "title": "Concoction - preparare e bere la pozione",
+      "description": "Come giocatore, voglio combinare una Caratteristica con gli ingredienti per creare la pozione della Sequenza successiva e berla per avanzare.",
+      "acceptanceCriteria": [
+        "PotionSystem.concoct(formula_id, characteristic, ingredienti[]) -> pozione (completa o parziale), consumando Caratteristica e ingredienti",
+        "Bere la pozione della Sequenza N-1 mentre si e' a Sequenza N: se acting_progress e' a 1.0 (US-212) avanza; altrimenti 'digerita male' - foundation giu', follia su (madness_on_force della Sequenza), nessun avanzamento",
+        "L'avanzamento aggiorna ProgressionComponent, riapplica gli stat_modifiers, resetta acting_progress, emette sequence_changed",
+        "La pozione parziale ha una penalita' (follia extra o effetto collaterale dai dati)",
+        "Test headless: concoct completa -> avanzamento con acting pieno; concoct con acting incompleto -> forzatura; pozione parziale -> penalita'",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 16,
+      "fase": 2,
+      "passes": true,
+      "notes": "Due autoload: Foundation (scripts/foundation.gd, dopo Madness) e PotionSystem (scripts/potion_system.gd, dopo Acting). Foundation: _valore da balance.json.foundation.iniziale (50), applica(delta, sorgente) clamp [minimo, 100], costante(nome), moltiplicatore_follia() = lerp(2.5, 1.0, valore/100) - 1.0 a fondamenta piene, sale a 2.5 a zero. balance.json.foundation: nuovo campo malus_digestione_difficile -10. PotionSystem.concoct(formula_id, characteristic_id, ingredienti[]): valida formula, coerenza Caratteristica (sequence == formula.characteristic_sequence) e possesso (CharacteristicStore); conta gli ingredienti RICHIESTI presenti fra quelli passati (distinti), sotto soglia_parziale -> ingredienti_insufficienti (Caratteristica NON consumata); parziale se < completo; consuma la Caratteristica e tiene _pozione {formula_id, da_sequenza, parziale, penalita}. bevi(forza): pozione per un'altra Sequenza -> rifiuto; Acting.e_completo() -> avanza (Progression.avanza riapplica stat_modifiers, emette sequence_changed, Acting._riparti) + Foundation +bonus_recitazione_completa, pozione parziale -> Madness.add(follia_extra * moltiplicatore_follia); Acting incompleto e forza=false -> DIGERITA MALE (Foundation malus_digestione_difficile, Madness.add(madness_on_force * mult), nessun avanzamento, pozione sprecata); forza=true (gancio US-212) -> avanza comunque + Foundation malus_avanzamento_forzato (-25) + follia pesante. SAVE: schema_version 8->9, campo 'fondamenta' {valore}, _migra_8_a_9; GameState.snapshot/applica agganciano Foundation. 10 test in test_concoction.gd (214 totali): concoct completa/parziale/sotto-soglia/caratteristica-incoerente/non-posseduta, bevi con acting completo avanza + reset acting + bonus fondamenta, acting incompleto digerita male, forzato -25, pozione parziale penalizza follia, pozione per altra Sequenza rifiutata. validator 0, nessuna regressione. Verifica a schermo rimandata: nessuna UI di pozioni finche' non c'e' la HUD di US-212 / la UI a libro di US-221; il loop e' coperto dai test headless."
+    },
+    {
+      "id": "US-212",
+      "title": "Blocco dell'avanzamento sotto acting_progress 1.0",
+      "description": "Come designer, voglio che non si possa avanzare di Sequenza finche' la recitazione non e' completa, e che forzare abbia un costo pesante.",
+      "acceptanceCriteria": [
+        "concoct + bere: con acting_progress < 1.0 l'avanzamento non avviene per via normale",
+        "Forzare (bere comunque) e' possibile e applica: foundation += malus_avanzamento_forzato, follia += madness_on_force della Sequenza, avanzamento con fondamenta degradate",
+        "foundation non scende sotto minimo (0); a foundation bassa il moltiplicatore di follia sale (moltiplicatore_follia_a_fondamenta_zero)",
+        "La UI (HUD) mostra se l'avanzamento e' disponibile o forzato",
+        "Test headless: avanzamento bloccato, forzatura con malus corretti, floor di foundation",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 17,
+      "fase": 2,
+      "passes": true,
+      "notes": "Il grosso della meccanica era gia' in US-209 (bevi con acting incompleto = digerita male; forza=true = avanza con malus -25; Foundation.applica clampa a minimo 0; moltiplicatore_follia). US-212 aggiunge: PotionSystem.avanzamento_disponibile() (pozione per la Sequenza corrente + Acting.e_completo) e avanzamento_forzabile() (pozione ma acting < 1.0). HUD: hud.tscn nuova riga 'Recitazione' (barra 0-1) + label 'Avanzamento'; hud.gd si aggancia a Acting.acting_progress_changed e a PotionSystem.pozione_creata/pozione_bevuta; _aggiorna_avanzamento() -> label nascosta senza pozione, 'Avanzamento pronto' con acting completo, 'Avanzamento solo forzando (fondamenta -25)' altrimenti. i18n: 3 chiavi nuove in strings.csv (HUD_RECITAZIONE, HUD_AVANZAMENTO_PRONTO, HUD_AVANZAMENTO_FORZATO) + .translation rigenerati. BUG TROVATO DALLA VERIFICA A SCHERMO: Acting non emetteva acting_progress_changed quando arrivava un evento tracciato (solo su _riparti/decadimento) -> la HUD non si aggiornava. Corretto: _su_evento riemette il segnale per ogni evento che una acting_action della Sequenza conta. 7 test in test_advancement_gate.gd (221 totali): stato senza pozione, pozione+acting incompleto = solo forzabile, acting completo = disponibile, bere senza recitazione non avanza, floor fondamenta a 0 (anche forzando 5 volte 9->4), moltiplicatore follia 1.0/1.75/2.5. VERIFICA A SCHERMO (finestra reale): label nascosta senza pozione, 'solo forzando' con acting 0, 'Avanzamento pronto' + barra a 1.0 con recitazione completa. validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-214",
+      "title": "Layer audio della follia",
+      "description": "Come giocatore, voglio sentire la follia prima di vederla: sussurri che crescono sul bus dedicato.",
+      "acceptanceCriteria": [
+        "AudioManager legge audio.json.madness_layer: 4 soglie (amb_whisper_faint/words/names/chorus) con volume_db e detune crescenti, sul bus whisper (gia' creato in US-019)",
+        "Il volume del bus whisper e' guidato dalla follia, non fisso",
+        "Soglia 80: duck_music_db abbassa la musica come dichiarato nei dati",
+        "One-shot casuali sopra follia 25: intervallo random in intervallo_secondi, sfx da one_shot_casuali.sfx",
+        "I sussurri di soglia 55 usano i nomi degli NPC incontrati e delle Ancore (fallback a un set generico se non ce ne sono)",
+        "disattiva_sussurri silenzia il bus whisper senza toccare la meccanica",
+        "Placeholder audio sintetizzati come in US-019 (non file)",
+        "Verifica a schermo/orecchio documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 18,
+      "fase": 2,
+      "passes": true,
+      "notes": "audio_manager.gd: carica audio.json.madness_layer, si aggancia a Madness.madness_changed -> aggiorna_follia(valore). Player _whisper (AudioStreamPlayer sul bus whisper). _soglia_follia_attiva(v) = la soglia piu' alta con madness_min <= v; il volume_db del bus whisper e' quello della soglia (guidato dalla follia, non fisso), il detune diventa pitch_scale, il loop e' un wash sintetizzato per soglia (amb_whisper_*). Sotto la prima soglia -> bus muto + whisper.stop(). SOGLIA 80: duck_music_db -20 abbassa il bus music (base memorizzato in _ready, ripristinato quando si scende sotto 80). disattiva_sussurri (imposta_accessibilita) -> AudioServer.set_bus_mute(whisper) senza toccare Madness; il re-hook riapplica sul cambio dell'opzione. ONE-SHOT: _process, sopra one_shot_casuali.madness_min (25), timer random in intervallo_secondi, poi tenta_one_shot() (pubblico) suona un sfx casuale da one_shot_casuali.sfx; disattiva_sussurri li sopprime. SOGLIA 55: imposta_nomi_sussurro(nomi)/nomi_sussurro() - gancio per NPC/Ancore (AnchorSystem US-216), fallback a un set generico se vuoto. 9 sfx nuovi in SFX_SPEC (4 one-shot + 4 wash), tutti sintetizzati (US-019, niente file). 6 test in test_madness_audio.gd (227 totali): whisper muto sotto la prima soglia, volume guidato dalla follia (-24 a 35, -10 a 85), duck musica a 80 + ripristino, disattiva_sussurri silenzia e resta muto, one-shot solo sopra 25 e soppressi da disattiva_sussurri, nomi con fallback. validator 0, nessuna regressione. Verifica all'orecchio non possibile (audio sintetizzato); lo stato dei bus e' coperto dai test."
+    },
+    {
+      "id": "US-214B",
+      "title": "Pulizia di default del cadavere del nemico",
+      "description": "Come giocatore, voglio che un nemico morto sfumi via invece di restare a schermo identico a uno vivo (buco visto in playtest: il segnale morto non ha consumatori).",
+      "acceptanceCriteria": [
+        "balance.json.nemico_base.cadavere {permanenza_s, dissolvenza_s}",
+        "enemy.gd alla morte: dopo aver emesso 'morto', se permanenza_s > 0 avvia un timer -> tween di modulate:a a 0 su dissolvenza_s -> queue_free",
+        "permanenza_s 0 = il cadavere resta (lo gestira' uno spawner/quest)",
+        "Il segnale 'morto' resta disponibile e viene emesso comunque prima della dissolvenza",
+        "Test headless: permanenza 0 resta, permanenza breve -> liberato, segnale emesso",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 19,
+      "fase": 2,
+      "passes": true,
+      "notes": "Buco segnalato dall'utente in playtest: enemy.gd (US-011) alla morte disattiva collision/hitbox/hurtbox, riproduce 'death' ed emette morto(self) ma NON si libera - e nessuno ascolta morto, quindi il cadavere restava a schermo congelato sul frame 5, identico a un nemico vivo. Aggiunto balance.json.nemico_base.cadavere {permanenza_s: 3.0, dissolvenza_s: 1.0}. enemy._avvia_dissolvenza_cadavere(): dopo morto.emit, se permanenza_s > 0 crea un SceneTreeTimer -> tween modulate:a -> queue_free. permanenza_s 0 = resta (per uno spawner/encounter di fase 6). Il segnale morto NON e' toccato: chi lo vuole lo riceve prima della dissolvenza. 3 test in test_corpse.gd (230 totali): permanenza 0 resta MORTO, permanenza breve -> liberato dopo permanenza+dissolvenza, segnale morto emesso. VERIFICA A SCHERMO: cadavere alpha 1.0 a t=0, 0.60 a t=3.4 (in dissolvenza), sparito a t=4.4. validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-215",
+      "title": "Effetti visivi della follia",
+      "description": "Come giocatore, voglio che la follia si veda a schermo, in modo leggibile e disattivabile per fotosensibilita'.",
+      "acceptanceCriteria": [
+        "Un overlay HUD (fuori dal libro) legge le soglie da balance.json.madness e da design-vfx.md cap. 5: 15 bordi che respirano d'inchiostro, 40 distorsioni sugli sprite, 70 il nero di scena si attiva da solo",
+        "Con riduci_flash / disattiva_sussurri la versione ridotta e' statica (vignetta fissa), mai assente (FR-8)",
+        "Gli effetti sono guidati dai dati (soglie e parametri), non da numeri negli script",
+        "Nessuna informazione vive solo nel canale visivo o solo in quello audio",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 20,
+      "fase": 2,
+      "passes": true,
+      "notes": "scenes/madness_overlay.tscn (CanvasLayer layer 90, FUORI dal libro) + scripts/madness_overlay.gd + shaders/madness_vignette.gdshader. In main.tscn e debug_scene.tscn. Soglie da balance.json.madness (15/40/70), parametri da nuova sezione balance.json.madness_vfx (nessun numero nello script). Si aggancia a Madness.madness_changed. VIGNETTA (soglia 15): ColorRect a schermo intero con lo shader madness_vignette (scurisce i bordi d'inchiostro), intensita = vignetta_alpha_max * lerp(0.35,1, frazione di follia) + un respiro sinusoidale (respiro_al_secondo/ampiezza) SE non riduci_flash. DISTORSIONE (soglia 40): scatti brevi (distorsione_durata_s) a intervalli random (distorsione_intervallo_s), un ColorRect magenta a bassa alpha; disattivati da riduci_distorsione. NERO DI SCENA (soglia 70): si attiva DA SOLO a intervalli random (nero_intervallo_s), alpha nero_alpha per nero_durata_s; con riduci_flash diventa STATICO a nero_alpha_statico (0.3) - MAI assente (FR-8). audio.json.accessibilita: aggiunti riduci_flash e riduci_distorsione (default false), letti via AudioManager.accessibilita. E' lo specchio visivo del layer audio di US-214, stesso valore di follia: nessuna info vive solo qui o solo nell'audio. 5 test in test_madness_visual.gd (235 totali): vignetta solo sopra 15, cresce con la follia, nero solo sopra 70 (anche forzando), riduci_flash -> nero statico costante mai assente, distorsione visibile. VERIFICA A SCHERMO (finestra reale): a follia 20 bordi leggermente scuriti (intensita 0.22), a follia 80 col nero attivo lo schermo e' quasi tutto nero (0.85). validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-216",
+      "title": "Ancore - registrazione, riduzione della follia, distruttibilita'",
+      "description": "Come giocatore, voglio Ancore (legami che mi tengono umano) che riducono la follia, e la cui perdita e' un colpo.",
+      "acceptanceCriteria": [
+        "data/anchors.json + schema: entita' con id (anchor_mirco, ...), name_i18n, forza (contributo alla riduzione)",
+        "AnchorSystem: register(anchor_id), destroy(anchor_id), active(); la riduzione totale della follia e' la somma delle forze, cappata a riduzione_max_ancore (0.60) del valore di follia",
+        "destroy emette anchor_lost(anchor_id) che aggiunge follia (MadnessComponent.add con sorgente 'anchor_lost')",
+        "Le Ancore attive sono serializzate nel save",
+        "Il validator verifica i riferimenti incrociati che esistono gia' nei dati (NPC, ancora_del_giocatore in twilight_giant.json Seq 1, sussurri soglia 55)",
+        "Test headless: registrazione, riduzione cappata, distruzione -> follia, persistenza",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 21,
+      "fase": 2,
+      "passes": true,
+      "notes": "data/anchors.json (4 Ancore: mirco/sidon = NPC, dimora = luogo, promessa) + data/schema/anchor.schema.json. Ogni Ancora: id, name_i18n, forza (punti di follia bufferizzabili), penalita (follia aggiunta se distrutta). GameData: _load_single(anchors), get_anchors()/get_anchor(id). Autoload AnchorSystem (scripts/anchor_system.gd), ULTIMO (dopo AudioManager). register(id) (false se ignoto o gia' attiva), destroy(id) (emette anchor_lost + Madness.add(penalita, 'anchor_lost', tramite_ancore=false)), active(), forza_totale(), assorbi(quantita) = min(forza_totale, riduzione_max_ancore * quantita). BUFFERING: Madness.add(q, sorgente, tramite_ancore=true) ora consulta AnchorSystem.assorbi(q) e aggiunge solo q - assorbito; il colpo da 'anchor_lost' passa tramite_ancore=false (non bufferizzato). riduzione_max_ancore (0.60) e' il CAP frazionario sul singolo colpo, non un reset. US-214 HOOK CHIUSO: AnchorSystem._aggiorna_nomi_sussurro() su register/destroy/load chiama AudioManager.imposta_nomi_sussurro coi name_i18n delle Ancore attive - i sussurri di soglia 55 pronunciano i nomi delle Ancore. SAVE: schema_version 9->10, campo 'ancore' (lista di id), _migra_9_a_10; GameState.snapshot/applica. validate_data.py: id unici, name_i18n, forza > 0, penalita > 0, almeno un'Ancora (il rituale di Seq 1 sacrifica 'ancora_del_giocatore'). 7 test in test_anchors.gd (242 totali): dati caricati, register/active, buffering (Ancora forza 10 assorbe 10 di un colpo da 20), cap frazionario (mai piu' del 60% di un colpo), destroy -> segnale + follia non bufferizzata, persistenza, nomi dei sussurri seguono le Ancore. validator 0, nessuna regressione (test_madness verde: senza Ancore il buffering e' no-op)."
+    },
+    {
+      "id": "US-217",
+      "title": "Motore del rituale di avanzamento",
+      "description": "Come giocatore, alle Sequenze alte l'avanzamento non e' una pozione: e' un rituale con luogo, momento, sacrifici e sigilli, che si puo' interrompere.",
+      "acceptanceCriteria": [
+        "RitualSystem legge advancement_ritual della Sequenza (location_tags, momento, fase_lunare, sacrifices[], sigils[])",
+        "Un rituale richiede: luogo con i location_tags giusti (in debug si simulano/forzano), momento/fase_lunare giusti (gancio a time.json), sacrifici disponibili, sigilli posseduti",
+        "Fase di build di ~45s (dato); interruzione (danno, movimento fuori area) -> il rituale fallisce, taglio audio secco al silenzio (audio.json.music.rituale.su_interruzione), penalita' di follia",
+        "Rituale completato -> avanzamento come US-209 (richiede comunque acting_progress 1.0)",
+        "Il sacrificio di un'Ancora (Seq 1 del TG) passa da AnchorSystem.destroy",
+        "Test headless: prerequisiti mancanti bloccano; interruzione fallisce con penalita'; completamento avanza",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 22,
+      "fase": 2,
+      "passes": true,
+      "notes": "Autoload RitualSystem (scripts/ritual_system.gd), ultimo. Legge advancement_ritual della Sequenza (location_tags, momento, fase_lunare, sacrifices, sigils - formato gia' nei dati). Il mondo di fase 6 non c'e': imposta_luogo(tags)/imposta_tempo(momento, fase_lunare) simulano, aggiungi_sigillo(id) e fornisci_sacrificio(id) sono i ganci per i sistemi futuri (strutture=fase 3, boss=fase 5); 'ancora_del_giocatore' passa da AnchorSystem (>=1 attiva). prerequisiti(rituale) -> {ok, mancanti[]}: ogni tag/momento/fase/sigillo/sacrificio mancante e' elencato con prefisso. avvia(rituale): richiede prerequisiti E Acting.e_completo (come l'avanzamento per pozione). Fase di build = audio.json.music.rituale.durata_build_secondi (45); _process conta alla rovescia. interrompi(motivo): rituale abortito, Madness.add(balance.json.rituale.penalita_follia_interruzione 15, non bufferizzata) + Foundation malus_fondamenta_interruzione (-8) + AudioManager.silenzio_secco(1.2) (muta music/ambience/whisper per 1.2s poi ripristina e ri-sincronizza col valore di follia). _completa: consuma i sacrifici modellati (AnchorSystem.destroy sulla prima Ancora attiva per 'ancora_del_giocatore'), Progression.avanza(), Foundation +bonus. SAVE: schema_version 10->11, campo 'rituale' {sigilli, sacrifici_forniti}, _migra_10_a_11; GameState.snapshot/applica. AudioManager: silenzio_secco/silenzio_secco_attivo nuovi. 6 test in test_ritual.gd (248 totali): prerequisiti dal rituale reale di Seq 4 (mancanti elencati, poi tutti soddisfatti), avvio richiede prereq + recitazione, completamento avanza di Sequenza, interruzione fallisce con penalita' follia+fondamenta, sacrificio dell'Ancora consumato, persistenza sigilli/sacrifici. validator 0, nessuna regressione (catena migrazione 1->11 verde). Verifica a schermo rimandata: nessuna UI di rituale finche' non c'e' la UI a libro / il mondo di fase 6; il motore e' coperto dai test."
+    },
+    {
+      "id": "US-218B",
+      "title": "Integrazione combat: tag di danno, tiro di schivata e precisione",
+      "description": "Come sviluppatore, voglio che il tag di danno viaggi lungo la pipeline di combattimento e che evasione/precisione decidano davvero se un colpo va a segno.",
+      "acceptanceCriteria": [
+        "hitbox porta il tag_danno fino a hurtbox.subisci (firma retrocompatibile: dict opzionale, i chiamanti a 3 argomenti restano validi)",
+        "hurtbox.subisci passa il tag a stats.assorbi_danno(danno, tag) e agli eventi damage_dealt/damage_taken - le acting_actions con filtro tag_danno si riempiono da combattimento reale",
+        "Lo scudo con tag_bloccati ora blocca solo i tag elencati (il tag non e' piu' '' non tipizzato)",
+        "Prima del danno: tiro di schivata, probabilita' = clamp(evasione_bersaglio - precisione_attaccante, 0, cap) con cap da balance.json.combattimento; schivato -> danno 0, segnale schivato(da)",
+        "Il tiro usa un RNG seedabile cosi' i test sono deterministici",
+        "Test headless: tag fisico assorbito da tag_bloccati [fisico] e tag luce no; alta evasione -> molti colpi mancati; precisione alta annulla l'evasione; damage_dealt emesso col tag",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 23,
+      "fase": 2,
+      "passes": true,
+      "notes": "TAG DI DANNO nella pipeline: hitbox.attiva(danno, stagger, origine, tag_danno='') porta il tag; _physics_process passa {tag_danno} come 4o arg (dict) a hurtbox.subisci e ha_colpito(bersaglio, danno, tag) porta il tag. hurtbox.subisci(danno, stagger, da, extra={}) retrocompatibile: legge extra.tag_danno, lo passa a stats.assorbi_danno(danno, tag) (lo scudo con tag_bloccati ora blocca DAVVERO solo i tag elencati) e a colpito(danno, stagger, da, tag). player.gd: attacco_leggero.tag_danno='fisico' in balance.json; _su_colpo_inflitto/_su_danno_subito ricevono il tag e lo mettono negli eventi damage_dealt/damage_taken -> le acting_actions con filtro tag_danno si riempiono da combattimento reale. enemy.gd: attacco 'fisico'. TIRO DI SCHIVATA: prima del danno, prob = clamp(evasione_bersaglio - precisione_attaccante, 0, balance.json.combattimento.cap_schivata 0.85); su colpo mancato danno 0 + segnale schivato(da) + return (niente damage_taken). RNG per-hurtbox seedabile (set_rng) per replay/test deterministici. evasione e precisione (stat forward-looking di US-024/228) ora contano. Segnali colpito e ha_colpito estesi (+tag): aggiornati i callable a 3/4 arg in dummy.gd, test_combat.gd; le lambda a meno argomenti restano valide in Godot 4. 4 test in test_combat_integration.gd (252 totali): scudo blocca solo i tag elencati (fisico si', luce no), alta evasione (0.6) -> molti colpi mancati, precisione 0.9 vs evasione 0.5 -> prob 0 nessuna schivata, damage_dealt emesso col tag e filtrabile. TRAPPOLA RITROVATA: le lambda GDScript catturano le locali PER VALORE (US-009) - il test raccoglieva in un int, corretto con un Dictionary. validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-218C",
+      "title": "Sistema di status sulle entita' + campi d'area per aura e decay",
+      "description": "Come sviluppatore, voglio che aura, curse e light_purify agiscano su status nominati con un tag (data-driven), e che aura/decay applichino l'effetto alle entita' nel raggio.",
+      "acceptanceCriteria": [
+        "data/status_effects.json + data/schema/status_effects.schema.json: ogni effetto (taunt, decadimento, sfortuna, autorita_decadimento) con tag, stat_modifiers opzionali (riusano i modificatori per id di US-007), durata_default",
+        "GameData carica status_effects.json; get_status_effect(id)",
+        "StatsComponent: applica_status(id, durata) / status_attivi() / rimuovi_status(id) / rimuovi_status_per_tag(tag); gli stat_modifiers dello status come modificatore per id 'status:<id>'",
+        "_p_aura e _p_curse applicano lo status 'effetto'; _p_light_purify rimuove anche gli status il cui tag matcha (torna 'per tag' come dice il PRD)",
+        "aura e decay con raggio > 0 generano un Area2D field (scripts/field.gd) figlio del caster che a ogni tick trova le hurtbox in raggio e applica danno (decay) o status (aura); si autodistrugge a fine durata, durata -1 finche' il caster e' valido",
+        "Il validator: ogni 'effetto' usato da aura/curse in data/abilities/ esiste in status_effects.json",
+        "Test headless: applica/rimuovi status, stat_modifiers dello status, light_purify per tag, un campo aura applica lo status a un bersaglio nel raggio e non a uno fuori",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 24,
+      "fase": 2,
+      "passes": true,
+      "notes": "data/status_effects.json (5 status: sfortuna, taunt, decadimento, autorita_decadimento, comando_non_morti) + schema. Ogni status: tag (dal vocabolario), durata_default (>0 o -1), negativo (bool), stat_modifiers opzionali. GameData: get_status_effect(id). StatsComponent: _statuses {id: {tag, left}}, applica_status(id, durata) (durata<0 = durata_default; stat_modifiers -> modificatore 'status:<id>'), rimuovi_status(id), rimuovi_status_per_tag(tag), ha_status(id), status_attivi(); _process scade da solo gli status a tempo (left>=0). ability_engine._p_curse: la maledizione e' ora uno STATUS nominato, non un marcatore vuoto (StatsComponent lo scade, light_purify lo toglie per tag). _p_aura: applica lo status 'effetto' + con raggio>0 e caster in scena genera un field. _p_decay: con raggio>0 e caster in scena genera un field (danno d'area), altrimenti fallback _pending. _p_light_purify: oltre a dot/decay/debuff pending, rimuove gli status con negativo:true per TAG (come dice il PRD), sempre entro potenza. scripts/field.gd: Area2D figlia del caster, collision_mask 4 (hurtbox sul layer 3), a ogni tick_rate trova le hurtbox in raggio e applica lo status (aura) o il danno (decay); si autodistrugge a durata, durata -1 finche' il caster e' valido. validate_data.py: ogni status ben formato (tag noto, durata, stat note); ogni effetto di aura/curse in data/abilities esiste in status_effects.json. 7 test in test_status_effects.gd (259 totali): status caricati, applica/rimuovi, stat_modifiers dello status, scadenza via _process, rimuovi_per_tag, light_purify toglie i negativi per tag (lascia i non-negativi), campo aura applica lo status a un bersaglio nel raggio e NON a uno fuori (overlap Area2D verificato headless). test_darkness_1 e test_primitive_tg1 aggiornati (curse -> ha_status; decay raggio 0 -> coda). validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-218",
+      "title": "Percezione per Sequenza",
+      "description": "Come giocatore, salendo di Sequenza voglio sentire e vedere cose che prima non c'erano: e' il radar dell'esplorazione.",
+      "acceptanceCriteria": [
+        "PerceptionSystem legge audio.json.sequence_perception per la Sequenza corrente: attiva i layers ambientali e abilita i reveal (spiriti_vicini, densita_mistica, segreti_adiacenti, ...)",
+        "Ogni reveal ha l'equivalente visivo (FR-8, design-vfx.md cap. 5): spiriti_vicini = sagome oltre i muri all'accento della palette del loro Pathway; densita_mistica = grana d'inchiostro nell'aria",
+        "La percezione si potenzia scendendo di Sequenza (piu' layer, piu' reveal): e' cumulativa, guidata dal dato",
+        "Nessun numero di Sequenza hardcoded: si legge la voce corrispondente o la piu' vicina inferiore",
+        "Test headless: layer/reveal attivi per Sequenza, cumulativita'",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 25,
+      "fase": 2,
+      "passes": true,
+      "notes": "Autoload PerceptionSystem (scripts/perception_system.gd), ultimo. Legge audio.json.sequence_perception (voci a 9/7/5/3/1). _voce_per_sequenza(seq) = la voce con la chiave numerica piu' piccola >= seq (a Seq 6 vale quella di 7: hai gia' superato la 7), la piu' bassa se seq < 1. Nessun numero di Sequenza nel codice. Si aggancia a Progression.sequence_changed -> aggiorna(). layers_attivi()/reveal_attivi()/reveal_attivo(nome). Cumulativa: scendendo di Sequenza i reveal aumentano e sono un superset. AUDIO: AudioManager.imposta_layers_ambientali(layers) - un AudioStreamPlayer per layer sul bus ambience, acceso/spento in base alla lista; 4 amb_* sintetizzati nuovi in SFX_SPEC. VISIVO (FR-7): scenes/perception_overlay.tscn (CanvasLayer layer 80) + perception_overlay.gd. spiriti_vicini -> Control che disegna un cerchio+anello sulle posizioni schermo dei nodi del gruppo 'nemici' (anche oltre i muri, e' un overlay). densita_mistica -> ColorRect grana tenue. In main.tscn e debug_scene.tscn. 5 test in test_perception.gd (264 totali): Seq 9 niente, Seq 7 primo reveal + layer, Seq intermedia usa la voce verso l'alto (6->7, 4->5), cumulativita' (7<5<3 reveal e superset), i layer audio si accendono/spengono. VERIFICA A SCHERMO (finestra reale): a Seq 5 anello blu sul nemico (spiriti_vicini) + velo di grana (densita_mistica); a Seq 9 overlay spento. validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-219",
+      "title": "Twilight Giant eseguito end-to-end dal motore",
+      "description": "Come sviluppatore, voglio la prova che l'architettura regge: il Twilight Giant, dalla Sequenza 9 alla 5, giocato con dati e zero codice dedicato.",
+      "acceptanceCriteria": [
+        "Un test headless 'vertical slice' parte da Sequenza 9 del Twilight Giant e arriva a Sequenza 5 in codice, esercitando per ogni salto 9->8->7->6->5: raccolta Caratteristica -> concoct -> acting completo via EventTracker -> bere -> avanzamento",
+        "Tutte le abilita' del Twilight Giant delle Sequenze 9-5 si eseguono senza warning 'primitiva non implementata' ne' 'fuori registro'",
+        "grep di scripts/ per 'twilight_giant' / nomi di Sequenza: zero occorrenze (nessun if per il Pathway) - assertito da un test o dalla CI",
+        "Gli stat_modifiers, i madness_on_force, gli acting_actions di ogni Sequenza attraversata producono l'effetto dichiarato nei dati",
+        "progress.txt documenta l'esito: l'architettura regge / va corretta, con il dettaglio di cosa ha richiesto codice se qualcosa l'ha richiesto",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 26,
+      "fase": 2,
+      "passes": true,
+      "notes": "VERDETTO: L'ARCHITETTURA REGGE. Il Twilight Giant va dalla Sequenza 9 alla 5 con ZERO codice dedicato. 3 test in test_vertical_slice.gd (267 totali): (1) test_twilight_giant_dalla_sequenza_9_alla_5 - per ogni salto 9->8->7->6->5: CharacteristicStore.aggiungi(char_twilight_giant_N) -> PotionSystem.concoct(formula_twilight_giant_N, ...) -> recitazione riempita LEGGENDO le acting_actions della Sequenza corrente da Progression.sequence_data() (helper _recita_sequenza_corrente: per ogni azione, emette 'target' eventi conteggio o un evento somma/secondi con quantita=target, con i filtri COME DATI) -> Acting.e_completo -> PotionSystem.bevi(false) -> Progression avanza; i stat_modifiers di ogni Sequenza (hp_max 20/35/50/80/130 ecc.) applicati al giocatore finto e verificati contro get_base + delta; niente follia da forzatura perche' la recitazione e' completa. (2) test_ogni_abilita_del_twilight_giant_9_5_si_esegue_senza_warning: le 11 abilita' delle Sequenze 9-5 (melee_arc/buff_stat/dash/projectile/shield/transform/debuff_stat/aura) eseguono tutte senza warning 'non implementata' ne' 'fuori registro'. (3) test_nessun_codice_nomina_il_twilight_giant: legge tutti gli scripts/*.gd, toglie i commenti, e verifica ZERO occorrenze di 'twilight_giant', nomi di Sequenza ('Warrior'/'Pugilist'), '\"tg_'. La CI gia' esegue run_tests.gd -> il check e' automatico. Il commento di ritual_system.gd che citava 'twilight_giant.json' e' stato genericizzato in 'data/pathways/'. NIENTE ha richiesto codice dedicato: la fase 2 puo' proseguire, le fasi 3-7 sono in gran parte lavoro di dati. validator 0."
+    },
+    {
+      "id": "US-220",
+      "title": "i18n reale (R-12)",
+      "description": "Come sviluppatore, voglio che le ~250 chiavi *_i18n sparse nei dati puntino a stringhe vere e che il validator becchi quelle rotte.",
+      "acceptanceCriteria": [
+        "tools/generate_i18n_stubs.py: scandisce data/ per ogni chiave *_i18n / name_i18n / descrizione_i18n e genera/aggiorna data/i18n/it.json con lo stub mancante (valore = la chiave, marcato da rivedere)",
+        "Le tre convenzioni di naming divergenti sono unificate in una (documentata in CLAUDE.md)",
+        "data/i18n/it.json (+ en.json incompleto) caricato da GameData; tr_data(key) come API",
+        "Il validator: ogni chiave *_i18n referenziata nei dati esiste in it.json (errore se manca)",
+        "I .translation compilati di fase 1 (HUD) restano; se si unificano i due sistemi lo si documenta",
+        "Test headless: chiave presente traduce, chiave mancante segnalata dal validator",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 27,
+      "fase": 2,
+      "passes": true,
+      "notes": "DUE sistemi i18n distinti e documentati (CLAUDE.md nuova sez. 'i18n'): (1) UI chrome / HUD = assets/i18n/strings.csv -> .translation, tr('HUD_..'), invariato; (2) stringhe DEI DATI = data/i18n/it.json + en.json, GameData.tr_data(key). CONVENZIONE UNICA (prima tre): <categoria>[.<pathway_id>].<local> - pathway_id presente per sequence/ability/acting/characteristic/form, assente per anchor/synergy e per 'pathway'; local = id verbatim (anchor/synergy meno il prefisso di tipo) o numero per sequence/characteristic. Le divergenti erano solo acting.* (mancava il pathway: 31 chiavi tg + fool) e 3 abilita' Fool senza prefisso id: riscritte dal tool nei dati (diff pulito, solo le righe delle chiavi). tools/generate_i18n_stubs.py (nuovo): scandisce data/ (esclusi schema/, i18n/, pathways_deferred/), canonicalizza sul posto, rigenera i cataloghi; chiavi nuove seed dal campo gemello in chiaro (name/descrizione) o stub 'TODO <chiave>'; preserva le traduzioni autoriali; --check per CI/idempotenza. Risultato: it.json 195 chiavi, 141 reali (tutte le acting_actions + nomi Pathway/Sequenza), 54 stub (abilita'/caratteristiche/ancore/forme: nessun testo in chiaro nei dati). en.json {} incompleto per scelta, tr_data ricade su it. GameData: _load_flat(), tr_data(key, locale='') fallback en->it->chiave (mai vuoto/crash), has_translation(), i18n_keys(). validate_data.py: blocco R-12 - ERRORE se una *_i18n dei dati attivi non ha voce in it.json; WARN su orfane e sul conteggio stub. 272 test headless (267 + 5 in test_i18n_data.gd), validator exit 0 (9 warn: 8 preesistenti + stub count), --check exit 0. Nessuna verifica a schermo: tr_data non ha consumatore visivo finche' non c'e' la UI a libro (US-221+). Resta lavoro di traduzione (54 stringhe it + tutto l'inglese): warning, non preteso dal validator."
+    },
+    {
+      "id": "US-221",
+      "title": "Shell del libro - parte 1: controller e dati",
+      "description": "Come giocatore, voglio aprire un libro che ferma il mondo e sfogliarne le pagine; come sviluppatore, voglio che le pagine siano un dato.",
+      "acceptanceCriteria": [
+        "data/ui/book.json + data/schema/book.schema.json come da design-ui-libro.md cap. 4: libro (voltata_ms, sfx, macchie_follia), pages[] (id, tipo, name_i18n, ordine, sbloccata_da, flag), segnalibri[]",
+        "Vocabolario chiuso degli 8 tipo di pagina in data/schema/page_types.json (o dentro lo schema)",
+        "BookController: apre/chiude (stesso input), ferma il mondo (get_tree().paused o equivalente che non blocca la UI), si apre sull'ultima pagina consultata",
+        "Le pagine non sbloccate per la fase corrente esistono ma sono bianche (un appunto a matita), non assenti",
+        "Il validator: tipo nel vocabolario; id/ordine unici; segnalibri -> pagine esistenti; chiavi i18n esistenti (con US-220)",
+        "Test headless: caricamento di book.json, pagine bianche vs sbloccate, il mondo e' in pausa mentre il libro e' aperto",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 28,
+      "fase": 2,
+      "passes": true,
+      "notes": "DATI: data/schema/page_types.json (vocabolario CHIUSO di 8 tipi: menu_principale, creazione_personaggio, mappa, diagramma_pathway, inventario, registro_sinergie, journal_quest, impostazioni); data/ui/book.json + data/schema/book.schema.json (blocco 'libro' con voltata_ms/dissolvenza_ridotta_ms/sfx/macchie_follia, 8 'pages' id+tipo+name_i18n+ordine+sbloccata_da.fase+flag, 3 segnalibri) copiato da design-ui-libro.md cap.4; data/balance.json nuova sezione 'gioco'{fase:2} - le pagine con sbloccata_da.fase > gioco.fase esistono ma sono bianche (fase 2: inventario/sinergie/mappa/journal). GameData: get_ui_book(), page_types() (38 file). Autoload Book (scripts/book.gd), ultimo, PROCESS_MODE_ALWAYS (input vivo in pausa): apri()/chiudi()/alterna() stesso ingresso; apri() -> get_tree().paused=true + segnale libro_aperto(pagina); chiudi() -> paused=false + memorizza l'ultima pagina; si riapre SEMPRE sull'ultima consultata (default = prima per 'ordine'); vai_a(id) segnale pagina_cambiata, id inesistente/uguale -> no-op; pagine() (ordinate + 'sbloccata' bool), pagina_sbloccata(id) (false=bianca), segnalibri(), config(), e_aperto(), pagina_corrente(); _fase_gioco() da balance con fallback 999 (dati illeggibili non nascondono pagine); _unhandled_input azione 'libro'. INPUT: project.godot azione 'libro' = Tab o I. i18n: 8 chiavi ui.page.* tradotte in it.json (203 chiavi). validate_data.py: blocco libro (8 tipi; tipo nel vocabolario; id/ordine unici; segnalibri->pagine esistenti; name_i18n; sbloccata_da ben formato; voltata_ms int>0; balance gioco.fase int). run_tests.gd: paused=false prima di ogni test. 279 test headless (272 + 7 in test_book.gd), validator exit 0. VERIFICA A SCHERMO (main.tscn reale): Tab apre il libro su 'copertina' + get_tree().paused true + il player non si muove; Tab di nuovo chiude + paused false. Resta: pagine vere (rendering) una per story; voltata+navigazione+sfx = US-222; persistenza dell'ultima pagina nel save non in scope (in memoria)."
+    },
+    {
+      "id": "US-222",
+      "title": "Shell del libro - parte 2: voltata e navigazione",
+      "description": "Come giocatore, voglio che cambiare pagina volti la pagina, con un'animazione, e che i segnalibri portino diretto alle pagine frequenti.",
+      "acceptanceCriteria": [
+        "Animazione di voltata 2D placeholder (3-4 frame di curvatura + ombra sulla piega); durata = voltata_ms dai dati",
+        "Input: pagina avanti/indietro (Q/E o dorsali), segnalibri diretti, chiusura con il tasto d'apertura",
+        "sfx_ui_page (voltata) e sfx_ui_book_open (apertura) sul bus ui",
+        "Con riduci_animazioni la voltata diventa una dissolvenza di dissolvenza_ridotta_ms; nessuna informazione vive solo nell'animazione",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 29,
+      "fase": 2,
+      "passes": true,
+      "notes": "scenes/book_overlay.tscn + scripts/book_overlay.gd (CanvasLayer layer 85, PROCESS_MODE_ALWAYS), in main.tscn e debug_scene.tscn: la PRESENTAZIONE del libro (il controller resta l'autoload Book). Disegna sfondo scuro, la pagina pergamena 600x340 centrata, la piega, il Titolo (chiave i18n della pagina via GameData.tr_data), il Corpo (placeholder '[ tipo ]' se sbloccata, '· appunto a matita ·' se bianca - mai assente), 3 segnalibri come Button. VOLTATA: contatore in _process (NON un Tween: si ferma con l'albero in pausa), durata = libro.voltata_ms/1000 (350ms), una fascia d'ombra (ColorRect) attraversa la piega, il testo cambia a meta' (t>=0.5). riduci_animazioni (NUOVA opzione in data/audio.json.accessibilita, default false) -> dissolvenza di dissolvenza_ridotta_ms (80ms); FR-8: Titolo/Corpo sempre testo, niente info solo nell'animazione. Agganciato ai segnali di Book (libro_aperto/libro_chiuso/pagina_cambiata). book.gd: avanti()/indietro() (scorrono per 'ordine', si fermano ai bordi), azzera() (chiuso + prima pagina), libro_config(). INPUT: project.godot pagina_indietro=Q, pagina_avanti=E, gestiti in _unhandled_input solo a libro aperto. AUDIO: audio_manager _ui (AudioStreamPlayer sul bus ui) + suona_ui(sfx); SFX_SPEC sfx_ui_book_open e sfx_ui_page sintetizzati; _apri/_volta suonano gli id da libro.sfx_apri/sfx_volta. run_tests.gd + prepara() di test_book/test_book_overlay usano azzera() (Book e' autoload, _ultima trapassava fra le suite). 284 test headless (279 + 5 in test_book_overlay.gd), validator exit 0, i18n --check exit 0. VERIFICA A SCHERMO (main.tscn finestra reale): Tab apre su 'Scaffale', E sfoglia frontespizio->mappa->diagramma->inventario (titolo e corpo seguono, fascia d'ombra attraversa, pagine bianche mostrano l'appunto), Q indietro, Tab chiude e il mondo riparte. Screenshot user://us222. Resta: segnalibri leggermente sovrapposti alla pagina (cosmetico); pagine vere una per story (US-223/224/225); voltata a fascia d'ombra e' placeholder finche' non c'e' l'arte."
+    },
+    {
+      "id": "US-223",
+      "title": "Pagina scaffale (menu principale) e frontespizio (creazione personaggio)",
+      "description": "Come giocatore, voglio scegliere il tomo da aprire (slot di salvataggio) e, per una partita nuova, scrivere il mio nome sul frontespizio.",
+      "acceptanceCriteria": [
+        "Pagina menu_principale: gli slot di SaveSystem come tomi su uno scaffale; tomo vuoto = nuova partita; aprire un tomo = caricare",
+        "Un save corrotto (US-015, stato CORROTTO) appare come tomo bruciato: leggibile come danno, mai crash, mai cancellazione silenziosa",
+        "Pagina creazione_personaggio: campo nome con 'Enel' gia' scritto (default di design-lore); conferma con la prima voltata; il nome finisce nel save (nome_personaggio, gia' serializzato da US-015)",
+        "In seguito la stessa pagina mostra chi sei (Pathway, Sequenza, titolo)",
+        "Tutte le stringhe da chiavi i18n",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 30,
+      "fase": 2,
+      "passes": true,
+      "notes": "Pagine vere: book_overlay.PAGINE={tipo:PackedScene}, _rendi() istanzia nel MarginContainer Contenuto e chiama aggiorna(); tipi senza scena -> placeholder, pagine bianche -> appunto a matita. scenes/pages/page_menu_principale.{tscn,gd}: un Button per slot (book.json libro.slot=4), SaveSystem.anteprima(slot) NUOVA (stato+nome+tempo senza applicare/migrare, non fidata): VUOTO->\"Tomo nuovo\"->scegli_slot+vai_a(frontespizio); VALIDO->\"<nome> - <tempo>\"->carica_slot->chiudi; CORROTTO->\"Tomo bruciato\" disabled (mai crash/cancellazione). page_creazione_personaggio.{tscn,gd}: partita non attiva -> LineEdit \"Enel\" (GameState.nome_default, design-lore) + \"Comincia\"; conferma()->nuova_partita(nome,slot); intercetta_avanti() = la voltata E conferma; partita attiva -> nome+Pathway(tr_data)+Sequenza+tier read-only. GameState: salva_slot/carica_slot, nuova_partita, partita_in_corso, scegli_slot/slot_scelto, nome_default, segnale partita_iniziata. i18n: stringhe di chrome del libro in assets/i18n/strings.csv + tr() (BOOK_*), tr_data resta per le identita' dei dati; .translation rigenerati. validator: libro.slot in [1,12]. 289 test headless (284+5 in test_page_scaffale.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): scaffale con 4 tomi (nuovo/\"Sidon - 0m\"/bruciato grigio/nuovo), frontespizio col campo \"Enel\" + \"Comincia\". Screenshot user://us223. Resta: nessun gating d'avvio \"apri prima il libro\" (fase 6)."
+    },
+    {
+      "id": "US-224",
+      "title": "Pagina diagramma dei Pathway con fog of war",
+      "description": "Come giocatore, voglio vedere l'albero delle Sequenze dei Pathway, ma solo per quanto ne so - e' la promessa della roadmap di fase 2.",
+      "acceptanceCriteria": [
+        "Pagina diagramma_pathway: le 10 colonne di Sequenze (id e chiavi i18n, nessun nome hardcoded), 10 righe per le Sequenze 9->0",
+        "Fog of war sulla conoscenza: si vede solo cio' che e' stato letto/scoperto (flag di conoscenza design-master cap. 5); il resto e' offuscato",
+        "La Sequenza corrente del giocatore e' evidenziata; le abilita' di quella Sequenza sono elencate",
+        "Il diagramma e' generato dai dati di Pathway, non disegnato a mano",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 31,
+      "fase": 2,
+      "passes": true,
+      "notes": "Autoload KnowledgeStore (scripts/knowledge_store.gd) prima di Book: set di flag namespaced (design-master cap.5), impara/conosce/tutti/dimentica_tutto, per_salvataggio/da_salvataggio non fidato. SAVE 11->12 campo conoscenza (lista), _migra_11_a_12, GameState snapshot/applica. scenes/pages/page_diagramma_pathway.{tscn,gd}: GridContainer generato dai dati - 10 colonne (pathway_ids ordinati) x 10 righe Seq 9->0, header = tr_data(pathway name_i18n), nessun nome hardcoded. _stato(pid,n): corrente (mia colonna+mia Seq), noto (mia colonna n>=mia_seq lived, o KnowledgeStore conosce pathway:<pid>/sequenza:<pid>:<n>), ignoto (offuscato). Cella = ColorRect per stato. Sotto: Sei qui + abilita della Sequenza corrente (tr_data). book_overlay: PAGINE += diagramma_pathway; FIX _rendi() remove_child prima di queue_free (differito -> get_child(0) restava la vecchia, rompeva nav/input); segnalibri da Button testuali a nastri sottili 12px col nome nel tooltip (non coprono la pagina). 294 test headless (289+5 test_page_diagramma.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): a Seq 6 la colonna propria nota da S9 a S6 (S6 ciano), altre offuscate; impara(pathway:fool) accende la colonna, impara(sequenza:death:5) solo quella cella; sotto le abilita di Seq 6. Screenshot user://us224. Resta: abilita come stub TODO (traduzione); sistema conoscenza pieno (dialoghi/libri/sinergie) = fase 6."
+    },
+    {
+      "id": "US-225",
+      "title": "Pagina colophon (impostazioni) e user://settings.json",
+      "description": "Come giocatore, voglio una pagina impostazioni per audio, video, input e lingua, che persista.",
+      "acceptanceCriteria": [
+        "Pagina impostazioni con: Audio (volumi per bus; sottotitoli_effetti, indicatore_visivo_tell, indicatore_direzione_suono, disattiva_sussurri), Video (scala finestra x1/x2/x3, fullscreen, disattiva_shake, riduci_hitstop, riduci_distorsione, riduci_flash, riduci_animazioni, macchie di follia on/off), Input (rimappatura tasti + supporto controller con rimappatura), Lingua (it/en)",
+        "Ogni opzione scrive user://settings.json con lo stesso rigore del save: scrittura atomica, typeof() al load, un file corrotto non e' fatale",
+        "Le opzioni applicate a runtime senza riavvio dove possibile (volumi, scala finestra, lingua, toggle di accessibilita')",
+        "AudioManager e i sistemi VFX leggono da qui invece che dai default di audio.json/vfx.json",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 32,
+      "fase": 2,
+      "passes": true,
+      "notes": "Autoload SettingsStore (scripts/settings_store.gd): user://settings.json con lo stesso rigore del save - scrittura ATOMICA (tmp+rename), JSON.parse_string+typeof() al load, file corrotto -> push_warning e default dai dati (mai fatale); get_val scarta i tipi incoerenti (settings manomesso). set_val -> _applica + _salva + segnale. _applica_tutto all avvio: lingua, volumi dei 6 bus, toggle accessibilita -> AudioManager.imposta_accessibilita, scala finestra/fullscreen via DisplayServer, rimappature InputMap. Sezioni: audio (volume_<bus> dB + sottotitoli/indicatori/disattiva_sussurri), video (scala 1/2/3, fullscreen, disattiva_shake, riduci_hitstop/distorsione/flash/animazioni, macchie_follia), input (azione->physical_keycode, sostituisce il 1o evento tastiera), lingua (it/en). AudioManager e i VFX leggono cio che SettingsStore spinge, non i default. scenes/pages/page_impostazioni.{tscn,gd} (ScrollContainer): sezioni da liste, ogni controllo -> set_val effetto immediato; rebind cattura il prossimo InputEventKey. book_overlay.PAGINE += impostazioni. i18n: ~24 COLOPHON_* in strings.csv. 302 test headless (294+8 test_settings.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): colophon coi 6 slider volume + toggle; scala_finestra=3 -> 1920x1080 senza riavvio; volume_music=-20 e disattiva_sussurri applicati subito; settings.json pulito. Screenshot user://us225. Resta: nessuna sezione controller dedicata (rebind solo tastiera)."
+    },
+    {
+      "id": "US-226",
+      "title": "data/vfx.json - palette visive e schema",
+      "description": "Come sviluppatore, voglio il gemello visivo di audio.json.pathway_palette: 10 palette a 3 colori, una per Pathway.",
+      "acceptanceCriteria": [
+        "data/vfx.json + data/schema/vfx.schema.json come da design-vfx.md cap. 4: pathway_palette_visiva (inchiostro/primario/accento/tratto/scia/distorsione), primitive_vfx, impact_frames, nero_di_scena, accessibilita",
+        "Vocabolario chiuso dei tratto (10 voci, uno per Pathway)",
+        "GameData carica vfx.json; get_vfx_palette(pathway_id), get_primitive_vfx(tipo)",
+        "Il validator: palette per ogni Pathway attivo (come il check audio); tratto nel vocabolario; colori #rrggbb; ogni primitiva implementata ha una voce in primitive_vfx",
+        "Nessun campo VFX sulle abilita' (ability.schema.json non si tocca)",
+        "Test headless: caricamento, lookup, validator",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 33,
+      "fase": 2,
+      "passes": true,
+      "notes": "data/vfx.json + data/schema/vfx.schema.json (design-vfx.md cap.4): gemello visivo di audio.json.pathway_palette. tratto_vocabolario 10 tratti chiusi (uno per Pathway, e la firma); pathway_palette_visiva 10 voci (inchiostro/primario/accento #rrggbb, tratto, scia, distorsione); primitive_vfx 15 voci (una per primitiva implementata: sprite/frames/impact_frame/scia); impact_frames, nero_di_scena, accessibilita. NESSUN campo VFX sulle abilita. data/schema/primitives.json: \"implemented\": true sulle 15 primitive col handler (proprieta del registro come \"deferred\"; il validator Python non legge _handlers). GameData: get_vfx_palette/get_primitive_vfx/get_vfx (39 file). ability_engine.tipi_primitiva_implementati() -> _handlers.keys(). validate_data.py: blocco VFX - tratto_vocabolario=10; palette per ogni Pathway attivo (come il check audio); colori #rrggbb; tratto nel vocabolario e unico per Pathway; ogni primitiva attiva+implementata ha una voce primitive_vfx ben formata; ERRORE se un abilita ha un campo vfx*. 307 test headless (302+5 test_vfx.gd), validator 0, i18n --check 0. Nessuna verifica a schermo: dati puri, il renderer e US-227."
+    },
+    {
+      "id": "US-227",
+      "title": "VFX delle primitive di fase 2 con impact frame",
+      "description": "Come giocatore, voglio che le abilita' abbiano un aspetto - inchiostro pesante, un colore di Pathway, l'impact frame sul colpo che conta.",
+      "acceptanceCriteria": [
+        "Un renderer di VFX per primitiva: legge primitive_vfx[tipo] + pathway_palette_visiva[pathway del caster], riproduce lo sprite placeholder parametrato (inchiostro/primario/accento)",
+        "Aggancio al timing esistente: il VFX parte sull'evento ability_release di animations.json",
+        "Impact frame a inversione bianco/nero, durata_frames agganciata a combat_feedback.hitstop_ms di audio.json",
+        "nero_di_scena sui trigger dichiarati (parry_perfect, posture_break, abilita' di Sequenza <= 4)",
+        "riduci_distorsione e riduci_flash rispettati (l'impact frame diventa un bordo spesso: stessa informazione, niente lampo)",
+        "Copre le primitive implementate fino a US-203 (~13-15); le altre man mano",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 34,
+      "fase": 2,
+      "passes": true,
+      "notes": "Autoload Vfx (scripts/vfx.gd) agganciato a AbilityEngine.ability_executed: per ogni primitiva legge data/vfx.json (get_primitive_vfx[tipo] + get_vfx_palette[pathway del caster]) e riproduce lo sprite placeholder tinto col primario, che sfuma su frames frame; primitiva senza voce -> saltata. Aggancio timing: esecuzione istantanea -> trigger ability_executed; gioca_primitiva() pubblico per spostarlo su ability_release quando ci sara l animazione di lancio. pathway: player -> Progression.pathway(); altri -> palette neutra. scenes/vfx_overlay.tscn + vfx_overlay.gd (CanvasLayer 88, sotto la follia), in main.tscn e debug_scene.tscn. IMPACT FRAME: lampo bianco a schermo per durata_frames/60 s (data/vfx.json.impact_frames, si tara con hitstop_ms); con riduci_flash -> bordo bianco 18px invece del lampo (stessa info, niente lampeggio, FR-8). NERO DI SCENA: alpha 0.85 per durata_ms sui trigger dichiarati - abilita Seq<=4 (parse sequence_id), parry_perfect (player), posture_break (enemy) via Vfx.evento_combat. Contatori in _process, non Tween. 313 test headless (307+6 test_vfx_render.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): tg_fendente_pesante -> lampo bianco + blob dorato (palette twilight_giant); tg_caccia_spirituale a Seq 4 -> sfondo nero; con riduci_flash il lampo diventa bordo. Screenshot user://us227. Resta: il lampo bianco approssima l inversione vera (serve shader/impact sprite, fase arte); primitive_vfx copre le 15 implementate."
+    },
+    {
+      "id": "US-229",
+      "title": "Macchie di follia sulle pagine del libro (P2)",
+      "description": "Come giocatore, voglio che la follia macchi anche il libro: bordi delle pagine piu' scuri, note a margine in una grafia non mia.",
+      "acceptanceCriteria": [
+        "Sopra le soglie di balance.json.madness, il BookController scurisce i bordi delle pagine e mostra note a margine (i sussurri in forma scritta - FR-8, equivalente visivo del canale audio di US-214)",
+        "Con disattiva_sussurri / riduci_animazioni (o il toggle dedicato 'macchie di follia') le macchie si congelano a uno stato neutro; la meccanica non cambia",
+        "macchie_follia in data/ui/book.json come interruttore dei dati",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 35,
+      "fase": 2,
+      "passes": true,
+      "notes": "book_overlay.gd agganciato a Madness.madness_changed, soglie da balance.json.madness (15/40). scenes/book_overlay.tscn: nodo Macchie (ColorRect + shader madness_vignette gia esistente US-215) sopra la pagina + NoteMargine (Label grafia rossa piccola). Soglia 15: bordi della pagina scuriti (intensita cresce con la follia) + respiro in _process. Soglia 40: nota a margine = i sussurri in forma SCRITTA (FR-8), testo da AudioManager.nomi_sussurro() + 3 frasi BOOK_MACCHIA_* in strings.csv. CONGELAMENTO se disattiva_sussurri O riduci_animazioni O toggle macchie_follia spento (a DUE livelli: book.json libro.macchie_follia AND SettingsStore video.macchie_follia): intensita fissa 0.22, niente respiro; la nota resta (testo). La follia non cambia. 318 test headless (313+5 test_book_macchie.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): a follia 75 bordi scuriti (~0.70 pulsante) + nota rossa; con disattiva_sussurri intensita fissa 0.22, follia resta 75. Screenshot user://us229. FASE 2 CHIUSA: 35/35."
+    }
+  ]
+}
