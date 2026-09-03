@@ -2678,3 +2678,16 @@ sezione test aggiornata.
   della primitiva (US-227) compare sul giocatore. Screenshot user://us304.
   CONTRATTO P0 CHIUSO.
 - Prossima storia: US-305 (valuta come oggetto).
+
+[2026-09-03] US-305 — Valuta come oggetto
+
+- Gran parte era gia' fatta in US-301 (data/items/valuta.json: moneta_comune
+  impilabile:true valore:1, + sigillo_reale valore:50) e US-302
+  (Inventory.ricchezza() = somma conta * valore su categoria:valuta).
+  US-305 aggiunge solo la verifica esplicita: la valuta NON ha metodi
+  dedicati in Inventory, e' conta('moneta_comune') come ogni stack.
+- Come verificato: 345 test headless (342 + 3 in test_valuta.gd: la valuta e'
+  categoria:valuta impilabile valore 1; si aggiunge/rimuove/conta e compare
+  in per_categoria come ogni item; ricchezza() = 0 a mani vuote, 30*1+4*50=230
+  con due tagli). validator 0.
+- Prossima storia: US-306 (tag di inventario ed equip esposti per le sinergie).

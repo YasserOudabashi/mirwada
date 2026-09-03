@@ -103,8 +103,8 @@
       ],
       "priority": 5,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Gran parte gia in US-301 (valuta.json: moneta_comune impilabile valore:1 + sigillo_reale valore:50) e US-302 (Inventory.ricchezza() = somma conta*valore su categoria:valuta). US-305 = verifica esplicita che la valuta NON ha metodi dedicati, e conta(moneta_comune) come ogni stack. 345 test headless (342+3 test_valuta.gd), validator 0."
     },
     {
       "id": "US-306",
