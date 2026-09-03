@@ -264,8 +264,8 @@
       ],
       "priority": 13,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "PotionSystem sezione nuova per le pozioni CONSUMABILI (percorso separato dalla concoction di avanzamento, invariata). ricetta_nota(id): tier base (nota_da_subito) o flag KnowledgeStore ricetta:<id>. prepara(id) -> {ok, reason, item_id, qualita}: verifica ricetta nota + ingredienti in Inventory, consuma, aggiunge l output, emette pozione_preparata. Reason: sistema_assente/ricetta_inesistente/ricetta_ignota/ingredienti_mancanti (non consuma). _qualita_finale = indice qualita_base + _bonus_stanza(laboratorio,qualita_pozione) (US-327, 0 senza BaseSystem) + _bonus_talento(alchimia_qualita) (US-329, 0 senza TalentSystem), clampato; per ora qualita = qualita_base. La qualita e calcolata e restituita ma non persistita per-istanza (consumabili stack); si estende quando contera meccanicamente. 362 test headless (357+5 test_concoction_v2.gd), validator 0, nessuna regressione."
     },
     {
       "id": "US-311",

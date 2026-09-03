@@ -146,3 +146,78 @@ func bevi(forza: bool = false) -> Dictionary:
 	_pozione = {}
 	pozione_bevuta.emit(esito["avanzato"], esito["forzato"])
 	return esito
+
+
+# --- Alchimia delle pozioni CONSUMABILI (US-310) --------------------------
+# Percorso separato dalla concoction di avanzamento qui sopra: si prepara una
+# ricetta di data/potions/recipes.json e si ottiene un item nell'inventario
+# con una qualita'. La qualita' base della ricetta sale col laboratorio
+# (US-326/327) e coi talenti di alchimia (US-329), scende con ingredienti
+# scadenti; finche' quei sistemi non esistono il bonus e' 0.
+
+signal pozione_preparata(recipe_id: String, item_id: String, qualita: String)
+
+
+## true se la ricetta e' utilizzabile: tier 'base' (nota da subito) oppure
+## un flag KnowledgeStore 'ricetta:<id>' (avanzata scoperta / leggendaria appresa).
+func ricetta_nota(recipe_id: String) -> bool:
+	var gd: Node = _gd()
+	var r: Dictionary = gd.call("get_recipe", recipe_id) if gd != null else {}
+	if r.is_empty():
+		return false
+	if bool(r.get("nota_da_subito", false)):
+		return true
+	var kn: Node = get_node_or_null("/root/KnowledgeStore")
+	return kn != null and bool(kn.call("conosce", "ricetta:" + recipe_id))
+
+
+## Prepara una ricetta nota consumando gli ingredienti dall'inventario.
+##   -> { ok, reason, item_id, qualita }
+func prepara(recipe_id: String) -> Dictionary:
+	var gd: Node = _gd()
+	var inv: Node = get_node_or_null("/root/Inventory")
+	if gd == null or inv == null:
+		return {"ok": false, "reason": "sistema_assente"}
+	var r: Dictionary = gd.call("get_recipe", recipe_id)
+	if r.is_empty():
+		return {"ok": false, "reason": "ricetta_inesistente"}
+	if not ricetta_nota(recipe_id):
+		return {"ok": false, "reason": "ricetta_ignota"}
+	var ingr: Dictionary = r.get("ingredienti", {})
+	for item_id in ingr:
+		if inv.call("conta", item_id) < int(ingr[item_id]):
+			return {"ok": false, "reason": "ingredienti_mancanti"}
+	# tutto presente: consuma e produce
+	for item_id in ingr:
+		inv.call("rimuovi", item_id, int(ingr[item_id]))
+	var qualita: String = _qualita_finale(r)
+	var out_id: String = str(r.get("output", {}).get("item_id", ""))
+	if not out_id.is_empty():
+		inv.call("aggiungi", out_id, 1)
+	pozione_preparata.emit(recipe_id, out_id, qualita)
+	return {"ok": true, "reason": "", "item_id": out_id, "qualita": qualita}
+
+
+func _qualita_finale(r: Dictionary) -> String:
+	var scala: Array = _gd().call("potion_quality")
+	var base: int = maxi(0, scala.find(str(r.get("qualita_base", "pura"))))
+	var bonus: int = _bonus_stanza("laboratorio", "qualita_pozione") + _bonus_talento("alchimia_qualita")
+	return str(scala[clampi(base + bonus, 0, scala.size() - 1)])
+
+
+func _bonus_stanza(tipo: String, chiave: String) -> int:
+	var bs: Node = get_node_or_null("/root/BaseSystem")
+	if bs == null:
+		return 0
+	return int((bs.call("bonus", tipo) as Dictionary).get(chiave, 0))
+
+
+func _bonus_talento(chiave: String) -> int:
+	var ts: Node = get_node_or_null("/root/TalentSystem")
+	if ts == null or not ts.has_method("bonus_int"):
+		return 0
+	return int(ts.call("bonus_int", chiave))
+
+
+func _gd() -> Node:
+	return get_node_or_null("/root/GameData")

@@ -2769,3 +2769,30 @@ sezione test aggiornata.
   risolve, la qualita' parziale di fase 2 e' nel vocabolario). validator 0,
   i18n --check 0.
 - Prossima storia: US-310 (concoction v2 - qualita', laboratorio, output).
+
+[2026-09-04] US-310 — Concoction v2: qualita', laboratorio, output nell'inventario
+
+- PotionSystem: sezione nuova per le pozioni CONSUMABILI (percorso separato
+  dalla concoction di avanzamento di fase 2, che resta invariata).
+  * ricetta_nota(recipe_id): tier 'base' (nota_da_subito) OPPURE flag
+    KnowledgeStore 'ricetta:<id>' (avanzata scoperta / leggendaria appresa).
+  * prepara(recipe_id) -> {ok, reason, item_id, qualita}: verifica ricetta
+    nota + ingredienti in Inventory, consuma gli ingredienti (Inventory.rimuovi),
+    aggiunge l'output (Inventory.aggiungi), emette pozione_preparata. Reason:
+    sistema_assente / ricetta_inesistente / ricetta_ignota / ingredienti_mancanti
+    (quest'ultimo NON consuma nulla).
+  * _qualita_finale: indice di qualita_base sulla scala potion_quality +
+    _bonus_stanza('laboratorio','qualita_pozione') (US-327, 0 finche' non
+    c'e' BaseSystem) + _bonus_talento('alchimia_qualita') (US-329, 0 finche'
+    non c'e' TalentSystem), clampato. Per ora qualita = qualita_base.
+- La qualita' e' calcolata e restituita ma NON ancora persistita per-istanza
+  (i consumabili sono stack): quando la qualita' contera' meccanicamente
+  (bevi con effetti di qualita') si estende l'inventario. Per ora US-314
+  mostra la qualita_base della ricetta.
+- Come verificato: 362 test headless (357 + 5 in test_concoction_v2.gd:
+  prepara base nota -> item in inventario + qualita 'pura' + ingrediente
+  consumato, ingredienti mancanti -> non consuma, ricetta inesistente/ignota,
+  avanzata preparabile solo col flag KnowledgeStore, prepara una consumabile
+  NON crea una pozione di avanzamento). validator 0. Nessuna regressione
+  (i 17 test di test_concoction / test_advancement_gate verdi).
+- Prossima storia: US-311 (sperimentazione e scoperta delle ricette).
