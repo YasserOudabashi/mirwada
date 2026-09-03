@@ -198,6 +198,132 @@ func prepara(recipe_id: String) -> Dictionary:
 	return {"ok": true, "reason": "", "item_id": out_id, "qualita": qualita}
 
 
+signal esperimento_fallito(esito: String)
+
+var _rng: RandomNumberGenerator = null
+
+
+## Combina una manciata di ingredienti (Array di item_id, con ripetizioni)
+## senza una ricetta. Se il multiset corrisponde esattamente a una ricetta
+## 'avanzata' non ancora nota -> la si SCOPRE (flag KnowledgeStore) e la
+## pozione e' prodotta. Altrimenti -> FALLIMENTO: esito pesato da
+## data/potions/experiment_outcomes.json. Gli ingredienti si consumano SEMPRE
+## (se li hai). RNG seedabile con imposta_seed().
+##   -> { ok, esito, ... }   esito: "scoperta" | "ingredienti_mancanti" | <outcome>
+func sperimenta(ingredienti: Array) -> Dictionary:
+	var gd: Node = _gd()
+	var inv: Node = get_node_or_null("/root/Inventory")
+	if gd == null or inv == null or ingredienti.is_empty():
+		return {"ok": false, "esito": "input_non_valido"}
+
+	var richiesti: Dictionary = _multiset(ingredienti)
+	for item_id in richiesti:
+		if inv.call("conta", item_id) < int(richiesti[item_id]):
+			return {"ok": false, "esito": "ingredienti_mancanti"}
+	for item_id in richiesti:
+		inv.call("rimuovi", item_id, int(richiesti[item_id]))
+
+	# corrisponde a una ricetta avanzata non ancora nota?
+	for rid in gd.call("recipes_per_tier", "avanzata"):
+		if ricetta_nota(rid):
+			continue
+		if _multiset_eq(richiesti, gd.call("get_recipe", rid).get("ingredienti", {})):
+			var kn: Node = get_node_or_null("/root/KnowledgeStore")
+			if kn != null:
+				kn.call("impara", "ricetta:" + rid)
+			var r: Dictionary = gd.call("get_recipe", rid)
+			var out_id: String = str(r.get("output", {}).get("item_id", ""))
+			var q: String = _qualita_finale(r)
+			if not out_id.is_empty():
+				inv.call("aggiungi", out_id, 1)
+			return {"ok": true, "esito": "scoperta", "recipe_id": rid, "item_id": out_id, "qualita": q}
+
+	# nessuna corrispondenza: fallimento pesato
+	return _fallimento(gd)
+
+
+func imposta_seed(s: int) -> void:
+	_rng = RandomNumberGenerator.new()
+	_rng.seed = s
+
+
+func _fallimento(gd: Node) -> Dictionary:
+	var outcomes: Dictionary = gd.call("experiment_outcomes")
+	var mult: float = 1.0
+	var found: Node = get_node_or_null("/root/Foundation")
+	if found != null:
+		mult = float(found.call("moltiplicatore_follia"))
+	var riduzione: float = _riduzione_rischio()
+
+	var pesi: Dictionary = {}
+	var totale: float = 0.0
+	for nome in outcomes:
+		var o: Dictionary = outcomes[nome]
+		var p: float = float(o.get("peso", 0))
+		if bool(o.get("mostruoso", false)):
+			p = p * mult * (1.0 - clampf(riduzione, 0.0, 0.95))
+		pesi[nome] = maxf(0.0, p)
+		totale += pesi[nome]
+
+	if _rng == null:
+		_rng = RandomNumberGenerator.new()
+	var tiro: float = _rng.randf() * totale
+	var scelto: String = "fumo"
+	for nome in pesi:
+		tiro -= pesi[nome]
+		if tiro <= 0.0:
+			scelto = nome
+			break
+
+	_applica_esito(scelto, outcomes.get(scelto, {}))
+	esperimento_fallito.emit(scelto)
+	return {"ok": true, "esito": scelto}
+
+
+func _applica_esito(nome: String, o: Dictionary) -> void:
+	var inv: Node = get_node_or_null("/root/Inventory")
+	if o.has("produce") and inv != null:
+		inv.call("aggiungi", str(o["produce"]), 1)
+	if o.has("follia"):
+		var m: Node = get_node_or_null("/root/Madness")
+		if m != null:
+			m.call("add", float(o["follia"]), "esperimento_alchemico")
+	if o.has("danno"):
+		var p: Node = get_tree().get_first_node_in_group("player")
+		var st: Node = p.get_node_or_null("StatsComponent") if p != null else null
+		if st != null:
+			st.set("hp", maxf(0.0, float(st.get("hp")) - float(o["danno"])))
+	# o.has("evoca") -> l'aberrazione la gestisce US-312 (_evoca_aberrazione)
+	if o.has("evoca"):
+		_evoca_aberrazione(str(o["evoca"]))
+
+
+## Gancio per US-312: qui l'aberrazione e' un no-op documentato.
+func _evoca_aberrazione(_entita_id: String) -> void:
+	pass
+
+
+func _riduzione_rischio() -> float:
+	return float(_bonus_stanza("laboratorio", "rischio_esperimento")) / 100.0 \
+		+ float(_bonus_talento("alchimia_rischio")) / 100.0
+
+
+func _multiset(a: Array) -> Dictionary:
+	var m: Dictionary = {}
+	for x in a:
+		m[str(x)] = int(m.get(str(x), 0)) + 1
+	return m
+
+
+func _multiset_eq(a: Dictionary, b: Variant) -> bool:
+	if typeof(b) != TYPE_DICTIONARY or a.size() != (b as Dictionary).size():
+		return false
+	for k in a:
+		if int(a[k]) != int((b as Dictionary).get(k, -1)):
+			return false
+	return true
+
+
 func _qualita_finale(r: Dictionary) -> String:
 	var scala: Array = _gd().call("potion_quality")
 	var base: int = maxi(0, scala.find(str(r.get("qualita_base", "pura"))))

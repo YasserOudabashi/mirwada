@@ -28,6 +28,15 @@
       "tag": ["crafting", "occulto"],
       "impilabile": true,
       "valore": 15
+    },
+    {
+      "id": "scarto_alchemico",
+      "categoria": "materiale",
+      "name_i18n": "item.scarto_alchemico",
+      "descrizione_i18n": "item.scarto_alchemico.desc",
+      "tag": ["decadimento"],
+      "impilabile": true,
+      "valore": 0
     }
   ]
 }

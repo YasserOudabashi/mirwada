@@ -27,6 +27,7 @@ const PATH_CHARACTERISTICS := "res://data/characteristics.json"
 const PATH_FORMULAS := "res://data/potions/formulas.json"
 const PATH_RECIPES := "res://data/potions/recipes.json"
 const PATH_POTION_QUALITY := "res://data/schema/potion_quality.json"
+const PATH_EXPERIMENT_OUTCOMES := "res://data/potions/experiment_outcomes.json"
 const PATH_ANCHORS := "res://data/anchors.json"
 const PATH_STATUS := "res://data/status_effects.json"
 ## Cataloghi di stringhe DEI DATI (US-220). Sistema separato dal tr() di Godot
@@ -59,6 +60,7 @@ var _characteristics: Dictionary = {}
 var _formulas: Dictionary = {}
 var _recipes: Dictionary = {}
 var _potion_quality: Dictionary = {}
+var _experiment_outcomes: Dictionary = {}
 var _anchors: Dictionary = {}
 var _statuses: Dictionary = {}
 var _i18n_it: Dictionary = {}
@@ -124,6 +126,7 @@ func load_all() -> void:
 	_load_single(PATH_FORMULAS, "formulas", _formulas, TYPE_DICTIONARY)
 	_load_single(PATH_RECIPES, "recipes", _recipes, TYPE_DICTIONARY)
 	_load_single(PATH_POTION_QUALITY, "qualita", _potion_quality, TYPE_ARRAY)
+	_load_single(PATH_EXPERIMENT_OUTCOMES, "outcomes", _experiment_outcomes, TYPE_DICTIONARY)
 	_load_single(PATH_ANCHORS, "anchors", _anchors, TYPE_ARRAY)
 	_load_single(PATH_STATUS, "statuses", _statuses, TYPE_DICTIONARY)
 	_load_flat(PATH_I18N_IT, _i18n_it)
@@ -294,6 +297,11 @@ func recipes_per_tier(tier: String) -> Array:
 ## Vocabolario chiuso della qualita' delle pozioni (crescente).
 func potion_quality() -> Array:
 	return _array_or_empty(_potion_quality.get("qualita"))
+
+
+## Esiti chiusi di un esperimento fallito (data/potions/experiment_outcomes.json).
+func experiment_outcomes() -> Dictionary:
+	return _dict_or_empty(_experiment_outcomes.get("outcomes"))
 
 
 ## --- Ancore (data/anchors.json) ---

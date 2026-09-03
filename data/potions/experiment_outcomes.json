@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "_comment": "Esiti CHIUSI di un esperimento di alchimia che non corrisponde a nessuna ricetta (US-311). 'peso' e' la probabilita' relativa base. I tre esiti mostruosi (ustione, contaminazione, aberrazione) sono 'mostruoso': true e il loro peso sale con la follia alta (Foundation.moltiplicatore_follia) e scende col laboratorio (US-327) e coi talenti (US-329).",
+  "outcomes": {
+    "fumo":          { "peso": 45, "mostruoso": false, "_nota": "niente: un po' di fumo puzzolente" },
+    "scarto":        { "peso": 30, "mostruoso": false, "produce": "scarto_alchemico" },
+    "ustione":       { "peso": 14, "mostruoso": true,  "danno": 20.0 },
+    "contaminazione":{ "peso": 8,  "mostruoso": true,  "follia": 8.0 },
+    "aberrazione":   { "peso": 3,  "mostruoso": true,  "evoca": "aberrazione_alchemica" }
+  }
+}

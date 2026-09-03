@@ -285,8 +285,8 @@
       ],
       "priority": 14,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/potions/experiment_outcomes.json: 5 esiti chiusi (fumo/scarto/ustione/contaminazione/aberrazione), i 3 mostruosi hanno il peso modulato dalla follia. data/items/materiali.json: scarto_alchemico. GameData.experiment_outcomes() (44 file). PotionSystem.sperimenta(ingredienti) -> {ok, esito}: verifica multiset posseduto (mancanti -> ingredienti_mancanti non consuma; presenti -> consuma SEMPRE); se == ricetta avanzata non nota -> SCOPERTA (KnowledgeStore.impara ricetta:<id> + produce); altrimenti FALLIMENTO pesato (mostruosi * moltiplicatore_follia * (1 - riduzione lab/talenti, 0)); RNG seedabile (imposta_seed); _applica_esito produce scarto / add follia / -hp / no-op; evoca -> _evoca_aberrazione no-op (US-312). validator: vocabolario chiuso, peso int>=0, mostruoso bool, produce risolve. 366 test headless (362+4 test_experiment.gd), validator 0, i18n --check 0."
     },
     {
       "id": "US-312",

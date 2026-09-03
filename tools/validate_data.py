@@ -677,6 +677,21 @@ def main():
         else:
             err(f"data/potions/recipes.json [{rid}]: output deve avere item_id o effetto")
 
+    # --- esiti degli esperimenti (data/potions/experiment_outcomes.json, US-311) ---
+    eo_doc = load_json(os.path.join(DATA, "potions", "experiment_outcomes.json"))
+    outcomes = (eo_doc or {}).get("outcomes", {})
+    EXPECTED_OUTCOMES = {"fumo", "scarto", "ustione", "contaminazione", "aberrazione"}
+    if set(outcomes) != EXPECTED_OUTCOMES:
+        err(f"data/potions/experiment_outcomes.json: esiti {sorted(outcomes)}, "
+            f"attesi {sorted(EXPECTED_OUTCOMES)} (vocabolario chiuso)")
+    for name, o in outcomes.items():
+        if not isinstance(o.get("peso"), int) or o.get("peso", -1) < 0:
+            err(f"data/potions/experiment_outcomes.json [{name}]: peso deve essere un intero >= 0")
+        if not isinstance(o.get("mostruoso"), bool):
+            err(f"data/potions/experiment_outcomes.json [{name}]: 'mostruoso' deve essere true/false")
+        if o.get("produce") is not None and o["produce"] not in item_ids:
+            err(f"data/potions/experiment_outcomes.json [{name}]: produce '{o.get('produce')}' non risolve a un item")
+
     # --- libro / UI (data/ui/book.json, US-221) ---
     pt_doc = load_json(os.path.join(DATA, "schema", "page_types.json"))
     page_types = set((pt_doc or {}).get("page_types", []))

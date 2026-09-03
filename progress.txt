@@ -2796,3 +2796,31 @@ sezione test aggiornata.
   NON crea una pozione di avanzamento). validator 0. Nessuna regressione
   (i 17 test di test_concoction / test_advancement_gate verdi).
 - Prossima storia: US-311 (sperimentazione e scoperta delle ricette).
+
+[2026-09-04] US-311 — Sperimentazione e scoperta delle ricette
+
+- data/potions/experiment_outcomes.json: 5 esiti CHIUSI di un esperimento
+  senza ricetta - fumo (niente), scarto (produce scarto_alchemico), ustione
+  (danno 20), contaminazione (follia 8), aberrazione (evoca, gancio US-312).
+  I tre mostruosi (mostruoso:true) hanno il peso modulato dalla follia.
+- data/items/materiali.json: scarto_alchemico (valore 0).
+- GameData: experiment_outcomes(). PATH_EXPERIMENT_OUTCOMES (44 file).
+- PotionSystem.sperimenta(ingredienti: Array) -> {ok, esito, ...}:
+  * verifica di possedere gli ingredienti passati (multiset); mancanti ->
+    ingredienti_mancanti, NON consuma. Presenti -> consuma SEMPRE.
+  * se il multiset == quello di una ricetta 'avanzata' non ancora nota ->
+    SCOPERTA: KnowledgeStore.impara('ricetta:<id>') + produce la pozione.
+  * altrimenti FALLIMENTO pesato: peso_base per esito, i mostruosi *
+    Foundation.moltiplicatore_follia() * (1 - riduzione rischio del
+    laboratorio/talenti, 0 finche' non esistono). Tiro con RNG seedabile
+    (imposta_seed). _applica_esito: produce lo scarto / add follia / -hp al
+    giocatore / no-op; evoca -> _evoca_aberrazione (no-op documentato, US-312).
+- validate_data.py: blocco esiti - vocabolario chiuso {fumo, scarto, ustione,
+  contaminazione, aberrazione}; peso int >= 0; mostruoso bool; produce risolve.
+- i18n: 2 chiavi scarto_alchemico.
+- Come verificato: 366 test headless (362 + 4 in test_experiment.gd: la combo
+  di una avanzata la scopre (+flag+pozione+consumo), combo ignota ->
+  fallimento deterministico (RNG seedabile) e ingredienti consumati anche sul
+  fallimento, ingredienti mancanti -> non consuma, follia alta -> esiti
+  mostruosi piu' frequenti su 300 tiri). validator 0, i18n --check 0.
+- Prossima storia: US-312 (fallimenti mostruosi - l'aberrazione).
