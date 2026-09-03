@@ -2368,3 +2368,41 @@ sezione test aggiornata.
   c'e' un vero gating "prima apri il libro" (fase 6, flusso di avvio). La
   pagina identita' e' minimale (nome/pathway/sequenza/tier).
 - Prossima storia: US-224 (pagina diagramma dei Pathway con fog of war).
+
+[2026-09-03] US-224 — Pagina diagramma dei Pathway con fog of war
+
+- Autoload KnowledgeStore (scripts/knowledge_store.gd), prima di Book: set di
+  flag booleani namespaced (design-master cap. 5). impara(flag)/conosce(flag)/
+  tutti()/dimentica_tutto(); per_salvataggio (lista) / da_salvataggio (non
+  fidato). SAVE: VERSIONE_CORRENTE 11->12, campo "conoscenza" (lista),
+  _migra_11_a_12; GameState.snapshot/applica agganciano lo store.
+- scenes/pages/page_diagramma_pathway.{tscn,gd}: GridContainer generato dai
+  dati - 10 colonne (GameData.pathway_ids ordinati) x 10 righe (Seq 9->0).
+  Header colonna = tr_data(pathway.name_i18n). Nessun nome hardcoded.
+  * _stato(pid, n): "corrente" (mia colonna, mia Sequenza), "noto" (mia
+    colonna e n >= mia_seq: Sequenze vissute; OPPURE KnowledgeStore conosce
+    "pathway:<pid>" o "sequenza:<pid>:<n>"), "ignoto" (offuscato) altrimenti.
+  * cella = ColorRect colorato per stato (corrente ciano, noto pergamena,
+    ignoto scuro).
+  * sotto: "Sei qui: <pathway> S<n> <tier>" + le abilita' della Sequenza
+    corrente (tr_data di ability.name_i18n).
+- book_overlay.gd: PAGINE += diagramma_pathway. FIX: _rendi() ora fa
+  remove_child PRIMA di queue_free - queue_free e' differito, get_child(0)
+  restava la pagina vecchia per un frame (rompeva navigazione e input).
+  Segnalibri: da Button larghi con testo a nastri sottili (12px) col nome
+  nel tooltip - non coprono piu' la pagina.
+- i18n: BOOK_DIAGRAMMA_SEI_QUI in strings.csv.
+- Come verificato: 294 test headless (289 + 5 in test_page_diagramma.gd:
+  griglia 10x10 dai dati con 100 celle tutte con stato, la propria colonna
+  nota fino alla Sequenza corrente + corrente evidenziata + non raggiunte
+  offuscate, fog of war sugli altri Pathway (impara sequenza -> solo quella;
+  impara pathway -> colonna), abilita' della Sequenza corrente elencate,
+  conoscenza nel save round-trip). validator 0, i18n --check 0. VERIFICA A
+  SCHERMO (main.tscn): a Seq 6 la colonna Twilight Giant e' nota da S9 a S6
+  (S6 ciano), le altre offuscate; impara("pathway:fool") accende la colonna
+  Fool, impara("sequenza:death:5") accende solo quella cella; sotto, le 2
+  abilita' di Seq 6. Screenshot user://us224.
+- Resta aperto: le abilita' compaiono come stub "TODO ..." (traduzione, non
+  codice). Il sistema conoscenza pieno (fonti: dialoghi, libri, sinergie
+  lore) e' fase 6: qui c'e' solo il magazzino + il consumo nel diagramma.
+- Prossima storia: US-225 (colophon / impostazioni + user://settings.json).

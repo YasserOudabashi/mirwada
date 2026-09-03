@@ -638,8 +638,8 @@
       ],
       "priority": 31,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Autoload KnowledgeStore (scripts/knowledge_store.gd) prima di Book: set di flag namespaced (design-master cap.5), impara/conosce/tutti/dimentica_tutto, per_salvataggio/da_salvataggio non fidato. SAVE 11->12 campo conoscenza (lista), _migra_11_a_12, GameState snapshot/applica. scenes/pages/page_diagramma_pathway.{tscn,gd}: GridContainer generato dai dati - 10 colonne (pathway_ids ordinati) x 10 righe Seq 9->0, header = tr_data(pathway name_i18n), nessun nome hardcoded. _stato(pid,n): corrente (mia colonna+mia Seq), noto (mia colonna n>=mia_seq lived, o KnowledgeStore conosce pathway:<pid>/sequenza:<pid>:<n>), ignoto (offuscato). Cella = ColorRect per stato. Sotto: Sei qui + abilita della Sequenza corrente (tr_data). book_overlay: PAGINE += diagramma_pathway; FIX _rendi() remove_child prima di queue_free (differito -> get_child(0) restava la vecchia, rompeva nav/input); segnalibri da Button testuali a nastri sottili 12px col nome nel tooltip (non coprono la pagina). 294 test headless (289+5 test_page_diagramma.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): a Seq 6 la colonna propria nota da S9 a S6 (S6 ciano), altre offuscate; impara(pathway:fool) accende la colonna, impara(sequenza:death:5) solo quella cella; sotto le abilita di Seq 6. Screenshot user://us224. Resta: abilita come stub TODO (traduzione); sistema conoscenza pieno (dialoghi/libri/sinergie) = fase 6."
     },
     {
       "id": "US-225",

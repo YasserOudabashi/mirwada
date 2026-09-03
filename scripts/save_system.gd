@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 11
+const VERSIONE_CORRENTE := 12
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -274,6 +274,14 @@ func _migra_10_a_11(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v11 -> v12: la conoscenza (US-224). Un personaggio pregresso non sa nulla:
+## il fog of war del diagramma parte tutto chiuso salvo la propria colonna.
+func _migra_11_a_12(doc: Dictionary) -> Dictionary:
+	if not doc.has("conoscenza"):
+		doc["conoscenza"] = []
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -294,6 +302,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"fondamenta": _campo(raw, "fondamenta", TYPE_DICTIONARY, {}),
 		"ancore": _campo(raw, "ancore", TYPE_ARRAY, []),
 		"rituale": _campo(raw, "rituale", TYPE_DICTIONARY, {}),
+		"conoscenza": _campo(raw, "conoscenza", TYPE_ARRAY, []),
 	}
 
 

@@ -80,6 +80,10 @@ func _rituale() -> Node:
 	return get_node_or_null("/root/RitualSystem")
 
 
+func _conoscenza() -> Node:
+	return get_node_or_null("/root/KnowledgeStore")
+
+
 func salva_rapido() -> Dictionary:
 	return salva_slot(SLOT_RAPIDO)
 
@@ -160,6 +164,7 @@ func snapshot() -> Dictionary:
 		"fondamenta": _fondamenta().per_salvataggio() if _fondamenta() != null else {},
 		"ancore": _ancore().per_salvataggio() if _ancore() != null else [],
 		"rituale": _rituale().per_salvataggio() if _rituale() != null else {},
+		"conoscenza": _conoscenza().per_salvataggio() if _conoscenza() != null else [],
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D:
@@ -197,6 +202,8 @@ func applica(dati: Dictionary) -> void:
 		_ancore().da_salvataggio(dati.get("ancore", []))
 	if _rituale() != null:
 		_rituale().da_salvataggio(dati.get("rituale", {}))
+	if _conoscenza() != null:
+		_conoscenza().da_salvataggio(dati.get("conoscenza", []))
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D and dati.has("posizione"):
 		(p as Node2D).global_position = dati["posizione"]

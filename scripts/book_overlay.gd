@@ -27,6 +27,7 @@ extends CanvasLayer
 const PAGINE := {
 	"menu_principale": preload("res://scenes/pages/page_menu_principale.tscn"),
 	"creazione_personaggio": preload("res://scenes/pages/page_creazione_personaggio.tscn"),
+	"diagramma_pathway": preload("res://scenes/pages/page_diagramma_pathway.tscn"),
 }
 
 var _volta_durata: float = 0.35
@@ -118,6 +119,7 @@ func _rendi(pagina: String) -> void:
 	_titolo.text = str(gd.call("tr_data", nome)) if gd != null else nome
 
 	for c in _contenuto.get_children():
+		_contenuto.remove_child(c)   # subito fuori: get_child(0) e' sempre la pagina viva
 		c.queue_free()
 
 	if not b.call("pagina_sbloccata", pagina):
@@ -150,13 +152,13 @@ func _costruisci_segnalibri() -> void:
 	if b == null:
 		return
 	var gd: Node = get_node_or_null("/root/GameData")
+	# Nastri sottili sul bordo: il nome sta nel tooltip, non occupano la pagina.
 	for id in b.call("segnalibri"):
 		var p: Dictionary = b.call("pagina", id)
 		var r := Button.new()
-		r.custom_minimum_size = Vector2(96, 20)
-		r.flat = true
+		r.custom_minimum_size = Vector2(12, 34)
 		var nome: String = str(p.get("name_i18n", id))
-		r.text = str(gd.call("tr_data", nome)) if gd != null else str(id)
+		r.tooltip_text = str(gd.call("tr_data", nome)) if gd != null else str(id)
 		r.pressed.connect(func() -> void:
 			if _book() != null:
 				_book().call("vai_a", id))
