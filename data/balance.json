@@ -2,8 +2,8 @@
   "schema_version": 1,
   "_comment": "Curve globali di bilanciamento. Tenute QUI e non sparse nelle abilita' perche' sono i numeri che cambieranno di piu' durante il playtest: devono essere modificabili in un file solo, con hot-reload. I numeri sono PLAUSIBILI, NON BILANCIATI: nessuno ha ancora giocato. Aspettati di riscriverli interamente.",
   "gioco": {
-    "_comment": "Meta di progressione del progetto, non del personaggio. 'fase' e' la fase di sviluppo raggiunta (CLAUDE.md): le pagine del libro con sbloccata_da.fase > questo valore esistono ma sono bianche (US-221). Si alza quando una fase chiude.",
-    "fase": 2
+    "_comment": "Meta di progressione del progetto, non del personaggio. 'fase' e' la fase di sviluppo CORRENTE: le pagine del libro con sbloccata_da.fase > questo valore esistono ma sono bianche (US-221). Si alza quando si apre una fase nuova.",
+    "fase": 3
   },
   "sequence_gap": {
     "_comment": "Il muro di Sequenza: un Beyonder molto piu' alto e' quasi immune. E' la meccanica che rende la coltivazione l'unica vera progressione. Moltiplicatore di danno in base a (sequenza_attaccante - sequenza_bersaglio); negativo = il bersaglio e' piu' alto.",

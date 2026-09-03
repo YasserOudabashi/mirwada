@@ -38,6 +38,7 @@ const PAGINE := {
 	"creazione_personaggio": preload("res://scenes/pages/page_creazione_personaggio.tscn"),
 	"diagramma_pathway": preload("res://scenes/pages/page_diagramma_pathway.tscn"),
 	"impostazioni": preload("res://scenes/pages/page_impostazioni.tscn"),
+	"inventario": preload("res://scenes/pages/page_inventario.tscn"),
 }
 
 var _volta_durata: float = 0.35

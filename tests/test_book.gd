@@ -32,14 +32,14 @@ func test_tipi_delle_pagine_nel_vocabolario() -> void:
 			"tipo '%s' nel vocabolario chiuso" % [(p as Dictionary).get("tipo")])
 
 
-func test_pagine_bianche_vs_sbloccate_in_fase_2() -> void:
+func test_pagine_bianche_vs_sbloccate() -> void:
 	var b: Node = _book()
-	# Fase 2 (data/balance.json gioco.fase): queste sono navigabili subito.
-	for pid in ["copertina", "frontespizio", "diagramma", "colophon"]:
-		assert_true(b.call("pagina_sbloccata", pid), "%s sbloccata in fase 2" % pid)
+	# data/balance.json gioco.fase = 3: queste sono navigabili.
+	for pid in ["copertina", "frontespizio", "diagramma", "colophon", "inventario"]:
+		assert_true(b.call("pagina_sbloccata", pid), "%s sbloccata alla fase corrente" % pid)
 	# Queste esistono ma sono bianche finche' la fase non le raggiunge.
-	for pid in ["inventario", "sinergie", "mappa", "journal"]:
-		assert_false(b.call("pagina_sbloccata", pid), "%s ancora bianca in fase 2" % pid)
+	for pid in ["sinergie", "mappa", "journal"]:
+		assert_false(b.call("pagina_sbloccata", pid), "%s ancora bianca (fase > 3)" % pid)
 		assert_false(b.call("pagina", pid).is_empty(), "%s esiste comunque nei dati" % pid)
 
 

@@ -143,8 +143,8 @@
       ],
       "priority": 7,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/balance.json gioco.fase 2->3 (fase di sviluppo corrente): la pagina inventario passa da bianca a scritta; aggiornati test_book + test_book_overlay (mappa come esempio di pagina bianca). scenes/pages/page_inventario.{tscn,gd} in book_overlay.PAGINE: 5 sezioni a bottoni toggle, ZAINO e INDOSSO scritte, RICETTARIO/TALENTI/BASE segnaposto. Zaino: item per categoria (BOOK_CAT_*), nome da tr_data + xN, equip -> Indossa (Equipment.equipaggia), pergamena -> Usa (Inventory.usa). Indosso: i 4 slot (BOOK_SLOT_*), item o vuoto, Togli (Equipment.rimuovi_slot), segnaposto sigilli. i18n: ~22 chiavi BOOK_INV/CAT/SLOT in strings.csv. 351 test headless (347+4 test_page_inventario.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): zaino con categorie e bottoni Indossa/Usa, Indosso coi 4 slot vuoti + segnaposto sigilli. Screenshot user://us307. BLOCCO A (US-301..307) CHIUSO."
     },
     {
       "id": "US-315",

@@ -38,3 +38,25 @@ COLOPHON_PREMI_TASTO,Premi un tasto...,Press a key...
 BOOK_MACCHIA_1,questa non è la tua grafia,this is not your handwriting
 BOOK_MACCHIA_2,{0} ti guarda leggere,{0} watches you read
 BOOK_MACCHIA_3,non voltare pagina,do not turn the page
+BOOK_INV_ZAINO,Zaino,Bag
+BOOK_INV_INDOSSO,Indosso,Worn
+BOOK_INV_RICETTARIO,Ricettario,Recipes
+BOOK_INV_TALENTI,Talenti,Talents
+BOOK_INV_BASE,Base,Home
+BOOK_INV_VUOTO,— vuoto —,— empty —
+BOOK_INV_USA,Usa,Use
+BOOK_INV_EQUIPAGGIA,Indossa,Equip
+BOOK_INV_TOGLI,Togli,Remove
+BOOK_INV_ARRIVA,Questa sezione si scrive più avanti.,This section is written later.
+BOOK_INV_SIGILLI_TODO,Sigilli incastonati: in arrivo.,Set sigils: coming.
+BOOK_CAT_INGREDIENTE,Ingredienti,Ingredients
+BOOK_CAT_EQUIP,Equipaggiamento,Equipment
+BOOK_CAT_SIGILLO,Sigilli,Sigils
+BOOK_CAT_PERGAMENA,Pergamene,Scrolls
+BOOK_CAT_MATERIALE,Materiali,Materials
+BOOK_CAT_VALUTA,Valuta,Currency
+BOOK_CAT_CONSUMABILE,Consumabili,Consumables
+BOOK_SLOT_ARMA,Arma,Weapon
+BOOK_SLOT_ARMATURA,Armatura,Armor
+BOOK_SLOT_ACCESSORIO_1,Accessorio I,Accessory I
+BOOK_SLOT_ACCESSORIO_2,Accessorio II,Accessory II

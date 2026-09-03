@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://c0pginvent0mir"]
+
+[ext_resource type="Script" path="res://scripts/pages/page_inventario.gd" id="1_pinv"]
+
+[node name="PageInventario" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 4
+script = ExtResource("1_pinv")

@@ -2710,3 +2710,32 @@ sezione test aggiornata.
   'guerra' condiviso su slot diversi -> conteggio 2, smontarne uno -> 1).
   validator 0.
 - Prossima storia: US-307 (pagina inventario del libro).
+
+[2026-09-03] US-307 — Pagina inventario del libro. BLOCCO A (inventario) CHIUSO.
+
+- data/balance.json gioco.fase 2 -> 3: la "fase di sviluppo corrente". La
+  pagina 'inventario' (sbloccata_da fase 3) passa da bianca a scritta.
+  Aggiornati test_book (test_pagine_bianche_vs_sbloccate) e test_book_overlay
+  (usa 'mappa' come esempio di pagina bianca, sbloccata_da fase 6).
+- scenes/pages/page_inventario.{tscn,gd} (VBoxContainer), in book_overlay.PAGINE.
+  5 sezioni con bottoni (toggle): ZAINO e INDOSSO scritte, RICETTARIO/TALENTI/
+  BASE segnaposto ("si scrive piu' avanti").
+  * Zaino: item raggruppati per categoria (label i18n BOOK_CAT_*), nome da
+    GameData.tr_data + "xN" per gli stack. equip -> bottone "Indossa"
+    (Equipment.equipaggia); pergamena -> "Usa" (Inventory.usa).
+  * Indosso: i 4 slot di equip_slots (label BOOK_SLOT_*), item equipaggiato o
+    "vuoto", bottone "Togli" (Equipment.rimuovi_slot). Riga segnaposto per i
+    sigilli incastonati (US-317).
+- i18n: ~22 chiavi BOOK_INV_* / BOOK_CAT_* / BOOK_SLOT_* in strings.csv,
+  .translation rigenerati (--import).
+- Come verificato: 351 test headless (347 + 4 in test_page_inventario.gd:
+  pagina istanziata (non bianca), lo zaino elenca gli item, equipaggia dal
+  bottone della pagina -> slot arma pieno, la sezione Indosso mostra i 4
+  slot). validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): con
+  ingredienti/equip/pergamene/materiali/valuta in zaino, la pagina mostra le
+  categorie coi bottoni Indossa/Usa; la sezione Indosso mostra Arma/Armatura/
+  Accessorio I/II tutti vuoti + il segnaposto sigilli. Screenshot user://us307.
+- BLOCCO A completo: US-301..307. Inventario, equip, stored_ability_id (P0),
+  valuta, tag per le sinergie, pagina del libro. Prossimo blocco: C
+  (sigilli e forgiatura, US-315..318).
+- Prossima storia: US-315 (schema dei sigilli).
