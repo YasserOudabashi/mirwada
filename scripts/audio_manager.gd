@@ -51,6 +51,11 @@ const SFX_SPEC := {
 	"amb_whisper_words": [90.0, 1.2, 0.8],
 	"amb_whisper_names": [110.0, 1.4, 0.75],
 	"amb_whisper_chorus": [140.0, 1.6, 0.7],
+	# Layer ambientali della percezione per Sequenza (US-218), sintetizzati.
+	"amb_spirit_faint": [180.0, 1.5, 0.5],
+	"amb_ley_hum": [55.0, 2.0, 0.2],
+	"amb_outer_drone": [40.0, 2.4, 0.15],
+	"amb_beyond": [28.0, 3.0, 0.3],
 }
 
 var _feedback: Dictionary = {}
@@ -211,6 +216,35 @@ func silenzio_secco(durata_s: float) -> void:
 
 func silenzio_secco_attivo() -> bool:
 	return Time.get_ticks_msec() < _silenzio_fino_ms
+
+
+## Layer ambientali della percezione per Sequenza (US-218): un AudioStreamPlayer
+## per layer sul bus ambience, acceso/spento in base alla lista corrente.
+var _amb_players: Dictionary = {}
+
+
+func imposta_layers_ambientali(layers: Array) -> void:
+	for nome in _amb_players.keys():
+		if not layers.has(nome):
+			(_amb_players[nome] as AudioStreamPlayer).stop()
+	for nome in layers:
+		var p: AudioStreamPlayer = _amb_players.get(nome)
+		if p == null:
+			p = AudioStreamPlayer.new()
+			p.bus = "ambience" if AudioServer.get_bus_index("ambience") != -1 else "Master"
+			p.stream = _stream_per(str(nome))
+			add_child(p)
+			_amb_players[nome] = p
+		if not p.playing:
+			p.play()
+
+
+func layers_ambientali_attivi() -> Array:
+	var out: Array = []
+	for nome in _amb_players:
+		if (_amb_players[nome] as AudioStreamPlayer).playing:
+			out.append(nome)
+	return out
 
 
 func nomi_sussurro() -> Array:

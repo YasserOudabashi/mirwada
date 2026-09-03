@@ -2104,3 +2104,31 @@ sezione test aggiornata.
   che fa targetare i nemici (serve AI), 'comando_non_morti' (serve summon
   controllabili).
 - Prossima storia: US-218 (Percezione per Sequenza).
+
+[2026-09-03] US-218 — Percezione per Sequenza
+
+- Autoload PerceptionSystem (scripts/perception_system.gd), ultimo. Legge
+  audio.json.sequence_perception (voci a 9/7/5/3/1).
+  _voce_per_sequenza(seq) = la voce con la chiave numerica piu' PICCOLA
+  >= seq (a Seq 6 vale quella di 7: hai gia' superato la 7); la piu'
+  bassa se seq < 1. Nessun numero di Sequenza nel codice. Si aggancia a
+  Progression.sequence_changed. layers_attivi/reveal_attivi/reveal_attivo.
+  Cumulativa: scendendo di Sequenza i reveal aumentano e sono un superset.
+- AUDIO: AudioManager.imposta_layers_ambientali(layers) - un
+  AudioStreamPlayer per layer sul bus ambience, acceso/spento in base
+  alla lista corrente. 4 amb_* sintetizzati nuovi.
+- VISIVO (FR-7 - ogni reveal ha audio E visivo):
+  scenes/perception_overlay.tscn (CanvasLayer layer 80) +
+  perception_overlay.gd. spiriti_vicini -> un Control che disegna
+  cerchio+anello sulle posizioni SCHERMO dei nodi del gruppo 'nemici'
+  (anche oltre i muri: e' un overlay). densita_mistica -> ColorRect grana
+  tenue. In main.tscn e debug_scene.tscn.
+- Come verificato: 264 test headless (259 + 5 in test_perception.gd:
+  Seq 9 niente, Seq 7 primo reveal + layer, Seq intermedia usa la voce
+  verso l'alto (6->7, 4->5), cumulativita' 7<5<3 e superset, i layer
+  audio si accendono/spengono). validator 0.
+- VERIFICA A SCHERMO (finestra reale): a Seq 5 anello blu sul nemico
+  (spiriti_vicini) + velo di grana (densita_mistica); a Seq 9 overlay
+  spento.
+- Prossima storia: US-219 (Twilight Giant eseguito end-to-end - IL VERDETTO
+  SULL'ARCHITETTURA).

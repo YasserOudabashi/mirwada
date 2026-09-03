@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bsq0main0scen"]
+[gd_scene load_steps=8 format=3 uid="uid://bsq0main0scen"]
 
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://scripts/test_zone.gd" id="2_zone"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="4_hud"]
 [ext_resource type="PackedScene" path="res://scenes/tell_indicator.tscn" id="5_tell"]
 [ext_resource type="PackedScene" path="res://scenes/madness_overlay.tscn" id="6_madov"]
+[ext_resource type="PackedScene" path="res://scenes/perception_overlay.tscn" id="7_perov"]
 
 [node name="Main" type="Node2D"]
 
@@ -23,3 +24,5 @@ position = Vector2(430, 496)
 [node name="TellIndicator" parent="." instance=ExtResource("5_tell")]
 
 [node name="MadnessOverlay" parent="." instance=ExtResource("6_madov")]
+
+[node name="PerceptionOverlay" parent="." instance=ExtResource("7_perov")]
