@@ -21,6 +21,7 @@ const PATH_PRIMITIVES := "res://data/schema/primitives.json"
 const PATH_ANIMATIONS := "res://data/animations.json"
 const PATH_AUDIO := "res://data/audio.json"
 const PATH_FORMS := "res://data/forms.json"
+const PATH_TRACKED_EVENTS := "res://data/schema/tracked_events.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -37,6 +38,7 @@ var _primitives: Dictionary = {}
 var _animations: Dictionary = {}
 var _audio: Dictionary = {}
 var _forms: Dictionary = {}
+var _tracked_events: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -86,6 +88,7 @@ func load_all() -> void:
 	_load_single(PATH_ANIMATIONS, "convenzioni", _animations, TYPE_DICTIONARY)
 	_load_single(PATH_AUDIO, "buses", _audio, TYPE_DICTIONARY)
 	_load_single(PATH_FORMS, "forms", _forms, TYPE_DICTIONARY)
+	_load_single(PATH_TRACKED_EVENTS, "events", _tracked_events, TYPE_DICTIONARY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -196,6 +199,16 @@ func get_audio(sezione: String) -> Dictionary:
 func get_form(forma_id: String) -> Dictionary:
 	var registry: Dictionary = _dict_or_empty(_forms.get("forms"))
 	return _dict_or_empty(registry.get(forma_id))
+
+
+## --- Eventi tracciabili (data/schema/tracked_events.json) ---
+## Vocabolario CHIUSO di 12: l'EventTracker (US-210) conta solo questi.
+func get_tracked_events() -> Dictionary:
+	return _dict_or_empty(_tracked_events.get("events"))
+
+
+func get_tracked_event(nome: String) -> Dictionary:
+	return _dict_or_empty(get_tracked_events().get(nome))
 
 
 func pathway_ids() -> Array:

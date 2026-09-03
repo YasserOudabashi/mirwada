@@ -1582,3 +1582,41 @@ sezione test aggiornata.
   Primitive implementate: 15 su 28 (shield, aura, dot, decay, debuff_stat,
   light_purify, transform, terrain_modify, curse, summon + le 5 di fase 1).
 - Prossima storia: US-210 (EventTracker generico) - inizio blocco C.
+
+[2026-09-03] US-210 spezzata; US-210 — EventTracker generico (il tracker)
+
+- DECISIONE: US-210 (tracker + count + emettitori nei sistemi di fase 1 +
+  save) toccava troppi file. Spezzata:
+  * US-210 (QUESTA) = il tracker, i contatori con filtri, il save.
+  * US-210B = gli emettitori in ability_engine/enemy/hurtbox.
+  Priorita' di US-211+ scalate di 1. Story di fase 2: 31 -> 32.
+- Cosa fatto:
+  - scripts/event_tracker.gd, autoload dopo Progression. _log grezzo di
+    {nome, dati}. emit_event(nome, dati): nome fuori dai 12 di
+    tracked_events.json -> push_error, non registrato, nessun crash.
+  - count(evento, filtri): filtra il log e aggrega alla lettura. Filtri
+    per SUFFISSO: "_max" -> <=, "_min" -> >=, valore booleano true -> il
+    campo deve valere true, altrimenti uguaglianza. La misura
+    (conteggio/somma/secondi) viene dallo schema: conteggio = quante voci,
+    somma/secondi = totale di dati.quantita. Filtro non ammesso per
+    quell'evento -> push_error + 0.
+  - game_data.gd: carica data/schema/tracked_events.json (28 file ora).
+    get_tracked_events(), get_tracked_event(nome).
+  - SAVE: SaveSystem VERSIONE_CORRENTE 4 -> 5. Campo "eventi" {log:[]} in
+    salva()/_leggi_snapshot/_migra_4_a_5. GameState.snapshot()/applica()
+    agganciano EventTracker.
+- LIMITI DICHIARATI:
+  * il _log cresce senza limite. Come le acting_actions, e' un punto da
+    rivedere (US-023 era proprio su questo), ma l'Acting persistente ha
+    bisogno della storia degli eventi. Da affrontare se diventa un
+    problema di memoria reale.
+  * il filtro "stesso_combattimento" (schema di enemy_defeated /
+    perfect_parry) serve un concetto di sessione di combattimento che non
+    esiste ancora: rimandato. count() oggi lo tratta come uguaglianza su
+    dati.stesso_combattimento se presente.
+- Come verificato: 178 test headless (170 + 8 in test_event_tracker.gd:
+  emit + conteggio, evento fuori vocabolario, filtro di uguaglianza (con
+  misura somma), filtro _max, filtro booleano, filtro non ammesso ->
+  errore gestito, persistenza nel save, migrazione v4->v5). validator
+  exit 0. Nessuna regressione (catena di migrazione 1->5 verde).
+- Prossima storia: US-210B (emettitori nei sistemi di fase 1).

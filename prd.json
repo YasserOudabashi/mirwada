@@ -184,20 +184,41 @@
     },
     {
       "id": "US-210",
-      "title": "EventTracker generico",
+      "title": "EventTracker generico - il tracker e i contatori",
       "description": "Come sviluppatore, voglio un unico sistema che conti gli eventi di gioco filtrati, cosi' che le azioni di recitazione siano contatori sui 12 eventi tracciati e non 40 rilevatori speciali.",
       "acceptanceCriteria": [
-        "Autoload EventTracker: emit_event(nome, dati) dove nome appartiene a data/schema/tracked_events.json (vocabolario chiuso di 12); un evento fuori vocabolario -> push_error, non crash",
-        "Contatori con filtri: count(evento, filtri) applica i filtri ammessi per quell'evento (gia' dichiarati nello schema)",
-        "I sistemi di combattimento di fase 1 emettono gli eventi rilevanti (enemy_defeated, damage_dealt, perfect_parry, dodge, ...) - un adattamento minimo, non una riscrittura",
-        "I contatori sono serializzati nel save (schema_version incrementato, migrazione)",
-        "Test headless: emissione, filtri, evento fuori vocabolario, persistenza",
+        "Autoload EventTracker: emit_event(nome, dati) dove nome appartiene ai 12 di data/schema/tracked_events.json; evento fuori vocabolario -> push_error, non crash",
+        "count(evento, filtri) applica i filtri ammessi per quell'evento (suffisso _max -> <=, _min -> >=, booleano -> true, altrimenti uguaglianza); misura conteggio/somma/secondi dallo schema",
+        "GameData carica tracked_events.json (get_tracked_events / get_tracked_event)",
+        "Il log e' serializzato nel save (schema_version su, migrazione)",
+        "Test headless: emissione, filtri, evento fuori vocabolario, filtro non ammesso, persistenza, migrazione",
         "python tools/validate_data.py esce 0",
         "Nessuna regressione sui test esistenti",
         "Typecheck passes",
         "Tests pass"
       ],
       "priority": 10,
+      "fase": 2,
+      "passes": true,
+      "notes": "US-210 spezzata: 210 = il tracker (questa), 210B = gli emettitori nei sistemi di fase 1. scripts/event_tracker.gd, autoload dopo Progression. _log grezzo di {nome, dati}; count() filtra e aggrega alla lettura (misura dallo schema). Filtri per suffisso: _max/_min/booleano/uguaglianza. Evento o filtro fuori vocabolario -> push_error + 0/no-op, mai crash. GameData carica data/schema/tracked_events.json (28 file). SAVE: schema_version 4->5, campo 'eventi' {log:[]} in salva/_leggi_snapshot/_migra_4_a_5; GameState.snapshot/applica agganciano EventTracker. NB: il log cresce senza limite - come le acting_actions, e' un punto da rivedere (US-023 era su questo), ma l'Acting ha bisogno della storia. stesso_combattimento come filtro serve un concetto di sessione di combattimento che non esiste ancora: rimandato a quando ci sara'. 8 test in test_event_tracker.gd (178 totali). validator 0, nessuna regressione (catena di migrazione 1->5 verde)."
+    },
+    {
+      "id": "US-210B",
+      "title": "EventTracker - emettitori nei sistemi di fase 1",
+      "description": "Come sviluppatore, voglio che i sistemi di combattimento di fase 1 emettano gli eventi tracciati rilevanti, cosi' che l'Acting Method abbia dati veri su cui contare.",
+      "acceptanceCriteria": [
+        "ability_engine.execute() su successo -> emit_event('ability_used', {ability_id})",
+        "enemy.gd alla morte -> emit_event('enemy_defeated', {...}) con i campi disponibili (senza_abilita se ricavabile, ecc.)",
+        "hurtbox.gd (solo se il genitore e' il giocatore): danno subito -> emit_event('damage_taken', {quantita, tag_danno}); parata perfetta -> emit_event('perfect_parry')",
+        "hurtbox/hitbox lato attaccante giocatore -> emit_event('damage_dealt', {quantita, tag_danno})",
+        "Adattamento MINIMO: agganciare, non riscrivere",
+        "Test headless: un combattimento simulato produce i contatori attesi (enemy_defeated, damage_dealt, ...)",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 11,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -218,7 +239,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 11,
+      "priority": 12,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -239,7 +260,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 12,
+      "priority": 13,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -260,7 +281,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 13,
+      "priority": 14,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -279,7 +300,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 14,
+      "priority": 15,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -300,7 +321,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 15,
+      "priority": 16,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -321,7 +342,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 16,
+      "priority": 17,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -344,7 +365,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 17,
+      "priority": 18,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -364,7 +385,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 18,
+      "priority": 19,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -385,7 +406,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 19,
+      "priority": 20,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -407,7 +428,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 20,
+      "priority": 21,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -428,7 +449,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 21,
+      "priority": 22,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -448,7 +469,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 22,
+      "priority": 23,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -469,7 +490,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 23,
+      "priority": 24,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -490,7 +511,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 24,
+      "priority": 25,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -510,7 +531,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 25,
+      "priority": 26,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -531,7 +552,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 26,
+      "priority": 27,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -551,7 +572,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 27,
+      "priority": 28,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -571,7 +592,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 28,
+      "priority": 29,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -592,7 +613,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 29,
+      "priority": 30,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -614,7 +635,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 30,
+      "priority": 31,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -633,7 +654,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 31,
+      "priority": 32,
       "fase": 2,
       "passes": false,
       "notes": ""
