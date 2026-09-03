@@ -15,6 +15,11 @@
     "difesa": 0,
     "evasione": 0
   },
+  "progressione": {
+    "_comment": "Punto di partenza di un personaggio nuovo. pathway_default vive QUI e non nello script: FR-1, nessun nome di Pathway hardcoded nel codice. Un save di fase 1 senza il campo progressione eredita questi valori dalla migrazione.",
+    "pathway_default": "twilight_giant",
+    "sequenza_iniziale": 9
+  },
   "madness": {
     "_comment": "Soglie degli effetti di follia. Non si azzera mai del tutto: la riduzione massima delle Ancore e' un cap, non un reset.",
     "soglia_distorsioni": 15,

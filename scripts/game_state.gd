@@ -34,6 +34,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		print("[GameState] caricamento rapido: ", "ok" if r.get("ok") else r.get("reason"))
 
 
+func _progression() -> Node:
+	return get_node_or_null("/root/Progression")
+
+
 func salva_rapido() -> Dictionary:
 	return get_node("/root/SaveSystem").call("salva", SLOT_RAPIDO, snapshot())
 
@@ -54,6 +58,7 @@ func snapshot() -> Dictionary:
 		"posizione": Vector2.ZERO,
 		"statistiche": {},
 		"evocazioni": [],
+		"progressione": _progression().per_salvataggio() if _progression() != null else {},
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D:
@@ -70,6 +75,8 @@ func snapshot() -> Dictionary:
 func applica(dati: Dictionary) -> void:
 	nome_personaggio = str(dati.get("nome_personaggio", NOME_DEFAULT))
 	tempo_gioco = float(dati.get("tempo_gioco", 0.0))
+	if _progression() != null:
+		_progression().da_salvataggio(dati.get("progressione", {}))
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D and dati.has("posizione"):
 		(p as Node2D).global_position = dati["posizione"]

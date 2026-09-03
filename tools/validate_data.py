@@ -300,6 +300,21 @@ def main():
         if ability_ids and aid not in ability_ids:
             err(f"{rel} [{sid}]: riferimento ad abilita' inesistente '{aid}'")
 
+    # --- progressione (US-201) ---
+    # Il Pathway di partenza vive nei dati, non nel codice (FR-1): qui si
+    # verifica che punti a un Pathway attivo e che la Sequenza sia valida.
+    balance_doc = load_json(os.path.join(DATA, "balance.json"))
+    if balance_doc:
+        prog = balance_doc.get("progressione", {})
+        pd = prog.get("pathway_default")
+        if pd not in pathway_ids:
+            err(f"data/balance.json [progressione.pathway_default]: '{pd}' non e' "
+                f"un Pathway attivo ({sorted(p for p in pathway_ids if p)}).")
+        si = prog.get("sequenza_iniziale")
+        if not isinstance(si, int) or not (0 <= si <= 9):
+            err(f"data/balance.json [progressione.sequenza_iniziale]: '{si}' fuori "
+                f"dall'intervallo 0-9.")
+
     # --- animazioni ---
     anim_doc = load_json(os.path.join(DATA, "animations.json"))
     if anim_doc:

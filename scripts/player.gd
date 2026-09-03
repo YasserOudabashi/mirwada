@@ -56,6 +56,12 @@ func _ready() -> void:
 	_hurtbox.parata_riuscita.connect(_su_parata_riuscita)
 	_hurtbox.colpito.connect(_su_danno_subito)
 
+	# Bonus di Sequenza del Pathway corrente (US-201): il giocatore entra in
+	# scena dopo gli autoload, quindi li richiede lui una volta pronto.
+	var prog: Node = get_node_or_null("/root/Progression")
+	if prog != null:
+		prog.call("riapplica_al_giocatore")
+
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd != null:
 		_combat = gd.call("get_balance", "combattimento")

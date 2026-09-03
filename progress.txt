@@ -1206,3 +1206,68 @@ sezione test aggiornata.
 - Come verificato: 108 test headless tutti verdi, validator exit 0.
   Il guard anti-0-test verificato a parte (exit 1).
 - Prossima storia: US-020 (tell sonoro degli attacchi nemici).
+
+---
+
+[SETUP-9] FASE 2 aperta — prd.json convertito, ralph non lanciabile
+
+- Cosa fatto: 006_PRD/prd-fase-2-pathway-core.md convertito in prd.json
+  (29 story US-201..US-229, campo "fase": 2, tutte passes:false).
+  branchName ralph/fase-2-pathway-core. Ordine di priorita' dal blocco A
+  (progressione + primitive + capacita' motore) fino a J, con US-228 subito
+  dopo US-202/203 (le primitive che le servono) e US-219 (verdetto
+  sull'architettura) prima del blocco I. prd.json di fase 1 archiviato in
+  archive/2026-09-03-fase-1-fondamenta/.
+- RALPH NON LANCIABILE su questo PC: ralph.sh riga 108 usa
+  `docker sandbox run claude`, ma Docker 29.6.2 ha RIMOSSO il plugin
+  `docker sandbox` ("deprecated and has been removed, migrate to Docker
+  Sandboxes"). In piu' Docker Desktop non era in esecuzione. Deciso con
+  l'utente: le story di fase 2 le lavora Claude a mano in sessione
+  interattiva, stesso flusso di ralph (una story per iterazione, test +
+  regressioni, commit US-2NN, questo file aggiornato) ma senza container.
+- Note ambiente: eseguibile Godot a
+  ./Godot_v4.3-stable_win64.exe/Godot_v4.3-stable_win64_console.exe
+  (cartella con lo stesso nome del file). Suite: 112 test a fase 1 chiusa.
+
+[2026-09-03] US-201 — Stato di progressione del giocatore
+
+- Cosa fatto:
+  - scripts/progression.gd, autoload "Progression" (2o dopo GameData in
+    project.godot). Tiene pathway_id + sequence (9->0) del giocatore.
+    API di sola lettura: pathway(), sequence(), tier(), sequence_data(),
+    stat_modifiers(). tier() deriva da sequence_data().tier, non e' calcolato
+    qui. Mutazione: configura(pathway_id, seq) per load/creazione/debug/test
+    (NON emette il segnale), avanza() decrementa di 1 e si ferma a 0 (emette
+    sequence_changed(nuova, vecchia)).
+  - FR-1 rispettato: nessun nome di Pathway nel codice. Il Pathway di
+    partenza vive in data/balance.json, nuova sezione "progressione"
+    {pathway_default, sequenza_iniziale}. _pathway_default() lo legge da
+    GameData.get_balance.
+  - stat_modifiers della Sequenza applicati allo StatsComponent del
+    giocatore come modificatore per id "sequence:<n>" (US-007). avanza()
+    rimuove "sequence:<vecchia>" e applica "sequence:<nuova>". Il giocatore
+    entra in scena DOPO gli autoload, quindi player.gd _ready() chiama
+    Progression.riapplica_al_giocatore() (una riga).
+  - SAVE: SaveSystem VERSIONE_CORRENTE 2 -> 3. Campo "progressione"
+    {pathway_id, sequence} in salva() e in _leggi_snapshot (riletto con
+    _campo(TYPE_DICTIONARY, {}), non fidato). _migra_2_a_3 aggiunge
+    {pathway_id:"", sequence:9} a un save di fase 1: la migrazione NON
+    conosce nomi di Pathway, pathway_id vuoto -> Progression.da_salvataggio
+    ricade sul default dei dati. da_salvataggio e' non fidata: typeof() +
+    default, un raw non-oggetto non fa crash.
+  - GameState.snapshot()/applica() agganciano Progression
+    (per_salvataggio / da_salvataggio).
+  - tools/validate_data.py: nuovo check "progressione" — pathway_default
+    deve essere un Pathway attivo, sequenza_iniziale 0-9.
+- Come verificato: 119 test headless (112 + 7 in test_progression.gd:
+  default dai dati, avanza + segnale, stop a 0, stat_modifiers per id
+  applicati/rimossi su un giocatore finto, round-trip del save, migrazione
+  da schema_version 2, campi non fidati). validator exit 0 (8 warning
+  preesistenti). Boot di main.tscn headless: GameData carica, nessuno
+  script error, nessun errore Progression.
+  Nessuna verifica a schermo: story di sistema senza UI, l'effetto sul
+  giocatore e' coperto dal test con giocatore finto in scena.
+- Note ambiente: gli "Unreferenced static string" al boot sono il rumore
+  di Godot ucciso da `timeout` a meta' shutdown (gia' notato in US-015),
+  non del codice.
+- Prossima storia: US-202 (primitive shield, aura, dot, decay).

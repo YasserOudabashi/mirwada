@@ -23,8 +23,8 @@
       ],
       "priority": 1,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Autoload Progression (scripts/progression.gd), 2o nella lista dopo GameData. API di sola lettura pathway()/sequence()/tier()/sequence_data()/stat_modifiers(); mutazione configura(pathway_id,seq) (load/creazione/test) e avanza() (9->0, si ferma a 0). tier deriva da sequence_data().tier, mai calcolato. FR-1: nessun nome di Pathway nel codice - il default vive in data/balance.json [progressione].pathway_default (nuova sezione), risolto da _pathway_default(). stat_modifiers della Sequenza applicati allo StatsComponent del giocatore come modificatore per id 'sequence:<n>' (US-007): avanza() rimuove il vecchio e applica il nuovo. Il player e' in scena dopo gli autoload, quindi player.gd _ready chiama Progression.riapplica_al_giocatore(). Segnale sequence_changed(nuova,vecchia) emesso solo da avanza(), non da configura(). SAVE: VERSIONE_CORRENTE 2->3, campo 'progressione' {pathway_id,sequence} serializzato in salva() e riletto in _leggi_snapshot con _campo(TYPE_DICTIONARY,{}); _migra_2_a_3 aggiunge {pathway_id:'',sequence:9} - la migrazione non conosce nomi di Pathway, pathway_id vuoto -> Progression.da_salvataggio ricade sul default dei dati. da_salvataggio e' NON FIDATA (typeof + default, raw non-oggetto -> nessun crash). GameState.snapshot/applica agganciano Progression. validate_data.py: nuovo check pathway_default = Pathway attivo, sequenza_iniziale 0-9. 7 test in test_progression.gd (119 totali, era 112), validator exit 0, boot di main.tscn pulito. Nessuna verifica a schermo: story di sistema, l'effetto sul giocatore e' coperto dai test."
     },
     {
       "id": "US-202",
