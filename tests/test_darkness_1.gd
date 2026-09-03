@@ -87,5 +87,5 @@ func test_darkness_sfortuna_cronica_si_esegue_con_primitive_attive() -> void:
 	assert_eq((r["effects"] as Array).size(), 4, "quattro primitive composte")
 	assert_true(s.call("has_modifier", "curse:darkness_sfortuna_cronica"), "maledizione attiva")
 	assert_true(s.call("has_modifier", "darkness_sfortuna_cronica:debuff:evasione"), "debuff evasione")
-	assert_true(s.call("has_modifier", "darkness_sfortuna_cronica:debuff:velocita"), "debuff velocita")
+	assert_true(s.call("has_modifier", "darkness_sfortuna_cronica:debuff:precisione"), "debuff precisione")
 	_cleanup(c)

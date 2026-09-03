@@ -1471,6 +1471,22 @@ sezione test aggiornata.
 - Primitive implementate: 13 -> 14 su 28.
 - Prossima storia: US-204 (AbilityEngine esegue un'abilita' non posseduta).
 
+[2026-09-03] FIXUP US-228 (feedback utente) — precisione come stat
+
+- L'utente ha chiesto se 'precisione' non fosse una stat da aggiungere
+  (mira / colpi critici). Decisione: SI, come stat forward-looking
+  speculare a 'evasione' (anche evasione oggi non e' letta da nessun
+  sistema di combattimento). Aggiunta a:
+  * stats_component.gd STAT_KEYS + _FALLBACK + configure_from_balance.
+  * data/balance.json stats_base (precisione: 0) con _comment aggiornato:
+    evasione/precisione sono forward-looking, le abilita' le modificano gia'
+    ma il combat non le legge.
+  * tools/validate_data.py known_stats (per il check delle forme).
+  * darkness_sfortuna_cronica: debuff_stat torna su 'precisione' (era
+    stato messo 'velocita' come ripiego), note aggiornata.
+- Verificato: 159 test verdi (test_stats_component e test_darkness_1
+  aggiornati), validator 0.
+
 [2026-09-03] US-204 — AbilityEngine esegue un'abilita' non posseduta (prestito a tempo)
 
 - CONTESTO: execute() prima non aveva NESSUN controllo di ownership -

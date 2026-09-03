@@ -10,10 +10,11 @@
   "hp_curve": { "9": 100, "8": 150, "7": 220, "6": 340, "5": 520, "4": 800, "3": 1300, "2": 2200, "1": 3800, "0": 7000 },
   "spiritualita_curve": { "9": 50, "8": 75, "7": 110, "6": 170, "5": 260, "4": 400, "3": 620, "2": 980, "1": 1500, "0": 3000 },
   "stats_base": {
-    "_comment": "Statistiche di partenza non legate alla Sequenza. hp_max e spiritualita_max vengono dalle curve qui sopra; queste no. velocita in px/s: a 90 servivano ~7s per attraversare lo schermo (640 px), troppo lenta, alzata a 140. PLAUSIBILI, non bilanciate.",
+    "_comment": "Statistiche di partenza non legate alla Sequenza. hp_max e spiritualita_max vengono dalle curve qui sopra; queste no. velocita in px/s: a 90 servivano ~7s per attraversare lo schermo (640 px), troppo lenta, alzata a 140. evasione e precisione sono stat forward-looking (schivare / mirare-critici): nessun sistema di combattimento le legge ancora, ma le abilita' possono gia' modificarle. PLAUSIBILI, non bilanciate.",
     "velocita": 140,
     "difesa": 0,
-    "evasione": 0
+    "evasione": 0,
+    "precisione": 0
   },
   "progressione": {
     "_comment": "Punto di partenza di un personaggio nuovo. pathway_default vive QUI e non nello script: FR-1, nessun nome di Pathway hardcoded nel codice. Un save di fase 1 senza il campo progressione eredita questi valori dalla migrazione.",

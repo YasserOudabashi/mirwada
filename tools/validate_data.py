@@ -314,7 +314,7 @@ def main():
     # nulla di quali forme esistano.
     forms_doc = load_json(os.path.join(DATA, "forms.json"))
     forms = (forms_doc or {}).get("forms", {})
-    known_stats = {"hp_max", "spiritualita_max", "velocita", "difesa", "evasione", "forza"}
+    known_stats = {"hp_max", "spiritualita_max", "velocita", "difesa", "evasione", "precisione", "forza"}
     for fid, f in forms.items():
         if not isinstance(f.get("name_i18n"), str) or not f["name_i18n"]:
             err(f"data/forms.json [{fid}]: name_i18n mancante o vuoto")

@@ -20,7 +20,7 @@ signal died
 ## Le statistiche modificabili. hp e spiritualita' correnti NON sono qui:
 ## sono risorse che si consumano, non caratteristiche.
 const STAT_KEYS: PackedStringArray = [
-	"hp_max", "spiritualita_max", "velocita", "difesa", "evasione",
+	"hp_max", "spiritualita_max", "velocita", "difesa", "evasione", "precisione",
 ]
 
 ## Sequenza di partenza: 9 e' la piu' bassa, dove comincia ogni personaggio.
@@ -32,7 +32,7 @@ const SEQUENZA_INIZIALE := 9
 ## configure_from_balance emette push_warning quando li usa.
 const _FALLBACK := {
 	"hp_max": 100.0, "spiritualita_max": 50.0,
-	"velocita": 90.0, "difesa": 0.0, "evasione": 0.0,
+	"velocita": 90.0, "difesa": 0.0, "evasione": 0.0, "precisione": 0.0,
 }
 
 var _base: Dictionary = {}
@@ -57,9 +57,9 @@ func _ready() -> void:
 
 
 ## Valori base da data/balance.json: hp_max e spiritualita_max dalle curve per
-## Sequenza, velocita/difesa/evasione dalla sezione stats_base (non dipendono
-## dalla Sequenza). Se GameData non c'e' si parte dai _FALLBACK con un avviso:
-## non e' una condizione normale, i numeri di gioco stanno nei dati.
+## Sequenza, velocita/difesa/evasione/precisione dalla sezione stats_base (non
+## dipendono dalla Sequenza). Se GameData non c'e' si parte dai _FALLBACK con
+## un avviso: non e' una condizione normale, i numeri di gioco stanno nei dati.
 func configure_from_balance(sequenza: int) -> void:
 	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
 	var hp_max: float = _FALLBACK["hp_max"]
@@ -67,6 +67,7 @@ func configure_from_balance(sequenza: int) -> void:
 	var velocita: float = _FALLBACK["velocita"]
 	var difesa: float = _FALLBACK["difesa"]
 	var evasione: float = _FALLBACK["evasione"]
+	var precisione: float = _FALLBACK["precisione"]
 
 	if gd != null:
 		hp_max = gd.call("curve_value", "hp_curve", sequenza, hp_max)
@@ -75,6 +76,7 @@ func configure_from_balance(sequenza: int) -> void:
 		velocita = float(sb.get("velocita", velocita))
 		difesa = float(sb.get("difesa", difesa))
 		evasione = float(sb.get("evasione", evasione))
+		precisione = float(sb.get("precisione", precisione))
 	else:
 		push_warning("[StatsComponent] GameData assente: statistiche dai valori "
 			+ "di emergenza, non da data/balance.json.")
@@ -85,6 +87,7 @@ func configure_from_balance(sequenza: int) -> void:
 		"velocita": velocita,
 		"difesa": difesa,
 		"evasione": evasione,
+		"precisione": precisione,
 	}
 	_hp = hp_max
 	_spiritualita = sp_max

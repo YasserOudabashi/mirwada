@@ -25,8 +25,8 @@
         },
         {
           "tipo": "debuff_stat",
-          "stat": "velocita",
-          "valore": -0.2,
+          "stat": "precisione",
+          "valore": -0.4,
           "durata": 20.0,
           "moltiplicativo": true
         },
@@ -45,7 +45,7 @@
         "singolo"
       ],
       "costo_follia": 2.0,
-      "note": "US-228: 'Knight of Misfortune' SENZA probability_shift (differita). La sfortuna e' curse('sfortuna', rimossa da purificazione) + stack di debuff_stat su evasione e velocita' + dot basso a tag follia: il bersaglio schiva meno, si muove peggio e si logora nel tempo. Il concept originale puntava a probability_shift; la manipolazione VERA della probabilita' resta a Wheel of Fortune (gruppo key_of_light, differito). design-master dice 'evasione/precisione' ma precisione non e' una stat del gioco: uso velocita'. Se in fase 5 il feel non basta -> discussione esplicita per riattivare probability_shift col suo gruppo."
+      "note": "US-228: 'Knight of Misfortune' SENZA probability_shift (differita). La sfortuna e' curse('sfortuna', rimossa da purificazione) + stack di debuff_stat su evasione e precisione + dot basso a tag follia: il bersaglio schiva meno, manca i colpi e si logora nel tempo. evasione e precisione sono stat forward-looking (nessun sistema di combattimento le legge ancora: arrivano con l'integrazione combat delle abilita'). Il concept originale puntava a probability_shift; la manipolazione VERA della probabilita' resta a Wheel of Fortune (gruppo key_of_light, differito). Se in fase 5 il feel non basta -> discussione esplicita per riattivare probability_shift col suo gruppo."
     },
     {
       "schema_version": 1,
