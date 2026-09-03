@@ -2132,3 +2132,46 @@ sezione test aggiornata.
   spento.
 - Prossima storia: US-219 (Twilight Giant eseguito end-to-end - IL VERDETTO
   SULL'ARCHITETTURA).
+
+[2026-09-03] US-219 — Twilight Giant end-to-end.  VERDETTO: L'ARCHITETTURA REGGE.
+
+- Il Twilight Giant va dalla Sequenza 9 alla 5 con ZERO codice dedicato.
+  Nessun `if` per il Pathway, nessun nome di Sequenza in scripts/.
+- tests/test_vertical_slice.gd, 3 test (267 totali):
+  1. test_twilight_giant_dalla_sequenza_9_alla_5 - per ogni salto
+     9->8->7->6->5:
+     * CharacteristicStore.aggiungi("char_twilight_giant_N")
+     * PotionSystem.concoct("formula_twilight_giant_N", cid, ingredienti
+       dalla formula)
+     * RECITAZIONE riempita LEGGENDO le acting_actions della Sequenza
+       corrente da Progression.sequence_data(). L'helper
+       _recita_sequenza_corrente() per ogni azione emette 'target' eventi
+       (misura conteggio) oppure un evento con quantita=target (somma/
+       secondi), coi FILTRI presi COME DATI. Nessun numero del TG nel test.
+     * Acting.e_completo() -> PotionSystem.bevi(false) -> Progression avanza
+     * i stat_modifiers di ogni Sequenza (hp_max 20/35/50/80/130, forza,
+       difesa, danno_arma...) applicati al giocatore finto e verificati
+       contro get_base + delta
+     * niente follia da forzatura: la recitazione e' completa, quindi
+       l'avanzamento e' NORMALE (e["forzato"] == false)
+  2. test_ogni_abilita_del_twilight_giant_9_5_si_esegue_senza_warning:
+     le 11 abilita' delle Sequenze 9-5 (primitive usate: melee_arc,
+     buff_stat, dash, projectile, shield, transform, debuff_stat, aura)
+     eseguono TUTTE senza warning "non implementata" ne' "fuori registro".
+  3. test_nessun_codice_nomina_il_twilight_giant: legge ogni scripts/*.gd,
+     toglie i commenti, verifica ZERO occorrenze di "twilight_giant",
+     "Warrior"/"Pugilist" (nomi di Sequenza), "\"tg_". La CI gia' esegue
+     run_tests.gd -> il check e' automatico.
+- Il commento di ritual_system.gd che citava "twilight_giant.json" e'
+  stato genericizzato in "data/pathways/".
+- CONCLUSIONE: niente ha richiesto codice dedicato al Twilight Giant. La
+  spina dorsale data-driven regge. Le fasi 3-7 sono in gran parte lavoro
+  di dati. Il checkpoint di fase 5 (aggiungere i 9 Pathway rimanenti senza
+  codice) e' realistico. Blocco H CHIUSO.
+- Debiti residui NON bloccanti per il criterio di uscita (documentati
+  nelle rispettive story): aura 'taunt' che fa targetare i nemici (serve
+  AI, fase 5), 'comando_non_morti' (serve summon controllabili), i filtri
+  acting che dipendono dal mondo (area_cleared reale, npc_influenced,
+  time_in_state 'trasformato', tipo_arma) - emessi a mano nel test, si
+  popoleranno da soli quando quei sistemi esisteranno.
+- Prossima storia: US-220 (i18n reale) - inizio blocco I.

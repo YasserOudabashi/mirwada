@@ -3,7 +3,7 @@ extends Node
 ## e' una pozione: e' un rituale con luogo, momento, sacrifici e sigilli, che
 ## si puo' interrompere.
 ##
-## Il formato di advancement_ritual e' gia' nei dati (twilight_giant.json):
+## Il formato di advancement_ritual e' gia' nei dati (data/pathways/):
 ##   location_tags, momento, fase_lunare, sacrifices[], sigils[]
 ##
 ## Fino al mondo di fase 6 il luogo e il tempo si simulano (imposta_luogo /

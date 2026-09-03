@@ -535,8 +535,8 @@
       ],
       "priority": 26,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "VERDETTO: L'ARCHITETTURA REGGE. Il Twilight Giant va dalla Sequenza 9 alla 5 con ZERO codice dedicato. 3 test in test_vertical_slice.gd (267 totali): (1) test_twilight_giant_dalla_sequenza_9_alla_5 - per ogni salto 9->8->7->6->5: CharacteristicStore.aggiungi(char_twilight_giant_N) -> PotionSystem.concoct(formula_twilight_giant_N, ...) -> recitazione riempita LEGGENDO le acting_actions della Sequenza corrente da Progression.sequence_data() (helper _recita_sequenza_corrente: per ogni azione, emette 'target' eventi conteggio o un evento somma/secondi con quantita=target, con i filtri COME DATI) -> Acting.e_completo -> PotionSystem.bevi(false) -> Progression avanza; i stat_modifiers di ogni Sequenza (hp_max 20/35/50/80/130 ecc.) applicati al giocatore finto e verificati contro get_base + delta; niente follia da forzatura perche' la recitazione e' completa. (2) test_ogni_abilita_del_twilight_giant_9_5_si_esegue_senza_warning: le 11 abilita' delle Sequenze 9-5 (melee_arc/buff_stat/dash/projectile/shield/transform/debuff_stat/aura) eseguono tutte senza warning 'non implementata' ne' 'fuori registro'. (3) test_nessun_codice_nomina_il_twilight_giant: legge tutti gli scripts/*.gd, toglie i commenti, e verifica ZERO occorrenze di 'twilight_giant', nomi di Sequenza ('Warrior'/'Pugilist'), '\"tg_'. La CI gia' esegue run_tests.gd -> il check e' automatico. Il commento di ritual_system.gd che citava 'twilight_giant.json' e' stato genericizzato in 'data/pathways/'. NIENTE ha richiesto codice dedicato: la fase 2 puo' proseguire, le fasi 3-7 sono in gran parte lavoro di dati. validator 0."
     },
     {
       "id": "US-220",
