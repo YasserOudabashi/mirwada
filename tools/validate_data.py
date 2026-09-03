@@ -290,6 +290,13 @@ def main():
                         if not isinstance(p.get("permanente"), bool):
                             err(f"{rel} [{aid}]: terrain_modify.permanente deve essere true/false "
                                 f"(permanente decide se la modifica va nel save)")
+                    if tipo == "summon":
+                        if not isinstance(p.get("entita_id"), str) or not p.get("entita_id"):
+                            err(f"{rel} [{aid}]: summon senza entita_id (la fonte dell'evocazione)")
+                        dur = p.get("durata")
+                        if dur == 0 or dur is None:
+                            err(f"{rel} [{aid}]: summon.durata deve essere -1 (persistente) o > 0 "
+                                f"(temporanea), mai 0")
                     td = p.get("tag_danno")
                     if td is not None and td not in valid_damage_tags:
                         err(f"{rel} [{aid}]: tag_danno '{td}' non nel vocabolario "

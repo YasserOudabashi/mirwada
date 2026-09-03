@@ -57,6 +57,7 @@ func _ready() -> void:
 		"transform": _p_transform,
 		"terrain_modify": _p_terrain_modify,
 		"curse": _p_curse,
+		"summon": _p_summon,
 	}
 
 
@@ -457,6 +458,41 @@ func _p_curse(prim: Dictionary, _caster: Node, stats: Node, ability_id: String) 
 	return {"tipo": "curse", "effetto": effetto, "durata": durata,
 			"condizione_rimozione": condizione_rimozione, "modifier_id": mod_id,
 			"applied": true}
+
+
+## summon: evoca "quantita" entita' di tipo entita_id. durata: -1 ->
+## PERSISTENTI, registrate in SummonRegistry (sopravvivono al combattimento e
+## al save); durata > 0 -> temporanee, un'entry _pending che scade. Lo spawn
+## del Node vero lo fara' il sistema del mondo/combat leggendo il registro:
+## qui si registra il fatto.
+func _p_summon(prim: Dictionary, caster: Node, _stats: Node, _ability_id: String) -> Dictionary:
+	var entita_id: String = str(prim.get("entita_id", ""))
+	var quantita: int = maxi(1, int(_num(prim.get("quantita"), 1.0)))
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var comportamento: String = str(prim.get("comportamento", ""))
+
+	var pos: Vector2 = Vector2.ZERO
+	if caster is Node2D and (caster as Node2D).is_inside_tree():
+		pos = (caster as Node2D).global_position
+
+	var rec: Dictionary = {"tipo": "summon", "entita_id": entita_id, "quantita": quantita,
+			"durata": durata, "comportamento": comportamento, "persistenti": [], "applied": true}
+
+	if entita_id.is_empty():
+		rec["applied"] = false
+		return rec
+
+	if durata < 0.0:
+		var reg: Node = get_tree().root.get_node_or_null("SummonRegistry")
+		if reg == null:
+			rec["applied"] = false
+			return rec
+		for i in quantita:
+			rec["persistenti"].append(reg.call("evoca", entita_id, comportamento, pos, 10.0))
+	elif durata > 0.0:
+		_pending.append({"kind": "summon_temp", "caster": caster, "left": durata,
+				"entita_id": entita_id, "quantita": quantita})
+	return rec
 
 
 ## Annulla una trasformazione in corso "su richiesta". true se ce n'era una.

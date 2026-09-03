@@ -42,6 +42,10 @@ func _world() -> Node:
 	return get_node_or_null("/root/WorldState")
 
 
+func _summons() -> Node:
+	return get_node_or_null("/root/SummonRegistry")
+
+
 func salva_rapido() -> Dictionary:
 	return get_node("/root/SaveSystem").call("salva", SLOT_RAPIDO, snapshot())
 
@@ -61,7 +65,7 @@ func snapshot() -> Dictionary:
 		"tempo_gioco": tempo_gioco,
 		"posizione": Vector2.ZERO,
 		"statistiche": {},
-		"evocazioni": [],
+		"evocazioni": _summons().per_salvataggio() if _summons() != null else [],
 		"progressione": _progression().per_salvataggio() if _progression() != null else {},
 		"mondo": _world().per_salvataggio() if _world() != null else {},
 	}
@@ -84,6 +88,8 @@ func applica(dati: Dictionary) -> void:
 		_progression().da_salvataggio(dati.get("progressione", {}))
 	if _world() != null:
 		_world().da_salvataggio(dati.get("mondo", {}))
+	if _summons() != null:
+		_summons().da_salvataggio(dati.get("evocazioni", []))
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D and dati.has("posizione"):
 		(p as Node2D).global_position = dati["posizione"]

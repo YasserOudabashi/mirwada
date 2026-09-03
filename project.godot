@@ -22,6 +22,7 @@ AbilityEngine="*res://scripts/ability_engine.gd"
 SaveSystem="*res://scripts/save_system.gd"
 GameState="*res://scripts/game_state.gd"
 WorldState="*res://scripts/world_state.gd"
+SummonRegistry="*res://scripts/summon_registry.gd"
 AudioManager="*res://scripts/audio_manager.gd"
 
 [display]

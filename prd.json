@@ -161,8 +161,8 @@
       ],
       "priority": 8,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Autoload SummonRegistry (scripts/summon_registry.gd), dopo WorldState. _summons: Array di {id univoco 'sum_N', tipo (=entita_id), comportamento, posizione:[x,y], hp}. evoca()/evocazioni()/conta()/rimuovi()/pulisci(). per_salvataggio/da_salvataggio non fidato: un'evocazione senza 'tipo' valido (fonte persa) NON viene ricreata, push_warning, nessun crash; raw non-lista -> []. ability_engine._p_summon: durata < 0 -> per quantita volte reg.evoca(entita_id, comportamento, posizione del caster, hp 10 placeholder) - PERSISTENTI, nel registro centrale, MAI figlie della scena; durata > 0 -> _pending {kind:summon_temp} ancorata al caster che scade; entita_id vuoto -> applied:false. Lo slot 'evocazioni' del save esiste gia' da US-015 (schema v2): GameState.snapshot/applica ora lo riempiono da SummonRegistry invece di []. Nessun bump di schema_version. Lo spawn del Node vero e' fase 6 (non ci sono scene di entita'): 'ricreare' al load = ripopolare il registro (documentato). validate_data.py: summon esige entita_id non vuoto e durata != 0. 6 test in test_summon.gd (165 totali): registro, persistente nel registro e non in scena, temporanea scade, round-trip del save, fonte persa non ricreata, execute(death_legione) compone summon+aura (8 legionari). validator 0, nessuna regressione."
     },
     {
       "id": "US-206",

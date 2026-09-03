@@ -1521,3 +1521,33 @@ sezione test aggiornata.
   non ha restrizioni, il prestito muore col caster). validator exit 0,
   nessuna regressione.
 - Prossima storia: US-205 (evocazioni persistenti serializzate).
+
+[2026-09-03] US-205 — Evocazioni persistenti serializzate
+
+- Cosa fatto:
+  - Autoload SummonRegistry (scripts/summon_registry.gd), dopo WorldState.
+    _summons: Array di {id "sum_N", tipo (= entita_id), comportamento,
+    posizione:[x,y], hp}. evoca() restituisce l'id univoco; evocazioni(),
+    conta(), rimuovi(id), pulisci(). per_salvataggio/da_salvataggio non
+    fidato: un'evocazione senza 'tipo' valido (FONTE PERSA) non viene
+    ricreata -> push_warning, nessun crash; raw non-lista -> [].
+  - ability_engine._p_summon:
+    * durata < 0 -> per "quantita" volte reg.evoca(entita_id, comportamento,
+      posizione del caster, hp 10 placeholder). PERSISTENTI: stanno nel
+      registro centrale, MAI figlie della scena di combattimento.
+    * durata > 0 -> _pending {kind:"summon_temp"} ancorata al caster, che
+      scade. entita_id vuoto -> applied:false.
+  - Lo slot "evocazioni" del save esiste GIA' da US-015 (schema v2):
+    GameState.snapshot()/applica() ora lo riempiono da SummonRegistry
+    invece di []. Nessun bump di schema_version necessario.
+  - Non ci sono ancora scene di entita' (fase 6): "ricreare" un'evocazione
+    al load significa ripopolare il registro. Lo spawn del Node vero lo
+    fara' il sistema del mondo/combat leggendo evocazioni().
+  - validate_data.py: summon esige entita_id non vuoto e durata != 0
+    (-1 persistente o > 0 temporanea).
+- Come verificato: 165 test headless (159 + 6 in test_summon.gd: registro,
+  persistente nel registro e NON in scena (caster senza figli extra),
+  temporanea che scade, round-trip del save, fonte persa non ricreata,
+  execute(death_legione) compone summon + aura -> 8 legionari persistenti).
+  validator exit 0. Nessuna regressione.
+- Prossima storia: US-206 (hook stored_ability_id nel motore).
