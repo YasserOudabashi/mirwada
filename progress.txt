@@ -1313,3 +1313,38 @@ sezione test aggiornata.
 - Aperto: riflessione dello scudo e filtro per tag; il tick delle aure
   (serve un sistema di status); la query d'area di decay/aura.
 - Prossima storia: US-203 (debuff_stat, light_purify, transform, terrain_modify).
+
+[2026-09-03] US-203 spezzata in 2a/2b/2c; US-203 (2a) — debuff_stat, light_purify
+
+- DECISIONE: US-203 come scritta era 4 primitive + un file dati nuovo
+  (forms.json per transform) + un autoload di stato del mondo + una
+  migrazione del save: troppo per una iterazione. Spezzata nel prd.json
+  come US-021 a suo tempo:
+  * US-203 (2a, QUESTA) = debuff_stat + light_purify. Zero dati nuovi,
+    zero modifiche al save.
+  * US-203B (2b) = transform + data/forms.json + schema + get_form.
+  * US-203C (2c) = terrain_modify + WorldState + save schema_version su.
+  Le priorita' delle story successive sono scalate di 2 (US-228 4->6 ecc.).
+  Totale story di fase 2: 29 -> 31.
+
+- Cosa fatto (2a):
+  - _p_buff_stat e _p_debuff_stat ora chiamano _mod_stat(prim, stats,
+    ability_id, tipo, debuff) condiviso. Il segno viene DAL DATO (valore
+    gia' negativo nei JSON), non forzato nel codice. id del modificatore:
+    "<abilita>:<stat>" per il buff, "<abilita>:debuff:<stat>" per il
+    debuff, cosi' un'abilita' che fa entrambi sulla stessa stat non si
+    sovrascrive. L'entry _pending del debuff porta "debuff": true.
+  - _p_light_purify filtra _pending: toglie le entry kind dot/decay e le
+    expire con "debuff": true sullo stesso stats, fino a "potenza"; per i
+    debuff chiama remove_modifier cosi' la stat torna su. "per tag" del
+    PRD non ha un parametro nel registro (params: raggio, potenza,
+    riduce_sequenza) -> la purifica va per NUMERO. raggio e
+    riduce_sequenza sono registrati nell'effect dict; la purifica d'area
+    su piu' entita' arriva con l'integrazione combat.
+- Come verificato: 135 test headless (128 + 7 in test_primitive_tg2.gd:
+  registro, debuff moltiplicativo + scadenza, buff e debuff coesistono,
+  light_purify toglie un dot / ripristina una stat / e' limitato dalla
+  potenza, execute(tg_crepuscolo) compone decay+debuff senza warning).
+  validator exit 0. Nessuna regressione.
+- Primitive implementate: 9 -> 11 su 28.
+- Prossima storia: US-203B (transform + data/forms.json).

@@ -49,20 +49,59 @@
     },
     {
       "id": "US-203",
-      "title": "Primitive del Twilight Giant - parte 2 (debuff_stat, light_purify, transform, terrain_modify)",
-      "description": "Come sviluppatore, voglio implementare le primitive di alterazione e di terreno del Twilight Giant.",
+      "title": "Primitive del Twilight Giant - parte 2a (debuff_stat, light_purify)",
+      "description": "Come sviluppatore, voglio le primitive di alterazione delle statistiche e di purifica del Twilight Giant.",
       "acceptanceCriteria": [
-        "debuff_stat (speculare a buff_stat di US-013, modificatori per id), light_purify (rimuove effetti per tag), transform (cambio di stato con stat_modifiers temporanei e trade-off, id modificatore 'transform:<ability_id>'), terrain_modify",
-        "terrain_modify con permanente: true scrive nello stato del mondo del save (varco aperto per sempre, design-world.md cap. 4); con permanente: false e' temporaneo",
-        "transform e' reversibile e si annulla alla scadenza o su richiesta",
-        "Con queste, il conteggio delle primitive implementate arriva a ~13-15/28",
-        "Test headless per ognuna, incluso il trade-off di transform e la persistenza di terrain_modify",
+        "debuff_stat speculare a buff_stat di US-013 (modificatori per id, moltiplicativo supportato); id separato '<abilita>:debuff:<stat>' cosi' buff e debuff sulla stessa stat coesistono",
+        "light_purify (params registro: raggio, potenza, riduce_sequenza) rimuove fino a potenza effetti negativi a tempo (dot, decay, debuff_stat) dal bersaglio; raggio e riduce_sequenza registrati",
+        "Nessuna primitiva fuori dal registro; parametri non nel registro -> errore del motore (US-022)",
+        "Test headless per ognuna, incluso il limite di potenza e il ripristino di una stat debuffata",
         "python tools/validate_data.py esce 0",
         "Nessuna regressione sui test esistenti",
         "Typecheck passes",
         "Tests pass"
       ],
       "priority": 3,
+      "fase": 2,
+      "passes": true,
+      "notes": "US-203 spezzata in 2a/2b/2c per la regola 'una story una iterazione' (precedente: US-021 a/b). Questa e' la meta' che non tocca ne' dati nuovi ne' il save. ability_engine.gd: _p_buff_stat e _p_debuff_stat ora chiamano _mod_stat condiviso (segno dal dato, non forzato; l'entry pending e' marcata debuff). _p_light_purify filtra _pending: rimuove kind dot/decay e le expire con debuff:true sullo stesso stats, fino a potenza, chiamando remove_modifier per i debuff. 'per tag' del PRD non ha un parametro nel registro -> purifica per numero. raggio/riduce_sequenza registrati, purifica d'area rimandata all'integrazione combat. 7 test in test_primitive_tg2.gd (135 totali), execute(tg_crepuscolo) compone decay+debuff_stat senza warning. validator 0. Primitive: 9 -> 11 su 28."
+    },
+    {
+      "id": "US-203B",
+      "title": "Primitive del Twilight Giant - parte 2b (transform + data/forms.json)",
+      "description": "Come sviluppatore, voglio la primitiva transform, che cambia forma al personaggio applicando i modificatori di una forma definita nei dati.",
+      "acceptanceCriteria": [
+        "data/forms.json + data/schema/forms.schema.json: ogni forma_id (tg_forma_gigante, tg_arma_luce, gia' referenziate da twilight_giant.json) con name_i18n e stat_modifiers (trade-off espliciti nei dati)",
+        "GameData carica forms.json; get_form(forma_id)",
+        "transform (params registro: forma_id, durata, costo_al_secondo) applica gli stat_modifiers della forma come modificatore per id 'transform:<ability_id>' (riusa i modificatori di US-007)",
+        "transform e' reversibile: si annulla alla scadenza (durata), su richiesta (annulla_transform), o quando costo_al_secondo esaurisce la spiritualita'",
+        "Il validator: ogni forma_id referenziato da un'abilita' esiste in forms.json; stat_modifiers su stat note",
+        "Test headless: applicazione degli stat_modifiers, annullamento su scadenza/richiesta, drenaggio di spiritualita'",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 4,
+      "fase": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-203C",
+      "title": "Primitive del Twilight Giant - parte 2c (terrain_modify + stato del mondo nel save)",
+      "description": "Come sviluppatore, voglio la primitiva terrain_modify, che con permanente:true incide una modifica del terreno nello stato del mondo persistente.",
+      "acceptanceCriteria": [
+        "Autoload WorldState (o estensione di GameState) con una lista terrain_mods {tipo_modifica, posizione, raggio}",
+        "terrain_modify (params registro: tipo_modifica, raggio, durata, permanente) con permanente:true registra la modifica in WorldState (varco aperto per sempre, design-world.md cap. 4); con permanente:false e' un effetto temporaneo sulla coda _pending",
+        "save schema_version incrementato; campo 'mondo' {terrain_mods} serializzato e riletto con typeof() + default; catena di migrazione dalla versione precedente",
+        "Test headless: permanente scrive in WorldState e sopravvive al round-trip del save; temporaneo scade; migrazione",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 5,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -82,7 +121,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 4,
+      "priority": 6,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -101,7 +140,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 5,
+      "priority": 7,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -120,7 +159,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 6,
+      "priority": 8,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -138,7 +177,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 7,
+      "priority": 9,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -158,7 +197,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 8,
+      "priority": 10,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -179,7 +218,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 9,
+      "priority": 11,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -200,7 +239,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 10,
+      "priority": 12,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -221,7 +260,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 11,
+      "priority": 13,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -240,7 +279,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 12,
+      "priority": 14,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -261,7 +300,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 13,
+      "priority": 15,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -282,7 +321,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 14,
+      "priority": 16,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -305,7 +344,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 15,
+      "priority": 17,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -325,7 +364,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 16,
+      "priority": 18,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -346,7 +385,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 17,
+      "priority": 19,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -368,7 +407,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 18,
+      "priority": 20,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -389,7 +428,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 19,
+      "priority": 21,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -409,7 +448,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 20,
+      "priority": 22,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -430,7 +469,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 21,
+      "priority": 23,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -451,7 +490,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 22,
+      "priority": 24,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -471,7 +510,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 23,
+      "priority": 25,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -492,7 +531,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 24,
+      "priority": 26,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -512,7 +551,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 25,
+      "priority": 27,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -532,7 +571,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 26,
+      "priority": 28,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -553,7 +592,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 27,
+      "priority": 29,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -575,7 +614,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 28,
+      "priority": 30,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -594,7 +633,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 29,
+      "priority": 31,
       "fase": 2,
       "passes": false,
       "notes": ""

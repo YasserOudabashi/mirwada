@@ -46,6 +46,8 @@ func _ready() -> void:
 		"aura": _p_aura,
 		"dot": _p_dot,
 		"decay": _p_decay,
+		"debuff_stat": _p_debuff_stat,
+		"light_purify": _p_light_purify,
 	}
 
 
@@ -206,6 +208,19 @@ static func _flag(v: Variant, fallback: bool) -> bool:
 	return v if typeof(v) == TYPE_BOOL else fallback
 
 func _p_buff_stat(prim: Dictionary, _caster: Node, stats: Node, ability_id: String) -> Dictionary:
+	return _mod_stat(prim, stats, ability_id, "buff_stat", false)
+
+
+## debuff_stat: speculare a buff_stat (US-013). Stesso motore di modificatori
+## per id; il valore dei dati e' gia' negativo, non lo si forza qui. id
+## separato ("<abilita>:debuff:<stat>") cosi' un'abilita' che buffa e debuffa
+## la stessa stat non si sovrascrive; l'effetto e' marcato debuff cosi'
+## light_purify lo riconosce.
+func _p_debuff_stat(prim: Dictionary, _caster: Node, stats: Node, ability_id: String) -> Dictionary:
+	return _mod_stat(prim, stats, ability_id, "debuff_stat", true)
+
+
+func _mod_stat(prim: Dictionary, stats: Node, ability_id: String, tipo: String, debuff: bool) -> Dictionary:
 	var stat: String = str(prim.get("stat", ""))
 	var valore: float = _num(prim.get("valore"), 0.0)
 	var durata: float = _num(prim.get("durata"), 0.0)
@@ -218,16 +233,46 @@ func _p_buff_stat(prim: Dictionary, _caster: Node, stats: Node, ability_id: Stri
 		delta = float(stats.call("get_base", stat)) * valore
 
 	# id derivato da abilita' + stat: riapplicare rinfresca invece di impilare.
-	var mod_id: String = "%s:%s" % [ability_id, stat]
+	var mod_id: String = "%s:debuff:%s" % [ability_id, stat] if debuff else "%s:%s" % [ability_id, stat]
 	stats.call("apply_modifier", mod_id, {stat: delta})
 
 	if durata > 0.0:
 		_pending.append({
 			"kind": "expire", "stats": stats, "mod_id": mod_id, "left": durata,
+			"debuff": debuff,
 		})
 
-	return {"tipo": "buff_stat", "stat": stat, "delta": delta,
-			"durata": durata, "modifier_id": mod_id}
+	return {"tipo": tipo, "stat": stat, "delta": delta,
+			"durata": durata, "modifier_id": mod_id, "debuff": debuff}
+
+
+## light_purify: toglie gli effetti negativi a tempo (dot, decay, debuff_stat)
+## dal bersaglio, fino a "potenza" effetti. "per tag" del PRD non ha un
+## parametro nel registro (params: raggio, potenza, riduce_sequenza): la
+## purifica va per numero, non per tag. raggio e riduce_sequenza sono
+## registrati; la purifica d'area su piu' entita' arriva con l'integrazione
+## combat.
+func _p_light_purify(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+	var raggio: float = _num(prim.get("raggio"), 0.0)
+	var potenza: int = int(_num(prim.get("potenza"), 1.0))
+	var riduce_sequenza: bool = _flag(prim.get("riduce_sequenza"), false)
+
+	var rimossi: int = 0
+	var superstiti: Array = []
+	for entry in _pending:
+		var e: Dictionary = entry
+		var negativo: bool = str(e["kind"]) in ["dot", "decay"] or e.get("debuff", false)
+		var mio: bool = e.get("stats", null) == stats
+		if negativo and mio and rimossi < potenza:
+			if str(e["kind"]) == "expire":
+				stats.call("remove_modifier", str(e["mod_id"]))
+			rimossi += 1
+			continue
+		superstiti.append(e)
+	_pending = superstiti
+
+	return {"tipo": "light_purify", "raggio": raggio, "potenza": potenza,
+			"riduce_sequenza": riduce_sequenza, "rimossi": rimossi}
 
 
 func _p_heal(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
