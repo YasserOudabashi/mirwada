@@ -2599,3 +2599,25 @@ sezione test aggiornata.
   generate_i18n_stubs.py --check 0. Nessuna verifica a schermo: story di
   dati + loader.
 - Prossima storia: US-302 (autoload Inventory).
+
+[2026-09-03] US-302 — Autoload Inventory
+
+- Autoload Inventory (scripts/inventory.gd), dopo CharacteristicStore.
+  * impilabile:true -> contatore in _stack; impilabile:false -> istanze
+    distinte in _istanze con instance_id univoco ("inv_N", _next_iid).
+  * aggiungi/rimuovi/conta/possiede/per_categoria(cat)/tutto();
+    rimuovi_istanza(instance_id) e restituisci_istanza() per l'equip (US-303);
+    ricchezza() (US-305, spostato qui). item ignoto -> warn, non aggiunto.
+  * Segnali item_aggiunto(item_id, quantita), item_rimosso(...).
+  * Nessun cap spaziale ne' peso.
+- SAVE: VERSIONE_CORRENTE 12 -> 13. Campo "inventario" {stack, istanze,
+  next_iid}, _migra_12_a_13 (personaggio pregresso a mani vuote).
+  GameState.snapshot/applica agganciano Inventory. da_salvataggio non fidato:
+  stack con item_id che non risolve o quantita' <= 0 scartati, istanze senza
+  instance_id/item_id valido scartate, raw non-oggetto -> vuoto.
+- Come verificato: 332 test headless (325 + 7 in test_inventory.gd: stack
+  aggiungi/conta/rimuovi + rimozione oltre il posseduto -> false, non-stack
+  = istanze distinte con instance_id + rimuovi_istanza, item ignoto non
+  esplode, segnali, ricchezza (30*1 + 2*50 = 130), round-trip via GameState,
+  da_salvataggio non fidato). validator 0, catena migrazione 1->13 verde.
+- Prossima storia: US-303 (equipaggiamento a slot).

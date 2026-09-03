@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 12
+const VERSIONE_CORRENTE := 13
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -282,6 +282,13 @@ func _migra_11_a_12(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v12 -> v13: l'inventario (US-302). Un personaggio pregresso parte a mani vuote.
+func _migra_12_a_13(doc: Dictionary) -> Dictionary:
+	if not doc.has("inventario"):
+		doc["inventario"] = {"stack": {}, "istanze": [], "next_iid": 1}
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -303,6 +310,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"ancore": _campo(raw, "ancore", TYPE_ARRAY, []),
 		"rituale": _campo(raw, "rituale", TYPE_DICTIONARY, {}),
 		"conoscenza": _campo(raw, "conoscenza", TYPE_ARRAY, []),
+		"inventario": _campo(raw, "inventario", TYPE_DICTIONARY, {}),
 	}
 
 

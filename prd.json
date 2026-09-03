@@ -42,8 +42,8 @@
       ],
       "priority": 2,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Autoload Inventory (scripts/inventory.gd) dopo CharacteristicStore. impilabile:true -> contatore _stack; impilabile:false -> istanze distinte _istanze con instance_id (inv_N). aggiungi/rimuovi/conta/possiede/per_categoria/tutto; rimuovi_istanza/restituisci_istanza per l equip (US-303); ricchezza() (US-305 spostato qui). item ignoto -> warn non aggiunge. Segnali item_aggiunto/item_rimosso. Nessun cap/peso. SAVE 12->13 campo inventario {stack, istanze, next_iid}, _migra_12_a_13, GameState snapshot/applica. da_salvataggio non fidato (item_id che non risolve o quantita<=0 scartati, raw non-oggetto -> vuoto). 332 test headless (325+7 test_inventory.gd), validator 0, catena migrazione 1->13 verde."
     },
     {
       "id": "US-303",
