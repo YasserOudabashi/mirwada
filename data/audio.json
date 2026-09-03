@@ -1,76 +1,246 @@
 {
   "schema_version": 1,
   "_comment": "Mappatura audio data-driven. Come le abilita': il codice implementa i BUS e i TRIGGER, i dati decidono cosa suona. Cambiare un suono o un livello non richiede ricompilare. I file audio veri non sono qui: questo file mappa id logici a percorsi, i percorsi si riempiono quando gli asset arrivano.",
-
   "buses": {
-    "master":   { "volume_db": 0 },
-    "music":    { "volume_db": -6,  "parent": "master" },
-    "sfx":      { "volume_db": -3,  "parent": "master" },
-    "ambience": { "volume_db": -12, "parent": "master" },
-    "ui":       { "volume_db": -6,  "parent": "master" },
-    "whisper":  { "volume_db": -30, "parent": "master",
-                  "_comment": "Bus della follia. Il volume NON e' fisso: viene guidato da madness (vedi madness_layer). Bus separato cosi' l'opzione di accessibilita' lo silenzia senza toccare il resto." }
+    "master": {
+      "volume_db": 0
+    },
+    "music": {
+      "volume_db": -6,
+      "parent": "master"
+    },
+    "sfx": {
+      "volume_db": -3,
+      "parent": "master"
+    },
+    "ambience": {
+      "volume_db": -12,
+      "parent": "master"
+    },
+    "ui": {
+      "volume_db": -6,
+      "parent": "master"
+    },
+    "whisper": {
+      "volume_db": -30,
+      "parent": "master",
+      "_comment": "Bus della follia. Il volume NON e' fisso: viene guidato da madness (vedi madness_layer). Bus separato cosi' l'opzione di accessibilita' lo silenzia senza toccare il resto."
+    }
   },
-
   "combat_feedback": {
     "_comment": "Il feedback di colpo e' meta' del feel di un action 2D. Ogni voce ha hitstop in millisecondi e shake, perche' audio, hitstop e shake vanno tarati INSIEME: separarli e' l'errore classico.",
-    "hit_light":    { "sfx": "sfx_hit_light",   "hitstop_ms": 40,  "shake": 0.2, "pitch_var": 0.1 },
-    "hit_heavy":    { "sfx": "sfx_hit_heavy",   "hitstop_ms": 90,  "shake": 0.5, "pitch_var": 0.08 },
-    "hit_critical": { "sfx": "sfx_hit_crit",    "hitstop_ms": 140, "shake": 0.8, "pitch_var": 0.05 },
-    "parry_normal": { "sfx": "sfx_parry",       "hitstop_ms": 60,  "shake": 0.3, "pitch_var": 0.1 },
-    "parry_perfect":{ "sfx": "sfx_parry_perf",  "hitstop_ms": 160, "shake": 0.6, "pitch_var": 0.0,
-                      "_comment": "Hitstop lungo e pitch fisso: la parata perfetta deve SUONARE diversa, non solo valere di piu'. E' la ricompensa piu' importante del combat." },
-    "posture_break":{ "sfx": "sfx_posture_break","hitstop_ms": 200, "shake": 1.0, "pitch_var": 0.0 },
-    "dash":         { "sfx": "sfx_dash",        "hitstop_ms": 0,   "shake": 0.0, "pitch_var": 0.15 },
-    "damage_taken": { "sfx": "sfx_hurt",        "hitstop_ms": 70,  "shake": 0.4, "pitch_var": 0.1 },
-    "death_player": { "sfx": "sfx_death",       "hitstop_ms": 400, "shake": 1.2, "pitch_var": 0.0 }
+    "hit_light": {
+      "sfx": "sfx_hit_light",
+      "hitstop_ms": 40,
+      "shake": 0.2,
+      "pitch_var": 0.1
+    },
+    "hit_heavy": {
+      "sfx": "sfx_hit_heavy",
+      "hitstop_ms": 90,
+      "shake": 0.5,
+      "pitch_var": 0.08
+    },
+    "hit_critical": {
+      "sfx": "sfx_hit_crit",
+      "hitstop_ms": 140,
+      "shake": 0.8,
+      "pitch_var": 0.05
+    },
+    "parry_normal": {
+      "sfx": "sfx_parry",
+      "hitstop_ms": 60,
+      "shake": 0.3,
+      "pitch_var": 0.1
+    },
+    "parry_perfect": {
+      "sfx": "sfx_parry_perf",
+      "hitstop_ms": 160,
+      "shake": 0.6,
+      "pitch_var": 0.0,
+      "_comment": "Hitstop lungo e pitch fisso: la parata perfetta deve SUONARE diversa, non solo valere di piu'. E' la ricompensa piu' importante del combat."
+    },
+    "posture_break": {
+      "sfx": "sfx_posture_break",
+      "hitstop_ms": 200,
+      "shake": 1.0,
+      "pitch_var": 0.0
+    },
+    "dash": {
+      "sfx": "sfx_dash",
+      "hitstop_ms": 0,
+      "shake": 0.0,
+      "pitch_var": 0.15
+    },
+    "damage_taken": {
+      "sfx": "sfx_hurt",
+      "hitstop_ms": 70,
+      "shake": 0.4,
+      "pitch_var": 0.1
+    },
+    "death_player": {
+      "sfx": "sfx_death",
+      "hitstop_ms": 400,
+      "shake": 1.2,
+      "pitch_var": 0.0
+    }
   },
-
   "telegraph": {
     "_comment": "TELL SONORO degli attacchi nemici. Suona all'inizio della fase di anticipo, prima dell'impatto. Deve essere riconoscibile a occhi chiusi e distinto per categoria: e' cosi' che il giocatore reagisce a un nemico fuori schermo. Requisito di leggibilita', non di atmosfera.",
-    "wind_up_light":  { "sfx": "sfx_tell_light",  "anticipo_ms": 300, "categoria": "schivabile" },
-    "wind_up_heavy":  { "sfx": "sfx_tell_heavy",  "anticipo_ms": 700, "categoria": "parabile" },
-    "wind_up_unblockable": { "sfx": "sfx_tell_unblock", "anticipo_ms": 900, "categoria": "solo_schivata",
-                      "_comment": "Timbro deliberatamente sgradevole e unico. Il giocatore deve imparare questo suono in un solo incontro." },
-    "wind_up_ranged": { "sfx": "sfx_tell_ranged", "anticipo_ms": 500, "categoria": "coprirsi" },
-    "wind_up_ritual": { "sfx": "sfx_tell_ritual", "anticipo_ms": 2500, "categoria": "interrompere" }
+    "wind_up_light": {
+      "sfx": "sfx_tell_light",
+      "anticipo_ms": 300,
+      "categoria": "schivabile"
+    },
+    "wind_up_heavy": {
+      "sfx": "sfx_tell_heavy",
+      "anticipo_ms": 700,
+      "categoria": "parabile"
+    },
+    "wind_up_unblockable": {
+      "sfx": "sfx_tell_unblock",
+      "anticipo_ms": 900,
+      "categoria": "solo_schivata",
+      "_comment": "Timbro deliberatamente sgradevole e unico. Il giocatore deve imparare questo suono in un solo incontro."
+    },
+    "wind_up_ranged": {
+      "sfx": "sfx_tell_ranged",
+      "anticipo_ms": 500,
+      "categoria": "coprirsi"
+    },
+    "wind_up_ritual": {
+      "sfx": "sfx_tell_ritual",
+      "anticipo_ms": 2500,
+      "categoria": "interrompere"
+    }
   },
-
   "madness_layer": {
     "_comment": "La follia si sente prima di vedersi. Curva legata alle soglie di data/balance.json. L'opzione di accessibilita' 'disattiva effetti percettivi' silenzia il bus whisper senza toccare la meccanica: la follia continua a salire e a fare danno, semplicemente non ti si insinua nelle orecchie.",
     "soglie": [
-      { "madness_min": 10, "loop": "amb_whisper_faint",  "volume_db": -32, "_comment": "Appena percettibile. Il giocatore non e' sicuro di aver sentito qualcosa." },
-      { "madness_min": 30, "loop": "amb_whisper_words",  "volume_db": -24, "detune": 0.02 },
-      { "madness_min": 55, "loop": "amb_whisper_names",  "volume_db": -18, "detune": 0.05,
-        "_comment": "I sussurri usano i nomi degli NPC che il giocatore ha incontrato e delle sue Ancore. Aggancio diretto al sistema di Ancore: la follia minaccia esattamente cio' che ti tiene umano." },
-      { "madness_min": 80, "loop": "amb_whisper_chorus", "volume_db": -10, "detune": 0.12, "duck_music_db": -20,
-        "_comment": "A questo punto i sussurri coprono la musica. Il duck e' voluto: il mondo si allontana." }
+      {
+        "madness_min": 10,
+        "loop": "amb_whisper_faint",
+        "volume_db": -32,
+        "_comment": "Appena percettibile. Il giocatore non e' sicuro di aver sentito qualcosa."
+      },
+      {
+        "madness_min": 30,
+        "loop": "amb_whisper_words",
+        "volume_db": -24,
+        "detune": 0.02
+      },
+      {
+        "madness_min": 55,
+        "loop": "amb_whisper_names",
+        "volume_db": -18,
+        "detune": 0.05,
+        "_comment": "I sussurri usano i nomi degli NPC che il giocatore ha incontrato e delle sue Ancore. Aggancio diretto al sistema di Ancore: la follia minaccia esattamente cio' che ti tiene umano."
+      },
+      {
+        "madness_min": 80,
+        "loop": "amb_whisper_chorus",
+        "volume_db": -10,
+        "detune": 0.12,
+        "duck_music_db": -20,
+        "_comment": "A questo punto i sussurri coprono la musica. Il duck e' voluto: il mondo si allontana."
+      }
     ],
     "one_shot_casuali": {
       "madness_min": 25,
-      "intervallo_secondi": [45, 180],
-      "sfx": ["sfx_whisper_name", "sfx_step_behind", "sfx_door_close", "sfx_breath"],
+      "intervallo_secondi": [
+        45,
+        180
+      ],
+      "sfx": [
+        "sfx_whisper_name",
+        "sfx_step_behind",
+        "sfx_door_close",
+        "sfx_breath"
+      ],
       "_comment": "Suoni singoli senza causa visibile. Il giocatore si gira e non c'e' niente. Frequenza crescente con la follia."
     }
   },
-
   "sequence_perception": {
     "_comment": "Salendo di Sequenza SENTI cose che prima non c'erano. E' un canale informativo che si potenzia con la coltivazione, non solo atmosfera: a Sequenza alta senti i nemici attraverso i muri e i segreti nelle stanze adiacenti.",
-    "9": { "layers": [] },
-    "7": { "layers": ["amb_spirit_faint"], "reveal": ["spiriti_vicini"] },
-    "5": { "layers": ["amb_spirit_faint", "amb_ley_hum"], "reveal": ["spiriti_vicini", "densita_mistica"] },
-    "3": { "layers": ["amb_spirit_faint", "amb_ley_hum", "amb_outer_drone"], "reveal": ["spiriti_vicini", "densita_mistica", "segreti_adiacenti"] },
-    "1": { "layers": ["amb_spirit_faint", "amb_ley_hum", "amb_outer_drone", "amb_beyond"], "reveal": ["spiriti_vicini", "densita_mistica", "segreti_adiacenti", "preghiere_dei_seguaci"] }
+    "9": {
+      "layers": []
+    },
+    "7": {
+      "layers": [
+        "amb_spirit_faint"
+      ],
+      "reveal": [
+        "spiriti_vicini"
+      ]
+    },
+    "5": {
+      "layers": [
+        "amb_spirit_faint",
+        "amb_ley_hum"
+      ],
+      "reveal": [
+        "spiriti_vicini",
+        "densita_mistica"
+      ]
+    },
+    "3": {
+      "layers": [
+        "amb_spirit_faint",
+        "amb_ley_hum",
+        "amb_outer_drone"
+      ],
+      "reveal": [
+        "spiriti_vicini",
+        "densita_mistica",
+        "segreti_adiacenti"
+      ]
+    },
+    "1": {
+      "layers": [
+        "amb_spirit_faint",
+        "amb_ley_hum",
+        "amb_outer_drone",
+        "amb_beyond"
+      ],
+      "reveal": [
+        "spiriti_vicini",
+        "densita_mistica",
+        "segreti_adiacenti",
+        "preghiere_dei_seguaci"
+      ]
+    }
   },
-
   "music": {
     "_comment": "Musica a LAYER, non tracce separate. Ogni zona ha uno stem di base sempre attivo e stem aggiuntivi che entrano in base allo stato. Cosi' il passaggio esplorazione->combattimento non e' un taglio brusco e servono meno minuti di musica composta.",
-    "stati": ["esplorazione", "tensione", "combattimento", "boss", "rituale", "base"],
+    "stati": [
+      "esplorazione",
+      "tensione",
+      "combattimento",
+      "boss",
+      "rituale",
+      "base"
+    ],
     "crossfade_ms": 1200,
     "zone": {
-      "citta": { "base": "mus_citta_base", "stems": { "tensione": "mus_citta_tension", "combattimento": "mus_citta_combat" } },
-      "base_giocatore": { "base": "mus_base_calma", "stems": {} },
-      "dungeon": { "base": "mus_dungeon_base", "stems": { "tensione": "mus_dungeon_tension", "combattimento": "mus_dungeon_combat", "boss": "mus_dungeon_boss" } }
+      "citta": {
+        "base": "mus_citta_base",
+        "stems": {
+          "tensione": "mus_citta_tension",
+          "combattimento": "mus_citta_combat"
+        }
+      },
+      "base_giocatore": {
+        "base": "mus_base_calma",
+        "stems": {}
+      },
+      "dungeon": {
+        "base": "mus_dungeon_base",
+        "stems": {
+          "tensione": "mus_dungeon_tension",
+          "combattimento": "mus_dungeon_combat",
+          "boss": "mus_dungeon_boss"
+        }
+      }
     },
     "rituale": {
       "_comment": "Durante un rituale di avanzamento la musica si riduce a un drone che sale. Se il rituale viene interrotto, taglio SECCO al silenzio prima dell'effetto di perdita di controllo. Il silenzio improvviso e' il momento piu' spaventoso che il gioco puo' produrre, e non costa niente.",
@@ -79,21 +249,59 @@
       "su_interruzione": "silenzio_secco"
     }
   },
-
   "pathway_palette": {
     "_comment": "Identita' timbrica per Pathway. Le abilita' pescano da qui invece di avere un sfx dedicato ciascuna: 10 palette invece di 200 suoni. E' lo stesso principio delle primitive applicato all'audio.",
-    "twilight_giant": { "materiale": "metallo_luce", "riverbero": "cattedrale", "registro": "basso" },
-    "death":          { "materiale": "ossa_vento",   "riverbero": "cripta",     "registro": "medio_basso" },
-    "darkness":       { "materiale": "feltro_soffio","riverbero": "nessuno",    "registro": "acuto_sottile" },
-    "fool":           { "materiale": "carta_corda",  "riverbero": "teatro",     "registro": "medio" },
-    "error":          { "materiale": "vetro_scatto", "riverbero": "vicolo",     "registro": "acuto" },
-    "door":           { "materiale": "aria_risucchio","riverbero": "grande_vuoto","registro": "medio" },
-    "hermit":         { "materiale": "pergamena_cristallo","riverbero": "studio","registro": "medio_acuto" },
-    "paragon":        { "materiale": "ottone_ingranaggio","riverbero": "officina","registro": "medio" },
-    "mother":         { "materiale": "legno_linfa",  "riverbero": "bosco",      "registro": "basso_caldo" },
-    "moon":           { "materiale": "acqua_pelo",   "riverbero": "grotta",     "registro": "medio_grave" }
+    "twilight_giant": {
+      "materiale": "metallo_luce",
+      "riverbero": "cattedrale",
+      "registro": "basso"
+    },
+    "death": {
+      "materiale": "ossa_vento",
+      "riverbero": "cripta",
+      "registro": "medio_basso"
+    },
+    "darkness": {
+      "materiale": "feltro_soffio",
+      "riverbero": "nessuno",
+      "registro": "acuto_sottile"
+    },
+    "fool": {
+      "materiale": "carta_corda",
+      "riverbero": "teatro",
+      "registro": "medio"
+    },
+    "error": {
+      "materiale": "vetro_scatto",
+      "riverbero": "vicolo",
+      "registro": "acuto"
+    },
+    "door": {
+      "materiale": "aria_risucchio",
+      "riverbero": "grande_vuoto",
+      "registro": "medio"
+    },
+    "hermit": {
+      "materiale": "pergamena_cristallo",
+      "riverbero": "studio",
+      "registro": "medio_acuto"
+    },
+    "paragon": {
+      "materiale": "ottone_ingranaggio",
+      "riverbero": "officina",
+      "registro": "medio"
+    },
+    "mother": {
+      "materiale": "legno_linfa",
+      "riverbero": "bosco",
+      "registro": "basso_caldo"
+    },
+    "moon": {
+      "materiale": "acqua_pelo",
+      "riverbero": "grotta",
+      "registro": "medio_grave"
+    }
   },
-
   "accessibilita": {
     "_comment": "Requisiti, non extra. Il gioco usa l'audio come canale informativo: chi non lo sente deve avere gli stessi dati.",
     "sottotitoli_effetti": true,
@@ -101,6 +309,8 @@
     "indicatore_direzione_suono": true,
     "disattiva_sussurri": false,
     "disattiva_shake": false,
-    "riduci_hitstop": false
+    "riduci_hitstop": false,
+    "riduci_flash": false,
+    "riduci_distorsione": false
   }
 }

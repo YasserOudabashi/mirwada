@@ -30,6 +30,18 @@
     "riduzione_max_ancore": 0.60,
     "decadimento_naturale_al_minuto": 0.0
   },
+  "madness_vfx": {
+    "_comment": "Parametri dell'overlay visivo della follia (US-215). Le SOGLIE stanno in 'madness'. Con riduci_flash tutto diventa statico: la vignetta resta a intensita' piena per la soglia (FR-8: la follia resta leggibile) ma non respira, e distorsione/nero non lampeggiano piu'.",
+    "vignetta_alpha_max": 0.5,
+    "respiro_al_secondo": 0.35,
+    "respiro_ampiezza": 0.12,
+    "distorsione_intervallo_s": [3.0, 9.0],
+    "distorsione_durata_s": 0.12,
+    "nero_intervallo_s": [7.0, 18.0],
+    "nero_durata_s": 0.55,
+    "nero_alpha": 0.85,
+    "nero_alpha_statico": 0.3
+  },
   "foundation": {
     "_comment": "Qualita' della progressione 0-100. Avanzare in fretta la abbassa. Fondamenta basse = tetto di potenza piu' basso e follia piu' rapida. E' la meccanica che punisce chi corre.",
     "iniziale": 50,

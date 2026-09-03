@@ -408,8 +408,8 @@
       ],
       "priority": 20,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "scenes/madness_overlay.tscn (CanvasLayer layer 90, FUORI dal libro) + scripts/madness_overlay.gd + shaders/madness_vignette.gdshader. In main.tscn e debug_scene.tscn. Soglie da balance.json.madness (15/40/70), parametri da nuova sezione balance.json.madness_vfx (nessun numero nello script). Si aggancia a Madness.madness_changed. VIGNETTA (soglia 15): ColorRect a schermo intero con lo shader madness_vignette (scurisce i bordi d'inchiostro), intensita = vignetta_alpha_max * lerp(0.35,1, frazione di follia) + un respiro sinusoidale (respiro_al_secondo/ampiezza) SE non riduci_flash. DISTORSIONE (soglia 40): scatti brevi (distorsione_durata_s) a intervalli random (distorsione_intervallo_s), un ColorRect magenta a bassa alpha; disattivati da riduci_distorsione. NERO DI SCENA (soglia 70): si attiva DA SOLO a intervalli random (nero_intervallo_s), alpha nero_alpha per nero_durata_s; con riduci_flash diventa STATICO a nero_alpha_statico (0.3) - MAI assente (FR-8). audio.json.accessibilita: aggiunti riduci_flash e riduci_distorsione (default false), letti via AudioManager.accessibilita. E' lo specchio visivo del layer audio di US-214, stesso valore di follia: nessuna info vive solo qui o solo nell'audio. 5 test in test_madness_visual.gd (235 totali): vignetta solo sopra 15, cresce con la follia, nero solo sopra 70 (anche forzando), riduci_flash -> nero statico costante mai assente, distorsione visibile. VERIFICA A SCHERMO (finestra reale): a follia 20 bordi leggermente scuriti (intensita 0.22), a follia 80 col nero attivo lo schermo e' quasi tutto nero (0.85). validator 0, nessuna regressione."
     },
     {
       "id": "US-216",

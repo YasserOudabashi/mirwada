@@ -1938,3 +1938,31 @@ sezione test aggiornata.
   hitbox/tell/iframe/parata. La mappa e' un banco di prova a placeholder
   (test_zone.gd, 40x30 tile 32x32): il mondo disegnato e' fase 6.
 - Prossima storia: US-215 (Effetti visivi della follia).
+
+[2026-09-03] US-215 — Effetti visivi della follia
+
+- scenes/madness_overlay.tscn (CanvasLayer layer 90, FUORI dal libro) +
+  scripts/madness_overlay.gd + shaders/madness_vignette.gdshader. In
+  main.tscn e debug_scene.tscn. Si aggancia a Madness.madness_changed.
+  Soglie da balance.json.madness (15/40/70); parametri dalla nuova sezione
+  balance.json.madness_vfx (nessun numero nello script).
+  - VIGNETTA (soglia 15): ColorRect a schermo intero con lo shader
+    madness_vignette (scurisce i bordi). intensita cresce con la follia;
+    respiro sinusoidale SE non riduci_flash.
+  - DISTORSIONE (soglia 40): scatti brevi (ColorRect magenta) a intervalli
+    random; disattivati da riduci_distorsione.
+  - NERO DI SCENA (soglia 70): si attiva DA SOLO a intervalli random,
+    alpha nero_alpha per nero_durata_s. Con riduci_flash -> STATICO a
+    nero_alpha_statico 0.3, MAI assente (FR-8).
+  - audio.json.accessibilita: aggiunti riduci_flash e riduci_distorsione
+    (default false), letti via AudioManager.accessibilita.
+  - Specchio visivo del layer audio (US-214), stesso valore di follia:
+    nessuna info vive solo nel visivo o solo nell'audio (FR-7/8).
+- Come verificato: 235 test headless (230 + 5 in test_madness_visual.gd:
+  vignetta solo sopra 15, cresce con la follia, nero solo sopra 70,
+  riduci_flash -> nero statico costante mai assente, distorsione visibile).
+  validator 0.
+- VERIFICA A SCHERMO (finestra reale): a follia 20 i bordi sono
+  leggermente scuriti (intensita 0.22); a follia 80 col nero attivo lo
+  schermo e' quasi tutto nero (0.85), i blob appena visibili.
+- Prossima storia: US-216 (Ancore - riduzione della follia, distruttibilita').
