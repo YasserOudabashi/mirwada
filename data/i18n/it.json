@@ -193,5 +193,13 @@
   "sequence.twilight_giant.9": "Warrior",
   "synergy.anti_ordine_disordine": "TODO synergy.anti_ordine_disordine",
   "synergy.crescita_pozione": "TODO synergy.crescita_pozione",
-  "synergy.inganno_probabilita": "TODO synergy.inganno_probabilita"
+  "synergy.inganno_probabilita": "TODO synergy.inganno_probabilita",
+  "ui.page.colophon": "Colophon",
+  "ui.page.copertina": "Scaffale",
+  "ui.page.diagramma": "Diagramma dei Pathway",
+  "ui.page.frontespizio": "Frontespizio",
+  "ui.page.inventario": "Inventario",
+  "ui.page.journal": "Diario",
+  "ui.page.mappa": "Mappa",
+  "ui.page.sinergie": "Registro delle sinergie"
 }

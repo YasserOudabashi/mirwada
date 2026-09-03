@@ -41,6 +41,9 @@ func _init() -> void:
 				continue
 			total += 1
 			suite.failures = PackedStringArray()
+			# Un test che apre il libro (US-221) mette in pausa l'albero: non
+			# deve trascinarsi nei test successivi.
+			paused = false
 			# Setup comune opzionale: una suite che dichiara prepara() la fa
 			# eseguire prima di ogni suo test (stato pulito, US-025).
 			if suite.has_method("prepara"):

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "_comment": "La shell del libro (design-ui-libro.md cap. 4). Il codice implementa UN controller (scripts/book.gd) + un tipo di pagina per ogni voce del vocabolario chiuso data/schema/page_types.json. Aggiungere una schermata = aggiungere una voce a 'pages'. Le pagine si sbloccano per fase dal dato: 'sbloccata_da.fase' > gioco.fase in balance.json => la pagina esiste ma e' bianca (un appunto a matita), mai assente.",
+  "libro": {
+    "voltata_ms": 350,
+    "dissolvenza_ridotta_ms": 80,
+    "sfx_apri": "sfx_ui_book_open",
+    "sfx_volta": "sfx_ui_page",
+    "macchie_follia": true
+  },
+  "pages": [
+    { "id": "copertina",    "tipo": "menu_principale",       "name_i18n": "ui.page.copertina",    "ordine": 0 },
+    { "id": "frontespizio", "tipo": "creazione_personaggio", "name_i18n": "ui.page.frontespizio", "ordine": 1 },
+    { "id": "mappa",        "tipo": "mappa",                 "name_i18n": "ui.page.mappa",        "ordine": 2, "doppia_pagina": true, "sbloccata_da": { "fase": 6 } },
+    { "id": "diagramma",    "tipo": "diagramma_pathway",     "name_i18n": "ui.page.diagramma",    "ordine": 3, "fog_of_war": true },
+    { "id": "inventario",   "tipo": "inventario",            "name_i18n": "ui.page.inventario",   "ordine": 4, "sbloccata_da": { "fase": 3 } },
+    { "id": "sinergie",     "tipo": "registro_sinergie",     "name_i18n": "ui.page.sinergie",     "ordine": 5, "sbloccata_da": { "fase": 4 } },
+    { "id": "journal",      "tipo": "journal_quest",         "name_i18n": "ui.page.journal",      "ordine": 6, "sbloccata_da": { "fase": 6 } },
+    { "id": "colophon",     "tipo": "impostazioni",          "name_i18n": "ui.page.colophon",     "ordine": 99 }
+  ],
+  "segnalibri": ["mappa", "diagramma", "journal"]
+}

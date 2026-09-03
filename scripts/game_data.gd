@@ -30,6 +30,8 @@ const PATH_STATUS := "res://data/status_effects.json"
 ## (assets/i18n/strings.csv), che copre solo la UI chrome. Vedi CLAUDE.md.
 const PATH_I18N_IT := "res://data/i18n/it.json"
 const PATH_I18N_EN := "res://data/i18n/en.json"
+const PATH_UI_BOOK := "res://data/ui/book.json"
+const PATH_PAGE_TYPES := "res://data/schema/page_types.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -53,6 +55,8 @@ var _anchors: Dictionary = {}
 var _statuses: Dictionary = {}
 var _i18n_it: Dictionary = {}
 var _i18n_en: Dictionary = {}
+var _ui_book: Dictionary = {}
+var _page_types: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -109,6 +113,8 @@ func load_all() -> void:
 	_load_single(PATH_STATUS, "statuses", _statuses, TYPE_DICTIONARY)
 	_load_flat(PATH_I18N_IT, _i18n_it)
 	_load_flat(PATH_I18N_EN, _i18n_en)
+	_load_single(PATH_UI_BOOK, "pages", _ui_book, TYPE_ARRAY)
+	_load_single(PATH_PAGE_TYPES, "page_types", _page_types, TYPE_ARRAY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -289,6 +295,18 @@ func has_translation(key: String) -> bool:
 
 func i18n_keys() -> Array:
 	return _i18n_it.keys()
+
+
+## --- Libro / UI (data/ui/book.json, US-221) ---
+## Documento completo: { libro:{}, pages:[], segnalibri:[] }. Il BookController
+## (autoload Book) e' l'unico lettore.
+func get_ui_book() -> Dictionary:
+	return _ui_book
+
+
+## Vocabolario chiuso degli 8 tipi di pagina (data/schema/page_types.json).
+func page_types() -> Array:
+	return _array_or_empty(_page_types.get("page_types"))
 
 
 ## La Caratteristica di quel (Pathway, Sequenza). {} se non esiste.

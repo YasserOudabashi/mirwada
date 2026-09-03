@@ -2221,3 +2221,59 @@ sezione test aggiornata.
   Entrambe sono lavoro di contenuto, non di codice - il validator le conta
   come warning, non le pretende.
 - Prossima storia: US-221 (shell del libro - parte 1: controller e dati).
+
+[2026-09-03] US-221 — Shell del libro, parte 1: controller e dati
+
+- DATI:
+  * data/schema/page_types.json: vocabolario CHIUSO di 8 tipi di pagina
+    (menu_principale, creazione_personaggio, mappa, diagramma_pathway,
+    inventario, registro_sinergie, journal_quest, impostazioni). Un tipo
+    nuovo e' codice, va discusso.
+  * data/ui/book.json (+ data/schema/book.schema.json): il blocco 'libro'
+    (voltata_ms 350, dissolvenza_ridotta_ms 80, sfx, macchie_follia), 8
+    'pages' (id, tipo, name_i18n, ordine, sbloccata_da.fase, flag), 3
+    'segnalibri'. Copiato 1:1 da design-ui-libro.md cap. 4.
+  * data/balance.json nuova sezione 'gioco' { fase: 2 }: la fase di sviluppo
+    raggiunta. Le pagine con sbloccata_da.fase > gioco.fase esistono ma sono
+    bianche (in fase 2: inventario/sinergie/mappa/journal).
+- GameData: get_ui_book(), page_types(). _load_flat gia' c'era (US-220);
+  book.json e page_types.json caricati con _load_single (38 file ora).
+- Autoload Book (scripts/book.gd), ULTIMO. PROCESS_MODE_ALWAYS: input e
+  controller restano vivi col mondo in pausa.
+  * apri()/chiudi()/alterna(): stesso ingresso apre e chiude. apri() ->
+    get_tree().paused = true + segnale libro_aperto(pagina). chiudi() ->
+    paused = false + libro_chiuso + memorizza l'ultima pagina.
+  * si riapre SEMPRE sull'ultima pagina consultata (_ultima, default = prima
+    pagina per 'ordine').
+  * vai_a(id): cambia pagina mentre e' aperto, segnale pagina_cambiata;
+    pagina inesistente o gia' corrente -> no-op.
+  * pagine() (ordinate, + chiave 'sbloccata' bool), pagina(id),
+    pagina_sbloccata(id) (false = bianca), segnalibri(), config(key),
+    e_aperto(), pagina_corrente().
+  * _fase_gioco() da balance.json gioco.fase, fallback 999 (dati illeggibili
+    -> non nascondere pagine).
+  * _unhandled_input: azione "libro" -> alterna().
+- INPUT: project.godot nuova azione "libro" = Tab (physical_keycode 4194306)
+  o I (73). Autoload Book aggiunto in coda alla lista.
+- i18n: 8 chiavi ui.page.* tradotte a mano in it.json (Scaffale, Frontespizio,
+  Mappa, Diagramma dei Pathway, Inventario, Registro delle sinergie, Diario,
+  Colophon). it.json: 203 chiavi.
+- validate_data.py: nuovo blocco libro - 8 tipi nel vocabolario; tipo di ogni
+  pagina nel vocabolario; id e ordine unici; segnalibri -> pagine esistenti;
+  name_i18n presente; sbloccata_da ben formato; voltata_ms int > 0;
+  balance.json gioco.fase intero presente.
+- run_tests.gd: 'paused = false' prima di ogni test - un test che apre il
+  libro non deve trascinare la pausa dell'albero nei test successivi.
+- Come verificato: 279 test headless (272 + 7 in test_book.gd: autoload+dati,
+  tipi nel vocabolario, pagine bianche vs sbloccate in fase 2, apri ferma il
+  mondo / chiudi lo riavvia, alterna stesso ingresso, riapre sull'ultima
+  pagina, segnalibri validi). validate_data.py exit 0 (9 warning preesistenti
+  + stub i18n). VERIFICA A SCHERMO (main.tscn reale, script usa e getta):
+  Tab -> libro aperto su 'copertina' + get_tree().paused true + il player non
+  si muove premendo move_right; Tab di nuovo -> chiuso + paused false.
+- Resta aperto: le PAGINE vere (rendering) sono una per story; l'animazione
+  di voltata + navigazione Q/E + sfx sono US-222; il libro non si apre ancora
+  su nessuna schermata disegnata. La persistenza dell'ultima pagina nel save
+  non e' in US-221 (in memoria, si resetta al riavvio) - agganciarla quando
+  serve.
+- Prossima storia: US-222 (shell del libro, parte 2: voltata e navigazione).

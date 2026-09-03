@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO degli 8 tipi di pagina del libro (design-ui-libro.md cap. 2 e 4). Il codice implementa un tipo di pagina per ognuno di questi. Un tipo nuovo e' CODICE: va discusso, come le primitive e gli eventi tracciati. Aggiungere una SCHERMATA che riusa un tipo esistente e' invece solo una voce in data/ui/book.json.",
+  "page_types": [
+    "menu_principale",
+    "creazione_personaggio",
+    "mappa",
+    "diagramma_pathway",
+    "inventario",
+    "registro_sinergie",
+    "journal_quest",
+    "impostazioni"
+  ]
+}

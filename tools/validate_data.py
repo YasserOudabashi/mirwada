@@ -571,6 +571,49 @@ def main():
                     warn(f"{rel} [{sid}]: richiede i tag {irraggiungibili} che nessun pathway "
                          f"attivo porta: sinergia irraggiungibile finche' il suo gruppo resta differito.")
 
+    # --- libro / UI (data/ui/book.json, US-221) ---
+    pt_doc = load_json(os.path.join(DATA, "schema", "page_types.json"))
+    page_types = set((pt_doc or {}).get("page_types", []))
+    if len(page_types) != 8:
+        err(f"data/schema/page_types.json: vocabolario di {len(page_types)} tipi, attesi 8 "
+            f"(design-ui-libro.md). Un tipo nuovo e' codice: va discusso.")
+    book = load_json(os.path.join(DATA, "ui", "book.json"))
+    if book:
+        pages = book.get("pages", [])
+        seen_ids, seen_ord = Counter(), Counter()
+        for p in pages:
+            pid = p.get("id")
+            seen_ids[pid] += 1
+            seen_ord[p.get("ordine")] += 1
+            if p.get("tipo") not in page_types:
+                err(f"data/ui/book.json [{pid}]: tipo '{p.get('tipo')}' non nel "
+                    f"vocabolario chiuso ({sorted(page_types)})")
+            if not isinstance(p.get("ordine"), int):
+                err(f"data/ui/book.json [{pid}]: 'ordine' mancante o non intero")
+            if not isinstance(p.get("name_i18n"), str) or not p.get("name_i18n"):
+                err(f"data/ui/book.json [{pid}]: name_i18n mancante o vuoto")
+            sb = p.get("sbloccata_da")
+            if sb is not None and (not isinstance(sb, dict) or not isinstance(sb.get("fase"), int)):
+                err(f"data/ui/book.json [{pid}]: sbloccata_da dev'essere {{'fase': int}}")
+        for pid, n in seen_ids.items():
+            if n > 1:
+                err(f"data/ui/book.json: id pagina duplicato '{pid}'")
+        for o, n in seen_ord.items():
+            if n > 1:
+                err(f"data/ui/book.json: 'ordine' {o} usato da {n} pagine (dev'essere unico)")
+        page_id_set = set(seen_ids)
+        for b in book.get("segnalibri", []):
+            if b not in page_id_set:
+                err(f"data/ui/book.json: segnalibro '{b}' non e' una pagina esistente")
+        lib = book.get("libro", {})
+        if not isinstance(lib.get("voltata_ms"), int) or lib.get("voltata_ms", 0) <= 0:
+            err("data/ui/book.json [libro]: voltata_ms dev'essere un intero > 0")
+        # gioco.fase deve esistere: le pagine si sbloccano contro questo numero
+        _bg = load_json(os.path.join(DATA, "balance.json"))
+        if _bg and not isinstance(_bg.get("gioco", {}).get("fase"), int):
+            err("data/balance.json [gioco.fase]: intero mancante. Le pagine del libro "
+                "si sbloccano confrontando sbloccata_da.fase con questo valore.")
+
     # --- i18n dei dati (data/i18n/, US-220 / R-12) ---
     # Ogni chiave *_i18n referenziata dai dati attivi deve avere una voce in
     # data/i18n/it.json. Una chiave che punta nel vuoto e' testo mancante che

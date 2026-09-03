@@ -577,8 +577,8 @@
       ],
       "priority": 28,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "DATI: data/schema/page_types.json (vocabolario CHIUSO di 8 tipi: menu_principale, creazione_personaggio, mappa, diagramma_pathway, inventario, registro_sinergie, journal_quest, impostazioni); data/ui/book.json + data/schema/book.schema.json (blocco 'libro' con voltata_ms/dissolvenza_ridotta_ms/sfx/macchie_follia, 8 'pages' id+tipo+name_i18n+ordine+sbloccata_da.fase+flag, 3 segnalibri) copiato da design-ui-libro.md cap.4; data/balance.json nuova sezione 'gioco'{fase:2} - le pagine con sbloccata_da.fase > gioco.fase esistono ma sono bianche (fase 2: inventario/sinergie/mappa/journal). GameData: get_ui_book(), page_types() (38 file). Autoload Book (scripts/book.gd), ultimo, PROCESS_MODE_ALWAYS (input vivo in pausa): apri()/chiudi()/alterna() stesso ingresso; apri() -> get_tree().paused=true + segnale libro_aperto(pagina); chiudi() -> paused=false + memorizza l'ultima pagina; si riapre SEMPRE sull'ultima consultata (default = prima per 'ordine'); vai_a(id) segnale pagina_cambiata, id inesistente/uguale -> no-op; pagine() (ordinate + 'sbloccata' bool), pagina_sbloccata(id) (false=bianca), segnalibri(), config(), e_aperto(), pagina_corrente(); _fase_gioco() da balance con fallback 999 (dati illeggibili non nascondono pagine); _unhandled_input azione 'libro'. INPUT: project.godot azione 'libro' = Tab o I. i18n: 8 chiavi ui.page.* tradotte in it.json (203 chiavi). validate_data.py: blocco libro (8 tipi; tipo nel vocabolario; id/ordine unici; segnalibri->pagine esistenti; name_i18n; sbloccata_da ben formato; voltata_ms int>0; balance gioco.fase int). run_tests.gd: paused=false prima di ogni test. 279 test headless (272 + 7 in test_book.gd), validator exit 0. VERIFICA A SCHERMO (main.tscn reale): Tab apre il libro su 'copertina' + get_tree().paused true + il player non si muove; Tab di nuovo chiude + paused false. Resta: pagine vere (rendering) una per story; voltata+navigazione+sfx = US-222; persistenza dell'ultima pagina nel save non in scope (in memoria)."
     },
     {
       "id": "US-222",
