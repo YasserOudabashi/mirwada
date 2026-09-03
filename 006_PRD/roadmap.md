@@ -59,7 +59,15 @@ giocando, con avanzamenti veri, follia che cresce e Ancore che contano.
 
 ---
 
-## Fase 3 — Sistemi di supporto (~28 story)
+## Fase 3 — Sistemi di supporto (~36 story)
+
+> **PRD generato il 2026-09-03**: `006_PRD/prd-fase-3-sistemi-di-supporto.md`
+> (36 story `US-3NN` in 8 blocchi: inventario/equip, alchimia, forgiatura/sigilli,
+> strutture, pet, base building, talenti, integrazione). Questa sezione resta
+> come scaletta; la verità è il PRD. Vocabolari nuovi dichiarati nel PRD:
+> `item_categories`, `equip_slots`, `room_types`, `tracked_talents` (~6-10,
+> chiuso — i 12 `tracked_events` restano invariati), tipi di effetto dei sigilli,
+> `experiment_outcomes`. Nessuna primitiva nuova.
 
 - Inventario e equipaggiamento con tag di sinergia
 - **Oggetti con `stored_ability_id`**: pergamene e congegni che contengono
