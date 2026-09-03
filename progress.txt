@@ -1425,3 +1425,48 @@ sezione test aggiornata.
   verdi con la catena di migrazione 1->2->3->4.
 - Primitive implementate: 12 -> 13 su 28. US-203 (2a/2b/2c) CHIUSA.
 - Prossima storia: US-228 (riscrittura dati di darkness_1 senza probability_shift).
+
+[2026-09-03] US-228 — darkness_1 (Knight of Misfortune) senza probability_shift
+
+- CONTESTO: darkness_1 non aveva un'abilita' (sequenza stub, abilities:[]).
+  Il concept "sfortuna cronica" puntava dritto a probability_shift, che e'
+  DIFFERITA (serviva a Wheel of Fortune / gruppo key_of_light). US-228:
+  scrivere l'abilita' con sole primitive attive.
+- Cosa fatto:
+  - data/abilities/darkness.json: nuova abilita' darkness_sfortuna_cronica
+    (sequence_id darkness_1, costo 40, cd 30). Primitive tutte ATTIVE:
+    * curse: effetto "sfortuna", condizione_rimozione "purificazione",
+      durata 20s.
+    * debuff_stat moltiplicativo su evasione (-0.35) e velocita (-0.2):
+      il bersaglio schiva meno e si muove peggio. design-master diceva
+      "evasione/precisione" ma precisione NON e' una stat del gioco ->
+      velocita (annotato nelle note dell'abilita').
+    * dot basso (3 danni ogni 2s per 20s) a tag follia: si logora.
+  - data/pathways/darkness.json: darkness_sfortuna_cronica aggiunta a
+    darkness_1.abilities. Lo stub resta (US-228 non chiede di
+    completare la sequenza; darkness_2 fa gia' lo stesso con
+    darkness_cancellazione).
+  - curse implementata: _p_curse in ability_engine. Non c'e' un sistema
+    di status, quindi la maledizione e' un MARCATORE: modificatore per id
+    "curse:<ability_id>" senza delta, scade a tempo (kind expire,
+    debuff:true) ed e' tolto da light_purify. effetto e
+    condizione_rimozione registrati per un futuro cleanse-per-condizione.
+    Il "danno" della sfortuna lo fanno debuff_stat e dot; curse e' il
+    contenitore concettuale.
+  - probability_shift resta deferred in primitives.json. Il check
+    generico del validator (una primitiva differita in un'abilita' ->
+    errore) copre gia' il caso: nessuna modifica al validator.
+- Come verificato: 153 test headless (149 + 4 in test_darkness_1.gd:
+  curse attiva nel registro / probability_shift assente dall'abilita',
+  curse marca+scade+purificabile, curse scade da sola,
+  execute(darkness_sfortuna_cronica) compone 4 primitive attive senza
+  warning). validator exit 0, nessuna abilita' attiva usa una differita.
+  Nessuna regressione.
+- RISULTATO PERCEPITO: sfortuna cronica su un bersaglio - schiva meno
+  (evasione giu'), inciampa (velocita giu'), si logora (dot follia),
+  finche' qualcuno non lo purifica. Nessuna manipolazione vera della
+  probabilita': quella resta a Wheel of Fortune (differito). Se in fase 5
+  il feel non basta -> discussione per riattivare probability_shift col
+  suo gruppo.
+- Primitive implementate: 13 -> 14 su 28.
+- Prossima storia: US-204 (AbilityEngine esegue un'abilita' non posseduta).

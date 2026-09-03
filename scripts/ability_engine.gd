@@ -50,6 +50,7 @@ func _ready() -> void:
 		"light_purify": _p_light_purify,
 		"transform": _p_transform,
 		"terrain_modify": _p_terrain_modify,
+		"curse": _p_curse,
 	}
 
 
@@ -347,6 +348,31 @@ func _p_terrain_modify(prim: Dictionary, caster: Node, _stats: Node, _ability_id
 			_pending.append({"kind": "terrain_temp", "caster": caster, "left": durata,
 					"tipo_modifica": tipo_modifica, "raggio": raggio})
 	return rec
+
+
+## curse: applica una maledizione al bersaglio. Non c'e' ancora un sistema di
+## status, quindi la maledizione e' un marcatore (modificatore per id
+## "curse:<ability_id>", senza delta) che scade a tempo ed e' tolto da
+## light_purify (marcato debuff). effetto e condizione_rimozione sono
+## registrati per quando ci sara' un sistema di cleanse per condizione.
+## Il "danno" della sfortuna lo fanno le altre primitive dell'abilita'
+## (debuff_stat, dot), non questa: curse e' il contenitore concettuale.
+func _p_curse(prim: Dictionary, _caster: Node, stats: Node, ability_id: String) -> Dictionary:
+	var effetto: String = str(prim.get("effetto", ""))
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var condizione_rimozione: String = str(prim.get("condizione_rimozione", ""))
+
+	var mod_id: String = "curse:%s" % ability_id
+	stats.call("apply_modifier", mod_id, {})
+	if durata > 0.0:
+		_pending.append({
+			"kind": "expire", "stats": stats, "mod_id": mod_id, "left": durata,
+			"debuff": true,
+		})
+
+	return {"tipo": "curse", "effetto": effetto, "durata": durata,
+			"condizione_rimozione": condizione_rimozione, "modifier_id": mod_id,
+			"applied": true}
 
 
 ## Annulla una trasformazione in corso "su richiesta". true se ce n'era una.

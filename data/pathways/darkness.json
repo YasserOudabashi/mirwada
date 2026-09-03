@@ -202,7 +202,9 @@
       "tier": "angel",
       "concept": "Infligge sfortuna cronica: i nemici falliscono, inciampano, si feriscono da soli.",
       "stat_modifiers": {},
-      "abilities": [],
+      "abilities": [
+        "darkness_sfortuna_cronica"
+      ],
       "acting_actions": [],
       "potion": {
         "characteristic_sequence": 1,

@@ -4,6 +4,51 @@
   "abilities": [
     {
       "schema_version": 1,
+      "id": "darkness_sfortuna_cronica",
+      "name_i18n": "ability.darkness.darkness_sfortuna_cronica",
+      "sequence_id": "darkness_1",
+      "costo_spiritualita": 40,
+      "cooldown": 30.0,
+      "primitive": [
+        {
+          "tipo": "curse",
+          "effetto": "sfortuna",
+          "durata": 20.0,
+          "condizione_rimozione": "purificazione"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "evasione",
+          "valore": -0.35,
+          "durata": 20.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "velocita",
+          "valore": -0.2,
+          "durata": 20.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "dot",
+          "danno_tick": 3,
+          "tick_rate": 2.0,
+          "durata": 20.0,
+          "tag_danno": "follia"
+        }
+      ],
+      "tag_sinergia": [
+        "maledizione",
+        "notte",
+        "follia",
+        "singolo"
+      ],
+      "costo_follia": 2.0,
+      "note": "US-228: 'Knight of Misfortune' SENZA probability_shift (differita). La sfortuna e' curse('sfortuna', rimossa da purificazione) + stack di debuff_stat su evasione e velocita' + dot basso a tag follia: il bersaglio schiva meno, si muove peggio e si logora nel tempo. Il concept originale puntava a probability_shift; la manipolazione VERA della probabilita' resta a Wheel of Fortune (gruppo key_of_light, differito). design-master dice 'evasione/precisione' ma precisione non e' una stat del gioco: uso velocita'. Se in fase 5 il feel non basta -> discussione esplicita per riattivare probability_shift col suo gruppo."
+    },
+    {
+      "schema_version": 1,
       "id": "darkness_cancellazione",
       "name_i18n": "ability.darkness.darkness_cancellazione",
       "sequence_id": "darkness_2",
