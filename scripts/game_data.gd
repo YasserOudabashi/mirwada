@@ -20,6 +20,7 @@ const PATH_BALANCE := "res://data/balance.json"
 const PATH_PRIMITIVES := "res://data/schema/primitives.json"
 const PATH_ANIMATIONS := "res://data/animations.json"
 const PATH_AUDIO := "res://data/audio.json"
+const PATH_FORMS := "res://data/forms.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -35,6 +36,7 @@ var _balance: Dictionary = {}
 var _primitives: Dictionary = {}
 var _animations: Dictionary = {}
 var _audio: Dictionary = {}
+var _forms: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -83,6 +85,7 @@ func load_all() -> void:
 	_load_single(PATH_PRIMITIVES, "primitives", _primitives, TYPE_DICTIONARY)
 	_load_single(PATH_ANIMATIONS, "convenzioni", _animations, TYPE_DICTIONARY)
 	_load_single(PATH_AUDIO, "buses", _audio, TYPE_DICTIONARY)
+	_load_single(PATH_FORMS, "forms", _forms, TYPE_DICTIONARY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -185,6 +188,14 @@ func animation_names(categoria: String) -> Array:
 ## Sezione di primo livello: buses, combat_feedback, telegraph, accessibilita...
 func get_audio(sezione: String) -> Dictionary:
 	return _dict_or_empty(_audio.get(sezione))
+
+
+## --- Forme (data/forms.json) ---
+## Definizione di una forma della primitiva "transform". {} = forma_id ignoto:
+## e' un errore di dati (il validator lo intercetta), non un caso da gestire.
+func get_form(forma_id: String) -> Dictionary:
+	var registry: Dictionary = _dict_or_empty(_forms.get("forms"))
+	return _dict_or_empty(registry.get(forma_id))
 
 
 func pathway_ids() -> Array:

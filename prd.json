@@ -84,8 +84,8 @@
       ],
       "priority": 4,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/forms.json (schema_version 1) + data/schema/forms.schema.json. Due forme, quelle referenziate da twilight_giant.json: tg_forma_gigante (hp_max +120, difesa +0.25, velocita -35) e tg_arma_luce (velocita +45, evasione +0.15, hp_max -40). Numeri PLAUSIBILI non bilanciati, ogni forma ha un trade-off negativo (il validator lo esige). GameData: PATH_FORMS, _load_single(forms), get_form(forma_id) -> {} se ignoto (27 file caricati ora). ability_engine._p_transform: legge la forma da GameData, applica stat_modifiers come modificatore per id 'transform:<ability_id>' (US-007), _pending {kind:transform}. Reversibile in tre modi: durata (expire), annulla_transform(ability_id) pubblica, e drenaggio - costo_al_secondo sottrae spiritualita' a ogni tick e a 0 toglie la forma (entry persistente quando durata<=0). tick_effects: nuovo ramo transform + span=delta per le entry persistenti (prima minf(delta,left)=0 le bloccava). flush_effects toglie anche i transform. Forma ignota -> applied:false + push_error (il validator la intercetta a monte). validate_data.py: nuovo blocco forme - forma_id di ogni transform esiste, stat_modifiers oggetto non vuoto di stat note con almeno un trade-off negativo. 7 test in test_primitive_tg_transform.gd (142 totali), execute(tg_crescita) compone transform+buff_stat senza warning. validator 0, boot pulito. Primitive: 11 -> 12 su 28."
     },
     {
       "id": "US-203C",

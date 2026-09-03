@@ -1348,3 +1348,44 @@ sezione test aggiornata.
   validator exit 0. Nessuna regressione.
 - Primitive implementate: 9 -> 11 su 28.
 - Prossima storia: US-203B (transform + data/forms.json).
+
+[2026-09-03] US-203B (2b) — transform + data/forms.json
+
+- Cosa fatto:
+  - data/forms.json (schema_version 1) + data/schema/forms.schema.json.
+    Le forme sono DATI: transform legge forma_id da qui, il motore non sa
+    quali forme esistano. Due forme, quelle gia' referenziate da
+    twilight_giant.json:
+    * tg_forma_gigante: hp_max +120, difesa +0.25, velocita -35
+    * tg_arma_luce: velocita +45, evasione +0.15, hp_max -40
+    PLAUSIBILI non bilanciate. Ogni forma DEVE avere un trade-off
+    negativo (il validator lo esige: "una forma non e' solo vantaggi").
+  - game_data.gd: PATH_FORMS, _load_single(PATH_FORMS, "forms", ...),
+    get_form(forma_id) -> {} se ignoto. 27 file caricati ora (era 26).
+  - ability_engine._p_transform: applica gli stat_modifiers della forma
+    come modificatore per id "transform:<ability_id>" (US-007), _pending
+    {kind:"transform"}. REVERSIBILE in tre modi:
+    1. durata > 0 -> scade (ramo transform in tick_effects e nel blocco
+       di scadenza).
+    2. annulla_transform(ability_id) pubblica -> toglie il modificatore
+       e l'entry.
+    3. costo_al_secondo > 0 -> drena spiritualita' a ogni tick; a 0 la
+       forma cade. Con durata <= 0 l'entry e' "persistente" e vive
+       finche' c'e' spiritualita'.
+  - tick_effects: aggiunto span = delta per le entry persistenti (prima
+    minf(delta, left) con left=0 dava span 0 e non drenava niente).
+    flush_effects toglie anche i modificatori transform.
+  - Forma ignota -> rec.applied = false + push_error (il validator la
+    prende a monte). transform NON e' un debuff: light_purify non lo tocca.
+  - validate_data.py: nuovo blocco forme. Ogni forma_id di una primitiva
+    transform in data/abilities/ esiste in forms.json; stat_modifiers e'
+    un oggetto non vuoto di stat note (hp_max, spiritualita_max, velocita,
+    difesa, evasione, forza) con almeno un valore negativo.
+- Come verificato: 142 test headless (135 + 7 in
+  test_primitive_tg_transform.gd: registro + forme caricate, stat_modifiers
+  applicati, reversibile su scadenza / su richiesta / a spiritualita'
+  esaurita, forma ignota non applica nulla, execute(tg_crescita) compone
+  transform + buff_stat senza warning). validator exit 0. Boot pulito
+  (27 file). Nessuna regressione.
+- Primitive implementate: 11 -> 12 su 28.
+- Prossima storia: US-203C (terrain_modify + stato del mondo nel save).

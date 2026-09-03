@@ -251,6 +251,7 @@ def main():
     # --- abilita' ---
     adir = os.path.join(DATA, "abilities")
     ability_ids = set()
+    transform_forms = []  # (rel, aid, forma_id) da verificare contro data/forms.json
     if os.path.isdir(adir):
         for fname in sorted(os.listdir(adir)):
             if not fname.endswith(".json"):
@@ -281,6 +282,8 @@ def main():
                         if ignoti:
                             err(f"{rel} [{aid}]: parametri non dichiarati per '{tipo}': "
                                 f"{sorted(ignoti)} (registro: {sorted(prim_params[tipo])})")
+                    if tipo == "transform" and p.get("forma_id"):
+                        transform_forms.append((rel, aid, p.get("forma_id")))
                     td = p.get("tag_danno")
                     if td is not None and td not in valid_damage_tags:
                         err(f"{rel} [{aid}]: tag_danno '{td}' non nel vocabolario "
@@ -299,6 +302,30 @@ def main():
     for rel, sid, aid in ability_refs:
         if ability_ids and aid not in ability_ids:
             err(f"{rel} [{sid}]: riferimento ad abilita' inesistente '{aid}'")
+
+    # --- forme (data/forms.json, primitiva transform, US-203B) ---
+    # Le forme sono dati: transform legge forma_id da qui, il motore non sa
+    # nulla di quali forme esistano.
+    forms_doc = load_json(os.path.join(DATA, "forms.json"))
+    forms = (forms_doc or {}).get("forms", {})
+    known_stats = {"hp_max", "spiritualita_max", "velocita", "difesa", "evasione", "forza"}
+    for fid, f in forms.items():
+        if not isinstance(f.get("name_i18n"), str) or not f["name_i18n"]:
+            err(f"data/forms.json [{fid}]: name_i18n mancante o vuoto")
+        sm = f.get("stat_modifiers")
+        if not isinstance(sm, dict) or not sm:
+            err(f"data/forms.json [{fid}]: stat_modifiers deve essere un oggetto non vuoto")
+        else:
+            for k, v in sm.items():
+                if k not in known_stats:
+                    err(f"data/forms.json [{fid}]: stat_modifiers ha una stat ignota '{k}'")
+                if not isinstance(v, (int, float)):
+                    err(f"data/forms.json [{fid}]: stat_modifiers['{k}'] non e' un numero")
+            if all((v if isinstance(v, (int, float)) else 0) >= 0 for v in sm.values()):
+                err(f"data/forms.json [{fid}]: nessun trade-off negativo. Una forma non e' solo vantaggi.")
+    for rel, aid, fid in transform_forms:
+        if fid not in forms:
+            err(f"{rel} [{aid}]: transform punta a forma_id '{fid}' inesistente in data/forms.json")
 
     # --- progressione (US-201) ---
     # Il Pathway di partenza vive nei dati, non nel codice (FR-1): qui si

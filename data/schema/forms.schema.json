@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "_comment": "Documentazione formale del formato di data/forms.json. Il validator (tools/validate_data.py) fa i controlli espliciti; questo file descrive la forma attesa. Le forme sono dati, non codice: transform legge forma_id da qui, il motore non sa nulla di quali forme esistano.",
+  "forma": {
+    "name_i18n": "string, chiave i18n del nome della forma (obbligatoria)",
+    "descrizione_i18n": "string, chiave i18n della descrizione (facoltativa)",
+    "stat_modifiers": "oggetto { nome_stat: numero }: delta additivo sulle statistiche base, applicato come modificatore per id 'transform:<ability_id>' e rimosso a fine trasformazione. Deve contenere almeno un trade-off negativo: nessuna forma e' solo vantaggi."
+  },
+  "regole_validator": [
+    "ogni forma_id referenziato da una primitiva transform in data/abilities/ esiste in forms.json",
+    "stat_modifiers e' un oggetto non vuoto di soli numeri",
+    "name_i18n presente e non vuoto"
+  ]
+}

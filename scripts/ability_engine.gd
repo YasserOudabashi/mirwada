@@ -48,6 +48,7 @@ func _ready() -> void:
 		"decay": _p_decay,
 		"debuff_stat": _p_debuff_stat,
 		"light_purify": _p_light_purify,
+		"transform": _p_transform,
 	}
 
 
@@ -275,6 +276,62 @@ func _p_light_purify(prim: Dictionary, _caster: Node, stats: Node, _ability_id: 
 			"riduce_sequenza": riduce_sequenza, "rimossi": rimossi}
 
 
+## transform: cambia forma applicando gli stat_modifiers di una forma definita
+## in data/forms.json (get_form). id del modificatore "transform:<ability_id>",
+## rimosso alla scadenza (durata), su richiesta (annulla_transform) o quando
+## costo_al_secondo esaurisce la spiritualita'. Reversibile: e' un modificatore
+## per id come un buff.
+func _p_transform(prim: Dictionary, _caster: Node, stats: Node, ability_id: String) -> Dictionary:
+	var forma_id: String = str(prim.get("forma_id", ""))
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var costo_al_secondo: float = _num(prim.get("costo_al_secondo"), 0.0)
+
+	var rec: Dictionary = {"tipo": "transform", "forma_id": forma_id,
+			"durata": durata, "costo_al_secondo": costo_al_secondo}
+
+	var forma: Dictionary = _game_data().call("get_form", forma_id)
+	if forma.is_empty():
+		push_error("[AbilityEngine] transform: forma inesistente '%s' (il validator deve intercettarlo)" % forma_id)
+		rec["applied"] = false
+		return rec
+
+	var mods_raw: Variant = forma.get("stat_modifiers")
+	var mods: Dictionary = mods_raw if typeof(mods_raw) == TYPE_DICTIONARY else {}
+	var mod_id: String = "transform:%s" % ability_id
+	stats.call("apply_modifier", mod_id, mods)
+	rec["applied"] = true
+	rec["modifier_id"] = mod_id
+	rec["stat_modifiers"] = mods
+
+	# Con durata > 0 scade a tempo. Con solo costo_al_secondo dura finche' c'e'
+	# spiritualita': entry persistente col drenaggio che la conclude.
+	if durata > 0.0 or costo_al_secondo > 0.0:
+		_pending.append({
+			"kind": "transform", "stats": stats, "mod_id": mod_id,
+			"left": maxf(durata, 0.0), "persistente": durata <= 0.0,
+			"costo_al_secondo": costo_al_secondo,
+		})
+	return rec
+
+
+## Annulla una trasformazione in corso "su richiesta". true se ce n'era una.
+func annulla_transform(ability_id: String) -> bool:
+	var mod_id: String = "transform:%s" % ability_id
+	var trovata: bool = false
+	var superstiti: Array = []
+	for entry in _pending:
+		var e: Dictionary = entry
+		if str(e["kind"]) == "transform" and str(e.get("mod_id", "")) == mod_id:
+			var raw: Variant = e["stats"]
+			if is_instance_valid(raw):
+				(raw as Node).call("remove_modifier", mod_id)
+			trovata = true
+			continue
+		superstiti.append(e)
+	_pending = superstiti
+	return trovata
+
+
 func _p_heal(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
 	var quantita: float = _num(prim.get("quantita"), 0.0)
 	var istantaneo: bool = _flag(prim.get("istantaneo"), true)
@@ -483,7 +540,10 @@ func tick_effects(delta: float) -> void:
 		if not persistente:
 			left -= delta
 
-		var span: float = minf(delta, float(e["left"]))
+		# Una entry persistente (aura -1, transform a solo costo) non ha "left"
+		# significativo: lo span del tick e' l'intero delta.
+		var span: float = delta if persistente else minf(delta, float(e["left"]))
+		var esaurita: bool = false
 		match kind:
 			"heal":
 				anchor.set("hp", float(anchor.get("hp")) + float(e["rate"]) * span)
@@ -494,13 +554,20 @@ func tick_effects(delta: float) -> void:
 				while float(e["tick_rate"]) > 0.0 and float(e["acc"]) >= float(e["tick_rate"]):
 					e["acc"] = float(e["acc"]) - float(e["tick_rate"])
 					anchor.set("hp", float(anchor.get("hp")) - float(e["danno_tick"]))
+			"transform":
+				var costo: float = float(e["costo_al_secondo"])
+				if costo > 0.0:
+					anchor.set("spiritualita", maxf(0.0, float(anchor.get("spiritualita")) - costo * span))
+					esaurita = float(anchor.get("spiritualita")) <= 0.0
 
-		if not persistente and left <= 0.0:
+		if esaurita or (not persistente and left <= 0.0):
 			match kind:
 				"expire":
 					anchor.call("remove_modifier", str(e["mod_id"]))
 				"scudo_expire":
 					anchor.call("azzera_scudo")
+				"transform":
+					anchor.call("remove_modifier", str(e["mod_id"]))
 			continue
 
 		e["left"] = left
@@ -522,7 +589,7 @@ func flush_effects() -> void:
 		var raw: Variant = e["stats"]
 		if not is_instance_valid(raw):
 			continue
-		if str(e["kind"]) == "expire":
+		if str(e["kind"]) == "expire" or str(e["kind"]) == "transform":
 			(raw as Node).call("remove_modifier", str(e["mod_id"]))
 		elif str(e["kind"]) == "scudo_expire":
 			(raw as Node).call("azzera_scudo")
