@@ -2277,3 +2277,53 @@ sezione test aggiornata.
   non e' in US-221 (in memoria, si resetta al riavvio) - agganciarla quando
   serve.
 - Prossima storia: US-222 (shell del libro, parte 2: voltata e navigazione).
+
+[2026-09-03] US-222 — Shell del libro, parte 2: voltata e navigazione
+
+- scenes/book_overlay.tscn + scripts/book_overlay.gd (CanvasLayer layer 85,
+  PROCESS_MODE_ALWAYS: vive col mondo in pausa). In main.tscn e
+  debug_scene.tscn. E' la PRESENTAZIONE; il controller resta l'autoload Book.
+  * Disegna: sfondo scuro semitrasparente, la pagina (ColorRect pergamena
+    600x340 centrato), la piega centrale, il Titolo (dalla chiave i18n della
+    pagina via GameData.tr_data), il Corpo (placeholder "[ tipo ]" se
+    sbloccata, "· appunto a matita · / questa pagina si aprira' piu' avanti"
+    se bianca - MAI assente), i 3 segnalibri come Button sul bordo destro.
+  * VOLTATA: contatore in _process (come madness_overlay, NON un Tween: i
+    Tween si fermano con l'albero in pausa). Durata = libro.voltata_ms/1000
+    (350 ms). Una fascia d'ombra (ColorRect "Voltata") attraversa la piega;
+    a meta' (t>=0.5) il testo della pagina cambia. A fine voltata l'ombra
+    sparisce.
+  * riduci_animazioni (nuova opzione in data/audio.json.accessibilita,
+    default false): la voltata diventa una dissolvenza di
+    dissolvenza_ridotta_ms (80 ms). FR-8: il Titolo/Corpo sono sempre testo,
+    nessuna informazione vive solo nell'animazione.
+  * Si aggancia ai segnali di Book: libro_aperto -> _apri, libro_chiuso ->
+    _chiudi, pagina_cambiata -> _volta.
+- book.gd: avanti()/indietro() (scorrono _pagine per 'ordine', si fermano ai
+  bordi, un libro non cicla); azzera() (torna chiuso + prima pagina: ritorno
+  al menu / isolamento dei test); libro_config().
+- INPUT: project.godot azioni pagina_indietro = Q, pagina_avanti = E.
+  Gestite in book_overlay._unhandled_input solo a libro aperto.
+- AUDIO: audio_manager.gd - _ui (AudioStreamPlayer sul bus ui) + suona_ui(sfx);
+  SFX_SPEC + sfx_ui_book_open [520,0.22,0.15] e sfx_ui_page [700,0.09,0.25]
+  (sintetizzati, US-019). _apri suona sfx_apri, _volta suona sfx_volta (id
+  presi da libro.sfx_apri/sfx_volta nei dati).
+- run_tests.gd: gia' resetta paused=false fra i test (US-221). azzera() nei
+  prepara() di test_book e test_book_overlay: Book e' un autoload, lo stato
+  (_ultima pagina) trapassava fra le suite.
+- Come verificato: 284 test headless (279 + 5 in test_book_overlay.gd: apri
+  mostra il titolo dalla chiave i18n, navigazione avanti/indietro cambia
+  pagina e titolo, pagina bianca mostra l'appunto, la voltata ha durata
+  finita, riduci_animazioni la chiude in un tick tenendo il titolo).
+  validate_data.py exit 0. generate_i18n_stubs.py --check exit 0.
+  VERIFICA A SCHERMO (main.tscn, finestra reale): Tab apre il libro su
+  'Scaffale'; E sfoglia frontespizio -> mappa -> diagramma -> inventario, il
+  titolo e il corpo seguono, la fascia d'ombra della voltata attraversa la
+  pagina, le pagine bianche (mappa, inventario) mostrano l'appunto a matita;
+  Q torna indietro; Tab chiude e il mondo riparte. Screenshot in user://us222.
+- Resta aperto: i segnalibri (Button) si sovrappongono un po' alla pagina (la
+  pagina e' 600 su viewport 640) - cosmetico, si sistema con l'arte vera. Le
+  PAGINE vere (contenuto) sono una per story: US-223 copertina/frontespizio,
+  US-224 diagramma, US-225 colophon. La voltata e' un placeholder a fascia
+  d'ombra: i 3-4 frame di curvatura disegnati arrivano con l'arte.
+- Prossima storia: US-223 (pagina scaffale + frontespizio / creazione personaggio).

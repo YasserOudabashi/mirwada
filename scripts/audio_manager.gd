@@ -51,6 +51,9 @@ const SFX_SPEC := {
 	"amb_whisper_words": [90.0, 1.2, 0.8],
 	"amb_whisper_names": [110.0, 1.4, 0.75],
 	"amb_whisper_chorus": [140.0, 1.6, 0.7],
+	# UI del libro (US-222), sul bus ui.
+	"sfx_ui_book_open": [520.0, 0.22, 0.15],
+	"sfx_ui_page": [700.0, 0.09, 0.25],
 	# Layer ambientali della percezione per Sequenza (US-218), sintetizzati.
 	"amb_spirit_faint": [180.0, 1.5, 0.5],
 	"amb_ley_hum": [55.0, 2.0, 0.2],
@@ -71,6 +74,7 @@ var _hitstop_fine_ms: int = 0
 ## --- Layer audio della follia (US-214) ---
 var _madness_layer: Dictionary = {}
 var _whisper: AudioStreamPlayer = null
+var _ui: AudioStreamPlayer = null
 var _music_db_base: float = 0.0
 var _music_ducked: bool = false
 var _one_shot_left: float = 0.0
@@ -99,6 +103,10 @@ func _ready() -> void:
 	_whisper = AudioStreamPlayer.new()
 	_whisper.bus = "whisper" if AudioServer.get_bus_index("whisper") != -1 else "Master"
 	add_child(_whisper)
+
+	_ui = AudioStreamPlayer.new()
+	_ui.bus = "ui" if AudioServer.get_bus_index("ui") != -1 else "Master"
+	add_child(_ui)
 	var mi: int = AudioServer.get_bus_index("music")
 	if mi != -1:
 		_music_db_base = AudioServer.get_bus_volume_db(mi)
@@ -160,6 +168,18 @@ func accessibilita(chiave: String) -> Variant:
 
 func hitstop_in_corso() -> bool:
 	return Time.get_ticks_msec() < _hitstop_fine_ms
+
+
+## Suona un sfx della UI sul bus 'ui' (US-222: apertura del libro, voltata di
+## pagina). Separato dal pool di combattimento cosi' i volumi restano distinti.
+func suona_ui(sfx: String) -> void:
+	if sfx.is_empty() or _ui == null:
+		return
+	var stream: AudioStream = _stream_per(sfx)
+	if stream == null:
+		return
+	_ui.stream = stream
+	_ui.play()
 
 
 # --- Layer audio della follia (US-214) --------------------------------------

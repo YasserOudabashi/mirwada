@@ -99,6 +99,40 @@ func vai_a(page_id: String) -> void:
 	pagina_cambiata.emit(page_id, vecchia)
 
 
+## Pagina successiva / precedente nell'ordine di sfogliatura. Ai bordi si
+## ferma (un libro non cicla). No-op a libro chiuso.
+func avanti() -> void:
+	_scorri(1)
+
+
+func indietro() -> void:
+	_scorri(-1)
+
+
+func _scorri(passo: int) -> void:
+	if not _aperto:
+		return
+	var i: int = _indice(_corrente) + passo
+	if i < 0 or i >= _pagine.size():
+		return
+	vai_a(str(_pagine[i].get("id", "")))
+
+
+func _indice(page_id: String) -> int:
+	for i in _pagine.size():
+		if str(_pagine[i].get("id", "")) == page_id:
+			return i
+	return 0
+
+
+## Riporta il libro allo stato iniziale: chiuso, prossima apertura sulla prima
+## pagina. Usato al ritorno al menu / nuova partita (e per isolare i test).
+func azzera() -> void:
+	chiudi()
+	_corrente = ""
+	_ultima = str(_pagine[0].get("id", "")) if not _pagine.is_empty() else ""
+
+
 func e_aperto() -> bool:
 	return _aperto
 
@@ -137,6 +171,10 @@ func segnalibri() -> Array:
 
 func config(key: String, fallback: Variant = null) -> Variant:
 	return _config.get(key, fallback)
+
+
+func libro_config() -> Dictionary:
+	return _config.duplicate()
 
 
 # --- Interno --------------------------------------------------------------

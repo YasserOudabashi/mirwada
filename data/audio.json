@@ -311,6 +311,7 @@
     "disattiva_shake": false,
     "riduci_hitstop": false,
     "riduci_flash": false,
-    "riduci_distorsione": false
+    "riduci_distorsione": false,
+    "riduci_animazioni": false
   }
 }

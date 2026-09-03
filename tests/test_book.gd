@@ -14,7 +14,7 @@ func _data() -> Node:
 func prepara() -> void:
 	var b: Node = _book()
 	if b != null:
-		b.call("chiudi")
+		b.call("azzera")
 	Engine.get_main_loop().root.get_tree().paused = false
 
 
