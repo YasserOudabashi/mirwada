@@ -1,0 +1,16 @@
+{
+  "_comment": "Documentazione formale di data/potions/recipes.json (US-308). Alchimia delle pozioni CONSUMABILI: percorso separato dalla concoction di AVANZAMENTO di fase 2 (data/potions/formulas.json, che resta invariata). Controlli veri in tools/validate_data.py.",
+  "schema_version": 1,
+  "recipe": {
+    "id": "string, univoco",
+    "name_i18n": "string, chiave i18n",
+    "tier": "string: base | avanzata | leggendaria",
+    "nota_da_subito": "bool - true solo per tier 'base'. 'avanzata' si scopre sperimentando (US-311), 'leggendaria' con un flag KnowledgeStore 'ricetta:<id>' (US-313)",
+    "output": {
+      "item_id": "string opzionale - un consumabile di data/items/ (risolve)",
+      "effetto": "{ tipo: primitiva_implementata, ... } opzionale - alternativa a item_id"
+    },
+    "ingredienti": "{ item_id (categoria:ingrediente, esiste): quantita int > 0 }",
+    "qualita_base": "string, una di data/schema/potion_quality.json"
+  }
+}

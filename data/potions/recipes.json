@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "_comment": "Ricette delle pozioni CONSUMABILI (US-308). Percorso separato dalla concoction di AVANZAMENTO di fase 2 (formulas.json). tier: base (note da subito), avanzata (scoperte sperimentando, US-311), leggendaria (apprese da un flag KnowledgeStore 'ricetta:<id>', US-313). Gli ingredienti sono item di data/items/ categoria:ingrediente.",
+  "recipes": {
+    "ric_cura_minore": {
+      "name_i18n": "recipe.ric_cura_minore",
+      "tier": "base",
+      "nota_da_subito": true,
+      "output": { "item_id": "pozione_cura_minore" },
+      "ingredienti": { "petalo_solare": 1, "acqua_sorgiva": 1 },
+      "qualita_base": "pura"
+    },
+    "ric_vigore": {
+      "name_i18n": "recipe.ric_vigore",
+      "tier": "base",
+      "nota_da_subito": true,
+      "output": { "item_id": "elisir_del_vigore" },
+      "ingredienti": { "sangue_di_lupo": 1, "radice_crepuscolo": 1 },
+      "qualita_base": "pura"
+    },
+    "ric_pastura": {
+      "name_i18n": "recipe.ric_pastura",
+      "tier": "base",
+      "nota_da_subito": true,
+      "output": { "item_id": "pastura_spirituale" },
+      "ingredienti": { "erba_lunare": 2, "polvere_ossa": 1 },
+      "qualita_base": "instabile"
+    },
+    "ric_cura_maggiore": {
+      "name_i18n": "recipe.ric_cura_maggiore",
+      "tier": "avanzata",
+      "nota_da_subito": false,
+      "output": { "item_id": "pozione_cura_maggiore" },
+      "ingredienti": { "petalo_solare": 2, "acqua_sorgiva": 1, "erba_lunare": 1 },
+      "qualita_base": "pura"
+    },
+    "ric_elisir_ombra": {
+      "name_i18n": "recipe.ric_elisir_ombra",
+      "tier": "avanzata",
+      "nota_da_subito": false,
+      "output": { "item_id": "elisir_ombra" },
+      "ingredienti": { "radice_crepuscolo": 2, "fungo_cavernicolo": 1 },
+      "qualita_base": "instabile"
+    },
+    "ric_ambrosia": {
+      "name_i18n": "recipe.ric_ambrosia",
+      "tier": "leggendaria",
+      "nota_da_subito": false,
+      "output": { "item_id": "ambrosia" },
+      "ingredienti": { "lacrima_di_luna": 1, "petalo_solare": 3, "acqua_sorgiva": 2 },
+      "qualita_base": "eccelsa"
+    }
+  }
+}

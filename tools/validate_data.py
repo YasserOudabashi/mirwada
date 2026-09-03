@@ -578,6 +578,7 @@ def main():
     equip_tipi = set((es_doc or {}).get("tipi", []))
     idir = os.path.join(DATA, "items")
     item_ids = set()
+    item_cat = {}   # id -> categoria
     known_item_stats = {"hp_max", "spiritualita_max", "velocita", "difesa",
                         "evasione", "precisione", "forza"}
     if os.path.isdir(idir):
@@ -594,6 +595,7 @@ def main():
                     err(f"{rel}: id item duplicato '{iid}'")
                 item_ids.add(iid)
                 cat = it.get("categoria")
+                item_cat[iid] = cat
                 if cat not in item_categories:
                     err(f"{rel} [{iid}]: categoria '{cat}' non nel vocabolario chiuso "
                         f"({sorted(item_categories)})")
@@ -634,6 +636,46 @@ def main():
     for c in item_categories:
         if c not in coperte:
             warn(f"data/items/: nessun item di esempio per la categoria '{c}'")
+
+    # --- ricette delle pozioni consumabili (data/potions/recipes.json, US-308) ---
+    pq_doc = load_json(os.path.join(DATA, "schema", "potion_quality.json"))
+    potion_quality = set((pq_doc or {}).get("qualita", []))
+    if len(potion_quality) != 4:
+        err(f"data/schema/potion_quality.json: {len(potion_quality)} qualita', attese 4")
+    rec_doc = load_json(os.path.join(DATA, "potions", "recipes.json"))
+    recipes = (rec_doc or {}).get("recipes", {})
+    VALID_TIER = {"base", "avanzata", "leggendaria"}
+    for rid, r in recipes.items():
+        tier = r.get("tier")
+        if tier not in VALID_TIER:
+            err(f"data/potions/recipes.json [{rid}]: tier '{tier}' non valido ({sorted(VALID_TIER)})")
+        if not isinstance(r.get("nota_da_subito"), bool):
+            err(f"data/potions/recipes.json [{rid}]: nota_da_subito deve essere true/false")
+        elif r.get("nota_da_subito") != (tier == "base"):
+            err(f"data/potions/recipes.json [{rid}]: nota_da_subito deve essere true SSE tier e' 'base'")
+        if r.get("qualita_base") not in potion_quality:
+            err(f"data/potions/recipes.json [{rid}]: qualita_base '{r.get('qualita_base')}' "
+                f"non nel vocabolario ({sorted(potion_quality)})")
+        ingr = r.get("ingredienti", {})
+        if not isinstance(ingr, dict) or not ingr:
+            err(f"data/potions/recipes.json [{rid}]: 'ingredienti' deve essere un oggetto non vuoto")
+        for ing, q in (ingr if isinstance(ingr, dict) else {}).items():
+            if item_cat.get(ing) != "ingrediente":
+                err(f"data/potions/recipes.json [{rid}]: ingrediente '{ing}' non e' un item categoria:ingrediente")
+            if not isinstance(q, int) or q <= 0:
+                err(f"data/potions/recipes.json [{rid}]: quantita' di '{ing}' deve essere un intero > 0")
+        out = r.get("output", {})
+        oid = out.get("item_id")
+        oeff = out.get("effetto")
+        if oid is not None:
+            if oid not in item_ids:
+                err(f"data/potions/recipes.json [{rid}]: output.item_id '{oid}' non risolve")
+        elif isinstance(oeff, dict):
+            if oeff.get("tipo") not in primitives or oeff.get("tipo") in deferred_primitives:
+                err(f"data/potions/recipes.json [{rid}]: output.effetto.tipo '{oeff.get('tipo')}' "
+                    f"non e' una primitiva implementabile")
+        else:
+            err(f"data/potions/recipes.json [{rid}]: output deve avere item_id o effetto")
 
     # --- libro / UI (data/ui/book.json, US-221) ---
     pt_doc = load_json(os.path.join(DATA, "schema", "page_types.json"))

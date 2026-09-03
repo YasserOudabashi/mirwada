@@ -25,6 +25,8 @@ const PATH_FORMS := "res://data/forms.json"
 const PATH_TRACKED_EVENTS := "res://data/schema/tracked_events.json"
 const PATH_CHARACTERISTICS := "res://data/characteristics.json"
 const PATH_FORMULAS := "res://data/potions/formulas.json"
+const PATH_RECIPES := "res://data/potions/recipes.json"
+const PATH_POTION_QUALITY := "res://data/schema/potion_quality.json"
 const PATH_ANCHORS := "res://data/anchors.json"
 const PATH_STATUS := "res://data/status_effects.json"
 ## Cataloghi di stringhe DEI DATI (US-220). Sistema separato dal tr() di Godot
@@ -55,6 +57,8 @@ var _forms: Dictionary = {}
 var _tracked_events: Dictionary = {}
 var _characteristics: Dictionary = {}
 var _formulas: Dictionary = {}
+var _recipes: Dictionary = {}
+var _potion_quality: Dictionary = {}
 var _anchors: Dictionary = {}
 var _statuses: Dictionary = {}
 var _i18n_it: Dictionary = {}
@@ -118,6 +122,8 @@ func load_all() -> void:
 	_load_single(PATH_TRACKED_EVENTS, "events", _tracked_events, TYPE_DICTIONARY)
 	_load_single(PATH_CHARACTERISTICS, "characteristics", _characteristics, TYPE_ARRAY)
 	_load_single(PATH_FORMULAS, "formulas", _formulas, TYPE_DICTIONARY)
+	_load_single(PATH_RECIPES, "recipes", _recipes, TYPE_DICTIONARY)
+	_load_single(PATH_POTION_QUALITY, "qualita", _potion_quality, TYPE_ARRAY)
 	_load_single(PATH_ANCHORS, "anchors", _anchors, TYPE_ARRAY)
 	_load_single(PATH_STATUS, "statuses", _statuses, TYPE_DICTIONARY)
 	_load_flat(PATH_I18N_IT, _i18n_it)
@@ -262,9 +268,32 @@ func get_formula(formula_id: String) -> Dictionary:
 	return _dict_or_empty(_dict_or_empty(_formulas.get("formulas")).get(formula_id))
 
 
-## Vocabolario chiuso degli ingredienti.
+## Vocabolario chiuso degli ingredienti (delle pozioni di AVANZAMENTO, fase 2).
 func ingredient_ids() -> Array:
 	return _array_or_empty(_formulas.get("ingredients"))
+
+
+## --- Ricette delle pozioni consumabili (data/potions/recipes.json, US-308) ---
+## Percorso separato dalle formule di avanzamento. {} se l'id non esiste.
+func get_recipe(id: String) -> Dictionary:
+	return _dict_or_empty(_dict_or_empty(_recipes.get("recipes")).get(id))
+
+
+func recipe_ids() -> Array:
+	return _dict_or_empty(_recipes.get("recipes")).keys()
+
+
+func recipes_per_tier(tier: String) -> Array:
+	var out: Array = []
+	for id in _dict_or_empty(_recipes.get("recipes")):
+		if str((_recipes["recipes"][id] as Dictionary).get("tier", "")) == tier:
+			out.append(id)
+	return out
+
+
+## Vocabolario chiuso della qualita' delle pozioni (crescente).
+func potion_quality() -> Array:
+	return _array_or_empty(_potion_quality.get("qualita"))
 
 
 ## --- Ancore (data/anchors.json) ---

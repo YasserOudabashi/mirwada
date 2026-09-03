@@ -31,6 +31,36 @@
       "impilabile": true,
       "valore": 22,
       "nutre_pet": true
+    },
+    {
+      "id": "pozione_cura_maggiore",
+      "categoria": "consumabile",
+      "name_i18n": "item.pozione_cura_maggiore",
+      "descrizione_i18n": "item.pozione_cura_maggiore.desc",
+      "tag": ["pozione", "guarigione", "luce"],
+      "impilabile": true,
+      "valore": 40,
+      "effetto": { "tipo": "heal", "quantita": 70.0, "istantaneo": true }
+    },
+    {
+      "id": "elisir_ombra",
+      "categoria": "consumabile",
+      "name_i18n": "item.elisir_ombra",
+      "descrizione_i18n": "item.elisir_ombra.desc",
+      "tag": ["pozione", "ombra", "agilita'"],
+      "impilabile": true,
+      "valore": 45,
+      "effetto": { "tipo": "buff_stat", "stat": "evasione", "valore": 0.2, "durata": 15.0, "moltiplicativo": false }
+    },
+    {
+      "id": "ambrosia",
+      "categoria": "consumabile",
+      "name_i18n": "item.ambrosia",
+      "descrizione_i18n": "item.ambrosia.desc",
+      "tag": ["pozione", "luna", "anima", "guarigione"],
+      "impilabile": true,
+      "valore": 200,
+      "effetto": { "tipo": "heal", "quantita": 200.0, "istantaneo": true }
     }
   ]
 }

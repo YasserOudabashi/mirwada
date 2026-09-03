@@ -245,8 +245,8 @@
       ],
       "priority": 12,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO B. Percorso SEPARATO dalle formule di avanzamento di fase 2 (formulas.json invariata): pozioni CONSUMABILI da ingredienti di data/items/. data/schema/potion_quality.json (vocab chiuso {scarsa,instabile,pura,eccelsa} crescente; formulas.json.penalita_parziale gia usa instabile). data/schema/potion_recipe.schema.json + data/potions/recipes.json (6 ricette: 3 base, 2 avanzata, 1 leggendaria; id/name_i18n/tier/nota_da_subito/output{item_id|effetto}/ingredienti{item_id:qta}/qualita_base). data/items/: 5 ingredienti + 3 consumabili nuovi (output). GameData: get_recipe/recipe_ids/recipes_per_tier/potion_quality (43 file). validate_data.py: blocco ricette - tier valido, nota_da_subito==(tier base), qualita_base nel vocab, ingredienti categoria:ingrediente qta int>0, output risolve; item_cat raccolto nel blocco item. i18n: 18 chiavi (265 totali). 357 test headless (351+6 test_recipes.gd), validator 0, i18n --check 0."
     },
     {
       "id": "US-310",

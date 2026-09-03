@@ -39,6 +39,43 @@
       "impilabile": true,
       "valore": 2,
       "coltivabile": true
+    },
+    {
+      "id": "acqua_sorgiva",
+      "categoria": "ingrediente",
+      "name_i18n": "item.acqua_sorgiva",
+      "descrizione_i18n": "item.acqua_sorgiva.desc",
+      "tag": ["acqua", "purificazione"],
+      "impilabile": true,
+      "valore": 1
+    },
+    {
+      "id": "petalo_solare",
+      "categoria": "ingrediente",
+      "name_i18n": "item.petalo_solare",
+      "descrizione_i18n": "item.petalo_solare.desc",
+      "tag": ["luce", "guarigione"],
+      "impilabile": true,
+      "valore": 4,
+      "coltivabile": true
+    },
+    {
+      "id": "sangue_di_lupo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sangue_di_lupo",
+      "descrizione_i18n": "item.sangue_di_lupo.desc",
+      "tag": ["sangue", "bestia", "forza"],
+      "impilabile": true,
+      "valore": 6
+    },
+    {
+      "id": "lacrima_di_luna",
+      "categoria": "ingrediente",
+      "name_i18n": "item.lacrima_di_luna",
+      "descrizione_i18n": "item.lacrima_di_luna.desc",
+      "tag": ["luna", "spirito", "anima"],
+      "impilabile": true,
+      "valore": 30
     }
   ]
 }

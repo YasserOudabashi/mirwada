@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO della qualita' delle pozioni consumabili (US-308). In ordine crescente. Una pozione preparata con ingredienti giusti e un buon laboratorio sale verso 'eccelsa'; una pozione parziale (fase 2, formulas.json.penalita_parziale) e' al piu' 'instabile'.",
+  "qualita": ["scarsa", "instabile", "pura", "eccelsa"]
+}

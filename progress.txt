@@ -2739,3 +2739,33 @@ sezione test aggiornata.
   valuta, tag per le sinergie, pagina del libro. Prossimo blocco: C
   (sigilli e forgiatura, US-315..318).
 - Prossima storia: US-315 (schema dei sigilli).
+
+[2026-09-03] US-308 — Ricettario, tier e qualita' delle pozioni
+
+- BLOCCO B (alchimia). Percorso SEPARATO dalle formule di AVANZAMENTO di
+  fase 2 (data/potions/formulas.json resta invariata): qui si preparano
+  pozioni CONSUMABILI da ingredienti di data/items/.
+- data/schema/potion_quality.json: vocabolario CHIUSO {scarsa, instabile,
+  pura, eccelsa} (crescente). formulas.json.penalita_parziale gia' usa
+  "instabile": scala condivisa, una pozione parziale e' al piu' instabile.
+- data/schema/potion_recipe.schema.json + data/potions/recipes.json: 6 ricette
+  (3 base note_da_subito, 2 avanzata, 1 leggendaria). Ognuna: id, name_i18n,
+  tier, nota_da_subito, output {item_id | effetto}, ingredienti {item_id: qta},
+  qualita_base.
+- data/items/: 5 ingredienti nuovi (acqua_sorgiva, petalo_solare,
+  sangue_di_lupo, lacrima_di_luna + fungo gia' c'era) e 3 consumabili nuovi
+  (pozione_cura_maggiore, elisir_ombra, ambrosia) come output delle ricette.
+- GameData: get_recipe(id), recipe_ids(), recipes_per_tier(tier),
+  potion_quality(). recipes.json + potion_quality.json caricati (43 file).
+- validate_data.py: blocco ricette - tier in {base,avanzata,leggendaria};
+  nota_da_subito bool == (tier base); qualita_base nel vocabolario; ogni
+  ingrediente e' un item categoria:ingrediente con qta int > 0; output.item_id
+  risolve o output.effetto.tipo e' una primitiva implementabile. + item_cat
+  (id -> categoria) raccolto nel blocco item per riuso.
+- i18n: 18 chiavi item.* / recipe.* tradotte (265 chiavi totali).
+- Come verificato: 357 test headless (351 + 6 in test_recipes.gd: vocabolario
+  qualita' 4 crescente, get_recipe + tier + id ignoto -> {}, recipes_per_tier
+  per i 3 tier, solo le base sono note_da_subito, ogni ingrediente/output
+  risolve, la qualita' parziale di fase 2 e' nel vocabolario). validator 0,
+  i18n --check 0.
+- Prossima storia: US-310 (concoction v2 - qualita', laboratorio, output).
