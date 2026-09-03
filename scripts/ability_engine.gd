@@ -20,6 +20,7 @@ const ERR_SCONOSCIUTA := "abilita_sconosciuta"
 const ERR_COOLDOWN := "in_cooldown"
 const ERR_SPIRITUALITA := "spiritualita_insufficiente"
 const ERR_NO_STATS := "caster_senza_stats"
+const ERR_NON_POSSEDUTA := "abilita_non_posseduta"
 
 ## Chiave "<instance_id>:<ability_id>" -> istante di fine in ms. Le voci dei
 ## caster non piu' validi o gia' scadute vengono rimosse da sweep_cooldowns():
@@ -27,6 +28,11 @@ const ERR_NO_STATS := "caster_senza_stats"
 var _cooldowns: Dictionary = {}
 const _SWEEP_OGNI_MS := 5000
 var _prossimo_sweep_ms: int = 0
+
+## Abilita' PRESTATE (US-204): "<instance_id>:<ability_id>" -> istante di fine
+## in ms. Un caster puo' eseguire un'abilita' fuori dal suo Pathway finche' il
+## prestito e' valido. Stress test: Error (Sequenza 6) usa abilita' altrui.
+var _granted: Dictionary = {}
 
 var _handlers: Dictionary = {}
 ## Effetti a tempo in corso. Una lista processata in _process invece di
@@ -71,6 +77,13 @@ func execute(ability_id: String, caster: Node) -> Dictionary:
 	if stats == null:
 		result["reason"] = ERR_NO_STATS
 		push_error("[AbilityEngine] %s non ha uno StatsComponent" % caster)
+		return result
+
+	# Il giocatore puo' lanciare solo le abilita' del suo Pathway o quelle
+	# prestate e ancora valide (US-204). Ogni altro caster (nemici, manichini,
+	# test) non ha un Pathway noto: nessuna restrizione.
+	if not _puo_lanciare(caster, ability_id):
+		result["reason"] = ERR_NON_POSSEDUTA
 		return result
 
 	if is_on_cooldown(caster, ability_id):
@@ -172,12 +185,83 @@ func cooldown_entries() -> int:
 ## Rimuove le voci scadute e quelle dei caster non piu' esistenti. Pubblica:
 ## i test la chiamano invece di aspettare l'intervallo di _process.
 func sweep_cooldowns() -> void:
+	_sweep(_cooldowns)
+	_sweep(_granted)
+
+
+func _sweep(index: Dictionary) -> void:
 	var now: int = Time.get_ticks_msec()
-	for key in _cooldowns.keys():
-		var scaduta: bool = now >= int(_cooldowns[key])
+	for key in index.keys():
+		var scaduta: bool = now >= int(index[key])
 		var iid: int = str(key).get_slice(":", 0).to_int()
 		if scaduta or not is_instance_id_valid(iid):
-			_cooldowns.erase(key)
+			index.erase(key)
+
+
+# --- Abilita' prestate (US-204) --------------------------------------------
+
+## Presta un'abilita' al caster per "durata" secondi: execute() la accettera'
+## anche se non e' nel suo Pathway. false se l'ability_id non esiste.
+func grant_temporary(ability_id: String, caster: Node, durata: float) -> bool:
+	if caster == null or (_game_data().call("get_ability", ability_id) as Dictionary).is_empty():
+		push_error("[AbilityEngine] grant_temporary: abilita' inesistente '%s'" % ability_id)
+		return false
+	var key: String = _key(caster, ability_id)
+	_granted[key] = Time.get_ticks_msec() + int(maxf(durata, 0.0) * 1000.0)
+	_pending.append({"kind": "grant_expire", "caster": caster, "key": key,
+			"left": maxf(durata, 0.001)})
+	return true
+
+
+func is_granted(caster: Node, ability_id: String) -> bool:
+	var key: String = _key(caster, ability_id)
+	return _granted.has(key) and Time.get_ticks_msec() < int(_granted[key])
+
+
+## Gli id delle abilita' ancora prestate a questo caster.
+func granted_abilities(caster: Node) -> Array:
+	var out: Array = []
+	if caster == null:
+		return out
+	var prefisso: String = "%d:" % caster.get_instance_id()
+	var now: int = Time.get_ticks_msec()
+	for key in _granted:
+		var k: String = key
+		if k.begins_with(prefisso) and now < int(_granted[key]):
+			out.append(k.substr(prefisso.length()))
+	return out
+
+
+func clear_granted() -> void:
+	_granted.clear()
+
+
+## Abilita' che il caster POSSIEDE: solo per il giocatore con un Pathway
+## attivo (le abilita' delle Sequenze da 9 fino alla corrente). Per ogni
+## altro caster e' [] = "non lo so", e allora execute() non pone limiti.
+func owned_abilities(caster: Node) -> Array:
+	if caster == null or not caster.is_in_group("player"):
+		return []
+	var prog: Node = get_tree().root.get_node_or_null("Progression")
+	if prog == null:
+		return []
+	var pid: String = prog.call("pathway")
+	if pid.is_empty():
+		return []
+	var seq_corrente: int = prog.call("sequence")
+	var out: Array = []
+	for s in range(9, seq_corrente - 1, -1):
+		var sd: Dictionary = _game_data().call("get_sequence", "%s_%d" % [pid, s])
+		for a in sd.get("abilities", []):
+			out.append(str(a))
+	return out
+
+
+func _puo_lanciare(caster: Node, ability_id: String) -> bool:
+	var posseduto: Array = owned_abilities(caster)
+	if posseduto.is_empty():
+		return true  # ownership sconosciuta: nessuna restrizione
+	return ability_id in posseduto or is_granted(caster, ability_id)
 
 
 func _start_cooldown(caster: Node, ability_id: String, seconds: float) -> void:
@@ -629,6 +713,8 @@ func tick_effects(delta: float) -> void:
 					anchor.call("azzera_scudo")
 				"transform":
 					anchor.call("remove_modifier", str(e["mod_id"]))
+				"grant_expire":
+					_granted.erase(str(e["key"]))
 			continue
 
 		e["left"] = left
@@ -645,6 +731,9 @@ func pending_count() -> int:
 func flush_effects() -> void:
 	for entry in _pending:
 		var e: Dictionary = entry
+		if str(e["kind"]) == "grant_expire":
+			_granted.erase(str(e["key"]))
+			continue
 		# Le entry ancorate al caster (aura, terrain_temp) non hanno un
 		# modificatore da togliere: si scartano e basta.
 		if not e.has("stats"):

@@ -142,8 +142,8 @@
       ],
       "priority": 7,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "grant_temporary(ability_id, caster, durata) -> bool (false se l'abilita' non esiste): registra il prestito in _granted ('<iid>:<ability_id>' -> istante di fine ms, come _cooldowns) e accoda un _pending {kind:grant_expire, caster, key}. is_granted(caster, ability_id), granted_abilities(caster), clear_granted(). CONTESTO: execute() prima non aveva NESSUN gate di ownership - eseguiva qualunque abilita' esistente. US-204 aggiunge il gate ma SOLO per il giocatore: owned_abilities(caster) restituisce le abilita' delle Sequenze da 9 alla corrente del Pathway di Progression, e solo se il caster e' nel gruppo 'player' con un pathway attivo; per ogni altro caster (nemici, manichini, test) restituisce [] = 'ownership sconosciuta' e _puo_lanciare non pone limiti (flusso invariato, zero regressioni sui ~18 test che chiamano execute con caster generici). _puo_lanciare: posseduta OR prestata OR ownership sconosciuta. execute() di un'abilita' non posseduta ne' prestata -> ERR_NON_POSSEDUTA (nuova costante), rifiuto gestito. Scadenza gestita da tick_effects (ramo grant_expire -> _granted.erase) e da sweep (sweep_cooldowns ora fa _sweep su entrambi gli indici: voci scadute o caster liberato). flush_effects pulisce anche _granted. 6 test in test_ability_grant.gd (159 totali): registrazione+ispezione, abilita' inesistente, giocatore non lancia una non posseduta, prestito sblocca+scade+torna rifiutata, caster senza Pathway senza restrizioni, prestito muore col caster. validator 0, nessuna regressione."
     },
     {
       "id": "US-205",

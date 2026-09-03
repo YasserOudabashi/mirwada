@@ -1470,3 +1470,38 @@ sezione test aggiornata.
   suo gruppo.
 - Primitive implementate: 13 -> 14 su 28.
 - Prossima storia: US-204 (AbilityEngine esegue un'abilita' non posseduta).
+
+[2026-09-03] US-204 — AbilityEngine esegue un'abilita' non posseduta (prestito a tempo)
+
+- CONTESTO: execute() prima non aveva NESSUN controllo di ownership -
+  eseguiva qualunque abilita' esistente in GameData. Lo stress test
+  chiedeva che Error (Sequenza 6) potesse usare abilita' altrui: ora c'e'
+  un meccanismo esplicito di PRESTITO, e il gate di ownership per il
+  giocatore.
+- Cosa fatto (scripts/ability_engine.gd):
+  - grant_temporary(ability_id, caster, durata) -> bool (false se l'abilita'
+    non esiste). Registra in _granted ("<iid>:<ability_id>" -> istante di
+    fine ms, stesso schema di _cooldowns) e accoda _pending
+    {kind:"grant_expire", caster, key}.
+  - is_granted(caster, id), granted_abilities(caster) -> Array,
+    clear_granted().
+  - owned_abilities(caster): le abilita' delle Sequenze da 9 alla corrente
+    del Pathway (via Progression), ma SOLO se caster e' nel gruppo "player"
+    con pathway attivo. Per ogni altro caster -> [] = "ownership
+    sconosciuta".
+  - _puo_lanciare(caster, id): posseduta OR prestata OR ownership
+    sconosciuta. execute() lo chiama subito dopo il check dello stats:
+    se false -> ERR_NON_POSSEDUTA (nuova costante), rifiuto gestito.
+  - ZERO REGRESSIONI: i ~18 test che chiamano execute() usano caster
+    generici (bare Node2D, non nel gruppo "player") -> owned_abilities []
+    -> nessun limite, flusso identico a prima.
+  - Scadenza: tick_effects ha il ramo grant_expire (-> _granted.erase);
+    sweep_cooldowns() ora fa _sweep(index) su _cooldowns E _granted (voci
+    scadute o caster liberato). flush_effects pulisce anche _granted.
+- Come verificato: 159 test headless (153 + 6 in test_ability_grant.gd:
+  registrazione + ispezione, abilita' inesistente -> false, il giocatore
+  non lancia un'abilita' non posseduta, il prestito la sblocca / scade via
+  tick_effects / torna rifiutata dopo la scadenza, un caster senza Pathway
+  non ha restrizioni, il prestito muore col caster). validator exit 0,
+  nessuna regressione.
+- Prossima storia: US-205 (evocazioni persistenti serializzate).
