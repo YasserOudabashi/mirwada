@@ -658,8 +658,8 @@
       ],
       "priority": 32,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Autoload SettingsStore (scripts/settings_store.gd): user://settings.json con lo stesso rigore del save - scrittura ATOMICA (tmp+rename), JSON.parse_string+typeof() al load, file corrotto -> push_warning e default dai dati (mai fatale); get_val scarta i tipi incoerenti (settings manomesso). set_val -> _applica + _salva + segnale. _applica_tutto all avvio: lingua, volumi dei 6 bus, toggle accessibilita -> AudioManager.imposta_accessibilita, scala finestra/fullscreen via DisplayServer, rimappature InputMap. Sezioni: audio (volume_<bus> dB + sottotitoli/indicatori/disattiva_sussurri), video (scala 1/2/3, fullscreen, disattiva_shake, riduci_hitstop/distorsione/flash/animazioni, macchie_follia), input (azione->physical_keycode, sostituisce il 1o evento tastiera), lingua (it/en). AudioManager e i VFX leggono cio che SettingsStore spinge, non i default. scenes/pages/page_impostazioni.{tscn,gd} (ScrollContainer): sezioni da liste, ogni controllo -> set_val effetto immediato; rebind cattura il prossimo InputEventKey. book_overlay.PAGINE += impostazioni. i18n: ~24 COLOPHON_* in strings.csv. 302 test headless (294+8 test_settings.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): colophon coi 6 slider volume + toggle; scala_finestra=3 -> 1920x1080 senza riavvio; volume_music=-20 e disattiva_sussurri applicati subito; settings.json pulito. Screenshot user://us225. Resta: nessuna sezione controller dedicata (rebind solo tastiera)."
     },
     {
       "id": "US-226",

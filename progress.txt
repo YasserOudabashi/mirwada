@@ -2406,3 +2406,42 @@ sezione test aggiornata.
   codice). Il sistema conoscenza pieno (fonti: dialoghi, libri, sinergie
   lore) e' fase 6: qui c'e' solo il magazzino + il consumo nel diagramma.
 - Prossima storia: US-225 (colophon / impostazioni + user://settings.json).
+
+[2026-09-03] US-225 — Colophon (impostazioni) e user://settings.json
+
+- Autoload SettingsStore (scripts/settings_store.gd), dopo KnowledgeStore.
+  user://settings.json con lo stesso rigore del save: scrittura ATOMICA
+  (tmp + DirAccess.rename), JSON.parse_string + typeof() al load, file
+  corrotto -> push_warning e si riparte dai default dei DATI (mai fatale).
+  * get_val(sez, chiave, default): se il tipo nel file diverge dal default
+    (settings manomesso) torna il default; int<->float tollerati.
+  * set_val(sez, chiave, val): _applica() + _salva() + segnale cambiata.
+  * _applica_tutto() all'avvio (dopo un frame): lingua, volumi dei 6 bus,
+    toggle accessibilita' -> AudioManager.imposta_accessibilita, scala
+    finestra / fullscreen via DisplayServer, rimappature InputMap.
+  * Sezioni: audio (volume_<bus> dB + sottotitoli/indicatori/disattiva_sussurri),
+    video (scala_finestra 1/2/3, fullscreen, disattiva_shake, riduci_hitstop/
+    distorsione/flash/animazioni, macchie_follia), input (azione -> physical_
+    keycode, sostituisce il 1o evento tastiera), lingua (it/en).
+  * AudioManager e i VFX NON leggono i default: leggono cio' che SettingsStore
+    spinge (i toggle passano tutti da imposta_accessibilita, che madness_
+    overlay gia' consulta).
+- scenes/pages/page_impostazioni.{tscn,gd} (ScrollContainer): sezioni
+  costruite da liste, ogni controllo -> SettingsStore.set_val, effetto
+  immediato. Rebind: click sul bottone -> "Premi un tasto..." -> il prossimo
+  InputEventKey diventa il bind. book_overlay.PAGINE += impostazioni.
+- i18n: ~24 chiavi COLOPHON_* in strings.csv (chrome del libro, come l'HUD).
+- Come verificato: 302 test headless (294 + 8 in test_settings.gd: scrittura
+  atomica + round-trip, file corrotto non fatale, tipo incoerente scartato,
+  volume applicato a runtime al bus, lingua applicata a runtime, toggle ->
+  AudioManager, rimappatura tasti in InputMap, il colophon costruisce le
+  sezioni). validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): il
+  colophon mostra i 6 slider di volume (Sussurri gia' basso a -30) e i
+  toggle; set scala_finestra=3 -> finestra 1920x1080 senza riavvio;
+  volume_music=-20 -> il bus scende subito; disattiva_sussurri -> arriva ad
+  AudioManager. settings.json scritto pulito. Screenshot user://us225.
+- Resta aperto: nessuna sezione controller dedicata (Godot mappa i joypad
+  sulle stesse azioni; il rebind cattura solo tastiera per ora). La scala
+  finestra non e' persistita fra sessioni come preset di progetto ma sì in
+  settings.json.
+- Prossima storia: US-226 (data/vfx.json - palette visive e schema).

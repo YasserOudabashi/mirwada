@@ -12,3 +12,26 @@ BOOK_FRONTESPIZIO_INVITO,Scrivi il tuo nome sul frontespizio,Write your name on 
 BOOK_FRONTESPIZIO_CONFERMA,Comincia,Begin
 BOOK_FRONTESPIZIO_SEQUENZA,Sequenza,Sequence
 BOOK_DIAGRAMMA_SEI_QUI,Sei qui:,You are here:
+COLOPHON_AUDIO,Audio,Audio
+COLOPHON_VIDEO,Video,Video
+COLOPHON_INPUT,Comandi,Controls
+COLOPHON_LINGUA,Lingua,Language
+COLOPHON_BUS_MASTER,Volume generale,Master volume
+COLOPHON_BUS_MUSIC,Musica,Music
+COLOPHON_BUS_SFX,Effetti,Effects
+COLOPHON_BUS_AMBIENCE,Ambiente,Ambience
+COLOPHON_BUS_UI,Interfaccia,Interface
+COLOPHON_BUS_WHISPER,Sussurri,Whispers
+COLOPHON_SOTTOTITOLI_EFFETTI,Sottotitoli degli effetti,Effect subtitles
+COLOPHON_INDICATORE_VISIVO_TELL,Indicatore visivo degli attacchi,Visual attack indicator
+COLOPHON_INDICATORE_DIREZIONE_SUONO,Indicatore di direzione del suono,Sound direction indicator
+COLOPHON_DISATTIVA_SUSSURRI,Disattiva i sussurri,Mute whispers
+COLOPHON_SCALA,Scala della finestra,Window scale
+COLOPHON_FULLSCREEN,Schermo intero,Fullscreen
+COLOPHON_DISATTIVA_SHAKE,Disattiva lo scuotimento,Disable screen shake
+COLOPHON_RIDUCI_HITSTOP,Riduci il fermo-immagine sui colpi,Reduce hitstop
+COLOPHON_RIDUCI_DISTORSIONE,Riduci le distorsioni,Reduce distortion
+COLOPHON_RIDUCI_FLASH,Riduci i lampi,Reduce flashing
+COLOPHON_RIDUCI_ANIMAZIONI,Riduci le animazioni,Reduce animations
+COLOPHON_MACCHIE_FOLLIA,Macchie di follia sulle pagine,Madness stains on pages
+COLOPHON_PREMI_TASTO,Premi un tasto...,Press a key...
