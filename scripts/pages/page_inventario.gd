@@ -47,6 +47,7 @@ func _mostra(sezione: String) -> void:
 	match sezione:
 		"zaino": _zaino()
 		"indosso": _indosso()
+		"ricettario": _ricettario()
 		_: _corpo.add_child(_riga(tr("BOOK_INV_ARRIVA")))
 
 
@@ -87,6 +88,47 @@ func _riga_item(v: Dictionary) -> HBoxContainer:
 		h.add_child(_azione(tr("BOOK_INV_USA"), func() -> void:
 			_n("/root/Inventory").call("usa", iid); _mostra("zaino")))
 	return h
+
+
+func _ricettario() -> void:
+	var gd: Node = _n("/root/GameData")
+	var ps: Node = _n("/root/PotionSystem")
+	var inv: Node = _n("/root/Inventory")
+	if gd == null or ps == null:
+		return
+	var ordine := {"base": 0, "avanzata": 1, "leggendaria": 2}
+	var ids: Array = gd.call("recipe_ids")
+	ids.sort_custom(func(a: String, b: String) -> bool:
+		var ta: int = int(ordine.get(gd.call("get_recipe", a).get("tier"), 9))
+		var tb: int = int(ordine.get(gd.call("get_recipe", b).get("tier"), 9))
+		return ta < tb if ta != tb else a < b)
+
+	for rid in ids:
+		var r: Dictionary = gd.call("get_recipe", rid)
+		var ingr: Dictionary = r.get("ingredienti", {})
+		var h := HBoxContainer.new()
+		if bool(ps.call("ricetta_nota", rid)):
+			var l := Label.new()
+			l.text = "%s  (%s)" % [str(gd.call("tr_data", r.get("name_i18n", rid))), str(r.get("tier"))]
+			l.custom_minimum_size = Vector2(300, 0)
+			h.add_child(l)
+			var ha_tutto := true
+			for ing in ingr:
+				if inv == null or inv.call("conta", ing) < int(ingr[ing]):
+					ha_tutto = false
+			var b := Button.new()
+			b.text = tr("BOOK_RIC_PREPARA")
+			b.disabled = not ha_tutto
+			b.pressed.connect(func() -> void:
+				_n("/root/PotionSystem").call("prepara", rid); _mostra("ricettario"))
+			h.add_child(b)
+		else:
+			# offuscata: sai che esiste e quanti ingredienti, non quale
+			var l := Label.new()
+			l.text = tr("BOOK_RIC_SCONOSCIUTA") % ingr.size()
+			l.modulate = Color(1, 1, 1, 0.55)
+			h.add_child(l)
+		_corpo.add_child(h)
 
 
 func _indosso() -> void:

@@ -342,8 +342,8 @@
       ],
       "priority": 17,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "page_inventario.gd: sezione ricettario reale (era segnaposto). Ricette ordinate per tier poi id. NOTA (PotionSystem.ricetta_nota): nome (tr_data) + (tier) + bottone Prepara (disabilitato se mancano ingredienti; premuto -> PotionSystem.prepara + refresh). NON nota: riga OFFUSCATA alpha 0.55 \"Ricetta sconosciuta - N ingredienti\" (sai che esiste e quanti ingredienti, non quale). i18n: BOOK_RIC_PREPARA, BOOK_RIC_SCONOSCIUTA (%d) in strings.csv. 375 test headless (372+3 test_page_ricettario.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): 3 base + 1 avanzata appresa + 2 righe offuscate. Screenshot user://us314. BLOCCO B (US-308/310/311/312/313/314) CHIUSO."
     },
     {
       "id": "US-319",

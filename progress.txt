@@ -2862,3 +2862,27 @@ sezione test aggiornata.
   la insegna (flag + consumo), dopo averla appresa si prepara e produce
   l'ambrosia). validator 0, i18n --check 0.
 - Prossima storia: US-314 (il ricettario nel libro).
+
+[2026-09-04] US-314 — Il ricettario nel libro. BLOCCO B (alchimia) CHIUSO.
+
+- page_inventario.gd: la sezione 'ricettario' (era il segnaposto "arriva piu'
+  avanti") diventa reale. Ricette ordinate per tier (base, avanzata,
+  leggendaria) poi per id.
+  * ricetta NOTA (PotionSystem.ricetta_nota): nome (tr_data) + "(tier)" +
+    bottone "Prepara" (disabilitato se mancano ingredienti -> Inventory.conta;
+    premuto -> PotionSystem.prepara + refresh).
+  * ricetta NON nota: riga OFFUSCATA (alpha 0.55) "Ricetta sconosciuta - N
+    ingredienti" - sai che esiste e quanti ingredienti, non quale (stesso
+    principio del fog of war del diagramma).
+- i18n: BOOK_RIC_PREPARA, BOOK_RIC_SCONOSCIUTA (con %d) in strings.csv.
+- Come verificato: 375 test headless (372 + 3 in test_page_ricettario.gd: le
+  base sempre visibili + le altre offuscate, un'avanzata scoperta compare
+  col nome, Prepara dal ricettario produce la pozione). validator 0,
+  i18n --check 0. VERIFICA A SCHERMO (main.tscn): il ricettario mostra 3 base
+  + 1 avanzata appresa (Prepara attivo/disattivo secondo gli ingredienti) +
+  2 righe "Ricetta sconosciuta - N ingredienti" offuscate. Screenshot
+  user://us314.
+- BLOCCO B completo: US-308, 310, 311, 312, 313, 314. Ricettario a 3 tier,
+  qualita', concoction v2, sperimentazione + scoperta, fallimenti mostruosi
+  (aberrazione), ricette leggendarie, ricettario nel libro.
+- Prossima storia: US-319 (StructureRegistry - blocco D).

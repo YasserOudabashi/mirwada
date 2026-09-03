@@ -60,3 +60,5 @@ BOOK_SLOT_ARMA,Arma,Weapon
 BOOK_SLOT_ARMATURA,Armatura,Armor
 BOOK_SLOT_ACCESSORIO_1,Accessorio I,Accessory I
 BOOK_SLOT_ACCESSORIO_2,Accessorio II,Accessory II
+BOOK_RIC_PREPARA,Prepara,Brew
+BOOK_RIC_SCONOSCIUTA,Ricetta sconosciuta — %d ingredienti,Unknown recipe — %d ingredients
