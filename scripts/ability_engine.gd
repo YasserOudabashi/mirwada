@@ -401,6 +401,16 @@ func _p_light_purify(prim: Dictionary, _caster: Node, stats: Node, _ability_id: 
 		superstiti.append(e)
 	_pending = superstiti
 
+	# US-218C: rimuove anche gli status negativi, PER TAG (come dice il PRD).
+	if stats != null and stats.has_method("status_attivi"):
+		var gd: Node = _game_data()
+		for sid in (stats.call("status_attivi") as Array).duplicate():
+			if rimossi >= potenza:
+				break
+			if bool((gd.call("get_status_effect", sid) as Dictionary).get("negativo", false)):
+				stats.call("rimuovi_status", sid)
+				rimossi += 1
+
 	return {"tipo": "light_purify", "raggio": raggio, "potenza": potenza,
 			"riduce_sequenza": riduce_sequenza, "rimossi": rimossi}
 
@@ -484,22 +494,21 @@ func _p_terrain_modify(prim: Dictionary, caster: Node, _stats: Node, _ability_id
 ## registrati per quando ci sara' un sistema di cleanse per condizione.
 ## Il "danno" della sfortuna lo fanno le altre primitive dell'abilita'
 ## (debuff_stat, dot), non questa: curse e' il contenitore concettuale.
-func _p_curse(prim: Dictionary, _caster: Node, stats: Node, ability_id: String) -> Dictionary:
+func _p_curse(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
 	var effetto: String = str(prim.get("effetto", ""))
 	var durata: float = _num(prim.get("durata"), 0.0)
 	var condizione_rimozione: String = str(prim.get("condizione_rimozione", ""))
 
-	var mod_id: String = "curse:%s" % ability_id
-	stats.call("apply_modifier", mod_id, {})
-	if durata > 0.0:
-		_pending.append({
-			"kind": "expire", "stats": stats, "mod_id": mod_id, "left": durata,
-			"debuff": true,
-		})
+	# US-218C: la maledizione e' uno status nominato (data/status_effects.json),
+	# non piu' un marcatore vuoto. StatsComponent lo scade da solo; light_purify
+	# lo toglie per tag.
+	var applicato: bool = false
+	if not effetto.is_empty() and stats != null and stats.has_method("applica_status"):
+		stats.call("applica_status", effetto, durata if durata > 0.0 else -1.0)
+		applicato = true
 
 	return {"tipo": "curse", "effetto": effetto, "durata": durata,
-			"condizione_rimozione": condizione_rimozione, "modifier_id": mod_id,
-			"applied": true}
+			"condizione_rimozione": condizione_rimozione, "applied": applicato}
 
 
 ## summon: evoca "quantita" entita' di tipo entita_id. durata: -1 ->
@@ -665,27 +674,36 @@ func _p_dot(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -
 			"durata": durata, "tag_danno": tag_danno}
 
 
-## decay: danno d'area continuo per una durata. Il danno dichiarato e' il
-## totale, spalmato sulla durata (come _p_heal nel tempo, di segno opposto).
-## raggio e colpisce_oggetti sono registrati; la query d'area sulle entita'
-## arriva con l'integrazione combat delle abilita'.
-func _p_decay(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+## decay: danno d'area continuo per una durata. Con raggio > 0 e un caster in
+## scena genera un field (scripts/field.gd) che colpisce le hurtbox nel
+## raggio; altrimenti ripiega sulla coda _pending (danno totale spalmato sul
+## caster stesso, come prima).
+func _p_decay(prim: Dictionary, caster: Node, stats: Node, _ability_id: String) -> Dictionary:
 	var danno: float = _num(prim.get("danno"), 0.0)
 	var raggio: float = _num(prim.get("raggio"), 0.0)
 	var colpisce_oggetti: bool = _flag(prim.get("colpisce_oggetti"), false)
 	var durata: float = _num(prim.get("durata"), 0.0)
 
-	if durata > 0.0 and stats != null:
+	var rec: Dictionary = {"tipo": "decay", "danno": danno, "raggio": raggio,
+			"colpisce_oggetti": colpisce_oggetti, "durata": durata, "campo": false}
+	if durata <= 0.0:
+		return rec
+
+	var tick_rate: float = _num(prim.get("tick_rate"), 1.0)
+	if raggio > 0.0 and _spawn_field(caster, {
+			"tipo": "decay", "raggio": raggio, "durata": durata,
+			"tick_rate": tick_rate, "danno_tick": danno / durata * tick_rate}):
+		rec["campo"] = true
+	elif stats != null:
 		_pending.append({"kind": "decay", "stats": stats, "rate": danno / durata,
 				"left": durata})
-	return {"tipo": "decay", "danno": danno, "raggio": raggio,
-			"colpisce_oggetti": colpisce_oggetti, "durata": durata}
+	return rec
 
 
-## aura: effetto persistente ancorato al caster, rimosso quando il caster non
-## e' piu' valido. durata -1 = permanente (sopravvive al combattimento). Il
-## tick dell'effetto (taunt, decadimento...) e' registrato ma non applicato:
-## non c'e' ancora un sistema di status sulle entita'.
+## aura: effetto persistente ancorato al caster. durata -1 = permanente. Con
+## raggio > 0 e un caster in scena genera un field (scripts/field.gd) che
+## applica lo status 'effetto' alle hurtbox nel raggio; l'entry _pending
+## resta come traccia ispezionabile e per il caso senza scena.
 func _p_aura(prim: Dictionary, caster: Node, _stats: Node, _ability_id: String) -> Dictionary:
 	var raggio: float = _num(prim.get("raggio"), 0.0)
 	var durata: float = _num(prim.get("durata"), 0.0)
@@ -694,12 +712,27 @@ func _p_aura(prim: Dictionary, caster: Node, _stats: Node, _ability_id: String) 
 	var bersagli: String = str(prim.get("bersagli", ""))
 	var persistente: bool = durata < 0.0
 
+	var campo: bool = false
 	if caster != null and (persistente or durata > 0.0):
 		_pending.append({"kind": "aura", "caster": caster, "left": maxf(durata, 0.0),
 				"persistente": persistente, "raggio": raggio, "effetto": effetto,
 				"tick_rate": tick_rate, "bersagli": bersagli})
+		if raggio > 0.0 and not effetto.is_empty():
+			campo = _spawn_field(caster, {"tipo": "aura", "raggio": raggio,
+					"durata": durata, "tick_rate": tick_rate, "effetto": effetto})
 	return {"tipo": "aura", "raggio": raggio, "durata": durata, "effetto": effetto,
-			"tick_rate": tick_rate, "bersagli": bersagli, "persistente": persistente}
+			"tick_rate": tick_rate, "bersagli": bersagli, "persistente": persistente,
+			"campo": campo}
+
+
+func _spawn_field(caster: Node, spec: Dictionary) -> bool:
+	var origin := caster as Node2D
+	if origin == null or not origin.is_inside_tree():
+		return false
+	var node := preload("res://scripts/field.gd").new()
+	origin.add_child(node)
+	node.setup(spec, caster)
+	return true
 
 
 # --- Spawn -------------------------------------------------------------------

@@ -494,8 +494,8 @@
       ],
       "priority": 24,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/status_effects.json (5 status: sfortuna, taunt, decadimento, autorita_decadimento, comando_non_morti) + schema. Ogni status: tag (dal vocabolario), durata_default (>0 o -1), negativo (bool), stat_modifiers opzionali. GameData: get_status_effect(id). StatsComponent: _statuses {id: {tag, left}}, applica_status(id, durata) (durata<0 = durata_default; stat_modifiers -> modificatore 'status:<id>'), rimuovi_status(id), rimuovi_status_per_tag(tag), ha_status(id), status_attivi(); _process scade da solo gli status a tempo (left>=0). ability_engine._p_curse: la maledizione e' ora uno STATUS nominato, non un marcatore vuoto (StatsComponent lo scade, light_purify lo toglie per tag). _p_aura: applica lo status 'effetto' + con raggio>0 e caster in scena genera un field. _p_decay: con raggio>0 e caster in scena genera un field (danno d'area), altrimenti fallback _pending. _p_light_purify: oltre a dot/decay/debuff pending, rimuove gli status con negativo:true per TAG (come dice il PRD), sempre entro potenza. scripts/field.gd: Area2D figlia del caster, collision_mask 4 (hurtbox sul layer 3), a ogni tick_rate trova le hurtbox in raggio e applica lo status (aura) o il danno (decay); si autodistrugge a durata, durata -1 finche' il caster e' valido. validate_data.py: ogni status ben formato (tag noto, durata, stat note); ogni effetto di aura/curse in data/abilities esiste in status_effects.json. 7 test in test_status_effects.gd (259 totali): status caricati, applica/rimuovi, stat_modifiers dello status, scadenza via _process, rimuovi_per_tag, light_purify toglie i negativi per tag (lascia i non-negativi), campo aura applica lo status a un bersaglio nel raggio e NON a uno fuori (overlap Area2D verificato headless). test_darkness_1 e test_primitive_tg1 aggiornati (curse -> ha_status; decay raggio 0 -> coda). validator 0, nessuna regressione."
     },
     {
       "id": "US-218",

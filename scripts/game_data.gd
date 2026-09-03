@@ -25,6 +25,7 @@ const PATH_TRACKED_EVENTS := "res://data/schema/tracked_events.json"
 const PATH_CHARACTERISTICS := "res://data/characteristics.json"
 const PATH_FORMULAS := "res://data/potions/formulas.json"
 const PATH_ANCHORS := "res://data/anchors.json"
+const PATH_STATUS := "res://data/status_effects.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -45,6 +46,7 @@ var _tracked_events: Dictionary = {}
 var _characteristics: Dictionary = {}
 var _formulas: Dictionary = {}
 var _anchors: Dictionary = {}
+var _statuses: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -98,6 +100,7 @@ func load_all() -> void:
 	_load_single(PATH_CHARACTERISTICS, "characteristics", _characteristics, TYPE_ARRAY)
 	_load_single(PATH_FORMULAS, "formulas", _formulas, TYPE_DICTIONARY)
 	_load_single(PATH_ANCHORS, "anchors", _anchors, TYPE_ARRAY)
+	_load_single(PATH_STATUS, "statuses", _statuses, TYPE_DICTIONARY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -248,6 +251,11 @@ func get_anchor(id: String) -> Dictionary:
 		if typeof(a) == TYPE_DICTIONARY and str((a as Dictionary).get("id", "")) == id:
 			return a
 	return {}
+
+
+## --- Status sulle entita' (data/status_effects.json) ---
+func get_status_effect(id: String) -> Dictionary:
+	return _dict_or_empty(_dict_or_empty(_statuses.get("statuses")).get(id))
 
 
 ## La Caratteristica di quel (Pathway, Sequenza). {} se non esiste.

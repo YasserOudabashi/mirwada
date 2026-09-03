@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "_comment": "Formato di data/status_effects.json. Il validator (tools/validate_data.py) fa i controlli espliciti.",
+  "status": {
+    "tag": "string dal vocabolario di data/tags.json",
+    "durata_default": "numero: secondi, oppure -1 per permanente",
+    "negativo": "bool: true se un purify lo rimuove",
+    "stat_modifiers": "oggetto { stat: numero } opzionale, applicato come modificatore per id 'status:<id>'"
+  },
+  "regole_validator": [
+    "tag nel vocabolario dei tag",
+    "durata_default numero (>0 o -1)",
+    "stat_modifiers su stat note",
+    "ogni 'effetto' usato da una primitiva aura/curse in data/abilities/ esiste qui"
+  ]
+}

@@ -258,6 +258,7 @@ def main():
     adir = os.path.join(DATA, "abilities")
     ability_ids = set()
     transform_forms = []  # (rel, aid, forma_id) da verificare contro data/forms.json
+    status_refs = []      # (rel, aid, effetto) di aura/curse -> data/status_effects.json
     if os.path.isdir(adir):
         for fname in sorted(os.listdir(adir)):
             if not fname.endswith(".json"):
@@ -296,6 +297,8 @@ def main():
                         if not isinstance(p.get("permanente"), bool):
                             err(f"{rel} [{aid}]: terrain_modify.permanente deve essere true/false "
                                 f"(permanente decide se la modifica va nel save)")
+                    if tipo in ("aura", "curse") and p.get("effetto"):
+                        status_refs.append((rel, aid, p.get("effetto")))
                     if tipo == "summon":
                         if not isinstance(p.get("entita_id"), str) or not p.get("entita_id"):
                             err(f"{rel} [{aid}]: summon senza entita_id (la fonte dell'evocazione)")
@@ -345,6 +348,23 @@ def main():
     for rel, aid, fid in transform_forms:
         if fid not in forms:
             err(f"{rel} [{aid}]: transform punta a forma_id '{fid}' inesistente in data/forms.json")
+
+    # --- status effects (data/status_effects.json, US-218C) ---
+    st_doc = load_json(os.path.join(DATA, "status_effects.json"))
+    statuses = (st_doc or {}).get("statuses", {})
+    known_stats_st = {"hp_max", "spiritualita_max", "velocita", "difesa", "evasione", "precisione", "forza"}
+    for sid, st in statuses.items():
+        if st.get("tag") not in valid_tags:
+            err(f"data/status_effects.json [{sid}]: tag '{st.get('tag')}' non nel vocabolario dei tag")
+        dd = st.get("durata_default")
+        if not isinstance(dd, (int, float)) or (dd <= 0 and dd != -1):
+            err(f"data/status_effects.json [{sid}]: durata_default deve essere > 0 o -1")
+        for k in (st.get("stat_modifiers") or {}):
+            if k not in known_stats_st:
+                err(f"data/status_effects.json [{sid}]: stat_modifiers ha una stat ignota '{k}'")
+    for rel, aid, eff in status_refs:
+        if eff not in statuses:
+            err(f"{rel} [{aid}]: aura/curse punta a effetto '{eff}' inesistente in data/status_effects.json")
 
     # --- ancore (data/anchors.json, US-216) ---
     anch_doc = load_json(os.path.join(DATA, "anchors.json"))

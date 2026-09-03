@@ -111,11 +111,13 @@ func test_decay_spalma_il_danno_totale_sulla_durata() -> void:
 	var s: Node = c.get_node("Stats")
 	s.set("hp", 100.0)
 
+	# raggio 0: nessun campo d'area, si usa la coda _pending (fallback,
+	# es. caster fuori scena). Il campo d'area e' testato in
+	# test_combat_integration (US-218C).
 	var rec: Dictionary = e.call("_p_decay",
-		{"danno": 60.0, "raggio": 7.0, "colpisce_oggetti": true, "durata": 10.0},
+		{"danno": 60.0, "raggio": 0.0, "colpisce_oggetti": true, "durata": 10.0},
 		c, s, "ab")
-	assert_almost_eq(float(rec["raggio"]), 7.0, "raggio registrato")
-	assert_true(rec["colpisce_oggetti"], "colpisce_oggetti registrato")
+	assert_false(rec["campo"], "raggio 0 -> nessun campo, coda _pending")
 
 	e.call("tick_effects", 5.0)
 	assert_almost_eq(float(s.get("hp")), 70.0, "meta' del danno a meta' durata")

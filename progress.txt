@@ -2065,3 +2065,42 @@ sezione test aggiornata.
   locali PER VALORE. Il test raccoglieva le schivate in un int -> restava
   0. Corretto con un Dictionary (tipo riferimento).
 - Prossima storia: US-218C (sistema di status + campi d'area per aura/decay).
+
+[2026-09-03] US-218C — Sistema di status sulle entita' + campi d'area
+
+- data/status_effects.json (5 status: sfortuna, taunt, decadimento,
+  autorita_decadimento, comando_non_morti) + schema. Ogni status: tag (dal
+  vocabolario), durata_default (>0 o -1), negativo (bool), stat_modifiers
+  opzionali. GameData: get_status_effect(id). 32 file.
+- StatsComponent: _statuses {id: {tag, left}}. applica_status(id, durata)
+  (durata < 0 = durata_default; stat_modifiers -> modificatore 'status:<id>'
+  via US-007), rimuovi_status, rimuovi_status_per_tag(tag), ha_status,
+  status_attivi. _process scade da solo gli status a tempo.
+- ability_engine:
+  - _p_curse: la maledizione e' ora uno STATUS nominato, non un marcatore
+    vuoto (prima era un modificatore per id senza delta + _pending). Lo
+    scade StatsComponent, lo toglie light_purify per tag.
+  - _p_aura: applica lo status 'effetto' + con raggio > 0 e caster in scena
+    genera un field.
+  - _p_decay: con raggio > 0 e caster in scena genera un field d'area;
+    altrimenti fallback sulla coda _pending (danno spalmato sul caster).
+  - _p_light_purify: oltre a dot/decay/debuff pending, rimuove gli status
+    negativo:true PER TAG (torna 'per tag' come dice il PRD), entro potenza.
+- scripts/field.gd: Area2D figlia del caster, collision_mask 4 (le hurtbox
+  sono sul layer 3). A ogni tick_rate trova le hurtbox nel raggio e applica
+  lo status (aura) o il danno (decay). Si autodistrugge a durata; durata -1
+  finche' il caster e' valido.
+- validate_data.py: ogni status ben formato (tag noto, durata, stat note);
+  ogni effetto di aura/curse in data/abilities esiste in status_effects.json.
+- Come verificato: 259 test headless (252 + 7 in test_status_effects.gd:
+  status caricati, applica/rimuovi, stat_modifiers dello status, scadenza
+  via _process, rimuovi_per_tag, light_purify toglie i negativi per tag
+  lasciando i non-negativi, campo aura applica lo status a un bersaglio nel
+  raggio e NON a uno fuori - overlap Area2D verificato headless).
+  test_darkness_1 e test_primitive_tg1 aggiornati (curse -> ha_status;
+  decay con raggio 0 -> coda). validator 0.
+- CHIUSI i debiti dichiarati in US-202: il tick delle aure, la query d'area
+  di decay/aura, "light_purify per tag". Restano non wired: aura 'taunt'
+  che fa targetare i nemici (serve AI), 'comando_non_morti' (serve summon
+  controllabili).
+- Prossima storia: US-218 (Percezione per Sequenza).

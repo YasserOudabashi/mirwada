@@ -38,6 +38,8 @@ const _FALLBACK := {
 var _base: Dictionary = {}
 ## id del modificatore -> { nome_stat: delta }
 var _modifiers: Dictionary = {}
+## status nominato -> { tag: String, left: float }  (left < 0 = permanente)
+var _statuses: Dictionary = {}
 var _hp: float = 0.0
 var _spiritualita: float = 0.0
 var _dead: bool = false
@@ -146,6 +148,63 @@ var spiritualita: float:
 
 func is_dead() -> bool:
 	return _dead
+
+
+func _process(delta: float) -> void:
+	if _statuses.is_empty():
+		return
+	for id in _statuses.keys():
+		var e: Dictionary = _statuses[id]
+		if float(e.get("left", -1.0)) < 0.0:
+			continue
+		e["left"] = float(e["left"]) - delta
+		if float(e["left"]) <= 0.0:
+			rimuovi_status(id)
+
+
+# --- Status (US-218C) -----------------------------------------------------
+
+## Applica uno status nominato (data/status_effects.json). durata < 0 usa la
+## durata_default dei dati; i suoi stat_modifiers diventano un modificatore
+## per id "status:<id>". Riapplicare rinfresca la durata.
+func applica_status(id: String, durata: float = -1.0) -> void:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	var dati: Dictionary = gd.call("get_status_effect", id) if gd != null else {}
+	if dati.is_empty():
+		push_error("[StatsComponent] status inesistente: '%s'" % id)
+		return
+	var d: float = durata
+	if d < 0.0:
+		d = float(dati.get("durata_default", -1.0))
+	_statuses[id] = {"tag": str(dati.get("tag", "")), "left": d}
+	var mods: Variant = dati.get("stat_modifiers", {})
+	apply_modifier("status:%s" % id, mods if typeof(mods) == TYPE_DICTIONARY else {})
+
+
+func rimuovi_status(id: String) -> bool:
+	if not _statuses.has(id):
+		return false
+	_statuses.erase(id)
+	remove_modifier("status:%s" % id)
+	return true
+
+
+## Toglie tutti gli status con questo tag. Restituisce quanti ne ha tolti.
+func rimuovi_status_per_tag(tag: String) -> int:
+	var tolti: int = 0
+	for id in _statuses.keys():
+		if str((_statuses[id] as Dictionary).get("tag", "")) == tag:
+			rimuovi_status(id)
+			tolti += 1
+	return tolti
+
+
+func ha_status(id: String) -> bool:
+	return _statuses.has(id)
+
+
+func status_attivi() -> Array:
+	return _statuses.keys()
 
 
 # --- Scudo (primitiva shield) ----------------------------------------------

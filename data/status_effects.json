@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "_comment": "Status sulle entita' (US-218C). aura e curse applicano uno di questi 'effetto'; light_purify li rimuove per TAG. tag e' del vocabolario di data/tags.json. stat_modifiers (opzionale) riusa i modificatori per id di US-007, applicati come 'status:<id>'. durata_default -1 = permanente finche' qualcosa non lo toglie. negativo:true = un purify lo rimuove.",
+  "statuses": {
+    "sfortuna": {
+      "tag": "maledizione",
+      "durata_default": 20.0,
+      "negativo": true,
+      "stat_modifiers": { "evasione": -0.15 }
+    },
+    "taunt": {
+      "tag": "provocazione",
+      "durata_default": 4.0,
+      "negativo": false,
+      "stat_modifiers": {}
+    },
+    "decadimento": {
+      "tag": "decadimento",
+      "durata_default": 8.0,
+      "negativo": true,
+      "stat_modifiers": { "difesa": -0.2, "velocita": -0.1 }
+    },
+    "autorita_decadimento": {
+      "tag": "dominio",
+      "durata_default": -1,
+      "negativo": true,
+      "stat_modifiers": { "difesa": -0.1 }
+    },
+    "comando_non_morti": {
+      "tag": "non_morto",
+      "durata_default": -1,
+      "negativo": false,
+      "stat_modifiers": {}
+    }
+  }
+}
