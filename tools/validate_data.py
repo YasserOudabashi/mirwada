@@ -660,6 +660,58 @@ def main():
         warn(f"data/i18n/it.json: {stubs}/{len(i18n_it)} stringhe ancora da tradurre "
              f"(valore 'TODO ...'). Non e' un errore: e' lavoro di traduzione.")
 
+    # --- VFX (data/vfx.json, US-226) ---
+    vfx = load_json(os.path.join(DATA, "vfx.json"))
+    if vfx:
+        tratto_vocab = set(vfx.get("tratto_vocabolario", []))
+        if len(tratto_vocab) != EXPECTED_PATHWAYS:
+            err(f"data/vfx.json: tratto_vocabolario ha {len(tratto_vocab)} voci, "
+                f"attese {EXPECTED_PATHWAYS} (uno per Pathway attivo — il tratto e' la firma)")
+        hex_re = ("inchiostro", "primario", "accento")
+        pal = vfx.get("pathway_palette_visiva", {})
+        for pid in pathway_ids:
+            if not pid:
+                continue
+            if pid not in pal:
+                err(f"data/vfx.json: manca la pathway_palette_visiva per '{pid}' "
+                    f"(come il check audio: un Pathway senza palette e' invisibile in gioco)")
+                continue
+            pv = pal[pid]
+            for c in hex_re:
+                v = pv.get(c, "")
+                if not (isinstance(v, str) and len(v) == 7 and v[0] == "#"
+                        and all(ch in "0123456789abcdefABCDEF" for ch in v[1:])):
+                    err(f"data/vfx.json [{pid}]: colore '{c}' = '{v}' non e' #rrggbb")
+            if pv.get("tratto") not in tratto_vocab:
+                err(f"data/vfx.json [{pid}]: tratto '{pv.get('tratto')}' non nel vocabolario chiuso")
+        # ogni tratto usato una volta sola: e' la firma del Pathway
+        used = [pv.get("tratto") for pv in pal.values() if pv.get("tratto") in tratto_vocab]
+        dup_tr = [t for t, n in Counter(used).items() if n > 1]
+        if dup_tr:
+            err(f"data/vfx.json: tratto condiviso da piu' Pathway {dup_tr} (dev'essere unico)")
+        # ogni primitiva ATTIVA e IMPLEMENTATA ha una voce in primitive_vfx
+        pvfx = vfx.get("primitive_vfx", {})
+        for name, spec in prim_doc["primitives"].items():
+            if spec.get("deferred") or not spec.get("implemented"):
+                continue
+            if name not in pvfx:
+                err(f"data/vfx.json: primitiva implementata '{name}' senza voce in primitive_vfx")
+            else:
+                e = pvfx[name]
+                if not isinstance(e.get("frames"), int) or e["frames"] <= 0:
+                    err(f"data/vfx.json [primitive_vfx.{name}]: frames dev'essere un intero > 0")
+                if not isinstance(e.get("impact_frame"), bool):
+                    err(f"data/vfx.json [primitive_vfx.{name}]: impact_frame dev'essere true/false")
+        # nessun campo VFX sulle abilita': ability.schema.json non si tocca
+        for fn in sorted(os.listdir(adir)) if os.path.isdir(adir) else []:
+            if not fn.endswith(".json"):
+                continue
+            doc = load_json(os.path.join(adir, fn)) or {}
+            for ab in (doc if isinstance(doc, list) else doc.get("abilities", [])):
+                if any(k.startswith("vfx") for k in ab):
+                    err(f"data/abilities/{fn} [{ab.get('id')}]: campo VFX su un'abilita'. "
+                        f"I VFX vivono per Pathway + primitiva, mai sull'abilita'.")
+
     report()
     return 1 if errors else 0
 

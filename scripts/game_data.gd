@@ -32,6 +32,7 @@ const PATH_I18N_IT := "res://data/i18n/it.json"
 const PATH_I18N_EN := "res://data/i18n/en.json"
 const PATH_UI_BOOK := "res://data/ui/book.json"
 const PATH_PAGE_TYPES := "res://data/schema/page_types.json"
+const PATH_VFX := "res://data/vfx.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -57,6 +58,7 @@ var _i18n_it: Dictionary = {}
 var _i18n_en: Dictionary = {}
 var _ui_book: Dictionary = {}
 var _page_types: Dictionary = {}
+var _vfx: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -115,6 +117,7 @@ func load_all() -> void:
 	_load_flat(PATH_I18N_EN, _i18n_en)
 	_load_single(PATH_UI_BOOK, "pages", _ui_book, TYPE_ARRAY)
 	_load_single(PATH_PAGE_TYPES, "page_types", _page_types, TYPE_ARRAY)
+	_load_single(PATH_VFX, "pathway_palette_visiva", _vfx, TYPE_DICTIONARY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -307,6 +310,21 @@ func get_ui_book() -> Dictionary:
 ## Vocabolario chiuso degli 8 tipi di pagina (data/schema/page_types.json).
 func page_types() -> Array:
 	return _array_or_empty(_page_types.get("page_types"))
+
+
+## --- VFX (data/vfx.json, US-226) ---
+## Gemello visivo di audio.json.pathway_palette. Un renderer per primitiva +
+## una palette per Pathway; nessun campo VFX sulle abilita'.
+func get_vfx_palette(pathway_id: String) -> Dictionary:
+	return _dict_or_empty(_dict_or_empty(_vfx.get("pathway_palette_visiva")).get(pathway_id))
+
+
+func get_primitive_vfx(tipo: String) -> Dictionary:
+	return _dict_or_empty(_dict_or_empty(_vfx.get("primitive_vfx")).get(tipo))
+
+
+func get_vfx(sezione: String) -> Dictionary:
+	return _dict_or_empty(_vfx.get(sezione))
 
 
 ## La Caratteristica di quel (Pathway, Sequenza). {} se non esiste.

@@ -2445,3 +2445,38 @@ sezione test aggiornata.
   finestra non e' persistita fra sessioni come preset di progetto ma sì in
   settings.json.
 - Prossima storia: US-226 (data/vfx.json - palette visive e schema).
+
+[2026-09-03] US-226 — data/vfx.json: palette visive e schema
+
+- data/vfx.json + data/schema/vfx.schema.json (design-vfx.md cap. 4). Gemello
+  visivo di audio.json.pathway_palette: un renderer per PRIMITIVA + una
+  palette per PATHWAY. NESSUN campo VFX sulle abilita' - ability.schema.json
+  non si tocca.
+  * tratto_vocabolario: 10 tratti chiusi (pennellata_carica/secca, assenza,
+    tratteggio, scheggia, cerchio, glifo, meccanico, crescita, fluido), uno
+    per Pathway - il tratto E' la firma.
+  * pathway_palette_visiva: 10 voci (inchiostro/primario/accento #rrggbb,
+    tratto, scia, distorsione 0..1). Colori PLAUSIBILI, l'arte li rivede.
+  * primitive_vfx: 15 voci, una per primitiva IMPLEMENTATA (sprite, frames,
+    impact_frame, scia).
+  * impact_frames (stile inversione, durata_frames 2, si tara con hitstop_ms),
+    nero_di_scena (trigger + durata_ms), accessibilita (riduci_distorsione/
+    flash, default da SettingsStore).
+- data/schema/primitives.json: aggiunto "implemented": true alle 15 primitive
+  col handler nel motore (proprieta' del REGISTRO, come "deferred"). Il
+  validator ne ha bisogno: e' Python, non legge _handlers.
+- GameData: get_vfx_palette(pathway_id), get_primitive_vfx(tipo), get_vfx(sez).
+  vfx.json caricato con _load_single (39 file).
+- ability_engine: tipi_primitiva_implementati() -> _handlers.keys().
+- validate_data.py: blocco VFX - tratto_vocabolario = 10; palette per ogni
+  Pathway attivo (come il check audio); inchiostro/primario/accento #rrggbb;
+  tratto nel vocabolario e UNICO per Pathway; ogni primitiva attiva e
+  implementata ha una voce primitive_vfx ben formata; ERRORE se un'abilita'
+  ha un campo che inizia per "vfx".
+- Come verificato: 307 test headless (302 + 5 in test_vfx.gd: palette per
+  ogni Pathway attivo coi colori #rrggbb, tratto unico per Pathway, lookup
+  primitive_vfx (+ ignoto -> {}), ogni primitiva di tipi_primitiva_
+  implementati ha un VFX, sezioni impact_frames/nero_di_scena presenti).
+  validator 0, i18n --check 0. Nessuna verifica a schermo: story di soli
+  dati, il renderer e' US-227.
+- Prossima storia: US-227 (VFX delle primitive di fase 2 con impact frame).

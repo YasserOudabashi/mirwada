@@ -61,6 +61,12 @@ func _ready() -> void:
 	}
 
 
+## I tipi di primitiva che il motore implementa davvero (hanno un handler).
+## Le altre primitive del registro sono attive ma non ancora scritte (fase 5).
+func tipi_primitiva_implementati() -> Array:
+	return _handlers.keys()
+
+
 ## Esegue l'abilita' sul caster. Non solleva mai: l'esito sta nel Dictionary
 ##   { ok, reason, effects: Array, warnings: PackedStringArray }
 func execute(ability_id: String, caster: Node) -> Dictionary:

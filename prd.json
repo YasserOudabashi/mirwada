@@ -679,8 +679,8 @@
       ],
       "priority": 33,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/vfx.json + data/schema/vfx.schema.json (design-vfx.md cap.4): gemello visivo di audio.json.pathway_palette. tratto_vocabolario 10 tratti chiusi (uno per Pathway, e la firma); pathway_palette_visiva 10 voci (inchiostro/primario/accento #rrggbb, tratto, scia, distorsione); primitive_vfx 15 voci (una per primitiva implementata: sprite/frames/impact_frame/scia); impact_frames, nero_di_scena, accessibilita. NESSUN campo VFX sulle abilita. data/schema/primitives.json: \"implemented\": true sulle 15 primitive col handler (proprieta del registro come \"deferred\"; il validator Python non legge _handlers). GameData: get_vfx_palette/get_primitive_vfx/get_vfx (39 file). ability_engine.tipi_primitiva_implementati() -> _handlers.keys(). validate_data.py: blocco VFX - tratto_vocabolario=10; palette per ogni Pathway attivo (come il check audio); colori #rrggbb; tratto nel vocabolario e unico per Pathway; ogni primitiva attiva+implementata ha una voce primitive_vfx ben formata; ERRORE se un abilita ha un campo vfx*. 307 test headless (302+5 test_vfx.gd), validator 0, i18n --check 0. Nessuna verifica a schermo: dati puri, il renderer e US-227."
     },
     {
       "id": "US-227",

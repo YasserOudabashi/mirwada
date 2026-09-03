@@ -9,7 +9,8 @@
         "gittata",
         "pierce",
         "tag_danno"
-      ]
+      ],
+      "implemented": true
     },
     "melee_arc": {
       "params": [
@@ -18,7 +19,8 @@
         "raggio",
         "stagger",
         "tag_danno"
-      ]
+      ],
+      "implemented": true
     },
     "aura": {
       "params": [
@@ -27,7 +29,8 @@
         "effetto",
         "tick_rate",
         "bersagli"
-      ]
+      ],
+      "implemented": true
     },
     "dot": {
       "params": [
@@ -35,7 +38,8 @@
         "tick_rate",
         "durata",
         "tag_danno"
-      ]
+      ],
+      "implemented": true
     },
     "heal": {
       "params": [
@@ -43,7 +47,8 @@
         "istantaneo",
         "durata",
         "bersaglio"
-      ]
+      ],
+      "implemented": true
     },
     "buff_stat": {
       "params": [
@@ -51,7 +56,8 @@
         "valore",
         "durata",
         "moltiplicativo"
-      ]
+      ],
+      "implemented": true
     },
     "debuff_stat": {
       "params": [
@@ -59,7 +65,8 @@
         "valore",
         "durata",
         "moltiplicativo"
-      ]
+      ],
+      "implemented": true
     },
     "dash": {
       "params": [
@@ -67,7 +74,8 @@
         "durata",
         "invulnerabile",
         "attraversa_nemici"
-      ]
+      ],
+      "implemented": true
     },
     "summon": {
       "params": [
@@ -75,7 +83,8 @@
         "quantita",
         "durata",
         "comportamento"
-      ]
+      ],
+      "implemented": true
     },
     "illusion": {
       "params": [
@@ -106,14 +115,16 @@
         "riflette",
         "tag_bloccati",
         "bersaglio"
-      ]
+      ],
+      "implemented": true
     },
     "transform": {
       "params": [
         "forma_id",
         "durata",
         "costo_al_secondo"
-      ]
+      ],
+      "implemented": true
     },
     "chain": {
       "params": [
@@ -129,7 +140,8 @@
         "raggio",
         "durata",
         "permanente"
-      ]
+      ],
+      "implemented": true
     },
     "possess": {
       "params": [
@@ -143,7 +155,8 @@
         "effetto",
         "durata",
         "condizione_rimozione"
-      ]
+      ],
+      "implemented": true
     },
     "reveal_info": {
       "params": [
@@ -199,7 +212,8 @@
         "raggio",
         "potenza",
         "riduce_sequenza"
-      ]
+      ],
+      "implemented": true
     },
     "shadow_meld": {
       "params": [
@@ -239,7 +253,8 @@
         "raggio",
         "colpisce_oggetti",
         "durata"
-      ]
+      ],
+      "implemented": true
     },
     "fear": {
       "params": [
