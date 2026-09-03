@@ -1684,3 +1684,18 @@ sezione test aggiornata.
   persistenza via GameState.snapshot/applica). validator exit 0. Nessuna
   regressione (catena di migrazione 1->6 verde).
 - Prossima storia: US-212 (blocco dell'avanzamento sotto acting_progress 1.0).
+
+[2026-09-03] RIORDINO prd.json — dipendenze reali
+
+- US-212 (blocco avanzamento) cita PotionSystem.concoct+bere (US-209) e
+  follia += madness_on_force (US-213), entrambe piu' avanti nell'ordine.
+  Anche US-209 (Concoction) dipende da US-207/208 (caratteristiche +
+  formule) e US-213. Riordinato il prd.json (solo priority, nessun codice):
+  13 US-207  14 US-208  15 US-213  16 US-209  17 US-212  18 US-214
+  19 US-215  20 US-216  21 US-217  22 US-218  23 US-219  24 US-220 ...
+  Rispetta l'"Ordine di lavoro consigliato" del PRD (C+B in parallelo,
+  poi D follia). Blocchi A e C (fino a US-211) restano chiusi.
+- Stato: 187 test headless verdi, validator 0. Primitive 15/28. Save
+  schema_version arrivato a 6 (progressione, mondo, evocazioni gia'
+  c'era, eventi, acting), catena di migrazione 1->6 completa e testata.
+- Prossima storia: US-207 (Caratteristica Beyonder come oggetto).

@@ -245,27 +245,6 @@
       "notes": "Autoload Acting (scripts/acting.gd), dopo SummonRegistry. Legge le acting_actions della Sequenza corrente da Progression.sequence_data(). Contributo di un'azione = clampf((count_ora - baseline) / target, 0, 1) * progresso_dichiarato; baseline = conteggio EventTracker al momento dell'ingresso nella Sequenza (l'Acting riparte da zero a ogni avanzamento, _riparti() rileva le baseline). acting_progress() = clampf(somma dei contributi - _decadimento, 0, 1). ripetibile:false -> _latched: una volta raggiunto il target il contributo resta acquisito. DECADIMENTO: Acting ascolta EventTracker.evento_emesso; se nome=='ability_used' E la Sequenza ha un'acting_action con filtro senza_abilita:true (recita 'duello puro'), _decadimento += balance.json.acting.decadimento_azione_incoerente (0.05). e_completo() con tolleranza 0.9999 (0.35+0.30+0.35 in FP non fa 1.0). Segnale acting_progress_changed(valore). _riparti() su Progression.sequence_changed. SAVE: schema_version 5->6, campo 'acting' {decadimento, baseline, latched} - _migra_5_a_6; GameState.applica chiama Acting.da_salvataggio DOPO progressione ed eventi (legge Sequenza e conteggi). NB: gli emettitori di US-210B non popolano ancora i filtri ricchi (senza_abilita, tag_danno, ecc.): il test usa eventi costruiti a mano, US-219 chiudera' il cerchio. 6 test in test_acting.gd (187 totali): accumulo, frazione parziale, cap a 1.0, decadimento per abilita' incoerente, reset su avanzamento (le acting_actions di Seq 8 hanno filtri diversi), persistenza via GameState.snapshot/applica. validator 0, nessuna regressione (catena migrazione 1->6 verde)."
     },
     {
-      "id": "US-212",
-      "title": "Blocco dell'avanzamento sotto acting_progress 1.0",
-      "description": "Come designer, voglio che non si possa avanzare di Sequenza finche' la recitazione non e' completa, e che forzare abbia un costo pesante.",
-      "acceptanceCriteria": [
-        "concoct + bere: con acting_progress < 1.0 l'avanzamento non avviene per via normale",
-        "Forzare (bere comunque) e' possibile e applica: foundation += malus_avanzamento_forzato, follia += madness_on_force della Sequenza, avanzamento con fondamenta degradate",
-        "foundation non scende sotto minimo (0); a foundation bassa il moltiplicatore di follia sale (moltiplicatore_follia_a_fondamenta_zero)",
-        "La UI (HUD) mostra se l'avanzamento e' disponibile o forzato",
-        "Test headless: avanzamento bloccato, forzatura con malus corretti, floor di foundation",
-        "Verifica a schermo documentata in progress.txt",
-        "python tools/validate_data.py esce 0",
-        "Nessuna regressione sui test esistenti",
-        "Typecheck passes",
-        "Tests pass"
-      ],
-      "priority": 13,
-      "fase": 2,
-      "passes": false,
-      "notes": ""
-    },
-    {
       "id": "US-207",
       "title": "Caratteristica Beyonder come oggetto",
       "description": "Come giocatore, voglio raccogliere le Caratteristiche Beyonder che i nemici lasciano, cosi' da poterle usare per avanzare.",
@@ -281,7 +260,7 @@
         "Typecheck passes",
         "Tests pass"
       ],
-      "priority": 14,
+      "priority": 13,
       "fase": 2,
       "passes": false,
       "notes": ""
@@ -295,6 +274,27 @@
         "Una formula parziale (3/5 ingredienti) produce una pozione con effetto collaterale/qualita' ridotta esplicito nei dati (mai un valore silenzioso)",
         "Il validator: ogni potion.formula_id delle Sequenze non-stub risolve; ogni ingredient e' un id noto; characteristic_sequence coerente con la Sequenza della pozione",
         "Test headless: formula completa vs parziale, formula inesistente -> errore",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 14,
+      "fase": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-213",
+      "title": "Follia - statistica cumulativa con effetti a soglia",
+      "description": "Come giocatore, voglio che la follia si accumuli da piu' sorgenti e produca effetti meccanici alle soglie di balance.json.",
+      "acceptanceCriteria": [
+        "MadnessComponent: valore 0->100, add(quantita', sorgente) con log della sorgente; non si azzera mai del tutto (riduzione_max_ancore e' un cap sulla riduzione, non un reset)",
+        "Sorgenti di fase 2: avanzamento forzato, sacrificio di un'Ancora, pozione parziale, permanenza nel mondo spirituale (gancio)",
+        "Effetti a soglia da balance.json.madness: 15 distorsioni, 40 abilita' autonome (probabilita' probabilita_attivazione_autonoma_sotto_soglia), 70 perdita di input intermittente, 100 stato mostro / game over per follia",
+        "decadimento_naturale_al_minuto (oggi 0) rispettato come dato",
+        "Segnale madness_changed(valore, soglia_attraversata); serializzato nel save",
+        "Test headless: accumulo, soglie, cap della riduzione, abilita' autonoma sotto soglia 40",
         "python tools/validate_data.py esce 0",
         "Nessuna regressione sui test esistenti",
         "Typecheck passes",
@@ -327,16 +327,16 @@
       "notes": ""
     },
     {
-      "id": "US-213",
-      "title": "Follia - statistica cumulativa con effetti a soglia",
-      "description": "Come giocatore, voglio che la follia si accumuli da piu' sorgenti e produca effetti meccanici alle soglie di balance.json.",
+      "id": "US-212",
+      "title": "Blocco dell'avanzamento sotto acting_progress 1.0",
+      "description": "Come designer, voglio che non si possa avanzare di Sequenza finche' la recitazione non e' completa, e che forzare abbia un costo pesante.",
       "acceptanceCriteria": [
-        "MadnessComponent: valore 0->100, add(quantita', sorgente) con log della sorgente; non si azzera mai del tutto (riduzione_max_ancore e' un cap sulla riduzione, non un reset)",
-        "Sorgenti di fase 2: avanzamento forzato, sacrificio di un'Ancora, pozione parziale, permanenza nel mondo spirituale (gancio)",
-        "Effetti a soglia da balance.json.madness: 15 distorsioni, 40 abilita' autonome (probabilita' probabilita_attivazione_autonoma_sotto_soglia), 70 perdita di input intermittente, 100 stato mostro / game over per follia",
-        "decadimento_naturale_al_minuto (oggi 0) rispettato come dato",
-        "Segnale madness_changed(valore, soglia_attraversata); serializzato nel save",
-        "Test headless: accumulo, soglie, cap della riduzione, abilita' autonoma sotto soglia 40",
+        "concoct + bere: con acting_progress < 1.0 l'avanzamento non avviene per via normale",
+        "Forzare (bere comunque) e' possibile e applica: foundation += malus_avanzamento_forzato, follia += madness_on_force della Sequenza, avanzamento con fondamenta degradate",
+        "foundation non scende sotto minimo (0); a foundation bassa il moltiplicatore di follia sale (moltiplicatore_follia_a_fondamenta_zero)",
+        "La UI (HUD) mostra se l'avanzamento e' disponibile o forzato",
+        "Test headless: avanzamento bloccato, forzatura con malus corretti, floor di foundation",
+        "Verifica a schermo documentata in progress.txt",
         "python tools/validate_data.py esce 0",
         "Nessuna regressione sui test esistenti",
         "Typecheck passes",
