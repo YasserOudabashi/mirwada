@@ -429,8 +429,8 @@
       ],
       "priority": 21,
       "fase": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/anchors.json (4 Ancore: mirco/sidon = NPC, dimora = luogo, promessa) + data/schema/anchor.schema.json. Ogni Ancora: id, name_i18n, forza (punti di follia bufferizzabili), penalita (follia aggiunta se distrutta). GameData: _load_single(anchors), get_anchors()/get_anchor(id). Autoload AnchorSystem (scripts/anchor_system.gd), ULTIMO (dopo AudioManager). register(id) (false se ignoto o gia' attiva), destroy(id) (emette anchor_lost + Madness.add(penalita, 'anchor_lost', tramite_ancore=false)), active(), forza_totale(), assorbi(quantita) = min(forza_totale, riduzione_max_ancore * quantita). BUFFERING: Madness.add(q, sorgente, tramite_ancore=true) ora consulta AnchorSystem.assorbi(q) e aggiunge solo q - assorbito; il colpo da 'anchor_lost' passa tramite_ancore=false (non bufferizzato). riduzione_max_ancore (0.60) e' il CAP frazionario sul singolo colpo, non un reset. US-214 HOOK CHIUSO: AnchorSystem._aggiorna_nomi_sussurro() su register/destroy/load chiama AudioManager.imposta_nomi_sussurro coi name_i18n delle Ancore attive - i sussurri di soglia 55 pronunciano i nomi delle Ancore. SAVE: schema_version 9->10, campo 'ancore' (lista di id), _migra_9_a_10; GameState.snapshot/applica. validate_data.py: id unici, name_i18n, forza > 0, penalita > 0, almeno un'Ancora (il rituale di Seq 1 sacrifica 'ancora_del_giocatore'). 7 test in test_anchors.gd (242 totali): dati caricati, register/active, buffering (Ancora forza 10 assorbe 10 di un colpo da 20), cap frazionario (mai piu' del 60% di un colpo), destroy -> segnale + follia non bufferizzata, persistenza, nomi dei sussurri seguono le Ancore. validator 0, nessuna regressione (test_madness verde: senza Ancore il buffering e' no-op)."
     },
     {
       "id": "US-217",

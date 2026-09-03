@@ -346,6 +346,26 @@ def main():
         if fid not in forms:
             err(f"{rel} [{aid}]: transform punta a forma_id '{fid}' inesistente in data/forms.json")
 
+    # --- ancore (data/anchors.json, US-216) ---
+    anch_doc = load_json(os.path.join(DATA, "anchors.json"))
+    anchors = (anch_doc or {}).get("anchors", [])
+    anchor_ids = set()
+    for a in anchors:
+        aid = a.get("id")
+        if aid in anchor_ids:
+            err(f"data/anchors.json: id duplicato '{aid}'")
+        anchor_ids.add(aid)
+        if not isinstance(a.get("name_i18n"), str) or not a.get("name_i18n"):
+            err(f"data/anchors.json [{aid}]: name_i18n mancante o vuoto")
+        if not isinstance(a.get("forza"), (int, float)) or a.get("forza", 0) <= 0:
+            err(f"data/anchors.json [{aid}]: forza deve essere > 0")
+        if not isinstance(a.get("penalita"), (int, float)) or a.get("penalita", 0) <= 0:
+            err(f"data/anchors.json [{aid}]: penalita deve essere > 0 (perdere un'Ancora e' un colpo)")
+    # il rituale di Seq 1 sacrifica 'ancora_del_giocatore': serve almeno un'Ancora
+    if anchors == [] or not anchor_ids:
+        err("data/anchors.json: nessuna Ancora. Il rituale di Sequenza 1 del "
+            "Twilight Giant sacrifica 'ancora_del_giocatore': deve poter esistere.")
+
     # --- caratteristiche Beyonder (data/characteristics.json, US-207) ---
     ch_doc = load_json(os.path.join(DATA, "characteristics.json"))
     chars = (ch_doc or {}).get("characteristics", [])

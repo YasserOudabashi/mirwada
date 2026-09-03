@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "_comment": "Ancore: i legami che tengono umano il Beyonder. Ogni Ancora attiva bufferizza parte della follia in arrivo (fino a forza punti, e mai piu' di riduzione_max_ancore = 0.60 del colpo). Distruggerne una aggiunge 'penalita' follia (source 'anchor_lost') e non e' bufferizzata. Referenziabili da: NPC (name_i18n), il sacrificio 'ancora_del_giocatore' del rituale di Seq 1 del Twilight Giant, i sussurri di soglia 55 (US-214).",
+  "anchors": [
+    {
+      "id": "anchor_mirco",
+      "name_i18n": "anchor.mirco",
+      "forza": 10,
+      "penalita": 18,
+      "_nota": "L'amico che ti ha visto prima che tutto cominciasse."
+    },
+    {
+      "id": "anchor_sidon",
+      "name_i18n": "anchor.sidon",
+      "forza": 8,
+      "penalita": 14
+    },
+    {
+      "id": "anchor_dimora",
+      "name_i18n": "anchor.dimora",
+      "forza": 6,
+      "penalita": 10,
+      "_nota": "Un luogo, non una persona."
+    },
+    {
+      "id": "anchor_promessa",
+      "name_i18n": "anchor.promessa",
+      "forza": 12,
+      "penalita": 24,
+      "_nota": "Una promessa fatta. Perderla e' il colpo piu' duro."
+    }
+  ]
+}

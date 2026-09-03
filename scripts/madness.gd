@@ -52,12 +52,22 @@ func _process(delta: float) -> void:
 
 # --- Mutazione -------------------------------------------------------------
 
-func add(quantita: float, sorgente: String) -> void:
+## tramite_ancore: se true (default) e quantita > 0, le Ancore attive
+## bufferizzano parte del colpo (US-216). Un colpo di follia DA una perdita
+## di Ancora passa false.
+func add(quantita: float, sorgente: String, tramite_ancore: bool = true) -> void:
 	if quantita == 0.0:
 		return
+	var effettiva: float = quantita
+	if tramite_ancore and quantita > 0.0:
+		var ancore: Node = get_node_or_null("/root/AnchorSystem")
+		if ancore != null:
+			effettiva = quantita - float(ancore.call("assorbi", quantita))
+	if effettiva == 0.0:
+		return
 	var prima_soglia: int = soglia_corrente()
-	_valore = clampf(_valore + quantita, 0.0, 100.0)
-	_log.append({"quantita": quantita, "sorgente": sorgente})
+	_valore = clampf(_valore + effettiva, 0.0, 100.0)
+	_log.append({"quantita": effettiva, "sorgente": sorgente})
 	var dopo_soglia: int = soglia_corrente()
 	madness_changed.emit(_valore, dopo_soglia if dopo_soglia != prima_soglia else -1)
 

@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 9
+const VERSIONE_CORRENTE := 10
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -68,6 +68,8 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		"follia": (dati.get("follia", {}) as Dictionary).duplicate(true),
 		# Qualita' della progressione (US-209). { valore }.
 		"fondamenta": (dati.get("fondamenta", {}) as Dictionary).duplicate(true),
+		# Ancore attive (US-216). Lista di id.
+		"ancore": (dati.get("ancore", []) as Array).duplicate(true),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -165,6 +167,8 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_7_a_8(doc)
 			8:
 				doc = _migra_8_a_9(doc)
+			9:
+				doc = _migra_9_a_10(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -234,6 +238,13 @@ func _migra_8_a_9(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v9 -> v10: le Ancore attive (US-216). Nessuna Ancora pregressa.
+func _migra_9_a_10(doc: Dictionary) -> Dictionary:
+	if not doc.has("ancore"):
+		doc["ancore"] = []
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -252,6 +263,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"caratteristiche": _campo(raw, "caratteristiche", TYPE_ARRAY, []),
 		"follia": _campo(raw, "follia", TYPE_DICTIONARY, {}),
 		"fondamenta": _campo(raw, "fondamenta", TYPE_DICTIONARY, {}),
+		"ancore": _campo(raw, "ancore", TYPE_ARRAY, []),
 	}
 
 

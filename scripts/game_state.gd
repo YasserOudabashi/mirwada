@@ -66,6 +66,10 @@ func _fondamenta() -> Node:
 	return get_node_or_null("/root/Foundation")
 
 
+func _ancore() -> Node:
+	return get_node_or_null("/root/AnchorSystem")
+
+
 func salva_rapido() -> Dictionary:
 	return get_node("/root/SaveSystem").call("salva", SLOT_RAPIDO, snapshot())
 
@@ -93,6 +97,7 @@ func snapshot() -> Dictionary:
 		"caratteristiche": _caratteristiche().per_salvataggio() if _caratteristiche() != null else [],
 		"follia": _follia().per_salvataggio() if _follia() != null else {},
 		"fondamenta": _fondamenta().per_salvataggio() if _fondamenta() != null else {},
+		"ancore": _ancore().per_salvataggio() if _ancore() != null else [],
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D:
@@ -126,6 +131,8 @@ func applica(dati: Dictionary) -> void:
 		_follia().da_salvataggio(dati.get("follia", {}))
 	if _fondamenta() != null:
 		_fondamenta().da_salvataggio(dati.get("fondamenta", {}))
+	if _ancore() != null:
+		_ancore().da_salvataggio(dati.get("ancore", []))
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D and dati.has("posizione"):
 		(p as Node2D).global_position = dati["posizione"]

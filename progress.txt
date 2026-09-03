@@ -1966,3 +1966,33 @@ sezione test aggiornata.
   leggermente scuriti (intensita 0.22); a follia 80 col nero attivo lo
   schermo e' quasi tutto nero (0.85), i blob appena visibili.
 - Prossima storia: US-216 (Ancore - riduzione della follia, distruttibilita').
+
+[2026-09-03] US-216 — Ancore: registrazione, buffering della follia, distruttibilita'
+
+- data/anchors.json (4 Ancore: mirco/sidon = NPC, dimora = luogo,
+  promessa) + schema. Ogni Ancora: id, name_i18n, forza (punti di follia
+  bufferizzabili), penalita (follia se distrutta). GameData: get_anchors()
+  / get_anchor(id). 31 file caricati.
+- Autoload AnchorSystem (scripts/anchor_system.gd), ULTIMO (dopo
+  AudioManager). register(id) / destroy(id) / active() / forza_totale() /
+  assorbi(quantita) = min(forza_totale, riduzione_max_ancore * quantita).
+- BUFFERING: Madness.add(q, sorgente, tramite_ancore=true) ora consulta
+  AnchorSystem.assorbi(q) e aggiunge solo q - assorbito. Il colpo da
+  destroy() passa tramite_ancore=false -> NON bufferizzato ("la sua
+  perdita e' un colpo"). riduzione_max_ancore (0.60) e' il CAP frazionario
+  sul singolo colpo, non un reset.
+- US-214 HOOK CHIUSO: AnchorSystem._aggiorna_nomi_sussurro() su
+  register/destroy/load -> AudioManager.imposta_nomi_sussurro(name_i18n
+  delle Ancore attive). I sussurri di soglia 55 pronunciano i nomi delle
+  Ancore.
+- SAVE: SaveSystem VERSIONE_CORRENTE 9 -> 10. Campo "ancore" (lista di id),
+  _migra_9_a_10. GameState.snapshot/applica.
+- validate_data.py: id unici, name_i18n, forza > 0, penalita > 0, almeno
+  un'Ancora (il rituale di Seq 1 del TG sacrifica 'ancora_del_giocatore').
+- Come verificato: 242 test headless (235 + 7 in test_anchors.gd: dati
+  caricati, register/active, buffering (Ancora forza 10 assorbe 10 di un
+  colpo da 20), cap frazionario (mai piu' del 60% di un colpo), destroy ->
+  segnale + follia non bufferizzata, persistenza, nomi sussurri seguono le
+  Ancore). validator 0. Nessuna regressione (test_madness verde: senza
+  Ancore il buffering e' no-op).
+- Prossima storia: US-217 (Motore del rituale di avanzamento).
