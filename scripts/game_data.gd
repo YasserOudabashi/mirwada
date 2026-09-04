@@ -41,6 +41,7 @@ const PATH_VFX := "res://data/vfx.json"
 const PATH_ITEM_CATEGORIES := "res://data/schema/item_categories.json"
 const PATH_EQUIP_SLOTS := "res://data/schema/equip_slots.json"
 const PATH_SIGIL_EFFECT_TYPES := "res://data/schema/sigil_effect_types.json"
+const PATH_FORGE_BLUEPRINTS := "res://data/forge/blueprints.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -75,6 +76,7 @@ var _item_categories: Dictionary = {}
 var _equip_slots: Dictionary = {}
 var _sigils: Dictionary = {}
 var _sigil_effect_types: Dictionary = {}
+var _forge_blueprints: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -142,6 +144,7 @@ func load_all() -> void:
 	_load_single(PATH_ITEM_CATEGORIES, "item_categories", _item_categories, TYPE_ARRAY)
 	_load_single(PATH_EQUIP_SLOTS, "slots", _equip_slots, TYPE_ARRAY)
 	_load_single(PATH_SIGIL_EFFECT_TYPES, "tipi", _sigil_effect_types, TYPE_ARRAY)
+	_load_single(PATH_FORGE_BLUEPRINTS, "blueprints", _forge_blueprints, TYPE_DICTIONARY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -410,6 +413,15 @@ func sigil_ids() -> Array:
 ## Vocabolario chiuso dei tipi di effetto/effetto_collaterale (US-315/318).
 func sigil_effect_types() -> Array:
 	return _array_or_empty(_sigil_effect_types.get("tipi"))
+
+
+## --- Progetti di forgiatura (data/forge/blueprints.json, US-316) ---
+func get_blueprint(id: String) -> Dictionary:
+	return _dict_or_empty(_dict_or_empty(_forge_blueprints.get("blueprints")).get(id))
+
+
+func blueprint_ids() -> Array:
+	return _dict_or_empty(_forge_blueprints.get("blueprints")).keys()
 
 
 ## --- VFX (data/vfx.json, US-226) ---

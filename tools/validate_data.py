@@ -770,6 +770,33 @@ def main():
         else:
             err(f"data/potions/recipes.json [{rid}]: output deve avere item_id o effetto")
 
+    # --- progetti di forgiatura (data/forge/blueprints.json, US-316) ---
+    bp_doc = load_json(os.path.join(DATA, "forge", "blueprints.json"))
+    blueprints = (bp_doc or {}).get("blueprints", {})
+    for bid, bp in blueprints.items():
+        if not isinstance(bp.get("name_i18n"), str) or not bp.get("name_i18n"):
+            err(f"data/forge/blueprints.json [{bid}]: name_i18n mancante")
+        out = bp.get("output")
+        if out not in item_ids:
+            err(f"data/forge/blueprints.json [{bid}]: output '{out}' non risolve a un item")
+        elif item_cat.get(out) != "equip":
+            err(f"data/forge/blueprints.json [{bid}]: output '{out}' non e' un item categoria:equip")
+        mat = bp.get("materiali", {})
+        if not isinstance(mat, dict) or not mat:
+            err(f"data/forge/blueprints.json [{bid}]: 'materiali' deve essere un oggetto non vuoto")
+        for m, q in (mat if isinstance(mat, dict) else {}).items():
+            if item_cat.get(m) != "materiale":
+                err(f"data/forge/blueprints.json [{bid}]: materiale '{m}' non e' un item categoria:materiale")
+            if not isinstance(q, int) or q <= 0:
+                err(f"data/forge/blueprints.json [{bid}]: quantita' di '{m}' deve essere un intero > 0")
+        if bp.get("qualita_base") not in potion_quality:
+            err(f"data/forge/blueprints.json [{bid}]: qualita_base '{bp.get('qualita_base')}' "
+                f"non nel vocabolario ({sorted(potion_quality)})")
+        if not isinstance(bp.get("nota_da_subito"), bool):
+            err(f"data/forge/blueprints.json [{bid}]: nota_da_subito deve essere true/false")
+    if len(blueprints) < 3:
+        err(f"data/forge/blueprints.json: solo {len(blueprints)} blueprint, attesi >= 3")
+
     # --- esiti degli esperimenti (data/potions/experiment_outcomes.json, US-311) ---
     eo_doc = load_json(os.path.join(DATA, "potions", "experiment_outcomes.json"))
     outcomes = (eo_doc or {}).get("outcomes", {})

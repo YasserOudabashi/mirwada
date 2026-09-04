@@ -183,8 +183,8 @@
       ],
       "priority": 9,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/schema/forge_blueprint.schema.json (doc). data/forge/blueprints.json: 3 blueprint (bp_spada_ferrea, bp_corazza_cuoio, bp_amuleto_lunare), tutti nota_da_subito:true per ora (il campo esiste per il gating futuro, come le ricette). Materiali da data/items/materiali.json (gia' preparati in US-301/US-311), output i 3 equip esistenti di US-303: nessun item nuovo. Autoload Forge (separato da PotionSystem, Open Question #1 del PRD risolta 'separati'): blueprint_nota(id), forgia(blueprint_id) -> {ok, reason, item_id, instance_id, qualita}. Qualita' sulla scala CONDIVISA potion_quality.json + bonus stanza 'fucina' (US-326/327, 0 per ora) + bonus talento 'forgiatura_qualita' (US-329, 0 per ora), stesso pattern di PotionSystem._qualita_finale. Inventory.aggiungi() ora ritorna Array[instance_id] (vuoto per un impilabile) invece di void: serviva a Forge per restituire l'istanza appena forgiata; tutti i chiamanti esistenti ignoravano gia' il ritorno, nessuna rottura. GameData: get_blueprint/blueprint_ids. validate_data.py: blocco blueprint - name_i18n, output risolve ed e' categoria:equip, ogni materiale e' categoria:materiale con qta > 0, qualita_base nel vocabolario condiviso, nota_da_subito bool, >= 3 blueprint. project.godot: autoload Forge. i18n: 3 chiavi forge.* tradotte (292 totali). 385 test headless attesi (381 + 4 in test_forge.gd: forgia produce equip + consuma materiali, materiali mancanti -> rifiuto senza consumo, blueprint inesistente gestito, blueprint_nota). validator 0, i18n --check 0."
     },
     {
       "id": "US-317",

@@ -2929,3 +2929,49 @@ sezione test aggiornata.
   pattern di caricamento/query replica esattamente _load_items/get_item gia'
   coperti da test_items.gd, che passano.
 - Prossima storia: US-316 (forgiatura dell'equipaggiamento - blocco C).
+
+[2026-09-04] US-316 — Forgiatura dell'equipaggiamento
+
+- data/schema/forge_blueprint.schema.json: doc (come sigil.schema.json).
+- data/forge/blueprints.json: 3 blueprint - bp_spada_ferrea (3 lingotto_ferro),
+  bp_corazza_cuoio (4 cuoio_conciato), bp_amuleto_lunare (2 cristallo_grezzo +
+  1 lingotto_ferro). Materiali gia' pronti da US-301/311 (materiali.json
+  diceva esplicitamente "input della forgiatura"), output i 3 equip esistenti
+  di US-303: zero item nuovi, solo un nuovo modo di ottenerli. Tutti
+  nota_da_subito:true per ora (il campo c'e' per il gating futuro via
+  KnowledgeStore 'progetto:<id>', come le ricette - nessun blueprint lo
+  richiede ancora, nessuna pergamena/oggetto lo insegna: si aggiungera' con
+  un blueprint futuro se serve).
+- Autoload Forge (separato da PotionSystem: Open Question #1 del PRD fase 3
+  risolta 'separati' finche' la duplicazione non supera ~30 righe - qui sono
+  ~35 righe utili, stesso pattern ma dati diversi):
+  * blueprint_nota(id): nota_da_subito OPPURE KnowledgeStore 'progetto:<id>'.
+  * forgia(id) -> {ok, reason, item_id, instance_id, qualita}: verifica noto +
+    materiali in Inventory, consuma (Inventory.rimuovi), produce l'equip
+    (Inventory.aggiungi) e ne cattura l'instance_id appena creato.
+  * _qualita_finale: qualita_base del blueprint sulla scala CONDIVISA
+    data/schema/potion_quality.json (non e' "di pozione": e' la scala
+    generica di ogni output di crafting) + bonus stanza 'fucina' (US-327,
+    0 per ora) + bonus talento 'forgiatura_qualita' (US-329, 0 per ora).
+- Inventory.aggiungi(item_id, quantita) ora ritorna Array (gli instance_id
+  creati; [] per un impilabile, che non ha identita'): serviva a Forge per
+  sapere quale istanza equip ha appena prodotto. Ogni chiamante esistente
+  (PotionSystem, characteristic_pickup, ~30 punti nei test) ignorava gia'
+  il ritorno: nessuna rottura, solo un'API un po' piu' utile.
+- validate_data.py: blocco blueprint - name_i18n presente, output risolve
+  ed e' categoria:equip, ogni materiale e' categoria:materiale con
+  quantita' > 0, qualita_base nel vocabolario condiviso delle qualita',
+  nota_da_subito bool, >= 3 blueprint.
+- project.godot: nuovo autoload Forge (dopo PotionSystem).
+- i18n: 3 chiavi forge.* tradotte (292 totali, nessun nuovo TODO).
+- Come verificato: validator 0 (9 warning invariati). i18n --check 0. Test
+  nuovi in tests/test_forge.gd (4): forgia con materiali -> equip in
+  inventario con instance_id + materiali consumati; materiali mancanti ->
+  rifiuto SENZA consumo; blueprint inesistente -> reason gestita, nessun
+  crash; blueprint_nota (true per nota_da_subito, false per id ignoto). NON
+  posso eseguire la suite headless in questa sessione (Godot non installato
+  nell'ambiente remoto): il codice replica esattamente il pattern gia'
+  testato di PotionSystem.prepara/_qualita_finale (test_concoction_v2.gd),
+  cambiando solo la fonte dati.
+- Prossima storia: US-317 (incisione dei sigilli sull'equip, fusa con
+  US-309 - blocco C).

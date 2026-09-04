@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "_comment": "Progetti di forgiatura (US-316). Materiali da data/items/materiali.json, output equip da data/items/equip.json: nessun equip nuovo, si riusa quello di US-303.",
+  "blueprints": {
+    "bp_spada_ferrea": {
+      "name_i18n": "forge.bp_spada_ferrea",
+      "output": "spada_ferrea",
+      "materiali": {"lingotto_ferro": 3},
+      "qualita_base": "pura",
+      "nota_da_subito": true
+    },
+    "bp_corazza_cuoio": {
+      "name_i18n": "forge.bp_corazza_cuoio",
+      "output": "corazza_cuoio",
+      "materiali": {"cuoio_conciato": 4},
+      "qualita_base": "pura",
+      "nota_da_subito": true
+    },
+    "bp_amuleto_lunare": {
+      "name_i18n": "forge.bp_amuleto_lunare",
+      "output": "amuleto_lunare",
+      "materiali": {"cristallo_grezzo": 2, "lingotto_ferro": 1},
+      "qualita_base": "eccelsa",
+      "nota_da_subito": true
+    }
+  }
+}
