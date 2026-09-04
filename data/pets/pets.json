@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "_comment": "Specie di pet (US-321). abilita' vuoto finche' non esistono abilita' dedicate ai pet (nessuna nei dati attivi oggi: non se ne inventa una fuori richiesta). ancora_id risolve in data/anchors.json - il pet E' un'Ancora.",
+  "pets": [
+    {
+      "id": "lupo_ombra",
+      "name_i18n": "pet.lupo_ombra",
+      "hp_max": 40,
+      "sequenza_iniziale": 8,
+      "domabilita": 0.6,
+      "ancora_id": "anchor_pet_lupo_ombra",
+      "comportamenti": [
+        {"soglia_bond": 20, "id": "fiuto_base"},
+        {"soglia_bond": 60, "id": "carica_assistita"}
+      ],
+      "abilita": [],
+      "curva_hp_max": {"8": 40, "7": 46, "6": 52, "5": 58}
+    },
+    {
+      "id": "corvo_predittivo",
+      "name_i18n": "pet.corvo_predittivo",
+      "hp_max": 22,
+      "sequenza_iniziale": 9,
+      "domabilita": 0.8,
+      "ancora_id": "anchor_pet_corvo",
+      "comportamenti": [
+        {"soglia_bond": 15, "id": "avvistamento"},
+        {"soglia_bond": 50, "id": "predizione_minore"}
+      ],
+      "abilita": [],
+      "curva_hp_max": {"9": 22, "8": 26, "7": 30}
+    }
+  ]
+}

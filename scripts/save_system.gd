@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 15
+const VERSIONE_CORRENTE := 16
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -85,6 +85,8 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		"equipaggiamento": (dati.get("equipaggiamento", {}) as Dictionary).duplicate(true),
 		# Strutture costruite dal giocatore (US-319). Lista di istanze.
 		"strutture": (dati.get("strutture", []) as Array).duplicate(true),
+		# Il pet del giocatore (US-321). {} se nessuno.
+		"pet": (dati.get("pet", {}) as Dictionary).duplicate(true),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -212,6 +214,8 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_13_a_14(doc)
 			14:
 				doc = _migra_14_a_15(doc)
+			15:
+				doc = _migra_15_a_16(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -324,6 +328,13 @@ func _migra_14_a_15(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v15 -> v16: il pet (US-321). Nessun pet pregresso.
+func _migra_15_a_16(doc: Dictionary) -> Dictionary:
+	if not doc.has("pet"):
+		doc["pet"] = {}
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -348,6 +359,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"inventario": _campo(raw, "inventario", TYPE_DICTIONARY, {}),
 		"equipaggiamento": _campo(raw, "equipaggiamento", TYPE_DICTIONARY, {}),
 		"strutture": _campo(raw, "strutture", TYPE_ARRAY, []),
+		"pet": _campo(raw, "pet", TYPE_DICTIONARY, {}),
 	}
 
 

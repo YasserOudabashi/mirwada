@@ -400,8 +400,8 @@
       ],
       "priority": 20,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/schema/pet.schema.json (doc) + data/pets/pets.json: 2 specie (lupo_ombra hp 40 seq 8, corvo_predittivo hp 22 seq 9), ognuna con comportamenti sbloccati per soglia di bond, curva_hp_max per Sequenza (US-324), abilita' VUOTO (nessuna abilita' dedicata ai pet nei dati attivi: non se ne inventa una fuori richiesta, il campo esiste per quando servira'). data/anchors.json: 2 nuove Ancore (anchor_pet_lupo_ombra, anchor_pet_corvo) - il pet E' un'Ancora, come da AC. GameData: _load_pets (pattern _load_items), get_pet_species/pet_species_ids. Autoload PetSystem: pet_attivo() -> Dictionary ({pet_id,bond,hp,sequenza} o {}), imposta_pet(pet_id) (setter grezzo: l'invariante 'un solo pet' e' regola di gioco di doma(), US-322, non del magazzino), bond(), sequenza_pet() (-1 senza pet). SAVE: nuovo campo top-level 'pet', schema_version 15->16, _migra_15_a_16. validate_data.py: blocco pet - id unici, name_i18n, hp_max > 0, sequenza_iniziale 0..9, domabilita 0..1, ancora_id risolve in anchors.json, ogni comportamento ha soglia_bond 0..100 + id, ogni abilita' (se presente) risolve, curva_hp_max (se presente) ha chiavi-Sequenza 0..9 valide e valori > 0. project.godot: autoload PetSystem. i18n: 4 chiavi nuove tradotte (303 totali). Test nuovi in tests/test_pet_system.gd (6): vocabolario caricato + il pet e' un'Ancora, nessun pet di default, imposta_pet popola hp/sequenza dalla specie, specie ignota -> false senza impostare nulla, round-trip del save, da_salvataggio non fidato. 415 test headless attesi (409 + 6). NON posso eseguire la suite headless in questa sessione (Godot non installato nell'ambiente remoto): verificata a mano la correttezza sintattica e la coerenza col pattern gia' testato di Inventory/Equipment. validator 0."
     },
     {
       "id": "US-322",

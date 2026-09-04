@@ -28,6 +28,20 @@
       "forza": 12,
       "penalita": 24,
       "_nota": "Una promessa fatta. Perderla e' il colpo piu' duro."
+    },
+    {
+      "id": "anchor_pet_lupo_ombra",
+      "name_i18n": "anchor.pet_lupo_ombra",
+      "forza": 7,
+      "penalita": 16,
+      "_nota": "US-321: il pet e' un'Ancora. Registrata da PetSystem.doma(), distrutta da PetSystem.morte()."
+    },
+    {
+      "id": "anchor_pet_corvo",
+      "name_i18n": "anchor.pet_corvo",
+      "forza": 5,
+      "penalita": 12,
+      "_nota": "US-321: il pet e' un'Ancora. Registrata da PetSystem.doma(), distrutta da PetSystem.morte()."
     }
   ]
 }

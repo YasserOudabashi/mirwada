@@ -18,6 +18,7 @@ const DIR_SYNERGIES := "res://data/synergies"
 const DIR_ITEMS := "res://data/items"
 const DIR_SIGILS := "res://data/sigils"
 const DIR_STRUCTURES := "res://data/structures"
+const DIR_PETS := "res://data/pets"
 const PATH_TAGS := "res://data/tags.json"
 const PATH_BALANCE := "res://data/balance.json"
 const PATH_PRIMITIVES := "res://data/schema/primitives.json"
@@ -79,6 +80,7 @@ var _sigils: Dictionary = {}
 var _sigil_effect_types: Dictionary = {}
 var _forge_blueprints: Dictionary = {}
 var _structures: Dictionary = {}
+var _pets: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -123,6 +125,7 @@ func load_all() -> void:
 	_load_items()
 	_load_sigils()
 	_load_structures()
+	_load_pets()
 	# L'ultimo argomento e' il tipo atteso per la chiave: un file in cui quella
 	# chiave ha la forma sbagliata viene scartato con un errore, non caricato.
 	_load_single(PATH_TAGS, "tags", _tags, TYPE_ARRAY)
@@ -436,6 +439,15 @@ func structure_ids() -> Array:
 	return _structures.keys()
 
 
+## --- Specie di pet (data/pets/, US-321) ---
+func get_pet_species(id: String) -> Dictionary:
+	return _pets.get(id, {})
+
+
+func pet_species_ids() -> Array:
+	return _pets.keys()
+
+
 ## --- VFX (data/vfx.json, US-226) ---
 ## Gemello visivo di audio.json.pathway_palette. Un renderer per primitiva +
 ## una palette per Pathway; nessun campo VFX sulle abilita'.
@@ -576,6 +588,23 @@ func _load_structures() -> void:
 			_upsert(_structures, sid, s)
 			visti[sid] = true
 	_prune(_structures, visti)
+
+
+func _load_pets() -> void:
+	var visti: Dictionary = {}
+	for path in _json_files_in(DIR_PETS):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		for entry in _object_list(doc, "pets", path):
+			var p: Dictionary = entry
+			var pid: String = str(p.get("id", ""))
+			if pid.is_empty():
+				_fail(path, "un pet non ha 'id'")
+				continue
+			_upsert(_pets, pid, p)
+			visti[pid] = true
+	_prune(_pets, visti)
 
 
 func _load_synergies() -> void:

@@ -1,0 +1,15 @@
+{
+  "_comment": "Documentazione formale di data/pets/*.json (US-321). Come gli altri schema in data/schema/ NON e' usato da un validatore jsonschema: i controlli veri sono espliciti in tools/validate_data.py. Ogni file e' { schema_version, pets: [ ... ] }.",
+  "schema_version": 1,
+  "pet": {
+    "id": "string, univoco fra tutte le specie",
+    "name_i18n": "string, chiave i18n ('pet.<id>')",
+    "hp_max": "numero > 0, alla sequenza_iniziale (US-324 lo fa crescere per Sequenza)",
+    "sequenza_iniziale": "int 0..9, la Sequenza del pet appena domato",
+    "domabilita": "float 0..1, probabilita' base di successo di PetSystem.doma() (US-322)",
+    "ancora_id": "string - il pet E' un'Ancora: deve risolvere a data/anchors.json",
+    "comportamenti": [{"soglia_bond": "int 0..100", "id": "string, sbloccato quando bond >= soglia"}],
+    "abilita": ["ability_id opzionale che il pet puo' eseguire - array vuoto finche' non esistono abilita' dedicate ai pet"],
+    "curva_hp_max": "{ '<sequenza>': numero } opzionale - hp_max per Sequenza quando il pet avanza (US-324); assente = hp_max fisso"
+  }
+}

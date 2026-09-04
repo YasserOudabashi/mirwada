@@ -96,6 +96,10 @@ func _strutture() -> Node:
 	return get_node_or_null("/root/StructureRegistry")
 
 
+func _pet() -> Node:
+	return get_node_or_null("/root/PetSystem")
+
+
 func salva_rapido() -> Dictionary:
 	return salva_slot(SLOT_RAPIDO)
 
@@ -180,6 +184,7 @@ func snapshot() -> Dictionary:
 		"inventario": _inventario().per_salvataggio() if _inventario() != null else {},
 		"equipaggiamento": _equip().per_salvataggio() if _equip() != null else {},
 		"strutture": _strutture().per_salvataggio() if _strutture() != null else [],
+		"pet": _pet().per_salvataggio() if _pet() != null else {},
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D:
@@ -226,6 +231,8 @@ func applica(dati: Dictionary) -> void:
 		_equip().da_salvataggio(dati.get("equipaggiamento", {}))
 	if _strutture() != null:
 		_strutture().da_salvataggio(dati.get("strutture", []))
+	if _pet() != null:
+		_pet().da_salvataggio(dati.get("pet", {}))
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D and dati.has("posizione"):
 		(p as Node2D).global_position = dati["posizione"]

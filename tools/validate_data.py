@@ -675,6 +675,56 @@ def main():
     if len(structure_ids) < 3:
         err(f"data/structures/: solo {len(structure_ids)} strutture, attese >= 3")
 
+    # --- pet (data/pets/, US-321) ---
+    anchor_ids = {a.get("id") for a in ((load_json(os.path.join(DATA, "anchors.json")) or {}).get("anchors", []))}
+    pdir = os.path.join(DATA, "pets")
+    pet_ids = set()
+    if os.path.isdir(pdir):
+        for fn in sorted(os.listdir(pdir)):
+            if not fn.endswith(".json"):
+                continue
+            doc = load_json(os.path.join(pdir, fn))
+            if doc is None:
+                continue
+            rel = f"data/pets/{fn}"
+            for p in doc.get("pets", []):
+                pid = p.get("id")
+                if pid in pet_ids:
+                    err(f"{rel}: id pet duplicato '{pid}'")
+                pet_ids.add(pid)
+                if not isinstance(p.get("name_i18n"), str) or not p.get("name_i18n"):
+                    err(f"{rel} [{pid}]: name_i18n mancante")
+                hp = p.get("hp_max")
+                if not isinstance(hp, (int, float)) or isinstance(hp, bool) or hp <= 0:
+                    err(f"{rel} [{pid}]: hp_max deve essere un numero > 0")
+                seq = p.get("sequenza_iniziale")
+                if not isinstance(seq, int) or isinstance(seq, bool) or not (0 <= seq <= 9):
+                    err(f"{rel} [{pid}]: sequenza_iniziale deve essere un intero 0..9")
+                dom = p.get("domabilita")
+                if not isinstance(dom, (int, float)) or isinstance(dom, bool) or not (0.0 <= dom <= 1.0):
+                    err(f"{rel} [{pid}]: domabilita deve essere un numero 0..1")
+                if p.get("ancora_id") not in anchor_ids:
+                    err(f"{rel} [{pid}]: ancora_id '{p.get('ancora_id')}' non risolve a un'Ancora "
+                        f"(il pet E' un'Ancora, US-321)")
+                for comp in p.get("comportamenti", []):
+                    if not isinstance(comp.get("soglia_bond"), int) or not (0 <= comp.get("soglia_bond", -1) <= 100):
+                        err(f"{rel} [{pid}]: comportamento con soglia_bond fuori 0..100")
+                    if not isinstance(comp.get("id"), str) or not comp.get("id"):
+                        err(f"{rel} [{pid}]: comportamento senza 'id'")
+                for aid in p.get("abilita", []):
+                    if ability_ids and aid not in ability_ids:
+                        err(f"{rel} [{pid}]: abilita '{aid}' non risolve")
+                curva = p.get("curva_hp_max")
+                if curva is not None:
+                    if not isinstance(curva, dict):
+                        err(f"{rel} [{pid}]: curva_hp_max deve essere un oggetto")
+                    else:
+                        for k, v in curva.items():
+                            if not k.isdigit() or not (0 <= int(k) <= 9):
+                                err(f"{rel} [{pid}]: curva_hp_max ha una chiave-Sequenza non valida '{k}'")
+                            if not isinstance(v, (int, float)) or isinstance(v, bool) or v <= 0:
+                                err(f"{rel} [{pid}]: curva_hp_max['{k}'] deve essere un numero > 0")
+
     # --- oggetti (data/items/, US-301) ---
     ic_doc = load_json(os.path.join(DATA, "schema", "item_categories.json"))
     item_categories = set((ic_doc or {}).get("item_categories", []))
