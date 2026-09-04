@@ -2975,3 +2975,52 @@ sezione test aggiornata.
   cambiando solo la fonte dati.
 - Prossima storia: US-317 (incisione dei sigilli sull'equip, fusa con
   US-309 - blocco C).
+
+[2026-09-04] US-317 — Incisione dei sigilli sull'equip (fusa con US-309)
+
+- Equipment estesa con _sigilli: Dictionary equip_instance_id -> [{instance_id,
+  item_id}] (del sigillo). Tenuta PER ISTANZA di equip, NON per slot/mount:
+  un sigillo e' incastonato nell'OGGETTO, non nel punto di aggancio. Smonti
+  la spada, i suoi sigilli restano nella spada (nello zaino); li ritrovi se
+  la rimonti. E' la differenza con _slot, che e' per mount.
+  * incastona(mount, sigillo_instance_id) -> bool: fallisce se il mount e'
+    vuoto, l'istanza non e' un item categoria:sigillo, o slot_sigilli
+    dell'equip e' gia' pieno.
+  * rimuovi_sigillo(mount, sigillo_instance_id) -> bool: estrae, spegne il
+    modificatore, restituisce il sigillo allo zaino (Inventory.restituisci_istanza).
+  * sigilli_incastonati(mount) -> Array, per ispezione/UI.
+- Un sigillo applica effetto E effetto_collaterale (sempre presente entrambi
+  se definiti, US-309: "l'effetto_collaterale, se presente, pure") come UN
+  SOLO modificatore per id "sigillo:<instance_id>" via StatsComponent -
+  ma solo per i tipi stat_modifier: moltiplicativo si converte in delta
+  sulla base come AbilityEngine._mod_stat (stesso motore, stessa logica).
+  tag_grant e stored_ability_id (US-315) non toccano lo StatsComponent:
+  Equipment.tag_attivi() (estesa: tag propri del sigillo item + tag_grant)
+  e la nuova Equipment.stored_abilities() li espongono in lettura.
+- rimuovi_slot() ora spegne anche i modificatori dei sigilli incastonati
+  nell'oggetto che si smonta (mancava: un bug che avrei lasciato attivo il
+  bonus anche a zaino, corretto prima di scrivere il test). equipaggia()
+  riaccende i modificatori dei sigilli se l'istanza rimontata ne aveva gia'.
+- SAVE: per_salvataggio() ora e' {slot, sigilli} invece della mappa nuda dei
+  mount. da_salvataggio() riconosce ANCHE la forma nuda pre-US-317 (raw
+  stesso e' la mappa slot, senza wrapper): auto-migrazione difensiva sul
+  CONTENUTO della chiave 'equipaggiamento' che esisteva gia' da v14, stesso
+  principio del next_iid opzionale dell'Inventory - NESSUN bump di
+  schema_version (resta v14): non e' una chiave nuova, e' una chiave
+  esistente che ora sa leggere anche la sua forma precedente.
+- Come verificato: validator 0 (nessun dato toccato in questa story). Test
+  nuovi in tests/test_sigilli_incastonatura.gd (7): incastona fino a
+  slot_sigilli (amuleto_lunare: 2) poi il 3o rifiuta; effetto (evasione +0.08)
+  e collaterale (spiritualita_max -10) di sigillo_ombra_fame applicati
+  all'incastonatura e rimossi all'estrazione, sigillo tornato nello zaino;
+  il tag del sigillo incastonato conta in tag_attivi; smontare l'equip
+  spegne il modificatore ma NON dimentica il sigillo (rimontando la stessa
+  istanza il modificatore torna); round-trip completo del save (snapshot ->
+  pulisci -> applica -> stesso stato); il formato di salvataggio nudo
+  pre-US-317 si legge ancora; un equip gia' Sigillato (lama_del_pentimento,
+  slot_sigilli:0) non accetta altri sigilli. NON posso eseguire la suite
+  headless in questa sessione (Godot non installato nell'ambiente remoto):
+  verificata a mano la correttezza sintattica (parentesi bilanciate su tutti
+  i file toccati) e la coerenza col motore di modificatori gia' testato
+  (test_equipment.gd, AbilityEngine._mod_stat).
+- Prossima storia: US-318 (oggetti Sigillati - blocco C, ultima).
