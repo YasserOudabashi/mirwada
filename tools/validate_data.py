@@ -831,6 +831,51 @@ def main():
         if c not in coperte:
             warn(f"data/items/: nessun item di esempio per la categoria '{c}'")
 
+    # --- stanze della base (data/base/rooms.json, US-326) ---
+    rt_doc = load_json(os.path.join(DATA, "schema", "room_types.json"))
+    room_types = set((rt_doc or {}).get("tipi", []))
+    rbk_doc = load_json(os.path.join(DATA, "schema", "room_bonus_keys.json"))
+    room_bonus_keys = set((rbk_doc or {}).get("chiavi", {}).keys())
+    rooms_doc = load_json(os.path.join(DATA, "base", "rooms.json"))
+    rooms = (rooms_doc or {}).get("rooms", {})
+    if set(rooms.keys()) != room_types:
+        err(f"data/base/rooms.json: tipi {sorted(rooms.keys())}, attesi esattamente {sorted(room_types)}")
+    for tipo, room in rooms.items():
+        livelli = room.get("livelli", [])
+        if not livelli:
+            err(f"data/base/rooms.json [{tipo}]: nessun livello")
+        for i, liv in enumerate(livelli):
+            atteso = i + 1
+            if liv.get("livello") != atteso:
+                err(f"data/base/rooms.json [{tipo}]: livello '{liv.get('livello')}' fuori sequenza "
+                    f"(atteso {atteso})")
+            costo = liv.get("costo", {})
+            if not isinstance(costo, dict) or not costo:
+                err(f"data/base/rooms.json [{tipo}] livello {atteso}: 'costo' deve essere un oggetto non vuoto")
+            for iid, q in (costo if isinstance(costo, dict) else {}).items():
+                if iid not in item_ids:
+                    err(f"data/base/rooms.json [{tipo}] livello {atteso}: costo '{iid}' non risolve a un item")
+                if not isinstance(q, int) or isinstance(q, bool) or q <= 0:
+                    err(f"data/base/rooms.json [{tipo}] livello {atteso}: quantita' di '{iid}' deve essere un intero > 0")
+            bonus = liv.get("bonus", {})
+            if not isinstance(bonus, dict):
+                err(f"data/base/rooms.json [{tipo}] livello {atteso}: 'bonus' deve essere un oggetto")
+            else:
+                for k in bonus:
+                    if k not in room_bonus_keys:
+                        err(f"data/base/rooms.json [{tipo}] livello {atteso}: chiave di bonus sconosciuta '{k}' "
+                            f"(vocabolario: {sorted(room_bonus_keys)})")
+                if "ricette_note" in bonus:
+                    rn = bonus["ricette_note"]
+                    if not isinstance(rn, list):
+                        err(f"data/base/rooms.json [{tipo}] livello {atteso}: ricette_note deve essere una lista")
+                    else:
+                        for rid in rn:
+                            _r = load_json(os.path.join(DATA, "potions", "recipes.json")) or {}
+                            if rid not in _r.get("recipes", {}):
+                                err(f"data/base/rooms.json [{tipo}] livello {atteso}: ricette_note "
+                                    f"'{rid}' non risolve a una ricetta")
+
     # --- ricette delle pozioni consumabili (data/potions/recipes.json, US-308) ---
     pq_doc = load_json(os.path.join(DATA, "schema", "potion_quality.json"))
     potion_quality = set((pq_doc or {}).get("qualita", []))

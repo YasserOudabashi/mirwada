@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO delle chiavi di bonus delle stanze (US-326). Ogni sistema che legge BaseSystem.bonus(tipo) sa quali chiavi aspettarsi da qui, non da un if sul nome della stanza (US-327).",
+  "chiavi": {
+    "rischio_esperimento": "int - laboratorio, riduzione % del peso dei fallimenti mostruosi (PotionSystem.sperimenta, US-311)",
+    "qualita_pozione": "int - laboratorio, bonus sulla scala potion_quality (PotionSystem.prepara, US-310)",
+    "qualita_forgia": "int - stanza_rituale, bonus sulla scala potion_quality (Forge.forgia, US-316)",
+    "ricette_note": "[recipe_id] - biblioteca, ricette 'avanzata' rese note senza sperimentare (US-327)",
+    "resa": "int - giardino, item raccolti per appezzamento pronto (US-328)"
+  }
+}

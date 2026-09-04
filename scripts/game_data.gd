@@ -44,6 +44,9 @@ const PATH_ITEM_CATEGORIES := "res://data/schema/item_categories.json"
 const PATH_EQUIP_SLOTS := "res://data/schema/equip_slots.json"
 const PATH_SIGIL_EFFECT_TYPES := "res://data/schema/sigil_effect_types.json"
 const PATH_FORGE_BLUEPRINTS := "res://data/forge/blueprints.json"
+const PATH_ROOM_TYPES := "res://data/schema/room_types.json"
+const PATH_ROOM_BONUS_KEYS := "res://data/schema/room_bonus_keys.json"
+const PATH_ROOMS := "res://data/base/rooms.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -81,6 +84,9 @@ var _sigil_effect_types: Dictionary = {}
 var _forge_blueprints: Dictionary = {}
 var _structures: Dictionary = {}
 var _pets: Dictionary = {}
+var _room_types: Dictionary = {}
+var _room_bonus_keys: Dictionary = {}
+var _rooms: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -151,6 +157,9 @@ func load_all() -> void:
 	_load_single(PATH_EQUIP_SLOTS, "slots", _equip_slots, TYPE_ARRAY)
 	_load_single(PATH_SIGIL_EFFECT_TYPES, "tipi", _sigil_effect_types, TYPE_ARRAY)
 	_load_single(PATH_FORGE_BLUEPRINTS, "blueprints", _forge_blueprints, TYPE_DICTIONARY)
+	_load_single(PATH_ROOM_TYPES, "tipi", _room_types, TYPE_ARRAY)
+	_load_single(PATH_ROOM_BONUS_KEYS, "chiavi", _room_bonus_keys, TYPE_DICTIONARY)
+	_load_single(PATH_ROOMS, "rooms", _rooms, TYPE_DICTIONARY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -446,6 +455,27 @@ func get_pet_species(id: String) -> Dictionary:
 
 func pet_species_ids() -> Array:
 	return _pets.keys()
+
+
+## --- Stanze della base (data/base/rooms.json, US-326) ---
+## Vocabolario chiuso dei 4 tipi (data/schema/room_types.json).
+func room_types() -> Array:
+	return _array_or_empty(_room_types.get("tipi"))
+
+
+## Vocabolario chiuso delle chiavi di bonus (data/schema/room_bonus_keys.json).
+func room_bonus_keys() -> Array:
+	return _dict_or_empty(_room_bonus_keys.get("chiavi")).keys()
+
+
+## { livelli: [...] } del tipo, {} se il tipo non esiste.
+func get_room_type(tipo: String) -> Dictionary:
+	return _dict_or_empty(_dict_or_empty(_rooms.get("rooms")).get(tipo))
+
+
+## I livelli del tipo, in ordine. [] se il tipo non esiste.
+func room_levels(tipo: String) -> Array:
+	return _array_or_empty(get_room_type(tipo).get("livelli"))
 
 
 ## --- VFX (data/vfx.json, US-226) ---

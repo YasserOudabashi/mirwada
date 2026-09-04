@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO dei 4 tipi di stanza (US-326, contratto design-master cap.5). Un tipo nuovo e' codice: va discusso, come le primitive.",
+  "tipi": ["laboratorio", "stanza_rituale", "biblioteca", "giardino"]
+}

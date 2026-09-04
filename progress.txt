@@ -3380,3 +3380,39 @@ sezione test aggiornata.
 - BLOCCO E completo: US-321 (schema e magazzino), US-322 (taming), US-323
   (bond), US-324 (coltivazione), US-325 (morte).
 - Prossima storia: US-326 (schema della base e delle 4 stanze - blocco F).
+
+[2026-09-04] US-326 — Schema della base e delle 4 stanze. BLOCCO F iniziato.
+
+- data/schema/room_types.json: vocabolario chiuso dei 4 tipi (laboratorio,
+  stanza_rituale, biblioteca, giardino). data/schema/room_bonus_keys.json:
+  vocabolario chiuso delle chiavi di bonus - cosi' un sistema legge
+  bonus(tipo) per chiave, mai un if sul nome della stanza (US-327).
+- data/base/rooms.json + schema doc: 2 livelli per tipo, costo dai
+  materiali gia' esistenti (US-316: lingotto_ferro/cuoio_conciato/
+  cristallo_grezzo), bonus COMPLETO per livello (non un delta da sommare
+  ai precedenti). biblioteca livello 2 rende nota ric_cura_maggiore
+  (avanzata) senza sperimentare - il gancio per US-327.
+- GameData: room_types/room_bonus_keys/get_room_type/room_levels.
+- Autoload BaseSystem: costruisci(tipo) (solo da livello 0), potenzia(tipo)
+  (solo da livello >= 1), livello(tipo), bonus(tipo) (il bonus del livello
+  ATTUALE, {} se non costruita), prossimo_costo(tipo).
+- SAVE: nuovo campo top-level 'base' ({tipo:livello}), schema_version
+  16->17, _migra_16_a_17.
+- validate_data.py: blocco stanze - rooms.json copre esattamente i 4 tipi
+  (ne' uno di piu' ne' di meno), livelli sequenziali da 1, ogni costo
+  risolve a un item con quantita' > 0, ogni chiave di bonus nel vocabolario
+  chiuso, ricette_note risolve a una ricetta. Inserito DOPO il blocco item
+  (serve item_ids gia' popolato, stesso vincolo d'ordine gia' visto per i
+  sigilli in US-315).
+- Come verificato: validator 0. Test nuovi in tests/test_base_system.gd
+  (9): vocabolario caricato; non costruita di default (livello 0, bonus
+  {}); costruisci sale a livello 1 e consuma il costo, bonus corretto;
+  senza materiali rifiuta senza consumo; potenzia richiede gia' costruita;
+  potenzia sale a livello 2 col bonus del NUOVO livello (non la somma);
+  oltre il massimo dei dati rifiuta; round-trip del save; da_salvataggio
+  non fidato (tipo fuori vocabolario scartato, livello oltre il massimo
+  clampato). NON posso eseguire la suite headless in questa sessione
+  (Godot non installato nell'ambiente remoto): verificata a mano la
+  correttezza sintattica (compreso tools/validate_data.py stesso) e la
+  coerenza col pattern gia' testato di Forge/PotionSystem.
+- Prossima storia: US-327 (le stanze alimentano i loro sistemi).
