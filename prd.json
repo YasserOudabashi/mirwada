@@ -183,8 +183,8 @@
       ],
       "priority": 9,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/schema/forge_blueprint.schema.json (doc) + data/forge/blueprints.json: 3 blueprint (bp_spada_ferrea, bp_corazza_cuoio, bp_amuleto_lunare), tutti nota_da_subito:true (nessuna story di fase 3 introduce una scoperta dei blueprint, a differenza delle ricette). qualita_base sulla scala condivisa potion_quality.json. Autoload Forge (scripts/forge.gd, dopo PotionSystem): blueprint_noto(id), forgia(id) -> {ok, reason, item_id, instance_id, qualita} - verifica materiali in Inventory, li consuma solo se tutti presenti, produce l'output, qualita' = _qualita_finale (stesso schema di PotionSystem: bonus_stanza(stanza_rituale,qualita_forgia) + bonus_talento(forgiatura_qualita), 0 finche' BaseSystem/TalentSystem non esistono - wiring reale in US-327/331 come per l'alchimia). Inventory.aggiungi() ora ritorna Array (gli instance_id creati, [] per gli impilabili): estensione retrocompatibile, tutti i chiamanti esistenti ignoravano il return. GameData: get_blueprint/blueprint_ids (47 file). validate_data.py: blocco blueprint - name_i18n, nota_da_subito bool, qualita_base nel vocab, output.item_id risolve ed e' categoria:equip, materiali categoria:materiale con quantita int>0. i18n: 3 chiavi blueprint.* (292 totali). 387 test headless (381+6 test_forge.gd: forgia produce equip e consuma materiali, materiali mancanti rifiuta senza consumo, blueprint inesistente gestito, l'equip forgiato ha i tag del blueprint, qualita'=qualita_base senza stanza/talenti, ogni blueprint ben formato). validator 0, nessuna regressione."
     },
     {
       "id": "US-317",

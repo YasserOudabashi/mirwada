@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "_comment": "Blueprint di forgiatura (US-316). Tutti nota_da_subito:true: nessuna story di fase 3 introduce una scoperta dei blueprint (a differenza delle ricette avanzata/leggendaria). qualita_base sulla scala condivisa data/schema/potion_quality.json.",
+  "blueprints": {
+    "bp_spada_ferrea": {
+      "name_i18n": "blueprint.bp_spada_ferrea",
+      "output": { "item_id": "spada_ferrea" },
+      "materiali": { "lingotto_ferro": 3 },
+      "qualita_base": "pura",
+      "nota_da_subito": true
+    },
+    "bp_corazza_cuoio": {
+      "name_i18n": "blueprint.bp_corazza_cuoio",
+      "output": { "item_id": "corazza_cuoio" },
+      "materiali": { "cuoio_conciato": 4 },
+      "qualita_base": "pura",
+      "nota_da_subito": true
+    },
+    "bp_amuleto_lunare": {
+      "name_i18n": "blueprint.bp_amuleto_lunare",
+      "output": { "item_id": "amuleto_lunare" },
+      "materiali": { "cristallo_grezzo": 2, "lingotto_ferro": 1 },
+      "qualita_base": "instabile",
+      "nota_da_subito": true
+    }
+  }
+}

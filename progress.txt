@@ -2932,3 +2932,47 @@ sezione test aggiornata.
   (stessi di sempre). Nessuna verifica a schermo: story di dati + loader,
   nessuna UI tocca ancora i sigilli (arriva con US-317).
 - Prossima storia: US-316 (forgiatura dell'equipaggiamento).
+
+[2026-09-05] US-316 — Forgiatura dell'equipaggiamento
+
+- Cosa fatto:
+  - data/schema/forge_blueprint.schema.json (doc) + data/forge/blueprints.json:
+    3 blueprint (bp_spada_ferrea: 3 lingotto_ferro -> spada_ferrea,
+    bp_corazza_cuoio: 4 cuoio_conciato -> corazza_cuoio, bp_amuleto_lunare:
+    2 cristallo_grezzo + 1 lingotto_ferro -> amuleto_lunare). Tutti gli output
+    sono equip GIA' esistenti (stub di US-301): niente item duplicati.
+    Tutti nota_da_subito:true: nessuna story di fase 3 introduce una scoperta
+    dei blueprint (a differenza delle ricette avanzata/leggendaria di US-311/313).
+  - Autoload Forge (scripts/forge.gd, dopo PotionSystem in project.godot):
+    forgia(blueprint_id) -> {ok, reason, item_id, instance_id, qualita}.
+    Verifica blueprint noto + tutti i materiali presenti PRIMA di consumare
+    (stesso pattern di PotionSystem.prepara): sul rifiuto zero consumo.
+    _qualita_finale ricalca alla lettera PotionSystem._qualita_finale (stessa
+    scala potion_quality.json, stesso _bonus_stanza/_bonus_talento a 0 finche'
+    BaseSystem/TalentSystem non esistono): il wiring vero del bonus e' US-327/331,
+    non questa story, come gia' deciso per l'alchimia in US-310.
+  - Inventory.aggiungi() ora ritorna Array (gli instance_id creati; [] per gli
+    item impilabile:true, che non ne hanno). Serve a Forge per sapere QUALE
+    istanza ha appena prodotto. Tutti i chiamanti esistenti (potion_system.gd,
+    tutti i test) ignoravano il valore di ritorno: cambio retrocompatibile,
+    verificato a grep prima di farlo.
+  - GameData: get_blueprint(id), blueprint_ids() (47 file).
+  - validate_data.py: name_i18n presente, nota_da_subito bool, qualita_base
+    nel vocabolario condiviso, output.item_id risolve ed e' categoria:equip
+    (non un materiale o altro), ogni materiale e' categoria:materiale con
+    quantita intera > 0.
+  - i18n: 3 chiavi blueprint.* tradotte a mano (292 totali).
+- Come verificato: 387 test headless (381 + 6 in test_forge.gd: forgia con
+  materiali -> equip in inventario + materiali consumati; materiali mancanti
+  -> rifiuto, zero consumo; blueprint inesistente gestito; l'equip forgiato ha
+  i tag del blueprint di provenienza; qualita' = qualita_base finche' non c'e'
+  stanza ne' talento; ogni blueprint dei dati e' ben formato). validate_data.py
+  -> 0 errori, 9 warning (gli stessi di sempre). Le 4 "ERROR: Parse JSON
+  failed" nel log sono PRE-ESISTENTI (test_save_system/test_settings che
+  alimentano di proposito un JSON malformato per verificare la gestione
+  dell'errore): confermato leggendo il contesto del log, non hanno a che fare
+  con Forge. Nessuna verifica a schermo: story di sistema, nessuna UI la
+  espone ancora (arriva con US-329, sezione Base del libro - la forgiatura
+  in se' non ha una sua pagina nel PRD di fase 3).
+- Prossima storia: US-317 (incisione dei sigilli sull'equip, fusione con
+  US-309 gia' decisa in RALPH-3).

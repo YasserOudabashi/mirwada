@@ -1,0 +1,11 @@
+{
+  "_comment": "Documentazione formale di data/forge/blueprints.json (US-316). Combina materiali (categoria:materiale) per produrre un equip. Controlli veri in tools/validate_data.py.",
+  "schema_version": 1,
+  "blueprint": {
+    "name_i18n": "string, chiave i18n",
+    "output": { "item_id": "string - un item categoria:equip esistente" },
+    "materiali": "{ item_id (categoria:materiale, esiste): quantita int > 0 }",
+    "qualita_base": "string, una di data/schema/potion_quality.json (scala condivisa con l'alchimia)",
+    "nota_da_subito": "bool - true finche' non esiste un percorso di scoperta dei blueprint (nessuna story di fase 3 lo introduce)"
+  }
+}

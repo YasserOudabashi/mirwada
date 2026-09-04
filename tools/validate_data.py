@@ -744,6 +744,34 @@ def main():
         else:
             err(f"data/potions/recipes.json [{rid}]: output deve avere item_id o effetto")
 
+    # --- blueprint di forgiatura (data/forge/blueprints.json, US-316) ---
+    bp_doc = load_json(os.path.join(DATA, "forge", "blueprints.json"))
+    blueprints = (bp_doc or {}).get("blueprints", {})
+    for bid, bp in blueprints.items():
+        rel = "data/forge/blueprints.json"
+        if not isinstance(bp.get("name_i18n"), str) or not bp.get("name_i18n"):
+            err(f"{rel} [{bid}]: name_i18n mancante")
+        if not isinstance(bp.get("nota_da_subito"), bool):
+            err(f"{rel} [{bid}]: nota_da_subito deve essere true/false")
+        if bp.get("qualita_base") not in potion_quality:
+            err(f"{rel} [{bid}]: qualita_base '{bp.get('qualita_base')}' non nel vocabolario "
+                f"({sorted(potion_quality)})")
+        oid = bp.get("output", {}).get("item_id")
+        if oid not in item_ids:
+            err(f"{rel} [{bid}]: output.item_id '{oid}' non risolve")
+        elif item_cat.get(oid) != "equip":
+            err(f"{rel} [{bid}]: output.item_id '{oid}' non e' un item categoria:equip")
+        materiali = bp.get("materiali", {})
+        if not isinstance(materiali, dict) or not materiali:
+            err(f"{rel} [{bid}]: 'materiali' deve essere un oggetto non vuoto")
+        for mid, q in (materiali if isinstance(materiali, dict) else {}).items():
+            if item_cat.get(mid) != "materiale":
+                err(f"{rel} [{bid}]: materiale '{mid}' non e' un item categoria:materiale")
+            if not isinstance(q, int) or q <= 0:
+                err(f"{rel} [{bid}]: quantita' di '{mid}' deve essere un intero > 0")
+    if len(blueprints) < 1:
+        err("data/forge/blueprints.json: nessun blueprint, atteso almeno 1")
+
     # --- esiti degli esperimenti (data/potions/experiment_outcomes.json, US-311) ---
     eo_doc = load_json(os.path.join(DATA, "potions", "experiment_outcomes.json"))
     outcomes = (eo_doc or {}).get("outcomes", {})

@@ -23,20 +23,27 @@ var _next_iid: int = 1
 
 # --- API ---------------------------------------------------------------
 
-func aggiungi(item_id: String, quantita: int = 1) -> void:
+## -> gli instance_id creati (vuoto per gli item impilabile:true, che non ne
+## hanno: sono un contatore). Serve a chi produce equip/oggetti unici e vuole
+## sapere QUALE istanza ha appena creato (Forge, US-316).
+func aggiungi(item_id: String, quantita: int = 1) -> Array:
 	if quantita <= 0:
-		return
+		return []
 	var it: Dictionary = _def(item_id)
 	if it.is_empty():
 		push_warning("[Inventory] item ignoto: %s" % item_id)
-		return
+		return []
+	var creati: Array = []
 	if bool(it.get("impilabile", false)):
 		_stack[item_id] = int(_stack.get(item_id, 0)) + quantita
 	else:
 		for i in quantita:
-			_istanze.append({"instance_id": "inv_%d" % _next_iid, "item_id": item_id})
+			var iid: String = "inv_%d" % _next_iid
+			_istanze.append({"instance_id": iid, "item_id": item_id})
 			_next_iid += 1
+			creati.append(iid)
 	item_aggiunto.emit(item_id, quantita)
+	return creati
 
 
 ## Rimuove `quantita` copie. false se non ce n'erano abbastanza (nessuna

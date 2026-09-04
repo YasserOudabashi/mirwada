@@ -41,6 +41,7 @@ const PATH_ITEM_CATEGORIES := "res://data/schema/item_categories.json"
 const PATH_EQUIP_SLOTS := "res://data/schema/equip_slots.json"
 const PATH_SIGILS := "res://data/sigils/core.json"
 const PATH_SIGIL_EFFECT_TYPES := "res://data/schema/sigil_effect_types.json"
+const PATH_BLUEPRINTS := "res://data/forge/blueprints.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -75,6 +76,7 @@ var _item_categories: Dictionary = {}
 var _equip_slots: Dictionary = {}
 var _sigils: Dictionary = {}
 var _sigil_effect_types: Dictionary = {}
+var _blueprints: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -142,6 +144,7 @@ func load_all() -> void:
 	_load_single(PATH_EQUIP_SLOTS, "slots", _equip_slots, TYPE_ARRAY)
 	_load_single(PATH_SIGILS, "sigils", _sigils, TYPE_DICTIONARY)
 	_load_single(PATH_SIGIL_EFFECT_TYPES, "effetti", _sigil_effect_types, TYPE_ARRAY)
+	_load_single(PATH_BLUEPRINTS, "blueprints", _blueprints, TYPE_DICTIONARY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -410,6 +413,15 @@ func sigil_ids() -> Array:
 ## Vocabolario chiuso dei tipi di effetto/effetto_collaterale dei sigilli.
 func sigil_effect_types(collaterale: bool = false) -> Array:
 	return _array_or_empty(_sigil_effect_types.get("effetti_collaterali" if collaterale else "effetti"))
+
+
+## --- Blueprint di forgiatura (data/forge/blueprints.json, US-316) ---
+func get_blueprint(id: String) -> Dictionary:
+	return _dict_or_empty(_blueprints.get("blueprints")).get(id, {})
+
+
+func blueprint_ids() -> Array:
+	return _dict_or_empty(_blueprints.get("blueprints")).keys()
 
 
 ## --- VFX (data/vfx.json, US-226) ---
