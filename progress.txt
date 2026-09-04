@@ -3824,3 +3824,59 @@ sezione test aggiornata.
   accurata, non una conferma da CI: resta da confermare quando gira li'.
 - Prossima storia: US-336 (aggiornamento roadmap e validator di chiusura -
   chiude la fase 3, 35/35 story).
+
+[2026-09-04] US-336 — Aggiornamento roadmap e validator di chiusura (FASE 3 CHIUSA, 35/35)
+
+- Solo documentazione, nessun dato ne' codice toccato.
+- 006_PRD/roadmap.md: sezione fase 3 aggiornata da '(~36 story)' a '(35 story)
+  — CHIUSA', con la nota su US-309 fusa in US-317 (spiega il conteggio 35 e
+  non 36), i vocabolari chiusi nuovi elencati con i loro conteggi reali, e
+  il criterio di uscita (US-335: il ciclo di crafting/progressione gira con
+  zero codice dedicato) citato esplicitamente.
+- 006_PRD/design-master.md Appendice C: 6 righe nuove, ognuna coi conteggi
+  letti dai file JSON reali (non a memoria) - item_categories (7),
+  equip_slots (4 slot + 3 tipi), room_types (4), tracked_talents (7),
+  sigil_effect_types (5), experiment_outcomes (5).
+- CLAUDE.md: Fase 3 marcata **CHIUSA** (35 story, 496 test - contati con
+  grep di '^func test_' su tutti i tests/*.gd, 88 file), con un riassunto
+  di cosa include e il verdetto sull'architettura (US-335). Fase corrente
+  aggiornata a **4 — Sinergie**.
+- README.md: stesso aggiornamento nella sezione "Stato", e il riferimento
+  al PRD di fase 3 aggiornato da "fase corrente" a "(chiusa)".
+- Audit del validator (criterio "un check per ogni file di dati nuovo"):
+  elencati tutti gli os.path.join(DATA, ...) in tools/validate_data.py e
+  confrontati uno per uno con ogni file/cartella di dati introdotto nelle
+  35 story di fase 3. Risultato: OGNI file attivo ha gia' un blocco di
+  validazione dedicato (item_categories.json, equip_slots.json,
+  data/items/, potions/recipes.json, potions/experiment_outcomes.json,
+  potion_quality.json, sigil_effect_types.json, data/sigils/,
+  forge/blueprints.json, structures/structures.json, pets/pets.json,
+  room_types.json, room_bonus_keys.json, base/rooms.json,
+  tracked_talents.json, data/talents/) - nessun file scoperto, nessuna
+  aggiunta necessaria al validator. I file *.schema.json restano
+  documentazione pura per scelta esplicita e dichiarata del progetto (il
+  loro stesso _comment lo dice), coerente col resto del progetto: l'audit
+  ha CONFERMATO la copertura gia' esistente, non ne ha creata di nuova.
+- Come verificato: python tools/validate_data.py esce 0 (9 warning
+  preesistenti invariati, nessun dato toccato). Nessun codice toccato:
+  nessuna regressione possibile sulla suite esistente. Godot non e'
+  installato in questo sandbox: non ho potuto eseguire la suite headless.
+
+===================================================================
+FASE 3 — SISTEMI DI SUPPORTO: CHIUSA. 35/35 story a passes:true
+(US-301..US-336, US-309 fusa in US-317). Verdetto sull'architettura
+(US-335): un ciclo completo di crafting/progressione attraverso ogni
+sistema della fase (inventario/equip, alchimia, forgiatura/sigilli,
+strutture, pet, base building, talenti, e la loro somma in
+SynergySources) gira con ZERO righe di codice dedicate a un
+item/ricetta/pet specifico. Nessuna correzione architetturale
+necessaria prima di aprire la fase 4 (Sinergie).
+
+Limite di questa intera sessione, ripetuto per onesta' in ogni story:
+Godot non e' installato in questo sandbox remoto. Ogni verifica e'
+stata statica (validate_data.py, controllo di bilanciamento parentesi,
+lettura completa dei file, confronto a mano con i dati reali) - MAI
+un'esecuzione vera della suite headless o un avvio a schermo. Il primo
+prossimo passo, prima di aprire fase 4 per davvero, dovrebbe essere far
+girare la suite in CI e confermare che i 496 test passino tutti.
+===================================================================

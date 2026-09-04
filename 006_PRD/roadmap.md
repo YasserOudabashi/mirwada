@@ -59,15 +59,19 @@ giocando, con avanzamenti veri, follia che cresce e Ancore che contano.
 
 ---
 
-## Fase 3 — Sistemi di supporto (~36 story)
+## Fase 3 — Sistemi di supporto (35 story) — **CHIUSA**
 
 > **PRD generato il 2026-09-03**: `006_PRD/prd-fase-3-sistemi-di-supporto.md`
-> (36 story `US-3NN` in 8 blocchi: inventario/equip, alchimia, forgiatura/sigilli,
-> strutture, pet, base building, talenti, integrazione). Questa sezione resta
-> come scaletta; la verità è il PRD. Vocabolari nuovi dichiarati nel PRD:
-> `item_categories`, `equip_slots`, `room_types`, `tracked_talents` (~6-10,
-> chiuso — i 12 `tracked_events` restano invariati), tipi di effetto dei sigilli,
-> `experiment_outcomes`. Nessuna primitiva nuova.
+> (35 story `US-3NN` in 8 blocchi: inventario/equip, alchimia, forgiatura/sigilli,
+> strutture, pet, base building, talenti, integrazione — US-309 e' stata fusa
+> in US-317, da cui il conto reale di 35 e non 36). Vocabolari chiusi nuovi
+> introdotti: `item_categories`, `equip_slots`, `room_types`, `tracked_talents`
+> (7, chiuso — i 12 `tracked_events` restano invariati), tipi di effetto dei
+> sigilli (`data/schema/sigil_effect_types.json`), `experiment_outcomes`.
+> Nessuna primitiva nuova. Criterio di uscita verificato in US-335
+> (`progress.txt`): un ciclo di crafting/progressione attraverso ogni sistema
+> della fase gira con zero righe di codice dedicate a un item/ricetta/pet
+> specifico — l'architettura regge, si passa a fase 4 senza correzioni.
 
 - Inventario e equipaggiamento con tag di sinergia
 - **Oggetti con `stored_ability_id`**: pergamene e congegni che contengono

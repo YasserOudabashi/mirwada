@@ -330,3 +330,9 @@ location_tags).
 | Location tags | `data/schema/location_tags.json` | 24 proposti | PROPOSTO in design-world.md, si crea con la prima story che li valida |
 | Condizioni | `ability.schema.json` (enum) | 8 + 3 proposte | le 3 nuove (`follia_min`, `reputazione_min`, `flag`) arrivano col motore dialoghi |
 | Modi di gating | `region.schema.json` proposto | primitiva, momento, fase_lunare, npc, conoscenza, sequenza | PROPOSTO in design-world.md |
+| Categorie di oggetti | `data/schema/item_categories.json` | 7 | chiuso, fase 3 (US-301) |
+| Slot di equipaggiamento | `data/schema/equip_slots.json` | 4 slot (arma/armatura/accessorio_1/accessorio_2) + 3 tipi | chiuso, fase 3 (US-301/303) |
+| Tipi di stanza | `data/schema/room_types.json` | 4 (laboratorio, stanza rituale, biblioteca, giardino) | chiuso, fase 3 (US-326) |
+| Comportamenti tracciabili (talenti) | `data/schema/tracked_talents.json` | 7 | chiuso, fase 3 (US-330) — secondo vocabolario di eventi accanto ai 12 `tracked_events`, per i comportamenti che non appartengono alla recitazione |
+| Tipi di effetto dei sigilli | `data/schema/sigil_effect_types.json` | 5 (`stat_modifier`, `stored_ability_id`, `tag_grant`, `follia_al_secondo`, `drain_spiritualita_al_secondo`) | chiuso, fase 3 (US-315), copre anche l'effetto_collaterale degli equip Sigillati |
+| Esiti degli esperimenti alchemici | `data/potions/experiment_outcomes.json` | 5 | chiuso, fase 3 (US-311/312) |

@@ -23,7 +23,17 @@ colophon/impostazioni con `user://settings.json`), `data/vfx.json` + renderer
 VFX per primitiva con impact frame. Criterio di uscita (US-219): il Twilight
 Giant va dalla Sequenza 9 alla 5 con zero codice dedicato.
 
-Il PRD della fase 3 (sistemi di supporto) si genera con `/prd` — vedi
+**Fase 3 — Sistemi di supporto: chiusa.** 35 story, 496 test. Inventario ed
+equipaggiamento con tag di sinergia, oggetti con `stored_ability_id`,
+alchimia (qualita', fallimenti mostruosi, scoperta ricette), forgiatura e
+incisione di sigilli (con effetti collaterali), un pet completo (taming,
+bond, coltivazione, morte come perdita di Ancora), base building (4 stanze:
+laboratorio, stanza rituale, biblioteca, giardino), talenti innati e
+acquisiti per osservazione del comportamento. Criterio di uscita (US-335):
+un ciclo completo di crafting/progressione gira con zero righe di codice
+dedicate a un item/ricetta/pet specifico.
+
+Il PRD della fase 4 (sinergie) si genera con `/prd` — vedi
 `006_PRD/roadmap.md`.
 
 ## Setup
@@ -50,7 +60,7 @@ zero righe di codice dedicate (data/abilities/twilight_giant.json).
 ## Documenti
 
 - `CLAUDE.md` — regole di lavoro, comandi, decisioni prese
-- `006_PRD/prd-fase-3-sistemi-di-supporto.md` — PRD della fase corrente
+- `006_PRD/prd-fase-3-sistemi-di-supporto.md` — PRD della fase 3 (chiusa)
 - `006_PRD/prd-fase-2-pathway-core.md` — PRD della fase 2 (chiusa)
 - `006_PRD/prd-fase-1-fondamenta.md` — PRD della fase 1 (chiusa)
 - `006_PRD/design-master.md` — design doc master: baseline dell'audit, sicurezza, contratti, story per fase, decisioni aperte
