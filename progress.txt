@@ -3765,3 +3765,62 @@ sezione test aggiornata.
   coinvolta. Godot non e' installato in questa sessione remota: non ho
   potuto eseguire la suite headless.
 - Prossima storia: US-335 (vertical slice della fase 3).
+
+[2026-09-04] US-335 — Vertical slice della fase 3 (il verdetto sull'architettura)
+
+- Nuovo tests/test_slice_fase_3.gd, sul modello di test_vertical_slice.gd
+  (US-219, fase 2). Due test:
+  - test_ciclo_completo_di_crafting_e_progressione(): un ciclo giocato in
+    codice attraverso TUTTI i sistemi di fase 3, in ordine - (1) giardino:
+    costruisci, pianta erba_lunare, avanza GameState.tempo_gioco, raccoglie;
+    (2) laboratorio: PotionSystem.sperimenta() con la combinazione esatta
+    di ric_cura_maggiore -> 'scoperta' (KnowledgeStore.impara), poi
+    PotionSystem.prepara() sulla ricetta ora nota -> qualita' migliorata
+    sopra 'pura' grazie al bonus del laboratorio; (3) Forge.forgia
+    ('bp_amuleto_lunare') -> Equipment.equipaggia() sull'instance_id
+    restituito; (4) Equipment.incastona() un sigillo con effetto_collaterale
+    (sigillo_ombra_fame) -> verificati SIA l'effetto (evasione su) SIA
+    l'effetto_collaterale (spiritualita_max giu' - un prezzo, non solo un
+    bonus); (5) PetSystem.doma('lupo_ombra') con un seed fortunato (stessa
+    ricerca lineare di test_pet_taming.gd), poi 10x EventTracker
+    'enemy_defeated' (bond_per_enemy_defeated 2.0 x10 = soglia_bond 20 di
+    fiuto_base) -> comportamenti_sbloccati() lo contiene, tag_attivi() ha
+    'analisi'; (6) 10x TalentTracker 'nemici_risparmiati' (target di
+    cacciatore_paziente) -> TalentSystem.possiede() diventa true; (7)
+    SynergySources.tag_sinergia_globali() contiene un tag rappresentativo
+    di ognuna delle 4 fonti (luna da Equipment, crescita da PetSystem,
+    non_letale da TalentSystem, pozione da BaseSystem).
+  - test_nessun_nome_di_contenuto_hardcoded_in_scripts() - IL VERDETTO,
+    come US-219 fece per fase 2: grep ricorsivo di scripts/ (quindi anche
+    scripts/pages/, a differenza del grep non ricorsivo di US-219) contro
+    TUTTI gli item_ids()+recipe_ids()+blueprint_ids()+pet_species_ids() di
+    GameData - zero occorrenze fuori dai commenti. I 4 TIPI di stanza
+    (laboratorio/stanza_rituale/biblioteca/giardino) sono esclusi di
+    proposito: sono il vocabolario CHIUSO di room_types.json, strutturale
+    come i 12 tracked_events (gia' letto per stringa da Forge/PotionSystem
+    da US-326/327), non "contenuto" nel senso della regola CLAUDE.md -
+    motivato nel commento del test per chi lo rilegge in futuro.
+- Prima di scrivere il test GDScript ho girato la STESSA identica logica di
+  grep in Python (stesso algoritmo: strip dei commenti, contains per ogni
+  id) su tutti gli id reali di item/ricette/blueprint/pet, PIU' strutture e
+  sigilli data/sigils/ per completezza: 0 occorrenze in tutti i casi.
+- VERDETTO SULL'ARCHITETTURA DI FASE 3: REGGE. Nessuna delle story da
+  US-315 a US-334 ha introdotto un `if` su un item/ricetta/pet/blueprint
+  specifico dentro scripts/ - ogni sistema (Forge, PotionSystem, Equipment,
+  PetSystem, BaseSystem, TalentSystem, SynergySources) compone leggendo i
+  dati, esattamente come richiesto dalla prima regola non negoziabile di
+  CLAUDE.md. Non serve correggere nulla prima di aprire fase 4.
+- Come verificato: python tools/validate_data.py esce 0 (nessun dato
+  toccato da questa story, 9 warning preesistenti invariati). Controllo di
+  bilanciamento parentesi via script python. Tracciamento a mano di ogni
+  numero usato nel test (qualita' finale, soglie di bond/talento, quantita'
+  di ingredienti) contro i dati reali (balance.json, rooms.json,
+  recipes.json, blueprints.json, talents.json, tracked_talents.json) per
+  essere sicuro che il test asserisca esiti davvero raggiungibili con quei
+  numeri, non ipotetici.
+- VERIFICA A SCHERMO NON ESEGUITA: Godot non e' installato in questa
+  sessione remota - non ho potuto eseguire ne' questo test ne' la suite
+  headless per davvero. Il verdetto sopra e' quindi una lettura statica
+  accurata, non una conferma da CI: resta da confermare quando gira li'.
+- Prossima storia: US-336 (aggiornamento roadmap e validator di chiusura -
+  chiude la fase 3, 35/35 story).
