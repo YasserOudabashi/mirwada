@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 14
+const VERSIONE_CORRENTE := 15
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -72,6 +72,19 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		"ancore": (dati.get("ancore", []) as Array).duplicate(true),
 		# Sigilli e sacrifici del rituale (US-217). { sigilli, sacrifici_forniti }.
 		"rituale": (dati.get("rituale", {}) as Dictionary).duplicate(true),
+		# Flag di conoscenza (US-224). BUG pre-esistente: mancava qui, quindi un
+		# salvataggio VERO (salva+carica da file, non solo GameState.applica in
+		# memoria) perdeva silenziosamente ricette scoperte/lezioni apprese a
+		# ogni giro. _leggi_snapshot()/_migra_11_a_12() gia' si aspettavano
+		# questa chiave: mancava solo la scrittura.
+		"conoscenza": (dati.get("conoscenza", []) as Array).duplicate(true),
+		# Zaino (US-302). Stesso bug: mancava, un salvataggio vero svuotava lo
+		# zaino a ogni giro.
+		"inventario": (dati.get("inventario", {}) as Dictionary).duplicate(true),
+		# Equipaggiamento a slot + sigilli incastonati (US-303/US-317). Idem.
+		"equipaggiamento": (dati.get("equipaggiamento", {}) as Dictionary).duplicate(true),
+		# Strutture costruite dal giocatore (US-319). Lista di istanze.
+		"strutture": (dati.get("strutture", []) as Array).duplicate(true),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -191,6 +204,14 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_9_a_10(doc)
 			10:
 				doc = _migra_10_a_11(doc)
+			11:
+				doc = _migra_11_a_12(doc)
+			12:
+				doc = _migra_12_a_13(doc)
+			13:
+				doc = _migra_13_a_14(doc)
+			14:
+				doc = _migra_14_a_15(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -296,6 +317,13 @@ func _migra_13_a_14(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v14 -> v15: le strutture costruite (US-319). Nessuna struttura pregressa.
+func _migra_14_a_15(doc: Dictionary) -> Dictionary:
+	if not doc.has("strutture"):
+		doc["strutture"] = []
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -319,6 +347,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"conoscenza": _campo(raw, "conoscenza", TYPE_ARRAY, []),
 		"inventario": _campo(raw, "inventario", TYPE_DICTIONARY, {}),
 		"equipaggiamento": _campo(raw, "equipaggiamento", TYPE_DICTIONARY, {}),
+		"strutture": _campo(raw, "strutture", TYPE_ARRAY, []),
 	}
 
 

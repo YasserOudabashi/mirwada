@@ -648,6 +648,33 @@ def main():
     if n_collaterale < 2:
         err(f"data/sigils/: solo {n_collaterale} sigilli con effetto_collaterale, attesi >= 2")
 
+    # --- strutture (data/structures/, US-319) ---
+    strdir = os.path.join(DATA, "structures")
+    structure_ids = set()
+    if os.path.isdir(strdir):
+        for fn in sorted(os.listdir(strdir)):
+            if not fn.endswith(".json"):
+                continue
+            doc = load_json(os.path.join(strdir, fn))
+            if doc is None:
+                continue
+            rel = f"data/structures/{fn}"
+            for s in doc.get("structures", []):
+                sid = s.get("id")
+                if sid in structure_ids:
+                    err(f"{rel}: id struttura duplicato '{sid}'")
+                structure_ids.add(sid)
+                if not isinstance(s.get("name_i18n"), str) or not s.get("name_i18n"):
+                    err(f"{rel} [{sid}]: name_i18n mancante")
+                hp = s.get("hp_max")
+                if not isinstance(hp, (int, float)) or isinstance(hp, bool) or hp <= 0:
+                    err(f"{rel} [{sid}]: hp_max deve essere un numero > 0")
+                for t in s.get("tag", []):
+                    if t not in valid_tags:
+                        err(f"{rel} [{sid}]: tag sconosciuto '{t}'")
+    if len(structure_ids) < 3:
+        err(f"data/structures/: solo {len(structure_ids)} strutture, attese >= 3")
+
     # --- oggetti (data/items/, US-301) ---
     ic_doc = load_json(os.path.join(DATA, "schema", "item_categories.json"))
     item_categories = set((ic_doc or {}).get("item_categories", []))

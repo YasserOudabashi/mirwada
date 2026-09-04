@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "_comment": "Strutture costruibili (US-319). Distinte dalle STANZE di base building (US-326: laboratorio/rituale/biblioteca/giardino, funzionali); una struttura e' un oggetto piazzabile con hp e nient'altro - cio' che tg_2/tg_crepuscolo possono degradare.",
+  "structures": [
+    {
+      "id": "palizzata_lignea",
+      "hp_max": 60,
+      "tag": ["difesa", "crafting"],
+      "name_i18n": "structure.palizzata_lignea"
+    },
+    {
+      "id": "torretta_vedetta",
+      "hp_max": 50,
+      "tag": ["difesa", "analisi"],
+      "name_i18n": "structure.torretta_vedetta"
+    },
+    {
+      "id": "altare_domestico",
+      "hp_max": 40,
+      "tag": ["rituale", "spirito"],
+      "name_i18n": "structure.altare_domestico"
+    }
+  ]
+}

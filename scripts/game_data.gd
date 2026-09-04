@@ -17,6 +17,7 @@ const DIR_ABILITIES := "res://data/abilities"
 const DIR_SYNERGIES := "res://data/synergies"
 const DIR_ITEMS := "res://data/items"
 const DIR_SIGILS := "res://data/sigils"
+const DIR_STRUCTURES := "res://data/structures"
 const PATH_TAGS := "res://data/tags.json"
 const PATH_BALANCE := "res://data/balance.json"
 const PATH_PRIMITIVES := "res://data/schema/primitives.json"
@@ -77,6 +78,7 @@ var _equip_slots: Dictionary = {}
 var _sigils: Dictionary = {}
 var _sigil_effect_types: Dictionary = {}
 var _forge_blueprints: Dictionary = {}
+var _structures: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -120,6 +122,7 @@ func load_all() -> void:
 	_load_synergies()
 	_load_items()
 	_load_sigils()
+	_load_structures()
 	# L'ultimo argomento e' il tipo atteso per la chiave: un file in cui quella
 	# chiave ha la forma sbagliata viene scartato con un errore, non caricato.
 	_load_single(PATH_TAGS, "tags", _tags, TYPE_ARRAY)
@@ -424,6 +427,15 @@ func blueprint_ids() -> Array:
 	return _dict_or_empty(_forge_blueprints.get("blueprints")).keys()
 
 
+## --- Strutture (data/structures/, US-319) ---
+func get_structure(id: String) -> Dictionary:
+	return _structures.get(id, {})
+
+
+func structure_ids() -> Array:
+	return _structures.keys()
+
+
 ## --- VFX (data/vfx.json, US-226) ---
 ## Gemello visivo di audio.json.pathway_palette. Un renderer per primitiva +
 ## una palette per Pathway; nessun campo VFX sulle abilita'.
@@ -547,6 +559,23 @@ func _load_sigils() -> void:
 			_upsert(_sigils, sid, sigil)
 			visti[sid] = true
 	_prune(_sigils, visti)
+
+
+func _load_structures() -> void:
+	var visti: Dictionary = {}
+	for path in _json_files_in(DIR_STRUCTURES):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		for entry in _object_list(doc, "structures", path):
+			var s: Dictionary = entry
+			var sid: String = str(s.get("id", ""))
+			if sid.is_empty():
+				_fail(path, "una struttura non ha 'id'")
+				continue
+			_upsert(_structures, sid, s)
+			visti[sid] = true
+	_prune(_structures, visti)
 
 
 func _load_synergies() -> void:

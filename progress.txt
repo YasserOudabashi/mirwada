@@ -3103,3 +3103,55 @@ sezione test aggiornata.
   del prossimo run CI.
 - Prossima storia: US-319 (StructureRegistry - blocco D, questa volta e'
   davvero la prossima).
+
+[2026-09-04] US-319 — StructureRegistry. BLOCCO D iniziato.
+
+- data/schema/structure.schema.json (doc) + data/structures/structures.json:
+  3 strutture (palizzata_lignea hp 60, torretta_vedetta hp 50, altare_domestico
+  hp 40). Contratto minimo da design-master.md cap.5: id, hp, tag. Distinte
+  dalle STANZE funzionali del base building (US-326: laboratorio/rituale/
+  biblioteca/giardino) - una struttura e' un oggetto piazzabile con hp e
+  nient'altro, cio' che tg_2/tg_crepuscolo possono degradare.
+- Autoload StructureRegistry, stesso principio di SummonRegistry (fase 3 non
+  ha ancora scene fisiche di struttura): costruisci/danneggia/distruggi/
+  attive/in_raggio (quest'ultimo gia' pronto per US-320). distruggi emette
+  EventTracker.emit_event('structure_destroyed', {volontario}) - evento gia'
+  nel vocabolario dei 12. danneggia a 0 hp chiama distruggi(..., false) da
+  solo (involontaria: qualcosa l'ha abbattuta, non il proprietario).
+- GameData: get_structure/structure_ids (stesso pattern di _load_items).
+- SAVE: nuovo campo top-level 'strutture', schema_version 14->15,
+  _migra_14_a_15.
+- BUG PRE-ESISTENTE trovato e corretto nella STESSA funzione che stavo gia'
+  modificando (save_system.gd:salva()): conoscenza/inventario/equipaggiamento
+  (US-224/302/303) non venivano MAI scritti nel documento di salvataggio -
+  un salvataggio vero (SaveSystem.salva()+carica() su file, non il solo
+  GameState.applica() in memoria) li perdeva silenziosamente a ogni giro. In
+  piu' le loro migrazioni _migra_11_a_12/_migra_12_a_13/_migra_13_a_14
+  esistevano gia' come funzioni ma non erano mai state agganciate al match
+  della catena in _migra() - da qui i warning "nessuna migrazione da
+  v11/v12/v13: salto" visti in OGNI run headless finora (erano innocui per
+  caso: il default vuoto di _leggi_snapshot coincide con quello che la
+  migrazione avrebbe scritto, ma la catena era comunque rotta). Corretto
+  qui perche' e' la stessa funzione/stesso file che US-319 doveva gia'
+  toccare per aggiungere 'strutture' - lasciarla rotta accanto alla mia
+  aggiunta sarebbe stato peggio che ignorarla. Nessun test esistente lo
+  copriva: i round-trip di test_equipment.gd/test_inventory.gd passano da
+  GameState.snapshot()/applica() direttamente, mai da un vero file di save.
+- validate_data.py: blocco strutture - id unici, name_i18n, hp_max numero
+  > 0, tag nel vocabolario, >= 3 strutture.
+- project.godot: nuovo autoload StructureRegistry.
+- i18n: 3 chiavi structure.* tradotte (299 totali, nessun nuovo TODO).
+- Come verificato: validator 0. Test nuovi in tests/test_structure_registry.gd
+  (9): costruisci + appare in attive() con hp=hp_max; tipo ignoto -> "" senza
+  crash; danneggia fino a 0 -> distrutta + structure_destroyed{volontario:false};
+  distruggi(...,true) conta nel bucket volontario (e non in quello
+  involontario); instance_id ignoto su distruggi -> false gestito; in_raggio
+  filtra correttamente per distanza; round-trip del save (isolato a livello
+  di StructureRegistry, non di GameState, per lo stesso motivo documentato
+  nel fix di US-317: autoload persistenti fra i file della suite);
+  da_salvataggio non fidato (raw non-array, struct_id ignoto). NON posso
+  eseguire la suite headless in questa sessione (Godot non installato
+  nell'ambiente remoto): verificata a mano la correttezza sintattica e la
+  coerenza col pattern gia' testato di SummonRegistry (test_summon.gd).
+- Prossima storia: US-320 (colpisce_oggetti - le abilita' danneggiano le
+  strutture).
