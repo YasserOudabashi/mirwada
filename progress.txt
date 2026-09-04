@@ -3416,3 +3416,36 @@ sezione test aggiornata.
   correttezza sintattica (compreso tools/validate_data.py stesso) e la
   coerenza col pattern gia' testato di Forge/PotionSystem.
 - Prossima storia: US-327 (le stanze alimentano i loro sistemi).
+
+[2026-09-04] US-327 — Le stanze alimentano i loro sistemi
+
+- BUG PRE-ESISTENTE trovato e corretto: Forge._qualita_finale (US-316)
+  leggeva BaseSystem.bonus('fucina','qualita_forgiatura') - ne' 'fucina'
+  ne' 'qualita_forgiatura' erano nel vocabolario canonico (BaseSystem non
+  esisteva ancora quando US-316 fu scritta: erano nomi indovinati).
+  Corretto a bonus('stanza_rituale','qualita_forgia'), i nomi definiti da
+  US-326. PotionSystem._riduzione_rischio/_qualita_finale (US-310/311)
+  invece usavano gia' 'laboratorio'/'rischio_esperimento'/'qualita_pozione'
+  - per puro azzeccamento erano gia' corretti: da quando BaseSystem esiste
+  funzionano senza aver toccato una riga.
+- PotionSystem.ricetta_nota() esteso: dopo nota_da_subito e il flag
+  KnowledgeStore, controlla anche BaseSystem.bonus('biblioteca').ricette_note
+  - un dato (US-326), non un if sul nome della ricetta.
+- RitualSystem NON collegato: il PRD menziona "un eventuale bonus di
+  build" (linguaggio esplicitamente ipotetico) ma non definisce ne' una
+  chiave di bonus ne' un consumo concreto. Costruire un gancio speculativo
+  senza un contratto dati reale da rispettare sarebbe complessita' non
+  richiesta - si aggiungera' quando servira' davvero, con la sua chiave
+  nel vocabolario chiuso.
+- Come verificato: validator 0 (nessun dato toccato). Test nuovi in
+  tests/test_stanze_bonus.gd (5): il laboratorio alza la qualita' delle
+  pozioni preparate (pura+1=eccelsa); senza laboratorio resta la
+  qualita_base; il laboratorio livello 2 riduce la frequenza degli esiti
+  mostruosi (confronto statistico su 300 tentativi, stesso seed, stesso
+  principio gia' usato da test_experiment.gd); la stanza_rituale alza la
+  qualita' della forgiatura; la biblioteca livello 2 rende nota
+  ric_cura_maggiore senza passare da KnowledgeStore. NON posso eseguire la
+  suite headless in questa sessione (Godot non installato nell'ambiente
+  remoto): verificata a mano la correttezza sintattica e la coerenza coi
+  pattern gia' testati.
+- Prossima storia: US-328 (il giardino - ingredienti che crescono nel tempo).

@@ -152,8 +152,8 @@ func bevi(forza: bool = false) -> Dictionary:
 # Percorso separato dalla concoction di avanzamento qui sopra: si prepara una
 # ricetta di data/potions/recipes.json e si ottiene un item nell'inventario
 # con una qualita'. La qualita' base della ricetta sale col laboratorio
-# (US-326/327) e coi talenti di alchimia (US-329), scende con ingredienti
-# scadenti; finche' quei sistemi non esistono il bonus e' 0.
+# (BaseSystem.bonus, US-326/327) e coi talenti di alchimia (US-329, 0
+# finche' non c'e' TalentSystem), scende con ingredienti scadenti.
 
 signal pozione_preparata(recipe_id: String, item_id: String, qualita: String)
 
@@ -168,7 +168,17 @@ func ricetta_nota(recipe_id: String) -> bool:
 	if bool(r.get("nota_da_subito", false)):
 		return true
 	var kn: Node = get_node_or_null("/root/KnowledgeStore")
-	return kn != null and bool(kn.call("conosce", "ricetta:" + recipe_id))
+	if kn != null and bool(kn.call("conosce", "ricetta:" + recipe_id)):
+		return true
+	# US-327: la biblioteca rende note certe ricette 'avanzata' senza
+	# sperimentare. bonus('biblioteca').ricette_note e' un dato (US-326),
+	# non un if sul nome della ricetta.
+	var bs: Node = get_node_or_null("/root/BaseSystem")
+	if bs != null:
+		var note: Array = (bs.call("bonus", "biblioteca") as Dictionary).get("ricette_note", [])
+		if note.has(recipe_id):
+			return true
+	return false
 
 
 ## Prepara una ricetta nota consumando gli ingredienti dall'inventario.

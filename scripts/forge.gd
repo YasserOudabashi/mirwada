@@ -52,13 +52,13 @@ func forgia(blueprint_id: String) -> Dictionary:
 
 ## Scala CONDIVISA con l'alchimia (data/schema/potion_quality.json): non e'
 ## una qualita' "di pozione", e' la scala crescente generica di ogni output
-## di crafting. qualita_base del blueprint + bonus fucina (US-326/327, 0
-## finche' non c'e' BaseSystem) + bonus talenti (US-329, 0 finche' non c'e'
-## TalentSystem), clampato.
+## di crafting. qualita_base del blueprint + bonus della stanza_rituale
+## (BaseSystem.bonus, US-326/327) + bonus talenti (US-329, 0 finche' non
+## c'e' TalentSystem), clampato.
 func _qualita_finale(b: Dictionary) -> String:
 	var scala: Array = _gd().call("potion_quality")
 	var base: int = maxi(0, scala.find(str(b.get("qualita_base", "pura"))))
-	var bonus: int = _bonus_stanza("fucina", "qualita_forgiatura") + _bonus_talento("forgiatura_qualita")
+	var bonus: int = _bonus_stanza("stanza_rituale", "qualita_forgia") + _bonus_talento("forgiatura_qualita")
 	return str(scala[clampi(base + bonus, 0, scala.size() - 1)])
 
 
