@@ -3155,3 +3155,40 @@ sezione test aggiornata.
   coerenza col pattern gia' testato di SummonRegistry (test_summon.gd).
 - Prossima storia: US-320 (colpisce_oggetti - le abilita' danneggiano le
   strutture).
+
+[2026-09-04] US-320 — colpisce_oggetti: le abilita' danneggiano le strutture. BLOCCO D CHIUSO.
+
+- field.gd: nuovo campo colpisce_oggetti (letto in setup()). _process, dopo
+  il tick normale sulle hurtbox (fisica, Area2D), chiama
+  _applica_tick_strutture() se tipo=='decay' and colpisce_oggetti and
+  danno_tick>0. Le strutture non hanno hurtbox (StructureRegistry e' un
+  registro dati, non una scena, come SummonRegistry): _applica_tick_strutture
+  usa StructureRegistry.in_raggio(centro, raggio) - gia' pronto da US-319 -
+  invece di get_overlapping_areas(), poi danneggia() ognuna col danno_tick.
+- ability_engine.gd:_p_decay ora passa 'colpisce_oggetti' nello spec passato
+  a _spawn_field: il dato dell'abilita' arriva fino al campo.
+- DECISIONE (gia' documentata nei DATI stessi, non serviva deciderla ora:
+  nota su tg_crepuscolo in data/abilities/twilight_giant.json, scritta in
+  US-301): le proprie strutture SONO colpite, nessuna esclusione per
+  "proprieta'" - tg_2 deve poter distruggere volontariamente la propria
+  base, e StructureRegistry non traccia nemmeno un proprietario per
+  struttura (non ce n'e' bisogno).
+- tg_2_accetta_decadimento (l'acting_action che si riempie da
+  structure_destroyed{volontario:true}) NON ha richiesto NESSUN codice:
+  Acting._contributo() e' gia' generico (EventTracker.count(evento, filtri),
+  fase 2) e legge l'evento che StructureRegistry.distruggi() gia' emette da
+  US-319. Esattamente il criterio dell'architettura verificato in US-219:
+  zero righe dedicate a un contenuto specifico del Twilight Giant.
+- Come verificato: validator 0 (nessun dato toccato). Test nuovi in
+  tests/test_colpisce_oggetti.gd (3): un campo decay con colpisce_oggetti:true
+  (spawnato e chiamato a mano, deterministico, nessun frame da aspettare)
+  danneggia le strutture in raggio (-15 hp) e lascia intatte quelle fuori
+  raggio; senza colpisce_oggetti le strutture restano intatte; _p_decay (la
+  primitiva vera) propaga colpisce_oggetti fino al campo che spawna
+  (integrazione: danno 100/durata 10 * tick_rate 1 = 10 hp persi). NON posso
+  eseguire la suite headless in questa sessione (Godot non installato
+  nell'ambiente remoto): verificata a mano la correttezza sintattica e la
+  coerenza coi pattern gia' testati (test_status_effects.gd per il campo
+  aura, test_primitive_tg1.gd per _p_decay).
+- BLOCCO D completo: US-319 (StructureRegistry), US-320 (colpisce_oggetti).
+- Prossima storia: US-321 (Schema e magazzino dei pet - blocco E).

@@ -14,6 +14,11 @@ var tick_rate: float = 1.0
 var effetto: String = ""           # aura: lo status da applicare
 var danno_tick: float = 0.0        # decay: danno per tick
 var bersagli_nemici: bool = true   # per ora: colpisce chi NON e' il caster
+## US-320: un decay con colpisce_oggetti:true (es. tg_crepuscolo) danneggia
+## anche le strutture nel raggio, comprese quelle del proprietario del
+## caster (nota di dati su tg_crepuscolo: "deve poter danneggiare la
+## propria base" - nessuna esclusione per struttura "propria").
+var colpisce_oggetti: bool = false
 
 var _left: float = 0.0
 var _acc: float = 0.0
@@ -27,6 +32,7 @@ func setup(spec: Dictionary, caster: Node) -> void:
 	tick_rate = maxf(0.05, float(spec.get("tick_rate", 1.0)))
 	effetto = str(spec.get("effetto", ""))
 	danno_tick = float(spec.get("danno_tick", 0.0))
+	colpisce_oggetti = bool(spec.get("colpisce_oggetti", false))
 	_caster = caster
 	_left = durata
 
@@ -54,6 +60,8 @@ func _process(delta: float) -> void:
 		return
 	_acc -= tick_rate
 	_applica_tick()
+	if tipo == "decay" and colpisce_oggetti and danno_tick > 0.0:
+		_applica_tick_strutture()
 
 
 func _applica_tick() -> void:
@@ -73,3 +81,14 @@ func _applica_tick() -> void:
 			stats.call("applica_status", effetto, -1.0)
 		elif tipo == "decay" and danno_tick > 0.0:
 			stats.set("hp", float(stats.get("hp")) - danno_tick)
+
+
+## US-320: le strutture non hanno hurtbox/Area2D (StructureRegistry e' un
+## registro dati, non una scena) - non passano da get_overlapping_areas().
+## Distanza semplice dal centro del campo, stesso raggio delle hurtbox.
+func _applica_tick_strutture() -> void:
+	var reg: Node = get_node_or_null("/root/StructureRegistry")
+	if reg == null:
+		return
+	for s in reg.call("in_raggio", global_position, raggio):
+		reg.call("danneggia", (s as Dictionary).get("instance_id", ""), danno_tick)

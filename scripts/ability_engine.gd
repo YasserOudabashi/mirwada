@@ -698,7 +698,8 @@ func _p_decay(prim: Dictionary, caster: Node, stats: Node, _ability_id: String) 
 	var tick_rate: float = _num(prim.get("tick_rate"), 1.0)
 	if raggio > 0.0 and _spawn_field(caster, {
 			"tipo": "decay", "raggio": raggio, "durata": durata,
-			"tick_rate": tick_rate, "danno_tick": danno / durata * tick_rate}):
+			"tick_rate": tick_rate, "danno_tick": danno / durata * tick_rate,
+			"colpisce_oggetti": colpisce_oggetti}):
 		rec["campo"] = true
 	elif stats != null:
 		_pending.append({"kind": "decay", "stats": stats, "rate": danno / durata,
