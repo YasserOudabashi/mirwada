@@ -3072,5 +3072,34 @@ sezione test aggiornata.
 - BLOCCO C completo: US-315, 316, 317 (fusa con 309), 318. Schema dei
   sigilli, forgiatura, incastonatura sull'equip, oggetti Sigillati con
   prezzo sempre pagato.
+
+[2026-09-04] Fix CI sulla PR del blocco C (US-317)
+
+- CI (job "valida-e-testa") sulla PR #1 ha dato 3 test falliti su 397:
+  * test_sigilli_incastonatura.test_round_trip_del_save_preserva_i_sigilli
+    (MIO): il test passava da GameState.snapshot()/applica(), che trascina
+    OGNI sistema (Progression, Acting, abilita' concesse...) sullo stesso
+    giocatore finto. Gli autoload sono singleton persistenti per l'intera
+    suite: test_ritual.gd gira prima (ordine alfabetico dei file) e lascia
+    una Sequenza avanzata con abilita' del Twilight Giant che toccano anche
+    'forza' - lo stesso stat che stavo testando. Il round trip via
+    GameState ha ricontaminato il giocatore finto del mio test con quel
+    residuo, sommando un delta che non era mio. FIX: il test ora chiama
+    Equipment.per_salvataggio()/da_salvataggio() DIRETTAMENTE, bypassando
+    GameState - isola quello che US-317 deve davvero garantire (Equipment
+    serializza e ricarica i suoi sigilli), il wiring GameState<->Equipment
+    resta coperto da test_equipment.gd (US-303). Non un bug del codice di
+    produzione: equipment.gd non e' cambiato.
+  * test_page_inventario.test_sezione_indosso_mostra_i_quattro_slot e
+    test_page_ricettario.test_le_base_sono_sempre_visibili_le_altre_offuscate:
+    PRE-ESISTENTI su main, non miei. Verificato via GitHub Actions: i commit
+    US-307 e US-314 (che hanno introdotto questi due test) sono GIA' rossi
+    su main (conclusion:"failure"), prima di qualunque mio commit. File non
+    toccati da questa PR (diff vuoto). Segnalato in un commento sulla PR,
+    non li ho toccati: sono fuori dallo scope del blocco C e la causa (una
+    sezione UI che risulta vuota in headless) va investigata a parte.
+- Come verificato: validator 0 (nessun dato toccato), parentesi bilanciate
+  sul file corretto. Push su claude/project-status-stories-jtfz3d, in attesa
+  del prossimo run CI.
 - Prossima storia: US-319 (StructureRegistry - blocco D, questa volta e'
   davvero la prossima).

@@ -96,19 +96,25 @@ func test_smontare_spegne_il_modificatore_ma_non_dimentica_il_sigillo() -> void:
 	p.free()
 
 
+## Round trip a livello di Equipment, NON di GameState: GameState.snapshot()/
+## applica() trascinano OGNI sistema (Progression, Acting, abilita' concesse...)
+## sullo stesso giocatore finto, ed essendo autoload persistenti fra i file di
+## test di tutta la suite, uno stato lasciato da un altro file (es. una
+## sequenza avanzata con abilita' del Twilight Giant che toccano 'forza')
+## contaminerebbe questo test. Il wiring GameState<->Equipment e' gia' coperto
+## da test_equipment.gd; qui si isola solo la persistenza dei sigilli.
 func test_round_trip_del_save_preserva_i_sigilli() -> void:
 	var p: Node2D = _giocatore_finto()
 	var stats: Node = p.get_node("StatsComponent")
 	var eq: Node = _n("/root/Equipment")
-	var gs: Node = _n("/root/GameState")
 	eq.call("equipaggia", _prima_istanza("amuleto_lunare"))
 	var sig_iid: String = _prima_istanza("sigillo_forza_minore")
 	eq.call("incastona", "accessorio_1", sig_iid)
 	var forza0: float = stats.call("get_stat", "forza")
-	var snap: Dictionary = gs.call("snapshot")
+	var snap: Dictionary = eq.call("per_salvataggio")
 	eq.call("pulisci")
 	assert_false(stats.call("has_modifier", "sigillo:" + sig_iid), "svuotato")
-	gs.call("applica", snap)
+	eq.call("da_salvataggio", snap)
 	assert_eq((eq.call("sigilli_incastonati", "accessorio_1") as Array).size(), 1, "il sigillo torna dal save")
 	assert_true(stats.call("has_modifier", "sigillo:" + sig_iid), "e il modificatore riapplicato")
 	assert_almost_eq(stats.call("get_stat", "forza"), forza0, "stesso valore di prima")
