@@ -163,8 +163,8 @@
       ],
       "priority": 8,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO C. data/schema/sigil.schema.json (doc) + data/schema/sigil_effect_types.json (vocab chiuso: effetti stat_modifier|stored_ability_id|tag_grant, effetti_collaterali sottoinsieme stat_modifier|tag_grant). data/sigils/core.json: 8 sigilli (sig_forza_1/difesa_1/velocita_1/precisione_1/custode/eco_lama/ombra_fame/sangue_avido), 2 con effetto_collaterale (ombra_fame drena spiritualita_max, sangue_avido drena hp_max). data/items/sigilli.json completato a 8 voci (sigillo_ref -> data/sigils, gia' stubbate in US-301). GameData: get_sigil/sigil_ids/sigil_effect_types (46 file). validate_data.py: blocco sigilli - name_i18n, tag nel vocab, effetto/effetto_collaterale nel vocab chiuso, stat_modifier.stat nota, stored_ability_id risolve, tag_grant.tag noto, effetto_collaterale.valore < 0 se stat_modifier (sempre uno svantaggio), >=8 sigilli, >=2 con collaterale, ogni item categoria:sigillo il cui sigillo_ref risolve. i18n: 20 chiavi nuove (289 totali, item.* + sigillo.*). 381 test headless (375+6 test_sigils.gd), validator 0, nessuna regressione."
     },
     {
       "id": "US-316",

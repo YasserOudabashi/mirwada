@@ -579,6 +579,7 @@ def main():
     idir = os.path.join(DATA, "items")
     item_ids = set()
     item_cat = {}   # id -> categoria
+    sigillo_refs = []   # [(rel, iid, sigillo_ref)] - risolti dopo aver caricato i sigilli
     known_item_stats = {"hp_max", "spiritualita_max", "velocita", "difesa",
                         "evasione", "precisione", "forza"}
     if os.path.isdir(idir):
@@ -618,6 +619,12 @@ def main():
                     if it.get("sigillato") and not it.get("effetto_collaterale"):
                         err(f"{rel} [{iid}]: sigillato:true senza effetto_collaterale "
                             f"(un Sigillato senza prezzo e' un bug di dati, US-318)")
+                if cat == "sigillo":
+                    sref = it.get("sigillo_ref")
+                    if not sref:
+                        err(f"{rel} [{iid}]: item categoria:sigillo senza sigillo_ref")
+                    else:
+                        sigillo_refs.append((rel, iid, sref))
                 sab = it.get("stored_ability_id")
                 if sab is not None and ability_ids and sab not in ability_ids:
                     err(f"{rel} [{iid}]: stored_ability_id '{sab}' non risolve a un'abilita'")
@@ -645,6 +652,57 @@ def main():
     for c in item_categories:
         if c not in coperte:
             warn(f"data/items/: nessun item di esempio per la categoria '{c}'")
+
+    # --- sigilli (data/sigils/, US-315) ---
+    set_doc = load_json(os.path.join(DATA, "schema", "sigil_effect_types.json"))
+    sigil_effetti_tipi = set((set_doc or {}).get("effetti", []))
+    sigil_collaterale_tipi = set((set_doc or {}).get("effetti_collaterali", []))
+    sigils_doc = load_json(os.path.join(DATA, "sigils", "core.json"))
+    sigils = (sigils_doc or {}).get("sigils", {})
+
+    def _check_sigil_effect(rel, sid, campo, eff, tipi_ammessi, richiedi_svantaggio):
+        if not isinstance(eff, dict):
+            err(f"{rel} [{sid}]: {campo} deve essere un oggetto")
+            return
+        tipo = eff.get("tipo")
+        if tipo not in tipi_ammessi:
+            err(f"{rel} [{sid}]: {campo}.tipo '{tipo}' non nel vocabolario chiuso ({sorted(tipi_ammessi)})")
+            return
+        if tipo == "stat_modifier":
+            if eff.get("stat") not in known_item_stats:
+                err(f"{rel} [{sid}]: {campo} stat sconosciuta '{eff.get('stat')}'")
+            if not isinstance(eff.get("valore"), (int, float)):
+                err(f"{rel} [{sid}]: {campo}.valore deve essere numerico")
+            elif richiedi_svantaggio and eff.get("valore") >= 0:
+                err(f"{rel} [{sid}]: {campo} e' un effetto_collaterale ma valore >= 0: "
+                    f"un collaterale e' sempre uno svantaggio (US-315)")
+        elif tipo == "stored_ability_id":
+            if eff.get("ability_id") not in ability_ids:
+                err(f"{rel} [{sid}]: {campo}.ability_id '{eff.get('ability_id')}' non risolve a un'abilita'")
+        elif tipo == "tag_grant":
+            if eff.get("tag") not in valid_tags:
+                err(f"{rel} [{sid}]: {campo}.tag sconosciuto '{eff.get('tag')}'")
+
+    n_con_collaterale = 0
+    for sid, sig in sigils.items():
+        rel = "data/sigils/core.json"
+        if not isinstance(sig.get("name_i18n"), str) or not sig.get("name_i18n"):
+            err(f"{rel} [{sid}]: name_i18n mancante")
+        for t in sig.get("tag", []):
+            if t not in valid_tags:
+                err(f"{rel} [{sid}]: tag sconosciuto '{t}'")
+        _check_sigil_effect(rel, sid, "effetto", sig.get("effetto"), sigil_effetti_tipi, False)
+        collaterale = sig.get("effetto_collaterale")
+        if collaterale is not None:
+            n_con_collaterale += 1
+            _check_sigil_effect(rel, sid, "effetto_collaterale", collaterale, sigil_collaterale_tipi, True)
+    if len(sigils) < 8:
+        err(f"data/sigils/: solo {len(sigils)} sigilli, attesi >= 8")
+    if n_con_collaterale < 2:
+        err(f"data/sigils/: solo {n_con_collaterale} sigilli con effetto_collaterale, attesi >= 2")
+    for rel, iid, sref in sigillo_refs:
+        if sref not in sigils:
+            err(f"{rel} [{iid}]: sigillo_ref '{sref}' non risolve a un sigillo di data/sigils/")
 
     # --- ricette delle pozioni consumabili (data/potions/recipes.json, US-308) ---
     pq_doc = load_json(os.path.join(DATA, "schema", "potion_quality.json"))

@@ -39,6 +39,8 @@ const PATH_PAGE_TYPES := "res://data/schema/page_types.json"
 const PATH_VFX := "res://data/vfx.json"
 const PATH_ITEM_CATEGORIES := "res://data/schema/item_categories.json"
 const PATH_EQUIP_SLOTS := "res://data/schema/equip_slots.json"
+const PATH_SIGILS := "res://data/sigils/core.json"
+const PATH_SIGIL_EFFECT_TYPES := "res://data/schema/sigil_effect_types.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -71,6 +73,8 @@ var _vfx: Dictionary = {}
 var _items: Dictionary = {}
 var _item_categories: Dictionary = {}
 var _equip_slots: Dictionary = {}
+var _sigils: Dictionary = {}
+var _sigil_effect_types: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -136,6 +140,8 @@ func load_all() -> void:
 	_load_single(PATH_VFX, "pathway_palette_visiva", _vfx, TYPE_DICTIONARY)
 	_load_single(PATH_ITEM_CATEGORIES, "item_categories", _item_categories, TYPE_ARRAY)
 	_load_single(PATH_EQUIP_SLOTS, "slots", _equip_slots, TYPE_ARRAY)
+	_load_single(PATH_SIGILS, "sigils", _sigils, TYPE_DICTIONARY)
+	_load_single(PATH_SIGIL_EFFECT_TYPES, "effetti", _sigil_effect_types, TYPE_ARRAY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -388,6 +394,22 @@ func equip_slots() -> Array:
 
 func equip_slot_tipi() -> Array:
 	return _array_or_empty(_equip_slots.get("tipi"))
+
+
+## --- Sigilli (data/sigils/, US-315) ---
+## La definizione di effetto/effetto_collaterale. La voce d'inventario (che
+## la referenzia via sigillo_ref) sta in data/items/.
+func get_sigil(id: String) -> Dictionary:
+	return _dict_or_empty(_sigils.get("sigils")).get(id, {})
+
+
+func sigil_ids() -> Array:
+	return _dict_or_empty(_sigils.get("sigils")).keys()
+
+
+## Vocabolario chiuso dei tipi di effetto/effetto_collaterale dei sigilli.
+func sigil_effect_types(collaterale: bool = false) -> Array:
+	return _array_or_empty(_sigil_effect_types.get("effetti_collaterali" if collaterale else "effetti"))
 
 
 ## --- VFX (data/vfx.json, US-226) ---

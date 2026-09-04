@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "_comment": "Definizioni dei sigilli (US-315). La voce d'inventario (categoria:sigillo, campo sigillo_ref) sta in data/items/sigilli.json. effetto_collaterale, quando presente, e' sempre uno svantaggio: stat_modifier con valore < 0, o tag_grant di un tag scomodo.",
+  "sigils": {
+    "sig_forza_1": {
+      "name_i18n": "sigillo.sig_forza_1",
+      "tag": ["forza"],
+      "effetto": { "tipo": "stat_modifier", "stat": "forza", "valore": 0.08, "moltiplicativo": true }
+    },
+    "sig_difesa_1": {
+      "name_i18n": "sigillo.sig_difesa_1",
+      "tag": ["difesa"],
+      "effetto": { "tipo": "stat_modifier", "stat": "difesa", "valore": 0.1, "moltiplicativo": true }
+    },
+    "sig_velocita_1": {
+      "name_i18n": "sigillo.sig_velocita_1",
+      "tag": ["vento"],
+      "effetto": { "tipo": "stat_modifier", "stat": "velocita", "valore": 8, "moltiplicativo": false }
+    },
+    "sig_precisione_1": {
+      "name_i18n": "sigillo.sig_precisione_1",
+      "tag": ["guerra"],
+      "effetto": { "tipo": "stat_modifier", "stat": "precisione", "valore": 0.06, "moltiplicativo": true }
+    },
+    "sig_custode": {
+      "name_i18n": "sigillo.sig_custode",
+      "tag": ["difesa"],
+      "effetto": { "tipo": "tag_grant", "tag": "difesa" }
+    },
+    "sig_eco_lama": {
+      "name_i18n": "sigillo.sig_eco_lama",
+      "tag": ["guerra", "luna"],
+      "effetto": { "tipo": "stored_ability_id", "ability_id": "tg_lama_argentea" }
+    },
+    "sig_ombra_fame": {
+      "name_i18n": "sigillo.sig_ombra_fame",
+      "tag": ["ombra"],
+      "effetto": { "tipo": "stat_modifier", "stat": "evasione", "valore": 0.12, "moltiplicativo": true },
+      "effetto_collaterale": { "tipo": "stat_modifier", "stat": "spiritualita_max", "valore": -15, "moltiplicativo": false }
+    },
+    "sig_sangue_avido": {
+      "name_i18n": "sigillo.sig_sangue_avido",
+      "tag": ["sangue"],
+      "effetto": { "tipo": "stat_modifier", "stat": "forza", "valore": 0.18, "moltiplicativo": true },
+      "effetto_collaterale": { "tipo": "stat_modifier", "stat": "hp_max", "valore": -20, "moltiplicativo": false }
+    }
+  }
+}

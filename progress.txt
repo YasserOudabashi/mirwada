@@ -2886,3 +2886,49 @@ sezione test aggiornata.
   qualita', concoction v2, sperimentazione + scoperta, fallimenti mostruosi
   (aberrazione), ricette leggendarie, ricettario nel libro.
 - Prossima storia: US-319 (StructureRegistry - blocco D).
+
+[2026-09-05] CONTROLLO + US-315 — Schema dei sigilli (blocco C, riallineamento)
+
+- Controllo richiesto dall'utente prima di proseguire: git log/status puliti,
+  python tools/validate_data.py -> 0 errori (9 warning noti), Godot 4.3
+  headless -> 375/375 test passati, letto scripts/potion_system.gd (blocco B)
+  per qualita' del codice: coerente con lo stile del progetto, nessun if per
+  contenuto specifico, forward-compatible con BaseSystem/TalentSystem non
+  ancora esistenti (bonus 0 finche' assenti). Nessuna regressione trovata.
+- ERRORE DI SEQUENZA TROVATO: la nota RALPH-3 (2026-09-03) fissa l'ordine
+  Blocco A -> Blocco C (sigilli/forgiatura, prio 8-11) -> Blocco B (alchimia,
+  prio 12-17) -> D. La sessione precedente ha chiuso il Blocco B e scritto
+  "Prossima storia: US-319" saltando interamente il Blocco C. prd.json aveva
+  gia' le priority corrette (8-11 per C), solo la nota finale era sbagliata.
+  Corretto riprendendo da US-315 come da richiesta esplicita dell'utente
+  ("continua con il blocco C").
+- Cosa fatto (US-315):
+  - data/schema/sigil.schema.json (doc) + data/schema/sigil_effect_types.json:
+    vocabolario CHIUSO {effetti: stat_modifier|stored_ability_id|tag_grant,
+    effetti_collaterali: stat_modifier|tag_grant (sottoinsieme - un collaterale
+    non e' mai "esegui un'abilita'", e' sempre una stat che peggiora o un tag
+    scomodo)}.
+  - data/sigils/core.json: 8 sigilli (sig_forza_1, sig_difesa_1, sig_velocita_1,
+    sig_precisione_1, sig_custode, sig_eco_lama, sig_ombra_fame, sig_sangue_avido).
+    2 con effetto_collaterale: sig_ombra_fame (evasione +12% / spiritualita_max
+    -15), sig_sangue_avido (forza +18% / hp_max -20). sig_forza_1 e
+    sig_ombra_fame erano GIA' referenziati da data/items/sigilli.json (stub di
+    US-301): id scelti per farli risolvere senza toccare quell'item.
+  - data/items/sigilli.json completato da 2 a 8 voci (una per sigillo).
+  - GameData: get_sigil(id)/sigil_ids()/sigil_effect_types(collaterale) (46 file).
+  - validate_data.py: name_i18n presente, tag nel vocabolario, effetto/
+    effetto_collaterale.tipo nel vocabolario chiuso (ammessi diversi per i due
+    campi), stat_modifier.stat nota, stored_ability_id risolve, tag_grant.tag
+    noto, effetto_collaterale.valore < 0 se stat_modifier (REGOLA: un
+    collaterale e' sempre uno svantaggio, US-315), >= 8 sigilli, >= 2 con
+    collaterale, ogni item categoria:sigillo il cui sigillo_ref risolve a un
+    sigillo esistente.
+  - i18n: 20 chiavi nuove tradotte a mano (item.sigillo_* + sigillo.sig_*,
+    289 totali).
+- Come verificato: 381 test headless (375 + 6 in test_sigils.gd: >= 8 sigilli,
+  get_sigil + id ignoto -> {}, >= 2 con collaterale, collaterale sempre
+  svantaggio, stored_ability_id del sigillo risolve, ogni item sigillo
+  referenzia un sigillo esistente). validate_data.py -> 0 errori, 9 warning
+  (stessi di sempre). Nessuna verifica a schermo: story di dati + loader,
+  nessuna UI tocca ancora i sigilli (arriva con US-317).
+- Prossima storia: US-316 (forgiatura dell'equipaggiamento).

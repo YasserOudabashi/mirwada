@@ -1,0 +1,5 @@
+{
+  "_comment": "Vocabolario CHIUSO dei tipi di effetto/effetto_collaterale dei sigilli (US-315). Un tipo nuovo e' codice: va discusso.",
+  "effetti": ["stat_modifier", "stored_ability_id", "tag_grant"],
+  "effetti_collaterali": ["stat_modifier", "tag_grant"]
+}

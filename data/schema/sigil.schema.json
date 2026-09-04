@@ -1,0 +1,10 @@
+{
+  "_comment": "Documentazione formale di data/sigils/*.json (US-315). Definisce COSA FA un sigillo; la voce d'inventario che lo referenzia (categoria:sigillo, campo sigillo_ref) sta in data/items/. Controlli veri in tools/validate_data.py.",
+  "schema_version": 1,
+  "sigil": {
+    "name_i18n": "string, chiave i18n",
+    "tag": ["string dal vocabolario chiuso di data/tags.json"],
+    "effetto": "{ tipo: uno di data/schema/sigil_effect_types.json, ... } - stat_modifier {stat, valore, moltiplicativo}, stored_ability_id {ability_id}, tag_grant {tag}",
+    "effetto_collaterale": "opzionale - stessa forma di 'effetto', ma limitato a stat_modifier|tag_grant e SEMPRE uno svantaggio: se stat_modifier, valore deve essere < 0"
+  }
+}
