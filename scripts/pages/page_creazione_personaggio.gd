@@ -1,16 +1,21 @@
 extends VBoxContainer
 ## Frontespizio (US-223). Partita nuova: campo nome con "Enel" gia' scritto
-## (design-lore, non un placeholder), si conferma con la voltata o col
-## bottone -> nuova_partita(nome, slot scelto). Partita in corso: mostra chi
-## sei (nome, Pathway, Sequenza, tier), sola lettura.
+## (design-lore, non un placeholder), sotto una scelta di talenti innati
+## (US-332, il numero e' balance.json.talenti.innati_da_scegliere), si
+## conferma con la voltata o col bottone -> nuova_partita(nome, slot scelto,
+## talenti scelti). Partita in corso: mostra chi sei (nome, Pathway,
+## Sequenza, tier, talenti posseduti), sola lettura.
 
 var _campo: LineEdit = null
+## id talento -> CheckBox, solo per la creazione.
+var _check_talenti: Dictionary = {}
 
 
 func aggiorna() -> void:
 	for c in get_children():
 		c.queue_free()
 	_campo = null
+	_check_talenti.clear()
 
 	var gs: Node = _n("/root/GameState")
 	if gs != null and bool(gs.call("partita_in_corso")):
@@ -26,10 +31,46 @@ func _mostra_creazione(gs: Node) -> void:
 	_campo.custom_minimum_size = Vector2(220, 24)
 	_campo.select_all()
 	add_child(_campo)
+
+	add_child(_riga(tr("BOOK_FRONTESPIZIO_TALENTI_INVITO") % _numero_da_scegliere()))
+	var gd: Node = _n("/root/GameData")
+	if gd != null:
+		for t in gd.call("talents_per_tipo", "innato"):
+			var d: Dictionary = t
+			var tid: String = str(d.get("id", ""))
+			var cb := CheckBox.new()
+			cb.text = str(gd.call("tr_data", d.get("name_i18n", tid)))
+			cb.toggled.connect(_su_talento_toggle.bind(tid))
+			add_child(cb)
+			_check_talenti[tid] = cb
+
 	var ok := Button.new()
 	ok.text = tr("BOOK_FRONTESPIZIO_CONFERMA")
 	ok.pressed.connect(conferma)
 	add_child(ok)
+
+
+## Al massimo balance.json.talenti.innati_da_scegliere selezionati: oltre
+## quel numero, il tocco piu' recente si annulla da solo.
+func _su_talento_toggle(premuto: bool, tid: String) -> void:
+	if not premuto:
+		return
+	if _talenti_selezionati().size() > _numero_da_scegliere():
+		(_check_talenti[tid] as CheckBox).button_pressed = false
+
+
+func _talenti_selezionati() -> Array:
+	var out: Array = []
+	for tid in _check_talenti:
+		if (_check_talenti[tid] as CheckBox).button_pressed:
+			out.append(tid)
+	return out
+
+
+func _numero_da_scegliere() -> int:
+	var gd: Node = _n("/root/GameData")
+	var b: Dictionary = gd.call("get_balance", "talenti") if gd != null else {}
+	return int(b.get("innati_da_scegliere", 2))
 
 
 func _mostra_identita(gs: Node) -> void:
@@ -44,6 +85,13 @@ func _mostra_identita(gs: Node) -> void:
 			nome_pw, tr("BOOK_FRONTESPIZIO_SEQUENZA"), int(prog.call("sequence")),
 			str(prog.call("tier")),
 		]))
+	var ts: Node = _n("/root/TalentSystem")
+	if ts != null and gd != null:
+		var nomi: PackedStringArray = []
+		for tid in ts.call("posseduti"):
+			nomi.append(str(gd.call("tr_data", gd.call("get_talent", tid).get("name_i18n", tid))))
+		if not nomi.is_empty():
+			add_child(_riga("%s: %s" % [tr("BOOK_FRONTESPIZIO_TALENTI"), ", ".join(nomi)]))
 
 
 ## Conferma la creazione. Chiamata dal bottone e dalla voltata in avanti.
@@ -52,7 +100,7 @@ func conferma() -> void:
 	var book: Node = _n("/root/Book")
 	if gs == null or _campo == null:
 		return
-	gs.call("nuova_partita", _campo.text, int(gs.call("slot_scelto")))
+	gs.call("nuova_partita", _campo.text, int(gs.call("slot_scelto")), _talenti_selezionati())
 	if book != null:
 		book.call("chiudi")
 
@@ -73,6 +121,8 @@ func testo_visibile() -> String:
 			out.append((c as Label).text)
 		elif c is LineEdit:
 			out.append((c as LineEdit).text)
+		elif c is CheckBox:
+			out.append((c as CheckBox).text)
 	return " / ".join(out)
 
 

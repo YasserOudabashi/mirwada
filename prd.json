@@ -620,8 +620,8 @@
       ],
       "priority": 31,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/balance.json: nuova sezione 'talenti' (innati_da_scegliere: 2). GameState.nuova_partita(nome, slot, talenti_innati: Array = []) - terzo parametro opzionale, i 2 chiamanti esistenti (page_creazione_personaggio con 2 argomenti nei test pre-US-332, test_page_scaffale.gd) restano validi senza modifiche. Svuota TalentSystem prima di concedere i nuovi (una partita nuova non eredita talenti da uno stato residuo) poi concedi() ciascuno - gia' serializzati come gli altri talenti da US-331, nessun codice di salvataggio dedicato. page_creazione_personaggio.gd: sotto il campo nome, una CheckBox per ogni talento tipo:innato (GameData.talents_per_tipo), limitata a balance.json.talenti.innati_da_scegliere selezioni - selezionarne una in piu' annulla da sola l'ultimo tocco (_su_talento_toggle). conferma() passa _talenti_selezionati() a nuova_partita. La pagina identita' (partita in corso, _mostra_identita gia' esistente da US-223) ora aggiunge una riga con i nomi (tr_data) dei talenti posseduti se ce ne sono. Tutte le stringhe nuove (BOOK_FRONTESPIZIO_TALENTI_INVITO con %d, BOOK_FRONTESPIZIO_TALENTI) in assets/i18n/strings.csv, i nomi dei talenti da GameData.tr_data. Test nuovi in tests/test_talenti_innati.gd (4): una checkbox per ogni talento innato (4, dal vocabolario US-330); selezionarne oltre il limite si auto-annulla (verificato ripercorrendo TUTTE le checkbox in sequenza, non solo le prime N); conferma concede esattamente i talenti selezionati (TalentSystem.possiede); la pagina identita' mostra il nome del talento posseduto dopo una nuova_partita con talenti_innati. VERIFICA A SCHERMO NON ESEGUITA: Godot non e' installato in questa sessione remota - non ho potuto vedere le checkbox, il limite di selezione, o la riga dei talenti nella pagina identita' renderizzati per davvero. validator 0."
     },
     {
       "id": "US-333",

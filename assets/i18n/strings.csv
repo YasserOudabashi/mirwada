@@ -11,6 +11,8 @@ BOOK_SCAFFALE_RIPRENDI,Torna alla partita,Back to game
 BOOK_FRONTESPIZIO_INVITO,Scrivi il tuo nome sul frontespizio,Write your name on the title page
 BOOK_FRONTESPIZIO_CONFERMA,Comincia,Begin
 BOOK_FRONTESPIZIO_SEQUENZA,Sequenza,Sequence
+BOOK_FRONTESPIZIO_TALENTI_INVITO,Scegli %d talenti innati,Choose %d innate talents
+BOOK_FRONTESPIZIO_TALENTI,Talenti,Talents
 BOOK_DIAGRAMMA_SEI_QUI,Sei qui:,You are here:
 COLOPHON_AUDIO,Audio,Audio
 COLOPHON_VIDEO,Video,Video

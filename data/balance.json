@@ -12,6 +12,10 @@
     "_comment": "US-328. Tempo in secondi di GameState.tempo_gioco (tempo di gioco, non wall-clock: si ferma da solo col mondo in pausa).",
     "tempo_crescita": 60.0
   },
+  "talenti": {
+    "_comment": "US-332. Quanti talenti innati si scelgono alla creazione del personaggio.",
+    "innati_da_scegliere": 2
+  },
   "pet": {
     "_comment": "US-322/323/324. Numeri PLAUSIBILI, non bilanciati. Taming, crescita del legame (bond 0..100), coltivazione.",
     "bonus_domabilita_talenti": 0.0,
