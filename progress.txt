@@ -3449,3 +3449,45 @@ sezione test aggiornata.
   remoto): verificata a mano la correttezza sintattica e la coerenza coi
   pattern gia' testati.
 - Prossima storia: US-328 (il giardino - ingredienti che crescono nel tempo).
+
+[2026-09-04] US-328 — Il giardino: ingredienti che crescono nel tempo
+
+- data/balance.json: nuova sezione 'giardino' (tempo_crescita: 60.0, in
+  secondi di GameState.tempo_gioco).
+- BaseSystem esteso: _appezzamenti (Array[{item_id, pronto_a}], pronto_a =
+  un istante di tempo_gioco). NESSUN _process/tick dedicato: la maturazione
+  si legge ON-DEMAND confrontando tempo_gioco corrente con pronto_a -
+  tempo_gioco e' gia' tempo di GIOCO (GameState._process lo incrementa) e
+  si ferma DA SOLO col mondo in pausa (libro aperto): Book/BookOverlay sono
+  gli UNICI due nodi PROCESS_MODE_ALWAYS del progetto, tutto il resto
+  (BaseSystem incluso, che non imposta nulla) eredita la pausa. Zero codice
+  per "si ferma col mondo in pausa" - pura conseguenza dell'architettura
+  gia' esistente, lo stesso principio verificato piu' volte in questo
+  blocco (US-320, US-323, US-325).
+- pianta(item_id) -> indice (-1 se il giardino non e' costruita, l'item non
+  e' categoria:ingrediente con coltivabile:true, non lo possiedi, o gli
+  appezzamenti liberi sono zero - il numero di appezzamenti E' livello
+  ('giardino'), nessun campo separato). appezzamenti() -> [{item_id,
+  pronto, tempo_rimasto}]. e_pronto(indice). raccogli(indice) -> bool: N
+  item nell'inventario, N = bonus('giardino').resa del livello attuale
+  (minimo 1, gia' nel vocabolario chiuso dei bonus da US-326).
+- plant_growth (la primitiva attiva-non-implementata per le abilita' del
+  Mother, fase 5) NON toccata: il giardino resta un sistema data-driven a
+  parte, come richiesto.
+- SAVE: BaseSystem.per_salvataggio() ora e' {livelli, giardino} invece
+  della mappa nuda dei livelli - introdotta in QUESTA stessa PR con
+  US-326, mai consumata da altri: nessuna migrazione necessaria, resta
+  dentro lo stesso schema_version 17.
+- Come verificato: validator 0. Test nuovi in tests/test_giardino.gd (8):
+  senza giardino costruito pianta rifiuta; solo ingredienti coltivabili
+  (un ingrediente non coltivabile e un item non-ingrediente entrambi
+  rifiutati); piantare non e' subito pronto (seme consumato, tempo_rimasto
+  > 0); avanzare tempo_gioco oltre tempo_crescita -> pronto; raccogliere
+  mette N item nell'inventario secondo la resa e libera l'appezzamento;
+  raccogliere prima del tempo rifiuta; gli appezzamenti sono limitati al
+  livello del giardino (1 al livello 1); round-trip a meta' crescita
+  (l'istante di maturazione sopravvive al save, non riparte da zero).
+- VERIFICA A SCHERMO NON ESEGUITA: Godot non e' installato in questa
+  sessione remota. La sezione Base del libro con l'interfaccia del
+  giardino arriva con US-329: verifica visiva rimandata a quella story.
+- Prossima storia: US-329 (la base nel libro - ultima del blocco F).
