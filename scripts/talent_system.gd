@@ -112,20 +112,35 @@ func _su_evento(_nome: String, _dati: Dictionary) -> void:
 func _sblocco_raggiunto(sblocco: Dictionary) -> bool:
 	if sblocco.is_empty():
 		return false
+	return _conteggio_sblocco(sblocco) >= float(sblocco.get("target", 0))
+
+
+## Conteggio corrente verso uno sblocco, pescando dal vocabolario giusto
+## (EventTracker o TalentTracker, US-330). Estratto da _sblocco_raggiunto
+## perche' la UI (US-333) deve poter mostrare lo stesso numero in una barra
+## di progresso, non solo il booleano "raggiunto o no".
+func _conteggio_sblocco(sblocco: Dictionary) -> float:
 	var evento: String = str(sblocco.get("evento", ""))
 	var filtri: Dictionary = sblocco.get("filtri", {})
-	var target: float = float(sblocco.get("target", 0))
 	var gd: Node = _gd()
 	if gd == null:
-		return false
-	var conteggio: float = 0.0
+		return 0.0
 	if not (gd.call("get_tracked_event", evento) as Dictionary).is_empty():
 		var et: Node = get_node_or_null("/root/EventTracker")
-		conteggio = et.call("count", evento, filtri) if et != null else 0.0
-	else:
-		var tt: Node = get_node_or_null("/root/TalentTracker")
-		conteggio = tt.call("count", evento, filtri) if tt != null else 0.0
-	return conteggio >= target
+		return et.call("count", evento, filtri) if et != null else 0.0
+	var tt: Node = get_node_or_null("/root/TalentTracker")
+	return tt.call("count", evento, filtri) if tt != null else 0.0
+
+
+## Progresso verso lo sblocco di un acquisito non ancora posseduto (US-333,
+## per la barra di progresso della pagina Talenti). {} se id non esiste o
+## non e' un acquisito.
+func progresso(id: String) -> Dictionary:
+	var t: Dictionary = _def(id)
+	if t.is_empty() or str(t.get("tipo", "")) != "acquisito":
+		return {}
+	var sblocco: Dictionary = t.get("sblocco", {})
+	return {"conteggio": _conteggio_sblocco(sblocco), "target": float(sblocco.get("target", 0))}
 
 
 # --- Interno -----------------------------------------------------------

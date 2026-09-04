@@ -79,3 +79,7 @@ BOOK_GIARDINO_IN_CRESCITA,in crescita — %ds,growing — %ds
 BOOK_GIARDINO_PRONTO,pronto,ready
 BOOK_GIARDINO_RACCOGLI,Raccogli,Harvest
 BOOK_GIARDINO_PIANTA,Pianta,Plant
+BOOK_TAL_POSSEDUTI,Talenti posseduti,Talents held
+BOOK_TAL_DA_SBLOCCARE,Ancora da sbloccare,Still to unlock
+BOOK_TAL_SCONOSCIUTO,Talento sconosciuto,Unknown talent
+BOOK_TAL_PROGRESSO,%d / %d,%d / %d

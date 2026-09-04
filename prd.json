@@ -638,8 +638,8 @@
       ],
       "priority": 32,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "TalentSystem: estratto _conteggio_sblocco(sblocco) da _sblocco_raggiunto, e aggiunto progresso(id) -> {conteggio, target} per gli acquisiti (pubblico, usato dalla UI). page_inventario.gd: nuova _talenti() sostituisce il segnaposto della sezione 'talenti' in _mostra(); mostra i posseduti (innati+acquisiti sbloccati) con nome + effetto in chiaro via _testo_effetto_talento(), poi gli acquisiti non posseduti: conteggio 0 -> riga offuscata (BOOK_TAL_SCONOSCIUTO, modulate alpha 0.55, come le ricette sconosciute in _ricettario()); conteggio > 0 -> nome + ProgressBar(min 0, max target) + testo 'conteggio/target'. 4 chiavi i18n chrome nuove in strings.csv (BOOK_TAL_POSSEDUTI/DA_SBLOCCARE/SCONOSCIUTO/PROGRESSO); nessuna chiave data/i18n nuova (nessun campo *_i18n nuovo nei dati). Nuovo tests/test_page_talenti.gd (4 test: posseduto mostra nome+effetto, acquisito senza progresso offuscato, acquisito con progresso mostra barra, sbloccato passa ai posseduti) sul pattern di test_page_base.gd (_righe/_testo). python tools/validate_data.py: 0 errori (9 warning preesistenti, invariati). Verifica: lettura statica dei file editati + controllo di bilanciamento parentesi via script python + analogia coi pattern gia' testati in CI (_ricettario/_base). Godot non e' installato in questo sandbox: non ho potuto eseguire ne' la suite headless ne' un avvio a schermo reale, quindi 'Verifica a schermo' resta non fatta finche' non gira in CI."
     },
     {
       "id": "US-334",

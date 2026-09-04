@@ -1,7 +1,6 @@
 extends VBoxContainer
 ## Pagina inventario del libro (US-307). Cinque sezioni: Zaino, Indosso,
-## Ricettario, Talenti, Base. Zaino e Indosso sono scritte; le altre sono
-## segnaposto finche' non arrivano le loro story (alchimia, talenti, base).
+## Ricettario (US-314), Talenti (US-333), Base (US-329).
 ##
 ## Chrome da assets/i18n/strings.csv + tr(); nomi degli item da GameData.tr_data.
 
@@ -48,6 +47,7 @@ func _mostra(sezione: String) -> void:
 		"zaino": _zaino()
 		"indosso": _indosso()
 		"ricettario": _ricettario()
+		"talenti": _talenti()
 		"base": _base()
 		_: _corpo.add_child(_riga(tr("BOOK_INV_ARRIVA")))
 
@@ -153,6 +153,84 @@ func _indosso() -> void:
 				eq.call("rimuovi_slot", mount); _mostra("indosso")))
 		_corpo.add_child(h)
 	_corpo.add_child(_riga(tr("BOOK_INV_SIGILLI_TODO")))
+
+
+## US-333: talenti posseduti (innati + acquisiti sbloccati) con l'effetto in
+## chiaro, poi gli acquisiti non ancora presi come righe con una barra di
+## progresso (conteggio/target di TalentSystem.progresso()). Un acquisito di
+## cui non si e' ancora visto nessun progresso (conteggio 0) e' offuscato,
+## come le ricette sconosciute in _ricettario().
+func _talenti() -> void:
+	var gd: Node = _n("/root/GameData")
+	var ts: Node = _n("/root/TalentSystem")
+	if gd == null or ts == null:
+		return
+
+	_corpo.add_child(_titolo(tr("BOOK_TAL_POSSEDUTI")))
+	var posseduti: Array = ts.call("posseduti")
+	if posseduti.is_empty():
+		_corpo.add_child(_riga(tr("BOOK_INV_VUOTO")))
+	for tid in posseduti:
+		var d: Dictionary = gd.call("get_talent", tid)
+		var l := Label.new()
+		l.text = "%s — %s" % [
+			str(gd.call("tr_data", d.get("name_i18n", tid))),
+			_testo_effetto_talento(d.get("effetto", {})),
+		]
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_corpo.add_child(l)
+
+	_corpo.add_child(_titolo(tr("BOOK_TAL_DA_SBLOCCARE")))
+	var mostrati := 0
+	for t in gd.call("talents_per_tipo", "acquisito"):
+		var d: Dictionary = t
+		var tid: String = str(d.get("id", ""))
+		if bool(ts.call("possiede", tid)):
+			continue
+		mostrati += 1
+		var prog: Dictionary = ts.call("progresso", tid)
+		var conteggio: float = float(prog.get("conteggio", 0.0))
+		var target: float = float(prog.get("target", 1.0))
+		var h := HBoxContainer.new()
+		if conteggio <= 0.0:
+			var l := Label.new()
+			l.text = tr("BOOK_TAL_SCONOSCIUTO")
+			l.modulate = Color(1, 1, 1, 0.55)
+			h.add_child(l)
+		else:
+			var l := Label.new()
+			l.text = str(gd.call("tr_data", d.get("name_i18n", tid)))
+			l.custom_minimum_size = Vector2(220, 0)
+			h.add_child(l)
+			var bar := ProgressBar.new()
+			bar.min_value = 0.0
+			bar.max_value = max(target, 1.0)
+			bar.value = min(conteggio, target)
+			bar.show_percentage = false
+			bar.custom_minimum_size = Vector2(140, 0)
+			h.add_child(bar)
+			var pl := Label.new()
+			pl.text = tr("BOOK_TAL_PROGRESSO") % [int(conteggio), int(target)]
+			h.add_child(pl)
+		_corpo.add_child(h)
+	if mostrati == 0:
+		_corpo.add_child(_riga(tr("BOOK_INV_VUOTO")))
+
+
+## Descrizione minimale, non tradotta parola per parola: mostra la chiave
+## dell'effetto cosi' com'e' nei dati, come _testo_bonus() fa gia' per i
+## bonus di stanza.
+func _testo_effetto_talento(eff: Dictionary) -> String:
+	match str(eff.get("tipo", "")):
+		"stat_modifier":
+			var pct: String = "%%" if bool(eff.get("moltiplicativo", false)) else ""
+			return "%s %s%s" % [str(eff.get("stat", "")), str(eff.get("valore", 0)), pct]
+		"tag_grant":
+			return str(eff.get("tag", ""))
+		"sblocco_sistema":
+			return "%s +%s" % [str(eff.get("chiave", "")), str(eff.get("valore", 0))]
+		_:
+			return ""
 
 
 ## US-329: le 4 stanze col livello, il costo del prossimo potenziamento, il

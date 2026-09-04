@@ -3661,3 +3661,48 @@ sezione test aggiornata.
   selezione, o la riga dei talenti nella pagina identita' renderizzati per
   davvero.
 - Prossima storia: US-333 (la sezione talenti nel libro).
+
+[2026-09-04] US-333 — La sezione talenti nel libro
+
+- scripts/talent_system.gd: estratto _conteggio_sblocco(sblocco) -> float da
+  _sblocco_raggiunto (stessa logica di lettura EventTracker/TalentTracker,
+  nessuna duplicazione), e aggiunto un nuovo metodo pubblico
+  progresso(id) -> {conteggio, target} per gli acquisiti non posseduti -
+  {} se l'id non esiste o non e' un acquisito. E' l'unico pezzo nuovo di
+  logica: la UI legge solo questo.
+- scripts/pages/page_inventario.gd: la sezione "talenti" (finora
+  segnaposto) ora ha una vera _talenti(), sullo stesso stile di
+  _ricettario()/_base(). Due blocchi:
+  - Posseduti (talenti_posseduti(), innati+acquisiti gia' sbloccati):
+    riga con nome (tr_data) + effetto in chiaro via il nuovo helper
+    _testo_effetto_talento() (stat_modifier -> "stat valore[%]";
+    tag_grant -> il tag; sblocco_sistema -> "chiave +valore").
+  - Ancora da sbloccare (acquisiti non posseduti): TalentSystem.progresso()
+    per ciascuno. conteggio 0 -> riga offuscata (BOOK_TAL_SCONOSCIUTO,
+    modulate alpha 0.55 - stesso trattamento delle ricette sconosciute in
+    _ricettario(), criterio di accettazione "chi non ha ancora visto
+    nessun progresso non vede il nome"). conteggio > 0 -> nome +
+    ProgressBar(0..target) + testo "conteggio/target".
+  4 chiavi i18n chrome nuove in assets/i18n/strings.csv:
+  BOOK_TAL_POSSEDUTI, BOOK_TAL_DA_SBLOCCARE, BOOK_TAL_SCONOSCIUTO,
+  BOOK_TAL_PROGRESSO. Nessuna chiave data/i18n nuova: niente campo *_i18n
+  nuovo nei dati, l'effetto e' testo grezzo dai dati (come _testo_bonus()
+  gia' fa per i bonus di stanza), non richiede traduzione.
+- Nuovo tests/test_page_talenti.gd (4 test), stesso pattern
+  _righe()/_testo() di tests/test_page_base.gd: talento posseduto mostra
+  nome ed effetto; acquisito senza nessun evento tracciato e' offuscato e
+  il suo nome resta nascosto; con un po' di progresso (sotto soglia) mostra
+  nome e barra; raggiunta la soglia passa dalla lista "da sbloccare" a
+  quella "posseduti".
+- Come verificato: python tools/validate_data.py esce 0 (stessi 9 warning
+  preesistenti, nessuno nuovo - la story non tocca dati). Controllo di
+  bilanciamento parentesi via script python su tutti i file GDScript
+  toccati. Lettura per intero dei file editati per coerenza con lo stile
+  esistente (stessa firma di _riga_item/_titolo/_azione, stesso schema
+  match sezione -> funzione).
+- VERIFICA A SCHERMO NON ESEGUITA: Godot non e' installato in questa
+  sessione remota - non ho potuto aprire il libro e vedere la sezione
+  Talenti, la barra di progresso o l'offuscamento renderizzati per davvero;
+  nemmeno la suite headless e' eseguibile qui. Resta da confermare quando
+  gira in CI.
+- Prossima storia: US-334 (il pet e i talenti come fonti di sinergia).
