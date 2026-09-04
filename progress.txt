@@ -3024,3 +3024,53 @@ sezione test aggiornata.
   i file toccati) e la coerenza col motore di modificatori gia' testato
   (test_equipment.gd, AbilityEngine._mod_stat).
 - Prossima storia: US-318 (oggetti Sigillati - blocco C, ultima).
+
+[2026-09-04] US-318 — Oggetti Sigillati. BLOCCO C (forgiatura e sigilli) CHIUSO.
+
+- Equipment._process(delta) -> tick_effetti_collaterali(delta) (pubblica di
+  proposito, come AbilityEngine.tick_effects: i test passano un delta scelto
+  invece di aspettare secondi veri). Per ogni mount con un equip
+  'sigillato:true' applica il suo effetto_collaterale in modo CONTINUO,
+  scalato dal delta - non un accumulatore a scatti, stesso principio del
+  tick 'transform' di AbilityEngine (costo_al_secondo * span ogni frame):
+  * follia_al_secondo -> Madness.add(valore*delta, "sigillato:<mount>")
+  * drain_spiritualita_al_secondo -> stats.set("spiritualita", ...) come il
+    tick 'transform' (StatsComponent.spiritualita e' una property con setter,
+    non serve un metodo nuovo)
+  * tag_grant -> non e' un tick: tag_attivi() estesa per includere anche il
+    tag_grant dell'effetto_collaterale DELL'EQUIP stesso (finora leggeva solo
+    i tag propri dell'item e dei sigilli incastonati, US-317).
+  Smontare l'equip ferma il tick da solo: tick_effetti_collaterali() itera
+  _slot, un mount vuoto non c'e' piu' da iterare (nessuna pulizia esplicita
+  necessaria, diversamente dai modificatori dei sigilli che vanno spenti a
+  mano perche' restano "vivi" nell'oggetto).
+- data/items/equip.json: 2 nuovi equip Sigillati - manopola_del_divoratore
+  (forza +0.25, drain_spiritualita_al_secondo 0.3) e corona_dell_assedio
+  (hp_max +25, effetto_collaterale tag_grant "provocazione" - il "tag
+  negativo che attira nemici" dell'esempio del PRD). Con lama_del_pentimento
+  (follia_al_secondo 0.4, gia' in US-301): 3 esempi, i 3 tipi di collaterale
+  "con prezzo" del vocabolario coperti (il quarto, stored_ability_id, resta
+  teorico finche' non serve un esempio concreto).
+- validate_data.py: il blocco sigillato (gia' aperto in US-315) ora valida
+  la FORMA per tipo, non solo che il tipo sia nel vocabolario: stat_modifier
+  richiede una stat nota e un valore < 0 (sempre uno svantaggio);
+  follia_al_secondo/drain_spiritualita_al_secondo richiedono un valore > 0
+  (e' un tasso al secondo, non ha senso negativo o zero); stored_ability_id
+  deve risolvere; tag_grant deve essere un tag del vocabolario. + conteggio
+  >= 3 equip sigillati.
+- i18n: 4 chiavi nuove tradotte (296 totali, nessun nuovo TODO).
+- Come verificato: validator 0. Test nuovi in tests/test_sigillato.gd (5):
+  >= 3 equip sigillati; indossare lama_del_pentimento e chiamare
+  tick_effetti_collaterali(2.0) fa salire la follia di esattamente 0.8
+  (0.4/s * 2s); smontarla prima del tick -> la follia non si muove;
+  manopola_del_divoratore drena 0.6 di spiritualita' in 2s (0.3/s);
+  corona_dell_assedio fa comparire "provocazione" in tag_attivi(). NON posso
+  eseguire la suite headless in questa sessione (Godot non installato
+  nell'ambiente remoto): verificata a mano la correttezza sintattica
+  (parentesi bilanciate) e la coerenza col pattern di tick continuo gia'
+  testato di AbilityEngine (dot/decay/transform, test_ability_engine.gd).
+- BLOCCO C completo: US-315, 316, 317 (fusa con 309), 318. Schema dei
+  sigilli, forgiatura, incastonatura sull'equip, oggetti Sigillati con
+  prezzo sempre pagato.
+- Prossima storia: US-319 (StructureRegistry - blocco D, questa volta e'
+  davvero la prossima).

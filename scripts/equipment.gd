@@ -28,6 +28,10 @@ func _ready() -> void:
 	pass
 
 
+func _process(delta: float) -> void:
+	tick_effetti_collaterali(delta)
+
+
 # --- API ---------------------------------------------------------------
 
 func equipaggia(instance_id: String) -> bool:
@@ -96,8 +100,14 @@ func slot_pieni() -> Dictionary:
 func tag_attivi() -> Dictionary:
 	var out: Dictionary = {}
 	for m in _slot:
-		for t in _def(str(_slot[m].get("item_id", ""))).get("tag", []):
+		var def: Dictionary = _def(str(_slot[m].get("item_id", "")))
+		for t in def.get("tag", []):
 			out[t] = int(out.get(t, 0)) + 1
+		# US-318: il tag_grant dell'effetto_collaterale di un equip Sigillato
+		# (es. un tag che attira nemici) conta anche lui, sempre, indossato.
+		var ec: Dictionary = def.get("effetto_collaterale", {})
+		if bool(def.get("sigillato", false)) and str(ec.get("tipo", "")) == "tag_grant" and ec.has("tag"):
+			out[str(ec["tag"])] = int(out.get(str(ec["tag"]), 0)) + 1
 		for voce in _sigilli.get(str(_slot[m].get("instance_id", "")), []):
 			var v: Dictionary = voce
 			var sig_item_id: String = str(v.get("item_id", ""))
@@ -302,6 +312,31 @@ func _rimuovi_mod_sigillo(instance_id: String) -> void:
 	var stats: Node = _stats()
 	if stats != null:
 		stats.call("remove_modifier", "sigillo:" + instance_id)
+
+
+## Applica l'effetto_collaterale degli equip 'sigillato:true' indossati
+## (US-318: un Sigillato paga un prezzo SEMPRE, non solo quando lo incastoni
+## con qualcosa). Continuo, scalato dal delta - come AbilityEngine.tick_effects
+## per un dot/decay/transform, non un accumulatore a scatti. Pubblica di
+## proposito: i test la chiamano con un delta scelto invece di aspettare
+## secondi veri.
+func tick_effetti_collaterali(delta: float) -> void:
+	for m in _slot:
+		var def: Dictionary = _def(str(_slot[m].get("item_id", "")))
+		if not bool(def.get("sigillato", false)):
+			continue
+		var ec: Dictionary = def.get("effetto_collaterale", {})
+		var tipo: String = str(ec.get("tipo", ""))
+		var valore: float = float(ec.get("valore", 0.0))
+		match tipo:
+			"follia_al_secondo":
+				var madness: Node = get_node_or_null("/root/Madness")
+				if madness != null and valore > 0.0:
+					madness.call("add", valore * delta, "sigillato:" + str(m))
+			"drain_spiritualita_al_secondo":
+				var stats: Node = _stats()
+				if stats != null and valore > 0.0:
+					stats.set("spiritualita", maxf(0.0, float(stats.get("spiritualita")) - valore * delta))
 
 
 func _sigil_def(sig_item_id: String) -> Dictionary:

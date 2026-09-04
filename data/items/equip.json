@@ -77,6 +77,44 @@
         "tipo": "follia_al_secondo",
         "valore": 0.4
       }
+    },
+    {
+      "id": "manopola_del_divoratore",
+      "categoria": "equip",
+      "name_i18n": "item.manopola_del_divoratore",
+      "descrizione_i18n": "item.manopola_del_divoratore.desc",
+      "tag": ["forza", "corruzione"],
+      "impilabile": false,
+      "valore": 0,
+      "slot": "accessorio",
+      "stat_modifiers": {
+        "forza": 0.25
+      },
+      "slot_sigilli": 0,
+      "sigillato": true,
+      "effetto_collaterale": {
+        "tipo": "drain_spiritualita_al_secondo",
+        "valore": 0.3
+      }
+    },
+    {
+      "id": "corona_dell_assedio",
+      "categoria": "equip",
+      "name_i18n": "item.corona_dell_assedio",
+      "descrizione_i18n": "item.corona_dell_assedio.desc",
+      "tag": ["dominio", "guerra"],
+      "impilabile": false,
+      "valore": 0,
+      "slot": "accessorio",
+      "stat_modifiers": {
+        "hp_max": 25
+      },
+      "slot_sigilli": 0,
+      "sigillato": true,
+      "effetto_collaterale": {
+        "tipo": "tag_grant",
+        "tag": "provocazione"
+      }
     }
   ]
 }

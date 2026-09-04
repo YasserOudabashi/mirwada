@@ -656,6 +656,7 @@ def main():
     idir = os.path.join(DATA, "items")
     item_ids = set()
     item_cat = {}   # id -> categoria
+    n_sigillati = 0
     if os.path.isdir(idir):
         for fn in sorted(os.listdir(idir)):
             if not fn.endswith(".json"):
@@ -694,10 +695,31 @@ def main():
                         err(f"{rel} [{iid}]: sigillato:true senza effetto_collaterale "
                             f"(un Sigillato senza prezzo e' un bug di dati, US-318)")
                     elif it.get("sigillato"):
+                        n_sigillati += 1
                         ec = it.get("effetto_collaterale") or {}
-                        if not isinstance(ec, dict) or ec.get("tipo") not in sigil_effect_types:
-                            err(f"{rel} [{iid}]: effetto_collaterale.tipo '{ec.get('tipo') if isinstance(ec, dict) else ec}' "
+                        et = ec.get("tipo") if isinstance(ec, dict) else None
+                        if not isinstance(ec, dict) or et not in sigil_effect_types:
+                            err(f"{rel} [{iid}]: effetto_collaterale.tipo '{et}' "
                                 f"non nel vocabolario chiuso ({sorted(sigil_effect_types)})")
+                        elif et == "stat_modifier":
+                            if ec.get("stat") not in known_item_stats:
+                                err(f"{rel} [{iid}]: effetto_collaterale ha una stat ignota '{ec.get('stat')}'")
+                            v = ec.get("valore")
+                            if not isinstance(v, (int, float)) or isinstance(v, bool) or v >= 0:
+                                err(f"{rel} [{iid}]: effetto_collaterale.valore deve essere un numero < 0 "
+                                    f"(e' sempre uno svantaggio)")
+                        elif et in ("follia_al_secondo", "drain_spiritualita_al_secondo"):
+                            v = ec.get("valore")
+                            if not isinstance(v, (int, float)) or isinstance(v, bool) or v <= 0:
+                                err(f"{rel} [{iid}]: effetto_collaterale.valore deve essere un numero > 0 "
+                                    f"(e' un tasso al secondo)")
+                        elif et == "stored_ability_id":
+                            if ability_ids and ec.get("ability_id") not in ability_ids:
+                                err(f"{rel} [{iid}]: effetto_collaterale.ability_id '{ec.get('ability_id')}' "
+                                    f"non risolve a un'abilita'")
+                        elif et == "tag_grant":
+                            if ec.get("tag") not in valid_tags:
+                                err(f"{rel} [{iid}]: effetto_collaterale.tag sconosciuto '{ec.get('tag')}'")
                 if cat == "sigillo":
                     sref = it.get("sigillo_ref")
                     if sref not in sigil_ids:
@@ -723,6 +745,8 @@ def main():
                         err(f"{rel} [{iid}]: effetto usa la primitiva sconosciuta '{et}'")
     if len(item_ids) < 12:
         err(f"data/items/: solo {len(item_ids)} item, attesi >= 12 che coprano le 7 categorie")
+    if n_sigillati < 3:
+        err(f"data/items/: solo {n_sigillati} equip 'sigillato:true', attesi >= 3 (US-318)")
     coperte = {it_cat for f in (os.listdir(idir) if os.path.isdir(idir) else [])
                if f.endswith(".json")
                for it_cat in [i.get("categoria") for i in (load_json(os.path.join(idir, f)) or {}).get("items", [])]}
