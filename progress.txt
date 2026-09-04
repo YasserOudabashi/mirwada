@@ -3233,3 +3233,37 @@ sezione test aggiornata.
   mano la correttezza sintattica e la coerenza col pattern gia' testato di
   Inventory/Equipment.
 - Prossima storia: US-322 (Taming - blocco E).
+
+[2026-09-04] US-322 — Taming
+
+- AnchorSystem: nuovo metodo unregister(anchor_id) - rilascio PULITO (toglie
+  dall'array senza anchor_lost ne' follia), diverso da destroy() (che e'
+  sempre una perdita vera, US-216). Serviva esattamente il contratto: libera()
+  non deve costare follia come la morte.
+- data/balance.json: nuova sezione 'pet' (bonus_domabilita_talenti 0.0
+  finche' non c'e' TalentSystem, + i pesi del bond per US-323 e la
+  soglia_avanzamento_bond per US-324 - aggiunti ora in un'unica sezione
+  invece di tre modifiche separate allo stesso file).
+- PetSystem esteso:
+  * imposta_seed(s) - stesso pattern di PotionSystem.
+  * doma(pet_id) -> bool: rifiuta se c'e' gia' un pet (un solo pet per
+    volta, libera() prima); tira _rng.randf() contro domabilita della
+    specie + bonus_domabilita_talenti; su successo imposta_pet +
+    AnchorSystem.register(ancora_id) + SummonRegistry.evoca(pet_id,
+    'alleato', Vector2.ZERO, hp) (evocazione persistente che US-325
+    rimuovera' alla morte; l'id si salva come 'summon_id' nello stato del
+    pet, preservato anche nel round-trip del save).
+  * libera() -> bool: AnchorSystem.unregister (NON destroy: niente follia)
+    + SummonRegistry.rimuovi + svuota lo stato; false senza pet.
+- Come verificato: validator 0. Test nuovi in tests/test_pet_taming.gd (6):
+  seed fortunato -> pet impostato + Ancora attiva (si cerca il primo seed
+  che riesce entro 300 tentativi - stesso principio gia' usato da
+  test_experiment.gd per l'alchimia: non si conosce a priori quale seed dia
+  quale esito col PRNG di Godot); seed sfortunato -> nessun pet; secondo
+  taming bloccato finche' non liberi, poi riesce; libera non aggiunge
+  follia e toglie l'Ancora; libera senza pet -> false; doma registra
+  un'evocazione persistente, libera la rimuove. NON posso eseguire la
+  suite headless in questa sessione (Godot non installato nell'ambiente
+  remoto): verificata a mano la correttezza sintattica e la coerenza col
+  pattern gia' testato di PotionSystem (RNG seedabile) e AnchorSystem.
+- Prossima storia: US-323 (bond - il legame cresce dalle azioni condivise).

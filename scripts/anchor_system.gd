@@ -48,6 +48,17 @@ func destroy(anchor_id: String) -> bool:
 	return true
 
 
+## Rilascio PULITO: toglie l'Ancora dall'array SENZA anchor_lost ne' follia -
+## diverso da destroy() (US-322: liberare un pet non e' come perderlo). false
+## se non era attiva.
+func unregister(anchor_id: String) -> bool:
+	if not _active.has(anchor_id):
+		return false
+	_active.erase(anchor_id)
+	_aggiorna_nomi_sussurro()
+	return true
+
+
 func active() -> Array:
 	return _active.duplicate()
 
