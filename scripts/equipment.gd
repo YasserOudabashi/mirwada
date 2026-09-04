@@ -11,6 +11,11 @@ extends Node
 ## effetto/effetto_collaterale del sigillo si applicano come modificatore
 ## "sigillo:<instance_id>[:collaterale]", stesso principio.
 ##
+## US-318: un equip sigillato:true porta un effetto_collaterale SEMPRE attivo
+## (non un modificatore statico: un tick nel tempo, o un tag_negativo in
+## tag_attivi()), finche' e' indossato. Vive in _pending (kind "sigillato"),
+## non nel save: si ri-deriva da _slot a ogni riapplica_al_giocatore().
+##
 ## NIENTE class_name: coerente col resto del progetto.
 
 signal equip_cambiato(slot: String)
@@ -22,6 +27,11 @@ var _slot: Dictionary = {}
 ## Smontare l'equip (rimuovi_slot) estrae prima ogni sigillo incastonato e lo
 ## restituisce allo zaino: nessuna perdita silenziosa di oggetti.
 var _sigilli: Dictionary = {}
+
+## Effetti collaterali SEMPRE attivi di un equip sigillato:true (US-318): non
+## finiscono nel save, si ri-derivano da _slot a ogni riapplica_al_giocatore()
+## (stesso principio di AbilityEngine._pending, kind dedicato "sigillato").
+var _pending: Array = []
 
 
 func _ready() -> void:
@@ -51,6 +61,7 @@ func equipaggia(instance_id: String) -> bool:
 	inv.call("rimuovi_istanza", instance_id)
 	_slot[mount] = {"instance_id": instance_id, "item_id": item_id}
 	_applica_mod(mount)
+	_applica_sigillato(mount)
 	equip_cambiato.emit(mount)
 	return true
 
@@ -63,6 +74,7 @@ func rimuovi_slot(mount: String) -> bool:
 		rimuovi_sigillo(mount, str((se as Dictionary).get("instance_id", "")))
 	var e: Dictionary = _slot[mount]
 	_rimuovi_mod(mount)
+	_rimuovi_sigillato(mount)
 	_slot.erase(mount)
 	var inv: Node = _inv()
 	if inv != null:
@@ -137,8 +149,8 @@ func slot_pieni() -> Dictionary:
 	return out
 
 
-## Tag degli item equipaggiati + dei sigilli incastonati (US-306/317: fonte
-## per il motore sinergie).
+## Tag degli item equipaggiati + dei sigilli incastonati + del tag_negativo di
+## un Sigillato (US-306/317/318: fonte per il motore sinergie).
 func tag_attivi() -> Dictionary:
 	var out: Dictionary = {}
 	for m in _slot:
@@ -148,12 +160,17 @@ func tag_attivi() -> Dictionary:
 		for se in (_sigilli[m] as Array):
 			for t in _sigil(str((se as Dictionary).get("sigillo_ref", ""))).get("tag", []):
 				out[t] = int(out.get(t, 0)) + 1
+	for entry in _pending:
+		if str(entry.get("kind", "")) == "sigillato" and str(entry.get("tipo", "")) == "tag_negativo":
+			var t: String = str(entry.get("tag", ""))
+			out[t] = int(out.get(t, 0)) + 1
 	return out
 
 
 func riapplica_al_giocatore() -> void:
 	for m in _slot:
 		_applica_mod(m)
+		_applica_sigillato(m)
 	for m in _sigilli:
 		for se in (_sigilli[m] as Array):
 			var sig: Dictionary = _sigil(str((se as Dictionary).get("sigillo_ref", "")))
@@ -169,6 +186,7 @@ func pulisci() -> void:
 			_rimuovi_mod_sigillo(str((se as Dictionary).get("instance_id", "")))
 	_slot.clear()
 	_sigilli.clear()
+	_pending.clear()
 
 
 # --- Salvataggio -----------------------------------------------------
@@ -229,6 +247,55 @@ func _rimuovi_mod(mount: String) -> void:
 	var stats: Node = _stats()
 	if stats != null:
 		stats.call("remove_modifier", "equip:" + mount)
+
+
+## Registra l'effetto_collaterale SEMPRE attivo di un equip sigillato:true
+## (US-318). Un mount puo' avere al piu' un'entry "sigillato": _rimuovi_sigillato
+## prima, cosi' un ri-equip non ne accumula due.
+func _applica_sigillato(mount: String) -> void:
+	_rimuovi_sigillato(mount)
+	var def: Dictionary = equipaggiato(mount)
+	if not bool(def.get("sigillato", false)):
+		return
+	var eff: Dictionary = def.get("effetto_collaterale", {})
+	if eff.is_empty():
+		return
+	_pending.append({"kind": "sigillato", "mount": mount,
+		"tipo": str(eff.get("tipo", "")), "valore": float(eff.get("valore", 0.0)),
+		"tag": str(eff.get("tag", ""))})
+
+
+func _rimuovi_sigillato(mount: String) -> void:
+	var superstiti: Array = []
+	for entry in _pending:
+		if not (str(entry.get("kind", "")) == "sigillato" and str(entry.get("mount", "")) == mount):
+			superstiti.append(entry)
+	_pending = superstiti
+
+
+func _process(delta: float) -> void:
+	if not _pending.is_empty():
+		tick_effects(delta)
+
+
+## Avanza gli effetti collaterali a tempo. Pubblica di proposito (come
+## AbilityEngine.tick_effects): i test la chiamano con un delta scelto invece
+## di aspettare secondi veri.
+func tick_effects(delta: float) -> void:
+	for entry in _pending:
+		if str(entry.get("kind", "")) != "sigillato":
+			continue
+		match str(entry.get("tipo", "")):
+			"follia_al_secondo":
+				var m: Node = get_node_or_null("/root/Madness")
+				if m != null:
+					m.call("add", float(entry.get("valore", 0.0)) * delta, "equip_sigillato")
+			"spiritualita_drain_al_secondo":
+				var stats: Node = _stats()
+				if stats != null:
+					stats.set("spiritualita", float(stats.get("spiritualita")) - float(entry.get("valore", 0.0)) * delta)
+			"tag_negativo":
+				pass   # espresso via tag_attivi(), niente da far scorrere qui
 
 
 ## Applica effetto + (se presente) effetto_collaterale di un sigillo appena

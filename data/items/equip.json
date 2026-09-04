@@ -77,6 +77,49 @@
         "tipo": "follia_al_secondo",
         "valore": 0.4
       }
+    },
+    {
+      "id": "corazza_espiazione",
+      "categoria": "equip",
+      "name_i18n": "item.corazza_espiazione",
+      "descrizione_i18n": "item.corazza_espiazione.desc",
+      "tag": [
+        "difesa",
+        "sangue"
+      ],
+      "impilabile": false,
+      "valore": 0,
+      "slot": "armatura",
+      "stat_modifiers": {
+        "difesa": 0.3
+      },
+      "slot_sigilli": 0,
+      "sigillato": true,
+      "effetto_collaterale": {
+        "tipo": "spiritualita_drain_al_secondo",
+        "valore": 0.5
+      }
+    },
+    {
+      "id": "anello_del_richiamo",
+      "categoria": "equip",
+      "name_i18n": "item.anello_del_richiamo",
+      "descrizione_i18n": "item.anello_del_richiamo.desc",
+      "tag": [
+        "spirito"
+      ],
+      "impilabile": false,
+      "valore": 0,
+      "slot": "accessorio",
+      "stat_modifiers": {
+        "precisione": 0.2
+      },
+      "slot_sigilli": 0,
+      "sigillato": true,
+      "effetto_collaterale": {
+        "tipo": "tag_negativo",
+        "tag": "maledizione"
+      }
     }
   ]
 }

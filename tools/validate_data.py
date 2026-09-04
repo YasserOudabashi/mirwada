@@ -576,10 +576,14 @@ def main():
     item_categories = set((ic_doc or {}).get("item_categories", []))
     es_doc = load_json(os.path.join(DATA, "schema", "equip_slots.json"))
     equip_tipi = set((es_doc or {}).get("tipi", []))
+    sig_doc = load_json(os.path.join(DATA, "schema", "sigillato_effect_types.json"))
+    sigillato_tick_tipi = set((sig_doc or {}).get("tick", []))
+    sigillato_tag_tipi = set((sig_doc or {}).get("tag", []))
     idir = os.path.join(DATA, "items")
     item_ids = set()
     item_cat = {}   # id -> categoria
     sigillo_refs = []   # [(rel, iid, sigillo_ref)] - risolti dopo aver caricato i sigilli
+    n_sigillati = 0
     known_item_stats = {"hp_max", "spiritualita_max", "velocita", "difesa",
                         "evasione", "precisione", "forza"}
     if os.path.isdir(idir):
@@ -616,9 +620,24 @@ def main():
                     for k, v in (it.get("stat_modifiers") or {}).items():
                         if k not in known_item_stats:
                             err(f"{rel} [{iid}]: stat_modifiers ha una stat ignota '{k}'")
-                    if it.get("sigillato") and not it.get("effetto_collaterale"):
+                    ec = it.get("effetto_collaterale")
+                    if it.get("sigillato"):
+                        n_sigillati += 1
+                    if it.get("sigillato") and not ec:
                         err(f"{rel} [{iid}]: sigillato:true senza effetto_collaterale "
                             f"(un Sigillato senza prezzo e' un bug di dati, US-318)")
+                    elif it.get("sigillato") and isinstance(ec, dict):
+                        et = ec.get("tipo")
+                        if et in sigillato_tick_tipi:
+                            if not isinstance(ec.get("valore"), (int, float)) or ec.get("valore", 0) <= 0:
+                                err(f"{rel} [{iid}]: effetto_collaterale.valore deve essere numerico > 0 "
+                                    f"(e' sempre uno svantaggio che sale col tempo)")
+                        elif et in sigillato_tag_tipi:
+                            if ec.get("tag") not in valid_tags:
+                                err(f"{rel} [{iid}]: effetto_collaterale.tag sconosciuto '{ec.get('tag')}'")
+                        else:
+                            err(f"{rel} [{iid}]: effetto_collaterale.tipo '{et}' non nel vocabolario chiuso "
+                                f"({sorted(sigillato_tick_tipi | sigillato_tag_tipi)})")
                 if cat == "sigillo":
                     sref = it.get("sigillo_ref")
                     if not sref:
@@ -646,6 +665,8 @@ def main():
                         err(f"{rel} [{iid}]: effetto usa la primitiva sconosciuta '{et}'")
     if len(item_ids) < 12:
         err(f"data/items/: solo {len(item_ids)} item, attesi >= 12 che coprano le 7 categorie")
+    if n_sigillati < 3:
+        err(f"data/items/: solo {n_sigillati} equip sigillato:true, attesi >= 3 (US-318)")
     coperte = {it_cat for f in (os.listdir(idir) if os.path.isdir(idir) else [])
                if f.endswith(".json")
                for it_cat in [i.get("categoria") for i in (load_json(os.path.join(idir, f)) or {}).get("items", [])]}

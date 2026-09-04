@@ -3053,3 +3053,60 @@ sezione test aggiornata.
   Nessuna verifica a schermo: nessuna story del PRD di fase 3 espone
   l'incastonamento nella pagina inventario (US-307/US-329 non lo coprono).
 - Prossima storia: US-318 (oggetti Sigillati).
+
+[2026-09-05] US-318 — Oggetti Sigillati (blocco C CHIUSO)
+
+- Cosa fatto:
+  - data/schema/sigillato_effect_types.json: vocabolario CHIUSO diverso da
+    quello dei sigilli incastonabili (US-315/data/schema/sigil_effect_types.json):
+    qui l'effetto_collaterale e' SEMPRE attivo mentre l'equip e' indosso, non
+    un modificatore statico. Due famiglie: "tick" (follia_al_secondo,
+    spiritualita_drain_al_secondo - un valore/secondo) e "tag" (tag_negativo -
+    un tag extra sommato in tag_attivi(), es. "attira i nemici").
+  - 2 nuovi equip Sigillati oltre a lama_del_pentimento (gia' in data/items/
+    equip.json da US-301): corazza_espiazione (armatura, difesa +0.3,
+    spiritualita_drain_al_secondo 0.5) e anello_del_richiamo (accessorio,
+    precisione +0.2, tag_negativo: maledizione). >= 3 richiesti dall'AC.
+  - Equipment (scripts/equipment.gd): nuovo _pending (Array, kind "sigillato")
+    - stesso principio del _pending di AbilityEngine, ma NON entra nel save:
+      si ri-deriva da _slot a ogni equipaggia()/riapplica_al_giocatore(),
+      perche' e' interamente determinato dal QUALE equip e' indossato, non da
+      uno stato che possa divergere. _applica_sigillato(mount) rimuove prima
+      un'eventuale entry residua (un ri-equip non impila due tick),
+      _rimuovi_sigillato(mount) la toglie a rimuovi_slot().
+    - _process(delta)/tick_effects(delta) pubblico (come AbilityEngine,
+      apposta per i test: niente await, un delta scelto invece di aspettare
+      secondi veri). follia_al_secondo -> Madness.add(valore*delta,
+      "equip_sigillato"); spiritualita_drain_al_secondo -> stats.spiritualita
+      -= valore*delta (il setter clampa gia' a [0, max]); tag_negativo -> nessun
+      tick, vive in tag_attivi().
+    - tag_attivi() ora somma anche i tag_negativo delle entry _pending attive.
+  - CORREZIONE DATI: anello_del_richiamo aveva "maledizione" SIA nel tag
+    statico dell'item SIA come tag_negativo -> contava due volte in
+    tag_attivi(). Trovato dal test (atteso 1, ottenuto 2). Rimosso dal tag
+    statico: la maledizione vive solo nell'effetto_collaterale, coerente con
+    "un Sigillato ha un prezzo dichiarato nei dati", non un tag ridondante.
+  - validate_data.py: effetto_collaterale.tipo nel vocabolario chiuso
+    tick|tag; i tick esigono valore numerico > 0 (un collaterale che sale nel
+    tempo non puo' essere <= 0, altrimenti non e' un prezzo); tag_negativo
+    esige un tag noto; contatore n_sigillati >= 3.
+  - i18n: 4 chiavi (name/desc dei 2 nuovi item, 296 totali).
+- Come verificato: 399 test headless (393 + 6 in tests/test_sigillato.gd: la
+  follia sale di 0.4/s mentre la lama e' indossata e continua ad accumularsi;
+  smontarla ferma il tick anche con 5s di margine; il drain di spiritualita'
+  scala esattamente col delta passato; il tag_negativo conta in tag_attivi();
+  smontare e rimontare lo stesso Sigillato non raddoppia il tick; un equip
+  normale non produce alcun tick). validate_data.py -> 0 errori, 9 warning
+  (gli stessi di sempre, incluse le solite 4 "ERROR: Parse JSON failed" di
+  test_save_system/test_settings, preesistenti e non correlate).
+  Nessuna verifica a schermo: nessuna story del PRD di fase 3 espone gli
+  effetti collaterali dei Sigillati nella pagina inventario (fuori scope,
+  come gia' notato per US-317).
+- BLOCCO C CHIUSO: US-315 (schema sigilli), US-316 (forgiatura), US-317
+  (incisione sigilli sull'equip, fusione US-309), US-318 (oggetti Sigillati).
+  Insieme al Blocco A (inventario, chiuso in sessione precedente) e al Blocco
+  B (alchimia, chiuso in sessione precedente), la fase 3 ha ora 17 story su
+  35 chiuse (US-301..307, 308/310..314, 315..318). Prossimo blocco per
+  priorita' in prd.json: D - strutture (US-319 StructureRegistry, US-320
+  colpisce_oggetti).
+- Prossima storia: US-319 (StructureRegistry - blocco D).

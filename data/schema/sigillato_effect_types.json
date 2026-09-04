@@ -1,0 +1,5 @@
+{
+  "_comment": "Vocabolario CHIUSO dell'effetto_collaterale di un equip sigillato:true (US-318). Diverso dal vocabolario dei sigilli incastonabili (data/schema/sigil_effect_types.json, US-315): qui l'effetto e' SEMPRE attivo mentre l'equip e' indosso, non un modificatore statico. 'tick' = valore/secondo processato da Equipment._pending finche' equipaggiato; 'tag' = un tag extra sommato in tag_attivi() finche' equipaggiato (es. attira i nemici).",
+  "tick": ["follia_al_secondo", "spiritualita_drain_al_secondo"],
+  "tag": ["tag_negativo"]
+}

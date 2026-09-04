@@ -224,8 +224,8 @@
       ],
       "priority": 11,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO C CHIUSO (US-315..318). data/schema/sigillato_effect_types.json: vocab chiuso, split 'tick' (follia_al_secondo, spiritualita_drain_al_secondo) vs 'tag' (tag_negativo) - i due tipi si comportano diversamente (un valore/secondo processato da Equipment._pending vs un tag sommato in tag_attivi()). 2 nuovi equip Sigillati oltre a lama_del_pentimento (US-301): corazza_espiazione (spiritualita_drain_al_secondo 0.5), anello_del_richiamo (tag_negativo: maledizione - rimosso 'maledizione' dal tag statico dell'item per non contarla due volte, la curse vive solo nell'effetto_collaterale). Equipment: _pending (kind 'sigillato', NON nel save - si ri-deriva da _slot a ogni riapplica_al_giocatore/equipaggia, stesso principio del _pending di AbilityEngine) + _process/tick_effects(delta) pubblico per i test. equipaggia()/rimuovi_slot() agganciano/staccano l'entry; tag_attivi() somma anche i tag_negativo attivi. validate_data.py: effetto_collaterale.tipo nel vocabolario tick|tag, valore numerico >0 per i tick, tag noto per tag_negativo, >= 3 equip sigillato:true (gia' verificato dal check esistente su sigillato+effetto_collaterale, esteso). i18n: 4 chiavi nuove (296 totali). 399 test headless (393+6 in tests/test_sigillato.gd: la follia sale nel tempo mentre indossato, si ferma alla rimozione, il drain di spiritualita' scala col delta, il tag_negativo conta in tag_attivi, ri-equipaggiare non impila due tick, un equip non sigillato non produce alcun tick). validator 0, nessuna regressione."
     },
     {
       "id": "US-308",
