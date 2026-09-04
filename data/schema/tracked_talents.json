@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO dei comportamenti-talento (US-330): quello che i 12 eventi di tracked_events.json non catturano da soli, ma che uno sblocco di talento vuole contare. Stessa forma di tracked_events.json (descrizione, filtri, misura) cosi' TalentTracker.count() e' lo stesso motore di EventTracker.count(). Un comportamento nuovo e' CODICE: va discusso, come i 12 eventi.",
+  "comportamenti": {
+    "giocato_di_notte": {
+      "descrizione": "Tempo cumulativo passato a giocare durante la notte. Gancio placeholder: nessun ciclo giorno/notte esiste prima della fase 6, l'emettitore non c'e' ancora.",
+      "filtri": [],
+      "misura": "secondi"
+    },
+    "sequenze_senza_pozione": {
+      "descrizione": "Avanzamenti di Sequenza NON passati dalla pozione (forzati o da rituale).",
+      "filtri": [],
+      "misura": "conteggio"
+    },
+    "nemici_risparmiati": {
+      "descrizione": "Nemici lasciati in vita invece che uccisi in un combattimento vinto.",
+      "filtri": [],
+      "misura": "conteggio"
+    },
+    "distanza_percorsa": {
+      "descrizione": "Metri percorsi camminando/correndo (non in dash).",
+      "filtri": [],
+      "misura": "somma"
+    },
+    "ingredienti_coltivati": {
+      "descrizione": "Ingredienti raccolti dal giardino (US-328).",
+      "filtri": [],
+      "misura": "conteggio"
+    },
+    "abilita_prestate_usate": {
+      "descrizione": "Esecuzioni di un'abilita' non posseduta (AbilityEngine.execute_stored, US-206/304): pergamene, congegni, sigilli.",
+      "filtri": [],
+      "misura": "conteggio"
+    },
+    "rituali_interrotti": {
+      "descrizione": "Rituali di avanzamento interrotti prima del completamento (RitualSystem, US-217).",
+      "filtri": [],
+      "misura": "conteggio"
+    }
+  }
+}

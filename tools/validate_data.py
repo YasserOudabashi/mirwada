@@ -725,6 +725,87 @@ def main():
                             if not isinstance(v, (int, float)) or isinstance(v, bool) or v <= 0:
                                 err(f"{rel} [{pid}]: curva_hp_max['{k}'] deve essere un numero > 0")
 
+    # --- talenti (data/talents/, US-330) ---
+    tt_doc = load_json(os.path.join(DATA, "schema", "tracked_talents.json"))
+    comportamenti = (tt_doc or {}).get("comportamenti", {})
+    VALID_MISURA = {"conteggio", "somma", "secondi"}
+    for nome, spec in comportamenti.items():
+        if not isinstance(spec.get("descrizione"), str) or not spec.get("descrizione"):
+            err(f"data/schema/tracked_talents.json [{nome}]: descrizione mancante")
+        if spec.get("misura") not in VALID_MISURA:
+            err(f"data/schema/tracked_talents.json [{nome}]: misura '{spec.get('misura')}' non valida "
+                f"({sorted(VALID_MISURA)})")
+        if not isinstance(spec.get("filtri"), list):
+            err(f"data/schema/tracked_talents.json [{nome}]: filtri deve essere una lista")
+    VALID_EFFETTO_TALENTO = {"stat_modifier", "tag_grant", "sblocco_sistema"}
+    tdir = os.path.join(DATA, "talents")
+    talent_ids = set()
+    n_innati = 0
+    n_acquisiti = 0
+    if os.path.isdir(tdir):
+        for fn in sorted(os.listdir(tdir)):
+            if not fn.endswith(".json"):
+                continue
+            doc = load_json(os.path.join(tdir, fn))
+            if doc is None:
+                continue
+            rel = f"data/talents/{fn}"
+            for t in doc.get("talents", []):
+                tid = t.get("id")
+                if tid in talent_ids:
+                    err(f"{rel}: id talento duplicato '{tid}'")
+                talent_ids.add(tid)
+                if not isinstance(t.get("name_i18n"), str) or not t.get("name_i18n"):
+                    err(f"{rel} [{tid}]: name_i18n mancante")
+                if not isinstance(t.get("descrizione_i18n"), str) or not t.get("descrizione_i18n"):
+                    err(f"{rel} [{tid}]: descrizione_i18n mancante")
+                tipo = t.get("tipo")
+                if tipo not in ("innato", "acquisito"):
+                    err(f"{rel} [{tid}]: tipo '{tipo}' non valido (innato|acquisito)")
+                elif tipo == "innato":
+                    n_innati += 1
+                else:
+                    n_acquisiti += 1
+                if tipo == "acquisito":
+                    sblocco = t.get("sblocco")
+                    if not isinstance(sblocco, dict):
+                        err(f"{rel} [{tid}]: un acquisito richiede 'sblocco'")
+                    else:
+                        ev = sblocco.get("evento")
+                        if ev not in events and ev not in comportamenti:
+                            err(f"{rel} [{tid}]: sblocco.evento '{ev}' non nel vocabolario (12 "
+                                f"tracked_events o 7 tracked_talents)")
+                        else:
+                            ammessi = set((events.get(ev) or comportamenti.get(ev, {})).get("filtri", []))
+                            for f in sblocco.get("filtri", {}):
+                                if f not in ammessi:
+                                    err(f"{rel} [{tid}]: sblocco.filtri ha '{f}', non ammesso per '{ev}'")
+                        target = sblocco.get("target")
+                        if not isinstance(target, int) or isinstance(target, bool) or target <= 0:
+                            err(f"{rel} [{tid}]: sblocco.target deve essere un intero > 0")
+                eff = t.get("effetto")
+                if not isinstance(eff, dict) or eff.get("tipo") not in VALID_EFFETTO_TALENTO:
+                    err(f"{rel} [{tid}]: effetto.tipo '{eff.get('tipo') if isinstance(eff, dict) else eff}' "
+                        f"non nel vocabolario chiuso ({sorted(VALID_EFFETTO_TALENTO)})")
+                elif eff["tipo"] == "stat_modifier":
+                    if eff.get("stat") not in known_item_stats:
+                        err(f"{rel} [{tid}]: effetto ha una stat ignota '{eff.get('stat')}'")
+                    if not isinstance(eff.get("valore"), (int, float)) or isinstance(eff.get("valore"), bool):
+                        err(f"{rel} [{tid}]: effetto.valore deve essere un numero")
+                elif eff["tipo"] == "tag_grant":
+                    if eff.get("tag") not in valid_tags:
+                        err(f"{rel} [{tid}]: effetto.tag sconosciuto '{eff.get('tag')}'")
+                    obtainable_tags.add(eff.get("tag"))
+                elif eff["tipo"] == "sblocco_sistema":
+                    if not isinstance(eff.get("chiave"), str) or not eff.get("chiave"):
+                        err(f"{rel} [{tid}]: effetto.chiave mancante")
+                    if not isinstance(eff.get("valore"), (int, float)) or isinstance(eff.get("valore"), bool):
+                        err(f"{rel} [{tid}]: effetto.valore deve essere un numero")
+    if n_innati < 4:
+        err(f"data/talents/: solo {n_innati} talenti innati, attesi >= 4")
+    if n_acquisiti < 8:
+        err(f"data/talents/: solo {n_acquisiti} talenti acquisiti, attesi >= 8")
+
     # --- oggetti (data/items/, US-301) ---
     ic_doc = load_json(os.path.join(DATA, "schema", "item_categories.json"))
     item_categories = set((ic_doc or {}).get("item_categories", []))

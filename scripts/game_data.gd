@@ -47,6 +47,8 @@ const PATH_FORGE_BLUEPRINTS := "res://data/forge/blueprints.json"
 const PATH_ROOM_TYPES := "res://data/schema/room_types.json"
 const PATH_ROOM_BONUS_KEYS := "res://data/schema/room_bonus_keys.json"
 const PATH_ROOMS := "res://data/base/rooms.json"
+const PATH_TRACKED_TALENTS := "res://data/schema/tracked_talents.json"
+const DIR_TALENTS := "res://data/talents"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -87,6 +89,8 @@ var _pets: Dictionary = {}
 var _room_types: Dictionary = {}
 var _room_bonus_keys: Dictionary = {}
 var _rooms: Dictionary = {}
+var _tracked_talents: Dictionary = {}
+var _talents: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -160,6 +164,8 @@ func load_all() -> void:
 	_load_single(PATH_ROOM_TYPES, "tipi", _room_types, TYPE_ARRAY)
 	_load_single(PATH_ROOM_BONUS_KEYS, "chiavi", _room_bonus_keys, TYPE_DICTIONARY)
 	_load_single(PATH_ROOMS, "rooms", _rooms, TYPE_DICTIONARY)
+	_load_single(PATH_TRACKED_TALENTS, "comportamenti", _tracked_talents, TYPE_DICTIONARY)
+	_load_talents()
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -478,6 +484,32 @@ func room_levels(tipo: String) -> Array:
 	return _array_or_empty(get_room_type(tipo).get("livelli"))
 
 
+## --- Talenti (data/talents/, US-330) ---
+## Vocabolario chiuso dei 7 comportamenti-talento (data/schema/tracked_talents.json).
+func tracked_talents() -> Dictionary:
+	return _tracked_talents
+
+
+func get_tracked_talent(nome: String) -> Dictionary:
+	return _dict_or_empty(_tracked_talents.get(nome))
+
+
+func get_talent(id: String) -> Dictionary:
+	return _talents.get(id, {})
+
+
+func talent_ids() -> Array:
+	return _talents.keys()
+
+
+func talents_per_tipo(tipo: String) -> Array:
+	var out: Array = []
+	for id in _talents:
+		if str((_talents[id] as Dictionary).get("tipo", "")) == tipo:
+			out.append(_talents[id])
+	return out
+
+
 ## --- VFX (data/vfx.json, US-226) ---
 ## Gemello visivo di audio.json.pathway_palette. Un renderer per primitiva +
 ## una palette per Pathway; nessun campo VFX sulle abilita'.
@@ -635,6 +667,23 @@ func _load_pets() -> void:
 			_upsert(_pets, pid, p)
 			visti[pid] = true
 	_prune(_pets, visti)
+
+
+func _load_talents() -> void:
+	var visti: Dictionary = {}
+	for path in _json_files_in(DIR_TALENTS):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		for entry in _object_list(doc, "talents", path):
+			var t: Dictionary = entry
+			var tid: String = str(t.get("id", ""))
+			if tid.is_empty():
+				_fail(path, "un talento non ha 'id'")
+				continue
+			_upsert(_talents, tid, t)
+			visti[tid] = true
+	_prune(_talents, visti)
 
 
 func _load_synergies() -> void:

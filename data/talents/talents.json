@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "_comment": "Talenti (US-330). Innati: sempre attivi, scelti alla creazione del personaggio (US-332). Acquisiti: sbloccati quando il conteggio di sblocco.evento (uno dei 12 tracked_events O uno dei 7 tracked_talents) raggiunge target.",
+  "talents": [
+    {
+      "id": "forza_innata",
+      "name_i18n": "talent.forza_innata",
+      "descrizione_i18n": "talent.forza_innata.desc",
+      "tipo": "innato",
+      "effetto": {"tipo": "stat_modifier", "stat": "forza", "valore": 0.1, "moltiplicativo": false}
+    },
+    {
+      "id": "spirito_innato",
+      "name_i18n": "talent.spirito_innato",
+      "descrizione_i18n": "talent.spirito_innato.desc",
+      "tipo": "innato",
+      "effetto": {"tipo": "stat_modifier", "stat": "spiritualita_max", "valore": 15.0, "moltiplicativo": false}
+    },
+    {
+      "id": "agile_di_natura",
+      "name_i18n": "talent.agile_di_natura",
+      "descrizione_i18n": "talent.agile_di_natura.desc",
+      "tipo": "innato",
+      "effetto": {"tipo": "stat_modifier", "stat": "velocita", "valore": 8.0, "moltiplicativo": false}
+    },
+    {
+      "id": "mente_acuta",
+      "name_i18n": "talent.mente_acuta",
+      "descrizione_i18n": "talent.mente_acuta.desc",
+      "tipo": "innato",
+      "effetto": {"tipo": "stat_modifier", "stat": "precisione", "valore": 0.06, "moltiplicativo": false}
+    },
+    {
+      "id": "mano_ferma",
+      "name_i18n": "talent.mano_ferma",
+      "descrizione_i18n": "talent.mano_ferma.desc",
+      "tipo": "acquisito",
+      "sblocco": {"evento": "perfect_parry", "filtri": {}, "target": 20},
+      "effetto": {"tipo": "stat_modifier", "stat": "precisione", "valore": 0.05, "moltiplicativo": false}
+    },
+    {
+      "id": "cacciatore_paziente",
+      "name_i18n": "talent.cacciatore_paziente",
+      "descrizione_i18n": "talent.cacciatore_paziente.desc",
+      "tipo": "acquisito",
+      "sblocco": {"evento": "nemici_risparmiati", "filtri": {}, "target": 10},
+      "effetto": {"tipo": "tag_grant", "tag": "non_letale"}
+    },
+    {
+      "id": "viandante_instancabile",
+      "name_i18n": "talent.viandante_instancabile",
+      "descrizione_i18n": "talent.viandante_instancabile.desc",
+      "tipo": "acquisito",
+      "sblocco": {"evento": "distanza_percorsa", "filtri": {}, "target": 5000},
+      "effetto": {"tipo": "stat_modifier", "stat": "velocita", "valore": 5.0, "moltiplicativo": false}
+    },
+    {
+      "id": "pollice_verde",
+      "name_i18n": "talent.pollice_verde",
+      "descrizione_i18n": "talent.pollice_verde.desc",
+      "tipo": "acquisito",
+      "sblocco": {"evento": "ingredienti_coltivati", "filtri": {}, "target": 5},
+      "effetto": {"tipo": "tag_grant", "tag": "pozione"}
+    },
+    {
+      "id": "sperimentatore_temerario",
+      "name_i18n": "talent.sperimentatore_temerario",
+      "descrizione_i18n": "talent.sperimentatore_temerario.desc",
+      "tipo": "acquisito",
+      "sblocco": {"evento": "item_crafted", "filtri": {}, "target": 15},
+      "effetto": {"tipo": "sblocco_sistema", "chiave": "alchimia_qualita", "valore": 1}
+    },
+    {
+      "id": "mano_che_rischia",
+      "name_i18n": "talent.mano_che_rischia",
+      "descrizione_i18n": "talent.mano_che_rischia.desc",
+      "tipo": "acquisito",
+      "sblocco": {"evento": "item_crafted", "filtri": {}, "target": 30},
+      "effetto": {"tipo": "sblocco_sistema", "chiave": "alchimia_rischio", "valore": 15}
+    },
+    {
+      "id": "fabbro_indomito",
+      "name_i18n": "talent.fabbro_indomito",
+      "descrizione_i18n": "talent.fabbro_indomito.desc",
+      "tipo": "acquisito",
+      "sblocco": {"evento": "item_crafted", "filtri": {}, "target": 50},
+      "effetto": {"tipo": "sblocco_sistema", "chiave": "forgiatura_qualita", "valore": 1}
+    },
+    {
+      "id": "addomesticatore_paziente",
+      "name_i18n": "talent.addomesticatore_paziente",
+      "descrizione_i18n": "talent.addomesticatore_paziente.desc",
+      "tipo": "acquisito",
+      "sblocco": {"evento": "nemici_risparmiati", "filtri": {}, "target": 25},
+      "effetto": {"tipo": "sblocco_sistema", "chiave": "domabilita_talenti", "valore": 10}
+    }
+  ]
+}
