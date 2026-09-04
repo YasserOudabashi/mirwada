@@ -6,7 +6,7 @@
       "id": "lupo_ombra",
       "name_i18n": "pet.lupo_ombra",
       "hp_max": 40,
-      "sequenza_iniziale": 8,
+      "sequenza_iniziale": 9,
       "domabilita": 0.6,
       "ancora_id": "anchor_pet_lupo_ombra",
       "comportamenti": [
@@ -14,7 +14,7 @@
         {"soglia_bond": 60, "id": "carica_assistita"}
       ],
       "abilita": [],
-      "curva_hp_max": {"8": 40, "7": 46, "6": 52, "5": 58}
+      "curva_hp_max": {"9": 40, "8": 46, "7": 52, "6": 58}
     },
     {
       "id": "corvo_predittivo",

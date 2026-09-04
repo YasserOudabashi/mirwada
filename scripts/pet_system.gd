@@ -6,6 +6,7 @@ extends Node
 
 signal pet_domato(pet_id: String)
 signal pet_liberato(pet_id: String)
+signal pet_avanzato(nuova_sequenza: int)
 ## soglia_attraversata: -1 se il cambio non ha superato nessuna soglia di
 ## data/pets/<specie>.comportamenti.
 signal bond_cambiato(valore: float, soglia_attraversata: int)
@@ -38,12 +39,23 @@ func imposta_pet(pet_id: String) -> bool:
 	var specie: Dictionary = _specie(pet_id)
 	if specie.is_empty():
 		return false
+	var seq: int = int(specie.get("sequenza_iniziale", 9))
 	_pet = {
 		"pet_id": pet_id, "bond": 0.0,
-		"hp": float(specie.get("hp_max", 0.0)),
-		"sequenza": int(specie.get("sequenza_iniziale", 9)),
+		"hp": _hp_max_per_sequenza(specie, seq),
+		"sequenza": seq,
 	}
 	return true
+
+
+## hp_max per Sequenza dalla curva della specie (US-324); se la Sequenza non
+## e' in curva_hp_max (o la specie non ne ha una), l'hp_max base.
+func _hp_max_per_sequenza(specie: Dictionary, sequenza: int) -> float:
+	var curva: Dictionary = specie.get("curva_hp_max", {})
+	var chiave: String = str(sequenza)
+	if curva.has(chiave):
+		return float(curva[chiave])
+	return float(specie.get("hp_max", 0.0))
 
 
 func bond() -> float:
@@ -172,6 +184,56 @@ func _aggiungi_bond(delta: float) -> void:
 	bond_cambiato.emit(dopo, soglia)
 
 
+# --- Coltivazione (US-324) ----------------------------------------------
+
+## Il pet avanza di Sequenza (9->0) se bond >= soglia_avanzamento_bond e il
+## giocatore ha una risorsa 'nutre_pet' da consumare (data/items/, la scelta
+## di QUALE risorsa e' un dato, non codice: la prima trovata fra quelle
+## possedute). Non puo' superare la Sequenza del giocatore (numero piu'
+## basso = piu' forte). hp_max/hp aggiornati dalla curva della specie
+## (curva_hp_max), mai calcolati nel codice.
+func avanza_pet() -> bool:
+	if _pet.is_empty():
+		return false
+	var seq: int = int(_pet.get("sequenza", 9))
+	if seq <= 0:
+		return false
+	var prog: Node = get_node_or_null("/root/Progression")
+	var seq_giocatore: int = int(prog.call("sequence")) if prog != null else 9
+	if seq - 1 < seq_giocatore:
+		return false
+	var pesi: Dictionary = _gd().call("get_balance", "pet") if _gd() != null else {}
+	if bond() < float(pesi.get("soglia_avanzamento_bond", 999.0)):
+		return false
+	var inv: Node = get_node_or_null("/root/Inventory")
+	if inv == null:
+		return false
+	var risorsa: String = _risorsa_nutrizione(inv)
+	if risorsa.is_empty():
+		return false
+	inv.call("rimuovi", risorsa, 1)
+
+	var nuova_seq: int = seq - 1
+	_pet["sequenza"] = nuova_seq
+	_pet["hp"] = _hp_max_per_sequenza(_specie(str(_pet.get("pet_id", ""))), nuova_seq)
+	pet_avanzato.emit(nuova_seq)
+	return true
+
+
+## Primo item categoria:consumabile con nutre_pet:true che il giocatore
+## possiede davvero. "" se non ne ha nessuno.
+func _risorsa_nutrizione(inv: Node) -> String:
+	var gd: Node = _gd()
+	if gd == null:
+		return ""
+	for it in gd.call("items_per_categoria", "consumabile"):
+		var d: Dictionary = it
+		var iid: String = str(d.get("id", ""))
+		if bool(d.get("nutre_pet", false)) and bool(inv.call("possiede", iid, 1)):
+			return iid
+	return ""
+
+
 # --- Salvataggio -----------------------------------------------------
 
 func per_salvataggio() -> Dictionary:
@@ -188,15 +250,18 @@ func da_salvataggio(raw: Variant) -> void:
 	var specie: Dictionary = _specie(pet_id)
 	if pet_id.is_empty() or specie.is_empty():
 		return
-	var hp_max: float = float(specie.get("hp_max", 0.0))
 	var bond_raw: Variant = d.get("bond")
 	var hp_raw: Variant = d.get("hp")
 	var seq_raw: Variant = d.get("sequenza")
+	var sequenza: int = int(seq_raw) if typeof(seq_raw) in [TYPE_FLOAT, TYPE_INT] else int(specie.get("sequenza_iniziale", 9))
+	# hp_max per QUESTA Sequenza (US-324: la curva della specie, non il solo
+	# hp_max base) - un pet caricato a meta' avanzamento clampa correttamente.
+	var hp_max: float = _hp_max_per_sequenza(specie, sequenza)
 	_pet = {
 		"pet_id": pet_id,
 		"bond": clampf(float(bond_raw) if typeof(bond_raw) in [TYPE_FLOAT, TYPE_INT] else 0.0, 0.0, 100.0),
 		"hp": clampf(float(hp_raw) if typeof(hp_raw) in [TYPE_FLOAT, TYPE_INT] else hp_max, 0.0, hp_max),
-		"sequenza": int(seq_raw) if typeof(seq_raw) in [TYPE_FLOAT, TYPE_INT] else int(specie.get("sequenza_iniziale", 9)),
+		"sequenza": sequenza,
 	}
 	var summon_id: Variant = d.get("summon_id")
 	if typeof(summon_id) == TYPE_STRING and not (summon_id as String).is_empty():

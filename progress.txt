@@ -3303,3 +3303,43 @@ sezione test aggiornata.
   verificata a mano la correttezza sintattica e la coerenza coi pattern
   gia' testati (Acting, Madness).
 - Prossima storia: US-324 (coltivazione del pet).
+
+[2026-09-04] US-324 — Coltivazione del pet
+
+- CORREZIONE DATI: lupo_ombra.sequenza_iniziale era 8 (US-321) - un passo
+  gia' AVANTI a un giocatore appena creato (Sequenza 9 di default),
+  violando "il pet non puo' superare la Sequenza del giocatore" fin dalla
+  doma. Corretto a 9 (curva_hp_max riallineata 9/8/7/6 invece di 8/7/6/5);
+  corvo_predittivo era gia' coerente.
+- PetSystem.avanza_pet() -> bool: pet attivo + sequenza > 0 + bond >=
+  soglia_avanzamento_bond (balance.json.pet, gia' pronta da US-322) + una
+  risorsa 'nutre_pet' posseduta (categoria:consumabile, gia' pronta da
+  US-301: pastura_spirituale). _risorsa_nutrizione prende la prima
+  posseduta fra quelle marcate nutre_pet - aggiungerne altre in futuro e'
+  un dato, non tocca il codice. Consuma la risorsa, decrementa sequenza,
+  aggiorna hp dalla curva_hp_max della specie per la nuova Sequenza. Cap:
+  seq-1 < Progression.sequence() -> rifiuto, MAI consumando la risorsa
+  (rifiutare deve costare zero, come ovunque nel progetto).
+- FIX collaterale nella STESSA area di codice: imposta_pet() e
+  da_salvataggio() usavano sempre l'hp_max BASE della specie invece della
+  curva per la Sequenza corrente - un pet caricato a meta' avanzamento
+  avrebbe clampato hp al valore sbagliato. Estratto un helper condiviso
+  _hp_max_per_sequenza(specie, sequenza) usato da tutti e tre i punti
+  (imposta_pet, avanza_pet, da_salvataggio). Nessun test esistente lo
+  copriva perche' finora sequenza == sequenza_iniziale sempre, i due
+  valori coincidevano per costruzione - il bug era li' ma invisibile.
+- Come verificato: validator 0. Test nuovi in tests/test_pet_avanzamento.gd
+  (6): bond alto + risorsa -> avanza (sequenza -1, hp dalla curva, risorsa
+  consumata); bond basso -> rifiuto (risorsa NON consumata); senza risorsa
+  -> rifiuto anche con bond alto; il pet non supera la Sequenza del
+  giocatore (Progression.configura per impostarla nel test, risorsa non
+  consumata sul rifiuto); gia' a Sequenza 0 -> nessun avanzamento oltre;
+  senza pet -> false. Progression e' un autoload persistente per tutta la
+  suite: prepara() la riporta sempre a Sequenza 9 di default, altrimenti
+  uno stato lasciato da un altro file la contaminerebbe (stessa lezione
+  del fix di US-317). NON posso eseguire la suite headless in questa
+  sessione (Godot non installato nell'ambiente remoto): verificata a mano
+  la correttezza sintattica e la coerenza col pattern gia' testato di
+  Progression.configura.
+- Prossima storia: US-325 (la morte del pet e' la perdita di un'Ancora -
+  ultima del blocco E).
