@@ -7,6 +7,7 @@ extends Node
 signal pet_domato(pet_id: String)
 signal pet_liberato(pet_id: String)
 signal pet_avanzato(nuova_sequenza: int)
+signal pet_morto(pet_id: String)
 ## soglia_attraversata: -1 se il cambio non ha superato nessuna soglia di
 ## data/pets/<specie>.comportamenti.
 signal bond_cambiato(valore: float, soglia_attraversata: int)
@@ -123,6 +124,28 @@ func libera() -> bool:
 		reg.call("rimuovi", str(_pet.get("summon_id", "")))
 	_pet = {}
 	pet_liberato.emit(pet_id)
+	return true
+
+
+## Il pet muore: un colpo VERO (US-325), diverso da libera(). AnchorSystem.
+## destroy() (non unregister): emette anchor_lost e aggiunge la sua
+## 'penalita' come follia NON bufferizzata, come ogni Ancora persa (US-216).
+## I sussurri di soglia 55 smettono di usare il nome del pet da soli
+## (AnchorSystem._aggiorna_nomi_sussurro gira dentro destroy()); il pet
+## morto non si ricrea al load perche' _pet e' gia' {} quando si salva.
+func morte() -> bool:
+	if _pet.is_empty():
+		return false
+	var pet_id: String = str(_pet.get("pet_id", ""))
+	var specie: Dictionary = _specie(pet_id)
+	var anc: Node = get_node_or_null("/root/AnchorSystem")
+	if anc != null:
+		anc.call("destroy", str(specie.get("ancora_id", "")))
+	var reg: Node = get_node_or_null("/root/SummonRegistry")
+	if reg != null and _pet.has("summon_id"):
+		reg.call("rimuovi", str(_pet.get("summon_id", "")))
+	_pet = {}
+	pet_morto.emit(pet_id)
 	return true
 
 

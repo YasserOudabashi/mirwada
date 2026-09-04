@@ -478,8 +478,8 @@
       ],
       "priority": 24,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "PetSystem.morte() -> bool: AnchorSystem.destroy(ancora_id) (NON unregister: e' la differenza con libera(), US-322 - un colpo VERO, emette anchor_lost e aggiunge la sua 'penalita' come follia NON bufferizzata, come ogni Ancora persa, US-216) + SummonRegistry.rimuovi(summon_id) (l'evocazione persistente creata da doma()) + svuota _pet -> pet_attivo() torna {}. Le altre due AC non hanno richiesto NESSUN codice, gia' garantite dall'architettura esistente: 'il pet morto non si ricrea al load' e' automatico (per_salvataggio() su _pet={} salva {}, da_salvataggio({}) non imposta nulla, gia' testato in US-321); 'i sussurri di soglia 55 smettono di usare il nome del pet' e' automatico (AnchorSystem._aggiorna_nomi_sussurro gia' gira dentro destroy() da prima di questa story, legge solo active()). Segnale pet_morto(pet_id). Test nuovi in tests/test_pet_morte.gd (6): morte distrugge l'Ancora e la follia sale (non bufferizzata); pet_attivo() torna {} dopo la morte; l'evocazione persistente del pet e' rimossa; morte senza pet -> false; il pet morto non persiste nel save (slot vuoto, non si ricrea al load); l'Ancora del pet morto non e' piu' fra quelle attive (i sussurri non hanno piu' nulla da nominare). VERIFICA A SCHERMO NON ESEGUITA: Godot non e' installato in questa sessione remota, non ho potuto vedere il libro/l'overlay a schermo. Segnalato esplicitamente come debito da colmare (contrariamente alla Definition of Done del progetto, che la richiede per ogni story con UI/gameplay - qui il gameplay c'e', l'UI dedicata no ancora: il libro non ha una sezione pet, arrivera' con US-333/base building). BLOCCO E COMPLETO: US-321..325 - schema e magazzino, taming, bond, coltivazione, morte. validator 0 (nessun dato toccato in questa story)."
     },
     {
       "id": "US-326",

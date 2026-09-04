@@ -3343,3 +3343,40 @@ sezione test aggiornata.
   Progression.configura.
 - Prossima storia: US-325 (la morte del pet e' la perdita di un'Ancora -
   ultima del blocco E).
+
+[2026-09-04] US-325 — La morte del pet e' la perdita di un'Ancora. BLOCCO E CHIUSO.
+
+- PetSystem.morte() -> bool: AnchorSystem.destroy(ancora_id) - NON
+  unregister(): e' la differenza con libera() (US-322), un colpo VERO,
+  emette anchor_lost e aggiunge la sua 'penalita' come follia NON
+  bufferizzata (US-216) - + SummonRegistry.rimuovi(summon_id) + svuota lo
+  stato -> pet_attivo() torna {}.
+- Le altre due AC non hanno richiesto NESSUN codice, gia' garantite
+  dall'architettura esistente:
+  * "il pet morto non si ricrea al load": automatico. per_salvataggio() su
+    _pet={} salva {}, da_salvataggio({}) non imposta nulla - gia' testato
+    in US-321, nessuna riga nuova serviva.
+  * "i sussurri di soglia 55 smettono di usare il nome del pet": automatico.
+    AnchorSystem._aggiorna_nomi_sussurro() gia' gira dentro destroy() da
+    prima di questa story e legge solo active() - un'Ancora rimossa da li'
+    sparisce dai sussurri da sola.
+  Esattamente il criterio dell'architettura verificato in US-219: quando i
+  contratti sono giusti, il contenuto nuovo costa dati e poche righe, non
+  un sistema parallelo.
+- Come verificato: validator 0 (nessun dato toccato). Test nuovi in
+  tests/test_pet_morte.gd (6): morte distrugge l'Ancora e la follia sale
+  (non bufferizzata, confrontata col valore prima); pet_attivo() torna {}
+  dopo la morte; l'evocazione persistente del pet (creata come farebbe
+  doma()) e' rimossa; morte senza pet -> false; il pet morto non persiste
+  nel save (per_salvataggio() vuoto, da_salvataggio(quel vuoto) non
+  ricrea nulla); l'Ancora del pet morto non e' piu' fra quelle attive.
+- VERIFICA A SCHERMO NON ESEGUITA: Godot non e' installato in questa
+  sessione remota, non ho potuto vedere il libro/l'overlay a schermo.
+  Segnalato come debito esplicito verso la Definition of Done (che la
+  richiede per ogni story con gameplay) - qui il gameplay c'e', un'UI
+  dedicata al pet nel libro non ancora (arrivera' con US-333/base
+  building). Chi ha accesso a Godot in locale dovrebbe verificare a
+  schermo prima di considerare il blocco davvero chiuso.
+- BLOCCO E completo: US-321 (schema e magazzino), US-322 (taming), US-323
+  (bond), US-324 (coltivazione), US-325 (morte).
+- Prossima storia: US-326 (schema della base e delle 4 stanze - blocco F).
