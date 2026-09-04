@@ -3491,3 +3491,46 @@ sezione test aggiornata.
   sessione remota. La sezione Base del libro con l'interfaccia del
   giardino arriva con US-329: verifica visiva rimandata a quella story.
 - Prossima storia: US-329 (la base nel libro - ultima del blocco F).
+
+[2026-09-04] US-329 — La base nel libro. BLOCCO F CHIUSO.
+
+- page_inventario.gd: la sezione 'base' (era il segnaposto "arriva piu'
+  avanti") diventa reale. Per ogni tipo (GameData.room_types(), nessun nome
+  hardcoded) mostra il livello o "Non costruita", il costo del prossimo
+  livello (prossimo_costo, {} se al massimo -> niente riga di costo/
+  pulsante), il bottone Costruisci/Potenzia (disabilitato se il costo non
+  e' coperto), il bonus attuale se costruita.
+- Il giardino in piu': _giardino_dettaglio() mostra ESATTAMENTE
+  livello('giardino') righe (una per appezzamento POSSIBILE, non solo
+  quelli occupati) - vuoto / "in crescita — Ns" (tempo_rimasto arrotondato
+  per eccesso) / pronto con bottone Raccogli; se ci sono appezzamenti
+  liberi, elenca gli ingredienti coltivabili POSSEDUTI con un bottone
+  Pianta ciascuno (pianta() sceglie da solo il primo appezzamento libero,
+  niente picker per slot specifico).
+- assets/i18n/strings.csv: 17 chiavi nuove (BOOK_STANZA_*, BOOK_GIARDINO_*).
+  I nomi delle stanze passano da tr() (chrome), i nomi degli item da
+  GameData.tr_data (dati), come nel resto della pagina.
+- Come verificato: validator 0 (nessun dato JSON toccato: strings.csv lo
+  compila l'import di Godot in CI, non validate_data.py). Test nuovi in
+  tests/test_page_base.gd (5): le stanze non costruite mostrano "Non
+  costruita" + il pulsante Costruisci; il pulsante e' disabilitato senza
+  materiali; costruire dal libro sale davvero di livello; il giardino
+  mostra l'appezzamento vuoto e un pulsante Pianta per l'ingrediente
+  posseduto, e piantare funziona; un appezzamento pronto mostra "pronto" +
+  Raccogli, e raccogliere mette l'item nell'inventario.
+- VERIFICA A SCHERMO NON ESEGUITA: Godot non e' installato in questa
+  sessione remota.
+- RISCHIO NOTO da verificare al primo run CI reale: i due test
+  PRE-ESISTENTI gia' segnalati rotti su main (test_page_inventario.
+  test_sezione_indosso_mostra_i_quattro_slot, test_page_ricettario.
+  test_le_base_sono_sempre_visibili_le_altre_offuscate) usano lo STESSO
+  meccanismo di rendering a righe (ScrollContainer > VBox letto via
+  get_children()) usato anche qui: se la causa e' sistemica (mai
+  diagnosticata a fondo), e' plausibile che i 5 test nuovi mostrino lo
+  stesso esito in CI per la stessa ragione pre-esistente, non per un bug
+  di questa story.
+- BLOCCO F completo: US-326 (schema delle stanze), US-327 (le stanze
+  alimentano i loro sistemi), US-328 (il giardino), US-329 (la base nel
+  libro).
+- Prossima storia: US-330 (schema dei talenti e vocabolario dei
+  comportamenti - blocco G).

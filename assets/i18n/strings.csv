@@ -62,3 +62,18 @@ BOOK_SLOT_ACCESSORIO_1,Accessorio I,Accessory I
 BOOK_SLOT_ACCESSORIO_2,Accessorio II,Accessory II
 BOOK_RIC_PREPARA,Prepara,Brew
 BOOK_RIC_SCONOSCIUTA,Ricetta sconosciuta — %d ingredienti,Unknown recipe — %d ingredients
+BOOK_STANZA_LABORATORIO,Laboratorio,Laboratory
+BOOK_STANZA_STANZA_RITUALE,Stanza rituale,Ritual room
+BOOK_STANZA_BIBLIOTECA,Biblioteca,Library
+BOOK_STANZA_GIARDINO,Giardino,Garden
+BOOK_STANZA_LIVELLO,Livello %d,Level %d
+BOOK_STANZA_NON_COSTRUITA,Non costruita,Not built
+BOOK_STANZA_COSTO,Costo: %s,Cost: %s
+BOOK_STANZA_BONUS,Bonus: %s,Bonus: %s
+BOOK_STANZA_COSTRUISCI,Costruisci,Build
+BOOK_STANZA_POTENZIA,Potenzia,Upgrade
+BOOK_GIARDINO_VUOTO,— appezzamento vuoto —,— empty plot —
+BOOK_GIARDINO_IN_CRESCITA,in crescita — %ds,growing — %ds
+BOOK_GIARDINO_PRONTO,pronto,ready
+BOOK_GIARDINO_RACCOGLI,Raccogli,Harvest
+BOOK_GIARDINO_PIANTA,Pianta,Plant
