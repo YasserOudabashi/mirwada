@@ -2885,4 +2885,47 @@ sezione test aggiornata.
 - BLOCCO B completo: US-308, 310, 311, 312, 313, 314. Ricettario a 3 tier,
   qualita', concoction v2, sperimentazione + scoperta, fallimenti mostruosi
   (aberrazione), ricette leggendarie, ricettario nel libro.
-- Prossima storia: US-319 (StructureRegistry - blocco D).
+- CORREZIONE: "prossima storia" era stata scritta come US-319, ma il blocco C
+  (forgiatura e sigilli, US-315..318) non era mai stato fatto - non era una
+  scelta, era una svista nell'annotazione. data/items/US-301 e data/items
+  US-306 rimandavano gia' a US-315/317 (sigillo_ref, "sigilli incastonati").
+  Si riprende da li': blocco C prima di D.
+
+[2026-09-04] US-315 — Schema dei sigilli
+
+- data/schema/sigil_effect_types.json: vocabolario CHIUSO di 5 tipi -
+  stat_modifier / stored_ability_id / tag_grant (le 3 forme di un sigillo,
+  US-315/317) + follia_al_secondo / drain_spiritualita_al_secondo (solo per
+  l'effetto_collaterale SEMPRE ATTIVO di un equip 'sigillato:true', US-318 -
+  gia' usato da lama_del_pentimento in US-301).
+- data/schema/sigil.schema.json: doc (come item.schema.json, non e' jsonschema).
+- data/sigils/sigils.json: 8 sigilli (sig_forza_1, sig_ombra_fame gia' referenziati
+  da US-301 + 6 nuovi: sig_agilita_1, sig_difesa_1, sig_conoscenza_1 (tipo
+  stored_ability_id -> tg_maestria_arma), sig_fortuna_1 (tipo tag_grant),
+  sig_vento_1, sig_maledizione_1). 4 con effetto_collaterale (>= 2 richiesti):
+  ogni collaterale e' uno stat_modifier con valore < 0 (fame drena
+  spiritualita_max, la difesa rallenta, la maledizione costa hp_max).
+- data/items/sigilli.json: 6 nuovi item categoria:sigillo (sigillo_ref ->
+  i 6 sigilli nuovi).
+- GameData: _load_sigils() (stesso pattern di _load_items), get_sigil(id),
+  sigil_ids(), sigil_effect_types().
+- validate_data.py: nuovo blocco sigilli PRIMA del blocco item (item ne usa
+  l'output) - id unici, name_i18n presente, tag nel vocabolario, effetto/
+  effetto_collaterale con tipo tra le 3 forme proprie di un sigillo (non le
+  2 "al_secondo", quelle sono solo per l'equip Sigillato), forma per tipo
+  (stat_modifier: stat nota + valore numerico [+moltiplicativo bool], negativo
+  se e' il collaterale; stored_ability_id: risolve; tag_grant: tag nel
+  vocabolario), >= 8 sigilli, >= 2 con collaterale. Nel blocco item: categoria
+  sigillo -> sigillo_ref risolve; equip.sigillato.effetto_collaterale.tipo nel
+  vocabolario chiuso (prima si controllava solo che fosse presente).
+- i18n: 20 chiavi nuove tradotte a mano (8 sigillo.*, 12 item.sigillo_*/.desc),
+  289 totali, nessun nuovo TODO.
+- Come verificato: validator 0 (9 warning invariati, gia' attesi). i18n --check
+  0. Test nuovi in tests/test_sigils.gd (6): >= 8 sigilli, get_sigil (esiste +
+  {} su id ignoto), vocabolario contiene le 3 forme, >= 2 con collaterale,
+  ogni item categoria:sigillo risolve il proprio sigillo_ref, ogni name_i18n
+  dei sigilli risolve. NON posso eseguire la suite headless in questa sessione
+  (Godot non installato nell'ambiente remoto): verificato a mano che il
+  pattern di caricamento/query replica esattamente _load_items/get_item gia'
+  coperti da test_items.gd, che passano.
+- Prossima storia: US-316 (forgiatura dell'equipaggiamento - blocco C).

@@ -21,6 +21,66 @@
       "impilabile": false,
       "valore": 45,
       "sigillo_ref": "sig_ombra_fame"
+    },
+    {
+      "id": "sigillo_agilita_minore",
+      "categoria": "sigillo",
+      "name_i18n": "item.sigillo_agilita_minore",
+      "descrizione_i18n": "item.sigillo_agilita_minore.desc",
+      "tag": ["sigillo", "agilita'"],
+      "impilabile": false,
+      "valore": 20,
+      "sigillo_ref": "sig_agilita_1"
+    },
+    {
+      "id": "sigillo_difesa_minore",
+      "categoria": "sigillo",
+      "name_i18n": "item.sigillo_difesa_minore",
+      "descrizione_i18n": "item.sigillo_difesa_minore.desc",
+      "tag": ["sigillo", "difesa"],
+      "impilabile": false,
+      "valore": 25,
+      "sigillo_ref": "sig_difesa_1"
+    },
+    {
+      "id": "sigillo_maestria_incisa",
+      "categoria": "sigillo",
+      "name_i18n": "item.sigillo_maestria_incisa",
+      "descrizione_i18n": "item.sigillo_maestria_incisa.desc",
+      "tag": ["sigillo", "conoscenza"],
+      "impilabile": false,
+      "valore": 80,
+      "sigillo_ref": "sig_conoscenza_1"
+    },
+    {
+      "id": "sigillo_fortuna_minore",
+      "categoria": "sigillo",
+      "name_i18n": "item.sigillo_fortuna_minore",
+      "descrizione_i18n": "item.sigillo_fortuna_minore.desc",
+      "tag": ["sigillo", "fortuna"],
+      "impilabile": false,
+      "valore": 30,
+      "sigillo_ref": "sig_fortuna_1"
+    },
+    {
+      "id": "sigillo_vento_minore",
+      "categoria": "sigillo",
+      "name_i18n": "item.sigillo_vento_minore",
+      "descrizione_i18n": "item.sigillo_vento_minore.desc",
+      "tag": ["sigillo", "vento"],
+      "impilabile": false,
+      "valore": 20,
+      "sigillo_ref": "sig_vento_1"
+    },
+    {
+      "id": "sigillo_maledizione_minore",
+      "categoria": "sigillo",
+      "name_i18n": "item.sigillo_maledizione_minore",
+      "descrizione_i18n": "item.sigillo_maledizione_minore.desc",
+      "tag": ["sigillo", "maledizione"],
+      "impilabile": false,
+      "valore": 50,
+      "sigillo_ref": "sig_maledizione_1"
     }
   ]
 }

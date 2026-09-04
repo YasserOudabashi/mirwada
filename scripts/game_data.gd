@@ -16,6 +16,7 @@ const DIR_PATHWAYS := "res://data/pathways"
 const DIR_ABILITIES := "res://data/abilities"
 const DIR_SYNERGIES := "res://data/synergies"
 const DIR_ITEMS := "res://data/items"
+const DIR_SIGILS := "res://data/sigils"
 const PATH_TAGS := "res://data/tags.json"
 const PATH_BALANCE := "res://data/balance.json"
 const PATH_PRIMITIVES := "res://data/schema/primitives.json"
@@ -39,6 +40,7 @@ const PATH_PAGE_TYPES := "res://data/schema/page_types.json"
 const PATH_VFX := "res://data/vfx.json"
 const PATH_ITEM_CATEGORIES := "res://data/schema/item_categories.json"
 const PATH_EQUIP_SLOTS := "res://data/schema/equip_slots.json"
+const PATH_SIGIL_EFFECT_TYPES := "res://data/schema/sigil_effect_types.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -71,6 +73,8 @@ var _vfx: Dictionary = {}
 var _items: Dictionary = {}
 var _item_categories: Dictionary = {}
 var _equip_slots: Dictionary = {}
+var _sigils: Dictionary = {}
+var _sigil_effect_types: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -113,6 +117,7 @@ func load_all() -> void:
 	_load_abilities()
 	_load_synergies()
 	_load_items()
+	_load_sigils()
 	# L'ultimo argomento e' il tipo atteso per la chiave: un file in cui quella
 	# chiave ha la forma sbagliata viene scartato con un errore, non caricato.
 	_load_single(PATH_TAGS, "tags", _tags, TYPE_ARRAY)
@@ -136,6 +141,7 @@ func load_all() -> void:
 	_load_single(PATH_VFX, "pathway_palette_visiva", _vfx, TYPE_DICTIONARY)
 	_load_single(PATH_ITEM_CATEGORIES, "item_categories", _item_categories, TYPE_ARRAY)
 	_load_single(PATH_EQUIP_SLOTS, "slots", _equip_slots, TYPE_ARRAY)
+	_load_single(PATH_SIGIL_EFFECT_TYPES, "tipi", _sigil_effect_types, TYPE_ARRAY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -390,6 +396,22 @@ func equip_slot_tipi() -> Array:
 	return _array_or_empty(_equip_slots.get("tipi"))
 
 
+## --- Sigilli (data/sigils/, US-315) ---
+## Definizione dell'effetto di un sigillo. {} se l'id non esiste. La voce
+## d'inventario e' l'item categoria:sigillo con 'sigillo_ref' che punta qui.
+func get_sigil(id: String) -> Dictionary:
+	return _sigils.get(id, {})
+
+
+func sigil_ids() -> Array:
+	return _sigils.keys()
+
+
+## Vocabolario chiuso dei tipi di effetto/effetto_collaterale (US-315/318).
+func sigil_effect_types() -> Array:
+	return _array_or_empty(_sigil_effect_types.get("tipi"))
+
+
 ## --- VFX (data/vfx.json, US-226) ---
 ## Gemello visivo di audio.json.pathway_palette. Un renderer per primitiva +
 ## una palette per Pathway; nessun campo VFX sulle abilita'.
@@ -496,6 +518,23 @@ func _load_items() -> void:
 			_upsert(_items, iid, item)
 			visti[iid] = true
 	_prune(_items, visti)
+
+
+func _load_sigils() -> void:
+	var visti: Dictionary = {}
+	for path in _json_files_in(DIR_SIGILS):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		for entry in _object_list(doc, "sigils", path):
+			var sigil: Dictionary = entry
+			var sid: String = str(sigil.get("id", ""))
+			if sid.is_empty():
+				_fail(path, "un sigillo non ha 'id'")
+				continue
+			_upsert(_sigils, sid, sigil)
+			visti[sid] = true
+	_prune(_sigils, visti)
 
 
 func _load_synergies() -> void:

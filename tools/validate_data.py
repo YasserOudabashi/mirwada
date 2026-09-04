@@ -571,6 +571,83 @@ def main():
                     warn(f"{rel} [{sid}]: richiede i tag {irraggiungibili} che nessun pathway "
                          f"attivo porta: sinergia irraggiungibile finche' il suo gruppo resta differito.")
 
+    known_item_stats = {"hp_max", "spiritualita_max", "velocita", "difesa",
+                        "evasione", "precisione", "forza"}
+
+    # --- sigilli (data/sigils/, US-315) ---
+    # Definizione dell'EFFETTO. La voce d'inventario (categoria:sigillo,
+    # 'sigillo_ref' -> qui) e' validata piu' sotto nel blocco item.
+    set_doc = load_json(os.path.join(DATA, "schema", "sigil_effect_types.json"))
+    sigil_effect_types = set((set_doc or {}).get("tipi", []))
+    # Un sigillo (a differenza dell'equip 'sigillato', US-318) porta solo
+    # queste 3 forme: le due "al_secondo" sono per l'effetto_collaterale
+    # SEMPRE ATTIVO di un equip Sigillato, non per un sigillo incastonabile.
+    sigil_own_types = {"stat_modifier", "stored_ability_id", "tag_grant"}
+    sdir = os.path.join(DATA, "sigils")
+    sigil_ids = set()
+    if os.path.isdir(sdir):
+        for fn in sorted(os.listdir(sdir)):
+            if not fn.endswith(".json"):
+                continue
+            doc = load_json(os.path.join(sdir, fn))
+            if doc is None:
+                continue
+            rel = f"data/sigils/{fn}"
+            for sg in doc.get("sigils", []):
+                sgid = sg.get("id")
+                if sgid in sigil_ids:
+                    err(f"{rel}: id sigillo duplicato '{sgid}'")
+                sigil_ids.add(sgid)
+                if not isinstance(sg.get("name_i18n"), str) or not sg.get("name_i18n"):
+                    err(f"{rel} [{sgid}]: name_i18n mancante")
+                for t in sg.get("tag", []):
+                    if t not in valid_tags:
+                        err(f"{rel} [{sgid}]: tag sconosciuto '{t}'")
+
+                def check_effetto(eff, campo, richiedi_svantaggio):
+                    if not isinstance(eff, dict):
+                        err(f"{rel} [{sgid}]: {campo} deve essere un oggetto")
+                        return
+                    et = eff.get("tipo")
+                    if et not in sigil_own_types:
+                        err(f"{rel} [{sgid}]: {campo}.tipo '{et}' non valido per un sigillo "
+                            f"({sorted(sigil_own_types)})")
+                        return
+                    if et not in sigil_effect_types:
+                        err(f"{rel} [{sgid}]: {campo}.tipo '{et}' non nel vocabolario chiuso")
+                    if et == "stat_modifier":
+                        if eff.get("stat") not in known_item_stats:
+                            err(f"{rel} [{sgid}]: {campo} ha una stat ignota '{eff.get('stat')}'")
+                        v = eff.get("valore")
+                        if not isinstance(v, (int, float)) or isinstance(v, bool):
+                            err(f"{rel} [{sgid}]: {campo}.valore deve essere un numero")
+                        elif richiedi_svantaggio and v >= 0:
+                            err(f"{rel} [{sgid}]: {campo} e' l'effetto_collaterale, deve essere "
+                                f"uno svantaggio (valore < 0)")
+                        if "moltiplicativo" in eff and not isinstance(eff.get("moltiplicativo"), bool):
+                            err(f"{rel} [{sgid}]: {campo}.moltiplicativo deve essere true/false")
+                    elif et == "stored_ability_id":
+                        if ability_ids and eff.get("ability_id") not in ability_ids:
+                            err(f"{rel} [{sgid}]: {campo}.ability_id '{eff.get('ability_id')}' "
+                                f"non risolve a un'abilita'")
+                    elif et == "tag_grant":
+                        if eff.get("tag") not in valid_tags:
+                            err(f"{rel} [{sgid}]: {campo}.tag sconosciuto '{eff.get('tag')}'")
+
+                check_effetto(sg.get("effetto"), "effetto", False)
+                if "effetto_collaterale" in sg:
+                    check_effetto(sg.get("effetto_collaterale"), "effetto_collaterale", True)
+    if len(sigil_ids) < 8:
+        err(f"data/sigils/: solo {len(sigil_ids)} sigilli, attesi >= 8")
+    n_collaterale = 0
+    if os.path.isdir(sdir):
+        for fn in sorted(os.listdir(sdir)):
+            if fn.endswith(".json"):
+                doc = load_json(os.path.join(sdir, fn)) or {}
+                n_collaterale += sum(1 for sg in doc.get("sigils", []) if sg.get("effetto_collaterale"))
+    if n_collaterale < 2:
+        err(f"data/sigils/: solo {n_collaterale} sigilli con effetto_collaterale, attesi >= 2")
+
     # --- oggetti (data/items/, US-301) ---
     ic_doc = load_json(os.path.join(DATA, "schema", "item_categories.json"))
     item_categories = set((ic_doc or {}).get("item_categories", []))
@@ -579,8 +656,6 @@ def main():
     idir = os.path.join(DATA, "items")
     item_ids = set()
     item_cat = {}   # id -> categoria
-    known_item_stats = {"hp_max", "spiritualita_max", "velocita", "difesa",
-                        "evasione", "precisione", "forza"}
     if os.path.isdir(idir):
         for fn in sorted(os.listdir(idir)):
             if not fn.endswith(".json"):
@@ -618,6 +693,15 @@ def main():
                     if it.get("sigillato") and not it.get("effetto_collaterale"):
                         err(f"{rel} [{iid}]: sigillato:true senza effetto_collaterale "
                             f"(un Sigillato senza prezzo e' un bug di dati, US-318)")
+                    elif it.get("sigillato"):
+                        ec = it.get("effetto_collaterale") or {}
+                        if not isinstance(ec, dict) or ec.get("tipo") not in sigil_effect_types:
+                            err(f"{rel} [{iid}]: effetto_collaterale.tipo '{ec.get('tipo') if isinstance(ec, dict) else ec}' "
+                                f"non nel vocabolario chiuso ({sorted(sigil_effect_types)})")
+                if cat == "sigillo":
+                    sref = it.get("sigillo_ref")
+                    if sref not in sigil_ids:
+                        err(f"{rel} [{iid}]: sigillo_ref '{sref}' non risolve a un sigillo di data/sigils/")
                 sab = it.get("stored_ability_id")
                 if sab is not None and ability_ids and sab not in ability_ids:
                     err(f"{rel} [{iid}]: stored_ability_id '{sab}' non risolve a un'abilita'")

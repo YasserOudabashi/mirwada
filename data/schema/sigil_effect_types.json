@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO dei tipi di effetto/effetto_collaterale (US-315). Copre sia l'effetto/effetto_collaterale di un sigillo (data/sigils/, applicato per id 'sigillo:<instance_id>' quando incastonato, US-317) sia l'effetto_collaterale di un item equip 'sigillato:true' (data/items/, sempre attivo mentre indossato, US-318). Un tipo nuovo e' codice: va discusso come le primitive.",
+  "tipi": [
+    "stat_modifier",
+    "stored_ability_id",
+    "tag_grant",
+    "follia_al_secondo",
+    "drain_spiritualita_al_secondo"
+  ]
+}

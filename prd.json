@@ -163,8 +163,8 @@
       ],
       "priority": 8,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/schema/sigil_effect_types.json (vocab chiuso 5 tipi: stat_modifier, stored_ability_id, tag_grant per i sigilli + follia_al_secondo/drain_spiritualita_al_secondo per l'effetto_collaterale sempre attivo di un equip Sigillato, US-318). data/schema/sigil.schema.json (doc). data/sigils/sigils.json: 8 sigilli (sig_forza_1, sig_ombra_fame, sig_agilita_1, sig_difesa_1, sig_conoscenza_1, sig_fortuna_1, sig_vento_1, sig_maledizione_1), 4 con effetto_collaterale (>=2 richiesti). data/items/sigilli.json: 6 nuovi item categoria:sigillo (sigillo_ref -> i sigilli nuovi; i 2 esistenti da US-301 risolvono anche loro ora). GameData: _load_sigils (come _load_items), get_sigil/sigil_ids/sigil_effect_types. validate_data.py: blocco sigilli (id unici, name_i18n, tag nel vocab, effetto/effetto_collaterale tipizzati e validati per forma, effetto_collaterale sempre uno svantaggio per stat_modifier, >=8 sigilli, >=2 con collaterale) + nel blocco item: sigillo_ref risolve, equip.sigillato.effetto_collaterale.tipo nel vocabolario chiuso. i18n: 20 chiavi nuove tradotte (289 totali). 381 test headless attesi (375 + 6 in test_sigils.gd: vocabolario, get_sigil, >=2 collaterale, ogni sigillo_ref risolve, ogni name_i18n risolve). validator 0, i18n --check 0."
     },
     {
       "id": "US-316",

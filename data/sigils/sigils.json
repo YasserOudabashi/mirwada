@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "_comment": "Definizioni di effetto dei sigilli (US-315). Referenziati da 'sigillo_ref' negli item categoria:sigillo di data/items/sigilli.json. Si applicano quando incastonati in un equip (US-317).",
+  "sigils": [
+    {
+      "id": "sig_forza_1",
+      "name_i18n": "sigillo.sig_forza_1",
+      "tag": ["forza"],
+      "effetto": {"tipo": "stat_modifier", "stat": "forza", "valore": 0.05, "moltiplicativo": false}
+    },
+    {
+      "id": "sig_ombra_fame",
+      "name_i18n": "sigillo.sig_ombra_fame",
+      "tag": ["ombra"],
+      "effetto": {"tipo": "stat_modifier", "stat": "evasione", "valore": 0.08, "moltiplicativo": false},
+      "effetto_collaterale": {"tipo": "stat_modifier", "stat": "spiritualita_max", "valore": -10.0, "moltiplicativo": false}
+    },
+    {
+      "id": "sig_agilita_1",
+      "name_i18n": "sigillo.sig_agilita_1",
+      "tag": ["agilita'"],
+      "effetto": {"tipo": "stat_modifier", "stat": "velocita", "valore": 8.0, "moltiplicativo": false}
+    },
+    {
+      "id": "sig_difesa_1",
+      "name_i18n": "sigillo.sig_difesa_1",
+      "tag": ["difesa"],
+      "effetto": {"tipo": "stat_modifier", "stat": "difesa", "valore": 0.1, "moltiplicativo": false},
+      "effetto_collaterale": {"tipo": "stat_modifier", "stat": "velocita", "valore": -5.0, "moltiplicativo": false}
+    },
+    {
+      "id": "sig_conoscenza_1",
+      "name_i18n": "sigillo.sig_conoscenza_1",
+      "tag": ["conoscenza"],
+      "effetto": {"tipo": "stored_ability_id", "ability_id": "tg_maestria_arma"}
+    },
+    {
+      "id": "sig_fortuna_1",
+      "name_i18n": "sigillo.sig_fortuna_1",
+      "tag": ["fortuna"],
+      "effetto": {"tipo": "tag_grant", "tag": "fortuna"}
+    },
+    {
+      "id": "sig_vento_1",
+      "name_i18n": "sigillo.sig_vento_1",
+      "tag": ["vento"],
+      "effetto": {"tipo": "stat_modifier", "stat": "precisione", "valore": 0.06, "moltiplicativo": false}
+    },
+    {
+      "id": "sig_maledizione_1",
+      "name_i18n": "sigillo.sig_maledizione_1",
+      "tag": ["maledizione"],
+      "effetto": {"tipo": "stat_modifier", "stat": "forza", "valore": 0.2, "moltiplicativo": false},
+      "effetto_collaterale": {"tipo": "stat_modifier", "stat": "hp_max", "valore": -15.0, "moltiplicativo": false}
+    }
+  ]
+}
