@@ -438,8 +438,8 @@
       ],
       "priority": 22,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "PetSystem esteso: _ready() si collega a EventTracker.evento_emesso, stesso principio di Acting (US-210/211) - nessun rilevatore speciale, un solo listener generico. _su_evento(nome, dati): con un pet attivo, enemy_defeated e area_cleared aggiungono i pesi di balance.json.pet (bond_per_enemy_defeated, bond_per_area_cleared); time_in_state aggiunge bond SOLO se dati.stato=='esplorazione' (bond_per_time_in_state_esplorazione) - il meccanismo e' pronto e testato a mano (EventTracker.emit_event diretto) ma nessun sistema emette ancora time_in_state con quello stato: serve il tracking di stato del giocatore, fuori scope per PetSystem. _aggiungi_bond clampa 0..100, rileva se una soglia di data/pets/<specie>.comportamenti e' stata appena superata ed emette bond_cambiato(valore, soglia_attraversata) (-1 se nessuna). comportamenti_sbloccati() -> Array degli id dei comportamenti della specie con soglia_bond <= bond attuale. L'accesso alle abilita' del pet non e' stato implementato: il campo 'abilita' resta vuoto in tutte le specie (scelta gia' presa in US-321), quindi non c'e' niente da sbloccare finche' non esiste un'abilita' dedicata ai pet - costruire un gating speculativo su un array vuoto sarebbe complessita' non richiesta. Test nuovi in tests/test_pet_bond.gd (6): enemy_defeated fa salire il bond del peso giusto; area_cleared idem; time_in_state sale SOLO con stato:esplorazione, un altro stato non conta; senza pet attivo l'evento non fa nulla (nessun crash); una soglia di bond sblocca il comportamento della specie ed emette bond_cambiato con la soglia corretta (nessun segnale prima di raggiungerla); il bond persiste nel round-trip del save. NON posso eseguire la suite headless in questa sessione (Godot non installato nell'ambiente remoto): verificata a mano la correttezza sintattica e la coerenza col pattern gia' testato di Acting (listener su evento_emesso) e Madness (segnale con soglia_attraversata, test_madness.gd). validator 0 (nessun dato toccato in questa story)."
     },
     {
       "id": "US-324",

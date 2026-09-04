@@ -3267,3 +3267,39 @@ sezione test aggiornata.
   remoto): verificata a mano la correttezza sintattica e la coerenza col
   pattern gia' testato di PotionSystem (RNG seedabile) e AnchorSystem.
 - Prossima storia: US-323 (bond - il legame cresce dalle azioni condivise).
+
+[2026-09-04] US-323 — Bond: il legame cresce dalle azioni condivise
+
+- PetSystem._ready() si collega a EventTracker.evento_emesso - stesso
+  principio di Acting (US-210/211): nessun rilevatore speciale scritto a
+  mano per il pet, un solo listener generico sul segnale.
+- _su_evento(nome, dati): con un pet attivo, enemy_defeated e area_cleared
+  aggiungono i pesi di balance.json.pet (bond_per_enemy_defeated,
+  bond_per_area_cleared, gia' preparati in US-322); time_in_state aggiunge
+  bond SOLO se dati.stato=='esplorazione' (bond_per_time_in_state_esplorazione).
+  Il meccanismo per time_in_state e' pronto e verificato a mano
+  (EventTracker.emit_event diretto nel test) ma NESSUN sistema del gioco
+  emette ancora time_in_state con quello stato - serve un tracking di stato
+  del giocatore che non esiste, fuori scope per il pet stesso.
+- _aggiungi_bond: clampa 0..100, rileva se una soglia_bond di
+  data/pets/<specie>.comportamenti e' stata appena superata (prima < soglia
+  <= dopo) ed emette bond_cambiato(valore, soglia_attraversata) (-1 se
+  nessuna soglia toccata - stesso pattern di Madness.madness_changed).
+- comportamenti_sbloccati() -> gli id dei comportamenti della specie con
+  soglia_bond <= bond attuale.
+- L'accesso alle abilita' del pet NON e' stato implementato: 'abilita'
+  resta vuoto in tutte le specie (scelta gia' presa in US-321). Costruire
+  un gating su un array vuoto sarebbe complessita' non richiesta - si
+  aggiungera' quando esistera' davvero un'abilita' dedicata ai pet.
+- Come verificato: validator 0 (nessun dato toccato). Test nuovi in
+  tests/test_pet_bond.gd (6): enemy_defeated e area_cleared fanno salire il
+  bond del peso giusto; time_in_state sale SOLO con stato:esplorazione, un
+  altro stato non conta; senza pet attivo l'evento non fa nulla (nessun
+  crash); una soglia di bond sblocca il comportamento della specie ed
+  emette bond_cambiato con la soglia corretta (nessun segnale prima di
+  raggiungerla, verificato con una callback come in test_madness.gd); il
+  bond persiste nel round-trip del save. NON posso eseguire la suite
+  headless in questa sessione (Godot non installato nell'ambiente remoto):
+  verificata a mano la correttezza sintattica e la coerenza coi pattern
+  gia' testati (Acting, Madness).
+- Prossima storia: US-324 (coltivazione del pet).

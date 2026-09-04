@@ -6,10 +6,19 @@ extends Node
 
 signal pet_domato(pet_id: String)
 signal pet_liberato(pet_id: String)
+## soglia_attraversata: -1 se il cambio non ha superato nessuna soglia di
+## data/pets/<specie>.comportamenti.
+signal bond_cambiato(valore: float, soglia_attraversata: int)
 
 ## {} se nessun pet. Altrimenti { pet_id, bond, hp, sequenza, summon_id }.
 var _pet: Dictionary = {}
 var _rng: RandomNumberGenerator = null
+
+
+func _ready() -> void:
+	var et: Node = get_node_or_null("/root/EventTracker")
+	if et != null and et.has_signal("evento_emesso"):
+		et.evento_emesso.connect(_su_evento)
 
 
 ## Definizione della specie del pet attivo unita al suo stato corrente, o {}
@@ -109,6 +118,58 @@ func _bonus_domabilita() -> float:
 	var gd: Node = _gd()
 	var b: Dictionary = gd.call("get_balance", "pet") if gd != null else {}
 	return float(b.get("bonus_domabilita_talenti", 0.0))
+
+
+# --- Bond (US-323) -----------------------------------------------------
+# Cresce ascoltando EventTracker, come l'Acting Method (US-210/211): nessun
+# rilevatore speciale, un solo listener sul segnale generico evento_emesso.
+# I pesi sono dati (data/balance.json.pet).
+
+## Comportamenti della specie del pet gia' sbloccati al bond attuale.
+func comportamenti_sbloccati() -> Array:
+	if _pet.is_empty():
+		return []
+	var out: Array = []
+	var b: float = bond()
+	for comp in _specie(str(_pet.get("pet_id", ""))).get("comportamenti", []):
+		var d: Dictionary = comp
+		if b >= float(d.get("soglia_bond", 999)):
+			out.append(str(d.get("id", "")))
+	return out
+
+
+func _su_evento(nome: String, dati: Dictionary) -> void:
+	if _pet.is_empty():
+		return
+	var pesi: Dictionary = _gd().call("get_balance", "pet") if _gd() != null else {}
+	var delta: float = 0.0
+	match nome:
+		"enemy_defeated":
+			delta = float(pesi.get("bond_per_enemy_defeated", 0.0))
+		"area_cleared":
+			delta = float(pesi.get("bond_per_area_cleared", 0.0))
+		"time_in_state":
+			# Nessun sistema emette ancora time_in_state{stato:esplorazione}
+			# (arrivera' col tracking di stato del giocatore, fuori scope
+			# qui): il meccanismo e' pronto, il peso resta 0 finche' non
+			# emette nessuno.
+			if str(dati.get("stato", "")) == "esplorazione":
+				delta = float(pesi.get("bond_per_time_in_state_esplorazione", 0.0))
+	if delta != 0.0:
+		_aggiungi_bond(delta)
+
+
+func _aggiungi_bond(delta: float) -> void:
+	var prima: float = float(_pet.get("bond", 0.0))
+	var dopo: float = clampf(prima + delta, 0.0, 100.0)
+	_pet["bond"] = dopo
+	var soglia: int = -1
+	for comp in _specie(str(_pet.get("pet_id", ""))).get("comportamenti", []):
+		var s: int = int((comp as Dictionary).get("soglia_bond", -1))
+		if prima < s and dopo >= s:
+			soglia = s
+			break
+	bond_cambiato.emit(dopo, soglia)
 
 
 # --- Salvataggio -----------------------------------------------------
