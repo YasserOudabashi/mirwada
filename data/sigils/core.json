@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "_comment": "Definizioni dei sigilli (US-315). La voce d'inventario (categoria:sigillo, campo sigillo_ref) sta in data/items/sigilli.json. effetto_collaterale, quando presente, e' sempre uno svantaggio: stat_modifier con valore < 0, o tag_grant di un tag scomodo.",
+  "_comment": "Definizioni dei sigilli (US-315). La voce d'inventario (categoria:sigillo, campo sigillo_ref) sta in data/items/sigilli.json. effetto_collaterale, quando presente, e' sempre uno svantaggio: stat_modifier con valore < 0, o tag_grant di un tag scomodo. ATTENZIONE 'forza': StatsComponent non le assegna una base (configure_from_balance non la seeda, e' un accumulatore solo-bonus) - moltiplicativo:true su 'forza' e' sempre un no-op (base*valore = 0). Usare moltiplicativo solo su stat con base reale (difesa/evasione/precisione/velocita/hp_max/spiritualita_max).",
   "sigils": {
     "sig_forza_1": {
       "name_i18n": "sigillo.sig_forza_1",
       "tag": ["forza"],
-      "effetto": { "tipo": "stat_modifier", "stat": "forza", "valore": 0.08, "moltiplicativo": true }
+      "effetto": { "tipo": "stat_modifier", "stat": "forza", "valore": 0.08, "moltiplicativo": false }
     },
     "sig_difesa_1": {
       "name_i18n": "sigillo.sig_difesa_1",
@@ -41,7 +41,7 @@
     "sig_sangue_avido": {
       "name_i18n": "sigillo.sig_sangue_avido",
       "tag": ["sangue"],
-      "effetto": { "tipo": "stat_modifier", "stat": "forza", "valore": 0.18, "moltiplicativo": true },
+      "effetto": { "tipo": "stat_modifier", "stat": "forza", "valore": 0.18, "moltiplicativo": false },
       "effetto_collaterale": { "tipo": "stat_modifier", "stat": "hp_max", "valore": -20, "moltiplicativo": false }
     }
   }

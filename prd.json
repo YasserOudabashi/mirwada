@@ -204,8 +204,8 @@
       ],
       "priority": 10,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Equipment (US-303) esteso: incastona(mount, sigillo_instance_id)/rimuovi_sigillo(mount, sigillo_instance_id)/sigilli_incastonati(mount). effetto/effetto_collaterale del sigillo -> modificatore 'sigillo:<instance_id>[:collaterale]' (solo stat_modifier produce un modificatore reale, con moltiplicativo=delta su get_base come ability_engine._mod_stat; tag_grant vive in tag_attivi(), stored_ability_id non ha ancora un consumatore - schema coperto, uso attivo e' story futura). rimuovi_slot ora estrae prima ogni sigillo incastonato (nessuna perdita silenziosa). Inventory.tag_attivi() include i tag dei sigilli incastonati via Equipment.tag_attivi(). SAVE: schema_version 14->15, 'equipaggiamento' passa da {mount:{...}} a {slot:{...}, sigilli:{mount:[...]}}, _migra_14_a_15 sposta il vecchio piatto sotto 'slot'. BUG PRE-ESISTENTE TROVATO E CORRETTO: il match in SaveSystem._migra() copriva solo v1..v10, le funzioni _migra_11_a_12/12_a_13/13_a_14 (US-224/302/303) erano scritte ma MAI invocate (dead code, mascherato dai default di _leggi_snapshot che coprono comunque i campi mancanti) - aggiunti i case 11/12/13/14 mancanti. Corretti anche 2 sigilli di dati errati in US-315 (sig_forza_1, sig_sangue_avido: moltiplicativo:true su 'forza' era un no-op silenzioso, 'forza' non ha una base seedata da configure_from_balance - portati a moltiplicativo:false, flat, come ogni altro stat_modifier su 'forza' nel progetto), trovato scrivendo il test di round-trip di questa story. GameData.get_item invariato. 393 test headless (387+6 in tests/test_incastonamento.gd: applica l'effetto, limite di slot rispettato, effetto_collaterale applicato e rimosso, i sigilli incastonati contano in tag_attivi, rimuovi_slot estrae senza perdita, round-trip del save). validator 0, nessuna regressione. Nessuna verifica a schermo: la pagina inventario non espone ancora l'incastonamento (fuori scope di questa story, il PRD di fase 3 non ha una story dedicata alla UI dei sigilli)."
     },
     {
       "id": "US-318",

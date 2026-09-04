@@ -2976,3 +2976,80 @@ sezione test aggiornata.
   in se' non ha una sua pagina nel PRD di fase 3).
 - Prossima storia: US-317 (incisione dei sigilli sull'equip, fusione con
   US-309 gia' decisa in RALPH-3).
+
+[2026-09-05] US-317 — Incisione dei sigilli sull'equip (fusione US-309)
+
+- Cosa fatto:
+  - Equipment (scripts/equipment.gd): incastona(mount, sigillo_instance_id)
+    fallisce se il mount e' vuoto o se non ci sono slot_sigilli liberi;
+    rimuovi_sigillo(mount, sigillo_instance_id) restituisce il sigillo allo
+    zaino; sigilli_incastonati(mount) per l'ispezione.
+  - effetto/effetto_collaterale del sigillo si applicano come modificatore
+    "sigillo:<instance_id>[:collaterale]" sullo StatsComponent. Solo
+    stat_modifier produce un modificatore reale (tag_grant vive gia' in
+    tag_attivi(), stored_ability_id non ha ancora un consumatore attivo:
+    lo schema di US-315 lo copre, l'USO e' materia di una story futura -
+    nessun crash, solo nessun effetto per ora, come "non ancora implementata"
+    altrove nel motore). moltiplicativo converte in delta sulla stat BASE,
+    ricalcando alla lettera ability_engine.gd._mod_stat.
+  - rimuovi_slot(mount) ora estrae PRIMA ogni sigillo incastonato e lo
+    restituisce allo zaino: smontare un equip non fa piu' perdere i sigilli
+    incisi (nessuna perdita silenziosa di oggetti, principio gia' del save).
+  - Inventory.tag_attivi() (US-306) ora include anche i tag dei sigilli
+    incastonati, non solo quelli dell'equip: Equipment.tag_attivi() somma
+    entrambe le fonti.
+  - SAVE: schema_version 14 -> 15. Il campo 'equipaggiamento' cambia forma da
+    {mount: {...}} a {slot: {mount: {...}}, sigilli: {mount: [{instance_id,
+    item_id, sigillo_ref}]}}. _migra_14_a_15 sposta il vecchio dict piatto
+    sotto 'slot' invece di perderlo; 'sigilli' parte vuoto.
+  - BUG PRE-ESISTENTE TROVATO E CORRETTO (non introdotto da questa sessione):
+    save_system.gd._migra() aveva un `match v:` che copriva solo v1..v10;
+    le funzioni _migra_11_a_12 (US-224), _migra_12_a_13 (US-302),
+    _migra_13_a_14 (US-303) erano scritte e corrette ma MAI invocate — dead
+    code. Il bug era mascherato: _leggi_snapshot() applica comunque un
+    default sano (TYPE_DICTIONARY/ARRAY -> {}/[]) a ogni campo mancante,
+    quindi il comportamento osservabile restava corretto anche senza le
+    migrazioni esplicite. Aggiunti i case 11/12/13/14 mancanti al match,
+    prima di aggiungere il proprio case 14 (necessario perche' la mia
+    migrazione 14->15 girasse davvero). Trovato controllando il log dei test
+    ("nessuna migrazione da v11/v12/v13: salto") durante il controllo di
+    integrita' a inizio sessione, prima ancora di toccare US-317.
+  - CORREZIONE DATI DI US-315: sig_forza_1 e sig_sangue_avido dichiaravano
+    moltiplicativo:true sulla stat 'forza', ma StatsComponent.configure_from_balance
+    non assegna MAI una base a 'forza' (e' un accumulatore solo-bonus, come
+    gli stat_modifiers piatti di ogni equip esistente: spada_ferrea,
+    lama_del_pentimento). moltiplicativo:true su una base 0 e' un effetto
+    SEMPRE zero: un bug silenzioso. Portati a moltiplicativo:false (flat),
+    coerente con l'unica convenzione che 'forza' abbia mai avuto nel
+    progetto. Trovato scrivendo il test di round-trip di questa story, che
+    lo avrebbe reso invisibile altrimenti (il sigillo veniva incastonato
+    "con successo" ma non cambiava nulla). Aggiunto un avviso nel _comment
+    di data/sigils/core.json cosi' non si ripete su un sigillo futuro.
+  - TRAPPOLA DI TEST (non un bug del motore): il primo tentativo del test di
+    round-trip falliva confrontando la forza PRIMA e DOPO snapshot/applica,
+    perche' GameState.applica() sincronizza anche Progression (che applica
+    IL SUO modificatore "sequence:<n>", comprensivo di un contributo a
+    forza): la prima misura non l'aveva mai visto (Progression non era mai
+    stata sincronizzata), la seconda si'. Non e' un bug dei sigilli: e' un
+    side effect legittimo di un altro sistema toccato dallo stesso round
+    trip. Il test ora sincronizza Progression una volta PRIMA di misurare
+    "prima", isolando cosi' il solo contributo del sigillo. Lezione: un test
+    di round-trip via GameState.snapshot()/applica() confronta stati del
+    MONDO INTERO, non del solo sistema che si vuole testare — se un altro
+    sistema autoload non era mai stato sincronizzato prima, il confronto
+    prima/dopo e' falsato dal SUO primo sync, non da un bug del sistema sotto
+    test.
+- Come verificato: 393 test headless (387 + 6 in tests/test_incastonamento.gd:
+  incastona applica l'effetto e consuma il sigillo dallo zaino; il limite di
+  slot_sigilli e' rispettato; effetto_collaterale applicato e rimosso
+  insieme all'effetto; i sigilli incastonati contano in tag_attivi; smontare
+  l'equip restituisce sia l'equip sia i sigilli, zero perdita; il round-trip
+  del save preserva l'incastonamento e il modificatore). validate_data.py ->
+  0 errori, 9 warning (gli stessi di sempre). Le "ERROR: Parse JSON failed"
+  nel log restano quelle preesistenti di test_save_system/test_settings
+  (JSON malformato di proposito), confermato di nuovo dal contesto del log.
+  Nessuna regressione sui test di Equipment esistenti (test_da_salvataggio_non_fidato
+  aggiornato al nuovo formato annidato, stesso comportamento testato).
+  Nessuna verifica a schermo: nessuna story del PRD di fase 3 espone
+  l'incastonamento nella pagina inventario (US-307/US-329 non lo coprono).
+- Prossima storia: US-318 (oggetti Sigillati).

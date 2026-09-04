@@ -7,12 +7,21 @@ extends Node
 ## il vecchio si rimuove e il nuovo si applica, senza sapere nulla degli altri
 ## bonus attivi.
 ##
+## US-317: ogni slot puo' portare fino a slot_sigilli sigilli incastonati.
+## effetto/effetto_collaterale del sigillo si applicano come modificatore
+## "sigillo:<instance_id>[:collaterale]", stesso principio.
+##
 ## NIENTE class_name: coerente col resto del progetto.
 
 signal equip_cambiato(slot: String)
 
 ## slot di aggancio -> { instance_id, item_id }
 var _slot: Dictionary = {}
+
+## slot di aggancio -> Array[{ instance_id, item_id, sigillo_ref }] (US-317).
+## Smontare l'equip (rimuovi_slot) estrae prima ogni sigillo incastonato e lo
+## restituisce allo zaino: nessuna perdita silenziosa di oggetti.
+var _sigilli: Dictionary = {}
 
 
 func _ready() -> void:
@@ -49,6 +58,9 @@ func equipaggia(instance_id: String) -> bool:
 func rimuovi_slot(mount: String) -> bool:
 	if not _slot.has(mount):
 		return false
+	# Estrae prima ogni sigillo incastonato: nessuna perdita silenziosa (US-317).
+	for se in (_sigilli.get(mount, []) as Array).duplicate(true):
+		rimuovi_sigillo(mount, str((se as Dictionary).get("instance_id", "")))
 	var e: Dictionary = _slot[mount]
 	_rimuovi_mod(mount)
 	_slot.erase(mount)
@@ -57,6 +69,58 @@ func rimuovi_slot(mount: String) -> bool:
 		inv.call("restituisci_istanza", str(e.get("instance_id", "")), str(e.get("item_id", "")))
 	equip_cambiato.emit(mount)
 	return true
+
+
+## Incastona un sigillo (istanza di zaino, categoria:sigillo) nello slot equip
+## occupato da 'mount'. Fallisce se il mount e' vuoto, se non ci sono
+## slot_sigilli liberi, o se l'istanza non e' un sigillo che risolve (US-317).
+func incastona(mount: String, sigillo_instance_id: String) -> bool:
+	if not _slot.has(mount):
+		return false
+	var cap: int = int(equipaggiato(mount).get("slot_sigilli", 0))
+	var attuali: Array = (_sigilli.get(mount, []) as Array).duplicate(true)
+	if attuali.size() >= cap:
+		return false
+	var inv: Node = _inv()
+	if inv == null:
+		return false
+	var inst: Dictionary = inv.call("istanza", sigillo_instance_id)
+	if inst.is_empty():
+		return false
+	var item_id: String = str(inst.get("item_id", ""))
+	if str(_def(item_id).get("categoria", "")) != "sigillo":
+		return false
+	var sref: String = str(_def(item_id).get("sigillo_ref", ""))
+	var sig: Dictionary = _sigil(sref)
+	if sig.is_empty():
+		return false
+	inv.call("rimuovi_istanza", sigillo_instance_id)
+	attuali.append({"instance_id": sigillo_instance_id, "item_id": item_id, "sigillo_ref": sref})
+	_sigilli[mount] = attuali
+	_applica_sigillo(sigillo_instance_id, sig)
+	equip_cambiato.emit(mount)
+	return true
+
+
+## Estrae un sigillo incastonato e lo restituisce allo zaino.
+func rimuovi_sigillo(mount: String, sigillo_instance_id: String) -> bool:
+	var attuali: Array = (_sigilli.get(mount, []) as Array).duplicate(true)
+	for i in attuali.size():
+		if str((attuali[i] as Dictionary).get("instance_id", "")) == sigillo_instance_id:
+			_rimuovi_mod_sigillo(sigillo_instance_id)
+			var e: Dictionary = attuali[i]
+			attuali.remove_at(i)
+			_sigilli[mount] = attuali
+			var inv: Node = _inv()
+			if inv != null:
+				inv.call("restituisci_istanza", sigillo_instance_id, str(e.get("item_id", "")))
+			equip_cambiato.emit(mount)
+			return true
+	return false
+
+
+func sigilli_incastonati(mount: String) -> Array:
+	return (_sigilli.get(mount, []) as Array).duplicate(true)
 
 
 ## Definizione dell'item nello slot, {} se vuoto.
@@ -73,40 +137,58 @@ func slot_pieni() -> Dictionary:
 	return out
 
 
-## Tag degli item equipaggiati (US-306: fonte per il motore sinergie).
+## Tag degli item equipaggiati + dei sigilli incastonati (US-306/317: fonte
+## per il motore sinergie).
 func tag_attivi() -> Dictionary:
 	var out: Dictionary = {}
 	for m in _slot:
 		for t in _def(str(_slot[m].get("item_id", ""))).get("tag", []):
 			out[t] = int(out.get(t, 0)) + 1
+	for m in _sigilli:
+		for se in (_sigilli[m] as Array):
+			for t in _sigil(str((se as Dictionary).get("sigillo_ref", ""))).get("tag", []):
+				out[t] = int(out.get(t, 0)) + 1
 	return out
 
 
 func riapplica_al_giocatore() -> void:
 	for m in _slot:
 		_applica_mod(m)
+	for m in _sigilli:
+		for se in (_sigilli[m] as Array):
+			var sig: Dictionary = _sigil(str((se as Dictionary).get("sigillo_ref", "")))
+			if not sig.is_empty():
+				_applica_sigillo(str((se as Dictionary).get("instance_id", "")), sig)
 
 
 func pulisci() -> void:
 	for m in _slot.keys():
 		_rimuovi_mod(m)
+	for m in _sigilli.keys():
+		for se in (_sigilli[m] as Array):
+			_rimuovi_mod_sigillo(str((se as Dictionary).get("instance_id", "")))
 	_slot.clear()
+	_sigilli.clear()
 
 
 # --- Salvataggio -----------------------------------------------------
 
 func per_salvataggio() -> Dictionary:
-	return _slot.duplicate(true)
+	return {"slot": _slot.duplicate(true), "sigilli": _sigilli.duplicate(true)}
 
 
-## NON FIDATO: tiene solo le voci ben formate con item_id equip che risolve.
+## NON FIDATO: tiene solo le voci ben formate con item_id equip/sigillo che
+## risolvono. Formato { slot: {mount:{instance_id,item_id}}, sigilli:
+## {mount:[{instance_id,item_id,sigillo_ref}]} } (US-317; SaveSystem migra
+## il formato piatto v14 in _migra_14_a_15).
 func da_salvataggio(raw: Variant) -> void:
 	pulisci()
 	if typeof(raw) != TYPE_DICTIONARY:
 		return
+	var d: Dictionary = raw
 	var validi: Array = _mount_validi()
-	for m in raw:
-		var e: Variant = raw[m]
+	for m in _dict_or_empty(d.get("slot")):
+		var e: Variant = d["slot"][m]
 		if not validi.has(str(m)) or typeof(e) != TYPE_DICTIONARY:
 			continue
 		var item_id: String = str((e as Dictionary).get("item_id", ""))
@@ -114,6 +196,22 @@ func da_salvataggio(raw: Variant) -> void:
 		if iid.is_empty() or str(_def(item_id).get("categoria", "")) != "equip":
 			continue
 		_slot[str(m)] = {"instance_id": iid, "item_id": item_id}
+	for m in _dict_or_empty(d.get("sigilli")):
+		if not validi.has(str(m)) or not _slot.has(str(m)) or typeof(d["sigilli"][m]) != TYPE_ARRAY:
+			continue
+		var cap: int = int(equipaggiato(str(m)).get("slot_sigilli", 0))
+		var out: Array = []
+		for se in (d["sigilli"][m] as Array):
+			if out.size() >= cap or typeof(se) != TYPE_DICTIONARY:
+				continue
+			var sid: String = str((se as Dictionary).get("instance_id", ""))
+			var iitem: String = str((se as Dictionary).get("item_id", ""))
+			var sref: String = str((se as Dictionary).get("sigillo_ref", ""))
+			if sid.is_empty() or str(_def(iitem).get("categoria", "")) != "sigillo" or _sigil(sref).is_empty():
+				continue
+			out.append({"instance_id": sid, "item_id": iitem, "sigillo_ref": sref})
+		if not out.is_empty():
+			_sigilli[str(m)] = out
 	riapplica_al_giocatore()
 
 
@@ -131,6 +229,45 @@ func _rimuovi_mod(mount: String) -> void:
 	var stats: Node = _stats()
 	if stats != null:
 		stats.call("remove_modifier", "equip:" + mount)
+
+
+## Applica effetto + (se presente) effetto_collaterale di un sigillo appena
+## incastonato, come modificatori per id "sigillo:<instance_id>[:collaterale]".
+func _applica_sigillo(instance_id: String, sig: Dictionary) -> void:
+	_applica_effetto(instance_id, sig.get("effetto", {}), "")
+	if sig.has("effetto_collaterale"):
+		_applica_effetto(instance_id, sig.get("effetto_collaterale", {}), ":collaterale")
+
+
+## Solo stat_modifier produce un modificatore reale: tag_grant vive in
+## tag_attivi(), stored_ability_id non ha ancora un consumatore (US-317
+## copre lo schema; l'uso attivo e' materia di una story futura).
+## moltiplicativo converte in delta sulla stat BASE, come ability_engine._mod_stat.
+func _applica_effetto(instance_id: String, eff: Dictionary, suffisso: String) -> void:
+	if str(eff.get("tipo", "")) != "stat_modifier":
+		return
+	var stats: Node = _stats()
+	if stats == null:
+		return
+	var stat: String = str(eff.get("stat", ""))
+	var valore: float = float(eff.get("valore", 0.0))
+	var delta: float = valore
+	if bool(eff.get("moltiplicativo", false)):
+		delta = float(stats.call("get_base", stat)) * valore
+	stats.call("apply_modifier", "sigillo:" + instance_id + suffisso, {stat: delta})
+
+
+func _rimuovi_mod_sigillo(instance_id: String) -> void:
+	var stats: Node = _stats()
+	if stats == null:
+		return
+	stats.call("remove_modifier", "sigillo:" + instance_id)
+	stats.call("remove_modifier", "sigillo:" + instance_id + ":collaterale")
+
+
+func _sigil(sigillo_ref: String) -> Dictionary:
+	var gd: Node = get_node_or_null("/root/GameData")
+	return gd.call("get_sigil", sigillo_ref) if gd != null else {}
 
 
 ## "arma"/"armatura" -> se stesso. "accessorio" -> primo accessorio_N libero
@@ -163,3 +300,7 @@ func _inv() -> Node:
 func _stats() -> Node:
 	var p: Node = get_tree().get_first_node_in_group("player")
 	return p.get_node_or_null("StatsComponent") if p != null else null
+
+
+static func _dict_or_empty(v: Variant) -> Dictionary:
+	return v if typeof(v) == TYPE_DICTIONARY else {}

@@ -104,5 +104,5 @@ func test_da_salvataggio_non_fidato() -> void:
 	var eq: Node = _n("/root/Equipment")
 	eq.call("da_salvataggio", "non un oggetto")
 	assert_eq(eq.call("slot_pieni"), {}, "raw non-oggetto -> niente equip")
-	eq.call("da_salvataggio", {"arma": {"instance_id": "x", "item_id": "erba_lunare"}})
+	eq.call("da_salvataggio", {"slot": {"arma": {"instance_id": "x", "item_id": "erba_lunare"}}})
 	assert_eq(eq.call("slot_pieni"), {}, "item non-equip in uno slot -> scartato")

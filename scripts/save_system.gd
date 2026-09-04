@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 14
+const VERSIONE_CORRENTE := 15
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -191,6 +191,14 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_9_a_10(doc)
 			10:
 				doc = _migra_10_a_11(doc)
+			11:
+				doc = _migra_11_a_12(doc)
+			12:
+				doc = _migra_12_a_13(doc)
+			13:
+				doc = _migra_13_a_14(doc)
+			14:
+				doc = _migra_14_a_15(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -293,6 +301,21 @@ func _migra_12_a_13(doc: Dictionary) -> Dictionary:
 func _migra_13_a_14(doc: Dictionary) -> Dictionary:
 	if not doc.has("equipaggiamento"):
 		doc["equipaggiamento"] = {}
+	return doc
+
+
+## v14 -> v15: i sigilli incastonati (US-317). "equipaggiamento" passa dal
+## formato piatto {mount: {...}} a {slot: {mount: {...}}, sigilli: {mount: [...]}}
+## - un vecchio save aveva gia' il piatto sotto la stessa chiave: lo si sposta
+## sotto "slot" invece di perderlo, "sigilli" parte vuoto (nessun sigillo
+## incastonato prima che esistessero).
+func _migra_14_a_15(doc: Dictionary) -> Dictionary:
+	var vecchio: Variant = doc.get("equipaggiamento", {})
+	if typeof(vecchio) != TYPE_DICTIONARY or not vecchio.has("slot"):
+		doc["equipaggiamento"] = {
+			"slot": vecchio if typeof(vecchio) == TYPE_DICTIONARY else {},
+			"sigilli": {},
+		}
 	return doc
 
 
