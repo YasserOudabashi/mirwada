@@ -173,6 +173,25 @@ func comportamenti_sbloccati() -> Array:
 	return out
 
 
+## Tag della specie del pet attivo + dei comportamenti gia' sbloccati
+## (US-334: fonte per il motore sinergie, come Equipment/TalentSystem).
+## {} se nessun pet.
+func tag_attivi() -> Dictionary:
+	var out: Dictionary = {}
+	if _pet.is_empty():
+		return out
+	var specie: Dictionary = _specie(str(_pet.get("pet_id", "")))
+	for t in specie.get("tag", []):
+		out[t] = int(out.get(t, 0)) + 1
+	var sbloccati: Array = comportamenti_sbloccati()
+	for comp in specie.get("comportamenti", []):
+		var d: Dictionary = comp
+		if sbloccati.has(str(d.get("id", ""))):
+			for t in d.get("tag", []):
+				out[t] = int(out.get(t, 0)) + 1
+	return out
+
+
 func _su_evento(nome: String, dati: Dictionary) -> void:
 	if _pet.is_empty():
 		return

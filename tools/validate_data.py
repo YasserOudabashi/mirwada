@@ -706,11 +706,19 @@ def main():
                 if p.get("ancora_id") not in anchor_ids:
                     err(f"{rel} [{pid}]: ancora_id '{p.get('ancora_id')}' non risolve a un'Ancora "
                         f"(il pet E' un'Ancora, US-321)")
+                for t in p.get("tag", []):
+                    if t not in valid_tags:
+                        err(f"{rel} [{pid}]: tag sconosciuto '{t}'")
+                    obtainable_tags.add(t)
                 for comp in p.get("comportamenti", []):
                     if not isinstance(comp.get("soglia_bond"), int) or not (0 <= comp.get("soglia_bond", -1) <= 100):
                         err(f"{rel} [{pid}]: comportamento con soglia_bond fuori 0..100")
                     if not isinstance(comp.get("id"), str) or not comp.get("id"):
                         err(f"{rel} [{pid}]: comportamento senza 'id'")
+                    for t in comp.get("tag", []):
+                        if t not in valid_tags:
+                            err(f"{rel} [{pid}]: comportamento '{comp.get('id')}' ha un tag sconosciuto '{t}'")
+                        obtainable_tags.add(t)
                 for aid in p.get("abilita", []):
                     if ability_ids and aid not in ability_ids:
                         err(f"{rel} [{pid}]: abilita '{aid}' non risolve")
@@ -922,6 +930,10 @@ def main():
     if set(rooms.keys()) != room_types:
         err(f"data/base/rooms.json: tipi {sorted(rooms.keys())}, attesi esattamente {sorted(room_types)}")
     for tipo, room in rooms.items():
+        for t in room.get("tag", []):
+            if t not in valid_tags:
+                err(f"data/base/rooms.json [{tipo}]: tag sconosciuto '{t}'")
+            obtainable_tags.add(t)
         livelli = room.get("livelli", [])
         if not livelli:
             err(f"data/base/rooms.json [{tipo}]: nessun livello")

@@ -62,6 +62,21 @@ func pulisci() -> void:
 	_appezzamenti.clear()
 
 
+## Tag delle stanze costruite (livello > 0, US-334: fonte per il motore
+## sinergie). Ogni stanza costruita conta 1, qualunque il suo livello.
+func tag_attivi() -> Dictionary:
+	var out: Dictionary = {}
+	var gd: Node = _gd()
+	if gd == null:
+		return out
+	for tipo in gd.call("room_types"):
+		if livello(str(tipo)) <= 0:
+			continue
+		for t in (gd.call("get_room_type", tipo) as Dictionary).get("tag", []):
+			out[t] = int(out.get(t, 0)) + 1
+	return out
+
+
 # --- Giardino (US-328) -------------------------------------------------
 
 ## Pianta item_id nel primo appezzamento libero (ce ne sono quanti il

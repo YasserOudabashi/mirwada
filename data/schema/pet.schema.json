@@ -8,7 +8,8 @@
     "sequenza_iniziale": "int 0..9, la Sequenza del pet appena domato",
     "domabilita": "float 0..1, probabilita' base di successo di PetSystem.doma() (US-322)",
     "ancora_id": "string - il pet E' un'Ancora: deve risolvere a data/anchors.json",
-    "comportamenti": [{"soglia_bond": "int 0..100", "id": "string, sbloccato quando bond >= soglia"}],
+    "tag": "[string] opzionale, dal vocabolario chiuso di data/tags.json - sempre attivi mentre questo pet e' quello domato (PetSystem.tag_attivi(), US-334)",
+    "comportamenti": [{"soglia_bond": "int 0..100", "id": "string, sbloccato quando bond >= soglia", "tag": "[string] opzionale, attivi solo dopo lo sblocco (US-334)"}],
     "abilita": ["ability_id opzionale che il pet puo' eseguire - array vuoto finche' non esistono abilita' dedicate ai pet"],
     "curva_hp_max": "{ '<sequenza>': numero } opzionale - hp_max per Sequenza quando il pet avanza (US-324); assente = hp_max fisso"
   }

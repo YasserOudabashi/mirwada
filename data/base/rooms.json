@@ -1,26 +1,30 @@
 {
   "schema_version": 1,
-  "_comment": "Livelli delle 4 stanze (US-326). costo da data/items/materiali.json (US-316). bonus: chiavi dal vocabolario chiuso di data/schema/room_bonus_keys.json.",
+  "_comment": "Livelli delle 4 stanze (US-326). costo da data/items/materiali.json (US-316). bonus: chiavi dal vocabolario chiuso di data/schema/room_bonus_keys.json. tag: attivi mentre la stanza e' costruita, qualunque il livello (US-334, BaseSystem.tag_attivi()).",
   "rooms": {
     "laboratorio": {
+      "tag": ["pozione"],
       "livelli": [
         {"livello": 1, "costo": {"lingotto_ferro": 2, "cristallo_grezzo": 1}, "bonus": {"rischio_esperimento": 20, "qualita_pozione": 1}},
         {"livello": 2, "costo": {"lingotto_ferro": 4, "cristallo_grezzo": 3}, "bonus": {"rischio_esperimento": 40, "qualita_pozione": 2}}
       ]
     },
     "stanza_rituale": {
+      "tag": ["rituale"],
       "livelli": [
         {"livello": 1, "costo": {"lingotto_ferro": 3, "cuoio_conciato": 2}, "bonus": {"qualita_forgia": 1}},
         {"livello": 2, "costo": {"lingotto_ferro": 6, "cuoio_conciato": 4}, "bonus": {"qualita_forgia": 2}}
       ]
     },
     "biblioteca": {
+      "tag": ["conoscenza"],
       "livelli": [
         {"livello": 1, "costo": {"cristallo_grezzo": 2}, "bonus": {"ricette_note": []}},
         {"livello": 2, "costo": {"cristallo_grezzo": 5}, "bonus": {"ricette_note": ["ric_cura_maggiore"]}}
       ]
     },
     "giardino": {
+      "tag": ["crescita"],
       "livelli": [
         {"livello": 1, "costo": {"cuoio_conciato": 1}, "bonus": {"resa": 2}},
         {"livello": 2, "costo": {"cuoio_conciato": 3}, "bonus": {"resa": 3}}

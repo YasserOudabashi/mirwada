@@ -33,8 +33,8 @@ func test_imposta_pet() -> void:
 	var p: Dictionary = ps.call("pet_attivo")
 	assert_eq(p.get("pet_id"), "lupo_ombra", "specie corretta")
 	assert_almost_eq(float(p.get("hp")), 40.0, "hp = hp_max della specie")
-	assert_eq(int(p.get("sequenza")), 8, "sequenza_iniziale della specie")
-	assert_eq(ps.call("sequenza_pet"), 8, "sequenza_pet legge lo stato")
+	assert_eq(int(p.get("sequenza")), 9, "sequenza_iniziale della specie")
+	assert_eq(ps.call("sequenza_pet"), 9, "sequenza_pet legge lo stato")
 
 
 func test_specie_ignota_non_imposta() -> void:
@@ -61,3 +61,20 @@ func test_da_salvataggio_non_fidato() -> void:
 	assert_true(ps.call("pet_attivo").is_empty(), "raw non-oggetto -> nessun pet")
 	ps.call("da_salvataggio", {"pet_id": "specie_inventata"})
 	assert_true(ps.call("pet_attivo").is_empty(), "pet_id ignoto -> nessun pet")
+
+
+## US-334: tag della specie sempre attivi, tag dei comportamenti solo dopo
+## lo sblocco (bond >= soglia).
+func test_tag_attivi_specie_e_comportamenti_sbloccati() -> void:
+	var ps: Node = _n("/root/PetSystem")
+	assert_true((ps.call("tag_attivi") as Dictionary).is_empty(), "nessun pet -> nessun tag")
+
+	ps.call("imposta_pet", "lupo_ombra")
+	var tag: Dictionary = ps.call("tag_attivi")
+	assert_true(tag.has("crescita"), "il tag della specie e' subito attivo")
+	assert_false(tag.has("analisi"), "il tag del comportamento non ancora sbloccato non conta")
+
+	ps.call("da_salvataggio", {"pet_id": "lupo_ombra", "bond": 20.0, "sequenza": 9})
+	tag = ps.call("tag_attivi")
+	assert_true(tag.has("analisi"), "sbloccato fiuto_base a bond 20: il suo tag conta")
+	assert_false(tag.has("guerra"), "carica_assistita (soglia 60) resta bloccato")

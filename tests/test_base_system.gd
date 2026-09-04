@@ -96,3 +96,21 @@ func test_da_salvataggio_non_fidato() -> void:
 	bs.call("da_salvataggio", {"stanza_inventata": 3, "laboratorio": 99})
 	assert_eq(bs.call("livello", "stanza_inventata"), 0, "tipo fuori vocabolario scartato")
 	assert_eq(bs.call("livello", "laboratorio"), 2, "livello oltre il massimo dei dati clampato (2 livelli)")
+
+
+## US-334: solo le stanze costruite contano, qualunque il loro livello.
+func test_tag_attivi_solo_stanze_costruite() -> void:
+	var bs: Node = _n("/root/BaseSystem")
+	var inv: Node = _n("/root/Inventory")
+	assert_true((bs.call("tag_attivi") as Dictionary).is_empty(), "niente costruito -> nessun tag")
+
+	inv.call("aggiungi", "lingotto_ferro", 6)
+	inv.call("aggiungi", "cristallo_grezzo", 4)
+	bs.call("costruisci", "laboratorio")
+	var tag: Dictionary = bs.call("tag_attivi")
+	assert_true(tag.has("pozione"), "il tag del laboratorio costruito conta")
+	assert_eq(int(tag["pozione"]), 1, "un solo laboratorio -> conta 1, non il livello")
+
+	bs.call("potenzia", "laboratorio")
+	assert_eq(int((bs.call("tag_attivi") as Dictionary).get("pozione", 0)), 1,
+		"il potenziamento non cambia il conteggio, il tag e' per stanza non per livello")

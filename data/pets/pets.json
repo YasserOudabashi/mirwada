@@ -9,9 +9,10 @@
       "sequenza_iniziale": 9,
       "domabilita": 0.6,
       "ancora_id": "anchor_pet_lupo_ombra",
+      "tag": ["bestia", "crescita"],
       "comportamenti": [
-        {"soglia_bond": 20, "id": "fiuto_base"},
-        {"soglia_bond": 60, "id": "carica_assistita"}
+        {"soglia_bond": 20, "id": "fiuto_base", "tag": ["analisi"]},
+        {"soglia_bond": 60, "id": "carica_assistita", "tag": ["guerra"]}
       ],
       "abilita": [],
       "curva_hp_max": {"9": 40, "8": 46, "7": 52, "6": 58}
@@ -23,9 +24,10 @@
       "sequenza_iniziale": 9,
       "domabilita": 0.8,
       "ancora_id": "anchor_pet_corvo",
+      "tag": ["bestia", "predizione"],
       "comportamenti": [
-        {"soglia_bond": 15, "id": "avvistamento"},
-        {"soglia_bond": 50, "id": "predizione_minore"}
+        {"soglia_bond": 15, "id": "avvistamento", "tag": ["analisi"]},
+        {"soglia_bond": 50, "id": "predizione_minore", "tag": ["divinazione"]}
       ],
       "abilita": [],
       "curva_hp_max": {"9": 22, "8": 26, "7": 30}

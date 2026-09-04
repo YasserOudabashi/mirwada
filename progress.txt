@@ -3706,3 +3706,62 @@ sezione test aggiornata.
   nemmeno la suite headless e' eseguibile qui. Resta da confermare quando
   gira in CI.
 - Prossima storia: US-334 (il pet e i talenti come fonti di sinergia).
+
+[2026-09-04] US-334 — Il pet e i talenti come fonti di sinergia
+
+- PetSystem.tag_attivi(): tag della specie del pet attivo (sempre) + tag dei
+  comportamenti gia' sbloccati, riusando comportamenti_sbloccati() gia'
+  esistente da US-323. {} se nessun pet.
+- BaseSystem.tag_attivi(): un conteggio per ogni stanza con livello>0 - il
+  tag e' per stanza costruita, non per livello (potenziare non lo cambia,
+  coerente con com'e' gia' bonus() per il resto).
+- TalentSystem.tag_attivi() esisteva gia' da US-331: nessun codice nuovo li',
+  solo verificato che il contratto regga.
+- Nuovo autoload SynergySources (scripts/synergy_sources.gd, registrato in
+  project.godot subito dopo TalentSystem): tag_sinergia_globali() somma i
+  tag_attivi() di Inventory (= Equipment: equip indossato + sigilli
+  incastonati, gia' US-306/317), PetSystem, TalentSystem, BaseSystem. Solo
+  aggregazione - NON risolve sinergie (richiede_tag, effetti): quello resta
+  fase 4, come da criterio di accettazione.
+- Dati: campo 'tag' (vocabolario chiuso di data/tags.json) aggiunto a
+  livello di specie e di comportamento in data/pets/pets.json (lupo_ombra:
+  bestia+crescita, fiuto_base: analisi, carica_assistita: guerra;
+  corvo_predittivo: bestia+predizione, avvistamento: analisi,
+  predizione_minore: divinazione), e a livello di tipo-stanza in
+  data/base/rooms.json (laboratorio: pozione, stanza_rituale: rituale,
+  biblioteca: conoscenza, giardino: crescita). tools/validate_data.py:
+  nuovi controlli su questi tag (vocabolario chiuso + accumulo in
+  obtainable_tags), stesso meccanismo gia' usato per pathway/abilita'/
+  talenti/strutture.
+- sinergia_crescita_pozione (richiede crescita:2, pozione:2) era GIA' non
+  segnalata come irraggiungibile PRIMA di questa story - crescita e pozione
+  erano gia' tag ottenibili da item/abilita' esistenti (obtainable_tags e'
+  un controllo sul VOCABOLARIO usato in build, non sulla raggiungibilita'
+  multi-fonte in gameplay). Verificato col validator prima e dopo: 9
+  warning, invariati. La story aggiunge comunque delle fonti concrete
+  pet+stanza+talento che il test headless usa per DIMOSTRARE la
+  raggiungibilita' per davvero in gameplay (pollice_verde + giardino +
+  lupo_ombra + laboratorio sommano crescita:2/pozione:2 - il disegno
+  gia' previsto da US-330, vedi nota li').
+- Trovato e corretto un bug preesistente in tests/test_pet_system.gd:
+  test_imposta_pet si aspettava ancora sequenza 8 per un lupo_ombra appena
+  impostato, ma sequenza_iniziale e' 9 dal fix di US-324 (gia' rotto in CI,
+  indipendente da questa story - corretto perche' stavo gia' toccando
+  questo file per il nuovo test di tag_attivi()).
+- Nuovi/estesi test: tests/test_pet_system.gd (+1: tag di specie subito
+  attivo, tag di comportamento solo dopo lo sblocco), tests/
+  test_base_system.gd (+1: solo le stanze costruite contano, il livello
+  no), tests/test_synergy_sources.gd (3 nuovi: nessuna fonte -> {}; la
+  somma di pet+stanze+talenti e' corretta; sinergia_crescita_pozione e'
+  raggiungibile leggendo richiede_tag da GameData.get_synergy() e
+  confrontandolo con tag_sinergia_globali()).
+- Come verificato: python tools/validate_data.py esce 0 (9 warning
+  preesistenti, invariati). JSON validi (pets.json, rooms.json, i due
+  schema aggiornati, prd.json). Controllo di bilanciamento parentesi via
+  script python su tutti i file GDScript toccati. Lettura per intero di
+  ogni file editato per coerenza di stile con Equipment.tag_attivi()/
+  Inventory.tag_attivi() gia' esistenti.
+- VERIFICA A SCHERMO: non applicabile - story solo API/dati, nessuna UI
+  coinvolta. Godot non e' installato in questa sessione remota: non ho
+  potuto eseguire la suite headless.
+- Prossima storia: US-335 (vertical slice della fase 3).
