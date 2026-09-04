@@ -104,6 +104,14 @@ func _base() -> Node:
 	return get_node_or_null("/root/BaseSystem")
 
 
+func _talenti() -> Node:
+	return get_node_or_null("/root/TalentSystem")
+
+
+func _talent_tracker() -> Node:
+	return get_node_or_null("/root/TalentTracker")
+
+
 func salva_rapido() -> Dictionary:
 	return salva_slot(SLOT_RAPIDO)
 
@@ -190,6 +198,12 @@ func snapshot() -> Dictionary:
 		"strutture": _strutture().per_salvataggio() if _strutture() != null else [],
 		"pet": _pet().per_salvataggio() if _pet() != null else {},
 		"base": _base().per_salvataggio() if _base() != null else {},
+		# {posseduti} + {log} nello stesso blob: TalentSystem/TalentTracker.
+		# da_salvataggio() leggono ognuno solo la propria chiave (US-331).
+		"talenti": {
+			"posseduti": (_talenti().per_salvataggio() as Dictionary).get("posseduti", []) if _talenti() != null else [],
+			"log": (_talent_tracker().per_salvataggio() as Dictionary).get("log", []) if _talent_tracker() != null else [],
+		},
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D:
@@ -240,6 +254,10 @@ func applica(dati: Dictionary) -> void:
 		_pet().da_salvataggio(dati.get("pet", {}))
 	if _base() != null:
 		_base().da_salvataggio(dati.get("base", {}))
+	if _talenti() != null:
+		_talenti().da_salvataggio(dati.get("talenti", {}))
+	if _talent_tracker() != null:
+		_talent_tracker().da_salvataggio(dati.get("talenti", {}))
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D and dati.has("posizione"):
 		(p as Node2D).global_position = dati["posizione"]

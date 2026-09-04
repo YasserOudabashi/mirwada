@@ -204,6 +204,7 @@ func prepara(recipe_id: String) -> Dictionary:
 	var out_id: String = str(r.get("output", {}).get("item_id", ""))
 	if not out_id.is_empty():
 		inv.call("aggiungi", out_id, 1)
+	_traccia_item_crafted("consumabile", qualita)
 	pozione_preparata.emit(recipe_id, out_id, qualita)
 	return {"ok": true, "reason": "", "item_id": out_id, "qualita": qualita}
 
@@ -378,3 +379,15 @@ func _bonus_talento(chiave: String) -> int:
 
 func _gd() -> Node:
 	return get_node_or_null("/root/GameData")
+
+
+## US-331: item_crafted (uno dei 12 tracked_events) alimenta gli sblocco dei
+## talenti di crafting (es. sperimentatore_temerario). qualita e' un tier
+## della scala (stringa); il filtro qualita_min lavora su numeri, quindi si
+## passa l'indice sulla scala, non il nome.
+func _traccia_item_crafted(categoria: String, qualita: String) -> void:
+	var et: Node = get_node_or_null("/root/EventTracker")
+	if et == null:
+		return
+	var indice: int = maxi(0, (_gd().call("potion_quality") as Array).find(qualita))
+	et.call("emit_event", "item_crafted", {"categoria": categoria, "qualita": indice})

@@ -122,6 +122,9 @@ func raccogli(indice: int) -> bool:
 	if inv != null:
 		inv.call("aggiungi", item_id, resa)
 	_appezzamenti.remove_at(indice)
+	var tt: Node = get_node_or_null("/root/TalentTracker")
+	if tt != null:
+		tt.call("emit_event", "ingredienti_coltivati", {})
 	appezzamento_raccolto.emit(indice, item_id, resa)
 	return true
 

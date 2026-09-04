@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 17
+const VERSIONE_CORRENTE := 18
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -89,6 +89,8 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		"pet": (dati.get("pet", {}) as Dictionary).duplicate(true),
 		# Livelli delle stanze della base (US-326). { tipo: livello }.
 		"base": (dati.get("base", {}) as Dictionary).duplicate(true),
+		# Talenti posseduti + log dei comportamenti-talento (US-330/331).
+		"talenti": (dati.get("talenti", {}) as Dictionary).duplicate(true),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -220,6 +222,8 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_15_a_16(doc)
 			16:
 				doc = _migra_16_a_17(doc)
+			17:
+				doc = _migra_17_a_18(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -346,6 +350,13 @@ func _migra_16_a_17(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v17 -> v18: i talenti (US-330/331). Nessun talento pregresso.
+func _migra_17_a_18(doc: Dictionary) -> Dictionary:
+	if not doc.has("talenti"):
+		doc["talenti"] = {}
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -372,6 +383,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"strutture": _campo(raw, "strutture", TYPE_ARRAY, []),
 		"pet": _campo(raw, "pet", TYPE_DICTIONARY, {}),
 		"base": _campo(raw, "base", TYPE_DICTIONARY, {}),
+		"talenti": _campo(raw, "talenti", TYPE_DICTIONARY, {}),
 	}
 
 

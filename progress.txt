@@ -3575,3 +3575,59 @@ sezione test aggiornata.
   EventTracker.
 - Prossima storia: US-331 (TalentSystem + emettitori dei nuovi
   comportamenti).
+
+[2026-09-04] US-331 — TalentSystem + emettitori dei nuovi comportamenti
+
+- scripts/talent_tracker.gd: autoload TalentTracker, STESSO motore di
+  EventTracker (log + count() con filtri, stesso _corrisponde), vocabolario
+  diverso (GameData.tracked_talents()) - due autoload separati perche' due
+  vocabolari chiusi distinti, non due fasi dello stesso sistema.
+- Autoload TalentSystem: posseduti()/possiede(id); bonus_int(chiave) (somma
+  gli effetti sblocco_sistema con quella chiave fra i posseduti - il gancio
+  che PotionSystem/Forge attendevano da US-310/311/316, ora vivo);
+  tag_attivi() (i tag_grant posseduti, per US-334); concedi(id) (applica
+  l'effetto stat_modifier subito + segnale talento_sbloccato, usato sia per
+  gli innati US-332 sia internamente per gli acquisiti); _su_evento(), un
+  SOLO listener collegato sia a EventTracker.evento_emesso sia a
+  TalentTracker.comportamento_emesso (stesso principio di Acting, fase 2):
+  a ogni evento ricontrolla lo sblocco di tutti gli acquisiti non ancora
+  posseduti, decidendo quale dei due tracker interrogare in base a
+  GameData.get_tracked_event(evento) (vuoto -> e' un comportamento-talento).
+- Emettitori REALI agganciati con adattamento minimo: player.gd
+  (+_traccia_talento, +5 righe: distanza_percorsa accumulata e scaricata a
+  lotti di 8 non un evento per frame; perfect_parry era gia' tracciato da
+  US-210, riutilizzato cosi' com'e' per mano_ferma), BaseSystem.raccogli
+  (+3 righe: ingredienti_coltivati), Inventory.usa (+3 righe:
+  abilita_prestate_usate), PotionSystem.prepara e Forge.forgia (+1 riga
+  ciascuno +helper: item_crafted, un evento dei 12 MAI tracciato finora
+  nonostante 3 talenti ne dipendano - qualita' passata come indice sulla
+  scala, non nome, perche' il filtro qualita_min lavora su numeri).
+- NON collegati (placeholder espliciti, gia' documentati in
+  tracked_talents.json): giocato_di_notte (nessun ciclo giorno/notte prima
+  della fase 6, nessun talento lo usa ancora), sequenze_senza_pozione,
+  rituali_interrotti, nemici_risparmiati (nessun sistema di combattimento
+  non-letale esiste ancora fra i dati attivi - i 2 talenti che ne dipendono
+  restano sbloccabili solo emettendo il comportamento a mano finche' non
+  arriva quel sistema; il meccanismo di sblocco resta comunque generico e
+  corretto, verificato coi comportamenti che HANNO un emettitore vero).
+- SAVE: nuovo campo top-level 'talenti' ({posseduti, log} - un solo blob
+  letto da entrambi gli autoload, ognuno la propria chiave), schema_version
+  17->18, _migra_17_a_18.
+- player.gd: riapplica_al_giocatore() di TalentSystem agganciato in _ready
+  come Progression/Equipment (+3 righe).
+- Come verificato: validator 0 (nessun dato toccato in questa story). Test
+  nuovi: tests/test_talent_system.gd (8) - un comportamento oltre soglia
+  sblocca, applica l'effetto stat_modifier ed emette il segnale con l'id
+  giusto; sotto soglia niente; concedi un innato applica subito l'effetto;
+  concedere due volte o un id ignoto fallisce; tag_attivi riflette un
+  tag_grant posseduto; bonus_int somma l'effetto sblocco_sistema; round-
+  trip del save (isolato su TalentSystem+TalentTracker direttamente, non
+  GameState, lezione gia' documentata in US-317/US-324); da_salvataggio
+  non fidato. tests/test_talent_emettitori.gd (4) - preparare una pozione e
+  forgiare tracciano davvero item_crafted; raccogliere dal giardino
+  traccia ingredienti_coltivati; usare una pergamena traccia
+  abilita_prestate_usate. NON posso eseguire la suite headless in questa
+  sessione (Godot non installato nell'ambiente remoto): verificata a mano
+  la correttezza sintattica su tutti i file toccati e la coerenza col
+  pattern gia' testato di EventTracker/Acting.
+- Prossima storia: US-332 (talenti innati alla creazione personaggio).

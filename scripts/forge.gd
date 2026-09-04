@@ -46,6 +46,7 @@ func forgia(blueprint_id: String) -> Dictionary:
 	var out_id: String = str(b.get("output", ""))
 	var creati: Array = inv.call("aggiungi", out_id, 1)
 	var instance_id: String = str(creati[0]) if not creati.is_empty() else ""
+	_traccia_item_crafted("equip", qualita)
 	oggetto_forgiato.emit(blueprint_id, out_id, qualita)
 	return {"ok": true, "reason": "", "item_id": out_id, "instance_id": instance_id, "qualita": qualita}
 
@@ -78,3 +79,15 @@ func _bonus_talento(chiave: String) -> int:
 
 func _gd() -> Node:
 	return get_node_or_null("/root/GameData")
+
+
+## US-331: item_crafted (uno dei 12 tracked_events) alimenta gli sblocco dei
+## talenti di forgiatura (es. fabbro_indomito). Stesso schema di
+## PotionSystem._traccia_item_crafted: qualita' come indice sulla scala, non
+## come nome, perche' il filtro qualita_min lavora su numeri.
+func _traccia_item_crafted(categoria: String, qualita: String) -> void:
+	var et: Node = get_node_or_null("/root/EventTracker")
+	if et == null:
+		return
+	var indice: int = maxi(0, (_gd().call("potion_quality") as Array).find(qualita))
+	et.call("emit_event", "item_crafted", {"categoria": categoria, "qualita": indice})

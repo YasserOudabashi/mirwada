@@ -44,6 +44,10 @@ var _dash_cd: float = 0.0
 
 var _parando: bool = false
 
+## US-331: distanza_percorsa (talento). Accumulata e scaricata a piccoli
+## lotti, non un evento per frame.
+var _distanza_acc: float = 0.0
+
 @onready var _audio: Node = get_node_or_null("/root/AudioManager")
 
 
@@ -64,6 +68,9 @@ func _ready() -> void:
 	var equip: Node = get_node_or_null("/root/Equipment")
 	if equip != null:
 		equip.call("riapplica_al_giocatore")
+	var talenti: Node = get_node_or_null("/root/TalentSystem")
+	if talenti != null:
+		talenti.call("riapplica_al_giocatore")
 
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd != null:
@@ -111,6 +118,11 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	_aggiorna_animazione()
+
+	_distanza_acc += velocity.length() * delta
+	if _distanza_acc >= 8.0:
+		_traccia_talento("distanza_percorsa", {"quantita": _distanza_acc})
+		_distanza_acc = 0.0
 
 
 ## Direzione guardata come vettore. La cerca ability_engine per orientare
@@ -262,6 +274,14 @@ func _traccia(evento: String, dati: Dictionary) -> void:
 	var et: Node = Engine.get_main_loop().root.get_node_or_null("EventTracker")
 	if et != null:
 		et.call("emit_event", evento, dati)
+
+
+## Come _traccia, ma per i comportamenti-talento (data/schema/tracked_talents.json,
+## US-330/331): vocabolario diverso, tracker diverso.
+func _traccia_talento(evento: String, dati: Dictionary) -> void:
+	var tt: Node = Engine.get_main_loop().root.get_node_or_null("TalentTracker")
+	if tt != null:
+		tt.call("emit_event", evento, dati)
 
 
 ## La direzione dominante decide lo sprite. In obliquo vince l'orizzontale:

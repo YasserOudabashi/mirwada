@@ -117,6 +117,9 @@ func usa(instance_id: String, bersaglio: Node = null) -> Dictionary:
 	if not bool(r.get("ok", false)):
 		return {"ok": false, "reason": str(r.get("reason", "esecuzione_fallita")), "risultato": r}
 	rimuovi_istanza(instance_id)   # consumo: 1 uso
+	var tt: Node = get_node_or_null("/root/TalentTracker")   # US-331
+	if tt != null:
+		tt.call("emit_event", "abilita_prestate_usate", {})
 	return {"ok": true, "reason": "", "risultato": r}
 
 
