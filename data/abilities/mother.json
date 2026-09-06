@@ -324,6 +324,232 @@
         "singolo"
       ],
       "note": "Trasmuta materia inerte in tessuto vivo: cura piena e corpo piu' saldo."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_drenaggio_vitale",
+      "name_i18n": "ability.mother.mother_drenaggio_vitale",
+      "sequence_id": "mother_3",
+      "costo_spiritualita": 20,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "dot",
+          "danno_tick": 15,
+          "tick_rate": 1.0,
+          "durata": 8.0,
+          "tag_danno": "decadimento"
+        },
+        {
+          "tipo": "heal",
+          "quantita": 30,
+          "istantaneo": true,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "crescita",
+        "decadimento",
+        "singolo"
+      ],
+      "note": "Il Pallbearer drena la forza vitale del nemico e la restituisce a se'."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_restituzione",
+      "name_i18n": "ability.mother.mother_restituzione",
+      "sequence_id": "mother_3",
+      "costo_spiritualita": 18,
+      "cooldown": 24.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 10,
+          "durata": 15.0,
+          "effetto": "area_viva",
+          "tick_rate": 2.0,
+          "bersagli": "alleati"
+        },
+        {
+          "tipo": "heal",
+          "quantita": 5,
+          "istantaneo": false,
+          "durata": 15.0,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "crescita",
+        "guarigione",
+        "area"
+      ],
+      "note": "Quello che si drena si restituisce alla terra e a chi vi cammina."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_chimera_su_misura",
+      "name_i18n": "ability.mother.mother_chimera_su_misura",
+      "sequence_id": "mother_2",
+      "costo_spiritualita": 36,
+      "cooldown": 90.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "chimera_su_misura",
+          "quantita": 1,
+          "durata": -1,
+          "comportamento": "aggressivo"
+        }
+      ],
+      "tag_sinergia": [
+        "genetica",
+        "bestia",
+        "evocazione"
+      ],
+      "note": "La Desolate Matriarch crea esseri viventi da zero, su misura. durata -1: la chimera resta, entra nel save."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_madre_dei_mostri",
+      "name_i18n": "ability.mother.mother_madre_dei_mostri",
+      "sequence_id": "mother_2",
+      "costo_spiritualita": 30,
+      "cooldown": 45.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "spiritualita_max",
+          "valore": 0.2,
+          "durata": 20.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "summon",
+          "entita_id": "chimera_prole",
+          "quantita": 3,
+          "durata": 30.0,
+          "comportamento": "aggressivo"
+        }
+      ],
+      "tag_sinergia": [
+        "genetica",
+        "evocazione",
+        "area"
+      ],
+      "note": "Una nidiata di prole: tre chimere e la forza spirituale per comandarle."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_natura_risponde",
+      "name_i18n": "ability.mother.mother_natura_risponde",
+      "sequence_id": "mother_1",
+      "costo_spiritualita": 32,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "terreno_vivo",
+          "raggio": 8,
+          "durata": 20.0,
+          "permanente": false
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "forza",
+          "valore": 0.3,
+          "durata": 20.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "terra",
+        "forza",
+        "area"
+      ],
+      "note": "La Naturewalker non comanda la natura con rituali: le basta chiedere. Il terreno si anima e la rende piu' forte."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_camminatrice",
+      "name_i18n": "ability.mother.mother_camminatrice",
+      "sequence_id": "mother_1",
+      "costo_spiritualita": 20,
+      "cooldown": 22.0,
+      "primitive": [
+        {
+          "tipo": "heal",
+          "quantita": 8,
+          "istantaneo": false,
+          "durata": 20.0,
+          "bersaglio": "self"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "velocita",
+          "valore": 0.15,
+          "durata": 20.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "crescita",
+        "guarigione",
+        "singolo"
+      ],
+      "note": "Camminare nel bosco cura: la Naturewalker non si ferma mai a lungo."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_dominio_della_terra",
+      "name_i18n": "ability.mother.mother_dominio_della_terra",
+      "sequence_id": "mother_0",
+      "costo_spiritualita": 55,
+      "cooldown": 60.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 16,
+          "durata": -1,
+          "effetto": "decadimento",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        }
+      ],
+      "tag_sinergia": [
+        "terra",
+        "dominio",
+        "area"
+      ],
+      "note": "La terra come dominio: tutto cio' che le si oppone marcisce."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_rinascita",
+      "name_i18n": "ability.mother.mother_rinascita",
+      "sequence_id": "mother_0",
+      "costo_spiritualita": 50,
+      "cooldown": 50.0,
+      "primitive": [
+        {
+          "tipo": "heal",
+          "quantita": 150,
+          "istantaneo": true,
+          "bersaglio": "self"
+        },
+        {
+          "tipo": "plant_growth",
+          "raggio": 12,
+          "specie": "eden",
+          "velocita": 5.0,
+          "persistente": true
+        }
+      ],
+      "tag_sinergia": [
+        "crescita",
+        "guarigione",
+        "terra"
+      ],
+      "note": "Dove passa, un giardino. La rinascita e' permanente: entra nel mondo."
     }
   ]
 }

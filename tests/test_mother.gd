@@ -15,6 +15,12 @@ const ABILITA_6_4 := [
 	"mother_dominio_druidico", "mother_muraglia_di_rovi",
 	"mother_omuncolo", "mother_materia_vivente",
 ]
+const ABILITA_3_0 := [
+	"mother_drenaggio_vitale", "mother_restituzione",
+	"mother_chimera_su_misura", "mother_madre_dei_mostri",
+	"mother_natura_risponde", "mother_camminatrice",
+	"mother_dominio_della_terra", "mother_rinascita",
+]
 
 
 func _engine() -> Node:
@@ -112,14 +118,36 @@ func test_mother_4_ha_un_rituale() -> void:
 			"mother_4 (Seq <= 4) ha un advancement_ritual")
 
 
-func test_mother_9_4_sono_contenuto() -> void:
+func test_ogni_abilita_mother_3_0_si_esegue_senza_warning() -> void:
+	var e: Node = _engine()
+	for aid in ABILITA_3_0:
+		var c: Node2D = _caster()
+		var r: Dictionary = e.call("execute", aid, c)
+		assert_true(r["ok"], "%s eseguita" % aid)
+		assert_eq((r["warnings"] as PackedStringArray).size(), 0,
+			"%s: nessun warning di primitiva: %s" % [aid, r["warnings"]])
+		e.call("clear_cooldowns")
+		_cleanup(c)
+	var reg: Node = Engine.get_main_loop().root.get_node_or_null("SummonRegistry")
+	if reg != null:
+		reg.call("pulisci")
+	if _ws() != null:
+		_ws().call("pulisci")
+
+
+func test_tutte_le_10_sequenze_mother_sono_contenuto() -> void:
 	var pw: Dictionary = _gd().call("get_pathway", "mother")
+	var madness_prec: float = -1.0
 	for seq in (pw.get("sequences", []) as Array):
-		var n: int = int((seq as Dictionary).get("sequence", -1))
-		if n < 4 or n > 9:
-			continue
-		assert_false(bool((seq as Dictionary).get("stub", false)), "mother_%d non e' piu' stub" % n)
+		var d: Dictionary = seq
+		var n: int = int(d.get("sequence"))
+		assert_false(bool(d.get("stub", false)), "mother_%d non e' piu' stub" % n)
 		var somma: float = 0.0
-		for a in ((seq as Dictionary).get("acting_actions", []) as Array):
+		for a in (d.get("acting_actions", []) as Array):
 			somma += float((a as Dictionary).get("progresso", 0.0))
 		assert_almost_eq(somma, 1.0, "mother_%d: acting sommano 1.0" % n)
+		assert_false((_gd().call("get_formula", "formula_mother_%d" % n) as Dictionary).is_empty(),
+			"formula_mother_%d esiste" % n)
+		var mf: float = float(d.get("madness_on_force", 0.0))
+		assert_gt(mf, madness_prec, "mother_%d: madness_on_force cresce" % n)
+		madness_prec = mf

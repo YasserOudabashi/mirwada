@@ -223,6 +223,30 @@
       "pathway_id": "mother",
       "sequence": 4,
       "name_i18n": "characteristic.mother.4"
+    },
+    {
+      "id": "char_mother_3",
+      "pathway_id": "mother",
+      "sequence": 3,
+      "name_i18n": "characteristic.mother.3"
+    },
+    {
+      "id": "char_mother_2",
+      "pathway_id": "mother",
+      "sequence": 2,
+      "name_i18n": "characteristic.mother.2"
+    },
+    {
+      "id": "char_mother_1",
+      "pathway_id": "mother",
+      "sequence": 1,
+      "name_i18n": "characteristic.mother.1"
+    },
+    {
+      "id": "char_mother_0",
+      "pathway_id": "mother",
+      "sequence": 0,
+      "name_i18n": "characteristic.mother.0"
     }
   ]
 }

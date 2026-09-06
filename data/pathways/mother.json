@@ -422,24 +422,74 @@
       "name_i18n": "sequence.mother.3",
       "tier": "saint",
       "concept": "Drena forza vitale dai nemici e dall'ambiente, restituendola alla terra.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 250,
+        "spiritualita_max": 0.35
+      },
+      "abilities": [
+        "mother_drenaggio_vitale",
+        "mother_restituzione"
+      ],
+      "acting_actions": [
+        {
+          "id": "mother_3_becchino",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_drenaggio_vitale"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_3_becchino",
+          "descrizione": "Drena 15 volte"
+        },
+        {
+          "id": "mother_3_ciclo",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 20,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_3_ciclo",
+          "descrizione": "Sconfiggi 20 nemici restituendo alla terra"
+        },
+        {
+          "id": "mother_3_decadenza",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "decadimento"
+          },
+          "target": 5000,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_3_decadenza",
+          "descrizione": "Infliggi 5000 danni da decadimento"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 3,
-        "ingredients": [],
+        "ingredients": [
+          "cenere_di_bosco",
+          "radice_che_beve",
+          "ultima_foglia_dell_autunno"
+        ],
         "formula_id": "formula_mother_3"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "altare_di_radici",
+          "luogo_in_decadenza"
+        ],
+        "momento": "crepuscolo",
+        "fase_lunare": "calante",
+        "sacrifices": [
+          "la_forza_vitale_di_un_bosco_che_hai_fatto_crescere"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 9.7,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 2,
@@ -448,24 +498,73 @@
       "name_i18n": "sequence.mother.2",
       "tier": "angel",
       "concept": "Crea esseri viventi da zero: chimere su misura per il giocatore.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 400,
+        "spiritualita_max": 0.45
+      },
+      "abilities": [
+        "mother_chimera_su_misura",
+        "mother_madre_dei_mostri"
+      ],
+      "acting_actions": [
+        {
+          "id": "mother_2_matriarca",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_chimera_su_misura"
+          },
+          "target": 8,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_2_matriarca",
+          "descrizione": "Crea 8 chimere su misura"
+        },
+        {
+          "id": "mother_2_nidiata",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 20,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_2_nidiata",
+          "descrizione": "Sconfiggi 20 nemici con la prole"
+        },
+        {
+          "id": "mother_2_madre",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_madre_dei_mostri"
+          },
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_2_madre",
+          "descrizione": "Genera 10 nidiate"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 2,
-        "ingredients": [],
+        "ingredients": [
+          "placenta_di_pietra",
+          "codice_della_vita_inciso",
+          "sangue_di_ogni_bestia"
+        ],
         "formula_id": "formula_mother_2"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "bosco_antico"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "nuova",
+        "sacrifices": [
+          "una_delle_tue_chimere_persistenti"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 11.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 1,
@@ -474,24 +573,75 @@
       "name_i18n": "sequence.mother.1",
       "tier": "angel",
       "concept": "La natura risponde ai suoi comandi senza bisogno di rituali.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 600,
+        "forza": 12,
+        "difesa": 0.3
+      },
+      "abilities": [
+        "mother_natura_risponde",
+        "mother_camminatrice"
+      ],
+      "acting_actions": [
+        {
+          "id": "mother_1_camminatrice",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_natura_risponde"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_1_camminatrice",
+          "descrizione": "Fai rispondere la natura 15 volte"
+        },
+        {
+          "id": "mother_1_sovrana",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_1_sovrana",
+          "descrizione": "Sconfiggi 15 nemici col terreno che ti obbedisce"
+        },
+        {
+          "id": "mother_1_nomade",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_camminatrice"
+          },
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_1_nomade",
+          "descrizione": "Cammina e curati 12 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 1,
-        "ingredients": [],
+        "ingredients": [
+          "polline_dorato",
+          "spina_dell_ultimo_inverno",
+          "radice_maestra"
+        ],
         "formula_id": "formula_mother_1"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "bosco_antico",
+          "sorgente"
+        ],
+        "momento": "alba",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "ancora_del_giocatore"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 12.6,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 0,
@@ -500,24 +650,74 @@
       "name_i18n": "sequence.mother.0",
       "tier": "god",
       "concept": "La terra come dominio.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 900,
+        "difesa": 0.6,
+        "spiritualita_max": 0.7
+      },
+      "abilities": [
+        "mother_dominio_della_terra",
+        "mother_rinascita"
+      ],
+      "acting_actions": [
+        {
+          "id": "mother_0_terra",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_dominio_della_terra"
+          },
+          "target": 5,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_0_terra",
+          "descrizione": "Imponi il dominio della terra 5 volte"
+        },
+        {
+          "id": "mother_0_mietitura",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 30,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_0_mietitura",
+          "descrizione": "Sconfiggi 30 nemici"
+        },
+        {
+          "id": "mother_0_eden",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_rinascita"
+          },
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_0_eden",
+          "descrizione": "Fai rinascere un eden 10 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 0,
-        "ingredients": [],
+        "ingredients": [
+          "seme_del_primo_giorno",
+          "respiro_della_foresta_del_mondo",
+          "cuore_del_pianeta"
+        ],
         "formula_id": "formula_mother_0"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "altare_di_radici"
+        ],
+        "momento": "alba",
+        "fase_lunare": "eclissi",
+        "sacrifices": [
+          "il_detentore_precedente_della_sequenza_0"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 14.0,
       "notes": "",
-      "stub": true
+      "stub": false
     }
   ]
 }

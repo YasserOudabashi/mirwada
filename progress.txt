@@ -4942,3 +4942,31 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - Prossima storia: US-514 (Mother Seq 3-0: Pallbearer / Desolate Matriarch /
   Naturewalker / Mother - drenaggio d'area, chimere permanenti, la natura
   che risponde senza rituali). Chiude il BLOCCO 3.
+
+[2026-09-06] US-514 — Mother Sequenze 3-0 (Pallbearer / Desolate Matriarch / Naturewalker / Mother). BLOCCO 3 CHIUSO. MOTHER COMPLETO.
+
+- NESSUNA primitiva nuova. Mother Seq 3/2/1/0 (stub -> false). MOTHER COMPLETO:
+  10/10 Sequenze.
+  * mother_drenaggio_vitale (dot decadimento + heal self), mother_restituzione
+    (aura area_viva + heal), mother_chimera_su_misura (summon durata -1 -
+    chimera permanente nel save), mother_madre_dei_mostri (buff + summon x3),
+    mother_natura_risponde (terrain_modify terreno_vivo + buff forza - "la
+    natura risponde senza rituali"), mother_camminatrice (heal + buff velocita),
+    mother_dominio_della_terra (aura persistente decadimento), mother_rinascita
+    (heal 150 + plant_growth persistente "eden").
+  * acting somma 1.0. madness 9.7/11.0/12.6/14.0.
+  * rituali Seq 3/2/1/0; Seq 2 sacrifica una chimera persistente, Seq 1
+    ancora_del_giocatore, Seq 0 il_detentore_precedente.
+  * formule formula_mother_3/2/1/0 + 12 ingredienti; char_mother_3/2/1/0.
+- i18n: 8 abilita' + 4 caratteristiche tradotte. 59 TODO.
+- Come verificato: 562 test headless (561 + 1 in test_mother.gd: le 8 abilita'
+  Seq 3-0 eseguono a 0 warning; tutte e 10 le Sequenze Mother non-stub,
+  acting 1.0, formule presenti, madness_on_force strettamente crescente).
+  validate exit 0 (3 warning).
+- BLOCCO 3 CHIUSO: US-512/513/514. Mother completo (10 Sequenze).
+  1 primitiva nuova (plant_growth) + 1 status (area_viva).
+- Fase 5: 14/22. Pathway completi: Death, Moon, Mother (+ TG di fase 2).
+  41 Sequenze non-stub su 100 (10 TG + fool_9 + 30 dei 3 Pathway nuovi).
+- Prossima storia: US-515 (BLOCCO 4 - Paragon Seq 9-7: Savant / Archaeologist
+  / Appraiser + reveal_info gia' implementata (US-505), gancio al sistema
+  sigilli di fase 3).
