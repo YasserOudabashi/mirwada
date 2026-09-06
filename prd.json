@@ -33,8 +33,8 @@
       ],
       "priority": 2,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 0. data/schema/ownership.json (NUOVO): la matrice di design-master cap.4 nel _comment + summon_materie_prime [cadavere, non_morto, spirito, costrutto, pet, bestia, chimera, omuncolo, evocazione] e tag_vietati_pathway_attivi [sogno]. validate_data.py: (1) ogni summon.entita_id deve iniziare per <materia>_ (startswith, non split: non_morto ha un underscore) - i 3 summon esistenti passano; (2) reveal_info/mind_read con sequence_id non hermit_* deve avere categoria - i 4 esistenti fuori Hermit ce l hanno; (3) il tag sogno vietato nei tags dei Pathway attivi e nei tag_sinergia. Verificato che i 3 check scattano. validate exit 0 (8 warning), 535 test verdi."
     },
     {
       "id": "US-503",
@@ -50,8 +50,8 @@
       ],
       "priority": 3,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 0. La riscrittura vera era gia stata fatta da US-228 (design-master cap.4): darkness_sfortuna_cronica = curse(sfortuna) + 2x debuff_stat (evasione/precisione) + dot(follia), nessun probability_shift. darkness_1 resta stub. tests/test_darkness_1.gd (5 test) copre gia tutto. Questa story: aggiunto il campo descrizione allo status sfortuna col feel; verificato 0 usi di probability_shift in data/abilities/ (solo citata nelle note). validate exit 0, 535 test verdi."
     },
     {
       "id": "US-504",
@@ -65,8 +65,8 @@
       ],
       "priority": 4,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 0 CHIUSO. validate_data.py: somma progresso > 1.0 -> ERRORE (era warning), salvo acting_surplus_voluto in notes. twilight_giant.json: 5 Sequenze normalizzate a 1.0 (seq5 0.5/0.3/0.2, seq4 0.4/0.35/0.25, seq3 0.4/0.35/0.25, seq2 0.5/0.25/0.25, seq1 0.5/0.25/0.25), pesi relativi preservati. Verificato che l eccezione funziona. validate exit 0, warning da 8 a 3. 535 test verdi. BLOCCO 0 chiuso (US-501..504)."
     },
     {
       "id": "US-505",
