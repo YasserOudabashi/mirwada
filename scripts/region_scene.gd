@@ -161,6 +161,9 @@ func _su_ingresso_zona(body: Node, location_tag: String) -> void:
 	if location_tag == _tag_corrente:
 		return
 	_tag_corrente = location_tag
+	var ws: Node = get_node_or_null("/root/WorldState")
+	if ws != null:
+		ws.call("imposta_zona", location_tag)
 	zona_cambiata.emit(location_tag)
 
 

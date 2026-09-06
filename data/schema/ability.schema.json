@@ -31,8 +31,10 @@
         "required": ["tipo", "valore"],
         "properties": {
           "tipo": {
+            "_comment": "follia_min / reputazione_min / flag sono per i DIALOGHI (US-613): entrano nell'enum condiviso (FR-3, un solo vocabolario di condizioni) ma nessuna abilita' li usa - il validator lo verifica.",
             "enum": ["acting_progress_min", "madness_max", "madness_min", "e_notte",
-                     "fase_lunare", "foundation_min", "tier_min", "in_zona_tag"]
+                     "fase_lunare", "foundation_min", "tier_min", "in_zona_tag",
+                     "follia_min", "reputazione_min", "flag"]
           },
           "valore": {}
         }

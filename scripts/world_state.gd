@@ -22,6 +22,11 @@ var _terrain_mods: Array = []
 var _regione: String = ""
 var _scoperte: Array = []   # id di regione, stringhe
 var _gate_aperti: Array = []  # id di gate, stringhe
+## Il location_tag della zona in cui si trova il giocatore ("" fuori da una
+## zona nominata). TRANSITORIO: e' posizione, non stato del mondo, non va nel
+## save. Lo aggiorna region_scene entrando/uscendo dalle Area2D delle zone;
+## lo legge la condizione in_zona_tag delle abilita' (US-605).
+var _zona_tag: String = ""
 
 
 ## Incide una modifica permanente. Le duplicate esatte (stesso tipo, stessa
@@ -48,6 +53,7 @@ func pulisci() -> void:
 	_regione = ""
 	_scoperte.clear()
 	_gate_aperti.clear()
+	_zona_tag = ""
 
 
 # --- Regione corrente e scoperte (US-602) -------------------------------
@@ -71,10 +77,20 @@ func entra_regione(id: String) -> void:
 		return
 	var cambia: bool = id != _regione or id not in _scoperte
 	_regione = id
+	_zona_tag = ""
 	if id not in _scoperte:
 		_scoperte.append(id)
 	if cambia:
 		regione_cambiata.emit(id)
+
+
+## Il location_tag della zona corrente del giocatore, o "" (US-605).
+func zona_corrente() -> String:
+	return _zona_tag
+
+
+func imposta_zona(location_tag: String) -> void:
+	_zona_tag = location_tag
 
 
 func gate_aperti() -> Array:

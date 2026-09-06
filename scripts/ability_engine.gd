@@ -24,6 +24,11 @@ const ERR_COOLDOWN := "in_cooldown"
 const ERR_SPIRITUALITA := "spiritualita_insufficiente"
 const ERR_NO_STATS := "caster_senza_stats"
 const ERR_NON_POSSEDUTA := "abilita_non_posseduta"
+## US-605: una condizione dell'abilita' (e_notte, fase_lunare, ...) non e'
+## soddisfatta. Rifiuto SENZA pagare il costo, come spiritualita_insufficiente.
+const ERR_CONDIZIONE := "condizione_non_soddisfatta"
+
+const Conditions := preload("res://scripts/conditions.gd")
 
 ## Chiave "<instance_id>:<ability_id>" -> istante di fine in ms. Le voci dei
 ## caster non piu' validi o gia' scadute vengono rimosse da sweep_cooldowns():
@@ -108,6 +113,16 @@ func execute(ability_id: String, caster: Node) -> Dictionary:
 
 	if is_on_cooldown(caster, ability_id):
 		result["reason"] = ERR_COOLDOWN
+		return result
+
+	# US-605: le condizioni (e_notte, fase_lunare, in_zona_tag, tier_min, ...)
+	# valgono SOLO col giocatore in scena. Un caster senza contesto (nemici,
+	# test isolati) non e' soggetto, come per l'ownership. Non soddisfatta ->
+	# rifiuto SENZA pagare il costo. execute_stored NON passa di qui: l'oggetto
+	# e' gia' il permesso.
+	if caster != null and caster.is_in_group("player") \
+			and not Conditions.tutte_soddisfatte(ability.get("condizioni", [])):
+		result["reason"] = ERR_CONDIZIONE
 		return result
 
 	# Il costo si paga PRIMA di eseguire, e se non basta non si esegue niente:

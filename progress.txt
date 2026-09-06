@@ -5332,3 +5332,48 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   Boot di main.tscn pulito, nessun errore da time_system.
 - Prossima storia: US-605 (AbilityEngine verifica le condizioni delle
   abilita': e_notte, fase_lunare, in_zona_tag, foundation_min, ecc.).
+
+[2026-09-07] US-605 — AbilityEngine verifica le condizioni delle abilita'. FASE 6, BLOCCO B CHIUSO.
+
+- scripts/conditions.gd (NUOVO, preload non autoload): Conditions.
+  tutte_soddisfatte(lista) + soddisfatta(tipo, valore). UN solo posto per la
+  semantica di e_notte / fase_lunare / in_zona_tag / foundation_min /
+  tier_min (ordine ["low","mid","saint","angel","god"]) / madness_min /
+  madness_max / acting_progress_min (FR-3). follia_min = alias di madness_min;
+  reputazione_min / flag leggono FactionSystem / KnowledgeStore se esistono,
+  altrimenti non bloccano (US-613/615). Autoload assenti -> non blocca
+  (lenient). tipo ignoto -> non blocca.
+- scripts/ability_engine.gd: const ERR_CONDIZIONE, const Conditions. In
+  execute(), DOPO il cooldown e PRIMA del costo: se il caster e' nel gruppo
+  "player" e Conditions.tutte_soddisfatte(ability.condizioni) e' falso ->
+  reason "condizione_non_soddisfatta", return senza pagare (come
+  spiritualita_insufficiente). Un caster senza contesto (nemici, test
+  isolati) NON e' nel gruppo player -> nessuna restrizione, come per
+  l'ownership. execute_stored NON passa di qui (l'oggetto e' il permesso).
+- scripts/world_state.gd: _zona_tag TRANSITORIO (non nel save) + zona_corrente()
+  / imposta_zona(tag). region_scene._su_ingresso_zona lo aggiorna. entra_regione
+  e pulisci lo azzerano.
+- data/schema/ability.schema.json: enum condizioni + follia_min /
+  reputazione_min / flag (vocabolario condiviso coi dialoghi, FR-3).
+- tools/validate_data.py: ogni ability.condizioni[].tipo dev'essere in
+  ABILITY_COND; follia_min/reputazione_min/flag su un'abilita' -> ERRORE
+  (sono per i dialoghi); ogni condizione ha 'valore'.
+- tests/test_conditions.gd (NUOVO, 7 test): e_notte blocca di giorno senza
+  pagare il costo + esegue di notte; caster senza contesto ignora le
+  condizioni; costellazione_del_custode solo a luna piena; abilita' senza
+  condizioni invariata; execute_stored ignora le condizioni; helper lenient.
+  I test prestano l'abilita' col grant_temporary per isolare la verifica
+  delle CONDIZIONI dal possesso.
+- REGRESSIONE ATTESA (PRD): i test che eseguono moon_furia_notturna /
+  costellazioni / tg_contrattacco / fool_* usano tutti un caster Node2D nudo
+  (non nel gruppo player) -> condizioni ignorate, ZERO aggiornamenti
+  necessari. Verificato con la suite completa.
+- Come verificato: validate exit 0 (3 warning invariati). 591 test headless
+  (584 + 7), tutti verdi. test_vertical_slice / test_slice_fase_5 /
+  test_moon / test_hermit / test_ability_engine invariati.
+- BLOCCO B CHIUSO: US-604/605. Il ciclo del tempo scorre e le condizioni
+  e_notte/fase_lunare/in_zona_tag/... delle abilita' ora valgono. Le
+  costellazioni di Hermit e la furia del Vampiro smettono di essere
+  decorative.
+- Prossima storia: US-606 (Darkness Seq 9-7: Sleepless / Midnight Poet /
+  Nightmare). BLOCCO C - chiude la fase 5b per eternal_darkness.

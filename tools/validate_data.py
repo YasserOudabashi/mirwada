@@ -351,6 +351,25 @@ def main():
                         if tb not in valid_damage_tags:
                             err(f"{rel} [{aid}]: tag_bloccati contiene '{tb}', non nel "
                                 f"vocabolario di data/schema/damage_tags.json")
+                # US-605: le condizioni delle abilita' - un solo vocabolario in
+                # tutto il gioco (FR-3). follia_min/reputazione_min/flag sono
+                # nell'enum condiviso ma servono ai DIALOGHI (US-613): nessuna
+                # abilita' li usa.
+                ABILITY_COND = {"acting_progress_min", "madness_max", "madness_min",
+                                "e_notte", "fase_lunare", "foundation_min", "tier_min",
+                                "in_zona_tag"}
+                SOLO_DIALOGO = {"follia_min", "reputazione_min", "flag"}
+                for cnd in ab.get("condizioni", []):
+                    ct = cnd.get("tipo") if isinstance(cnd, dict) else None
+                    if ct in SOLO_DIALOGO:
+                        err(f"{rel} [{aid}]: condizione '{ct}' e' riservata ai dialoghi "
+                            f"(US-613), un'abilita' non la usa.")
+                    elif ct not in ABILITY_COND:
+                        err(f"{rel} [{aid}]: condizione di tipo sconosciuto '{ct}' "
+                            f"(ammessi: {sorted(ABILITY_COND)})")
+                    elif "valore" not in cnd:
+                        err(f"{rel} [{aid}]: condizione '{ct}' senza 'valore'")
+
                 for t in ab.get("tag_sinergia", []):
                     if t in tag_vietati_attivi:
                         err(f"{rel} [{aid}]: tag_sinergia '{t}' vietato nei Pathway attivi "

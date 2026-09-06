@@ -86,8 +86,8 @@
       ],
       "priority": 5,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO B CHIUSO. scripts/conditions.gd (NUOVO, preload): Conditions.tutte_soddisfatte/soddisfatta - un solo posto per e_notte/fase_lunare/in_zona_tag/foundation_min/tier_min/madness_min/max/acting_progress_min (FR-3). follia_min=alias madness_min; reputazione_min/flag non bloccano finche' FactionSystem/KnowledgeStore assenti. ability_engine.gd: check in execute() DOPO cooldown, PRIMA del costo, solo se caster in gruppo 'player' -> ERR_CONDIZIONE senza pagare. execute_stored NON verifica. world_state.gd: _zona_tag transitorio + zona_corrente/imposta_zona (da region_scene). ability.schema.json: enum + 3 tipi dialogo. validate: condizioni delle abilita' nel vocabolario, follia_min/reputazione_min/flag -> errore su un'abilita'. tests/test_conditions.gd (7 test). ZERO regressioni: i test esistenti usano casters nudi (non gruppo player). validate exit 0, 591 test verdi."
     },
     {
       "id": "US-606",
