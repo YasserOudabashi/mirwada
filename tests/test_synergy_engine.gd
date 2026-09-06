@@ -463,6 +463,21 @@ func test_batch2_occhio_del_ladro_alza_l_evasione() -> void:
 	_fine()
 
 
+func test_batch4_sinergie_dei_pathway_di_fase_5() -> void:
+	# US-521: le sinergie che nascono coi Pathway nuovi si attivano coi loro tag.
+	_se().call("imposta_override_tag", {"pozione": 1, "rituale": 1})
+	_se().call("rivaluta")
+	assert_true(_se().call("e_attiva", "sinergia_distilleria_rituale"),
+		"pozione (Moon via sequenza) + rituale (stanza) -> distilleria_rituale attiva")
+	assert_eq(_se().call("bonus_qualita", "pozioni"), 1, "e alza la qualita' delle pozioni di 1")
+
+	_se().call("imposta_override_tag", {"conoscenza": 2})
+	_se().call("rivaluta")
+	assert_true(_se().call("e_attiva", "sinergia_biblioteca_vivente"),
+		"conoscenza 2 (Hermit + biblioteca) -> biblioteca_vivente attiva")
+	_fine()
+
+
 func test_batch2_sapienza_curativa_alza_gli_hp_max() -> void:
 	var base: float = _stats().call("get_base", "hp_max")
 	_se().call("imposta_override_tag", {"guarigione": 1, "conoscenza": 1})

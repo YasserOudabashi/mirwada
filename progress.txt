@@ -5125,3 +5125,33 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   caratteristiche; US-522 chiusura fase 5).
 - Prossima storia: US-521 (sinergie batch_4 dei 5 Pathway nuovi + verifica che
   le 50 caratteristiche esistano e siano tradotte).
+
+[2026-09-07] US-521 — Sinergie e caratteristiche dei 5 Pathway nuovi. BLOCCO 6.
+
+- data/synergies/batch_4.json (NUOVO): 6 sinergie coi Pathway di fase 5
+  incrociati coi sistemi di fase 3, tutte raggiungibili (il tag del Pathway
+  arriva dalla fonte 'sequenza'):
+  * sinergia_esercito_immortale (morte+guerra -> +1 quantita summon),
+  * sinergia_distilleria_rituale (pozione+rituale -> qualita pozioni +1, visibile),
+  * sinergia_giardino_della_madre (crescita 2 -> spiritualita_max +10%),
+  * sinergia_officina_arcana (crafting+occulto -> qualita forgia +1),
+  * sinergia_biblioteca_vivente (conoscenza 2 -> sblocca ric_ambrosia),
+  * sinergia_costrutto_bestiale (crafting+bestia -> aggiungi paragon_costrutto_vivo).
+  Sinergie totali: 50 (10 core + 8+10+16+6 batch), 32 raggiungibili
+  (era 26: i tag dei 5 Pathway nuovi ne hanno sbloccate 6 dei batch 1-3 via
+  la fonte sequenza, oltre alle 6 nuove).
+- CARATTERISTICHE: verificato che tutte e 50 le char_<pathway>_<n> dei 5
+  Pathway nuovi esistono e hanno name_i18n TRADOTTA (0 TODO). In piu':
+  tradotte anche le 10 caratteristiche del Twilight Giant (erano TODO
+  dall'audit). i18n TODO: da 58 a 48.
+- DIAGRAMMA DEL LIBRO: nessun codice nuovo. Verifica a schermo (finestra
+  reale): con Moon S7 (Vampire) attivo, il diagramma mostra 10 colonne, la
+  cella Moon/S7 "corrente" in ciano, tutto il resto fog of war; il dettaglio
+  elenca le abilita' della Sequenza coi NOMI TRADOTTI ("Morso", "Furia
+  notturna"). I 5 Pathway nuovi sono contenuto pieno consumato dalla UI di
+  fase 2 senza modifiche. Screenshot in user://us521/.
+- Come verificato: 570 test headless (569 + 1 in test_synergy_engine.gd:
+  sinergia_distilleria_rituale e sinergia_biblioteca_vivente si attivano coi
+  loro tag). validate exit 0 (3 warning, nessuno nuovo da batch_4).
+- Prossima storia: US-522 (CHIUSURA FASE 5: roadmap.md, design-pathways.md,
+  design-master.md, CLAUDE.md, README.md; check di chiusura nel validator).

@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "_comment": "BATCH 4 (US-521): sinergie che nascono coi 5 Pathway nuovi della fase 5 (Death/Moon/Mother/Paragon/Hermit) incrociati coi sistemi di fase 3 (stanze, pet, forgia). Tutte raggiungibili: il tag del Pathway arriva dalla fonte 'sequenza'. Valori plausibili, da ritarare.",
+  "synergies": [
+    {
+      "schema_version": 1,
+      "id": "sinergia_esercito_immortale",
+      "name_i18n": "synergy.esercito_immortale",
+      "richiede_tag": { "morte": 1, "guerra": 1 },
+      "fonti": ["sequenza", "pet"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_primitiva", "primitiva": "summon", "parametro": "quantita", "delta": 1, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "Il Pathway Death (morte) + un pet da guerra: ogni evocazione porta un non-morto in piu'. sequenza+pet."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_distilleria_rituale",
+      "name_i18n": "synergy.distilleria_rituale",
+      "richiede_tag": { "pozione": 1, "rituale": 1 },
+      "fonti": ["sequenza", "stanza"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_qualita_crafting", "categoria": "pozioni", "delta": 1 },
+      "scoperta": "visibile",
+      "note": "Un Pathway alchemico (Moon) + la stanza rituale: distillare sotto un cerchio tracciato alza la qualita'. sequenza+stanza."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_giardino_della_madre",
+      "name_i18n": "synergy.giardino_della_madre",
+      "richiede_tag": { "crescita": 2 },
+      "fonti": ["sequenza", "stanza"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_stat", "stat": "spiritualita_max", "valore": 0.1, "moltiplicativo": true },
+      "scoperta": "nascosta",
+      "note": "Il Pathway Mother (crescita) + il giardino costruito: vivere fra le cose che crescono nutre lo spirito. sequenza+stanza."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_officina_arcana",
+      "name_i18n": "synergy.officina_arcana",
+      "richiede_tag": { "crafting": 1, "occulto": 1 },
+      "fonti": ["sequenza", "stanza"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_qualita_crafting", "categoria": "forgia", "delta": 1 },
+      "scoperta": "nascosta",
+      "note": "Il Pathway Paragon (crafting) + la stanza rituale: forgiare con i sigilli tracciati a terra. sequenza+stanza."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_biblioteca_vivente",
+      "name_i18n": "synergy.biblioteca_vivente",
+      "richiede_tag": { "conoscenza": 2 },
+      "fonti": ["sequenza", "stanza"],
+      "priorita": 0,
+      "effetto": { "tipo": "sblocca_ricetta", "recipe_id": "ric_ambrosia" },
+      "scoperta": "nascosta",
+      "note": "Il Pathway Hermit (conoscenza) + la biblioteca: quello che sai e quello che hai catalogato bastano per la ricetta leggendaria. sequenza+stanza."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_costrutto_bestiale",
+      "name_i18n": "synergy.costrutto_bestiale",
+      "richiede_tag": { "crafting": 1, "bestia": 1 },
+      "fonti": ["sequenza", "pet"],
+      "priorita": 0,
+      "effetto": { "tipo": "aggiungi_abilita", "ability_id": "paragon_costrutto_vivo" },
+      "scoperta": "nascosta",
+      "note": "Il Pathway Paragon (crafting) + un pet vivo da studiare: impari a infondere spirito nella materia. sequenza+pet."
+    }
+  ]
+}
