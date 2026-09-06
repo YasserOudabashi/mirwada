@@ -3383,3 +3383,37 @@ sezione test aggiornata.
   invariati). Nessuna verifica a schermo.
 - Prossima storia: US-324 (PetSystem.avanza_pet: bond >= soglia + risorsa
   dedicata -> il pet sale di Sequenza, cap alla Sequenza del giocatore).
+
+[2026-09-06] US-324 — Coltivazione del pet. BLOCCO E.
+
+- data/pets/core.json: ogni specie ha ora 'avanzamento':
+  { soglia_bond, nutrimento (item_id), hp_per_sequenza {num: hp} }.
+  * nutrimento = pastura_spirituale (consumabile con nutre_pet:true, gia' nei
+    dati da US-308 - foresight).
+  * hp_per_sequenza e' LA CURVA: nei dati, non nel codice. 9 = hp_max.
+    lupo_cinereo 9:60/8:95/7:140, corvo_veggente 9:28/8:44/7:66.
+- scripts/pet_system.gd avanza_pet() -> bool. Richiede, in quest'ordine:
+  pet attivo; avanzamento non vuoto; bond() >= soglia_bond; nuova = seq-1 >= 0;
+  nuova >= Progression.sequence() (il pet PAREGGIA ma non SUPERA il giocatore -
+  numero piu' basso = piu' forte, quindi nuova < seq_giocatore e' vietato);
+  1 nutrimento in Inventory. Successo: consuma il nutrimento,
+  _pet.sequenza = nuova, _pet.hp = hp_per_sequenza[nuova] se c'e',
+  pet_avanzato.emit(nuova).
+- Il bond NON si resetta dopo l'avanzamento: l'AC e' muto e ogni step costa
+  comunque un nutrimento + il cap alla Sequenza del giocatore lo frena.
+- Stat del pet / abilita' aggiuntive PER Sequenza: rimandate. Il combattimento
+  col pet (che le consumerebbe) non c'e' ancora - metterle nei dati ora
+  sarebbe peso morto (ponytail). hp_max e' l'unica curva che serve adesso.
+- Il round-trip del save non cambia: sequenza/hp vivono in _pet.
+- validate_data.py: nuovo set nutre_pet_ids raccolto nel loop degli item;
+  blocco avanzamento (soglia_bond 0..100, nutrimento e' un item nutre_pet:true,
+  hp_per_sequenza chiavi "0".."9" e valori > 0).
+- Come verificato: 437 test headless (432 + 5 in test_pet_coltivazione.gd:
+  bond basso rifiuta e NON consuma; senza pastura rifiuta; bond+pastura ->
+  9->8, consuma 1, hp = 95 dalla curva; giocatore a Seq 7 -> il pet fa
+  9->8->7 poi si ferma, consumate solo le 2 riuscite; l'avanzamento persiste
+  nel save). validate_data.py exit 0 (9 warning invariati), i18n --check 0.
+  Nessuna verifica a schermo.
+- Prossima storia: US-325 (la morte del pet passa da AnchorSystem.destroy:
+  perdere il pet = perdere un'Ancora, colpo di follia vero). Chiude il
+  blocco E.

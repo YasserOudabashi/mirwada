@@ -457,8 +457,8 @@
       ],
       "priority": 23,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO E. data/pets/core.json: ogni specie ha 'avanzamento' {soglia_bond, nutrimento (item_id consumabile con nutre_pet:true - pastura_spirituale, gia' nei dati da US-308), hp_per_sequenza {num Sequenza: hp}}. La curva vive nei dati, non nel codice. PetSystem.avanza_pet() -> bool: richiede pet attivo, bond >= avanzamento.soglia_bond, sequenza_pet()-1 >= 0, e sequenza_pet()-1 NON sotto la Sequenza del giocatore (Progression.sequence(); il pet puo' pareggiare ma non superare il padrone), e 1 unita' di nutrimento in Inventory (consumata). Successo: _pet.sequenza -= 1, hp da hp_per_sequenza[nuova] se c'e', pet_avanzato.emit(nuova). Bond NON si resetta dopo l'avanzamento (AC muto; ogni step costa comunque un nutrimento e il cap alla Sequenza del giocatore lo limita). Stat/abilita' aggiuntive per Sequenza: rimandate a quando il combattimento col pet le consuma (fuori US-324). validate_data.py: avanzamento presente, soglia_bond 0..100, nutrimento risolve a un item nutre_pet:true, hp_per_sequenza chiavi 0..9 e valori > 0 (nuovo set nutre_pet_ids nel loop item). 437 test headless (432 + 5 in test_pet_coltivazione.gd: bond basso rifiuta e non consuma; senza nutrimento rifiuta; bond+pastura -> avanza, consuma 1, hp dalla curva; 3 tentativi con giocatore a Seq 7 -> 9->8->7 poi stop, consumate solo le 2 riuscite; l'avanzamento persiste nel save). validate exit 0, i18n --check 0. Nessuna verifica a schermo."
     },
     {
       "id": "US-325",

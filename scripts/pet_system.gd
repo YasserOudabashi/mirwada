@@ -14,6 +14,7 @@ signal pet_liberato(pet_id: String)
 signal taming_fallito(pet_id: String)
 ## comportamento_sbloccato = "" se nessuna soglia attraversata da questo colpo.
 signal bond_cambiato(valore: int, comportamento_sbloccato: String)
+signal pet_avanzato(sequenza: int)
 
 ## {} = nessun pet. Altrimenti { pet_id, bond, hp, sequenza }.
 var _pet: Dictionary = {}
@@ -33,6 +34,10 @@ func _gd() -> Node:
 
 func _ancore() -> Node:
 	return get_node_or_null("/root/AnchorSystem")
+
+
+func _inv() -> Node:
+	return get_node_or_null("/root/Inventory")
 
 
 ## {} se nessun pet. Copia: il chiamante non muta lo stato interno.
@@ -175,6 +180,45 @@ func _applica_bond(nuovo: int) -> void:
 			if vecchio < s and s <= nuovo:
 				sbloccato = str(c.get("id", ""))
 	bond_cambiato.emit(nuovo, sbloccato)
+
+
+## --- Coltivazione (US-324) ---
+
+## Fa salire il pet di una Sequenza (9 -> 0). Serve:
+##   - bond >= avanzamento.soglia_bond (dai dati della specie)
+##   - una unita' di avanzamento.nutrimento nell'inventario (consumata)
+##   - la nuova Sequenza NON deve superare quella del giocatore (il pet non
+##     supera il padrone) ne' scendere sotto 0
+## hp del pet aggiornato da avanzamento.hp_per_sequenza (curva nei dati).
+## Restituisce true se il pet e' avanzato.
+func avanza_pet() -> bool:
+	if _pet.is_empty():
+		return false
+	var specie: Dictionary = _gd().call("get_pet", str(_pet.get("pet_id", ""))) if _gd() != null else {}
+	var av: Dictionary = specie.get("avanzamento", {})
+	if av.is_empty():
+		return false
+	if bond() < int(av.get("soglia_bond", 101)):
+		return false
+	var nuova: int = sequenza_pet() - 1
+	if nuova < 0:
+		return false
+	var prog: Node = get_node_or_null("/root/Progression")
+	var seq_giocatore: int = int(prog.call("sequence")) if prog != null else 9
+	if nuova < seq_giocatore:
+		push_warning("[PetSystem] il pet non puo' superare la Sequenza del giocatore (%d)." % seq_giocatore)
+		return false
+	var cibo: String = str(av.get("nutrimento", ""))
+	if _inv() == null or int(_inv().call("conta", cibo)) < 1:
+		return false
+	_inv().call("rimuovi", cibo, 1)
+
+	_pet["sequenza"] = nuova
+	var curva: Dictionary = av.get("hp_per_sequenza", {})
+	if curva.has(str(nuova)):
+		_pet["hp"] = float(curva[str(nuova)])
+	pet_avanzato.emit(nuova)
+	return true
 
 
 func _comportamenti_specie() -> Array:

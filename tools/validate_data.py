@@ -582,6 +582,7 @@ def main():
     idir = os.path.join(DATA, "items")
     item_ids = set()
     item_cat = {}   # id -> categoria
+    nutre_pet_ids = set()   # item con nutre_pet:true (US-324)
     sigillo_refs = []   # [(rel, iid, sigillo_ref)] - risolti dopo aver caricato i sigilli
     n_sigillati = 0
     known_item_stats = {"hp_max", "spiritualita_max", "velocita", "difesa",
@@ -601,6 +602,8 @@ def main():
                 item_ids.add(iid)
                 cat = it.get("categoria")
                 item_cat[iid] = cat
+                if it.get("nutre_pet") is True:
+                    nutre_pet_ids.add(iid)
                 if cat not in item_categories:
                     err(f"{rel} [{iid}]: categoria '{cat}' non nel vocabolario chiuso "
                         f"({sorted(item_categories)})")
@@ -866,6 +869,24 @@ def main():
                 b = comp.get("bond")
                 if not isinstance(b, int) or not (0 <= b <= 100):
                     err(f"{rel} [{pid}]: comportamento '{comp.get('id')}': bond deve essere 0..100")
+            av = pet.get("avanzamento")
+            if not isinstance(av, dict) or not av:
+                err(f"{rel} [{pid}]: manca 'avanzamento' (soglia_bond + nutrimento + hp_per_sequenza)")
+            else:
+                sb = av.get("soglia_bond")
+                if not isinstance(sb, int) or not (0 <= sb <= 100):
+                    err(f"{rel} [{pid}]: avanzamento.soglia_bond deve essere 0..100")
+                nut = av.get("nutrimento")
+                if nut not in nutre_pet_ids:
+                    err(f"{rel} [{pid}]: avanzamento.nutrimento '{nut}' non e' un item con nutre_pet:true")
+                hps = av.get("hp_per_sequenza", {})
+                if not isinstance(hps, dict) or not hps:
+                    err(f"{rel} [{pid}]: avanzamento.hp_per_sequenza mancante")
+                for k, v in (hps.items() if isinstance(hps, dict) else []):
+                    if not (isinstance(k, str) and k.isdigit() and 0 <= int(k) <= 9):
+                        err(f"{rel} [{pid}]: hp_per_sequenza: chiave '{k}' non e' una Sequenza 0..9")
+                    if not isinstance(v, (int, float)) or v <= 0:
+                        err(f"{rel} [{pid}]: hp_per_sequenza['{k}'] deve essere > 0")
     if n_pets < 1:
         err("data/pets/: nessuna specie di pet, attesa almeno 1")
 

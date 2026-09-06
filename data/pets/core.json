@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "_comment": "Specie di pet (US-321). Lo stato del pet attivo (bond/hp/sequenza correnti) sta in PetSystem + save, non qui. Un solo pet per volta (US-322). Il pet E' un'Ancora: ancora_id punta a data/anchors.json.",
+  "_comment": "Specie di pet (US-321). Lo stato del pet attivo (bond/hp/sequenza correnti) sta in PetSystem + save, non qui. Un solo pet per volta (US-322). Il pet E' un'Ancora: ancora_id punta a data/anchors.json. avanzamento (US-324): soglia_bond + nutrimento (un consumabile con nutre_pet) + hp_per_sequenza (la curva, nei dati non nel codice; 9 = hp_max).",
   "pets": [
     {
       "id": "lupo_cinereo",
@@ -14,7 +14,12 @@
       "comportamenti": [
         { "id": "difendi", "bond": 35 },
         { "id": "assalto_coordinato", "bond": 70 }
-      ]
+      ],
+      "avanzamento": {
+        "soglia_bond": 60,
+        "nutrimento": "pastura_spirituale",
+        "hp_per_sequenza": { "9": 60, "8": 95, "7": 140 }
+      }
     },
     {
       "id": "corvo_veggente",
@@ -28,7 +33,12 @@
       "comportamenti": [
         { "id": "avvista", "bond": 30 },
         { "id": "recupera", "bond": 65 }
-      ]
+      ],
+      "avanzamento": {
+        "soglia_bond": 55,
+        "nutrimento": "pastura_spirituale",
+        "hp_per_sequenza": { "9": 28, "8": 44, "7": 66 }
+      }
     }
   ]
 }

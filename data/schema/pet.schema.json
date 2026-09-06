@@ -15,6 +15,11 @@
         "id": "string - chiave del comportamento (US-323 sblocca a soglia)",
         "bond": "int 0..100 - soglia di bond che lo sblocca"
       }
-    ]
+    ],
+    "avanzamento": {
+      "soglia_bond": "int 0..100 - bond minimo per avanzare di Sequenza (US-324)",
+      "nutrimento": "string - item_id di un consumabile con nutre_pet:true, consumato a ogni avanzamento",
+      "hp_per_sequenza": "oggetto { \"<num Sequenza 0..9>\": hp_max a quella Sequenza }. La chiave 9 di solito = hp_max. La curva vive qui, non nel codice."
+    }
   }
 }
