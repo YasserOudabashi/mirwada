@@ -1,11 +1,10 @@
 extends VBoxContainer
-## Pagina inventario del libro (US-307). Cinque sezioni: Zaino, Indosso,
-## Ricettario, Talenti, Base. Zaino e Indosso sono scritte; le altre sono
-## segnaposto finche' non arrivano le loro story (alchimia, talenti, base).
+## Pagina inventario del libro (US-307). Sei sezioni: Zaino, Indosso,
+## Ricettario, Talenti, Base, Sinergie (US-410).
 ##
 ## Chrome da assets/i18n/strings.csv + tr(); nomi degli item da GameData.tr_data.
 
-const SEZIONI := ["zaino", "indosso", "ricettario", "talenti", "base"]
+const SEZIONI := ["zaino", "indosso", "ricettario", "talenti", "base", "sinergie"]
 
 var _tab: HBoxContainer = null
 var _corpo: VBoxContainer = null
@@ -50,6 +49,7 @@ func _mostra(sezione: String) -> void:
 		"ricettario": _ricettario()
 		"base": _base()
 		"talenti": _talenti()
+		"sinergie": _sinergie()
 		_: _corpo.add_child(_riga(tr("BOOK_INV_ARRIVA")))
 
 
@@ -292,6 +292,50 @@ func _talenti() -> void:
 		q.text = "%d / %d" % [int(conta), int(target)]
 		h.add_child(q)
 		_corpo.add_child(h)
+
+
+## US-410: le sinergie col fog of war. attiva = nome + effetto + fonti;
+## visibile = nome + i tag mancanti; vista = riga offuscata; ignota = assente
+## (gia' filtrata da SynergyEngine.stato_registro()).
+func _sinergie() -> void:
+	var gd: Node = _n("/root/GameData")
+	var se: Node = _n("/root/SynergyEngine")
+	if gd == null or se == null:
+		return
+	var cont: Vector2i = se.call("contatore")
+	_corpo.add_child(_titolo(tr("BOOK_SYN_CONTATORE") % [cont.x, cont.y]))
+	var reg: Array = se.call("stato_registro")
+	if reg.is_empty():
+		_corpo.add_child(_riga(tr("BOOK_SYN_VUOTO")))
+		return
+	for voce in reg:
+		var v: Dictionary = voce
+		var sid: String = str(v["id"])
+		var syn: Dictionary = gd.call("get_synergy", sid)
+		var nome: String = str(gd.call("tr_data", syn.get("name_i18n", sid)))
+		match str(v["stato"]):
+			"attiva":
+				var testo: String = nome
+				if bool(syn.get("anti", false)):
+					testo = "▲ " + testo
+					var nomi: Array = []
+					for b in syn.get("neutralizza", []):
+						nomi.append(str(gd.call("tr_data", (gd.call("get_synergy", b) as Dictionary).get("name_i18n", b))))
+					if not nomi.is_empty():
+						testo += " — " + tr("BOOK_SYN_NEUTRALIZZA") % ", ".join(nomi)
+				var fonti: Array = syn.get("fonti", [])
+				_corpo.add_child(_riga("%s — %s  [%s]" % [
+					testo, _riassunto(syn.get("effetto", {})), ", ".join(fonti)]))
+			"visibile":
+				var manca: Array = []
+				var tm: Dictionary = v["tag_mancanti"]
+				for t in tm:
+					manca.append("%s x%d" % [t, int(tm[t])])
+				_corpo.add_child(_riga("%s — %s %s" % [nome, tr("BOOK_SYN_MANCA"), ", ".join(manca)]))
+			"vista":
+				var l := _riga(nome)
+				l.modulate = Color(1, 1, 1, 0.55)
+				_corpo.add_child(l)
 
 
 func testo_visibile() -> String:

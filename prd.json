@@ -199,8 +199,8 @@
       ],
       "priority": 10,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO B. page_inventario.gd: SEZIONI 5 -> 6 (aggiunta 'sinergie'), nessun nuovo page_type, book.json intatto. _sinergie(): _titolo col contatore da SynergyEngine.contatore(); una riga per voce di stato_registro() - 'attiva' = nome (tr_data) + _riassunto(effetto) + [fonti], anti con prefisso '▲ ' + tr('BOOK_SYN_NEUTRALIZZA') % nomi_gemelle; 'visibile' = nome + tr('BOOK_SYN_MANCA') + 'tag xN'; 'vista' = _riga(nome) modulate.a 0.55. _riassunto() e' l'helper gia' presente. 5 chiavi in strings.csv (BOOK_INV_SINERGIE, BOOK_SYN_CONTATORE/VUOTO/MANCA/NEUTRALIZZA), .translation rigenerati. 527 test headless (522 + 5 in test_page_sinergie.gd). validate exit 0. Verifica a schermo: tab 'Synergies' 6a selezionata, 'Discovered: 3 / 8', anti marcata '▲' + neutralizes, visibile 'missing: crescita x2, pozione x2', vista offuscata. Nomi ancora stub TODO (US-413 traduce)."
     },
     {
       "id": "US-411",

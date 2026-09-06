@@ -4281,3 +4281,34 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
   nessuno nuovo. Nessuna verifica a schermo: la UI e' US-410.
 - Prossima storia: US-410 (sezione Sinergie nella pagina inventario del libro:
   SEZIONI 5 -> 6, fog of war da stato_registro(), contatore in cima).
+
+[2026-09-06] US-410 — Sezione Sinergie nella pagina del libro. BLOCCO B.
+
+- scripts/pages/page_inventario.gd: SEZIONI 5 -> 6 (aggiunta "sinergie"),
+  nessun nuovo page_type, data/ui/book.json intatto. Nuovo _sinergie():
+  * in cima: _titolo(tr("BOOK_SYN_CONTATORE") % [scoperte, totali]) da
+    SynergyEngine.contatore();
+  * una riga per voce di SynergyEngine.stato_registro() (le 'ignota' sono
+    gia' filtrate a monte):
+    - "attiva": nome (tr_data) + _riassunto(effetto) + " [fonti]". Se anti:
+      prefisso "▲ " e " — " + tr("BOOK_SYN_NEUTRALIZZA") % nomi_gemelle.
+    - "visibile": nome + tr("BOOK_SYN_MANCA") + "tag xN, ..." dai tag_mancanti.
+    - "vista": _riga(nome) con modulate.a 0.55 (stesso stile del ricettario
+      offuscato e dei talenti sconosciuti).
+  _riassunto() e' l'helper gia' presente (usato anche dalla sezione talenti).
+- assets/i18n/strings.csv: 5 chiavi nuove (BOOK_INV_SINERGIE, BOOK_SYN_CONTATORE,
+  BOOK_SYN_VUOTO, BOOK_SYN_MANCA, BOOK_SYN_NEUTRALIZZA), .translation rigenerati
+  con --import. La tab usa tr("BOOK_INV_" + s.to_upper()) come le altre 5.
+- Come verificato:
+  * 527 test headless (522 + 5 in test_page_sinergie.gd: contatore prima riga;
+    visibile coi tag mancanti; attiva con effetto + fonti; vista offuscata
+    alpha 0.55; anti-sinergia marcata "▲" + "neutralizza"). validate exit 0
+    (9 warning invariati). 1 SCRIPT ERROR preesistente, nessuno nuovo.
+  * A SCHERMO (finestra reale, script usa e getta in job tmp): tab "Synergies"
+    6a e selezionata; "Discovered: 3 / 8" in cima; riga anti_furia_e_calma
+    con "▲" e "neutralizes ..."; crescita_pozione "missing: crescita x2,
+    pozione x2"; studio_sereno offuscata. Screenshot inviato all'utente.
+    I nomi sono stub "TODO synergy.*" (li traduce US-413).
+- Prossima storia: US-411 (il registro reagisce dal vivo: la sezione si
+  ricostruisce su sinergia_attivata/disattivata; evidenzia una volta la
+  sinergia appena attivata).

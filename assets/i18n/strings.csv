@@ -80,3 +80,8 @@ BOOK_FRONTESPIZIO_NESSUN_TALENTO,Nessun talento,No talents
 BOOK_TAL_POSSEDUTI,Talenti,Talents
 BOOK_TAL_IN_ARRIVO,In arrivo,In progress
 BOOK_TAL_SCONOSCIUTO,Talento sconosciuto,Unknown talent
+BOOK_INV_SINERGIE,Sinergie,Synergies
+BOOK_SYN_CONTATORE,Scoperte: %d / %d,Discovered: %d / %d
+BOOK_SYN_VUOTO,Nessuna sinergia scoperta.,No synergies discovered yet.
+BOOK_SYN_MANCA,manca:,missing:
+BOOK_SYN_NEUTRALIZZA,neutralizza %s,neutralizes %s
