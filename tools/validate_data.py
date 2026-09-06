@@ -92,6 +92,10 @@ def main():
     # US-501: vocabolario chiuso dei luoghi dei rituali di avanzamento.
     _loc_doc = load_json(os.path.join(DATA, "schema", "location_tags.json")) or {}
     valid_location_tags = set(_loc_doc.get("location_tags", []))
+    # US-502: matrice di proprieta' - materie prime dei summon, tag vietati.
+    _own_doc = load_json(os.path.join(DATA, "schema", "ownership.json")) or {}
+    summon_materie = set(_own_doc.get("summon_materie_prime", []))
+    tag_vietati_attivi = set(_own_doc.get("tag_vietati_pathway_attivi", []))
     # Tag ottenibili nella build attiva: servono a segnalare le sinergie
     # irraggiungibili (richiedono tag che nessun pathway attivo porta).
     obtainable_tags = set()
@@ -127,6 +131,9 @@ def main():
         for t in doc.get("tags", []):
             if t not in valid_tags:
                 err(f"{rel}: tag di pathway sconosciuto '{t}' (aggiungilo a data/tags.json o correggilo)")
+            if t in tag_vietati_attivi:
+                err(f"{rel}: tag '{t}' vietato nei Pathway attivi (matrice di proprieta', "
+                    f"US-502: appartiene a un Pathway differito).")
             obtainable_tags.add(t)
 
         seqs = doc.get("sequences", [])
@@ -309,12 +316,26 @@ def main():
                     if tipo in ("aura", "curse") and p.get("effetto"):
                         status_refs.append((rel, aid, p.get("effetto")))
                     if tipo == "summon":
-                        if not isinstance(p.get("entita_id"), str) or not p.get("entita_id"):
+                        eid = p.get("entita_id")
+                        if not isinstance(eid, str) or not eid:
                             err(f"{rel} [{aid}]: summon senza entita_id (la fonte dell'evocazione)")
+                        # US-502: entita_id dichiara la materia prima nel prefisso
+                        # (matrice di proprieta', data/schema/ownership.json).
+                        elif summon_materie and not any(eid.startswith(m + "_") for m in summon_materie):
+                            err(f"{rel} [{aid}]: summon.entita_id '{eid}' senza prefisso di materia "
+                                f"prima ({sorted(summon_materie)}): ogni evocazione dichiara da cosa "
+                                f"nasce (matrice di proprieta', US-502).")
                         dur = p.get("durata")
                         if dur == 0 or dur is None:
                             err(f"{rel} [{aid}]: summon.durata deve essere -1 (persistente) o > 0 "
                                 f"(temporanea), mai 0")
+                    # US-502: la divinazione fuori da Hermit rivela solo la categoria.
+                    if tipo in ("reveal_info", "mind_read") \
+                            and not str(ab.get("sequence_id", "")).startswith("hermit_") \
+                            and not p.get("categoria"):
+                        err(f"{rel} [{aid}]: {tipo} fuori da Hermit senza 'categoria': "
+                            f"solo Hermit e' il divinatore sistemico, gli altri rivelano una "
+                            f"categoria (matrice di proprieta', US-502).")
                     td = p.get("tag_danno")
                     if td is not None and td not in valid_damage_tags:
                         err(f"{rel} [{aid}]: tag_danno '{td}' non nel vocabolario "
@@ -324,6 +345,9 @@ def main():
                             err(f"{rel} [{aid}]: tag_bloccati contiene '{tb}', non nel "
                                 f"vocabolario di data/schema/damage_tags.json")
                 for t in ab.get("tag_sinergia", []):
+                    if t in tag_vietati_attivi:
+                        err(f"{rel} [{aid}]: tag_sinergia '{t}' vietato nei Pathway attivi "
+                            f"(matrice di proprieta', US-502).")
                     if t not in valid_tags:
                         err(f"{rel} [{aid}]: tag sconosciuto '{t}'")
                     obtainable_tags.add(t)

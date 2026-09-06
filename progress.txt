@@ -4562,3 +4562,31 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
   prefisso di materia prima su entita_id dei summon; categoria obbligatoria
   sulla divinazione fuori da Hermit; il tag 'sogno' vietato nei Pathway
   attivi).
+
+[2026-09-06] US-502 — La matrice di proprieta' come check del validator. BLOCCO 0.
+
+- data/schema/ownership.json (NUOVO): la matrice di design-master.md cap.4
+  (mondo spirituale, copia/furto abilita', evocazioni permanenti,
+  occultamento, divinazione) nel _comment + due vocabolari operativi:
+  summon_materie_prime [cadavere, non_morto, spirito, costrutto, pet, bestia,
+  chimera, omuncolo, evocazione] e tag_vietati_pathway_attivi [sogno].
+- tools/validate_data.py, tre check nuovi:
+  1. ogni summon: entita_id DEVE iniziare per '<materia>_' con <materia> nel
+     vocabolario (startswith, non split: 'non_morto' ha un underscore).
+     I 3 summon esistenti passano (non_morto_legionario, bestia_remota,
+     costrutto_animato).
+  2. reveal_info/mind_read con sequence_id non 'hermit_*' DEVE avere
+     'categoria' valorizzata (la divinazione fuori da Hermit rivela solo la
+     categoria del verbo). I 4 reveal_info esistenti fuori da Hermit hanno
+     gia' 'categoria'.
+  3. il tag 'sogno' non compare in nessun tags di Pathway attivo ne' in
+     nessun tag_sinergia di abilita' attiva.
+- Verificato che i 3 check SCATTANO: iniettato non_morto->non (bug del split,
+  corretto), tolto categoria a door_viaggio_lungo -> errore, aggiunto 'sogno'
+  a fool.tags -> errore. Tutti e 3 rilevati, dati ripristinati con git checkout.
+- Come verificato: python tools/validate_data.py exit 0 (8 warning invariati).
+  535 test headless verdi (test_data_valida.gd gira il validator). 1 SCRIPT
+  ERROR preesistente.
+- Prossima storia: US-503 (darkness_1 / darkness_sfortuna_cronica riscritta
+  senza probability_shift: curse effetto 'sfortuna' + debuff_stat + dot follia;
+  status_effects.json: effetto 'sfortuna').
