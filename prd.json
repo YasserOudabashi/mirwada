@@ -293,8 +293,8 @@
       ],
       "priority": 15,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO C. data/synergies/batch_3.json (NUOVO): 16 sinergie che richiedono tag portati SOLO da Pathway di gruppi differiti (desiderio/demone, mutazione/possessione, ordine/legge, disordine/cavillo, giudizio/negazione, specchio, fuoco/provocazione/trappola, sussurro/depravazione, contratto, tempesta/fulmine, sogno/emozione, verita'/predizione, fortuna/probabilita'). Restano INATTIVE. tools/validate_data.py: le N warning 'irraggiungibile' collassate in UNA riga ('N sinergie irraggiungibili (attese: ... gruppi di Pathway differiti ...): <lista ordinata>'). Warning totali 9 -> 8. 006_PRD/design-pathways.md: nuova sezione con la tabella gruppo differito -> sinergie che si accendono riattivandolo (5 gruppi: father_of_devils, the_anarchy, calamity_of_destruction, god_almighty, key_of_light). i18n: 16 name_i18n tradotti in it.json. Nessun test nuovo (dati inattivi); aggiornato test_contatore_sale (assert su range invece che 'totali-2', ora ci sono 18 irraggiungibili). 535 test headless invariati, validate exit 0. Sinergie totali: 44 (10 core + 8 + 10 + 16), 26 raggiungibili."
     },
     {
       "id": "US-416",

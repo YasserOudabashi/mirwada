@@ -4457,3 +4457,34 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-415 (BATCH 3: ~15 sinergie che puntano ai gruppi
   differiti - restano irraggiungibili, warning atteso; il validator le conta
   in UNA riga sola invece di N warning; riga per gruppo in design-pathways.md).
+
+[2026-09-06] US-415 — Batch 3: sinergie dei gruppi differiti. BLOCCO C.
+
+- data/synergies/batch_3.json (NUOVO): 16 sinergie che richiedono almeno un
+  tag portato SOLO da un Pathway di gruppo differiti (father_of_devils,
+  the_anarchy, calamity_of_destruction, god_almighty, key_of_light). Restano
+  INATTIVE con i 10 Pathway attivi. Scritte ora cosi' che riattivare un gruppo
+  (fase 5) le accenda senza nuovo codice. Tutte con effetto schema-valido
+  (primitive non differite), mai testate perche' dati inattivi.
+- tools/validate_data.py: le N warning 'sinergia irraggiungibile' (una per
+  sinergia) collassate in UNA riga sola:
+  '18 sinergie irraggiungibili (attese: richiedono tag di gruppi di Pathway
+   differiti, si accenderanno riattivando il gruppo): <lista ordinata>'.
+  unreachable_syns accumulato nel loop, warn() unico dopo. Warning totali:
+  9 -> 8.
+- 006_PRD/design-pathways.md: nuova sotto-sezione 'Sinergie che si accendono
+  riattivando un gruppo (US-415)' con la tabella gruppo differito -> elenco
+  delle sinergie di batch_3.json (+ le 2 di core.json). E il promemoria di
+  rilanciare generate_i18n_stubs dopo una riattivazione.
+- i18n: 16 name_i18n tradotti in italiano in it.json.
+- Come verificato: 535 test headless invariati (nessun test nuovo: dati
+  inattivi, la verifica e' il validator che li accetta). Aggiornato solo
+  test_contatore_sale_attivando_una_nascosta: l'assert sul totale scopribile
+  e' un range (>=20 e < totale) invece di 'totale - 2' - ora le
+  irraggiungibili sono 18. validate_data.py exit 0, 8 warning. 1 SCRIPT ERROR
+  preesistente. Nessuna verifica a schermo.
+- Sinergie totali: 44 (10 core + 8 batch_1 + 10 batch_2 + 16 batch_3),
+  26 raggiungibili.
+- Prossima storia: US-416 (CHIUSURA FASE 4: roadmap.md -> CHIUSA, conteggi
+  reali; design-master.md Appendice C + A; CLAUDE.md + README; check di
+  chiusura nel validator FASE_4_DATA + M sinergie raggiungibili).

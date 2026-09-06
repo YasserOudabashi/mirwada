@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "_comment": "BATCH 3 (US-415): 16 sinergie che richiedono tag portati SOLO da Pathway di gruppi DIFFERITI. Restano INATTIVE e il validator le conta in UNA riga sola ('N sinergie irraggiungibili...'). Scritte ora cosi' che riattivare un gruppo (fase 5) le accenda da sole, senza nuovo codice. La mappa gruppo -> sinergie e' in 006_PRD/design-pathways.md. Valori plausibili, mai testati (dati inattivi).",
+  "synergies": [
+    {
+      "schema_version": 1,
+      "id": "sinergia_patto_abissale",
+      "name_i18n": "synergy.patto_abissale",
+      "richiede_tag": { "desiderio": 1, "demone": 1 },
+      "fonti": ["sequenza", "equipaggiamento"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_stat", "stat": "forza", "valore": 0.15, "moltiplicativo": true },
+      "scoperta": "nascosta",
+      "note": "GRUPPO DIFFERITO father_of_devils (Abyss). Il patto col demone in cambio di potenza."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_carne_mutevole",
+      "name_i18n": "synergy.carne_mutevole",
+      "richiede_tag": { "mutazione": 1, "possessione": 1 },
+      "fonti": ["sequenza", "abilita"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_primitiva", "primitiva": "transform", "parametro": "durata", "delta": 5, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "GRUPPO DIFFERITO father_of_devils (Chained). La carne che cambia forma resta cambiata piu' a lungo."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_marchio_corrotto",
+      "name_i18n": "synergy.marchio_corrotto",
+      "richiede_tag": { "corruzione": 1, "maledizione": 1 },
+      "fonti": ["sequenza", "equipaggiamento"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_follia", "delta_al_minuto": 0.6 },
+      "scoperta": "lore",
+      "note": "GRUPPO DIFFERITO father_of_devils. La corruzione che si porta addosso logora la mente."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_legge_di_ferro",
+      "name_i18n": "synergy.legge_di_ferro",
+      "richiede_tag": { "ordine": 1, "legge": 1 },
+      "fonti": ["sequenza", "talento"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_stat", "stat": "difesa", "valore": 8, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "GRUPPO DIFFERITO the_anarchy (Justiciar). L'ordine imposto e' una corazza."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_giudizio_supremo",
+      "name_i18n": "synergy.giudizio_supremo",
+      "richiede_tag": { "giudizio": 1, "negazione": 1 },
+      "fonti": ["sequenza", "abilita"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_primitiva", "primitiva": "curse", "parametro": "durata", "delta": 10, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "GRUPPO DIFFERITO the_anarchy (Justiciar). La condanna pronunciata dura piu' a lungo."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_anarchia_pura",
+      "name_i18n": "synergy.anarchia_pura",
+      "richiede_tag": { "disordine": 1, "cavillo": 1 },
+      "fonti": ["sequenza", "equipaggiamento"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_stat", "stat": "velocita", "valore": 0.2, "moltiplicativo": true },
+      "scoperta": "nascosta",
+      "note": "GRUPPO DIFFERITO the_anarchy (Black Emperor). Nessuna regola, nessun freno."
+    },
+    {
+      "schema_version": 1,
+      "id": "anti_legge_e_caos",
+      "name_i18n": "synergy.anti_legge_e_caos",
+      "richiede_tag": { "legge": 1, "disordine": 1 },
+      "fonti": ["sequenza", "abilita"],
+      "priorita": 100,
+      "anti": true,
+      "neutralizza": ["sinergia_legge_di_ferro", "sinergia_anarchia_pura"],
+      "effetto": { "tipo": "modifica_follia", "delta_al_minuto": 1.5 },
+      "scoperta": "lore",
+      "note": "GRUPPO DIFFERITO the_anarchy. Portare la legge di Justiciar e il caos di Black Emperor insieme: le due autorita' si annullano e la mente cede. Neutralizza sinergia_legge_di_ferro e sinergia_anarchia_pura."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_specchio_infranto",
+      "name_i18n": "synergy.specchio_infranto",
+      "richiede_tag": { "specchio": 1, "maledizione": 1 },
+      "fonti": ["sequenza", "abilita"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_primitiva", "primitiva": "illusion", "parametro": "potenza", "delta": 2, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "GRUPPO DIFFERITO calamity_of_destruction (Demoness). Ogni riflesso e' una bugia piu' convincente."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_via_del_fuoco",
+      "name_i18n": "synergy.via_del_fuoco",
+      "richiede_tag": { "fuoco": 1, "provocazione": 1 },
+      "fonti": ["sequenza", "abilita"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_primitiva", "primitiva": "dot", "parametro": "danno_tick", "delta": 5, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "GRUPPO DIFFERITO calamity_of_destruction (Red Priest). Il fuoco appiccato con rabbia brucia di piu'."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_campo_minato",
+      "name_i18n": "synergy.campo_minato",
+      "richiede_tag": { "trappola": 1, "disastro": 1 },
+      "fonti": ["sequenza", "abilita"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_primitiva", "primitiva": "terrain_modify", "parametro": "durata", "delta": 8, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "GRUPPO DIFFERITO calamity_of_destruction (Red Priest / Demoness). Le trappole piazzate restano armate piu' a lungo."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_sussurri_appesi",
+      "name_i18n": "synergy.sussurri_appesi",
+      "richiede_tag": { "sussurro": 1, "depravazione": 1 },
+      "fonti": ["sequenza", "abilita"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_follia", "delta_al_minuto": 0.5 },
+      "scoperta": "lore",
+      "note": "GRUPPO DIFFERITO god_almighty (Hanged Man). I sussurri dal patibolo non tacciono mai del tutto."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_contratto_solare",
+      "name_i18n": "synergy.contratto_solare",
+      "richiede_tag": { "contratto": 1, "purificazione": 1 },
+      "fonti": ["sequenza", "stanza"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_stat", "stat": "hp_max", "valore": 0.2, "moltiplicativo": true },
+      "scoperta": "visibile",
+      "note": "GRUPPO DIFFERITO god_almighty (Sun). Il patto con la luce in cambio di resistenza."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_tempesta_vivente",
+      "name_i18n": "synergy.tempesta_vivente",
+      "richiede_tag": { "tempesta": 1, "fulmine": 1 },
+      "fonti": ["sequenza", "abilita"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_primitiva", "primitiva": "chain", "parametro": "rimbalzi", "delta": 2, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "GRUPPO DIFFERITO god_almighty (Tyrant). Il fulmine incatenato salta fra piu' bersagli."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_sogno_lucido",
+      "name_i18n": "synergy.sogno_lucido",
+      "richiede_tag": { "sogno": 1, "emozione": 1 },
+      "fonti": ["sequenza", "abilita"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_primitiva", "primitiva": "possess", "parametro": "durata", "delta": 8, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "GRUPPO DIFFERITO god_almighty (Visionary). Entrare nel sogno altrui e restarci."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_verita_rivelata",
+      "name_i18n": "synergy.verita_rivelata",
+      "richiede_tag": { "verita'": 1, "predizione": 1 },
+      "fonti": ["sequenza", "stanza"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_qualita_crafting", "categoria": "pozioni", "delta": 2 },
+      "scoperta": "nascosta",
+      "note": "GRUPPO DIFFERITO god_almighty (White Tower). Sapere in anticipo cosa uscira' dall'alambicco."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_ruota_favorevole",
+      "name_i18n": "synergy.ruota_favorevole",
+      "richiede_tag": { "fortuna": 1, "probabilita'": 1 },
+      "fonti": ["sequenza", "talento"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_stat", "stat": "evasione", "valore": 0.25, "moltiplicativo": true },
+      "scoperta": "visibile",
+      "note": "GRUPPO DIFFERITO key_of_light (Wheel of Fortune). La ruota che gira sempre dalla tua parte."
+    }
+  ]
+}

@@ -570,6 +570,7 @@ def main():
     if os.path.isdir(sdir):
         syn_ids = set()
         syn_neutralizza = {}  # sid -> [id, ...]
+        unreachable_syns = []  # (sid, [tag, ...]) - sinergie di gruppi differiti
         for fname in sorted(os.listdir(sdir)):
             if not fname.endswith(".json"):
                 continue
@@ -638,8 +639,12 @@ def main():
                 irraggiungibili = [t for t in syn.get("richiede_tag", {})
                                    if t in valid_tags and t not in obtainable_tags]
                 if irraggiungibili:
-                    warn(f"{rel} [{sid}]: richiede i tag {irraggiungibili} che nessun pathway "
-                         f"attivo porta: sinergia irraggiungibile finche' il suo gruppo resta differito.")
+                    unreachable_syns.append((sid, irraggiungibili))
+        # US-415: una riga sola invece di N warning che annegano gli altri.
+        if unreachable_syns:
+            lista = ", ".join(sorted(s for s, _ in unreachable_syns))
+            warn(f"{len(unreachable_syns)} sinergie irraggiungibili (attese: richiedono tag di "
+                 f"gruppi di Pathway differiti, si accenderanno riattivando il gruppo): {lista}")
         for anti_id, bersagli in syn_neutralizza.items():
             for b in bersagli:
                 if b not in syn_ids:

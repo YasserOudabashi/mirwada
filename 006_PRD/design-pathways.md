@@ -83,6 +83,26 @@ Le assenze che pesano davvero:
 Se un giorno se ne riattiva uno, **riattiva il suo gruppo intero**, mai il
 singolo Pathway.
 
+### Sinergie che si accendono riattivando un gruppo (US-415)
+
+`data/synergies/batch_3.json` contiene 16 sinergie già scritte che richiedono
+tag portati **solo** da Pathway di gruppi differiti. Restano inattive (il
+validator le conta in una riga sola, `N sinergie irraggiungibili…`). Riattivare
+il gruppo le accende **senza nuovo codice** — è la prova che l'architettura
+regge oltre le 10 Sequenze. Mappa gruppo → sinergie:
+
+| Gruppo differito | Pathway | Sinergie di `batch_3.json` che si attivano |
+|---|---|---|
+| `father_of_devils` | Abyss, Chained | `sinergia_patto_abissale`, `sinergia_carne_mutevole`, `sinergia_marchio_corrotto` |
+| `the_anarchy` | Justiciar, Black Emperor | `sinergia_legge_di_ferro`, `sinergia_giudizio_supremo`, `sinergia_anarchia_pura`, `anti_legge_e_caos` (+ `anti_ordine_disordine` in `core.json`) |
+| `calamity_of_destruction` | Demoness, Red Priest | `sinergia_specchio_infranto`, `sinergia_via_del_fuoco`, `sinergia_campo_minato` |
+| `god_almighty` | Hanged Man, Sun, Tyrant, Visionary, White Tower | `sinergia_sussurri_appesi`, `sinergia_contratto_solare`, `sinergia_tempesta_vivente`, `sinergia_sogno_lucido`, `sinergia_verita_rivelata` |
+| `key_of_light` | Wheel of Fortune | `sinergia_ruota_favorevole` (+ `sinergia_inganno_probabilita` in `core.json`) |
+
+Dopo aver riattivato un gruppo: rilancia `tools/generate_i18n_stubs.py` (le
+sinergie hanno già le chiavi i18n, ma i nuovi Pathway/Sequenze no) e verifica
+che il conteggio delle irraggiungibili nel validator sia sceso.
+
 ## Effetto reale sul carico di lavoro
 
 È utile essere precisi, perché l'intuizione qui inganna.
