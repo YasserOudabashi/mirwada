@@ -33,6 +33,9 @@ var _prossimo_sweep_ms: int = 0
 ## in ms. Un caster puo' eseguire un'abilita' fuori dal suo Pathway finche' il
 ## prestito e' valido. Stress test: Error (Sequenza 6) usa abilita' altrui.
 var _granted: Dictionary = {}
+## Abilita' prestate a tempo INDETERMINATO (US-404: mentre una sinergia e'
+## attiva). { "<instance_id>:<ability_id>": true }. Non scadono in _sweep.
+var _permanenti: Dictionary = {}
 
 var _handlers: Dictionary = {}
 ## Effetti a tempo in corso. Una lista processata in _process invece di
@@ -267,7 +270,29 @@ func grant_temporary(ability_id: String, caster: Node, durata: float) -> bool:
 
 func is_granted(caster: Node, ability_id: String) -> bool:
 	var key: String = _key(caster, ability_id)
+	if _permanenti.has(key):
+		return true
 	return _granted.has(key) and Time.get_ticks_msec() < int(_granted[key])
+
+
+## Presta un'abilita' al GIOCATORE a tempo indeterminato (US-404: finche' una
+## sinergia resta attiva). Nessuna scadenza a tempo: si toglie con
+## revoca_permanente(). false se l'ability_id non esiste o non c'e' un player.
+func grant_permanente(ability_id: String) -> bool:
+	if (_game_data().call("get_ability", ability_id) as Dictionary).is_empty():
+		push_error("[AbilityEngine] grant_permanente: abilita' inesistente '%s'" % ability_id)
+		return false
+	var p: Node = get_tree().get_first_node_in_group("player")
+	if p == null:
+		return false
+	_permanenti[_key(p, ability_id)] = true
+	return true
+
+
+func revoca_permanente(ability_id: String) -> void:
+	var p: Node = get_tree().get_first_node_in_group("player")
+	if p != null:
+		_permanenti.erase(_key(p, ability_id))
 
 
 ## Gli id delle abilita' ancora prestate a questo caster.
@@ -281,11 +306,15 @@ func granted_abilities(caster: Node) -> Array:
 		var k: String = key
 		if k.begins_with(prefisso) and now < int(_granted[key]):
 			out.append(k.substr(prefisso.length()))
+	for key in _permanenti:
+		if str(key).begins_with(prefisso):
+			out.append(str(key).substr(prefisso.length()))
 	return out
 
 
 func clear_granted() -> void:
 	_granted.clear()
+	_permanenti.clear()
 
 
 ## Abilita' che il caster POSSIEDE: solo per il giocatore con un Pathway

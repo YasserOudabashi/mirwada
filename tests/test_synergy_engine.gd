@@ -186,3 +186,55 @@ func test_modifica_follia_versa_il_delta_al_minuto_in_madness() -> void:
 	_se().call("_process", 60.0)
 	assert_almost_eq(m.call("valore"), dopo_stop, "disattivata -> non versa piu' nulla")
 	_fine()
+
+
+func test_modifica_qualita_crafting_alza_la_qualita_delle_pozioni() -> void:
+	var ps: Node = Engine.get_main_loop().root.get_node_or_null("PotionSystem")
+	var inv: Node = Engine.get_main_loop().root.get_node_or_null("Inventory")
+	var gd := _gd()
+	var ric: Dictionary = gd.call("get_recipe", "ric_cura_minore")  # qualita_base "pura"
+	for ing in ric.get("ingredienti", {}):
+		inv.call("aggiungi", ing, int(ric["ingredienti"][ing]))
+	var senza: Dictionary = ps.call("prepara", "ric_cura_minore")
+	assert_eq(str(senza.get("qualita")), "pura", "senza sinergia: qualita' di base")
+
+	# sinergia_crescita_pozione: modifica_qualita_crafting pozioni delta 1
+	_se().call("imposta_override_tag", {"crescita": 2, "pozione": 2})
+	_se().call("rivaluta")
+	for ing in ric.get("ingredienti", {}):
+		inv.call("aggiungi", ing, int(ric["ingredienti"][ing]))
+	var con: Dictionary = ps.call("prepara", "ric_cura_minore")
+	assert_eq(str(con.get("qualita")), "eccelsa", "la sinergia alza di un passo -> eccelsa")
+	_fine()
+
+
+func test_sblocca_ricetta_impara_e_resta_nota() -> void:
+	var ps: Node = Engine.get_main_loop().root.get_node_or_null("PotionSystem")
+	var kn: Node = Engine.get_main_loop().root.get_node_or_null("KnowledgeStore")
+	if kn != null:
+		kn.call("dimentica_tutto")
+	assert_false(ps.call("ricetta_nota", "ric_cura_maggiore"), "prima: non nota")
+	# sinergia_ricettario_condiviso: sblocca_ricetta ric_cura_maggiore
+	_se().call("imposta_override_tag", {"conoscenza": 1, "crescita": 1})
+	_se().call("rivaluta")
+	assert_true(ps.call("ricetta_nota", "ric_cura_maggiore"), "attivata -> nota")
+	_se().call("imposta_override_tag", {})
+	_se().call("rivaluta")
+	assert_true(ps.call("ricetta_nota", "ric_cura_maggiore"),
+		"disattivata -> resta nota (imparare non si dimentica)")
+	_fine()
+
+
+func test_aggiungi_abilita_concede_e_revoca() -> void:
+	var ae: Node = Engine.get_main_loop().root.get_node_or_null("AbilityEngine")
+	# sinergia_istinto_bestiale: aggiungi_abilita mother_dominio_druidico
+	assert_false(ae.call("is_granted", _p, "mother_dominio_druidico"), "prima: non prestata")
+	_se().call("imposta_override_tag", {"bestia": 1, "guerra": 1})
+	_se().call("rivaluta")
+	assert_true(ae.call("is_granted", _p, "mother_dominio_druidico"),
+		"sinergia attiva -> abilita' prestata permanentemente")
+	_se().call("imposta_override_tag", {})
+	_se().call("rivaluta")
+	assert_false(ae.call("is_granted", _p, "mother_dominio_druidico"),
+		"sinergia spenta -> abilita' revocata")
+	_fine()

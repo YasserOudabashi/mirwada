@@ -51,7 +51,10 @@ func forgia(blueprint_id: String) -> Dictionary:
 func _qualita_finale(bp: Dictionary) -> String:
 	var scala: Array = _gd().call("potion_quality")
 	var base: int = maxi(0, scala.find(str(bp.get("qualita_base", "pura"))))
-	var bonus: int = _bonus_stanza("stanza_rituale", "qualita_forgia") + _bonus_talento("forgiatura_qualita")
+	var se: Node = get_node_or_null("/root/SynergyEngine")
+	var bonus: int = _bonus_stanza("stanza_rituale", "qualita_forgia") \
+		+ _bonus_talento("forgiatura_qualita") \
+		+ (int(se.call("bonus_qualita", "forgia")) if se != null else 0)
 	return str(scala[clampi(base + bonus, 0, scala.size() - 1)])
 
 

@@ -4086,3 +4086,35 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-404 (effetti modifica_qualita_crafting -> PotionSystem/
   Forge; sblocca_ricetta -> KnowledgeStore; aggiungi_abilita ->
   AbilityEngine.grant_permanente).
+
+[2026-09-06] US-404 — Effetti qualita_crafting / sblocca_ricetta / aggiungi_abilita. BLOCCO A.
+
+- modifica_qualita_crafting e' ESCLUSIVO per categoria: SynergyEngine.
+  bonus_qualita(categoria) restituisce il delta (passi interi) della sola
+  sinergia attiva con priorita' piu' alta su quella categoria (a parita': id
+  lessicografico minore). PotionSystem._qualita_finale somma
+  _bonus_sinergia('pozioni'); Forge._qualita_finale somma bonus_qualita
+  ('forgia'). I sistemi TIRANO il bonus, come gia' fanno con BaseSystem.bonus.
+- sblocca_ricetta: su sinergia_attivata KnowledgeStore.impara('ricetta:' +
+  recipe_id). NIENTE revoca alla disattivazione: imparare non si dimentica.
+- aggiungi_abilita: AbilityEngine.grant_permanente(ability_id) NUOVO - gemello
+  di grant_temporary senza scadenza a tempo. _permanenti: Dictionary che
+  _sweep NON tocca; is_granted / granted_abilities / clear_granted lo
+  riconoscono. revoca_permanente(ability_id). Trova il player da se'
+  (get_first_node_in_group). SynergyEngine tiene _abilita_attive {syn_id:
+  ability_id}; su sinergia_disattivata revoca; riapplica() ri-concede;
+  pulisci() revoca tutto.
+- data/synergies/core.json: 2 esempi di riferimento nuovi -
+  sinergia_ricettario_condiviso (sblocca ric_cura_maggiore, richiede
+  conoscenza+crescita) e sinergia_istinto_bestiale (aggiunge
+  mother_dominio_druidico, richiede bestia+guerra).
+- Come verificato: 512 test headless (509 + 3 in test_synergy_engine.gd:
+  modifica_qualita_crafting alza ric_cura_minore da 'pura' a 'eccelsa';
+  sblocca_ricetta rende nota ric_cura_maggiore e RESTA nota dopo la
+  disattivazione; aggiungi_abilita concede mother_dominio_druidico mentre la
+  sinergia e' attiva e la revoca quando si spegne). validate_data.py exit 0
+  (9 warning invariati; +2 stub i18n per i nomi delle 2 nuove sinergie).
+  Nessuna verifica a schermo.
+- Prossima storia: US-405 (effetto modifica_primitiva: hook in
+  AbilityEngine._esegui_primitive che applica i delta delle sinergie attive
+  ai parametri della primitiva, su una copia del dizionario).

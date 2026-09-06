@@ -37,6 +37,28 @@
     },
     {
       "schema_version": 1,
+      "id": "sinergia_ricettario_condiviso",
+      "name_i18n": "synergy.ricettario_condiviso",
+      "richiede_tag": { "conoscenza": 1, "crescita": 1 },
+      "fonti": ["stanza", "pet"],
+      "priorita": 0,
+      "effetto": { "tipo": "sblocca_ricetta", "recipe_id": "ric_cura_maggiore" },
+      "scoperta": "nascosta",
+      "note": "Biblioteca + un pet che bruca: quello che il pet trova, la biblioteca lo cataloga. Esempio di riferimento per sblocca_ricetta (US-404). Imparata la ricetta resta nota anche se la sinergia si spegne."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_istinto_bestiale",
+      "name_i18n": "synergy.istinto_bestiale",
+      "richiede_tag": { "bestia": 1, "guerra": 1 },
+      "fonti": ["pet", "talento"],
+      "priorita": 0,
+      "effetto": { "tipo": "aggiungi_abilita", "ability_id": "mother_dominio_druidico" },
+      "scoperta": "nascosta",
+      "note": "Un pet feroce + un talento di guerra: impari a comandare la bestia. Esempio di riferimento per aggiungi_abilita (US-404). L'abilita' e' concessa finche' la sinergia e' attiva."
+    },
+    {
+      "schema_version": 1,
       "id": "anti_ordine_disordine",
       "name_i18n": "synergy.anti_ordine_disordine",
       "richiede_tag": { "ordine": 2, "disordine": 2 },

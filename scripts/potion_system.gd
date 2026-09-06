@@ -361,8 +361,15 @@ func _multiset_eq(a: Dictionary, b: Variant) -> bool:
 func _qualita_finale(r: Dictionary) -> String:
 	var scala: Array = _gd().call("potion_quality")
 	var base: int = maxi(0, scala.find(str(r.get("qualita_base", "pura"))))
-	var bonus: int = _bonus_stanza("laboratorio", "qualita_pozione") + _bonus_talento("alchimia_qualita")
+	var bonus: int = _bonus_stanza("laboratorio", "qualita_pozione") \
+		+ _bonus_talento("alchimia_qualita") + _bonus_sinergia("pozioni")
 	return str(scala[clampi(base + bonus, 0, scala.size() - 1)])
+
+
+## Passi di qualita' dalla sinergia attiva (US-404). 0 se SynergyEngine assente.
+func _bonus_sinergia(categoria: String) -> int:
+	var se: Node = get_node_or_null("/root/SynergyEngine")
+	return int(se.call("bonus_qualita", categoria)) if se != null else 0
 
 
 func _bonus_stanza(tipo: String, chiave: String) -> int:

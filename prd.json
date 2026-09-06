@@ -83,8 +83,8 @@
       ],
       "priority": 4,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO A. modifica_qualita_crafting: ESCLUSIVO per categoria - SynergyEngine.bonus_qualita(categoria) -> il delta (passi interi) della sinergia attiva con priorita' piu' alta su quella categoria (tie: id lessicografico minore). PotionSystem._qualita_finale somma _bonus_sinergia('pozioni'); Forge._qualita_finale somma SynergyEngine.bonus_qualita('forgia'). Nessun if sul nome di una sinergia. sblocca_ricetta: su sinergia_attivata KnowledgeStore.impara('ricetta:'+recipe_id); NESSUNA revoca alla disattivazione (imparare non si dimentica). aggiungi_abilita: AbilityEngine.grant_permanente(ability_id) NUOVO (gemello di grant_temporary, _permanenti: Dictionary che _sweep NON tocca; is_granted / granted_abilities / clear_granted lo riconoscono). SynergyEngine tiene _abilita_attive {syn_id: ability_id}; su sinergia_disattivata revoca_permanente. riapplica() ri-concede anche le abilita'. pulisci() revoca tutto. data/synergies/core.json: 2 esempi di riferimento nuovi (sinergia_ricettario_condiviso -> sblocca ric_cura_maggiore; sinergia_istinto_bestiale -> aggiungi mother_dominio_druidico). 512 test headless (509 + 3 in test_synergy_engine.gd: modifica_qualita_crafting alza ric_cura_minore da 'pura' a 'eccelsa'; sblocca_ricetta rende nota ric_cura_maggiore e resta nota dopo la disattivazione; aggiungi_abilita concede mother_dominio_druidico mentre attiva e la revoca dopo). validate exit 0 (9 warning invariati). Nessuna verifica a schermo."
     },
     {
       "id": "US-405",

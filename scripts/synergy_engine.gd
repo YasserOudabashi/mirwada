@@ -26,6 +26,8 @@ var _accumulo: float = 0.0
 ## US-403: { synergy_id: delta_al_minuto } delle sinergie modifica_follia attive.
 var _follia_attive: Dictionary = {}
 var _acc_follia: float = 0.0
+## US-404: { synergy_id: ability_id } delle sinergie aggiungi_abilita attive.
+var _abilita_attive: Dictionary = {}
 
 
 func _ready() -> void:
@@ -144,8 +146,10 @@ func rivaluta() -> void:
 	_attive_prec = ora
 
 
-## Ri-applica i modificatori di stat delle sinergie attive: da chiamare quando
-## compare il giocatore in scena o dopo un load (come TalentSystem.riapplica).
+## Ri-applica gli effetti "spinti" (modifica_stat, aggiungi_abilita) delle
+## sinergie attive: da chiamare quando compare il giocatore in scena o dopo un
+## load (come TalentSystem.riapplica). Gli effetti "tirati" (qualita_crafting,
+## primitiva) e modifica_follia non hanno bisogno di essere ri-applicati.
 func riapplica() -> void:
 	for id in _attive_prec:
 		_applica_effetto(str(id))
@@ -156,11 +160,16 @@ func pulisci() -> void:
 	if st != null:
 		for id in _attive_prec:
 			st.call("remove_modifier", "synergy:" + str(id))
+	var ae: Node = get_node_or_null("/root/AbilityEngine")
+	if ae != null:
+		for id in _abilita_attive:
+			ae.call("revoca_permanente", str(_abilita_attive[id]))
 	_tag_override = {}
 	_attive_prec = []
 	_accumulo = 0.0
 	_follia_attive = {}
 	_acc_follia = 0.0
+	_abilita_attive = {}
 
 
 # --- Applicazione degli effetti (US-403..405) ------------------------
@@ -171,6 +180,30 @@ func _su_attivata(id: String) -> void:
 
 func _su_disattivata(id: String) -> void:
 	_rimuovi_effetto(id)
+
+
+## US-404: modifica_qualita_crafting e' ESCLUSIVO per categoria - PotionSystem/
+## Forge chiedono qui il delta (in passi di qualita') della sinergia attiva con
+## priorita' piu' alta su quella categoria (tie: id lessicografico minore).
+func bonus_qualita(categoria: String) -> int:
+	if _gd() == null:
+		return 0
+	var scelta_pri: int = -2147483648
+	var scelta_id: String = ""
+	var scelta_delta: int = 0
+	for id in _attive_prec:
+		var syn: Dictionary = _gd().call("get_synergy", id)
+		var eff: Dictionary = syn.get("effetto", {})
+		if str(eff.get("tipo", "")) != "modifica_qualita_crafting":
+			continue
+		if str(eff.get("categoria", "")) != categoria:
+			continue
+		var pri: int = int(syn.get("priorita", 0))
+		if pri > scelta_pri or (pri == scelta_pri and (scelta_id == "" or str(id) < scelta_id)):
+			scelta_pri = pri
+			scelta_id = str(id)
+			scelta_delta = int(eff.get("delta", 0))
+	return scelta_delta
 
 
 func _applica_effetto(id: String) -> void:
@@ -186,6 +219,17 @@ func _applica_effetto(id: String) -> void:
 			st.call("apply_modifier", "synergy:" + id, {stat: delta})
 		"modifica_follia":
 			_follia_attive[id] = float(eff.get("delta_al_minuto", 0.0))
+		"sblocca_ricetta":
+			var kn: Node = get_node_or_null("/root/KnowledgeStore")
+			if kn != null:
+				# imparare non si dimentica: nessuna revoca alla disattivazione
+				kn.call("impara", "ricetta:" + str(eff.get("recipe_id", "")))
+		"aggiungi_abilita":
+			var ae: Node = get_node_or_null("/root/AbilityEngine")
+			if ae != null and ae.call("grant_permanente", str(eff.get("ability_id", ""))):
+				_abilita_attive[id] = str(eff.get("ability_id", ""))
+		"modifica_qualita_crafting", "modifica_primitiva":
+			pass  # PULL: i sistemi leggono bonus_qualita() / delta_primitiva()
 
 
 func _rimuovi_effetto(id: String) -> void:
@@ -193,6 +237,11 @@ func _rimuovi_effetto(id: String) -> void:
 	if st != null:
 		st.call("remove_modifier", "synergy:" + id)
 	_follia_attive.erase(id)
+	if _abilita_attive.has(id):
+		var ae: Node = get_node_or_null("/root/AbilityEngine")
+		if ae != null:
+			ae.call("revoca_permanente", str(_abilita_attive[id]))
+		_abilita_attive.erase(id)
 
 
 func _stats() -> Node:
