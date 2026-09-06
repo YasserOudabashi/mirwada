@@ -68,6 +68,10 @@ func _talenti() -> Node:
 	return get_node_or_null("/root/TalentSystem")
 
 
+func _sinergie() -> Node:
+	return get_node_or_null("/root/SynergyEngine")
+
+
 func _talent_tracker() -> Node:
 	return get_node_or_null("/root/TalentTracker")
 
@@ -215,6 +219,7 @@ func snapshot() -> Dictionary:
 			"posseduti": _talenti().per_salvataggio() if _talenti() != null else [],
 			"comportamenti": _talent_tracker().per_salvataggio() if _talent_tracker() != null else {},
 		},
+		"sinergie": _sinergie().per_salvataggio() if _sinergie() != null else {},
 		"conoscenza": _conoscenza().per_salvataggio() if _conoscenza() != null else [],
 		"inventario": _inventario().per_salvataggio() if _inventario() != null else {},
 		"equipaggiamento": _equip().per_salvataggio() if _equip() != null else {},
@@ -281,3 +286,9 @@ func applica(dati: Dictionary) -> void:
 	var s: Dictionary = dati.get("statistiche", {})
 	if stats != null and s.has("hp"):
 		stats.set("hp", float(s["hp"]))
+	# SynergyEngine PER ULTIMO: legge i tag di tutte le fonti gia' ripristinate.
+	# Le sinergie ATTIVE si riderivano dai tag; il save porta solo le VISTE.
+	if _sinergie() != null:
+		_sinergie().da_salvataggio(dati.get("sinergie", {}))
+		_sinergie().call("rivaluta")
+		_sinergie().call("riapplica")

@@ -320,6 +320,69 @@ func test_anti_sinergia_neutralizza_la_gemella_e_applica_il_malus() -> void:
 	_fine()
 
 
+func test_registro_viste_semina_le_visibili_e_ricorda_le_attivate() -> void:
+	_se().call("rivaluta")  # nessun tag -> niente attivo, ma le 'visibile' si seminano
+	assert_true((_se().call("viste") as Array).has("sinergia_crescita_pozione"),
+		"una sinergia 'visibile' e' nel registro dall'inizio")
+	assert_false((_se().call("viste") as Array).has("sinergia_studio_sereno"),
+		"una 'nascosta' non ancora attivata non e' vista")
+
+	_se().call("imposta_override_tag", {"occulto": 1, "conoscenza": 1})
+	_se().call("rivaluta")
+	assert_true((_se().call("viste") as Array).has("sinergia_studio_sereno"),
+		"attivata una volta -> vista per sempre")
+	_se().call("imposta_override_tag", {})
+	_se().call("rivaluta")
+	assert_true((_se().call("viste") as Array).has("sinergia_studio_sereno"),
+		"resta vista anche dopo la disattivazione")
+	_fine()
+
+
+func test_impara_sinergia_da_fonte_lore() -> void:
+	assert_true(_se().call("impara_sinergia", "anti_ordine_disordine"), "id valido")
+	assert_true((_se().call("viste") as Array).has("anti_ordine_disordine"), "ora e' vista")
+	assert_false(_se().call("impara_sinergia", "sinergia_che_non_esiste"), "id ignoto -> false")
+	_fine()
+
+
+func test_round_trip_del_save_solo_le_viste() -> void:
+	var s: Node = Engine.get_main_loop().root.get_node_or_null("SaveSystem")
+	var SLOT := 950
+	if s.esiste(SLOT):
+		s.cancella(SLOT)
+	_se().call("imposta_override_tag", {"occulto": 1, "conoscenza": 1})
+	_se().call("rivaluta")  # attiva (e vede) sinergia_studio_sereno
+	var snap: Dictionary = {"nome_personaggio": "Enel", "sinergie": _se().call("per_salvataggio")}
+	s.salva(SLOT, snap)
+	_se().call("pulisci")
+	assert_true((_se().call("viste") as Array).is_empty(), "registro azzerato")
+
+	var caricato: Dictionary = s.carica(SLOT)
+	_se().call("da_salvataggio", (caricato["dati"] as Dictionary)["sinergie"])
+	assert_true((_se().call("viste") as Array).has("sinergia_studio_sereno"),
+		"la sinergia vista e' tornata dal save")
+	assert_true((_se().call("attive") as Array).is_empty(),
+		"le ATTIVE non si leggono dal save: senza tag, niente attivo")
+	s.cancella(SLOT)
+	_fine()
+
+
+func test_migrazione_da_v19_aggiunge_il_registro_vuoto() -> void:
+	var s: Node = Engine.get_main_loop().root.get_node_or_null("SaveSystem")
+	var SLOT := 951
+	if s.esiste(SLOT):
+		s.cancella(SLOT)
+	DirAccess.make_dir_recursive_absolute("user://saves")
+	var f := FileAccess.open("user://saves/slot_%d.json" % SLOT, FileAccess.WRITE)
+	f.store_string('{"schema_version": 19, "nome_personaggio": "v19", "posizione": [0,0], "statistiche": {}}')
+	f.close()
+	var c: Dictionary = s.carica(SLOT)
+	assert_true(c["ok"] and c["migrato"], "migrazione applicata")
+	assert_eq((c["dati"] as Dictionary)["sinergie"], {"viste": []}, "campo sinergie vuoto")
+	s.cancella(SLOT)
+	_fine()
+
+
 func test_aggiungi_abilita_concede_e_revoca() -> void:
 	var ae: Node = Engine.get_main_loop().root.get_node_or_null("AbilityEngine")
 	# sinergia_istinto_bestiale: aggiungi_abilita mother_dominio_druidico

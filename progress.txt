@@ -4217,3 +4217,36 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-408 (SAVE: SynergyEngine._viste [id] persistite in
   save.sinergie.viste; _migra_19_a_20; GameState wire; le attive si
   riderivano dai tag al load).
+
+[2026-09-06] US-408 — SAVE registro delle sinergie viste. BLOCCO A CHIUSO.
+
+- SynergyEngine._viste: Array. Una sinergia entra in _viste quando:
+  (a) e' 'visibile' -> _semina_visibili() alla prima rivaluta (una volta,
+      via flag _viste_seed);
+  (b) si ATTIVA (in rivaluta, prima di emettere sinergia_attivata) - per
+      sempre, qualsiasi 'scoperta';
+  (c) impara_sinergia(id) da una fonte lore (dialoghi/libri = fase 6; per ora
+      solo debug/drop).
+  viste() getter. per_salvataggio() -> {viste: [...]}; da_salvataggio(raw)
+  NON FIDATA (solo id che risolvono; resetta _viste_seed).
+- Le sinergie ATTIVE NON si salvano: si riderivano dai tag al load. Il save
+  porta solo la memoria (_viste).
+- SAVE: VERSIONE_CORRENTE 19 -> 20. Campo "sinergie" {viste: [id]} in salva(),
+  _leggi_snapshot, _migra_19_a_20 (default {viste: []}). Catena da v1 verde.
+- GameState: _sinergie(); riga in snapshot(); in applica() SynergyEngine E'
+  L'ULTIMO (dopo tutte le fonti ripristinate) -> da_salvataggio(sinergie),
+  poi rivaluta() (le attive dai tag correnti), poi riapplica() (ri-mette gli
+  effetti spinti).
+- Come verificato: 520 test headless (516 + 4 in test_synergy_engine.gd:
+  le 'visibile' nel registro dall'inizio; una 'nascosta' entra solo
+  attivandosi e ci resta anche dopo la disattivazione; impara_sinergia da
+  fonte lore; round-trip del save porta solo le VISTE (le attive si
+  riderivano, senza tag -> niente attivo); migrazione da v19 -> {viste: []}).
+  validate_data.py exit 0 (9 warning invariati). Nessuna verifica a schermo.
+- BLOCCO A CHIUSO: US-401..408. SynergyEngine completo - schema+motore
+  (401), reattivita' su segnale + poll (402), i 6 effetti modifica_stat/
+  follia/qualita_crafting/sblocca_ricetta/aggiungi_abilita/primitiva
+  (403..405), priorita' e conflitti + spiega() (406), anti-sinergie con
+  neutralizza (407), SAVE registro viste v19->v20 (408). Fase 4: 8/16.
+- Prossima storia: US-409 (logica di visibilita': SynergyEngine.stato_registro()
+  -> [{id, stato: attiva|visibile|vista|ignota, tag_mancanti}] + contatore()).

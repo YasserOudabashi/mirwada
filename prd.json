@@ -160,8 +160,8 @@
       ],
       "priority": 8,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO A CHIUSO. SynergyEngine._viste: Array - le sinergie che il giocatore ha VISTO. Entra in _viste: (a) le 'visibile' alla prima rivaluta (_semina_visibili, una volta sola via _viste_seed); (b) qualsiasi sinergia che si ATTIVA (in rivaluta, prima di emettere sinergia_attivata); (c) impara_sinergia(id) da una fonte lore (per ora solo debug/drop). viste() getter. per_salvataggio() -> {viste: [...]}; da_salvataggio(raw) NON FIDATA (solo id che risolvono; resetta _viste_seed). Le sinergie ATTIVE non si salvano: si riderivano dai tag. SAVE: VERSIONE_CORRENTE 19 -> 20. Campo 'sinergie' {viste: [id]} in salva(), _leggi_snapshot, _migra_19_a_20 (default {viste: []}). GameState: _sinergie(), riga in snapshot(); in applica() SynergyEngine E' L'ULTIMO (dopo Inventory/Equipment/Pet/Talent/Base ripristinati) -> da_salvataggio(sinergie) poi rivaluta() poi riapplica(): le attive si riderivano dai tag correnti, gli effetti si ri-mettono. 520 test headless (516 + 4 in test_synergy_engine.gd: le 'visibile' si seminano nel registro dall'inizio, una 'nascosta' entra solo attivandosi e ci resta; impara_sinergia da fonte lore; round-trip del save porta solo le VISTE, le attive si riderivano; migrazione da v19 -> {viste: []}). La catena di migrazione da v1 resta verde. validate exit 0. Nessuna verifica a schermo. BLOCCO A CHIUSO: US-401..408 - schema+motore, reattivita', i 6 effetti, priorita'/conflitti, anti-sinergie, save. Prossimo: BLOCCO B (registro nel libro)."
     },
     {
       "id": "US-409",

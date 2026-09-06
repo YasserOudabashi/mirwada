@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 19
+const VERSIONE_CORRENTE := 20
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -80,6 +80,9 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		"base": (dati.get("base", {}) as Dictionary).duplicate(true),
 		# Talenti (US-331). { posseduti: [id], comportamenti: {nome: conteggio} }.
 		"talenti": (dati.get("talenti", {}) as Dictionary).duplicate(true),
+		# Sinergie VISTE (US-408). { viste: [id] }. Le attive non si salvano:
+		# si riderivano dai tag al load.
+		"sinergie": (dati.get("sinergie", {}) as Dictionary).duplicate(true),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -215,6 +218,8 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_17_a_18(doc)
 			18:
 				doc = _migra_18_a_19(doc)
+			19:
+				doc = _migra_19_a_20(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -363,6 +368,13 @@ func _migra_18_a_19(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v19 -> v20: il registro delle sinergie viste (US-408). Nessuna vista.
+func _migra_19_a_20(doc: Dictionary) -> Dictionary:
+	if not doc.has("sinergie"):
+		doc["sinergie"] = {"viste": []}
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -387,6 +399,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"pet": _campo(raw, "pet", TYPE_DICTIONARY, {}),
 		"base": _campo(raw, "base", TYPE_DICTIONARY, {}),
 		"talenti": _campo(raw, "talenti", TYPE_DICTIONARY, {}),
+		"sinergie": _campo(raw, "sinergie", TYPE_DICTIONARY, {}),
 		"conoscenza": _campo(raw, "conoscenza", TYPE_ARRAY, []),
 		"inventario": _campo(raw, "inventario", TYPE_DICTIONARY, {}),
 		"equipaggiamento": _campo(raw, "equipaggiamento", TYPE_DICTIONARY, {}),

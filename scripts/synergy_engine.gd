@@ -28,6 +28,10 @@ var _follia_attive: Dictionary = {}
 var _acc_follia: float = 0.0
 ## US-404: { synergy_id: ability_id } delle sinergie aggiungi_abilita attive.
 var _abilita_attive: Dictionary = {}
+## US-408: le sinergie che il giocatore ha VISTO (visibili dall'inizio, o
+## attivate almeno una volta, o insegnate da una fonte lore). Persiste nel save.
+var _viste: Array = []
+var _viste_seed: bool = false
 
 
 func _ready() -> void:
@@ -161,14 +165,29 @@ func tag_mancanti(id: String) -> Dictionary:
 ## volta, emette sinergia_attivata / sinergia_disattivata. Idempotente: due
 ## chiamate consecutive senza cambi di tag non emettono niente.
 func rivaluta() -> void:
+	_semina_visibili()
 	var ora: Array = attive()
 	for id in ora:
 		if not _attive_prec.has(id):
+			if not _viste.has(id):
+				_viste.append(id)  # US-408: attivata -> vista per sempre
 			sinergia_attivata.emit(id)
 	for id in _attive_prec:
 		if not ora.has(id):
 			sinergia_disattivata.emit(id)
 	_attive_prec = ora
+
+
+## Le sinergie 'visibile' sono nel registro dall'inizio: entrano in _viste alla
+## prima rivalutazione. Una volta sola.
+func _semina_visibili() -> void:
+	if _viste_seed or _gd() == null:
+		return
+	_viste_seed = true
+	for id in _gd().call("synergy_ids"):
+		if str((_gd().call("get_synergy", id) as Dictionary).get("scoperta", "")) == "visibile":
+			if not _viste.has(str(id)):
+				_viste.append(str(id))
 
 
 ## Ri-applica gli effetti "spinti" (modifica_stat, aggiungi_abilita) delle
@@ -242,6 +261,44 @@ func _vincente_esclusiva(tipo: String, chiave: String) -> String:
 	return best_id
 
 
+## --- Registro delle sinergie viste (US-408) ------------------------
+
+func viste() -> Array:
+	return _viste.duplicate()
+
+
+## Insegna una sinergia da una fonte lore (dialoghi/libri = fase 6; per ora
+## solo debug o drop di test). true se l'id esiste.
+func impara_sinergia(id: String) -> bool:
+	if _gd() == null or (_gd().call("get_synergy", id) as Dictionary).is_empty():
+		return false
+	if not _viste.has(id):
+		_viste.append(id)
+	return true
+
+
+func per_salvataggio() -> Dictionary:
+	return {"viste": _viste.duplicate()}
+
+
+## Rilettura NON FIDATA: solo id che risolvono a una sinergia esistente. Le
+## sinergie ATTIVE non si leggono dal save: si riderivano dai tag correnti
+## (il chiamante fa rivaluta() dopo aver ripristinato le fonti).
+func da_salvataggio(raw: Variant) -> void:
+	_viste = []
+	_viste_seed = false
+	if typeof(raw) != TYPE_DICTIONARY:
+		return
+	for id in _array_or_empty((raw as Dictionary).get("viste")):
+		if typeof(id) == TYPE_STRING and _gd() != null \
+				and not (_gd().call("get_synergy", id) as Dictionary).is_empty():
+			_viste.append(str(id))
+
+
+static func _array_or_empty(v: Variant) -> Array:
+	return v if typeof(v) == TYPE_ARRAY else []
+
+
 func pulisci() -> void:
 	var st: Node = _stats()
 	if st != null:
@@ -257,6 +314,8 @@ func pulisci() -> void:
 	_follia_attive = {}
 	_acc_follia = 0.0
 	_abilita_attive = {}
+	_viste = []
+	_viste_seed = false
 
 
 # --- Applicazione degli effetti (US-403..405) ------------------------
