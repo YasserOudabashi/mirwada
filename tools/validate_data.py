@@ -1243,6 +1243,26 @@ def main():
                     err(f"data/abilities/{fn} [{ab.get('id')}]: campo VFX su un'abilita'. "
                         f"I VFX vivono per Pathway + primitiva, mai sull'abilita'.")
 
+    # --- chiusura fase 3 (US-336): ogni file di dati introdotto nella fase
+    # deve esistere. Se una story futura ne cancella uno per sbaglio, il
+    # validator lo dice subito invece di lasciare un sistema senza dati.
+    FASE_3_DATA = [
+        "schema/item_categories.json", "schema/equip_slots.json",
+        "schema/item.schema.json", "schema/sigil.schema.json",
+        "schema/sigil_effect_types.json", "schema/sigillato_effect_types.json",
+        "schema/forge_blueprint.schema.json", "schema/structure.schema.json",
+        "schema/pet.schema.json", "schema/room_types.json", "schema/room.schema.json",
+        "schema/talent.schema.json", "schema/tracked_talents.json",
+        "sigils/core.json", "forge/blueprints.json", "structures/core.json",
+        "pets/core.json", "base/rooms.json", "talents/core.json",
+        "potions/recipes.json", "potions/formulas.json",
+        "potions/experiment_outcomes.json", "schema/potion_quality.json",
+    ]
+    for rel in FASE_3_DATA:
+        if not os.path.exists(os.path.join(DATA, rel)):
+            err(f"data/{rel}: file di dati della fase 3 mancante (US-336: la fase e' chiusa, "
+                f"nessuno di questi file va cancellato)")
+
     report()
     return 1 if errors else 0
 

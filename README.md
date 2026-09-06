@@ -23,8 +23,18 @@ colophon/impostazioni con `user://settings.json`), `data/vfx.json` + renderer
 VFX per primitiva con impact frame. Criterio di uscita (US-219): il Twilight
 Giant va dalla Sequenza 9 alla 5 con zero codice dedicato.
 
-Il PRD della fase 3 (sistemi di supporto) si genera con `/prd` — vedi
-`006_PRD/roadmap.md`.
+**Fase 3 — Sistemi di supporto: chiusa.** 35 story, 498 test. Inventario/
+equip con tag di sinergia, `stored_ability_id`, alchimia (qualità, fallimenti
+mostruosi, scoperta ricette), forgiatura e sigilli (con effetti collaterali),
+strutture (`StructureRegistry`, le abilità d'area le rompono), un pet completo
+(taming, `bond`, coltivazione, la sua morte è la perdita di un'Ancora), base
+building (4 stanze coi bonus letti per chiave, giardino che cresce col tempo
+di gioco), talenti (innati alla creazione + acquisiti contando comportamenti),
+e `SynergySources` che somma i tag di tutte le fonti per la fase 4. Save da
+schema_version 12 a 19. Verdetto (US-335): i sistemi compongono un ciclo
+completo con zero codice dedicato a un contenuto.
+
+Il PRD della fase 4 (sinergie) si genera con `/prd` — vedi `006_PRD/roadmap.md`.
 
 ## Setup
 

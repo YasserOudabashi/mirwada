@@ -3895,3 +3895,49 @@ sezione test aggiornata.
 - Prossima e ULTIMA storia della fase 3: US-336 (aggiornamento roadmap.md,
   design-master.md Appendice C, CLAUDE.md, README.md; il validator ha un
   check per ogni file di dati nuovo della fase).
+
+[2026-09-06] US-336 — Aggiornamento roadmap e validator di chiusura. FASE 3 CHIUSA.
+
+- Documenti:
+  * 006_PRD/roadmap.md: sezione fase 3 -> "CHIUSA (35 story, 498 test)".
+    US-301..336 in 8 blocchi, save da schema_version 12 a 19, verdetto US-335,
+    lista completa dei vocabolari chiusi nuovi e dei formati nuovi.
+  * 006_PRD/design-master.md Appendice C: 9 righe nuove nella tabella dei
+    vocabolari (item_categories, equip_slots, room_types + bonus, tracked_
+    talents, sigil_effect_types, sigillato_effect_types, experiment_outcomes),
+    e tolto "(questa sessione)" da damage_tags/time ormai vecchi.
+  * CLAUDE.md: fase 3 CHIUSA (conteggi + verdetto + vocabolari + SynergySources);
+    "Fase corrente: 4 - Sinergie (da aprire)".
+  * README.md: paragrafo "Fase 3 - Sistemi di supporto: chiusa" con il riassunto
+    dei sistemi e il verdetto.
+- validate_data.py: check di CHIUSURA - FASE_3_DATA elenca i 23 file di
+  dati/schema introdotti nella fase; err se uno manca (una story futura non
+  deve cancellarli per sbaglio). Ogni singolo file ha gia' il suo blocco di
+  validazione dedicato, aggiunto story per story lungo la fase.
+- Come verificato: validate_data.py exit 0 (9 warning: 5 somme acting del TG
+  + 89 sequenze stub + 2 sinergie di gruppi differiti + 1 conteggio TODO i18n
+  - tutti attesi e documentati). 498 test headless invariati, tutti verdi.
+
+============================================================
+FASE 3 — SISTEMI DI SUPPORTO: CHIUSA. 35/35 story (US-301..336).
+============================================================
+- Blocchi: A inventario/equip, B alchimia, C forgiatura/sigilli, D strutture,
+  E pet, F base building, G talenti, H integrazione.
+- Save: schema_version da 12 (fine fase 2) a 19. Ogni bump ha la sua
+  _migra_N_a_N+1 e il suo test; la catena da v1 e' verde.
+- 498 test headless (erano 399 a fine fase 2 sul ramo main verificato).
+- Nessuna primitiva nuova (registro 28+3). I 12 tracked_events invariati.
+  I comportamenti-talento vivono nel vocabolario separato tracked_talents.json.
+- Verdetto architettura (US-335): i sistemi di supporto compongono un ciclo
+  completo (coltivazione -> alchimia -> forgia -> sigilli -> pet -> talenti ->
+  sinergie) con ZERO righe di codice dedicate a un contenuto specifico.
+  Il grep di scripts/ per id di item/pet/sigillo/ricetta/blueprint: zero.
+- Autoload nuovi: Inventory, Equipment, StructureRegistry, PetSystem,
+  BaseSystem, TalentTracker, TalentSystem, SynergySources.
+- Punto di controllo di fase 5 (aggiungere i 9 Pathway = dati, non codice):
+  NON minacciato. I sistemi per Death/Paragon/Moon/Mother (evocazioni) e
+  Hermit (oggetti con stored_ability_id) sono pronti.
+
+PROSSIMO: aprire la fase 4 (Sinergie, ~16 story) con /prd. SynergySources.
+tag_sinergia_globali() e' la materia prima; data/synergies/core.json ha 3
+esempi (sinergia_crescita_pozione ora raggiungibile).

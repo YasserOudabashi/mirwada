@@ -325,8 +325,15 @@ location_tags).
 | Primitive | `data/schema/primitives.json` | 28 attive + 3 differite | chiuso, parametri validati |
 | Eventi tracciabili | `data/schema/tracked_events.json` | 12 | chiuso |
 | Tag di sinergia | `data/tags.json` | 82 (39 usati) | chiuso |
-| Tag di danno | `data/schema/damage_tags.json` | 8 | chiuso, NUOVO (questa sessione) |
-| Tempo | `data/schema/time.json` | 4 momenti + 5 fasi lunari | chiuso, NUOVO (questa sessione) |
+| Tag di danno | `data/schema/damage_tags.json` | 8 | chiuso |
+| Tempo | `data/schema/time.json` | 4 momenti + 5 fasi lunari | chiuso |
+| Categorie di oggetto | `data/schema/item_categories.json` | 7 | chiuso, fase 3 (US-301) |
+| Slot di equipaggiamento | `data/schema/equip_slots.json` | 4 slot + 3 tipi | chiuso, fase 3 (US-301) |
+| Tipi di stanza + bonus ammessi | `data/schema/room_types.json` | 4 tipi | chiuso, fase 3 (US-326) |
+| Comportamenti-talento | `data/schema/tracked_talents.json` | 7 | chiuso, fase 3 (US-330) — distinti dai 12 `tracked_events` |
+| Effetti dei sigilli | `data/schema/sigil_effect_types.json` | effetti + effetti_collaterali | chiuso, fase 3 (US-315) |
+| Effetti dei Sigillati | `data/schema/sigillato_effect_types.json` | tick + tag | chiuso, fase 3 (US-318) |
+| Esiti degli esperimenti | `data/potions/experiment_outcomes.json` | 5 (pesati) | chiuso, fase 3 (US-311) |
 | Location tags | `data/schema/location_tags.json` | 24 proposti | PROPOSTO in design-world.md, si crea con la prima story che li valida |
 | Condizioni | `ability.schema.json` (enum) | 8 + 3 proposte | le 3 nuove (`follia_min`, `reputazione_min`, `flag`) arrivano col motore dialoghi |
 | Modi di gating | `region.schema.json` proposto | primitiva, momento, fase_lunare, npc, conoscenza, sequenza | PROPOSTO in design-world.md |

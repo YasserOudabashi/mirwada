@@ -102,11 +102,22 @@ il Twilight Giant va dalla Sequenza 9 alla 5 con zero codice dedicato
 scaffale, frontespizio, diagramma con fog of war, colophon/impostazioni),
 `data/vfx.json` + renderer VFX per primitiva.
 
-Fase corrente: **3 — Sistemi di supporto**. Scaletta in `006_PRD/roadmap.md`
-(inventario/equip, alchimia, forgiatura sigilli, pet, base building, talenti).
+Fase 3 — Sistemi di supporto: **CHIUSA** (35 story US-301..336, 498 test).
+PRD in `006_PRD/prd-fase-3-sistemi-di-supporto.md`. 8 blocchi: inventario/
+equip, alchimia, forgiatura/sigilli, strutture, pet, base building, talenti,
+integrazione. Save da schema_version 12 a 19. Verdetto sull'architettura
+verificato in US-335 (`tests/test_slice_fase_3.gd`): coltivazione, alchimia,
+forgia, sigilli, pet, talenti e sinergie compongono un ciclo completo con
+**zero righe di codice dedicate a un contenuto specifico**. Vocabolari chiusi
+nuovi: `item_categories`, `equip_slots`, `room_types`, `tracked_talents`
+(distinto dai 12 `tracked_events`, invariati), effetti dei sigilli,
+`experiment_outcomes`. Nessuna primitiva nuova. Fonti di tag per la fase 4:
+`SynergySources.tag_sinergia_globali()` (inventario + pet + talenti + stanze).
+
+Fase corrente: **4 — Sinergie** (da aprire). Scaletta in `006_PRD/roadmap.md`.
 PRD dettagliato da generare con `/prd`.
 
-Le fasi 4-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
+Le fasi 5-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
 genera con `/prd` **solo quando la precedente è chiusa**.
 
 Punto di controllo del progetto: la **fase 5**. Se aggiungere i 9 Pathway

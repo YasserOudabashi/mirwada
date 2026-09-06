@@ -691,8 +691,8 @@
       ],
       "priority": 35,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO H - CHIUSURA FASE 3. Documenti aggiornati: 006_PRD/roadmap.md (sezione fase 3 -> CHIUSA, 35 story US-301..336, save 12->19, verdetto US-335, lista completa dei vocabolari chiusi e dei formati nuovi); 006_PRD/design-master.md Appendice C (righe nuove per item_categories, equip_slots, room_types, tracked_talents, sigil_effect_types, sigillato_effect_types, experiment_outcomes); CLAUDE.md (fase 3 CHIUSA con conteggi + verdetto, fase corrente -> 4 Sinergie); README.md (paragrafo fase 3 chiusa). validate_data.py: check di CHIUSURA - FASE_3_DATA elenca i 23 file di dati/schema introdotti nella fase, err se uno manca (una story futura non deve cancellarli per sbaglio). Ogni singolo file ha gia' il suo blocco di validazione dedicato (aggiunto story per story). validate_data.py exit 0 (9 warning: 5 acting sum TG + 89 stub + 2 sinergie di gruppi differiti + 1 i18n TODO - tutti attesi). 498 test headless invariati. FASE 3 CHIUSA: 35/35 story."
     }
   ]
 }

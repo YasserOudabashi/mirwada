@@ -59,15 +59,27 @@ giocando, con avanzamenti veri, follia che cresce e Ancore che contano.
 
 ---
 
-## Fase 3 — Sistemi di supporto (~36 story)
+## Fase 3 — Sistemi di supporto — CHIUSA (35 story, 498 test)
 
-> **PRD generato il 2026-09-03**: `006_PRD/prd-fase-3-sistemi-di-supporto.md`
-> (36 story `US-3NN` in 8 blocchi: inventario/equip, alchimia, forgiatura/sigilli,
-> strutture, pet, base building, talenti, integrazione). Questa sezione resta
-> come scaletta; la verità è il PRD. Vocabolari nuovi dichiarati nel PRD:
-> `item_categories`, `equip_slots`, `room_types`, `tracked_talents` (~6-10,
-> chiuso — i 12 `tracked_events` restano invariati), tipi di effetto dei sigilli,
-> `experiment_outcomes`. Nessuna primitiva nuova.
+> **PRD**: `006_PRD/prd-fase-3-sistemi-di-supporto.md`. Chiusa il 2026-09-06:
+> 35 story `US-301..336` in 8 blocchi (A inventario/equip, B alchimia,
+> C forgiatura/sigilli, D strutture, E pet, F base building, G talenti,
+> H integrazione). Il save e' passato da schema_version 12 a 19. Verdetto
+> sull'architettura (US-335, `tests/test_slice_fase_3.gd`): i sistemi di
+> supporto compongono un ciclo completo — coltivazione, alchimia, forgia,
+> sigilli, pet, talenti, sinergie — con **zero righe di codice dedicate a un
+> contenuto specifico**, come il Twilight Giant in fase 2. Nessuna primitiva
+> nuova, i 12 `tracked_events` invariati.
+>
+> **Vocabolari chiusi nuovi della fase 3**:
+> `data/schema/item_categories.json` (7 categorie), `equip_slots.json`
+> (4 slot + 3 tipi), `room_types.json` (4 tipi di stanza + chiavi di bonus
+> ammesse), `tracked_talents.json` (7 comportamenti-talento — distinti dai 12
+> eventi), `sigil_effect_types.json` + `sigillato_effect_types.json` (tipi di
+> effetto/collaterale), `experiment_outcomes.json` (5 esiti pesati).
+> **Formati nuovi**: `structure.schema.json`, `pet.schema.json`,
+> `room.schema.json`, `talent.schema.json`, `forge_blueprint.schema.json`,
+> `sigil.schema.json`.
 
 - Inventario e equipaggiamento con tag di sinergia
 - **Oggetti con `stored_ability_id`**: pergamene e congegni che contengono
