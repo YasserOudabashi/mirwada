@@ -5377,3 +5377,36 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   decorative.
 - Prossima storia: US-606 (Darkness Seq 9-7: Sleepless / Midnight Poet /
   Nightmare). BLOCCO C - chiude la fase 5b per eternal_darkness.
+
+[2026-09-07] US-606 — Darkness Sequenze 9-7 (Sleepless / Midnight Poet / Nightmare). FASE 6, BLOCCO C.
+
+- NESSUNA primitiva nuova (fear/debuff_stat/dot/light_purify/buff_stat gia'
+  c'erano). Darkness Seq 9/8/7 stub -> false:
+  * darkness_forza_del_buio (Seq 9): 2x buff_stat moltiplicativo (forza x2,
+    evasione +80%) durata 12, CONDIZIONE e_notte:true - "al buio le
+    statistiche raddoppiano", la condizione ora vale (US-605).
+  * darkness_veglia_perpetua (Seq 9): buff_stat difesa flat + light_purify
+    (toglie il sonno imposto). Nessuna condizione.
+  * darkness_verso_cupo (Seq 8): 2x debuff_stat (forza -30%, velocita -20%) -
+    Midnight Poet deprime l'aggressivita'.
+  * darkness_poesia_amara (Seq 8): debuff_stat evasione + dot follia.
+  * darkness_incubo (Seq 7): fear + debuff_stat precisione -40%, CONDIZIONE
+    e_notte - Nightmare disorienta la mira.
+  * darkness_terrore_notturno (Seq 7): fear raggio 110 (area) + dot follia.
+- acting somma 1.0 per Seq. Seq 9 usa time_in_state {stato: notte} (600s) tra
+  le acting - il primo Pathway che recita sul tempo di gioco (US-604).
+  madness_on_force 1.1 / 2.5 / 3.9 (crescente). Nessun advancement_ritual
+  (Seq > 4). Tier low.
+- formule formula_darkness_9/8/7 + 9 ingredienti nuovi (velo_di_mezzanotte,
+  occhio_che_non_dorme, ...); char_darkness_9/8/7 tradotte (Insonne / Poeta
+  di Mezzanotte / Incubo).
+- i18n: 6 abilita' + 3 caratteristiche tradotte (seed dai campi name/
+  descrizione). i18n TODO 48 -> 51 (le 3 chiavi sequence.darkness.* restano
+  in inglese come per gli altri Pathway).
+- tests/test_darkness.gd (NUOVO, 4 test): le 6 abilita' 9-7 eseguono a 0
+  warning; darkness_incubo applica 'paura' e abbassa la precisione;
+  darkness_forza_del_buio ha la condizione e_notte; Seq 9/8/7 non-stub, acting
+  1.0, madness crescente, formule presenti.
+- Come verificato: validate exit 0 (stub 39 -> 36). 595 test headless
+  (591 + 4), tutti verdi (test_darkness_1 di US-503 invariato).
+- Prossima storia: US-607 (Darkness Seq 6-4 + shadow_meld in gioco).

@@ -21,18 +21,65 @@
       "name_i18n": "sequence.darkness.9",
       "tier": "low",
       "concept": "Veglia perpetua: visione notturna, immunita' al sonno, forza al buio.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 40,
+        "spiritualita_max": 0.1
+      },
+      "abilities": [
+        "darkness_forza_del_buio",
+        "darkness_veglia_perpetua"
+      ],
+      "acting_actions": [
+        {
+          "id": "darkness_9_veglia",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_forza_del_buio"
+          },
+          "target": 10,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_9_veglia",
+          "descrizione": "Invoca la Forza del Buio 10 volte"
+        },
+        {
+          "id": "darkness_9_notte",
+          "evento": "time_in_state",
+          "filtri": {
+            "stato": "notte"
+          },
+          "target": 600,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_9_notte",
+          "descrizione": "Resta sveglio nella notte per 600 secondi"
+        },
+        {
+          "id": "darkness_9_purga",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_veglia_perpetua"
+          },
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_9_purga",
+          "descrizione": "Rinnova la Veglia Perpetua 12 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 9,
-        "ingredients": [],
+        "ingredients": [
+          "velo_di_mezzanotte",
+          "occhio_che_non_dorme",
+          "cenere_di_stella_morta"
+        ],
         "formula_id": "formula_darkness_9"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
-      "notes": "",
-      "stub": true
+      "madness_on_force": 1.1,
+      "notes": "BLOCCO C (US-606): Darkness da stub a contenuto, nessuna primitiva nuova.",
+      "stub": false
     },
     {
       "sequence": 8,
@@ -41,18 +88,65 @@
       "name_i18n": "sequence.darkness.8",
       "tier": "low",
       "concept": "Parole che deprimono desideri e umore nemico, riducendo aggressivita'.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 50,
+        "forza": 0.05
+      },
+      "abilities": [
+        "darkness_verso_cupo",
+        "darkness_poesia_amara"
+      ],
+      "acting_actions": [
+        {
+          "id": "darkness_8_verso",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_verso_cupo"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_8_verso",
+          "descrizione": "Recita il Verso Cupo a 12 bersagli"
+        },
+        {
+          "id": "darkness_8_poesia",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_poesia_amara"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_8_poesia",
+          "descrizione": "Recita la Poesia Amara 12 volte"
+        },
+        {
+          "id": "darkness_8_follia",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "follia"
+          },
+          "target": 1500,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_8_follia",
+          "descrizione": "Infliggi 1500 danni da follia"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 8,
-        "ingredients": [],
+        "ingredients": [
+          "inchiostro_di_seppia_abissale",
+          "corda_di_impiccato",
+          "lacrima_di_vedova"
+        ],
         "formula_id": "formula_darkness_8"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
-      "notes": "",
-      "stub": true
+      "madness_on_force": 2.5,
+      "notes": "BLOCCO C (US-606): Darkness da stub a contenuto, nessuna primitiva nuova.",
+      "stub": false
     },
     {
       "sequence": 7,
@@ -61,18 +155,65 @@
       "name_i18n": "sequence.darkness.7",
       "tier": "low",
       "concept": "Entra negli incubi e infligge paura che disorienta i controlli nemici.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 60,
+        "spiritualita_max": 0.1
+      },
+      "abilities": [
+        "darkness_incubo",
+        "darkness_terrore_notturno"
+      ],
+      "acting_actions": [
+        {
+          "id": "darkness_7_incubo",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_incubo"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_7_incubo",
+          "descrizione": "Entra in 15 incubi"
+        },
+        {
+          "id": "darkness_7_terrore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_terrore_notturno"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_7_terrore",
+          "descrizione": "Scatena il Terrore Notturno 12 volte"
+        },
+        {
+          "id": "darkness_7_paura",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "follia"
+          },
+          "target": 1800,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_7_paura",
+          "descrizione": "Infliggi 1800 danni da follia"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 7,
-        "ingredients": [],
+        "ingredients": [
+          "polvere_di_incubo",
+          "piuma_di_civetta_nera",
+          "radice_di_mandragora_urlante"
+        ],
         "formula_id": "formula_darkness_7"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
-      "notes": "",
-      "stub": true
+      "madness_on_force": 3.9,
+      "notes": "BLOCCO C (US-606): Darkness da stub a contenuto, nessuna primitiva nuova.",
+      "stub": false
     },
     {
       "sequence": 6,

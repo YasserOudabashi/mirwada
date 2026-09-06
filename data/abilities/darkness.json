@@ -78,6 +78,207 @@
       ],
       "costo_follia": 3.0,
       "note": "STRESS TEST. Cancella cose e persone dalla percezione altrui. Risolto parametrizzando illusion con tipo_illusione, senza primitiva nuova."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_forza_del_buio",
+      "name": "Forza del Buio",
+      "name_i18n": "ability.darkness.darkness_forza_del_buio",
+      "sequence_id": "darkness_9",
+      "costo_spiritualita": 20,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "forza",
+          "valore": 1.0,
+          "durata": 12.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 0.8,
+          "durata": 12.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "notte",
+        "forza",
+        "ombra"
+      ],
+      "costo_follia": 1.0,
+      "note": "Sleepless: al buio le statistiche del Darkness raddoppiano. La condizione e_notte ora vale (US-605): di giorno l'abilita' e' rifiutata senza pagare il costo.",
+      "condizioni": [
+        {
+          "tipo": "e_notte",
+          "valore": true
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_veglia_perpetua",
+      "name": "Veglia Perpetua",
+      "name_i18n": "ability.darkness.darkness_veglia_perpetua",
+      "sequence_id": "darkness_9",
+      "costo_spiritualita": 15,
+      "cooldown": 20.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.12,
+          "durata": 25.0,
+          "moltiplicativo": false
+        },
+        {
+          "tipo": "light_purify",
+          "raggio": 0,
+          "potenza": 1,
+          "riduce_sequenza": false
+        }
+      ],
+      "tag_sinergia": [
+        "notte",
+        "sonno",
+        "negazione"
+      ],
+      "costo_follia": 1.0,
+      "note": "Immunita' al sonno: light_purify toglie lo status imposto. Nessuna condizione: la veglia e' sempre."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_verso_cupo",
+      "name": "Verso Cupo",
+      "name_i18n": "ability.darkness.darkness_verso_cupo",
+      "sequence_id": "darkness_8",
+      "costo_spiritualita": 25,
+      "cooldown": 15.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "forza",
+          "valore": -0.3,
+          "durata": 15.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "velocita",
+          "valore": -0.2,
+          "durata": 15.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "notte",
+        "emozione",
+        "singolo"
+      ],
+      "costo_follia": 1.5,
+      "note": "Midnight Poet: parole che deprimono desiderio e umore, riducendo l'aggressivita' del bersaglio."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_poesia_amara",
+      "name": "Poesia Amara",
+      "name_i18n": "ability.darkness.darkness_poesia_amara",
+      "sequence_id": "darkness_8",
+      "costo_spiritualita": 22,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "evasione",
+          "valore": -0.25,
+          "durata": 12.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "dot",
+          "danno_tick": 3,
+          "tick_rate": 2.0,
+          "durata": 12.0,
+          "tag_danno": "follia"
+        }
+      ],
+      "tag_sinergia": [
+        "notte",
+        "emozione",
+        "follia"
+      ],
+      "costo_follia": 1.5,
+      "note": "La malinconia che logora: debuff di evasione + dot a tag follia."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_incubo",
+      "name": "Incubo",
+      "name_i18n": "ability.darkness.darkness_incubo",
+      "sequence_id": "darkness_7",
+      "costo_spiritualita": 30,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "fear",
+          "raggio": 0,
+          "durata": 8.0,
+          "soglia_resistenza": 0.3
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.4,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "sonno",
+        "follia",
+        "mente"
+      ],
+      "costo_follia": 2.0,
+      "note": "Nightmare: entra nell'incubo del bersaglio e vi infligge paura che disorienta la mira. Solo di notte (US-605).",
+      "condizioni": [
+        {
+          "tipo": "e_notte",
+          "valore": true
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_terrore_notturno",
+      "name": "Terrore Notturno",
+      "name_i18n": "ability.darkness.darkness_terrore_notturno",
+      "sequence_id": "darkness_7",
+      "costo_spiritualita": 35,
+      "cooldown": 25.0,
+      "primitive": [
+        {
+          "tipo": "fear",
+          "raggio": 110,
+          "durata": 6.0,
+          "soglia_resistenza": 0.2
+        },
+        {
+          "tipo": "dot",
+          "danno_tick": 4,
+          "tick_rate": 2.0,
+          "durata": 8.0,
+          "tag_danno": "follia"
+        }
+      ],
+      "tag_sinergia": [
+        "sonno",
+        "follia",
+        "area"
+      ],
+      "costo_follia": 2.5,
+      "note": "Paura d'area che rompe le formazioni + logorio a tag follia."
     }
   ]
 }

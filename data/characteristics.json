@@ -367,6 +367,24 @@
       "pathway_id": "hermit",
       "sequence": 0,
       "name_i18n": "characteristic.hermit.0"
+    },
+    {
+      "id": "char_darkness_9",
+      "pathway_id": "darkness",
+      "sequence": 9,
+      "name_i18n": "characteristic.darkness.9"
+    },
+    {
+      "id": "char_darkness_8",
+      "pathway_id": "darkness",
+      "sequence": 8,
+      "name_i18n": "characteristic.darkness.8"
+    },
+    {
+      "id": "char_darkness_7",
+      "pathway_id": "darkness",
+      "sequence": 7,
+      "name_i18n": "characteristic.darkness.7"
     }
   ]
 }

@@ -102,8 +102,8 @@
       ],
       "priority": 6,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO C. Nessuna primitiva nuova. Darkness Seq 9/8/7 stub->false: forza_del_buio (2x buff mult forza/evasione, cond e_notte - 'raddoppiate di notte', la condizione ora vale US-605), veglia_perpetua (buff difesa + light_purify), verso_cupo (2x debuff - Midnight Poet), poesia_amara (debuff + dot follia), incubo (fear + debuff precisione, cond e_notte), terrore_notturno (fear area + dot). acting 1.0; Seq 9 recita su time_in_state {stato:notte} 600s (primo Pathway sul tempo di gioco). madness 1.1/2.5/3.9. formule+9 ingredienti; char 9/8/7 tradotte. tests/test_darkness.gd (4 test). validate exit 0 (stub 39->36), 595 test verdi."
     },
     {
       "id": "US-607",

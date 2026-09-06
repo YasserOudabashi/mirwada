@@ -21,6 +21,7 @@
     "cenere_di_bosco",
     "cenere_di_re",
     "cenere_di_spirito",
+    "cenere_di_stella_morta",
     "cera_di_candela_rituale",
     "cera_di_veglia",
     "chiave_d_ossa",
@@ -30,6 +31,7 @@
     "chiodo_di_bara",
     "chiodo_di_ferro_freddo",
     "codice_della_vita_inciso",
+    "corda_di_impiccato",
     "corno_di_alce_spettrale",
     "corona_di_ossa",
     "corteccia_febbrifuga",
@@ -74,12 +76,14 @@
     "incenso_di_mirra",
     "inchiostro_che_non_si_cancella",
     "inchiostro_di_due_mondi",
+    "inchiostro_di_seppia_abissale",
     "inchiostro_ferrogallico",
     "inchiostro_luminescente",
     "inchiostro_stellare",
     "ingranaggio_di_precisione",
     "lacrima_di_amante",
     "lacrima_di_paladino",
+    "lacrima_di_vedova",
     "lama_di_luce_solidificata",
     "lega_beyonder",
     "lega_impossibile_da_replicare",
@@ -101,6 +105,7 @@
     "nucleo_spirituale_stabile",
     "numero_che_non_dovrebbe_esistere",
     "obolo_di_bronzo",
+    "occhio_che_non_dorme",
     "occhio_di_vetro_nero",
     "olio_conduttore",
     "oro_bianco",
@@ -113,11 +118,13 @@
     "petalo_di_belladonna",
     "pietra_di_marea",
     "pietra_di_soglia",
+    "piuma_di_civetta_nera",
     "placenta_di_pietra",
     "platino_rituale",
     "polline_dorato",
     "polvere_di_arena",
     "polvere_di_crepuscolo",
+    "polvere_di_incubo",
     "polvere_di_meteora",
     "polvere_di_ossario",
     "polvere_di_pagine_antiche",
@@ -136,6 +143,7 @@
     "radice_che_beve",
     "radice_di_ferro_lunare",
     "radice_di_immortelle",
+    "radice_di_mandragora_urlante",
     "radice_di_quercia",
     "radice_di_valeriana",
     "radice_di_veggente",
@@ -182,6 +190,7 @@
     "ultima_foglia_dell_autunno",
     "ultimo_battito",
     "ultimo_respiro",
+    "velo_di_mezzanotte",
     "voce_del_gigante",
     "voce_di_creatura_mai_vista",
     "zanna_di_latte"
@@ -1039,6 +1048,48 @@
         "follia_extra": 2.0,
         "qualita": "instabile",
         "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_darkness_9": {
+      "characteristic_sequence": 9,
+      "ingredients": [
+        "velo_di_mezzanotte",
+        "occhio_che_non_dorme",
+        "cenere_di_stella_morta"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione con ingredienti mancanti: piu' follia, qualita' ridotta. Esplicito nei dati."
+      }
+    },
+    "formula_darkness_8": {
+      "characteristic_sequence": 8,
+      "ingredients": [
+        "inchiostro_di_seppia_abissale",
+        "corda_di_impiccato",
+        "lacrima_di_vedova"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione con ingredienti mancanti: piu' follia, qualita' ridotta. Esplicito nei dati."
+      }
+    },
+    "formula_darkness_7": {
+      "characteristic_sequence": 7,
+      "ingredients": [
+        "polvere_di_incubo",
+        "piuma_di_civetta_nera",
+        "radice_di_mandragora_urlante"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione con ingredienti mancanti: piu' follia, qualita' ridotta. Esplicito nei dati."
       }
     }
   }
