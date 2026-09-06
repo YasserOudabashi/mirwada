@@ -419,8 +419,8 @@
       ],
       "priority": 21,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO E. PetSystem.doma(pet_id, bonus=0.0) -> bool: bloccato se hai gia' un pet (push_warning, libera() prima); specie ignota -> false; tiro _rng.randf() contro soglia = clampf(domabilita + bonus, 0, 1). Successo -> imposta_pet + AnchorSystem.register(ancora_id) (il pet riduce la follia come le altre Ancore). Fallimento -> taming_fallito.emit, niente pet, niente Ancora. bonus e' il gancio per talenti/oggetti (US-33x lo passeranno). RNG seedabile: imposta_seed(s) (stesso pattern di PotionSystem), null -> randomize() alla prima doma. AnchorSystem.rilascia(id) NUOVO: rilascio PULITO (erase + aggiorna nomi sussurro, nessuna follia, nessun anchor_lost) - a differenza di destroy() che e' la morte (US-325). PetSystem.libera() ora chiama rilascia(ancora_id). 426 test headless (421 + 5 in test_taming.gd: doma con bonus 1.0 -> pet+Ancora; bonus -1.0 -> niente; stesso seed -> stesso esito; secondo taming bloccato; libera() rilascia l'Ancora senza aggiungere follia e sblocca un nuovo taming). validate_data.py exit 0. Nessuna verifica a schermo: nessuna UI."
     },
     {
       "id": "US-323",

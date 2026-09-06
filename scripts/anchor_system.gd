@@ -48,6 +48,17 @@ func destroy(anchor_id: String) -> bool:
 	return true
 
 
+## Rilascio PULITO di un'Ancora attiva (US-322: liberare il pet). A differenza
+## di destroy() non e' un colpo: nessuna follia, nessun anchor_lost. false se
+## l'Ancora non era attiva.
+func rilascia(anchor_id: String) -> bool:
+	if not _active.has(anchor_id):
+		return false
+	_active.erase(anchor_id)
+	_aggiorna_nomi_sussurro()
+	return true
+
+
 func active() -> Array:
 	return _active.duplicate()
 
