@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "synergy.schema.json",
   "title": "Synergy",
+  "_comment": "Documentazione di data/synergies/*.json. I controlli veri sono in tools/validate_data.py (nessuna dipendenza jsonschema). Fase 4: 'priorita' e l'oneOf di 'effetto' per i 6 tipi; 'neutralizza' per le anti-sinergie. RISOLUZIONE dei conflitti (SynergyEngine): (1) raccogli le sinergie soddisfatte (richiede_tag >= soglia, nessun esclude_tag presente); (2) gli effetti CUMULATIVI (modifica_stat, modifica_follia, modifica_primitiva) si SOMMANO, 'priorita' fissa solo l'ordine di applicazione; (3) gli effetti ESCLUSIVI (modifica_qualita_crafting sulla stessa categoria; sblocca_ricetta/aggiungi_abilita sullo stesso id) -> vince 'priorita' desc, poi 'id' asc. Convenzione: anti-sinergie a priorita 100.",
   "type": "object",
   "required": ["schema_version", "id", "name_i18n", "richiede_tag", "fonti", "effetto", "scoperta"],
   "additionalProperties": false,
@@ -9,6 +10,7 @@
     "schema_version": { "const": 1 },
     "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
     "name_i18n": { "type": "string", "pattern": "^synergy\\." },
+    "priorita": { "type": "integer", "default": 0 },
     "richiede_tag": {
       "type": "object",
       "minProperties": 1,
@@ -22,18 +24,76 @@
       "type": "array",
       "minItems": 2,
       "items": { "enum": ["abilita", "equipaggiamento", "pet", "stanza", "talento", "sequenza", "ingrediente"] },
-      "_comment": "minItems 2 e' deliberato: una sinergia che pesca da una sola categoria non attraversa i sistemi e viola il pilastro di design."
+      "_comment": "minItems 2 e' deliberato: una sinergia che pesca da una sola categoria non attraversa i sistemi e viola il pilastro di design. 'sequenza' = i tag del Pathway attivo (fase 4). 'ingrediente' e' accettato ma nessuna fonte lo alimenta in fase 4 (la sinergia a tempo di craft e' fase 5+)."
     },
     "effetto": {
       "type": "object",
       "required": ["tipo"],
-      "properties": {
-        "tipo": { "enum": ["aggiungi_abilita", "modifica_stat", "modifica_primitiva",
-                           "sblocca_ricetta", "modifica_follia", "modifica_qualita_crafting"] }
-      }
+      "oneOf": [
+        {
+          "properties": {
+            "tipo": { "const": "modifica_stat" },
+            "stat": { "enum": ["hp_max", "spiritualita_max", "velocita", "difesa", "evasione", "precisione", "forza"] },
+            "valore": { "type": "number" },
+            "moltiplicativo": { "type": "boolean" }
+          },
+          "required": ["tipo", "stat", "valore", "moltiplicativo"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "tipo": { "const": "modifica_follia" },
+            "delta_al_minuto": { "type": "number", "_comment": "negativo = una sinergia positiva riduce la follia nel tempo; positivo = una anti-sinergia l'accelera" }
+          },
+          "required": ["tipo", "delta_al_minuto"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "tipo": { "const": "modifica_qualita_crafting" },
+            "categoria": { "enum": ["pozioni", "forgia"] },
+            "delta": { "type": "integer", "_comment": "passi interi sulla scala di qualita', come qualita_pozione/qualita_forgia delle stanze" }
+          },
+          "required": ["tipo", "categoria", "delta"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "tipo": { "const": "sblocca_ricetta" },
+            "recipe_id": { "type": "string" }
+          },
+          "required": ["tipo", "recipe_id"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "tipo": { "const": "aggiungi_abilita" },
+            "ability_id": { "type": "string" }
+          },
+          "required": ["tipo", "ability_id"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "tipo": { "const": "modifica_primitiva" },
+            "primitiva": { "type": "string", "_comment": "una del registro chiuso data/schema/primitives.json, attiva e non differita" },
+            "parametro": { "type": "string", "_comment": "uno dei 'params' di quella primitiva" },
+            "delta": { "type": "number" },
+            "moltiplicativo": { "type": "boolean", "_comment": "true -> param *= (1 + delta); false -> param += delta" }
+          },
+          "required": ["tipo", "primitiva", "parametro", "delta", "moltiplicativo"],
+          "additionalProperties": false
+        }
+      ]
     },
     "anti": { "type": "boolean", "default": false },
+    "neutralizza": {
+      "type": "array",
+      "items": { "type": "string" },
+      "_comment": "solo per anti:true - gli id delle sinergie gemelle che questa anti-sinergia disattiva quando e' essa stessa attiva. Dichiarato nei dati, mai inferito per set di tag."
+    },
     "scoperta": { "enum": ["visibile", "nascosta", "lore"] },
+    "stub": { "type": "boolean", "_comment": "true = l'output (es. un'abilita') non e' ancora scritto: il validator non pretende che esista" },
     "note": { "type": "string" }
   }
 }

@@ -3970,3 +3970,54 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
   suo effetto si misura, zero righe di codice la nominano (grep, come
   US-219/US-335).
 - Prossima storia: US-401 (schema esteso + SynergyEngine: risoluzione dei tag).
+
+[2026-09-06] US-401 — Schema esteso e SynergyEngine. BLOCCO A.
+
+- data/schema/synergy.schema.json (doc, non enforced): campo 'priorita'
+  (int, default 0); 'effetto' e' un oneOf per i 6 tipo coi loro campi:
+  * modifica_stat        { stat, valore, moltiplicativo }
+  * modifica_follia      { delta_al_minuto }  (negativo = riduce nel tempo)
+  * modifica_qualita_crafting { categoria: pozioni|forgia, delta: INT }
+  * sblocca_ricetta      { recipe_id }
+  * aggiungi_abilita     { ability_id }
+  * modifica_primitiva   { primitiva, parametro, delta, moltiplicativo }
+  Campo 'neutralizza': [id] per le anti-sinergie (US-407). Campo 'stub'.
+  La regola di risoluzione conflitti e' scritta nel _comment: cumulativi
+  (stat/follia/primitiva) si sommano (priorita' = solo ordine); esclusivi
+  (qualita_crafting per categoria, sblocca_ricetta/aggiungi_abilita per id)
+  -> priorita' desc, poi id asc. Convenzione: anti a priorita 100.
+- data/synergies/core.json: sinergia_crescita_pozione delta 0.20 -> 1
+  (passi interi di qualita', non piu' un moltiplicatore). Nuova
+  sinergia_studio_sereno (esempio di riferimento per esclude_tag +
+  modifica_stat): stanza_rituale + biblioteca, esclude corruzione ->
+  spiritualita_max +10%.
+- scripts/synergy_engine.gd (autoload SynergyEngine, DOPO SynergySources in
+  project.godot - in _ready() US-402 si connettera' ai segnali delle fonti):
+  * tag_globali() -> da SynergySources.tag_sinergia_globali(), o da
+    _tag_override nei test.
+  * attive() -> [id] soddisfatti (ogni richiede_tag >= soglia, nessun
+    esclude_tag presente), ordine lessicografico.
+  * e_attiva(id), tag_mancanti(id) -> { tag: quanti ne mancano }.
+  * pulisci() azzera l'override; imposta_override_tag(d) e' SOLO per i test.
+  US-401 fa solo la RISOLUZIONE: nessun effetto applicato (US-403+), nessun
+  segnale (US-402), niente anti-sinergie (US-407).
+- scripts/synergy_sources.gd: per_fonte() aggiunge la fonte "sequenza" = i
+  tag del Pathway attivo (Progression.pathway() -> GameData.get_pathway()
+  .tags). 'ingrediente' resta nell'enum dello schema senza una fonte in
+  fase 4 (documentato).
+- scripts/game_data.gd: synergy_ids() (get_synergy c'era gia').
+- tools/validate_data.py: nel blocco sinergie - 'priorita' intero; 'effetto'
+  ben formato per tipo (stat nota; categoria pozioni|forgia + delta int;
+  recipe_id in recipes.json; ability_id in ability_ids o stub:true;
+  primitiva attiva-non-differita + parametro nei suoi params; delta numerico);
+  'neutralizza' solo su anti:true, e ogni id elencato risolve a una sinergia
+  esistente.
+- Come verificato: 504 test headless (498 + 6 in test_synergy_engine.gd:
+  synergy_ids espone le sinergie; richiede_tag soddisfatti -> attiva;
+  sotto soglia -> non attiva + tag_mancanti dice quanto manca; esclude_tag
+  presente -> blocca; attive() ordinata; per_fonte include 'sequenza' coi tag
+  del Pathway). validate_data.py exit 0 (9 warning: le 2 sinergie di gruppi
+  differiti + 5 acting TG + 89 stub + 1 i18n). Nessuna verifica a schermo.
+- Prossima storia: US-402 (rivalutazione reattiva: SynergyEngine si connette
+  ai segnali delle fonti + poll ogni ~0.5s, emette sinergia_attivata/
+  disattivata sui cambi reali).

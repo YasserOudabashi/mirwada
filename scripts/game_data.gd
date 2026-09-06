@@ -259,6 +259,10 @@ func get_synergy(id: String) -> Dictionary:
 	return _synergies.get(id, {})
 
 
+func synergy_ids() -> Array:
+	return _synergies.keys()
+
+
 ## Definizione di una primitiva dal registro chiuso di data/schema/.
 ## Vuoto = primitiva inesistente: e' un errore di dati, non un caso da gestire.
 func get_primitive(tipo: String) -> Dictionary:

@@ -19,9 +19,21 @@
       "name_i18n": "synergy.crescita_pozione",
       "richiede_tag": { "crescita": 2, "pozione": 2 },
       "fonti": ["stanza", "ingrediente", "pet"],
-      "effetto": { "tipo": "modifica_qualita_crafting", "categoria": "pozioni", "delta": 0.20 },
+      "effetto": { "tipo": "modifica_qualita_crafting", "categoria": "pozioni", "delta": 1 },
       "scoperta": "visibile",
       "note": "Giardino + ingredienti coltivati + pet erbivoro. Sinergia introduttiva, deliberatamente visibile per insegnare il sistema."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_studio_sereno",
+      "name_i18n": "synergy.studio_sereno",
+      "richiede_tag": { "occulto": 1, "conoscenza": 1 },
+      "esclude_tag": { "corruzione": 1 },
+      "fonti": ["stanza", "talento"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_stat", "stat": "spiritualita_max", "valore": 0.1, "moltiplicativo": true },
+      "scoperta": "nascosta",
+      "note": "Stanza rituale + biblioteca, finche' non porti tag di corruzione: studiare in pace ricarica lo spirito. Esempio di riferimento per esclude_tag e modifica_stat (US-401)."
     },
     {
       "schema_version": 1,

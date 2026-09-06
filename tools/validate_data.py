@@ -565,8 +565,11 @@ def main():
 
     # --- sinergie ---
     sdir = os.path.join(DATA, "synergies")
+    _rec_for_syn = load_json(os.path.join(DATA, "potions", "recipes.json")) or {}
+    recipe_ids_all = set((_rec_for_syn.get("recipes", {}) or {}).keys())
     if os.path.isdir(sdir):
         syn_ids = set()
+        syn_neutralizza = {}  # sid -> [id, ...]
         for fname in sorted(os.listdir(sdir)):
             if not fname.endswith(".json"):
                 continue
@@ -585,18 +588,62 @@ def main():
                 if len(set(syn.get("fonti", []))) < 2:
                     err(f"{rel} [{sid}]: una sinergia deve pescare da almeno 2 fonti diverse "
                         f"(pilastro di design: le sinergie attraversano i sistemi)")
-                # L'output della sinergia deve esistere: un'abilita' fantasma si
-                # scoprirebbe solo al momento in cui il giocatore la sblocca.
+                if "priorita" in syn and not isinstance(syn["priorita"], int):
+                    err(f"{rel} [{sid}]: 'priorita' deve essere un intero")
+                # --- effetto ben formato per tipo (fase 4, US-401) ---
                 eff = syn.get("effetto", {})
-                if eff.get("tipo") == "aggiungi_abilita" and not syn.get("stub"):
-                    if eff.get("ability_id") not in ability_ids:
+                et = eff.get("tipo")
+                syn_stats = {"hp_max", "spiritualita_max", "velocita", "difesa",
+                             "evasione", "precisione", "forza"}
+                if et == "modifica_stat":
+                    if eff.get("stat") not in syn_stats:
+                        err(f"{rel} [{sid}]: effetto.stat '{eff.get('stat')}' non e' una stat nota")
+                    if not isinstance(eff.get("valore"), (int, float)):
+                        err(f"{rel} [{sid}]: effetto.valore deve essere numerico")
+                    if not isinstance(eff.get("moltiplicativo"), bool):
+                        err(f"{rel} [{sid}]: effetto.moltiplicativo deve essere true/false")
+                elif et == "modifica_follia":
+                    if not isinstance(eff.get("delta_al_minuto"), (int, float)):
+                        err(f"{rel} [{sid}]: effetto.delta_al_minuto deve essere numerico")
+                elif et == "modifica_qualita_crafting":
+                    if eff.get("categoria") not in ("pozioni", "forgia"):
+                        err(f"{rel} [{sid}]: effetto.categoria deve essere 'pozioni' o 'forgia'")
+                    if not isinstance(eff.get("delta"), int):
+                        err(f"{rel} [{sid}]: effetto.delta deve essere un intero (passi di qualita')")
+                elif et == "sblocca_ricetta":
+                    if eff.get("recipe_id") not in recipe_ids_all:
+                        err(f"{rel} [{sid}]: effetto.recipe_id '{eff.get('recipe_id')}' non risolve")
+                elif et == "aggiungi_abilita":
+                    if not syn.get("stub") and eff.get("ability_id") not in ability_ids:
                         err(f"{rel} [{sid}]: effetto aggiunge l'abilita' inesistente "
                             f"'{eff.get('ability_id')}'. Scrivila, o marca la sinergia \"stub\": true.")
+                elif et == "modifica_primitiva":
+                    pn = eff.get("primitiva")
+                    pspec = prim_doc["primitives"].get(pn, {})
+                    if not pspec or pspec.get("deferred"):
+                        err(f"{rel} [{sid}]: effetto.primitiva '{pn}' non e' una primitiva attiva")
+                    elif eff.get("parametro") not in pspec.get("params", []):
+                        err(f"{rel} [{sid}]: effetto.parametro '{eff.get('parametro')}' non e' un "
+                            f"parametro di '{pn}' ({pspec.get('params', [])})")
+                    if not isinstance(eff.get("delta"), (int, float)):
+                        err(f"{rel} [{sid}]: effetto.delta deve essere numerico")
+                    if not isinstance(eff.get("moltiplicativo"), bool):
+                        err(f"{rel} [{sid}]: effetto.moltiplicativo deve essere true/false")
+                else:
+                    err(f"{rel} [{sid}]: effetto.tipo '{et}' non riconosciuto")
+                if syn.get("neutralizza"):
+                    if not syn.get("anti"):
+                        err(f"{rel} [{sid}]: 'neutralizza' ha senso solo su una anti-sinergia (anti:true)")
+                    syn_neutralizza[sid] = list(syn["neutralizza"])
                 irraggiungibili = [t for t in syn.get("richiede_tag", {})
                                    if t in valid_tags and t not in obtainable_tags]
                 if irraggiungibili:
                     warn(f"{rel} [{sid}]: richiede i tag {irraggiungibili} che nessun pathway "
                          f"attivo porta: sinergia irraggiungibile finche' il suo gruppo resta differito.")
+        for anti_id, bersagli in syn_neutralizza.items():
+            for b in bersagli:
+                if b not in syn_ids:
+                    err(f"data/synergies/: [{anti_id}] neutralizza '{b}', che non e' una sinergia esistente")
 
     # --- oggetti (data/items/, US-301) ---
     ic_doc = load_json(os.path.join(DATA, "schema", "item_categories.json"))

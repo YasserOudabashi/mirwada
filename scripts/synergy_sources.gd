@@ -17,12 +17,29 @@ const _FONTI := {
 }
 
 
-## Il dettaglio per fonte: { nome_fonte: { tag: conteggio } }.
+## Il dettaglio per fonte: { nome_fonte: { tag: conteggio } }. Le 4 fonti con
+## tag_attivi() + 'sequenza' (i tag del Pathway attivo, US-401). 'ingrediente'
+## e' nell'enum dello schema ma non ha una fonte in fase 4.
 func per_fonte() -> Dictionary:
 	var out: Dictionary = {}
 	for nome in _FONTI:
 		var n: Node = get_node_or_null(_FONTI[nome])
 		out[nome] = (n.call("tag_attivi") as Dictionary).duplicate() if n != null and n.has_method("tag_attivi") else {}
+	out["sequenza"] = _tag_sequenza()
+	return out
+
+
+## I tag del Pathway attualmente attivo (Progression + GameData). {} se non
+## c'e' una partita in corso.
+func _tag_sequenza() -> Dictionary:
+	var prog: Node = get_node_or_null("/root/Progression")
+	var gd: Node = get_node_or_null("/root/GameData")
+	if prog == null or gd == null:
+		return {}
+	var pw: Dictionary = gd.call("get_pathway", str(prog.call("pathway")))
+	var out: Dictionary = {}
+	for t in pw.get("tags", []):
+		out[str(t)] = int(out.get(str(t), 0)) + 1
 	return out
 
 

@@ -22,8 +22,8 @@
       ],
       "priority": 1,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO A. data/schema/synergy.schema.json (doc) esteso: campo 'priorita' (int, default 0); 'effetto' diventa un oneOf per i 6 tipo coi loro campi (modifica_stat {stat,valore,moltiplicativo}, modifica_follia {delta_al_minuto}, modifica_qualita_crafting {categoria pozioni|forgia, delta INT}, sblocca_ricetta {recipe_id}, aggiungi_abilita {ability_id}, modifica_primitiva {primitiva, parametro, delta, moltiplicativo}); campo 'neutralizza' [id] per le anti (US-407); 'stub'. La regola di risoluzione conflitti e' nel _comment. data/synergies/core.json: sinergia_crescita_pozione delta 0.20 -> 1 (passi interi); nuova sinergia_studio_sereno di riferimento (esclude_tag corruzione + modifica_stat). scripts/synergy_engine.gd (autoload SynergyEngine, DOPO SynergySources in project.godot): tag_globali() (da SynergySources o _tag_override nei test), attive() -> [id] soddisfatti (richiede_tag >= soglia, nessun esclude_tag presente), ordinati; e_attiva(id); tag_mancanti(id) -> {tag: quanti mancano}; pulisci() (azzera l'override); imposta_override_tag(d) SOLO test. SynergySources.per_fonte() esteso con 'sequenza' = i tag del Pathway attivo (Progression.pathway() + GameData.get_pathway().tags). GameData.synergy_ids(). validate_data.py: 'priorita' int; 'effetto' ben formato per tipo (stat nota / categoria pozioni|forgia / recipe_id e ability_id risolvono / primitiva attiva + parametro nei suoi params); 'neutralizza' solo su anti:true e ogni id risolve. 504 test headless (498 + 6 in test_synergy_engine.gd), validate exit 0 (9 warning invariati: le 2 sinergie di gruppi differiti restano). Nessuna verifica a schermo: la UI e' US-410."
     },
     {
       "id": "US-402",
