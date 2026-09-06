@@ -419,13 +419,13 @@ func test_stato_registro_classifica_i_quattro_stati() -> void:
 func test_contatore_sale_attivando_una_nascosta() -> void:
 	var totali_syn: int = (_gd().call("synergy_ids") as Array).size()
 	var c0: Vector2i = _se().call("contatore")
-	assert_true(c0.y >= 8 and c0.y <= totali_syn - 2,
-		"il totale esclude le sinergie irraggiungibili (probabilita'/ordine/disordine)")
-	assert_eq(c0.x, 1, "all'inizio: solo la sinergia 'visibile' e' scoperta")
+	assert_eq(c0.y, totali_syn - 2,
+		"il totale esclude le 2 irraggiungibili (probabilita', ordine/disordine)")
+	var vis0: int = c0.x
 
 	_se().call("imposta_override_tag", {"occulto": 1, "conoscenza": 1})
 	_se().call("rivaluta")  # attiva sinergia_studio_sereno (nascosta) -> entra in _viste
-	assert_eq((_se().call("contatore") as Vector2i).x, 2, "attivata una nascosta -> scoperte +1")
+	assert_eq((_se().call("contatore") as Vector2i).x, vis0 + 1, "attivata una nascosta -> scoperte +1")
 	assert_eq((_se().call("contatore") as Vector2i).y, c0.y, "il totale non cambia")
 	_fine()
 

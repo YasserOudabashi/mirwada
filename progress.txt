@@ -4372,3 +4372,48 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-413 (BATCH 1: 8 sinergie raggiungibili, una per
   meccanismo, inclusa la sinergia del CRITERIO DI USCITA pet+stanza+talento;
   test_slice_fase_4.gd).
+
+[2026-09-06] US-413 — Batch 1: 8 sinergie raggiungibili + criterio di uscita. BLOCCO C.
+
+- data/synergies/batch_1.json (NUOVO): 8 sinergie, tutte raggiungibili coi
+  10 Pathway attivi + pet/stanze/talenti (nessun warning nuovo del validator).
+  Una per meccanismo di effetto:
+  1. sinergia_studio_notturno   modifica_stat precisione +6   (conoscenza+notte)
+  2. sinergia_veglia_del_corvo  modifica_follia -0.4/min      (rituale+divinazione)
+  3. sinergia_fucina_ispirata   modifica_qualita_crafting forgia +1 (crafting+scienza)
+  4. sinergia_archivio_analitico sblocca_ricetta ric_elisir_ombra (conoscenza+analisi)
+  5. sinergia_confine_del_crepuscolo aggiungi_abilita tg_crepuscolo
+     (decadimento+morte: due Pathway del gruppo Eternal Darkness)
+  6. sinergia_ondata_di_declino modifica_primitiva decay.raggio +15 (disastro+decadimento)
+  7. anti_branco_in_biblioteca  anti, neutralizza sinergia_studio_notturno,
+     follia +0.8/min                                          (guerra2+conoscenza)
+  8. sinergia_dottrina_del_guardiano  CRITERIO DI USCITA:
+     modifica_stat difesa +5, scoperta "visibile", fonti [pet,stanza,talento],
+     richiede { guerra:1, conoscenza:1, non_letale:1 } - guerra SOLO dal pet
+     (lupo_cinereo), conoscenza SOLO dalla stanza (biblioteca), non_letale SOLO
+     dal talento (clemenza). Nessuna fonte da sola basta.
+- i18n: gli 8 name_i18n tradotti in italiano in data/i18n/it.json (non piu'
+  "TODO"), + ability.fool.sinergia_colpo_del_caso (US-412). generate_i18n_stubs
+  preserva le traduzioni autoriali. 62 TODO restanti (erano 71 dopo l'aggiunta).
+- test_slice_fase_4.gd (NUOVO): il criterio di uscita.
+  * stanza sola -> non attiva; stanza + pet -> non attiva;
+    stanza + pet + talento -> ATTIVA, difesa +5 misurata sullo StatsComponent;
+    tolto il talento -> disattivata, il +5 sparisce.
+  * test_nessun_codice_nomina_la_sinergia_di_uscita: grep di res://scripts e
+    res://scripts/pages per l'id, 0 occorrenze. Come US-219/US-335.
+- REGRESSIONI aggiornate (2 test di test_synergy_engine, drift di contenuto):
+  * test_conflitto_cumulativo: sinergia_studio_notturno ora e' su 'precisione'
+    (era spiritualita_max nel primo giro) proprio per non sommarsi alle 2
+    sinergie di riferimento del test del cumulo. Meccanismo 1 invariato.
+  * test_contatore_sale_attivando_una_nascosta: le sinergie 'visibile' e il
+    totale scopribile ora sono presi dinamicamente (con batch_1 il totale
+    passa da 8 a 16, le visibili da 1 a 2), l'invariante testata resta
+    "attivare una nascosta fa +1 alle scoperte, il totale non cambia".
+- Come verificato: 531 test headless (529 + 2 nuovi), tutti verdi.
+  validate_data.py exit 0, 9 warning invariati (le irraggiungibili restano 2:
+  sinergia_inganno_probabilita e anti_ordine_disordine). 1 SCRIPT ERROR
+  preesistente, nessuno nuovo. Nessuna verifica a schermo (dati + slice test).
+- Sinergie totali ora: 18 (10 core + 8 batch_1), 16 raggiungibili.
+- Prossima storia: US-414 (BATCH 2: ~10 sinergie di combinazione, mix
+  visibile/nascosta, almeno 2 con 'priorita' per un conflitto reale col
+  batch 1).

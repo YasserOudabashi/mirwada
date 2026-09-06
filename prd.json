@@ -255,8 +255,8 @@
       ],
       "priority": 13,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO C. data/synergies/batch_1.json (NUOVO): 8 sinergie raggiungibili (nessun warning nuovo del validator), una per meccanismo: (1) sinergia_studio_notturno modifica_stat precisione +6 (conoscenza+notte); (2) sinergia_veglia_del_corvo modifica_follia -0.4/min (rituale+divinazione); (3) sinergia_fucina_ispirata modifica_qualita_crafting forgia +1 (crafting+scienza); (4) sinergia_archivio_analitico sblocca_ricetta ric_elisir_ombra (conoscenza+analisi); (5) sinergia_confine_del_crepuscolo aggiungi_abilita tg_crepuscolo (decadimento+morte, 2 Pathway del gruppo Eternal Darkness); (6) sinergia_ondata_di_declino modifica_primitiva decay.raggio +15 (disastro+decadimento); (7) anti_branco_in_biblioteca anti+neutralizza sinergia_studio_notturno, follia +0.8/min (guerra2+conoscenza); (8) CRITERIO DI USCITA sinergia_dottrina_del_guardiano modifica_stat difesa +5, scoperta visibile, fonti [pet,stanza,talento], richiede {guerra:1(solo pet), conoscenza:1(solo stanza), non_letale:1(solo talento clemenza)}. i18n: 8 name_i18n tradotti in it.json (non piu' TODO) + ability.fool.sinergia_colpo_del_caso. test_slice_fase_4.gd (NUOVO, il criterio di uscita): stanza sola / stanza+pet non bastano, stanza+pet+talento -> attiva, difesa +5 misurata, tolto il talento -> spenta; grep scripts/ per l'id = 0. 531 test headless (529 + 2 nuovi; aggiornati test_conflitto_cumulativo - studio_notturno ora su precisione non spiritualita_max - e test_contatore - visibili e totale ora dinamici). validate exit 0, 9 warning invariati. Nessuna verifica a schermo."
     },
     {
       "id": "US-414",

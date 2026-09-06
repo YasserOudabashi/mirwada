@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "_comment": "BATCH 1 (US-413): 8 sinergie raggiungibili coi 10 Pathway attivi + pet/stanze/talenti, una per meccanismo di effetto, piu' la sinergia del CRITERIO DI USCITA (pet + stanza + talento, nessuna fonte da sola). Contenuto, non esempi di riferimento (quelli stanno in core.json). Valori plausibili, da ritarare col playtest.",
+  "synergies": [
+    {
+      "schema_version": 1,
+      "id": "sinergia_studio_notturno",
+      "name_i18n": "synergy.studio_notturno",
+      "richiede_tag": { "conoscenza": 1, "notte": 1 },
+      "fonti": ["stanza", "talento"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_stat", "stat": "precisione", "valore": 6, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "Biblioteca + il talento figlio_della_notte: studiare quando il mondo tace affina la concentrazione. MECCANISMO 1 (modifica_stat)."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_veglia_del_corvo",
+      "name_i18n": "synergy.veglia_del_corvo",
+      "richiede_tag": { "rituale": 1, "divinazione": 1 },
+      "fonti": ["stanza", "pet"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_follia", "delta_al_minuto": -0.4 },
+      "scoperta": "nascosta",
+      "note": "La stanza rituale + il corvo veggente: il rito e il presagio tengono a bada la mente. MECCANISMO 2 (modifica_follia che RIDUCE la follia nel tempo)."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_fucina_ispirata",
+      "name_i18n": "synergy.fucina_ispirata",
+      "richiede_tag": { "crafting": 1, "scienza": 1 },
+      "fonti": ["sequenza", "stanza"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_qualita_crafting", "categoria": "forgia", "delta": 1 },
+      "scoperta": "nascosta",
+      "note": "Un Pathway della crafting (Paragon) + il laboratorio: la teoria guida il martello. MECCANISMO 3 (modifica_qualita_crafting, categoria forgia)."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_archivio_analitico",
+      "name_i18n": "synergy.archivio_analitico",
+      "richiede_tag": { "conoscenza": 1, "analisi": 1 },
+      "fonti": ["stanza", "abilita"],
+      "priorita": 0,
+      "effetto": { "tipo": "sblocca_ricetta", "recipe_id": "ric_elisir_ombra" },
+      "scoperta": "nascosta",
+      "note": "Biblioteca + un'abilita' che scompone e analizza: quello che leggi lo sai rifare. MECCANISMO 4 (sblocca_ricetta). Imparata resta nota anche se la sinergia si spegne."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_confine_del_crepuscolo",
+      "name_i18n": "synergy.confine_del_crepuscolo",
+      "richiede_tag": { "decadimento": 1, "morte": 1 },
+      "fonti": ["sequenza", "equipaggiamento"],
+      "priorita": 0,
+      "effetto": { "tipo": "aggiungi_abilita", "ability_id": "tg_crepuscolo" },
+      "scoperta": "nascosta",
+      "note": "Due sensibilita' vicine del gruppo Eternal Darkness (decadimento del Twilight Giant, morte di Death): sul confine si impara un'abilita' che nessuno dei due possiede da solo. MECCANISMO 5 (aggiungi_abilita)."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_ondata_di_declino",
+      "name_i18n": "synergy.ondata_di_declino",
+      "richiede_tag": { "disastro": 1, "decadimento": 1 },
+      "fonti": ["abilita", "sequenza"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_primitiva", "primitiva": "decay", "parametro": "raggio", "delta": 15, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "Un'abilita' da disastro d'area + un Pathway del decadimento: il declino si propaga piu' lontano. MECCANISMO 6 (modifica_primitiva, +15 al raggio di ogni decay). Si somma a sinergia_marea_crepuscolare se attive insieme."
+    },
+    {
+      "schema_version": 1,
+      "id": "anti_branco_in_biblioteca",
+      "name_i18n": "synergy.anti_branco_in_biblioteca",
+      "richiede_tag": { "guerra": 2, "conoscenza": 1 },
+      "fonti": ["pet", "stanza"],
+      "priorita": 100,
+      "anti": true,
+      "neutralizza": ["sinergia_studio_notturno"],
+      "effetto": { "tipo": "modifica_follia", "delta_al_minuto": 0.8 },
+      "scoperta": "lore",
+      "note": "Un branco da guerra scatenato (lupo con il comportamento d'assalto) in biblioteca: non si studia nel ringhio. ANTI-SINERGIA raggiungibile (MECCANISMO 7): neutralizza sinergia_studio_notturno e accelera la follia."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_dottrina_del_guardiano",
+      "name_i18n": "synergy.dottrina_del_guardiano",
+      "richiede_tag": { "guerra": 1, "conoscenza": 1, "non_letale": 1 },
+      "fonti": ["pet", "stanza", "talento"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_stat", "stat": "difesa", "valore": 5, "moltiplicativo": false },
+      "scoperta": "visibile",
+      "note": "CRITERIO DI USCITA (US-413 / test_slice_fase_4): il pet da guerra insegna a combattere, la biblioteca la disciplina, il talento clemenza il rifiuto di uccidere. Nessuna delle tre fonti da sola porta tutti e tre i tag (guerra solo dal pet, conoscenza solo dalla stanza, non_letale solo dal talento). Zero righe di codice la nominano."
+    }
+  ]
+}
