@@ -5257,3 +5257,41 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   user://us602_mirwada.png inviato all'utente.
 - Prossima storia: US-603 (le 4 regioni a tema come scene placeholder +
   passaggi fra regioni).
+
+[2026-09-07] US-603 — Le 4 regioni a tema come scene placeholder + passaggi. FASE 6, BLOCCO A CHIUSO.
+
+- scenes/regioni/{marche_crepuscolo,valle_madre,archivio_sepolto,frontiera_
+  porte}.tscn (NUOVI): 4 TileMapLayer + region_scene.gd, region_id impostato.
+  Nessuno script nuovo: la stessa region_scene.gd di US-602 li serve tutti
+  (data-driven da regions.json).
+- scripts/region_scene.gd esteso:
+  * _tinta_di_fondo(): ColorRect z_index -100 col colore 'primario' della
+    palette_visiva della regione (da GameData.get_vfx_palette), alpha 0.14.
+    'neutra' (Mirwada) non ha palette -> niente tinta. E' la "densita' mistica
+    visiva minima" di design-world cap. 2.
+  * _crea_passaggi(): hub-and-spoke. Mirwada ha un Passaggio_<id> (Area2D +
+    marker) per ogni altra regione lungo il bordo destro; ogni regione a tema
+    ne ha uno verso Mirwada a sinistra. Gli id di destinazione escono da
+    GameData.get_regions(), nessun nome hardcoded.
+  * _su_passaggio -> _viaggia_verso (deferred): carica
+    res://scenes/regioni/<target>.tscn, la aggiunge a main, queue_free della
+    regione vecchia. Player/overlay vivono in main.tscn (fratelli): restano,
+    la nuova regione li riposiziona nel suo _ready. Finche' il gating (US-611)
+    non c'e', ogni passaggio e' aperto (la Frontiera dichiara gia' il gating
+    'sequenza: 4' nei dati, applicato in US-611).
+  * passaggi_verso() -> gli id raggiungibili (per i test).
+- tests/test_regions.gd +2: ogni regione ha una scena e instanziarla registra
+  la regione corrente (5/5); passaggi hub-and-spoke (Mirwada -> 4, valle ->
+  ["mirwada"]).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  577 test headless (575 + 2), tutti verdi. Nessun errore nuovo rispetto a
+  HEAD (grep ^ERROR: 21 == 21). Verifica a schermo (rendering reale,
+  _shot_us603.gd): nuova_partita -> Mirwada; entro in un passaggio -> viaggio
+  a marche_crepuscolo; torno -> mirwada; scoperte accumulano
+  ["mirwada", "marche_crepuscolo"]; la regione corrente in WorldState segue
+  ogni viaggio. Screenshot us603_marche.png (la tinta darkness e' volutamente
+  tenue sopra il pavimento gia' scuro).
+- BLOCCO A CHIUSO: US-601/602/603. Le 5 regioni sono dati + una scena
+  placeholder data-driven ciascuna; ci si muove fra Mirwada e le 4 regioni a
+  tema. Save v21.
+- Prossima storia: US-604 (TimeSystem - momento e fase lunare). BLOCCO B.

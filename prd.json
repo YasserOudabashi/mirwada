@@ -50,8 +50,8 @@
       ],
       "priority": 3,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO A CHIUSO. 4 scene .tscn (marche_crepuscolo/valle_madre/archivio_sepolto/frontiera_porte) tutte servite dalla stessa region_scene.gd data-driven. region_scene.gd esteso: _tinta_di_fondo (ColorRect col 'primario' della palette_visiva, alpha 0.14, 'neutra' -> niente), _crea_passaggi (hub-and-spoke: Mirwada->4, ogni regione->Mirwada; id da GameData.get_regions), _viaggia_verso (carica la scena target, queue_free della vecchia; player/overlay in main.tscn restano). passaggi_verso() per i test. test_regions.gd +2 (7 totali). validate exit 0, 577 test verdi, 0 errori nuovi. Verifica a schermo: Mirwada<->Marche, scoperte accumulano, regione corrente segue. Frontiera dichiara gating 'sequenza:4' nei dati (applicato in US-611)."
     },
     {
       "id": "US-604",

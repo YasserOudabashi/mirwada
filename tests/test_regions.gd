@@ -75,6 +75,47 @@ func test_da_salvataggio_non_fidato() -> void:
 	ws.call("pulisci")
 
 
+func test_ogni_regione_ha_una_scena_e_si_registra() -> void:
+	var ws: Node = _ws()
+	for r in _gd().call("get_regions"):
+		var rid: String = str((r as Dictionary).get("id", ""))
+		var path: String = "res://scenes/regioni/%s.tscn" % rid
+		assert_true(ResourceLoader.exists(path), "scena della regione '%s' esiste" % rid)
+		ws.call("pulisci")
+		var contenitore := Node2D.new()
+		_root().add_child(contenitore)
+		var scena: Node = load(path).instantiate()
+		contenitore.add_child(scena)
+		assert_eq(str(ws.call("regione_corrente")), rid,
+			"instanziare %s registra la regione corrente" % rid)
+		contenitore.free()
+	ws.call("pulisci")
+
+
+func test_passaggi_hub_and_spoke() -> void:
+	var ws: Node = _ws()
+	# hub: un passaggio per ogni altra regione
+	ws.call("pulisci")
+	var cont := Node2D.new()
+	_root().add_child(cont)
+	var hub: Node = load("res://scenes/regioni/mirwada.tscn").instantiate()
+	cont.add_child(hub)
+	var target_hub: Array = hub.call("passaggi_verso")
+	assert_eq(target_hub.size(), 4, "la citta' ha 4 passaggi (uno per regione a tema)")
+	assert_false(target_hub.has("mirwada"), "nessun passaggio verso se stessa")
+	cont.free()
+	# spoke: un passaggio verso la citta'
+	ws.call("pulisci")
+	var cont2 := Node2D.new()
+	_root().add_child(cont2)
+	var spoke: Node = load("res://scenes/regioni/valle_madre.tscn").instantiate()
+	cont2.add_child(spoke)
+	assert_eq((spoke.call("passaggi_verso") as Array), ["mirwada"],
+		"una regione a tema torna alla citta'")
+	cont2.free()
+	ws.call("pulisci")
+
+
 func test_migrazione_save_v20_a_v21() -> void:
 	_pulisci_slot()
 	# un save v20 non ha i campi regione/scoperte/gate_aperti in "mondo"

@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://c0region0valle"]
+
+[ext_resource type="Script" path="res://scripts/region_scene.gd" id="1_region"]
+
+[node name="ValleMadre" type="TileMapLayer"]
+script = ExtResource("1_region")
+region_id = "valle_madre"
