@@ -4184,3 +4184,36 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-407 (anti-sinergie: una anti:true soddisfatta applica
   il malus e neutralizza le sinergie in 'neutralizza'; test col meccanismo su
   una anti raggiungibile).
+
+[2026-09-06] US-407 — Anti-sinergie. BLOCCO A.
+
+- SynergyEngine: attive() = soddisfatte() - neutralizzate().
+  * soddisfatte(): richiede_tag ok + esclude_tag assenti (l'insieme grezzo -
+    include anti e neutralizzate).
+  * neutralizzate(): unione dei 'neutralizza' di ogni anti-sinergia
+    SODDISFATTA.
+  * attive(): soddisfatte meno neutralizzate = l'insieme che applica gli
+    effetti.
+- Una sinergia neutralizzata: resta soddisfatta ma esce da attive() ->
+  _su_disattivata -> effetto tolto. L'anti-sinergia stessa (soddisfatta, non
+  neutralizzata) resta in attive() e applica il suo malus (tipicamente
+  modifica_follia positivo o modifica_stat negativo).
+- spiega(id) per una neutralizzata: applicato=false, sovrascritta_da = id
+  dell'anti, motivo = "neutralizzata da una anti-sinergia".
+- L'appartenenza gemella e' il campo 'neutralizza' nei DATI, mai inferita per
+  set di tag (il validator: 'neutralizza' solo su anti:true, ogni id risolve).
+- data/synergies/core.json: anti_furia_e_calma - RAGGIUNGIBILE (guerra 2 +
+  occulto 1, priorita 100, neutralizza sinergia_meditazione_profonda, malus
+  modifica_follia +1.0/min). anti_ordine_disordine resta irraggiungibile
+  (warning atteso); il meccanismo e' testato con anti_furia_e_calma.
+- Come verificato: 516 test headless (515 + 1 in test_synergy_engine.gd:
+  la gemella da sola applica +5% spiritualita_max; aggiungo i tag dell'anti ->
+  la gemella resta SODDISFATTA ma non ATTIVA, il +5% sparisce, l'anti e'
+  attiva; spiega() -> sovrascritta_da anti_furia_e_calma; tolgo un tag
+  dell'anti -> la gemella torna attiva). validate_data.py exit 0. Nessuna
+  verifica a schermo.
+- BLOCCO A quasi finito: US-401..407. Resta US-408 (SAVE registro viste,
+  schema_version 19 -> 20). Poi il blocco B (registro nel libro).
+- Prossima storia: US-408 (SAVE: SynergyEngine._viste [id] persistite in
+  save.sinergie.viste; _migra_19_a_20; GameState wire; le attive si
+  riderivano dai tag al load).

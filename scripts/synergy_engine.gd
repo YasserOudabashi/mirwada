@@ -100,8 +100,10 @@ func tag_globali() -> Dictionary:
 	return (ss.call("tag_sinergia_globali") as Dictionary) if ss != null else {}
 
 
-## Gli id delle sinergie soddisfatte dai tag correnti, in ordine lessicografico.
-func attive() -> Array:
+## Gli id delle sinergie soddisfatte dai tag correnti (richiede_tag ok,
+## esclude_tag assenti), in ordine lessicografico. Include le anti-sinergie e
+## le sinergie neutralizzate: e' l'insieme "grezzo".
+func soddisfatte() -> Array:
 	if _gd() == null:
 		return []
 	var tg: Dictionary = tag_globali()
@@ -110,6 +112,29 @@ func attive() -> Array:
 		if _soddisfatta(_gd().call("get_synergy", id), tg):
 			out.append(str(id))
 	out.sort()
+	return out
+
+
+## Gli id neutralizzati da una anti-sinergia SODDISFATTA (US-407).
+func neutralizzate() -> Array:
+	var out: Array = []
+	for id in soddisfatte():
+		var syn: Dictionary = _gd().call("get_synergy", id)
+		if bool(syn.get("anti", false)):
+			for b in syn.get("neutralizza", []):
+				if not out.has(str(b)):
+					out.append(str(b))
+	return out
+
+
+## Gli id delle sinergie ATTIVE: soddisfatte e non neutralizzate. E' l'insieme
+## che applica gli effetti.
+func attive() -> Array:
+	var neut: Array = neutralizzate()
+	var out: Array = []
+	for id in soddisfatte():
+		if not neut.has(id):
+			out.append(id)
 	return out
 
 
@@ -169,10 +194,19 @@ func spiega(id: String) -> Dictionary:
 		"effetto_tipo": et,
 		"applicato": _attive_prec.has(id),
 		"sovrascritta_da": "",
+		"motivo": "",
 		"contributo": null,
 	}
 	if not _attive_prec.has(id):
 		out["applicato"] = false
+		# US-407: spiega perche' - neutralizzata da una anti-sinergia?
+		if _soddisfatta(syn, tag_globali()):
+			for aid in soddisfatte():
+				var a: Dictionary = _gd().call("get_synergy", aid)
+				if bool(a.get("anti", false)) and (a.get("neutralizza", []) as Array).has(id):
+					out["sovrascritta_da"] = str(aid)
+					out["motivo"] = "neutralizzata da una anti-sinergia"
+					break
 		return out
 	if et == "modifica_qualita_crafting":
 		var cat: String = str(eff.get("categoria", ""))

@@ -290,6 +290,36 @@ func test_conflitto_esclusivo_vince_la_priorita_piu_alta() -> void:
 	_fine()
 
 
+func test_anti_sinergia_neutralizza_la_gemella_e_applica_il_malus() -> void:
+	var base: float = _stats().call("get_base", "spiritualita_max")
+	# meditazione_profonda (modifica_stat spiritualita_max +5%) da sola
+	_se().call("imposta_override_tag", {"occulto": 1, "notte": 1})
+	_se().call("rivaluta")
+	assert_true(_se().call("e_attiva", "sinergia_meditazione_profonda"), "gemella attiva da sola")
+	assert_almost_eq(_stats().call("get_stat", "spiritualita_max"), base * 1.05, "e applica il +5%")
+
+	# aggiungo i tag dell'anti-sinergia (guerra 2 + occulto gia' c'e')
+	_se().call("imposta_override_tag", {"occulto": 1, "notte": 1, "guerra": 2})
+	_se().call("rivaluta")
+	assert_true((_se().call("soddisfatte") as Array).has("sinergia_meditazione_profonda"),
+		"la gemella e' ancora SODDISFATTA")
+	assert_false(_se().call("e_attiva", "sinergia_meditazione_profonda"),
+		"ma NON attiva: neutralizzata dall'anti-sinergia")
+	assert_true(_se().call("e_attiva", "anti_furia_e_calma"), "l'anti-sinergia e' attiva")
+	assert_almost_eq(_stats().call("get_stat", "spiritualita_max"), base,
+		"il +5% della gemella e' stato tolto")
+
+	var sp: Dictionary = _se().call("spiega", "sinergia_meditazione_profonda")
+	assert_eq(str(sp["sovrascritta_da"]), "anti_furia_e_calma", "spiega: neutralizzata dall'anti")
+
+	# tolgo un tag dell'anti -> la gemella torna
+	_se().call("imposta_override_tag", {"occulto": 1, "notte": 1, "guerra": 1})
+	_se().call("rivaluta")
+	assert_true(_se().call("e_attiva", "sinergia_meditazione_profonda"),
+		"tolto un tag dell'anti -> la gemella torna attiva")
+	_fine()
+
+
 func test_aggiungi_abilita_concede_e_revoca() -> void:
 	var ae: Node = Engine.get_main_loop().root.get_node_or_null("AbilityEngine")
 	# sinergia_istinto_bestiale: aggiungi_abilita mother_dominio_druidico

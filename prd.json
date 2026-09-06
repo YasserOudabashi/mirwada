@@ -140,8 +140,8 @@
       ],
       "priority": 7,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO A. SynergyEngine: attive() ora = soddisfatte() - neutralizzate(). soddisfatte() -> richiede_tag ok + esclude_tag assenti (l'insieme grezzo, include anti e neutralizzate). neutralizzate() -> l'unione dei 'neutralizza' di ogni anti-sinergia SODDISFATTA. attive() -> soddisfatte meno neutralizzate: e' l'insieme che applica gli effetti. Una sinergia neutralizzata: resta soddisfatta ma esce da attive() -> _su_disattivata -> il suo effetto viene tolto. L'anti-sinergia stessa (soddisfatta, non neutralizzata) resta in attive() e applica il suo malus (tipicamente modifica_follia positivo). spiega(id) per una neutralizzata: applicato false, sovrascritta_da = l'id dell'anti, motivo 'neutralizzata da una anti-sinergia'. L'appartenenza gemella e' il campo 'neutralizza' nei DATI, mai inferita. data/synergies/core.json: anti_furia_e_calma (RAGGIUNGIBILE: guerra 2 + occulto 1, priorita 100, neutralizza sinergia_meditazione_profonda, malus modifica_follia +1.0/min). anti_ordine_disordine resta irraggiungibile (warning atteso) - il meccanismo e' testato con anti_furia_e_calma. 516 test headless (515 + 1 in test_synergy_engine.gd: gemella +5% da sola; aggiungo i tag dell'anti -> la gemella resta soddisfatta ma non attiva, il +5% sparisce, l'anti e' attiva; spiega dice sovrascritta_da anti_furia_e_calma; tolgo un tag dell'anti -> la gemella torna). validate exit 0 (9 warning invariati; +1 stub i18n). Nessuna verifica a schermo."
     },
     {
       "id": "US-408",

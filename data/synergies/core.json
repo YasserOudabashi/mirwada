@@ -92,6 +92,19 @@
     },
     {
       "schema_version": 1,
+      "id": "anti_furia_e_calma",
+      "name_i18n": "synergy.anti_furia_e_calma",
+      "richiede_tag": { "guerra": 2, "occulto": 1 },
+      "fonti": ["pet", "stanza"],
+      "priorita": 100,
+      "anti": true,
+      "neutralizza": ["sinergia_meditazione_profonda"],
+      "effetto": { "tipo": "modifica_follia", "delta_al_minuto": 1.0 },
+      "scoperta": "lore",
+      "note": "Troppa furia (un pet da guerra + il suo comportamento d'assalto) nella stanza rituale: non si medita nel sangue. Anti-sinergia RAGGIUNGIBILE, per testare il meccanismo di neutralizzazione (US-407): spegne sinergia_meditazione_profonda e accelera la follia."
+    },
+    {
+      "schema_version": 1,
       "id": "anti_ordine_disordine",
       "name_i18n": "synergy.anti_ordine_disordine",
       "richiede_tag": { "ordine": 2, "disordine": 2 },
