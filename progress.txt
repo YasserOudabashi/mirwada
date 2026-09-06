@@ -3542,3 +3542,56 @@ sezione test aggiornata.
   la pagina Base e' US-329.
 - Prossima storia: US-328 (il giardino: pianta/raccogli, crescita col tempo
   di gioco, appezzamenti = livello del giardino, ingredienti coltivabile:true).
+
+[2026-09-06] US-328 — Il giardino: ingredienti che crescono nel tempo. BLOCCO F.
+
+- data/balance.json: nuova sezione giardino { tempo_crescita_s: 30,
+  resa_base: 2 } (edit di testo chirurgico). 3 ingredienti avevano gia'
+  coltivabile:true (erba_lunare, fungo_cavernicolo, petalo_solare - foresight).
+- BaseSystem giardino:
+  * _appezzamenti: Array di { item_id, crescita } (crescita = secondi di
+    tempo di gioco rimasti; <= 0 = pronto).
+  * numero_appezzamenti() = bonus('giardino').appezzamenti (lv1->1, lv2->2).
+  * pianta(item_id) -> indice / -1: giardino costruito + appezzamento libero
+    + item categoria:ingrediente e coltivabile:true + 1 unita' in Inventory
+    (consumata come seme). crescita = balance.giardino.tempo_crescita_s.
+  * raccogli(i) -> N: appezzamento pronto -> resa_base + bonus resa_raccolto
+    item nello zaino, l'appezzamento torna libero. 0 se non pronto / fuori
+    range.
+  * appezzamenti() -> [{item_id, crescita, pronto}] lungo
+    numero_appezzamenti() (i buchi = appezzamenti liberi). appezzamento_
+    libero() -> primo indice libero / -1.
+- CRESCITA COL TEMPO DI GIOCO, non wall-clock: BaseSystem._process(delta)
+  decrementa 'crescita'; _ready() imposta process_mode =
+  PROCESS_MODE_PAUSABLE. Col libro aperto (get_tree().paused = true) _process
+  non gira -> la crescita si ferma. Nessun accoppiamento con
+  GameState.tempo_gioco: la meccanica di pausa e' quella nativa del tree.
+- plant_growth (primitiva attiva-non-implementata) NON toccata: e' per le
+  abilita' del Mother (fase 5). Il giardino e' un sistema data-driven a parte,
+  come dice l'AC.
+- SAVE: niente bump di schema_version. BaseSystem.per_salvataggio ora
+  restituisce { stanze, appezzamenti }; da_salvataggio legge SIA questo
+  formato SIA il vecchio piatto { tipo: livello } di un save v18 pre-giardino
+  (d.get("stanze", d) se manca la chiave "appezzamenti"). Il campo "base"
+  esiste dalla v18 (US-326) e il vecchio contenuto resta leggibile: una
+  migrazione in piu' non serve.
+- validate_data.py: balance.giardino (tempo_crescita_s > 0, resa_base int
+  >= 1); ogni campo 'coltivabile' e' bool e coltivabile:true implica
+  categoria:ingrediente; almeno 1 ingrediente coltivabile.
+- Come verificato: 467 test headless (459 + 8 in test_giardino.gd:
+  appezzamenti scalano col livello; pianta rifiuta non-coltivabili e
+  non-ingredienti; pianta consuma il seme e non e' pronta subito; niente
+  appezzamenti liberi; cresce con _process e si raccoglie in 4 copie a
+  giardino lv2; raccogli non pronto / fuori range -> 0; round-trip a meta'
+  crescita conserva i secondi rimasti; da_salvataggio legge il vecchio
+  formato piatto). validate_data.py exit 0 (9 warning invariati),
+  i18n --check 0.
+  VERIFICA A RUNTIME (scenes/main.tscn con la Godot locale): costruito il
+  giardino, piantata erba_lunare, dopo 4s reali di gioco la crescita e'
+  scesa da 30 a 25.98 (il _process avanza col tempo di gioco vero), forzata
+  la maturazione, raccolti 3 item finiti in zaino. Nessun SCRIPT ERROR.
+  Il giardino non ha ancora rappresentazione a schermo: la pagina Base e'
+  US-329.
+- Prossima storia: US-329 (la Base nel libro: la sezione Base della pagina
+  inventario mostra le 4 stanze + il giardino coi pulsanti costruisci/
+  potenzia/pianta/raccogli). Chiude il blocco F.

@@ -542,8 +542,8 @@
       ],
       "priority": 27,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO F. BaseSystem giardino: _appezzamenti Array di {item_id, crescita (secondi di tempo di gioco rimasti; <=0 = pronto)}. numero_appezzamenti() = bonus('giardino').appezzamenti (lv1->1, lv2->2). pianta(item_id) -> indice/-1: richiede giardino costruito, appezzamento libero, item categoria:ingrediente + coltivabile:true, 1 unita' in Inventory (consumata come seme); crescita = balance.giardino.tempo_crescita_s. raccogli(i) -> N (resa_base + bonus resa_raccolto; 0 se non pronto); l'appezzamento torna libero. appezzamenti() -> Array [{item_id, crescita, pronto}] lungo numero_appezzamenti (i buchi sono appezzamenti liberi). CRESCITA COL TEMPO DI GIOCO: BaseSystem._process(delta) decrementa crescita; _ready() imposta process_mode = PROCESS_MODE_PAUSABLE -> col libro aperto (get_tree().paused) _process non gira e la crescita si ferma. Niente wall-clock, niente accoppiamento con GameState. plant_growth (primitiva) NON toccata: il giardino e' un sistema a parte. SAVE: BaseSystem.per_salvataggio ora {stanze, appezzamenti}; da_salvataggio legge sia il formato nuovo sia il vecchio piatto {tipo:livello} di un save v18 pre-giardino -> nessun bump di schema_version (v18 basta, il campo 'base' esiste da US-326 e il vecchio contenuto si legge ancora). validate_data.py: balance.giardino ben formato; 'coltivabile' se presente e' bool e implica categoria:ingrediente; >= 1 ingrediente coltivabile. i18n --check 0. 467 test headless (459 + 8 in test_giardino.gd). VERIFICA A RUNTIME (scenes/main.tscn, Godot locale): costruito il giardino, piantata erba_lunare, dopo 4s reali di gioco la crescita e' scesa 30->25.98 (il _process avanza davvero col tempo), forzata la maturazione e raccolti 3 item -> in zaino. Nessun SCRIPT ERROR. La pagina Base e' US-329, il giardino non ha ancora rappresentazione a schermo. validate exit 0."
     },
     {
       "id": "US-329",

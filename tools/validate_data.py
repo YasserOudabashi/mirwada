@@ -939,6 +939,30 @@ def main():
         if not isinstance(v, (int, float)) or v < 0:
             err(f"data/balance.json [pet_bond.{k}]: peso mancante o negativo")
 
+    # --- giardino (data/balance.json giardino + ingredienti coltivabili, US-328) ---
+    giardino = (balance_doc or {}).get("giardino", {})
+    tc = giardino.get("tempo_crescita_s")
+    if not isinstance(tc, (int, float)) or tc <= 0:
+        err("data/balance.json [giardino.tempo_crescita_s]: deve essere un numero > 0")
+    if not isinstance(giardino.get("resa_base"), int) or giardino.get("resa_base", 0) < 1:
+        err("data/balance.json [giardino.resa_base]: deve essere un intero >= 1")
+    coltivabili = 0
+    for fn in sorted(os.listdir(idir)) if os.path.isdir(idir) else []:
+        if not fn.endswith(".json"):
+            continue
+        for it in (load_json(os.path.join(idir, fn)) or {}).get("items", []):
+            if "coltivabile" in it:
+                if not isinstance(it["coltivabile"], bool):
+                    err(f"data/items/{fn} [{it.get('id')}]: 'coltivabile' deve essere true/false")
+                if it["coltivabile"]:
+                    if it.get("categoria") != "ingrediente":
+                        err(f"data/items/{fn} [{it.get('id')}]: coltivabile:true ma non e' "
+                            f"categoria:ingrediente (il giardino pianta solo ingredienti)")
+                    coltivabili += 1
+    if coltivabili < 1:
+        err("data/items/: nessun ingrediente con coltivabile:true (il giardino, US-328, "
+            "non avrebbe nulla da piantare)")
+
     # --- esiti degli esperimenti (data/potions/experiment_outcomes.json, US-311) ---
     eo_doc = load_json(os.path.join(DATA, "potions", "experiment_outcomes.json"))
     outcomes = (eo_doc or {}).get("outcomes", {})

@@ -17,6 +17,11 @@
     "per_nemico_sconfitto": 2,
     "per_area_completata": 12
   },
+  "giardino": {
+    "_comment": "Il giardino della base (US-328). tempo_crescita_s: secondi di tempo di gioco (non wall-clock; si ferma col libro aperto) prima che un appezzamento sia pronto. resa_base: item raccolti; il bonus 'resa_raccolto' del giardino si somma. Numeri PLAUSIBILI, non bilanciati.",
+    "tempo_crescita_s": 30.0,
+    "resa_base": 2
+  },
   "sequence_gap": {
     "_comment": "Il muro di Sequenza: un Beyonder molto piu' alto e' quasi immune. E' la meccanica che rende la coltivazione l'unica vera progressione. Moltiplicatore di danno in base a (sequenza_attaccante - sequenza_bersaglio); negativo = il bersaglio e' piu' alto.",
     "-4": 0.02, "-3": 0.08, "-2": 0.25, "-1": 0.60,
