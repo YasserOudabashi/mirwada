@@ -438,8 +438,8 @@
       ],
       "priority": 22,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO E. PetSystem si connette a EventTracker.evento_emesso in _ready(). _su_evento: se hai un pet, enemy_defeated -> bond += pet_bond.per_nemico_sconfitto (2), area_cleared -> += per_area_completata (12). Pesi in data/balance.json.pet_bond. bond clampato 0..100 in _applica_bond, che calcola le soglie attraversate salendo (vecchio < soglia <= nuovo, dai comportamenti[] della specie) ed emette bond_cambiato(valore:int, comportamento_sbloccato:String) ('' se nessuna). comportamenti_sbloccati() -> [id] con bond >= soglia. imposta_bond(v) (debug / US-324) passa dalla stessa logica. SCELTE: 'mentre il pet e' evocato' = 'hai un pet' finche' non c'e' la scena del pet; time_in_state 'esplorazione' del PRD NON aggiunto - non e' nel vocabolario chiuso dei 12 eventi, sarebbe codice da discutere; enemy_defeated + area_cleared bastano. Il bond vive gia' in _pet[bond] -> persiste nel save senza cambi a save_system. validate_data.py: pet_bond pesi >= 0. 432 test headless (426 + 6 in test_pet_bond.gd: eventi -> bond sale; eventi non pertinenti no; senza pet nessun crash; a soglia comportamento sbloccato + segnale col valore e la soglia; nessuna soglia -> segnale con ''; bond persiste nel round-trip). validate exit 0. Nessuna verifica a schermo: nessuna UI."
     },
     {
       "id": "US-324",

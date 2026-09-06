@@ -4,19 +4,27 @@ extends Node
 ## sono dati (data/pets/, via GameData).
 ##
 ## Il pet E' un'Ancora: US-322 (doma) lo registra in AnchorSystem, US-325 (la
-## sua morte) lo distrugge. Qui c'e' solo il magazzino + il round-trip del
-## save; taming, bond dagli eventi e coltivazione sono US-322..324.
+## sua morte) lo distrugge. US-323: il bond 0..100 sale ascoltando
+## EventTracker mentre hai un pet e a soglia (per specie) sblocca comportamenti.
 ##
 ## NIENTE class_name: coerente col resto del progetto.
 
 signal pet_impostato(pet_id: String)
 signal pet_liberato(pet_id: String)
 signal taming_fallito(pet_id: String)
+## comportamento_sbloccato = "" se nessuna soglia attraversata da questo colpo.
+signal bond_cambiato(valore: int, comportamento_sbloccato: String)
 
 ## {} = nessun pet. Altrimenti { pet_id, bond, hp, sequenza }.
 var _pet: Dictionary = {}
 ## RNG del taming (US-322). null -> randomize alla prima doma. Seedabile.
 var _rng: RandomNumberGenerator = null
+
+
+func _ready() -> void:
+	var et: Node = get_node_or_null("/root/EventTracker")
+	if et != null and et.has_signal("evento_emesso"):
+		et.evento_emesso.connect(_su_evento)
 
 
 func _gd() -> Node:
@@ -108,8 +116,75 @@ func sequenza_pet() -> int:
 	return int(_pet.get("sequenza", -1)) if not _pet.is_empty() else -1
 
 
+# --- Bond (US-323) -----------------------------------------------------
+
+## I comportamenti della specie gia' sbloccati al bond corrente (id).
+## Ordinati per soglia crescente.
+func comportamenti_sbloccati() -> Array:
+	if _pet.is_empty():
+		return []
+	var b: int = bond()
+	var out: Array = []
+	for c in _comportamenti_specie():
+		if b >= int(c.get("bond", 0)):
+			out.append(str(c.get("id", "")))
+	return out
+
+
+## Fissa il bond a un valore assoluto (0..100). Debug / US-324. Passa dalla
+## stessa logica di soglia di un incremento da eventi.
+func imposta_bond(valore: int) -> void:
+	if _pet.is_empty():
+		return
+	_applica_bond(clampi(valore, 0, 100))
+
+
 func pulisci() -> void:
 	_pet = {}
+
+
+## enemy_defeated / area_cleared mentre hai un pet -> il bond sale (pesi in
+## balance.json.pet_bond). Gli altri eventi non contano per il legame.
+## enemy_defeated: il gate "mentre il pet e' evocato" e' per ora "hai un pet"
+## (la scena del pet arriva piu' avanti). time_in_state "esplorazione" del PRD
+## non c'e': non e' nel vocabolario chiuso dei 12 eventi e aggiungerlo sarebbe
+## codice da discutere. enemy_defeated + area_cleared bastano (combattimento
+## condiviso).
+func _su_evento(nome: String, _dati: Dictionary) -> void:
+	if _pet.is_empty():
+		return
+	var pesi: Dictionary = _gd().call("get_balance", "pet_bond") if _gd() != null else {}
+	match nome:
+		"enemy_defeated":
+			_applica_bond(bond() + int(pesi.get("per_nemico_sconfitto", 0)))
+		"area_cleared":
+			_applica_bond(bond() + int(pesi.get("per_area_completata", 0)))
+
+
+func _applica_bond(nuovo: int) -> void:
+	var vecchio: int = bond()
+	nuovo = clampi(nuovo, 0, 100)
+	if nuovo == vecchio:
+		return
+	_pet["bond"] = nuovo
+	# soglie attraversate salendo: vecchio < soglia <= nuovo
+	var sbloccato: String = ""
+	if nuovo > vecchio:
+		for c in _comportamenti_specie():
+			var s: int = int(c.get("bond", 0))
+			if vecchio < s and s <= nuovo:
+				sbloccato = str(c.get("id", ""))
+	bond_cambiato.emit(nuovo, sbloccato)
+
+
+func _comportamenti_specie() -> Array:
+	if _pet.is_empty() or _gd() == null:
+		return []
+	var specie: Dictionary = _gd().call("get_pet", str(_pet.get("pet_id", "")))
+	var lista: Array = (specie.get("comportamenti", []) as Array).duplicate()
+	lista.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return int(a.get("bond", 0)) < int(b.get("bond", 0)))
+	return lista
 
 
 # --- Salvataggio --------------------------------------------------------

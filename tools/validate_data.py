@@ -869,6 +869,13 @@ def main():
     if n_pets < 1:
         err("data/pets/: nessuna specie di pet, attesa almeno 1")
 
+    # --- pesi del bond (data/balance.json pet_bond, US-323) ---
+    pet_bond = (balance_doc or {}).get("pet_bond", {})
+    for k in ("per_nemico_sconfitto", "per_area_completata"):
+        v = pet_bond.get(k)
+        if not isinstance(v, (int, float)) or v < 0:
+            err(f"data/balance.json [pet_bond.{k}]: peso mancante o negativo")
+
     # --- esiti degli esperimenti (data/potions/experiment_outcomes.json, US-311) ---
     eo_doc = load_json(os.path.join(DATA, "potions", "experiment_outcomes.json"))
     outcomes = (eo_doc or {}).get("outcomes", {})

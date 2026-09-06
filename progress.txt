@@ -3348,3 +3348,38 @@ sezione test aggiornata.
   a schermo.
 - Prossima storia: US-323 (bond: sale ascoltando EventTracker mentre il pet
   e' evocato; a soglia sblocca i comportamenti; persiste nel save).
+
+[2026-09-06] US-323 — bond: il legame cresce dalle azioni condivise. BLOCCO E.
+
+- scripts/pet_system.gd: _ready() si connette a EventTracker.evento_emesso.
+  _su_evento(nome, _dati): se hai un pet,
+  * enemy_defeated -> bond += balance.pet_bond.per_nemico_sconfitto (2)
+  * area_cleared  -> bond += per_area_completata (12)
+  Gli altri 10 eventi non contano per il legame.
+- data/balance.json: nuova sezione pet_bond (per_nemico_sconfitto 2,
+  per_area_completata 12). Numeri plausibili, non bilanciati. Edit di testo
+  chirurgico (json.dump avrebbe riscritto tutto il file: evitato).
+- _applica_bond(nuovo): clamp 0..100; se cambia, calcola le soglie
+  attraversate SALENDO (vecchio < soglia <= nuovo, dai comportamenti[] della
+  specie ordinati per soglia) ed emette
+  bond_cambiato(valore:int, comportamento_sbloccato:String). "" se nessuna
+  soglia. comportamenti_sbloccati() -> [id] con bond >= soglia.
+  imposta_bond(v) (debug / lo usa US-324) passa dalla stessa logica.
+- SCELTE dichiarate:
+  * "mentre il pet e' evocato" (PRD) -> per ora "hai un pet": la scena/Node
+    del pet arriva piu' avanti, il gate si stringera' li'.
+  * time_in_state "esplorazione" del PRD NON aggiunto: "esplorazione" non e'
+    tra i valori_stato del vocabolario chiuso dei 12 eventi
+    (tracked_events.json), aggiungerlo e' codice da discutere. enemy_defeated
+    + area_cleared coprono il "combattimento condiviso", che e' il senso.
+- Il bond vive gia' in _pet["bond"] (US-321): persiste nel save senza
+  toccare save_system.gd. da_salvataggio lo clampa gia' 0..100.
+- validate_data.py: blocco pet_bond (i due pesi numeri >= 0).
+- Come verificato: 432 test headless (426 + 6 in test_pet_bond.gd: eventi
+  condivisi -> bond sale coi pesi giusti; ability_used non conta; senza pet
+  nessun crash; a bond 34->46 si attraversa 35 -> 'difendi' sbloccato +
+  bond_cambiato(46,"difendi"); nessuna soglia -> bond_cambiato(.,""); il
+  bond persiste nel round-trip del save). validate_data.py exit 0 (9 warning
+  invariati). Nessuna verifica a schermo.
+- Prossima storia: US-324 (PetSystem.avanza_pet: bond >= soglia + risorsa
+  dedicata -> il pet sale di Sequenza, cap alla Sequenza del giocatore).

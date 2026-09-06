@@ -12,6 +12,11 @@
     "_comment": "Meta di progressione del progetto, non del personaggio. 'fase' e' la fase di sviluppo CORRENTE: le pagine del libro con sbloccata_da.fase > questo valore esistono ma sono bianche (US-221). Si alza quando si apre una fase nuova.",
     "fase": 3
   },
+  "pet_bond": {
+    "_comment": "Pesi del legame col pet (US-323). Il bond 0-100 sale ascoltando EventTracker mentre hai un pet. Le soglie che sbloccano i comportamenti sono per specie in data/pets/. Numeri PLAUSIBILI, non bilanciati.",
+    "per_nemico_sconfitto": 2,
+    "per_area_completata": 12
+  },
   "sequence_gap": {
     "_comment": "Il muro di Sequenza: un Beyonder molto piu' alto e' quasi immune. E' la meccanica che rende la coltivazione l'unica vera progressione. Moltiplicatore di danno in base a (sequenza_attaccante - sequenza_bersaglio); negativo = il bersaglio e' piu' alto.",
     "-4": 0.02, "-3": 0.08, "-2": 0.25, "-1": 0.60,
