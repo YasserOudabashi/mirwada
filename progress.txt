@@ -3110,3 +3110,30 @@ sezione test aggiornata.
   priorita' in prd.json: D - strutture (US-319 StructureRegistry, US-320
   colpisce_oggetti).
 - Prossima storia: US-319 (StructureRegistry - blocco D).
+
+[2026-09-06] ATTENZIONE — branch remoto parallelo non mersato, DA DECIDERE
+
+- Durante il push del lavoro sopra (US-315..318), trovato su origin un
+  branch mai mersato: `claude/project-status-stories-jtfz3d`, diverge dalla
+  STESSA base (b4bf773, US-314) e arriva fino a US-336 — cioe' rivendica la
+  fase 3 CHIUSA PER INTERO (35/35 story, blocchi C/D/E/F/G/H tutti fatti),
+  duplicando e superando il lavoro di questa sessione.
+- LIMITE DICHIARATO nel suo stesso progress.txt: quella sessione girava in
+  un sandbox remoto SENZA Godot installato. Ogni "Tests pass" di quelle 22
+  story (US-315..336) e' SOLO validate_data.py + lettura a mano — MAI una
+  esecuzione vera della suite headless. Lo dice il branch stesso: "il primo
+  prossimo passo... far girare la suite in CI e confermare che i 496 test
+  passino tutti". Questo viola la Definition of Done di CLAUDE.md ("test
+  headless passano") per tutte e 22 le story di quel branch.
+- Questa sessione, al contrario, ha eseguito la suite Godot reale a ogni
+  story (US-315..318): 399/399 verificati passare per davvero, e un bug
+  vero (moltiplicativo:true su una stat senza base) e' stato trovato
+  SCRIVENDO ed ESEGUENDO un test — esattamente il tipo di errore che una
+  verifica solo statica non avrebbe mai potuto scoprire.
+- NON MERSATO, NON CANCELLATO: decisione lasciata all'utente. Opzioni sul
+  tavolo: (a) scartare il branch e continuare da main (il lavoro di questa
+  sessione, verificato); (b) recuperare da quel branch solo le idee di
+  design per i blocchi D-H (strutture/pet/base/talenti) come riferimento,
+  poi riscrivere/verificare ogni story con Godot vero; (c) altro.
+- Prossima storia (invariata): US-319, ma PRIMA va presa la decisione sul
+  branch parallelo.
