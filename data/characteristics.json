@@ -145,6 +145,24 @@
       "pathway_id": "moon",
       "sequence": 7,
       "name_i18n": "characteristic.moon.7"
+    },
+    {
+      "id": "char_moon_6",
+      "pathway_id": "moon",
+      "sequence": 6,
+      "name_i18n": "characteristic.moon.6"
+    },
+    {
+      "id": "char_moon_5",
+      "pathway_id": "moon",
+      "sequence": 5,
+      "name_i18n": "characteristic.moon.5"
+    },
+    {
+      "id": "char_moon_4",
+      "pathway_id": "moon",
+      "sequence": 4,
+      "name_i18n": "characteristic.moon.4"
     }
   ]
 }

@@ -10,6 +10,11 @@ const ABILITA_9_7 := [
 	"moon_richiamo_compagno", "moon_legame_bestiale",
 	"moon_morso", "moon_furia_notturna",
 ]
+const ABILITA_6_4 := [
+	"moon_elisir_superiore", "moon_veleno_raffinato",
+	"moon_patto_di_sangue", "moon_richiamo_scarlatto",
+	"moon_convoca_branco", "moon_spirito_totem",
+]
 
 
 func _engine() -> Node:
@@ -67,11 +72,37 @@ func test_il_morso_del_vampiro_cura_il_caster() -> void:
 	_cleanup(c)
 
 
-func test_moon_9_7_sono_contenuto() -> void:
+func test_ogni_abilita_moon_6_4_si_esegue_senza_warning() -> void:
+	var e: Node = _engine()
+	for aid in ABILITA_6_4:
+		var c: Node2D = _caster()
+		var r: Dictionary = e.call("execute", aid, c)
+		assert_true(r["ok"], "%s eseguita" % aid)
+		assert_eq((r["warnings"] as PackedStringArray).size(), 0,
+			"%s: nessun warning di primitiva: %s" % [aid, r["warnings"]])
+		e.call("clear_cooldowns")
+		_cleanup(c)
+	var reg: Node = Engine.get_main_loop().root.get_node_or_null("SummonRegistry")
+	if reg != null:
+		reg.call("pulisci")
+
+
+func test_moon_4_ha_un_rituale_di_sangue() -> void:
+	var pw: Dictionary = _gd().call("get_pathway", "moon")
+	for seq in (pw.get("sequences", []) as Array):
+		if int((seq as Dictionary).get("sequence", -1)) != 4:
+			continue
+		var rit: Dictionary = (seq as Dictionary).get("advancement_ritual", {})
+		assert_false(rit.is_empty(), "moon_4 (Seq <= 4) ha un advancement_ritual")
+		assert_true((rit.get("sacrifices", []) as Array).has("sangue_del_giocatore"),
+			"il rituale dello Shaman King usa il sangue del giocatore (Scarlet Scholar)")
+
+
+func test_moon_9_4_sono_contenuto() -> void:
 	var pw: Dictionary = _gd().call("get_pathway", "moon")
 	for seq in (pw.get("sequences", []) as Array):
 		var n: int = int((seq as Dictionary).get("sequence", -1))
-		if n < 7 or n > 9:
+		if n < 4 or n > 9:
 			continue
 		assert_false(bool((seq as Dictionary).get("stub", false)), "moon_%d non e' piu' stub" % n)
 		var somma: float = 0.0

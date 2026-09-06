@@ -4836,3 +4836,28 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - Prossima storia: US-510 (Moon Seq 6-4: Potions Professor / Scarlet Scholar /
   Shaman King; Seq 5 sangue come materiale rituale, Seq 4 il branco del pet +
   primo advancement_ritual del Moon).
+
+[2026-09-06] US-510 — Moon Sequenze 6-4 (Potions Professor / Scarlet Scholar / Shaman King). BLOCCO 2.
+
+- NESSUNA primitiva nuova. Moon Seq 6/5/4 (stub -> false):
+  * moon_elisir_superiore (heal nel tempo + buff difesa), moon_veleno_raffinato
+    (dot veleno + debuff precisione), moon_patto_di_sangue (buff forza +
+    debuff hp_max = il prezzo del sangue), moon_richiamo_scarlatto (summon
+    bestia_di_sangue), moon_convoca_branco (summon bestia_branco x4 + buff
+    velocita), moon_spirito_totem (aura persistente decadimento sui nemici).
+  * acting somma 1.0. madness 5.5/6.8/8.5.
+  * moon_4 (Seq <= 4): advancement_ritual con location_tags [radura_lunare,
+    grotta_di_marea] (dal vocabolario US-501), fase_lunare "piena" (Moon usa
+    la luna), sacrifices [sangue_del_giocatore, un_pelo_del_tuo_pet] - il
+    sangue come materiale rituale (identita' dello Scarlet Scholar, Seq 5).
+  * formule formula_moon_6/5/4 + 9 ingredienti; char_moon_6/5/4.
+  * tag_sinergia: 'veleno' e' un damage_tag ma NON un tag di sinergia ->
+    moon_veleno_raffinato usa ["pozione","decadimento","singolo"].
+- i18n: 6 abilita' + 3 caratteristiche tradotte. 61 TODO.
+- Come verificato: 553 test headless (551 + 2 in test_moon.gd: le 6 abilita'
+  Seq 6-4 eseguono a 0 warning; moon_4 ha un rituale col sangue del
+  giocatore; Seq 9-4 non-stub, acting 1.0). validate exit 0 (3 warning).
+  Nessuna verifica a schermo: nessuna primitiva nuova.
+- Prossima storia: US-511 (Moon Seq 3-0: High Summoner / Life-Giver / Beauty
+  Goddess / Moon - summon a distanza, creatura persistente che coltiva,
+  fascino con curse 'affascinato'). Chiude il BLOCCO 2.

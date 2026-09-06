@@ -196,6 +196,173 @@
         }
       ],
       "note": "Di notte il sangue del Vampiro ribolle: forza in piu', ma solo al buio."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_elisir_superiore",
+      "name_i18n": "ability.moon.moon_elisir_superiore",
+      "sequence_id": "moon_6",
+      "costo_spiritualita": 12,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "heal",
+          "quantita": 20,
+          "istantaneo": false,
+          "durata": 8.0,
+          "bersaglio": "self"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.2,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "pozione",
+        "guarigione",
+        "difesa"
+      ],
+      "note": "Pozioni avanzate: cura nel tempo e protezione insieme."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_veleno_raffinato",
+      "name_i18n": "ability.moon.moon_veleno_raffinato",
+      "sequence_id": "moon_6",
+      "costo_spiritualita": 10,
+      "cooldown": 10.0,
+      "primitive": [
+        {
+          "tipo": "dot",
+          "danno_tick": 12,
+          "tick_rate": 1.0,
+          "durata": 8.0,
+          "tag_danno": "veleno"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.3,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "pozione",
+        "decadimento",
+        "singolo"
+      ],
+      "note": "Il Potions Professor conosce anche i veleni: colpo lento, effetto duraturo."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_patto_di_sangue",
+      "name_i18n": "ability.moon.moon_patto_di_sangue",
+      "sequence_id": "moon_5",
+      "costo_spiritualita": 14,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "forza",
+          "valore": 0.3,
+          "durata": 12.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "hp_max",
+          "valore": -0.15,
+          "durata": 12.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "sangue",
+        "forza",
+        "rituale"
+      ],
+      "note": "Lo Scarlet Scholar versa il proprio sangue: piu' forte, ma piu' fragile."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_richiamo_scarlatto",
+      "name_i18n": "ability.moon.moon_richiamo_scarlatto",
+      "sequence_id": "moon_5",
+      "costo_spiritualita": 16,
+      "cooldown": 26.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "bestia_di_sangue",
+          "quantita": 2,
+          "durata": 30.0,
+          "comportamento": "aggressivo"
+        }
+      ],
+      "tag_sinergia": [
+        "sangue",
+        "bestia",
+        "evocazione"
+      ],
+      "note": "Bestie evocate dal sangue versato: feroci, ma di breve durata."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_convoca_branco",
+      "name_i18n": "ability.moon.moon_convoca_branco",
+      "sequence_id": "moon_4",
+      "costo_spiritualita": 24,
+      "cooldown": 40.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "bestia_branco",
+          "quantita": 4,
+          "durata": 45.0,
+          "comportamento": "aggressivo"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "velocita",
+          "valore": 0.15,
+          "durata": 45.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "bestia",
+        "evocazione",
+        "area"
+      ],
+      "note": "Lo Shaman King chiama il branco: quattro bestie e la corsa condivisa."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_spirito_totem",
+      "name_i18n": "ability.moon.moon_spirito_totem",
+      "sequence_id": "moon_4",
+      "costo_spiritualita": 30,
+      "cooldown": 60.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 12,
+          "durata": -1,
+          "effetto": "decadimento",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        }
+      ],
+      "tag_sinergia": [
+        "bestia",
+        "dominio",
+        "area"
+      ],
+      "note": "Uno spirito-totem piantato nel terreno: consuma i nemici che gli si avvicinano finche' lo Shaman vive."
     }
   ]
 }

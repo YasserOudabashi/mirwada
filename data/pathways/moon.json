@@ -216,18 +216,65 @@
       "name_i18n": "sequence.moon.6",
       "tier": "mid",
       "concept": "Pozioni avanzate con qualita' superiore e effetti combinati.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 90,
+        "spiritualita_max": 0.25
+      },
+      "abilities": [
+        "moon_elisir_superiore",
+        "moon_veleno_raffinato"
+      ],
+      "acting_actions": [
+        {
+          "id": "moon_6_professore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_elisir_superiore"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_6_professore",
+          "descrizione": "Prepara 15 elisir superiori"
+        },
+        {
+          "id": "moon_6_avvelenatore",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "veleno"
+          },
+          "target": 3500,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_6_avvelenatore",
+          "descrizione": "Infliggi 3500 danni da veleno"
+        },
+        {
+          "id": "moon_6_alambicco",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_veleno_raffinato"
+          },
+          "target": 15,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_6_alambicco",
+          "descrizione": "Raffina 15 veleni"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 6,
-        "ingredients": [],
+        "ingredients": [
+          "ambra_grigia",
+          "fiala_di_luna_piena",
+          "muschio_di_caverna"
+        ],
         "formula_id": "formula_moon_6"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 5.5,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 5,
@@ -236,18 +283,61 @@
       "name_i18n": "sequence.moon.5",
       "tier": "mid",
       "concept": "Sangue come materiale rituale: potenzia i rituali di avanzamento.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 130,
+        "forza": 8
+      },
+      "abilities": [
+        "moon_patto_di_sangue",
+        "moon_richiamo_scarlatto"
+      ],
+      "acting_actions": [
+        {
+          "id": "moon_5_studioso",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_patto_di_sangue"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_5_studioso",
+          "descrizione": "Sigilla 15 patti di sangue"
+        },
+        {
+          "id": "moon_5_ferocia",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 18,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_5_ferocia",
+          "descrizione": "Sconfiggi 18 nemici"
+        },
+        {
+          "id": "moon_5_prezzo",
+          "evento": "damage_taken",
+          "filtri": {},
+          "target": 3000,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_5_prezzo",
+          "descrizione": "Subisci 3000 danni: il prezzo del sangue"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 5,
-        "ingredients": [],
+        "ingredients": [
+          "calice_incrinato",
+          "sale_scarlatto",
+          "radice_di_ferro_lunare"
+        ],
         "formula_id": "formula_moon_5"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 6.8,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 4,
@@ -256,24 +346,75 @@
       "name_i18n": "sequence.moon.4",
       "tier": "saint",
       "concept": "Comanda branchi e spiriti bestiali; il pet acquisisce un branco.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 200,
+        "spiritualita_max": 0.4
+      },
+      "abilities": [
+        "moon_convoca_branco",
+        "moon_spirito_totem"
+      ],
+      "acting_actions": [
+        {
+          "id": "moon_4_re",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_convoca_branco"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_4_re",
+          "descrizione": "Convoca il branco 12 volte"
+        },
+        {
+          "id": "moon_4_caccia",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 25,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_4_caccia",
+          "descrizione": "Sconfiggi 25 nemici col branco"
+        },
+        {
+          "id": "moon_4_totem",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_spirito_totem"
+          },
+          "target": 8,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_4_totem",
+          "descrizione": "Pianta 8 spiriti-totem"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 4,
-        "ingredients": [],
+        "ingredients": [
+          "corno_di_alce_spettrale",
+          "pietra_di_marea",
+          "fiore_che_sboccia_solo_di_notte"
+        ],
         "formula_id": "formula_moon_4"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "radura_lunare",
+          "grotta_di_marea"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "piena",
+        "sacrifices": [
+          "sangue_del_giocatore",
+          "un_pelo_del_tuo_pet"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 8.5,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 3,

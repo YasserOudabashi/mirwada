@@ -4,8 +4,10 @@
   "ingredients": [
     "acciaio_stellare",
     "acqua_dello_stige",
+    "ambra_grigia",
     "argento_annerito",
     "argento_benedetto",
+    "calice_incrinato",
     "caratteristica_del_gigante",
     "cenere_di_re",
     "cenere_di_spirito",
@@ -13,6 +15,7 @@
     "chiave_d_ossa",
     "chiave_dell_oltretomba",
     "chiodo_di_bara",
+    "corno_di_alce_spettrale",
     "corona_di_ossa",
     "cuore_che_non_si_ferma",
     "cuore_di_montagna",
@@ -22,8 +25,10 @@
     "estratto_di_muscolo",
     "ferro_delle_lapidi",
     "ferro_temperato",
+    "fiala_di_luna_piena",
     "fiele_di_demone",
     "filo_delle_parche",
+    "fiore_che_sboccia_solo_di_notte",
     "fiore_di_luna",
     "frammento_di_alba",
     "il_confine_del_mondo",
@@ -35,6 +40,7 @@
     "metallo_impossibile",
     "moneta_del_traghettatore",
     "muffa_sepolcrale",
+    "muschio_di_caverna",
     "nebbia_del_limbo",
     "nucleo_del_crepuscolo",
     "obolo_di_bronzo",
@@ -43,12 +49,14 @@
     "osso_di_pugile",
     "pelo_di_lupo_bianco",
     "petalo_di_belladonna",
+    "pietra_di_marea",
     "pietra_di_soglia",
     "platino_rituale",
     "polvere_di_arena",
     "polvere_di_crepuscolo",
     "polvere_di_ossario",
     "polvere_di_specchio_incrinato",
+    "radice_di_ferro_lunare",
     "radice_di_immortelle",
     "radice_di_quercia",
     "radice_di_valeriana",
@@ -58,6 +66,7 @@
     "rugiada_notturna",
     "sale_della_veglia_eterna",
     "sale_di_roccia",
+    "sale_scarlatto",
     "sangue_di_cervo",
     "sangue_di_gufo_lunare",
     "sangue_di_toro",
@@ -404,6 +413,48 @@
         "sangue_rappreso",
         "petalo_di_belladonna",
         "argento_annerito"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_moon_6": {
+      "characteristic_sequence": 6,
+      "ingredients": [
+        "ambra_grigia",
+        "fiala_di_luna_piena",
+        "muschio_di_caverna"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_moon_5": {
+      "characteristic_sequence": 5,
+      "ingredients": [
+        "calice_incrinato",
+        "sale_scarlatto",
+        "radice_di_ferro_lunare"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_moon_4": {
+      "characteristic_sequence": 4,
+      "ingredients": [
+        "corno_di_alce_spettrale",
+        "pietra_di_marea",
+        "fiore_che_sboccia_solo_di_notte"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {
