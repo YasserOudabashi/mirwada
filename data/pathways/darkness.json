@@ -433,24 +433,77 @@
       "name_i18n": "sequence.darkness.3",
       "tier": "saint",
       "concept": "Aura di terrore che rompe le formazioni nemiche e controlla il buio.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 240,
+        "spiritualita_max": 0.25,
+        "forza": 0.1
+      },
+      "abilities": [
+        "darkness_aura_di_terrore",
+        "darkness_predica_nera"
+      ],
+      "acting_actions": [
+        {
+          "id": "darkness_3_terrore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_aura_di_terrore"
+          },
+          "target": 14,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_3_terrore",
+          "descrizione": "Scatena l'Aura di Terrore 14 volte"
+        },
+        {
+          "id": "darkness_3_predica",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_predica_nera"
+          },
+          "target": 14,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_3_predica",
+          "descrizione": "Pronuncia 14 Prediche Nere"
+        },
+        {
+          "id": "darkness_3_follia",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "follia"
+          },
+          "target": 3500,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_3_follia",
+          "descrizione": "Infliggi 3500 danni da follia"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 3,
-        "ingredients": [],
+        "ingredients": [
+          "mitra_di_vescovo_apostata",
+          "incenso_di_cenere",
+          "campana_incrinata"
+        ],
         "formula_id": "formula_darkness_3"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "tempio_abbandonato",
+          "luogo_in_decadenza"
+        ],
+        "momento": "notte_fonda",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "la_voce_di_un_coro"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
-      "notes": "",
-      "stub": true
+      "madness_on_force": 9.5,
+      "notes": "BLOCCO C (US-608): Darkness COMPLETO 10/10. illusion portata in gioco; darkness_1 (US-503) non piu' stub.",
+      "stub": false
     },
     {
       "sequence": 2,
@@ -459,26 +512,77 @@
       "name_i18n": "sequence.darkness.2",
       "tier": "angel",
       "concept": "Cancella cose e persone dalla percezione altrui, anche in pieno giorno.",
-      "stat_modifiers": {},
+      "stat_modifiers": {
+        "hp_max": 340,
+        "spiritualita_max": 0.3,
+        "evasione": 0.1
+      },
       "abilities": [
-        "darkness_cancellazione"
+        "darkness_cancellazione",
+        "darkness_svanire"
       ],
-      "acting_actions": [],
+      "acting_actions": [
+        {
+          "id": "darkness_2_cancella",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_cancellazione"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_2_cancella",
+          "descrizione": "Cancella 12 presenze dalla percezione"
+        },
+        {
+          "id": "darkness_2_svanire",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_svanire"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_2_svanire",
+          "descrizione": "Svanisci 12 volte"
+        },
+        {
+          "id": "darkness_2_ombra",
+          "evento": "time_in_state",
+          "filtri": {
+            "stato": "notte"
+          },
+          "target": 1200,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_2_ombra",
+          "descrizione": "Resta occultato nella notte per 1200 secondi"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 2,
-        "ingredients": [],
+        "ingredients": [
+          "specchio_annerito",
+          "polvere_di_confine",
+          "filo_dell_oblio"
+        ],
         "formula_id": "formula_darkness_2"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "cripta",
+          "sotterraneo"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "nuova",
+        "sacrifices": [
+          "il_ricordo_del_proprio_volto"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
-      "notes": "",
-      "stub": true
+      "madness_on_force": 10.8,
+      "notes": "BLOCCO C (US-608): Darkness COMPLETO 10/10. illusion portata in gioco; darkness_1 (US-503) non piu' stub.",
+      "stub": false
     },
     {
       "sequence": 1,
@@ -487,26 +591,77 @@
       "name_i18n": "sequence.darkness.1",
       "tier": "angel",
       "concept": "Infligge sfortuna cronica: i nemici falliscono, inciampano, si feriscono da soli.",
-      "stat_modifiers": {},
+      "stat_modifiers": {
+        "hp_max": 520,
+        "spiritualita_max": 0.35,
+        "forza": 0.2
+      },
       "abilities": [
-        "darkness_sfortuna_cronica"
+        "darkness_sfortuna_cronica",
+        "darkness_giogo_della_malasorte"
       ],
-      "acting_actions": [],
+      "acting_actions": [
+        {
+          "id": "darkness_1_sfortuna",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_sfortuna_cronica"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_1_sfortuna",
+          "descrizione": "Maledici 15 bersagli con la sfortuna cronica"
+        },
+        {
+          "id": "darkness_1_giogo",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_giogo_della_malasorte"
+          },
+          "target": 10,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_1_giogo",
+          "descrizione": "Cala il Giogo della Malasorte 10 volte"
+        },
+        {
+          "id": "darkness_1_follia",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "follia"
+          },
+          "target": 4500,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_1_follia",
+          "descrizione": "Infliggi 4500 danni da follia"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 1,
-        "ingredients": [],
+        "ingredients": [
+          "chiodo_arrugginito_di_forca",
+          "tredicesimo_grano_di_rosario",
+          "sale_versato"
+        ],
         "formula_id": "formula_darkness_1"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "tempio_abbandonato",
+          "rovina"
+        ],
+        "momento": "notte_fonda",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "ancora_del_giocatore"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
-      "notes": "",
-      "stub": true
+      "madness_on_force": 12.5,
+      "notes": "BLOCCO C (US-608): Darkness COMPLETO 10/10. illusion portata in gioco; darkness_1 (US-503) non piu' stub.",
+      "stub": false
     },
     {
       "sequence": 0,
@@ -515,24 +670,65 @@
       "name_i18n": "sequence.darkness.0",
       "tier": "god",
       "concept": "La notte come dominio.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 900,
+        "spiritualita_max": 0.5,
+        "forza": 0.3,
+        "difesa": 0.2
+      },
+      "abilities": [
+        "darkness_dominio_della_notte"
+      ],
+      "acting_actions": [
+        {
+          "id": "darkness_0_dominio",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_dominio_della_notte"
+          },
+          "target": 20,
+          "progresso": 0.5,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_0_dominio",
+          "descrizione": "Imponi il Dominio della Notte 20 volte"
+        },
+        {
+          "id": "darkness_0_veglia",
+          "evento": "time_in_state",
+          "filtri": {
+            "stato": "notte"
+          },
+          "target": 3000,
+          "progresso": 0.5,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_0_veglia",
+          "descrizione": "Regna sulla notte per 3000 secondi"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 0,
-        "ingredients": [],
+        "ingredients": [
+          "frammento_di_notte_primordiale",
+          "occhio_del_gufo_del_giudizio",
+          "ultimo_respiro_del_giorno"
+        ],
         "formula_id": "formula_darkness_0"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "tempio_abbandonato",
+          "cripta"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "eclissi",
+        "sacrifices": [
+          "il_detentore_precedente_della_sequenza_0"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
-      "notes": "",
-      "stub": true
+      "madness_on_force": 14.0,
+      "notes": "BLOCCO C (US-608): Darkness COMPLETO 10/10. illusion portata in gioco; darkness_1 (US-503) non piu' stub.",
+      "stub": false
     }
   ]
 }

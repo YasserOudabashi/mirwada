@@ -15,6 +15,10 @@ signal ability_executed(ability_id: String, caster: Node, result: Dictionary)
 ## US-505: reveal_info ha rivelato qualcosa. Il consumatore (HUD/libro, world
 ## state) si aggancia in fase 6.
 signal info_rivelata(categoria: String, raggio: float, origine: Vector2)
+## US-608: illusion ha creato un inganno percettivo (esche, danno percepito,
+## cancellazione). Il consumatore vero (IA che ci casca, tell visivo sulle
+## esche) e' combat/fase 6.
+signal illusione_creata(tipo_illusione: String, raggio: float, origine: Vector2)
 
 ## Motivi di rifiuto, come costanti: i test e la UI non devono confrontare
 ## stringhe scritte a mano.
@@ -77,6 +81,7 @@ func _ready() -> void:
 		"plant_growth": _p_plant_growth,
 		"mind_read": _p_mind_read,
 		"shadow_meld": _p_shadow_meld,
+		"illusion": _p_illusion,
 	}
 
 
@@ -622,6 +627,29 @@ func _p_plant_growth(prim: Dictionary, caster: Node, _stats: Node, _ability_id: 
 			ws.call("registra_terreno", "vegetazione:" + specie, pos, raggio)
 			rec["applied"] = true
 	return rec
+
+
+## illusion (US-608, primitiva della fase 5b portata qui dal Servant of
+## Concealment del Darkness - fool_velo_illusorio e darkness_cancellazione la
+## usano). Crea un inganno percettivo di 'tipo_illusione' nel raggio per
+## 'durata'. 'potenza' = quante esche / quanto e' convincente. Il consumatore
+## vero (IA, tell visivo) e' combat/fase 6: qui l'abilita' emette il fatto e,
+## per 'danno_percepito', un dot a tag follia che sparisce se il bersaglio
+## "capisce" (rimovibile da light_purify come ogni dot).
+func _p_illusion(prim: Dictionary, caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+	var raggio: float = _num(prim.get("raggio"), 0.0)
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var potenza: int = int(_num(prim.get("potenza"), 1.0))
+	var tipo_illusione: String = str(prim.get("tipo_illusione", ""))
+	var origine: Vector2 = (caster as Node2D).global_position if caster is Node2D and (caster as Node2D).is_inside_tree() else Vector2.ZERO
+
+	if tipo_illusione == "danno_percepito" and durata > 0.0 and stats != null:
+		_pending.append({"kind": "dot", "stats": stats, "danno_tick": float(potenza),
+				"tick_rate": 1.0, "left": durata, "acc": 0.0})
+
+	illusione_creata.emit(tipo_illusione, raggio, origine)
+	return {"tipo": "illusion", "raggio": raggio, "durata": durata, "potenza": potenza,
+			"tipo_illusione": tipo_illusione, "applied": true}
 
 
 ## shadow_meld (US-607, primitiva della fase 5b portata qui dal Nightwatcher

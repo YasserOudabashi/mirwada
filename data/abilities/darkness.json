@@ -456,6 +456,192 @@
       ],
       "costo_follia": 4.0,
       "note": "Crea oscurita' locale: TimeSystem.e_notte(posizione) la legge come notte anche di giorno (gancio US-607). I nemici, al buio, vedono peggio (debuff precisione)."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_aura_di_terrore",
+      "name": "Aura di Terrore",
+      "name_i18n": "ability.darkness.darkness_aura_di_terrore",
+      "sequence_id": "darkness_3",
+      "costo_spiritualita": 50,
+      "cooldown": 28.0,
+      "primitive": [
+        {
+          "tipo": "fear",
+          "raggio": 180,
+          "durata": 8.0,
+          "soglia_resistenza": 0.15
+        },
+        {
+          "tipo": "aura",
+          "raggio": 180,
+          "durata": 15.0,
+          "effetto": "paura",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        }
+      ],
+      "tag_sinergia": [
+        "sonno",
+        "follia",
+        "area"
+      ],
+      "costo_follia": 4.0,
+      "note": "Horror Bishop: un'aura di terrore che rompe le formazioni nemiche - fear istantaneo + aura di 'paura' persistente."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_predica_nera",
+      "name": "Predica Nera",
+      "name_i18n": "ability.darkness.darkness_predica_nera",
+      "sequence_id": "darkness_3",
+      "costo_spiritualita": 44,
+      "cooldown": 22.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "forza",
+          "valore": -0.4,
+          "durata": 12.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "curse",
+          "effetto": "sfortuna",
+          "durata": 12.0,
+          "condizione_rimozione": "purificazione"
+        },
+        {
+          "tipo": "dot",
+          "danno_tick": 4,
+          "tick_rate": 2.0,
+          "durata": 12.0,
+          "tag_danno": "follia"
+        }
+      ],
+      "tag_sinergia": [
+        "maledizione",
+        "follia",
+        "area"
+      ],
+      "costo_follia": 3.5,
+      "note": "Sermone che spezza il coraggio: debuff forza + maledizione di sfortuna + logorio."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_svanire",
+      "name": "Svanire",
+      "name_i18n": "ability.darkness.darkness_svanire",
+      "sequence_id": "darkness_2",
+      "costo_spiritualita": 42,
+      "cooldown": 26.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 10,
+          "durata": 20.0,
+          "potenza": 4,
+          "tipo_illusione": "cancellazione_percettiva"
+        },
+        {
+          "tipo": "shadow_meld",
+          "durata": 12.0,
+          "velocita": 1.2,
+          "richiede_ombra": false
+        }
+      ],
+      "tag_sinergia": [
+        "occultamento",
+        "illusione",
+        "ombra"
+      ],
+      "costo_follia": 3.0,
+      "note": "Servant of Concealment: cancella se stesso dalla percezione altrui (illusion) e si fonde con l'ombra (shadow_meld) - anche in pieno giorno."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_giogo_della_malasorte",
+      "name": "Giogo della Malasorte",
+      "name_i18n": "ability.darkness.darkness_giogo_della_malasorte",
+      "sequence_id": "darkness_1",
+      "costo_spiritualita": 55,
+      "cooldown": 40.0,
+      "primitive": [
+        {
+          "tipo": "curse",
+          "effetto": "sfortuna",
+          "durata": 25.0,
+          "condizione_rimozione": "purificazione"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "evasione",
+          "valore": -0.4,
+          "durata": 25.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.4,
+          "durata": 25.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "dot",
+          "danno_tick": 5,
+          "tick_rate": 2.0,
+          "durata": 25.0,
+          "tag_danno": "follia"
+        }
+      ],
+      "tag_sinergia": [
+        "maledizione",
+        "follia",
+        "area"
+      ],
+      "costo_follia": 5.0,
+      "note": "Knight of Misfortune, versione d'area: la sfortuna cronica di darkness_sfortuna_cronica (US-503, senza probability_shift) estesa a piu' bersagli."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_dominio_della_notte",
+      "name": "Dominio della Notte",
+      "name_i18n": "ability.darkness.darkness_dominio_della_notte",
+      "sequence_id": "darkness_0",
+      "costo_spiritualita": 80,
+      "cooldown": 90.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 300,
+          "durata": -1,
+          "effetto": "paura",
+          "tick_rate": 3.0,
+          "bersagli": "nemici"
+        },
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "oscurita",
+          "raggio": 300,
+          "durata": 60.0,
+          "permanente": false
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "forza",
+          "valore": 0.5,
+          "durata": -1,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "notte",
+        "ombra",
+        "dominio"
+      ],
+      "costo_follia": 8.0,
+      "note": "Darkness (Sequenza 0): la notte come dominio. Aura di terrore permanente + oscurita' che rende notte tutto intorno + il caster raddoppia quasi la forza. Abilita' di dominio come i Seq 0 di fase 5."
     }
   ]
 }

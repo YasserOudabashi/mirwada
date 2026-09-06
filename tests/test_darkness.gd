@@ -15,6 +15,12 @@ const ABILITA_6_4 := [
 	"darkness_ospite_maligno", "darkness_scaglia_spirito",
 	"darkness_manto_d_ombra", "darkness_notte_artificiale",
 ]
+const ABILITA_3_0 := [
+	"darkness_aura_di_terrore", "darkness_predica_nera",
+	"darkness_cancellazione", "darkness_svanire",
+	"darkness_sfortuna_cronica", "darkness_giogo_della_malasorte",
+	"darkness_dominio_della_notte",
+]
 
 
 func _root() -> Node: return Engine.get_main_loop().root
@@ -120,13 +126,74 @@ func test_darkness_4_ha_il_rituale_notturno() -> void:
 		assert_gt((rit.get("location_tags", []) as Array).size(), 0.0, "coi suoi luoghi")
 
 
-func test_darkness_9_a_4_non_piu_stub_acting_1() -> void:
+func test_ogni_abilita_darkness_3_0_si_esegue_senza_warning() -> void:
+	for aid in ABILITA_3_0:
+		var c: Node2D = _caster()
+		var r: Dictionary = _e().call("execute", aid, c)
+		assert_true(r["ok"], "%s eseguita: %s" % [aid, r.get("reason")])
+		assert_eq((r["warnings"] as PackedStringArray).size(), 0,
+			"%s: nessun warning (illusion ora implementata): %s" % [aid, r["warnings"]])
+		_e().call("clear_cooldowns")
+		_cleanup(c)
+
+
+func test_illusion_emette_il_segnale_e_il_danno_percepito_e_un_dot() -> void:
+	var c: Node2D = _caster()
+	var visto: Array = []
+	var cb := func(tipo: String, _r: float, _o: Vector2) -> void: visto.append(tipo)
+	_e().connect("illusione_creata", cb)
+	var r: Dictionary = _e().call("execute", "darkness_svanire", c)
+	_e().disconnect("illusione_creata", cb)
+	assert_true(r["ok"], "svanire eseguito")
+	assert_true(visto.has("cancellazione_percettiva"),
+		"illusion emette illusione_creata col tipo dichiarato")
+	# danno_percepito -> un dot: lo verifico sulla primitiva isolata
+	var c2: Node2D = _caster()
+	var s2: Node = c2.get_node("Stats")
+	var hp0: float = float(s2.get("hp"))
+	_e().call("_p_illusion", {"raggio":4,"durata":6.0,"potenza":3,"tipo_illusione":"danno_percepito"}, c2, s2, "ab")
+	_e().call("tick_effects", 2.0)
+	assert_gt(hp0, float(s2.get("hp")), "danno_percepito e' un dot a tag follia (hp scesi)")
+	_cleanup(c)
+	_cleanup(c2)
+
+
+func test_darkness_1_non_e_piu_stub_ma_l_abilita_resta_quella_di_us503() -> void:
+	# US-608: darkness_1 (Knight of Misfortune) esce da stub. L'abilita'
+	# darkness_sfortuna_cronica resta quella di US-503 (senza probability_shift).
+	var pw: Dictionary = _gd().call("get_pathway", "darkness")
+	for s in (pw.get("sequences", []) as Array):
+		if int((s as Dictionary).get("sequence")) != 1:
+			continue
+		assert_false(bool((s as Dictionary).get("stub", true)), "darkness_1 non e' piu' stub")
+		assert_true((s as Dictionary).get("abilities", []).has("darkness_sfortuna_cronica"),
+			"tiene ancora l'abilita' di US-503")
+	var ab: Dictionary = _gd().call("get_ability", "darkness_sfortuna_cronica")
+	for p in (ab.get("primitive", []) as Array):
+		assert_ne(str((p as Dictionary).get("tipo")), "probability_shift",
+			"nessuna primitiva differita (probability_shift)")
+
+
+func test_darkness_completo_ritual_seq0_e_i_luoghi() -> void:
+	var pw: Dictionary = _gd().call("get_pathway", "darkness")
+	var stub_rimasti: Array = []
+	for s in (pw.get("sequences", []) as Array):
+		if bool((s as Dictionary).get("stub", false)):
+			stub_rimasti.append((s as Dictionary).get("sequence"))
+		var n: int = int((s as Dictionary).get("sequence"))
+		if n <= 4:
+			var rit: Dictionary = (s as Dictionary).get("advancement_ritual", {})
+			assert_false(rit.is_empty(), "darkness_%d ha un rituale" % n)
+	assert_eq(stub_rimasti.size(), 0, "DARKNESS COMPLETO: 0 Sequenze stub (%s)" % stub_rimasti)
+
+
+func test_darkness_tutte_e_10_non_piu_stub_acting_1() -> void:
 	var pw: Dictionary = _gd().call("get_pathway", "darkness")
 	var madness_prec: float = -1.0
 	for seq in (pw.get("sequences", []) as Array):
 		var d: Dictionary = seq
 		var n: int = int(d.get("sequence"))
-		if n < 4 or n > 9:
+		if n > 9:
 			continue
 		assert_false(bool(d.get("stub", false)), "darkness_%d non e' piu' stub" % n)
 		var somma: float = 0.0

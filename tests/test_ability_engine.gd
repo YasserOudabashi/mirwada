@@ -99,8 +99,8 @@ func test_cooldown_blocca_la_seconda_esecuzione() -> void:
 
 func test_composizione_di_due_primitive() -> void:
 	# Il criterio di US-013: fool_velo_illusorio compone illusion + buff_stat.
-	# illusion e' nel registro chiuso ma non ancora implementata: deve produrre
-	# un AVVISO e lasciare proseguire, non far fallire l'abilita'.
+	# Dalla fase 6 illusion e' implementata (Darkness): entrambe le primitive
+	# eseguono, zero avvisi.
 	var e: Node = _engine()
 	var c: Node2D = _caster()
 	var s: Node = c.get_node("Stats")
@@ -109,12 +109,12 @@ func test_composizione_di_due_primitive() -> void:
 	assert_true(r["ok"], "abilita' eseguita")
 
 	var warnings: PackedStringArray = r["warnings"]
-	assert_eq(warnings.size(), 1, "un solo avviso")
-	assert_true(str(warnings[0]).contains("illusion"), "l'avviso riguarda illusion")
+	assert_eq(warnings.size(), 0, "nessun avviso: illusion e buff_stat sono implementate")
 
 	var effects: Array = r["effects"]
-	assert_eq(effects.size(), 1, "una primitiva eseguita davvero")
-	assert_eq((effects[0] as Dictionary)["tipo"], "buff_stat", "e' il buff_stat")
+	assert_eq(effects.size(), 2, "due primitive eseguite davvero")
+	var tipi: Array = [(effects[0] as Dictionary)["tipo"], (effects[1] as Dictionary)["tipo"]]
+	assert_true(tipi.has("illusion") and tipi.has("buff_stat"), "illusion + buff_stat: %s" % tipi)
 
 	# evasione +0.15 dal JSON, applicata come modificatore
 	assert_almost_eq(float(s.call("get_stat", "evasione")), 0.15, "evasione buffata")
@@ -152,16 +152,20 @@ func test_primitiva_fuori_registro_e_errore() -> void:
 
 func test_primitiva_nel_registro_ma_non_implementata_prosegue() -> void:
 	# L'altro esito: NEL registro chiuso ma senza handler -> warning "non
-	# implementata", l'abilita' prosegue. illusion e' esattamente questo caso.
+	# implementata", l'abilita' prosegue. 'chain' e' esattamente questo caso
+	# (attiva ma senza handler; illusion/shadow_meld sono state implementate
+	# in fase 6 per Darkness).
 	var e: Node = _engine()
 	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
-	assert_false((gd.call("get_primitive", "illusion") as Dictionary).is_empty(),
-		"illusion e' nel registro")
+	assert_false((gd.call("get_primitive", "chain") as Dictionary).is_empty(),
+		"chain e' nel registro")
+	assert_false(e.call("tipi_primitiva_implementati").has("chain"),
+		"chain non ha ancora un handler")
 
 	var abilities: Dictionary = gd.get("_abilities")
 	abilities["_ab_non_impl"] = {
 		"id": "_ab_non_impl", "costo_spiritualita": 0,
-		"primitive": [{"tipo": "illusion"}],
+		"primitive": [{"tipo": "chain"}],
 	}
 	var c: Node2D = _caster()
 	var r: Dictionary = e.call("execute", "_ab_non_impl", c)

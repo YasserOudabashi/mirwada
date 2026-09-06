@@ -403,6 +403,30 @@
       "pathway_id": "darkness",
       "sequence": 4,
       "name_i18n": "characteristic.darkness.4"
+    },
+    {
+      "id": "char_darkness_3",
+      "pathway_id": "darkness",
+      "sequence": 3,
+      "name_i18n": "characteristic.darkness.3"
+    },
+    {
+      "id": "char_darkness_2",
+      "pathway_id": "darkness",
+      "sequence": 2,
+      "name_i18n": "characteristic.darkness.2"
+    },
+    {
+      "id": "char_darkness_1",
+      "pathway_id": "darkness",
+      "sequence": 1,
+      "name_i18n": "characteristic.darkness.1"
+    },
+    {
+      "id": "char_darkness_0",
+      "pathway_id": "darkness",
+      "sequence": 0,
+      "name_i18n": "characteristic.darkness.0"
     }
   ]
 }

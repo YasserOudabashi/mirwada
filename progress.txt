@@ -5450,3 +5450,54 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   test_debug_primitive, test_time_system, test_conditions invariati.
 - Prossima storia: US-608 (Darkness Seq 3-2 + illusion; darkness_0 e
   darkness_1 chiusi -> DARKNESS 10/10 -> 100/100 Sequenze, 22/22 Pathway).
+
+[2026-09-07] US-608 — Darkness Sequenze 3-0 (Horror Bishop / Servant of Concealment / Knight of Misfortune / Darkness) + illusion. FASE 6, BLOCCO C CHIUSO. DARKNESS COMPLETO 10/10.
+
+- PRIMITIVA illusion IMPLEMENTATA (della fase 5b, portata dal Servant of
+  Concealment - fool_velo_illusorio e darkness_cancellazione la usavano con
+  un warning tollerato): _p_illusion emette illusione_creata(tipo_illusione,
+  raggio, origine); per tipo_illusione "danno_percepito" spawna un dot a tag
+  follia (rimovibile da light_purify come ogni dot); esche / cancellazione /
+  copie -> il consumatore (IA, tell visivo) e' combat/fase 6. primitives.json
+  implemented:true; vfx.json vfx_mirage; _handlers +1; signal nuovo.
+- Darkness Seq 3/2/1/0 stub -> false. DARKNESS 10/10:
+  * darkness_aura_di_terrore (Seq 3, Horror Bishop): fear r180 + aura 'paura'
+    persistente sui nemici; darkness_predica_nera: debuff forza + curse
+    sfortuna + dot.
+  * darkness_svanire (Seq 2, Servant of Concealment): illusion
+    'cancellazione_percettiva' + shadow_meld - "anche in pieno giorno".
+    darkness_cancellazione (stress test US-228) ora esegue a 0 warning.
+  * darkness_giogo_della_malasorte (Seq 1): la sfortuna cronica di
+    darkness_sfortuna_cronica (US-503, senza probability_shift) estesa
+    all'area. darkness_1 ESCE DA STUB (l'abilita' resta quella di US-503).
+  * darkness_dominio_della_notte (Seq 0): aura terrore permanente +
+    terrain_modify oscurita r300 + buff forza permanente. Abilita' di
+    dominio come i Seq 0 di fase 5.
+- rituali Seq 4/3/2/1/0 (darkness_4 gia' da US-607). Seq 1 sacrifica
+  ancora_del_giocatore; Seq 0 il_detentore_precedente_della_sequenza_0,
+  momento notte_fonda, fase_lunare "eclissi". acting somma 1.0 (Seq 2/0 usano
+  time_in_state notte). madness 9.5/10.8/12.5/14.0.
+- formule formula_darkness_3/2/1/0 + 12 ingredienti; char_darkness_3/2/1/0
+  tradotte. i18n: 7 abilita' + 4 caratteristiche.
+- REGRESSIONE GESTITA: test_ability_engine usava illusion come esempio di
+  "primitiva nel registro ma non implementata" -> aggiornati 2 test:
+  test_composizione_di_due_primitive ora attende 0 warning + 2 effetti
+  (illusion + buff_stat); test_primitiva_nel_registro_ma_non_implementata
+  usa 'chain' (attiva, senza handler) invece di illusion.
+- tests/test_darkness.gd +5 (13 totali): abilita' 3-0 a 0 warning; illusion
+  emette il segnale + danno_percepito e' un dot; darkness_1 fuori da stub ma
+  abilita' invariata; DARKNESS COMPLETO 0 stub + rituali Seq<=4.
+- Come verificato: validate exit 0 (stub 33 -> 29: restano Fool 9 + Error 10
+  + Door 10, che sono la fase 5b vera - PRD prd-fase-5b-lord-of-mysteries.md,
+  fuori dai blocchi A/B/C). 603 test headless, tutti verdi. Boot di main.tscn
+  pulito.
+- BLOCCO C CHIUSO: US-606/607/608. Darkness completo 10/10. Il gruppo
+  eternal_darkness (Twilight Giant + Death + Darkness) e' interamente
+  non-stub. shadow_meld e illusion implementate (5b, interlacciate).
+  Restano senza handler: chain, possess, steal, time_rewind (fase 5b).
+- NOTA: il "100/100 Sequenze, 22/22 Pathway" dell'AC di US-608 presuppone
+  Fool/Error/Door gia' fatti (fase 5b). Con i blocchi A/B/C: 71/100
+  (10 TG + fool_9 + 50 fase 5 + 10 Darkness). La chiusura documenti
+  (CLAUDE.md/README) e il conteggio finale sono di US-622.
+- Prossima storia (fuori dai 3 blocchi chiesti): US-611 (BLOCCO D - il motore
+  del mondo applica regions.json.gating[] via AreaGate).

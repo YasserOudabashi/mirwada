@@ -233,6 +233,12 @@
       "frames": 4,
       "impact_frame": false,
       "scia": true
+    },
+    "illusion": {
+      "sprite": "vfx_mirage",
+      "frames": 4,
+      "impact_frame": false,
+      "scia": false
     }
   },
   "impact_frames": {

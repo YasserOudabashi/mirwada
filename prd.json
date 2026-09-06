@@ -137,8 +137,8 @@
       ],
       "priority": 8,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO C CHIUSO. DARKNESS 10/10. illusion IMPLEMENTATA (fase 5b, portata dal Servant of Concealment): _p_illusion -> segnale illusione_creata + dot per 'danno_percepito'; primitives implemented + vfx_mirage. Darkness Seq 3/2/1/0 stub->false: aura_di_terrore/predica_nera (Horror Bishop), svanire (illusion+shadow_meld) + darkness_cancellazione ora 0 warning, giogo_della_malasorte (sfortuna d'area) + darkness_1 ESCE DA STUB (abilita' invariata da US-503), dominio_della_notte (Seq 0). rituali Seq<=4; Seq 0 fase_lunare eclissi. madness 9.5/10.8/12.5/14.0. formule+char 3/2/1/0. REGRESSIONE gestita: 2 test di test_ability_engine aggiornati (illusion era l'esempio di 'non implementata' -> ora usa 'chain'). tests/test_darkness.gd +5 (13). validate exit 0 (stub 33->29: restano Fool/Error/Door = fase 5b vera). 603 test verdi. NOTA: '100/100, 22/22' dell'AC presuppone fase 5b; coi blocchi A/B/C siamo a 71/100. Chiusura documenti/conteggi = US-622."
     },
     {
       "id": "US-611",

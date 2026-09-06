@@ -92,7 +92,8 @@
         "durata",
         "potenza",
         "tipo_illusione"
-      ]
+      ],
+      "implemented": true
     },
     "mind_read": {
       "params": [

@@ -17,6 +17,7 @@
     "balsamo_di_silenzio",
     "bilancia_di_precisione",
     "calice_incrinato",
+    "campana_incrinata",
     "caratteristica_del_gigante",
     "carta_millimetrata",
     "catalizzatore_proibito",
@@ -31,6 +32,7 @@
     "chiave_dell_oltretomba",
     "chiave_di_ogni_serratura",
     "chiave_di_soluzione",
+    "chiodo_arrugginito_di_forca",
     "chiodo_di_bara",
     "chiodo_di_ferro_freddo",
     "codice_della_vita_inciso",
@@ -59,6 +61,7 @@
     "fiala_di_luna_piena",
     "fiele_di_demone",
     "filo_d_argento_lunare",
+    "filo_dell_oblio",
     "filo_delle_parche",
     "filo_di_lana_rossa",
     "filo_di_lutto",
@@ -69,6 +72,7 @@
     "frammento_di_alba",
     "frammento_di_cielo_notturno",
     "frammento_di_luna",
+    "frammento_di_notte_primordiale",
     "frammento_di_tavoletta",
     "fungo_a_specchio",
     "gesso_consacrato",
@@ -78,6 +82,7 @@
     "grimorio_bianco",
     "il_confine_del_mondo",
     "incenso_dei_riti",
+    "incenso_di_cenere",
     "incenso_di_mirra",
     "inchiostro_che_non_si_cancella",
     "inchiostro_di_due_mondi",
@@ -101,6 +106,7 @@
     "mercurio_filosofale",
     "metallo_impossibile",
     "miele_selvatico",
+    "mitra_di_vescovo_apostata",
     "moneta_del_traghettatore",
     "muffa_sepolcrale",
     "muschio_di_caverna",
@@ -111,6 +117,7 @@
     "numero_che_non_dovrebbe_esistere",
     "obolo_di_bronzo",
     "occhio_che_non_dorme",
+    "occhio_del_gufo_del_giudizio",
     "occhio_di_vetro_nero",
     "olio_conduttore",
     "ombra_imbottigliata",
@@ -129,6 +136,7 @@
     "platino_rituale",
     "polline_dorato",
     "polvere_di_arena",
+    "polvere_di_confine",
     "polvere_di_crepuscolo",
     "polvere_di_incubo",
     "polvere_di_meteora",
@@ -166,6 +174,7 @@
     "sale_della_vita",
     "sale_di_roccia",
     "sale_scarlatto",
+    "sale_versato",
     "sangue_di_cervo",
     "sangue_di_gufo_lunare",
     "sangue_di_ogni_bestia",
@@ -181,6 +190,7 @@
     "sigillo_di_ceralacca",
     "soffio_di_spettro",
     "spazzola_da_scavo",
+    "specchio_annerito",
     "specchio_annerito_dal_fumo",
     "specchio_di_luna_nera",
     "spiga_dorata",
@@ -194,9 +204,11 @@
     "tendine_di_lupo",
     "terra_di_cimitero",
     "terriccio_di_prima_luna",
+    "tredicesimo_grano_di_rosario",
     "ultima_foglia_dell_autunno",
     "ultimo_battito",
     "ultimo_respiro",
+    "ultimo_respiro_del_giorno",
     "velo_di_mezzanotte",
     "voce_del_gigante",
     "voce_di_creatura_mai_vista",
@@ -1134,6 +1146,62 @@
         "ala_di_falena_crepuscolare",
         "ombra_imbottigliata",
         "chiodo_di_bara"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_darkness_3": {
+      "characteristic_sequence": 3,
+      "ingredients": [
+        "mitra_di_vescovo_apostata",
+        "incenso_di_cenere",
+        "campana_incrinata"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_darkness_2": {
+      "characteristic_sequence": 2,
+      "ingredients": [
+        "specchio_annerito",
+        "polvere_di_confine",
+        "filo_dell_oblio"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_darkness_1": {
+      "characteristic_sequence": 1,
+      "ingredients": [
+        "chiodo_arrugginito_di_forca",
+        "tredicesimo_grano_di_rosario",
+        "sale_versato"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_darkness_0": {
+      "characteristic_sequence": 0,
+      "ingredients": [
+        "frammento_di_notte_primordiale",
+        "occhio_del_gufo_del_giudizio",
+        "ultimo_respiro_del_giorno"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {
