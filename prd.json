@@ -202,8 +202,8 @@
       ],
       "priority": 12,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 3. Primitiva nuova plant_growth (_p_plant_growth, gemello di terrain_modify): persistente:true -> registra_terreno('vegetazione:'+specie) nel WorldState (riuso, entra nel save); temporaneo -> record (consumo di fase 6). implemented; vfx vfx_bloom; +1 handler. Nuovo status 'area_viva' (tag guarigione, difesa +0.05). Mother Seq 9/8/7 stub->false: germoglio_rapido (plant_growth), mano_verde, diagnosi (light_purify - rimuove veleni/maledizioni), sutura, benedizione_raccolto (aura area_viva), terra_generosa (plant_growth PERSISTENTE). acting 1.0, madness 1.3/2.7/4.1. formule+ingredienti+char_mother_9/8/7. 559 test (555+4). validate exit 0."
     },
     {
       "id": "US-513",
@@ -218,8 +218,8 @@
       ],
       "priority": 13,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 3. Nessuna primitiva nuova. Mother Seq 6/5/4 stub->false: innesto (summon chimera_semplice), mutazione_rapida (debuff + dot), muraglia_di_rovi (plant_growth + terrain_modify terreno_impraticabile), omuncolo (summon chimera_omuncolo x2), materia_vivente (heal 45 + buff). mother_dominio_druidico (stress test seq 5) nel roster. acting 1.0, madness 5.6/6.9/8.6. mother_4 rituale con location_tags [bosco_antico, sorgente]. formule+ingredienti+char_mother_6/5/4. 561 test (559+2). validate exit 0."
     },
     {
       "id": "US-514",
@@ -235,8 +235,8 @@
       ],
       "priority": 14,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 3 CHIUSO. MOTHER COMPLETO (10/10). Nessuna primitiva nuova. Mother Seq 3/2/1/0 stub->false: drenaggio_vitale (dot + heal), restituzione (aura area_viva), chimera_su_misura (summon durata -1 - permanente nel save), madre_dei_mostri (buff + summon x3), natura_risponde (terrain_modify terreno_vivo + buff forza), camminatrice (heal + buff), dominio_della_terra (aura persistente), rinascita (heal 150 + plant_growth persistente 'eden'). acting 1.0, madness 9.7/11.0/12.6/14.0. rituali Seq 3/2/1/0; Seq 1 Ancora, Seq 0 il_detentore_precedente. formule formula_mother_3/2/1/0 + 12 ingredienti; char_mother_3/2/1/0. i18n: 8 abilita' + 4 char. 562 test (561+1). validate exit 0."
     },
     {
       "id": "US-515",
@@ -251,8 +251,8 @@
       ],
       "priority": 15,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 4. reveal_info gia' implementata (US-505). NESSUNA primitiva nuova. Paragon Seq 9/8/7 stub->false: analisi (reveal_info proprieta_oggetto), deduzione (buff), scavo (terrain_modify + reveal_info reperto), disinnesco (light_purify - disinnesca trappole d'area), perizia (reveal_info categoria 'sigillo' - rivela l'effetto_collaterale di un Oggetto Sigillato senza if per Paragon), stima (2x buff). acting 1.0, madness 1.2/2.5/3.9. formule+ingredienti+char_paragon_9/8/7. 565 test (562+3, incl. guardia 'nessuna primitiva differita' per US-517). validate exit 0."
     },
     {
       "id": "US-516",
@@ -267,8 +267,8 @@
       ],
       "priority": 16,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 4. Nessuna primitiva nuova. Paragon Seq 6/5/4 stub->false: congegno_offensivo (summon costrutto_torretta - flusso vero da Forge di fase 3), arma_beyonder (buff + projectile pierce 2), ricognizione (reveal_info categoria 'mappa' r20 - Paragon MISURA), previsione (buff evasione), trasmutazione (terrain_modify + debuff), costrutto_pesante (summon costrutto_titano + buff). acting 1.0, madness 5.4/6.7/8.4. paragon_4 rituale [officina, torre_di_osservazione]. formule+ingredienti+char_paragon_6/5/4. 565 test. validate exit 0."
     },
     {
       "id": "US-517",
@@ -284,8 +284,8 @@
       ],
       "priority": 17,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 4 CHIUSO. PARAGON COMPLETO (10/10). Nessuna primitiva nuova; NUOVO status 'gravita_alterata' (tag invenzione, negativo). paragon_1 (Illuminator) RISCRITTA SENZA rule_bind (primitiva differita): aura(gravita_alterata) persistente + terrain_modify(legge_locale_sospesa). Come darkness_1. Grep di data/abilities/ per rule_bind come primitiva: 0. Paragon Seq 3/2/1/0 stub->false: incisione_duale (buff + shield riflettente), sigillo_ibrido (curse + debuff), officina_mobile (summon costrutto_autonomo durata -1), campo_alterato, dettato_fisico (2x buff), civilta_come_dominio (aura persistente), legione_meccanica (summon x5). paragon_costrutto_vivo (stress test seq 2) nel roster. acting 1.0, madness 9.6/10.9/12.5/14.0. rituali Seq 3/2/1/0. formule formula_paragon_3/2/1/0 + 12 ingredienti; char_paragon_3/2/1/0. i18n: 8 abilita' + 4 char. 565 test. validate exit 0."
     },
     {
       "id": "US-518",
@@ -300,8 +300,8 @@
       ],
       "priority": 18,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 5. Nessuna primitiva nuova (reveal_info gia' da US-505). Hermit Seq 9/8/7 stub->false: percezione_mistica (reveal_info categoria 'densita_mistica' - Hermit e' il divinatore sistemico, categoria piu' ampia), traccia_rituale (buff), sigillo_su_arma (buff forza + melee_arc luce), conoscenza_applicata (2x buff), evocazione_minore (summon evocazione_famiglio), incantesimo_tradizionale (projectile spirito + debuff). acting 1.0, madness 1.2/2.6/4.0. formule+ingredienti+char_hermit_9/8/7. 568 test (565+3, incl. guardia 'nessuna primitiva differita' per US-520). validate exit 0."
     },
     {
       "id": "US-519",
@@ -316,8 +316,8 @@
       ],
       "priority": 19,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 5. Nessuna primitiva nuova. Hermit Seq 6/5/4 stub->false: pergamena_pronta (buff + shield - la produzione dell'oggetto pergamena con stored_ability_id e' aggancio di fase 6), scarica_precotta (projectile luce pierce 2), costellazione_del_guerriero (buff forza, condizione e_notte), costellazione_del_custode (buff difesa, condizione fase_lunare piena - le condizioni sono DATI, l'engine le legge in fase 6), incantesimo_su_misura (dot spirito + debuff), teoria_in_pratica (aura area_viva + buff). acting 1.0, madness 5.5/6.8/8.5. hermit_4 rituale [torre_di_osservazione, vetta], fase_lunare nuova. formule+ingredienti+char_hermit_6/5/4. 568 test. validate exit 0."
     },
     {
       "id": "US-520",
@@ -334,8 +334,8 @@
       ],
       "priority": 20,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 5 CHIUSO. HERMIT COMPLETO (10/10). TUTTI E 5 I PATHWAY DI FASE 5 COMPLETI. Primitiva nuova mind_read (_p_mind_read - riusa il segnale info_rivelata con categoria 'mente:<rivela>'; consumatore = fase 6). implemented; vfx vfx_insight; +1 handler. Nuovo status 'destino_segnato' (tag destino, negativo, difesa/evasione -0.3). hermit_1 (Knowledge Emperor) RISCRITTA SENZA rule_bind: curse(destino_segnato) + debuff pesante + reveal_info. Grep di data/abilities/ per rule_bind come primitiva: 0. Hermit Seq 3/2/1/0 stub->false: veggenza (mind_read), occhio_interiore (reveal_info + buff), potere_dal_sapere (2x buff), estrazione_arcana (dot + heal), marchio_del_destino (curse + debuff + reveal_info), riscrittura (mind_read + debuff), occulto_come_dominio (aura destino_segnato persistente), verita_ultima (mind_read r20 + buff). acting 1.0, madness 9.6/10.9/12.5/14.0. rituali Seq 3/2/1/0. formule formula_hermit_3/2/1/0 + 12 ingredienti; char_hermit_3/2/1/0. i18n: 8 abilita' + 4 char. 569 test (568+1: mind_read emette info_rivelata; marchio applica destino_segnato). validate exit 0."
     },
     {
       "id": "US-521",
@@ -351,8 +351,8 @@
       ],
       "priority": 21,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 6. data/synergies/batch_4.json (NUOVO): 6 sinergie coi 5 Pathway nuovi incrociati coi sistemi di fase 3, tutte raggiungibili (tag del Pathway dalla fonte sequenza): esercito_immortale (morte+guerra -> summon.quantita +1), distilleria_rituale (pozione+rituale -> qualita pozioni +1, visibile), giardino_della_madre (crescita 2 -> spiritualita_max +10%), officina_arcana (crafting+occulto -> qualita forgia +1), biblioteca_vivente (conoscenza 2 -> sblocca ric_ambrosia), costrutto_bestiale (crafting+bestia -> aggiungi paragon_costrutto_vivo). Sinergie totali 50, 32 raggiungibili (era 26 - i tag dei 5 Pathway nuovi ne hanno sbloccate 6 dei batch 1-3 + 6 nuove). Verificato: le 50 caratteristiche dei 5 Pathway esistono e sono tradotte (0 TODO); tradotte anche le 10 del TG. i18n TODO 58 -> 48. DIAGRAMMA del libro: nessun codice nuovo; verifica a schermo (Moon S7 attivo) -> 10 colonne, fog of war corretto, abilita' della Sequenza coi nomi tradotti. 570 test (569+1). validate exit 0."
     },
     {
       "id": "US-522",
@@ -369,8 +369,8 @@
       ],
       "priority": 22,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "FASE 5 CHIUSA. roadmap.md/design-pathways.md/design-master.md/CLAUDE.md/README.md: fase 5 CHIUSA (22 story, 570 test), 5 Pathway nuovi completi, checkpoint superato. Sezione 'fase 5b' (Darkness resto/Fool/Error/Door + illusion/possess/steal/time_rewind/chain/shadow_meld) dentro fase 6. tools/validate_data.py: check di chiusura FASE_5 - FASE_5_DATA devono esistere, i 5 Pathway (death/moon/mother/paragon/hermit) senza Sequenze stub, nessuna primitiva implemented+deferred. validate exit 0 (3 warning: 39 stub di Darkness/Fool/Error/Door, 18 sinergie dei gruppi differiti, i18n TODO). 570 test verdi."
     }
   ]
 }
