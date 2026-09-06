@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO dei comportamenti-talento (US-330): cio' che i 12 eventi di tracked_events.json NON catturano. TalentTracker (US-331) li conta, gli emettitori sono agganciati ai sistemi esistenti con adattamento minimo. Aggiungere una voce e' codice: va discusso, come per i 12 eventi. Ogni voce: 'misura' (conteggio | somma | secondi) e 'filtri' ammessi.",
+  "talents": {
+    "giocato_di_notte": {
+      "descrizione": "Tempo cumulativo passato nel mondo mentre e' notte.",
+      "misura": "secondi",
+      "filtri": []
+    },
+    "sequenze_senza_pozione": {
+      "descrizione": "Sequenze avanzate senza aver mai preparato una pozione a quel livello.",
+      "misura": "conteggio",
+      "filtri": []
+    },
+    "nemici_risparmiati": {
+      "descrizione": "Nemici lasciati vivi potendoli uccidere.",
+      "misura": "conteggio",
+      "filtri": []
+    },
+    "distanza_percorsa": {
+      "descrizione": "Distanza totale percorsa a piedi nel mondo (px).",
+      "misura": "somma",
+      "filtri": []
+    },
+    "ingredienti_coltivati": {
+      "descrizione": "Ingredienti raccolti dal giardino della base.",
+      "misura": "conteggio",
+      "filtri": []
+    },
+    "abilita_prestate_usate": {
+      "descrizione": "Abilita' non possedute eseguite (oggetti con stored_ability_id, primitiva grant).",
+      "misura": "conteggio",
+      "filtri": []
+    },
+    "rituali_interrotti": {
+      "descrizione": "Rituali di avanzamento lasciati a meta'.",
+      "misura": "conteggio",
+      "filtri": []
+    }
+  }
+}

@@ -963,6 +963,87 @@ def main():
         err("data/items/: nessun ingrediente con coltivabile:true (il giardino, US-328, "
             "non avrebbe nulla da piantare)")
 
+    # --- talenti (data/talents/, data/schema/tracked_talents.json, US-330) ---
+    tt_doc = load_json(os.path.join(DATA, "schema", "tracked_talents.json")) or {}
+    tracked_talents = tt_doc.get("talents", {})
+    for tk, tv in tracked_talents.items():
+        if tv.get("misura") not in ("conteggio", "somma", "secondi"):
+            err(f"data/schema/tracked_talents.json [{tk}]: 'misura' deve essere "
+                f"conteggio|somma|secondi")
+        if not isinstance(tv.get("filtri"), list):
+            err(f"data/schema/tracked_talents.json [{tk}]: 'filtri' deve essere una lista")
+    # evento di sblocco: uno dei 12 eventi O uno dei comportamenti-talento
+    eventi_ok = {}  # nome -> filtri ammessi
+    for en, ev in events.items():
+        eventi_ok[en] = set(ev.get("filtri", []))
+    for tk, tv in tracked_talents.items():
+        eventi_ok[tk] = set(tv.get("filtri", []))
+    talent_stats = {"hp_max", "spiritualita_max", "velocita", "difesa", "evasione",
+                    "precisione", "forza"}
+    tal_dir = os.path.join(DATA, "talents")
+    tal_ids = set()
+    n_innati = n_acquisiti = 0
+    for fn in sorted(os.listdir(tal_dir)) if os.path.isdir(tal_dir) else []:
+        if not fn.endswith(".json"):
+            continue
+        rel = f"data/talents/{fn}"
+        for t in (load_json(os.path.join(tal_dir, fn)) or {}).get("talents", []):
+            tid = t.get("id", "")
+            if not tid:
+                err(f"{rel}: un talento non ha 'id'")
+                continue
+            if tid in tal_ids:
+                err(f"{rel}: id talento duplicato '{tid}'")
+            tal_ids.add(tid)
+            for campo in ("name_i18n", "descrizione_i18n"):
+                if not isinstance(t.get(campo), str) or not t.get(campo):
+                    err(f"{rel} [{tid}]: {campo} mancante o vuoto")
+            tipo = t.get("tipo")
+            if tipo == "innato":
+                n_innati += 1
+                if "sblocco" in t:
+                    err(f"{rel} [{tid}]: un talento 'innato' non ha 'sblocco'")
+            elif tipo == "acquisito":
+                n_acquisiti += 1
+                sb = t.get("sblocco")
+                if not isinstance(sb, dict):
+                    err(f"{rel} [{tid}]: un talento 'acquisito' richiede 'sblocco'")
+                else:
+                    ev = sb.get("evento")
+                    if ev not in eventi_ok:
+                        err(f"{rel} [{tid}]: sblocco.evento '{ev}' non e' nei 12 eventi ne' "
+                            f"nei comportamenti-talento")
+                    else:
+                        for fk in (sb.get("filtri", {}) or {}):
+                            if fk not in eventi_ok[ev]:
+                                err(f"{rel} [{tid}]: filtro '{fk}' non ammesso per '{ev}'")
+                    if not isinstance(sb.get("target"), (int, float)) or sb.get("target", 0) <= 0:
+                        err(f"{rel} [{tid}]: sblocco.target deve essere un numero > 0")
+            else:
+                err(f"{rel} [{tid}]: 'tipo' deve essere 'innato' o 'acquisito'")
+            eff = t.get("effetto", {})
+            et = eff.get("tipo")
+            if et == "stat_modifier":
+                if eff.get("stat") not in talent_stats:
+                    err(f"{rel} [{tid}]: effetto.stat '{eff.get('stat')}' non e' una stat nota")
+                if not isinstance(eff.get("valore"), (int, float)):
+                    err(f"{rel} [{tid}]: effetto.valore deve essere numerico")
+                if not isinstance(eff.get("moltiplicativo"), bool):
+                    err(f"{rel} [{tid}]: effetto.moltiplicativo deve essere true/false")
+            elif et == "tag_grant":
+                if eff.get("tag") not in valid_tags:
+                    err(f"{rel} [{tid}]: effetto.tag '{eff.get('tag')}' non nel vocabolario chiuso")
+            elif et == "sblocco_sistema":
+                if not eff.get("sistema") or not eff.get("chiave"):
+                    err(f"{rel} [{tid}]: effetto sblocco_sistema richiede 'sistema' e 'chiave'")
+            else:
+                err(f"{rel} [{tid}]: effetto.tipo '{et}' non e' stat_modifier|tag_grant|sblocco_sistema")
+    if n_innati < 4:
+        err(f"data/talents/: solo {n_innati} talenti 'innato', attesi >= 4 (la scelta alla "
+            f"creazione, US-332)")
+    if n_acquisiti < 8:
+        err(f"data/talents/: solo {n_acquisiti} talenti 'acquisito', attesi >= 8")
+
     # --- esiti degli esperimenti (data/potions/experiment_outcomes.json, US-311) ---
     eo_doc = load_json(os.path.join(DATA, "potions", "experiment_outcomes.json"))
     outcomes = (eo_doc or {}).get("outcomes", {})

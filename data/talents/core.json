@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "_comment": "Talenti (US-330). 'innato' = scelto alla creazione (US-332); 'acquisito' = sbloccato da un comportamento oltre soglia (US-331). 'sblocco.evento' punta ai 12 di tracked_events.json o ai comportamenti-talento di tracked_talents.json. Numeri PLAUSIBILI, non bilanciati.",
+  "talents": [
+    {
+      "id": "costituzione_robusta",
+      "name": "Costituzione robusta",
+      "descrizione": "Sei sempre stato piu' solido degli altri.",
+      "name_i18n": "talent.costituzione_robusta",
+      "descrizione_i18n": "talent.costituzione_robusta.desc",
+      "tipo": "innato",
+      "effetto": { "tipo": "stat_modifier", "stat": "hp_max", "valore": 0.1, "moltiplicativo": true }
+    },
+    {
+      "id": "mano_ferma",
+      "name": "Mano ferma",
+      "descrizione": "I tuoi colpi vanno dove vuoi tu.",
+      "name_i18n": "talent.mano_ferma",
+      "descrizione_i18n": "talent.mano_ferma.desc",
+      "tipo": "innato",
+      "effetto": { "tipo": "stat_modifier", "stat": "precisione", "valore": 6, "moltiplicativo": false }
+    },
+    {
+      "id": "spirito_vivace",
+      "name": "Spirito vivace",
+      "descrizione": "La tua spiritualita' si ricarica in fretta.",
+      "name_i18n": "talent.spirito_vivace",
+      "descrizione_i18n": "talent.spirito_vivace.desc",
+      "tipo": "innato",
+      "effetto": { "tipo": "stat_modifier", "stat": "spiritualita_max", "valore": 0.15, "moltiplicativo": true }
+    },
+    {
+      "id": "piede_leggero",
+      "name": "Piede leggero",
+      "descrizione": "Ti muovi svelto e ti fai da parte al momento giusto.",
+      "name_i18n": "talent.piede_leggero",
+      "descrizione_i18n": "talent.piede_leggero.desc",
+      "tipo": "innato",
+      "effetto": { "tipo": "stat_modifier", "stat": "evasione", "valore": 5, "moltiplicativo": false }
+    },
+
+    {
+      "id": "figlio_della_notte",
+      "name": "Figlio della notte",
+      "descrizione": "Le ore piccole non ti pesano piu': ci vedi meglio al buio.",
+      "name_i18n": "talent.figlio_della_notte",
+      "descrizione_i18n": "talent.figlio_della_notte.desc",
+      "tipo": "acquisito",
+      "sblocco": { "evento": "giocato_di_notte", "target": 600 },
+      "effetto": { "tipo": "tag_grant", "tag": "notte" }
+    },
+    {
+      "id": "frugalita",
+      "name": "Frugalita'",
+      "descrizione": "Sei avanzato di Sequenza a denti stretti, senza pozioni.",
+      "name_i18n": "talent.frugalita",
+      "descrizione_i18n": "talent.frugalita.desc",
+      "tipo": "acquisito",
+      "sblocco": { "evento": "sequenze_senza_pozione", "target": 3 },
+      "effetto": { "tipo": "stat_modifier", "stat": "difesa", "valore": 4, "moltiplicativo": false }
+    },
+    {
+      "id": "clemenza",
+      "name": "Clemenza",
+      "descrizione": "Hai lasciato vivere chi potevi uccidere. Qualcosa cambia in te.",
+      "name_i18n": "talent.clemenza",
+      "descrizione_i18n": "talent.clemenza.desc",
+      "tipo": "acquisito",
+      "sblocco": { "evento": "nemici_risparmiati", "target": 5 },
+      "effetto": { "tipo": "tag_grant", "tag": "non_letale" }
+    },
+    {
+      "id": "passo_lungo",
+      "name": "Passo lungo",
+      "descrizione": "Hai camminato tanto: le gambe non ti tradiscono piu'.",
+      "name_i18n": "talent.passo_lungo",
+      "descrizione_i18n": "talent.passo_lungo.desc",
+      "tipo": "acquisito",
+      "sblocco": { "evento": "distanza_percorsa", "target": 8000 },
+      "effetto": { "tipo": "stat_modifier", "stat": "velocita", "valore": 0.08, "moltiplicativo": true }
+    },
+    {
+      "id": "pollice_verde",
+      "name": "Pollice verde",
+      "descrizione": "Il giardino ti rende: raccogli di piu' di quanto pianti.",
+      "name_i18n": "talent.pollice_verde",
+      "descrizione_i18n": "talent.pollice_verde.desc",
+      "tipo": "acquisito",
+      "sblocco": { "evento": "ingredienti_coltivati", "target": 10 },
+      "effetto": { "tipo": "sblocco_sistema", "sistema": "giardino", "chiave": "resa_bonus_talento" }
+    },
+    {
+      "id": "mano_altrui",
+      "name": "Mano altrui",
+      "descrizione": "Ti sei abituato a usare poteri che non sono tuoi.",
+      "name_i18n": "talent.mano_altrui",
+      "descrizione_i18n": "talent.mano_altrui.desc",
+      "tipo": "acquisito",
+      "sblocco": { "evento": "abilita_prestate_usate", "target": 8 },
+      "effetto": { "tipo": "tag_grant", "tag": "furto" }
+    },
+    {
+      "id": "rito_spezzato",
+      "name": "Rito spezzato",
+      "descrizione": "Hai lasciato a meta' abbastanza rituali da non temerne piu' il richiamo.",
+      "name_i18n": "talent.rito_spezzato",
+      "descrizione_i18n": "talent.rito_spezzato.desc",
+      "tipo": "acquisito",
+      "sblocco": { "evento": "rituali_interrotti", "target": 3 },
+      "effetto": { "tipo": "stat_modifier", "stat": "difesa", "valore": 3, "moltiplicativo": false }
+    },
+    {
+      "id": "veterano",
+      "name": "Veterano",
+      "descrizione": "Hai visto abbastanza scontri da sapere quando stringere i denti.",
+      "name_i18n": "talent.veterano",
+      "descrizione_i18n": "talent.veterano.desc",
+      "tipo": "acquisito",
+      "sblocco": { "evento": "enemy_defeated", "target": 50 },
+      "effetto": { "tipo": "stat_modifier", "stat": "hp_max", "valore": 0.06, "moltiplicativo": true }
+    },
+    {
+      "id": "temprato_dal_dolore",
+      "name": "Temprato dal dolore",
+      "descrizione": "Hai incassato tanto: il corpo ha imparato ad assorbire.",
+      "name_i18n": "talent.temprato_dal_dolore",
+      "descrizione_i18n": "talent.temprato_dal_dolore.desc",
+      "tipo": "acquisito",
+      "sblocco": { "evento": "damage_taken", "target": 20000 },
+      "effetto": { "tipo": "stat_modifier", "stat": "difesa", "valore": 6, "moltiplicativo": false }
+    }
+  ]
+}

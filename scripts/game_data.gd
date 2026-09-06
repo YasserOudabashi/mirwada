@@ -20,6 +20,8 @@ const DIR_STRUCTURES := "res://data/structures"
 const DIR_PETS := "res://data/pets"
 const PATH_ROOM_TYPES := "res://data/schema/room_types.json"
 const PATH_ROOMS := "res://data/base/rooms.json"
+const PATH_TRACKED_TALENTS := "res://data/schema/tracked_talents.json"
+const DIR_TALENTS := "res://data/talents"
 const PATH_TAGS := "res://data/tags.json"
 const PATH_BALANCE := "res://data/balance.json"
 const PATH_PRIMITIVES := "res://data/schema/primitives.json"
@@ -80,6 +82,8 @@ var _structures: Dictionary = {}
 var _pets: Dictionary = {}
 var _room_types: Dictionary = {}
 var _rooms: Dictionary = {}
+var _tracked_talents: Dictionary = {}
+var _talents: Dictionary = {}
 var _item_categories: Dictionary = {}
 var _equip_slots: Dictionary = {}
 var _sigils: Dictionary = {}
@@ -129,6 +133,7 @@ func load_all() -> void:
 	_load_items()
 	_load_structures()
 	_load_pets()
+	_load_talents()
 	# L'ultimo argomento e' il tipo atteso per la chiave: un file in cui quella
 	# chiave ha la forma sbagliata viene scartato con un errore, non caricato.
 	_load_single(PATH_TAGS, "tags", _tags, TYPE_ARRAY)
@@ -154,6 +159,7 @@ func load_all() -> void:
 	_load_single(PATH_EQUIP_SLOTS, "slots", _equip_slots, TYPE_ARRAY)
 	_load_single(PATH_ROOM_TYPES, "tipi", _room_types, TYPE_ARRAY)
 	_load_single(PATH_ROOMS, "rooms", _rooms, TYPE_DICTIONARY)
+	_load_single(PATH_TRACKED_TALENTS, "talents", _tracked_talents, TYPE_DICTIONARY)
 	_load_single(PATH_SIGILS, "sigils", _sigils, TYPE_DICTIONARY)
 	_load_single(PATH_SIGIL_EFFECT_TYPES, "effetti", _sigil_effect_types, TYPE_ARRAY)
 	_load_single(PATH_BLUEPRINTS, "blueprints", _blueprints, TYPE_DICTIONARY)
@@ -224,6 +230,29 @@ func room_type_ids() -> Array:
 ## Le chiavi di bonus ammesse per un tipo di stanza (vocabolario chiuso).
 func room_bonus_ammessi(tipo: String) -> Array:
 	return _array_or_empty(_dict_or_empty(_room_types.get("bonus_ammessi")).get(tipo))
+
+
+## --- Talenti (data/talents/, data/schema/tracked_talents.json, US-330) ---
+func get_talent(id: String) -> Dictionary:
+	return _talents.get(id, {})
+
+
+## I comportamenti-talento: vocabolario chiuso che i 12 eventi non catturano.
+func tracked_talents() -> Dictionary:
+	return _dict_or_empty(_tracked_talents.get("talents"))
+
+
+func talents_per_tipo(tipo: String) -> Array:
+	var out: Array = []
+	for id in _talents:
+		if str((_talents[id] as Dictionary).get("tipo", "")) == tipo:
+			out.append(id)
+	out.sort()
+	return out
+
+
+func talent_ids() -> Array:
+	return _talents.keys()
 
 
 func get_synergy(id: String) -> Dictionary:
@@ -618,6 +647,23 @@ func _load_pets() -> void:
 			_upsert(_pets, pid, p)
 			visti[pid] = true
 	_prune(_pets, visti)
+
+
+func _load_talents() -> void:
+	var visti: Dictionary = {}
+	for path in _json_files_in(DIR_TALENTS):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		for entry in _object_list(doc, "talents", path):
+			var t: Dictionary = entry
+			var tid: String = str(t.get("id", ""))
+			if tid.is_empty():
+				_fail(path, "un talento non ha 'id'")
+				continue
+			_upsert(_talents, tid, t)
+			visti[tid] = true
+	_prune(_talents, visti)
 
 
 func _load_synergies() -> void:

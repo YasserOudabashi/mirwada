@@ -3639,3 +3639,38 @@ sezione test aggiornata.
   28/35. Prossimo e ultimo blocco: G - talenti (US-330 schema talenti +
   vocabolario chiuso dei comportamenti-talento).
 - Prossima storia: US-330.
+
+[2026-09-06] US-330 — Schema dei talenti + vocabolario dei comportamenti. BLOCCO G.
+
+- data/schema/tracked_talents.json: vocabolario CHIUSO di 7 comportamenti-
+  talento, cio' che i 12 eventi di tracked_events.json NON catturano
+  (giocato_di_notte/secondi, sequenze_senza_pozione, nemici_risparmiati,
+  distanza_percorsa/somma, ingredienti_coltivati, abilita_prestate_usate,
+  rituali_interrotti). Ogni voce: misura + filtri ammessi. Come i 12 eventi:
+  aggiungerne uno e' codice, va discusso.
+- data/schema/talent.schema.json (doc) + data/talents/core.json: 13 talenti,
+  4 innati + 9 acquisiti (>= 4 e >= 8 come chiede l'AC, con margine).
+  * innato: solo effetto (scelto alla creazione, US-332).
+  * acquisito: sblocco { evento (uno dei 12 di tracked_events O uno dei 7
+    comportamenti-talento), filtri, target > 0 } + effetto.
+  * effetto: stat_modifier { stat, valore, moltiplicativo } (modificatore per
+    id 'talent:<id>' sullo StatsComponent) | tag_grant { tag dal vocabolario
+    chiuso } (per le sinergie, US-334) | sblocco_sistema { sistema, chiave }.
+- GameData: _load_talents (upsert+prune come gli item) +
+  _load_single(tracked_talents); get_talent(id), tracked_talents(),
+  talents_per_tipo(tipo) (ordinato), talent_ids().
+- validate_data.py: misura conteggio|somma|secondi; sblocco.evento risolve in
+  uno dei due vocabolari; ogni filtro ammesso per quell'evento; un innato NON
+  ha 'sblocco'; effetto ben formato per tipo (stat nota / tag noto / sistema+
+  chiave); >= 4 innati e >= 8 acquisiti.
+- i18n: 26 chiavi talent.* (name + desc di 13 talenti) seminate dai campi
+  gemelli name/descrizione. it.json 332 chiavi, 55 TODO (invariati).
+- Come verificato: 476 test headless (471 + 5 in test_talents_data.gd:
+  il vocabolario ha >= 6 comportamenti con misura valida; i talenti si
+  caricano e ci sono >= 4 innati / >= 8 acquisiti; ogni acquisito ha uno
+  sblocco con evento risolvibile e target > 0; ogni effetto ha un tipo
+  valido; gli innati non hanno sblocco). validate_data.py exit 0 (9 warning
+  invariati). Nessuna verifica a schermo: TalentSystem e la UI sono US-331/333.
+- Prossima storia: US-331 (TalentTracker per i comportamenti-talento +
+  emettitori agganciati ai sistemi con adattamento minimo + TalentSystem che
+  sblocca a soglia e applica l'effetto; SAVE +1).

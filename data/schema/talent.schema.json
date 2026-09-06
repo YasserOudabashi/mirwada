@@ -1,0 +1,24 @@
+{
+  "_comment": "Documentazione formale di data/talents/*.json (US-330). Un talento e' 'innato' (scelto alla creazione personaggio, US-332) o 'acquisito' (sbloccato da un comportamento oltre soglia, US-331). Controlli veri in tools/validate_data.py.",
+  "schema_version": 1,
+  "talent": {
+    "id": "string, univoco",
+    "name": "string in chiaro (seed i18n)",
+    "name_i18n": "string, chiave i18n (categoria 'talent')",
+    "descrizione": "string in chiaro (seed i18n)",
+    "descrizione_i18n": "string, chiave i18n",
+    "tipo": "innato | acquisito",
+    "sblocco": {
+      "_solo_per": "acquisito",
+      "evento": "una chiave di data/schema/tracked_events.json (i 12) OPPURE di data/schema/tracked_talents.json",
+      "filtri": "{ chiave: valore } - ammessi solo i filtri dichiarati per quell'evento nel suo vocabolario",
+      "target": "number > 0 - soglia del contatore che sblocca il talento"
+    },
+    "effetto": {
+      "tipo": "stat_modifier | tag_grant | sblocco_sistema",
+      "_stat_modifier": "{ stat, valore, moltiplicativo: bool } - modificatore per id 'talent:<id>' sullo StatsComponent",
+      "_tag_grant": "{ tag } - un tag dal vocabolario chiuso di data/tags.json, per le sinergie (US-334)",
+      "_sblocco_sistema": "{ sistema, chiave } - una chiave che il sistema relativo legge (es. PotionSystem, giardino)"
+    }
+  }
+}

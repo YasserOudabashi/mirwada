@@ -580,8 +580,8 @@
       ],
       "priority": 29,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO G iniziato. data/schema/tracked_talents.json: vocabolario CHIUSO di 7 comportamenti-talento (giocato_di_notte/secondi, sequenze_senza_pozione, nemici_risparmiati, distanza_percorsa/somma, ingredienti_coltivati, abilita_prestate_usate, rituali_interrotti) - cio' che i 12 eventi non catturano. Ogni voce: misura (conteggio|somma|secondi) + filtri ammessi. data/schema/talent.schema.json (doc) + data/talents/core.json: 13 talenti (4 innati + 9 acquisiti). Ogni talento: id/name/name_i18n/descrizione/descrizione_i18n/tipo (innato|acquisito). Acquisito: sblocco {evento (uno dei 12 di tracked_events O uno dei 7 comportamenti-talento), filtri, target>0}. effetto {tipo: stat_modifier {stat,valore,moltiplicativo} | tag_grant {tag dal vocabolario chiuso} | sblocco_sistema {sistema,chiave}}. GameData: _load_talents (pattern _load_items) + _load_single(tracked_talents); get_talent(id), tracked_talents(), talents_per_tipo(tipo), talent_ids(). validate_data.py: misura valida; sblocco.evento in uno dei due vocabolari; filtri ammessi per quell'evento; innato NON ha sblocco; effetto ben formato per tipo; >= 4 innati e >= 8 acquisiti. i18n: 26 chiavi talent.* seminate da name/descrizione. it.json 332 chiavi. 476 test headless (471 + 5 in test_talents_data.gd), validate exit 0. TalentSystem/emettitori = US-331."
     },
     {
       "id": "US-331",
