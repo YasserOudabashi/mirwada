@@ -3845,3 +3845,53 @@ sezione test aggiornata.
   giardino -> alchimia -> forgia -> sigilli -> pet -> talenti -> synergy
   sources, tutto senza codice dedicato a un contenuto specifico). E' il
   verdetto sull'architettura.
+
+[2026-09-06] US-335 — Vertical slice della fase 3. IL VERDETTO. BLOCCO H.
+
+- tests/test_slice_fase_3.gd. Due test:
+  * test_la_fase_3_compone_senza_codice_dedicato(): in un SOLO test, ogni
+    contenuto e' SCOPERTO dai dati (il test non scrive nessun id):
+    1. giardino: costruisci, pianta il primo ingrediente coltivabile trovato
+       via items_per_categoria, _process(999), raccogli -> resa > 0
+    2. laboratorio lv2: sperimenta l'ULTIMA ricetta avanzata (quella NON resa
+       nota dalla biblioteca) usando la sua lista ingredienti -> esito
+       "scoperta"; poi prepara -> qualita' > qualita_base grazie a
+       qualita_pozione del laboratorio
+    3. forgia il 1o blueprint dai suoi materiali, equipaggia
+    4. incastona il 1o sigillo con effetto_collaterale -> has_modifier(
+       "sigillo:<iid>") E has_modifier("sigillo:<iid>:collaterale")
+    5. doma il 1o pet con comportamenti (seed fortunato), emetti
+       ceil(soglia_min/peso)+1 enemy_defeated -> comportamenti_sbloccati non
+       vuoto
+    6. registra il comportamento-talento del 1o talento acquisito che ci si
+       aggancia, oltre soglia -> TalentSystem._process -> possiede()
+    7. SynergySources.per_fonte() non vuoto per pet/base/inventario;
+       tag_sinergia_globali() somma > 3 tag
+  * test_nessun_codice_nomina_un_contenuto_specifico(): grep di scripts/ e
+    scripts/pages/ per gli id di item/pet/sigillo/blueprint/ricetta fra
+    virgolette, fuori dai commenti -> ZERO occorrenze (come US-219 per il
+    Twilight Giant).
+
+  ============================================================
+  VERDETTO SULL'ARCHITETTURA DI FASE 3: REGGE.
+  ============================================================
+  I sistemi di supporto compongono un ciclo completo
+    coltivazione -> alchimia -> forgia -> sigilli -> pet -> talenti -> sinergie
+  senza una riga di codice dedicata a un contenuto specifico, esattamente
+  come il Twilight Giant (fase 2) va dalla Sequenza 9 alla 0 con zero codice
+  dedicato. Le uniche stringhe di dominio nel codice sono nomi di VOCABOLARI
+  CHIUSI (tipi di stanza in PotionSystem/Forge, eventi in EventTracker,
+  comportamenti-talento negli emettitori, stat, tag) che i sistemi
+  indirizzano PER CHIAVE - come get_stat("forza"), non come un if su un
+  contenuto. Il punto di controllo della fase 5 (aggiungere i 9 Pathway
+  rimanenti = dati, non codice) non e' minacciato da nulla della fase 3.
+
+- Come verificato: 498 test headless (496 + 2), validate_data.py exit 0.
+  Nessuna regressione sui test di fase 2. NB trovato ed eviato: la slice
+  creava un player node e non lo liberava nel 2o test -> test_vertical_slice
+  e test_talent_system vedevano due nodi "player" e leggevano quello
+  sbagliato (hp_max 100 invece di 120). Fix: prepara() libera ogni nodo
+  "player" pregresso, ogni test chiama _fine().
+- Prossima e ULTIMA storia della fase 3: US-336 (aggiornamento roadmap.md,
+  design-master.md Appendice C, CLAUDE.md, README.md; il validator ha un
+  check per ogni file di dati nuovo della fase).
