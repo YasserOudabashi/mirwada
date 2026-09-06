@@ -6,7 +6,8 @@
       "tag": "maledizione",
       "durata_default": 20.0,
       "negativo": true,
-      "stat_modifiers": { "evasione": -0.15 }
+      "stat_modifiers": { "evasione": -0.15 },
+      "descrizione": "Inciampi, manchi il colpo, ti ferisci da solo. E' l'effetto della 'Knight of Misfortune' del Darkness resa senza probability_shift (curse + debuff_stat + dot): il feel e' sfortuna, la manipolazione vera della probabilita' resta a Wheel of Fortune."
     },
     "taunt": {
       "tag": "provocazione",

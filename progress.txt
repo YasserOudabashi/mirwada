@@ -4590,3 +4590,28 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-503 (darkness_1 / darkness_sfortuna_cronica riscritta
   senza probability_shift: curse effetto 'sfortuna' + debuff_stat + dot follia;
   status_effects.json: effetto 'sfortuna').
+
+[2026-09-06] US-503 — darkness_1 senza probability_shift. BLOCCO 0.
+
+- La riscrittura vera l'aveva GIA' fatta US-228 (raccomandazione di
+  design-master.md cap. 4): darkness_sfortuna_cronica compone solo primitive
+  attive - curse(effetto 'sfortuna', condizione_rimozione 'purificazione') +
+  debuff_stat(evasione -0.35 molt) + debuff_stat(precisione -0.4 molt) +
+  dot(danno_tick 3, tag_danno 'follia'). darkness_1 e' e resta stub:true (il
+  resto del Darkness e' fase 5b). tests/test_darkness_1.gd (5 test) copre
+  gia' l'esecuzione senza warning, lo status, la purificazione, la scadenza.
+- Questa story aggiunge solo cio' che mancava all'AC: data/status_effects.json
+  [sfortuna] ha ora un campo 'descrizione' col feel ("Inciampi, manchi il
+  colpo, ti ferisci da solo... il feel e' sfortuna, la manipolazione vera
+  della probabilita' resta a Wheel of Fortune").
+- probability_shift come PRIMITIVA USATA: 0 occorrenze in data/abilities/
+  (il validator gia' da' errore su una primitiva differita usata). Resta solo
+  citata nella 'note' dell'abilita' e in batch_3/design docs, come record
+  della decisione - non e' un uso.
+- Come verificato: python tools/validate_data.py exit 0 (8 warning invariati);
+  535 test headless verdi (test_darkness_1.gd invariato, nessun test nuovo:
+  la copertura c'era gia'). Test ridondante che avevo aggiunto a
+  test_ability_engine.gd -> rimosso (ponytail).
+- Prossima storia: US-504 (regola acting_actions somma esatta 1.0:
+  normalizzare le 5 sequenze TG che sommano 1.05-1.15; warning -> errore con
+  eccezione 'acting_surplus_voluto' in notes).
