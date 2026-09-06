@@ -217,8 +217,8 @@
       ],
       "priority": 11,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO B CHIUSO. page_inventario.gd: _collega_sinergie() (da aggiorna()) connette la pagina a SynergyEngine.sinergia_attivata/disattivata (guardia is_connected; l'autoload libera le connessioni quando la pagina muore). Sui segnali, se _sezione=='sinergie' e la pagina e' nell'albero -> _mostra('sinergie') ricostruisce; altrimenti niente (la prossima apertura ridisegna comunque). Evidenziazione: _appena_attivate: Array; in _sinergie() una riga 'attiva' con id in _appena_attivate prende prefisso '▸ ' + font_color (0.12,0.45,0.72) poi l'id viene rimosso -> un solo render evidenziato. Nessun timer (libro in pausa). 528 test headless (527 + 1 in test_page_sinergie.gd: attivazione dal vivo -> la pagina si ricostruisce, riga con '▸', rebuild successivo pulito). validate exit 0. Verifica a schermo: crescita_pozione da 'missing: ...' a '▸ ... attiva' in blu col libro aperto, senza riaprire."
     },
     {
       "id": "US-412",

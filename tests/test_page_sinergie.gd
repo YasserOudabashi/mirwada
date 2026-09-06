@@ -37,11 +37,14 @@ func _pagina_sinergie() -> Array:
 		ov.call("_process", 0.2)
 	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
 	pag.call("_mostra", "sinergie")
-	var sc: Node = null
+	return [ov, _righe(pag), pag]
+
+
+func _righe(pag: Node) -> Array:
 	for c in pag.get_children():
 		if c is ScrollContainer:
-			sc = c
-	return [ov, sc.get_child(0).get_children()]
+			return c.get_child(0).get_children()
+	return []
 
 
 func _testo(righe: Array) -> String:
@@ -110,5 +113,26 @@ func test_una_anti_sinergia_attiva_e_marcata() -> void:
 	var t: String = _testo(res[1])
 	assert_true(t.contains("▲"), "l'anti-sinergia attiva ha un marcatore")
 	assert_true(t.contains("neutralizza"), "e la riga dice quale sinergia neutralizza")
+	res[0].free()
+	_fine()
+
+
+func test_il_registro_reagisce_a_una_attivazione_dal_vivo() -> void:
+	# US-411: libro gia' aperto sulla sezione, poi attivo una sinergia
+	_se().call("imposta_override_tag", {"guerra": 1})
+	var res: Array = _pagina_sinergie()
+	var pag: Node = res[2]
+	assert_true(_testo(_righe(pag)).contains(tr("BOOK_SYN_MANCA")),
+		"prima: sinergia_crescita_pozione e' 'visibile'")
+
+	_se().call("imposta_override_tag", {"crescita": 2, "pozione": 2})
+	_se().call("rivaluta")  # emette sinergia_attivata -> la pagina si ricostruisce da sola
+	var t: String = _testo(_righe(pag))
+	assert_true(t.contains("▸"), "la sinergia appena attivata e' evidenziata una volta")
+	assert_true(t.contains("modifica_qualita_crafting"),
+		"ed e' passata a 'attiva' senza riaprire il libro")
+
+	pag.call("_mostra", "sinergie")  # un rebuild successivo
+	assert_false(_testo(_righe(pag)).contains("▸"), "l'evidenziazione dura un solo render")
 	res[0].free()
 	_fine()

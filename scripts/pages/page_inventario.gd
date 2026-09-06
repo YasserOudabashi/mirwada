@@ -9,6 +9,9 @@ const SEZIONI := ["zaino", "indosso", "ricettario", "talenti", "base", "sinergie
 var _tab: HBoxContainer = null
 var _corpo: VBoxContainer = null
 var _sezione: String = "zaino"
+## US-411: id delle sinergie attivate mentre la pagina e' viva. La riga si
+## evidenzia al primo render, poi torna normale.
+var _appena_attivate: Array = []
 
 
 func aggiorna() -> void:
@@ -32,7 +35,33 @@ func aggiorna() -> void:
 	_corpo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_corpo.add_theme_constant_override("separation", 2)
 	sc.add_child(_corpo)
+	_collega_sinergie()
 	_mostra(_sezione)
+
+
+## US-411: la sezione Sinergie si ricostruisce dal vivo sui segnali del motore
+## (se aperta su quella sezione; altrimenti la prossima apertura la ridisegna
+## comunque da zero). L'autoload libera le connessioni quando la pagina muore.
+func _collega_sinergie() -> void:
+	var se: Node = _n("/root/SynergyEngine")
+	if se == null:
+		return
+	if not se.sinergia_attivata.is_connected(_su_sinergia_attivata):
+		se.sinergia_attivata.connect(_su_sinergia_attivata)
+	if not se.sinergia_disattivata.is_connected(_su_sinergia_disattivata):
+		se.sinergia_disattivata.connect(_su_sinergia_disattivata)
+
+
+func _su_sinergia_attivata(id: String) -> void:
+	if not _appena_attivate.has(id):
+		_appena_attivate.append(id)
+	if _sezione == "sinergie" and is_inside_tree():
+		_mostra("sinergie")
+
+
+func _su_sinergia_disattivata(_id: String) -> void:
+	if _sezione == "sinergie" and is_inside_tree():
+		_mostra("sinergie")
 
 
 func _mostra(sezione: String) -> void:
@@ -323,9 +352,16 @@ func _sinergie() -> void:
 						nomi.append(str(gd.call("tr_data", (gd.call("get_synergy", b) as Dictionary).get("name_i18n", b))))
 					if not nomi.is_empty():
 						testo += " — " + tr("BOOK_SYN_NEUTRALIZZA") % ", ".join(nomi)
+				var appena: bool = _appena_attivate.has(sid)
+				if appena:
+					_appena_attivate.erase(sid)  # US-411: evidenziata una volta sola
+					testo = "▸ " + testo
 				var fonti: Array = syn.get("fonti", [])
-				_corpo.add_child(_riga("%s — %s  [%s]" % [
-					testo, _riassunto(syn.get("effetto", {})), ", ".join(fonti)]))
+				var riga := _riga("%s — %s  [%s]" % [
+					testo, _riassunto(syn.get("effetto", {})), ", ".join(fonti)])
+				if appena:
+					riga.add_theme_color_override("font_color", Color(0.12, 0.45, 0.72))
+				_corpo.add_child(riga)
 			"visibile":
 				var manca: Array = []
 				var tm: Dictionary = v["tag_mancanti"]

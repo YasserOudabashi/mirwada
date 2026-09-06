@@ -4312,3 +4312,32 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-411 (il registro reagisce dal vivo: la sezione si
   ricostruisce su sinergia_attivata/disattivata; evidenzia una volta la
   sinergia appena attivata).
+
+[2026-09-06] US-411 — Il registro delle sinergie reagisce dal vivo. BLOCCO B CHIUSO.
+
+- page_inventario.gd: _collega_sinergie() (chiamato da aggiorna()) connette la
+  pagina a SynergyEngine.sinergia_attivata/disattivata con guardia is_connected
+  (l'autoload libera le connessioni quando la pagina muore). Sui segnali, se
+  _sezione == "sinergie" e la pagina e' nell'albero, _mostra("sinergie")
+  ricostruisce la sezione. Se il libro e' su un'altra sezione (o chiuso) non
+  fa nulla: la prossima apertura ridisegna comunque da stato_registro().
+- Evidenziazione: _appena_attivate: Array raccoglie gli id attivati mentre la
+  pagina e' viva. In _sinergie(), una riga "attiva" il cui id e' in
+  _appena_attivate prende il prefisso "▸ " e font_color (0.12,0.45,0.72), poi
+  l'id viene rimosso dalla lista -> un solo render evidenziato, il rebuild
+  successivo la mostra normale. Nessun timer (il libro vive con l'albero in
+  pausa, i timer si fermerebbero).
+- Come verificato:
+  * 528 test headless (527 + 1 in test_page_sinergie.gd: libro aperto sulla
+    sezione, crescita_pozione 'visibile' coi tag mancanti; attivo -> la pagina
+    si ricostruisce da sola, la riga ha "▸" ed e' passata a "attiva"; un
+    rebuild successivo non ha piu' "▸"). validate exit 0 (9 warning invariati).
+    1 SCRIPT ERROR preesistente, nessuno nuovo.
+  * A SCHERMO (finestra reale): libro aperto su "Synergies", crescita_pozione
+    "missing: crescita x2, pozione x2"; imposto i tag col libro APERTO ->
+    la riga diventa "▸ ... modifica_qualita_crafting ... [stanza, ingrediente,
+    pet]" in blu, senza riaprire il libro. Screenshot inviato.
+- BLOCCO B CHIUSO: US-409 (stato_registro + contatore), US-410 (sezione nel
+  libro col fog of war), US-411 (reattivita' dal vivo). Fase 4: 11/16.
+- Prossima storia: US-412 (sinergia_colpo_del_caso: l'abilita' che
+  sinergia_inganno_probabilita promette; togliere lo stub). BLOCCO C.
