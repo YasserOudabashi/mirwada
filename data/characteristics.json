@@ -85,6 +85,24 @@
       "pathway_id": "fool",
       "sequence": 9,
       "name_i18n": "characteristic.fool.9"
+    },
+    {
+      "id": "char_death_6",
+      "pathway_id": "death",
+      "sequence": 6,
+      "name_i18n": "characteristic.death.6"
+    },
+    {
+      "id": "char_death_5",
+      "pathway_id": "death",
+      "sequence": 5,
+      "name_i18n": "characteristic.death.5"
+    },
+    {
+      "id": "char_death_4",
+      "pathway_id": "death",
+      "sequence": 4,
+      "name_i18n": "characteristic.death.4"
     }
   ]
 }

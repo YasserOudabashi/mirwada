@@ -7,14 +7,19 @@
     "caratteristica_del_gigante",
     "cenere_di_spirito",
     "cera_di_veglia",
+    "chiave_d_ossa",
     "chiodo_di_bara",
+    "cuore_che_non_si_ferma",
     "cuore_di_montagna",
     "dente_di_teschio",
     "ectoplasma",
+    "essenza_spettrale",
     "estratto_di_muscolo",
+    "ferro_delle_lapidi",
     "ferro_temperato",
     "fiele_di_demone",
     "frammento_di_alba",
+    "incenso_dei_riti",
     "lacrima_di_paladino",
     "lama_di_luce_solidificata",
     "linfa_di_gigante",
@@ -22,17 +27,21 @@
     "metallo_impossibile",
     "moneta_del_traghettatore",
     "muffa_sepolcrale",
+    "nebbia_del_limbo",
     "nucleo_del_crepuscolo",
     "oro_bianco",
     "ossidiana_decaduta",
     "osso_di_pugile",
+    "pietra_di_soglia",
     "platino_rituale",
     "polvere_di_arena",
     "polvere_di_crepuscolo",
     "polvere_di_specchio_incrinato",
+    "radice_di_immortelle",
     "radice_di_quercia",
     "radice_di_veggente",
     "resina_di_ferro",
+    "sale_della_veglia_eterna",
     "sale_di_roccia",
     "sangue_di_gufo_lunare",
     "sangue_di_toro",
@@ -240,6 +249,48 @@
         "follia_extra": 2.0,
         "qualita": "instabile",
         "_nota": "Pozione con ingredienti mancanti: piu' follia e qualita' ridotta. Esplicito nei dati."
+      }
+    },
+    "formula_death_6": {
+      "characteristic_sequence": 6,
+      "ingredients": [
+        "essenza_spettrale",
+        "ferro_delle_lapidi",
+        "incenso_dei_riti"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_death_5": {
+      "characteristic_sequence": 5,
+      "ingredients": [
+        "chiave_d_ossa",
+        "nebbia_del_limbo",
+        "pietra_di_soglia"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_death_4": {
+      "characteristic_sequence": 4,
+      "ingredients": [
+        "cuore_che_non_si_ferma",
+        "radice_di_immortelle",
+        "sale_della_veglia_eterna"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
       }
     }
   }

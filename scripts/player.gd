@@ -129,6 +129,17 @@ func get_facing() -> Vector2:
 	return FACING.get(_dir_sguardo, Vector2.DOWN)
 
 
+## US-506: la primitiva teleport consegna qui l'ordine. Salto istantaneo di
+## 'distanza' px nella direzione dell'input (o, se fermo, di quella guardata).
+## Riposizionamento; la porta permanente verso il mondo spirituale e' fase 6.
+func teleport_verso(spec: Dictionary) -> void:
+	var distanza: float = float(spec.get("distanza", 160.0))
+	var dir: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if dir == Vector2.ZERO:
+		dir = get_facing()
+	global_position += dir.normalized() * distanza
+
+
 func sta_attaccando() -> bool:
 	return _attaccando
 

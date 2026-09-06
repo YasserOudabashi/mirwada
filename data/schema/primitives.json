@@ -106,7 +106,8 @@
         "distanza",
         "richiede_visuale",
         "porta_alleati"
-      ]
+      ],
+      "implemented": true
     },
     "shield": {
       "params": [

@@ -185,6 +185,171 @@
         "area"
       ],
       "note": "Un coro di spiriti in lutto: chi ha volonta' debole fugge, gli altri si logorano."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_scaglia_spirito",
+      "name_i18n": "ability.death.death_scaglia_spirito",
+      "sequence_id": "death_6",
+      "costo_spiritualita": 8,
+      "cooldown": 4.0,
+      "primitive": [
+        {
+          "tipo": "projectile",
+          "danno": 22,
+          "velocita": 9,
+          "gittata": 10,
+          "pierce": 1,
+          "tag_danno": "spirito"
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "spirito",
+        "singolo"
+      ],
+      "note": "Il primo vero potere offensivo del Death: uno spirito scagliato come un dardo."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_falange_spettrale",
+      "name_i18n": "ability.death.death_falange_spettrale",
+      "sequence_id": "death_6",
+      "costo_spiritualita": 14,
+      "cooldown": 22.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "spirito_soldato",
+          "quantita": 3,
+          "durata": 30.0,
+          "comportamento": "aggressivo"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.15,
+          "durata": 30.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "spirito",
+        "evocazione",
+        "area"
+      ],
+      "note": "Tre spiriti-soldato in formazione: comandi, loro combattono."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_passo_tra_i_mondi",
+      "name_i18n": "ability.death.death_passo_tra_i_mondi",
+      "sequence_id": "death_5",
+      "costo_spiritualita": 12,
+      "cooldown": 10.0,
+      "primitive": [
+        {
+          "tipo": "teleport",
+          "distanza": 200,
+          "richiede_visuale": false,
+          "porta_alleati": false
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "spazio",
+        "viaggio"
+      ],
+      "note": "Un passo nel mondo spirituale e uno fuori, altrove. Riposizionamento; la porta permanente per l'esplorazione e' fase 6."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_porta_di_fuga",
+      "name_i18n": "ability.death.death_porta_di_fuga",
+      "sequence_id": "death_5",
+      "costo_spiritualita": 16,
+      "cooldown": 25.0,
+      "primitive": [
+        {
+          "tipo": "teleport",
+          "distanza": 160,
+          "richiede_visuale": true,
+          "porta_alleati": true
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 0.3,
+          "durata": 4.0,
+          "moltiplicativo": false
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "spazio",
+        "difesa"
+      ],
+      "note": "Una porta che porta via anche gli alleati vicini: si fugge insieme."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_carne_ostinata",
+      "name_i18n": "ability.death.death_carne_ostinata",
+      "sequence_id": "death_4",
+      "costo_spiritualita": 14,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "heal",
+          "quantita": 8,
+          "istantaneo": false,
+          "durata": 10.0,
+          "bersaglio": "self"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.3,
+          "durata": 10.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "guarigione",
+        "difesa"
+      ],
+      "note": "Le ferite si chiudono da sole: l'Undying non muore facilmente."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_rialzati",
+      "name_i18n": "ability.death.death_rialzati",
+      "sequence_id": "death_4",
+      "costo_spiritualita": 20,
+      "cooldown": 40.0,
+      "primitive": [
+        {
+          "tipo": "heal",
+          "quantita": 50,
+          "istantaneo": true,
+          "bersaglio": "self"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "hp_max",
+          "valore": 0.15,
+          "durata": 12.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "guarigione",
+        "singolo"
+      ],
+      "note": "Torni in piedi quando dovresti essere a terra."
     }
   ]
 }

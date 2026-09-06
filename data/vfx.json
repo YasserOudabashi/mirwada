@@ -34,7 +34,8 @@
     "curse":          { "sprite": "vfx_hex",       "frames": 3, "impact_frame": false, "scia": false },
     "summon":         { "sprite": "vfx_conjure",   "frames": 4, "impact_frame": true,  "scia": false },
     "fear":           { "sprite": "vfx_dread",     "frames": 4, "impact_frame": false, "scia": false },
-    "reveal_info":    { "sprite": "vfx_scry",      "frames": 3, "impact_frame": false, "scia": false }
+    "reveal_info":    { "sprite": "vfx_scry",      "frames": 3, "impact_frame": false, "scia": false },
+    "teleport":       { "sprite": "vfx_rift",      "frames": 3, "impact_frame": true,  "scia": false }
   },
   "impact_frames": {
     "_comment": "Durata legata a combat_feedback.hitstop_ms di audio.json: si tarano insieme (US-227).",

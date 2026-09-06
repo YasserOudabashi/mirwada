@@ -10,6 +10,11 @@ const ABILITA_9_7 := [
 	"death_rianima_servo", "death_stretta_della_terra",
 	"death_seduta_spiritica", "death_lamento_funebre",
 ]
+const ABILITA_6_4 := [
+	"death_scaglia_spirito", "death_falange_spettrale",
+	"death_passo_tra_i_mondi", "death_porta_di_fuga",
+	"death_carne_ostinata", "death_rialzati",
+]
 
 
 func _engine() -> Node:
@@ -80,11 +85,43 @@ func test_reveal_info_emette_il_segnale_con_la_categoria() -> void:
 	_cleanup(c)
 
 
-func test_le_acting_di_death_9_7_sommano_uno() -> void:
+func test_ogni_abilita_death_6_4_si_esegue_senza_warning() -> void:
+	var e: Node = _engine()
+	for aid in ABILITA_6_4:
+		var c: Node2D = _caster()
+		var r: Dictionary = e.call("execute", aid, c)
+		assert_true(r["ok"], "%s eseguita" % aid)
+		assert_eq((r["warnings"] as PackedStringArray).size(), 0,
+			"%s: nessun warning di primitiva (teleport implementata): %s" % [aid, r["warnings"]])
+		e.call("clear_cooldowns")
+		_cleanup(c)
+
+
+func test_teleport_consegna_l_ordine_e_non_crasha() -> void:
+	# come _p_dash: se il caster non sa muoversi, applied=false e nessun crash.
+	var e: Node = _engine()
+	var r: Dictionary = e.call("_p_teleport",
+		{"distanza": 200, "richiede_visuale": false, "porta_alleati": false}, null, null, "ab")
+	assert_eq(str(r["tipo"]), "teleport", "record della primitiva")
+	assert_almost_eq(float(r["distanza"]), 200.0, "distanza dai dati")
+	assert_false(bool(r["applied"]), "caster senza teleport_verso -> non applicato")
+
+
+func test_death_4_ha_un_rituale_con_luogo_valido() -> void:
+	var pw: Dictionary = _gd().call("get_pathway", "death")
+	for seq in (pw.get("sequences", []) as Array):
+		if int((seq as Dictionary).get("sequence", -1)) != 4:
+			continue
+		var rit: Dictionary = (seq as Dictionary).get("advancement_ritual", {})
+		assert_false(rit.is_empty(), "death_4 (Seq <= 4) ha un advancement_ritual")
+		assert_gt(float((rit.get("location_tags", []) as Array).size()), 0.0, "col suo luogo")
+
+
+func test_le_acting_di_death_9_4_sommano_uno() -> void:
 	var pw: Dictionary = _gd().call("get_pathway", "death")
 	for seq in (pw.get("sequences", []) as Array):
 		var n: int = int((seq as Dictionary).get("sequence", -1))
-		if n < 7 or n > 9:
+		if n < 4 or n > 9:
 			continue
 		var somma: float = 0.0
 		for a in ((seq as Dictionary).get("acting_actions", []) as Array):

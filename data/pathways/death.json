@@ -216,18 +216,63 @@
       "name_i18n": "sequence.death.6",
       "tier": "mid",
       "concept": "Comanda spiriti e li scaglia; il primo vero potere offensivo del Pathway.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 80,
+        "spiritualita_max": 0.15
+      },
+      "abilities": [
+        "death_scaglia_spirito",
+        "death_falange_spettrale"
+      ],
+      "acting_actions": [
+        {
+          "id": "death_6_scagliatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "death_scaglia_spirito"
+          },
+          "target": 25,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_6_scagliatore",
+          "descrizione": "Scaglia 25 spiriti"
+        },
+        {
+          "id": "death_6_comandante",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 18,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_6_comandante",
+          "descrizione": "Sconfiggi 18 nemici col tuo esercito spettrale"
+        },
+        {
+          "id": "death_6_offensiva",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "spirito"
+          },
+          "target": 4000,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_6_offensiva",
+          "descrizione": "Infliggi 4000 danni da spirito"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 6,
-        "ingredients": [],
+        "ingredients": [
+          "essenza_spettrale",
+          "ferro_delle_lapidi",
+          "incenso_dei_riti"
+        ],
         "formula_id": "formula_death_6"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 5.2,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 5,
@@ -236,18 +281,61 @@
       "name_i18n": "sequence.death.5",
       "tier": "mid",
       "concept": "Apre passaggi verso il mondo spirituale, usabili per esplorare e fuggire.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 110,
+        "velocita": 0.1
+      },
+      "abilities": [
+        "death_passo_tra_i_mondi",
+        "death_porta_di_fuga"
+      ],
+      "acting_actions": [
+        {
+          "id": "death_5_guardiano",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "death_passo_tra_i_mondi"
+          },
+          "target": 20,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_5_guardiano",
+          "descrizione": "Apri 20 passaggi"
+        },
+        {
+          "id": "death_5_esploratore",
+          "evento": "area_cleared",
+          "filtri": {},
+          "target": 10,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_5_esploratore",
+          "descrizione": "Ripulisci 10 aree spostandoti tra i varchi"
+        },
+        {
+          "id": "death_5_incolume",
+          "evento": "damage_taken",
+          "filtri": {},
+          "target": 2500,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_5_incolume",
+          "descrizione": "Subisci 2500 danni senza morire, sfuggendo di continuo"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 5,
-        "ingredients": [],
+        "ingredients": [
+          "chiave_d_ossa",
+          "nebbia_del_limbo",
+          "pietra_di_soglia"
+        ],
         "formula_id": "formula_death_5"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 6.6,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 4,
@@ -256,24 +344,74 @@
       "name_i18n": "sequence.death.4",
       "tier": "saint",
       "concept": "Rigenerazione estrema: non muore facilmente, torna in piedi.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 180,
+        "difesa": 0.2
+      },
+      "abilities": [
+        "death_carne_ostinata",
+        "death_rialzati"
+      ],
+      "acting_actions": [
+        {
+          "id": "death_4_ostinato",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "death_carne_ostinata"
+          },
+          "target": 18,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_4_ostinato",
+          "descrizione": "Rigenera 18 volte"
+        },
+        {
+          "id": "death_4_incassatore",
+          "evento": "damage_taken",
+          "filtri": {},
+          "target": 6000,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_4_incassatore",
+          "descrizione": "Subisci 6000 danni senza morire"
+        },
+        {
+          "id": "death_4_ritorno",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "death_rialzati"
+          },
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_4_ritorno",
+          "descrizione": "Rialzati 10 volte dopo essere caduto"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 4,
-        "ingredients": [],
+        "ingredients": [
+          "cuore_che_non_si_ferma",
+          "radice_di_immortelle",
+          "sale_della_veglia_eterna"
+        ],
         "formula_id": "formula_death_4"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "cripta",
+          "luogo_di_massacro"
+        ],
+        "momento": "notte_fonda",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "dieci_anni_della_propria_eta"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 8.2,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 3,

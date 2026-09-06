@@ -66,6 +66,7 @@ func _ready() -> void:
 		"summon": _p_summon,
 		"fear": _p_fear,
 		"reveal_info": _p_reveal_info,
+		"teleport": _p_teleport,
 	}
 
 
@@ -557,6 +558,22 @@ func _p_curse(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String)
 
 	return {"tipo": "curse", "effetto": effetto, "durata": durata,
 			"condizione_rimozione": condizione_rimozione, "applied": applicato}
+
+
+## teleport (US-506): consegna al caster l'ordine di saltare di 'distanza'.
+## Come _p_dash: il movimento vero e' del controller. La "porta permanente
+## verso il mondo spirituale" (esplorazione) e' fase 6; qui c'e' il salto.
+func _p_teleport(prim: Dictionary, caster: Node, _stats: Node, _ability_id: String) -> Dictionary:
+	var spec: Dictionary = {
+		"tipo": "teleport",
+		"distanza": _num(prim.get("distanza"), 160.0),
+		"richiede_visuale": _flag(prim.get("richiede_visuale"), true),
+		"porta_alleati": _flag(prim.get("porta_alleati"), false),
+	}
+	spec["applied"] = caster != null and caster.has_method("teleport_verso")
+	if spec["applied"]:
+		caster.call("teleport_verso", spec)
+	return spec
 
 
 ## fear (US-505): applica lo status 'paura' al bersaglio. Con un caster in

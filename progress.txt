@@ -4690,3 +4690,36 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
   che il PRD dimensiona cosi'. Ogni pezzo e' piccolo.
 - Prossima storia: US-506 (Death Seq 6-4: Spirit Guide / Gatekeeper / Undying
   + primitiva teleport + primo advancement_ritual con location_tags).
+
+[2026-09-06] US-506 — Death Sequenze 6-4 (Spirit Guide / Gatekeeper / Undying). BLOCCO 1.
+
+- PRIMITIVA NUOVA teleport: _p_teleport in ability_engine.gd, gemello di
+  _p_dash - consegna l'ordine 'teleport_verso' al caster, applied=false se il
+  caster non sa muoversi (nessun crash). player.gd: teleport_verso(spec)
+  sposta il giocatore di 'distanza' px nella direzione dell'input/sguardo.
+  primitives.json teleport -> implemented; vfx.json primitive_vfx teleport
+  (vfx_rift). _handlers +1. La "porta permanente verso il mondo spirituale"
+  (esplorazione, matrice di proprieta': Death ABITA) e' fase 6; qui c'e' il
+  salto (riposizionamento).
+- CONTENUTO Death Seq 6/5/4 (stub -> false):
+  * death_scaglia_spirito (projectile spirito - primo potere offensivo),
+    death_falange_spettrale (summon spirito_soldato x3 + buff difesa),
+    death_passo_tra_i_mondi (teleport 200px), death_porta_di_fuga (teleport
+    porta_alleati + buff evasione), death_carne_ostinata (heal nel tempo +
+    buff difesa), death_rialzati (heal istantaneo 50 + buff hp_max).
+  * acting somma 1.0 (0.4/0.35/0.25). madness 5.2/6.6/8.2.
+  * death_4 (Seq <= 4): PRIMO advancement_ritual del Death - location_tags
+    [cripta, luogo_di_massacro] (dal vocabolario US-501), momento notte_fonda,
+    sacrifice "dieci_anni_della_propria_eta" (l'Undying paga in vita per non
+    morire).
+  * formule formula_death_6/5/4 + 9 ingredienti nuovi; char_death_6/5/4.
+- i18n: 6 nomi abilita' + 3 caratteristiche tradotti. 62 TODO (invariato).
+- Come verificato: 542 test headless (539 + 3 in test_death.gd: le 6 abilita'
+  Seq 6-4 eseguono a 0 warning; teleport consegna l'ordine senza crash;
+  death_4 ha un rituale con luogo; le acting di Seq 9-4 sommano 1.0).
+  validate exit 0 (3 warning). Verifica a schermo (finestra reale):
+  death_passo_tra_i_mondi sposta il giocatore da (200,180) a (200,380) -
+  esattamente i 200px di 'distanza' nei dati, direzione guardata, 0 warning.
+- Prossima storia: US-507 (Death Seq 3-0: Ferryman / Death Consul / Pale
+  Emperor / Death + primitive soul_detach e resurrect + summon durata -1
+  persistente con test di round-trip del save + CHECKPOINT US-508).
