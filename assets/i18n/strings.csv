@@ -62,3 +62,15 @@ BOOK_SLOT_ACCESSORIO_1,Accessorio I,Accessory I
 BOOK_SLOT_ACCESSORIO_2,Accessorio II,Accessory II
 BOOK_RIC_PREPARA,Prepara,Brew
 BOOK_RIC_SCONOSCIUTA,Ricetta sconosciuta — %d ingredienti,Unknown recipe — %d ingredients
+BOOK_BASE_LIVELLO,Livello %d,Level %d
+BOOK_BASE_NON_COSTRUITA,Non costruita,Not built
+BOOK_BASE_COSTRUISCI,Costruisci,Build
+BOOK_BASE_POTENZIA,Potenzia,Upgrade
+BOOK_BASE_MAX,Al massimo,Maxed
+BOOK_BASE_COSTO,Costo:,Cost:
+BOOK_BASE_BONUS,Bonus:,Bonus:
+BOOK_BASE_GIARDINO_TITOLO,Appezzamenti,Plots
+BOOK_BASE_APPEZZAMENTO_VUOTO,— vuoto —,— empty —
+BOOK_BASE_IN_CRESCITA,In crescita: %d s,Growing: %d s
+BOOK_BASE_PRONTO,Pronto,Ready
+BOOK_BASE_RACCOGLI,Raccogli,Harvest

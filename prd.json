@@ -561,8 +561,8 @@
       ],
       "priority": 28,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO F CHIUSO. scripts/pages/page_inventario.gd: la sezione 'base' (era il segnaposto BOOK_INV_ARRIVA) diventa reale. _base(): per ogni room_type_ids() -> titolo (tr_data(name_i18n)), 'Livello N' o 'Non costruita', 'Bonus: <k v, ...>' se costruita, 'Costo: <nome x qty>' del prossimo passo (o 'Al massimo'), pulsante Costruisci/Potenzia disabilitato se il costo non e' coperto (Inventory.conta) -> premuto chiama BaseSystem.costruisci/potenzia e rinfresca. _giardino(): se numero_appezzamenti()>0, titolo + una riga per appezzamento (vuoto / 'In crescita: N s' col ceil dei secondi rimasti / '<nome> - Pronto' + pulsante Raccogli che chiama BaseSystem.raccogli). Stringhe: 12 chiavi BOOK_BASE_* nuove in assets/i18n/strings.csv, .translation rigenerati con --import; i name_i18n via GameData.tr_data. Il riassunto dei bonus mostra 'chiave valore' grezzo (le chiavi sono id interni, non tradotte: la pagina Base e' funzionale, non di vetrina - ponytail). 471 test headless (467 + 4 in test_page_base.gd: le 4 stanze compaiono col loro stato; costruisci dal libro solo col costo coperto e gli altri bottoni disabilitati; il giardino in crescita mostra il conto alla rovescia; Raccogli dal libro quando l'appezzamento e' pronto -> item in zaino). validate_data.py exit 0. VERIFICA A SCHERMO (scenes/main.tscn + book_overlay, Godot locale): sezione Home selezionata, Laboratorio 'Level 1' + Bonus + Cost + Upgrade, Stanza rituale 'Not built' + Cost + Build. Chrome in inglese solo per il locale OS del PC di test; i nomi item (tr_data) gia' in italiano. Screenshot nel tmp del job."
     },
     {
       "id": "US-330",

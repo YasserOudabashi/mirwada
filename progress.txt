@@ -3595,3 +3595,47 @@ sezione test aggiornata.
 - Prossima storia: US-329 (la Base nel libro: la sezione Base della pagina
   inventario mostra le 4 stanze + il giardino coi pulsanti costruisci/
   potenzia/pianta/raccogli). Chiude il blocco F.
+
+[2026-09-06] US-329 — La base nel libro. BLOCCO F CHIUSO.
+
+- scripts/pages/page_inventario.gd: la sezione "base" (era il segnaposto
+  BOOK_INV_ARRIVA come lo erano ricettario/talenti prima delle loro story)
+  diventa reale.
+  * _base(): per ogni GameData.room_type_ids() -> _titolo(tr_data(name_i18n)),
+    riga "Livello N" o "Non costruita", "Bonus: <k v, ...>" se costruita,
+    "Costo: <nome_item x qty>" del prossimo passo (o "Al massimo"), un pulsante
+    Costruisci (lv 0) o Potenzia (lv>0) disabilitato se
+    Inventory non copre il costo; premuto -> BaseSystem.costruisci/potenzia +
+    _mostra("base") per rinfrescare.
+  * _giardino(bs): se numero_appezzamenti() > 0, _titolo + una riga per
+    appezzamento: "— vuoto —" / "In crescita: N s" (ceil dei secondi
+    rimasti) / "<nome> — Pronto" + pulsante Raccogli -> BaseSystem.raccogli.
+  * Il riassunto dei bonus e' "chiave valore" grezzo: le chiavi sono id
+    interni (rischio_esperimento, qualita_forgia, ...), non stringhe da
+    tradurre. La pagina Base e' funzionale, non di vetrina (ponytail); una
+    descrizione localizzata per chiave si aggiunge se servira'.
+- assets/i18n/strings.csv: 12 chiavi BOOK_BASE_* nuove (LIVELLO, NON_
+  COSTRUITA, COSTRUISCI, POTENZIA, MAX, COSTO, BONUS, GIARDINO_TITOLO,
+  APPEZZAMENTO_VUOTO, IN_CRESCITA, PRONTO, RACCOGLI). strings.it/en
+  .translation rigenerati con `godot --headless --path . --import`.
+- Come verificato: 471 test headless (467 + 4 in test_page_base.gd: le 4
+  stanze compaiono col loro stato e almeno una "Non costruita"; costruisci
+  dalla pagina solo col costo coperto - il bottone del laboratorio (con
+  materiali) e' attivo, gli altri disabilitati -, e costruire dal libro porta
+  laboratorio a livello 1; il giardino in crescita mostra il conto alla
+  rovescia; Raccogli dal libro quando l'appezzamento e' pronto -> erba_lunare
+  in zaino). NB: i test di pagina che aprono il book_overlay due volte nello
+  stesso metodo lasciano nodi mezzo-distrutti -> SCRIPT ERROR spurio: ogni
+  test apre l'overlay UNA volta sola (come gia' fa test_page_ricettario).
+  validate_data.py exit 0 (9 warning invariati).
+  VERIFICA A SCHERMO (scenes/main.tscn + book_overlay, Godot locale): tab
+  "Home" selezionato; Laboratorio "Level 1" + "Bonus: rischio_esperimento
+  -10" + "Cost: Lingotto di ferro x6, Cristallo grezzo x3" + pulsante
+  Upgrade; Stanza rituale "Not built" + Cost + pulsante Build. La chrome e'
+  in inglese solo per il locale OS di questo PC; i nomi degli item (tr_data)
+  sono gia' in italiano. Screenshot basepage.png nel tmp del job.
+- BLOCCO F CHIUSO: US-326 (schema base + 4 stanze), US-327 (le stanze
+  alimentano i sistemi), US-328 (giardino), US-329 (base nel libro). Fase 3:
+  28/35. Prossimo e ultimo blocco: G - talenti (US-330 schema talenti +
+  vocabolario chiuso dei comportamenti-talento).
+- Prossima storia: US-330.

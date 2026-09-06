@@ -48,6 +48,7 @@ func _mostra(sezione: String) -> void:
 		"zaino": _zaino()
 		"indosso": _indosso()
 		"ricettario": _ricettario()
+		"base": _base()
 		_: _corpo.add_child(_riga(tr("BOOK_INV_ARRIVA")))
 
 
@@ -152,6 +153,88 @@ func _indosso() -> void:
 				eq.call("rimuovi_slot", mount); _mostra("indosso")))
 		_corpo.add_child(h)
 	_corpo.add_child(_riga(tr("BOOK_INV_SIGILLI_TODO")))
+
+
+func _base() -> void:
+	var gd: Node = _n("/root/GameData")
+	var bs: Node = _n("/root/BaseSystem")
+	var inv: Node = _n("/root/Inventory")
+	if gd == null or bs == null:
+		return
+	for tipo in gd.call("room_type_ids"):
+		var rt: Dictionary = gd.call("get_room_type", tipo)
+		var lv: int = int(bs.call("livello", tipo))
+		_corpo.add_child(_titolo(str(gd.call("tr_data", rt.get("name_i18n", tipo)))))
+		_corpo.add_child(_riga(tr("BOOK_BASE_NON_COSTRUITA") if lv == 0 else tr("BOOK_BASE_LIVELLO") % lv))
+		var bonus: Dictionary = bs.call("bonus", tipo)
+		if not bonus.is_empty():
+			_corpo.add_child(_riga("%s %s" % [tr("BOOK_BASE_BONUS"), _riassunto(bonus)]))
+		var costo: Dictionary = bs.call("costo_prossimo", tipo)
+		if costo.is_empty():
+			_corpo.add_child(_riga(tr("BOOK_BASE_MAX")))
+			continue
+		_corpo.add_child(_riga("%s %s" % [tr("BOOK_BASE_COSTO"), _riassunto_costo(costo)]))
+		var riga := HBoxContainer.new()
+		var b := Button.new()
+		b.text = tr("BOOK_BASE_COSTRUISCI") if lv == 0 else tr("BOOK_BASE_POTENZIA")
+		b.disabled = not _coperto(inv, costo)
+		var azione: String = "costruisci" if lv == 0 else "potenzia"
+		b.pressed.connect(func() -> void:
+			_n("/root/BaseSystem").call(azione, tipo); _mostra("base"))
+		riga.add_child(b)
+		_corpo.add_child(riga)
+	_giardino(bs)
+
+
+func _giardino(bs: Node) -> void:
+	if int(bs.call("numero_appezzamenti")) <= 0:
+		return
+	_corpo.add_child(_titolo(tr("BOOK_BASE_GIARDINO_TITOLO")))
+	var gd: Node = _n("/root/GameData")
+	var stato: Array = bs.call("appezzamenti")
+	for i in stato.size():
+		var a: Dictionary = stato[i]
+		var h := HBoxContainer.new()
+		var l := Label.new()
+		l.custom_minimum_size = Vector2(220, 0)
+		if str(a.get("item_id", "")).is_empty():
+			l.text = tr("BOOK_BASE_APPEZZAMENTO_VUOTO")
+		elif bool(a.get("pronto", false)):
+			var nome: String = str(gd.call("tr_data", (gd.call("get_item", a["item_id"]) as Dictionary).get("name_i18n", a["item_id"])))
+			l.text = "%s — %s" % [nome, tr("BOOK_BASE_PRONTO")]
+		else:
+			l.text = tr("BOOK_BASE_IN_CRESCITA") % int(ceil(float(a.get("crescita", 0.0))))
+		h.add_child(l)
+		if bool(a.get("pronto", false)):
+			var idx: int = i
+			h.add_child(_azione(tr("BOOK_BASE_RACCOGLI"), func() -> void:
+				_n("/root/BaseSystem").call("raccogli", idx); _mostra("base")))
+		_corpo.add_child(h)
+
+
+func _coperto(inv: Node, costo: Dictionary) -> bool:
+	if inv == null:
+		return false
+	for item_id in costo:
+		if int(inv.call("conta", item_id)) < int(costo[item_id]):
+			return false
+	return true
+
+
+func _riassunto(d: Dictionary) -> String:
+	var parti: Array = []
+	for k in d:
+		parti.append("%s %s" % [k, d[k]])
+	return ", ".join(parti)
+
+
+func _riassunto_costo(costo: Dictionary) -> String:
+	var gd: Node = _n("/root/GameData")
+	var parti: Array = []
+	for item_id in costo:
+		var nome: String = str(gd.call("tr_data", (gd.call("get_item", item_id) as Dictionary).get("name_i18n", item_id)))
+		parti.append("%s x%d" % [nome, int(costo[item_id])])
+	return ", ".join(parti)
 
 
 func testo_visibile() -> String:
