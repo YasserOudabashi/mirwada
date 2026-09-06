@@ -5063,3 +5063,26 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - Prossima storia: US-519 (Hermit Seq 6-4: Scrolls Professor / Constellations
   Master / Mysticologist - pergamene con stored_ability_id, costellazioni
   condizionate da momento/fase_lunare).
+
+[2026-09-06] US-519 — Hermit Sequenze 6-4 (Scrolls Professor / Constellations Master / Mysticologist). BLOCCO 5.
+
+- NESSUNA primitiva nuova. Hermit Seq 6/5/4 (stub -> false):
+  * hermit_pergamena_pronta (buff + shield - la produzione dell'oggetto
+    pergamena con stored_ability_id e' aggancio di fase 6), hermit_scarica_
+    precotta (projectile luce pierce 2), hermit_costellazione_del_guerriero
+    (buff forza, condizione e_notte), hermit_costellazione_del_custode
+    (buff difesa, condizione fase_lunare piena), hermit_incantesimo_su_misura
+    (dot spirito + debuff), hermit_teoria_in_pratica (aura area_viva + buff).
+  * Le condizioni e_notte / fase_lunare sono DATI: l'engine non le forza
+    ancora (come tg_contrattacco con acting_progress_min), le legge il ciclo
+    giorno/notte di fase 6.
+  * acting somma 1.0. madness 5.5/6.8/8.5.
+  * hermit_4 (Seq <= 4): advancement_ritual, location_tags [torre_di_
+    osservazione, vetta], fase_lunare nuova.
+  * formule formula_hermit_6/5/4 + 9 ingredienti; char_hermit_6/5/4.
+- i18n: 6 abilita' + 3 caratteristiche tradotte. 58 TODO.
+- Come verificato: 568 test headless (test_hermit.gd itera dinamicamente e
+  copre le 6-4). validate exit 0 (3 warning).
+- Prossima storia: US-520 (Hermit Seq 3-0: Clairvoyant / Sage / Knowledge
+  Emperor / Hermit + primitiva mind_read; hermit_1 riscritta senza rule_bind).
+  Chiude il BLOCCO 5.

@@ -184,6 +184,180 @@
         "singolo"
       ],
       "note": "Un incantesimo tradizionale: dardo di spirito che rallenta chi colpisce."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_pergamena_pronta",
+      "name_i18n": "ability.hermit.hermit_pergamena_pronta",
+      "sequence_id": "hermit_6",
+      "costo_spiritualita": 12,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "spiritualita_max",
+          "valore": 0.15,
+          "durata": 20.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "shield",
+          "assorbimento": 40,
+          "durata": 20.0,
+          "riflette": 0,
+          "tag_bloccati": [],
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "occulto",
+        "conoscenza",
+        "difesa"
+      ],
+      "note": "Lo Scrolls Professor prepara pergamene monouso: magia precotta pronta da spendere. La produzione dell'oggetto pergamena (stored_ability_id, US-306) e' aggancio di fase 6."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_scarica_precotta",
+      "name_i18n": "ability.hermit.hermit_scarica_precotta",
+      "sequence_id": "hermit_6",
+      "costo_spiritualita": 10,
+      "cooldown": 6.0,
+      "primitive": [
+        {
+          "tipo": "projectile",
+          "danno": 30,
+          "velocita": 14,
+          "gittata": 12,
+          "pierce": 2,
+          "tag_danno": "luce"
+        }
+      ],
+      "tag_sinergia": [
+        "occulto",
+        "conoscenza",
+        "singolo"
+      ],
+      "note": "Spendere una pergamena al momento giusto: scarica di luce che perfora."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_costellazione_del_guerriero",
+      "name_i18n": "ability.hermit.hermit_costellazione_del_guerriero",
+      "sequence_id": "hermit_5",
+      "costo_spiritualita": 14,
+      "cooldown": 25.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "forza",
+          "valore": 0.3,
+          "durata": 15.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "stella",
+        "forza",
+        "singolo"
+      ],
+      "condizioni": [
+        {
+          "tipo": "e_notte",
+          "valore": true
+        }
+      ],
+      "note": "La costellazione del Guerriero: potenziamento stellare, ma solo di notte quando le stelle si vedono."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_costellazione_del_custode",
+      "name_i18n": "ability.hermit.hermit_costellazione_del_custode",
+      "sequence_id": "hermit_5",
+      "costo_spiritualita": 14,
+      "cooldown": 25.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.35,
+          "durata": 15.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "stella",
+        "difesa",
+        "singolo"
+      ],
+      "condizioni": [
+        {
+          "tipo": "fase_lunare",
+          "valore": "piena"
+        }
+      ],
+      "note": "La costellazione del Custode: scudo stellare, ma solo a luna piena."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_incantesimo_su_misura",
+      "name_i18n": "ability.hermit.hermit_incantesimo_su_misura",
+      "sequence_id": "hermit_4",
+      "costo_spiritualita": 18,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "dot",
+          "danno_tick": 14,
+          "tick_rate": 1.0,
+          "durata": 8.0,
+          "tag_danno": "spirito"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.3,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "occulto",
+        "conoscenza",
+        "spirito"
+      ],
+      "note": "Il Mysticologist crea incantesimi propri: un maleficio spirituale su misura per il bersaglio."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_teoria_in_pratica",
+      "name_i18n": "ability.hermit.hermit_teoria_in_pratica",
+      "sequence_id": "hermit_4",
+      "costo_spiritualita": 16,
+      "cooldown": 24.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 8,
+          "durata": 15.0,
+          "effetto": "area_viva",
+          "tick_rate": 2.0,
+          "bersagli": "alleati"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "spiritualita_max",
+          "valore": 0.15,
+          "durata": 15.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "occulto",
+        "conoscenza",
+        "area"
+      ],
+      "note": "La conoscenza mistica messa in pratica: un'area benedetta e piu' spirito per tutti."
     }
   ]
 }

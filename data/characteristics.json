@@ -325,6 +325,24 @@
       "pathway_id": "hermit",
       "sequence": 7,
       "name_i18n": "characteristic.hermit.7"
+    },
+    {
+      "id": "char_hermit_6",
+      "pathway_id": "hermit",
+      "sequence": 6,
+      "name_i18n": "characteristic.hermit.6"
+    },
+    {
+      "id": "char_hermit_5",
+      "pathway_id": "hermit",
+      "sequence": 5,
+      "name_i18n": "characteristic.hermit.5"
+    },
+    {
+      "id": "char_hermit_4",
+      "pathway_id": "hermit",
+      "sequence": 4,
+      "name_i18n": "characteristic.hermit.4"
     }
   ]
 }

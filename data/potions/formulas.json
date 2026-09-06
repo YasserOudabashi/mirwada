@@ -10,6 +10,7 @@
     "argento_annerito",
     "argento_benedetto",
     "argilla_rossa_del_fiume",
+    "astrolabio_tascabile",
     "bilancia_di_precisione",
     "calice_incrinato",
     "caratteristica_del_gigante",
@@ -23,6 +24,7 @@
     "cera_di_veglia",
     "chiave_d_ossa",
     "chiave_dell_oltretomba",
+    "chiave_di_soluzione",
     "chiodo_di_bara",
     "chiodo_di_ferro_freddo",
     "codice_della_vita_inciso",
@@ -52,6 +54,7 @@
     "fiore_di_camomilla_selvatica",
     "fiore_di_luna",
     "frammento_di_alba",
+    "frammento_di_cielo_notturno",
     "frammento_di_luna",
     "frammento_di_tavoletta",
     "fungo_a_specchio",
@@ -59,10 +62,12 @@
     "ghianda_millenaria",
     "goccia_di_linfa",
     "goccia_di_prima_pioggia",
+    "grimorio_bianco",
     "il_confine_del_mondo",
     "incenso_dei_riti",
     "incenso_di_mirra",
     "inchiostro_di_due_mondi",
+    "inchiostro_ferrogallico",
     "inchiostro_luminescente",
     "inchiostro_stellare",
     "ingranaggio_di_precisione",
@@ -96,6 +101,7 @@
     "osso_di_pugile",
     "pelo_di_lupo_bianco",
     "pergamena_a_doppia_faccia",
+    "pergamena_di_qualita",
     "petalo_di_belladonna",
     "pietra_di_marea",
     "pietra_di_soglia",
@@ -104,6 +110,7 @@
     "polline_dorato",
     "polvere_di_arena",
     "polvere_di_crepuscolo",
+    "polvere_di_meteora",
     "polvere_di_ossario",
     "polvere_di_sale_nero",
     "polvere_di_specchio_incrinato",
@@ -113,6 +120,7 @@
     "prisma_che_devia_la_luce",
     "progetto_del_mondo_perfetto",
     "punta_d_argento",
+    "quintessenza_distillata",
     "radice_amara",
     "radice_che_beve",
     "radice_di_ferro_lunare",
@@ -144,6 +152,7 @@
     "seme_dell_albero_madre",
     "seme_di_stella_cadente",
     "seme_dormiente",
+    "sigillo_di_ceralacca",
     "soffio_di_spettro",
     "spazzola_da_scavo",
     "specchio_di_luna_nera",
@@ -914,6 +923,48 @@
         "ossa_di_gatto_nero",
         "incenso_di_mirra",
         "chiodo_di_ferro_freddo"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_hermit_6": {
+      "characteristic_sequence": 6,
+      "ingredients": [
+        "pergamena_di_qualita",
+        "sigillo_di_ceralacca",
+        "inchiostro_ferrogallico"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_hermit_5": {
+      "characteristic_sequence": 5,
+      "ingredients": [
+        "polvere_di_meteora",
+        "astrolabio_tascabile",
+        "frammento_di_cielo_notturno"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_hermit_4": {
+      "characteristic_sequence": 4,
+      "ingredients": [
+        "quintessenza_distillata",
+        "grimorio_bianco",
+        "chiave_di_soluzione"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

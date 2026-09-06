@@ -216,20 +216,63 @@
       "name_i18n": "sequence.hermit.6",
       "tier": "mid",
       "concept": "Prepara pergamene monouso: magia precotta da spendere al momento giusto.",
-      "stat_modifiers": {},
+      "stat_modifiers": {
+        "hp_max": 90,
+        "spiritualita_max": 0.3
+      },
       "abilities": [
-        "hermit_pergamena"
+        "hermit_pergamena_pronta",
+        "hermit_scarica_precotta"
       ],
-      "acting_actions": [],
+      "acting_actions": [
+        {
+          "id": "hermit_6_scrivano",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_pergamena_pronta"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_6_scrivano",
+          "descrizione": "Prepara 15 pergamene"
+        },
+        {
+          "id": "hermit_6_scaricatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_scarica_precotta"
+          },
+          "target": 18,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_6_scaricatore",
+          "descrizione": "Scarica 18 pergamene"
+        },
+        {
+          "id": "hermit_6_professore",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_6_professore",
+          "descrizione": "Sconfiggi 12 nemici con la magia precotta"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 6,
-        "ingredients": [],
+        "ingredients": [
+          "pergamena_di_qualita",
+          "sigillo_di_ceralacca",
+          "inchiostro_ferrogallico"
+        ],
         "formula_id": "formula_hermit_6"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 5.5,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 5,
@@ -238,18 +281,63 @@
       "name_i18n": "sequence.hermit.5",
       "tier": "mid",
       "concept": "Costellazioni: potenziamenti stellari legati alla posizione e all'ora.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 130,
+        "spiritualita_max": 0.35
+      },
+      "abilities": [
+        "hermit_costellazione_del_guerriero",
+        "hermit_costellazione_del_custode"
+      ],
+      "acting_actions": [
+        {
+          "id": "hermit_5_astrologo",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_costellazione_del_guerriero"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_5_astrologo",
+          "descrizione": "Invoca la costellazione del Guerriero 15 volte"
+        },
+        {
+          "id": "hermit_5_guardiano",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_costellazione_del_custode"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_5_guardiano",
+          "descrizione": "Invoca la costellazione del Custode 15 volte"
+        },
+        {
+          "id": "hermit_5_veggente",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 15,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_5_veggente",
+          "descrizione": "Sconfiggi 15 nemici sotto le stelle giuste"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 5,
-        "ingredients": [],
+        "ingredients": [
+          "polvere_di_meteora",
+          "astrolabio_tascabile",
+          "frammento_di_cielo_notturno"
+        ],
         "formula_id": "formula_hermit_5"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 6.8,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 4,
@@ -258,24 +346,76 @@
       "name_i18n": "sequence.hermit.4",
       "tier": "saint",
       "concept": "Crea incantesimi propri combinando conoscenze acquisite.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 200,
+        "spiritualita_max": 0.4
+      },
+      "abilities": [
+        "hermit_incantesimo_su_misura",
+        "hermit_teoria_in_pratica"
+      ],
+      "acting_actions": [
+        {
+          "id": "hermit_4_mistico",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_incantesimo_su_misura"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_4_mistico",
+          "descrizione": "Crea 15 incantesimi su misura"
+        },
+        {
+          "id": "hermit_4_spirituale",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "spirito"
+          },
+          "target": 3000,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_4_spirituale",
+          "descrizione": "Infliggi 3000 danni da spirito"
+        },
+        {
+          "id": "hermit_4_teorico",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_teoria_in_pratica"
+          },
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_4_teorico",
+          "descrizione": "Metti in pratica la teoria 12 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 4,
-        "ingredients": [],
+        "ingredients": [
+          "quintessenza_distillata",
+          "grimorio_bianco",
+          "chiave_di_soluzione"
+        ],
         "formula_id": "formula_hermit_4"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "torre_di_osservazione",
+          "vetta"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "nuova",
+        "sacrifices": [
+          "un_incantesimo_che_avevi_inventato_tu_bruciato_davanti_a_un_maestro"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 8.5,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 3,
