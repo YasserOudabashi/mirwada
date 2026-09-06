@@ -1043,6 +1043,13 @@ def main():
             f"creazione, US-332)")
     if n_acquisiti < 8:
         err(f"data/talents/: solo {n_acquisiti} talenti 'acquisito', attesi >= 8")
+    # US-332: quanti innati si scelgono alla creazione
+    n_creaz = (balance_doc or {}).get("talenti", {}).get("innati_alla_creazione")
+    if not isinstance(n_creaz, int) or n_creaz < 1:
+        err("data/balance.json [talenti.innati_alla_creazione]: deve essere un intero >= 1")
+    elif n_creaz > n_innati:
+        err(f"data/balance.json [talenti.innati_alla_creazione] = {n_creaz} ma ci sono solo "
+            f"{n_innati} talenti 'innato'")
 
     # --- esiti degli esperimenti (data/potions/experiment_outcomes.json, US-311) ---
     eo_doc = load_json(os.path.join(DATA, "potions", "experiment_outcomes.json"))

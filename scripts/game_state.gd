@@ -141,11 +141,27 @@ func carica_slot(slot: int) -> Dictionary:
 
 ## Creazione personaggio (US-223): fissa il nome, riparte da zero, salva sullo
 ## slot scelto. Il Pathway/Sequenza di partenza vengono dai dati (Progression).
-func nuova_partita(nome: String, slot: int) -> Dictionary:
+## talenti_innati (US-332): id di talenti 'innato' scelti alla creazione — solo
+## quelli veri entrano in TalentSystem, il resto e' ignorato.
+func nuova_partita(nome: String, slot: int, talenti_innati: Array = []) -> Dictionary:
 	nome_personaggio = nome.strip_edges() if not nome.strip_edges().is_empty() else NOME_DEFAULT
 	tempo_gioco = 0.0
 	_partita_attiva = true
 	_slot_corrente = slot
+	var ts: Node = _talenti()
+	var gd: Node = get_node_or_null("/root/GameData")
+	if ts != null:
+		ts.call("pulisci")
+		var maxn: int = 99
+		if gd != null:
+			maxn = int((gd.call("get_balance", "talenti") as Dictionary).get("innati_alla_creazione", 99))
+		var presi: int = 0
+		for tid in talenti_innati:
+			if presi >= maxn:
+				break
+			var t: Dictionary = gd.call("get_talent", str(tid)) if gd != null else {}
+			if str(t.get("tipo", "")) == "innato" and ts.call("concedi", str(tid)):
+				presi += 1
 	partita_iniziata.emit(nome_personaggio)
 	return get_node("/root/SaveSystem").call("salva", slot, snapshot())
 

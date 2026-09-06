@@ -74,3 +74,6 @@ BOOK_BASE_APPEZZAMENTO_VUOTO,— vuoto —,— empty —
 BOOK_BASE_IN_CRESCITA,In crescita: %d s,Growing: %d s
 BOOK_BASE_PRONTO,Pronto,Ready
 BOOK_BASE_RACCOGLI,Raccogli,Harvest
+BOOK_FRONTESPIZIO_TALENTI,Talenti innati — scegline %d,Innate talents — pick %d
+BOOK_FRONTESPIZIO_I_TUOI_TALENTI,I tuoi talenti,Your talents
+BOOK_FRONTESPIZIO_NESSUN_TALENTO,Nessun talento,No talents

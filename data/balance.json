@@ -22,6 +22,10 @@
     "tempo_crescita_s": 30.0,
     "resa_base": 2
   },
+  "talenti": {
+    "_comment": "Talenti (US-330..333). innati_alla_creazione: quanti talenti 'innato' il giocatore sceglie alla creazione personaggio (US-332).",
+    "innati_alla_creazione": 2
+  },
   "sequence_gap": {
     "_comment": "Il muro di Sequenza: un Beyonder molto piu' alto e' quasi immune. E' la meccanica che rende la coltivazione l'unica vera progressione. Moltiplicatore di danno in base a (sequenza_attaccante - sequenza_bersaglio); negativo = il bersaglio e' piu' alto.",
     "-4": 0.02, "-3": 0.08, "-2": 0.25, "-1": 0.60,

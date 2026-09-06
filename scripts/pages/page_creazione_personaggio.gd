@@ -5,12 +5,16 @@ extends VBoxContainer
 ## sei (nome, Pathway, Sequenza, tier), sola lettura.
 
 var _campo: LineEdit = null
+## US-332: id dei talenti innati spuntati alla creazione.
+var _scelti: Array = []
+var _max_talenti: int = 0
 
 
 func aggiorna() -> void:
 	for c in get_children():
 		c.queue_free()
 	_campo = null
+	_scelti = []
 
 	var gs: Node = _n("/root/GameState")
 	if gs != null and bool(gs.call("partita_in_corso")):
@@ -26,10 +30,41 @@ func _mostra_creazione(gs: Node) -> void:
 	_campo.custom_minimum_size = Vector2(220, 24)
 	_campo.select_all()
 	add_child(_campo)
+	_talenti_innati(gs)
 	var ok := Button.new()
 	ok.text = tr("BOOK_FRONTESPIZIO_CONFERMA")
 	ok.pressed.connect(conferma)
 	add_child(ok)
+
+
+## La scelta di 1-2 talenti innati (US-332). Il numero e' un dato
+## (balance.json talenti.innati_alla_creazione).
+func _talenti_innati(gs: Node) -> void:
+	var gd: Node = _n("/root/GameData")
+	if gd == null:
+		return
+	_max_talenti = int((gd.call("get_balance", "talenti") as Dictionary).get("innati_alla_creazione", 0))
+	if _max_talenti <= 0:
+		return
+	add_child(_riga(tr("BOOK_FRONTESPIZIO_TALENTI") % _max_talenti))
+	for tid in gd.call("talents_per_tipo", "innato"):
+		var t: Dictionary = gd.call("get_talent", tid)
+		var cb := CheckBox.new()
+		cb.text = str(gd.call("tr_data", t.get("name_i18n", tid)))
+		cb.toggled.connect(func(premuto: bool) -> void:
+			_su_talento(cb, str(tid), premuto))
+		add_child(cb)
+
+
+func _su_talento(cb: CheckBox, tid: String, premuto: bool) -> void:
+	if premuto:
+		if _scelti.size() >= _max_talenti:
+			cb.set_pressed_no_signal(false)  # oltre il limite: annulla la spunta
+			return
+		if not _scelti.has(tid):
+			_scelti.append(tid)
+	else:
+		_scelti.erase(tid)
 
 
 func _mostra_identita(gs: Node) -> void:
@@ -44,6 +79,13 @@ func _mostra_identita(gs: Node) -> void:
 			nome_pw, tr("BOOK_FRONTESPIZIO_SEQUENZA"), int(prog.call("sequence")),
 			str(prog.call("tier")),
 		]))
+	var ts: Node = _n("/root/TalentSystem")
+	if ts != null and gd != null:
+		var nomi: Array = []
+		for tid in ts.call("posseduti"):
+			nomi.append(str(gd.call("tr_data", (gd.call("get_talent", tid) as Dictionary).get("name_i18n", tid))))
+		add_child(_riga("%s %s" % [tr("BOOK_FRONTESPIZIO_I_TUOI_TALENTI"),
+			", ".join(nomi) if not nomi.is_empty() else tr("BOOK_FRONTESPIZIO_NESSUN_TALENTO")]))
 
 
 ## Conferma la creazione. Chiamata dal bottone e dalla voltata in avanti.
@@ -52,7 +94,7 @@ func conferma() -> void:
 	var book: Node = _n("/root/Book")
 	if gs == null or _campo == null:
 		return
-	gs.call("nuova_partita", _campo.text, int(gs.call("slot_scelto")))
+	gs.call("nuova_partita", _campo.text, int(gs.call("slot_scelto")), _scelti)
 	if book != null:
 		book.call("chiudi")
 

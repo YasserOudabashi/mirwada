@@ -620,8 +620,8 @@
       ],
       "priority": 31,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO G. data/balance.json: talenti.innati_alla_creazione = 2 (il numero e' un dato). scripts/pages/page_creazione_personaggio.gd: _talenti_innati() sotto il campo nome - riga 'Talenti innati - scegline N' + una CheckBox per talento innato (nome da tr_data). _su_talento: spuntare oltre N annulla la spunta (set_pressed_no_signal(false)); _scelti tiene gli id. conferma() passa _scelti a nuova_partita. _mostra_identita (partita in corso): riga 'I tuoi talenti: <nomi>' o 'Nessun talento'. GameState.nuova_partita(nome, slot, talenti_innati=[]) : TalentSystem.pulisci, poi concedi() per ogni id con tipo=='innato', cappato a balance.talenti.innati_alla_creazione (trust boundary del save, non solo la UI). I talenti innati si serializzano come gli altri (campo 'talenti.posseduti', US-331). strings.csv: 3 chiavi BOOK_FRONTESPIZIO_TALENTI / _I_TUOI_TALENTI / _NESSUN_TALENTO, .translation rigenerati. validate_data.py: innati_alla_creazione intero >= 1 e <= numero di innati. 488 test headless (484 + 4 in test_creazione_talenti.gd: nuova_partita accetta gli innati; ignora gli acquisiti e cappa a 2; i talenti innati tornano dal save via applica(); la pagina offre >= 4 CheckBox). NB: nuova_partita attiva la partita -> il test azzera _partita_attiva in prepara e dopo ogni test (come test_page_scaffale), altrimenti lo scaffale conta un tomo di troppo. validate exit 0. VERIFICA A SCHERMO (main.tscn + book_overlay, Godot locale): frontespizio con campo nome 'Enel', 'Innate talents - pick 2' + 4 checkbox (Costituzione robusta/Mano ferma/Piede leggero/Spirito vivace) + Begin; spuntati 2 e confermato -> posseduti = [costituzione_robusta, mano_ferma]; riaperto -> pagina identita' 'Your talents Costituzione robusta, Mano ferma'. Screenshot creazione.png / identita.png."
     },
     {
       "id": "US-333",

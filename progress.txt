@@ -3727,3 +3727,40 @@ sezione test aggiornata.
 - Prossima storia: US-332 (1-2 talenti innati scelti alla creazione
   personaggio; GameState.nuova_partita li accetta; la pagina identita' li
   mostra).
+
+[2026-09-06] US-332 — Talenti innati alla creazione personaggio. BLOCCO G.
+
+- data/balance.json: sezione talenti { innati_alla_creazione: 2 } - quanti se
+  ne scelgono e' un dato.
+- scripts/pages/page_creazione_personaggio.gd: _talenti_innati() sotto il
+  campo nome. Riga "Talenti innati - scegline N" + una CheckBox per talento
+  innato (nome da tr_data). _su_talento: spuntare oltre N annulla la spunta
+  (set_pressed_no_signal(false)); _scelti tiene gli id. conferma() li passa a
+  nuova_partita. _mostra_identita (partita in corso): aggiunge "I tuoi
+  talenti: <nomi>" (o "Nessun talento").
+- GameState.nuova_partita(nome, slot, talenti_innati: Array = []):
+  TalentSystem.pulisci(), poi concedi() per ogni id con tipo == "innato",
+  cappato a balance.talenti.innati_alla_creazione. Il cap sta anche qui e non
+  solo nella UI: nuova_partita e' un confine di fiducia per il save. I
+  talenti innati si serializzano come gli altri (campo talenti.posseduti,
+  US-331).
+- assets/i18n/strings.csv: 3 chiavi (BOOK_FRONTESPIZIO_TALENTI con %d,
+  _I_TUOI_TALENTI, _NESSUN_TALENTO). .translation rigenerati con --import.
+- validate_data.py: innati_alla_creazione intero >= 1 e <= numero di innati.
+- Come verificato: 488 test headless (484 + 4 in test_creazione_talenti.gd:
+  nuova_partita accetta gli innati scelti; ignora un acquisito e cappa a 2;
+  gli innati tornano dal save via applica(); la pagina offre >= 4 CheckBox).
+  nuova_partita attiva la partita -> il test azzera _partita_attiva in
+  prepara() e dopo ogni test (come test_page_scaffale), altrimenti lo
+  scaffale contava un tomo di troppo (regressione trovata ed evitata).
+  validate_data.py exit 0 (9 warning invariati).
+  VERIFICA A SCHERMO (main.tscn + book_overlay, Godot locale): frontespizio
+  col campo nome "Enel", "Innate talents - pick 2" + 4 CheckBox (Costituzione
+  robusta / Mano ferma / Piede leggero / Spirito vivace) + Begin; spuntati 2
+  e confermato -> TalentSystem.posseduti = [costituzione_robusta, mano_ferma];
+  riaperto -> pagina identita' "Your talents Costituzione robusta, Mano
+  ferma". Chrome in inglese per il locale OS del PC di test. Screenshot
+  creazione.png / identita.png nel tmp del job.
+- Prossima storia: US-333 (sezione Talenti nel libro: posseduti con effetto +
+  acquisiti non presi con barra di progresso count/target, offuscati se
+  progresso 0). Chiude il blocco G.
