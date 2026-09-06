@@ -4892,3 +4892,29 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - Fase 5: 11/22. Pathway completi: Death, Moon (+ Twilight Giant di fase 2).
 - Prossima storia: US-512 (BLOCCO 3 - Mother Seq 9-7: Planter / Doctor /
   Harvest Priest + primitiva plant_growth).
+
+[2026-09-06] US-512 — Mother Sequenze 9-7 (Planter / Doctor / Harvest Priest). BLOCCO 3.
+
+- PRIMITIVA NUOVA plant_growth: _p_plant_growth (gemello di _p_terrain_modify).
+  persistente:true -> registra_terreno("vegetazione:"+specie) nel WorldState
+  (riuso: come i varchi permanenti del TG, entra nel save); persistente:false
+  -> record, il campo lo consuma il combat/mondo (fase 6). primitives.json
+  implemented; vfx.json vfx_bloom; _handlers +1.
+- NUOVO status 'area_viva' (tag guarigione, non negativo, difesa +0.05): il
+  terreno benedetto dallo Harvest Priest.
+- CONTENUTO Mother Seq 9/8/7 (stub -> false):
+  * mother_germoglio_rapido (plant_growth temporaneo), mother_mano_verde
+    (heal nel tempo + buff velocita), mother_diagnosi (light_purify - rimuove
+    veleni/maledizioni), mother_sutura (heal istantaneo), mother_benedizione_
+    raccolto (aura area_viva sugli alleati), mother_terra_generosa
+    (plant_growth PERSISTENTE - campo fiorito nel WorldState).
+  * acting somma 1.0. madness 1.3/2.7/4.1. Nessun ritual (Seq > 4).
+  * formule formula_mother_9/8/7 + 9 ingredienti; char_mother_9/8/7.
+  * mother_dominio_druidico (stress test seq mother_5) - tradotto il nome.
+- i18n: 6 abilita' + 3 caratteristiche + mother_dominio_druidico. 59 TODO.
+- Come verificato: 559 test headless (555 + 4 in test_mother.gd: le 6 abilita'
+  eseguono a 0 warning; plant_growth persistente entra nel WorldState come
+  "vegetazione:*", quello temporaneo no; Seq 9-7 non-stub, acting 1.0).
+  validate exit 0 (3 warning).
+- Prossima storia: US-513 (Mother Seq 6-4: Biologist / Druid / Classical
+  Alchemist - terraforming, chimere via summon chimera_).

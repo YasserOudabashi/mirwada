@@ -70,6 +70,15 @@
         "forza": -0.15
       },
       "descrizione": "Il bersaglio e' incantato: non attacca chi lo ha affascinato e combatte distratto. Lo applica curse(\"affascinato\") della Beauty Goddess (Moon Seq 1). Non e' possess (quello e' del Fool)."
+    },
+    "area_viva": {
+      "tag": "guarigione",
+      "durata_default": 20.0,
+      "negativo": false,
+      "stat_modifiers": {
+        "difesa": 0.05
+      },
+      "descrizione": "Il terreno benedetto dallo Harvest Priest: chi vi sta sopra e' protetto e si rigenera lentamente (la cura nel tempo la fa il campo dell aura)."
     }
   }
 }

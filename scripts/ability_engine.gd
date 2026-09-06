@@ -69,6 +69,7 @@ func _ready() -> void:
 		"teleport": _p_teleport,
 		"soul_detach": _p_soul_detach,
 		"resurrect": _p_resurrect,
+		"plant_growth": _p_plant_growth,
 	}
 
 
@@ -560,6 +561,29 @@ func _p_curse(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String)
 
 	return {"tipo": "curse", "effetto": effetto, "durata": durata,
 			"condizione_rimozione": condizione_rimozione, "applied": applicato}
+
+
+## plant_growth (US-512): fa crescere vegetazione di 'specie' in un raggio.
+## persistente:true -> la vegetazione resta ed entra nel WorldState (come
+## terrain_modify permanente, riuso); altrimenti e' un campo che il combat/
+## mondo consumera' (fase 6). velocita e' registrata per la resa a schermo.
+func _p_plant_growth(prim: Dictionary, caster: Node, _stats: Node, _ability_id: String) -> Dictionary:
+	var raggio: float = _num(prim.get("raggio"), 0.0)
+	var specie: String = str(prim.get("specie", ""))
+	var velocita: float = _num(prim.get("velocita"), 1.0)
+	var persistente: bool = _flag(prim.get("persistente"), false)
+	var pos: Vector2 = Vector2.ZERO
+	if caster is Node2D and (caster as Node2D).is_inside_tree():
+		pos = (caster as Node2D).global_position
+	var rec: Dictionary = {"tipo": "plant_growth", "raggio": raggio, "specie": specie,
+			"velocita": velocita, "persistente": persistente,
+			"posizione": [pos.x, pos.y], "applied": not persistente}
+	if persistente:
+		var ws: Node = get_tree().root.get_node_or_null("WorldState")
+		if ws != null:
+			ws.call("registra_terreno", "vegetazione:" + specie, pos, raggio)
+			rec["applied"] = true
+	return rec
 
 
 ## soul_detach (US-507): il Ferryman uccide separando anima e corpo. Applica

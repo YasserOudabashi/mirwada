@@ -21,18 +21,63 @@
       "name_i18n": "sequence.mother.9",
       "tier": "low",
       "concept": "Coltiva e accelera la crescita delle piante; base del ciclo ingredienti.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 25,
+        "spiritualita_max": 0.1
+      },
+      "abilities": [
+        "mother_germoglio_rapido",
+        "mother_mano_verde"
+      ],
+      "acting_actions": [
+        {
+          "id": "mother_9_seminatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_germoglio_rapido"
+          },
+          "target": 20,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_9_seminatore",
+          "descrizione": "Fai germogliare 20 volte"
+        },
+        {
+          "id": "mother_9_linfa",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_mano_verde"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_9_linfa",
+          "descrizione": "Usa la mano verde 15 volte"
+        },
+        {
+          "id": "mother_9_apprendista",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_9_apprendista",
+          "descrizione": "Sconfiggi 10 nemici imparando il ciclo"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 9,
-        "ingredients": [],
+        "ingredients": [
+          "seme_dormiente",
+          "terriccio_di_prima_luna",
+          "goccia_di_linfa"
+        ],
         "formula_id": "formula_mother_9"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 1.3,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 8,
@@ -41,18 +86,63 @@
       "name_i18n": "sequence.mother.8",
       "tier": "low",
       "concept": "Cura le ferite e diagnostica veleni e maledizioni.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 40,
+        "spiritualita_max": 0.12
+      },
+      "abilities": [
+        "mother_diagnosi",
+        "mother_sutura"
+      ],
+      "acting_actions": [
+        {
+          "id": "mother_8_dottore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_diagnosi"
+          },
+          "target": 18,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_8_dottore",
+          "descrizione": "Diagnostica 18 volte"
+        },
+        {
+          "id": "mother_8_chirurgo",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_sutura"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_8_chirurgo",
+          "descrizione": "Sutura 15 ferite"
+        },
+        {
+          "id": "mother_8_paziente",
+          "evento": "damage_taken",
+          "filtri": {},
+          "target": 700,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_8_paziente",
+          "descrizione": "Subisci 700 danni e curati"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 8,
-        "ingredients": [],
+        "ingredients": [
+          "corteccia_febbrifuga",
+          "fiore_di_camomilla_selvatica",
+          "radice_amara"
+        ],
         "formula_id": "formula_mother_8"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 2.7,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 7,
@@ -61,18 +151,63 @@
       "name_i18n": "sequence.mother.7",
       "tier": "low",
       "concept": "Benedice i raccolti e rigenera un'area viva intorno a se'.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 55,
+        "spiritualita_max": 0.15
+      },
+      "abilities": [
+        "mother_benedizione_raccolto",
+        "mother_terra_generosa"
+      ],
+      "acting_actions": [
+        {
+          "id": "mother_7_sacerdote",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_benedizione_raccolto"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_7_sacerdote",
+          "descrizione": "Benedici il raccolto 15 volte"
+        },
+        {
+          "id": "mother_7_giardiniere",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_terra_generosa"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_7_giardiniere",
+          "descrizione": "Rendi generosa la terra 12 volte"
+        },
+        {
+          "id": "mother_7_protettore",
+          "evento": "damage_absorbed_for_ally",
+          "filtri": {},
+          "target": 400,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_7_protettore",
+          "descrizione": "Assorbi 400 danni diretti agli alleati"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 7,
-        "ingredients": [],
+        "ingredients": [
+          "spiga_dorata",
+          "miele_selvatico",
+          "acqua_di_fonte_benedetta"
+        ],
         "formula_id": "formula_mother_7"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 4.1,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 6,

@@ -4,6 +4,7 @@
   "ingredients": [
     "acciaio_stellare",
     "acqua_dello_stige",
+    "acqua_di_fonte_benedetta",
     "ambra_grigia",
     "argento_annerito",
     "argento_benedetto",
@@ -17,6 +18,7 @@
     "chiodo_di_bara",
     "corno_di_alce_spettrale",
     "corona_di_ossa",
+    "corteccia_febbrifuga",
     "cuore_che_non_si_ferma",
     "cuore_di_montagna",
     "cuore_di_quercia_madre",
@@ -31,9 +33,11 @@
     "filo_d_argento_lunare",
     "filo_delle_parche",
     "fiore_che_sboccia_solo_di_notte",
+    "fiore_di_camomilla_selvatica",
     "fiore_di_luna",
     "frammento_di_alba",
     "frammento_di_luna",
+    "goccia_di_linfa",
     "goccia_di_prima_pioggia",
     "il_confine_del_mondo",
     "incenso_dei_riti",
@@ -44,6 +48,7 @@
     "luce_di_luna_imbottigliata",
     "mano_di_gloria",
     "metallo_impossibile",
+    "miele_selvatico",
     "moneta_del_traghettatore",
     "muffa_sepolcrale",
     "muschio_di_caverna",
@@ -63,6 +68,7 @@
     "polvere_di_ossario",
     "polvere_di_specchio_incrinato",
     "prima_notte_del_mondo",
+    "radice_amara",
     "radice_di_ferro_lunare",
     "radice_di_immortelle",
     "radice_di_quercia",
@@ -84,12 +90,15 @@
     "scheggia_divina",
     "scudo_fuso",
     "seme_di_stella_cadente",
+    "seme_dormiente",
     "soffio_di_spettro",
     "specchio_di_luna_nera",
+    "spiga_dorata",
     "stendardo_lacero",
     "tempo_solidificato",
     "tendine_di_lupo",
     "terra_di_cimitero",
+    "terriccio_di_prima_luna",
     "ultimo_battito",
     "ultimo_respiro",
     "voce_del_gigante",
@@ -523,6 +532,48 @@
         "frammento_di_luna",
         "respiro_dell_oceano",
         "prima_notte_del_mondo"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_mother_9": {
+      "characteristic_sequence": 9,
+      "ingredients": [
+        "seme_dormiente",
+        "terriccio_di_prima_luna",
+        "goccia_di_linfa"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_mother_8": {
+      "characteristic_sequence": 8,
+      "ingredients": [
+        "corteccia_febbrifuga",
+        "fiore_di_camomilla_selvatica",
+        "radice_amara"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_mother_7": {
+      "characteristic_sequence": 7,
+      "ingredients": [
+        "spiga_dorata",
+        "miele_selvatico",
+        "acqua_di_fonte_benedetta"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

@@ -39,6 +39,149 @@
         "disastro"
       ],
       "note": "STRESS TEST. Tre primitive composte per il terraforming tattico. Nessuna nuova."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_germoglio_rapido",
+      "name_i18n": "ability.mother.mother_germoglio_rapido",
+      "sequence_id": "mother_9",
+      "costo_spiritualita": 5,
+      "cooldown": 8.0,
+      "primitive": [
+        {
+          "tipo": "plant_growth",
+          "raggio": 4,
+          "specie": "rampicante_utile",
+          "velocita": 3.0,
+          "persistente": false
+        }
+      ],
+      "tag_sinergia": [
+        "crescita",
+        "terra",
+        "area"
+      ],
+      "note": "Il Planter accelera la crescita: rampicanti in pochi secondi dove serve."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_mano_verde",
+      "name_i18n": "ability.mother.mother_mano_verde",
+      "sequence_id": "mother_9",
+      "costo_spiritualita": 6,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "heal",
+          "quantita": 5,
+          "istantaneo": false,
+          "durata": 15.0,
+          "bersaglio": "self"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "velocita",
+          "valore": 0.05,
+          "durata": 15.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "crescita",
+        "guarigione",
+        "singolo"
+      ],
+      "note": "La linfa che scorre nelle vene: cura lenta e passo piu' svelto."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_diagnosi",
+      "name_i18n": "ability.mother.mother_diagnosi",
+      "sequence_id": "mother_8",
+      "costo_spiritualita": 7,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "light_purify",
+          "raggio": 3,
+          "potenza": 2,
+          "riduce_sequenza": false
+        }
+      ],
+      "tag_sinergia": [
+        "guarigione",
+        "purificazione",
+        "singolo"
+      ],
+      "note": "Il Doctor diagnostica e rimuove: veleni e maledizioni via, fino a 2 effetti."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_sutura",
+      "name_i18n": "ability.mother.mother_sutura",
+      "sequence_id": "mother_8",
+      "costo_spiritualita": 8,
+      "cooldown": 10.0,
+      "primitive": [
+        {
+          "tipo": "heal",
+          "quantita": 35,
+          "istantaneo": true,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "guarigione",
+        "singolo"
+      ],
+      "note": "Una sutura pulita: la ferita si chiude subito."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_benedizione_raccolto",
+      "name_i18n": "ability.mother.mother_benedizione_raccolto",
+      "sequence_id": "mother_7",
+      "costo_spiritualita": 11,
+      "cooldown": 22.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 8,
+          "durata": 20.0,
+          "effetto": "area_viva",
+          "tick_rate": 2.0,
+          "bersagli": "alleati"
+        }
+      ],
+      "tag_sinergia": [
+        "crescita",
+        "guarigione",
+        "area"
+      ],
+      "note": "Lo Harvest Priest benedice il terreno: chi vi sta sopra si rigenera."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_terra_generosa",
+      "name_i18n": "ability.mother.mother_terra_generosa",
+      "sequence_id": "mother_7",
+      "costo_spiritualita": 13,
+      "cooldown": 30.0,
+      "primitive": [
+        {
+          "tipo": "plant_growth",
+          "raggio": 6,
+          "specie": "campo_fiorito",
+          "velocita": 2.0,
+          "persistente": true
+        }
+      ],
+      "tag_sinergia": [
+        "crescita",
+        "terra",
+        "area"
+      ],
+      "note": "Un campo fiorito che RESTA: la terra rigenerata entra nello stato del mondo (come i varchi permanenti del Twilight Giant)."
     }
   ]
 }

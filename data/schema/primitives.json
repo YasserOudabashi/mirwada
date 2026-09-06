@@ -198,7 +198,8 @@
         "specie",
         "velocita",
         "persistente"
-      ]
+      ],
+      "implemented": true
     },
     "weather_control": {
       "params": [
