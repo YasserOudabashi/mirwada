@@ -5,6 +5,7 @@
     "id": "string, univoco",
     "name": "string in chiaro (seed i18n)",
     "name_i18n": "string, chiave i18n (categoria 'pet')",
+    "tag": ["string dal vocabolario chiuso di data/tags.json - la specie li espone a SynergySources (US-334)"],
     "hp_max": "number > 0 - alla Sequenza iniziale; la coltivazione (US-324) lo alza",
     "sequenza_iniziale": "int 0..9 - il pet ha la sua progressione di Sequenza",
     "domabilita": "number 0..1 - probabilita' base di taming (US-322)",
@@ -13,7 +14,8 @@
     "comportamenti": [
       {
         "id": "string - chiave del comportamento (US-323 sblocca a soglia)",
-        "bond": "int 0..100 - soglia di bond che lo sblocca"
+        "bond": "int 0..100 - soglia di bond che lo sblocca",
+        "tag": ["opzionale - tag dal vocabolario chiuso, esposti a SynergySources quando il comportamento e' sbloccato (US-334)"]
       }
     ],
     "avanzamento": {

@@ -45,6 +45,15 @@ func tag_concessi() -> Array:
 	return out
 
 
+## Come tag_concessi() ma { tag: conteggio }, la forma che SynergySources
+## somma (US-334).
+func tag_attivi() -> Dictionary:
+	var out: Dictionary = {}
+	for t in tag_concessi():
+		out[t] = int(out.get(t, 0)) + 1
+	return out
+
+
 ## Somma dei 'valore' (default 1) dei talenti sblocco_sistema posseduti la cui
 ## chiave corrisponde. I sistemi (PotionSystem, Forge, giardino) lo interrogano.
 func bonus_int(chiave: String) -> int:

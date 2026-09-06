@@ -657,8 +657,8 @@
       ],
       "priority": 33,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO H iniziato. Le fonti di fase 3 espongono i tag come l'inventario (US-306): PetSystem.tag_attivi() {tag: conteggio} = tag della specie + tag dei comportamenti sbloccati; TalentSystem.tag_attivi() = tag_grant dei talenti posseduti (Dictionary; tag_concessi() resta come Array); BaseSystem.tag_attivi() = tag delle stanze costruite (livello >= 1). Dati: room.schema.json + rooms.json campo 'tag' per stanza (laboratorio pozione/scienza, stanza_rituale rituale/occulto, biblioteca conoscenza, giardino crescita/pozione); pet.schema.json + pets/core.json campo 'tag' per specie e 'tag' opzionale per comportamento; nuova specie capra_lunare (erbivora, tag bestia/crescita, comportamento brucare tag crescita) per dare alla sinergia_crescita_pozione la sua fonte 'pet'. Autoload SynergySources (scripts/synergy_sources.gd): per_fonte() -> {inventario/pet/talenti/base: {tag: conteggio}}, tag_sinergia_globali() somma tutto. NON risolve nessuna sinergia (fase 4); nessuna sinergia nominata nel file. validate_data.py: raccoglie i tag di stanze/pet/talenti in obtainable_tags PRIMA del check sinergie; valida che i tag di stanze/pet siano nel vocabolario chiuso. RISULTATO: il warning 'sinergia irraggiungibile' per sinergia_crescita_pozione E' SPARITO (crescita e pozione ora raggiungibili da giardino + capra). Restano solo inganno_probabilita (probabilita') e anti_ordine_disordine: gruppi differiti, atteso. 496 test headless (491 + 5 in test_synergy_sources.gd: pet espone i tag di specie + comportamenti sbloccati; talenti i tag_grant; stanze i loro tag; tag_sinergia_globali somma le 4 fonti (crescita 2 = pet+giardino, pozione 2 = giardino+lab); per_fonte non nomina sinergie). validate exit 0, i18n --check 0. Nessuna verifica a schermo."
     },
     {
       "id": "US-335",

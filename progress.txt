@@ -3801,3 +3801,47 @@ sezione test aggiornata.
   fonti di sinergia), US-335 (vertical slice - il verdetto sull'architettura),
   US-336 (chiusura roadmap + validator).
 - Prossima storia: US-334.
+
+[2026-09-06] US-334 — Il pet e i talenti come fonti di sinergia. BLOCCO H.
+
+- Le fonti di fase 3 espongono i tag come l'inventario (US-306), pronte per
+  la fase 4:
+  * PetSystem.tag_attivi() -> { tag: conteggio } = tag della specie + tag dei
+    comportamenti gia' sbloccati.
+  * TalentSystem.tag_attivi() -> { tag: conteggio } = tag_grant dei talenti
+    posseduti (tag_concessi() resta come Array per la UI).
+  * BaseSystem.tag_attivi() -> { tag: conteggio } = tag delle stanze costruite
+    (livello >= 1).
+- Dati: campo 'tag' nuovo su
+  * data/schema/room.schema.json + data/base/rooms.json (laboratorio:
+    pozione/scienza; stanza_rituale: rituale/occulto; biblioteca: conoscenza;
+    giardino: crescita/pozione).
+  * data/schema/pet.schema.json + data/pets/core.json - 'tag' per specie,
+    'tag' opzionale per comportamento. Nuova specie capra_lunare (erbivora,
+    tag bestia/crescita, comportamento brucare -> crescita, abilita
+    mother_dominio_druidico): e' la fonte 'pet' che mancava a
+    sinergia_crescita_pozione.
+- scripts/synergy_sources.gd (autoload SynergySources): per_fonte() ->
+  { inventario|pet|talenti|base: {tag: conteggio} }; tag_sinergia_globali()
+  somma tutto. NON risolve nessuna regola di sinergia (fase 4). Nessuna
+  sinergia e' nominata nel file, nessuna fonte conosce le sinergie.
+- validate_data.py: raccoglie i tag di stanze/pet(+comportamenti)/talenti in
+  obtainable_tags PRIMA del check sinergie; valida che i tag di stanze e pet
+  siano nel vocabolario chiuso di tags.json.
+- RISULTATO (AC): il warning "sinergia irraggiungibile" per
+  sinergia_crescita_pozione E' SPARITO - 'crescita' e 'pozione' sono ora
+  raggiungibili (giardino + capra_lunare). Restano a warning solo
+  sinergia_inganno_probabilita (probabilita') e anti_ordine_disordine
+  (ordine/disordine): appartengono a gruppi di Pathway differiti, atteso.
+- Come verificato: 496 test headless (491 + 5 in test_synergy_sources.gd:
+  il pet espone i tag di specie e dei comportamenti sbloccati; i talenti i
+  tag_grant; le stanze i loro tag; tag_sinergia_globali somma le 4 fonti
+  (crescita 2 = pet + giardino, pozione 2 = giardino + laboratorio, notte
+  dal talento, bestia dal pet); per_fonte elenca le 4 fonti senza nominare
+  sinergie). validate_data.py exit 0 (9 warning: 2 sinergie di gruppi
+  differiti + 5 acting sum + 89 stub + 1 i18n), i18n --check 0. Nessuna
+  verifica a schermo.
+- Prossima storia: US-335 (vertical slice della fase 3: un test che compone
+  giardino -> alchimia -> forgia -> sigilli -> pet -> talenti -> synergy
+  sources, tutto senza codice dedicato a un contenuto specifico). E' il
+  verdetto sull'architettura.

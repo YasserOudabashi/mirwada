@@ -4,6 +4,7 @@
   "room": {
     "name": "string in chiaro (seed i18n)",
     "name_i18n": "string, chiave i18n (categoria 'room')",
+    "tag": ["string dal vocabolario chiuso di data/tags.json - la stanza costruita li espone a SynergySources (US-334)"],
     "livelli": [
       {
         "costo": "{ item_id (esistente): quantita int > 0 } - consumato dall'inventario per raggiungere questo livello",

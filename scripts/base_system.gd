@@ -78,6 +78,20 @@ func stanze() -> Dictionary:
 	return _base.duplicate(true)
 
 
+## --- Fonte di sinergia (US-334) ---
+## I tag delle stanze COSTRUITE (livello >= 1). { tag: conteggio }.
+func tag_attivi() -> Dictionary:
+	var out: Dictionary = {}
+	if _gd() == null:
+		return out
+	for tipo in _base:
+		if int(_base[tipo]) <= 0:
+			continue
+		for t in (_gd().call("get_room_type", tipo) as Dictionary).get("tag", []):
+			out[str(t)] = int(out.get(str(t), 0)) + 1
+	return out
+
+
 # --- Mutazione ------------------------------------------------------
 
 ## Costruisce la stanza (porta al livello 1). false se gia' costruita, tipo

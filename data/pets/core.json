@@ -6,14 +6,15 @@
       "id": "lupo_cinereo",
       "name": "Lupo cinereo",
       "name_i18n": "pet.lupo_cinereo",
+      "tag": ["bestia", "guerra"],
       "hp_max": 60,
       "sequenza_iniziale": 9,
       "domabilita": 0.35,
       "ancora_id": "anchor_pet",
       "abilita": ["tg_carica_spalla"],
       "comportamenti": [
-        { "id": "difendi", "bond": 35 },
-        { "id": "assalto_coordinato", "bond": 70 }
+        { "id": "difendi", "bond": 35, "tag": ["difesa"] },
+        { "id": "assalto_coordinato", "bond": 70, "tag": ["guerra"] }
       ],
       "avanzamento": {
         "soglia_bond": 60,
@@ -25,19 +26,40 @@
       "id": "corvo_veggente",
       "name": "Corvo veggente",
       "name_i18n": "pet.corvo_veggente",
+      "tag": ["bestia", "divinazione"],
       "hp_max": 28,
       "sequenza_iniziale": 9,
       "domabilita": 0.5,
       "ancora_id": "anchor_pet",
       "abilita": ["fool_divinazione_pendolo"],
       "comportamenti": [
-        { "id": "avvista", "bond": 30 },
+        { "id": "avvista", "bond": 30, "tag": ["divinazione"] },
         { "id": "recupera", "bond": 65 }
       ],
       "avanzamento": {
         "soglia_bond": 55,
         "nutrimento": "pastura_spirituale",
         "hp_per_sequenza": { "9": 28, "8": 44, "7": 66 }
+      }
+    },
+    {
+      "id": "capra_lunare",
+      "name": "Capra lunare",
+      "name_i18n": "pet.capra_lunare",
+      "tag": ["bestia", "crescita"],
+      "hp_max": 34,
+      "sequenza_iniziale": 9,
+      "domabilita": 0.6,
+      "ancora_id": "anchor_pet",
+      "abilita": ["mother_dominio_druidico"],
+      "comportamenti": [
+        { "id": "brucare", "bond": 25, "tag": ["crescita"] },
+        { "id": "testata", "bond": 60 }
+      ],
+      "avanzamento": {
+        "soglia_bond": 50,
+        "nutrimento": "pastura_spirituale",
+        "hp_per_sequenza": { "9": 34, "8": 52, "7": 80 }
       }
     }
   ]

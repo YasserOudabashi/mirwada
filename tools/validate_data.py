@@ -536,6 +536,33 @@ def main():
         if soglie != sorted(soglie):
             err("data/audio.json [madness_layer]: le soglie non sono in ordine crescente.")
 
+    # --- fonti di tag di fase 3 (US-334): stanze costruibili, specie di pet
+    # (+ comportamenti), tag_grant dei talenti. Rendono raggiungibili le
+    # sinergie che pescano da questi sistemi. La VALIDAZIONE piena di quei
+    # file sta piu' sotto; qui si raccolgono solo i tag prima del check.
+    _rooms_doc = load_json(os.path.join(DATA, "base", "rooms.json")) or {}
+    for _t in _rooms_doc.get("rooms", {}).values():
+        for _tag in (_t.get("tag", []) if isinstance(_t, dict) else []):
+            obtainable_tags.add(_tag)
+    _pdir = os.path.join(DATA, "pets")
+    for _fn in sorted(os.listdir(_pdir)) if os.path.isdir(_pdir) else []:
+        if not _fn.endswith(".json"):
+            continue
+        for _pet in (load_json(os.path.join(_pdir, _fn)) or {}).get("pets", []):
+            for _tag in _pet.get("tag", []):
+                obtainable_tags.add(_tag)
+            for _comp in _pet.get("comportamenti", []):
+                for _tag in (_comp.get("tag", []) if isinstance(_comp, dict) else []):
+                    obtainable_tags.add(_tag)
+    _tdir = os.path.join(DATA, "talents")
+    for _fn in sorted(os.listdir(_tdir)) if os.path.isdir(_tdir) else []:
+        if not _fn.endswith(".json"):
+            continue
+        for _tal in (load_json(os.path.join(_tdir, _fn)) or {}).get("talents", []):
+            _eff = _tal.get("effetto", {})
+            if _eff.get("tipo") == "tag_grant" and _eff.get("tag"):
+                obtainable_tags.add(_eff["tag"])
+
     # --- sinergie ---
     sdir = os.path.join(DATA, "synergies")
     if os.path.isdir(sdir):
@@ -862,6 +889,9 @@ def main():
             for aid in pet.get("abilita", []):
                 if ability_ids and aid not in ability_ids:
                     err(f"{rel} [{pid}]: abilita '{aid}' non risolve a un'abilita' esistente")
+            for tg in pet.get("tag", []):
+                if tg not in valid_tags:
+                    err(f"{rel} [{pid}]: tag sconosciuto '{tg}' (vocabolario chiuso di data/tags.json)")
             for comp in pet.get("comportamenti", []):
                 if not isinstance(comp, dict) or not comp.get("id"):
                     err(f"{rel} [{pid}]: comportamento senza 'id'")
@@ -869,6 +899,9 @@ def main():
                 b = comp.get("bond")
                 if not isinstance(b, int) or not (0 <= b <= 100):
                     err(f"{rel} [{pid}]: comportamento '{comp.get('id')}': bond deve essere 0..100")
+                for tg in comp.get("tag", []):
+                    if tg not in valid_tags:
+                        err(f"{rel} [{pid}]: comportamento '{comp.get('id')}': tag sconosciuto '{tg}'")
             av = pet.get("avanzamento")
             if not isinstance(av, dict) or not av:
                 err(f"{rel} [{pid}]: manca 'avanzamento' (soglia_bond + nutrimento + hp_per_sequenza)")
@@ -908,6 +941,9 @@ def main():
         rel = "data/base/rooms.json"
         if not isinstance(room.get("name_i18n"), str) or not room.get("name_i18n"):
             err(f"{rel} [{tipo}]: name_i18n mancante o vuoto")
+        for tg in room.get("tag", []):
+            if tg not in valid_tags:
+                err(f"{rel} [{tipo}]: tag sconosciuto '{tg}' (vocabolario chiuso di data/tags.json)")
         livelli = room.get("livelli", [])
         if not isinstance(livelli, list) or not livelli:
             err(f"{rel} [{tipo}]: 'livelli' deve essere una lista non vuota")

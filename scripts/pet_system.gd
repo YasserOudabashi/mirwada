@@ -247,6 +247,25 @@ func avanza_pet() -> bool:
 	return true
 
 
+## --- Fonte di sinergia (US-334) ---
+
+## I tag che il pet ATTIVO porta: quelli della specie + quelli dei
+## comportamenti gia' sbloccati. { tag: conteggio }. {} se nessun pet.
+func tag_attivi() -> Dictionary:
+	if _pet.is_empty() or _gd() == null:
+		return {}
+	var specie: Dictionary = _gd().call("get_pet", str(_pet.get("pet_id", "")))
+	var out: Dictionary = {}
+	for t in specie.get("tag", []):
+		out[str(t)] = int(out.get(str(t), 0)) + 1
+	var sbloccati: Array = comportamenti_sbloccati()
+	for c in specie.get("comportamenti", []):
+		if str(c.get("id", "")) in sbloccati:
+			for t in c.get("tag", []):
+				out[str(t)] = int(out.get(str(t), 0)) + 1
+	return out
+
+
 func _comportamenti_specie() -> Array:
 	if _pet.is_empty() or _gd() == null:
 		return []

@@ -3,6 +3,7 @@
   "_comment": "Le 4 stanze della base (US-326). livelli[0] = livello 1. 'bonus' e' lo stato completo a quel livello, non un delta. Vocabolario chiuso di tipi e chiavi in data/schema/room_types.json. Numeri PLAUSIBILI, non bilanciati. Convenzione dei valori: rischio_esperimento = PUNTI PERCENTUALI interi (PotionSystem li divide per 100); qualita_pozione / qualita_forgia / ricette_avanzate_note / appezzamenti / resa_raccolto = conteggi interi.",
   "rooms": {
     "laboratorio": {
+      "tag": ["pozione", "scienza"],
       "name": "Laboratorio",
       "name_i18n": "room.laboratorio",
       "livelli": [
@@ -17,6 +18,7 @@
       ]
     },
     "stanza_rituale": {
+      "tag": ["rituale", "occulto"],
       "name": "Stanza rituale",
       "name_i18n": "room.stanza_rituale",
       "livelli": [
@@ -31,6 +33,7 @@
       ]
     },
     "biblioteca": {
+      "tag": ["conoscenza"],
       "name": "Biblioteca",
       "name_i18n": "room.biblioteca",
       "livelli": [
@@ -45,6 +48,7 @@
       ]
     },
     "giardino": {
+      "tag": ["crescita", "pozione"],
       "name": "Giardino",
       "name_i18n": "room.giardino",
       "livelli": [
