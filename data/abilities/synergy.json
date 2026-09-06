@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "_comment": "Abilita' concesse dalle sinergie: NON appartengono a un Pathway. Il sequence_id e' preso in prestito (il validator lo esige esistente) dal Pathway tematicamente piu' vicino - qui 'fool', per il tema destino/inganno - ma il gameplay non lo usa per il gating: l'abilita' arriva da aggiungi_abilita, non dalla progressione.",
+  "abilities": [
+    {
+      "schema_version": 1,
+      "id": "sinergia_colpo_del_caso",
+      "name_i18n": "ability.fool.sinergia_colpo_del_caso",
+      "sequence_id": "fool_1",
+      "costo_spiritualita": 15,
+      "cooldown": 20.0,
+      "primitive": [
+        { "tipo": "buff_stat", "stat": "evasione", "valore": 8, "durata": 6.0, "moltiplicativo": false },
+        { "tipo": "buff_stat", "stat": "precisione", "valore": 8, "durata": 6.0, "moltiplicativo": false }
+      ],
+      "tag_sinergia": ["destino", "inganno"],
+      "note": "La sinergia firma del gioco: sinergia_inganno_probabilita la presta. Per qualche secondo la sorte gira dalla tua parte - schivi meglio e colpisci meglio. Solo primitive del registro chiuso, nessuna nuova."
+    }
+  ]
+}

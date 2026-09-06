@@ -4341,3 +4341,34 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
   libro col fog of war), US-411 (reattivita' dal vivo). Fase 4: 11/16.
 - Prossima storia: US-412 (sinergia_colpo_del_caso: l'abilita' che
   sinergia_inganno_probabilita promette; togliere lo stub). BLOCCO C.
+
+[2026-09-06] US-412 — sinergia_colpo_del_caso, l'abilita' della sinergia firma. BLOCCO C.
+
+- data/abilities/synergy.json (NUOVO file): sinergia_colpo_del_caso.
+  Due primitive buff_stat dal registro chiuso (evasione +8 e precisione +8
+  flat per 6s): "per un momento la sorte gira dalla tua parte". Nessuna
+  primitiva nuova. tag_sinergia [destino, inganno].
+- sequence_id: "fool_1" PRESO IN PRESTITO. Il validator esige un sequence_id
+  esistente (pattern ^..._[0-9]$ + deve risolvere a una Sequenza reale), e la
+  convenzione "synergy" del PRD non lo soddisfa. Precedente gia' nel codebase:
+  mother_dominio_druidico (concessa da sinergia_istinto_bestiale) usa
+  "mother_5" allo stesso modo. Il gameplay NON usa il sequence_id per il
+  gating: l'abilita' entra da aggiungi_abilita, non dalla progressione.
+- name_i18n: "ability.fool.sinergia_colpo_del_caso". generate_i18n_stubs.py
+  deriva lo scope dal sequence_id (fool_1 -> fool) e la canonicalizza cosi';
+  stub "TODO ..." in it.json (63 stub totali, era 62).
+- core.json: sinergia_inganno_probabilita perde "stub": true. Resta
+  IRRAGGIUNGIBILE: il tag probabilita' arriva solo dal gruppo differito
+  key_of_light -> il validator la elenca ancora tra le irraggiungibili
+  (warning ATTESO, elencato qui). Le irraggiungibili restano 2:
+  sinergia_inganno_probabilita (probabilita') e anti_ordine_disordine
+  (ordine/disordine).
+- Il validator non da' piu' l'errore "effetto aggiunge l'abilita' inesistente".
+- Come verificato: 529 test headless (528 + 1 in test_synergy_engine.gd:
+  l'abilita' e' nel registro di GameData; grant_permanente + execute riesce,
+  0 warning di primitiva, 2 effects dai due buff_stat). validate_data.py
+  exit 0, 9 warning invariati. 1 SCRIPT ERROR preesistente, nessuno nuovo.
+  Nessuna verifica a schermo: dati + motore.
+- Prossima storia: US-413 (BATCH 1: 8 sinergie raggiungibili, una per
+  meccanismo, inclusa la sinergia del CRITERIO DI USCITA pet+stanza+talento;
+  test_slice_fase_4.gd).

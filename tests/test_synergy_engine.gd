@@ -430,6 +430,22 @@ func test_contatore_sale_attivando_una_nascosta() -> void:
 	_fine()
 
 
+func test_sinergia_colpo_del_caso_e_scritta_e_si_esegue() -> void:
+	# US-412: l'abilita' che sinergia_inganno_probabilita promette (stub tolto).
+	var ae: Node = Engine.get_main_loop().root.get_node_or_null("AbilityEngine")
+	assert_false((_gd().call("get_ability", "sinergia_colpo_del_caso") as Dictionary).is_empty(),
+		"l'abilita' della sinergia firma e' nel registro di GameData")
+	_stats().call("configure_from_balance", 0)  # sequenza forte -> spiritualita piena
+	assert_true(ae.call("grant_permanente", "sinergia_colpo_del_caso"), "concessa al player")
+	var r: Dictionary = ae.call("execute", "sinergia_colpo_del_caso", _p)
+	assert_true(bool(r["ok"]), "execute riesce")
+	assert_true((r["warnings"] as PackedStringArray).is_empty(),
+		"nessun warning di primitiva: tutte dal registro chiuso")
+	assert_eq((r["effects"] as Array).size(), 2, "i due buff_stat sono applicati")
+	ae.call("revoca_permanente", "sinergia_colpo_del_caso")
+	_fine()
+
+
 func test_aggiungi_abilita_concede_e_revoca() -> void:
 	var ae: Node = Engine.get_main_loop().root.get_node_or_null("AbilityEngine")
 	# sinergia_istinto_bestiale: aggiungi_abilita mother_dominio_druidico

@@ -236,8 +236,8 @@
       ],
       "priority": 12,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO C. data/abilities/synergy.json (nuovo): sinergia_colpo_del_caso - 2x buff_stat (evasione +8, precisione +8, 6s, flat) dal registro chiuso, tag_sinergia [destino, inganno]. sequence_id 'fool_1' preso in prestito (il validator lo esige esistente; il gameplay non lo usa - l'abilita' arriva da aggiungi_abilita, non dalla progressione); name_i18n ability.fool.sinergia_colpo_del_caso (canonicalizzato da generate_i18n_stubs, stub in it.json). core.json: sinergia_inganno_probabilita perde stub:true; resta IRRAGGIUNGIBILE (tag probabilita' del gruppo differito key_of_light) -> warning atteso, invariato. Il validator non segnala piu' 'abilita' inesistente'. 529 test headless (528 + 1: l'abilita' e' nel registro, grant_permanente + execute riesce senza warning di primitiva, 2 effects). validate exit 0 (9 warning invariati). Nessuna verifica a schermo (dati + motore)."
     },
     {
       "id": "US-413",
