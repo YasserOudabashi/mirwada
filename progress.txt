@@ -3764,3 +3764,40 @@ sezione test aggiornata.
 - Prossima storia: US-333 (sezione Talenti nel libro: posseduti con effetto +
   acquisiti non presi con barra di progresso count/target, offuscati se
   progresso 0). Chiude il blocco G.
+
+[2026-09-06] US-333 — La sezione talenti nel libro. BLOCCO G CHIUSO.
+
+- scripts/pages/page_inventario.gd: la sezione "talenti" (ultimo segnaposto
+  BOOK_INV_ARRIVA) diventa reale. _talenti():
+  * titolo "Talenti" + una riga per talento posseduto (TalentSystem.
+    posseduti()): "nome (tr_data) - <riassunto effetto>". Nessun posseduto ->
+    "Nessun talento".
+  * titolo "In arrivo" + per ogni acquisito NON posseduto: count =
+    EventTracker.count(evento, filtri) se evento e' uno dei 12,
+    TalentTracker.count(evento) se e' un comportamento-talento.
+    - count == 0 -> Label "Talento sconosciuto" con modulate.a 0.55: non sai
+      cosa non hai ancora iniziato a fare (stesso principio del fog of war del
+      ricettario / diagramma).
+    - count > 0 -> HBox: nome + ProgressBar (max_value = target,
+      value = min(count, target)) + Label "count / target".
+- assets/i18n/strings.csv: 3 chiavi (BOOK_TAL_POSSEDUTI, _IN_ARRIVO,
+  _SCONOSCIUTO). .translation rigenerati con --import.
+- Come verificato: 491 test headless (488 + 3 in test_page_talenti.gd:
+  un talento posseduto compare col suo effetto (nome + "precisione" nel
+  riassunto); un acquisito con progresso ha una ProgressBar al valore del
+  contatore + la Label "2000 / 8000"; un acquisito senza progresso e' una
+  riga "Talento sconosciuto" a modulate.a 0.55). validate_data.py exit 0
+  (9 warning invariati).
+  VERIFICA A SCHERMO (main.tscn + book_overlay, Godot locale): tab Talents;
+  fra i posseduti "Mano ferma - tipo stat_modifier, stat precisione, valore
+  6, moltiplicativo false" e "Spirito vivace - ... spiritualita_max, valore
+  0.15, moltiplicativo true"; sotto "In progress" le righe "Unknown talent"
+  offuscate e (sotto la piega del capture 640x360 - un lembo di barra e'
+  visibile in fondo) le ProgressBar degli acquisiti con progresso.
+  Screenshot talenti.png nel tmp del job.
+- BLOCCO G CHIUSO: US-330 (schema + vocabolario), US-331 (TalentTracker +
+  emettitori + TalentSystem), US-332 (innati alla creazione), US-333 (sezione
+  nel libro). Fase 3: 32/35. Resta il BLOCCO H: US-334 (pet e talenti come
+  fonti di sinergia), US-335 (vertical slice - il verdetto sull'architettura),
+  US-336 (chiusura roadmap + validator).
+- Prossima storia: US-334.

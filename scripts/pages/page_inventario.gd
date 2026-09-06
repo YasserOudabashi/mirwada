@@ -49,6 +49,7 @@ func _mostra(sezione: String) -> void:
 		"indosso": _indosso()
 		"ricettario": _ricettario()
 		"base": _base()
+		"talenti": _talenti()
 		_: _corpo.add_child(_riga(tr("BOOK_INV_ARRIVA")))
 
 
@@ -235,6 +236,62 @@ func _riassunto_costo(costo: Dictionary) -> String:
 		var nome: String = str(gd.call("tr_data", (gd.call("get_item", item_id) as Dictionary).get("name_i18n", item_id)))
 		parti.append("%s x%d" % [nome, int(costo[item_id])])
 	return ", ".join(parti)
+
+
+func _talenti() -> void:
+	var gd: Node = _n("/root/GameData")
+	var ts: Node = _n("/root/TalentSystem")
+	if gd == null or ts == null:
+		return
+	var et: Node = _n("/root/EventTracker")
+	var tt: Node = _n("/root/TalentTracker")
+	var eventi_vocab: Dictionary = gd.call("get_tracked_events")
+
+	# --- posseduti ---
+	var posseduti: Array = ts.call("posseduti")
+	_corpo.add_child(_titolo(tr("BOOK_TAL_POSSEDUTI")))
+	if posseduti.is_empty():
+		_corpo.add_child(_riga(tr("BOOK_FRONTESPIZIO_NESSUN_TALENTO")))
+	for tid in posseduti:
+		var t: Dictionary = gd.call("get_talent", tid)
+		var nome: String = str(gd.call("tr_data", t.get("name_i18n", tid)))
+		_corpo.add_child(_riga("%s — %s" % [nome, _riassunto(t.get("effetto", {}))]))
+
+	# --- acquisiti non ancora presi ---
+	_corpo.add_child(_titolo(tr("BOOK_TAL_IN_ARRIVO")))
+	for tid in gd.call("talents_per_tipo", "acquisito"):
+		if ts.call("possiede", tid):
+			continue
+		var t: Dictionary = gd.call("get_talent", tid)
+		var sb: Dictionary = t.get("sblocco", {})
+		var ev: String = str(sb.get("evento", ""))
+		var target: float = float(sb.get("target", 1.0))
+		var conta: float = 0.0
+		if eventi_vocab.has(ev):
+			conta = float(et.call("count", ev, sb.get("filtri", {}))) if et != null else 0.0
+		elif tt != null:
+			conta = float(tt.call("count", ev))
+		if conta <= 0.0:
+			# nessun progresso: non sai cosa non hai ancora iniziato a fare
+			var o := Label.new()
+			o.text = tr("BOOK_TAL_SCONOSCIUTO")
+			o.modulate = Color(1, 1, 1, 0.55)
+			_corpo.add_child(o)
+			continue
+		var h := HBoxContainer.new()
+		var l := Label.new()
+		l.text = str(gd.call("tr_data", t.get("name_i18n", tid)))
+		l.custom_minimum_size = Vector2(160, 0)
+		h.add_child(l)
+		var barra := ProgressBar.new()
+		barra.max_value = target
+		barra.value = minf(conta, target)
+		barra.custom_minimum_size = Vector2(140, 14)
+		h.add_child(barra)
+		var q := Label.new()
+		q.text = "%d / %d" % [int(conta), int(target)]
+		h.add_child(q)
+		_corpo.add_child(h)
 
 
 func testo_visibile() -> String:

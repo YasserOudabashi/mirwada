@@ -638,8 +638,8 @@
       ],
       "priority": 32,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO G CHIUSO. scripts/pages/page_inventario.gd: la sezione 'talenti' (era il segnaposto BOOK_INV_ARRIVA) diventa reale. _talenti(): titolo 'Talenti' + un riga per talento posseduto (TalentSystem.posseduti()) 'nome - <riassunto effetto>'; titolo 'In arrivo' + per ogni acquisito NON posseduto: count = EventTracker.count(evento, filtri) se e' uno dei 12, TalentTracker.count(evento) se e' un comportamento-talento. count == 0 -> riga OFFUSCATA (Label 'Talento sconosciuto', modulate.a 0.55: non sai cosa non hai ancora iniziato a fare). count > 0 -> HBox con nome + ProgressBar (max_value = target, value = min(count, target)) + Label 'count / target'. strings.csv: 3 chiavi BOOK_TAL_POSSEDUTI / _IN_ARRIVO / _SCONOSCIUTO, .translation rigenerati. 491 test headless (488 + 3 in test_page_talenti.gd: un posseduto compare col suo effetto; un acquisito con progresso ha ProgressBar al valore giusto + il conteggio 'count / target'; un acquisito senza progresso e' una riga offuscata a 0.55). validate_data.py exit 0. VERIFICA A SCHERMO (main.tscn + book_overlay, Godot locale): tab Talents; 'Mano ferma - tipo stat_modifier, stat precisione, valore 6...' e 'Spirito vivace...' fra i posseduti; sotto 'In progress' le righe 'Unknown talent' offuscate e (sotto la piega del capture 640x360, visibile un lembo di barra) le ProgressBar degli acquisiti in corso. Screenshot talenti.png nel tmp del job. BLOCCO G CHIUSO: US-330..333. Fase 3: 32/35."
     },
     {
       "id": "US-334",

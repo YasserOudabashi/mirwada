@@ -77,3 +77,6 @@ BOOK_BASE_RACCOGLI,Raccogli,Harvest
 BOOK_FRONTESPIZIO_TALENTI,Talenti innati — scegline %d,Innate talents — pick %d
 BOOK_FRONTESPIZIO_I_TUOI_TALENTI,I tuoi talenti,Your talents
 BOOK_FRONTESPIZIO_NESSUN_TALENTO,Nessun talento,No talents
+BOOK_TAL_POSSEDUTI,Talenti,Talents
+BOOK_TAL_IN_ARRIVO,In arrivo,In progress
+BOOK_TAL_SCONOSCIUTO,Talento sconosciuto,Unknown talent
