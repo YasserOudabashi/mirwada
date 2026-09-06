@@ -691,7 +691,25 @@ func _p_decay(prim: Dictionary, caster: Node, stats: Node, _ability_id: String) 
 	var durata: float = _num(prim.get("durata"), 0.0)
 
 	var rec: Dictionary = {"tipo": "decay", "danno": danno, "raggio": raggio,
-			"colpisce_oggetti": colpisce_oggetti, "durata": durata, "campo": false}
+			"colpisce_oggetti": colpisce_oggetti, "durata": durata, "campo": false,
+			"strutture_colpite": []}
+
+	# colpisce_oggetti (US-320): le strutture non hanno un Node in scena, vivono
+	# solo in StructureRegistry. Le colpiamo qui, al lancio, con il danno TOTALE
+	# del decay in un colpo: sono bersagli grossolani (hp 25-60), spalmare il
+	# tick su di loro non aggiunge nulla. Colpisce OGNI struttura in raggio,
+	# comprese quelle del giocatore (data/abilities/twilight_giant.json: tg_2
+	# "deve poter danneggiare la propria base"). La crollo che ne deriva NON e'
+	# volontario: la scelta deliberata di lasciar decadere una struttura e'
+	# StructureRegistry.distruggi(iid, true), un'altra strada.
+	if colpisce_oggetti and raggio > 0.0 and caster is Node2D and (caster as Node2D).is_inside_tree():
+		var sr: Node = get_tree().root.get_node_or_null("StructureRegistry")
+		if sr != null:
+			var centro: Vector2 = (caster as Node2D).global_position
+			for iid in sr.call("in_raggio", centro, raggio):
+				sr.call("danneggia", iid, danno)
+				(rec["strutture_colpite"] as Array).append(iid)
+
 	if durata <= 0.0:
 		return rec
 

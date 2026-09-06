@@ -3204,3 +3204,39 @@ sezione test aggiornata.
   la story non tocca UI.
 - Prossima storia: US-320 (colpisce_oggetti - le abilita' d'area danneggiano
   le strutture via StructureRegistry).
+
+[2026-09-06] US-320 — colpisce_oggetti: le abilita' d'area rompono le strutture
+
+- scripts/ability_engine.gd _p_decay: quando colpisce_oggetti:true e raggio>0
+  e il caster e' un Node2D in scena, interroga
+  StructureRegistry.in_raggio(caster.global_position, raggio) e chiama
+  danneggia(iid, danno) su ognuna. Il danno applicato e' il TOTALE del decay
+  in un colpo, non spalmato sul tick: le strutture (hp 25-60) sono bersagli
+  grossolani, il campo di gioco non ha un Node struttura da colpire tick per
+  tick (vivono solo nel registro). rec["strutture_colpite"] elenca gli iid.
+- "ogni altra primitiva che lo dichiara": nel registro chiuso solo `decay`
+  ha colpisce_oggetti nei params. Nessun framework generico per una sola
+  primitiva (ponytail). Se un domani una seconda primitiva d'area lo
+  dichiara, si copia il blocchetto.
+- DECISIONE (gia' scritta nei dati, nota di tg_crepuscolo in
+  data/abilities/twilight_giant.json — qui solo ratificata): l'AoE colpisce
+  OGNI struttura in raggio, anche quelle del giocatore. tg_2 "deve poter
+  danneggiare la propria base".
+- Voluntario vs non: il crollo che arriva da danneggia()->hp<=0 e'
+  structure_destroyed{volontario:FALSE} (e' danno da combattimento). La
+  strada per tg_2_accetta_decadimento (structure_destroyed{volontario:true})
+  resta StructureRegistry.distruggi(iid, true) — una scelta deliberata del
+  giocatore, non l'AoE. Quel percorso e' gia' verificato end-to-end in
+  US-319 (test: distruggi(.,true) -> EventTracker.count con filtro
+  {volontario:true} = 1). L'acting_action puo' quindi riempirsi da gioco
+  reale: il filtro {volontario:true} e' valido per structure_destroyed
+  (tracked_events.json) e EventTracker lo conta.
+- Come verificato: 412 test headless (407 + 5 in test_colpisce_oggetti.gd:
+  decay in raggio -> la struttura perde hp (60->40); fuori raggio -> intatta;
+  senza colpisce_oggetti -> intatta; decay che porta hp a 0 -> crollo
+  contato come NON volontario; tg_crepuscolo via execute() degrada la
+  palizzata). validate_data.py exit 0 (9 warning invariati). Nessuna verifica
+  a schermo: la story non tocca UI.
+- BLOCCO D CHIUSO: US-319 (StructureRegistry) + US-320 (colpisce_oggetti).
+  Fase 3: 19/35. Prossimo blocco: E - pet (US-321 schema e magazzino dei pet).
+- Prossima storia: US-321 (schema pet + PetSystem + il pet E' un'Ancora).

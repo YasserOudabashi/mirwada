@@ -380,8 +380,8 @@
       ],
       "priority": 19,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO D. _p_decay (scripts/ability_engine.gd): con colpisce_oggetti:true e raggio>0 e caster Node2D in scena, cerca StructureRegistry.in_raggio(pos,raggio) e chiama danneggia(iid, danno) su ognuna - danno TOTALE del decay in un colpo (le strutture sono bersagli grossolani, hp 25-60: spalmare il tick non aggiunge nulla). rec['strutture_colpite'] elenca gli iid per ispezione/test. DECISIONE (gia' fissata in data/abilities/twilight_giant.json, nota di tg_crepuscolo): colpisce OGNI struttura in raggio, comprese quelle del giocatore - tg_2 deve poter degradare la propria base. Il crollo da AoE e' structure_destroyed{volontario:FALSE}; la scelta deliberata di lasciar decadere una struttura (che alimenta tg_2_accetta_decadimento) e' StructureRegistry.distruggi(iid,true), gia' verificata in US-319. 'ogni altra primitiva che lo dichiara': solo decay lo ha nei params del registro chiuso, nessun framework generico (ponytail). Nessun cambio al validator (nessun AC lo chiede). 412 test headless (407 + 5 in test_colpisce_oggetti.gd: in raggio perde hp; fuori raggio intatta; senza colpisce_oggetti intatta; azzerata -> crollo non volontario; tg_crepuscolo via execute degrada la palizzata). validate_data.py exit 0. Nessuna verifica a schermo: nessuna UI."
     },
     {
       "id": "US-321",
