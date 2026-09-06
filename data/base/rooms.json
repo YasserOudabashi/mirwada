@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "_comment": "Le 4 stanze della base (US-326). livelli[0] = livello 1. 'bonus' e' lo stato completo a quel livello, non un delta. Vocabolario chiuso di tipi e chiavi in data/schema/room_types.json. Numeri PLAUSIBILI, non bilanciati.",
+  "_comment": "Le 4 stanze della base (US-326). livelli[0] = livello 1. 'bonus' e' lo stato completo a quel livello, non un delta. Vocabolario chiuso di tipi e chiavi in data/schema/room_types.json. Numeri PLAUSIBILI, non bilanciati. Convenzione dei valori: rischio_esperimento = PUNTI PERCENTUALI interi (PotionSystem li divide per 100); qualita_pozione / qualita_forgia / ricette_avanzate_note / appezzamenti / resa_raccolto = conteggi interi.",
   "rooms": {
     "laboratorio": {
       "name": "Laboratorio",
@@ -8,11 +8,11 @@
       "livelli": [
         {
           "costo": { "lingotto_ferro": 3, "cristallo_grezzo": 1 },
-          "bonus": { "rischio_esperimento": -0.1 }
+          "bonus": { "rischio_esperimento": -10 }
         },
         {
           "costo": { "lingotto_ferro": 6, "cristallo_grezzo": 3 },
-          "bonus": { "rischio_esperimento": -0.2, "qualita_pozione": 1 }
+          "bonus": { "rischio_esperimento": -20, "qualita_pozione": 1 }
         }
       ]
     },

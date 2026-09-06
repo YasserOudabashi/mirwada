@@ -69,14 +69,15 @@ func test_tipo_sconosciuto() -> void:
 func test_potenzia_sale_di_livello_e_aggiorna_il_bonus() -> void:
 	_rifornisci(_bs().call("costo_prossimo", "laboratorio"))
 	_bs().call("costruisci", "laboratorio")
-	assert_eq(_bs().call("bonus", "laboratorio"), {"rischio_esperimento": -0.1},
-		"bonus del livello 1")
+	var b1: Dictionary = _bs().call("bonus", "laboratorio")
+	assert_eq(b1.size(), 1, "il livello 1 ha una sola chiave di bonus")
+	assert_almost_eq(float(b1.get("rischio_esperimento", 0.0)), -10.0, "rischio del livello 1")
 
 	_rifornisci(_bs().call("costo_prossimo", "laboratorio"))
 	assert_true(_bs().call("potenzia", "laboratorio"), "potenziata")
 	assert_eq(_bs().call("livello", "laboratorio"), 2, "livello 2")
 	var b: Dictionary = _bs().call("bonus", "laboratorio")
-	assert_almost_eq(float(b.get("rischio_esperimento", 0.0)), -0.2, "rischio del livello 2")
+	assert_almost_eq(float(b.get("rischio_esperimento", 0.0)), -20.0, "rischio del livello 2 (punti %)")
 	assert_eq(int(b.get("qualita_pozione", 0)), 1, "qualita_pozione del livello 2")
 
 

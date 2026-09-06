@@ -3504,3 +3504,41 @@ sezione test aggiornata.
 - Prossima storia: US-327 (le stanze alimentano i loro sistemi: PotionSystem
   legge bonus("laboratorio"), Forge bonus("stanza_rituale"), biblioteca ->
   ricette note).
+
+[2026-09-06] US-327 — Le stanze alimentano i loro sistemi. BLOCCO F.
+
+- I ganci c'erano gia': PotionSystem._bonus_stanza / Forge._bonus_stanza
+  (scritti in blocco B / US-316 come no-op finche' BaseSystem non esisteva).
+  Ora BaseSystem esiste (US-326) e si accendono da soli. Tutti leggono
+  bonus(tipo) PER CHIAVE: nessun if sul nome di una stanza.
+  * PotionSystem._riduzione_rischio() <- 'rischio_esperimento' (laboratorio)
+  * PotionSystem._qualita_finale()    <- 'qualita_pozione'   (laboratorio)
+  * Forge._qualita_finale()           <- 'qualita_forgia'    (stanza_rituale)
+- FIX di segno in _riduzione_rischio: 'rischio_esperimento' e' NEGATIVO nei
+  dati (-20 = "il rischio scende di 20 punti"), ma _fallimento fa
+  1 - clampf(riduzione, 0, 0.95): serve una riduzione POSITIVA. Prima
+  return bonus/100 -> -0.2 -> clampata a 0 -> nessun effetto. Ora
+  return -(bonus + talento)/100 -> 0.20. Convenzione ("rischio_esperimento =
+  punti percentuali interi negativi") scritta nel _comment di rooms.json.
+  Nessuna regressione: senza BaseSystem il valore era 0, resta 0.
+- NUOVO - la biblioteca: PotionSystem.ricetta_nota() ora, per una ricetta
+  tier 'avanzata', restituisce true anche se il suo indice nella lista delle
+  avanzate ORDINATA e' < bonus('biblioteca').ricette_avanzate_note. Cioe':
+  biblioteca lv1 rende nota la 1a avanzata, lv2 le prime 2 - senza
+  sperimentare. GameData.recipes_per_tier ora fa out.sort() per un ordine
+  stabile fra macchine (l'unlock dev'essere deterministico).
+- RitualSystem: nessun bonus di build definito. stanza_rituale da' solo
+  'qualita_forgia' (che consuma la Forge). L'AC dice "un eventuale bonus di
+  build": se servira' si aggiunge una chiave a room_types.json
+  bonus_ammessi.stanza_rituale. Non inventata ora (ponytail).
+- giardino: US-328.
+- Come verificato: 459 test headless (454 + 5 in
+  test_stanze_alimentano_sistemi.gd: laboratorio lv2 -> ric_cura_minore da
+  'pura' a 'eccelsa'; _riduzione_rischio 0 -> 0.20; su 100 sperimenta seedati
+  con la stessa combo, meno esiti 'aberrazione' col laboratorio; stanza
+  rituale lv2 -> bp_amuleto_lunare da 'instabile' a 'eccelsa'; biblioteca lv1
+  sblocca ric_cura_maggiore, non ric_elisir_ombra; lv2 sblocca anche quella).
+  validate_data.py exit 0 (9 warning invariati). Nessuna verifica a schermo:
+  la pagina Base e' US-329.
+- Prossima storia: US-328 (il giardino: pianta/raccogli, crescita col tempo
+  di gioco, appezzamenti = livello del giardino, ingredienti coltivabile:true).

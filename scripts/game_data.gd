@@ -353,6 +353,7 @@ func recipes_per_tier(tier: String) -> Array:
 	for id in _dict_or_empty(_recipes.get("recipes")):
 		if str((_recipes["recipes"][id] as Dictionary).get("tier", "")) == tier:
 			out.append(id)
+	out.sort()  # ordine stabile: la biblioteca (US-327) sblocca le prime N
 	return out
 
 

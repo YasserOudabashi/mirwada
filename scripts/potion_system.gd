@@ -168,7 +168,17 @@ func ricetta_nota(recipe_id: String) -> bool:
 	if bool(r.get("nota_da_subito", false)):
 		return true
 	var kn: Node = get_node_or_null("/root/KnowledgeStore")
-	return kn != null and bool(kn.call("conosce", "ricetta:" + recipe_id))
+	if kn != null and bool(kn.call("conosce", "ricetta:" + recipe_id)):
+		return true
+	# US-327: la biblioteca rende note le prime N ricette 'avanzata' (in ordine
+	# stabile) senza doverle sperimentare. N = bonus 'ricette_avanzate_note'.
+	if str(r.get("tier", "")) == "avanzata":
+		var quante: int = _bonus_stanza("biblioteca", "ricette_avanzate_note")
+		if quante > 0:
+			var idx: int = (gd.call("recipes_per_tier", "avanzata") as Array).find(recipe_id)
+			if idx >= 0 and idx < quante:
+				return true
+	return false
 
 
 ## Prepara una ricetta nota consumando gli ingredienti dall'inventario.
@@ -324,9 +334,12 @@ func _evoca_aberrazione(entita_id: String) -> void:
 		found.call("applica", float(b.get("malus_fondamenta_aberrazione", -15.0)), "aberrazione_alchemica")
 
 
+## rischio_esperimento (laboratorio) e alchimia_rischio (talento) sono NEGATIVI
+## nei dati: -20 = "il rischio scende di 20 punti". Qui li si gira in una
+## riduzione POSITIVA in [0, 1] che _fallimento sottrae dal peso mostruoso.
 func _riduzione_rischio() -> float:
-	return float(_bonus_stanza("laboratorio", "rischio_esperimento")) / 100.0 \
-		+ float(_bonus_talento("alchimia_rischio")) / 100.0
+	return -(float(_bonus_stanza("laboratorio", "rischio_esperimento"))
+		+ float(_bonus_talento("alchimia_rischio"))) / 100.0
 
 
 func _multiset(a: Array) -> Dictionary:

@@ -520,8 +520,8 @@
       ],
       "priority": 26,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO F. I ganci erano gia' nel codice (scritti in blocco B/US-316 come no-op finche' BaseSystem non esisteva): ora BaseSystem c'e' e si accendono. PotionSystem._riduzione_rischio() legge _bonus_stanza('laboratorio', 'rischio_esperimento'); _qualita_finale() legge 'qualita_pozione'. Forge._qualita_finale() legge _bonus_stanza('stanza_rituale', 'qualita_forgia'). Tutti per CHIAVE, nessun if sul nome della stanza. FIX: _riduzione_rischio girava il segno male - rischio_esperimento e' NEGATIVO nei dati (-20 = -20 punti), _fallimento fa 1 - clampf(riduzione, 0, 0.95) quindi serve una riduzione POSITIVA: ora return -(bonus+talento)/100. Convenzione documentata in rooms.json (_comment). NUOVO: biblioteca. PotionSystem.ricetta_nota() se tier=='avanzata' e idx nella lista avanzate ordinata < bonus('biblioteca').ricette_avanzate_note -> nota senza sperimentare. GameData.recipes_per_tier ora ordina (out.sort()) per un unlock stabile. RitualSystem: nessun bonus di build definito (stanza_rituale da' solo qualita_forgia alla Forge); 'eventuale' nell'AC, si aggiunge una chiave a bonus_ammessi.stanza_rituale se servira'. giardino = US-328. 459 test headless (454 + 5 in test_stanze_alimentano_sistemi.gd: laboratorio lv2 -> pozione da 'pura' a 'eccelsa' e _riduzione_rischio 0->0.20 e meno aberrazioni su 100 sperimenta seedati; stanza_rituale lv2 -> forgia da 'instabile' a 'eccelsa'; biblioteca lv1 sblocca la 1a avanzata, lv2 la 2a). validate exit 0. Nessuna verifica a schermo: la UI e' US-329."
     },
     {
       "id": "US-328",
