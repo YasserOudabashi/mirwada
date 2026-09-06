@@ -189,7 +189,8 @@
         "durata",
         "vulnerabilita_corpo",
         "velocita"
-      ]
+      ],
+      "implemented": true
     },
     "plant_growth": {
       "params": [
@@ -247,7 +248,8 @@
         "hp_ripristinati",
         "costo_follia",
         "cooldown"
-      ]
+      ],
+      "implemented": true
     },
     "decay": {
       "params": [

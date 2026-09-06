@@ -350,6 +350,204 @@
         "singolo"
       ],
       "note": "Torni in piedi quando dovresti essere a terra."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_recisione",
+      "name_i18n": "ability.death.death_recisione",
+      "sequence_id": "death_3",
+      "costo_spiritualita": 22,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "soul_detach",
+          "durata": 8.0,
+          "vulnerabilita_corpo": 0.6,
+          "velocita": 1.4
+        },
+        {
+          "tipo": "dot",
+          "danno_tick": 10,
+          "tick_rate": 1.0,
+          "durata": 8.0,
+          "tag_danno": "spirito"
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "anima",
+        "spirito",
+        "singolo"
+      ],
+      "note": "Il Ferryman recide: anima e corpo si staccano, il corpo abbandonato quasi non combatte."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_traghetto",
+      "name_i18n": "ability.death.death_traghetto",
+      "sequence_id": "death_3",
+      "costo_spiritualita": 16,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "heal",
+          "quantita": 30,
+          "istantaneo": true,
+          "bersaglio": "self"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "spiritualita_max",
+          "valore": 0.2,
+          "durata": 15.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "anima",
+        "guarigione"
+      ],
+      "note": "Traghettare un'anima e' una risorsa: ogni passaggio restituisce forza."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_editto_di_morte",
+      "name_i18n": "ability.death.death_editto_di_morte",
+      "sequence_id": "death_2",
+      "costo_spiritualita": 30,
+      "cooldown": 40.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.4,
+          "durata": 12.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "aura",
+          "raggio": 8,
+          "durata": -1,
+          "effetto": "decadimento",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "decadimento",
+        "dominio",
+        "area"
+      ],
+      "note": "Un editto che non si revoca: chi entra nel raggio decade finche' il Console vive."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_sentenza",
+      "name_i18n": "ability.death.death_sentenza",
+      "sequence_id": "death_1",
+      "costo_spiritualita": 35,
+      "cooldown": 25.0,
+      "primitive": [
+        {
+          "tipo": "dot",
+          "danno_tick": 35,
+          "tick_rate": 0.5,
+          "durata": 6.0,
+          "tag_danno": "spirito"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.6,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "spirito",
+        "singolo"
+      ],
+      "note": "Sotto una certa soglia di vita la sentenza e' immediata: qui e' resa come un dot brutale (l'uccisione istantanea vera arriva col combat, fase 6)."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_imperatore_resurrezione",
+      "name_i18n": "ability.death.death_imperatore_resurrezione",
+      "sequence_id": "death_1",
+      "costo_spiritualita": 28,
+      "cooldown": 30.0,
+      "primitive": [
+        {
+          "tipo": "resurrect",
+          "bersaglio": "evocazione",
+          "hp_ripristinati": 80,
+          "costo_follia": 5.0,
+          "cooldown": 30.0
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "non_morto",
+        "guarigione"
+      ],
+      "note": "Il Pale Emperor rialza gli alleati caduti. Il prezzo e' follia."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_autorita_finale",
+      "name_i18n": "ability.death.death_autorita_finale",
+      "sequence_id": "death_0",
+      "costo_spiritualita": 50,
+      "cooldown": 60.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 15,
+          "durata": -1,
+          "effetto": "autorita_decadimento",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "dominio",
+        "decadimento",
+        "area"
+      ],
+      "note": "L'autorita' della fine su tutto cio' che le sta intorno."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_ultima_parola",
+      "name_i18n": "ability.death.death_ultima_parola",
+      "sequence_id": "death_0",
+      "costo_spiritualita": 45,
+      "cooldown": 45.0,
+      "primitive": [
+        {
+          "tipo": "fear",
+          "raggio": 12,
+          "durata": 10.0,
+          "soglia_resistenza": 9
+        },
+        {
+          "tipo": "dot",
+          "danno_tick": 20,
+          "tick_rate": 1.0,
+          "durata": 10.0,
+          "tag_danno": "spirito"
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "spirito",
+        "area"
+      ],
+      "note": "Tutti temono Death. Anche i forti."
     }
   ]
 }

@@ -67,6 +67,8 @@ func _ready() -> void:
 		"fear": _p_fear,
 		"reveal_info": _p_reveal_info,
 		"teleport": _p_teleport,
+		"soul_detach": _p_soul_detach,
+		"resurrect": _p_resurrect,
 	}
 
 
@@ -558,6 +560,41 @@ func _p_curse(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String)
 
 	return {"tipo": "curse", "effetto": effetto, "durata": durata,
 			"condizione_rimozione": condizione_rimozione, "applied": applicato}
+
+
+## soul_detach (US-507): il Ferryman uccide separando anima e corpo. Applica
+## lo status 'anima_recisa' al bersaglio (crollo di difesa/precisione/velocita)
+## per 'durata'. vulnerabilita_corpo e velocita restano registrati per quando
+## il combat leggera' il corpo separato (fase 6).
+func _p_soul_detach(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var applicato: bool = false
+	if stats != null and stats.has_method("applica_status"):
+		stats.call("applica_status", "anima_recisa", durata if durata > 0.0 else -1.0)
+		applicato = true
+	return {"tipo": "soul_detach", "durata": durata,
+			"vulnerabilita_corpo": _num(prim.get("vulnerabilita_corpo"), 0.0),
+			"velocita": _num(prim.get("velocita"), 0.0), "applied": applicato}
+
+
+## resurrect (US-507): riporta in piedi un bersaglio caduto ripristinando
+## 'hp_ripristinati' hp (anche da hp <= 0), al prezzo di 'costo_follia' in
+## Madness. Il targeting di un alleato/evocazione specifico e' fase 6: qui
+## agisce sullo stats risolto (self).
+func _p_resurrect(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+	var hp_rip: float = _num(prim.get("hp_ripristinati"), 0.0)
+	var costo_follia: float = _num(prim.get("costo_follia"), 0.0)
+	var bersaglio: String = str(prim.get("bersaglio", "self"))
+	var applicato: bool = false
+	if stats != null and stats.get("hp") != null and (bersaglio == "self" or bersaglio == ""):
+		stats.set("hp", maxf(float(stats.get("hp")), 0.0) + hp_rip)
+		applicato = true
+	if costo_follia > 0.0:
+		var m: Node = get_tree().root.get_node_or_null("Madness")
+		if m != null:
+			m.call("add", costo_follia, "ability:resurrect", false)
+	return {"tipo": "resurrect", "bersaglio": bersaglio, "hp_ripristinati": hp_rip,
+			"costo_follia": costo_follia, "applied": applicato}
 
 
 ## teleport (US-506): consegna al caster l'ordine di saltare di 'distanza'.

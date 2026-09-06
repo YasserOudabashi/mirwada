@@ -6,7 +6,9 @@
       "tag": "maledizione",
       "durata_default": 20.0,
       "negativo": true,
-      "stat_modifiers": { "evasione": -0.15 },
+      "stat_modifiers": {
+        "evasione": -0.15
+      },
       "descrizione": "Inciampi, manchi il colpo, ti ferisci da solo. E' l'effetto della 'Knight of Misfortune' del Darkness resa senza probability_shift (curse + debuff_stat + dot): il feel e' sfortuna, la manipolazione vera della probabilita' resta a Wheel of Fortune."
     },
     "taunt": {
@@ -19,13 +21,18 @@
       "tag": "decadimento",
       "durata_default": 8.0,
       "negativo": true,
-      "stat_modifiers": { "difesa": -0.2, "velocita": -0.1 }
+      "stat_modifiers": {
+        "difesa": -0.2,
+        "velocita": -0.1
+      }
     },
     "autorita_decadimento": {
       "tag": "dominio",
       "durata_default": -1,
       "negativo": true,
-      "stat_modifiers": { "difesa": -0.1 }
+      "stat_modifiers": {
+        "difesa": -0.1
+      }
     },
     "comando_non_morti": {
       "tag": "non_morto",
@@ -37,8 +44,22 @@
       "tag": "spirito",
       "durata_default": 6.0,
       "negativo": true,
-      "stat_modifiers": { "precisione": -0.2, "difesa": -0.1 },
+      "stat_modifiers": {
+        "precisione": -0.2,
+        "difesa": -0.1
+      },
       "descrizione": "Il bersaglio e' spaventato: colpisce peggio e para peggio. Il 'fuggire' vero e' comportamento IA (fase 6); qui l'effetto e' lo status. Lo applica la primitiva fear (Death Seq 7, lamento dei morti)."
+    },
+    "anima_recisa": {
+      "tag": "anima",
+      "durata_default": 8.0,
+      "negativo": true,
+      "stat_modifiers": {
+        "difesa": -0.5,
+        "precisione": -0.4,
+        "velocita": -0.3
+      },
+      "descrizione": "Anima e corpo separati: il corpo abbandonato combatte a malapena. Lo applica soul_detach (Ferryman, Death Seq 3)."
     }
   }
 }

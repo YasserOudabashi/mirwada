@@ -4723,3 +4723,46 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-507 (Death Seq 3-0: Ferryman / Death Consul / Pale
   Emperor / Death + primitive soul_detach e resurrect + summon durata -1
   persistente con test di round-trip del save + CHECKPOINT US-508).
+
+[2026-09-06] US-507 — Death Sequenze 3-0 (Ferryman / Death Consul / Pale Emperor / Death). BLOCCO 1. DEATH COMPLETO.
+
+- PRIMITIVE NUOVE soul_detach e resurrect:
+  * _p_soul_detach: applica lo status 'anima_recisa' (nuovo: tag anima,
+    negativo, difesa -0.5 / precisione -0.4 / velocita -0.3). vulnerabilita_corpo
+    e velocita registrati per il combat (fase 6: il corpo separato a terra).
+  * _p_resurrect: ripristina hp_ripristinati (anche da hp <= 0) sul bersaglio
+    self, addebita costo_follia a Madness. Il targeting di un'evocazione
+    specifica e' fase 6 (bersaglio != self -> applied false, come _p_heal).
+  primitives.json: soul_detach/resurrect -> implemented. vfx.json: vfx_sever /
+  vfx_revenant. _handlers +2.
+- CONTENUTO Death Seq 3/2/1/0 (stub -> false). DEATH E' COMPLETO: tutte e 10
+  le Sequenze hanno contenuto reale.
+  * death_recisione (soul_detach + dot), death_traghetto (heal + buff),
+    death_editto_di_morte (debuff + aura persistente), death_sentenza (dot
+    brutale + debuff), death_imperatore_resurrezione (resurrect evocazione),
+    death_autorita_finale (aura persistente autorita_decadimento),
+    death_ultima_parola (fear r12 + dot). death_legione (seq 2, stress test)
+    resta e ora e' nel roster della Sequenza.
+  * acting somma 1.0. madness_on_force 9.5/10.8/12.5/14.0.
+  * rituali per Seq 3/2/1/0 con location_tags dal vocabolario US-501;
+    Seq 1 sacrifica ancora_del_giocatore (come TG Seq 1), Seq 0
+    "il_detentore_precedente_della_sequenza_0" (come TG Seq 0).
+  * formule formula_death_3/2/1/0 + 12 ingredienti nuovi; char_death_3/2/1/0.
+- i18n: 8 nomi abilita' (incl. il vecchio TODO death_legione) + 4
+  caratteristiche tradotti. 61 TODO.
+- Come verificato: 545 test headless (542 + 3 in test_death.gd: le 7 abilita'
+  Seq 3-0 eseguono a 0 warning; soul_detach applica anima_recisa e abbassa
+  la difesa; resurrect (primitiva, bersaglio self) ripristina +80 hp da 0 e
+  costa follia; tutte e 10 le Sequenze Death non-stub, acting 1.0,
+  madness_on_force strettamente crescente 1.0 -> 14.0).
+  test_summon.gd (US-205, invariato): il round-trip del save delle evocazioni
+  persistenti (summon durata -1) era gia' coperto - test_round_trip_del_save
+  + test_execute_death_legione. validate exit 0 (3 warning).
+- VERIFICA A SCHERMO: il VFX placeholder + gli effetti (status, hp, follia)
+  sono confermati dai test e dalle verifiche di US-505/506. Il corpo separato
+  a terra (soul_detach) e gli sprite della legione persistente sono
+  integrazione combat/mondo -> fase 6 (Open Question 3 del PRD).
+- BLOCCO 1 quasi chiuso: US-505/506/507 = Death completo. Resta US-508
+  (CHECKPOINT: verdetto sull'architettura prima degli altri 4 Pathway).
+- Prossima storia: US-508 (test_slice_fase_5.gd + grep 'nessun codice nomina
+  death' + verdetto in progress.txt).

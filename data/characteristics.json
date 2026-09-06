@@ -103,6 +103,30 @@
       "pathway_id": "death",
       "sequence": 4,
       "name_i18n": "characteristic.death.4"
+    },
+    {
+      "id": "char_death_3",
+      "pathway_id": "death",
+      "sequence": 3,
+      "name_i18n": "characteristic.death.3"
+    },
+    {
+      "id": "char_death_2",
+      "pathway_id": "death",
+      "sequence": 2,
+      "name_i18n": "characteristic.death.2"
+    },
+    {
+      "id": "char_death_1",
+      "pathway_id": "death",
+      "sequence": 1,
+      "name_i18n": "characteristic.death.1"
+    },
+    {
+      "id": "char_death_0",
+      "pathway_id": "death",
+      "sequence": 0,
+      "name_i18n": "characteristic.death.0"
     }
   ]
 }

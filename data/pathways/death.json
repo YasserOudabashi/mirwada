@@ -420,24 +420,74 @@
       "name_i18n": "sequence.death.3",
       "tier": "saint",
       "concept": "Uccide separando anima e corpo; traghetta anime come risorsa.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 240,
+        "spiritualita_max": 0.3
+      },
+      "abilities": [
+        "death_recisione",
+        "death_traghetto"
+      ],
+      "acting_actions": [
+        {
+          "id": "death_3_traghettatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "death_recisione"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_3_traghettatore",
+          "descrizione": "Recidi 15 anime"
+        },
+        {
+          "id": "death_3_falciatore",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 20,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_3_falciatore",
+          "descrizione": "Sconfiggi 20 nemici"
+        },
+        {
+          "id": "death_3_spirituale",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "spirito"
+          },
+          "target": 8000,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_3_spirituale",
+          "descrizione": "Infliggi 8000 danni da spirito"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 3,
-        "ingredients": [],
+        "ingredients": [
+          "obolo_di_bronzo",
+          "acqua_dello_stige",
+          "filo_delle_parche"
+        ],
         "formula_id": "formula_death_3"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "tempio_abbandonato",
+          "cripta"
+        ],
+        "momento": "crepuscolo",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "il_nome_di_un_morto_che_amavi"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 9.5,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 2,
@@ -446,26 +496,74 @@
       "name_i18n": "sequence.death.2",
       "tier": "angel",
       "concept": "Eserciti di non-morti persistenti anche fuori dal combattimento.",
-      "stat_modifiers": {},
+      "stat_modifiers": {
+        "hp_max": 350,
+        "difesa": 0.35
+      },
       "abilities": [
-        "death_legione"
+        "death_legione",
+        "death_editto_di_morte"
       ],
-      "acting_actions": [],
+      "acting_actions": [
+        {
+          "id": "death_2_console",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "death_legione"
+          },
+          "target": 10,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_2_console",
+          "descrizione": "Schiera la legione 10 volte"
+        },
+        {
+          "id": "death_2_conquista",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 25,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_2_conquista",
+          "descrizione": "Sconfiggi 25 nemici col tuo esercito persistente"
+        },
+        {
+          "id": "death_2_declino",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "decadimento"
+          },
+          "target": 10000,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_2_declino",
+          "descrizione": "Infliggi 10000 danni da decadimento"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 2,
-        "ingredients": [],
+        "ingredients": [
+          "corona_di_ossa",
+          "stendardo_lacero",
+          "polvere_di_ossario"
+        ],
         "formula_id": "formula_death_2"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "luogo_di_massacro",
+          "cripta"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "eclissi",
+        "sacrifices": [
+          "un_alleato_evocato_a_cui_ti_eri_affezionato"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 10.8,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 1,
@@ -474,24 +572,75 @@
       "name_i18n": "sequence.death.1",
       "tier": "angel",
       "concept": "Uccisione istantanea sotto soglia e resurrezione degli alleati.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 500,
+        "difesa": 0.4,
+        "spiritualita_max": 0.4
+      },
+      "abilities": [
+        "death_sentenza",
+        "death_imperatore_resurrezione"
+      ],
+      "acting_actions": [
+        {
+          "id": "death_1_giudice",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "death_sentenza"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_1_giudice",
+          "descrizione": "Pronuncia 15 sentenze"
+        },
+        {
+          "id": "death_1_imperatore",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_1_imperatore",
+          "descrizione": "Sconfiggi 15 nemici sotto la soglia della sentenza"
+        },
+        {
+          "id": "death_1_pastore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "death_imperatore_resurrezione"
+          },
+          "target": 8,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_1_pastore",
+          "descrizione": "Rialza 8 alleati caduti"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 1,
-        "ingredients": [],
+        "ingredients": [
+          "scettro_pallido",
+          "cenere_di_re",
+          "ultimo_battito"
+        ],
         "formula_id": "formula_death_1"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "cripta",
+          "tempio_abbandonato"
+        ],
+        "momento": "notte_fonda",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "ancora_del_giocatore"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 12.5,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 0,
@@ -500,24 +649,74 @@
       "name_i18n": "sequence.death.0",
       "tier": "god",
       "concept": "Dominio sulla fine: la morte come autorita' sul mondo.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 800,
+        "difesa": 0.6,
+        "spiritualita_max": 0.6
+      },
+      "abilities": [
+        "death_autorita_finale",
+        "death_ultima_parola"
+      ],
+      "acting_actions": [
+        {
+          "id": "death_0_dominio",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "death_autorita_finale"
+          },
+          "target": 5,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_0_dominio",
+          "descrizione": "Imponi l'autorita' finale 5 volte"
+        },
+        {
+          "id": "death_0_mietitura",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 30,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_0_mietitura",
+          "descrizione": "Sconfiggi 30 nemici"
+        },
+        {
+          "id": "death_0_silenzio",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "death_ultima_parola"
+          },
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_0_silenzio",
+          "descrizione": "Pronuncia l'ultima parola 10 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 0,
-        "ingredients": [],
+        "ingredients": [
+          "il_confine_del_mondo",
+          "respiro_finale",
+          "chiave_dell_oltretomba"
+        ],
         "formula_id": "formula_death_0"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "tempio_abbandonato"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "eclissi",
+        "sacrifices": [
+          "il_detentore_precedente_della_sequenza_0"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 14.0,
       "notes": "",
-      "stub": true
+      "stub": false
     }
   ]
 }

@@ -15,6 +15,11 @@ const ABILITA_6_4 := [
 	"death_passo_tra_i_mondi", "death_porta_di_fuga",
 	"death_carne_ostinata", "death_rialzati",
 ]
+const ABILITA_3_0 := [
+	"death_recisione", "death_traghetto", "death_editto_di_morte",
+	"death_sentenza", "death_imperatore_resurrezione",
+	"death_autorita_finale", "death_ultima_parola",
+]
 
 
 func _engine() -> Node:
@@ -117,14 +122,59 @@ func test_death_4_ha_un_rituale_con_luogo_valido() -> void:
 		assert_gt(float((rit.get("location_tags", []) as Array).size()), 0.0, "col suo luogo")
 
 
-func test_le_acting_di_death_9_4_sommano_uno() -> void:
+func test_ogni_abilita_death_3_0_si_esegue_senza_warning() -> void:
+	var e: Node = _engine()
+	for aid in ABILITA_3_0:
+		var c: Node2D = _caster()
+		var r: Dictionary = e.call("execute", aid, c)
+		assert_true(r["ok"], "%s eseguita" % aid)
+		assert_eq((r["warnings"] as PackedStringArray).size(), 0,
+			"%s: nessun warning di primitiva (soul_detach/resurrect implementate): %s" % [aid, r["warnings"]])
+		e.call("clear_cooldowns")
+		_cleanup(c)
+
+
+func test_soul_detach_applica_anima_recisa() -> void:
+	var e: Node = _engine()
+	var c: Node2D = _caster()
+	var s: Node = c.get_node("Stats")
+	var dif0: float = s.call("get_stat", "difesa")
+	e.call("execute", "death_recisione", c)
+	assert_true(s.call("ha_status", "anima_recisa"), "soul_detach applica lo status 'anima_recisa'")
+	assert_gt(dif0, s.call("get_stat", "difesa"), "il corpo reciso para molto peggio (difesa crollata)")
+	_cleanup(c)
+
+
+func test_resurrect_ripristina_hp_e_costa_follia() -> void:
+	# l'abilita' death_imperatore_resurrezione mira a "evocazione" (targeting
+	# alleati = fase 6); qui si verifica la primitiva su un bersaglio self.
+	var e: Node = _engine()
+	var m: Node = Engine.get_main_loop().root.get_node_or_null("Madness")
+	if m != null:
+		m.call("azzera")
+	var c: Node2D = _caster()
+	var s: Node = c.get_node("Stats")
+	s.set("hp", 0.0)
+	var follia0: float = m.call("valore") if m != null else 0.0
+	var r: Dictionary = e.call("_p_resurrect",
+		{"bersaglio": "self", "hp_ripristinati": 80, "costo_follia": 5.0}, c, s, "ab")
+	assert_true(bool(r["applied"]), "resurrect applicato al bersaglio self")
+	assert_almost_eq(float(s.get("hp")), 80.0, "resurrect riporta in piedi da hp 0 (+80)")
+	if m != null:
+		assert_gt(m.call("valore"), follia0, "e costa follia (il prezzo del Pale Emperor)")
+	_cleanup(c)
+
+
+func test_tutte_le_10_sequenze_death_sono_contenuto() -> void:
 	var pw: Dictionary = _gd().call("get_pathway", "death")
+	var madness_prec: float = -1.0
 	for seq in (pw.get("sequences", []) as Array):
-		var n: int = int((seq as Dictionary).get("sequence", -1))
-		if n < 4 or n > 9:
-			continue
+		var d: Dictionary = seq
+		assert_false(bool(d.get("stub", false)), "death_%d non e' piu' stub" % int(d.get("sequence")))
 		var somma: float = 0.0
-		for a in ((seq as Dictionary).get("acting_actions", []) as Array):
+		for a in (d.get("acting_actions", []) as Array):
 			somma += float((a as Dictionary).get("progresso", 0.0))
-		assert_almost_eq(somma, 1.0, "death_%d: le acting_actions sommano esattamente 1.0" % n)
-		assert_false(bool((seq as Dictionary).get("stub", false)), "death_%d non e' piu' stub" % n)
+		assert_almost_eq(somma, 1.0, "death_%d: acting sommano 1.0" % int(d.get("sequence")))
+		var mf: float = float(d.get("madness_on_force", 0.0))
+		assert_gt(mf, madness_prec, "death_%d: madness_on_force cresce lungo il Pathway" % int(d.get("sequence")))
+		madness_prec = mf
