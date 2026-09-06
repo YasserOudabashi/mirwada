@@ -50,12 +50,12 @@
       "schema_version": 1,
       "id": "sinergia_confine_del_crepuscolo",
       "name_i18n": "synergy.confine_del_crepuscolo",
-      "richiede_tag": { "decadimento": 1, "morte": 1 },
+      "richiede_tag": { "morte": 1, "non_morto": 1 },
       "fonti": ["sequenza", "equipaggiamento"],
       "priorita": 0,
-      "effetto": { "tipo": "aggiungi_abilita", "ability_id": "tg_crepuscolo" },
+      "effetto": { "tipo": "aggiungi_abilita", "ability_id": "death_legione" },
       "scoperta": "nascosta",
-      "note": "Due sensibilita' vicine del gruppo Eternal Darkness (decadimento del Twilight Giant, morte di Death): sul confine si impara un'abilita' che nessuno dei due possiede da solo. MECCANISMO 5 (aggiungi_abilita)."
+      "note": "Il Pathway Death (morte) + reliquie di non-morti indossate: sul confine fra i due mondi si impara a chiamare la legione. MECCANISMO 5 (aggiungi_abilita). sequenza+equipaggiamento."
     },
     {
       "schema_version": 1,

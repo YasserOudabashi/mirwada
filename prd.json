@@ -274,8 +274,8 @@
       ],
       "priority": 14,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO C. data/synergies/batch_2.json (NUOVO): 10 sinergie di combinazione, tutte raggiungibili, coppie di fonti diverse (pet+stanza, stanza+sequenza, talento+pet, sequenza+talento, sequenza+pet, sequenza+stanza). 3 visibili / 7 nascoste (~1/3). NESSUN richiede_tag usa un tag del Pathway di default (arma/difesa/luce/decadimento del TG) - altrimenti si accenderebbero da sole (bug trovato: sinergia_disciplina_del_ferro {arma,guerra} si attivava equipaggiando una spada -> rimossa, sostituita con sinergia_rito_di_guerra {guerra,rituale}). 2 sinergie usano priorita per un CONFLITTO ESCLUSIVO reale: sinergia_forgia_arcana (forgia, pri 15) vince su sinergia_fucina_ispirata del batch 1 (pri 0); sinergia_alchimia_bestiale (pozioni, pri 5) vince su sinergia_crescita_pozione di core (pri 0). Anche batch_1 sinergia_confine_del_crepuscolo cambiata ({morte,non_morto} -> death_legione) per non dipendere da decadimento (tag del Pathway di default). i18n: 10 name_i18n tradotti in it.json. 535 test headless (531 + 4 in test_synergy_engine: i 2 conflitti di priorita' + occhio_del_ladro evasione + sapienza_curativa hp_max). test_synergy_engine.prepara() ora pulisce anche /root/Equipment; test_round_trip asserisce sulla sinergia salvata specifica invece che su attive().is_empty() (il Pathway di default porta sempre dei tag). validate exit 0, 9 warning invariati. Nessuna verifica a schermo."
     },
     {
       "id": "US-415",

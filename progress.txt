@@ -4417,3 +4417,43 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-414 (BATCH 2: ~10 sinergie di combinazione, mix
   visibile/nascosta, almeno 2 con 'priorita' per un conflitto reale col
   batch 1).
+
+[2026-09-06] US-414 — Batch 2: 10 sinergie di combinazione. BLOCCO C.
+
+- data/synergies/batch_2.json (NUOVO): 10 sinergie, tutte raggiungibili.
+  Coppie di fonti diverse: rito_di_guerra (pet+stanza), forgia_arcana
+  (stanza+sequenza), alchimia_bestiale (pet+stanza), occhio_del_ladro
+  (talento+pet), passo_nell_ombra (sequenza+talento), richiamo_selvatico
+  (sequenza+pet), veggenza_notturna (pet+talento), sapienza_curativa
+  (sequenza+stanza), cerchio_spiritico (stanza+sequenza), cammino_stellare
+  (sequenza+stanza). 3 visibili (occhio_del_ladro, veggenza_notturna,
+  sapienza_curativa), 7 nascoste.
+- 2 CONFLITTI DI PRIORITA' reali col batch 1 / core (effetti esclusivi):
+  * sinergia_forgia_arcana (modifica_qualita_crafting forgia, delta 2,
+    priorita 15) vince su sinergia_fucina_ispirata (batch 1, delta 1, pri 0).
+  * sinergia_alchimia_bestiale (pozioni, delta 2, priorita 5) vince su
+    sinergia_crescita_pozione (core, delta 1, pri 0) - ma maestria_alchemica
+    (pri 10) vince su entrambe.
+- REGOLA NUOVA scoperta e applicata: un richiede_tag NON deve usare un tag
+  del Pathway di DEFAULT (twilight_giant: arma/difesa/luce/decadimento). La
+  fonte 'sequenza' porta sempre i tag del Pathway attivo, e all'avvio quello
+  e' il TG (default di fase 2). Bug trovato: la prima stesura aveva
+  sinergia_disciplina_del_ferro {arma, guerra} -> equipaggiare una spada
+  (tag guerra) + arma sempre presente = modifica_stat forza +5 a sorpresa,
+  rompeva test_equipment. Sostituita con sinergia_rito_di_guerra
+  {guerra, rituale} (pet + stanza, entrambe deliberate). Anche batch_1
+  sinergia_confine_del_crepuscolo riscritta: {morte, non_morto} ->
+  death_legione (dipendeva da 'decadimento', tag del TG).
+- i18n: 10 name_i18n tradotti in italiano in it.json.
+- Come verificato: 535 test headless (531 + 4 in test_synergy_engine.gd:
+  i 2 conflitti di priorita' verificati con bonus_qualita + spiega();
+  occhio_del_ladro -> evasione +5; sapienza_curativa -> hp_max +8%).
+  test_synergy_engine.prepara() ora pulisce anche /root/Equipment.
+  test_round_trip_del_save_solo_le_viste: l'assert "niente attivo dopo il
+  load" e' diventato "la sinergia salvata non e' fra le attive" (il Pathway
+  di default porta comunque dei tag live). validate exit 0, 9 warning
+  invariati. 1 SCRIPT ERROR preesistente. Nessuna verifica a schermo.
+- Sinergie totali ora: 28 (10 core + 8 batch_1 + 10 batch_2), 26 raggiungibili.
+- Prossima storia: US-415 (BATCH 3: ~15 sinergie che puntano ai gruppi
+  differiti - restano irraggiungibili, warning atteso; il validator le conta
+  in UNA riga sola invece di N warning; riga per gruppo in design-pathways.md).

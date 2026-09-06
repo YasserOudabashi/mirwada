@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "_comment": "BATCH 2 (US-414): ~10 sinergie di combinazione, tutte raggiungibili oggi, che pescano da coppie di fonti diverse. Mix di scoperta visibile/nascosta (~1/3 visibili). NESSUN richiede_tag usa un tag del Pathway di default (arma/difesa/luce/decadimento del Twilight Giant): quelle sinergie si accenderebbero da sole. sinergia_forgia_arcana e sinergia_alchimia_bestiale usano 'priorita' per vincere un conflitto ESCLUSIVO reale col batch 1 / core. Valori plausibili, da ritarare.",
+  "synergies": [
+    {
+      "schema_version": 1,
+      "id": "sinergia_rito_di_guerra",
+      "name_i18n": "synergy.rito_di_guerra",
+      "richiede_tag": { "guerra": 1, "rituale": 1 },
+      "fonti": ["pet", "stanza"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_stat", "stat": "forza", "valore": 5, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "Un pet da guerra + la stanza rituale: si benedice l'arma prima della battaglia. pet+stanza."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_forgia_arcana",
+      "name_i18n": "synergy.forgia_arcana",
+      "richiede_tag": { "rituale": 1, "invenzione": 1 },
+      "fonti": ["stanza", "sequenza"],
+      "priorita": 15,
+      "effetto": { "tipo": "modifica_qualita_crafting", "categoria": "forgia", "delta": 2 },
+      "scoperta": "nascosta",
+      "note": "Stanza rituale + un Pathway dell'invenzione (Paragon): incantare mentre si forgia. CONFLITTO ESCLUSIVO con sinergia_fucina_ispirata (batch 1, forgia delta 1, priorita 0): a priorita 15 vince questa."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_alchimia_bestiale",
+      "name_i18n": "synergy.alchimia_bestiale",
+      "richiede_tag": { "bestia": 1, "pozione": 1 },
+      "fonti": ["pet", "stanza"],
+      "priorita": 5,
+      "effetto": { "tipo": "modifica_qualita_crafting", "categoria": "pozioni", "delta": 2 },
+      "scoperta": "nascosta",
+      "note": "Un pet + il laboratorio/giardino: pelo, saliva, fiato animale entrano nelle pozioni. CONFLITTO ESCLUSIVO con sinergia_crescita_pozione (core, pozioni delta 1, priorita 0): a priorita 5 vince questa (ma sinergia_maestria_alchemica a priorita 10 vince su entrambe)."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_occhio_del_ladro",
+      "name_i18n": "synergy.occhio_del_ladro",
+      "richiede_tag": { "furto": 1, "divinazione": 1 },
+      "fonti": ["talento", "pet"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_stat", "stat": "evasione", "valore": 5, "moltiplicativo": false },
+      "scoperta": "visibile",
+      "note": "Il talento mano_altrui + il corvo veggente: vedi la mano prima che si muova. talento+pet."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_passo_nell_ombra",
+      "name_i18n": "synergy.passo_nell_ombra",
+      "richiede_tag": { "occultamento": 1, "notte": 1 },
+      "fonti": ["sequenza", "talento"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_stat", "stat": "velocita", "valore": 0.1, "moltiplicativo": true },
+      "scoperta": "nascosta",
+      "note": "Un Pathway dell'occultamento (Darkness/Door) + il talento figlio_della_notte: al buio ti muovi piu' in fretta. sequenza+talento."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_richiamo_selvatico",
+      "name_i18n": "synergy.richiamo_selvatico",
+      "richiede_tag": { "evocazione": 1, "bestia": 1 },
+      "fonti": ["sequenza", "pet"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_primitiva", "primitiva": "summon", "parametro": "quantita", "delta": 1, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "Un Pathway dell'evocazione (Moon) + un pet: il branco risponde in piu'. +1 alla quantita di ogni summon. sequenza+pet."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_veggenza_notturna",
+      "name_i18n": "synergy.veggenza_notturna",
+      "richiede_tag": { "divinazione": 1, "notte": 1 },
+      "fonti": ["pet", "talento"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_primitiva", "primitiva": "reveal_info", "parametro": "raggio", "delta": 4, "moltiplicativo": false },
+      "scoperta": "visibile",
+      "note": "Il corvo veggente + il talento figlio_della_notte: di notte i presagi arrivano da piu' lontano. +4 al raggio di reveal_info. pet+talento."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_sapienza_curativa",
+      "name_i18n": "synergy.sapienza_curativa",
+      "richiede_tag": { "guarigione": 1, "conoscenza": 1 },
+      "fonti": ["sequenza", "stanza"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_stat", "stat": "hp_max", "valore": 0.08, "moltiplicativo": true },
+      "scoperta": "visibile",
+      "note": "Un Pathway della guarigione (Mother) + la biblioteca: sai dove il corpo cede e come rinforzarlo. sequenza+stanza."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_cerchio_spiritico",
+      "name_i18n": "synergy.cerchio_spiritico",
+      "richiede_tag": { "rituale": 1, "spirito": 1 },
+      "fonti": ["stanza", "sequenza"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_primitiva", "primitiva": "aura", "parametro": "raggio", "delta": 2, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "Stanza rituale + un Pathway dello spirito (Death/Fool): il cerchio tracciato allarga ogni aura. +2 al raggio. stanza+sequenza."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_cammino_stellare",
+      "name_i18n": "synergy.cammino_stellare",
+      "richiede_tag": { "stella": 1, "occulto": 1 },
+      "fonti": ["sequenza", "stanza"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_primitiva", "primitiva": "teleport", "parametro": "distanza", "delta": 5, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "Un Pathway delle stelle (Hermit/Door) + la stanza rituale: le costellazioni segnano un salto piu' lungo. +5 alla distanza di teleport. sequenza+stanza."
+    }
+  ]
+}

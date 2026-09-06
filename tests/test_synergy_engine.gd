@@ -23,7 +23,7 @@ func prepara() -> void:
 	for vecchio in Engine.get_main_loop().root.get_tree().get_nodes_in_group("player"):
 		vecchio.free()
 	for a in ["/root/SynergyEngine", "/root/BaseSystem", "/root/PetSystem",
-			"/root/TalentSystem", "/root/Inventory"]:
+			"/root/TalentSystem", "/root/Inventory", "/root/Equipment"]:
 		var n: Node = Engine.get_main_loop().root.get_node_or_null(a)
 		if n != null:
 			n.call("pulisci")
@@ -361,8 +361,8 @@ func test_round_trip_del_save_solo_le_viste() -> void:
 	_se().call("da_salvataggio", (caricato["dati"] as Dictionary)["sinergie"])
 	assert_true((_se().call("viste") as Array).has("sinergia_studio_sereno"),
 		"la sinergia vista e' tornata dal save")
-	assert_true((_se().call("attive") as Array).is_empty(),
-		"le ATTIVE non si leggono dal save: senza tag, niente attivo")
+	assert_false((_se().call("attive") as Array).has("sinergia_studio_sereno"),
+		"le ATTIVE non si leggono dal save: senza i suoi tag, la sinergia salvata non e' attiva")
 	s.cancella(SLOT)
 	_fine()
 
@@ -427,6 +427,47 @@ func test_contatore_sale_attivando_una_nascosta() -> void:
 	_se().call("rivaluta")  # attiva sinergia_studio_sereno (nascosta) -> entra in _viste
 	assert_eq((_se().call("contatore") as Vector2i).x, vis0 + 1, "attivata una nascosta -> scoperte +1")
 	assert_eq((_se().call("contatore") as Vector2i).y, c0.y, "il totale non cambia")
+	_fine()
+
+
+func test_batch2_forgia_arcana_vince_il_conflitto_esclusivo_col_batch1() -> void:
+	# sinergia_fucina_ispirata (batch 1, forgia +1, pri 0) vs sinergia_forgia_arcana
+	# (batch 2, forgia +2, pri 15): stessa categoria -> vince la priorita' piu' alta.
+	_se().call("imposta_override_tag", {"rituale": 1, "invenzione": 1, "crafting": 1, "scienza": 1})
+	_se().call("rivaluta")
+	assert_true(_se().call("e_attiva", "sinergia_fucina_ispirata") and _se().call("e_attiva", "sinergia_forgia_arcana"),
+		"entrambe le sinergie forgia sono attive")
+	assert_eq(_se().call("bonus_qualita", "forgia"), 2, "vince il delta della priorita' 15, non la somma")
+	assert_eq(str((_se().call("spiega", "sinergia_fucina_ispirata") as Dictionary)["sovrascritta_da"]),
+		"sinergia_forgia_arcana", "spiega() indica chi ha vinto")
+	_fine()
+
+
+func test_batch2_alchimia_bestiale_vince_su_crescita_pozione() -> void:
+	_se().call("imposta_override_tag", {"bestia": 1, "crescita": 2, "pozione": 2})
+	_se().call("rivaluta")
+	assert_true(_se().call("e_attiva", "sinergia_crescita_pozione") and _se().call("e_attiva", "sinergia_alchimia_bestiale"),
+		"crescita_pozione (pri 0) e alchimia_bestiale (pri 5) attive, maestria no (manca scienza)")
+	assert_eq(_se().call("bonus_qualita", "pozioni"), 2, "vince alchimia_bestiale (pri 5)")
+	_fine()
+
+
+func test_batch2_occhio_del_ladro_alza_l_evasione() -> void:
+	var base: float = _stats().call("get_base", "evasione")
+	_se().call("imposta_override_tag", {"furto": 1, "divinazione": 1})
+	_se().call("rivaluta")
+	assert_almost_eq(_stats().call("get_stat", "evasione"), base + 5.0, "modifica_stat evasione +5")
+	_se().call("imposta_override_tag", {})
+	_se().call("rivaluta")
+	assert_almost_eq(_stats().call("get_stat", "evasione"), base, "disattivata -> torna")
+	_fine()
+
+
+func test_batch2_sapienza_curativa_alza_gli_hp_max() -> void:
+	var base: float = _stats().call("get_base", "hp_max")
+	_se().call("imposta_override_tag", {"guarigione": 1, "conoscenza": 1})
+	_se().call("rivaluta")
+	assert_almost_eq(_stats().call("get_stat", "hp_max"), base * 1.08, "modifica_stat hp_max +8%")
 	_fine()
 
 
