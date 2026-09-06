@@ -4990,3 +4990,24 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   Paragon usa una primitiva differita - guardia per US-517). validate exit 0.
 - Prossima storia: US-516 (Paragon Seq 6-4: Artisan / Astronomer / Alchemist -
   gancio al sistema forgia di fase 3, costrutti via summon costrutto_).
+
+[2026-09-06] US-516 — Paragon Sequenze 6-4 (Artisan / Astronomer / Alchemist). BLOCCO 4.
+
+- NESSUNA primitiva nuova. Paragon Seq 6/5/4 (stub -> false):
+  * paragon_congegno_offensivo (summon costrutto_torretta - materia prima
+    "crafting", flusso vero da Forge di fase 3), paragon_arma_beyonder (buff
+    forza + projectile pierce 2), paragon_ricognizione (reveal_info categoria
+    "mappa", raggio 20 - Paragon MISURA), paragon_previsione (buff evasione),
+    paragon_trasmutazione (terrain_modify + debuff difesa), paragon_costrutto_
+    pesante (summon costrutto_titano + buff difesa).
+  * acting somma 1.0. madness 5.4/6.7/8.4.
+  * paragon_4 (Seq <= 4): advancement_ritual, location_tags [officina,
+    torre_di_osservazione], sacrifice "il tuo strumento migliore distrutto di
+    tua mano".
+  * formule formula_paragon_6/5/4 + 9 ingredienti; char_paragon_6/5/4.
+- i18n: 6 abilita' + 3 caratteristiche tradotte. 59 TODO.
+- Come verificato: 565 test headless (invariati - test_paragon.gd itera le
+  Sequenze non-stub e copre le 6-4 da solo). validate exit 0 (3 warning).
+- Prossima storia: US-517 (Paragon Seq 3-0: Arcane Scholar / Knowledge Magister
+  / Illuminator / Paragon - costrutti permanenti; paragon_1 RISCRITTA senza
+  rule_bind). Chiude il BLOCCO 4.

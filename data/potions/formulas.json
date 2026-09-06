@@ -13,6 +13,8 @@
     "bilancia_di_precisione",
     "calice_incrinato",
     "caratteristica_del_gigante",
+    "carta_millimetrata",
+    "catalizzatore_proibito",
     "cellula_madre",
     "cenere_di_bosco",
     "cenere_di_re",
@@ -26,6 +28,7 @@
     "corona_di_ossa",
     "corteccia_febbrifuga",
     "cristallo_di_riferimento",
+    "crogiolo_indistruttibile",
     "cuore_che_non_si_ferma",
     "cuore_del_pianeta",
     "cuore_di_montagna",
@@ -53,13 +56,18 @@
     "goccia_di_prima_pioggia",
     "il_confine_del_mondo",
     "incenso_dei_riti",
+    "inchiostro_stellare",
+    "ingranaggio_di_precisione",
     "lacrima_di_amante",
     "lacrima_di_paladino",
     "lama_di_luce_solidificata",
+    "lega_beyonder",
+    "lente_di_lungo_fuoco",
     "lente_graduata",
     "linfa_di_gigante",
     "luce_di_luna_imbottigliata",
     "mano_di_gloria",
+    "mercurio_filosofale",
     "metallo_impossibile",
     "miele_selvatico",
     "moneta_del_traghettatore",
@@ -69,6 +77,7 @@
     "nebbia_del_limbo",
     "nucleo_del_crepuscolo",
     "obolo_di_bronzo",
+    "olio_conduttore",
     "oro_bianco",
     "ossidiana_decaduta",
     "osso_di_pugile",
@@ -744,6 +753,48 @@
         "bilancia_di_precisione",
         "acido_da_saggio",
         "cristallo_di_riferimento"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_paragon_6": {
+      "characteristic_sequence": 6,
+      "ingredients": [
+        "ingranaggio_di_precisione",
+        "lega_beyonder",
+        "olio_conduttore"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_paragon_5": {
+      "characteristic_sequence": 5,
+      "ingredients": [
+        "lente_di_lungo_fuoco",
+        "carta_millimetrata",
+        "inchiostro_stellare"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_paragon_4": {
+      "characteristic_sequence": 4,
+      "ingredients": [
+        "mercurio_filosofale",
+        "crogiolo_indistruttibile",
+        "catalizzatore_proibito"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

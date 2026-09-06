@@ -216,18 +216,63 @@
       "name_i18n": "sequence.paragon.6",
       "tier": "mid",
       "concept": "Costruisce armi e congegni Beyonder: il Pathway del crafting.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 90,
+        "spiritualita_max": 0.25
+      },
+      "abilities": [
+        "paragon_congegno_offensivo",
+        "paragon_arma_beyonder"
+      ],
+      "acting_actions": [
+        {
+          "id": "paragon_6_artigiano",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_congegno_offensivo"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_6_artigiano",
+          "descrizione": "Costruisci 15 congegni"
+        },
+        {
+          "id": "paragon_6_armaiolo",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_arma_beyonder"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_6_armaiolo",
+          "descrizione": "Forgia 15 armi Beyonder"
+        },
+        {
+          "id": "paragon_6_officina",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 15,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_6_officina",
+          "descrizione": "Sconfiggi 15 nemici con le tue creazioni"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 6,
-        "ingredients": [],
+        "ingredients": [
+          "ingranaggio_di_precisione",
+          "lega_beyonder",
+          "olio_conduttore"
+        ],
         "formula_id": "formula_paragon_6"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 5.4,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 5,
@@ -236,18 +281,63 @@
       "name_i18n": "sequence.paragon.5",
       "tier": "mid",
       "concept": "Strumenti ottici e mappe: previsione e ricognizione a distanza.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 130,
+        "spiritualita_max": 0.3
+      },
+      "abilities": [
+        "paragon_ricognizione",
+        "paragon_previsione"
+      ],
+      "acting_actions": [
+        {
+          "id": "paragon_5_astronomo",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_ricognizione"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_5_astronomo",
+          "descrizione": "Fai ricognizione 15 volte"
+        },
+        {
+          "id": "paragon_5_veggente",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_previsione"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_5_veggente",
+          "descrizione": "Prevedi 15 attacchi"
+        },
+        {
+          "id": "paragon_5_cartografo",
+          "evento": "area_cleared",
+          "filtri": {},
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_5_cartografo",
+          "descrizione": "Mappa 10 aree completamente"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 5,
-        "ingredients": [],
+        "ingredients": [
+          "lente_di_lungo_fuoco",
+          "carta_millimetrata",
+          "inchiostro_stellare"
+        ],
         "formula_id": "formula_paragon_5"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 6.7,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 4,
@@ -256,24 +346,74 @@
       "name_i18n": "sequence.paragon.4",
       "tier": "saint",
       "concept": "Trasmutazione dei materiali; alchimia applicata al crafting.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 200,
+        "spiritualita_max": 0.4
+      },
+      "abilities": [
+        "paragon_trasmutazione",
+        "paragon_costrutto_pesante"
+      ],
+      "acting_actions": [
+        {
+          "id": "paragon_4_alchimista",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_trasmutazione"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_4_alchimista",
+          "descrizione": "Trasmuta 15 volte"
+        },
+        {
+          "id": "paragon_4_fonditore",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 18,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_4_fonditore",
+          "descrizione": "Sconfiggi 18 nemici"
+        },
+        {
+          "id": "paragon_4_titano",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_costrutto_pesante"
+          },
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_4_titano",
+          "descrizione": "Erigi 10 costrutti titanici"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 4,
-        "ingredients": [],
+        "ingredients": [
+          "mercurio_filosofale",
+          "crogiolo_indistruttibile",
+          "catalizzatore_proibito"
+        ],
         "formula_id": "formula_paragon_4"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "officina",
+          "torre_di_osservazione"
+        ],
+        "momento": "mezzogiorno",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "il_tuo_strumento_migliore_distrutto_di_tua_mano"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 8.4,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 3,

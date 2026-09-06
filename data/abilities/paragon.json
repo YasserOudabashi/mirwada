@@ -180,6 +180,165 @@
         "singolo"
       ],
       "note": "Stimare il valore di tutto in tempo reale: sai dove colpire e dove non farti colpire."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_congegno_offensivo",
+      "name_i18n": "ability.paragon.paragon_congegno_offensivo",
+      "sequence_id": "paragon_6",
+      "costo_spiritualita": 13,
+      "cooldown": 22.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "costrutto_torretta",
+          "quantita": 1,
+          "durata": 30.0,
+          "comportamento": "difensivo"
+        }
+      ],
+      "tag_sinergia": [
+        "crafting",
+        "invenzione",
+        "singolo"
+      ],
+      "note": "L'Artisan costruisce una torretta Beyonder. entita_id costrutto_: la fonte e' il crafting (matrice di proprieta'). Il flusso vero passa per Forge di fase 3."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_arma_beyonder",
+      "name_i18n": "ability.paragon.paragon_arma_beyonder",
+      "sequence_id": "paragon_6",
+      "costo_spiritualita": 10,
+      "cooldown": 8.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "forza",
+          "valore": 0.25,
+          "durata": 12.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "projectile",
+          "danno": 20,
+          "velocita": 12,
+          "gittata": 12,
+          "pierce": 2,
+          "tag_danno": "fisico"
+        }
+      ],
+      "tag_sinergia": [
+        "crafting",
+        "forza",
+        "singolo"
+      ],
+      "note": "Un'arma Beyonder appena forgiata: colpo che passa attraverso e forza in piu'."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_ricognizione",
+      "name_i18n": "ability.paragon.paragon_ricognizione",
+      "sequence_id": "paragon_5",
+      "costo_spiritualita": 9,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "reveal_info",
+          "raggio": 20,
+          "categoria": "mappa",
+          "durata": 30.0
+        }
+      ],
+      "tag_sinergia": [
+        "scienza",
+        "analisi",
+        "area"
+      ],
+      "note": "L'Astronomer usa strumenti ottici: ricognizione a distanza, categoria mappa. Paragon MISURA, non legge le menti."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_previsione",
+      "name_i18n": "ability.paragon.paragon_previsione",
+      "sequence_id": "paragon_5",
+      "costo_spiritualita": 11,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 0.2,
+          "durata": 12.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "scienza",
+        "conoscenza",
+        "singolo"
+      ],
+      "note": "Prevedere le traiettorie: sai da dove arrivera' il colpo prima che parta."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_trasmutazione",
+      "name_i18n": "ability.paragon.paragon_trasmutazione",
+      "sequence_id": "paragon_4",
+      "costo_spiritualita": 18,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "materiale_trasmutato",
+          "raggio": 5,
+          "durata": 20.0,
+          "permanente": false
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.3,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "crafting",
+        "invenzione",
+        "area"
+      ],
+      "note": "L'Alchemist trasmuta i materiali intorno: il terreno cambia sostanza e le armature avversarie cedono."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_costrutto_pesante",
+      "name_i18n": "ability.paragon.paragon_costrutto_pesante",
+      "sequence_id": "paragon_4",
+      "costo_spiritualita": 26,
+      "cooldown": 45.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "costrutto_titano",
+          "quantita": 1,
+          "durata": 45.0,
+          "comportamento": "aggressivo"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.2,
+          "durata": 45.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "crafting",
+        "difesa",
+        "evocazione"
+      ],
+      "note": "Un costrutto titanico: combatte per te mentre tu resti al riparo."
     }
   ]
 }

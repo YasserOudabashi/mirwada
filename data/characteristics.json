@@ -265,6 +265,24 @@
       "pathway_id": "paragon",
       "sequence": 7,
       "name_i18n": "characteristic.paragon.7"
+    },
+    {
+      "id": "char_paragon_6",
+      "pathway_id": "paragon",
+      "sequence": 6,
+      "name_i18n": "characteristic.paragon.6"
+    },
+    {
+      "id": "char_paragon_5",
+      "pathway_id": "paragon",
+      "sequence": 5,
+      "name_i18n": "characteristic.paragon.5"
+    },
+    {
+      "id": "char_paragon_4",
+      "pathway_id": "paragon",
+      "sequence": 4,
+      "name_i18n": "characteristic.paragon.4"
     }
   ]
 }
