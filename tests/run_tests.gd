@@ -15,6 +15,13 @@ const TESTS_DIR := "res://tests"
 func _init() -> void:
 	await process_frame
 
+	# Locale di test fisso: alcune asserzioni confrontano la chrome tradotta
+	# (strings.csv) in italiano. Su una macchina con locale OS "en_*" Godot
+	# caricherebbe l'inglese e quei test fallirebbero; su CI (locale "C") va
+	# gia' sul fallback "it". Fissarlo qui rende la suite identica ovunque.
+	# I test che servono l'inglese lo impostano da se' e ripristinano "it".
+	TranslationServer.set_locale("it")
+
 	var files: PackedStringArray = _discover()
 	if files.is_empty():
 		print("NESSUN file di test trovato in %s — la discovery e' rotta." % TESTS_DIR)
