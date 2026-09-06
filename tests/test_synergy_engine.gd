@@ -16,8 +16,11 @@ func _gd() -> Node:
 
 
 func prepara() -> void:
-	if _se() != null:
-		_se().call("pulisci")
+	for a in ["/root/SynergyEngine", "/root/BaseSystem", "/root/PetSystem",
+			"/root/TalentSystem", "/root/Inventory"]:
+		var n: Node = Engine.get_main_loop().root.get_node_or_null(a)
+		if n != null:
+			n.call("pulisci")
 
 
 func test_synergy_ids_espone_le_sinergie_dei_dati() -> void:
@@ -58,6 +61,43 @@ func test_attive_e_ordinata_e_deterministica() -> void:
 	var b: Array = a.duplicate()
 	b.sort()
 	assert_eq(a, b, "attive() e' in ordine lessicografico")
+
+
+func test_rivaluta_emette_solo_sui_cambi_reali() -> void:
+	var attivate: Array = []
+	var disattivate: Array = []
+	_se().connect("sinergia_attivata", func(id: String) -> void: attivate.append(id))
+	_se().connect("sinergia_disattivata", func(id: String) -> void: disattivate.append(id))
+
+	_se().call("imposta_override_tag", {"crescita": 2, "pozione": 2})
+	_se().call("rivaluta")
+	assert_true(attivate.has("sinergia_crescita_pozione"), "prima rivaluta -> attivata")
+
+	attivate.clear()
+	_se().call("rivaluta")  # stesso stato
+	assert_true(attivate.is_empty(), "stesso stato -> nessun segnale")
+
+	_se().call("imposta_override_tag", {"crescita": 1})
+	_se().call("rivaluta")
+	assert_true(disattivate.has("sinergia_crescita_pozione"), "tolto un tag -> disattivata")
+
+
+func test_un_segnale_di_una_fonte_fa_rivalutare() -> void:
+	var attivate: Array = []
+	_se().connect("sinergia_attivata", func(id: String) -> void: attivate.append(id))
+	var bs: Node = Engine.get_main_loop().root.get_node_or_null("BaseSystem")
+	var inv: Node = Engine.get_main_loop().root.get_node_or_null("Inventory")
+	var ps: Node = Engine.get_main_loop().root.get_node_or_null("PetSystem")
+	# giardino (crescita+pozione) + laboratorio (pozione) + capra (crescita) ->
+	# crescita 2, pozione 2 -> sinergia_crescita_pozione
+	for tipo in ["giardino", "laboratorio"]:
+		for item_id in bs.call("costo_prossimo", tipo):
+			inv.call("aggiungi", item_id, int(bs.call("costo_prossimo", tipo)[item_id]))
+		bs.call("costruisci", tipo)
+	ps.call("imposta_pet", "capra_lunare")  # emette pet_impostato -> rivaluta
+	assert_true(_se().call("e_attiva", "sinergia_crescita_pozione"),
+		"i segnali delle fonti hanno riportato la sinergia attiva senza chiamare rivaluta a mano")
+	assert_true(attivate.has("sinergia_crescita_pozione"), "e sinergia_attivata e' stato emesso")
 
 
 func test_synergy_sources_include_la_fonte_sequenza() -> void:

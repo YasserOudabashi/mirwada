@@ -4021,3 +4021,35 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-402 (rivalutazione reattiva: SynergyEngine si connette
   ai segnali delle fonti + poll ogni ~0.5s, emette sinergia_attivata/
   disattivata sui cambi reali).
+
+[2026-09-06] US-402 — Rivalutazione reattiva delle sinergie. BLOCCO A.
+
+- SynergyEngine._ready() si connette ai segnali di cambiamento delle fonti:
+  * Equipment.equip_cambiato  (gia' emesso su equipaggia / rimuovi_slot /
+    incastona / rimuovi_sigillo - 4 punti)
+  * PetSystem.{pet_impostato, pet_liberato, pet_morto, bond_cambiato,
+    pet_avanzato}
+  * TalentSystem.talento_sbloccato
+  * BaseSystem.{stanza_costruita, stanza_potenziata}
+  * Progression.sequence_changed
+  _collega(path, [segnali]) usa has_signal() + Callable.unbind(arita) cosi'
+  un handler unico (_su_fonte_cambiata) accetta qualsiasi firma. Nessun
+  segnale mancante fra le fonti di fase 3: se ne mancasse uno sarebbe un bug
+  di quella fonte (micro-story), non un if in SynergyEngine.
+- _process(delta): _accumulo += delta; ogni 0.5s (_POLL_S) rivaluta()
+  comunque - rete di sicurezza se una fonte dimentica di segnalare.
+- rivaluta(): ora = attive(); per ogni id in ora non in _attive_prec ->
+  sinergia_attivata.emit(id); per ogni id in _attive_prec non in ora ->
+  sinergia_disattivata.emit(id); _attive_prec = ora. Idempotente: due
+  chiamate consecutive sullo stesso stato di tag non emettono niente.
+- pulisci() azzera anche _attive_prec e _accumulo (isolamento dei test).
+- Come verificato: 506 test headless (504 + 2 in test_synergy_engine.gd:
+  rivaluta emette solo sui cambi reali (attivata la 1a volta, niente al 2o
+  giro, disattivata togliendo un tag); un solo segnale di una fonte
+  (costruisco giardino + laboratorio, imposta_pet capra_lunare) fa
+  rivalutare da solo -> sinergia_crescita_pozione risulta attiva senza aver
+  chiamato rivaluta() a mano, e sinergia_attivata e' stato emesso).
+  validate_data.py exit 0 (9 warning invariati). Nessuna verifica a schermo.
+- Prossima storia: US-403 (effetti modifica_stat e modifica_follia:
+  su sinergia_attivata -> modificatore 'synergy:<id>' sullo StatsComponent /
+  contributo in Madness; su sinergia_disattivata -> rimozione; riapplica()).

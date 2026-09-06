@@ -43,8 +43,8 @@
       ],
       "priority": 2,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO A. SynergyEngine._ready() si connette ai segnali di cambiamento delle fonti: Equipment.equip_cambiato (copre equipaggia/rimuovi_slot/incastona/rimuovi_sigillo - 4 emit gia' esistenti); PetSystem.{pet_impostato, pet_liberato, pet_morto, bond_cambiato, pet_avanzato}; TalentSystem.talento_sbloccato; BaseSystem.{stanza_costruita, stanza_potenziata}; Progression.sequence_changed. _collega() usa has_signal + Callable.unbind(arita) cosi' un handler unico (_su_fonte_cambiata) accetta qualsiasi firma. _process(delta): accumulatore, ogni 0.5s rivaluta() comunque (rete di sicurezza). rivaluta(): ricalcola attive(), diff contro _attive_prec, emette sinergia_attivata(id)/sinergia_disattivata(id) SOLO sui cambi reali; idempotente. pulisci() azzera anche _attive_prec e _accumulo. Nessun segnale mancante: se una fonte non avesse il segnale giusto sarebbe un bug di quella fonte (micro-story), non un if qui. 506 test headless (504 + 2 in test_synergy_engine.gd: rivaluta emette solo sui cambi reali - attivata la 1a volta, niente al 2o giro sullo stesso stato, disattivata togliendo un tag; un segnale di una fonte (costruisco giardino+laboratorio + imposta_pet capra_lunare) fa rivalutare da solo -> sinergia_crescita_pozione attiva senza chiamare rivaluta a mano). validate exit 0. Nessuna verifica a schermo."
     },
     {
       "id": "US-403",
