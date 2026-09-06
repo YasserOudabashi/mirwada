@@ -15,7 +15,7 @@ func _n(s: String) -> Node:
 
 func prepara() -> void:
 	for a in ["/root/Inventory", "/root/Equipment", "/root/BaseSystem", "/root/PetSystem",
-			"/root/TalentSystem"]:
+			"/root/TalentSystem", "/root/SynergyEngine"]:
 		if _n(a) != null:
 			_n(a).call("pulisci")
 	for a in ["/root/TalentTracker", "/root/EventTracker"]:

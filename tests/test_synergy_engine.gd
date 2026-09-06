@@ -39,6 +39,8 @@ func prepara() -> void:
 
 
 func _fine() -> void:
+	if _se() != null:
+		_se().call("pulisci")  # azzera override + effetti, non contaminare le altre suite
 	if is_instance_valid(_p):
 		_p.free()
 
@@ -250,6 +252,41 @@ func test_modifica_primitiva_altera_il_parametro_prima_dell_handler() -> void:
 	_se().call("rivaluta")
 	assert_true(float(_gd().call("get_ability", "tg_crepuscolo").get("primitive", [{}])[0].get("raggio", 0)) == 7.0,
 		"i DATI dell'abilita' non sono stati toccati (la copia)")
+	_fine()
+
+
+func test_conflitto_cumulativo_le_modifica_stat_si_sommano() -> void:
+	var base: float = _stats().call("get_base", "spiritualita_max")
+	# studio_sereno (+10%) + meditazione_profonda (+5%) sulla stessa stat
+	_se().call("imposta_override_tag", {"occulto": 1, "conoscenza": 1, "notte": 1})
+	_se().call("rivaluta")
+	assert_true(_se().call("e_attiva", "sinergia_studio_sereno") and _se().call("e_attiva", "sinergia_meditazione_profonda"),
+		"entrambe attive")
+	assert_almost_eq(_stats().call("get_stat", "spiritualita_max"), base * 1.15,
+		"i due modificatori synergy:<id> si sommano (+10% +5% = +15%)")
+	_fine()
+
+
+func test_conflitto_esclusivo_vince_la_priorita_piu_alta() -> void:
+	var ps: Node = Engine.get_main_loop().root.get_node_or_null("PotionSystem")
+	var inv: Node = Engine.get_main_loop().root.get_node_or_null("Inventory")
+	var ric: Dictionary = _gd().call("get_recipe", "ric_cura_minore")  # "pura" (idx 2)
+	# crescita_pozione (delta 1, pri 0) + maestria_alchemica (delta 2, pri 10),
+	# stessa categoria "pozioni" -> vince maestria (pri 10) -> +2 non +3
+	_se().call("imposta_override_tag", {"crescita": 2, "pozione": 2, "scienza": 1})
+	_se().call("rivaluta")
+	assert_eq(_se().call("bonus_qualita", "pozioni"), 2,
+		"esclusivo: vince il delta della priorita' piu' alta, non la somma")
+	for ing in ric.get("ingredienti", {}):
+		inv.call("aggiungi", ing, int(ric["ingredienti"][ing]))
+	# pura (2) + 2 -> clamp a eccelsa (3), la scala e' scarsa/instabile/pura/eccelsa
+	assert_eq(str(ps.call("prepara", "ric_cura_minore").get("qualita")), "eccelsa",
+		"la pozione sale del solo bonus vincente")
+
+	var sp: Dictionary = _se().call("spiega", "sinergia_crescita_pozione")
+	assert_false(bool(sp["applicato"]), "spiega: crescita_pozione non e' applicata")
+	assert_eq(str(sp["sovrascritta_da"]), "sinergia_maestria_alchemica",
+		"spiega: sovrascritta dalla sinergia a priorita' piu' alta")
 	_fine()
 
 

@@ -4149,3 +4149,38 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-406 (priorita' e conflitti: SynergyEngine.spiega(id);
   test che due modifica_stat sulla stessa stat si sommano e due
   modifica_qualita_crafting stessa categoria -> vince la priorita' alta).
+
+[2026-09-06] US-406 — Priorita' e conflitti fra sinergie. BLOCCO A.
+
+- La regola era gia' nel _comment di synergy.schema.json (US-401) e in parte
+  implementata (bonus_qualita, US-404). Qui si completa e si testa.
+- CUMULATIVI (modifica_stat / modifica_follia / modifica_primitiva): i
+  contributi si SOMMANO gia' per costruzione (modificatori synergy:<id>
+  distinti sullo StatsComponent; _follia_attive per id; somma_flat +
+  somma_mult in applica_modifiche_primitiva). 'priorita' non cambia il
+  risultato, solo l'ordine (stabile).
+- ESCLUSIVI: _vincente_esclusiva(tipo, chiave) -> l'id con 'priorita' desc,
+  poi id lessicografico asc. bonus_qualita() rifattorizzata per usarla.
+- FIX aggiungi_abilita: _rimuovi_effetto revoca l'abilita' SOLO se nessun
+  altra sinergia attiva in _abilita_attive la concede ancora (due sinergie
+  possono prestare lo stesso ability_id; togliere una non deve togliere
+  l'abilita' se l'altra la vuole).
+- NUOVO SynergyEngine.spiega(id) -> { attiva, effetto_tipo, applicato,
+  sovrascritta_da (id della esclusiva che ha vinto, o ""), contributo } per
+  il debug e la UI del registro (US-410).
+- data/synergies/core.json: sinergia_meditazione_profonda (2a modifica_stat
+  su spiritualita_max) e sinergia_maestria_alchemica (priorita 10,
+  modifica_qualita_crafting pozioni delta 2).
+- REGRESSIONE trovata ed evitata: SynergyEngine ora alza GLOBALMENTE la
+  qualita' del crafting -> l'override di un test contaminava gli altri.
+  test_synergy_engine._fine() e le prepara() di test_stanze_alimentano_
+  sistemi e test_slice_fase_3 azzerano SynergyEngine.
+- Come verificato: 515 test headless (513 + 2 in test_synergy_engine.gd:
+  due modifica_stat sulla stessa stat -> +10% +5% = +15% (cumulo); due
+  modifica_qualita_crafting stessa categoria -> bonus_qualita = 2 (priorita
+  10) non 3 (somma), e spiega() dice crescita_pozione sovrascritta_da
+  maestria_alchemica). validate_data.py exit 0 (9 warning invariati; +2 stub
+  i18n). Nessuna verifica a schermo.
+- Prossima storia: US-407 (anti-sinergie: una anti:true soddisfatta applica
+  il malus e neutralizza le sinergie in 'neutralizza'; test col meccanismo su
+  una anti raggiungibile).

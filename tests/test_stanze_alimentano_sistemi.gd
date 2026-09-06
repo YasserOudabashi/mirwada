@@ -32,6 +32,11 @@ func prepara() -> void:
 		_inv().call("pulisci")
 	if _kn() != null and _kn().has_method("dimentica_tutto"):
 		_kn().call("dimentica_tutto")
+	# le sinergie (fase 4) alzano anche la qualita' del crafting: azzera il
+	# motore, cosi' questi test misurano solo il bonus della stanza.
+	var se: Node = Engine.get_main_loop().root.get_node_or_null("SynergyEngine")
+	if se != null:
+		se.call("pulisci")
 
 
 func _costruisci_livello(tipo: String, livello: int) -> void:

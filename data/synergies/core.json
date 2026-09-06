@@ -70,6 +70,28 @@
     },
     {
       "schema_version": 1,
+      "id": "sinergia_meditazione_profonda",
+      "name_i18n": "synergy.meditazione_profonda",
+      "richiede_tag": { "occulto": 1, "notte": 1 },
+      "fonti": ["stanza", "talento"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_stat", "stat": "spiritualita_max", "valore": 0.05, "moltiplicativo": true },
+      "scoperta": "nascosta",
+      "note": "Meditare di notte nella stanza rituale. Esempio di riferimento per il CUMULO di modifica_stat (US-406): si somma a sinergia_studio_sereno sulla stessa stat."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_maestria_alchemica",
+      "name_i18n": "synergy.maestria_alchemica",
+      "richiede_tag": { "scienza": 1, "crescita": 1 },
+      "fonti": ["stanza", "pet"],
+      "priorita": 10,
+      "effetto": { "tipo": "modifica_qualita_crafting", "categoria": "pozioni", "delta": 2 },
+      "scoperta": "nascosta",
+      "note": "Laboratorio + un pet che porta germogli freschi. Esempio di riferimento per il CONFLITTO ESCLUSIVO (US-406): a priorita 10 vince su sinergia_crescita_pozione (priorita 0) sulla categoria pozioni."
+    },
+    {
+      "schema_version": 1,
       "id": "anti_ordine_disordine",
       "name_i18n": "synergy.anti_ordine_disordine",
       "richiede_tag": { "ordine": 2, "disordine": 2 },

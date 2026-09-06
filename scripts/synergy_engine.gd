@@ -155,6 +155,59 @@ func riapplica() -> void:
 		_applica_effetto(str(id))
 
 
+## US-406: perche' una sinergia sta (o non sta) applicando il suo effetto.
+## Per il debug e per la UI del registro. { attiva, effetto_tipo, applicato,
+## sovrascritta_da (id della sinergia esclusiva che ha vinto, o ""),
+## contributo (il valore che questa sinergia mette, per gli effetti che si
+## sommano) }.
+func spiega(id: String) -> Dictionary:
+	var syn: Dictionary = _gd().call("get_synergy", id) if _gd() != null else {}
+	var eff: Dictionary = syn.get("effetto", {})
+	var et: String = str(eff.get("tipo", ""))
+	var out: Dictionary = {
+		"attiva": _attive_prec.has(id),
+		"effetto_tipo": et,
+		"applicato": _attive_prec.has(id),
+		"sovrascritta_da": "",
+		"contributo": null,
+	}
+	if not _attive_prec.has(id):
+		out["applicato"] = false
+		return out
+	if et == "modifica_qualita_crafting":
+		var cat: String = str(eff.get("categoria", ""))
+		var vincente: String = _vincente_esclusiva("modifica_qualita_crafting", cat)
+		if vincente != id:
+			out["applicato"] = false
+			out["sovrascritta_da"] = vincente
+		else:
+			out["contributo"] = int(eff.get("delta", 0))
+	elif et == "modifica_stat":
+		out["contributo"] = float(eff.get("valore", 0.0))
+	elif et == "modifica_follia":
+		out["contributo"] = float(eff.get("delta_al_minuto", 0.0))
+	return out
+
+
+## L'id della sinergia esclusiva che vince su una data chiave (categoria per
+## modifica_qualita_crafting): priorita' desc, poi id lessicografico asc.
+func _vincente_esclusiva(tipo: String, chiave: String) -> String:
+	var best_pri: int = -2147483648
+	var best_id: String = ""
+	for sid in _attive_prec:
+		var syn: Dictionary = _gd().call("get_synergy", sid)
+		var eff: Dictionary = syn.get("effetto", {})
+		if str(eff.get("tipo", "")) != tipo:
+			continue
+		if tipo == "modifica_qualita_crafting" and str(eff.get("categoria", "")) != chiave:
+			continue
+		var pri: int = int(syn.get("priorita", 0))
+		if pri > best_pri or (pri == best_pri and (best_id == "" or str(sid) < best_id)):
+			best_pri = pri
+			best_id = str(sid)
+	return best_id
+
+
 func pulisci() -> void:
 	var st: Node = _stats()
 	if st != null:
@@ -188,22 +241,10 @@ func _su_disattivata(id: String) -> void:
 func bonus_qualita(categoria: String) -> int:
 	if _gd() == null:
 		return 0
-	var scelta_pri: int = -2147483648
-	var scelta_id: String = ""
-	var scelta_delta: int = 0
-	for id in _attive_prec:
-		var syn: Dictionary = _gd().call("get_synergy", id)
-		var eff: Dictionary = syn.get("effetto", {})
-		if str(eff.get("tipo", "")) != "modifica_qualita_crafting":
-			continue
-		if str(eff.get("categoria", "")) != categoria:
-			continue
-		var pri: int = int(syn.get("priorita", 0))
-		if pri > scelta_pri or (pri == scelta_pri and (scelta_id == "" or str(id) < scelta_id)):
-			scelta_pri = pri
-			scelta_id = str(id)
-			scelta_delta = int(eff.get("delta", 0))
-	return scelta_delta
+	var vincente: String = _vincente_esclusiva("modifica_qualita_crafting", categoria)
+	if vincente == "":
+		return 0
+	return int((_gd().call("get_synergy", vincente) as Dictionary).get("effetto", {}).get("delta", 0))
 
 
 ## US-405: applica ai parametri di 'prim' (che il chiamante ha gia' COPIATO) i
@@ -267,10 +308,13 @@ func _rimuovi_effetto(id: String) -> void:
 		st.call("remove_modifier", "synergy:" + id)
 	_follia_attive.erase(id)
 	if _abilita_attive.has(id):
-		var ae: Node = get_node_or_null("/root/AbilityEngine")
-		if ae != null:
-			ae.call("revoca_permanente", str(_abilita_attive[id]))
+		var ability_id: String = str(_abilita_attive[id])
 		_abilita_attive.erase(id)
+		# US-406: revoca l'abilita' SOLO se nessun'altra sinergia attiva la
+		# concede ancora (piu' sinergie possono prestare lo stesso ability_id).
+		var ae: Node = get_node_or_null("/root/AbilityEngine")
+		if ae != null and not _abilita_attive.values().has(ability_id):
+			ae.call("revoca_permanente", ability_id)
 
 
 func _stats() -> Node:

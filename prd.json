@@ -121,8 +121,8 @@
       ],
       "priority": 6,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO A. La regola di risoluzione era gia' descritta nel _comment di synergy.schema.json (US-401) e in parte implementata (bonus_qualita in US-404). US-406 la completa e la testa. CUMULATIVI: modifica_stat -> due modificatori synergy:<id> distinti, lo StatsComponent li somma; modifica_follia -> _follia_attive per id, tutti sommati in _process; modifica_primitiva -> somma_flat + somma_mult in applica_modifiche_primitiva. 'priorita' non cambia il RISULTATO, solo l'ordine (stabile). ESCLUSIVI: _vincente_esclusiva(tipo, chiave) -> id con priorita' desc poi id lessicografico asc; bonus_qualita rifattorizzata per usarla. FIX aggiungi_abilita: _rimuovi_effetto revoca l'abilita' SOLO se nessun'altra sinergia attiva in _abilita_attive la concede ancora (piu' sinergie possono prestare lo stesso ability_id). NUOVO SynergyEngine.spiega(id) -> { attiva, effetto_tipo, applicato, sovrascritta_da, contributo } per il debug e la UI del registro (US-410). data/synergies/core.json: sinergia_meditazione_profonda (2a modifica_stat su spiritualita_max, per il cumulo) e sinergia_maestria_alchemica (priorita 10, modifica_qualita_crafting pozioni delta 2, per il conflitto esclusivo). 515 test headless (513 + 2 in test_synergy_engine.gd: due modifica_stat sulla stessa stat -> +10% +5% = +15%; due modifica_qualita_crafting stessa categoria -> bonus_qualita = 2 (priorita 10) non 3, e spiega() dice che crescita_pozione e' sovrascritta_da maestria_alchemica). REGRESSIONE trovata ed evitata: test_synergy_engine._fine() e le prepara() di test_stanze_alimentano_sistemi e test_slice_fase_3 ora azzerano SynergyEngine (il motore alza globalmente la qualita' del crafting, l'override di un test contaminava gli altri). validate exit 0. Nessuna verifica a schermo."
     },
     {
       "id": "US-407",
