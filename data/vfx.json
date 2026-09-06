@@ -38,7 +38,8 @@
     "teleport":       { "sprite": "vfx_rift",      "frames": 3, "impact_frame": true,  "scia": false },
     "soul_detach":    { "sprite": "vfx_sever",     "frames": 4, "impact_frame": true,  "scia": false },
     "resurrect":      { "sprite": "vfx_revenant",  "frames": 5, "impact_frame": true,  "scia": false },
-    "plant_growth":   { "sprite": "vfx_bloom",     "frames": 5, "impact_frame": false, "scia": false }
+    "plant_growth":   { "sprite": "vfx_bloom",     "frames": 5, "impact_frame": false, "scia": false },
+    "mind_read":      { "sprite": "vfx_insight",   "frames": 3, "impact_frame": false, "scia": false }
   },
   "impact_frames": {
     "_comment": "Durata legata a combat_feedback.hitstop_ms di audio.json: si tarano insieme (US-227).",

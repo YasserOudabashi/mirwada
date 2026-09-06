@@ -99,7 +99,8 @@
         "raggio",
         "profondita",
         "rivela"
-      ]
+      ],
+      "implemented": true
     },
     "teleport": {
       "params": [

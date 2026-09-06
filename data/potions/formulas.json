@@ -6,6 +6,7 @@
     "acido_da_saggio",
     "acqua_dello_stige",
     "acqua_di_fonte_benedetta",
+    "ago_che_cuce_il_fato",
     "ambra_grigia",
     "argento_annerito",
     "argento_benedetto",
@@ -24,6 +25,7 @@
     "cera_di_veglia",
     "chiave_d_ossa",
     "chiave_dell_oltretomba",
+    "chiave_di_ogni_serratura",
     "chiave_di_soluzione",
     "chiodo_di_bara",
     "chiodo_di_ferro_freddo",
@@ -33,14 +35,17 @@
     "corteccia_febbrifuga",
     "costante_universale_incrinata",
     "cristallo_di_riferimento",
+    "cristallo_mnemonico",
     "crogiolo_indistruttibile",
     "cuore_che_non_si_ferma",
     "cuore_del_pianeta",
     "cuore_di_montagna",
     "cuore_di_quercia_madre",
     "dente_di_teschio",
+    "domanda_senza_risposta",
     "ectoplasma",
     "enzima_dormiente",
+    "essenza_di_biblioteca",
     "essenza_spettrale",
     "estratto_di_muscolo",
     "ferro_delle_lapidi",
@@ -50,6 +55,7 @@
     "filo_d_argento_lunare",
     "filo_delle_parche",
     "filo_di_lana_rossa",
+    "filo_reciso_dalle_parche",
     "fiore_che_sboccia_solo_di_notte",
     "fiore_di_camomilla_selvatica",
     "fiore_di_luna",
@@ -66,6 +72,7 @@
     "il_confine_del_mondo",
     "incenso_dei_riti",
     "incenso_di_mirra",
+    "inchiostro_che_non_si_cancella",
     "inchiostro_di_due_mondi",
     "inchiostro_ferrogallico",
     "inchiostro_luminescente",
@@ -94,6 +101,7 @@
     "nucleo_spirituale_stabile",
     "numero_che_non_dovrebbe_esistere",
     "obolo_di_bronzo",
+    "occhio_di_vetro_nero",
     "olio_conduttore",
     "oro_bianco",
     "ossa_di_gatto_nero",
@@ -112,11 +120,14 @@
     "polvere_di_crepuscolo",
     "polvere_di_meteora",
     "polvere_di_ossario",
+    "polvere_di_pagine_antiche",
     "polvere_di_sale_nero",
     "polvere_di_specchio_incrinato",
+    "polvere_di_terza_vista",
     "polvere_reagente",
     "prima_notte_del_mondo",
     "prima_ruota_mai_costruita",
+    "primo_libro_mai_scritto",
     "prisma_che_devia_la_luce",
     "progetto_del_mondo_perfetto",
     "punta_d_argento",
@@ -155,6 +166,7 @@
     "sigillo_di_ceralacca",
     "soffio_di_spettro",
     "spazzola_da_scavo",
+    "specchio_annerito_dal_fumo",
     "specchio_di_luna_nera",
     "spiga_dorata",
     "spina_dell_ultimo_inverno",
@@ -965,6 +977,62 @@
         "quintessenza_distillata",
         "grimorio_bianco",
         "chiave_di_soluzione"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_hermit_3": {
+      "characteristic_sequence": 3,
+      "ingredients": [
+        "occhio_di_vetro_nero",
+        "polvere_di_terza_vista",
+        "specchio_annerito_dal_fumo"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_hermit_2": {
+      "characteristic_sequence": 2,
+      "ingredients": [
+        "essenza_di_biblioteca",
+        "cristallo_mnemonico",
+        "polvere_di_pagine_antiche"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_hermit_1": {
+      "characteristic_sequence": 1,
+      "ingredients": [
+        "ago_che_cuce_il_fato",
+        "filo_reciso_dalle_parche",
+        "inchiostro_che_non_si_cancella"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_hermit_0": {
+      "characteristic_sequence": 0,
+      "ingredients": [
+        "primo_libro_mai_scritto",
+        "chiave_di_ogni_serratura",
+        "domanda_senza_risposta"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

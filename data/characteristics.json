@@ -343,6 +343,30 @@
       "pathway_id": "hermit",
       "sequence": 4,
       "name_i18n": "characteristic.hermit.4"
+    },
+    {
+      "id": "char_hermit_3",
+      "pathway_id": "hermit",
+      "sequence": 3,
+      "name_i18n": "characteristic.hermit.3"
+    },
+    {
+      "id": "char_hermit_2",
+      "pathway_id": "hermit",
+      "sequence": 2,
+      "name_i18n": "characteristic.hermit.2"
+    },
+    {
+      "id": "char_hermit_1",
+      "pathway_id": "hermit",
+      "sequence": 1,
+      "name_i18n": "characteristic.hermit.1"
+    },
+    {
+      "id": "char_hermit_0",
+      "pathway_id": "hermit",
+      "sequence": 0,
+      "name_i18n": "characteristic.hermit.0"
     }
   ]
 }

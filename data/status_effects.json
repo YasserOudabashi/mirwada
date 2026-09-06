@@ -89,6 +89,16 @@
         "evasione": -0.2
       },
       "descrizione": "Dentro il campo dell'Illuminator le leggi fisiche locali sono sospese: chi si muove contro la volonta' del Paragon rallenta e schiva peggio. Reso senza rule_bind (primitiva differita): aura + terrain_modify, feel equivalente."
+    },
+    "destino_segnato": {
+      "tag": "destino",
+      "durata_default": 15.0,
+      "negativo": true,
+      "stat_modifiers": {
+        "difesa": -0.3,
+        "evasione": -0.3
+      },
+      "descrizione": "Il Knowledge Emperor ha letto e segnato il filo del destino del bersaglio: subisce di piu' e schiva peggio. Reso senza rule_bind (differita): curse + debuff_stat + reveal_info."
     }
   }
 }

@@ -358,6 +358,233 @@
         "area"
       ],
       "note": "La conoscenza mistica messa in pratica: un'area benedetta e piu' spirito per tutti."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_veggenza",
+      "name_i18n": "ability.hermit.hermit_veggenza",
+      "sequence_id": "hermit_3",
+      "costo_spiritualita": 18,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "mind_read",
+          "raggio": 12,
+          "profondita": 3,
+          "rivela": "intenzione"
+        }
+      ],
+      "tag_sinergia": [
+        "divinazione",
+        "occulto",
+        "singolo"
+      ],
+      "note": "Il Clairvoyant vede e sente le esistenze nascoste, incluse quelle che non vogliono essere viste. mind_read: Hermit e' l'unico Pathway attivo che la usa."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_occhio_interiore",
+      "name_i18n": "ability.hermit.hermit_occhio_interiore",
+      "sequence_id": "hermit_3",
+      "costo_spiritualita": 15,
+      "cooldown": 20.0,
+      "primitive": [
+        {
+          "tipo": "reveal_info",
+          "raggio": 15,
+          "categoria": "esistenza_nascosta",
+          "durata": 20.0
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 0.2,
+          "durata": 15.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "divinazione",
+        "occulto",
+        "area"
+      ],
+      "note": "L'occhio interiore rivela cio' che si nasconde e ti fa schivare cio' che non vedevi."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_potere_dal_sapere",
+      "name_i18n": "ability.hermit.hermit_potere_dal_sapere",
+      "sequence_id": "hermit_2",
+      "costo_spiritualita": 26,
+      "cooldown": 30.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "spiritualita_max",
+          "valore": 0.3,
+          "durata": 20.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "forza",
+          "valore": 0.2,
+          "durata": 20.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "conoscenza",
+        "occulto",
+        "forza"
+      ],
+      "note": "Il Sage drena potere direttamente dalla conoscenza accumulata."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_estrazione_arcana",
+      "name_i18n": "ability.hermit.hermit_estrazione_arcana",
+      "sequence_id": "hermit_2",
+      "costo_spiritualita": 20,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "dot",
+          "danno_tick": 20,
+          "tick_rate": 1.0,
+          "durata": 8.0,
+          "tag_danno": "spirito"
+        },
+        {
+          "tipo": "heal",
+          "quantita": 25,
+          "istantaneo": true,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "conoscenza",
+        "spirito",
+        "singolo"
+      ],
+      "note": "Estrarre potere arcano dal nemico: si consuma lui, si rafforza il Sage."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_marchio_del_destino",
+      "name_i18n": "ability.hermit.hermit_marchio_del_destino",
+      "sequence_id": "hermit_1",
+      "costo_spiritualita": 34,
+      "cooldown": 22.0,
+      "primitive": [
+        {
+          "tipo": "curse",
+          "effetto": "destino_segnato",
+          "durata": 15.0,
+          "condizione_rimozione": "purificazione"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.5,
+          "durata": 15.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "reveal_info",
+          "raggio": 5,
+          "categoria": "filo_del_destino",
+          "durata": 15.0
+        }
+      ],
+      "tag_sinergia": [
+        "destino",
+        "occulto",
+        "singolo"
+      ],
+      "note": "Il Knowledge Emperor legge e altera il destino tessuto di una persona. SENZA rule_bind (differita): curse(destino_segnato) + debuff pesante + reveal_info. Come darkness_1/paragon_1."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_riscrittura",
+      "name_i18n": "ability.hermit.hermit_riscrittura",
+      "sequence_id": "hermit_1",
+      "costo_spiritualita": 24,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "mind_read",
+          "raggio": 8,
+          "profondita": 5,
+          "rivela": "futuro_prossimo"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.4,
+          "durata": 10.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "destino",
+        "divinazione",
+        "singolo"
+      ],
+      "note": "Leggere il futuro prossimo del bersaglio e riscriverne un frammento: sbaglia i colpi che avrebbe azzeccato."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_occulto_come_dominio",
+      "name_i18n": "ability.hermit.hermit_occulto_come_dominio",
+      "sequence_id": "hermit_0",
+      "costo_spiritualita": 55,
+      "cooldown": 60.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 16,
+          "durata": -1,
+          "effetto": "destino_segnato",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        }
+      ],
+      "tag_sinergia": [
+        "occulto",
+        "dominio",
+        "area"
+      ],
+      "note": "L'occulto come dominio: chi vi si oppone e' gia' segnato."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_verita_ultima",
+      "name_i18n": "ability.hermit.hermit_verita_ultima",
+      "sequence_id": "hermit_0",
+      "costo_spiritualita": 48,
+      "cooldown": 45.0,
+      "primitive": [
+        {
+          "tipo": "mind_read",
+          "raggio": 20,
+          "profondita": 9,
+          "rivela": "ogni_segreto"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "spiritualita_max",
+          "valore": 0.3,
+          "durata": 20.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "conoscenza",
+        "divinazione",
+        "area"
+      ],
+      "note": "Nessun segreto resiste all'Hermit di Sequenza 0."
     }
   ]
 }

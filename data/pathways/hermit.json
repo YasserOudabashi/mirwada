@@ -424,24 +424,74 @@
       "name_i18n": "sequence.hermit.3",
       "tier": "saint",
       "concept": "Vede e sente le esistenze nascoste, incluse quelle che non vogliono essere viste.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 250,
+        "spiritualita_max": 0.4
+      },
+      "abilities": [
+        "hermit_veggenza",
+        "hermit_occhio_interiore"
+      ],
+      "acting_actions": [
+        {
+          "id": "hermit_3_veggente",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_veggenza"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_3_veggente",
+          "descrizione": "Leggi 15 menti"
+        },
+        {
+          "id": "hermit_3_occhio",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_occhio_interiore"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_3_occhio",
+          "descrizione": "Apri l'occhio interiore 15 volte"
+        },
+        {
+          "id": "hermit_3_chiaroveggente",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 18,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_3_chiaroveggente",
+          "descrizione": "Sconfiggi 18 nemici prevedendone le mosse"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 3,
-        "ingredients": [],
+        "ingredients": [
+          "occhio_di_vetro_nero",
+          "polvere_di_terza_vista",
+          "specchio_annerito_dal_fumo"
+        ],
         "formula_id": "formula_hermit_3"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "torre_di_osservazione",
+          "cripta"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "nuova",
+        "sacrifices": [
+          "il_ricordo_del_volto_di_una_persona_a_cui_volevi_bene"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 9.6,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 2,
@@ -450,24 +500,74 @@
       "name_i18n": "sequence.hermit.2",
       "tier": "angel",
       "concept": "Drena potere direttamente dalla conoscenza mistica accumulata.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 400,
+        "spiritualita_max": 0.5
+      },
+      "abilities": [
+        "hermit_potere_dal_sapere",
+        "hermit_estrazione_arcana"
+      ],
+      "acting_actions": [
+        {
+          "id": "hermit_2_saggio",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_potere_dal_sapere"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_2_saggio",
+          "descrizione": "Attingi al sapere 15 volte"
+        },
+        {
+          "id": "hermit_2_sapiente",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 20,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_2_sapiente",
+          "descrizione": "Sconfiggi 20 nemici col potere della conoscenza"
+        },
+        {
+          "id": "hermit_2_estrattore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_estrazione_arcana"
+          },
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_2_estrattore",
+          "descrizione": "Estrai potere arcano 12 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 2,
-        "ingredients": [],
+        "ingredients": [
+          "essenza_di_biblioteca",
+          "cristallo_mnemonico",
+          "polvere_di_pagine_antiche"
+        ],
         "formula_id": "formula_hermit_2"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "biblioteca",
+          "archivio"
+        ],
+        "momento": "mezzogiorno",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "dieci_libri_che_avevi_amato_letti_e_poi_bruciati"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 10.9,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 1,
@@ -476,24 +576,73 @@
       "name_i18n": "sequence.hermit.1",
       "tier": "angel",
       "concept": "Legge e altera il destino tessuto di una persona.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 600,
+        "spiritualita_max": 0.55
+      },
+      "abilities": [
+        "hermit_marchio_del_destino",
+        "hermit_riscrittura"
+      ],
+      "acting_actions": [
+        {
+          "id": "hermit_1_imperatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_marchio_del_destino"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_1_imperatore",
+          "descrizione": "Segna 15 destini"
+        },
+        {
+          "id": "hermit_1_sovrano",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_1_sovrano",
+          "descrizione": "Sconfiggi 15 nemici gia' segnati"
+        },
+        {
+          "id": "hermit_1_scriba",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_riscrittura"
+          },
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_1_scriba",
+          "descrizione": "Riscrivi 12 frammenti di futuro"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 1,
-        "ingredients": [],
+        "ingredients": [
+          "ago_che_cuce_il_fato",
+          "filo_reciso_dalle_parche",
+          "inchiostro_che_non_si_cancella"
+        ],
         "formula_id": "formula_hermit_1"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "sala_dei_sigilli"
+        ],
+        "momento": "notte_fonda",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "ancora_del_giocatore"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 12.5,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 0,
@@ -502,24 +651,74 @@
       "name_i18n": "sequence.hermit.0",
       "tier": "god",
       "concept": "L'occulto come dominio.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 900,
+        "spiritualita_max": 0.75,
+        "difesa": 0.4
+      },
+      "abilities": [
+        "hermit_occulto_come_dominio",
+        "hermit_verita_ultima"
+      ],
+      "acting_actions": [
+        {
+          "id": "hermit_0_occulto",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_occulto_come_dominio"
+          },
+          "target": 5,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_0_occulto",
+          "descrizione": "Imponi l'occulto come dominio 5 volte"
+        },
+        {
+          "id": "hermit_0_verita",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 30,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_0_verita",
+          "descrizione": "Sconfiggi 30 nemici"
+        },
+        {
+          "id": "hermit_0_onnisciente",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_verita_ultima"
+          },
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_0_onnisciente",
+          "descrizione": "Estrai ogni segreto 10 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 0,
-        "ingredients": [],
+        "ingredients": [
+          "primo_libro_mai_scritto",
+          "chiave_di_ogni_serratura",
+          "domanda_senza_risposta"
+        ],
         "formula_id": "formula_hermit_0"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "archivio"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "eclissi",
+        "sacrifices": [
+          "il_detentore_precedente_della_sequenza_0"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 14.0,
       "notes": "",
-      "stub": true
+      "stub": false
     }
   ]
 }

@@ -70,6 +70,7 @@ func _ready() -> void:
 		"soul_detach": _p_soul_detach,
 		"resurrect": _p_resurrect,
 		"plant_growth": _p_plant_growth,
+		"mind_read": _p_mind_read,
 	}
 
 
@@ -561,6 +562,19 @@ func _p_curse(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String)
 
 	return {"tipo": "curse", "effetto": effetto, "durata": durata,
 			"condizione_rimozione": condizione_rimozione, "applied": applicato}
+
+
+## mind_read (US-520): il Clairvoyant/Knowledge Emperor legge la mente di un
+## bersaglio nel raggio. Riusa il segnale info_rivelata (canale reveal) con
+## categoria "mente:<rivela>". Il consumatore (HUD/UI del bersaglio, IA che
+## reagisce) e' fase 6.
+func _p_mind_read(prim: Dictionary, caster: Node, _stats: Node, _ability_id: String) -> Dictionary:
+	var raggio: float = _num(prim.get("raggio"), 0.0)
+	var profondita: float = _num(prim.get("profondita"), 1.0)
+	var rivela: String = str(prim.get("rivela", ""))
+	var origine: Vector2 = (caster as Node2D).global_position if caster is Node2D and (caster as Node2D).is_inside_tree() else Vector2.ZERO
+	info_rivelata.emit("mente:" + rivela, raggio, origine)
+	return {"tipo": "mind_read", "raggio": raggio, "profondita": profondita, "rivela": rivela}
 
 
 ## plant_growth (US-512): fa crescere vegetazione di 'specie' in un raggio.

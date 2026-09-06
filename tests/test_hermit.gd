@@ -74,6 +74,26 @@ func test_le_acting_di_hermit_sommano_uno() -> void:
 			"hermit_%d: acting sommano 1.0" % int((seq as Dictionary).get("sequence")))
 
 
+func test_mind_read_emette_il_segnale_e_il_marchio_applica_destino_segnato() -> void:
+	var e: Node = _engine()
+	var c: Node2D = _caster()
+	var s: Node = c.get_node("Stats")
+	var visto: Array = []
+	var cb := func(cat: String, _r: float, _o: Vector2) -> void: visto.append(cat)
+	e.connect("info_rivelata", cb)
+	e.call("execute", "hermit_veggenza", c)  # mind_read rivela "intenzione"
+	e.disconnect("info_rivelata", cb)
+	assert_true(visto.has("mente:intenzione"), "mind_read emette info_rivelata con 'mente:<rivela>'")
+
+	var dif0: float = s.call("get_stat", "difesa")
+	e.call("clear_cooldowns")
+	e.call("execute", "hermit_marchio_del_destino", c)  # curse destino_segnato + debuff + reveal_info
+	assert_true(s.call("ha_status", "destino_segnato"),
+		"hermit_1 (senza rule_bind) applica lo status 'destino_segnato'")
+	assert_gt(dif0, s.call("get_stat", "difesa"), "e il bersaglio segnato para peggio")
+	_cleanup(c)
+
+
 func test_nessuna_abilita_hermit_usa_una_primitiva_differita() -> void:
 	# US-520: hermit_1 (Knowledge Emperor) non deve puntare a rule_bind.
 	var differite := ["rule_bind", "weather_control", "probability_shift"]

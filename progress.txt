@@ -5086,3 +5086,42 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - Prossima storia: US-520 (Hermit Seq 3-0: Clairvoyant / Sage / Knowledge
   Emperor / Hermit + primitiva mind_read; hermit_1 riscritta senza rule_bind).
   Chiude il BLOCCO 5.
+
+[2026-09-07] US-520 — Hermit Sequenze 3-0 (Clairvoyant / Sage / Knowledge Emperor / Hermit). BLOCCO 5 CHIUSO. HERMIT COMPLETO. TUTTI E 5 I PATHWAY DELLA FASE 5 COMPLETI.
+
+- PRIMITIVA NUOVA mind_read: _p_mind_read - riusa il segnale info_rivelata con
+  categoria "mente:<rivela>". Il consumatore (UI del bersaglio, IA che
+  reagisce) e' fase 6. primitives.json implemented; vfx.json vfx_insight;
+  _handlers +1. Hermit e' l'unico Pathway attivo che la usa.
+- NUOVO status 'destino_segnato' (tag destino, negativo, difesa -0.3 /
+  evasione -0.3).
+- hermit_1 (Knowledge Emperor) RISCRITTA SENZA rule_bind: "legge e altera il
+  destino tessuto" = curse(destino_segnato) + debuff_stat pesante +
+  reveal_info(filo_del_destino). Come darkness_1 / paragon_1. Il grep di
+  data/abilities/ per rule_bind COME PRIMITIVA -> 0 (resta solo citato nelle
+  note "SENZA rule_bind").
+- CONTENUTO Hermit Seq 3/2/1/0 (stub -> false). HERMIT COMPLETO: 10/10.
+  * hermit_veggenza (mind_read), hermit_occhio_interiore (reveal_info + buff),
+    hermit_potere_dal_sapere (2x buff), hermit_estrazione_arcana (dot + heal),
+    hermit_marchio_del_destino (curse + debuff + reveal_info),
+    hermit_riscrittura (mind_read + debuff), hermit_occulto_come_dominio
+    (aura destino_segnato persistente), hermit_verita_ultima (mind_read r20 +
+    buff).
+  * acting somma 1.0. madness 9.6/10.9/12.5/14.0.
+  * rituali Seq 3/2/1/0; Seq 1 Ancora, Seq 0 il_detentore_precedente.
+  * formule formula_hermit_3/2/1/0 + 12 ingredienti; char_hermit_3/2/1/0.
+- i18n: 8 abilita' + 4 caratteristiche tradotte. 58 TODO.
+- Come verificato: 569 test headless (568 + 1 in test_hermit.gd: mind_read
+  emette info_rivelata con "mente:intenzione"; hermit_marchio_del_destino
+  applica destino_segnato e abbassa la difesa). validate exit 0 (3 warning).
+- BLOCCO 5 CHIUSO: US-518/519/520. Hermit completo (10 Sequenze).
+- FASE 5 - CONTENUTO COMPLETO: Death, Moon, Mother, Paragon, Hermit tutti a
+  10/10 Sequenze. 61 Sequenze non-stub su 100 (10 TG + fool_9 + 50).
+  Primitive implementate in fase 5: fear, reveal_info, teleport, soul_detach,
+  resurrect (blocco 1), plant_growth (blocco 3), mind_read (blocco 5) = 7.
+  Restano senza handler (per fase 5b - Darkness/Fool/Error/Door): illusion,
+  possess, steal, time_rewind, chain, shadow_meld.
+- Fase 5: 20/22. Resta il BLOCCO 6 (US-521 sinergie batch_4 + le 50
+  caratteristiche; US-522 chiusura fase 5).
+- Prossima storia: US-521 (sinergie batch_4 dei 5 Pathway nuovi + verifica che
+  le 50 caratteristiche esistano e siano tradotte).
