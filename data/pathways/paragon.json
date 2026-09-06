@@ -422,24 +422,74 @@
       "name_i18n": "sequence.paragon.3",
       "tier": "saint",
       "concept": "Unisce scienza e misticismo: incisioni che funzionano su entrambi i piani.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 250,
+        "spiritualita_max": 0.35
+      },
+      "abilities": [
+        "paragon_incisione_duale",
+        "paragon_sigillo_ibrido"
+      ],
+      "acting_actions": [
+        {
+          "id": "paragon_3_scolaro",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_incisione_duale"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_3_scolaro",
+          "descrizione": "Incidi 15 sigilli duali"
+        },
+        {
+          "id": "paragon_3_maestro",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 18,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_3_maestro",
+          "descrizione": "Sconfiggi 18 nemici"
+        },
+        {
+          "id": "paragon_3_ibrido",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_sigillo_ibrido"
+          },
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_3_ibrido",
+          "descrizione": "Applica 12 sigilli ibridi"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 3,
-        "ingredients": [],
+        "ingredients": [
+          "inchiostro_di_due_mondi",
+          "stilo_di_ossidiana",
+          "pergamena_a_doppia_faccia"
+        ],
         "formula_id": "formula_paragon_3"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "sala_dei_sigilli",
+          "studio"
+        ],
+        "momento": "notte_fonda",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "una_teoria_a_cui_tenevi_dimostrata_falsa_da_te_stesso"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 9.6,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 2,
@@ -448,26 +498,73 @@
       "name_i18n": "sequence.paragon.2",
       "tier": "angel",
       "concept": "Infonde spirito negli oggetti creati: costrutti autonomi e permanenti.",
-      "stat_modifiers": {},
+      "stat_modifiers": {
+        "hp_max": 400,
+        "spiritualita_max": 0.45
+      },
       "abilities": [
-        "paragon_costrutto_vivo"
+        "paragon_costrutto_vivo",
+        "paragon_officina_mobile"
       ],
-      "acting_actions": [],
+      "acting_actions": [
+        {
+          "id": "paragon_2_magister",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_costrutto_vivo"
+          },
+          "target": 8,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_2_magister",
+          "descrizione": "Anima 8 costrutti vivi"
+        },
+        {
+          "id": "paragon_2_industria",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 20,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_2_industria",
+          "descrizione": "Sconfiggi 20 nemici coi costrutti"
+        },
+        {
+          "id": "paragon_2_officina",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_officina_mobile"
+          },
+          "target": 6,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_2_officina",
+          "descrizione": "Schiera 6 officine mobili"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 2,
-        "ingredients": [],
+        "ingredients": [
+          "nucleo_spirituale_stabile",
+          "telaio_di_precisione_assoluta",
+          "memoria_cristallizzata"
+        ],
         "formula_id": "formula_paragon_2"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "officina"
+        ],
+        "momento": "mezzogiorno",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "il_primo_costrutto_che_avevi_creato_e_a_cui_ti_eri_affezionato"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 10.9,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 1,
@@ -476,24 +573,74 @@
       "name_i18n": "sequence.paragon.1",
       "tier": "angel",
       "concept": "Altera le leggi fisiche locali in un raggio.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 600,
+        "spiritualita_max": 0.5
+      },
+      "abilities": [
+        "paragon_campo_alterato",
+        "paragon_dettato_fisico"
+      ],
+      "acting_actions": [
+        {
+          "id": "paragon_1_illuminatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_campo_alterato"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_1_illuminatore",
+          "descrizione": "Altera le leggi locali 12 volte"
+        },
+        {
+          "id": "paragon_1_legislatore",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_1_legislatore",
+          "descrizione": "Sconfiggi 15 nemici nel tuo campo alterato"
+        },
+        {
+          "id": "paragon_1_dettatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_dettato_fisico"
+          },
+          "target": 15,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_1_dettatore",
+          "descrizione": "Detta la fisica 15 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 1,
-        "ingredients": [],
+        "ingredients": [
+          "costante_universale_incrinata",
+          "prisma_che_devia_la_luce",
+          "numero_che_non_dovrebbe_esistere"
+        ],
         "formula_id": "formula_paragon_1"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "torre_di_osservazione",
+          "sala_dei_sigilli"
+        ],
+        "momento": "mezzogiorno",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "ancora_del_giocatore"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 12.5,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 0,
@@ -502,24 +649,74 @@
       "name_i18n": "sequence.paragon.0",
       "tier": "god",
       "concept": "La civilta' come dominio.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 900,
+        "spiritualita_max": 0.7,
+        "difesa": 0.5
+      },
+      "abilities": [
+        "paragon_civilta_come_dominio",
+        "paragon_legione_meccanica"
+      ],
+      "acting_actions": [
+        {
+          "id": "paragon_0_civilta",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_civilta_come_dominio"
+          },
+          "target": 5,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_0_civilta",
+          "descrizione": "Imponi la civilta' come dominio 5 volte"
+        },
+        {
+          "id": "paragon_0_ordine",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 30,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_0_ordine",
+          "descrizione": "Sconfiggi 30 nemici"
+        },
+        {
+          "id": "paragon_0_legione",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_legione_meccanica"
+          },
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_0_legione",
+          "descrizione": "Schiera 10 legioni meccaniche"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 0,
-        "ingredients": [],
+        "ingredients": [
+          "progetto_del_mondo_perfetto",
+          "lega_impossibile_da_replicare",
+          "prima_ruota_mai_costruita"
+        ],
         "formula_id": "formula_paragon_0"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "officina"
+        ],
+        "momento": "mezzogiorno",
+        "fase_lunare": "eclissi",
+        "sacrifices": [
+          "il_detentore_precedente_della_sequenza_0"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 14.0,
       "notes": "",
-      "stub": true
+      "stub": false
     }
   ]
 }

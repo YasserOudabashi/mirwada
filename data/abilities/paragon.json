@@ -339,6 +339,197 @@
         "evocazione"
       ],
       "note": "Un costrutto titanico: combatte per te mentre tu resti al riparo."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_incisione_duale",
+      "name_i18n": "ability.paragon.paragon_incisione_duale",
+      "sequence_id": "paragon_3",
+      "costo_spiritualita": 20,
+      "cooldown": 22.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "spiritualita_max",
+          "valore": 0.2,
+          "durata": 15.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "shield",
+          "assorbimento": 60,
+          "durata": 15.0,
+          "riflette": 0.2,
+          "tag_bloccati": [],
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "scienza",
+        "conoscenza",
+        "difesa"
+      ],
+      "note": "L'Arcane Scholar incide sigilli che funzionano su scienza E misticismo: barriera che riflette e spirito piu' saldo."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_sigillo_ibrido",
+      "name_i18n": "ability.paragon.paragon_sigillo_ibrido",
+      "sequence_id": "paragon_3",
+      "costo_spiritualita": 16,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "curse",
+          "effetto": "decadimento",
+          "durata": 10.0,
+          "condizione_rimozione": "purificazione"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.35,
+          "durata": 10.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "scienza",
+        "decadimento",
+        "singolo"
+      ],
+      "note": "Un sigillo ibrido inciso sul bersaglio: si corrode e perde la mira."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_officina_mobile",
+      "name_i18n": "ability.paragon.paragon_officina_mobile",
+      "sequence_id": "paragon_2",
+      "costo_spiritualita": 38,
+      "cooldown": 90.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "costrutto_autonomo",
+          "quantita": 2,
+          "durata": -1,
+          "comportamento": "difensivo"
+        }
+      ],
+      "tag_sinergia": [
+        "crafting",
+        "invenzione",
+        "evocazione"
+      ],
+      "note": "Il Knowledge Magister infonde spirito negli oggetti: due costrutti autonomi e PERMANENTI, serializzati nel save."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_campo_alterato",
+      "name_i18n": "ability.paragon.paragon_campo_alterato",
+      "sequence_id": "paragon_1",
+      "costo_spiritualita": 34,
+      "cooldown": 40.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 10,
+          "durata": -1,
+          "effetto": "gravita_alterata",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        },
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "legge_locale_sospesa",
+          "raggio": 10,
+          "durata": 20.0,
+          "permanente": false
+        }
+      ],
+      "tag_sinergia": [
+        "invenzione",
+        "dominio",
+        "area"
+      ],
+      "note": "L'Illuminator altera le leggi fisiche locali. SENZA rule_bind (differita): aura(gravita_alterata) + terrain_modify. Il feel resta, la manipolazione VERA delle regole resta a un Pathway differito."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_dettato_fisico",
+      "name_i18n": "ability.paragon.paragon_dettato_fisico",
+      "sequence_id": "paragon_1",
+      "costo_spiritualita": 22,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 0.3,
+          "durata": 12.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "velocita",
+          "valore": 0.2,
+          "durata": 12.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "invenzione",
+        "scienza",
+        "singolo"
+      ],
+      "note": "Dentro il tuo campo, riscrivi la fisica a tuo favore: piu' veloce, piu' difficile da colpire."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_civilta_come_dominio",
+      "name_i18n": "ability.paragon.paragon_civilta_come_dominio",
+      "sequence_id": "paragon_0",
+      "costo_spiritualita": 55,
+      "cooldown": 60.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 16,
+          "durata": -1,
+          "effetto": "gravita_alterata",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        }
+      ],
+      "tag_sinergia": [
+        "scienza",
+        "dominio",
+        "area"
+      ],
+      "note": "La civilta' come dominio: dove arriva il Paragon, le regole sono le sue."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_legione_meccanica",
+      "name_i18n": "ability.paragon.paragon_legione_meccanica",
+      "sequence_id": "paragon_0",
+      "costo_spiritualita": 50,
+      "cooldown": 50.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "costrutto_legione",
+          "quantita": 5,
+          "durata": 40.0,
+          "comportamento": "aggressivo"
+        }
+      ],
+      "tag_sinergia": [
+        "crafting",
+        "evocazione",
+        "area"
+      ],
+      "note": "Cinque costrutti da guerra: la civilta' che si difende da sola."
     }
   ]
 }

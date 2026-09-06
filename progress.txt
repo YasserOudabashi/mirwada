@@ -5011,3 +5011,35 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - Prossima storia: US-517 (Paragon Seq 3-0: Arcane Scholar / Knowledge Magister
   / Illuminator / Paragon - costrutti permanenti; paragon_1 RISCRITTA senza
   rule_bind). Chiude il BLOCCO 4.
+
+[2026-09-06] US-517 — Paragon Sequenze 3-0 (Arcane Scholar / Knowledge Magister / Illuminator / Paragon). BLOCCO 4 CHIUSO. PARAGON COMPLETO.
+
+- NESSUNA primitiva nuova. NUOVO status 'gravita_alterata' (tag invenzione,
+  negativo, velocita -0.4 / evasione -0.2).
+- paragon_1 (Illuminator) RISCRITTA SENZA rule_bind (primitiva differita):
+  "altera le leggi fisiche locali" = aura(gravita_alterata) persistente sui
+  nemici + terrain_modify(legge_locale_sospesa). Come darkness_1: il feel
+  resta, la manipolazione vera delle regole resta a un Pathway differito.
+  Grep di data/abilities/ per rule_bind come primitiva: 0 (chiude anche il
+  residuo di hermit_1, che US-520 riscrivera').
+- CONTENUTO Paragon Seq 3/2/1/0 (stub -> false). PARAGON COMPLETO: 10/10.
+  * paragon_incisione_duale (buff + shield riflettente), paragon_sigillo_ibrido
+    (curse decadimento + debuff), paragon_officina_mobile (summon
+    costrutto_autonomo durata -1 - costrutti permanenti nel save),
+    paragon_campo_alterato (aura gravita_alterata + terrain_modify),
+    paragon_dettato_fisico (2x buff), paragon_civilta_come_dominio (aura
+    persistente), paragon_legione_meccanica (summon costrutto_legione x5).
+    paragon_costrutto_vivo (stress test seq 2) nel roster.
+  * acting somma 1.0. madness 9.6/10.9/12.5/14.0.
+  * rituali Seq 3/2/1/0; Seq 1 Ancora, Seq 0 il_detentore_precedente.
+  * formule formula_paragon_3/2/1/0 + 12 ingredienti; char_paragon_3/2/1/0.
+- i18n: 8 abilita' + 4 caratteristiche tradotte. 58 TODO.
+- Come verificato: 565 test headless (test_paragon.gd itera dinamicamente e
+  copre le 20 abilita'; il check "nessuna primitiva differita" e' la verifica
+  del rule_bind rimosso). validate exit 0 (3 warning).
+- BLOCCO 4 CHIUSO: US-515/516/517. Paragon completo (10 Sequenze).
+  0 primitive nuove (reveal_info gia' c'era da US-505); 1 status nuovo.
+- Fase 5: 17/22. Pathway completi: Death, Moon, Mother, Paragon (+ TG).
+  51 Sequenze non-stub su 100. Resta solo Hermit (blocco 5) + chiusura.
+- Prossima storia: US-518 (BLOCCO 5 - Hermit Seq 9-7: Mystery Pryer / Melee
+  Scholar / Warlock).

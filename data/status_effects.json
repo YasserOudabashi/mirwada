@@ -79,6 +79,16 @@
         "difesa": 0.05
       },
       "descrizione": "Il terreno benedetto dallo Harvest Priest: chi vi sta sopra e' protetto e si rigenera lentamente (la cura nel tempo la fa il campo dell aura)."
+    },
+    "gravita_alterata": {
+      "tag": "invenzione",
+      "durata_default": -1,
+      "negativo": true,
+      "stat_modifiers": {
+        "velocita": -0.4,
+        "evasione": -0.2
+      },
+      "descrizione": "Dentro il campo dell'Illuminator le leggi fisiche locali sono sospese: chi si muove contro la volonta' del Paragon rallenta e schiva peggio. Reso senza rule_bind (primitiva differita): aura + terrain_modify, feel equivalente."
     }
   }
 }

@@ -283,6 +283,30 @@
       "pathway_id": "paragon",
       "sequence": 4,
       "name_i18n": "characteristic.paragon.4"
+    },
+    {
+      "id": "char_paragon_3",
+      "pathway_id": "paragon",
+      "sequence": 3,
+      "name_i18n": "characteristic.paragon.3"
+    },
+    {
+      "id": "char_paragon_2",
+      "pathway_id": "paragon",
+      "sequence": 2,
+      "name_i18n": "characteristic.paragon.2"
+    },
+    {
+      "id": "char_paragon_1",
+      "pathway_id": "paragon",
+      "sequence": 1,
+      "name_i18n": "characteristic.paragon.1"
+    },
+    {
+      "id": "char_paragon_0",
+      "pathway_id": "paragon",
+      "sequence": 0,
+      "name_i18n": "characteristic.paragon.0"
     }
   ]
 }

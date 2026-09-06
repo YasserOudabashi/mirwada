@@ -27,6 +27,7 @@
     "corno_di_alce_spettrale",
     "corona_di_ossa",
     "corteccia_febbrifuga",
+    "costante_universale_incrinata",
     "cristallo_di_riferimento",
     "crogiolo_indistruttibile",
     "cuore_che_non_si_ferma",
@@ -56,17 +57,20 @@
     "goccia_di_prima_pioggia",
     "il_confine_del_mondo",
     "incenso_dei_riti",
+    "inchiostro_di_due_mondi",
     "inchiostro_stellare",
     "ingranaggio_di_precisione",
     "lacrima_di_amante",
     "lacrima_di_paladino",
     "lama_di_luce_solidificata",
     "lega_beyonder",
+    "lega_impossibile_da_replicare",
     "lente_di_lungo_fuoco",
     "lente_graduata",
     "linfa_di_gigante",
     "luce_di_luna_imbottigliata",
     "mano_di_gloria",
+    "memoria_cristallizzata",
     "mercurio_filosofale",
     "metallo_impossibile",
     "miele_selvatico",
@@ -76,12 +80,15 @@
     "muschio_luminoso",
     "nebbia_del_limbo",
     "nucleo_del_crepuscolo",
+    "nucleo_spirituale_stabile",
+    "numero_che_non_dovrebbe_esistere",
     "obolo_di_bronzo",
     "olio_conduttore",
     "oro_bianco",
     "ossidiana_decaduta",
     "osso_di_pugile",
     "pelo_di_lupo_bianco",
+    "pergamena_a_doppia_faccia",
     "petalo_di_belladonna",
     "pietra_di_marea",
     "pietra_di_soglia",
@@ -94,6 +101,9 @@
     "polvere_di_specchio_incrinato",
     "polvere_reagente",
     "prima_notte_del_mondo",
+    "prima_ruota_mai_costruita",
+    "prisma_che_devia_la_luce",
+    "progetto_del_mondo_perfetto",
     "radice_amara",
     "radice_che_beve",
     "radice_di_ferro_lunare",
@@ -132,7 +142,9 @@
     "spina_dell_ultimo_inverno",
     "spina_di_rovo_antico",
     "stendardo_lacero",
+    "stilo_di_ossidiana",
     "taccuino_di_appunti",
+    "telaio_di_precisione_assoluta",
     "tempo_solidificato",
     "tendine_di_lupo",
     "terra_di_cimitero",
@@ -795,6 +807,62 @@
         "mercurio_filosofale",
         "crogiolo_indistruttibile",
         "catalizzatore_proibito"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_paragon_3": {
+      "characteristic_sequence": 3,
+      "ingredients": [
+        "inchiostro_di_due_mondi",
+        "stilo_di_ossidiana",
+        "pergamena_a_doppia_faccia"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_paragon_2": {
+      "characteristic_sequence": 2,
+      "ingredients": [
+        "nucleo_spirituale_stabile",
+        "telaio_di_precisione_assoluta",
+        "memoria_cristallizzata"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_paragon_1": {
+      "characteristic_sequence": 1,
+      "ingredients": [
+        "costante_universale_incrinata",
+        "prisma_che_devia_la_luce",
+        "numero_che_non_dovrebbe_esistere"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_paragon_0": {
+      "characteristic_sequence": 0,
+      "ingredients": [
+        "progetto_del_mondo_perfetto",
+        "lega_impossibile_da_replicare",
+        "prima_ruota_mai_costruita"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {
