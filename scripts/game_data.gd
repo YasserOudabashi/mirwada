@@ -48,6 +48,7 @@ const PATH_EQUIP_SLOTS := "res://data/schema/equip_slots.json"
 const PATH_SIGILS := "res://data/sigils/core.json"
 const PATH_SIGIL_EFFECT_TYPES := "res://data/schema/sigil_effect_types.json"
 const PATH_BLUEPRINTS := "res://data/forge/blueprints.json"
+const PATH_REGIONS := "res://data/world/regions.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -89,6 +90,7 @@ var _equip_slots: Dictionary = {}
 var _sigils: Dictionary = {}
 var _sigil_effect_types: Dictionary = {}
 var _blueprints: Dictionary = {}
+var _regions: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -163,6 +165,7 @@ func load_all() -> void:
 	_load_single(PATH_SIGILS, "sigils", _sigils, TYPE_DICTIONARY)
 	_load_single(PATH_SIGIL_EFFECT_TYPES, "effetti", _sigil_effect_types, TYPE_ARRAY)
 	_load_single(PATH_BLUEPRINTS, "blueprints", _blueprints, TYPE_DICTIONARY)
+	_load_single(PATH_REGIONS, "regions", _regions, TYPE_ARRAY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -528,6 +531,19 @@ func get_primitive_vfx(tipo: String) -> Dictionary:
 
 func get_vfx(sezione: String) -> Dictionary:
 	return _dict_or_empty(_vfx.get(sezione))
+
+
+## --- Regioni del mondo (data/world/regions.json, US-601) ---
+func get_regions() -> Array:
+	return _array_or_empty(_regions.get("regions"))
+
+
+## {} se l'id non esiste: il chiamante controlla con is_empty().
+func get_region(id: String) -> Dictionary:
+	for r in get_regions():
+		if typeof(r) == TYPE_DICTIONARY and str((r as Dictionary).get("id", "")) == id:
+			return r
+	return {}
 
 
 ## La Caratteristica di quel (Pathway, Sequenza). {} se non esiste.

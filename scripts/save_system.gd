@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 20
+const VERSIONE_CORRENTE := 21
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -220,6 +220,8 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_18_a_19(doc)
 			19:
 				doc = _migra_19_a_20(doc)
+			20:
+				doc = _migra_20_a_21(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -372,6 +374,26 @@ func _migra_18_a_19(doc: Dictionary) -> Dictionary:
 func _migra_19_a_20(doc: Dictionary) -> Dictionary:
 	if not doc.has("sinergie"):
 		doc["sinergie"] = {"viste": []}
+	return doc
+
+
+## v20 -> v21: il mondo di fase 6 (US-602). Il campo "mondo" esiste gia' da
+## v4 (terrain_mods): qui si aggiungono regione corrente, regioni scoperte e
+## gate aperti in modo permanente. UNICO bump di tutta la fase 6: le story
+## successive che aggiungono campi a "mondo" (tempo, npc, flag, reputazione,
+## quest) NON bumpano - il campo manca nei save v21 e WorldState/i sistemi
+## ne gestiscono l'assenza col default.
+func _migra_20_a_21(doc: Dictionary) -> Dictionary:
+	var mondo: Variant = doc.get("mondo", {})
+	if typeof(mondo) != TYPE_DICTIONARY:
+		mondo = {}
+	if not mondo.has("regione"):
+		mondo["regione"] = ""
+	if not mondo.has("scoperte"):
+		mondo["scoperte"] = []
+	if not mondo.has("gate_aperti"):
+		mondo["gate_aperti"] = []
+	doc["mondo"] = mondo
 	return doc
 
 

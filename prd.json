@@ -34,8 +34,8 @@
       ],
       "priority": 2,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO A. game_data.gd: get_regions()/get_region(id). world_state.gd: regione_corrente/scoperte/gate_aperti + segnale regione_cambiata, per/da_salvataggio estesi (rilettura non fidata). save_system.gd: VERSIONE 20->21 + _migra_20_a_21 (UNICO bump di fase 6). region_scene.gd (NUOVO): una implementazione data-driven per tutte le regioni - tilemap diagnostico + Area2D per location_tag + camera clamp + WorldState.entra_regione. scenes/regioni/mirwada.tscn + main.tscn istanzia Mirwada (via test_zone). tests/test_regions.gd (5 test). validate exit 0, 575 test verdi. Verifica a schermo (rendering reale): Mirwada carica, regione_corrente='mirwada', 5 zone location_tag, camera 0/0/1536/1152. Screenshot us602_mirwada.png."
     },
     {
       "id": "US-603",

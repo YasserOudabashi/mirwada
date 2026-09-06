@@ -5218,3 +5218,42 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   nuovo, il validator E' la verifica come da US-501).
 - Prossima storia: US-602 (WorldState + regione corrente + scena hub Mirwada;
   save schema_version 20 -> 21).
+
+[2026-09-07] US-602 — WorldState esteso + regione corrente + scena hub. FASE 6, BLOCCO A.
+
+- scripts/game_data.gd: PATH_REGIONS + _regions + _load_single(TYPE_ARRAY);
+  get_regions() / get_region(id). Un solo file, come gli altri _load_single.
+- scripts/world_state.gd: _regione / _scoperte / _gate_aperti + segnale
+  regione_cambiata(id). API: regione_corrente(), scoperte(), e_scoperta(id),
+  entra_regione(id) (idempotente sul valore), gate_aperti(), gate_e_aperto(id),
+  apri_gate(id). per_salvataggio()/da_salvataggio() estesi; rilettura NON
+  FIDATA (_solo_stringhe scarta le voci malformate). pulisci() azzera tutto.
+- scripts/save_system.gd: VERSIONE_CORRENTE 20 -> 21; _migra_20_a_21 aggiunge
+  mondo.regione/scoperte/gate_aperti (il campo 'mondo' esiste da v4). NOTA nel
+  commento: UNICO bump di fase 6 - le story successive che aggiungono campi a
+  'mondo' (tempo, npc, flag, reputazione, quest) NON bumpano, gestiscono
+  l'assenza col default.
+- scripts/region_scene.gd (NUOVO): UNA implementazione per tutte e 5 le
+  regioni. @export region_id; legge location_tags da GameData; dipinge un
+  tilemap diagnostico bordato (48x36) come la zona di test di US-006; una
+  Area2D per location_tag (griglia, meta 'location_tag'), body_entered ->
+  zona_cambiata + tag_corrente(); colloca il player, clampa la camera ai
+  bordi regione; WorldState.entra_regione(region_id).
+- scenes/regioni/mirwada.tscn (NUOVO): TileMapLayer + region_scene.gd,
+  region_id="mirwada".
+- scenes/main.tscn: istanzia Mirwada al posto di TestZone (test_zone.gd
+  resta nel repo, non piu' in main). Player/Enemy/HUD/overlay invariati.
+- tests/test_regions.gd (NUOVO, 5 test): GameData carica 5 regioni;
+  WorldState regione corrente + scoperte + segnale una volta sola; round-trip
+  del mondo (regione + scoperte + gate); da_salvataggio non fidato; migrazione
+  save v20 -> v21.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  575 test headless (570 + 5), tutti verdi - test_save_system incluso (la
+  catena da v1 ora arriva a v21). Verifica a schermo (rendering reale, non
+  headless): nuova_partita -> main.tscn carica Mirwada; regione_corrente=
+  "mirwada", scoperte=["mirwada"]; le 5 zone porto/archivio/vicolo/piazza/
+  sotterraneo esistono coi loro location_tag; tag_corrente="porto" entrando;
+  camera limits 0/0/1536/1152 (clamp ai bordi regione). Screenshot
+  user://us602_mirwada.png inviato all'utente.
+- Prossima storia: US-603 (le 4 regioni a tema come scene placeholder +
+  passaggi fra regioni).
