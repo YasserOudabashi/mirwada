@@ -76,6 +76,7 @@ func _ready() -> void:
 		"resurrect": _p_resurrect,
 		"plant_growth": _p_plant_growth,
 		"mind_read": _p_mind_read,
+		"shadow_meld": _p_shadow_meld,
 	}
 
 
@@ -552,6 +553,14 @@ func _p_terrain_modify(prim: Dictionary, caster: Node, _stats: Node, _ability_id
 		if durata > 0.0:
 			_pending.append({"kind": "terrain_temp", "caster": caster, "left": durata,
 					"tipo_modifica": tipo_modifica, "raggio": raggio})
+		# US-607: 'oscurita' e' un tipo_modifica che il ciclo del tempo legge
+		# come notte LOCALE - come 'permanente:true' instrada a WorldState,
+		# non e' un caso speciale per un Pathway. Il Nightwatcher del Darkness
+		# accende cosi' i suoi poteri notturni anche di giorno.
+		if tipo_modifica == "oscurita" and durata > 0.0:
+			var ts: Node = get_tree().root.get_node_or_null("TimeSystem")
+			if ts != null and ts.has_method("crea_oscurita"):
+				ts.call("crea_oscurita", pos, raggio, durata)
 	return rec
 
 
@@ -613,6 +622,24 @@ func _p_plant_growth(prim: Dictionary, caster: Node, _stats: Node, _ability_id: 
 			ws.call("registra_terreno", "vegetazione:" + specie, pos, raggio)
 			rec["applied"] = true
 	return rec
+
+
+## shadow_meld (US-607, primitiva della fase 5b portata qui dal Nightwatcher
+## del Darkness - la prima Sequenza attiva che la usa): il caster si fonde con
+## l'ombra. Applica lo status 'occultato' (sfugge al rilevamento) per 'durata'.
+## 'velocita' e 'richiede_ombra' sono registrati: il bonus di movimento e il
+## gate "solo in ombra" sono combat/mondo (fase 6). Anche Door (Secrets
+## Sorcerer) la usera'.
+func _p_shadow_meld(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var applicato: bool = false
+	if stats != null and stats.has_method("applica_status"):
+		stats.call("applica_status", "occultato", durata if durata > 0.0 else -1.0)
+		applicato = true
+	return {"tipo": "shadow_meld", "durata": durata,
+			"velocita": _num(prim.get("velocita"), 0.0),
+			"richiede_ombra": _flag(prim.get("richiede_ombra"), false),
+			"applied": applicato}
 
 
 ## soul_detach (US-507): il Ferryman uccide separando anima e corpo. Applica

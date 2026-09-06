@@ -225,7 +225,8 @@
         "durata",
         "velocita",
         "richiede_ombra"
-      ]
+      ],
+      "implemented": true
     },
     "steal": {
       "params": [

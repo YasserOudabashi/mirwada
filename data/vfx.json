@@ -2,44 +2,238 @@
   "schema_version": 1,
   "_comment": "Gemello visivo di audio.json.pathway_palette (design-vfx.md cap. 4). Il codice implementa un renderer per PRIMITIVA + una palette per PATHWAY: nessun campo VFX sulle abilita', ability.schema.json non si tocca. I colori sono PLAUSIBILI, non definitivi: l'arte vera li rivede. Il 'tratto' e' la firma visiva del Pathway, uno solo per ognuno.",
   "tratto_vocabolario": [
-    "pennellata_carica", "pennellata_secca", "assenza", "tratteggio", "scheggia",
-    "cerchio", "glifo", "meccanico", "crescita", "fluido"
+    "pennellata_carica",
+    "pennellata_secca",
+    "assenza",
+    "tratteggio",
+    "scheggia",
+    "cerchio",
+    "glifo",
+    "meccanico",
+    "crescita",
+    "fluido"
   ],
   "pathway_palette_visiva": {
-    "twilight_giant": { "inchiostro": "#0a0a0f", "primario": "#e8c34a", "accento": "#fff6d8", "tratto": "pennellata_carica", "scia": "solida", "distorsione": 0.30 },
-    "darkness":       { "inchiostro": "#07070a", "primario": "#4b3b6b", "accento": "#b9a6e0", "tratto": "pennellata_secca", "scia": "sfrangiata", "distorsione": 0.45 },
-    "death":          { "inchiostro": "#08090b", "primario": "#5f7d8c", "accento": "#d7e9f0", "tratto": "glifo", "scia": "spettrale", "distorsione": 0.35 },
-    "door":           { "inchiostro": "#0a0810", "primario": "#7a5cc0", "accento": "#e4d6ff", "tratto": "cerchio", "scia": "assente", "distorsione": 0.25 },
-    "error":          { "inchiostro": "#0b0a08", "primario": "#c85a3c", "accento": "#ffd8c0", "tratto": "scheggia", "scia": "spezzata", "distorsione": 0.55 },
-    "hermit":         { "inchiostro": "#0a0906", "primario": "#b98a3e", "accento": "#f2dcae", "tratto": "tratteggio", "scia": "polverosa", "distorsione": 0.20 },
-    "moon":           { "inchiostro": "#070a0c", "primario": "#6fb0c4", "accento": "#dff4fa", "tratto": "fluido", "scia": "liquida", "distorsione": 0.40 },
-    "mother":         { "inchiostro": "#060a07", "primario": "#5c9a4e", "accento": "#d8f0c8", "tratto": "crescita", "scia": "germogliante", "distorsione": 0.30 },
-    "paragon":        { "inchiostro": "#0a0a0c", "primario": "#c9c2b0", "accento": "#ffffff", "tratto": "meccanico", "scia": "netta", "distorsione": 0.15 },
-    "fool":           { "inchiostro": "#0a080c", "primario": "#8f7fae", "accento": "#e8e0f2", "tratto": "assenza", "scia": "assente", "distorsione": 0.60 }
+    "twilight_giant": {
+      "inchiostro": "#0a0a0f",
+      "primario": "#e8c34a",
+      "accento": "#fff6d8",
+      "tratto": "pennellata_carica",
+      "scia": "solida",
+      "distorsione": 0.3
+    },
+    "darkness": {
+      "inchiostro": "#07070a",
+      "primario": "#4b3b6b",
+      "accento": "#b9a6e0",
+      "tratto": "pennellata_secca",
+      "scia": "sfrangiata",
+      "distorsione": 0.45
+    },
+    "death": {
+      "inchiostro": "#08090b",
+      "primario": "#5f7d8c",
+      "accento": "#d7e9f0",
+      "tratto": "glifo",
+      "scia": "spettrale",
+      "distorsione": 0.35
+    },
+    "door": {
+      "inchiostro": "#0a0810",
+      "primario": "#7a5cc0",
+      "accento": "#e4d6ff",
+      "tratto": "cerchio",
+      "scia": "assente",
+      "distorsione": 0.25
+    },
+    "error": {
+      "inchiostro": "#0b0a08",
+      "primario": "#c85a3c",
+      "accento": "#ffd8c0",
+      "tratto": "scheggia",
+      "scia": "spezzata",
+      "distorsione": 0.55
+    },
+    "hermit": {
+      "inchiostro": "#0a0906",
+      "primario": "#b98a3e",
+      "accento": "#f2dcae",
+      "tratto": "tratteggio",
+      "scia": "polverosa",
+      "distorsione": 0.2
+    },
+    "moon": {
+      "inchiostro": "#070a0c",
+      "primario": "#6fb0c4",
+      "accento": "#dff4fa",
+      "tratto": "fluido",
+      "scia": "liquida",
+      "distorsione": 0.4
+    },
+    "mother": {
+      "inchiostro": "#060a07",
+      "primario": "#5c9a4e",
+      "accento": "#d8f0c8",
+      "tratto": "crescita",
+      "scia": "germogliante",
+      "distorsione": 0.3
+    },
+    "paragon": {
+      "inchiostro": "#0a0a0c",
+      "primario": "#c9c2b0",
+      "accento": "#ffffff",
+      "tratto": "meccanico",
+      "scia": "netta",
+      "distorsione": 0.15
+    },
+    "fool": {
+      "inchiostro": "#0a080c",
+      "primario": "#8f7fae",
+      "accento": "#e8e0f2",
+      "tratto": "assenza",
+      "scia": "assente",
+      "distorsione": 0.6
+    }
   },
   "primitive_vfx": {
-    "melee_arc":      { "sprite": "vfx_slash",     "frames": 3, "impact_frame": true,  "scia": true },
-    "projectile":     { "sprite": "vfx_bolt",      "frames": 2, "impact_frame": true,  "scia": true },
-    "dash":           { "sprite": "vfx_streak",    "frames": 3, "impact_frame": false, "scia": true },
-    "buff_stat":      { "sprite": "vfx_rune_up",   "frames": 4, "impact_frame": false, "scia": false },
-    "debuff_stat":    { "sprite": "vfx_rune_down", "frames": 4, "impact_frame": false, "scia": false },
-    "heal":           { "sprite": "vfx_mend",      "frames": 4, "impact_frame": false, "scia": false },
-    "shield":         { "sprite": "vfx_ward",      "frames": 3, "impact_frame": false, "scia": false },
-    "aura":           { "sprite": "vfx_aura_ring", "frames": 4, "impact_frame": false, "scia": false },
-    "dot":            { "sprite": "vfx_smoulder",  "frames": 3, "impact_frame": false, "scia": false },
-    "decay":          { "sprite": "vfx_wither",    "frames": 4, "impact_frame": false, "scia": false },
-    "light_purify":   { "sprite": "vfx_cleanse",   "frames": 3, "impact_frame": true,  "scia": false },
-    "transform":      { "sprite": "vfx_shift",     "frames": 5, "impact_frame": true,  "scia": false },
-    "terrain_modify": { "sprite": "vfx_fracture",  "frames": 4, "impact_frame": true,  "scia": false },
-    "curse":          { "sprite": "vfx_hex",       "frames": 3, "impact_frame": false, "scia": false },
-    "summon":         { "sprite": "vfx_conjure",   "frames": 4, "impact_frame": true,  "scia": false },
-    "fear":           { "sprite": "vfx_dread",     "frames": 4, "impact_frame": false, "scia": false },
-    "reveal_info":    { "sprite": "vfx_scry",      "frames": 3, "impact_frame": false, "scia": false },
-    "teleport":       { "sprite": "vfx_rift",      "frames": 3, "impact_frame": true,  "scia": false },
-    "soul_detach":    { "sprite": "vfx_sever",     "frames": 4, "impact_frame": true,  "scia": false },
-    "resurrect":      { "sprite": "vfx_revenant",  "frames": 5, "impact_frame": true,  "scia": false },
-    "plant_growth":   { "sprite": "vfx_bloom",     "frames": 5, "impact_frame": false, "scia": false },
-    "mind_read":      { "sprite": "vfx_insight",   "frames": 3, "impact_frame": false, "scia": false }
+    "melee_arc": {
+      "sprite": "vfx_slash",
+      "frames": 3,
+      "impact_frame": true,
+      "scia": true
+    },
+    "projectile": {
+      "sprite": "vfx_bolt",
+      "frames": 2,
+      "impact_frame": true,
+      "scia": true
+    },
+    "dash": {
+      "sprite": "vfx_streak",
+      "frames": 3,
+      "impact_frame": false,
+      "scia": true
+    },
+    "buff_stat": {
+      "sprite": "vfx_rune_up",
+      "frames": 4,
+      "impact_frame": false,
+      "scia": false
+    },
+    "debuff_stat": {
+      "sprite": "vfx_rune_down",
+      "frames": 4,
+      "impact_frame": false,
+      "scia": false
+    },
+    "heal": {
+      "sprite": "vfx_mend",
+      "frames": 4,
+      "impact_frame": false,
+      "scia": false
+    },
+    "shield": {
+      "sprite": "vfx_ward",
+      "frames": 3,
+      "impact_frame": false,
+      "scia": false
+    },
+    "aura": {
+      "sprite": "vfx_aura_ring",
+      "frames": 4,
+      "impact_frame": false,
+      "scia": false
+    },
+    "dot": {
+      "sprite": "vfx_smoulder",
+      "frames": 3,
+      "impact_frame": false,
+      "scia": false
+    },
+    "decay": {
+      "sprite": "vfx_wither",
+      "frames": 4,
+      "impact_frame": false,
+      "scia": false
+    },
+    "light_purify": {
+      "sprite": "vfx_cleanse",
+      "frames": 3,
+      "impact_frame": true,
+      "scia": false
+    },
+    "transform": {
+      "sprite": "vfx_shift",
+      "frames": 5,
+      "impact_frame": true,
+      "scia": false
+    },
+    "terrain_modify": {
+      "sprite": "vfx_fracture",
+      "frames": 4,
+      "impact_frame": true,
+      "scia": false
+    },
+    "curse": {
+      "sprite": "vfx_hex",
+      "frames": 3,
+      "impact_frame": false,
+      "scia": false
+    },
+    "summon": {
+      "sprite": "vfx_conjure",
+      "frames": 4,
+      "impact_frame": true,
+      "scia": false
+    },
+    "fear": {
+      "sprite": "vfx_dread",
+      "frames": 4,
+      "impact_frame": false,
+      "scia": false
+    },
+    "reveal_info": {
+      "sprite": "vfx_scry",
+      "frames": 3,
+      "impact_frame": false,
+      "scia": false
+    },
+    "teleport": {
+      "sprite": "vfx_rift",
+      "frames": 3,
+      "impact_frame": true,
+      "scia": false
+    },
+    "soul_detach": {
+      "sprite": "vfx_sever",
+      "frames": 4,
+      "impact_frame": true,
+      "scia": false
+    },
+    "resurrect": {
+      "sprite": "vfx_revenant",
+      "frames": 5,
+      "impact_frame": true,
+      "scia": false
+    },
+    "plant_growth": {
+      "sprite": "vfx_bloom",
+      "frames": 5,
+      "impact_frame": false,
+      "scia": false
+    },
+    "mind_read": {
+      "sprite": "vfx_insight",
+      "frames": 3,
+      "impact_frame": false,
+      "scia": false
+    },
+    "shadow_meld": {
+      "sprite": "vfx_umbra",
+      "frames": 4,
+      "impact_frame": false,
+      "scia": true
+    }
   },
   "impact_frames": {
     "_comment": "Durata legata a combat_feedback.hitstop_ms di audio.json: si tarano insieme (US-227).",
@@ -48,7 +242,11 @@
   },
   "nero_di_scena": {
     "_comment": "Lo sfondo si mangia di nero nei momenti forti (design-vfx principio 2).",
-    "trigger": ["parry_perfect", "posture_break", "abilita_sequenza_max_4"],
+    "trigger": [
+      "parry_perfect",
+      "posture_break",
+      "abilita_sequenza_max_4"
+    ],
     "durata_ms": 250
   },
   "accessibilita": {

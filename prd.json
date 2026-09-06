@@ -119,8 +119,8 @@
       ],
       "priority": 7,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO C. shadow_meld IMPLEMENTATA (fase 5b, portata dal Nightwatcher): _p_shadow_meld -> status 'occultato' (NUOVO, non negativo, evasione +0.25); primitives.json implemented + vfx_umbra. GANCIO oscurita': _p_terrain_modify tipo_modifica 'oscurita' -> TimeSystem.crea_oscurita; e_notte(posizione) legge le zone di oscurita' come notte locale (come permanente:true -> WorldState, non un if). Darkness Seq 6/5/4 stub->false: quiete_dell_anima/requiem (heal + light_purify), ospite_maligno (summon spirito_maligno) / scaglia_spirito (projectile spirito), manto_d_ombra (shadow_meld) / notte_artificiale (terrain_modify oscurita + debuff). Seq 4 rituale [cripta, luogo_in_decadenza] momento notte_fonda. acting 1.0. madness 5.3/6.6/8.3. formule+char 6/5/4. tests/test_darkness.gd +4 (8). validate exit 0 (stub 36->33), 599 test verdi."
     },
     {
       "id": "US-608",

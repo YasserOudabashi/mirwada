@@ -5410,3 +5410,43 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - Come verificato: validate exit 0 (stub 39 -> 36). 595 test headless
   (591 + 4), tutti verdi (test_darkness_1 di US-503 invariato).
 - Prossima storia: US-607 (Darkness Seq 6-4 + shadow_meld in gioco).
+
+[2026-09-07] US-607 — Darkness Sequenze 6-4 (Soul Assurer / Spirit Warlock / Nightwatcher) + shadow_meld. FASE 6, BLOCCO C.
+
+- PRIMITIVA shadow_meld IMPLEMENTATA (della fase 5b, portata qui dal
+  Nightwatcher - primo Pathway attivo che la usa; anche Door la usera'):
+  _p_shadow_meld applica lo status 'occultato' al caster per 'durata'.
+  'velocita'/'richiede_ombra' registrati (bonus movimento + gate "solo in
+  ombra" = fase 6). primitives.json implemented:true; vfx.json vfx_umbra;
+  _handlers +1. NUOVO status 'occultato' (tag occultamento, NON negativo,
+  evasione +0.25).
+- GANCIO oscurita' locale (US-607): _p_terrain_modify con tipo_modifica
+  "oscurita" e durata > 0 chiama TimeSystem.crea_oscurita(pos, raggio,
+  durata). TimeSystem.e_notte(posizione) ora accetta una posizione: e' notte
+  se il ciclo E' notte O se una zona di oscurita' attiva la contiene. Come
+  'permanente:true' instrada a WorldState - non e' un if per un Pathway, e'
+  il contratto di terrain_modify. Le zone scadono da sole (game time),
+  azzerate da da_salvataggio.
+- Darkness Seq 6/5/4 stub -> false:
+  * darkness_quiete_dell_anima / darkness_requiem (Seq 6, Soul Assurer):
+    heal nel tempo + light_purify ("pacifica anime") / buff difesa + heal.
+  * darkness_ospite_maligno (Seq 5, Spirit Warlock): summon spirito_maligno
+    (prefisso 'spirito', ownership.json) + buff forza; darkness_scaglia_spirito:
+    projectile tag_danno spirito.
+  * darkness_manto_d_ombra (Seq 4, Nightwatcher): shadow_meld; darkness_notte_
+    artificiale: terrain_modify oscurita + debuff precisione.
+- Seq 4 advancement_ritual: location_tags [cripta, luogo_in_decadenza],
+  momento notte_fonda, sacrifice "il_proprio_nome_sussurrato_a_un_morto".
+  acting somma 1.0 (Seq 6 usa damage_absorbed_for_ally, Seq 4 usa
+  time_in_state notte 900s). madness 5.3/6.6/8.3.
+- formule formula_darkness_6/5/4 + 9 ingredienti; char_darkness_6/5/4
+  tradotte. i18n: 6 abilita' + 3 caratteristiche.
+- tests/test_darkness.gd +4 (8 totali): le 6 abilita' 6-4 a 0 warning;
+  shadow_meld applica 'occultato' (non negativo); darkness_notte_artificiale
+  -> e_notte(posizione) vero dentro l'oscurita' anche di giorno, falso fuori;
+  darkness_4 ha il rituale a notte_fonda; Seq 9-4 non-stub acting 1.0.
+- Come verificato: validate exit 0 (stub 36 -> 33). 599 test headless
+  (595 + 4), tutti verdi. test_vfx (ogni primitiva implementata ha un vfx),
+  test_debug_primitive, test_time_system, test_conditions invariati.
+- Prossima storia: US-608 (Darkness Seq 3-2 + illusion; darkness_0 e
+  darkness_1 chiusi -> DARKNESS 10/10 -> 100/100 Sequenze, 22/22 Pathway).

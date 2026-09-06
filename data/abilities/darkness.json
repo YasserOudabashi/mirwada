@@ -279,6 +279,183 @@
       ],
       "costo_follia": 2.5,
       "note": "Paura d'area che rompe le formazioni + logorio a tag follia."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_quiete_dell_anima",
+      "name": "Quiete dell'Anima",
+      "name_i18n": "ability.darkness.darkness_quiete_dell_anima",
+      "sequence_id": "darkness_6",
+      "costo_spiritualita": 28,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "heal",
+          "quantita": 40,
+          "istantaneo": false,
+          "durata": 8.0,
+          "bersaglio": "self"
+        },
+        {
+          "tipo": "light_purify",
+          "raggio": 6,
+          "potenza": 2,
+          "riduce_sequenza": false
+        }
+      ],
+      "tag_sinergia": [
+        "anima",
+        "guarigione",
+        "spirito"
+      ],
+      "costo_follia": 2.0,
+      "note": "Soul Assurer: pacifica anime inquiete (light_purify) e cura il danno spirituale (heal nel tempo)."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_requiem",
+      "name": "Requiem",
+      "name_i18n": "ability.darkness.darkness_requiem",
+      "sequence_id": "darkness_6",
+      "costo_spiritualita": 24,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.15,
+          "durata": 20.0,
+          "moltiplicativo": false
+        },
+        {
+          "tipo": "heal",
+          "quantita": 25,
+          "istantaneo": true,
+          "durata": 0.0,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "anima",
+        "difesa",
+        "guarigione"
+      ],
+      "costo_follia": 2.0,
+      "note": "Un canto che rassicura: buff di difesa + cura istantanea."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_ospite_maligno",
+      "name": "Ospite Maligno",
+      "name_i18n": "ability.darkness.darkness_ospite_maligno",
+      "sequence_id": "darkness_5",
+      "costo_spiritualita": 40,
+      "cooldown": 30.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "spirito_maligno",
+          "quantita": 1,
+          "durata": 40.0,
+          "comportamento": "aggressivo"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "forza",
+          "valore": 0.2,
+          "durata": 40.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "spirito",
+        "evocazione",
+        "ombra"
+      ],
+      "costo_follia": 3.0,
+      "note": "Spirit Warlock: ospita uno spirito maligno nel corpo (materia prima 'spirito', ownership.json). Il consumo/scambio combat e' fase 6."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_scaglia_spirito",
+      "name": "Scaglia Spirito",
+      "name_i18n": "ability.darkness.darkness_scaglia_spirito",
+      "sequence_id": "darkness_5",
+      "costo_spiritualita": 32,
+      "cooldown": 8.0,
+      "primitive": [
+        {
+          "tipo": "projectile",
+          "danno": 45,
+          "velocita": 260,
+          "gittata": 180,
+          "pierce": 1,
+          "tag_danno": "spirito"
+        }
+      ],
+      "tag_sinergia": [
+        "spirito",
+        "singolo",
+        "ombra"
+      ],
+      "costo_follia": 2.5,
+      "note": "Scaglia lo spirito ospitato come proiettile vivente."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_manto_d_ombra",
+      "name": "Manto d'Ombra",
+      "name_i18n": "ability.darkness.darkness_manto_d_ombra",
+      "sequence_id": "darkness_4",
+      "costo_spiritualita": 30,
+      "cooldown": 22.0,
+      "primitive": [
+        {
+          "tipo": "shadow_meld",
+          "durata": 8.0,
+          "velocita": 1.4,
+          "richiede_ombra": true
+        }
+      ],
+      "tag_sinergia": [
+        "occultamento",
+        "ombra",
+        "silenzioso"
+      ],
+      "costo_follia": 3.0,
+      "note": "Nightwatcher: il caster si fonde con l'ombra (status 'occultato'). richiede_ombra e' registrato; il gate 'solo in ombra' e' fase 6."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_notte_artificiale",
+      "name": "Notte Artificiale",
+      "name_i18n": "ability.darkness.darkness_notte_artificiale",
+      "sequence_id": "darkness_4",
+      "costo_spiritualita": 45,
+      "cooldown": 35.0,
+      "primitive": [
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "oscurita",
+          "raggio": 140,
+          "durata": 12.0,
+          "permanente": false
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.35,
+          "durata": 12.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "ombra",
+        "notte",
+        "area"
+      ],
+      "costo_follia": 4.0,
+      "note": "Crea oscurita' locale: TimeSystem.e_notte(posizione) la legge come notte anche di giorno (gancio US-607). I nemici, al buio, vedono peggio (debuff precisione)."
     }
   ]
 }

@@ -385,6 +385,24 @@
       "pathway_id": "darkness",
       "sequence": 7,
       "name_i18n": "characteristic.darkness.7"
+    },
+    {
+      "id": "char_darkness_6",
+      "pathway_id": "darkness",
+      "sequence": 6,
+      "name_i18n": "characteristic.darkness.6"
+    },
+    {
+      "id": "char_darkness_5",
+      "pathway_id": "darkness",
+      "sequence": 5,
+      "name_i18n": "characteristic.darkness.5"
+    },
+    {
+      "id": "char_darkness_4",
+      "pathway_id": "darkness",
+      "sequence": 4,
+      "name_i18n": "characteristic.darkness.4"
     }
   ]
 }

@@ -6,12 +6,15 @@
     "acido_da_saggio",
     "acqua_dello_stige",
     "acqua_di_fonte_benedetta",
+    "acqua_di_fonte_cieca",
     "ago_che_cuce_il_fato",
+    "ala_di_falena_crepuscolare",
     "ambra_grigia",
     "argento_annerito",
     "argento_benedetto",
     "argilla_rossa_del_fiume",
     "astrolabio_tascabile",
+    "balsamo_di_silenzio",
     "bilancia_di_precisione",
     "calice_incrinato",
     "caratteristica_del_gigante",
@@ -34,6 +37,7 @@
     "corda_di_impiccato",
     "corno_di_alce_spettrale",
     "corona_di_ossa",
+    "corona_di_papavero_nero",
     "corteccia_febbrifuga",
     "costante_universale_incrinata",
     "cristallo_di_riferimento",
@@ -57,6 +61,7 @@
     "filo_d_argento_lunare",
     "filo_delle_parche",
     "filo_di_lana_rossa",
+    "filo_di_lutto",
     "filo_reciso_dalle_parche",
     "fiore_che_sboccia_solo_di_notte",
     "fiore_di_camomilla_selvatica",
@@ -108,6 +113,7 @@
     "occhio_che_non_dorme",
     "occhio_di_vetro_nero",
     "olio_conduttore",
+    "ombra_imbottigliata",
     "oro_bianco",
     "ossa_di_gatto_nero",
     "ossidiana_decaduta",
@@ -148,6 +154,7 @@
     "radice_di_valeriana",
     "radice_di_veggente",
     "radice_maestra",
+    "reliquia_profanata",
     "resina_conservante",
     "resina_di_ferro",
     "respiro_dell_oceano",
@@ -193,7 +200,8 @@
     "velo_di_mezzanotte",
     "voce_del_gigante",
     "voce_di_creatura_mai_vista",
-    "zanna_di_latte"
+    "zanna_di_latte",
+    "zolfo_delle_fosse"
   ],
   "formulas": {
     "formula_fool_9": {
@@ -1090,6 +1098,48 @@
         "follia_extra": 2.0,
         "qualita": "instabile",
         "_nota": "Pozione con ingredienti mancanti: piu' follia, qualita' ridotta. Esplicito nei dati."
+      }
+    },
+    "formula_darkness_6": {
+      "characteristic_sequence": 6,
+      "ingredients": [
+        "balsamo_di_silenzio",
+        "corona_di_papavero_nero",
+        "acqua_di_fonte_cieca"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_darkness_5": {
+      "characteristic_sequence": 5,
+      "ingredients": [
+        "reliquia_profanata",
+        "zolfo_delle_fosse",
+        "filo_di_lutto"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_darkness_4": {
+      "characteristic_sequence": 4,
+      "ingredients": [
+        "ala_di_falena_crepuscolare",
+        "ombra_imbottigliata",
+        "chiodo_di_bara"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
       }
     }
   }

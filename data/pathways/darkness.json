@@ -222,18 +222,63 @@
       "name_i18n": "sequence.darkness.6",
       "tier": "mid",
       "concept": "Pacifica anime inquiete e cura il danno spirituale degli alleati.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 90,
+        "spiritualita_max": 0.15
+      },
+      "abilities": [
+        "darkness_quiete_dell_anima",
+        "darkness_requiem"
+      ],
+      "acting_actions": [
+        {
+          "id": "darkness_6_quiete",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_quiete_dell_anima"
+          },
+          "target": 14,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_6_quiete",
+          "descrizione": "Pacifica 14 anime inquiete"
+        },
+        {
+          "id": "darkness_6_requiem",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_requiem"
+          },
+          "target": 14,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_6_requiem",
+          "descrizione": "Intona 14 requiem"
+        },
+        {
+          "id": "darkness_6_cura",
+          "evento": "damage_absorbed_for_ally",
+          "filtri": {},
+          "target": 600,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_6_cura",
+          "descrizione": "Assorbi 600 danni per gli alleati"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 6,
-        "ingredients": [],
+        "ingredients": [
+          "balsamo_di_silenzio",
+          "corona_di_papavero_nero",
+          "acqua_di_fonte_cieca"
+        ],
         "formula_id": "formula_darkness_6"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
-      "notes": "",
-      "stub": true
+      "madness_on_force": 5.3,
+      "notes": "BLOCCO C (US-607): shadow_meld portata in gioco; oscurita' come notte locale.",
+      "stub": false
     },
     {
       "sequence": 5,
@@ -242,18 +287,65 @@
       "name_i18n": "sequence.darkness.5",
       "tier": "mid",
       "concept": "Ospita spiriti maligni nel corpo e li scaglia come proiettili viventi.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 120,
+        "forza": 0.1
+      },
+      "abilities": [
+        "darkness_ospite_maligno",
+        "darkness_scaglia_spirito"
+      ],
+      "acting_actions": [
+        {
+          "id": "darkness_5_ospite",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_ospite_maligno"
+          },
+          "target": 10,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_5_ospite",
+          "descrizione": "Ospita 10 spiriti maligni"
+        },
+        {
+          "id": "darkness_5_scaglia",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_scaglia_spirito"
+          },
+          "target": 20,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_5_scaglia",
+          "descrizione": "Scaglia 20 spiriti"
+        },
+        {
+          "id": "darkness_5_danno",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "spirito"
+          },
+          "target": 2500,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_5_danno",
+          "descrizione": "Infliggi 2500 danni da spirito"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 5,
-        "ingredients": [],
+        "ingredients": [
+          "reliquia_profanata",
+          "zolfo_delle_fosse",
+          "filo_di_lutto"
+        ],
         "formula_id": "formula_darkness_5"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
-      "notes": "",
-      "stub": true
+      "madness_on_force": 6.6,
+      "notes": "BLOCCO C (US-607): shadow_meld portata in gioco; oscurita' come notte locale.",
+      "stub": false
     },
     {
       "sequence": 4,
@@ -262,24 +354,77 @@
       "name_i18n": "sequence.darkness.4",
       "tier": "saint",
       "concept": "Dominio della notte: statistiche raddoppiate al buio, oscurita' creabile.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 170,
+        "spiritualita_max": 0.2,
+        "evasione": 0.05
+      },
+      "abilities": [
+        "darkness_manto_d_ombra",
+        "darkness_notte_artificiale"
+      ],
+      "acting_actions": [
+        {
+          "id": "darkness_4_manto",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_manto_d_ombra"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_4_manto",
+          "descrizione": "Fonditi con l'ombra 15 volte"
+        },
+        {
+          "id": "darkness_4_notte",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "darkness_notte_artificiale"
+          },
+          "target": 10,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_4_notte",
+          "descrizione": "Crea la Notte Artificiale 10 volte"
+        },
+        {
+          "id": "darkness_4_veglia",
+          "evento": "time_in_state",
+          "filtri": {
+            "stato": "notte"
+          },
+          "target": 900,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.darkness.darkness_4_veglia",
+          "descrizione": "Veglia nella notte per 900 secondi"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 4,
-        "ingredients": [],
+        "ingredients": [
+          "ala_di_falena_crepuscolare",
+          "ombra_imbottigliata",
+          "chiodo_di_bara"
+        ],
         "formula_id": "formula_darkness_4"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "cripta",
+          "luogo_in_decadenza"
+        ],
+        "momento": "notte_fonda",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "il_proprio_nome_sussurrato_a_un_morto"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
-      "notes": "",
-      "stub": true
+      "madness_on_force": 8.3,
+      "notes": "BLOCCO C (US-607): shadow_meld portata in gioco; oscurita' come notte locale.",
+      "stub": false
     },
     {
       "sequence": 3,

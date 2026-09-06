@@ -30,6 +30,10 @@ var _prossima_eclissi_ciclo: int = 0
 
 var _momento_corrente: String = "alba"
 var _fase_corrente: String = "nuova"
+## US-607: zone di oscurita' create da terrain_modify tipo_modifica "oscurita"
+## (il Nightwatcher del Darkness). { c: Vector2, r: float, fino: float(tick) }.
+## e_notte(posizione) le legge come notte LOCALE. Transitorie, non nel save.
+var _oscurita: Array = []
 
 
 func _ready() -> void:
@@ -97,6 +101,8 @@ func avanza(delta: float) -> void:
 	if delta <= 0.0:
 		return
 	_tick += delta
+	if not _oscurita.is_empty():
+		_oscurita = _oscurita.filter(func(z): return _tick < float(z["fino"]))
 
 	# time_in_state { stato: notte }: EventTracker lo somma (misura "secondi").
 	# Darkness ci recita (darkness_4 "dominio della notte").
@@ -162,8 +168,22 @@ func fase_lunare() -> String:
 	return "eclissi" if _eclissi_fino >= 0.0 else _fase_corrente
 
 
-func e_notte() -> bool:
-	return _momento_corrente in NOTTE
+## Senza argomento: la notte del ciclo. Con una posizione: anche una zona di
+## oscurita' attiva che la contiene (US-607, gancio per combat/mondo di fase 6).
+func e_notte(posizione: Variant = null) -> bool:
+	if _momento_corrente in NOTTE:
+		return true
+	if typeof(posizione) == TYPE_VECTOR2:
+		for z in _oscurita:
+			if _tick < float(z["fino"]) and (posizione as Vector2).distance_to(z["c"]) <= float(z["r"]):
+				return true
+	return false
+
+
+## Crea una zona di oscurita' che vale come notte locale per 'durata' secondi
+## di gioco. La chiama _p_terrain_modify quando tipo_modifica == "oscurita".
+func crea_oscurita(centro: Vector2, raggio: float, durata: float) -> void:
+	_oscurita.append({"c": centro, "r": maxf(raggio, 1.0), "fino": _tick + maxf(durata, 0.1)})
 
 
 func in_eclissi() -> bool:
@@ -191,6 +211,7 @@ func per_salvataggio() -> Dictionary:
 func da_salvataggio(raw: Variant) -> void:
 	var d: Dictionary = raw if typeof(raw) == TYPE_DICTIONARY else {}
 	_tick = float(d["tick"]) if typeof(d.get("tick")) in [TYPE_FLOAT, TYPE_INT] else 0.0
+	_oscurita.clear()
 	_eclissi_fino = -1.0
 	_prossima_eclissi_ciclo = _ciclo_lunare() + int(_cfg("cicli_lunari_per_eclissi", 8))
 	_ricalcola(true)
