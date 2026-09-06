@@ -152,8 +152,8 @@
       ],
       "priority": 9,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 2. Nessuna primitiva nuova. Moon Seq 9/8/7 stub->false: moon_distillato_curativo (heal), moon_tonico_erbe (2x buff), moon_richiamo_compagno (summon bestia_compagna - la doma permanente passa per PetSystem di fase 3), moon_legame_bestiale (buff+heal), moon_morso (debuff forza + heal self = il drenaggio del Vampiro), moon_furia_notturna (buff forza, condizione e_notte). acting 1.0, madness 1.2/2.6/4.0. formule+ingredienti+char_moon_9/8/7. i18n tradotto. 551 test (548+3). validate exit 0."
     },
     {
       "id": "US-510",
@@ -168,8 +168,8 @@
       ],
       "priority": 10,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 2. Nessuna primitiva nuova. Moon Seq 6/5/4 stub->false: moon_elisir_superiore, moon_veleno_raffinato (dot veleno), moon_patto_di_sangue (buff forza + debuff hp_max = il prezzo del sangue), moon_richiamo_scarlatto (summon bestia_di_sangue), moon_convoca_branco (summon bestia_branco x4 + buff velocita), moon_spirito_totem (aura persistente). acting 1.0, madness 5.5/6.8/8.5. moon_4 (Seq<=4): advancement_ritual con fase_lunare piena, sacrifices [sangue_del_giocatore, un_pelo_del_tuo_pet] - il sangue come materiale rituale (Scarlet Scholar). formule+ingredienti+char_moon_6/5/4. 553 test (551+2). validate exit 0."
     },
     {
       "id": "US-511",
@@ -185,8 +185,8 @@
       ],
       "priority": 11,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 2 CHIUSO. MOON COMPLETO (10/10 Sequenze). Nessuna primitiva nuova; NUOVO status 'affascinato' (curse, tag mente, negativo - il bersaglio non attacca chi lo ha incantato; NON possess, quello e' del Fool). Moon Seq 3/2/1/0 stub->false: moon_chiamata_lontana (summon bestia_ignota, materia prima 'distanza'), moon_creatura_vivente (summon durata -1 comportamento coltivatore - aggancio a giardino via dati), moon_dono_della_vita, moon_fascino_assoluto (curse affascinato + debuff), moon_corte_incantata/moon_dominio_lunare (aura affascinato persistente), moon_marea_di_bestie (summon x6). acting 1.0, madness 9.8/11.2/12.8/14.0. rituali Seq 3/2/1/0 con fasi lunari; Seq 1 Ancora, Seq 0 il_detentore_precedente. formule formula_moon_3/2/1/0 + 12 ingredienti; char_moon_3/2/1/0. i18n: 8 abilita' + 4 char. 555 test (553+2). validate exit 0. Architettura: Moon aggancia PetSystem/BaseSystem/giardino tutto via dati, zero codice dedicato."
     },
     {
       "id": "US-512",
