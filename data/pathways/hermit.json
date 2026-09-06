@@ -21,18 +21,63 @@
       "name_i18n": "sequence.hermit.9",
       "tier": "low",
       "concept": "Percepisce il misticismo e traccia rituali di base.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 20,
+        "spiritualita_max": 0.15
+      },
+      "abilities": [
+        "hermit_percezione_mistica",
+        "hermit_traccia_rituale"
+      ],
+      "acting_actions": [
+        {
+          "id": "hermit_9_indagatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_percezione_mistica"
+          },
+          "target": 20,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_9_indagatore",
+          "descrizione": "Percepisci il misticismo 20 volte"
+        },
+        {
+          "id": "hermit_9_tracciatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_traccia_rituale"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_9_tracciatore",
+          "descrizione": "Traccia 15 rituali di base"
+        },
+        {
+          "id": "hermit_9_novizio",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_9_novizio",
+          "descrizione": "Sconfiggi 10 nemici studiando l'occulto"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 9,
-        "ingredients": [],
+        "ingredients": [
+          "gesso_consacrato",
+          "polvere_di_sale_nero",
+          "filo_di_lana_rossa"
+        ],
         "formula_id": "formula_hermit_9"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 1.2,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 8,
@@ -41,18 +86,63 @@
       "name_i18n": "sequence.hermit.8",
       "tier": "low",
       "concept": "Combatte applicando la conoscenza: sigilli incisi sull'arma in tempo reale.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 40,
+        "forza": 5
+      },
+      "abilities": [
+        "hermit_sigillo_su_arma",
+        "hermit_conoscenza_applicata"
+      ],
+      "acting_actions": [
+        {
+          "id": "hermit_8_incisore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_sigillo_su_arma"
+          },
+          "target": 20,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_8_incisore",
+          "descrizione": "Incidi 20 sigilli sull'arma"
+        },
+        {
+          "id": "hermit_8_luce",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "luce"
+          },
+          "target": 2500,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_8_luce",
+          "descrizione": "Infliggi 2500 danni di luce"
+        },
+        {
+          "id": "hermit_8_erudito",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_8_erudito",
+          "descrizione": "Sconfiggi 12 nemici combattendo col sapere"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 8,
-        "ingredients": [],
+        "ingredients": [
+          "punta_d_argento",
+          "cera_di_candela_rituale",
+          "inchiostro_luminescente"
+        ],
         "formula_id": "formula_hermit_8"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 2.6,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 7,
@@ -61,18 +151,63 @@
       "name_i18n": "sequence.hermit.7",
       "tier": "low",
       "concept": "Incantesimi tradizionali ed evocazione minore.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 55,
+        "spiritualita_max": 0.2
+      },
+      "abilities": [
+        "hermit_evocazione_minore",
+        "hermit_incantesimo_tradizionale"
+      ],
+      "acting_actions": [
+        {
+          "id": "hermit_7_stregone",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_evocazione_minore"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_7_stregone",
+          "descrizione": "Evoca un famiglio 15 volte"
+        },
+        {
+          "id": "hermit_7_incantatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "hermit_incantesimo_tradizionale"
+          },
+          "target": 18,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_7_incantatore",
+          "descrizione": "Lancia 18 incantesimi tradizionali"
+        },
+        {
+          "id": "hermit_7_praticante",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.hermit.hermit_7_praticante",
+          "descrizione": "Sconfiggi 12 nemici col famiglio e gli incantesimi"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 7,
-        "ingredients": [],
+        "ingredients": [
+          "ossa_di_gatto_nero",
+          "incenso_di_mirra",
+          "chiodo_di_ferro_freddo"
+        ],
         "formula_id": "formula_hermit_7"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 4.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 6,

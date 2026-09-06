@@ -24,6 +24,166 @@
         "crafting"
       ],
       "note": "RISOLTO (US-304): la pergamena e' l'item 'pergamena_hermit' in data/items/pergamene.json, con stored_ability_id -> questa abilita'. Inventory.usa() esegue l'abilita' via AbilityEngine.execute_stored (US-206) e consuma l'item. Nessuna primitiva nuova. reveal_info resta attiva-non-implementata: l'item funziona, il VFX/effetto arriva col Pathway Hermit in fase 5."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_percezione_mistica",
+      "name_i18n": "ability.hermit.hermit_percezione_mistica",
+      "sequence_id": "hermit_9",
+      "costo_spiritualita": 5,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "reveal_info",
+          "raggio": 10,
+          "categoria": "densita_mistica",
+          "durata": 25.0
+        }
+      ],
+      "tag_sinergia": [
+        "occulto",
+        "divinazione",
+        "area"
+      ],
+      "note": "Il Mystery Pryer percepisce il misticismo. Hermit E' il divinatore sistemico: qui la categoria puo' essere piu' ampia che negli altri Pathway."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_traccia_rituale",
+      "name_i18n": "ability.hermit.hermit_traccia_rituale",
+      "sequence_id": "hermit_9",
+      "costo_spiritualita": 6,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "spiritualita_max",
+          "valore": 0.1,
+          "durata": 15.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "occulto",
+        "rituale",
+        "singolo"
+      ],
+      "note": "Tracciare un rituale di base: il cerchio disegnato rinsalda lo spirito."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_sigillo_su_arma",
+      "name_i18n": "ability.hermit.hermit_sigillo_su_arma",
+      "sequence_id": "hermit_8",
+      "costo_spiritualita": 8,
+      "cooldown": 6.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "forza",
+          "valore": 0.2,
+          "durata": 10.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "melee_arc",
+          "danno": 16,
+          "angolo": 60,
+          "raggio": 1.8,
+          "stagger": 20,
+          "tag_danno": "luce"
+        }
+      ],
+      "tag_sinergia": [
+        "occulto",
+        "conoscenza",
+        "forza"
+      ],
+      "note": "Il Melee Scholar incide un sigillo sull'arma mentre combatte: colpo di luce potenziato."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_conoscenza_applicata",
+      "name_i18n": "ability.hermit.hermit_conoscenza_applicata",
+      "sequence_id": "hermit_8",
+      "costo_spiritualita": 7,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "precisione",
+          "valore": 6,
+          "durata": 12.0,
+          "moltiplicativo": false
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.1,
+          "durata": 12.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "conoscenza",
+        "difesa",
+        "singolo"
+      ],
+      "note": "Combattere applicando la conoscenza: sai dove parare e dove colpire."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_evocazione_minore",
+      "name_i18n": "ability.hermit.hermit_evocazione_minore",
+      "sequence_id": "hermit_7",
+      "costo_spiritualita": 10,
+      "cooldown": 24.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "evocazione_famiglio",
+          "quantita": 1,
+          "durata": 30.0,
+          "comportamento": "difensivo"
+        }
+      ],
+      "tag_sinergia": [
+        "occulto",
+        "rituale",
+        "singolo"
+      ],
+      "note": "Il Warlock evoca un famiglio. entita_id evocazione_: la materia prima e' il rituale (matrice di proprieta')."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_incantesimo_tradizionale",
+      "name_i18n": "ability.hermit.hermit_incantesimo_tradizionale",
+      "sequence_id": "hermit_7",
+      "costo_spiritualita": 9,
+      "cooldown": 7.0,
+      "primitive": [
+        {
+          "tipo": "projectile",
+          "danno": 18,
+          "velocita": 10,
+          "gittata": 10,
+          "pierce": 1,
+          "tag_danno": "spirito"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "velocita",
+          "valore": -0.2,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "occulto",
+        "spirito",
+        "singolo"
+      ],
+      "note": "Un incantesimo tradizionale: dardo di spirito che rallenta chi colpisce."
     }
   ]
 }

@@ -5043,3 +5043,23 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   51 Sequenze non-stub su 100. Resta solo Hermit (blocco 5) + chiusura.
 - Prossima storia: US-518 (BLOCCO 5 - Hermit Seq 9-7: Mystery Pryer / Melee
   Scholar / Warlock).
+
+[2026-09-06] US-518 — Hermit Sequenze 9-7 (Mystery Pryer / Melee Scholar / Warlock). BLOCCO 5.
+
+- NESSUNA primitiva nuova (reveal_info gia' da US-505). Hermit Seq 9/8/7
+  (stub -> false):
+  * hermit_percezione_mistica (reveal_info categoria "densita_mistica" - Hermit
+    e' il divinatore sistemico, categoria piu' ampia), hermit_traccia_rituale
+    (buff spiritualita), hermit_sigillo_su_arma (buff forza + melee_arc luce -
+    il gancio col sistema sigilli e' dati), hermit_conoscenza_applicata (2x
+    buff), hermit_evocazione_minore (summon evocazione_famiglio),
+    hermit_incantesimo_tradizionale (projectile spirito + debuff velocita).
+  * acting somma 1.0. madness 1.2/2.6/4.0. Nessun ritual (Seq > 4).
+  * formule formula_hermit_9/8/7 + 9 ingredienti; char_hermit_9/8/7.
+- i18n: 6 abilita' + 3 caratteristiche tradotte. 58 TODO.
+- Come verificato: 568 test headless (565 + 3 in test_hermit.gd: ogni abilita'
+  Hermit non-stub esegue a 0 warning; acting sommano 1.0; nessuna primitiva
+  differita - guardia per US-520). validate exit 0.
+- Prossima storia: US-519 (Hermit Seq 6-4: Scrolls Professor / Constellations
+  Master / Mysticologist - pergamene con stored_ability_id, costellazioni
+  condizionate da momento/fase_lunare).

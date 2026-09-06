@@ -19,10 +19,12 @@
     "cenere_di_bosco",
     "cenere_di_re",
     "cenere_di_spirito",
+    "cera_di_candela_rituale",
     "cera_di_veglia",
     "chiave_d_ossa",
     "chiave_dell_oltretomba",
     "chiodo_di_bara",
+    "chiodo_di_ferro_freddo",
     "codice_della_vita_inciso",
     "corno_di_alce_spettrale",
     "corona_di_ossa",
@@ -45,6 +47,7 @@
     "fiele_di_demone",
     "filo_d_argento_lunare",
     "filo_delle_parche",
+    "filo_di_lana_rossa",
     "fiore_che_sboccia_solo_di_notte",
     "fiore_di_camomilla_selvatica",
     "fiore_di_luna",
@@ -52,12 +55,15 @@
     "frammento_di_luna",
     "frammento_di_tavoletta",
     "fungo_a_specchio",
+    "gesso_consacrato",
     "ghianda_millenaria",
     "goccia_di_linfa",
     "goccia_di_prima_pioggia",
     "il_confine_del_mondo",
     "incenso_dei_riti",
+    "incenso_di_mirra",
     "inchiostro_di_due_mondi",
+    "inchiostro_luminescente",
     "inchiostro_stellare",
     "ingranaggio_di_precisione",
     "lacrima_di_amante",
@@ -85,6 +91,7 @@
     "obolo_di_bronzo",
     "olio_conduttore",
     "oro_bianco",
+    "ossa_di_gatto_nero",
     "ossidiana_decaduta",
     "osso_di_pugile",
     "pelo_di_lupo_bianco",
@@ -98,12 +105,14 @@
     "polvere_di_arena",
     "polvere_di_crepuscolo",
     "polvere_di_ossario",
+    "polvere_di_sale_nero",
     "polvere_di_specchio_incrinato",
     "polvere_reagente",
     "prima_notte_del_mondo",
     "prima_ruota_mai_costruita",
     "prisma_che_devia_la_luce",
     "progetto_del_mondo_perfetto",
+    "punta_d_argento",
     "radice_amara",
     "radice_che_beve",
     "radice_di_ferro_lunare",
@@ -863,6 +872,48 @@
         "progetto_del_mondo_perfetto",
         "lega_impossibile_da_replicare",
         "prima_ruota_mai_costruita"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_hermit_9": {
+      "characteristic_sequence": 9,
+      "ingredients": [
+        "gesso_consacrato",
+        "polvere_di_sale_nero",
+        "filo_di_lana_rossa"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_hermit_8": {
+      "characteristic_sequence": 8,
+      "ingredients": [
+        "punta_d_argento",
+        "cera_di_candela_rituale",
+        "inchiostro_luminescente"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_hermit_7": {
+      "characteristic_sequence": 7,
+      "ingredients": [
+        "ossa_di_gatto_nero",
+        "incenso_di_mirra",
+        "chiodo_di_ferro_freddo"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {
