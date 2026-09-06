@@ -890,6 +890,48 @@ def main():
     if n_pets < 1:
         err("data/pets/: nessuna specie di pet, attesa almeno 1")
 
+    # --- base building (data/base/, data/schema/room_types.json, US-326) ---
+    ATTESI_ROOM_TYPES = {"laboratorio", "stanza_rituale", "biblioteca", "giardino"}
+    rt_doc = load_json(os.path.join(DATA, "schema", "room_types.json")) or {}
+    room_tipi = rt_doc.get("tipi", [])
+    bonus_ammessi = rt_doc.get("bonus_ammessi", {})
+    if set(room_tipi) != ATTESI_ROOM_TYPES:
+        err(f"data/schema/room_types.json: 'tipi' deve essere esattamente {sorted(ATTESI_ROOM_TYPES)}, "
+            f"e' {sorted(room_tipi)} (vocabolario chiuso)")
+    rooms_doc = load_json(os.path.join(DATA, "base", "rooms.json")) or {}
+    rooms = rooms_doc.get("rooms", {})
+    for tipo in sorted(ATTESI_ROOM_TYPES):
+        if tipo not in rooms:
+            err(f"data/base/rooms.json: manca la stanza '{tipo}'")
+            continue
+        room = rooms[tipo]
+        rel = "data/base/rooms.json"
+        if not isinstance(room.get("name_i18n"), str) or not room.get("name_i18n"):
+            err(f"{rel} [{tipo}]: name_i18n mancante o vuoto")
+        livelli = room.get("livelli", [])
+        if not isinstance(livelli, list) or not livelli:
+            err(f"{rel} [{tipo}]: 'livelli' deve essere una lista non vuota")
+            continue
+        chiavi_ok = set(bonus_ammessi.get(tipo, []))
+        for i, lv in enumerate(livelli, start=1):
+            costo = lv.get("costo", {})
+            if not isinstance(costo, dict) or not costo:
+                err(f"{rel} [{tipo} lv{i}]: 'costo' deve essere un oggetto non vuoto")
+            for item_id, q in (costo.items() if isinstance(costo, dict) else []):
+                if item_id not in item_ids:
+                    err(f"{rel} [{tipo} lv{i}]: costo '{item_id}' non risolve a un item esistente")
+                if not isinstance(q, int) or q <= 0:
+                    err(f"{rel} [{tipo} lv{i}]: quantita' di '{item_id}' deve essere un intero > 0")
+            bon = lv.get("bonus", {})
+            if not isinstance(bon, dict) or not bon:
+                err(f"{rel} [{tipo} lv{i}]: 'bonus' deve essere un oggetto non vuoto")
+            for k, v in (bon.items() if isinstance(bon, dict) else []):
+                if k not in chiavi_ok:
+                    err(f"{rel} [{tipo} lv{i}]: chiave di bonus '{k}' non ammessa per '{tipo}' "
+                        f"({sorted(chiavi_ok)}) - vedi room_types.json")
+                if not isinstance(v, (int, float)):
+                    err(f"{rel} [{tipo} lv{i}]: bonus '{k}' deve essere numerico")
+
     # --- pesi del bond (data/balance.json pet_bond, US-323) ---
     pet_bond = (balance_doc or {}).get("pet_bond", {})
     for k in ("per_nemico_sconfitto", "per_area_completata"):

@@ -500,8 +500,8 @@
       ],
       "priority": 25,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO F iniziato. data/schema/room_types.json: vocabolario CHIUSO dei 4 tipi (laboratorio/stanza_rituale/biblioteca/giardino) + bonus_ammessi[tipo] (le chiavi di bonus valide per tipo). data/schema/room.schema.json (doc) + data/base/rooms.json: ogni stanza name/name_i18n/livelli[]; livelli[0]=livello 1; ogni livello costo {item_id: qty} + bonus {chiave: numero} (stato COMPLETO al livello, non delta). 2 livelli per stanza. GameData: get_room_type(tipo), room_levels(tipo), room_type_ids(), room_bonus_ammessi(tipo). Autoload BaseSystem (scripts/base_system.gd, dopo PetSystem): costruisci(tipo)->bool (livello 0->1, costo consumato da Inventory; false se gia' costruita/tipo ignoto/costo scoperto), potenzia(tipo)->bool (lv->lv+1, false se non costruita o al massimo), livello(tipo)->int (0=non costruita), bonus(tipo)->Dictionary (bonus completo del livello, {} se 0), costo_prossimo(tipo), stanze(), pulisci(), per/da_salvataggio (non fidata: solo tipi noti, livello clampato 0..n). SAVE 17->18: campo 'base' {tipo->livello}, _migra_17_a_18; GameState snapshot/applica. validate_data.py: tipi == set chiuso; ogni costo referenzia item esistenti (qty int >0); ogni chiave di bonus in bonus_ammessi[tipo]; valori bonus numerici. i18n: room.* seminate da name. 454 test headless (442 + 12 in test_base_system.gd), validate exit 0. Nessuna verifica a schermo (la UI e' US-329)."
     },
     {
       "id": "US-327",

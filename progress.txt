@@ -3449,3 +3449,58 @@ sezione test aggiornata.
 - Prossima storia: US-326 (data/schema/room_types.json vocabolario chiuso
   dei 4 tipi + data/base/rooms.json coi livelli, costi e bonus;
   GameData.get_room_type/room_levels).
+
+[2026-09-06] IMG — key art Gemini spostate
+
+- img/ (6 jpg Gemini, untracked nella root) -> assets/concept/regioni/,
+  committate. L'art brief (006_PRD/art-brief-gemini.md) prescrive
+  assets/concept/<categoria>/ per il concept da Gemini: sono key art di
+  regione (riferimento mood/palette), non asset di gioco. 442 test ok dopo
+  lo spostamento.
+
+[2026-09-06] US-326 — Schema della base e delle 4 stanze. BLOCCO F iniziato.
+
+- data/schema/room_types.json: vocabolario CHIUSO dei 4 tipi (laboratorio,
+  stanza_rituale, biblioteca, giardino) + bonus_ammessi{tipo: [chiavi]}. Un
+  tipo o una chiave di bonus fuori da qui = errore del validator (stesso
+  principio dei 12 eventi / dei tag).
+- data/schema/room.schema.json (doc) + data/base/rooms.json: ogni stanza
+  name/name_i18n/livelli[]. livelli[0] = livello 1. Ogni livello: costo
+  {item_id: qty} + bonus {chiave: numero}. Il bonus e' lo STATO COMPLETO a
+  quel livello, non un incremento (bonus("laboratorio") a lv2 restituisce
+  {rischio_esperimento: -0.2, qualita_pozione: 1}, non solo il delta). 2
+  livelli per stanza, numeri plausibili.
+- GameData: get_room_type(tipo) (la stanza dai dati), room_levels(tipo),
+  room_type_ids() (i 4), room_bonus_ammessi(tipo) (le chiavi valide).
+- scripts/base_system.gd (autoload BaseSystem, dopo PetSystem):
+  * livello(tipo) -> int (0 = non costruita)
+  * bonus(tipo) -> Dictionary (il bonus completo del livello attuale, {} a 0)
+  * costo_prossimo(tipo) -> Dictionary ({} se al massimo/ignoto)
+  * costruisci(tipo) -> bool: 0 -> 1. false se gia' costruita, tipo ignoto,
+    costo non coperto. _paga() consuma il costo da Inventory in modo atomico
+    (controlla tutto, poi rimuove tutto).
+  * potenzia(tipo) -> bool: lv -> lv+1. false se non costruita o al massimo.
+  * pulisci(), per_salvataggio(), da_salvataggio (non fidata: solo tipi noti,
+    livello clampato 0..numero-livelli, valori non numerici scartati).
+  * Nessun if sul nome di una stanza: i sistemi (US-327) leggono bonus(tipo)
+    per chiave.
+- SAVE: VERSIONE_CORRENTE 17 -> 18. Campo "base" {tipo -> livello} in salva(),
+  _leggi_snapshot(), _migra_17_a_18 (default {}). GameState: _base(), righe
+  in snapshot()/applica().
+- validate_data.py: blocco base building - tipi == {laboratorio, stanza_
+  rituale, biblioteca, giardino} esatto; ogni costo referenzia item esistenti
+  (qty int > 0); ogni chiave di bonus in bonus_ammessi[tipo]; valori bonus
+  numerici; ogni stanza ha name_i18n e livelli non vuoti.
+- i18n: room.laboratorio / .stanza_rituale / .biblioteca / .giardino seminate
+  dal campo gemello name. it.json 306 chiavi, 55 TODO (invariati).
+- Come verificato: 454 test headless (442 + 12 in test_base_system.gd:
+  4 tipi vocabolario chiuso con livelli; costruisci consuma il costo e lascia
+  il margine; costo non coperto non fa nulla; niente ricostruzione; tipo
+  ignoto -> false; potenzia sale e aggiorna il bonus; potenzia richiede la
+  stanza costruita; bloccata al massimo; bonus {} se non costruita;
+  da_salvataggio scarta i malformati e clampa; round-trip; migrazione da v17).
+  validate_data.py exit 0 (9 warning invariati). Nessuna verifica a schermo:
+  la pagina Base e' US-329.
+- Prossima storia: US-327 (le stanze alimentano i loro sistemi: PotionSystem
+  legge bonus("laboratorio"), Forge bonus("stanza_rituale"), biblioteca ->
+  ricette note).

@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "_comment": "Le 4 stanze della base (US-326). livelli[0] = livello 1. 'bonus' e' lo stato completo a quel livello, non un delta. Vocabolario chiuso di tipi e chiavi in data/schema/room_types.json. Numeri PLAUSIBILI, non bilanciati.",
+  "rooms": {
+    "laboratorio": {
+      "name": "Laboratorio",
+      "name_i18n": "room.laboratorio",
+      "livelli": [
+        {
+          "costo": { "lingotto_ferro": 3, "cristallo_grezzo": 1 },
+          "bonus": { "rischio_esperimento": -0.1 }
+        },
+        {
+          "costo": { "lingotto_ferro": 6, "cristallo_grezzo": 3 },
+          "bonus": { "rischio_esperimento": -0.2, "qualita_pozione": 1 }
+        }
+      ]
+    },
+    "stanza_rituale": {
+      "name": "Stanza rituale",
+      "name_i18n": "room.stanza_rituale",
+      "livelli": [
+        {
+          "costo": { "cristallo_grezzo": 2, "moneta_comune": 20 },
+          "bonus": { "qualita_forgia": 1 }
+        },
+        {
+          "costo": { "cristallo_grezzo": 5, "moneta_comune": 60 },
+          "bonus": { "qualita_forgia": 2 }
+        }
+      ]
+    },
+    "biblioteca": {
+      "name": "Biblioteca",
+      "name_i18n": "room.biblioteca",
+      "livelli": [
+        {
+          "costo": { "cuoio_conciato": 4, "moneta_comune": 15 },
+          "bonus": { "ricette_avanzate_note": 1 }
+        },
+        {
+          "costo": { "cuoio_conciato": 8, "moneta_comune": 45 },
+          "bonus": { "ricette_avanzate_note": 2 }
+        }
+      ]
+    },
+    "giardino": {
+      "name": "Giardino",
+      "name_i18n": "room.giardino",
+      "livelli": [
+        {
+          "costo": { "radice_crepuscolo": 2, "acqua_sorgiva": 3 },
+          "bonus": { "appezzamenti": 1, "resa_raccolto": 1 }
+        },
+        {
+          "costo": { "radice_crepuscolo": 5, "acqua_sorgiva": 8 },
+          "bonus": { "appezzamenti": 2, "resa_raccolto": 2 }
+        }
+      ]
+    }
+  }
+}

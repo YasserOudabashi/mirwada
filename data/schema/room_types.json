@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO dei 4 tipi di stanza della base (US-326) e delle chiavi di bonus ammesse per ognuno. Un tipo o una chiave di bonus non elencata qui fa fallire il validator: e' lo stesso principio dei 12 eventi e dei tag. I livelli, i costi e i valori dei bonus stanno in data/base/rooms.json; qui c'e' solo il vocabolario.",
+  "tipi": ["laboratorio", "stanza_rituale", "biblioteca", "giardino"],
+  "bonus_ammessi": {
+    "laboratorio": ["rischio_esperimento", "qualita_pozione"],
+    "stanza_rituale": ["qualita_forgia"],
+    "biblioteca": ["ricette_avanzate_note"],
+    "giardino": ["appezzamenti", "resa_raccolto"]
+  }
+}

@@ -18,6 +18,8 @@ const DIR_SYNERGIES := "res://data/synergies"
 const DIR_ITEMS := "res://data/items"
 const DIR_STRUCTURES := "res://data/structures"
 const DIR_PETS := "res://data/pets"
+const PATH_ROOM_TYPES := "res://data/schema/room_types.json"
+const PATH_ROOMS := "res://data/base/rooms.json"
 const PATH_TAGS := "res://data/tags.json"
 const PATH_BALANCE := "res://data/balance.json"
 const PATH_PRIMITIVES := "res://data/schema/primitives.json"
@@ -76,6 +78,8 @@ var _vfx: Dictionary = {}
 var _items: Dictionary = {}
 var _structures: Dictionary = {}
 var _pets: Dictionary = {}
+var _room_types: Dictionary = {}
+var _rooms: Dictionary = {}
 var _item_categories: Dictionary = {}
 var _equip_slots: Dictionary = {}
 var _sigils: Dictionary = {}
@@ -148,6 +152,8 @@ func load_all() -> void:
 	_load_single(PATH_VFX, "pathway_palette_visiva", _vfx, TYPE_DICTIONARY)
 	_load_single(PATH_ITEM_CATEGORIES, "item_categories", _item_categories, TYPE_ARRAY)
 	_load_single(PATH_EQUIP_SLOTS, "slots", _equip_slots, TYPE_ARRAY)
+	_load_single(PATH_ROOM_TYPES, "tipi", _room_types, TYPE_ARRAY)
+	_load_single(PATH_ROOMS, "rooms", _rooms, TYPE_DICTIONARY)
 	_load_single(PATH_SIGILS, "sigils", _sigils, TYPE_DICTIONARY)
 	_load_single(PATH_SIGIL_EFFECT_TYPES, "effetti", _sigil_effect_types, TYPE_ARRAY)
 	_load_single(PATH_BLUEPRINTS, "blueprints", _blueprints, TYPE_DICTIONARY)
@@ -197,6 +203,27 @@ func get_pet(id: String) -> Dictionary:
 
 func pet_ids() -> Array:
 	return _pets.keys()
+
+
+## --- Base building (data/base/, data/schema/room_types.json, US-326) ---
+## Il tipo di stanza dai dati (name/name_i18n/livelli). {} se ignoto.
+func get_room_type(tipo: String) -> Dictionary:
+	return _dict_or_empty(_dict_or_empty(_rooms.get("rooms")).get(tipo))
+
+
+## I livelli di una stanza (indice 0 = livello 1). [] se tipo ignoto.
+func room_levels(tipo: String) -> Array:
+	return _array_or_empty(get_room_type(tipo).get("livelli"))
+
+
+## Vocabolario chiuso dei 4 tipi di stanza.
+func room_type_ids() -> Array:
+	return _array_or_empty(_room_types.get("tipi"))
+
+
+## Le chiavi di bonus ammesse per un tipo di stanza (vocabolario chiuso).
+func room_bonus_ammessi(tipo: String) -> Array:
+	return _array_or_empty(_dict_or_empty(_room_types.get("bonus_ammessi")).get(tipo))
 
 
 func get_synergy(id: String) -> Dictionary:

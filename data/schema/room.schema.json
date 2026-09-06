@@ -1,0 +1,14 @@
+{
+  "_comment": "Documentazione formale di data/base/rooms.json (US-326). Ogni stanza ha una lista 'livelli' (indice 0 = livello 1): costruire porta al livello 1, potenziare al successivo. Il vocabolario chiuso dei tipi e delle chiavi di bonus e' in data/schema/room_types.json. Controlli veri in tools/validate_data.py.",
+  "schema_version": 1,
+  "room": {
+    "name": "string in chiaro (seed i18n)",
+    "name_i18n": "string, chiave i18n (categoria 'room')",
+    "livelli": [
+      {
+        "costo": "{ item_id (esistente): quantita int > 0 } - consumato dall'inventario per raggiungere questo livello",
+        "bonus": "{ chiave (da room_types.json bonus_ammessi[tipo]): valore numerico } - lo stato COMPLETO del bonus a questo livello, non un incremento"
+      }
+    ]
+  }
+}
