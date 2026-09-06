@@ -22,6 +22,15 @@ building di fase 3 riempie.
 
 ## 2. Le cinque regioni
 
+> **REALIZZATO in fase 6 (US-601)**: `data/world/regions.json` +
+> `data/schema/region.schema.json` + `data/schema/gate_types.json` (6 modi).
+> Il validator verifica `location_tags` ⊆ vocabolario, `music_zone` in
+> `audio.json`, `gating[].tipo` nel vocabolario dei modi, `gating[].primitiva`
+> attiva, `palette_visiva` in `vfx.json` (o `neutra`), `group_affinity` valido,
+> e che ogni `location_tag` di un rituale non-stub sia ospitato da almeno una
+> regione. Le scene placeholder giocabili nascono in US-602/603, il gating si
+> applica in US-611.
+
 Nomi provvisori (decisione aperta n. 1 del master; chiavi i18n `region.*`).
 
 ### 2.1 Mirwada — la citta' (hub, neutra)

@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "_comment": "Le 5 regioni del mondo (design-world.md cap. 2, US-601). Una per gruppo di Pathway + la citta' neutra: e' il terzo canale dell'identita' di Pathway dopo primitive e audio. I nomi vivono solo qui e nelle chiavi i18n 'region.*' (FR-1: nessun nome hardcoded). Le scene placeholder giocabili nascono in US-602/603; il gating si applica in US-611.",
+  "regions": [
+    {
+      "id": "mirwada",
+      "name": "Mirwada",
+      "name_i18n": "region.mirwada",
+      "group_affinity": "neutra",
+      "densita_mistica": 0.2,
+      "location_tags": [
+        "porto",
+        "archivio",
+        "vicolo",
+        "piazza",
+        "sotterraneo"
+      ],
+      "music_zone": "citta",
+      "gating": [],
+      "palette_visiva": "neutra"
+    },
+    {
+      "id": "marche_crepuscolo",
+      "name": "Marche del Crepuscolo",
+      "name_i18n": "region.marche_crepuscolo",
+      "group_affinity": "eternal_darkness",
+      "densita_mistica": 0.6,
+      "location_tags": [
+        "altura",
+        "luogo_di_battaglia",
+        "tempio_abbandonato",
+        "rovina",
+        "luogo_in_decadenza",
+        "vetta",
+        "luogo_di_massacro",
+        "cripta",
+        "trono_del_gigante"
+      ],
+      "music_zone": "marche",
+      "gating": [
+        {
+          "tipo": "primitiva",
+          "primitiva": "shadow_meld",
+          "area": "passaggi_ombra"
+        },
+        {
+          "tipo": "momento",
+          "valore": "notte_fonda",
+          "area": "cripte"
+        }
+      ],
+      "palette_visiva": "darkness"
+    },
+    {
+      "id": "valle_madre",
+      "name": "Valle della Madre",
+      "name_i18n": "region.valle_madre",
+      "group_affinity": "goddess_of_origin",
+      "densita_mistica": 0.45,
+      "location_tags": [
+        "bosco_antico",
+        "radura_lunare",
+        "grotta_di_marea",
+        "sorgente",
+        "altare_di_radici"
+      ],
+      "music_zone": "valle",
+      "gating": [
+        {
+          "tipo": "primitiva",
+          "primitiva": "plant_growth",
+          "area": "ponti_di_radici"
+        },
+        {
+          "tipo": "fase_lunare",
+          "valore": "piena",
+          "area": "grotte_di_marea"
+        }
+      ],
+      "palette_visiva": "mother"
+    },
+    {
+      "id": "archivio_sepolto",
+      "name": "Archivio Sepolto",
+      "name_i18n": "region.archivio_sepolto",
+      "group_affinity": "demon_of_knowledge",
+      "densita_mistica": 0.7,
+      "location_tags": [
+        "biblioteca",
+        "officina",
+        "torre_di_osservazione",
+        "sala_dei_sigilli",
+        "studio"
+      ],
+      "music_zone": "archivio",
+      "gating": [
+        {
+          "tipo": "conoscenza",
+          "valore": "testi_ordine_minore",
+          "area": "ali_interne"
+        }
+      ],
+      "palette_visiva": "hermit"
+    },
+    {
+      "id": "frontiera_porte",
+      "name": "Frontiera delle Porte",
+      "name_i18n": "region.frontiera_porte",
+      "group_affinity": "lord_of_mysteries",
+      "densita_mistica": 0.9,
+      "location_tags": [
+        "teatro",
+        "crocevia",
+        "soglia",
+        "nebbia_grigia",
+        "palco"
+      ],
+      "music_zone": "frontiera",
+      "gating": [
+        {
+          "tipo": "sequenza",
+          "valore": 4,
+          "area": "ingresso"
+        },
+        {
+          "tipo": "primitiva",
+          "primitiva": "teleport",
+          "area": "isole_nebbia"
+        }
+      ],
+      "palette_visiva": "fool"
+    }
+  ]
+}

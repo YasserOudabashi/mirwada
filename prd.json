@@ -17,8 +17,8 @@
       ],
       "priority": 1,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO A. gate_types.json (6 modi), region.schema.json, data/world/regions.json (5 regioni di design-world cap.2), audio.json music.zone + marche/valle/archivio/frontiera (minimi, US-619 li completa). validate_data.py: sezione regioni - location_tags subset vocabolario, music_zone in audio, gating[].tipo in gate_types.json + valore giusto per tipo, palette_visiva in vfx o 'neutra', group_affinity valido, ogni location_tag di un rituale non-stub ospitato da >=1 regione (20/20 coperti). 5 chiavi region.* tradotte via seed 'name'. design-world.md cap.2 aggiornato. validate exit 0 (3 warning invariati), 570 test verdi (nessun test nuovo, il validator e' la verifica come US-501)."
     },
     {
       "id": "US-602",

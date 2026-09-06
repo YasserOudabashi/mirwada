@@ -579,6 +579,84 @@ def main():
         if soglie != sorted(soglie):
             err("data/audio.json [madness_layer]: le soglie non sono in ordine crescente.")
 
+    # --- regioni (data/world/regions.json, US-601) ---
+    # Le regioni sono DATI: gating, audio, NPC, spawn leggono questo vocabolario
+    # chiuso. Un 'if' per una regione specifica e' un bug: si riformula sui dati.
+    gt_doc = load_json(os.path.join(DATA, "schema", "gate_types.json")) or {}
+    valid_gate_types = set(gt_doc.get("gate_types", []))
+    if len(valid_gate_types) != 6:
+        err(f"data/schema/gate_types.json: {len(valid_gate_types)} modi di gate, attesi 6 "
+            f"(design-world.md cap. 4). Un modo nuovo e' codice: va discusso.")
+    _vfx_for_reg = load_json(os.path.join(DATA, "vfx.json")) or {}
+    valid_palette_visiva = set(_vfx_for_reg.get("pathway_palette_visiva", {})) | {"neutra"}
+    music_zone_ids = set((audio or {}).get("music", {}).get("zone", {}))
+    region_group_ok = VALID_GROUPS | {"neutra"}
+    regions_doc = load_json(os.path.join(DATA, "world", "regions.json"))
+    region_ids = set()
+    region_location_tags = set()  # unione dei location_tags di tutte le regioni
+    if regions_doc is None:
+        err("data/world/regions.json: mancante o illeggibile (US-601).")
+    else:
+        for reg in regions_doc.get("regions", []):
+            rid = reg.get("id")
+            rel = "data/world/regions.json"
+            if rid in region_ids:
+                err(f"{rel}: id regione duplicato '{rid}'")
+            region_ids.add(rid)
+            n_i = reg.get("name_i18n", "")
+            if not isinstance(n_i, str) or not n_i.startswith("region."):
+                err(f"{rel} [{rid}]: name_i18n '{n_i}' deve avere il prefisso 'region.'")
+            if reg.get("group_affinity") not in region_group_ok:
+                err(f"{rel} [{rid}]: group_affinity '{reg.get('group_affinity')}' non valido "
+                    f"(un gruppo di Pathway o 'neutra')")
+            dm = reg.get("densita_mistica")
+            if not isinstance(dm, (int, float)) or not (0.0 <= dm <= 1.0):
+                err(f"{rel} [{rid}]: densita_mistica deve essere un numero in [0, 1]")
+            for t in reg.get("location_tags", []):
+                if valid_location_tags and t not in valid_location_tags:
+                    err(f"{rel} [{rid}]: location_tag '{t}' fuori dal vocabolario di "
+                        f"data/schema/location_tags.json")
+                region_location_tags.add(t)
+            if music_zone_ids and reg.get("music_zone") not in music_zone_ids:
+                err(f"{rel} [{rid}]: music_zone '{reg.get('music_zone')}' non e' una zona di "
+                    f"data/audio.json music.zone ({sorted(music_zone_ids)})")
+            if reg.get("palette_visiva") not in valid_palette_visiva:
+                err(f"{rel} [{rid}]: palette_visiva '{reg.get('palette_visiva')}' non e' una "
+                    f"palette di data/vfx.json (o 'neutra')")
+            for g in reg.get("gating", []):
+                gt = g.get("tipo")
+                if valid_gate_types and gt not in valid_gate_types:
+                    err(f"{rel} [{rid}]: gating.tipo '{gt}' non nel vocabolario di gate_types.json")
+                    continue
+                if gt == "primitiva":
+                    if g.get("primitiva") not in primitives:
+                        err(f"{rel} [{rid}]: gating primitiva '{g.get('primitiva')}' non e' una "
+                            f"primitiva attiva del registro")
+                elif gt == "momento":
+                    if g.get("valore") not in valid_momenti:
+                        err(f"{rel} [{rid}]: gating momento '{g.get('valore')}' non nel vocabolario time.json")
+                elif gt == "fase_lunare":
+                    if g.get("valore") not in valid_fasi_lunari:
+                        err(f"{rel} [{rid}]: gating fase_lunare '{g.get('valore')}' non nel vocabolario time.json")
+                elif gt == "sequenza":
+                    if not isinstance(g.get("valore"), int) or not (0 <= g.get("valore") <= 9):
+                        err(f"{rel} [{rid}]: gating sequenza.valore deve essere un int 0..9")
+        # check informativo: le regioni devono ospitare i luoghi dei rituali
+        rituali_tags = set()
+        for _fn in files:
+            _pw = load_json(os.path.join(pdir, _fn)) or {}
+            for _s in _pw.get("sequences", []):
+                if _s.get("stub"):
+                    continue
+                _r = _s.get("advancement_ritual")
+                if isinstance(_r, dict):
+                    rituali_tags.update(_r.get("location_tags", []))
+        senza_regione = sorted(rituali_tags - region_location_tags)
+        if senza_regione:
+            err(f"data/world/regions.json: i location_tags {senza_regione} sono usati da un "
+                f"rituale non-stub ma nessuna regione li ospita (US-601: le regioni realizzano "
+                f"a schermo i luoghi dei rituali).")
+
     # --- fonti di tag di fase 3 (US-334): stanze costruibili, specie di pet
     # (+ comportamenti), tag_grant dei talenti. Rendono raggiungibili le
     # sinergie che pescano da questi sistemi. La VALIDAZIONE piena di quei

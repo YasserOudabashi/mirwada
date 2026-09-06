@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "_comment": "Documentazione formale di data/world/regions.json (US-601, design-world.md cap. 8). Le regioni sono DATI: gating, audio, NPC, spawn, densita' mistica leggono questo vocabolario chiuso. Controlli veri in tools/validate_data.py.",
+  "region": {
+    "id": "string univoco, snake_case",
+    "name_i18n": "string, chiave i18n con prefisso 'region.' (categoria globale, come anchor/synergy)",
+    "group_affinity": "un gruppo di Pathway valido, oppure 'neutra' (la citta' hub)",
+    "densita_mistica": "numero 0..1: muove recupero spiritualita', efficacia rituali, percezione per Sequenza, frequenza spawn (design-world cap. 6). La citta' e' volutamente bassa (~0.2).",
+    "location_tags": ["string dal vocabolario chiuso di data/schema/location_tags.json: la regione realizza a schermo ogni tag qui presente"],
+    "music_zone": "string: una zona di data/audio.json music.zone",
+    "gating": [
+      {
+        "tipo": "un modo da data/schema/gate_types.json",
+        "primitiva": "(tipo=primitiva) una primitiva ATTIVA del registro",
+        "valore": "(tipo=momento|fase_lunare|conoscenza|sequenza) il valore atteso: un momento/una fase lunare dal vocabolario time.json; un flag testi_* ; una Sequenza int per il tetto di 'sequenza'",
+        "modo": "(tipo=npc) il modo di npc_influenced richiesto (es. 'aiutato')",
+        "area": "string: etichetta dell'area interna a cui il gate si applica (documentazione + aggancio scena)"
+      }
+    ],
+    "palette_visiva": "una chiave di data/vfx.json pathway_palette_visiva, oppure 'neutra'"
+  },
+  "regole_validator": [
+    "id univoco; name_i18n con prefisso 'region.' e voce in it.json",
+    "group_affinity in VALID_GROUPS o 'neutra'",
+    "densita_mistica numero in [0, 1]",
+    "location_tags sottoinsieme del vocabolario di location_tags.json",
+    "music_zone esiste in audio.json music.zone",
+    "gating[].tipo nel vocabolario gate_types.json; per 'primitiva' la primitiva e' attiva; per 'momento'/'fase_lunare' il valore e' nel vocabolario time.json; per 'sequenza' il valore e' un int 0..9",
+    "palette_visiva in vfx.json pathway_palette_visiva o 'neutra'",
+    "ogni location_tag di un advancement_ritual non-stub e' in almeno una regione (check informativo: le regioni devono ospitare i luoghi dei rituali)"
+  ]
+}

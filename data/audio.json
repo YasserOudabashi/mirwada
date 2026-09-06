@@ -240,6 +240,23 @@
           "combattimento": "mus_dungeon_combat",
           "boss": "mus_dungeon_boss"
         }
+      },
+      "_comment_regioni": "Le 4 zone musica delle regioni a tema (US-601, una per gruppo di Pathway). Struttura minima ora: la pathway_palette/riverbero e gli stem completi arrivano con US-619. I nomi dei file sono placeholder per un musicista (non-goal: produrre i suoni).",
+      "marche": {
+        "base": "mus_marche_base",
+        "stems": { "tensione": "mus_marche_tension", "combattimento": "mus_marche_combat" }
+      },
+      "valle": {
+        "base": "mus_valle_base",
+        "stems": { "tensione": "mus_valle_tension", "combattimento": "mus_valle_combat" }
+      },
+      "archivio": {
+        "base": "mus_archivio_base",
+        "stems": { "tensione": "mus_archivio_tension", "combattimento": "mus_archivio_combat" }
+      },
+      "frontiera": {
+        "base": "mus_frontiera_base",
+        "stems": { "tensione": "mus_frontiera_tension", "combattimento": "mus_frontiera_combat", "boss": "mus_frontiera_boss" }
       }
     },
     "rituale": {

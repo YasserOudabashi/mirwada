@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO dei 6 modi di gating delle regioni (design-world.md cap. 4). Ogni modo e' servito da un sistema che esiste gia' o nasce in fase 6: primitiva -> motore abilita' (possiede/ha usato), momento e fase_lunare -> TimeSystem (US-604), npc -> flag di npc_influenced (US-612), conoscenza -> flag testi_* (US-613), sequenza -> Progression. Un modo nuovo e' CODICE (un ramo in AreaGate, US-611): va discusso, come le primitive e gli eventi tracciati.",
+  "gate_types": [
+    "primitiva",
+    "momento",
+    "fase_lunare",
+    "npc",
+    "conoscenza",
+    "sequenza"
+  ]
+}

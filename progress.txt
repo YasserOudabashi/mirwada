@@ -5186,3 +5186,35 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - Prossima fase: 6 - Mondo (include la fase 5b). PRD con /prd. Roadmap in
   006_PRD/roadmap.md. P0 di fase 6: regions.json + il ciclo giorno/notte, che
   sbloccano Darkness e le condizioni e_notte/fase_lunare gia' nei dati Hermit.
+
+[2026-09-07] US-601 — regions.json + schema + validator. FASE 6, BLOCCO A.
+
+- data/schema/gate_types.json (NUOVO): vocabolario chiuso dei 6 modi di gate
+  (primitiva, momento, fase_lunare, npc, conoscenza, sequenza) - design-world
+  cap. 4. Un modo nuovo e' codice (un ramo in AreaGate, US-611).
+- data/schema/region.schema.json (NUOVO): doc informale del formato, come gli
+  altri schema/. additionalProperties concettuale; i check veri nel validator.
+- data/world/regions.json (NUOVO): le 5 regioni di design-world cap. 2 -
+  mirwada (neutra, densita 0.2), marche_crepuscolo (eternal_darkness, 0.6),
+  valle_madre (goddess_of_origin, 0.45), archivio_sepolto (demon_of_knowledge,
+  0.7), frontiera_porte (lord_of_mysteries, 0.9). Campo gemello 'name' come
+  seed i18n; le 5 chiavi region.* tradotte (0 TODO nuovo).
+- data/audio.json: aggiunte le 4 zone musica marche/valle/archivio/frontiera
+  a music.zone (struttura minima: base + stem tensione/combattimento; la
+  pathway_palette e gli stem completi sono US-619). Nomi file placeholder.
+- tools/validate_data.py: sezione "regioni (US-601)". Check: gate_types.json
+  ha 6 voci; per ogni regione id unico, name_i18n con prefisso 'region.',
+  group_affinity in VALID_GROUPS|{neutra}, densita 0..1, location_tags subset
+  del vocabolario US-501, music_zone in audio music.zone, palette_visiva in
+  vfx pathway_palette_visiva|{neutra}, gating[].tipo nel vocabolario, e per
+  ogni tipo il valore giusto (primitiva attiva / momento-fase_lunare nel
+  vocabolario time.json / sequenza int 0..9). Check informativo: ogni
+  location_tag di un rituale non-stub e' ospitato da almeno una regione
+  (i 20 tag usati oggi sono tutti coperti).
+- 006_PRD/design-world.md cap. 2: blocco "REALIZZATO in fase 6 (US-601)".
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati:
+  39 stub, 18 sinergie differite, 48 i18n TODO). 570 test headless, tutti
+  verdi (il validator gira nella suite via test_data_valida.gd - nessun test
+  nuovo, il validator E' la verifica come da US-501).
+- Prossima storia: US-602 (WorldState + regione corrente + scena hub Mirwada;
+  save schema_version 20 -> 21).
