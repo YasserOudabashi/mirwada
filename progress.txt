@@ -4524,3 +4524,41 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima fase: 5 - Espansione contenuti (roadmap.md). PUNTO DI CONTROLLO:
   se aggiungere i 9 Pathway rimanenti richiede codice invece che dati,
   l'architettura della fase 2 va corretta prima. Il PRD si genera con /prd.
+
+---
+
+[2026-09-06] FASE 5 aperta — PRD + prd.json
+
+- 006_PRD/prd-fase-5-espansione-contenuti.md generato (skill /prd). 22 story
+  in 6 blocchi: 0 fondamenta, 1 Death+checkpoint, 2 Moon, 3 Mother, 4 Paragon,
+  5 Hermit, 6 chiusura. Scelte con l'utente: 3 story/Pathway, fase 5 = 5
+  Pathway (Death/Moon/Mother/Paragon/Hermit) + darkness_1 riscritto, parita'
+  col TG, primitive interlacciate. Darkness (resto)/Fool/Error/Door -> fase 5b.
+- prd.json convertito a fase 5 (US-501..522, campo "fase": 5). branchName
+  ralph/fase-5-espansione-contenuti.
+
+[2026-09-06] US-501 — location_tags.json, vocabolario chiuso dei luoghi. BLOCCO 0.
+
+- data/schema/location_tags.json (NUOVO): 29 voci. Gli 8 tag gia' usati dai
+  rituali del Twilight Giant (altura, luogo_di_battaglia, luogo_di_massacro,
+  luogo_in_decadenza, rovina, tempio_abbandonato, trono_del_gigante, vetta)
+  entrano identici - zero migrazione - piu' le voci delle 5 regioni di
+  design-world.md (porto/archivio/vicolo/piazza/sotterraneo; cripta;
+  bosco_antico/radura_lunare/grotta_di_marea/sorgente/altare_di_radici;
+  biblioteca/officina/torre_di_osservazione/sala_dei_sigilli/studio;
+  teatro/crocevia/soglia/nebbia_grigia/palco).
+- tools/validate_data.py: caricato valid_location_tags; nel loop dei rituali,
+  errore se un advancement_ritual.location_tags contiene un tag fuori
+  vocabolario (guardia 'if valid_location_tags' cosi' non esplode se il file
+  manca). Il check dell'esistenza non-vuota c'era gia'.
+- 006_PRD/design-world.md sezione 3 aggiornata: file creato in fase 5, 29
+  voci, il validator rifiuta i tag fuori vocabolario, le regioni di fase 6
+  devono realizzarli a schermo.
+- Come verificato: python tools/validate_data.py exit 0, 8 warning invariati
+  (le sequenze TG passano senza modifiche). 535 test headless verdi
+  (test_data_valida.gd gira il validator nella suite: e' la verifica di
+  US-501, nessun test nuovo come da AC). 1 SCRIPT ERROR preesistente.
+- Prossima storia: US-502 (matrice di proprieta' come check del validator:
+  prefisso di materia prima su entita_id dei summon; categoria obbligatoria
+  sulla divinazione fuori da Hermit; il tag 'sogno' vietato nei Pathway
+  attivi).

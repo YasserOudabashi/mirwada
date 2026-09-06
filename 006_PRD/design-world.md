@@ -106,9 +106,12 @@ abbandonato dove le cose recitano se stesse, soglie che portano altrove.
 
 ## 3. Il vocabolario chiuso dei luoghi
 
-Nuovo file `data/schema/location_tags.json` (si crea con la prima story di
-fase 5/6 che lo valida): le 24 voci elencate sopra. Gli 8 tag gia' usati dai
-rituali del TG entrano identici — **zero migrazione**.
+`data/schema/location_tags.json` (**creato in fase 5, US-501** — anticipato
+da fase 6 perche' i rituali dei 5 Pathway nuovi lo richiedono): le 29 voci
+elencate sopra. Gli 8 tag gia' usati dai rituali del TG sono entrati identici,
+**zero migrazione**. Il validator ora rifiuta un `advancement_ritual` con un
+`location_tag` fuori vocabolario. Le regioni di fase 6 devono realizzare a
+schermo ogni tag qui presente.
 
 I **siti unici dei rituali di Sequenza 0** degli altri 9 pathway (gli analoghi
 di `trono_del_gigante`) si aggiungono al vocabolario con le story di fase 5,

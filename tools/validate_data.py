@@ -89,6 +89,9 @@ def main():
     valid_damage_tags = set(dmg_doc["damage_tags"])
     valid_momenti = set(time_doc["momenti"])
     valid_fasi_lunari = set(time_doc["fasi_lunari"])
+    # US-501: vocabolario chiuso dei luoghi dei rituali di avanzamento.
+    _loc_doc = load_json(os.path.join(DATA, "schema", "location_tags.json")) or {}
+    valid_location_tags = set(_loc_doc.get("location_tags", []))
     # Tag ottenibili nella build attiva: servono a segnalare le sinergie
     # irraggiungibili (richiedono tag che nessun pathway attivo porta).
     obtainable_tags = set()
@@ -185,6 +188,12 @@ def main():
                 if not stub and not ritual.get("location_tags"):
                     err(f"{rel} [{sid}]: rituale senza location_tags su una sequenza non-stub: "
                         f"un rituale senza luogo non e' eseguibile.")
+                # US-501: i location_tags dichiarati devono stare nel vocabolario
+                # chiuso, come i tag di sinergia. Vale anche per i pathway differiti.
+                fuori = [t for t in ritual.get("location_tags", []) if t not in valid_location_tags]
+                if valid_location_tags and fuori:
+                    err(f"{rel} [{sid}]: location_tags {fuori} fuori dal vocabolario di "
+                        f"data/schema/location_tags.json")
 
             for aid in seq.get("abilities", []):
                 ability_refs.append((rel, sid, aid))
