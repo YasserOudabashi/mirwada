@@ -41,6 +41,7 @@ var _dashing: bool = false
 var _dash_vel: Vector2 = Vector2.ZERO
 var _dash_left: float = 0.0
 var _dash_cd: float = 0.0
+var _dist_accum: float = 0.0  # emettitore distanza_percorsa (US-331)
 
 var _parando: bool = false
 
@@ -111,6 +112,15 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	_aggiorna_animazione()
+
+	# emettitore distanza_percorsa (US-331): si accumula e si versa a blocchi
+	# di 64px per non chiamare TalentTracker 60 volte al secondo.
+	_dist_accum += velocity.length() * delta
+	if _dist_accum >= 64.0:
+		var tt: Node = get_node_or_null("/root/TalentTracker")
+		if tt != null:
+			tt.call("registra", "distanza_percorsa", _dist_accum)
+		_dist_accum = 0.0
 
 
 ## Direzione guardata come vettore. La cerca ability_engine per orientare

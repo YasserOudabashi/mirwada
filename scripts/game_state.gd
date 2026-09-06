@@ -64,6 +64,14 @@ func _base() -> Node:
 	return get_node_or_null("/root/BaseSystem")
 
 
+func _talenti() -> Node:
+	return get_node_or_null("/root/TalentSystem")
+
+
+func _talent_tracker() -> Node:
+	return get_node_or_null("/root/TalentTracker")
+
+
 func _eventi() -> Node:
 	return get_node_or_null("/root/EventTracker")
 
@@ -187,6 +195,10 @@ func snapshot() -> Dictionary:
 		"strutture": _strutture().per_salvataggio() if _strutture() != null else [],
 		"pet": _pet().per_salvataggio() if _pet() != null else {},
 		"base": _base().per_salvataggio() if _base() != null else {},
+		"talenti": {
+			"posseduti": _talenti().per_salvataggio() if _talenti() != null else [],
+			"comportamenti": _talent_tracker().per_salvataggio() if _talent_tracker() != null else {},
+		},
 		"conoscenza": _conoscenza().per_salvataggio() if _conoscenza() != null else [],
 		"inventario": _inventario().per_salvataggio() if _inventario() != null else {},
 		"equipaggiamento": _equip().per_salvataggio() if _equip() != null else {},
@@ -233,6 +245,12 @@ func applica(dati: Dictionary) -> void:
 		_pet().da_salvataggio(dati.get("pet", {}))
 	if _base() != null:
 		_base().da_salvataggio(dati.get("base", {}))
+	var tal: Dictionary = dati.get("talenti", {})
+	if _talent_tracker() != null:
+		_talent_tracker().da_salvataggio(tal.get("comportamenti", {}))
+	# TalentSystem DOPO il tracker: riapplica gli effetti dei talenti posseduti.
+	if _talenti() != null:
+		_talenti().da_salvataggio(tal.get("posseduti", []))
 	if _conoscenza() != null:
 		_conoscenza().da_salvataggio(dati.get("conoscenza", []))
 	if _inventario() != null:

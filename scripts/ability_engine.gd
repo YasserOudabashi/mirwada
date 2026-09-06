@@ -144,6 +144,9 @@ func execute_stored(stored_ability_id: String, consumer: Node) -> Dictionary:
 	_esegui_primitive(ability, consumer, stats, stored_ability_id, result)
 	result["ok"] = true
 	result["reason"] = OK
+	var tt: Node = get_node_or_null("/root/TalentTracker")
+	if tt != null:
+		tt.call("registra", "abilita_prestate_usate", 1.0)  # emettitore US-331
 	ability_executed.emit(stored_ability_id, consumer, result)
 	return result
 

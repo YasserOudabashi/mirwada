@@ -87,7 +87,7 @@
       "descrizione_i18n": "talent.pollice_verde.desc",
       "tipo": "acquisito",
       "sblocco": { "evento": "ingredienti_coltivati", "target": 10 },
-      "effetto": { "tipo": "sblocco_sistema", "sistema": "giardino", "chiave": "resa_bonus_talento" }
+      "effetto": { "tipo": "sblocco_sistema", "sistema": "giardino", "chiave": "resa_bonus_talento", "valore": 1 }
     },
     {
       "id": "mano_altrui",

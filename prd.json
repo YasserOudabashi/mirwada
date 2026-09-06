@@ -600,8 +600,8 @@
       ],
       "priority": 30,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO G. Due autoload: TalentTracker (scripts/talent_tracker.gd) - contatori dei 7 comportamenti-talento, versione ridotta di EventTracker senza filtri; registra(nome, quantita), count(nome), azzera, per/da_salvataggio (non fidata: solo chiavi nel vocabolario). TalentSystem (scripts/talent_system.gd) - _process controlla ogni acquisito non posseduto: count(evento) da EventTracker se e' uno dei 12, da TalentTracker se e' un comportamento-talento; >= target -> concedi(). concedi(id): _posseduti += id, _applica_effetto, talento_sbloccato.emit. _applica_effetto: stat_modifier -> StatsComponent.apply_modifier('talent:<id>', {stat: valore o valore*get_base se moltiplicativo}); tag_grant/sblocco_sistema non applicati qui ma letti a domanda (tag_concessi() per US-334, bonus_int(chiave) per i sistemi). riapplica() ri-mette i modificatori (dopo load / quando compare il player). EMETTITORI (adattamento minimo 1-3 righe): ingredienti_coltivati <- BaseSystem.raccogli; abilita_prestate_usate <- AbilityEngine.execute_stored; distanza_percorsa <- player._physics_process (accumulo locale, versato a blocchi di 64px); rituali_interrotti <- RitualSystem.interrompi. giocato_di_notte / sequenze_senza_pozione / nemici_risparmiati: registra() e' pubblico, si agganciano quando esisteranno il ciclo notte (fase 6) e la meccanica del risparmiare. pollice_verde ora ha valore:1 e BaseSystem.raccogli somma bonus_int('resa_bonus_talento') alla resa. SAVE 18->19: campo 'talenti' {posseduti, comportamenti}, _migra_18_a_19; GameState wire (tracker prima, system dopo -> riapplica). 484 test headless (476 + 8 in test_talent_system.gd: concedi applica lo stat_modifier additivo e moltiplicativo; comportamento oltre soglia sblocca + segnale, sotto no; evento dei 12 (50 enemy_defeated) sblocca veterano; tag_grant -> tag_concessi; sblocco_sistema -> bonus_int; round-trip del save; migrazione da v18). validate exit 0. Nessuna verifica a schermo: US-332/333."
     },
     {
       "id": "US-332",

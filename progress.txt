@@ -3674,3 +3674,56 @@ sezione test aggiornata.
 - Prossima storia: US-331 (TalentTracker per i comportamenti-talento +
   emettitori agganciati ai sistemi con adattamento minimo + TalentSystem che
   sblocca a soglia e applica l'effetto; SAVE +1).
+
+[2026-09-06] US-331 — TalentTracker + emettitori + TalentSystem. BLOCCO G.
+
+- scripts/talent_tracker.gd (autoload TalentTracker): contatori dei 7
+  comportamenti-talento. Versione ridotta di EventTracker (nessun filtro).
+  registra(nome, quantita=1), count(nome), azzera(), per/da_salvataggio
+  (non fidata: solo chiavi del vocabolario, valori >= 0).
+- scripts/talent_system.gd (autoload TalentSystem, dopo TalentTracker):
+  * _process -> _controlla_sblocchi(): per ogni acquisito non posseduto,
+    count(evento) da EventTracker se e' uno dei 12, da TalentTracker se e' un
+    comportamento-talento; >= sblocco.target -> concedi(id).
+  * concedi(id): idempotente. _posseduti += id, _applica_effetto,
+    talento_sbloccato.emit(id). Anche la creazione personaggio (US-332)
+    chiamera' concedi().
+  * _applica_effetto: stat_modifier -> _stats().apply_modifier('talent:<id>',
+    {stat: delta}) dove delta = valore, o valore * get_base(stat) se
+    moltiplicativo. tag_grant / sblocco_sistema NON applicati qui: letti a
+    domanda con tag_concessi() (US-334) e bonus_int(chiave) (i sistemi).
+  * riapplica(): ri-mette i modificatori di stat dei posseduti - da chiamare
+    dopo un load o quando compare il player. da_salvataggio() la chiama.
+  * pulisci() toglie anche i modificatori 'talent:<id>' dallo StatsComponent.
+- EMETTITORI, adattamento minimo (1-3 righe per file):
+  * ingredienti_coltivati  <- BaseSystem.raccogli() (la resa)
+  * abilita_prestate_usate <- AbilityEngine.execute_stored() (dopo ok)
+  * distanza_percorsa      <- player.gd _physics_process (accumulo locale
+    _dist_accum, versato a blocchi di 64px per non chiamare 60 volte/s)
+  * rituali_interrotti     <- RitualSystem.interrompi()
+  giocato_di_notte / sequenze_senza_pozione / nemici_risparmiati: nessun
+  punto di aggancio naturale ora (ciclo notte = fase 6; il "risparmiare" un
+  nemico non e' ancora una meccanica). registra() e' pubblico: si agganciano
+  allora. Quei talenti restano sbloccabili-ma-fermi (la UI US-333 li mostra
+  offuscati).
+- pollice_verde: effetto ora { ..., valore: 1 }. BaseSystem.raccogli somma
+  TalentSystem.bonus_int('resa_bonus_talento') alla resa: il talento fa
+  davvero raccogliere di piu'.
+- SAVE: VERSIONE_CORRENTE 18 -> 19. Campo "talenti" { posseduti: [id],
+  comportamenti: {nome: conteggio} } in salva(), _leggi_snapshot(),
+  _migra_18_a_19 (default {posseduti:[], comportamenti:{}}). GameState:
+  _talenti() + _talent_tracker(), snapshot assembla il campo, applica()
+  ripristina il tracker PRIMA del system (che poi riapplica gli effetti).
+- Come verificato: 484 test headless (476 + 8 in test_talent_system.gd:
+  concedi applica lo stat_modifier additivo (+6 precisione) e moltiplicativo
+  (+10% hp_max sul base); un comportamento oltre soglia sblocca + segnale,
+  sotto soglia no; 50 enemy_defeated (evento dei 12) sblocca 'veterano';
+  tag_grant -> tag_concessi() contiene 'notte'; sblocco_sistema ->
+  bonus_int('resa_bonus_talento') = 1; round-trip del save di posseduti e
+  comportamenti; migrazione da v18). validate_data.py exit 0 (9 warning
+  invariati). Nessuna regressione sugli emettitori (player/ability/ritual/
+  base). Nessuna verifica a schermo: US-332 (scelta alla creazione) e US-333
+  (sezione Talenti nel libro).
+- Prossima storia: US-332 (1-2 talenti innati scelti alla creazione
+  personaggio; GameState.nuova_partita li accetta; la pagina identita' li
+  mostra).

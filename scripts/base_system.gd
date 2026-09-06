@@ -189,10 +189,15 @@ func raccogli(indice: int) -> int:
 	if item_id.is_empty() or float(a.get("crescita", 1.0)) > 0.0:
 		return 0
 	var b: Dictionary = _gd().call("get_balance", "giardino") if _gd() != null else {}
-	var n: int = maxi(1, int(b.get("resa_base", 1)) + int(bonus("giardino").get("resa_raccolto", 0)))
+	var ts: Node = get_node_or_null("/root/TalentSystem")
+	var bonus_talento: int = int(ts.call("bonus_int", "resa_bonus_talento")) if ts != null else 0
+	var n: int = maxi(1, int(b.get("resa_base", 1)) + int(bonus("giardino").get("resa_raccolto", 0)) + bonus_talento)
 	if _inv() != null:
 		_inv().call("aggiungi", item_id, n)
 	_appezzamenti[indice] = {"item_id": "", "crescita": 0.0}
+	var tt: Node = get_node_or_null("/root/TalentTracker")
+	if tt != null:
+		tt.call("registra", "ingredienti_coltivati", n)  # emettitore US-331
 	raccolto.emit(item_id, n)
 	return n
 

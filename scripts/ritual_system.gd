@@ -113,6 +113,9 @@ func interrompi(motivo: String) -> void:
 		return
 	_rituale = {}
 	_left = 0.0
+	var tt: Node = get_node_or_null("/root/TalentTracker")
+	if tt != null:
+		tt.call("registra", "rituali_interrotti", 1.0)  # emettitore US-331
 	var b: Dictionary = _balance()
 	var m: Node = get_node_or_null("/root/Madness")
 	if m != null:
