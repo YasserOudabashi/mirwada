@@ -8,8 +8,10 @@
     "ambra_grigia",
     "argento_annerito",
     "argento_benedetto",
+    "argilla_rossa_del_fiume",
     "calice_incrinato",
     "caratteristica_del_gigante",
+    "cellula_madre",
     "cenere_di_re",
     "cenere_di_spirito",
     "cera_di_veglia",
@@ -24,6 +26,7 @@
     "cuore_di_quercia_madre",
     "dente_di_teschio",
     "ectoplasma",
+    "enzima_dormiente",
     "essenza_spettrale",
     "estratto_di_muscolo",
     "ferro_delle_lapidi",
@@ -37,6 +40,8 @@
     "fiore_di_luna",
     "frammento_di_alba",
     "frammento_di_luna",
+    "fungo_a_specchio",
+    "ghianda_millenaria",
     "goccia_di_linfa",
     "goccia_di_prima_pioggia",
     "il_confine_del_mondo",
@@ -52,6 +57,7 @@
     "moneta_del_traghettatore",
     "muffa_sepolcrale",
     "muschio_di_caverna",
+    "muschio_luminoso",
     "nebbia_del_limbo",
     "nucleo_del_crepuscolo",
     "obolo_di_bronzo",
@@ -80,6 +86,7 @@
     "rosa_che_non_appassisce",
     "rugiada_notturna",
     "sale_della_veglia_eterna",
+    "sale_della_vita",
     "sale_di_roccia",
     "sale_scarlatto",
     "sangue_di_cervo",
@@ -89,11 +96,13 @@
     "scettro_pallido",
     "scheggia_divina",
     "scudo_fuso",
+    "seme_dell_albero_madre",
     "seme_di_stella_cadente",
     "seme_dormiente",
     "soffio_di_spettro",
     "specchio_di_luna_nera",
     "spiga_dorata",
+    "spina_di_rovo_antico",
     "stendardo_lacero",
     "tempo_solidificato",
     "tendine_di_lupo",
@@ -574,6 +583,48 @@
         "spiga_dorata",
         "miele_selvatico",
         "acqua_di_fonte_benedetta"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_mother_6": {
+      "characteristic_sequence": 6,
+      "ingredients": [
+        "cellula_madre",
+        "enzima_dormiente",
+        "fungo_a_specchio"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_mother_5": {
+      "characteristic_sequence": 5,
+      "ingredients": [
+        "ghianda_millenaria",
+        "spina_di_rovo_antico",
+        "muschio_luminoso"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_mother_4": {
+      "characteristic_sequence": 4,
+      "ingredients": [
+        "sale_della_vita",
+        "argilla_rossa_del_fiume",
+        "seme_dell_albero_madre"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

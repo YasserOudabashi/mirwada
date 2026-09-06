@@ -216,18 +216,63 @@
       "name_i18n": "sequence.mother.6",
       "tier": "mid",
       "concept": "Modifica le creature: innesti e primi ibridi.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 95,
+        "spiritualita_max": 0.25
+      },
+      "abilities": [
+        "mother_innesto",
+        "mother_mutazione_rapida"
+      ],
+      "acting_actions": [
+        {
+          "id": "mother_6_biologo",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_innesto"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_6_biologo",
+          "descrizione": "Innesta 15 chimere"
+        },
+        {
+          "id": "mother_6_mutageno",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "veleno"
+          },
+          "target": 3000,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_6_mutageno",
+          "descrizione": "Infliggi 3000 danni da veleno"
+        },
+        {
+          "id": "mother_6_selezione",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 15,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_6_selezione",
+          "descrizione": "Sconfiggi 15 nemici"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 6,
-        "ingredients": [],
+        "ingredients": [
+          "cellula_madre",
+          "enzima_dormiente",
+          "fungo_a_specchio"
+        ],
         "formula_id": "formula_mother_6"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 5.6,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 5,
@@ -236,20 +281,63 @@
       "name_i18n": "sequence.mother.5",
       "tier": "mid",
       "concept": "Comanda la vegetazione come arma e come terreno: terraforming tattico.",
-      "stat_modifiers": {},
+      "stat_modifiers": {
+        "hp_max": 135,
+        "forza": 8
+      },
       "abilities": [
-        "mother_dominio_druidico"
+        "mother_dominio_druidico",
+        "mother_muraglia_di_rovi"
       ],
-      "acting_actions": [],
+      "acting_actions": [
+        {
+          "id": "mother_5_druido",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_dominio_druidico"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_5_druido",
+          "descrizione": "Domina il terreno 12 volte"
+        },
+        {
+          "id": "mother_5_muraglia",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_muraglia_di_rovi"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_5_muraglia",
+          "descrizione": "Alza 15 muraglie di rovi"
+        },
+        {
+          "id": "mother_5_signore",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 18,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_5_signore",
+          "descrizione": "Sconfiggi 18 nemici col terreno come arma"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 5,
-        "ingredients": [],
+        "ingredients": [
+          "ghianda_millenaria",
+          "spina_di_rovo_antico",
+          "muschio_luminoso"
+        ],
         "formula_id": "formula_mother_5"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 6.9,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 4,
@@ -258,24 +346,74 @@
       "name_i18n": "sequence.mother.4",
       "tier": "saint",
       "concept": "Alchimia della vita: omuncoli e materiali organici artificiali.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 210,
+        "spiritualita_max": 0.4
+      },
+      "abilities": [
+        "mother_omuncolo",
+        "mother_materia_vivente"
+      ],
+      "acting_actions": [
+        {
+          "id": "mother_4_alchimista",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_omuncolo"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_4_alchimista",
+          "descrizione": "Forgia 12 omuncoli"
+        },
+        {
+          "id": "mother_4_creatore",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 20,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_4_creatore",
+          "descrizione": "Sconfiggi 20 nemici con le tue creazioni"
+        },
+        {
+          "id": "mother_4_trasmutatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "mother_materia_vivente"
+          },
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.mother.mother_4_trasmutatore",
+          "descrizione": "Trasmuta materia viva 12 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 4,
-        "ingredients": [],
+        "ingredients": [
+          "sale_della_vita",
+          "argilla_rossa_del_fiume",
+          "seme_dell_albero_madre"
+        ],
         "formula_id": "formula_mother_4"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "bosco_antico",
+          "sorgente"
+        ],
+        "momento": "mezzogiorno",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "un_organo_donato_da_un_alleato_consenziente"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 8.6,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 3,

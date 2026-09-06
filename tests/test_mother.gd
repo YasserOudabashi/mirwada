@@ -10,6 +10,11 @@ const ABILITA_9_7 := [
 	"mother_diagnosi", "mother_sutura",
 	"mother_benedizione_raccolto", "mother_terra_generosa",
 ]
+const ABILITA_6_4 := [
+	"mother_innesto", "mother_mutazione_rapida",
+	"mother_dominio_druidico", "mother_muraglia_di_rovi",
+	"mother_omuncolo", "mother_materia_vivente",
+]
 
 
 func _engine() -> Node:
@@ -81,11 +86,37 @@ func test_plant_growth_temporaneo_non_tocca_il_world_state() -> void:
 	_cleanup(c)
 
 
-func test_mother_9_7_sono_contenuto() -> void:
+func test_ogni_abilita_mother_6_4_si_esegue_senza_warning() -> void:
+	var e: Node = _engine()
+	for aid in ABILITA_6_4:
+		var c: Node2D = _caster()
+		var r: Dictionary = e.call("execute", aid, c)
+		assert_true(r["ok"], "%s eseguita" % aid)
+		assert_eq((r["warnings"] as PackedStringArray).size(), 0,
+			"%s: nessun warning di primitiva: %s" % [aid, r["warnings"]])
+		e.call("clear_cooldowns")
+		_cleanup(c)
+	var reg: Node = Engine.get_main_loop().root.get_node_or_null("SummonRegistry")
+	if reg != null:
+		reg.call("pulisci")
+	if _ws() != null:
+		_ws().call("pulisci")
+
+
+func test_mother_4_ha_un_rituale() -> void:
+	var pw: Dictionary = _gd().call("get_pathway", "mother")
+	for seq in (pw.get("sequences", []) as Array):
+		if int((seq as Dictionary).get("sequence", -1)) != 4:
+			continue
+		assert_false(((seq as Dictionary).get("advancement_ritual", {}) as Dictionary).is_empty(),
+			"mother_4 (Seq <= 4) ha un advancement_ritual")
+
+
+func test_mother_9_4_sono_contenuto() -> void:
 	var pw: Dictionary = _gd().call("get_pathway", "mother")
 	for seq in (pw.get("sequences", []) as Array):
 		var n: int = int((seq as Dictionary).get("sequence", -1))
-		if n < 7 or n > 9:
+		if n < 4 or n > 9:
 			continue
 		assert_false(bool((seq as Dictionary).get("stub", false)), "mother_%d non e' piu' stub" % n)
 		var somma: float = 0.0

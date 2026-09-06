@@ -4918,3 +4918,27 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   validate exit 0 (3 warning).
 - Prossima storia: US-513 (Mother Seq 6-4: Biologist / Druid / Classical
   Alchemist - terraforming, chimere via summon chimera_).
+
+[2026-09-06] US-513 — Mother Sequenze 6-4 (Biologist / Druid / Classical Alchemist). BLOCCO 3.
+
+- NESSUNA primitiva nuova. Mother Seq 6/5/4 (stub -> false):
+  * mother_innesto (summon chimera_semplice + buff difesa), mother_mutazione_
+    rapida (debuff velocita + dot veleno), mother_muraglia_di_rovi
+    (plant_growth temporaneo + terrain_modify terreno_impraticabile),
+    mother_omuncolo (summon chimera_omuncolo x2), mother_materia_vivente
+    (heal 45 + buff hp_max). mother_dominio_druidico (stress test seq 5) nel
+    roster.
+  * acting somma 1.0. madness 5.6/6.9/8.6.
+  * mother_4 (Seq <= 4): advancement_ritual, location_tags [bosco_antico,
+    sorgente], momento mezzogiorno, sacrifice "un organo donato da un alleato
+    consenziente".
+  * formule formula_mother_6/5/4 + 9 ingredienti; char_mother_6/5/4.
+  * summon chimera_: la materia prima "ingredienti vivi" e' nella nota; il
+    consumo vero da PotionSystem/Inventory e' aggancio di fase 6.
+- i18n: 5 abilita' + 3 caratteristiche tradotte. 59 TODO.
+- Come verificato: 561 test headless (559 + 2 in test_mother.gd: le 6 abilita'
+  Seq 6-4 eseguono a 0 warning; mother_4 ha un rituale; Seq 9-4 non-stub,
+  acting 1.0). validate exit 0 (3 warning).
+- Prossima storia: US-514 (Mother Seq 3-0: Pallbearer / Desolate Matriarch /
+  Naturewalker / Mother - drenaggio d'area, chimere permanenti, la natura
+  che risponde senza rituali). Chiude il BLOCCO 3.

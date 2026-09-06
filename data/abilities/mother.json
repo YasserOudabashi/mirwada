@@ -182,6 +182,148 @@
         "area"
       ],
       "note": "Un campo fiorito che RESTA: la terra rigenerata entra nello stato del mondo (come i varchi permanenti del Twilight Giant)."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_innesto",
+      "name_i18n": "ability.mother.mother_innesto",
+      "sequence_id": "mother_6",
+      "costo_spiritualita": 13,
+      "cooldown": 22.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "chimera_semplice",
+          "quantita": 1,
+          "durata": 35.0,
+          "comportamento": "difensivo"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.15,
+          "durata": 35.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "genetica",
+        "bestia",
+        "difesa"
+      ],
+      "note": "Il Biologist innesta: una chimera semplice al fianco. Materia prima: ingredienti vivi (matrice di proprieta')."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_mutazione_rapida",
+      "name_i18n": "ability.mother.mother_mutazione_rapida",
+      "sequence_id": "mother_6",
+      "costo_spiritualita": 10,
+      "cooldown": 10.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "velocita",
+          "valore": -0.35,
+          "durata": 8.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "dot",
+          "danno_tick": 8,
+          "tick_rate": 1.5,
+          "durata": 8.0,
+          "tag_danno": "veleno"
+        }
+      ],
+      "tag_sinergia": [
+        "genetica",
+        "decadimento",
+        "singolo"
+      ],
+      "note": "Innesca una mutazione ostile: il bersaglio rallenta e si corrompe."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_muraglia_di_rovi",
+      "name_i18n": "ability.mother.mother_muraglia_di_rovi",
+      "sequence_id": "mother_5",
+      "costo_spiritualita": 15,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "plant_growth",
+          "raggio": 5,
+          "specie": "rovi_taglienti",
+          "velocita": 4.0,
+          "persistente": false
+        },
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "terreno_impraticabile",
+          "raggio": 5,
+          "durata": 15.0,
+          "permanente": false
+        }
+      ],
+      "tag_sinergia": [
+        "crescita",
+        "terra",
+        "area"
+      ],
+      "note": "Il Druido alza una muraglia di rovi: terreno impraticabile per 15 secondi."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_omuncolo",
+      "name_i18n": "ability.mother.mother_omuncolo",
+      "sequence_id": "mother_4",
+      "costo_spiritualita": 24,
+      "cooldown": 40.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "chimera_omuncolo",
+          "quantita": 2,
+          "durata": 40.0,
+          "comportamento": "aggressivo"
+        }
+      ],
+      "tag_sinergia": [
+        "genetica",
+        "bestia",
+        "evocazione"
+      ],
+      "note": "Il Classical Alchemist forgia omuncoli da materia organica. entita_id chimera_: la fonte e' dichiarata."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_materia_vivente",
+      "name_i18n": "ability.mother.mother_materia_vivente",
+      "sequence_id": "mother_4",
+      "costo_spiritualita": 18,
+      "cooldown": 26.0,
+      "primitive": [
+        {
+          "tipo": "heal",
+          "quantita": 45,
+          "istantaneo": true,
+          "bersaglio": "self"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "hp_max",
+          "valore": 0.12,
+          "durata": 15.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "genetica",
+        "guarigione",
+        "singolo"
+      ],
+      "note": "Trasmuta materia inerte in tessuto vivo: cura piena e corpo piu' saldo."
     }
   ]
 }
