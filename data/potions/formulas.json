@@ -4,6 +4,7 @@
   "ingredients": [
     "acciaio_stellare",
     "acqua_dello_stige",
+    "argento_annerito",
     "argento_benedetto",
     "caratteristica_del_gigante",
     "cenere_di_re",
@@ -23,6 +24,7 @@
     "ferro_temperato",
     "fiele_di_demone",
     "filo_delle_parche",
+    "fiore_di_luna",
     "frammento_di_alba",
     "il_confine_del_mondo",
     "incenso_dei_riti",
@@ -39,6 +41,8 @@
     "oro_bianco",
     "ossidiana_decaduta",
     "osso_di_pugile",
+    "pelo_di_lupo_bianco",
+    "petalo_di_belladonna",
     "pietra_di_soglia",
     "platino_rituale",
     "polvere_di_arena",
@@ -47,13 +51,17 @@
     "polvere_di_specchio_incrinato",
     "radice_di_immortelle",
     "radice_di_quercia",
+    "radice_di_valeriana",
     "radice_di_veggente",
     "resina_di_ferro",
     "respiro_finale",
+    "rugiada_notturna",
     "sale_della_veglia_eterna",
     "sale_di_roccia",
+    "sangue_di_cervo",
     "sangue_di_gufo_lunare",
     "sangue_di_toro",
+    "sangue_rappreso",
     "scettro_pallido",
     "scheggia_divina",
     "scudo_fuso",
@@ -64,7 +72,8 @@
     "terra_di_cimitero",
     "ultimo_battito",
     "ultimo_respiro",
-    "voce_del_gigante"
+    "voce_del_gigante",
+    "zanna_di_latte"
   ],
   "formulas": {
     "formula_fool_9": {
@@ -353,6 +362,48 @@
         "il_confine_del_mondo",
         "respiro_finale",
         "chiave_dell_oltretomba"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_moon_9": {
+      "characteristic_sequence": 9,
+      "ingredients": [
+        "radice_di_valeriana",
+        "rugiada_notturna",
+        "fiore_di_luna"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_moon_8": {
+      "characteristic_sequence": 8,
+      "ingredients": [
+        "pelo_di_lupo_bianco",
+        "zanna_di_latte",
+        "sangue_di_cervo"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_moon_7": {
+      "characteristic_sequence": 7,
+      "ingredients": [
+        "sangue_rappreso",
+        "petalo_di_belladonna",
+        "argento_annerito"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

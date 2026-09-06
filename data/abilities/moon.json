@@ -33,6 +33,169 @@
       ],
       "costo_follia": 2.0,
       "note": "STRESS TEST. Aggancio diretto al sistema pet tramite lo stat bond_pet."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_distillato_curativo",
+      "name_i18n": "ability.moon.moon_distillato_curativo",
+      "sequence_id": "moon_9",
+      "costo_spiritualita": 5,
+      "cooldown": 8.0,
+      "primitive": [
+        {
+          "tipo": "heal",
+          "quantita": 25,
+          "istantaneo": true,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "pozione",
+        "guarigione",
+        "singolo"
+      ],
+      "note": "La prima pozione dell'Apothecary: un sorso e la ferita si chiude."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_tonico_erbe",
+      "name_i18n": "ability.moon.moon_tonico_erbe",
+      "sequence_id": "moon_9",
+      "costo_spiritualita": 6,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "precisione",
+          "valore": 5,
+          "durata": 10.0,
+          "moltiplicativo": false
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "velocita",
+          "valore": 0.08,
+          "durata": 10.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "pozione",
+        "agilita'",
+        "singolo"
+      ],
+      "note": "Erboristeria di base: mano ferma e passo svelto per qualche istante."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_richiamo_compagno",
+      "name_i18n": "ability.moon.moon_richiamo_compagno",
+      "sequence_id": "moon_8",
+      "costo_spiritualita": 10,
+      "cooldown": 25.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "bestia_compagna",
+          "quantita": 1,
+          "durata": 40.0,
+          "comportamento": "difensivo"
+        }
+      ],
+      "tag_sinergia": [
+        "bestia",
+        "evocazione",
+        "singolo"
+      ],
+      "note": "Il Beast Tamer chiama una bestia al fianco. La doma PERMANENTE del pet passa per PetSystem (fase 3); questa e' un compagno a tempo."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_legame_bestiale",
+      "name_i18n": "ability.moon.moon_legame_bestiale",
+      "sequence_id": "moon_8",
+      "costo_spiritualita": 7,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.15,
+          "durata": 12.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "heal",
+          "quantita": 4,
+          "istantaneo": false,
+          "durata": 12.0,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "bestia",
+        "difesa",
+        "guarigione"
+      ],
+      "note": "Il legame con la bestia protegge e cura chi lo tiene."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_morso",
+      "name_i18n": "ability.moon.moon_morso",
+      "sequence_id": "moon_7",
+      "costo_spiritualita": 8,
+      "cooldown": 6.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "forza",
+          "valore": -0.3,
+          "durata": 8.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "heal",
+          "quantita": 20,
+          "istantaneo": true,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "sangue",
+        "bestia",
+        "singolo"
+      ],
+      "note": "Il Vampiro morde: il nemico si indebolisce, tu ti rigeneri."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_furia_notturna",
+      "name_i18n": "ability.moon.moon_furia_notturna",
+      "sequence_id": "moon_7",
+      "costo_spiritualita": 9,
+      "cooldown": 20.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "forza",
+          "valore": 0.25,
+          "durata": 10.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "sangue",
+        "notte",
+        "forza"
+      ],
+      "condizioni": [
+        {
+          "tipo": "e_notte",
+          "valore": true
+        }
+      ],
+      "note": "Di notte il sangue del Vampiro ribolle: forza in piu', ma solo al buio."
     }
   ]
 }

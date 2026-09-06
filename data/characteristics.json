@@ -127,6 +127,24 @@
       "pathway_id": "death",
       "sequence": 0,
       "name_i18n": "characteristic.death.0"
+    },
+    {
+      "id": "char_moon_9",
+      "pathway_id": "moon",
+      "sequence": 9,
+      "name_i18n": "characteristic.moon.9"
+    },
+    {
+      "id": "char_moon_8",
+      "pathway_id": "moon",
+      "sequence": 8,
+      "name_i18n": "characteristic.moon.8"
+    },
+    {
+      "id": "char_moon_7",
+      "pathway_id": "moon",
+      "sequence": 7,
+      "name_i18n": "characteristic.moon.7"
     }
   ]
 }

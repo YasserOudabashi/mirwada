@@ -4812,3 +4812,27 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   superato.
 - Prossima storia: US-509 (BLOCCO 2 - Moon Seq 9-7: Apothecary / Beast Tamer
   / Vampire; gancio col PetSystem, nessuna primitiva nuova attesa).
+
+[2026-09-06] US-509 — Moon Sequenze 9-7 (Apothecary / Beast Tamer / Vampire). BLOCCO 2.
+
+- NESSUNA primitiva nuova (come da PRD): Moon 9-7 ricombina heal/buff_stat/
+  debuff_stat/summon gia' implementate.
+- CONTENUTO Moon Seq 9/8/7 (stub -> false):
+  * moon_distillato_curativo (heal self), moon_tonico_erbe (2x buff_stat),
+    moon_richiamo_compagno (summon bestia_compagna, durata 40 - la doma
+    PERMANENTE del pet passa per PetSystem di fase 3, questa e' un compagno
+    a tempo), moon_legame_bestiale (buff difesa + heal nel tempo),
+    moon_morso (debuff forza + heal self = il drenaggio del Vampiro),
+    moon_furia_notturna (buff forza, condizione e_notte).
+  * acting somma 1.0. madness 1.2/2.6/4.0. stat_modifiers. Nessun ritual
+    (Seq > 4). formule formula_moon_9/8/7 + 9 ingredienti; char_moon_9/8/7.
+  * moon_evocazione_remota (stress test, seq moon_3) resta.
+- i18n: 6 abilita' + 3 caratteristiche tradotte. 61 TODO.
+- Come verificato: 551 test headless (548 + 3 in test_moon.gd: le 6 abilita'
+  eseguono a 0 warning; moon_morso cura il caster di +20 hp; le Seq 9-7 non
+  sono piu' stub, acting 1.0, formule presenti). validate exit 0 (3 warning).
+  Nessuna verifica a schermo: nessuna primitiva nuova; il lato bersaglio del
+  drenaggio (hp nemico) e' targeting combat = fase 6.
+- Prossima storia: US-510 (Moon Seq 6-4: Potions Professor / Scarlet Scholar /
+  Shaman King; Seq 5 sangue come materiale rituale, Seq 4 il branco del pet +
+  primo advancement_ritual del Moon).

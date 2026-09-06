@@ -21,18 +21,63 @@
       "name_i18n": "sequence.moon.9",
       "tier": "low",
       "concept": "Pozioni di base ed erboristeria: la porta d'ingresso all'alchimia.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 20,
+        "spiritualita_max": 0.1
+      },
+      "abilities": [
+        "moon_distillato_curativo",
+        "moon_tonico_erbe"
+      ],
+      "acting_actions": [
+        {
+          "id": "moon_9_speziale",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_distillato_curativo"
+          },
+          "target": 20,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_9_speziale",
+          "descrizione": "Distilla 20 pozioni curative"
+        },
+        {
+          "id": "moon_9_erborista",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_tonico_erbe"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_9_erborista",
+          "descrizione": "Prepara 15 tonici alle erbe"
+        },
+        {
+          "id": "moon_9_apprendista",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_9_apprendista",
+          "descrizione": "Sconfiggi 10 nemici mentre impari il mestiere"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 9,
-        "ingredients": [],
+        "ingredients": [
+          "radice_di_valeriana",
+          "rugiada_notturna",
+          "fiore_di_luna"
+        ],
         "formula_id": "formula_moon_9"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 1.2,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 8,
@@ -41,18 +86,63 @@
       "name_i18n": "sequence.moon.8",
       "tier": "low",
       "concept": "Doma le bestie: il primo pet permanente del gioco.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 35,
+        "spiritualita_max": 0.12
+      },
+      "abilities": [
+        "moon_richiamo_compagno",
+        "moon_legame_bestiale"
+      ],
+      "acting_actions": [
+        {
+          "id": "moon_8_domatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_richiamo_compagno"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_8_domatore",
+          "descrizione": "Chiama un compagno bestiale 15 volte"
+        },
+        {
+          "id": "moon_8_branco",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_8_branco",
+          "descrizione": "Sconfiggi 15 nemici con una bestia al fianco"
+        },
+        {
+          "id": "moon_8_legame",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_legame_bestiale"
+          },
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_8_legame",
+          "descrizione": "Rinsalda il legame 10 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 8,
-        "ingredients": [],
+        "ingredients": [
+          "pelo_di_lupo_bianco",
+          "zanna_di_latte",
+          "sangue_di_cervo"
+        ],
         "formula_id": "formula_moon_8"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 2.6,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 7,
@@ -61,18 +151,63 @@
       "name_i18n": "sequence.moon.7",
       "tier": "low",
       "concept": "Drena sangue, rigenera e guadagna forza di notte.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 55,
+        "forza": 5
+      },
+      "abilities": [
+        "moon_morso",
+        "moon_furia_notturna"
+      ],
+      "acting_actions": [
+        {
+          "id": "moon_7_morso",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_morso"
+          },
+          "target": 25,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_7_morso",
+          "descrizione": "Mordi 25 volte"
+        },
+        {
+          "id": "moon_7_predatore",
+          "evento": "damage_dealt",
+          "filtri": {},
+          "target": 3000,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_7_predatore",
+          "descrizione": "Infliggi 3000 danni"
+        },
+        {
+          "id": "moon_7_notturno",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_furia_notturna"
+          },
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_7_notturno",
+          "descrizione": "Scatena la furia notturna 12 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 7,
-        "ingredients": [],
+        "ingredients": [
+          "sangue_rappreso",
+          "petalo_di_belladonna",
+          "argento_annerito"
+        ],
         "formula_id": "formula_moon_7"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 4.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 6,
