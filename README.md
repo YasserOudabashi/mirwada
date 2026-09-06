@@ -45,8 +45,25 @@ raggiungibili coi 10 Pathway attivi (le altre 18 puntano a gruppi differiti e
 si accenderanno riattivandoli). Verdetto (US-413, `tests/test_slice_fase_4.gd`):
 una sinergia pet + stanza + talento si attiva senza una riga di codice dedicata.
 
-Il PRD della fase 5 (espansione contenuti) si genera con `/prd` — vedi
-`006_PRD/roadmap.md`. La fase 5 è il **punto di controllo** dell'architettura.
+**Fase 5 — Espansione contenuti: chiusa.** 22 story, 570 test. Cinque Pathway
+nuovi completi — **Death, Moon, Mother, Paragon, Hermit**, tutti a 10/10
+Sequenze (abilità, recitazione, pozioni, rituali di avanzamento). Sette
+primitive implementate (`fear`, `reveal_info`, `teleport`, `soul_detach`,
+`resurrect`, `plant_growth`, `mind_read`), ognuna quando il primo Pathway
+l'ha richiesta. `darkness_1`/`paragon_1`/`hermit_1` riscritte senza le
+primitive differite. `data/schema/location_tags.json` + `ownership.json` (la
+matrice di proprietà come check del validator). Save invariato.
+
+**Il punto di controllo dell'architettura è stato superato** (US-508,
+`tests/test_slice_fase_5.gd`): Death giocato interamente in codice, dalla
+Sequenza 8 alla 2, con zero righe che nominano il Pathway; il `git diff` del
+blocco tocca solo i 5 handler di primitiva nuovi + un metodo di movimento del
+player. `AbilityEngine.execute` non è stato toccato.
+
+**Fase 5b** (Darkness resto, Fool, Error, Door + `illusion`/`possess`/`steal`/
+`time_rewind`/`chain`/`shadow_meld`) è dentro la fase 6, dopo il ciclo
+giorno/notte. Il PRD della fase 6 si genera con `/prd` — vedi
+`006_PRD/roadmap.md`.
 
 ## Setup
 

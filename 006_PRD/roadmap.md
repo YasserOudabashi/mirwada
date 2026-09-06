@@ -134,21 +134,52 @@ davvero, senza codice dedicato. **Verificato** in `test_slice_fase_4.gd`.
 
 ---
 
-## Fase 5 — Espansione contenuti (~13 story, quasi tutte di dati)
+## Fase 5 — Espansione contenuti — CHIUSA (22 story, 570 test)
 
-I restanti 9 Pathway. **Una story per Pathway** se l'architettura ha retto.
-Se qui servono `if` speciali, la fase 2 ha sbagliato qualcosa e va corretta
-prima di proseguire: e' il punto di controllo dell'intero progetto.
+> **PRD**: `006_PRD/prd-fase-5-espansione-contenuti.md`. Chiusa il 2026-09-07:
+> 22 story `US-501..522` in 6 blocchi (0 fondamenta, 1 Death + checkpoint,
+> 2 Moon, 3 Mother, 4 Paragon, 5 Hermit, 6 chiusura). Save `schema_version`
+> INVARIATO (la fase 5 e' contenuto, non struttura).
+>
+> **Verdetto del punto di controllo (US-508)**: l'architettura REGGE oltre il
+> Twilight Giant. `tests/test_slice_fase_5.gd` gioca Death dalla Sequenza 8
+> alla 2 in codice (Caratteristica -> concoct -> recitazione via EventTracker
+> -> bevi -> avanzamento) con ZERO righe di codice che nominano "death". Il
+> `git diff` del blocco Death tocca solo 5 handler `_p_<primitiva>` nel
+> pattern del registro chiuso + `player.teleport_verso`;
+> `AbilityEngine.execute` e `_esegui_primitive` sono intatti.
+>
+> **Cosa contiene**:
+> - 5 Pathway completi: Death, Moon, Mother, Paragon, Hermit, tutti a 10/10
+>   Sequenze. 61 Sequenze non-stub su 100 (10 TG + fool_9 + 50).
+> - 7 primitive implementate: `fear`, `reveal_info`, `teleport`, `soul_detach`,
+>   `resurrect`, `plant_growth`, `mind_read`, ognuna quando il primo Pathway
+>   l'ha richiesta.
+> - `darkness_1`, `paragon_1`, `hermit_1` riscritte senza le primitive
+>   differite (`probability_shift`, `rule_bind`). Grep di `data/abilities/`
+>   per una primitiva differita usata -> 0.
+> - `data/schema/location_tags.json` (29 luoghi) + `ownership.json` (la
+>   matrice di proprieta' come check del validator).
+> - 6 sinergie nuove (`batch_4.json`); 32 raggiungibili su 50.
+> - Regola `acting_actions` somma esatta 1.0 (errore, non warning).
+>
+> **Fase 5b** (non ancora un PRD): Darkness (le altre 9 Sequenze), Fool,
+> Error, Door. Le primitive dure senza handler (`illusion`, `possess`,
+> `steal`, `time_rewind`, `chain`, `shadow_meld`) hanno bisogno del ciclo
+> giorno/notte e delle regioni di fase 6 per essere tarate a schermo.
 
-Ordine consigliato in `006_PRD/design-pathways.md`: Death, Moon, Mother,
-Paragon, Hermit, Darkness, e per ultimi Fool / Error / Door, che richiedono
-le primitive piu' difficili da rendere leggibili a schermo.
-
-Piu' le 13 primitive attive rimanenti (28 attive totali, 3 differite).
+Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 
 ---
 
-## Fase 6 — Mondo (~35 story)
+## Fase 6 — Mondo (~35 story + fase 5b)
+
+> Include la **fase 5b**: Darkness (le 9 Sequenze rimaste), Fool, Error, Door,
+> dopo che il ciclo giorno/notte e le regioni sono in piedi. `location_tags.json`
+> e' gia' stato creato in fase 5 (US-501): le regioni devono realizzare a
+> schermo ogni tag. `ownership.json` (matrice di proprieta') e' gia' un check
+> del validator. Le condizioni `e_notte` / `fase_lunare` delle abilita' Hermit
+> di Sequenza 5 sono gia' scritte nei dati: la fase 6 le fa valere.
 
 - **Musica a layer per zona**: stem di base sempre attivo + stem che entrano
   su tensione/combattimento/boss, con crossfade. Riduce i minuti di musica da

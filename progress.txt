@@ -5155,3 +5155,34 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   loro tag). validate exit 0 (3 warning, nessuno nuovo da batch_4).
 - Prossima storia: US-522 (CHIUSURA FASE 5: roadmap.md, design-pathways.md,
   design-master.md, CLAUDE.md, README.md; check di chiusura nel validator).
+
+[2026-09-07] US-522 — Chiusura fase 5. FASE 5 CHIUSA.
+
+- 006_PRD/roadmap.md: sezione "Fase 5" -> "CHIUSA (22 story, 570 test)" col
+  blocco descrittivo (6 blocchi, verdetto del checkpoint, 5 Pathway completi,
+  7 primitive, darkness_1/paragon_1/hermit_1 senza differite, location_tags +
+  ownership, batch_4, acting = 1.0). Sezione "Fase 6" -> "(~35 story + fase
+  5b)" con la nota che 5b (Darkness resto/Fool/Error/Door + illusion/possess/
+  steal/time_rewind/chain/shadow_meld) e' dentro fase 6.
+- 006_PRD/design-pathways.md: "Ordine di implementazione" con TG + i 5 Pathway
+  di fase 5 spuntati; nuova sotto-sezione "Fase 5b" con Darkness/Fool/Error/
+  Door e il perche' delle primitive dure rimandate.
+- 006_PRD/design-master.md: Appendice A "Fase 5" -> CHIUSA col riepilogo;
+  Appendice C: righe nuove per location_tags.json e ownership.json.
+- CLAUDE.md: sezione fasi -> "Fase 5 ... CHIUSA (22 story, 570 test)" col
+  verdetto del punto di controllo esplicito; "Fase corrente: 5b + 6 - Mondo".
+- README.md: paragrafo "Fase 5 - Espansione contenuti: chiusa" coi conteggi e
+  il verdetto; nota sulla fase 5b dentro fase 6.
+- tools/validate_data.py: check di chiusura fase 5 (US-522):
+  * FASE_5_DATA (location_tags.json, ownership.json, abilities/death|moon|
+    mother|paragon|hermit.json, synergies/batch_4.json) devono esistere;
+  * i 5 Pathway (death/moon/mother/paragon/hermit) non hanno Sequenze stub;
+  * nessuna primitiva ha 'implemented' e 'deferred' insieme.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: 39 stub -
+  Darkness/Fool/Error/Door -, 18 sinergie dei gruppi differiti, i18n TODO).
+  570 test headless, tutti verdi.
+- FASE 5 CHIUSA: US-501..522, 22/22. 5 Pathway nuovi completi, 7 primitive
+  implementate, il punto di controllo del progetto superato. Save invariato.
+- Prossima fase: 6 - Mondo (include la fase 5b). PRD con /prd. Roadmap in
+  006_PRD/roadmap.md. P0 di fase 6: regions.json + il ciclo giorno/notte, che
+  sbloccano Darkness e le condizioni e_notte/fase_lunare gia' nei dati Hermit.

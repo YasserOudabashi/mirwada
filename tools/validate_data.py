@@ -1378,6 +1378,29 @@ def main():
                 f"attivi, attese >= {M} (US-416). Una story ha rotto una fonte di tag o una "
                 f"richiede_tag.")
 
+    # --- chiusura fase 5 (US-522): i 5 Pathway nuovi hanno tutte e 10 le
+    # Sequenze non-stub; ogni primitiva marcata 'implemented' ha un handler
+    # (verificato a runtime da tests/test_vfx.gd; qui il controllo di dati).
+    FASE_5_DATA = [
+        "schema/location_tags.json", "schema/ownership.json",
+        "abilities/death.json", "abilities/moon.json", "abilities/mother.json",
+        "abilities/paragon.json", "abilities/hermit.json", "synergies/batch_4.json",
+    ]
+    for rel in FASE_5_DATA:
+        if not os.path.exists(os.path.join(DATA, rel)):
+            err(f"data/{rel}: file di dati della fase 5 mancante (US-522: la fase e' chiusa).")
+    FASE_5_PATHWAY = ["death", "moon", "mother", "paragon", "hermit"]
+    for _pid in FASE_5_PATHWAY:
+        _pw = load_json(os.path.join(pdir, f"{_pid}.json")) or {}
+        _stub = [s.get("sequence") for s in _pw.get("sequences", []) if s.get("stub")]
+        if _stub:
+            err(f"data/pathways/{_pid}.json: Sequenze ancora stub {sorted(_stub)} - "
+                f"la fase 5 e' chiusa, i 5 Pathway devono essere completi (US-522).")
+    # ogni primitiva 'implemented' deve avere params dichiarati e non essere differita
+    for _name, _spec in prim_doc["primitives"].items():
+        if _spec.get("implemented") and _spec.get("deferred"):
+            err(f"data/schema/primitives.json [{_name}]: 'implemented' e 'deferred' insieme.")
+
     report()
     return 1 if errors else 0
 

@@ -271,13 +271,19 @@ di `sinergia_inganno_probabilita` è tolto (resta irraggiungibile finché
 `key_of_light` è differito). Criterio di uscita verificato in
 `test_slice_fase_4.gd`. 44 sinergie, 26 raggiungibili.
 
-### Fase 5 — contenuto pathway
+### Fase 5 — contenuto pathway — CHIUSA (US-501..522, 570 test)
 
-P0: matrice di proprieta' (cap. 4) applicata PRIMA di riempire gli stub.
-P1: 9 pathway × 3 story ciascuno (Seq 9-7, 6-4, 3-0 — una story unica
-sforerebbe il limite delle 200 righe: il file abilities del TG da solo e' ~600).
-P1: VFX delle primitive man mano che si implementano. P2: R-13 — spostare le
-tabelle nomi di `generate_pathways.py` in un file dati (nota IP).
+**Fatto**: matrice di proprieta' (cap. 4) resa check del validator
+(`data/schema/ownership.json`, US-502). 5 Pathway completi — Death, Moon,
+Mother, Paragon, Hermit, 3 story ciascuno — a 10/10 Sequenze. 7 primitive
+implementate coi loro VFX (fear, reveal_info, teleport, soul_detach, resurrect,
+plant_growth, mind_read). `darkness_1`/`paragon_1`/`hermit_1` senza primitive
+differite. `location_tags.json` (29 luoghi). `batch_4.json` (6 sinergie).
+**Verdetto del checkpoint (US-508)**: l'architettura regge — Death giocato in
+codice Seq 8->2 con zero righe dedicate.
+**Rimane fase 5b** (dentro fase 6): Darkness/Fool/Error/Door + illusion,
+possess, steal, time_rewind, chain, shadow_meld.
+P2: R-13 — spostare le tabelle nomi di `generate_pathways.py` in un file dati.
 
 ### Fase 6 — mondo (da `design-world.md` e `design-npc-quest.md`)
 
@@ -339,6 +345,8 @@ location_tags).
 | Effetti dei Sigillati | `data/schema/sigillato_effect_types.json` | tick + tag | chiuso, fase 3 (US-318) |
 | Esiti degli esperimenti | `data/potions/experiment_outcomes.json` | 5 (pesati) | chiuso, fase 3 (US-311) |
 | Schema sinergie | `data/schema/synergy.schema.json` | `priorita` + `effetto` come `oneOf` dei 6 tipi + `neutralizza` | esteso fase 4 (US-401), retro-compatibile; regola di risoluzione conflitti nel `_comment` |
+| Luoghi dei rituali | `data/schema/location_tags.json` | 29 | chiuso, fase 5 (US-501) — anticipato da fase 6; le regioni devono realizzarli a schermo |
+| Matrice di proprieta' | `data/schema/ownership.json` | `summon_materie_prime` (9) + `tag_vietati_pathway_attivi` | chiuso, fase 5 (US-502) — reso check del validator |
 | Location tags | `data/schema/location_tags.json` | 24 proposti | PROPOSTO in design-world.md, si crea con la prima story che li valida |
 | Condizioni | `ability.schema.json` (enum) | 8 + 3 proposte | le 3 nuove (`follia_min`, `reputazione_min`, `flag`) arrivano col motore dialoghi |
 | Modi di gating | `region.schema.json` proposto | primitiva, momento, fase_lunare, npc, conoscenza, sequenza | PROPOSTO in design-world.md |

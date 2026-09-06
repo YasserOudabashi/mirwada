@@ -159,23 +159,30 @@ scritta guardando questo file. In particolare, nota:
 - `madness_on_force` cresce da 1.0 a 13.6 lungo il Pathway: forzare un
   avanzamento a Sequenza bassa è recuperabile, a Sequenza alta ti distrugge.
 
-## Ordine di implementazione consigliato
+## Ordine di implementazione
 
-1. **Twilight Giant** (fase 2) — già scritto, il più leggibile a schermo, e
-   stressa poche primitive difficili. Se il motore lo esegue correttamente,
-   l'architettura è validata.
-2. **Death** (fase 5) — introduce `summon` e le entità persistenti, che
-   servono anche a pet e costrutti. Va fatto presto perché sblocca altri
-   sistemi.
-3. **Moon** e **Mother** — sbloccano rispettivamente pet e ingredienti, cioè
-   i pilastri di fase 3.
-4. **Paragon** — crafting e costrutti; dipende da `summon` di Death.
-5. **Hermit** — rituali; dipende dalle stanze rituali di fase 3.
-6. **Darkness** — richiede il ciclo giorno/notte di fase 6.
-7. **Fool**, **Error**, **Door** — ultimi. Sono i più belli e i più difficili:
-   `illusion`, `possess`, `steal` e `time_rewind` sono le primitive più dure da
-   rendere leggibili a schermo. Vanno affrontate quando il resto è stabile,
-   non prima.
+1. **Twilight Giant** (fase 2) — ✅ scritto. Prova che l'architettura regge.
+2. **Death** (fase 5, US-505..508) — ✅. `summon` persistente + `fear`,
+   `reveal_info`, `teleport`, `soul_detach`, `resurrect`. Seguito dal
+   **checkpoint** (US-508): verdetto = l'architettura regge.
+3. **Moon** (fase 5, US-509..511) — ✅. Aggancio a PetSystem, 0 primitive nuove.
+4. **Mother** (fase 5, US-512..514) — ✅. `plant_growth`; aggancio a WorldState.
+5. **Paragon** (fase 5, US-515..517) — ✅. Aggancio a Forge; `paragon_1`
+   riscritta senza `rule_bind`.
+6. **Hermit** (fase 5, US-518..520) — ✅. `mind_read`; `hermit_1` riscritta
+   senza `rule_bind`.
+
+### Fase 5b — dopo il ciclo giorno/notte e le regioni di fase 6
+
+7. **Darkness** — `darkness_1` è già riscritta senza `probability_shift`
+   (US-503); le altre 9 Sequenze dipendono dal giorno/notte (stealth notturno,
+   incubi). `shadow_meld` da implementare.
+8. **Fool**, **Error**, **Door** — i più difficili: `illusion` (quali nemici
+   sono finti), `possess` (di chi è il corpo), `steal` (cosa ho preso e per
+   quanto), `time_rewind` (cosa è tornato), `chain`. La leggibilità a schermo
+   di queste primitive è un problema di design che serve contenuto reale in un
+   vero combattimento per essere risolto: si affrontano quando fase 6 ha dato
+   loro un mondo in cui vivere.
 
 ---
 

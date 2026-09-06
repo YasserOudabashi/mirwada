@@ -125,20 +125,32 @@ di cui 26 raggiungibili; `batch_3.json` punta ai gruppi differiti;
 combinando pet + stanza + talento, con zero codice dedicato. Nessuna primitiva
 nuova. `synergy.schema.json` esteso (`priorita`, `effetto` oneOf, `neutralizza`).
 
-Fase corrente: **5 — Espansione contenuti**. Roadmap in `006_PRD/roadmap.md`;
-il PRD dettagliato si genera con `/prd`. Questo è il **punto di controllo**
-del progetto (vedi sotto).
+Fase 5 — Espansione contenuti: **CHIUSA** (22 story US-501..522, 570 test).
+PRD in `006_PRD/prd-fase-5-espansione-contenuti.md`. 6 blocchi: 0 fondamenta
+(`location_tags.json`, matrice di proprietà nel validator, `darkness_1` senza
+`probability_shift`, acting = 1.0), 1 Death + **checkpoint**, 2 Moon, 3 Mother,
+4 Paragon, 5 Hermit, 6 chiusura. **5 Pathway nuovi completi** (Death, Moon,
+Mother, Paragon, Hermit, 10/10 Sequenze). **7 primitive implementate** (fear,
+reveal_info, teleport, soul_detach, resurrect, plant_growth, mind_read).
+`paragon_1`/`hermit_1` riscritte senza `rule_bind`. Save invariato.
 
-Le fasi 5-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
+**Il punto di controllo è stato superato (US-508)**: `test_slice_fase_5.gd`
+gioca Death Seq 8→2 in codice con zero righe che nominano "death"; il `git diff`
+del blocco tocca solo 5 handler `_p_<primitiva>` + `player.teleport_verso`,
+`AbilityEngine.execute` intatto. L'architettura della fase 2 regge oltre il
+Twilight Giant.
+
+Fase corrente: **5b + 6 — Mondo**. Roadmap in `006_PRD/roadmap.md`; il PRD si
+genera con `/prd`. La fase 5b (Darkness resto, Fool, Error, Door + le primitive
+`illusion`/`possess`/`steal`/`time_rewind`/`chain`/`shadow_meld`) va dentro la
+fase 6, dopo il ciclo giorno/notte e le regioni.
+
+Le fasi 6-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
 genera con `/prd` **solo quando la precedente è chiusa**.
 
-Punto di controllo del progetto: la **fase 5**. Se aggiungere i 9 Pathway
-rimanenti richiede codice invece che dati, l'architettura della fase 2 va
-corretta prima di proseguire.
-
-Prova che l'architettura regge: `data/abilities/twilight_giant.json` contiene
-un Pathway completo dalla Sequenza 9 alla 0 — 20 abilità — con **zero righe di
-codice dedicate**. È il modello da imitare per ogni story di dati.
+Prova che l'architettura regge: `data/abilities/twilight_giant.json` (fase 2) e
+i 5 Pathway di fase 5 sono contenuto completo con **zero righe di codice
+dedicate**. È il modello da imitare per ogni story di dati.
 
 ## Decisioni prese
 
