@@ -34,6 +34,157 @@
       ],
       "costo_follia": 4.0,
       "note": "STRESS TEST. durata -1: evocazioni persistenti fuori dal combattimento. Il motore deve gestire entita' che sopravvivono al cambio di scena."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_tocco_gelido",
+      "name_i18n": "ability.death.death_tocco_gelido",
+      "sequence_id": "death_9",
+      "costo_spiritualita": 4,
+      "cooldown": 3.0,
+      "primitive": [
+        {
+          "tipo": "melee_arc",
+          "danno": 12,
+          "angolo": 70,
+          "raggio": 1.8,
+          "stagger": 15,
+          "tag_danno": "decadimento"
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "decadimento",
+        "singolo"
+      ],
+      "note": "Il primo attacco del Death: una carezza che fa marcire. Danno basso, insegna il tag decadimento."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_pelle_di_tomba",
+      "name_i18n": "ability.death.death_pelle_di_tomba",
+      "sequence_id": "death_9",
+      "costo_spiritualita": 4,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.2,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "difesa",
+        "decadimento"
+      ],
+      "note": "Il corpo del Corpse Collector non teme freddo ne' decomposizione."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_rianima_servo",
+      "name_i18n": "ability.death.death_rianima_servo",
+      "sequence_id": "death_8",
+      "costo_spiritualita": 8,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "cadavere_servo",
+          "quantita": 2,
+          "durata": 25.0,
+          "comportamento": "aggressivo"
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "non_morto",
+        "evocazione"
+      ],
+      "note": "Rianima cadaveri semplici come alleati temporanei. Materia prima: un morto (matrice di proprieta')."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_stretta_della_terra",
+      "name_i18n": "ability.death.death_stretta_della_terra",
+      "sequence_id": "death_8",
+      "costo_spiritualita": 6,
+      "cooldown": 8.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "velocita",
+          "valore": -0.35,
+          "durata": 6.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "dot",
+          "danno_tick": 4,
+          "tick_rate": 1.5,
+          "durata": 6.0,
+          "tag_danno": "decadimento"
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "decadimento",
+        "singolo"
+      ],
+      "note": "La terra della fossa afferra: il bersaglio rallenta e marcisce."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_seduta_spiritica",
+      "name_i18n": "ability.death.death_seduta_spiritica",
+      "sequence_id": "death_7",
+      "costo_spiritualita": 10,
+      "cooldown": 25.0,
+      "primitive": [
+        {
+          "tipo": "reveal_info",
+          "raggio": 12,
+          "categoria": "voce_dei_morti",
+          "durata": 15.0
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "spirito",
+        "divinazione"
+      ],
+      "note": "Parla coi morti per informazioni non altrimenti accessibili. Divinazione fuori da Hermit: la categoria limita cosa si sente (matrice di proprieta')."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_lamento_funebre",
+      "name_i18n": "ability.death.death_lamento_funebre",
+      "sequence_id": "death_7",
+      "costo_spiritualita": 9,
+      "cooldown": 20.0,
+      "primitive": [
+        {
+          "tipo": "fear",
+          "raggio": 5,
+          "durata": 6.0,
+          "soglia_resistenza": 3
+        },
+        {
+          "tipo": "dot",
+          "danno_tick": 3,
+          "tick_rate": 2.0,
+          "durata": 6.0,
+          "tag_danno": "spirito"
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "spirito",
+        "area"
+      ],
+      "note": "Un coro di spiriti in lutto: chi ha volonta' debole fugge, gli altri si logorano."
     }
   ]
 }

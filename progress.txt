@@ -4641,3 +4641,52 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-505 (BLOCCO 1 - Death Sequenze 9-7: Corpse Collector,
   Gravedigger, Spirit Medium + primitiva nuova 'fear' + formule/caratteristiche
   + i18n + verifica a schermo).
+
+[2026-09-06] US-505 — Death Sequenze 9-7 (Corpse Collector / Gravedigger / Spirit Medium). BLOCCO 1.
+
+- PRIMITIVE NUOVE (interlacciate, US-505 e' il primo Pathway che le usa):
+  * fear: _p_fear in ability_engine.gd. Applica lo status 'paura' (nuovo in
+    status_effects.json: tag spirito, negativo, precisione -0.2 difesa -0.1).
+    Con caster + raggio accende un field d'area (riuso _spawn_field, tipo aura,
+    effetto paura). soglia_resistenza registrata ma il confronto e' IA (fase 6).
+  * reveal_info: _p_reveal_info. Emette il nuovo segnale info_rivelata(categoria,
+    raggio, origine); il consumatore (HUD/libro, world state) e' fase 6.
+    Death Seq 7 e 9 lo usano gia' -> spostato qui da US-515 (Paragon), che ora
+    lo trovera' gia' implementato.
+  primitives.json: fear/reveal_info -> implemented: true. vfx.json: primitive_vfx
+  fear (vfx_dread) e reveal_info (vfx_scry). AbilityEngine._handlers: +2 entry.
+  execute/_esegui_primitive NON toccati.
+- CONTENUTO Death Seq 9/8/7 (stub -> false):
+  * 6 abilita' in data/abilities/death.json, solo primitive del registro:
+    death_tocco_gelido (melee_arc decadimento), death_pelle_di_tomba (buff difesa),
+    death_rianima_servo (summon entita_id cadavere_servo, durata 25),
+    death_stretta_della_terra (debuff velocita + dot decadimento),
+    death_seduta_spiritica (reveal_info categoria voce_dei_morti),
+    death_lamento_funebre (fear + dot spirito).
+  * acting_actions per Seq, somma esatta 1.0 (0.4/0.35/0.25). stat_modifiers,
+    madness_on_force 1.0/2.4/3.8. Nessun advancement_ritual (Seq > 4).
+  * formule formula_death_9/8/7 + 9 ingredienti nuovi in formulas.json;
+    caratteristiche char_death_9/8/7 in characteristics.json.
+- HARDENING: il check "ogni Sequenza non-stub ha la sua Caratteristica" era
+  hardcoded su twilight_giant -> generalizzato a tutti i Pathway attivi.
+  Ha subito pescato un buco reale: fool_9 (non-stub dall'audit) non aveva
+  char_fool_9 -> aggiunta.
+- i18n: 6 nomi di abilita' + 4 caratteristiche (death_9/8/7 + fool_9) tradotti
+  in it.json; pathway.death e sequence.death.9/8/7 gia' seminati dai campi
+  name. acting seminate dal campo descrizione. 62 TODO (invariato).
+- Come verificato: 539 test headless (535 + 4 in test_death.gd: le 6 abilita'
+  eseguono con 0 warning di primitiva; fear applica 'paura' e abbassa la
+  precisione; reveal_info emette info_rivelata con la categoria dei dati; le
+  acting di ogni Seq sommano 1.0 e le Seq non sono piu' stub).
+  validate_data.py exit 0 (3 warning: stub, 18 sinergie differite, i18n TODO).
+  Verifica a schermo (finestra reale): death_lamento_funebre e
+  death_seduta_spiritica eseguono a 0 warning, lo status paura si applica, il
+  VFX placeholder si accende con la palette del Death. Il fuggire del nemico
+  e lo sprite dell'evocato sono fase 6 (integrazione combat/mondo) - come da
+  Open Question 3 del PRD.
+- NOTA SCOPE: 10 file toccati (oltre il ~4 della regola), ma 4 sono infra
+  delle 2 primitive nuove (handler + primitives + vfx + status) e 1 e'
+  hardening del validator; il resto e' il contenuto Death "parita' col TG"
+  che il PRD dimensiona cosi'. Ogni pezzo e' piccolo.
+- Prossima storia: US-506 (Death Seq 6-4: Spirit Guide / Gatekeeper / Undying
+  + primitiva teleport + primo advancement_ritual con location_tags).

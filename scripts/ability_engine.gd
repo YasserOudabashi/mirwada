@@ -12,6 +12,9 @@ extends Node
 ##   - fuori dal registro -> ERRORE: e' un bug nei dati, non un caso da gestire
 
 signal ability_executed(ability_id: String, caster: Node, result: Dictionary)
+## US-505: reveal_info ha rivelato qualcosa. Il consumatore (HUD/libro, world
+## state) si aggancia in fase 6.
+signal info_rivelata(categoria: String, raggio: float, origine: Vector2)
 
 ## Motivi di rifiuto, come costanti: i test e la UI non devono confrontare
 ## stringhe scritte a mano.
@@ -61,6 +64,8 @@ func _ready() -> void:
 		"terrain_modify": _p_terrain_modify,
 		"curse": _p_curse,
 		"summon": _p_summon,
+		"fear": _p_fear,
+		"reveal_info": _p_reveal_info,
 	}
 
 
@@ -552,6 +557,45 @@ func _p_curse(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String)
 
 	return {"tipo": "curse", "effetto": effetto, "durata": durata,
 			"condizione_rimozione": condizione_rimozione, "applied": applicato}
+
+
+## fear (US-505): applica lo status 'paura' al bersaglio. Con un caster in
+## scena e raggio > 0 accende un field d'area che lo propaga alle hurtbox nel
+## raggio. 'soglia_resistenza' e' registrata ma il confronto con la resistenza
+## del bersaglio e' comportamento IA (fase 6): qui l'effetto e' lo status,
+## come per curse/dot (stat forward-looking).
+func _p_fear(prim: Dictionary, caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+	var raggio: float = _num(prim.get("raggio"), 0.0)
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var soglia: float = _num(prim.get("soglia_resistenza"), 0.0)
+
+	var applicato: bool = false
+	if stats != null and stats.has_method("applica_status"):
+		stats.call("applica_status", "paura", durata if durata > 0.0 else -1.0)
+		applicato = true
+
+	var campo: bool = false
+	if caster != null and raggio > 0.0 and durata > 0.0:
+		campo = _spawn_field(caster, {"tipo": "aura", "raggio": raggio,
+				"durata": durata, "tick_rate": 1.0, "effetto": "paura"})
+
+	return {"tipo": "fear", "raggio": raggio, "durata": durata,
+			"soglia_resistenza": soglia, "applied": applicato, "campo": campo}
+
+
+## reveal_info (US-505): rivela informazioni di una 'categoria' in un raggio
+## per una durata. Fuori da Hermit la categoria e' obbligatoria (matrice di
+## proprieta', US-502) e limita cosa si vede. Il consumatore vero (HUD/libro,
+## world state) arriva con fase 6: qui l'abilita' emette il fatto, come reveal
+## degli altri sistemi.
+func _p_reveal_info(prim: Dictionary, caster: Node, _stats: Node, _ability_id: String) -> Dictionary:
+	var raggio: float = _num(prim.get("raggio"), 0.0)
+	var categoria: String = str(prim.get("categoria", ""))
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var origine: Vector2 = (caster as Node2D).global_position if caster is Node2D and (caster as Node2D).is_inside_tree() else Vector2.ZERO
+	info_rivelata.emit(categoria, raggio, origine)
+	return {"tipo": "reveal_info", "raggio": raggio, "categoria": categoria,
+			"durata": durata, "origine": origine}
 
 
 ## summon: evoca "quantita" entita' di tipo entita_id. durata: -1 ->

@@ -61,6 +61,30 @@
       "pathway_id": "twilight_giant",
       "sequence": 0,
       "name_i18n": "characteristic.twilight_giant.0"
+    },
+    {
+      "id": "char_death_9",
+      "pathway_id": "death",
+      "sequence": 9,
+      "name_i18n": "characteristic.death.9"
+    },
+    {
+      "id": "char_death_8",
+      "pathway_id": "death",
+      "sequence": 8,
+      "name_i18n": "characteristic.death.8"
+    },
+    {
+      "id": "char_death_7",
+      "pathway_id": "death",
+      "sequence": 7,
+      "name_i18n": "characteristic.death.7"
+    },
+    {
+      "id": "char_fool_9",
+      "pathway_id": "fool",
+      "sequence": 9,
+      "name_i18n": "characteristic.fool.9"
     }
   ]
 }

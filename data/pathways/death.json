@@ -21,18 +21,61 @@
       "name_i18n": "sequence.death.9",
       "tier": "low",
       "concept": "Resiste a freddo e decomposizione; vede dove sono morti di recente.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 25,
+        "difesa": 0.05
+      },
+      "abilities": [
+        "death_tocco_gelido",
+        "death_pelle_di_tomba"
+      ],
+      "acting_actions": [
+        {
+          "id": "death_9_raccolta",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 8,
+          "progresso": 0.4,
+          "ripetibile": false,
+          "descrizione_i18n": "acting.death.death_9_raccolta",
+          "descrizione": "Sconfiggi 8 nemici: ogni caduto e' un cadavere raccolto"
+        },
+        {
+          "id": "death_9_gelo",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "decadimento"
+          },
+          "target": 1500,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_9_gelo",
+          "descrizione": "Infliggi 1500 danni da decadimento"
+        },
+        {
+          "id": "death_9_resistenza",
+          "evento": "damage_taken",
+          "filtri": {},
+          "target": 800,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_9_resistenza",
+          "descrizione": "Subisci 800 danni senza morire: il corpo non teme la decomposizione"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 9,
-        "ingredients": [],
+        "ingredients": [
+          "terra_di_cimitero",
+          "dente_di_teschio",
+          "muffa_sepolcrale"
+        ],
         "formula_id": "formula_death_9"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 1.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 8,
@@ -41,18 +84,63 @@
       "name_i18n": "sequence.death.8",
       "tier": "low",
       "concept": "Rianima cadaveri semplici come alleati temporanei.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 40,
+        "difesa": 0.08
+      },
+      "abilities": [
+        "death_rianima_servo",
+        "death_stretta_della_terra"
+      ],
+      "acting_actions": [
+        {
+          "id": "death_8_necroforo",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "death_rianima_servo"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_8_necroforo",
+          "descrizione": "Rianima 15 servi cadavere"
+        },
+        {
+          "id": "death_8_fossa",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_8_fossa",
+          "descrizione": "Sconfiggi 12 nemici (la fossa comune si riempie)"
+        },
+        {
+          "id": "death_8_terra",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "decadimento"
+          },
+          "target": 3000,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_8_terra",
+          "descrizione": "Infliggi 3000 danni da decadimento"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 8,
-        "ingredients": [],
+        "ingredients": [
+          "mano_di_gloria",
+          "chiodo_di_bara",
+          "cera_di_veglia"
+        ],
         "formula_id": "formula_death_8"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 2.4,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 7,
@@ -61,18 +149,65 @@
       "name_i18n": "sequence.death.7",
       "tier": "low",
       "concept": "Parla con i morti per ottenere informazioni non altrimenti accessibili.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 55,
+        "spiritualita_max": 0.1
+      },
+      "abilities": [
+        "death_seduta_spiritica",
+        "death_lamento_funebre"
+      ],
+      "acting_actions": [
+        {
+          "id": "death_7_medium",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "death_seduta_spiritica"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_7_medium",
+          "descrizione": "Tieni 12 sedute spiritiche"
+        },
+        {
+          "id": "death_7_lamento",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "death_lamento_funebre"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_7_lamento",
+          "descrizione": "Intona 15 lamenti funebri"
+        },
+        {
+          "id": "death_7_spirito",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "spirito"
+          },
+          "target": 2000,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.death.death_7_spirito",
+          "descrizione": "Infliggi 2000 danni da spirito"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 7,
-        "ingredients": [],
+        "ingredients": [
+          "ectoplasma",
+          "moneta_del_traghettatore",
+          "soffio_di_spettro"
+        ],
         "formula_id": "formula_death_7"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 3.8,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 6,

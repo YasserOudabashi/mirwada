@@ -6,7 +6,11 @@
     "argento_benedetto",
     "caratteristica_del_gigante",
     "cenere_di_spirito",
+    "cera_di_veglia",
+    "chiodo_di_bara",
     "cuore_di_montagna",
+    "dente_di_teschio",
+    "ectoplasma",
     "estratto_di_muscolo",
     "ferro_temperato",
     "fiele_di_demone",
@@ -14,7 +18,10 @@
     "lacrima_di_paladino",
     "lama_di_luce_solidificata",
     "linfa_di_gigante",
+    "mano_di_gloria",
     "metallo_impossibile",
+    "moneta_del_traghettatore",
+    "muffa_sepolcrale",
     "nucleo_del_crepuscolo",
     "oro_bianco",
     "ossidiana_decaduta",
@@ -31,8 +38,10 @@
     "sangue_di_toro",
     "scheggia_divina",
     "scudo_fuso",
+    "soffio_di_spettro",
     "tempo_solidificato",
     "tendine_di_lupo",
+    "terra_di_cimitero",
     "ultimo_respiro",
     "voce_del_gigante"
   ],
@@ -189,6 +198,48 @@
         "follia_extra": 2.0,
         "qualita": "instabile",
         "_nota": "Pozione fatta con ingredienti mancanti: piu' follia quando si beve e qualita' ridotta. Effetto esplicito nei dati, mai silenzioso."
+      }
+    },
+    "formula_death_9": {
+      "characteristic_sequence": 9,
+      "ingredients": [
+        "terra_di_cimitero",
+        "dente_di_teschio",
+        "muffa_sepolcrale"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione con ingredienti mancanti: piu' follia e qualita' ridotta. Esplicito nei dati."
+      }
+    },
+    "formula_death_8": {
+      "characteristic_sequence": 8,
+      "ingredients": [
+        "mano_di_gloria",
+        "chiodo_di_bara",
+        "cera_di_veglia"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione con ingredienti mancanti: piu' follia e qualita' ridotta. Esplicito nei dati."
+      }
+    },
+    "formula_death_7": {
+      "characteristic_sequence": 7,
+      "ingredients": [
+        "ectoplasma",
+        "moneta_del_traghettatore",
+        "soffio_di_spettro"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Pozione con ingredienti mancanti: piu' follia e qualita' ridotta. Esplicito nei dati."
       }
     }
   }

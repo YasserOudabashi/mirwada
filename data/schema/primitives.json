@@ -163,7 +163,8 @@
         "raggio",
         "categoria",
         "durata"
-      ]
+      ],
+      "implemented": true
     },
     "probability_shift": {
       "params": [
@@ -261,7 +262,8 @@
         "raggio",
         "durata",
         "soglia_resistenza"
-      ]
+      ],
+      "implemented": true
     }
   }
 }

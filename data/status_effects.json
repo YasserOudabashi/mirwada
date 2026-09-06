@@ -32,6 +32,13 @@
       "durata_default": -1,
       "negativo": false,
       "stat_modifiers": {}
+    },
+    "paura": {
+      "tag": "spirito",
+      "durata_default": 6.0,
+      "negativo": true,
+      "stat_modifiers": { "precisione": -0.2, "difesa": -0.1 },
+      "descrizione": "Il bersaglio e' spaventato: colpisce peggio e para peggio. Il 'fuggire' vero e' comportamento IA (fase 6); qui l'effetto e' lo status. Lo applica la primitiva fear (Death Seq 7, lamento dei morti)."
     }
   }
 }

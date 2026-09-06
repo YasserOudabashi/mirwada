@@ -452,16 +452,19 @@ def main():
             if (nc.get("pathway_id"), nc.get("sequence")) not in char_by_ps:
                 err(f"data/balance.json [nemico_base.caratteristica]: nessuna Caratteristica "
                     f"per ({nc.get('pathway_id')}, Seq {nc.get('sequence')}) in data/characteristics.json")
-    # ogni Sequenza non-stub in scope (twilight_giant) deve avere la sua Caratteristica
-    tg_path = os.path.join(pdir, "twilight_giant.json")
-    tg = load_json(tg_path)
-    if tg:
-        for s in tg.get("sequences", []):
+    # ogni Sequenza non-stub di OGNI Pathway attivo deve avere la sua
+    # Caratteristica (US-505: generalizzato da twilight_giant a tutti).
+    for _fname in files:
+        _pw = load_json(os.path.join(pdir, _fname))
+        if not _pw:
+            continue
+        _pid = _pw.get("id")
+        for s in _pw.get("sequences", []):
             if s.get("stub"):
                 continue
             cs = s.get("potion", {}).get("characteristic_sequence")
-            if cs is not None and ("twilight_giant", cs) not in char_by_ps:
-                err(f"data/pathways/twilight_giant.json [{s.get('id')}]: manca la Caratteristica "
+            if cs is not None and (_pid, cs) not in char_by_ps:
+                err(f"data/pathways/{_fname} [{s.get('id')}]: manca la Caratteristica "
                     f"per characteristic_sequence {cs} in data/characteristics.json")
 
     # --- formule delle pozioni (data/potions/formulas.json, US-208) ---
