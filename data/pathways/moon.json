@@ -423,26 +423,74 @@
       "name_i18n": "sequence.moon.3",
       "tier": "saint",
       "concept": "Evoca creature da grande distanza, anche mai incontrate.",
-      "stat_modifiers": {},
+      "stat_modifiers": {
+        "hp_max": 260,
+        "spiritualita_max": 0.35
+      },
       "abilities": [
-        "moon_evocazione_remota"
+        "moon_evocazione_remota",
+        "moon_chiamata_lontana"
       ],
-      "acting_actions": [],
+      "acting_actions": [
+        {
+          "id": "moon_3_evocatrice",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_evocazione_remota"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_3_evocatrice",
+          "descrizione": "Evoca da remoto 15 volte"
+        },
+        {
+          "id": "moon_3_lontananza",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_chiamata_lontana"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_3_lontananza",
+          "descrizione": "Chiama creature ignote 12 volte"
+        },
+        {
+          "id": "moon_3_padrona",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 20,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_3_padrona",
+          "descrizione": "Sconfiggi 20 nemici con creature evocate"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 3,
-        "ingredients": [],
+        "ingredients": [
+          "seme_di_stella_cadente",
+          "voce_di_creatura_mai_vista",
+          "filo_d_argento_lunare"
+        ],
         "formula_id": "formula_moon_3"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "grotta_di_marea",
+          "bosco_antico"
+        ],
+        "momento": "crepuscolo",
+        "fase_lunare": "crescente",
+        "sacrifices": [
+          "il_richiamo_di_un_amico_che_non_verra_piu"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 9.8,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 2,
@@ -451,24 +499,74 @@
       "name_i18n": "sequence.moon.2",
       "tier": "angel",
       "concept": "Dona vita: crea creature durature che coltivano insieme al giocatore.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 380,
+        "spiritualita_max": 0.45
+      },
+      "abilities": [
+        "moon_creatura_vivente",
+        "moon_dono_della_vita"
+      ],
+      "acting_actions": [
+        {
+          "id": "moon_2_datrice",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_creatura_vivente"
+          },
+          "target": 8,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_2_datrice",
+          "descrizione": "Crea 8 esseri viventi duraturi"
+        },
+        {
+          "id": "moon_2_pastora",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 20,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_2_pastora",
+          "descrizione": "Sconfiggi 20 nemici"
+        },
+        {
+          "id": "moon_2_dono",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_dono_della_vita"
+          },
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_2_dono",
+          "descrizione": "Dona vita 12 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 2,
-        "ingredients": [],
+        "ingredients": [
+          "goccia_di_prima_pioggia",
+          "cuore_di_quercia_madre",
+          "luce_di_luna_imbottigliata"
+        ],
         "formula_id": "formula_moon_2"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "sorgente",
+          "altare_di_radici"
+        ],
+        "momento": "alba",
+        "fase_lunare": "crescente",
+        "sacrifices": [
+          "una_creatura_che_avevi_evocato_e_amato"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 11.2,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 1,
@@ -477,24 +575,73 @@
       "name_i18n": "sequence.moon.1",
       "tier": "angel",
       "concept": "Fascino assoluto: dominio sui viventi senza combattimento.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 550,
+        "spiritualita_max": 0.5
+      },
+      "abilities": [
+        "moon_fascino_assoluto",
+        "moon_corte_incantata"
+      ],
+      "acting_actions": [
+        {
+          "id": "moon_1_dea",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_fascino_assoluto"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_1_dea",
+          "descrizione": "Incanta 15 bersagli"
+        },
+        {
+          "id": "moon_1_corte",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_1_corte",
+          "descrizione": "Sconfiggi 12 nemici senza che ti tocchino"
+        },
+        {
+          "id": "moon_1_regno",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_corte_incantata"
+          },
+          "target": 6,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_1_regno",
+          "descrizione": "Tieni una corte incantata 6 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 1,
-        "ingredients": [],
+        "ingredients": [
+          "specchio_di_luna_nera",
+          "rosa_che_non_appassisce",
+          "lacrima_di_amante"
+        ],
         "formula_id": "formula_moon_1"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "radura_lunare"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "piena",
+        "sacrifices": [
+          "ancora_del_giocatore"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 12.8,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 0,
@@ -503,24 +650,73 @@
       "name_i18n": "sequence.moon.0",
       "tier": "god",
       "concept": "La luna come dominio.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 850,
+        "spiritualita_max": 0.7
+      },
+      "abilities": [
+        "moon_dominio_lunare",
+        "moon_marea_di_bestie"
+      ],
+      "acting_actions": [
+        {
+          "id": "moon_0_luna",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_dominio_lunare"
+          },
+          "target": 5,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_0_luna",
+          "descrizione": "Imponi il dominio lunare 5 volte"
+        },
+        {
+          "id": "moon_0_marea",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 30,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_0_marea",
+          "descrizione": "Sconfiggi 30 nemici"
+        },
+        {
+          "id": "moon_0_bestie",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "moon_marea_di_bestie"
+          },
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.moon.moon_0_bestie",
+          "descrizione": "Scatena la marea di bestie 10 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 0,
-        "ingredients": [],
+        "ingredients": [
+          "frammento_di_luna",
+          "respiro_dell_oceano",
+          "prima_notte_del_mondo"
+        ],
         "formula_id": "formula_moon_0"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "radura_lunare"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "eclissi",
+        "sacrifices": [
+          "il_detentore_precedente_della_sequenza_0"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 14.0,
       "notes": "",
-      "stub": true
+      "stub": false
     }
   ]
 }

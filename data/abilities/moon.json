@@ -363,6 +363,188 @@
         "area"
       ],
       "note": "Uno spirito-totem piantato nel terreno: consuma i nemici che gli si avvicinano finche' lo Shaman vive."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_chiamata_lontana",
+      "name_i18n": "ability.moon.moon_chiamata_lontana",
+      "sequence_id": "moon_3",
+      "costo_spiritualita": 20,
+      "cooldown": 24.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "bestia_ignota",
+          "quantita": 2,
+          "durata": 35.0,
+          "comportamento": "aggressivo"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "spiritualita_max",
+          "valore": 0.1,
+          "durata": 35.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "bestia",
+        "evocazione",
+        "area"
+      ],
+      "note": "La High Summoner chiama creature che non ha mai incontrato, da lontano. Materia prima: la distanza (matrice di proprieta')."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_creatura_vivente",
+      "name_i18n": "ability.moon.moon_creatura_vivente",
+      "sequence_id": "moon_2",
+      "costo_spiritualita": 34,
+      "cooldown": 90.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "bestia_custode",
+          "quantita": 1,
+          "durata": -1,
+          "comportamento": "coltivatore"
+        }
+      ],
+      "tag_sinergia": [
+        "bestia",
+        "crescita",
+        "evocazione"
+      ],
+      "note": "La Life-Giver crea un essere che dura e coltiva insieme al giocatore. comportamento 'coltivatore': l'aggancio a giardino/BaseSystem e' dati, non codice."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_dono_della_vita",
+      "name_i18n": "ability.moon.moon_dono_della_vita",
+      "sequence_id": "moon_2",
+      "costo_spiritualita": 22,
+      "cooldown": 30.0,
+      "primitive": [
+        {
+          "tipo": "heal",
+          "quantita": 60,
+          "istantaneo": true,
+          "bersaglio": "self"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "hp_max",
+          "valore": 0.1,
+          "durata": 15.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "crescita",
+        "guarigione",
+        "singolo"
+      ],
+      "note": "Dona vita: una cura piena e un aumento momentaneo della resistenza."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_fascino_assoluto",
+      "name_i18n": "ability.moon.moon_fascino_assoluto",
+      "sequence_id": "moon_1",
+      "costo_spiritualita": 30,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "curse",
+          "effetto": "affascinato",
+          "durata": 12.0,
+          "condizione_rimozione": "purificazione"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "forza",
+          "valore": -0.4,
+          "durata": 12.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "mente",
+        "dominio",
+        "singolo"
+      ],
+      "note": "La Beauty Goddess incanta: il bersaglio non ti attacca piu' e combatte distratto. Dominio sui viventi SENZA combattimento. Non e' possess (Fool)."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_corte_incantata",
+      "name_i18n": "ability.moon.moon_corte_incantata",
+      "sequence_id": "moon_1",
+      "costo_spiritualita": 40,
+      "cooldown": 70.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 10,
+          "durata": -1,
+          "effetto": "affascinato",
+          "tick_rate": 3.0,
+          "bersagli": "nemici"
+        }
+      ],
+      "tag_sinergia": [
+        "mente",
+        "dominio",
+        "area"
+      ],
+      "note": "Un raggio di fascino permanente: chi entra e' incantato finche' la Dea vive."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_dominio_lunare",
+      "name_i18n": "ability.moon.moon_dominio_lunare",
+      "sequence_id": "moon_0",
+      "costo_spiritualita": 55,
+      "cooldown": 60.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 16,
+          "durata": -1,
+          "effetto": "affascinato",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        }
+      ],
+      "tag_sinergia": [
+        "mente",
+        "dominio",
+        "area"
+      ],
+      "note": "La luna come dominio: tutto cio' che le sta sotto e' incantato."
+    },
+    {
+      "schema_version": 1,
+      "id": "moon_marea_di_bestie",
+      "name_i18n": "ability.moon.moon_marea_di_bestie",
+      "sequence_id": "moon_0",
+      "costo_spiritualita": 50,
+      "cooldown": 50.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "bestia_marea",
+          "quantita": 6,
+          "durata": 40.0,
+          "comportamento": "aggressivo"
+        }
+      ],
+      "tag_sinergia": [
+        "bestia",
+        "evocazione",
+        "area"
+      ],
+      "note": "Sei bestie da ogni direzione, come la marea che sale."
     }
   ]
 }

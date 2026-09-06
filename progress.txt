@@ -4861,3 +4861,34 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - Prossima storia: US-511 (Moon Seq 3-0: High Summoner / Life-Giver / Beauty
   Goddess / Moon - summon a distanza, creatura persistente che coltiva,
   fascino con curse 'affascinato'). Chiude il BLOCCO 2.
+
+[2026-09-06] US-511 — Moon Sequenze 3-0 (High Summoner / Life-Giver / Beauty Goddess / Moon). BLOCCO 2 CHIUSO. MOON COMPLETO.
+
+- NESSUNA primitiva nuova. NUOVO status 'affascinato' (tag mente, negativo,
+  precisione -0.3 / forza -0.15): il bersaglio non attacca chi lo ha incantato.
+  Applicato da curse("affascinato") - NON possess (quello e' del Fool).
+- CONTENUTO Moon Seq 3/2/1/0 (stub -> false). MOON E' COMPLETO: 10/10 Sequenze.
+  * moon_chiamata_lontana (summon bestia_ignota - materia prima "distanza"),
+    moon_creatura_vivente (summon durata -1 comportamento "coltivatore" -
+    aggancio a giardino/BaseSystem via dati), moon_dono_della_vita (heal 60 +
+    buff hp_max), moon_fascino_assoluto (curse affascinato + debuff forza -
+    dominio sui viventi SENZA combattimento), moon_corte_incantata (aura
+    persistente affascinato), moon_dominio_lunare (aura affascinato r16),
+    moon_marea_di_bestie (summon x6). moon_evocazione_remota (stress test
+    seq 3) nel roster.
+  * acting somma 1.0. madness 9.8/11.2/12.8/14.0.
+  * rituali Seq 3/2/1/0 con location_tags dal vocabolario US-501, fasi lunari
+    (Moon usa la luna): Seq 1 sacrifica ancora_del_giocatore, Seq 0
+    il_detentore_precedente_della_sequenza_0.
+  * formule formula_moon_3/2/1/0 + 12 ingredienti; char_moon_3/2/1/0.
+- i18n: 8 abilita' + 4 caratteristiche tradotte. 60 TODO.
+- Come verificato: 555 test headless (553 + 2 in test_moon.gd: le 8 abilita'
+  Seq 3-0 eseguono a 0 warning; moon_fascino_assoluto applica 'affascinato';
+  tutte e 10 le Sequenze Moon non-stub, acting 1.0, formule presenti,
+  madness_on_force strettamente crescente). validate exit 0 (3 warning).
+- BLOCCO 2 CHIUSO: US-509/510/511. Moon completo (10 Sequenze), 0 primitive
+  nuove (solo lo status 'affascinato'). L'architettura continua a reggere:
+  Moon aggancia PetSystem/BaseSystem/giardino tutto via dati.
+- Fase 5: 11/22. Pathway completi: Death, Moon (+ Twilight Giant di fase 2).
+- Prossima storia: US-512 (BLOCCO 3 - Mother Seq 9-7: Planter / Doctor /
+  Harvest Priest + primitiva plant_growth).

@@ -19,6 +19,7 @@
     "corona_di_ossa",
     "cuore_che_non_si_ferma",
     "cuore_di_montagna",
+    "cuore_di_quercia_madre",
     "dente_di_teschio",
     "ectoplasma",
     "essenza_spettrale",
@@ -27,15 +28,20 @@
     "ferro_temperato",
     "fiala_di_luna_piena",
     "fiele_di_demone",
+    "filo_d_argento_lunare",
     "filo_delle_parche",
     "fiore_che_sboccia_solo_di_notte",
     "fiore_di_luna",
     "frammento_di_alba",
+    "frammento_di_luna",
+    "goccia_di_prima_pioggia",
     "il_confine_del_mondo",
     "incenso_dei_riti",
+    "lacrima_di_amante",
     "lacrima_di_paladino",
     "lama_di_luce_solidificata",
     "linfa_di_gigante",
+    "luce_di_luna_imbottigliata",
     "mano_di_gloria",
     "metallo_impossibile",
     "moneta_del_traghettatore",
@@ -56,13 +62,16 @@
     "polvere_di_crepuscolo",
     "polvere_di_ossario",
     "polvere_di_specchio_incrinato",
+    "prima_notte_del_mondo",
     "radice_di_ferro_lunare",
     "radice_di_immortelle",
     "radice_di_quercia",
     "radice_di_valeriana",
     "radice_di_veggente",
     "resina_di_ferro",
+    "respiro_dell_oceano",
     "respiro_finale",
+    "rosa_che_non_appassisce",
     "rugiada_notturna",
     "sale_della_veglia_eterna",
     "sale_di_roccia",
@@ -74,7 +83,9 @@
     "scettro_pallido",
     "scheggia_divina",
     "scudo_fuso",
+    "seme_di_stella_cadente",
     "soffio_di_spettro",
+    "specchio_di_luna_nera",
     "stendardo_lacero",
     "tempo_solidificato",
     "tendine_di_lupo",
@@ -82,6 +93,7 @@
     "ultimo_battito",
     "ultimo_respiro",
     "voce_del_gigante",
+    "voce_di_creatura_mai_vista",
     "zanna_di_latte"
   ],
   "formulas": {
@@ -455,6 +467,62 @@
         "corno_di_alce_spettrale",
         "pietra_di_marea",
         "fiore_che_sboccia_solo_di_notte"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_moon_3": {
+      "characteristic_sequence": 3,
+      "ingredients": [
+        "seme_di_stella_cadente",
+        "voce_di_creatura_mai_vista",
+        "filo_d_argento_lunare"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_moon_2": {
+      "characteristic_sequence": 2,
+      "ingredients": [
+        "goccia_di_prima_pioggia",
+        "cuore_di_quercia_madre",
+        "luce_di_luna_imbottigliata"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_moon_1": {
+      "characteristic_sequence": 1,
+      "ingredients": [
+        "specchio_di_luna_nera",
+        "rosa_che_non_appassisce",
+        "lacrima_di_amante"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_moon_0": {
+      "characteristic_sequence": 0,
+      "ingredients": [
+        "frammento_di_luna",
+        "respiro_dell_oceano",
+        "prima_notte_del_mondo"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

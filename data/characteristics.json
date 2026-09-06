@@ -163,6 +163,30 @@
       "pathway_id": "moon",
       "sequence": 4,
       "name_i18n": "characteristic.moon.4"
+    },
+    {
+      "id": "char_moon_3",
+      "pathway_id": "moon",
+      "sequence": 3,
+      "name_i18n": "characteristic.moon.3"
+    },
+    {
+      "id": "char_moon_2",
+      "pathway_id": "moon",
+      "sequence": 2,
+      "name_i18n": "characteristic.moon.2"
+    },
+    {
+      "id": "char_moon_1",
+      "pathway_id": "moon",
+      "sequence": 1,
+      "name_i18n": "characteristic.moon.1"
+    },
+    {
+      "id": "char_moon_0",
+      "pathway_id": "moon",
+      "sequence": 0,
+      "name_i18n": "characteristic.moon.0"
     }
   ]
 }

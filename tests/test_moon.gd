@@ -15,6 +15,12 @@ const ABILITA_6_4 := [
 	"moon_patto_di_sangue", "moon_richiamo_scarlatto",
 	"moon_convoca_branco", "moon_spirito_totem",
 ]
+const ABILITA_3_0 := [
+	"moon_evocazione_remota", "moon_chiamata_lontana",
+	"moon_creatura_vivente", "moon_dono_della_vita",
+	"moon_fascino_assoluto", "moon_corte_incantata",
+	"moon_dominio_lunare", "moon_marea_di_bestie",
+]
 
 
 func _engine() -> Node:
@@ -98,16 +104,44 @@ func test_moon_4_ha_un_rituale_di_sangue() -> void:
 			"il rituale dello Shaman King usa il sangue del giocatore (Scarlet Scholar)")
 
 
-func test_moon_9_4_sono_contenuto() -> void:
+func test_ogni_abilita_moon_3_0_si_esegue_senza_warning() -> void:
+	var e: Node = _engine()
+	for aid in ABILITA_3_0:
+		var c: Node2D = _caster()
+		var r: Dictionary = e.call("execute", aid, c)
+		assert_true(r["ok"], "%s eseguita" % aid)
+		assert_eq((r["warnings"] as PackedStringArray).size(), 0,
+			"%s: nessun warning di primitiva: %s" % [aid, r["warnings"]])
+		e.call("clear_cooldowns")
+		_cleanup(c)
+	var reg: Node = Engine.get_main_loop().root.get_node_or_null("SummonRegistry")
+	if reg != null:
+		reg.call("pulisci")
+
+
+func test_fascino_assoluto_applica_affascinato() -> void:
+	var e: Node = _engine()
+	var c: Node2D = _caster()
+	var s: Node = c.get_node("Stats")
+	e.call("execute", "moon_fascino_assoluto", c)
+	assert_true(s.call("ha_status", "affascinato"),
+		"moon_fascino_assoluto applica lo status 'affascinato' (curse, non possess)")
+	_cleanup(c)
+
+
+func test_tutte_le_10_sequenze_moon_sono_contenuto() -> void:
 	var pw: Dictionary = _gd().call("get_pathway", "moon")
+	var madness_prec: float = -1.0
 	for seq in (pw.get("sequences", []) as Array):
-		var n: int = int((seq as Dictionary).get("sequence", -1))
-		if n < 4 or n > 9:
-			continue
-		assert_false(bool((seq as Dictionary).get("stub", false)), "moon_%d non e' piu' stub" % n)
+		var d: Dictionary = seq
+		var n: int = int(d.get("sequence"))
+		assert_false(bool(d.get("stub", false)), "moon_%d non e' piu' stub" % n)
 		var somma: float = 0.0
-		for a in ((seq as Dictionary).get("acting_actions", []) as Array):
+		for a in (d.get("acting_actions", []) as Array):
 			somma += float((a as Dictionary).get("progresso", 0.0))
 		assert_almost_eq(somma, 1.0, "moon_%d: acting sommano 1.0" % n)
-		var fid: String = "formula_moon_%d" % n
-		assert_false((_gd().call("get_formula", fid) as Dictionary).is_empty(), "%s esiste" % fid)
+		assert_false((_gd().call("get_formula", "formula_moon_%d" % n) as Dictionary).is_empty(),
+			"formula_moon_%d esiste" % n)
+		var mf: float = float(d.get("madness_on_force", 0.0))
+		assert_gt(mf, madness_prec, "moon_%d: madness_on_force cresce" % n)
+		madness_prec = mf

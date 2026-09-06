@@ -60,6 +60,16 @@
         "velocita": -0.3
       },
       "descrizione": "Anima e corpo separati: il corpo abbandonato combatte a malapena. Lo applica soul_detach (Ferryman, Death Seq 3)."
+    },
+    "affascinato": {
+      "tag": "mente",
+      "durata_default": 12.0,
+      "negativo": true,
+      "stat_modifiers": {
+        "precisione": -0.3,
+        "forza": -0.15
+      },
+      "descrizione": "Il bersaglio e' incantato: non attacca chi lo ha affascinato e combatte distratto. Lo applica curse(\"affascinato\") della Beauty Goddess (Moon Seq 1). Non e' possess (quello e' del Fool)."
     }
   }
 }
