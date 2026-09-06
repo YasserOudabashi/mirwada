@@ -233,12 +233,19 @@ def main():
                                 f"non nel vocabolario di data/schema/damage_tags.json")
                 if not act.get("target", 0) > 0:
                     err(f"{rel} [{sid}]: acting_action '{aid_act}' senza target numerico")
-            if seq.get("acting_actions") and total_prog < 0.999:  # tolleranza virgola mobile
-                err(f"{rel} [{sid}]: le acting_actions sommano a {total_prog:.2f} < 1.0: "
-                    f"il giocatore non puo' completare la recitazione e resta bloccato qui per sempre.")
-            if seq.get("acting_actions") and total_prog > 1.001:
-                warn(f"{rel} [{sid}]: le acting_actions sommano a {total_prog:.2f} > 1.0: "
-                     f"il surplus rende saltabile l'azione meno comoda. Se non e' voluto, riporta la somma a 1.0.")
+            # US-504: la somma dev'essere esattamente 1.0 (tolleranza 0.001).
+            # < 1.0 = il giocatore resta bloccato. > 1.0 = un'azione e' saltabile:
+            # errore, tranne se la Sequenza lo dichiara voluto in notes con
+            # 'acting_surplus_voluto'.
+            if seq.get("acting_actions"):
+                surplus_voluto = "acting_surplus_voluto" in str(seq.get("notes", ""))
+                if total_prog < 0.999:
+                    err(f"{rel} [{sid}]: le acting_actions sommano a {total_prog:.2f} < 1.0: "
+                        f"il giocatore non puo' completare la recitazione e resta bloccato qui per sempre.")
+                elif total_prog > 1.001 and not surplus_voluto:
+                    err(f"{rel} [{sid}]: le acting_actions sommano a {total_prog:.2f} > 1.0: "
+                        f"un'azione diventa saltabile. Riporta la somma a 1.0, o dichiara "
+                        f"'acting_surplus_voluto' in notes se e' una scelta di design.")
 
         if sorted(seen_nums, reverse=True) != list(range(9, -1, -1)):
             err(f"{rel}: le sequenze non coprono esattamente 9..0 (trovate {sorted(seen_nums, reverse=True)})")

@@ -312,7 +312,7 @@
             "senza_alleati_caduti": true
           },
           "target": 8,
-          "progresso": 0.35,
+          "progresso": 0.3,
           "ripetibile": true,
           "descrizione_i18n": "acting.twilight_giant.tg_5_nessun_caduto",
           "descrizione": "Completa 8 aree senza perdere nessun alleato"
@@ -322,7 +322,7 @@
           "evento": "damage_taken",
           "filtri": {},
           "target": 12000,
-          "progresso": 0.25,
+          "progresso": 0.2,
           "ripetibile": true,
           "descrizione_i18n": "acting.twilight_giant.tg_5_incassa",
           "descrizione": "Subisci 12000 danni senza morire"
@@ -391,7 +391,7 @@
             "sequenza_bersaglio_max": 6
           },
           "target": 5,
-          "progresso": 0.3,
+          "progresso": 0.25,
           "ripetibile": true,
           "descrizione_i18n": "acting.twilight_giant.tg_4_caccia",
           "descrizione": "Sconfiggi 5 Beyonder di Sequenza 6 o superiore"
@@ -447,7 +447,7 @@
             "modo": "risparmiato"
           },
           "target": 10,
-          "progresso": 0.45,
+          "progresso": 0.4,
           "ripetibile": true,
           "descrizione_i18n": "acting.twilight_giant.tg_3_giudizio",
           "descrizione": "Risparmia 10 nemici che si arrendono"
@@ -472,7 +472,7 @@
             "tag_bersaglio": "spirito"
           },
           "target": 20000,
-          "progresso": 0.3,
+          "progresso": 0.25,
           "ripetibile": true,
           "descrizione_i18n": "acting.twilight_giant.tg_3_purifica",
           "descrizione": "Infliggi 20000 danni di luce a creature spirituali"
@@ -529,7 +529,7 @@
             "volontario": true
           },
           "target": 1,
-          "progresso": 0.55,
+          "progresso": 0.5,
           "ripetibile": false,
           "descrizione_i18n": "acting.twilight_giant.tg_2_accetta_decadimento",
           "descrizione": "Lascia decadere volontariamente una struttura che avevi costruito"
@@ -541,7 +541,7 @@
             "ability_id": "tg_crepuscolo"
           },
           "target": 25,
-          "progresso": 0.3,
+          "progresso": 0.25,
           "ripetibile": true,
           "descrizione_i18n": "acting.twilight_giant.tg_2_crepuscolo",
           "descrizione": "Usa il Crepuscolo 25 volte"
@@ -553,7 +553,7 @@
             "tag_danno": "decadimento"
           },
           "target": 40000,
-          "progresso": 0.3,
+          "progresso": 0.25,
           "ripetibile": true,
           "descrizione_i18n": "acting.twilight_giant.tg_2_declino",
           "descrizione": "Infliggi 40000 danni da decadimento"
@@ -609,7 +609,7 @@
             "sequenza_bersaglio_max": 2
           },
           "target": 3,
-          "progresso": 0.55,
+          "progresso": 0.5,
           "ripetibile": false,
           "descrizione_i18n": "acting.twilight_giant.tg_1_angelo",
           "descrizione": "Sconfiggi 3 Beyonder di Sequenza 2 o superiore"
@@ -621,7 +621,7 @@
             "ability_id": "tg_spezza_barriera"
           },
           "target": 10,
-          "progresso": 0.3,
+          "progresso": 0.25,
           "ripetibile": true,
           "descrizione_i18n": "acting.twilight_giant.tg_1_barriera",
           "descrizione": "Apri 10 varchi in barriere considerate inviolabili"
@@ -633,7 +633,7 @@
             "tipo_rituale": "avanzamento"
           },
           "target": 1,
-          "progresso": 0.3,
+          "progresso": 0.25,
           "ripetibile": false,
           "descrizione_i18n": "acting.twilight_giant.tg_1_rituale",
           "descrizione": "Completa il rituale di Sequenza 1 senza interruzioni"

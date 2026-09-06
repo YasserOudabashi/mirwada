@@ -4615,3 +4615,29 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-504 (regola acting_actions somma esatta 1.0:
   normalizzare le 5 sequenze TG che sommano 1.05-1.15; warning -> errore con
   eccezione 'acting_surplus_voluto' in notes).
+
+[2026-09-06] US-504 — acting_actions somma esatta 1.0. BLOCCO 0 CHIUSO.
+
+- tools/validate_data.py: la somma dei progresso di una Sequenza non-stub
+  * < 1.0 -> errore (era gia' errore: il giocatore resta bloccato);
+  * > 1.0 -> ERRORE (era warning), tranne se la Sequenza dichiara
+    'acting_surplus_voluto' nel campo notes -> allora e' una scelta di design
+    accettata.
+- data/pathways/twilight_giant.json: le 5 Sequenze che sommavano 1.05-1.15
+  normalizzate a 1.0 (decisione del PRD: nessuna azione del TG e' pensata
+  come saltabile). 11 valori progresso ritoccati, pesi relativi preservati
+  (l'azione dominante di ogni Sequenza resta la piu' pesante):
+  seq5 0.5/0.3/0.2  seq4 0.4/0.35/0.25  seq3 0.4/0.35/0.25
+  seq2 0.5/0.25/0.25  seq1 0.5/0.25/0.25.
+- Verificato che l'eccezione FUNZIONA: iniettato somma 1.1 + notes con
+  'acting_surplus_voluto' -> validate esce 0; tolto -> errore. Dati ripristinati.
+- Come verificato: python tools/validate_data.py exit 0, warning da 8 a 3
+  (spariti i 5 'acting_actions sommano > 1.0'). generate_pathways.py: 10/100,
+  zero diff strutturale. 535 test headless verdi (test_vertical_slice del TG
+  invariato: le acting con somma 1.0 non cambiano la logica di completamento).
+- BLOCCO 0 CHIUSO: US-501 (location_tags.json), US-502 (matrice di proprieta'
+  nel validator), US-503 (darkness_1 verificato), US-504 (acting = 1.0).
+  Le fondamenta ci sono: si puo' scrivere contenuto Pathway.
+- Prossima storia: US-505 (BLOCCO 1 - Death Sequenze 9-7: Corpse Collector,
+  Gravedigger, Spirit Medium + primitiva nuova 'fear' + formule/caratteristiche
+  + i18n + verifica a schermo).
