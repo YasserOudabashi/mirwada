@@ -823,6 +823,52 @@ def main():
         err("data/structures/: nessun tipo di struttura, atteso almeno 1 "
             "(tg_2 e il base building parlano tramite questo registro)")
 
+    # --- specie di pet (data/pets/, US-321) ---
+    pet_dir = os.path.join(DATA, "pets")
+    pet_ids_seen = set()
+    n_pets = 0
+    for fn in sorted(os.listdir(pet_dir)) if os.path.isdir(pet_dir) else []:
+        if not fn.endswith(".json"):
+            continue
+        rel = f"data/pets/{fn}"
+        pdoc = load_json(os.path.join(pet_dir, fn)) or {}
+        for pet in pdoc.get("pets", []):
+            pid = pet.get("id", "")
+            if not pid:
+                err(f"{rel}: un pet non ha 'id'")
+                continue
+            if pid in pet_ids_seen:
+                err(f"{rel}: id pet duplicato '{pid}'")
+            pet_ids_seen.add(pid)
+            n_pets += 1
+            if not isinstance(pet.get("name_i18n"), str) or not pet.get("name_i18n"):
+                err(f"{rel} [{pid}]: name_i18n mancante o vuoto")
+            hp = pet.get("hp_max")
+            if not isinstance(hp, (int, float)) or hp <= 0:
+                err(f"{rel} [{pid}]: hp_max deve essere un numero > 0")
+            seq = pet.get("sequenza_iniziale")
+            if not isinstance(seq, int) or not (0 <= seq <= 9):
+                err(f"{rel} [{pid}]: sequenza_iniziale deve essere un intero 0..9")
+            dom = pet.get("domabilita")
+            if not isinstance(dom, (int, float)) or not (0.0 <= dom <= 1.0):
+                err(f"{rel} [{pid}]: domabilita deve essere un numero 0..1")
+            anc = pet.get("ancora_id")
+            if anc not in anchor_ids:
+                err(f"{rel} [{pid}]: ancora_id '{anc}' non risolve a un'Ancora di data/anchors.json "
+                    f"(il pet E' un'Ancora)")
+            for aid in pet.get("abilita", []):
+                if ability_ids and aid not in ability_ids:
+                    err(f"{rel} [{pid}]: abilita '{aid}' non risolve a un'abilita' esistente")
+            for comp in pet.get("comportamenti", []):
+                if not isinstance(comp, dict) or not comp.get("id"):
+                    err(f"{rel} [{pid}]: comportamento senza 'id'")
+                    continue
+                b = comp.get("bond")
+                if not isinstance(b, int) or not (0 <= b <= 100):
+                    err(f"{rel} [{pid}]: comportamento '{comp.get('id')}': bond deve essere 0..100")
+    if n_pets < 1:
+        err("data/pets/: nessuna specie di pet, attesa almeno 1")
+
     # --- esiti degli esperimenti (data/potions/experiment_outcomes.json, US-311) ---
     eo_doc = load_json(os.path.join(DATA, "potions", "experiment_outcomes.json"))
     outcomes = (eo_doc or {}).get("outcomes", {})

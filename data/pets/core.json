@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "_comment": "Specie di pet (US-321). Lo stato del pet attivo (bond/hp/sequenza correnti) sta in PetSystem + save, non qui. Un solo pet per volta (US-322). Il pet E' un'Ancora: ancora_id punta a data/anchors.json.",
+  "pets": [
+    {
+      "id": "lupo_cinereo",
+      "name": "Lupo cinereo",
+      "name_i18n": "pet.lupo_cinereo",
+      "hp_max": 60,
+      "sequenza_iniziale": 9,
+      "domabilita": 0.35,
+      "ancora_id": "anchor_pet",
+      "abilita": ["tg_carica_spalla"],
+      "comportamenti": [
+        { "id": "difendi", "bond": 35 },
+        { "id": "assalto_coordinato", "bond": 70 }
+      ]
+    },
+    {
+      "id": "corvo_veggente",
+      "name": "Corvo veggente",
+      "name_i18n": "pet.corvo_veggente",
+      "hp_max": 28,
+      "sequenza_iniziale": 9,
+      "domabilita": 0.5,
+      "ancora_id": "anchor_pet",
+      "abilita": ["fool_divinazione_pendolo"],
+      "comportamenti": [
+        { "id": "avvista", "bond": 30 },
+        { "id": "recupera", "bond": 65 }
+      ]
+    }
+  ]
+}

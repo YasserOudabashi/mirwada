@@ -28,6 +28,13 @@
       "forza": 12,
       "penalita": 24,
       "_nota": "Una promessa fatta. Perderla e' il colpo piu' duro."
+    },
+    {
+      "id": "anchor_pet",
+      "name_i18n": "anchor.pet",
+      "forza": 7,
+      "penalita": 16,
+      "_nota": "Il pet (US-321): e' un'Ancora come le altre. La sua morte (US-325) passa da AnchorSystem e aggiunge 'penalita' follia."
     }
   ]
 }

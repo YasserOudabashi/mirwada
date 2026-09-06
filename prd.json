@@ -400,8 +400,8 @@
       ],
       "priority": 20,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO E iniziato. data/schema/pet.schema.json (doc) + data/pets/core.json (2 specie: lupo_cinereo hp 60 / corvo_veggente hp 28; ognuna id/name/name_i18n/hp_max/sequenza_iniziale/domabilita/ancora_id/abilita/comportamenti). Il pet E' un'Ancora: nuova voce anchor_pet in data/anchors.json (forza 7, penalita 16); entrambe le specie puntano li'. Autoload PetSystem (scripts/pet_system.gd): pet_attivo()->Dictionary ({} se nessuno, copia), imposta_pet(pet_id)->bool (specie ignota -> false, nessun cambiamento; bond 0, hp/sequenza dai dati), libera() (per US-322: liberare prima di domarne un altro), ha_pet(), bond()->int, sequenza_pet()->int (-1 se nessun pet), pulisci(), per/da_salvataggio (rilettura non fidata: pet_id assente o specie sparita -> nessun pet; bond clampato 0..100, sequenza 0..9). GameData._load_pets + get_pet/pet_ids. SAVE 16->17: campo 'pet' ({} o {pet_id,bond,hp,sequenza}), _migra_16_a_17; GameState snapshot/applica. validate_data.py: id unici, name_i18n, hp_max>0, sequenza_iniziale int 0..9, domabilita 0..1, ancora_id risolve in anchors.json, ogni abilita risolve, comportamenti {id, bond 0..100}. i18n: pet.lupo_cinereo/pet.corvo_veggente seminate da 'name'; anchor.pet stub TODO come i suoi fratelli anchor.* (traduzione, non errore). doma/bond-dagli-eventi/coltivazione = US-322..324. 421 test headless (412 + 9 in test_pet_system.gd), validate_data.py exit 0 (9 warning invariati). Nessuna verifica a schermo: nessuna UI."
     },
     {
       "id": "US-322",

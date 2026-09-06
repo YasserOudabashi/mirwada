@@ -56,6 +56,10 @@ func _strutture() -> Node:
 	return get_node_or_null("/root/StructureRegistry")
 
 
+func _pet() -> Node:
+	return get_node_or_null("/root/PetSystem")
+
+
 func _eventi() -> Node:
 	return get_node_or_null("/root/EventTracker")
 
@@ -177,6 +181,7 @@ func snapshot() -> Dictionary:
 		"ancore": _ancore().per_salvataggio() if _ancore() != null else [],
 		"rituale": _rituale().per_salvataggio() if _rituale() != null else {},
 		"strutture": _strutture().per_salvataggio() if _strutture() != null else [],
+		"pet": _pet().per_salvataggio() if _pet() != null else {},
 		"conoscenza": _conoscenza().per_salvataggio() if _conoscenza() != null else [],
 		"inventario": _inventario().per_salvataggio() if _inventario() != null else {},
 		"equipaggiamento": _equip().per_salvataggio() if _equip() != null else {},
@@ -219,6 +224,8 @@ func applica(dati: Dictionary) -> void:
 		_rituale().da_salvataggio(dati.get("rituale", {}))
 	if _strutture() != null:
 		_strutture().da_salvataggio(dati.get("strutture", []))
+	if _pet() != null:
+		_pet().da_salvataggio(dati.get("pet", {}))
 	if _conoscenza() != null:
 		_conoscenza().da_salvataggio(dati.get("conoscenza", []))
 	if _inventario() != null:

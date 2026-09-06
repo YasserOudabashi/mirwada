@@ -1,0 +1,20 @@
+{
+  "_comment": "Documentazione formale di data/pets/*.json (US-321). Una specie di pet: il formato dati. Lo stato del pet ATTIVO del giocatore (bond, hp, sequenza correnti) vive in PetSystem e nel save, non qui. Controlli veri in tools/validate_data.py.",
+  "schema_version": 1,
+  "pet": {
+    "id": "string, univoco",
+    "name": "string in chiaro (seed i18n)",
+    "name_i18n": "string, chiave i18n (categoria 'pet')",
+    "hp_max": "number > 0 - alla Sequenza iniziale; la coltivazione (US-324) lo alza",
+    "sequenza_iniziale": "int 0..9 - il pet ha la sua progressione di Sequenza",
+    "domabilita": "number 0..1 - probabilita' base di taming (US-322)",
+    "ancora_id": "string - un id di data/anchors.json: il pet E' un'Ancora (US-322 lo registra, US-325 lo distrugge)",
+    "abilita": ["string - ability_id che il pet puo' eseguire, deve risolvere"],
+    "comportamenti": [
+      {
+        "id": "string - chiave del comportamento (US-323 sblocca a soglia)",
+        "bond": "int 0..100 - soglia di bond che lo sblocca"
+      }
+    ]
+  }
+}

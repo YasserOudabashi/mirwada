@@ -3240,3 +3240,49 @@ sezione test aggiornata.
 - BLOCCO D CHIUSO: US-319 (StructureRegistry) + US-320 (colpisce_oggetti).
   Fase 3: 19/35. Prossimo blocco: E - pet (US-321 schema e magazzino dei pet).
 - Prossima storia: US-321 (schema pet + PetSystem + il pet E' un'Ancora).
+
+[2026-09-06] US-321 — Schema e magazzino dei pet. BLOCCO E iniziato.
+
+- data/schema/pet.schema.json (doc) + data/pets/core.json: 2 specie
+  (lupo_cinereo hp 60 abilita tg_carica_spalla; corvo_veggente hp 28 abilita
+  fool_divinazione_pendolo). Ogni specie: id/name/name_i18n/hp_max/
+  sequenza_iniziale/domabilita/ancora_id/abilita[]/comportamenti[{id,bond}].
+- Il pet E' un'Ancora: nuova voce anchor_pet in data/anchors.json (forza 7,
+  penalita 16). Entrambe le specie puntano a anchor_pet. US-322 lo
+  registrera' in AnchorSystem quando domi, US-325 lo distruggera' alla morte
+  del pet. Scelta: UNA sola ancora condivisa, non una per specie — c'e' un
+  solo pet per volta, la forza diversa per specie sarebbe un dato in piu'
+  senza un consumatore (ponytail); se servira', e' una riga di dati.
+- scripts/pet_system.gd (autoload PetSystem, dopo AnchorSystem in
+  project.godot). Magazzino del pet attivo: _pet = {} | {pet_id, bond, hp,
+  sequenza}.
+  * pet_attivo() -> copia ({} se nessuno).
+  * imposta_pet(pet_id) -> bool. Specie ignota -> push_error + false, niente
+    cambia. bond 0, hp = hp_max, sequenza = sequenza_iniziale.
+  * libera() (US-322 ne ha bisogno), ha_pet(), bond() -> int,
+    sequenza_pet() -> int (-1 senza pet), pulisci().
+  * per/da_salvataggio: rilettura NON FIDATA — raw non-oggetto o vuoto o
+    pet_id non stringa -> nessun pet; specie sparita dai dati -> nessun pet +
+    push_warning; bond clampato 0..100, sequenza 0..9.
+- GameData: _load_pets() (pattern _load_items), get_pet(id), pet_ids().
+- SAVE: VERSIONE_CORRENTE 16 -> 17. Campo "pet" ({} default) in salva(),
+  _leggi_snapshot(), _migra_16_a_17. GameState: _pet(), righe in
+  snapshot()/applica().
+- validate_data.py: blocco pet — id unici, name_i18n, hp_max>0,
+  sequenza_iniziale int 0..9, domabilita numero 0..1, ancora_id risolve in
+  anchors.json, ogni abilita risolve a un'abilita' esistente, comportamenti
+  {id non vuoto, bond int 0..100}, >= 1 specie.
+- i18n: generate_i18n_stubs.py -> pet.lupo_cinereo / pet.corvo_veggente
+  seminate dal campo gemello `name`; anchor.pet resta stub "TODO anchor.pet"
+  come tutti gli altri anchor.* (anche anchor.mirco e' ancora stub: e'
+  lavoro di traduzione, non un errore). it.json 302 chiavi, 55 TODO.
+- doma (tiro contro domabilita + AnchorSystem.register) = US-322; bond che
+  sale dagli eventi + sblocco comportamenti = US-323; avanza_pet = US-324.
+- Come verificato: 421 test headless (412 + 9 in test_pet_system.gd: specie
+  caricate; ogni ancora_id risolve; nessun pet di default; imposta_pet
+  prende hp/sequenza dalla specie; specie ignota non cambia il pet corrente;
+  libera() azzera; round-trip del save; da_salvataggio scarta i malformati e
+  clampa bond/sequenza; migrazione da v16 aggiunge {} ). validate_data.py
+  exit 0 (9 warning invariati). Nessuna verifica a schermo: nessuna UI.
+- Prossima storia: US-322 (Taming: PetSystem.doma con tiro seeded, un pet
+  per volta, l'Ancora entra da AnchorSystem).
