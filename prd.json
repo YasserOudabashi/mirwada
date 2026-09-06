@@ -63,8 +63,8 @@
       ],
       "priority": 3,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO A. SynergyEngine._ready() si connette ai PROPRI segnali sinergia_attivata/disattivata -> _su_attivata/_su_disattivata -> _applica_effetto/_rimuovi_effetto (diff e applicazione restano separati). modifica_stat: apply_modifier('synergy:<id>', {stat: delta}) sullo StatsComponent del giocatore, delta = valore o valore*get_base(stat) se moltiplicativo (stesso pattern di TalentSystem). Due sinergie sulla stessa stat -> due modificatori distinti, StatsComponent li somma (i conflitti cumulativi 'funzionano gia'; US-406 formalizza + esclusivi). modifica_follia: _follia_attive[id] = delta_al_minuto; in _process, un accumulatore da 1s versa delta_al_minuto/60 * elapsed in Madness.add(q, 'synergy:<id>', tramite_ancore=false) - negativo = riduce la follia nel tempo. riapplica() rimette i modificatori di stat delle attive (da chiamare quando compare il player / dopo un load - il gancio in GameState.applica e' US-408). pulisci() toglie tutti i modificatori 'synergy:<id>' e azzera _follia_attive. 509 test headless (506 + 3 in test_synergy_engine.gd: modifica_stat si applica (+10% spiritualita_max) e si toglie alla disattivazione; riapplica() rimette i modificatori dopo un clear_modifiers simulato; modifica_follia versa 0.5 in Madness in un minuto simulato (_process(60.0)) e si ferma alla disattivazione). validate exit 0 (9 warning invariati). Nessuna verifica a schermo."
     },
     {
       "id": "US-404",

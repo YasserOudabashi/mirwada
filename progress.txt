@@ -4053,3 +4053,36 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-403 (effetti modifica_stat e modifica_follia:
   su sinergia_attivata -> modificatore 'synergy:<id>' sullo StatsComponent /
   contributo in Madness; su sinergia_disattivata -> rimozione; riapplica()).
+
+[2026-09-06] US-403 — Effetti modifica_stat e modifica_follia. BLOCCO A.
+
+- SynergyEngine._ready() connette anche i PROPRI segnali sinergia_attivata/
+  disattivata a _su_attivata/_su_disattivata: il DIFF (rivaluta) e
+  l'APPLICAZIONE (effetti) restano separati.
+- _applica_effetto(id) su match effetto.tipo:
+  * modifica_stat -> _stats().apply_modifier("synergy:<id>", {stat: delta}),
+    delta = valore, o valore * get_base(stat) se moltiplicativo. Due sinergie
+    sulla stessa stat -> due modificatori distinti, lo StatsComponent li
+    somma (i conflitti CUMULATIVI funzionano gia'; US-406 formalizza la
+    regola e aggiunge gli esclusivi).
+  * modifica_follia -> _follia_attive[id] = delta_al_minuto.
+- _process: in piu' al poll da 0.5s, un accumulatore _acc_follia da 1s versa
+  per ogni sinergia in _follia_attive delta_al_minuto/60 * elapsed in
+  Madness.add(q, "synergy:<id>", tramite_ancore=false). Negativo -> una
+  sinergia positiva RIDUCE la follia nel tempo; positivo -> una anti-sinergia
+  l'accelera.
+- _rimuovi_effetto(id): remove_modifier("synergy:<id>") + _follia_attive.erase.
+- riapplica(): rimette i modificatori di stat di tutte le _attive_prec - da
+  chiamare quando compare il player in scena o dopo un load. Il gancio in
+  GameState.applica() e' US-408 (SAVE).
+- pulisci(): toglie ogni modificatore "synergy:<id>" dal player e azzera
+  _follia_attive / _acc_follia.
+- Come verificato: 509 test headless (506 + 3 in test_synergy_engine.gd:
+  modifica_stat +10% spiritualita_max si applica e si toglie alla
+  disattivazione; riapplica() rimette i modificatori dopo un clear_modifiers
+  (giocatore appena comparso); modifica_follia versa 0.5 in Madness in un
+  minuto simulato (_process(60.0)) e si ferma alla disattivazione).
+  validate_data.py exit 0 (9 warning invariati). Nessuna verifica a schermo.
+- Prossima storia: US-404 (effetti modifica_qualita_crafting -> PotionSystem/
+  Forge; sblocca_ricetta -> KnowledgeStore; aggiungi_abilita ->
+  AbilityEngine.grant_permanente).

@@ -23,6 +23,9 @@ var _tag_override: Dictionary = {}
 ## L'insieme attivo all'ultima rivalutazione: il diff si fa contro questo.
 var _attive_prec: Array = []
 var _accumulo: float = 0.0
+## US-403: { synergy_id: delta_al_minuto } delle sinergie modifica_follia attive.
+var _follia_attive: Dictionary = {}
+var _acc_follia: float = 0.0
 
 
 func _ready() -> void:
@@ -34,6 +37,10 @@ func _ready() -> void:
 	_collega("/root/TalentSystem", ["talento_sbloccato"])
 	_collega("/root/BaseSystem", ["stanza_costruita", "stanza_potenziata"])
 	_collega("/root/Progression", ["sequence_changed"])
+	# US-403+: il motore reagisce ai PROPRI segnali per applicare/togliere gli
+	# effetti. Diff e applicazione restano separati.
+	sinergia_attivata.connect(_su_attivata)
+	sinergia_disattivata.connect(_su_disattivata)
 
 
 func _collega(path: String, segnali: Array) -> void:
@@ -64,6 +71,18 @@ func _process(delta: float) -> void:
 	if _accumulo >= _POLL_S:
 		_accumulo = 0.0
 		rivaluta()
+	# US-403: le sinergie modifica_follia versano il loro delta_al_minuto in
+	# Madness un secondo alla volta. Negativo = riducono la follia nel tempo.
+	if not _follia_attive.is_empty():
+		_acc_follia += delta
+		if _acc_follia >= 1.0:
+			var m: Node = get_node_or_null("/root/Madness")
+			if m != null:
+				for id in _follia_attive:
+					var q: float = float(_follia_attive[id]) / 60.0 * _acc_follia
+					if q != 0.0:
+						m.call("add", q, "synergy:" + str(id), false)
+			_acc_follia = 0.0
 
 
 func _gd() -> Node:
@@ -125,10 +144,60 @@ func rivaluta() -> void:
 	_attive_prec = ora
 
 
+## Ri-applica i modificatori di stat delle sinergie attive: da chiamare quando
+## compare il giocatore in scena o dopo un load (come TalentSystem.riapplica).
+func riapplica() -> void:
+	for id in _attive_prec:
+		_applica_effetto(str(id))
+
+
 func pulisci() -> void:
+	var st: Node = _stats()
+	if st != null:
+		for id in _attive_prec:
+			st.call("remove_modifier", "synergy:" + str(id))
 	_tag_override = {}
 	_attive_prec = []
 	_accumulo = 0.0
+	_follia_attive = {}
+	_acc_follia = 0.0
+
+
+# --- Applicazione degli effetti (US-403..405) ------------------------
+
+func _su_attivata(id: String) -> void:
+	_applica_effetto(id)
+
+
+func _su_disattivata(id: String) -> void:
+	_rimuovi_effetto(id)
+
+
+func _applica_effetto(id: String) -> void:
+	var eff: Dictionary = (_gd().call("get_synergy", id) as Dictionary).get("effetto", {}) if _gd() != null else {}
+	match str(eff.get("tipo", "")):
+		"modifica_stat":
+			var st: Node = _stats()
+			if st == null:
+				return
+			var stat: String = str(eff.get("stat", ""))
+			var v: float = float(eff.get("valore", 0.0))
+			var delta: float = v * float(st.call("get_base", stat)) if bool(eff.get("moltiplicativo", false)) else v
+			st.call("apply_modifier", "synergy:" + id, {stat: delta})
+		"modifica_follia":
+			_follia_attive[id] = float(eff.get("delta_al_minuto", 0.0))
+
+
+func _rimuovi_effetto(id: String) -> void:
+	var st: Node = _stats()
+	if st != null:
+		st.call("remove_modifier", "synergy:" + id)
+	_follia_attive.erase(id)
+
+
+func _stats() -> Node:
+	var p: Node = get_tree().get_first_node_in_group("player")
+	return p.get_node_or_null("StatsComponent") if p != null else null
 
 
 # --- Interno --------------------------------------------------------
