@@ -3417,3 +3417,35 @@ sezione test aggiornata.
 - Prossima storia: US-325 (la morte del pet passa da AnchorSystem.destroy:
   perdere il pet = perdere un'Ancora, colpo di follia vero). Chiude il
   blocco E.
+
+[2026-09-06] US-325 — La morte del pet e' la perdita di un'Ancora. BLOCCO E CHIUSO.
+
+- scripts/pet_system.gd morte() -> bool: se c'e' un pet, svuota _pet e
+  AnchorSystem.destroy(ancora_id). destroy (US-216) fa: anchor_lost.emit +
+  Madness.add(penalita, "anchor_lost", false) [false = NON bufferizzata] +
+  _aggiorna_nomi_sussurro (i sussurri di soglia 55 smettono di nominare il
+  pet, automatico). pet_morto.emit(id).
+- Gancio SummonRegistry: se _pet portasse un "summon_id" morte() lo
+  rimuoverebbe. Non lo porta ancora (nessuna scena/Node del pet in questa
+  fase): il gancio c'e', si attivera' quando il pet avra' un'istanza evocata.
+- Il pet morto NON torna al load: per_salvataggio() di _pet vuoto -> lo slot
+  "pet" del save e' {}; da_salvataggio({}) -> nessun pet. Nessun cambio a
+  save_system.gd (il campo "pet" e la sua migrazione ci sono da US-321).
+- Nessun cambio a validate_data.py / i18n (nessun dato nuovo).
+- Come verificato: 442 test headless (437 + 5 in test_pet_morte.gd: morte ->
+  Ancora distrutta + anchor_lost + follia == 16 (= penalita di anchor_pet);
+  pet_attivo() torna {}; morte() senza pet -> false, nessuna follia; i
+  sussurri (AudioManager.nomi_sussurro) smettono di contenere "anchor.pet";
+  il pet morto non si ricrea da un save con slot pet vuoto).
+  VERIFICA A SCHERMO (scenes/main.tscn con la Godot locale, script una-tantum):
+  doma("lupo_cinereo", 1.0) poi morte() -> follia 0 -> 16. 16 supera
+  soglia_distorsioni (15, balance.json.madness) -> compare la vignetta
+  dell'overlay follia (US-215): angoli scuriti, leggero dimming complessivo.
+  Screenshot before/after (petmorte_before.png / petmorte_after.png nel tmp
+  del job). validate_data.py exit 0 (9 warning invariati).
+- BLOCCO E CHIUSO: US-321 (schema+magazzino), US-322 (taming), US-323 (bond),
+  US-324 (coltivazione), US-325 (morte = Ancora persa). Fase 3: 24/35.
+  Prossimo blocco: F - base building (US-326 schema base + 4 stanze).
+- Prossima storia: US-326 (data/schema/room_types.json vocabolario chiuso
+  dei 4 tipi + data/base/rooms.json coi livelli, costi e bonus;
+  GameData.get_room_type/room_levels).

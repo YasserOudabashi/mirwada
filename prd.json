@@ -478,8 +478,8 @@
       ],
       "priority": 24,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO E CHIUSO. PetSystem.morte() -> bool: se c'e' un pet, svuota _pet, AnchorSystem.destroy(ancora_id) (anchor_lost + follia = penalita NON bufferizzata, come ogni Ancora US-216; destroy chiama gia' _aggiorna_nomi_sussurro -> i sussurri di soglia 55 smettono di nominare il pet), pet_morto.emit. Gancio SummonRegistry: se _pet portasse un summon_id lo rimuove - non lo porta ancora (nessuna scena pet), hook pronto per dopo. Il pet morto NON si ricrea al load: lo slot 'pet' del save e' {} (per_salvataggio di _pet vuoto), da_salvataggio({}) -> nessun pet. Nessun cambio a save_system/validator/i18n. 442 test headless (437 + 5 in test_pet_morte.gd: morte distrugge l'Ancora + anchor_lost + follia == 16 (penalita anchor_pet); pet_attivo() torna {}; morte() senza pet -> false e nessuna follia; i sussurri smettono di nominare anchor.pet; il pet morto non torna al load). VERIFICA A SCHERMO (scenes/main.tscn, Godot locale): doma('lupo_cinereo') poi morte() -> follia 0 -> 16, supera soglia_distorsioni (15) -> compare la vignetta dell'overlay follia (angoli scuriti, dimming leggero). Screenshot before/after in job tmp. validate_data.py exit 0 (9 warning invariati)."
     },
     {
       "id": "US-326",

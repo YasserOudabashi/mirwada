@@ -11,6 +11,7 @@ extends Node
 
 signal pet_impostato(pet_id: String)
 signal pet_liberato(pet_id: String)
+signal pet_morto(pet_id: String)
 signal taming_fallito(pet_id: String)
 ## comportamento_sbloccato = "" se nessuna soglia attraversata da questo colpo.
 signal bond_cambiato(valore: int, comportamento_sbloccato: String)
@@ -106,6 +107,31 @@ func libera() -> void:
 	if _ancore() != null and not anc.is_empty():
 		_ancore().call("rilascia", anc)
 	pet_liberato.emit(id)
+
+
+## La morte del pet (US-325): un colpo VERO, non un inconveniente.
+## AnchorSystem.destroy(ancora_id) -> anchor_lost + follia NON bufferizzata
+## (come ogni Ancora, US-216) e i sussurri di soglia 55 smettono di nominarlo.
+## pet_attivo() torna {} e lo slot resta vuoto anche nel save. false se non
+## c'era un pet.
+func morte() -> bool:
+	if _pet.is_empty():
+		return false
+	var id: String = str(_pet.get("pet_id", ""))
+	var specie: Dictionary = _gd().call("get_pet", id) if _gd() != null else {}
+	var anc: String = str(specie.get("ancora_id", ""))
+	# L'eventuale istanza evocata del pet (quando ci sara' - _pet non porta
+	# ancora un summon_id): tolta da SummonRegistry.
+	var sid: String = str(_pet.get("summon_id", ""))
+	if not sid.is_empty():
+		var sr: Node = get_node_or_null("/root/SummonRegistry")
+		if sr != null:
+			sr.call("rimuovi", sid)
+	_pet = {}
+	if _ancore() != null and not anc.is_empty():
+		_ancore().call("destroy", anc)
+	pet_morto.emit(id)
+	return true
 
 
 func ha_pet() -> bool:
