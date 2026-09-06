@@ -4118,3 +4118,34 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-405 (effetto modifica_primitiva: hook in
   AbilityEngine._esegui_primitive che applica i delta delle sinergie attive
   ai parametri della primitiva, su una copia del dizionario).
+
+[2026-09-06] US-405 — Effetto modifica_primitiva. BLOCCO A. Tutti e 6 gli effetti funzionano.
+
+- SynergyEngine.applica_modifiche_primitiva(primitiva, prim): per ogni
+  sinergia modifica_primitiva attiva su quella primitiva, accumula i delta
+  flat e i moltiplicativi PER PARAMETRO, poi
+    prim[par] = (base + somma_flat) * (1 + somma_mult)
+  Muta 'prim' in place: il chiamante l'ha gia' copiato.
+- AbilityEngine._esegui_primitive: 'var prim = (entry as Dictionary)
+  .duplicate(true)' (prima era '= entry' - i dati dell'abilita' non si
+  toccano mai) + subito dopo, se SynergyEngine c'e',
+  applica_modifiche_primitiva(tipo, prim). Copre execute() ed
+  execute_stored(); esegui_primitiva() (debug) chiama gli handler diretti e
+  non e' coperta - accettabile.
+- SynergyEngine._applica_effetto: modifica_primitiva e' PULL (come
+  modifica_qualita_crafting): non spinge nulla su sinergia_attivata, i
+  sistemi lo tirano.
+- data/synergies/core.json: sinergia_marea_crepuscolare - modifica_primitiva
+  decay.raggio +20 flat, richiede crescita+bestia, fonti [stanza, pet].
+- Come verificato: 513 test headless (512 + 1 in test_synergy_engine.gd: con
+  la sinergia attiva execute_stored('tg_crepuscolo') da' un effetto decay con
+  raggio 27 (7 base + 20); senza la sinergia raggio 7; e GameData.get_ability
+  ha ancora raggio 7 - la copia funziona). 1 solo SCRIPT ERROR preesistente,
+  nessuno nuovo. validate_data.py exit 0. Nessuna verifica a schermo.
+- BLOCCO A a meta': US-401..405 (schema+motore, reattivita', i 6 effetti).
+  Restano US-406 (priorita'/conflitti - la regola e' gia' implementata per
+  modifica_qualita_crafting, va estesa/testata per gli altri), US-407
+  (anti-sinergie con neutralizza), US-408 (SAVE registro viste, v19->v20).
+- Prossima storia: US-406 (priorita' e conflitti: SynergyEngine.spiega(id);
+  test che due modifica_stat sulla stessa stat si sommano e due
+  modifica_qualita_crafting stessa categoria -> vince la priorita' alta).

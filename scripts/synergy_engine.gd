@@ -206,6 +206,35 @@ func bonus_qualita(categoria: String) -> int:
 	return scelta_delta
 
 
+## US-405: applica ai parametri di 'prim' (che il chiamante ha gia' COPIATO) i
+## delta delle sinergie modifica_primitiva attive su quella primitiva. I delta
+## flat di piu' sinergie si sommano; i moltiplicativi pure:
+##   nuovo = (base + somma_flat) * (1 + somma_mult)
+func applica_modifiche_primitiva(primitiva: String, prim: Dictionary) -> void:
+	if _gd() == null:
+		return
+	var flat: Dictionary = {}
+	var mult: Dictionary = {}
+	for id in _attive_prec:
+		var eff: Dictionary = (_gd().call("get_synergy", id) as Dictionary).get("effetto", {})
+		if str(eff.get("tipo", "")) != "modifica_primitiva":
+			continue
+		if str(eff.get("primitiva", "")) != primitiva:
+			continue
+		var par: String = str(eff.get("parametro", ""))
+		if bool(eff.get("moltiplicativo", false)):
+			mult[par] = float(mult.get(par, 0.0)) + float(eff.get("delta", 0.0))
+		else:
+			flat[par] = float(flat.get(par, 0.0)) + float(eff.get("delta", 0.0))
+	var pars: Array = flat.keys()
+	for p in mult:
+		if not pars.has(p):
+			pars.append(p)
+	for par in pars:
+		var base: float = float(prim.get(par, 0.0))
+		prim[par] = (base + float(flat.get(par, 0.0))) * (1.0 + float(mult.get(par, 0.0)))
+
+
 func _applica_effetto(id: String) -> void:
 	var eff: Dictionary = (_gd().call("get_synergy", id) as Dictionary).get("effetto", {}) if _gd() != null else {}
 	match str(eff.get("tipo", "")):
@@ -229,7 +258,7 @@ func _applica_effetto(id: String) -> void:
 			if ae != null and ae.call("grant_permanente", str(eff.get("ability_id", ""))):
 				_abilita_attive[id] = str(eff.get("ability_id", ""))
 		"modifica_qualita_crafting", "modifica_primitiva":
-			pass  # PULL: i sistemi leggono bonus_qualita() / delta_primitiva()
+			pass  # PULL: i sistemi leggono bonus_qualita() / applica_modifiche_primitiva()
 
 
 func _rimuovi_effetto(id: String) -> void:

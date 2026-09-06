@@ -103,8 +103,8 @@
       ],
       "priority": 5,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO A. SynergyEngine.applica_modifiche_primitiva(primitiva, prim): per ogni sinergia modifica_primitiva attiva su quella primitiva, accumula i delta flat e moltiplicativi per parametro; poi prim[par] = (base + somma_flat) * (1 + somma_mult). Muta 'prim' IN PLACE - il chiamante l'ha gia' copiato. AbilityEngine._esegui_primitive: 'var prim = entry.duplicate(true)' (prima era '= entry': i dati dell'abilita' non si toccano MAI) + subito dopo, se SynergyEngine c'e', applica_modifiche_primitiva(tipo, prim). Copre execute() ed execute_stored() (che passano da _esegui_primitive); esegui_primitiva() (debug-only) chiama gli handler direttamente e non e' coperta - accettabile. SynergyEngine._applica_effetto: modifica_primitiva e' PULL (come modifica_qualita_crafting), non spinge nulla su sinergia_attivata. data/synergies/core.json: sinergia_marea_crepuscolare (esempio di riferimento) - modifica_primitiva decay.raggio +20 flat, richiede crescita+bestia. 513 test headless (512 + 1 in test_synergy_engine.gd: con la sinergia attiva execute_stored('tg_crepuscolo') restituisce un effetto decay con raggio 27 (7 base + 20), senza la sinergia raggio 7; e i DATI dell'abilita' (GameData.get_ability) hanno ancora raggio 7 - la copia ha funzionato). 1 solo SCRIPT ERROR preesistente, nessuno nuovo. validate exit 0. Nessuna verifica a schermo. TUTTI E 6 I TIPI DI EFFETTO ora funzionano."
     },
     {
       "id": "US-406",

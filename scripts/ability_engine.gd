@@ -170,8 +170,13 @@ func _esegui_primitive(ability: Dictionary, caster: Node, stats: Node, ability_i
 			push_error("[AbilityEngine] %s: primitiva non-oggetto scartata (%s)" % [ability_id, entry])
 			result["warnings"].append("primitiva non-oggetto scartata")
 			continue
-		var prim: Dictionary = entry
+		# COPIA: le sinergie modifica_primitiva (US-405) alterano i parametri
+		# prima dell'handler, ma i dati dell'abilita' non si toccano mai.
+		var prim: Dictionary = (entry as Dictionary).duplicate(true)
 		var tipo: String = str(prim.get("tipo", ""))
+		var se: Node = get_tree().root.get_node_or_null("SynergyEngine")
+		if se != null:
+			se.call("applica_modifiche_primitiva", tipo, prim)
 
 		if not _handlers.has(tipo):
 			if (_game_data().call("get_primitive", tipo) as Dictionary).is_empty():

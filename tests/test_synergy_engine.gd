@@ -225,6 +225,34 @@ func test_sblocca_ricetta_impara_e_resta_nota() -> void:
 	_fine()
 
 
+func test_modifica_primitiva_altera_il_parametro_prima_dell_handler() -> void:
+	var ae: Node = Engine.get_main_loop().root.get_node_or_null("AbilityEngine")
+	# execute_stored: esegue le primitive senza il controllo di possesso, e
+	# passa comunque da _esegui_primitive (dove vive l'hook US-405).
+	var senza: Dictionary = ae.call("execute_stored", "tg_crepuscolo", _p)
+	var r_senza := 0.0
+	for e in (senza["effects"] as Array):
+		if str((e as Dictionary).get("tipo")) == "decay":
+			r_senza = float((e as Dictionary).get("raggio", 0.0))
+	assert_almost_eq(r_senza, 7.0, "senza sinergia: raggio base del decay (tg_crepuscolo)")
+
+	# sinergia_marea_crepuscolare: modifica_primitiva decay.raggio +20
+	_se().call("imposta_override_tag", {"crescita": 1, "bestia": 1})
+	_se().call("rivaluta")
+	var con: Dictionary = ae.call("execute_stored", "tg_crepuscolo", _p)
+	var r_con := 0.0
+	for e in (con["effects"] as Array):
+		if str((e as Dictionary).get("tipo")) == "decay":
+			r_con = float((e as Dictionary).get("raggio", 0.0))
+	assert_almost_eq(r_con, 27.0, "con la sinergia: raggio 7 + 20 = 27")
+
+	_se().call("imposta_override_tag", {})
+	_se().call("rivaluta")
+	assert_true(float(_gd().call("get_ability", "tg_crepuscolo").get("primitive", [{}])[0].get("raggio", 0)) == 7.0,
+		"i DATI dell'abilita' non sono stati toccati (la copia)")
+	_fine()
+
+
 func test_aggiungi_abilita_concede_e_revoca() -> void:
 	var ae: Node = Engine.get_main_loop().root.get_node_or_null("AbilityEngine")
 	# sinergia_istinto_bestiale: aggiungi_abilita mother_dominio_druidico

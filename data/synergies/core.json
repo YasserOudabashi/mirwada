@@ -59,6 +59,17 @@
     },
     {
       "schema_version": 1,
+      "id": "sinergia_marea_crepuscolare",
+      "name_i18n": "synergy.marea_crepuscolare",
+      "richiede_tag": { "crescita": 1, "bestia": 1 },
+      "fonti": ["stanza", "pet"],
+      "priorita": 0,
+      "effetto": { "tipo": "modifica_primitiva", "primitiva": "decay", "parametro": "raggio", "delta": 20, "moltiplicativo": false },
+      "scoperta": "nascosta",
+      "note": "Il giardino nutre, la bestia diffonde: il decadimento si allarga. Esempio di riferimento per modifica_primitiva (US-405): +20 al raggio di ogni primitiva decay finche' la sinergia e' attiva."
+    },
+    {
+      "schema_version": 1,
       "id": "anti_ordine_disordine",
       "name_i18n": "synergy.anti_ordine_disordine",
       "richiede_tag": { "ordine": 2, "disordine": 2 },
