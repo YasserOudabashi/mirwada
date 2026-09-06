@@ -4488,3 +4488,39 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
 - Prossima storia: US-416 (CHIUSURA FASE 4: roadmap.md -> CHIUSA, conteggi
   reali; design-master.md Appendice C + A; CLAUDE.md + README; check di
   chiusura nel validator FASE_4_DATA + M sinergie raggiungibili).
+
+[2026-09-06] US-416 — Chiusura fase 4. FASE 4 CHIUSA.
+
+- 006_PRD/roadmap.md: 'Fase 4 - Sinergie (~16 story)' -> 'Fase 4 - Sinergie -
+  CHIUSA (16 story, 535 test)' col blocco descrittivo (3 blocchi A/B/C, i 6
+  effetti, priorita'/conflitti + spiega(), anti-sinergie con neutralizza,
+  registro nel save 19->20 + sezione libro, 44 sinergie / 26 raggiungibili,
+  synergy.schema.json esteso) e il verdetto del criterio di uscita.
+- 006_PRD/design-master.md:
+  * Appendice C: nuova riga 'Schema sinergie' (priorita + oneOf dei 6 tipi +
+    neutralizza, esteso US-401, retro-compatibile).
+  * Appendice A sezione 'Fase 4' -> CHIUSA: pagina registro fatta,
+    sinergia_colpo_del_caso scritta, stub tolto, criterio di uscita in
+    test_slice_fase_4.gd.
+- CLAUDE.md: sezione fasi -> 'Fase 4 - Sinergie: CHIUSA (16 story, 535 test)'
+  col riassunto dei 3 blocchi; 'Fase corrente: 5 - Espansione contenuti'
+  (che e' anche il punto di controllo dell'architettura).
+- README.md: paragrafo 'Fase 4 - Sinergie: chiusa' coi conteggi e il verdetto;
+  il rimando /prd aggiornato alla fase 5.
+- tools/validate_data.py: check di chiusura fase 4 (US-416):
+  * FASE_4_DATA = [synergies/core.json, synergies/batch_1.json,
+    synergies/batch_2.json, synergies/batch_3.json, abilities/synergy.json]
+    devono esistere (come FASE_3_DATA);
+  * almeno M=15 sinergie raggiungibili coi 10 Pathway attivi
+    (len(syn_ids) - len(unreachable_syns)); oggi 26.
+- Come verificato: python tools/validate_data.py exit 0 (8 warning:
+  stub sequenze, 18 sinergie irraggiungibili in una riga, i18n TODO,
+  5 somme acting TG, e altre preesistenti). 535 test headless, tutti verdi.
+  1 SCRIPT ERROR + 4 'Parse JSON failed' preesistenti (test di migrazione
+  save), nessuno nuovo.
+- FASE 4 CHIUSA: US-401..416, 16/16. SynergyEngine completo, registro nel
+  libro, 44 sinergie di contenuto (26 attive + 18 pronte per i gruppi
+  differiti), criterio di uscita verificato.
+- Prossima fase: 5 - Espansione contenuti (roadmap.md). PUNTO DI CONTROLLO:
+  se aggiungere i 9 Pathway rimanenti richiede codice invece che dati,
+  l'architettura della fase 2 va corretta prima. Il PRD si genera con /prd.

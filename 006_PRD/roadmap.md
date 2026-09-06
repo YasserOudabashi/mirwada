@@ -96,16 +96,41 @@ giocando, con avanzamenti veri, follia che cresce e Ancore che contano.
 
 ---
 
-## Fase 4 — Sinergie (~16 story)
+## Fase 4 — Sinergie — CHIUSA (16 story, 535 test)
 
-- Motore dei tag: raccolta dei tag attivi da tutte le fonti
-- Risoluzione delle regole di sinergia, con priorita' e conflitti
-- Anti-sinergie
-- Registro delle sinergie scoperte
-- 30-40 sinergie di contenuto (story di soli dati)
+> **PRD**: `006_PRD/prd-fase-4-sinergie.md`. Chiusa il 2026-09-06:
+> 16 story `US-401..416` in 3 blocchi (A il motore, B il registro nel libro,
+> C il contenuto). Il save e' passato da schema_version 19 a 20 (un bump, una
+> `_migra_19_a_20`). Verdetto sull'architettura (US-413,
+> `tests/test_slice_fase_4.gd`): `sinergia_dottrina_del_guardiano` nasce solo
+> combinando pet (`guerra`) + stanza (`conoscenza`) + talento (`non_letale`) —
+> nessuna fonte da sola basta — e si attiva col suo effetto misurabile e
+> **zero righe di codice che la nominano**. Nessuna primitiva nuova, i 12
+> `tracked_events` invariati.
+>
+> **Cosa contiene**:
+> - `SynergyEngine` (autoload): risoluzione tag -> sinergie attive, poll a
+>   2 Hz + segnali delle fonti, `stato_registro()` / `contatore()` per il
+>   fog of war.
+> - I **6 tipi di effetto** funzionano tutti (applicazione + rimozione):
+>   `modifica_stat`, `modifica_follia`, `modifica_qualita_crafting`,
+>   `sblocca_ricetta`, `aggiungi_abilita`, `modifica_primitiva` (hook in
+>   `AbilityEngine._esegui_primitive` su una copia di `prim`).
+> - **Priorita' e conflitti**: cumulativi si sommano, esclusivi -> `priorita`
+>   desc poi `id` asc. `spiega(id)` per debug/UI.
+> - **Anti-sinergie**: `anti: true` + `neutralizza: [id]` dichiarato nei dati.
+> - **Registro** persistente (`sinergie.viste` nel save) + sezione Sinergie
+>   nella pagina inventario del libro, reattiva dal vivo.
+> - **44 sinergie** di cui **26 raggiungibili** coi 10 Pathway attivi; le
+>   altre 18 (`batch_3.json` + 2 in `core.json`) richiedono tag di gruppi
+>   differiti e si accenderanno riattivando il gruppo (mappa in
+>   `design-pathways.md`). `sinergia_colpo_del_caso` scritta
+>   (`data/abilities/synergy.json`).
+> - `synergy.schema.json` esteso: `priorita`, `effetto` come `oneOf` dei 6
+>   tipi, `neutralizza`.
 
 **Criterio di uscita:** una sinergia nata da pet + stanza + talento si attiva
-davvero, senza codice dedicato.
+davvero, senza codice dedicato. **Verificato** in `test_slice_fase_4.gd`.
 
 ---
 

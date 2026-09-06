@@ -1315,6 +1315,26 @@ def main():
             err(f"data/{rel}: file di dati della fase 3 mancante (US-336: la fase e' chiusa, "
                 f"nessuno di questi file va cancellato)")
 
+    # --- chiusura fase 4 (US-416): i file nuovi della fase devono esistere, e
+    # almeno M sinergie devono restare raggiungibili coi gruppi attivi (se
+    # scende sotto, una story ha rotto le fonti di tag o le sinergie).
+    FASE_4_DATA = [
+        "synergies/core.json", "synergies/batch_1.json",
+        "synergies/batch_2.json", "synergies/batch_3.json",
+        "abilities/synergy.json",
+    ]
+    for rel in FASE_4_DATA:
+        if not os.path.exists(os.path.join(DATA, rel)):
+            err(f"data/{rel}: file di dati della fase 4 mancante (US-416: la fase e' chiusa, "
+                f"nessuno di questi file va cancellato)")
+    if os.path.isdir(sdir):
+        raggiungibili = len(syn_ids) - len(unreachable_syns)
+        M = 15
+        if raggiungibili < M:
+            err(f"data/synergies/: solo {raggiungibili} sinergie raggiungibili coi 10 Pathway "
+                f"attivi, attese >= {M} (US-416). Una story ha rotto una fonte di tag o una "
+                f"richiede_tag.")
+
     report()
     return 1 if errors else 0
 

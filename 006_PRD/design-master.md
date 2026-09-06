@@ -262,10 +262,14 @@ P2: macchie di follia sulle pagine (con toggle).
 
 P1: pagina inventario del libro. P0: contratto `stored_ability_id`.
 
-### Fase 4
+### Fase 4 — CHIUSA (US-401..416, 535 test)
 
-P1: pagina registro sinergie; scrivere `sinergia_colpo_del_caso` e togliere lo
-stub alla sinergia firma.
+P1 pagina registro sinergie: **fatta** (sezione della pagina inventario del
+libro, US-410/411, col fog of war e reattiva dal vivo).
+`sinergia_colpo_del_caso`: **scritta** (`data/abilities/synergy.json`), lo stub
+di `sinergia_inganno_probabilita` è tolto (resta irraggiungibile finché
+`key_of_light` è differito). Criterio di uscita verificato in
+`test_slice_fase_4.gd`. 44 sinergie, 26 raggiungibili.
 
 ### Fase 5 — contenuto pathway
 
@@ -334,6 +338,7 @@ location_tags).
 | Effetti dei sigilli | `data/schema/sigil_effect_types.json` | effetti + effetti_collaterali | chiuso, fase 3 (US-315) |
 | Effetti dei Sigillati | `data/schema/sigillato_effect_types.json` | tick + tag | chiuso, fase 3 (US-318) |
 | Esiti degli esperimenti | `data/potions/experiment_outcomes.json` | 5 (pesati) | chiuso, fase 3 (US-311) |
+| Schema sinergie | `data/schema/synergy.schema.json` | `priorita` + `effetto` come `oneOf` dei 6 tipi + `neutralizza` | esteso fase 4 (US-401), retro-compatibile; regola di risoluzione conflitti nel `_comment` |
 | Location tags | `data/schema/location_tags.json` | 24 proposti | PROPOSTO in design-world.md, si crea con la prima story che li valida |
 | Condizioni | `ability.schema.json` (enum) | 8 + 3 proposte | le 3 nuove (`follia_min`, `reputazione_min`, `flag`) arrivano col motore dialoghi |
 | Modi di gating | `region.schema.json` proposto | primitiva, momento, fase_lunare, npc, conoscenza, sequenza | PROPOSTO in design-world.md |

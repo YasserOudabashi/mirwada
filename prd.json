@@ -312,8 +312,8 @@
       ],
       "priority": 16,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO C - FASE 4 CHIUSA. 006_PRD/roadmap.md: sezione Fase 4 -> 'CHIUSA (16 story, 535 test)', elenco di cosa contiene (SynergyEngine, i 6 effetti, priorita'/conflitti, anti-sinergie, registro, 44 sinergie di cui 26 raggiungibili), criterio di uscita verificato in test_slice_fase_4.gd. 006_PRD/design-master.md: Appendice C riga per synergy.schema.json esteso; Appendice A sezione Fase 4 -> CHIUSA (pagina registro fatta, sinergia_colpo_del_caso scritta). CLAUDE.md + README.md: fase 4 chiusa coi conteggi, fase corrente = 5. tools/validate_data.py: check di chiusura FASE_4_DATA (synergies/core|batch_1|batch_2|batch_3.json + abilities/synergy.json devono esistere) + check 'almeno 15 sinergie raggiungibili' (oggi 26). validate exit 0 (8 warning), 535 test headless invariati. Fase 4: 16/16."
     }
   ]
 }

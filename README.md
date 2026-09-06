@@ -34,7 +34,19 @@ e `SynergySources` che somma i tag di tutte le fonti per la fase 4. Save da
 schema_version 12 a 19. Verdetto (US-335): i sistemi compongono un ciclo
 completo con zero codice dedicato a un contenuto.
 
-Il PRD della fase 4 (sinergie) si genera con `/prd` — vedi `006_PRD/roadmap.md`.
+**Fase 4 — Sinergie: chiusa.** 16 story, 535 test. `SynergyEngine` (autoload)
+risolve i tag posseduti in sinergie attive, con priorità/conflitti e
+anti-sinergie (`neutralizza` dichiarato nei dati); i 6 tipi di effetto
+funzionano tutti (`modifica_stat`, `modifica_follia`, `modifica_qualita_crafting`,
+`sblocca_ricetta`, `aggiungi_abilita`, `modifica_primitiva`). Registro
+persistente (`sinergie.viste`, save 19 → 20) + sezione Sinergie nella pagina
+inventario del libro col fog of war, reattiva dal vivo. 44 sinergie di cui 26
+raggiungibili coi 10 Pathway attivi (le altre 18 puntano a gruppi differiti e
+si accenderanno riattivandoli). Verdetto (US-413, `tests/test_slice_fase_4.gd`):
+una sinergia pet + stanza + talento si attiva senza una riga di codice dedicata.
+
+Il PRD della fase 5 (espansione contenuti) si genera con `/prd` — vedi
+`006_PRD/roadmap.md`. La fase 5 è il **punto di controllo** dell'architettura.
 
 ## Setup
 

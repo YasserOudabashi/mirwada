@@ -114,11 +114,20 @@ nuovi: `item_categories`, `equip_slots`, `room_types`, `tracked_talents`
 `experiment_outcomes`. Nessuna primitiva nuova. Fonti di tag per la fase 4:
 `SynergySources.tag_sinergia_globali()` (inventario + pet + talenti + stanze).
 
-Fase corrente: **4 — Sinergie**. PRD in `006_PRD/prd-fase-4-sinergie.md`
-(16 story US-401..416: motore SynergyEngine, i 6 tipi di effetto,
-priorità/conflitti, anti-sinergie, registro col fog of war, ~30-40 sinergie
-di contenuto). `prd.json` è già convertito. Criterio di uscita: una sinergia
-pet+stanza+talento si attiva senza codice dedicato. Save: 19 → 20.
+Fase 4 — Sinergie: **CHIUSA** (16 story US-401..416, 535 test). PRD in
+`006_PRD/prd-fase-4-sinergie.md`. 3 blocchi: A il motore (`SynergyEngine`
+autoload, i 6 tipi di effetto, priorità/conflitti, anti-sinergie con
+`neutralizza`, save 19 → 20), B il registro nel libro (sezione della pagina
+inventario col fog of war, reattiva dal vivo), C il contenuto (44 sinergie
+di cui 26 raggiungibili; `batch_3.json` punta ai gruppi differiti;
+`sinergia_colpo_del_caso` scritta). Criterio di uscita verificato in
+`tests/test_slice_fase_4.gd`: `sinergia_dottrina_del_guardiano` si attiva solo
+combinando pet + stanza + talento, con zero codice dedicato. Nessuna primitiva
+nuova. `synergy.schema.json` esteso (`priorita`, `effetto` oneOf, `neutralizza`).
+
+Fase corrente: **5 — Espansione contenuti**. Roadmap in `006_PRD/roadmap.md`;
+il PRD dettagliato si genera con `/prd`. Questo è il **punto di controllo**
+del progetto (vedi sotto).
 
 Le fasi 5-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
 genera con `/prd` **solo quando la precedente è chiusa**.
