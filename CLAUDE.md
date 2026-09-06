@@ -114,8 +114,11 @@ nuovi: `item_categories`, `equip_slots`, `room_types`, `tracked_talents`
 `experiment_outcomes`. Nessuna primitiva nuova. Fonti di tag per la fase 4:
 `SynergySources.tag_sinergia_globali()` (inventario + pet + talenti + stanze).
 
-Fase corrente: **4 — Sinergie** (da aprire). Scaletta in `006_PRD/roadmap.md`.
-PRD dettagliato da generare con `/prd`.
+Fase corrente: **4 — Sinergie**. PRD in `006_PRD/prd-fase-4-sinergie.md`
+(16 story US-401..416: motore SynergyEngine, i 6 tipi di effetto,
+priorità/conflitti, anti-sinergie, registro col fog of war, ~30-40 sinergie
+di contenuto). `prd.json` è già convertito. Criterio di uscita: una sinergia
+pet+stanza+talento si attiva senza codice dedicato. Save: 19 → 20.
 
 Le fasi 5-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
 genera con `/prd` **solo quando la precedente è chiusa**.

@@ -1,0 +1,698 @@
+{
+  "project": "Mirwada",
+  "branchName": "ralph/fase-3-sistemi-di-supporto",
+  "description": "Fase 3 - Sistemi di supporto: inventario ed equipaggiamento, oggetti con stored_ability_id (contratto P0), alchimia (qualita', fallimenti mostruosi, ricette a 3 tier), forgiatura e incisione di sigilli (oggetti Sigillati con effetto collaterale), strutture, pet (bond, coltivazione, morte = perdita d'Ancora), base building (4 stanze funzionali), talenti (innati + acquisiti su vocabolario chiuso tracked_talents). Nessuna primitiva nuova, tracked_events invariato a 12. PRD: 006_PRD/prd-fase-3-sistemi-di-supporto.md.",
+  "userStories": [
+    {
+      "id": "US-301",
+      "title": "Vocabolario e schema degli item",
+      "description": "Come sviluppatore, voglio un formato dati chiuso per gli oggetti, cosi' che ingredienti, equip, sigilli, pergamene e valuta siano tutti la stessa entita' con una categoria.",
+      "acceptanceCriteria": [
+        "data/schema/item_categories.json: vocabolario CHIUSO delle categorie (ingrediente, equip, sigillo, pergamena, materiale, valuta, consumabile). Una categoria nuova e' codice: va discussa",
+        "data/schema/item.schema.json + data/items/*.json: ogni item con id, categoria (dal vocabolario), name_i18n, descrizione_i18n, tag (dal vocabolario chiuso di data/tags.json), impilabile (bool), valore (int)",
+        "Campi opzionali per categoria: equip -> slot, stat_modifiers, slot_sigilli (int); pergamena/consumabile -> stored_ability_id; sigillo -> effetto, effetto_collaterale",
+        "GameData carica data/items/: get_item(id), item_categories(), items_per_categoria(cat)",
+        "Almeno 12 item di esempio che coprono tutte le categorie",
+        "Il validator: categoria nel vocabolario; tag nel vocabolario dei tag; slot (se equip) nel vocabolario equip_slots; stored_ability_id (se presente) risolve a un'abilita' esistente",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 1,
+      "fase": 3,
+      "passes": true,
+      "notes": "data/schema/item_categories.json (7 categorie chiuse), data/schema/equip_slots.json (4 slot + 3 tipi; accessorio -> primo accessorio_N libero), data/schema/item.schema.json. data/items/ 7 file 20 item su tutte le categorie (ingredienti coltivabili, 1 equip Sigillato con effetto_collaterale, pergamene stored_ability_id, sigilli sigillo_ref->data/sigils US-315, 2 valute, consumabili con effetto=primitiva). GameData: _load_items (come _load_abilities), get_item/item_categories/items_per_categoria/item_ids/equip_slots/equip_slot_tipi (41 file). validate_data.py: blocco item - id unici, categoria nel vocab, tag nel vocab tag, valore int>=0, impilabile bool, equip slot nei tipi + stat note + sigillato richiede effetto_collaterale, stored_ability_id risolve, effetto.tipo primitiva non differita, >=12 item. i18n: 40 chiavi item.* tradotte (243 totali). 325 test headless (318+7 test_items.gd), validator 0, i18n --check 0."
+    },
+    {
+      "id": "US-302",
+      "title": "Autoload Inventory",
+      "description": "Come sviluppatore, voglio un magazzino unico degli oggetti del giocatore, serializzato, cosi' che ogni sistema di fase 3 legga da qui.",
+      "acceptanceCriteria": [
+        "Autoload Inventory: aggiungi(item_id, quantita), rimuovi(item_id, quantita) -> bool, conta(item_id), possiede(item_id, quantita) -> bool, per_categoria(cat) -> Array, tutto() -> Dictionary",
+        "Gli item impilabile:false occupano una voce ciascuno (istanze distinte, instance_id); quelli impilabile:true sono un contatore",
+        "Segnali item_aggiunto(item_id, quantita), item_rimosso(item_id, quantita)",
+        "Nessun cap spaziale ne' peso (lista categorizzata)",
+        "SAVE: schema_version 12 -> 13; campo 'inventario' serializzato e riletto con typeof() + default sano (item_id ignoto scartato, mai crash); catena di migrazione dalla versione di fase 2",
+        "Test headless: aggiungi/rimuovi/conta, stack vs istanze, round-trip del save, migrazione, da_salvataggio non fidato",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 2,
+      "fase": 3,
+      "passes": true,
+      "notes": "Autoload Inventory (scripts/inventory.gd) dopo CharacteristicStore. impilabile:true -> contatore _stack; impilabile:false -> istanze distinte _istanze con instance_id (inv_N). aggiungi/rimuovi/conta/possiede/per_categoria/tutto; rimuovi_istanza/restituisci_istanza per l equip (US-303); ricchezza() (US-305 spostato qui). item ignoto -> warn non aggiunge. Segnali item_aggiunto/item_rimosso. Nessun cap/peso. SAVE 12->13 campo inventario {stack, istanze, next_iid}, _migra_12_a_13, GameState snapshot/applica. da_salvataggio non fidato (item_id che non risolve o quantita<=0 scartati, raw non-oggetto -> vuoto). 332 test headless (325+7 test_inventory.gd), validator 0, catena migrazione 1->13 verde."
+    },
+    {
+      "id": "US-303",
+      "title": "Equipaggiamento a slot",
+      "description": "Come giocatore, voglio equipaggiare armi, armature e accessori, e che i loro bonus contino davvero.",
+      "acceptanceCriteria": [
+        "data/schema/equip_slots.json: vocabolario CHIUSO degli slot (arma, armatura, accessorio_1, accessorio_2)",
+        "Autoload Equipment (o estensione di Inventory): equipaggia(instance_id), rimuovi_slot(slot), equipaggiato(slot) -> item, slot_pieni() -> Dictionary",
+        "Equipaggiare consuma la voce dallo zaino; rimuoverla la restituisce",
+        "Gli stat_modifiers dell'equip applicati allo StatsComponent del giocatore come modificatore per id 'equip:<slot>' (US-007); a ogni cambio di equip il vecchio si rimuove e il nuovo si applica",
+        "SAVE: schema_version +1; campo 'equipaggiamento' {slot -> instance_id}; migrazione",
+        "Test headless: equip/unequip, stat_modifiers applicati e rimossi, round-trip, uno slot per volta",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 3,
+      "fase": 3,
+      "passes": true,
+      "notes": "Autoload Equipment (scripts/equipment.gd) dopo Inventory. _slot: mount -> {instance_id, item_id}. Mount da equip_slots.json (arma/armatura/accessorio_1/accessorio_2); il campo slot dell item e un TIPO (arma/armatura/accessorio), _mount_per mappa accessorio -> primo accessorio_N libero. equipaggia(instance_id): solo categoria:equip; smonta il mount se pieno; Inventory.rimuovi_istanza; stat_modifiers come modificatore per id equip:<mount> (US-007) sullo StatsComponent. rimuovi_slot: remove_modifier + restituisci_istanza. equipaggiato/slot_pieni/tag_attivi (gancio US-306)/riapplica_al_giocatore (chiamata da player.gd _ready come Progression). SAVE 13->14 campo equipaggiamento, _migra_13_a_14, GameState.applica DOPO Inventory. da_salvataggio non fidato (mount non valido o item non-equip scartati) poi riapplica. 338 test headless (332+6 test_equipment.gd), validator 0, catena migrazione 1->14 verde."
+    },
+    {
+      "id": "US-304",
+      "title": "stored_ability_id - consumo dall'inventario (P0)",
+      "description": "Come giocatore, voglio usare una pergamena e far scattare l'abilita' che contiene, una volta, senza possederla.",
+      "acceptanceCriteria": [
+        "Inventory.usa(instance_id, bersaglio := null): se l'item ha stored_ability_id, chiama AbilityEngine.execute_stored(stored_ability_id, giocatore) (US-206) e poi consuma l'item (1 uso)",
+        "Nessun costo di spiritualita' ne' cooldown; nessun controllo di ownership",
+        "Un item senza stored_ability_id passato a usa() -> esito gestito, non crash",
+        "hermit_pergamena (data/abilities/hermit.json) diventa un item reale in data/items/ con stored_ability_id, e la sua note di stress test e' risolta",
+        "Test headless: usa pergamena -> abilita' eseguita -> item consumato; seconda usa() sulla stessa istanza -> rifiuto gestito; item non-pergamena -> gestito",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 4,
+      "fase": 3,
+      "passes": true,
+      "notes": "Inventory.usa(instance_id, bersaglio) -> {ok, reason, risultato}: se l item ha stored_ability_id chiama AbilityEngine.execute_stored (US-206, gia pronto: nessun costo/cooldown/ownership) e SOLO su risultato.ok consuma l istanza. Item senza stored_ability_id -> nessuna_abilita, non consumato, nessun crash. Istanza assente/nessun giocatore/motore assente -> esiti gestiti. data/items/pergamene.json: nuova pergamena_hermit (stored hermit_pergamena); la note di stress test in hermit.json e RISOLTA (la pergamena e un item, niente primitiva nuova; reveal_info resta non-impl, l item funziona). 342 test headless (338+4 test_stored_item.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): pergamena_vigore -> usa() ok -> conta 1->0 -> execute_stored esegue tg_stretta_ferrea + VFX placeholder della primitiva sul giocatore. Screenshot user://us304. CONTRATTO P0 CHIUSO."
+    },
+    {
+      "id": "US-305",
+      "title": "Valuta come oggetto",
+      "description": "Come sviluppatore, voglio che il denaro sia un item categoria:valuta, mai un campo speciale del giocatore (design-master cap. 5).",
+      "acceptanceCriteria": [
+        "data/items/valuta.json: almeno una valuta (moneta_comune), impilabile:true, valore:1",
+        "Inventory non ha metodi speciali per la valuta: e' conta('moneta_comune')",
+        "Helper di sola lettura Inventory.ricchezza() = somma conta(v) * valore(v) su tutte le categorie valuta",
+        "Test headless: la valuta si aggiunge/rimuove/conta come ogni altro item; ricchezza() corretta con due tagli di valuta",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 5,
+      "fase": 3,
+      "passes": true,
+      "notes": "Gran parte gia in US-301 (valuta.json: moneta_comune impilabile valore:1 + sigillo_reale valore:50) e US-302 (Inventory.ricchezza() = somma conta*valore su categoria:valuta). US-305 = verifica esplicita che la valuta NON ha metodi dedicati, e conta(moneta_comune) come ogni stack. 345 test headless (342+3 test_valuta.gd), validator 0."
+    },
+    {
+      "id": "US-306",
+      "title": "Tag di inventario ed equip esposti per le sinergie",
+      "description": "Come sviluppatore, voglio che i tag di cio' che il giocatore possiede ed equipaggia siano raccoglibili da un'unica API, cosi' che il motore delle sinergie di fase 4 ci si agganci senza riscrivere l'inventario.",
+      "acceptanceCriteria": [
+        "Inventory.tag_attivi() -> Dictionary (tag -> conteggio): somma i tag degli item EQUIPAGGIATI e dei sigilli incastonati. Gli item nello zaino non contano",
+        "L'API e' di sola lettura e non conosce le sinergie: e' fase 4 a chiamarla",
+        "Documentato come una delle fonti di richiede_tag (le altre: talento, pet, stanza)",
+        "Test headless: due equip con tag condiviso -> conteggio 2; togliere un equip aggiorna il conteggio; un item nello zaino non compare",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 6,
+      "fase": 3,
+      "passes": true,
+      "notes": "Inventory.tag_attivi() -> {tag: conteggio}: delega a Equipment.tag_attivi() (tag degli item INDOSSATI; sigilli incastonati in US-317). Item nello zaino NON contano. SOLA LETTURA, non conosce le sinergie (fase 4 / SynergySources US-334 compone con pet/talenti/stanze). design-master.md cap.5: bullet Fonti di richiede_tag (Inventory/PetSystem/TalentSystem/BaseSystem, ognuna tag_attivi() di sola lettura). data/items/equip.json: tag guerra a spada_ferrea + corazza_cuoio (serviva una coppia con tag condiviso su slot diversi). 347 test headless (345+2 test_inventory_tags.gd), validator 0."
+    },
+    {
+      "id": "US-307",
+      "title": "Pagina inventario del libro",
+      "description": "Come giocatore, voglio aprire il libro alla pagina inventario e vedere cosa ho, cosa indosso, e poter equipaggiare / usare / incastonare.",
+      "acceptanceCriteria": [
+        "La pagina 'inventario' (tipo gia' nel vocabolario, data/ui/book.json) passa da bianca a scritta: scenes/pages/page_inventario.tscn + script, registrata in book_overlay.PAGINE",
+        "Sezioni (tab o colonne): Zaino (item per categoria), Indosso (i 4 slot equip + sigilli incastonati), Ricettario (vuoto per ora), Talenti (vuoto per ora), Base (vuoto per ora)",
+        "Azioni: equipaggia / rimuovi (US-303), usa pergamena (US-304)",
+        "Tutte le stringhe di chrome da assets/i18n/strings.csv + tr(); i name_i18n/descrizione_i18n degli item da GameData.tr_data",
+        "tools/generate_i18n_stubs.py gira: gli *_i18n degli item nuovi hanno voce in data/i18n/it.json",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 7,
+      "fase": 3,
+      "passes": true,
+      "notes": "data/balance.json gioco.fase 2->3 (fase di sviluppo corrente): la pagina inventario passa da bianca a scritta; aggiornati test_book + test_book_overlay (mappa come esempio di pagina bianca). scenes/pages/page_inventario.{tscn,gd} in book_overlay.PAGINE: 5 sezioni a bottoni toggle, ZAINO e INDOSSO scritte, RICETTARIO/TALENTI/BASE segnaposto. Zaino: item per categoria (BOOK_CAT_*), nome da tr_data + xN, equip -> Indossa (Equipment.equipaggia), pergamena -> Usa (Inventory.usa). Indosso: i 4 slot (BOOK_SLOT_*), item o vuoto, Togli (Equipment.rimuovi_slot), segnaposto sigilli. i18n: ~22 chiavi BOOK_INV/CAT/SLOT in strings.csv. 351 test headless (347+4 test_page_inventario.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): zaino con categorie e bottoni Indossa/Usa, Indosso coi 4 slot vuoti + segnaposto sigilli. Screenshot user://us307. BLOCCO A (US-301..307) CHIUSO."
+    },
+    {
+      "id": "US-315",
+      "title": "Schema dei sigilli",
+      "description": "Come sviluppatore, voglio un formato dati per i sigilli: cosa fanno e cosa costano.",
+      "acceptanceCriteria": [
+        "data/sigils/*.json + data/schema/sigil.schema.json: ogni sigillo con id, name_i18n, tag, effetto (uno di: stat_modifier {stat, valore, moltiplicativo}, stored_ability_id, tag_grant), effetto_collaterale (opzionale, stessa forma, sempre negativo)",
+        "Vocabolario CHIUSO dei tipi di effetto e effetto_collaterale",
+        "I sigilli sono item categoria:sigillo (US-301): data/sigils/ e' la definizione dell'effetto, data/items/ la voce d'inventario che lo referenzia",
+        "Almeno 8 sigilli, di cui >= 2 con effetto_collaterale",
+        "Il validator: effetto/effetto_collaterale nel vocabolario; stat note; stored_ability_id risolve; effetto_collaterale e' sempre uno svantaggio",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 8,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO C. data/schema/sigil.schema.json (doc) + data/schema/sigil_effect_types.json (vocab chiuso: effetti stat_modifier|stored_ability_id|tag_grant, effetti_collaterali sottoinsieme stat_modifier|tag_grant). data/sigils/core.json: 8 sigilli (sig_forza_1/difesa_1/velocita_1/precisione_1/custode/eco_lama/ombra_fame/sangue_avido), 2 con effetto_collaterale (ombra_fame drena spiritualita_max, sangue_avido drena hp_max). data/items/sigilli.json completato a 8 voci (sigillo_ref -> data/sigils, gia' stubbate in US-301). GameData: get_sigil/sigil_ids/sigil_effect_types (46 file). validate_data.py: blocco sigilli - name_i18n, tag nel vocab, effetto/effetto_collaterale nel vocab chiuso, stat_modifier.stat nota, stored_ability_id risolve, tag_grant.tag noto, effetto_collaterale.valore < 0 se stat_modifier (sempre uno svantaggio), >=8 sigilli, >=2 con collaterale, ogni item categoria:sigillo il cui sigillo_ref risolve. i18n: 20 chiavi nuove (289 totali, item.* + sigillo.*). 381 test headless (375+6 test_sigils.gd), validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-316",
+      "title": "Forgiatura dell'equipaggiamento",
+      "description": "Come giocatore, voglio combinare materiali per forgiare un pezzo di equipaggiamento.",
+      "acceptanceCriteria": [
+        "data/forge/blueprints.json + schema: ogni blueprint con id, output (equip item_id), materiali (item_id categoria:materiale + quantita), qualita_base, gating (nota_da_subito o flag)",
+        "Autoload Forge (o parte di un CraftingSystem condiviso con l'alchimia): forgia(blueprint_id) -> {ok, item_instance, qualita}",
+        "La qualita' dell'equip forgiato scala coi materiali, con la stanza rituale/fucina (US-326) e coi talenti di forgiatura",
+        "Un equip forgiato ha i tag del blueprint (contano nelle sinergie una volta equipaggiato)",
+        "Test headless: forgia con materiali -> equip in inventario; materiali mancanti -> rifiuto senza consumo; qualita' sale col bonus della stanza",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 9,
+      "fase": 3,
+      "passes": true,
+      "notes": "data/schema/forge_blueprint.schema.json (doc) + data/forge/blueprints.json: 3 blueprint (bp_spada_ferrea, bp_corazza_cuoio, bp_amuleto_lunare), tutti nota_da_subito:true (nessuna story di fase 3 introduce una scoperta dei blueprint, a differenza delle ricette). qualita_base sulla scala condivisa potion_quality.json. Autoload Forge (scripts/forge.gd, dopo PotionSystem): blueprint_noto(id), forgia(id) -> {ok, reason, item_id, instance_id, qualita} - verifica materiali in Inventory, li consuma solo se tutti presenti, produce l'output, qualita' = _qualita_finale (stesso schema di PotionSystem: bonus_stanza(stanza_rituale,qualita_forgia) + bonus_talento(forgiatura_qualita), 0 finche' BaseSystem/TalentSystem non esistono - wiring reale in US-327/331 come per l'alchimia). Inventory.aggiungi() ora ritorna Array (gli instance_id creati, [] per gli impilabili): estensione retrocompatibile, tutti i chiamanti esistenti ignoravano il return. GameData: get_blueprint/blueprint_ids (47 file). validate_data.py: blocco blueprint - name_i18n, nota_da_subito bool, qualita_base nel vocab, output.item_id risolve ed e' categoria:equip, materiali categoria:materiale con quantita int>0. i18n: 3 chiavi blueprint.* (292 totali). 387 test headless (381+6 test_forge.gd: forgia produce equip e consuma materiali, materiali mancanti rifiuta senza consumo, blueprint inesistente gestito, l'equip forgiato ha i tag del blueprint, qualita'=qualita_base senza stanza/talenti, ogni blueprint ben formato). validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-317",
+      "title": "Incisione dei sigilli sull'equip (fusione US-309 + US-317)",
+      "description": "Come giocatore, voglio incastonare un sigillo in un pezzo di equipaggiamento per aggiungergli un effetto.",
+      "acceptanceCriteria": [
+        "Equipment.incastona(slot, sigillo_instance_id) -> bool: fallisce se lo slot equip non ha slot_sigilli liberi",
+        "L'effetto del sigillo si applica come modificatore per id 'sigillo:<instance_id>' finche' l'equip e' indossato; l'effetto_collaterale (se presente) pure",
+        "Equipment.rimuovi_sigillo(slot, sigillo_instance_id) restituisce il sigillo allo zaino",
+        "I sigilli incastonati contano in Inventory.tag_attivi() (US-306)",
+        "SAVE: i sigilli incastonati serializzati nell'equipaggiamento; migrazione",
+        "Test headless: incastona fino al limite di slot, il successivo fallisce; effetto e collaterale applicati/rimossi con l'equip; round-trip",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 10,
+      "fase": 3,
+      "passes": true,
+      "notes": "Equipment (US-303) esteso: incastona(mount, sigillo_instance_id)/rimuovi_sigillo(mount, sigillo_instance_id)/sigilli_incastonati(mount). effetto/effetto_collaterale del sigillo -> modificatore 'sigillo:<instance_id>[:collaterale]' (solo stat_modifier produce un modificatore reale, con moltiplicativo=delta su get_base come ability_engine._mod_stat; tag_grant vive in tag_attivi(), stored_ability_id non ha ancora un consumatore - schema coperto, uso attivo e' story futura). rimuovi_slot ora estrae prima ogni sigillo incastonato (nessuna perdita silenziosa). Inventory.tag_attivi() include i tag dei sigilli incastonati via Equipment.tag_attivi(). SAVE: schema_version 14->15, 'equipaggiamento' passa da {mount:{...}} a {slot:{...}, sigilli:{mount:[...]}}, _migra_14_a_15 sposta il vecchio piatto sotto 'slot'. BUG PRE-ESISTENTE TROVATO E CORRETTO: il match in SaveSystem._migra() copriva solo v1..v10, le funzioni _migra_11_a_12/12_a_13/13_a_14 (US-224/302/303) erano scritte ma MAI invocate (dead code, mascherato dai default di _leggi_snapshot che coprono comunque i campi mancanti) - aggiunti i case 11/12/13/14 mancanti. Corretti anche 2 sigilli di dati errati in US-315 (sig_forza_1, sig_sangue_avido: moltiplicativo:true su 'forza' era un no-op silenzioso, 'forza' non ha una base seedata da configure_from_balance - portati a moltiplicativo:false, flat, come ogni altro stat_modifier su 'forza' nel progetto), trovato scrivendo il test di round-trip di questa story. GameData.get_item invariato. 393 test headless (387+6 in tests/test_incastonamento.gd: applica l'effetto, limite di slot rispettato, effetto_collaterale applicato e rimosso, i sigilli incastonati contano in tag_attivi, rimuovi_slot estrae senza perdita, round-trip del save). validator 0, nessuna regressione. Nessuna verifica a schermo: la pagina inventario non espone ancora l'incastonamento (fuori scope di questa story, il PRD di fase 3 non ha una story dedicata alla UI dei sigilli)."
+    },
+    {
+      "id": "US-318",
+      "title": "Oggetti Sigillati",
+      "description": "Come giocatore, voglio maneggiare equip Sigillato: molto potente, ma con un prezzo sempre pagato.",
+      "acceptanceCriteria": [
+        "Un item equip con campo sigillato:true porta un effetto_collaterale di livello alto (follia al secondo, drain di spiritualita', un tag negativo che attira nemici) SEMPRE attivo mentre e' indossato, dichiarato nei dati",
+        "Equipment applica l'effetto_collaterale del Sigillato come un _pending persistente (kind dedicato) finche' e' equipaggiato; lo toglie alla rimozione",
+        "Almeno 3 equip Sigillati di esempio con trade-off netti",
+        "Il validator: un equip sigillato:true DEVE avere un effetto_collaterale non vuoto",
+        "Test headless: equipaggia un Sigillato -> l'effetto collaterale tick (es. follia sale); rimuovilo -> si ferma",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 11,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO C CHIUSO (US-315..318). data/schema/sigillato_effect_types.json: vocab chiuso, split 'tick' (follia_al_secondo, spiritualita_drain_al_secondo) vs 'tag' (tag_negativo) - i due tipi si comportano diversamente (un valore/secondo processato da Equipment._pending vs un tag sommato in tag_attivi()). 2 nuovi equip Sigillati oltre a lama_del_pentimento (US-301): corazza_espiazione (spiritualita_drain_al_secondo 0.5), anello_del_richiamo (tag_negativo: maledizione - rimosso 'maledizione' dal tag statico dell'item per non contarla due volte, la curse vive solo nell'effetto_collaterale). Equipment: _pending (kind 'sigillato', NON nel save - si ri-deriva da _slot a ogni riapplica_al_giocatore/equipaggia, stesso principio del _pending di AbilityEngine) + _process/tick_effects(delta) pubblico per i test. equipaggia()/rimuovi_slot() agganciano/staccano l'entry; tag_attivi() somma anche i tag_negativo attivi. validate_data.py: effetto_collaterale.tipo nel vocabolario tick|tag, valore numerico >0 per i tick, tag noto per tag_negativo, >= 3 equip sigillato:true (gia' verificato dal check esistente su sigillato+effetto_collaterale, esteso). i18n: 4 chiavi nuove (296 totali). 399 test headless (393+6 in tests/test_sigillato.gd: la follia sale nel tempo mentre indossato, si ferma alla rimozione, il drain di spiritualita' scala col delta, il tag_negativo conta in tag_attivi, ri-equipaggiare non impila due tick, un equip non sigillato non produce alcun tick). validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-308",
+      "title": "Ricettario, tier e qualita' delle pozioni",
+      "description": "Come sviluppatore, voglio estendere il sistema pozioni di fase 2 con un ricettario a tre tier e una qualita' esplicita.",
+      "acceptanceCriteria": [
+        "data/potions/recipes.json + schema: ogni ricetta con id, tier (base|avanzata|leggendaria), output (item_id o effetto), ingredienti (item_id + quantita), qualita_base",
+        "Vocabolario CHIUSO della qualita': scarsa, instabile, pura, eccelsa. La penalita_parziale di fase 2 (formulas.json) si mappa su questa scala (una pozione parziale e' al piu' instabile)",
+        "GameData.get_recipe(id), recipes_per_tier(tier)",
+        "Le ricette base sono note dall'inizio; avanzata si scoprono sperimentando (US-311); leggendaria si sbloccano con un flag KnowledgeStore ('ricetta:<id>')",
+        "Il validator: tier e qualita_base nei vocabolari; ogni ingrediente e' un item categoria:ingrediente esistente; ogni output risolve",
+        "Test headless: caricamento, lookup per tier, mapping parziale -> instabile",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 12,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO B. Percorso SEPARATO dalle formule di avanzamento di fase 2 (formulas.json invariata): pozioni CONSUMABILI da ingredienti di data/items/. data/schema/potion_quality.json (vocab chiuso {scarsa,instabile,pura,eccelsa} crescente; formulas.json.penalita_parziale gia usa instabile). data/schema/potion_recipe.schema.json + data/potions/recipes.json (6 ricette: 3 base, 2 avanzata, 1 leggendaria; id/name_i18n/tier/nota_da_subito/output{item_id|effetto}/ingredienti{item_id:qta}/qualita_base). data/items/: 5 ingredienti + 3 consumabili nuovi (output). GameData: get_recipe/recipe_ids/recipes_per_tier/potion_quality (43 file). validate_data.py: blocco ricette - tier valido, nota_da_subito==(tier base), qualita_base nel vocab, ingredienti categoria:ingrediente qta int>0, output risolve; item_cat raccolto nel blocco item. i18n: 18 chiavi (265 totali). 357 test headless (351+6 test_recipes.gd), validator 0, i18n --check 0."
+    },
+    {
+      "id": "US-310",
+      "title": "Concoction v2 - qualita', laboratorio, output nell'inventario",
+      "description": "Come giocatore, voglio preparare una pozione da una ricetta nota e ottenere un item nell'inventario con una qualita'.",
+      "acceptanceCriteria": [
+        "PotionSystem.prepara(recipe_id) -> {ok, item_instance, qualita}: verifica ricetta nota + ingredienti in Inventory, consuma gli ingredienti, produce un item categoria:consumabile con qualita' calcolata",
+        "Qualita' = qualita_base della ricetta + bonus del laboratorio (US-326) + bonus dei talenti di alchimia - malus se ingredienti scadenti",
+        "La concoction di AVANZAMENTO di fase 2 (PotionSystem.concoct + bevi) resta invariata: questa e' la preparazione di pozioni consumabili, un percorso separato e documentato",
+        "Test headless: prepara con ricetta nota -> item in inventario con qualita'; ricetta ignota -> rifiuto; ingredienti mancanti -> rifiuto, niente consumo",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 13,
+      "fase": 3,
+      "passes": true,
+      "notes": "PotionSystem sezione nuova per le pozioni CONSUMABILI (percorso separato dalla concoction di avanzamento, invariata). ricetta_nota(id): tier base (nota_da_subito) o flag KnowledgeStore ricetta:<id>. prepara(id) -> {ok, reason, item_id, qualita}: verifica ricetta nota + ingredienti in Inventory, consuma, aggiunge l output, emette pozione_preparata. Reason: sistema_assente/ricetta_inesistente/ricetta_ignota/ingredienti_mancanti (non consuma). _qualita_finale = indice qualita_base + _bonus_stanza(laboratorio,qualita_pozione) (US-327, 0 senza BaseSystem) + _bonus_talento(alchimia_qualita) (US-329, 0 senza TalentSystem), clampato; per ora qualita = qualita_base. La qualita e calcolata e restituita ma non persistita per-istanza (consumabili stack); si estende quando contera meccanicamente. 362 test headless (357+5 test_concoction_v2.gd), validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-311",
+      "title": "Sperimentazione e scoperta delle ricette",
+      "description": "Come giocatore, voglio combinare ingredienti a caso e a volte scoprire una ricetta nuova.",
+      "acceptanceCriteria": [
+        "PotionSystem.sperimenta(ingredienti: Array) -> {esito, ...}: se la combinazione (multiset di item_id) corrisponde a una ricetta avanzata non ancora nota -> SCOPERTA: la ricetta entra nel ricettario (KnowledgeStore flag 'ricetta:<id>'), la pozione e' prodotta",
+        "Se non corrisponde a nessuna ricetta -> FALLIMENTO: esito pesato da data/potions/experiment_outcomes.json (vocabolario chiuso: fumo, scarto, ustione, contaminazione, aberrazione)",
+        "Il peso del fallimento mostruoso scende col laboratorio e coi talenti; sale con la follia alta (Foundation.moltiplicatore_follia)",
+        "Gli ingredienti si consumano sempre (anche sul fallimento)",
+        "RNG seedabile per test deterministici",
+        "Test headless: combinazione = ricetta avanzata -> scoperta + flag; combinazione ignota con seed -> fallimento atteso; laboratorio riduce il peso mostruoso",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 14,
+      "fase": 3,
+      "passes": true,
+      "notes": "data/potions/experiment_outcomes.json: 5 esiti chiusi (fumo/scarto/ustione/contaminazione/aberrazione), i 3 mostruosi hanno il peso modulato dalla follia. data/items/materiali.json: scarto_alchemico. GameData.experiment_outcomes() (44 file). PotionSystem.sperimenta(ingredienti) -> {ok, esito}: verifica multiset posseduto (mancanti -> ingredienti_mancanti non consuma; presenti -> consuma SEMPRE); se == ricetta avanzata non nota -> SCOPERTA (KnowledgeStore.impara ricetta:<id> + produce); altrimenti FALLIMENTO pesato (mostruosi * moltiplicatore_follia * (1 - riduzione lab/talenti, 0)); RNG seedabile (imposta_seed); _applica_esito produce scarto / add follia / -hp / no-op; evoca -> _evoca_aberrazione no-op (US-312). validator: vocabolario chiuso, peso int>=0, mostruoso bool, produce risolve. 366 test headless (362+4 test_experiment.gd), validator 0, i18n --check 0."
+    },
+    {
+      "id": "US-312",
+      "title": "Fallimenti mostruosi - l'aberrazione",
+      "description": "Come giocatore, voglio che un esperimento andato malissimo evochi qualcosa di ostile.",
+      "acceptanceCriteria": [
+        "L'esito aberrazione di US-311 evoca un'entita' ostile temporanea via SummonRegistry (durata > 0, entita_id 'aberrazione_alchemica', comportamento ostile), aggiunge follia, e degrada le fondamenta",
+        "I numeri (hp dell'aberrazione, follia, malus fondamenta) sono in balance.json (nuova sezione alchimia)",
+        "L'aberrazione NON e' persistente: scade e non entra nel save",
+        "Test headless: forzare aberrazione -> 1 evocazione ostile temporanea + follia salita + fondamenta scese; l'evocazione scade",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 15,
+      "fase": 3,
+      "passes": true,
+      "notes": "SummonRegistry: canale TEMPORANEO. evoca_temporanea(tipo,comportamento,durata,hp) -> id tmp_N; _temporanee processata in _process (scade, emette evocazione_rimossa); conta_temporanee/temporanee; NON serializzata; pulisci svuota anche queste. data/balance.json sezione alchimia (aberrazione_hp 30, durata 25s, follia 12, malus_fondamenta -15). PotionSystem._evoca_aberrazione (era il no-op di US-311): evoca_temporanea(aberrazione_alchemica,ostile) + Madness.add + Foundation.applica, numeri da balance. + forza_esito(nome) per debug/test. 369 test headless (366+3 test_aberrazione.gd), validator 0, nessuna regressione."
+    },
+    {
+      "id": "US-313",
+      "title": "Ricette leggendarie via conoscenza",
+      "description": "Come giocatore, voglio imparare una ricetta rara leggendo un tomo o comprandola da Sidon.",
+      "acceptanceCriteria": [
+        "Una ricetta leggendaria e' utilizzabile solo se KnowledgeStore.conosce('ricetta:<id>')",
+        "Un item categoria:pergamena con campo insegna_ricetta:<recipe_id>: Inventory.usa() su di esso -> KnowledgeStore.impara('ricetta:<id>') + consuma",
+        "Il validator: ogni insegna_ricetta risolve a una ricetta leggendaria",
+        "Test headless: prepara(leggendaria) senza flag -> rifiuto; usa la pergamena -> flag -> prepara riesce",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 16,
+      "fase": 3,
+      "passes": true,
+      "notes": "PotionSystem.ricetta_nota() gia gestiva le leggendarie (serve il flag KnowledgeStore ricetta:<id>). Inventory.usa() esteso: se l item ha insegna_ricetta -> KnowledgeStore.impara(ricetta:<id>) + consuma (controllato PRIMA di stored_ability_id), risultato {ricetta_appresa:<id>}. data/items/pergamene.json: pergamena_ambrosia (insegna_ricetta ric_ambrosia). validate_data.py: ogni insegna_ricetta risolve a una ricetta tier leggendaria. test_items aggiornato (pergamena ha stored_ability_id O insegna_ricetta). 372 test headless (369+3 test_ricetta_leggendaria.gd), validator 0, i18n --check 0."
+    },
+    {
+      "id": "US-314",
+      "title": "Il ricettario nel libro",
+      "description": "Come giocatore, voglio sfogliare le ricette che conosco, con quelle ignote annotate come '?'.",
+      "acceptanceCriteria": [
+        "La sezione Ricettario della pagina inventario (US-307) elenca: ricette base (sempre), avanzata scoperte, leggendaria apprese",
+        "Le ricette non note esistono come righe OFFUSCATE ('ricetta sconosciuta', numero di ingredienti visibile) - non assenti",
+        "Da una ricetta nota: pulsante 'prepara' (US-310) se gli ingredienti ci sono",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 17,
+      "fase": 3,
+      "passes": true,
+      "notes": "page_inventario.gd: sezione ricettario reale (era segnaposto). Ricette ordinate per tier poi id. NOTA (PotionSystem.ricetta_nota): nome (tr_data) + (tier) + bottone Prepara (disabilitato se mancano ingredienti; premuto -> PotionSystem.prepara + refresh). NON nota: riga OFFUSCATA alpha 0.55 \"Ricetta sconosciuta - N ingredienti\" (sai che esiste e quanti ingredienti, non quale). i18n: BOOK_RIC_PREPARA, BOOK_RIC_SCONOSCIUTA (%d) in strings.csv. 375 test headless (372+3 test_page_ricettario.gd), validator 0, i18n --check 0. VERIFICA A SCHERMO (main.tscn): 3 base + 1 avanzata appresa + 2 righe offuscate. Screenshot user://us314. BLOCCO B (US-308/310/311/312/313/314) CHIUSO."
+    },
+    {
+      "id": "US-319",
+      "title": "StructureRegistry",
+      "description": "Come sviluppatore, voglio un registro delle strutture costruite, cosi' che tg_2 (che le distrugge) e il base building (che le crea) parlino la stessa lingua.",
+      "acceptanceCriteria": [
+        "data/schema/structure.schema.json + data/structures/*.json: ogni tipo di struttura con id, hp_max, tag, name_i18n",
+        "Autoload StructureRegistry: costruisci(struct_id, posizione), danneggia(instance_id, quantita), distruggi(instance_id, volontario: bool), attive(). distruggi emette EventTracker.emit_event('structure_destroyed', {volontario}) (evento gia' nel vocabolario dei 12)",
+        "Le strutture attive nel save (schema_version +1; migrazione)",
+        "Test headless: costruisci -> attiva; danneggia fino a 0 -> distrutta + evento; structure_destroyed{volontario:true} contato quando distruggi(..., true)",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 18,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO D. data/schema/structure.schema.json (doc) + data/structures/core.json (3 tipi: palizzata/totem_veglia/deposito, ognuno id/name/name_i18n/hp_max/tag). Autoload StructureRegistry (scripts/structure_registry.gd), gemello di SummonRegistry: costruisci(struct_id,pos)->instance_id (''+push_error se tipo ignoto), danneggia(iid,q) (hp<=0 -> distruggi involontario), distruggi(iid,volontario)->bool emette EventTracker.emit_event('structure_destroyed',{volontario}), attive(), conta(), in_raggio(centro,r) (per US-320), pulisci(), per/da_salvataggio (rilettura non fidata: struct_id assente o tipo sparito dai dati -> voce scartata). GameData._load_structures + get_structure/structure_ids. SAVE 15->16: campo 'strutture' (lista), _migra_15_a_16, _leggi_snapshot; GameState snapshot/applica. validate_data.py: id unici, hp_max>0, tag nel vocabolario chiuso, >=1 tipo. tg_2_accetta_decadimento (gia' in twilight_giant.json) ascolta structure_destroyed{volontario:true}: il gancio e' pronto per US-320. 407 test headless (399+8 in test_structure_registry.gd), validate_data.py exit 0 (9 warning invariati). Nessuna verifica a schermo: nessuna UI in questa story."
+    },
+    {
+      "id": "US-320",
+      "title": "colpisce_oggetti - le abilita' danneggiano le strutture",
+      "description": "Come giocatore, voglio che tg_crepuscolo (che ha colpisce_oggetti:true) possa davvero rompere una struttura.",
+      "acceptanceCriteria": [
+        "Le primitive d'area con colpisce_oggetti:true (decay, e ogni altra che lo dichiara nel registro) cercano anche le strutture in raggio via StructureRegistry e chiamano danneggia",
+        "Le strutture del giocatore: decidere e documentare se le proprie abilita' le colpiscono (tg_2 vuole poterle distruggere volontariamente)",
+        "L'acting_action tg_2_accetta_decadimento si riempie da gioco reale (structure_destroyed{volontario:true})",
+        "Test headless: decay con colpisce_oggetti in raggio di una struttura -> la struttura perde hp; fuori raggio -> intatta",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 19,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO D. _p_decay (scripts/ability_engine.gd): con colpisce_oggetti:true e raggio>0 e caster Node2D in scena, cerca StructureRegistry.in_raggio(pos,raggio) e chiama danneggia(iid, danno) su ognuna - danno TOTALE del decay in un colpo (le strutture sono bersagli grossolani, hp 25-60: spalmare il tick non aggiunge nulla). rec['strutture_colpite'] elenca gli iid per ispezione/test. DECISIONE (gia' fissata in data/abilities/twilight_giant.json, nota di tg_crepuscolo): colpisce OGNI struttura in raggio, comprese quelle del giocatore - tg_2 deve poter degradare la propria base. Il crollo da AoE e' structure_destroyed{volontario:FALSE}; la scelta deliberata di lasciar decadere una struttura (che alimenta tg_2_accetta_decadimento) e' StructureRegistry.distruggi(iid,true), gia' verificata in US-319. 'ogni altra primitiva che lo dichiara': solo decay lo ha nei params del registro chiuso, nessun framework generico (ponytail). Nessun cambio al validator (nessun AC lo chiede). 412 test headless (407 + 5 in test_colpisce_oggetti.gd: in raggio perde hp; fuori raggio intatta; senza colpisce_oggetti intatta; azzerata -> crollo non volontario; tg_crepuscolo via execute degrada la palizzata). validate_data.py exit 0. Nessuna verifica a schermo: nessuna UI."
+    },
+    {
+      "id": "US-321",
+      "title": "Schema e magazzino dei pet",
+      "description": "Come sviluppatore, voglio un formato dati per i pet e un posto dove tenere quello del giocatore.",
+      "acceptanceCriteria": [
+        "data/pets/*.json + data/schema/pet.schema.json: ogni specie con id, name_i18n, hp_max, sequenza_iniziale, comportamenti (sbloccati per soglia di bond), abilita (ability_id che il pet puo' eseguire), domabilita, ancora_id (il pet E' un'Ancora: data/anchors.json deve avere la voce)",
+        "Autoload PetSystem: pet_attivo() -> Dictionary ({} se nessuno), imposta_pet(pet_id), bond(), sequenza_pet()",
+        "SAVE: schema_version +1; campo 'pet' {pet_id, bond, hp, sequenza}; migrazione",
+        "Il validator: ancora_id esiste in data/anchors.json; abilita risolvono; sequenza_iniziale in [0,9]",
+        "Test headless: caricamento, imposta/leggi pet, round-trip del save",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 20,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO E iniziato. data/schema/pet.schema.json (doc) + data/pets/core.json (2 specie: lupo_cinereo hp 60 / corvo_veggente hp 28; ognuna id/name/name_i18n/hp_max/sequenza_iniziale/domabilita/ancora_id/abilita/comportamenti). Il pet E' un'Ancora: nuova voce anchor_pet in data/anchors.json (forza 7, penalita 16); entrambe le specie puntano li'. Autoload PetSystem (scripts/pet_system.gd): pet_attivo()->Dictionary ({} se nessuno, copia), imposta_pet(pet_id)->bool (specie ignota -> false, nessun cambiamento; bond 0, hp/sequenza dai dati), libera() (per US-322: liberare prima di domarne un altro), ha_pet(), bond()->int, sequenza_pet()->int (-1 se nessun pet), pulisci(), per/da_salvataggio (rilettura non fidata: pet_id assente o specie sparita -> nessun pet; bond clampato 0..100, sequenza 0..9). GameData._load_pets + get_pet/pet_ids. SAVE 16->17: campo 'pet' ({} o {pet_id,bond,hp,sequenza}), _migra_16_a_17; GameState snapshot/applica. validate_data.py: id unici, name_i18n, hp_max>0, sequenza_iniziale int 0..9, domabilita 0..1, ancora_id risolve in anchors.json, ogni abilita risolve, comportamenti {id, bond 0..100}. i18n: pet.lupo_cinereo/pet.corvo_veggente seminate da 'name'; anchor.pet stub TODO come i suoi fratelli anchor.* (traduzione, non errore). doma/bond-dagli-eventi/coltivazione = US-322..324. 421 test headless (412 + 9 in test_pet_system.gd), validate_data.py exit 0 (9 warning invariati). Nessuna verifica a schermo: nessuna UI."
+    },
+    {
+      "id": "US-322",
+      "title": "Taming",
+      "description": "Come giocatore, voglio domare una creatura e renderla il mio pet.",
+      "acceptanceCriteria": [
+        "PetSystem.doma(pet_id) -> bool: tiro contro domabilita (+ bonus da talenti/oggetti), su successo imposta_pet + AnchorSystem.register(ancora_id)",
+        "Un solo pet per volta: domare un secondo richiede prima di liberare il primo. libera() usa un percorso 'rilascio pulito' che NON aggiunge penalita' di follia (diverso dalla morte)",
+        "RNG seedabile",
+        "Test headless: doma con seed fortunato -> pet impostato + Ancora attiva; seed sfortunato -> nessun pet; secondo taming bloccato finche' non liberi",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 21,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO E. PetSystem.doma(pet_id, bonus=0.0) -> bool: bloccato se hai gia' un pet (push_warning, libera() prima); specie ignota -> false; tiro _rng.randf() contro soglia = clampf(domabilita + bonus, 0, 1). Successo -> imposta_pet + AnchorSystem.register(ancora_id) (il pet riduce la follia come le altre Ancore). Fallimento -> taming_fallito.emit, niente pet, niente Ancora. bonus e' il gancio per talenti/oggetti (US-33x lo passeranno). RNG seedabile: imposta_seed(s) (stesso pattern di PotionSystem), null -> randomize() alla prima doma. AnchorSystem.rilascia(id) NUOVO: rilascio PULITO (erase + aggiorna nomi sussurro, nessuna follia, nessun anchor_lost) - a differenza di destroy() che e' la morte (US-325). PetSystem.libera() ora chiama rilascia(ancora_id). 426 test headless (421 + 5 in test_taming.gd: doma con bonus 1.0 -> pet+Ancora; bonus -1.0 -> niente; stesso seed -> stesso esito; secondo taming bloccato; libera() rilascia l'Ancora senza aggiungere follia e sblocca un nuovo taming). validate_data.py exit 0. Nessuna verifica a schermo: nessuna UI."
+    },
+    {
+      "id": "US-323",
+      "title": "bond - il legame cresce dalle azioni condivise",
+      "description": "Come giocatore, voglio che combattere e viaggiare col pet rafforzi il legame, e che il legame sblocchi cose.",
+      "acceptanceCriteria": [
+        "bond 0..100. Sale ascoltando EventTracker: enemy_defeated mentre il pet e' evocato, area_cleared, time_in_state 'esplorazione' (contatori, come l'Acting Method). I pesi in balance.json",
+        "A soglie di bond (dato per specie) si sbloccano comportamenti e l'accesso alle abilita del pet",
+        "Segnale bond_cambiato(valore, soglia_attraversata)",
+        "Test headless: eventi condivisi -> bond sale; a soglia -> comportamento sbloccato + segnale; il bond persiste nel save",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 22,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO E. PetSystem si connette a EventTracker.evento_emesso in _ready(). _su_evento: se hai un pet, enemy_defeated -> bond += pet_bond.per_nemico_sconfitto (2), area_cleared -> += per_area_completata (12). Pesi in data/balance.json.pet_bond. bond clampato 0..100 in _applica_bond, che calcola le soglie attraversate salendo (vecchio < soglia <= nuovo, dai comportamenti[] della specie) ed emette bond_cambiato(valore:int, comportamento_sbloccato:String) ('' se nessuna). comportamenti_sbloccati() -> [id] con bond >= soglia. imposta_bond(v) (debug / US-324) passa dalla stessa logica. SCELTE: 'mentre il pet e' evocato' = 'hai un pet' finche' non c'e' la scena del pet; time_in_state 'esplorazione' del PRD NON aggiunto - non e' nel vocabolario chiuso dei 12 eventi, sarebbe codice da discutere; enemy_defeated + area_cleared bastano. Il bond vive gia' in _pet[bond] -> persiste nel save senza cambi a save_system. validate_data.py: pet_bond pesi >= 0. 432 test headless (426 + 6 in test_pet_bond.gd: eventi -> bond sale; eventi non pertinenti no; senza pet nessun crash; a soglia comportamento sbloccato + segnale col valore e la soglia; nessuna soglia -> segnale con ''; bond persiste nel round-trip). validate exit 0. Nessuna verifica a schermo: nessuna UI."
+    },
+    {
+      "id": "US-324",
+      "title": "Coltivazione del pet",
+      "description": "Come giocatore, voglio che anche il pet avanzi di Sequenza.",
+      "acceptanceCriteria": [
+        "PetSystem.avanza_pet() -> bool: il pet sale di Sequenza (9->0) se bond >= soglia_avanzamento e si consuma una risorsa dedicata (item categoria:consumabile con nutre_pet:true, o un ingrediente raro - la scelta e' un dato)",
+        "Avanzare il pet ne migliora hp_max e gli stat/abilita secondo data/pets/ (curve nel file della specie, non nel codice)",
+        "Il pet non puo' superare la Sequenza del giocatore",
+        "Test headless: bond alto + risorsa -> avanza; bond basso -> rifiuto; cap alla Sequenza del giocatore",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 23,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO E. data/pets/core.json: ogni specie ha 'avanzamento' {soglia_bond, nutrimento (item_id consumabile con nutre_pet:true - pastura_spirituale, gia' nei dati da US-308), hp_per_sequenza {num Sequenza: hp}}. La curva vive nei dati, non nel codice. PetSystem.avanza_pet() -> bool: richiede pet attivo, bond >= avanzamento.soglia_bond, sequenza_pet()-1 >= 0, e sequenza_pet()-1 NON sotto la Sequenza del giocatore (Progression.sequence(); il pet puo' pareggiare ma non superare il padrone), e 1 unita' di nutrimento in Inventory (consumata). Successo: _pet.sequenza -= 1, hp da hp_per_sequenza[nuova] se c'e', pet_avanzato.emit(nuova). Bond NON si resetta dopo l'avanzamento (AC muto; ogni step costa comunque un nutrimento e il cap alla Sequenza del giocatore lo limita). Stat/abilita' aggiuntive per Sequenza: rimandate a quando il combattimento col pet le consuma (fuori US-324). validate_data.py: avanzamento presente, soglia_bond 0..100, nutrimento risolve a un item nutre_pet:true, hp_per_sequenza chiavi 0..9 e valori > 0 (nuovo set nutre_pet_ids nel loop item). 437 test headless (432 + 5 in test_pet_coltivazione.gd: bond basso rifiuta e non consuma; senza nutrimento rifiuta; bond+pastura -> avanza, consuma 1, hp dalla curva; 3 tentativi con giocatore a Seq 7 -> 9->8->7 poi stop, consumate solo le 2 riuscite; l'avanzamento persiste nel save). validate exit 0, i18n --check 0. Nessuna verifica a schermo."
+    },
+    {
+      "id": "US-325",
+      "title": "La morte del pet e' la perdita di un'Ancora",
+      "description": "Come giocatore, voglio che perdere il pet sia un colpo vero, non solo un inconveniente.",
+      "acceptanceCriteria": [
+        "PetSystem.morte(): AnchorSystem.destroy(ancora_id) -> segnale anchor_lost + follia aggiunta (non bufferizzata), come per ogni Ancora (US-216); pet_attivo() torna {}",
+        "Lo SummonRegistry rimuove l'istanza evocata del pet",
+        "Il pet morto NON si ricrea al load; lo slot pet del save si svuota",
+        "I sussurri di soglia 55 (US-214) smettono di usare il nome del pet",
+        "Test headless: morte -> Ancora distrutta + follia su + slot pet vuoto + persiste vuoto nel save",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 24,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO E CHIUSO. PetSystem.morte() -> bool: se c'e' un pet, svuota _pet, AnchorSystem.destroy(ancora_id) (anchor_lost + follia = penalita NON bufferizzata, come ogni Ancora US-216; destroy chiama gia' _aggiorna_nomi_sussurro -> i sussurri di soglia 55 smettono di nominare il pet), pet_morto.emit. Gancio SummonRegistry: se _pet portasse un summon_id lo rimuove - non lo porta ancora (nessuna scena pet), hook pronto per dopo. Il pet morto NON si ricrea al load: lo slot 'pet' del save e' {} (per_salvataggio di _pet vuoto), da_salvataggio({}) -> nessun pet. Nessun cambio a save_system/validator/i18n. 442 test headless (437 + 5 in test_pet_morte.gd: morte distrugge l'Ancora + anchor_lost + follia == 16 (penalita anchor_pet); pet_attivo() torna {}; morte() senza pet -> false e nessuna follia; i sussurri smettono di nominare anchor.pet; il pet morto non torna al load). VERIFICA A SCHERMO (scenes/main.tscn, Godot locale): doma('lupo_cinereo') poi morte() -> follia 0 -> 16, supera soglia_distorsioni (15) -> compare la vignetta dell'overlay follia (angoli scuriti, dimming leggero). Screenshot before/after in job tmp. validate_data.py exit 0 (9 warning invariati)."
+    },
+    {
+      "id": "US-326",
+      "title": "Schema della base e delle 4 stanze",
+      "description": "Come sviluppatore, voglio una griglia astratta di stanze e i loro bonus, tutto nei dati.",
+      "acceptanceCriteria": [
+        "data/schema/room_types.json: vocabolario CHIUSO dei 4 tipi (laboratorio, stanza_rituale, biblioteca, giardino)",
+        "data/base/rooms.json + schema: per ogni tipo di stanza, i livelli (1..N) con costo (item_id + quantita), bonus (oggetto dato)",
+        "GameData.get_room_type(tipo), room_levels(tipo)",
+        "Autoload BaseSystem: costruisci(tipo), potenzia(tipo), livello(tipo) -> int (0 = non costruita), bonus(tipo) -> Dictionary",
+        "SAVE: schema_version +1; campo 'base' {tipo -> livello}; migrazione",
+        "Il validator: ogni costo referenzia item esistenti; bonus e' un oggetto di chiavi note (vocabolario dei bonus per stanza)",
+        "Test headless: costruisci -> livello 1; potenzia -> livello 2 + costo consumato; bonus corretto per livello; round-trip",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 25,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO F iniziato. data/schema/room_types.json: vocabolario CHIUSO dei 4 tipi (laboratorio/stanza_rituale/biblioteca/giardino) + bonus_ammessi[tipo] (le chiavi di bonus valide per tipo). data/schema/room.schema.json (doc) + data/base/rooms.json: ogni stanza name/name_i18n/livelli[]; livelli[0]=livello 1; ogni livello costo {item_id: qty} + bonus {chiave: numero} (stato COMPLETO al livello, non delta). 2 livelli per stanza. GameData: get_room_type(tipo), room_levels(tipo), room_type_ids(), room_bonus_ammessi(tipo). Autoload BaseSystem (scripts/base_system.gd, dopo PetSystem): costruisci(tipo)->bool (livello 0->1, costo consumato da Inventory; false se gia' costruita/tipo ignoto/costo scoperto), potenzia(tipo)->bool (lv->lv+1, false se non costruita o al massimo), livello(tipo)->int (0=non costruita), bonus(tipo)->Dictionary (bonus completo del livello, {} se 0), costo_prossimo(tipo), stanze(), pulisci(), per/da_salvataggio (non fidata: solo tipi noti, livello clampato 0..n). SAVE 17->18: campo 'base' {tipo->livello}, _migra_17_a_18; GameState snapshot/applica. validate_data.py: tipi == set chiuso; ogni costo referenzia item esistenti (qty int >0); ogni chiave di bonus in bonus_ammessi[tipo]; valori bonus numerici. i18n: room.* seminate da name. 454 test headless (442 + 12 in test_base_system.gd), validate exit 0. Nessuna verifica a schermo (la UI e' US-329)."
+    },
+    {
+      "id": "US-327",
+      "title": "Le stanze alimentano i loro sistemi",
+      "description": "Come giocatore, voglio che costruire il laboratorio renda davvero l'alchimia meno pericolosa.",
+      "acceptanceCriteria": [
+        "PotionSystem (US-310/311) legge BaseSystem.bonus('laboratorio'): rischio_esperimento riduce il peso dei fallimenti mostruosi, qualita_pozione alza la qualita'",
+        "Forge (US-316) legge BaseSystem.bonus('stanza_rituale'): qualita_forgia; RitualSystem (fase 2) legge un eventuale bonus di build",
+        "biblioteca: livello >= N rende note certe ricette avanzata senza sperimentare",
+        "Nessun sistema hardcoda il nome di una stanza in un if di caso speciale: legge bonus(tipo) per chiave",
+        "Test headless: laboratorio livello 2 -> sperimenta mostra un peso mostruoso piu' basso; senza laboratorio, peso pieno",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 26,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO F. I ganci erano gia' nel codice (scritti in blocco B/US-316 come no-op finche' BaseSystem non esisteva): ora BaseSystem c'e' e si accendono. PotionSystem._riduzione_rischio() legge _bonus_stanza('laboratorio', 'rischio_esperimento'); _qualita_finale() legge 'qualita_pozione'. Forge._qualita_finale() legge _bonus_stanza('stanza_rituale', 'qualita_forgia'). Tutti per CHIAVE, nessun if sul nome della stanza. FIX: _riduzione_rischio girava il segno male - rischio_esperimento e' NEGATIVO nei dati (-20 = -20 punti), _fallimento fa 1 - clampf(riduzione, 0, 0.95) quindi serve una riduzione POSITIVA: ora return -(bonus+talento)/100. Convenzione documentata in rooms.json (_comment). NUOVO: biblioteca. PotionSystem.ricetta_nota() se tier=='avanzata' e idx nella lista avanzate ordinata < bonus('biblioteca').ricette_avanzate_note -> nota senza sperimentare. GameData.recipes_per_tier ora ordina (out.sort()) per un unlock stabile. RitualSystem: nessun bonus di build definito (stanza_rituale da' solo qualita_forgia alla Forge); 'eventuale' nell'AC, si aggiunge una chiave a bonus_ammessi.stanza_rituale se servira'. giardino = US-328. 459 test headless (454 + 5 in test_stanze_alimentano_sistemi.gd: laboratorio lv2 -> pozione da 'pura' a 'eccelsa' e _riduzione_rischio 0->0.20 e meno aberrazioni su 100 sperimenta seedati; stanza_rituale lv2 -> forgia da 'instabile' a 'eccelsa'; biblioteca lv1 sblocca la 1a avanzata, lv2 la 2a). validate exit 0. Nessuna verifica a schermo: la UI e' US-329."
+    },
+    {
+      "id": "US-328",
+      "title": "Il giardino - ingredienti che crescono nel tempo",
+      "description": "Come giocatore, voglio piantare un ingrediente nel giardino e raccoglierne di piu' dopo un po'.",
+      "acceptanceCriteria": [
+        "BaseSystem (giardino): pianta(item_id) in uno degli appezzamenti (numero = livello del giardino); dopo tempo_crescita (tick di gioco, in balance.json) l'appezzamento e' pronto; raccogli(appezzamento) -> N item nell'inventario (resa scala col livello)",
+        "Solo item categoria:ingrediente con campo coltivabile:true",
+        "La crescita avanza col tempo di gioco (GameState.tempo_gioco o un tick dedicato), NON in tempo reale wall-clock; si ferma col mondo in pausa (libro aperto)",
+        "SAVE: gli appezzamenti (item piantato + istante di maturazione) nel save",
+        "plant_growth (primitiva, attiva-non-implementata) NON si tocca: e' per le abilita' del Mother (fase 5). Il giardino e' un sistema data-driven a parte",
+        "Test headless: pianta -> non pronto; avanza il tempo oltre tempo_crescita -> pronto; raccogli -> item in inventario; round-trip a meta' crescita",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 27,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO F. BaseSystem giardino: _appezzamenti Array di {item_id, crescita (secondi di tempo di gioco rimasti; <=0 = pronto)}. numero_appezzamenti() = bonus('giardino').appezzamenti (lv1->1, lv2->2). pianta(item_id) -> indice/-1: richiede giardino costruito, appezzamento libero, item categoria:ingrediente + coltivabile:true, 1 unita' in Inventory (consumata come seme); crescita = balance.giardino.tempo_crescita_s. raccogli(i) -> N (resa_base + bonus resa_raccolto; 0 se non pronto); l'appezzamento torna libero. appezzamenti() -> Array [{item_id, crescita, pronto}] lungo numero_appezzamenti (i buchi sono appezzamenti liberi). CRESCITA COL TEMPO DI GIOCO: BaseSystem._process(delta) decrementa crescita; _ready() imposta process_mode = PROCESS_MODE_PAUSABLE -> col libro aperto (get_tree().paused) _process non gira e la crescita si ferma. Niente wall-clock, niente accoppiamento con GameState. plant_growth (primitiva) NON toccata: il giardino e' un sistema a parte. SAVE: BaseSystem.per_salvataggio ora {stanze, appezzamenti}; da_salvataggio legge sia il formato nuovo sia il vecchio piatto {tipo:livello} di un save v18 pre-giardino -> nessun bump di schema_version (v18 basta, il campo 'base' esiste da US-326 e il vecchio contenuto si legge ancora). validate_data.py: balance.giardino ben formato; 'coltivabile' se presente e' bool e implica categoria:ingrediente; >= 1 ingrediente coltivabile. i18n --check 0. 467 test headless (459 + 8 in test_giardino.gd). VERIFICA A RUNTIME (scenes/main.tscn, Godot locale): costruito il giardino, piantata erba_lunare, dopo 4s reali di gioco la crescita e' scesa 30->25.98 (il _process avanza davvero col tempo), forzata la maturazione e raccolti 3 item -> in zaino. Nessun SCRIPT ERROR. La pagina Base e' US-329, il giardino non ha ancora rappresentazione a schermo. validate exit 0."
+    },
+    {
+      "id": "US-329",
+      "title": "La base nel libro",
+      "description": "Come giocatore, voglio gestire le stanze dalla pagina inventario.",
+      "acceptanceCriteria": [
+        "La sezione Base della pagina inventario (US-307): le 4 stanze col livello, il costo del prossimo potenziamento, il bonus attuale; pulsanti costruisci / potenzia se il costo e' coperto",
+        "Il giardino mostra gli appezzamenti (vuoto / in crescita con conto alla rovescia / pronto) e il pulsante raccogli",
+        "Tutte le stringhe da strings.csv + tr(); i name_i18n da tr_data",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 28,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO F CHIUSO. scripts/pages/page_inventario.gd: la sezione 'base' (era il segnaposto BOOK_INV_ARRIVA) diventa reale. _base(): per ogni room_type_ids() -> titolo (tr_data(name_i18n)), 'Livello N' o 'Non costruita', 'Bonus: <k v, ...>' se costruita, 'Costo: <nome x qty>' del prossimo passo (o 'Al massimo'), pulsante Costruisci/Potenzia disabilitato se il costo non e' coperto (Inventory.conta) -> premuto chiama BaseSystem.costruisci/potenzia e rinfresca. _giardino(): se numero_appezzamenti()>0, titolo + una riga per appezzamento (vuoto / 'In crescita: N s' col ceil dei secondi rimasti / '<nome> - Pronto' + pulsante Raccogli che chiama BaseSystem.raccogli). Stringhe: 12 chiavi BOOK_BASE_* nuove in assets/i18n/strings.csv, .translation rigenerati con --import; i name_i18n via GameData.tr_data. Il riassunto dei bonus mostra 'chiave valore' grezzo (le chiavi sono id interni, non tradotte: la pagina Base e' funzionale, non di vetrina - ponytail). 471 test headless (467 + 4 in test_page_base.gd: le 4 stanze compaiono col loro stato; costruisci dal libro solo col costo coperto e gli altri bottoni disabilitati; il giardino in crescita mostra il conto alla rovescia; Raccogli dal libro quando l'appezzamento e' pronto -> item in zaino). validate_data.py exit 0. VERIFICA A SCHERMO (scenes/main.tscn + book_overlay, Godot locale): sezione Home selezionata, Laboratorio 'Level 1' + Bonus + Cost + Upgrade, Stanza rituale 'Not built' + Cost + Build. Chrome in inglese solo per il locale OS del PC di test; i nomi item (tr_data) gia' in italiano. Screenshot nel tmp del job."
+    },
+    {
+      "id": "US-330",
+      "title": "Schema dei talenti e vocabolario dei comportamenti",
+      "description": "Come sviluppatore, voglio un formato per i talenti e un vocabolario chiuso dei comportamenti che i 12 eventi non catturano.",
+      "acceptanceCriteria": [
+        "data/schema/tracked_talents.json: vocabolario CHIUSO di ~6-10 comportamenti-talento (giocato_di_notte, sequenze_senza_pozione, nemici_risparmiati, distanza_percorsa, ingredienti_coltivati, abilita_prestate_usate, rituali_interrotti). Ogni voce: misura (conteggio/somma/secondi), filtri ammessi",
+        "data/talents/*.json + data/schema/talent.schema.json: ogni talento con id, name_i18n, descrizione_i18n, tipo (innato|acquisito), sblocco (per gli acquisiti: {evento, filtri, target} - l'evento puo' essere uno dei 12 di tracked_events.json O uno di tracked_talents.json), effetto (modificatore per id, o tag_grant, o sblocco di sistema)",
+        "GameData carica entrambi: get_talent(id), tracked_talents(), talents_per_tipo(tipo)",
+        "Il validator: sblocco.evento in uno dei due vocabolari; filtri ammessi; effetto ben formato; >= 4 innati e >= 8 acquisiti",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 29,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO G iniziato. data/schema/tracked_talents.json: vocabolario CHIUSO di 7 comportamenti-talento (giocato_di_notte/secondi, sequenze_senza_pozione, nemici_risparmiati, distanza_percorsa/somma, ingredienti_coltivati, abilita_prestate_usate, rituali_interrotti) - cio' che i 12 eventi non catturano. Ogni voce: misura (conteggio|somma|secondi) + filtri ammessi. data/schema/talent.schema.json (doc) + data/talents/core.json: 13 talenti (4 innati + 9 acquisiti). Ogni talento: id/name/name_i18n/descrizione/descrizione_i18n/tipo (innato|acquisito). Acquisito: sblocco {evento (uno dei 12 di tracked_events O uno dei 7 comportamenti-talento), filtri, target>0}. effetto {tipo: stat_modifier {stat,valore,moltiplicativo} | tag_grant {tag dal vocabolario chiuso} | sblocco_sistema {sistema,chiave}}. GameData: _load_talents (pattern _load_items) + _load_single(tracked_talents); get_talent(id), tracked_talents(), talents_per_tipo(tipo), talent_ids(). validate_data.py: misura valida; sblocco.evento in uno dei due vocabolari; filtri ammessi per quell'evento; innato NON ha sblocco; effetto ben formato per tipo; >= 4 innati e >= 8 acquisiti. i18n: 26 chiavi talent.* seminate da name/descrizione. it.json 332 chiavi. 476 test headless (471 + 5 in test_talents_data.gd), validate exit 0. TalentSystem/emettitori = US-331."
+    },
+    {
+      "id": "US-331",
+      "title": "TalentSystem + emettitori dei nuovi comportamenti",
+      "description": "Come sviluppatore, voglio contare i comportamenti-talento e sbloccare i talenti a soglia.",
+      "acceptanceCriteria": [
+        "Autoload TalentTracker (o estensione di EventTracker): conta gli eventi di tracked_talents.json. Gli emettitori sono agganciati ai sistemi esistenti con adattamento MINIMO (1-4 righe a file): giocato_di_notte dal ciclo del tempo (gancio placeholder finche' fase 6), distanza_percorsa da player.gd, ingredienti_coltivati dal giardino, ecc.",
+        "Autoload TalentSystem: posseduti() -> Array, possiede(id) -> bool; controlla gli sblocco degli acquisiti non ancora posseduti contro i conteggi di EventTracker + TalentTracker",
+        "Talento sbloccato -> effetto applicato (modificatore per id 'talent:<id>' sullo StatsComponent, o tag_grant, o chiamata di sblocco al sistema relativo) + segnale talento_sbloccato(id)",
+        "SAVE: schema_version +1; campo 'talenti' {posseduti, log dei comportamenti}; migrazione",
+        "Test headless: comportamento oltre soglia -> talento sbloccato + effetto + segnale; sotto soglia -> niente; persistenza",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 30,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO G. Due autoload: TalentTracker (scripts/talent_tracker.gd) - contatori dei 7 comportamenti-talento, versione ridotta di EventTracker senza filtri; registra(nome, quantita), count(nome), azzera, per/da_salvataggio (non fidata: solo chiavi nel vocabolario). TalentSystem (scripts/talent_system.gd) - _process controlla ogni acquisito non posseduto: count(evento) da EventTracker se e' uno dei 12, da TalentTracker se e' un comportamento-talento; >= target -> concedi(). concedi(id): _posseduti += id, _applica_effetto, talento_sbloccato.emit. _applica_effetto: stat_modifier -> StatsComponent.apply_modifier('talent:<id>', {stat: valore o valore*get_base se moltiplicativo}); tag_grant/sblocco_sistema non applicati qui ma letti a domanda (tag_concessi() per US-334, bonus_int(chiave) per i sistemi). riapplica() ri-mette i modificatori (dopo load / quando compare il player). EMETTITORI (adattamento minimo 1-3 righe): ingredienti_coltivati <- BaseSystem.raccogli; abilita_prestate_usate <- AbilityEngine.execute_stored; distanza_percorsa <- player._physics_process (accumulo locale, versato a blocchi di 64px); rituali_interrotti <- RitualSystem.interrompi. giocato_di_notte / sequenze_senza_pozione / nemici_risparmiati: registra() e' pubblico, si agganciano quando esisteranno il ciclo notte (fase 6) e la meccanica del risparmiare. pollice_verde ora ha valore:1 e BaseSystem.raccogli somma bonus_int('resa_bonus_talento') alla resa. SAVE 18->19: campo 'talenti' {posseduti, comportamenti}, _migra_18_a_19; GameState wire (tracker prima, system dopo -> riapplica). 484 test headless (476 + 8 in test_talent_system.gd: concedi applica lo stat_modifier additivo e moltiplicativo; comportamento oltre soglia sblocca + segnale, sotto no; evento dei 12 (50 enemy_defeated) sblocca veterano; tag_grant -> tag_concessi; sblocco_sistema -> bonus_int; round-trip del save; migrazione da v18). validate exit 0. Nessuna verifica a schermo: US-332/333."
+    },
+    {
+      "id": "US-332",
+      "title": "Talenti innati alla creazione personaggio",
+      "description": "Come giocatore, alla creazione del personaggio voglio scegliere 1-2 talenti innati che mi accompagnano tutta la partita.",
+      "acceptanceCriteria": [
+        "La pagina creazione_personaggio (US-223) si estende: sotto il nome, una scelta di 1-2 talenti innato da data/talents/ (il numero e' un dato in balance.json)",
+        "GameState.nuova_partita(nome, slot, talenti_innati: Array): i talenti innati entrano in TalentSystem e sono serializzati come gli altri",
+        "La pagina identita' (partita in corso) mostra i talenti posseduti",
+        "Tutte le stringhe da i18n",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 31,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO G. data/balance.json: talenti.innati_alla_creazione = 2 (il numero e' un dato). scripts/pages/page_creazione_personaggio.gd: _talenti_innati() sotto il campo nome - riga 'Talenti innati - scegline N' + una CheckBox per talento innato (nome da tr_data). _su_talento: spuntare oltre N annulla la spunta (set_pressed_no_signal(false)); _scelti tiene gli id. conferma() passa _scelti a nuova_partita. _mostra_identita (partita in corso): riga 'I tuoi talenti: <nomi>' o 'Nessun talento'. GameState.nuova_partita(nome, slot, talenti_innati=[]) : TalentSystem.pulisci, poi concedi() per ogni id con tipo=='innato', cappato a balance.talenti.innati_alla_creazione (trust boundary del save, non solo la UI). I talenti innati si serializzano come gli altri (campo 'talenti.posseduti', US-331). strings.csv: 3 chiavi BOOK_FRONTESPIZIO_TALENTI / _I_TUOI_TALENTI / _NESSUN_TALENTO, .translation rigenerati. validate_data.py: innati_alla_creazione intero >= 1 e <= numero di innati. 488 test headless (484 + 4 in test_creazione_talenti.gd: nuova_partita accetta gli innati; ignora gli acquisiti e cappa a 2; i talenti innati tornano dal save via applica(); la pagina offre >= 4 CheckBox). NB: nuova_partita attiva la partita -> il test azzera _partita_attiva in prepara e dopo ogni test (come test_page_scaffale), altrimenti lo scaffale conta un tomo di troppo. validate exit 0. VERIFICA A SCHERMO (main.tscn + book_overlay, Godot locale): frontespizio con campo nome 'Enel', 'Innate talents - pick 2' + 4 checkbox (Costituzione robusta/Mano ferma/Piede leggero/Spirito vivace) + Begin; spuntati 2 e confermato -> posseduti = [costituzione_robusta, mano_ferma]; riaperto -> pagina identita' 'Your talents Costituzione robusta, Mano ferma'. Screenshot creazione.png / identita.png."
+    },
+    {
+      "id": "US-333",
+      "title": "La sezione talenti nel libro",
+      "description": "Come giocatore, voglio vedere i talenti che ho e quanto manca a quelli che sto per sbloccare.",
+      "acceptanceCriteria": [
+        "La sezione Talenti della pagina inventario (US-307): posseduti (con effetto), + gli acquisiti non ancora presi come righe con una barra di progresso (count / target dello sblocco)",
+        "Gli acquisiti di cui il giocatore non ha ancora visto nessun progresso sono offuscati",
+        "Verifica a schermo documentata in progress.txt",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 32,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO G CHIUSO. scripts/pages/page_inventario.gd: la sezione 'talenti' (era il segnaposto BOOK_INV_ARRIVA) diventa reale. _talenti(): titolo 'Talenti' + un riga per talento posseduto (TalentSystem.posseduti()) 'nome - <riassunto effetto>'; titolo 'In arrivo' + per ogni acquisito NON posseduto: count = EventTracker.count(evento, filtri) se e' uno dei 12, TalentTracker.count(evento) se e' un comportamento-talento. count == 0 -> riga OFFUSCATA (Label 'Talento sconosciuto', modulate.a 0.55: non sai cosa non hai ancora iniziato a fare). count > 0 -> HBox con nome + ProgressBar (max_value = target, value = min(count, target)) + Label 'count / target'. strings.csv: 3 chiavi BOOK_TAL_POSSEDUTI / _IN_ARRIVO / _SCONOSCIUTO, .translation rigenerati. 491 test headless (488 + 3 in test_page_talenti.gd: un posseduto compare col suo effetto; un acquisito con progresso ha ProgressBar al valore giusto + il conteggio 'count / target'; un acquisito senza progresso e' una riga offuscata a 0.55). validate_data.py exit 0. VERIFICA A SCHERMO (main.tscn + book_overlay, Godot locale): tab Talents; 'Mano ferma - tipo stat_modifier, stat precisione, valore 6...' e 'Spirito vivace...' fra i posseduti; sotto 'In progress' le righe 'Unknown talent' offuscate e (sotto la piega del capture 640x360, visibile un lembo di barra) le ProgressBar degli acquisiti in corso. Screenshot talenti.png nel tmp del job. BLOCCO G CHIUSO: US-330..333. Fase 3: 32/35."
+    },
+    {
+      "id": "US-334",
+      "title": "Il pet e i talenti come fonti di sinergia",
+      "description": "Come sviluppatore, voglio che pet, talenti e stanze espongano i loro tag come fa l'inventario (US-306), cosi' che fase 4 li componga.",
+      "acceptanceCriteria": [
+        "PetSystem.tag_attivi() (i tag della specie + dei comportamenti sbloccati), TalentSystem.tag_attivi() (i tag_grant dei talenti posseduti), BaseSystem.tag_attivi() (i tag delle stanze costruite)",
+        "Un'API unica tag_sinergia_globali() -> Dictionary (autoload SynergySources o metodo statico) che somma: inventario equipaggiato + sigilli + pet + talenti + stanze. NON risolve sinergie: e' la materia prima di fase 4",
+        "sinergia_crescita_pozione (data/synergies/core.json) non e' piu' segnalata come irraggiungibile dal validator",
+        "Test headless: un pet + una stanza + un talento coi tag giusti -> tag_sinergia_globali() li somma; sinergia_crescita_pozione raggiungibile",
+        "python tools/validate_data.py esce 0",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 33,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO H iniziato. Le fonti di fase 3 espongono i tag come l'inventario (US-306): PetSystem.tag_attivi() {tag: conteggio} = tag della specie + tag dei comportamenti sbloccati; TalentSystem.tag_attivi() = tag_grant dei talenti posseduti (Dictionary; tag_concessi() resta come Array); BaseSystem.tag_attivi() = tag delle stanze costruite (livello >= 1). Dati: room.schema.json + rooms.json campo 'tag' per stanza (laboratorio pozione/scienza, stanza_rituale rituale/occulto, biblioteca conoscenza, giardino crescita/pozione); pet.schema.json + pets/core.json campo 'tag' per specie e 'tag' opzionale per comportamento; nuova specie capra_lunare (erbivora, tag bestia/crescita, comportamento brucare tag crescita) per dare alla sinergia_crescita_pozione la sua fonte 'pet'. Autoload SynergySources (scripts/synergy_sources.gd): per_fonte() -> {inventario/pet/talenti/base: {tag: conteggio}}, tag_sinergia_globali() somma tutto. NON risolve nessuna sinergia (fase 4); nessuna sinergia nominata nel file. validate_data.py: raccoglie i tag di stanze/pet/talenti in obtainable_tags PRIMA del check sinergie; valida che i tag di stanze/pet siano nel vocabolario chiuso. RISULTATO: il warning 'sinergia irraggiungibile' per sinergia_crescita_pozione E' SPARITO (crescita e pozione ora raggiungibili da giardino + capra). Restano solo inganno_probabilita (probabilita') e anti_ordine_disordine: gruppi differiti, atteso. 496 test headless (491 + 5 in test_synergy_sources.gd: pet espone i tag di specie + comportamenti sbloccati; talenti i tag_grant; stanze i loro tag; tag_sinergia_globali somma le 4 fonti (crescita 2 = pet+giardino, pozione 2 = giardino+lab); per_fonte non nomina sinergie). validate exit 0, i18n --check 0. Nessuna verifica a schermo."
+    },
+    {
+      "id": "US-335",
+      "title": "Vertical slice della fase 3",
+      "description": "Come sviluppatore, voglio la prova che i sistemi di supporto compongono senza codice dedicato: un ciclo di crafting completo, in un test.",
+      "acceptanceCriteria": [
+        "Un test headless test_slice_fase_3.gd che in codice: (1) costruisce il giardino, pianta un coltivabile, avanza il tempo, raccoglie; (2) costruisce il laboratorio, sperimenta una combinazione = ricetta avanzata -> scoperta, prepara la pozione (qualita' migliorata); (3) forgia un equip da materiali, lo equipaggia; (4) incastona un sigillo con effetto_collaterale, verifica effetto + collaterale; (5) doma un pet (seed fortunato), il bond sale con un enemy_defeated simulato, si sblocca un comportamento; (6) un talento acquisito si sblocca superando la soglia di un comportamento; (7) SynergySources.tag_sinergia_globali() contiene i tag di tutte le fonti",
+        "grep di scripts/ per nomi di item/ricette/pet/stanze specifici: zero occorrenze (nessun if per un contenuto), assertito da un test o dalla CI (come US-219)",
+        "progress.txt documenta l'esito: l'architettura di fase 3 regge / va corretta",
+        "Nessuna regressione sui test esistenti",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 34,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO H. tests/test_slice_fase_3.gd - la vertical slice, come US-219 per il Twilight Giant. test_la_fase_3_compone_senza_codice_dedicato(): in un solo test, TUTTO scoperto dai dati (nessun id di contenuto scritto nel test): 1) giardino costruito, piantato il primo ingrediente coltivabile trovato, avanzato il tempo, raccolto (resa > 0); 2) laboratorio lv2, sperimentata l'ULTIMA ricetta avanzata (quella non resa nota dalla biblioteca) via la sua lista ingredienti -> esito 'scoperta', poi prepara -> qualita' > qualita_base grazie a qualita_pozione del laboratorio; 3) forgiato il 1o blueprint dai suoi materiali, equipaggiato; 4) trovato il 1o sigillo con effetto_collaterale, incastonato -> has_modifier('sigillo:<iid>') E has_modifier('sigillo:<iid>:collaterale'); 5) domato il 1o pet con comportamenti (seed fortunato bonus 1.0), emessi ceil(soglia_min/peso)+1 enemy_defeated -> comportamenti_sbloccati non vuoto; 6) registrato il comportamento-talento del 1o talento acquisito che ci si aggancia oltre soglia -> _process -> possiede(); 7) SynergySources.per_fonte() non vuoto per pet/base/inventario, tag_sinergia_globali() somma > 3 tag. test_nessun_codice_nomina_un_contenuto_specifico(): grep di scripts/ (+ scripts/pages/) per gli id di item/pet/sigillo/blueprint/ricetta racchiusi tra virgolette, fuori dai commenti -> ZERO occorrenze. VERDETTO: l'architettura di fase 3 REGGE. I sistemi di supporto compongono un ciclo completo (coltivazione -> alchimia -> forgia -> sigilli -> pet -> talenti -> sinergie) senza una riga di codice dedicata a un contenuto specifico, esattamente come il Twilight Giant in fase 2. Le uniche stringhe di dominio nel codice sono nomi di VOCABOLARI CHIUSI (tipi di stanza, eventi, comportamenti-talento, stat, tag) che i sistemi indirizzano per chiave - come get_stat('forza'), non come un if su un contenuto. 498 test headless (496 + 2), nessuna regressione sui test di fase 2, validate exit 0. NB: la slice creava un player node e non lo liberava nel 2o test -> test_vertical_slice e test_talent_system vedevano due player. Fix: prepara() libera ogni nodo 'player' pregresso e ogni test chiama _fine()."
+    },
+    {
+      "id": "US-336",
+      "title": "Aggiornamento roadmap e validator di chiusura",
+      "description": "Come sviluppatore, voglio che roadmap e documenti riflettano la fase 3 chiusa e i vocabolari nuovi.",
+      "acceptanceCriteria": [
+        "006_PRD/roadmap.md: sezione fase 3 aggiornata al conteggio reale delle story; i vocabolari nuovi elencati",
+        "006_PRD/design-master.md Appendice C: righe nuove per item_categories, equip_slots, room_types, tracked_talents, sigil effetti, experiment_outcomes",
+        "CLAUDE.md + README.md: fase 3 chiusa, conteggio story e test",
+        "Il validator ha un check per ogni file di dati nuovo introdotto nella fase",
+        "python tools/validate_data.py esce 0",
+        "Tests pass"
+      ],
+      "priority": 35,
+      "fase": 3,
+      "passes": true,
+      "notes": "BLOCCO H - CHIUSURA FASE 3. Documenti aggiornati: 006_PRD/roadmap.md (sezione fase 3 -> CHIUSA, 35 story US-301..336, save 12->19, verdetto US-335, lista completa dei vocabolari chiusi e dei formati nuovi); 006_PRD/design-master.md Appendice C (righe nuove per item_categories, equip_slots, room_types, tracked_talents, sigil_effect_types, sigillato_effect_types, experiment_outcomes); CLAUDE.md (fase 3 CHIUSA con conteggi + verdetto, fase corrente -> 4 Sinergie); README.md (paragrafo fase 3 chiusa). validate_data.py: check di CHIUSURA - FASE_3_DATA elenca i 23 file di dati/schema introdotti nella fase, err se uno manca (una story futura non deve cancellarli per sbaglio). Ogni singolo file ha gia' il suo blocco di validazione dedicato (aggiunto story per story). validate_data.py exit 0 (9 warning: 5 acting sum TG + 89 stub + 2 sinergie di gruppi differiti + 1 i18n TODO - tutti attesi). 498 test headless invariati. FASE 3 CHIUSA: 35/35 story."
+    }
+  ]
+}

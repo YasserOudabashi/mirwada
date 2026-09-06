@@ -3941,32 +3941,3 @@ FASE 3 — SISTEMI DI SUPPORTO: CHIUSA. 35/35 story (US-301..336).
 PROSSIMO: aprire la fase 4 (Sinergie, ~16 story) con /prd. SynergySources.
 tag_sinergia_globali() e' la materia prima; data/synergies/core.json ha 3
 esempi (sinergia_crescita_pozione ora raggiungibile).
-
-[2026-09-06] FASE 4 APERTA — Sinergie
-
-- PRD generato: 006_PRD/prd-fase-4-sinergie.md (16 story US-401..416 in 3
-  blocchi). Domande di design risposte dall'utente:
-  * TUTTI E 6 i tipi di effetto, incluso modifica_primitiva (hook nel motore
-    delle primitive: delta ai parametri prima di eseguire, su una copia).
-  * Registro a 3 livelli (visibile / nascosta / lore) col fog of war,
-    persistito nel save (solo le 'viste'; le attive si riderivano dai tag).
-  * Rivalutazione su segnale delle fonti + poll di sicurezza ogni ~0.5 s.
-  * Priorita'/conflitti: effetti cumulativi si sommano (priorita' fissa
-    l'ordine), effetti esclusivi -> priorita' desc poi id asc. Anti-sinergie
-    con campo 'neutralizza' esplicito nei dati.
-  * Contenuto: US-412 scrive sinergia_colpo_del_caso e toglie lo stub;
-    US-413 batch 1 (8 sinergie, una per meccanismo + il criterio di uscita
-    pet+stanza+talento); US-414 batch 2 (~10 raggiungibili); US-415 batch 3
-    (~15 di gruppi differiti, inattive, warning atteso raggruppato in una riga).
-- SAVE: fase 4 bumpa schema_version 19 -> 20 UNA sola volta (campo
-  sinergie.viste), _migra_19_a_20.
-- prd.json sostituito (fase 3 -> fase 4). La fase 3 (35 story, tutte
-  passes:true) e progress.txt archiviati in
-  archive/2026-09-06-fase-3-sistemi-di-supporto/.
-- Autoload nuovo previsto: SynergyEngine (scripts/synergy_engine.gd), DOPO
-  tutte le fonti in project.godot (si connette ai loro segnali in _ready).
-- Criterio di uscita (test_slice_fase_4.gd): una sinergia che richiede tag da
-  pet + stanza + talento insieme si attiva solo con le tre fonti in gioco, il
-  suo effetto si misura, zero righe di codice la nominano (grep, come
-  US-219/US-335).
-- Prossima storia: US-401 (schema esteso + SynergyEngine: risoluzione dei tag).
