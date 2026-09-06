@@ -4766,3 +4766,49 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
   (CHECKPOINT: verdetto sull'architettura prima degli altri 4 Pathway).
 - Prossima storia: US-508 (test_slice_fase_5.gd + grep 'nessun codice nomina
   death' + verdetto in progress.txt).
+
+[2026-09-06] US-508 — CHECKPOINT: verdetto sull'architettura dopo Death. BLOCCO 1 CHIUSO.
+
+=====================================================================
+VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
+=====================================================================
+
+- tests/test_slice_fase_5.gd (3 test):
+  * test_death_dalla_sequenza_8_alla_2: Death giocato in codice dalla Seq 8
+    alla 2 - per ogni salto Caratteristica -> concoct (formula+ingredienti dai
+    dati) -> recitazione via EventTracker (letta dalle acting_actions, nessun
+    numero di Death nel test) -> bevi -> avanzamento NORMALE. Sette Sequenze,
+    zero righe di codice dedicate. Identico a test_vertical_slice del TG
+    (US-219), ma su un Pathway SCRITTO IN FASE 5.
+  * test_ogni_abilita_death_si_esegue_senza_warning: tutte e 20 le abilita'
+    di Death eseguono con 0 warning "non implementata"/"fuori registro".
+  * test_nessun_codice_nomina_death: grep di res://scripts e res://scripts/pages
+    per "death_", i nomi di Sequenza (Corpse Collector, Ferryman, ...) e
+    "death" (esclusa la riga di enemy.gd dove e' uno STATO di animazione, non
+    il Pathway). ZERO occorrenze.
+- git diff del BLOCCO 1 (US-505..507), file .gd:
+  * scripts/ability_engine.gd +98 righe: SOLO il signal info_rivelata, 5 entry
+    nella tabella _handlers, e 5 nuove funzioni _p_<primitiva> (fear,
+    reveal_info, teleport, soul_detach, resurrect), ognuna ~15 righe nel
+    pattern del registro chiuso. execute() e _esegui_primitive() NON TOCCATI.
+  * scripts/player.gd +11 righe: teleport_verso(spec), un entry point di
+    movimento come start_dash - non un caso speciale per Death.
+  Nessuna modifica a un altro sistema per un contenuto specifico del Death.
+- REGRESSIONE trovata e risolta: test_slice_fase_5 avanza le Fondamenta con
+  bevi() (bonus_recitazione_completa), e girando PRIMA di
+  test_stanze_alimentano_sistemi ("sl" < "st") ne alterava il moltiplicatore
+  di follia -> _fallimento pesava diverso -> il test statistico delle
+  aberrazioni si ribaltava. Fix: test_slice_fase_5 ripristina Foundation (e
+  Madness, SummonRegistry) in prepara() e _fine(). Stessa classe di
+  contaminazione latente in test_vertical_slice, mascherata dall'ordine.
+- Come verificato: 548 test headless, tutti verdi. validate_data.py exit 0
+  (3 warning: stub, 18 sinergie differite, i18n TODO). 1 SCRIPT ERROR + 4
+  Parse JSON preesistenti.
+- CONSEGUENZA: si procede coi 4 Pathway rimanenti della fase 5 (Moon, Mother,
+  Paragon, Hermit) senza correzioni alla fase 2. Il modello "una primitiva
+  nuova per story, nessun'altra riga di codice" ha retto su Death.
+- BLOCCO 1 CHIUSO: US-505..508. Death completo (10 Sequenze), 5 primitive
+  implementate (fear/reveal_info/teleport/soul_detach/resurrect), checkpoint
+  superato.
+- Prossima storia: US-509 (BLOCCO 2 - Moon Seq 9-7: Apothecary / Beast Tamer
+  / Vampire; gancio col PetSystem, nessuna primitiva nuova attesa).
