@@ -1,33 +1,37 @@
 name: CI
 
-# Validator dei dati + suite headless. Gira su:
-#   - push su main (l'ultima rete di sicurezza: i test si lanciano gia' in
-#     locale a ogni story, vedi progress.txt US-001 / regola ralph)
-#   - ogni pull request
-#   - a mano (workflow_dispatch)
-# NON gira sui push dei branch di lavoro (ralph/*, sessioni cloud, feature):
-# quei push bruciavano i 2000 minuti/mese inclusi. Un branch si fa controllare
-# aprendo la PR.
-# Salta anche i commit di sola documentazione (progress.txt, *.md, PRD, diario).
+# Validator dei dati + suite headless.
+#
+# 2026-09-06: i 2000 min/mese di Actions dell'account sono ESAURITI (2199/2000,
+# reset 1 ottobre 2026). Fino ad allora i trigger automatici sono DISATTIVATI
+# per non generare overage a pagamento: resta solo l'avvio a mano
+# (workflow_dispatch). I test si lanciano comunque in locale a ogni story
+# (Godot headless, vedi progress.txt / regola ralph), quindi la rete di
+# sicurezza non sparisce.
+#
+# PER RIATTIVARE (dopo il reset o dopo aver messo il budget Actions a $0 su
+# github.com/settings/billing) togli il commento a push: e pull_request: qui
+# sotto. La config e' gia' magra: solo main, niente commit di sola doc,
+# concurrency, timeout, cache del binario Godot.
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - "**.md"
-      - "006_PRD/**"
-      - "docs/**"
-      - "diario.py"
-      - "progress.txt"
-      - "img/**"
-  pull_request:
-    paths-ignore:
-      - "**.md"
-      - "006_PRD/**"
-      - "docs/**"
-      - "diario.py"
-      - "progress.txt"
-      - "img/**"
+  # push:
+  #   branches: [main]
+  #   paths-ignore:
+  #     - "**.md"
+  #     - "006_PRD/**"
+  #     - "docs/**"
+  #     - "diario.py"
+  #     - "progress.txt"
+  #     - "img/**"
+  # pull_request:
+  #   paths-ignore:
+  #     - "**.md"
+  #     - "006_PRD/**"
+  #     - "docs/**"
+  #     - "diario.py"
+  #     - "progress.txt"
+  #     - "img/**"
   workflow_dispatch:
 
 # Un push nuovo sullo stesso ref annulla la run precedente ancora in coda/corso.
