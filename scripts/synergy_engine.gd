@@ -267,6 +267,98 @@ func viste() -> Array:
 	return _viste.duplicate()
 
 
+## --- Fog of war del registro (US-409) -----------------------------
+
+## Lo stato di ogni sinergia NON 'ignota', per la sezione Sinergie del libro
+## (US-410). Array di { id, stato, tag_mancanti }:
+##   "attiva"   -> e_attiva(id)
+##   "visibile" -> scoperta == "visibile" ma non attiva (tag_mancanti popolato)
+##   "vista"    -> in _viste ma non attiva ne' visibile (riga offuscata)
+##   "ignota"   -> mai vista e non visibile: ASSENTE dall'array
+## Ordinato per id (stabile fra macchine).
+func stato_registro() -> Array:
+	if _gd() == null:
+		return []
+	_semina_visibili()
+	var ora: Array = attive()
+	var out: Array = []
+	for id in _gd().call("synergy_ids"):
+		var sid: String = str(id)
+		var stato: String
+		if ora.has(sid):
+			stato = "attiva"
+		elif str((_gd().call("get_synergy", sid) as Dictionary).get("scoperta", "")) == "visibile":
+			stato = "visibile"
+		elif _viste.has(sid):
+			stato = "vista"
+		else:
+			continue
+		out.append({
+			"id": sid,
+			"stato": stato,
+			"tag_mancanti": tag_mancanti(sid) if stato == "visibile" else {},
+		})
+	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a["id"] < b["id"])
+	return out
+
+
+## (scoperte, totali_scopribili). 'scoperte' = sinergie in _viste; 'totali_
+## scopribili' esclude le sinergie irraggiungibili coi gruppi di Pathway attivi
+## (richiedono un tag che nessuna fonte del contenuto attivo porta) — come il
+## contatore del diagramma dei Pathway conta solo i gruppi attivi.
+func contatore() -> Vector2i:
+	if _gd() == null:
+		return Vector2i.ZERO
+	_semina_visibili()
+	var ott: Dictionary = _tag_ottenibili()
+	var scoperte: int = 0
+	var totali: int = 0
+	for id in _gd().call("synergy_ids"):
+		var raggiungibile: bool = true
+		for t in (_gd().call("get_synergy", id) as Dictionary).get("richiede_tag", {}):
+			if not ott.has(str(t)):
+				raggiungibile = false
+				break
+		if raggiungibile:
+			totali += 1
+		if _viste.has(str(id)):
+			scoperte += 1
+	return Vector2i(scoperte, totali)
+
+
+## I tag che il giocatore PUO' portare coi gruppi di Pathway attivi + tutte le
+## abilita'/stanze/pet/talenti del contenuto attivo. Rispecchia obtainable_tags
+## di tools/validate_data.py.
+## ponytail: ricalcolato a ogni contatore(); una cache se il registro scottasse.
+func _tag_ottenibili() -> Dictionary:
+	var gd: Node = _gd()
+	var out: Dictionary = {}
+	if gd == null:
+		return out
+	for pid in gd.call("pathway_ids"):
+		for t in (gd.call("get_pathway", pid) as Dictionary).get("tags", []):
+			out[str(t)] = true
+	for aid in gd.call("ability_ids"):
+		for t in (gd.call("get_ability", aid) as Dictionary).get("tag_sinergia", []):
+			out[str(t)] = true
+	for tipo in gd.call("room_type_ids"):
+		for t in (gd.call("get_room_type", tipo) as Dictionary).get("tag", []):
+			out[str(t)] = true
+	for pet_id in gd.call("pet_ids"):
+		var pet: Dictionary = gd.call("get_pet", pet_id)
+		for t in pet.get("tag", []):
+			out[str(t)] = true
+		for comp in pet.get("comportamenti", []):
+			if comp is Dictionary:
+				for t in (comp as Dictionary).get("tag", []):
+					out[str(t)] = true
+	for tid in gd.call("talent_ids"):
+		var eff: Dictionary = (gd.call("get_talent", tid) as Dictionary).get("effetto", {})
+		if str(eff.get("tipo", "")) == "tag_grant" and str(eff.get("tag", "")) != "":
+			out[str(eff["tag"])] = true
+	return out
+
+
 ## Insegna una sinergia da una fonte lore (dialoghi/libri = fase 6; per ora
 ## solo debug o drop di test). true se l'id esiste.
 func impara_sinergia(id: String) -> bool:

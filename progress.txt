@@ -4250,3 +4250,34 @@ esempi (sinergia_crescita_pozione ora raggiungibile).
   neutralizza (407), SAVE registro viste v19->v20 (408). Fase 4: 8/16.
 - Prossima storia: US-409 (logica di visibilita': SynergyEngine.stato_registro()
   -> [{id, stato: attiva|visibile|vista|ignota, tag_mancanti}] + contatore()).
+
+[2026-09-06] US-409 — Logica di visibilita' (fog of war delle sinergie). BLOCCO B.
+
+- SynergyEngine.stato_registro() -> Array di {id, stato, tag_mancanti} per ogni
+  sinergia NON 'ignota', ordinato per id:
+  * "attiva"   = e_attiva(id) (soddisfatta e non neutralizzata)
+  * "visibile" = scoperta=='visibile' ma non attiva -> tag_mancanti popolato
+  * "vista"    = in _viste ma non attiva ne' visibile -> tag_mancanti {}
+  * "ignota"   = mai vista e non visibile -> assente dall'array (continue)
+  Chiama _semina_visibili() in testa cosi' funziona anche senza una rivaluta
+  precedente. tag_mancanti riusa il metodo di US-401.
+- SynergyEngine.contatore() -> Vector2i (scoperte, totali_scopribili):
+  scoperte = quante sinergie in _viste; totali_scopribili = quante sinergie
+  hanno TUTTI i richiede_tag in _tag_ottenibili() (esclude le irraggiungibili
+  coi gruppi differiti). Oggi: (n_viste, 8) - le 8 di core.json meno
+  sinergia_inganno_probabilita (probabilita') e anti_ordine_disordine
+  (ordine/disordine).
+- _tag_ottenibili() rispecchia obtainable_tags di tools/validate_data.py:
+  tag dei pathway attivi + tag_sinergia delle abilita' attive + tag delle
+  stanze + tag di specie/comportamenti dei pet + tag_grant dei talenti.
+  Nuovo GameData.ability_ids() (gemello di synergy_ids/talent_ids) per iterare
+  le abilita'. ponytail: ricalcolato a ogni contatore(), nessuna cache.
+- Come verificato: 522 test headless (520 + 2 in test_synergy_engine.gd:
+  stato_registro classifica i 4 stati - visibile con tag mancanti, ignota
+  assente, attiva coi tag, vista dopo la disattivazione; contatore parte a
+  (1, 8) - 1 sola 'visibile' scoperta, 8 raggiungibili su 10 - e le scoperte
+  salgono a 2 attivando una 'nascosta', il totale non cambia).
+  validate_data.py exit 0 (9 warning invariati). 1 SCRIPT ERROR preesistente,
+  nessuno nuovo. Nessuna verifica a schermo: la UI e' US-410.
+- Prossima storia: US-410 (sezione Sinergie nella pagina inventario del libro:
+  SEZIONI 5 -> 6, fog of war da stato_registro(), contatore in cima).

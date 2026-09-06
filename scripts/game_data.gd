@@ -191,6 +191,10 @@ func get_ability(id: String) -> Dictionary:
 	return _abilities.get(id, {})
 
 
+func ability_ids() -> Array:
+	return _abilities.keys()
+
+
 ## --- Strutture costruibili (data/structures/, US-319) ---
 ## Il tipo. Le istanze piazzate stanno in StructureRegistry.
 func get_structure(id: String) -> Dictionary:

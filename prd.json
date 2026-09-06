@@ -178,8 +178,8 @@
       ],
       "priority": 9,
       "fase": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO B. SynergyEngine.stato_registro() -> Array {id, stato, tag_mancanti} ordinato per id: 'attiva' = e_attiva(id); 'visibile' = scoperta=='visibile' e non attiva (tag_mancanti popolato); 'vista' = in _viste ma non attiva ne' visibile (tag_mancanti {}); 'ignota' = mai vista e non visibile -> assente (continue). _semina_visibili() in testa. SynergyEngine.contatore() -> Vector2i (scoperte = |_viste|, totali_scopribili = sinergie con tutti i richiede_tag in _tag_ottenibili()). _tag_ottenibili() rispecchia obtainable_tags di validate_data.py: pathway attivi + tag_sinergia abilita' attive + stanze + pet (specie+comportamenti) + talenti tag_grant. Nuovo GameData.ability_ids(). Oggi contatore parte a (1, 8): 1 'visibile', 8/10 raggiungibili (escluse probabilita' e ordine/disordine dei gruppi differiti). 522 test headless (520 + 2: stato_registro classifica i 4 stati; contatore (1,8) -> (2,8) attivando una nascosta). validate exit 0 (9 warning invariati). Nessuna verifica a schermo: UI e' US-410."
     },
     {
       "id": "US-410",

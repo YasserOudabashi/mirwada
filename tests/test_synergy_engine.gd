@@ -383,6 +383,53 @@ func test_migrazione_da_v19_aggiunge_il_registro_vuoto() -> void:
 	_fine()
 
 
+func _stato_by_id() -> Dictionary:
+	var out: Dictionary = {}
+	for r in _se().call("stato_registro"):
+		out[str((r as Dictionary)["id"])] = r
+	return out
+
+
+func test_stato_registro_classifica_i_quattro_stati() -> void:
+	# US-409: crescita_pozione e' 'visibile', maestria_alchemica 'nascosta'.
+	_se().call("imposta_override_tag", {})
+	_se().call("rivaluta")
+	var reg: Dictionary = _stato_by_id()
+	assert_eq(str((reg.get("sinergia_crescita_pozione", {}) as Dictionary).get("stato")), "visibile",
+		"visibile ma non attiva -> 'visibile'")
+	assert_true((reg["sinergia_crescita_pozione"]["tag_mancanti"] as Dictionary).has("crescita"),
+		"la voce 'visibile' porta i tag mancanti")
+	assert_false(reg.has("sinergia_maestria_alchemica"),
+		"una 'nascosta' mai vista -> 'ignota', assente dal registro")
+
+	_se().call("imposta_override_tag", {"occulto": 1, "conoscenza": 1})
+	_se().call("rivaluta")
+	reg = _stato_by_id()
+	assert_eq(str(reg["sinergia_studio_sereno"]["stato"]), "attiva", "tag soddisfatti -> 'attiva'")
+
+	_se().call("imposta_override_tag", {})
+	_se().call("rivaluta")
+	reg = _stato_by_id()
+	assert_eq(str(reg["sinergia_studio_sereno"]["stato"]), "vista",
+		"gia' attivata una volta, ora non piu' -> 'vista'")
+	assert_eq(reg["sinergia_studio_sereno"]["tag_mancanti"], {}, "la voce 'vista' non mostra i tag")
+	_fine()
+
+
+func test_contatore_sale_attivando_una_nascosta() -> void:
+	var totali_syn: int = (_gd().call("synergy_ids") as Array).size()
+	var c0: Vector2i = _se().call("contatore")
+	assert_true(c0.y >= 8 and c0.y <= totali_syn - 2,
+		"il totale esclude le sinergie irraggiungibili (probabilita'/ordine/disordine)")
+	assert_eq(c0.x, 1, "all'inizio: solo la sinergia 'visibile' e' scoperta")
+
+	_se().call("imposta_override_tag", {"occulto": 1, "conoscenza": 1})
+	_se().call("rivaluta")  # attiva sinergia_studio_sereno (nascosta) -> entra in _viste
+	assert_eq((_se().call("contatore") as Vector2i).x, 2, "attivata una nascosta -> scoperte +1")
+	assert_eq((_se().call("contatore") as Vector2i).y, c0.y, "il totale non cambia")
+	_fine()
+
+
 func test_aggiungi_abilita_concede_e_revoca() -> void:
 	var ae: Node = Engine.get_main_loop().root.get_node_or_null("AbilityEngine")
 	# sinergia_istinto_bestiale: aggiungi_abilita mother_dominio_druidico
