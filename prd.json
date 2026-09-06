@@ -84,8 +84,8 @@
       ],
       "priority": 5,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 1. Primitive nuove fear (status 'paura') e reveal_info (segnale info_rivelata) - interlacciate, Death e' il primo Pathway che le usa (reveal_info spostata qui da US-515). primitives.json implemented; vfx.json vfx_dread/vfx_scry; _handlers +2; execute/_esegui_primitive non toccati. Death Seq 9/8/7 stub->false: 6 abilita' (melee_arc/buff/summon cadavere_servo/debuff+dot/reveal_info/fear+dot), acting somma 1.0, madness 1.0/2.4/3.8, formule+ingredienti+char_death_9/8/7. HARDENING: il check 'ogni Seq non-stub ha la Caratteristica' generalizzato da twilight_giant a tutti i Pathway -> ha pescato char_fool_9 mancante. i18n: 6 abilita' + 4 char tradotti. 539 test (535+4). validate exit 0. Verifica a schermo: le abilita' eseguono a 0 warning, status paura si applica, VFX placeholder con palette Death; il fuggire dei nemici e lo sprite dell'evocato = fase 6."
     },
     {
       "id": "US-506",
@@ -100,8 +100,8 @@
       ],
       "priority": 6,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 1. Primitiva nuova teleport: _p_teleport (gemello di _p_dash, consegna l'ordine teleport_verso; applied=false senza il metodo). player.teleport_verso(spec) sposta il giocatore di 'distanza' px. primitives.json implemented; vfx vfx_rift; _handlers +1. Death Seq 6/5/4 stub->false: 6 abilita' (projectile spirito/summon spirito_soldato/2x teleport/2x heal+buff), acting 1.0, madness 5.2/6.6/8.2. death_4 (Seq<=4): PRIMO advancement_ritual del Death, location_tags [cripta, luogo_di_massacro], momento notte_fonda, sacrifice 'dieci_anni_della_propria_eta'. formule+ingredienti+char_death_6/5/4. i18n tradotto. 542 test (539+3). validate exit 0. Verifica a schermo: death_passo_tra_i_mondi sposta il giocatore di esattamente 200px (il valore dei dati), 0 warning."
     },
     {
       "id": "US-507",
@@ -119,8 +119,8 @@
       ],
       "priority": 7,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 1. Primitive nuove soul_detach (status 'anima_recisa') e resurrect (ripristina hp da <= 0 + costo_follia a Madness, bersaglio self; targeting evocazione = fase 6). primitives.json implemented; vfx vfx_sever/vfx_revenant; _handlers +2. Death Seq 3/2/1/0 stub->false. DEATH COMPLETO: tutte e 10 le Sequenze hanno contenuto reale. 7 abilita' nuove + death_legione (stress test seq 2) nel roster. acting 1.0, madness 9.5/10.8/12.5/14.0. rituali Seq 3/2/1/0; Seq 1 sacrifica ancora_del_giocatore, Seq 0 il_detentore_precedente_della_sequenza_0. formule formula_death_3/2/1/0 + 12 ingredienti; char_death_3/2/1/0. i18n: 8 abilita' + 4 char. 545 test (542+3). test_summon.gd (US-205) copre gia' il round-trip del save delle evocazioni persistenti (summon durata -1). validate exit 0."
     },
     {
       "id": "US-508",
@@ -135,8 +135,8 @@
       ],
       "priority": 8,
       "fase": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO 1 CHIUSO. VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT. tests/test_slice_fase_5.gd (3 test): Death giocato in codice Seq 8->2 (Caratteristica -> concoct -> recitazione via EventTracker dai dati -> bevi -> avanzamento normale), zero righe dedicate; tutte e 20 le abilita' Death eseguono a 0 warning; grep di res://scripts+pages per 'death_'/nomi di Sequenza/'death' (esclusa la riga di enemy.gd = stato di animazione) -> 0 occorrenze. git diff del blocco 1 (.gd): SOLO 5 handler _p_<primitiva> nel pattern del registro + il signal info_rivelata + 5 entry in _handlers + player.teleport_verso; execute()/_esegui_primitive() NON toccati. Regressione risolta: test_slice_fase_5 alzava le Fondamenta con bevi() e contaminava il test statistico delle aberrazioni di test_stanze -> ripristina Foundation/Madness/SummonRegistry in prepara()/_fine(). 548 test verdi. validate exit 0. Si procede con Moon/Mother/Paragon/Hermit senza correzioni alla fase 2."
     },
     {
       "id": "US-509",
