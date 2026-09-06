@@ -1,15 +1,44 @@
 name: CI
 
-# Validator dei dati + suite headless a ogni push e PR. I dati JSON restano
-# protetti da un automatismo, non dalla disciplina di chi committa.
+# Validator dei dati + suite headless. Gira su:
+#   - push su main (l'ultima rete di sicurezza: i test si lanciano gia' in
+#     locale a ogni story, vedi progress.txt US-001 / regola ralph)
+#   - ogni pull request
+#   - a mano (workflow_dispatch)
+# NON gira sui push dei branch di lavoro (ralph/*, sessioni cloud, feature):
+# quei push bruciavano i 2000 minuti/mese inclusi. Un branch si fa controllare
+# aprendo la PR.
+# Salta anche i commit di sola documentazione (progress.txt, *.md, PRD, diario).
 
 on:
   push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "006_PRD/**"
+      - "docs/**"
+      - "diario.py"
+      - "progress.txt"
+      - "img/**"
   pull_request:
+    paths-ignore:
+      - "**.md"
+      - "006_PRD/**"
+      - "docs/**"
+      - "diario.py"
+      - "progress.txt"
+      - "img/**"
+  workflow_dispatch:
+
+# Un push nuovo sullo stesso ref annulla la run precedente ancora in coda/corso.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   valida-e-testa:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       GODOT_VERSION: "4.3"
     steps:
@@ -22,15 +51,29 @@ jobs:
       - name: Validator dei dati
         run: python tools/validate_data.py
 
+      - name: Cache del binario Godot
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot/godot
+          key: godot-${{ env.GODOT_VERSION }}-linux-x86_64
+
       - name: Scarica Godot ${{ env.GODOT_VERSION }} headless
+        if: steps.cache-godot.outputs.cache-hit != 'true'
         run: |
           set -euo pipefail
+          mkdir -p ~/godot
           base="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
           file="Godot_v${GODOT_VERSION}-stable_linux.x86_64"
           curl -fsSL -o godot.zip "${base}/${file}.zip"
           unzip -q godot.zip
-          sudo install -m 0755 "${file}" /usr/local/bin/godot
-          godot --version
+          mv "${file}" ~/godot/godot
+          chmod +x ~/godot/godot
+
+      - name: Godot sul PATH
+        run: |
+          echo "$HOME/godot" >> "$GITHUB_PATH"
+          "$HOME/godot/godot" --version
 
       - name: Import delle risorse
         # L'import headless in 4.3 non sempre esce 0; il gate vero e' la suite.

@@ -3286,3 +3286,32 @@ sezione test aggiornata.
   exit 0 (9 warning invariati). Nessuna verifica a schermo: nessuna UI.
 - Prossima storia: US-322 (Taming: PetSystem.doma con tiro seeded, un pet
   per volta, l'Ancora entra da AnchorSystem).
+
+[2026-09-06] VERIFICA A SCHERMO + CI piu' magra
+
+- Godot 4.3 c'e' anche in locale:
+  D:/005-Friend/Ivan/MEgaProJect/Godot_v4.3-stable_win64.exe/ (cartella, come
+  da .gitignore). Usato quello.
+- Il GIOCO VERO gira: scenes/main.tscn avviata con
+  `godot --path . --quit-after 420` -> boot pulito, [GameData] 54 file (erano
+  52: +structures +pets), zero SCRIPT ERROR, exit 0. Screenshot: HUD
+  (Health/Spirit/Acting), player blu, dummy rosso, tilemap. Le etichette HUD
+  sono in inglese solo perche' il locale OS di questo PC e' en_*: sul PC
+  italiano sono in italiano (comportamento corretto, non un bug). Quindi
+  US-319..321 non hanno rotto nulla a runtime, non solo nei test.
+- CI: l'account YasserOudabashi ha finito i 2000 min/mese di GitHub Actions
+  (2199/2000, reset 1 ottobre). Causa: .github/workflows/ci.yml girava su
+  OGNI push di OGNI branch (ralph/*, sessioni cloud, feature) + ogni PR.
+  Nuovo ci.yml:
+  * push: solo su `main` (i branch di lavoro si fanno controllare aprendo la
+    PR; i test si lanciano gia' in locale a ogni story).
+  * paths-ignore: salta i commit di sola doc (*.md, 006_PRD/, docs/,
+    progress.txt, diario.py, img/). Un commit misto codice+progress.txt gira
+    lo stesso.
+  * concurrency + cancel-in-progress: una raffica di push fa girare solo
+    l'ultima.
+  * timeout-minutes: 15 sul job (una run appesa non brucia ore).
+  * actions/cache sul binario Godot: non lo riscarica ogni run.
+  NB: queste modifiche tagliano il consumo FUTURO, non l'overage gia'
+  maturato. Per non pagare fino al reset: impostare budget Actions a $0
+  (github.com/settings/billing -> "Manage budgets" nella mail).
