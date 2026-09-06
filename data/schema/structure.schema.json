@@ -1,0 +1,11 @@
+{
+  "_comment": "Documentazione formale di data/structures/*.json (US-319). Un tipo di struttura costruibile: cio' che il base building (US-326+) crea e cio' che le abilita' d'area con colpisce_oggetti:true (US-320, tg_2) distruggono. Il registro delle istanze vive in StructureRegistry, non nei dati. Controlli veri in tools/validate_data.py.",
+  "schema_version": 1,
+  "structure": {
+    "id": "string, univoco",
+    "name": "string in chiaro (seed i18n)",
+    "name_i18n": "string, chiave i18n (categoria 'structure')",
+    "hp_max": "number > 0 - punti struttura prima del crollo",
+    "tag": ["string dal vocabolario chiuso di data/tags.json"]
+  }
+}

@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 15
+const VERSIONE_CORRENTE := 16
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -72,6 +72,8 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		"ancore": (dati.get("ancore", []) as Array).duplicate(true),
 		# Sigilli e sacrifici del rituale (US-217). { sigilli, sacrifici_forniti }.
 		"rituale": (dati.get("rituale", {}) as Dictionary).duplicate(true),
+		# Strutture costruite (US-319). Lista di { id, struct_id, posizione, hp }.
+		"strutture": (dati.get("strutture", []) as Array).duplicate(true),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -199,6 +201,8 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_13_a_14(doc)
 			14:
 				doc = _migra_14_a_15(doc)
+			15:
+				doc = _migra_15_a_16(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -319,6 +323,13 @@ func _migra_14_a_15(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v15 -> v16: le strutture costruite (US-319). Nessuna struttura pregressa.
+func _migra_15_a_16(doc: Dictionary) -> Dictionary:
+	if not doc.has("strutture"):
+		doc["strutture"] = []
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -339,6 +350,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"fondamenta": _campo(raw, "fondamenta", TYPE_DICTIONARY, {}),
 		"ancore": _campo(raw, "ancore", TYPE_ARRAY, []),
 		"rituale": _campo(raw, "rituale", TYPE_DICTIONARY, {}),
+		"strutture": _campo(raw, "strutture", TYPE_ARRAY, []),
 		"conoscenza": _campo(raw, "conoscenza", TYPE_ARRAY, []),
 		"inventario": _campo(raw, "inventario", TYPE_DICTIONARY, {}),
 		"equipaggiamento": _campo(raw, "equipaggiamento", TYPE_DICTIONARY, {}),

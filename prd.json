@@ -361,8 +361,8 @@
       ],
       "priority": 18,
       "fase": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO D. data/schema/structure.schema.json (doc) + data/structures/core.json (3 tipi: palizzata/totem_veglia/deposito, ognuno id/name/name_i18n/hp_max/tag). Autoload StructureRegistry (scripts/structure_registry.gd), gemello di SummonRegistry: costruisci(struct_id,pos)->instance_id (''+push_error se tipo ignoto), danneggia(iid,q) (hp<=0 -> distruggi involontario), distruggi(iid,volontario)->bool emette EventTracker.emit_event('structure_destroyed',{volontario}), attive(), conta(), in_raggio(centro,r) (per US-320), pulisci(), per/da_salvataggio (rilettura non fidata: struct_id assente o tipo sparito dai dati -> voce scartata). GameData._load_structures + get_structure/structure_ids. SAVE 15->16: campo 'strutture' (lista), _migra_15_a_16, _leggi_snapshot; GameState snapshot/applica. validate_data.py: id unici, hp_max>0, tag nel vocabolario chiuso, >=1 tipo. tg_2_accetta_decadimento (gia' in twilight_giant.json) ascolta structure_destroyed{volontario:true}: il gancio e' pronto per US-320. 407 test headless (399+8 in test_structure_registry.gd), validate_data.py exit 0 (9 warning invariati). Nessuna verifica a schermo: nessuna UI in questa story."
     },
     {
       "id": "US-320",

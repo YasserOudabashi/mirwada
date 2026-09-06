@@ -793,6 +793,36 @@ def main():
     if len(blueprints) < 1:
         err("data/forge/blueprints.json: nessun blueprint, atteso almeno 1")
 
+    # --- strutture costruibili (data/structures/, US-319) ---
+    struct_dir = os.path.join(DATA, "structures")
+    structure_ids = set()
+    n_structures = 0
+    for fn in sorted(os.listdir(struct_dir)) if os.path.isdir(struct_dir) else []:
+        if not fn.endswith(".json"):
+            continue
+        rel = f"data/structures/{fn}"
+        sdoc = load_json(os.path.join(struct_dir, fn)) or {}
+        for s in sdoc.get("structures", []):
+            sid = s.get("id", "")
+            if not sid:
+                err(f"{rel}: una struttura non ha 'id'")
+                continue
+            if sid in structure_ids:
+                err(f"{rel}: id struttura duplicato '{sid}'")
+            structure_ids.add(sid)
+            n_structures += 1
+            if not isinstance(s.get("name_i18n"), str) or not s.get("name_i18n"):
+                err(f"{rel} [{sid}]: name_i18n mancante o vuoto")
+            hp = s.get("hp_max")
+            if not isinstance(hp, (int, float)) or hp <= 0:
+                err(f"{rel} [{sid}]: hp_max deve essere un numero > 0")
+            for t in s.get("tag", []):
+                if t not in valid_tags:
+                    err(f"{rel} [{sid}]: tag sconosciuto '{t}' (aggiungilo a data/tags.json o correggilo)")
+    if n_structures < 1:
+        err("data/structures/: nessun tipo di struttura, atteso almeno 1 "
+            "(tg_2 e il base building parlano tramite questo registro)")
+
     # --- esiti degli esperimenti (data/potions/experiment_outcomes.json, US-311) ---
     eo_doc = load_json(os.path.join(DATA, "potions", "experiment_outcomes.json"))
     outcomes = (eo_doc or {}).get("outcomes", {})

@@ -3137,3 +3137,70 @@ sezione test aggiornata.
   poi riscrivere/verificare ogni story con Godot vero; (c) altro.
 - Prossima storia (invariata): US-319, ma PRIMA va presa la decisione sul
   branch parallelo.
+
+[2026-09-06] DECISO — branch parallelo scartato
+
+- Scelta (a): il branch `claude/project-status-stories-jtfz3d` / PR #1 e'
+  chiuso non-mersato su GitHub, il ref remoto e' cancellato. NON si recupera,
+  NON si usa nemmeno come referenza. Si continua da main, che e' l'unico
+  lavoro verificato con Godot reale.
+- Stato reale fase 3: 17/35 (blocchi A/B/C chiusi). Prossima storia: US-319
+  StructureRegistry (blocco D). Nessun blocco residuo.
+
+[2026-09-06] AMBIENTE DI TEST — Godot su questo PC
+
+- Questo PC non aveva Godot. Scaricato Godot_v4.3-stable_win64 in
+  ~/.claude/jobs/<job>/tmp (effimero, fuori repo). Il .gitignore prevede gia'
+  `Godot_v*-stable_win64.exe/` per una copia locale stabile: se si continua a
+  lavorare da qui, scaricarlo in modo permanente nella root del progetto.
+- Comando suite: `godot --headless --path . --script res://tests/run_tests.gd`.
+- REGRESSIONE APPARENTE risolta: test_page_inventario / test_page_ricettario
+  fallivano perche' il locale OS di questo PC e' en_* -> Godot caricava
+  strings.en.translation e le asserzioni sulla chrome italiana saltavano. Su
+  CI (locale "C") il fallback "it" li salvava. Fix: run_tests.gd fissa
+  TranslationServer.set_locale("it") a inizio suite (commit a se'). Il codice
+  di blocco C non c'entrava.
+
+[2026-09-06] US-319 — StructureRegistry. BLOCCO D iniziato.
+
+- data/schema/structure.schema.json (doc) + data/structures/core.json: 3 tipi
+  (palizzata hp 40 / totem_veglia hp 25 / deposito hp 60), ognuno con
+  id/name/name_i18n/hp_max/tag. I tag sono dal vocabolario chiuso di tags.json.
+- scripts/structure_registry.gd (autoload StructureRegistry, dopo
+  SummonRegistry in project.godot). Gemello di SummonRegistry: le istanze non
+  sono figlie della scena, sopravvivono a scena e salvataggio; lo spawn del
+  Node vero lo fara' il sistema del mondo leggendo attive().
+  * costruisci(struct_id, pos) -> instance_id ("str_N"); struct_id ignoto ->
+    "" + push_error, nessuna istanza.
+  * danneggia(iid, q): hp -= max(0,q); hp <= 0 -> distruggi(iid, false).
+  * distruggi(iid, volontario) -> bool; emette
+    EventTracker.emit_event("structure_destroyed", {volontario}) (evento gia'
+    nel vocabolario dei 12).
+  * attive(), conta(), in_raggio(centro, raggio) -> [instance_id] (serve a
+    US-320), pulisci().
+  * per_salvataggio()/da_salvataggio(raw): rilettura NON FIDATA — struct_id
+    assente o tipo non piu' nei dati -> voce scartata con push_warning, mai
+    crash; raw non-lista -> registro vuoto.
+- GameData: _load_structures() (stesso pattern di _load_items, upsert+prune),
+  get_structure(id), structure_ids().
+- SAVE: VERSIONE_CORRENTE 15 -> 16. Campo "strutture" (lista) in salva(),
+  _leggi_snapshot(), _migra_15_a_16 (default []). GameState: _strutture(),
+  righe in snapshot()/applica() (da_salvataggio dopo il resto, prima di
+  conoscenza).
+- validate_data.py: blocco strutture — id non vuoti e unici, hp_max numero
+  > 0, ogni tag nel vocabolario chiuso di tags.json, >= 1 tipo totale.
+- i18n: generate_i18n_stubs.py -> 3 chiavi nuove (structure.palizzata /
+  .totem_veglia / .deposito), seminate dal campo gemello `name`, nessuno stub
+  TODO nuovo. it.json 299 chiavi, 54 TODO (invariati).
+- Il gancio per US-320 e' pronto: tg_2_accetta_decadimento in
+  twilight_giant.json ascolta gia' structure_destroyed{volontario:true}.
+- Come verificato: 407 test headless (399 + 8 in test_structure_registry.gd:
+  costruisci -> attiva con hp = hp_max; struct_id ignoto -> niente;
+  danneggia fino a 0 -> distrutta + evento NON volontario; distruggi(.,true)
+  contato dal filtro {volontario:true}; in_raggio filtra per distanza;
+  round-trip del save conserva hp danneggiato; da_salvataggio scarta le voci
+  malformate e il raw non-lista; migrazione da v15 aggiunge il campo vuoto).
+  validate_data.py exit 0 (9 warning invariati). Nessuna verifica a schermo:
+  la story non tocca UI.
+- Prossima storia: US-320 (colpisce_oggetti - le abilita' d'area danneggiano
+  le strutture via StructureRegistry).

@@ -52,6 +52,10 @@ func _summons() -> Node:
 	return get_node_or_null("/root/SummonRegistry")
 
 
+func _strutture() -> Node:
+	return get_node_or_null("/root/StructureRegistry")
+
+
 func _eventi() -> Node:
 	return get_node_or_null("/root/EventTracker")
 
@@ -172,6 +176,7 @@ func snapshot() -> Dictionary:
 		"fondamenta": _fondamenta().per_salvataggio() if _fondamenta() != null else {},
 		"ancore": _ancore().per_salvataggio() if _ancore() != null else [],
 		"rituale": _rituale().per_salvataggio() if _rituale() != null else {},
+		"strutture": _strutture().per_salvataggio() if _strutture() != null else [],
 		"conoscenza": _conoscenza().per_salvataggio() if _conoscenza() != null else [],
 		"inventario": _inventario().per_salvataggio() if _inventario() != null else {},
 		"equipaggiamento": _equip().per_salvataggio() if _equip() != null else {},
@@ -212,6 +217,8 @@ func applica(dati: Dictionary) -> void:
 		_ancore().da_salvataggio(dati.get("ancore", []))
 	if _rituale() != null:
 		_rituale().da_salvataggio(dati.get("rituale", {}))
+	if _strutture() != null:
+		_strutture().da_salvataggio(dati.get("strutture", []))
 	if _conoscenza() != null:
 		_conoscenza().da_salvataggio(dati.get("conoscenza", []))
 	if _inventario() != null:

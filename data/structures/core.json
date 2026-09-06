@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "_comment": "Tipi di struttura costruibili (US-319). Le istanze piazzate stanno in StructureRegistry, non qui. hp_max e' la soglia di crollo; tag alimenta le sinergie come per ogni altra entita'.",
+  "structures": [
+    {
+      "id": "palizzata",
+      "name": "Palizzata",
+      "name_i18n": "structure.palizzata",
+      "hp_max": 40,
+      "tag": ["difesa", "terra"]
+    },
+    {
+      "id": "totem_veglia",
+      "name": "Totem di veglia",
+      "name_i18n": "structure.totem_veglia",
+      "hp_max": 25,
+      "tag": ["rituale", "occulto"]
+    },
+    {
+      "id": "deposito",
+      "name": "Deposito",
+      "name_i18n": "structure.deposito",
+      "hp_max": 60,
+      "tag": ["crafting"]
+    }
+  ]
+}
