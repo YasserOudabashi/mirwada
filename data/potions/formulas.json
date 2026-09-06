@@ -3,12 +3,14 @@
   "_comment": "Formule delle pozioni Beyonder (US-208). Ogni formula_id (referenziato da potion.formula_id nelle Sequenze non-stub) elenca la Caratteristica richiesta (characteristic_sequence) e gli ingredienti COMPLETI. soglia_parziale: numero minimo di ingredienti per una pozione PARZIALE (sotto soglia = non si prepara). penalita_parziale: cosa costa una pozione parziale, sempre esplicito. 'ingredients' e' il vocabolario chiuso degli ingredienti.",
   "ingredients": [
     "acciaio_stellare",
+    "acido_da_saggio",
     "acqua_dello_stige",
     "acqua_di_fonte_benedetta",
     "ambra_grigia",
     "argento_annerito",
     "argento_benedetto",
     "argilla_rossa_del_fiume",
+    "bilancia_di_precisione",
     "calice_incrinato",
     "caratteristica_del_gigante",
     "cellula_madre",
@@ -23,6 +25,7 @@
     "corno_di_alce_spettrale",
     "corona_di_ossa",
     "corteccia_febbrifuga",
+    "cristallo_di_riferimento",
     "cuore_che_non_si_ferma",
     "cuore_del_pianeta",
     "cuore_di_montagna",
@@ -43,6 +46,7 @@
     "fiore_di_luna",
     "frammento_di_alba",
     "frammento_di_luna",
+    "frammento_di_tavoletta",
     "fungo_a_specchio",
     "ghianda_millenaria",
     "goccia_di_linfa",
@@ -52,6 +56,7 @@
     "lacrima_di_amante",
     "lacrima_di_paladino",
     "lama_di_luce_solidificata",
+    "lente_graduata",
     "linfa_di_gigante",
     "luce_di_luna_imbottigliata",
     "mano_di_gloria",
@@ -78,6 +83,7 @@
     "polvere_di_crepuscolo",
     "polvere_di_ossario",
     "polvere_di_specchio_incrinato",
+    "polvere_reagente",
     "prima_notte_del_mondo",
     "radice_amara",
     "radice_che_beve",
@@ -87,6 +93,7 @@
     "radice_di_valeriana",
     "radice_di_veggente",
     "radice_maestra",
+    "resina_conservante",
     "resina_di_ferro",
     "respiro_dell_oceano",
     "respiro_della_foresta_del_mondo",
@@ -110,11 +117,13 @@
     "seme_di_stella_cadente",
     "seme_dormiente",
     "soffio_di_spettro",
+    "spazzola_da_scavo",
     "specchio_di_luna_nera",
     "spiga_dorata",
     "spina_dell_ultimo_inverno",
     "spina_di_rovo_antico",
     "stendardo_lacero",
+    "taccuino_di_appunti",
     "tempo_solidificato",
     "tendine_di_lupo",
     "terra_di_cimitero",
@@ -693,6 +702,48 @@
         "seme_del_primo_giorno",
         "respiro_della_foresta_del_mondo",
         "cuore_del_pianeta"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_paragon_9": {
+      "characteristic_sequence": 9,
+      "ingredients": [
+        "lente_graduata",
+        "polvere_reagente",
+        "taccuino_di_appunti"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_paragon_8": {
+      "characteristic_sequence": 8,
+      "ingredients": [
+        "spazzola_da_scavo",
+        "resina_conservante",
+        "frammento_di_tavoletta"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_paragon_7": {
+      "characteristic_sequence": 7,
+      "ingredients": [
+        "bilancia_di_precisione",
+        "acido_da_saggio",
+        "cristallo_di_riferimento"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

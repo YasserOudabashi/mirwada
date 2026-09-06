@@ -32,6 +32,154 @@
         "crafting"
       ],
       "note": "STRESS TEST. Stessa primitiva summon di Death con parametri diversi: la prova che il registro chiuso funziona."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_analisi",
+      "name_i18n": "ability.paragon.paragon_analisi",
+      "sequence_id": "paragon_9",
+      "costo_spiritualita": 5,
+      "cooldown": 10.0,
+      "primitive": [
+        {
+          "tipo": "reveal_info",
+          "raggio": 8,
+          "categoria": "proprieta_oggetto",
+          "durata": 20.0
+        }
+      ],
+      "tag_sinergia": [
+        "scienza",
+        "analisi",
+        "singolo"
+      ],
+      "note": "Il Savant analizza: proprieta' di un oggetto rivelate. Divinazione fuori da Hermit -> solo la categoria (matrice di proprieta')."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_deduzione",
+      "name_i18n": "ability.paragon.paragon_deduzione",
+      "sequence_id": "paragon_9",
+      "costo_spiritualita": 6,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "precisione",
+          "valore": 8,
+          "durata": 12.0,
+          "moltiplicativo": false
+        }
+      ],
+      "tag_sinergia": [
+        "scienza",
+        "conoscenza",
+        "singolo"
+      ],
+      "note": "Ragionare a mente fredda: la mira si fa piu' precisa."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_scavo",
+      "name_i18n": "ability.paragon.paragon_scavo",
+      "sequence_id": "paragon_8",
+      "costo_spiritualita": 8,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "scavo",
+          "raggio": 3,
+          "durata": 10.0,
+          "permanente": false
+        },
+        {
+          "tipo": "reveal_info",
+          "raggio": 5,
+          "categoria": "reperto",
+          "durata": 15.0
+        }
+      ],
+      "tag_sinergia": [
+        "analisi",
+        "terra",
+        "area"
+      ],
+      "note": "L'Archaeologist scava e identifica: cosa c'e' sepolto e dove."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_disinnesco",
+      "name_i18n": "ability.paragon.paragon_disinnesco",
+      "sequence_id": "paragon_8",
+      "costo_spiritualita": 7,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "light_purify",
+          "raggio": 4,
+          "potenza": 2,
+          "riduce_sequenza": false
+        }
+      ],
+      "tag_sinergia": [
+        "analisi",
+        "purificazione",
+        "area"
+      ],
+      "note": "Disinnesca trappole antiche: gli effetti d'area ostili nel raggio spariscono."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_perizia",
+      "name_i18n": "ability.paragon.paragon_perizia",
+      "sequence_id": "paragon_7",
+      "costo_spiritualita": 10,
+      "cooldown": 22.0,
+      "primitive": [
+        {
+          "tipo": "reveal_info",
+          "raggio": 6,
+          "categoria": "sigillo",
+          "durata": 20.0
+        }
+      ],
+      "tag_sinergia": [
+        "analisi",
+        "conoscenza",
+        "singolo"
+      ],
+      "note": "L'Appraiser valuta un Oggetto Sigillato e ne rivela l'effetto_collaterale (dato di fase 3). Nessun if per Paragon nel sistema sigilli."
+    },
+    {
+      "schema_version": 1,
+      "id": "paragon_stima",
+      "name_i18n": "ability.paragon.paragon_stima",
+      "sequence_id": "paragon_7",
+      "costo_spiritualita": 8,
+      "cooldown": 15.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "precisione",
+          "valore": 0.15,
+          "durata": 10.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 5,
+          "durata": 10.0,
+          "moltiplicativo": false
+        }
+      ],
+      "tag_sinergia": [
+        "scienza",
+        "conoscenza",
+        "singolo"
+      ],
+      "note": "Stimare il valore di tutto in tempo reale: sai dove colpire e dove non farti colpire."
     }
   ]
 }

@@ -247,6 +247,24 @@
       "pathway_id": "mother",
       "sequence": 0,
       "name_i18n": "characteristic.mother.0"
+    },
+    {
+      "id": "char_paragon_9",
+      "pathway_id": "paragon",
+      "sequence": 9,
+      "name_i18n": "characteristic.paragon.9"
+    },
+    {
+      "id": "char_paragon_8",
+      "pathway_id": "paragon",
+      "sequence": 8,
+      "name_i18n": "characteristic.paragon.8"
+    },
+    {
+      "id": "char_paragon_7",
+      "pathway_id": "paragon",
+      "sequence": 7,
+      "name_i18n": "characteristic.paragon.7"
     }
   ]
 }

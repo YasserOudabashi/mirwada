@@ -4970,3 +4970,23 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - Prossima storia: US-515 (BLOCCO 4 - Paragon Seq 9-7: Savant / Archaeologist
   / Appraiser + reveal_info gia' implementata (US-505), gancio al sistema
   sigilli di fase 3).
+
+[2026-09-06] US-515 — Paragon Sequenze 9-7 (Savant / Archaeologist / Appraiser). BLOCCO 4.
+
+- reveal_info gia' implementata in US-505 (Death) - Paragon la trova pronta.
+  NESSUNA primitiva nuova.
+- CONTENUTO Paragon Seq 9/8/7 (stub -> false):
+  * paragon_analisi (reveal_info categoria proprieta_oggetto), paragon_deduzione
+    (buff precisione), paragon_scavo (terrain_modify scavo + reveal_info reperto),
+    paragon_disinnesco (light_purify - disinnesca trappole d'area),
+    paragon_perizia (reveal_info categoria "sigillo" - rivela l'effetto_
+    collaterale di un Oggetto Sigillato, dato di fase 3, senza if per Paragon),
+    paragon_stima (2x buff_stat).
+  * acting somma 1.0. madness 1.2/2.5/3.9. Nessun ritual (Seq > 4).
+  * formule formula_paragon_9/8/7 + 9 ingredienti; char_paragon_9/8/7.
+- i18n: 6 abilita' + 3 caratteristiche tradotte. 59 TODO.
+- Come verificato: 565 test headless (562 + 3 in test_paragon.gd: ogni abilita'
+  Paragon non-stub esegue a 0 warning; le acting sommano 1.0; nessuna abilita'
+  Paragon usa una primitiva differita - guardia per US-517). validate exit 0.
+- Prossima storia: US-516 (Paragon Seq 6-4: Artisan / Astronomer / Alchemist -
+  gancio al sistema forgia di fase 3, costrutti via summon costrutto_).

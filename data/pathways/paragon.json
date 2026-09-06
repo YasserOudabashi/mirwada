@@ -21,18 +21,63 @@
       "name_i18n": "sequence.paragon.9",
       "tier": "low",
       "concept": "Conoscenza scientifica: analizza oggetti e ne rivela le proprieta'.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 20,
+        "spiritualita_max": 0.12
+      },
+      "abilities": [
+        "paragon_analisi",
+        "paragon_deduzione"
+      ],
+      "acting_actions": [
+        {
+          "id": "paragon_9_savant",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_analisi"
+          },
+          "target": 20,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_9_savant",
+          "descrizione": "Analizza 20 oggetti"
+        },
+        {
+          "id": "paragon_9_deduttore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_deduzione"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_9_deduttore",
+          "descrizione": "Deduci 15 volte"
+        },
+        {
+          "id": "paragon_9_studioso",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_9_studioso",
+          "descrizione": "Sconfiggi 10 nemici studiandone le debolezze"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 9,
-        "ingredients": [],
+        "ingredients": [
+          "lente_graduata",
+          "polvere_reagente",
+          "taccuino_di_appunti"
+        ],
         "formula_id": "formula_paragon_9"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 1.2,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 8,
@@ -41,18 +86,63 @@
       "name_i18n": "sequence.paragon.8",
       "tier": "low",
       "concept": "Scava, identifica reperti e disinnesca trappole antiche.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 35,
+        "spiritualita_max": 0.12
+      },
+      "abilities": [
+        "paragon_scavo",
+        "paragon_disinnesco"
+      ],
+      "acting_actions": [
+        {
+          "id": "paragon_8_archeologo",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_scavo"
+          },
+          "target": 18,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_8_archeologo",
+          "descrizione": "Scava 18 siti"
+        },
+        {
+          "id": "paragon_8_artificiere",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_disinnesco"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_8_artificiere",
+          "descrizione": "Disinnesca 15 trappole"
+        },
+        {
+          "id": "paragon_8_esploratore",
+          "evento": "damage_taken",
+          "filtri": {},
+          "target": 600,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_8_esploratore",
+          "descrizione": "Subisci 600 danni esplorando rovine"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 8,
-        "ingredients": [],
+        "ingredients": [
+          "spazzola_da_scavo",
+          "resina_conservante",
+          "frammento_di_tavoletta"
+        ],
         "formula_id": "formula_paragon_8"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 2.5,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 7,
@@ -61,18 +151,63 @@
       "name_i18n": "sequence.paragon.7",
       "tier": "low",
       "concept": "Valuta e identifica gli Oggetti Sigillati, rivelandone gli effetti collaterali.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 55,
+        "spiritualita_max": 0.15
+      },
+      "abilities": [
+        "paragon_perizia",
+        "paragon_stima"
+      ],
+      "acting_actions": [
+        {
+          "id": "paragon_7_perito",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_perizia"
+          },
+          "target": 18,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_7_perito",
+          "descrizione": "Perizia 18 Oggetti Sigillati"
+        },
+        {
+          "id": "paragon_7_stimatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "paragon_stima"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_7_stimatore",
+          "descrizione": "Stima 15 volte"
+        },
+        {
+          "id": "paragon_7_mercante",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.paragon.paragon_7_mercante",
+          "descrizione": "Sconfiggi 12 nemici sfruttando cio' che hai valutato"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 7,
-        "ingredients": [],
+        "ingredients": [
+          "bilancia_di_precisione",
+          "acido_da_saggio",
+          "cristallo_di_riferimento"
+        ],
         "formula_id": "formula_paragon_7"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 3.9,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 6,
