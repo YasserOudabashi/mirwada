@@ -512,6 +512,18 @@ def main():
             err(f"data/balance.json [progressione.sequenza_iniziale]: '{si}' fuori "
                 f"dall'intervallo 0-9.")
 
+        # US-604: il ciclo del tempo (TimeSystem) legge la sezione "tempo".
+        tempo = balance_doc.get("tempo", {})
+        for k in ("secondi_per_momento", "durata_eclissi_s"):
+            v = tempo.get(k)
+            if not isinstance(v, (int, float)) or v <= 0:
+                err(f"data/balance.json [tempo.{k}]: deve essere un numero > 0 "
+                    f"(il ciclo giorno/notte di US-604 lo usa).")
+        for k in ("momenti_per_giorno", "giorni_per_fase_lunare", "cicli_lunari_per_eclissi"):
+            v = tempo.get(k)
+            if not isinstance(v, int) or v < 1:
+                err(f"data/balance.json [tempo.{k}]: deve essere un intero >= 1.")
+
     # --- animazioni ---
     anim_doc = load_json(os.path.join(DATA, "animations.json"))
     if anim_doc:

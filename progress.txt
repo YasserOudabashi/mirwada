@@ -5295,3 +5295,40 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   placeholder data-driven ciascuna; ci si muove fra Mirwada e le 4 regioni a
   tema. Save v21.
 - Prossima storia: US-604 (TimeSystem - momento e fase lunare). BLOCCO B.
+
+[2026-09-07] US-604 — TimeSystem: momento e fase lunare. FASE 6, BLOCCO B.
+
+- scripts/time_system.gd (NUOVO autoload, subito dopo GameData): due assi da
+  data/schema/time.json - momento (alba/mezzogiorno/crepuscolo/notte_fonda) e
+  fase_lunare (nuova/crescente/piena/calante; 'eclissi' FILTRATA fuori dal
+  ciclo). avanza(delta) pubblica (i test la chiamano con delta scelto, come
+  AbilityEngine.tick_effects). e_notte() = crepuscolo|notte_fonda. Segnali
+  momento_cambiato, fase_lunare_cambiata, eclissi_iniziata/finita.
+  * eclissi: evento schedulato (ogni cicli_lunari_per_eclissi cicli) O
+    forza_eclissi() (un rituale di Sequenza alta). Mentre in corso,
+    fase_lunare() ritorna "eclissi" (override), poi torna alla fase reale.
+  * pausa: _process rispetta _pausa; imposta_pausa(bool) per il motore
+    dialoghi (US-613); connessione differita a Book.libro_aperto/chiuso
+    (Book e' un autoload piu' in basso). Il libro fa gia' get_tree().paused.
+  * time_in_state {stato: notte, quantita: delta} emesso a EventTracker
+    mentre e_notte() (misura "secondi") - Darkness ci recita (darkness_4).
+- data/balance.json: sezione "tempo" (secondi_per_momento 120, momenti_per_
+  giorno 4, giorni_per_fase_lunare 3, cicli_lunari_per_eclissi 8,
+  durata_eclissi_s 90). PLAUSIBILI, non bilanciati (open question 3 del PRD).
+- scripts/game_state.gd: _mondo_snapshot() mette TimeSystem.per_salvataggio()
+  in mondo.tempo; applica() chiama TimeSystem.da_salvataggio(mondo.tempo).
+  NESSUN bump: US-602 (v20->21) e' l'unico di fase 6; 'tempo' assente nei
+  save v21 vecchi -> default. gioco.fase resta 3 (le pagine mappa/journal
+  restano bianche finche' US-616/617 non le implementano coi loro test).
+- tools/validate_data.py: check balance.tempo (secondi_per_momento e
+  durata_eclissi_s > 0; i 3 conteggi interi >= 1).
+- tests/test_time_system.gd (NUOVO, 7 test): momento avanza + 1 segnale per
+  passaggio; e_notte coerente; time_in_state notte in EventTracker; fase
+  lunare avanza dopo 3 giorni; eclissi forzabile + schedulata + segnali (nota:
+  accumulatore Array nella lambda, non int - le lambda GDScript catturano i
+  locali per valore); pausa ferma _process; round-trip del tick.
+- Come verificato: validate exit 0 (3 warning invariati). 584 test headless
+  (577 + 7), tutti verdi (test_book incluso: apri ferma il mondo invariato).
+  Boot di main.tscn pulito, nessun errore da time_system.
+- Prossima storia: US-605 (AbilityEngine verifica le condizioni delle
+  abilita': e_notte, fase_lunare, in_zona_tag, foundation_min, ecc.).

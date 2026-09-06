@@ -68,8 +68,8 @@
       ],
       "priority": 4,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO B. scripts/time_system.gd (NUOVO autoload dopo GameData): momento + fase_lunare da time.json ('eclissi' filtrata fuori dal ciclo, e' evento schedulato/forza_eclissi). avanza(delta) pubblica. e_notte(). Segnali momento_cambiato/fase_lunare_cambiata/eclissi_iniziata/finita. Pausa: _pausa + imposta_pausa (per US-613) + connessione differita a Book. time_in_state {stato:notte} a EventTracker. balance.json sezione 'tempo' (plausibili). game_state.gd: mondo.tempo via _mondo_snapshot/da_salvataggio, NESSUN bump (US-602 e' l'unico). validate: check balance.tempo. tests/test_time_system.gd (7 test). validate exit 0, 584 test verdi."
     },
     {
       "id": "US-605",

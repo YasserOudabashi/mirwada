@@ -17,6 +17,7 @@ config/features=PackedStringArray("4.3", "GL Compatibility")
 
 ; Fonte unica dei dati. Deve stare prima di ogni sistema che li legge.
 GameData="*res://scripts/game_data.gd"
+TimeSystem="*res://scripts/time_system.gd"
 Progression="*res://scripts/progression.gd"
 EventTracker="*res://scripts/event_tracker.gd"
 AbilityEngine="*res://scripts/ability_engine.gd"

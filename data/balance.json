@@ -12,6 +12,14 @@
     "_comment": "Meta di progressione del progetto, non del personaggio. 'fase' e' la fase di sviluppo CORRENTE: le pagine del libro con sbloccata_da.fase > questo valore esistono ma sono bianche (US-221). Si alza quando si apre una fase nuova.",
     "fase": 3
   },
+  "tempo": {
+    "_comment": "Ciclo del tempo di gioco (US-604, TimeSystem). Secondi di tempo di gioco (si ferma col libro aperto/dialogo). PLAUSIBILI, non bilanciati: la durata giusta di un giorno la decide il playtest (open question 3 del PRD fase 6). Un giorno = momenti_per_giorno * secondi_per_momento = 8 minuti; una fase lunare = 3 giorni; l'eclissi e' un evento raro (ogni 8 cicli lunari) di durata_eclissi_s.",
+    "secondi_per_momento": 120.0,
+    "momenti_per_giorno": 4,
+    "giorni_per_fase_lunare": 3,
+    "cicli_lunari_per_eclissi": 8,
+    "durata_eclissi_s": 90.0
+  },
   "pet_bond": {
     "_comment": "Pesi del legame col pet (US-323). Il bond 0-100 sale ascoltando EventTracker mentre hai un pet. Le soglie che sbloccano i comportamenti sono per specie in data/pets/. Numeri PLAUSIBILI, non bilanciati.",
     "per_nemico_sconfitto": 2,

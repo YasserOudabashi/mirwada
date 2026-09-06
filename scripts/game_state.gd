@@ -48,6 +48,10 @@ func _world() -> Node:
 	return get_node_or_null("/root/WorldState")
 
 
+func _tempo() -> Node:
+	return get_node_or_null("/root/TimeSystem")
+
+
 func _summons() -> Node:
 	return get_node_or_null("/root/SummonRegistry")
 
@@ -204,7 +208,10 @@ func snapshot() -> Dictionary:
 		"statistiche": {},
 		"evocazioni": _summons().per_salvataggio() if _summons() != null else [],
 		"progressione": _progression().per_salvataggio() if _progression() != null else {},
-		"mondo": _world().per_salvataggio() if _world() != null else {},
+		# fase 6: il "mondo" e' WorldState (regione, scoperte, gate) + i campi
+		# aggiunti dalle story senza bump (US-602 e' l'unico). TimeSystem ci
+		# scrive "tempo"; NpcSystem/FlagStore/ecc. seguiranno lo stesso schema.
+		"mondo": _mondo_snapshot(),
 		"eventi": _eventi().per_salvataggio() if _eventi() != null else {},
 		"acting": _acting().per_salvataggio() if _acting() != null else {},
 		"caratteristiche": _caratteristiche().per_salvataggio() if _caratteristiche() != null else [],
@@ -236,6 +243,16 @@ func snapshot() -> Dictionary:
 	return dati
 
 
+## Il campo "mondo" del save: WorldState + i sotto-campi delle story di fase 6
+## che NON bumpano lo schema (mondo.tempo, mondo.npc, ...). Assenti nei save
+## vecchi -> ogni sistema usa il proprio default al load.
+func _mondo_snapshot() -> Dictionary:
+	var m: Dictionary = _world().per_salvataggio() if _world() != null else {}
+	if _tempo() != null:
+		m["tempo"] = _tempo().per_salvataggio()
+	return m
+
+
 func applica(dati: Dictionary) -> void:
 	nome_personaggio = str(dati.get("nome_personaggio", NOME_DEFAULT))
 	tempo_gioco = float(dati.get("tempo_gioco", 0.0))
@@ -243,6 +260,8 @@ func applica(dati: Dictionary) -> void:
 		_progression().da_salvataggio(dati.get("progressione", {}))
 	if _world() != null:
 		_world().da_salvataggio(dati.get("mondo", {}))
+	if _tempo() != null:
+		_tempo().da_salvataggio((dati.get("mondo", {}) as Dictionary).get("tempo", {}))
 	if _summons() != null:
 		_summons().da_salvataggio(dati.get("evocazioni", []))
 	if _eventi() != null:
