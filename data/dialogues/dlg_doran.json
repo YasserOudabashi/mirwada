@@ -1,17 +1,81 @@
 {
   "schema_version": 1,
   "id": "dlg_doran",
-  "_comment": "Stub US-613: un nodo. US-614 scrive il grafo vero (design-npc-quest cap. 2).",
   "start": "n1",
+  "_comment": "Investigatore. Ogni parola con lui e' rischiosa; il sospetto sale da solo (US-615).",
   "nodes": {
     "n1": {
       "speaker": "npc_doran",
-      "text": "Strane coincidenze, ultimamente. Ti tengo d'occhio.",
+      "text": "Strane coincidenze intorno a te. Ti dispiace se ti faccio qualche domanda?",
       "text_i18n": "dialogue.doran.n1",
       "choices": [
         {
+          "text": "Chiedi pure, non ho nulla da nascondere.",
+          "text_i18n": "dialogue.doran.n1.collabora",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "persuaso"
+            },
+            {
+              "tipo": "flag",
+              "id": "doran_ha_interrogato",
+              "valore": true
+            }
+          ],
+          "goto": "n2"
+        },
+        {
+          "text": "Lascia perdere, Doran.",
+          "text_i18n": "dialogue.doran.n1.minaccia",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "intimidito"
+            },
+            {
+              "tipo": "flag",
+              "id": "doran_sospetto_alto",
+              "valore": true
+            }
+          ],
+          "goto": "n3"
+        },
+        {
           "text": "Devo andare.",
           "text_i18n": "dialogue.doran.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n2": {
+      "speaker": "npc_doran",
+      "text": "Per ora ti credo. Per ora.",
+      "text_i18n": "dialogue.doran.n2",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.doran.n2.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n3": {
+      "speaker": "npc_doran",
+      "text": "Interessante reazione. Molto interessante.",
+      "text_i18n": "dialogue.doran.n3",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.doran.n3.congedo",
           "condizioni": [],
           "effetti": [],
           "goto": null

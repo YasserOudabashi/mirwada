@@ -5714,3 +5714,41 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - BLOCCO F quasi chiuso: manca US-614 (i grafi veri degli 8; ora sono stub a
   1 nodo). Il motore + la pagina + il gancio ci sono.
 - Prossima storia: US-614 (gli 8 file dialogo + i popolani). BLOCCO F.
+
+[2026-09-07] US-614 — Gli 8 file dialogo del roster + i popolani generici. FASE 6, BLOCCO F CHIUSO.
+
+- data/dialogues/: 7 grafi veri (dlg_mirco e dlg_generic erano gia' reali da
+  US-613). 2-3 nodi ciascuno, coerenti col ruolo meccanico di
+  design-npc-quest cap. 2:
+  * dlg_sidon: apri_vendita (npc_sidon) + rumor a pagamento (paga -> flag
+    sidon_ha_parlato, punta a Ottavia).
+  * dlg_vesna: la cura chiede reputazione_min ["quartiere", 0] (US-615);
+    "rassicura" abbassa la diffida (flag vesna_diffida=false).
+  * dlg_aldo: la sfida al duello chiede flag aldo_duello_disponibile
+    (lo scrive US-620); provocare intimidisce.
+  * dlg_ottavia: concede flag testi_ordine_minore (apre l'Archivio, US-611)
+    a tier_min mid OPPURE avendo il flag sidon_ha_parlato.
+  * dlg_bruno: "aiuta" e' gated da e_notte:true -> flag bruno_porto_notturno
+    + npc_influenced modo aiutato (apre i passaggi notturni, gate npc US-611).
+  * dlg_lena: nessun servizio, solo "gioca" (flag lena_ricorda_il_gioco,
+    modo aiutato) - misura quanto ne resta.
+  * dlg_doran: collaborare persuade, minacciare intimidisce e alza il
+    sospetto (flag doran_sospetto_alto).
+- Vocabolari: solo condizioni condivise (tier_min/flag/reputazione_min/e_notte)
+  ed effetti dai 5 (emit_event/flag/apri_vendita). Zero verbi nuovi.
+- tools/generate_i18n_stubs.py rilanciato: +40 chiavi dialogue.* seminate dal
+  campo gemello 'text' (it.json 784 -> 824; i 48 TODO invariati - tutti i
+  testi del roster tradotti).
+- tests/test_dialoghi_roster.gd (NUOVO, 4 test): ogni dialogo (9) si gioca
+  fino a un nodo terminale scegliendo sempre il congedo, senza loop; Ottavia
+  concede il flag e quel flag apre davvero l'AreaGate 'conoscenza'
+  dell'Archivio (integrazione US-611); Bruno: "aiuta" nascosta di giorno,
+  visibile e funzionante di notte (flag + memoria); i testi del roster non
+  sono stub TODO.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati,
+  la sezione dialoghi di US-613 valida i 9 grafi: start, goto, orfani,
+  speaker, vocabolari). 633 test headless (629 + 4), tutti verdi.
+- BLOCCO F CHIUSO: US-613 (motore) + US-613b (pagina + gancio) + US-614
+  (contenuto). Si parla con gli 8 NPC di Mirwada, le scelte hanno condizioni
+  e conseguenze, il mondo si ferma.
+- Prossima storia: US-615 (fazioni + reputazione). BLOCCO G.

@@ -1,17 +1,82 @@
 {
   "schema_version": 1,
   "id": "dlg_sidon",
-  "_comment": "Stub US-613: un nodo. US-614 scrive il grafo vero (design-npc-quest cap. 2).",
   "start": "n1",
+  "_comment": "Mercante di reagenti e voci (design-npc-quest 2). apri_vendita + rumor a pagamento.",
   "nodes": {
     "n1": {
       "speaker": "npc_sidon",
-      "text": "Reagenti e voci, al giusto prezzo.",
+      "text": "Reagenti freschi, e qualche voce se ti interessa.",
       "text_i18n": "dialogue.sidon.n1",
       "choices": [
         {
+          "text": "Fammi vedere la merce.",
+          "text_i18n": "dialogue.sidon.n1.compra",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "apri_vendita",
+              "npc_id": "npc_sidon"
+            }
+          ],
+          "goto": null
+        },
+        {
+          "text": "Che voci girano?",
+          "text_i18n": "dialogue.sidon.n1.voci",
+          "condizioni": [],
+          "effetti": [],
+          "goto": "n2"
+        },
+        {
           "text": "Devo andare.",
           "text_i18n": "dialogue.sidon.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n2": {
+      "speaker": "npc_sidon",
+      "text": "Le voci costano. Sempre.",
+      "text_i18n": "dialogue.sidon.n2",
+      "choices": [
+        {
+          "text": "Pago. Parla.",
+          "text_i18n": "dialogue.sidon.n2.paga",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "persuaso"
+            },
+            {
+              "tipo": "flag",
+              "id": "sidon_ha_parlato",
+              "valore": true
+            }
+          ],
+          "goto": "n3"
+        },
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.sidon.n2.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n3": {
+      "speaker": "npc_sidon",
+      "text": "Un archivista dell'ordine minore compra cose che non dovrebbero esistere. Parla con Ottavia.",
+      "text_i18n": "dialogue.sidon.n3",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.sidon.n3.congedo",
           "condizioni": [],
           "effetti": [],
           "goto": null

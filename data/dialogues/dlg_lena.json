@@ -1,17 +1,70 @@
 {
   "schema_version": 1,
   "id": "dlg_lena",
-  "_comment": "Stub US-613: un nodo. US-614 scrive il grafo vero (design-npc-quest cap. 2).",
   "start": "n1",
+  "_comment": "Bambina del quartiere. Nessun servizio, solo umanita'. Le sue scene misurano quanto ne resta.",
   "nodes": {
     "n1": {
       "speaker": "npc_lena",
-      "text": "Giochi con me? Nessuno vuole mai giocare.",
+      "text": "Nessuno vuole mai giocare. Tu giochi?",
       "text_i18n": "dialogue.lena.n1",
       "choices": [
         {
+          "text": "Va bene. Solo un momento pero'.",
+          "text_i18n": "dialogue.lena.n1.gioca",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "aiutato"
+            },
+            {
+              "tipo": "flag",
+              "id": "lena_ricorda_il_gioco",
+              "valore": true
+            }
+          ],
+          "goto": "n2"
+        },
+        {
+          "text": "Adesso non posso.",
+          "text_i18n": "dialogue.lena.n1.no",
+          "condizioni": [],
+          "effetti": [],
+          "goto": "n3"
+        },
+        {
           "text": "Devo andare.",
           "text_i18n": "dialogue.lena.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n2": {
+      "speaker": "npc_lena",
+      "text": "Sei strano. Ma di quelli buoni. Torni domani?",
+      "text_i18n": "dialogue.lena.n2",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.lena.n2.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n3": {
+      "speaker": "npc_lena",
+      "text": "Lo dicono tutti i grandi.",
+      "text_i18n": "dialogue.lena.n3",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.lena.n3.congedo",
           "condizioni": [],
           "effetti": [],
           "goto": null

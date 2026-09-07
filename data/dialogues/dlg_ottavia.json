@@ -1,17 +1,73 @@
 {
   "schema_version": 1,
   "id": "dlg_ottavia",
-  "_comment": "Stub US-613: un nodo. US-614 scrive il grafo vero (design-npc-quest cap. 2).",
   "start": "n1",
+  "_comment": "Archivista dell'ordine minore. Concede il flag testi_ordine_minore che apre l'Archivio Sepolto (US-611).",
   "nodes": {
     "n1": {
       "speaker": "npc_ottavia",
-      "text": "L'Archivio non e' per tutti. Non ancora per te.",
+      "text": "L'Archivio non e' per curiosi. Cosa cerchi?",
       "text_i18n": "dialogue.ottavia.n1",
       "choices": [
         {
+          "text": "Vorrei leggere i testi dell'ordine minore.",
+          "text_i18n": "dialogue.ottavia.n1.chiedi",
+          "condizioni": [
+            {
+              "tipo": "tier_min",
+              "valore": "mid"
+            }
+          ],
+          "effetti": [],
+          "goto": "n2"
+        },
+        {
+          "text": "So gia' abbastanza da meritarlo.",
+          "text_i18n": "dialogue.ottavia.n1.insisti",
+          "condizioni": [
+            {
+              "tipo": "flag",
+              "valore": "sidon_ha_parlato"
+            }
+          ],
+          "effetti": [],
+          "goto": "n2"
+        },
+        {
           "text": "Devo andare.",
           "text_i18n": "dialogue.ottavia.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n2": {
+      "speaker": "npc_ottavia",
+      "text": "Forse. Prendi questo lasciapassare: le ali interne ti sono aperte.",
+      "text_i18n": "dialogue.ottavia.n2",
+      "choices": [
+        {
+          "text": "Grazie.",
+          "text_i18n": "dialogue.ottavia.n2.accetta",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "testi_ordine_minore",
+              "valore": true
+            },
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "persuaso"
+            }
+          ],
+          "goto": null
+        },
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.ottavia.n2.congedo",
           "condizioni": [],
           "effetti": [],
           "goto": null

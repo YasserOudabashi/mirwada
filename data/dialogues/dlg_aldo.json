@@ -1,17 +1,81 @@
 {
   "schema_version": 1,
   "id": "dlg_aldo",
-  "_comment": "Stub US-613: un nodo. US-614 scrive il grafo vero (design-npc-quest cap. 2).",
   "start": "n1",
+  "_comment": "Ex collega, ora rivale. Il duello si sblocca ai passaggi di tier (US-620 scrive aldo_duello_disponibile).",
   "nodes": {
     "n1": {
       "speaker": "npc_aldo",
-      "text": "Guarda chi si vede. Sei ancora indietro.",
+      "text": "Guarda chi si vede. Ancora a inseguire, eh?",
       "text_i18n": "dialogue.aldo.n1",
       "choices": [
         {
+          "text": "Battiamoci, allora.",
+          "text_i18n": "dialogue.aldo.n1.sfida",
+          "condizioni": [
+            {
+              "tipo": "flag",
+              "valore": "aldo_duello_disponibile"
+            }
+          ],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "aldo_duello_accettato",
+              "valore": true
+            },
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "intimidito"
+            }
+          ],
+          "goto": "n2"
+        },
+        {
+          "text": "Sei tu che guardi indietro.",
+          "text_i18n": "dialogue.aldo.n1.provoca",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "intimidito"
+            }
+          ],
+          "goto": "n3"
+        },
+        {
           "text": "Devo andare.",
           "text_i18n": "dialogue.aldo.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n2": {
+      "speaker": "npc_aldo",
+      "text": "Finalmente. Non deludermi.",
+      "text_i18n": "dialogue.aldo.n2",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.aldo.n2.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n3": {
+      "speaker": "npc_aldo",
+      "text": "Vedremo chi arriva prima in fondo alla scala.",
+      "text_i18n": "dialogue.aldo.n3",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.aldo.n3.congedo",
           "condizioni": [],
           "effetti": [],
           "goto": null

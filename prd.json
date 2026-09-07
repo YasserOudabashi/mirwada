@@ -224,8 +224,8 @@
       ],
       "priority": 12,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO F CHIUSO. 7 grafi veri (dlg_mirco e dlg_generic gia' reali da US-613), 2-3 nodi ciascuno, coerenti col ruolo meccanico di design-npc-quest cap. 2: sidon (apri_vendita + rumor a pagamento -> flag sidon_ha_parlato); vesna (cura gated da reputazione_min ['quartiere',0], US-615); aldo (sfida gated da flag aldo_duello_disponibile, US-620); ottavia (concede flag testi_ordine_minore -> apre l'Archivio US-611, a tier_min mid OR flag sidon_ha_parlato); bruno (aiuta gated da e_notte -> flag bruno_porto_notturno + modo aiutato, apre i passaggi notturni gate npc US-611); lena (nessun servizio, solo 'gioca' -> flag lena_ricorda_il_gioco); doran (minaccia -> flag doran_sospetto_alto). Solo condizioni condivise (tier_min/flag/reputazione_min/e_notte) ed effetti dai 5 (emit_event/flag/apri_vendita), zero verbi nuovi. generate_i18n_stubs: +40 chiavi dialogue.* seminate da 'text' (it.json 784->824, 48 TODO invariati - tutti i testi del roster tradotti). tests/test_dialoghi_roster.gd (4 test): ogni dialogo (9) si gioca fino a un terminale senza loop; Ottavia concede il flag e quel flag apre davvero l'AreaGate 'conoscenza' dell'Archivio (integrazione US-611); Bruno 'aiuta' nascosta di giorno, funzionante di notte; testi non-TODO. validate exit 0 (3 warning invariati, la sezione dialoghi di US-613 valida i 9 grafi). 633 test verdi (629+4). NOTA: la verifica a schermo dei singoli dialoghi e' coperta da US-613b (la pagina); qui e' contenuto + test di integrazione."
     },
     {
       "id": "US-615",

@@ -1,17 +1,84 @@
 {
   "schema_version": 1,
   "id": "dlg_vesna",
-  "_comment": "Stub US-613: un nodo. US-614 scrive il grafo vero (design-npc-quest cap. 2).",
   "start": "n1",
+  "_comment": "Guaritrice ai margini. reputazione_min per la cura; usare poteri davanti a lei la raffredda (US-615).",
   "nodes": {
     "n1": {
       "speaker": "npc_vesna",
-      "text": "Tienili lontani da qui, i tuoi poteri.",
+      "text": "Se sei ferito posso aiutarti. Se sei uno di loro, gira al largo.",
       "text_i18n": "dialogue.vesna.n1",
       "choices": [
         {
+          "text": "Ho bisogno di cure.",
+          "text_i18n": "dialogue.vesna.n1.cura",
+          "condizioni": [
+            {
+              "tipo": "reputazione_min",
+              "valore": [
+                "quartiere",
+                0
+              ]
+            }
+          ],
+          "effetti": [
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "aiutato"
+            }
+          ],
+          "goto": "n2"
+        },
+        {
+          "text": "Non sono una minaccia.",
+          "text_i18n": "dialogue.vesna.n1.rassicura",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "persuaso"
+            },
+            {
+              "tipo": "flag",
+              "id": "vesna_diffida",
+              "valore": false
+            }
+          ],
+          "goto": "n3"
+        },
+        {
           "text": "Devo andare.",
           "text_i18n": "dialogue.vesna.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n2": {
+      "speaker": "npc_vesna",
+      "text": "Tieni. E cerca di non tornare troppo presto.",
+      "text_i18n": "dialogue.vesna.n2",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.vesna.n2.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n3": {
+      "speaker": "npc_vesna",
+      "text": "Lo dicono tutti. Poi cambiano.",
+      "text_i18n": "dialogue.vesna.n3",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.vesna.n3.congedo",
           "condizioni": [],
           "effetti": [],
           "goto": null

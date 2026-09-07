@@ -1,17 +1,66 @@
 {
   "schema_version": 1,
   "id": "dlg_bruno",
-  "_comment": "Stub US-613: un nodo. US-614 scrive il grafo vero (design-npc-quest cap. 2).",
   "start": "n1",
+  "_comment": "Contrabbandiere del porto, solo di notte. Aiutarlo apre i passaggi notturni (gate npc, US-611).",
   "nodes": {
     "n1": {
       "speaker": "npc_bruno",
-      "text": "Di giorno non mi hai visto. Di notte, forse parliamo.",
+      "text": "Di giorno non ci siamo visti. Adesso, cosa vuoi?",
       "text_i18n": "dialogue.bruno.n1",
       "choices": [
         {
+          "text": "Ti do una mano a spostare il carico.",
+          "text_i18n": "dialogue.bruno.n1.aiuta",
+          "condizioni": [
+            {
+              "tipo": "e_notte",
+              "valore": true
+            }
+          ],
+          "effetti": [
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "aiutato"
+            },
+            {
+              "tipo": "flag",
+              "id": "bruno_porto_notturno",
+              "valore": true
+            }
+          ],
+          "goto": "n2"
+        },
+        {
+          "text": "Fammi vedere cosa hai.",
+          "text_i18n": "dialogue.bruno.n1.merce",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "apri_vendita",
+              "npc_id": "npc_bruno"
+            }
+          ],
+          "goto": null
+        },
+        {
           "text": "Devo andare.",
           "text_i18n": "dialogue.bruno.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n2": {
+      "speaker": "npc_bruno",
+      "text": "Bravo. Adesso il molo di notte e' anche tuo. E la strada per le Marche.",
+      "text_i18n": "dialogue.bruno.n2",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.bruno.n2.congedo",
           "condizioni": [],
           "effetti": [],
           "goto": null
