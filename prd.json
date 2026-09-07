@@ -207,8 +207,8 @@
       ],
       "priority": 11,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO F. page_types.json 8->9 (+page_dialogo); validate_data.py conta 9. book.json voce 'dialogo' ordine 7 con \"transitoria\": true (non diventa l'ultima pagina consultata; dato, nessun id hardcoded). scripts/pages/page_dialogo.gd + .tscn (NUOVI): legge DialogueEngine (nodo_corrente/interlocutore/scelte_valide), speaker in colore + testo + un Button per scelta valida -> scegli(i); ridisegna a nodo_cambiato/dialogo_finito, remove_child immediato. book.gd: apri_a(page_id) (non sporca _ultima); chiudi() salta _ultima se la pagina e' transitoria. book_overlay.gd: PAGINE += page_dialogo; dialogo_avviato -> apri/vai alla pagina di tipo page_dialogo (_pagina_di_tipo, nessun id hardcoded); dialogo_finito -> chiude se transitoria; libro_chiuso -> DialogueEngine.termina. region_scene.gd: _npc_vicino da body_entered/exited dei marker; _unhandled_input su 'interagisci' -> DialogueEngine.avvia(roster[id].dialogue_id, id), no-op se libro aperto o dialogo in corso. project.godot: azione 'interagisci' (F/Invio). i18n: ui.page.dialogo='Dialogo'. tests/test_page_dialogo.gd (5 test); test_book.gd 8->9. validate exit 0 (3 warning invariati), 629 test verdi (624+5). Verifica a schermo (_shot_us613b.gd, rendering reale): avvicino il giocatore a Mirco + 'interagisci' -> libro sulla pagina 'Dialogo', Mirco in azzurro, 2 bottoni (tier_min:mid nascosta a Seq 9), tick fermo; scegli -> n2; congedo -> dialogo finito + libro chiuso. Screenshot us613b_dialogo_n1/n2.png."
     },
     {
       "id": "US-614",
