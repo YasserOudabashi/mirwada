@@ -44,8 +44,12 @@ func _ready() -> void:
 	_crea_zone()
 	_crea_passaggi()
 	_crea_gate()
+	_crea_npc()
 	_colloca_giocatore()
 	_registra_regione()
+	var ts: Node = get_node_or_null("/root/TimeSystem")
+	if ts != null and ts.has_signal("momento_cambiato"):
+		ts.momento_cambiato.connect(func(_m): _crea_npc())
 
 
 func _regione_dati() -> Dictionary:
@@ -174,6 +178,38 @@ func _crea_gate() -> void:
 			TILE * 4 + (float(H - 8) * TILE) * (float(i) + 0.5) / float(maxi(gates.size(), 1)))
 		ag.call("configura", region_id, g)
 		add_child(ag)
+
+
+## Gli NPC presenti ORA (schedule + momento corrente, US-612): un marker nella
+## zona del loro location_tag. Ricostruito a ogni momento_cambiato - Bruno
+## compare solo di notte, Mirco sparisce a notte_fonda. Entrarci = "incontrato".
+func _crea_npc() -> void:
+	for c in get_children():
+		if c is Area2D and c.has_meta("npc_id"):
+			c.queue_free()
+	var ns: Node = get_node_or_null("/root/NpcSystem")
+	if ns == null:
+		return
+	var presenti: Dictionary = ns.call("presenti", region_id)
+	for id in presenti:
+		var zona: Node2D = get_node_or_null("Zona_%s" % str(presenti[id])) as Node2D
+		var area := Area2D.new()
+		area.name = "Npc_%s" % str(id)
+		area.set_meta("npc_id", str(id))
+		area.position = zona.position if zona != null else Vector2(W, H) * TILE * 0.5
+		var shape := CollisionShape2D.new()
+		var rect := RectangleShape2D.new()
+		rect.size = Vector2(TILE, TILE) * 1.2
+		shape.shape = rect
+		area.add_child(shape)
+		var m := ColorRect.new()
+		m.color = Color(0.4, 0.6, 0.95, 0.8)
+		m.size = Vector2(TILE, TILE)
+		m.position = -0.5 * m.size
+		m.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		area.add_child(m)
+		area.body_entered.connect(func(b): if b.is_in_group("player"): ns.call("incontra", str(id)))
+		add_child(area)
 
 
 func _su_ingresso_zona(body: Node, location_tag: String) -> void:

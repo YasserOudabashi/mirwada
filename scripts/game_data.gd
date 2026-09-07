@@ -49,6 +49,7 @@ const PATH_SIGILS := "res://data/sigils/core.json"
 const PATH_SIGIL_EFFECT_TYPES := "res://data/schema/sigil_effect_types.json"
 const PATH_BLUEPRINTS := "res://data/forge/blueprints.json"
 const PATH_REGIONS := "res://data/world/regions.json"
+const PATH_ROSTER := "res://data/npc/roster.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -91,6 +92,7 @@ var _sigils: Dictionary = {}
 var _sigil_effect_types: Dictionary = {}
 var _blueprints: Dictionary = {}
 var _regions: Dictionary = {}
+var _roster: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -166,6 +168,7 @@ func load_all() -> void:
 	_load_single(PATH_SIGIL_EFFECT_TYPES, "effetti", _sigil_effect_types, TYPE_ARRAY)
 	_load_single(PATH_BLUEPRINTS, "blueprints", _blueprints, TYPE_DICTIONARY)
 	_load_single(PATH_REGIONS, "regions", _regions, TYPE_ARRAY)
+	_load_single(PATH_ROSTER, "npcs", _roster, TYPE_ARRAY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -543,6 +546,19 @@ func get_region(id: String) -> Dictionary:
 	for r in get_regions():
 		if typeof(r) == TYPE_DICTIONARY and str((r as Dictionary).get("id", "")) == id:
 			return r
+	return {}
+
+
+## --- NPC (data/npc/roster.json, US-612) ---
+func get_npcs() -> Array:
+	return _array_or_empty(_roster.get("npcs"))
+
+
+## {} se l'id non esiste: il chiamante controlla con is_empty().
+func get_npc(id: String) -> Dictionary:
+	for n in get_npcs():
+		if typeof(n) == TYPE_DICTIONARY and str((n as Dictionary).get("id", "")) == id:
+			return n
 	return {}
 
 

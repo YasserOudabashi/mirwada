@@ -5556,3 +5556,58 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   si aprono per momento/fase lunare/primitiva posseduta/conoscenza/Sequenza, e
   un varco forzato resta aperto per sempre.
 - Prossima storia: US-612 (roster.json + npc.schema.json + NpcSystem). BLOCCO E.
+
+[2026-09-07] US-612 — roster.json + npc.schema.json + validator + NpcSystem. FASE 6, BLOCCO E.
+
+- data/npc/roster.json (NUOVO): gli 8 del roster (npc_mirco/sidon/vesna/aldo/
+  ottavia/bruno/lena/doran) + npc_generic_01..10 (fool_9_inganno ne inganna 10,
+  tg_6_giuramento ne aiuta 8). Ogni voce: region_id, anchor_candidate,
+  faction_id (null ammesso finche' US-615), schedule[{momento, location_tag|null}]
+  sui vocabolari di time.json/regions.json, vendor (null o {listino:[item_id]}),
+  dialogue_id (-> data/dialogues/, US-614), memoria {}. name/role in chiaro =
+  seme i18n (chiavi npc.<short>.name/role). Bruno ha location_tag solo a
+  crepuscolo/notte_fonda: "esiste solo di notte".
+- data/schema/npc.schema.json (NUOVO): la forma (additionalProperties:false),
+  documentazione come gli altri schema del progetto.
+- scripts/npc_system.gd (NUOVO autoload, dopo AnchorSystem): stato VIVO degli
+  NPC (i dati stanno nel roster). incontra(id)/conosciuti()/conosce(id);
+  influenza(id, modo) -> aggiorna memoria (contatore per uno dei 5 modi di
+  npc_influenced) + EventTracker.emit_event("npc_influenced", {modo}) + segnale
+  npc_influenzato; memoria(id); ha_influenza("<id>[:<modo>]") per i gate npc
+  (US-611); promuovi_ancora(id)/ancore_attive() (solo anchor_candidate);
+  presenti(region_id) -> {id: location_tag} da schedule + TimeSystem.momento();
+  nomi_i18n() (conosciuti + Ancore) spinto ad AudioManager.
+- scripts/game_data.gd: PATH_ROSTER + _roster + load + get_npcs()/get_npc(id).
+- scripts/audio_manager.gd: _nomi_npc + imposta_nomi_npc(); nomi_sussurro() ora
+  UNISCE i nomi NPC (NpcSystem) e le Ancore (AnchorSystem, invariato) -> i
+  sussurri di soglia 55 pronunciano gli uni e le altre (contratto audio.json).
+- scripts/game_state.gd: mondo.npc via _mondo_snapshot/applica (come mondo.tempo,
+  NESSUN bump: US-602 e' l'unico di fase 6). Assente nei save v21 vecchi ->
+  default vuoti.
+- scripts/region_scene.gd: _crea_npc() un marker Area2D per NPC presente ORA
+  (presenti()), nella zona del suo location_tag; ricostruito a ogni
+  TimeSystem.momento_cambiato; entrarci col player = NpcSystem.incontra(id).
+- tools/validate_data.py: sezione NPC (dopo item_ids). id prefisso npc_,
+  name/role_i18n prefisso npc., region_id in regions.json, schedule
+  momento/location_tag nei vocabolari, vendor.listino item reali, faction_id in
+  factions.json SE esiste (US-615), dialogue_id con un file SE data/dialogues/
+  esiste (US-614), gli 8 del roster presenti, >= 10 generici.
+- tools/generate_i18n_stubs.py rilanciato: +18 chiavi npc.* seminate da
+  name/role (it.json 739 -> 757; i 48 TODO invariati).
+- tests/test_npc_system.gd (NUOVO, 8 test): roster 18 caricato; influenza
+  aggiorna memoria + emette npc_influenced + modo fuori dai 5 rifiutato;
+  ha_influenza per i gate; nomi_sussurro include conosciuti e Ancore;
+  presenti() segue lo schedule (Mirco in piazza all'alba, Bruno al porto solo
+  di notte); round-trip del save; da_salvataggio non fidato.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  617 test headless (610 + 7), tutti verdi (test_audio/test_book che leggono
+  nomi_sussurro invariati). 1 SCRIPT ERROR preesistente (non nuovo). Verifica a
+  schermo (rendering reale, _shot_us612.gd): in Mirwada all'alba 16 NPC in scena
+  nella location_tag giusta (Aldo e Bruno assenti, location_tag null); a
+  notte_fonda solo Bruno/Doran/generic_04. Screenshot us612_mirwada_giorno.png,
+  us612_mirwada_notte.png.
+- NOTA dimensione: story fondativa di blocco (schema + dati + autoload + loader
+  + validator + save + audio + spawn), 11 file toccati - inevitabile per un
+  sistema nuovo, ogni pezzo e' piccolo e additivo.
+- Prossima storia: US-613 (motore dialoghi + dialogue.schema.json + FlagStore +
+  pagina page_dialogo). BLOCCO F.

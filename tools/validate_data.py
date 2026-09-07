@@ -1027,6 +1027,69 @@ def main():
     if len(blueprints) < 1:
         err("data/forge/blueprints.json: nessun blueprint, atteso almeno 1")
 
+    # --- NPC (data/npc/roster.json, US-612) ---
+    # Un NPC e' DATO: schedule sui momenti/location_tags, vendor sugli item.
+    # faction_id -> data/factions.json (US-615) e dialogue_id -> data/dialogues/
+    # (US-614): finche' quei file non esistono il check e' indulgente.
+    roster_doc = load_json(os.path.join(DATA, "npc", "roster.json"))
+    faction_ids = set()
+    _fac_path = os.path.join(DATA, "factions.json")
+    if os.path.exists(_fac_path):
+        _fac_doc = load_json(_fac_path) or {}
+        faction_ids = {f.get("id") for f in _fac_doc.get("factions", [])}
+    dlg_dir = os.path.join(DATA, "dialogues")
+    dlg_ids = set()
+    if os.path.isdir(dlg_dir):
+        for fn in os.listdir(dlg_dir):
+            d = load_json(os.path.join(dlg_dir, fn)) or {}
+            if d.get("id"):
+                dlg_ids.add(d["id"])
+    if roster_doc is None:
+        err("data/npc/roster.json: mancante o illeggibile (US-612).")
+    else:
+        rel = "data/npc/roster.json"
+        npc_ids = set()
+        n_generici = 0
+        for npc in roster_doc.get("npcs", []):
+            nid = npc.get("id", "")
+            if nid in npc_ids:
+                err(f"{rel}: id NPC duplicato '{nid}'")
+            npc_ids.add(nid)
+            if not isinstance(nid, str) or not nid.startswith("npc_"):
+                err(f"{rel} [{nid}]: id deve avere il prefisso 'npc_'")
+            if nid.startswith("npc_generic_"):
+                n_generici += 1
+            for campo in ("name_i18n", "role_i18n"):
+                v = npc.get(campo)
+                if not isinstance(v, str) or not v.startswith("npc."):
+                    err(f"{rel} [{nid}]: {campo} '{v}' deve avere il prefisso 'npc.'")
+            if npc.get("region_id") not in region_ids:
+                err(f"{rel} [{nid}]: region_id '{npc.get('region_id')}' non e' una regione di regions.json")
+            for voce in npc.get("schedule", []):
+                mom = voce.get("momento")
+                if mom not in valid_momenti:
+                    err(f"{rel} [{nid}]: schedule momento '{mom}' non nel vocabolario time.json")
+                lt = voce.get("location_tag")
+                if lt is not None and valid_location_tags and lt not in valid_location_tags:
+                    err(f"{rel} [{nid}]: schedule location_tag '{lt}' fuori dal vocabolario di location_tags.json")
+            ven = npc.get("vendor")
+            if ven is not None:
+                for iid in ven.get("listino", []):
+                    if iid not in item_ids:
+                        err(f"{rel} [{nid}]: vendor.listino '{iid}' non e' un item esistente")
+            fid = npc.get("faction_id")
+            if fid is not None and faction_ids and fid not in faction_ids:
+                err(f"{rel} [{nid}]: faction_id '{fid}' non e' in data/factions.json")
+            did = npc.get("dialogue_id")
+            if dlg_ids and did not in dlg_ids:
+                err(f"{rel} [{nid}]: dialogue_id '{did}' non ha un file in data/dialogues/")
+        for atteso in ("npc_mirco", "npc_sidon", "npc_vesna", "npc_aldo",
+                       "npc_ottavia", "npc_bruno", "npc_lena", "npc_doran"):
+            if atteso not in npc_ids:
+                err(f"{rel}: manca l'NPC del roster '{atteso}' (design-npc-quest cap. 2)")
+        if n_generici < 10:
+            err(f"{rel}: solo {n_generici} npc_generic_*, attesi >= 10 (fool_9_inganno ne inganna 10)")
+
     # --- strutture costruibili (data/structures/, US-319) ---
     struct_dir = os.path.join(DATA, "structures")
     structure_ids = set()

@@ -81,7 +81,8 @@ var _one_shot_left: float = 0.0
 var _follia_corrente: float = 0.0
 ## Nomi che i sussurri di soglia 55 pronunciano (NPC incontrati, Ancore).
 ## Li popola AnchorSystem / il sistema NPC; se vuoto si usa un set generico.
-var _nomi_sussurro: Array = []
+var _nomi_sussurro: Array = []   # Ancore (AnchorSystem)
+var _nomi_npc: Array = []         # NPC incontrati + Ancore del roster (NpcSystem, US-612)
 const _NOMI_GENERICI := ["...", "torna", "sei qui", "non e' reale"]
 
 
@@ -217,6 +218,12 @@ func imposta_nomi_sussurro(nomi: Array) -> void:
 	_nomi_sussurro = nomi.duplicate()
 
 
+## US-612: i nomi degli NPC che il giocatore ha incontrato (e le Ancore del
+## roster). NpcSystem li spinge qui; nomi_sussurro() li unisce alle Ancore.
+func imposta_nomi_npc(nomi: Array) -> void:
+	_nomi_npc = nomi.duplicate()
+
+
 ## Taglio secco al silenzio (US-217): un rituale interrotto muta music,
 ## ambience e whisper per durata_s, poi li ripristina. Il silenzio
 ## improvviso e' il momento piu' spaventoso che il gioco produce.
@@ -268,7 +275,11 @@ func layers_ambientali_attivi() -> Array:
 
 
 func nomi_sussurro() -> Array:
-	return _nomi_sussurro if not _nomi_sussurro.is_empty() else _NOMI_GENERICI
+	var uniti: Array = _nomi_npc.duplicate()
+	for n in _nomi_sussurro:
+		if n not in uniti:
+			uniti.append(n)
+	return uniti if not uniti.is_empty() else _NOMI_GENERICI
 
 
 ## Un one-shot casuale della follia. Pubblico per i test.

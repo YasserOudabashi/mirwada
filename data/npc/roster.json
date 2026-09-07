@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "_comment": "Gli 8 NPC del roster di design-npc-quest cap. 2 + i popolani generici che tg_6_giuramento (aiuta 8) e fool_9_inganno (inganna 10) richiedono. Un NPC e' DATO: schedule sui momenti di time.json e sui location_tags di regions.json, memoria = contatore per modo di npc_influenced (i 5 di tracked_events.json). name/role sono il seme i18n (chiavi npc.<short>.*). dialogue_id -> data/dialogues/ (US-614); faction_id -> data/factions.json (US-615): il validator e' indulgente finche' quei file non esistono.",
+  "npcs": [
+    {
+      "id": "npc_mirco",
+      "name": "Mirco",
+      "name_i18n": "npc.mirco.name",
+      "role": "Primo volto amichevole, insegna le basi",
+      "role_i18n": "npc.mirco.role",
+      "region_id": "mirwada",
+      "anchor_candidate": true,
+      "faction_id": "quartiere",
+      "schedule": [
+        { "momento": "alba", "location_tag": "piazza" },
+        { "momento": "mezzogiorno", "location_tag": "piazza" },
+        { "momento": "crepuscolo", "location_tag": "vicolo" },
+        { "momento": "notte_fonda", "location_tag": null }
+      ],
+      "vendor": null,
+      "dialogue_id": "dlg_mirco",
+      "memoria": {}
+    },
+    {
+      "id": "npc_sidon",
+      "name": "Sidon",
+      "name_i18n": "npc.sidon.name",
+      "role": "Mercante di reagenti e voci",
+      "role_i18n": "npc.sidon.role",
+      "region_id": "mirwada",
+      "anchor_candidate": false,
+      "faction_id": "porto",
+      "schedule": [
+        { "momento": "alba", "location_tag": "porto" },
+        { "momento": "mezzogiorno", "location_tag": "porto" },
+        { "momento": "crepuscolo", "location_tag": "porto" },
+        { "momento": "notte_fonda", "location_tag": null }
+      ],
+      "vendor": { "listino": ["erba_lunare", "radice_crepuscolo", "polvere_ossa", "acqua_sorgiva"] },
+      "dialogue_id": "dlg_sidon",
+      "memoria": {}
+    },
+    {
+      "id": "npc_vesna",
+      "name": "Vesna",
+      "name_i18n": "npc.vesna.name",
+      "role": "Guaritrice ai margini, diffida dei Beyonder",
+      "role_i18n": "npc.vesna.role",
+      "region_id": "mirwada",
+      "anchor_candidate": true,
+      "faction_id": "quartiere",
+      "schedule": [
+        { "momento": "alba", "location_tag": "vicolo" },
+        { "momento": "mezzogiorno", "location_tag": "vicolo" },
+        { "momento": "crepuscolo", "location_tag": "vicolo" },
+        { "momento": "notte_fonda", "location_tag": null }
+      ],
+      "vendor": { "listino": ["pozione_cura_minore", "erba_lunare"] },
+      "dialogue_id": "dlg_vesna",
+      "memoria": {}
+    },
+    {
+      "id": "npc_aldo",
+      "name": "Aldo",
+      "name_i18n": "npc.aldo.name",
+      "role": "Ex collega, ora rivale in ascesa",
+      "role_i18n": "npc.aldo.role",
+      "region_id": "mirwada",
+      "anchor_candidate": false,
+      "faction_id": null,
+      "schedule": [
+        { "momento": "alba", "location_tag": null },
+        { "momento": "mezzogiorno", "location_tag": "piazza" },
+        { "momento": "crepuscolo", "location_tag": "piazza" },
+        { "momento": "notte_fonda", "location_tag": null }
+      ],
+      "vendor": null,
+      "dialogue_id": "dlg_aldo",
+      "memoria": {}
+    },
+    {
+      "id": "npc_ottavia",
+      "name": "Ottavia",
+      "name_i18n": "npc.ottavia.name",
+      "role": "Archivista di un ordine minore",
+      "role_i18n": "npc.ottavia.role",
+      "region_id": "mirwada",
+      "anchor_candidate": false,
+      "faction_id": "ordine_minore",
+      "schedule": [
+        { "momento": "alba", "location_tag": "archivio" },
+        { "momento": "mezzogiorno", "location_tag": "archivio" },
+        { "momento": "crepuscolo", "location_tag": "archivio" },
+        { "momento": "notte_fonda", "location_tag": null }
+      ],
+      "vendor": null,
+      "dialogue_id": "dlg_ottavia",
+      "memoria": {}
+    },
+    {
+      "id": "npc_bruno",
+      "name": "Bruno",
+      "name_i18n": "npc.bruno.name",
+      "role": "Contrabbandiere del porto",
+      "role_i18n": "npc.bruno.role",
+      "region_id": "mirwada",
+      "anchor_candidate": false,
+      "faction_id": "porto",
+      "schedule": [
+        { "momento": "alba", "location_tag": null },
+        { "momento": "mezzogiorno", "location_tag": null },
+        { "momento": "crepuscolo", "location_tag": "porto" },
+        { "momento": "notte_fonda", "location_tag": "porto" }
+      ],
+      "vendor": { "listino": ["elisir_ombra", "polvere_ossa"] },
+      "dialogue_id": "dlg_bruno",
+      "memoria": {}
+    },
+    {
+      "id": "npc_lena",
+      "name": "Lena",
+      "name_i18n": "npc.lena.name",
+      "role": "Bambina del quartiere operaio",
+      "role_i18n": "npc.lena.role",
+      "region_id": "mirwada",
+      "anchor_candidate": true,
+      "faction_id": "quartiere",
+      "schedule": [
+        { "momento": "alba", "location_tag": "vicolo" },
+        { "momento": "mezzogiorno", "location_tag": "piazza" },
+        { "momento": "crepuscolo", "location_tag": "vicolo" },
+        { "momento": "notte_fonda", "location_tag": null }
+      ],
+      "vendor": null,
+      "dialogue_id": "dlg_lena",
+      "memoria": {}
+    },
+    {
+      "id": "npc_doran",
+      "name": "Doran",
+      "name_i18n": "npc.doran.name",
+      "role": "Investigatore che segue le tue tracce",
+      "role_i18n": "npc.doran.role",
+      "region_id": "mirwada",
+      "anchor_candidate": false,
+      "faction_id": "giustizia",
+      "schedule": [
+        { "momento": "alba", "location_tag": "vicolo" },
+        { "momento": "mezzogiorno", "location_tag": "piazza" },
+        { "momento": "crepuscolo", "location_tag": "vicolo" },
+        { "momento": "notte_fonda", "location_tag": "porto" }
+      ],
+      "vendor": null,
+      "dialogue_id": "dlg_doran",
+      "memoria": {}
+    },
+    { "id": "npc_generic_01", "name": "Popolano", "name_i18n": "npc.generic.name", "role": "Abitante di Mirwada", "role_i18n": "npc.generic.role", "region_id": "mirwada", "anchor_candidate": false, "faction_id": null, "schedule": [ { "momento": "alba", "location_tag": "piazza" }, { "momento": "mezzogiorno", "location_tag": "piazza" }, { "momento": "crepuscolo", "location_tag": "piazza" }, { "momento": "notte_fonda", "location_tag": null } ], "vendor": null, "dialogue_id": "dlg_generic", "memoria": {} },
+    { "id": "npc_generic_02", "name": "Popolano", "name_i18n": "npc.generic.name", "role": "Abitante di Mirwada", "role_i18n": "npc.generic.role", "region_id": "mirwada", "anchor_candidate": false, "faction_id": null, "schedule": [ { "momento": "alba", "location_tag": "vicolo" }, { "momento": "mezzogiorno", "location_tag": "porto" }, { "momento": "crepuscolo", "location_tag": "piazza" }, { "momento": "notte_fonda", "location_tag": null } ], "vendor": null, "dialogue_id": "dlg_generic", "memoria": {} },
+    { "id": "npc_generic_03", "name": "Popolano", "name_i18n": "npc.generic.name", "role": "Abitante di Mirwada", "role_i18n": "npc.generic.role", "region_id": "mirwada", "anchor_candidate": false, "faction_id": null, "schedule": [ { "momento": "alba", "location_tag": "piazza" }, { "momento": "mezzogiorno", "location_tag": "piazza" }, { "momento": "crepuscolo", "location_tag": "vicolo" }, { "momento": "notte_fonda", "location_tag": null } ], "vendor": null, "dialogue_id": "dlg_generic", "memoria": {} },
+    { "id": "npc_generic_04", "name": "Popolano", "name_i18n": "npc.generic.name", "role": "Abitante di Mirwada", "role_i18n": "npc.generic.role", "region_id": "mirwada", "anchor_candidate": false, "faction_id": null, "schedule": [ { "momento": "alba", "location_tag": "porto" }, { "momento": "mezzogiorno", "location_tag": "porto" }, { "momento": "crepuscolo", "location_tag": "porto" }, { "momento": "notte_fonda", "location_tag": "vicolo" } ], "vendor": null, "dialogue_id": "dlg_generic", "memoria": {} },
+    { "id": "npc_generic_05", "name": "Popolano", "name_i18n": "npc.generic.name", "role": "Abitante di Mirwada", "role_i18n": "npc.generic.role", "region_id": "mirwada", "anchor_candidate": false, "faction_id": null, "schedule": [ { "momento": "alba", "location_tag": "piazza" }, { "momento": "mezzogiorno", "location_tag": "vicolo" }, { "momento": "crepuscolo", "location_tag": "piazza" }, { "momento": "notte_fonda", "location_tag": null } ], "vendor": null, "dialogue_id": "dlg_generic", "memoria": {} },
+    { "id": "npc_generic_06", "name": "Popolano", "name_i18n": "npc.generic.name", "role": "Abitante di Mirwada", "role_i18n": "npc.generic.role", "region_id": "mirwada", "anchor_candidate": false, "faction_id": null, "schedule": [ { "momento": "alba", "location_tag": "vicolo" }, { "momento": "mezzogiorno", "location_tag": "piazza" }, { "momento": "crepuscolo", "location_tag": "vicolo" }, { "momento": "notte_fonda", "location_tag": null } ], "vendor": null, "dialogue_id": "dlg_generic", "memoria": {} },
+    { "id": "npc_generic_07", "name": "Popolano", "name_i18n": "npc.generic.name", "role": "Abitante di Mirwada", "role_i18n": "npc.generic.role", "region_id": "mirwada", "anchor_candidate": false, "faction_id": null, "schedule": [ { "momento": "alba", "location_tag": "piazza" }, { "momento": "mezzogiorno", "location_tag": "porto" }, { "momento": "crepuscolo", "location_tag": "piazza" }, { "momento": "notte_fonda", "location_tag": null } ], "vendor": null, "dialogue_id": "dlg_generic", "memoria": {} },
+    { "id": "npc_generic_08", "name": "Popolano", "name_i18n": "npc.generic.name", "role": "Abitante di Mirwada", "role_i18n": "npc.generic.role", "region_id": "mirwada", "anchor_candidate": false, "faction_id": null, "schedule": [ { "momento": "alba", "location_tag": "archivio" }, { "momento": "mezzogiorno", "location_tag": "archivio" }, { "momento": "crepuscolo", "location_tag": "piazza" }, { "momento": "notte_fonda", "location_tag": null } ], "vendor": null, "dialogue_id": "dlg_generic", "memoria": {} },
+    { "id": "npc_generic_09", "name": "Popolano", "name_i18n": "npc.generic.name", "role": "Abitante di Mirwada", "role_i18n": "npc.generic.role", "region_id": "mirwada", "anchor_candidate": false, "faction_id": null, "schedule": [ { "momento": "alba", "location_tag": "vicolo" }, { "momento": "mezzogiorno", "location_tag": "piazza" }, { "momento": "crepuscolo", "location_tag": "porto" }, { "momento": "notte_fonda", "location_tag": null } ], "vendor": null, "dialogue_id": "dlg_generic", "memoria": {} },
+    { "id": "npc_generic_10", "name": "Popolano", "name_i18n": "npc.generic.name", "role": "Abitante di Mirwada", "role_i18n": "npc.generic.role", "region_id": "mirwada", "anchor_candidate": false, "faction_id": null, "schedule": [ { "momento": "alba", "location_tag": "piazza" }, { "momento": "mezzogiorno", "location_tag": "piazza" }, { "momento": "crepuscolo", "location_tag": "piazza" }, { "momento": "notte_fonda", "location_tag": null } ], "vendor": null, "dialogue_id": "dlg_generic", "memoria": {} }
+  ]
+}

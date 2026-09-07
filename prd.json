@@ -171,8 +171,8 @@
       ],
       "priority": 10,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO E. data/npc/roster.json (NUOVO): 8 del roster (mirco/sidon/vesna/aldo/ottavia/bruno/lena/doran) + npc_generic_01..10. schedule[{momento, location_tag|null}] sui vocabolari time.json/regions.json; vendor null o {listino:[item_id]}; faction_id null ammesso (US-615); dialogue_id -> data/dialogues/ (US-614); name/role = seme i18n (npc.<short>.*). Bruno location_tag solo crepuscolo/notte. data/schema/npc.schema.json (NUOVO, doc). scripts/npc_system.gd (NUOVO autoload dopo AnchorSystem): incontra/conosciuti/conosce; influenza(id, modo) -> memoria (contatore sui 5 modi) + EventTracker.emit_event('npc_influenced',{modo}) + segnale; memoria(id); ha_influenza('<id>[:<modo>]') per i gate npc di US-611; promuovi_ancora/ancore_attive (solo anchor_candidate); presenti(region_id)->{id:location_tag} da schedule+TimeSystem.momento(); nomi_i18n() spinto ad AudioManager. game_data.gd: PATH_ROSTER + get_npcs()/get_npc(id). audio_manager.gd: _nomi_npc + imposta_nomi_npc(); nomi_sussurro() UNISCE nomi NPC + Ancore (contratto sussurri soglia 55). game_state.gd: mondo.npc via _mondo_snapshot/applica, NESSUN bump (US-602 unico). region_scene.gd: _crea_npc() marker per NPC presente, ricostruito a momento_cambiato, entrarci = incontra(id). validate_data.py: sezione NPC (id/i18n prefissi, region_id, schedule nei vocabolari, vendor.listino, faction_id/dialogue_id indulgenti finche' i file non esistono, 8 del roster + >=10 generici). generate_i18n_stubs rilanciato (+18 chiavi npc.* seminate; it.json 739->757, 48 TODO invariati). tests/test_npc_system.gd (8 test). validate exit 0 (3 warning invariati), 617 test verdi (610+7), 1 SCRIPT ERROR preesistente. Verifica a schermo (_shot_us612.gd, rendering reale): Mirwada all'alba 16 NPC nella location_tag giusta (Aldo/Bruno assenti), a notte_fonda solo Bruno/Doran/generic_04. Screenshot us612_mirwada_giorno/notte.png. NOTA: story fondativa di blocco, 11 file (schema+dati+autoload+loader+validator+save+audio+spawn), ogni pezzo piccolo e additivo."
     },
     {
       "id": "US-613",
