@@ -85,3 +85,8 @@ BOOK_SYN_CONTATORE,Scoperte: %d / %d,Discovered: %d / %d
 BOOK_SYN_VUOTO,Nessuna sinergia scoperta.,No synergies discovered yet.
 BOOK_SYN_MANCA,manca:,missing:
 BOOK_SYN_NEUTRALIZZA,neutralizza %s,neutralizes %s
+BOOK_INV_JOURNAL,Diario,Journal
+BOOK_JOURNAL_ATTIVE,In corso,Active
+BOOK_JOURNAL_COMPLETATE,Completate,Completed
+BOOK_JOURNAL_FALLITE,Fallite,Failed
+BOOK_JOURNAL_VUOTO,Nessuna impresa nel diario.,Nothing in the journal yet.

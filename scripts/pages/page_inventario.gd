@@ -1,10 +1,10 @@
 extends VBoxContainer
-## Pagina inventario del libro (US-307). Sei sezioni: Zaino, Indosso,
-## Ricettario, Talenti, Base, Sinergie (US-410).
+## Pagina inventario del libro (US-307). Sette sezioni: Zaino, Indosso,
+## Ricettario, Talenti, Base, Sinergie (US-410), Diario (US-616b).
 ##
 ## Chrome da assets/i18n/strings.csv + tr(); nomi degli item da GameData.tr_data.
 
-const SEZIONI := ["zaino", "indosso", "ricettario", "talenti", "base", "sinergie"]
+const SEZIONI := ["zaino", "indosso", "ricettario", "talenti", "base", "sinergie", "journal"]
 
 var _tab: HBoxContainer = null
 var _corpo: VBoxContainer = null
@@ -35,21 +35,32 @@ func aggiorna() -> void:
 	_corpo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_corpo.add_theme_constant_override("separation", 2)
 	sc.add_child(_corpo)
-	_collega_sinergie()
+	_collega_segnali()
 	_mostra(_sezione)
 
 
-## US-411: la sezione Sinergie si ricostruisce dal vivo sui segnali del motore
-## (se aperta su quella sezione; altrimenti la prossima apertura la ridisegna
-## comunque da zero). L'autoload libera le connessioni quando la pagina muore.
-func _collega_sinergie() -> void:
+## US-411/616b: le sezioni Sinergie e Diario si ricostruiscono dal vivo sui
+## segnali dei rispettivi motori (se aperte su quella sezione; altrimenti la
+## prossima apertura le ridisegna comunque da zero). L'autoload libera le
+## connessioni quando la pagina muore.
+func _collega_segnali() -> void:
 	var se: Node = _n("/root/SynergyEngine")
-	if se == null:
-		return
-	if not se.sinergia_attivata.is_connected(_su_sinergia_attivata):
-		se.sinergia_attivata.connect(_su_sinergia_attivata)
-	if not se.sinergia_disattivata.is_connected(_su_sinergia_disattivata):
-		se.sinergia_disattivata.connect(_su_sinergia_disattivata)
+	if se != null:
+		if not se.sinergia_attivata.is_connected(_su_sinergia_attivata):
+			se.sinergia_attivata.connect(_su_sinergia_attivata)
+		if not se.sinergia_disattivata.is_connected(_su_sinergia_disattivata):
+			se.sinergia_disattivata.connect(_su_sinergia_disattivata)
+	var qs: Node = _n("/root/QuestSystem")
+	if qs != null and not qs.quest_completata.is_connected(_su_quest_evento):
+		qs.quest_avviata.connect(_su_quest_evento)
+		qs.step_completato.connect(func(_q, _s): _su_quest_evento(_q))
+		qs.quest_completata.connect(_su_quest_evento)
+		qs.quest_fallita.connect(_su_quest_evento)
+
+
+func _su_quest_evento(_quest_id: String) -> void:
+	if _sezione == "journal" and is_inside_tree():
+		_mostra("journal")
 
 
 func _su_sinergia_attivata(id: String) -> void:
@@ -79,6 +90,7 @@ func _mostra(sezione: String) -> void:
 		"base": _base()
 		"talenti": _talenti()
 		"sinergie": _sinergie()
+		"journal": _journal()
 		_: _corpo.add_child(_riga(tr("BOOK_INV_ARRIVA")))
 
 
@@ -374,8 +386,58 @@ func _sinergie() -> void:
 				_corpo.add_child(l)
 
 
+## US-616b: il diario. Quest attive coi loro step (quello corrente in grassetto
+## logico "▸", i fatti spuntati), completate, fallite. Dati da QuestSystem +
+## GameData; nessun verbo di quest qui, solo lettura.
+func _journal() -> void:
+	var gd: Node = _n("/root/GameData")
+	var qs: Node = _n("/root/QuestSystem")
+	if gd == null or qs == null:
+		return
+	var attive: Array = qs.call("attive")
+	var completate: Array = qs.call("completate")
+	var fallite: Array = qs.call("fallite")
+	if attive.is_empty() and completate.is_empty() and fallite.is_empty():
+		_corpo.add_child(_riga(tr("BOOK_JOURNAL_VUOTO")))
+		return
+
+	if not attive.is_empty():
+		_corpo.add_child(_titolo(tr("BOOK_JOURNAL_ATTIVE")))
+		for qid in attive:
+			var q: Dictionary = gd.call("get_quest", qid)
+			_corpo.add_child(_riga(str(gd.call("tr_data", q.get("name_i18n", qid)))))
+			var passo: int = int(qs.call("passo_corrente", qid))
+			var steps: Array = q.get("steps", [])
+			for i in steps.size():
+				var d: String = str(gd.call("tr_data", (steps[i] as Dictionary).get("desc_i18n", "")))
+				var segno: String = "  ✓ " if i < passo else ("  ▸ " if i == passo else "  · ")
+				var l := _riga(segno + d)
+				if i < passo:
+					l.modulate = Color(1, 1, 1, 0.55)
+				_corpo.add_child(l)
+
+	_lista_quest(gd, tr("BOOK_JOURNAL_COMPLETATE"), completate, 0.7)
+	_lista_quest(gd, tr("BOOK_JOURNAL_FALLITE"), fallite, 0.45)
+
+
+func _lista_quest(gd: Node, titolo: String, ids: Array, alpha: float) -> void:
+	if ids.is_empty():
+		return
+	_corpo.add_child(_titolo(titolo))
+	for qid in ids:
+		var q: Dictionary = gd.call("get_quest", qid)
+		var l := _riga(str(gd.call("tr_data", q.get("name_i18n", qid))))
+		l.modulate = Color(1, 1, 1, alpha)
+		_corpo.add_child(l)
+
+
 func testo_visibile() -> String:
 	return "inventario"
+
+
+## Interrogabile dai test / verifica a schermo: quante righe ci sono ora.
+func righe_journal() -> int:
+	return _corpo.get_child_count() if _corpo != null else 0
 
 
 # --- Costruttori -----------------------------------------------------

@@ -5861,3 +5861,26 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   646 test headless (639 + 7), tutti verdi (re-entrancy di _rivaluta risolta: applicare un effetto flag emette KnowledgeStore.appreso che rientrava mentre si avanzava).
 - Prossima storia: US-616b (sezione Journal nella pagina inventario), poi
   US-617 (mappa + fast travel). BLOCCO G/H.
+
+[2026-09-07] US-616b — Sezione Journal nella pagina inventario del libro. FASE 6, BLOCCO G CHIUSO.
+
+- scripts/pages/page_inventario.gd: SEZIONI da 6 a 7 (+"journal", NESSUN nuovo
+  page_type - e' una sezione della pagina inventario come Sinergie di US-410).
+  _journal(): quest attive coi loro step (fatto "✓" attenuato, corrente "▸",
+  da fare "·"), completate (alpha 0.7), fallite (alpha 0.45). Dati da
+  QuestSystem (attive/completate/fallite/passo_corrente) + GameData.get_quest
+  per nomi/desc via tr_data. Nessun verbo di quest qui, solo lettura.
+- _collega_sinergie -> _collega_segnali: oltre a SynergyEngine ora connette
+  QuestSystem (quest_avviata/step_completato/quest_completata/quest_fallita);
+  se la sezione aperta e' "journal" si ridisegna dal vivo (come la sezione
+  Sinergie, US-411).
+- assets/i18n/strings.csv: BOOK_INV_JOURNAL + BOOK_JOURNAL_ATTIVE/COMPLETATE/
+  FALLITE/VUOTO (it+en). Rigenerati strings.it/en.translation con
+  `godot --headless --import`.
+- tests/test_page_inventario.gd +1: la sezione journal parte vuota, mostra la
+  quest attiva quando si avvia (redraw dal vivo), la sposta sotto "Completate"
+  quando i 3 enemy_defeated la chiudono.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  647 test headless (646 + 1), tutti verdi.
+- BLOCCO G CHIUSO: US-615 (fazioni) + US-616 (motore quest) + US-616b (journal).
+- Prossima storia: US-617 (pagina mappa + fast travel come potere). BLOCCO H.
