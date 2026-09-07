@@ -12,7 +12,7 @@
   "pages": [
     { "id": "copertina",    "tipo": "menu_principale",       "name_i18n": "ui.page.copertina",    "ordine": 0 },
     { "id": "frontespizio", "tipo": "creazione_personaggio", "name_i18n": "ui.page.frontespizio", "ordine": 1 },
-    { "id": "mappa",        "tipo": "mappa",                 "name_i18n": "ui.page.mappa",        "ordine": 2, "doppia_pagina": true, "sbloccata_da": { "fase": 6 } },
+    { "id": "mappa",        "tipo": "mappa",                 "name_i18n": "ui.page.mappa",        "ordine": 2, "doppia_pagina": true },
     { "id": "diagramma",    "tipo": "diagramma_pathway",     "name_i18n": "ui.page.diagramma",    "ordine": 3, "fog_of_war": true },
     { "id": "inventario",   "tipo": "inventario",            "name_i18n": "ui.page.inventario",   "ordine": 4, "sbloccata_da": { "fase": 3 } },
     { "id": "sinergie",     "tipo": "registro_sinergie",     "name_i18n": "ui.page.sinergie",     "ordine": 5, "sbloccata_da": { "fase": 4 } },

@@ -5884,3 +5884,84 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   647 test headless (646 + 1), tutti verdi.
 - BLOCCO G CHIUSO: US-615 (fazioni) + US-616 (motore quest) + US-616b (journal).
 - Prossima storia: US-617 (pagina mappa + fast travel come potere). BLOCCO H.
+
+[2026-09-07] US-617 — Pagina mappa del libro + fast travel come potere. FASE 6, BLOCCO H.
+
+- data/ui/book.json: la voce 'mappa' (tipo 'mappa', page_type gia' nel
+  vocabolario) perde 'sbloccata_da: fase 6' - la mappa e' contenuto diegetico
+  del libro come il diagramma, si consulta sempre; mostra solo cio' che hai
+  scoperto (fog of war). Resta 'doppia_pagina: true' (il rendering a doppia
+  pagina vera e' un ponytail rimandato: la pagina rende nell'area contenuto).
+- scripts/pages/page_mappa.gd + .tscn (NUOVI): le regioni SCOPERTE
+  (WorldState.scoperte), la corrente evidenziata "▸ ... (sei qui)", i varchi
+  noti (dai dati). Un bottone "Viaggia" per ogni regione != corrente,
+  ABILITATO solo se _puo_viaggiare(): una primitiva teleport nelle Sequenze
+  gia' raggiunte del Pathway del giocatore (riuso AreaGate._possiede_primitiva:
+  death_5 "passo tra i mondi", door_3 "viaggio lungo") OPPURE un varco
+  permanente 'apre_varco*' inciso nel mondo dal TG. Altrimenti "servono le
+  strade". Il bottone chiama region_scene.viaggia_a(target).
+- scripts/region_scene.gd: viaggia_a(target) pubblico - come _su_passaggio ma
+  senza Area2D di confine (il mezzo lo verifica la pagina), rispetta comunque
+  _ingresso_aperto (gating d'ingresso, US-611). book_overlay.gd: PAGINE +=
+  "mappa".
+- assets/i18n/strings.csv: BOOK_MAPPA_VUOTA/QUI/VIAGGIA/GATE/MEZZO_SI/MEZZO_NO
+  (it+en), .translation rigenerati con --import.
+- test_book.gd / test_book_overlay.gd: 'mappa' non e' piu' l'esempio di pagina
+  bianca (ora e' 'journal').
+- tests/test_page_mappa.gd (NUOVO, 5 test): fog of war (Marche assente finche'
+  non visitata); senza mezzo nessun bottone attivo; con death_5 (primitiva
+  teleport) si viaggia; un varco permanente del TG basta; viaggia_a rispetta
+  il gating d'ingresso della Frontiera.
+
+[2026-09-07] US-618 — Densita' mistica: percezione, recupero, forzatura, spawn. FASE 6, BLOCCO H.
+
+- data/balance.json: sezione 'densita_mistica' (recupero_spiritualita_al_sec,
+  molt_recupero_per_densita, efficacia_forzatura_per_densita, spawn_base_al_min,
+  spawn_per_densita, sequenza_percezione). validate_data.py la controlla.
+- scripts/world_state.gd: densita_mistica_corrente() = densita_mistica della
+  regione corrente (regions.json), con imposta_densita_override(v) per una
+  zona che la modifica localmente (transitorio, azzerato da entra_regione/
+  pulisci). Fuori regione: 0.2 (bassa, come la citta'). spawn_rate_corrente()
+  = base + densita * per_densita (il gancio per lo spawner di fase 7).
+- scripts/stats_component.gd: _rigenera_spiritualita(delta) nel _process -
+  SOLO se il parent e' nel gruppo "player" (i nemici non rigenerano). Ritmo =
+  recupero_al_sec * (1 + densita * molt) * delta. Prima non c'era alcun
+  recupero passivo di spiritualita': ora c'e', e conviene stare fuori citta'.
+- scripts/perception_system.gd: densita_percepita() -> la densita' del luogo
+  se Progression.sequence() <= sequenza_percezione (5), altrimenti -1.0 (non
+  la senti). E' il canale diegetico dell'AC.
+- scripts/foundation.gd: malus_forzatura() = malus_avanzamento_forzato *
+  clamp(1 - densita * efficacia, 0.1, 1). potion_system.gd: bevi(forza) usa
+  malus_forzatura() invece di costante("malus_avanzamento_forzato") - dove la
+  densita' e' alta, forzare l'avanzamento costa meno alle Fondamenta.
+- tests/test_densita_mistica.gd (NUOVO, 6 test): densita dalla regione +
+  override; il recupero a 0.7 > a 0.2; i nemici non recuperano; la percezione
+  parte da Seq 5; forzare alla Frontiera costa meno che in citta'; lo spawn
+  rate sale con la densita'.
+
+[2026-09-07] US-619 — Audio del mondo: zone, ambienti, layer. FASE 6, BLOCCO H.
+
+- LIMITE DICHIARATO: i file audio NON li produce questo lavoro. data/audio.json
+  e' la specifica completa per un musicista o per stem CC0 compatibili con la
+  struttura a layer. Tutti i nomi (mus_*, amb_*) sono placeholder.
+- data/audio.json esteso:
+  * music.zone.{citta,marche,valle,archivio,frontiera}: + pathway_palette +
+    riverbero (0..1) + stem 'boss'.
+  * music.ambienti: {zona: {giorno, notte}} per le 5 zone. Il ciclo del tempo
+    commuta l'attivo.
+  * music.layer: sempre_attivo "base", in_crossfade [tensione, combattimento,
+    boss], stato_per_stem per ognuno dei 6 music.stati, crossfade_ms. Solo
+    struttura, nessun file.
+  * music.rituale: gia' completo da prima (drone build 45s, taglio secco).
+- scripts/audio_manager.gd: aggiorna_ambiente() sceglie lo stream ambientale =
+  music.ambienti[music_zone della regione corrente][giorno|notte];
+  ambiente_corrente() lo espone. Connesso a TimeSystem.momento_cambiato e
+  WorldState.regione_cambiata.
+- tools/validate_data.py: music.layer coerente (sempre_attivo base, stati =
+  stato_per_stem keys, stem in in_crossfade), riverbero in 0..1, ogni
+  music_zone usata da una regione ha un ambiente giorno/notte.
+- tests/test_audio_mondo.gd (NUOVO, 3 test): l'ambiente segue regione e
+  momento (Marche giorno -> notte -> Valle notte); la struttura a layer;
+  ogni music_zone delle regioni ha palette + ambiente.
+- BLOCCO H CHIUSO: US-617/618/619.
+- Prossima storia: US-620 (indizi dell'antagonista + scene degli atti). BLOCCO I.

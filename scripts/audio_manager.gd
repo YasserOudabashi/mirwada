@@ -117,6 +117,17 @@ func _ready() -> void:
 		follia.madness_changed.connect(func(v: float, _s: int) -> void: aggiorna_follia(v))
 	_ripianifica_one_shot()
 
+	# US-619: il ciclo giorno/notte e il cambio regione commutano l'ambiente
+	# sonoro. I file audio sono un non-goal: qui si sceglie lo stream, non lo
+	# si produce.
+	var ts: Node = get_node_or_null("/root/TimeSystem")
+	if ts != null and ts.has_signal("momento_cambiato"):
+		ts.momento_cambiato.connect(func(_m: String) -> void: aggiorna_ambiente())
+	var ws: Node = get_node_or_null("/root/WorldState")
+	if ws != null and ws.has_signal("regione_cambiata"):
+		ws.regione_cambiata.connect(func(_id: String) -> void: aggiorna_ambiente())
+	aggiorna_ambiente.call_deferred()
+
 
 # --- API -----------------------------------------------------------------
 
@@ -272,6 +283,28 @@ func layers_ambientali_attivi() -> Array:
 		if (_amb_players[nome] as AudioStreamPlayer).playing:
 			out.append(nome)
 	return out
+
+
+## US-619: lo stream ambientale attivo = data/audio.json.music.ambienti
+## [music_zone della regione corrente][giorno|notte]. Placeholder: la SCELTA e'
+## registrata (ambiente_corrente()), il file lo mette un musicista.
+var _ambiente_corrente: String = ""
+
+
+func aggiorna_ambiente() -> void:
+	var gd: Node = get_node_or_null("/root/GameData")
+	var ws: Node = get_node_or_null("/root/WorldState")
+	var ts: Node = get_node_or_null("/root/TimeSystem")
+	if gd == null or ws == null:
+		return
+	var zona: String = str(gd.call("get_region", str(ws.call("regione_corrente"))).get("music_zone", ""))
+	var amb: Dictionary = ((gd.call("get_audio", "music") as Dictionary).get("ambienti", {}) as Dictionary).get(zona, {})
+	var quando: String = "notte" if (ts != null and bool(ts.call("e_notte"))) else "giorno"
+	_ambiente_corrente = str(amb.get(quando, ""))
+
+
+func ambiente_corrente() -> String:
+	return _ambiente_corrente
 
 
 func nomi_sussurro() -> Array:

@@ -36,12 +36,40 @@
   },
   "sequence_gap": {
     "_comment": "Il muro di Sequenza: un Beyonder molto piu' alto e' quasi immune. E' la meccanica che rende la coltivazione l'unica vera progressione. Moltiplicatore di danno in base a (sequenza_attaccante - sequenza_bersaglio); negativo = il bersaglio e' piu' alto.",
-    "-4": 0.02, "-3": 0.08, "-2": 0.25, "-1": 0.60,
-    "0": 1.00,
-    "1": 1.6, "2": 2.8, "3": 5.0, "4": 9.0
+    "-4": 0.02,
+    "-3": 0.08,
+    "-2": 0.25,
+    "-1": 0.6,
+    "0": 1.0,
+    "1": 1.6,
+    "2": 2.8,
+    "3": 5.0,
+    "4": 9.0
   },
-  "hp_curve": { "9": 100, "8": 150, "7": 220, "6": 340, "5": 520, "4": 800, "3": 1300, "2": 2200, "1": 3800, "0": 7000 },
-  "spiritualita_curve": { "9": 50, "8": 75, "7": 110, "6": 170, "5": 260, "4": 400, "3": 620, "2": 980, "1": 1500, "0": 3000 },
+  "hp_curve": {
+    "9": 100,
+    "8": 150,
+    "7": 220,
+    "6": 340,
+    "5": 520,
+    "4": 800,
+    "3": 1300,
+    "2": 2200,
+    "1": 3800,
+    "0": 7000
+  },
+  "spiritualita_curve": {
+    "9": 50,
+    "8": 75,
+    "7": 110,
+    "6": 170,
+    "5": 260,
+    "4": 400,
+    "3": 620,
+    "2": 980,
+    "1": 1500,
+    "0": 3000
+  },
   "stats_base": {
     "_comment": "Statistiche di partenza non legate alla Sequenza. hp_max e spiritualita_max vengono dalle curve qui sopra; queste no. velocita in px/s: a 90 servivano ~7s per attraversare lo schermo (640 px), troppo lenta, alzata a 140. evasione e precisione sono stat forward-looking (schivare / mirare-critici): nessun sistema di combattimento le legge ancora, ma le abilita' possono gia' modificarle. PLAUSIBILI, non bilanciate.",
     "velocita": 140,
@@ -60,7 +88,7 @@
     "soglia_abilita_autonome": 40,
     "soglia_perdita_input": 70,
     "soglia_mostro": 100,
-    "riduzione_max_ancore": 0.60,
+    "riduzione_max_ancore": 0.6,
     "decadimento_naturale_al_minuto": 0.0
   },
   "madness_vfx": {
@@ -68,9 +96,15 @@
     "vignetta_alpha_max": 0.5,
     "respiro_al_secondo": 0.35,
     "respiro_ampiezza": 0.12,
-    "distorsione_intervallo_s": [3.0, 9.0],
+    "distorsione_intervallo_s": [
+      3.0,
+      9.0
+    ],
     "distorsione_durata_s": 0.12,
-    "nero_intervallo_s": [7.0, 18.0],
+    "nero_intervallo_s": [
+      7.0,
+      18.0
+    ],
     "nero_durata_s": 0.55,
     "nero_alpha": 0.85,
     "nero_alpha_statico": 0.3
@@ -145,5 +179,15 @@
       "sequence": 9,
       "probabilita": 1.0
     }
+  },
+  "densita_mistica": {
+    "_comment": "US-618: uscire dalla citta' conviene. densita_baseline (~la citta') e' il punto in cui non c'e' ne' bonus ne' malus; sopra si recupera di piu' e forzare costa meno. PLAUSIBILI, non bilanciati.",
+    "recupero_spiritualita_al_sec": 1.5,
+    "molt_recupero_per_densita": 3.0,
+    "efficacia_forzatura_per_densita": 0.5,
+    "spawn_base_al_min": 0.5,
+    "spawn_per_densita": 4.0,
+    "sequenza_percezione": 5,
+    "densita_baseline": 0.2
   }
 }

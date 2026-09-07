@@ -27,6 +27,10 @@ var _gate_aperti: Array = []  # id di gate, stringhe
 ## save. Lo aggiorna region_scene entrando/uscendo dalle Area2D delle zone;
 ## lo legge la condizione in_zona_tag delle abilita' (US-605).
 var _zona_tag: String = ""
+## US-618: una zona puo' modificare localmente la densita' mistica della
+## regione (>= 0 = override attivo, -1 = usa quella di regions.json).
+## TRANSITORIO: e' posizione, non stato del mondo.
+var _densita_override: float = -1.0
 
 
 ## Incide una modifica permanente. Le duplicate esatte (stesso tipo, stessa
@@ -54,6 +58,7 @@ func pulisci() -> void:
 	_scoperte.clear()
 	_gate_aperti.clear()
 	_zona_tag = ""
+	_densita_override = -1.0
 
 
 # --- Regione corrente e scoperte (US-602) -------------------------------
@@ -78,6 +83,7 @@ func entra_regione(id: String) -> void:
 	var cambia: bool = id != _regione or id not in _scoperte
 	_regione = id
 	_zona_tag = ""
+	_densita_override = -1.0
 	if id not in _scoperte:
 		_scoperte.append(id)
 	if cambia:
@@ -91,6 +97,35 @@ func zona_corrente() -> String:
 
 func imposta_zona(location_tag: String) -> void:
 	_zona_tag = location_tag
+
+
+# --- Densita' mistica (US-618) -----------------------------------------
+
+## La densita' mistica dove si trova il giocatore: quella della regione
+## corrente (regions.json), o l'override locale di una zona. Fuori da ogni
+## regione: 0.2 (bassa, come la citta').
+func densita_mistica_corrente() -> float:
+	if _densita_override >= 0.0:
+		return _densita_override
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd == null or _regione.is_empty():
+		return 0.2
+	var v: Variant = gd.call("get_region", _regione).get("densita_mistica", 0.2)
+	return float(v) if typeof(v) in [TYPE_FLOAT, TYPE_INT] else 0.2
+
+
+func imposta_densita_override(valore: float) -> void:
+	_densita_override = valore   # < 0 = nessun override
+
+
+## Frequenza di spawn (Beyonder / segreti) per la densita' corrente, al minuto.
+## Lo spawner vero e' fase 7: qui e' il gancio che legge il dato.
+func spawn_rate_corrente() -> float:
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd == null:
+		return 0.0
+	var c: Dictionary = gd.call("get_balance", "densita_mistica")
+	return float(c.get("spawn_base_al_min", 0.5)) + densita_mistica_corrente() * float(c.get("spawn_per_densita", 4.0))
 
 
 func gate_aperti() -> Array:

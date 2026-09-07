@@ -291,8 +291,8 @@
       ],
       "priority": 15,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO H. book.json: 'mappa' perde sbloccata_da fase 6 (contenuto diegetico come il diagramma; mostra solo lo scoperto = fog of war). doppia_pagina resta ma il rendering a doppia pagina vero e' un ponytail rimandato. scripts/pages/page_mappa.gd + .tscn (NUOVI): regioni scoperte (WorldState.scoperte), corrente evidenziata, varchi noti; bottone Viaggia per regione != corrente, abilitato solo se _puo_viaggiare() = una primitiva teleport nelle Sequenze raggiunte (riuso AreaGate._possiede_primitiva: death_5, door_3) o un varco 'apre_varco*' del TG. Il bottone -> region_scene.viaggia_a(target) (NUOVO metodo pubblico, come _su_passaggio senza Area2D, rispetta _ingresso_aperto/gating US-611). book_overlay.gd PAGINE += mappa. strings.csv BOOK_MAPPA_* (it+en), .translation via --import. test_book/test_book_overlay: 'mappa' -> 'journal' come esempio di pagina bianca. tests/test_page_mappa.gd (5 test). validate exit 0, tests verdi."
     },
     {
       "id": "US-618",
@@ -309,8 +309,8 @@
       ],
       "priority": 16,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO H. balance.json sezione densita_mistica (recupero/molt/efficacia_forzatura/spawn/sequenza_percezione/densita_baseline=0.2). world_state.gd: densita_mistica_corrente() dalla regione (regions.json) + imposta_densita_override (transitorio) + spawn_rate_corrente() (gancio spawner fase 7); fuori regione 0.2. stats_component.gd: _rigenera_spiritualita nel _process SOLO se il parent e' 'player' (i nemici no) - prima non c'era recupero passivo; ritmo scala con max(0, densita - baseline). perception_system.gd: densita_percepita() = la densita' se sequence() <= sequenza_percezione (5), sennò -1. foundation.gd: malus_forzatura() = malus base * clamp(1 - max(0, densita-baseline)*efficacia, 0.1, 1); potion_system.gd bevi(forza) lo usa (in citta' = malus pieno, fuori costa meno). validate: sezione densita_mistica. tests/test_densita_mistica.gd (6 test). validate exit 0, tests verdi."
     },
     {
       "id": "US-619",
@@ -325,8 +325,8 @@
       ],
       "priority": 17,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO H CHIUSO. LIMITE DICHIARATO in progress.txt: nessun file audio prodotto, audio.json e' la spec per un musicista. data/audio.json: music.zone.* + pathway_palette + riverbero (0..1) + stem boss; music.ambienti {zona:{giorno,notte}} per le 5 zone; music.layer (sempre_attivo base, in_crossfade [tensione,combattimento,boss], stato_per_stem per i 6 music.stati). audio_manager.gd: aggiorna_ambiente() sceglie lo stream ambientale = music.ambienti[music_zone regione corrente][giorno|notte], ambiente_corrente() lo espone; connesso a TimeSystem.momento_cambiato + WorldState.regione_cambiata. validate_data.py: music.layer coerente, riverbero 0..1, ogni music_zone di una regione ha un ambiente giorno/notte. tests/test_audio_mondo.gd (3 test). validate exit 0, tests verdi."
     },
     {
       "id": "US-620",

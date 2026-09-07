@@ -40,6 +40,7 @@ const PAGINE := {
 	"impostazioni": preload("res://scenes/pages/page_impostazioni.tscn"),
 	"inventario": preload("res://scenes/pages/page_inventario.tscn"),
 	"page_dialogo": preload("res://scenes/pages/page_dialogo.tscn"),
+	"mappa": preload("res://scenes/pages/page_mappa.tscn"),
 }
 
 var _volta_durata: float = 0.35

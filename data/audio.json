@@ -226,8 +226,11 @@
         "base": "mus_citta_base",
         "stems": {
           "tensione": "mus_citta_tension",
-          "combattimento": "mus_citta_combat"
-        }
+          "combattimento": "mus_citta_combat",
+          "boss": "mus_citta_boss"
+        },
+        "pathway_palette": "neutra",
+        "riverbero": 0.15
       },
       "base_giocatore": {
         "base": "mus_base_calma",
@@ -244,19 +247,43 @@
       "_comment_regioni": "Le 4 zone musica delle regioni a tema (US-601, una per gruppo di Pathway). Struttura minima ora: la pathway_palette/riverbero e gli stem completi arrivano con US-619. I nomi dei file sono placeholder per un musicista (non-goal: produrre i suoni).",
       "marche": {
         "base": "mus_marche_base",
-        "stems": { "tensione": "mus_marche_tension", "combattimento": "mus_marche_combat" }
+        "stems": {
+          "tensione": "mus_marche_tension",
+          "combattimento": "mus_marche_combat",
+          "boss": "mus_marche_boss"
+        },
+        "pathway_palette": "darkness",
+        "riverbero": 0.55
       },
       "valle": {
         "base": "mus_valle_base",
-        "stems": { "tensione": "mus_valle_tension", "combattimento": "mus_valle_combat" }
+        "stems": {
+          "tensione": "mus_valle_tension",
+          "combattimento": "mus_valle_combat",
+          "boss": "mus_valle_boss"
+        },
+        "pathway_palette": "mother",
+        "riverbero": 0.35
       },
       "archivio": {
         "base": "mus_archivio_base",
-        "stems": { "tensione": "mus_archivio_tension", "combattimento": "mus_archivio_combat" }
+        "stems": {
+          "tensione": "mus_archivio_tension",
+          "combattimento": "mus_archivio_combat",
+          "boss": "mus_archivio_boss"
+        },
+        "pathway_palette": "hermit",
+        "riverbero": 0.6
       },
       "frontiera": {
         "base": "mus_frontiera_base",
-        "stems": { "tensione": "mus_frontiera_tension", "combattimento": "mus_frontiera_combat", "boss": "mus_frontiera_boss" }
+        "stems": {
+          "tensione": "mus_frontiera_tension",
+          "combattimento": "mus_frontiera_combat",
+          "boss": "mus_frontiera_boss"
+        },
+        "pathway_palette": "fool",
+        "riverbero": 0.7
       }
     },
     "rituale": {
@@ -264,6 +291,54 @@
       "loop": "mus_ritual_drone",
       "durata_build_secondi": 45,
       "su_interruzione": "silenzio_secco"
+    },
+    "ambienti": {
+      "_comment": "US-619: il paesaggio sonoro ambientale, giorno vs notte, per zona musica. Il ciclo del tempo (TimeSystem) commuta l'attivo. File placeholder per un musicista / stem CC0.",
+      "citta": {
+        "giorno": "amb_citta_giorno",
+        "notte": "amb_citta_notte"
+      },
+      "marche": {
+        "giorno": "amb_marche_giorno",
+        "notte": "amb_marche_notte"
+      },
+      "valle": {
+        "giorno": "amb_valle_giorno",
+        "notte": "amb_valle_notte"
+      },
+      "archivio": {
+        "giorno": "amb_archivio_giorno",
+        "notte": "amb_archivio_notte"
+      },
+      "frontiera": {
+        "giorno": "amb_frontiera_giorno",
+        "notte": "amb_frontiera_notte"
+      }
+    },
+    "layer": {
+      "_comment": "US-619: struttura a stem. 'base' loop sempre attivo; gli altri entrano/escono in crossfade_ms secondo lo stato di gioco (music.stati). Nessun file qui: e' il contratto per chi compone.",
+      "sempre_attivo": "base",
+      "in_crossfade": [
+        "tensione",
+        "combattimento",
+        "boss"
+      ],
+      "crossfade_ms": 1200,
+      "stato_per_stem": {
+        "esplorazione": [],
+        "tensione": [
+          "tensione"
+        ],
+        "combattimento": [
+          "combattimento"
+        ],
+        "boss": [
+          "combattimento",
+          "boss"
+        ],
+        "rituale": [],
+        "base": []
+      }
     }
   },
   "pathway_palette": {

@@ -280,6 +280,20 @@ func _ingresso_aperto(target: String) -> bool:
 	return true
 
 
+## US-617: fast travel dalla pagina mappa del libro. Come _su_passaggio ma
+## senza l'Area2D di confine (il "mezzo" lo verifica la pagina). Rispetta
+## comunque il gating d'ingresso. false se un viaggio e' gia' in corso o la
+## regione respinge.
+func viaggia_a(target: String) -> bool:
+	if _in_viaggio or target == region_id or not _ingresso_aperto(target):
+		return false
+	if not ResourceLoader.exists("res://scenes/regioni/%s.tscn" % target):
+		return false
+	_in_viaggio = true
+	_viaggia_verso.call_deferred(target)
+	return true
+
+
 ## Sostituisce questa scena di regione con quella della destinazione. Il player
 ## e gli overlay vivono in main.tscn (fratelli): restano, la nuova regione li
 ## riposiziona nel suo _ready. Finche' il gating (US-611) non c'e', ogni

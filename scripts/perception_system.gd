@@ -51,6 +51,21 @@ func reveal_attivo(nome: String) -> bool:
 	return _reveal.has(nome)
 
 
+## US-618: da una certa Sequenza in su (balance.densita_mistica.sequenza_
+## percezione, di default 5) il giocatore "sente" la densita' mistica del
+## luogo. Sotto quella Sequenza: -1.0 (non la percepisci).
+func densita_percepita() -> float:
+	var gd: Node = get_node_or_null("/root/GameData")
+	var prog: Node = get_node_or_null("/root/Progression")
+	var soglia: int = 5
+	if gd != null:
+		soglia = int(gd.call("get_balance", "densita_mistica").get("sequenza_percezione", 5))
+	if prog == null or int(prog.call("sequence")) > soglia:
+		return -1.0
+	var ws: Node = get_node_or_null("/root/WorldState")
+	return float(ws.call("densita_mistica_corrente")) if ws != null else -1.0
+
+
 # --- Interno ----------------------------------------------------------
 
 ## La voce con la chiave numerica piu' PICCOLA che sia >= seq (a Seq 6 -> "7").

@@ -127,7 +127,8 @@ func bevi(forza: bool = false) -> Dictionary:
 	elif forza:
 		prog.call("avanza")
 		if found != null:
-			found.call("applica", found.call("costante", "malus_avanzamento_forzato"), "avanzamento_forzato")
+			# US-618: il malus e' attenuato dove la densita' mistica e' alta.
+			found.call("applica", found.call("malus_forzatura"), "avanzamento_forzato")
 		if madness != null:
 			var f: float = madness_on_force * mult
 			madness.call("add", f, "avanzamento_forzato")

@@ -42,6 +42,22 @@ func costante(nome: String) -> float:
 	return _num(nome)
 
 
+## US-618: il malus di forzare l'avanzamento, ATTENUATO dove la densita'
+## mistica e' alta ("forzare costa meno", design-world). Base da balance,
+## scala da WorldState.densita_mistica_corrente(). Il malus resta negativo.
+func malus_forzatura() -> float:
+	var base: float = costante("malus_avanzamento_forzato")
+	var gd: Node = get_node_or_null("/root/GameData")
+	var ws: Node = get_node_or_null("/root/WorldState")
+	if gd == null or ws == null:
+		return base
+	var c: Dictionary = gd.call("get_balance", "densita_mistica")
+	var k: float = float(c.get("efficacia_forzatura_per_densita", 0.5))
+	var baseline: float = float(c.get("densita_baseline", 0.2))
+	var d: float = float(ws.call("densita_mistica_corrente"))
+	return base * clampf(1.0 - maxf(0.0, d - baseline) * k, 0.1, 1.0)
+
+
 ## Moltiplicatore della follia: 1.0 a fondamenta piene, sale fino a
 ## moltiplicatore_follia_a_fondamenta_zero quando le fondamenta sono a 0.
 func moltiplicatore_follia() -> float:

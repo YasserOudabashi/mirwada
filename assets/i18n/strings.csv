@@ -90,3 +90,9 @@ BOOK_JOURNAL_ATTIVE,In corso,Active
 BOOK_JOURNAL_COMPLETATE,Completate,Completed
 BOOK_JOURNAL_FALLITE,Fallite,Failed
 BOOK_JOURNAL_VUOTO,Nessuna impresa nel diario.,Nothing in the journal yet.
+BOOK_MAPPA_VUOTA,Nessuna regione sulla mappa.,No regions on the map yet.
+BOOK_MAPPA_QUI,sei qui,you are here
+BOOK_MAPPA_VIAGGIA,Viaggia,Travel
+BOOK_MAPPA_GATE,varchi:,gates:
+BOOK_MAPPA_MEZZO_SI,Hai un mezzo per viaggiare.,You have a means to travel.
+BOOK_MAPPA_MEZZO_NO,Servono le strade: nessuna scorciatoia.,You need the roads: no shortcuts.

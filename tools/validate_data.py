@@ -543,6 +543,20 @@ def main():
             if not isinstance(v, int) or v < 1:
                 err(f"data/balance.json [tempo.{k}]: deve essere un intero >= 1.")
 
+        # US-618: la densita' mistica (recupero spiritualita', forzatura, spawn).
+        dm = balance_doc.get("densita_mistica", {})
+        for k in ("recupero_spiritualita_al_sec", "molt_recupero_per_densita",
+                  "efficacia_forzatura_per_densita", "spawn_base_al_min", "spawn_per_densita"):
+            v = dm.get(k)
+            if not isinstance(v, (int, float)) or v < 0:
+                err(f"data/balance.json [densita_mistica.{k}]: deve essere un numero >= 0 (US-618).")
+        db = dm.get("densita_baseline")
+        if not isinstance(db, (int, float)) or not (0.0 <= db <= 1.0):
+            err("data/balance.json [densita_mistica.densita_baseline]: numero 0..1.")
+        sp = dm.get("sequenza_percezione")
+        if not isinstance(sp, int) or not (0 <= sp <= 9):
+            err("data/balance.json [densita_mistica.sequenza_percezione]: intero 0-9.")
+
     # --- animazioni ---
     anim_doc = load_json(os.path.join(DATA, "animations.json"))
     if anim_doc:
@@ -609,6 +623,38 @@ def main():
         soglie = [x.get("madness_min", -1) for x in audio.get("madness_layer", {}).get("soglie", [])]
         if soglie != sorted(soglie):
             err("data/audio.json [madness_layer]: le soglie non sono in ordine crescente.")
+
+        # US-619: struttura a layer + ambienti giorno/notte.
+        mus = audio.get("music", {})
+        layer = mus.get("layer", {})
+        if layer.get("sempre_attivo") != "base":
+            err("data/audio.json [music.layer.sempre_attivo]: deve essere 'base' (stem sempre attivo).")
+        if not layer.get("in_crossfade"):
+            err("data/audio.json [music.layer.in_crossfade]: elenco degli stem in crossfade vuoto.")
+        stati = set(mus.get("stati", []))
+        sps = layer.get("stato_per_stem", {})
+        if stati and set(sps) != stati:
+            err(f"data/audio.json [music.layer.stato_per_stem]: le chiavi {sorted(sps)} non "
+                f"coincidono con music.stati {sorted(stati)}.")
+        stem_validi = set(layer.get("in_crossfade", [])) | {"base"}
+        for st, elenco in sps.items():
+            for s in elenco:
+                if s not in stem_validi:
+                    err(f"data/audio.json [music.layer.stato_per_stem.{st}]: stem '{s}' non "
+                        f"e' in in_crossfade ({sorted(stem_validi)}).")
+        amb = mus.get("ambienti", {})
+        for zid, z in mus.get("zone", {}).items():
+            if zid.startswith("_"):
+                continue
+            if not isinstance(z, dict):
+                continue
+            if "riverbero" in z and not (0.0 <= float(z["riverbero"]) <= 1.0):
+                err(f"data/audio.json [music.zone.{zid}.riverbero]: fuori da 0..1.")
+        for zid, a in amb.items():
+            if zid.startswith("_"):
+                continue
+            if not isinstance(a, dict) or "giorno" not in a or "notte" not in a:
+                err(f"data/audio.json [music.ambienti.{zid}]: servono 'giorno' e 'notte'.")
 
     # --- regioni (data/world/regions.json, US-601) ---
     # Le regioni sono DATI: gating, audio, NPC, spawn leggono questo vocabolario
@@ -687,6 +733,14 @@ def main():
             err(f"data/world/regions.json: i location_tags {senza_regione} sono usati da un "
                 f"rituale non-stub ma nessuna regione li ospita (US-601: le regioni realizzano "
                 f"a schermo i luoghi dei rituali).")
+
+        # US-619: ogni music_zone usata da una regione ha un ambiente giorno/notte.
+        amb_zone = set((audio or {}).get("music", {}).get("ambienti", {}))
+        for reg in regions_doc.get("regions", []):
+            mz = reg.get("music_zone")
+            if mz and mz not in amb_zone:
+                err(f"data/audio.json [music.ambienti]: manca la zona '{mz}' usata dalla "
+                    f"regione '{reg.get('id')}' (US-619: ambiente giorno/notte per ogni zona).")
 
     # --- fonti di tag di fase 3 (US-334): stanze costruibili, specie di pet
     # (+ comportamenti), tag_grant dei talenti. Rendono raggiungibili le
