@@ -341,8 +341,8 @@
       ],
       "priority": 18,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO I. data/lore/antagonisti.json (NUOVO): 1 antagonista per Pathway attivo (10) - il detentore precedente della Sequenza 0 del Pathway del giocatore (decisione n.9), strutturale, nessun boss (fase 7), solo indizi[{text, text_i18n}]. game_data.gd: get_antagonisti/get_antagonista(pathway_id). roster.json: npc_aldo + avanzamento_temporale {sequenza_iniziale 9, ogni_momenti 8, sequenza_minima 4} + sfida_ai_tier. npc_system.gd: _collega_narrativa (differito) - _su_momento (TimeSystem) fa scendere la Sequenza degli NPC avanzamento_temporale (Aldo); _su_rituale (RitualSystem.rituale_completato) sequenza<=6 -> flag atto_1_concluso; _su_sequenza_giocatore (Progression.sequence_changed) se cambia il tier -> <corto>_duello_disponibile per gli sfida_ai_tier. sequenza_npc(id), antagonista_del_giocatore(); _seq_npc nel save. validate: sezione antagonisti + avanzamento_temporale. generate_i18n_stubs +40 chiavi antagonist.* (it.json 836->876, 48 TODO invariati). tests/test_narrativa.gd (5 test). validate exit 0, 669 test verdi."
     },
     {
       "id": "US-621",
@@ -358,8 +358,8 @@
       ],
       "priority": 19,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO I. dialogue_engine.gd: effetto impara_sinergia (6o del vocabolario chiuso) -> SynergyEngine.impara_sinergia(id) (mette in _viste). dlg_ottavia: il nodo 'grazie' insegna anche la sinergia lore anti_furia_e_calma. inventory.gd: usa() ha un ramo stored_flag - un libro trovato che al consumo scrive un flag di conoscenza e si consuma. data/items/pergamene.json: libro_ordine_minore (pergamena, stored_flag testi_ordine_minore) - apre le ali interne dell'Archivio (US-611). validate: impara_sinergia.id = sinergia scoperta:'lore'; stored_flag per le pergamene, una sola cosa per pergamena. tests/test_lore_conoscenza.gd (3 test): il libro apre davvero l'AreaGate dell'Archivio; Ottavia insegna la sinergia lore -> _viste. Regressioni gestite: test_items (pergamena con stored_flag), test_madness_audio (nomi_sussurro unisce Ancore + NPC). validate exit 0, 669 test verdi."
     },
     {
       "id": "US-622",
@@ -375,8 +375,8 @@
       ],
       "priority": 20,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO I CHIUSO. FASE 6 CHIUSA (24 story, 669 test, 9 blocchi). roadmap.md: 'Fase 6 - Mondo - CHIUSA' con l'elenco dei blocchi e la nota che la fase 5b (Fool/Error/Door, 29 Seq stub) resta aperta. design-world.md/design-npc-quest.md: intestazione 'REALIZZATO in fase 6' + decisioni (nomi regioni, roster 8, antagonista). design-master.md: Appendice A fase 6 CHIUSA, Appendice B decisioni n.1/6/9 CHIUSE, Appendice C i vocabolari/schema nuovi. CLAUDE.md + README.md: fase 6 chiusa, save schema_version 21, fase corrente = 5b. validate_data.py: check di chiusura - i file di dati esistono, ogni dialogue_id del roster ha un file, le 4 quest di Atto I esistono. NON si controlla 'zero Sequenze stub' (Fool/Error/Door = fase 5b, PRD a parte). validate exit 0 (3 warning invariati), 669 test verdi."
     }
   ]
 }

@@ -21,7 +21,7 @@ signal apri_vendita(npc_id: String)
 signal avvia_quest(quest_id: String)
 
 const Conditions := preload("res://scripts/conditions.gd")
-const EFFETTI := ["emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest"]
+const EFFETTI := ["emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest", "impara_sinergia"]
 
 var _dialogo: Dictionary = {}
 var _dialogue_id: String = ""
@@ -149,6 +149,12 @@ func _applica_effetto(eff: Variant) -> void:
 			if qs != null:
 				qs.call("avvia", str(e.get("quest_id", "")))
 			avvia_quest.emit(str(e.get("quest_id", "")))
+		"impara_sinergia":
+			# US-621: una fonte "lore" (Ottavia, un libro) insegna una sinergia
+			# scoperta:"lore" -> entra in SynergyEngine._viste.
+			var se: Node = get_node_or_null("/root/SynergyEngine")
+			if se != null:
+				se.call("impara_sinergia", str(e.get("id", "")))
 
 
 func _ferma_il_mondo(fermo: bool) -> void:

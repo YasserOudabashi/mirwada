@@ -53,6 +53,7 @@ const PATH_BLUEPRINTS := "res://data/forge/blueprints.json"
 const PATH_REGIONS := "res://data/world/regions.json"
 const PATH_ROSTER := "res://data/npc/roster.json"
 const PATH_FACTIONS := "res://data/factions.json"
+const PATH_ANTAGONISTI := "res://data/lore/antagonisti.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -99,6 +100,7 @@ var _roster: Dictionary = {}
 var _dialogues: Dictionary = {}
 var _factions: Dictionary = {}
 var _quests: Dictionary = {}
+var _antagonisti: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -178,6 +180,7 @@ func load_all() -> void:
 	_load_single(PATH_REGIONS, "regions", _regions, TYPE_ARRAY)
 	_load_single(PATH_ROSTER, "npcs", _roster, TYPE_ARRAY)
 	_load_single(PATH_FACTIONS, "factions", _factions, TYPE_ARRAY)
+	_load_single(PATH_ANTAGONISTI, "antagonisti", _antagonisti, TYPE_ARRAY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -595,6 +598,19 @@ func get_quests() -> Array:
 
 func get_quest(id: String) -> Dictionary:
 	return _quests.get(id, {})
+
+
+## --- Antagonisti (data/lore/antagonisti.json, US-620) ---
+func get_antagonisti() -> Array:
+	return _array_or_empty(_antagonisti.get("antagonisti"))
+
+
+## L'antagonista del Pathway dato (il detentore precedente della sua Seq 0).
+func get_antagonista(pathway_id: String) -> Dictionary:
+	for a in get_antagonisti():
+		if typeof(a) == TYPE_DICTIONARY and str((a as Dictionary).get("pathway_id", "")) == pathway_id:
+			return a
+	return {}
 
 
 ## La Caratteristica di quel (Pathway, Sequenza). {} se non esiste.

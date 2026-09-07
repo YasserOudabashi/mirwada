@@ -51,12 +51,15 @@ func test_pergamena_ha_stored_ability_che_risolve() -> void:
 		var d: Dictionary = it
 		var aid: String = str(d.get("stored_ability_id", ""))
 		var ric: String = str(d.get("insegna_ricetta", ""))
-		# una pergamena porta un'abilita' OPPURE insegna una ricetta
+		var flag: String = str(d.get("stored_flag", ""))
+		# una pergamena porta un'abilita' OPPURE insegna una ricetta OPPURE
+		# scrive un flag di conoscenza (US-621: i libri)
 		if not aid.is_empty():
 			assert_false(gd.call("get_ability", aid).is_empty(),
 				"%s: stored_ability_id '%s' risolve" % [d.get("id"), aid])
 		else:
-			assert_false(ric.is_empty(), "%s: una pergamena ha stored_ability_id o insegna_ricetta" % d.get("id"))
+			assert_true(not ric.is_empty() or not flag.is_empty(),
+				"%s: una pergamena ha stored_ability_id, insegna_ricetta o stored_flag" % d.get("id"))
 
 
 func test_ogni_name_i18n_degli_item_risolve() -> void:

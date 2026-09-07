@@ -5973,3 +5973,84 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   amb_citta_notte quando TimeSystem entra nella notte.
 - BLOCCO H CHIUSO: US-617/618/619. 661 test verdi.
 - Prossima storia: US-620 (indizi dell'antagonista + scene degli atti). BLOCCO I.
+
+[2026-09-08] US-620 — Indizi dell'antagonista + scene degli atti come flag/dati. FASE 6, BLOCCO I.
+
+- data/lore/antagonisti.json (NUOVO): 1 antagonista per Pathway attivo (10).
+  E' il detentore precedente della Sequenza 0 del Pathway del giocatore
+  (design-npc-quest decisione n.9): strutturale, cambia col Pathway scelto,
+  nessun boss (fase 7) - solo 'indizi' (frasi con text_i18n che dialoghi e
+  libri lasceranno cadere). id, pathway_id, name_i18n (antagonist.*),
+  indizi[{text, text_i18n}].
+- scripts/game_data.gd: PATH_ANTAGONISTI + get_antagonisti()/get_antagonista(
+  pathway_id).
+- data/npc/roster.json: npc_aldo + avanzamento_temporale {sequenza_iniziale 9,
+  ogni_momenti 8, sequenza_minima 4} + sfida_ai_tier true.
+- scripts/npc_system.gd: _ready -> _collega_narrativa (differito). _su_momento
+  (TimeSystem.momento_cambiato): conta i momenti e fa scendere la Sequenza
+  degli NPC con avanzamento_temporale (Aldo, lo specchio). _su_rituale
+  (RitualSystem.rituale_completato): sequenza <= 6 -> KnowledgeStore.imposta(
+  atto_1_concluso) - "il primo rituale non basta piu'" (design cap. 5).
+  _su_sequenza_giocatore (Progression.sequence_changed): se cambia il tier del
+  giocatore, gli NPC sfida_ai_tier (Aldo) scrivono <corto>_duello_disponibile
+  (il duello e' una quest, fase 7). sequenza_npc(id); antagonista_del_giocatore().
+  _seq_npc nel save (mondo.npc).
+- tools/validate_data.py: sezione antagonisti (1 per Pathway attivo, prefissi
+  i18n, indizi non vuoti) + avanzamento_temporale del roster.
+- generate_i18n_stubs: +40 chiavi antagonist.* seminate da name/text (it.json
+  836 -> 876, 48 TODO invariati).
+- tests/test_narrativa.gd (NUOVO, 5 test): antagonista per Pathway; Aldo scende
+  fino alla Sequenza minima col tempo mentre gli altri restano fermi; flag
+  aldo_duello_disponibile al passaggio di tier; flag atto_1_concluso al primo
+  rituale di Seq <= 6; round-trip di _seq_npc.
+
+[2026-09-08] US-621 — Sinergie 'lore' + conoscenza dai libri. FASE 6, BLOCCO I.
+
+- scripts/dialogue_engine.gd: effetto 'impara_sinergia' (6o del vocabolario
+  chiuso dei dialoghi) -> SynergyEngine.impara_sinergia(id) (gia' esistente,
+  mette la sinergia in _viste). dialogue.schema.json + validate_data.py
+  aggiornati.
+- data/dialogues/dlg_ottavia.json: il nodo "grazie" ora insegna anche la
+  sinergia lore anti_furia_e_calma (oltre al flag testi_ordine_minore).
+- scripts/inventory.gd: usa(instance_id) ha un ramo 'stored_flag' - un
+  libro/pergamena trovato che al consumo scrive un flag di conoscenza
+  (KnowledgeStore.imposta true) e si consuma. Prima c'erano solo
+  stored_ability_id e insegna_ricetta.
+- data/items/pergamene.json: libro_ordine_minore (categoria pergamena,
+  stored_flag testi_ordine_minore) - un tomo trovato nel mondo che apre le ali
+  interne dell'Archivio Sepolto.
+- tools/validate_data.py: impara_sinergia.id dev'essere una sinergia
+  scoperta:'lore'; stored_flag e' per le pergamene e una pergamena porta UNA
+  sola cosa (ability | ricetta | flag).
+- tests/test_lore_conoscenza.gd (NUOVO, 3 test): il libro scrive il flag e
+  quel flag apre l'AreaGate 'conoscenza' dell'Archivio (integrazione US-611);
+  Ottavia insegna la sinergia lore -> entra in _viste; impara_sinergia di un
+  id ignoto -> false.
+- REGRESSIONI GESTITE: test_items (una pergamena ora puo' avere stored_flag),
+  test_madness_audio (nomi_sussurro unisce Ancore + NPC: il test isola anche
+  _nomi_npc).
+
+[2026-09-08] US-622 — Chiusura fase 6. FASE 6 CHIUSA. BLOCCO I CHIUSO.
+
+- 006_PRD/roadmap.md: "Fase 6 — Mondo — CHIUSA (22 story, 669 test)" con
+  l'elenco completo dei 9 blocchi e la nota che la fase 5b (Fool/Error/Door,
+  29 Seq stub) resta aperta - il "22/22 Pathway completi" arriva con quella.
+- 006_PRD/design-world.md, design-npc-quest.md: intestazione "REALIZZATO in
+  fase 6" con le decisioni prese (nomi regioni, roster 8, antagonista).
+- 006_PRD/design-master.md: Appendice A fase 6 -> CHIUSA; Appendice B
+  decisioni n.1/6/9 -> CHIUSE; Appendice C: le righe dei vocabolari/schema
+  nuovi (gate_types, region, npc, dialogue, quest, faction, antagonisti,
+  page_types +page_dialogo, audio del mondo).
+- CLAUDE.md + README.md: fase 6 chiusa, conteggi, save schema_version 21,
+  "fase corrente: 5b - Lord of Mysteries".
+- tools/validate_data.py: check di chiusura fase 6 - i file di dati della fase
+  esistono (regions/roster/factions/antagonisti + i 5 schema); ogni
+  dialogue_id del roster ha un file; le 4 quest di Atto I esistono. NON si
+  controlla "zero Sequenze stub" (Fool/Error/Door = fase 5b, un PRD a parte).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  669 test headless (661 + 8), tutti verdi.
+- FASE 6 CHIUSA: 22 story (US-601..622 + US-613b/US-616b), 9 blocchi. Il mondo
+  esiste: regioni, tempo, gating, NPC, dialoghi, fazioni, quest, mappa,
+  densita', audio (spec), narrativa. Save 20 -> 21 (un bump).
+- Prossima fase: 5b (Fool, Error, Door). PRD sorgente
+  006_PRD/prd-fase-5b-lord-of-mysteries.md.

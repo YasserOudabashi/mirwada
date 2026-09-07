@@ -43,7 +43,7 @@
                     "type": "object",
                     "required": ["tipo"],
                     "properties": {
-                      "tipo": { "enum": ["emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest"] }
+                      "tipo": { "enum": ["emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest", "impara_sinergia"] }
                     }
                   }
                 },

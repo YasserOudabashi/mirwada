@@ -60,10 +60,26 @@ Sequenza 8 alla 2, con zero righe che nominano il Pathway; il `git diff` del
 blocco tocca solo i 5 handler di primitiva nuovi + un metodo di movimento del
 player. `AbilityEngine.execute` non è stato toccato.
 
-**Fase 5b** (Darkness resto, Fool, Error, Door + `illusion`/`possess`/`steal`/
-`time_rewind`/`chain`/`shadow_meld`) è dentro la fase 6, dopo il ciclo
-giorno/notte. Il PRD della fase 6 si genera con `/prd` — vedi
-`006_PRD/roadmap.md`.
+**Fase 6 — Mondo: chiusa.** 22 story, 669 test. Cinque regioni giocabili
+(una scena data-driven per tutte), ciclo giorno/notte + fasi lunari
+(`TimeSystem`) che fa valere le condizioni `e_notte`/`fase_lunare`/`in_zona_tag`
+delle abilità. **Darkness completo 10/10** + `shadow_meld`/`illusion` (fase 5b
+interlacciata). `AreaGate` che applica `regions.json.gating[]` (6 modi da
+`gate_types.json`), aperto per sempre da un `terrain_modify` permanente. 8 NPC
+(`roster.json`) con schedule e memoria; motore dialoghi (`DialogueEngine`,
+effetti da vocabolario chiuso) + i 9 grafi; fazioni + reputazione
+(`FactionSystem`, comportamenti automatici dichiarati nei dati); motore quest
+(`QuestSystem`, lettore di eventi + flag, zero verbi nuovi) + 4 quest di Atto I
++ Journal nel libro; pagina mappa (fog of war, fast travel = potere); densità
+mistica (recupero, forzatura, percezione da Seq 5); audio del mondo come
+**specifica** (nessun file audio prodotto); antagonista strutturale per Pathway
+(`data/lore/antagonisti.json`). Save **`schema_version` 20 → 21** (un solo
+bump: tutto il resto sta nel campo `mondo`).
+
+**Ancora aperto — fase 5b** (Fool, Error, Door + `possess`/`steal`/`time_rewind`/
+`chain`): 29 Sequenze stub. Il "22/22 Pathway attivi completi" e "100/100
+Sequenze" arrivano quando la fase 5b è chiusa. PRD sorgente:
+`006_PRD/prd-fase-5b-lord-of-mysteries.md`.
 
 ## Setup
 

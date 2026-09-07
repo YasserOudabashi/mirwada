@@ -172,14 +172,45 @@ Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 
 ---
 
-## Fase 6 — Mondo (~35 story + fase 5b)
+## Fase 6 — Mondo — CHIUSA (22 story, 669 test)
 
-> Include la **fase 5b**: Darkness (le 9 Sequenze rimaste), Fool, Error, Door,
-> dopo che il ciclo giorno/notte e le regioni sono in piedi. `location_tags.json`
-> e' gia' stato creato in fase 5 (US-501): le regioni devono realizzare a
-> schermo ogni tag. `ownership.json` (matrice di proprieta') e' gia' un check
-> del validator. Le condizioni `e_notte` / `fase_lunare` delle abilita' Hermit
-> di Sequenza 5 sono gia' scritte nei dati: la fase 6 le fa valere.
+> **PRD**: `006_PRD/prd-fase-6-mondo.md`. Chiusa il 2026-09-08: 22 story
+> (`US-601..622` + `US-613b`, `US-616b`) in 9 blocchi (A regioni, B condizioni
+> del tempo, C Darkness, D gating, E NPC, F dialoghi, G fazioni + quest,
+> H mappa + densita' + audio, I narrativa + chiusura). Save `schema_version`
+> 20 -> 21 con UNA `_migra_20_a_21` (US-602, l'unico bump: tempo, npc,
+> reputazione, quest, flag stanno tutti nel campo `mondo` senza bumpare).
+>
+> **Cosa contiene**:
+> - 5 regioni giocabili (una scena `region_scene.gd` data-driven per tutte),
+>   ciclo giorno/notte + fasi lunari (`TimeSystem`), le condizioni `e_notte` /
+>   `fase_lunare` / `in_zona_tag` delle abilita' ORA valgono (`Conditions`
+>   condiviso da `AbilityEngine` e `DialogueEngine`).
+> - **Darkness completo 10/10** (fase 5b, gruppo eternal_darkness): +
+>   `shadow_meld` e `illusion` implementate. 71/100 Sequenze non-stub.
+> - Gating dell'esplorazione: `AreaGate` legge `regions.json.gating[]`
+>   (6 modi da `gate_types.json`), `terrain_modify` permanente lo apre per
+>   sempre.
+> - 8 NPC (`roster.json`) con schedule, memoria, Ancore; motore dialoghi
+>   (`DialogueEngine`, effetti da vocabolario chiuso); i 9 grafi; fazioni +
+>   reputazione (`FactionSystem`, comportamenti automatici dai dati); motore
+>   quest (`QuestSystem`, lettore di eventi + flag, zero verbi nuovi) + le 4
+>   quest di Atto I + il Journal nel libro.
+> - Pagina mappa (fog of war, fast travel = potere); densita' mistica
+>   (recupero, forzatura, percezione da Seq 5); audio del mondo come SPEC
+>   (nessun file audio prodotto).
+> - Antagonista strutturale (`data/lore/antagonisti.json`, uno per Pathway);
+>   Aldo avanza col tempo di gioco; flag `atto_1_concluso` / `aldo_duello_disponibile`.
+> - Vocabolari chiusi nuovi: `gate_types.json` (6), effetti dei dialoghi (6),
+>   effetti delle quest (5), livelli di reputazione. Schema nuovi:
+>   `npc.schema.json`, `dialogue.schema.json`, `quest.schema.json`,
+>   `faction.schema.json`, `region.schema.json`.
+>
+> **Ancora aperto (fase 5b, PRD a parte)**: Fool (9 Seq), Error (10), Door (10)
+> = 29 Sequenze stub. Il "22/22 Pathway attivi completi" e il "100/100
+> Sequenze" arrivano quando la fase 5b e' chiusa, non con la fase 6. Le
+> primitive dure senza handler restano `possess` / `steal` / `time_rewind` /
+> `chain`.
 
 - **Musica a layer per zona**: stem di base sempre attivo + stem che entrano
   su tensione/combattimento/boss, con crossfade. Riduce i minuti di musica da

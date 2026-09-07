@@ -140,12 +140,33 @@ del blocco tocca solo 5 handler `_p_<primitiva>` + `player.teleport_verso`,
 `AbilityEngine.execute` intatto. L'architettura della fase 2 regge oltre il
 Twilight Giant.
 
-Fase corrente: **5b + 6 — Mondo**. Roadmap in `006_PRD/roadmap.md`; il PRD si
-genera con `/prd`. La fase 5b (Darkness resto, Fool, Error, Door + le primitive
-`illusion`/`possess`/`steal`/`time_rewind`/`chain`/`shadow_meld`) va dentro la
-fase 6, dopo il ciclo giorno/notte e le regioni.
+Fase 6 — Mondo: **CHIUSA** (22 story US-601..622 + US-613b/US-616b, 669 test).
+PRD in `006_PRD/prd-fase-6-mondo.md`. 9 blocchi (A regioni, B condizioni del
+tempo, C Darkness, D gating, E NPC, F dialoghi, G fazioni + quest, H mappa +
+densità + audio, I narrativa + chiusura). Save `schema_version` **20 → 21**
+(US-602, l'unico bump: tempo/npc/reputazione/quest/flag stanno tutti nel campo
+`mondo` senza bumpare). 5 regioni giocabili data-driven; `TimeSystem`
+(giorno/notte + fasi lunari) che fa valere `e_notte`/`fase_lunare`/`in_zona_tag`
+delle abilità (`Conditions` condiviso da AbilityEngine e DialogueEngine);
+**Darkness completo 10/10** + `shadow_meld`/`illusion` (fase 5b interlacciata);
+`AreaGate` che applica `regions.json.gating[]` (6 modi); 8 NPC + `DialogueEngine`
++ i 9 grafi; `FactionSystem` (comportamenti automatici dai dati);
+`QuestSystem` (lettore di eventi + flag, zero verbi nuovi) + 4 quest di Atto I +
+Journal; pagina mappa (fog of war, fast travel = potere); densità mistica;
+audio del mondo come **spec** (nessun file audio prodotto);
+`data/lore/antagonisti.json` (antagonista strutturale per Pathway). Vocabolari
+chiusi nuovi: `gate_types.json` (6), effetti dialoghi (6), effetti quest (5),
+livelli di reputazione. Schema nuovi: `npc`/`dialogue`/`quest`/`faction`/`region`.
 
-Le fasi 6-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
+**Ancora aperto — fase 5b (PRD a parte)**: Fool (9 Seq), Error (10), Door (10)
+= 29 Sequenze stub. Il "**22/22 Pathway attivi completi**" e "100/100 Sequenze"
+arrivano quando la fase 5b è chiusa, non con la fase 6. Primitive dure senza
+handler: `possess`/`steal`/`time_rewind`/`chain`.
+
+Fase corrente: **5b — Lord of Mysteries** (Fool, Error, Door). PRD sorgente:
+`006_PRD/prd-fase-5b-lord-of-mysteries.md`. Poi fase 7 (endgame).
+
+Le fasi 7-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
 genera con `/prd` **solo quando la precedente è chiusa**.
 
 Prova che l'architettura regge: `data/abilities/twilight_giant.json` (fase 2) e

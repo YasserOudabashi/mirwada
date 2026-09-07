@@ -1,5 +1,17 @@
 # Mirwada — NPC, dialoghi, fazioni, quest, narrativa
 
+> **REALIZZATO in fase 6** (US-612..621, chiusa il 2026-09-08). Gli 8 NPC sono
+> `data/npc/roster.json` + `NpcSystem`; i dialoghi sono grafi in
+> `data/dialogues/` letti da `DialogueEngine` (effetti da vocabolario chiuso di
+> 6); le 4 fazioni sono `data/factions.json` + `FactionSystem` (Vesna e il
+> sospetto di Doran sono comportamenti DICHIARATI NEI DATI, nessun `if`); il
+> motore quest è `QuestSystem` (lettore di EventTracker + flag, zero verbi
+> nuovi) con le 4 quest di Atto I in `data/quests/`.
+> **Decisione n.6 (roster 8)**: tenuti tutti e otto.
+> **Decisione n.9 (antagonista)**: strutturale — il detentore precedente della
+> Sequenza 0 del Pathway del giocatore, uno per Pathway in
+> `data/lore/antagonisti.json`, solo indizi (nessun boss: fase 7).
+
 Figlio di `design-master.md`. Materia di fase 6; il roster e i contratti si
 fissano ora perche' i dati li citano gia' (sussurri a soglia 55 che usano i
 nomi degli NPC, `npc_influenced` nel vocabolario eventi, le Ancore nei

@@ -76,7 +76,9 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_aldo",
-      "memoria": {}
+      "memoria": {},
+      "avanzamento_temporale": { "sequenza_iniziale": 9, "ogni_momenti": 8, "sequenza_minima": 4 },
+      "sfida_ai_tier": true
     },
     {
       "id": "npc_ottavia",

@@ -1,5 +1,16 @@
 # Mirwada — Mondo: regioni, biomi, gating, tempo
 
+> **REALIZZATO in fase 6** (US-601..619, chiusa il 2026-09-08). Le 5 regioni
+> sono `data/world/regions.json` + una scena `region_scene.gd` data-driven; il
+> ciclo giorno/notte + fasi lunari è `TimeSystem`; il gating è il componente
+> `AreaGate` che legge `regions.json.gating[]` (6 modi in `gate_types.json`);
+> il fast travel è un potere (pagina mappa del libro, US-617); la densità
+> mistica è `WorldState.densita_mistica_corrente()` (US-618); l'audio del
+> mondo è la specifica in `data/audio.json` (US-619, nessun file prodotto).
+> **Decisione n.1 (nomi delle regioni)**: Mirwada / Marche del Crepuscolo /
+> Valle della Madre / Archivio Sepolto / Frontiera delle Porte — vivono solo
+> nei dati e nelle chiavi `region.*`.
+
 Figlio di `design-master.md`. Materia di fase 6 (le fondamenta dei vocabolari
 si anticipano a fase 5, perche' i rituali le usano gia'). Vincoli ereditati:
 **niente open world senza gating, niente generazione procedurale** (non-goals),

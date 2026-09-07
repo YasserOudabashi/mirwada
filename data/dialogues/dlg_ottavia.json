@@ -61,6 +61,10 @@
               "tipo": "emit_event",
               "evento": "npc_influenced",
               "modo": "persuaso"
+            },
+            {
+              "tipo": "impara_sinergia",
+              "id": "anti_furia_e_calma"
             }
           ],
           "goto": null

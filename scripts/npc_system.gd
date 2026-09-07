@@ -22,6 +22,90 @@ const MODI := ["persuaso", "ingannato", "aiutato", "intimidito", "risparmiato"]
 var _conosciuti: Array = []          # id degli NPC incontrati, in ordine
 var _memoria: Dictionary = {}        # id -> { modo: conteggio }
 var _ancore: Array = []              # anchor_candidate diventati Ancore
+## US-620: la Sequenza degli NPC che avanzano col tempo di gioco (Aldo, lo
+## specchio). id -> numero di Sequenza. Nel save (mondo.npc).
+var _seq_npc: Dictionary = {}
+## Momenti di TimeSystem passati da quando NpcSystem e' vivo. TRANSITORIO.
+var _momenti_contati: int = 0
+
+
+func _ready() -> void:
+	_collega_narrativa.call_deferred()
+
+
+## US-620: gancio narrativo. Connesso in differita perche' RitualSystem e
+## Progression possono non esistere ancora all'_init di NpcSystem.
+func _collega_narrativa() -> void:
+	var ts: Node = get_node_or_null("/root/TimeSystem")
+	if ts != null and ts.has_signal("momento_cambiato") and not ts.momento_cambiato.is_connected(_su_momento):
+		ts.momento_cambiato.connect(_su_momento)
+	var rs: Node = get_node_or_null("/root/RitualSystem")
+	if rs != null and rs.has_signal("rituale_completato") and not rs.rituale_completato.is_connected(_su_rituale):
+		rs.rituale_completato.connect(_su_rituale)
+	var prog: Node = get_node_or_null("/root/Progression")
+	if prog != null and prog.has_signal("sequence_changed") \
+			and not prog.sequence_changed.is_connected(_su_sequenza_giocatore):
+		prog.sequence_changed.connect(_su_sequenza_giocatore)
+
+
+func _su_momento(_m: String) -> void:
+	_momenti_contati += 1
+	for n in _roster():
+		var av: Variant = (n as Dictionary).get("avanzamento_temporale")
+		if typeof(av) != TYPE_DICTIONARY:
+			continue
+		var id: String = str((n as Dictionary).get("id", ""))
+		var iniz: int = int(av.get("sequenza_iniziale", 9))
+		var ogni: int = maxi(int(av.get("ogni_momenti", 8)), 1)
+		var minima: int = int(av.get("sequenza_minima", 0))
+		var attesa: int = maxi(iniz - int(_momenti_contati / ogni), minima)
+		if attesa < int(_seq_npc.get(id, iniz)):
+			_seq_npc[id] = attesa
+
+
+func _su_rituale(sequenza: int) -> void:
+	# design-npc-quest cap. 5: l'Atto I finisce quando "il primo rituale non
+	# basta piu'" - il primo advancement_ritual di Sequenza <= 6.
+	if sequenza <= 6:
+		var ks: Node = get_node_or_null("/root/KnowledgeStore")
+		if ks != null:
+			ks.call("imposta", "atto_1_concluso", true)
+
+
+func _su_sequenza_giocatore(nuova: int, vecchia: int) -> void:
+	var prog: Node = get_node_or_null("/root/Progression")
+	var gd: Node = get_node_or_null("/root/GameData")
+	var ks: Node = get_node_or_null("/root/KnowledgeStore")
+	if prog == null or gd == null or ks == null:
+		return
+	var pid: String = str(prog.call("pathway"))
+	var t_nuova: String = str(gd.call("get_sequence", "%s_%d" % [pid, nuova]).get("tier", ""))
+	var t_vecchia: String = str(gd.call("get_sequence", "%s_%d" % [pid, vecchia]).get("tier", ""))
+	if t_nuova == t_vecchia or t_nuova.is_empty():
+		return
+	# un passaggio di tier: gli NPC "sfida_ai_tier" (Aldo) offrono il duello
+	for n in _roster():
+		if bool((n as Dictionary).get("sfida_ai_tier", false)):
+			var corto: String = str((n as Dictionary).get("id", "")).trim_prefix("npc_")
+			ks.call("imposta", "%s_duello_disponibile" % corto, true)
+
+
+## La Sequenza corrente di un NPC che avanza col tempo (Aldo). Il default e'
+## la sequenza_iniziale del suo avanzamento_temporale, o 9.
+func sequenza_npc(id: String) -> int:
+	var av: Variant = _npc(id).get("avanzamento_temporale")
+	var iniz: int = int(av.get("sequenza_iniziale", 9)) if typeof(av) == TYPE_DICTIONARY else 9
+	return int(_seq_npc.get(id, iniz))
+
+
+## L'antagonista del Pathway del giocatore (data/lore/antagonisti.json). {} se
+## non c'e' un Pathway o un antagonista per quel Pathway.
+func antagonista_del_giocatore() -> Dictionary:
+	var prog: Node = get_node_or_null("/root/Progression")
+	var gd: Node = get_node_or_null("/root/GameData")
+	if prog == null or gd == null:
+		return {}
+	return gd.call("get_antagonista", str(prog.call("pathway")))
 
 
 ## Il giocatore ha incrociato un NPC: entra fra i conosciuti (i sussurri lo
@@ -151,6 +235,7 @@ func per_salvataggio() -> Dictionary:
 		"conosciuti": _conosciuti.duplicate(),
 		"memoria": _memoria.duplicate(true),
 		"ancore": _ancore.duplicate(),
+		"seq_npc": _seq_npc.duplicate(),
 	}
 
 
@@ -160,9 +245,15 @@ func da_salvataggio(raw: Variant) -> void:
 	_conosciuti = []
 	_memoria = {}
 	_ancore = []
+	_seq_npc = {}
 	var d: Dictionary = raw if typeof(raw) == TYPE_DICTIONARY else {}
 	_conosciuti = _solo_stringhe(d.get("conosciuti"))
 	_ancore = _solo_stringhe(d.get("ancore"))
+	var sn: Variant = d.get("seq_npc")
+	if typeof(sn) == TYPE_DICTIONARY:
+		for id in (sn as Dictionary):
+			if typeof(id) == TYPE_STRING and typeof(sn[id]) in [TYPE_INT, TYPE_FLOAT]:
+				_seq_npc[id] = clampi(int(sn[id]), 0, 9)
 	var mem: Variant = d.get("memoria")
 	if typeof(mem) == TYPE_DICTIONARY:
 		for id in (mem as Dictionary):
@@ -181,6 +272,8 @@ func pulisci() -> void:
 	_conosciuti.clear()
 	_memoria.clear()
 	_ancore.clear()
+	_seq_npc.clear()
+	_momenti_contati = 0
 	_aggiorna_sussurri()
 
 

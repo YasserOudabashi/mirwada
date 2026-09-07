@@ -775,6 +775,7 @@ def main():
     recipe_ids_all = set((_rec_for_syn.get("recipes", {}) or {}).keys())
     if os.path.isdir(sdir):
         syn_ids = set()
+        lore_syn_ids = set()   # US-621: sinergie scoperta:"lore" (le insegna una fonte lore)
         syn_neutralizza = {}  # sid -> [id, ...]
         unreachable_syns = []  # (sid, [tag, ...]) - sinergie di gruppi differiti
         for fname in sorted(os.listdir(sdir)):
@@ -789,6 +790,8 @@ def main():
                 if sid in syn_ids:
                     err(f"{rel}: id sinergia duplicato '{sid}'")
                 syn_ids.add(sid)
+                if syn.get("scoperta") == "lore":
+                    lore_syn_ids.add(sid)
                 for t in list(syn.get("richiede_tag", {})) + list(syn.get("esclude_tag", {})):
                     if t not in valid_tags:
                         err(f"{rel} [{sid}]: tag sconosciuto '{t}'")
@@ -935,6 +938,15 @@ def main():
                 sab = it.get("stored_ability_id")
                 if sab is not None and ability_ids and sab not in ability_ids:
                     err(f"{rel} [{iid}]: stored_ability_id '{sab}' non risolve a un'abilita'")
+                sfl = it.get("stored_flag")
+                if sfl is not None:
+                    if not isinstance(sfl, str) or not sfl:
+                        err(f"{rel} [{iid}]: stored_flag deve essere una stringa non vuota (US-621)")
+                    if it.get("categoria") != "pergamena":
+                        err(f"{rel} [{iid}]: stored_flag e' per gli item categoria:pergamena (libri)")
+                    if sab is not None or it.get("insegna_ricetta") is not None:
+                        err(f"{rel} [{iid}]: una pergamena porta UNA sola cosa "
+                            f"(stored_ability_id | insegna_ricetta | stored_flag)")
                 ins = it.get("insegna_ricetta")
                 if ins is not None:
                     _r = load_json(os.path.join(DATA, "potions", "recipes.json")) or {}
@@ -1185,6 +1197,43 @@ def main():
             if atteso not in ids_visti:
                 err(f"{rel}: manca la fazione '{atteso}' (design-npc-quest cap. 3)")
 
+    # --- antagonisti (data/lore/antagonisti.json, US-620) ---
+    ant_path = os.path.join(DATA, "lore", "antagonisti.json")
+    if not os.path.exists(ant_path):
+        err("data/lore/antagonisti.json: mancante o illeggibile (US-620).")
+    else:
+        adoc = load_json(ant_path) or {}
+        rel = "data/lore/antagonisti.json"
+        coperti = set()
+        for a in adoc.get("antagonisti", []):
+            pid = a.get("pathway_id")
+            coperti.add(pid)
+            if pathway_ids and pid not in pathway_ids:
+                err(f"{rel} [{a.get('id')}]: pathway_id '{pid}' non e' un Pathway attivo")
+            ni = a.get("name_i18n")
+            if not isinstance(ni, str) or not ni.startswith("antagonist."):
+                err(f"{rel} [{a.get('id')}]: name_i18n '{ni}' senza prefisso 'antagonist.'")
+            indizi = a.get("indizi", [])
+            if not indizi:
+                err(f"{rel} [{a.get('id')}]: nessun indizio")
+            for ind in indizi:
+                ti = ind.get("text_i18n") if isinstance(ind, dict) else None
+                if not isinstance(ti, str) or not ti.startswith("antagonist."):
+                    err(f"{rel} [{a.get('id')}]: un indizio senza text_i18n 'antagonist.*'")
+        for pid in pathway_ids:
+            if pid and pid not in coperti:
+                err(f"{rel}: manca l'antagonista per il Pathway attivo '{pid}' (US-620: uno per Pathway).")
+
+    # --- avanzamento_temporale nel roster (US-620) ---
+    if roster_doc is not None:
+        for npc in roster_doc.get("npcs", []):
+            av = npc.get("avanzamento_temporale")
+            if av is not None:
+                for k in ("sequenza_iniziale", "ogni_momenti", "sequenza_minima"):
+                    v = av.get(k)
+                    if not isinstance(v, int) or v < 0:
+                        err(f"data/npc/roster.json [{npc.get('id')}]: avanzamento_temporale.{k} intero >= 0.")
+
     # --- dialoghi (data/dialogues/, US-613) ---
     # Un grafo a nodi: start valido, ogni goto verso un nodo esistente o null,
     # nessun nodo orfano (irraggiungibile dallo start), speaker nel roster,
@@ -1192,7 +1241,7 @@ def main():
     DLG_COND = {"acting_progress_min", "madness_max", "madness_min", "e_notte",
                 "fase_lunare", "foundation_min", "tier_min", "in_zona_tag",
                 "follia_min", "reputazione_min", "flag"}
-    DLG_EFFETTI = {"emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest"}
+    DLG_EFFETTI = {"emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest", "impara_sinergia"}
     _dlg_quest_ids = set()   # quest_id nominati da un effetto avvia_quest
     tracked_ev = load_json(os.path.join(DATA, "schema", "tracked_events.json")) or {}
     ev_names = set(tracked_ev.get("events", {}).keys())
@@ -1247,6 +1296,9 @@ def main():
                                     f"non e' uno dei 5 ({sorted(modi_influenced)})")
                         if et == "avvia_quest":
                             _dlg_quest_ids.add(eff.get("quest_id"))
+                        if et == "impara_sinergia" and lore_syn_ids and eff.get("id") not in lore_syn_ids:
+                            err(f"{rel} [{nid}]: impara_sinergia.id '{eff.get('id')}' non e' una "
+                                f"sinergia scoperta:'lore' ({sorted(lore_syn_ids)})")
 
     # --- quest (data/quests/, US-616) ---
     # Un lettore di eventi + flag: ogni step e' uno dei 12 eventi (coi filtri
@@ -1792,6 +1844,29 @@ def main():
     for _name, _spec in prim_doc["primitives"].items():
         if _spec.get("implemented") and _spec.get("deferred"):
             err(f"data/schema/primitives.json [{_name}]: 'implemented' e 'deferred' insieme.")
+
+    # --- chiusura fase 6 (US-622): il mondo esiste ed e' coerente ---
+    # (NON si controlla "zero Sequenze stub": Fool/Error/Door restano fase 5b,
+    #  un PRD a parte. Il "22/22 Pathway completi" arriva con quella.)
+    FASE_6_DATA = [
+        "world/regions.json", "npc/roster.json", "factions.json",
+        "lore/antagonisti.json", "schema/npc.schema.json", "schema/dialogue.schema.json",
+        "schema/quest.schema.json", "schema/faction.schema.json", "schema/gate_types.json",
+    ]
+    for rel in FASE_6_DATA:
+        if not os.path.exists(os.path.join(DATA, rel)):
+            err(f"data/{rel}: file di dati della fase 6 mancante (US-622: la fase e' chiusa).")
+    # ogni dialogue_id del roster ha un file
+    if roster_doc is not None and os.path.isdir(dlg_dir):
+        _dlg_files = {f[:-5] for f in os.listdir(dlg_dir) if f.endswith(".json")}
+        for _npc in roster_doc.get("npcs", []):
+            if _npc.get("dialogue_id") not in _dlg_files:
+                err(f"data/dialogues/: manca il file per dialogue_id '{_npc.get('dialogue_id')}' "
+                    f"dell'NPC '{_npc.get('id')}' (US-622).")
+    # le quest di Atto I esistono
+    for _qid in ("q_mirco_01", "q_sidon_01", "q_vesna_01", "q_lena_01"):
+        if not os.path.exists(os.path.join(DATA, "quests", f"{_qid}.json")):
+            err(f"data/quests/{_qid}.json: quest di Atto I mancante (US-622).")
 
     report()
     return 1 if errors else 0

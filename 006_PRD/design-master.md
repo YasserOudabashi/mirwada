@@ -281,18 +281,20 @@ plant_growth, mind_read). `darkness_1`/`paragon_1`/`hermit_1` senza primitive
 differite. `location_tags.json` (29 luoghi). `batch_4.json` (6 sinergie).
 **Verdetto del checkpoint (US-508)**: l'architettura regge — Death giocato in
 codice Seq 8->2 con zero righe dedicate.
-**Rimane fase 5b** (dentro fase 6): Darkness/Fool/Error/Door + illusion,
-possess, steal, time_rewind, chain, shadow_meld.
+**Fase 5b**: Darkness completo 10/10 + `shadow_meld` + `illusion` fatti dentro
+la fase 6 (US-606..608). **Restano Fool/Error/Door** (29 Sequenze stub) +
+`possess`/`steal`/`time_rewind`/`chain` → PRD `prd-fase-5b-lord-of-mysteries.md`.
 P2: R-13 — spostare le tabelle nomi di `generate_pathways.py` in un file dati.
 
-### Fase 6 — mondo (da `design-world.md` e `design-npc-quest.md`)
+### Fase 6 — mondo (da `design-world.md` e `design-npc-quest.md`) — CHIUSA
 
-P0: `location_tags.json` + `regions.json` + schema + validator (anticipabili a
-fase 5: servono ai rituali). P1: una story dati + una story scena per regione;
-`npc/roster.json` + schema; motore dialoghi (1-2 story) + un file dialogo per
-NPC (8 story piccole); motore quest su EventTracker (1-2 story) + quest di
-Atto I; `factions.json` + reputazione; pagina mappa del libro (doppia pagina).
-P2: zone musica per le 4 regioni nuove in audio.json.
+**CHIUSA il 2026-09-08**, 22 story (`US-601..622` + `US-613b`/`US-616b`),
+669 test, 9 blocchi. `regions.json` + `region_scene.gd` data-driven;
+`TimeSystem`; `AreaGate` (`gate_types.json`, 6 modi); `roster.json` +
+`NpcSystem`; `DialogueEngine` + 9 grafi; `QuestSystem` + 4 quest di Atto I +
+Journal; `factions.json` + `FactionSystem`; pagina mappa + fast travel come
+potere; densità mistica; audio del mondo come spec. Save 20 → 21 (un bump).
+**Aperto**: fase 5b (Fool/Error/Door, 29 Sequenze stub) → prd-fase-5b.
 
 ### Fase 7 — endgame
 
@@ -305,8 +307,9 @@ location_tags).
 
 ## Appendice B — Decisioni aperte (con raccomandazione)
 
-1. **Nomi delle regioni** — provvisori in `design-world.md`. Raccomandazione:
-   la citta' si chiama Mirwada come il gioco (il titolo e' un luogo).
+1. **Nomi delle regioni** — **CHIUSA (fase 6, US-601)**: Mirwada / Marche del
+   Crepuscolo / Valle della Madre / Archivio Sepolto / Frontiera delle Porte.
+   Vivono solo nei dati e nelle chiavi `region.*`.
 2. **Libro diegetico** — "il libro E' il salvataggio" + macchie di follia sulle
    pagine. Raccomandato si' (design-ui-libro.md, cap. 2).
 3. **`damage_tags` a 8 voci** — applicato in questa sessione (fisico, luce,
@@ -315,16 +318,18 @@ location_tags).
 4. **darkness_1** — riscrittura curse/debuff raccomandata (cap. 4);
    l'alternativa riattiva un gruppo differito intero.
 5. **Matrice di proprieta'** — raccomandata come scritta (cap. 4).
-6. **Roster NPC** — tenere tutti e 8 (Mirco e Sidon richiesti; gli altri 6
-   coprono esattamente i sistemi: 3 Ancore, gating conoscenza, gating zona,
-   rivale, pressione investigativa).
+6. **Roster NPC** — **CHIUSA (fase 6, US-612)**: tenuti tutti e 8 (Mirco e
+   Sidon richiesti; gli altri 6 coprono esattamente i sistemi: 3 Ancore,
+   gating conoscenza, gating zona, rivale, pressione investigativa).
 7. **Story pathway di fase 5** — 3 story per pathway invece di 1 (limite 200
    righe). La roadmap va aggiornata quando si genera il PRD di fase 5.
 8. **Eredita' tra personaggi** (fase 7) — cosa passa al successivo: oggetto,
    conoscenza (fog of war del diagramma gia' scoperto), reputazione, o
    un'Ancora sopravvissuta. Da decidere col PRD di fase 7.
-9. **Antagonista / detentore della Sequenza 0** — le opzioni in
-   `design-npc-quest.md` cap. 5; da decidere entro il PRD di fase 6.
+9. **Antagonista / detentore della Sequenza 0** — **CHIUSA (fase 6, US-620)**:
+   strutturale. È il detentore precedente della Sequenza 0 del Pathway del
+   giocatore, uno per Pathway in `data/lore/antagonisti.json`; nessun boss
+   (fase 7), solo indizi (chiavi i18n che dialoghi e libri lasciano cadere).
 
 ---
 
@@ -348,5 +353,13 @@ location_tags).
 | Luoghi dei rituali | `data/schema/location_tags.json` | 29 | chiuso, fase 5 (US-501) — anticipato da fase 6; le regioni devono realizzarli a schermo |
 | Matrice di proprieta' | `data/schema/ownership.json` | `summon_materie_prime` (9) + `tag_vietati_pathway_attivi` | chiuso, fase 5 (US-502) — reso check del validator |
 | Location tags | `data/schema/location_tags.json` | 24 proposti | PROPOSTO in design-world.md, si crea con la prima story che li valida |
-| Condizioni | `ability.schema.json` (enum) | 8 + 3 proposte | le 3 nuove (`follia_min`, `reputazione_min`, `flag`) arrivano col motore dialoghi |
-| Modi di gating | `region.schema.json` proposto | primitiva, momento, fase_lunare, npc, conoscenza, sequenza | PROPOSTO in design-world.md |
+| Condizioni | `ability.schema.json` (enum) | 8 + `follia_min`/`reputazione_min`/`flag` | chiuso, fase 6 (US-605/613) — un solo vocabolario, `scripts/conditions.gd` lo valuta per abilità E dialoghi |
+| Modi di gating | `data/schema/gate_types.json` | 6 (primitiva, momento, fase_lunare, npc, conoscenza, sequenza) | chiuso, fase 6 (US-601); `AreaGate` ha un ramo per ognuno |
+| Regioni | `data/schema/region.schema.json` + `data/world/regions.json` | 5 regioni | chiuso, fase 6 (US-601) |
+| NPC | `data/schema/npc.schema.json` + `data/npc/roster.json` | 8 + 10 generici | chiuso, fase 6 (US-612) |
+| Dialoghi | `data/schema/dialogue.schema.json` + `data/dialogues/` | 9 grafi; effetti = 6 (`emit_event`, `flag`, `reputazione`, `apri_vendita`, `avvia_quest`, `impara_sinergia`) | chiuso, fase 6 (US-613/621) |
+| Quest | `data/schema/quest.schema.json` + `data/quests/` | 4 di Atto I; effetti = 5 (`flag`, `item`, `reputazione`, `ancora`, `apri_vendita`) | chiuso, fase 6 (US-616) |
+| Fazioni | `data/schema/faction.schema.json` + `data/factions.json` | 4 (`ordine_minore`, `porto`, `quartiere`, `giustizia`) | chiuso, fase 6 (US-615) |
+| Antagonisti | `data/lore/antagonisti.json` | 1 per Pathway attivo (10) | chiuso, fase 6 (US-620) |
+| Tipi di pagina del libro | `data/schema/page_types.json` | 9 (+`page_dialogo`) | esteso fase 6 (US-613b) |
+| Audio del mondo | `data/audio.json` (`music.ambienti`, `music.layer`) | 5 zone giorno/notte + struttura a stem | spec fase 6 (US-619) — nessun file audio prodotto |
