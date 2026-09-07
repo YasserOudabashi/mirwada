@@ -275,8 +275,8 @@
       ],
       "priority": 14,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO G CHIUSO. page_inventario.gd SEZIONI 6->7 (+journal, nessun page_type nuovo). _journal(): quest attive coi loro step (fatto/corrente/da fare), completate (alpha 0.7), fallite (0.45), da QuestSystem + GameData via tr_data. _collega_sinergie -> _collega_segnali: connette anche QuestSystem (quest_avviata/step_completato/quest_completata/quest_fallita) -> redraw dal vivo se la sezione aperta e' 'journal' (come Sinergie US-411). strings.csv: BOOK_INV_JOURNAL + BOOK_JOURNAL_* (it+en), .translation rigenerati con --import. test_page_inventario.gd +1 (journal vuoto -> quest attiva dal vivo -> sotto Completate). validate exit 0 (3 warning invariati), 647 test verdi (646+1)."
     },
     {
       "id": "US-617",
