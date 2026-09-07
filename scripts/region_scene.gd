@@ -15,6 +15,8 @@ extends TileMapLayer
 
 signal zona_cambiata(location_tag: String)
 
+const AreaGate := preload("res://scripts/area_gate.gd")
+
 const TILE := 32
 const W := 48
 const H := 36
@@ -41,6 +43,7 @@ func _ready() -> void:
 	_tinta_di_fondo()
 	_crea_zone()
 	_crea_passaggi()
+	_crea_gate()
 	_colloca_giocatore()
 	_registra_regione()
 
@@ -155,6 +158,24 @@ func _crea_passaggi() -> void:
 		add_child(area)
 
 
+## Una AreaGate per ogni voce di regions.json.gating[]: una barriera che si
+## apre/chiude coi 6 modi di gate_types.json (US-611). Disposte in colonna
+## nell'interno; l'arte vera e la geometria sono un non-goal di fase 6.
+func _crea_gate() -> void:
+	var gates: Array = (_regione_dati().get("gating", []) as Array)
+	for i in gates.size():
+		var g: Variant = gates[i]
+		if typeof(g) != TYPE_DICTIONARY:
+			continue
+		var ag: Area2D = AreaGate.new()
+		ag.name = "Gate_%s" % str((g as Dictionary).get("area", i))
+		ag.position = Vector2(
+			float(W) * 0.5 * TILE,
+			TILE * 4 + (float(H - 8) * TILE) * (float(i) + 0.5) / float(maxi(gates.size(), 1)))
+		ag.call("configura", region_id, g)
+		add_child(ag)
+
+
 func _su_ingresso_zona(body: Node, location_tag: String) -> void:
 	if not body.is_in_group("player"):
 		return
@@ -170,8 +191,23 @@ func _su_ingresso_zona(body: Node, location_tag: String) -> void:
 func _su_passaggio(body: Node, target: String) -> void:
 	if _in_viaggio or not body.is_in_group("player"):
 		return
+	if not _ingresso_aperto(target):
+		return  # la regione respinge (es. la Frontiera oltre la Sequenza 4)
 	_in_viaggio = true
 	_viaggia_verso.call_deferred(target)
+
+
+## Un gating con area "ingresso" chiude la regione stessa (US-611): la
+## convenzione e' nel dato, non un caso per una regione. Le altre aree di
+## gating sono barriere interne (AreaGate in scena).
+func _ingresso_aperto(target: String) -> bool:
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd == null:
+		return true
+	for g in (gd.call("get_region", target).get("gating", []) as Array):
+		if typeof(g) == TYPE_DICTIONARY and str((g as Dictionary).get("area", "")) == "ingresso":
+			return AreaGate.valuta_gate(target, g, get_tree().root)
+	return true
 
 
 ## Sostituisce questa scena di regione con quella della destinazione. Il player

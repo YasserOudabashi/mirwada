@@ -153,8 +153,8 @@
       ],
       "priority": 9,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO D CHIUSO (unica story). scripts/area_gate.gd (NUOVO, preload): AreaGate estende Area2D - configura(region_id, gate), e_aperto(), id()='<regione>/<area>'. Barriera in scena: StaticBody2D figlio (disabled=e_aperto) + marker ColorRect rosso/verde in _process. valuta_gate(region_id, gate, root) STATIC (pura, la riusa region_scene per i passaggi): match sul TIPO dei 6 di gate_types.json, mai sulla regione/area (FR-8). momento->TimeSystem.momento(); fase_lunare->TimeSystem.fase_lunare(); sequenza->Progression.sequence()>=valore (respinge chi e' 'sopra'); primitiva->una abilita' delle Sequenze 9->corrente del Pathway la compone (dai dati, nessun nome hardcoded); conoscenza->KnowledgeStore.conosce; npc->NpcSystem.ha_influenza se esiste (US-612), sennò chiuso. Sistema assente->gate chiuso. gate in WorldState.gate_aperti->sempre aperto. terrain_modify permanente: AreaGate ascolta WorldState.terreno_modificato (emesso solo dai permanenti); se copre la barriera->WorldState.apri_gate(id()), gia' nel save (nessun bump). region_scene.gd: _crea_gate() una AreaGate per voce di gating[]; _su_passaggio consulta un gating area=='ingresso' (convenzione nel dato) via valuta_gate prima di viaggiare. Nessun cambio al validator (US-601 valida gia' gating[]). tests/test_area_gate.gd (7 test). validate exit 0 (3 warning invariati), 610 test verdi (603+7), 0 ERROR nuovi. Verifica a schermo (rendering reale, _shot_us611.gd): Marche gate 'cripte' barriera ROSSA di giorno -> VERDE a notte_fonda; Archivio 'ali_interne' rosso senza flag -> verde dopo impara('testi_ordine_minore'). Screenshot us611_marche_gate_chiuso/aperto.png, us611_archivio_chiuso/aperto.png."
     },
     {
       "id": "US-612",

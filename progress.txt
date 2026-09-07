@@ -5501,3 +5501,58 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   (CLAUDE.md/README) e il conteggio finale sono di US-622.
 - Prossima storia (fuori dai 3 blocchi chiesti): US-611 (BLOCCO D - il motore
   del mondo applica regions.json.gating[] via AreaGate).
+
+[2026-09-07] US-611 — Il motore del mondo applica regions.json.gating[]. FASE 6, BLOCCO D CHIUSO.
+
+- scripts/area_gate.gd (NUOVO, preload non autoload): AreaGate estende Area2D.
+  configura(region_id, gate) + e_aperto() + id() = "<regione>/<area>". Una
+  barriera in scena: StaticBody2D figlio (disabled = e_aperto()) che il player
+  non attraversa da chiuso + marker ColorRect (rosso chiuso / verde aperto),
+  aggiornati in _process.
+- valuta_gate(region_id, gate, root) STATIC, valutazione pura senza nodo (la
+  usano sia la barriera sia il controllo dei passaggi in region_scene). Il
+  match e' sul TIPO (i 6 di data/schema/gate_types.json), MAI sulla regione o
+  sull'area (FR-8, "un modo nuovo e' un ramo qui + una voce in gate_types.json"):
+  * momento      -> TimeSystem.momento() == valore
+  * fase_lunare  -> TimeSystem.fase_lunare() == valore
+  * sequenza     -> Progression.sequence() >= valore (piu' avanti = numero piu'
+                    basso: la Frontiera "respinge chi e' sopra la Sequenza 4")
+  * primitiva    -> _possiede_primitiva: una delle abilita' delle Sequenze
+                    9->corrente del Pathway del giocatore compone quella
+                    primitiva (spina dorsale dai dati, nessun nome di Pathway)
+  * conoscenza   -> KnowledgeStore.conosce(valore) (i flag testi_*, US-613)
+  * npc          -> NpcSystem.ha_influenza(valore) se esiste (US-612), sennò
+                    chiuso: un gate npc si apre solo influenzando l'NPC
+  Sistema assente (TimeSystem/KnowledgeStore/NpcSystem non in albero) ->
+  gate CHIUSO (una barriera non valutabile non lascia passare); gate gia' in
+  WorldState.gate_aperti -> sempre aperto.
+- terrain_modify permanente:true: AreaGate si connette a
+  WorldState.terreno_modificato (emesso SOLO dai permanenti in registra_terreno);
+  se la modifica copre la barriera -> WorldState.apri_gate(id()). L'id entra
+  in gate_aperti, gia' serializzato nel save (US-602, nessun bump).
+- scripts/region_scene.gd: preload AreaGate; _crea_gate() istanzia una AreaGate
+  per ogni voce di regions.json.gating[] (colonna nell'interno, placeholder).
+  _su_passaggio: un gating con area "ingresso" (convenzione nel DATO, non un if
+  per la Frontiera) chiude la regione stessa -> _ingresso_aperto(target) via
+  AreaGate.valuta_gate prima di viaggiare.
+- Nessun cambio a validate_data.py: US-601 valida gia' gating[] a fondo.
+- tests/test_area_gate.gd (NUOVO, 7 test): momento chiuso di giorno / aperto a
+  notte_fonda; fase_lunare chiuso a nuova / aperto a piena; conoscenza si apre
+  col flag; sequenza respinge la Seq 2 e lascia passare la Seq 9; primitiva
+  legge le abilita' del Pathway (TG no shadow_meld, Darkness Seq 4 si',
+  Darkness no plant_growth); terrain_modify permanente apre per sempre e
+  sopravvive al round-trip del save del mondo; region_scene crea 1 AreaGate per
+  voce di gating (Marche 2, Mirwada 0). prepara() ripulisce
+  WorldState/TimeSystem/KnowledgeStore/Progression fra un test e l'altro.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  610 test headless (603 + 7), tutti verdi. Nessun ERROR nuovo rispetto a HEAD.
+  Verifica a schermo (rendering reale, _shot_us611.gd, non headless): nelle
+  Marche il gate 'cripte' e' una barriera ROSSA di giorno (e_aperto=false),
+  diventa VERDE a notte_fonda (e_aperto=true); nell'Archivio Sepolto il gate
+  'ali_interne' e' rosso senza il flag, verde dopo
+  KnowledgeStore.impara('testi_ordine_minore'). Screenshot
+  us611_marche_gate_chiuso/aperto.png, us611_archivio_chiuso/aperto.png.
+- BLOCCO D CHIUSO (un'unica story). Il gating di regions.json ora vale: le aree
+  si aprono per momento/fase lunare/primitiva posseduta/conoscenza/Sequenza, e
+  un varco forzato resta aperto per sempre.
+- Prossima storia: US-612 (roster.json + npc.schema.json + NpcSystem). BLOCCO E.
