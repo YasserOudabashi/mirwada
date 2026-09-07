@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "dlg_generic",
+  "_comment": "I popolani npc_generic_*: influenzabili, senza profondita' (design-npc-quest cap. 2).",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "speaker": "npc_generic_01",
+      "text": "Si'? Cosa vuoi?",
+      "text_i18n": "dialogue.generic.n1",
+      "choices": [
+        {
+          "text": "Lascia che ti aiuti.",
+          "text_i18n": "dialogue.generic.n1.aiuta",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "aiutato"
+            }
+          ],
+          "goto": null
+        },
+        {
+          "text": "Credimi, e' cosi'.",
+          "text_i18n": "dialogue.generic.n1.inganna",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "ingannato"
+            }
+          ],
+          "goto": null
+        },
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.generic.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    }
+  }
+}

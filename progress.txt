@@ -5611,3 +5611,63 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   sistema nuovo, ogni pezzo e' piccolo e additivo.
 - Prossima storia: US-613 (motore dialoghi + dialogue.schema.json + FlagStore +
   pagina page_dialogo). BLOCCO F.
+
+[2026-09-07] US-613 — Motore dialoghi + dialogue.schema.json + FlagStore. FASE 6, BLOCCO F.
+
+- SPEZZATA (regola 3): questa story e' il MOTORE. La pagina del libro
+  page_dialogo (nuovo page_type) + il gancio di interazione col mondo sono
+  US-613b, nuova story in prd.json. Con gioco.fase = 3 la pagina sarebbe
+  comunque bianca; l'engine gira e i test lo coprono.
+- data/schema/dialogue.schema.json (NUOVO): grafo { id, start, nodes:{ speaker,
+  text_i18n, choices:[{ text_i18n, condizioni[], effetti[], goto|null }] } }.
+- scripts/dialogue_engine.gd (NUOVO autoload, dopo NpcSystem):
+  * avvia(dialogue_id, interlocutore_id) -> carica il grafo da GameData, va
+    allo start, FERMA IL MONDO (TimeSystem.imposta_pausa(true)). false se il
+    dialogo o il nodo di start non esistono.
+  * scelte_valide() -> le choices del nodo con Conditions.tutte_soddisfatte
+    (riuso scripts/conditions.gd, FR-3: un dialogo notturno usa la stessa
+    condizione e_notte di un'abilita' notturna). Le nasconde, non le disabilita.
+  * scegli(i) -> applica gli effetti della i-esima scelta VALIDA, poi il goto;
+    goto null / verso un nodo assente -> termina().
+  * termina() -> riavvia il mondo, segnale dialogo_finito.
+  * segnali: dialogo_avviato / nodo_cambiato / dialogo_finito / apri_vendita /
+    avvia_quest (gli ultimi due per la UI e US-615/616).
+- Effetti = vocabolario CHIUSO di 5 (design-npc-quest 1): emit_event, flag,
+  reputazione, apri_vendita, avvia_quest. emit_event con npc_influenced passa
+  da NpcSystem.influenza(interlocutore, modo) (aggiorna la memoria dell'NPC
+  toccato + emette l'evento); gli altri dei 12 -> EventTracker diretto.
+  reputazione: no-op finche' FactionSystem non esiste (US-615). avvia_quest:
+  segnale + QuestSystem.avvia se esiste (US-616).
+- FlagStore UNIFICATO su KnowledgeStore (l'AC permette "FlagStore delega a
+  KnowledgeStore"): aggiunti imposta(flag, bool) e dimentica(flag).
+  L'effetto flag dei dialoghi scrive li'. NIENTE campo mondo.flag: i flag
+  restano nel save "conoscenza" gia' esistente - un solo store, un solo save.
+  Il gate "conoscenza" di US-611 gia' legge KnowledgeStore.conosce.
+- scripts/game_data.gd: DIR_DIALOGUES + _load_dialogues() (un file per dialogo,
+  l'oggetto E' il grafo, chiave = doc.id) + get_dialogue(id).
+- data/dialogues/: dlg_mirco (grafo vero a 3 nodi - tutorial diegetico +
+  bersaglio dei test dell'engine: una scelta con tier_min:mid, un effetto
+  flag, un effetto emit_event npc_influenced, un goto), 7 stub del roster
+  (1 nodo + congedo, US-614 scrive i grafi veri), dlg_generic (scelte
+  aiuta/inganna per tg_6_giuramento e fool_9_inganno).
+- tools/validate_data.py: sezione dialoghi. start dev'essere un nodo; ogni
+  goto verso un nodo esistente o null; nodi ORFANI (irraggiungibili dallo
+  start, BFS) = errore; speaker nel roster; condizioni nel vocabolario
+  condiviso (11 tipi); effetti nei 5; emit_event.evento tra i 12 tracked_events
+  e, per npc_influenced, modo tra i 5. Verificato a mano: un goto rotto + un
+  nodo orfano fanno fallire il validator.
+- tools/generate_i18n_stubs.py rilanciato: +26 chiavi dialogue.* seminate dal
+  campo gemello 'text' (it.json 757 -> 783; i 48 TODO invariati).
+- tests/test_dialogue_engine.gd (NUOVO, 7 test): avvia + nodo di start;
+  tier_min nasconde una scelta a low e la mostra a mid; scegli applica
+  emit_event + aggiorna la memoria + segue il goto; l'effetto flag scrive su
+  KnowledgeStore; il congedo termina e il mondo riparte; goto null non crasha
+  e influenza l'interlocutore giusto; i 9 dialoghi caricati da GameData.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  624 test headless (617 + 7), tutti verdi (test_conditions/test_npc_system/
+  test_area_gate/test_time_system invariati). Runtime (_shot_us613.gd): avvio
+  dlg_mirco -> il tick di TimeSystem resta fermo per 30 frame; scegli(0) ->
+  npc_influenced{persuaso}=1, memoria mirco {persuaso:1}, nodo -> n2; dopo il
+  congedo il tick riparte.
+- Prossima storia: US-613b (page_dialogo + gancio di interazione), poi US-614
+  (i grafi veri degli 8). BLOCCO F.

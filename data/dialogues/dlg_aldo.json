@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "dlg_aldo",
+  "_comment": "Stub US-613: un nodo. US-614 scrive il grafo vero (design-npc-quest cap. 2).",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "speaker": "npc_aldo",
+      "text": "Guarda chi si vede. Sei ancora indietro.",
+      "text_i18n": "dialogue.aldo.n1",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.aldo.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    }
+  }
+}

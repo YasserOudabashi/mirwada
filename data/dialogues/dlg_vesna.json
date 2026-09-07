@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "dlg_vesna",
+  "_comment": "Stub US-613: un nodo. US-614 scrive il grafo vero (design-npc-quest cap. 2).",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "speaker": "npc_vesna",
+      "text": "Tienili lontani da qui, i tuoi poteri.",
+      "text_i18n": "dialogue.vesna.n1",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.vesna.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    }
+  }
+}

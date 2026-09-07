@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Un grafo di dialogo di data/dialogues/ (design-npc-quest cap. 6.2, US-613)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "start", "nodes"],
+  "properties": {
+    "schema_version": { "type": "integer" },
+    "_comment": { "type": "string" },
+    "id": { "type": "string", "pattern": "^dlg_" },
+    "start": { "type": "string" },
+    "nodes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["speaker", "text_i18n", "choices"],
+        "properties": {
+          "speaker": { "type": "string" },
+          "text": { "type": "string" },
+          "text_i18n": { "type": "string", "pattern": "^dialogue\\." },
+          "choices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["text_i18n", "condizioni", "effetti", "goto"],
+              "properties": {
+                "text": { "type": "string" },
+                "text_i18n": { "type": "string", "pattern": "^dialogue\\." },
+                "condizioni": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["tipo"],
+                    "properties": { "tipo": { "type": "string" }, "valore": {} }
+                  }
+                },
+                "effetti": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["tipo"],
+                    "properties": {
+                      "tipo": { "enum": ["emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest"] }
+                    }
+                  }
+                },
+                "goto": { "type": ["string", "null"] }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

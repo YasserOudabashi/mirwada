@@ -176,7 +176,7 @@
     },
     {
       "id": "US-613",
-      "title": "Motore dialoghi + dialogue.schema.json + pagina del libro (Blocco F)",
+      "title": "Motore dialoghi + dialogue.schema.json (Blocco F)",
       "description": "Come giocatore, voglio parlare con gli NPC: scelte, condizioni, conseguenze.",
       "acceptanceCriteria": [
         "data/schema/dialogue.schema.json: id, start, nodes ({speaker, text_i18n, choices[]}); ogni choice: text_i18n, condizioni[] (vocabolario abilita' + follia_min/reputazione_min/flag), effetti[] (vocabolario chiuso ~5: emit_event->solo i 12, flag, reputazione, apri_vendita, avvia_quest), goto.",
@@ -186,6 +186,23 @@
         "Validator: start/goto verso nodi esistenti, speaker nel roster, emit_event valido, effetti dal vocabolario chiuso, chiavi i18n.",
         "SAVE: campo mondo.flag {}.",
         "Test headless + verifica a schermo.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 11,
+      "fase": 6,
+      "passes": true,
+      "notes": "BLOCCO F. SPEZZATA (regola 3 del progetto: story troppo grande): questo e' il MOTORE; la pagina del libro page_dialogo e' US-613b. data/schema/dialogue.schema.json (NUOVO). scripts/dialogue_engine.gd (NUOVO autoload dopo NpcSystem): avvia(dialogue_id, interlocutore_id) - carica il grafo, ferma il mondo (TimeSystem.imposta_pausa), segnali dialogo_avviato/nodo_cambiato/dialogo_finito/apri_vendita/avvia_quest. scelte_valide() = choices con Conditions.tutte_soddisfatte (riuso conditions.gd, FR-3). scegli(i) applica effetti + segue goto (null/assente -> termina). Effetti = vocabolario CHIUSO di 5: emit_event (npc_influenced passa da NpcSystem.influenza sull'interlocutore, gli altri 12 -> EventTracker), flag -> KnowledgeStore.imposta, reputazione (US-615 no-op), apri_vendita (segnale), avvia_quest (US-616 segnale). FlagStore: UNIFICATO su KnowledgeStore - aggiunti imposta(flag,bool)/dimentica(flag); NIENTE mondo.flag (l'AC permette 'FlagStore delega a KnowledgeStore', i flag restano nel save 'conoscenza' esistente). game_data.gd: DIR_DIALOGUES + _load_dialogues() (un file per dialogo, chiave=doc.id) + get_dialogue(id). data/dialogues/: dlg_mirco (grafo vero 3 nodi, bersaglio test), 7 stub del roster (1 nodo, US-614 li scrive), dlg_generic (aiuta/inganna per tg_6/fool_9). validate_data.py: sezione dialoghi - start valido, ogni goto verso nodo esistente o null, nodi orfani (irraggiungibili dallo start) = errore, speaker nel roster, condizioni nel vocabolario, effetti nei 5, emit_event solo sui 12 + modo sui 5. generate_i18n_stubs rilanciato (+26 chiavi dialogue.* seminate da 'text'; it.json 757->783, 48 TODO invariati). tests/test_dialogue_engine.gd (7 test) + verificato che il validator becca goto rotto + orfani. validate exit 0 (3 warning invariati), 624 test verdi (617+7). Runtime (_shot_us613.gd): avvia dlg_mirco -> tick del tempo fermo; scegli -> npc_influenced + memoria + goto n2; congedo -> tick riparte."
+    },
+    {
+      "id": "US-613b",
+      "title": "Pagina page_dialogo del libro (Blocco F)",
+      "description": "Come giocatore, voglio vedere il dialogo nel libro: speaker, testo, le scelte valide, e sceglierne una.",
+      "acceptanceCriteria": [
+        "data/schema/page_types.json: +page_dialogo (nuovo page_type, discusso - i dialoghi sono contenuto diegetico del libro). data/ui/book.json: voce 'dialogo' (fase 6).",
+        "scenes/pages/page_dialogo.tscn + scripts/pages/page_dialogo.gd: legge DialogueEngine (nodo_corrente + scelte_valide), mostra speaker + testo + un bottone per scelta valida; il bottone chiama DialogueEngine.scegli(i). Tutte le stringhe da tr_data.",
+        "book_overlay.gd: PAGINE += page_dialogo; su dialogo_avviato apre il libro sulla pagina dialogo, su dialogo_finito lo chiude.",
+        "L'interazione col mondo (avvicinarsi a un NPC e premere interagisci) chiama DialogueEngine.avvia(npc.dialogue_id, npc.id). L'handler vive in region_scene/player, nessun if per un NPC.",
+        "Verifica a schermo in progress.txt: parlo con Mirco, scelgo una risposta, il libro mostra il nodo successivo, il mondo era fermo.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
       "priority": 11,

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "dlg_sidon",
+  "_comment": "Stub US-613: un nodo. US-614 scrive il grafo vero (design-npc-quest cap. 2).",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "speaker": "npc_sidon",
+      "text": "Reagenti e voci, al giusto prezzo.",
+      "text_i18n": "dialogue.sidon.n1",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.sidon.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    }
+  }
+}

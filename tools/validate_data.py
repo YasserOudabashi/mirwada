@@ -1090,6 +1090,66 @@ def main():
         if n_generici < 10:
             err(f"{rel}: solo {n_generici} npc_generic_*, attesi >= 10 (fool_9_inganno ne inganna 10)")
 
+    # --- dialoghi (data/dialogues/, US-613) ---
+    # Un grafo a nodi: start valido, ogni goto verso un nodo esistente o null,
+    # nessun nodo orfano (irraggiungibile dallo start), speaker nel roster,
+    # effetti dal vocabolario chiuso di 5, emit_event solo sui 12 eventi.
+    DLG_COND = {"acting_progress_min", "madness_max", "madness_min", "e_notte",
+                "fase_lunare", "foundation_min", "tier_min", "in_zona_tag",
+                "follia_min", "reputazione_min", "flag"}
+    DLG_EFFETTI = {"emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest"}
+    tracked_ev = load_json(os.path.join(DATA, "schema", "tracked_events.json")) or {}
+    ev_names = set(tracked_ev.get("events", {}).keys())
+    modi_influenced = set(tracked_ev.get("events", {}).get("npc_influenced", {}).get("valori_modo", []))
+    if os.path.isdir(dlg_dir):
+        for fn in sorted(os.listdir(dlg_dir)):
+            if not fn.endswith(".json"):
+                continue
+            rel = f"data/dialogues/{fn}"
+            doc = load_json(os.path.join(dlg_dir, fn)) or {}
+            nodes = doc.get("nodes", {})
+            start = doc.get("start")
+            if start not in nodes:
+                err(f"{rel}: start '{start}' non e' un nodo del grafo")
+            # raggiungibilita' dallo start
+            visti = set()
+            frontiera = [start] if start in nodes else []
+            while frontiera:
+                nid = frontiera.pop()
+                if nid in visti:
+                    continue
+                visti.add(nid)
+                for ch in nodes.get(nid, {}).get("choices", []):
+                    g = ch.get("goto")
+                    if g is not None and g not in nodes:
+                        err(f"{rel} [{nid}]: goto '{g}' verso un nodo inesistente")
+                    elif isinstance(g, str):
+                        frontiera.append(g)
+            orfani = sorted(set(nodes) - visti)
+            if orfani:
+                err(f"{rel}: nodi irraggiungibili dallo start: {orfani}")
+            for nid, nd in nodes.items():
+                sp = nd.get("speaker")
+                if roster_doc is not None and sp not in npc_ids:
+                    err(f"{rel} [{nid}]: speaker '{sp}' non e' nel roster")
+                for ch in nd.get("choices", []):
+                    for cnd in ch.get("condizioni", []):
+                        if cnd.get("tipo") not in DLG_COND:
+                            err(f"{rel} [{nid}]: condizione '{cnd.get('tipo')}' fuori dal vocabolario "
+                                f"({sorted(DLG_COND)})")
+                    for eff in ch.get("effetti", []):
+                        et = eff.get("tipo")
+                        if et not in DLG_EFFETTI:
+                            err(f"{rel} [{nid}]: effetto '{et}' fuori dal vocabolario chiuso "
+                                f"({sorted(DLG_EFFETTI)})")
+                        if et == "emit_event":
+                            if eff.get("evento") not in ev_names:
+                                err(f"{rel} [{nid}]: emit_event.evento '{eff.get('evento')}' non e' "
+                                    f"uno dei 12 eventi tracciati")
+                            if eff.get("evento") == "npc_influenced" and eff.get("modo") not in modi_influenced:
+                                err(f"{rel} [{nid}]: emit_event npc_influenced.modo '{eff.get('modo')}' "
+                                    f"non e' uno dei 5 ({sorted(modi_influenced)})")
+
     # --- strutture costruibili (data/structures/, US-319) ---
     struct_dir = os.path.join(DATA, "structures")
     structure_ids = set()

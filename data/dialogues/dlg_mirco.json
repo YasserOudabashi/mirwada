@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "id": "dlg_mirco",
+  "_comment": "Tutorial diegetico. Grafo di riferimento per l'engine (US-613); US-614 lo estende.",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "speaker": "npc_mirco",
+      "text": "Sei nuovo da queste parti. Sta' attento a chi ascolti.",
+      "text_i18n": "dialogue.mirco.n1",
+      "choices": [
+        {
+          "text": "Grazie del consiglio.",
+          "text_i18n": "dialogue.mirco.n1.a",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "persuaso"
+            }
+          ],
+          "goto": "n2"
+        },
+        {
+          "text": "So gia' badare a me stesso.",
+          "text_i18n": "dialogue.mirco.n1.b",
+          "condizioni": [
+            {
+              "tipo": "tier_min",
+              "valore": "mid"
+            }
+          ],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "mirco_sa_del_potere",
+              "valore": true
+            }
+          ],
+          "goto": "n3"
+        },
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.mirco.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n2": {
+      "speaker": "npc_mirco",
+      "text": "Bravo. Torna quando vuoi imparare qualcosa.",
+      "text_i18n": "dialogue.mirco.n2",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.mirco.n2.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n3": {
+      "speaker": "npc_mirco",
+      "text": "...lo vedo. Speriamo tu sappia dove ti porta.",
+      "text_i18n": "dialogue.mirco.n3",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.mirco.n3.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    }
+  }
+}
