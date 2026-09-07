@@ -5752,3 +5752,19 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   (contenuto). Si parla con gli 8 NPC di Mirwada, le scelte hanno condizioni
   e conseguenze, il mondo si ferma.
 - Prossima storia: US-615 (fazioni + reputazione). BLOCCO G.
+
+[2026-09-07] tests/run_tests.gd — un file di test con errore di parse non appende piu' il runner.
+
+- Problema: load() di un file di test con errore di sintassi non restituisce
+  null ma uno script NON istanziabile; script.new() poi sollevava un errore
+  che usciva da _init() e la SceneTree headless non chiamava mai quit() ->
+  il runner restava appeso (visto in US-614: minuti di processo Godot vivo,
+  0 output utile). Costava un kill manuale + rerun.
+- Fix (tests/run_tests.gd): dopo load(), se script == null o non
+  script.can_instantiate() -> lo si segna in all_failures ("script non
+  caricabile (errore di parse?)"), failed += 1, continue. Guard anche su
+  script.new() == null. Il ramo finale "0 test" ora scatta solo se
+  total == 0 AND failed == 0 (un file rotto e nessun test valido = comunque
+  exit 1, non "falso verde").
+- Verificato con un file di test volutamente rotto: exit 1, il file compare
+  come FALLITO, gli altri 633 test girano lo stesso, il processo TERMINA.

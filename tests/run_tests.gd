@@ -33,13 +33,22 @@ func _init() -> void:
 	var all_failures: PackedStringArray = []
 
 	for path in files:
+		# Un errore di PARSE in un file di test: load() non restituisce null ma
+		# uno script non istanziabile; senza questo controllo, script.new() piu'
+		# sotto solleva un errore che esce da _init() e la SceneTree headless
+		# non chiama mai quit() -> il runner resta appeso per sempre. Qui invece
+		# lo si segna come fallimento e si prosegue.
 		var script: GDScript = load(path)
-		if script == null:
-			all_failures.append("%s: impossibile caricare lo script" % path)
+		if script == null or not script.can_instantiate():
+			all_failures.append("%s — script non caricabile (errore di parse?)" % path)
 			failed += 1
 			continue
 
 		var suite: RefCounted = script.new()
+		if suite == null:
+			all_failures.append("%s — script.new() ha restituito null" % path)
+			failed += 1
+			continue
 		var suite_name: String = path.get_file().get_basename()
 
 		for m in suite.get_method_list():
@@ -67,7 +76,7 @@ func _init() -> void:
 					print("       %s" % f)
 
 	print("")
-	if total == 0:
+	if total == 0 and failed == 0:
 		print("0 test eseguiti: i file ci sono ma nessun metodo test_. Falso verde.")
 		quit(1)
 		return
@@ -75,7 +84,7 @@ func _init() -> void:
 		print("%d test, tutti passati." % total)
 		quit(0)
 	else:
-		print("%d test, %d FALLITI:" % [total, failed])
+		print("%d test eseguiti, %d FALLITI:" % [total, failed])
 		for f in all_failures:
 			print("  - %s" % f)
 		quit(1)
