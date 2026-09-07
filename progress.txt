@@ -5912,6 +5912,12 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   non visitata); senza mezzo nessun bottone attivo; con death_5 (primitiva
   teleport) si viaggia; un varco permanente del TG basta; viaggia_a rispetta
   il gating d'ingresso della Frontiera.
+- Verifica a schermo (rendering reale, _shot_h.gd): visito Mirwada+Marche, apro
+  la mappa -> vedo solo quelle due (fog of war), "▸ Mirwada (sei qui)", i
+  varchi della Marche elencati; col Twilight Giant a Seq 9 "Servono le strade"
+  e il bottone Viaggia e' disabilitato; passato al Death Seq 5 (primitiva
+  teleport) "Hai un mezzo per viaggiare" e il bottone si abilita. Screenshot
+  h_mappa_senza_mezzo.png / h_mappa_con_mezzo.png.
 
 [2026-09-07] US-618 — Densita' mistica: percezione, recupero, forzatura, spawn. FASE 6, BLOCCO H.
 
@@ -5963,5 +5969,7 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - tests/test_audio_mondo.gd (NUOVO, 3 test): l'ambiente segue regione e
   momento (Marche giorno -> notte -> Valle notte); la struttura a layer;
   ogni music_zone delle regioni ha palette + ambiente.
-- BLOCCO H CHIUSO: US-617/618/619.
+- Verifica a schermo (_shot_h.gd): l'ambiente audio passa da amb_citta_giorno a
+  amb_citta_notte quando TimeSystem entra nella notte.
+- BLOCCO H CHIUSO: US-617/618/619. 661 test verdi.
 - Prossima storia: US-620 (indizi dell'antagonista + scene degli atti). BLOCCO I.
