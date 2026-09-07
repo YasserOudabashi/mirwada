@@ -1139,6 +1139,7 @@ def main():
                 "fase_lunare", "foundation_min", "tier_min", "in_zona_tag",
                 "follia_min", "reputazione_min", "flag"}
     DLG_EFFETTI = {"emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest"}
+    _dlg_quest_ids = set()   # quest_id nominati da un effetto avvia_quest
     tracked_ev = load_json(os.path.join(DATA, "schema", "tracked_events.json")) or {}
     ev_names = set(tracked_ev.get("events", {}).keys())
     modi_influenced = set(tracked_ev.get("events", {}).get("npc_influenced", {}).get("valori_modo", []))
@@ -1190,6 +1191,70 @@ def main():
                             if eff.get("evento") == "npc_influenced" and eff.get("modo") not in modi_influenced:
                                 err(f"{rel} [{nid}]: emit_event npc_influenced.modo '{eff.get('modo')}' "
                                     f"non e' uno dei 5 ({sorted(modi_influenced)})")
+                        if et == "avvia_quest":
+                            _dlg_quest_ids.add(eff.get("quest_id"))
+
+    # --- quest (data/quests/, US-616) ---
+    # Un lettore di eventi + flag: ogni step e' uno dei 12 eventi (coi filtri
+    # validi come le acting_actions) o un flag. giver nel roster; il flag di
+    # completamento e' scritto da almeno un dialogo o una quest; ricompense reali.
+    quests_dir = os.path.join(DATA, "quests")
+    quest_docs = {}
+    flag_scritti = set()          # flag scritti da un effetto (dialogo o quest on_complete/ricompensa)
+    if os.path.isdir(dlg_dir):
+        for fn in os.listdir(dlg_dir):
+            dd = load_json(os.path.join(dlg_dir, fn)) or {}
+            for nd in dd.get("nodes", {}).values():
+                for ch in nd.get("choices", []):
+                    for eff in ch.get("effetti", []):
+                        if eff.get("tipo") == "flag" and eff.get("valore", True):
+                            flag_scritti.add(eff.get("id"))
+    if os.path.isdir(quests_dir):
+        for fn in sorted(os.listdir(quests_dir)):
+            if fn.endswith(".json"):
+                q = load_json(os.path.join(quests_dir, fn)) or {}
+                quest_docs[q.get("id")] = q
+                for st in q.get("steps", []):
+                    for eff in st.get("on_complete", []) + q.get("ricompense", []):
+                        if eff.get("tipo") == "flag" and eff.get("valore", True):
+                            flag_scritti.add(eff.get("id"))
+    QUEST_EFF = {"flag", "item", "reputazione", "ancora", "apri_vendita"}
+    for qid, q in quest_docs.items():
+        rel = f"data/quests/{qid}.json"
+        if roster_doc is not None and q.get("giver") not in npc_ids:
+            err(f"{rel}: giver '{q.get('giver')}' non e' nel roster")
+        for altra in q.get("exclusive_with", []):
+            if altra not in quest_docs:
+                err(f"{rel}: exclusive_with '{altra}' non e' una quest esistente")
+        for st in q.get("steps", []):
+            comp = st.get("completamento", {})
+            if comp.get("tipo") == "evento":
+                ev = comp.get("evento")
+                if ev not in events:
+                    err(f"{rel} [{st.get('id')}]: evento '{ev}' non e' nel vocabolario dei 12")
+                else:
+                    allowed = set(events[ev].get("filtri", []))
+                    for f in comp.get("filtri", {}):
+                        if f not in allowed:
+                            err(f"{rel} [{st.get('id')}]: filtro '{f}' non ammesso per '{ev}' "
+                                f"(ammessi: {sorted(allowed)})")
+            elif comp.get("tipo") == "flag":
+                if comp.get("id") not in flag_scritti:
+                    err(f"{rel} [{st.get('id')}]: completamento.flag '{comp.get('id')}' non e' "
+                        f"scritto da nessun dialogo o quest")
+            for eff in st.get("on_complete", []):
+                if eff.get("tipo") not in QUEST_EFF:
+                    err(f"{rel} [{st.get('id')}]: on_complete effetto '{eff.get('tipo')}' fuori vocabolario")
+        for eff in q.get("ricompense", []):
+            if eff.get("tipo") not in QUEST_EFF:
+                err(f"{rel}: ricompensa effetto '{eff.get('tipo')}' fuori vocabolario ({sorted(QUEST_EFF)})")
+            if eff.get("tipo") == "item" and eff.get("item_id") not in item_ids:
+                err(f"{rel}: ricompensa item '{eff.get('item_id')}' non e' un item esistente")
+            if eff.get("tipo") == "ancora" and roster_doc is not None and eff.get("npc_id") not in npc_ids:
+                err(f"{rel}: ricompensa ancora '{eff.get('npc_id')}' non e' nel roster")
+    for qid in _dlg_quest_ids:
+        if quest_docs and qid not in quest_docs:
+            err(f"data/dialogues/: un effetto avvia_quest punta a '{qid}', quest inesistente")
 
     # --- strutture costruibili (data/structures/, US-319) ---
     struct_dir = os.path.join(DATA, "structures")

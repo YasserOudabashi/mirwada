@@ -18,6 +18,10 @@
               "tipo": "emit_event",
               "evento": "npc_influenced",
               "modo": "persuaso"
+            },
+            {
+              "tipo": "avvia_quest",
+              "quest_id": "q_mirco_01"
             }
           ],
           "goto": "n2"

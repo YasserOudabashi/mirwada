@@ -25,7 +25,12 @@
           "text": "Che voci girano?",
           "text_i18n": "dialogue.sidon.n1.voci",
           "condizioni": [],
-          "effetti": [],
+          "effetti": [
+            {
+              "tipo": "avvia_quest",
+              "quest_id": "q_sidon_01"
+            }
+          ],
           "goto": "n2"
         },
         {

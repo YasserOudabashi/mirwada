@@ -42,8 +42,12 @@
             },
             {
               "tipo": "flag",
-              "id": "vesna_diffida",
-              "valore": false
+              "id": "vesna_rassicurata",
+              "valore": true
+            },
+            {
+              "tipo": "avvia_quest",
+              "quest_id": "q_vesna_01"
             }
           ],
           "goto": "n3"

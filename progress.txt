@@ -5813,3 +5813,51 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
   639 test headless (633 + 6), tutti verdi.
 - Prossima storia: US-616 (motore quest + journal + quest di Atto I). BLOCCO G.
+
+[2026-09-07] US-616 — Motore quest + quest.schema.json + le quest di Atto I. FASE 6, BLOCCO G.
+
+- SPEZZATA (regola 3): questa e' il MOTORE + le quest. La sezione Journal nella
+  pagina inventario del libro + la verifica a schermo sono US-616b.
+- data/schema/quest.schema.json (NUOVO): id, name_i18n, giver, atto (1-3),
+  fallibile, exclusive_with[], steps[{id, desc_i18n, completamento:
+  {tipo:evento, evento, filtri, target} | {tipo:flag, id}, on_complete[]}],
+  ricompense[]. on_complete/ricompense = vocabolario chiuso di 5:
+  flag/item/reputazione/ancora/apri_vendita.
+- scripts/quest_system.gd (NUOVO autoload dopo FactionSystem): un LETTORE.
+  _ready connette EventTracker.evento_emesso e KnowledgeStore.appreso ->
+  _rivaluta. avvia(quest_id) (dall'effetto dialogo avvia_quest); registra la
+  baseline del conteggio dell'evento dello step; le quest di exclusive_with
+  ancora attive e fallibili -> fallite. Uno step 'evento' e' completo quando
+  count(evento, filtri) - baseline >= target (come l'Acting Method); uno step
+  'flag' quando KnowledgeStore.conosce(id). on_complete applicati per step,
+  ricompense alla fine. stato() in non_iniziata/attiva/completata/fallita.
+  fallisci(quest_id) per il fallimento esplicito (NPC morto, tempo scaduto:
+  decide il chiamante). Zero verbi di quest nuovi.
+- data/quests/ (4, atto 1): q_mirco_01 (enemy_defeated senza_abilita x3 ->
+  2 lingotti_ferro), q_sidon_01 (item_crafted x2 -> apri_vendita), q_vesna_01
+  (flag vesna_rassicurata -> Ancora Vesna, fallibile), q_lena_01 (flag
+  lena_ricorda_il_gioco -> Ancora Lena, fallibile).
+- Gancio avvia_quest nei 4 dialoghi dei giver (dlg_mirco/sidon/vesna/lena):
+  una scelta appende {tipo: avvia_quest, quest_id}. dlg_vesna "rassicura" ora
+  scrive il flag POSITIVO vesna_rassicurata (prima azzerava vesna_diffida,
+  che un lettore di flag non puo' osservare).
+- scripts/game_data.gd: DIR_QUESTS + _load_quests() + get_quest(id)/get_quests().
+- scripts/game_state.gd: mondo.quest {attive, completate, fallite} via
+  _mondo_snapshot/applica (come reputazione/npc/tempo, NESSUN bump).
+- tools/validate_data.py: sezione quest. giver nel roster; exclusive_with
+  verso quest esistenti; step 'evento' coi filtri validi come le
+  acting_actions; step 'flag' con id scritto da almeno un effetto flag di un
+  dialogo o di una quest; ricompense item/ancora reali; on_complete/ricompense
+  nel vocabolario di 5. Nel check dialoghi: un effetto avvia_quest deve
+  puntare a una quest esistente.
+- generate_i18n_stubs: +8 chiavi quest.* seminate da name/desc (it.json
+  828 -> 836, 48 TODO invariati).
+- tests/test_quest_system.gd (NUOVO, 7 test): avvia/stato; step evento
+  completa + ricompensa nello zaino + flag; i filtri che non combaciano non
+  contano; step flag completa e rende l'NPC un'Ancora; fallibile (e una quest
+  non fallibile non fallisce); un dialogo avvia la quest (e se il flag e' gia'
+  scritto la chiude subito); round-trip del save.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  646 test headless (639 + 7), tutti verdi (re-entrancy di _rivaluta risolta: applicare un effetto flag emette KnowledgeStore.appreso che rientrava mentre si avanzava).
+- Prossima storia: US-616b (sezione Journal nella pagina inventario), poi
+  US-617 (mappa + fast travel). BLOCCO G/H.

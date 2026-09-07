@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "q_vesna_01",
+  "name": "Il beneficio del dubbio",
+  "name_i18n": "quest.q_vesna_01.name",
+  "_comment": "Ancora: convincere Vesna che non sei una minaccia la rende un'Ancora.",
+  "giver": "npc_vesna",
+  "atto": 1,
+  "fallibile": true,
+  "exclusive_with": [],
+  "steps": [
+    {
+      "id": "s1",
+      "desc": "Rassicura Vesna sul tuo conto.",
+      "desc_i18n": "quest.q_vesna_01.s1",
+      "completamento": {
+        "tipo": "flag",
+        "id": "vesna_rassicurata"
+      },
+      "on_complete": [
+        {
+          "tipo": "ancora",
+          "npc_id": "npc_vesna"
+        }
+      ]
+    }
+  ],
+  "ricompense": [
+    {
+      "tipo": "flag",
+      "id": "q_vesna_01_done",
+      "valore": true
+    },
+    {
+      "tipo": "reputazione",
+      "faction_id": "quartiere",
+      "delta": 10
+    }
+  ]
+}

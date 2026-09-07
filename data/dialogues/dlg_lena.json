@@ -23,6 +23,10 @@
               "tipo": "flag",
               "id": "lena_ricorda_il_gioco",
               "valore": true
+            },
+            {
+              "tipo": "avvia_quest",
+              "quest_id": "q_lena_01"
             }
           ],
           "goto": "n2"

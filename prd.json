@@ -247,16 +247,30 @@
     },
     {
       "id": "US-616",
-      "title": "Motore quest + quest.schema.json + journal + quest di Atto I (Blocco G)",
+      "title": "Motore quest + quest.schema.json + quest di Atto I (Blocco G)",
       "description": "Come giocatore, voglio quest che nascono dagli NPC e si completano facendo cose.",
       "acceptanceCriteria": [
         "data/schema/quest.schema.json: id, name_i18n, giver, atto (1-3), fallibile, exclusive_with[], steps[] ({id, desc_i18n, completamento: {tipo:'evento', evento, filtri, target} | {tipo:'flag', id}, on_complete[]}), ricompense[].",
         "QuestSystem (autoload): osserva EventTracker e FlagStore e avanza. avvia(quest_id), stato(quest_id). fallibile:true supportato. Zero verbi di quest nuovi.",
         "Le quest di Atto I in data/quests/: q_mirco_01, q_sidon_01, q_vesna_01, q_lena_01 (3-5, atto:1).",
-        "Journal come sezione della pagina inventario del libro (SEZIONI 6 -> 7, nessun nuovo page_type).",
         "Validator: giver nel roster, evento/filtri validi, completamento.flag scritto da almeno un dialogo/quest, ricompense.item_id reali, exclusive_with verso quest esistenti, chiavi i18n.",
         "SAVE: campo mondo.quest { attive:{}, completate:[], fallite:[] }.",
-        "Test headless + verifica a schermo.",
+        "Test headless. La sezione Journal del libro + la verifica a schermo sono US-616b.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 14,
+      "fase": 6,
+      "passes": true,
+      "notes": "BLOCCO G. SPEZZATA (regola 3): motore + quest qui, sezione Journal del libro = US-616b. quest.schema.json (NUOVO). scripts/quest_system.gd (NUOVO autoload dopo FactionSystem): un LETTORE - _ready connette EventTracker.evento_emesso + KnowledgeStore.appreso -> _rivaluta (con guardia anti-re-entranza: applicare un effetto flag emette appreso). avvia(quest_id) registra la baseline del count dell'evento; step 'evento' completo se count(evento,filtri)-baseline >= target (come Acting Method), step 'flag' se KnowledgeStore.conosce(id). on_complete per step, ricompense alla fine. exclusive_with -> le altre attive+fallibili diventano fallite. fallisci(quest_id) per il fallimento esplicito. stato() in non_iniziata/attiva/completata/fallita. Effetti (on_complete+ricompense) = 5: flag/item/reputazione/ancora/apri_vendita. data/quests/ (4, atto 1): q_mirco_01 (enemy_defeated senza_abilita x3 -> 2 lingotto_ferro), q_sidon_01 (item_crafted x2 -> apri_vendita), q_vesna_01 (flag vesna_rassicurata -> Ancora Vesna), q_lena_01 (flag lena_ricorda_il_gioco -> Ancora Lena). Gancio avvia_quest in 4 dialoghi dei giver; dlg_vesna 'rassicura' ora scrive il flag positivo vesna_rassicurata. game_data.gd: DIR_QUESTS + get_quest(id). game_state.gd: mondo.quest (nessun bump). validate_data.py: sezione quest (giver, exclusive_with, step evento coi filtri come le acting_actions, step flag scritto da un dialogo/quest, ricompense item/ancora reali) + avvia_quest dei dialoghi verso quest esistenti. generate_i18n_stubs: +8 chiavi quest.* (it.json 828->836, 48 TODO invariati). tests/test_quest_system.gd (7 test). validate exit 0 (3 warning invariati), 646 test verdi (639+7)."
+    },
+    {
+      "id": "US-616b",
+      "title": "Sezione Journal nella pagina inventario del libro (Blocco G)",
+      "description": "Come giocatore, voglio vedere nel libro le quest attive coi loro step, le completate e le fallite.",
+      "acceptanceCriteria": [
+        "page_inventario.gd: SEZIONI da 6 a 7 (+journal), nessun nuovo page_type. La sezione legge QuestSystem (attive coi passo/step, completate, fallite) + GameData.get_quest per i nomi/desc via tr_data.",
+        "La sezione si ricostruisce dal vivo sui segnali di QuestSystem (come la sezione Sinergie di US-410/411).",
+        "Verifica a schermo in progress.txt: prendo q_mirco_01 da Mirco, la completo combattendo, il journal la mostra completata e la ricompensa e' nello zaino.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
       "priority": 14,

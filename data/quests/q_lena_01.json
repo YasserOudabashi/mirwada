@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "q_lena_01",
+  "name": "Un momento per giocare",
+  "name_i18n": "quest.q_lena_01.name",
+  "_comment": "Ancora: giocare con Lena la rende un'Ancora - l'Ancora piu' fragile.",
+  "giver": "npc_lena",
+  "atto": 1,
+  "fallibile": true,
+  "exclusive_with": [],
+  "steps": [
+    {
+      "id": "s1",
+      "desc": "Gioca con Lena.",
+      "desc_i18n": "quest.q_lena_01.s1",
+      "completamento": {
+        "tipo": "flag",
+        "id": "lena_ricorda_il_gioco"
+      },
+      "on_complete": [
+        {
+          "tipo": "ancora",
+          "npc_id": "npc_lena"
+        }
+      ]
+    }
+  ],
+  "ricompense": [
+    {
+      "tipo": "flag",
+      "id": "q_lena_01_done",
+      "valore": true
+    },
+    {
+      "tipo": "reputazione",
+      "faction_id": "quartiere",
+      "delta": 5
+    }
+  ]
+}

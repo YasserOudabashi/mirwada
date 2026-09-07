@@ -23,6 +23,7 @@ const PATH_ROOMS := "res://data/base/rooms.json"
 const PATH_TRACKED_TALENTS := "res://data/schema/tracked_talents.json"
 const DIR_TALENTS := "res://data/talents"
 const DIR_DIALOGUES := "res://data/dialogues"
+const DIR_QUESTS := "res://data/quests"
 const PATH_TAGS := "res://data/tags.json"
 const PATH_BALANCE := "res://data/balance.json"
 const PATH_PRIMITIVES := "res://data/schema/primitives.json"
@@ -97,6 +98,7 @@ var _regions: Dictionary = {}
 var _roster: Dictionary = {}
 var _dialogues: Dictionary = {}
 var _factions: Dictionary = {}
+var _quests: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -143,6 +145,7 @@ func load_all() -> void:
 	_load_pets()
 	_load_talents()
 	_load_dialogues()
+	_load_quests()
 	# L'ultimo argomento e' il tipo atteso per la chiave: un file in cui quella
 	# chiave ha la forma sbagliata viene scartato con un errore, non caricato.
 	_load_single(PATH_TAGS, "tags", _tags, TYPE_ARRAY)
@@ -585,6 +588,15 @@ func get_faction(id: String) -> Dictionary:
 	return {}
 
 
+## --- Quest (data/quests/, US-616) ---
+func get_quests() -> Array:
+	return _quests.values()
+
+
+func get_quest(id: String) -> Dictionary:
+	return _quests.get(id, {})
+
+
 ## La Caratteristica di quel (Pathway, Sequenza). {} se non esiste.
 func characteristic_for(pathway_id: String, sequence: int) -> Dictionary:
 	for c in _array_or_empty(_characteristics.get("characteristics")):
@@ -676,6 +688,22 @@ func _load_dialogues() -> void:
 		_upsert(_dialogues, did, doc)
 		visti[did] = true
 	_prune(_dialogues, visti)
+
+
+## US-616: un file per quest (data/quests/q_*.json), l'oggetto e' la quest.
+func _load_quests() -> void:
+	var visti: Dictionary = {}
+	for path in _json_files_in(DIR_QUESTS):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		var qid: String = str(doc.get("id", ""))
+		if qid.is_empty():
+			_fail(path, "una quest non ha 'id'")
+			continue
+		_upsert(_quests, qid, doc)
+		visti[qid] = true
+	_prune(_quests, visti)
 
 
 func _load_items() -> void:

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "q_sidon_01",
+  "name": "Merce di scambio",
+  "name_i18n": "quest.q_sidon_01.name",
+  "_comment": "Economia: produci qualcosa da vendere, e il banco di Sidon si apre.",
+  "giver": "npc_sidon",
+  "atto": 1,
+  "fallibile": false,
+  "exclusive_with": [],
+  "steps": [
+    {
+      "id": "s1",
+      "desc": "Produci 2 oggetti.",
+      "desc_i18n": "quest.q_sidon_01.s1",
+      "completamento": {
+        "tipo": "evento",
+        "evento": "item_crafted",
+        "filtri": {},
+        "target": 2
+      },
+      "on_complete": [
+        {
+          "tipo": "flag",
+          "id": "q_sidon_01_s1",
+          "valore": true
+        }
+      ]
+    }
+  ],
+  "ricompense": [
+    {
+      "tipo": "apri_vendita",
+      "npc_id": "npc_sidon"
+    },
+    {
+      "tipo": "flag",
+      "id": "q_sidon_01_done",
+      "valore": true
+    }
+  ]
+}
