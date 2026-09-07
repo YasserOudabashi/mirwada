@@ -21,7 +21,7 @@ func prepara() -> void:
 func test_autoload_e_dati_caricati() -> void:
 	var b: Node = _book()
 	assert_true(b != null, "autoload Book registrato")
-	assert_eq(_data().call("page_types").size(), 8, "8 tipi di pagina nel vocabolario")
+	assert_eq(_data().call("page_types").size(), 9, "9 tipi di pagina nel vocabolario (+ page_dialogo, US-613b)")
 	assert_gt(float((b.call("pagine") as Array).size()), 0.0, "pagine caricate da book.json")
 
 

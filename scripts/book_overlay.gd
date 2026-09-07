@@ -39,6 +39,7 @@ const PAGINE := {
 	"diagramma_pathway": preload("res://scenes/pages/page_diagramma_pathway.tscn"),
 	"impostazioni": preload("res://scenes/pages/page_impostazioni.tscn"),
 	"inventario": preload("res://scenes/pages/page_inventario.tscn"),
+	"page_dialogo": preload("res://scenes/pages/page_dialogo.tscn"),
 }
 
 var _volta_durata: float = 0.35
@@ -74,6 +75,37 @@ func _ready() -> void:
 			_aggiorna_macchie())
 		_follia = float(mad.call("valore"))
 	_aggiorna_macchie()
+
+	# US-613b: un dialogo che parte apre il libro sulla pagina page_dialogo;
+	# quando finisce (o si chiude il libro a mano) il dialogo termina.
+	var de: Node = get_node_or_null("/root/DialogueEngine")
+	if de != null:
+		de.dialogo_avviato.connect(func(_id: String) -> void:
+			var pid: String = _pagina_di_tipo("page_dialogo")
+			if pid.is_empty():
+				return
+			if b != null and bool(b.call("e_aperto")):
+				b.call("vai_a", pid)
+			elif b != null:
+				b.call("apri_a", pid))
+		de.dialogo_finito.connect(func(_id: String) -> void:
+			if b != null and bool(b.call("e_aperto")) \
+					and bool(b.call("pagina", b.call("pagina_corrente")).get("transitoria", false)):
+				b.call("chiudi"))
+		if b != null:
+			b.libro_chiuso.connect(func() -> void:
+				if bool(de.call("in_corso")):
+					de.call("termina"))
+
+
+func _pagina_di_tipo(tipo: String) -> String:
+	var b: Node = _book()
+	if b == null:
+		return ""
+	for p in b.call("pagine"):
+		if str((p as Dictionary).get("tipo", "")) == tipo:
+			return str((p as Dictionary).get("id", ""))
+	return ""
 
 
 func _book() -> Node:

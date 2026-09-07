@@ -35,6 +35,9 @@ const HUB := "mirwada"
 
 var _tag_corrente: String = ""
 var _in_viaggio: bool = false
+## L'NPC nel cui raggio si trova il giocatore ("" = nessuno). Premere
+## "interagisci" qui sopra avvia il suo dialogo (US-613b).
+var _npc_vicino: String = ""
 
 
 func _ready() -> void:
@@ -208,8 +211,39 @@ func _crea_npc() -> void:
 		m.position = -0.5 * m.size
 		m.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		area.add_child(m)
-		area.body_entered.connect(func(b): if b.is_in_group("player"): ns.call("incontra", str(id)))
+		area.body_entered.connect(_npc_avvicinato.bind(str(id)))
+		area.body_exited.connect(_npc_allontanato.bind(str(id)))
 		add_child(area)
+
+
+func _npc_avvicinato(body: Node, id: String) -> void:
+	if not body.is_in_group("player"):
+		return
+	var ns: Node = get_node_or_null("/root/NpcSystem")
+	if ns != null:
+		ns.call("incontra", id)
+	_npc_vicino = id
+
+
+func _npc_allontanato(body: Node, id: String) -> void:
+	if body.is_in_group("player") and _npc_vicino == id:
+		_npc_vicino = ""
+
+
+## "interagisci" vicino a un NPC -> avvia il suo dialogo (nessun if per un NPC:
+## dialogue_id viene dal roster). No-op se il libro e' gia' aperto o un dialogo
+## e' in corso.
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("interagisci") or _npc_vicino.is_empty():
+		return
+	var de: Node = get_node_or_null("/root/DialogueEngine")
+	var book: Node = get_node_or_null("/root/Book")
+	if de == null or bool(de.call("in_corso")) or (book != null and bool(book.call("e_aperto"))):
+		return
+	var gd: Node = get_node_or_null("/root/GameData")
+	var did: String = str(gd.call("get_npc", _npc_vicino).get("dialogue_id", "")) if gd != null else ""
+	if not did.is_empty() and de.call("avvia", did, _npc_vicino):
+		get_viewport().set_input_as_handled()
 
 
 func _su_ingresso_zona(body: Node, location_tag: String) -> void:

@@ -5671,3 +5671,46 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   congedo il tick riparte.
 - Prossima storia: US-613b (page_dialogo + gancio di interazione), poi US-614
   (i grafi veri degli 8). BLOCCO F.
+
+[2026-09-07] US-613b — Pagina page_dialogo del libro + gancio di interazione. FASE 6, BLOCCO F.
+
+- data/schema/page_types.json: +page_dialogo (9 tipi ora). data/ui/book.json:
+  voce 'dialogo' (ordine 7, "transitoria": true - non diventa l'ultima pagina
+  consultata). validate_data.py: il conteggio dei page_types passa da 8 a 9.
+- scripts/pages/page_dialogo.gd + scenes/pages/page_dialogo.tscn (NUOVI):
+  legge DialogueEngine (nodo_corrente + interlocutore + scelte_valide),
+  mostra il nome di chi parla (tr_data, colore speaker), il testo del nodo e
+  un Button per ogni scelta VALIDA -> il bottone chiama DialogueEngine.scegli(i).
+  Si ridisegna a nodo_cambiato e dialogo_finito. remove_child immediato (non
+  solo queue_free) cosi' i test contano bene i bottoni.
+- scripts/book.gd: apri_a(page_id) apre il libro direttamente su una pagina
+  senza sporcare _ultima; chiudi() NON aggiorna _ultima se la pagina corrente
+  e' "transitoria" (dato in book.json, nessun id hardcoded) -> riaprire il
+  libro a mano torna dov'eri.
+- scripts/book_overlay.gd: PAGINE += page_dialogo. Su DialogueEngine.
+  dialogo_avviato apre/naviga alla pagina di tipo page_dialogo (_pagina_di_tipo,
+  nessun id hardcoded); su dialogo_finito chiude il libro se e' su una pagina
+  transitoria; su libro_chiuso (Tab a mano) termina il dialogo in corso.
+- scripts/region_scene.gd: _npc_vicino tracciato da body_entered/exited dei
+  marker NPC; _unhandled_input su "interagisci" -> DialogueEngine.avvia(
+  roster[_npc_vicino].dialogue_id, _npc_vicino). Nessun if per un NPC: il
+  dialogue_id viene dal roster. No-op se il libro e' aperto o un dialogo e' in
+  corso.
+- project.godot: nuova azione input "interagisci" (F o Invio).
+- data/i18n/it.json: +ui.page.dialogo = "Dialogo" (784 chiavi, 48 TODO
+  invariati).
+- tests/test_page_dialogo.gd (NUOVO, 5 test): book.json dichiara la pagina;
+  un dialogo apre il libro sulla pagina 'dialogo' e a fine dialogo lo chiude;
+  un bottone per scelta valida (2 a tier low, 3 a mid); premere il bottone
+  segue il goto -> n2; chiudere il libro a mano termina il dialogo.
+  test_book.gd: 8 -> 9 tipi di pagina.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  629 test headless (624 + 5), tutti verdi. Verifica a schermo (rendering
+  reale, _shot_us613b.gd): avvicino il giocatore al marker di Mirco, premo
+  "interagisci" -> il libro si apre sulla pagina "Dialogo" con "Mirco" in
+  azzurro, il testo e 2 bottoni (la scelta tier_min:mid nascosta a Seq 9); il
+  tick del tempo resta fermo; scelgo -> nodo n2; congedo -> dialogo finito +
+  libro chiuso. Screenshot us613b_dialogo_n1.png, us613b_dialogo_n2.png.
+- BLOCCO F quasi chiuso: manca US-614 (i grafi veri degli 8; ora sono stub a
+  1 nodo). Il motore + la pagina + il gancio ci sono.
+- Prossima storia: US-614 (gli 8 file dialogo + i popolani). BLOCCO F.

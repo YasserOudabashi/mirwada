@@ -1432,9 +1432,9 @@ def main():
     # --- libro / UI (data/ui/book.json, US-221) ---
     pt_doc = load_json(os.path.join(DATA, "schema", "page_types.json"))
     page_types = set((pt_doc or {}).get("page_types", []))
-    if len(page_types) != 8:
-        err(f"data/schema/page_types.json: vocabolario di {len(page_types)} tipi, attesi 8 "
-            f"(design-ui-libro.md). Un tipo nuovo e' codice: va discusso.")
+    if len(page_types) != 9:
+        err(f"data/schema/page_types.json: vocabolario di {len(page_types)} tipi, attesi 9 "
+            f"(design-ui-libro.md + page_dialogo US-613b). Un tipo nuovo e' codice: va discusso.")
     book = load_json(os.path.join(DATA, "ui", "book.json"))
     if book:
         pages = book.get("pages", [])

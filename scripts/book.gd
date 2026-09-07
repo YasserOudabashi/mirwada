@@ -73,11 +73,27 @@ func apri() -> void:
 	libro_aperto.emit(_corrente)
 
 
+## Apre il libro direttamente su una pagina (US-613b: un dialogo che parte
+## salta alla pagina dialogo). Pagina inesistente -> apre sull'ultima.
+func apri_a(page_id: String) -> void:
+	if _aperto or _pagine.is_empty():
+		return
+	_aperto = true
+	_corrente = page_id if not pagina(page_id).is_empty() else _ultima
+	if _corrente.is_empty():
+		_corrente = str(_pagine[0].get("id", ""))
+	get_tree().paused = true
+	libro_aperto.emit(_corrente)
+
+
 func chiudi() -> void:
 	if not _aperto:
 		return
 	_aperto = false
-	_ultima = _corrente
+	# Una pagina "transitoria" (il dialogo) non diventa l'ultima consultata:
+	# riaprire il libro a mano deve tornare dov'eri.
+	if not bool(pagina(_corrente).get("transitoria", false)):
+		_ultima = _corrente
 	get_tree().paused = false
 	libro_chiuso.emit()
 

@@ -56,6 +56,12 @@ func dialogue_id() -> String:
 	return _dialogue_id
 
 
+## L'NPC con cui si sta parlando (per la UI: i dlg_generic hanno uno speaker
+## fisso nei dati, ma a schermo va il nome dell'interlocutore vero).
+func interlocutore() -> String:
+	return _interlocutore
+
+
 ## Il nodo corrente grezzo ({} fuori da un dialogo).
 func nodo_corrente() -> Dictionary:
 	return (_dialogo.get("nodes", {}) as Dictionary).get(_nodo_id, {}) if in_corso() else {}

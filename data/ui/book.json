@@ -17,6 +17,7 @@
     { "id": "inventario",   "tipo": "inventario",            "name_i18n": "ui.page.inventario",   "ordine": 4, "sbloccata_da": { "fase": 3 } },
     { "id": "sinergie",     "tipo": "registro_sinergie",     "name_i18n": "ui.page.sinergie",     "ordine": 5, "sbloccata_da": { "fase": 4 } },
     { "id": "journal",      "tipo": "journal_quest",         "name_i18n": "ui.page.journal",      "ordine": 6, "sbloccata_da": { "fase": 6 } },
+    { "id": "dialogo",      "tipo": "page_dialogo",          "name_i18n": "ui.page.dialogo",      "ordine": 7, "transitoria": true },
     { "id": "colophon",     "tipo": "impostazioni",          "name_i18n": "ui.page.colophon",     "ordine": 99 }
   ],
   "segnalibri": ["mappa", "diagramma", "journal"]

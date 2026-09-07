@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "_comment": "Vocabolario CHIUSO degli 8 tipi di pagina del libro (design-ui-libro.md cap. 2 e 4). Il codice implementa un tipo di pagina per ognuno di questi. Un tipo nuovo e' CODICE: va discusso, come le primitive e gli eventi tracciati. Aggiungere una SCHERMATA che riusa un tipo esistente e' invece solo una voce in data/ui/book.json.",
+  "_comment": "Vocabolario CHIUSO dei 9 tipi di pagina del libro (design-ui-libro.md cap. 2 e 4). Il codice implementa un tipo di pagina per ognuno di questi. Un tipo nuovo e' CODICE: va discusso, come le primitive e gli eventi tracciati. Aggiungere una SCHERMATA che riusa un tipo esistente e' invece solo una voce in data/ui/book.json. page_dialogo (US-613b): i dialoghi sono contenuto diegetico del libro come tutto il resto.",
   "page_types": [
     "menu_principale",
     "creazione_personaggio",
@@ -9,6 +9,7 @@
     "inventario",
     "registro_sinergie",
     "journal_quest",
-    "impostazioni"
+    "impostazioni",
+    "page_dialogo"
   ]
 }
