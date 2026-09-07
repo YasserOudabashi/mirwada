@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "_comment": "Le 4 fazioni di Mirwada (design-npc-quest cap. 3). Poche e concrete. La reputazione e' un numero; livello() la mappa sulle soglie. 'reazione_al_potere' = usare un potere davanti a un membro presente costa reputazione (Vesna). 'giustizia' e' una fazione da un uomo solo (Doran): il suo blocco 'sospetto' la fa salire a ogni evento in una regione, e a soglia scrive un flag - nessun if per una fazione nel codice, e' il dato a dichiararlo.",
+  "factions": [
+    {
+      "id": "ordine_minore",
+      "name": "L'Ordine Minore",
+      "name_i18n": "faction.ordine_minore",
+      "soglie": { "ostile": -30, "neutrale": 0, "amichevole": 20, "alleato": 50 },
+      "membri": ["npc_ottavia"],
+      "reazione_al_potere": null,
+      "sospetto": null
+    },
+    {
+      "id": "porto",
+      "name": "Il Porto",
+      "name_i18n": "faction.porto",
+      "soglie": { "ostile": -30, "neutrale": 0, "amichevole": 20, "alleato": 50 },
+      "membri": ["npc_sidon", "npc_bruno"],
+      "reazione_al_potere": null,
+      "sospetto": null
+    },
+    {
+      "id": "quartiere",
+      "name": "Il Quartiere",
+      "name_i18n": "faction.quartiere",
+      "soglie": { "ostile": -30, "neutrale": 0, "amichevole": 20, "alleato": 50 },
+      "membri": ["npc_mirco", "npc_vesna", "npc_lena"],
+      "reazione_al_potere": { "delta": -5, "membro": "npc_vesna" },
+      "sospetto": null
+    },
+    {
+      "id": "giustizia",
+      "name": "La Giustizia",
+      "name_i18n": "faction.giustizia",
+      "soglie": { "alleato": 0, "amichevole": 10, "neutrale": 25, "ostile": 45 },
+      "membri": ["npc_doran"],
+      "reazione_al_potere": null,
+      "sospetto": { "evento": "ability_used", "regione": "mirwada", "delta": 3, "soglia": 30, "flag": "doran_sospetto_alto" }
+    }
+  ]
+}

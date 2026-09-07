@@ -242,8 +242,8 @@
       ],
       "priority": 13,
       "fase": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "BLOCCO G. data/schema/faction.schema.json + data/factions.json (NUOVI): 4 fazioni (ordine_minore/porto/quartiere/giustizia), soglie nome->valore, membri coerenti coi faction_id del roster. Due comportamenti automatici DICHIARATI NEI DATI (nessun if per una fazione): quartiere.reazione_al_potere {delta:-5, membro:npc_vesna} (potere davanti a Vesna presente nella tua location_tag -> -5); giustizia.sospetto {evento:ability_used, regione:mirwada, delta:3, soglia:30, flag:doran_sospetto_alto} (sale a ogni ability_used in citta', a soglia scrive il flag; soglie invertite: 0=alleato 45=ostile, la reputazione E' il sospetto). scripts/faction_system.gd (NUOVO autoload dopo DialogueEngine): reputazione/modifica/livello (livello = soglia col valore piu' alto <= rep, direzione-agnostico); _ready connette EventTracker.evento_emesso e AbilityEngine.ability_executed (solo caster nel gruppo player). game_data.gd: get_factions/get_faction. game_state.gd: mondo.reputazione (nessun bump). Conditions.reputazione_min e DialogueEngine effetto 'reputazione' (gia' scritti) ora hanno un FactionSystem vero. validate_data.py: sezione fazioni (i18n prefisso, soglie, membri coerenti, sospetto.evento/regione, le 4 attese) + la sezione NPC ora valida i faction_id del roster. generate_i18n_stubs: +4 chiavi faction.* (it.json 824->828, 48 TODO invariati). tests/test_faction_system.gd (6 test). validate exit 0 (3 warning invariati), 639 test verdi (633+6)."
     },
     {
       "id": "US-616",

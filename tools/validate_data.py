@@ -1090,6 +1090,47 @@ def main():
         if n_generici < 10:
             err(f"{rel}: solo {n_generici} npc_generic_*, attesi >= 10 (fool_9_inganno ne inganna 10)")
 
+    # --- fazioni (data/factions.json, US-615) ---
+    tracked_ev0 = load_json(os.path.join(DATA, "schema", "tracked_events.json")) or {}
+    ev_names0 = set(tracked_ev0.get("events", {}).keys())
+    fac_path = os.path.join(DATA, "factions.json")
+    if not os.path.exists(fac_path):
+        err("data/factions.json: mancante o illeggibile (US-615).")
+    else:
+        fdoc = load_json(fac_path) or {}
+        rel = "data/factions.json"
+        ids_visti = set()
+        for f in fdoc.get("factions", []):
+            fid = f.get("id", "")
+            if fid in ids_visti:
+                err(f"{rel}: id fazione duplicato '{fid}'")
+            ids_visti.add(fid)
+            ni = f.get("name_i18n")
+            if not isinstance(ni, str) or not ni.startswith("faction."):
+                err(f"{rel} [{fid}]: name_i18n '{ni}' deve avere il prefisso 'faction.'")
+            soglie = f.get("soglie", {})
+            if not isinstance(soglie, dict) or len(soglie) < 2 or not all(isinstance(v, (int, float)) for v in soglie.values()):
+                err(f"{rel} [{fid}]: 'soglie' deve avere >= 2 nomi di livello con valore numerico")
+            for m in f.get("membri", []):
+                if roster_doc is not None and m not in npc_ids:
+                    err(f"{rel} [{fid}]: membro '{m}' non e' nel roster")
+                elif roster_doc is not None:
+                    m_fid = next((n.get("faction_id") for n in roster_doc.get("npcs", []) if n.get("id") == m), None)
+                    if m_fid != fid:
+                        err(f"{rel} [{fid}]: il membro '{m}' ha faction_id '{m_fid}' nel roster (incoerente)")
+            rp = f.get("reazione_al_potere")
+            if isinstance(rp, dict) and roster_doc is not None and rp.get("membro") not in npc_ids:
+                err(f"{rel} [{fid}]: reazione_al_potere.membro '{rp.get('membro')}' non e' nel roster")
+            sp = f.get("sospetto")
+            if isinstance(sp, dict):
+                if sp.get("evento") not in ev_names0:
+                    err(f"{rel} [{fid}]: sospetto.evento '{sp.get('evento')}' non e' uno dei 12 eventi tracciati")
+                if sp.get("regione") not in region_ids:
+                    err(f"{rel} [{fid}]: sospetto.regione '{sp.get('regione')}' non e' una regione")
+        for atteso in ("ordine_minore", "porto", "quartiere", "giustizia"):
+            if atteso not in ids_visti:
+                err(f"{rel}: manca la fazione '{atteso}' (design-npc-quest cap. 3)")
+
     # --- dialoghi (data/dialogues/, US-613) ---
     # Un grafo a nodi: start valido, ogni goto verso un nodo esistente o null,
     # nessun nodo orfano (irraggiungibile dallo start), speaker nel roster,

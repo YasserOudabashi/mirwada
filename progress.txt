@@ -5768,3 +5768,48 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   exit 1, non "falso verde").
 - Verificato con un file di test volutamente rotto: exit 1, il file compare
   come FALLITO, gli altri 633 test girano lo stesso, il processo TERMINA.
+
+[2026-09-07] US-615 — Fazioni + reputazione. FASE 6, BLOCCO G.
+
+- data/schema/faction.schema.json + data/factions.json (NUOVI): 4 fazioni
+  (ordine_minore/porto/quartiere/giustizia) con name_i18n, soglie (nomi di
+  livello -> valore) e membri (id NPC, coerenti col faction_id del roster).
+  Due comportamenti automatici DICHIARATI NEI DATI, nessun if per una fazione
+  nel codice:
+  * quartiere.reazione_al_potere { delta: -5, membro: npc_vesna }: usare un
+    potere mentre Vesna e' presente nella tua stessa location_tag costa -5.
+  * giustizia.sospetto { evento: ability_used, regione: mirwada, delta: 3,
+    soglia: 30, flag: doran_sospetto_alto }: quell'evento in quella regione
+    alza la reputazione; a soglia scrive il flag (che US-616 leggera' per la
+    caccia). Le soglie di giustizia sono INVERTITE (0 = alleato, 45 = ostile):
+    la sua "reputazione" e' il sospetto, sale col malus.
+- scripts/faction_system.gd (NUOVO autoload dopo DialogueEngine):
+  reputazione(id) -> float; modifica(id, delta, sorgente); livello(id) =
+  la soglia col valore piu' alto <= reputazione (ordina per valore, quindi
+  vale sia per le fazioni normali sia per giustizia). _ready connette
+  EventTracker.evento_emesso (-> _su_evento per i blocchi 'sospetto') e
+  AbilityEngine.ability_executed (-> _su_abilita per 'reazione_al_potere',
+  solo se il caster e' nel gruppo player). _applica_soglie scrive il flag.
+- scripts/game_data.gd: PATH_FACTIONS + get_factions()/get_faction(id).
+- scripts/game_state.gd: mondo.reputazione via _mondo_snapshot/applica
+  (come npc/tempo, NESSUN bump).
+- Conditions.reputazione_min (gia' nell'enum da US-605) ora ha un
+  FactionSystem vero da interrogare: valore = [faction_id, soglia].
+  DialogueEngine effetto 'reputazione' -> FactionSystem.modifica (gia'
+  scritto in US-613, ora fa qualcosa).
+- tools/validate_data.py: sezione fazioni. name_i18n prefisso faction.,
+  soglie >= 2 numeriche, membri nel roster + faction_id coerente,
+  reazione_al_potere.membro nel roster, sospetto.evento tra i 12 +
+  sospetto.regione tra le regioni; le 4 fazioni attese presenti. La sezione
+  NPC ora valida davvero i faction_id del roster contro factions.json.
+- generate_i18n_stubs: +4 chiavi faction.* seminate da 'name' (it.json
+  824 -> 828, 48 TODO invariati).
+- tests/test_faction_system.gd (NUOVO, 6 test): modifica cambia il livello;
+  giustizia ha le soglie invertite; il sospetto di Doran sale a ogni
+  ability_used in citta' (e scatta il flag a 30) e NON fuori citta'; un
+  potere davanti a Vesna nella sua zona costa -5 al quartiere, in un'altra
+  zona no; reputazione_min nasconde la scelta "cura" di dlg_vesna sotto
+  soglia; round-trip del save + valore non numerico scartato.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  639 test headless (633 + 6), tutti verdi.
+- Prossima storia: US-616 (motore quest + journal + quest di Atto I). BLOCCO G.

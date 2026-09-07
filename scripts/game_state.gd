@@ -56,6 +56,10 @@ func _npc() -> Node:
 	return get_node_or_null("/root/NpcSystem")
 
 
+func _fazioni() -> Node:
+	return get_node_or_null("/root/FactionSystem")
+
+
 func _summons() -> Node:
 	return get_node_or_null("/root/SummonRegistry")
 
@@ -256,6 +260,8 @@ func _mondo_snapshot() -> Dictionary:
 		m["tempo"] = _tempo().per_salvataggio()
 	if _npc() != null:
 		m["npc"] = _npc().per_salvataggio()
+	if _fazioni() != null:
+		m["reputazione"] = _fazioni().per_salvataggio()
 	return m
 
 
@@ -270,6 +276,8 @@ func applica(dati: Dictionary) -> void:
 		_tempo().da_salvataggio((dati.get("mondo", {}) as Dictionary).get("tempo", {}))
 	if _npc() != null:
 		_npc().da_salvataggio((dati.get("mondo", {}) as Dictionary).get("npc", {}))
+	if _fazioni() != null:
+		_fazioni().da_salvataggio((dati.get("mondo", {}) as Dictionary).get("reputazione", {}))
 	if _summons() != null:
 		_summons().da_salvataggio(dati.get("evocazioni", []))
 	if _eventi() != null:

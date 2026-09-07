@@ -51,6 +51,7 @@ const PATH_SIGIL_EFFECT_TYPES := "res://data/schema/sigil_effect_types.json"
 const PATH_BLUEPRINTS := "res://data/forge/blueprints.json"
 const PATH_REGIONS := "res://data/world/regions.json"
 const PATH_ROSTER := "res://data/npc/roster.json"
+const PATH_FACTIONS := "res://data/factions.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -95,6 +96,7 @@ var _blueprints: Dictionary = {}
 var _regions: Dictionary = {}
 var _roster: Dictionary = {}
 var _dialogues: Dictionary = {}
+var _factions: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -172,6 +174,7 @@ func load_all() -> void:
 	_load_single(PATH_BLUEPRINTS, "blueprints", _blueprints, TYPE_DICTIONARY)
 	_load_single(PATH_REGIONS, "regions", _regions, TYPE_ARRAY)
 	_load_single(PATH_ROSTER, "npcs", _roster, TYPE_ARRAY)
+	_load_single(PATH_FACTIONS, "factions", _factions, TYPE_ARRAY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -568,6 +571,18 @@ func get_npc(id: String) -> Dictionary:
 ## Il grafo di un dialogo (data/dialogues/, US-613). {} se non esiste.
 func get_dialogue(id: String) -> Dictionary:
 	return _dialogues.get(id, {})
+
+
+## --- Fazioni (data/factions.json, US-615) ---
+func get_factions() -> Array:
+	return _array_or_empty(_factions.get("factions"))
+
+
+func get_faction(id: String) -> Dictionary:
+	for f in get_factions():
+		if typeof(f) == TYPE_DICTIONARY and str((f as Dictionary).get("id", "")) == id:
+			return f
+	return {}
 
 
 ## La Caratteristica di quel (Pathway, Sequenza). {} se non esiste.
