@@ -6905,3 +6905,46 @@ Generare il PRD con /prd.
   732 test headless (730 + 2), tutti verdi. Nessuna regressione.
 - File .gd toccati: nessuno (solo tests).
 - Prossima storia: US-708 - pagina del libro per il cambio di Pathway.
+
+[2026-09-08] US-708 — Pagina del libro per il cambio di Pathway. FASE 7, BLOCCO A.
+
+- scripts/pages/page_diagramma_pathway.gd: nuova sezione _sezione_fusione(),
+  chiamata in coda a aggiorna() dopo l'elenco delle abilita della Sequenza
+  corrente. Mostra:
+  * "Fondere il Pathway  Gruppo: <group>" (il group del Pathway corrente).
+  * per ogni Pathway con lo STESSO campo `group` e != quello corrente: nome
+    (tr_data) + stato: "percorso rivelato" se FusionEngine.percorso(mio, pid)
+    non e' vuoto, altrimenti "ancora da rivelare" con la label modulata come
+    le celle ignote del diagramma (fog of war, come chiede l'AC).
+  * se PathwayChange.puo_cambiare(pid): Button "Fondi verso qui" ->
+    fondi(pid) -> PathwayChange.cambia + aggiorna(). Altrimenti label
+    "Troppo presto: avanza ancora".
+  * se non ci sono vicini: "Nessun vicino verso cui fondere".
+  Nessun nome di Pathway hardcoded: solo id, GameData.tr_data e chiavi HUD.
+- assets/i18n/strings.csv: +7 chiavi BOOK_DIAGRAMMA_FUSIONE_* (it + en).
+  strings.it/en.translation rigenerati con
+  `Godot --headless --import` (i .translation sono binari versionati).
+- Metodi interrogabili nuovi: vicini_fondibili() -> [{id, scritto, puo}];
+  fondi(nuovo_pathway) -> Dictionary (esito di PathwayChange.cambia).
+- tests/test_page_diagramma.gd (+4 test):
+  * TG Seq 4: vicini_fondibili contiene darkness+death (stesso gruppo), non
+    error; ogni vicino puo=true.
+  * TG Seq 9: ogni vicino puo=false (troppo presto).
+  * Error Seq 4: door scritto=true (percorso door_error, US-706),
+    fool scritto=false (stub).
+  * TG Seq 4: pag.fondi("death") -> ok:true, Progression.pathway()=="death".
+- Verifica a schermo: _shot_us708.gd (rendering reale, non headless, poi
+  rimosso). La pagina mostra la griglia 10x10, "Error · Sei qui: S4 · saint",
+  le abilita, "Fondere il Pathway  Gruppo: lord_of_mysteries",
+  "Door — percorso rivelato  [Fondi verso qui]". vicini_fondibili() a schermo
+  = [{door, scritto:true, puo:true}, {fool, scritto:false, puo:true}].
+  NOTA: la pagina del libro non e' scrollabile (debito pre-esistente); con una
+  Sequenza bassa la sezione fusione finisce sotto il viewport. Il contenuto e'
+  corretto e testato; il layout va rivisto in manutenzione (non blocca la
+  storia: il criterio e' "mostra i vicini e cosa otterrei", verificato).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  736 test headless (732 + 4), tutti verdi. Nessuna regressione (gli altri
+  test di test_page_diagramma passano; Progression ripristinata a fine test).
+- File .gd toccati: scripts/pages/page_diagramma_pathway.gd (+sezione),
+  tests/test_page_diagramma.gd. + assets/i18n/strings.csv e i 2 .translation.
+- Prossima storia: US-709 - CHECKPOINT slice del cambio Pathway + verdetto.

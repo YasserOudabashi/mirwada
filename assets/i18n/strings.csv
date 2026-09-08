@@ -96,3 +96,10 @@ BOOK_MAPPA_VIAGGIA,Viaggia,Travel
 BOOK_MAPPA_GATE,varchi:,gates:
 BOOK_MAPPA_MEZZO_SI,Hai un mezzo per viaggiare.,You have a means to travel.
 BOOK_MAPPA_MEZZO_NO,Servono le strade: nessuna scorciatoia.,You need the roads: no shortcuts.
+BOOK_DIAGRAMMA_FUSIONE_TITOLO,Fondere il Pathway,Fuse the Pathway
+BOOK_DIAGRAMMA_FUSIONE_GRUPPO,Gruppo:,Group:
+BOOK_DIAGRAMMA_FUSIONE_SCRITTO,percorso rivelato,path revealed
+BOOK_DIAGRAMMA_FUSIONE_STUB,ancora da rivelare,yet to be revealed
+BOOK_DIAGRAMMA_FUSIONE_CONFERMA,Fondi verso qui,Fuse toward here
+BOOK_DIAGRAMMA_FUSIONE_TROPPO_PRESTO,Troppo presto: avanza ancora,Too soon: advance further
+BOOK_DIAGRAMMA_FUSIONE_NIENTE,Nessun vicino verso cui fondere,No neighbor to fuse toward

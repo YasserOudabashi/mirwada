@@ -126,8 +126,8 @@
       ],
       "priority": 8,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. scripts/pages/page_diagramma_pathway.gd: nuova sezione _sezione_fusione() in coda a aggiorna() (dopo l'elenco abilita). Mostra 'Fondere il Pathway  Gruppo: <group>' e, per ogni Pathway con lo STESSO campo group != quello corrente: nome + 'percorso rivelato' (FusionEngine.percorso non vuoto) o 'ancora da rivelare' (stub -> testo modulato come le celle ignote, fog of war). Se PathwayChange.puo_cambiare -> Button 'Fondi verso qui' (pressed -> fondi(pid) -> PathwayChange.cambia + aggiorna()); altrimenti label 'Troppo presto: avanza ancora'. Nessun nome hardcoded: solo id + tr_data + chiavi HUD. assets/i18n/strings.csv +7 chiavi BOOK_DIAGRAMMA_FUSIONE_* (it+en), .translation rigenerati (godot --headless --import). Metodi interrogabili: vicini_fondibili() -> [{id,scritto,puo}], fondi(pid). tests/test_page_diagramma.gd +4 test (vicini solo dello stesso gruppo; Seq 9 tutti puo=false; error->door scritto=true, error->fool scritto=false; fondi('death') da TG Seq 4 -> ok, Progression su death). Verifica a schermo (_shot_us708.gd, rendering reale, non headless, poi rimosso): la pagina mostra grid + 'Error Sei qui: S4' + abilita + 'Fondere il Pathway Gruppo: lord_of_mysteries' + 'Door - percorso rivelato [Fondi verso qui]'; vicini_fondibili() = [{door,scritto:true,puo:true},{fool,scritto:false,puo:true}]. Nota: la pagina non e' scrollabile (debito pre-esistente del libro), con Seq bassa la sezione fusione esce sotto il viewport - contenuto corretto, layout da rivedere in manutenzione. validate exit 0. 736 test verdi."
     },
     {
       "id": "US-709",

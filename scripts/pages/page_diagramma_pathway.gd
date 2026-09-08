@@ -18,6 +18,9 @@ const C_CORRENTE := Color(0.4, 0.76, 0.82)
 
 var _stati: Dictionary = {}   # "pid:n" -> "noto" | "ignoto" | "corrente"
 var _abilita: Array = []
+## US-708: i Pathway vicini verso cui si puo' fondere. Ogni voce:
+## { id, scritto (percorso di fusione non-stub), puo (PathwayChange.puo_cambiare) }.
+var _vicini: Array = []
 
 
 func aggiorna() -> void:
@@ -25,6 +28,7 @@ func aggiorna() -> void:
 		c.queue_free()
 	_stati.clear()
 	_abilita.clear()
+	_vicini.clear()
 
 	var gd: Node = _n("/root/GameData")
 	var prog: Node = _n("/root/Progression")
@@ -67,6 +71,74 @@ func aggiorna() -> void:
 			var nome: String = str(gd.call("tr_data", ab.get("name_i18n", aid)))
 			_abilita.append(nome)
 			add_child(_riga("· " + nome))
+
+		_sezione_fusione(gd, prog, mio, pw)
+
+
+# --- sezione "fondere il Pathway" (US-708) ---------------------------
+## Mostra il gruppo del Pathway corrente, i vicini fondibili e, per ognuno, se
+## il percorso di fusione e' scritto o "ancora da rivelare" (stub -> fog of
+## war, come le celle ignote del diagramma). Se PathwayChange.puo_cambiare e'
+## true un'azione conferma il cambio; altrimenti si mostra il motivo.
+func _sezione_fusione(gd: Node, _prog: Node, mio: String, pw: Dictionary) -> void:
+	var pc: Node = _n("/root/PathwayChange")
+	var fe: Node = _n("/root/FusionEngine")
+	if pc == null:
+		return
+	var gruppo: String = str(pw.get("group", ""))
+	add_child(_riga("%s  %s %s" % [
+		tr("BOOK_DIAGRAMMA_FUSIONE_TITOLO"), tr("BOOK_DIAGRAMMA_FUSIONE_GRUPPO"), gruppo]))
+
+	var ids: Array = gd.call("pathway_ids")
+	ids.sort()
+	for pid in ids:
+		if pid == mio:
+			continue
+		var altro: Dictionary = gd.call("get_pathway", pid)
+		if str(altro.get("group", "")) != gruppo:
+			continue
+		var scritto: bool = fe != null and not (fe.call("percorso", mio, pid) as Dictionary).is_empty()
+		var puo: bool = bool(pc.call("puo_cambiare", pid))
+		_vicini.append({"id": pid, "scritto": scritto, "puo": puo})
+
+		var h := HBoxContainer.new()
+		var l := Label.new()
+		l.custom_minimum_size = Vector2(200, 0)
+		l.text = "%s — %s" % [
+			str(gd.call("tr_data", altro.get("name_i18n", pid))),
+			tr("BOOK_DIAGRAMMA_FUSIONE_SCRITTO") if scritto else tr("BOOK_DIAGRAMMA_FUSIONE_STUB")]
+		if not scritto:
+			l.modulate = C_IGNOTO.lightened(0.5)  # fog of war, come le celle ignote
+		h.add_child(l)
+		if puo:
+			var b := Button.new()
+			b.text = tr("BOOK_DIAGRAMMA_FUSIONE_CONFERMA")
+			b.pressed.connect(fondi.bind(pid))
+			h.add_child(b)
+		else:
+			var m := Label.new()
+			m.modulate = Color(1, 1, 1, 0.55)
+			m.text = tr("BOOK_DIAGRAMMA_FUSIONE_TROPPO_PRESTO")
+			h.add_child(m)
+		add_child(h)
+
+	if _vicini.is_empty():
+		add_child(_riga(tr("BOOK_DIAGRAMMA_FUSIONE_NIENTE")))
+
+
+## Conferma il cambio verso `nuovo_pathway`. Rigenera la pagina dopo.
+## Interrogabile dai test.
+func fondi(nuovo_pathway: String) -> Dictionary:
+	var pc: Node = _n("/root/PathwayChange")
+	if pc == null:
+		return {"ok": false, "reason": "no_pathway_change"}
+	var res: Dictionary = pc.call("cambia", nuovo_pathway)
+	aggiorna()
+	return res
+
+
+func vicini_fondibili() -> Array:
+	return _vicini.duplicate(true)
 
 
 # --- Interrogabile dai test / UI --------------------------------------

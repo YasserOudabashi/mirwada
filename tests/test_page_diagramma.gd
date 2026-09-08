@@ -95,6 +95,63 @@ func test_abilita_della_sequenza_corrente_elencate() -> void:
 	ov.free()
 
 
+func test_sezione_fusione_elenca_solo_i_vicini_dello_stesso_gruppo() -> void:
+	var prog: Node = _n("/root/Progression")
+	prog.call("configura", "twilight_giant", 4)   # gruppo eternal_darkness
+	var ov: CanvasLayer = _pagina()
+	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
+	var vicini: Array = pag.call("vicini_fondibili")
+	var ids: Array = []
+	for v in vicini:
+		ids.append(v["id"])
+	assert_true("darkness" in ids and "death" in ids, "i vicini di gruppo del Twilight Giant")
+	assert_false("error" in ids, "nessun Pathway di un altro gruppo")
+	for v in vicini:
+		assert_true(bool(v["puo"]), "Seq 4: puo_cambiare verso ogni vicino")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	prog.call("configura", "twilight_giant", 9)
+
+
+func test_sezione_fusione_troppo_presto_nessuna_conferma() -> void:
+	var prog: Node = _n("/root/Progression")
+	prog.call("configura", "twilight_giant", 9)
+	var ov: CanvasLayer = _pagina()
+	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
+	for v in (pag.call("vicini_fondibili") as Array):
+		assert_false(bool(v["puo"]), "Seq 9: troppo presto, nessun cambio")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+
+
+func test_sezione_fusione_percorso_scritto_vs_da_rivelare() -> void:
+	var prog: Node = _n("/root/Progression")
+	prog.call("configura", "error", 4)
+	var ov: CanvasLayer = _pagina()
+	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
+	var per_id: Dictionary = {}
+	for v in (pag.call("vicini_fondibili") as Array):
+		per_id[v["id"]] = v
+	assert_true(bool(per_id["door"]["scritto"]), "error->door: percorso rivelato")
+	assert_false(bool(per_id["fool"]["scritto"]), "error->fool: ancora da rivelare (stub)")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	prog.call("configura", "twilight_giant", 9)
+
+
+func test_sezione_fusione_conferma_cambia_il_pathway() -> void:
+	var prog: Node = _n("/root/Progression")
+	prog.call("configura", "twilight_giant", 4)
+	var ov: CanvasLayer = _pagina()
+	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
+	var res: Dictionary = pag.call("fondi", "death")
+	assert_true(bool(res["ok"]), "conferma: cambio riuscito")
+	assert_eq(prog.call("pathway"), "death", "ora sul Pathway vicino")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	prog.call("configura", "twilight_giant", 9)
+
+
 func test_conoscenza_nel_save() -> void:
 	var kn: Node = _n("/root/KnowledgeStore")
 	kn.call("impara", "pathway:fool")
