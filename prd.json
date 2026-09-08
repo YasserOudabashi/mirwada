@@ -191,8 +191,8 @@
       ],
       "priority": 10,
       "fase": "5b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. DOOR COMPLETO 10/10. 100/100 SEQUENZE NON-STUB. Nessuna primitiva nuova: Key of Stars/Door usano terrain_modify tipo_modifica 'varco_forzato' permanente:true -> WorldState (come i varchi del TG, zero codice nuovo). door_3 Wanderer, door_2 Planeswalker (teleport 1500 + door_replica_nota = steal non_sottrae senza pre-registrazione), door_1 Key of Stars (varco_forzato + teleport; rituale eclissi Ancora), door_0 Door (aura gravita_alterata + teleport) stub->false. formula_door_3/2/1/0 + 12 ingredienti + char_door_3/2/1/0 tradotti. test_door.gd esteso (varco_forzato registrato nel WorldState e sopravvive al round-trip del save; Door 10/10; Seq 1 Ancora). Nessun .gd toccato. validate exit 0 - ORA 2 warning (sparito 'stub'). 708 test verdi."
     },
     {
       "id": "US-5B11",

@@ -425,26 +425,75 @@
       "name_i18n": "sequence.door.3",
       "tier": "saint",
       "concept": "Teletrasporto a lunga distanza portando con se' alleati e pet.",
-      "stat_modifiers": {},
+      "stat_modifiers": {
+        "hp_max": 150,
+        "velocita": 0.15,
+        "spiritualita_max": 0.2
+      },
       "abilities": [
-        "door_viaggio_lungo"
+        "door_viaggio_lungo",
+        "door_passo_del_pellegrino"
       ],
-      "acting_actions": [],
+      "acting_actions": [
+        {
+          "id": "door_3_viandante",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_viaggio_lungo"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_3_viandante",
+          "descrizione": "Compi 12 viaggi lunghi con alleati e pet"
+        },
+        {
+          "id": "door_3_pellegrino",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_passo_del_pellegrino"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_3_pellegrino",
+          "descrizione": "Guida 12 pellegrinaggi attraverso lo spazio"
+        },
+        {
+          "id": "door_3_carovaniere",
+          "evento": "area_cleared",
+          "filtri": {},
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_3_carovaniere",
+          "descrizione": "Attraversa 10 aree ostili senza mai fermarti"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 3,
-        "ingredients": [],
+        "ingredients": [
+          "suola_consumata_da_mille_strade",
+          "acqua_di_un_pozzo_che_non_trovi_piu",
+          "bussola_che_punta_a_dove_vuoi_tu"
+        ],
         "formula_id": "formula_door_3"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "nebbia_grigia",
+          "crocevia"
+        ],
+        "momento": "notte_fonda",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "il_posto_che_chiamavi_casa"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 10.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 2,
@@ -453,24 +502,75 @@
       "name_i18n": "sequence.door.2",
       "tier": "angel",
       "concept": "Apre porte stabili tra piani; replica abilita' che conosce senza registrarle.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 260,
+        "spiritualita_max": 0.3,
+        "velocita": 0.15
+      },
+      "abilities": [
+        "door_camminatore_di_piani",
+        "door_replica_nota"
+      ],
+      "acting_actions": [
+        {
+          "id": "door_2_camminatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_camminatore_di_piani"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_2_camminatore",
+          "descrizione": "Cammina tra 12 piani lontani"
+        },
+        {
+          "id": "door_2_replicante",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_replica_nota"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_2_replicante",
+          "descrizione": "Replica 12 abilita' che gia' conosci, senza registrarle"
+        },
+        {
+          "id": "door_2_ubiquo",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 20,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_2_ubiquo",
+          "descrizione": "Sconfiggi 20 nemici essendo ovunque e da nessuna parte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 2,
-        "ingredients": [],
+        "ingredients": [
+          "frammento_di_una_porta_tra_i_mondi",
+          "eco_di_un_potere_visto_una_volta_sola",
+          "polvere_di_un_piano_gia_chiuso"
+        ],
         "formula_id": "formula_door_2"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "crocevia",
+          "nebbia_grigia"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "nuova",
+        "sacrifices": [
+          "la_possibilita_di_restare_fermo"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 11.5,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 1,
@@ -479,24 +579,75 @@
       "name_i18n": "sequence.door.1",
       "tier": "angel",
       "concept": "Chiavi che aprono qualunque cosa, compresi luoghi che non hanno una porta.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 400,
+        "spiritualita_max": 0.35,
+        "velocita": 0.15
+      },
+      "abilities": [
+        "door_chiave_di_ogni_luogo",
+        "door_porta_dove_non_ce"
+      ],
+      "acting_actions": [
+        {
+          "id": "door_1_chiavaio",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_chiave_di_ogni_luogo"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_1_chiavaio",
+          "descrizione": "Apri 12 luoghi con la chiave di ogni serratura"
+        },
+        {
+          "id": "door_1_apriporte",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_porta_dove_non_ce"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_1_apriporte",
+          "descrizione": "Forza 12 varchi dove non c'era una porta"
+        },
+        {
+          "id": "door_1_ovunque",
+          "evento": "area_cleared",
+          "filtri": {},
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_1_ovunque",
+          "descrizione": "Entra in 10 aree che credevano di essere chiuse"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 1,
-        "ingredients": [],
+        "ingredients": [
+          "chiave_fatta_di_luce_di_stella",
+          "serratura_dell_orizzonte",
+          "cardine_del_cielo"
+        ],
         "formula_id": "formula_door_1"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "nebbia_grigia",
+          "soglia"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "eclissi",
+        "sacrifices": [
+          "ancora_del_giocatore"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 12.8,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 0,
@@ -505,24 +656,74 @@
       "name_i18n": "sequence.door.0",
       "tier": "god",
       "concept": "Passaggio senza limiti.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 700,
+        "spiritualita_max": 0.6,
+        "velocita": 0.2
+      },
+      "abilities": [
+        "door_passaggio_senza_limiti",
+        "door_ogni_soglia"
+      ],
+      "acting_actions": [
+        {
+          "id": "door_0_dominio",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_passaggio_senza_limiti"
+          },
+          "target": 5,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_0_dominio",
+          "descrizione": "Imponi il passaggio senza limiti 5 volte"
+        },
+        {
+          "id": "door_0_apriporte_supremo",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_ogni_soglia"
+          },
+          "target": 10,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_0_apriporte_supremo",
+          "descrizione": "Attraversa 10 soglie che non esistevano"
+        },
+        {
+          "id": "door_0_nessun_muro",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 30,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_0_nessun_muro",
+          "descrizione": "Sconfiggi 30 nemici: nessun muro ti ha fermato"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 0,
-        "ingredients": [],
+        "ingredients": [
+          "prima_porta_mai_aperta",
+          "distanza_ridotta_a_zero",
+          "soglia_tra_tutto_e_tutto"
+        ],
         "formula_id": "formula_door_0"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "nebbia_grigia"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "eclissi",
+        "sacrifices": [
+          "il_detentore_precedente_della_sequenza_0"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 14.0,
       "notes": "",
-      "stub": true
+      "stub": false
     }
   ]
 }

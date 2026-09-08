@@ -288,7 +288,19 @@
     "mappa_che_si_ripiega_su_se_stessa",
     "segreto_sigillato_in_cera_nera",
     "ombra_ritagliata_con_le_forbici",
-    "chiave_che_chiude_e_non_apre"
+    "chiave_che_chiude_e_non_apre",
+    "suola_consumata_da_mille_strade",
+    "acqua_di_un_pozzo_che_non_trovi_piu",
+    "bussola_che_punta_a_dove_vuoi_tu",
+    "frammento_di_una_porta_tra_i_mondi",
+    "eco_di_un_potere_visto_una_volta_sola",
+    "polvere_di_un_piano_gia_chiuso",
+    "chiave_fatta_di_luce_di_stella",
+    "serratura_dell_orizzonte",
+    "cardine_del_cielo",
+    "prima_porta_mai_aperta",
+    "distanza_ridotta_a_zero",
+    "soglia_tra_tutto_e_tutto"
   ],
   "formulas": {
     "formula_fool_9": {
@@ -1627,6 +1639,62 @@
         "segreto_sigillato_in_cera_nera",
         "ombra_ritagliata_con_le_forbici",
         "chiave_che_chiude_e_non_apre"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_3": {
+      "characteristic_sequence": 3,
+      "ingredients": [
+        "suola_consumata_da_mille_strade",
+        "acqua_di_un_pozzo_che_non_trovi_piu",
+        "bussola_che_punta_a_dove_vuoi_tu"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_2": {
+      "characteristic_sequence": 2,
+      "ingredients": [
+        "frammento_di_una_porta_tra_i_mondi",
+        "eco_di_un_potere_visto_una_volta_sola",
+        "polvere_di_un_piano_gia_chiuso"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_1": {
+      "characteristic_sequence": 1,
+      "ingredients": [
+        "chiave_fatta_di_luce_di_stella",
+        "serratura_dell_orizzonte",
+        "cardine_del_cielo"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_0": {
+      "characteristic_sequence": 0,
+      "ingredients": [
+        "prima_porta_mai_aperta",
+        "distanza_ridotta_a_zero",
+        "soglia_tra_tutto_e_tutto"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

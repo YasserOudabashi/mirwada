@@ -365,6 +365,202 @@
         "viaggio"
       ],
       "note": "Svanisce e riappare altrove, senza che nessuno sappia che c'era. shadow_meld + teleport, entrambe gia' implementate."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_passo_del_pellegrino",
+      "name": "Passo del pellegrino",
+      "name_i18n": "ability.door.door_passo_del_pellegrino",
+      "sequence_id": "door_3",
+      "costo_spiritualita": 26,
+      "cooldown": 24.0,
+      "primitive": [
+        {
+          "tipo": "teleport",
+          "distanza": 600,
+          "richiede_visuale": false,
+          "porta_alleati": true
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "difesa",
+          "valore": 0.15,
+          "durata": 6.0,
+          "moltiplicativo": false
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "viaggio",
+        "difesa"
+      ],
+      "note": "Il Wanderer porta un gruppo su una strada lunga, e all'arrivo sono ancora saldi."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_camminatore_di_piani",
+      "name": "Camminatore di piani",
+      "name_i18n": "ability.door.door_camminatore_di_piani",
+      "sequence_id": "door_2",
+      "costo_spiritualita": 34,
+      "cooldown": 30.0,
+      "primitive": [
+        {
+          "tipo": "teleport",
+          "distanza": 1500,
+          "richiede_visuale": false,
+          "porta_alleati": true
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "viaggio",
+        "singolo"
+      ],
+      "note": "Il Planeswalker apre una porta stabile tra piani: distanza enorme, con alleati e pet. Sempre teleport, mai una primitiva nuova."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_replica_nota",
+      "name": "Replica nota",
+      "name_i18n": "ability.door.door_replica_nota",
+      "sequence_id": "door_2",
+      "costo_spiritualita": 24,
+      "cooldown": 26.0,
+      "primitive": [
+        {
+          "tipo": "steal",
+          "categoria": "abilita",
+          "ability_id": "tg_turbine",
+          "probabilita": 1.0,
+          "durata_prestito": 25.0,
+          "non_sottrae": true
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "conoscenza",
+        "singolo"
+      ],
+      "note": "Il Planeswalker replica un'abilita' che GIA' conosce, senza il passaggio di registrazione dello Scribe: steal { non_sottrae:true } senza bisogno di 'osservare' prima. Nessuna primitiva nuova."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_chiave_di_ogni_luogo",
+      "name": "Chiave di ogni luogo",
+      "name_i18n": "ability.door.door_chiave_di_ogni_luogo",
+      "sequence_id": "door_1",
+      "costo_spiritualita": 36,
+      "cooldown": 40.0,
+      "primitive": [
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "varco_forzato",
+          "raggio": 3,
+          "durata": 0,
+          "permanente": true
+        },
+        {
+          "tipo": "teleport",
+          "distanza": 300,
+          "richiede_visuale": false,
+          "porta_alleati": true
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "viaggio",
+        "stella"
+      ],
+      "costo_follia": 4.0,
+      "note": "La Key of Stars apre qualunque cosa, anche un luogo senza porta: terrain_modify tipo_modifica 'varco_forzato' permanente:true entra nel WorldState (e sopravvive al reload, come i varchi del Twilight Giant) + teleport per passarci."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_porta_dove_non_ce",
+      "name": "Una porta dove non c'e'",
+      "name_i18n": "ability.door.door_porta_dove_non_ce",
+      "sequence_id": "door_1",
+      "costo_spiritualita": 28,
+      "cooldown": 30.0,
+      "primitive": [
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "varco_forzato",
+          "raggio": 3,
+          "durata": 0,
+          "permanente": true
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "stella",
+        "singolo"
+      ],
+      "costo_follia": 3.0,
+      "note": "Solo il varco, senza attraversarlo subito: resta aperto nel mondo (WorldState)."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_passaggio_senza_limiti",
+      "name": "Passaggio senza limiti",
+      "name_i18n": "ability.door.door_passaggio_senza_limiti",
+      "sequence_id": "door_0",
+      "costo_spiritualita": 55,
+      "cooldown": 60.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 15,
+          "durata": -1,
+          "effetto": "gravita_alterata",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        },
+        {
+          "tipo": "teleport",
+          "distanza": 400,
+          "richiede_visuale": false,
+          "porta_alleati": true
+        }
+      ],
+      "tag_sinergia": [
+        "dominio",
+        "spazio",
+        "area"
+      ],
+      "note": "L'abilita' di dominio del Door: nel raggio ogni passaggio e' suo da concedere o negare - i nemici si muovono a fatica (gravita_alterata) mentre lui e gli alleati saltano dove vogliono. Aura persistente + teleport, come i Seq 0 di fase 5."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_ogni_soglia",
+      "name": "Ogni soglia",
+      "name_i18n": "ability.door.door_ogni_soglia",
+      "sequence_id": "door_0",
+      "costo_spiritualita": 45,
+      "cooldown": 45.0,
+      "primitive": [
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "varco_forzato",
+          "raggio": 5,
+          "durata": 0,
+          "permanente": true
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "velocita",
+          "valore": 0.3,
+          "durata": 10.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "dominio",
+        "viaggio"
+      ],
+      "note": "Apre un varco largo che resta nel mondo, e per un momento il Door e' piu' veloce di ogni porta."
     }
   ]
 }

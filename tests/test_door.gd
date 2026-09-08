@@ -17,6 +17,14 @@ const ABILITA_6_4 := [
 	"door_scorciatoia", "door_porta_di_gruppo",
 	"door_occultamento_totale", "door_segreto_svanito",
 ]
+const ABILITA_3_0 := [
+	"door_viaggio_lungo", "door_passo_del_pellegrino",
+	"door_camminatore_di_piani", "door_replica_nota",
+	"door_chiave_di_ogni_luogo", "door_porta_dove_non_ce",
+	"door_passaggio_senza_limiti", "door_ogni_soglia",
+]
+
+const SLOT := 913
 
 
 func _engine() -> Node:
@@ -27,6 +35,14 @@ func _gd() -> Node:
 	return Engine.get_main_loop().root.get_node("GameData")
 
 
+func _world() -> Node:
+	return Engine.get_main_loop().root.get_node_or_null("WorldState")
+
+
+func _save() -> Node:
+	return Engine.get_main_loop().root.get_node_or_null("SaveSystem")
+
+
 func prepara() -> void:
 	var e: Node = _engine()
 	if e != null:
@@ -34,6 +50,8 @@ func prepara() -> void:
 		e.call("clear_granted")
 		e.call("clear_snapshots")
 		e.call("flush_effects")
+	if _world() != null:
+		_world().call("pulisci")
 
 
 func _caster() -> Node2D:
@@ -122,13 +140,63 @@ func test_traveler_e_teleport_coi_parametri_del_door() -> void:
 	assert_gt(float(p["distanza"]), 300.0, "distanza grande (scorciatoia tra zone lontane)")
 
 
-func test_door_9_4_sono_contenuto_e_le_acting_sommano_uno() -> void:
+func test_ogni_abilita_door_3_0_si_esegue_senza_warning() -> void:
+	var e: Node = _engine()
+	for aid in ABILITA_3_0:
+		var c: Node2D = _caster()
+		var r: Dictionary = e.call("execute", aid, c)
+		assert_true(r["ok"], "%s eseguita" % aid)
+		assert_eq((r["warnings"] as PackedStringArray).size(), 0,
+			"%s: nessun warning di primitiva: %s" % [aid, r["warnings"]])
+		e.call("clear_cooldowns")
+		e.call("clear_granted")
+		_world().call("pulisci")
+		_cleanup(c)
+
+
+func test_key_of_stars_apre_un_varco_forzato_permanente() -> void:
+	var e: Node = _engine()
+	var c: Node2D = _caster()
+	e.call("execute", "door_porta_dove_non_ce", c)
+	var terreni: Array = _world().call("terreni")
+	assert_eq(terreni.size(), 1, "il varco forzato e' registrato nel WorldState")
+	assert_eq(str((terreni[0] as Dictionary)["tipo_modifica"]), "varco_forzato",
+		"tipo_modifica 'varco_forzato'")
+	_cleanup(c)
+
+
+func test_varco_forzato_sopravvive_al_reload() -> void:
+	var e: Node = _engine()
+	var s: Node = _save()
+	var c: Node2D = _caster()
+	c.global_position = Vector2(64, 64)
+	e.call("_p_terrain_modify",
+		{"tipo_modifica": "varco_forzato", "raggio": 3.0, "permanente": true},
+		c, c.get_node("Stats"), "ab")
+	_cleanup(c)
+
+	if s.esiste(SLOT):
+		s.cancella(SLOT)
+	var snap: Dictionary = {"nome_personaggio": "Zroya", "mondo": _world().call("per_salvataggio")}
+	assert_true(s.salva(SLOT, snap)["ok"], "salva ok")
+	_world().call("pulisci")
+	assert_eq((_world().call("terreni") as Array).size(), 0, "mondo azzerato")
+
+	var caricato: Dictionary = s.carica(SLOT)
+	_world().call("da_salvataggio", (caricato["dati"] as Dictionary)["mondo"])
+	var terreni: Array = _world().call("terreni")
+	assert_eq(terreni.size(), 1, "il varco del Key of Stars torna dal save (come i varchi del TG)")
+	assert_eq(str((terreni[0] as Dictionary)["tipo_modifica"]), "varco_forzato", "tipo ripristinato")
+	s.cancella(SLOT)
+
+
+func test_door_e_contenuto_completo_10_su_10() -> void:
 	var pw: Dictionary = _gd().call("get_pathway", "door")
 	var madness_prec: float = -1.0
+	var n: int = 0
 	for seq in (pw.get("sequences", []) as Array):
 		var d: Dictionary = seq
-		if int(d.get("sequence", -1)) < 4:
-			continue
+		n += 1
 		assert_false(bool(d.get("stub", false)),
 			"door_%d non e' piu' stub" % int(d.get("sequence")))
 		var somma: float = 0.0
@@ -139,3 +207,14 @@ func test_door_9_4_sono_contenuto_e_le_acting_sommano_uno() -> void:
 		var mf: float = float(d.get("madness_on_force", 0.0))
 		assert_gt(mf, madness_prec, "door_%d: madness_on_force cresce" % int(d.get("sequence")))
 		madness_prec = mf
+	assert_eq(n, 10, "Door ha 10 Sequenze, tutte contenuto")
+
+
+func test_door_1_sacrifica_un_ancora() -> void:
+	var pw: Dictionary = _gd().call("get_pathway", "door")
+	for seq in (pw.get("sequences", []) as Array):
+		if int((seq as Dictionary).get("sequence", -1)) != 1:
+			continue
+		var rit: Dictionary = (seq as Dictionary).get("advancement_ritual", {})
+		assert_true("ancora_del_giocatore" in (rit.get("sacrifices", []) as Array),
+			"il rituale di Sequenza 1 sacrifica un'Ancora del giocatore")

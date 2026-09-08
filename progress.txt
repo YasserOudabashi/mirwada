@@ -6528,3 +6528,44 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - File .gd toccati: nessuno (steal.non_sottrae era gia' letto dall'handler;
   solo +1 riga nel registro params di primitives.json, che e' un DATO).
 - Prossima storia: US-5B10 - Door Seq 3-0 + varco_forzato nel WorldState.
+
+[2026-09-08] US-5B10 — Door, Sequenze 3-0 (Wanderer / Planeswalker / Key of Stars / Door) + varco_forzato nel WorldState. FASE 5b, BLOCCO C CHIUSO. DOOR COMPLETO 10/10. **100/100 SEQUENZE NON-STUB.**
+
+- Nessuna primitiva nuova. Wanderer/Planeswalker usano teleport; Planeswalker
+  usa steal { non_sottrae:true } (US-5B09); Key of Stars/Door usano
+  terrain_modify tipo_modifica "varco_forzato" permanente:true - entra nel
+  WorldState come i varchi del Twilight Giant (fase 2), NESSUN codice nuovo.
+- CONTENUTO Door Seq 3/2/1/0 (stub -> false). DOOR COMPLETO 10/10.
+  * door_3 Wanderer (saint): door_viaggio_lungo (gia' esistente) +
+    door_passo_del_pellegrino (teleport gruppo + buff difesa). Rituale
+    nebbia_grigia/crocevia, sacrifica "il_posto_che_chiamavi_casa". madness 10.0.
+  * door_2 Planeswalker (angel): door_camminatore_di_piani (teleport 1500 +
+    alleati) + door_replica_nota (steal non_sottrae senza pre-registrazione:
+    "replica cio' che GIA' conosce", distinto dallo Scribe che deve osservare).
+    Rituale crocevia/nebbia_grigia, luna nuova. madness 11.5.
+  * door_1 Key of Stars (angel): door_chiave_di_ogni_luogo (terrain_modify
+    varco_forzato permanente + teleport) + door_porta_dove_non_ce (solo il
+    varco). Rituale nebbia_grigia/soglia, ECLISSI, sacrifica
+    ancora_del_giocatore. madness 12.8.
+  * door_0 Door (god): door_passaggio_senza_limiti (aura persistente
+    gravita_alterata sui nemici r15 + teleport - abilita' di dominio) +
+    door_ogni_soglia (varco_forzato largo + buff velocita). Rituale
+    nebbia_grigia, eclissi, il detentore precedente. madness 14.0.
+- formule formula_door_3/2/1/0 + 12 ingredienti nuovi. caratteristiche
+  char_door_3/2/1/0 (tradotte). i18n rilanciato (it.json 1026 -> 1049); 46
+  TODO totali = baseline TG (nessuna chiave door/error/fool). Il validator NON
+  emette piu' il warning "N sequenze stub": 100/100 non-stub.
+- VERIFICA A SCHERMO: test_door.gd - door_porta_dove_non_ce registra un
+  'varco_forzato' nel WorldState; _p_terrain_modify permanente:true col tipo
+  'varco_forzato' SOPRAVVIVE al round-trip del save (riuso del test di
+  terrain_modify permanente, US-203C); Door contenuto completo 10/10; Seq 1
+  sacrifica un'Ancora.
+- Come verificato: python tools/validate_data.py exit 0 (ORA 2 warning, non
+  piu' 3: sparito "stub", restano sinergie irraggiungibili 17 + TODO i18n 46).
+  708 test headless (704 + 4 in test_door.gd), tutti verdi. Nessuna
+  regressione.
+- File .gd toccati: nessuno (solo dati + tests/test_door.gd).
+- BLOCCO C CHIUSO: US-5B08/09/10. Door 10/10.
+- 100/100 SEQUENZE NON-STUB. 22/22 Pathway attivi completi (Fool + Error +
+  Door + i 19 gia' fatti). Prossimo: BLOCCO D - US-5B11 (sinergie del gruppo)
+  + US-5B12 (chiusura fase 5b, documenti).

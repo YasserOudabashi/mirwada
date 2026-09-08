@@ -577,6 +577,30 @@
       "pathway_id": "door",
       "sequence": 4,
       "name_i18n": "characteristic.door.4"
+    },
+    {
+      "id": "char_door_3",
+      "pathway_id": "door",
+      "sequence": 3,
+      "name_i18n": "characteristic.door.3"
+    },
+    {
+      "id": "char_door_2",
+      "pathway_id": "door",
+      "sequence": 2,
+      "name_i18n": "characteristic.door.2"
+    },
+    {
+      "id": "char_door_1",
+      "pathway_id": "door",
+      "sequence": 1,
+      "name_i18n": "characteristic.door.1"
+    },
+    {
+      "id": "char_door_0",
+      "pathway_id": "door",
+      "sequence": 0,
+      "name_i18n": "characteristic.door.0"
     }
   ]
 }
