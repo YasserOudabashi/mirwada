@@ -206,8 +206,8 @@
       ],
       "priority": 13,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. scripts/tribulation_overlay.gd + scenes/tribulation_overlay.tscn (CanvasLayer layer 85, Panel + VBox di Label), aggiunto a scenes/main.tscn. Mostra nome (tr_data), descrizione (tr_data), handicap mentre_in_corso (chiave HUD TRIB_EFFETTO_<KEY>), progresso %. Reattivo: si connette a TribulationSystem.tribolazione_attivata/progresso_cambiato/tribolazione_superata + _sincronizza() allo stato corrente al boot/load. Nascosto se nessuna prova in corso. assets/i18n/strings.csv +7 chiavi (TRIB_OVERLAY_EFFETTO/PROGRESSO + 5 TRIB_EFFETTO_*), .translation rigenerati. Metodi test: visibile(), stato_mostrato(). Fix: parametro _on_superata rinominato (_da shadowava il membro). tests/test_tribulation_overlay.gd NUOVO 3 test (nascosto senza prova; appare coi dati di trib_5_4 - nome == tr_data, descrizione e effetto non vuoti; progresso 1/3 dal vivo dopo 1 npc_influenced, overlay sparisce al superamento). Verifica: scriptata (test headless, come le primitive di fase 5/5b); il render windowed non cattura in questo ambiente. validate exit 0. 749 test verdi."
     },
     {
       "id": "US-714",

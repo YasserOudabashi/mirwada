@@ -7131,3 +7131,46 @@ Prossimo: BLOCCO B - US-710 tribulation.schema.json + data/tribulations/.
   (+npc_antagonista), tools/validate_data.py (+riconciliazione flag),
   tests/test_tribulation.gd, tests/test_npc_system.gd. Nessuno script .gd.
 - Prossima storia: US-713 - overlay del libro per la tribolazione in corso.
+
+[2026-09-08] US-713 — Overlay del libro per la tribolazione in corso. FASE 7, BLOCCO B CHIUSO.
+
+- scripts/tribulation_overlay.gd + scenes/tribulation_overlay.tscn (CanvasLayer
+  layer 85, sotto la follia; Panel centrato in alto + VBox di 4 Label),
+  aggiunto a scenes/main.tscn (load_steps 10->11).
+  Mostra: Nome (GameData.tr_data del name_i18n), Descrizione (tr_data del
+  descrizione_i18n), Effetto (tr("TRIB_OVERLAY_EFFETTO") + tr("TRIB_EFFETTO_" +
+  mentre_in_corso.to_upper())), Progresso ("Progresso N%").
+  Reattivo dal vivo: _ready si connette a TribulationSystem
+  tribolazione_attivata / progresso_cambiato / tribolazione_superata;
+  _sincronizza() riallinea allo stato corrente al boot/load (stato()).
+  Nascosto (_pannello.visible=false) quando nessuna prova e' in corso.
+- assets/i18n/strings.csv: +7 chiavi (TRIB_OVERLAY_EFFETTO, TRIB_OVERLAY_PROGRESSO,
+  TRIB_EFFETTO_FOLLIA_ACCELERATA / SPIRITUALITA_DIMEZZATA / NEMICI_RINFORZATI /
+  ABILITA_BLOCCATE / NOTTE_PERENNE) it+en. .translation rigenerati
+  (Godot --headless --import).
+- Metodi interrogabili: visibile(), stato_mostrato() {da, nome, descrizione,
+  effetto, progresso}.
+- FIX trovato: il parametro di _on_superata si chiamava _da e faceva shadow
+  del membro _da: l'overlay non si nascondeva al superamento. Rinominato
+  _salto.
+- tests/test_tribulation_overlay.gd (NUOVO, 3 test):
+  * nascosto senza prova in corso.
+  * attiva(5) -> visibile; stato_mostrato().nome == tr_data(trib_5_4.name_i18n),
+    descrizione ed effetto non vuoti.
+  * emit npc_influenced x1 -> progresso 1/3 dal vivo; x3 -> superata ->
+    overlay sparisce.
+- Verifica a schermo: scriptata (test headless), come per le primitive di
+  fase 5/5b. Il render windowed non produce cattura in questo ambiente
+  (nessun display); il contenuto e il toggle sono verificati dai 3 test.
+- Come verificato: python tools/validate_data.py exit 0. 749 test headless
+  (746 + 3), tutti verdi. Nessuna regressione.
+- File toccati: scripts/tribulation_overlay.gd (nuovo),
+  scenes/tribulation_overlay.tscn (nuovo), scenes/main.tscn (+istanza),
+  assets/i18n/strings.csv + .translation, tests/test_tribulation_overlay.gd.
+
+=== BLOCCO B CHIUSO (2026-09-08) ===
+US-710..713. tribulation.schema.json + 4 file dati, TribulationSystem (lettore
+di eventi + flag che blocca Progression.avanza ai salti di fascia 7/5/3/1),
+4 tribolazioni di contenuto con i18n reale + 2 flag da dialoghi (dlg_doran +
+dlg_antagonista nuovo), overlay reattivo. 749 test (erano 720 a inizio fase 7).
+Save invariato (endgame gia' a v22). Prossimo: BLOCCO C - US-714 preghiere.
