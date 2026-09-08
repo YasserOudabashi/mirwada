@@ -190,8 +190,8 @@
       ],
       "priority": 12,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. Le 4 tribolazioni di data/tribulations/ (US-710) rifinite: i18n reale (name + descrizione) per tutte e 8 le chiavi tribulation.* in it.json (0 TODO). Temi: 7->6 'La citta' non basta piu'' (area_cleared x2), 5->4 'Le fazioni prendono posizione' (npc_influenced x3), 3->2 'Doran sa' (flag), 1->0 'La soglia' (flag). I 2 flag sono posti da un dialogo, nessun verbo nuovo: data/dialogues/dlg_doran.json ha una scelta in piu' (condizioni tier_min:saint) che pone tribolazione_doran_affrontato; data/dialogues/dlg_antagonista.json NUOVO - UN solo grafo generico per l'antagonista di ogni Pathway (non 22), l'ultima scelta (tier_min:angel) pone tribolazione_soglia_varcata; data/npc/roster.json +npc_antagonista (region frontiera_porte, tag soglia, dialogue_id dlg_antagonista). tools/validate_data.py: nuova riconciliazione - ogni superamento.flag di una tribolazione dev'essere scritto da un effetto flag di un dialogo/quest (stesso contratto delle quest). tests/test_tribulation.gd +2 (ogni tribolazione tradotta + condizioni con un tipo; i flag di superamento posti da un dialogo). test_npc_system.gd 18->19. validate exit 0. 746 test verdi."
     },
     {
       "id": "US-713",

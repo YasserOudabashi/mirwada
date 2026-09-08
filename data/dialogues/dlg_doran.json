@@ -46,6 +46,18 @@
           "goto": "n3"
         },
         {
+          "text": "Sai gia' tutto, Doran. Diciamolo ad alta voce.",
+          "text_i18n": "dialogue.doran.n1.affronta",
+          "condizioni": [
+            { "tipo": "tier_min", "valore": "saint" }
+          ],
+          "effetti": [
+            { "tipo": "emit_event", "evento": "npc_influenced", "modo": "intimidito" },
+            { "tipo": "flag", "id": "tribolazione_doran_affrontato", "valore": true }
+          ],
+          "goto": "n3"
+        },
+        {
           "text": "Devo andare.",
           "text_i18n": "dialogue.doran.n1.congedo",
           "condizioni": [],

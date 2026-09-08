@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "dlg_antagonista",
+  "start": "n1",
+  "_comment": "UN solo grafo per l'antagonista di OGNI Pathway (fase 7, US-712), NON 22. Il colore del Pathway arriva dal nome (data/lore/antagonisti.json, get_antagonista) mostrato come speaker; il testo resta generico. L'ultima scelta - visibile solo a tier angel - pone il flag 'tribolazione_soglia_varcata' che chiude la tribolazione 1->0.",
+  "nodes": {
+    "n1": {
+      "speaker": "npc_antagonista",
+      "text": "Sei arrivato dove mi sono fermato io. La stessa Sequenza, la stessa soglia. Cosa ti fa credere di poterla varcare?",
+      "text_i18n": "dialogue.antagonista.n1",
+      "choices": [
+        {
+          "text": "Sono venuto a prendere cio' che era tuo.",
+          "text_i18n": "dialogue.antagonista.n1.varca",
+          "condizioni": [
+            { "tipo": "tier_min", "valore": "angel" }
+          ],
+          "effetti": [
+            { "tipo": "flag", "id": "tribolazione_soglia_varcata", "valore": true }
+          ],
+          "goto": "n2"
+        },
+        {
+          "text": "Non ancora. Ma verro'.",
+          "text_i18n": "dialogue.antagonista.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n2": {
+      "speaker": "npc_antagonista",
+      "text": "Allora la soglia e' tua da varcare. Come lo fu per me. Vedremo se ti reggera' meglio.",
+      "text_i18n": "dialogue.antagonista.n2",
+      "choices": [
+        {
+          "text": "Fatti da parte.",
+          "text_i18n": "dialogue.antagonista.n2.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    }
+  }
+}

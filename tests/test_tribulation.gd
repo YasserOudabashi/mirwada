@@ -53,3 +53,34 @@ func test_ogni_tribolazione_risolve_i_suoi_riferimenti() -> void:
 			assert_gt(float(sup.get("target", 0)), 0.0, "%s: target >= 1" % tid)
 		else:
 			assert_false(str(sup["flag"]).is_empty(), "%s: flag non vuoto" % tid)
+
+
+# --- US-712: contenuto (i18n + flag posti da dialoghi) -----------------
+
+func test_ogni_tribolazione_e_tradotta_e_le_condizioni_sono_valide() -> void:
+	var gd: Node = _gd()
+	for tid in gd.call("tribulation_ids"):
+		var t: Dictionary = gd.call("get_tribulation", tid)
+		for k in [str(t.get("name_i18n")), str(t.get("descrizione_i18n"))]:
+			assert_true(gd.call("has_translation", k), "%s: '%s' tradotta (non TODO)" % [tid, k])
+		# le condizioni sono nel vocabolario di conditions.gd (Conditions le valuta)
+		for c in (t.get("condizioni", []) as Array):
+			assert_false(str((c as Dictionary).get("tipo", "")).is_empty(), "%s: condizione con un tipo" % tid)
+
+
+func test_i_flag_di_superamento_sono_posti_da_un_dialogo() -> void:
+	# I due flag (Doran e l'antagonista) devono essere scritti da un effetto
+	# 'flag' in un grafo di dialogo: nessun verbo nuovo.
+	var flag_scritti: Dictionary = {}
+	for did in ["dlg_doran", "dlg_antagonista"]:
+		var dlg: Dictionary = _gd().call("get_dialogue", did)
+		for nodo in (dlg.get("nodes", {}) as Dictionary).values():
+			for ch in ((nodo as Dictionary).get("choices", []) as Array):
+				for eff in ((ch as Dictionary).get("effetti", []) as Array):
+					if str((eff as Dictionary).get("tipo", "")) == "flag":
+						flag_scritti[str((eff as Dictionary).get("id", ""))] = true
+	for tid in _gd().call("tribulation_ids"):
+		var sup: Dictionary = _gd().call("get_tribulation", tid).get("superamento", {})
+		if sup.has("flag"):
+			assert_true(flag_scritti.has(str(sup["flag"])),
+				"%s: il flag '%s' e' posto da un dialogo" % [tid, sup["flag"]])

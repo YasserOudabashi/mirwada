@@ -7088,3 +7088,46 @@ Prossimo: BLOCCO B - US-710 tribulation.schema.json + data/tribulations/.
   potion_system.gd, ritual_system.gd, time_system.gd, project.godot (+autoload)
   + 5 test.
 - Prossima storia: US-712 - le 4 tribolazioni di contenuto (i18n + flag antagonista).
+
+[2026-09-08] US-712 — Le 4 tribolazioni di contenuto. FASE 7, BLOCCO B.
+
+- i18n reale (name + descrizione) per tutte e 8 le chiavi tribulation.* in
+  data/i18n/it.json: 0 TODO su tribulation.*. Temi:
+  * trib_7_6 "La citta' non basta piu'" - superamento area_cleared x2,
+    mentre nemici_rinforzati.
+  * trib_5_4 "Le fazioni prendono posizione" - npc_influenced x3,
+    mentre spiritualita_dimezzata.
+  * trib_3_2 "Doran sa" - flag tribolazione_doran_affrontato,
+    mentre follia_accelerata.
+  * trib_1_0 "La soglia" - flag tribolazione_soglia_varcata,
+    mentre notte_perenne.
+- I due flag sono posti da un DIALOGO (nessun verbo nuovo):
+  * data/dialogues/dlg_doran.json: scelta nuova in n1 (condizioni
+    tier_min:saint) -> emit npc_influenced:intimidito + flag
+    tribolazione_doran_affrontato, goto n3. A tier basso la scelta e' nascosta
+    (DialogueEngine), quindi test_dialoghi_roster non cambia.
+  * data/dialogues/dlg_antagonista.json (NUOVO): UN solo grafo generico per
+    l'antagonista di OGNI Pathway (NON 22). Il colore del Pathway arriva dal
+    nome in antagonisti.json mostrato come speaker; il testo resta generico.
+    n1 -> scelta "Sono venuto a prendere cio' che era tuo" (condizioni
+    tier_min:angel) pone tribolazione_soglia_varcata, goto n2 -> congedo.
+  * data/npc/roster.json: +npc_antagonista (region frontiera_porte, schedule
+    notte_fonda@soglia, faction null, dialogue_id dlg_antagonista,
+    name/role_i18n npc.antagonista.*). Roster 18 -> 19.
+- tools/validate_data.py: nella sezione tribolazioni raccoglie i
+  superamento.flag in trib_flags; dopo la costruzione di flag_scritti
+  (dialoghi + quest) verifica che ogni flag di superamento sia scritto da un
+  dialogo o una quest - errore altrimenti. Stesso contratto delle quest.
+- tests/test_tribulation.gd (+2 test): ogni tribolazione ha name/descrizione
+  tradotte (non TODO) e condizioni con un tipo; ogni superamento.flag e'
+  posto da un effetto 'flag' in dlg_doran o dlg_antagonista.
+  tests/test_npc_system.gd: 18 -> 19 (npc_antagonista).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning, TODO i18n
+  torna a 42 = baseline). 746 test headless (744 + 2), tutti verdi. Nessuna
+  regressione (test_dialoghi_roster, test_narrativa, test_npc_system verdi).
+- File toccati: data/tribulations/*.json (gia' di US-710, i18n a parte),
+  data/i18n/it.json (+16 chiavi), data/dialogues/dlg_doran.json (+1 scelta),
+  data/dialogues/dlg_antagonista.json (nuovo), data/npc/roster.json
+  (+npc_antagonista), tools/validate_data.py (+riconciliazione flag),
+  tests/test_tribulation.gd, tests/test_npc_system.gd. Nessuno script .gd.
+- Prossima storia: US-713 - overlay del libro per la tribolazione in corso.

@@ -394,6 +394,7 @@ def main():
     tdir = os.path.join(DATA, "tribulations")
     salti_attesi = {7: 6, 5: 4, 3: 2, 1: 0}
     salti_visti = {}
+    trib_flags = []   # (rel, tid, flag) da riconciliare coi flag scritti (US-712)
     if not os.path.isdir(tdir):
         err("data/tribulations/: cartella mancante (fase 7, US-710).")
     else:
@@ -432,6 +433,8 @@ def main():
                 err(f"{rel} [{tid}]: superamento con 'evento' ha bisogno di 'target' >= 1")
             if has_flag and not (isinstance(sup.get("flag"), str) and sup.get("flag")):
                 err(f"{rel} [{tid}]: superamento.flag vuoto")
+            elif has_flag:
+                trib_flags.append((rel, tid, sup.get("flag")))
         for da in salti_attesi:
             n = len(salti_visti.get(da, []))
             if n == 0:
@@ -1487,6 +1490,12 @@ def main():
                     for eff in st.get("on_complete", []) + q.get("ricompense", []):
                         if eff.get("tipo") == "flag" and eff.get("valore", True):
                             flag_scritti.add(eff.get("id"))
+    # US-712: il flag di superamento di una tribolazione dev'essere posto da un
+    # dialogo o una quest (nessun verbo nuovo: e' lo stesso contratto delle quest).
+    for rel, tid, flag in trib_flags:
+        if flag not in flag_scritti:
+            err(f"{rel} [{tid}]: superamento.flag '{flag}' non e' scritto da nessun dialogo o quest")
+
     QUEST_EFF = {"flag", "item", "reputazione", "ancora", "apri_vendita"}
     for qid, q in quest_docs.items():
         rel = f"data/quests/{qid}.json"
