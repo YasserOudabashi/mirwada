@@ -248,7 +248,7 @@ data-driven in `data/audio.json`. Il doppiaggio si', quello resta fuori.
 
 ## Repo
 
-https://github.com/YasserOudabashi/mirwada (privata)
+https://github.com/YasserOudabashi/mirwada (pubblica)
 
 Repo dedicata a questo progetto, aggiunta alla tabella "Repository che uso"
 in ~/.claude/CLAUDE.md come prescrive quel file per ogni repo nuova.
