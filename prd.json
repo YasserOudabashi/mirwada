@@ -75,8 +75,8 @@
       ],
       "priority": 4,
       "fase": "5b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. BLOCCO A CHIUSO. test_slice_fase_5b.gd (3 test): Error 8->2 giocato dai dati (Caratteristica->concoct->recitazione via EventTracker->bevi->avanzamento normale); 20 abilita' senza warning; test_nessun_codice_nomina_error zero occorrenze (unica esclusione: parser.get_error_line/message di Godot in game_data.gd). GIT DIFF BLOCCO A file .gd non-test: SOLO scripts/ability_engine.gd +173 -0 (3 handler _p_steal/_p_possess/_p_time_rewind + ring buffer time_rewind + hook generici: execute +1 riga _campiona_snapshot, _process +4, sweep +3). execute/_esegui_primitive (il dispatcher) NON modificati, zero righe rimosse, nessun if per un Pathway. VERDETTO: l'architettura della fase 2 REGGE sui Pathway difficili del Lord of Mysteries - Error (il piu' agganciato ai sistemi) e' contenuto completo 10/10 con solo handler generici. Vocabolari nuovi: 'avatar' (9a materia prima summon) + status 'posseduto', entrambi discussi. NIENTE STOP: Fool e Door possono partire. validate exit 0 (stub 19), 685 test verdi."
     },
     {
       "id": "US-5B05",

@@ -6259,3 +6259,68 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   dell'Error. Elenco per il checkpoint US-5B04.
 - Prossima storia: US-5B04 - CHECKPOINT: test_slice_fase_5b.gd (Error 8->2) +
   test_nessun_codice_nomina_error + verdetto sull'architettura.
+
+[2026-09-08] US-5B04 — CHECKPOINT: Error slice 8->2 + verdetto architettura. FASE 5b, BLOCCO A CHIUSO.
+
+- tests/test_slice_fase_5b.gd (NUOVO, 3 test):
+  * test_error_dalla_sequenza_8_alla_2: gioca Error dalla Sequenza 8 alla 2
+    in codice - per ogni salto Caratteristica -> concoct (formula+ingredienti
+    dai dati) -> recitazione via EventTracker (le acting_actions lette dai
+    dati, nessun numero di Error nel test) -> bevi -> avanzamento NORMALE
+    (zero follia da forzatura). Come test_slice_fase_5 per Death (US-508).
+  * test_ogni_abilita_error_si_esegue_senza_warning: le 20 abilita' (2 per
+    Sequenza) eseguono, nessun warning "non implementata" / "fuori registro".
+  * test_nessun_codice_nomina_error: grep di res://scripts e
+    res://scripts/pages per "error_", "\"error\"" e gli 8 nomi di Sequenza
+    dell'Error. ZERO occorrenze fuori dai commenti (unica esclusione:
+    game_data.gd usa parser.get_error_line()/get_error_message() del parser
+    JSON di Godot, non il Pathway).
+
+- GIT DIFF DEL BLOCCO A (file .gd non di test), rispetto a eaf67e2 (inizio
+  fase 5b):
+    scripts/ability_engine.gd  +173, -0   (SOLO aggiunte)
+  Cosa contiene:
+  * _handlers: +3 righe ("steal", "possess", "time_rewind" -> _p_*).
+  * _p_steal (US-5B01): dispaccio su 'categoria' (oggetto/abilita/conoscenza),
+    riuso di grant_temporary (US-204) e KnowledgeStore.impara.
+  * _p_possess (US-5B02): applica lo status 'posseduto', record corpo_a_terra
+    (pattern identico a _p_soul_detach di Death).
+  * _p_time_rewind + ring buffer (US-5B03): _snapshots, _campiona_snapshot,
+    campiona_snapshots, clear_snapshots, snapshot_count.
+  * Hook GENERICI (non un caso Error):
+      - execute(): +1 riga  _campiona_snapshot(caster)  sul percorso di
+        successo (vale per QUALSIASI caster, non nomina Error).
+      - _process(): +4 righe  ricampiona sul passo _SNAP_PASSO_S.
+      - sweep_cooldowns(): +3 righe  purga gli snapshot dei caster morti.
+  * execute() / _esegui_primitive: il DISPATCHER delle primitive (l'iterazione
+    dell'array "primitive", i 3 esiti implementata/non-scritta/fuori-registro,
+    l'hook SynergyEngine) NON e' modificato. Zero righe rimosse in tutto il
+    file. Nessun `if` per un Pathway/Sequenza specifico.
+
+- VERDETTO SULL'ARCHITETTURA (criterio di uscita, prd-fase-5b sez. 8):
+  L'ARCHITETTURA DELLA FASE 2 REGGE anche sui Pathway "difficili" del gruppo
+  Lord of Mysteries.
+  * Error, il Pathway con piu' agganci ai sistemi (grant_temporary per steal
+    "abilita", KnowledgeStore per steal "conoscenza", Madness per time_rewind,
+    ownership.json per la materia prima avatar), e' contenuto COMPLETO 10/10
+    scritto con: 3 handler di primitiva nuovi + il ring buffer di time_rewind,
+    tutti generici. Nessuna riga di AbilityEngine.execute /
+    _esegui_primitive / DialogueEngine / QuestSystem nomina "error".
+  * Le primitive-firma del gruppo (steal, possess, time_rewind) si sono
+    parametrizzate senza inventare eventi (i 12 tracked_events invariati) ne'
+    primitive (registro: steal/possess/time_rewind erano gia' voci senza
+    handler; +2 param a steal e possess, dichiarati). weather_control /
+    probability_shift / rule_bind restano differite e non usate.
+  * L'unico dato NUOVO di vocabolario chiuso: 'avatar' come 9a materia prima
+    di summon (ownership.json) e lo status 'posseduto' (status_effects.json).
+    Entrambi discussi (avatar con l'utente; posseduto e' il gemello di
+    anima_recisa gia' esistente).
+  NIENTE STOP. Fool e Door possono partire.
+
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: 19 stub
+  [restano Fool 9 + Door 10, la fase 5b li chiude], 17 sinergie
+  irraggiungibili, 47 TODO i18n = baseline). 685 test headless (682 + 3 in
+  test_slice_fase_5b.gd), tutti verdi. Nessuna regressione.
+- BLOCCO A CHIUSO: US-5B01/02/03/04. Error 10/10. steal + possess +
+  time_rewind implementate. Prossimo: BLOCCO B - Fool (US-5B05 illusion gia'
+  in fase 6; fool_2 senza probability_shift in US-5B07).
