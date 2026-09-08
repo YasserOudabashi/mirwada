@@ -6702,3 +6702,36 @@ Generare il PRD con /prd.
   (+migrazione +campo), scripts/game_state.gd (+wiring), project.godot
   (+autoload).
 - Prossima storia: US-702 - fusion.schema.json + data/fusions/ (8 file, 7 stub).
+
+[2026-09-08] US-702 — fusion.schema.json + data/fusions/ (8 file, 7 stub). FASE 7, BLOCCO 0.
+
+- data/schema/fusion.schema.json (NUOVO): un file per PERCORSO DI FUSIONE
+  possibile. id = <pathA>_<pathB> alfabetico (il gruppo e' un campo, NON
+  nell'id: i nomi di gruppo contengono '_' e sarebbero ambigui - deviazione
+  motivata dal PRD che proponeva <gruppo>_<pathA>_<pathB>). Campi: gruppo
+  (enum dei 4 gruppi attivi), pathway_a/pathway_b, abilita_fuse[] (id ^fus_,
+  da_sequenza 7..9 = le Sequenze CONSERVATE al cambio, name_i18n
+  ^ability\.fusion\., primitive[], tag_sinergia[]), stub (bool).
+- data/fusions/: 8 file, uno per coppia di Pathway vicini in un gruppo attivo:
+  Lord of Mysteries door_error/door_fool/error_fool; Eternal Darkness
+  darkness_death/darkness_twilight_giant/death_twilight_giant; Demon of
+  Knowledge hermit_paragon; Goddess of Origin moon_mother. TUTTI stub in
+  US-702; door_error lo scrive US-706.
+- tools/validate_data.py: NUOVA sezione "percorsi di fusione" (dopo il check
+  degli id pathway duplicati). Calcola i percorsi ATTESI da tutte le coppie
+  non ordinate dentro un gruppo ATTIVO (4 gruppi -> 3+3+1+1 = 8); verifica id
+  = nome file, pathway_a/b Pathway attivi dello stesso gruppo, campo 'gruppo'
+  coerente, id alfabetico, abilita_fuse vuoto sse stub, per le abilita' fuse
+  non-stub gli stessi controlli delle abilita' (primitive nel registro attivo,
+  parametri dichiarati, tag validi, tag_danno nel vocabolario). Errore se un
+  percorso atteso manca o se ce n'e' uno non atteso. Warning "N percorsi di
+  fusione su 8 sono stub".
+- tests/test_fusion.gd (NUOVO, 2 test): esistono tutti e 8 i file con id
+  coerente e pathway_a < pathway_b; i due Pathway di ogni percorso hanno lo
+  stesso 'group' (via GameData.get_pathway) e il campo 'gruppo' e' coerente.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: +1 nuovo
+  "8 percorsi di fusione su 8 sono stub", + i 2 gia' noti). 718 test headless
+  (716 + 2), tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (solo dati + validator + tests/test_fusion.gd).
+- Prossima storia: US-703 - vocabolari tribulation_effects.json +
+  prayer_effects.json.

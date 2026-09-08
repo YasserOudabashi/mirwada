@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "door_error",
+  "gruppo": "lord_of_mysteries",
+  "pathway_a": "door",
+  "pathway_b": "error",
+  "abilita_fuse": [],
+  "stub": true,
+  "note": "Il ladro che ruba DOVE sei, non cosa: rubare da una posizione, fotocopiare un varco, scambiare la refurtiva con il proprio posto."
+}

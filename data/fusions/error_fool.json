@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "error_fool",
+  "gruppo": "lord_of_mysteries",
+  "pathway_a": "error",
+  "pathway_b": "fool",
+  "abilita_fuse": [],
+  "stub": true,
+  "note": "Due bugiardi in uno: rubare un'illusione, fingere di aver rubato, l'inganno che si nutre del furto."
+}

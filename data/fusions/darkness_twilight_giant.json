@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "darkness_twilight_giant",
+  "gruppo": "eternal_darkness",
+  "pathway_a": "darkness",
+  "pathway_b": "twilight_giant",
+  "abilita_fuse": [],
+  "stub": true,
+  "note": "Il gigante che combatte al buio: forza raddoppiata nell'ombra, l'arma di luce che è anche cancellazione."
+}

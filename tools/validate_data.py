@@ -277,6 +277,93 @@ def main():
         if dupes:
             err(f"id {name} duplicati: {dupes}")
 
+    # --- percorsi di fusione (data/fusions/, fase 7 US-702) ---
+    # Il cambio di Pathway funziona solo tra vicini dello STESSO gruppo. I
+    # percorsi possibili sono uno per coppia non ordinata dentro un gruppo
+    # attivo: FusionEngine li legge, il codice non conosce le coppie.
+    pathway_group = {}
+    for _fn in files:
+        _d = load_json(os.path.join(pdir, _fn)) or {}
+        if _d.get("id"):
+            pathway_group[_d["id"]] = _d.get("group")
+    # gruppi attivi (tutti i loro Pathway sono in data/pathways/)
+    _active_groups = {g for g, n in present.items()
+                      if g in GROUP_SIZES and n == GROUP_SIZES[g]}
+    expected_fusions = set()
+    for g in sorted(_active_groups):
+        _members = sorted(p for p, gg in pathway_group.items() if gg == g)
+        for i in range(len(_members)):
+            for j in range(i + 1, len(_members)):
+                expected_fusions.add(f"{_members[i]}_{_members[j]}")
+    fdir = os.path.join(DATA, "fusions")
+    fusion_stub = 0
+    seen_fusions = set()
+    if not os.path.isdir(fdir):
+        err("data/fusions/: cartella mancante (fase 7, US-702).")
+    else:
+        for fn in sorted(f for f in os.listdir(fdir) if f.endswith(".json")):
+            doc = load_json(os.path.join(fdir, fn))
+            if doc is None:
+                continue
+            rel = f"data/fusions/{fn}"
+            fid = doc.get("id")
+            seen_fusions.add(fid)
+            if fn != f"{fid}.json":
+                err(f"{rel}: nome file diverso dall'id '{fid}'")
+            a, b = doc.get("pathway_a"), doc.get("pathway_b")
+            if a not in pathway_group or b not in pathway_group:
+                err(f"{rel}: pathway_a/pathway_b '{a}'/'{b}' non sono Pathway attivi")
+            elif pathway_group[a] != pathway_group[b]:
+                err(f"{rel}: '{a}' e '{b}' non sono dello stesso gruppo "
+                    f"({pathway_group[a]} / {pathway_group[b]}): non sono vicini fondibili")
+            elif doc.get("gruppo") != pathway_group[a]:
+                err(f"{rel}: campo 'gruppo' '{doc.get('gruppo')}' incoerente col gruppo dei Pathway ({pathway_group[a]})")
+            elif fid != f"{min(a, b)}_{max(a, b)}":
+                err(f"{rel}: id '{fid}' non e' '<pathA>_<pathB>' alfabetico ('{min(a, b)}_{max(a, b)}')")
+            is_stub = bool(doc.get("stub"))
+            fuse = doc.get("abilita_fuse", [])
+            if is_stub:
+                fusion_stub += 1
+                if fuse:
+                    err(f"{rel}: marcato stub ma ha abilita_fuse: svuotalo o togli il flag")
+            elif not fuse:
+                err(f"{rel}: non stub ma senza abilita_fuse")
+            for ab in fuse:
+                aid = ab.get("id")
+                dseq = ab.get("da_sequenza")
+                if not isinstance(dseq, int) or not (7 <= dseq <= 9):
+                    err(f"{rel} [{aid}]: da_sequenza '{dseq}' fuori da 7..9 (le Sequenze conservate)")
+                if not str(ab.get("name_i18n", "")).startswith("ability.fusion."):
+                    err(f"{rel} [{aid}]: name_i18n senza prefisso 'ability.fusion.'")
+                for p in ab.get("primitive", []):
+                    tipo = p.get("tipo")
+                    if tipo in deferred_primitives:
+                        err(f"{rel} [{aid}]: primitiva '{tipo}' e' DIFFERITA")
+                    elif tipo not in primitives:
+                        err(f"{rel} [{aid}]: primitiva sconosciuta '{tipo}'")
+                    else:
+                        ignoti = set(p) - {"tipo"} - prim_params[tipo]
+                        if ignoti:
+                            err(f"{rel} [{aid}]: parametri non dichiarati per '{tipo}': {sorted(ignoti)}")
+                    td = p.get("tag_danno")
+                    if td is not None and td not in valid_damage_tags:
+                        err(f"{rel} [{aid}]: tag_danno '{td}' non nel vocabolario")
+                for t in ab.get("tag_sinergia", []):
+                    if t not in valid_tags:
+                        err(f"{rel} [{aid}]: tag_sinergia sconosciuto '{t}'")
+                    obtainable_tags.add(t)
+        _mancanti = sorted(expected_fusions - seen_fusions)
+        if _mancanti:
+            err(f"data/fusions/: mancano i percorsi di fusione {_mancanti} "
+                f"(uno per coppia di Pathway vicini in un gruppo attivo).")
+        _extra = sorted(seen_fusions - expected_fusions)
+        if _extra:
+            err(f"data/fusions/: percorsi di fusione non attesi {_extra} "
+                f"(le coppie devono essere dentro un gruppo attivo).")
+        if fusion_stub:
+            warn(f"{fusion_stub} percorsi di fusione su {len(expected_fusions)} sono stub "
+                 f"dichiarati (fase 7b): contenuto da scrivere, non un errore.")
+
     # --- abilita' ---
     adir = os.path.join(DATA, "abilities")
     ability_ids = set()
