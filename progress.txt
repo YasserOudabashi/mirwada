@@ -6948,3 +6948,53 @@ Generare il PRD con /prd.
 - File .gd toccati: scripts/pages/page_diagramma_pathway.gd (+sezione),
   tests/test_page_diagramma.gd. + assets/i18n/strings.csv e i 2 .translation.
 - Prossima storia: US-709 - CHECKPOINT slice del cambio Pathway + verdetto.
+
+[2026-09-08] US-709 — CHECKPOINT: slice del cambio Pathway + verdetto. FASE 7, BLOCCO A CHIUSO.
+
+- tests/test_slice_fase_7.gd (NUOVO, 2 test — US-720 lo estende col ciclo
+  completo):
+  1. test_error_seq4_diventa_door_seq4_con_abilita_basse_e_fuse:
+     personaggio Error Seq 4. Il test NON nomina "door": scorre pathway_ids,
+     prende il vicino con lo stesso `group` di Error e un percorso di fusione
+     NON vuoto (FusionEngine.percorso). PathwayChange.cambia(vicino) -> ok;
+     Progression su quel Pathway, Sequenza 4 invariata; error_scasso (Error
+     Seq 9) NON e' "abilita_non_posseduta"; la prima abilita fusa e' in
+     EndgameState.fusioni ed esegue con ok:true e nessun warning "primitiva
+     fuori registro".
+  2. test_nessun_codice_nomina_un_pathway_o_una_fusione:
+     grep di res://scripts e res://scripts/pages. vietati: i 10 id di Pathway
+     fra virgolette, "fus_", "door_error", "error_door". Commenti esclusi
+     (split su "#"). UNA eccezione: enemy.gd riproduce l'ANIMAZIONE "death"
+     (riproduci ...), non il Pathway. Risultato: 0 occorrenze.
+  prepara() rimuove i nodi rimasti nel gruppo "player" da altri suite:
+  AbilityEngine.grant_permanente aggancia get_first_node_in_group("player"),
+  il checkpoint deve partire pulito.
+
+- VERDETTO: IL CAMBIO PATHWAY E' DATI.
+  git diff del blocco A, file .gd NON di test (caa4275..HEAD):
+    * scripts/fusion_engine.gd       NUOVO  (62 righe) - nessun id di coppia
+    * scripts/pathway_change.gd      NUOVO  (123 righe) - la relazione "vicini"
+      e' il campo `group`, mai un id
+    * scripts/game_data.gd           +52 -1 - _load_fusions, get_ability con
+      fallback su _fusion_abilities, get_fusion/fusion_ids
+    * scripts/pages/page_diagramma_pathway.gd  +72 - la sezione UISOLO id +
+      tr_data + chiavi HUD
+  AbilityEngine.execute / _esegui_primitive NON modificati:
+    git log caa4275..HEAD -- scripts/ability_engine.gd  ->  (vuoto)
+  Un'abilita fusa e' un'abilita come le altre: ha il campo "primitive", passa
+  dal dispatcher tipo->handler intatto, il giocatore la lancia perche'
+  grant_permanente la mette in _permanenti.
+
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  738 test headless (736 + 2), tutti verdi. Nessuna regressione
+  (test_slice_fase_5b, test_progression, test_pathway_change, test_page_diagramma
+  tutti verdi).
+- File .gd toccati: tests/test_slice_fase_7.gd (nuovo).
+
+=== BLOCCO A CHIUSO (2026-09-08) ===
+US-704..709. Cambio Pathway tra vicini dello stesso gruppo (PathwayChange),
+FusionEngine (compone le abilita fuse da data/fusions/), percorso door_error
+completo (6 abilita fuse), 7 percorsi stub dichiarati, pagina del libro,
+checkpoint superato. 738 test (erano 720 a inizio fase 7). Save invariato in
+questo blocco (endgame gia' a v22 da US-701). AbilityEngine intatto.
+Prossimo: BLOCCO B - US-710 tribulation.schema.json + data/tribulations/.
