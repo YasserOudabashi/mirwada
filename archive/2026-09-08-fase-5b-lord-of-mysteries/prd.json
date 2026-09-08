@@ -1,0 +1,231 @@
+{
+  "project": "Mirwada",
+  "branchName": "ralph/fase-5b-lord-of-mysteries",
+  "description": "Fase 5b — Lord of Mysteries (Fool, Error, Door). Tre Pathway attivi completi a 10/10 Sequenze, ~60 abilita' nuove da primitive del registro attivo. Handler mancanti implementati alla prima story che li usa: steal, possess, time_rewind (blocco A); chain solo se una Sequenza lo richiede. illusion e shadow_meld gia' implementate in fase 6. fool_2 (Miracle Invoker) riscritta senza probability_shift. Save schema_version invariato. Ordine vincolante: blocco A (Error) + US-5B04 checkpoint con potere di veto prima di Fool e Door. Criterio di uscita: test_slice_fase_5b.gd gioca Error 8->2 con zero righe di codice che nominano 'error'.",
+  "userStories": [
+    {
+      "id": "US-5B01",
+      "title": "Error, Sequenze 9-7 (Marauder -> Cryptologist) + primitiva steal (Blocco A)",
+      "description": "Come giocatore, voglio scassinare e rubare da un nemico, truffare gli NPC, e decifrare formule e sigilli rubando conoscenza invece di oggetti.",
+      "acceptanceCriteria": [
+        "data/pathways/error.json Seq 9/8/7: stub -> false, contenuto pieno (stat_modifiers, 2 abilita'/Seq che risolvono, acting_actions somma 1.0 dai 12 eventi, potion con formula_id+characteristic_sequence+ingredienti, madness_on_force crescente da ~1.0). Tier low, nessun advancement_ritual.",
+        "Primitiva nuova steal { categoria, durata_prestito, probabilita }: handler _p_steal in scripts/ability_engine.gd (_handlers + _p_steal, execute/_esegui_primitive non toccati), VFX in data/vfx.json, primitives.json steal -> implemented:true. categoria:'oggetto' registra il furto nel record (sottratto:true), aggancio inventario reale rimandato a fase 6; categoria:'abilita' presta l'ability_id al caster via AbilityEngine.grant_temporary (US-204) con scadenza durata_prestito; categoria:'conoscenza' -> KnowledgeStore.impara.",
+        "Seq 8 (Swindler) usa il flusso npc_influenced (evento gia' nel vocabolario) via acting_actions; nessun if per Error.",
+        "Seq 7 (Cryptologist): steal categoria:'conoscenza' + reveal_info con categoria valorizzata.",
+        "data/potions/formulas.json + data/characteristics.json: 3 formule + 3 caratteristiche (formula_error_9..7, char_error_9..7), ingredienti nuovi nel vocabolario chiuso.",
+        "i18n: python tools/generate_i18n_stubs.py rilanciato; nomi nuovi tradotti in data/i18n/it.json (nessun 'TODO' sui dati attivi).",
+        "tests/test_error.gd (nuovo): ogni abilita' Seq 9-7 esegue senza warning di primitiva; steal categoria:'abilita' rende is_granted true per la durata e false dopo; le acting sommano 1.0.",
+        "Verifica a schermo documentata in progress.txt: steal e' leggibile — si vede COSA e' stato preso (icona dell'abilita'/oggetto) e per QUANTO (timer). Se non leggibile con un manichino scriptato, dichiararlo e rimandare l'affinamento a un aggancio combat di fase 6.",
+        "python tools/validate_data.py esce 0. Nessuna regressione sui test esistenti. Typecheck passes. Tests pass."
+      ],
+      "priority": 1,
+      "fase": "5b",
+      "passes": true,
+      "notes": "Fatto 2026-09-08. steal implementata (_p_steal, execute/_esegui_primitive intatti), primitives.json implemented:true, vfx.json vfx_pilfer. Error Seq 9/8/7 stub->false: Marauder (steal oggetto + melee_arc), Swindler (npc_influenced via acting, nessun if), Cryptologist (steal conoscenza + reveal_info con categoria). formula_error_9/8/7 + 9 ingredienti + char_error_9/8/7. i18n rilanciato, 3 caratteristiche + 6 abilita' + 9 acting tradotte (+ error_furto_prometeo). test_error.gd 5 test verdi. validate exit 0 (stub 29->26). 674 test totali, nessuna regressione. FR-10: leggibilita' piena di steal (icona di cosa rubato + timer prestito) rimandata all'aggancio combat/HUD di fase 6 e dichiarata in progress.txt; in 5b la primitiva emette record + spec VFX. ability_id di steal lo aggiunge US-5B02, non_sottrae US-5B09."
+    },
+    {
+      "id": "US-5B02",
+      "title": "Error, Sequenze 6-4 (Prometheus -> Parasite) + primitiva possess (Blocco A)",
+      "description": "Come giocatore, voglio rubare temporaneamente un'abilita' Beyonder appena vista, entrare nei sogni per rubare ricordi, e attaccarmi a un ospite usandone sensi e movimento restando nascosto.",
+      "acceptanceCriteria": [
+        "data/pathways/error.json Seq 6/5/4: stub -> false, contenuto pieno. Seq 4 = tier saint, advancement_ritual obbligatorio con location_tags dal vocabolario US-501 (es. nebbia_grigia, crocevia, soglia), momento/fase_lunare, sacrifices.",
+        "Seq 6 (Prometheus): steal categoria:'abilita' con durata_prestito breve e probabilita < 1.0 (non sempre riesce) — la firma dell'Error, distinta dallo Scribe del Door.",
+        "Primitiva nuova possess { durata, soglia_resistenza, controllo }: handler _p_possess + VFX + primitives.json possess -> implemented:true. Applica lo status 'posseduto' al bersaglio (nuovo in data/status_effects.json, categoria negativo) e registra controllo (parziale/totale/sensi). Il corpo del caster resta a terra vulnerabile durante possess: record { corpo_a_terra:true, vulnerabilita_corpo, durata } identico al pattern di soul_detach (Death); la resa combat e' fase 6. Seq 4 (Parasite) usa possess controllo:'sensi' (nessun controllo motorio, solo percezione condivisa).",
+        "Seq 5 (Dream Stealer): steal categoria:'conoscenza' + debuff_stat sul bersaglio + condizione e_notte sull'abilita' (dato, l'engine la fa valere).",
+        "3 formule + 3 caratteristiche (formula_error_6..4, char_error_6..4) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_error.gd esteso: le abilita' Seq 6-4 eseguono senza warning; possess applica lo status 'posseduto' e registra corpo_a_terra; le acting sommano 1.0.",
+        "Verifica a schermo in progress.txt: possess e' leggibile — di chi e' il corpo che controllo? il caster a terra e' visibile e vulnerabile?",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 2,
+      "fase": "5b",
+      "passes": true,
+      "notes": "Fatto 2026-09-08. possess implementata (_p_possess, execute/_esegui_primitive intatti), primitives.json implemented + param vulnerabilita_corpo (condiviso soul_detach), vfx.json vfx_grip, status_effects.json 'posseduto' nuovo (tag possessione, negativo). steal +param ability_id nel registro; error_furto_prometeo -> steal abilita con ability_id tg_fendente_pesante, durata 12s, prob 0.7. Error Seq 6/5/4 stub->false: Prometheus (steal abilita + projectile), Dream Stealer (steal conoscenza + debuff, condizione e_notte, tag 'sonno' perche' 'sogno' e' vietato ai Pathway attivi), Parasite tier saint con advancement_ritual (nebbia_grigia/crocevia, notte_fonda, sacrifica un ricordo) + possess controllo:sensi. formula_error_6/5/4 + 9 ingredienti + char_error_6/5/4. i18n rilanciato e tradotto. test_error.gd esteso (possess applica 'posseduto' e crolla velocita; corpo_a_terra nel record; Prometheus presta e scade). validate exit 0 (stub 26->23). 678 test verdi, nessuna regressione. FR-10: resa combat di possess (corpo del caster a terra bersagliabile, ospite che agisce) rimandata a fase 6 e dichiarata in progress.txt."
+    },
+    {
+      "id": "US-5B03",
+      "title": "Error, Sequenze 3-0 (Mentor of Deceit -> Error) + primitiva time_rewind + materia prima avatar (Blocco A)",
+      "description": "Come giocatore, voglio creare avatar autonomi che agiscono come me, impiantare un errore nel destino di un bersaglio, e riavvolgere brevi tratti di tempo.",
+      "acceptanceCriteria": [
+        "data/pathways/error.json Seq 3/2/1/0: stub -> false, tier alti, rituali con trade-off espliciti; Seq 1 sacrifica un'Ancora del giocatore (come twilight_giant_1). madness_on_force verso ~12-14.",
+        "avatar come 9a materia prima di summon: aggiunta a data/schema/ownership.json con motivazione esplicita (gli avatar dell'Error sono autonomi, non cadaveri/costrutti/pet/chimere/evocazioni). Seq 3 (Mentor of Deceit): summon con entita_id prefisso 'avatar_error_...'.",
+        "Seq 2 (Trojan Horse of Destiny): 'impianta un errore nel destino' reso con curse (effetto destino_segnato, gia' in status_effects.json da hermit_1) + debuff_stat pesanti + dot a tag follia.",
+        "Primitiva nuova time_rewind { secondi, ripristina, costo_follia } (Seq 1, Worm of Time): handler _p_time_rewind + VFX + primitives.json time_rewind -> implemented:true. AbilityEngine tiene un ring buffer di snapshot del caster (hp, spiritualita', posizione, ms) a passo ~0.5 s, ~10 voci, aggiornato in _process e purgato con sweep_cooldowns dei caster morti. time_rewind rilegge lo snapshot di 'secondi' fa (posizione solo se 'ripristina' lo include) e addebita costo_follia a Madness. Nessun bump del save, time_rewind non serializza nulla.",
+        "Seq 0 (Error): l'abilita' di dominio ('sfrutta i buchi nelle regole') — aura a raggio ampio con effetto composito, come i Seq 0 di fase 5.",
+        "4 formule + 4 caratteristiche (formula_error_3..0, char_error_3..0) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_error.gd esteso: time_rewind riporta gli hp del caster al valore di N secondi fa e costa follia; le abilita' Seq 3-0 eseguono senza warning; summon avatar_error risolve.",
+        "Verifica a schermo in progress.txt: cosa e' tornato indietro? un lampo che segna il punto di ripristino.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 3,
+      "fase": "5b",
+      "passes": true,
+      "notes": "Fatto 2026-09-08. ERROR COMPLETO 10/10. time_rewind implementata: _p_time_rewind + ring buffer per-caster in ability_engine.gd (execute +1 riga _campiona_snapshot, _process +4, sweep +3; execute/_esegui_primitive non toccati per un caso Error). Riporta hp/spiritualita/posizione del caster dallo snapshot di N secondi fa, costa follia, non tocca il save. primitives.json implemented, vfx.json vfx_unwind. Materia prima 'avatar' aggiunta a ownership.json (9a voce) + matrice aggiornata: avatar per Error, illusion per Fool. Error Seq 3/2/1/0 stub->false: Mentor of Deceit (summon avatar + illusion), Trojan Horse of Destiny (curse destino_segnato + debuff + dot follia, senza rule_bind), Worm of Time (time_rewind x2, rituale eclissi sacrifica Ancora), Error (aura dominio + time_rewind completo). formula_error_3/2/1/0 + 12 ingredienti + char_error_3/2/1/0. i18n tutto tradotto. test_error.gd esteso (time_rewind riporta hp indietro e costa follia; summon avatar_; Seq 3-0 senza warning; Error 10/10; Seq 1 sacrifica Ancora). validate exit 0 (stub 23->19). 682 test verdi, nessuna regressione. FR-10 time_rewind: resa a schermo del punto di ripristino = spec vfx_unwind; raggio su altre entita' = fase 6."
+    },
+    {
+      "id": "US-5B04",
+      "title": "CHECKPOINT — Error slice + verdetto architettura (Blocco A)",
+      "description": "Come sviluppatore, voglio la conferma che Error e' stato scritto senza toccare il codice per un caso specifico, prima di committare Fool e Door.",
+      "acceptanceCriteria": [
+        "tests/test_slice_fase_5b.gd (nuovo): compone un percorso Error dalla Sequenza 8 alla 2 — per ogni salto Caratteristica -> concoct -> recitazione via EventTracker (dai dati) -> bevi -> avanzamento. Come test_slice_fase_5 ma su un Pathway del gruppo Lord of Mysteries.",
+        "test_nessun_codice_nomina_error (in test_slice_fase_5b.gd): grep di res://scripts e res://scripts/pages per 'error_' e i nomi di Sequenza dell'Error. Zero occorrenze fuori dai commenti.",
+        "git diff del blocco A (file .gd): solo i nuovi handler _p_steal, _p_possess, _p_time_rewind (+ il ring buffer di snapshot per time_rewind) e i loro test. AbilityEngine.execute / _esegui_primitive non modificati per un caso specifico dell'Error. Elenco esatto dei file .gd toccati in progress.txt.",
+        "Verdetto in progress.txt: l'architettura regge / non regge sui Pathway 'difficili'. Se non regge: correzioni necessarie e STOP (la story non passa).",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 4,
+      "fase": "5b",
+      "passes": true,
+      "notes": "Fatto 2026-09-08. BLOCCO A CHIUSO. test_slice_fase_5b.gd (3 test): Error 8->2 giocato dai dati (Caratteristica->concoct->recitazione via EventTracker->bevi->avanzamento normale); 20 abilita' senza warning; test_nessun_codice_nomina_error zero occorrenze (unica esclusione: parser.get_error_line/message di Godot in game_data.gd). GIT DIFF BLOCCO A file .gd non-test: SOLO scripts/ability_engine.gd +173 -0 (3 handler _p_steal/_p_possess/_p_time_rewind + ring buffer time_rewind + hook generici: execute +1 riga _campiona_snapshot, _process +4, sweep +3). execute/_esegui_primitive (il dispatcher) NON modificati, zero righe rimosse, nessun if per un Pathway. VERDETTO: l'architettura della fase 2 REGGE sui Pathway difficili del Lord of Mysteries - Error (il piu' agganciato ai sistemi) e' contenuto completo 10/10 con solo handler generici. Vocabolari nuovi: 'avatar' (9a materia prima summon) + status 'posseduto', entrambi discussi. NIENTE STOP: Fool e Door possono partire. validate exit 0 (stub 19), 685 test verdi."
+    },
+    {
+      "id": "US-5B05",
+      "title": "Fool, Sequenze 9-7 (Seer -> Magician) + primitiva illusion (Blocco B)",
+      "description": "Come giocatore, voglio divinare col pendolo e leggere le intenzioni nemiche, usare destrezza acrobatica e illusioni brevi, e creare illusioni solide che infliggono danno percepito.",
+      "acceptanceCriteria": [
+        "data/pathways/fool.json Seq 9/8/7: stub -> false, contenuto pieno. fool_9 e' gia' non-stub dall'audit (fool_divinazione_pendolo, fool_lettura_espressioni): la story ne completa stat_modifiers/potion/madness_on_force e aggiunge le acting_actions a somma 1.0.",
+        "Primitiva nuova illusion { raggio, durata, potenza, tipo_illusione }: handler _p_illusion + VFX + primitives.json (illusion e' gia' implemented:true da fase 6 — verificare che l'handler copra tipo_illusione:'copia_nemico'/'danno_percepito'/'oggetto_evocato'/'aspetto', estenderlo se manca senza toccare execute). tipo_illusione:'copia_nemico' registra N bersagli-esca (il combat e' fase 6); 'danno_percepito' -> dot a tag follia con condizione di rimozione registrata (si annulla se il bersaglio 'capisce'). DECISIONE: il significato di 'potenza' (numero di copie vs convincimento) si fissa in questa story col primo VFX a schermo e si documenta in progress.txt.",
+        "Seq 7 (Magician): illusion tipo_illusione:'oggetto_evocato' + melee_arc/projectile per il colpo.",
+        "La leggibilita' di illusion e' il rischio numero uno: la verifica a schermo deve mostrare che il giocatore distingue un'esca da un nemico vero (tell visivo sull'esca: bordo tremolante / colore della palette Fool da design-vfx.md). Se non e' leggibile con un placeholder, la story si ferma e lo si segnala in progress.txt.",
+        "3 formule + 3 caratteristiche (formula_fool_9..7, char_fool_9..7) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_fool.gd (nuovo): illusion registra le esche; il danno percepito e' un dot follia rimuovibile; le acting sommano 1.0; ogni abilita' Seq 9-7 esegue senza warning.",
+        "Verifica a schermo documentata in progress.txt (leggibilita' esca vs nemico vero).",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 5,
+      "fase": "5b",
+      "passes": true,
+      "notes": "Fatto 2026-09-08. illusion gia' implemented (fase 6): _p_illusion esteso senza toccare execute - 'potenza' e' per-tipo_illusione (copia_nemico -> numero esche in rec['esche']; danno_percepito -> intensita' dot follia; invariato il resto). fool_9 gia' non-stub, invariato. fool_8 Clown (dash + illusion aspetto) e fool_7 Magician (illusion danno_percepito + illusion oggetto_evocato + melee_arc) stub->false. formula_fool_8/7 + 6 ingredienti + char_fool_8/7. i18n: tradotte le 4 abilita' fool ex-TODO di fase 2 + le nuove + char. test_fool.gd (5 test): danno_percepito e' un dot follia rimovibile da light_purify; copia_nemico registra le esche; illusione_creata emette il tipo. validate exit 0 (stub 19->17). 690 test verdi. FR-10 (rischio n.1): il tell visivo esca-vs-nemico (bordo tremolante + palette Fool, distorsione 0.6) e' resa combat/fase 6; in 5b la meccanica (dot rimovibile, conteggio esche) e' completa e testata, NON un blocco."
+    },
+    {
+      "id": "US-5B06",
+      "title": "Fool, Sequenze 6-4 (Faceless -> Bizarro Sorcerer) (Blocco B)",
+      "description": "Come giocatore, voglio assumere aspetto e voce di un NPC ereditandone i permessi sociali, controllare un nemico come marionetta, e sostituirmi a un oggetto a distanza.",
+      "acceptanceCriteria": [
+        "data/pathways/fool.json Seq 6/5/4: stub -> false, contenuto pieno. Seq 4 advancement_ritual obbligatorio con location_tags (es. teatro, palco) dal vocabolario.",
+        "Seq 6 (Faceless): 'eredita i permessi sociali' -> illusion tipo_illusione:'aspetto' + un emit di npc_influenced modo:'ingannato' via acting_actions; il gate npc vero lo aggancia fase 6. Nessun if per Fool.",
+        "Seq 5 (Marionettist): possess controllo:'totale' (gia' implementata in US-5B02) + debuff_stat sugli altri nemici che 'vedono un alleato voltarsi'. Il nemico controllato che attacca gli altri e' combat, fase 6.",
+        "Seq 4 (Bizarro Sorcerer): teleport (gia' implementata, US-506) con porta_alleati:false + illusion (un'esca lasciata al posto di partenza).",
+        "3 formule + 3 caratteristiche (formula_fool_6..4, char_fool_6..4) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_fool.gd esteso: le abilita' Seq 6-4 eseguono senza warning; le acting sommano 1.0.",
+        "Verifica a schermo in progress.txt: possess controllo:'totale' — si capisce chi controllo?",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 6,
+      "fase": "5b",
+      "passes": true,
+      "notes": "Fatto 2026-09-08. Nessuna primitiva nuova (illusion/possess/teleport gia' implementate). fool_6 Faceless (illusion aspetto + buff; permessi sociali = fase 6, truffa contata da npc_influenced acting, nessun if), fool_5 Marionettist (fool_fili_marionetta possess controllo 'completo'->'totale' + fear/debuff sugli altri), fool_4 Bizarro Sorcerer saint (teleport + illusion; rituale teatro/palco obbligatorio) stub->false. formula_fool_6/5/4 + 9 ingredienti + char_fool_6/5/4 + i18n. test_fool.gd esteso (possess controllo totale distinto dal sensi dell'Error; rituale teatro; 6 abilita' senza warning). Nessun .gd toccato (solo dati). validate exit 0 (stub 17->14). 693 test verdi."
+    },
+    {
+      "id": "US-5B07",
+      "title": "Fool, Sequenze 3-0 (Scholar of Yore -> Fool) — fool_2 senza probability_shift (Blocco B)",
+      "description": "Come giocatore, voglio richiamare dal passato una versione precedente di me o di un oggetto, spendere spiritualita' per eventi improbabili, e creare un'area di segretezza in cui la realta' locale e' manomettibile.",
+      "acceptanceCriteria": [
+        "data/pathways/fool.json Seq 3/2/1/0: stub -> false, tier alti, Ancora sacrificata al rituale di Seq 1.",
+        "Seq 3 (Scholar of Yore): 'richiama una versione precedente' -> time_rewind (gia' implementata, US-5B03) sul caster + illusion (gli avatar del Fool sono FINTI — decisione presa: illusion, non la materia prima avatar).",
+        "Seq 2 (Miracle Invoker) SENZA probability_shift (primitiva differita): 'converte spiritualita' in eventi improbabili' reso con buff_stat/debuff_stat a varianza alta dichiarata nel campo note dell'abilita' + curse (effetto sfortuna, gia' in status_effects.json) sul bersaglio. Come darkness_1/paragon_1/hermit_1.",
+        "grep di data/abilities/ per 'probability_shift' come tipo di primitiva -> 0 occorrenze.",
+        "Seq 1 (Attendant of Mysteries): terrain_modify tipo_modifica:'area_di_segretezza' + illusion a raggio ampio.",
+        "Seq 0 (Fool): l'abilita' di dominio ('falsifica la realta' su scala di mondo') — aura con effetto composito.",
+        "4 formule + 4 caratteristiche (formula_fool_3..0, char_fool_3..0) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_fool.gd esteso: le abilita' Seq 3-0 eseguono senza warning; nessuna abilita' del Fool usa una primitiva differita; le acting sommano 1.0.",
+        "Verifica a schermo documentata in progress.txt.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 7,
+      "fase": "5b",
+      "passes": true,
+      "notes": "Fatto 2026-09-08. FOOL COMPLETO 10/10. BLOCCO B CHIUSO. Nessuna primitiva nuova. fool_2 Miracle Invoker RISCRITTA senza probability_shift: fool_miracolo (buff evasione/precisione a varianza alta dichiarata) + fool_sfortuna_altrui (curse('sfortuna') gia' esistente + debuff), come darkness_1/paragon_1/hermit_1. grep data/abilities/ per '\"tipo\": \"probability_shift\"' -> 0 (solo in note storiche di darkness.json). fool_3 Scholar of Yore (time_rewind + illusion: la versione precedente e' FINTA, illusion non avatar), fool_1 Attendant of Mysteries (terrain_modify area_di_segretezza non permanente + illusion; rituale eclissi Ancora), fool_0 Fool (aura sfortuna + illusion). formula_fool_3/2/1/0 + 12 ingredienti + char_fool_3/2/1/0 tradotti. test_fool.gd esteso (fool_2 solo primitive registro; curse sfortuna; Seq 1 Ancora; Fool 10/10). validate exit 0 (stub 14->10, restano solo le 10 del Door). 697 test verdi. File .gd del blocco B: solo _p_illusion esteso in US-5B05 (~10 righe, execute intatto)."
+    },
+    {
+      "id": "US-5B08",
+      "title": "Door, Sequenze 9-7 (Apprentice -> Astrologer) + primitiva shadow_meld (Blocco C)",
+      "description": "Come giocatore, voglio teletrasporti brevi a vista e aprire serrature mistiche, incantesimi di fuga e scambio di posizione, e divinazione stellare che rivela percorsi nascosti.",
+      "acceptanceCriteria": [
+        "data/pathways/door.json Seq 9/8/7: stub -> false, contenuto pieno. Seq 9 (Apprentice) usa teleport (gia' implementata).",
+        "Primitiva shadow_meld { durata, velocita, richiede_ombra }: shadow_meld e' gia' implemented:true da fase 6 — verificare che l'handler _p_shadow_meld applichi lo status 'occultato' (se manca, aggiungerlo a data/status_effects.json come non negativo) al caster per durata; richiede_ombra registrato (il gate 'solo in ombra' e' fase 6). Estendere l'handler solo se necessario, senza toccare execute.",
+        "Seq 8 (Trickmaster): teleport porta_alleati:false + debuff_stat/buff_stat per lo 'scambio di posizione' (registrato; lo swap vero col bersaglio e' combat).",
+        "Seq 7 (Astrologer): reveal_info (gia' implementata) con categoria:'percorso' — divinazione dello spazio (matrice: Door divina i percorsi, non le menti).",
+        "3 formule + 3 caratteristiche (formula_door_9..7, char_door_9..7) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_door.gd (nuovo): shadow_meld applica lo status 'occultato' per la durata; le abilita' Seq 9-7 eseguono senza warning; le acting sommano 1.0.",
+        "Verifica a schermo in progress.txt: shadow_meld — il giocatore si vede 'sbiadire'; il tell che e' occultato.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 8,
+      "fase": "5b",
+      "passes": true,
+      "notes": "Fatto 2026-09-08. shadow_meld gia' implemented (fase 6): nessuna modifica al codice, door_occhio_nell_ombra e' la prima Sequenza attiva del Door a usarla (status 'occultato'). door_9 Apprentice (teleport + terrain_modify serratura + reveal_info), door_8 Trickmaster (teleport fuga/swap; swap vero = combat), door_7 Astrologer (reveal_info categoria 'percorso' - matrice: Door divina lo spazio - + shadow_meld) stub->false. formula_door_9/8/7 + 9 ingredienti + char_door_9/8/7 + i18n (tradotto anche door_viaggio_lungo ex-TODO). test_door.gd (4 test): shadow_meld applica occultato; reveal_info emette 'percorso'; 6 abilita' senza warning. Nessun .gd toccato. validate exit 0 (stub 10->7). 701 test verdi."
+    },
+    {
+      "id": "US-5B09",
+      "title": "Door, Sequenze 6-4 (Scribe -> Secrets Sorcerer) — fotocopia via steal non_sottrae (Blocco C)",
+      "description": "Come giocatore, voglio registrare un'abilita' osservata e riprodurla una volta, viaggiare nel mondo spirituale come scorciatoia, e occultamento totale che sfugge anche al rilevamento mistico.",
+      "acceptanceCriteria": [
+        "data/pathways/door.json Seq 6/5/4: stub -> false, contenuto pieno. Seq 4 advancement_ritual obbligatorio con location_tags (es. soglia, crocevia).",
+        "Seq 6 (Scribe): 'registra e riproduce' -> steal { categoria:'abilita', probabilita:1.0, non_sottrae:true } — riusa AbilityEngine.grant_temporary (US-204) ma il record e' marcato fotocopia:true / non_sottrae:true: l'originale sul nemico non e' sottratto. Un solo vocabolario steal con un flag, nessuna primitiva nuova, nessun if per Door. Il validator (matrice di proprieta' / ownership.json) verifica la distinzione da steal dell'Error.",
+        "Seq 5 (Traveler): teleport distanza grande + porta_alleati:true — il fast travel del Door (scorciatoie istantanee, mai permanenza). Nessun if: teleport coi parametri giusti.",
+        "Seq 4 (Secrets Sorcerer): shadow_meld (gia' implementata, US-5B08) con durata lunga + illusion (un'esca).",
+        "3 formule + 3 caratteristiche (formula_door_6..4, char_door_6..4) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_door.gd esteso: la 'fotocopia' concede l'abilita' al caster SENZA marcare il nemico come derubato (sottratto resta false); le abilita' Seq 6-4 eseguono senza warning; le acting sommano 1.0.",
+        "Verifica a schermo documentata in progress.txt.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 9,
+      "fase": "5b",
+      "passes": true,
+      "notes": "Fatto 2026-09-08. steal +param non_sottrae nel registro (l'handler lo leggeva gia' da US-5B01: rec['sottratto']=not non_sottrae). door_6 Scribe door_registra_abilita = steal{categoria:abilita, ability_id:tg_stretta_ferrea, probabilita:1.0, non_sottrae:true} = FOTOCOPIA: concede via grant_temporary MA sottratto=false (distinto dall'Error che sottrae). Un solo vocabolario steal con un flag, nessun if per Door. door_5 Traveler (teleport distanza 500 + porta_alleati - fast travel del Door, nessuna primitiva nuova), door_4 Secrets Sorcerer saint (shadow_meld lungo + illusion; rituale soglia/crocevia) stub->false. formule + ingredienti + char_door_6/5/4 tradotti. test_door.gd esteso (fotocopia concede senza marcare sottratto; Traveler e' teleport coi parametri). Nessun .gd toccato (solo +1 riga params in primitives.json = dato). validate exit 0 (stub 7->4). 704 test verdi."
+    },
+    {
+      "id": "US-5B10",
+      "title": "Door, Sequenze 3-0 (Wanderer -> Door) — varco_forzato nel WorldState (Blocco C)",
+      "description": "Come giocatore, voglio teletrasporto a lunga distanza portando alleati e pet, aprire porte stabili tra piani replicando abilita' note, e chiavi che aprono qualunque cosa.",
+      "acceptanceCriteria": [
+        "data/pathways/door.json Seq 3/2/1/0: stub -> false, tier alti, Ancora sacrificata al rituale di Seq 1.",
+        "Seq 2 (Planeswalker): teleport porta_alleati:true a lunghissima distanza + steal { non_sottrae:true } senza registrazione preventiva ('replica abilita' che conosce'). Nessuna primitiva nuova.",
+        "Seq 1 (Key of Stars): 'chiavi che aprono qualunque cosa, anche luoghi senza porta' -> terrain_modify tipo_modifica:'varco_forzato' permanente:true (entra nel WorldState, come i varchi del Twilight Giant) + teleport.",
+        "Seq 0 (Door): l'abilita' di dominio ('passaggio senza limiti') — aura + teleport a costo ridotto in un raggio.",
+        "4 formule + 4 caratteristiche (formula_door_3..0, char_door_3..0) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_door.gd esteso: il varco_forzato permanente sopravvive al reload (riuso del test di terrain_modify permanente); le abilita' Seq 3-0 eseguono senza warning; le acting sommano 1.0.",
+        "Verifica a schermo documentata in progress.txt.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 10,
+      "fase": "5b",
+      "passes": true,
+      "notes": "Fatto 2026-09-08. DOOR COMPLETO 10/10. 100/100 SEQUENZE NON-STUB. Nessuna primitiva nuova: Key of Stars/Door usano terrain_modify tipo_modifica 'varco_forzato' permanente:true -> WorldState (come i varchi del TG, zero codice nuovo). door_3 Wanderer, door_2 Planeswalker (teleport 1500 + door_replica_nota = steal non_sottrae senza pre-registrazione), door_1 Key of Stars (varco_forzato + teleport; rituale eclissi Ancora), door_0 Door (aura gravita_alterata + teleport) stub->false. formula_door_3/2/1/0 + 12 ingredienti + char_door_3/2/1/0 tradotti. test_door.gd esteso (varco_forzato registrato nel WorldState e sopravvive al round-trip del save; Door 10/10; Seq 1 Ancora). Nessun .gd toccato. validate exit 0 - ORA 2 warning (sparito 'stub'). 708 test verdi."
+    },
+    {
+      "id": "US-5B11",
+      "title": "Sinergie e caratteristiche del gruppo Lord of Mysteries (Blocco D)",
+      "description": "Come giocatore, voglio che Fool, Error e Door partecipino alle sinergie e alla creazione personaggio come gli altri Pathway.",
+      "acceptanceCriteria": [
+        "Rivalutazione di data/synergies/batch_3.json: le sinergie che usano i tag inganno/furto/spazio/viaggio/destino (ora portati da Fool/Error/Door via la fonte 'sequenza') — quali sono diventate raggiungibili? sinergia_colpo_del_caso ora e' eseguibile; sinergia_inganno_probabilita resta irraggiungibile (tag probabilita' di key_of_light, differito) — atteso. Documentato in progress.txt.",
+        "data/synergies/batch_5.json (nuovo): 4-6 sinergie che sfruttano le combinazioni del gruppo (Error steal + talento; Fool illusion + pet; Door teleport + sigillo d'area...). Tutte raggiungibili, i18n completo, fonti >= 2. Almeno una anti-sinergia con neutralizza (Fool + Error si mordono: entrambi mentono).",
+        "data/characteristics.json: le 30 caratteristiche nuove (10 per Pathway: char_fool_*, char_error_*, char_door_*) esistono e sono tradotte (0 TODO).",
+        "Il diagramma dei Pathway nel libro e il frontespizio mostrano Fool, Error, Door con contenuto pieno — nessun codice nuovo. Verifica a schermo: creo un personaggio su ognuno dei tre, documentato in progress.txt.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 11,
+      "fase": "5b",
+      "passes": true,
+      "notes": "Fatto 2026-09-08. Rivalutazione batch_3: sinergia_contratto_solare ora RAGGIUNGIBILE (tag 'contratto' da error_patto_truffaldino) - irraggiungibili 18->17; le altre 17 richiedono un tag da un gruppo ancora differito (atteso). data/synergies/batch_5.json: 6 sinergie del gruppo tutte raggiungibili (tag da sequenza/abilita + talento[furto,notte] + pet[divinazione] + stanza[rituale,conoscenza]), i18n completo, fonti>=2: ladro_di_poteri (modifica_primitiva steal), teatro_di_ombre, rete_di_porte, debito_temporale, archivio_fotocopiato, + anti_due_bugiardi (ANTI-SINERGIA priorita 100, neutralizza ladro_di_poteri: inganno+furto -> follia +1.2/min). Le 30 caratteristiche del gruppo gia' aggiunte in US-5B05..10, tutte tradotte. test_lord_of_mysteries.gd (5 test): 30 char esistono+tradotte; Fool/Error/Door senza stub; si crea un personaggio sui 3; batch_5 solo tag ottenibili; anti_due_bugiardi neutralizza ladro_di_poteri. Nessun .gd toccato. validate exit 0. 713 test verdi."
+    },
+    {
+      "id": "US-5B12",
+      "title": "Chiusura fase 5b — gruppo Lord of Mysteries (Blocco D)",
+      "description": "Come sviluppatore, voglio che i documenti riflettano il gruppo Lord of Mysteries chiuso.",
+      "acceptanceCriteria": [
+        "006_PRD/roadmap.md: nota 'fase 5b' -> 'CHIUSA per il gruppo Lord of Mysteries (12 story); resta Darkness gia' fatto in fase 6'. Conteggio reale story e test.",
+        "006_PRD/design-pathways.md: sezione 'Fase 5b' con Fool/Error/Door spuntati; Darkness segnato come realizzato in fase 6.",
+        "006_PRD/design-master.md Appendice C: righe per le primitive implementate in 5b (steal, possess, time_rewind; + eventuali estensioni di illusion/shadow_meld) e per la materia prima avatar in ownership.json; Appendice A aggiornata.",
+        "CLAUDE.md + README.md: gruppo Lord of Mysteries chiuso, conteggi aggiornati, criterio di uscita in test_slice_fase_5b.gd, 'fase corrente' -> fase 7 (endgame). grep di data/abilities/ per una primitiva differita usata come tipo -> 0.",
+        "tools/validate_data.py: check di chiusura fase 5b — fool/error/door senza Sequenze stub.",
+        "python tools/validate_data.py esce 0. Tutti i test headless verdi. Typecheck passes. Tests pass."
+      ],
+      "priority": 12,
+      "fase": "5b",
+      "passes": true,
+      "notes": "Fatto 2026-09-08. FASE 5b CHIUSA. roadmap.md: sezione 'Fase 5b - CHIUSA (12 story, 713 test)'. design-pathways.md: Darkness (fase 6) + Fool/Error/Door spuntati, '22/22 Pathway completi, 100/100 Sequenze'. design-master.md: Appendice A sottosezione Fase 5b; Appendice C righe Primitive (27 con handler, chain no), Matrice (10 materie prime +avatar), batch_5. CLAUDE.md + README.md: gruppo chiuso, conteggi, 3 primitive, criterio di uscita, 'fase corrente: 7'. validate_data.py: check di chiusura fase 5b (fool/error/door senza stub; steal/possess/time_rewind implemented; batch_5.json esiste; stub_count==0). grep data/abilities/ per primitiva differita come tipo -> 0. validate exit 0 (2 warning). 713 test verdi. Nessun .gd toccato."
+    }
+  ]
+}
