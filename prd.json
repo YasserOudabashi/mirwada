@@ -30,8 +30,8 @@
       ],
       "priority": 2,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. fusion.schema.json + 8 file data/fusions/ (id <pathA>_<pathB> alfabetico, gruppo come campo - deviazione motivata dal pattern del PRD). Tutti stub, door_error lo scrive US-706. validate_data.py: nuova sezione fusioni (percorsi attesi = coppie dentro un gruppo attivo = 8; controlli su abilita_fuse non-stub uguali alle abilita; warning stub; errore se manca/non atteso). test_fusion.gd 2 test. validate exit 0 (3 warning). 718 test verdi."
     },
     {
       "id": "US-703",
