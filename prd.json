@@ -110,8 +110,8 @@
       ],
       "priority": 7,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. I 7 file stub esistevano gia' da US-702 (stub:true, abilita_fuse:[], 'note' col concept in una riga); il check del validator (warning 'N su 8 stub', errore se un percorso possibile manca o e' non atteso) e' di US-702. Questa storia aggiunge le prove del comportamento: tests/test_fusion.gd +1 (i 7 percorsi diversi da door_error sono stub:true, abilita_fuse vuoto, note non vuota); tests/test_pathway_change.gd +1 (Hermit Seq 4 -> Paragon, percorso hermit_paragon stub: cambio ok:true, abilita basse conservate lo stesso, EndgameState.fusioni resta []). FusionEngine.percorso/applica_al_cambio gia' ritornavano {}/[] per uno stub (US-705). validate exit 0. 732 test verdi."
     },
     {
       "id": "US-708",

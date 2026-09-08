@@ -6883,3 +6883,25 @@ Generare il PRD con /prd.
   test_vfx invariati).
 - File .gd toccati: nessuno (dati + i18n + tests). AbilityEngine intatto.
 - Prossima storia: US-707 - gli altri 7 percorsi come stub + check validator.
+
+[2026-09-08] US-707 — Gli altri 7 percorsi come stub + check del validator. FASE 7, BLOCCO A.
+
+- I 7 file stub (darkness_death, darkness_twilight_giant, death_twilight_giant,
+  door_fool, error_fool, hermit_paragon, moon_mother) esistono da US-702:
+  stub:true, abilita_fuse:[], 'note' col concept in una riga. Il check del
+  validator (warning "N percorsi di fusione su 8 sono stub"; errore se un
+  percorso possibile manca del tutto o se ce n'e' uno non atteso) e' gia' in
+  tools/validate_data.py da US-702. FusionEngine.percorso() ritorna {} per uno
+  stub, applica_al_cambio() ritorna [] (US-705).
+- Questa storia aggiunge le PROVE del comportamento:
+  * tests/test_fusion.gd test_gli_altri_7_percorsi_sono_stub_dichiarati_con_una_nota:
+    ogni percorso != door_error ha stub:true, abilita_fuse vuoto, note non vuota.
+  * tests/test_pathway_change.gd test_cambio_verso_percorso_stub_riesce_senza_fusioni:
+    Hermit Seq 4 -> Paragon (percorso hermit_paragon, stub): cambia() -> ok:true,
+    Progression su "paragon", res.conservate non vuoto, EndgameState.fusioni
+    resta []. Il cambio verso un vicino funziona anche senza percorso scritto:
+    conserva le abilita basse, solo non concede abilita fuse.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  732 test headless (730 + 2), tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (solo tests).
+- Prossima storia: US-708 - pagina del libro per il cambio di Pathway.

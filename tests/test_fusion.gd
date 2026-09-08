@@ -107,6 +107,17 @@ func test_door_error_non_e_piu_stub() -> void:
 		assert_true(gd.call("has_translation", key), "%s: tradotta (non TODO)" % key)
 
 
+func test_gli_altri_7_percorsi_sono_stub_dichiarati_con_una_nota() -> void:
+	for fid in PERCORSI:
+		if fid == "door_error":
+			continue
+		var doc: Dictionary = JSON.parse_string(
+			FileAccess.get_file_as_string("res://data/fusions/%s.json" % fid))
+		assert_true(bool(doc.get("stub", false)), "%s: stub true" % fid)
+		assert_eq((doc.get("abilita_fuse", []) as Array).size(), 0, "%s: abilita_fuse vuoto" % fid)
+		assert_false(str(doc.get("note", "")).is_empty(), "%s: ha una nota che spiega il concept" % fid)
+
+
 func test_ogni_abilita_fusa_door_error_esegue_senza_primitiva_fuori_registro() -> void:
 	var e: Node = Engine.get_main_loop().root.get_node("AbilityEngine")
 	e.call("clear_cooldowns")

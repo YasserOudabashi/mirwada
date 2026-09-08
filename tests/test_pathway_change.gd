@@ -81,3 +81,17 @@ func test_dopo_il_cambio_le_abilita_basse_del_vecchio_pathway_restano() -> void:
 	var r2: Dictionary = e.call("execute", "door_occultamento_totale", g)
 	assert_ne(r2["reason"], "abilita_non_posseduta", "door_4 posseduta sul nuovo Pathway")
 	_cleanup(g)
+
+
+# --- US-707: cambio verso un vicino con percorso di fusione stub --------
+
+func test_cambio_verso_percorso_stub_riesce_senza_fusioni() -> void:
+	var g: Node2D = _giocatore()
+	var eg: Node = Engine.get_main_loop().root.get_node("EndgameState")
+	_prog().configura("hermit", 4)
+	var res: Dictionary = _pc().call("cambia", "paragon")
+	assert_true(res["ok"], "Hermit -> Paragon: cambio riuscito (stesso gruppo)")
+	assert_eq(_prog().call("pathway"), "paragon", "ora su Paragon")
+	assert_gt(float((res["conservate"] as Array).size()), 0.0, "abilita basse conservate lo stesso")
+	assert_eq((eg.get("fusioni") as Array).size(), 0, "percorso stub: endgame.fusioni resta []")
+	_cleanup(g)
