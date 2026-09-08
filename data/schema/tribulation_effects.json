@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO di cosa fa una tribolazione MENTRE E' IN CORSO (fase 7, US-703). Una tribolazione e' la prova a un salto di fascia (Seq 7->6, 5->4, 3->2, 1->0): TribulationSystem la attiva, blocca l'avanzamento finche' 'superamento' non e' raggiunto, e applica UNO di questi effetti come handicap. NON e' un evento tracciato: e' uno stato temporaneo, come uno status. L'effetto si toglie al superamento. Aggiungere una voce e' codice (TribulationSystem ha un ramo per ognuna): va discusso.",
+  "effetti": {
+    "follia_accelerata": {
+      "_comment": "La follia sale piu' in fretta mentre la prova e' aperta: Madness guadagna un delta_al_minuto extra. La soglia non calava mai, ora sale.",
+      "parametro": "delta_al_minuto",
+      "default": 1.5
+    },
+    "spiritualita_dimezzata": {
+      "_comment": "Il tetto di spiritualita' e' dimezzato: si combatte con meta' delle risorse. Modificatore per id su spiritualita_max, tolto al superamento.",
+      "parametro": "moltiplicatore",
+      "default": 0.5
+    },
+    "nemici_rinforzati": {
+      "_comment": "Gli spawn della densita' mistica arrivano piu' spesso e piu' forti finche' la prova e' aperta. Riusa i moltiplicatori di densita_mistica di balance.json.",
+      "parametro": "moltiplicatore_spawn",
+      "default": 1.6
+    },
+    "abilita_bloccate": {
+      "_comment": "Le abilita' della Sequenza corrente sono inagibili: si affronta la prova solo con quelle delle Sequenze basse. AbilityEngine.execute rifiuta con un motivo, come una condizione non soddisfatta.",
+      "parametro": "sequenza_bloccata",
+      "default": true
+    },
+    "notte_perenne": {
+      "_comment": "Il ciclo del tempo resta bloccato sulla notte per tutta la durata della prova (TimeSystem.forza_momento). Le abilita' e_notte sono sempre attive, ma anche i pericoli notturni.",
+      "parametro": "momento",
+      "default": "notte_fonda"
+    }
+  }
+}

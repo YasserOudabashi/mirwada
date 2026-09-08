@@ -6735,3 +6735,31 @@ Generare il PRD con /prd.
 - File .gd toccati: nessuno (solo dati + validator + tests/test_fusion.gd).
 - Prossima storia: US-703 - vocabolari tribulation_effects.json +
   prayer_effects.json.
+
+[2026-09-08] US-703 — vocabolari chiusi tribulation_effects.json + prayer_effects.json. FASE 7, BLOCCO 0 CHIUSO.
+
+- data/schema/tribulation_effects.json (NUOVO, 5 voci): cosa fa una
+  tribolazione MENTRE E' IN CORSO (handicap temporaneo). follia_accelerata
+  (delta_al_minuto extra a Madness), spiritualita_dimezzata (moltiplicatore
+  0.5 su spiritualita_max), nemici_rinforzati (moltiplicatore_spawn 1.6 sulla
+  densita' mistica), abilita_bloccate (le abilita' della Sequenza corrente
+  inagibili), notte_perenne (TimeSystem bloccato su notte_fonda). NON e' un
+  evento tracciato: e' uno stato temporaneo che si toglie al superamento.
+- data/schema/prayer_effects.json (NUOVO, 4 voci): gli effetti SEMANTICI +
+  i18n delle preghiere delle Sequenze alte. Ogni voce DICHIARA su quale
+  primitiva esistente si appoggia: benedizione_seguaci (aura bersagli:evocati),
+  voto_di_autorita (aura bersagli:nemici), intercessione (heal), anatema
+  (curse). NESSUNA primitiva nuova - il campo 'preghiera' su un'abilita' e'
+  flavour, l'effetto vero lo fanno le sue primitive.
+- tools/validate_data.py: carica entrambi i vocabolari (dopo ownership.json);
+  errore se 'effetti'/'preghiere' e' vuoto o > 6 voci (chiuso); per ogni
+  preghiera 'primitiva' dev'essere del registro. valid_tribulation_effects /
+  valid_prayer_effects disponibili per US-710/US-714.
+- tests/test_endgame_vocab.gd (NUOVO, 2 test): tribulation_effects chiuso e
+  non vuoto, ogni voce ha _comment; ogni prayer_effect si appoggia a una
+  primitiva esistente (via GameData.get_primitive).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  720 test headless (718 + 2), tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (solo dati + validator + tests/test_endgame_vocab.gd).
+- BLOCCO 0 CHIUSO: US-701/702/703 (save 21->22, schema fusioni + 8 file stub,
+  2 vocabolari chiusi). Prossimo: BLOCCO A - US-704 cambio Pathway tra vicini.

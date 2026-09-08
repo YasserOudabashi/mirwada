@@ -96,6 +96,24 @@ def main():
     _own_doc = load_json(os.path.join(DATA, "schema", "ownership.json")) or {}
     summon_materie = set(_own_doc.get("summon_materie_prime", []))
     tag_vietati_attivi = set(_own_doc.get("tag_vietati_pathway_attivi", []))
+    # US-703: vocabolari chiusi della fase 7.
+    _trib_doc = load_json(os.path.join(DATA, "schema", "tribulation_effects.json")) or {}
+    valid_tribulation_effects = set(_trib_doc.get("effetti", {}))
+    _pray_doc = load_json(os.path.join(DATA, "schema", "prayer_effects.json")) or {}
+    valid_prayer_effects = set(_pray_doc.get("preghiere", {}))
+    for _nome, _vocab, _chiave in (
+        ("data/schema/tribulation_effects.json", _trib_doc, "effetti"),
+        ("data/schema/prayer_effects.json", _pray_doc, "preghiere"),
+    ):
+        _v = _vocab.get(_chiave, {})
+        if not isinstance(_v, dict) or not _v:
+            err(f"{_nome}: '{_chiave}' deve essere un oggetto non vuoto (US-703).")
+        elif len(_v) > 6:
+            err(f"{_nome}: {len(_v)} voci, atteso <= 6 (vocabolario chiuso, US-703).")
+    for _p, _spec in _pray_doc.get("preghiere", {}).items():
+        if _spec.get("primitiva") not in prim_params:
+            err(f"data/schema/prayer_effects.json [{_p}]: 'primitiva' "
+                f"'{_spec.get('primitiva')}' non e' del registro (US-703).")
     # Tag ottenibili nella build attiva: servono a segnalare le sinergie
     # irraggiungibili (richiedono tag che nessun pathway attivo porta).
     obtainable_tags = set()
