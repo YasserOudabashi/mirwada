@@ -6668,3 +6668,37 @@ diff .gd del blocco A = solo ability_engine.gd +173 -0, dispatcher intatto.
 
 Prossima fase: 7 - Endgame (cambio Pathway, fusioni del gruppo, finali).
 Generare il PRD con /prd.
+
+[2026-09-08] US-701 — Save schema_version 21 -> 22, campo endgame. FASE 7, BLOCCO 0.
+
+- scripts/endgame_state.gd (NUOVO autoload EndgameState, dopo WorldState in
+  project.godot): store del campo 'endgame' del save. { pathway_precedente,
+  fusioni[], tribolazioni_superate[], eredita{}, finale }. Metodi:
+  registra_cambio / aggiungi_fusione / segna_tribolazione /
+  tribolazione_superata / imposta_eredita / imposta_finale / pulisci. I motori
+  di fase 7 (PathwayChange, FusionEngine, TribulationSystem, EndingSystem) ci
+  scriveranno attraverso: il save non li conosce (pattern di 'mondo' di fase 6).
+- da_salvataggio NON FIDATO: pathway_precedente solo stringa; fusioni solo
+  stringhe non vuote; tribolazioni_superate solo interi in {7,5,3,1}; eredita
+  validata campo per campo (_leggi_eredita: conoscenza [flag], ancora
+  {id, forza>=0}, reputazione {fid: float}, oggetto item_id) - e' il pezzo che
+  l'utente modificherebbe per iniziare "ricco"; finale solo stringa.
+- scripts/save_system.gd: VERSIONE_CORRENTE 21 -> 22; _migra_21_a_22 aggiunge
+  doc['endgame'] coi default se assente (idempotente, non tocca gli altri
+  campi); 'endgame' aggiunto a salva() e a _leggi_snapshot() (_campo
+  TYPE_DICTIONARY default {}).
+- scripts/game_state.gd: snapshot() aggiunge "endgame" da
+  EndgameState.per_salvataggio; applica() chiama EndgameState.da_salvataggio
+  prima di SynergyEngine.
+- Come verificato: python tools/validate_data.py exit 0 (2 warning invariati).
+  716 test headless (713 + 3 in test_save_system.gd:
+  test_migrazione_v21_a_v22_aggiunge_endgame [un save v21 senza endgame ->
+  campo aggiunto coi default, il campo 'mondo' pre-esistente non toccato];
+  test_endgame_round_trip; test_endgame_state_scarta_le_voci_malformate).
+  Nessuna regressione (test_characteristic.test_migrazione_da_v6 e
+  test_save_system.test_migrazione_da_versione_vecchia passano ancora: la
+  catena arriva a 22).
+- File .gd toccati: scripts/endgame_state.gd (nuovo), scripts/save_system.gd
+  (+migrazione +campo), scripts/game_state.gd (+wiring), project.godot
+  (+autoload).
+- Prossima storia: US-702 - fusion.schema.json + data/fusions/ (8 file, 7 stub).

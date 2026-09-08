@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 21
+const VERSIONE_CORRENTE := 22
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -83,6 +83,9 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		# Sinergie VISTE (US-408). { viste: [id] }. Le attive non si salvano:
 		# si riderivano dai tag al load.
 		"sinergie": (dati.get("sinergie", {}) as Dictionary).duplicate(true),
+		# Endgame (US-701): cambio Pathway, fusioni, tribolazioni, eredita',
+		# finale. Un solo bump di fase 7 (schema_version 22).
+		"endgame": (dati.get("endgame", {}) as Dictionary).duplicate(true),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -222,6 +225,8 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_19_a_20(doc)
 			20:
 				doc = _migra_20_a_21(doc)
+			21:
+				doc = _migra_21_a_22(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -397,6 +402,22 @@ func _migra_20_a_21(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v21 -> v22: l'endgame di fase 7 (US-701). Cambio Pathway, abilita' fuse,
+## tribolazioni superate, contratto di eredita', finale raggiunto. UNICO bump
+## di tutta la fase 7: le story successive che scrivono dentro "endgame" non
+## bumpano. Un personaggio pregresso non ha ancora un endgame -> default vuoti.
+func _migra_21_a_22(doc: Dictionary) -> Dictionary:
+	if not doc.has("endgame"):
+		doc["endgame"] = {
+			"pathway_precedente": "",
+			"fusioni": [],
+			"tribolazioni_superate": [],
+			"eredita": {},
+			"finale": "",
+		}
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -425,6 +446,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"conoscenza": _campo(raw, "conoscenza", TYPE_ARRAY, []),
 		"inventario": _campo(raw, "inventario", TYPE_DICTIONARY, {}),
 		"equipaggiamento": _campo(raw, "equipaggiamento", TYPE_DICTIONARY, {}),
+		"endgame": _campo(raw, "endgame", TYPE_DICTIONARY, {}),
 	}
 
 

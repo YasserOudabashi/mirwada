@@ -132,6 +132,10 @@ func _equip() -> Node:
 	return get_node_or_null("/root/Equipment")
 
 
+func _endgame() -> Node:
+	return get_node_or_null("/root/EndgameState")
+
+
 func salva_rapido() -> Dictionary:
 	return salva_slot(SLOT_RAPIDO)
 
@@ -242,6 +246,8 @@ func snapshot() -> Dictionary:
 		"conoscenza": _conoscenza().per_salvataggio() if _conoscenza() != null else [],
 		"inventario": _inventario().per_salvataggio() if _inventario() != null else {},
 		"equipaggiamento": _equip().per_salvataggio() if _equip() != null else {},
+		# fase 7: cambio Pathway, fusioni, tribolazioni, eredita', finale.
+		"endgame": _endgame().per_salvataggio() if _endgame() != null else {},
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D:
@@ -329,6 +335,8 @@ func applica(dati: Dictionary) -> void:
 	var s: Dictionary = dati.get("statistiche", {})
 	if stats != null and s.has("hp"):
 		stats.set("hp", float(s["hp"]))
+	if _endgame() != null:
+		_endgame().da_salvataggio(dati.get("endgame", {}))
 	# SynergyEngine PER ULTIMO: legge i tag di tutte le fonti gia' ripristinate.
 	# Le sinergie ATTIVE si riderivano dai tag; il save porta solo le VISTE.
 	if _sinergie() != null:
