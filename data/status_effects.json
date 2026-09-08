@@ -108,6 +108,17 @@
         "evasione": 0.25
       },
       "descrizione": "Il Beyonder si e' fuso con l'ombra: sfugge al rilevamento (anche mistico) e para meno visibile. Lo applica shadow_meld (Door Secrets Sorcerer, Darkness Nightwatcher). Non negativo: e' un vantaggio."
+    },
+    "posseduto": {
+      "tag": "possessione",
+      "durata_default": 6.0,
+      "negativo": true,
+      "stat_modifiers": {
+        "velocita": -0.5,
+        "precisione": -0.35,
+        "difesa": -0.2
+      },
+      "descrizione": "Il bersaglio non e' piu' padrone del proprio corpo: si muove a scatti e reagisce in ritardo. Lo applica possess (Error Parasite, Fool Marionettist). Il 'controllo' (sensi/parziale/totale) e' nel record della primitiva; l'ospite che attacca per il caster e' combat (fase 6)."
     }
   }
 }

@@ -39,8 +39,8 @@
       ],
       "priority": 2,
       "fase": "5b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. possess implementata (_p_possess, execute/_esegui_primitive intatti), primitives.json implemented + param vulnerabilita_corpo (condiviso soul_detach), vfx.json vfx_grip, status_effects.json 'posseduto' nuovo (tag possessione, negativo). steal +param ability_id nel registro; error_furto_prometeo -> steal abilita con ability_id tg_fendente_pesante, durata 12s, prob 0.7. Error Seq 6/5/4 stub->false: Prometheus (steal abilita + projectile), Dream Stealer (steal conoscenza + debuff, condizione e_notte, tag 'sonno' perche' 'sogno' e' vietato ai Pathway attivi), Parasite tier saint con advancement_ritual (nebbia_grigia/crocevia, notte_fonda, sacrifica un ricordo) + possess controllo:sensi. formula_error_6/5/4 + 9 ingredienti + char_error_6/5/4. i18n rilanciato e tradotto. test_error.gd esteso (possess applica 'posseduto' e crolla velocita; corpo_a_terra nel record; Prometheus presta e scade). validate exit 0 (stub 26->23). 678 test verdi, nessuna regressione. FR-10: resa combat di possess (corpo del caster a terra bersagliabile, ospite che agisce) rimandata a fase 6 e dichiarata in progress.txt."
     },
     {
       "id": "US-5B03",

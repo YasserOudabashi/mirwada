@@ -6125,3 +6125,67 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - File .gd toccati: scripts/ability_engine.gd (handler steal + 1 riga _handlers).
   execute / _esegui_primitive non toccati. Elenco per il checkpoint US-5B04.
 - Prossima storia: US-5B02 - Error Seq 6-4 + primitiva possess.
+
+[2026-09-08] US-5B02 — Error, Sequenze 6-4 (Prometheus / Dream Stealer / Parasite) + primitiva possess. FASE 5b, BLOCCO A.
+
+- PRIMITIVA NUOVA possess: _p_possess in scripts/ability_engine.gd (_handlers
+  +1, execute / _esegui_primitive INTATTI). Applica lo status 'posseduto' allo
+  stats risolto (come soul_detach applica 'anima_recisa') per 'durata';
+  registra 'controllo' (sensi | parziale | totale) e - come soul_detach - il
+  corpo del caster a terra: record { corpo_a_terra:true, vulnerabilita_corpo }.
+  L'ospite che agisce per il caster e' combat (fase 6).
+  primitives.json: possess -> implemented:true, +param vulnerabilita_corpo
+  (condiviso con soul_detach, FR-7). vfx.json: primitive_vfx.possess = vfx_grip
+  (impact_frame sull'atto di afferrare).
+  status_effects.json: NUOVO 'posseduto' (tag possessione, negativo,
+  velocita -0.5 / precisione -0.35 / difesa -0.2).
+- steal: +param ability_id nel registro. error_furto_prometeo ora lo usa:
+  steal { categoria:abilita, ability_id:"tg_fendente_pesante",
+  durata_prestito:12, probabilita:0.7 } - prestito breve, non sempre riesce
+  (la firma dell'Error vs la fotocopia del Door). _p_steal gia' leggeva
+  ability_id da US-5B01: nessuna modifica all'handler.
+- CONTENUTO Error Seq 6/5/4 (stub -> false):
+  * error_6 Prometheus: error_furto_prometeo (steal abilita) +
+    error_scintilla_rubata (projectile spirito). acting: ability_used(furto)
+    0.45 + damage_dealt(spirito) 0.30 + enemy_defeated 0.25. madness 5.0.
+  * error_5 Dream Stealer: error_furto_dei_sogni (steal conoscenza + debuff,
+    condizione e_notte dai dati) + error_incubo_parassita (dot follia +
+    debuff). tag 'sonno' (non 'sogno': 'sogno' e' vietato ai Pathway attivi,
+    matrice di proprieta' - appartiene a Visionary). acting: ability_used
+    0.40 + time_in_state(notte) 0.35 + damage_dealt(follia) 0.25. madness 6.4.
+  * error_4 Parasite (tier saint): error_innesto_parassita (possess
+    controllo:'sensi', vulnerabilita_corpo 0.4) + error_simbiosi_furtiva
+    (shadow_meld + heal self). advancement_ritual: nebbia_grigia + crocevia
+    (ospitati da frontiera_porte), notte_fonda, sacrifica
+    'un_ricordo_a_cui_tenevi'. acting: ability_used 0.40 +
+    time_in_state(in_ombra) 0.35 + enemy_defeated 0.25. madness 8.0.
+- formule formula_error_6/5/4 + 9 ingredienti nuovi. caratteristiche
+  char_error_6/5/4 (Essenza di Prometheus / Dream Stealer / Parasite).
+- i18n: generate_i18n_stubs.py rilanciato (it.json 896 -> 913). 6 abilita' +
+  9 acting seed da name/descrizione; 3 caratteristiche tradotte a mano.
+- VERIFICA A SCHERMO / leggibilita' di possess (FR-10). Sessione headless:
+  verifica scriptata (come teleport/soul_detach/mind_read di fase 5).
+  test_error.gd:
+  * possess: lo status 'posseduto' e' applicato e crolla la velocita' (il
+    bersaglio si muove a scatti -> leggibile a colpo d'occhio); il record
+    dichiara corpo_a_terra + controllo dai dati.
+  * error_furto_prometeo presta tg_fendente_pesante per 12s e il prestito
+    scade.
+  DICHIARAZIONE FR-10: "di chi e' il corpo che controllo? il caster a terra e'
+  visibile e vulnerabile?" - la resa PIENA (il corpo del caster renderizzato a
+  terra e bersagliabile, la camera/HUD che segue l'ospite, l'ospite che
+  attacca per te) e' combat/fase 6, come dichiarato in prd-fase-5b sez. 5.
+  In 5b: (a) lo status 'posseduto' sul bersaglio con il tell del rallentamento,
+  (b) il record { corpo_a_terra, vulnerabilita_corpo } che il combat leggera',
+  (c) la spec VFX vfx_grip. Il pattern e' identico a soul_detach (Death Seq 3),
+  gia' verificato in fase 5.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: stub
+  26->23, sinergie irraggiungibili 17 [invariato: sinergia_sogno_lucido resta
+  irraggiungibile, tag 'sogno' vietato], TODO i18n conteggio 50 ma le chiavi
+  nuove sono tradotte). 678 test headless (674 + 4 netti in test_error.gd),
+  tutti verdi. Nessuna regressione.
+- File .gd toccati nel blocco A finora: scripts/ability_engine.gd
+  (handler steal + handler possess + 2 righe _handlers). execute /
+  _esegui_primitive non toccati. Per il checkpoint US-5B04.
+- Prossima storia: US-5B03 - Error Seq 3-0 + primitiva time_rewind + materia
+  prima avatar in ownership.json.

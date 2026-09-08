@@ -245,6 +245,12 @@
       "frames": 3,
       "impact_frame": true,
       "scia": true
+    },
+    "possess": {
+      "sprite": "vfx_grip",
+      "frames": 4,
+      "impact_frame": true,
+      "scia": false
     }
   },
   "impact_frames": {

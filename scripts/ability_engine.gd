@@ -83,6 +83,7 @@ func _ready() -> void:
 		"shadow_meld": _p_shadow_meld,
 		"illusion": _p_illusion,
 		"steal": _p_steal,
+		"possess": _p_possess,
 	}
 
 
@@ -693,6 +694,27 @@ func _p_steal(prim: Dictionary, caster: Node, _stats: Node, ability_id: String) 
 			rec["applied"] = true
 
 	return rec
+
+
+## possess (US-5B02): il caster prende il controllo di un ospite. Applica lo
+## status 'posseduto' al bersaglio (lo stats risolto, come soul_detach) per
+## 'durata' e registra 'controllo' (sensi | parziale | totale). Come
+## soul_detach di Death: il CORPO del caster resta a terra vulnerabile durante
+## la possessione - il record lo dichiara ({ corpo_a_terra, vulnerabilita_corpo });
+## la resa combat (il corpo bersagliabile, l'ospite che attacca per te) e'
+## fase 6. Anche il Fool (Marionettist) la usera'.
+func _p_possess(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var controllo: String = str(prim.get("controllo", ""))
+	var applicato: bool = false
+	if stats != null and stats.has_method("applica_status"):
+		stats.call("applica_status", "posseduto", durata if durata > 0.0 else -1.0)
+		applicato = true
+	return {"tipo": "possess", "durata": durata, "controllo": controllo,
+			"soglia_resistenza": _num(prim.get("soglia_resistenza"), 0.0),
+			"corpo_a_terra": true,
+			"vulnerabilita_corpo": _num(prim.get("vulnerabilita_corpo"), 0.6),
+			"applied": applicato}
 
 
 ## shadow_meld (US-607, primitiva della fase 5b portata qui dal Nightwatcher

@@ -445,6 +445,24 @@
       "pathway_id": "error",
       "sequence": 7,
       "name_i18n": "characteristic.error.7"
+    },
+    {
+      "id": "char_error_6",
+      "pathway_id": "error",
+      "sequence": 6,
+      "name_i18n": "characteristic.error.6"
+    },
+    {
+      "id": "char_error_5",
+      "pathway_id": "error",
+      "sequence": 5,
+      "name_i18n": "characteristic.error.5"
+    },
+    {
+      "id": "char_error_4",
+      "pathway_id": "error",
+      "sequence": 4,
+      "name_i18n": "characteristic.error.4"
     }
   ]
 }

@@ -1,8 +1,10 @@
 extends "res://tests/test_case.gd"
-## US-5B01 — Error, Sequenze 9-7: le abilita' si eseguono senza warning di
-## primitiva (steal implementata qui); steal presta un'abilita' via
-## grant_temporary e la scadenza la revoca; steal "conoscenza" scrive un flag
-## in KnowledgeStore; le acting_actions delle 3 Sequenze sommano 1.0.
+## US-5B01 / US-5B02 — Error, Sequenze 9-4: le abilita' si eseguono senza
+## warning di primitiva (steal e possess implementate qui); steal presta
+## un'abilita' via grant_temporary e la scadenza la revoca; steal "conoscenza"
+## scrive un flag in KnowledgeStore; possess applica lo status 'posseduto' e
+## registra il corpo del caster a terra; le acting_actions delle Sequenze
+## sommano 1.0.
 
 const Stats := preload("res://scripts/stats_component.gd")
 
@@ -10,6 +12,11 @@ const ABILITA_9_7 := [
 	"error_scasso", "error_pugnalata_furtiva",
 	"error_parlantina", "error_patto_truffaldino",
 	"error_decifrazione", "error_lettura_rubata",
+]
+const ABILITA_6_4 := [
+	"error_furto_prometeo", "error_scintilla_rubata",
+	"error_furto_dei_sogni", "error_incubo_parassita",
+	"error_innesto_parassita", "error_simbiosi_furtiva",
 ]
 
 
@@ -100,11 +107,55 @@ func test_steal_oggetto_registra_il_furto_e_marca_sottratto() -> void:
 	_cleanup(c)
 
 
-func test_error_9_7_sono_contenuto_e_le_acting_sommano_uno() -> void:
+func test_ogni_abilita_error_6_4_si_esegue_senza_warning() -> void:
+	var e: Node = _engine()
+	for aid in ABILITA_6_4:
+		var c: Node2D = _caster()
+		var r: Dictionary = e.call("execute", aid, c)
+		assert_true(r["ok"], "%s eseguita" % aid)
+		assert_eq((r["warnings"] as PackedStringArray).size(), 0,
+			"%s: nessun warning di primitiva (possess implementata): %s" % [aid, r["warnings"]])
+		e.call("clear_cooldowns")
+		e.call("clear_granted")
+		_cleanup(c)
+
+
+func test_possess_applica_posseduto_e_registra_il_corpo_a_terra() -> void:
+	var e: Node = _engine()
+	var c: Node2D = _caster()
+	var s: Node = c.get_node("Stats")
+	var vel0: float = s.call("get_stat", "velocita")
+	var r: Dictionary = e.call("execute", "error_innesto_parassita", c)
+	assert_true(r["ok"], "innesto parassita eseguito")
+	assert_true(s.call("ha_status", "posseduto"),
+		"possess applica lo status 'posseduto' al bersaglio")
+	assert_gt(vel0, s.call("get_stat", "velocita"),
+		"il posseduto non e' piu' padrone del corpo (velocita' crollata)")
+	var rec: Dictionary = (r["effects"] as Array)[0]
+	assert_true(bool(rec["corpo_a_terra"]),
+		"il record dichiara il corpo del caster a terra (come soul_detach)")
+	assert_eq(str(rec["controllo"]), "sensi", "il tipo di controllo viene dai dati")
+	_cleanup(c)
+
+
+func test_prometeo_presta_l_abilita_dichiarata_nei_dati() -> void:
+	var e: Node = _engine()
+	var c: Node2D = _caster()
+	e.call("execute", "error_furto_prometeo", c)
+	assert_true(e.call("is_granted", c, "tg_fendente_pesante"),
+		"steal 'abilita' presta l'ability_id dichiarato dal Prometheus")
+	e.call("tick_effects", 12.5)
+	assert_false(e.call("is_granted", c, "tg_fendente_pesante"),
+		"il prestito breve del Prometheus scade")
+	e.call("clear_granted")
+	_cleanup(c)
+
+
+func test_error_sequenze_scritte_sono_contenuto_e_le_acting_sommano_uno() -> void:
 	var pw: Dictionary = _gd().call("get_pathway", "error")
 	for seq in (pw.get("sequences", []) as Array):
 		var d: Dictionary = seq
-		if int(d.get("sequence", -1)) < 7:
+		if int(d.get("sequence", -1)) < 4:
 			continue
 		assert_false(bool(d.get("stub", false)),
 			"error_%d non e' piu' stub" % int(d.get("sequence")))
@@ -115,3 +166,14 @@ func test_error_9_7_sono_contenuto_e_le_acting_sommano_uno() -> void:
 			"error_%d: le acting_actions sommano 1.0" % int(d.get("sequence")))
 		assert_gt(float(d.get("madness_on_force", 0.0)), 0.0,
 			"error_%d: madness_on_force > 0" % int(d.get("sequence")))
+
+
+func test_error_4_ha_un_rituale_con_luogo_valido() -> void:
+	var pw: Dictionary = _gd().call("get_pathway", "error")
+	for seq in (pw.get("sequences", []) as Array):
+		if int((seq as Dictionary).get("sequence", -1)) != 4:
+			continue
+		var rit: Dictionary = (seq as Dictionary).get("advancement_ritual", {})
+		assert_false(rit.is_empty(), "error_4 (Seq <= 4) ha un advancement_ritual")
+		assert_gt(float((rit.get("location_tags", []) as Array).size()), 0.0,
+			"col suo luogo (nebbia_grigia / crocevia)")

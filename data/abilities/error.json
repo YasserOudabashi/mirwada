@@ -169,8 +169,9 @@
         {
           "tipo": "steal",
           "categoria": "abilita",
-          "durata_prestito": 30.0,
-          "probabilita": 0.75
+          "ability_id": "tg_fendente_pesante",
+          "durata_prestito": 12.0,
+          "probabilita": 0.7
         }
       ],
       "tag_sinergia": [
@@ -179,7 +180,153 @@
         "singolo"
       ],
       "costo_follia": 1.5,
-      "note": "STRESS TEST (US-204). Ruba un'abilita' vista e la rende eseguibile via grant_temporary. La Sequenza 6 (US-5B02) le dara' l'ability_id del potere copiato."
+      "note": "Ruba un'abilita' Beyonder appena vista e la rende eseguibile via grant_temporary (US-204). Il prestito e' breve e non sempre riesce (probabilita 0.7): la firma dell'Error, distinta dallo Scribe del Door (fotocopia, sempre). ability_id nei dati = quale potere questo Beyonder e' capace di copiare; il bersaglio da cui rubare lo sceglie il combat (fase 6)."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_scintilla_rubata",
+      "name": "Scintilla rubata",
+      "name_i18n": "ability.error.error_scintilla_rubata",
+      "sequence_id": "error_6",
+      "costo_spiritualita": 12,
+      "cooldown": 5.0,
+      "primitive": [
+        {
+          "tipo": "projectile",
+          "danno": 24,
+          "velocita": 10,
+          "gittata": 11,
+          "pierce": 1,
+          "tag_danno": "spirito"
+        }
+      ],
+      "tag_sinergia": [
+        "furto",
+        "spirito",
+        "singolo"
+      ],
+      "note": "Un frammento del potere rubato scagliato indietro: il Prometheus non tiene mai a lungo cio' che prende."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_furto_dei_sogni",
+      "name": "Furto dei sogni",
+      "name_i18n": "ability.error.error_furto_dei_sogni",
+      "sequence_id": "error_5",
+      "costo_spiritualita": 16,
+      "cooldown": 20.0,
+      "primitive": [
+        {
+          "tipo": "steal",
+          "categoria": "conoscenza",
+          "durata_prestito": 0,
+          "probabilita": 0.85
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.25,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "condizioni": [
+        {
+          "tipo": "e_notte",
+          "valore": true
+        }
+      ],
+      "tag_sinergia": [
+        "furto",
+        "sonno",
+        "conoscenza"
+      ],
+      "note": "Entra nel sogno di un dormiente e ne porta via ricordi e formule. Solo di notte (condizione dai dati, l'engine la fa valere). Il derubato dei ricordi combatte peggio."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_incubo_parassita",
+      "name": "Incubo parassita",
+      "name_i18n": "ability.error.error_incubo_parassita",
+      "sequence_id": "error_5",
+      "costo_spiritualita": 14,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "dot",
+          "danno_tick": 6,
+          "tick_rate": 1.5,
+          "durata": 8.0,
+          "tag_danno": "follia"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.2,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "sonno",
+        "parassita",
+        "follia"
+      ],
+      "note": "Lascia un incubo che si nutre da solo: logora la mente del bersaglio finche' dura."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_innesto_parassita",
+      "name": "Innesto parassita",
+      "name_i18n": "ability.error.error_innesto_parassita",
+      "sequence_id": "error_4",
+      "costo_spiritualita": 22,
+      "cooldown": 26.0,
+      "primitive": [
+        {
+          "tipo": "possess",
+          "durata": 10.0,
+          "soglia_resistenza": 4,
+          "controllo": "sensi",
+          "vulnerabilita_corpo": 0.4
+        }
+      ],
+      "tag_sinergia": [
+        "parassita",
+        "possessione",
+        "occultamento"
+      ],
+      "costo_follia": 3.0,
+      "note": "Il Parasite si attacca a un ospite e ne condivide i sensi (controllo 'sensi': nessun controllo motorio). Come soul_detach: il corpo del caster resta a terra, meno vulnerabile del solito perche' nascosto (0.4). L'ospite che agisce e' combat (fase 6)."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_simbiosi_furtiva",
+      "name": "Simbiosi furtiva",
+      "name_i18n": "ability.error.error_simbiosi_furtiva",
+      "sequence_id": "error_4",
+      "costo_spiritualita": 14,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "shadow_meld",
+          "durata": 8.0,
+          "velocita": 0.2,
+          "richiede_ombra": false
+        },
+        {
+          "tipo": "heal",
+          "quantita": 20,
+          "istantaneo": true,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "parassita",
+        "occultamento",
+        "guarigione"
+      ],
+      "note": "Attinge alle risorse dell'ospite per rimarginare le proprie ferite, restando occultato."
     }
   ]
 }

@@ -150,8 +150,10 @@
       "params": [
         "durata",
         "soglia_resistenza",
-        "controllo"
-      ]
+        "controllo",
+        "vulnerabilita_corpo"
+      ],
+      "implemented": true
     },
     "curse": {
       "params": [
@@ -233,7 +235,8 @@
       "params": [
         "categoria",
         "durata_prestito",
-        "probabilita"
+        "probabilita",
+        "ability_id"
       ],
       "implemented": true
     },

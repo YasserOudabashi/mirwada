@@ -222,7 +222,16 @@
     "dado_truccato",
     "stele_di_rosetta_infranta",
     "inchiostro_simpatico_rubato",
-    "chiave_di_cifrario"
+    "chiave_di_cifrario",
+    "favilla_del_titano_incatenato",
+    "fegato_sempre_rigenerato",
+    "creta_del_primo_uomo",
+    "cuscino_di_un_dormiente_inquieto",
+    "sabbia_del_sonno_rubata",
+    "ricordo_altrui_in_bottiglia",
+    "vischio_che_si_aggrappa",
+    "cuore_condiviso",
+    "muta_di_pelle_altrui"
   ],
   "formulas": {
     "formula_fool_9": {
@@ -1253,6 +1262,48 @@
         "stele_di_rosetta_infranta",
         "inchiostro_simpatico_rubato",
         "chiave_di_cifrario"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_6": {
+      "characteristic_sequence": 6,
+      "ingredients": [
+        "favilla_del_titano_incatenato",
+        "fegato_sempre_rigenerato",
+        "creta_del_primo_uomo"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_5": {
+      "characteristic_sequence": 5,
+      "ingredients": [
+        "cuscino_di_un_dormiente_inquieto",
+        "sabbia_del_sonno_rubata",
+        "ricordo_altrui_in_bottiglia"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_4": {
+      "characteristic_sequence": 4,
+      "ingredients": [
+        "vischio_che_si_aggrappa",
+        "cuore_condiviso",
+        "muta_di_pelle_altrui"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {
