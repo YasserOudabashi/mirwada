@@ -157,8 +157,8 @@
       ],
       "priority": 10,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. data/schema/tribulation.schema.json (additionalProperties:false): id ^trib_, name_i18n/descrizione_i18n ^tribulation., salto {da in [7,5,3,1], a in [6,4,2,0]}, condizioni[] (enum = vocabolario di conditions.gd), mentre_in_corso (chiave di tribulation_effects.json), superamento ({evento,filtri,target} XOR {flag}). data/tribulations/: 4 file trib_7_6/trib_5_4/trib_3_2/trib_1_0. superamento: 7->6 area_cleared x2, 5->4 npc_influenced x3, 3->2 flag tribolazione_doran_affrontato, 1->0 flag tribolazione_soglia_varcata. mentre_in_corso: nemici_rinforzati / spiritualita_dimezzata / follia_accelerata / notte_perenne. condizioni: tier_min della fascia (low/mid/saint/angel, sempre vere a quella Seq - documentano il requisito). tools/validate_data.py: nuova sezione tribolazioni (dopo fusioni) - salto valido, condizioni nel vocabolario TRIB_COND, superamento evento XOR flag, evento nei 12, target>=1, mentre_in_corso in tribulation_effects, UNA sola per salto, errore se ne manca una. game_data.gd: DIR_TRIBULATIONS + _load_tribulations (_tribulations per id), get_tribulation/tribulation_ids/tribulation_per_salto(da). i18n: 8 chiavi tribulation.* come stub TODO (US-712 le traduce). tests/test_tribulation.gd 2 test (una per salto, 8->7 e 2->1 nessuna; ogni tribolazione risolve mentre_in_corso/evento/flag). validate exit 0. 740 test verdi."
     },
     {
       "id": "US-711",

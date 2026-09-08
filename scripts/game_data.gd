@@ -16,6 +16,7 @@ const DIR_PATHWAYS := "res://data/pathways"
 const DIR_ABILITIES := "res://data/abilities"
 const DIR_SYNERGIES := "res://data/synergies"
 const DIR_FUSIONS := "res://data/fusions"
+const DIR_TRIBULATIONS := "res://data/tribulations"
 const DIR_ITEMS := "res://data/items"
 const DIR_STRUCTURES := "res://data/structures"
 const DIR_PETS := "res://data/pets"
@@ -71,6 +72,8 @@ var _synergies: Dictionary = {}
 ## un'abilita' qualsiasi senza che finiscano in ability_ids()/ability_count().
 var _fusions: Dictionary = {}
 var _fusion_abilities: Dictionary = {}
+## Tribolazioni ai salti di fascia (data/tribulations/, fase 7). Doc per id.
+var _tribulations: Dictionary = {}
 var _tags: Dictionary = {}
 var _balance: Dictionary = {}
 var _primitives: Dictionary = {}
@@ -150,6 +153,7 @@ func load_all() -> void:
 	_load_abilities()
 	_load_synergies()
 	_load_fusions()
+	_load_tribulations()
 	_load_items()
 	_load_structures()
 	_load_pets()
@@ -228,6 +232,24 @@ func get_fusion(id: String) -> Dictionary:
 
 func fusion_ids() -> Array:
 	return _fusions.keys()
+
+
+## --- Tribolazioni (data/tribulations/, fase 7 US-710) ---
+func get_tribulation(id: String) -> Dictionary:
+	return _tribulations.get(id, {})
+
+
+func tribulation_ids() -> Array:
+	return _tribulations.keys()
+
+
+## La tribolazione del salto che PARTE dalla Sequenza `da` (7/5/3/1). {} se
+## nessuna. Il validator garantisce che ce ne sia una sola per salto.
+func tribulation_per_salto(da: int) -> Dictionary:
+	for t in _tribulations.values():
+		if int((t as Dictionary).get("salto", {}).get("da", -1)) == da:
+			return t
+	return {}
 
 
 func ability_ids() -> Array:
@@ -856,6 +878,23 @@ func _load_fusions() -> void:
 			visti_ab[aid] = true
 	_prune(_fusions, visti)
 	_prune(_fusion_abilities, visti_ab)
+
+
+## Tribolazioni (fase 7): un file per salto di fascia, l'oggetto e' la
+## tribolazione ({id, salto, condizioni, mentre_in_corso, superamento, ...}).
+func _load_tribulations() -> void:
+	var visti: Dictionary = {}
+	for path in _json_files_in(DIR_TRIBULATIONS):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		var tid: String = str(doc.get("id", ""))
+		if tid.is_empty():
+			_fail(path, "una tribolazione non ha 'id'")
+			continue
+		_upsert(_tribulations, tid, doc)
+		visti[tid] = true
+	_prune(_tribulations, visti)
 
 
 func _load_single(path: String, key: String, target: Dictionary, key_type: int) -> void:

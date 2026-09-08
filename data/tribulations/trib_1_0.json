@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "trib_1_0",
+  "name_i18n": "tribulation.trib_1_0.name",
+  "descrizione_i18n": "tribulation.trib_1_0.descrizione",
+  "salto": { "da": 1, "a": 0 },
+  "condizioni": [
+    { "tipo": "tier_min", "valore": "angel" }
+  ],
+  "mentre_in_corso": "notte_perenne",
+  "superamento": { "flag": "tribolazione_soglia_varcata" }
+}

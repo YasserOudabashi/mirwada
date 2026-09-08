@@ -6998,3 +6998,39 @@ completo (6 abilita fuse), 7 percorsi stub dichiarati, pagina del libro,
 checkpoint superato. 738 test (erano 720 a inizio fase 7). Save invariato in
 questo blocco (endgame gia' a v22 da US-701). AbilityEngine intatto.
 Prossimo: BLOCCO B - US-710 tribulation.schema.json + data/tribulations/.
+
+[2026-09-08] US-710 — tribulation.schema.json + data/tribulations/. FASE 7, BLOCCO B.
+
+- data/schema/tribulation.schema.json (NUOVO, additionalProperties:false):
+  id ^trib_, name_i18n/descrizione_i18n ^tribulation., salto {da in [7,5,3,1],
+  a in [6,4,2,0]}, condizioni[] (enum = i tipi di conditions.gd, NESSUN tipo
+  nuovo), mentre_in_corso (chiave di tribulation_effects.json), superamento
+  ({evento, filtri, target>=1} XOR {flag}).
+- data/tribulations/: 4 file, uno per salto di fascia:
+  * trib_7_6: mentre nemici_rinforzati; superamento area_cleared x2.
+  * trib_5_4: mentre spiritualita_dimezzata; superamento npc_influenced x3.
+  * trib_3_2: mentre follia_accelerata; superamento flag
+    "tribolazione_doran_affrontato".
+  * trib_1_0: mentre notte_perenne; superamento flag
+    "tribolazione_soglia_varcata" (US-712 lo pone da un dialogo antagonista).
+  condizioni: un solo tier_min della fascia (low/mid/saint/angel) - sempre
+  vero a quella Sequenza, documenta il requisito senza hard-bloccare.
+- tools/validate_data.py: nuova sezione "tribolazioni" dopo "percorsi di
+  fusione". Controlla: salto.da/a e' un salto di fascia; condizioni.tipo nel
+  vocabolario TRIB_COND (= tutti i tipi di conditions.gd); superamento ha
+  evento XOR flag; evento nei 12 tracked_events; target>=1 se evento;
+  mentre_in_corso in tribulation_effects.json; UNA sola tribolazione per
+  salto; errore se ne manca una.
+- scripts/game_data.gd: DIR_TRIBULATIONS + _load_tribulations() (_tribulations
+  per id, _prune reload-safe); get_tribulation(id), tribulation_ids(),
+  tribulation_per_salto(da) -> la tribolazione del salto che parte da `da`.
+- i18n: 8 chiavi tribulation.* generate come stub "TODO ..." da
+  generate_i18n_stubs.py (TODO 42 -> 50). US-712 le traduce.
+- tests/test_tribulation.gd (NUOVO, 2 test): una tribolazione per ogni salto
+  di fascia (e nessuna per 8->7 / 2->1); ogni tribolazione risolve
+  mentre_in_corso (vocabolario), superamento evento XOR flag, evento nei 12.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: +8 TODO
+  i18n, gli altri invariati). 740 test headless (738 + 2), tutti verdi.
+  Nessuna regressione (test_data_valida verde: il validator esce 0).
+- File .gd toccati: scripts/game_data.gd (+_load_tribulations +3 getter).
+- Prossima storia: US-711 - TribulationSystem (lettore, blocca l'avanzamento).

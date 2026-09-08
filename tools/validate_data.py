@@ -382,6 +382,64 @@ def main():
             warn(f"{fusion_stub} percorsi di fusione su {len(expected_fusions)} sono stub "
                  f"dichiarati (fase 7b): contenuto da scrivere, non un errore.")
 
+    # --- tribolazioni (data/tribulations/, fase 7 US-710) ---
+    # Una prova per salto di fascia (7->6, 5->4, 3->2, 1->0). Lettore di
+    # eventi + flag: 'superamento' e' uno dei 12 tracked_events o un flag,
+    # 'condizioni' il vocabolario chiuso di conditions.gd, 'mentre_in_corso'
+    # una voce di tribulation_effects.json. Una sola tribolazione per salto.
+    TRIB_COND = {"e_notte", "fase_lunare", "in_zona_tag", "foundation_min",
+                 "tier_min", "madness_min", "follia_min", "madness_max",
+                 "acting_progress_min", "reputazione_min", "flag"}
+    twelve_events = set(ev_doc.get("events", {}))
+    tdir = os.path.join(DATA, "tribulations")
+    salti_attesi = {7: 6, 5: 4, 3: 2, 1: 0}
+    salti_visti = {}
+    if not os.path.isdir(tdir):
+        err("data/tribulations/: cartella mancante (fase 7, US-710).")
+    else:
+        for fn in sorted(os.listdir(tdir)):
+            if not fn.endswith(".json"):
+                continue
+            rel = f"data/tribulations/{fn}"
+            doc = load_json(os.path.join(tdir, fn))
+            if doc is None:
+                err(f"{rel}: JSON illeggibile")
+                continue
+            tid = doc.get("id")
+            salto = doc.get("salto", {})
+            da, a = salto.get("da"), salto.get("a")
+            if da not in salti_attesi or salti_attesi[da] != a:
+                err(f"{rel}: salto {da}->{a} non e' un salto di fascia valido "
+                    f"(attesi {salti_attesi})")
+            else:
+                salti_visti.setdefault(da, []).append(tid)
+            for c in doc.get("condizioni", []):
+                ct = c.get("tipo") if isinstance(c, dict) else None
+                if ct not in TRIB_COND:
+                    err(f"{rel} [{tid}]: condizione di tipo sconosciuto '{ct}' "
+                        f"(vocabolario di conditions.gd: {sorted(TRIB_COND)})")
+            mic = doc.get("mentre_in_corso")
+            if mic not in valid_tribulation_effects:
+                err(f"{rel} [{tid}]: mentre_in_corso '{mic}' non e' in "
+                    f"data/schema/tribulation_effects.json")
+            sup = doc.get("superamento", {})
+            has_ev, has_flag = "evento" in sup, "flag" in sup
+            if has_ev == has_flag:
+                err(f"{rel} [{tid}]: 'superamento' deve avere O 'evento' O 'flag', non entrambi/nessuno")
+            if has_ev and sup.get("evento") not in twelve_events:
+                err(f"{rel} [{tid}]: superamento.evento '{sup.get('evento')}' non e' uno dei 12 eventi tracciati")
+            if has_ev and not (isinstance(sup.get("target"), (int, float)) and sup.get("target") >= 1):
+                err(f"{rel} [{tid}]: superamento con 'evento' ha bisogno di 'target' >= 1")
+            if has_flag and not (isinstance(sup.get("flag"), str) and sup.get("flag")):
+                err(f"{rel} [{tid}]: superamento.flag vuoto")
+        for da in salti_attesi:
+            n = len(salti_visti.get(da, []))
+            if n == 0:
+                err(f"data/tribulations/: manca la tribolazione del salto {da}->{salti_attesi[da]}")
+            elif n > 1:
+                err(f"data/tribulations/: {n} tribolazioni per il salto {da}->{salti_attesi[da]} "
+                    f"({salti_visti[da]}): ne serve UNA sola")
+
     # --- abilita' ---
     adir = os.path.join(DATA, "abilities")
     ability_ids = set()

@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "tribulation.schema.json",
+  "title": "Tribulation",
+  "_comment": "Documentazione di data/tribulations/*.json (fase 7, US-710). Una tribolazione e' la prova a un salto di FASCIA: le Sequenze 7->6, 5->4, 3->2, 1->0. TribulationSystem (US-711) e' un LETTORE di eventi + flag: attiva la prova quando il personaggio arriva a una di quelle Sequenze, blocca Progression.avanza finche' 'superamento' non e' raggiunto, e applica 'mentre_in_corso' (una voce di tribulation_effects.json) come handicap temporaneo. NESSUN verbo nuovo: 'superamento' e' uno dei 12 tracked_events o un flag di KnowledgeStore, 'condizioni' e' il vocabolario chiuso di conditions.gd. Una sola tribolazione per salto. I controlli veri sono in tools/validate_data.py.",
+  "type": "object",
+  "required": ["schema_version", "id", "name_i18n", "salto", "condizioni", "mentre_in_corso", "superamento", "descrizione_i18n"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^trib_[a-z0-9_]+$" },
+    "name_i18n": { "type": "string", "pattern": "^tribulation\\." },
+    "descrizione_i18n": { "type": "string", "pattern": "^tribulation\\." },
+    "salto": {
+      "type": "object",
+      "required": ["da", "a"],
+      "additionalProperties": false,
+      "properties": {
+        "da": { "type": "integer", "enum": [7, 5, 3, 1] },
+        "a": { "type": "integer", "enum": [6, 4, 2, 0] }
+      }
+    },
+    "condizioni": {
+      "type": "array",
+      "_comment": "{ tipo, valore } dal vocabolario di conditions.gd. Devono valere perche' il superamento conti. Tenerle coerenti con la fascia (es. tier_min).",
+      "items": {
+        "type": "object",
+        "required": ["tipo"],
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "enum": ["e_notte", "fase_lunare", "in_zona_tag", "foundation_min", "tier_min",
+                     "madness_min", "follia_min", "madness_max", "acting_progress_min",
+                     "reputazione_min", "flag"]
+          }
+        }
+      }
+    },
+    "mentre_in_corso": {
+      "type": "string",
+      "_comment": "Una chiave di data/schema/tribulation_effects.json: l'handicap attivo mentre la prova e' aperta, tolto al superamento."
+    },
+    "superamento": {
+      "type": "object",
+      "_comment": "O { evento (uno dei 12 tracked_events), filtri, target } OPPURE { flag: '<nome>' } posto da una quest o un dialogo. Mai un verbo nuovo.",
+      "additionalProperties": false,
+      "properties": {
+        "evento": { "type": "string" },
+        "filtri": { "type": "object" },
+        "target": { "type": "number", "minimum": 1 },
+        "flag": { "type": "string" }
+      }
+    }
+  }
+}

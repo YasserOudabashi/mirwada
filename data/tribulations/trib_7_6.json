@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "trib_7_6",
+  "name_i18n": "tribulation.trib_7_6.name",
+  "descrizione_i18n": "tribulation.trib_7_6.descrizione",
+  "salto": { "da": 7, "a": 6 },
+  "condizioni": [
+    { "tipo": "tier_min", "valore": "low" }
+  ],
+  "mentre_in_corso": "nemici_rinforzati",
+  "superamento": { "evento": "area_cleared", "filtri": {}, "target": 2 }
+}
