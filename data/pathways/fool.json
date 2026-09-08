@@ -88,18 +88,65 @@
       "name_i18n": "sequence.fool.8",
       "tier": "low",
       "concept": "Destrezza acrobatica, travestimento, illusioni brevi per rompere l'aggro.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "velocita": 0.12,
+        "evasione": 0.1
+      },
+      "abilities": [
+        "fool_acrobazia",
+        "fool_travestimento_lampo"
+      ],
+      "acting_actions": [
+        {
+          "id": "fool_8_giocoliere",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_acrobazia"
+          },
+          "target": 20,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_8_giocoliere",
+          "descrizione": "Esegui 20 acrobazie per uscire dai guai"
+        },
+        {
+          "id": "fool_8_rompi_aggro",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_travestimento_lampo"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_8_rompi_aggro",
+          "descrizione": "Rompi l'aggro 15 volte con un travestimento lampo"
+        },
+        {
+          "id": "fool_8_spettacolo",
+          "evento": "area_cleared",
+          "filtri": {
+            "senza_uccidere": true
+          },
+          "target": 2,
+          "progresso": 0.3,
+          "ripetibile": false,
+          "descrizione_i18n": "acting.fool.fool_8_spettacolo",
+          "descrizione": "Completa 2 aree ostili senza uccidere: solo scena"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 8,
-        "ingredients": [],
+        "ingredients": [
+          "naso_finto_di_ceramica",
+          "sonaglio_che_confonde",
+          "cerone_da_palcoscenico"
+        ],
         "formula_id": "formula_fool_8"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 2.2,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 7,
@@ -108,18 +155,65 @@
       "name_i18n": "sequence.fool.7",
       "tier": "low",
       "concept": "Illusioni solide che infliggono danno percepito; oggetti evocati dal nulla per un colpo.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "spiritualita_max": 0.1,
+        "precisione": 0.08
+      },
+      "abilities": [
+        "fool_illusione_solida",
+        "fool_oggetto_dal_nulla"
+      ],
+      "acting_actions": [
+        {
+          "id": "fool_7_prestigiatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_illusione_solida"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_7_prestigiatore",
+          "descrizione": "Lancia 15 illusioni solide"
+        },
+        {
+          "id": "fool_7_colpo_finto",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "follia"
+          },
+          "target": 2500,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_7_colpo_finto",
+          "descrizione": "Infliggi 2500 danni percepiti (tag follia): fanno male perche' ci credi"
+        },
+        {
+          "id": "fool_7_evocatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_oggetto_dal_nulla"
+          },
+          "target": 15,
+          "progresso": 0.3,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_7_evocatore",
+          "descrizione": "Evoca 15 oggetti dal nulla per colpire"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 7,
-        "ingredients": [],
+        "ingredients": [
+          "cilindro_a_doppio_fondo",
+          "colomba_che_non_esiste",
+          "asso_sempre_in_cima_al_mazzo"
+        ],
         "formula_id": "formula_fool_7"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 3.5,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 6,

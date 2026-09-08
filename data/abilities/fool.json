@@ -120,6 +120,117 @@
       ],
       "costo_follia": 2.0,
       "note": "STRESS TEST. Marionettista: possess con soglia legata alla Sequenza del bersaglio. Nessuna primitiva nuova."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_acrobazia",
+      "name": "Acrobazia",
+      "name_i18n": "ability.fool.fool_acrobazia",
+      "sequence_id": "fool_8",
+      "costo_spiritualita": 6,
+      "cooldown": 4.0,
+      "primitive": [
+        {
+          "tipo": "dash",
+          "distanza": 90,
+          "durata": 0.2,
+          "invulnerabile": true,
+          "attraversa_nemici": true
+        }
+      ],
+      "tag_sinergia": [
+        "agilita'",
+        "non_letale",
+        "inganno"
+      ],
+      "note": "Il Clown esce da ogni angolo: uno scatto invulnerabile che attraversa i nemici. Nessuna primitiva nuova."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_travestimento_lampo",
+      "name": "Travestimento lampo",
+      "name_i18n": "ability.fool.fool_travestimento_lampo",
+      "sequence_id": "fool_8",
+      "costo_spiritualita": 10,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 3,
+          "durata": 6.0,
+          "potenza": 1,
+          "tipo_illusione": "aspetto"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.15,
+          "durata": 5.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "inganno",
+        "occultamento"
+      ],
+      "note": "Cambia aspetto per un attimo: i nemici perdono il bersaglio (rompe l'aggro). L'eredita' vera dei permessi sociali e' il Faceless (Seq 6); qui e' solo scena."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_illusione_solida",
+      "name": "Illusione solida",
+      "name_i18n": "ability.fool.fool_illusione_solida",
+      "sequence_id": "fool_7",
+      "costo_spiritualita": 14,
+      "cooldown": 8.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 5,
+          "durata": 8.0,
+          "potenza": 3,
+          "tipo_illusione": "danno_percepito"
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "follia",
+        "singolo"
+      ],
+      "note": "Un'illusione talmente convincente che ferisce: dot a tag follia (potenza = intensita' del danno percepito) che sparisce se il bersaglio capisce. Rimovibile da light_purify come ogni dot."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_oggetto_dal_nulla",
+      "name": "Oggetto dal nulla",
+      "name_i18n": "ability.fool.fool_oggetto_dal_nulla",
+      "sequence_id": "fool_7",
+      "costo_spiritualita": 10,
+      "cooldown": 3.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 2,
+          "durata": 1.0,
+          "potenza": 1,
+          "tipo_illusione": "oggetto_evocato"
+        },
+        {
+          "tipo": "melee_arc",
+          "danno": 20,
+          "angolo": 90,
+          "raggio": 1.8,
+          "stagger": 25,
+          "tag_danno": "fisico"
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "inganno",
+        "singolo"
+      ],
+      "note": "Un bastone, un mattone, una sedia: l'oggetto non c'e' finche' non colpisce. illusion(oggetto_evocato) + melee_arc per il colpo vero."
     }
   ]
 }

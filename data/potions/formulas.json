@@ -243,7 +243,13 @@
     "verme_che_mangia_i_minuti",
     "riga_bianca_nel_regolamento_del_mondo",
     "cavillo_primordiale",
-    "porta_che_non_c_e_mai_stata"
+    "porta_che_non_c_e_mai_stata",
+    "naso_finto_di_ceramica",
+    "sonaglio_che_confonde",
+    "cerone_da_palcoscenico",
+    "cilindro_a_doppio_fondo",
+    "colomba_che_non_esiste",
+    "asso_sempre_in_cima_al_mazzo"
   ],
   "formulas": {
     "formula_fool_9": {
@@ -1372,6 +1378,34 @@
         "riga_bianca_nel_regolamento_del_mondo",
         "cavillo_primordiale",
         "porta_che_non_c_e_mai_stata"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_8": {
+      "characteristic_sequence": 8,
+      "ingredients": [
+        "naso_finto_di_ceramica",
+        "sonaglio_che_confonde",
+        "cerone_da_palcoscenico"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_7": {
+      "characteristic_sequence": 7,
+      "ingredients": [
+        "cilindro_a_doppio_fondo",
+        "colomba_che_non_esiste",
+        "asso_sempre_in_cima_al_mazzo"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

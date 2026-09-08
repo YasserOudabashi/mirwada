@@ -648,13 +648,19 @@ func _p_plant_growth(prim: Dictionary, caster: Node, _stats: Node, _ability_id: 
 	return rec
 
 
-## illusion (US-608, primitiva della fase 5b portata qui dal Servant of
-## Concealment del Darkness - fool_velo_illusorio e darkness_cancellazione la
-## usano). Crea un inganno percettivo di 'tipo_illusione' nel raggio per
-## 'durata'. 'potenza' = quante esche / quanto e' convincente. Il consumatore
-## vero (IA, tell visivo) e' combat/fase 6: qui l'abilita' emette il fatto e,
-## per 'danno_percepito', un dot a tag follia che sparisce se il bersaglio
-## "capisce" (rimovibile da light_purify come ogni dot).
+## illusion (US-608 / US-5B05, primitiva-firma del gruppo Lord of Mysteries).
+## Crea un inganno percettivo di 'tipo_illusione' nel raggio per 'durata'. Il
+## SIGNIFICATO di 'potenza' e' per-tipo_illusione (deciso in US-5B05 col primo
+## VFX a schermo):
+##   "copia_nemico"    -> potenza = NUMERO di esche registrate (i "finti" veri
+##                        li fa comparire il combat, fase 6; qui il conteggio).
+##   "danno_percepito" -> potenza = intensita' del dot a tag follia, che
+##                        sparisce se il bersaglio "capisce" (rimovibile da
+##                        light_purify come ogni dot).
+##   altri ("aspetto", "oggetto_evocato", "copia_statica", ...) -> potenza e'
+##                        registrata; l'effetto pieno e' combat/UI (fase 6).
+## Il consumatore vero (IA che ci casca, tell visivo sull'esca - bordo
+## tremolante, palette Fool) e' combat/fase 6: qui l'abilita' emette il fatto.
 func _p_illusion(prim: Dictionary, caster: Node, stats: Node, _ability_id: String) -> Dictionary:
 	var raggio: float = _num(prim.get("raggio"), 0.0)
 	var durata: float = _num(prim.get("durata"), 0.0)
@@ -662,13 +668,20 @@ func _p_illusion(prim: Dictionary, caster: Node, stats: Node, _ability_id: Strin
 	var tipo_illusione: String = str(prim.get("tipo_illusione", ""))
 	var origine: Vector2 = (caster as Node2D).global_position if caster is Node2D and (caster as Node2D).is_inside_tree() else Vector2.ZERO
 
-	if tipo_illusione == "danno_percepito" and durata > 0.0 and stats != null:
-		_pending.append({"kind": "dot", "stats": stats, "danno_tick": float(potenza),
-				"tick_rate": 1.0, "left": durata, "acc": 0.0})
+	var rec: Dictionary = {"tipo": "illusion", "raggio": raggio, "durata": durata,
+			"potenza": potenza, "tipo_illusione": tipo_illusione, "applied": true}
+
+	match tipo_illusione:
+		"danno_percepito":
+			if durata > 0.0 and stats != null:
+				_pending.append({"kind": "dot", "stats": stats, "danno_tick": float(potenza),
+						"tick_rate": 1.0, "left": durata, "acc": 0.0})
+			rec["dot_follia"] = true
+		"copia_nemico":
+			rec["esche"] = potenza
 
 	illusione_creata.emit(tipo_illusione, raggio, origine)
-	return {"tipo": "illusion", "raggio": raggio, "durata": durata, "potenza": potenza,
-			"tipo_illusione": tipo_illusione, "applied": true}
+	return rec
 
 
 ## steal (US-5B01, primitiva-firma del gruppo Lord of Mysteries): sottrae

@@ -6324,3 +6324,53 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - BLOCCO A CHIUSO: US-5B01/02/03/04. Error 10/10. steal + possess +
   time_rewind implementate. Prossimo: BLOCCO B - Fool (US-5B05 illusion gia'
   in fase 6; fool_2 senza probability_shift in US-5B07).
+
+[2026-09-08] US-5B05 — Fool, Sequenze 9-7 (Seer / Clown / Magician) + primitiva illusion. FASE 5b, BLOCCO B.
+
+- illusion: era gia' implemented:true (fase 6, Servant of Concealment del
+  Darkness). _p_illusion ESTESO senza toccare execute:
+  * il SIGNIFICATO di 'potenza' e' per-tipo_illusione (decisione di US-5B05
+    col primo VFX): "copia_nemico" -> potenza = NUMERO di esche (record
+    rec["esche"]); "danno_percepito" -> potenza = intensita' del dot follia
+    (comportamento invariato); altri tipi -> potenza registrata.
+  * match su tipo_illusione al posto dell'if singolo su "danno_percepito".
+  vfx.json: illusion aveva gia' vfx_mirage.
+- CONTENUTO Fool Seq 9/8/7:
+  * fool_9 Seer: era gia' non-stub (audit) - invariato (3 abilita',
+    reveal_info(pericolo/intenzione) + illusion(copia_statica), acting 1.0,
+    madness 1.0).
+  * fool_8 Clown (stub -> false): fool_acrobazia (dash invulnerabile che
+    attraversa) + fool_travestimento_lampo (illusion 'aspetto' + debuff
+    precisione = rompe l'aggro). acting: 2x ability_used + area_cleared
+    (senza_uccidere). madness 2.2.
+  * fool_7 Magician (stub -> false): fool_illusione_solida (illusion
+    'danno_percepito' potenza 3) + fool_oggetto_dal_nulla (illusion
+    'oggetto_evocato' + melee_arc fisico). acting: 2x ability_used +
+    damage_dealt(follia). madness 3.5.
+- formule formula_fool_8/7 + 6 ingredienti nuovi. caratteristiche
+  char_fool_8/7. i18n rilanciato (it.json 937 -> 949); tradotte le 4 abilita'
+  fool pre-esistenti (erano TODO da fase 2) + le 4 nuove + char_fool_8/7.
+- VERIFICA A SCHERMO / leggibilita' di illusion (FR-10, "rischio numero uno").
+  Sessione headless: verifica scriptata (test_fool.gd):
+  * illusion 'danno_percepito' e' un dot a tag follia che TOGLIE hp e che
+    light_purify rimuove (il bersaglio "capisce" -> smette di far male).
+  * illusion 'copia_nemico' registra rec["esche"] = potenza.
+  * illusione_creata emette il tipo_illusione dai dati.
+  DICHIARAZIONE FR-10: il giocatore distingue un'esca da un nemico vero SOLO
+  quando il combat (fase 6) fa comparire le esche con il TELL visivo: bordo
+  tremolante + palette Fool (data/vfx.json: fool ha tratto "assenza", primario
+  #8f7fae, distorsione 0.6 - la piu' alta di tutti i Pathway, apposta). In 5b
+  la primitiva registra il numero di esche e il fatto (illusione_creata); il
+  renderer delle esche con il loro tell e' integrazione combat, prd-fase-5b
+  sez. 5. NON e' un blocco: la meccanica (dot rimovibile, conteggio esche) e'
+  completa e testata; manca solo la resa a schermo, che e' esplicitamente
+  fase 6.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: stub
+  19->17, sinergie 17 invariato, TODO i18n 49 [char_fool tradotte, 4 fool
+  ability ex-TODO risolte, restano i 47 nomi TG baseline meno 4 fool = ~43 +
+  ...]). 690 test headless (685 + 5 in test_fool.gd), tutti verdi. Nessuna
+  regressione.
+- File .gd toccati: scripts/ability_engine.gd (_p_illusion esteso, +~10 righe,
+  execute intatto) + tests/test_fool.gd.
+- Prossima storia: US-5B06 - Fool Seq 6-4 (Faceless / Marionettist / Bizarro
+  Sorcerer).

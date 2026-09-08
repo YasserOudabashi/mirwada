@@ -94,8 +94,8 @@
       ],
       "priority": 5,
       "fase": "5b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. illusion gia' implemented (fase 6): _p_illusion esteso senza toccare execute - 'potenza' e' per-tipo_illusione (copia_nemico -> numero esche in rec['esche']; danno_percepito -> intensita' dot follia; invariato il resto). fool_9 gia' non-stub, invariato. fool_8 Clown (dash + illusion aspetto) e fool_7 Magician (illusion danno_percepito + illusion oggetto_evocato + melee_arc) stub->false. formula_fool_8/7 + 6 ingredienti + char_fool_8/7. i18n: tradotte le 4 abilita' fool ex-TODO di fase 2 + le nuove + char. test_fool.gd (5 test): danno_percepito e' un dot follia rimovibile da light_purify; copia_nemico registra le esche; illusione_creata emette il tipo. validate exit 0 (stub 19->17). 690 test verdi. FR-10 (rischio n.1): il tell visivo esca-vs-nemico (bordo tremolante + palette Fool, distorsione 0.6) e' resa combat/fase 6; in 5b la meccanica (dot rimovibile, conteggio esche) e' completa e testata, NON un blocco."
     },
     {
       "id": "US-5B06",
