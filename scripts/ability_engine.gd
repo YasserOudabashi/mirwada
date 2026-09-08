@@ -82,6 +82,7 @@ func _ready() -> void:
 		"mind_read": _p_mind_read,
 		"shadow_meld": _p_shadow_meld,
 		"illusion": _p_illusion,
+		"steal": _p_steal,
 	}
 
 
@@ -650,6 +651,48 @@ func _p_illusion(prim: Dictionary, caster: Node, stats: Node, _ability_id: Strin
 	illusione_creata.emit(tipo_illusione, raggio, origine)
 	return {"tipo": "illusion", "raggio": raggio, "durata": durata, "potenza": potenza,
 			"tipo_illusione": tipo_illusione, "applied": true}
+
+
+## steal (US-5B01, primitiva-firma del gruppo Lord of Mysteries): sottrae
+## qualcosa a un bersaglio. 'categoria' decide COSA:
+##   "oggetto"    -> registra il furto di un item. L'aggancio a Inventory con un
+##                   bersaglio reale e' combat/fase 6 (prd-fase-5b, OQ 2): qui
+##                   si registra il fatto.
+##   "abilita"    -> presta al caster l'ability_id indicato via grant_temporary
+##                   (US-204) per 'durata_prestito' secondi. Il bersaglio da cui
+##                   si ruba lo sceglie il combat (fase 6); l'ability_id nei dati
+##                   dice quale potere questo Beyonder e' capace di copiare.
+##   "conoscenza" -> KnowledgeStore.impara un flag "rubata:<ability_id>".
+## 'probabilita' < 1.0 = non sempre riesce (registrato; il tiro vero e' combat).
+## 'non_sottrae' true (Door, fotocopia): il record segna sottratto:false, cioe'
+##   il bersaglio NON resta privo di cio' che gli e' stato copiato.
+func _p_steal(prim: Dictionary, caster: Node, _stats: Node, ability_id: String) -> Dictionary:
+	var categoria: String = str(prim.get("categoria", ""))
+	var durata_prestito: float = _num(prim.get("durata_prestito"), 0.0)
+	var probabilita: float = _num(prim.get("probabilita"), 1.0)
+	var non_sottrae: bool = _flag(prim.get("non_sottrae"), false)
+
+	var rec: Dictionary = {"tipo": "steal", "categoria": categoria,
+			"durata_prestito": durata_prestito, "probabilita": probabilita,
+			"sottratto": not non_sottrae, "applied": false}
+
+	match categoria:
+		"abilita":
+			var target_id: String = str(prim.get("ability_id", ""))
+			rec["ability_id"] = target_id
+			if not target_id.is_empty() and caster != null:
+				rec["applied"] = grant_temporary(target_id, caster, durata_prestito)
+		"conoscenza":
+			var flag: String = "rubata:" + ability_id
+			rec["flag"] = flag
+			var ks: Node = get_tree().root.get_node_or_null("KnowledgeStore")
+			if ks != null:
+				ks.call("impara", flag)
+				rec["applied"] = true
+		"oggetto":
+			rec["applied"] = true
+
+	return rec
 
 
 ## shadow_meld (US-607, primitiva della fase 5b portata qui dal Nightwatcher

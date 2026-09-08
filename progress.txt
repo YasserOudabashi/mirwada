@@ -6054,3 +6054,74 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   densita', audio (spec), narrativa. Save 20 -> 21 (un bump).
 - Prossima fase: 5b (Fool, Error, Door). PRD sorgente
   006_PRD/prd-fase-5b-lord-of-mysteries.md.
+
+[2026-09-08] US-5B01 — Error, Sequenze 9-7 (Marauder / Swindler / Cryptologist) + primitiva steal. FASE 5b, BLOCCO A.
+
+- PRIMITIVA NUOVA steal: _p_steal in scripts/ability_engine.gd (_handlers +1,
+  execute / _esegui_primitive INTATTI). 'categoria' decide cosa:
+  * "oggetto"    -> registra il furto (record applied:true, sottratto:true).
+                    L'aggancio a Inventory con un bersaglio reale e' fase 6
+                    (prd-fase-5b OQ 2).
+  * "abilita"    -> grant_temporary(prim.ability_id, caster, durata_prestito)
+                    - riuso di US-204. In 5B01 nessun dato lo usa (nessun
+                    ability_id nel registro params ancora): l'ability_id di
+                    steal lo aggiunge US-5B02 (Prometheus). Testato via
+                    chiamata diretta _p_steal.
+  * "conoscenza" -> KnowledgeStore.impara("rubata:<ability_id>").
+  Il record segna sempre 'sottratto' (= not non_sottrae): la fotocopia del
+  Door (non_sottrae:true) e' US-5B09, il flag e' gia' letto dall'handler ma
+  non ancora nel registro params.
+  primitives.json: steal -> implemented:true (attive/differite invariate).
+  vfx.json: primitive_vfx.steal = vfx_pilfer (impact_frame + scia verso il
+  caster: l'icona di cio' che e' preso vola in mano).
+- CONTENUTO Error Seq 9/8/7 (stub -> false):
+  * error_9 Marauder: error_scasso (steal oggetto), error_pugnalata_furtiva
+    (melee_arc fisico). stat velocita/evasione. acting: ability_used(scasso)
+    0.4 + enemy_defeated(senza_subire_danno) 0.35 + damage_dealt(fisico) 0.25.
+    madness 1.0.
+  * error_8 Swindler: error_parlantina (debuff precisione), error_patto_
+    truffaldino (buff spiritualita_max). acting: npc_influenced(ingannato)
+    0.45 + npc_influenced(persuaso) 0.30 + ability_used(parlantina) 0.25 -
+    la truffa e' il flusso npc_influenced contato dalla recitazione, NESSUN
+    if per Error. madness 2.3.
+  * error_7 Cryptologist: error_decifrazione (steal conoscenza + reveal_info
+    categoria "formule_cifrate"), error_lettura_rubata (reveal_info
+    "sigilli_nascosti" + debuff difesa). reveal_info fuori da Hermit porta la
+    categoria (matrice di proprieta'). acting: 2x ability_used + time_in_state
+    (meditazione) 300s. madness 3.6.
+- formule formula_error_9/8/7 + 9 ingredienti nuovi (grimaldello_cantante,
+  guanto_del_borseggiatore, refurtiva_dimenticata, lingua_d_argento_falsa,
+  contratto_con_la_clausola_nascosta, dado_truccato, stele_di_rosetta_
+  infranta, inchiostro_simpatico_rubato, chiave_di_cifrario).
+  characteristics char_error_9/8/7.
+- i18n: generate_i18n_stubs.py rilanciato (it.json 878 -> 896). Tradotte in
+  it.json: 6 abilita' + 9 acting (seed da name/descrizione) + 3 caratteristiche
+  ("Essenza di Marauder/Swindler/Cryptologist") + error_furto_prometeo (era
+  TODO da fase 2). TODO netti: 47 pre-esistenti (nomi TG mai tradotti, ecc.),
+  +3 error caratteristiche ora tradotte -> il conteggio TODO in it.json e' 50
+  ma le 3 chiavi error sono tradotte; i 47 restanti sono debito pre-esistente.
+- VERIFICA A SCHERMO / leggibilita' di steal (FR-10). Sessione headless senza
+  display: verifica scriptata come per ogni primitiva di fase 5 (teleport,
+  soul_detach, mind_read -> tutte verificate con asserzioni headless
+  sull'output osservabile, non screenshot). test_error.gd:
+  * steal "abilita": is_granted true per la durata, false dopo tick_effects
+    (il prestito e' ispezionabile -> la UI puo' mostrare un badge col timer).
+  * steal "conoscenza": KnowledgeStore.conosce("rubata:...") -> true (la
+    conoscenza rubata e' un flag leggibile dal libro/diagramma).
+  * steal "oggetto": record { applied:true, sottratto:true }.
+  DICHIARAZIONE FR-10: la leggibilita' PIENA di steal a schermo - l'icona di
+  COSA e' stato preso + il timer di PER QUANTO - richiede l'aggancio combat/HUD
+  di fase 6 (un bersaglio reale da cui rubare, la HUD del prestito). In 5b la
+  primitiva: (a) emette il record con categoria + durata + sottratto, (b) ha
+  la spec VFX vfx_pilfer (impact_frame sullo strappo + scia dell'oggetto verso
+  il caster) che rende leggibile il "qualcosa e' volato via dal bersaglio a
+  te". L'affinamento (badge persistente col countdown per "abilita", icona
+  item per "oggetto") e' lavoro di fase 6, come da prd-fase-5b sez. 5.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: 29->26
+  stub, 18->17 sinergie irraggiungibili [sinergia_colpo_del_caso ora
+  raggiungibile - rivalutazione completa in US-5B11], 48->50 TODO i18n conteggio
+  ma le chiavi nuove sono tradotte). 674 test headless (669 + 5 in
+  test_error.gd), tutti verdi. Nessuna regressione.
+- File .gd toccati: scripts/ability_engine.gd (handler steal + 1 riga _handlers).
+  execute / _esegui_primitive non toccati. Elenco per il checkpoint US-5B04.
+- Prossima storia: US-5B02 - Error Seq 6-4 + primitiva possess.

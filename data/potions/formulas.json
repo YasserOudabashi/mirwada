@@ -213,7 +213,16 @@
     "voce_del_gigante",
     "voce_di_creatura_mai_vista",
     "zanna_di_latte",
-    "zolfo_delle_fosse"
+    "zolfo_delle_fosse",
+    "grimaldello_cantante",
+    "guanto_del_borseggiatore",
+    "refurtiva_dimenticata",
+    "lingua_d_argento_falsa",
+    "contratto_con_la_clausola_nascosta",
+    "dado_truccato",
+    "stele_di_rosetta_infranta",
+    "inchiostro_simpatico_rubato",
+    "chiave_di_cifrario"
   ],
   "formulas": {
     "formula_fool_9": {
@@ -1202,6 +1211,48 @@
         "frammento_di_notte_primordiale",
         "occhio_del_gufo_del_giudizio",
         "ultimo_respiro_del_giorno"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_9": {
+      "characteristic_sequence": 9,
+      "ingredients": [
+        "grimaldello_cantante",
+        "guanto_del_borseggiatore",
+        "refurtiva_dimenticata"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_8": {
+      "characteristic_sequence": 8,
+      "ingredients": [
+        "lingua_d_argento_falsa",
+        "contratto_con_la_clausola_nascosta",
+        "dado_truccato"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_7": {
+      "characteristic_sequence": 7,
+      "ingredients": [
+        "stele_di_rosetta_infranta",
+        "inchiostro_simpatico_rubato",
+        "chiave_di_cifrario"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

@@ -21,18 +21,65 @@
       "name_i18n": "sequence.error.9",
       "tier": "low",
       "concept": "Scasso, furto da inventario nemico, colpo alle spalle con bonus se non visto.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "velocita": 0.08,
+        "evasione": 0.05
+      },
+      "abilities": [
+        "error_scasso",
+        "error_pugnalata_furtiva"
+      ],
+      "acting_actions": [
+        {
+          "id": "error_9_saccheggio",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_scasso"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_9_saccheggio",
+          "descrizione": "Scassina 15 volte: ogni serratura forzata e' bottino"
+        },
+        {
+          "id": "error_9_agguato",
+          "evento": "enemy_defeated",
+          "filtri": {
+            "senza_subire_danno": true
+          },
+          "target": 10,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_9_agguato",
+          "descrizione": "Abbatti 10 nemici senza incassare un colpo: il Marauder non si fa vedere"
+        },
+        {
+          "id": "error_9_refurtiva",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "fisico"
+          },
+          "target": 1200,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_9_refurtiva",
+          "descrizione": "Infliggi 1200 danni fisici alle spalle dei nemici"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 9,
-        "ingredients": [],
+        "ingredients": [
+          "grimaldello_cantante",
+          "guanto_del_borseggiatore",
+          "refurtiva_dimenticata"
+        ],
         "formula_id": "formula_error_9"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 1.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 8,
@@ -41,18 +88,65 @@
       "name_i18n": "sequence.error.8",
       "tier": "low",
       "concept": "Eloquenza e truffa: estrae denaro e informazioni dagli NPC senza combattere.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "spiritualita_max": 0.08,
+        "precisione": 0.05
+      },
+      "abilities": [
+        "error_parlantina",
+        "error_patto_truffaldino"
+      ],
+      "acting_actions": [
+        {
+          "id": "error_8_raggiro",
+          "evento": "npc_influenced",
+          "filtri": {
+            "modo": "ingannato"
+          },
+          "target": 12,
+          "progresso": 0.45,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_8_raggiro",
+          "descrizione": "Inganna 12 NPC: la truffa e' il mestiere dello Swindler"
+        },
+        {
+          "id": "error_8_persuasione",
+          "evento": "npc_influenced",
+          "filtri": {
+            "modo": "persuaso"
+          },
+          "target": 8,
+          "progresso": 0.3,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_8_persuasione",
+          "descrizione": "Persuadi 8 NPC con la sola parlantina"
+        },
+        {
+          "id": "error_8_dialettica",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_parlantina"
+          },
+          "target": 15,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_8_dialettica",
+          "descrizione": "Usa la parlantina 15 volte per confondere i bersagli"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 8,
-        "ingredients": [],
+        "ingredients": [
+          "lingua_d_argento_falsa",
+          "contratto_con_la_clausola_nascosta",
+          "dado_truccato"
+        ],
         "formula_id": "formula_error_8"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 2.3,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 7,
@@ -61,18 +155,65 @@
       "name_i18n": "sequence.error.7",
       "tier": "low",
       "concept": "Decifra formule, sigilli e testi cifrati; ruba conoscenza invece di oggetti.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "spiritualita_max": 0.1,
+        "precisione": 0.08
+      },
+      "abilities": [
+        "error_decifrazione",
+        "error_lettura_rubata"
+      ],
+      "acting_actions": [
+        {
+          "id": "error_7_cifrario",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_decifrazione"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_7_cifrario",
+          "descrizione": "Decifra 12 formule o sigilli: la conoscenza si prende, non si chiede"
+        },
+        {
+          "id": "error_7_glossa",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_lettura_rubata"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_7_glossa",
+          "descrizione": "Ruba 12 letture dai testi altrui"
+        },
+        {
+          "id": "error_7_studio",
+          "evento": "time_in_state",
+          "filtri": {
+            "stato": "meditazione"
+          },
+          "target": 300,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_7_studio",
+          "descrizione": "Passa 300 secondi a studiare i cifrari rubati"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 7,
-        "ingredients": [],
+        "ingredients": [
+          "stele_di_rosetta_infranta",
+          "inchiostro_simpatico_rubato",
+          "chiave_di_cifrario"
+        ],
         "formula_id": "formula_error_7"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 3.6,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 6,

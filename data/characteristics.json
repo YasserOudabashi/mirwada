@@ -427,6 +427,24 @@
       "pathway_id": "darkness",
       "sequence": 0,
       "name_i18n": "characteristic.darkness.0"
+    },
+    {
+      "id": "char_error_9",
+      "pathway_id": "error",
+      "sequence": 9,
+      "name_i18n": "characteristic.error.9"
+    },
+    {
+      "id": "char_error_8",
+      "pathway_id": "error",
+      "sequence": 8,
+      "name_i18n": "characteristic.error.8"
+    },
+    {
+      "id": "char_error_7",
+      "pathway_id": "error",
+      "sequence": 7,
+      "name_i18n": "characteristic.error.7"
     }
   ]
 }

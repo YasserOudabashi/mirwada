@@ -239,6 +239,12 @@
       "frames": 4,
       "impact_frame": false,
       "scia": false
+    },
+    "steal": {
+      "sprite": "vfx_pilfer",
+      "frames": 3,
+      "impact_frame": true,
+      "scia": true
     }
   },
   "impact_frames": {

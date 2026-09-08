@@ -20,8 +20,8 @@
       ],
       "priority": 1,
       "fase": "5b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. steal implementata (_p_steal, execute/_esegui_primitive intatti), primitives.json implemented:true, vfx.json vfx_pilfer. Error Seq 9/8/7 stub->false: Marauder (steal oggetto + melee_arc), Swindler (npc_influenced via acting, nessun if), Cryptologist (steal conoscenza + reveal_info con categoria). formula_error_9/8/7 + 9 ingredienti + char_error_9/8/7. i18n rilanciato, 3 caratteristiche + 6 abilita' + 9 acting tradotte (+ error_furto_prometeo). test_error.gd 5 test verdi. validate exit 0 (stub 29->26). 674 test totali, nessuna regressione. FR-10: leggibilita' piena di steal (icona di cosa rubato + timer prestito) rimandata all'aggancio combat/HUD di fase 6 e dichiarata in progress.txt; in 5b la primitiva emette record + spec VFX. ability_id di steal lo aggiunge US-5B02, non_sottrae US-5B09."
     },
     {
       "id": "US-5B02",

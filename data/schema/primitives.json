@@ -234,7 +234,8 @@
         "categoria",
         "durata_prestito",
         "probabilita"
-      ]
+      ],
+      "implemented": true
     },
     "rule_bind": {
       "params": [

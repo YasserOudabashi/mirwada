@@ -4,7 +4,163 @@
   "abilities": [
     {
       "schema_version": 1,
+      "id": "error_scasso",
+      "name": "Scasso",
+      "name_i18n": "ability.error.error_scasso",
+      "sequence_id": "error_9",
+      "costo_spiritualita": 5,
+      "cooldown": 8.0,
+      "primitive": [
+        {
+          "tipo": "steal",
+          "categoria": "oggetto",
+          "durata_prestito": 0,
+          "probabilita": 0.8
+        }
+      ],
+      "tag_sinergia": [
+        "furto",
+        "singolo",
+        "cavillo"
+      ],
+      "note": "Il primo furto del Marauder: forza una serratura o alleggerisce un nemico. L'aggancio all'inventario del bersaglio e' combat (fase 6); qui la primitiva registra il colpo."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_pugnalata_furtiva",
+      "name": "Pugnalata furtiva",
+      "name_i18n": "ability.error.error_pugnalata_furtiva",
+      "sequence_id": "error_9",
+      "costo_spiritualita": 6,
+      "cooldown": 4.0,
+      "primitive": [
+        {
+          "tipo": "melee_arc",
+          "danno": 16,
+          "angolo": 55,
+          "raggio": 1.5,
+          "stagger": 22,
+          "tag_danno": "fisico"
+        }
+      ],
+      "tag_sinergia": [
+        "furto",
+        "singolo",
+        "agilita'"
+      ],
+      "note": "Un colpo alle spalle: danno secco se il bersaglio non ti ha visto. Il bonus da invisibilita' e' combat (fase 6)."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_parlantina",
+      "name": "Parlantina",
+      "name_i18n": "ability.error.error_parlantina",
+      "sequence_id": "error_8",
+      "costo_spiritualita": 8,
+      "cooldown": 10.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.2,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "mente",
+        "singolo"
+      ],
+      "note": "Un fiume di parole che distrae: il bersaglio perde il filo e mira peggio. La truffa vera sugli NPC e' il flusso npc_influenced, contato dalla recitazione."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_patto_truffaldino",
+      "name": "Patto truffaldino",
+      "name_i18n": "ability.error.error_patto_truffaldino",
+      "sequence_id": "error_8",
+      "costo_spiritualita": 10,
+      "cooldown": 24.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "spiritualita_max",
+          "valore": 0.15,
+          "durata": 20.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "contratto",
+        "furto"
+      ],
+      "note": "Ogni accordo dello Swindler ha una clausola nascosta a suo favore: ne ricava risorse."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_decifrazione",
+      "name": "Decifrazione",
+      "name_i18n": "ability.error.error_decifrazione",
+      "sequence_id": "error_7",
+      "costo_spiritualita": 12,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "steal",
+          "categoria": "conoscenza",
+          "durata_prestito": 0,
+          "probabilita": 0.9
+        },
+        {
+          "tipo": "reveal_info",
+          "raggio": 10,
+          "categoria": "formule_cifrate",
+          "durata": 12.0
+        }
+      ],
+      "tag_sinergia": [
+        "furto",
+        "conoscenza",
+        "analisi"
+      ],
+      "note": "Il Cryptologist ruba conoscenza al posto di oggetti: decifra una formula o un sigillo e se lo tiene. reveal_info porta la categoria (divinazione fuori da Hermit, matrice di proprieta')."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_lettura_rubata",
+      "name": "Lettura rubata",
+      "name_i18n": "ability.error.error_lettura_rubata",
+      "sequence_id": "error_7",
+      "costo_spiritualita": 10,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "reveal_info",
+          "raggio": 8,
+          "categoria": "sigilli_nascosti",
+          "durata": 10.0
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.15,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "conoscenza",
+        "divinazione",
+        "singolo"
+      ],
+      "note": "Legge i sigilli difensivi del bersaglio e ne trova il difetto: la difesa cede dove il testo lo dice."
+    },
+    {
+      "schema_version": 1,
       "id": "error_furto_prometeo",
+      "name": "Furto di Prometeo",
       "name_i18n": "ability.error.error_furto_prometeo",
       "sequence_id": "error_6",
       "costo_spiritualita": 25,
@@ -23,7 +179,7 @@
         "singolo"
       ],
       "costo_follia": 1.5,
-      "note": "STRESS TEST. Ruba un'abilita' vista e la rende eseguibile. Richiede che AbilityEngine sappia eseguire un'abilita' non posseduta: nessuna primitiva nuova, ma una capacita' del motore da mettere nel PRD di fase 2."
+      "note": "STRESS TEST (US-204). Ruba un'abilita' vista e la rende eseguibile via grant_temporary. La Sequenza 6 (US-5B02) le dara' l'ability_id del potere copiato."
     }
   ]
 }
