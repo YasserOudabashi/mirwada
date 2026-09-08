@@ -6493,3 +6493,38 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - File .gd toccati: nessuno (solo dati + tests/test_door.gd).
 - Prossima storia: US-5B09 - Door Seq 6-4 (Scribe fotocopia via steal
   non_sottrae / Traveler / Secrets Sorcerer).
+
+[2026-09-08] US-5B09 — Door, Sequenze 6-4 (Scribe / Traveler / Secrets Sorcerer) — fotocopia via steal non_sottrae. FASE 5b, BLOCCO C.
+
+- steal: +param non_sottrae nel registro (primitives.json). _p_steal lo
+  leggeva gia' da US-5B01: rec["sottratto"] = not non_sottrae. Nessuna
+  modifica all'handler.
+- CONTENUTO Door Seq 6/5/4 (stub -> false):
+  * door_6 Scribe: door_registra_abilita = steal { categoria:"abilita",
+    ability_id:"tg_stretta_ferrea", probabilita:1.0, durata_prestito:20,
+    non_sottrae:true } - FOTOCOPIA: concede l'abilita' al caster (grant_temporary,
+    lo stesso motore di US-204) MA l'originale sul nemico NON e' sottratto.
+    Distinto dallo steal dell'Error (sottrae, probabilita < 1). Un solo
+    vocabolario 'steal' con un flag, NESSUN if per Door. + door_riproduci_copia
+    (projectile). madness 5.0.
+  * door_5 Traveler: door_scorciatoia (teleport distanza 500 + porta_alleati)
+    + door_porta_di_gruppo (teleport 400 + buff velocita). Il fast travel DEL
+    DOOR (design-world cap. 7): scorciatoia istantanea, mai permanenza. Nessun
+    if: teleport coi parametri giusti. madness 6.3.
+  * door_4 Secrets Sorcerer (saint): door_occultamento_totale (shadow_meld
+    lungo 15s + illusion esca) + door_segreto_svanito (shadow_meld + teleport).
+    Rituale soglia/crocevia (frontiera_porte), notte_fonda, sacrifica
+    "un_segreto_che_ti_definiva". madness 8.0.
+- formule formula_door_6/5/4 + 9 ingredienti. caratteristiche char_door_6/5/4
+  (tradotte). i18n rilanciato (it.json 1008 -> 1026). 45 TODO = baseline.
+- VERIFICA A SCHERMO: test_door.gd - la fotocopia dello Scribe concede
+  tg_stretta_ferrea (is_granted true) MA rec["sottratto"] == false (il nemico
+  non e' marcato derubato); il Traveler e' teleport con porta_alleati:true e
+  distanza grande, nessuna primitiva nuova; le 6 abilita' Seq 6-4 senza
+  warning.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: stub
+  7->4, sinergie 17, TODO 45). 704 test headless (701 + 3 in test_door.gd),
+  tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (steal.non_sottrae era gia' letto dall'handler;
+  solo +1 riga nel registro params di primitives.json, che e' un DATO).
+- Prossima storia: US-5B10 - Door Seq 3-0 + varco_forzato nel WorldState.

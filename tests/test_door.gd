@@ -12,6 +12,11 @@ const ABILITA_9_7 := [
 	"door_via_di_fuga", "door_scambio_di_posto",
 	"door_lettura_stellare", "door_occhio_nell_ombra",
 ]
+const ABILITA_6_4 := [
+	"door_registra_abilita", "door_riproduci_copia",
+	"door_scorciatoia", "door_porta_di_gruppo",
+	"door_occultamento_totale", "door_segreto_svanito",
+]
 
 
 func _engine() -> Node:
@@ -81,12 +86,48 @@ func test_reveal_info_del_door_e_sullo_spazio() -> void:
 	_cleanup(c)
 
 
-func test_door_9_7_sono_contenuto_e_le_acting_sommano_uno() -> void:
+func test_ogni_abilita_door_6_4_si_esegue_senza_warning() -> void:
+	var e: Node = _engine()
+	for aid in ABILITA_6_4:
+		var c: Node2D = _caster()
+		var r: Dictionary = e.call("execute", aid, c)
+		assert_true(r["ok"], "%s eseguita" % aid)
+		assert_eq((r["warnings"] as PackedStringArray).size(), 0,
+			"%s: nessun warning di primitiva: %s" % [aid, r["warnings"]])
+		e.call("clear_cooldowns")
+		e.call("clear_granted")
+		_cleanup(c)
+
+
+func test_scribe_fotocopia_senza_marcare_sottratto() -> void:
+	var e: Node = _engine()
+	var c: Node2D = _caster()
+	var r: Dictionary = e.call("execute", "door_registra_abilita", c)
+	var rec: Dictionary = (r["effects"] as Array)[0]
+	assert_true(e.call("is_granted", c, "tg_stretta_ferrea"),
+		"la fotocopia concede l'abilita' al caster (grant_temporary, come lo steal)")
+	assert_false(bool(rec["sottratto"]),
+		"MA con non_sottrae:true il nemico NON e' marcato derubato (distinzione dall'Error)")
+	e.call("clear_granted")
+	_cleanup(c)
+
+
+func test_traveler_e_teleport_coi_parametri_del_door() -> void:
+	# Nessun 'if' per il Door: il fast travel e' teleport con distanza grande +
+	# porta_alleati:true, come da dati.
+	var ab: Dictionary = _gd().call("get_ability", "door_scorciatoia")
+	var p: Dictionary = (ab.get("primitive", []) as Array)[0]
+	assert_eq(str(p["tipo"]), "teleport", "e' teleport, non una primitiva nuova")
+	assert_true(bool(p["porta_alleati"]), "porta gli alleati (il Traveler viaggia in gruppo)")
+	assert_gt(float(p["distanza"]), 300.0, "distanza grande (scorciatoia tra zone lontane)")
+
+
+func test_door_9_4_sono_contenuto_e_le_acting_sommano_uno() -> void:
 	var pw: Dictionary = _gd().call("get_pathway", "door")
 	var madness_prec: float = -1.0
 	for seq in (pw.get("sequences", []) as Array):
 		var d: Dictionary = seq
-		if int(d.get("sequence", -1)) < 7:
+		if int(d.get("sequence", -1)) < 4:
 			continue
 		assert_false(bool(d.get("stub", false)),
 			"door_%d non e' piu' stub" % int(d.get("sequence")))

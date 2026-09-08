@@ -237,7 +237,8 @@
         "categoria",
         "durata_prestito",
         "probabilita",
-        "ability_id"
+        "ability_id",
+        "non_sottrae"
       ],
       "implemented": true
     },

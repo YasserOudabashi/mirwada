@@ -202,6 +202,169 @@
         "stella"
       ],
       "note": "Osserva i percorsi restando occultato. shadow_meld (gia' implementata in fase 6, Nightwatcher del Darkness) applica lo status 'occultato'; anche il Secrets Sorcerer (Seq 4, US-5B09) la usera'."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_registra_abilita",
+      "name": "Registra abilita'",
+      "name_i18n": "ability.door.door_registra_abilita",
+      "sequence_id": "door_6",
+      "costo_spiritualita": 22,
+      "cooldown": 28.0,
+      "primitive": [
+        {
+          "tipo": "steal",
+          "categoria": "abilita",
+          "ability_id": "tg_stretta_ferrea",
+          "probabilita": 1.0,
+          "durata_prestito": 20.0,
+          "non_sottrae": true
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "conoscenza",
+        "singolo"
+      ],
+      "note": "MATRICE DI PROPRIETA': lo Scribe FOTOCOPIA (non_sottrae:true, probabilita 1.0) - registra un'abilita' osservata e se la tiene, ma l'originale sul nemico NON e' sottratto. Distinto dallo steal dell'Error (sottrae, probabilita < 1). Un solo vocabolario 'steal' con un flag, nessuna primitiva nuova, nessun if per Door."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_riproduci_copia",
+      "name": "Riproduci la copia",
+      "name_i18n": "ability.door.door_riproduci_copia",
+      "sequence_id": "door_6",
+      "costo_spiritualita": 12,
+      "cooldown": 5.0,
+      "primitive": [
+        {
+          "tipo": "projectile",
+          "danno": 22,
+          "velocita": 9,
+          "gittata": 10,
+          "pierce": 1,
+          "tag_danno": "fisico"
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "inganno",
+        "singolo"
+      ],
+      "note": "Scarica una riproduzione del potere registrato: la fotocopia funziona una volta."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_scorciatoia",
+      "name": "Scorciatoia",
+      "name_i18n": "ability.door.door_scorciatoia",
+      "sequence_id": "door_5",
+      "costo_spiritualita": 18,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "teleport",
+          "distanza": 500,
+          "richiede_visuale": false,
+          "porta_alleati": true
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "viaggio",
+        "singolo"
+      ],
+      "note": "Il fast travel DEL DOOR (design-world cap. 7): scorciatoia istantanea tra zone lontane, mai permanenza. Nessun if: e' teleport con distanza grande e porta_alleati:true."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_porta_di_gruppo",
+      "name": "Porta di gruppo",
+      "name_i18n": "ability.door.door_porta_di_gruppo",
+      "sequence_id": "door_5",
+      "costo_spiritualita": 24,
+      "cooldown": 22.0,
+      "primitive": [
+        {
+          "tipo": "teleport",
+          "distanza": 400,
+          "richiede_visuale": false,
+          "porta_alleati": true
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "velocita",
+          "valore": 0.2,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "viaggio",
+        "area"
+      ],
+      "note": "Porta un gruppo intero attraverso una porta di viaggio, e per un momento sono tutti piu' rapidi."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_occultamento_totale",
+      "name": "Occultamento totale",
+      "name_i18n": "ability.door.door_occultamento_totale",
+      "sequence_id": "door_4",
+      "costo_spiritualita": 24,
+      "cooldown": 20.0,
+      "primitive": [
+        {
+          "tipo": "shadow_meld",
+          "durata": 15.0,
+          "velocita": 0.2,
+          "richiede_ombra": false
+        },
+        {
+          "tipo": "illusion",
+          "raggio": 3,
+          "durata": 8.0,
+          "potenza": 1,
+          "tipo_illusione": "copia_statica"
+        }
+      ],
+      "tag_sinergia": [
+        "occultamento",
+        "illusione",
+        "spazio"
+      ],
+      "costo_follia": 2.0,
+      "note": "Il Secrets Sorcerer sparisce anche dal rilevamento mistico: shadow_meld lungo (status 'occultato') + un'esca al suo posto."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_segreto_svanito",
+      "name": "Segreto svanito",
+      "name_i18n": "ability.door.door_segreto_svanito",
+      "sequence_id": "door_4",
+      "costo_spiritualita": 18,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "shadow_meld",
+          "durata": 8.0,
+          "velocita": 0.15,
+          "richiede_ombra": false
+        },
+        {
+          "tipo": "teleport",
+          "distanza": 200,
+          "richiede_visuale": false,
+          "porta_alleati": false
+        }
+      ],
+      "tag_sinergia": [
+        "occultamento",
+        "spazio",
+        "viaggio"
+      ],
+      "note": "Svanisce e riappare altrove, senza che nessuno sappia che c'era. shadow_meld + teleport, entrambe gia' implementate."
     }
   ]
 }

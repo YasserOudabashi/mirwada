@@ -172,8 +172,8 @@
       ],
       "priority": 9,
       "fase": "5b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. steal +param non_sottrae nel registro (l'handler lo leggeva gia' da US-5B01: rec['sottratto']=not non_sottrae). door_6 Scribe door_registra_abilita = steal{categoria:abilita, ability_id:tg_stretta_ferrea, probabilita:1.0, non_sottrae:true} = FOTOCOPIA: concede via grant_temporary MA sottratto=false (distinto dall'Error che sottrae). Un solo vocabolario steal con un flag, nessun if per Door. door_5 Traveler (teleport distanza 500 + porta_alleati - fast travel del Door, nessuna primitiva nuova), door_4 Secrets Sorcerer saint (shadow_meld lungo + illusion; rituale soglia/crocevia) stub->false. formule + ingredienti + char_door_6/5/4 tradotti. test_door.gd esteso (fotocopia concede senza marcare sottratto; Traveler e' teleport coi parametri). Nessun .gd toccato (solo +1 riga params in primitives.json = dato). validate exit 0 (stub 7->4). 704 test verdi."
     },
     {
       "id": "US-5B10",

@@ -279,7 +279,16 @@
     "filo_teso_tra_due_stanze",
     "carta_stellare_con_una_stella_in_piu",
     "sabbia_di_meridiana_notturna",
-    "lente_puntata_sempre_a_nord"
+    "lente_puntata_sempre_a_nord",
+    "inchiostro_che_copia_da_solo",
+    "carta_carbone_dell_anima",
+    "timbro_di_ogni_potere",
+    "biglietto_di_sola_andata_e_ritorno",
+    "sabbia_di_due_deserti_lontani",
+    "mappa_che_si_ripiega_su_se_stessa",
+    "segreto_sigillato_in_cera_nera",
+    "ombra_ritagliata_con_le_forbici",
+    "chiave_che_chiude_e_non_apre"
   ],
   "formulas": {
     "formula_fool_9": {
@@ -1576,6 +1585,48 @@
         "carta_stellare_con_una_stella_in_piu",
         "sabbia_di_meridiana_notturna",
         "lente_puntata_sempre_a_nord"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_6": {
+      "characteristic_sequence": 6,
+      "ingredients": [
+        "inchiostro_che_copia_da_solo",
+        "carta_carbone_dell_anima",
+        "timbro_di_ogni_potere"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_5": {
+      "characteristic_sequence": 5,
+      "ingredients": [
+        "biglietto_di_sola_andata_e_ritorno",
+        "sabbia_di_due_deserti_lontani",
+        "mappa_che_si_ripiega_su_se_stessa"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_4": {
+      "characteristic_sequence": 4,
+      "ingredients": [
+        "segreto_sigillato_in_cera_nera",
+        "ombra_ritagliata_con_le_forbici",
+        "chiave_che_chiude_e_non_apre"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

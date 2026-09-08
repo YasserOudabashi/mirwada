@@ -216,18 +216,63 @@
       "name_i18n": "sequence.door.6",
       "tier": "mid",
       "concept": "Registra un'abilita' osservata e la riproduce una volta.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "spiritualita_max": 0.15,
+        "precisione": 0.1
+      },
+      "abilities": [
+        "door_registra_abilita",
+        "door_riproduci_copia"
+      ],
+      "acting_actions": [
+        {
+          "id": "door_6_scriba",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_registra_abilita"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_6_scriba",
+          "descrizione": "Registra 12 abilita' osservate"
+        },
+        {
+          "id": "door_6_copista",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_riproduci_copia"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_6_copista",
+          "descrizione": "Riproduci 15 copie di poteri altrui"
+        },
+        {
+          "id": "door_6_biblioteca",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 15,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_6_biblioteca",
+          "descrizione": "Sconfiggi 15 nemici con le loro stesse abilita' fotocopiate"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 6,
-        "ingredients": [],
+        "ingredients": [
+          "inchiostro_che_copia_da_solo",
+          "carta_carbone_dell_anima",
+          "timbro_di_ogni_potere"
+        ],
         "formula_id": "formula_door_6"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 5.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 5,
@@ -236,18 +281,63 @@
       "name_i18n": "sequence.door.5",
       "tier": "mid",
       "concept": "Viaggio nel mondo spirituale come scorciatoia tra zone lontane.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "velocita": 0.15,
+        "spiritualita_max": 0.12
+      },
+      "abilities": [
+        "door_scorciatoia",
+        "door_porta_di_gruppo"
+      ],
+      "acting_actions": [
+        {
+          "id": "door_5_viaggiatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_scorciatoia"
+          },
+          "target": 20,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_5_viaggiatore",
+          "descrizione": "Prendi 20 scorciatoie tra zone lontane"
+        },
+        {
+          "id": "door_5_carovana",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_porta_di_gruppo"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_5_carovana",
+          "descrizione": "Porta 12 gruppi attraverso una porta di viaggio"
+        },
+        {
+          "id": "door_5_esploratore",
+          "evento": "area_cleared",
+          "filtri": {},
+          "target": 8,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_5_esploratore",
+          "descrizione": "Ripulisci 8 aree arrivando da dove non se lo aspettano"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 5,
-        "ingredients": [],
+        "ingredients": [
+          "biglietto_di_sola_andata_e_ritorno",
+          "sabbia_di_due_deserti_lontani",
+          "mappa_che_si_ripiega_su_se_stessa"
+        ],
         "formula_id": "formula_door_5"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 6.3,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 4,
@@ -256,24 +346,77 @@
       "name_i18n": "sequence.door.4",
       "tier": "saint",
       "concept": "Occultamento totale: sfugge al rilevamento anche mistico.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 130,
+        "evasione": 0.15,
+        "spiritualita_max": 0.15
+      },
+      "abilities": [
+        "door_occultamento_totale",
+        "door_segreto_svanito"
+      ],
+      "acting_actions": [
+        {
+          "id": "door_4_invisibile",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_occultamento_totale"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_4_invisibile",
+          "descrizione": "Occultati completamente 12 volte"
+        },
+        {
+          "id": "door_4_svanito",
+          "evento": "time_in_state",
+          "filtri": {
+            "stato": "in_ombra"
+          },
+          "target": 500,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_4_svanito",
+          "descrizione": "Passa 500 secondi occultato, fuori da ogni rilevamento"
+        },
+        {
+          "id": "door_4_fantasma",
+          "evento": "enemy_defeated",
+          "filtri": {
+            "senza_subire_danno": true
+          },
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_4_fantasma",
+          "descrizione": "Abbatti 12 nemici che non ti hanno mai visto"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 4,
-        "ingredients": [],
+        "ingredients": [
+          "segreto_sigillato_in_cera_nera",
+          "ombra_ritagliata_con_le_forbici",
+          "chiave_che_chiude_e_non_apre"
+        ],
         "formula_id": "formula_door_4"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "soglia",
+          "crocevia"
+        ],
+        "momento": "notte_fonda",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "un_segreto_che_ti_definiva"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 8.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 3,
