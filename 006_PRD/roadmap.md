@@ -206,11 +206,9 @@ Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 >   `npc.schema.json`, `dialogue.schema.json`, `quest.schema.json`,
 >   `faction.schema.json`, `region.schema.json`.
 >
-> **Ancora aperto (fase 5b, PRD a parte)**: Fool (9 Seq), Error (10), Door (10)
-> = 29 Sequenze stub. Il "22/22 Pathway attivi completi" e il "100/100
-> Sequenze" arrivano quando la fase 5b e' chiusa, non con la fase 6. Le
-> primitive dure senza handler restano `possess` / `steal` / `time_rewind` /
-> `chain`.
+> **Fase 5b (CHIUSA il 2026-09-08, vedi sotto)**: Fool, Error, Door completati.
+> Darkness era gia' stato completato qui in fase 6 (blocco C, gruppo
+> eternal_darkness).
 
 - **Musica a layer per zona**: stem di base sempre attivo + stem che entrano
   su tensione/combattimento/boss, con crossfade. Riduce i minuti di musica da
@@ -226,6 +224,52 @@ Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 - Fazioni e reputazione
 - NPC, dialoghi, quest
 - Segreti e lore
+
+---
+
+## Fase 5b — Lord of Mysteries — CHIUSA per il gruppo (12 story, 713 test)
+
+> **PRD**: `006_PRD/prd-fase-5b-lord-of-mysteries.md`. Chiusa il 2026-09-08:
+> 12 story `US-5B01..5B12` in 4 blocchi (A Error + checkpoint, B Fool, C Door,
+> D chiusura). Save `schema_version` **INVARIATO** (contenuto, non struttura).
+> Darkness (l'altro membro del gruppo eternal_darkness rimasto) era gia' stato
+> completato in fase 6, blocco C.
+>
+> **Verdetto del checkpoint (US-5B04)**: l'architettura della fase 2 REGGE
+> anche sui Pathway "difficili" del Lord of Mysteries. `tests/test_slice_fase_5b.gd`
+> gioca Error dalla Sequenza 8 alla 2 in codice con ZERO righe che nominano
+> "error". Il `git diff` del blocco A (file `.gd` non di test) e' SOLO
+> `scripts/ability_engine.gd` +173 -0: i 3 handler `_p_steal` / `_p_possess` /
+> `_p_time_rewind` + il ring buffer di `time_rewind` + hook generici
+> (`execute()` +1 riga `_campiona_snapshot`, `_process`/`sweep` piccole
+> aggiunte). `execute` / `_esegui_primitive` — il dispatcher — intatti.
+>
+> **Cosa contiene**:
+> - **3 Pathway completi**: Fool, Error, Door, tutti a 10/10 Sequenze. Con
+>   Darkness (fase 6) e i 19 gia' fatti: **22/22 Pathway attivi completi,
+>   100/100 Sequenze non-stub**.
+> - **3 primitive implementate**: `steal` (categoria oggetto/abilita/conoscenza,
+>   +param `ability_id`/`non_sottrae`), `possess` (status `posseduto`, record
+>   `corpo_a_terra` come `soul_detach`), `time_rewind` (ring buffer di snapshot
+>   per-caster in `AbilityEngine`, non tocca il save). `illusion` e
+>   `shadow_meld` erano gia' implementate in fase 6; `_p_illusion` esteso
+>   (`potenza` per-`tipo_illusione`). `chain` resta senza handler: nessuna
+>   Sequenza attiva lo richiede.
+> - **`fool_2` (Miracle Invoker) riscritta senza `probability_shift`**: buff/
+>   debuff a varianza dichiarata + `curse(sfortuna)` gia' esistente. Grep di
+>   `data/abilities/` per una primitiva differita usata come `tipo` -> **0**.
+> - **Materia prima `avatar`** in `ownership.json` (9a voce di `summon`): gli
+>   avatar dell'Error sono autonomi; il Fool usa `illusion` (sono finti).
+> - **`data/synergies/batch_5.json`**: 6 sinergie del gruppo, tutte
+>   raggiungibili, + `anti_due_bugiardi` (anti-sinergia, neutralizza
+>   `sinergia_ladro_di_poteri`). `sinergia_contratto_solare` di `batch_3` e'
+>   diventata raggiungibile (tag `contratto` da `error_patto_truffaldino`).
+> - Nessun vocabolario di eventi nuovo (i 12 `tracked_events` invariati).
+>
+> **Criterio di uscita nel validator**: `tools/validate_data.py` verifica che
+> Fool/Error/Door non abbiano Sequenze stub, che `steal`/`possess`/`time_rewind`
+> siano `implemented`, che `batch_5.json` esista, e che il gioco sia a 100/100
+> Sequenze non-stub.
 
 ---
 

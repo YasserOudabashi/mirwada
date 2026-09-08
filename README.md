@@ -76,10 +76,19 @@ mistica (recupero, forzatura, percezione da Seq 5); audio del mondo come
 (`data/lore/antagonisti.json`). Save **`schema_version` 20 → 21** (un solo
 bump: tutto il resto sta nel campo `mondo`).
 
-**Ancora aperto — fase 5b** (Fool, Error, Door + `possess`/`steal`/`time_rewind`/
-`chain`): 29 Sequenze stub. Il "22/22 Pathway attivi completi" e "100/100
-Sequenze" arrivano quando la fase 5b è chiusa. PRD sorgente:
-`006_PRD/prd-fase-5b-lord-of-mysteries.md`.
+**Fase 5b — Lord of Mysteries: chiusa.** 12 story, 713 test. **Fool, Error,
+Door completi 10/10** → con Darkness (fase 6) e i 19 già fatti: **22/22
+Pathway attivi completi, 100/100 Sequenze non-stub**. Tre primitive
+implementate: `steal` (oggetto/abilità/conoscenza; l'Error *sottrae*, il Door
+*fotocopia* con `non_sottrae`), `possess` (status `posseduto`, il corpo del
+caster a terra come `soul_detach`), `time_rewind` (ring buffer di snapshot
+per-caster, non tocca il save). `fool_2` riscritta senza `probability_shift`
+(differita). Materia prima `avatar` nuova (Error: autonomi; Fool: `illusion`).
+`chain` resta senza handler: nessuna Sequenza attiva lo richiede. Save
+**invariato**. Verdetto (US-5B04, `tests/test_slice_fase_5b.gd`): Error giocato
+in codice dalla Sequenza 8 alla 2, zero righe che nominano il Pathway; il
+`git diff` del blocco A è solo `ability_engine.gd` +173 -0 (handler nuovi +
+ring buffer), il dispatcher intatto. PRD: `006_PRD/prd-fase-5b-lord-of-mysteries.md`.
 
 ## Setup
 
@@ -99,13 +108,14 @@ mano. Esce 0 se tutto passa, 1 al primo fallimento.
 ## Architettura in una riga
 
 Il codice implementa 28 primitive parametriche; i dati JSON le compongono in
-abilita'. Prova: il Twilight Giant e' completo dalla Sequenza 9 alla 0 con
-zero righe di codice dedicate (data/abilities/twilight_giant.json).
+abilita'. Prova: tutti e 22 i Pathway attivi sono completi dalla Sequenza 9
+alla 0 con zero righe di codice dedicate (data/abilities/*.json).
 
 ## Documenti
 
 - `CLAUDE.md` — regole di lavoro, comandi, decisioni prese
-- `006_PRD/prd-fase-3-sistemi-di-supporto.md` — PRD della fase corrente
+- `006_PRD/prd-fase-5b-lord-of-mysteries.md` — PRD dell'ultima fase chiusa
+- `006_PRD/prd-fase-6-mondo.md` — PRD della fase 6 (chiusa)
 - `006_PRD/prd-fase-2-pathway-core.md` — PRD della fase 2 (chiusa)
 - `006_PRD/prd-fase-1-fondamenta.md` — PRD della fase 1 (chiusa)
 - `006_PRD/design-master.md` — design doc master: baseline dell'audit, sicurezza, contratti, story per fase, decisioni aperte

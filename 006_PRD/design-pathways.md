@@ -174,15 +174,24 @@ scritta guardando questo file. In particolare, nota:
 
 ### Fase 5b — dopo il ciclo giorno/notte e le regioni di fase 6
 
-7. **Darkness** — `darkness_1` è già riscritta senza `probability_shift`
-   (US-503); le altre 9 Sequenze dipendono dal giorno/notte (stealth notturno,
-   incubi). `shadow_meld` da implementare.
-8. **Fool**, **Error**, **Door** — i più difficili: `illusion` (quali nemici
-   sono finti), `possess` (di chi è il corpo), `steal` (cosa ho preso e per
-   quanto), `time_rewind` (cosa è tornato), `chain`. La leggibilità a schermo
-   di queste primitive è un problema di design che serve contenuto reale in un
-   vero combattimento per essere risolto: si affrontano quando fase 6 ha dato
-   loro un mondo in cui vivere.
+7. **Darkness** — ✅ realizzato in **fase 6, blocco C** (il day/night lo
+   abilitava). `darkness_1` senza `probability_shift` (US-503); `shadow_meld` e
+   `illusion` implementate lì.
+8. **Fool**, **Error**, **Door** — ✅ **fase 5b, US-5B01..5B12** (chiusa il
+   2026-09-08). `steal`, `possess`, `time_rewind` implementate (l'Error per
+   primo, come criterio di uscita); `_p_illusion` esteso (`potenza` è
+   per-`tipo_illusione`: numero di esche per `copia_nemico`, intensità per
+   `danno_percepito`). `fool_2` (Miracle Invoker) riscritta senza
+   `probability_shift`. `chain` resta senza handler: nessuna Sequenza attiva lo
+   richiede. La leggibilità piena a schermo di `illusion`/`possess`/`steal`/
+   `time_rewind` (il tell dell'esca, la camera sull'ospite, l'icona del
+   maltolto, il lampo del punto di ripristino) è **integrazione combat/UI di
+   fase 6**: in 5b la primitiva registra il fatto + applica lo status + ha la
+   spec VFX. Verdetto del checkpoint US-5B04: l'architettura della fase 2 regge
+   anche sui Pathway difficili.
+
+**Con la fase 5b chiusa: 22/22 Pathway attivi completi, 100/100 Sequenze
+non-stub.**
 
 ---
 

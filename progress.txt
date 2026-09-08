@@ -6620,3 +6620,51 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - File .gd toccati: nessuno (solo dati: batch_5.json + i18n + tests).
 - Prossima storia: US-5B12 - chiusura fase 5b (documenti + check di chiusura
   nel validator).
+
+[2026-09-08] US-5B12 — Chiusura fase 5b. FASE 5b CHIUSA. BLOCCO D CHIUSO.
+
+- 006_PRD/roadmap.md: nuova sezione "Fase 5b — Lord of Mysteries — CHIUSA per
+  il gruppo (12 story, 713 test)" con verdetto del checkpoint, cosa contiene,
+  criterio di uscita nel validator. La nota "Ancora aperto (fase 5b)" della
+  sezione Fase 6 -> "Fase 5b CHIUSA, vedi sotto".
+- 006_PRD/design-pathways.md: sezione "Fase 5b" - Darkness spuntato (fatto in
+  fase 6, blocco C), Fool/Error/Door spuntati (US-5B01..5B12). Nota finale
+  "22/22 Pathway attivi completi, 100/100 Sequenze non-stub".
+- 006_PRD/design-master.md: Appendice A - nuova sottosezione "Fase 5b - CHIUSA"
+  (dopo Fase 5); Fase 6 "Aperto: fase 5b" -> "Poi fase 5b (chiusa) e fase 7".
+  Appendice C: riga Primitive ("27 con handler"; steal/possess/time_rewind
+  implementate, chain no); riga Matrice di proprieta' ("10, +avatar"); riga
+  nuova per batch_5.json.
+- CLAUDE.md: "Fase 5b - Lord of Mysteries: CHIUSA (12 story US-5B01..5B12, 713
+  test)" con il dettaglio delle 3 primitive, fool_2, avatar, batch_5, criterio
+  di uscita. "Fase corrente: 7 - Endgame". "Prova che l'architettura regge"
+  aggiornata coi 3 Pathway del Lord of Mysteries.
+- README.md: "Fase 5b - Lord of Mysteries: chiusa" con 22/22 + 100/100, le 3
+  primitive, il verdetto. "Architettura in una riga": "tutti e 22 i Pathway
+  attivi completi con zero righe di codice dedicate". Lista documenti
+  aggiornata (prd-fase-5b come ultima fase chiusa).
+- tools/validate_data.py: check di chiusura fase 5b (dopo quello di fase 5):
+  * fool/error/door senza Sequenze stub -> errore se ne restano.
+  * steal/possess/time_rewind devono essere 'implemented' -> errore altrimenti.
+  * data/synergies/batch_5.json deve esistere.
+  * stub_count deve essere 0 (100/100 Sequenze non-stub) -> errore altrimenti.
+  Il commento del check di chiusura fase 6 aggiornato ("lo fa il check fase 5b").
+- Come verificato: python tools/validate_data.py exit 0 (2 warning: 17 sinergie
+  irraggiungibili di gruppi differiti, 42 TODO i18n = baseline nomi TG).
+  grep di data/abilities/ per una primitiva differita come "tipo" -> 0.
+  713 test headless, tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (solo docs + validate_data.py + progress/prd).
+
+=== FASE 5b CHIUSA (2026-09-08) ===
+12 story US-5B01..5B12, 4 blocchi. 713 test headless (erano 669 a inizio fase).
+Fool, Error, Door completi 10/10. Con Darkness (fase 6) e i 19 gia' fatti:
+**22/22 PATHWAY ATTIVI COMPLETI, 100/100 SEQUENZE NON-STUB.**
+Primitive implementate: steal, possess, time_rewind (+ _p_illusion esteso).
+chain resta senza handler (nessuna Sequenza attiva lo usa).
+fool_2 senza probability_shift. Materia prima avatar. batch_5.json (6 sinergie).
+Save schema_version INVARIATO.
+Verdetto US-5B04: l'architettura della fase 2 regge sui Pathway difficili -
+diff .gd del blocco A = solo ability_engine.gd +173 -0, dispatcher intatto.
+
+Prossima fase: 7 - Endgame (cambio Pathway, fusioni del gruppo, finali).
+Generare il PRD con /prd.

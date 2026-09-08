@@ -158,20 +158,35 @@ audio del mondo come **spec** (nessun file audio prodotto);
 chiusi nuovi: `gate_types.json` (6), effetti dialoghi (6), effetti quest (5),
 livelli di reputazione. Schema nuovi: `npc`/`dialogue`/`quest`/`faction`/`region`.
 
-**Ancora aperto — fase 5b (PRD a parte)**: Fool (9 Seq), Error (10), Door (10)
-= 29 Sequenze stub. Il "**22/22 Pathway attivi completi**" e "100/100 Sequenze"
-arrivano quando la fase 5b è chiusa, non con la fase 6. Primitive dure senza
-handler: `possess`/`steal`/`time_rewind`/`chain`.
+Fase 5b — Lord of Mysteries: **CHIUSA** (12 story US-5B01..5B12, 713 test).
+PRD in `006_PRD/prd-fase-5b-lord-of-mysteries.md`. 4 blocchi (A Error +
+checkpoint, B Fool, C Door, D chiusura). Save `schema_version` **invariato**.
+**Fool, Error, Door completi 10/10** → con Darkness (chiuso in fase 6) e i 19
+già fatti: **22/22 Pathway attivi completi, 100/100 Sequenze non-stub**.
+3 primitive implementate: `steal` (categoria oggetto/abilita/conoscenza,
++param `ability_id`/`non_sottrae`), `possess` (status `posseduto`, record
+`corpo_a_terra` come `soul_detach`), `time_rewind` (ring buffer di snapshot
+per-caster in `AbilityEngine`, non tocca il save). `illusion`/`shadow_meld`
+erano già di fase 6; `_p_illusion` esteso (`potenza` per-`tipo_illusione`).
+`chain` resta senza handler (nessuna Sequenza attiva lo richiede).
+`fool_2` riscritta senza `probability_shift` (grep di `data/abilities/` per
+una primitiva differita come `tipo` → **0**). Materia prima `avatar` nuova in
+`ownership.json` (Error: avatar autonomi; Fool: `illusion`). `batch_5.json`:
+6 sinergie del gruppo + `anti_due_bugiardi`. Criterio di uscita verificato in
+`tests/test_slice_fase_5b.gd` (Error 8→2, zero codice che nomina "error";
+diff `.gd` del blocco A = solo `ability_engine.gd` +173 -0, dispatcher
+intatto) e nel validator (check di chiusura fase 5b).
 
-Fase corrente: **5b — Lord of Mysteries** (Fool, Error, Door). PRD sorgente:
-`006_PRD/prd-fase-5b-lord-of-mysteries.md`. Poi fase 7 (endgame).
+Fase corrente: **7 — Endgame** (cambio Pathway, fusioni del gruppo, finali).
+Generare il PRD con `/prd`. Roadmap in `006_PRD/roadmap.md`.
 
 Le fasi 7-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
 genera con `/prd` **solo quando la precedente è chiusa**.
 
-Prova che l'architettura regge: `data/abilities/twilight_giant.json` (fase 2) e
-i 5 Pathway di fase 5 sono contenuto completo con **zero righe di codice
-dedicate**. È il modello da imitare per ogni story di dati.
+Prova che l'architettura regge: `data/abilities/twilight_giant.json` (fase 2),
+i 5 Pathway di fase 5 e i 3 del Lord of Mysteries (fase 5b) sono contenuto
+completo con **zero righe di codice dedicate**. È il modello da imitare per
+ogni story di dati.
 
 ## Decisioni prese
 

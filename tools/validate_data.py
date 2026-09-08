@@ -1845,9 +1845,35 @@ def main():
         if _spec.get("implemented") and _spec.get("deferred"):
             err(f"data/schema/primitives.json [{_name}]: 'implemented' e 'deferred' insieme.")
 
+    # --- chiusura fase 5b (US-5B12): il gruppo Lord of Mysteries e' completo ---
+    # Fool/Error/Door a 10/10 Sequenze non-stub; le primitive-firma del gruppo
+    # (steal, possess, time_rewind) implementate; nessuna abilita' attiva usa
+    # una primitiva differita.
+    FASE_5B_PATHWAY = ["fool", "error", "door"]
+    for _pid in FASE_5B_PATHWAY:
+        _pw = load_json(os.path.join(pdir, f"{_pid}.json")) or {}
+        _stub = [s.get("sequence") for s in _pw.get("sequences", []) if s.get("stub")]
+        if _stub:
+            err(f"data/pathways/{_pid}.json: Sequenze ancora stub {sorted(_stub)} - "
+                f"la fase 5b e' chiusa, il gruppo Lord of Mysteries deve essere "
+                f"completo (US-5B12).")
+    for _name in ("steal", "possess", "time_rewind"):
+        if not prim_doc["primitives"].get(_name, {}).get("implemented"):
+            err(f"data/schema/primitives.json [{_name}]: primitiva-firma del "
+                f"gruppo Lord of Mysteries non marcata 'implemented' (US-5B12).")
+    if os.path.exists(os.path.join(DATA, "synergies", "batch_5.json")):
+        pass
+    else:
+        err("data/synergies/batch_5.json: mancante (US-5B12: le sinergie del "
+            "gruppo Lord of Mysteries).")
+    # nessuna Sequenza stub in tutto il gioco: 100/100 non-stub (US-5B12).
+    if stub_count:
+        err(f"{stub_count} Sequenze ancora stub su {total_sequences}: con la fase "
+            f"5b chiusa il gioco e' a 100/100 Sequenze non-stub (US-5B12).")
+
     # --- chiusura fase 6 (US-622): il mondo esiste ed e' coerente ---
-    # (NON si controlla "zero Sequenze stub": Fool/Error/Door restano fase 5b,
-    #  un PRD a parte. Il "22/22 Pathway completi" arriva con quella.)
+    # (NON si controlla "zero Sequenze stub": lo fa il check di chiusura fase 5b
+    #  qui sopra. Il "22/22 Pathway completi" arriva con la fase 5b.)
     FASE_6_DATA = [
         "world/regions.json", "npc/roster.json", "factions.json",
         "lore/antagonisti.json", "schema/npc.schema.json", "schema/dialogue.schema.json",

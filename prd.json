@@ -224,8 +224,8 @@
       ],
       "priority": 12,
       "fase": "5b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. FASE 5b CHIUSA. roadmap.md: sezione 'Fase 5b - CHIUSA (12 story, 713 test)'. design-pathways.md: Darkness (fase 6) + Fool/Error/Door spuntati, '22/22 Pathway completi, 100/100 Sequenze'. design-master.md: Appendice A sottosezione Fase 5b; Appendice C righe Primitive (27 con handler, chain no), Matrice (10 materie prime +avatar), batch_5. CLAUDE.md + README.md: gruppo chiuso, conteggi, 3 primitive, criterio di uscita, 'fase corrente: 7'. validate_data.py: check di chiusura fase 5b (fool/error/door senza stub; steal/possess/time_rewind implemented; batch_5.json esiste; stub_count==0). grep data/abilities/ per primitiva differita come tipo -> 0. validate exit 0 (2 warning). 713 test verdi. Nessun .gd toccato."
     }
   ]
 }

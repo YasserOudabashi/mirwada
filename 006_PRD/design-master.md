@@ -281,10 +281,27 @@ plant_growth, mind_read). `darkness_1`/`paragon_1`/`hermit_1` senza primitive
 differite. `location_tags.json` (29 luoghi). `batch_4.json` (6 sinergie).
 **Verdetto del checkpoint (US-508)**: l'architettura regge — Death giocato in
 codice Seq 8->2 con zero righe dedicate.
-**Fase 5b**: Darkness completo 10/10 + `shadow_meld` + `illusion` fatti dentro
-la fase 6 (US-606..608). **Restano Fool/Error/Door** (29 Sequenze stub) +
-`possess`/`steal`/`time_rewind`/`chain` → PRD `prd-fase-5b-lord-of-mysteries.md`.
 P2: R-13 — spostare le tabelle nomi di `generate_pathways.py` in un file dati.
+
+### Fase 5b — Lord of Mysteries — CHIUSA (US-5B01..5B12, 713 test)
+
+**CHIUSA il 2026-09-08**, 12 story, 4 blocchi (A Error + checkpoint, B Fool,
+C Door, D chiusura). Save `schema_version` INVARIATO. Darkness era già stato
+completato in fase 6 (US-606..608) + `shadow_meld`/`illusion`.
+**Fatto**: Fool, Error, Door a 10/10 Sequenze → **22/22 Pathway attivi
+completi, 100/100 Sequenze non-stub**. `steal`/`possess`/`time_rewind`
+implementate (Error per primo, criterio di uscita; `time_rewind` con un ring
+buffer di snapshot per-caster in `AbilityEngine`, non tocca il save).
+`_p_illusion` esteso (`potenza` per-`tipo_illusione`). `fool_2` riscritta
+senza `probability_shift`; grep `data/abilities/` per una primitiva differita
+come `tipo` → 0. Materia prima `avatar` in `ownership.json` (Error autonomi,
+Fool `illusion`). `chain` resta senza handler (nessuna Sequenza attiva lo usa).
+`batch_5.json`: 6 sinergie del gruppo + `anti_due_bugiardi`.
+**Verdetto del checkpoint (US-5B04)**: l'architettura della fase 2 regge sui
+Pathway difficili — `test_slice_fase_5b.gd` gioca Error Seq 8→2 con zero righe
+che nominano "error"; il `git diff` del blocco A (file `.gd` non di test) è
+solo `ability_engine.gd` +173 -0, il dispatcher `execute`/`_esegui_primitive`
+intatto.
 
 ### Fase 6 — mondo (da `design-world.md` e `design-npc-quest.md`) — CHIUSA
 
@@ -294,7 +311,7 @@ P2: R-13 — spostare le tabelle nomi di `generate_pathways.py` in un file dati.
 `NpcSystem`; `DialogueEngine` + 9 grafi; `QuestSystem` + 4 quest di Atto I +
 Journal; `factions.json` + `FactionSystem`; pagina mappa + fast travel come
 potere; densità mistica; audio del mondo come spec. Save 20 → 21 (un bump).
-**Aperto**: fase 5b (Fool/Error/Door, 29 Sequenze stub) → prd-fase-5b.
+Poi **fase 5b** (chiusa il 2026-09-08, vedi sopra) e **fase 7** (endgame).
 
 ### Fase 7 — endgame
 
@@ -337,7 +354,7 @@ location_tags).
 
 | Vocabolario | File | Voci | Stato |
 |---|---|---|---|
-| Primitive | `data/schema/primitives.json` | 28 attive + 3 differite | chiuso, parametri validati |
+| Primitive | `data/schema/primitives.json` | 28 attive + 3 differite; 27 con handler | chiuso, parametri validati. Fase 5b: `steal` (+param `ability_id`/`non_sottrae`), `possess` (+param `vulnerabilita_corpo`), `time_rewind` implementate; `_p_illusion` esteso. `chain` senza handler (nessuna Sequenza attiva lo usa). Le 3 differite (`probability_shift`/`weather_control`/`rule_bind`) restano non implementate |
 | Eventi tracciabili | `data/schema/tracked_events.json` | 12 | chiuso |
 | Tag di sinergia | `data/tags.json` | 82 (39 usati) | chiuso |
 | Tag di danno | `data/schema/damage_tags.json` | 8 | chiuso |
@@ -351,7 +368,7 @@ location_tags).
 | Esiti degli esperimenti | `data/potions/experiment_outcomes.json` | 5 (pesati) | chiuso, fase 3 (US-311) |
 | Schema sinergie | `data/schema/synergy.schema.json` | `priorita` + `effetto` come `oneOf` dei 6 tipi + `neutralizza` | esteso fase 4 (US-401), retro-compatibile; regola di risoluzione conflitti nel `_comment` |
 | Luoghi dei rituali | `data/schema/location_tags.json` | 29 | chiuso, fase 5 (US-501) — anticipato da fase 6; le regioni devono realizzarli a schermo |
-| Matrice di proprieta' | `data/schema/ownership.json` | `summon_materie_prime` (9) + `tag_vietati_pathway_attivi` | chiuso, fase 5 (US-502) — reso check del validator |
+| Matrice di proprieta' | `data/schema/ownership.json` | `summon_materie_prime` (10, +`avatar` in fase 5b) + `tag_vietati_pathway_attivi` | chiuso, fase 5 (US-502) — reso check del validator. `avatar` = gli avatar autonomi dell'Error (Fool: `illusion`) |
 | Location tags | `data/schema/location_tags.json` | 24 proposti | PROPOSTO in design-world.md, si crea con la prima story che li valida |
 | Condizioni | `ability.schema.json` (enum) | 8 + `follia_min`/`reputazione_min`/`flag` | chiuso, fase 6 (US-605/613) — un solo vocabolario, `scripts/conditions.gd` lo valuta per abilità E dialoghi |
 | Modi di gating | `data/schema/gate_types.json` | 6 (primitiva, momento, fase_lunare, npc, conoscenza, sequenza) | chiuso, fase 6 (US-601); `AreaGate` ha un ramo per ognuno |
@@ -361,5 +378,6 @@ location_tags).
 | Quest | `data/schema/quest.schema.json` + `data/quests/` | 4 di Atto I; effetti = 5 (`flag`, `item`, `reputazione`, `ancora`, `apri_vendita`) | chiuso, fase 6 (US-616) |
 | Fazioni | `data/schema/faction.schema.json` + `data/factions.json` | 4 (`ordine_minore`, `porto`, `quartiere`, `giustizia`) | chiuso, fase 6 (US-615) |
 | Antagonisti | `data/lore/antagonisti.json` | 1 per Pathway attivo (10) | chiuso, fase 6 (US-620) |
+| Schema sinergie (2) | `data/synergies/batch_5.json` | 6 sinergie del gruppo Lord of Mysteries (5 + 1 anti) | fase 5b (US-5B11); `anti_due_bugiardi` neutralizza `sinergia_ladro_di_poteri` |
 | Tipi di pagina del libro | `data/schema/page_types.json` | 9 (+`page_dialogo`) | esteso fase 6 (US-613b) |
 | Audio del mondo | `data/audio.json` (`music.ambienti`, `music.layer`) | 5 zone giorno/notte + struttura a stem | spec fase 6 (US-619) — nessun file audio prodotto |
