@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "_comment": "BATCH 5 (US-5B11): sinergie che nascono col gruppo Lord of Mysteries (Fool/Error/Door) incrociato coi sistemi di fase 3 (talenti, pet, stanze) e coi Sigilli d'area. Tutte RAGGIUNGIBILI: i tag del Pathway arrivano dalla fonte 'sequenza'/'abilita', gli altri da talento (furto, notte), pet (divinazione, bestia), stanza (rituale, conoscenza). Valori plausibili, da ritarare dopo il playtest. Una anti-sinergia (anti_due_bugiardi): Fool ed Error si mordono perche' mentono entrambi.",
+  "synergies": [
+    {
+      "schema_version": 1,
+      "id": "sinergia_ladro_di_poteri",
+      "name_i18n": "synergy.ladro_di_poteri",
+      "richiede_tag": {
+        "furto": 3,
+        "singolo": 1
+      },
+      "fonti": [
+        "sequenza",
+        "talento"
+      ],
+      "priorita": 0,
+      "effetto": {
+        "tipo": "modifica_primitiva",
+        "primitiva": "steal",
+        "parametro": "durata_prestito",
+        "delta": 0.35,
+        "moltiplicativo": true
+      },
+      "scoperta": "nascosta",
+      "note": "Error (steal a raffica) + un talento di furto: cio' che rubi te lo tieni piu' a lungo. Il tag 'furto' arriva dalle abilita' dell'Error e da un tag_grant di talento."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_teatro_di_ombre",
+      "name_i18n": "synergy.teatro_di_ombre",
+      "richiede_tag": {
+        "illusione": 2,
+        "divinazione": 1
+      },
+      "fonti": [
+        "sequenza",
+        "pet"
+      ],
+      "priorita": 0,
+      "effetto": {
+        "tipo": "modifica_stat",
+        "stat": "evasione",
+        "valore": 0.12,
+        "moltiplicativo": true
+      },
+      "scoperta": "nascosta",
+      "note": "Fool (illusioni) + un pet che divina: le esche sanno sempre dove metterti al riparo. 'divinazione' arriva da un pet o da door_lettura_stellare."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_rete_di_porte",
+      "name_i18n": "synergy.rete_di_porte",
+      "richiede_tag": {
+        "viaggio": 2,
+        "rituale": 1
+      },
+      "fonti": [
+        "sequenza",
+        "stanza"
+      ],
+      "priorita": 0,
+      "effetto": {
+        "tipo": "modifica_stat",
+        "stat": "velocita",
+        "valore": 0.15,
+        "moltiplicativo": true
+      },
+      "scoperta": "nascosta",
+      "note": "Door (teleport in serie) + una stanza rituale che ancora le mete: la rete di scorciatoie ti rende piu' rapido ovunque."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_debito_temporale",
+      "name_i18n": "synergy.debito_temporale",
+      "richiede_tag": {
+        "tempo": 2,
+        "notte": 1
+      },
+      "fonti": [
+        "sequenza",
+        "talento"
+      ],
+      "priorita": 0,
+      "effetto": {
+        "tipo": "modifica_follia",
+        "delta_al_minuto": -0.6
+      },
+      "scoperta": "nascosta",
+      "note": "Error (time_rewind) + un talento notturno: riavvolgere il tempo di notte costa meno alla mente. 'notte' arriva da un tag_grant di talento."
+    },
+    {
+      "schema_version": 1,
+      "id": "sinergia_archivio_fotocopiato",
+      "name_i18n": "synergy.archivio_fotocopiato",
+      "richiede_tag": {
+        "conoscenza": 2,
+        "spazio": 1
+      },
+      "fonti": [
+        "sequenza",
+        "stanza"
+      ],
+      "priorita": 0,
+      "effetto": {
+        "tipo": "modifica_stat",
+        "stat": "spiritualita_max",
+        "valore": 0.1,
+        "moltiplicativo": true
+      },
+      "scoperta": "nascosta",
+      "note": "Door (fotocopia le abilita', divina lo spazio) + una biblioteca: piu' poteri copiati tieni in archivio, piu' spirito hai per riprodurli."
+    },
+    {
+      "schema_version": 1,
+      "id": "anti_due_bugiardi",
+      "name_i18n": "synergy.anti_due_bugiardi",
+      "richiede_tag": {
+        "inganno": 2,
+        "furto": 2
+      },
+      "fonti": [
+        "sequenza",
+        "abilita"
+      ],
+      "priorita": 100,
+      "anti": true,
+      "neutralizza": [
+        "sinergia_ladro_di_poteri"
+      ],
+      "effetto": {
+        "tipo": "modifica_follia",
+        "delta_al_minuto": 1.2
+      },
+      "scoperta": "nascosta",
+      "note": "Fool ed Error insieme (o l'Error che spinge sia su inganno sia su furto - il suo Pathway porta entrambi i tag): due bugiardi non si fidano l'uno dell'altro. La paranoia accelera la follia e disattiva sinergia_ladro_di_poteri finche' e' attiva."
+    }
+  ]
+}

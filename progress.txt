@@ -6569,3 +6569,54 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - 100/100 SEQUENZE NON-STUB. 22/22 Pathway attivi completi (Fool + Error +
   Door + i 19 gia' fatti). Prossimo: BLOCCO D - US-5B11 (sinergie del gruppo)
   + US-5B12 (chiusura fase 5b, documenti).
+
+[2026-09-08] US-5B11 — Sinergie e caratteristiche del gruppo Lord of Mysteries. FASE 5b, BLOCCO D.
+
+- RIVALUTAZIONE batch_3.json (i tag inganno/furto/spazio/viaggio/destino/
+  contratto ora portati da Fool/Error/Door via 'sequenza'/'abilita'):
+  * sinergia_contratto_solare (contratto + purificazione) e' diventata
+    RAGGIUNGIBILE: il tag 'contratto' ora arriva da error_patto_truffaldino
+    (Error Seq 8). Il conteggio "sinergie irraggiungibili" e' sceso 18 -> 17.
+  * Le altre 17 restano irraggiungibili: OGNUNA richiede un secondo tag da un
+    gruppo ancora differito (disordine/ordine/legge/probabilita'/mutazione/
+    corruzione/tempesta/fuoco/verita'/sogno/giudizio/negazione/sussurro/
+    depravazione/trappola/disastro/demone/desiderio). Nessuna di queste si
+    accende riattivando il solo Lord of Mysteries: e' atteso (US-415).
+  * sinergia_inganno_probabilita (core.json) resta irraggiungibile (serve
+    probabilita', da key_of_light). La sua abilita' concessa
+    sinergia_colpo_del_caso E' scritta e risolve, ma la sinergia che la da'
+    non puo' attivarsi finche' Wheel of Fortune e' differito.
+- data/synergies/batch_5.json (NUOVO): 6 sinergie del gruppo, tutte
+  RAGGIUNGIBILI (i tag arrivano da sequenza/abilita + talento[furto,notte] +
+  pet[divinazione] + stanza[rituale,conoscenza]), i18n completo, fonti >= 2:
+  * sinergia_ladro_di_poteri (Error steal + talento furto -> steal.durata_
+    prestito *1.35)
+  * sinergia_teatro_di_ombre (Fool illusione + pet divinazione -> evasione)
+  * sinergia_rete_di_porte (Door viaggio + stanza rituale -> velocita)
+  * sinergia_debito_temporale (Error tempo + talento notte -> follia -0.6/min)
+  * sinergia_archivio_fotocopiato (Door conoscenza+spazio + biblioteca ->
+    spiritualita_max)
+  * anti_due_bugiardi (ANTI-SINERGIA, priorita 100): inganno + furto insieme
+    (Fool+Error, o l'Error che porta entrambi i tag del suo Pathway) ->
+    follia +1.2/min e NEUTRALIZZA sinergia_ladro_di_poteri. "Due bugiardi non
+    si fidano l'uno dell'altro."
+- data/characteristics.json: le 30 Caratteristiche del gruppo (char_fool_0..9,
+  char_error_0..9, char_door_0..9) esistono gia' - aggiunte nelle story di
+  contenuto US-5B05..5B10 - e sono TUTTE tradotte (0 TODO). Verificato in
+  test_lord_of_mysteries.
+- Diagramma dei Pathway / frontespizio: nessun codice nuovo. Le pagine del
+  libro leggono get_pathway/get_sequence dai dati e i 3 Pathway ora sono
+  contenuto pieno. Verifica a schermo (scriptata): test_lord_of_mysteries.
+  test_si_crea_un_personaggio_su_ognuno_dei_tre - Progression.configura su
+  fool/error/door + le abilita' di Seq 9 esistono dalla creazione.
+- tests/test_lord_of_mysteries.gd (NUOVO, 5 test): le 30 caratteristiche
+  esistono e sono tradotte; Fool/Error/Door senza stub; si crea un
+  personaggio sui 3; le sinergie di batch_5 hanno solo tag ottenibili;
+  anti_due_bugiardi neutralizza sinergia_ladro_di_poteri (soddisfatte /
+  neutralizzate / e_attiva).
+- Come verificato: python tools/validate_data.py exit 0 (2 warning: sinergie
+  irraggiungibili 17, TODO i18n 42). 713 test headless (708 + 5 in
+  test_lord_of_mysteries.gd), tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (solo dati: batch_5.json + i18n + tests).
+- Prossima storia: US-5B12 - chiusura fase 5b (documenti + check di chiusura
+  nel validator).

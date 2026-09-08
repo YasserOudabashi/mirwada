@@ -207,8 +207,8 @@
       ],
       "priority": 11,
       "fase": "5b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. Rivalutazione batch_3: sinergia_contratto_solare ora RAGGIUNGIBILE (tag 'contratto' da error_patto_truffaldino) - irraggiungibili 18->17; le altre 17 richiedono un tag da un gruppo ancora differito (atteso). data/synergies/batch_5.json: 6 sinergie del gruppo tutte raggiungibili (tag da sequenza/abilita + talento[furto,notte] + pet[divinazione] + stanza[rituale,conoscenza]), i18n completo, fonti>=2: ladro_di_poteri (modifica_primitiva steal), teatro_di_ombre, rete_di_porte, debito_temporale, archivio_fotocopiato, + anti_due_bugiardi (ANTI-SINERGIA priorita 100, neutralizza ladro_di_poteri: inganno+furto -> follia +1.2/min). Le 30 caratteristiche del gruppo gia' aggiunte in US-5B05..10, tutte tradotte. test_lord_of_mysteries.gd (5 test): 30 char esistono+tradotte; Fool/Error/Door senza stub; si crea un personaggio sui 3; batch_5 solo tag ottenibili; anti_due_bugiardi neutralizza ladro_di_poteri. Nessun .gd toccato. validate exit 0. 713 test verdi."
     },
     {
       "id": "US-5B12",
