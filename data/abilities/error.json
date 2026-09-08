@@ -327,6 +327,255 @@
         "guarigione"
       ],
       "note": "Attinge alle risorse dell'ospite per rimarginare le proprie ferite, restando occultato."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_proietta_avatar",
+      "name": "Proietta avatar",
+      "name_i18n": "ability.error.error_proietta_avatar",
+      "sequence_id": "error_3",
+      "costo_spiritualita": 28,
+      "cooldown": 32.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "avatar_error_mentore",
+          "quantita": 2,
+          "durata": 30.0,
+          "comportamento": "aggressivo"
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "evocazione",
+        "singolo"
+      ],
+      "costo_follia": 3.5,
+      "note": "Il Mentor of Deceit proietta da se' avatar autonomi (materia prima 'avatar' in ownership.json: non cadaveri, non costrutti, non illusioni - agiscono davvero). Persistenza vera fuori dal combat e' fase 6: qui durata 30s."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_inganno_stratificato",
+      "name": "Inganno stratificato",
+      "name_i18n": "ability.error.error_inganno_stratificato",
+      "sequence_id": "error_3",
+      "costo_spiritualita": 20,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 6,
+          "durata": 8.0,
+          "potenza": 2,
+          "tipo_illusione": "copia_nemico"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.2,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "illusione",
+        "area"
+      ],
+      "note": "Inganni dentro inganni: esche che sembrano nemici veri, mentre chi guarda perde la mira. Le esche 'vere' nel combat sono fase 6."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_cavallo_di_troia",
+      "name": "Cavallo di Troia",
+      "name_i18n": "ability.error.error_cavallo_di_troia",
+      "sequence_id": "error_2",
+      "costo_spiritualita": 32,
+      "cooldown": 28.0,
+      "primitive": [
+        {
+          "tipo": "curse",
+          "effetto": "destino_segnato",
+          "durata": 15.0,
+          "condizione_rimozione": ""
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "forza",
+          "valore": -0.35,
+          "durata": 12.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "dot",
+          "danno_tick": 10,
+          "tick_rate": 1.0,
+          "durata": 12.0,
+          "tag_danno": "follia"
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "destino",
+        "maledizione"
+      ],
+      "note": "Un errore impiantato nel destino: da qui in avanti i piani del bersaglio falliscono. Reso con curse(destino_segnato) + debuff + dot follia, come hermit_1 (SENZA rule_bind)."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_piano_che_crolla",
+      "name": "Il piano che crolla",
+      "name_i18n": "ability.error.error_piano_che_crolla",
+      "sequence_id": "error_2",
+      "costo_spiritualita": 22,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.4,
+          "durata": 10.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "evasione",
+          "valore": -0.3,
+          "durata": 10.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "destino",
+        "singolo",
+        "cavillo"
+      ],
+      "note": "Ogni appiglio che il bersaglio credeva di avere cede nello stesso momento."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_riavvolgi",
+      "name": "Riavvolgi",
+      "name_i18n": "ability.error.error_riavvolgi",
+      "sequence_id": "error_1",
+      "costo_spiritualita": 26,
+      "cooldown": 20.0,
+      "primitive": [
+        {
+          "tipo": "time_rewind",
+          "secondi": 3.0,
+          "ripristina": [
+            "hp",
+            "spiritualita"
+          ],
+          "costo_follia": 6.0
+        }
+      ],
+      "tag_sinergia": [
+        "tempo",
+        "singolo",
+        "cavillo"
+      ],
+      "note": "Il Worm of Time riavvolge se stesso di 3 secondi: hp e spiritualita' tornano a com'erano. Il prezzo e' follia. Il raggio su altre entita' e' fase 6."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_verme_del_tempo",
+      "name": "Verme del tempo",
+      "name_i18n": "ability.error.error_verme_del_tempo",
+      "sequence_id": "error_1",
+      "costo_spiritualita": 34,
+      "cooldown": 40.0,
+      "primitive": [
+        {
+          "tipo": "time_rewind",
+          "secondi": 5.0,
+          "ripristina": [
+            "hp",
+            "spiritualita",
+            "posizione"
+          ],
+          "costo_follia": 10.0
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "velocita",
+          "valore": 0.2,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "tempo",
+        "viaggio",
+        "singolo"
+      ],
+      "note": "Un riavvolgimento piu' lungo che riporta anche il corpo dov'era: si esce da una posizione persa. Costa molta follia."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_falla_nelle_regole",
+      "name": "Falla nelle regole",
+      "name_i18n": "ability.error.error_falla_nelle_regole",
+      "sequence_id": "error_0",
+      "costo_spiritualita": 55,
+      "cooldown": 60.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 15,
+          "durata": -1,
+          "effetto": "destino_segnato",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.3,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "dominio",
+        "cavillo",
+        "area"
+      ],
+      "note": "L'abilita' di dominio dell'Error: nel raggio le regole hanno una falla e chiunque vi entri e' gia' segnato dal fato. Aura persistente + debuff, come i Seq 0 di fase 5."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_ultima_scappatoia",
+      "name": "Ultima scappatoia",
+      "name_i18n": "ability.error.error_ultima_scappatoia",
+      "sequence_id": "error_0",
+      "costo_spiritualita": 45,
+      "cooldown": 50.0,
+      "primitive": [
+        {
+          "tipo": "time_rewind",
+          "secondi": 6.0,
+          "ripristina": [
+            "hp",
+            "spiritualita",
+            "posizione"
+          ],
+          "costo_follia": 14.0
+        },
+        {
+          "tipo": "heal",
+          "quantita": 60,
+          "istantaneo": true,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "tempo",
+        "dominio",
+        "singolo"
+      ],
+      "note": "Non esiste situazione senza uscita per l'Error: riavvolge fino a sei secondi e si rimargina. La follia che costa e' enorme."
     }
   ]
 }

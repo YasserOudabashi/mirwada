@@ -1,10 +1,10 @@
 extends "res://tests/test_case.gd"
-## US-5B01 / US-5B02 — Error, Sequenze 9-4: le abilita' si eseguono senza
-## warning di primitiva (steal e possess implementate qui); steal presta
-## un'abilita' via grant_temporary e la scadenza la revoca; steal "conoscenza"
-## scrive un flag in KnowledgeStore; possess applica lo status 'posseduto' e
-## registra il corpo del caster a terra; le acting_actions delle Sequenze
-## sommano 1.0.
+## US-5B01 / US-5B02 / US-5B03 — Error, 10/10 Sequenze: ogni abilita' si esegue
+## senza warning di primitiva (steal, possess, time_rewind implementate qui);
+## steal presta un'abilita' via grant_temporary; steal "conoscenza" scrive un
+## flag in KnowledgeStore; possess applica 'posseduto' e registra il corpo a
+## terra; time_rewind riporta gli hp del caster al valore di N secondi fa e
+## costa follia; summon 'avatar_error' risolve; le acting_actions sommano 1.0.
 
 const Stats := preload("res://scripts/stats_component.gd")
 
@@ -17,6 +17,12 @@ const ABILITA_6_4 := [
 	"error_furto_prometeo", "error_scintilla_rubata",
 	"error_furto_dei_sogni", "error_incubo_parassita",
 	"error_innesto_parassita", "error_simbiosi_furtiva",
+]
+const ABILITA_3_0 := [
+	"error_proietta_avatar", "error_inganno_stratificato",
+	"error_cavallo_di_troia", "error_piano_che_crolla",
+	"error_riavvolgi", "error_verme_del_tempo",
+	"error_falla_nelle_regole", "error_ultima_scappatoia",
 ]
 
 
@@ -37,7 +43,11 @@ func prepara() -> void:
 	if e != null:
 		e.call("clear_cooldowns")
 		e.call("clear_granted")
+		e.call("clear_snapshots")
 		e.call("flush_effects")
+	var m: Node = Engine.get_main_loop().root.get_node_or_null("Madness")
+	if m != null:
+		m.call("azzera")
 
 
 func _caster() -> Node2D:
@@ -151,12 +161,63 @@ func test_prometeo_presta_l_abilita_dichiarata_nei_dati() -> void:
 	_cleanup(c)
 
 
-func test_error_sequenze_scritte_sono_contenuto_e_le_acting_sommano_uno() -> void:
+func test_ogni_abilita_error_3_0_si_esegue_senza_warning() -> void:
+	var e: Node = _engine()
+	for aid in ABILITA_3_0:
+		var c: Node2D = _caster()
+		var r: Dictionary = e.call("execute", aid, c)
+		assert_true(r["ok"], "%s eseguita" % aid)
+		assert_eq((r["warnings"] as PackedStringArray).size(), 0,
+			"%s: nessun warning di primitiva (time_rewind/summon implementate): %s" % [aid, r["warnings"]])
+		e.call("clear_cooldowns")
+		e.call("clear_snapshots")
+		_cleanup(c)
+
+
+func test_time_rewind_riporta_gli_hp_indietro_e_costa_follia() -> void:
+	var e: Node = _engine()
+	var m: Node = Engine.get_main_loop().root.get_node_or_null("Madness")
+	var c: Node2D = _caster()
+	var s: Node = c.get_node("Stats")
+	var hp_pieni: float = float(s.get("hp"))
+	# 1a esecuzione: entra nel ring buffer con hp pieni.
+	e.call("execute", "error_scasso", c)
+	assert_gt(float(e.call("snapshot_count", c)), 0.0, "il caster e' nel ring buffer")
+	# subisce danno, poi ricampiona (snapshot piu' recente con hp bassi).
+	s.set("hp", hp_pieni - 80.0)
+	e.call("campiona_snapshots")
+	var follia0: float = m.call("valore") if m != null else 0.0
+	# riavvolge di 5s: nessuno snapshot e' cosi' vecchio -> prende il piu' vecchio (hp pieni).
+	var rec: Dictionary = e.call("_p_time_rewind",
+		{"tipo": "time_rewind", "secondi": 5.0, "ripristina": ["hp", "spiritualita"],
+		"costo_follia": 8.0}, c, s, "ab")
+	assert_true(bool(rec["applied"]), "time_rewind ha letto uno snapshot")
+	assert_almost_eq(float(s.get("hp")), hp_pieni,
+		"gli hp del caster tornano al valore di prima del danno", 0.5)
+	if m != null:
+		assert_gt(m.call("valore"), follia0, "time_rewind costa follia")
+	_cleanup(c)
+
+
+func test_proietta_avatar_evoca_una_materia_prima_avatar() -> void:
+	var e: Node = _engine()
+	var c: Node2D = _caster()
+	var r: Dictionary = e.call("execute", "error_proietta_avatar", c)
+	assert_true(r["ok"], "proietta avatar eseguito")
+	var rec: Dictionary = (r["effects"] as Array)[0]
+	assert_eq(str(rec["tipo"]), "summon", "e' una summon")
+	assert_true(str(rec["entita_id"]).begins_with("avatar_"),
+		"entita_id ha il prefisso della materia prima 'avatar' (ownership.json)")
+	_cleanup(c)
+
+
+func test_error_e_contenuto_completo_10_su_10() -> void:
 	var pw: Dictionary = _gd().call("get_pathway", "error")
+	var madness_prec: float = -1.0
+	var n: int = 0
 	for seq in (pw.get("sequences", []) as Array):
 		var d: Dictionary = seq
-		if int(d.get("sequence", -1)) < 4:
-			continue
+		n += 1
 		assert_false(bool(d.get("stub", false)),
 			"error_%d non e' piu' stub" % int(d.get("sequence")))
 		var somma: float = 0.0
@@ -164,8 +225,21 @@ func test_error_sequenze_scritte_sono_contenuto_e_le_acting_sommano_uno() -> voi
 			somma += float((a as Dictionary).get("progresso", 0.0))
 		assert_almost_eq(somma, 1.0,
 			"error_%d: le acting_actions sommano 1.0" % int(d.get("sequence")))
-		assert_gt(float(d.get("madness_on_force", 0.0)), 0.0,
-			"error_%d: madness_on_force > 0" % int(d.get("sequence")))
+		var mf: float = float(d.get("madness_on_force", 0.0))
+		assert_gt(mf, madness_prec,
+			"error_%d: madness_on_force cresce lungo il Pathway" % int(d.get("sequence")))
+		madness_prec = mf
+	assert_eq(n, 10, "Error ha 10 Sequenze, tutte contenuto")
+
+
+func test_error_1_sacrifica_un_ancora() -> void:
+	var pw: Dictionary = _gd().call("get_pathway", "error")
+	for seq in (pw.get("sequences", []) as Array):
+		if int((seq as Dictionary).get("sequence", -1)) != 1:
+			continue
+		var rit: Dictionary = (seq as Dictionary).get("advancement_ritual", {})
+		assert_true("ancora_del_giocatore" in (rit.get("sacrifices", []) as Array),
+			"il rituale di Sequenza 1 sacrifica un'Ancora del giocatore (come twilight_giant_1)")
 
 
 func test_error_4_ha_un_rituale_con_luogo_valido() -> void:

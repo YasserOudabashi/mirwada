@@ -59,8 +59,8 @@
       ],
       "priority": 3,
       "fase": "5b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. ERROR COMPLETO 10/10. time_rewind implementata: _p_time_rewind + ring buffer per-caster in ability_engine.gd (execute +1 riga _campiona_snapshot, _process +4, sweep +3; execute/_esegui_primitive non toccati per un caso Error). Riporta hp/spiritualita/posizione del caster dallo snapshot di N secondi fa, costa follia, non tocca il save. primitives.json implemented, vfx.json vfx_unwind. Materia prima 'avatar' aggiunta a ownership.json (9a voce) + matrice aggiornata: avatar per Error, illusion per Fool. Error Seq 3/2/1/0 stub->false: Mentor of Deceit (summon avatar + illusion), Trojan Horse of Destiny (curse destino_segnato + debuff + dot follia, senza rule_bind), Worm of Time (time_rewind x2, rituale eclissi sacrifica Ancora), Error (aura dominio + time_rewind completo). formula_error_3/2/1/0 + 12 ingredienti + char_error_3/2/1/0. i18n tutto tradotto. test_error.gd esteso (time_rewind riporta hp indietro e costa follia; summon avatar_; Seq 3-0 senza warning; Error 10/10; Seq 1 sacrifica Ancora). validate exit 0 (stub 23->19). 682 test verdi, nessuna regressione. FR-10 time_rewind: resa a schermo del punto di ripristino = spec vfx_unwind; raggio su altre entita' = fase 6."
     },
     {
       "id": "US-5B04",

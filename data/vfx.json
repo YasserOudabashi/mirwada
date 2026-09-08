@@ -251,6 +251,12 @@
       "frames": 4,
       "impact_frame": true,
       "scia": false
+    },
+    "time_rewind": {
+      "sprite": "vfx_unwind",
+      "frames": 5,
+      "impact_frame": true,
+      "scia": true
     }
   },
   "impact_frames": {

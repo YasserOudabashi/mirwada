@@ -231,7 +231,19 @@
     "ricordo_altrui_in_bottiglia",
     "vischio_che_si_aggrappa",
     "cuore_condiviso",
-    "muta_di_pelle_altrui"
+    "muta_di_pelle_altrui",
+    "specchio_che_riflette_un_altro",
+    "sillaba_di_un_nome_non_tuo",
+    "filo_del_burattinaio",
+    "chiodo_nell_ingranaggio_del_fato",
+    "lettera_mai_consegnata",
+    "voto_infranto_alla_radice",
+    "clessidra_che_cola_all_indietro",
+    "eco_di_un_istante_gia_passato",
+    "verme_che_mangia_i_minuti",
+    "riga_bianca_nel_regolamento_del_mondo",
+    "cavillo_primordiale",
+    "porta_che_non_c_e_mai_stata"
   ],
   "formulas": {
     "formula_fool_9": {
@@ -1304,6 +1316,62 @@
         "vischio_che_si_aggrappa",
         "cuore_condiviso",
         "muta_di_pelle_altrui"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_3": {
+      "characteristic_sequence": 3,
+      "ingredients": [
+        "specchio_che_riflette_un_altro",
+        "sillaba_di_un_nome_non_tuo",
+        "filo_del_burattinaio"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_2": {
+      "characteristic_sequence": 2,
+      "ingredients": [
+        "chiodo_nell_ingranaggio_del_fato",
+        "lettera_mai_consegnata",
+        "voto_infranto_alla_radice"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_1": {
+      "characteristic_sequence": 1,
+      "ingredients": [
+        "clessidra_che_cola_all_indietro",
+        "eco_di_un_istante_gia_passato",
+        "verme_che_mangia_i_minuti"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_0": {
+      "characteristic_sequence": 0,
+      "ingredients": [
+        "riga_bianca_nel_regolamento_del_mondo",
+        "cavillo_primordiale",
+        "porta_che_non_c_e_mai_stata"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

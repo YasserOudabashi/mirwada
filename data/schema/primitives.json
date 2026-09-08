@@ -186,7 +186,8 @@
         "secondi",
         "ripristina",
         "costo_follia"
-      ]
+      ],
+      "implemented": true
     },
     "soul_detach": {
       "params": [

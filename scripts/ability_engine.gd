@@ -49,6 +49,17 @@ var _granted: Dictionary = {}
 ## attiva). { "<instance_id>:<ability_id>": true }. Non scadono in _sweep.
 var _permanenti: Dictionary = {}
 
+## Ring buffer di snapshot per time_rewind (US-5B03, Worm of Time dell'Error):
+## instance_id del caster -> Array di { ms, hp, sp, pos }. Ogni caster che
+## esegue un'abilita' entra nel buffer; _process aggiunge un'istantanea ogni
+## _SNAP_PASSO_S, il buffer tiene le ultime _SNAP_MAX. time_rewind ne rilegge
+## una. Piccolo e per-caster: costo trascurabile. NON serializzato (il save
+## non cambia). I caster morti si purgano con sweep_cooldowns().
+const _SNAP_PASSO_S := 0.5
+const _SNAP_MAX := 12
+var _snapshots: Dictionary = {}
+var _snap_acc: float = 0.0
+
 var _handlers: Dictionary = {}
 ## Effetti a tempo in corso. Una lista processata in _process invece di
 ## await su SceneTreeTimer: gli await lasciano timer appesi se la partita
@@ -84,6 +95,7 @@ func _ready() -> void:
 		"illusion": _p_illusion,
 		"steal": _p_steal,
 		"possess": _p_possess,
+		"time_rewind": _p_time_rewind,
 	}
 
 
@@ -146,6 +158,8 @@ func execute(ability_id: String, caster: Node) -> Dictionary:
 
 	result["ok"] = true
 	result["reason"] = OK
+	# US-5B03: il caster che agisce entra nel ring buffer di time_rewind.
+	_campiona_snapshot(caster)
 	# US-210B: un'abilita' eseguita con successo e' un evento tracciato.
 	var et: Node = get_tree().root.get_node_or_null("EventTracker")
 	if et != null:
@@ -280,6 +294,9 @@ func cooldown_entries() -> int:
 func sweep_cooldowns() -> void:
 	_sweep(_cooldowns)
 	_sweep(_granted)
+	for iid in _snapshots.keys():
+		if not is_instance_id_valid(int(iid)):
+			_snapshots.erase(iid)
 
 
 func _sweep(index: Dictionary) -> void:
@@ -696,6 +713,92 @@ func _p_steal(prim: Dictionary, caster: Node, _stats: Node, ability_id: String) 
 	return rec
 
 
+# --- Ring buffer di snapshot per time_rewind (US-5B03) -----------------------
+
+## Aggiunge un'istantanea dello stato del caster (hp, spiritualita, posizione,
+## ms) al suo buffer. Chiamata da execute() a ogni abilita' eseguita.
+func _campiona_snapshot(caster: Node) -> void:
+	if caster == null:
+		return
+	var s: Node = find_stats(caster)
+	if s == null:
+		return
+	var pos: Vector2 = Vector2.ZERO
+	if caster is Node2D and (caster as Node2D).is_inside_tree():
+		pos = (caster as Node2D).global_position
+	var iid: int = caster.get_instance_id()
+	var buf: Array = _snapshots.get(iid, [])
+	buf.append({"ms": Time.get_ticks_msec(), "hp": float(s.get("hp")),
+			"sp": float(s.get("spiritualita")), "pos": pos})
+	while buf.size() > _SNAP_MAX:
+		buf.pop_front()
+	_snapshots[iid] = buf
+
+
+## Ri-campiona ogni caster ancora vivo gia' nel buffer. Pubblica: _process la
+## chiama sul passo _SNAP_PASSO_S, i test la chiamano a mano.
+func campiona_snapshots() -> void:
+	for iid in _snapshots.keys():
+		if is_instance_id_valid(int(iid)):
+			_campiona_snapshot(instance_from_id(int(iid)) as Node)
+		else:
+			_snapshots.erase(iid)
+
+
+func clear_snapshots() -> void:
+	_snapshots.clear()
+	_snap_acc = 0.0
+
+
+func snapshot_count(caster: Node) -> int:
+	if caster == null:
+		return 0
+	return (_snapshots.get(caster.get_instance_id(), []) as Array).size()
+
+
+## time_rewind (US-5B03, Worm of Time dell'Error): riporta il caster allo stato
+## di 'secondi' fa letto dal ring buffer e addebita 'costo_follia' a Madness.
+## 'ripristina' e' la lista dei campi da riportare indietro (default hp +
+## spiritualita; "posizione" opt-in). Se il buffer non arriva a 'secondi' fa,
+## si usa l'istantanea piu' vecchia disponibile. Il "raggio limitato" su altre
+## entita' e' combat/fase 6: qui agisce sul caster. Non tocca il save.
+func _p_time_rewind(prim: Dictionary, caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+	var secondi: float = _num(prim.get("secondi"), 3.0)
+	var costo_follia: float = _num(prim.get("costo_follia"), 0.0)
+	var ripristina: Array = prim.get("ripristina") if typeof(prim.get("ripristina")) == TYPE_ARRAY else ["hp", "spiritualita"]
+
+	var rec: Dictionary = {"tipo": "time_rewind", "secondi": secondi,
+			"costo_follia": costo_follia, "ripristina": ripristina, "applied": false}
+	if caster == null or stats == null:
+		return rec
+
+	var buf: Array = _snapshots.get(caster.get_instance_id(), [])
+	if buf.is_empty():
+		return rec
+
+	var target_ms: int = Time.get_ticks_msec() - int(secondi * 1000.0)
+	var snap: Dictionary = buf[0]
+	for e in buf:
+		if int((e as Dictionary)["ms"]) <= target_ms:
+			snap = e
+
+	if "hp" in ripristina:
+		stats.set("hp", float(snap["hp"]))
+	if "spiritualita" in ripristina:
+		stats.set("spiritualita", float(snap["sp"]))
+	if "posizione" in ripristina and caster is Node2D:
+		(caster as Node2D).global_position = snap["pos"]
+
+	if costo_follia > 0.0:
+		var m: Node = get_tree().root.get_node_or_null("Madness")
+		if m != null:
+			m.call("add", costo_follia, "ability:time_rewind", false)
+
+	rec["applied"] = true
+	rec["ripristinato_da_ms"] = int(snap["ms"])
+	return rec
+
+
 ## possess (US-5B02): il caster prende il controllo di un ospite. Applica lo
 ## status 'posseduto' al bersaglio (lo stats risolto, come soul_detach) per
 ## 'durata' e registra 'controllo' (sensi | parziale | totale). Come
@@ -1101,6 +1204,11 @@ func _facing(origin: Node2D) -> Vector2:
 func _process(delta: float) -> void:
 	if not _pending.is_empty():
 		tick_effects(delta)
+	if not _snapshots.is_empty():
+		_snap_acc += delta
+		if _snap_acc >= _SNAP_PASSO_S:
+			_snap_acc = 0.0
+			campiona_snapshots()
 	var now: int = Time.get_ticks_msec()
 	if now >= _prossimo_sweep_ms:
 		_prossimo_sweep_ms = now + _SWEEP_OGNI_MS

@@ -463,6 +463,30 @@
       "pathway_id": "error",
       "sequence": 4,
       "name_i18n": "characteristic.error.4"
+    },
+    {
+      "id": "char_error_3",
+      "pathway_id": "error",
+      "sequence": 3,
+      "name_i18n": "characteristic.error.3"
+    },
+    {
+      "id": "char_error_2",
+      "pathway_id": "error",
+      "sequence": 2,
+      "name_i18n": "characteristic.error.2"
+    },
+    {
+      "id": "char_error_1",
+      "pathway_id": "error",
+      "sequence": 1,
+      "name_i18n": "characteristic.error.1"
+    },
+    {
+      "id": "char_error_0",
+      "pathway_id": "error",
+      "sequence": 0,
+      "name_i18n": "characteristic.error.0"
     }
   ]
 }

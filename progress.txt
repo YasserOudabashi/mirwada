@@ -6189,3 +6189,73 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   _esegui_primitive non toccati. Per il checkpoint US-5B04.
 - Prossima storia: US-5B03 - Error Seq 3-0 + primitiva time_rewind + materia
   prima avatar in ownership.json.
+
+[2026-09-08] US-5B03 — Error, Sequenze 3-0 (Mentor of Deceit / Trojan Horse of Destiny / Worm of Time / Error) + primitiva time_rewind + materia prima avatar. FASE 5b, BLOCCO A. ERROR COMPLETO 10/10.
+
+- PRIMITIVA NUOVA time_rewind: _p_time_rewind + ring buffer in
+  scripts/ability_engine.gd (execute / _esegui_primitive INTATTI - execute()
+  aggiunge una sola riga: _campiona_snapshot(caster) sul percorso di successo).
+  * _snapshots: instance_id -> Array di { ms, hp, sp, pos }. Ogni caster che
+    esegue un'abilita' entra nel buffer; _process ricampiona ogni
+    _SNAP_PASSO_S (0.5s), buffer max _SNAP_MAX (12). Pubbliche per i test:
+    campiona_snapshots(), clear_snapshots(), snapshot_count(caster).
+  * _p_time_rewind { secondi, ripristina[], costo_follia }: legge lo snapshot
+    piu' vicino (e non successivo) a "secondi fa"; se il buffer non e' cosi'
+    vecchio usa il piu' vecchio. Ripristina i campi in 'ripristina' (default
+    ["hp","spiritualita"]; "posizione" opt-in). Addebita costo_follia a
+    Madness.add(..., "ability:time_rewind", false). NON tocca il save.
+  * sweep_cooldowns() purga anche gli snapshot dei caster morti.
+  primitives.json: time_rewind -> implemented:true. vfx.json:
+  primitive_vfx.time_rewind = vfx_unwind (impact_frame sul punto di ripristino
+  + scia che riavvolge).
+- MATERIA PRIMA avatar: aggiunta a data/schema/ownership.json
+  summon_materie_prime (9a voce) + riga della matrice aggiornata (Error:
+  avatar autonomi, non nati da un corpo/costrutto - il Mentor of Deceit li
+  proietta da se'). Decisione presa con l'utente: avatar per l'Error,
+  illusion per il Fool (Scholar of Yore, US-5B07).
+- CONTENUTO Error Seq 3/2/1/0 (stub -> false). ERROR COMPLETO: 10/10.
+  * error_3 Mentor of Deceit (saint): error_proietta_avatar (summon
+    avatar_error_mentore) + error_inganno_stratificato (illusion copia_nemico
+    + debuff). Rituale nebbia_grigia/vicolo, crepuscolo, sacrifica la faccia
+    vera per un giorno. madness 10.0.
+  * error_2 Trojan Horse of Destiny (angel): error_cavallo_di_troia
+    (curse destino_segnato + debuff forza + dot follia - come hermit_1,
+    SENZA rule_bind) + error_piano_che_crolla (2x debuff). Rituale
+    crocevia/nebbia_grigia, notte_fonda, luna calante. madness 11.5.
+  * error_1 Worm of Time (angel): error_riavvolgi (time_rewind 3s hp/sp) +
+    error_verme_del_tempo (time_rewind 5s hp/sp/posizione + buff velocita).
+    Rituale nebbia_grigia/soglia, notte_fonda, ECLISSI, sacrifica
+    ancora_del_giocatore (come twilight_giant_1). madness 12.8.
+  * error_0 Error (god): error_falla_nelle_regole (aura persistente
+    destino_segnato r15 + debuff - abilita' di dominio come i Seq 0 di fase 5)
+    + error_ultima_scappatoia (time_rewind 6s completo + heal). Rituale
+    nebbia_grigia, notte_fonda, eclissi, sacrifica il detentore precedente.
+    madness 14.0.
+- formule formula_error_3/2/1/0 + 12 ingredienti nuovi. caratteristiche
+  char_error_3/2/1/0 (Essenza di Mentor of Deceit / Trojan Horse of Destiny /
+  Worm of Time / Error). i18n rilanciato (it.json 913 -> 937), tutte le chiavi
+  error tradotte (0 TODO error; 47 TODO totali = baseline pre-esistente).
+- VERIFICA A SCHERMO / leggibilita' di time_rewind (FR-10). Sessione headless:
+  verifica scriptata (come ogni primitiva di fase 5). test_error.gd:
+  * time_rewind: dopo un danno di 80 hp, riavvolgendo di 5s gli hp tornano al
+    valore pieno (lo snapshot piu' vecchio) e la follia sale.
+  * summon avatar_error: il record ha entita_id col prefisso 'avatar_'.
+  * ogni abilita' Seq 3-0 esegue senza warning di primitiva.
+  DICHIARAZIONE FR-10: "cosa e' tornato indietro? un lampo che segna il punto
+  di ripristino" - la resa a schermo (il lampo/segnaposto sul punto di
+  ripristino, il ghost del percorso riavvolto) e' la spec vfx_unwind
+  (impact_frame + scia). Il raggio su ALTRE entita' e la resa combat sono
+  fase 6 (prd-fase-5b sez. 5). In 5b: la primitiva riporta indietro lo stato
+  del caster dal ring buffer, in modo ispezionabile (snapshot_count).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: stub
+  23->19 [Error 10/10 non-stub], sinergie irraggiungibili 17 invariato, TODO
+  i18n 47 = baseline). 682 test headless (678 + 4 netti in test_error.gd),
+  tutti verdi. Nessuna regressione.
+- File .gd toccati in TUTTO il blocco A: SOLO scripts/ability_engine.gd
+  (_handlers +3 righe; _p_steal, _p_possess, _p_time_rewind + il ring buffer
+  di time_rewind e i suoi helper; execute() +1 riga _campiona_snapshot;
+  _process +4 righe; sweep_cooldowns +3 righe) + tests/test_error.gd.
+  execute() / _esegui_primitive NON modificati per un caso specifico
+  dell'Error. Elenco per il checkpoint US-5B04.
+- Prossima storia: US-5B04 - CHECKPOINT: test_slice_fase_5b.gd (Error 8->2) +
+  test_nessun_codice_nomina_error + verdetto sull'architettura.
