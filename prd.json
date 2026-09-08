@@ -174,8 +174,8 @@
       ],
       "priority": 11,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. scripts/tribulation_system.gd (NUOVO autoload TribulationSystem, dopo Madness). Lettore di eventi + flag: si connette a Progression.sequence_changed (attiva la prova arrivando a Seq 7/5/3/1), EventTracker.evento_emesso e KnowledgeStore.appreso (_ricalcola_progresso scansiona TUTTI i salti non superati - una prova puo' essere passata anche prima di essere attiva). API: tribolazione_per(da), avanzamento_bloccato(da) (dati non vuoti AND non superata), superata(da) (EndgameState), attiva(da), stato() {in_corso,da,superata,progresso}, moltiplicatore_spawn()/sequenza_bloccata() (handicap esposti), marca_superate_tutte()/azzera() (test/debug). Effetti mentre_in_corso: follia_accelerata (Madness.add in _process, delta_al_minuto da tribulation_effects.json), spiritualita_dimezzata (modifier -50% su spiritualita_max base del giocatore), notte_perenne (TimeSystem.forza_momento - metodo nuovo, +libera_momento/momento_forzato); nemici_rinforzati/abilita_bloccate esposti come query (nessun consumatore live, come audio-as-spec fase 6). scripts/progression.gd: avanza() rifiuta se TribulationSystem.avanzamento_bloccato(_sequence). scripts/potion_system.gd bevi() e scripts/ritual_system.gd avvia(): reason 'tribolazione_in_corso', pozione non sprecata. endgame.tribolazioni_superate nel save (gia' da US-701). 5 test pre-esistenti che attraversano un salto di fascia senza riguardare le tribolazioni (test_advancement_gate, test_narrativa, test_slice_fase_5/5b, test_vertical_slice) chiamano marca_superate_tutte() in prepara() - aggiornamento legittimo, ora modellano il gioco vero. tests/test_tribulation_system.gd NUOVO 4 test (blocco per flag 3->2; superamento per evento npc_influenced x3 su 5->4; follia_accelerata applicata e tolta; round-trip nel save). 5 file .gd non di test toccati (oltre il ~4: segnalato, ma sono tutti guard clause piccole di una feature coesa). validate exit 0. 744 test verdi."
     },
     {
       "id": "US-712",

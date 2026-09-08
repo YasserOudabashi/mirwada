@@ -7034,3 +7034,57 @@ Prossimo: BLOCCO B - US-710 tribulation.schema.json + data/tribulations/.
   Nessuna regressione (test_data_valida verde: il validator esce 0).
 - File .gd toccati: scripts/game_data.gd (+_load_tribulations +3 getter).
 - Prossima storia: US-711 - TribulationSystem (lettore, blocca l'avanzamento).
+
+[2026-09-08] US-711 — TribulationSystem (lettore, blocca l'avanzamento). FASE 7, BLOCCO B.
+
+- scripts/tribulation_system.gd (NUOVO autoload TribulationSystem, in
+  project.godot dopo Madness). Lettore di eventi + flag, nessun verbo proprio:
+  * _ready: si connette a Progression.sequence_changed (arrivando a Seq 7/5/3/1
+    -> attiva la prova di quel salto), EventTracker.evento_emesso e
+    KnowledgeStore.appreso -> _ricalcola_progresso.
+  * _ricalcola_progresso scansiona TUTTI i salti non superati: una prova puo'
+    essere passata anche PRIMA di essere "attiva" (il flag/l'evento c'e' gia').
+    Al 100% -> EndgameState.segna_tribolazione(da) + (se era l'attiva) toglie
+    l'handicap; emette tribolazione_superata.
+  * API: tribolazione_per(da), avanzamento_bloccato(da) (dati non vuoti AND
+    non superata), superata(da), attiva(da), stato() {in_corso, da, superata,
+    progresso}, moltiplicatore_spawn()/sequenza_bloccata() (handicap esposti),
+    marca_superate_tutte()/azzera() (test/debug).
+  * Effetti mentre_in_corso:
+    - follia_accelerata: _process aggiunge Madness (delta_al_minuto /60 * dt,
+      default 1.5 da tribulation_effects.json).
+    - spiritualita_dimezzata: modifier "tribolazione:spiritualita_dimezzata"
+      = -(1-mult)*spiritualita_max_base sul giocatore; tolto al superamento.
+    - notte_perenne: TimeSystem.forza_momento("notte_fonda").
+    - nemici_rinforzati / abilita_bloccate: esposti come query, nessun
+      consumatore live (come l'audio-come-spec di fase 6).
+- scripts/time_system.gd: forza_momento(m)/libera_momento()/momento_forzato().
+  _ricalcola non tocca _momento_corrente finche' _momento_forzato e' impostato
+  (il ciclo lunare e il tick continuano).
+- scripts/progression.gd: avanza() all'inizio -> se
+  TribulationSystem.avanzamento_bloccato(_sequence) ritorna false (rifiuto).
+- scripts/potion_system.gd bevi(): completo|forza + tribolazione aperta ->
+  { ok:false, reason:"tribolazione_in_corso" }, pozione NON sprecata.
+- scripts/ritual_system.gd avvia(): stesso rifiuto prima di partire.
+- endgame.tribolazioni_superate: gia' serializzato (US-701), round-trip OK.
+- 5 test pre-esistenti attraversano un salto di fascia senza riguardare le
+  tribolazioni (test_advancement_gate, test_narrativa, test_slice_fase_5,
+  test_slice_fase_5b, test_vertical_slice): chiamano
+  TribulationSystem.marca_superate_tutte() in prepara(). E' un aggiornamento
+  legittimo - quei test ora modellano il gioco vero, non una regressione.
+- tests/test_tribulation_system.gd (NUOVO, 4 test):
+  * 3->2 bloccato finche' il flag di superamento non e' posto; poi avanza e
+    endgame.tribolazioni_superate contiene 3.
+  * 5->4: superamento npc_influenced x3, il progresso arriva a 1.0 col tracker.
+  * follia_accelerata: la follia sale in _process mentre la prova e' aperta,
+    si ferma dopo il superamento.
+  * round-trip nel save (snapshot -> pulisci -> applica -> superata torna).
+- NOTA rule 3 (CLAUDE.md): 5 file .gd non di test toccati (> ~4). Sono tutti
+  guard clause piccole di una feature coesa (il gate della tribolazione).
+  Segnalato, non spezzato.
+- Come verificato: python tools/validate_data.py exit 0. 744 test headless
+  (740 + 4), tutti verdi. Nessuna regressione (i 5 test aggiornati passano).
+- File .gd toccati: scripts/tribulation_system.gd (nuovo), progression.gd,
+  potion_system.gd, ritual_system.gd, time_system.gd, project.godot (+autoload)
+  + 5 test.
+- Prossima storia: US-712 - le 4 tribolazioni di contenuto (i18n + flag antagonista).

@@ -30,6 +30,10 @@ var _prossima_eclissi_ciclo: int = 0
 
 var _momento_corrente: String = "alba"
 var _fase_corrente: String = "nuova"
+## US-711: momento bloccato da una tribolazione (notte_perenne) o da un
+## rituale. "" = il ciclo procede normale. Finche' e' impostato, _ricalcola
+## non tocca _momento_corrente.
+var _momento_forzato: String = ""
 ## US-607: zone di oscurita' create da terrain_modify tipo_modifica "oscurita"
 ## (il Nightwatcher del Darkness). { c: Vector2, r: float, fino: float(tick) }.
 ## e_notte(posizione) le legge come notte LOCALE. Transitorie, non nel save.
@@ -138,7 +142,7 @@ func _ricalcola(silenzioso: bool) -> void:
 
 	var nuovo_momento: String = str(momenti[m_idx])
 	var nuova_fase: String = str(fasi[f_idx])
-	if nuovo_momento != _momento_corrente:
+	if _momento_forzato.is_empty() and nuovo_momento != _momento_corrente:
 		_momento_corrente = nuovo_momento
 		if not silenzioso:
 			momento_cambiato.emit(_momento_corrente)
@@ -161,6 +165,25 @@ func _ciclo_lunare() -> int:
 
 func momento() -> String:
 	return _momento_corrente
+
+
+## US-711: blocca il momento del giorno (tribolazione notte_perenne). Il ciclo
+## lunare e il tick continuano; solo il momento resta fermo finche' non si
+## chiama libera_momento().
+func forza_momento(m: String) -> void:
+	_momento_forzato = str(m)
+	if not _momento_forzato.is_empty() and _momento_forzato != _momento_corrente:
+		_momento_corrente = _momento_forzato
+		momento_cambiato.emit(_momento_corrente)
+
+
+func libera_momento() -> void:
+	_momento_forzato = ""
+	_ricalcola(false)
+
+
+func momento_forzato() -> bool:
+	return not _momento_forzato.is_empty()
 
 
 ## "eclissi" mentre un'eclissi e' in corso, altrimenti la fase del ciclo.

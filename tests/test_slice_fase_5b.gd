@@ -42,6 +42,8 @@ func prepara() -> void:
 	_store().call("pulisci")
 	_et().call("azzera")
 	_madness().call("azzera")
+	# US-711: lo slice della fase 5b (Error 8->2) non e' sulle tribolazioni.
+	_root().get_node("TribulationSystem").call("marca_superate_tutte")
 	_engine().call("flush_effects")
 	_engine().call("clear_cooldowns")
 	_engine().call("clear_granted")

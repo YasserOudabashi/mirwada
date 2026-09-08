@@ -115,6 +115,13 @@ func bevi(forza: bool = false) -> Dictionary:
 
 	var esito: Dictionary = {"ok": true, "avanzato": false, "forzato": false, "follia": 0.0}
 
+	# US-711: a un salto di fascia con una tribolazione aperta, l'avanzamento e'
+	# rifiutato e la pozione NON si spreca (Progression.avanza gia' rifiuta;
+	# qui non applichiamo malus ne' consumiamo la pozione).
+	var trib: Node = get_node_or_null("/root/TribulationSystem")
+	if (completo or forza) and trib != null and bool(trib.call("avanzamento_bloccato", int(prog.call("sequence")))):
+		return {"ok": false, "reason": "tribolazione_in_corso"}
+
 	if completo:
 		prog.call("avanza")
 		if found != null:

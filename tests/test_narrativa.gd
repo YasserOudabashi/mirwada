@@ -21,6 +21,8 @@ func prepara() -> void:
 	_ks().call("dimentica_tutto")
 	_ts().call("da_salvataggio", {})
 	_pr().call("configura", "twilight_giant", 9)
+	# US-711: i flag narrativi ai passaggi di tier, non la prova della tribolazione.
+	_root().get_node("TribulationSystem").call("marca_superate_tutte")
 
 
 func test_antagonista_per_pathway() -> void:
