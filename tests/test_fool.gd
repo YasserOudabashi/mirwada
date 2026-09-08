@@ -16,6 +16,12 @@ const ABILITA_6_4 := [
 	"fool_fili_marionetta", "fool_scambio_bersagli",
 	"fool_scambio_con_oggetto", "fool_prestigio_di_stanza",
 ]
+const ABILITA_3_0 := [
+	"fool_richiamo_dal_passato", "fool_eco_di_ieri",
+	"fool_miracolo", "fool_sfortuna_altrui",
+	"fool_area_di_segretezza", "fool_realta_manomessa",
+	"fool_realta_falsificata", "fool_nessuno",
+]
 
 
 func _engine() -> Node:
@@ -140,13 +146,60 @@ func test_fool_4_ha_un_rituale_di_teatro() -> void:
 			"fool_4 (Bizarro Sorcerer) si avanza a teatro / sul palco")
 
 
-func test_fool_9_4_sono_contenuto_e_le_acting_sommano_uno() -> void:
+func test_ogni_abilita_fool_3_0_si_esegue_senza_warning() -> void:
+	var e: Node = _engine()
+	for aid in ABILITA_3_0:
+		var c: Node2D = _caster()
+		var r: Dictionary = e.call("execute", aid, c)
+		assert_true(r["ok"], "%s eseguita" % aid)
+		assert_eq((r["warnings"] as PackedStringArray).size(), 0,
+			"%s: nessun warning di primitiva: %s" % [aid, r["warnings"]])
+		e.call("clear_cooldowns")
+		e.call("clear_snapshots")
+		_cleanup(c)
+
+
+func test_fool_2_riscritta_senza_probability_shift() -> void:
+	var gd: Node = _gd()
+	# fool_2 (Miracle Invoker) non usa la primitiva differita: solo primitive
+	# del registro attivo (buff_stat / debuff_stat / curse).
+	for aid in ["fool_miracolo", "fool_sfortuna_altrui"]:
+		var ab: Dictionary = gd.call("get_ability", aid)
+		for p in (ab.get("primitive", []) as Array):
+			var tipo: String = str((p as Dictionary).get("tipo", ""))
+			assert_ne(tipo, "probability_shift",
+				"%s non usa probability_shift (primitiva differita)" % aid)
+			assert_false(gd.call("get_primitive", tipo).is_empty(),
+				"%s usa solo primitive del registro ('%s')" % [aid, tipo])
+
+
+func test_sfortuna_altrui_applica_lo_status_sfortuna() -> void:
+	var e: Node = _engine()
+	var c: Node2D = _caster()
+	var s: Node = c.get_node("Stats")
+	e.call("execute", "fool_sfortuna_altrui", c)
+	assert_true(s.call("ha_status", "sfortuna"),
+		"curse(sfortuna) applica lo status gia' esistente (Knight of Misfortune)")
+	_cleanup(c)
+
+
+func test_fool_1_sacrifica_un_ancora() -> void:
+	var pw: Dictionary = _gd().call("get_pathway", "fool")
+	for seq in (pw.get("sequences", []) as Array):
+		if int((seq as Dictionary).get("sequence", -1)) != 1:
+			continue
+		var rit: Dictionary = (seq as Dictionary).get("advancement_ritual", {})
+		assert_true("ancora_del_giocatore" in (rit.get("sacrifices", []) as Array),
+			"il rituale di Sequenza 1 sacrifica un'Ancora del giocatore")
+
+
+func test_fool_e_contenuto_completo_10_su_10() -> void:
 	var pw: Dictionary = _gd().call("get_pathway", "fool")
 	var madness_prec: float = -1.0
+	var n: int = 0
 	for seq in (pw.get("sequences", []) as Array):
 		var d: Dictionary = seq
-		if int(d.get("sequence", -1)) < 4:
-			continue
+		n += 1
 		assert_false(bool(d.get("stub", false)),
 			"fool_%d non e' piu' stub" % int(d.get("sequence")))
 		var somma: float = 0.0
@@ -158,3 +211,4 @@ func test_fool_9_4_sono_contenuto_e_le_acting_sommano_uno() -> void:
 		assert_gt(mf, madness_prec,
 			"fool_%d: madness_on_force cresce" % int(d.get("sequence")))
 		madness_prec = mf
+	assert_eq(n, 10, "Fool ha 10 Sequenze, tutte contenuto")

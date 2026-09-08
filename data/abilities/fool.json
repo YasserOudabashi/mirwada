@@ -385,6 +385,263 @@
         "area"
       ],
       "note": "Riempie una stanza di copie: 2 esche (potenza = numero) e chi guarda non sa piu' dove mirare."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_richiamo_dal_passato",
+      "name": "Richiamo dal passato",
+      "name_i18n": "ability.fool.fool_richiamo_dal_passato",
+      "sequence_id": "fool_3",
+      "costo_spiritualita": 24,
+      "cooldown": 22.0,
+      "primitive": [
+        {
+          "tipo": "time_rewind",
+          "secondi": 4.0,
+          "ripristina": [
+            "hp",
+            "spiritualita"
+          ],
+          "costo_follia": 7.0
+        },
+        {
+          "tipo": "illusion",
+          "raggio": 4,
+          "durata": 8.0,
+          "potenza": 1,
+          "tipo_illusione": "copia_statica"
+        }
+      ],
+      "tag_sinergia": [
+        "tempo",
+        "illusione",
+        "singolo"
+      ],
+      "note": "Lo Scholar of Yore richiama una versione precedente di se': time_rewind (gia' implementata, US-5B03) sul caster + un'immagine di com'era. Gli avatar del Fool sono FINTI (decisione: illusion, non la materia prima 'avatar' dell'Error)."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_eco_di_ieri",
+      "name": "Eco di ieri",
+      "name_i18n": "ability.fool.fool_eco_di_ieri",
+      "sequence_id": "fool_3",
+      "costo_spiritualita": 18,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 6,
+          "durata": 10.0,
+          "potenza": 2,
+          "tipo_illusione": "copia_nemico"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.2,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "tempo",
+        "area"
+      ],
+      "note": "Echi di nemici che il bersaglio ha gia' affrontato: 2 esche dal passato che confondono la mira."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_miracolo",
+      "name": "Miracolo",
+      "name_i18n": "ability.fool.fool_miracolo",
+      "sequence_id": "fool_2",
+      "costo_spiritualita": 40,
+      "cooldown": 30.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 0.5,
+          "durata": 6.0,
+          "moltiplicativo": false
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "precisione",
+          "valore": 0.4,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "fortuna",
+        "destino",
+        "singolo"
+      ],
+      "costo_follia": 3.0,
+      "note": "L'improbabile reso risorsa: costa molta spiritualita', dura poco, ma per quei secondi tutto ti riesce. VARIANZA ALTA DICHIARATA: nei dati e' un bonus grande e breve; la manipolazione vera della probabilita' resta a Wheel of Fortune (differito). Nessuna primitiva differita."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_sfortuna_altrui",
+      "name": "Sfortuna altrui",
+      "name_i18n": "ability.fool.fool_sfortuna_altrui",
+      "sequence_id": "fool_2",
+      "costo_spiritualita": 22,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "curse",
+          "effetto": "sfortuna",
+          "durata": 20.0,
+          "condizione_rimozione": ""
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "evasione",
+          "valore": -0.3,
+          "durata": 12.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "fortuna",
+        "maledizione",
+        "singolo"
+      ],
+      "note": "Scarica l'improbabile sul bersaglio: inciampa, manca, si ferisce da solo. curse(sfortuna) gia' esistente (Knight of Misfortune del Darkness) + debuff. Nessuna primitiva differita."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_area_di_segretezza",
+      "name": "Area di segretezza",
+      "name_i18n": "ability.fool.fool_area_di_segretezza",
+      "sequence_id": "fool_1",
+      "costo_spiritualita": 30,
+      "cooldown": 24.0,
+      "primitive": [
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "area_di_segretezza",
+          "raggio": 8,
+          "durata": 15.0,
+          "permanente": false
+        },
+        {
+          "tipo": "illusion",
+          "raggio": 8,
+          "durata": 15.0,
+          "potenza": 3,
+          "tipo_illusione": "copia_nemico"
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "occultamento",
+        "area"
+      ],
+      "note": "Un'area in cui la realta' locale e' manomettibile: terrain_modify a tempo (non permanente) + 3 esche. Cosa la 'segretezza' faccia davvero a schermo e' fase 6; qui e' un campo dichiarato + illusioni."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_realta_manomessa",
+      "name": "Realta' manomessa",
+      "name_i18n": "ability.fool.fool_realta_manomessa",
+      "sequence_id": "fool_1",
+      "costo_spiritualita": 26,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.4,
+          "durata": 10.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.3,
+          "durata": 10.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "curse",
+          "effetto": "sfortuna",
+          "durata": 15.0,
+          "condizione_rimozione": ""
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "maledizione",
+        "area"
+      ],
+      "note": "Dentro l'area di segretezza le regole cedono per chi non e' il Fool."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_realta_falsificata",
+      "name": "Realta' falsificata",
+      "name_i18n": "ability.fool.fool_realta_falsificata",
+      "sequence_id": "fool_0",
+      "costo_spiritualita": 55,
+      "cooldown": 60.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 15,
+          "durata": -1,
+          "effetto": "sfortuna",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        },
+        {
+          "tipo": "illusion",
+          "raggio": 15,
+          "durata": 12.0,
+          "potenza": 4,
+          "tipo_illusione": "copia_nemico"
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "dominio",
+        "area"
+      ],
+      "note": "L'abilita' di dominio del Fool: nel raggio la realta' e' quella che dice lui - sfortuna cronica per i nemici + 4 esche. Aura persistente + illusion, come i Seq 0 di fase 5."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_nessuno",
+      "name": "Nessuno",
+      "name_i18n": "ability.fool.fool_nessuno",
+      "sequence_id": "fool_0",
+      "costo_spiritualita": 45,
+      "cooldown": 45.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 10,
+          "durata": 10.0,
+          "potenza": 1,
+          "tipo_illusione": "aspetto"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 0.6,
+          "durata": 10.0,
+          "moltiplicativo": false
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "occultamento",
+        "dominio"
+      ],
+      "note": "Il Fool non e' nessuno: nessun aspetto fisso, nessun bersaglio possibile."
     }
   ]
 }

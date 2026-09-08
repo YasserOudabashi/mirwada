@@ -258,7 +258,19 @@
     "articolazione_di_marionetta",
     "cappello_a_cilindro_senza_fondo",
     "specchio_da_camerino_incrinato",
-    "sipario_di_velluto_polveroso"
+    "sipario_di_velluto_polveroso",
+    "pagina_strappata_da_un_diario",
+    "polvere_di_un_oggetto_gia_distrutto",
+    "ritratto_di_te_da_bambino",
+    "biglietto_della_lotteria_vincente",
+    "quadrifoglio_a_cinque_foglie",
+    "moneta_caduta_sempre_di_taglio",
+    "angolo_di_stanza_che_non_esiste",
+    "silenzio_tra_due_battiti",
+    "regola_locale_scritta_a_matita",
+    "battuta_finale_mai_detta",
+    "specchio_che_non_riflette_nessuno",
+    "copione_del_mondo_con_le_correzioni"
   ],
   "formulas": {
     "formula_fool_9": {
@@ -1457,6 +1469,62 @@
         "cappello_a_cilindro_senza_fondo",
         "specchio_da_camerino_incrinato",
         "sipario_di_velluto_polveroso"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_3": {
+      "characteristic_sequence": 3,
+      "ingredients": [
+        "pagina_strappata_da_un_diario",
+        "polvere_di_un_oggetto_gia_distrutto",
+        "ritratto_di_te_da_bambino"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_2": {
+      "characteristic_sequence": 2,
+      "ingredients": [
+        "biglietto_della_lotteria_vincente",
+        "quadrifoglio_a_cinque_foglie",
+        "moneta_caduta_sempre_di_taglio"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_1": {
+      "characteristic_sequence": 1,
+      "ingredients": [
+        "angolo_di_stanza_che_non_esiste",
+        "silenzio_tra_due_battiti",
+        "regola_locale_scritta_a_matita"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_0": {
+      "characteristic_sequence": 0,
+      "ingredients": [
+        "battuta_finale_mai_detta",
+        "specchio_che_non_riflette_nessuno",
+        "copione_del_mondo_con_le_correzioni"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

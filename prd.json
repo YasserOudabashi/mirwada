@@ -134,8 +134,8 @@
       ],
       "priority": 7,
       "fase": "5b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. FOOL COMPLETO 10/10. BLOCCO B CHIUSO. Nessuna primitiva nuova. fool_2 Miracle Invoker RISCRITTA senza probability_shift: fool_miracolo (buff evasione/precisione a varianza alta dichiarata) + fool_sfortuna_altrui (curse('sfortuna') gia' esistente + debuff), come darkness_1/paragon_1/hermit_1. grep data/abilities/ per '\"tipo\": \"probability_shift\"' -> 0 (solo in note storiche di darkness.json). fool_3 Scholar of Yore (time_rewind + illusion: la versione precedente e' FINTA, illusion non avatar), fool_1 Attendant of Mysteries (terrain_modify area_di_segretezza non permanente + illusion; rituale eclissi Ancora), fool_0 Fool (aura sfortuna + illusion). formula_fool_3/2/1/0 + 12 ingredienti + char_fool_3/2/1/0 tradotti. test_fool.gd esteso (fool_2 solo primitive registro; curse sfortuna; Seq 1 Ancora; Fool 10/10). validate exit 0 (stub 14->10, restano solo le 10 del Door). 697 test verdi. File .gd del blocco B: solo _p_illusion esteso in US-5B05 (~10 righe, execute intatto)."
     },
     {
       "id": "US-5B08",

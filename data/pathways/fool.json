@@ -433,24 +433,77 @@
       "name_i18n": "sequence.fool.3",
       "tier": "saint",
       "concept": "Richiama dal passato una versione precedente di se' o di un oggetto distrutto.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 150,
+        "spiritualita_max": 0.22,
+        "evasione": 0.12
+      },
+      "abilities": [
+        "fool_richiamo_dal_passato",
+        "fool_eco_di_ieri"
+      ],
+      "acting_actions": [
+        {
+          "id": "fool_3_studioso",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_richiamo_dal_passato"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_3_studioso",
+          "descrizione": "Richiama 12 volte una versione precedente di te"
+        },
+        {
+          "id": "fool_3_antiquario",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_eco_di_ieri"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_3_antiquario",
+          "descrizione": "Evoca 12 echi di nemici passati"
+        },
+        {
+          "id": "fool_3_memoria",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "follia"
+          },
+          "target": 4000,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_3_memoria",
+          "descrizione": "Infliggi 4000 danni da follia con i ricordi altrui"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 3,
-        "ingredients": [],
+        "ingredients": [
+          "pagina_strappata_da_un_diario",
+          "polvere_di_un_oggetto_gia_distrutto",
+          "ritratto_di_te_da_bambino"
+        ],
         "formula_id": "formula_fool_3"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "nebbia_grigia",
+          "biblioteca"
+        ],
+        "momento": "notte_fonda",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "una_pagina_del_tuo_passato"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 10.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 2,
@@ -459,24 +512,77 @@
       "name_i18n": "sequence.fool.2",
       "tier": "angel",
       "concept": "Converte spiritualita' in eventi improbabili: il miracolo come risorsa spendibile.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 260,
+        "spiritualita_max": 0.3,
+        "evasione": 0.15
+      },
+      "abilities": [
+        "fool_miracolo",
+        "fool_sfortuna_altrui"
+      ],
+      "acting_actions": [
+        {
+          "id": "fool_2_miracolato",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_miracolo"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_2_miracolato",
+          "descrizione": "Invoca 12 miracoli spendendo spiritualita'"
+        },
+        {
+          "id": "fool_2_iettatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_sfortuna_altrui"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_2_iettatore",
+          "descrizione": "Scarica la sfortuna su 12 bersagli"
+        },
+        {
+          "id": "fool_2_improbabile",
+          "evento": "enemy_defeated",
+          "filtri": {
+            "senza_subire_danno": true
+          },
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_2_improbabile",
+          "descrizione": "Vinci 10 scontri contro ogni pronostico, senza un graffio"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 2,
-        "ingredients": [],
+        "ingredients": [
+          "biglietto_della_lotteria_vincente",
+          "quadrifoglio_a_cinque_foglie",
+          "moneta_caduta_sempre_di_taglio"
+        ],
         "formula_id": "formula_fool_2"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "nebbia_grigia",
+          "crocevia"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "piena",
+        "sacrifices": [
+          "tutta_la_fortuna_che_ti_restava"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
-      "notes": "",
-      "stub": true
+      "madness_on_force": 11.5,
+      "notes": "fool_2 (Miracle Invoker) e' RISCRITTA senza la primitiva differita del gruppo key_of_light: 'eventi improbabili' resi con buff_stat/debuff_stat a forte varianza dichiarata + curse(sfortuna) gia' esistente. La manipolazione VERA della probabilita' resta a Wheel of Fortune (differito). Come darkness_1 / paragon_1 / hermit_1.",
+      "stub": false
     },
     {
       "sequence": 1,
@@ -485,24 +591,77 @@
       "name_i18n": "sequence.fool.1",
       "tier": "angel",
       "concept": "Crea un'area di segretezza in cui la realta' locale puo' essere manomessa.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 400,
+        "spiritualita_max": 0.35,
+        "evasione": 0.18
+      },
+      "abilities": [
+        "fool_area_di_segretezza",
+        "fool_realta_manomessa"
+      ],
+      "acting_actions": [
+        {
+          "id": "fool_1_custode",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_area_di_segretezza"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_1_custode",
+          "descrizione": "Apri 15 aree di segretezza"
+        },
+        {
+          "id": "fool_1_manomissione",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_realta_manomessa"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_1_manomissione",
+          "descrizione": "Manometti 12 volte la realta' locale"
+        },
+        {
+          "id": "fool_1_dietro_le_quinte",
+          "evento": "area_cleared",
+          "filtri": {
+            "senza_uccidere": true
+          },
+          "target": 3,
+          "progresso": 0.25,
+          "ripetibile": false,
+          "descrizione_i18n": "acting.fool.fool_1_dietro_le_quinte",
+          "descrizione": "Risolvi 3 aree ostili restando dietro le quinte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 1,
-        "ingredients": [],
+        "ingredients": [
+          "angolo_di_stanza_che_non_esiste",
+          "silenzio_tra_due_battiti",
+          "regola_locale_scritta_a_matita"
+        ],
         "formula_id": "formula_fool_1"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "nebbia_grigia",
+          "soglia"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "eclissi",
+        "sacrifices": [
+          "ancora_del_giocatore"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 12.8,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 0,
@@ -511,24 +670,74 @@
       "name_i18n": "sequence.fool.0",
       "tier": "god",
       "concept": "Falsifica la realta' su scala di mondo.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 700,
+        "spiritualita_max": 0.6,
+        "evasione": 0.25
+      },
+      "abilities": [
+        "fool_realta_falsificata",
+        "fool_nessuno"
+      ],
+      "acting_actions": [
+        {
+          "id": "fool_0_dominio",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_realta_falsificata"
+          },
+          "target": 5,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_0_dominio",
+          "descrizione": "Falsifica la realta' 5 volte su scala d'area"
+        },
+        {
+          "id": "fool_0_maschera_finale",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_nessuno"
+          },
+          "target": 10,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_0_maschera_finale",
+          "descrizione": "Diventa nessuno 10 volte"
+        },
+        {
+          "id": "fool_0_burla_del_mondo",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 30,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_0_burla_del_mondo",
+          "descrizione": "Sconfiggi 30 nemici: per il mondo non e' successo niente"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 0,
-        "ingredients": [],
+        "ingredients": [
+          "battuta_finale_mai_detta",
+          "specchio_che_non_riflette_nessuno",
+          "copione_del_mondo_con_le_correzioni"
+        ],
         "formula_id": "formula_fool_0"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "nebbia_grigia"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "eclissi",
+        "sacrifices": [
+          "il_detentore_precedente_della_sequenza_0"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 14.0,
       "notes": "",
-      "stub": true
+      "stub": false
     }
   ]
 }

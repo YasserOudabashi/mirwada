@@ -6410,3 +6410,53 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   tutti verdi. Nessuna regressione.
 - File .gd toccati: nessuno (solo dati + tests/test_fool.gd).
 - Prossima storia: US-5B07 - Fool Seq 3-0 + fool_2 SENZA probability_shift.
+
+[2026-09-08] US-5B07 — Fool, Sequenze 3-0 (Scholar of Yore / Miracle Invoker / Attendant of Mysteries / Fool) — fool_2 SENZA probability_shift. FASE 5b, BLOCCO B CHIUSO. FOOL COMPLETO 10/10.
+
+- Nessuna primitiva nuova. Scholar of Yore usa time_rewind (US-5B03),
+  Attendant of Mysteries usa terrain_modify (fase 2), tutti usano illusion.
+- fool_2 (Miracle Invoker) RISCRITTA SENZA probability_shift (differita, gruppo
+  key_of_light):
+  * fool_miracolo: buff_stat evasione +0.5 / precisione +0.4 a forte varianza
+    DICHIARATA nel note (bonus grande e breve, costa 40 spiritualita' + 3
+    follia). fool_sfortuna_altrui: curse('sfortuna', gia' esistente da
+    darkness_sfortuna_cronica US-503) + debuff evasione. Come darkness_1 /
+    paragon_1 / hermit_1.
+  * grep di data/abilities/ per "tipo": "probability_shift" -> 0. Le sole
+    occorrenze di 'probability_shift' sono in NOTE (darkness.json, spiegazione
+    storica). test_fool.test_fool_2_riscritta_senza_probability_shift lo
+    verifica anche a runtime.
+- CONTENUTO Fool Seq 3/2/1/0 (stub -> false). FOOL COMPLETO 10/10.
+  * fool_3 Scholar of Yore (saint): fool_richiamo_dal_passato (time_rewind +
+    illusion copia_statica - la "versione precedente" e' FINTA: illusion, non
+    la materia prima 'avatar' dell'Error, come da decisione) + fool_eco_di_ieri
+    (illusion copia_nemico + debuff). Rituale nebbia_grigia/biblioteca,
+    notte_fonda. madness 10.0.
+  * fool_2 Miracle Invoker (angel): vedi sopra. Rituale nebbia_grigia/crocevia,
+    notte_fonda, luna piena, sacrifica "tutta_la_fortuna_che_ti_restava".
+    madness 11.5.
+  * fool_1 Attendant of Mysteries (angel): fool_area_di_segretezza
+    (terrain_modify 'area_di_segretezza' NON permanente + illusion 3 esche) +
+    fool_realta_manomessa (2x debuff + curse sfortuna). Rituale
+    nebbia_grigia/soglia, notte_fonda, ECLISSI, sacrifica ancora_del_giocatore.
+    madness 12.8.
+  * fool_0 Fool (god): fool_realta_falsificata (aura persistente 'sfortuna' r15
+    + illusion 4 esche - abilita' di dominio) + fool_nessuno (illusion aspetto
+    + buff evasione). Rituale nebbia_grigia, notte_fonda, eclissi, sacrifica il
+    detentore precedente. madness 14.0.
+- formule formula_fool_3/2/1/0 + 12 ingredienti nuovi. caratteristiche
+  char_fool_3/2/1/0 (tradotte). i18n rilanciato (it.json 966 -> 990). Tutte le
+  chiavi fool tradotte (47 TODO totali = baseline TG, nessuna fool).
+- VERIFICA A SCHERMO: test_fool.gd - le 8 abilita' Seq 3-0 senza warning;
+  fool_2 usa solo primitive del registro attivo; curse(sfortuna) applica lo
+  status; Seq 1 sacrifica un'Ancora; Fool contenuto completo 10/10 con acting
+  1.0 e madness crescente 1.0 -> 14.0.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: stub
+  14->10 [restano solo le 10 Sequenze del Door], sinergie 17, TODO i18n 47 =
+  baseline). 697 test headless (693 + 4 in test_fool.gd), tutti verdi. Nessuna
+  regressione.
+- File .gd toccati in tutto il BLOCCO B: SOLO scripts/ability_engine.gd
+  (_p_illusion esteso in US-5B05, ~10 righe, execute intatto) + i test.
+- BLOCCO B CHIUSO: US-5B05/06/07. Fool 10/10. Prossimo: BLOCCO C - Door
+  (US-5B08 shadow_meld gia' in fase 6; US-5B09 fotocopia via steal non_sottrae;
+  US-5B10 varco_forzato nel WorldState).

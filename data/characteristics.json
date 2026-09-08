@@ -117,6 +117,30 @@
       "name_i18n": "characteristic.fool.4"
     },
     {
+      "id": "char_fool_3",
+      "pathway_id": "fool",
+      "sequence": 3,
+      "name_i18n": "characteristic.fool.3"
+    },
+    {
+      "id": "char_fool_2",
+      "pathway_id": "fool",
+      "sequence": 2,
+      "name_i18n": "characteristic.fool.2"
+    },
+    {
+      "id": "char_fool_1",
+      "pathway_id": "fool",
+      "sequence": 1,
+      "name_i18n": "characteristic.fool.1"
+    },
+    {
+      "id": "char_fool_0",
+      "pathway_id": "fool",
+      "sequence": 0,
+      "name_i18n": "characteristic.fool.0"
+    },
+    {
       "id": "char_death_6",
       "pathway_id": "death",
       "sequence": 6,
