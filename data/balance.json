@@ -82,6 +82,11 @@
     "pathway_default": "twilight_giant",
     "sequenza_iniziale": 9
   },
+  "cambio_pathway": {
+    "_comment": "Fase 7, US-704. Il cambio di Pathway funziona solo tra vicini dello STESSO gruppo (campo 'group' dei dati) e solo quando il personaggio e' abbastanza avanzato: sequenza <= soglia_sequenza. Le abilita' delle Sequenze conservate_da_sequenza..9 del vecchio Pathway restano al giocatore. PLAUSIBILI, non bilanciati.",
+    "soglia_sequenza": 4,
+    "conservate_da_sequenza": 7
+  },
   "madness": {
     "_comment": "Soglie degli effetti di follia. Non si azzera mai del tutto: la riduzione massima delle Ancore e' un cap, non un reset.",
     "soglia_distorsioni": 15,

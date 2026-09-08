@@ -61,8 +61,8 @@
       ],
       "priority": 4,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. scripts/pathway_change.gd (NUOVO autoload PathwayChange, dopo EndgameState). puo_cambiare(nuovo) true SSE nuovo esiste, e' un altro Pathway con lo STESSO campo 'group' di quello corrente, e Progression.sequence() <= soglia_sequenza (data/balance.json cambio_pathway, 4). cambia(nuovo) -> {ok,da,a,sequenza,conservate} o {ok:false,reason}: registra EndgameState.pathway_precedente, Progression.configura(nuovo, stessa Seq), grant_permanente delle abilita' Seq conservate_da_sequenza(7)..9 del vecchio Pathway, poi hook opzionale FusionEngine.applica_al_cambio (US-705). Nessun id di Pathway nel codice: la relazione 'vicini' e' il group. data/balance.json: sezione cambio_pathway (soglia_sequenza 4, conservate_da_sequenza 7). tests/test_pathway_change.gd 4 test (Error S4->Door ok; Error->Death gruppo_diverso, Pathway non toccato; Error S9->Door troppo_presto; dopo il cambio error_scasso e door_occultamento_totale entrambe non 'abilita_non_posseduta'). validate exit 0. 724 test verdi."
     },
     {
       "id": "US-705",

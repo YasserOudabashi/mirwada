@@ -6763,3 +6763,42 @@ Generare il PRD con /prd.
 - File .gd toccati: nessuno (solo dati + validator + tests/test_endgame_vocab.gd).
 - BLOCCO 0 CHIUSO: US-701/702/703 (save 21->22, schema fusioni + 8 file stub,
   2 vocabolari chiusi). Prossimo: BLOCCO A - US-704 cambio Pathway tra vicini.
+
+[2026-09-08] US-704 — Cambio Pathway solo tra vicini dello stesso gruppo. FASE 7, BLOCCO A.
+
+- scripts/pathway_change.gd (NUOVO autoload PathwayChange, in project.godot
+  subito dopo EndgameState — deps GameData/Progression/AbilityEngine/
+  EndgameState tutte gia' sopra). API:
+  * puo_cambiare(nuovo_pathway) -> bool: true SSE nuovo_pathway esiste nei
+    dati, e' diverso dall'attuale, ha lo STESSO campo 'group' del Pathway
+    corrente (letto da GameData.get_pathway, MAI un id hardcoded) e
+    Progression.sequence() <= soglia_sequenza.
+  * cambia(nuovo_pathway) -> Dictionary: { ok:true, da, a, sequenza,
+    conservate:[ability_id] } oppure { ok:false, reason } senza toccare
+    niente. reason: no_progression / stesso_pathway / no_gamedata /
+    pathway_inesistente / gruppo_diverso / troppo_presto.
+  * cambia: EndgameState.registra_cambio(vecchio); Progression.configura(
+    nuovo, STESSA Sequenza numerica); grant_permanente (AbilityEngine) delle
+    abilita' delle Sequenze conservate_da_sequenza..9 del vecchio Pathway
+    (restano lanciabili dal giocatore via is_granted/_permanenti); poi hook
+    opzionale get_node_or_null("/root/FusionEngine").applica_al_cambio se
+    esiste (lo aggancia US-705, assente ora).
+- data/balance.json: nuova sezione "cambio_pathway" { soglia_sequenza: 4,
+  conservate_da_sequenza: 7 }. I numeri stanno nei dati (FR-1), non nello
+  script. PLAUSIBILI, non bilanciati.
+- tests/test_pathway_change.gd (NUOVO, 4 test):
+  * Error Seq 4 -> Door: puo_cambiare true (stesso gruppo lord_of_mysteries,
+    Seq 4 <= 4).
+  * Error -> Death: puo_cambiare false, cambia -> reason "gruppo_diverso",
+    Progression.pathway() resta "error" (rifiuto non tocca niente).
+  * Error Seq 9 -> Door: reason "troppo_presto" (9 > 4).
+  * dopo cambia("door") da Error Seq 4: Progression su "door" Seq 4;
+    "error_scasso" in res.conservate; AbilityEngine.execute("error_scasso")
+    e execute("door_occultamento_totale") sul giocatore NON danno
+    "abilita_non_posseduta" (vecchia Seq 9 conservata + nuova Seq 4 posseduta).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  724 test headless (720 + 4), tutti verdi. Nessuna regressione.
+- File .gd toccati: scripts/pathway_change.gd (nuovo), project.godot (+autoload),
+  data/balance.json (+sezione), tests/test_pathway_change.gd (nuovo).
+  AbilityEngine.execute / _esegui_primitive NON toccati.
+- Prossima storia: US-705 - FusionEngine (compone le abilita' fuse dai dati).
