@@ -45,8 +45,8 @@
       ],
       "priority": 3,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. tribulation_effects.json (5 voci: follia_accelerata/spiritualita_dimezzata/nemici_rinforzati/abilita_bloccate/notte_perenne). prayer_effects.json (4 voci: benedizione_seguaci/voto_di_autorita/intercessione/anatema, ognuna dichiara la primitiva esistente su cui si appoggia - nessuna primitiva nuova). validate_data.py carica entrambi (chiusi <=6, primitiva nel registro). test_endgame_vocab.gd 2 test. validate exit 0. 720 test verdi. BLOCCO 0 chiuso."
     },
     {
       "id": "US-704",
