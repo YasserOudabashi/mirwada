@@ -4,7 +4,74 @@
   "gruppo": "lord_of_mysteries",
   "pathway_a": "door",
   "pathway_b": "error",
-  "abilita_fuse": [],
-  "stub": true,
-  "note": "Il ladro che ruba DOVE sei, non cosa: rubare da una posizione, fotocopiare un varco, scambiare la refurtiva con il proprio posto."
+  "abilita_fuse": [
+    {
+      "id": "fus_door_error_furto_dislocato",
+      "da_sequenza": 9,
+      "name_i18n": "ability.fusion.fus_door_error_furto_dislocato",
+      "primitive": [
+        { "tipo": "steal", "categoria": "oggetto", "durata_prestito": 0, "probabilita": 0.8 },
+        { "tipo": "teleport", "distanza": 120, "richiede_visuale": true, "porta_alleati": false }
+      ],
+      "tag_sinergia": ["furto", "spazio", "singolo"],
+      "note": "Il Marauder che ruba DOVE sei: alleggerisce il bersaglio e nello stesso gesto si ancora alla sua posizione."
+    },
+    {
+      "id": "fus_door_error_grimaldello_spaziale",
+      "da_sequenza": 9,
+      "name_i18n": "ability.fusion.fus_door_error_grimaldello_spaziale",
+      "primitive": [
+        { "tipo": "steal", "categoria": "oggetto", "durata_prestito": 0, "probabilita": 0.9, "non_sottrae": true },
+        { "tipo": "terrain_modify", "tipo_modifica": "apre_varco", "raggio": 40, "durata": 8.0, "permanente": false }
+      ],
+      "tag_sinergia": ["furto", "viaggio", "cavillo"],
+      "note": "Non forza la serratura: fotocopia il passaggio e apre un varco accanto. La refurtiva e' il 'dove', non l'oggetto."
+    },
+    {
+      "id": "fus_door_error_refurtiva_scambiata",
+      "da_sequenza": 8,
+      "name_i18n": "ability.fusion.fus_door_error_refurtiva_scambiata",
+      "primitive": [
+        { "tipo": "steal", "categoria": "oggetto", "durata_prestito": 10.0, "probabilita": 0.75 },
+        { "tipo": "teleport", "distanza": 160, "richiede_visuale": false, "porta_alleati": false }
+      ],
+      "tag_sinergia": ["furto", "spazio", "inganno"],
+      "note": "Scambia la refurtiva con il proprio posto: quello che hai preso resta dov'eri tu, tu sei dove stava lui."
+    },
+    {
+      "id": "fus_door_error_nota_dislocata",
+      "da_sequenza": 8,
+      "name_i18n": "ability.fusion.fus_door_error_nota_dislocata",
+      "primitive": [
+        { "tipo": "steal", "categoria": "abilita", "ability_id": "door_passo_breve", "durata_prestito": 18.0, "probabilita": 0.7, "non_sottrae": true },
+        { "tipo": "teleport", "distanza": 100, "richiede_visuale": false, "porta_alleati": false }
+      ],
+      "tag_sinergia": ["parassita", "spazio"],
+      "note": "Copia un'abilita' del bersaglio e la rilancia da un angolo cieco, gia' spostati."
+    },
+    {
+      "id": "fus_door_error_soglia_rubata",
+      "da_sequenza": 7,
+      "name_i18n": "ability.fusion.fus_door_error_soglia_rubata",
+      "primitive": [
+        { "tipo": "steal", "categoria": "conoscenza", "durata_prestito": 0, "probabilita": 0.85 },
+        { "tipo": "terrain_modify", "tipo_modifica": "varco_forzato", "raggio": 48, "durata": 0.0, "permanente": true }
+      ],
+      "tag_sinergia": ["furto", "occultamento", "conoscenza"],
+      "note": "Ruba il 'dove' di un segreto invece del segreto: il varco che apre resta aperto anche dopo."
+    },
+    {
+      "id": "fus_door_error_colpo_tra_le_porte",
+      "da_sequenza": 7,
+      "name_i18n": "ability.fusion.fus_door_error_colpo_tra_le_porte",
+      "primitive": [
+        { "tipo": "teleport", "distanza": 180, "richiede_visuale": true, "porta_alleati": false },
+        { "tipo": "steal", "categoria": "oggetto", "durata_prestito": 6.0, "probabilita": 0.8 }
+      ],
+      "tag_sinergia": ["furto", "viaggio", "spazio"],
+      "note": "Attraversa, alleggerisce, torna: la finestra di furto e' il tempo di una porta che si chiude."
+    }
+  ],
+  "stub": false,
+  "note": "Il ladro che ruba DOVE sei, non cosa: rubare da una posizione, fotocopiare un varco, scambiare la refurtiva con il proprio posto. Solo primitive del registro attivo (steal, teleport, terrain_modify). VFX: il renderer per-primitiva (Vfx, US-226) copre steal/teleport/terrain_modify; la palette del Door e dell'Error sono entrambe di lord_of_mysteries, nessun campo VFX dedicato serve."
 }

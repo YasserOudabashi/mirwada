@@ -3,6 +3,8 @@ extends "res://tests/test_case.gd"
 ## Pathway vicini in un gruppo attivo. In US-702 sono tutti stub tranne
 ## door_error (US-706); FusionEngine li legge in US-705.
 
+const Stats := preload("res://scripts/stats_component.gd")
+
 const PERCORSI := [
 	"door_error", "door_fool", "error_fool",
 	"darkness_death", "darkness_twilight_giant", "death_twilight_giant",
@@ -90,3 +92,38 @@ func test_ogni_abilita_fusa_non_stub_risolve_come_abilita() -> void:
 	# nessun percorso non-stub ancora (US-706 scrive door_error): trovate puo'
 	# essere 0. Se e' > 0, i controlli sopra sono passati.
 	assert_true(trovate >= 0, "iterazione completata")
+
+
+# --- US-706: door_error, percorso completo -----------------------------
+
+func test_door_error_non_e_piu_stub() -> void:
+	var doc: Dictionary = JSON.parse_string(
+		FileAccess.get_file_as_string("res://data/fusions/door_error.json"))
+	assert_false(bool(doc.get("stub", true)), "door_error: stub false")
+	assert_gt(float((doc.get("abilita_fuse", []) as Array).size()), 4.0, "door_error: >= 5 abilita fuse")
+	var gd: Node = _gd()
+	for ab in doc["abilita_fuse"]:
+		var key: String = str((ab as Dictionary)["name_i18n"])
+		assert_true(gd.call("has_translation", key), "%s: tradotta (non TODO)" % key)
+
+
+func test_ogni_abilita_fusa_door_error_esegue_senza_primitiva_fuori_registro() -> void:
+	var e: Node = Engine.get_main_loop().root.get_node("AbilityEngine")
+	e.call("clear_cooldowns")
+	e.call("clear_granted")
+	var c := Node2D.new()
+	var s: Node = Stats.new()
+	s.name = "Stats"
+	c.add_child(s)
+	Engine.get_main_loop().root.add_child(c)
+	s.call("configure_from_balance", 5)
+	var fuse: Array = _fe().call("abilita_fuse", "error", "door")
+	for ab in fuse:
+		var aid: String = str((ab as Dictionary)["id"])
+		var res: Dictionary = e.call("execute", aid, c)
+		assert_true(res["ok"], "%s: eseguita" % aid)
+		for w in (res["warnings"] as PackedStringArray):
+			assert_false(str(w).begins_with("primitiva fuori registro"),
+				"%s: nessuna primitiva fuori registro (%s)" % [aid, w])
+	Engine.get_main_loop().root.remove_child(c)
+	c.free()

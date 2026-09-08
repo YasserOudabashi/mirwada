@@ -94,8 +94,8 @@
       ],
       "priority": 6,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. data/fusions/door_error.json stub:false, 6 abilita fuse (da_sequenza 9/9/8/8/7/7): furto_dislocato (steal+teleport), grimaldello_spaziale (steal non_sottrae + terrain_modify apre_varco), refurtiva_scambiata (steal+teleport), nota_dislocata (steal abilita non_sottrae + teleport), soglia_rubata (steal conoscenza + terrain_modify varco_forzato permanente), colpo_tra_le_porte (teleport+steal). Solo primitive del registro attivo (steal/teleport/terrain_modify, tutte implemented). Ogni abilita: id fus_door_error_*, name_i18n ability.fusion.*, >= 2 tag_sinergia validi. i18n: 6 chiavi ability.fusion.* tradotte in it.json (non TODO); generate_i18n_stubs.py rilanciato (le raccoglie verbatim dal ramo generico, nessuna canonicalizzazione); en.json resta vuoto per scelta di progetto. VFX: nessun campo dedicato, il renderer per-primitiva (Vfx) copre steal/teleport/terrain_modify, palette Door/Error entrambe lord_of_mysteries (dichiarato nella note del file). tests/test_fusion.gd +2 test (door_error non piu' stub, >=5 abilita, tutte tradotte; ognuna esegue via AbilityEngine.execute con ok:true e zero warning 'primitiva fuori registro'). validate exit 0. 730 test verdi."
     },
     {
       "id": "US-707",

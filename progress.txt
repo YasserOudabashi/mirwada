@@ -6841,3 +6841,45 @@ Generare il PRD con /prd.
   (+_load_fusions +get_ability fallback +get_fusion/fusion_ids),
   project.godot (+autoload), tests/test_fusion.gd.
 - Prossima storia: US-706 - percorso di fusione completo error -> door.
+
+[2026-09-08] US-706 — Percorso di fusione completo: error -> door. FASE 7, BLOCCO A.
+
+- data/fusions/door_error.json: stub:false, 6 abilita fuse (da_sequenza
+  9/9/8/8/7/7 = le Sequenze conservate al cambio). Concept: il ladro che ruba
+  DOVE sei, non cosa.
+  * fus_door_error_furto_dislocato (9): steal(oggetto) + teleport(visuale)
+  * fus_door_error_grimaldello_spaziale (9): steal(oggetto, non_sottrae) +
+    terrain_modify(apre_varco)
+  * fus_door_error_refurtiva_scambiata (8): steal(oggetto) + teleport
+  * fus_door_error_nota_dislocata (8): steal(abilita door_passo_breve,
+    non_sottrae) + teleport
+  * fus_door_error_soglia_rubata (7): steal(conoscenza) +
+    terrain_modify(varco_forzato, permanente:true)
+  * fus_door_error_colpo_tra_le_porte (7): teleport + steal(oggetto)
+  Solo primitive del registro attivo (steal, teleport, terrain_modify — tutte
+  implemented). Ogni abilita: id ^fus_door_error_, name_i18n ^ability.fusion.,
+  >= 2 tag_sinergia dal vocabolario.
+- i18n: 6 chiavi "ability.fusion.fus_door_error_*" aggiunte a data/i18n/it.json
+  con traduzione vera (non TODO). generate_i18n_stubs.py rilanciato: le
+  raccoglie verbatim (ramo generico walk(), nessuna canonicalizzazione dato
+  che non sono in /pathways/ ne' /abilities/). data/i18n/en.json resta a 0
+  chiavi (catalogo incompleto per scelta di progetto, come dalle fasi 1-6).
+- VFX: nessun campo dedicato. Il renderer per-primitiva (Vfx, US-226) copre
+  steal/teleport/terrain_modify (test_vfx lo verifica gia'); Door ed Error
+  condividono la palette lord_of_mysteries. Dichiarato nella 'note' del file.
+- GameData._load_fusions (US-705) ora indicizza le 6 abilita in
+  _fusion_abilities: get_ability("fus_door_error_*") le risolve.
+- tests/test_fusion.gd (+2 test):
+  * test_door_error_non_e_piu_stub: stub false, >= 5 abilita, ogni name_i18n
+    ha una traduzione vera (GameData.has_translation).
+  * test_ogni_abilita_fusa_door_error_esegue...: caster con Stats Seq 5, per
+    ogni abilita fusa AbilityEngine.execute -> ok:true e nessun warning che
+    inizia con "primitiva fuori registro".
+  Il test US-705 test_ogni_abilita_fusa_non_stub_risolve_come_abilita ora ha
+  denti (door_error e' non-stub).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati,
+  TODO i18n 42 -> 42: le 6 chiavi nuove sono traduzioni vere). 730 test
+  headless (728 + 2), tutti verdi. Nessuna regressione (test_i18n_data,
+  test_vfx invariati).
+- File .gd toccati: nessuno (dati + i18n + tests). AbilityEngine intatto.
+- Prossima storia: US-707 - gli altri 7 percorsi come stub + check validator.
