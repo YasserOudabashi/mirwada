@@ -153,8 +153,8 @@
       ],
       "priority": 8,
       "fase": "5b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. shadow_meld gia' implemented (fase 6): nessuna modifica al codice, door_occhio_nell_ombra e' la prima Sequenza attiva del Door a usarla (status 'occultato'). door_9 Apprentice (teleport + terrain_modify serratura + reveal_info), door_8 Trickmaster (teleport fuga/swap; swap vero = combat), door_7 Astrologer (reveal_info categoria 'percorso' - matrice: Door divina lo spazio - + shadow_meld) stub->false. formula_door_9/8/7 + 9 ingredienti + char_door_9/8/7 + i18n (tradotto anche door_viaggio_lungo ex-TODO). test_door.gd (4 test): shadow_meld applica occultato; reveal_info emette 'percorso'; 6 abilita' senza warning. Nessun .gd toccato. validate exit 0 (stub 10->7). 701 test verdi."
     },
     {
       "id": "US-5B09",

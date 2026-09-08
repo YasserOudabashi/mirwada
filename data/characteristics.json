@@ -541,6 +541,24 @@
       "pathway_id": "error",
       "sequence": 0,
       "name_i18n": "characteristic.error.0"
+    },
+    {
+      "id": "char_door_9",
+      "pathway_id": "door",
+      "sequence": 9,
+      "name_i18n": "characteristic.door.9"
+    },
+    {
+      "id": "char_door_8",
+      "pathway_id": "door",
+      "sequence": 8,
+      "name_i18n": "characteristic.door.8"
+    },
+    {
+      "id": "char_door_7",
+      "pathway_id": "door",
+      "sequence": 7,
+      "name_i18n": "characteristic.door.7"
     }
   ]
 }

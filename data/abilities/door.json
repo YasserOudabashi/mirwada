@@ -5,6 +5,7 @@
     {
       "schema_version": 1,
       "id": "door_viaggio_lungo",
+      "name": "Viaggio lungo",
       "name_i18n": "ability.door.door_viaggio_lungo",
       "sequence_id": "door_3",
       "costo_spiritualita": 35,
@@ -29,6 +30,178 @@
         "occultamento"
       ],
       "note": "STRESS TEST. Teletrasporto a lunga distanza con alleati e pet. Nessuna primitiva nuova."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_passo_breve",
+      "name": "Passo breve",
+      "name_i18n": "ability.door.door_passo_breve",
+      "sequence_id": "door_9",
+      "costo_spiritualita": 8,
+      "cooldown": 3.0,
+      "primitive": [
+        {
+          "tipo": "teleport",
+          "distanza": 120,
+          "richiede_visuale": true,
+          "porta_alleati": false
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "viaggio",
+        "singolo"
+      ],
+      "note": "Il primo passo dell'Apprentice: un salto breve verso un punto a vista. teleport gia' implementata (US-506)."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_grimaldello_mistico",
+      "name": "Grimaldello mistico",
+      "name_i18n": "ability.door.door_grimaldello_mistico",
+      "sequence_id": "door_9",
+      "costo_spiritualita": 10,
+      "cooldown": 6.0,
+      "primitive": [
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "serratura_aperta",
+          "raggio": 2,
+          "durata": 0,
+          "permanente": false
+        },
+        {
+          "tipo": "reveal_info",
+          "raggio": 6,
+          "categoria": "passaggi_bloccati",
+          "durata": 8.0
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "occultamento",
+        "analisi"
+      ],
+      "note": "Apre serrature mistiche e mostra dove sono i passaggi bloccati. terrain_modify non permanente (la serratura resta aperta per la scena); reveal_info porta la categoria (matrice: Door divina lo SPAZIO)."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_via_di_fuga",
+      "name": "Via di fuga",
+      "name_i18n": "ability.door.door_via_di_fuga",
+      "sequence_id": "door_8",
+      "costo_spiritualita": 12,
+      "cooldown": 10.0,
+      "primitive": [
+        {
+          "tipo": "teleport",
+          "distanza": 160,
+          "richiede_visuale": false,
+          "porta_alleati": false
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 0.3,
+          "durata": 4.0,
+          "moltiplicativo": false
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "viaggio",
+        "difesa"
+      ],
+      "note": "Un incantesimo di fuga: via da qui, e per un attimo difficile da colpire."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_scambio_di_posto",
+      "name": "Scambio di posto",
+      "name_i18n": "ability.door.door_scambio_di_posto",
+      "sequence_id": "door_8",
+      "costo_spiritualita": 16,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "teleport",
+          "distanza": 200,
+          "richiede_visuale": true,
+          "porta_alleati": false
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.2,
+          "durata": 5.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "precisione",
+          "valore": 0.15,
+          "durata": 5.0,
+          "moltiplicativo": false
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "inganno",
+        "singolo"
+      ],
+      "note": "Scambia posizione con un bersaglio: il Trickmaster finisce dov'era lui, in vantaggio. Lo swap VERO delle posizioni col bersaglio e' combat (fase 6); qui teleport + i modificatori che rendono il fatto."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_lettura_stellare",
+      "name": "Lettura stellare",
+      "name_i18n": "ability.door.door_lettura_stellare",
+      "sequence_id": "door_7",
+      "costo_spiritualita": 12,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "reveal_info",
+          "raggio": 20,
+          "categoria": "percorso",
+          "durata": 12.0
+        }
+      ],
+      "tag_sinergia": [
+        "divinazione",
+        "stella",
+        "spazio"
+      ],
+      "note": "L'Astrologer legge nelle stelle i percorsi nascosti. Matrice di proprieta': Door divina lo SPAZIO (i percorsi), non le menti (Hermit) ne' per ingannare (Fool)."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_occhio_nell_ombra",
+      "name": "Occhio nell'ombra",
+      "name_i18n": "ability.door.door_occhio_nell_ombra",
+      "sequence_id": "door_7",
+      "costo_spiritualita": 14,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "shadow_meld",
+          "durata": 6.0,
+          "velocita": 0.15,
+          "richiede_ombra": false
+        },
+        {
+          "tipo": "reveal_info",
+          "raggio": 12,
+          "categoria": "percorso",
+          "durata": 8.0
+        }
+      ],
+      "tag_sinergia": [
+        "occultamento",
+        "divinazione",
+        "stella"
+      ],
+      "note": "Osserva i percorsi restando occultato. shadow_meld (gia' implementata in fase 6, Nightwatcher del Darkness) applica lo status 'occultato'; anche il Secrets Sorcerer (Seq 4, US-5B09) la usera'."
     }
   ]
 }

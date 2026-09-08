@@ -6460,3 +6460,36 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - BLOCCO B CHIUSO: US-5B05/06/07. Fool 10/10. Prossimo: BLOCCO C - Door
   (US-5B08 shadow_meld gia' in fase 6; US-5B09 fotocopia via steal non_sottrae;
   US-5B10 varco_forzato nel WorldState).
+
+[2026-09-08] US-5B08 — Door, Sequenze 9-7 (Apprentice / Trickmaster / Astrologer) + shadow_meld. FASE 5b, BLOCCO C.
+
+- shadow_meld: era gia' implemented:true (fase 6, Nightwatcher del Darkness).
+  Nessuna modifica al codice: door_occhio_nell_ombra (Astrologer) e' la prima
+  Sequenza ATTIVA del Door a usarla, e applica lo status 'occultato' (gia'
+  esistente). vfx.json: shadow_meld aveva gia' vfx_umbra.
+- CONTENUTO Door Seq 9/8/7 (stub -> false):
+  * door_9 Apprentice: door_passo_breve (teleport a vista) + door_grimaldello_
+    mistico (terrain_modify 'serratura_aperta' non permanente + reveal_info
+    'passaggi_bloccati'). madness 1.0.
+  * door_8 Trickmaster: door_via_di_fuga (teleport + buff evasione) +
+    door_scambio_di_posto (teleport + debuff/buff per lo swap - lo swap VERO
+    col bersaglio e' combat, fase 6). madness 2.2.
+  * door_7 Astrologer: door_lettura_stellare (reveal_info categoria "percorso")
+    + door_occhio_nell_ombra (shadow_meld + reveal_info "percorso"). Matrice di
+    proprieta': il Door divina lo SPAZIO (percorsi), non le menti (Hermit) ne'
+    per ingannare (Fool). madness 3.4.
+- formule formula_door_9/8/7 + 9 ingredienti nuovi. caratteristiche
+  char_door_9/8/7. i18n rilanciato (it.json 990 -> 1008); tradotto anche
+  door_viaggio_lungo (ex-TODO di fase 2). 45 TODO totali = baseline TG.
+- VERIFICA A SCHERMO: test_door.gd - shadow_meld applica 'occultato'; il
+  reveal_info del Door emette la categoria "percorso" (matrice); le 6 abilita'
+  Seq 9-7 senza warning. shadow_meld: "il giocatore si vede sbiadire; il tell
+  che e' occultato" - la resa (l'alpha del personaggio, l'icona di stato) e' UI
+  di fase 6; in 5b lo status 'occultato' (+0.25 evasione) e la spec vfx_umbra
+  (scia sfrangiata).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: stub
+  10->7, sinergie 17, TODO 45). 701 test headless (697 + 4 in test_door.gd),
+  tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (solo dati + tests/test_door.gd).
+- Prossima storia: US-5B09 - Door Seq 6-4 (Scribe fotocopia via steal
+  non_sottrae / Traveler / Secrets Sorcerer).

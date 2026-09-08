@@ -21,18 +21,63 @@
       "name_i18n": "sequence.door.9",
       "tier": "low",
       "concept": "Teletrasporti brevi a vista; apre serrature mistiche e passaggi bloccati.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "velocita": 0.1,
+        "evasione": 0.08
+      },
+      "abilities": [
+        "door_passo_breve",
+        "door_grimaldello_mistico"
+      ],
+      "acting_actions": [
+        {
+          "id": "door_9_saltatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_passo_breve"
+          },
+          "target": 25,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_9_saltatore",
+          "descrizione": "Fai 25 passi brevi nello spazio"
+        },
+        {
+          "id": "door_9_scassinatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_grimaldello_mistico"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_9_scassinatore",
+          "descrizione": "Apri 15 serrature mistiche"
+        },
+        {
+          "id": "door_9_esploratore",
+          "evento": "area_cleared",
+          "filtri": {},
+          "target": 8,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_9_esploratore",
+          "descrizione": "Ripulisci 8 aree passando dove gli altri non passano"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 9,
-        "ingredients": [],
+        "ingredients": [
+          "chiave_senza_denti",
+          "polvere_di_gesso_stellare",
+          "cardine_arrugginito_di_una_porta_perduta"
+        ],
         "formula_id": "formula_door_9"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 1.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 8,
@@ -41,18 +86,63 @@
       "name_i18n": "sequence.door.8",
       "tier": "low",
       "concept": "Incantesimi di fuga e scambio di posizione con un bersaglio.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "velocita": 0.12,
+        "evasione": 0.12
+      },
+      "abilities": [
+        "door_via_di_fuga",
+        "door_scambio_di_posto"
+      ],
+      "acting_actions": [
+        {
+          "id": "door_8_fuggitivo",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_via_di_fuga"
+          },
+          "target": 20,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_8_fuggitivo",
+          "descrizione": "Fuggi 20 volte da uno scontro impossibile"
+        },
+        {
+          "id": "door_8_scambista",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_scambio_di_posto"
+          },
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_8_scambista",
+          "descrizione": "Scambia posizione con un bersaglio 15 volte"
+        },
+        {
+          "id": "door_8_imprendibile",
+          "evento": "damage_taken",
+          "filtri": {},
+          "target": 1500,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_8_imprendibile",
+          "descrizione": "Incassa 1500 danni restando sempre in movimento"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 8,
-        "ingredients": [],
+        "ingredients": [
+          "specchio_da_borsetta_a_due_facce",
+          "gessetto_che_disegna_porte",
+          "filo_teso_tra_due_stanze"
+        ],
         "formula_id": "formula_door_8"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 2.2,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 7,
@@ -61,18 +151,63 @@
       "name_i18n": "sequence.door.7",
       "tier": "low",
       "concept": "Divinazione stellare che rivela percorsi nascosti sulla mappa.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "spiritualita_max": 0.1,
+        "precisione": 0.08
+      },
+      "abilities": [
+        "door_lettura_stellare",
+        "door_occhio_nell_ombra"
+      ],
+      "acting_actions": [
+        {
+          "id": "door_7_astrologo",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_lettura_stellare"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_7_astrologo",
+          "descrizione": "Leggi 15 volte i percorsi nelle stelle"
+        },
+        {
+          "id": "door_7_veggente",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "door_occhio_nell_ombra"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_7_veggente",
+          "descrizione": "Osserva 12 volte dall'ombra senza essere visto"
+        },
+        {
+          "id": "door_7_cartografo",
+          "evento": "area_cleared",
+          "filtri": {},
+          "target": 8,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.door.door_7_cartografo",
+          "descrizione": "Mappa 8 aree seguendo i percorsi nascosti"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 7,
-        "ingredients": [],
+        "ingredients": [
+          "carta_stellare_con_una_stella_in_piu",
+          "sabbia_di_meridiana_notturna",
+          "lente_puntata_sempre_a_nord"
+        ],
         "formula_id": "formula_door_7"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 3.4,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 6,
