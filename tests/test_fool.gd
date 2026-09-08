@@ -11,6 +11,11 @@ const ABILITA_9_7 := [
 	"fool_acrobazia", "fool_travestimento_lampo",
 	"fool_illusione_solida", "fool_oggetto_dal_nulla",
 ]
+const ABILITA_6_4 := [
+	"fool_volto_rubato", "fool_voce_prestata",
+	"fool_fili_marionetta", "fool_scambio_bersagli",
+	"fool_scambio_con_oggetto", "fool_prestigio_di_stanza",
+]
 
 
 func _engine() -> Node:
@@ -26,6 +31,7 @@ func prepara() -> void:
 	if e != null:
 		e.call("clear_cooldowns")
 		e.call("clear_granted")
+		e.call("clear_snapshots")
 		e.call("flush_effects")
 
 
@@ -98,12 +104,48 @@ func test_illusion_emette_il_segnale_illusione_creata() -> void:
 	_cleanup(c)
 
 
-func test_fool_9_7_sono_contenuto_e_le_acting_sommano_uno() -> void:
+func test_ogni_abilita_fool_6_4_si_esegue_senza_warning() -> void:
+	var e: Node = _engine()
+	for aid in ABILITA_6_4:
+		var c: Node2D = _caster()
+		var r: Dictionary = e.call("execute", aid, c)
+		assert_true(r["ok"], "%s eseguita" % aid)
+		assert_eq((r["warnings"] as PackedStringArray).size(), 0,
+			"%s: nessun warning di primitiva (possess/teleport/illusion): %s" % [aid, r["warnings"]])
+		e.call("clear_cooldowns")
+		_cleanup(c)
+
+
+func test_marionettist_possiede_con_controllo_totale() -> void:
+	var e: Node = _engine()
+	var c: Node2D = _caster()
+	var s: Node = c.get_node("Stats")
+	var r: Dictionary = e.call("execute", "fool_fili_marionetta", c)
+	assert_true(r["ok"], "fili della marionetta eseguito")
+	assert_true(s.call("ha_status", "posseduto"), "possess applica 'posseduto'")
+	var rec: Dictionary = (r["effects"] as Array)[0]
+	assert_eq(str(rec["controllo"]), "totale",
+		"il Marionettist ha il controllo TOTALE (distinto dal 'sensi' del Parasite Error)")
+	_cleanup(c)
+
+
+func test_fool_4_ha_un_rituale_di_teatro() -> void:
+	var pw: Dictionary = _gd().call("get_pathway", "fool")
+	for seq in (pw.get("sequences", []) as Array):
+		if int((seq as Dictionary).get("sequence", -1)) != 4:
+			continue
+		var rit: Dictionary = (seq as Dictionary).get("advancement_ritual", {})
+		var lt: Array = rit.get("location_tags", [])
+		assert_true("teatro" in lt or "palco" in lt,
+			"fool_4 (Bizarro Sorcerer) si avanza a teatro / sul palco")
+
+
+func test_fool_9_4_sono_contenuto_e_le_acting_sommano_uno() -> void:
 	var pw: Dictionary = _gd().call("get_pathway", "fool")
 	var madness_prec: float = -1.0
 	for seq in (pw.get("sequences", []) as Array):
 		var d: Dictionary = seq
-		if int(d.get("sequence", -1)) < 7:
+		if int(d.get("sequence", -1)) < 4:
 			continue
 		assert_false(bool(d.get("stub", false)),
 			"fool_%d non e' piu' stub" % int(d.get("sequence")))

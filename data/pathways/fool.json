@@ -222,18 +222,65 @@
       "name_i18n": "sequence.fool.6",
       "tier": "mid",
       "concept": "Assume aspetto e voce di un NPC e ne eredita i permessi sociali: apre porte chiuse.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "spiritualita_max": 0.12,
+        "evasione": 0.1
+      },
+      "abilities": [
+        "fool_volto_rubato",
+        "fool_voce_prestata"
+      ],
+      "acting_actions": [
+        {
+          "id": "fool_6_impostore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_volto_rubato"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_6_impostore",
+          "descrizione": "Ruba 12 volti"
+        },
+        {
+          "id": "fool_6_infiltrato",
+          "evento": "npc_influenced",
+          "filtri": {
+            "modo": "ingannato"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_6_infiltrato",
+          "descrizione": "Inganna 12 NPC con un volto che non e' il tuo"
+        },
+        {
+          "id": "fool_6_porte_chiuse",
+          "evento": "area_cleared",
+          "filtri": {
+            "senza_uccidere": true
+          },
+          "target": 2,
+          "progresso": 0.25,
+          "ripetibile": false,
+          "descrizione_i18n": "acting.fool.fool_6_porte_chiuse",
+          "descrizione": "Attraversa 2 aree ostili senza uccidere: il Faceless passa, non combatte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 6,
-        "ingredients": [],
+        "ingredients": [
+          "maschera_senza_lineamenti",
+          "voce_registrata_su_cera",
+          "ritratto_che_cambia_faccia"
+        ],
         "formula_id": "formula_fool_6"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 5.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 5,
@@ -242,20 +289,63 @@
       "name_i18n": "sequence.fool.5",
       "tier": "mid",
       "concept": "Fili spirituali: controlla un nemico come marionetta e lo usa contro gli altri.",
-      "stat_modifiers": {},
+      "stat_modifiers": {
+        "spiritualita_max": 0.15,
+        "precisione": 0.1
+      },
       "abilities": [
-        "fool_fili_marionetta"
+        "fool_fili_marionetta",
+        "fool_scambio_bersagli"
       ],
-      "acting_actions": [],
+      "acting_actions": [
+        {
+          "id": "fool_5_burattinaio",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_fili_marionetta"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_5_burattinaio",
+          "descrizione": "Attacca 12 fili a 12 marionette"
+        },
+        {
+          "id": "fool_5_contro_i_suoi",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 15,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_5_contro_i_suoi",
+          "descrizione": "Sconfiggi 15 nemici mettendoli l'uno contro l'altro"
+        },
+        {
+          "id": "fool_5_scompiglio",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_scambio_bersagli"
+          },
+          "target": 12,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_5_scompiglio",
+          "descrizione": "Semina lo scompiglio 12 volte tra i nemici"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 5,
-        "ingredients": [],
+        "ingredients": [
+          "filo_spirituale_annodato",
+          "croce_di_legno_del_burattinaio",
+          "articolazione_di_marionetta"
+        ],
         "formula_id": "formula_fool_5"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 6.3,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 4,
@@ -264,24 +354,77 @@
       "name_i18n": "sequence.fool.4",
       "tier": "saint",
       "concept": "Sostituisce se stesso con un oggetto a distanza; gioco di prestigio su scala di stanza.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 130,
+        "velocita": 0.12,
+        "evasione": 0.12
+      },
+      "abilities": [
+        "fool_scambio_con_oggetto",
+        "fool_prestigio_di_stanza"
+      ],
+      "acting_actions": [
+        {
+          "id": "fool_4_prestigiatore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_scambio_con_oggetto"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_4_prestigiatore",
+          "descrizione": "Scambiati con un oggetto 12 volte"
+        },
+        {
+          "id": "fool_4_illusionista",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "fool_prestigio_di_stanza"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.fool.fool_4_illusionista",
+          "descrizione": "Riempi 12 stanze di illusioni"
+        },
+        {
+          "id": "fool_4_scena",
+          "evento": "area_cleared",
+          "filtri": {
+            "senza_uccidere": true
+          },
+          "target": 3,
+          "progresso": 0.25,
+          "ripetibile": false,
+          "descrizione_i18n": "acting.fool.fool_4_scena",
+          "descrizione": "Chiudi 3 aree ostili con la sola messinscena"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 4,
-        "ingredients": [],
+        "ingredients": [
+          "cappello_a_cilindro_senza_fondo",
+          "specchio_da_camerino_incrinato",
+          "sipario_di_velluto_polveroso"
+        ],
         "formula_id": "formula_fool_4"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "teatro",
+          "palco"
+        ],
+        "momento": "crepuscolo",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "la_certezza_di_sapere_chi_sei"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 8.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 3,

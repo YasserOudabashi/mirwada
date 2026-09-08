@@ -99,6 +99,24 @@
       "name_i18n": "characteristic.fool.7"
     },
     {
+      "id": "char_fool_6",
+      "pathway_id": "fool",
+      "sequence": 6,
+      "name_i18n": "characteristic.fool.6"
+    },
+    {
+      "id": "char_fool_5",
+      "pathway_id": "fool",
+      "sequence": 5,
+      "name_i18n": "characteristic.fool.5"
+    },
+    {
+      "id": "char_fool_4",
+      "pathway_id": "fool",
+      "sequence": 4,
+      "name_i18n": "characteristic.fool.4"
+    },
+    {
       "id": "char_death_6",
       "pathway_id": "death",
       "sequence": 6,

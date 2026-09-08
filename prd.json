@@ -113,8 +113,8 @@
       ],
       "priority": 6,
       "fase": "5b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. Nessuna primitiva nuova (illusion/possess/teleport gia' implementate). fool_6 Faceless (illusion aspetto + buff; permessi sociali = fase 6, truffa contata da npc_influenced acting, nessun if), fool_5 Marionettist (fool_fili_marionetta possess controllo 'completo'->'totale' + fear/debuff sugli altri), fool_4 Bizarro Sorcerer saint (teleport + illusion; rituale teatro/palco obbligatorio) stub->false. formula_fool_6/5/4 + 9 ingredienti + char_fool_6/5/4 + i18n. test_fool.gd esteso (possess controllo totale distinto dal sensi dell'Error; rituale teatro; 6 abilita' senza warning). Nessun .gd toccato (solo dati). validate exit 0 (stub 17->14). 693 test verdi."
     },
     {
       "id": "US-5B07",

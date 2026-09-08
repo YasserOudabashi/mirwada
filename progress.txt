@@ -6374,3 +6374,39 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   execute intatto) + tests/test_fool.gd.
 - Prossima storia: US-5B06 - Fool Seq 6-4 (Faceless / Marionettist / Bizarro
   Sorcerer).
+
+[2026-09-08] US-5B06 — Fool, Sequenze 6-4 (Faceless / Marionettist / Bizarro Sorcerer). FASE 5b, BLOCCO B.
+
+- Nessuna primitiva nuova: Faceless usa illusion(aspetto), Marionettist usa
+  possess(totale) (implementata US-5B02), Bizarro Sorcerer usa teleport
+  (implementata US-506) + illusion.
+- CONTENUTO Fool Seq 6/5/4 (stub -> false):
+  * fool_6 Faceless: fool_volto_rubato (illusion 'aspetto' + buff evasione)
+    + fool_voce_prestata (2x debuff). "Eredita i permessi sociali" -> il gate
+    npc vero e' fase 6; in 5b e' illusion(aspetto) e la truffa la conta
+    l'acting npc_influenced(ingannato). NESSUN if per Fool. madness 5.0.
+  * fool_5 Marionettist: fool_fili_marionetta (possess controllo "completo" ->
+    "totale", allineato al vocabolario sensi/parziale/totale) + fool_scambio_
+    bersagli (fear area + debuff difesa: gli altri nemici vedono un alleato
+    voltarsi). Il nemico controllato che attacca davvero e' combat (fase 6).
+    madness 6.3.
+  * fool_4 Bizarro Sorcerer (saint): fool_scambio_con_oggetto (teleport +
+    illusion copia_statica lasciata al posto) + fool_prestigio_di_stanza
+    (illusion copia_nemico potenza 2 + debuff). Rituale OBBLIGATORIO:
+    teatro/palco (ospitati da frontiera_porte), crepuscolo, sacrifica
+    "la_certezza_di_sapere_chi_sei". madness 8.0.
+- formule formula_fool_6/5/4 + 9 ingredienti nuovi. caratteristiche
+  char_fool_6/5/4. i18n rilanciato (it.json 949 -> 966), tutte le chiavi fool
+  tradotte (46 TODO totali = baseline TG).
+- VERIFICA A SCHERMO: test_fool.gd - fool_fili_marionetta applica 'posseduto'
+  con controllo:"totale" (distinto dal "sensi" del Parasite dell'Error nel
+  record); le 6 abilita' Seq 6-4 eseguono senza warning; fool_4 ha il rituale
+  di teatro. FR-10 per possess controllo:"totale": "si capisce chi controllo?"
+  - come US-5B02, la resa (camera/HUD che segue l'ospite, l'ospite che
+  attacca) e' fase 6; in 5b lo status 'posseduto' col tell del rallentamento
+  + il record controllo:"totale".
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: stub
+  17->14, sinergie 17, TODO 46). 693 test headless (690 + 3 in test_fool.gd),
+  tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (solo dati + tests/test_fool.gd).
+- Prossima storia: US-5B07 - Fool Seq 3-0 + fool_2 SENZA probability_shift.

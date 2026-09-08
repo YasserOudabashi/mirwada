@@ -93,6 +93,7 @@
     {
       "schema_version": 1,
       "id": "fool_fili_marionetta",
+      "name": "Fili della marionetta",
       "name_i18n": "ability.fool.fool_fili_marionetta",
       "sequence_id": "fool_5",
       "costo_spiritualita": 30,
@@ -102,7 +103,7 @@
           "tipo": "possess",
           "durata": 12.0,
           "soglia_resistenza": 4,
-          "controllo": "completo"
+          "controllo": "totale"
         },
         {
           "tipo": "debuff_stat",
@@ -231,6 +232,159 @@
         "singolo"
       ],
       "note": "Un bastone, un mattone, una sedia: l'oggetto non c'e' finche' non colpisce. illusion(oggetto_evocato) + melee_arc per il colpo vero."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_volto_rubato",
+      "name": "Volto rubato",
+      "name_i18n": "ability.fool.fool_volto_rubato",
+      "sequence_id": "fool_6",
+      "costo_spiritualita": 18,
+      "cooldown": 25.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 3,
+          "durata": 20.0,
+          "potenza": 1,
+          "tipo_illusione": "aspetto"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 0.2,
+          "durata": 20.0,
+          "moltiplicativo": false
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "inganno",
+        "occultamento"
+      ],
+      "note": "Il Faceless prende aspetto e voce di qualcuno: chi lo cerca non lo trova. L'eredita' dei permessi sociali (gate npc) e' fase 6; in 5b e' illusion(aspetto) + evasione, e la truffa la conta la recitazione (npc_influenced)."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_voce_prestata",
+      "name": "Voce prestata",
+      "name_i18n": "ability.fool.fool_voce_prestata",
+      "sequence_id": "fool_6",
+      "costo_spiritualita": 12,
+      "cooldown": 10.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.25,
+          "durata": 8.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.15,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "mente",
+        "singolo"
+      ],
+      "note": "Parla con una voce di cui il bersaglio si fida: abbassa la guardia."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_scambio_bersagli",
+      "name": "Scambio dei bersagli",
+      "name_i18n": "ability.fool.fool_scambio_bersagli",
+      "sequence_id": "fool_5",
+      "costo_spiritualita": 16,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "fear",
+          "raggio": 6,
+          "durata": 5.0,
+          "soglia_resistenza": 3
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.2,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "controllo",
+        "area"
+      ],
+      "note": "Gli altri nemici vedono un alleato voltarsi contro di loro: panico e guardia rotta. Il nemico controllato che attacca davvero e' combat (fase 6)."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_scambio_con_oggetto",
+      "name": "Scambio con un oggetto",
+      "name_i18n": "ability.fool.fool_scambio_con_oggetto",
+      "sequence_id": "fool_4",
+      "costo_spiritualita": 16,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "teleport",
+          "distanza": 180,
+          "richiede_visuale": true,
+          "porta_alleati": false
+        },
+        {
+          "tipo": "illusion",
+          "raggio": 2,
+          "durata": 6.0,
+          "potenza": 1,
+          "tipo_illusione": "copia_statica"
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "spazio",
+        "inganno"
+      ],
+      "note": "Il Bizarro Sorcerer si scambia con un oggetto a distanza: teleport via, un'esca statica al suo posto. teleport gia' implementata (US-506)."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_prestigio_di_stanza",
+      "name": "Prestigio di stanza",
+      "name_i18n": "ability.fool.fool_prestigio_di_stanza",
+      "sequence_id": "fool_4",
+      "costo_spiritualita": 20,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 8,
+          "durata": 10.0,
+          "potenza": 2,
+          "tipo_illusione": "copia_nemico"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.2,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "inganno",
+        "area"
+      ],
+      "note": "Riempie una stanza di copie: 2 esche (potenza = numero) e chi guarda non sa piu' dove mirare."
     }
   ]
 }

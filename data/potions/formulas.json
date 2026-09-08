@@ -249,7 +249,16 @@
     "cerone_da_palcoscenico",
     "cilindro_a_doppio_fondo",
     "colomba_che_non_esiste",
-    "asso_sempre_in_cima_al_mazzo"
+    "asso_sempre_in_cima_al_mazzo",
+    "maschera_senza_lineamenti",
+    "voce_registrata_su_cera",
+    "ritratto_che_cambia_faccia",
+    "filo_spirituale_annodato",
+    "croce_di_legno_del_burattinaio",
+    "articolazione_di_marionetta",
+    "cappello_a_cilindro_senza_fondo",
+    "specchio_da_camerino_incrinato",
+    "sipario_di_velluto_polveroso"
   ],
   "formulas": {
     "formula_fool_9": {
@@ -1406,6 +1415,48 @@
         "cilindro_a_doppio_fondo",
         "colomba_che_non_esiste",
         "asso_sempre_in_cima_al_mazzo"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_6": {
+      "characteristic_sequence": 6,
+      "ingredients": [
+        "maschera_senza_lineamenti",
+        "voce_registrata_su_cera",
+        "ritratto_che_cambia_faccia"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_5": {
+      "characteristic_sequence": 5,
+      "ingredients": [
+        "filo_spirituale_annodato",
+        "croce_di_legno_del_burattinaio",
+        "articolazione_di_marionetta"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_4": {
+      "characteristic_sequence": 4,
+      "ingredients": [
+        "cappello_a_cilindro_senza_fondo",
+        "specchio_da_camerino_incrinato",
+        "sipario_di_velluto_polveroso"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {
