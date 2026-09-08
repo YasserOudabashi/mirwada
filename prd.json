@@ -78,8 +78,8 @@
       ],
       "priority": 5,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. scripts/fusion_engine.gd (NUOVO autoload FusionEngine, dopo PathwayChange). percorso(x,y) cerca in data/fusions/ il file la cui {pathway_a,pathway_b} combacia in QUALSIASI ordine; {} se non esiste o stub. abilita_fuse(x,y) -> Array (le voci abilita_fuse, gia' nella forma id/name_i18n/primitive/tag_sinergia). applica_al_cambio(vecchio,nuovo): grant_permanente + EndgameState.aggiungi_fusione per ogni abilita fusa non-stub, segnale fusione_concessa. game_data.gd: DIR_FUSIONS + _load_fusions (doc per id in _fusions; le abilita_fuse dei percorsi NON stub in _fusion_abilities per id fus_*); get_ability() ramo di fallback su _fusion_abilities (fuori da ability_ids/ability_count: un fus_ id non e' legato a una Sequenza); get_fusion/fusion_ids nuovi. pathway_change.gd gia' chiamava l'hook opzionale FusionEngine.applica_al_cambio. AbilityEngine.execute/_esegui_primitive INTATTI: un'abilita fusa ha il campo 'primitive' e passa dal motore normale. tests/test_fusion.gd +4 test (ordine non conta, percorso stub -> {}/[]; coppia fuori gruppo -> {}; ogni abilita fusa non-stub risolve via get_ability - teeth dopo US-706). validate exit 0. 728 test verdi."
     },
     {
       "id": "US-706",

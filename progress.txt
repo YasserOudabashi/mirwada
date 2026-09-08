@@ -6802,3 +6802,42 @@ Generare il PRD con /prd.
   data/balance.json (+sezione), tests/test_pathway_change.gd (nuovo).
   AbilityEngine.execute / _esegui_primitive NON toccati.
 - Prossima storia: US-705 - FusionEngine (compone le abilita' fuse dai dati).
+
+[2026-09-08] US-705 — FusionEngine (compone le abilita' fuse dai dati). FASE 7, BLOCCO A.
+
+- scripts/fusion_engine.gd (NUOVO autoload FusionEngine, in project.godot
+  dopo PathwayChange). API:
+  * percorso(pathway_x, pathway_y) -> Dictionary: scorre GameData.fusion_ids(),
+    ritorna il doc del file la cui {pathway_a, pathway_b} combacia in
+    QUALSIASI ordine; {} se non esiste o e' stub. Nessun id di coppia nel
+    codice.
+  * abilita_fuse(pathway_x, pathway_y) -> Array: le voci abilita_fuse del
+    percorso, gia' nella forma id/name_i18n/primitive/tag_sinergia. [] per
+    stub/inesistente.
+  * applica_al_cambio(vecchio, nuovo) -> Array: per ogni abilita fusa
+    non-stub -> AbilityEngine.grant_permanente + EndgameState.aggiungi_fusione;
+    segnale fusione_concessa(percorso_id, abilita). [] se stub.
+    PathwayChange.cambia lo chiama gia' (hook opzionale aggiunto in US-704).
+- scripts/game_data.gd:
+  * DIR_FUSIONS + _load_fusions(): _fusions[id] = doc del percorso; per i
+    percorsi NON stub, ogni voce abilita_fuse entra in _fusion_abilities per
+    il suo id "fus_*". _prune su entrambi (reload-safe).
+  * get_ability(id): se non e' in _abilities, fallback su _fusion_abilities.
+    Ramo separato: un id fus_* non e' legato a una Sequenza e NON finisce in
+    ability_ids()/ability_count() (i loop del validator sulle Sequenze non lo
+    vedono).
+  * get_fusion(id) / fusion_ids() nuovi.
+- AbilityEngine.execute / _esegui_primitive NON toccati: un'abilita fusa ha
+  il campo "primitive" e passa dal motore normale. Il giocatore la lancia
+  perche' grant_permanente la mette in _permanenti (is_granted -> true).
+- tests/test_fusion.gd (+4 test): ordine dei due Pathway non conta;
+  percorso stub (hermit_paragon) -> {} e abilita_fuse -> []; coppia fuori
+  gruppo (error/death) -> {}; ogni abilita fusa di un percorso non-stub
+  risolve via GameData.get_ability (vale dopo US-706, ora itera a vuoto).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  728 test headless (724 + 4), tutti verdi. Nessuna regressione (test_game_data
+  invariato: le abilita fuse non entrano nei conteggi).
+- File .gd toccati: scripts/fusion_engine.gd (nuovo), scripts/game_data.gd
+  (+_load_fusions +get_ability fallback +get_fusion/fusion_ids),
+  project.godot (+autoload), tests/test_fusion.gd.
+- Prossima storia: US-706 - percorso di fusione completo error -> door.

@@ -15,6 +15,7 @@ signal data_reloaded(files_loaded: int, errors: int)
 const DIR_PATHWAYS := "res://data/pathways"
 const DIR_ABILITIES := "res://data/abilities"
 const DIR_SYNERGIES := "res://data/synergies"
+const DIR_FUSIONS := "res://data/fusions"
 const DIR_ITEMS := "res://data/items"
 const DIR_STRUCTURES := "res://data/structures"
 const DIR_PETS := "res://data/pets"
@@ -64,6 +65,12 @@ var _pathways: Dictionary = {}
 var _sequences: Dictionary = {}
 var _abilities: Dictionary = {}
 var _synergies: Dictionary = {}
+## Percorsi di fusione (data/fusions/, fase 7). _fusions: doc per id
+## "<pathA>_<pathB>". _fusion_abilities: le abilita' fuse dei percorsi NON stub,
+## indicizzate per il loro id "fus_...", cosi' get_ability() le risolve come
+## un'abilita' qualsiasi senza che finiscano in ability_ids()/ability_count().
+var _fusions: Dictionary = {}
+var _fusion_abilities: Dictionary = {}
 var _tags: Dictionary = {}
 var _balance: Dictionary = {}
 var _primitives: Dictionary = {}
@@ -142,6 +149,7 @@ func load_all() -> void:
 	_load_pathways()
 	_load_abilities()
 	_load_synergies()
+	_load_fusions()
 	_load_items()
 	_load_structures()
 	_load_pets()
@@ -206,7 +214,20 @@ func get_sequence(id: String) -> Dictionary:
 
 
 func get_ability(id: String) -> Dictionary:
-	return _abilities.get(id, {})
+	# Ramo separato per le abilita' fuse (fase 7): un id "fus_*" non e' legato a
+	# una Sequenza, ma esegue come ogni altra abilita'.
+	if _abilities.has(id):
+		return _abilities[id]
+	return _fusion_abilities.get(id, {})
+
+
+## Il percorso di fusione con quell'id ("<pathA>_<pathB>"). {} se non esiste.
+func get_fusion(id: String) -> Dictionary:
+	return _fusions.get(id, {})
+
+
+func fusion_ids() -> Array:
+	return _fusions.keys()
 
 
 func ability_ids() -> Array:
@@ -805,6 +826,36 @@ func _load_synergies() -> void:
 			_upsert(_synergies, sid, syn)
 			visti[sid] = true
 	_prune(_synergies, visti)
+
+
+## Percorsi di fusione (fase 7): un file per coppia di Pathway vicini, l'oggetto
+## e' il percorso ({id, gruppo, pathway_a, pathway_b, abilita_fuse[], stub}).
+## Le abilita_fuse dei percorsi non-stub entrano in _fusion_abilities per id.
+func _load_fusions() -> void:
+	var visti: Dictionary = {}
+	var visti_ab: Dictionary = {}
+	for path in _json_files_in(DIR_FUSIONS):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		var fid: String = str(doc.get("id", ""))
+		if fid.is_empty():
+			_fail(path, "un percorso di fusione non ha 'id'")
+			continue
+		_upsert(_fusions, fid, doc)
+		visti[fid] = true
+		if bool(doc.get("stub", false)):
+			continue
+		for entry in _object_list(doc, "abilita_fuse", path):
+			var ab: Dictionary = entry
+			var aid: String = str(ab.get("id", ""))
+			if aid.is_empty():
+				_fail(path, "un'abilita' fusa non ha 'id'")
+				continue
+			_upsert(_fusion_abilities, aid, ab)
+			visti_ab[aid] = true
+	_prune(_fusions, visti)
+	_prune(_fusion_abilities, visti_ab)
 
 
 func _load_single(path: String, key: String, target: Dictionary, key_type: int) -> void:
