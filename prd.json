@@ -15,8 +15,8 @@
       ],
       "priority": 1,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-08. EndgameState nuovo autoload (store del campo endgame: pathway_precedente/fusioni/tribolazioni_superate/eredita/finale, da_salvataggio non fidato). save_system.gd VERSIONE_CORRENTE 22 + _migra_21_a_22 + campo in salva()/_leggi_snapshot(). game_state.gd wiring. test_save_system.gd +3 test (migrazione v21->v22, round-trip, scarta voci malformate). validate exit 0. 716 test verdi, nessuna regressione."
     },
     {
       "id": "US-702",
