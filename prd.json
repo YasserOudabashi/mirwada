@@ -1,382 +1,231 @@
 {
   "project": "Mirwada",
-  "branchName": "ralph/fase-6-mondo",
-  "description": "Fase 6 - Mondo: 5 regioni disegnate a mano (una per gruppo di Pathway + la citta' neutra), ciclo giorno/notte + lunare che fa valere le condizioni e_notte/fase_lunare gia' nei dati, gating dell'esplorazione, 8 NPC + dialoghi, motore quest (lettore di EventTracker + flag, zero verbi nuovi), fazioni e reputazione, pagina mappa del libro. Chiude la fase 5b per il gruppo eternal_darkness: Darkness completo (Seq 9-2 da stub a contenuto) + shadow_meld/illusion interlacciate -> 100/100 Sequenze, 22/22 Pathway attivi. Save: UN bump schema_version 20->21 con UNA _migra_20_a_21. PRD in 006_PRD/prd-fase-6-mondo.md (fase 5b in 006_PRD/prd-fase-5b-lord-of-mysteries.md, dentro fase 6).",
+  "branchName": "ralph/fase-5b-lord-of-mysteries",
+  "description": "Fase 5b — Lord of Mysteries (Fool, Error, Door). Tre Pathway attivi completi a 10/10 Sequenze, ~60 abilita' nuove da primitive del registro attivo. Handler mancanti implementati alla prima story che li usa: steal, possess, time_rewind (blocco A); chain solo se una Sequenza lo richiede. illusion e shadow_meld gia' implementate in fase 6. fool_2 (Miracle Invoker) riscritta senza probability_shift. Save schema_version invariato. Ordine vincolante: blocco A (Error) + US-5B04 checkpoint con potere di veto prima di Fool e Door. Criterio di uscita: test_slice_fase_5b.gd gioca Error 8->2 con zero righe di codice che nominano 'error'.",
   "userStories": [
     {
-      "id": "US-601",
-      "title": "regions.json + schema + validator (Blocco A)",
-      "description": "Come sviluppatore, voglio le 5 regioni come dati validati, cosi' che ogni sistema che parla di 'zona' (gating, audio, NPC, spawn) legga un vocabolario chiuso.",
+      "id": "US-5B01",
+      "title": "Error, Sequenze 9-7 (Marauder -> Cryptologist) + primitiva steal (Blocco A)",
+      "description": "Come giocatore, voglio scassinare e rubare da un nemico, truffare gli NPC, e decifrare formule e sigilli rubando conoscenza invece di oggetti.",
       "acceptanceCriteria": [
-        "data/schema/region.schema.json (additionalProperties:false): id, name_i18n (^region\\.), group_affinity (gruppo valido o 'neutra'), densita_mistica (0..1), location_tags (array), music_zone, gating[] ({tipo, valore/primitiva, area}), palette_visiva.",
-        "data/world/regions.json: le 5 regioni di design-world.md 2 (Mirwada neutra densita bassa; Marche eternal_darkness; Valle goddess_of_origin; Archivio demon_of_knowledge; Frontiera lord_of_mysteries). Ogni location_tags subset del vocabolario di US-501.",
-        "tools/validate_data.py: location_tags subset vocabolario; music_zone esiste in audio.json; gating[].tipo nel nuovo data/schema/gate_types.json (6 voci); gating[].primitiva attiva nel registro; palette_visiva in vfx.json o 'neutra'; group_affinity valido.",
-        "Check informativo: ogni location_tag di un rituale non-stub e' in almeno una regione.",
-        "006_PRD/design-world.md 2: nota che regions.json e' realizzato.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "data/pathways/error.json Seq 9/8/7: stub -> false, contenuto pieno (stat_modifiers, 2 abilita'/Seq che risolvono, acting_actions somma 1.0 dai 12 eventi, potion con formula_id+characteristic_sequence+ingredienti, madness_on_force crescente da ~1.0). Tier low, nessun advancement_ritual.",
+        "Primitiva nuova steal { categoria, durata_prestito, probabilita }: handler _p_steal in scripts/ability_engine.gd (_handlers + _p_steal, execute/_esegui_primitive non toccati), VFX in data/vfx.json, primitives.json steal -> implemented:true. categoria:'oggetto' registra il furto nel record (sottratto:true), aggancio inventario reale rimandato a fase 6; categoria:'abilita' presta l'ability_id al caster via AbilityEngine.grant_temporary (US-204) con scadenza durata_prestito; categoria:'conoscenza' -> KnowledgeStore.impara.",
+        "Seq 8 (Swindler) usa il flusso npc_influenced (evento gia' nel vocabolario) via acting_actions; nessun if per Error.",
+        "Seq 7 (Cryptologist): steal categoria:'conoscenza' + reveal_info con categoria valorizzata.",
+        "data/potions/formulas.json + data/characteristics.json: 3 formule + 3 caratteristiche (formula_error_9..7, char_error_9..7), ingredienti nuovi nel vocabolario chiuso.",
+        "i18n: python tools/generate_i18n_stubs.py rilanciato; nomi nuovi tradotti in data/i18n/it.json (nessun 'TODO' sui dati attivi).",
+        "tests/test_error.gd (nuovo): ogni abilita' Seq 9-7 esegue senza warning di primitiva; steal categoria:'abilita' rende is_granted true per la durata e false dopo; le acting sommano 1.0.",
+        "Verifica a schermo documentata in progress.txt: steal e' leggibile — si vede COSA e' stato preso (icona dell'abilita'/oggetto) e per QUANTO (timer). Se non leggibile con un manichino scriptato, dichiararlo e rimandare l'affinamento a un aggancio combat di fase 6.",
+        "python tools/validate_data.py esce 0. Nessuna regressione sui test esistenti. Typecheck passes. Tests pass."
       ],
       "priority": 1,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO A. gate_types.json (6 modi), region.schema.json, data/world/regions.json (5 regioni di design-world cap.2), audio.json music.zone + marche/valle/archivio/frontiera (minimi, US-619 li completa). validate_data.py: sezione regioni - location_tags subset vocabolario, music_zone in audio, gating[].tipo in gate_types.json + valore giusto per tipo, palette_visiva in vfx o 'neutra', group_affinity valido, ogni location_tag di un rituale non-stub ospitato da >=1 regione (20/20 coperti). 5 chiavi region.* tradotte via seed 'name'. design-world.md cap.2 aggiornato. validate exit 0 (3 warning invariati), 570 test verdi (nessun test nuovo, il validator e' la verifica come US-501)."
+      "fase": "5b",
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-602",
-      "title": "WorldState esteso + regione corrente + scena hub (Blocco A)",
-      "description": "Come giocatore, voglio muovermi in una citta' vera invece che in una zona di test.",
+      "id": "US-5B02",
+      "title": "Error, Sequenze 6-4 (Prometheus -> Parasite) + primitiva possess (Blocco A)",
+      "description": "Come giocatore, voglio rubare temporaneamente un'abilita' Beyonder appena vista, entrare nei sogni per rubare ricordi, e attaccarmi a un ospite usandone sensi e movimento restando nascosto.",
       "acceptanceCriteria": [
-        "WorldState tiene regione_corrente e la lista delle regioni scoperte; segnale regione_cambiata(id).",
-        "scenes/regioni/mirwada.tscn: la citta' come tilemap placeholder giocabile con i location_tags marcati su zone (Area2D con un tag), camera coi limiti di zona (US-005), player. Arte placeholder come US-006.",
-        "scenes/main.tscn carica mirwada.tscn invece della zona di test.",
-        "SAVE: schema_version 20 -> 21. Campo mondo { regione:'mirwada', scoperte:['mirwada'], gate_aperti:[] }. _migra_20_a_21 (default). Catena da v1 verde.",
-        "Verifica a schermo in progress.txt.",
+        "data/pathways/error.json Seq 6/5/4: stub -> false, contenuto pieno. Seq 4 = tier saint, advancement_ritual obbligatorio con location_tags dal vocabolario US-501 (es. nebbia_grigia, crocevia, soglia), momento/fase_lunare, sacrifices.",
+        "Seq 6 (Prometheus): steal categoria:'abilita' con durata_prestito breve e probabilita < 1.0 (non sempre riesce) — la firma dell'Error, distinta dallo Scribe del Door.",
+        "Primitiva nuova possess { durata, soglia_resistenza, controllo }: handler _p_possess + VFX + primitives.json possess -> implemented:true. Applica lo status 'posseduto' al bersaglio (nuovo in data/status_effects.json, categoria negativo) e registra controllo (parziale/totale/sensi). Il corpo del caster resta a terra vulnerabile durante possess: record { corpo_a_terra:true, vulnerabilita_corpo, durata } identico al pattern di soul_detach (Death); la resa combat e' fase 6. Seq 4 (Parasite) usa possess controllo:'sensi' (nessun controllo motorio, solo percezione condivisa).",
+        "Seq 5 (Dream Stealer): steal categoria:'conoscenza' + debuff_stat sul bersaglio + condizione e_notte sull'abilita' (dato, l'engine la fa valere).",
+        "3 formule + 3 caratteristiche (formula_error_6..4, char_error_6..4) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_error.gd esteso: le abilita' Seq 6-4 eseguono senza warning; possess applica lo status 'posseduto' e registra corpo_a_terra; le acting sommano 1.0.",
+        "Verifica a schermo in progress.txt: possess e' leggibile — di chi e' il corpo che controllo? il caster a terra e' visibile e vulnerabile?",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
       "priority": 2,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO A. game_data.gd: get_regions()/get_region(id). world_state.gd: regione_corrente/scoperte/gate_aperti + segnale regione_cambiata, per/da_salvataggio estesi (rilettura non fidata). save_system.gd: VERSIONE 20->21 + _migra_20_a_21 (UNICO bump di fase 6). region_scene.gd (NUOVO): una implementazione data-driven per tutte le regioni - tilemap diagnostico + Area2D per location_tag + camera clamp + WorldState.entra_regione. scenes/regioni/mirwada.tscn + main.tscn istanzia Mirwada (via test_zone). tests/test_regions.gd (5 test). validate exit 0, 575 test verdi. Verifica a schermo (rendering reale): Mirwada carica, regione_corrente='mirwada', 5 zone location_tag, camera 0/0/1536/1152. Screenshot us602_mirwada.png."
+      "fase": "5b",
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-603",
-      "title": "Le 4 regioni a tema come scene placeholder + passaggi fra regioni (Blocco A)",
-      "description": "Come giocatore, voglio uscire dalla citta' verso le Marche, la Valle, l'Archivio, la Frontiera.",
+      "id": "US-5B03",
+      "title": "Error, Sequenze 3-0 (Mentor of Deceit -> Error) + primitiva time_rewind + materia prima avatar (Blocco A)",
+      "description": "Come giocatore, voglio creare avatar autonomi che agiscono come me, impiantare un errore nel destino di un bersaglio, e riavvolgere brevi tratti di tempo.",
       "acceptanceCriteria": [
-        "scenes/regioni/{marche,valle,archivio,frontiera}.tscn: 4 tilemap placeholder giocabili coi biomi interni di design-world 2 e i location_tags sulle zone. Tinta di sfondo dalla palette_visiva.",
-        "Passaggi fra regioni: Area2D 'confine' che cambia WorldState.regione_corrente e carica la scena, aggiungendo la regione alle scoperte. I confini rispettano il gating (US-611) - finche' non c'e', sono aperti.",
-        "La Frontiera dichiara nel gating il respingere chi e' sopra Sequenza ~4 (applicato in US-611).",
-        "Verifica a schermo: si passa da Mirwada a ognuna delle 4 regioni e si torna.",
+        "data/pathways/error.json Seq 3/2/1/0: stub -> false, tier alti, rituali con trade-off espliciti; Seq 1 sacrifica un'Ancora del giocatore (come twilight_giant_1). madness_on_force verso ~12-14.",
+        "avatar come 9a materia prima di summon: aggiunta a data/schema/ownership.json con motivazione esplicita (gli avatar dell'Error sono autonomi, non cadaveri/costrutti/pet/chimere/evocazioni). Seq 3 (Mentor of Deceit): summon con entita_id prefisso 'avatar_error_...'.",
+        "Seq 2 (Trojan Horse of Destiny): 'impianta un errore nel destino' reso con curse (effetto destino_segnato, gia' in status_effects.json da hermit_1) + debuff_stat pesanti + dot a tag follia.",
+        "Primitiva nuova time_rewind { secondi, ripristina, costo_follia } (Seq 1, Worm of Time): handler _p_time_rewind + VFX + primitives.json time_rewind -> implemented:true. AbilityEngine tiene un ring buffer di snapshot del caster (hp, spiritualita', posizione, ms) a passo ~0.5 s, ~10 voci, aggiornato in _process e purgato con sweep_cooldowns dei caster morti. time_rewind rilegge lo snapshot di 'secondi' fa (posizione solo se 'ripristina' lo include) e addebita costo_follia a Madness. Nessun bump del save, time_rewind non serializza nulla.",
+        "Seq 0 (Error): l'abilita' di dominio ('sfrutta i buchi nelle regole') — aura a raggio ampio con effetto composito, come i Seq 0 di fase 5.",
+        "4 formule + 4 caratteristiche (formula_error_3..0, char_error_3..0) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_error.gd esteso: time_rewind riporta gli hp del caster al valore di N secondi fa e costa follia; le abilita' Seq 3-0 eseguono senza warning; summon avatar_error risolve.",
+        "Verifica a schermo in progress.txt: cosa e' tornato indietro? un lampo che segna il punto di ripristino.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
       "priority": 3,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO A CHIUSO. 4 scene .tscn (marche_crepuscolo/valle_madre/archivio_sepolto/frontiera_porte) tutte servite dalla stessa region_scene.gd data-driven. region_scene.gd esteso: _tinta_di_fondo (ColorRect col 'primario' della palette_visiva, alpha 0.14, 'neutra' -> niente), _crea_passaggi (hub-and-spoke: Mirwada->4, ogni regione->Mirwada; id da GameData.get_regions), _viaggia_verso (carica la scena target, queue_free della vecchia; player/overlay in main.tscn restano). passaggi_verso() per i test. test_regions.gd +2 (7 totali). validate exit 0, 577 test verdi, 0 errori nuovi. Verifica a schermo: Mirwada<->Marche, scoperte accumulano, regione corrente segue. Frontiera dichiara gating 'sequenza:4' nei dati (applicato in US-611)."
+      "fase": "5b",
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-604",
-      "title": "TimeSystem - momento e fase lunare (Blocco B)",
-      "description": "Come giocatore, voglio che il tempo scorra: giorno e notte, fasi della luna.",
+      "id": "US-5B04",
+      "title": "CHECKPOINT — Error slice + verdetto architettura (Blocco A)",
+      "description": "Come sviluppatore, voglio la conferma che Error e' stato scritto senza toccare il codice per un caso specifico, prima di committare Fool e Door.",
       "acceptanceCriteria": [
-        "TimeSystem (autoload): momento() avanza alba->mezzogiorno->crepuscolo->notte_fonda su durata da balance.json (sezione tempo); fase_lunare() avanza su ciclo lungo; e_notte() = crepuscolo o notte_fonda. Segnali momento_cambiato, fase_lunare_cambiata.",
-        "eclissi: evento raro schedulato (ogni ~M cicli lunari o forzabile), non una tappa. Segnale eclissi_iniziata/finita.",
-        "Il ciclo si ferma quando il libro e' aperto o un dialogo e' in corso.",
-        "time_in_state emette con { stato:'notte' } mentre e_notte(): EventTracker lo conta.",
-        "SAVE: campo mondo.tempo { momento, fase_lunare, tick }. Nessun secondo bump.",
-        "Test headless: il momento avanza col _process; e_notte() coerente; l'eclissi si schedula; il ciclo non avanza col libro aperto.",
+        "tests/test_slice_fase_5b.gd (nuovo): compone un percorso Error dalla Sequenza 8 alla 2 — per ogni salto Caratteristica -> concoct -> recitazione via EventTracker (dai dati) -> bevi -> avanzamento. Come test_slice_fase_5 ma su un Pathway del gruppo Lord of Mysteries.",
+        "test_nessun_codice_nomina_error (in test_slice_fase_5b.gd): grep di res://scripts e res://scripts/pages per 'error_' e i nomi di Sequenza dell'Error. Zero occorrenze fuori dai commenti.",
+        "git diff del blocco A (file .gd): solo i nuovi handler _p_steal, _p_possess, _p_time_rewind (+ il ring buffer di snapshot per time_rewind) e i loro test. AbilityEngine.execute / _esegui_primitive non modificati per un caso specifico dell'Error. Elenco esatto dei file .gd toccati in progress.txt.",
+        "Verdetto in progress.txt: l'architettura regge / non regge sui Pathway 'difficili'. Se non regge: correzioni necessarie e STOP (la story non passa).",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
       "priority": 4,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO B. scripts/time_system.gd (NUOVO autoload dopo GameData): momento + fase_lunare da time.json ('eclissi' filtrata fuori dal ciclo, e' evento schedulato/forza_eclissi). avanza(delta) pubblica. e_notte(). Segnali momento_cambiato/fase_lunare_cambiata/eclissi_iniziata/finita. Pausa: _pausa + imposta_pausa (per US-613) + connessione differita a Book. time_in_state {stato:notte} a EventTracker. balance.json sezione 'tempo' (plausibili). game_state.gd: mondo.tempo via _mondo_snapshot/da_salvataggio, NESSUN bump (US-602 e' l'unico). validate: check balance.tempo. tests/test_time_system.gd (7 test). validate exit 0, 584 test verdi."
+      "fase": "5b",
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-605",
-      "title": "AbilityEngine verifica le condizioni delle abilita' (Blocco B)",
-      "description": "Come giocatore, voglio che la costellazione del Custode funzioni davvero solo a luna piena, e la furia notturna del Vampiro solo di notte.",
+      "id": "US-5B05",
+      "title": "Fool, Sequenze 9-7 (Seer -> Magician) + primitiva illusion (Blocco B)",
+      "description": "Come giocatore, voglio divinare col pendolo e leggere le intenzioni nemiche, usare destrezza acrobatica e illusioni brevi, e creare illusioni solide che infliggono danno percepito.",
       "acceptanceCriteria": [
-        "AbilityEngine.execute, prima di eseguire, verifica ogni voce di ability.condizioni contro lo stato di gioco (e_notte, fase_lunare, in_zona_tag, foundation_min, tier_min, madness_min/max, acting_progress_min). Non soddisfatta -> reason 'condizione_non_soddisfatta', ok:false, nessun costo pagato.",
-        "Un caster senza contesto (test isolati, nemici) tratta le condizioni come soddisfatte.",
-        "I 3 nuovi tipi di condizione dei dialoghi (follia_min, reputazione_min, flag) entrano nell'enum di ability.schema.json ma restano non usati dalle abilita'.",
-        "Un Conditions helper condiviso (scripts/conditions.gd) valuta la lista, usato da execute (e da DialogueEngine in US-613).",
-        "execute_stored NON verifica le condizioni.",
-        "Test headless: hermit_costellazione_del_custode esegue a fase_lunare piena e viene rifiutata altrimenti senza pagare spiritualita'; moon_furia_notturna esegue solo di notte; le abilita' senza condizioni non cambiano comportamento; i test che eseguono abilita' condizionate con un player in scena aggiornati a impostare TimeSystem.",
-        "python tools/validate_data.py esce 0. Nessuna regressione (dopo aggiornamento test). Typecheck passes. Tests pass."
+        "data/pathways/fool.json Seq 9/8/7: stub -> false, contenuto pieno. fool_9 e' gia' non-stub dall'audit (fool_divinazione_pendolo, fool_lettura_espressioni): la story ne completa stat_modifiers/potion/madness_on_force e aggiunge le acting_actions a somma 1.0.",
+        "Primitiva nuova illusion { raggio, durata, potenza, tipo_illusione }: handler _p_illusion + VFX + primitives.json (illusion e' gia' implemented:true da fase 6 — verificare che l'handler copra tipo_illusione:'copia_nemico'/'danno_percepito'/'oggetto_evocato'/'aspetto', estenderlo se manca senza toccare execute). tipo_illusione:'copia_nemico' registra N bersagli-esca (il combat e' fase 6); 'danno_percepito' -> dot a tag follia con condizione di rimozione registrata (si annulla se il bersaglio 'capisce'). DECISIONE: il significato di 'potenza' (numero di copie vs convincimento) si fissa in questa story col primo VFX a schermo e si documenta in progress.txt.",
+        "Seq 7 (Magician): illusion tipo_illusione:'oggetto_evocato' + melee_arc/projectile per il colpo.",
+        "La leggibilita' di illusion e' il rischio numero uno: la verifica a schermo deve mostrare che il giocatore distingue un'esca da un nemico vero (tell visivo sull'esca: bordo tremolante / colore della palette Fool da design-vfx.md). Se non e' leggibile con un placeholder, la story si ferma e lo si segnala in progress.txt.",
+        "3 formule + 3 caratteristiche (formula_fool_9..7, char_fool_9..7) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_fool.gd (nuovo): illusion registra le esche; il danno percepito e' un dot follia rimuovibile; le acting sommano 1.0; ogni abilita' Seq 9-7 esegue senza warning.",
+        "Verifica a schermo documentata in progress.txt (leggibilita' esca vs nemico vero).",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
       "priority": 5,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO B CHIUSO. scripts/conditions.gd (NUOVO, preload): Conditions.tutte_soddisfatte/soddisfatta - un solo posto per e_notte/fase_lunare/in_zona_tag/foundation_min/tier_min/madness_min/max/acting_progress_min (FR-3). follia_min=alias madness_min; reputazione_min/flag non bloccano finche' FactionSystem/KnowledgeStore assenti. ability_engine.gd: check in execute() DOPO cooldown, PRIMA del costo, solo se caster in gruppo 'player' -> ERR_CONDIZIONE senza pagare. execute_stored NON verifica. world_state.gd: _zona_tag transitorio + zona_corrente/imposta_zona (da region_scene). ability.schema.json: enum + 3 tipi dialogo. validate: condizioni delle abilita' nel vocabolario, follia_min/reputazione_min/flag -> errore su un'abilita'. tests/test_conditions.gd (7 test). ZERO regressioni: i test esistenti usano casters nudi (non gruppo player). validate exit 0, 591 test verdi."
+      "fase": "5b",
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-606",
-      "title": "Darkness, Sequenze 9-7 (Sleepless -> Nightmare) (Blocco C)",
-      "description": "Come giocatore, voglio veglia perpetua e forza al buio, parole che deprimono i nemici, ed entrare negli incubi infliggendo paura.",
+      "id": "US-5B06",
+      "title": "Fool, Sequenze 6-4 (Faceless -> Bizarro Sorcerer) (Blocco B)",
+      "description": "Come giocatore, voglio assumere aspetto e voce di un NPC ereditandone i permessi sociali, controllare un nemico come marionetta, e sostituirmi a un oggetto a distanza.",
       "acceptanceCriteria": [
-        "data/pathways/darkness.json Seq 9/8/7: stub -> false, contenuto pieno. Tier low. Seq 9 (Sleepless): buff_stat condizionati e_notte (forza/percezione raddoppiate di notte).",
-        "Seq 7 (Nightmare): fear (gia' implementata, US-505) + debuff_stat su precisione + condizione e_notte.",
-        "Nessuna primitiva nuova attesa.",
-        "Formule + caratteristiche + ingredienti + i18n + test (tests/test_darkness.gd) + verifica a schermo.",
+        "data/pathways/fool.json Seq 6/5/4: stub -> false, contenuto pieno. Seq 4 advancement_ritual obbligatorio con location_tags (es. teatro, palco) dal vocabolario.",
+        "Seq 6 (Faceless): 'eredita i permessi sociali' -> illusion tipo_illusione:'aspetto' + un emit di npc_influenced modo:'ingannato' via acting_actions; il gate npc vero lo aggancia fase 6. Nessun if per Fool.",
+        "Seq 5 (Marionettist): possess controllo:'totale' (gia' implementata in US-5B02) + debuff_stat sugli altri nemici che 'vedono un alleato voltarsi'. Il nemico controllato che attacca gli altri e' combat, fase 6.",
+        "Seq 4 (Bizarro Sorcerer): teleport (gia' implementata, US-506) con porta_alleati:false + illusion (un'esca lasciata al posto di partenza).",
+        "3 formule + 3 caratteristiche (formula_fool_6..4, char_fool_6..4) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_fool.gd esteso: le abilita' Seq 6-4 eseguono senza warning; le acting sommano 1.0.",
+        "Verifica a schermo in progress.txt: possess controllo:'totale' — si capisce chi controllo?",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
       "priority": 6,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO C. Nessuna primitiva nuova. Darkness Seq 9/8/7 stub->false: forza_del_buio (2x buff mult forza/evasione, cond e_notte - 'raddoppiate di notte', la condizione ora vale US-605), veglia_perpetua (buff difesa + light_purify), verso_cupo (2x debuff - Midnight Poet), poesia_amara (debuff + dot follia), incubo (fear + debuff precisione, cond e_notte), terrore_notturno (fear area + dot). acting 1.0; Seq 9 recita su time_in_state {stato:notte} 600s (primo Pathway sul tempo di gioco). madness 1.1/2.5/3.9. formule+9 ingredienti; char 9/8/7 tradotte. tests/test_darkness.gd (4 test). validate exit 0 (stub 39->36), 595 test verdi."
+      "fase": "5b",
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-607",
-      "title": "Darkness, Sequenze 6-4 (Soul Assurer -> Nightwatcher) + shadow_meld (Blocco C)",
-      "description": "Come giocatore, voglio pacificare anime e curare il danno spirituale, ospitare spiriti maligni e scagliarli, e il dominio della notte.",
+      "id": "US-5B07",
+      "title": "Fool, Sequenze 3-0 (Scholar of Yore -> Fool) — fool_2 senza probability_shift (Blocco B)",
+      "description": "Come giocatore, voglio richiamare dal passato una versione precedente di me o di un oggetto, spendere spiritualita' per eventi improbabili, e creare un'area di segretezza in cui la realta' locale e' manomettibile.",
       "acceptanceCriteria": [
-        "Seq 6/5/4 pieni. Seq 4 rituale obbligatorio con location_tags (cripta, luogo_in_decadenza), momento: notte_fonda.",
-        "Seq 5 (Spirit Warlock): summon entita_id 'spirito_maligno_...' (prefisso spirito, gia' in ownership.json) + projectile a tag_danno: spirito.",
-        "Primitiva nuova shadow_meld (interlacciata, la fase 5b e' dentro fase 6): handler + VFX + tolta dalla lista non-implementata + status 'occultato' in status_effects.json. Parametri dal registro.",
-        "Seq 4 (Nightwatcher): shadow_meld + terrain_modify tipo_modifica: 'oscurita' permanente: false (documentato: gancio letto da TimeSystem.e_notte come override locale).",
-        "Formule + caratteristiche + ingredienti + i18n + test + verifica a schermo.",
+        "data/pathways/fool.json Seq 3/2/1/0: stub -> false, tier alti, Ancora sacrificata al rituale di Seq 1.",
+        "Seq 3 (Scholar of Yore): 'richiama una versione precedente' -> time_rewind (gia' implementata, US-5B03) sul caster + illusion (gli avatar del Fool sono FINTI — decisione presa: illusion, non la materia prima avatar).",
+        "Seq 2 (Miracle Invoker) SENZA probability_shift (primitiva differita): 'converte spiritualita' in eventi improbabili' reso con buff_stat/debuff_stat a varianza alta dichiarata nel campo note dell'abilita' + curse (effetto sfortuna, gia' in status_effects.json) sul bersaglio. Come darkness_1/paragon_1/hermit_1.",
+        "grep di data/abilities/ per 'probability_shift' come tipo di primitiva -> 0 occorrenze.",
+        "Seq 1 (Attendant of Mysteries): terrain_modify tipo_modifica:'area_di_segretezza' + illusion a raggio ampio.",
+        "Seq 0 (Fool): l'abilita' di dominio ('falsifica la realta' su scala di mondo') — aura con effetto composito.",
+        "4 formule + 4 caratteristiche (formula_fool_3..0, char_fool_3..0) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_fool.gd esteso: le abilita' Seq 3-0 eseguono senza warning; nessuna abilita' del Fool usa una primitiva differita; le acting sommano 1.0.",
+        "Verifica a schermo documentata in progress.txt.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
       "priority": 7,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO C. shadow_meld IMPLEMENTATA (fase 5b, portata dal Nightwatcher): _p_shadow_meld -> status 'occultato' (NUOVO, non negativo, evasione +0.25); primitives.json implemented + vfx_umbra. GANCIO oscurita': _p_terrain_modify tipo_modifica 'oscurita' -> TimeSystem.crea_oscurita; e_notte(posizione) legge le zone di oscurita' come notte locale (come permanente:true -> WorldState, non un if). Darkness Seq 6/5/4 stub->false: quiete_dell_anima/requiem (heal + light_purify), ospite_maligno (summon spirito_maligno) / scaglia_spirito (projectile spirito), manto_d_ombra (shadow_meld) / notte_artificiale (terrain_modify oscurita + debuff). Seq 4 rituale [cripta, luogo_in_decadenza] momento notte_fonda. acting 1.0. madness 5.3/6.6/8.3. formule+char 6/5/4. tests/test_darkness.gd +4 (8). validate exit 0 (stub 36->33), 599 test verdi."
+      "fase": "5b",
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-608",
-      "title": "Darkness, Sequenze 3-0 (Horror Bishop -> Darkness) + illusion (Blocco C)",
-      "description": "Come giocatore, voglio un'aura di terrore che rompe le formazioni, e cancellare cose e persone dalla percezione altrui anche in pieno giorno.",
+      "id": "US-5B08",
+      "title": "Door, Sequenze 9-7 (Apprentice -> Astrologer) + primitiva shadow_meld (Blocco C)",
+      "description": "Come giocatore, voglio teletrasporti brevi a vista e aprire serrature mistiche, incantesimi di fuga e scambio di posizione, e divinazione stellare che rivela percorsi nascosti.",
       "acceptanceCriteria": [
-        "Seq 3/2/1/0 pieni, tier alti, rituali. Seq 1 darkness_1 gia' fatta in US-503 (resta come da US-503).",
-        "Primitiva nuova illusion (interlacciata): handler + VFX + tolta dalla lista non-implementata. Parametri dal registro. darkness_cancellazione (stress test gia' esistente) la usa - questa story ne completa la Sequenza 2.",
-        "Seq 3 (Horror Bishop): fear a raggio ampio + aura con effetto paura persistente sui nemici.",
-        "darkness_0: aura di dominio. Darkness diventa 10/10.",
-        "Con Darkness: 100/100 Sequenze non-stub. Tutti e 22 i Pathway attivi completi.",
-        "Formule + caratteristiche + ingredienti + i18n + test + verifica a schermo.",
+        "data/pathways/door.json Seq 9/8/7: stub -> false, contenuto pieno. Seq 9 (Apprentice) usa teleport (gia' implementata).",
+        "Primitiva shadow_meld { durata, velocita, richiede_ombra }: shadow_meld e' gia' implemented:true da fase 6 — verificare che l'handler _p_shadow_meld applichi lo status 'occultato' (se manca, aggiungerlo a data/status_effects.json come non negativo) al caster per durata; richiede_ombra registrato (il gate 'solo in ombra' e' fase 6). Estendere l'handler solo se necessario, senza toccare execute.",
+        "Seq 8 (Trickmaster): teleport porta_alleati:false + debuff_stat/buff_stat per lo 'scambio di posizione' (registrato; lo swap vero col bersaglio e' combat).",
+        "Seq 7 (Astrologer): reveal_info (gia' implementata) con categoria:'percorso' — divinazione dello spazio (matrice: Door divina i percorsi, non le menti).",
+        "3 formule + 3 caratteristiche (formula_door_9..7, char_door_9..7) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_door.gd (nuovo): shadow_meld applica lo status 'occultato' per la durata; le abilita' Seq 9-7 eseguono senza warning; le acting sommano 1.0.",
+        "Verifica a schermo in progress.txt: shadow_meld — il giocatore si vede 'sbiadire'; il tell che e' occultato.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
       "priority": 8,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO C CHIUSO. DARKNESS 10/10. illusion IMPLEMENTATA (fase 5b, portata dal Servant of Concealment): _p_illusion -> segnale illusione_creata + dot per 'danno_percepito'; primitives implemented + vfx_mirage. Darkness Seq 3/2/1/0 stub->false: aura_di_terrore/predica_nera (Horror Bishop), svanire (illusion+shadow_meld) + darkness_cancellazione ora 0 warning, giogo_della_malasorte (sfortuna d'area) + darkness_1 ESCE DA STUB (abilita' invariata da US-503), dominio_della_notte (Seq 0). rituali Seq<=4; Seq 0 fase_lunare eclissi. madness 9.5/10.8/12.5/14.0. formule+char 3/2/1/0. REGRESSIONE gestita: 2 test di test_ability_engine aggiornati (illusion era l'esempio di 'non implementata' -> ora usa 'chain'). tests/test_darkness.gd +5 (13). validate exit 0 (stub 33->29: restano Fool/Error/Door = fase 5b vera). 603 test verdi. NOTA: '100/100, 22/22' dell'AC presuppone fase 5b; coi blocchi A/B/C siamo a 71/100. Chiusura documenti/conteggi = US-622."
+      "fase": "5b",
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-611",
-      "title": "Il motore del mondo applica regions.json.gating[] (Blocco D)",
-      "description": "Come giocatore, voglio che alcune aree si aprano solo di notte, con una primitiva, o avendo letto certi testi.",
+      "id": "US-5B09",
+      "title": "Door, Sequenze 6-4 (Scribe -> Secrets Sorcerer) — fotocopia via steal non_sottrae (Blocco C)",
+      "description": "Come giocatore, voglio registrare un'abilita' osservata e riprodurla una volta, viaggiare nel mondo spirituale come scorciatoia, e occultamento totale che sfugge anche al rilevamento mistico.",
       "acceptanceCriteria": [
-        "Componente AreaGate (Area2D + un dato di gate) che legge un blocco di gating e apre/chiude il passaggio per: primitiva / momento / fase_lunare / npc / conoscenza / sequenza.",
-        "terrain_modify permanente: true che tocca un AreaGate lo apre per sempre (WorldState.gate_aperti, salvato).",
-        "Nessun if per una regione o un gate specifico.",
-        "Test headless + verifica a schermo.",
+        "data/pathways/door.json Seq 6/5/4: stub -> false, contenuto pieno. Seq 4 advancement_ritual obbligatorio con location_tags (es. soglia, crocevia).",
+        "Seq 6 (Scribe): 'registra e riproduce' -> steal { categoria:'abilita', probabilita:1.0, non_sottrae:true } — riusa AbilityEngine.grant_temporary (US-204) ma il record e' marcato fotocopia:true / non_sottrae:true: l'originale sul nemico non e' sottratto. Un solo vocabolario steal con un flag, nessuna primitiva nuova, nessun if per Door. Il validator (matrice di proprieta' / ownership.json) verifica la distinzione da steal dell'Error.",
+        "Seq 5 (Traveler): teleport distanza grande + porta_alleati:true — il fast travel del Door (scorciatoie istantanee, mai permanenza). Nessun if: teleport coi parametri giusti.",
+        "Seq 4 (Secrets Sorcerer): shadow_meld (gia' implementata, US-5B08) con durata lunga + illusion (un'esca).",
+        "3 formule + 3 caratteristiche (formula_door_6..4, char_door_6..4) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_door.gd esteso: la 'fotocopia' concede l'abilita' al caster SENZA marcare il nemico come derubato (sottratto resta false); le abilita' Seq 6-4 eseguono senza warning; le acting sommano 1.0.",
+        "Verifica a schermo documentata in progress.txt.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
       "priority": 9,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO D CHIUSO (unica story). scripts/area_gate.gd (NUOVO, preload): AreaGate estende Area2D - configura(region_id, gate), e_aperto(), id()='<regione>/<area>'. Barriera in scena: StaticBody2D figlio (disabled=e_aperto) + marker ColorRect rosso/verde in _process. valuta_gate(region_id, gate, root) STATIC (pura, la riusa region_scene per i passaggi): match sul TIPO dei 6 di gate_types.json, mai sulla regione/area (FR-8). momento->TimeSystem.momento(); fase_lunare->TimeSystem.fase_lunare(); sequenza->Progression.sequence()>=valore (respinge chi e' 'sopra'); primitiva->una abilita' delle Sequenze 9->corrente del Pathway la compone (dai dati, nessun nome hardcoded); conoscenza->KnowledgeStore.conosce; npc->NpcSystem.ha_influenza se esiste (US-612), sennò chiuso. Sistema assente->gate chiuso. gate in WorldState.gate_aperti->sempre aperto. terrain_modify permanente: AreaGate ascolta WorldState.terreno_modificato (emesso solo dai permanenti); se copre la barriera->WorldState.apri_gate(id()), gia' nel save (nessun bump). region_scene.gd: _crea_gate() una AreaGate per voce di gating[]; _su_passaggio consulta un gating area=='ingresso' (convenzione nel dato) via valuta_gate prima di viaggiare. Nessun cambio al validator (US-601 valida gia' gating[]). tests/test_area_gate.gd (7 test). validate exit 0 (3 warning invariati), 610 test verdi (603+7), 0 ERROR nuovi. Verifica a schermo (rendering reale, _shot_us611.gd): Marche gate 'cripte' barriera ROSSA di giorno -> VERDE a notte_fonda; Archivio 'ali_interne' rosso senza flag -> verde dopo impara('testi_ordine_minore'). Screenshot us611_marche_gate_chiuso/aperto.png, us611_archivio_chiuso/aperto.png."
+      "fase": "5b",
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-612",
-      "title": "roster.json + npc.schema.json + validator + NpcSystem (Blocco E)",
-      "description": "Come giocatore, voglio 8 persone vere in citta', ognuna con la sua vita e la sua memoria.",
+      "id": "US-5B10",
+      "title": "Door, Sequenze 3-0 (Wanderer -> Door) — varco_forzato nel WorldState (Blocco C)",
+      "description": "Come giocatore, voglio teletrasporto a lunga distanza portando alleati e pet, aprire porte stabili tra piani replicando abilita' note, e chiavi che aprono qualunque cosa.",
       "acceptanceCriteria": [
-        "data/schema/npc.schema.json (additionalProperties:false): id, name_i18n, role_i18n, region_id, anchor_candidate, faction_id, schedule[] ({momento, location_tag|null}), vendor (null o {listino:[item_id]}), dialogue_id, memoria (default {}).",
-        "data/npc/roster.json: gli 8 (mirco, sidon, vesna, aldo, ottavia, bruno, lena, doran) + npc_generic_* sufficienti per tg_6_giuramento (8) e fool_9_inganno (10).",
-        "NpcSystem (autoload): conosciuti(), ancore_attive(), memoria(id), influenza(id, modo) -> emette npc_influenced con { modo }. AudioManager.nomi_sussurro legge da qui.",
-        "Validator: region_id, faction_id, schedule location_tag/momento, dialogue_id, vendor.listino, chiavi i18n.",
-        "SAVE: campo mondo.npc { conosciuti:[], memoria:{}, ancore:[] }.",
-        "Test headless + verifica a schermo.",
+        "data/pathways/door.json Seq 3/2/1/0: stub -> false, tier alti, Ancora sacrificata al rituale di Seq 1.",
+        "Seq 2 (Planeswalker): teleport porta_alleati:true a lunghissima distanza + steal { non_sottrae:true } senza registrazione preventiva ('replica abilita' che conosce'). Nessuna primitiva nuova.",
+        "Seq 1 (Key of Stars): 'chiavi che aprono qualunque cosa, anche luoghi senza porta' -> terrain_modify tipo_modifica:'varco_forzato' permanente:true (entra nel WorldState, come i varchi del Twilight Giant) + teleport.",
+        "Seq 0 (Door): l'abilita' di dominio ('passaggio senza limiti') — aura + teleport a costo ridotto in un raggio.",
+        "4 formule + 4 caratteristiche (formula_door_3..0, char_door_3..0) + ingredienti nel vocabolario + i18n rilanciato e tradotto.",
+        "tests/test_door.gd esteso: il varco_forzato permanente sopravvive al reload (riuso del test di terrain_modify permanente); le abilita' Seq 3-0 eseguono senza warning; le acting sommano 1.0.",
+        "Verifica a schermo documentata in progress.txt.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
       "priority": 10,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO E. data/npc/roster.json (NUOVO): 8 del roster (mirco/sidon/vesna/aldo/ottavia/bruno/lena/doran) + npc_generic_01..10. schedule[{momento, location_tag|null}] sui vocabolari time.json/regions.json; vendor null o {listino:[item_id]}; faction_id null ammesso (US-615); dialogue_id -> data/dialogues/ (US-614); name/role = seme i18n (npc.<short>.*). Bruno location_tag solo crepuscolo/notte. data/schema/npc.schema.json (NUOVO, doc). scripts/npc_system.gd (NUOVO autoload dopo AnchorSystem): incontra/conosciuti/conosce; influenza(id, modo) -> memoria (contatore sui 5 modi) + EventTracker.emit_event('npc_influenced',{modo}) + segnale; memoria(id); ha_influenza('<id>[:<modo>]') per i gate npc di US-611; promuovi_ancora/ancore_attive (solo anchor_candidate); presenti(region_id)->{id:location_tag} da schedule+TimeSystem.momento(); nomi_i18n() spinto ad AudioManager. game_data.gd: PATH_ROSTER + get_npcs()/get_npc(id). audio_manager.gd: _nomi_npc + imposta_nomi_npc(); nomi_sussurro() UNISCE nomi NPC + Ancore (contratto sussurri soglia 55). game_state.gd: mondo.npc via _mondo_snapshot/applica, NESSUN bump (US-602 unico). region_scene.gd: _crea_npc() marker per NPC presente, ricostruito a momento_cambiato, entrarci = incontra(id). validate_data.py: sezione NPC (id/i18n prefissi, region_id, schedule nei vocabolari, vendor.listino, faction_id/dialogue_id indulgenti finche' i file non esistono, 8 del roster + >=10 generici). generate_i18n_stubs rilanciato (+18 chiavi npc.* seminate; it.json 739->757, 48 TODO invariati). tests/test_npc_system.gd (8 test). validate exit 0 (3 warning invariati), 617 test verdi (610+7), 1 SCRIPT ERROR preesistente. Verifica a schermo (_shot_us612.gd, rendering reale): Mirwada all'alba 16 NPC nella location_tag giusta (Aldo/Bruno assenti), a notte_fonda solo Bruno/Doran/generic_04. Screenshot us612_mirwada_giorno/notte.png. NOTA: story fondativa di blocco, 11 file (schema+dati+autoload+loader+validator+save+audio+spawn), ogni pezzo piccolo e additivo."
+      "fase": "5b",
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-613",
-      "title": "Motore dialoghi + dialogue.schema.json (Blocco F)",
-      "description": "Come giocatore, voglio parlare con gli NPC: scelte, condizioni, conseguenze.",
+      "id": "US-5B11",
+      "title": "Sinergie e caratteristiche del gruppo Lord of Mysteries (Blocco D)",
+      "description": "Come giocatore, voglio che Fool, Error e Door partecipino alle sinergie e alla creazione personaggio come gli altri Pathway.",
       "acceptanceCriteria": [
-        "data/schema/dialogue.schema.json: id, start, nodes ({speaker, text_i18n, choices[]}); ogni choice: text_i18n, condizioni[] (vocabolario abilita' + follia_min/reputazione_min/flag), effetti[] (vocabolario chiuso ~5: emit_event->solo i 12, flag, reputazione, apri_vendita, avvia_quest), goto.",
-        "DialogueEngine (autoload): avvia(dialogue_id), valuta condizioni, applica effetti, segue goto. Il mondo si ferma durante un dialogo.",
-        "FlagStore (autoload o dentro WorldState): flag booleani namespaced. Unificare con KnowledgeStore.",
-        "Nuova pagina del libro page_dialogo (nuovo page_type, discusso).",
-        "Validator: start/goto verso nodi esistenti, speaker nel roster, emit_event valido, effetti dal vocabolario chiuso, chiavi i18n.",
-        "SAVE: campo mondo.flag {}.",
-        "Test headless + verifica a schermo.",
+        "Rivalutazione di data/synergies/batch_3.json: le sinergie che usano i tag inganno/furto/spazio/viaggio/destino (ora portati da Fool/Error/Door via la fonte 'sequenza') — quali sono diventate raggiungibili? sinergia_colpo_del_caso ora e' eseguibile; sinergia_inganno_probabilita resta irraggiungibile (tag probabilita' di key_of_light, differito) — atteso. Documentato in progress.txt.",
+        "data/synergies/batch_5.json (nuovo): 4-6 sinergie che sfruttano le combinazioni del gruppo (Error steal + talento; Fool illusion + pet; Door teleport + sigillo d'area...). Tutte raggiungibili, i18n completo, fonti >= 2. Almeno una anti-sinergia con neutralizza (Fool + Error si mordono: entrambi mentono).",
+        "data/characteristics.json: le 30 caratteristiche nuove (10 per Pathway: char_fool_*, char_error_*, char_door_*) esistono e sono tradotte (0 TODO).",
+        "Il diagramma dei Pathway nel libro e il frontespizio mostrano Fool, Error, Door con contenuto pieno — nessun codice nuovo. Verifica a schermo: creo un personaggio su ognuno dei tre, documentato in progress.txt.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
       "priority": 11,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO F. SPEZZATA (regola 3 del progetto: story troppo grande): questo e' il MOTORE; la pagina del libro page_dialogo e' US-613b. data/schema/dialogue.schema.json (NUOVO). scripts/dialogue_engine.gd (NUOVO autoload dopo NpcSystem): avvia(dialogue_id, interlocutore_id) - carica il grafo, ferma il mondo (TimeSystem.imposta_pausa), segnali dialogo_avviato/nodo_cambiato/dialogo_finito/apri_vendita/avvia_quest. scelte_valide() = choices con Conditions.tutte_soddisfatte (riuso conditions.gd, FR-3). scegli(i) applica effetti + segue goto (null/assente -> termina). Effetti = vocabolario CHIUSO di 5: emit_event (npc_influenced passa da NpcSystem.influenza sull'interlocutore, gli altri 12 -> EventTracker), flag -> KnowledgeStore.imposta, reputazione (US-615 no-op), apri_vendita (segnale), avvia_quest (US-616 segnale). FlagStore: UNIFICATO su KnowledgeStore - aggiunti imposta(flag,bool)/dimentica(flag); NIENTE mondo.flag (l'AC permette 'FlagStore delega a KnowledgeStore', i flag restano nel save 'conoscenza' esistente). game_data.gd: DIR_DIALOGUES + _load_dialogues() (un file per dialogo, chiave=doc.id) + get_dialogue(id). data/dialogues/: dlg_mirco (grafo vero 3 nodi, bersaglio test), 7 stub del roster (1 nodo, US-614 li scrive), dlg_generic (aiuta/inganna per tg_6/fool_9). validate_data.py: sezione dialoghi - start valido, ogni goto verso nodo esistente o null, nodi orfani (irraggiungibili dallo start) = errore, speaker nel roster, condizioni nel vocabolario, effetti nei 5, emit_event solo sui 12 + modo sui 5. generate_i18n_stubs rilanciato (+26 chiavi dialogue.* seminate da 'text'; it.json 757->783, 48 TODO invariati). tests/test_dialogue_engine.gd (7 test) + verificato che il validator becca goto rotto + orfani. validate exit 0 (3 warning invariati), 624 test verdi (617+7). Runtime (_shot_us613.gd): avvia dlg_mirco -> tick del tempo fermo; scegli -> npc_influenced + memoria + goto n2; congedo -> tick riparte."
+      "fase": "5b",
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-613b",
-      "title": "Pagina page_dialogo del libro (Blocco F)",
-      "description": "Come giocatore, voglio vedere il dialogo nel libro: speaker, testo, le scelte valide, e sceglierne una.",
+      "id": "US-5B12",
+      "title": "Chiusura fase 5b — gruppo Lord of Mysteries (Blocco D)",
+      "description": "Come sviluppatore, voglio che i documenti riflettano il gruppo Lord of Mysteries chiuso.",
       "acceptanceCriteria": [
-        "data/schema/page_types.json: +page_dialogo (nuovo page_type, discusso - i dialoghi sono contenuto diegetico del libro). data/ui/book.json: voce 'dialogo' (fase 6).",
-        "scenes/pages/page_dialogo.tscn + scripts/pages/page_dialogo.gd: legge DialogueEngine (nodo_corrente + scelte_valide), mostra speaker + testo + un bottone per scelta valida; il bottone chiama DialogueEngine.scegli(i). Tutte le stringhe da tr_data.",
-        "book_overlay.gd: PAGINE += page_dialogo; su dialogo_avviato apre il libro sulla pagina dialogo, su dialogo_finito lo chiude.",
-        "L'interazione col mondo (avvicinarsi a un NPC e premere interagisci) chiama DialogueEngine.avvia(npc.dialogue_id, npc.id). L'handler vive in region_scene/player, nessun if per un NPC.",
-        "Verifica a schermo in progress.txt: parlo con Mirco, scelgo una risposta, il libro mostra il nodo successivo, il mondo era fermo.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
-      ],
-      "priority": 11,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO F. page_types.json 8->9 (+page_dialogo); validate_data.py conta 9. book.json voce 'dialogo' ordine 7 con \"transitoria\": true (non diventa l'ultima pagina consultata; dato, nessun id hardcoded). scripts/pages/page_dialogo.gd + .tscn (NUOVI): legge DialogueEngine (nodo_corrente/interlocutore/scelte_valide), speaker in colore + testo + un Button per scelta valida -> scegli(i); ridisegna a nodo_cambiato/dialogo_finito, remove_child immediato. book.gd: apri_a(page_id) (non sporca _ultima); chiudi() salta _ultima se la pagina e' transitoria. book_overlay.gd: PAGINE += page_dialogo; dialogo_avviato -> apri/vai alla pagina di tipo page_dialogo (_pagina_di_tipo, nessun id hardcoded); dialogo_finito -> chiude se transitoria; libro_chiuso -> DialogueEngine.termina. region_scene.gd: _npc_vicino da body_entered/exited dei marker; _unhandled_input su 'interagisci' -> DialogueEngine.avvia(roster[id].dialogue_id, id), no-op se libro aperto o dialogo in corso. project.godot: azione 'interagisci' (F/Invio). i18n: ui.page.dialogo='Dialogo'. tests/test_page_dialogo.gd (5 test); test_book.gd 8->9. validate exit 0 (3 warning invariati), 629 test verdi (624+5). Verifica a schermo (_shot_us613b.gd, rendering reale): avvicino il giocatore a Mirco + 'interagisci' -> libro sulla pagina 'Dialogo', Mirco in azzurro, 2 bottoni (tier_min:mid nascosta a Seq 9), tick fermo; scegli -> n2; congedo -> dialogo finito + libro chiuso. Screenshot us613b_dialogo_n1/n2.png."
-    },
-    {
-      "id": "US-614",
-      "title": "Gli 8 file dialogo + i popolani generici (Blocco F)",
-      "description": "Come giocatore, voglio che ognuno degli 8 abbia qualcosa da dire, coerente con chi e'.",
-      "acceptanceCriteria": [
-        "data/dialogues/dlg_{mirco,sidon,vesna,aldo,ottavia,bruno,lena,doran}.json: un grafo per NPC coerente col ruolo meccanico di design-npc-quest 2.",
-        "I nodi che concedono un servizio hanno le condizioni giuste. Il nome scelto parametrizza via chiave i18n con parametro.",
-        "dlg_generic.json per i npc_generic_*.",
-        "i18n: tutte le chiavi dialogue.* tradotte.",
-        "Verifica a schermo.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "006_PRD/roadmap.md: nota 'fase 5b' -> 'CHIUSA per il gruppo Lord of Mysteries (12 story); resta Darkness gia' fatto in fase 6'. Conteggio reale story e test.",
+        "006_PRD/design-pathways.md: sezione 'Fase 5b' con Fool/Error/Door spuntati; Darkness segnato come realizzato in fase 6.",
+        "006_PRD/design-master.md Appendice C: righe per le primitive implementate in 5b (steal, possess, time_rewind; + eventuali estensioni di illusion/shadow_meld) e per la materia prima avatar in ownership.json; Appendice A aggiornata.",
+        "CLAUDE.md + README.md: gruppo Lord of Mysteries chiuso, conteggi aggiornati, criterio di uscita in test_slice_fase_5b.gd, 'fase corrente' -> fase 7 (endgame). grep di data/abilities/ per una primitiva differita usata come tipo -> 0.",
+        "tools/validate_data.py: check di chiusura fase 5b — fool/error/door senza Sequenze stub.",
+        "python tools/validate_data.py esce 0. Tutti i test headless verdi. Typecheck passes. Tests pass."
       ],
       "priority": 12,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO F CHIUSO. 7 grafi veri (dlg_mirco e dlg_generic gia' reali da US-613), 2-3 nodi ciascuno, coerenti col ruolo meccanico di design-npc-quest cap. 2: sidon (apri_vendita + rumor a pagamento -> flag sidon_ha_parlato); vesna (cura gated da reputazione_min ['quartiere',0], US-615); aldo (sfida gated da flag aldo_duello_disponibile, US-620); ottavia (concede flag testi_ordine_minore -> apre l'Archivio US-611, a tier_min mid OR flag sidon_ha_parlato); bruno (aiuta gated da e_notte -> flag bruno_porto_notturno + modo aiutato, apre i passaggi notturni gate npc US-611); lena (nessun servizio, solo 'gioca' -> flag lena_ricorda_il_gioco); doran (minaccia -> flag doran_sospetto_alto). Solo condizioni condivise (tier_min/flag/reputazione_min/e_notte) ed effetti dai 5 (emit_event/flag/apri_vendita), zero verbi nuovi. generate_i18n_stubs: +40 chiavi dialogue.* seminate da 'text' (it.json 784->824, 48 TODO invariati - tutti i testi del roster tradotti). tests/test_dialoghi_roster.gd (4 test): ogni dialogo (9) si gioca fino a un terminale senza loop; Ottavia concede il flag e quel flag apre davvero l'AreaGate 'conoscenza' dell'Archivio (integrazione US-611); Bruno 'aiuta' nascosta di giorno, funzionante di notte; testi non-TODO. validate exit 0 (3 warning invariati, la sezione dialoghi di US-613 valida i 9 grafi). 633 test verdi (629+4). NOTA: la verifica a schermo dei singoli dialoghi e' coperta da US-613b (la pagina); qui e' contenuto + test di integrazione."
-    },
-    {
-      "id": "US-615",
-      "title": "Fazioni + reputazione (Blocco G)",
-      "description": "Come giocatore, voglio che le mie azioni abbiano un peso sociale.",
-      "acceptanceCriteria": [
-        "data/factions.json + data/schema/faction.schema.json: 4 fazioni (ordine_minore, porto, quartiere, giustizia) con name_i18n, soglie (ostile/neutrale/amichevole/alleato) e membri (id NPC).",
-        "FactionSystem (autoload): reputazione(faction_id), modifica(faction_id, delta, sorgente), livello(faction_id).",
-        "Doran = sospetto: giustizia sale da sola a ogni ability_used mentre regione_corrente == 'mirwada'. A soglia, flag doran_sospetto_alto.",
-        "Usare un potere davanti a Vesna abbassa reputazione quartiere (handler in FactionSystem/NpcSystem, nessun if per Vesna nel motore abilita').",
-        "SAVE: campo mondo.reputazione {}.",
-        "Test headless.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
-      ],
-      "priority": 13,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO G. data/schema/faction.schema.json + data/factions.json (NUOVI): 4 fazioni (ordine_minore/porto/quartiere/giustizia), soglie nome->valore, membri coerenti coi faction_id del roster. Due comportamenti automatici DICHIARATI NEI DATI (nessun if per una fazione): quartiere.reazione_al_potere {delta:-5, membro:npc_vesna} (potere davanti a Vesna presente nella tua location_tag -> -5); giustizia.sospetto {evento:ability_used, regione:mirwada, delta:3, soglia:30, flag:doran_sospetto_alto} (sale a ogni ability_used in citta', a soglia scrive il flag; soglie invertite: 0=alleato 45=ostile, la reputazione E' il sospetto). scripts/faction_system.gd (NUOVO autoload dopo DialogueEngine): reputazione/modifica/livello (livello = soglia col valore piu' alto <= rep, direzione-agnostico); _ready connette EventTracker.evento_emesso e AbilityEngine.ability_executed (solo caster nel gruppo player). game_data.gd: get_factions/get_faction. game_state.gd: mondo.reputazione (nessun bump). Conditions.reputazione_min e DialogueEngine effetto 'reputazione' (gia' scritti) ora hanno un FactionSystem vero. validate_data.py: sezione fazioni (i18n prefisso, soglie, membri coerenti, sospetto.evento/regione, le 4 attese) + la sezione NPC ora valida i faction_id del roster. generate_i18n_stubs: +4 chiavi faction.* (it.json 824->828, 48 TODO invariati). tests/test_faction_system.gd (6 test). validate exit 0 (3 warning invariati), 639 test verdi (633+6)."
-    },
-    {
-      "id": "US-616",
-      "title": "Motore quest + quest.schema.json + quest di Atto I (Blocco G)",
-      "description": "Come giocatore, voglio quest che nascono dagli NPC e si completano facendo cose.",
-      "acceptanceCriteria": [
-        "data/schema/quest.schema.json: id, name_i18n, giver, atto (1-3), fallibile, exclusive_with[], steps[] ({id, desc_i18n, completamento: {tipo:'evento', evento, filtri, target} | {tipo:'flag', id}, on_complete[]}), ricompense[].",
-        "QuestSystem (autoload): osserva EventTracker e FlagStore e avanza. avvia(quest_id), stato(quest_id). fallibile:true supportato. Zero verbi di quest nuovi.",
-        "Le quest di Atto I in data/quests/: q_mirco_01, q_sidon_01, q_vesna_01, q_lena_01 (3-5, atto:1).",
-        "Validator: giver nel roster, evento/filtri validi, completamento.flag scritto da almeno un dialogo/quest, ricompense.item_id reali, exclusive_with verso quest esistenti, chiavi i18n.",
-        "SAVE: campo mondo.quest { attive:{}, completate:[], fallite:[] }.",
-        "Test headless. La sezione Journal del libro + la verifica a schermo sono US-616b.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
-      ],
-      "priority": 14,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO G. SPEZZATA (regola 3): motore + quest qui, sezione Journal del libro = US-616b. quest.schema.json (NUOVO). scripts/quest_system.gd (NUOVO autoload dopo FactionSystem): un LETTORE - _ready connette EventTracker.evento_emesso + KnowledgeStore.appreso -> _rivaluta (con guardia anti-re-entranza: applicare un effetto flag emette appreso). avvia(quest_id) registra la baseline del count dell'evento; step 'evento' completo se count(evento,filtri)-baseline >= target (come Acting Method), step 'flag' se KnowledgeStore.conosce(id). on_complete per step, ricompense alla fine. exclusive_with -> le altre attive+fallibili diventano fallite. fallisci(quest_id) per il fallimento esplicito. stato() in non_iniziata/attiva/completata/fallita. Effetti (on_complete+ricompense) = 5: flag/item/reputazione/ancora/apri_vendita. data/quests/ (4, atto 1): q_mirco_01 (enemy_defeated senza_abilita x3 -> 2 lingotto_ferro), q_sidon_01 (item_crafted x2 -> apri_vendita), q_vesna_01 (flag vesna_rassicurata -> Ancora Vesna), q_lena_01 (flag lena_ricorda_il_gioco -> Ancora Lena). Gancio avvia_quest in 4 dialoghi dei giver; dlg_vesna 'rassicura' ora scrive il flag positivo vesna_rassicurata. game_data.gd: DIR_QUESTS + get_quest(id). game_state.gd: mondo.quest (nessun bump). validate_data.py: sezione quest (giver, exclusive_with, step evento coi filtri come le acting_actions, step flag scritto da un dialogo/quest, ricompense item/ancora reali) + avvia_quest dei dialoghi verso quest esistenti. generate_i18n_stubs: +8 chiavi quest.* (it.json 828->836, 48 TODO invariati). tests/test_quest_system.gd (7 test). validate exit 0 (3 warning invariati), 646 test verdi (639+7)."
-    },
-    {
-      "id": "US-616b",
-      "title": "Sezione Journal nella pagina inventario del libro (Blocco G)",
-      "description": "Come giocatore, voglio vedere nel libro le quest attive coi loro step, le completate e le fallite.",
-      "acceptanceCriteria": [
-        "page_inventario.gd: SEZIONI da 6 a 7 (+journal), nessun nuovo page_type. La sezione legge QuestSystem (attive coi passo/step, completate, fallite) + GameData.get_quest per i nomi/desc via tr_data.",
-        "La sezione si ricostruisce dal vivo sui segnali di QuestSystem (come la sezione Sinergie di US-410/411).",
-        "Verifica a schermo in progress.txt: prendo q_mirco_01 da Mirco, la completo combattendo, il journal la mostra completata e la ricompensa e' nello zaino.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
-      ],
-      "priority": 14,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO G CHIUSO. page_inventario.gd SEZIONI 6->7 (+journal, nessun page_type nuovo). _journal(): quest attive coi loro step (fatto/corrente/da fare), completate (alpha 0.7), fallite (0.45), da QuestSystem + GameData via tr_data. _collega_sinergie -> _collega_segnali: connette anche QuestSystem (quest_avviata/step_completato/quest_completata/quest_fallita) -> redraw dal vivo se la sezione aperta e' 'journal' (come Sinergie US-411). strings.csv: BOOK_INV_JOURNAL + BOOK_JOURNAL_* (it+en), .translation rigenerati con --import. test_page_inventario.gd +1 (journal vuoto -> quest attiva dal vivo -> sotto Completate). validate exit 0 (3 warning invariati), 647 test verdi (646+1)."
-    },
-    {
-      "id": "US-617",
-      "title": "Pagina mappa del libro + fast travel come potere (Blocco H)",
-      "description": "Come giocatore, voglio vedere dove sono stato e come muovermi tra le regioni note.",
-      "acceptanceCriteria": [
-        "page_type mappa in book.json (doppia_pagina): le regioni scoperte (WorldState), i gate noti, la posizione corrente. Le non scoperte sono assenti (fog of war).",
-        "Fast travel = potere: nessun menu di teletrasporto. Da un nodo mappa di una regione scoperta si viaggia solo con un mezzo del proprio Pathway (door_5, death_5, varchi permanenti del TG).",
-        "Tutte le stringhe di chrome da assets/i18n/strings.csv.",
-        "Verifica a schermo.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
-      ],
-      "priority": 15,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO H. book.json: 'mappa' perde sbloccata_da fase 6 (contenuto diegetico come il diagramma; mostra solo lo scoperto = fog of war). doppia_pagina resta ma il rendering a doppia pagina vero e' un ponytail rimandato. scripts/pages/page_mappa.gd + .tscn (NUOVI): regioni scoperte (WorldState.scoperte), corrente evidenziata, varchi noti; bottone Viaggia per regione != corrente, abilitato solo se _puo_viaggiare() = una primitiva teleport nelle Sequenze raggiunte (riuso AreaGate._possiede_primitiva: death_5, door_3) o un varco 'apre_varco*' del TG. Il bottone -> region_scene.viaggia_a(target) (NUOVO metodo pubblico, come _su_passaggio senza Area2D, rispetta _ingresso_aperto/gating US-611). book_overlay.gd PAGINE += mappa. strings.csv BOOK_MAPPA_* (it+en), .translation via --import. test_book/test_book_overlay: 'mappa' -> 'journal' come esempio di pagina bianca. tests/test_page_mappa.gd (5 test). validate exit 0, tests verdi."
-    },
-    {
-      "id": "US-618",
-      "title": "Densita' mistica - percezione, recupero, spawn (Blocco H)",
-      "description": "Come giocatore, voglio che uscire dalla citta' convenga.",
-      "acceptanceCriteria": [
-        "WorldState.densita_mistica_corrente() = quella della regione corrente (da regions.json), con override locale.",
-        "Percezione per Sequenza (audio.json.sequence_perception, da Seq 5): AudioManager la legge da WorldState, non da un valore hardcodato.",
-        "Il recupero della spiritualita' scala con densita_mistica_corrente() (moltiplicatore da balance.json). L'efficacia dei rituali (malus di forzatura, Foundation) idem.",
-        "La frequenza degli spawn Beyonder e dei segreti per zona scala con la densita' (spawner minimo placeholder).",
-        "La citta' e' bassa (densita ~0.2).",
-        "Test headless.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
-      ],
-      "priority": 16,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO H. balance.json sezione densita_mistica (recupero/molt/efficacia_forzatura/spawn/sequenza_percezione/densita_baseline=0.2). world_state.gd: densita_mistica_corrente() dalla regione (regions.json) + imposta_densita_override (transitorio) + spawn_rate_corrente() (gancio spawner fase 7); fuori regione 0.2. stats_component.gd: _rigenera_spiritualita nel _process SOLO se il parent e' 'player' (i nemici no) - prima non c'era recupero passivo; ritmo scala con max(0, densita - baseline). perception_system.gd: densita_percepita() = la densita' se sequence() <= sequenza_percezione (5), sennò -1. foundation.gd: malus_forzatura() = malus base * clamp(1 - max(0, densita-baseline)*efficacia, 0.1, 1); potion_system.gd bevi(forza) lo usa (in citta' = malus pieno, fuori costa meno). validate: sezione densita_mistica. tests/test_densita_mistica.gd (6 test). validate exit 0, tests verdi."
-    },
-    {
-      "id": "US-619",
-      "title": "Audio del mondo - zone, ambienti, layer (Blocco H)",
-      "description": "Come sviluppatore, voglio che audio.json descriva completamente il paesaggio sonoro del mondo.",
-      "acceptanceCriteria": [
-        "data/audio.json esteso: le 4 zone musica nuove (marche, valle, archivio, frontiera) con pathway_palette/riverbero; ambienti per momento (giorno/notte per zona); la struttura della musica a layer (stem base + tensione/combat/boss con crossfade - solo struttura); il drone del rituale (build 45s, taglio secco all'interruzione).",
-        "Il ciclo giorno/notte cambia l'ambiente sonoro attivo (AudioManager ascolta TimeSystem.momento_cambiato).",
-        "Validator: ogni music_zone di regions.json esiste; le soglie e la struttura a layer sono coerenti.",
-        "LIMITE DICHIARATO in progress.txt: i file audio non li produce questo lavoro.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
-      ],
-      "priority": 17,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO H CHIUSO. LIMITE DICHIARATO in progress.txt: nessun file audio prodotto, audio.json e' la spec per un musicista. data/audio.json: music.zone.* + pathway_palette + riverbero (0..1) + stem boss; music.ambienti {zona:{giorno,notte}} per le 5 zone; music.layer (sempre_attivo base, in_crossfade [tensione,combattimento,boss], stato_per_stem per i 6 music.stati). audio_manager.gd: aggiorna_ambiente() sceglie lo stream ambientale = music.ambienti[music_zone regione corrente][giorno|notte], ambiente_corrente() lo espone; connesso a TimeSystem.momento_cambiato + WorldState.regione_cambiata. validate_data.py: music.layer coerente, riverbero 0..1, ogni music_zone di una regione ha un ambiente giorno/notte. tests/test_audio_mondo.gd (3 test). validate exit 0, tests verdi."
-    },
-    {
-      "id": "US-620",
-      "title": "Gli indizi dell'antagonista + le scene degli atti (Blocco I)",
-      "description": "Come giocatore, voglio che la trama principale si accenni attraverso il mondo.",
-      "acceptanceCriteria": [
-        "L'antagonista e' il detentore precedente della Sequenza 0 del Pathway del giocatore: un dato in data/lore/antagonisti.json (uno per Pathway attivo, id, name_i18n, indizi come chiavi i18n). Nessun boss (fase 7): solo gli indizi.",
-        "Le scene degli atti sono flag + quest, non un motore nuovo.",
-        "npc_aldo: la sua Sequenza sale col tempo di gioco (roster.json, avanzamento_temporale); ai passaggi di tier del giocatore, flag aldo_duello_disponibile.",
-        "i18n: tutte le chiavi degli indizi tradotte.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
-      ],
-      "priority": 18,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO I. data/lore/antagonisti.json (NUOVO): 1 antagonista per Pathway attivo (10) - il detentore precedente della Sequenza 0 del Pathway del giocatore (decisione n.9), strutturale, nessun boss (fase 7), solo indizi[{text, text_i18n}]. game_data.gd: get_antagonisti/get_antagonista(pathway_id). roster.json: npc_aldo + avanzamento_temporale {sequenza_iniziale 9, ogni_momenti 8, sequenza_minima 4} + sfida_ai_tier. npc_system.gd: _collega_narrativa (differito) - _su_momento (TimeSystem) fa scendere la Sequenza degli NPC avanzamento_temporale (Aldo); _su_rituale (RitualSystem.rituale_completato) sequenza<=6 -> flag atto_1_concluso; _su_sequenza_giocatore (Progression.sequence_changed) se cambia il tier -> <corto>_duello_disponibile per gli sfida_ai_tier. sequenza_npc(id), antagonista_del_giocatore(); _seq_npc nel save. validate: sezione antagonisti + avanzamento_temporale. generate_i18n_stubs +40 chiavi antagonist.* (it.json 836->876, 48 TODO invariati). tests/test_narrativa.gd (5 test). validate exit 0, 669 test verdi."
-    },
-    {
-      "id": "US-621",
-      "title": "Sinergie scoperta: 'lore' e conoscenza dai libri (Blocco I)",
-      "description": "Come giocatore, voglio che leggere i libri giusti e parlare con Ottavia mi insegni sinergie e mi apra l'Archivio.",
-      "acceptanceCriteria": [
-        "Le sinergie con scoperta: 'lore' ora si imparano: un effetto di dialogo/libro impara_sinergia (nuova voce del vocabolario chiuso degli effetti). Ottavia ne insegna almeno una.",
-        "I flag testi_* di gating conoscenza si guadagnano da: dialoghi, libri trovati (item con stored_flag), sinergie lore.",
-        "L'Archivio Sepolto usa i flag testi_* come gating conoscenza (US-611).",
-        "SynergyEngine._viste: una sinergia lore imparata entra in _viste.",
-        "Test headless.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
-      ],
-      "priority": 19,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO I. dialogue_engine.gd: effetto impara_sinergia (6o del vocabolario chiuso) -> SynergyEngine.impara_sinergia(id) (mette in _viste). dlg_ottavia: il nodo 'grazie' insegna anche la sinergia lore anti_furia_e_calma. inventory.gd: usa() ha un ramo stored_flag - un libro trovato che al consumo scrive un flag di conoscenza e si consuma. data/items/pergamene.json: libro_ordine_minore (pergamena, stored_flag testi_ordine_minore) - apre le ali interne dell'Archivio (US-611). validate: impara_sinergia.id = sinergia scoperta:'lore'; stored_flag per le pergamene, una sola cosa per pergamena. tests/test_lore_conoscenza.gd (3 test): il libro apre davvero l'AreaGate dell'Archivio; Ottavia insegna la sinergia lore -> _viste. Regressioni gestite: test_items (pergamena con stored_flag), test_madness_audio (nomi_sussurro unisce Ancore + NPC). validate exit 0, 669 test verdi."
-    },
-    {
-      "id": "US-622",
-      "title": "Chiusura fase 6 (Blocco I)",
-      "description": "Come sviluppatore, voglio che i documenti riflettano il mondo costruito e tutti e 22 i Pathway completi.",
-      "acceptanceCriteria": [
-        "006_PRD/roadmap.md fase 6 -> CHIUSA (N story, M test), elenco completo.",
-        "006_PRD/design-world.md, design-npc-quest.md: intestazione 'REALIZZATO in fase 6'; decisioni prese registrate.",
-        "006_PRD/design-master.md Appendice A fase 6 -> CHIUSA; Appendice B decisioni n.1/6/9 -> CHIUSE; Appendice C: i nuovi schema.",
-        "CLAUDE.md + README.md: fase 6 chiusa, conteggi, 'tutti e 22 i Pathway attivi completi', save schema_version 21.",
-        "Il validator ha un check di chiusura: zero Sequenze stub in data/pathways/; regions.json/roster.json/factions.json esistono e coerenti; ogni dialogue_id del roster ha un file; le quest di Atto I esistono.",
-        "python tools/validate_data.py esce 0. Tests pass."
-      ],
-      "priority": 20,
-      "fase": 6,
-      "passes": true,
-      "notes": "BLOCCO I CHIUSO. FASE 6 CHIUSA (24 story, 669 test, 9 blocchi). roadmap.md: 'Fase 6 - Mondo - CHIUSA' con l'elenco dei blocchi e la nota che la fase 5b (Fool/Error/Door, 29 Seq stub) resta aperta. design-world.md/design-npc-quest.md: intestazione 'REALIZZATO in fase 6' + decisioni (nomi regioni, roster 8, antagonista). design-master.md: Appendice A fase 6 CHIUSA, Appendice B decisioni n.1/6/9 CHIUSE, Appendice C i vocabolari/schema nuovi. CLAUDE.md + README.md: fase 6 chiusa, save schema_version 21, fase corrente = 5b. validate_data.py: check di chiusura - i file di dati esistono, ogni dialogue_id del roster ha un file, le 4 quest di Atto I esistono. NON si controlla 'zero Sequenze stub' (Fool/Error/Door = fase 5b, PRD a parte). validate exit 0 (3 warning invariati), 669 test verdi."
+      "fase": "5b",
+      "passes": false,
+      "notes": ""
     }
   ]
 }
