@@ -62,6 +62,51 @@ func test_la_propria_colonna_e_nota_fino_alla_sequenza_corrente() -> void:
 	ov.free()
 
 
+func test_prossima_sequenza_rivela_solo_il_nome() -> void:
+	var gd: Node = _n("/root/GameData")
+	var prog: Node = _n("/root/Progression")
+	prog.call("configura", prog.call("pathway"), 7)   # prossima = Sequenza 6
+	var ov: CanvasLayer = _pagina()
+	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
+	var mio: String = str(prog.call("pathway"))
+	assert_eq(pag.call("cella_stato", mio, 6), "prossima", "la Sequenza subito dopo: stato dedicato")
+	assert_eq(pag.call("cella_stato", mio, 5), "ignoto", "due Sequenze dopo: resta offuscata")
+	var seq6: Dictionary = gd.call("get_sequence", "%s_6" % mio)
+	var nome_atteso: String = str(gd.call("tr_data", seq6.get("name_i18n", "")))
+	assert_eq(str(pag.call("prossima_sequenza_nome")), nome_atteso,
+		"il nome mostrato combacia col nome reale della Sequenza 6")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	prog.call("configura", mio, 9)
+
+
+func test_prossima_sequenza_assente_a_sequenza_0() -> void:
+	var prog: Node = _n("/root/Progression")
+	prog.call("configura", prog.call("pathway"), 0)
+	var ov: CanvasLayer = _pagina()
+	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
+	assert_eq(str(pag.call("prossima_sequenza_nome")), "", "a Sequenza 0 non c'e' una prossima")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	prog.call("configura", prog.call("pathway"), 9)
+
+
+func test_prossima_sequenza_non_scrive_in_knowledgestore() -> void:
+	# La "prossima" e' un presagio calcolato al volo, non conoscenza appresa:
+	# non deve MAI comparire come flag persistente (US-719 la eredita' solo
+	# dai flag di KnowledgeStore, questa anteprima non deve influenzarla).
+	var prog: Node = _n("/root/Progression")
+	var kn: Node = _n("/root/KnowledgeStore")
+	prog.call("configura", prog.call("pathway"), 7)
+	var mio: String = str(prog.call("pathway"))
+	var ov: CanvasLayer = _pagina()
+	assert_false(bool(kn.call("conosce", "sequenza:%s:6" % mio)),
+		"vedere la 'prossima' non la scrive in KnowledgeStore")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	prog.call("configura", mio, 9)
+
+
 func test_fog_of_war_sugli_altri_pathway() -> void:
 	var gd: Node = _n("/root/GameData")
 	var prog: Node = _n("/root/Progression")

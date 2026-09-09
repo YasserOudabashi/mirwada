@@ -7278,3 +7278,42 @@ ancora):
   pannello di dettaglio sotto la Sequenza corrente, senza abilita' ne' altri
   dati. Nessuna primitiva/vocabolario nuovo, un file + una chiave i18n + un
   test in tests/test_book_ui.gd (o dove gia' testata questa pagina).
+
+=== IMPLEMENTATO: fog of war sui nomi di Sequenza (2026-09-09) ===
+Controllo di sicurezza PRIMA di agire (chiesto esplicitamente dall'utente):
+grep su tutto il repo per "noto"/"ignoto"/"corrente" -> solo
+page_diagramma_pathway.gd e il suo test le usano, nessun altro codice ne
+dipende. Controllato l'AC originale di US-224 (fase 2): non vieta ne'
+richiede questa eccezione, e' una precisazione legittima. Controllato US-719
+(fase 7, Blocco D, non ancora implementata): eredita SOLO i flag espliciti
+di KnowledgeStore, mai lo stato "vissuto" della Sequenza corrente -> la
+"prossima" doveva restare fuori da KnowledgeStore per non essere ereditata
+per errore da un nuovo personaggio. Controllato che GameData.get_sequence(id)
+gia' esiste e restituisce il dizionario con name_i18n: nessun nuovo metodo.
+Nessun test esistente assumeva "ignoto" proprio sulla cella (mio, seq-1).
+
+Implementazione in scripts/pages/page_diagramma_pathway.gd:
+- Nuovo stato "prossima" in _stato(): SOLO per (proprio Pathway, Sequenza
+  attuale - 1), e SOLO se nessun flag KnowledgeStore la rivela gia' per
+  intero (in quel caso resta "noto", reveal piu' ricco che vince).
+  A Sequenza 0 non c'e' prossima (mia_seq - 1 = -1, nessuna cella la
+  raggiunge: il range di n e' 9..0).
+- _prossima_nome (var interna) calcolato SOLO al render, mai scritto in
+  KnowledgeStore: non e' conoscenza appresa, e' un presagio del proprio
+  cammino. Non entra nell'eredita' di US-719.
+- Riga in piu' nel pannello di dettaglio: "<BOOK_DIAGRAMMA_PROSSIMA> <nome>",
+  mostra SOLO il nome (tr_data di name_i18n), mai abilita' o altri dati
+  della prossima Sequenza.
+- Colore dedicato C_PROSSIMA per la cella nella griglia (tra C_NOTO e
+  C_IGNOTO).
+- Getter prossima_sequenza_nome() interrogabile dai test.
+- assets/i18n/strings.csv: +1 chiave (BOOK_DIAGRAMMA_PROSSIMA) it+en,
+  .translation rigenerati (godot --headless --editor --quit-after 3).
+- tests/test_page_diagramma.gd: 3 test nuovi (rivela solo il nome della
+  Sequenza subito dopo, non quella dopo ancora; assente a Sequenza 0; non
+  scrive in KnowledgeStore).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning
+  invariati - nessuna modifica ai dati di gioco, solo UI/codice + i18n
+  chrome). 755 test headless (752 + 3), tutti verdi, nessuna regressione.
+- File toccati: scripts/pages/page_diagramma_pathway.gd,
+  assets/i18n/strings.csv + .translation, tests/test_page_diagramma.gd.
