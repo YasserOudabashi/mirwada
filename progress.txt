@@ -8173,3 +8173,109 @@ riprendere alla prossima sessione se non arriva prima.
 PROSSIMA STORIA: US-807 — le altre quattro regioni disegnate e popolate
 (Marche del Crepuscolo, Valle Madre, Archivio Sepolto, Frontiera delle
 Porte), ciascuna con identita' propria e nemici/oggetti della sua fascia.
+
+=== Decisione sulla grafica (Blocco E) presa dall'utente ===
+
+La domanda aperta sulla grafica (vedi sopra) e' stata risposta: l'utente
+ha scelto una combinazione di tre strade quando si arrivera' al Blocco E
+(US-812/813) — generatore Pillow piu' raffinato (piu' strati, ombreggiatura
+a bande, dithering), luci/particellari veri via Godot (Light2D, GPUParticles2D
+per torce/fumo, indipendenti dalla qualita' degli sprite), e una ricerca di
+asset pack CC0 da integrare dove compatibili. Da ridiscutere con l'utente
+CON LE OPZIONI CONCRETE quando ci si arriva (richiesto esplicitamente:
+"per ora queste poi quando arriviamo li rifammi la domanda"), non prima.
+
+L'utente ha anche chiesto di spezzare US-807 in 4 story (una per regione)
+PRIMA di iniziarla, per restare nel budget di una context window a story
+(regola 3 di CLAUDE.md — vedi commit `090795f`, `006_PRD/prd-fase-8-
+vertical-slice.md` e `prd.json` aggiornati con US-807a..d al posto della
+singola US-807).
+
+=== US-807a: Marche del Crepuscolo - layout + popolazione (fase 8, Blocco B) ===
+
+COSA FATTO.
+- data/world/layouts/marche_crepuscolo.json: seconda regione con layout
+  (dopo Mirwada, US-805/US-806), stesso formato, ZERO codice nuovo — prova
+  che l'architettura di US-805/US-806 regge su una seconda regione senza
+  toccare region_scene.gd/enemy.gd/item_pickup.gd/game_data.gd. Disegnata
+  a mano con lo stesso procedimento di Mirwada: script Python usa e getta
+  nello scratchpad genera la griglia 48x36, valida a mano contro le stesse
+  regole del validator PRIMA di scrivere il file vero (un primo tentativo
+  aveva un ostacolo casuale sopra la cella del passaggio verso mirwada,
+  corretto liberando un piccolo corridoio vicino a spawn/passaggio prima
+  dello scatter casuale).
+  10 zone (una per location_tag di regions.json['marche_crepuscolo']): 8
+  zone di "brughiera" (altura, luogo_di_battaglia, tempio_abbandonato,
+  rovina, luogo_in_decadenza, vetta, luogo_di_massacro, soglia_del_
+  crepuscolo) come rettangoli 8x14 con ostacoli 'o'/'t' sparsi casualmente
+  (seed fisso, riproducibile) — CORREZIONE rispetto al piano: con 10 zone
+  su una griglia 48x36 non c'e' spazio per curare ognuna come le 5 di
+  Mirwada, quindi solo le 2 zone che contano narrativamente sono distinte:
+  'cripta' (stanza 8x8 murata con un varco di 2 celle sul lato sud — il
+  varco NON e' agganciato tecnicamente alla posizione dell'AreaGate reale,
+  che region_scene.gd::_crea_gate() posiziona con una formula generica
+  indipendente dal layout, esattamente come per ogni altra regione oggi:
+  e' solo continuita' narrativa/visiva) e 'trono_del_gigante' (8x8,
+  pavimento variante ',' aperto, dove sta il boss).
+  Spawn [4,4] (continuita' con Mirwada), unico passaggio verso 'mirwada'
+  a [4,6] (una regione a raggio ha un solo passaggio, non 4 come l'hub).
+- nemici: 6 di Sequenza 9/8 (mix, 3+3), sparsi nelle 6 delle 8 zone di
+  brughiera (>=8 celle dallo spawn, stessa regola di US-806), + 1 boss
+  Sequenza 7 dentro trono_del_gigante, override identico nello schema a
+  quello di Mirwada (danno_attacco 15 = +50% del base 10, raggio_aggro
+  200, scala 1.5), ma tag "non_morto" (non "bestia": vocabolario di
+  data/tags.json, tema brughiera/cripte) e caratteristica del gruppo
+  eternal_darkness (pathway_id "twilight_giant", scelto perche' e' gia' il
+  Pathway "banco di prova" di tutta la vertical slice e Marche ha gia'
+  trono_del_gigante fra i suoi location_tags — coerenza tematica).
+- oggetti: 8 moneta_comune (quantita' 1-3), sparse su tutte le 8 zone di
+  brughiera, una per zona, celle diverse da quelle dei nemici (nessuna
+  collisione, verificato nello script di generazione).
+- tests/test_layouts.gd: 6 test nuovi dedicati a marche_crepuscolo, stesso
+  stile esplicito (non parametrico) di quelli di mirwada: dipintura (bordo
+  solido, brughiera calpestabile, muro della cripta solido, varco della
+  cripta calpestabile), spawn+passaggio dal layout, nemici con Sequenza
+  giusta + boss riconoscibile (scala, sequenza, _cfg.danno_attacco/tag/
+  caratteristica.pathway_id dopo l'override), oggetti raccolti in
+  Inventory, area_cleared alla morte dell'ultimo nemico, nemici inerti
+  senza Player. Esteso anche test_get_layout_presente_e_assente per
+  includere marche_crepuscolo fra le regioni con layout.
+
+COME VERIFICATO.
+- python tools/validate_data.py: 0 errori, un warning in meno (marche_
+  crepuscolo ora ha un layout: restano archivio_sepolto/frontiera_porte/
+  valle_madre, attesi fino a US-807b/c/d).
+- godot --headless --import: pulito.
+- Suite: 812 test, tutti passati (806 + 6 nuovi). Nessuna regressione su
+  test_regions.gd/test_area_gate.gd (istanziano tutte e 5 le regioni
+  headless).
+- VERIFICA A SCHERMO REALE (Xvfb, script di QA non committato): PRIMO
+  TENTATIVO con un Node2D nudo come player finto -> la telecamera non si
+  muoveva (nessun Camera2D figlio), 3 screenshot identici. CORRETTO
+  istanziando il vero scenes/player.tscn (che porta il suo Camera2D):
+  3 screenshot mandati in chat mostrano davvero contenuto diverso -
+  brughiera con ostacoli sparsi, l'ammasso di muri della cripta, il trono
+  del gigante col boss e i pickup (diamanti gialli) visibili. Contati a
+  runtime: 7 nemici (6+boss) e 8 oggetti spawnati, come da dati.
+
+CORREZIONI rispetto al piano approvato.
+- Le 8 zone di "brughiera" sono rettangoli semplici con ostacoli sparsi
+  casualmente, non 8 quartieri distinti come i 5 di Mirwada: dichiarato
+  esplicitamente nel piano stesso per restare nel budget di una story con
+  10 zone invece di 5.
+- Nessun controllo nuovo nel validator per l'allineamento varco-cripta/
+  posizione dell'AreaGate: la posizione del gate resta una formula
+  generica indipendente dal layout (invariata da prima di questa story),
+  quindi non c'e' nulla da validare in piu' — il piano lo aveva gia'
+  anticipato nel Context.
+
+COSA RESTA APERTO (dichiarato, non di questa story).
+- Valle Madre, Archivio Sepolto, Frontiera delle Porte restano piatte
+  (fallback) fino a US-807b/c/d.
+- drop resta vuoto per contratto (US-809 lo popola).
+- La resa grafica vera (torce, particellari, sprite rifiniti) resta
+  rimandata al Blocco E con la decisione presa sopra.
+
+PROSSIMA STORIA: US-807b — Valle Madre, layout + popolazione (fiume e
+ponti di radici, gruppo goddess_of_origin, boss Sequenza 7 del Pathway
+Mother).
