@@ -273,20 +273,98 @@ Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 
 ---
 
-## Fase 7 — Endgame (~20 story)
+## Fase 7 — Endgame — CHIUSA (21 story, 776 test)
 
-- Cambio Pathway con `fusion_rules` data-driven
-- Sequenze alte: autorita', seguaci, preghiere
-- Unicita' della Sequenza 0: l'NPC che occupa il posto
-- Tribolazioni ai salti di fascia
-- Finali multipli, incluso il game over per follia con eredita' al personaggio
-  successivo
+> **PRD**: `006_PRD/prd-fase-7-endgame.md`. Chiusa il 2026-09-09: 21 story
+> (`US-701..721`) in 5 blocchi (0 fondamenta, A cambio Pathway + fusione,
+> B tribolazioni, C Sequenze alte/preghiere + siti rituali, D finali +
+> eredita', E checkpoint + chiusura). Save `schema_version` **21 -> 22**
+> con UNA `_migra_21_a_22` (US-701, l'unico bump: cambio Pathway, fusioni,
+> tribolazioni superate, eredita', finale stanno tutti nel campo `endgame`).
+>
+> **Cosa contiene**:
+> - Cambio di Pathway (`PathwayChange`) solo tra vicini dello stesso gruppo,
+>   sotto una soglia di Sequenza; conserva le abilita' delle Sequenze basse
+>   del vecchio Pathway. Fusione (`FusionEngine`) data-driven da
+>   `data/fusions/*.json`: 1 percorso completo (`error_door`, 6 abilita' fuse),
+>   7 stub dichiarati (fase 7b).
+> - Tribolazioni ai salti di fascia (Seq 7->6, 5->4, 3->2, 1->0):
+>   `TribulationSystem`, lettore puro di eventi/flag, blocca
+>   `Progression.avanza` finche' non superate; le 4 di contenuto con
+>   handicap temporaneo e overlay nel libro.
+> - Sequenze alte come contenuto: 6 abilita' di "preghiera" (campo
+>   puramente semantico) su primitive gia' esistenti; i siti rituali di
+>   Sequenza 0 spostati dai tag generici a 4 siti condivisi per gruppo,
+>   coerenti con l'antagonista e col cambio Pathway.
+> - I 3 finali (Apoteosi, Consumazione = il game over per follia,
+>   Rinuncia) come dati (`data/endings.json`), valutati e scelti da
+>   `EndingSystem` (nessun tipo di condizione nuovo); schermata di finale
+>   che estende il colophon (non un tipo di pagina nuovo); eredita' al
+>   personaggio successivo (conoscenza sempre, Ancora a forza dimezzata,
+>   reputazione dimezzata e un oggetto per il profilo "completo") scelta
+>   dal giocatore e riapplicata a un nuovo personaggio sullo stesso slot.
+> - Fog of war sui nomi di Sequenza nel diagramma del libro: si conosce al
+>   massimo il nome della Sequenza immediatamente successiva alla propria
+>   (richiesta utente in corsa, non pianificata nel PRD originale).
+> - Vocabolari chiusi nuovi: `tribulation_effects.json`, `prayer_effects.json`,
+>   gli enum `fusion`/`ending`/`eredita_profilo`. Schema nuovi:
+>   `fusion.schema.json`, `tribulation.schema.json`, `ending.schema.json`.
+> - **Verdetto del checkpoint (US-720)**: l'endgame e' dati. Un personaggio
+>   attraversa cambio Pathway + fusione, una tribolazione superata, un
+>   finale raggiunto e l'eredita' riapplicata a un nuovo personaggio, senza
+>   una riga di codice che nomini un Pathway/una fusione/una tribolazione/
+>   un finale specifico. `scripts/ability_engine.gd` non toccato in tutta
+>   la fase.
 
 ---
 
-## Fase 8 — Opzionale
+## Fase 8 — Vertical slice giocabile (IN CORSO)
+
+> PRD: `006_PRD/prd-fase-8-vertical-slice.md` (14 story, US-801..US-814).
+> Istruzioni operative per eseguirlo: `006_PRD/prossimi-passi.md`.
+
+Le fasi 1-7 hanno costruito **tutti i sistemi** del gioco, provati da 776
+test headless. **Ma nessuno puo' giocarlo con la tastiera**: `main.tscn` e'
+rimasta la scena di prova della fase 1. Diagnosi fatta il 2026-09-09
+giocando davvero il gioco (Xvfb + screenshot) e con tre esplorazioni del
+codice — sei blocchi, tutti verificati `file:riga` nel PRD:
+
+1. L'avvio non avvia una partita (`Book.apri()`/`GameState.nuova_partita()`
+   non sono mai chiamati; nessuna scelta del Pathway alla creazione).
+2. Nessun tasto lancia un'abilita' (`AbilityEngine.execute` esiste, nessun
+   input lo raggiunge).
+3. Proiettili e archi non fanno danno (nessun `collision_mask`, nessun
+   `area_entered`: solo `hitbox.gd` colpisce davvero).
+4. La recitazione si ferma a ~1.5%: `enemy_defeated` e' emesso con payload
+   `{}`, quindi il filtro `senza_abilita` non matcha mai; e
+   `damage_absorbed_for_ally` non ha emettitori (nessun alleato in scena).
+5. **Nessuno puo' salire di Sequenza**: `PotionSystem.concoct/bevi` non ha
+   UI, e i **299 ingredienti** delle 100 formule non esistono come oggetti.
+6. Il mondo e' un pavimento piatto generato dal codice: 0 nemici e 0
+   oggetti nelle 5 regioni, NPC = quadrati blu, sprite diagnostici.
+
+**Cosa fa la fase 8**: collega i sistemi gia' scritti in una partita
+giocabile, riempie i dati mancanti, e mette una grafica provvisoria
+generata. **Zero sistemi nuovi**, zero primitive/eventi/tag nuovi, save
+`schema_version` **22 invariato**.
+
+7 blocchi: 0 avvio + controlli (avvio di partita con scelta del Pathway,
+abilita' a tastiera + hotbar, proiettili che colpiscono), A recitazione
+(payload veri di `enemy_defeated`, `item_crafted`/`ritual_completed`/
+`area_cleared`, `tg_9_protettore` riscritta nei dati), B mondo (mappe ASCII
+disegnate a mano in `data/world/layouts/`, nemici/boss/oggetti dai dati),
+C economia (i 299 ingredienti diventano oggetti con almeno una fonte:
+drop, listini, raccolta), D pagine del libro (sezione Avanzamento con
+Prepara/Bevi, negozio compra/vendi nel dialogo), E grafica (pixel art
+procedurale deterministica, stessa geometria dei fogli attuali), F verifica
+giocata end-to-end + chiusura.
+
+---
+
+## Fase 9 — Opzionale
 
 Pathway Non-Standard (Eternal Aeon, Chaos Primogenitor, Scrooge, Dreamless e
 gli altri bestowers). Meccanica diversa: avanzamento per **Boon** invece che
 per pozione, quindi non e' solo contenuto ma un secondo sistema di
-progressione. Da fare solo a fasi 1-7 chiuse.
+progressione. Le fasi 1-7 sono chiuse: sbloccata, ma opzionale — il PRD
+dettagliato si genera con `/prd` solo quando si decide di farla davvero.

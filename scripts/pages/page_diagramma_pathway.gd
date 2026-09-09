@@ -7,7 +7,11 @@ extends VBoxContainer
 ##   * la propria colonna, dalle Sequenze 9 fino a quella corrente (le ha
 ##     vissute),
 ##   * oppure un flag in KnowledgeStore ("pathway:<id>" o "sequenza:<id>:<n>").
-## Il resto e' offuscato.
+## Il resto e' offuscato, con UNA eccezione: il nome (solo il nome, mai le
+## abilita') della Sequenza immediatamente successiva alla propria, sul
+## proprio Pathway soltanto ("prossima" - un presagio, non conoscenza
+## acquisita: non entra in KnowledgeStore, quindi non si eredita a fine
+## partita, US-719).
 ##
 ## La Sequenza corrente e' evidenziata e le sue abilita' sono elencate sotto.
 ## Nessun nome di Pathway/Sequenza hardcoded: solo id e chiavi i18n.
@@ -15,9 +19,17 @@ extends VBoxContainer
 const C_NOTO := Color(0.74, 0.67, 0.5)
 const C_IGNOTO := Color(0.22, 0.2, 0.17)
 const C_CORRENTE := Color(0.4, 0.76, 0.82)
+const C_PROSSIMA := Color(0.5, 0.42, 0.3)
 
-var _stati: Dictionary = {}   # "pid:n" -> "noto" | "ignoto" | "corrente"
+var _stati: Dictionary = {}   # "pid:n" -> "noto" | "ignoto" | "corrente" | "prossima"
 var _abilita: Array = []
+## Fog of war sui nomi di Sequenza (CLAUDE.md, richiesta utente 2026-09-09).
+## Il giocatore puo' conoscere al massimo il nome della Sequenza immediatamente
+## successiva alla propria, sul proprio Pathway soltanto: mai le sue abilita'
+## o altri dettagli, mai Sequenze piu' lontane. Calcolato al volo da
+## Progression, MAI scritto in KnowledgeStore: US-719 (eredita' al personaggio
+## successivo, fase 7) eredita solo i flag imparati li', non questa anteprima.
+var _prossima_nome: String = ""
 ## US-708: i Pathway vicini verso cui si puo' fondere. Ogni voce:
 ## { id, scritto (percorso di fusione non-stub), puo (PathwayChange.puo_cambiare) }.
 var _vicini: Array = []
@@ -29,6 +41,7 @@ func aggiorna() -> void:
 	_stati.clear()
 	_abilita.clear()
 	_vicini.clear()
+	_prossima_nome = ""
 
 	var gd: Node = _n("/root/GameData")
 	var prog: Node = _n("/root/Progression")
@@ -71,6 +84,12 @@ func aggiorna() -> void:
 			var nome: String = str(gd.call("tr_data", ab.get("name_i18n", aid)))
 			_abilita.append(nome)
 			add_child(_riga("· " + nome))
+
+		if mia_seq > 0:
+			var prossima: Dictionary = gd.call("get_sequence", "%s_%d" % [mio, mia_seq - 1])
+			if not prossima.is_empty():
+				_prossima_nome = str(gd.call("tr_data", prossima.get("name_i18n", "")))
+				add_child(_riga("%s %s" % [tr("BOOK_DIAGRAMMA_PROSSIMA"), _prossima_nome]))
 
 		_sezione_fusione(gd, prog, mio, pw)
 
@@ -151,6 +170,10 @@ func abilita_elencate() -> Array:
 	return _abilita.duplicate()
 
 
+func prossima_sequenza_nome() -> String:
+	return _prossima_nome
+
+
 func testo_visibile() -> String:
 	return "diagramma"
 
@@ -165,13 +188,19 @@ func _stato(pid: String, n: int, mio: String, mia_seq: int, kn: Node) -> String:
 	if kn != null and (kn.call("conosce", "pathway:%s" % pid)
 			or kn.call("conosce", "sequenza:%s:%d" % [pid, n])):
 		return "noto"
+	if pid == mio and n == mia_seq - 1:
+		return "prossima"
 	return "ignoto"
 
 
 func _cella_cella(stato: String) -> Control:
 	var r := ColorRect.new()
 	r.custom_minimum_size = Vector2(44, 13)
-	r.color = C_CORRENTE if stato == "corrente" else (C_NOTO if stato == "noto" else C_IGNOTO)
+	match stato:
+		"corrente": r.color = C_CORRENTE
+		"noto": r.color = C_NOTO
+		"prossima": r.color = C_PROSSIMA
+		_: r.color = C_IGNOTO
 	return r
 
 

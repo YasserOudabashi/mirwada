@@ -2,7 +2,7 @@
   "schema_version": 1,
   "id": "dlg_antagonista",
   "start": "n1",
-  "_comment": "UN solo grafo per l'antagonista di OGNI Pathway (fase 7, US-712), NON 22. Il colore del Pathway arriva dal nome (data/lore/antagonisti.json, get_antagonista) mostrato come speaker; il testo resta generico. L'ultima scelta - visibile solo a tier angel - pone il flag 'tribolazione_soglia_varcata' che chiude la tribolazione 1->0.",
+  "_comment": "UN solo grafo per l'antagonista di OGNI Pathway (fase 7, US-712), NON 22. Il colore del Pathway arriva dal nome (data/lore/antagonisti.json, get_antagonista) mostrato come speaker; il testo resta generico. La scelta 'varca' - visibile solo a tier angel - pone il flag 'tribolazione_soglia_varcata' che chiude la tribolazione 1->0. La scelta 'rinuncia' (US-716, fase 7 Blocco D), stessa condizione, pone 'pozione_distrutta': il finale Rinuncia.",
   "nodes": {
     "n1": {
       "speaker": "npc_antagonista",
@@ -19,6 +19,17 @@
             { "tipo": "flag", "id": "tribolazione_soglia_varcata", "valore": true }
           ],
           "goto": "n2"
+        },
+        {
+          "text": "Non voglio quello che hai. Rompo la mia pozione qui, davanti a te.",
+          "text_i18n": "dialogue.antagonista.n1.rinuncia",
+          "condizioni": [
+            { "tipo": "tier_min", "valore": "angel" }
+          ],
+          "effetti": [
+            { "tipo": "flag", "id": "pozione_distrutta", "valore": true }
+          ],
+          "goto": null
         },
         {
           "text": "Non ancora. Ma verro'.",

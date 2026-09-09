@@ -109,6 +109,15 @@ func da_salvataggio(raw: Variant) -> void:
 	cambiato.emit()
 
 
+## US-719: wrapper pubblico di _leggi_eredita, per chi deve sanitizzare un
+## contratto di eredita' letto da un ALTRO save (GameState.nuova_partita,
+## che legge lo slot precedente prima di sovrascriverlo) senza passare da
+## da_salvataggio() (che sostituirebbe anche pathway_precedente/fusioni/ecc.
+## di QUESTO EndgameState, che per il nuovo personaggio deve restare vuoto).
+func eredita_sanitizzata(raw: Variant) -> Dictionary:
+	return _leggi_eredita(raw)
+
+
 ## Il contratto di eredita' e' il pezzo piu' delicato: lo legge un save che
 ## l'utente puo' avere modificato per iniziare la partita successiva "ricco".
 func _leggi_eredita(raw: Variant) -> Dictionary:

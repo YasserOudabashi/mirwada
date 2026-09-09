@@ -679,7 +679,8 @@
         "difesa": 1.0
       },
       "abilities": [
-        "tg_autorita_crepuscolo"
+        "tg_autorita_crepuscolo",
+        "tg_giuramento_del_crepuscolo"
       ],
       "acting_actions": [
         {
@@ -706,7 +707,7 @@
       },
       "advancement_ritual": {
         "location_tags": [
-          "trono_del_gigante"
+          "soglia_del_crepuscolo"
         ],
         "momento": null,
         "fase_lunare": "eclissi",

@@ -10,7 +10,12 @@
 > **Decisione n.6 (roster 8)**: tenuti tutti e otto.
 > **Decisione n.9 (antagonista)**: strutturale — il detentore precedente della
 > Sequenza 0 del Pathway del giocatore, uno per Pathway in
-> `data/lore/antagonisti.json`, solo indizi (nessun boss: fase 7).
+> `data/lore/antagonisti.json`, solo indizi (nessun boss).
+>
+> **§5 (tribolazioni, finali, eredita') REALIZZATO in fase 7** (US-701..721,
+> chiusa il 2026-09-09): `TribulationSystem`, `data/endings.json` +
+> `EndingSystem`, eredita' al personaggio successivo (decisione n.8, ora
+> CHIUSA). Vedi `006_PRD/prd-fase-7-endgame.md`.
 
 Figlio di `design-master.md`. Materia di fase 6; il roster e i contratti si
 fissano ora perche' i dati li citano gia' (sussurri a soglia 55 che usano i
@@ -109,19 +114,22 @@ le fasce di tier:
   su cosa stai diventando. Aldo avanza in parallelo e il confronto diventa
   inevitabile. I rituali cominciano a chiedere luoghi veri e sacrifici veri.
 - **Atto III — la soglia (Seq 3-1, tier saint/angel).** La Frontiera delle
-  Porte. Le tribolazioni (roadmap fase 7). Il rituale di Sequenza 1 chiede
-  **un'Ancora** (gia' scritto nei dati del TG): la storia arriva dove la
-  meccanica aveva promesso. Doran sa. Lena capisce. Vesna sceglie.
+  Porte. Le tribolazioni — **REALIZZATO in fase 7** (`TribulationSystem`,
+  US-710/711/712). Il rituale di Sequenza 1 chiede **un'Ancora** (gia'
+  scritto nei dati del TG): la storia arriva dove la meccanica aveva
+  promesso. Doran sa. Lena capisce. Vesna sceglie.
 - **Finale — Sequenza 0.** Il rituale chiede "il detentore precedente della
   Sequenza 0" (gia' nei dati). Chi e', dove si trova e cosa significa
   sacrificarlo e' la rivelazione della trama principale.
 
-### I finali (con `data/endings.json`, fase 7)
+### I finali (con `data/endings.json`) — REALIZZATO in fase 7 (US-716..719)
 
 1. **Apoteosi** — Sequenza 0 raggiunta. Vinci, e il costo e' esattamente la
    lista delle Ancore spese per arrivarci.
-2. **Consumazione** — follia a 100: game over *con eredita'* (roadmap fase 7)
-   al personaggio successivo. Cosa si eredita e' la decisione aperta n. 8.
+2. **Consumazione** — follia a 100: game over *con eredita'* al personaggio
+   successivo. Cosa si eredita (decisione aperta n. 8, **CHIUSA**): sempre
+   la conoscenza, e per questo profilo anche un'Ancora a forza dimezzata,
+   la reputazione dimezzata e un oggetto scelto.
 3. **Rinuncia** — il finale umano: fermarsi, distruggere la pozione,
    restare a una Sequenza mortale. Sbloccato dalle Ancore mantenute vive.
    E' il finale che da' senso a Lena.
@@ -129,15 +137,13 @@ le fasce di tier:
 Varianti di epilogo per gruppo di pathway (4 varianti, non 10: il gruppo
 decide il sapore dell'apoteosi).
 
-### L'antagonista (decisione aperta n. 9 del master)
+### L'antagonista — CHIUSA (decisione aperta n. 9 del master, fase 6 US-620)
 
-Tre candidati gia' nel cast, in ordine di raccomandazione:
-1. **il detentore precedente della Sequenza 0** del pathway del giocatore —
-   l'antagonista e' *strutturale*, gia' nei dati, e cambia con il pathway
-   scelto: massima rigiocabilita', zero contenuto sprecato;
-2. l'ordine di Ottavia, che colleziona Beyonder come colleziona testi;
-3. Doran come tragedia — l'uomo giusto dalla parte sbagliata (funziona meglio
-   come pressione costante che come boss finale).
+**il detentore precedente della Sequenza 0** del pathway del giocatore —
+l'antagonista e' *strutturale*, in `data/lore/antagonisti.json`, e cambia
+con il pathway scelto: massima rigiocabilita', zero contenuto sprecato.
+Nessun boss fight (fase 7, non-goal esplicito): solo indizi (chiavi i18n
+che dialoghi e libri lasciano cadere) e il sito del rituale di Sequenza 0.
 
 ## 6. Schema dati (forma, non contenuto)
 

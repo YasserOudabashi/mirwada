@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "_comment": "I 3 finali (fase 7, US-716). EndingSystem.valuta() sceglie, tra quelli con 'condizioni' tutte soddisfatte, quello con 'priorita' piu' alta. Consumazione ha la priorita' massima: e' un game over, deve vincere su qualunque altra condizione soddisfatta nello stesso istante (FR-10). Apoteosi e Rinuncia si escludono a vicenda nella pratica (una richiede tier_min god, l'altra presume di essersi fermati prima), ma la priorita' decide comunque se mai coincidessero. Rinuncia richiede anche 'almeno un'Ancora viva' (US-716): non e' un tipo di condizione nuovo (FR-9 lo vieta), e' una regola GENERICA su 'eredita_profilo' == 'ancore' applicata da EndingSystem a qualunque finale con quel profilo, mai un id di finale nominato nel codice (FR-15).",
+  "endings": [
+    {
+      "schema_version": 1,
+      "id": "consumazione",
+      "name_i18n": "ending.consumazione.name",
+      "condizioni": [
+        { "tipo": "madness_min", "valore": 100 }
+      ],
+      "priorita": 100,
+      "eredita_profilo": "completo",
+      "epiloghi_per_gruppo": {
+        "eternal_darkness_i18n": "ending.consumazione.epilogo_eternal_darkness",
+        "goddess_of_origin_i18n": "ending.consumazione.epilogo_goddess_of_origin",
+        "demon_of_knowledge_i18n": "ending.consumazione.epilogo_demon_of_knowledge",
+        "lord_of_mysteries_i18n": "ending.consumazione.epilogo_lord_of_mysteries"
+      }
+    },
+    {
+      "schema_version": 1,
+      "id": "apoteosi",
+      "name_i18n": "ending.apoteosi.name",
+      "condizioni": [
+        { "tipo": "tier_min", "valore": "god" },
+        { "tipo": "flag", "valore": "rituale_sequenza_0_completato" }
+      ],
+      "priorita": 50,
+      "eredita_profilo": "solo_conoscenza",
+      "epiloghi_per_gruppo": {
+        "eternal_darkness_i18n": "ending.apoteosi.epilogo_eternal_darkness",
+        "goddess_of_origin_i18n": "ending.apoteosi.epilogo_goddess_of_origin",
+        "demon_of_knowledge_i18n": "ending.apoteosi.epilogo_demon_of_knowledge",
+        "lord_of_mysteries_i18n": "ending.apoteosi.epilogo_lord_of_mysteries"
+      }
+    },
+    {
+      "schema_version": 1,
+      "id": "rinuncia",
+      "name_i18n": "ending.rinuncia.name",
+      "condizioni": [
+        { "tipo": "flag", "valore": "pozione_distrutta" }
+      ],
+      "priorita": 10,
+      "eredita_profilo": "ancore",
+      "epiloghi_per_gruppo": {
+        "eternal_darkness_i18n": "ending.rinuncia.epilogo_eternal_darkness",
+        "goddess_of_origin_i18n": "ending.rinuncia.epilogo_goddess_of_origin",
+        "demon_of_knowledge_i18n": "ending.rinuncia.epilogo_demon_of_knowledge",
+        "lord_of_mysteries_i18n": "ending.rinuncia.epilogo_lord_of_mysteries"
+      }
+    }
+  ]
+}

@@ -40,6 +40,10 @@
         }
       }
     },
-    "note": { "type": "string" }
+    "note": { "type": "string" },
+    "preghiera": {
+      "_comment": "US-714: opzionale, Sequenze 3-0. Nomina una voce di data/schema/prayer_effects.json (vocabolario chiuso). Puramente semantico + i18n: l'effetto meccanico lo fanno le 'primitive' dell'abilita', il validator verifica solo la coerenza tra i due.",
+      "type": "string"
+    }
   }
 }

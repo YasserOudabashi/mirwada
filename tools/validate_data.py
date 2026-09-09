@@ -443,6 +443,56 @@ def main():
                 err(f"data/tribulations/: {n} tribolazioni per il salto {da}->{salti_attesi[da]} "
                     f"({salti_visti[da]}): ne serve UNA sola")
 
+    # --- finali (data/endings.json, fase 7 US-716) ---
+    # 3 voci esatte (FR-9), condizioni dal vocabolario di conditions.gd (nessun
+    # tipo nuovo), eredita_profilo nell'enum, epiloghi_per_gruppo copre i 4
+    # gruppi di Pathway attivi. 'rituale_sequenza_0_completato' e' posto dal
+    # CODICE (EndingSystem ascolta RitualSystem, non un dialogo/quest): unico
+    # flag esente dalla riconciliazione con flag_scritti qui sotto.
+    ENDING_COND = TRIB_COND
+    ENDING_IDS = {"apoteosi", "consumazione", "rinuncia"}
+    EREDITA_PROFILI = {"completo", "ancore", "solo_conoscenza"}
+    GRUPPI_ATTIVI = {"eternal_darkness_i18n", "goddess_of_origin_i18n",
+                      "demon_of_knowledge_i18n", "lord_of_mysteries_i18n"}
+    FLAG_ENDING_ESENTI = {"rituale_sequenza_0_completato"}
+    ending_flags = []   # (rel, eid, flag) da riconciliare coi flag scritti (come trib_flags)
+    end_doc = load_json(os.path.join(DATA, "endings.json"))
+    if end_doc is None:
+        err("data/endings.json: mancante o illeggibile (fase 7, US-716).")
+    else:
+        endings = end_doc.get("endings", [])
+        seen_ids = set()
+        for e in endings:
+            eid = e.get("id")
+            rel = "data/endings.json"
+            if eid in seen_ids:
+                err(f"{rel}: id finale duplicato '{eid}'")
+            seen_ids.add(eid)
+            for c in e.get("condizioni", []):
+                ct = c.get("tipo") if isinstance(c, dict) else None
+                if ct not in ENDING_COND:
+                    err(f"{rel} [{eid}]: condizione di tipo sconosciuto '{ct}' "
+                        f"(vocabolario di conditions.gd: {sorted(ENDING_COND)})")
+                if ct == "flag":
+                    flag = c.get("valore")
+                    if not isinstance(flag, str) or not flag:
+                        err(f"{rel} [{eid}]: condizione 'flag' senza 'valore' valido")
+                    elif flag not in FLAG_ENDING_ESENTI:
+                        ending_flags.append((rel, eid, flag))
+            if e.get("eredita_profilo") not in EREDITA_PROFILI:
+                err(f"{rel} [{eid}]: eredita_profilo '{e.get('eredita_profilo')}' "
+                    f"non nell'enum {sorted(EREDITA_PROFILI)}")
+            epg = e.get("epiloghi_per_gruppo", {})
+            mancanti = GRUPPI_ATTIVI - set(epg)
+            extra = set(epg) - GRUPPI_ATTIVI
+            if mancanti:
+                err(f"{rel} [{eid}]: epiloghi_per_gruppo manca {sorted(mancanti)}")
+            if extra:
+                err(f"{rel} [{eid}]: epiloghi_per_gruppo ha gruppi ignoti {sorted(extra)}")
+        if seen_ids != ENDING_IDS:
+            err(f"data/endings.json: attesi esattamente i finali {sorted(ENDING_IDS)}, "
+                f"trovati {sorted(seen_ids)} (FR-9)")
+
     # --- abilita' ---
     adir = os.path.join(DATA, "abilities")
     ability_ids = set()
@@ -545,6 +595,28 @@ def main():
                     obtainable_tags.add(t)
                 if not ab.get("tag_sinergia"):
                     err(f"{rel} [{aid}]: nessun tag_sinergia. Un'abilita' senza tag e' invisibile al motore delle sinergie.")
+
+                # US-714: preghiera (Sequenze alte) - puramente semantica/i18n,
+                # ma deve essere nel vocabolario e coerente con le primitive
+                # dell'abilita' (data/schema/prayer_effects.json).
+                pray = ab.get("preghiera")
+                if pray is not None:
+                    if pray not in valid_prayer_effects:
+                        err(f"{rel} [{aid}]: preghiera '{pray}' non nel vocabolario di "
+                            f"data/schema/prayer_effects.json")
+                    else:
+                        spec = _pray_doc["preghiere"][pray]
+                        prim_richiesta = spec.get("primitiva")
+                        prims_ab = ab.get("primitive", [])
+                        if prim_richiesta and not any(p.get("tipo") == prim_richiesta for p in prims_ab):
+                            err(f"{rel} [{aid}]: preghiera '{pray}' richiede una primitiva "
+                                f"'{prim_richiesta}', assente dall'abilita'")
+                        bersagli_richiesti = spec.get("richiede", {}).get("bersagli")
+                        if bersagli_richiesti and not any(
+                                p.get("tipo") == prim_richiesta and p.get("bersagli") == bersagli_richiesti
+                                for p in prims_ab):
+                            err(f"{rel} [{aid}]: preghiera '{pray}' richiede '{prim_richiesta}' "
+                                f"con bersagli '{bersagli_richiesti}'")
 
     for rel, sid, aid in ability_refs:
         if ability_ids and aid not in ability_ids:
@@ -1496,6 +1568,12 @@ def main():
         if flag not in flag_scritti:
             err(f"{rel} [{tid}]: superamento.flag '{flag}' non e' scritto da nessun dialogo o quest")
 
+    # US-716: la condizione 'flag' di un finale (eccetto quelli posti dal
+    # codice, FLAG_ENDING_ESENTI) deve essere scritta da un dialogo o una quest.
+    for rel, eid, flag in ending_flags:
+        if flag not in flag_scritti:
+            err(f"{rel} [{eid}]: condizione flag '{flag}' non e' scritta da nessun dialogo o quest")
+
     QUEST_EFF = {"flag", "item", "reputazione", "ancora", "apri_vendita"}
     for qid, q in quest_docs.items():
         rel = f"data/quests/{qid}.json"
@@ -2065,6 +2143,33 @@ def main():
     for _qid in ("q_mirco_01", "q_sidon_01", "q_vesna_01", "q_lena_01"):
         if not os.path.exists(os.path.join(DATA, "quests", f"{_qid}.json")):
             err(f"data/quests/{_qid}.json: quest di Atto I mancante (US-622).")
+
+    # --- chiusura fase 7 (US-721): l'endgame esiste ed e' coerente ---
+    FASE_7_DATA = [
+        "schema/fusion.schema.json", "schema/tribulation.schema.json",
+        "schema/ending.schema.json", "schema/tribulation_effects.json",
+        "schema/prayer_effects.json", "endings.json",
+    ]
+    for rel in FASE_7_DATA:
+        if not os.path.exists(os.path.join(DATA, rel)):
+            err(f"data/{rel}: file di dati della fase 7 mancante (US-721: la fase e' chiusa).")
+    if not os.path.isdir(os.path.join(DATA, "fusions")) or not os.listdir(os.path.join(DATA, "fusions")):
+        err("data/fusions/: cartella mancante o vuota (US-721).")
+    if not os.path.isdir(os.path.join(DATA, "tribulations")) or not os.listdir(os.path.join(DATA, "tribulations")):
+        err("data/tribulations/: cartella mancante o vuota (US-721).")
+    # door_error e' l'UNICO percorso di fusione completo (US-706): gli altri 7
+    # restano stub dichiarati per la fase 7b, il validator li conta (warning).
+    _fus_ed = load_json(os.path.join(DATA, "fusions", "door_error.json"))
+    if _fus_ed is None:
+        err("data/fusions/door_error.json: mancante (US-721: e' il percorso completo).")
+    elif bool(_fus_ed.get("stub", False)):
+        err("data/fusions/door_error.json: ancora stub - la fase 7 e' chiusa, questo "
+            "percorso deve essere completo (US-706/721).")
+    _end_doc = load_json(os.path.join(DATA, "endings.json"))
+    _end_ids = {e.get("id") for e in (_end_doc or {}).get("endings", [])}
+    if _end_ids != {"apoteosi", "consumazione", "rinuncia"}:
+        err(f"data/endings.json: attesi esattamente i 3 finali con la fase 7 chiusa, "
+            f"trovati {sorted(_end_ids)} (US-721).")
 
     report()
     return 1 if errors else 0

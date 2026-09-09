@@ -579,7 +579,8 @@
       },
       "abilities": [
         "death_sentenza",
-        "death_imperatore_resurrezione"
+        "death_imperatore_resurrezione",
+        "death_benedizione_dei_caduti"
       ],
       "acting_actions": [
         {
@@ -705,7 +706,7 @@
       },
       "advancement_ritual": {
         "location_tags": [
-          "tempio_abbandonato"
+          "soglia_del_crepuscolo"
         ],
         "momento": "notte_fonda",
         "fase_lunare": "eclissi",

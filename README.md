@@ -90,6 +90,28 @@ in codice dalla Sequenza 8 alla 2, zero righe che nominano il Pathway; il
 `git diff` del blocco A è solo `ability_engine.gd` +173 -0 (handler nuovi +
 ring buffer), il dispatcher intatto. PRD: `006_PRD/prd-fase-5b-lord-of-mysteries.md`.
 
+**Fase 7 — Endgame: chiusa.** 21 story, 776 test. Cambio di Pathway
+(`PathwayChange`) solo tra vicini dello stesso gruppo + fusione
+(`FusionEngine`, un percorso completo `error_door` con 6 abilità fuse, 7
+stub dichiarati per la fase 7b). `TribulationSystem` (lettore di eventi/
+flag) blocca l'avanzamento ai 4 salti di fascia finché la prova non è
+superata. Sequenze alte come contenuto: 6 abilità di "preghiera" su
+primitive già esistenti + 4 siti rituali di Sequenza 0 condivisi per
+gruppo. I 3 finali (`data/endings.json`: Apoteosi, Consumazione = il game
+over per follia, Rinuncia) valutati da `EndingSystem` (nessun tipo di
+condizione nuovo); schermata di finale che estende il colophon; eredità
+al personaggio successivo — conoscenza sempre, Ancora a forza dimezzata,
+reputazione dimezzata e un oggetto scelto (profilo completo) — riapplicata
+a un nuovo personaggio sullo stesso slot. Save **`schema_version` 21 → 22**
+(un solo bump: tutto il resto sta nel campo `endgame`).
+
+**Verdetto del checkpoint** (US-720, `tests/test_slice_fase_7.gd`): un
+personaggio attraversa l'intero ciclo — cambio Pathway con fusione, una
+tribolazione superata, un finale raggiunto, l'eredità riapplicata — con
+zero righe di codice che nominino un Pathway, una coppia di fusione, una
+tribolazione o un finale specifico. `ability_engine.gd` non è stato
+toccato in tutta la fase. PRD: `006_PRD/prd-fase-7-endgame.md`.
+
 ## Setup
 
 Richiede Godot 4.x e Python 3 (solo per gli strumenti di dati).
@@ -108,13 +130,18 @@ mano. Esce 0 se tutto passa, 1 al primo fallimento.
 ## Architettura in una riga
 
 Il codice implementa 28 primitive parametriche; i dati JSON le compongono in
-abilita'. Prova: tutti e 22 i Pathway attivi sono completi dalla Sequenza 9
-alla 0 con zero righe di codice dedicate (data/abilities/*.json).
+abilita'. Prova: tutti e 10 i Pathway attivi (100/100 Sequenze) sono
+completi dalla Sequenza 9 alla 0 con zero righe di codice dedicate
+(data/abilities/*.json) — e l'intero endgame di fase 7 (cambio Pathway,
+tribolazioni, finali) regge sulla stessa architettura.
 
 ## Documenti
 
 - `CLAUDE.md` — regole di lavoro, comandi, decisioni prese
-- `006_PRD/prd-fase-5b-lord-of-mysteries.md` — PRD dell'ultima fase chiusa
+- `006_PRD/prd-fase-8-vertical-slice.md` — **PRD della fase corrente** (vertical slice giocabile, 14 story)
+- `006_PRD/prossimi-passi.md` — **come eseguirla**: ordine delle operazioni, quando usare `/prd` e `/ralph`, setup, trappole note
+- `006_PRD/prd-fase-7-endgame.md` — PRD dell'ultima fase chiusa (fase 7)
+- `006_PRD/prd-fase-5b-lord-of-mysteries.md` — PRD della fase 5b (chiusa)
 - `006_PRD/prd-fase-6-mondo.md` — PRD della fase 6 (chiusa)
 - `006_PRD/prd-fase-2-pathway-core.md` — PRD della fase 2 (chiusa)
 - `006_PRD/prd-fase-1-fondamenta.md` — PRD della fase 1 (chiusa)
@@ -127,7 +154,7 @@ alla 0 con zero righe di codice dedicate (data/abilities/*.json).
 - `006_PRD/design-vfx.md` — identita' visiva delle abilita' (stile manhwa), 10 palette
 - `006_PRD/art-brief-gemini.md` — prompt pronti per generare concept/ritratti/UI con Gemini, con i limiti dichiarati
 - `data/audio.json` — sistema audio data-driven (tell sonori, follia, palette)
-- `006_PRD/roadmap.md` — fasi 2-8
+- `006_PRD/roadmap.md` — fasi 2-9
 - `prd.json` — story della fase corrente in formato ralph
 - `progress.txt` — memoria tra le sessioni
 - `docs/documentazione.py` — rigenera la documentazione docx; `diario.py` — diario del progetto

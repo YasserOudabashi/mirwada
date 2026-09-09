@@ -586,7 +586,8 @@
       },
       "abilities": [
         "door_chiave_di_ogni_luogo",
-        "door_porta_dove_non_ce"
+        "door_porta_dove_non_ce",
+        "door_anatema_del_varco"
       ],
       "acting_actions": [
         {
@@ -712,7 +713,7 @@
       },
       "advancement_ritual": {
         "location_tags": [
-          "nebbia_grigia"
+          "porta_senza_stanza"
         ],
         "momento": "notte_fonda",
         "fase_lunare": "eclissi",
