@@ -8279,3 +8279,77 @@ COSA RESTA APERTO (dichiarato, non di questa story).
 PROSSIMA STORIA: US-807b — Valle Madre, layout + popolazione (fiume e
 ponti di radici, gruppo goddess_of_origin, boss Sequenza 7 del Pathway
 Mother).
+
+=== US-807b: Valle Madre - layout + popolazione (fase 8, Blocco B) ===
+
+COSA FATTO.
+- data/world/layouts/valle_madre.json: terza regione con layout, ZERO
+  codice nuovo (stessa architettura di US-805/US-806/US-807a). 6 zone
+  (una per location_tag di regions.json['valle_madre']: bosco_antico,
+  radura_lunare, grotta_di_marea, sorgente, altare_di_radici, radice_del_
+  mondo), disegio a griglia 3x2 di rettangoli 14x15 — con solo 6 zone
+  (contro le 10 di Marche) c'e' stato margine per curare meglio 3 zone:
+  'grotta_di_marea' (acqua '~' su meta' zona, attraversata da un ponte di
+  radici '=' — il nome del gate esistente {tipo:primitiva,
+  primitiva:plant_growth, area:ponti_di_radici}, NON una zona a se
+  stante: 'ponti_di_radici'/'grotte_di_marea' del gating sono etichette
+  narrative del gate, indipendenti dai 6 location_tags richiesti come
+  zone), 'sorgente' (pavimento variante ',' con un piccolo specchio
+  d'acqua al centro), 'radice_del_mondo' (decoro calpestabile '+', stesso
+  trucco del sotterraneo di Mirwada). bosco_antico/radura_lunare/altare_
+  di_radici: vegetazione con ostacoli 'o' sparsi (seed fisso).
+  Spawn [4,4], passaggio verso 'mirwada' a [4,6] (continuita' con Marche).
+- nemici: 6 di Sequenza 9/8 (3+3) sparse in bosco_antico/radura_lunare/
+  sorgente/grotta_di_marea (>=8 celle dallo spawn) + 1 boss Sequenza 7
+  dentro altare_di_radici (un altare si presta bene a un guardiano),
+  override danno_attacco 15/raggio_aggro 200/scala 1.5 (stesso schema dei
+  boss precedenti), tag "bestia" (natura, coerente col gruppo
+  goddess_of_origin) e caratteristica del Pathway "mother" (Sequenza 7,
+  garantita) — scelto perche' 'valle_madre' e "mother" condividono il
+  nome/tema (Madre), coerenza tematica come per twilight_giant a Marche.
+- oggetti: 7 moneta_comune sparse su tutte e 6 le zone naturali (una in
+  piu' su bosco_antico), quantita' 1-3.
+- tests/test_layouts.gd: 6 test nuovi dedicati a valle_madre (dipintura
+  incluso il ponte di radici che attraversa l'acqua, spawn+passaggio,
+  nemici+boss via _cfg, oggetti in Inventory, area_cleared, nemici inerti
+  senza player). Esteso test_get_layout_presente_e_assente (valle_madre
+  ora ha layout, archivio_sepolto e' il nuovo esempio "senza"). CORRETTO
+  test_regione_senza_layout_resta_invariata: usava valle_madre come
+  esempio di regione senza layout, ora non e' piu' vero -> spostato su
+  archivio_sepolto (ancora senza fino a US-807c).
+
+COME VERIFICATO.
+- python tools/validate_data.py: 0 errori, warning in meno (valle_madre
+  ora ha un layout: restano archivio_sepolto/frontiera_porte).
+- godot --headless --import: pulito.
+- Suite: 818 test, tutti passati (812 + 6 nuovi). Nessuna regressione
+  (test_regions.gd/test_area_gate.gd/test_audio_mondo.gd che nominano
+  valle_madre non assumevano l'assenza di layout, solo region_id/scena).
+- VERIFICA A SCHERMO REALE (Xvfb, script di QA non committato): 3
+  screenshot mandati in chat (grotta di marea con l'acqua, la sorgente, e
+  l'altare di radici col boss — visibilmente piu' grande dei nemici
+  normali grazie alla scala 1.5). SCOPERTA IN CORSO D'OPERA: il primo
+  tentativo con 2-3 `await process_frame` per teletrasporto produceva
+  ancora 3 screenshot quasi identici nonostante l'uso del vero
+  scenes/player.tscn (con Camera2D) — non era il bug del "player finto"
+  di US-806/US-807a, stavolta era lo SMOOTHING della camera
+  (scripts/game_camera.gd, position_smoothing_speed=5.0): con un salto
+  grande, 2-3 frame non bastano perche' la convergenza esponenziale
+  arrivi a destinazione. Risolto chiamando
+  player.get_node("Camera2D").reset_smoothing() dopo ogni teletrasporto
+  prima dello screenshot. Aggiunta come trappola #13 in
+  006_PRD/prossimi-passi.md per non riscoprirla a ogni regione.
+
+CORREZIONI rispetto al piano approvato.
+- Nessuna deviazione sostanziale dal piano di US-807b (non scritto un
+  plan-mode formale per questa story: proseguita direttamente dopo "vai"
+  dell'utente, stesso schema di US-807a gia' approvato in precedenza).
+
+COSA RESTA APERTO (dichiarato, non di questa story).
+- Archivio Sepolto e Frontiera delle Porte restano piatte fino a
+  US-807c/d.
+- drop resta vuoto per contratto (US-809 lo popola).
+
+PROSSIMA STORIA: US-807c — Archivio Sepolto, layout + popolazione (sale e
+corridoi interni, gruppo demon_of_knowledge, boss Sequenza 6 del Pathway
+Hermit).

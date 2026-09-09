@@ -296,6 +296,19 @@ che gli overlay ricevessero il segnale: sposta `add_child` prima.
     DIRETTAMENTE (pattern già in `tests/test_ability_engine.gd` per
     `dentro_arco`/`colpi_residui`), non affidandosi a un tick di fisica
     reale in un ambiente headless lento.
+13. **La `Camera2D` del player (`scripts/game_camera.gd`) ha smoothing
+    attivo** (`position_smoothing_speed = 5.0`): in uno script di QA che
+    teletrasporta il player per fare più screenshot, 2-3 `await
+    process_frame` non bastano a farla arrivare a destinazione (converge
+    esponenzialmente, resta quasi ferma su un salto grande) — gli
+    screenshot vengono tutti uguali, non per un bug del gioco ma dello
+    script di QA. Fix: dopo ogni teletrasporto chiamare
+    `player.get_node("Camera2D").reset_smoothing()` (metodo nativo di
+    `Camera2D`) prima di catturare lo screenshot, invece di aspettare
+    molti frame. Scoperto in US-807b. Nota collaterale: uno script di QA
+    deve istanziare il vero `scenes/player.tscn` (che porta la
+    `Camera2D`), non un `Node2D` nudo come player finto — altrimenti non
+    c'è nessuna telecamera che segua i teletrasporti (US-806/US-807a).
 
 ---
 
