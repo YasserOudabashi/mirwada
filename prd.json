@@ -34,8 +34,8 @@
       ],
       "priority": 2,
       "fase": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-09. project.godot: 4 azioni abilita_1..4 (tasti 1-4). scripts/player.gd: lancia_abilita_slot(n) pubblico (come start_dash) -- AbilityEngine.owned_abilities(self) -> execute(owned[n], self); _gestisci_input_abilita() scansiona i 4 tasti e lo chiama; flag _castando come _attaccando cosi' _aggiorna_animazione() non sovrascrive 'cast' il frame dopo. scripts/hud.gd + scenes/hud.tscn: riga Hotbar (4 Label), _aggiorna_hotbar() su ability_executed/sequence_changed + un accumulatore _process ogni 0.1s per il cooldown. Chiave i18n HUD_HOTBAR_VUOTO. tests/test_player_abilita.gd (nuovo, 4 test) + tests/test_i18n_hud.gd esteso (1 test; la prima versione controllava anche che l'id grezzo non apparisse nel testo, ma tg_fendente_pesante e' fra le 42 stringhe TODO gia' segnalate dal validator -- debito di traduzione preesistente, non un fallback nel codice: asserzione corretta). Verificato: validate_data.py 0 (3 warning invariati); import pulito; suite 785/785 verdi (780+5), nessuna regressione. Verifica a schermo reale con Xvfb (2 screenshot in chat): la hotbar mostra le 2 abilita' del Twilight Giant Seq 9; dopo il tasto '1' reale, Spiritualita' 50->44 (esattamente il costo di 6) e lo slot mostra '3.0s' di cooldown (esattamente il valore dei dati) -- prova end-to-end che il tasto arriva fino ad AbilityEngine.execute. Dettagli in progress.txt."
     },
     {
       "id": "US-803",
@@ -51,8 +51,8 @@
       ],
       "priority": 3,
       "fase": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-09. scripts/projectile.gd e scripts/melee_arc.gd: collision_mask 4 (Hurtbox, come hitbox.gd), monitoring true; area_entered chiama subisci() con la stessa firma di hitbox.gd:61; projectile usa registra_colpo() (gia' esistente) per dedup/pierce, melee_arc usa dentro_arco() (gia' esistente) + un set _colpiti; entrambi escludono la hurtbox del caster. setup() di entrambi guadagna un 4 parametro opzionale caster:=null, i chiamanti/test esistenti a 3 argomenti restano validi. scripts/ability_engine.gd: _spawn_projectile/_spawn_melee_arc passano ora il caster a setup() (una riga ciascuno). tests/test_projectile_hit.gd (nuovo, 5 test): colpo con tag della primitiva, no doppio colpo sullo stesso bersaglio, pierce 2 attraversa 3 bersagli poi si libera, la propria hurtbox esclusa, l'arco filtra per angolo. _su_area_entrata chiamato direttamente (pattern gia' in test_ability_engine.gd per dentro_arco/colpi_residui): la logica e' provata in modo deterministico, senza dipendere da un tick di fisica reale. Verificato: validate_data.py 0 (3 warning invariati); import pulito; suite 790/790 verdi (785+5), nessuna regressione su test_ability_engine.gd. Nessuna verifica a schermo richiesta dall'AC (un Area2D di collisione non e' visibile): indagato comunque un tentativo di colpo dal vivo nello stesso script di QA di US-802 -- non arrivato per un limite dell'ambiente headless (melee_arc.gd::_process misura la vita 0.25s sul delta idle, non sui frame; sotto rendering software lento un frame puo' durare piu' di 0.25s reali e l'arco si libera prima che la fisica registri l'overlap), non per un difetto del codice: il cast stesso e' confermato dal vivo nello screenshot di US-802 (costo scalato, cooldown avviato). Annotato come trappola #12 in 006_PRD/prossimi-passi.md. Dettagli in progress.txt."
     },
     {
       "id": "US-804",

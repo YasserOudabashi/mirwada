@@ -5,6 +5,7 @@ HUD_HP_VALORE,{0} / {1},{0} / {1}
 HUD_RECITAZIONE,Recitazione,Acting
 HUD_AVANZAMENTO_PRONTO,Avanzamento pronto,Advancement ready
 HUD_AVANZAMENTO_FORZATO,Avanzamento solo forzando (fondamenta -25),Advancement only by forcing (foundation -25)
+HUD_HOTBAR_VUOTO,·,·
 BOOK_SCAFFALE_TOMO_NUOVO,Tomo nuovo,New tome
 BOOK_SCAFFALE_TOMO_BRUCIATO,Tomo bruciato,Burnt tome
 BOOK_SCAFFALE_RIPRENDI,Torna alla partita,Back to game

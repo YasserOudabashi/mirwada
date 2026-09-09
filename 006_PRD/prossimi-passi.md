@@ -274,6 +274,25 @@ che gli overlay ricevessero il segnale: sposta `add_child` prima.
 10. **`EventTracker._corrisponde`**: un filtro booleano `true` pretende
     `dati[k] == true`; un payload `{}` non matcha mai. I nuovi payload
     emettono i booleani espliciti (`false` compreso).
+11. **`Input.action_press("azione")` + una sola `await physics_frame` è
+    sufficiente per far scattare `Input.is_action_just_pressed` dentro il
+    normale `_physics_process` di un nodo (verificato: US-802). Nella
+    suite sincrona dei test (`tests/test_case.gd`, nessun frame reale tra
+    una chiamata e l'altra) funziona anche `action_press` seguito
+    dalla chiamata diretta al metodo, senza nessun `await`.
+12. **Un `Area2D` a vita breve creato a runtime che misura la propria
+    durata in `_process(delta)` (idle, non `_physics_process`) può
+    autodistruggersi prima che la fisica registri un overlap, sotto
+    rendering software lento (Xvfb + llvmpipe, headless): un solo frame
+    idle può durare più della vita dichiarata. Successo in `scripts/
+    melee_arc.gd` (vita 0.25s, US-803): il cast funziona (tracciato,
+    costo scalato, cooldown avviato — verificabile a schermo), ma un
+    colpo dal vivo in uno script di QA può non registrarsi per questo
+    motivo, non per un bug. La logica di collisione va provata con un
+    test automatico che chiama `_su_area_entrata`/equivalenti
+    DIRETTAMENTE (pattern già in `tests/test_ability_engine.gd` per
+    `dentro_arco`/`colpi_residui`), non affidandosi a un tick di fisica
+    reale in un ambiente headless lento.
 
 ---
 

@@ -10,7 +10,16 @@ extends CanvasLayer
 @onready var _label_sp: Label = $Root/VBox/SP/Etichetta
 @onready var _barra_acting: ProgressBar = $Root/VBox/Acting/Barra
 @onready var _label_acting: Label = $Root/VBox/Acting/Etichetta
+@onready var _hotbar: Array = [
+	$Root/VBox/Hotbar/Slot0, $Root/VBox/Hotbar/Slot1,
+	$Root/VBox/Hotbar/Slot2, $Root/VBox/Hotbar/Slot3,
+]
 @onready var _label_avanz: Label = $Root/VBox/Avanzamento
+
+## US-802: il cooldown scorre col tempo, non con un segnale — si ridisegna
+## la hotbar ogni 0.1s invece che ogni frame (60 volte al secondo sarebbe
+## sprecato per un numero che cambia percettibilmente una volta ogni tanto).
+var _cd_accum: float = 0.0
 
 
 func _ready() -> void:
@@ -23,6 +32,14 @@ func _ready() -> void:
 		pozioni.pozione_creata.connect(func(_s: int, _p: bool) -> void: _aggiorna_avanzamento())
 		pozioni.pozione_bevuta.connect(func(_a: bool, _f: bool) -> void: _aggiorna_avanzamento())
 	_aggiorna_avanzamento()
+
+	var ae: Node = get_node_or_null("/root/AbilityEngine")
+	if ae != null:
+		ae.ability_executed.connect(func(_id: String, _c: Node, _r: Dictionary) -> void: _aggiorna_hotbar())
+	var prog: Node = get_node_or_null("/root/Progression")
+	if prog != null and prog.has_signal("sequence_changed"):
+		prog.sequence_changed.connect(func(_n: int, _v: int) -> void: _aggiorna_hotbar())
+	_aggiorna_hotbar()
 
 	var p: Node = get_tree().get_first_node_in_group("player")
 	var stats: Node = p.get_node_or_null("StatsComponent") if p != null else null
@@ -73,3 +90,34 @@ func _aggiorna_avanzamento() -> void:
 		_label_avanz.text = tr("HUD_AVANZAMENTO_PRONTO")
 	else:
 		_label_avanz.text = tr("HUD_AVANZAMENTO_FORZATO")
+
+
+func _process(delta: float) -> void:
+	_cd_accum += delta
+	if _cd_accum >= 0.1:
+		_cd_accum = 0.0
+		_aggiorna_hotbar()
+
+
+## US-802: una riga per slot 1-4, dalle abilita' possedute
+## (AbilityEngine.owned_abilities del giocatore, stesso ordine dei tasti
+## abilita_1..4 in player.gd). Nessun nome hardcoded: il testo viene da
+## GameData.tr_data sul name_i18n dell'abilita'.
+func _aggiorna_hotbar() -> void:
+	var ae: Node = get_node_or_null("/root/AbilityEngine")
+	var gd: Node = get_node_or_null("/root/GameData")
+	var p: Node = get_tree().get_first_node_in_group("player")
+	var owned: Array = ae.call("owned_abilities", p) if ae != null and p != null else []
+	for i in _hotbar.size():
+		var lbl: Label = _hotbar[i]
+		if i >= owned.size():
+			lbl.text = "%d  %s" % [i + 1, tr("HUD_HOTBAR_VUOTO")]
+			continue
+		var aid: String = str(owned[i])
+		var ab: Dictionary = gd.call("get_ability", aid) if gd != null else {}
+		var nome: String = str(gd.call("tr_data", ab.get("name_i18n", aid))) if gd != null else aid
+		var cd: float = float(ae.call("cooldown_left", p, aid)) if ae != null else 0.0
+		if cd > 0.0:
+			lbl.text = "%d  %s  %.1fs" % [i + 1, nome, cd]
+		else:
+			lbl.text = "%d  %s" % [i + 1, nome]

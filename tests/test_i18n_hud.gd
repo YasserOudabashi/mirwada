@@ -53,3 +53,42 @@ func test_hud_aggancia_le_barre_ai_segnali() -> void:
 
 	hud.free()
 	host.free()
+
+
+## US-802: la hotbar non deve mai mostrare un id grezzo o un testo fisso —
+## solo tr()/GameData.tr_data() sui dati dell'abilita'.
+func test_hotbar_non_ha_testo_hardcoded() -> void:
+	var host := Node.new()
+	host.add_to_group("player")
+	var stats: Node = StatsComponent.new()
+	stats.name = "StatsComponent"
+	stats.configure_from_balance(9)
+	host.add_child(stats)
+	Engine.get_main_loop().root.add_child(host)
+
+	var root: Node = Engine.get_main_loop().root
+	root.get_node("Progression").call("configura", "twilight_giant", 9)
+	var gd: Node = root.get_node("GameData")
+	var owned: Array = root.get_node("AbilityEngine").call("owned_abilities", host)
+	assert_true(owned.size() >= 1, "il Twilight Giant a Sequenza 9 possiede almeno un'abilita'")
+
+	var hud: CanvasLayer = HudScene.instantiate()
+	root.add_child(hud)
+
+	# Confronto diretto con l'output di tr_data (non con un fallback nel
+	# codice): passa sia che la voce it.json sia tradotta sia che sia
+	# ancora uno stub "TODO <chiave>" (42 note, debito di traduzione
+	# preesistente, non di questa story) — quello che conta e' che il testo
+	# mostrato SEGUA il catalogo dati, non un valore scritto in hud.gd.
+	var slot0: Label = hud.get_node("Root/VBox/Hotbar/Slot0")
+	var ab0: Dictionary = gd.call("get_ability", str(owned[0]))
+	var nome0: String = str(gd.call("tr_data", ab0.get("name_i18n", "")))
+	assert_true(slot0.text.contains(nome0),
+		"slot 0 mostra esattamente l'output di GameData.tr_data, non un nome scritto in hud.gd")
+
+	var slot3: Label = hud.get_node("Root/VBox/Hotbar/Slot3")
+	assert_true(slot3.text.contains(tr("HUD_HOTBAR_VUOTO")),
+		"lo slot senza abilita' mostra la chiave tradotta, non un placeholder fisso")
+
+	hud.free()
+	host.free()

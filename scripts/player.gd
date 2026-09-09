@@ -45,6 +45,11 @@ var _dist_accum: float = 0.0  # emettitore distanza_percorsa (US-331)
 
 var _parando: bool = false
 
+## US-802: hotbar. true mentre l'animazione "cast" e' in corso, cosi'
+## _aggiorna_animazione() non la sovrascrive col walk/idle del frame dopo
+## (stesso ruolo di _attaccando per l'attacco).
+var _castando: bool = false
+
 @onready var _audio: Node = get_node_or_null("/root/AudioManager")
 
 
@@ -98,6 +103,8 @@ func _physics_process(delta: float) -> void:
 
 	if Input.is_action_just_pressed("attacco") and not _attaccando and not _parando:
 		_inizia_attacco()
+
+	_gestisci_input_abilita()
 
 	var input: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var vel_max: float = _stats.get_stat("velocita")
@@ -191,6 +198,38 @@ func _inizia_attacco() -> void:
 	_anim.call("riproduci", STATO_ATTACCO, _dir_sguardo)
 
 
+## Hotbar (US-802): abilita_1..4 lanciano la N-esima abilita' posseduta
+## (AbilityEngine.owned_abilities, stesso ordine che mostra l'HUD). Stessi
+## guard di _inizia_attacco (non durante un attacco/parata/cast gia' in
+## corso: schivata e dash tornano prima di arrivare qui).
+func _gestisci_input_abilita() -> void:
+	if _attaccando or _parando or _castando:
+		return
+	for n in 4:
+		if Input.is_action_just_pressed("abilita_%d" % (n + 1)):
+			lancia_abilita_slot(n)
+			return  # un solo tasto abilita' per frame, come attacco/schivata/parata
+
+
+## Lancia la N-esima abilita' posseduta (indice 0-based, stesso ordine di
+## AbilityEngine.owned_abilities e della hotbar dell'HUD). Pubblico, come
+## start_dash: lo usa l'input qui sopra, e i test lo chiamano direttamente
+## bypassando Input (stesso pattern di _su_colpo_inflitto/_su_danno_subito).
+## Nessuna logica di bersaglio: la fa gia' AbilityEngine.execute.
+func lancia_abilita_slot(n: int) -> Dictionary:
+	var ae: Node = get_node_or_null("/root/AbilityEngine")
+	if ae == null:
+		return {"ok": false, "reason": "nessun_ability_engine"}
+	var owned: Array = ae.call("owned_abilities", self)
+	if n < 0 or n >= owned.size():
+		return {"ok": false, "reason": "slot_vuoto"}
+	var risultato: Dictionary = ae.call("execute", str(owned[n]), self)
+	if bool(risultato.get("ok", false)):
+		_castando = true
+		_anim.call("riproduci", "cast", _dir_sguardo)
+	return risultato
+
+
 func _su_evento_anim(nome: String) -> void:
 	match nome:
 		"hitbox_on":
@@ -206,6 +245,8 @@ func _su_anim_finita(stato: String) -> void:
 	if stato == STATO_ATTACCO:
 		_attaccando = false
 		_hitbox.call("disattiva")
+	elif stato == "cast":
+		_castando = false
 
 
 ## Finestre guidate dai frame di animations.json. "iframe": invulnerabilita'
@@ -295,7 +336,7 @@ func _aggiorna_sguardo(input: Vector2) -> void:
 
 
 func _aggiorna_animazione() -> void:
-	if _attaccando or _dashing or _parando:
+	if _attaccando or _dashing or _parando or _castando:
 		return
 	var stato: String = "walk" if velocity.length() > SOGLIA_MOTO else "idle"
 	_anim.call("riproduci", stato, _dir_sguardo)

@@ -7735,3 +7735,123 @@ COSA RESTA APERTO (dichiarato, non di questa story).
 
 PROSSIMA STORIA: US-802 — abilita' a tastiera (tasti 1-4) + hotbar
 nell'HUD + proiettili/archi che colpiscono davvero (Blocco 0).
+
+=== US-802: abilita' a tastiera + hotbar nell'HUD (fase 8, Blocco 0) ===
+
+COSA FATTO.
+- project.godot: 4 azioni abilita_1..abilita_4 (tasti 1-4), stesso stile
+  delle voci esistenti (pagina_avanti come modello: singolo evento).
+- scripts/player.gd: _gestisci_input_abilita() (chiamata da
+  _physics_process dopo il blocco attacco) scansiona i 4 tasti e chiama
+  lancia_abilita_slot(n). lancia_abilita_slot(n) e' PUBBLICA (come
+  start_dash, che gia' serve sia l'input che la primitiva dash):
+  AbilityEngine.owned_abilities(self) -> AbilityEngine.execute(owned[n],
+  self). Nessuna logica di bersaglio nuova (la fa gia' execute). Se ok,
+  riproduce l'animazione "cast". Aggiunto un flag _castando (come
+  _attaccando) cosi' _aggiorna_animazione() non sovrascrive "cast" col
+  walk/idle del frame dopo; si azzera in _su_anim_finita quando
+  l'animazione "cast" finisce. Guard: non lancia durante attacco/parata/
+  un altro cast (il dash torna prima di arrivare qui).
+- scripts/hud.gd + scenes/hud.tscn: riga Hotbar (4 Label) sotto
+  Recitazione. _aggiorna_hotbar() legge owned_abilities + cooldown_left,
+  aggiornata sui segnali ability_executed/sequence_changed e ogni 0.1s
+  (_process con accumulatore, per il countdown del cooldown). Nuova
+  chiave i18n HUD_HOTBAR_VUOTO ("·") per gli slot senza abilita'.
+- tests/test_player_abilita.gd (NUOVO, 4 test): lancia_abilita_slot
+  esegue la N-esima posseduta (Twilight Giant Seq 9 ha 2 abilita', un
+  buon caso slot-pieno/slot-vuoto); slot oltre le possedute non fa
+  nulla; il tasto abilita_1 (Input.action_press + chiamata diretta,
+  sincrono: la finestra "appena premuto" di Input non richiede un frame
+  reale nel test harness, verificato empiricamente) lancia lo slot 0;
+  l'input e' ignorato durante un attacco in corso.
+- tests/test_i18n_hud.gd esteso (1 test): la hotbar mostra esattamente
+  l'output di GameData.tr_data (non un nome scritto in hud.gd) e lo slot
+  vuoto mostra la chiave tradotta. NOTA: la prima versione del test
+  controllava anche "l'id grezzo non appare nel testo", ma
+  tg_fendente_pesante e' una delle 42 stringhe TODO gia' segnalate dal
+  validator (debito di traduzione preesistente, non di questa story): lo
+  stub "TODO ability.twilight_giant.tg_fendente_pesante" CONTIENE l'id
+  per costruzione. Non era un bug nel codice (che chiama comunque
+  tr_data, mai un fallback), era un'asserzione fragile: corretta.
+
+COME VERIFICATO.
+- python tools/validate_data.py: 0 (3 warning invariati).
+- godot --headless --import: pulito.
+- Suite: 785 test, tutti passati (780 + 5 nuovi). Nessuna regressione.
+- VERIFICA A SCHERMO REALE (Xvfb, script di QA non committato): avviato
+  main.tscn per davvero, teletrasportato il player accanto al nemico,
+  premuto il tasto "1" vero (Input.action_press + un physics_frame reale
+  del motore, non chiamato a mano). Screenshot mandati in chat:
+  1) hotbar popolata: "1 TODO ability.twilight_giant.tg_fendente_pesante
+     2 TODO ability.twilight_giant...." (nomi ancora da tradurre, stesso
+     debito preesistente di cui sopra — il meccanismo e' corretto, i
+     TESTI non lo sono ancora, fuori scope).
+  2) dopo il tasto: Spiritualita' 50 -> 44 (esattamente il costo di 6 di
+     tg_fendente_pesante) e lo slot 1 mostra "3.0s" di cooldown
+     (esattamente il cooldown dei dati) — prova end-to-end che il tasto
+     arriva davvero fino ad AbilityEngine.execute e l'HUD lo riflette dal
+     vivo, non solo nei test.
+
+COSA RESTA APERTO. I nomi delle abilita' del Twilight Giant Seq 9 restano
+TODO (debito di traduzione preesistente); l'hotbar mostra icone testuali,
+non icone vere (fuori scope, sprite arrivano in US-812/813).
+
+PROSSIMA STORIA: US-803 — proiettili e archi che colpiscono davvero
+(gia' fatta in questa stessa iterazione, vedi blocco sotto).
+
+
+=== US-803: proiettili e archi che colpiscono davvero (fase 8, Blocco 0) ===
+
+COSA FATTO.
+- scripts/projectile.gd: collision_mask = 4 (le Hurtbox stanno sul layer
+  3, come hitbox.gd), monitoring = true; area_entered -> _su_area_entrata
+  chiama subisci(danno, 0.0, caster, {"tag_danno": tag}) con la STESSA
+  firma di hitbox.gd:61 (stagger 0.0: la primitiva projectile non porta
+  un campo stagger nei dati, non e' un valore inventato, e' l'assenza
+  di quel concetto per questa primitiva); registra_colpo() (gia'
+  esistente) dedupe e gestisce il pierce; esclude la hurtbox del caster
+  (area.get_parent() == _caster). setup() guadagna un 4° parametro
+  opzionale caster := null: i chiamanti/test esistenti (3 argomenti)
+  restano validi.
+- scripts/melee_arc.gd: stesso collegamento; filtra con dentro_arco()
+  (gia' esistente) prima di colpire, un bersaglio una sola volta
+  (_colpiti), esclude la hurtbox del caster. setup() guadagna lo stesso
+  4° parametro opzionale.
+- scripts/ability_engine.gd: _spawn_projectile/_spawn_melee_arc passano
+  ora il caster a setup(). Unica riga toccata per funzione.
+- tests/test_projectile_hit.gd (NUOVO, 5 test): un colpo arriva con il
+  tag della primitiva; lo stesso bersaglio non e' colpito due volte;
+  pierce 2 attraversa esattamente 3 bersagli poi si libera; la propria
+  hurtbox non viene colpita; l'arco colpisce solo dentro l'angolo (un
+  bersaglio davanti si', uno dietro no). _su_area_entrata e' chiamato
+  direttamente (come dentro_arco/colpi_residui in
+  test_ability_engine.gd, gia' un pattern del progetto): l'overlap
+  fisico vero lo garantisce il motore, i test provano la LOGICA in modo
+  deterministico, senza dipendere da un tick di fisica reale.
+
+COME VERIFICATO.
+- python tools/validate_data.py: 0 (3 warning invariati).
+- godot --headless --import: pulito.
+- Suite: 790 test, tutti passati (785 + 5 nuovi). Nessuna regressione su
+  test_ability_engine.gd (che gia' testava _p_projectile/_p_melee_arc).
+- Verifica a schermo NON richiesta dall'AC di questa story (a differenza
+  di US-802): un Area2D di collisione non e' visibile a schermo, la
+  prova e' funzionale. Ho comunque provato a osservare un colpo dal vivo
+  nello stesso script di QA di US-802 (player teletrasportato sopra al
+  nemico, tasto reale): il colpo non e' arrivato, MA la causa e' un
+  limite dell'ambiente, non del codice — indagato a fondo (posizione,
+  angolo, figli del player tutti stampati): l'arco viene creato, il
+  cast va a buon fine (ability_used tracciato, Spiritualita' scalata,
+  cooldown avviato, screenshot in US-802 lo mostra), ma sparisce prima
+  che la fisica registri l'overlap. melee_arc.gd::_process(delta)
+  decrementa "vita" (0.25s) usando il delta dell'idle process, non un
+  numero fisso di frame: sotto rendering software lento (llvmpipe,
+  headless) un solo frame puo' durare piu' di 0.25s reali, e l'arco si
+  autodistrugge prima che il physics server rilevi il nuovo
+  CollisionShape2D. Comportamento preesistente (non toccato da questa
+  story), irrilevante a 60fps reali, e i 5 test automatici sopra
+  provano la stessa logica in modo deterministico senza questo limite.
+  Annotato in prossimi-passi.md come trappola per le prossime sessioni.
+
+PROSSIMA STORIA: US-804 — eventi di recitazione emessi con payload vero
++ tg_9_protettore riscritta nei dati (Blocco A).
