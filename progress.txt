@@ -7174,3 +7174,79 @@ di eventi + flag che blocca Progression.avanza ai salti di fascia 7/5/3/1),
 4 tribolazioni di contenuto con i18n reale + 2 flag da dialoghi (dlg_doran +
 dlg_antagonista nuovo), overlay reattivo. 749 test (erano 720 a inizio fase 7).
 Save invariato (endgame gia' a v22). Prossimo: BLOCCO C - US-714 preghiere.
+
+=== US-714: preghiere delle Sequenze alte (2026-09-09) ===
+- ability.schema.json: campo opzionale 'preghiera' (retro-compatibile, solo
+  documentazione: il validator non usa jsonschema, e' Python bespoke).
+- tools/validate_data.py: se 'preghiera' e' presente deve stare nel
+  vocabolario di prayer_effects.json (US-703) E l'abilita' deve portare
+  davvero la primitiva/bersagli che quella voce richiede (non solo
+  appartenenza al vocabolario: coerenza dichiarativa).
+- 6 abilita' nuove di Sequenza 1/0, una per Pathway, sparse sui 4 gruppi:
+  * darkness_anatema_del_vuoto (darkness_0): curse(sfortuna, riusato) +
+    debuff_stat. preghiera: anatema.
+  * tg_giuramento_del_crepuscolo (twilight_giant_0): aura(autorita_decadimento,
+    riusato da death_autorita_finale) su nemici. preghiera: voto_di_autorita.
+  * death_benedizione_dei_caduti (death_1): aura(comando_non_morti, riusato
+    da death_legione) su evocati. preghiera: benedizione_seguaci.
+  * hermit_intercessione_arcana (hermit_1): heal su self. preghiera:
+    intercessione.
+  * mother_benedizione_della_covata (mother_1): aura(area_viva, riusato
+    dall'Harvest Priest) su evocati. preghiera: benedizione_seguaci.
+  * door_anatema_del_varco (door_1): curse(varco_sigillato, NUOVO status in
+    status_effects.json, tag 'spazio') + debuff_stat. preghiera: anatema.
+- darkness_0 e twilight_giant_0 avevano solo 1 abilita': ora 2, nessuna
+  eccezione al conteggio. death_1/hermit_1/mother_1/door_1 passano da 2 a 3
+  (Sequenze angel): eccezione ammessa dall'AC, motivata nella 'note' di ogni
+  abilita' (US-714 la aggiunge come 3a, non sostituisce le 2 esistenti).
+- i18n: 6 chiavi in data/i18n/it.json. en.json resta {} (non validato).
+- tests/test_prayer.gd NUOVO: esecuzione senza warning delle 6 abilita' +
+  il campo preghiera esposto da GameData.get_ability combacia col
+  vocabolario chiuso.
+- Regressione trovata e corretta: tests/test_slice_fase_5.gd contava
+  esattamente 20 abilita' di Death (2 per Sequenza, checkpoint di fase 5).
+  Aggiornato a 21 con una nota che spiega la 21esima (US-714).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning
+  invariati). 751 test headless (749 + 2), tutti verdi.
+- File toccati: data/schema/ability.schema.json, tools/validate_data.py,
+  data/status_effects.json, data/abilities/{darkness,twilight_giant,death,
+  hermit,mother,door}.json, data/pathways/{darkness,twilight_giant,death,
+  hermit,mother,door}.json, data/i18n/it.json, tests/test_prayer.gd (nuovo),
+  tests/test_slice_fase_5.gd.
+
+=== US-715: siti rituali di Sequenza 0 (2026-09-09) ===
+- data/schema/location_tags.json: 4 tag nuovi, uno per GRUPPO (non per
+  Pathway): soglia_del_crepuscolo (eternal_darkness), radice_del_mondo
+  (goddess_of_origin), biblioteca_di_tutto (demon_of_knowledge),
+  porta_senza_stanza (lord_of_mysteries). Motivazione nel _comment del file.
+- data/world/regions.json: ogni tag aggiunto alla regione del proprio
+  gruppo (marche_crepuscolo, valle_madre, archivio_sepolto, frontiera_porte).
+- I 10 Pathway ATTIVI: advancement_ritual.location_tags della Sequenza 0
+  sostituito col tag del gruppo. Prima alcuni erano generici e ospitati
+  dalla citta' neutra invece che dalla regione del gruppo (es. Hermit aveva
+  'archivio', ospitato solo da 'mirwada', non da 'archivio_sepolto').
+  Coerenza con l'antagonista (data/lore/antagonisti.json, US-620) gia'
+  presente nei testi: es. Twilight Giant "il trono in cima alle Marche" ->
+  soglia_del_crepuscolo in marche_crepuscolo; Hermit "l'Archivio Sepolto" ->
+  biblioteca_di_tutto in archivio_sepolto. eternal_darkness e
+  lord_of_mysteries condividono ora lo stesso sito fra i loro Pathway,
+  coerente col cambio Pathway di fase 7 (fonde solo vicini dello stesso
+  gruppo).
+- Scope: SOLO i 10 Pathway attivi. I 12 differiti (data/pathways_deferred/)
+  appartengono a gruppi fuori dai 4 attivi e sono interamente stub: fuori
+  scope, coerente con come le fasi precedenti trattano il differito.
+- tests/test_regions.gd: NUOVO test_ritual_di_sequenza_0_ospitato_da_una_regione
+  (itera i 10 Pathway attivi via GameData.pathway_ids(), verifica che ogni
+  location_tag della Sequenza 0 sia ospitato da almeno una regione).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning
+  invariati). 752 test headless (751 + 1), tutti verdi.
+- File toccati: data/schema/location_tags.json, data/world/regions.json,
+  data/pathways/{darkness,death,twilight_giant,hermit,paragon,mother,moon,
+  fool,error,door}.json, tests/test_regions.gd.
+
+=== BLOCCO C CHIUSO (2026-09-09) ===
+US-714..715. Preghiere delle Sequenze alte (6 abilita' nuove, campo
+'preghiera' puramente semantico) + siti rituali di Sequenza 0 spostati dai
+tag generici ai 4 siti di gruppo, coerenti con l'antagonista e col cambio
+Pathway di fase 7. 752 test (erano 749 a fine Blocco B). Save invariato.
+Prossimo: BLOCCO D - US-716 finali (data/endings.json).

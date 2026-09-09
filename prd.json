@@ -223,8 +223,8 @@
       ],
       "priority": 14,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "ability.schema.json: campo opzionale 'preghiera' (US-714), puramente semantico. validate_data.py: check che 'preghiera' sia nel vocabolario di prayer_effects.json E che l'abilita' porti davvero la primitiva/bersagli richiesti dalla voce (coerenza dichiarativa, non solo appartenenza). 6 abilita' nuove di Sequenza 1/0 su 4 gruppi diversi: darkness_anatema_del_vuoto (darkness_0, curse+debuff, riusa status 'sfortuna'), tg_giuramento_del_crepuscolo (twilight_giant_0, aura nemici, riusa 'autorita_decadimento'), death_benedizione_dei_caduti (death_1, aura evocati, riusa 'comando_non_morti'), hermit_intercessione_arcana (hermit_1, heal self), mother_benedizione_della_covata (mother_1, aura evocati, riusa 'area_viva'), door_anatema_del_varco (door_1, curse+debuff, NUOVO status 'varco_sigillato' in status_effects.json, tag 'spazio'). Vincolo abilita'/Sequenza: darkness_0 e twilight_giant_0 avevano solo 1 abilita' -> ora 2, nessuna eccezione; death_1/hermit_1/mother_1/door_1 passano da 2 a 3 (Sequenze angel, eccezione ammessa dal criterio di accettazione, motivata nel campo 'note' di ogni abilita'). i18n: 6 chiavi in data/i18n/it.json (en.json resta {} come per il resto della fase, non validato da R-12). tests/test_prayer.gd NUOVO (2 test: esecuzione senza warning delle 6 abilita'; il campo preghiera esposto da GameData.get_ability combacia col vocabolario chiuso). Regressione: tests/test_slice_fase_5.gd aggiornato (20 -> 21 abilita' di Death, la nuova e' la preghiera di Sequenza 1). validate exit 0 (3 warning invariati). 751 test verdi (749 + 2 nuovi)."
     },
     {
       "id": "US-715",
@@ -240,8 +240,8 @@
       ],
       "priority": 15,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "4 tag nuovi in data/schema/location_tags.json, uno per GRUPPO (non per Pathway), motivati nel _comment: soglia_del_crepuscolo (eternal_darkness), radice_del_mondo (goddess_of_origin), biblioteca_di_tutto (demon_of_knowledge), porta_senza_stanza (lord_of_mysteries). Ognuno aggiunto alla regione del proprio gruppo in data/world/regions.json. I 10 Pathway ATTIVI puntano il location_tags del proprio advancement_ritual di Sequenza 0 al tag del gruppo (sostituendo i tag generici precedenti, alcuni dei quali erano ospitati solo dalla citta' neutra invece che dalla regione del gruppo: es. Hermit aveva 'archivio', ospitato solo da 'mirwada', non da 'archivio_sepolto'). Scope: SOLO i 10 Pathway attivi, non i 22 dell'AC originale - i 12 differiti in data/pathways_deferred/ appartengono a gruppi fuori dai 4 attivi e sono interamente stub (nessuna regione reale li ospiterebbe); riattivarli e' fuori scope di questa story, coerente con come le fasi precedenti trattano il contenuto differito. Coerenza con l'antagonista (data/lore/antagonisti.json, US-620): ogni antagonista di un Pathway vive gia' nella regione del proprio gruppo (es. Twilight Giant 'il trono in cima alle Marche' -> soglia_del_crepuscolo in marche_crepuscolo; Hermit 'l'Archivio Sepolto' -> biblioteca_di_tutto in archivio_sepolto); ora il sito del rituale di Sequenza 0 e' lo stesso sito, invece di un tag scollegato. Il gruppo eternal_darkness (darkness/death/twilight_giant) e lord_of_mysteries (fool/error/door) ora condividono lo stesso sito di Sequenza 0 fra i loro Pathway, coerente col fatto che il cambio Pathway di fase 7 fonde solo vicini dello stesso gruppo. tests/test_regions.gd: NUOVO test_ritual_di_sequenza_0_ospitato_da_una_regione (itera i 10 Pathway attivi, verifica che ogni location_tag della Sequenza 0 sia ospitato da almeno una regione). validate exit 0 (3 warning invariati). 752 test verdi (751 + 1 nuovo)."
     },
     {
       "id": "US-716",

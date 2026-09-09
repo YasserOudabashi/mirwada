@@ -550,6 +550,31 @@
         "terra"
       ],
       "note": "Dove passa, un giardino. La rinascita e' permanente: entra nel mondo."
+    },
+    {
+      "schema_version": 1,
+      "id": "mother_benedizione_della_covata",
+      "name_i18n": "ability.mother.mother_benedizione_della_covata",
+      "sequence_id": "mother_1",
+      "costo_spiritualita": 28,
+      "cooldown": 30.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 8,
+          "durata": -1,
+          "effetto": "area_viva",
+          "tick_rate": 2.0,
+          "bersagli": "evocati"
+        }
+      ],
+      "tag_sinergia": [
+        "crescita",
+        "guarigione",
+        "evocazione"
+      ],
+      "preghiera": "benedizione_seguaci",
+      "note": "US-714. La Naturewalker benedice cio' che ha generato: aura(area_viva) su bersagli 'evocati', stesso effetto gia' usato dal terreno benedetto dell'Harvest Priest (US-714 lo riusa)."
     }
   ]
 }

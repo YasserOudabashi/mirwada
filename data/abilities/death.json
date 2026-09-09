@@ -548,6 +548,32 @@
         "area"
       ],
       "note": "Tutti temono Death. Anche i forti."
+    },
+    {
+      "schema_version": 1,
+      "id": "death_benedizione_dei_caduti",
+      "name_i18n": "ability.death.death_benedizione_dei_caduti",
+      "sequence_id": "death_1",
+      "costo_spiritualita": 30,
+      "cooldown": 35.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 10,
+          "durata": -1,
+          "effetto": "comando_non_morti",
+          "tick_rate": 2.0,
+          "bersagli": "evocati"
+        }
+      ],
+      "tag_sinergia": [
+        "morte",
+        "non_morto",
+        "evocazione"
+      ],
+      "costo_follia": 4.0,
+      "preghiera": "benedizione_seguaci",
+      "note": "US-714. Il Pale Emperor intercede per la sua legione: aura(comando_non_morti) su bersagli 'evocati', stesso effetto gia' usato da death_legione (US-714 lo riusa)."
     }
   ]
 }

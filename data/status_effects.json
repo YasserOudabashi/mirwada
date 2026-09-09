@@ -109,6 +109,16 @@
       },
       "descrizione": "Il Beyonder si e' fuso con l'ombra: sfugge al rilevamento (anche mistico) e para meno visibile. Lo applica shadow_meld (Door Secrets Sorcerer, Darkness Nightwatcher). Non negativo: e' un vantaggio."
     },
+    "varco_sigillato": {
+      "tag": "spazio",
+      "durata_default": 15.0,
+      "negativo": true,
+      "stat_modifiers": {
+        "velocita": -0.3,
+        "evasione": -0.25
+      },
+      "descrizione": "Lo spazio intorno al bersaglio si richiude su se stesso: si muove impacciato e schiva peggio. Lo applica l'anatema della Key of Stars (Door Seq 1): il tuo stesso potere di aprire varchi, usato per sigillarne uno intorno a un nemico."
+    },
     "posseduto": {
       "tag": "possessione",
       "durata_default": 6.0,

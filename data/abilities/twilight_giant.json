@@ -591,6 +591,32 @@
         "area"
       ],
       "note": "Autorita' divina passiva e globale. Endgame: tutto cio' che il giocatore non protegge attivamente decade."
+    },
+    {
+      "schema_version": 1,
+      "id": "tg_giuramento_del_crepuscolo",
+      "name_i18n": "ability.twilight_giant.tg_giuramento_del_crepuscolo",
+      "sequence_id": "twilight_giant_0",
+      "costo_spiritualita": 45,
+      "cooldown": 50.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 12,
+          "durata": -1,
+          "effetto": "autorita_decadimento",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        }
+      ],
+      "tag_sinergia": [
+        "dominio",
+        "luce",
+        "area"
+      ],
+      "costo_follia": 5.0,
+      "preghiera": "voto_di_autorita",
+      "note": "US-714. Il Twilight Giant impone la propria autorita' su chi entra nel raggio: non e' un colpo, e' un editto. aura(autorita_decadimento) su nemici, stesso effetto gia' usato da death_autorita_finale (US-714 lo riusa, non lo duplica)."
     }
   ]
 }

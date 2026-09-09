@@ -585,6 +585,29 @@
         "area"
       ],
       "note": "Nessun segreto resiste all'Hermit di Sequenza 0."
+    },
+    {
+      "schema_version": 1,
+      "id": "hermit_intercessione_arcana",
+      "name_i18n": "ability.hermit.hermit_intercessione_arcana",
+      "sequence_id": "hermit_1",
+      "costo_spiritualita": 26,
+      "cooldown": 24.0,
+      "primitive": [
+        {
+          "tipo": "heal",
+          "quantita": 30,
+          "istantaneo": false,
+          "durata": 8.0,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "rituale",
+        "conoscenza"
+      ],
+      "preghiera": "intercessione",
+      "note": "US-714. Il Knowledge Emperor non prega un dio: legge la propria formula di guarigione dal destino gia' scritto. heal su self, come le altre cure del Pathway."
     }
   ]
 }

@@ -677,7 +677,8 @@
         "difesa": 0.2
       },
       "abilities": [
-        "darkness_dominio_della_notte"
+        "darkness_dominio_della_notte",
+        "darkness_anatema_del_vuoto"
       ],
       "acting_actions": [
         {
@@ -716,8 +717,7 @@
       },
       "advancement_ritual": {
         "location_tags": [
-          "tempio_abbandonato",
-          "cripta"
+          "soglia_del_crepuscolo"
         ],
         "momento": "notte_fonda",
         "fase_lunare": "eclissi",

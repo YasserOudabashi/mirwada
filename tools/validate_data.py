@@ -546,6 +546,28 @@ def main():
                 if not ab.get("tag_sinergia"):
                     err(f"{rel} [{aid}]: nessun tag_sinergia. Un'abilita' senza tag e' invisibile al motore delle sinergie.")
 
+                # US-714: preghiera (Sequenze alte) - puramente semantica/i18n,
+                # ma deve essere nel vocabolario e coerente con le primitive
+                # dell'abilita' (data/schema/prayer_effects.json).
+                pray = ab.get("preghiera")
+                if pray is not None:
+                    if pray not in valid_prayer_effects:
+                        err(f"{rel} [{aid}]: preghiera '{pray}' non nel vocabolario di "
+                            f"data/schema/prayer_effects.json")
+                    else:
+                        spec = _pray_doc["preghiere"][pray]
+                        prim_richiesta = spec.get("primitiva")
+                        prims_ab = ab.get("primitive", [])
+                        if prim_richiesta and not any(p.get("tipo") == prim_richiesta for p in prims_ab):
+                            err(f"{rel} [{aid}]: preghiera '{pray}' richiede una primitiva "
+                                f"'{prim_richiesta}', assente dall'abilita'")
+                        bersagli_richiesti = spec.get("richiede", {}).get("bersagli")
+                        if bersagli_richiesti and not any(
+                                p.get("tipo") == prim_richiesta and p.get("bersagli") == bersagli_richiesti
+                                for p in prims_ab):
+                            err(f"{rel} [{aid}]: preghiera '{pray}' richiede '{prim_richiesta}' "
+                                f"con bersagli '{bersagli_richiesti}'")
+
     for rel, sid, aid in ability_refs:
         if ability_ids and aid not in ability_ids:
             err(f"{rel} [{sid}]: riferimento ad abilita' inesistente '{aid}'")

@@ -561,6 +561,36 @@
         "viaggio"
       ],
       "note": "Apre un varco largo che resta nel mondo, e per un momento il Door e' piu' veloce di ogni porta."
+    },
+    {
+      "schema_version": 1,
+      "id": "door_anatema_del_varco",
+      "name_i18n": "ability.door.door_anatema_del_varco",
+      "sequence_id": "door_1",
+      "costo_spiritualita": 27,
+      "cooldown": 26.0,
+      "primitive": [
+        {
+          "tipo": "curse",
+          "effetto": "varco_sigillato",
+          "durata": 15.0,
+          "condizione_rimozione": ""
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "velocita",
+          "valore": -0.3,
+          "durata": 15.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "spazio",
+        "maledizione"
+      ],
+      "costo_follia": 3.0,
+      "preghiera": "anatema",
+      "note": "US-714. La Key of Stars sigilla lo spazio intorno al bersaglio invece di aprirlo: curse(varco_sigillato, nuovo status) + debuff velocita'. Stessa primitiva delle altre maledizioni del gioco, nessuna nuova."
     }
   ]
 }
