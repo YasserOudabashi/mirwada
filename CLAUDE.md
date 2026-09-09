@@ -252,6 +252,26 @@ nuove partono da un eventuale testo in chiaro già nei dati (campo gemello
 dà **errore** se una chiave `*_i18n` dei dati attivi non ha voce in `it.json`.
 Riattivi un gruppo differito → rilancia il tool e traduci i nuovi stub.
 
+## Fog of war sulla conoscenza — nomi di Sequenza
+
+Ogni Sequenza di ogni Pathway ha gia' un nome canonico proprio e distinto
+(campo `name` di ogni voce in `data/pathways/*.json`: 100 nomi diversi,
+nessuna fascia condivide un nome generico — es. Twilight Giant 9=Warrior,
+8=Pugilist, ... 0=Twilight Giant). Verificato riga per riga su tutti i 10
+Pathway attivi (2026-09-09): i dati sono gia' corretti, non serve toccarli.
+
+Il giocatore non deve MAI conoscere in anticipo il nome di una Sequenza non
+ancora raggiunta. Unica eccezione: puo' conoscere il nome della Sequenza
+**immediatamente successiva** alla propria sul **proprio** Pathway (un
+presagio/indiscrezione) — mai il nome, ne' altro, di Sequenze piu' lontane,
+ne' quello di Sequenze di altri Pathway (a meno di un flag esplicito in
+KnowledgeStore, gia' previsto dal fog of war esistente). La pagina diagramma
+del libro (`scripts/pages/page_diagramma_pathway.gd`, fase 2 US-224) applica
+il fog of war sulle celle della griglia (colonna propria fino alla Sequenza
+corrente = nota, il resto ignoto salvo flag) ma oggi non renderizza nomi di
+Sequenza da nessuna parte nella griglia; l'eccezione della Sequenza
+successiva (solo nome, mai abilita' o altri dettagli) e' da implementare.
+
 ## Non-goals
 
 Multiplayer, 3D, generazione procedurale del mondo, monetizzazione,

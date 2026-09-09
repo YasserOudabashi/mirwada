@@ -7250,3 +7250,31 @@ US-714..715. Preghiere delle Sequenze alte (6 abilita' nuove, campo
 tag generici ai 4 siti di gruppo, coerenti con l'antagonista e col cambio
 Pathway di fase 7. 752 test (erano 749 a fine Blocco B). Save invariato.
 Prossimo: BLOCCO D - US-716 finali (data/endings.json).
+
+=== RICHIESTA UTENTE: fog of war sui nomi di Sequenza (2026-09-09, APERTA) ===
+L'utente ha chiesto di sistemare i nomi delle Sequenze: non tutte le fasce
+hanno lo stesso nome, e il giocatore deve poter conoscere al massimo il nome
+della Sequenza successiva alla propria, mai delle altre (che restano
+nascoste). Investigazione fatta PRIMA di agire (nessuna modifica al gioco
+ancora):
+- Controllati i campi 'name' di tutte le Sequenze dei 10 Pathway attivi
+  (data/pathways/*.json): sono GIA' tutti distinti e corretti (100 nomi
+  unici, corrispondono al prospetto canonico che l'utente ha allegato in
+  chat - es. Twilight Giant 9=Warrior...0=Twilight Giant). Non c'e' nulla
+  da correggere nei dati.
+- Il gap reale e' nella pagina diagramma del libro
+  (scripts/pages/page_diagramma_pathway.gd, fase 2 US-224): il fog of war
+  sulla griglia gia' funziona (colonna propria nota fino alla Sequenza
+  corrente, resto ignoto salvo flag KnowledgeStore), ma la griglia non
+  mostra MAI il testo del nome di una Sequenza (solo celle colorate) e non
+  esiste alcuna eccezione che riveli il nome della Sequenza immediatamente
+  successiva alla propria.
+- Regola aggiunta a CLAUDE.md (sezione "Fog of war sulla conoscenza — nomi
+  di Sequenza") cosi' resti scritta anche se questa sessione si interrompe.
+- Piano proposto (NON ancora implementato, in attesa di conferma dell'utente
+  in chat): in page_diagramma_pathway.gd aggiungere uno stato "prossima" a
+  _stato() per (mio, mia_seq - 1) quando esiste (mia_seq > 0), mostrarne SOLO
+  il nome (tr_data del campo name_i18n della Sequenza) in una riga nel
+  pannello di dettaglio sotto la Sequenza corrente, senza abilita' ne' altri
+  dati. Nessuna primitiva/vocabolario nuovo, un file + una chiave i18n + un
+  test in tests/test_book_ui.gd (o dove gia' testata questa pagina).
