@@ -1,5 +1,6 @@
-[gd_scene load_steps=11 format=3 uid="uid://bsq0main0scen"]
+[gd_scene load_steps=12 format=3 uid="uid://bsq0main0scen"]
 
+[ext_resource type="Script" path="res://scripts/main.gd" id="0_main"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/regioni/mirwada.tscn" id="2_region"]
 [ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="3_enemy"]
@@ -12,6 +13,7 @@
 [ext_resource type="PackedScene" path="res://scenes/tribulation_overlay.tscn" id="10_trbov"]
 
 [node name="Main" type="Node2D"]
+script = ExtResource("0_main")
 
 [node name="Mirwada" parent="." instance=ExtResource("2_region")]
 

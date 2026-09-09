@@ -7660,3 +7660,78 @@ toccato). Suite non rilanciata: in questo commit non c'e' un solo file
 PROSSIMO PASSO: mergiare la PR #3 (chiusura fase 7) in main, poi generare
 prd.json dal PRD con /ralph 006_PRD/prd-fase-8-vertical-slice.md e
 correggere i campi come dice prossimi-passi.md § 2. Poi US-801.
+
+=== US-801: avvio di partita vero + scelta del Pathway (fase 8, Blocco 0) ===
+
+COSA FATTO.
+- scripts/main.gd (NUOVO, sul nodo Main di scenes/main.tscn): _ready()
+  chiama Book.apri() (si apre sulla pagina di ordine piu' basso, la
+  copertina/scaffale); si connette a GameState.partita_iniziata e
+  ricostruisce la regione corrente ricaricando la stessa scena (stesso
+  meccanismo di region_scene.gd::_viaggia_verso: nuova istanza aggiunta,
+  la vecchia queue_free()). Nessun id di regione hardcoded: usa lo
+  scene_file_path del nodo regione gia' in scena, riconosciuto dal suo
+  contratto pubblico (has_method("viaggia_a")), non dal nome del nodo.
+- scenes/main.tscn: aggiunto lo script main.gd al nodo Main (load_steps
+  10 -> 11 ext_resource + il nodo Main con script). Il nodo Enemy
+  hardcoded RESTA (lo toglie US-806 quando i nemici arrivano dai layout):
+  il gioco deve restare giocabile a ogni commit.
+- scripts/pages/page_creazione_personaggio.gd: _mostra_creazione()
+  guadagna un OptionButton coi 10 Pathway attivi (GameData.pathway_ids(),
+  nome via tr_data), preselezionato sul default di
+  balance.json.progressione.pathway_default. conferma() passa l'id
+  scelto a nuova_partita(). Nuova chiave i18n BOOK_FRONTESPIZIO_PATHWAY
+  (IT "Scegli il tuo Pathway" / EN "Choose your Pathway") in
+  assets/i18n/strings.csv.
+- scripts/game_state.gd::nuova_partita: 4° parametro opzionale
+  pathway_id := "", passato a Progression.configura(pathway_id, 9) (prima
+  chiamava sempre configura("", 9)). Con "" il comportamento e'
+  identico a prima: Progression.configura() gia' ricade sul default
+  quando pathway_id e' vuoto, quindi i chiamanti/test esistenti (che non
+  passano il 4° argomento) non hanno nessuna regressione. carica_slot()
+  emette gia' partita_iniziata (verificato, non toccato).
+- tests/test_main_boot.gd (NUOVO, 4 test): main.gd apre il libro
+  sull'avvio sulla pagina tipo menu_principale; nuova_partita con un
+  Pathway esplicito DIVERSO dal default configura Progression su quello
+  (il test sceglie il primo id != default, non "l'ultimo della lista":
+  scoperto durante la verifica a schermo che l'ultimo Pathway in ordine
+  alfabetico e' proprio twilight_giant, cioe' il default — un test che
+  avesse preso l'ultimo non avrebbe provato nulla); senza pathway_id usa
+  il default (nessuna regressione); _su_partita_iniziata ricostruisce la
+  regione (la vecchia istanza risulta is_queued_for_deletion(), una nuova
+  con lo stesso region_id prende il suo posto — verificato senza await,
+  controllando l'ultimo figlio per indice, come gia' fa
+  tests/test_area_gate.gd con cont.free() sincrono a fine test).
+
+COME VERIFICATO.
+- python tools/validate_data.py: esce 0, stessi 3 warning di sempre
+  (nessun dato toccato).
+- godot --headless --path . --import: pulito (nessun errore).
+- godot --headless --path . --script res://tests/run_tests.gd: 780 test,
+  tutti passati (776 + 4 nuovi di test_main_boot.gd). Nessuna regressione.
+- VERIFICA A SCHERMO REALE (Xvfb, script di QA non committato): avviato
+  main.tscn per davvero, screenshot mandati in chat.
+  1) 01_scaffale.png: Play apre lo scaffale da solo (4 "Tomo nuovo"),
+     senza toccare nessun tasto — prima di questa story si finiva
+     direttamente nel mondo senza libro.
+  2) 02_frontespizio_scelta_pathway.png: la creazione mostra "Scegli il
+     tuo Pathway" (i18n, non un placeholder) con un OptionButton coi 10
+     Pathway, "Twilight Giant" preselezionato; sotto, i talenti innati
+     gia' esistenti.
+  3) 03_mondo_dopo_creazione.png: confermando, il libro si chiude e si
+     entra nel mondo — l'HUD mostra Salute 100/120: 100 e' la base di
+     Sequenza 9 (balance.json.hp_curve), +20 e' esattamente lo
+     stat_modifiers.hp_max del Twilight Giant Sequenza 9
+     (data/pathways/twilight_giant.json) — prova end-to-end che il
+     Pathway scelto nell'OptionButton arriva davvero fino a Progression
+     e agli stat del personaggio, non solo salvato in un campo.
+
+COSA RESTA APERTO (dichiarato, non di questa story).
+- Il mondo e' ancora vuoto (pavimento piatto, un solo nemico hardcoded):
+  arriva con US-805/806/807 (Blocco B).
+- Nessun tasto lancia un'abilita' ancora: US-802.
+- Lo screenshot 03 mostra il player come un semplice quadrato blu: sprite
+  veri arrivano in US-812/813 (Blocco E), volutamente per ultimi.
+
+PROSSIMA STORIA: US-802 — abilita' a tastiera (tasti 1-4) + hotbar
+nell'HUD + proiettili/archi che colpiscono davvero (Blocco 0).

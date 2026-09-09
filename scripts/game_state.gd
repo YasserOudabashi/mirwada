@@ -164,7 +164,9 @@ func carica_slot(slot: int) -> Dictionary:
 
 
 ## Creazione personaggio (US-223): fissa il nome, riparte da zero, salva sullo
-## slot scelto. Il Pathway/Sequenza di partenza vengono dai dati (Progression).
+## slot scelto. La Sequenza di partenza viene dai dati (Progression); il
+## Pathway e' quello scelto (US-801) o, con "" (compatibilita' coi chiamanti
+## esistenti/i test), il default di balance.json.progressione.
 ## talenti_innati (US-332): id di talenti 'innato' scelti alla creazione — solo
 ## quelli veri entrano in TalentSystem, il resto e' ignorato.
 ##
@@ -175,7 +177,8 @@ func carica_slot(slot: int) -> Dictionary:
 ## (Sequenza, follia) si azzerano qui: nuova_partita() puo' essere chiamata
 ## nella STESSA sessione di un personaggio appena concluso, i cui autoload
 ## portano ancora il suo stato.
-func nuova_partita(nome: String, slot: int, talenti_innati: Array = []) -> Dictionary:
+func nuova_partita(nome: String, slot: int, talenti_innati: Array = [],
+		pathway_id: String = "") -> Dictionary:
 	var eredita: Dictionary = _eredita_da_slot(slot)
 
 	nome_personaggio = nome.strip_edges() if not nome.strip_edges().is_empty() else NOME_DEFAULT
@@ -184,7 +187,7 @@ func nuova_partita(nome: String, slot: int, talenti_innati: Array = []) -> Dicti
 	_slot_corrente = slot
 
 	if _progression() != null:
-		_progression().call("configura", "", 9)
+		_progression().call("configura", pathway_id, 9)
 	if _follia() != null:
 		_follia().call("azzera")
 	if _conoscenza() != null:

@@ -17,8 +17,8 @@
       ],
       "priority": 1,
       "fase": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto 2026-09-09. scripts/main.gd (nuovo): _ready() chiama Book.apri() e si connette a GameState.partita_iniziata per ricostruire la regione corrente (stesso meccanismo di region_scene._viaggia_verso, nessun id hardcoded: riconosce il nodo regione da has_method('viaggia_a') e riusa il suo scene_file_path). scenes/main.tscn: script attaccato al nodo Main; il nodo Enemy hardcoded resta (lo toglie US-806). page_creazione_personaggio.gd: OptionButton con i 10 Pathway attivi (GameData.pathway_ids(), tr_data), preselezionato sul default di balance.json.progressione; conferma() passa l'id scelto a nuova_partita(). game_state.gd::nuova_partita: 4 parametro opzionale pathway_id := '' passato a Progression.configura (con '' il comportamento e' identico a prima: nessuna regressione sui chiamanti esistenti). Nuova chiave i18n BOOK_FRONTESPIZIO_PATHWAY (IT/EN). tests/test_main_boot.gd (nuovo, 4 test). Verificato: python tools/validate_data.py esce 0 (3 warning invariati); godot --headless --import pulito; suite headless 780/780 verdi (776 + 4 nuovi), nessuna regressione. Verifica a schermo reale con Xvfb (3 screenshot inviati in chat): 1) Play apre lo scaffale da solo, 2) la creazione mostra 'Scegli il tuo Pathway' con l'OptionButton dei 10 Pathway (Twilight Giant preselezionato), 3) dopo la conferma il libro si chiude e l'HUD nel mondo mostra Salute 100/120 = base Sequenza 9 (100) + il bonus stat_modifiers.hp_max (+20) del Twilight Giant Sequenza 9 -- prova end-to-end che il Pathway scelto arriva fino a Progression e agli stat, non solo salvato in un campo. Dettagli completi in progress.txt."
     },
     {
       "id": "US-802",
