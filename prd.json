@@ -271,8 +271,8 @@
       ],
       "priority": 17,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "scripts/ending_system.gd (NUOVO autoload, registrato dopo KnowledgeStore in project.godot). valuta(): itera GameData.get_endings(), Conditions.tutte_soddisfatte(condizioni) + regola generica eredita_profilo=='ancore' -> richiede AnchorSystem.active() non vuoto (mai un id di finale nel codice, FR-15). Ascolta 3 segnali per rivalutare live: Madness.madness_changed, RitualSystem.rituale_completato, KnowledgeStore.appreso. Il flag 'rituale_sequenza_0_completato' (condizione Apoteosi) e' posto qui: RitualSystem.rituale_completato porta la Sequenza di PARTENZA del rituale (non quella di arrivo, verificato leggendo ritual_system.gd _completa()), quindi si controlla Progression.sequence()==0 DOPO l'avanzamento, non il parametro del segnale. _raggiungi(id): EndgameState.imposta_finale(id) (il round-trip nel save era gia' garantito da US-701) + segnale finale_raggiunto(id, gruppo) + Book.apri_a('colophon') (gia' mette in pausa da solo, book.gd riga 85 - nessuna pausa duplicata). US-718 riempira' il colophon col contenuto del finale. Un finale gia' raggiunto non si sovrascrive (_rivaluta controlla EndgameState.finale non vuoto prima di richiamare valuta()). BUG trovato e corretto in fase di test: _rivaluta() e' agganciata a segnali live, quindi un test che spinge follia a 100 pausa l'albero (Book si apre) - senza richiudere il libro a fine test, la pausa filtrava nella suite alfabeticamente successiva (test_equipment) e ne rompeva il round-trip. Fix: _fine() in ogni test di test_ending_system.gd richiude il libro se aperto. tests/test_ending_system.gd NUOVO (7 test): nessuna condizione -> ''; follia 100 -> consumazione; Seq 0 da sola non basta, +rituale -> apoteosi; entrambe insieme -> vince consumazione (priorita' piu' alta, FR-10); flag pozione_distrutta da solo non basta, +Ancora viva -> rinuncia; il segnale finale_raggiunto scrive endgame.finale e apre il libro; un finale gia' raggiunto non si sovrascrive. validate exit 0 (3 warning invariati). 766 test verdi (759 + 7)."
     },
     {
       "id": "US-718",

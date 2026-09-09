@@ -7349,3 +7349,38 @@ antagonisti.json) + get_endings()/get_ending(id).
   (nuovo), data/dialogues/dlg_antagonista.json, data/i18n/it.json,
   scripts/game_data.gd, tools/validate_data.py, tests/test_endings.gd
   (nuovo).
+
+=== US-717: EndingSystem - valuta e sceglie (fase 7, Blocco D) ===
+scripts/ending_system.gd (NUOVO autoload, dopo KnowledgeStore in
+project.godot). valuta(): Conditions.tutte_soddisfatte(condizioni) su ogni
+finale + regola generica "eredita_profilo=='ancore' richiede
+AnchorSystem.active() non vuoto" (mai un id di finale nel codice, FR-15).
+Rivaluta live su 3 segnali: Madness.madness_changed, RitualSystem.
+rituale_completato, KnowledgeStore.appreso. Il flag
+'rituale_sequenza_0_completato' e' posto QUI, non da un dialogo: ho
+verificato in ritual_system.gd che rituale_completato(sequenza) porta la
+Sequenza di PARTENZA del rituale (catturata a inizio build, PRIMA di
+Progression.avanza), non quella di arrivo - quindi il controllo vero e'
+Progression.sequence()==0 DOPO l'avanzamento, non il parametro del
+segnale. _raggiungi(id): EndgameState.imposta_finale(id) (round-trip nel
+save gia' garantito da US-701) + segnale finale_raggiunto(id, gruppo) +
+Book.apri_a('colophon') (che gia' mette in pausa da solo). US-718 riempira'
+il colophon col contenuto vero del finale.
+- BUG trovato e corretto durante i test: _rivaluta() e' agganciata a
+  segnali live, quindi un test che spinge la follia a 100 fa scattare
+  _raggiungi() e mette in pausa l'albero (Book si apre). Senza richiudere
+  il libro a fine test, la pausa filtrava nella suite ALFABETICAMENTE
+  SUCCESSIVA (test_equipment.gd) e ne rompeva il round-trip del save (un
+  test apparentemente scollegato falliva). Fix: _fine() in ogni test di
+  test_ending_system.gd richiude il libro se rimasto aperto.
+- tests/test_ending_system.gd NUOVO (7 test): nessuna condizione -> '';
+  follia 100 -> consumazione; Seq 0 da sola non basta (serve anche il
+  rituale) -> apoteosi; entrambe insieme -> vince consumazione (priorita'
+  piu' alta, FR-10 il game over vince sempre); flag pozione_distrutta da
+  solo non basta (serve un'Ancora viva) -> rinuncia; il segnale
+  finale_raggiunto scrive endgame.finale e apre il libro; un finale gia'
+  raggiunto non si sovrascrive.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning
+  invariati). 766 test headless (759 + 7), tutti verdi.
+- File toccati: scripts/ending_system.gd (nuovo), project.godot,
+  tests/test_ending_system.gd (nuovo).
