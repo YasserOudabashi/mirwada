@@ -8353,3 +8353,80 @@ COSA RESTA APERTO (dichiarato, non di questa story).
 PROSSIMA STORIA: US-807c — Archivio Sepolto, layout + popolazione (sale e
 corridoi interni, gruppo demon_of_knowledge, boss Sequenza 6 del Pathway
 Hermit).
+
+=== US-807c: Archivio Sepolto - layout + popolazione (fase 8, Blocco B) ===
+
+COSA FATTO.
+- data/world/layouts/archivio_sepolto.json: quinta regione con layout,
+  ZERO codice nuovo. 6 zone (biblioteca, officina, torre_di_osservazione,
+  studio, sala_dei_sigilli, biblioteca_di_tutto), stavolta disegnate come
+  vere SALE MURATE (identita' "sale e corridoi", diversa da Marche
+  aperta/Valle naturale): ogni zona e' una stanza 14x15 con muro '#'
+  perimetrale, pavimento variante ',' dentro, e varchi (celle '.') scavati
+  sul perimetro che si affacciano su 2 corridoi larghi 1 cella (colonna
+  x=16, colonna x=31, riga y=17) che collegano tutte le sale fra loro.
+  sala_dei_sigilli ha UN SOLO varco (verso studio) — coerente col nome:
+  la stanza piu' chiusa, tema "conoscenza sigillata". La zona 'ali_interne'
+  del gate esistente ({tipo:conoscenza, valore:testi_ordine_minore,
+  area:ali_interne}) NON e' uno dei 6 location_tags richiesti (stessa
+  situazione di 'ponti_di_radici' in US-807b): e' un'etichetta narrativa
+  del gate, non una zona a se'. ERRORE SCOPERTO E CORRETTO PRIMA DEL
+  COMMIT: il primo disegno metteva i varchi delle sale su coordinate FUORI
+  dal perimetro reale della stanza (es. gap dichiarato a x=16 per una
+  stanza il cui muro destro era a x=15) — un bug silenzioso che avrebbe
+  reso 'officina' completamente sigillata (zero varchi veri sul suo
+  perimetro). Scoperto con un controllo di raggiungibilita' via BFS dallo
+  spawn PRIMA di scrivere il file vero (nello script Python dello
+  scratchpad, non nel validator: e' un controllo di design, non un
+  requisito dei dati) — corrette tutte le coordinate dei varchi perche'
+  cadano davvero sul muro della stanza giusta, poi riverificata la
+  raggiungibilita' di tutte e 6 le sale.
+  Spawn [4,4] (dentro la sala biblioteca), passaggio verso mirwada a [4,6].
+- nemici: 6 di Sequenza 8/7 (3+3) sparse in officina/torre_di_osservazione/
+  studio/sala_dei_sigilli (>=8 celle dallo spawn) + 1 boss Sequenza 6
+  dentro biblioteca_di_tutto (la "biblioteca di tutto", stanza piu' grande
+  e simbolica: coerente per un guardiano), override danno_attacco 15/
+  raggio_aggro 200/scala 1.5 (stesso schema), tag "spirito" (guardiani
+  eterei della conoscenza, coerente col gruppo demon_of_knowledge) e
+  caratteristica del Pathway "hermit" (Sequenza 6, garantita) — scelto
+  perche' palette_visiva di archivio_sepolto in regions.json e' gia'
+  "hermit": coerenza gia' presente nei dati, non inventata.
+- oggetti: 6 moneta_comune, uno per sala (tutte e 6), quantita' 1-3.
+- tests/test_layouts.gd: 6 test nuovi dedicati a archivio_sepolto
+  (dipintura incluso un muro interno di sala e un varco fra sale, spawn
+  dentro la biblioteca, passaggio, nemici+boss via _cfg, oggetti in
+  Inventory, area_cleared, nemici inerti senza player). Esteso
+  test_get_layout_presente_e_assente (archivio_sepolto ora ha layout,
+  frontiera_porte e' l'unico esempio "senza" rimasto). CORRETTO di nuovo
+  test_regione_senza_layout_resta_invariata: spostato da archivio_sepolto
+  (ora ha un layout) a frontiera_porte (l'ultima regione ancora senza,
+  fino a US-807d).
+
+COME VERIFICATO.
+- python tools/validate_data.py: 0 errori, un warning in meno (archivio_
+  sepolto ora ha un layout: resta solo frontiera_porte).
+- godot --headless --import: pulito.
+- Suite: 824 test, tutti passati (818 + 6 nuovi). Nessuna regressione
+  (test_regions.gd/test_area_gate.gd/test_densita_mistica.gd/
+  test_lore_conoscenza.gd/test_dialoghi_roster.gd che nominano
+  archivio_sepolto non assumevano l'assenza di layout).
+- VERIFICA A SCHERMO REALE (Xvfb, script di QA non committato, con
+  reset_smoothing() dalla trappola #13 gia' documentata): 3 screenshot
+  mandati in chat — corridoi e muri di sala ben distinti (diverso dal
+  look aperto di Marche/Valle), la biblioteca di tutto col boss (piu'
+  grande, scala 1.5x, ben visibile).
+
+CORREZIONI rispetto al piano.
+- Vedi sopra: coordinate dei varchi delle sale corrette prima del commit
+  dopo un controllo di raggiungibilita' che avrebbe altrimenti lasciato
+  'officina' inaccessibile — errore mio, non dell'AC, catturato con
+  verifica proattiva invece che scoperto a schermo o da un giocatore.
+
+COSA RESTA APERTO (dichiarato, non di questa story).
+- Frontiera delle Porte resta piatta fino a US-807d (che chiude anche il
+  Blocco B, convertendo il warning "regione senza layout" in errore).
+- drop resta vuoto per contratto (US-809 lo popola).
+
+PROSSIMA STORIA: US-807d — Frontiera delle Porte, layout + popolazione +
+chiusura del Blocco B (isole nella nebbia, gruppo lord_of_mysteries, boss
+Sequenza 5 del Pathway Door).
