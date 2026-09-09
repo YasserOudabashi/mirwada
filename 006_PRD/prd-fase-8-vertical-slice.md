@@ -656,44 +656,139 @@ nell'inventario e usarlo.
       `items_per_categoria("ingrediente")` ≥ 299 + 8.
 - [ ] `python tools/validate_data.py` esce 0. Nessuna regressione. Typecheck passes. Tests pass.
 
-#### US-809: Fonti nel mondo — drop per regione, listini, raccolta a terra
+#### US-809: Fonti nel mondo — drop per regione, listini, raccolta a terra — SPEZZATA
 
-**Description:** Come giocatore, voglio poter ottenere ogni ingrediente
-di cui ho bisogno giocando: uccidendo nemici della regione giusta,
-comprando da un venditore, o raccogliendolo a terra.
+**Nota (2026-09-09):** come US-807, questa story copriva 3 meccaniche
+abbastanza indipendenti (drop dei nemici, listini, raccolta a terra +
+chiusura del validator) lungo ~12 file. Su richiesta esplicita
+dell'utente, spezzata **prima di iniziare** in **US-809a** (drop dei
+nemici), **US-809b** (listini dei venditori), **US-809c** (raccolta a
+terra + il blocco validator "fonti", che ha senso solo a tutte e 3 le
+meccaniche esistenti). Il testo originale sotto resta come riferimento
+del disegno complessivo, non più la fonte di verità.
+
+*Description originale:* Come giocatore, voglio poter ottenere ogni
+ingrediente di cui ho bisogno giocando: uccidendo nemici della regione
+giusta, comprando da un venditore, o raccogliendolo a terra.
+
+*Acceptance Criteria originali (superseded dalle 3 story sotto):*
+
+- **Drop dei nemici** (dati): nel layout, `drop: {"9": [ids], "8":
+  [ids], ...}` = ingredienti delle formule dei Pathway del
+  `group_affinity` della regione, per Sequenza; per l'hub `mirwada` tutti
+  i Pathway ma solo Sequenze 9-8. Il tool di US-808 guadagna un'opzione
+  `--drops` che scrive queste tabelle nei layout. `region_scene::
+  _crea_nemici` mette nell'`override` di ogni nemico `oggetti_a_morte =
+  drop[str(sequenza)]`: nessuna tabella nel codice.
+- `scripts/enemy.gd::_lascia_oggetto()` accanto a `_lascia_caratteristica`:
+  con probabilità `_cfg.drop_probabilita` (nuovo campo in
+  `balance.json.nemico_base`) lascia a terra un item a caso da
+  `_cfg.oggetti_a_morte`. Il boss ha `drop_probabilita: 1.0`.
+- **Listini** (dati, `roster.json` `vendor.listino`): Sidon = ingredienti
+  Seq 9-8 di tutti i Pathway attivi; Vesna = tag `guarigione`/`crescita`;
+  Bruno = Seq 9-7 del gruppo `eternal_darkness`. Generati dal tool
+  (`--listini`); le voci esistenti restano.
+- **Raccolta a terra** (dati, a mano nei layout): in `mirwada.json` gli
+  ingredienti del Twilight Giant Seq 9→7 + `moneta_comune`; nelle altre
+  regioni gli ingredienti del gruppo.
+- Validator, blocco "fonti": per ogni ingrediente di una formula attiva,
+  ≥1 fonte fra drop/listino/oggetti. Errore altrimenti.
+- Test `tests/test_enemy_drop.gd` come sopra. `validate_data.py` 0.
+
+#### US-809a: Drop dei nemici (Blocco C)
+
+**Description:** Come giocatore, voglio che uccidere un nemico possa
+lasciare a terra un ingrediente della sua regione, così posso raccogliere
+materiali giocando invece di dover solo comprare o cercare a terra.
 
 **Acceptance Criteria:**
 
-- [ ] **Drop dei nemici** (dati): nel layout, `drop: {"9": [ids], "8":
-      [ids], ...}` = ingredienti delle formule dei Pathway del
-      `group_affinity` della regione, per Sequenza; per l'hub `mirwada`
-      tutti i Pathway ma solo Sequenze 9-8. Il tool di US-808 guadagna
-      un'opzione `--drops` che scrive queste tabelle nei layout (committate,
-      idempotente). `region_scene::_crea_nemici` mette nell'`override` di
-      ogni nemico `oggetti_a_morte = drop[str(sequenza)]`: **nessuna
-      tabella nel codice**.
+- [ ] `data/balance.json.nemico_base`: nuovo campo `drop_probabilita`
+      (proposta 0.6, `_comment` esplicito che ne spiega l'uso e come un
+      boss lo sovrascrive per-istanza via `override`).
 - [ ] `scripts/enemy.gd::_lascia_oggetto()` accanto a `_lascia_caratteristica`
-      (`:214`): con probabilità `_cfg.drop_probabilita` (nuovo campo in
-      `balance.json.nemico_base`, proposta 0.6, `_comment` esplicito) lascia
-      a terra **un** item scelto a caso da `_cfg.oggetti_a_morte` come
-      `item_pickup`. Il boss ha `drop_probabilita: 1.0` nell'`override`.
-- [ ] **Listini** (dati, `roster.json` `vendor.listino`): Sidon = ingredienti
-      Seq 9-8 di tutti i Pathway attivi; Vesna = ingredienti con tag
-      `guarigione`/`crescita`; Bruno = Seq 9-7 del gruppo
-      `eternal_darkness`. Generati dal tool (`--listini`), committati; le
-      voci esistenti restano.
-- [ ] **Raccolta a terra** (dati, a mano nei layout): in `mirwada.json` gli
-      ingredienti del Twilight Giant Seq 9→7 (così il primo ciclo si chiude
-      senza negozio) + `moneta_comune`; nelle altre regioni gli ingredienti
-      del gruppo (US-807 li usa).
-- [ ] Validator, blocco "fonti": per ogni ingrediente di una formula di un
-      Pathway attivo, esiste ≥1 fonte fra: un layout con l'id in `drop`,
-      un venditore con l'id nel `listino`, un layout con l'id in `oggetti`.
-      Errore altrimenti, con l'elenco dei mancanti.
-- [ ] Test `tests/test_enemy_drop.gd`: nemico con `oggetti_a_morte` e
-      `drop_probabilita: 1.0` → alla morte c'è un `item_pickup` figlio della
-      regione con uno degli id; con `0.0` → nessuno.
-- [ ] `python tools/validate_data.py` esce 0. Nessuna regressione. Typecheck passes. Tests pass.
+      (`:278`, stesso pattern: legge `_cfg`, tira un `randf()`, instanzia
+      un pickup, lo aggiunge al genitore): con probabilità
+      `_cfg.drop_probabilita` lascia a terra **un** item scelto a caso da
+      `_cfg.oggetti_a_morte` (array di id) come `item_pickup.gd` (US-806).
+      Chiamata da `_su_morte()` accanto a `_lascia_caratteristica()`. Se
+      `oggetti_a_morte` è vuoto o assente, no-op (nessuna regressione sul
+      nemico da banco di prova, che oggi non ha questo campo).
+- [ ] `scripts/region_scene.gd::_crea_nemici()` (`:250`): legge
+      `layout.drop` (dict `{"<sequenza>": [ids]}`) una volta; per ogni
+      nemico, se `drop` ha una voce per la sua `sequenza`, la inietta come
+      `oggetti_a_morte` nell'`override` (su una **copia** — `.duplicate(true)`
+      — per non mutare il dict condiviso del layout, stessa disciplina
+      della correzione fatta in US-806 per `_cfg`). Nessuna tabella nel
+      codice: l'unica fonte è `layout.drop`.
+- [ ] `tools/generate_formula_ingredients.py`: nuova opzione `--drops`
+      (idempotente, non tocca `nemici`/`oggetti` degli stessi layout):
+      per le 4 regioni con `group_affinity` reale, scrive `drop` con una
+      chiave per ogni Sequenza 0-9 che ha almeno una formula fra i
+      Pathway attivi di quel gruppo, valore = lista degli ingredienti di
+      quelle formule; per `mirwada` (`group_affinity: "neutra"`), `drop`
+      con solo le chiavi `"9"`/`"8"`, ingredienti di **tutti** i 10
+      Pathway attivi a quelle Sequenze.
+- [ ] I boss dei 5 layout guadagnano `"drop_probabilita": 1.0` nel loro
+      `override` (una riga a mano per file, i boss esistono già da
+      US-806/US-807a..d).
+- [ ] Test `tests/test_enemy_drop.gd` (nuovo): un nemico con
+      `override.oggetti_a_morte` non vuoto e `drop_probabilita: 1.0` →
+      alla morte c'è un `item_pickup` figlio della regione con uno degli
+      id dichiarati; con `drop_probabilita: 0.0` → nessun pickup nuovo.
+- [ ] Verifica Xvfb: uno screenshot che mostra un drop raccolto dopo aver
+      ucciso un nemico, in `progress.txt`.
+- [ ] `python tools/validate_data.py` esce 0. Nessuna regressione. Tests pass.
+
+#### US-809b: Listini dei venditori (Blocco C)
+
+**Description:** Come giocatore, voglio poter comprare gli ingredienti
+che mi servono da un venditore invece di dover sempre ucciderli o
+cercarli a terra.
+
+**Acceptance Criteria:**
+
+- [ ] `tools/generate_formula_ingredients.py`: nuova opzione `--listini`
+      (idempotente: solo append, mai rimuove/duplica un id già presente)
+      che estende `vendor.listino` in `data/npc/roster.json` per i 3 NPC
+      che hanno già un `vendor` reale (`npc_sidon`, `npc_vesna`,
+      `npc_bruno`, verificati esistenti): Sidon = ingredienti di Sequenza
+      9-8 di tutti i 10 Pathway attivi; Vesna = ingredienti con tag
+      `guarigione` o `crescita` (dal `tag` generato in US-808); Bruno =
+      ingredienti di Sequenza 9-7 del gruppo `eternal_darkness`. Le 8
+      voci scritte a mano già presenti (`erba_lunare` ecc.) restano.
+- [ ] Verifica: nessuna regressione sui test/dialoghi che leggono
+      `roster.json` (`tests/test_dialoghi_roster.gd` e simili).
+- [ ] `python tools/validate_data.py` esce 0. Nessuna regressione. Tests pass.
+
+#### US-809c: Raccolta a terra + chiusura (fonti nel mondo)
+
+**Description:** Come giocatore, voglio trovare ingredienti veri a terra
+nelle regioni (non solo monete), e sapere che ogni ingrediente di cui ho
+bisogno è ottenibile in almeno un modo.
+
+**Acceptance Criteria:**
+
+- [ ] I 5 layout (`data/world/layouts/*.json`): il campo `oggetti`
+      sostituisce (in tutto o in parte) le voci `moneta_comune` di
+      US-806/US-807a..d con ingredienti veri. `mirwada.json`: gli
+      ingredienti del Twilight Giant Sequenza 9→7 (9 id, così il primo
+      ciclo di coltivazione si chiude senza dover passare da un negozio)
+      + `moneta_comune` residua. Le altre 4 regioni: ingredienti del
+      Pathway già scelto in US-807a..d per quella regione (coerenza col
+      boss/Caratteristica già assegnati).
+- [ ] `tools/validate_data.py`: nuovo blocco "fonti" — per ogni
+      ingrediente di ogni formula dei 10 Pathway attivi, verifica che
+      esista **almeno una fonte** fra: un layout con l'id in `drop`
+      (qualunque Sequenza, US-809a), un venditore con l'id nel `listino`
+      (US-809b), un layout con l'id in `oggetti` (questa story). Errore
+      con l'elenco degli id senza nessuna fonte, altrimenti.
+- [ ] Verifica Xvfb: screenshot di un ingrediente vero raccolto a terra
+      (non più una moneta), in `progress.txt`.
+- [ ] `python tools/validate_data.py` esce 0 (il blocco "fonti" non trova
+      mancanti: la copertura del drop di US-809a su tutte le Sequenze di
+      ogni gruppo dovrebbe già coprire i 299 ingredienti da sola). Nessuna
+      regressione. Tests pass.
 
 ### Blocco D — Pagine del libro
 

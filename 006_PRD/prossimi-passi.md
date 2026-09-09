@@ -3,9 +3,10 @@
 > Scritto il 2026-09-09. Leggilo **dopo** `CLAUDE.md` e **prima** di toccare
 > qualunque file. Dice cosa fare, in che ordine, con quali strumenti, e le
 > trappole già scoperte. Il "cosa" dettagliato è in
-> `006_PRD/prd-fase-8-vertical-slice.md` (17 story: US-801..US-806,
-> US-807a..d, US-808..US-814 — US-807 originale spezzata in 4 per regione
-> il 2026-09-09, prima di iniziarla, su richiesta esplicita dell'utente).
+> `006_PRD/prd-fase-8-vertical-slice.md` (19 story: US-801..US-806,
+> US-807a..d, US-808, US-809a..c, US-810..US-814 — US-807 e US-809
+> originali spezzate rispettivamente in 4 per regione e 3 per meccanica,
+> sempre prima di iniziarle, su richiesta esplicita dell'utente).
 
 ---
 

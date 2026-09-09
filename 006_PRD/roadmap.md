@@ -320,8 +320,9 @@ Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 
 ## Fase 8 — Vertical slice giocabile (IN CORSO)
 
-> PRD: `006_PRD/prd-fase-8-vertical-slice.md` (17 story: US-801..US-806,
-> US-807a..d, US-808..US-814 — US-807 spezzata in 4 per regione).
+> PRD: `006_PRD/prd-fase-8-vertical-slice.md` (19 story: US-801..US-806,
+> US-807a..d, US-808, US-809a..c, US-810..US-814 — US-807 spezzata in 4
+> per regione, US-809 spezzata in 3 per meccanica).
 > Istruzioni operative per eseguirlo: `006_PRD/prossimi-passi.md`.
 
 Le fasi 1-7 hanno costruito **tutti i sistemi** del gioco, provati da 776

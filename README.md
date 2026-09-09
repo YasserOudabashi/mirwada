@@ -139,7 +139,7 @@ tribolazioni, finali) regge sulla stessa architettura.
 ## Documenti
 
 - `CLAUDE.md` — regole di lavoro, comandi, decisioni prese
-- `006_PRD/prd-fase-8-vertical-slice.md` — **PRD della fase corrente** (vertical slice giocabile, 17 story)
+- `006_PRD/prd-fase-8-vertical-slice.md` — **PRD della fase corrente** (vertical slice giocabile, 19 story)
 - `006_PRD/prossimi-passi.md` — **come eseguirla**: ordine delle operazioni, quando usare `/prd` e `/ralph`, setup, trappole note
 - `006_PRD/prd-fase-7-endgame.md` — PRD dell'ultima fase chiusa (fase 7)
 - `006_PRD/prd-fase-5b-lord-of-mysteries.md` — PRD della fase 5b (chiusa)
