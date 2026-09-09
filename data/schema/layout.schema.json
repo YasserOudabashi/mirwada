@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "_comment": "Documentazione formale di data/world/layouts/*.json (US-805, fase 8 Blocco B). Una mappa disegnata a mano per una regione: sostituisce il rettangolo piatto generato da region_scene.gd::_dipingi() con un layout vero. Una regione SENZA file qui continua a usare il fallback piatto di sempre (nessuna regressione). Controlli veri in tools/validate_data.py.",
+  "layout": {
+    "schema_version": "int, sempre 1 in questa fase",
+    "region_id": "string: deve esistere in data/world/regions.json",
+    "mappa": "esattamente 36 stringhe di esattamente 48 caratteri ciascuna (griglia [y][x], stessa dimensione W=48/H=36 di region_scene.gd). Solo caratteri della legenda fissa. Bordo esterno (riga 0, riga 35, colonna 0, colonna 47) tutto '#'.",
+    "spawn": "[x, y] in celle, dentro i limiti, su una cella calpestabile ('.'/','/'='/'+ ')",
+    "zone": "{location_tag: [x, y, w, h]} in celle. Un rettangolo per ogni location_tag della regione (copertura completa per Mirwada; le altre regioni non hanno ancora un layout). Rettangoli dentro i limiti, non sovrapposti.",
+    "passaggi": "{region_id: [x, y]} opzionale, per-destinazione: una destinazione assente dal dict usa la posizione a bordo calcolata di oggi (fallback di region_scene.gd::_crea_passaggi). Ogni region_id deve esistere in data/world/regions.json.",
+    "nemici": "array, vuoto in questa story (US-806 lo popola)",
+    "oggetti": "array, vuoto in questa story (US-809 lo popola)",
+    "drop": "dict, vuoto in questa story (US-809 lo popola)"
+  },
+  "legenda": {
+    ".": "pavimento",
+    ",": "pavimento variante",
+    "=": "sentiero",
+    "#": "muro (solido)",
+    "o": "ostacolo (solido)",
+    "t": "ostacolo 2 (solido)",
+    "~": "acqua (solida in questa story: la resa grafica distinta e il comportamento speciale arrivano con US-813)",
+    "+": "decoro calpestabile"
+  },
+  "regole_validator": [
+    "region_id esiste in data/world/regions.json",
+    "mappa: 36 righe di 48 caratteri, solo caratteri della legenda",
+    "bordo esterno tutto '#'",
+    "spawn dentro i limiti e su una cella calpestabile",
+    "zone: chiavi sottoinsieme di location_tags della regione; per la regione con layout la copertura deve essere completa (ogni location_tag ha una zona); rettangoli dentro i limiti",
+    "passaggi: ogni region_id di destinazione esiste in data/world/regions.json",
+    "una regione senza file layout produce solo un warning (atteso finche' US-807 non disegna le altre 4)"
+  ]
+}

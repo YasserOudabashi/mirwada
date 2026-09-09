@@ -7944,3 +7944,118 @@ tracciato; area_cleared resta un contratto, il codice arriva con US-806.
 
 PROSSIMA STORIA: US-805 — formato dei layout + loader + validator +
 Mirwada disegnata a mano (Blocco B, il mondo comincia a popolarsi).
+
+=== US-805: formato dei layout + loader + validator + Mirwada disegnata (fase 8, Blocco B) ===
+
+COSA FATTO.
+- data/schema/layout.schema.json (documentazione, stile degli altri schema
+  di data/schema/): campi schema_version, region_id, mappa (36 righe di 48
+  caratteri), spawn [x,y], zone {location_tag:[x,y,w,h]}, passaggi
+  {region_id:[x,y]} (opzionale, per-destinazione), nemici/oggetti/drop
+  (vuoti in questa story). Legenda fissa documentata: '.' pavimento, ','
+  pavimento variante, '=' sentiero, '#' muro, 'o'/'t' ostacoli, '~' acqua
+  (solida in questa story: la resa distinta arriva con US-813), '+' decoro
+  calpestabile.
+- data/world/layouts/mirwada.json: disegnata a mano, 48x36. Bordo esterno
+  tutto '#'. Spawn [4,4] (stessa cella di sempre, continuita'). 5 zone, una
+  per location_tag di regions.json['mirwada'] (porto, archivio, vicolo,
+  piazza, sotterraneo, verificate identiche via python prima di scrivere il
+  file): porto sud-est con banchina '=' e blocco d'acqua '~' a valle;
+  piazza centrale aperta (pavimento variante ','); vicolo a ovest, corridoi
+  scavati fra ostacoli 'o' (non un rettangolo aperto); archivio a nord, un
+  edificio isolato con pareti '#' e un ingresso di 2 celle; sotterraneo
+  racchiuso da muri con un solo varco a nord, interno decorato ('+'). 4
+  passaggi sul bordo est (x=44) verso le altre regioni, uno per y scelto a
+  mano. Il design e' stato generato e validato in uno script Python usa e
+  getta (non committato) PRIMA di scrivere il file vero, per non scoprire
+  errori solo dopo il commit: un primo tentativo aveva messo il passaggio
+  verso frontiera_porte su una cella d'acqua ([44,29]), corretto a [44,24]
+  e rivalidato.
+- scripts/game_data.gd: const DIR_LAYOUTS, var _layouts, _load_layouts()
+  (copia esatta del pattern di _load_quests, :768-780: un file per
+  regione, chiave region_id invece di id, stesso _upsert/_prune), agganciata
+  a load_all() accanto a _load_quests() -> hot-reload gratis (F5 gia'
+  chiama load_all()). get_layout(region_id) -> Dictionary, {} se assente
+  (stesso contratto di get_region).
+- scripts/region_scene.gd: SPAWN da const a var _spawn (default (4,4)),
+  sovrascritta in _ready() da layout.spawn se il layout esiste. _dipingi():
+  se GameData.get_layout(region_id) non e' vuoto e mappa ha 36 righe,
+  dipinge carattere per carattere ('.'/,'/'='/'+' -> PAVIMENTO, '#'/'o'/
+  't'/'~' -> MURO); altrimenti fallback identico al riempimento piatto di
+  sempre (invariato per le 4 regioni senza layout). _crea_zone(): per ogni
+  location_tag, se layout.zone[tag] esiste usa quel rettangolo esatto
+  (posizione/dimensione in celle*TILE); altrimenti la griglia automatica di
+  sempre. Nomi dei nodi (Zona_<tag>) e conteggio (1 per location_tag)
+  invariati: _crea_npc() e i test che contano per script non cambiano
+  comportamento. _crea_passaggi(): per ogni destinazione, se
+  layout.passaggi[id] esiste usa quella cella (centro cella in pixel);
+  altrimenti la posizione a bordo calcolata di sempre. Stesso numero/nomi
+  di nodi Passaggio_<id>. _crea_gate()/_crea_npc()/viaggio/fast-travel non
+  toccati.
+- tools/validate_data.py: nuovo blocco "layouts" subito dopo il check
+  US-619 (music_zone), riusa region_ids gia' raccolto nel blocco regioni:
+  per ogni file in data/world/layouts/*.json, region_id esiste ed e'
+  univoco fra i layout; mappa ha 36 righe di 48 caratteri, solo caratteri
+  di legenda; bordo esterno (riga 0/35, colonna 0/47) tutto '#'; spawn
+  dentro i limiti e su cella calpestabile; zone sottoinsieme dei
+  location_tags della regione, ogni coordinata dentro i limiti, e la
+  regione CON layout deve coprire tutti i suoi location_tags (err se ne
+  manca uno); passaggi verso region_id esistenti. Ogni regione SENZA
+  layout produce un warn() (non un err()): atteso finche' US-807 non
+  disegna le altre 4, non blocca il commit.
+- tests/test_layouts.gd (NUOVO, 6 test): get_layout("mirwada") non vuoto,
+  get_layout("nonesiste")/get_layout("valle_madre") {}; istanziando
+  mirwada.tscn con un Player fittizio come fratello (stesso contratto di
+  main.tscn: _colloca_giocatore() lo trova via get_parent().
+  get_node_or_null("Player")) -> bordo solido (tile MURO), cella '.'
+  interna non solida, cella '~' (44,29) solida, player posizionato
+  esattamente sulla cella spawn del layout; Zona_porto dentro il
+  rettangolo [36,26,10,8] dichiarato; Passaggio_marche_crepuscolo sulla
+  cella [44,5] dichiarata. Una regione SENZA layout (valle_madre) ->
+  bordo pieno e spawn di default (4,4) invariati: nessuna regressione,
+  provata esplicitamente.
+
+CORREZIONI rispetto al mio stesso AC/piano.
+- Gli esempi letterali di coordinate passaggi nell'AC originale
+  ([46,8]/[46,20]) erano solo illustrativi del formato dei dati, non
+  vincolanti: le coordinate reali sono state disegnate a mano dentro i
+  limiti della griglia 48x36 e verificate con un validator dry-run PRIMA
+  di scrivere i file veri nel repository (vedi sopra, il fix del passaggio
+  sull'acqua).
+- Il piano accennava a "rettangoli non sovrapposti" nel design delle zone
+  ma non lo richiedeva esplicitamente come controllo del validator: non
+  l'ho implementato come check formale (le 5 zone di Mirwada sono comunque
+  disgiunte per costruzione, verificato a mano riga per riga prima del
+  commit) — se in US-807 le prossime 4 regioni introducessero zone
+  sovrapposte per errore, oggi il validator non lo scoprirebbe: da tenere
+  a mente in quella story.
+
+COME VERIFICATO.
+- python tools/validate_data.py: 0 errori. 4 nuovi warning attesi (uno per
+  regione senza layout: archivio_sepolto, frontiera_porte,
+  marche_crepuscolo, valle_madre), i gruppi di warning preesistenti
+  (fusioni stub, sinergie irraggiungibili, traduzioni TODO) invariati.
+- godot --headless --path . --import: pulito.
+- Suite: 802 test, tutti passati (796 + 6 nuovi). Nessuna regressione su
+  test_regions.gd/test_area_gate.gd/test_page_mappa.gd (conteggio nodi
+  zona/passaggio invariato, istanziano tutte e 5 le regioni headless) ne'
+  sui checkpoint test_slice_fase_*.gd.
+- VERIFICA A SCHERMO REALE (Xvfb, script di QA non committato): avviato
+  main.tscn, 3 screenshot mandati in chat. Mirwada non e' piu' un
+  rettangolo piatto: si vedono le pareti dell'edificio archivio con
+  l'ingresso (vicino allo spawn), i corridoi/ostacoli del vicolo, le
+  pareti del sotterraneo come vere strutture. Player posizionato
+  esattamente sul pixel atteso (144,144) = map_to_local((4,4)), la stessa
+  cella di sempre.
+
+COSA RESTA APERTO (dichiarato, non di questa story).
+- Le altre 4 regioni restano piatte (fallback) fino a US-807.
+- nemici/oggetti/drop del formato layout restano vuoti per contratto:
+  US-806 (nemici/boss) e US-809 (oggetti/drop) li popolano.
+- La resa grafica distinta per o/t/~ (oggi tutti sul tile muro, fisicamente
+  corretti ma visivamente identici) arriva con US-813.
+- Nessun controllo di sovrapposizione fra zone nel validator (vedi
+  correzioni sopra).
+
+PROSSIMA STORIA: US-806 — nemici, boss e oggetti a terra dai layout,
+Mirwada popolata; rimuove il nodo Enemy hardcoded da main.tscn.

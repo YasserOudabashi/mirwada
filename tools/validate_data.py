@@ -980,6 +980,104 @@ def main():
                 err(f"data/audio.json [music.ambienti]: manca la zona '{mz}' usata dalla "
                     f"regione '{reg.get('id')}' (US-619: ambiente giorno/notte per ogni zona).")
 
+    # --- layout disegnati a mano (data/world/layouts/*.json, US-805) ---
+    # Sostituiscono il rettangolo piatto generato da region_scene.gd per una
+    # regione; una regione SENZA file qui resta piatta come oggi (fallback
+    # esplicito in codice) -> solo un warning, non un errore, finche' US-807
+    # non disegna le altre 4.
+    LEGENDA_LAYOUT = set(".,=#ot~+")
+    CALPESTABILI_LAYOUT = set(".,=+")
+    region_tags_by_id = {}
+    if regions_doc is not None:
+        for reg in regions_doc.get("regions", []):
+            region_tags_by_id[reg.get("id")] = set(reg.get("location_tags", []))
+
+    layouts_dir = os.path.join(DATA, "world", "layouts")
+    layout_region_ids = set()
+    if os.path.isdir(layouts_dir):
+        for fn in sorted(os.listdir(layouts_dir)):
+            if not fn.endswith(".json"):
+                continue
+            rel = f"data/world/layouts/{fn}"
+            doc = load_json(os.path.join(layouts_dir, fn))
+            if doc is None:
+                continue
+            rid = doc.get("region_id")
+            if rid not in region_ids:
+                err(f"{rel}: region_id '{rid}' non esiste in data/world/regions.json")
+                continue
+            if rid in layout_region_ids:
+                err(f"{rel}: region_id '{rid}' duplicato tra i layout")
+            layout_region_ids.add(rid)
+
+            mappa = doc.get("mappa", [])
+            if not isinstance(mappa, list) or len(mappa) != 36:
+                err(f"{rel} [{rid}]: mappa deve avere 36 righe "
+                    f"(trovate {len(mappa) if isinstance(mappa, list) else 'n/a'})")
+                mappa = []
+            righe_valide = True
+            for y, riga in enumerate(mappa):
+                if not isinstance(riga, str) or len(riga) != 48:
+                    err(f"{rel} [{rid}]: riga {y} deve avere 48 caratteri")
+                    righe_valide = False
+                    continue
+                fuori = set(riga) - LEGENDA_LAYOUT
+                if fuori:
+                    err(f"{rel} [{rid}]: riga {y} usa caratteri fuori dalla legenda: {sorted(fuori)}")
+
+            if len(mappa) == 36 and righe_valide:
+                bordo_ok = all(c == "#" for c in mappa[0]) and all(c == "#" for c in mappa[35])
+                bordo_ok = bordo_ok and all(riga[0] == "#" and riga[47] == "#" for riga in mappa)
+                if not bordo_ok:
+                    err(f"{rel} [{rid}]: il bordo esterno (riga 0, riga 35, colonna 0, "
+                        f"colonna 47) deve essere tutto '#'")
+
+            spawn = doc.get("spawn", [])
+            if not (isinstance(spawn, list) and len(spawn) == 2
+                    and all(isinstance(v, int) for v in spawn)):
+                err(f"{rel} [{rid}]: spawn deve essere [x, y] di interi")
+            elif len(mappa) == 36 and righe_valide:
+                sx, sy = spawn
+                if not (0 <= sx < 48 and 0 <= sy < 36):
+                    err(f"{rel} [{rid}]: spawn {spawn} fuori dai limiti (48x36)")
+                elif mappa[sy][sx] not in CALPESTABILI_LAYOUT:
+                    err(f"{rel} [{rid}]: spawn {spawn} non e' su una cella calpestabile "
+                        f"('{mappa[sy][sx]}')")
+
+            region_tags = region_tags_by_id.get(rid, set())
+            zone = doc.get("zone", {})
+            if not isinstance(zone, dict):
+                err(f"{rel} [{rid}]: zone deve essere un dict")
+                zone = {}
+            for tag, rect in zone.items():
+                if tag not in region_tags:
+                    err(f"{rel} [{rid}]: zone['{tag}'] non e' un location_tag della regione "
+                        f"({sorted(region_tags)})")
+                if not (isinstance(rect, list) and len(rect) == 4
+                        and all(isinstance(v, int) for v in rect)):
+                    err(f"{rel} [{rid}]: zone['{tag}'] deve essere [x, y, w, h] di interi")
+                    continue
+                zx, zy, zw, zh = rect
+                if zx < 0 or zy < 0 or zw <= 0 or zh <= 0 or zx + zw > 48 or zy + zh > 36:
+                    err(f"{rel} [{rid}]: zone['{tag}'] {rect} fuori dai limiti (48x36)")
+            mancanti = region_tags - set(zone)
+            if mancanti:
+                err(f"{rel} [{rid}]: mancano zone per i location_tags {sorted(mancanti)} "
+                    f"(una regione CON layout deve coprirli tutti)")
+
+            passaggi = doc.get("passaggi", {})
+            if not isinstance(passaggi, dict):
+                err(f"{rel} [{rid}]: passaggi deve essere un dict")
+                passaggi = {}
+            for dest in passaggi:
+                if dest not in region_ids:
+                    err(f"{rel} [{rid}]: passaggi['{dest}'] punta a una regione inesistente")
+
+    for _rid in sorted(region_ids - layout_region_ids):
+        warn(f"data/world/regions.json [{_rid}]: nessun layout in data/world/layouts/ "
+             f"(US-805: atteso finche' US-807 non la disegna; region_scene.gd usa il "
+             f"fallback piatto).")
+
     # --- fonti di tag di fase 3 (US-334): stanze costruibili, specie di pet
     # (+ comportamenti), tag_grant dei talenti. Rendono raggiungibili le
     # sinergie che pescano da questi sistemi. La VALIDAZIONE piena di quei

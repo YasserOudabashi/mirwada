@@ -26,6 +26,7 @@ const PATH_TRACKED_TALENTS := "res://data/schema/tracked_talents.json"
 const DIR_TALENTS := "res://data/talents"
 const DIR_DIALOGUES := "res://data/dialogues"
 const DIR_QUESTS := "res://data/quests"
+const DIR_LAYOUTS := "res://data/world/layouts"
 const PATH_TAGS := "res://data/tags.json"
 const PATH_BALANCE := "res://data/balance.json"
 const PATH_PRIMITIVES := "res://data/schema/primitives.json"
@@ -111,6 +112,7 @@ var _roster: Dictionary = {}
 var _dialogues: Dictionary = {}
 var _factions: Dictionary = {}
 var _quests: Dictionary = {}
+var _layouts: Dictionary = {}
 var _antagonisti: Dictionary = {}
 var _endings: Dictionary = {}
 
@@ -162,6 +164,7 @@ func load_all() -> void:
 	_load_talents()
 	_load_dialogues()
 	_load_quests()
+	_load_layouts()
 	# L'ultimo argomento e' il tipo atteso per la chiave: un file in cui quella
 	# chiave ha la forma sbagliata viene scartato con un errore, non caricato.
 	_load_single(PATH_TAGS, "tags", _tags, TYPE_ARRAY)
@@ -646,6 +649,12 @@ func get_quest(id: String) -> Dictionary:
 	return _quests.get(id, {})
 
 
+## --- Layout disegnati a mano (data/world/layouts/, US-805) ---
+## {} se la regione non ha un layout: il chiamante usa il fallback piatto.
+func get_layout(region_id: String) -> Dictionary:
+	return _layouts.get(region_id, {})
+
+
 ## --- Antagonisti (data/lore/antagonisti.json, US-620) ---
 func get_antagonisti() -> Array:
 	return _array_or_empty(_antagonisti.get("antagonisti"))
@@ -778,6 +787,24 @@ func _load_quests() -> void:
 		_upsert(_quests, qid, doc)
 		visti[qid] = true
 	_prune(_quests, visti)
+
+
+## US-805: un file per layout disegnato a mano (data/world/layouts/*.json),
+## chiave = region_id. Una regione senza file qui non ha layout: get_layout
+## torna {} e region_scene.gd usa il fallback piatto di sempre.
+func _load_layouts() -> void:
+	var visti: Dictionary = {}
+	for path in _json_files_in(DIR_LAYOUTS):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		var rid: String = str(doc.get("region_id", ""))
+		if rid.is_empty():
+			_fail(path, "un layout non ha 'region_id'")
+			continue
+		_upsert(_layouts, rid, doc)
+		visti[rid] = true
+	_prune(_layouts, visti)
 
 
 func _load_items() -> void:

@@ -25,8 +25,9 @@ const SORGENTE := 0
 const PAVIMENTO := Vector2i(0, 0)
 const MURO := Vector2i(1, 0)
 
-## Cella di comparsa del giocatore.
-const SPAWN := Vector2i(4, 4)
+## Cella di comparsa del giocatore. Default; _ready() la sovrascrive con
+## layout.spawn se la regione ha un layout disegnato a mano (US-805).
+var _spawn := Vector2i(4, 4)
 ## La regione hub: collegata a tutte le altre (design-world cap. 2.1).
 const HUB := "mirwada"
 
@@ -42,6 +43,11 @@ var _npc_vicino: String = ""
 
 func _ready() -> void:
 	tile_set = load("res://assets/placeholder/tileset.tres")
+	var layout: Dictionary = _layout_dati()
+	if not layout.is_empty():
+		var sp: Array = (layout.get("spawn", []) as Array)
+		if sp.size() == 2:
+			_spawn = Vector2i(int(sp[0]), int(sp[1]))
 	_dipingi()
 	_tinta_di_fondo()
 	_crea_zone()
@@ -60,7 +66,31 @@ func _regione_dati() -> Dictionary:
 	return gd.call("get_region", region_id) if gd != null else {}
 
 
+## {} se la regione non ha un layout disegnato a mano (US-805): ogni chiamante
+## qui sotto cade sul comportamento piatto di sempre.
+func _layout_dati() -> Dictionary:
+	var gd: Node = get_node_or_null("/root/GameData")
+	return gd.call("get_layout", region_id) if gd != null else {}
+
+
+## Caratteri solidi (muro/ostacolo/acqua) della legenda di layout.schema.json.
+## L'acqua e' fisicamente solida in questa story: la resa e il comportamento
+## distinti arrivano con US-813.
+const _CARATTERI_SOLIDI := "#ot~"
+
+
 func _dipingi() -> void:
+	var layout: Dictionary = _layout_dati()
+	var mappa: Array = (layout.get("mappa", []) as Array)
+	if mappa.size() == H:
+		for y in H:
+			var riga: String = str(mappa[y])
+			if riga.length() != W:
+				continue
+			for x in W:
+				var solido: bool = _CARATTERI_SOLIDI.contains(riga[x])
+				set_cell(Vector2i(x, y), SORGENTE, MURO if solido else PAVIMENTO)
+		return
 	for x in W:
 		for y in H:
 			var bordo: bool = x == 0 or y == 0 or x == W - 1 or y == H - 1
@@ -99,29 +129,41 @@ func _crea_zone() -> void:
 	if tags.is_empty():
 		return
 
-	# griglia di celle-zona nell'area interna (dentro il bordo di muri)
+	var zone: Dictionary = (_layout_dati().get("zone", {}) as Dictionary)
+
+	# griglia di celle-zona nell'area interna (dentro il bordo di muri):
+	# fallback per i tag senza rettangolo nel layout (o senza layout affatto).
 	var cols: int = int(ceil(sqrt(float(tags.size()))))
 	var righe: int = int(ceil(float(tags.size()) / float(cols)))
 	var cell_w: float = float(W - 2) * TILE / float(cols)
 	var cell_h: float = float(H - 2) * TILE / float(righe)
 
 	for i in tags.size():
-		var col: int = i % cols
-		var row: int = i / cols
-		var centro := Vector2(
-			TILE + cell_w * (col + 0.5),
-			TILE + cell_h * (row + 0.5))
+		var tag: String = str(tags[i])
+		var centro: Vector2
+		var dim: Vector2
+		if zone.has(tag):
+			var r: Array = (zone[tag] as Array)
+			dim = Vector2(float(r[2]), float(r[3])) * TILE
+			centro = Vector2(float(r[0]), float(r[1])) * TILE + dim * 0.5
+		else:
+			var col: int = i % cols
+			var row: int = i / cols
+			dim = Vector2(cell_w, cell_h)
+			centro = Vector2(
+				TILE + cell_w * (col + 0.5),
+				TILE + cell_h * (row + 0.5))
 		var area := Area2D.new()
-		area.name = "Zona_%s" % str(tags[i])
-		area.set_meta("location_tag", str(tags[i]))
+		area.name = "Zona_%s" % tag
+		area.set_meta("location_tag", tag)
 		area.position = centro
 		# monitora il corpo del giocatore (layer 1): mask di default 1 basta.
 		var shape := CollisionShape2D.new()
 		var rect := RectangleShape2D.new()
-		rect.size = Vector2(cell_w, cell_h)
+		rect.size = dim
 		shape.shape = rect
 		area.add_child(shape)
-		area.body_entered.connect(_su_ingresso_zona.bind(str(tags[i])))
+		area.body_entered.connect(_su_ingresso_zona.bind(tag))
 		add_child(area)
 
 
@@ -142,14 +184,23 @@ func _crea_passaggi() -> void:
 	elif not region_id.is_empty():
 		destinazioni.append(HUB)
 
+	var passaggi: Dictionary = (_layout_dati().get("passaggi", {}) as Dictionary)
+
 	for i in destinazioni.size():
-		var lato_destro: bool = region_id == HUB
-		var x: float = float(W - 3) * TILE if lato_destro else 3.0 * TILE
-		var y: float = TILE * 3 + (float(H - 6) * TILE) * (float(i) + 0.5) / float(maxi(destinazioni.size(), 1))
+		var dest: String = str(destinazioni[i])
+		var pos: Vector2
+		if passaggi.has(dest):
+			var c: Array = (passaggi[dest] as Array)
+			pos = Vector2(float(c[0]) + 0.5, float(c[1]) + 0.5) * TILE
+		else:
+			var lato_destro: bool = region_id == HUB
+			var x: float = float(W - 3) * TILE if lato_destro else 3.0 * TILE
+			var y: float = TILE * 3 + (float(H - 6) * TILE) * (float(i) + 0.5) / float(maxi(destinazioni.size(), 1))
+			pos = Vector2(x, y)
 		var area := Area2D.new()
-		area.name = "Passaggio_%s" % destinazioni[i]
-		area.set_meta("target_region", destinazioni[i])
-		area.position = Vector2(x, y)
+		area.name = "Passaggio_%s" % dest
+		area.set_meta("target_region", dest)
+		area.position = pos
 		var shape := CollisionShape2D.new()
 		var rect := RectangleShape2D.new()
 		rect.size = Vector2(TILE * 1.5, TILE * 2)
@@ -161,7 +212,7 @@ func _crea_passaggi() -> void:
 		marker.size = rect.size
 		marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		area.add_child(marker)
-		area.body_entered.connect(_su_passaggio.bind(str(destinazioni[i])))
+		area.body_entered.connect(_su_passaggio.bind(dest))
 		add_child(area)
 
 
@@ -329,7 +380,7 @@ func _colloca_giocatore() -> void:
 	var player := get_parent().get_node_or_null("Player") as Node2D
 	if player == null:
 		return
-	player.global_position = to_global(map_to_local(SPAWN))
+	player.global_position = to_global(map_to_local(_spawn))
 	var cam := player.get_node_or_null("Camera2D")
 	if cam != null and cam.has_method("apply_zone_limits"):
 		cam.call("apply_zone_limits", Rect2(global_position, Vector2(W * TILE, H * TILE)))
