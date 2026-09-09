@@ -202,11 +202,26 @@ nuovo personaggio — con zero righe di codice che nominino un Pathway, una
 coppia di fusione, una tribolazione o un finale specifico.
 `scripts/ability_engine.gd` non è stato toccato in tutta la fase.
 
-Fase corrente: **8 — opzionale** (Pathway Non-Standard, avanzamento per
-Boon). Le fasi 1-7 sono chiuse: nessuna fase è bloccante, si genera il PRD
-di fase 8 con `/prd` solo quando si decide di farla davvero — altrimenti il
-progetto è in manutenzione (contenuto/bilanciamento/arte/audio, non nuove
-fasi). Roadmap in `006_PRD/roadmap.md`.
+Fase corrente: **8 — Vertical slice giocabile** (IN CORSO). Le fasi 1-7
+hanno costruito tutti i sistemi, ma **nessuno può giocare il gioco con la
+tastiera**: `main.tscn` è rimasta la scena di prova della fase 1 (nessuna
+partita avviata, nessun tasto per le abilità, proiettili che non fanno
+danno, recitazione ferma all'1.5%, i 299 ingredienti delle formule che non
+esistono come oggetti, mondo senza nemici né oggetti). La fase 8 collega i
+sistemi già scritti, riempie i dati mancanti e mette una grafica
+provvisoria generata: **zero sistemi nuovi**, save invariato.
+
+- PRD: `006_PRD/prd-fase-8-vertical-slice.md` — 14 story (US-801..US-814)
+  in 7 blocchi, ognuna con acceptance criteria verificabili.
+- **Come eseguirlo: `006_PRD/prossimi-passi.md`** — ordine delle
+  operazioni, quando usare `/prd` e `/ralph`, setup dell'ambiente, comandi
+  di verifica, e le trappole già scoperte (isolamento dei test, libro
+  lasciato aperto, nomi reali dei segnali...). **Leggilo prima di toccare
+  qualunque file.**
+
+Fase 9 (opzionale, non bloccante): Pathway Non-Standard, avanzamento per
+Boon — il PRD si genera con `/prd` solo quando si decide di farla davvero.
+Roadmap in `006_PRD/roadmap.md`.
 
 Prova che l'architettura regge: `data/abilities/twilight_giant.json` (fase 2),
 i 5 Pathway di fase 5, i 3 del Lord of Mysteries (fase 5b) e l'intero

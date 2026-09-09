@@ -7563,3 +7563,100 @@ Prossimo: fase 8 (opzionale, Pathway Non-Standard) solo se si decide di
 farla - PRD con /prd quando serve. Altrimenti il progetto e' in
 manutenzione (arte vera, audio, playtest/bilanciamento, decisione IP
 sul repo pubblico - vedi Nota IP in CLAUDE.md).
+
+=== [2026-09-09] DIAGNOSI: IL GIOCO NON E' GIOCABILE A MANO + PRD FASE 8 ===
+
+CONTESTO. L'utente ha premuto Play su main.tscn e si e' trovato in una
+griglia vuota con un solo nemico: niente da raccogliere, nessun modo di
+lanciare le proprie abilita', la recitazione bloccata. Questa sessione NON
+ha scritto codice: ha capito PERCHE', e ha messo la risposta nel repo come
+PRD di fase 8 + istruzioni operative.
+
+COME E' STATO SCOPERTO. (a) Giocando il gioco per davvero: script SceneTree
+lanciato con xvfb-run che istanzia main.tscn, sintetizza input e legge lo
+stato degli autoload, con screenshot. (b) Tre esplorazioni indipendenti del
+codebase in parallelo (giocabilita' delle scene, pipeline grafica, ciclo di
+avanzamento per un umano). (c) Una revisione critica del disegno prima di
+scriverlo. Ogni riferimento file:riga del PRD e' stato verificato a mano su
+questo commit.
+
+I SEI BLOCCHI TROVATI (nessuno superabile giocando, anche col piano
+iniziale "aggiungi qualche nemico e un pickup"):
+
+1. L'avvio non avvia una partita. Nessuno chiama Book.apri() ne'
+   GameState.nuova_partita(): all'avvio partita_attiva == false,
+   Progression._pathway_id == "" (fallback sul default di balance.json),
+   inventario vuoto, base a 0 stanze. main.tscn e' la scena di prova della
+   fase 1: regione + player + UN Enemy a coordinate fisse (scenes/main.tscn
+   :21-22) + overlay. La creazione del personaggio non fa scegliere il
+   Pathway.
+2. Nessun tasto lancia un'abilita'. player.gd gestisce solo attacco/
+   schivata/parata + movimento. AbilityEngine.execute (ability_engine.gd
+   :110) e' chiamato solo da sistemi interni e dai test; debug_scene.gd
+   lancia primitive grezze, non abilita'. Le due abilita' di Sequenza 9 del
+   Twilight Giant sono possedute dal primo secondo e inutilizzabili.
+3. Le abilita' a proiettile/arco non fanno danno: projectile.gd e
+   melee_arc.gd non hanno collision_mask ne' area_entered (sola
+   cinematica). L'unico che colpisce e' hitbox.gd:52-61, che chiama
+   Hurtbox.subisci(danno, stagger, da, {"tag_danno": tag}).
+4. La recitazione non puo' avanzare. enemy.gd:188 emette enemy_defeated
+   con payload {}: in event_tracker.gd::_corrisponde un filtro booleano
+   pretende == true, quindi senza_abilita non matcha MAI (e con lui la
+   quest q_mirco_01). damage_absorbed_for_ally (35% della Sequenza 9 del
+   TG) non ha emettitori: non esistono alleati in scena. item_crafted,
+   area_cleared, ritual_completed non sono mai emessi dal codice di gioco.
+   Risultato misurato: la barra Recitazione si ferma intorno all'1.5%.
+5. Nessuno puo' salire di Sequenza. PotionSystem.concoct/bevi
+   (potion_system.gd:22,97) non ha nessuna pagina o tasto che li chiami; e
+   i 299 ingredienti delle 100 formule (data/potions/formulas.json,
+   ingredients) NON esistono come oggetti: data/items/ingredienti.json ne
+   ha 8, tutti diversi, e nessun drop/listino/raccolta li fornisce. Il
+   negozio di Sidon esiste nei dati ma nessuno ascolta
+   DialogueEngine.apri_vendita.
+6. Il mondo e' vuoto e senza grafica. region_scene.gd::_dipingi() riempie
+   un rettangolo 48x36 uguale per le 5 regioni; 0 nemici e 0 oggetti da
+   dati; NPC = quadrati blu senza nome; sprite = placeholder diagnostici.
+
+DECISIONI PRESE CON L'UTENTE (2026-09-09):
+- Tutti i 299 ingredienti diventano oggetti con almeno una fonte nel mondo
+  ("deve esserci tutto"), non solo quelli del primo Pathway.
+- tg_9_protettore si riscrive nei DATI (perfect_parry x12): nessun alleato
+  in scena in questa fase. damage_absorbed_for_ally resta nel vocabolario
+  chiuso (lo usano i Pathway differiti).
+- Mappe disegnate a mano in ASCII (data/world/layouts/<region>.json), una
+  per regione: sono dati, si correggono con un editor di testo, il
+  validator le controlla.
+- Negozio (compra/vendi) dentro questo giro.
+- Grafica provvisoria generata proceduralmente (Pillow, deterministica),
+  stessa geometria dei fogli attuali: l'arte vera sostituira' i PNG.
+- Un boss non e' un tipo: e' un nemico con override di dati + scala. Zero
+  "if boss" nel codice.
+- Numerazione: questa e' la FASE 8; "Pathway Non-Standard" slitta a fase 9.
+
+COSA E' STATO SCRITTO (solo documentazione, zero .gd/.tscn/dati di gioco):
+- 006_PRD/prd-fase-8-vertical-slice.md — PRD nel formato delle fasi
+  precedenti (le 9 sezioni): 14 story US-801..US-814 in 7 blocchi (0 avvio
+  + controlli, A recitazione, B mondo dai layout, C economia degli
+  ingredienti, D pagine del libro, E grafica, F verifica giocata), ognuna
+  dimensionata per una context window; 15 FR; non-goals espliciti; una
+  tabella "cose che si riusano" con ~20 righe file:riga verificate;
+  metriche; 6 domande aperte.
+- 006_PRD/prossimi-passi.md — istruzioni operative per le prossime
+  sessioni: stato del repo, /prd NO (il PRD c'e' gia' ed e' piu' preciso di
+  quanto /prd genererebbe) e /ralph SI' (con la tabella dei campi da
+  correggere: branchName, fase 8, id US-8NN), i due modi di eseguire le
+  story, setup di un ambiente nuovo (Godot 4.3 dalla CI, Pillow, Xvfb), la
+  ricetta Xvfb che funziona, e le 10 trappole gia' scoperte (reset di
+  _partita_attiva, libro lasciato aperto che mette in pausa le suite
+  successive, firma di assert_almost_eq, import prima della suite, nomi
+  reali dei segnali, filtri booleani dell'EventTracker...).
+- roadmap.md / CLAUDE.md / README.md allineati alla numerazione nuova.
+
+COME VERIFICATO: python tools/validate_data.py esce 0 (nessun dato
+toccato). Suite non rilanciata: in questo commit non c'e' un solo file
+.gd/.tscn/di dati. prd.json NON toccato (ha ancora le 21 story della fase
+7, tutte passes:true).
+
+PROSSIMO PASSO: mergiare la PR #3 (chiusura fase 7) in main, poi generare
+prd.json dal PRD con /ralph 006_PRD/prd-fase-8-vertical-slice.md e
+correggere i campi come dice prossimi-passi.md § 2. Poi US-801.

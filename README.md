@@ -138,7 +138,9 @@ tribolazioni, finali) regge sulla stessa architettura.
 ## Documenti
 
 - `CLAUDE.md` — regole di lavoro, comandi, decisioni prese
-- `006_PRD/prd-fase-7-endgame.md` — PRD dell'ultima fase chiusa
+- `006_PRD/prd-fase-8-vertical-slice.md` — **PRD della fase corrente** (vertical slice giocabile, 14 story)
+- `006_PRD/prossimi-passi.md` — **come eseguirla**: ordine delle operazioni, quando usare `/prd` e `/ralph`, setup, trappole note
+- `006_PRD/prd-fase-7-endgame.md` — PRD dell'ultima fase chiusa (fase 7)
 - `006_PRD/prd-fase-5b-lord-of-mysteries.md` — PRD della fase 5b (chiusa)
 - `006_PRD/prd-fase-6-mondo.md` — PRD della fase 6 (chiusa)
 - `006_PRD/prd-fase-2-pathway-core.md` — PRD della fase 2 (chiusa)
@@ -152,7 +154,7 @@ tribolazioni, finali) regge sulla stessa architettura.
 - `006_PRD/design-vfx.md` — identita' visiva delle abilita' (stile manhwa), 10 palette
 - `006_PRD/art-brief-gemini.md` — prompt pronti per generare concept/ritratti/UI con Gemini, con i limiti dichiarati
 - `data/audio.json` — sistema audio data-driven (tell sonori, follia, palette)
-- `006_PRD/roadmap.md` — fasi 2-8
+- `006_PRD/roadmap.md` — fasi 2-9
 - `prd.json` — story della fase corrente in formato ralph
 - `progress.txt` — memoria tra le sessioni
 - `docs/documentazione.py` — rigenera la documentazione docx; `diario.py` — diario del progetto

@@ -318,7 +318,50 @@ Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 
 ---
 
-## Fase 8 — Opzionale
+## Fase 8 — Vertical slice giocabile (IN CORSO)
+
+> PRD: `006_PRD/prd-fase-8-vertical-slice.md` (14 story, US-801..US-814).
+> Istruzioni operative per eseguirlo: `006_PRD/prossimi-passi.md`.
+
+Le fasi 1-7 hanno costruito **tutti i sistemi** del gioco, provati da 776
+test headless. **Ma nessuno puo' giocarlo con la tastiera**: `main.tscn` e'
+rimasta la scena di prova della fase 1. Diagnosi fatta il 2026-09-09
+giocando davvero il gioco (Xvfb + screenshot) e con tre esplorazioni del
+codice — sei blocchi, tutti verificati `file:riga` nel PRD:
+
+1. L'avvio non avvia una partita (`Book.apri()`/`GameState.nuova_partita()`
+   non sono mai chiamati; nessuna scelta del Pathway alla creazione).
+2. Nessun tasto lancia un'abilita' (`AbilityEngine.execute` esiste, nessun
+   input lo raggiunge).
+3. Proiettili e archi non fanno danno (nessun `collision_mask`, nessun
+   `area_entered`: solo `hitbox.gd` colpisce davvero).
+4. La recitazione si ferma a ~1.5%: `enemy_defeated` e' emesso con payload
+   `{}`, quindi il filtro `senza_abilita` non matcha mai; e
+   `damage_absorbed_for_ally` non ha emettitori (nessun alleato in scena).
+5. **Nessuno puo' salire di Sequenza**: `PotionSystem.concoct/bevi` non ha
+   UI, e i **299 ingredienti** delle 100 formule non esistono come oggetti.
+6. Il mondo e' un pavimento piatto generato dal codice: 0 nemici e 0
+   oggetti nelle 5 regioni, NPC = quadrati blu, sprite diagnostici.
+
+**Cosa fa la fase 8**: collega i sistemi gia' scritti in una partita
+giocabile, riempie i dati mancanti, e mette una grafica provvisoria
+generata. **Zero sistemi nuovi**, zero primitive/eventi/tag nuovi, save
+`schema_version` **22 invariato**.
+
+7 blocchi: 0 avvio + controlli (avvio di partita con scelta del Pathway,
+abilita' a tastiera + hotbar, proiettili che colpiscono), A recitazione
+(payload veri di `enemy_defeated`, `item_crafted`/`ritual_completed`/
+`area_cleared`, `tg_9_protettore` riscritta nei dati), B mondo (mappe ASCII
+disegnate a mano in `data/world/layouts/`, nemici/boss/oggetti dai dati),
+C economia (i 299 ingredienti diventano oggetti con almeno una fonte:
+drop, listini, raccolta), D pagine del libro (sezione Avanzamento con
+Prepara/Bevi, negozio compra/vendi nel dialogo), E grafica (pixel art
+procedurale deterministica, stessa geometria dei fogli attuali), F verifica
+giocata end-to-end + chiusura.
+
+---
+
+## Fase 9 — Opzionale
 
 Pathway Non-Standard (Eternal Aeon, Chaos Primogenitor, Scrooge, Dreamless e
 gli altri bestowers). Meccanica diversa: avanzamento per **Boon** invece che
