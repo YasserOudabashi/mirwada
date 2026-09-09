@@ -286,8 +286,8 @@
       ],
       "priority": 18,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Estensione del colophon (scripts/pages/page_impostazioni.gd) invece di un tipo di pagina nuovo: page_types.json e' un vocabolario chiuso ('va discusso'), estendere una pagina esistente non lo tocca, coerente con l'opzione che l'AC stesso offriva. _sezione_finale() in cima ad aggiorna(): nulla se EndgameState.finale e' vuoto (il caso normale); altrimenti nome del finale (name_i18n), l'epilogo della VARIANTE DI GIUSTO GRUPPO (ricavato da Progression.pathway() -> group, non salvato a parte: e' statico per Pathway e non cambia dopo il finale), e un riepilogo di endgame.eredita (conoscenza/ancora/reputazione/oggetto) SOLO se non vuoto - finche' US-719 non lo compila non appare nessun placeholder finto. 'L'azione che sceglie l'oggetto da ereditare' resta esplicitamente a US-719 (lo dice l'AC stesso). 5 chiavi UI chrome in assets/i18n/strings.csv (COLOPHON_FINALE_*), .translation rigenerati. Verifica a schermo REALE (non solo scriptata): Xvfb + Godot non-headless con software rendering (llvmpipe), screenshot catturato via get_viewport().get_texture().get_image().save_png() e mandato all'utente in chat - due catture, Apoteosi con sola conoscenza e Consumazione con le 4 righe di eredita' popolate, entrambe rese correttamente in italiano (serviva TranslationServer.set_locale('it') esplicito, il boot normale del gioco lo fa gia' via SettingsStore). Trovata una traduzione mancante preesistente ('anchor.mirco', 'TODO ...') non causata da questa story, non toccata. tests/test_page_finale.gd NUOVO (4 test): nessun finale -> nessuna sezione; finale raggiunto -> nome ed epilogo del gruppo giusto mostrati; eredita vuota -> nessun riepilogo (niente placeholder finto); eredita compilata -> il riepilogo appare col conteggio giusto. validate exit 0 (3 warning invariati). 770 test verdi (766 + 4)."
     },
     {
       "id": "US-719",

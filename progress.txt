@@ -7384,3 +7384,37 @@ il colophon col contenuto vero del finale.
   invariati). 766 test headless (759 + 7), tutti verdi.
 - File toccati: scripts/ending_system.gd (nuovo), project.godot,
   tests/test_ending_system.gd (nuovo).
+
+=== US-718: schermata di finale nel libro (fase 7, Blocco D) ===
+Estensione del colophon (scripts/pages/page_impostazioni.gd) invece di un
+tipo di pagina nuovo: page_types.json e' un vocabolario chiuso ("va
+discusso"), estendere una pagina esistente lo evita - l'AC offriva
+esplicitamente questa opzione. _sezione_finale() in cima ad aggiorna():
+nulla se EndgameState.finale e' vuoto; altrimenti nome del finale,
+l'epilogo della variante di gruppo GIUSTA (da Progression.pathway()->group,
+non serve salvarlo: e' statico e non cambia dopo il finale), e un
+riepilogo di endgame.eredita SOLO se non vuoto (niente placeholder finto
+finche' US-719 non lo compila). "L'azione che sceglie l'oggetto da
+ereditare" resta a US-719 come dice l'AC stesso. 5 chiavi UI chrome nuove
+(COLOPHON_FINALE_*) in strings.csv.
+- VERIFICA A SCHERMO REALE (non solo scriptata, per la prima volta in
+  questa sessione): ho scoperto che Xvfb e' installato nel container.
+  Godot NON-headless (software rendering llvmpipe via Mesa) sotto
+  xvfb-run puo' renderizzare davvero e salvare uno screenshot PNG
+  (get_viewport().get_texture().get_image().save_png()) da uno script
+  -s SceneTree standalone (serve un await process_frame x2 in
+  _initialize() prima di toccare gli autoload, altrimenti get_tree() e'
+  ancora null). Due catture mandate all'utente in chat: Apoteosi (solo
+  conoscenza) e Consumazione (le 4 righe di eredita' popolate). Serviva
+  TranslationServer.set_locale('it') esplicito nello script (il boot
+  normale lo fa gia' via SettingsStore, che qui non gira). Trovata una
+  traduzione mancante preesistente non legata a questa story
+  ('anchor.mirco' -> 'TODO ...'), non toccata.
+- tests/test_page_finale.gd NUOVO (4 test): nessun finale -> nessuna
+  sezione; finale raggiunto -> nome ed epilogo del gruppo giusto; eredita
+  vuota -> nessun riepilogo; eredita compilata -> riepilogo col conteggio
+  giusto.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning
+  invariati). 770 test headless (766 + 4), tutti verdi.
+- File toccati: scripts/pages/page_impostazioni.gd, assets/i18n/strings.csv
+  + .translation, tests/test_page_finale.gd (nuovo).

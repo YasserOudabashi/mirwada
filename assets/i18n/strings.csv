@@ -13,6 +13,11 @@ BOOK_FRONTESPIZIO_CONFERMA,Comincia,Begin
 BOOK_FRONTESPIZIO_SEQUENZA,Sequenza,Sequence
 BOOK_DIAGRAMMA_SEI_QUI,Sei qui:,You are here:
 BOOK_DIAGRAMMA_PROSSIMA,Si dice che verrà:,Rumor says it will be:
+COLOPHON_FINALE_EREDITA_TITOLO,Ciò che passa,What carries on
+COLOPHON_FINALE_EREDITA_CONOSCENZA,Conoscenza: %d frammenti ricordati,Knowledge: %d remembered fragments
+COLOPHON_FINALE_EREDITA_ANCORA,Un'Ancora: %s,An Anchor: %s
+COLOPHON_FINALE_EREDITA_REPUTAZIONE,Reputazione dimezzata con %d fazioni,Reputation halved with %d factions
+COLOPHON_FINALE_EREDITA_OGGETTO,Un oggetto portato con sé: %s,An object carried over: %s
 COLOPHON_AUDIO,Audio,Audio
 COLOPHON_VIDEO,Video,Video
 COLOPHON_INPUT,Comandi,Controls

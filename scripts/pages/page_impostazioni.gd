@@ -2,6 +2,11 @@ extends ScrollContainer
 ## Colophon del libro (US-225): audio, video, input, lingua. Ogni controllo
 ## scrive in SettingsStore (user://settings.json) e l'effetto e' immediato.
 ## Nessun testo hardcoded: tutto da tr() (assets/i18n/strings.csv), come l'HUD.
+##
+## US-718 (fase 7, Blocco D): se un finale e' stato raggiunto, il colophon
+## si estende invece di diventare un tipo di pagina nuovo (page_types.json e'
+## un vocabolario chiuso, "va discusso" - estendere una pagina esistente non
+## lo tocca). La sezione finale appare per prima, sopra tutto il resto.
 
 const BUS := ["master", "music", "sfx", "ambience", "ui", "whisper"]
 const ACC_AUDIO := ["sottotitoli_effetti", "indicatore_visivo_tell",
@@ -20,6 +25,8 @@ func aggiorna() -> void:
 	_vbox = VBoxContainer.new()
 	_vbox.add_theme_constant_override("separation", 3)
 	add_child(_vbox)
+
+	_sezione_finale()
 
 	_titolo("COLOPHON_AUDIO")
 	for b in BUS:
@@ -40,6 +47,75 @@ func aggiorna() -> void:
 
 	_titolo("COLOPHON_LINGUA")
 	_lingua()
+
+
+# --- Finale (US-718) -------------------------------------------------
+
+## Nulla se nessun finale e' stato raggiunto (il caso normale). Altrimenti:
+## nome del finale, epilogo della variante di gruppo, e un riassunto di cosa
+## passa al personaggio successivo (endgame.eredita, compilato da US-719 -
+## finche' non c'e' quella story il contratto e' vuoto e si vede solo il
+## titolo/epilogo, mai un placeholder finto).
+func _sezione_finale() -> void:
+	var eg: Node = _n("/root/EndgameState")
+	var gd: Node = _n("/root/GameData")
+	if eg == null or gd == null:
+		return
+	var finale_id: String = str(eg.get("finale"))
+	if finale_id.is_empty():
+		return
+	var ending: Dictionary = gd.call("get_ending", finale_id)
+	if ending.is_empty():
+		return
+
+	var titolo := Label.new()
+	titolo.text = str(gd.call("tr_data", ending.get("name_i18n", finale_id)))
+	titolo.add_theme_font_size_override("font_size", 18)
+	_vbox.add_child(titolo)
+
+	var epilogo := Label.new()
+	epilogo.text = str(gd.call("tr_data", _chiave_epilogo(gd, ending)))
+	epilogo.autowrap_mode = TextServer.AUTOWRAP_WORD
+	epilogo.custom_minimum_size = Vector2(360, 0)
+	_vbox.add_child(epilogo)
+
+	_riepilogo_eredita(eg, gd)
+	_vbox.add_child(HSeparator.new())
+
+
+func _chiave_epilogo(gd: Node, ending: Dictionary) -> String:
+	var prog: Node = _n("/root/Progression")
+	var pid: String = str(prog.call("pathway")) if prog != null else ""
+	var pw: Dictionary = gd.call("get_pathway", pid)
+	var gruppo: String = str(pw.get("group", ""))
+	var epg: Dictionary = ending.get("epiloghi_per_gruppo", {})
+	return str(epg.get("%s_i18n" % gruppo, ""))
+
+
+func _riepilogo_eredita(eg: Node, gd: Node) -> void:
+	var eredita: Dictionary = eg.get("eredita")
+	var righe: Array = []
+	if (eredita.get("conoscenza", []) as Array).size() > 0:
+		righe.append(tr("COLOPHON_FINALE_EREDITA_CONOSCENZA") % (eredita["conoscenza"] as Array).size())
+	if eredita.has("ancora") and not (eredita["ancora"] as Dictionary).is_empty():
+		var a: Dictionary = eredita["ancora"]
+		var ad: Dictionary = gd.call("get_anchor", str(a.get("id", "")))
+		righe.append(tr("COLOPHON_FINALE_EREDITA_ANCORA") %
+			str(gd.call("tr_data", ad.get("name_i18n", a.get("id", "")))))
+	if (eredita.get("reputazione", {}) as Dictionary).size() > 0:
+		righe.append(tr("COLOPHON_FINALE_EREDITA_REPUTAZIONE") % (eredita["reputazione"] as Dictionary).size())
+	if not str(eredita.get("oggetto", "")).is_empty():
+		var it: Dictionary = gd.call("get_item", str(eredita["oggetto"]))
+		righe.append(tr("COLOPHON_FINALE_EREDITA_OGGETTO") %
+			str(gd.call("tr_data", it.get("name_i18n", eredita["oggetto"]))))
+
+	if righe.is_empty():
+		return
+	_titolo("COLOPHON_FINALE_EREDITA_TITOLO")
+	for r in righe:
+		var l := Label.new()
+		l.text = "· " + str(r)
+		_vbox.add_child(l)
 
 
 # --- Costruttori di riga --------------------------------------------
