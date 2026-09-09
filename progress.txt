@@ -8726,3 +8726,56 @@ COSA RESTA APERTO (dichiarato, non di questa story).
 
 PROSSIMA STORIA: US-809b — Listini dei venditori (--listini nel
 generatore, append a roster.json per Sidon/Vesna/Bruno).
+
+=== US-809b: Listini dei venditori (fase 8, Blocco C) ===
+
+COSA FATTO.
+- tools/generate_formula_ingredients.py: fattorizzato il calcolo condiviso
+  fra --drops e --listini in due funzioni pure, `per_pathway_seq(formulas)`
+  (pathway_id -> {sequenza: {ingredienti}}, gia' inline in write_drops) e
+  `group_by_pathway()` (pathway_id -> group, da pathways/*.json.group, mai
+  hardcoded) — nessun comportamento cambiato per --drops (riverificato: 0
+  regioni aggiornate al rilancio, idempotenza intatta dopo il refactor).
+- Nuova opzione --listini: estende vendor.listino di npc_sidon/npc_vesna/
+  npc_bruno in data/npc/roster.json, SOLO append (unione con l'esistente,
+  mai una rimozione). roster.json era gia' in puro stile json.dump(indent=2)
+  (round-trip testato byte-per-byte prima di scrivere una riga di codice:
+  diverso dai layout di US-809a, qui save_json normale basta, nessuna
+  sostituzione testuale mirata necessaria).
+  - Sidon: ingredienti di Sequenza 9+8 di TUTTI i 10 Pathway attivi (stesso
+    calcolo gia' fatto per drop["9"]/drop["8"] della regione neutra in
+    write_drops) -> 60 id nuovi (64 totali con i 4 scritti a mano).
+  - Vesna: ogni item categoria:ingrediente col tag "guarigione" o "crescita"
+    (letto direttamente da data/items/ingredienti.json, non per-Sequenza)
+    -> 24 id nuovi (26 totali).
+  - Bruno: ingredienti di Sequenza 9+8+7 dei Pathway del gruppo
+    eternal_darkness (twilight_giant/darkness/death, letto da
+    pathways/*.json.group) -> 27 id nuovi (29 totali).
+- main(): branch --listini nello stesso stile di --drops.
+
+COME VERIFICATO.
+- Le 4 voci scritte a mano (erba_lunare/radice_crepuscolo/polvere_ossa/
+  acqua_sorgiva per Sidon, pozione_cura_minore/erba_lunare per Vesna,
+  elisir_ombra/polvere_ossa per Bruno) sono TUTTE ancora presenti nei
+  listini dopo il run — verificato con un assert per ciascuna, non solo
+  "il file e' piu' grande di prima".
+- Idempotenza vera: copiato roster.json, rilanciato --listini una seconda
+  volta, diff byte-per-byte IDENTICO ("0 id nuovi" per tutti e 3 gli npc).
+- python tools/validate_data.py: 0 errori (il check gia' esistente
+  "vendor.listino non e' un item esistente" a riga ~1547 valida ogni id
+  aggiunto).
+- godot --headless --import: pulito. Suite: 834 test, tutti passati (nessun
+  file .gd toccato in questa story: e' generazione dati pura, come da AC).
+- Nessun test Godot nuovo: l'AC di US-809b non ne richiede (solo dati).
+
+COSA RESTA APERTO (dichiarato, non di questa story).
+- I 5 layout continuano a spargere moneta_comune negli "oggetti" a terra:
+  US-809c li sostituisce con ingredienti veri e chiude il blocco validator
+  "fonti".
+- Nota di copertura (dal piano di US-809, gia' verificata a mano prima
+  della fase 8): ogni gruppo copre gia' tutte le sue Sequenze via drop, per
+  cui i listini/oggetti a terra sono varieta' di gameplay piu' che necessita'
+  tecnica per il blocco "fonti" — ma restano comunque richiesti dall'AC come
+  meccaniche di gioco a se'.
+
+PROSSIMA STORIA: US-809c — Raccolta a terra + chiusura "fonti nel mondo".

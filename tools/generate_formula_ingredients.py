@@ -5,8 +5,9 @@ ingredienti citati dalle formule dei 10 Pathway attivi
 (data/potions/formulas.json).
 
 Esecuzione (dalla root del progetto):
-    python tools/generate_formula_ingredients.py          # item + i18n (US-808)
-    python tools/generate_formula_ingredients.py --drops  # layout.drop per le 5 regioni (US-809a)
+    python tools/generate_formula_ingredients.py            # item + i18n (US-808)
+    python tools/generate_formula_ingredients.py --drops    # layout.drop per le 5 regioni (US-809a)
+    python tools/generate_formula_ingredients.py --listini  # vendor.listino di Sidon/Vesna/Bruno (US-809b)
 
 Idempotente: le voci gia' presenti (le 8 scritte a mano e ogni id generato
 in un run precedente) si PRESERVANO tal quali (merge per id, come
@@ -48,6 +49,7 @@ EN_PATH = os.path.join(DATA, "i18n", "en.json")
 REGIONS_PATH = os.path.join(DATA, "world", "regions.json")
 PATHWAYS_DIR = os.path.join(DATA, "pathways")
 LAYOUTS_DIR = os.path.join(DATA, "world", "layouts")
+ROSTER_PATH = os.path.join(DATA, "npc", "roster.json")
 
 # Sequenza minima che cita l'ingrediente -> valore (9 e' la piu' debole/comune,
 # 0 la piu' rara). Tabella dell'AC di US-808, non bilanciata.
@@ -382,6 +384,29 @@ def add_boss_drop_probabilita(text):
     return text[:line_start] + nuova + text[line_end:]
 
 
+def per_pathway_seq(formulas):
+    """pathway_id -> {sequenza: {ingrediente, ...}}. Condivisa da --drops e
+    --listini: entrambe le opzioni partono dalla stessa scomposizione delle
+    formule per (Pathway, Sequenza)."""
+    out = {}
+    for fid, f in formulas.items():
+        pid, seq = parse_formula_id(fid)
+        out.setdefault(pid, {}).setdefault(seq, set()).update(f.get("ingredients", []))
+    return out
+
+
+def group_by_pathway():
+    """pathway_id -> group, letto da data/pathways/*.json (mai hardcoded).
+    Condivisa da --drops e --listini."""
+    out = {}
+    for fn in sorted(os.listdir(PATHWAYS_DIR)):
+        if not fn.endswith(".json"):
+            continue
+        pw = load_json(os.path.join(PATHWAYS_DIR, fn))
+        out[pw["id"]] = pw.get("group")
+    return out
+
+
 def write_drops(formulas):
     """US-809a, opzione --drops: scrive layout.drop per le 5 regioni e
     drop_probabilita: 1.0 sul boss di ciascuna. Pura funzione di
@@ -399,19 +424,9 @@ def write_drops(formulas):
     regions_doc = load_json(REGIONS_PATH)
     group_by_region = {r["id"]: r.get("group_affinity") for r in regions_doc.get("regions", [])}
 
-    group_by_pathway = {}
-    for fn in sorted(os.listdir(PATHWAYS_DIR)):
-        if not fn.endswith(".json"):
-            continue
-        pw = load_json(os.path.join(PATHWAYS_DIR, fn))
-        group_by_pathway[pw["id"]] = pw.get("group")
-
-    # pathway_id -> {sequenza: {ingrediente, ...}}
-    per_pathway_seq = {}
-    for fid, f in formulas.items():
-        pid, seq = parse_formula_id(fid)
-        per_pathway_seq.setdefault(pid, {}).setdefault(seq, set()).update(f.get("ingredients", []))
-    tutti_pathway = sorted(per_pathway_seq.keys())
+    gbp = group_by_pathway()
+    pps = per_pathway_seq(formulas)
+    tutti_pathway = sorted(pps.keys())
 
     scritti = 0
     for region_id, group in sorted(group_by_region.items()):
@@ -425,15 +440,15 @@ def write_drops(formulas):
             for seq in (9, 8):
                 ids = set()
                 for pid in tutti_pathway:
-                    ids.update(per_pathway_seq.get(pid, {}).get(seq, set()))
+                    ids.update(pps.get(pid, {}).get(seq, set()))
                 if ids:
                     drop[str(seq)] = sorted(ids)
         else:
-            pids_del_gruppo = [pid for pid, g in group_by_pathway.items() if g == group]
+            pids_del_gruppo = [pid for pid, g in gbp.items() if g == group]
             for seq in range(10):
                 ids = set()
                 for pid in pids_del_gruppo:
-                    ids.update(per_pathway_seq.get(pid, {}).get(seq, set()))
+                    ids.update(pps.get(pid, {}).get(seq, set()))
                 if ids:
                     drop[str(seq)] = sorted(ids)
 
@@ -452,11 +467,83 @@ def write_drops(formulas):
           f"regioni (le altre erano gia' corrette: idempotente).")
 
 
+def write_listini(formulas):
+    """US-809b, opzione --listini: estende vendor.listino di npc_sidon/
+    npc_vesna/npc_bruno in data/npc/roster.json. Solo APPEND: fa l'unione
+    col listino gia' scritto a mano, non toglie mai nulla. roster.json e'
+    gia' in formato json.dump(indent=2) puro (verificato: round-trip
+    identico byte-per-byte), a differenza dei layout — qui save_json normale
+    basta, nessuna sostituzione testuale mirata necessaria.
+
+    Sidon: ingredienti di Sequenza 9+8 di TUTTI i Pathway attivi (stesso
+    calcolo del drop "9"/"8" della regione neutra in write_drops).
+    Vesna: ogni item categoria:ingrediente col tag 'guarigione' o 'crescita'
+    (non e' per-Sequenza: scorre gli item gia' generati da questo stesso
+    tool in US-808).
+    Bruno: ingredienti di Sequenza 9+8+7 dei Pathway del gruppo
+    eternal_darkness (letto da pathways/*.json.group, mai hardcoded).
+    """
+    pps = per_pathway_seq(formulas)
+    gbp = group_by_pathway()
+    tutti_pathway = sorted(pps.keys())
+
+    sidon = set()
+    for pid in tutti_pathway:
+        for seq in (9, 8):
+            sidon.update(pps.get(pid, {}).get(seq, set()))
+
+    items_doc = load_json(ITEMS_PATH)
+    vesna = set()
+    for it in items_doc.get("items", []):
+        if it.get("categoria") != "ingrediente":
+            continue
+        tag = set(it.get("tag", []))
+        if "guarigione" in tag or "crescita" in tag:
+            vesna.add(it["id"])
+
+    pids_eternal_darkness = [pid for pid, g in gbp.items() if g == "eternal_darkness"]
+    bruno = set()
+    for pid in pids_eternal_darkness:
+        for seq in (9, 8, 7):
+            bruno.update(pps.get(pid, {}).get(seq, set()))
+
+    nuovi_per_npc = {"npc_sidon": sidon, "npc_vesna": vesna, "npc_bruno": bruno}
+
+    roster_doc = load_json(ROSTER_PATH)
+    cambiato = False
+    for npc in roster_doc.get("npcs", []):
+        nid = npc.get("id")
+        if nid not in nuovi_per_npc:
+            continue
+        ven = npc.get("vendor")
+        if ven is None:
+            continue
+        esistente = set(ven.get("listino", []))
+        unione = sorted(esistente | nuovi_per_npc[nid])
+        aggiunti = len(unione) - len(esistente)
+        if unione != ven.get("listino", []):
+            ven["listino"] = unione
+            cambiato = True
+        print(f"  {nid}: {aggiunti} id nuovi, {len(unione)} totali nel listino")
+
+    if cambiato:
+        save_json(ROSTER_PATH, roster_doc)
+        print("OK: --listini ha aggiornato data/npc/roster.json.")
+    else:
+        print("OK: --listini non ha trovato nulla da aggiungere (idempotente).")
+
+
 def main():
     if "--drops" in sys.argv[1:]:
         formulas_doc = load_json(FORMULAS_PATH)
         formulas = formulas_doc.get("formulas", formulas_doc)
         write_drops(formulas)
+        return 0
+
+    if "--listini" in sys.argv[1:]:
+        formulas_doc = load_json(FORMULAS_PATH)
+        formulas = formulas_doc.get("formulas", formulas_doc)
+        write_listini(formulas)
         return 0
 
     formulas_doc = load_json(FORMULAS_PATH)

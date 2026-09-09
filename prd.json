@@ -231,8 +231,8 @@
       ],
       "priority": 13,
       "fase": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto esattamente come da AC. Fattorizzato per_pathway_seq()/group_by_pathway() da write_drops() (US-809a) per riuso pulito, verificato che il refactor non abbia cambiato il comportamento di --drops (0 regioni aggiornate al rilancio). roster.json era gia' in puro json.dump(indent=2) (round-trip testato prima di scrivere codice), quindi save_json normale basta qui, a differenza dei layout di US-809a. Sidon 60 id nuovi (Sequenza 9+8 di tutti i 10 Pathway), Vesna 24 (tag guarigione/crescita), Bruno 27 (Sequenza 9+8+7 del gruppo eternal_darkness) - tutti append-only, le 4 voci scritte a mano preservate e verificate una per una. Idempotenza vera riverificata (diff byte-per-byte identico al secondo run). 834 test, 0 errori nel validator. Nessun test Godot nuovo (generazione dati pura, nessun file .gd toccato)."
     },
     {
       "id": "US-809c",
