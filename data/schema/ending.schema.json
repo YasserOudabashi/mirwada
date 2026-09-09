@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ending.schema.json",
+  "title": "Ending",
+  "_comment": "Documentazione di data/endings.json (fase 7, US-716). Un finale e' raggiunto quando TUTTE le sue 'condizioni' (vocabolario chiuso di conditions.gd, nessun tipo nuovo) sono soddisfatte. EndingSystem.valuta() (US-717) sceglie, tra i finali soddisfatti, quello con 'priorita' piu' alta. La Consumazione E' il game over per follia (madness_min 100, FR-10), non un percorso separato. 'eredita_profilo' decide quale sottoinsieme del contratto di eredita' (FR-14, EndgameState.eredita) si compila al finale: solo_conoscenza (Apoteosi) / ancore (Rinuncia) / completo (Consumazione). 'epiloghi_per_gruppo' copre i 4 gruppi di Pathway attivi (design-pathways.md): il gruppo decide il sapore del testo, non il Pathway. I controlli veri sono in tools/validate_data.py.",
+  "type": "object",
+  "required": ["schema_version", "id", "name_i18n", "condizioni", "priorita", "eredita_profilo", "epiloghi_per_gruppo"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "enum": ["apoteosi", "consumazione", "rinuncia"] },
+    "name_i18n": { "type": "string", "pattern": "^ending\\." },
+    "condizioni": {
+      "type": "array",
+      "minItems": 1,
+      "_comment": "{ tipo, valore } dal vocabolario di conditions.gd. TUTTE devono valere.",
+      "items": {
+        "type": "object",
+        "required": ["tipo"],
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "enum": ["e_notte", "fase_lunare", "in_zona_tag", "foundation_min", "tier_min",
+                     "madness_min", "follia_min", "madness_max", "acting_progress_min",
+                     "reputazione_min", "flag"]
+          }
+        }
+      }
+    },
+    "priorita": {
+      "type": "integer",
+      "_comment": "Se piu' finali sono soddisfatti insieme, vince quello con priorita' piu' alta."
+    },
+    "eredita_profilo": {
+      "type": "string",
+      "enum": ["completo", "ancore", "solo_conoscenza"]
+    },
+    "epiloghi_per_gruppo": {
+      "type": "object",
+      "_comment": "Una chiave *_i18n per ognuno dei 4 gruppi di Pathway attivi (il suffisso e' cio' che fa scansionare il validator R-12 il riferimento, come ogni altro campo i18n dei dati).",
+      "required": ["eternal_darkness_i18n", "goddess_of_origin_i18n", "demon_of_knowledge_i18n", "lord_of_mysteries_i18n"],
+      "additionalProperties": false,
+      "properties": {
+        "eternal_darkness_i18n": { "type": "string", "pattern": "^ending\\." },
+        "goddess_of_origin_i18n": { "type": "string", "pattern": "^ending\\." },
+        "demon_of_knowledge_i18n": { "type": "string", "pattern": "^ending\\." },
+        "lord_of_mysteries_i18n": { "type": "string", "pattern": "^ending\\." }
+      }
+    }
+  }
+}

@@ -443,6 +443,56 @@ def main():
                 err(f"data/tribulations/: {n} tribolazioni per il salto {da}->{salti_attesi[da]} "
                     f"({salti_visti[da]}): ne serve UNA sola")
 
+    # --- finali (data/endings.json, fase 7 US-716) ---
+    # 3 voci esatte (FR-9), condizioni dal vocabolario di conditions.gd (nessun
+    # tipo nuovo), eredita_profilo nell'enum, epiloghi_per_gruppo copre i 4
+    # gruppi di Pathway attivi. 'rituale_sequenza_0_completato' e' posto dal
+    # CODICE (EndingSystem ascolta RitualSystem, non un dialogo/quest): unico
+    # flag esente dalla riconciliazione con flag_scritti qui sotto.
+    ENDING_COND = TRIB_COND
+    ENDING_IDS = {"apoteosi", "consumazione", "rinuncia"}
+    EREDITA_PROFILI = {"completo", "ancore", "solo_conoscenza"}
+    GRUPPI_ATTIVI = {"eternal_darkness_i18n", "goddess_of_origin_i18n",
+                      "demon_of_knowledge_i18n", "lord_of_mysteries_i18n"}
+    FLAG_ENDING_ESENTI = {"rituale_sequenza_0_completato"}
+    ending_flags = []   # (rel, eid, flag) da riconciliare coi flag scritti (come trib_flags)
+    end_doc = load_json(os.path.join(DATA, "endings.json"))
+    if end_doc is None:
+        err("data/endings.json: mancante o illeggibile (fase 7, US-716).")
+    else:
+        endings = end_doc.get("endings", [])
+        seen_ids = set()
+        for e in endings:
+            eid = e.get("id")
+            rel = "data/endings.json"
+            if eid in seen_ids:
+                err(f"{rel}: id finale duplicato '{eid}'")
+            seen_ids.add(eid)
+            for c in e.get("condizioni", []):
+                ct = c.get("tipo") if isinstance(c, dict) else None
+                if ct not in ENDING_COND:
+                    err(f"{rel} [{eid}]: condizione di tipo sconosciuto '{ct}' "
+                        f"(vocabolario di conditions.gd: {sorted(ENDING_COND)})")
+                if ct == "flag":
+                    flag = c.get("valore")
+                    if not isinstance(flag, str) or not flag:
+                        err(f"{rel} [{eid}]: condizione 'flag' senza 'valore' valido")
+                    elif flag not in FLAG_ENDING_ESENTI:
+                        ending_flags.append((rel, eid, flag))
+            if e.get("eredita_profilo") not in EREDITA_PROFILI:
+                err(f"{rel} [{eid}]: eredita_profilo '{e.get('eredita_profilo')}' "
+                    f"non nell'enum {sorted(EREDITA_PROFILI)}")
+            epg = e.get("epiloghi_per_gruppo", {})
+            mancanti = GRUPPI_ATTIVI - set(epg)
+            extra = set(epg) - GRUPPI_ATTIVI
+            if mancanti:
+                err(f"{rel} [{eid}]: epiloghi_per_gruppo manca {sorted(mancanti)}")
+            if extra:
+                err(f"{rel} [{eid}]: epiloghi_per_gruppo ha gruppi ignoti {sorted(extra)}")
+        if seen_ids != ENDING_IDS:
+            err(f"data/endings.json: attesi esattamente i finali {sorted(ENDING_IDS)}, "
+                f"trovati {sorted(seen_ids)} (FR-9)")
+
     # --- abilita' ---
     adir = os.path.join(DATA, "abilities")
     ability_ids = set()
@@ -1517,6 +1567,12 @@ def main():
     for rel, tid, flag in trib_flags:
         if flag not in flag_scritti:
             err(f"{rel} [{tid}]: superamento.flag '{flag}' non e' scritto da nessun dialogo o quest")
+
+    # US-716: la condizione 'flag' di un finale (eccetto quelli posti dal
+    # codice, FLAG_ENDING_ESENTI) deve essere scritta da un dialogo o una quest.
+    for rel, eid, flag in ending_flags:
+        if flag not in flag_scritti:
+            err(f"{rel} [{eid}]: condizione flag '{flag}' non e' scritta da nessun dialogo o quest")
 
     QUEST_EFF = {"flag", "item", "reputazione", "ancora", "apri_vendita"}
     for qid, q in quest_docs.items():

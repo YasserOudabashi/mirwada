@@ -255,8 +255,8 @@
       ],
       "priority": 16,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/schema/ending.schema.json (nuovo) + data/endings.json (3 voci). 'sequence 0 raggiunta' resa con tier_min:god (ogni Sequenza 0 attiva e' gia' tier 'god', zero condizioni nuove); 'rituale completato' con un flag 'rituale_sequenza_0_completato' POSTO DAL CODICE (EndingSystem, US-717, ascolta RitualSystem.rituale_completato e controlla Progression.sequence()==0 dopo l'avanzamento) - unico flag esente dalla riconciliazione dialogo/quest del validator. 'almeno un'Ancora viva' per Rinuncia NON e' un tipo di condizione nuovo (FR-9): e' una regola generica su eredita_profilo=='ancore' che EndingSystem applichera' (US-717), mai un id di finale nel codice (FR-15). Flag 'pozione_distrutta' (Rinuncia) posto da una nuova scelta nel dialogo esistente dlg_antagonista (terza opzione al nodo n1, stessa condizione tier_min:angel della scelta 'varca' che chiude la tribolazione) - riuso del grafo unico gia' scritto in US-712, zero NPC/quest nuovi. epiloghi_per_gruppo: chiavi rinominate con suffisso _i18n (eternal_darkness_i18n, ecc.) cosi' il validator R-12 le riconosce come riferimenti i18n (altrimenti finivano fra le chiavi orfane). game_data.gd: PATH_ENDINGS + _load_single (come antagonisti.json) + get_endings()/get_ending(id). tests/test_endings.gd NUOVO (4 test: i 3 id esatti; consumazione ha la priorita' piu' alta di apoteosi/rinuncia; ogni finale risolve name_i18n/eredita_profilo/condizioni/i 4 epiloghi tradotti; i flag non esenti sono scritti da un dialogo). validate exit 0 (3 warning invariati). 759 test verdi (755 + 4)."
     },
     {
       "id": "US-717",

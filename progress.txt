@@ -7317,3 +7317,35 @@ Implementazione in scripts/pages/page_diagramma_pathway.gd:
   chrome). 755 test headless (752 + 3), tutti verdi, nessuna regressione.
 - File toccati: scripts/pages/page_diagramma_pathway.gd,
   assets/i18n/strings.csv + .translation, tests/test_page_diagramma.gd.
+
+=== US-716: ending.schema.json + data/endings.json (fase 7, Blocco D) ===
+data/schema/ending.schema.json (nuovo) + data/endings.json (3 voci:
+apoteosi, consumazione, rinuncia). Decisioni prese durante l'investigazione
+(prima di scrivere): "Sequenza 0 raggiunta" = tier_min:god (ogni Seq 0
+attiva e' gia' tier 'god', zero condizioni nuove in conditions.gd, FR-9).
+"Rituale completato" = flag 'rituale_sequenza_0_completato' POSTO DAL
+CODICE in US-717 (EndingSystem ascolta RitualSystem.rituale_completato,
+controlla Progression.sequence()==0 DOPO l'avanzamento - il segnale porta
+la Sequenza di PARTENZA del rituale, non quella di arrivo) - esente dalla
+riconciliazione dialogo/quest che il validator impone agli altri flag.
+"Almeno un'Ancora viva" per Rinuncia non e' un tipo di condizione nuovo:
+sara' una regola generica in EndingSystem su eredita_profilo=='ancore',
+mai un id di finale nominato nel codice (FR-15). Flag 'pozione_distrutta'
+(Rinuncia): aggiunta una terza scelta al dialogo esistente dlg_antagonista
+(nodo n1, stessa condizione tier_min:angel della scelta 'varca' gia'
+scritta in US-712) - riuso del grafo unico, zero NPC/quest nuovi.
+epiloghi_per_gruppo: chiavi con suffisso _i18n (eternal_darkness_i18n
+ecc.) cosi' il validator R-12 le riconosce come riferimenti i18n.
+game_data.gd: PATH_ENDINGS + _load_single (stesso pattern di
+antagonisti.json) + get_endings()/get_ending(id).
+- tests/test_endings.gd NUOVO (4 test): i 3 id esatti; consumazione ha
+  priorita' piu' alta di apoteosi/rinuncia (FR-10, il game over vince);
+  ogni finale risolve name_i18n/eredita_profilo/condizioni/i 4 epiloghi,
+  tutti tradotti; i flag di condizione non esenti sono scritti da un
+  dialogo (stesso pattern di test_tribulation.gd).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning
+  invariati). 759 test headless (755 + 4), tutti verdi.
+- File toccati: data/schema/ending.schema.json (nuovo), data/endings.json
+  (nuovo), data/dialogues/dlg_antagonista.json, data/i18n/it.json,
+  scripts/game_data.gd, tools/validate_data.py, tests/test_endings.gd
+  (nuovo).
