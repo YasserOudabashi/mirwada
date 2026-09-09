@@ -36,6 +36,13 @@ var _anticipo_left: float = 0.0
 ## sequenza_bersaglio in enemy_defeated.
 var sequenza: int = 9
 
+## US-806: sottoinsieme di data/balance.json.nemico_base impostato dal
+## layout PRIMA che il nemico entri nell'albero (region_scene.gd::
+## _crea_nemici). Mergiato su _cfg in _ready(): ogni chiave che lo script
+## gia' legge con _cfg.get(...) diventa sovrascrivibile per-istanza senza
+## altre righe. {} = comportamento di sempre (il nemico da banco di prova).
+var override: Dictionary = {}
+
 ## US-804: dal momento in cui il nemico entra in INSEGUIMENTO (l'inizio
 ## dello scontro) fino alla morte, se il player ha lanciato un'abilita' o
 ## subito danno -- per il payload di enemy_defeated (senza_abilita,
@@ -48,7 +55,11 @@ func _ready() -> void:
 	add_to_group("nemici")
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd != null:
-		_cfg = gd.call("get_balance", "nemico_base")
+		# duplicate(): get_balance() torna il Dictionary CONDIVISO di GameData,
+		# non una copia (US-806) — mergiare l'override lì dentro corromperebbe
+		# nemico_base per ogni altro nemico dell'intera partita.
+		_cfg = (gd.call("get_balance", "nemico_base") as Dictionary).duplicate(true)
+	_cfg.merge(override, true)
 
 	_postura.call("configura",
 		float(_cfg.get("postura_massimo", 60.0)), 3.0, 15.0)
@@ -284,6 +295,12 @@ func _lascia_caratteristica() -> void:
 
 func stato() -> String:
 	return Stato.keys()[_stato]
+
+
+## US-806: per l'aggregato di area_cleared in region_scene.gd (letto solo
+## alla morte, via 'morto').
+func senza_abilita() -> bool:
+	return _senza_abilita
 
 
 func _guarda_verso(punto: Vector2) -> void:

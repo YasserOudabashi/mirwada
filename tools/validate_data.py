@@ -1310,6 +1310,56 @@ def main():
         if c not in coperte:
             warn(f"data/items/: nessun item di esempio per la categoria '{c}'")
 
+    # --- nemici/oggetti dei layout (US-806) ---
+    # Rilegge data/world/layouts/*.json (item_ids/pathway_ids non erano ancora
+    # pronti nel blocco "layouts" piu' sopra, US-805). Un boss e' dati
+    # (sequenza + override + scala), mai un flag: qui si valida solo la forma.
+    _bal_nemici = load_json(os.path.join(DATA, "balance.json")) or {}
+    nemico_base_keys = set((_bal_nemici.get("nemico_base", {}) or {}).keys())
+    if os.path.isdir(layouts_dir):
+        for fn in sorted(os.listdir(layouts_dir)):
+            if not fn.endswith(".json"):
+                continue
+            rel = f"data/world/layouts/{fn}"
+            doc = load_json(os.path.join(layouts_dir, fn)) or {}
+            rid = doc.get("region_id")
+            mappa = doc.get("mappa", [])
+            righe_ok = isinstance(mappa, list) and len(mappa) == 36 and all(
+                isinstance(r, str) and len(r) == 48 for r in mappa)
+
+            def _calpestabile(x, y):
+                return righe_ok and 0 <= x < 48 and 0 <= y < 36 and mappa[y][x] in CALPESTABILI_LAYOUT
+
+            for nm in doc.get("nemici", []):
+                nx, ny = nm.get("x"), nm.get("y")
+                if not (isinstance(nx, int) and isinstance(ny, int) and _calpestabile(nx, ny)):
+                    err(f"{rel} [{rid}]: nemico a ({nx},{ny}) non e' su una cella calpestabile")
+                seq = nm.get("sequenza")
+                if not (isinstance(seq, int) and 0 <= seq <= 9):
+                    err(f"{rel} [{rid}]: nemico sequenza '{seq}' deve essere un int 0..9")
+                scala = nm.get("scala", 1.0)
+                if not (isinstance(scala, (int, float)) and 0.5 <= scala <= 3):
+                    err(f"{rel} [{rid}]: nemico scala '{scala}' deve essere in [0.5, 3]")
+                ov = nm.get("override", {})
+                if not isinstance(ov, dict):
+                    err(f"{rel} [{rid}]: nemico override deve essere un dict")
+                    ov = {}
+                fuori = set(ov) - nemico_base_keys
+                if fuori:
+                    err(f"{rel} [{rid}]: nemico override ha chiavi fuori da "
+                        f"balance.json.nemico_base: {sorted(fuori)}")
+                car = ov.get("caratteristica")
+                if isinstance(car, dict) and car.get("pathway_id") not in pathway_ids:
+                    err(f"{rel} [{rid}]: nemico override.caratteristica.pathway_id "
+                        f"'{car.get('pathway_id')}' non e' un Pathway attivo")
+
+            for og in doc.get("oggetti", []):
+                ox, oy = og.get("x"), og.get("y")
+                if not (isinstance(ox, int) and isinstance(oy, int) and _calpestabile(ox, oy)):
+                    err(f"{rel} [{rid}]: oggetto a ({ox},{oy}) non e' su una cella calpestabile")
+                if og.get("item_id") not in item_ids:
+                    err(f"{rel} [{rid}]: oggetto item_id '{og.get('item_id')}' non esiste in data/items/")
+
     # --- sigilli (data/sigils/, US-315) ---
     set_doc = load_json(os.path.join(DATA, "schema", "sigil_effect_types.json"))
     sigil_effetti_tipi = set((set_doc or {}).get("effetti", []))

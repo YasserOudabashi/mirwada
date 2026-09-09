@@ -8,8 +8,8 @@
     "spawn": "[x, y] in celle, dentro i limiti, su una cella calpestabile ('.'/','/'='/'+ ')",
     "zone": "{location_tag: [x, y, w, h]} in celle. Un rettangolo per ogni location_tag della regione (copertura completa per Mirwada; le altre regioni non hanno ancora un layout). Rettangoli dentro i limiti, non sovrapposti.",
     "passaggi": "{region_id: [x, y]} opzionale, per-destinazione: una destinazione assente dal dict usa la posizione a bordo calcolata di oggi (fallback di region_scene.gd::_crea_passaggi). Ogni region_id deve esistere in data/world/regions.json.",
-    "nemici": "array, vuoto in questa story (US-806 lo popola)",
-    "oggetti": "array, vuoto in questa story (US-809 lo popola)",
+    "nemici": "array di {x, y, sequenza, scala, override} (US-806). x/y: cella calpestabile. sequenza: 0..9, la Sequenza del nemico (curva HP/SP da StatsComponent.configure_from_balance). scala: fattore di Node2D.scale, in [0.5, 3] (un boss e' 1.5). override: sottoinsieme delle chiavi di data/balance.json.nemico_base (es. danno_attacco, raggio_aggro, tag, caratteristica:{pathway_id, sequence, probabilita}), mergiato su nemico_base per-istanza (enemy.gd::override). Un boss e' dati (sequenza piu' bassa + override piu' duro + scala 1.5), MAI un flag 'boss'.",
+    "oggetti": "array di {x, y, item_id, quantita} (US-806). x/y: cella calpestabile. item_id: deve esistere in data/items/. quantita: intero >= 1, va a Inventory.aggiungi(item_id, quantita) alla raccolta. Gli ingredienti delle formule di pozione arrivano nel mondo solo da US-809 (prima non esistono come item): fino ad allora questo campo usa solo item gia' esistenti (es. moneta_comune).",
     "drop": "dict, vuoto in questa story (US-809 lo popola)"
   },
   "legenda": {
@@ -29,6 +29,8 @@
     "spawn dentro i limiti e su una cella calpestabile",
     "zone: chiavi sottoinsieme di location_tags della regione; per la regione con layout la copertura deve essere completa (ogni location_tag ha una zona); rettangoli dentro i limiti",
     "passaggi: ogni region_id di destinazione esiste in data/world/regions.json",
-    "una regione senza file layout produce solo un warning (atteso finche' US-807 non disegna le altre 4)"
+    "una regione senza file layout produce solo un warning (atteso finche' US-807 non disegna le altre 4)",
+    "nemici: x/y calpestabili; sequenza intero 0..9; chiavi di override sottoinsieme di nemico_base; override.caratteristica.pathway_id (se presente) e' un Pathway attivo; scala in [0.5, 3]",
+    "oggetti: x/y calpestabili; item_id esiste in data/items/"
   ]
 }
