@@ -163,7 +163,7 @@
     }
   },
   "nemico_base": {
-    "_comment": "Nemico da banco di prova. La DURATA della fase di anticipo la fissa il tell in data/audio.json.telegraph[telegraph].anticipo_ms (US-020): l'animazione 'anticipo' e' solo cosmetica. Qui raggi, danno, recupero e quale tell usa. PLAUSIBILI, non bilanciati. 'tag' (US-806) e' vuoto di default: un nemico dei layout lo sovrascrive per-istanza via override.tag e finisce in enemy_defeated.tag_nemico.",
+    "_comment": "Nemico da banco di prova. La DURATA della fase di anticipo la fissa il tell in data/audio.json.telegraph[telegraph].anticipo_ms (US-020): l'animazione 'anticipo' e' solo cosmetica. Qui raggi, danno, recupero e quale tell usa. PLAUSIBILI, non bilanciati. 'tag' (US-806) e' vuoto di default: un nemico dei layout lo sovrascrive per-istanza via override.tag e finisce in enemy_defeated.tag_nemico. 'drop_probabilita' (US-809a): probabilita' di lasciare un item da override.oggetti_a_morte alla morte (enemy.gd::_lascia_oggetto); un boss la sovrascrive a 1.0 per-istanza via override.",
     "telegraph": "wind_up_light",
     "raggio_aggro": 140,
     "raggio_attacco": 26,
@@ -174,6 +174,7 @@
     "recupero_s": 0.6,
     "postura_massimo": 60,
     "tag": "",
+    "drop_probabilita": 0.6,
     "cadavere": {
       "_comment": "Pulizia di default del cadavere (US-214B). Il segnale 'morto' resta per chi vuole gestirlo (spawner, quest): questa e' solo la dissolvenza automatica se nessuno lo fa. permanenza_s: quanto resta intatto; dissolvenza_s: quanto ci mette a sfumare via prima di liberarsi. 0 = resta per sempre.",
       "permanenza_s": 3.0,

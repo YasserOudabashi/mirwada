@@ -68,7 +68,8 @@
         "danno_attacco": 15,
         "raggio_aggro": 200,
         "tag": "non_morto",
-        "caratteristica": {"pathway_id": "twilight_giant", "sequence": 7, "probabilita": 1.0}
+        "caratteristica": {"pathway_id": "twilight_giant", "sequence": 7, "probabilita": 1.0},
+        "drop_probabilita": 1.0
       }
     }
   ],
@@ -82,5 +83,116 @@
     {"x": 11, "y": 28, "item_id": "moneta_comune", "quantita": 2},
     {"x": 43, "y": 28, "item_id": "moneta_comune", "quantita": 1}
   ],
-  "drop": {}
+  "drop": {
+    "0": [
+      "caratteristica_del_gigante",
+      "chiave_dell_oltretomba",
+      "frammento_di_notte_primordiale",
+      "il_confine_del_mondo",
+      "nucleo_del_crepuscolo",
+      "occhio_del_gufo_del_giudizio",
+      "respiro_finale",
+      "tempo_solidificato",
+      "ultimo_respiro_del_giorno"
+    ],
+    "1": [
+      "cenere_di_re",
+      "chiodo_arrugginito_di_forca",
+      "metallo_impossibile",
+      "sale_versato",
+      "scettro_pallido",
+      "scheggia_divina",
+      "tredicesimo_grano_di_rosario",
+      "ultimo_battito",
+      "voce_del_gigante"
+    ],
+    "2": [
+      "corona_di_ossa",
+      "filo_dell_oblio",
+      "ossidiana_decaduta",
+      "polvere_di_confine",
+      "polvere_di_crepuscolo",
+      "polvere_di_ossario",
+      "specchio_annerito",
+      "stendardo_lacero",
+      "ultimo_respiro"
+    ],
+    "3": [
+      "acqua_dello_stige",
+      "campana_incrinata",
+      "filo_delle_parche",
+      "incenso_di_cenere",
+      "lacrima_di_paladino",
+      "lama_di_luce_solidificata",
+      "mitra_di_vescovo_apostata",
+      "obolo_di_bronzo",
+      "platino_rituale"
+    ],
+    "4": [
+      "ala_di_falena_crepuscolare",
+      "argento_benedetto",
+      "cenere_di_spirito",
+      "chiodo_di_bara",
+      "cuore_che_non_si_ferma",
+      "fiele_di_demone",
+      "ombra_imbottigliata",
+      "radice_di_immortelle",
+      "sale_della_veglia_eterna"
+    ],
+    "5": [
+      "chiave_d_ossa",
+      "cuore_di_montagna",
+      "filo_di_lutto",
+      "nebbia_del_limbo",
+      "pietra_di_soglia",
+      "reliquia_profanata",
+      "resina_di_ferro",
+      "scudo_fuso",
+      "zolfo_delle_fosse"
+    ],
+    "6": [
+      "acqua_di_fonte_cieca",
+      "balsamo_di_silenzio",
+      "corona_di_papavero_nero",
+      "essenza_spettrale",
+      "ferro_delle_lapidi",
+      "frammento_di_alba",
+      "incenso_dei_riti",
+      "linfa_di_gigante",
+      "oro_bianco"
+    ],
+    "7": [
+      "acciaio_stellare",
+      "ectoplasma",
+      "moneta_del_traghettatore",
+      "piuma_di_civetta_nera",
+      "polvere_di_arena",
+      "polvere_di_incubo",
+      "radice_di_mandragora_urlante",
+      "soffio_di_spettro",
+      "tendine_di_lupo"
+    ],
+    "8": [
+      "cera_di_veglia",
+      "chiodo_di_bara",
+      "corda_di_impiccato",
+      "estratto_di_muscolo",
+      "inchiostro_di_seppia_abissale",
+      "lacrima_di_vedova",
+      "mano_di_gloria",
+      "osso_di_pugile",
+      "sale_di_roccia"
+    ],
+    "9": [
+      "cenere_di_stella_morta",
+      "dente_di_teschio",
+      "ferro_temperato",
+      "muffa_sepolcrale",
+      "occhio_che_non_dorme",
+      "radice_di_quercia",
+      "sangue_di_toro",
+      "terra_di_cimitero",
+      "velo_di_mezzanotte"
+    ]
+  }
 }

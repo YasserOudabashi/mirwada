@@ -217,8 +217,8 @@
       ],
       "priority": 12,
       "fase": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto esattamente come da AC, con una correzione tecnica scoperta e risolta prima del commit: il primo tentativo di --drops scriveva i 5 layout con json.dump(indent=2) sull'intero documento, distruggendo lo stile compatto scritto a mano (un nemico/oggetto per riga) con un diff pieno di rumore di riformattazione (1187 inserzioni/129 cancellazioni, quasi tutto non-contenuto). Corretto con sostituzioni testuali mirate (format_drop_block/splice_drop_block/add_boss_drop_probabilita): il diff finale e' solo le righe nuove (464 ins/10 canc), zero riformattazione. Idempotenza vera riverificata (diff -rq byte-per-byte identico al secondo run). 834 test totali (831+3 nuovi), 0 errori nel validator. Verifica Xvfb: ucciso il boss di Marche Crepuscolo (Sequenza 7, twilight_giant) a schermo, screenshot prima/dopo mandati in chat — lascia sia la Caratteristica sia un ingrediente vero (polvere_di_incubo, dalla drop table della regione), non piu' moneta_comune. Aperto per US-809b/c: listini scritti a mano invariati, oggetti a terra ancora moneta_comune, nessun blocco validator 'fonti' ancora."
     },
     {
       "id": "US-809b",

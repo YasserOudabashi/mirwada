@@ -64,7 +64,8 @@
         "danno_attacco": 15,
         "raggio_aggro": 200,
         "tag": "spirito",
-        "caratteristica": {"pathway_id": "hermit", "sequence": 6, "probabilita": 1.0}
+        "caratteristica": {"pathway_id": "hermit", "sequence": 6, "probabilita": 1.0},
+        "drop_probabilita": 1.0
       }
     }
   ],
@@ -76,5 +77,86 @@
     {"x": 24, "y": 25, "item_id": "moneta_comune", "quantita": 2},
     {"x": 39, "y": 25, "item_id": "moneta_comune", "quantita": 1}
   ],
-  "drop": {}
+  "drop": {
+    "0": [
+      "chiave_di_ogni_serratura",
+      "domanda_senza_risposta",
+      "lega_impossibile_da_replicare",
+      "prima_ruota_mai_costruita",
+      "primo_libro_mai_scritto",
+      "progetto_del_mondo_perfetto"
+    ],
+    "1": [
+      "ago_che_cuce_il_fato",
+      "costante_universale_incrinata",
+      "filo_reciso_dalle_parche",
+      "inchiostro_che_non_si_cancella",
+      "numero_che_non_dovrebbe_esistere",
+      "prisma_che_devia_la_luce"
+    ],
+    "2": [
+      "cristallo_mnemonico",
+      "essenza_di_biblioteca",
+      "memoria_cristallizzata",
+      "nucleo_spirituale_stabile",
+      "polvere_di_pagine_antiche",
+      "telaio_di_precisione_assoluta"
+    ],
+    "3": [
+      "inchiostro_di_due_mondi",
+      "occhio_di_vetro_nero",
+      "pergamena_a_doppia_faccia",
+      "polvere_di_terza_vista",
+      "specchio_annerito_dal_fumo",
+      "stilo_di_ossidiana"
+    ],
+    "4": [
+      "catalizzatore_proibito",
+      "chiave_di_soluzione",
+      "crogiolo_indistruttibile",
+      "grimorio_bianco",
+      "mercurio_filosofale",
+      "quintessenza_distillata"
+    ],
+    "5": [
+      "astrolabio_tascabile",
+      "carta_millimetrata",
+      "frammento_di_cielo_notturno",
+      "inchiostro_stellare",
+      "lente_di_lungo_fuoco",
+      "polvere_di_meteora"
+    ],
+    "6": [
+      "inchiostro_ferrogallico",
+      "ingranaggio_di_precisione",
+      "lega_beyonder",
+      "olio_conduttore",
+      "pergamena_di_qualita",
+      "sigillo_di_ceralacca"
+    ],
+    "7": [
+      "acido_da_saggio",
+      "bilancia_di_precisione",
+      "chiodo_di_ferro_freddo",
+      "cristallo_di_riferimento",
+      "incenso_di_mirra",
+      "ossa_di_gatto_nero"
+    ],
+    "8": [
+      "cera_di_candela_rituale",
+      "frammento_di_tavoletta",
+      "inchiostro_luminescente",
+      "punta_d_argento",
+      "resina_conservante",
+      "spazzola_da_scavo"
+    ],
+    "9": [
+      "filo_di_lana_rossa",
+      "gesso_consacrato",
+      "lente_graduata",
+      "polvere_di_sale_nero",
+      "polvere_reagente",
+      "taccuino_di_appunti"
+    ]
+  }
 }

@@ -247,20 +247,32 @@ func _crea_gate() -> void:
 ## configure_from_balance va DOPO (sovrascrive il default Sequenza 9 di
 ## StatsComponent._ready). Nessuna voce (layout assente o senza nemici) ->
 ## nessun nemico spawnato, come oggi per le regioni senza layout.
+## US-809a: layout.drop ({"<sequenza>": [item_id, ...]}) e' l'UNICA fonte
+## di override.oggetti_a_morte — nessuna tabella nel codice. Iniettato su
+## una COPIA dell'override dichiarato (.duplicate: lo stesso dict di
+## layout.nemici[i].override e' condiviso, mutarlo direttamente lo
+## corromperebbe per ogni futura istanza dello stesso layout, stesso bug
+## gia' corretto in enemy.gd::_ready per _cfg in US-806).
 func _crea_nemici() -> void:
-	var nemici: Array = (_layout_dati().get("nemici", []) as Array)
+	var layout: Dictionary = _layout_dati()
+	var nemici: Array = (layout.get("nemici", []) as Array)
+	var drop: Dictionary = (layout.get("drop", {}) as Dictionary)
 	_nemici_vivi = nemici.size()
 	_area_nemici_senza_abilita = true
 	for n in nemici:
 		var spec: Dictionary = n as Dictionary
+		var sequenza: int = int(spec.get("sequenza", 9))
+		var override: Dictionary = (spec.get("override", {}) as Dictionary).duplicate(true)
+		if drop.has(str(sequenza)):
+			override["oggetti_a_morte"] = drop[str(sequenza)]
 		var e: Node = preload("res://scenes/enemy.tscn").instantiate()
-		e.set("override", (spec.get("override", {}) as Dictionary))
+		e.set("override", override)
 		e.set("scale", Vector2.ONE * float(spec.get("scala", 1.0)))
 		add_child(e)
 		e.set("global_position", to_global(map_to_local(
 			Vector2i(int(spec.get("x", 0)), int(spec.get("y", 0))))))
-		e.set("sequenza", int(spec.get("sequenza", 9)))
-		e.get_node("StatsComponent").call("configure_from_balance", int(spec.get("sequenza", 9)))
+		e.set("sequenza", sequenza)
+		e.get_node("StatsComponent").call("configure_from_balance", sequenza)
 		e.connect("morto", _su_nemico_morto)
 
 

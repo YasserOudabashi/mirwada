@@ -64,7 +64,8 @@
         "danno_attacco": 15,
         "raggio_aggro": 200,
         "tag": "ombra",
-        "caratteristica": {"pathway_id": "fool", "sequence": 5, "probabilita": 1.0}
+        "caratteristica": {"pathway_id": "fool", "sequence": 5, "probabilita": 1.0},
+        "drop_probabilita": 1.0
       }
     }
   ],
@@ -76,5 +77,116 @@
     {"x": 36, "y": 29, "item_id": "moneta_comune", "quantita": 2},
     {"x": 20, "y": 30, "item_id": "moneta_comune", "quantita": 1}
   ],
-  "drop": {}
+  "drop": {
+    "0": [
+      "battuta_finale_mai_detta",
+      "cavillo_primordiale",
+      "copione_del_mondo_con_le_correzioni",
+      "distanza_ridotta_a_zero",
+      "porta_che_non_c_e_mai_stata",
+      "prima_porta_mai_aperta",
+      "riga_bianca_nel_regolamento_del_mondo",
+      "soglia_tra_tutto_e_tutto",
+      "specchio_che_non_riflette_nessuno"
+    ],
+    "1": [
+      "angolo_di_stanza_che_non_esiste",
+      "cardine_del_cielo",
+      "chiave_fatta_di_luce_di_stella",
+      "clessidra_che_cola_all_indietro",
+      "eco_di_un_istante_gia_passato",
+      "regola_locale_scritta_a_matita",
+      "serratura_dell_orizzonte",
+      "silenzio_tra_due_battiti",
+      "verme_che_mangia_i_minuti"
+    ],
+    "2": [
+      "biglietto_della_lotteria_vincente",
+      "chiodo_nell_ingranaggio_del_fato",
+      "eco_di_un_potere_visto_una_volta_sola",
+      "frammento_di_una_porta_tra_i_mondi",
+      "lettera_mai_consegnata",
+      "moneta_caduta_sempre_di_taglio",
+      "polvere_di_un_piano_gia_chiuso",
+      "quadrifoglio_a_cinque_foglie",
+      "voto_infranto_alla_radice"
+    ],
+    "3": [
+      "acqua_di_un_pozzo_che_non_trovi_piu",
+      "bussola_che_punta_a_dove_vuoi_tu",
+      "filo_del_burattinaio",
+      "pagina_strappata_da_un_diario",
+      "polvere_di_un_oggetto_gia_distrutto",
+      "ritratto_di_te_da_bambino",
+      "sillaba_di_un_nome_non_tuo",
+      "specchio_che_riflette_un_altro",
+      "suola_consumata_da_mille_strade"
+    ],
+    "4": [
+      "cappello_a_cilindro_senza_fondo",
+      "chiave_che_chiude_e_non_apre",
+      "cuore_condiviso",
+      "muta_di_pelle_altrui",
+      "ombra_ritagliata_con_le_forbici",
+      "segreto_sigillato_in_cera_nera",
+      "sipario_di_velluto_polveroso",
+      "specchio_da_camerino_incrinato",
+      "vischio_che_si_aggrappa"
+    ],
+    "5": [
+      "articolazione_di_marionetta",
+      "biglietto_di_sola_andata_e_ritorno",
+      "croce_di_legno_del_burattinaio",
+      "cuscino_di_un_dormiente_inquieto",
+      "filo_spirituale_annodato",
+      "mappa_che_si_ripiega_su_se_stessa",
+      "ricordo_altrui_in_bottiglia",
+      "sabbia_del_sonno_rubata",
+      "sabbia_di_due_deserti_lontani"
+    ],
+    "6": [
+      "carta_carbone_dell_anima",
+      "creta_del_primo_uomo",
+      "favilla_del_titano_incatenato",
+      "fegato_sempre_rigenerato",
+      "inchiostro_che_copia_da_solo",
+      "maschera_senza_lineamenti",
+      "ritratto_che_cambia_faccia",
+      "timbro_di_ogni_potere",
+      "voce_registrata_su_cera"
+    ],
+    "7": [
+      "asso_sempre_in_cima_al_mazzo",
+      "carta_stellare_con_una_stella_in_piu",
+      "chiave_di_cifrario",
+      "cilindro_a_doppio_fondo",
+      "colomba_che_non_esiste",
+      "inchiostro_simpatico_rubato",
+      "lente_puntata_sempre_a_nord",
+      "sabbia_di_meridiana_notturna",
+      "stele_di_rosetta_infranta"
+    ],
+    "8": [
+      "cerone_da_palcoscenico",
+      "contratto_con_la_clausola_nascosta",
+      "dado_truccato",
+      "filo_teso_tra_due_stanze",
+      "gessetto_che_disegna_porte",
+      "lingua_d_argento_falsa",
+      "naso_finto_di_ceramica",
+      "sonaglio_che_confonde",
+      "specchio_da_borsetta_a_due_facce"
+    ],
+    "9": [
+      "cardine_arrugginito_di_una_porta_perduta",
+      "chiave_senza_denti",
+      "grimaldello_cantante",
+      "guanto_del_borseggiatore",
+      "polvere_di_gesso_stellare",
+      "polvere_di_specchio_incrinato",
+      "radice_di_veggente",
+      "refurtiva_dimenticata",
+      "sangue_di_gufo_lunare"
+    ]
+  }
 }

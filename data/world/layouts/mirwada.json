@@ -66,7 +66,8 @@
         "danno_attacco": 15,
         "raggio_aggro": 200,
         "tag": "bestia",
-        "caratteristica": {"pathway_id": "twilight_giant", "sequence": 8, "probabilita": 1.0}
+        "caratteristica": {"pathway_id": "twilight_giant", "sequence": 8, "probabilita": 1.0},
+        "drop_probabilita": 1.0
       }
     }
   ],
@@ -82,5 +83,70 @@
     {"x": 40, "y": 10, "item_id": "moneta_comune", "quantita": 2},
     {"x": 5, "y": 30, "item_id": "moneta_comune", "quantita": 1}
   ],
-  "drop": {}
+  "drop": {
+    "8": [
+      "cera_di_candela_rituale",
+      "cera_di_veglia",
+      "cerone_da_palcoscenico",
+      "chiodo_di_bara",
+      "contratto_con_la_clausola_nascosta",
+      "corda_di_impiccato",
+      "corteccia_febbrifuga",
+      "dado_truccato",
+      "estratto_di_muscolo",
+      "filo_teso_tra_due_stanze",
+      "fiore_di_camomilla_selvatica",
+      "frammento_di_tavoletta",
+      "gessetto_che_disegna_porte",
+      "inchiostro_di_seppia_abissale",
+      "inchiostro_luminescente",
+      "lacrima_di_vedova",
+      "lingua_d_argento_falsa",
+      "mano_di_gloria",
+      "naso_finto_di_ceramica",
+      "osso_di_pugile",
+      "pelo_di_lupo_bianco",
+      "punta_d_argento",
+      "radice_amara",
+      "resina_conservante",
+      "sale_di_roccia",
+      "sangue_di_cervo",
+      "sonaglio_che_confonde",
+      "spazzola_da_scavo",
+      "specchio_da_borsetta_a_due_facce",
+      "zanna_di_latte"
+    ],
+    "9": [
+      "cardine_arrugginito_di_una_porta_perduta",
+      "cenere_di_stella_morta",
+      "chiave_senza_denti",
+      "dente_di_teschio",
+      "ferro_temperato",
+      "filo_di_lana_rossa",
+      "fiore_di_luna",
+      "gesso_consacrato",
+      "goccia_di_linfa",
+      "grimaldello_cantante",
+      "guanto_del_borseggiatore",
+      "lente_graduata",
+      "muffa_sepolcrale",
+      "occhio_che_non_dorme",
+      "polvere_di_gesso_stellare",
+      "polvere_di_sale_nero",
+      "polvere_di_specchio_incrinato",
+      "polvere_reagente",
+      "radice_di_quercia",
+      "radice_di_valeriana",
+      "radice_di_veggente",
+      "refurtiva_dimenticata",
+      "rugiada_notturna",
+      "sangue_di_gufo_lunare",
+      "sangue_di_toro",
+      "seme_dormiente",
+      "taccuino_di_appunti",
+      "terra_di_cimitero",
+      "terriccio_di_prima_luna",
+      "velo_di_mezzanotte"
+    ]
+  }
 }

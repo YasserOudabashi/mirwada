@@ -222,6 +222,7 @@ func _su_morte() -> void:
 			"tag_nemico": str(_cfg.get("tag", "")),
 		})
 	_lascia_caratteristica()
+	_lascia_oggetto()
 	morto.emit(self)
 	_avvia_dissolvenza_cadavere()
 
@@ -291,6 +292,22 @@ func _lascia_caratteristica() -> void:
 	var pickup := preload("res://scripts/characteristic_pickup.gd").new()
 	get_parent().add_child(pickup)
 	pickup.call("setup", str(car.get("id", "")), global_position)
+
+
+## US-809a: alla morte, con probabilita' drop_probabilita, lascia a terra
+## UN item scelto a caso fra quelli di override.oggetti_a_morte (dal
+## layout.drop della regione, via region_scene.gd::_crea_nemici). Vuoto o
+## assente (il nemico da banco di prova, ogni regione senza layout) -> no-op.
+func _lascia_oggetto() -> void:
+	var oggetti: Array = _cfg.get("oggetti_a_morte", [])
+	if oggetti.is_empty():
+		return
+	if randf() > float(_cfg.get("drop_probabilita", 0.0)):
+		return
+	var item_id: String = str(oggetti[randi() % oggetti.size()])
+	var pickup := preload("res://scripts/item_pickup.gd").new()
+	get_parent().add_child(pickup)
+	pickup.call("setup", item_id, global_position)
 
 
 func stato() -> String:

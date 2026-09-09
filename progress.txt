@@ -8629,3 +8629,100 @@ COSA RESTA APERTO (dichiarato, non di questa story).
 
 PROSSIMA STORIA: US-809 — Fonti nel mondo: drop per regione, listini,
 raccolta a terra (Blocco C).
+
+=== docs: US-809 spezzata in US-809a/b/c prima di iniziare (fase 8) ===
+Su richiesta esplicita dell'utente (stessa scelta gia' fatta per US-807),
+US-809 e' spezzata in 3 story per meccanica PRIMA di iniziarla: US-809a
+drop dei nemici, US-809b listini dei venditori, US-809c raccolta a terra +
+chiusura col blocco validator "fonti". Solo documenti toccati (prd-fase-8-
+vertical-slice.md, prd.json, CLAUDE.md/prossimi-passi.md/roadmap.md/
+README.md per il conteggio story 17->19): nessun dato o codice.
+
+=== US-809a: Drop dei nemici (fase 8, Blocco C) ===
+
+COSA FATTO.
+- data/balance.json.nemico_base: nuovo campo "drop_probabilita": 0.6
+  (probabilita' di lasciare un item da override.oggetti_a_morte alla
+  morte; un boss lo sovrascrive a 1.0 per-istanza via override, stesso
+  meccanismo gia' usato per danno_attacco/raggio_aggro/scala).
+- scripts/enemy.gd: nuovo _lascia_oggetto() che rispecchia esattamente
+  _lascia_caratteristica() (US-207): legge override.oggetti_a_morte da
+  _cfg, tira randf() contro drop_probabilita, sceglie UN item a caso fra
+  quelli disponibili, istanzia item_pickup.gd e lo aggiunge al genitore.
+  Vuoto/assente (nemico da banco di prova, nessun layout) -> no-op.
+  Richiamato da _su_morte() subito dopo _lascia_caratteristica().
+- scripts/region_scene.gd::_crea_nemici(): legge layout.drop
+  ({"<sequenza>": [item_id, ...]}) e inietta la lista corrispondente alla
+  Sequenza del nemico in override.oggetti_a_morte PRIMA di add_child.
+  Iniettato su una COPIA dell'override dichiarato (.duplicate(true)): lo
+  stesso dict di layout.nemici[i].override e' condiviso fra istanze dello
+  stesso layout, mutarlo direttamente lo corromperebbe per sempre — stessa
+  disciplina gia' corretta in enemy.gd::_ready() per _cfg in US-806.
+- tools/generate_formula_ingredients.py: nuova opzione --drops. Legge
+  regions.json (group_affinity), pathways/*.json (group, mai hardcoded) e
+  formulas.json, e scrive layout.drop per le 5 regioni: le 4 con
+  group_affinity reale ricevono tutte le Sequenze 0..9 che hanno almeno
+  una formula fra i Pathway attivi del loro gruppo; la regione neutra
+  (mirwada, l'hub) riceve solo le Sequenze "9"/"8" con gli ingredienti di
+  TUTTI i Pathway attivi. La stessa opzione aggiunge anche
+  drop_probabilita: 1.0 all'override del boss di ciascuna regione (un
+  boss lascia sempre il suo drop). Pura funzione dei dati esistenti:
+  nessuna voce scritta a mano da preservare, ogni run ricalcola tutto da
+  zero (idempotente per costruzione).
+- tests/test_enemy_drop.gd (nuovo): 3 test — drop_probabilita 1.0 lascia
+  sempre l'item dichiarato (raccolta verificata, non si raccoglie due
+  volte); drop_probabilita 0.0 non lascia nulla; il nemico da banco di
+  prova (override vuoto, come oggi) non lascia nessun item_pickup.
+
+COME VERIFICATO.
+- python tools/validate_data.py: 0 errori (nessun blocco validator nuovo
+  in questa story: il blocco "fonti" e' US-809c).
+- godot --headless --import: pulito.
+- Suite: 834 test, tutti passati (831 + 3 nuovi in test_enemy_drop.gd).
+  Nessuna regressione.
+- Idempotenza VERA di --drops: copiati i 5 layout, rilanciato il comando
+  una seconda volta, diff -rq byte-per-byte IDENTICO ("0 regioni
+  aggiornate" nel log, non solo quello — confrontato il contenuto vero).
+- VERIFICA A SCHERMO REALE (Xvfb, script di QA nello scratchpad non
+  committato, stesso reset_smoothing() della trappola #13): istanziata la
+  scena vera di Marche Crepuscolo, teletrasportato il player accanto al
+  boss (Sequenza 7, twilight_giant), ucciso azzerando gli hp — screenshot
+  prima/dopo mandati in chat. Dopo: il boss e' sparito e lascia a terra
+  sia la Caratteristica (char_twilight_giant_7, gia' garantita da prima)
+  sia un item vero (polvere_di_incubo — un ingrediente reale della
+  drop["7"] di quella regione, non piu' moneta_comune) — la catena
+  layout.drop -> region_scene._crea_nemici -> enemy._lascia_oggetto ->
+  item_pickup funziona davvero a schermo, non solo nei test.
+
+CORREZIONI rispetto al piano (scoperta e corretta PRIMA del commit).
+- Il primo tentativo di --drops scriveva i 5 layout con save_json()
+  (json.dump(doc, indent=2) sull'intero documento): i file erano stati
+  scritti A MANO in stile compatto (un oggetto nemico/oggetto per riga,
+  es. {"x": 30, "y": 3, "sequenza": 9, "scala": 1.0, "override": {}}) —
+  un round-trip json.dump standard distrugge quello stile, riformattando
+  ogni dict annidato su piu' righe (git diff: 1187 inserzioni/129
+  cancellazioni per 5 file, quasi tutto rumore di formattazione, zero
+  contenuto nuovo). Scoperto PRIMA del commit ispezionando il diff riga
+  per riga (non dato per scontato che "il tool ha girato" bastasse).
+  CORRETTO: --drops ora scrive con sostituzioni TESTUALI mirate
+  (format_drop_block/splice_drop_block/add_boss_drop_probabilita in
+  tools/generate_formula_ingredients.py), non un re-dump del documento:
+  tocca solo la riga '"drop": {}' -> '"drop": {...}' (drop e' sempre
+  l'ultima chiave, garantito dai layout esistenti) e la riga
+  '"caratteristica": {...}' del boss (aggiunge una sorella
+  drop_probabilita con la stessa indentazione). Risultato: il diff finale
+  sui 5 layout e' SOLO le righe nuove (464 inserzioni/10 cancellazioni,
+  le cancellazioni sono le righe "drop": {}/caratteristica sostituite),
+  zero rumore di riformattazione — riverificato riga per riga col diff
+  qui sopra. Idempotenza riverificata dopo la correzione.
+
+COSA RESTA APERTO (dichiarato, non di questa story).
+- I listini dei venditori (Sidon/Vesna/Bruno) restano quelli scritti a
+  mano prima di questa story: US-809b li estende.
+- I 5 layout continuano a spargere moneta_comune negli "oggetti" a terra:
+  US-809c li sostituisce con ingredienti veri.
+- Nessun blocco validator "fonti" ancora: arriva con US-809c, quando
+  tutte e 3 le meccaniche esistono davvero.
+
+PROSSIMA STORIA: US-809b — Listini dei venditori (--listini nel
+generatore, append a roster.json per Sidon/Vesna/Bruno).

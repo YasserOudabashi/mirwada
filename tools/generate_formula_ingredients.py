@@ -5,7 +5,8 @@ ingredienti citati dalle formule dei 10 Pathway attivi
 (data/potions/formulas.json).
 
 Esecuzione (dalla root del progetto):
-    python tools/generate_formula_ingredients.py
+    python tools/generate_formula_ingredients.py          # item + i18n (US-808)
+    python tools/generate_formula_ingredients.py --drops  # layout.drop per le 5 regioni (US-809a)
 
 Idempotente: le voci gia' presenti (le 8 scritte a mano e ogni id generato
 in un run precedente) si PRESERVANO tal quali (merge per id, come
@@ -44,6 +45,9 @@ ITEMS_PATH = os.path.join(DATA, "items", "ingredienti.json")
 TAGS_PATH = os.path.join(DATA, "tags.json")
 IT_PATH = os.path.join(DATA, "i18n", "it.json")
 EN_PATH = os.path.join(DATA, "i18n", "en.json")
+REGIONS_PATH = os.path.join(DATA, "world", "regions.json")
+PATHWAYS_DIR = os.path.join(DATA, "pathways")
+LAYOUTS_DIR = os.path.join(DATA, "world", "layouts")
 
 # Sequenza minima che cita l'ingrediente -> valore (9 e' la piu' debole/comune,
 # 0 la piu' rara). Tabella dell'AC di US-808, non bilanciata.
@@ -328,7 +332,133 @@ def tag_per(item_id):
     return sorted(tag)
 
 
+def format_drop_block(drop):
+    """Serializza layout.drop nello stile a 2 spazi annidato sotto la radice
+    (coerente con un ipotetico json.dumps(doc, indent=2)). Usata per una
+    sostituzione TESTUALE mirata di '  "drop": ...' — mai un re-dump
+    dell'intero file: nemici/oggetti/zone/passaggi sono scritti a mano in
+    stile compatto (un oggetto per riga) che json.dump(indent=2) su tutto
+    il documento distruggerebbe (scoperto e corretto in US-809a, vedi
+    progress.txt)."""
+    if not drop:
+        return "{}"
+    righe = ["{"]
+    sequenze = sorted(drop.keys(), key=int)
+    for i, seq in enumerate(sequenze):
+        righe.append(f'    "{seq}": [')
+        ingredienti = drop[seq]
+        for j, ing in enumerate(ingredienti):
+            virgola = "," if j < len(ingredienti) - 1 else ""
+            righe.append(f'      "{ing}"{virgola}')
+        virgola = "," if i < len(sequenze) - 1 else ""
+        righe.append(f'    ]{virgola}')
+    righe.append("  }")
+    return "\n".join(righe)
+
+
+def splice_drop_block(text, drop):
+    """'drop' e' sempre l'ultima chiave del layout (US-806): sostituisce
+    tutto da '  "drop": ' a fine file, qualunque fosse il contenuto
+    precedente (una riga o gia' multi-riga da un run precedente)."""
+    marker = '  "drop": '
+    idx = text.index(marker)
+    return text[:idx] + marker + format_drop_block(drop) + "\n}\n"
+
+
+def add_boss_drop_probabilita(text):
+    """Il boss di ogni regione (override.caratteristica, sequenza fissa
+    piu' bassa) lascia SEMPRE il suo drop: aggiunge drop_probabilita: 1.0
+    come sorella di "caratteristica" dentro override, con l'indentazione
+    di quella riga. Idempotente: se gia' presente prima di "drop", no-op."""
+    testa = text[:text.index('"drop":')]
+    if '"drop_probabilita"' in testa:
+        return text
+    idx = text.index('"caratteristica":')
+    line_start = text.rfind("\n", 0, idx) + 1
+    line_end = text.index("\n", idx)
+    line = text[line_start:line_end]
+    indent = line[:len(line) - len(line.lstrip())]
+    nuova = line + ",\n" + indent + '"drop_probabilita": 1.0'
+    return text[:line_start] + nuova + text[line_end:]
+
+
+def write_drops(formulas):
+    """US-809a, opzione --drops: scrive layout.drop per le 5 regioni e
+    drop_probabilita: 1.0 sul boss di ciascuna. Pura funzione di
+    formulas.json + regions.json + pathways/*.json (group): nessuna voce
+    scritta a mano da preservare qui, a differenza degli item — ogni run
+    ricalcola tutto da zero (idempotente per costruzione). Scrive con
+    sostituzioni testuali mirate (mai un re-dump json.dump dell'intero
+    file: vedi format_drop_block).
+
+    Per le 4 regioni con group_affinity reale: una chiave per ogni Sequenza
+    0..9 che ha almeno una formula fra i Pathway attivi di quel gruppo,
+    valore = gli ingredienti di quelle formule. Per la regione neutra
+    (l'hub): solo le chiavi "9"/"8", ingredienti di TUTTI i Pathway attivi.
+    """
+    regions_doc = load_json(REGIONS_PATH)
+    group_by_region = {r["id"]: r.get("group_affinity") for r in regions_doc.get("regions", [])}
+
+    group_by_pathway = {}
+    for fn in sorted(os.listdir(PATHWAYS_DIR)):
+        if not fn.endswith(".json"):
+            continue
+        pw = load_json(os.path.join(PATHWAYS_DIR, fn))
+        group_by_pathway[pw["id"]] = pw.get("group")
+
+    # pathway_id -> {sequenza: {ingrediente, ...}}
+    per_pathway_seq = {}
+    for fid, f in formulas.items():
+        pid, seq = parse_formula_id(fid)
+        per_pathway_seq.setdefault(pid, {}).setdefault(seq, set()).update(f.get("ingredients", []))
+    tutti_pathway = sorted(per_pathway_seq.keys())
+
+    scritti = 0
+    for region_id, group in sorted(group_by_region.items()):
+        layout_path = os.path.join(LAYOUTS_DIR, f"{region_id}.json")
+        if not os.path.exists(layout_path):
+            print(f"  {region_id}: nessun layout, saltata (atteso solo prima di US-807d)")
+            continue
+
+        drop = {}
+        if group == "neutra":
+            for seq in (9, 8):
+                ids = set()
+                for pid in tutti_pathway:
+                    ids.update(per_pathway_seq.get(pid, {}).get(seq, set()))
+                if ids:
+                    drop[str(seq)] = sorted(ids)
+        else:
+            pids_del_gruppo = [pid for pid, g in group_by_pathway.items() if g == group]
+            for seq in range(10):
+                ids = set()
+                for pid in pids_del_gruppo:
+                    ids.update(per_pathway_seq.get(pid, {}).get(seq, set()))
+                if ids:
+                    drop[str(seq)] = sorted(ids)
+
+        with open(layout_path, encoding="utf-8") as fh:
+            originale = fh.read()
+        testo = add_boss_drop_probabilita(originale)
+        testo = splice_drop_block(testo, drop)
+        if testo != originale:
+            with open(layout_path, "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(testo)
+            scritti += 1
+        print(f"  {region_id} ({group}): drop su {len(drop)} Sequenze, "
+              f"{sum(len(v) for v in drop.values())} voci totali")
+
+    print(f"OK: --drops ha aggiornato layout.drop/drop_probabilita per {scritti} "
+          f"regioni (le altre erano gia' corrette: idempotente).")
+
+
 def main():
+    if "--drops" in sys.argv[1:]:
+        formulas_doc = load_json(FORMULAS_PATH)
+        formulas = formulas_doc.get("formulas", formulas_doc)
+        write_drops(formulas)
+        return 0
+
     formulas_doc = load_json(FORMULAS_PATH)
     formulas = formulas_doc.get("formulas", formulas_doc)
 
