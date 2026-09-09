@@ -17,7 +17,10 @@ extends Node
 ## Al finale raggiunto: EndgameState.finale si aggiorna (round-trip nel save
 ## gia' garantito da US-701), il gioco entra in pausa sulla pagina del libro
 ## che mostra il finale (US-718 estende il colophon, non aggiunge un tipo di
-## pagina nuovo).
+## pagina nuovo). US-719: compone anche la parte automatica del contratto di
+## eredita' (conoscenza sempre, reputazione se il profilo e' 'completo');
+## Ancora e oggetto restano una scelta del giocatore (scegli_ancora/
+## scegli_oggetto), applicata al nuovo personaggio da GameState.nuova_partita.
 ##
 ## NIENTE class_name: coerente col resto del progetto.
 
@@ -91,11 +94,74 @@ func _raggiungi(id: String) -> void:
 	if eg == null:
 		return
 	eg.call("imposta_finale", id)
+	eg.call("imposta_eredita", _componi_eredita_iniziale(id))
 	var gruppo: String = _gruppo_corrente()
 	finale_raggiunto.emit(id, gruppo)
 	var book: Node = _n("/root/Book")
 	if book != null:
 		book.call("apri_a", "colophon")
+
+
+## US-719, FR-14: la parte AUTOMATICA del contratto di eredita', compilata
+## subito al finale. 'conoscenza' sempre; 'reputazione' solo pel profilo
+## 'completo'. 'ancora' e 'oggetto' sono una SCELTA del giocatore alla
+## schermata di finale (scegli_ancora/scegli_oggetto sotto): non c'e' modo
+## corretto di sceglierli in automatico quando ce n'e' piu' di uno.
+func _componi_eredita_iniziale(id: String) -> Dictionary:
+	var gd: Node = _n("/root/GameData")
+	var ending: Dictionary = gd.call("get_ending", id) if gd != null else {}
+	var profilo: String = str(ending.get("eredita_profilo", ""))
+	var out: Dictionary = {}
+
+	var kn: Node = _n("/root/KnowledgeStore")
+	if kn != null:
+		var flags: Array = []
+		for f in (kn.call("tutti") as Array):
+			var s: String = str(f)
+			if s.begins_with("pathway:") or s.begins_with("sequenza:"):
+				flags.append(s)
+		out["conoscenza"] = flags
+
+	if profilo == "completo":
+		var fs: Node = _n("/root/FactionSystem")
+		if fs != null:
+			var rep: Dictionary = {}
+			for fid in (fs.call("per_salvataggio") as Dictionary):
+				rep[fid] = float((fs.call("per_salvataggio") as Dictionary)[fid]) * 0.5
+			out["reputazione"] = rep
+
+	return out
+
+
+## Sceglie l'Ancora da ereditare (profili 'ancore'/'completo'): deve essere
+## una delle Ancore attive ADESSO. Passa a forza dimezzata (FR-14). false se
+## l'id non e' un'Ancora attiva.
+func scegli_ancora(anchor_id: String) -> bool:
+	var eg: Node = _n("/root/EndgameState")
+	var anc: Node = _n("/root/AnchorSystem")
+	var gd: Node = _n("/root/GameData")
+	if eg == null or anc == null or gd == null:
+		return false
+	if not (anc.call("active") as Array).has(anchor_id):
+		return false
+	var forza: float = float(anc.call("forza_di", anchor_id))
+	var contratto: Dictionary = (eg.get("eredita") as Dictionary).duplicate(true)
+	contratto["ancora"] = {"id": anchor_id, "forza": forza / 2.0}
+	eg.call("imposta_eredita", contratto)
+	return true
+
+
+## Sceglie l'oggetto da ereditare (profilo 'completo'): deve essere posseduto
+## ADESSO. false se non e' nell'inventario.
+func scegli_oggetto(item_id: String) -> bool:
+	var eg: Node = _n("/root/EndgameState")
+	var inv: Node = _n("/root/Inventory")
+	if eg == null or inv == null or not bool(inv.call("possiede", item_id, 1)):
+		return false
+	var contratto: Dictionary = (eg.get("eredita") as Dictionary).duplicate(true)
+	contratto["oggetto"] = item_id
+	eg.call("imposta_eredita", contratto)
+	return true
 
 
 func _gruppo_corrente() -> String:

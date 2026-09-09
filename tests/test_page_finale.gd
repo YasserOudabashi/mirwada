@@ -2,6 +2,9 @@ extends "res://tests/test_case.gd"
 ## US-718 — la schermata di finale estende il colophon (page_impostazioni.gd)
 ## invece di un tipo di pagina nuovo (page_types.json e' un vocabolario
 ## chiuso). Appare solo se EndgameState.finale non e' vuoto.
+##
+## US-719: quando il profilo del finale e' 'ancore'/'completo', la pagina
+## offre anche il controllo per scegliere l'Ancora/l'oggetto da ereditare.
 
 const OverlayScene := preload("res://scenes/book_overlay.tscn")
 
@@ -51,6 +54,16 @@ func _raccogli_testo(n: Node, out: Array) -> void:
 		_raccogli_testo(c, out)
 
 
+func _trova(n: Node, tipo: Variant) -> Node:
+	if is_instance_of(n, tipo):
+		return n
+	for c in n.get_children():
+		var trovato: Node = _trova(c, tipo)
+		if trovato != null:
+			return trovato
+	return null
+
+
 func test_nessun_finale_niente_sezione() -> void:
 	var ov: CanvasLayer = _pagina()
 	var testo: String = _testo(ov)
@@ -96,4 +109,45 @@ func test_eredita_compilata_mostra_il_riepilogo() -> void:
 	assert_true(testo.contains("2"), "il conteggio della conoscenza ereditata e' mostrato")
 	_n("/root/Book").call("chiudi")
 	ov.free()
+	_fine()
+
+
+func test_profilo_completo_offre_la_scelta_dell_ancora_e_dell_oggetto() -> void:
+	# US-719: Consumazione ha eredita_profilo 'completo'.
+	_n("/root/AnchorSystem").call("register", "anchor_mirco")
+	_n("/root/Inventory").call("aggiungi", "moneta_comune", 1)
+	_n("/root/EndgameState").call("imposta_finale", "consumazione")
+	_n("/root/EndgameState").call("imposta_eredita", {"conoscenza": []})
+
+	var ov: CanvasLayer = _pagina()
+	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
+	var testo: String = _testo(ov)
+	assert_true(testo.contains("Ciò che passa"), "la sezione appare anche a sola richiesta di scelta")
+	var opzioni: Node = _trova(pag, OptionButton)
+	assert_true(opzioni != null, "un selettore per l'Ancora/l'oggetto e' a schermo")
+
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	_n("/root/AnchorSystem").call("pulisci")
+	_n("/root/Inventory").call("pulisci")
+	_fine()
+
+
+func test_scegliere_l_ancora_aggiorna_il_riepilogo_e_fa_sparire_il_selettore() -> void:
+	_n("/root/AnchorSystem").call("register", "anchor_mirco")
+	_n("/root/EndgameState").call("imposta_finale", "consumazione")
+	_n("/root/EndgameState").call("imposta_eredita", {"conoscenza": []})
+
+	assert_true(bool(_n("/root/EndingSystem").call("scegli_ancora", "anchor_mirco")), "scelta accettata")
+
+	var ov: CanvasLayer = _pagina()
+	var testo: String = _testo(ov)
+	assert_true(testo.contains("Un'Ancora"), "il riepilogo mostra l'Ancora scelta")
+	var eredita: Dictionary = _n("/root/EndgameState").call("get", "eredita")
+	assert_almost_eq(float((eredita["ancora"] as Dictionary).get("forza", -1.0)), 5.0,
+		"5 = 10 (anchor_mirco) / 2", 0.01)
+
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	_n("/root/AnchorSystem").call("pulisci")
 	_fine()

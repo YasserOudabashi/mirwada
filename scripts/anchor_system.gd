@@ -15,6 +15,10 @@ signal ancora_registrata(id: String)
 signal anchor_lost(id: String)
 
 var _active: Array = []
+## US-719: un'Ancora ereditata da un personaggio precedente vive a forza
+## dimezzata rispetto al dato. id -> forza (solo le Ancore con un override;
+## un'Ancora normale non ci compare e usa la forza dei dati).
+var _forza_override: Dictionary = {}
 
 
 func _ready() -> void:
@@ -24,10 +28,14 @@ func _ready() -> void:
 # --- API --------------------------------------------------------------
 
 ## Registra un'Ancora. false se l'id non esiste nei dati o e' gia' attiva.
-func register(anchor_id: String) -> bool:
+## forza_override >= 0 (US-719, eredita' al personaggio successivo): usa
+## questa forza invece di quella dei dati - un'Ancora ereditata a meta' forza.
+func register(anchor_id: String, forza_override: float = -1.0) -> bool:
 	if _active.has(anchor_id) or _dati_ancora(anchor_id).is_empty():
 		return false
 	_active.append(anchor_id)
+	if forza_override >= 0.0:
+		_forza_override[anchor_id] = forza_override
 	ancora_registrata.emit(anchor_id)
 	_aggiorna_nomi_sussurro()
 	return true
@@ -39,6 +47,7 @@ func destroy(anchor_id: String) -> bool:
 	if not _active.has(anchor_id):
 		return false
 	_active.erase(anchor_id)
+	_forza_override.erase(anchor_id)
 	var pen: float = float(_dati_ancora(anchor_id).get("penalita", 0.0))
 	anchor_lost.emit(anchor_id)
 	var m: Node = get_node_or_null("/root/Madness")
@@ -55,6 +64,7 @@ func rilascia(anchor_id: String) -> bool:
 	if not _active.has(anchor_id):
 		return false
 	_active.erase(anchor_id)
+	_forza_override.erase(anchor_id)
 	_aggiorna_nomi_sussurro()
 	return true
 
@@ -63,11 +73,19 @@ func active() -> Array:
 	return _active.duplicate()
 
 
+## La forza in uso per quell'Ancora attiva (l'override ereditato se c'e',
+## altrimenti quella dei dati). 0.0 se non e' attiva.
+func forza_di(anchor_id: String) -> float:
+	if not _active.has(anchor_id):
+		return 0.0
+	return _forza_override.get(anchor_id, float(_dati_ancora(anchor_id).get("forza", 0.0)))
+
+
 ## Somma delle forze delle Ancore attive: il tetto di follia bufferizzabile.
 func forza_totale() -> float:
 	var t: float = 0.0
 	for id in _active:
-		t += float(_dati_ancora(id).get("forza", 0.0))
+		t += forza_di(id)
 	return t
 
 
@@ -81,21 +99,42 @@ func assorbi(quantita: float) -> float:
 
 func pulisci() -> void:
 	_active.clear()
+	_forza_override.clear()
 	_aggiorna_nomi_sussurro()
 
 
 # --- Salvataggio -----------------------------------------------------
 
+## Un'Ancora normale e' la sua stringa id (formato invariato, com'era prima
+## di US-719); una con un override di forza e' { id, forza } - i save
+## precedenti (solo stringhe) restano leggibili identici.
 func per_salvataggio() -> Array:
-	return _active.duplicate()
+	var out: Array = []
+	for id in _active:
+		if _forza_override.has(id):
+			out.append({"id": id, "forza": _forza_override[id]})
+		else:
+			out.append(id)
+	return out
 
 
 func da_salvataggio(raw: Variant) -> void:
 	_active = []
-	if typeof(raw) == TYPE_ARRAY:
-		for v in raw:
-			if typeof(v) == TYPE_STRING and not _dati_ancora(v).is_empty():
-				_active.append(v)
+	_forza_override = {}
+	if typeof(raw) != TYPE_ARRAY:
+		_aggiorna_nomi_sussurro()
+		return
+	for v in raw:
+		if typeof(v) == TYPE_STRING and not _dati_ancora(v).is_empty():
+			_active.append(v)
+		elif typeof(v) == TYPE_DICTIONARY:
+			var id: String = str((v as Dictionary).get("id", ""))
+			var dati: Dictionary = _dati_ancora(id)
+			if not dati.is_empty():
+				_active.append(id)
+				var forza: Variant = (v as Dictionary).get("forza")
+				if typeof(forza) in [TYPE_INT, TYPE_FLOAT]:
+					_forza_override[id] = clampf(float(forza), 0.0, float(dati.get("forza", 0.0)))
 	_aggiorna_nomi_sussurro()
 
 

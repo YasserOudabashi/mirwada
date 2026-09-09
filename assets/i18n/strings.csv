@@ -18,6 +18,8 @@ COLOPHON_FINALE_EREDITA_CONOSCENZA,Conoscenza: %d frammenti ricordati,Knowledge:
 COLOPHON_FINALE_EREDITA_ANCORA,Un'Ancora: %s,An Anchor: %s
 COLOPHON_FINALE_EREDITA_REPUTAZIONE,Reputazione dimezzata con %d fazioni,Reputation halved with %d factions
 COLOPHON_FINALE_EREDITA_OGGETTO,Un oggetto portato con sé: %s,An object carried over: %s
+COLOPHON_FINALE_SCEGLI_ANCORA,Scegli questa Ancora,Choose this Anchor
+COLOPHON_FINALE_SCEGLI_OGGETTO,Scegli questo oggetto,Choose this object
 COLOPHON_AUDIO,Audio,Audio
 COLOPHON_VIDEO,Video,Video
 COLOPHON_INPUT,Comandi,Controls

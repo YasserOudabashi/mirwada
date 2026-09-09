@@ -79,7 +79,7 @@ func _sezione_finale() -> void:
 	epilogo.custom_minimum_size = Vector2(360, 0)
 	_vbox.add_child(epilogo)
 
-	_riepilogo_eredita(eg, gd)
+	_riepilogo_eredita(eg, gd, ending)
 	_vbox.add_child(HSeparator.new())
 
 
@@ -92,8 +92,9 @@ func _chiave_epilogo(gd: Node, ending: Dictionary) -> String:
 	return str(epg.get("%s_i18n" % gruppo, ""))
 
 
-func _riepilogo_eredita(eg: Node, gd: Node) -> void:
+func _riepilogo_eredita(eg: Node, gd: Node, ending: Dictionary) -> void:
 	var eredita: Dictionary = eg.get("eredita")
+	var profilo: String = str(ending.get("eredita_profilo", ""))
 	var righe: Array = []
 	if (eredita.get("conoscenza", []) as Array).size() > 0:
 		righe.append(tr("COLOPHON_FINALE_EREDITA_CONOSCENZA") % (eredita["conoscenza"] as Array).size())
@@ -109,13 +110,78 @@ func _riepilogo_eredita(eg: Node, gd: Node) -> void:
 		righe.append(tr("COLOPHON_FINALE_EREDITA_OGGETTO") %
 			str(gd.call("tr_data", it.get("name_i18n", eredita["oggetto"]))))
 
-	if righe.is_empty():
+	# US-719: Ancora/oggetto sono una SCELTA del giocatore, non compilati in
+	# automatico (potrebbero essercene piu' di uno). Il profilo del finale
+	# dice quali servono; il controllo appare finche' non e' stata fatta.
+	var serve_ancora: bool = profilo in ["ancore", "completo"] and not eredita.has("ancora")
+	var serve_oggetto: bool = profilo == "completo" and not eredita.has("oggetto")
+
+	if righe.is_empty() and not serve_ancora and not serve_oggetto:
 		return
 	_titolo("COLOPHON_FINALE_EREDITA_TITOLO")
 	for r in righe:
 		var l := Label.new()
 		l.text = "· " + str(r)
 		_vbox.add_child(l)
+	if serve_ancora:
+		_scelta_ancora()
+	if serve_oggetto:
+		_scelta_oggetto()
+
+
+## Un'Ancora attiva scelta per l'eredita' (US-719). Nulla se non ce n'e'
+## nessuna attiva adesso (niente da scegliere: il riepilogo mostrera' solo
+## le altre voci).
+func _scelta_ancora() -> void:
+	var anc: Node = _n("/root/AnchorSystem")
+	var gd: Node = _n("/root/GameData")
+	if anc == null or gd == null:
+		return
+	var attive: Array = anc.call("active")
+	if attive.is_empty():
+		return
+	var h := HBoxContainer.new()
+	var o := OptionButton.new()
+	for id in attive:
+		var ad: Dictionary = gd.call("get_anchor", str(id))
+		o.add_item(str(gd.call("tr_data", ad.get("name_i18n", id))))
+	var b := Button.new()
+	b.text = tr("COLOPHON_FINALE_SCEGLI_ANCORA")
+	b.pressed.connect(func() -> void:
+		var es: Node = _n("/root/EndingSystem")
+		if es != null:
+			es.call("scegli_ancora", str(attive[o.get_selected()]))
+		aggiorna())
+	h.add_child(o)
+	h.add_child(b)
+	_vbox.add_child(h)
+
+
+## Un item impilabile dallo zaino scelto per l'eredita' (US-719). Nulla se lo
+## zaino non ha item impilabili adesso.
+func _scelta_oggetto() -> void:
+	var inv: Node = _n("/root/Inventory")
+	var gd: Node = _n("/root/GameData")
+	if inv == null or gd == null:
+		return
+	var ids: Array = (inv.call("tutto") as Dictionary).get("stack", {}).keys()
+	if ids.is_empty():
+		return
+	var h := HBoxContainer.new()
+	var o := OptionButton.new()
+	for id in ids:
+		var it: Dictionary = gd.call("get_item", str(id))
+		o.add_item(str(gd.call("tr_data", it.get("name_i18n", id))))
+	var b := Button.new()
+	b.text = tr("COLOPHON_FINALE_SCEGLI_OGGETTO")
+	b.pressed.connect(func() -> void:
+		var es: Node = _n("/root/EndingSystem")
+		if es != null:
+			es.call("scegli_oggetto", str(ids[o.get_selected()]))
+		aggiorna())
+	h.add_child(o)
+	h.add_child(b)
+	_vbox.add_child(h)
 
 
 # --- Costruttori di riga --------------------------------------------

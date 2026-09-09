@@ -7418,3 +7418,66 @@ ereditare" resta a US-719 come dice l'AC stesso. 5 chiavi UI chrome nuove
   invariati). 770 test headless (766 + 4), tutti verdi.
 - File toccati: scripts/pages/page_impostazioni.gd, assets/i18n/strings.csv
   + .translation, tests/test_page_finale.gd (nuovo).
+
+=== US-719: eredita' al personaggio successivo (fase 7, Blocco D chiuso) ===
+EndingSystem._componi_eredita_iniziale(id): parte AUTOMATICA (conoscenza
+sempre, reputazione se profilo 'completo') compilata subito in
+_raggiungi(). Ancora/oggetto sono una scelta esplicita
+(scegli_ancora(id)/scegli_oggetto(item_id)): non potevano essere
+automatiche, il giocatore puo' avere piu' di un'Ancora o oggetto (il test
+ne usa 2). AnchorSystem esteso con un override di forza per-istanza
+(_forza_override + forza_di(id) pubblico) - retrocompatibile, i save
+vecchi restano array di stringhe semplici. EndgameState.eredita_sanitizzata
+e' un wrapper pubblico del sanitizzatore gia' esistente, per leggere
+l'eredita' di UN ALTRO save senza toccare il resto di QUESTO EndgameState.
+
+GameState.nuova_partita(): legge l'eredita' dello slot che sta per
+sovrascrivere PRIMA di azzerare, poi resetta Progression/Follia/
+KnowledgeStore/AnchorSystem/FactionSystem/Inventory/EndgameState e applica
+l'eredita' sanitizzata. Gap preesistente scoperto: nuova_partita() non
+azzerava MAI questi sistemi (funzionava solo perche' si presumeva sempre
+chiamata a boot fresco) - necessario sistemarlo ora che questa story
+introduce davvero la rinascita nello stesso slot, nella stessa sessione.
+
+UI (estende US-718, scripts/pages/page_impostazioni.gd): OptionButton +
+bottone per scegliere Ancora/oggetto quando il profilo del finale li
+richiede e non sono ancora scelti; chiamano EndingSystem.scegli_*() e si
+aggiornano da soli. VERIFICA A SCHERMO REALE (Xvfb, come US-718):
+screenshot mandato in chat - i due selettori ("TODO anchor.mirco" /
+traduzione mancante preesistente, e "Moneta comune") e i bottoni "Scegli
+questa Ancora"/"Scegli questo oggetto" appaiono correttamente sopra il
+riepilogo "Ciò che passa" con "Reputazione dimezzata con 1 fazioni".
+
+- tests/test_eredita.gd NUOVO (3 test): ciclo completo Consumazione con 2
+  Ancore vive + reputazione + oggetto -> eredita compilata -> scelte fatte
+  -> nuovo personaggio -> conoscenza seminata, 1 Ancora a forza/2 (10/2=5),
+  reputazione a meta', oggetto nello zaino, Sequenza di nuovo a 9, endgame
+  azzerato; slot vuoto -> nessuna eredita applicata; contratto con id
+  ignoti (Ancora inesistente, oggetto inesistente, entry non-stringa nella
+  conoscenza) -> tutto scartato senza crash (FR-13).
+- tests/test_page_finale.gd +2 test: i selettori appaiono col profilo
+  'completo'; scegliere l'Ancora aggiorna il riepilogo (forza dimezzata
+  visibile).
+- BUG trovato durante i test (stessa classe del leak di pausa in US-717):
+  nuova_partita()/carica_slot() attivano GameState._partita_attiva senza
+  un modo pubblico per spegnerla - convenzione GIA' documentata e usata da
+  test_creazione_talenti.gd (gs.set("_partita_attiva", false) prima e dopo
+  ogni test), che la mia prima versione di test_eredita.gd non seguiva:
+  ha rotto test_page_scaffale nella suite alfabeticamente successiva (5
+  bottoni invece di 4 - il bottone "Riprendi" extra, mostrato solo a
+  partita in corso). Corretto seguendo la stessa convenzione gia' in uso.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning
+  invariati). 775 test headless (770 + 5), tutti verdi.
+- File toccati: scripts/ending_system.gd, scripts/anchor_system.gd,
+  scripts/endgame_state.gd, scripts/game_state.gd,
+  scripts/pages/page_impostazioni.gd, assets/i18n/strings.csv +
+  .translation, tests/test_eredita.gd (nuovo), tests/test_page_finale.gd.
+
+=== BLOCCO D CHIUSO (2026-09-09) ===
+US-716..719. I 3 finali come dati (Apoteosi/Consumazione/Rinuncia),
+EndingSystem che li valuta e sceglie ascoltando follia/rituale/flag in
+tempo reale, la schermata di finale (estende il colophon), l'eredita' al
+personaggio successivo con scelta esplicita di Ancora/oggetto e
+rinascita sullo stesso slot verificata end-to-end. 775 test (erano 759 a
+inizio Blocco D). Save invariato (endgame gia' a v22 da Blocco 0).
+Prossimo: BLOCCO E - checkpoint + chiusura fase 7.
