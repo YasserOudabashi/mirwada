@@ -7481,3 +7481,56 @@ personaggio successivo con scelta esplicita di Ancora/oggetto e
 rinascita sullo stesso slot verificata end-to-end. 775 test (erano 759 a
 inizio Blocco D). Save invariato (endgame gia' a v22 da Blocco 0).
 Prossimo: BLOCCO E - checkpoint + chiusura fase 7.
+
+=== US-720: VERDETTO del criterio di uscita della fase 7 ===
+tests/test_slice_fase_7.gd esteso con test_ciclo_completo_endgame_zero_
+codice_dedicato: LO STESSO personaggio (Error Seq 4) attraversa, in
+sequenza, tutti e quattro i pezzi della fase 7 - cambio Pathway con
+fusione (verso un vicino di gruppo SCOPERTO dai dati), una tribolazione
+attivata e superata (id del salto scoperto da GameData.tribulation_ids,
+superamento forzato leggendo se il dato dichiara 'evento' o 'flag', mai
+scritto a mano), un finale raggiunto (soglia generica Madness=100, l'id
+del finale letto da EndgameState DOPO il fatto, mai assunto), un'Ancora e
+un oggetto scoperti dai dati e scelti per l'eredita', e la riapplicazione
+completa a un nuovo personaggio sullo stesso slot (Sequenza di nuovo a 9,
+follia azzerata, nessun finale residuo). Se un solo passaggio avesse
+richiesto di scrivere un id specifico nel motore, questo test non
+sarebbe stato scrivibile cosi'.
+
+git diff di tutta la fase 7 (d53e9d7~1..HEAD, file .gd non di test):
+  scripts/anchor_system.gd            +53 -x   (override forza per Ancora ereditata)
+  scripts/endgame_state.gd            +154     (NUOVO, US-701)
+  scripts/ending_system.gd            +182     (NUOVO, US-717/719)
+  scripts/fusion_engine.gd            +62      (NUOVO, US-705)
+  scripts/game_data.gd                +107     (loader fusions/tribulations/endings/anchors)
+  scripts/game_state.gd               +70      (nuova_partita legge/applica l'eredita')
+  scripts/pages/page_diagramma_pathway.gd +107 (fusione + fog of war nomi Sequenza)
+  scripts/pages/page_impostazioni.gd  +142     (schermata di finale, estende il colophon)
+  scripts/pathway_change.gd           +123     (NUOVO, US-704)
+  scripts/potion_system.gd            +7       (tribolazione blocca il rituale)
+  scripts/progression.gd              +6       (avanza() legge TribulationSystem)
+  scripts/ritual_system.gd            +5       (idem)
+  scripts/save_system.gd              +24      (schema_version 21->22, US-701)
+  scripts/time_system.gd              +25      (pausa/notte forzata per le tribolazioni)
+  scripts/tribulation_overlay.gd      +84      (NUOVO, US-713)
+  scripts/tribulation_system.gd       +254     (NUOVO, US-711)
+  16 file, 1392 righe aggiunte, 13 tolte.
+
+scripts/ability_engine.gd: ZERO righe toccate in tutta la fase 7 (assente
+dal diff sopra) - il dispatcher execute()/_esegui_primitive resta esattamente
+quello di fase 2. Grep di "twilight_giant"/"darkness"/"death"/"moon"/
+"mother"/"paragon"/"hermit"/"fool"/"error"/"door"/"trib_"/"apoteosi"/
+"consumazione"/"rinuncia" nei 4 motori nuovi (FusionEngine, TribulationSystem,
+EndingSystem, PathwayChange): 0 occorrenze fuori dai commenti.
+
+VERDETTO: l'ENDGAME E' DATI. Cambio Pathway, fusioni, tribolazioni e
+finali si compongono, in un ciclo unico dimostrato dal test sopra, senza
+una riga di codice che nomini un Pathway, una coppia di fusione, una
+tribolazione o un finale specifico. L'architettura verificata nei
+checkpoint di fase 2 (US-219), fase 5 (US-508) e fase 5b (US-5B04) regge
+anche sull'ultimo pezzo, il piu' trasversale: un sistema che compone
+TUTTI gli altri sistemi del gioco (Progression, Madness, KnowledgeStore,
+AnchorSystem, FactionSystem, Inventory, GameState) resta dati quanto loro.
+
+Come verificato: python tools/validate_data.py exit 0 (3 warning
+invariati). 776 test headless (775 + 1), tutti verdi. Nessuna regressione.

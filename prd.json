@@ -317,8 +317,8 @@
       ],
       "priority": 20,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "tests/test_slice_fase_7.gd: nuovo test_ciclo_completo_endgame_zero_codice_dedicato che estende quello di US-709. Lo STESSO personaggio (Error Seq 4) attraversa in sequenza cambio Pathway+fusione (vicino scoperto dai dati), una tribolazione attivata e superata (id/superamento scoperti da GameData.tribulation_ids, mai scritti a mano), un finale raggiunto (soglia generica madness_min 100, id letto DOPO da EndgameState), un'Ancora e un oggetto scoperti e scelti per l'eredita', e la riapplicazione a un nuovo personaggio sullo stesso slot (Sequenza 9, follia 0, nessun finale residuo). test_nessun_codice_nomina_un_pathway_o_una_fusione esteso con gli id di tribolazioni/finali. git diff di tutta la fase 7 (16 file .gd non-test, 1392+/-13) in progress.txt: ability_engine.gd MAI toccato (assente dal diff); grep dei 10 Pathway + trib_*/apoteosi/consumazione/rinuncia nei 4 motori nuovi (FusionEngine/TribulationSystem/EndingSystem/PathwayChange) = 0 occorrenze fuori commenti. VERDETTO in progress.txt: l'endgame e' dati. validate exit 0 (3 warning invariati). 776 test verdi (775 + 1)."
     },
     {
       "id": "US-721",
