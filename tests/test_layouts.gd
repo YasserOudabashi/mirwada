@@ -171,11 +171,12 @@ func test_mirwada_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	assert_eq(pickup_list.size(), 10, "10 oggetti a terra dal layout")
 
 	var inv: Node = _root().get_node("Inventory")
-	var prima: int = int(inv.call("conta", "moneta_comune"))
 	var uno = pickup_list[0]
+	var item_id: String = str(uno.char_id)
+	var prima: int = int(inv.call("conta", item_id))
 	var q: int = int(uno.quantita)
 	assert_true(bool(uno.call("raccogli")), "raccogli() riesce la prima volta")
-	assert_eq(int(inv.call("conta", "moneta_comune")), prima + q, "Inventory.conta cresce della quantita' del dato")
+	assert_eq(int(inv.call("conta", item_id)), prima + q, "Inventory.conta cresce della quantita' del dato")
 	assert_false(bool(uno.call("raccogli")), "raccogli() e' idempotente (gia' raccolto)")
 
 	(r["cont"] as Node2D).free()
@@ -288,11 +289,12 @@ func test_marche_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	assert_eq(pickup_list.size(), 8, "8 oggetti a terra dal layout")
 
 	var inv: Node = _root().get_node("Inventory")
-	var prima: int = int(inv.call("conta", "moneta_comune"))
 	var uno = pickup_list[0]
+	var item_id: String = str(uno.char_id)
+	var prima: int = int(inv.call("conta", item_id))
 	var q: int = int(uno.quantita)
 	assert_true(bool(uno.call("raccogli")), "raccogli() riesce la prima volta")
-	assert_eq(int(inv.call("conta", "moneta_comune")), prima + q, "Inventory.conta cresce della quantita' del dato")
+	assert_eq(int(inv.call("conta", item_id)), prima + q, "Inventory.conta cresce della quantita' del dato")
 
 	(r["cont"] as Node2D).free()
 
@@ -399,11 +401,12 @@ func test_valle_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	assert_eq(pickup_list.size(), 7, "7 oggetti a terra dal layout")
 
 	var inv: Node = _root().get_node("Inventory")
-	var prima: int = int(inv.call("conta", "moneta_comune"))
 	var uno = pickup_list[0]
+	var item_id: String = str(uno.char_id)
+	var prima: int = int(inv.call("conta", item_id))
 	var q: int = int(uno.quantita)
 	assert_true(bool(uno.call("raccogli")), "raccogli() riesce la prima volta")
-	assert_eq(int(inv.call("conta", "moneta_comune")), prima + q, "Inventory.conta cresce della quantita' del dato")
+	assert_eq(int(inv.call("conta", item_id)), prima + q, "Inventory.conta cresce della quantita' del dato")
 
 	(r["cont"] as Node2D).free()
 
@@ -508,11 +511,12 @@ func test_archivio_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	assert_eq(pickup_list.size(), 6, "6 oggetti a terra dal layout")
 
 	var inv: Node = _root().get_node("Inventory")
-	var prima: int = int(inv.call("conta", "moneta_comune"))
 	var uno = pickup_list[0]
+	var item_id: String = str(uno.char_id)
+	var prima: int = int(inv.call("conta", item_id))
 	var q: int = int(uno.quantita)
 	assert_true(bool(uno.call("raccogli")), "raccogli() riesce la prima volta")
-	assert_eq(int(inv.call("conta", "moneta_comune")), prima + q, "Inventory.conta cresce della quantita' del dato")
+	assert_eq(int(inv.call("conta", item_id)), prima + q, "Inventory.conta cresce della quantita' del dato")
 
 	(r["cont"] as Node2D).free()
 
@@ -617,11 +621,12 @@ func test_frontiera_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	assert_eq(pickup_list.size(), 6, "6 oggetti a terra dal layout")
 
 	var inv: Node = _root().get_node("Inventory")
-	var prima: int = int(inv.call("conta", "moneta_comune"))
 	var uno = pickup_list[0]
+	var item_id: String = str(uno.char_id)
+	var prima: int = int(inv.call("conta", item_id))
 	var q: int = int(uno.quantita)
 	assert_true(bool(uno.call("raccogli")), "raccogli() riesce la prima volta")
-	assert_eq(int(inv.call("conta", "moneta_comune")), prima + q, "Inventory.conta cresce della quantita' del dato")
+	assert_eq(int(inv.call("conta", item_id)), prima + q, "Inventory.conta cresce della quantita' del dato")
 
 	(r["cont"] as Node2D).free()
 

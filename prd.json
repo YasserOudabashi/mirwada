@@ -246,8 +246,8 @@
       ],
       "priority": 14,
       "fase": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto esattamente come da AC. Nuova opzione --oggetti (stessa disciplina di sostituzione testuale mirata di --drops in US-809a: mai un re-dump json.dump dei layout scritti a mano in stile compatto). Pathway del boss letto da nemici[].override.caratteristica.pathway_id, mai hardcoded. Risultato esatto: mirwada 9/10 slot (Twilight Giant Seq 9+8+7, l'ultimo resta moneta_comune per contratto AC), le altre 4 regioni 100% degli slot. Blocco validator 'fonti' aggiunto dopo il blocco NPC/roster (dove roster_doc e' in scope): 0 ingredienti senza fonte su 299. Idempotenza vera riverificata (diff byte-per-byte identico al secondo run). CORREZIONE scoperta rilanciando la suite (non nell'AC): le 5 test 'oggetti_a_terra_raccolti_finiscono_in_inventory' assumevano 'moneta_comune' letterale - corrette per leggere l'item_id vero dal pickup (uno.char_id), restando generiche. 834 test, 0 errori nel validator. Verifica Xvfb: ingrediente vero (ferro_temperato) raccolto a Mirwada, screenshot prima/dopo mandati in chat, Inventory.conta == 1 confermato. Nota: il primo tentativo di QA con camminata fisica verso il pickup si e' bloccato (processo Godot al 213% CPU per oltre 5 minuti, ucciso) - riscritto per chiamare raccogli() direttamente, pattern gia' verificato in US-809a. BLOCCO C CHIUSO."
     },
     {
       "id": "US-810",

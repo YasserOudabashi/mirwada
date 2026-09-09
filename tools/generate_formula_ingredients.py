@@ -8,6 +8,7 @@ Esecuzione (dalla root del progetto):
     python tools/generate_formula_ingredients.py            # item + i18n (US-808)
     python tools/generate_formula_ingredients.py --drops    # layout.drop per le 5 regioni (US-809a)
     python tools/generate_formula_ingredients.py --listini  # vendor.listino di Sidon/Vesna/Bruno (US-809b)
+    python tools/generate_formula_ingredients.py --oggetti  # layout.oggetti a terra (US-809c)
 
 Idempotente: le voci gia' presenti (le 8 scritte a mano e ogni id generato
 in un run precedente) si PRESERVANO tal quali (merge per id, come
@@ -384,6 +385,108 @@ def add_boss_drop_probabilita(text):
     return text[:line_start] + nuova + text[line_end:]
 
 
+def format_oggetti_block(entries):
+    """Stesso stile compatto di format_drop_block, ma per la lista
+    'oggetti' (un dict per riga, com'e' gia' scritto a mano): usata per una
+    sostituzione TESTUALE mirata di '  "oggetti": [...]', mai un re-dump
+    del documento (vedi format_drop_block per il motivo)."""
+    if not entries:
+        return "[]"
+    righe = ["["]
+    for i, e in enumerate(entries):
+        virgola = "," if i < len(entries) - 1 else ""
+        righe.append(
+            f'    {{"x": {e["x"]}, "y": {e["y"]}, "item_id": "{e["item_id"]}", '
+            f'"quantita": {e["quantita"]}}}{virgola}')
+    righe.append("  ]")
+    return "\n".join(righe)
+
+
+def splice_oggetti_block(text, entries):
+    """'oggetti' e' sempre seguita da 'drop' (US-806/US-809a): sostituisce
+    tutto da '  "oggetti": [' fino al marker '  "drop":' successivo,
+    qualunque fosse il contenuto precedente."""
+    start = text.index('  "oggetti": [')
+    end = text.index('\n  "drop":', start)
+    return text[:start] + '  "oggetti": ' + format_oggetti_block(entries) + "," + text[end:]
+
+
+def _boss_pathway_id(layout_doc):
+    """Legge il Pathway del boss di una regione da nemici[].override.
+    caratteristica.pathway_id (US-807a..d) — mai un nome hardcoded."""
+    for n in layout_doc.get("nemici", []):
+        car = (n.get("override") or {}).get("caratteristica")
+        if isinstance(car, dict) and car.get("pathway_id"):
+            return car["pathway_id"]
+    return None
+
+
+def write_oggetti(formulas):
+    """US-809c, opzione --oggetti: sostituisce (in tutto o in parte) le
+    voci moneta_comune di layout.oggetti con ingredienti veri del Pathway
+    del boss della regione. mirwada: sostituisce i primi N-1 slot (Twilight
+    Giant Sequenza 9+8+7 = esattamente 9 id, l'AC lo chiede per nome su 10
+    oggetti totali), l'ultimo resta moneta_comune (il residuo esplicito
+    dell'AC). Le altre 4 regioni: sostituisce TUTTI gli slot con gli
+    ingredienti del Pathway del boss, Sequenza 9 scendendo finche' non ce
+    ne sono abbastanza. Posizioni/quantita esistenti restano: cambia solo
+    item_id. Sostituzione testuale mirata (format_oggetti_block), mai un
+    re-dump del documento.
+    """
+    pps = per_pathway_seq(formulas)
+
+    scritti = 0
+    for fn in sorted(os.listdir(LAYOUTS_DIR)):
+        if not fn.endswith(".json"):
+            continue
+        layout_path = os.path.join(LAYOUTS_DIR, fn)
+        layout = load_json(layout_path)
+        region_id = layout.get("region_id", fn[:-5])
+        boss_pid = _boss_pathway_id(layout)
+        oggetti = layout.get("oggetti", [])
+        if boss_pid is None or not oggetti:
+            print(f"  {region_id}: nessun boss/oggetti, saltata")
+            continue
+
+        n_residuo = 1 if region_id == "mirwada" else 0
+        n_da_sostituire = len(oggetti) - n_residuo
+
+        ids = []
+        visti = set()
+        for seq in range(9, -1, -1):
+            for ing in sorted(pps.get(boss_pid, {}).get(seq, [])):
+                if ing not in visti:
+                    visti.add(ing)
+                    ids.append(ing)
+            if len(ids) >= n_da_sostituire:
+                break
+        ids = ids[:n_da_sostituire]
+        if len(ids) < n_da_sostituire:
+            print(f"  ATTENZIONE {region_id}: solo {len(ids)} ingredienti di "
+                  f"'{boss_pid}' disponibili per {n_da_sostituire} slot")
+
+        nuovi_oggetti = []
+        for i, o in enumerate(oggetti):
+            if i < len(ids):
+                nuovi_oggetti.append({"x": o["x"], "y": o["y"],
+                                       "item_id": ids[i], "quantita": 1})
+            else:
+                nuovi_oggetti.append(o)
+
+        with open(layout_path, encoding="utf-8") as fh:
+            originale = fh.read()
+        testo = splice_oggetti_block(originale, nuovi_oggetti)
+        if testo != originale:
+            with open(layout_path, "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(testo)
+            scritti += 1
+        print(f"  {region_id} (boss {boss_pid}): {len(ids)}/{len(oggetti)} "
+              f"oggetti sostituiti con ingredienti veri")
+
+    print(f"OK: --oggetti ha aggiornato {scritti} regioni "
+          f"(le altre erano gia' corrette: idempotente).")
+
+
 def per_pathway_seq(formulas):
     """pathway_id -> {sequenza: {ingrediente, ...}}. Condivisa da --drops e
     --listini: entrambe le opzioni partono dalla stessa scomposizione delle
@@ -544,6 +647,12 @@ def main():
         formulas_doc = load_json(FORMULAS_PATH)
         formulas = formulas_doc.get("formulas", formulas_doc)
         write_listini(formulas)
+        return 0
+
+    if "--oggetti" in sys.argv[1:]:
+        formulas_doc = load_json(FORMULAS_PATH)
+        formulas = formulas_doc.get("formulas", formulas_doc)
+        write_oggetti(formulas)
         return 0
 
     formulas_doc = load_json(FORMULAS_PATH)

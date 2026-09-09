@@ -1558,6 +1558,38 @@ def main():
         if n_generici < 10:
             err(f"{rel}: solo {n_generici} npc_generic_*, attesi >= 10 (fool_9_inganno ne inganna 10)")
 
+    # --- fonti degli ingredienti (US-809c, chiusura "fonti nel mondo") ---
+    # Ogni ingrediente citato da una formula deve avere ALMENO UNA fonte in
+    # gioco: un drop di nemico (US-809a, layout.drop), un venditore (US-809b,
+    # roster.json vendor.listino) o la raccolta a terra (US-809c, layout.
+    # oggetti). roster_doc e' definito subito sopra (blocco NPC); item_ids
+    # gia' in scope dal blocco item piu' in alto.
+    ingredienti_citati = set()
+    for _fid, _f in formulas.items():
+        ingredienti_citati.update(_f.get("ingredients", []))
+
+    fonti_trovate = set()
+    if roster_doc is not None:
+        for npc in roster_doc.get("npcs", []):
+            ven = npc.get("vendor")
+            if ven is not None:
+                fonti_trovate.update(ven.get("listino", []))
+    if os.path.isdir(layouts_dir):
+        for fn in sorted(os.listdir(layouts_dir)):
+            if not fn.endswith(".json"):
+                continue
+            _ldoc = load_json(os.path.join(layouts_dir, fn)) or {}
+            for lst in _ldoc.get("drop", {}).values():
+                fonti_trovate.update(lst)
+            for og in _ldoc.get("oggetti", []):
+                fonti_trovate.add(og.get("item_id"))
+
+    _mancanti = sorted(ingredienti_citati - fonti_trovate)
+    if _mancanti:
+        err(f"data/potions/formulas.json: {len(_mancanti)} ingredienti senza "
+            f"nessuna fonte in gioco (ne' drop, ne' listino, ne' oggetti a "
+            f"terra): {', '.join(_mancanti)}")
+
     # --- fazioni (data/factions.json, US-615) ---
     tracked_ev0 = load_json(os.path.join(DATA, "schema", "tracked_events.json")) or {}
     ev_names0 = set(tracked_ev0.get("events", {}).keys())

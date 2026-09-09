@@ -70,12 +70,12 @@
     }
   ],
   "oggetti": [
-    {"x": 9, "y": 12, "item_id": "moneta_comune", "quantita": 2},
-    {"x": 24, "y": 9, "item_id": "moneta_comune", "quantita": 1},
-    {"x": 39, "y": 9, "item_id": "moneta_comune", "quantita": 3},
-    {"x": 9, "y": 25, "item_id": "moneta_comune", "quantita": 1},
-    {"x": 24, "y": 25, "item_id": "moneta_comune", "quantita": 2},
-    {"x": 39, "y": 25, "item_id": "moneta_comune", "quantita": 1}
+    {"x": 9, "y": 12, "item_id": "filo_di_lana_rossa", "quantita": 1},
+    {"x": 24, "y": 9, "item_id": "gesso_consacrato", "quantita": 1},
+    {"x": 39, "y": 9, "item_id": "polvere_di_sale_nero", "quantita": 1},
+    {"x": 9, "y": 25, "item_id": "cera_di_candela_rituale", "quantita": 1},
+    {"x": 24, "y": 25, "item_id": "inchiostro_luminescente", "quantita": 1},
+    {"x": 39, "y": 25, "item_id": "punta_d_argento", "quantita": 1}
   ],
   "drop": {
     "0": [

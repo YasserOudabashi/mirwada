@@ -72,15 +72,15 @@
     }
   ],
   "oggetti": [
-    {"x": 10, "y": 2, "item_id": "moneta_comune", "quantita": 3},
-    {"x": 32, "y": 5, "item_id": "moneta_comune", "quantita": 2},
-    {"x": 20, "y": 10, "item_id": "moneta_comune", "quantita": 1},
-    {"x": 9, "y": 13, "item_id": "moneta_comune", "quantita": 2},
-    {"x": 30, "y": 20, "item_id": "moneta_comune", "quantita": 1},
-    {"x": 15, "y": 24, "item_id": "moneta_comune", "quantita": 3},
-    {"x": 33, "y": 29, "item_id": "moneta_comune", "quantita": 2},
-    {"x": 22, "y": 30, "item_id": "moneta_comune", "quantita": 1},
-    {"x": 40, "y": 10, "item_id": "moneta_comune", "quantita": 2},
+    {"x": 10, "y": 2, "item_id": "ferro_temperato", "quantita": 1},
+    {"x": 32, "y": 5, "item_id": "radice_di_quercia", "quantita": 1},
+    {"x": 20, "y": 10, "item_id": "sangue_di_toro", "quantita": 1},
+    {"x": 9, "y": 13, "item_id": "estratto_di_muscolo", "quantita": 1},
+    {"x": 30, "y": 20, "item_id": "osso_di_pugile", "quantita": 1},
+    {"x": 15, "y": 24, "item_id": "sale_di_roccia", "quantita": 1},
+    {"x": 33, "y": 29, "item_id": "acciaio_stellare", "quantita": 1},
+    {"x": 22, "y": 30, "item_id": "polvere_di_arena", "quantita": 1},
+    {"x": 40, "y": 10, "item_id": "tendine_di_lupo", "quantita": 1},
     {"x": 5, "y": 30, "item_id": "moneta_comune", "quantita": 1}
   ],
   "drop": {

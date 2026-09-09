@@ -70,13 +70,13 @@
     }
   ],
   "oggetti": [
-    {"x": 15, "y": 6, "item_id": "moneta_comune", "quantita": 2},
-    {"x": 30, "y": 3, "item_id": "moneta_comune", "quantita": 1},
-    {"x": 3, "y": 20, "item_id": "moneta_comune", "quantita": 3},
-    {"x": 33, "y": 4, "item_id": "moneta_comune", "quantita": 1},
-    {"x": 34, "y": 20, "item_id": "moneta_comune", "quantita": 2},
-    {"x": 6, "y": 12, "item_id": "moneta_comune", "quantita": 1},
-    {"x": 23, "y": 8, "item_id": "moneta_comune", "quantita": 2}
+    {"x": 15, "y": 6, "item_id": "goccia_di_linfa", "quantita": 1},
+    {"x": 30, "y": 3, "item_id": "seme_dormiente", "quantita": 1},
+    {"x": 3, "y": 20, "item_id": "terriccio_di_prima_luna", "quantita": 1},
+    {"x": 33, "y": 4, "item_id": "corteccia_febbrifuga", "quantita": 1},
+    {"x": 34, "y": 20, "item_id": "fiore_di_camomilla_selvatica", "quantita": 1},
+    {"x": 6, "y": 12, "item_id": "radice_amara", "quantita": 1},
+    {"x": 23, "y": 8, "item_id": "acqua_di_fonte_benedetta", "quantita": 1}
   ],
   "drop": {
     "0": [

@@ -70,12 +70,12 @@
     }
   ],
   "oggetti": [
-    {"x": 20, "y": 18, "item_id": "moneta_comune", "quantita": 2},
-    {"x": 4, "y": 7, "item_id": "moneta_comune", "quantita": 1},
-    {"x": 36, "y": 7, "item_id": "moneta_comune", "quantita": 3},
-    {"x": 4, "y": 29, "item_id": "moneta_comune", "quantita": 1},
-    {"x": 36, "y": 29, "item_id": "moneta_comune", "quantita": 2},
-    {"x": 20, "y": 30, "item_id": "moneta_comune", "quantita": 1}
+    {"x": 20, "y": 18, "item_id": "polvere_di_specchio_incrinato", "quantita": 1},
+    {"x": 4, "y": 7, "item_id": "radice_di_veggente", "quantita": 1},
+    {"x": 36, "y": 7, "item_id": "sangue_di_gufo_lunare", "quantita": 1},
+    {"x": 4, "y": 29, "item_id": "cerone_da_palcoscenico", "quantita": 1},
+    {"x": 36, "y": 29, "item_id": "naso_finto_di_ceramica", "quantita": 1},
+    {"x": 20, "y": 30, "item_id": "sonaglio_che_confonde", "quantita": 1}
   ],
   "drop": {
     "0": [

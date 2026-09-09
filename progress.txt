@@ -8779,3 +8779,93 @@ COSA RESTA APERTO (dichiarato, non di questa story).
   meccaniche di gioco a se'.
 
 PROSSIMA STORIA: US-809c — Raccolta a terra + chiusura "fonti nel mondo".
+
+=== US-809c: Raccolta a terra + chiusura "fonti nel mondo" (fase 8, Blocco C) ===
+
+COSA FATTO.
+- tools/generate_formula_ingredients.py: nuova opzione --oggetti. Stessa
+  disciplina di --drops (US-809a): sostituzione TESTUALE mirata del blocco
+  "oggetti": [...] (nuove format_oggetti_block/splice_oggetti_block, mai un
+  re-dump del documento — i 5 layout hanno nemici/oggetti scritti a mano in
+  stile compatto). Nuovo _boss_pathway_id(layout) legge il Pathway del boss
+  da nemici[].override.caratteristica.pathway_id (US-807a..d), mai un nome
+  hardcoded. Per ogni regione: prende gli ingredienti del Pathway del boss
+  da Sequenza 9 scendendo finche' non bastano per riempire gli slot
+  "oggetti" esistenti (posizioni/ordine invariati, cambia solo item_id);
+  mirwada lascia l'ultimo slot come moneta_comune (residuo esplicito
+  dell'AC), le altre 4 regioni sostituiscono tutti gli slot. Risultato
+  esatto, verificato riga per riga: mirwada 9/10 (Twilight Giant Sequenza
+  9+8+7), marche_crepuscolo 8/8 (Twilight Giant), valle_madre 7/7 (Mother),
+  archivio_sepolto 6/6 (Hermit), frontiera_porte 6/6 (Fool).
+- tools/validate_data.py: nuovo blocco "fonti degli ingredienti", inserito
+  SUBITO DOPO il blocco NPC/roster (dove roster_doc e' gia' in scope — il
+  blocco "ingredienti delle formule" di US-808 e' troppo presto, prima che
+  roster_doc esista). Per ogni ingrediente citato da una formula, verifica
+  che esista almeno una fonte fra: layout.drop (US-809a), vendor.listino
+  (US-809b), layout.oggetti (questa story). Errore con l'elenco dei
+  mancanti altrimenti.
+- tests/test_layouts.gd: le 5 test "oggetti_a_terra_raccolti_finiscono_in_
+  inventory" (una per regione, gia' esistenti da US-805/US-806) erano
+  scritte contro "moneta_comune" letterale — con gli item veri al posto
+  della moneta per la maggior parte degli slot, il primo pickup della
+  lista (pickup_list[0]) ora e' quasi sempre un ingrediente, non piu' una
+  moneta. CORRETTO: le 5 funzioni leggono l'item_id vero dal pickup stesso
+  (uno.char_id) invece di dare per scontato "moneta_comune" — il test resta
+  generico (qualunque cosa sia a terra, raccoglierla la fa entrare in
+  Inventory), coerente con com'era pensato originariamente, solo senza
+  l'assunzione ora falsa sull'id specifico.
+
+COME VERIFICATO.
+- Idempotenza vera di --oggetti: copiati i 5 layout, rilanciato il comando
+  una seconda volta, diff -rq byte-per-byte IDENTICO ("0 regioni
+  aggiornate" nel log, contenuto verificato non solo il log).
+- git diff sui 5 layout: SOLO le righe con item_id cambiato (nessun rumore
+  di riformattazione, stessa disciplina di US-809a) — es. mirwada:
+  9 inserzioni/9 cancellazioni esatte, una per slot sostituito.
+- python tools/validate_data.py: 0 errori, il blocco "fonti" nuovo trova
+  0 ingredienti mancanti (i 299 sono gia' tutti coperti da drop+listini+
+  oggetti insieme, come previsto dall'analisi di copertura del piano
+  originale di US-809).
+- godot --headless --import: pulito. Suite: PRIMO run con 5 fallimenti
+  (le 5 test "oggetti_a_terra..." sopra, causa reale trovata subito: non un
+  bug del codice ma un'assunzione del test ormai falsa) — corretto come
+  sopra, RIVERIFICATO: 834 test, tutti passati, nessuna regressione.
+- VERIFICA A SCHERMO REALE (Xvfb, script di QA nello scratchpad non
+  committato, stesso pattern gia' usato in US-809a — prima tentata una
+  versione con camminata fisica verso il pickup che si e' bloccata per
+  oltre 5 minuti al 213% CPU: godot processava i frame ma qualcosa non
+  convergeva mai nel ciclo di attesa; processo ucciso, script riscritto per
+  chiamare raccogli() direttamente sul pickup come gia' fatto in
+  test_enemy_drop.gd/US-809a, evitando la camminata simulata): screenshot
+  prima/dopo mandati in chat — a Mirwada un ingrediente vero
+  (ferro_temperato, non piu' moneta_comune) sparisce dal terreno dopo la
+  raccolta, Inventory.conta('ferro_temperato') == 1 confermato in log.
+
+CORREZIONI rispetto al piano.
+- La camminata fisica nello script di QA (pensata per essere piu'
+  "end-to-end" della semplice chiamata a raccogli()) si e' rivelata un
+  vicolo cieco (vedi sopra): abbandonata per il pattern gia' verificato
+  funzionante di US-809a, che resta comunque una prova reale a schermo
+  (screenshot prima/dopo, non solo l'assert dei test).
+- I 5 test esistenti "oggetti_a_terra_raccolti_finiscono_in_inventory" non
+  erano nell'AC di questa story come "da correggere" (l'AC parlava solo del
+  nuovo blocco validator "fonti" e della sostituzione dei dati) — la
+  necessita' e' emersa SOLO rilanciando la suite dopo aver scritto i dati,
+  scoperta e corretta prima di considerare la story chiusa, non ignorata.
+
+COSA RESTA APERTO (dichiarato, non di questa story).
+- Nessuno rispetto all'AC: Blocco C (US-809a/b/c) e' chiuso. Ogni
+  ingrediente delle formule ha ora almeno una fonte reale in gioco (drop,
+  listino o raccolta a terra), verificato dal validator.
+
+=== BLOCCO C CHIUSO ===
+US-809a, US-809b, US-809c: ogni ingrediente citato dalle formule (299) ha
+almeno una fonte reale in gioco — drop dei nemici, listino di un venditore
+o raccolta a terra — verificato meccanicamente dal blocco validator
+"fonti". Zero righe di codice dedicate a un ingrediente/regione/venditore
+specifico: tutto generato da tools/generate_formula_ingredients.py a
+partire da formulas.json + regions.json + pathways/*.json.group + i boss
+gia' scritti nei layout.
+
+PROSSIMA STORIA: US-810 — Sezione Avanzamento nel diagramma (Prepara/Bevi
+la pozione, Blocco D).
