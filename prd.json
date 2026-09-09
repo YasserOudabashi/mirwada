@@ -114,19 +114,71 @@
       "notes": "data/balance.json.nemico_base: aggiunta chiave base 'tag':'' (l'AC la usa come esempio di chiave di override sottoinsieme di nemico_base, ma nemico_base non l'aveva mai avuta: correzione minima, dato puro, _comment aggiornato). data/schema/layout.schema.json: nemici/oggetti documentati con la forma reale (erano segnaposto vuoti da US-805). data/world/layouts/mirwada.json: 6 nemici Sequenza 9 (coordinate calcolate e validate a mano contro la griglia reale: fuori piazza, >=8 celle dallo spawn, su cella calpestabile) + 1 boss Sequenza 8 al porto (override: danno_attacco 15 [+50%], raggio_aggro 200, tag 'bestia', caratteristica twilight_giant Seq 8 garantita; scala 1.5) + 10 oggetti moneta_comune (quantita 1-3 variate). scripts/enemy.gd: var override:Dictionary={}; in _ready() _cfg = get_balance('nemico_base').duplicate(true) POI _cfg.merge(override,true) — BUG SCOPERTO E CORRETTO IN CORSO D'OPERA: get_balance() torna il Dictionary CONDIVISO di GameData (verificato in game_data.gd::_dict_or_empty, che restituisce v per riferimento), quindi mergiare l'override senza duplicate(true) prima avrebbe corrotto nemico_base per OGNI nemico della partita (compreso il nemico da banco di prova di altri test), in modo silente e cumulativo. Aggiunto anche il getter pubblico senza_abilita() (usato da region_scene per l'aggregato di area_cleared). scripts/item_pickup.gd (NUOVO, 16 righe): extends characteristic_pickup.gd, solo 'quantita' in piu' e raccogli() ridefinita -> Inventory.aggiungi(char_id, quantita) (char_id ereditato, riletto come item_id: setup(id,posizione) e Area2D sono letteralmente quelli del genitore, invariati). scripts/region_scene.gd: _crea_nemici() (override/scale via .set() PRIMA di add_child — convenzione .call()/.set() del progetto per istanze da preload().instantiate()/·new() senza class_name — poi sequenza + StatsComponent.configure_from_balance(sequenza) DOPO add_child, morto connesso a _su_nemico_morto), _su_nemico_morto() (aggregato senza_abilita, emette area_cleared -- senza_alleati_caduti:true sempre in questa fase, senza_uccidere:false sempre -- alla morte dell'ultimo), _crea_oggetti(); agganciate in _ready() dopo _crea_gate(), prima di _crea_npc(). scenes/main.tscn: rimosso il nodo Enemy hardcoded + il suo ext_resource (load_steps 12->11): i nemici di Mirwada arrivano ora dal layout via region_scene.gd. tools/validate_data.py: nuovo blocco dopo item_ids/item_cat (~riga 1313, PRIMA di 'sigilli' — non dentro il blocco 'layouts' di US-805 che sta piu' in alto e non ha ancora item_ids/pathway_ids pronti): x/y calpestabili, sequenza 0..9, override sottoinsieme di nemico_base, override.caratteristica.pathway_id attivo, scala in [0.5,3], item_id esistente. tests/test_layouts.gd (+4 test): nemici_dal_layout_sequenza_e_boss (conteggio 7, boss per scala>1, sequenza 8, hp_max dalla curva via GameData.curve_value, override letto via boss.get('_cfg') -- GDScript non ha privacy reale, l'underscore e' solo convenzione, quindi leggere una var privata da fuori e' legittimo in un test), oggetti_a_terra_raccolti_finiscono_in_inventory (10 pickup, raccogli() incrementa Inventory.conta, idempotente), area_cleared_alla_morte_dell_ultimo_nemico (0 finche' resta un vivo, poi 1 coi filtri del contratto), nemici_di_mirwada_senza_player_restano_inerti (senza Player sibling, tutti restano IDLE, nessun crash). CORREZIONE rispetto al mio stesso AC: gli 'ingredienti del TG 9->7' che l'AC voleva come oggetti a terra NON ESISTONO ANCORA come item (verificato con grep su data/items/: zero hit per i 9 ingredienti) — sono previsti in US-808/809 (Blocco C, dopo questa story), e l'AC stesso lo ammette ('vedi US-809 per le fonti'). Ho usato SOLO moneta_comune (gia' esistente) per i 10 oggetti a terra di questa story; gli ingredienti veri arriveranno nel mondo con US-809, non prima. COME VERIFICATO. python tools/validate_data.py: 0 errori, stessi 7 warning di prima (nessuno nuovo: le mie coordinate/override/item_id sono tutti validi). godot --headless --import: pulito. Suite: 806 test, tutti passati (802 + 4 nuovi), nessuna regressione (test_regions/test_area_gate/test_page_mappa/test_main_boot tutti verdi, il conteggio di nodi zona/passaggio/gate invariato). VERIFICA A SCHERMO REALE (Xvfb, script di QA non committato): stampe di conteggio (main.tscn senza nodo Enemy: confermato false; 7 nemici spawnati; 10 oggetti spawnati) + 2 screenshot mandati in chat: il boss (cerchio rosso piu' grande) al porto, e un nemico normale + un pickup (rombo giallo) nel vicolo, ben distinti dal player (quadrato blu). Un dettaglio scoperto durante la QA (non un bug, annotato per la prossima volta che si scrivono script di verifica): Camera2D ha uno smoothing lento (game_camera.gd, velocita 5.0) che con 2 soli process_frame dopo un teleport del player lascia la camera quasi ferma sulla posizione precedente — nello script di QA ho impostato anche cam.global_position = player.global_position per bypassarlo, non e' un problema del gioco (a 60fps normali lo smoothing e' quello voluto). COSA RESTA APERTO (dichiarato, non di questa story). Gli ingredienti veri delle formule come oggetti a terra: US-808 (item)/US-809 (fonti nel mondo). Le altre 4 regioni restano senza nemici/oggetti fino a US-807. drop resta vuoto per contratto (US-809). tipo_arma nel payload di enemy_defeated resta rimandato (nessuna Sequenza 9 attiva lo usa, gia' annotato in US-804)."
     },
     {
-      "id": "US-807",
-      "title": "Le altre quattro regioni disegnate e popolate (Blocco B)",
-      "description": "Come giocatore, voglio che ogni regione abbia una mappa propria, nemici della sua fascia e oggetti del suo gruppo.",
+      "id": "US-807a",
+      "title": "Marche del Crepuscolo - layout + popolazione (Blocco B)",
+      "description": "Come giocatore, voglio che questa regione abbia una mappa propria, nemici della sua fascia e oggetti del suo gruppo.",
       "acceptanceCriteria": [
-        "data/world/layouts/marche_crepuscolo.json, valle_madre.json, archivio_sepolto.json, frontiera_porte.json disegnati a mano, ciascuno con identita' coerente con design-world.md §2 e arte/02_regioni_e_mappe.md: Marche = brughiera e cripte (ostacoli t, zona cripte chiusa da muri con un varco per il gate momento); Valle = fiume e ponti di radici (~ attraversato da = nella zona ponti_di_radici - il gate primitiva esistente resta sul varco); Archivio = sale e corridoi (# interni, ali_interne raggiungibile solo dal gate conoscenza); Frontiera = isole nella nebbia (~ ovunque, isole . collegate da =, gate sequenza all'ingresso). I gate esistenti non cambiano: il layout mette il varco dove regions.json.gating[].area gia' lo dichiara (il validator lo controlla: la zona del gate confina con un solo varco calpestabile).",
-        "Nemici: Sequenza per regione dal group_affinity e dalla fascia (Marche 9-8, Valle 9-8, Archivio 8-7, Frontiera 7-6), 6-10 per regione, 1 boss per regione (Sequenza -1 rispetto ai normali, override piu' duro, Caratteristica del gruppo garantita, scala 1.5), tag dai vocabolari (bestia, spirito, costrutto, ... solo voci di tags.json).",
-        "Oggetti a terra: 6-10 per regione, ingredienti dei Pathway del gruppo (US-809 definisce le fonti; qui si usano id gia' esistenti dopo US-808) + moneta_comune.",
-        "Validator: tutte e 5 le regioni hanno layout; il warning di US-805 (\"zona senza layout\") diventa errore.",
-        "Test: tests/test_layouts.gd gira su tutte e 5 (parametrico: per ogni layout, spawn calpestabile, >=1 nemico, >=1 boss riconoscibile dalla scala > 1, ogni zona di gate ha un solo varco).",
-        "Verifica Xvfb: uno screenshot per regione in progress.txt.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "data/world/layouts/marche_crepuscolo.json: identita' brughiera e cripte, ostacolo 't' oltre a 'o'. Zona 'cripta' chiusa da muri con un solo varco allineato al gate esistente {tipo:momento, valore:notte_fonda, area:cripte} (non si tocca il gate, solo la geometria). 10 location_tags da coprire (altura, luogo_di_battaglia, tempio_abbandonato, rovina, luogo_in_decadenza, vetta, luogo_di_massacro, cripta, trono_del_gigante, soglia_del_crepuscolo): con 10 zone alcune restano rettangoli semplici, l'identita' si concentra su cripta/trono_del_gigante. Spawn e passaggio verso mirwada su cella calpestabile.",
+        "Nemici: 6-10 di Sequenza 9 e 8 (mix), fuori dallo spawn (stessa distanza minima di US-806); 1 boss Sequenza 7, override (danno_attacco/raggio_aggro piu' duri, tag:'non_morto', caratteristica:{pathway_id:'twilight_giant', sequence:7, probabilita:1.0}), scala 1.5, dentro la zona cripta.",
+        "Oggetti: 6-10 moneta_comune (ingredienti veri rimandati a US-809, come gia' corretto in US-806).",
+        "tools/validate_data.py: nessun cambio di logica in questa story (il warning 'regione senza layout' resta per le 3 ancora senza, diventa errore solo in US-807d).",
+        "tests/test_layouts.gd esteso con test dedicati per marche_crepuscolo (stesso stile esplicito di quelli di mirwada: bordo solido, spawn dal layout, nemici con la Sequenza giusta, boss riconoscibile dalla scala, oggetti raccolti in Inventory, area_cleared alla morte dell'ultimo, nemici inerti senza player).",
+        "Verifica Xvfb: screenshot delle Marche in progress.txt.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Tests pass."
       ],
       "priority": 7,
+      "fase": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-807b",
+      "title": "Valle Madre - layout + popolazione (Blocco B)",
+      "description": "Come giocatore, voglio che questa regione abbia una mappa propria, nemici della sua fascia e oggetti del suo gruppo.",
+      "acceptanceCriteria": [
+        "data/world/layouts/valle_madre.json: identita' fiume. Corpo d'acqua '~' attraversato da un ponte '=' nella zona ponti_di_radici, allineato al gate esistente {tipo:primitiva, primitiva:plant_growth, area:ponti_di_radici} (non si tocca il gate). 6 location_tags da coprire (bosco_antico, radura_lunare, grotta_di_marea, sorgente, altare_di_radici, radice_del_mondo) - con solo 6 zone c'e' margine per curare meglio sorgente/radice_del_mondo. Spawn e passaggio verso mirwada su cella calpestabile.",
+        "Nemici: 6-10 di Sequenza 9 e 8; 1 boss Sequenza 7, override (tag:'bestia', caratteristica:{pathway_id:'mother', sequence:7, probabilita:1.0}), scala 1.5, dentro una zona d'acqua/natura.",
+        "Oggetti: 6-10 moneta_comune (stessa nota di US-807a su US-809).",
+        "tests/test_layouts.gd esteso con test dedicati per valle_madre (stesso stile di US-807a).",
+        "Verifica Xvfb: screenshot della Valle in progress.txt.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Tests pass."
+      ],
+      "priority": 8,
+      "fase": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-807c",
+      "title": "Archivio Sepolto - layout + popolazione (Blocco B)",
+      "description": "Come giocatore, voglio che questa regione abbia una mappa propria, nemici della sua fascia e oggetti del suo gruppo.",
+      "acceptanceCriteria": [
+        "data/world/layouts/archivio_sepolto.json: identita' sale e corridoi interni (molti muri '#' a formare stanze, non una brughiera aperta). Zona ali_interne raggiungibile da un solo varco allineato al gate esistente {tipo:conoscenza, valore:testi_ordine_minore, area:ali_interne} (non si tocca il gate). 6 location_tags (biblioteca, officina, torre_di_osservazione, sala_dei_sigilli, studio, biblioteca_di_tutto). Spawn e passaggio verso mirwada su cella calpestabile.",
+        "Nemici: 6-10 di Sequenza 8 e 7; 1 boss Sequenza 6, override (tag:'spirito', caratteristica:{pathway_id:'hermit', sequence:6, probabilita:1.0}), scala 1.5, dentro ali_interne o sala_dei_sigilli.",
+        "Oggetti: 6-10 moneta_comune (stessa nota di US-807a su US-809).",
+        "tests/test_layouts.gd esteso con test dedicati per archivio_sepolto (stesso stile di US-807a).",
+        "Verifica Xvfb: screenshot dell'Archivio in progress.txt.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Tests pass."
+      ],
+      "priority": 9,
+      "fase": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-807d",
+      "title": "Frontiera delle Porte - layout + popolazione + chiusura Blocco B",
+      "description": "Come giocatore, voglio che questa regione abbia una mappa propria, nemici della sua fascia e oggetti del suo gruppo.",
+      "acceptanceCriteria": [
+        "data/world/layouts/frontiera_porte.json: identita' isole nella nebbia. '~' predominante, isole '.' collegate da sentieri '='. Varco all'ingresso allineato al gate esistente {tipo:sequenza, valore:4, area:ingresso} (non si tocca il gate, resta il tetto di Sequenza 4 gia' nei dati). 6 location_tags (teatro, crocevia, soglia, nebbia_grigia, palco, porta_senza_stanza). Spawn e passaggio verso mirwada su cella calpestabile, su un'isola non in acqua.",
+        "Nemici: 6-10 di Sequenza 7 e 6; 1 boss Sequenza 5, override (tag:'ombra', caratteristica:{pathway_id:'door', sequence:5, probabilita:1.0}), scala 1.5, su un'isola isolata.",
+        "Oggetti: 6-10 moneta_comune (stessa nota di US-807a su US-809).",
+        "tools/validate_data.py: con questa la 5a e ultima regione ha un layout - il check 'regione senza layout' passa da warn() a err() esplicitamente (nessuna regione dovrebbe piu' scattarlo, ma se un layout venisse rimosso per errore in futuro il validator blocca invece di avvisare soltanto).",
+        "tests/test_layouts.gd esteso con test dedicati per frontiera_porte (stesso stile di US-807a) + un test di chiusura 'tutte e 5 le regioni hanno un layout' (GameData.get_layout(id) non vuoto per ogni id di get_regions()).",
+        "Verifica Xvfb: screenshot della Frontiera in progress.txt.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Tests pass."
+      ],
+      "priority": 10,
       "fase": 8,
       "passes": false,
       "notes": ""
@@ -144,7 +196,7 @@
         "Test: tests/test_data_loading.gd (o simile esistente) - GameData.get_item(\"ferro_temperato\") non e' vuoto; conteggio items_per_categoria(\"ingrediente\") >= 299 + 8.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 8,
+      "priority": 11,
       "fase": 8,
       "passes": false,
       "notes": ""
@@ -162,7 +214,7 @@
         "Test tests/test_enemy_drop.gd: nemico con oggetti_a_morte e drop_probabilita:1.0 -> alla morte c'e' un item_pickup figlio della regione con uno degli id; con 0.0 -> nessuno.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 9,
+      "priority": 12,
       "fase": 8,
       "passes": false,
       "notes": ""
@@ -181,7 +233,7 @@
         "Verifica Xvfb: screenshot della sezione prima e dopo Prepara, in progress.txt.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 10,
+      "priority": 13,
       "fase": 8,
       "passes": false,
       "notes": ""
@@ -199,7 +251,7 @@
         "Verifica Xvfb: screenshot del negozio di Sidon, in progress.txt.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 11,
+      "priority": 14,
       "fase": 8,
       "passes": false,
       "notes": ""
@@ -221,7 +273,7 @@
         "Verifica Xvfb obbligatoria: screenshot di idle/walk/attack/parry del personaggio e anticipo/attacco del nemico, in progress.txt.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 12,
+      "priority": 15,
       "fase": 8,
       "passes": false,
       "notes": ""
@@ -241,7 +293,7 @@
         "Verifica Xvfb: uno screenshot per regione con NPC e oggetti, in progress.txt.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 13,
+      "priority": 16,
       "fase": 8,
       "passes": false,
       "notes": ""
@@ -259,7 +311,7 @@
         "Screenshot finali inviati all'utente in chat (SendUserFile).",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 14,
+      "priority": 17,
       "fase": 8,
       "passes": false,
       "notes": ""

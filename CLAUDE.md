@@ -211,8 +211,9 @@ esistono come oggetti, mondo senza nemici né oggetti). La fase 8 collega i
 sistemi già scritti, riempie i dati mancanti e mette una grafica
 provvisoria generata: **zero sistemi nuovi**, save invariato.
 
-- PRD: `006_PRD/prd-fase-8-vertical-slice.md` — 14 story (US-801..US-814)
-  in 7 blocchi, ognuna con acceptance criteria verificabili.
+- PRD: `006_PRD/prd-fase-8-vertical-slice.md` — 17 story (US-801..US-806,
+  US-807a..d, US-808..US-814; US-807 originale spezzata in 4 per regione,
+  2026-09-09) in 7 blocchi, ognuna con acceptance criteria verificabili.
 - **Come eseguirlo: `006_PRD/prossimi-passi.md`** — ordine delle
   operazioni, quando usare `/prd` e `/ralph`, setup dell'ambiente, comandi
   di verifica, e le trappole già scoperte (isolamento dei test, libro

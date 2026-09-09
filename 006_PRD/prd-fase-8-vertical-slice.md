@@ -442,42 +442,175 @@ della regione.
       visibili, in `progress.txt`.
 - [ ] `python tools/validate_data.py` esce 0. Nessuna regressione. Typecheck passes. Tests pass.
 
-#### US-807: Le altre quattro regioni disegnate e popolate
+#### US-807: Le altre quattro regioni disegnate e popolate — SPEZZATA
 
-**Description:** Come giocatore, voglio che ogni regione abbia una mappa
-propria, nemici della sua fascia e oggetti del suo gruppo.
+**Nota (2026-09-09):** questa story copriva 4 regioni in un colpo solo — a
+giudicare dal precedente della fase (US-805, una sola regione, già vicina
+al budget di una context window per la regola 3 di `CLAUDE.md`), 4 regioni
+insieme avrebbero quasi certamente sforato. Su richiesta esplicita
+dell'utente, spezzata **prima di iniziare** in 4 story indipendenti, una
+per regione: **US-807a** (Marche del Crepuscolo), **US-807b** (Valle
+Madre), **US-807c** (Archivio Sepolto), **US-807d** (Frontiera delle
+Porte, che chiude anche il Blocco B). Il testo originale (qui sotto, non
+più la fonte di verità) resta come riferimento del disegno complessivo;
+le 4 story seguenti lo suddividono senza perdere nessun criterio.
+
+*Description originale:* Come giocatore, voglio che ogni regione abbia una
+mappa propria, nemici della sua fascia e oggetti del suo gruppo.
+
+*Acceptance Criteria originali (superseded dalle 4 story sotto):*
+
+- `data/world/layouts/marche_crepuscolo.json`, `valle_madre.json`,
+  `archivio_sepolto.json`, `frontiera_porte.json` disegnati a mano,
+  ciascuno con **identità** coerente con `design-world.md` §2 e
+  `arte/02_regioni_e_mappe.md`: Marche = brughiera e cripte (ostacoli `t`,
+  zona `cripte` chiusa da muri con un varco per il gate `momento`); Valle =
+  fiume e ponti di radici (`~` attraversato da `=` nella zona
+  `ponti_di_radici` — il gate `primitiva` esistente resta sul varco);
+  Archivio = sale e corridoi (`#` interni, `ali_interne` raggiungibile solo
+  dal gate `conoscenza`); Frontiera = isole nella nebbia (`~` ovunque,
+  isole `.` collegate da `=`, gate `sequenza` all'ingresso). **I gate
+  esistenti non cambiano**: il layout mette il varco dove
+  `regions.json.gating[].area` già lo dichiara.
+- Nemici: Sequenza per regione dal `group_affinity` e dalla fascia (Marche
+  9-8, Valle 9-8, Archivio 8-7, Frontiera 7-6), 6-10 per regione, **1
+  boss** per regione (Sequenza -1 rispetto ai normali, `override` più duro,
+  Caratteristica del gruppo garantita, `scala` 1.5), `tag` dai vocabolari.
+- Oggetti a terra: 6-10 per regione + `moneta_comune` (gli ingredienti veri
+  restano rimandati a US-809, come già corretto in US-806).
+- Validator: tutte e 5 le regioni hanno layout; il warning di US-805
+  ("zona senza layout") diventa **errore**.
+- Test, verifica Xvfb, `validate_data.py` 0 come sempre.
+
+#### US-807a: Marche del Crepuscolo — layout + popolazione (Blocco B)
+
+**Description:** Come giocatore, voglio che le Marche del Crepuscolo
+abbiano una mappa propria da brughiera e cripte, con nemici del Twilight
+Giant (gruppo `eternal_darkness`) e un boss riconoscibile.
 
 **Acceptance Criteria:**
 
-- [ ] `data/world/layouts/marche_crepuscolo.json`, `valle_madre.json`,
-      `archivio_sepolto.json`, `frontiera_porte.json` disegnati a mano,
-      ciascuno con **identità** coerente con `design-world.md` §2 e
-      `arte/02_regioni_e_mappe.md`: Marche = brughiera e cripte (ostacoli
-      `t`, zona `cripte` chiusa da muri con un varco per il gate `momento`);
-      Valle = fiume e ponti di radici (`~` attraversato da `=` nella zona
-      `ponti_di_radici` — il gate `primitiva` esistente resta sul varco);
-      Archivio = sale e corridoi (`#` interni, `ali_interne` raggiungibile
-      solo dal gate `conoscenza`); Frontiera = isole nella nebbia (`~`
-      ovunque, isole `.` collegate da `=`, gate `sequenza` all'ingresso).
-      **I gate esistenti non cambiano**: il layout mette il varco dove
-      `regions.json.gating[].area` già lo dichiara (il validator lo
-      controlla: la zona del gate confina con un solo varco calpestabile).
-- [ ] Nemici: Sequenza per regione dal `group_affinity` e dalla fascia
-      (Marche 9-8, Valle 9-8, Archivio 8-7, Frontiera 7-6), 6-10 per
-      regione, **1 boss** per regione (Sequenza -1 rispetto ai normali,
-      `override` più duro, Caratteristica del gruppo garantita, `scala`
-      1.5), `tag` dai vocabolari (`bestia`, `spirito`, `costrutto`, ...
-      solo voci di `tags.json`).
-- [ ] Oggetti a terra: 6-10 per regione, ingredienti dei Pathway del gruppo
-      (US-809 definisce le fonti; qui si usano id già esistenti dopo
-      US-808) + `moneta_comune`.
-- [ ] Validator: tutte e 5 le regioni hanno layout; il warning di US-805
-      ("zona senza layout") diventa **errore**.
-- [ ] Test: `tests/test_layouts.gd` gira su tutte e 5 (parametrico: per ogni
-      layout, spawn calpestabile, ≥1 nemico, ≥1 boss riconoscibile dalla
-      `scala` > 1, ogni zona di gate ha un solo varco).
-- [ ] Verifica Xvfb: uno screenshot per regione in `progress.txt`.
-- [ ] `python tools/validate_data.py` esce 0. Nessuna regressione. Typecheck passes. Tests pass.
+- [ ] `data/world/layouts/marche_crepuscolo.json`: identità brughiera e
+      cripte. Usa l'ostacolo `t` (oltre a `o`) per varietà visiva. Una zona
+      `cripta` chiusa da muri `#` con un solo varco calpestabile allineato
+      al gate esistente `{"tipo":"momento","valore":"notte_fonda","area":"cripte"}`
+      (`data/world/regions.json`, non tocco il gate, solo la geometria).
+      10 `location_tags` da coprire con una zona ciascuno (`altura`,
+      `luogo_di_battaglia`, `tempio_abbandonato`, `rovina`,
+      `luogo_in_decadenza`, `vetta`, `luogo_di_massacro`, `cripta`,
+      `trono_del_gigante`, `soglia_del_crepuscolo`): con 10 zone su una
+      griglia 48×36 alcune saranno rettangoli semplici senza decorazione
+      elaborata (a differenza delle 5 di Mirwada), per restare dentro lo
+      scope della story — l'identità brughiera/cripte si concentra su 2-3
+      zone chiave (`cripta`, `trono_del_gigante`), le altre sono spazio
+      aperto con l'ostacolo giusto. Spawn e passaggio verso `mirwada`
+      (unico, essendo una regione a raggio, non hub) su cella calpestabile.
+- [ ] Nemici: 6-10 di Sequenza 9 e 8 (mix), sparsi fuori dallo spawn (stessa
+      regola di distanza minima di US-806); **1 boss** Sequenza 7,
+      `override` (danno_attacco/raggio_aggro più duri, `tag: "non_morto"`
+      dal vocabolario di `data/tags.json`, `caratteristica: {pathway_id:
+      "twilight_giant", sequence: 7, probabilita: 1.0}`), `scala` 1.5,
+      dentro la zona `cripta`.
+- [ ] Oggetti: 6-10 `moneta_comune` (ingredienti veri rimandati a US-809,
+      come già corretto in US-806 — l'AC originale li chiedeva ma non
+      esistono ancora come item).
+- [ ] `tools/validate_data.py`: nessun cambio di logica (il warning
+      "regione senza layout" continua a valere per le 3 regioni ancora
+      senza — diventa errore solo nell'ultima, US-807d).
+- [ ] `tests/test_layouts.gd` esteso con test dedicati per
+      `marche_crepuscolo` (stesso stile esplicito di quelli di `mirwada`:
+      bordo solido, spawn dal layout, nemici con la Sequenza giusta, boss
+      riconoscibile dalla `scala`, oggetti raccolti finiscono in Inventory,
+      area_cleared alla morte dell'ultimo, nemici inerti senza player).
+- [ ] Verifica Xvfb: screenshot delle Marche in `progress.txt`.
+- [ ] `python tools/validate_data.py` esce 0. Nessuna regressione. Tests pass.
+
+#### US-807b: Valle Madre — layout + popolazione (Blocco B)
+
+**Description:** Come giocatore, voglio che la Valle Madre abbia una mappa
+propria da fiume e ponti di radici, con nemici del gruppo
+`goddess_of_origin` e un boss riconoscibile.
+
+**Acceptance Criteria:**
+
+- [ ] `data/world/layouts/valle_madre.json`: identità fiume. Un corpo
+      d'acqua `~` attraversato da un ponte `=` nella zona
+      `ponti_di_radici`, allineato al gate esistente
+      `{"tipo":"primitiva","primitiva":"plant_growth","area":"ponti_di_radici"}`
+      (non tocco il gate). 6 `location_tags` da coprire (`bosco_antico`,
+      `radura_lunare`, `grotta_di_marea`, `sorgente`, `altare_di_radici`,
+      `radice_del_mondo`) — con solo 6 zone (contro le 10 di Marche) c'è
+      margine per curare meglio 2-3 aree chiave (`sorgente`,
+      `radice_del_mondo`). Spawn e passaggio verso `mirwada` su cella
+      calpestabile.
+- [ ] Nemici: 6-10 di Sequenza 9 e 8; **1 boss** Sequenza 7, `override`
+      (`tag: "bestia"`, `caratteristica: {pathway_id: "mother", sequence:
+      7, probabilita: 1.0}`), `scala` 1.5, dentro una zona d'acqua/natura.
+- [ ] Oggetti: 6-10 `moneta_comune` (stessa nota di US-807a su US-809).
+- [ ] `tests/test_layouts.gd` esteso con test dedicati per `valle_madre`
+      (stesso stile di US-807a).
+- [ ] Verifica Xvfb: screenshot della Valle in `progress.txt`.
+- [ ] `python tools/validate_data.py` esce 0. Nessuna regressione. Tests pass.
+
+#### US-807c: Archivio Sepolto — layout + popolazione (Blocco B)
+
+**Description:** Come giocatore, voglio che l'Archivio Sepolto abbia una
+mappa propria da sale e corridoi, con nemici del gruppo
+`demon_of_knowledge` e un boss riconoscibile.
+
+**Acceptance Criteria:**
+
+- [ ] `data/world/layouts/archivio_sepolto.json`: identità sale e corridoi
+      interni (molti muri `#` a formare stanze, non una brughiera aperta).
+      Una zona `ali_interne` raggiungibile da un solo varco allineato al
+      gate esistente `{"tipo":"conoscenza","valore":"testi_ordine_minore",
+      "area":"ali_interne"}` (non tocco il gate). 6 `location_tags`
+      (`biblioteca`, `officina`, `torre_di_osservazione`, `sala_dei_sigilli`,
+      `studio`, `biblioteca_di_tutto`). Spawn e passaggio verso `mirwada`
+      su cella calpestabile.
+- [ ] Nemici: 6-10 di Sequenza 8 e 7; **1 boss** Sequenza 6, `override`
+      (`tag: "spirito"`, `caratteristica: {pathway_id: "hermit", sequence:
+      6, probabilita: 1.0}`), `scala` 1.5, dentro `ali_interne` o
+      `sala_dei_sigilli`.
+- [ ] Oggetti: 6-10 `moneta_comune` (stessa nota di US-807a su US-809).
+- [ ] `tests/test_layouts.gd` esteso con test dedicati per
+      `archivio_sepolto` (stesso stile di US-807a).
+- [ ] Verifica Xvfb: screenshot dell'Archivio in `progress.txt`.
+- [ ] `python tools/validate_data.py` esce 0. Nessuna regressione. Tests pass.
+
+#### US-807d: Frontiera delle Porte — layout + popolazione + chiusura Blocco B
+
+**Description:** Come giocatore, voglio che la Frontiera delle Porte abbia
+una mappa propria da isole nella nebbia, con nemici del gruppo
+`lord_of_mysteries` e un boss riconoscibile; con questa regione tutte e 5
+hanno un layout, quindi il validator chiude il cerchio.
+
+**Acceptance Criteria:**
+
+- [ ] `data/world/layouts/frontiera_porte.json`: identità isole nella
+      nebbia. `~` predominante, isole `.` collegate da sentieri `=`. Un
+      varco all'ingresso allineato al gate esistente
+      `{"tipo":"sequenza","valore":4,"area":"ingresso"}` (non tocco il
+      gate — resta il tetto di Sequenza 4 già nei dati). 6 `location_tags`
+      (`teatro`, `crocevia`, `soglia`, `nebbia_grigia`, `palco`,
+      `porta_senza_stanza`). Spawn e passaggio verso `mirwada` su cella
+      calpestabile (su un'isola, non in acqua).
+- [ ] Nemici: 6-10 di Sequenza 7 e 6; **1 boss** Sequenza 5, `override`
+      (`tag: "ombra"`, `caratteristica: {pathway_id: "door", sequence: 5,
+      probabilita: 1.0}`), `scala` 1.5, su un'isola isolata.
+- [ ] Oggetti: 6-10 `moneta_comune` (stessa nota di US-807a su US-809).
+- [ ] `tools/validate_data.py`: con questa la 5ª e ultima regione ha un
+      layout — il check "regione senza layout" (oggi `warn()`) non troverà
+      più nessuna regione a cui applicarsi, ma converto comunque
+      esplicitamente la logica a `err()` per il caso, cosi' se in futuro
+      un layout viene rimosso per errore il validator lo blocca invece di
+      limitarsi ad avvisare.
+- [ ] `tests/test_layouts.gd` esteso con test dedicati per
+      `frontiera_porte` (stesso stile di US-807a) + un test di chiusura
+      "tutte e 5 le regioni hanno un layout" (`GameData.get_layout(id)`
+      non vuoto per ogni id di `get_regions()`).
+- [ ] Verifica Xvfb: screenshot della Frontiera in `progress.txt`.
+- [ ] `python tools/validate_data.py` esce 0. Nessuna regressione. Tests pass.
 
 ### Blocco C — Economia degli ingredienti
 

@@ -3,7 +3,9 @@
 > Scritto il 2026-09-09. Leggilo **dopo** `CLAUDE.md` e **prima** di toccare
 > qualunque file. Dice cosa fare, in che ordine, con quali strumenti, e le
 > trappole già scoperte. Il "cosa" dettagliato è in
-> `006_PRD/prd-fase-8-vertical-slice.md` (14 story, US-801..US-814).
+> `006_PRD/prd-fase-8-vertical-slice.md` (17 story: US-801..US-806,
+> US-807a..d, US-808..US-814 — US-807 originale spezzata in 4 per regione
+> il 2026-09-09, prima di iniziarla, su richiesta esplicita dell'utente).
 
 ---
 
@@ -156,9 +158,10 @@ definizione).
    sessione), push con `git push -u origin <branch>`.
 9. Se la story supera ~4 file o ~200 righe di diff **dopo** averla letta
    bene: fermati, dillo, proponi lo split (regola 3). Le story del PRD sono
-   già state dimensionate per evitarlo, ma US-807 (4 mappe) e US-812
-   (19 fogli) sono le più grosse: se una non chiude, spezzala per regione
-   / per foglio, aggiornando `prd.json`.
+   già state dimensionate per evitarlo; US-807 (4 mappe) era la più grossa
+   ed è già stata spezzata in US-807a..d (una regione ciascuna) prima di
+   iniziarla. US-812 (19 fogli) resta la candidata più probabile a uno
+   split ulteriore (per foglio) se non dovesse chiudere in un colpo solo.
 
 ---
 
