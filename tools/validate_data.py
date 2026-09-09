@@ -2144,6 +2144,33 @@ def main():
         if not os.path.exists(os.path.join(DATA, "quests", f"{_qid}.json")):
             err(f"data/quests/{_qid}.json: quest di Atto I mancante (US-622).")
 
+    # --- chiusura fase 7 (US-721): l'endgame esiste ed e' coerente ---
+    FASE_7_DATA = [
+        "schema/fusion.schema.json", "schema/tribulation.schema.json",
+        "schema/ending.schema.json", "schema/tribulation_effects.json",
+        "schema/prayer_effects.json", "endings.json",
+    ]
+    for rel in FASE_7_DATA:
+        if not os.path.exists(os.path.join(DATA, rel)):
+            err(f"data/{rel}: file di dati della fase 7 mancante (US-721: la fase e' chiusa).")
+    if not os.path.isdir(os.path.join(DATA, "fusions")) or not os.listdir(os.path.join(DATA, "fusions")):
+        err("data/fusions/: cartella mancante o vuota (US-721).")
+    if not os.path.isdir(os.path.join(DATA, "tribulations")) or not os.listdir(os.path.join(DATA, "tribulations")):
+        err("data/tribulations/: cartella mancante o vuota (US-721).")
+    # door_error e' l'UNICO percorso di fusione completo (US-706): gli altri 7
+    # restano stub dichiarati per la fase 7b, il validator li conta (warning).
+    _fus_ed = load_json(os.path.join(DATA, "fusions", "door_error.json"))
+    if _fus_ed is None:
+        err("data/fusions/door_error.json: mancante (US-721: e' il percorso completo).")
+    elif bool(_fus_ed.get("stub", False)):
+        err("data/fusions/door_error.json: ancora stub - la fase 7 e' chiusa, questo "
+            "percorso deve essere completo (US-706/721).")
+    _end_doc = load_json(os.path.join(DATA, "endings.json"))
+    _end_ids = {e.get("id") for e in (_end_doc or {}).get("endings", [])}
+    if _end_ids != {"apoteosi", "consumazione", "rinuncia"}:
+        err(f"data/endings.json: attesi esattamente i 3 finali con la fase 7 chiusa, "
+            f"trovati {sorted(_end_ids)} (US-721).")
+
     report()
     return 1 if errors else 0
 

@@ -177,16 +177,41 @@ una primitiva differita come `tipo` → **0**). Materia prima `avatar` nuova in
 diff `.gd` del blocco A = solo `ability_engine.gd` +173 -0, dispatcher
 intatto) e nel validator (check di chiusura fase 5b).
 
-Fase corrente: **7 — Endgame** (cambio Pathway, fusioni del gruppo, finali).
-Generare il PRD con `/prd`. Roadmap in `006_PRD/roadmap.md`.
+Fase 7 — Endgame: **CHIUSA** (21 story US-701..721, 776 test). PRD in
+`006_PRD/prd-fase-7-endgame.md`. 5 blocchi (0 fondamenta, A cambio Pathway +
+fusione, B tribolazioni, C Sequenze alte/preghiere + siti rituali, D finali +
+eredità, E checkpoint + chiusura). Save `schema_version` **21 → 22**
+(US-701, l'unico bump: cambio Pathway, fusioni, tribolazioni superate,
+eredità, finale stanno tutti nel campo `endgame`). Include: `PathwayChange`
+(cambio solo tra vicini dello stesso gruppo) + `FusionEngine` (1 percorso
+completo `error_door`, 7 stub dichiarati per la fase 7b); `TribulationSystem`
+(lettore di eventi/flag, blocca `Progression.avanza` ai 4 salti di fascia);
+6 abilità di "preghiera" sulle Sequenze alte (campo puramente semantico) +
+4 siti rituali di Sequenza 0 condivisi per gruppo; `data/endings.json` (3
+finali) + `EndingSystem` (nessun tipo di condizione nuovo, la Consumazione
+È il game over per follia); schermata di finale che estende il colophon
+(nessun tipo di pagina nuovo); eredità al personaggio successivo (tutte e
+quattro le voci, scelte dal giocatore, riapplicate a un nuovo personaggio
+sullo stesso slot); fog of war sui nomi di Sequenza nel diagramma (richiesta
+utente in corsa: si conosce al più il nome della Sequenza successiva).
 
-Le fasi 7-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
-genera con `/prd` **solo quando la precedente è chiusa**.
+**Verdetto del checkpoint (US-720)**: `test_slice_fase_7.gd` fa attraversare
+a un personaggio l'intero ciclo — cambio Pathway con fusione, una
+tribolazione superata, un finale raggiunto, l'eredità riapplicata a un
+nuovo personaggio — con zero righe di codice che nominino un Pathway, una
+coppia di fusione, una tribolazione o un finale specifico.
+`scripts/ability_engine.gd` non è stato toccato in tutta la fase.
+
+Fase corrente: **8 — opzionale** (Pathway Non-Standard, avanzamento per
+Boon). Le fasi 1-7 sono chiuse: nessuna fase è bloccante, si genera il PRD
+di fase 8 con `/prd` solo quando si decide di farla davvero — altrimenti il
+progetto è in manutenzione (contenuto/bilanciamento/arte/audio, non nuove
+fasi). Roadmap in `006_PRD/roadmap.md`.
 
 Prova che l'architettura regge: `data/abilities/twilight_giant.json` (fase 2),
-i 5 Pathway di fase 5 e i 3 del Lord of Mysteries (fase 5b) sono contenuto
-completo con **zero righe di codice dedicate**. È il modello da imitare per
-ogni story di dati.
+i 5 Pathway di fase 5, i 3 del Lord of Mysteries (fase 5b) e l'intero
+endgame di fase 7 sono contenuto/motori completi con **zero righe di
+codice dedicate**. È il modello da imitare per ogni story di dati.
 
 ## Decisioni prese
 

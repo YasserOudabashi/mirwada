@@ -273,14 +273,48 @@ Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 
 ---
 
-## Fase 7 — Endgame (~20 story)
+## Fase 7 — Endgame — CHIUSA (21 story, 776 test)
 
-- Cambio Pathway con `fusion_rules` data-driven
-- Sequenze alte: autorita', seguaci, preghiere
-- Unicita' della Sequenza 0: l'NPC che occupa il posto
-- Tribolazioni ai salti di fascia
-- Finali multipli, incluso il game over per follia con eredita' al personaggio
-  successivo
+> **PRD**: `006_PRD/prd-fase-7-endgame.md`. Chiusa il 2026-09-09: 21 story
+> (`US-701..721`) in 5 blocchi (0 fondamenta, A cambio Pathway + fusione,
+> B tribolazioni, C Sequenze alte/preghiere + siti rituali, D finali +
+> eredita', E checkpoint + chiusura). Save `schema_version` **21 -> 22**
+> con UNA `_migra_21_a_22` (US-701, l'unico bump: cambio Pathway, fusioni,
+> tribolazioni superate, eredita', finale stanno tutti nel campo `endgame`).
+>
+> **Cosa contiene**:
+> - Cambio di Pathway (`PathwayChange`) solo tra vicini dello stesso gruppo,
+>   sotto una soglia di Sequenza; conserva le abilita' delle Sequenze basse
+>   del vecchio Pathway. Fusione (`FusionEngine`) data-driven da
+>   `data/fusions/*.json`: 1 percorso completo (`error_door`, 6 abilita' fuse),
+>   7 stub dichiarati (fase 7b).
+> - Tribolazioni ai salti di fascia (Seq 7->6, 5->4, 3->2, 1->0):
+>   `TribulationSystem`, lettore puro di eventi/flag, blocca
+>   `Progression.avanza` finche' non superate; le 4 di contenuto con
+>   handicap temporaneo e overlay nel libro.
+> - Sequenze alte come contenuto: 6 abilita' di "preghiera" (campo
+>   puramente semantico) su primitive gia' esistenti; i siti rituali di
+>   Sequenza 0 spostati dai tag generici a 4 siti condivisi per gruppo,
+>   coerenti con l'antagonista e col cambio Pathway.
+> - I 3 finali (Apoteosi, Consumazione = il game over per follia,
+>   Rinuncia) come dati (`data/endings.json`), valutati e scelti da
+>   `EndingSystem` (nessun tipo di condizione nuovo); schermata di finale
+>   che estende il colophon (non un tipo di pagina nuovo); eredita' al
+>   personaggio successivo (conoscenza sempre, Ancora a forza dimezzata,
+>   reputazione dimezzata e un oggetto per il profilo "completo") scelta
+>   dal giocatore e riapplicata a un nuovo personaggio sullo stesso slot.
+> - Fog of war sui nomi di Sequenza nel diagramma del libro: si conosce al
+>   massimo il nome della Sequenza immediatamente successiva alla propria
+>   (richiesta utente in corsa, non pianificata nel PRD originale).
+> - Vocabolari chiusi nuovi: `tribulation_effects.json`, `prayer_effects.json`,
+>   gli enum `fusion`/`ending`/`eredita_profilo`. Schema nuovi:
+>   `fusion.schema.json`, `tribulation.schema.json`, `ending.schema.json`.
+> - **Verdetto del checkpoint (US-720)**: l'endgame e' dati. Un personaggio
+>   attraversa cambio Pathway + fusione, una tribolazione superata, un
+>   finale raggiunto e l'eredita' riapplicata a un nuovo personaggio, senza
+>   una riga di codice che nomini un Pathway/una fusione/una tribolazione/
+>   un finale specifico. `scripts/ability_engine.gd` non toccato in tutta
+>   la fase.
 
 ---
 
@@ -289,4 +323,5 @@ Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 Pathway Non-Standard (Eternal Aeon, Chaos Primogenitor, Scrooge, Dreamless e
 gli altri bestowers). Meccanica diversa: avanzamento per **Boon** invece che
 per pozione, quindi non e' solo contenuto ma un secondo sistema di
-progressione. Da fare solo a fasi 1-7 chiuse.
+progressione. Le fasi 1-7 sono chiuse: sbloccata, ma opzionale — il PRD
+dettagliato si genera con `/prd` solo quando si decide di farla davvero.

@@ -334,8 +334,8 @@
       ],
       "priority": 21,
       "fase": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "006_PRD/roadmap.md: 'Fase 7 - Endgame - CHIUSA (21 story, 776 test)' con i 5 blocchi e cosa contiene, nota sui 7 percorsi stub per la fase 7b; Fase 8 aggiornata ('sbloccata, ma opzionale'). design-master.md: sezione Fase 7 in Appendice A -> CHIUSA con verdetto del checkpoint; Appendice B decisione n.8 (eredita') -> CHIUSA (la n.9 antagonista era gia' chiusa da fase 6); Appendice C: 6 righe nuove (fusion, tribulation_effects, tribulation, prayer_effects, ending, campo endgame del save). design-npc-quest.md: nota di testa + Atto III + sezione finali + sezione antagonista marcate REALIZZATO/CHIUSA in fase 7, con riferimento a US-701..721 e al PRD. CLAUDE.md: paragrafo 'Fase 7 - Endgame: CHIUSA' nello stesso stile delle altre fasi chiuse (contenuto, save 21->22, verdetto del checkpoint) + 'Fase corrente: 8 - opzionale' (nessuna fase bloccante, PRD di fase 8 solo se si decide di farla, altrimenti manutenzione). README.md: paragrafo Fase 7 nello stesso stile + corretto un refuso preesistente non legato a questa story ('22 Pathway attivi' -> '10', il progetto ne ha 10 attivi su 22 totali nel design) + riferimento PRD aggiornato all'ultima fase chiusa. tools/validate_data.py: nuovo blocco 'chiusura fase 7' (prima di report()) - i file di dati (fusions/, tribulations/, endings.json + i 3 schema + tribulation_effects/prayer_effects) esistono; data/fusions/door_error.json esiste e non e' stub (nome file verificato su disco, l'AC lo chiama correttamente 'door_error'); i 3 finali esatti presenti in endings.json. validate exit 0 (3 warning invariati). 776 test verdi, nessuna regressione. FASE 7 CHIUSA."
     }
   ]
 }

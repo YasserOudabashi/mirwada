@@ -313,12 +313,24 @@ Journal; `factions.json` + `FactionSystem`; pagina mappa + fast travel come
 potere; densità mistica; audio del mondo come spec. Save 20 → 21 (un bump).
 Poi **fase 5b** (chiusa il 2026-09-08, vedi sopra) e **fase 7** (endgame).
 
-### Fase 7 — endgame
+### Fase 7 — endgame — CHIUSA
 
-P1: `data/endings.json` (finali come dati, condizioni dal vocabolario
-condizioni); eredita' al personaggio successivo (contratto nel save — decisione
-aperta n. 8); siti rituali di Sequenza 0 per i 9 pathway (aggiunte versionate a
-location_tags).
+**CHIUSA il 2026-09-09**, 21 story (`US-701..721`), 776 test, 5 blocchi
+(0 fondamenta, A cambio Pathway + fusione, B tribolazioni, C Sequenze
+alte/preghiere + siti rituali, D finali + eredita', E checkpoint +
+chiusura). `PathwayChange` + `FusionEngine` (1 percorso completo
+`error_door`, 7 stub); `TribulationSystem` (lettore puro, blocca
+`Progression.avanza` ai 4 salti di fascia); `data/endings.json` (3 finali,
+condizioni dal vocabolario di `conditions.gd`) + `EndingSystem`; schermata
+di finale che estende il colophon; eredita' al personaggio successivo
+(decisione aperta n. 8, ora chiusa) applicata da `GameState.nuova_partita`
+a un nuovo personaggio sullo stesso slot. Save 21 → 22 (un bump).
+
+**Verdetto del checkpoint (US-720)**: l'endgame è dati — un personaggio
+attraversa cambio Pathway con fusione, una tribolazione superata, un
+finale raggiunto e l'eredità riapplicata, senza una riga di codice che
+nomini un Pathway/una fusione/una tribolazione/un finale specifico;
+`scripts/ability_engine.gd` non toccato in tutta la fase.
 
 ---
 
@@ -340,9 +352,12 @@ location_tags).
    gating conoscenza, gating zona, rivale, pressione investigativa).
 7. **Story pathway di fase 5** — 3 story per pathway invece di 1 (limite 200
    righe). La roadmap va aggiornata quando si genera il PRD di fase 5.
-8. **Eredita' tra personaggi** (fase 7) — cosa passa al successivo: oggetto,
-   conoscenza (fog of war del diagramma gia' scoperto), reputazione, o
-   un'Ancora sopravvissuta. Da decidere col PRD di fase 7.
+8. **Eredita' tra personaggi** — **CHIUSA (fase 7, US-719)**: tutte e
+   quattro le voci, ognuna attenuata secondo il profilo del finale —
+   conoscenza sempre (fog of war del diagramma), Ancora scelta a forza
+   dimezzata, reputazione dimezzata e un oggetto scelto (profilo
+   "completo"). `GameState.nuova_partita` la applica a un nuovo
+   personaggio sullo stesso slot.
 9. **Antagonista / detentore della Sequenza 0** — **CHIUSA (fase 6, US-620)**:
    strutturale. È il detentore precedente della Sequenza 0 del Pathway del
    giocatore, uno per Pathway in `data/lore/antagonisti.json`; nessun boss
@@ -381,3 +396,9 @@ location_tags).
 | Schema sinergie (2) | `data/synergies/batch_5.json` | 6 sinergie del gruppo Lord of Mysteries (5 + 1 anti) | fase 5b (US-5B11); `anti_due_bugiardi` neutralizza `sinergia_ladro_di_poteri` |
 | Tipi di pagina del libro | `data/schema/page_types.json` | 9 (+`page_dialogo`) | esteso fase 6 (US-613b) |
 | Audio del mondo | `data/audio.json` (`music.ambienti`, `music.layer`) | 5 zone giorno/notte + struttura a stem | spec fase 6 (US-619) — nessun file audio prodotto |
+| Percorsi di fusione | `data/schema/fusion.schema.json` + `data/fusions/` | 8 (1 completo `error_door`, 7 stub) | chiuso, fase 7 (US-702/706) |
+| Effetti delle tribolazioni | `data/schema/tribulation_effects.json` | 4 (`spiritualita_dimezzata`, `follia_accelerata`, `nemici_rinforzati`, `abilita_bloccate`, `notte_perenne`) | chiuso, fase 7 (US-703) |
+| Tribolazioni | `data/schema/tribulation.schema.json` + `data/tribulations/` | 4 (una per salto di fascia 7/5/3/1) | chiuso, fase 7 (US-710) |
+| Effetti delle preghiere | `data/schema/prayer_effects.json` | 4 (`benedizione_seguaci`, `voto_di_autorita`, `intercessione`, `anatema`) | chiuso, fase 7 (US-703) |
+| Finali | `data/schema/ending.schema.json` + `data/endings.json` | 3 (`apoteosi`, `consumazione`, `rinuncia`) fissi; `eredita_profilo` (`completo`/`ancore`/`solo_conoscenza`) | chiuso, fase 7 (US-716) |
+| Campo `endgame` del save | `scripts/endgame_state.gd` | `pathway_precedente`, `fusioni[]`, `tribolazioni_superate[]`, `eredita{}`, `finale` | chiuso, fase 7 (US-701), schema_version 22 |

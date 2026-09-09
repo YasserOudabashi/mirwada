@@ -7534,3 +7534,32 @@ AnchorSystem, FactionSystem, Inventory, GameState) resta dati quanto loro.
 
 Come verificato: python tools/validate_data.py exit 0 (3 warning
 invariati). 776 test headless (775 + 1), tutti verdi. Nessuna regressione.
+
+=== US-721: chiusura fase 7 (Blocco E chiuso) ===
+Documenti aggiornati nello stesso stile delle chiusure precedenti (fase
+6, fase 5b): 006_PRD/roadmap.md (Fase 7 CHIUSA, 21 story, 776 test, i 5
+blocchi e cosa contiene; Fase 8 sbloccata ma opzionale), design-master.md
+(Appendice A fase 7 -> CHIUSA col verdetto; Appendice B decisione n.8
+eredita' -> CHIUSA; Appendice C +6 righe di vocabolari/schema),
+design-npc-quest.md (Atto III, sezione finali, sezione antagonista ->
+REALIZZATO/CHIUSA in fase 7), CLAUDE.md (paragrafo Fase 7 CHIUSA + Fase
+corrente: 8 opzionale/manutenzione), README.md (paragrafo Fase 7 chiusa +
+corretto un refuso preesistente "22 Pathway attivi" -> "10", non legato a
+questa story). tools/validate_data.py: nuovo blocco di chiusura fase 7
+(file di dati esistono, door_error non-stub, i 3 finali esatti presenti).
+
+=== FASE 7 — ENDGAME: CHIUSA (2026-09-09) ===
+21 story (US-701..721), 776 test (erano 713 a fine fase 5b/inizio fase 7).
+5 blocchi: 0 fondamenta (save 21->22), A cambio Pathway + fusione, B
+tribolazioni, C Sequenze alte/preghiere + siti rituali, D finali +
+eredita', E checkpoint + chiusura. Verdetto del checkpoint (US-720):
+l'endgame e' dati - cambio Pathway con fusione, una tribolazione
+superata, un finale raggiunto, l'eredita' riapplicata a un nuovo
+personaggio, tutto senza una riga di codice che nomini un Pathway/una
+fusione/una tribolazione/un finale specifico. ability_engine.gd mai
+toccato in tutta la fase. Come verificato: python tools/validate_data.py
+exit 0, 776 test headless tutti verdi.
+Prossimo: fase 8 (opzionale, Pathway Non-Standard) solo se si decide di
+farla - PRD con /prd quando serve. Altrimenti il progetto e' in
+manutenzione (arte vera, audio, playtest/bilanciamento, decisione IP
+sul repo pubblico - vedi Nota IP in CLAUDE.md).
