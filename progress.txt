@@ -7855,3 +7855,92 @@ COME VERIFICATO.
 
 PROSSIMA STORIA: US-804 — eventi di recitazione emessi con payload vero
 + tg_9_protettore riscritta nei dati (Blocco A).
+
+=== US-804: eventi di recitazione con payload vero + tg_9_protettore (fase 8, Blocco A) ===
+
+COSA FATTO.
+- scripts/enemy.gd: nuovo var pubblico "sequenza" (default 9, sovrascritto
+  dai layout in US-806) — CORREZIONE rispetto all'AC originale ("dalla
+  propria StatsComponent"): verificato che StatsComponent non conserva
+  affatto il numero di Sequenza con cui e' stata configurata (lo usa solo
+  per calcolare le curve e lo scarta), quindi l'ho aggiunto sul nemico
+  stesso, coerente con dove US-806 dovra' comunque scriverlo (l'override
+  del layout). Nuovi _senza_abilita/_senza_subire_danno (default true),
+  azzerati e agganciati ai segnali in _inizia_tracciamento_scontro(),
+  chiamata a ogni ingresso in INSEGUIMENTO (uno scontro nuovo riparte
+  pulito anche se il nemico aveva gia' perso l'aggro prima):
+  AbilityEngine.ability_executed -> se caster e' il bersaglio,
+  _senza_abilita=false; Hurtbox.colpito del player -> se danno>0,
+  _senza_subire_danno=false (la parata perfetta emette con danno 0,
+  quindi NON conta come "subito"). _su_morte ora emette enemy_defeated
+  con {senza_abilita, senza_subire_danno, sequenza_bersaglio, tag_nemico}
+  tutti espliciti (mai {}); tag_nemico legge _cfg.get("tag", "") ->
+  vuoto finche' nessun layout lo imposta (US-806), come previsto dall'AC.
+  tipo_arma rimandato: nessuna Sequenza 9 attiva lo usa.
+- scripts/potion_system.gd: _traccia_item_crafted(item_id, qualita)
+  chiamata da prepara() dopo un successo. CORREZIONE rispetto all'AC
+  originale ("in concoct"): verificato che concoct() e' la pipeline di
+  AVANZAMENTO (Caratteristica + ingredienti -> stato interno _pozione,
+  MAI un Item vero) mentre prepara() e' l'alchimia reale che crea un
+  oggetto in Inventory con una categoria — e' li' che "un oggetto
+  prodotto" ha senso. Coerente con l'esplorazione originale della
+  sessione (che aveva gia' individuato prepara()/forgia(), non concoct(),
+  come i punti giusti) — l'AC scritto da me aveva confuso i due nomi.
+- scripts/forge.gd: stessa _traccia_item_crafted (contratto identico) in
+  forgia(), dopo l'aggiunta in Inventory.
+- scripts/ritual_system.gd: _completa() emette ritual_completed {} (nessun
+  dato di rituale porta oggi un "tipo": il filtro tipo_rituale resta nel
+  vocabolario per quando servira').
+- data/pathways/twilight_giant.json: tg_9_protettore riscritta da
+  damage_absorbed_for_ally (irraggiungibile: nessun alleato in scena in
+  questa fase) a perfect_parry, target 12, filtri {} (NON
+  stesso_combattimento: ho scoperto per caso che tg_8_parate lo usa gia'
+  ma player.gd non lo popola mai nel payload di perfect_parry -> stesso
+  bug di "senza_abilita" ma a Sequenza 8, FUORI SCOPE per questa story,
+  segnalato qui e non toccato). it.json aggiornata sulla chiave esistente
+  (tools/generate_i18n_stubs.py rilanciato: solo riordino alfabetico del
+  resto del file, nessuna traduzione toccata). en.json non ha MAI avuto
+  questa chiave (catalogo EN incompleto per scelta, preesistente, non
+  toccato da questa story).
+- CORREZIONE alla mia stessa affermazione nel PRD ("damage_absorbed_for_
+  ally compare solo in tg_9_protettore nei Pathway attivi"): FALSO,
+  verificato con grep — darkness_6_cura (Sequenza 6) e mother_7_protettore
+  (Sequenza 7) lo usano ancora. Fuori scope per questa story (Sequenze
+  piu' alte, non nel loop Seq9->8 di questo giro): segnalato, non toccato.
+- area_cleared: SOLO IL CONTRATTO documentato (come da AC), nessun codice
+  in region_scene.gd — dipende dai nemici spawnati dal layout, US-806.
+- tests/test_enemy_payload.gd (NUOVO, 5 test): senza_abilita true/false,
+  senza_subire_danno true/false (parata perfetta esclusa), sequenza_
+  bersaglio nel payload e nel filtro _max.
+- tests/test_acting.gd: 1 test nuovo (tg_9_duello_puro avanza solo con
+  senza_abilita:true, non con :false) + _recita_seq9_completa() corretta
+  per il nuovo evento di tg_9_protettore.
+- STESSA correzione propagata a 3 altri file che duplicavano l'helper
+  "completa la recitazione Seq9" indipendentemente (scoperto con un grep
+  mirato, non erano nell'AC ma si sarebbero rotti): test_advancement_
+  gate.gd, test_concoction.gd, test_ritual.gd — tutti e 3 emettevano
+  ancora damage_absorbed_for_ally x300, ora perfect_parry x12.
+
+COME VERIFICATO.
+- python tools/validate_data.py: 0 (3 warning invariati).
+- godot --headless --import: pulito.
+- Suite: 796 test, tutti passati (790 + 6 nuovi). Nessuna regressione
+  (compresi i checkpoint test_slice_fase_*.gd, i grep "zero codice
+  dedicato" restano a 0).
+- VERIFICA A SCHERMO REALE (Xvfb, script di QA non committato): avviato
+  main.tscn, player avvicinato al nemico (che entra DAVVERO in
+  INSEGUIMENTO per prossimita', non forzato), ucciso senza mai lanciare
+  un'abilita'. Screenshot mandati in chat: 1) Recitazione a zero
+  all'avvio, 2) dopo la morte del nemico la barra mostra un riempimento
+  visibile — acting_progress = 0.1167, ESATTAMENTE 1/3 di 0.35 (il peso
+  di tg_9_duello_puro, target 3 kill). Prima di questa story la barra
+  restava vuota per sempre, qualunque cosa si facesse.
+
+COSA RESTA APERTO (dichiarato, non di questa story). tg_8_parate ha lo
+stesso bug di origine di tg_9_duello_puro (filtro mai popolato) ma a
+Sequenza 8 con stesso_combattimento; darkness_6_cura/mother_7_protettore
+restano su damage_absorbed_for_ally irraggiungibile; tipo_arma non
+tracciato; area_cleared resta un contratto, il codice arriva con US-806.
+
+PROSSIMA STORIA: US-805 — formato dei layout + loader + validator +
+Mirwada disegnata a mano (Blocco B, il mondo comincia a popolarsi).

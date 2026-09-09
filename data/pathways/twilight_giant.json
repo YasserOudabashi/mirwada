@@ -56,13 +56,13 @@
         },
         {
           "id": "tg_9_protettore",
-          "evento": "damage_absorbed_for_ally",
+          "evento": "perfect_parry",
           "filtri": {},
-          "target": 300,
+          "target": 12,
           "progresso": 0.35,
           "ripetibile": true,
           "descrizione_i18n": "acting.twilight_giant.tg_9_protettore",
-          "descrizione": "Assorbi 300 danni diretti agli alleati"
+          "descrizione": "Para perfettamente 12 colpi"
         }
       ],
       "potion": {

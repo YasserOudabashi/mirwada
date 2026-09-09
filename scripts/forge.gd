@@ -44,8 +44,21 @@ func forgia(blueprint_id: String) -> Dictionary:
 	var creati: Array = inv.call("aggiungi", out_id, 1)
 	var qualita: String = _qualita_finale(bp)
 	var iid: String = str(creati[0]) if not creati.is_empty() else ""
+	_traccia_item_crafted(out_id, qualita)
 	equip_forgiato.emit(blueprint_id, out_id, qualita)
 	return {"ok": true, "reason": "", "item_id": out_id, "instance_id": iid, "qualita": qualita}
+
+
+## US-804: un oggetto e' stato prodotto (tracked_events.json: categoria,
+## qualita_min). "categoria" viene dai dati dell'item stesso, mai scritta
+## qui. Stesso contratto di PotionSystem._traccia_item_crafted.
+func _traccia_item_crafted(item_id: String, qualita: String) -> void:
+	var et: Node = get_node_or_null("/root/EventTracker")
+	if et == null:
+		return
+	var item: Dictionary = _gd().call("get_item", item_id)
+	et.call("emit_event", "item_crafted",
+		{"categoria": str(item.get("categoria", "")), "qualita": qualita})
 
 
 func _qualita_finale(bp: Dictionary) -> String:
