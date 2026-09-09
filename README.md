@@ -121,6 +121,7 @@ Richiede Godot 4.x e Python 3 (solo per gli strumenti di dati).
 python tools/validate_data.py      # valida tutti i dati, esce 0 se ok
 godot --headless --path . --script res://tests/run_tests.gd   # suite headless, esce 0 se ok
 python tools/generate_pathways.py  # rigenera la spina dorsale dei 10 pathway
+python tools/generate_formula_ingredients.py  # item mancanti per gli ingredienti delle formule
 ```
 
 La suite headless include un test che esegue `tools/validate_data.py`: un

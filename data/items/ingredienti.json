@@ -1,81 +1,4148 @@
 {
   "schema_version": 1,
-  "_comment": "Ingredienti: materia prima di alchimia (US-308+) e del giardino (US-328). Quelli coltivabile:true si possono piantare.",
+  "_comment": "Ingredienti: materia prima di alchimia (US-308+) e del giardino (US-328). Quelli coltivabile:true si possono piantare. US-808: gli ingredienti citati dalle formule (data/potions/formulas.json) sono generati da tools/generate_formula_ingredients.py — non modificarli a mano, rilancia il tool. valore dalla sequenza minima che li cita: 9->3, 8->5, 7->8, 6->12, 5->18, 4->27, 3->40, 2->60, 1->90, 0->120.",
   "items": [
     {
-      "id": "erba_lunare",
+      "id": "acciaio_stellare",
       "categoria": "ingrediente",
-      "name_i18n": "item.erba_lunare",
-      "descrizione_i18n": "item.erba_lunare.desc",
-      "tag": ["luna", "crescita", "pozione"],
+      "name_i18n": "item.acciaio_stellare",
+      "descrizione_i18n": "item.acciaio_stellare.desc",
+      "name": "Acciaio stellare",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Twilight Giant.",
+      "tag": [
+        "forza",
+        "pozione",
+        "stella"
+      ],
       "impilabile": true,
-      "valore": 3,
-      "coltivabile": true
+      "valore": 8
     },
     {
-      "id": "radice_crepuscolo",
+      "id": "acido_da_saggio",
       "categoria": "ingrediente",
-      "name_i18n": "item.radice_crepuscolo",
-      "descrizione_i18n": "item.radice_crepuscolo.desc",
-      "tag": ["decadimento", "ombra"],
+      "name_i18n": "item.acido_da_saggio",
+      "descrizione_i18n": "item.acido_da_saggio.desc",
+      "name": "Acido da saggio",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
       "impilabile": true,
-      "valore": 5
+      "valore": 8
     },
     {
-      "id": "polvere_ossa",
+      "id": "acqua_dello_stige",
       "categoria": "ingrediente",
-      "name_i18n": "item.polvere_ossa",
-      "descrizione_i18n": "item.polvere_ossa.desc",
-      "tag": ["morte", "rituale"],
+      "name_i18n": "item.acqua_dello_stige",
+      "descrizione_i18n": "item.acqua_dello_stige.desc",
+      "name": "Acqua dello stige",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Death.",
+      "tag": [
+        "acqua",
+        "pozione"
+      ],
       "impilabile": true,
-      "valore": 4
+      "valore": 40
     },
     {
-      "id": "fungo_cavernicolo",
+      "id": "acqua_di_fonte_benedetta",
       "categoria": "ingrediente",
-      "name_i18n": "item.fungo_cavernicolo",
-      "descrizione_i18n": "item.fungo_cavernicolo.desc",
-      "tag": ["terra", "follia"],
+      "name_i18n": "item.acqua_di_fonte_benedetta",
+      "descrizione_i18n": "item.acqua_di_fonte_benedetta.desc",
+      "name": "Acqua di fonte benedetta",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Mother.",
+      "tag": [
+        "acqua",
+        "pozione"
+      ],
       "impilabile": true,
-      "valore": 2,
-      "coltivabile": true
+      "valore": 8
+    },
+    {
+      "id": "acqua_di_fonte_cieca",
+      "categoria": "ingrediente",
+      "name_i18n": "item.acqua_di_fonte_cieca",
+      "descrizione_i18n": "item.acqua_di_fonte_cieca.desc",
+      "name": "Acqua di fonte cieca",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Darkness.",
+      "tag": [
+        "acqua",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "acqua_di_un_pozzo_che_non_trovi_piu",
+      "categoria": "ingrediente",
+      "name_i18n": "item.acqua_di_un_pozzo_che_non_trovi_piu",
+      "descrizione_i18n": "item.acqua_di_un_pozzo_che_non_trovi_piu.desc",
+      "name": "Acqua di un pozzo che non trovi più",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Door.",
+      "tag": [
+        "acqua",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
     },
     {
       "id": "acqua_sorgiva",
       "categoria": "ingrediente",
       "name_i18n": "item.acqua_sorgiva",
       "descrizione_i18n": "item.acqua_sorgiva.desc",
-      "tag": ["acqua", "purificazione"],
+      "tag": [
+        "acqua",
+        "purificazione"
+      ],
       "impilabile": true,
       "valore": 1
     },
     {
-      "id": "petalo_solare",
+      "id": "ago_che_cuce_il_fato",
       "categoria": "ingrediente",
-      "name_i18n": "item.petalo_solare",
-      "descrizione_i18n": "item.petalo_solare.desc",
-      "tag": ["luce", "guarigione"],
+      "name_i18n": "item.ago_che_cuce_il_fato",
+      "descrizione_i18n": "item.ago_che_cuce_il_fato.desc",
+      "name": "Ago che cuce il fato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Hermit.",
+      "tag": [
+        "destino",
+        "pozione"
+      ],
       "impilabile": true,
-      "valore": 4,
+      "valore": 90
+    },
+    {
+      "id": "ala_di_falena_crepuscolare",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ala_di_falena_crepuscolare",
+      "descrizione_i18n": "item.ala_di_falena_crepuscolare.desc",
+      "name": "Ala di falena crepuscolare",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "ambra_grigia",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ambra_grigia",
+      "descrizione_i18n": "item.ambra_grigia.desc",
+      "name": "Ambra grigia",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Moon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "angolo_di_stanza_che_non_esiste",
+      "categoria": "ingrediente",
+      "name_i18n": "item.angolo_di_stanza_che_non_esiste",
+      "descrizione_i18n": "item.angolo_di_stanza_che_non_esiste.desc",
+      "name": "Angolo di stanza che non esiste",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Fool.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "argento_annerito",
+      "categoria": "ingrediente",
+      "name_i18n": "item.argento_annerito",
+      "descrizione_i18n": "item.argento_annerito.desc",
+      "name": "Argento annerito",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Moon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "argento_benedetto",
+      "categoria": "ingrediente",
+      "name_i18n": "item.argento_benedetto",
+      "descrizione_i18n": "item.argento_benedetto.desc",
+      "name": "Argento benedetto",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "argilla_rossa_del_fiume",
+      "categoria": "ingrediente",
+      "name_i18n": "item.argilla_rossa_del_fiume",
+      "descrizione_i18n": "item.argilla_rossa_del_fiume.desc",
+      "name": "Argilla rossa del fiume",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Mother.",
+      "tag": [
+        "pozione",
+        "terra"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "articolazione_di_marionetta",
+      "categoria": "ingrediente",
+      "name_i18n": "item.articolazione_di_marionetta",
+      "descrizione_i18n": "item.articolazione_di_marionetta.desc",
+      "name": "Articolazione di marionetta",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Fool.",
+      "tag": [
+        "inganno",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "asso_sempre_in_cima_al_mazzo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.asso_sempre_in_cima_al_mazzo",
+      "descrizione_i18n": "item.asso_sempre_in_cima_al_mazzo.desc",
+      "name": "Asso sempre in cima al mazzo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Fool.",
+      "tag": [
+        "fortuna",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "astrolabio_tascabile",
+      "categoria": "ingrediente",
+      "name_i18n": "item.astrolabio_tascabile",
+      "descrizione_i18n": "item.astrolabio_tascabile.desc",
+      "name": "Astrolabio tascabile",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Hermit.",
+      "tag": [
+        "pozione",
+        "stella"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "balsamo_di_silenzio",
+      "categoria": "ingrediente",
+      "name_i18n": "item.balsamo_di_silenzio",
+      "descrizione_i18n": "item.balsamo_di_silenzio.desc",
+      "name": "Balsamo di silenzio",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Darkness.",
+      "tag": [
+        "pozione",
+        "silenzioso"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "battuta_finale_mai_detta",
+      "categoria": "ingrediente",
+      "name_i18n": "item.battuta_finale_mai_detta",
+      "descrizione_i18n": "item.battuta_finale_mai_detta.desc",
+      "name": "Battuta finale mai detta",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Fool.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "biglietto_della_lotteria_vincente",
+      "categoria": "ingrediente",
+      "name_i18n": "item.biglietto_della_lotteria_vincente",
+      "descrizione_i18n": "item.biglietto_della_lotteria_vincente.desc",
+      "name": "Biglietto della lotteria vincente",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Fool.",
+      "tag": [
+        "fortuna",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "biglietto_di_sola_andata_e_ritorno",
+      "categoria": "ingrediente",
+      "name_i18n": "item.biglietto_di_sola_andata_e_ritorno",
+      "descrizione_i18n": "item.biglietto_di_sola_andata_e_ritorno.desc",
+      "name": "Biglietto di sola andata e ritorno",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "bilancia_di_precisione",
+      "categoria": "ingrediente",
+      "name_i18n": "item.bilancia_di_precisione",
+      "descrizione_i18n": "item.bilancia_di_precisione.desc",
+      "name": "Bilancia di precisione",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "bussola_che_punta_a_dove_vuoi_tu",
+      "categoria": "ingrediente",
+      "name_i18n": "item.bussola_che_punta_a_dove_vuoi_tu",
+      "descrizione_i18n": "item.bussola_che_punta_a_dove_vuoi_tu.desc",
+      "name": "Bussola che punta a dove vuoi tu",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Door.",
+      "tag": [
+        "divinazione",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "calice_incrinato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.calice_incrinato",
+      "descrizione_i18n": "item.calice_incrinato.desc",
+      "name": "Calice incrinato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Moon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "campana_incrinata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.campana_incrinata",
+      "descrizione_i18n": "item.campana_incrinata.desc",
+      "name": "Campana incrinata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "cappello_a_cilindro_senza_fondo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cappello_a_cilindro_senza_fondo",
+      "descrizione_i18n": "item.cappello_a_cilindro_senza_fondo.desc",
+      "name": "Cappello a cilindro senza fondo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Fool.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "caratteristica_del_gigante",
+      "categoria": "ingrediente",
+      "name_i18n": "item.caratteristica_del_gigante",
+      "descrizione_i18n": "item.caratteristica_del_gigante.desc",
+      "name": "Caratteristica del gigante",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Twilight Giant.",
+      "tag": [
+        "forza",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "cardine_arrugginito_di_una_porta_perduta",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cardine_arrugginito_di_una_porta_perduta",
+      "descrizione_i18n": "item.cardine_arrugginito_di_una_porta_perduta.desc",
+      "name": "Cardine arrugginito di una porta perduta",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "cardine_del_cielo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cardine_del_cielo",
+      "descrizione_i18n": "item.cardine_del_cielo.desc",
+      "name": "Cardine del cielo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Door.",
+      "tag": [
+        "pozione",
+        "stella"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "carta_carbone_dell_anima",
+      "categoria": "ingrediente",
+      "name_i18n": "item.carta_carbone_dell_anima",
+      "descrizione_i18n": "item.carta_carbone_dell_anima.desc",
+      "name": "Carta carbone dell'anima",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Door.",
+      "tag": [
+        "anima",
+        "destino",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "carta_millimetrata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.carta_millimetrata",
+      "descrizione_i18n": "item.carta_millimetrata.desc",
+      "name": "Carta millimetrata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Paragon.",
+      "tag": [
+        "destino",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "carta_stellare_con_una_stella_in_piu",
+      "categoria": "ingrediente",
+      "name_i18n": "item.carta_stellare_con_una_stella_in_piu",
+      "descrizione_i18n": "item.carta_stellare_con_una_stella_in_piu.desc",
+      "name": "Carta stellare con una stella in più",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Door.",
+      "tag": [
+        "destino",
+        "pozione",
+        "stella"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "catalizzatore_proibito",
+      "categoria": "ingrediente",
+      "name_i18n": "item.catalizzatore_proibito",
+      "descrizione_i18n": "item.catalizzatore_proibito.desc",
+      "name": "Catalizzatore proibito",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "cavillo_primordiale",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cavillo_primordiale",
+      "descrizione_i18n": "item.cavillo_primordiale.desc",
+      "name": "Cavillo primordiale",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "cellula_madre",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cellula_madre",
+      "descrizione_i18n": "item.cellula_madre.desc",
+      "name": "Cellula madre",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Mother.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "cenere_di_bosco",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cenere_di_bosco",
+      "descrizione_i18n": "item.cenere_di_bosco.desc",
+      "name": "Cenere di bosco",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Mother.",
+      "tag": [
+        "pozione",
+        "terra"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "cenere_di_re",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cenere_di_re",
+      "descrizione_i18n": "item.cenere_di_re.desc",
+      "name": "Cenere di re",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Death.",
+      "tag": [
+        "pozione",
+        "terra"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "cenere_di_spirito",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cenere_di_spirito",
+      "descrizione_i18n": "item.cenere_di_spirito.desc",
+      "name": "Cenere di spirito",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Twilight Giant.",
+      "tag": [
+        "pozione",
+        "spirito",
+        "terra"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "cenere_di_stella_morta",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cenere_di_stella_morta",
+      "descrizione_i18n": "item.cenere_di_stella_morta.desc",
+      "name": "Cenere di stella morta",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Darkness.",
+      "tag": [
+        "pozione",
+        "stella",
+        "terra"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "cera_di_candela_rituale",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cera_di_candela_rituale",
+      "descrizione_i18n": "item.cera_di_candela_rituale.desc",
+      "name": "Cera di candela rituale",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Hermit.",
+      "tag": [
+        "pozione",
+        "rituale"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "cera_di_veglia",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cera_di_veglia",
+      "descrizione_i18n": "item.cera_di_veglia.desc",
+      "name": "Cera di veglia",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Death.",
+      "tag": [
+        "pozione",
+        "sonno"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "cerone_da_palcoscenico",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cerone_da_palcoscenico",
+      "descrizione_i18n": "item.cerone_da_palcoscenico.desc",
+      "name": "Cerone da palcoscenico",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Fool.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "chiave_che_chiude_e_non_apre",
+      "categoria": "ingrediente",
+      "name_i18n": "item.chiave_che_chiude_e_non_apre",
+      "descrizione_i18n": "item.chiave_che_chiude_e_non_apre.desc",
+      "name": "Chiave che chiude e non apre",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "chiave_d_ossa",
+      "categoria": "ingrediente",
+      "name_i18n": "item.chiave_d_ossa",
+      "descrizione_i18n": "item.chiave_d_ossa.desc",
+      "name": "Chiave d'ossa",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Death.",
+      "tag": [
+        "morte",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "chiave_dell_oltretomba",
+      "categoria": "ingrediente",
+      "name_i18n": "item.chiave_dell_oltretomba",
+      "descrizione_i18n": "item.chiave_dell_oltretomba.desc",
+      "name": "Chiave dell'oltretomba",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Death.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "chiave_di_cifrario",
+      "categoria": "ingrediente",
+      "name_i18n": "item.chiave_di_cifrario",
+      "descrizione_i18n": "item.chiave_di_cifrario.desc",
+      "name": "Chiave di cifrario",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Error.",
+      "tag": [
+        "conoscenza",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "chiave_di_ogni_serratura",
+      "categoria": "ingrediente",
+      "name_i18n": "item.chiave_di_ogni_serratura",
+      "descrizione_i18n": "item.chiave_di_ogni_serratura.desc",
+      "name": "Chiave di ogni serratura",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "chiave_di_soluzione",
+      "categoria": "ingrediente",
+      "name_i18n": "item.chiave_di_soluzione",
+      "descrizione_i18n": "item.chiave_di_soluzione.desc",
+      "name": "Chiave di soluzione",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "chiave_fatta_di_luce_di_stella",
+      "categoria": "ingrediente",
+      "name_i18n": "item.chiave_fatta_di_luce_di_stella",
+      "descrizione_i18n": "item.chiave_fatta_di_luce_di_stella.desc",
+      "name": "Chiave fatta di luce di stella",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Door.",
+      "tag": [
+        "luce",
+        "pozione",
+        "stella"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "chiave_senza_denti",
+      "categoria": "ingrediente",
+      "name_i18n": "item.chiave_senza_denti",
+      "descrizione_i18n": "item.chiave_senza_denti.desc",
+      "name": "Chiave senza denti",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "chiodo_arrugginito_di_forca",
+      "categoria": "ingrediente",
+      "name_i18n": "item.chiodo_arrugginito_di_forca",
+      "descrizione_i18n": "item.chiodo_arrugginito_di_forca.desc",
+      "name": "Chiodo arrugginito di forca",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Darkness.",
+      "tag": [
+        "morte",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "chiodo_di_bara",
+      "categoria": "ingrediente",
+      "name_i18n": "item.chiodo_di_bara",
+      "descrizione_i18n": "item.chiodo_di_bara.desc",
+      "name": "Chiodo di bara",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Darkness.",
+      "tag": [
+        "morte",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "chiodo_di_ferro_freddo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.chiodo_di_ferro_freddo",
+      "descrizione_i18n": "item.chiodo_di_ferro_freddo.desc",
+      "name": "Chiodo di ferro freddo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Hermit.",
+      "tag": [
+        "forza",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "chiodo_nell_ingranaggio_del_fato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.chiodo_nell_ingranaggio_del_fato",
+      "descrizione_i18n": "item.chiodo_nell_ingranaggio_del_fato.desc",
+      "name": "Chiodo nell'ingranaggio del fato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Error.",
+      "tag": [
+        "destino",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "cilindro_a_doppio_fondo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cilindro_a_doppio_fondo",
+      "descrizione_i18n": "item.cilindro_a_doppio_fondo.desc",
+      "name": "Cilindro a doppio fondo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Fool.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "clessidra_che_cola_all_indietro",
+      "categoria": "ingrediente",
+      "name_i18n": "item.clessidra_che_cola_all_indietro",
+      "descrizione_i18n": "item.clessidra_che_cola_all_indietro.desc",
+      "name": "Clessidra che cola all'indietro",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Error.",
+      "tag": [
+        "pozione",
+        "tempo"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "codice_della_vita_inciso",
+      "categoria": "ingrediente",
+      "name_i18n": "item.codice_della_vita_inciso",
+      "descrizione_i18n": "item.codice_della_vita_inciso.desc",
+      "name": "Codice della vita inciso",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Mother.",
+      "tag": [
+        "conoscenza",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "colomba_che_non_esiste",
+      "categoria": "ingrediente",
+      "name_i18n": "item.colomba_che_non_esiste",
+      "descrizione_i18n": "item.colomba_che_non_esiste.desc",
+      "name": "Colomba che non esiste",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Fool.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "contratto_con_la_clausola_nascosta",
+      "categoria": "ingrediente",
+      "name_i18n": "item.contratto_con_la_clausola_nascosta",
+      "descrizione_i18n": "item.contratto_con_la_clausola_nascosta.desc",
+      "name": "Contratto con la clausola nascosta",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Error.",
+      "tag": [
+        "contratto",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "copione_del_mondo_con_le_correzioni",
+      "categoria": "ingrediente",
+      "name_i18n": "item.copione_del_mondo_con_le_correzioni",
+      "descrizione_i18n": "item.copione_del_mondo_con_le_correzioni.desc",
+      "name": "Copione del mondo con le correzioni",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Fool.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "corda_di_impiccato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.corda_di_impiccato",
+      "descrizione_i18n": "item.corda_di_impiccato.desc",
+      "name": "Corda di impiccato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "corno_di_alce_spettrale",
+      "categoria": "ingrediente",
+      "name_i18n": "item.corno_di_alce_spettrale",
+      "descrizione_i18n": "item.corno_di_alce_spettrale.desc",
+      "name": "Corno di alce spettrale",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Moon.",
+      "tag": [
+        "pozione",
+        "spirito"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "corona_di_ossa",
+      "categoria": "ingrediente",
+      "name_i18n": "item.corona_di_ossa",
+      "descrizione_i18n": "item.corona_di_ossa.desc",
+      "name": "Corona di ossa",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Death.",
+      "tag": [
+        "morte",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "corona_di_papavero_nero",
+      "categoria": "ingrediente",
+      "name_i18n": "item.corona_di_papavero_nero",
+      "descrizione_i18n": "item.corona_di_papavero_nero.desc",
+      "name": "Corona di papavero nero",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "corteccia_febbrifuga",
+      "categoria": "ingrediente",
+      "name_i18n": "item.corteccia_febbrifuga",
+      "descrizione_i18n": "item.corteccia_febbrifuga.desc",
+      "name": "Corteccia febbrifuga",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Mother.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "costante_universale_incrinata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.costante_universale_incrinata",
+      "descrizione_i18n": "item.costante_universale_incrinata.desc",
+      "name": "Costante universale incrinata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "creta_del_primo_uomo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.creta_del_primo_uomo",
+      "descrizione_i18n": "item.creta_del_primo_uomo.desc",
+      "name": "Creta del primo uomo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Error.",
+      "tag": [
+        "pozione",
+        "terra"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "cristallo_di_riferimento",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cristallo_di_riferimento",
+      "descrizione_i18n": "item.cristallo_di_riferimento.desc",
+      "name": "Cristallo di riferimento",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "cristallo_mnemonico",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cristallo_mnemonico",
+      "descrizione_i18n": "item.cristallo_mnemonico.desc",
+      "name": "Cristallo mnemonico",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "croce_di_legno_del_burattinaio",
+      "categoria": "ingrediente",
+      "name_i18n": "item.croce_di_legno_del_burattinaio",
+      "descrizione_i18n": "item.croce_di_legno_del_burattinaio.desc",
+      "name": "Croce di legno del burattinaio",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Fool.",
+      "tag": [
+        "inganno",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "crogiolo_indistruttibile",
+      "categoria": "ingrediente",
+      "name_i18n": "item.crogiolo_indistruttibile",
+      "descrizione_i18n": "item.crogiolo_indistruttibile.desc",
+      "name": "Crogiolo indistruttibile",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "cuore_che_non_si_ferma",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cuore_che_non_si_ferma",
+      "descrizione_i18n": "item.cuore_che_non_si_ferma.desc",
+      "name": "Cuore che non si ferma",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Death.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "cuore_condiviso",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cuore_condiviso",
+      "descrizione_i18n": "item.cuore_condiviso.desc",
+      "name": "Cuore condiviso",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "cuore_del_pianeta",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cuore_del_pianeta",
+      "descrizione_i18n": "item.cuore_del_pianeta.desc",
+      "name": "Cuore del pianeta",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Mother.",
+      "tag": [
+        "pozione",
+        "stella"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "cuore_di_montagna",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cuore_di_montagna",
+      "descrizione_i18n": "item.cuore_di_montagna.desc",
+      "name": "Cuore di montagna",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "cuore_di_quercia_madre",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cuore_di_quercia_madre",
+      "descrizione_i18n": "item.cuore_di_quercia_madre.desc",
+      "name": "Cuore di quercia madre",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Moon.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "cuscino_di_un_dormiente_inquieto",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cuscino_di_un_dormiente_inquieto",
+      "descrizione_i18n": "item.cuscino_di_un_dormiente_inquieto.desc",
+      "name": "Cuscino di un dormiente inquieto",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Error.",
+      "tag": [
+        "pozione",
+        "sonno"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "dado_truccato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.dado_truccato",
+      "descrizione_i18n": "item.dado_truccato.desc",
+      "name": "Dado truccato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Error.",
+      "tag": [
+        "fortuna",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "dente_di_teschio",
+      "categoria": "ingrediente",
+      "name_i18n": "item.dente_di_teschio",
+      "descrizione_i18n": "item.dente_di_teschio.desc",
+      "name": "Dente di teschio",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Death.",
+      "tag": [
+        "morte",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "distanza_ridotta_a_zero",
+      "categoria": "ingrediente",
+      "name_i18n": "item.distanza_ridotta_a_zero",
+      "descrizione_i18n": "item.distanza_ridotta_a_zero.desc",
+      "name": "Distanza ridotta a zero",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "domanda_senza_risposta",
+      "categoria": "ingrediente",
+      "name_i18n": "item.domanda_senza_risposta",
+      "descrizione_i18n": "item.domanda_senza_risposta.desc",
+      "name": "Domanda senza risposta",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "eco_di_un_istante_gia_passato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.eco_di_un_istante_gia_passato",
+      "descrizione_i18n": "item.eco_di_un_istante_gia_passato.desc",
+      "name": "Eco di un istante già passato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Error.",
+      "tag": [
+        "pozione",
+        "spirito"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "eco_di_un_potere_visto_una_volta_sola",
+      "categoria": "ingrediente",
+      "name_i18n": "item.eco_di_un_potere_visto_una_volta_sola",
+      "descrizione_i18n": "item.eco_di_un_potere_visto_una_volta_sola.desc",
+      "name": "Eco di un potere visto una volta sola",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Door.",
+      "tag": [
+        "pozione",
+        "spirito"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "ectoplasma",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ectoplasma",
+      "descrizione_i18n": "item.ectoplasma.desc",
+      "name": "Ectoplasma",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Death.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "enzima_dormiente",
+      "categoria": "ingrediente",
+      "name_i18n": "item.enzima_dormiente",
+      "descrizione_i18n": "item.enzima_dormiente.desc",
+      "name": "Enzima dormiente",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Mother.",
+      "tag": [
+        "pozione",
+        "sonno"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "erba_lunare",
+      "categoria": "ingrediente",
+      "name_i18n": "item.erba_lunare",
+      "descrizione_i18n": "item.erba_lunare.desc",
+      "tag": [
+        "luna",
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3,
       "coltivabile": true
     },
     {
-      "id": "sangue_di_lupo",
+      "id": "essenza_di_biblioteca",
       "categoria": "ingrediente",
-      "name_i18n": "item.sangue_di_lupo",
-      "descrizione_i18n": "item.sangue_di_lupo.desc",
-      "tag": ["sangue", "bestia", "forza"],
+      "name_i18n": "item.essenza_di_biblioteca",
+      "descrizione_i18n": "item.essenza_di_biblioteca.desc",
+      "name": "Essenza di biblioteca",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
       "impilabile": true,
-      "valore": 6
+      "valore": 60
+    },
+    {
+      "id": "essenza_spettrale",
+      "categoria": "ingrediente",
+      "name_i18n": "item.essenza_spettrale",
+      "descrizione_i18n": "item.essenza_spettrale.desc",
+      "name": "Essenza spettrale",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Death.",
+      "tag": [
+        "pozione",
+        "spirito"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "estratto_di_muscolo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.estratto_di_muscolo",
+      "descrizione_i18n": "item.estratto_di_muscolo.desc",
+      "name": "Estratto di muscolo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "favilla_del_titano_incatenato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.favilla_del_titano_incatenato",
+      "descrizione_i18n": "item.favilla_del_titano_incatenato.desc",
+      "name": "Favilla del titano incatenato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "fegato_sempre_rigenerato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.fegato_sempre_rigenerato",
+      "descrizione_i18n": "item.fegato_sempre_rigenerato.desc",
+      "name": "Fegato sempre rigenerato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "ferro_delle_lapidi",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ferro_delle_lapidi",
+      "descrizione_i18n": "item.ferro_delle_lapidi.desc",
+      "name": "Ferro delle lapidi",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Death.",
+      "tag": [
+        "forza",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "ferro_temperato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ferro_temperato",
+      "descrizione_i18n": "item.ferro_temperato.desc",
+      "name": "Ferro temperato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Twilight Giant.",
+      "tag": [
+        "forza",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "fiala_di_luna_piena",
+      "categoria": "ingrediente",
+      "name_i18n": "item.fiala_di_luna_piena",
+      "descrizione_i18n": "item.fiala_di_luna_piena.desc",
+      "name": "Fiala di luna piena",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Moon.",
+      "tag": [
+        "luna",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "fiele_di_demone",
+      "categoria": "ingrediente",
+      "name_i18n": "item.fiele_di_demone",
+      "descrizione_i18n": "item.fiele_di_demone.desc",
+      "name": "Fiele di demone",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "filo_d_argento_lunare",
+      "categoria": "ingrediente",
+      "name_i18n": "item.filo_d_argento_lunare",
+      "descrizione_i18n": "item.filo_d_argento_lunare.desc",
+      "name": "Filo d'argento lunare",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Moon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "filo_del_burattinaio",
+      "categoria": "ingrediente",
+      "name_i18n": "item.filo_del_burattinaio",
+      "descrizione_i18n": "item.filo_del_burattinaio.desc",
+      "name": "Filo del burattinaio",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Error.",
+      "tag": [
+        "inganno",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "filo_dell_oblio",
+      "categoria": "ingrediente",
+      "name_i18n": "item.filo_dell_oblio",
+      "descrizione_i18n": "item.filo_dell_oblio.desc",
+      "name": "Filo dell'oblio",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "filo_delle_parche",
+      "categoria": "ingrediente",
+      "name_i18n": "item.filo_delle_parche",
+      "descrizione_i18n": "item.filo_delle_parche.desc",
+      "name": "Filo delle parche",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Death.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "filo_di_lana_rossa",
+      "categoria": "ingrediente",
+      "name_i18n": "item.filo_di_lana_rossa",
+      "descrizione_i18n": "item.filo_di_lana_rossa.desc",
+      "name": "Filo di lana rossa",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "filo_di_lutto",
+      "categoria": "ingrediente",
+      "name_i18n": "item.filo_di_lutto",
+      "descrizione_i18n": "item.filo_di_lutto.desc",
+      "name": "Filo di lutto",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "filo_reciso_dalle_parche",
+      "categoria": "ingrediente",
+      "name_i18n": "item.filo_reciso_dalle_parche",
+      "descrizione_i18n": "item.filo_reciso_dalle_parche.desc",
+      "name": "Filo reciso dalle parche",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "filo_spirituale_annodato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.filo_spirituale_annodato",
+      "descrizione_i18n": "item.filo_spirituale_annodato.desc",
+      "name": "Filo spirituale annodato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Fool.",
+      "tag": [
+        "pozione",
+        "spirito"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "filo_teso_tra_due_stanze",
+      "categoria": "ingrediente",
+      "name_i18n": "item.filo_teso_tra_due_stanze",
+      "descrizione_i18n": "item.filo_teso_tra_due_stanze.desc",
+      "name": "Filo teso tra due stanze",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "fiore_che_sboccia_solo_di_notte",
+      "categoria": "ingrediente",
+      "name_i18n": "item.fiore_che_sboccia_solo_di_notte",
+      "descrizione_i18n": "item.fiore_che_sboccia_solo_di_notte.desc",
+      "name": "Fiore che sboccia solo di notte",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Moon.",
+      "tag": [
+        "crescita",
+        "notte",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "fiore_di_camomilla_selvatica",
+      "categoria": "ingrediente",
+      "name_i18n": "item.fiore_di_camomilla_selvatica",
+      "descrizione_i18n": "item.fiore_di_camomilla_selvatica.desc",
+      "name": "Fiore di camomilla selvatica",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Mother.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "fiore_di_luna",
+      "categoria": "ingrediente",
+      "name_i18n": "item.fiore_di_luna",
+      "descrizione_i18n": "item.fiore_di_luna.desc",
+      "name": "Fiore di luna",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Moon.",
+      "tag": [
+        "crescita",
+        "luna",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "frammento_di_alba",
+      "categoria": "ingrediente",
+      "name_i18n": "item.frammento_di_alba",
+      "descrizione_i18n": "item.frammento_di_alba.desc",
+      "name": "Frammento di alba",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "frammento_di_cielo_notturno",
+      "categoria": "ingrediente",
+      "name_i18n": "item.frammento_di_cielo_notturno",
+      "descrizione_i18n": "item.frammento_di_cielo_notturno.desc",
+      "name": "Frammento di cielo notturno",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Hermit.",
+      "tag": [
+        "pozione",
+        "stella"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "frammento_di_luna",
+      "categoria": "ingrediente",
+      "name_i18n": "item.frammento_di_luna",
+      "descrizione_i18n": "item.frammento_di_luna.desc",
+      "name": "Frammento di luna",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Moon.",
+      "tag": [
+        "luna",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "frammento_di_notte_primordiale",
+      "categoria": "ingrediente",
+      "name_i18n": "item.frammento_di_notte_primordiale",
+      "descrizione_i18n": "item.frammento_di_notte_primordiale.desc",
+      "name": "Frammento di notte primordiale",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Darkness.",
+      "tag": [
+        "notte",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "frammento_di_tavoletta",
+      "categoria": "ingrediente",
+      "name_i18n": "item.frammento_di_tavoletta",
+      "descrizione_i18n": "item.frammento_di_tavoletta.desc",
+      "name": "Frammento di tavoletta",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "frammento_di_una_porta_tra_i_mondi",
+      "categoria": "ingrediente",
+      "name_i18n": "item.frammento_di_una_porta_tra_i_mondi",
+      "descrizione_i18n": "item.frammento_di_una_porta_tra_i_mondi.desc",
+      "name": "Frammento di una porta tra i mondi",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "fungo_a_specchio",
+      "categoria": "ingrediente",
+      "name_i18n": "item.fungo_a_specchio",
+      "descrizione_i18n": "item.fungo_a_specchio.desc",
+      "name": "Fungo a specchio",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Mother.",
+      "tag": [
+        "pozione",
+        "specchio"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "fungo_cavernicolo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.fungo_cavernicolo",
+      "descrizione_i18n": "item.fungo_cavernicolo.desc",
+      "tag": [
+        "terra",
+        "follia"
+      ],
+      "impilabile": true,
+      "valore": 2,
+      "coltivabile": true
+    },
+    {
+      "id": "gessetto_che_disegna_porte",
+      "categoria": "ingrediente",
+      "name_i18n": "item.gessetto_che_disegna_porte",
+      "descrizione_i18n": "item.gessetto_che_disegna_porte.desc",
+      "name": "Gessetto che disegna porte",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "gesso_consacrato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.gesso_consacrato",
+      "descrizione_i18n": "item.gesso_consacrato.desc",
+      "name": "Gesso consacrato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "ghianda_millenaria",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ghianda_millenaria",
+      "descrizione_i18n": "item.ghianda_millenaria.desc",
+      "name": "Ghianda millenaria",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Mother.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "goccia_di_linfa",
+      "categoria": "ingrediente",
+      "name_i18n": "item.goccia_di_linfa",
+      "descrizione_i18n": "item.goccia_di_linfa.desc",
+      "name": "Goccia di linfa",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Mother.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "goccia_di_prima_pioggia",
+      "categoria": "ingrediente",
+      "name_i18n": "item.goccia_di_prima_pioggia",
+      "descrizione_i18n": "item.goccia_di_prima_pioggia.desc",
+      "name": "Goccia di prima pioggia",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Moon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "grimaldello_cantante",
+      "categoria": "ingrediente",
+      "name_i18n": "item.grimaldello_cantante",
+      "descrizione_i18n": "item.grimaldello_cantante.desc",
+      "name": "Grimaldello cantante",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "grimorio_bianco",
+      "categoria": "ingrediente",
+      "name_i18n": "item.grimorio_bianco",
+      "descrizione_i18n": "item.grimorio_bianco.desc",
+      "name": "Grimorio bianco",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "guanto_del_borseggiatore",
+      "categoria": "ingrediente",
+      "name_i18n": "item.guanto_del_borseggiatore",
+      "descrizione_i18n": "item.guanto_del_borseggiatore.desc",
+      "name": "Guanto del borseggiatore",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "il_confine_del_mondo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.il_confine_del_mondo",
+      "descrizione_i18n": "item.il_confine_del_mondo.desc",
+      "name": "Il confine del mondo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Death.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "incenso_dei_riti",
+      "categoria": "ingrediente",
+      "name_i18n": "item.incenso_dei_riti",
+      "descrizione_i18n": "item.incenso_dei_riti.desc",
+      "name": "Incenso dei riti",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Death.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "incenso_di_cenere",
+      "categoria": "ingrediente",
+      "name_i18n": "item.incenso_di_cenere",
+      "descrizione_i18n": "item.incenso_di_cenere.desc",
+      "name": "Incenso di cenere",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Darkness.",
+      "tag": [
+        "pozione",
+        "terra"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "incenso_di_mirra",
+      "categoria": "ingrediente",
+      "name_i18n": "item.incenso_di_mirra",
+      "descrizione_i18n": "item.incenso_di_mirra.desc",
+      "name": "Incenso di mirra",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "inchiostro_che_copia_da_solo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.inchiostro_che_copia_da_solo",
+      "descrizione_i18n": "item.inchiostro_che_copia_da_solo.desc",
+      "name": "Inchiostro che copia da solo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "inchiostro_che_non_si_cancella",
+      "categoria": "ingrediente",
+      "name_i18n": "item.inchiostro_che_non_si_cancella",
+      "descrizione_i18n": "item.inchiostro_che_non_si_cancella.desc",
+      "name": "Inchiostro che non si cancella",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "inchiostro_di_due_mondi",
+      "categoria": "ingrediente",
+      "name_i18n": "item.inchiostro_di_due_mondi",
+      "descrizione_i18n": "item.inchiostro_di_due_mondi.desc",
+      "name": "Inchiostro di due mondi",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "inchiostro_di_seppia_abissale",
+      "categoria": "ingrediente",
+      "name_i18n": "item.inchiostro_di_seppia_abissale",
+      "descrizione_i18n": "item.inchiostro_di_seppia_abissale.desc",
+      "name": "Inchiostro di seppia abissale",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "inchiostro_ferrogallico",
+      "categoria": "ingrediente",
+      "name_i18n": "item.inchiostro_ferrogallico",
+      "descrizione_i18n": "item.inchiostro_ferrogallico.desc",
+      "name": "Inchiostro ferrogallico",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "inchiostro_luminescente",
+      "categoria": "ingrediente",
+      "name_i18n": "item.inchiostro_luminescente",
+      "descrizione_i18n": "item.inchiostro_luminescente.desc",
+      "name": "Inchiostro luminescente",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "inchiostro_simpatico_rubato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.inchiostro_simpatico_rubato",
+      "descrizione_i18n": "item.inchiostro_simpatico_rubato.desc",
+      "name": "Inchiostro simpatico rubato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "inchiostro_stellare",
+      "categoria": "ingrediente",
+      "name_i18n": "item.inchiostro_stellare",
+      "descrizione_i18n": "item.inchiostro_stellare.desc",
+      "name": "Inchiostro stellare",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Paragon.",
+      "tag": [
+        "pozione",
+        "stella"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "ingranaggio_di_precisione",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ingranaggio_di_precisione",
+      "descrizione_i18n": "item.ingranaggio_di_precisione.desc",
+      "name": "Ingranaggio di precisione",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "lacrima_di_amante",
+      "categoria": "ingrediente",
+      "name_i18n": "item.lacrima_di_amante",
+      "descrizione_i18n": "item.lacrima_di_amante.desc",
+      "name": "Lacrima di amante",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Moon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
     },
     {
       "id": "lacrima_di_luna",
       "categoria": "ingrediente",
       "name_i18n": "item.lacrima_di_luna",
       "descrizione_i18n": "item.lacrima_di_luna.desc",
-      "tag": ["luna", "spirito", "anima"],
+      "tag": [
+        "luna",
+        "spirito",
+        "anima"
+      ],
       "impilabile": true,
       "valore": 30
+    },
+    {
+      "id": "lacrima_di_paladino",
+      "categoria": "ingrediente",
+      "name_i18n": "item.lacrima_di_paladino",
+      "descrizione_i18n": "item.lacrima_di_paladino.desc",
+      "name": "Lacrima di paladino",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "lacrima_di_vedova",
+      "categoria": "ingrediente",
+      "name_i18n": "item.lacrima_di_vedova",
+      "descrizione_i18n": "item.lacrima_di_vedova.desc",
+      "name": "Lacrima di vedova",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "lama_di_luce_solidificata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.lama_di_luce_solidificata",
+      "descrizione_i18n": "item.lama_di_luce_solidificata.desc",
+      "name": "Lama di luce solidificata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Twilight Giant.",
+      "tag": [
+        "arma",
+        "luce",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "lega_beyonder",
+      "categoria": "ingrediente",
+      "name_i18n": "item.lega_beyonder",
+      "descrizione_i18n": "item.lega_beyonder.desc",
+      "name": "Lega beyonder",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "lega_impossibile_da_replicare",
+      "categoria": "ingrediente",
+      "name_i18n": "item.lega_impossibile_da_replicare",
+      "descrizione_i18n": "item.lega_impossibile_da_replicare.desc",
+      "name": "Lega impossibile da replicare",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "lente_di_lungo_fuoco",
+      "categoria": "ingrediente",
+      "name_i18n": "item.lente_di_lungo_fuoco",
+      "descrizione_i18n": "item.lente_di_lungo_fuoco.desc",
+      "name": "Lente di lungo fuoco",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Paragon.",
+      "tag": [
+        "fuoco",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "lente_graduata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.lente_graduata",
+      "descrizione_i18n": "item.lente_graduata.desc",
+      "name": "Lente graduata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "lente_puntata_sempre_a_nord",
+      "categoria": "ingrediente",
+      "name_i18n": "item.lente_puntata_sempre_a_nord",
+      "descrizione_i18n": "item.lente_puntata_sempre_a_nord.desc",
+      "name": "Lente puntata sempre a nord",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "lettera_mai_consegnata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.lettera_mai_consegnata",
+      "descrizione_i18n": "item.lettera_mai_consegnata.desc",
+      "name": "Lettera mai consegnata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Error.",
+      "tag": [
+        "conoscenza",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "linfa_di_gigante",
+      "categoria": "ingrediente",
+      "name_i18n": "item.linfa_di_gigante",
+      "descrizione_i18n": "item.linfa_di_gigante.desc",
+      "name": "Linfa di gigante",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Twilight Giant.",
+      "tag": [
+        "crescita",
+        "forza",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "lingua_d_argento_falsa",
+      "categoria": "ingrediente",
+      "name_i18n": "item.lingua_d_argento_falsa",
+      "descrizione_i18n": "item.lingua_d_argento_falsa.desc",
+      "name": "Lingua d'argento falsa",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "luce_di_luna_imbottigliata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.luce_di_luna_imbottigliata",
+      "descrizione_i18n": "item.luce_di_luna_imbottigliata.desc",
+      "name": "Luce di luna imbottigliata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Moon.",
+      "tag": [
+        "luce",
+        "luna",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "mano_di_gloria",
+      "categoria": "ingrediente",
+      "name_i18n": "item.mano_di_gloria",
+      "descrizione_i18n": "item.mano_di_gloria.desc",
+      "name": "Mano di gloria",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Death.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "mappa_che_si_ripiega_su_se_stessa",
+      "categoria": "ingrediente",
+      "name_i18n": "item.mappa_che_si_ripiega_su_se_stessa",
+      "descrizione_i18n": "item.mappa_che_si_ripiega_su_se_stessa.desc",
+      "name": "Mappa che si ripiega su sé stessa",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "maschera_senza_lineamenti",
+      "categoria": "ingrediente",
+      "name_i18n": "item.maschera_senza_lineamenti",
+      "descrizione_i18n": "item.maschera_senza_lineamenti.desc",
+      "name": "Maschera senza lineamenti",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Fool.",
+      "tag": [
+        "illusione",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "memoria_cristallizzata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.memoria_cristallizzata",
+      "descrizione_i18n": "item.memoria_cristallizzata.desc",
+      "name": "Memoria cristallizzata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "mercurio_filosofale",
+      "categoria": "ingrediente",
+      "name_i18n": "item.mercurio_filosofale",
+      "descrizione_i18n": "item.mercurio_filosofale.desc",
+      "name": "Mercurio filosofale",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "metallo_impossibile",
+      "categoria": "ingrediente",
+      "name_i18n": "item.metallo_impossibile",
+      "descrizione_i18n": "item.metallo_impossibile.desc",
+      "name": "Metallo impossibile",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "miele_selvatico",
+      "categoria": "ingrediente",
+      "name_i18n": "item.miele_selvatico",
+      "descrizione_i18n": "item.miele_selvatico.desc",
+      "name": "Miele selvatico",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Mother.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "mitra_di_vescovo_apostata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.mitra_di_vescovo_apostata",
+      "descrizione_i18n": "item.mitra_di_vescovo_apostata.desc",
+      "name": "Mitra di vescovo apostata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "moneta_caduta_sempre_di_taglio",
+      "categoria": "ingrediente",
+      "name_i18n": "item.moneta_caduta_sempre_di_taglio",
+      "descrizione_i18n": "item.moneta_caduta_sempre_di_taglio.desc",
+      "name": "Moneta caduta sempre di taglio",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Fool.",
+      "tag": [
+        "fortuna",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "moneta_del_traghettatore",
+      "categoria": "ingrediente",
+      "name_i18n": "item.moneta_del_traghettatore",
+      "descrizione_i18n": "item.moneta_del_traghettatore.desc",
+      "name": "Moneta del traghettatore",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Death.",
+      "tag": [
+        "fortuna",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "muffa_sepolcrale",
+      "categoria": "ingrediente",
+      "name_i18n": "item.muffa_sepolcrale",
+      "descrizione_i18n": "item.muffa_sepolcrale.desc",
+      "name": "Muffa sepolcrale",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Death.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "muschio_di_caverna",
+      "categoria": "ingrediente",
+      "name_i18n": "item.muschio_di_caverna",
+      "descrizione_i18n": "item.muschio_di_caverna.desc",
+      "name": "Muschio di caverna",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Moon.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "muschio_luminoso",
+      "categoria": "ingrediente",
+      "name_i18n": "item.muschio_luminoso",
+      "descrizione_i18n": "item.muschio_luminoso.desc",
+      "name": "Muschio luminoso",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Mother.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "muta_di_pelle_altrui",
+      "categoria": "ingrediente",
+      "name_i18n": "item.muta_di_pelle_altrui",
+      "descrizione_i18n": "item.muta_di_pelle_altrui.desc",
+      "name": "Muta di pelle altrui",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Error.",
+      "tag": [
+        "carne",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "naso_finto_di_ceramica",
+      "categoria": "ingrediente",
+      "name_i18n": "item.naso_finto_di_ceramica",
+      "descrizione_i18n": "item.naso_finto_di_ceramica.desc",
+      "name": "Naso finto di ceramica",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Fool.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "nebbia_del_limbo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.nebbia_del_limbo",
+      "descrizione_i18n": "item.nebbia_del_limbo.desc",
+      "name": "Nebbia del limbo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Death.",
+      "tag": [
+        "occultamento",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "nucleo_del_crepuscolo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.nucleo_del_crepuscolo",
+      "descrizione_i18n": "item.nucleo_del_crepuscolo.desc",
+      "name": "Nucleo del crepuscolo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "nucleo_spirituale_stabile",
+      "categoria": "ingrediente",
+      "name_i18n": "item.nucleo_spirituale_stabile",
+      "descrizione_i18n": "item.nucleo_spirituale_stabile.desc",
+      "name": "Nucleo spirituale stabile",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Paragon.",
+      "tag": [
+        "pozione",
+        "spirito"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "numero_che_non_dovrebbe_esistere",
+      "categoria": "ingrediente",
+      "name_i18n": "item.numero_che_non_dovrebbe_esistere",
+      "descrizione_i18n": "item.numero_che_non_dovrebbe_esistere.desc",
+      "name": "Numero che non dovrebbe esistere",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "obolo_di_bronzo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.obolo_di_bronzo",
+      "descrizione_i18n": "item.obolo_di_bronzo.desc",
+      "name": "Obolo di bronzo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Death.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "occhio_che_non_dorme",
+      "categoria": "ingrediente",
+      "name_i18n": "item.occhio_che_non_dorme",
+      "descrizione_i18n": "item.occhio_che_non_dorme.desc",
+      "name": "Occhio che non dorme",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "occhio_del_gufo_del_giudizio",
+      "categoria": "ingrediente",
+      "name_i18n": "item.occhio_del_gufo_del_giudizio",
+      "descrizione_i18n": "item.occhio_del_gufo_del_giudizio.desc",
+      "name": "Occhio del gufo del giudizio",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "occhio_di_vetro_nero",
+      "categoria": "ingrediente",
+      "name_i18n": "item.occhio_di_vetro_nero",
+      "descrizione_i18n": "item.occhio_di_vetro_nero.desc",
+      "name": "Occhio di vetro nero",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "olio_conduttore",
+      "categoria": "ingrediente",
+      "name_i18n": "item.olio_conduttore",
+      "descrizione_i18n": "item.olio_conduttore.desc",
+      "name": "Olio conduttore",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "ombra_imbottigliata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ombra_imbottigliata",
+      "descrizione_i18n": "item.ombra_imbottigliata.desc",
+      "name": "Ombra imbottigliata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Darkness.",
+      "tag": [
+        "ombra",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "ombra_ritagliata_con_le_forbici",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ombra_ritagliata_con_le_forbici",
+      "descrizione_i18n": "item.ombra_ritagliata_con_le_forbici.desc",
+      "name": "Ombra ritagliata con le forbici",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Door.",
+      "tag": [
+        "ombra",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "oro_bianco",
+      "categoria": "ingrediente",
+      "name_i18n": "item.oro_bianco",
+      "descrizione_i18n": "item.oro_bianco.desc",
+      "name": "Oro bianco",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "ossa_di_gatto_nero",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ossa_di_gatto_nero",
+      "descrizione_i18n": "item.ossa_di_gatto_nero.desc",
+      "name": "Ossa di gatto nero",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Hermit.",
+      "tag": [
+        "morte",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "ossidiana_decaduta",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ossidiana_decaduta",
+      "descrizione_i18n": "item.ossidiana_decaduta.desc",
+      "name": "Ossidiana decaduta",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Twilight Giant.",
+      "tag": [
+        "ombra",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "osso_di_pugile",
+      "categoria": "ingrediente",
+      "name_i18n": "item.osso_di_pugile",
+      "descrizione_i18n": "item.osso_di_pugile.desc",
+      "name": "Osso di pugile",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Twilight Giant.",
+      "tag": [
+        "morte",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "pagina_strappata_da_un_diario",
+      "categoria": "ingrediente",
+      "name_i18n": "item.pagina_strappata_da_un_diario",
+      "descrizione_i18n": "item.pagina_strappata_da_un_diario.desc",
+      "name": "Pagina strappata da un diario",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Fool.",
+      "tag": [
+        "conoscenza",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "pelo_di_lupo_bianco",
+      "categoria": "ingrediente",
+      "name_i18n": "item.pelo_di_lupo_bianco",
+      "descrizione_i18n": "item.pelo_di_lupo_bianco.desc",
+      "name": "Pelo di lupo bianco",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Moon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "pergamena_a_doppia_faccia",
+      "categoria": "ingrediente",
+      "name_i18n": "item.pergamena_a_doppia_faccia",
+      "descrizione_i18n": "item.pergamena_a_doppia_faccia.desc",
+      "name": "Pergamena a doppia faccia",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "pergamena_di_qualita",
+      "categoria": "ingrediente",
+      "name_i18n": "item.pergamena_di_qualita",
+      "descrizione_i18n": "item.pergamena_di_qualita.desc",
+      "name": "Pergamena di qualita",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "petalo_di_belladonna",
+      "categoria": "ingrediente",
+      "name_i18n": "item.petalo_di_belladonna",
+      "descrizione_i18n": "item.petalo_di_belladonna.desc",
+      "name": "Petalo di belladonna",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Moon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "petalo_solare",
+      "categoria": "ingrediente",
+      "name_i18n": "item.petalo_solare",
+      "descrizione_i18n": "item.petalo_solare.desc",
+      "tag": [
+        "luce",
+        "guarigione"
+      ],
+      "impilabile": true,
+      "valore": 4,
+      "coltivabile": true
+    },
+    {
+      "id": "pietra_di_marea",
+      "categoria": "ingrediente",
+      "name_i18n": "item.pietra_di_marea",
+      "descrizione_i18n": "item.pietra_di_marea.desc",
+      "name": "Pietra di marea",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Moon.",
+      "tag": [
+        "pozione",
+        "terra"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "pietra_di_soglia",
+      "categoria": "ingrediente",
+      "name_i18n": "item.pietra_di_soglia",
+      "descrizione_i18n": "item.pietra_di_soglia.desc",
+      "name": "Pietra di soglia",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Death.",
+      "tag": [
+        "pozione",
+        "terra"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "piuma_di_civetta_nera",
+      "categoria": "ingrediente",
+      "name_i18n": "item.piuma_di_civetta_nera",
+      "descrizione_i18n": "item.piuma_di_civetta_nera.desc",
+      "name": "Piuma di civetta nera",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "placenta_di_pietra",
+      "categoria": "ingrediente",
+      "name_i18n": "item.placenta_di_pietra",
+      "descrizione_i18n": "item.placenta_di_pietra.desc",
+      "name": "Placenta di pietra",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Mother.",
+      "tag": [
+        "pozione",
+        "terra"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "platino_rituale",
+      "categoria": "ingrediente",
+      "name_i18n": "item.platino_rituale",
+      "descrizione_i18n": "item.platino_rituale.desc",
+      "name": "Platino rituale",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Twilight Giant.",
+      "tag": [
+        "pozione",
+        "rituale"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "polline_dorato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polline_dorato",
+      "descrizione_i18n": "item.polline_dorato.desc",
+      "name": "Polline dorato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Mother.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "polvere_di_arena",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_di_arena",
+      "descrizione_i18n": "item.polvere_di_arena.desc",
+      "name": "Polvere di arena",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "polvere_di_confine",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_di_confine",
+      "descrizione_i18n": "item.polvere_di_confine.desc",
+      "name": "Polvere di confine",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "polvere_di_crepuscolo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_di_crepuscolo",
+      "descrizione_i18n": "item.polvere_di_crepuscolo.desc",
+      "name": "Polvere di crepuscolo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "polvere_di_gesso_stellare",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_di_gesso_stellare",
+      "descrizione_i18n": "item.polvere_di_gesso_stellare.desc",
+      "name": "Polvere di gesso stellare",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Door.",
+      "tag": [
+        "pozione",
+        "stella"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "polvere_di_incubo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_di_incubo",
+      "descrizione_i18n": "item.polvere_di_incubo.desc",
+      "name": "Polvere di incubo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Darkness.",
+      "tag": [
+        "pozione",
+        "sogno"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "polvere_di_meteora",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_di_meteora",
+      "descrizione_i18n": "item.polvere_di_meteora.desc",
+      "name": "Polvere di meteora",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "polvere_di_ossario",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_di_ossario",
+      "descrizione_i18n": "item.polvere_di_ossario.desc",
+      "name": "Polvere di ossario",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Death.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "polvere_di_pagine_antiche",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_di_pagine_antiche",
+      "descrizione_i18n": "item.polvere_di_pagine_antiche.desc",
+      "name": "Polvere di pagine antiche",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "polvere_di_sale_nero",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_di_sale_nero",
+      "descrizione_i18n": "item.polvere_di_sale_nero.desc",
+      "name": "Polvere di sale nero",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "polvere_di_specchio_incrinato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_di_specchio_incrinato",
+      "descrizione_i18n": "item.polvere_di_specchio_incrinato.desc",
+      "name": "Polvere di specchio incrinato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Fool.",
+      "tag": [
+        "pozione",
+        "specchio"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "polvere_di_terza_vista",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_di_terza_vista",
+      "descrizione_i18n": "item.polvere_di_terza_vista.desc",
+      "name": "Polvere di terza vista",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "polvere_di_un_oggetto_gia_distrutto",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_di_un_oggetto_gia_distrutto",
+      "descrizione_i18n": "item.polvere_di_un_oggetto_gia_distrutto.desc",
+      "name": "Polvere di un oggetto già distrutto",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Fool.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "polvere_di_un_piano_gia_chiuso",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_di_un_piano_gia_chiuso",
+      "descrizione_i18n": "item.polvere_di_un_piano_gia_chiuso.desc",
+      "name": "Polvere di un piano già chiuso",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "polvere_ossa",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_ossa",
+      "descrizione_i18n": "item.polvere_ossa.desc",
+      "tag": [
+        "morte",
+        "rituale"
+      ],
+      "impilabile": true,
+      "valore": 4
+    },
+    {
+      "id": "polvere_reagente",
+      "categoria": "ingrediente",
+      "name_i18n": "item.polvere_reagente",
+      "descrizione_i18n": "item.polvere_reagente.desc",
+      "name": "Polvere reagente",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "porta_che_non_c_e_mai_stata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.porta_che_non_c_e_mai_stata",
+      "descrizione_i18n": "item.porta_che_non_c_e_mai_stata.desc",
+      "name": "Porta che non c e mai stata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "prima_notte_del_mondo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.prima_notte_del_mondo",
+      "descrizione_i18n": "item.prima_notte_del_mondo.desc",
+      "name": "Prima notte del mondo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Moon.",
+      "tag": [
+        "notte",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "prima_porta_mai_aperta",
+      "categoria": "ingrediente",
+      "name_i18n": "item.prima_porta_mai_aperta",
+      "descrizione_i18n": "item.prima_porta_mai_aperta.desc",
+      "name": "Prima porta mai aperta",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "prima_ruota_mai_costruita",
+      "categoria": "ingrediente",
+      "name_i18n": "item.prima_ruota_mai_costruita",
+      "descrizione_i18n": "item.prima_ruota_mai_costruita.desc",
+      "name": "Prima ruota mai costruita",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "primo_libro_mai_scritto",
+      "categoria": "ingrediente",
+      "name_i18n": "item.primo_libro_mai_scritto",
+      "descrizione_i18n": "item.primo_libro_mai_scritto.desc",
+      "name": "Primo libro mai scritto",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Hermit.",
+      "tag": [
+        "conoscenza",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "prisma_che_devia_la_luce",
+      "categoria": "ingrediente",
+      "name_i18n": "item.prisma_che_devia_la_luce",
+      "descrizione_i18n": "item.prisma_che_devia_la_luce.desc",
+      "name": "Prisma che devia la luce",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Paragon.",
+      "tag": [
+        "luce",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "progetto_del_mondo_perfetto",
+      "categoria": "ingrediente",
+      "name_i18n": "item.progetto_del_mondo_perfetto",
+      "descrizione_i18n": "item.progetto_del_mondo_perfetto.desc",
+      "name": "Progetto del mondo perfetto",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "punta_d_argento",
+      "categoria": "ingrediente",
+      "name_i18n": "item.punta_d_argento",
+      "descrizione_i18n": "item.punta_d_argento.desc",
+      "name": "Punta d'argento",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "quadrifoglio_a_cinque_foglie",
+      "categoria": "ingrediente",
+      "name_i18n": "item.quadrifoglio_a_cinque_foglie",
+      "descrizione_i18n": "item.quadrifoglio_a_cinque_foglie.desc",
+      "name": "Quadrifoglio a cinque foglie",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Fool.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "quintessenza_distillata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.quintessenza_distillata",
+      "descrizione_i18n": "item.quintessenza_distillata.desc",
+      "name": "Quintessenza distillata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Hermit.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "radice_amara",
+      "categoria": "ingrediente",
+      "name_i18n": "item.radice_amara",
+      "descrizione_i18n": "item.radice_amara.desc",
+      "name": "Radice amara",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Mother.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "radice_che_beve",
+      "categoria": "ingrediente",
+      "name_i18n": "item.radice_che_beve",
+      "descrizione_i18n": "item.radice_che_beve.desc",
+      "name": "Radice che beve",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Mother.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "radice_crepuscolo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.radice_crepuscolo",
+      "descrizione_i18n": "item.radice_crepuscolo.desc",
+      "tag": [
+        "decadimento",
+        "ombra"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "radice_di_ferro_lunare",
+      "categoria": "ingrediente",
+      "name_i18n": "item.radice_di_ferro_lunare",
+      "descrizione_i18n": "item.radice_di_ferro_lunare.desc",
+      "name": "Radice di ferro lunare",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Moon.",
+      "tag": [
+        "crescita",
+        "forza",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "radice_di_immortelle",
+      "categoria": "ingrediente",
+      "name_i18n": "item.radice_di_immortelle",
+      "descrizione_i18n": "item.radice_di_immortelle.desc",
+      "name": "Radice di immortelle",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Death.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "radice_di_mandragora_urlante",
+      "categoria": "ingrediente",
+      "name_i18n": "item.radice_di_mandragora_urlante",
+      "descrizione_i18n": "item.radice_di_mandragora_urlante.desc",
+      "name": "Radice di mandragora urlante",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Darkness.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "radice_di_quercia",
+      "categoria": "ingrediente",
+      "name_i18n": "item.radice_di_quercia",
+      "descrizione_i18n": "item.radice_di_quercia.desc",
+      "name": "Radice di quercia",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Twilight Giant.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "radice_di_valeriana",
+      "categoria": "ingrediente",
+      "name_i18n": "item.radice_di_valeriana",
+      "descrizione_i18n": "item.radice_di_valeriana.desc",
+      "name": "Radice di valeriana",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Moon.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "radice_di_veggente",
+      "categoria": "ingrediente",
+      "name_i18n": "item.radice_di_veggente",
+      "descrizione_i18n": "item.radice_di_veggente.desc",
+      "name": "Radice di veggente",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Fool.",
+      "tag": [
+        "crescita",
+        "divinazione",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "radice_maestra",
+      "categoria": "ingrediente",
+      "name_i18n": "item.radice_maestra",
+      "descrizione_i18n": "item.radice_maestra.desc",
+      "name": "Radice maestra",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Mother.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "refurtiva_dimenticata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.refurtiva_dimenticata",
+      "descrizione_i18n": "item.refurtiva_dimenticata.desc",
+      "name": "Refurtiva dimenticata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "regola_locale_scritta_a_matita",
+      "categoria": "ingrediente",
+      "name_i18n": "item.regola_locale_scritta_a_matita",
+      "descrizione_i18n": "item.regola_locale_scritta_a_matita.desc",
+      "name": "Regola locale scritta a matita",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Fool.",
+      "tag": [
+        "legge",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "reliquia_profanata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.reliquia_profanata",
+      "descrizione_i18n": "item.reliquia_profanata.desc",
+      "name": "Reliquia profanata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Darkness.",
+      "tag": [
+        "pozione",
+        "rituale"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "resina_conservante",
+      "categoria": "ingrediente",
+      "name_i18n": "item.resina_conservante",
+      "descrizione_i18n": "item.resina_conservante.desc",
+      "name": "Resina conservante",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "resina_di_ferro",
+      "categoria": "ingrediente",
+      "name_i18n": "item.resina_di_ferro",
+      "descrizione_i18n": "item.resina_di_ferro.desc",
+      "name": "Resina di ferro",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Twilight Giant.",
+      "tag": [
+        "forza",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "respiro_dell_oceano",
+      "categoria": "ingrediente",
+      "name_i18n": "item.respiro_dell_oceano",
+      "descrizione_i18n": "item.respiro_dell_oceano.desc",
+      "name": "Respiro dell'oceano",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Moon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "respiro_della_foresta_del_mondo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.respiro_della_foresta_del_mondo",
+      "descrizione_i18n": "item.respiro_della_foresta_del_mondo.desc",
+      "name": "Respiro della foresta del mondo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Mother.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "respiro_finale",
+      "categoria": "ingrediente",
+      "name_i18n": "item.respiro_finale",
+      "descrizione_i18n": "item.respiro_finale.desc",
+      "name": "Respiro finale",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Death.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "ricordo_altrui_in_bottiglia",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ricordo_altrui_in_bottiglia",
+      "descrizione_i18n": "item.ricordo_altrui_in_bottiglia.desc",
+      "name": "Ricordo altrui in bottiglia",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "riga_bianca_nel_regolamento_del_mondo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.riga_bianca_nel_regolamento_del_mondo",
+      "descrizione_i18n": "item.riga_bianca_nel_regolamento_del_mondo.desc",
+      "name": "Riga bianca nel regolamento del mondo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "ritratto_che_cambia_faccia",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ritratto_che_cambia_faccia",
+      "descrizione_i18n": "item.ritratto_che_cambia_faccia.desc",
+      "name": "Ritratto che cambia faccia",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Fool.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "ritratto_di_te_da_bambino",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ritratto_di_te_da_bambino",
+      "descrizione_i18n": "item.ritratto_di_te_da_bambino.desc",
+      "name": "Ritratto di te da bambino",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Fool.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "rosa_che_non_appassisce",
+      "categoria": "ingrediente",
+      "name_i18n": "item.rosa_che_non_appassisce",
+      "descrizione_i18n": "item.rosa_che_non_appassisce.desc",
+      "name": "Rosa che non appassisce",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Moon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "rugiada_notturna",
+      "categoria": "ingrediente",
+      "name_i18n": "item.rugiada_notturna",
+      "descrizione_i18n": "item.rugiada_notturna.desc",
+      "name": "Rugiada notturna",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Moon.",
+      "tag": [
+        "notte",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "sabbia_del_sonno_rubata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sabbia_del_sonno_rubata",
+      "descrizione_i18n": "item.sabbia_del_sonno_rubata.desc",
+      "name": "Sabbia del sonno rubata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Error.",
+      "tag": [
+        "pozione",
+        "sonno",
+        "terra"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "sabbia_di_due_deserti_lontani",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sabbia_di_due_deserti_lontani",
+      "descrizione_i18n": "item.sabbia_di_due_deserti_lontani.desc",
+      "name": "Sabbia di due deserti lontani",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Door.",
+      "tag": [
+        "pozione",
+        "terra"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "sabbia_di_meridiana_notturna",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sabbia_di_meridiana_notturna",
+      "descrizione_i18n": "item.sabbia_di_meridiana_notturna.desc",
+      "name": "Sabbia di meridiana notturna",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Door.",
+      "tag": [
+        "notte",
+        "pozione",
+        "terra"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "sale_della_veglia_eterna",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sale_della_veglia_eterna",
+      "descrizione_i18n": "item.sale_della_veglia_eterna.desc",
+      "name": "Sale della veglia eterna",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Death.",
+      "tag": [
+        "pozione",
+        "sonno"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "sale_della_vita",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sale_della_vita",
+      "descrizione_i18n": "item.sale_della_vita.desc",
+      "name": "Sale della vita",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Mother.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "sale_di_roccia",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sale_di_roccia",
+      "descrizione_i18n": "item.sale_di_roccia.desc",
+      "name": "Sale di roccia",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "sale_scarlatto",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sale_scarlatto",
+      "descrizione_i18n": "item.sale_scarlatto.desc",
+      "name": "Sale scarlatto",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Moon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "sale_versato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sale_versato",
+      "descrizione_i18n": "item.sale_versato.desc",
+      "name": "Sale versato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "sangue_di_cervo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sangue_di_cervo",
+      "descrizione_i18n": "item.sangue_di_cervo.desc",
+      "name": "Sangue di cervo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Moon.",
+      "tag": [
+        "pozione",
+        "sangue"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "sangue_di_gufo_lunare",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sangue_di_gufo_lunare",
+      "descrizione_i18n": "item.sangue_di_gufo_lunare.desc",
+      "name": "Sangue di gufo lunare",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Fool.",
+      "tag": [
+        "pozione",
+        "sangue"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "sangue_di_lupo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sangue_di_lupo",
+      "descrizione_i18n": "item.sangue_di_lupo.desc",
+      "tag": [
+        "sangue",
+        "bestia",
+        "forza"
+      ],
+      "impilabile": true,
+      "valore": 6
+    },
+    {
+      "id": "sangue_di_ogni_bestia",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sangue_di_ogni_bestia",
+      "descrizione_i18n": "item.sangue_di_ogni_bestia.desc",
+      "name": "Sangue di ogni bestia",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Mother.",
+      "tag": [
+        "pozione",
+        "sangue"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "sangue_di_toro",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sangue_di_toro",
+      "descrizione_i18n": "item.sangue_di_toro.desc",
+      "name": "Sangue di toro",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Twilight Giant.",
+      "tag": [
+        "pozione",
+        "sangue"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "sangue_rappreso",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sangue_rappreso",
+      "descrizione_i18n": "item.sangue_rappreso.desc",
+      "name": "Sangue rappreso",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Moon.",
+      "tag": [
+        "pozione",
+        "sangue"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "scettro_pallido",
+      "categoria": "ingrediente",
+      "name_i18n": "item.scettro_pallido",
+      "descrizione_i18n": "item.scettro_pallido.desc",
+      "name": "Scettro pallido",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Death.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "scheggia_divina",
+      "categoria": "ingrediente",
+      "name_i18n": "item.scheggia_divina",
+      "descrizione_i18n": "item.scheggia_divina.desc",
+      "name": "Scheggia divina",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "scudo_fuso",
+      "categoria": "ingrediente",
+      "name_i18n": "item.scudo_fuso",
+      "descrizione_i18n": "item.scudo_fuso.desc",
+      "name": "Scudo fuso",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "segreto_sigillato_in_cera_nera",
+      "categoria": "ingrediente",
+      "name_i18n": "item.segreto_sigillato_in_cera_nera",
+      "descrizione_i18n": "item.segreto_sigillato_in_cera_nera.desc",
+      "name": "Segreto sigillato in cera nera",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "seme_del_primo_giorno",
+      "categoria": "ingrediente",
+      "name_i18n": "item.seme_del_primo_giorno",
+      "descrizione_i18n": "item.seme_del_primo_giorno.desc",
+      "name": "Seme del primo giorno",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Mother.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "seme_dell_albero_madre",
+      "categoria": "ingrediente",
+      "name_i18n": "item.seme_dell_albero_madre",
+      "descrizione_i18n": "item.seme_dell_albero_madre.desc",
+      "name": "Seme dell'albero madre",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Mother.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "seme_di_stella_cadente",
+      "categoria": "ingrediente",
+      "name_i18n": "item.seme_di_stella_cadente",
+      "descrizione_i18n": "item.seme_di_stella_cadente.desc",
+      "name": "Seme di stella cadente",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Moon.",
+      "tag": [
+        "crescita",
+        "pozione",
+        "stella"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "seme_dormiente",
+      "categoria": "ingrediente",
+      "name_i18n": "item.seme_dormiente",
+      "descrizione_i18n": "item.seme_dormiente.desc",
+      "name": "Seme dormiente",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Mother.",
+      "tag": [
+        "crescita",
+        "pozione",
+        "sonno"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "serratura_dell_orizzonte",
+      "categoria": "ingrediente",
+      "name_i18n": "item.serratura_dell_orizzonte",
+      "descrizione_i18n": "item.serratura_dell_orizzonte.desc",
+      "name": "Serratura dell'orizzonte",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "sigillo_di_ceralacca",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sigillo_di_ceralacca",
+      "descrizione_i18n": "item.sigillo_di_ceralacca.desc",
+      "name": "Sigillo di ceralacca",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Hermit.",
+      "tag": [
+        "pozione",
+        "sigillo"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "silenzio_tra_due_battiti",
+      "categoria": "ingrediente",
+      "name_i18n": "item.silenzio_tra_due_battiti",
+      "descrizione_i18n": "item.silenzio_tra_due_battiti.desc",
+      "name": "Silenzio tra due battiti",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Fool.",
+      "tag": [
+        "pozione",
+        "silenzioso"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "sillaba_di_un_nome_non_tuo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sillaba_di_un_nome_non_tuo",
+      "descrizione_i18n": "item.sillaba_di_un_nome_non_tuo.desc",
+      "name": "Sillaba di un nome non tuo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "sipario_di_velluto_polveroso",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sipario_di_velluto_polveroso",
+      "descrizione_i18n": "item.sipario_di_velluto_polveroso.desc",
+      "name": "Sipario di velluto polveroso",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Fool.",
+      "tag": [
+        "illusione",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "soffio_di_spettro",
+      "categoria": "ingrediente",
+      "name_i18n": "item.soffio_di_spettro",
+      "descrizione_i18n": "item.soffio_di_spettro.desc",
+      "name": "Soffio di spettro",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Death.",
+      "tag": [
+        "pozione",
+        "spirito"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "soglia_tra_tutto_e_tutto",
+      "categoria": "ingrediente",
+      "name_i18n": "item.soglia_tra_tutto_e_tutto",
+      "descrizione_i18n": "item.soglia_tra_tutto_e_tutto.desc",
+      "name": "Soglia tra tutto e tutto",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "sonaglio_che_confonde",
+      "categoria": "ingrediente",
+      "name_i18n": "item.sonaglio_che_confonde",
+      "descrizione_i18n": "item.sonaglio_che_confonde.desc",
+      "name": "Sonaglio che confonde",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Fool.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "spazzola_da_scavo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.spazzola_da_scavo",
+      "descrizione_i18n": "item.spazzola_da_scavo.desc",
+      "name": "Spazzola da scavo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "specchio_annerito",
+      "categoria": "ingrediente",
+      "name_i18n": "item.specchio_annerito",
+      "descrizione_i18n": "item.specchio_annerito.desc",
+      "name": "Specchio annerito",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Darkness.",
+      "tag": [
+        "pozione",
+        "specchio"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "specchio_annerito_dal_fumo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.specchio_annerito_dal_fumo",
+      "descrizione_i18n": "item.specchio_annerito_dal_fumo.desc",
+      "name": "Specchio annerito dal fumo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Hermit.",
+      "tag": [
+        "pozione",
+        "specchio"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "specchio_che_non_riflette_nessuno",
+      "categoria": "ingrediente",
+      "name_i18n": "item.specchio_che_non_riflette_nessuno",
+      "descrizione_i18n": "item.specchio_che_non_riflette_nessuno.desc",
+      "name": "Specchio che non riflette nessuno",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Fool.",
+      "tag": [
+        "pozione",
+        "specchio"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "specchio_che_riflette_un_altro",
+      "categoria": "ingrediente",
+      "name_i18n": "item.specchio_che_riflette_un_altro",
+      "descrizione_i18n": "item.specchio_che_riflette_un_altro.desc",
+      "name": "Specchio che riflette un altro",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Error.",
+      "tag": [
+        "pozione",
+        "specchio"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "specchio_da_borsetta_a_due_facce",
+      "categoria": "ingrediente",
+      "name_i18n": "item.specchio_da_borsetta_a_due_facce",
+      "descrizione_i18n": "item.specchio_da_borsetta_a_due_facce.desc",
+      "name": "Specchio da borsetta a due facce",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Door.",
+      "tag": [
+        "pozione",
+        "specchio"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "specchio_da_camerino_incrinato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.specchio_da_camerino_incrinato",
+      "descrizione_i18n": "item.specchio_da_camerino_incrinato.desc",
+      "name": "Specchio da camerino incrinato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Fool.",
+      "tag": [
+        "pozione",
+        "specchio"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "specchio_di_luna_nera",
+      "categoria": "ingrediente",
+      "name_i18n": "item.specchio_di_luna_nera",
+      "descrizione_i18n": "item.specchio_di_luna_nera.desc",
+      "name": "Specchio di luna nera",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Moon.",
+      "tag": [
+        "luna",
+        "pozione",
+        "specchio"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "spiga_dorata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.spiga_dorata",
+      "descrizione_i18n": "item.spiga_dorata.desc",
+      "name": "Spiga dorata",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Mother.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "spina_dell_ultimo_inverno",
+      "categoria": "ingrediente",
+      "name_i18n": "item.spina_dell_ultimo_inverno",
+      "descrizione_i18n": "item.spina_dell_ultimo_inverno.desc",
+      "name": "Spina dell'ultimo inverno",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Mother.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "spina_di_rovo_antico",
+      "categoria": "ingrediente",
+      "name_i18n": "item.spina_di_rovo_antico",
+      "descrizione_i18n": "item.spina_di_rovo_antico.desc",
+      "name": "Spina di rovo antico",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Mother.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
+    },
+    {
+      "id": "stele_di_rosetta_infranta",
+      "categoria": "ingrediente",
+      "name_i18n": "item.stele_di_rosetta_infranta",
+      "descrizione_i18n": "item.stele_di_rosetta_infranta.desc",
+      "name": "Stele di rosetta infranta",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "stendardo_lacero",
+      "categoria": "ingrediente",
+      "name_i18n": "item.stendardo_lacero",
+      "descrizione_i18n": "item.stendardo_lacero.desc",
+      "name": "Stendardo lacero",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Death.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "stilo_di_ossidiana",
+      "categoria": "ingrediente",
+      "name_i18n": "item.stilo_di_ossidiana",
+      "descrizione_i18n": "item.stilo_di_ossidiana.desc",
+      "name": "Stilo di ossidiana",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Paragon.",
+      "tag": [
+        "ombra",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "suola_consumata_da_mille_strade",
+      "categoria": "ingrediente",
+      "name_i18n": "item.suola_consumata_da_mille_strade",
+      "descrizione_i18n": "item.suola_consumata_da_mille_strade.desc",
+      "name": "Suola consumata da mille strade",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "taccuino_di_appunti",
+      "categoria": "ingrediente",
+      "name_i18n": "item.taccuino_di_appunti",
+      "descrizione_i18n": "item.taccuino_di_appunti.desc",
+      "name": "Taccuino di appunti",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "telaio_di_precisione_assoluta",
+      "categoria": "ingrediente",
+      "name_i18n": "item.telaio_di_precisione_assoluta",
+      "descrizione_i18n": "item.telaio_di_precisione_assoluta.desc",
+      "name": "Telaio di precisione assoluta",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Paragon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "tempo_solidificato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.tempo_solidificato",
+      "descrizione_i18n": "item.tempo_solidificato.desc",
+      "name": "Tempo solidificato",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Twilight Giant.",
+      "tag": [
+        "pozione",
+        "tempo"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "tendine_di_lupo",
+      "categoria": "ingrediente",
+      "name_i18n": "item.tendine_di_lupo",
+      "descrizione_i18n": "item.tendine_di_lupo.desc",
+      "name": "Tendine di lupo",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 7 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 8
+    },
+    {
+      "id": "terra_di_cimitero",
+      "categoria": "ingrediente",
+      "name_i18n": "item.terra_di_cimitero",
+      "descrizione_i18n": "item.terra_di_cimitero.desc",
+      "name": "Terra di cimitero",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Death.",
+      "tag": [
+        "pozione",
+        "terra"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "terriccio_di_prima_luna",
+      "categoria": "ingrediente",
+      "name_i18n": "item.terriccio_di_prima_luna",
+      "descrizione_i18n": "item.terriccio_di_prima_luna.desc",
+      "name": "Terriccio di prima luna",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Mother.",
+      "tag": [
+        "luna",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "timbro_di_ogni_potere",
+      "categoria": "ingrediente",
+      "name_i18n": "item.timbro_di_ogni_potere",
+      "descrizione_i18n": "item.timbro_di_ogni_potere.desc",
+      "name": "Timbro di ogni potere",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Door.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "tredicesimo_grano_di_rosario",
+      "categoria": "ingrediente",
+      "name_i18n": "item.tredicesimo_grano_di_rosario",
+      "descrizione_i18n": "item.tredicesimo_grano_di_rosario.desc",
+      "name": "Tredicesimo grano di rosario",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "ultima_foglia_dell_autunno",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ultima_foglia_dell_autunno",
+      "descrizione_i18n": "item.ultima_foglia_dell_autunno.desc",
+      "name": "Ultima foglia dell'autunno",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Mother.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "ultimo_battito",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ultimo_battito",
+      "descrizione_i18n": "item.ultimo_battito.desc",
+      "name": "Ultimo battito",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Death.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "ultimo_respiro",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ultimo_respiro",
+      "descrizione_i18n": "item.ultimo_respiro.desc",
+      "name": "Ultimo respiro",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Twilight Giant.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "ultimo_respiro_del_giorno",
+      "categoria": "ingrediente",
+      "name_i18n": "item.ultimo_respiro_del_giorno",
+      "descrizione_i18n": "item.ultimo_respiro_del_giorno.desc",
+      "name": "Ultimo respiro del giorno",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 0 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 120
+    },
+    {
+      "id": "velo_di_mezzanotte",
+      "categoria": "ingrediente",
+      "name_i18n": "item.velo_di_mezzanotte",
+      "descrizione_i18n": "item.velo_di_mezzanotte.desc",
+      "name": "Velo di mezzanotte",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 9 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 3
+    },
+    {
+      "id": "verme_che_mangia_i_minuti",
+      "categoria": "ingrediente",
+      "name_i18n": "item.verme_che_mangia_i_minuti",
+      "descrizione_i18n": "item.verme_che_mangia_i_minuti.desc",
+      "name": "Verme che mangia i minuti",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "vischio_che_si_aggrappa",
+      "categoria": "ingrediente",
+      "name_i18n": "item.vischio_che_si_aggrappa",
+      "descrizione_i18n": "item.vischio_che_si_aggrappa.desc",
+      "name": "Vischio che si aggrappa",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 4 di Error.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 27
+    },
+    {
+      "id": "voce_del_gigante",
+      "categoria": "ingrediente",
+      "name_i18n": "item.voce_del_gigante",
+      "descrizione_i18n": "item.voce_del_gigante.desc",
+      "name": "Voce del gigante",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 1 di Twilight Giant.",
+      "tag": [
+        "forza",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 90
+    },
+    {
+      "id": "voce_di_creatura_mai_vista",
+      "categoria": "ingrediente",
+      "name_i18n": "item.voce_di_creatura_mai_vista",
+      "descrizione_i18n": "item.voce_di_creatura_mai_vista.desc",
+      "name": "Voce di creatura mai vista",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 3 di Moon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 40
+    },
+    {
+      "id": "voce_registrata_su_cera",
+      "categoria": "ingrediente",
+      "name_i18n": "item.voce_registrata_su_cera",
+      "descrizione_i18n": "item.voce_registrata_su_cera.desc",
+      "name": "Voce registrata su cera",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 6 di Fool.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 12
+    },
+    {
+      "id": "voto_infranto_alla_radice",
+      "categoria": "ingrediente",
+      "name_i18n": "item.voto_infranto_alla_radice",
+      "descrizione_i18n": "item.voto_infranto_alla_radice.desc",
+      "name": "Voto infranto alla radice",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 2 di Error.",
+      "tag": [
+        "crescita",
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 60
+    },
+    {
+      "id": "zanna_di_latte",
+      "categoria": "ingrediente",
+      "name_i18n": "item.zanna_di_latte",
+      "descrizione_i18n": "item.zanna_di_latte.desc",
+      "name": "Zanna di latte",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 8 di Moon.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 5
+    },
+    {
+      "id": "zolfo_delle_fosse",
+      "categoria": "ingrediente",
+      "name_i18n": "item.zolfo_delle_fosse",
+      "descrizione_i18n": "item.zolfo_delle_fosse.desc",
+      "name": "Zolfo delle fosse",
+      "descrizione": "Ingrediente alchemico. Compare nella formula di Sequenza 5 di Darkness.",
+      "tag": [
+        "pozione"
+      ],
+      "impilabile": true,
+      "valore": 18
     }
   ]
 }

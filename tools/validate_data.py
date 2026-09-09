@@ -1360,6 +1360,22 @@ def main():
                 if og.get("item_id") not in item_ids:
                     err(f"{rel} [{rid}]: oggetto item_id '{og.get('item_id')}' non esiste in data/items/")
 
+    # --- ingredienti delle formule (US-808) ---
+    # Ogni ingrediente citato da una formula di potion (tutte quelle in
+    # data/potions/formulas.json appartengono ai 10 Pathway attivi: il file
+    # non ne contiene di differiti) deve esistere come item di categoria
+    # 'ingrediente' in data/items/ — generato da
+    # tools/generate_formula_ingredients.py, mai un id fantasma citato solo
+    # nella formula.
+    for _fid, _f in formulas.items():
+        for _ing in _f.get("ingredients", []):
+            if _ing not in item_cat:
+                err(f"data/potions/formulas.json [{_fid}]: ingrediente '{_ing}' non esiste come item "
+                    f"in data/items/ (lancia tools/generate_formula_ingredients.py)")
+            elif item_cat[_ing] != "ingrediente":
+                err(f"data/potions/formulas.json [{_fid}]: ingrediente '{_ing}' esiste come item ma "
+                    f"con categoria '{item_cat[_ing]}', non 'ingrediente'")
+
     # --- sigilli (data/sigils/, US-315) ---
     set_doc = load_json(os.path.join(DATA, "schema", "sigil_effect_types.json"))
     sigil_effetti_tipi = set((set_doc or {}).get("effetti", []))

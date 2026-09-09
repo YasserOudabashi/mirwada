@@ -8523,3 +8523,109 @@ diventano oggetti (generatore + i18n). Apre la strada a US-809 (fonti nel
 mondo: da quel punto gli oggetti a terra nei 5 layout potranno finalmente
 usare gli ingredienti veri al posto di moneta_comune, se si deciderà di
 tornare a popolarli).
+
+=== US-808: I 299 ingredienti delle formule diventano oggetti - generatore + i18n (fase 8, Blocco C) ===
+
+COSA FATTO.
+- tools/generate_formula_ingredients.py (NUOVO, 429 righe): idempotente
+  come generate_pathways.py (merge per id, non tocca mai una voce gia'
+  presente). Legge data/potions/formulas.json (100 formule, 10 Pathway
+  attivi, 299 ingredienti unici), per ogni id non ancora in data/items/
+  ingredienti.json genera {id, categoria:"ingrediente", name_i18n,
+  descrizione_i18n, name/descrizione (seed IT in chiaro), tag, impilabile,
+  valore}. Le 8 voci scritte a mano (erba_lunare ecc.) restano intatte:
+  nessuna delle due liste di id si sovrappone, verificato prima di
+  scrivere che 'preservare' significhi davvero "non toccare", non solo
+  "non sovrascrivere per caso".
+- Nome IT: split dell'id per '_', tabella ACCENTI (30 voci: piu'->più,
+  gia'->già, citta'->città, verita'->verità...) per le parole che perdono
+  l'accento diventando un id ASCII, tabella ELISIONI (dell/nell/dall/
+  sull/all/quell/d/l -> apostrofo invece di spazio: "filo_dell_
+  incantesimo" -> "Filo dell'incantesimo"), maiuscola solo sulla prima
+  lettera (sentence case italiano, non Title Case).
+- valore: dalla sequenza PIU' BASSA fra tutte le formule che citano
+  l'ingrediente (un ingrediente condiviso fra Sequenza 9 e Sequenza 5 vale
+  come se fosse di Sequenza 5, il piu' raro) via la tabella dell'AC
+  (9->3 ... 0->120), documentata anche nel _comment del file generato
+  (non solo nel docstring del tool, come richiesto).
+- tag: TAG_MAP chiuso (114 voci) SOLO con tag reali di
+  data/tags.json (82, verificati uno per uno all'avvio del tool: un tag
+  fuori dal vocabolario fa fallire IL TOOL, non il validator dopo, come
+  da AC). CORREZIONE rispetto all'esempio dell'AC originale ("sangue->
+  vita"): il tag "vita" NON esiste nel vocabolario dei 82 tag (verificato
+  con grep) — "sangue" e' invece esso stesso un tag valido, quindi
+  sangue->sangue. Ogni item ha sempre "pozione" in aggiunta a quelli
+  trovati dalle parole dell'id.
+- i18n EN: generate_i18n_stubs.py (US-220, invariato) NON traduce in
+  inglese — lo confermato leggendone il codice prima di assumere il
+  contrario: per il locale "en" scrive SOLO le chiavi gia' presenti come
+  traduzione autoriale (mai un seed). Quindi generate_formula_
+  ingredients.py scrive DIRETTAMENTE in data/i18n/en.json con un
+  EN_DICT proprio (365 voci, copertura parziale per scelta): un id e'
+  tradotto in EN solo se OGNI sua parola e' nel dizionario, altrimenti
+  resta assente da en.json (mai un mezzo-TODO dentro la stringa) e le
+  parole ignote finiscono in un report a fine run (246 parole, coerente
+  con "elencate a fine run" dell'AC). 142/299 (47%) tradotti in EN.
+  MIGLIORIA aggiunta in corsa (non nell'AC originale, ma la qualita' del
+  primo risultato lo giustificava): per gli id di ESATTAMENTE 2 parole
+  "nome aggettivo" (62 dei 299, il pattern piu' comune: "ferro_
+  temperato"), l'EN inverte l'ordine ("Tempered iron", non "Iron
+  tempered") via un piccolo insieme AGGETTIVI (57 voci, sottoinsieme di
+  EN_DICT) — altrimenti l'inglese sarebbe stato grammaticalmente storto
+  per un quinto degli item tradotti. Id piu' lunghi restano nell'ordine
+  letterale (l'AC lo permette esplicitamente: "dove serve").
+- tools/generate_formula_ingredients.py lancia da solo tools/
+  generate_i18n_stubs.py alla fine (subprocess), cosi' un singolo comando
+  basta per allineare item + IT + EN.
+- tools/validate_data.py: nuovo blocco "ingredienti delle formule"
+  (dopo il blocco item_ids/item_cat, stessa posizione del blocco nemici/
+  oggetti dei layout di US-806): ogni ingrediente di ogni formula di
+  data/potions/formulas.json (tutte del 10 Pathway attivi: il file non ne
+  contiene di differiti, verificato) esiste come item di categoria
+  "ingrediente" — errore se manca o se la categoria e' sbagliata.
+- README.md § Setup: aggiunto il comando.
+- tests/test_items.gd: 1 test nuovo (get_item("ferro_temperato") non
+  vuoto, categoria corretta; items_per_categoria("ingrediente") >= 307).
+
+COME VERIFICATO.
+- Idempotenza VERA (non solo "0 nuovi creati"): copiato ingredienti.json/
+  it.json/en.json prima di un secondo (e terzo, dopo l'aggiunta della nota
+  nel _comment) run e diffato byte-per-byte contro il risultato — IDENTICO
+  ogni volta, come richiesto dall'AC.
+- python tools/validate_data.py: 0 errori (compreso il nuovo blocco
+  "ingredienti delle formule": tutti e 299 risolvono).
+- godot --headless --import + suite: 831 test, tutti passati (830 + 1
+  nuovo). test_items.test_ogni_name_i18n_degli_item_risolve (gia'
+  esistente, US-301) conferma che TUTTE le 299 chiavi i18n nuove
+  risolvono davvero, non solo che esistono.
+- Spot-check manuale di 10+20 item campionati a caso: nomi IT naturali e
+  corretti ("Specchio di luna nera", "Creta del primo uomo", "Ultimo
+  respiro del giorno"); le 28 traduzioni EN a 2 parole rilette una per
+  una dopo la correzione dell'ordine aggettivo/nome ("Tempered iron",
+  "Cracked chalice", "Mother cell", "Torn banner" — tutte corrette).
+
+CORREZIONI rispetto all'AC originale.
+- "sangue -> vita" (esempio letterale nell'AC) non e' applicabile: "vita"
+  non e' un tag del vocabolario chiuso di data/tags.json (82 tag,
+  verificato). Sostituito con sangue -> sangue (il tag esiste gia' con
+  quel nome esatto).
+- Aggiunta l'inversione aggettivo/nome per gli id a 2 parole (dettaglio
+  implementativo dell'AC: "ordine invertito dove serve"), non presente
+  nel primissimo tentativo del tool: scoperta rileggendo un campione
+  delle traduzioni EN generate ("Dust of chalk stellar" era chiaramente
+  sbagliato) prima di considerare la story chiusa, non dopo.
+
+COSA RESTA APERTO (dichiarato, non di questa story).
+- 157/299 ingredienti (53%) restano senza traduzione EN (parole fuori dal
+  dizionario EN_DICT): coerente con "catalogo EN incompleto per scelta",
+  gia' vero per il resto del progetto (42 TODO nel catalogo IT esistevano
+  gia' prima di questa story, invariati).
+- Gli id piu' lunghi di 2 parole non hanno alcuna riordinazione
+  grammaticale EN (restano nell'ordine letterale italiano): l'AC lo
+  permette, ma e' un limite dichiarato, non silenzioso.
+- I 5 layout regionali (Blocco B) continuano a usare moneta_comune al
+  posto degli ingredienti veri: la sostituzione (se si decide di farla)
+  e' scope di US-809 "Fonti nel mondo", non di questa story.
+
+PROSSIMA STORIA: US-809 — Fonti nel mondo: drop per regione, listini,
+raccolta a terra (Blocco C).
