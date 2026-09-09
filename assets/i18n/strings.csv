@@ -54,6 +54,11 @@ BOOK_INV_RICETTARIO,Ricettario,Recipes
 BOOK_INV_TALENTI,Talenti,Talents
 BOOK_INV_BASE,Base,Home
 BOOK_INV_VUOTO,— vuoto —,— empty —
+BOOK_NEGOZIO_MONETE,Monete,Coins
+BOOK_NEGOZIO_COMPRA,Compra,Buy
+BOOK_NEGOZIO_VENDI,Vendi,Sell
+BOOK_NEGOZIO_CHIUDI,Chiudi,Close
+BOOK_NEGOZIO_VALUTA_ASSENTE,Nessuna valuta nel gioco,No currency in the game
 BOOK_INV_USA,Usa,Use
 BOOK_INV_EQUIPAGGIA,Indossa,Equip
 BOOK_INV_TOGLI,Togli,Remove

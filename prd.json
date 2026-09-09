@@ -283,8 +283,8 @@
       ],
       "priority": 16,
       "fase": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto esattamente come da AC. page_dialogo.gd si collega a ENTRAMBI DialogueEngine.apri_vendita e QuestSystem.apri_vendita (due segnali distinti e reali, non un doppione - verificato con un agente Explore prima di scrivere codice). Chiavi i18n BOOK_NEGOZIO_* (non LIBRO_ come nell'AC, stessa correzione di US-810). 843 test (838+5 nuovi), 0 regressioni su test_page_dialogo.gd, 0 errori nel validator. BUG REALE TROVATO E CORRETTO grazie allo screenshot di verifica (non dai test): la scelta di dialogo che apre il negozio di Sidon (dlg_sidon.json) ha anche goto:null, quindi la stessa scegli() finiva il dialogo nella stessa mossa - book_overlay.gd chiudeva il libro subito dopo (dialogo_finito -> pagina transitoria -> chiudi), nascondendo il negozio appena aperto. Corretto in book_overlay.gd con un guard _pagina_in_negozio() che chiede in_negozio() all'istanza di pagina montata prima di auto-chiudere. Tocca un quinto file (book_overlay.gd) oltre ai quattro pianificati: dichiarato come correzione di bug scoperta in corsa, non scope creep. Verifica Xvfb: negozio di Sidon aperto da un dialogo vero, screenshot mandato in chat dopo la correzione. BLOCCO D CHIUSO (US-810+US-811)."
     },
     {
       "id": "US-812",

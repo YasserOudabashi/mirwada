@@ -8960,3 +8960,90 @@ COSA RESTA APERTO (dichiarato, non di questa story).
 - US-811 — Negozio nella pagina dialogo: ultima story del Blocco D.
 
 PROSSIMA STORIA: US-811 — Negozio nella pagina dialogo (compra/vendi).
+
+=== US-811: Negozio nella pagina dialogo (fase 8, Blocco D) ===
+
+COSA FATTO.
+- scripts/pages/page_dialogo.gd: nuovo campo _negozio_npc_id ("" = dialogo
+  normale). _ready() si collega A ENTRAMBI DialogueEngine.apri_vendita
+  (:20, una scelta di dialogo) e QuestSystem.apri_vendita (:17, ricompensa
+  di quest completata) — due segnali distinti e REALI, non un doppione
+  dell'AC (dlg_sidon.json/dlg_bruno.json per il primo, q_sidon_01.json per
+  il secondo). aggiorna() guadagna un ramo negozio in testa (early return),
+  mai un fall-through verso il rendering delle scelte di dialogo (protegge
+  scelte_a_schermo() che conta tutti i Button figli).
+  _disegna_negozio(): intestazione col nome del venditore, "Monete: N"
+  (Inventory.ricchezza()), sezione Compra (un bottone per item di
+  npc.vendor.listino, attivo se Inventory.conta(valuta) >= valore),
+  sezione Vendi (un bottone per ogni item posseduto di categoria != valuta,
+  via Inventory.per_categoria() su ogni GameData.item_categories() esclusa
+  "valuta" — Inventory.tutto() non porta la categoria, non e' lo strumento
+  giusto qui), bottone Chiudi. valuta =
+  GameData.items_per_categoria("valuta")[0].id: nessun id nel codice; lista
+  vuota -> avviso i18n, nessun bottone.
+  compra(item_id)/vendi(item_id) pubbliche: rimuovi+aggiungi su Inventory,
+  poi aggiorna(). in_negozio() pubblica.
+- assets/i18n/strings.csv: 5 righe BOOK_NEGOZIO_* (non LIBRO_NEGOZIO_* come
+  diceva l'AC: stesso tipo di correzione gia' fatta in US-810, il prefisso
+  reale di tutto il libro e' BOOK_).
+- tests/test_page_negozio.gd (nuovo, 5 test): apertura da un dialogo VERO
+  (dlg_sidon, scelta "Fammi vedere la merce", non un'emissione diretta del
+  segnale) -> in_negozio(); compra un item da 3 monete (10->7, un
+  ingrediente reale del listino di Sidon esteso da US-809b) -> conta+1;
+  comprare senza fondi -> rifiuto, niente cambia; vendere -> conta-1,
+  monete + valore/2 (arrotondato per difetto, minimo 1, verificato 3/2=1);
+  Chiudi (bottone vero, non una chiamata diretta al metodo privato) ->
+  in_negozio() == false.
+
+COME VERIFICATO.
+- godot --headless --import: pulito. Suite: 843 test, tutti passati
+  (838 + 5 nuovi). tests/test_page_dialogo.gd (incluso
+  test_un_bottone_per_scelta_valida, il piu' a rischio) invariato: 0
+  regressioni.
+- python tools/validate_data.py: 0 errori, 3 warning invariati.
+- VERIFICA A SCHERMO REALE (Xvfb, script di QA nello scratchpad non
+  committato): negozio di Sidon aperto da un dialogo vero, screenshot
+  mandato in chat — intestazione "Sidon", "Monete: 10", listino con prezzi
+  e bottoni Compra.
+
+CORREZIONE — BUG REALE TROVATO DALLO SCREENSHOT, NON DAI TEST (prima di
+considerare la story chiusa).
+- Il primo tentativo di screenshot mostrava il libro COMPLETAMENTE VUOTO
+  (schermo grigio) nonostante pag.call("in_negozio") risultasse true nel
+  log — la sezione negozio era davvero disegnata, ma invisibile. Causa
+  reale: scripts/book_overlay.gd ascolta gia' DialogueEngine.dialogo_finito
+  per chiudere il libro quando la pagina corrente e' "transitoria" (la
+  pagina "dialogo" lo e', data/ui/book.json:20) — e la scelta "Fammi vedere
+  la merce" di dlg_sidon.json ha SIA l'effetto apri_vendita SIA goto:null,
+  quindi la stessa scegli(0) che apre il negozio finisce anche il dialogo
+  nella stessa chiamata: apri_vendita si applica, poi termina() emette
+  dialogo_finito, e il libro si chiudeva subito sotto al negozio appena
+  aperto. Bug pre-esistente nei dati (dlg_sidon.json non e' stato toccato
+  in questa story) mai emerso prima perche' nessun listener reagiva ad
+  apri_vendita finche' questa story non ne ha scritto uno.
+  CORRETTO in scripts/book_overlay.gd: il listener di dialogo_finito ora
+  chiude il libro solo se la pagina corrente NON e' un page_dialogo in
+  modalita' negozio (nuovo _pagina_in_negozio(), interroga in_negozio()
+  sull'istanza montata senza presumere quale tipo di pagina sia). Nessuna
+  regressione sulle altre pagine transitorie/dialoghi normali (il guard e'
+  false ovunque tranne quando il negozio e' davvero aperto). Riverificato:
+  843 test ancora tutti verdi, screenshot rifatto mostra il negozio a
+  schermo. Tocca un quinto file oltre ai quattro attesi dal piano
+  (page_dialogo.gd, strings.csv, le due .translation, il test) — dichiarato
+  qui perche' e' una correzione di bug scoperta in corsa, non scope creep
+  pianificato.
+
+COSA RESTA APERTO (dichiarato, non di questa story).
+- Nessuno rispetto all'AC. Blocco D (US-810, US-811) e' chiuso.
+
+=== BLOCCO D CHIUSO ===
+US-810, US-811: il giocatore puo' vedere cosa gli manca per la pozione
+della propria Sequenza, prepararla, berla (con la penalita' di follia
+scritta se la forza), e comprare/vendere con un venditore dentro il
+dialogo — tutto data-driven (formule, listini, categorie di item), zero
+nomi di Pathway/ingrediente/NPC hardcoded nel codice nuovo.
+
+PROSSIMA STORIA: US-812 — generate_sprites.py (Blocco E, grafica
+provvisoria generata) — da ridiscutere con l'utente prima di partire, per
+la decisione gia' presa su "generatore piu' raffinato + luci/particellari
+veri + asset CC0" (vedi nota in cima al file).
