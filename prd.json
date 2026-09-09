@@ -265,8 +265,8 @@
       ],
       "priority": 15,
       "fase": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto esattamente come da AC, con due correzioni scoperte prima di chiudere la story. (1) Chiavi i18n: l'AC diceva LIBRO_AVANZAMENTO_*, ma quel prefisso non esiste in strings.csv - la convenzione reale (verificata con un agente Explore prima di scrivere codice) e' BOOK_DIAGRAMMA_AVANZAMENTO_*, coerente con BOOK_DIAGRAMMA_FUSIONE_* gia' nella stessa pagina. (2) Bug auto-scoperto nello screenshot di verifica: _testo_penalita() mostrava il campo interno '_nota' della formula (documentazione dati, mai testo per il giocatore) dentro il testo del bottone Prepara - corretto escludendo le chiavi con prefisso '_'. Colmato un gap non esplicito nell'AC: PotionSystem.concoct() non tocca l'Inventory (solo CharacteristicStore), quindi prepara_pozione() rimuove esplicitamente gli ingredienti consumati. 838 test (834+4 nuovi), 0 errori nel validator. Verifica Xvfb: screenshot prima/dopo Prepara mandati in chat, bottone Bevi forzato con +2 follia comparso correttamente. Un artefatto dello script di QA (non del codice di gioco) inizialmente nascondeva il bottone Bevi nello screenshot 'dopo' per un queue_free() differito non ancora smaltito - diagnosticato stampando i figli della pagina, risolto aggiungendo un frame di margine nello script di verifica."
     },
     {
       "id": "US-811",

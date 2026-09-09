@@ -8869,3 +8869,94 @@ gia' scritti nei layout.
 
 PROSSIMA STORIA: US-810 — Sezione Avanzamento nel diagramma (Prepara/Bevi
 la pozione, Blocco D).
+
+=== US-810: Sezione Avanzamento nel diagramma - Prepara/Bevi (fase 8, Blocco D) ===
+
+COSA FATTO.
+- scripts/pages/page_diagramma_pathway.gd: nuova _sezione_avanzamento(gd,
+  prog, mio, pw, sd), chiamata subito dopo _sezione_fusione() (stesso
+  stile a righe), riusa `sd` gia' calcolato in aggiorna() (niente doppia
+  sequence_data()). Legge sd.potion (formula_id, characteristic_sequence,
+  ingredients): riga Caratteristica richiesta (GameData.characteristic_for
+  + CharacteristicStore.possiede), una riga per ingrediente
+  ("nome x posseduti/1", Inventory.conta), riga recitazione
+  (Acting.acting_progress() in %). Bottone Prepara attivo se Caratteristica
+  posseduta E ingredienti posseduti >= soglia_parziale della formula
+  (default = tutti); sotto soglia piena mostra "Prepara (parziale: ...)"
+  con la penalita' letta da formula.penalita_parziale (escludendo le
+  chiavi con prefisso '_', vedi CORREZIONI). Bottone Bevi visibile se
+  PotionSystem.pozione_pronta() non e' vuoto: "Bevi" se
+  avanzamento_disponibile(), "Bevi (forzato: +N follia)" se solo
+  avanzamento_forzabile() (N = sd.madness_on_force x
+  Foundation.moltiplicatore_follia(), stesso calcolo di potion_system.gd
+  :113-114/140), disabilitato altrimenti. Riga di esito dopo l'ultima
+  azione (mappa reason -> chiave i18n).
+- prepara_pozione() (pubblica): PotionSystem.concoct() (:22-57) NON tocca
+  l'Inventory — legge solo l'Array di ingredienti passato e consuma la
+  Caratteristica da CharacteristicStore. Qui, dopo un concoct() riuscito,
+  si rimuove dall'Inventory un'unita' di ciascun ingrediente
+  EFFETTIVAMENTE posseduto e passato a concoct() — colma il gap che l'AC
+  dava per scontato ("poi Inventory.rimuovi di ognuno usato") senza dirlo
+  esplicitamente a chi lo fa.
+- bevi_pozione(forza) (pubblica): chiama PotionSystem.bevi(forza), salva
+  l'esito, ridisegna. avanzamento_stato() (pubblica, mirror di
+  vicini_fondibili()): stato per gli accessor di test.
+- assets/i18n/strings.csv: 17 righe nuove BOOK_DIAGRAMMA_AVANZAMENTO_*
+  (non LIBRO_AVANZAMENTO_* come diceva l'AC: quel prefisso non esiste da
+  nessuna parte nel file, la convenzione reale di tutta la pagina/libro e'
+  BOOK_ — vedi CORREZIONI).
+- tests/test_page_avanzamento.gd (nuovo, 4 test): prepara con Caratteristica
+  + 3/3 ingredienti -> pozione pronta, ingredienti scalati dall'Inventory;
+  bevi con recitazione completa (stesso _recita_completa() di
+  tests/test_advancement_gate.gd per tg_9_protettore, US-804) -> Sequenza
+  9->8; prepara parziale (2/3, soglia_parziale della formula
+  twilight_giant_9 e' 2) + bevi con recitazione completa -> follia extra
+  (penalita_parziale.follia_extra) applicata; senza Caratteristica ->
+  avanzamento_stato().prepara_attivo == false e prepara_pozione() rifiutata
+  con reason "caratteristica_mancante".
+
+COME VERIFICATO.
+- godot --headless --import: pulito. Suite: 838 test, tutti passati (834 +
+  4 nuovi). Nessuna regressione (tests/test_page_diagramma.gd non conta
+  get_child_count(): nessuna modifica necessaria li', confermato prima di
+  scrivere codice).
+- python tools/validate_data.py: 0 errori, 3 warning invariati.
+- VERIFICA A SCHERMO REALE (Xvfb, script di QA nello scratchpad non
+  committato): istanziata la pagina diagramma vera su Twilight Giant
+  Sequenza 9, screenshot prima (Caratteristica posseduta + 3/3 ingredienti,
+  Prepara attivo) e dopo (Prepara chiamato: ingredienti/Caratteristica
+  consumati, bottone Bevi forzato comparso con "+2 follia", esito "fatto")
+  mandati in chat.
+
+CORREZIONI rispetto al piano/AC.
+- L'AC dava per scontato chiavi i18n `LIBRO_AVANZAMENTO_*`: quel prefisso
+  non esiste in assets/i18n/strings.csv. La convenzione reale, verificata
+  con l'agente Explore PRIMA di scrivere codice, e' `BOOK_` (es.
+  BOOK_DIAGRAMMA_FUSIONE_*, gia' nella stessa pagina) — usato
+  BOOK_DIAGRAMMA_AVANZAMENTO_* per coerenza.
+- BUG AUTO-SCOPERTO nello screenshot di verifica, PRIMA di considerare la
+  story chiusa: la prima versione di _testo_penalita() univa TUTTE le
+  chiavi di formula.penalita_parziale, incluso "_nota" — un campo di
+  documentazione interna dei dati (stessa convenzione di "_comment" nei
+  file data/), che finiva letteralmente nel testo del bottone
+  ("Prepara (parziale: follia_extra 2, qualita instabile, _nota Pozione
+  fatta con ingredienti mancanti...)"). CORRETTO escludendo le chiavi con
+  prefisso "_" — visto SOLO grazie allo screenshot reale, non l'avrebbe
+  mai catturato un test che confronta solo bool/numeri.
+- Il primo tentativo di screenshot "dopo" mostrava la sezione IDENTICA a
+  "prima" (niente bottone Bevi visibile): non un bug del codice ma un
+  artefatto dello script di QA — aggiorna() chiamato da prepara_pozione()
+  fa queue_free() (differito) dei vecchi figli e ne aggiunge subito di
+  nuovi, quindi un solo process_frame dopo la chiamata non basta a
+  smaltire i vecchi prima dello screenshot (get_child_count() mostrava 32
+  invece di 16: il doppio, vecchi+nuovi sovrapposti). Diagnosticato
+  stampando i figli uno per uno (il bottone Bevi C'ERA gia', solo
+  nascosto dietro la copia vecchia) — corretto aggiungendo un secondo
+  process_frame di margine nello script di QA, non nel codice di gioco
+  (in partita reale il giocatore impiega piu' di un frame a cliccare, il
+  problema non si manifesta mai davvero).
+
+COSA RESTA APERTO (dichiarato, non di questa story).
+- US-811 — Negozio nella pagina dialogo: ultima story del Blocco D.
+
+PROSSIMA STORIA: US-811 — Negozio nella pagina dialogo (compra/vendi).

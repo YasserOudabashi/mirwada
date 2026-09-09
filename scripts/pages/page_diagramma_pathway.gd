@@ -33,6 +33,14 @@ var _prossima_nome: String = ""
 ## US-708: i Pathway vicini verso cui si puo' fondere. Ogni voce:
 ## { id, scritto (percorso di fusione non-stub), puo (PathwayChange.puo_cambiare) }.
 var _vicini: Array = []
+## US-810: esito dell'ultima prepara_pozione()/bevi_pozione() (dal Dictionary
+## di ritorno di PotionSystem), mostrato nella sezione avanzamento finche' non
+## arriva un'altra azione. NON azzerato in aggiorna(): e' l'ultimo risultato,
+## non uno stato ricalcolato dai dati.
+var _pozione_stato: Dictionary = {}
+## US-810: stato della sezione avanzamento per gli accessor di test (mirror
+## di _vicini), ricalcolato ad ogni aggiorna().
+var _avanzamento: Dictionary = {}
 
 
 func aggiorna() -> void:
@@ -41,6 +49,7 @@ func aggiorna() -> void:
 	_stati.clear()
 	_abilita.clear()
 	_vicini.clear()
+	_avanzamento.clear()
 	_prossima_nome = ""
 
 	var gd: Node = _n("/root/GameData")
@@ -92,6 +101,7 @@ func aggiorna() -> void:
 				add_child(_riga("%s %s" % [tr("BOOK_DIAGRAMMA_PROSSIMA"), _prossima_nome]))
 
 		_sezione_fusione(gd, prog, mio, pw)
+		_sezione_avanzamento(gd, prog, mio, pw, sd)
 
 
 # --- sezione "fondere il Pathway" (US-708) ---------------------------
@@ -158,6 +168,172 @@ func fondi(nuovo_pathway: String) -> Dictionary:
 
 func vicini_fondibili() -> Array:
 	return _vicini.duplicate(true)
+
+
+# --- sezione "avanzamento": Prepara/Bevi la pozione (US-810) -----------
+## Formula della Sequenza corrente (Progression.sequence_data().potion, gia'
+## in `sd`): Caratteristica richiesta, ingredienti posseduti/1, recitazione,
+## bottoni Prepara (attivo con Caratteristica + ingredienti >= soglia
+## parziale della formula) e Bevi (normale se avanzamento_disponibile(),
+## forzato con malus di follia se solo avanzamento_forzabile(), altrimenti
+## disabilitato). Stesso stile a righe di _sezione_fusione.
+func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, sd: Dictionary) -> void:
+	add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_TITOLO")))
+	var potion: Dictionary = sd.get("potion", {})
+	if potion.is_empty():
+		add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_NIENTE")))
+		return
+
+	var ps: Node = _n("/root/PotionSystem")
+	var store: Node = _n("/root/CharacteristicStore")
+	var inv: Node = _n("/root/Inventory")
+	var acting: Node = _n("/root/Acting")
+	var found: Node = _n("/root/Foundation")
+
+	var car: Dictionary = gd.call("characteristic_for", mio, int(potion.get("characteristic_sequence", -1)))
+	var car_posseduta: bool = store != null and not car.is_empty() \
+		and bool(store.call("possiede", str(car.get("id", ""))))
+	add_child(_riga("%s: %s (%s)" % [
+		tr("BOOK_DIAGRAMMA_AVANZAMENTO_CARATTERISTICA"),
+		str(gd.call("tr_data", car.get("name_i18n", car.get("id", "")))),
+		tr("BOOK_DIAGRAMMA_AVANZAMENTO_POSSEDUTA") if car_posseduta else tr("BOOK_DIAGRAMMA_AVANZAMENTO_MANCANTE")]))
+
+	var richiesti: Array = potion.get("ingredients", [])
+	var posseduti: Array = []
+	var ingredienti_stato: Array = []
+	for iid in richiesti:
+		var n: int = int(inv.call("conta", iid)) if inv != null else 0
+		if n >= 1:
+			posseduti.append(iid)
+		var nome: String = str(gd.call("tr_data", (gd.call("get_item", iid) as Dictionary).get("name_i18n", iid)))
+		ingredienti_stato.append({"id": iid, "nome": nome, "posseduti": n})
+		add_child(_riga("· %s  x %d/1" % [nome, n]))
+
+	var recitazione: float = float(acting.call("acting_progress")) if acting != null else 0.0
+	add_child(_riga("%s: %d%%" % [tr("BOOK_DIAGRAMMA_AVANZAMENTO_RECITAZIONE"), int(round(recitazione * 100))]))
+
+	var formula: Dictionary = gd.call("get_formula", str(potion.get("formula_id", "")))
+	var soglia: int = int(formula.get("soglia_parziale", richiesti.size()))
+	var parziale: bool = posseduti.size() < richiesti.size()
+
+	var b_prepara := Button.new()
+	b_prepara.text = (tr("BOOK_DIAGRAMMA_AVANZAMENTO_PREPARA_PARZIALE") % _testo_penalita(formula)) \
+		if parziale else tr("BOOK_DIAGRAMMA_AVANZAMENTO_PREPARA")
+	b_prepara.disabled = not (car_posseduta and posseduti.size() >= soglia)
+	b_prepara.pressed.connect(prepara_pozione)
+	add_child(b_prepara)
+
+	var pronta: Dictionary = ps.call("pozione_pronta") if ps != null else {}
+	if not pronta.is_empty():
+		var disponibile: bool = ps != null and bool(ps.call("avanzamento_disponibile"))
+		var forzabile: bool = ps != null and bool(ps.call("avanzamento_forzabile"))
+		var b_bevi := Button.new()
+		if disponibile:
+			b_bevi.text = tr("BOOK_DIAGRAMMA_AVANZAMENTO_BEVI")
+			b_bevi.pressed.connect(bevi_pozione.bind(false))
+		elif forzabile:
+			var mult: float = found.call("moltiplicatore_follia") if found != null else 1.0
+			var n_follia: int = int(round(float(sd.get("madness_on_force", 0.0)) * mult))
+			b_bevi.text = tr("BOOK_DIAGRAMMA_AVANZAMENTO_BEVI_FORZATO") % n_follia
+			b_bevi.pressed.connect(bevi_pozione.bind(true))
+		else:
+			b_bevi.disabled = true
+			b_bevi.text = tr("BOOK_DIAGRAMMA_AVANZAMENTO_BEVI")
+		add_child(b_bevi)
+
+	if not _pozione_stato.is_empty():
+		add_child(_riga(_esito_testo(_pozione_stato)))
+
+	_avanzamento = {
+		"potion": potion.duplicate(true),
+		"caratteristica_posseduta": car_posseduta,
+		"ingredienti": ingredienti_stato,
+		"recitazione": recitazione,
+		"prepara_attivo": not b_prepara.disabled,
+	}
+
+
+## '_nota'/'_comment' (prefisso '_') sono documentazione interna dei dati,
+## mai testo per il giocatore — stessa convenzione gia' usata altrove nei
+## file data/ (es. items_doc._comment).
+func _testo_penalita(formula: Dictionary) -> String:
+	var pen: Dictionary = formula.get("penalita_parziale", {})
+	var parti: Array = []
+	for k in pen:
+		if str(k).begins_with("_"):
+			continue
+		parti.append("%s %s" % [str(k), str(pen[k])])
+	return ", ".join(parti) if not parti.is_empty() else "?"
+
+
+func _esito_testo(stato: Dictionary) -> String:
+	if bool(stato.get("ok", false)):
+		return tr("BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_OK")
+	var chiavi := {
+		"caratteristica_incoerente": "BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_CARATTERISTICA_INCOERENTE",
+		"caratteristica_mancante": "BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_CARATTERISTICA_MANCANTE",
+		"ingredienti_insufficienti": "BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_INGREDIENTI_INSUFFICIENTI",
+		"formula_inesistente": "BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_FORMULA_INESISTENTE",
+		"nessuna_pozione": "BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_NESSUNA_POZIONE",
+	}
+	var chiave: String = str(chiavi.get(str(stato.get("reason", "")), ""))
+	return tr(chiave) if not chiave.is_empty() else str(stato.get("reason", ""))
+
+
+## Prepara la pozione della Sequenza corrente: PotionSystem.concoct() legge
+## solo l'Array di ingredienti passato e consuma la Caratteristica — NON
+## tocca l'Inventory (:22-57) — quindi qui, dopo un esito riuscito, si
+## rimuove dall'Inventory un'unita' di ciascun ingrediente effettivamente
+## posseduto e passato a concoct(). Pubblica, interrogabile dai test.
+func prepara_pozione() -> Dictionary:
+	var prog: Node = _n("/root/Progression")
+	var gd: Node = _n("/root/GameData")
+	var ps: Node = _n("/root/PotionSystem")
+	var inv: Node = _n("/root/Inventory")
+	if prog == null or gd == null or ps == null:
+		_pozione_stato = {"ok": false, "reason": "no_potion_system"}
+		return _pozione_stato
+
+	var mio: String = str(prog.call("pathway"))
+	var sd: Dictionary = prog.call("sequence_data")
+	var potion: Dictionary = sd.get("potion", {})
+	if potion.is_empty():
+		_pozione_stato = {"ok": false, "reason": "nessuna_formula"}
+		aggiorna()
+		return _pozione_stato
+
+	var car: Dictionary = gd.call("characteristic_for", mio, int(potion.get("characteristic_sequence", -1)))
+	var richiesti: Array = potion.get("ingredients", [])
+	var posseduti: Array = []
+	for iid in richiesti:
+		if inv != null and int(inv.call("conta", iid)) >= 1:
+			posseduti.append(iid)
+
+	var res: Dictionary = ps.call("concoct", str(potion.get("formula_id", "")), str(car.get("id", "")), posseduti)
+	if bool(res.get("ok", false)) and inv != null:
+		for iid in posseduti:
+			inv.call("rimuovi", iid, 1)
+	_pozione_stato = res
+	aggiorna()
+	return res
+
+
+## Beve la pozione pronta (forza: avanza comunque con malus se la
+## recitazione non e' completa, vedi PotionSystem.bevi). Pubblica,
+## interrogabile dai test.
+func bevi_pozione(forza: bool = false) -> Dictionary:
+	var ps: Node = _n("/root/PotionSystem")
+	if ps == null:
+		_pozione_stato = {"ok": false, "reason": "no_potion_system"}
+		return _pozione_stato
+	var res: Dictionary = ps.call("bevi", forza)
+	_pozione_stato = res
+	aggiorna()
+	return res
+
+
+func avanzamento_stato() -> Dictionary:
+	return _avanzamento.duplicate(true)
 
 
 # --- Interrogabile dai test / UI --------------------------------------

@@ -113,6 +113,22 @@ BOOK_DIAGRAMMA_FUSIONE_STUB,ancora da rivelare,yet to be revealed
 BOOK_DIAGRAMMA_FUSIONE_CONFERMA,Fondi verso qui,Fuse toward here
 BOOK_DIAGRAMMA_FUSIONE_TROPPO_PRESTO,Troppo presto: avanza ancora,Too soon: advance further
 BOOK_DIAGRAMMA_FUSIONE_NIENTE,Nessun vicino verso cui fondere,No neighbor to fuse toward
+BOOK_DIAGRAMMA_AVANZAMENTO_TITOLO,Avanzamento,Advancement
+BOOK_DIAGRAMMA_AVANZAMENTO_NIENTE,Nessuna pozione per questa Sequenza,No potion for this Sequence
+BOOK_DIAGRAMMA_AVANZAMENTO_CARATTERISTICA,Caratteristica richiesta,Required Characteristic
+BOOK_DIAGRAMMA_AVANZAMENTO_POSSEDUTA,posseduta,possessed
+BOOK_DIAGRAMMA_AVANZAMENTO_MANCANTE,mancante,missing
+BOOK_DIAGRAMMA_AVANZAMENTO_RECITAZIONE,Recitazione,Acting
+BOOK_DIAGRAMMA_AVANZAMENTO_PREPARA,Prepara,Prepare
+BOOK_DIAGRAMMA_AVANZAMENTO_PREPARA_PARZIALE,Prepara (parziale: %s),Prepare (partial: %s)
+BOOK_DIAGRAMMA_AVANZAMENTO_BEVI,Bevi,Drink
+BOOK_DIAGRAMMA_AVANZAMENTO_BEVI_FORZATO,Bevi (forzato: +%d follia),Drink (forced: +%d madness)
+BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_OK,fatto,done
+BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_CARATTERISTICA_INCOERENTE,la Caratteristica non è per questa formula,the Characteristic doesn't match this formula
+BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_CARATTERISTICA_MANCANTE,manca la Caratteristica,missing the Characteristic
+BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_INGREDIENTI_INSUFFICIENTI,ingredienti insufficienti,not enough ingredients
+BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_FORMULA_INESISTENTE,formula inesistente,formula doesn't exist
+BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_NESSUNA_POZIONE,nessuna pozione pronta,no potion ready
 TRIB_OVERLAY_EFFETTO,Mentre dura:,While it lasts:
 TRIB_OVERLAY_PROGRESSO,Progresso,Progress
 TRIB_EFFETTO_FOLLIA_ACCELERATA,la follia sale piu' in fretta,madness rises faster
