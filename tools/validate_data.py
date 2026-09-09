@@ -1074,9 +1074,9 @@ def main():
                     err(f"{rel} [{rid}]: passaggi['{dest}'] punta a una regione inesistente")
 
     for _rid in sorted(region_ids - layout_region_ids):
-        warn(f"data/world/regions.json [{_rid}]: nessun layout in data/world/layouts/ "
-             f"(US-805: atteso finche' US-807 non la disegna; region_scene.gd usa il "
-             f"fallback piatto).")
+        err(f"data/world/regions.json [{_rid}]: nessun layout in data/world/layouts/ "
+            f"(US-807d: tutte e 5 le regioni hanno un layout da questa story in poi; "
+            f"un layout mancante non e' piu' atteso).")
 
     # --- fonti di tag di fase 3 (US-334): stanze costruibili, specie di pet
     # (+ comportamenti), tag_grant dei talenti. Rendono raggiungibili le

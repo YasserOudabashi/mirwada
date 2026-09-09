@@ -8430,3 +8430,96 @@ COSA RESTA APERTO (dichiarato, non di questa story).
 PROSSIMA STORIA: US-807d — Frontiera delle Porte, layout + popolazione +
 chiusura del Blocco B (isole nella nebbia, gruppo lord_of_mysteries, boss
 Sequenza 5 del Pathway Door).
+
+=== US-807d: Frontiera delle Porte - layout + popolazione + chiusura Blocco B (fase 8) ===
+
+COSA FATTO.
+- data/world/layouts/frontiera_porte.json: sesta e ULTIMA regione con
+  layout, ZERO codice nuovo. Identita' "isole nella nebbia": sfondo
+  dominante '~' (nebbia/acqua), 6 isole (una per location_tag: crocevia
+  al centro come hub, soglia/teatro/palco/nebbia_grigia/porta_senza_
+  stanza intorno) collegate alla crocevia da ponti '=' a L (orizzontale
+  poi verticale). Spawn sull'isola soglia [7,7], passaggio verso mirwada
+  a [7,9]. 'ingresso'/'isole_nebbia' del gating esistente sono etichette
+  narrative del gate (stessa situazione di ponti_di_radici/ali_interne
+  nelle story precedenti), non location_tags: non toccati.
+  CORREZIONE rispetto al piano: la Context del piano assumeva pathway_id
+  "door" per la Caratteristica del boss (nome-tema Frontiera delle
+  Porte/Door), ma data/world/regions.json.frontiera_porte.palette_visiva
+  e' in realta' "fool" (non "door") — corretto USANDO IL DATO REALE
+  invece dell'assunzione, stessa disciplina di US-807c (palette_visiva
+  "hermit" per l'Archivio). "door" e "fool" appartengono comunque allo
+  stesso gruppo lord_of_mysteries, quindi la caratteristica resta valida
+  per il gruppo giusto — solo il Pathway specifico e' cambiato.
+  Lezione da US-807c (bug delle sale sigillate) applicata qui: verificata
+  la raggiungibilita' via BFS dallo spawn per tutte e 6 le isole PRIMA di
+  scrivere il file vero (script nello scratchpad) — nessun bug scoperto
+  stavolta, il disegno a stella (crocevia + 5 ponti) e' strutturalmente
+  piu' semplice da collegare bene rispetto al labirinto di sale
+  dell'Archivio.
+- nemici: 6 di Sequenza 7/6 (3+3) sparse su teatro/crocevia/palco/
+  nebbia_grigia (>=8 celle dallo spawn) + 1 boss Sequenza 5 sull'isola
+  porta_senza_stanza (override danno_attacco 15/raggio_aggro 200/scala
+  1.5, tag "ombra" — coerente col tema nebbia/mistero, dal vocabolario di
+  data/tags.json — caratteristica Pathway "fool" Sequenza 5 garantita).
+- oggetti: 6 moneta_comune, una per isola.
+- tools/validate_data.py: il check "regione senza layout" (US-805, warn())
+  ora e' err() — CHIUSURA DEL BLOCCO B. Con tutte e 5 le regioni gia'
+  popolate il cambio non ha effetto pratico oggi (region_ids -
+  layout_region_ids e' un insieme vuoto), ma blocca il commit se in
+  futuro un layout sparisse per errore invece di limitarsi ad avvisare.
+- tests/test_layouts.gd: 6 test nuovi dedicati a frontiera_porte (stesso
+  stile delle 4 regioni precedenti). CHIUSURA: test_get_layout_presente_e_
+  assente non ha piu' un caso "regione senza layout" (tutte e 5 ce l'hanno
+  ora) — tolto quel ramo. test_regione_senza_layout_resta_invariata
+  SOSTITUITO con test_tutte_le_regioni_hanno_un_layout (itera
+  GameData.get_regions() e verifica get_layout(id) non vuoto per
+  ciascuna) — soddisfa l'AC originale di US-807 ("test di chiusura tutte
+  e 5 le regioni hanno un layout").
+  ERRORE DI EDITING CATTURATO SUBITO: la prima stesura del nuovo test di
+  chiusura lasciava una riga orfana `(r["cont"] as Node2D).free()` dal
+  vecchio test rimosso, causando un parse error ("Identifier r not
+  declared") al primo --import — corretto prima di procedere.
+  ERRORE DI TEST CATTURATO SUBITO: la cella scelta per "cella d'acqua
+  solida" nel test di dipintura era (4,4), che in realta' cade DENTRO
+  l'isola soglia (rect riempito di ',', non '~') — corretto usando (15,4),
+  una cella genuinamente fuori da ogni isola.
+
+COME VERIFICATO.
+- python tools/validate_data.py: 0 errori, 0 warning "regione senza
+  layout" residui (l'insieme e' vuoto: tutte e 5 le regioni coperte).
+- godot --headless --import: pulito (dopo la correzione del parse error).
+- Suite: 830 test, tutti passati (824 + 6 nuovi). Nessuna regressione.
+- VERIFICA A SCHERMO REALE (Xvfb, con reset_smoothing() dalla trappola
+  #13): 3 screenshot mandati in chat — la crocevia centrale con i ponti,
+  un ponte isolato nella nebbia (molto scuro: coerente col tema, la
+  nebbia domina la mappa), l'isola porta_senza_stanza col boss
+  visibilmente piu' grande.
+
+COSA RESTA APERTO PER TUTTO IL BLOCCO B (dichiarato, non blocca la
+chiusura).
+- I rami di fallback di region_scene.gd (_dipingi/_crea_zone/
+  _crea_passaggi senza layout) restano nel codice ma ora NESSUNA delle 5
+  regioni attive li esercita piu' — copertura di test persa su quel
+  percorso (non rimosso: serve ancora come fallback esplicito se un
+  layout viene tolto, e la sua logica resta comunque semplice). Notato
+  onestamente, non e' un difetto di questa story.
+- drop resta vuoto per contratto in tutti e 5 i layout (US-809 lo popola).
+- La resa grafica vera (torce, particellari, sprite rifiniti, palette per
+  regione) resta rimandata al Blocco E con la decisione gia' presa
+  dall'utente (vedi blocco "Decisione sulla grafica" sopra).
+
+=== BLOCCO B CHIUSO ===
+US-805, US-806, US-807a, US-807b, US-807c, US-807d: tutte e 5 le regioni
+del mondo sono disegnate a mano e popolate di nemici/boss/oggetti, con
+ZERO righe di codice dedicate a una regione specifica — region_scene.gd/
+enemy.gd/item_pickup.gd/game_data.gd sono stati scritti UNA VOLTA in
+US-805/US-806 e non piu' toccati nelle 4 story successive. E' la stessa
+prova gia' vista in fase 2/5/5b/7 (zero codice dedicato per Pathway
+diversi) applicata alle regioni del mondo.
+
+PROSSIMA STORIA: US-808 — Blocco C, i 299 ingredienti delle formule
+diventano oggetti (generatore + i18n). Apre la strada a US-809 (fonti nel
+mondo: da quel punto gli oggetti a terra nei 5 layout potranno finalmente
+usare gli ingredienti veri al posto di moneta_comune, se si deciderà di
+tornare a popolarli).

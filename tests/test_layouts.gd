@@ -6,6 +6,8 @@ extends "res://tests/test_case.gd"
 ## codice dedicato (solo test dedicati che leggono il suo layout).
 ## US-807b — Valle Madre: terza regione, stesso schema.
 ## US-807c — Archivio Sepolto: quarta regione, stesso schema.
+## US-807d — Frontiera delle Porte: quinta e ultima regione, chiude il
+## Blocco B (tutte e 5 le regioni hanno un layout da qui in poi).
 
 const TILE := 32  # region_scene.gd::TILE
 const PAVIMENTO := Vector2i(0, 0)  # region_scene.gd::PAVIMENTO
@@ -43,9 +45,8 @@ func test_get_layout_presente_e_assente() -> void:
 	assert_false(_gd().call("get_layout", "marche_crepuscolo").is_empty(), "marche_crepuscolo ha un layout")
 	assert_false(_gd().call("get_layout", "valle_madre").is_empty(), "valle_madre ha un layout")
 	assert_false(_gd().call("get_layout", "archivio_sepolto").is_empty(), "archivio_sepolto ha un layout")
+	assert_false(_gd().call("get_layout", "frontiera_porte").is_empty(), "frontiera_porte ha un layout")
 	assert_true(_gd().call("get_layout", "nonesiste").is_empty(), "id ignoto -> {}")
-	assert_true(_gd().call("get_layout", "frontiera_porte").is_empty(),
-		"regione senza layout (fino a US-807d) -> {}")
 
 
 func test_mirwada_dipinta_dal_layout() -> void:
@@ -102,17 +103,15 @@ func test_mirwada_passaggio_dalla_cella_del_layout() -> void:
 	(r["cont"] as Node2D).free()
 
 
-func test_regione_senza_layout_resta_invariata() -> void:
-	var r: Dictionary = _istanzia_con_player("frontiera_porte")
-	var scena: TileMapLayer = r["scena"]
-	var player: Node2D = r["player"]
-
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), MURO, "bordo pieno (fallback piatto)")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(1, 1)), PAVIMENTO, "interno calpestabile (fallback piatto)")
-	var atteso: Vector2 = scena.to_global(scena.map_to_local(Vector2i(4, 4)))
-	assert_eq(player.global_position, atteso, "spawn di default (4,4) invariato senza layout")
-
-	(r["cont"] as Node2D).free()
+## US-807d: chiusura del Blocco B — tutte e 5 le regioni hanno un layout
+## disegnato a mano (nessuna resta piu' sul fallback piatto). Sostituisce
+## il vecchio test "regione senza layout resta invariata": non esiste piu'
+## una regione simile fra le 5 attive per dimostrarlo.
+func test_tutte_le_regioni_hanno_un_layout() -> void:
+	for r in _gd().call("get_regions"):
+		var rid: String = str((r as Dictionary).get("id", ""))
+		assert_false(_gd().call("get_layout", rid).is_empty(),
+			"la regione '%s' ha un layout disegnato a mano" % rid)
 
 
 ## Trova i nemici/pickup spawnati DENTRO la scena regione (non l'intero
@@ -537,6 +536,115 @@ func test_nemici_di_archivio_senza_player_restano_inerti() -> void:
 	var cont := Node2D.new()
 	_root().add_child(cont)
 	var scena: Node = load("res://scenes/regioni/archivio_sepolto.tscn").instantiate()
+	cont.add_child(scena)
+
+	var nemici: Array = _nemici_di(scena)
+	assert_eq(nemici.size(), 7, "i nemici si spawnano comunque senza Player")
+	for e in nemici:
+		e.call("_physics_process", 0.016)
+		assert_eq(str(e.call("stato")), "IDLE", "nessun bersaglio -> resta IDLE, nessun crash")
+
+	cont.free()
+
+
+## --- US-807d: Frontiera delle Porte (sesta e ultima regione con layout) ---
+
+
+func test_frontiera_dipinta_dal_layout() -> void:
+	var r: Dictionary = _istanzia_con_player("frontiera_porte")
+	var scena: TileMapLayer = r["scena"]
+
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), MURO, "bordo esterno solido")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(15, 4)), MURO,
+		"cella '~' (nebbia) fuori da un'isola e' solida in questa story (US-813 le da' la resa vera)")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(7, 7)), PAVIMENTO, "spawn sull'isola soglia, calpestabile")
+	# ponte '=' che collega la crocevia centrale alle isole
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(24, 12)), PAVIMENTO, "il ponte fra isole e' calpestabile")
+
+	(r["cont"] as Node2D).free()
+
+
+func test_frontiera_spawn_e_passaggio_dal_layout() -> void:
+	var r: Dictionary = _istanzia_con_player("frontiera_porte")
+	var scena: Node = r["scena"]
+	var player: Node2D = r["player"]
+
+	var atteso_spawn: Vector2 = scena.to_global(scena.map_to_local(Vector2i(7, 7)))
+	assert_eq(player.global_position, atteso_spawn, "il player compare sulla cella spawn del layout")
+
+	var passaggio: Node2D = scena.get_node_or_null("Passaggio_mirwada")
+	assert_false(passaggio == null, "Passaggio_mirwada esiste (unica destinazione di una regione a raggio)")
+	var atteso_pass := Vector2(7.5, 9.5) * TILE
+	assert_almost_eq(passaggio.position.x, atteso_pass.x, "passaggio.x dalla cella del layout")
+	assert_almost_eq(passaggio.position.y, atteso_pass.y, "passaggio.y dalla cella del layout")
+
+	(r["cont"] as Node2D).free()
+
+
+func test_frontiera_nemici_dal_layout_sequenza_e_boss() -> void:
+	var r: Dictionary = _istanzia_con_player("frontiera_porte")
+	var scena: Node = r["scena"]
+
+	var nemici: Array = _nemici_di(scena)
+	assert_eq(nemici.size(), 7, "6 nemici di Sequenza 7/6 + 1 boss dal layout")
+
+	var boss = null
+	for e in nemici:
+		if float(e.scale.x) > 1.0:
+			boss = e
+	assert_false(boss == null, "il boss (scala 1.5) esiste fra i nemici spawnati")
+	assert_almost_eq(float(boss.scale.x), 1.5, "scala del boss")
+	assert_eq(int(boss.sequenza), 5, "il boss della Frontiera e' di Sequenza 5")
+
+	var hp_atteso_boss: float = float(_gd().call("curve_value", "hp_curve", 5, 0.0))
+	var hp_boss: float = float(boss.get_node("StatsComponent").call("get_stat", "hp_max"))
+	assert_almost_eq(hp_boss, hp_atteso_boss, "StatsComponent.configure_from_balance(5) applicata al boss")
+
+	var cfg_boss: Dictionary = boss.get("_cfg")
+	assert_almost_eq(float(cfg_boss.get("danno_attacco", -1.0)), 15.0, "override.danno_attacco mergiato in _cfg")
+	assert_eq(str(cfg_boss.get("tag", "")), "ombra", "override.tag mergiato in _cfg")
+	var car: Dictionary = cfg_boss.get("caratteristica", {})
+	assert_eq(str(car.get("pathway_id", "")), "fool", "Caratteristica del gruppo garantita al boss")
+
+	(r["cont"] as Node2D).free()
+
+
+func test_frontiera_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
+	var r: Dictionary = _istanzia_con_player("frontiera_porte")
+	var scena: Node = r["scena"]
+
+	var pickup_list: Array = _pickup_di(scena)
+	assert_eq(pickup_list.size(), 6, "6 oggetti a terra dal layout")
+
+	var inv: Node = _root().get_node("Inventory")
+	var prima: int = int(inv.call("conta", "moneta_comune"))
+	var uno = pickup_list[0]
+	var q: int = int(uno.quantita)
+	assert_true(bool(uno.call("raccogli")), "raccogli() riesce la prima volta")
+	assert_eq(int(inv.call("conta", "moneta_comune")), prima + q, "Inventory.conta cresce della quantita' del dato")
+
+	(r["cont"] as Node2D).free()
+
+
+func test_frontiera_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
+	var r: Dictionary = _istanzia_con_player("frontiera_porte")
+	var scena: Node = r["scena"]
+
+	var nemici: Array = _nemici_di(scena)
+	assert_eq(nemici.size(), 7, "setup: 7 nemici")
+	for e in nemici:
+		e.get_node("StatsComponent").set("hp", 0.0)
+	assert_almost_eq(_et().call("count", "area_cleared",
+		{"senza_alleati_caduti": true, "senza_uccidere": false}), 1.0,
+		"area_cleared emesso una volta sola alla morte dell'ultimo nemico")
+
+	(r["cont"] as Node2D).free()
+
+
+func test_nemici_di_frontiera_senza_player_restano_inerti() -> void:
+	var cont := Node2D.new()
+	_root().add_child(cont)
+	var scena: Node = load("res://scenes/regioni/frontiera_porte.tscn").instantiate()
 	cont.add_child(scena)
 
 	var nemici: Array = _nemici_di(scena)
