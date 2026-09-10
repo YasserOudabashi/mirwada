@@ -9510,3 +9510,48 @@ headless (era 776 a inizio fase), 0 errori del validator. Fase 8 CHIUSA.
 
 PROSSIMA STORIA: nessuna pianificata. Fase 9 (Pathway Non-Standard) resta
 opzionale — si pianifica con `/prd` solo su richiesta esplicita.
+
+---
+
+[2026-09-10] Copertura test "9 -> 0 per tutti i Pathway" (richiesta diretta,
+fuori da un US di prd.json)
+
+- Cosa fatto:
+  - tests/test_slice_tutti_i_pathway.gd (nuovo): generalizza il pattern gia'
+    usato da test_vertical_slice.gd (Twilight Giant 9->5), test_slice_fase_5.gd
+    (Death 8->2) e test_slice_fase_5b.gd (Error 8->2) leggendo
+    GameData.pathway_ids() invece di elencare i Pathway a mano. Risultato:
+    tutti e 10 i Pathway attivi completano la Sequenza 9 -> 0 in codice
+    (Caratteristica -> concoct -> recitazione via EventTracker dai dati ->
+    bevi -> avanzamento NORMALE, mai forzato), in un solo file automatico
+    dentro la suite headless.
+  - Scrivendolo sono emersi (e sono stati corretti, nel nuovo file) due bug
+    reali mai toccati dai tre checkpoint esistenti perche' non arrivavano
+    mai cosi' in basso: (1) EventTracker._corrisponde coi filtri "_min"/
+    "_max" (es. "qualita_min") vuole il campo SENZA suffisso nei dati
+    dell'evento, non il filtro cosi' com'e' — un'acting_action come
+    tg_4_concoction (Twilight Giant, Sequenza 4) restava ferma a progresso
+    0.4 finche' non tradotto; (2) il costo in spiritualita' cresce scendendo
+    di Sequenza e il setter di StatsComponent clampa subito al massimo
+    della Sequenza configurata — un caster fisso a Sequenza 9 non poteva
+    permettersi darkness_giogo_della_malasorte (55) / darkness_dominio_
+    della_notte (80), corretto riconfigurando il caster sulla Sequenza
+    dell'abilita' in prova.
+  - 006_PRD/prd-copertura-vertical-slice.md (nuovo): la richiesta era anche
+    "gioco reale" (Livello B, tests/manual/qa_vslice.gd: input a tastiera,
+    Xvfb) per tutti i 10 Pathway. Verificato sui dati del mondo che oggi e'
+    possibile SOLO per il Twilight Giant (l'unico con ingredienti/boss/
+    venditore piazzati a Mirwada — le altre 4 regioni hanno solo nemici
+    generici senza Caratteristica da droppare e 0-24 ingredienti su 30
+    piazzati per Pathway): il PRD documenta il gap regione per regione e
+    cosa servirebbe (contenuto di mondo, non test) per estenderlo.
+- Come verificato:
+  - `godot --headless --path . --script res://tests/run_tests.gd`: 852 test,
+    tutti passati (850 + i 2 nuovi). Nessuna regressione.
+  - `python tools/validate_data.py`: esce 0, gli stessi 3 warning di prima
+    (nessun dato toccato da questa story).
+- Nota ambiente: nessun contenuto di mondo scritto in questa sessione (fuori
+  scope: e' una decisione di design su quale regione/Pathway, non un `if`
+  mancante). Il PRD e' pronto per diventare una fase se l'utente lo chiede.
+- Prossima storia: nessuna pianificata; eventualmente le 9 coppie
+  contenuto+script del Livello B elencate nel PRD, una alla volta.
