@@ -54,6 +54,9 @@ Scelte confermate con l'utente (2026-09-10):
   `Progression`, save, pagina diagramma (fog of war, colonna del proprio
   Pathway), invece di una numerazione propria — meno fedele al lessico
   dell'opera originale ma un sistema in meno da costruire.
+- **Eternal Aeon si sceglie col ciclo standard di creazione**: stesso
+  `OptionButton` di `page_creazione_personaggio.gd` usato per i Pathway
+  standard, nessun gating narrativo da costruire in questa fase (vedi § 5).
 
 ---
 
@@ -293,11 +296,12 @@ documentazione.
   questa fase implementa solo "dono una tantum".
 - **Come si ottiene narrativamente l'accesso a un Pathway Non-Standard**
   (nel materiale di riferimento di solito non si sceglie all'inizio, lo si
-  riceve in circostanze uniche). Per questa fase Eternal Aeon resta
-  selezionabile alla creazione del personaggio come i Pathway standard,
-  stesso `OptionButton` di `page_creazione_personaggio.gd` — un gating
-  narrativo vero (una quest che "sblocca" la scelta) è lavoro futuro, non
-  qui. **Segnalato esplicitamente per un veto dell'utente in revisione.**
+  riceve in circostanze uniche). **Deciso con l'utente (2026-09-10):**
+  Eternal Aeon è selezionabile alla creazione del personaggio esattamente
+  come i Pathway standard, stesso `OptionButton`/stesso ciclo di
+  `page_creazione_personaggio.gd` — nessuna condizione di sblocco per
+  questa fase. Un gating narrativo vero (una quest che "sblocca" la
+  scelta) resta un possibile lavoro futuro, fuori da questa fase.
 - Cambio di Pathway (fase 7) DA o VERSO un Pathway Non-Standard — bloccato
   (US-903), non implementato in nessuna forma.
 - Fusione (fase 7) coinvolgente un Pathway Non-Standard.
