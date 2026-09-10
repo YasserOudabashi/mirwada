@@ -10500,5 +10500,61 @@ COME VERIFICATO.
 File toccati: scenes/pages/page_diagramma_pathway.tscn,
 scripts/pages/page_diagramma_pathway.gd.
 
-PROSSIMA STORIA: nessuna pianificata. Fase 10 (opzionale, altri Pathway
-Non-Standard) si apre con /prd solo quando richiesta.
+---
+
+[2026-09-10] Fix post-fase-9 (playtest dell'utente): onboarding minimale
+
+CONTESTO. L'utente ha avviato il gioco (dopo il pull della fase 9) e ha
+segnalato tre cose: (1) "non capisco dove sono io" - il giocatore e' uno
+sprite piccolo identico agli NPC e senza etichetta; (2) le abilita' a
+schermo mostrano "TODO ability.twilight_giant..." (42 stringhe i18n ancora
+stub - story a parte, in lavorazione); (3) "non so come parlare con le
+persone" - l'interazione (F/Invio vicino a un NPC, gia' viva da US-613b)
+non ha nessun prompt a schermo. Scelta dell'utente: onboarding MINIMALE.
+
+COSA FATTO.
+- scripts/player.gd: `_monta_nome()` in `_ready()` - crea una Label "Nome"
+  sopra lo sprite col nome da GameState.nome_personaggio, aggiornata su
+  `partita_iniziata`. Stesso stile (font 10) della Label degli NPC in
+  region_scene.gd. La camera centra il giocatore, quindi la sua etichetta
+  e' sempre al centro dello schermo: si distingue dagli NPC.
+- scripts/region_scene.gd:
+  - `_crea_un_npc()`: la Label del nome ora si chiama "Nome"; per gli NPC
+    con `dialogue_id` non vuoto si aggiunge una seconda Label "Prompt"
+    ("[F] Parla", tasto risolto da InputMap), nascosta.
+  - `_npc_avvicinato`/`_npc_allontanato`: mostrano/nascondono il "Prompt"
+    dell'NPC (nuovo helper `_mostra_prompt`).
+  - nuovo helper `_tasto_interagisci()`: legge il tasto legato a
+    "interagisci" da InputMap (rispetta i remap del colophon, story 3).
+- assets/i18n/strings.csv: chiave HUD_PROMPT_INTERAGISCI
+  ("[{tasto}] Parla" / "[{tasto}] Talk"). .translation rigenerati.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 886 test
+  (884 + 2 nuovi), tutti passati. Il test esistente
+  test_layouts.test_npc_ha_sprite_e_nome_tradotto e' stato aggiornato
+  (ora prende la Label per nome "Nome", prima l'unica Label): passa.
+- python tools/validate_data.py: esce 0, stessi 3 warning di sempre.
+- 2 test nuovi: test_player_abilita.test_giocatore_ha_una_label_col_nome,
+  test_layouts.test_npc_prompt_interazione_appare_e_sparisce_col_player.
+- Verifica a schermo (tests/manual/qa_onboarding.gd, non nella suite):
+  main.tscn -> crea "Tester" -> la Label "Nome" mostra "Tester" e
+  renderizza in-world (screenshot 01, gli stessi NPC "Ottavia"/"Popolano"
+  hanno la loro Label col nome allo stesso modo); avvicinato l'NPC il
+  prompt passa da nascosto a visibile con testo "[F] Parla" e
+  `_npc_vicino` viene settato. TUTTI I PASSI OK. Nota: nel harness
+  SceneTree la camera del player non diventa `current` per lo screenshot
+  (il player non si vede nel frame catturato) - non e' un bug della
+  feature: nel gioco vero lanciato normalmente la camera centra il
+  giocatore (visto negli screenshot del primo avvio).
+
+APERTO. Il pannello "come si gioca" al primo avvio NON e' stato fatto
+(l'utente ha scelto "minimale"). La camera del harness qa_onboarding.gd
+non centra il player nello screenshot (vedi sopra).
+
+File toccati: scripts/player.gd, scripts/region_scene.gd,
+assets/i18n/strings.csv (+ .translation), tests/test_layouts.gd,
+tests/test_player_abilita.gd, tests/manual/qa_onboarding.gd (nuovo).
+
+PROSSIMA STORIA: traduzione delle 42 stringhe i18n TODO (it.json/en.json),
+poi colophon (tasti abilita'/interagisci rimappabili).

@@ -388,10 +388,23 @@ func _crea_un_npc(id: String, gd: Node, posizione: Vector2) -> void:
 	area.add_child(sprite)
 
 	var nome := Label.new()
+	nome.name = "Nome"
 	nome.text = str(gd.call("tr_data", npc_dati.get("name_i18n", id))) if gd != null else id
 	nome.add_theme_font_size_override("font_size", 10)
 	nome.position = Vector2(-TILE, -TILE * 0.95)
 	area.add_child(nome)
+
+	# US-onboarding: prompt "[F] Parla" mentre il giocatore e' nel raggio, solo
+	# per gli NPC che hanno davvero un dialogo. Nascosto finche' non ci si
+	# avvicina.
+	if not str(npc_dati.get("dialogue_id", "")).is_empty():
+		var prompt := Label.new()
+		prompt.name = "Prompt"
+		prompt.add_theme_font_size_override("font_size", 10)
+		prompt.position = Vector2(-TILE, TILE * 0.7)
+		prompt.text = tr("HUD_PROMPT_INTERAGISCI").format({"tasto": _tasto_interagisci()})
+		prompt.hide()
+		area.add_child(prompt)
 
 	area.body_entered.connect(_npc_avvicinato.bind(id))
 	area.body_exited.connect(_npc_allontanato.bind(id))
@@ -405,11 +418,28 @@ func _npc_avvicinato(body: Node, id: String) -> void:
 	if ns != null:
 		ns.call("incontra", id)
 	_npc_vicino = id
+	_mostra_prompt(id, true)
 
 
 func _npc_allontanato(body: Node, id: String) -> void:
 	if body.is_in_group("player") and _npc_vicino == id:
 		_npc_vicino = ""
+		_mostra_prompt(id, false)
+
+
+func _mostra_prompt(id: String, visibile: bool) -> void:
+	var p: Node = get_node_or_null("Npc_%s/Prompt" % id)
+	if p != null:
+		p.visible = visibile
+
+
+## Il tasto legato a "interagisci" da mostrare nel prompt (rispetta i remap
+## del colophon). "F" se l'azione non ha un tasto.
+func _tasto_interagisci() -> String:
+	for ev in InputMap.action_get_events("interagisci"):
+		if ev is InputEventKey:
+			return OS.get_keycode_string((ev as InputEventKey).physical_keycode)
+	return "F"
 
 
 ## "interagisci" vicino a un NPC -> avvia il suo dialogo (nessun if per un NPC:

@@ -77,3 +77,19 @@ func test_input_ignorato_durante_un_attacco() -> void:
 		"nessuna abilita' lanciata mentre _attaccando e' true")
 
 	player.free()
+
+
+## Onboarding: il giocatore porta una Label col nome, come gli NPC, cosi' a
+## schermo si capisce quale figura si controlla.
+func test_giocatore_ha_una_label_col_nome() -> void:
+	var gs: Node = _n("/root/GameState")
+	var salvato: String = str(gs.get("nome_personaggio"))
+	gs.set("nome_personaggio", "Tester")
+	var player: Node = _giocatore()
+
+	var lbl: Label = player.get_node_or_null("Nome")
+	assert_false(lbl == null, "il giocatore ha una Label 'Nome'")
+	assert_eq(lbl.text, "Tester", "la Label mostra il nome del personaggio corrente")
+
+	player.free()
+	gs.set("nome_personaggio", salvato)

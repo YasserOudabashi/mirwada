@@ -52,8 +52,14 @@ var _castando: bool = false
 
 @onready var _audio: Node = get_node_or_null("/root/AudioManager")
 
+## Etichetta col nome del personaggio sopra lo sprite: come gli NPC (US-813),
+## cosi' a schermo si distingue quale figura sei. Il testo viene da
+## GameState.nome_personaggio, aggiornato quando parte una partita.
+var _nome_lbl: Label = null
+
 
 func _ready() -> void:
+	_monta_nome()
 	_anim.call("configura", CATEGORIA_ANIM)
 	_anim.evento_frame.connect(_su_evento_anim)
 	_anim.animazione_finita.connect(_su_anim_finita)
@@ -79,6 +85,23 @@ func _ready() -> void:
 		float(arco.get("angolo", 100.0)), float(arco.get("raggio", 22.0)))
 
 	_anim.call("riproduci", "idle", _dir_sguardo)
+
+
+## Nome sopra la testa, stesso stile della Label degli NPC in region_scene.gd.
+func _monta_nome() -> void:
+	var gs: Node = get_node_or_null("/root/GameState")
+	if gs == null:
+		return
+	_nome_lbl = Label.new()
+	_nome_lbl.name = "Nome"
+	_nome_lbl.add_theme_font_size_override("font_size", 10)
+	_nome_lbl.position = Vector2(-32, -34)
+	_nome_lbl.custom_minimum_size = Vector2(64, 0)
+	_nome_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	add_child(_nome_lbl)
+	_nome_lbl.text = str(gs.get("nome_personaggio"))
+	if gs.has_signal("partita_iniziata"):
+		gs.partita_iniziata.connect(func(n: String) -> void: _nome_lbl.text = n)
 
 
 func _physics_process(delta: float) -> void:

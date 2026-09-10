@@ -719,18 +719,41 @@ func test_npc_ha_sprite_e_nome_tradotto() -> void:
 	assert_false(npc == null, "npc_mirco e' presente in piazza all'alba")
 
 	var sprite: Sprite2D = null
-	var label: Label = null
 	for c in npc.get_children():
 		if c is Sprite2D:
 			sprite = c
-		elif c is Label:
-			label = c
+	var label: Label = npc.get_node_or_null("Nome")
 	assert_false(sprite == null, "l'NPC ha uno Sprite2D")
 	assert_true(sprite.texture != null and sprite.texture.resource_path.ends_with("npc_popolano.png"),
 		"lo sprite usa npc_popolano.png")
 
-	assert_false(label == null, "l'NPC ha una Label col nome")
+	assert_false(label == null, "l'NPC ha una Label 'Nome' col nome")
 	var atteso: String = str(_gd().call("tr_data", _gd().call("get_npc", "npc_mirco").get("name_i18n", "")))
 	assert_eq(label.text, atteso, "il testo della Label e' il nome tradotto (GameData.tr_data)")
+
+	(r["cont"] as Node2D).free()
+
+
+## Onboarding: un NPC con dialogo mostra il prompt "[F] Parla" solo mentre il
+## giocatore e' nel suo raggio.
+func test_npc_prompt_interazione_appare_e_sparisce_col_player() -> void:
+	var r: Dictionary = _istanzia_con_player("mirwada")
+	var scena: Node = r["scena"]
+	var player: Node = r["player"]
+
+	var npc: Node = scena.get_node_or_null("Npc_npc_mirco")
+	assert_false(npc == null, "npc_mirco e' in piazza all'alba")
+	var prompt: Label = npc.get_node_or_null("Prompt")
+	assert_false(prompt == null, "npc_mirco ha un dialogo -> ha un prompt")
+	assert_false(prompt.visible, "il prompt e' nascosto finche' non ci si avvicina")
+
+	scena.call("_npc_avvicinato", player, "npc_mirco")
+	assert_true(prompt.visible, "avvicinandosi il prompt compare")
+	var atteso: String = scena.tr("HUD_PROMPT_INTERAGISCI").format(
+		{"tasto": scena.call("_tasto_interagisci")})
+	assert_eq(prompt.text, atteso, "il prompt nomina il tasto legato a 'interagisci'")
+
+	scena.call("_npc_allontanato", player, "npc_mirco")
+	assert_false(prompt.visible, "allontanandosi il prompt sparisce")
 
 	(r["cont"] as Node2D).free()
