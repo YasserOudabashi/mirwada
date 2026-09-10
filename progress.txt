@@ -10466,5 +10466,39 @@ CLAUDE.md, README.md, 006_PRD/roadmap.md, prd.json.
 
 === FASE 9 CHIUSA (US-901..US-907, 884 test) ===
 
+---
+
+[2026-09-10] Fix post-fase-9: scroll nella pagina diagramma
+
+COSA FATTO. L'utente ha segnalato uno screenshot reale (Mother, Sequenza
+9): il testo in fondo alla pagina diagramma ("Fondere il Pathway",
+l'avanzamento) finiva tagliato fuori dallo schermo. Causa: la pagina
+(griglia 10x10 + dettaglio + fusione + avanzamento/dono) puo' superare
+i 360px del design, e non aveva nessuno ScrollContainer - limitazione
+gia' segnalata (non affrontata) nelle note di US-906/US-907.
+- scenes/pages/page_diagramma_pathway.tscn: nodo radice da VBoxContainer
+  a ScrollContainer.
+- scripts/pages/page_diagramma_pathway.gd: `extends ScrollContainer`;
+  nuovo `_vbox: VBoxContainer` ricreato ad ogni aggiorna() e aggiunto
+  come unico figlio dello ScrollContainer (ogni `add_child()` di riga/
+  bottone del corpo pagina ora e' `_vbox.add_child()`) - stesso identico
+  pattern gia' in uso in page_impostazioni.gd, nessuna astrazione nuova.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 884
+  test, tutti passati. Nessuna regressione (nessun test esistente
+  presumeva VBoxContainer come radice).
+- python tools/validate_data.py: esce 0, stessi 3 warning di sempre.
+- Verifica a schermo con Xvfb (script usa-e-getta, non committato):
+  riprodotto lo scenario esatto della segnalazione (Mother, Sequenza 9)
+  - confermato che la pagina e' davvero uno ScrollContainer con
+    scroll_vertical range reale (272px), e che scorrendo fino in fondo
+    compare tutto cio' che prima era tagliato ("Fondere il Pathway",
+    "Avanzamento", Caratteristica/ingredienti/Recitazione/bottone
+    Prepara) - screenshot prima/dopo mandati in chat.
+
+File toccati: scenes/pages/page_diagramma_pathway.tscn,
+scripts/pages/page_diagramma_pathway.gd.
+
 PROSSIMA STORIA: nessuna pianificata. Fase 10 (opzionale, altri Pathway
 Non-Standard) si apre con /prd solo quando richiesta.

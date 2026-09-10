@@ -1,6 +1,13 @@
-extends VBoxContainer
+extends ScrollContainer
 ## Pagina "diagramma dei Pathway" (US-224). 10 colonne (i Pathway attivi) x 10
 ## righe (Sequenze 9->0). Generato dai dati di GameData, mai disegnato a mano.
+##
+## ScrollContainer (non VBoxContainer diretto) perche' il contenuto — griglia
+## 10x10 + dettaglio + fusione + avanzamento/dono — puo' superare i 360px del
+## design: senza scroll la parte bassa finiva fuori pagina (segnalato
+## dall'utente su schermo reale). Stesso pattern gia' in uso in
+## page_impostazioni.gd: un solo VBoxContainer interno (_vbox), ricreato ad
+## ogni aggiorna(), e' l'unico figlio dello ScrollContainer.
 ##
 ## FOG OF WAR sulla conoscenza (design-master cap. 5): una cella e' leggibile
 ## solo se il giocatore la conosce —
@@ -45,11 +52,15 @@ var _avanzamento: Dictionary = {}
 ## BoonSystem.ricevi_boon()), stesso ruolo di _pozione_stato ma per i
 ## Pathway non_standard. NON azzerato in aggiorna(): e' l'ultimo risultato.
 var _dono_stato: Dictionary = {}
+var _vbox: VBoxContainer = null
 
 
 func aggiorna() -> void:
 	for c in get_children():
 		c.queue_free()
+	_vbox = VBoxContainer.new()
+	_vbox.add_theme_constant_override("separation", 6)
+	add_child(_vbox)
 	_stati.clear()
 	_abilita.clear()
 	_vicini.clear()
@@ -71,7 +82,7 @@ func aggiorna() -> void:
 	griglia.columns = pathway_ids.size() + 1
 	griglia.add_theme_constant_override("h_separation", 2)
 	griglia.add_theme_constant_override("v_separation", 2)
-	add_child(griglia)
+	_vbox.add_child(griglia)
 
 	griglia.add_child(_cella_testo(""))
 	for pid in pathway_ids:
@@ -90,19 +101,19 @@ func aggiorna() -> void:
 		var pw: Dictionary = gd.call("get_pathway", mio)
 		var nome_pw: String = str(gd.call("tr_data", pw.get("name_i18n", mio)))
 		var sd: Dictionary = prog.call("sequence_data")
-		add_child(_riga("%s  ·  %s S%d  ·  %s" % [
+		_vbox.add_child(_riga("%s  ·  %s S%d  ·  %s" % [
 			nome_pw, tr("BOOK_DIAGRAMMA_SEI_QUI"), mia_seq, str(prog.call("tier"))]))
 		for aid in sd.get("abilities", []):
 			var ab: Dictionary = gd.call("get_ability", aid)
 			var nome: String = str(gd.call("tr_data", ab.get("name_i18n", aid)))
 			_abilita.append(nome)
-			add_child(_riga("· " + nome))
+			_vbox.add_child(_riga("· " + nome))
 
 		if mia_seq > 0:
 			var prossima: Dictionary = gd.call("get_sequence", "%s_%d" % [mio, mia_seq - 1])
 			if not prossima.is_empty():
 				_prossima_nome = str(gd.call("tr_data", prossima.get("name_i18n", "")))
-				add_child(_riga("%s %s" % [tr("BOOK_DIAGRAMMA_PROSSIMA"), _prossima_nome]))
+				_vbox.add_child(_riga("%s %s" % [tr("BOOK_DIAGRAMMA_PROSSIMA"), _prossima_nome]))
 
 		_sezione_fusione(gd, prog, mio, pw)
 		_sezione_avanzamento(gd, prog, mio, pw, sd)
@@ -119,7 +130,7 @@ func _sezione_fusione(gd: Node, _prog: Node, mio: String, pw: Dictionary) -> voi
 	if pc == null:
 		return
 	var gruppo: String = str(pw.get("group", ""))
-	add_child(_riga("%s  %s %s" % [
+	_vbox.add_child(_riga("%s  %s %s" % [
 		tr("BOOK_DIAGRAMMA_FUSIONE_TITOLO"), tr("BOOK_DIAGRAMMA_FUSIONE_GRUPPO"), gruppo]))
 
 	var ids: Array = gd.call("pathway_ids")
@@ -153,10 +164,10 @@ func _sezione_fusione(gd: Node, _prog: Node, mio: String, pw: Dictionary) -> voi
 			m.modulate = Color(1, 1, 1, 0.55)
 			m.text = tr("BOOK_DIAGRAMMA_FUSIONE_TROPPO_PRESTO")
 			h.add_child(m)
-		add_child(h)
+		_vbox.add_child(h)
 
 	if _vicini.is_empty():
-		add_child(_riga(tr("BOOK_DIAGRAMMA_FUSIONE_NIENTE")))
+		_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_FUSIONE_NIENTE")))
 
 
 ## Conferma il cambio verso `nuovo_pathway`. Rigenera la pagina dopo.
@@ -187,10 +198,10 @@ func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, s
 		_sezione_dono(gd)
 		return
 
-	add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_TITOLO")))
+	_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_TITOLO")))
 	var potion: Dictionary = sd.get("potion", {})
 	if potion.is_empty():
-		add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_NIENTE")))
+		_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_NIENTE")))
 		return
 
 	var ps: Node = _n("/root/PotionSystem")
@@ -202,7 +213,7 @@ func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, s
 	var car: Dictionary = gd.call("characteristic_for", mio, int(potion.get("characteristic_sequence", -1)))
 	var car_posseduta: bool = store != null and not car.is_empty() \
 		and bool(store.call("possiede", str(car.get("id", ""))))
-	add_child(_riga("%s: %s (%s)" % [
+	_vbox.add_child(_riga("%s: %s (%s)" % [
 		tr("BOOK_DIAGRAMMA_AVANZAMENTO_CARATTERISTICA"),
 		str(gd.call("tr_data", car.get("name_i18n", car.get("id", "")))),
 		tr("BOOK_DIAGRAMMA_AVANZAMENTO_POSSEDUTA") if car_posseduta else tr("BOOK_DIAGRAMMA_AVANZAMENTO_MANCANTE")]))
@@ -216,10 +227,10 @@ func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, s
 			posseduti.append(iid)
 		var nome: String = str(gd.call("tr_data", (gd.call("get_item", iid) as Dictionary).get("name_i18n", iid)))
 		ingredienti_stato.append({"id": iid, "nome": nome, "posseduti": n})
-		add_child(_riga("· %s  x %d/1" % [nome, n]))
+		_vbox.add_child(_riga("· %s  x %d/1" % [nome, n]))
 
 	var recitazione: float = float(acting.call("acting_progress")) if acting != null else 0.0
-	add_child(_riga("%s: %d%%" % [tr("BOOK_DIAGRAMMA_AVANZAMENTO_RECITAZIONE"), int(round(recitazione * 100))]))
+	_vbox.add_child(_riga("%s: %d%%" % [tr("BOOK_DIAGRAMMA_AVANZAMENTO_RECITAZIONE"), int(round(recitazione * 100))]))
 
 	var formula: Dictionary = gd.call("get_formula", str(potion.get("formula_id", "")))
 	var soglia: int = int(formula.get("soglia_parziale", richiesti.size()))
@@ -230,7 +241,7 @@ func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, s
 		if parziale else tr("BOOK_DIAGRAMMA_AVANZAMENTO_PREPARA")
 	b_prepara.disabled = not (car_posseduta and posseduti.size() >= soglia)
 	b_prepara.pressed.connect(prepara_pozione)
-	add_child(b_prepara)
+	_vbox.add_child(b_prepara)
 
 	var pronta: Dictionary = ps.call("pozione_pronta") if ps != null else {}
 	if not pronta.is_empty():
@@ -248,10 +259,10 @@ func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, s
 		else:
 			b_bevi.disabled = true
 			b_bevi.text = tr("BOOK_DIAGRAMMA_AVANZAMENTO_BEVI")
-		add_child(b_bevi)
+		_vbox.add_child(b_bevi)
 
 	if not _pozione_stato.is_empty():
-		add_child(_riga(_esito_testo(_pozione_stato)))
+		_vbox.add_child(_riga(_esito_testo(_pozione_stato)))
 
 	_avanzamento = {
 		"potion": potion.duplicate(true),
@@ -270,25 +281,25 @@ func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, s
 ## un ramo sul DATO (boon vs potion sulla Sequenza corrente), mai un tipo di
 ## pagina nuovo (FR-5).
 func _sezione_dono(gd: Node) -> void:
-	add_child(_riga(tr("BOOK_DIAGRAMMA_DONO_TITOLO")))
+	_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_DONO_TITOLO")))
 	var bs: Node = _n("/root/BoonSystem")
 	if bs == null:
-		add_child(_riga(tr("BOOK_DIAGRAMMA_DONO_NIENTE")))
+		_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_DONO_NIENTE")))
 		return
 
 	var requisiti: Array = bs.call("requisiti_stato")
 	for req in requisiti:
-		add_child(_riga(_riga_requisito(gd, req)))
+		_vbox.add_child(_riga(_riga_requisito(gd, req)))
 
 	var puo_ricevere: bool = bool(bs.call("puo_ricevere"))
 	var b := Button.new()
 	b.text = tr("BOOK_DIAGRAMMA_DONO_RICEVI")
 	b.disabled = not puo_ricevere
 	b.pressed.connect(ricevi_dono)
-	add_child(b)
+	_vbox.add_child(b)
 
 	if not _dono_stato.is_empty():
-		add_child(_riga(_esito_dono_testo(_dono_stato)))
+		_vbox.add_child(_riga(_esito_dono_testo(_dono_stato)))
 
 	_avanzamento = {
 		"boon": true,
