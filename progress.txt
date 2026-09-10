@@ -10695,4 +10695,35 @@ File toccati: scripts/main.gd, scripts/hud.gd, scripts/vfx.gd,
 tests/test_main_boot.gd, tests/test_i18n_hud.gd,
 tests/manual/qa_giocabilita.gd (nuovo).
 
+---
+
+[2026-09-10] Fix post-fase-9 (playtest): il giocatore spariva anche al
+cambio regione
+
+CONTESTO. Dopo il fix di main.gd, l'utente: "appena ho cambiato scena non
+mi si vede ancora". Il fix andava fatto in TUTTI i punti che ricaricano
+una regione.
+
+CAUSA. scripts/region_scene.gd::_viaggia_verso (passaggi + fast travel
+via page_mappa.viaggia_a) aveva lo STESSO bug di main.gd: `padre.add_child
+(nuova)` -> la nuova regione ultimo figlio di Main -> tilemap sopra il
+Player. main.gd::_su_partita_iniziata era l'unico altro punto e l'avevo
+gia' sistemato; questi due sono gli unici che istanziano una regione viva
+(grep di scenes/regioni/ e add_child).
+- FIX: `padre.move_child(nuova, get_index())` - identico a main.gd.
+
+COME VERIFICATO.
+- python tools/validate_data.py: 0 errori, 2 warning.
+- godot --headless ... run_tests.gd: 891 test (890 + 1), tutti passati.
+- Test nuovo:
+  test_layouts.test_cambio_regione_tiene_la_nuova_sotto_il_player -
+  dopo _viaggia_verso la nuova regione e' a un indice < Player.
+- Verifica a schermo (qa_giocabilita.gd, +passo cambio regione):
+  da Mirwada -> viaggia_a("marche_crepuscolo") -> nuova regione a indice
+  0 < Player a 1, e lo sprite del giocatore e' dipinto (3 colori distinti
+  al centro, screenshot 03). Il giocatore si vede nella nuova regione.
+
+File toccati: scripts/region_scene.gd, tests/test_layouts.gd,
+tests/manual/qa_giocabilita.gd.
+
 PROSSIMA STORIA: nessuna pianificata.

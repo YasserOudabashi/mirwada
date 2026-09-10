@@ -524,6 +524,10 @@ func _viaggia_verso(target: String) -> void:
 		return
 	var nuova: Node = load(scena_path).instantiate()
 	padre.add_child(nuova)
+	# la regione deve restare SOTTO Player/HUD/overlay nell'ordine di disegno
+	# (in main.tscn e' il primo figlio): add_child la mette per ultima e il
+	# suo tilemap coprirebbe il giocatore. Stesso fix di main.gd::_su_partita_iniziata.
+	padre.move_child(nuova, get_index())
 	queue_free()
 
 

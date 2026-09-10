@@ -734,6 +734,34 @@ func test_npc_ha_sprite_e_nome_tradotto() -> void:
 	(r["cont"] as Node2D).free()
 
 
+## Cambio regione (passaggio o fast travel): la nuova regione deve restare
+## SOTTO il Player nell'ordine di disegno, come in main.tscn - altrimenti il
+## suo tilemap copre il giocatore (bug scoperto giocando, stesso di
+## main.gd::_su_partita_iniziata).
+func test_cambio_regione_tiene_la_nuova_sotto_il_player() -> void:
+	var cont := Node2D.new()
+	_root().add_child(cont)
+	var scena: Node = load("res://scenes/regioni/mirwada.tscn").instantiate()
+	cont.add_child(scena)                 # indice 0, come in main.tscn
+	var player := Node2D.new()
+	player.name = "Player"
+	player.add_to_group("player")
+	cont.add_child(player)                # indice 1
+
+	scena.call("_viaggia_verso", "marche_crepuscolo")
+
+	var nuova: Node = null
+	for c in cont.get_children():
+		if c != scena and c.has_method("viaggia_a"):
+			nuova = c
+	assert_false(nuova == null, "una nuova regione ha preso il posto della vecchia")
+	assert_true(nuova.get_index() < player.get_index(),
+		"la nuova regione si disegna PRIMA del Player (indice %d < %d)"
+		% [nuova.get_index(), player.get_index()])
+
+	cont.free()
+
+
 ## Onboarding: un NPC con dialogo mostra il prompt "[F] Parla" solo mentre il
 ## giocatore e' nel suo raggio.
 func test_npc_prompt_interazione_appare_e_sparisce_col_player() -> void:

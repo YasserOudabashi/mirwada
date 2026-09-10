@@ -96,6 +96,33 @@ func _initialize() -> void:
 			img2.save_png("%s/02_abilita_feedback.png" % OUT)
 			print("  screenshot -> ", ProjectSettings.globalize_path("%s/02_abilita_feedback.png" % OUT))
 
+	# --- il giocatore si vede ANCHE dopo un cambio regione ---
+	print("=== dopo un cambio regione il giocatore si vede ancora ===")
+	var altre: Array = regione.call("passaggi_verso")
+	_assert(altre.size() > 0, "Mirwada ha almeno un passaggio")
+	if altre.size() > 0:
+		_assert(regione.call("viaggia_a", str(altre[0])), "viaggio verso %s avviato" % altre[0])
+		for _i in 90: await process_frame
+		var nuova_reg: Node = null
+		for c in main.get_children():
+			if c.has_method("viaggia_a"):
+				nuova_reg = c
+		_assert(nuova_reg != null and nuova_reg != regione, "nuova regione caricata")
+		_assert(nuova_reg.get_index() < p.get_index(),
+			"la nuova regione sta sotto il Player (indici %d < %d)"
+			% [nuova_reg.get_index() if nuova_reg else -1, p.get_index()])
+		var img3: Image = get_root().get_texture().get_image()
+		if img3 != null:
+			var cc := Vector2i(img3.get_width() / 2, img3.get_height() / 2)
+			var cols := {}
+			for dx in range(-10, 11, 2):
+				for dy in range(-10, 11, 2):
+					cols[img3.get_pixelv(cc + Vector2i(dx, dy)).to_html()] = true
+			_assert(cols.size() >= 3,
+				"al centro schermo, nella nuova regione, si vede lo sprite: %d colori" % cols.size())
+			img3.save_png("%s/03_dopo_cambio_regione.png" % OUT)
+			print("  screenshot -> ", ProjectSettings.globalize_path("%s/03_dopo_cambio_regione.png" % OUT))
+
 	if _ok:
 		print("=== qa_giocabilita: TUTTI I PASSI OK ===")
 		quit(0)
