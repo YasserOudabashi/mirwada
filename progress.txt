@@ -9047,3 +9047,126 @@ PROSSIMA STORIA: US-812 — generate_sprites.py (Blocco E, grafica
 provvisoria generata) — da ridiscutere con l'utente prima di partire, per
 la decisione gia' presa su "generatore piu' raffinato + luci/particellari
 veri + asset CC0" (vedi nota in cima al file).
+
+=== Decisione sulla grafica, confermata (2026-09-10) ===
+Riproposta la domanda all'utente con 4 opzioni concrete (solo generatore,
+generatore+luci/particellari, cerco asset CC0 al posto del generatore,
+mostrami un esempio prima). Prima risposta "cerco asset pack CC0"; l'utente
+ha interrotto subito dopo per correggere: "fai tutte e tre le cose" —
+combinare generatore piu' raffinato + luci/particellari veri + ricerca CC0.
+Ricerca fatta (WebSearch, sola lettura): nessun pack CC0 copre il
+vocabolario esatto di animazioni del gioco (parry/meditate/cast insieme
+sono troppo specifiche) — per personaggio/nemico/pet il generatore
+procedurale resta l'unica fonte realistica. Per il tileset (vincoli molto
+piu' larghi: 8 tipi generici, texture seamless) candidato concreto
+individuato per US-813: "Tiny Top Down Pack" di Screaming Brain Studios
+(CC0, 100 tile 32x32) — valutazione rimandata a quella story.
+
+=== US-812: generate_sprites.py - personaggio, nemico, pet, 19 fogli (fase 8, Blocco E) ===
+
+COSA FATTO.
+- tools/generate_sprites.py (nuovo, Pillow, SEED fisso = 20260910):
+  pixel art procedurale 32x32 a strati (ombra/gambe/corpo/braccia/testa/
+  copricapo/arma-accento) per le 19 combinazioni (categoria, animazione) di
+  data/animations.json (10 personaggio + 6 nemico_base + 3 pet). Palette
+  FISSA per categoria (non una delle 10 di Pathway: "sono i VFX a dire il
+  Pathway, non il cappotto"): personaggio = cappotto blu ardesia + berretto
+  + sciarpa accento caldo + pelle; nemico = tonaca grigio cenere +
+  cappuccio + accento verde malato, niente pelle (incappucciato); pet =
+  pelo bruno, disegnato come quadrupede (rig separato da quello umanoide).
+  Outline 1px (non 2px di arte/04: motivato nel tool e in arte/03 — a 32px
+  un bordo 2px su un personaggio alto ~24px mangia troppo dettaglio).
+  _pose_for(cat, nome, spec, frame, n_frame) calcola i parametri di posa
+  (bob/passo/lean/braccio/guardia/arma/bagliore/accovacciato/caduto/
+  seduto/finestra-perfetta) leggendo SOLO i campi del vocabolario chiuso di
+  animations.json (anticipo/attivi/recupero/finestra_perfetta) — zero casi
+  speciali per Pathway o nome di personaggio.
+- Estensione "luci/particellari veri" (richiesta esplicita dell'utente,
+  oltre l'AC originale): rim-light sulle forme a colore primario; bagliore
+  morbido (_glow, nucleo pieno + 2 anelli di caduta) sul tell del nemico,
+  sulla finestra di parata perfetta e sul rilascio di cast, invece di un
+  pixel netto; 3-4 particelle deterministiche (_particelle, offset dal
+  seed, MAI random non seedato) sull'ultimo frame di cast/sul picco del
+  tell. Tutto dentro lo stesso script Pillow: nessun sistema VFX runtime
+  nuovo, animation_machine.gd non toccato.
+- tools/generate_placeholders.py: riscritto per importare il corpo pulito
+  da generate_sprites.py (import diretto via importlib, stessa cartella
+  tools/) e disegnarci sopra SOLO gli overlay diagnostici di sempre (bordo
+  colorato per fase + numero del frame) — non ridisegna piu' ellissi
+  proprie. Il tileset placeholder (4 tile, invariato: US-813 lo sostituisce
+  con le 8 tile per palette) resta qui, non si e' spostato.
+- README.md § Setup: i due comandi nuovi. arte/03_sprite_e_animazioni.md:
+  nuovo § 1b "Generatore procedurale provvisorio" — cosa rispetta (32x32,
+  4 direzioni, origine, nomi file, tell visibile) e cosa NON rispetta
+  deliberatamente (1px non 2px, palette fissa non di Pathway, luci/
+  particellari come estensione), con la correzione del bug del mirror
+  documentata li' per chi tocca il tool in futuro.
+- tests/test_sprites_generati.gd (nuovo, 3 test): i 19 fogli esistono con
+  le dimensioni attese da animations.json; il frame 0 di anticipo del
+  nemico differisce da idle (il tell si vede); ogni foglio direzionale ha
+  la riga destra pixel-per-pixel identica allo specchio della riga
+  sinistra (per ogni frame separatamente, non l'intera riga del foglio
+  ribaltata in blocco). tests/test_animation_machine.gd NON toccato:
+  ancora verde, il contratto (percorso file, righe/colonne, DIM=32) e'
+  invariato.
+
+COME VERIFICATO.
+- Idempotenza/determinismo VERO: copiati i 19 PNG, rilanciato il tool una
+  seconda volta, md5sum identico su tutti e 19 (non solo "il tool non ha
+  stampato errori").
+- godot --headless --import: pulito. Suite: 846 test, tutti passati
+  (843 + 3 nuovi). test_animation_machine.gd: tutti e 7 i test ancora
+  verdi, invariati.
+- python tools/validate_data.py: 0 errori, 3 warning invariati.
+- VERIFICA A SCHERMO REALE (Xvfb, script di QA nello scratchpad non
+  committato): istanziati scenes/player.tscn e scenes/enemy.tscn veri
+  (non un placeholder), riprodotte le animazioni vere via
+  AnimationMachine.riproduci(stato, direzione) e saltato al frame
+  interessante di ciascuna (es. frame attivo per attack_heavy, frame 0
+  per la finestra di parata perfetta) — screenshot mandato in chat: idle/
+  walk/attack_heavy/parry del personaggio, anticipo/attacco del nemico. Il
+  tell verde del nemico si vede chiaramente accendersi con le particelle
+  sul frame finale.
+
+CORREZIONI rispetto al piano/al primo tentativo (scoperte PRIMA di
+considerare la story chiusa, non dopo).
+- BUG REALE nel bagliore: la prima versione di _glow() disegnava un nucleo
+  pieno e poi anelli di caduta PIU' GRANDI sopra — dato che ImageDraw di
+  Pillow SOVRASCRIVE i pixel invece di fonderli fra piu' disegni sulla
+  stessa immagine, l'ultimo anello (il piu' debole) cancellava il nucleo
+  appena disegnato: il risultato era una macchia sbiadita che copriva mezzo
+  personaggio invece di un piccolo accento luminoso. Scoperto guardando lo
+  screenshot (non da un test: nessun test controllava l'aspetto del
+  bagliore), diagnosticato campionando i pixel via Python prima di
+  concludere fosse "solo un problema di sfondo del preview". CORRETTO
+  invertendo l'ordine di disegno (anelli grandi/deboli PRIMA, nucleo pieno
+  per ultimo) — cosi' il nucleo resta sempre sopra.
+- BUG REALE nel mirror destra/sinistra: la geometria calcolata a mano per
+  "right" (stesse formule di "left" con un segno diverso in piu' punti,
+  incluso un offset laterale asimmetrico "ox" per dare un effetto di
+  profondita' 3/4) NON produceva uno specchio pixel-esatto — 160 pixel
+  diversi su 1024 nel solo idle, scoperti scrivendo il test del piano
+  PRIMA di dare per scontato che "sembra simmetrico guardandolo" bastasse.
+  CORRETTO alla radice: build_frame() ora disegna sempre "left" e deriva
+  "right" ribaltando l'immagine (Image.transpose FLIP_LEFT_RIGHT) —
+  garantisce un mirror esatto per costruzione, per qualunque posa presente
+  e futura, senza dover verificare a mano ogni nuova animazione. Riverificato
+  su 7 fogli diversi (non solo idle): 0 mismatch ovunque.
+- La direzione "up" inizialmente mostrava il volto identico a "down"
+  (nessuna differenza fra fronte e retro): corretto mostrando il colore del
+  copricapo su tutta la testa per "up" (nuca/retro del cappello, mai la
+  pelle) invece della pelle — non era nell'AC in questi termini, ma "di
+  spalle uguale a di fronte" e' un difetto di leggibilita' reale per un
+  gioco top-down, notato guardando lo screenshot.
+
+COSA RESTA APERTO (dichiarato, non di questa story).
+- US-813: sprite di NPC/oggetti/passaggi/gate + tileset per palette
+  (valutazione del pack CC0 "Tiny Top Down Pack" per il tileset).
+- La coordinazione arti/braccia del rig quadrupede (pet) e del nemico
+  incappucciato resta semplificata (le braccia del cultista sotto il
+  cappuccio si leggono poco): accettabile per grafica provvisoria, non
+  bloccante — il tell si legge comunque dal bagliore/accento, che e' il
+  requisito meccanico vero (FR-8), non la posa esatta delle braccia.
+
+PROSSIMA STORIA: US-813 — Sprite di NPC, oggetti, passaggi, gate + tileset
+per palette.

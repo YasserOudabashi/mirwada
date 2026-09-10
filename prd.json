@@ -305,8 +305,8 @@
       ],
       "priority": 17,
       "fase": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto come da AC, con l'estensione 'luci/particellari veri' esplicitamente richiesta dall'utente (rim-light, bagliore morbido su tell/parata perfetta/cast, particelle deterministiche sull'ultimo frame di cast) - tutto dentro lo stesso script Pillow, nessun sistema VFX runtime nuovo. Decisione grafica finale dell'utente: combinare generatore+luci/particellari+ricerca CC0 (non solo CC0 come prima risposta, corretta subito dopo). Ricerca CC0 fatta: nessun pack copre il vocabolario esatto (parry/meditate/cast), quindi il generatore procedurale resta la fonte per personaggio/nemico/pet; per il tileset di US-813 individuato un candidato concreto (Tiny Top Down Pack, CC0, screamingbrainstudios.itch.io). 846 test (843+3 nuovi), test_animation_machine.gd invariato e verde (7/7). 0 errori nel validator. Idempotenza vera (md5sum identico al secondo run). DUE BUG REALI trovati e corretti PRIMA di chiudere: (1) _glow() disegnava il nucleo pieno PRIMA degli anelli di caduta piu' grandi, che lo sovrascrivevano (Pillow ImageDraw non fonde, sovrascrive) - il bagliore appariva come una macchia sbiadita invece di un accento luminoso, corretto invertendo l'ordine di disegno; (2) il mirror destra/sinistra calcolato a mano (stesse formule con segno diverso) non era pixel-esatto (160/1024 mismatch nel solo idle) - corretto disegnando sempre 'left' e derivando 'right' con Image.transpose, garantendo il mirror per costruzione anziche' a mano, riverificato 0 mismatch su 7 fogli diversi. Anche 'up' corretto per mostrare il retro del copricapo invece del volto (di spalle = di fronte era un difetto reale, non nell'AC ma notato dallo screenshot). Verifica Xvfb: personaggio/nemico veri (scenes/player.tscn, enemy.tscn) via AnimationMachine, screenshot idle/walk/attack_heavy/parry + anticipo/attacco nemico mandati in chat."
     },
     {
       "id": "US-813",
