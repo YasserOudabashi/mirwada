@@ -9318,5 +9318,195 @@ COSA RESTA APERTO (dichiarato, non di questa story).
   incappucciato (nota gia' aperta da US-812) resta semplificata: non
   bloccante, stesso motivo di allora.
 
-PROSSIMA STORIA: US-814 — chiusura fase 8 (qa_vslice.gd, test_slice_fase_8,
-blocco validator "chiusura fase 8", documentazione).
+=== US-814: verifica giocata end-to-end + documentazione + chiusura (fase 8, Blocco F) ===
+
+COSA FATTO.
+- tests/manual/qa_vslice.gd (nuovo, script SceneTree, NON nella suite
+  headless — tests/run_tests.gd legge solo res://tests, non ricorsivo):
+  gioca l'intera vertical slice per davvero con Xvfb, un assert + uno
+  screenshot per passo. 9 passi: (1) avvio, il libro si apre da solo sullo
+  scaffale; (2) creazione di "Tester" (Pathway = quello preselezionato
+  dalla pagina da GameData.pathway_ids()+balance.json.pathway_default,
+  mai scritto a mano), conferma() chiude il libro da solo; (3) conferma
+  che il libro sia chiuso; (4) cammina coi tasti veri (Input.action_press
+  sui move_*) fino ai 3 oggetti del layout di Mirwada — che sono esatta-
+  mente i 3 ingredienti di formula_twilight_giant_9, non e' un caso: US-809
+  li ha piazzati li' —, Inventory.conta sale per ciascuno; (5) preme
+  abilita_1 (tasto vero), l'evento tracciato ability_used sale; (6) cammina
+  fino al boss di Mirwada (layout.nemici, l'unico con scala>1.0, Sequenza
+  8) e lo uccide a colpi di mischia (tasto "attacco" vero, non un bypass):
+  il segnale morto(chi) di enemy.gd arriva, l'evento tracciato
+  enemy_defeated sale con un payload reale (non piu' {}), il drop
+  (drop_probabilita 1.0) compare a terra o viene raccolto sul colpo;
+  (7) DialogueEngine.avvia(dlg_sidon)+scegli(0) apre la vendita, compra()
+  sulla pagina dialogo fa salire Inventory e scendere la valuta; (8) nel
+  diagramma, prepara_pozione() (formula_twilight_giant_9, i 3 ingredienti
+  gia' in Inventory dal passo 4 + la Caratteristica di Sequenza 9), la
+  recitazione riempita via EventTracker.emit_event per ogni acting_action
+  della Sequenza corrente (stesso schema di
+  tests/test_vertical_slice.gd::_recita_sequenza_corrente), bevi_pozione()
+  forzata (vedi sotto perche') porta Progression.sequence() da 9 a 8;
+  (9) cammina fino a un passaggio ed entra in un'altra regione con un
+  layout diverso. Esce 0/1, come gli altri strumenti.
+- tests/test_slice_fase_8.gd (nuovo, IL CHECKPOINT, nella suite headless):
+  a differenza dei checkpoint delle fasi 5/5b/7 (liste "vietati" scritte a
+  mano), qui la lista degli id proibiti nel motore (res://scripts,
+  res://scripts/pages) e' SCOPERTA dai dati — GameData.pathway_ids(), gli
+  id di data/world/regions.json (esclusa "mirwada", gia' hardcoded da
+  region_scene.gd::HUB fin dalla fase 6 per design, verificato che sia
+  l'unica eccezione con un grep diretto), gli id di data/npc/roster.json
+  (nessuna eccezione: verificato che oggi non ce n'e' nessuno hardcoded),
+  gli id di data/potions/formulas.json che iniziano per
+  "formula_twilight_giant_", e i 3 ingredienti di formula_twilight_giant_9.
+  Riporta avanti l'unica eccezione gia' ammessa dal checkpoint di fase 7
+  ("death" come animazione, non Pathway, in enemy.gd). Un secondo test
+  conferma che qa_vslice.gd esista e non sia raccolto da run_tests.gd.
+- tools/validate_data.py: blocco "chiusura fase 8" dopo quello di fase 7 —
+  i 5 file data/world/layouts/*.json esistono; NUOVO controllo (non
+  c'era) che ogni layout abbia almeno un nemico con scala > 1.0 (un
+  boss, convenzione US-806); "ogni ingrediente attivo ha una fonte" e'
+  gia' coperto dal blocco US-809c esistente, dichiarato soddisfatto nel
+  commento; i 19+4=23 fogli sprite (calcolati da data/animations.json +
+  i 4 di US-813) esistono in assets/placeholder/ con la dimensione esatta
+  attesa (lettura diretta dell'header PNG via struct, nessuna dipendenza
+  nuova).
+- scripts/pages/page_impostazioni.gd: una Label con
+  tr("COLOPHON_SCHEMA_COMANDI") subito dopo il titolo COLOPHON_INPUT,
+  prima della lista dei tasti rimappabili (quella resta invariata: e'
+  gia' dinamica, elenca ogni azione col tasto attuale). assets/i18n/
+  strings.csv: nuova chiave COLOPHON_SCHEMA_COMANDI (it/en) col riepilogo
+  prosa dello schema comandi (valori confermati leggendo project.godot
+  [input]: WASD/frecce movimento, J attacco, Spazio/Shift schivata, K
+  parata, 1-4 abilita', Tab/I libro, F/Invio interagisci, Q/E volta
+  pagina — combacia col testo dell'AC del PRD).
+- Documentazione: CLAUDE.md (Fase 8 CHIUSA con verdetto, "Fase corrente"
+  rimossa dato che l'unica fase attiva restante e' la 9 opzionale),
+  README.md (paragrafo Fase 8 + comandi build_tileset.gd/qa_vslice.gd nel
+  blocco Setup), 006_PRD/roadmap.md (blocco Fase 8 riscritto da "IN CORSO"
+  a "CHIUSA" nello stile delle fasi precedenti, "fasi 1-7" -> "fasi 1-8"
+  nella sezione fase 9), arte/README.md (punto 2 aggiornato — dalla fase 8
+  l'arte generata e' "pulita", non solo diagnostica — + generate_sprites.py/
+  build_tileset.gd nella sezione Strumenti).
+
+BUG TROVATI E CORRETTI SCRIVENDO qa_vslice.gd (nessuno nell'AC in questi
+termini, tutti scoperti facendo girare lo script per davvero, non
+indovinati a tavolino).
+- `_initialize()` chiamava `_passo_1_avvio()` senza `await`: essendo una
+  funzione che contiene `await` al suo interno, GDScript la avvia come
+  coroutine e PROSEGUE subito col passo successivo invece di aspettarla —
+  una race condition che rendeva il passo 2 (creazione) instabile fra un
+  run e l'altro (a volte passava, a volte no, secondo la schedulazione).
+  Scoperto confrontando l'ordine di stampa dei print fra due run identici.
+  Corretto aggiungendo `await`.
+- `Book.apri_a(page_id)` e' no-op se il libro e' GIA' aperto (guardia
+  esplicita nel codice, `book.gd:78-79`) — usavo apri_a per navigare dallo
+  scaffale al frontespizio, ma main.gd ha gia' aperto il libro al passo 1:
+  serviva `vai_a`, il metodo per cambiare pagina a libro gia' aperto.
+  Stesso errore ripetuto al passo 8 (il libro resta aperto sul negozio di
+  Sidon dal passo 7, US-811: non si chiude sotto un negozio appena
+  aperto) — corretto controllando `e_aperto()` prima di scegliere fra
+  `vai_a`/`apri_a`.
+- La voltata di pagina (book_overlay.gd) e' un'animazione a TEMPO REALE
+  (0.35s di default) che scambia il contenuto vivo della pagina a meta'
+  corsa: due `await process_frame` non bastano mai a vederla completata.
+  Corretto con un'attesa di 40 frame dopo ogni cambio di pagina.
+- Raggiungere una cella "entro 12px" non garantiva la raccolta di un
+  oggetto (RAGGIO del CollisionShape2D e' 10px in
+  characteristic_pickup.gd): soglia troppo larga, l'Area2D poteva non
+  arrivare mai a sovrapporsi per davvero. Corretto restringendo la
+  soglia a 6px.
+- Camminare in linea retta (Input.action_press sui move_*, senza aggirare
+  gli ostacoli) verso un oggetto/passaggio lontano si impantanava contro
+  un muro del layout disegnato a mano, esaurendo il tetto di frame senza
+  arrivare mai. Corretto con un avvicinamento (teletrasporto vicino al
+  bersaglio, MAI sul bersaglio stesso) seguito da un ultimo tratto
+  camminato per davvero — resta un pickup/attraversamento a fisica vera,
+  non un bypass.
+- Dopo essere arrivato vicino al boss camminando, `_dir_sguardo` restava
+  nell'ultima direzione di MOVIMENTO (es. "su", se ci si avvicina da
+  sopra) e non necessariamente verso il boss: la hitbox mischia si apriva
+  dalla parte sbagliata e mancava sempre il bersaglio. Corretto calcolando
+  esplicitamente la direzione dal player al boss e impostando
+  `_dir_sguardo` prima di ogni attacco.
+- Il boss (raggio_aggro) si sposta durante il combattimento: un singolo
+  avvicinamento prima della sequenza di colpi non basta, dopo i primi
+  scambi la mischia (raggio_arco 22px) smetteva di trovarlo (0 danno su
+  30 colpi sferrati nella prova che l'ha scoperto). Corretto riavvicinando
+  il player al boss a OGNI colpo, non solo quando "abbastanza lontano".
+- Il rilevamento del drop del boss per CONTEGGIO di item_pickup in scena
+  era un falso positivo/negativo: la citta' ha altri oggetti del layout
+  mai raccolti (il conteggio "prima" non era zero) e il combattimento fa
+  passare il player vicino ad alcuni di essi (raccogliendoli per
+  davvero, un effetto collaterale reale del cammino, non un bug).
+  Corretto confrontando l'IDENTITA' dei nodi (un pickup nuovo non
+  presente nell'elenco "prima") E, in aggiunta, il totale degli item
+  posseduti (il player muore addosso al boss: se il drop nasce sotto ai
+  suoi piedi puo' essere raccolto nello stesso istante,
+  item_pickup.gd::_su_corpo — in quel caso non resta un pickup nuovo a
+  terra, ma la somma sale comunque).
+- SCOPERTA DI DATI (non un bug, un'interazione reale fra due parti
+  dell'AC): lo stile di recitazione della Sequenza 9 del Twilight Giant
+  e' "duello puro" — Acting applica un decadimento per ogni azione
+  INCOERENTE col ruolo, e l'AC del passo 5 chiede esplicitamente di
+  premere un'abilita' (per provare il tasto vero) PRIMA di arrivare
+  all'alchimia della stessa Sequenza. Usare un'abilita' e' incoerente col
+  "duello puro": la recitazione riempita via EventTracker arriva a
+  acting_progress 0.950, mai a 1.0, in QUESTO cammino (non e' un tetto
+  generale: senza il passo 5 arriverebbe a 1.0, come in
+  tests/test_vertical_slice.gd che non usa mai abilita'). Corretto
+  accettando che la recitazione resti alta ma non completa (assert
+  acting_progress >= 0.9, non e_completo()) e chiamando
+  bevi_pozione(true) (forzata, malus di follia dai dati — PotionSystem.bevi
+  gia' previsto per questo caso), non e' un bypass: e' l'esito corretto
+  di questa specifica sequenza di azioni.
+- Inventory.tutto()["istanze"] e' un Array, non un Dictionary (avevo
+  scritto `as Dictionary` per errore, SCRIPT ERROR a runtime): corretto
+  in `_totale_inventario()`.
+
+COME VERIFICATO.
+- godot --headless --path . --import: pulito dopo le modifiche a
+  strings.csv e ai nuovi file .gd.
+- godot --headless --path . --script res://tests/run_tests.gd: 850 test,
+  tutti passati (848 + 2 nuovi di test_slice_fase_8.gd). Nessuna
+  regressione.
+- python tools/validate_data.py: esce 0, 3 warning invariati (fusioni
+  stub di fase 7b, sinergie di gruppi differiti, stringhe TODO), blocco
+  "chiusura fase 8" senza errori.
+- VERIFICA A SCHERMO REALE (Xvfb, --display-driver x11 --rendering-driver
+  opengl3): tests/manual/qa_vslice.gd lanciato PER DAVVERO, due volte di
+  seguito (per escludere un fluke dopo le correzioni di timing/RNG sopra):
+  entrambe le volte "TUTTI I PASSI OK", exit 0, 9 screenshot prodotti in
+  /tmp/qa_vslice/, mandati in chat (scaffale, frontespizio, mondo dopo la
+  creazione, raccolta ingredienti, boss sconfitto, negozio di Sidon,
+  Sequenza 8 raggiunta, nuova regione). Confermato a schermo l'intero
+  ciclo: creazione con Pathway scelto dai dati, movimento/raccolta/abilita'/
+  attacco tutti a tasto vero, un boss ucciso in combattimento reale (non un
+  hp=0 diretto), un acquisto vero da un NPC, una pozione preparata e bevuta
+  con avanzamento di Sequenza, un passaggio fra regioni con layout diverso.
+
+COSA RESTA APERTO (dichiarato, non bloccante).
+- tests/manual/qa_vslice.gd non e' perfettamente deterministico
+  frame-per-frame (dipende dal framerate reale del rendering software di
+  Xvfb/llvmpipe, molto piu' lento di un display reale): i margini di
+  tempo/soglia scelti (40 frame per una voltata di pagina, 80 colpi max
+  contro il boss, teletrasporti di avvicinamento) sono generosi apposta.
+  Non e' nella suite headless proprio per questo: e' uno strumento di
+  verifica manuale, rilanciabile a mano prima di ogni release, non un
+  gate CI.
+- La scorciatoia della Caratteristica di Sequenza 9 (concessa diretta via
+  CharacteristicStore invece che farmata) e quella della valuta per Sidon
+  (concessa diretta via Inventory) restano scorciatoie dichiarate di
+  QUESTO script di QA, non del gioco: il gioco vero le richiede per le
+  vie consuete (drop di un Beyonder di Sequenza giusta, vendita di un
+  oggetto). Documentate nei commenti del file.
+
+VERDETTO DI CHIUSURA FASE 8.
+Tutti i sistemi scritti nelle fasi 1-7 sono ora raggiungibili con la
+tastiera in una partita vera, dall'avvio al cambio di regione, passando
+per raccolta, combattimento, commercio e alchimia — provato giocando
+davvero (Xvfb) e non solo dai test headless. Zero sistemi nuovi, zero
+primitive/eventi/tag nuovi, save schema_version 22 invariato. 850 test
+headless (era 776 a inizio fase), 0 errori del validator. Fase 8 CHIUSA.
+
+PROSSIMA STORIA: nessuna pianificata. Fase 9 (Pathway Non-Standard) resta
+opzionale — si pianifica con `/prd` solo su richiesta esplicita.

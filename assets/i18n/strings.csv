@@ -25,6 +25,7 @@ COLOPHON_FINALE_SCEGLI_OGGETTO,Scegli questo oggetto,Choose this object
 COLOPHON_AUDIO,Audio,Audio
 COLOPHON_VIDEO,Video,Video
 COLOPHON_INPUT,Comandi,Controls
+COLOPHON_SCHEMA_COMANDI,WASD/frecce: movimento · J: attacco · Spazio/Shift: schivata · K: parata · 1-4: abilità · Tab/I: libro · F/Invio: interagisci · Q/E: volta pagina,WASD/arrows: move · J: attack · Space/Shift: dodge · K: parry · 1-4: abilities · Tab/I: book · F/Enter: interact · Q/E: turn page
 COLOPHON_LINGUA,Lingua,Language
 COLOPHON_BUS_MASTER,Volume generale,Master volume
 COLOPHON_BUS_MUSIC,Musica,Music

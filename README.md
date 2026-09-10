@@ -112,6 +112,20 @@ zero righe di codice che nominino un Pathway, una coppia di fusione, una
 tribolazione o un finale specifico. `ability_engine.gd` non è stato
 toccato in tutta la fase. PRD: `006_PRD/prd-fase-7-endgame.md`.
 
+**Fase 8 — Vertical slice giocabile: chiusa.** 19 story, 850 test. Le fasi
+1-7 avevano costruito tutti i sistemi ma nessuno poteva giocare il gioco
+con la tastiera; la fase 8 ha collegato i sistemi già scritti, riempito i
+dati mancanti (i 307 ingredienti delle formule diventano oggetti veri con
+fonti nel mondo, 5 regioni con layout disegnati a mano, boss e nemici dai
+dati) e messo una grafica provvisoria generata (`tools/generate_sprites.py`:
+pixel art procedurale deterministica, 23 fogli). **Zero sistemi nuovi**,
+save invariato. Verdetto (US-814): `tests/manual/qa_vslice.gd` gioca
+un'intera partita con Xvfb — creazione, raccolta, abilità a tastiera, un
+boss ucciso a colpi di mischia, un acquisto da un NPC, una pozione
+preparata e bevuta (Sequenza 9 → 8), un passaggio fra regioni — con zero
+righe di codice che nominino un Pathway/regione/NPC/formula specifici
+(`tests/test_slice_fase_8.gd`, lista vietata letta dai dati).
+
 ## Setup
 
 Richiede Godot 4.x e Python 3 (solo per gli strumenti di dati).
@@ -122,8 +136,14 @@ python tools/validate_data.py      # valida tutti i dati, esce 0 se ok
 godot --headless --path . --script res://tests/run_tests.gd   # suite headless, esce 0 se ok
 python tools/generate_pathways.py  # rigenera la spina dorsale dei 10 pathway
 python tools/generate_formula_ingredients.py  # item mancanti per gli ingredienti delle formule
-python tools/generate_sprites.py      # arte pulita: personaggio/nemico/pet, 19 fogli (US-812)
+python tools/generate_sprites.py      # arte pulita: personaggio/nemico/pet/NPC/oggetti/tileset, 23 fogli (US-812/US-813)
 python tools/generate_placeholders.py # arte + overlay diagnostici (bordi/numero frame) per tarare il combattimento
+godot --headless --path . --script res://tools/build_tileset.gd  # ricostruisce il TileSet dal tileset.png (US-813)
+
+# Verifica a schermo reale della vertical slice (Xvfb, non fa parte della suite headless):
+# Xvfb :99 -screen 0 1280x720x24 &
+# DISPLAY=:99 godot --display-driver x11 --rendering-driver opengl3 \
+#   --path . --script res://tests/manual/qa_vslice.gd
 ```
 
 La suite headless include un test che esegue `tools/validate_data.py`: un

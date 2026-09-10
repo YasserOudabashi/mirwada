@@ -13,6 +13,7 @@ Gli schema in data/schema/ restano la documentazione formale del formato.
 
 import json
 import os
+import struct
 import sys
 from collections import Counter
 
@@ -2366,6 +2367,61 @@ def main():
     if _end_ids != {"apoteosi", "consumazione", "rinuncia"}:
         err(f"data/endings.json: attesi esattamente i 3 finali con la fase 7 chiusa, "
             f"trovati {sorted(_end_ids)} (US-721).")
+
+    # --- chiusura fase 8 (US-814): la vertical slice e' giocabile ---
+    # "ogni ingrediente attivo ha una fonte" e' gia' il blocco US-809c qui
+    # sopra (fonti_trovate/senza fonte): non lo riscrivo.
+    _FASE_8_REGIONI = ["mirwada", "marche_crepuscolo", "valle_madre",
+                        "archivio_sepolto", "frontiera_porte"]
+    for _rid in _FASE_8_REGIONI:
+        if not os.path.exists(os.path.join(layouts_dir, f"{_rid}.json")):
+            err(f"data/world/layouts/{_rid}.json: layout della fase 8 mancante (US-814: "
+                f"le 5 regioni devono avere tutte un layout disegnato a mano).")
+        else:
+            _lay = load_json(os.path.join(layouts_dir, f"{_rid}.json")) or {}
+            _nemici_lay = _lay.get("nemici", [])
+            if not any(float(n.get("scala", 1.0)) > 1.0 for n in _nemici_lay if isinstance(n, dict)):
+                err(f"data/world/layouts/{_rid}.json: nessun nemico con scala > 1.0 - "
+                    f"ogni regione deve avere almeno un boss (US-814/US-806).")
+
+    def _png_size(path):
+        try:
+            with open(path, "rb") as fh:
+                head = fh.read(24)
+            if len(head) < 24 or head[:8] != b"\x89PNG\r\n\x1a\n":
+                return None
+            w, h = struct.unpack(">II", head[16:24])
+            return w, h
+        except OSError:
+            return None
+
+    _PLACEHOLDER = os.path.join(ROOT, "assets", "placeholder")
+    _anim_doc = load_json(os.path.join(DATA, "animations.json")) or {}
+    _n_direzioni = len((_anim_doc.get("convenzioni", {}) or {}).get("direzioni", [])) or 4
+    _fogli_attesi = {}
+    for _cat in ("personaggio", "nemico_base", "pet"):
+        for _nome, _spec in (_anim_doc.get(_cat, {}) or {}).items():
+            _righe = _n_direzioni if _spec.get("direzionale", True) else 1
+            _fogli_attesi[f"{_cat}_{_nome}.png"] = (32 * int(_spec.get("frames", 1)), 32 * _righe)
+    _fogli_attesi.update({
+        "npc_popolano.png": (32, 32 * 6),
+        "oggetti.png": (32 * 9, 32),
+        "passaggio.png": (32, 32),
+        "gate.png": (32, 32),
+    })
+    if len(_fogli_attesi) != 23:
+        err(f"tools/validate_data.py: attesi 19+4=23 fogli sprite, il calcolo ne da' "
+            f"{len(_fogli_attesi)} (US-814: data/animations.json e' cambiato?).")
+    for _nome_file, (_w_atteso, _h_atteso) in _fogli_attesi.items():
+        _path = os.path.join(_PLACEHOLDER, _nome_file)
+        if not os.path.exists(_path):
+            err(f"assets/placeholder/{_nome_file}: foglio sprite mancante (US-814: la fase 8 "
+                f"e' chiusa, i 19+4 fogli devono esistere - rilancia tools/generate_sprites.py).")
+            continue
+        _dim = _png_size(_path)
+        if _dim != (_w_atteso, _h_atteso):
+            err(f"assets/placeholder/{_nome_file}: dimensione {_dim}, attesa "
+                f"({_w_atteso}, {_h_atteso}) (US-814).")
 
     report()
     return 1 if errors else 0

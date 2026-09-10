@@ -202,25 +202,40 @@ nuovo personaggio — con zero righe di codice che nominino un Pathway, una
 coppia di fusione, una tribolazione o un finale specifico.
 `scripts/ability_engine.gd` non è stato toccato in tutta la fase.
 
-Fase corrente: **8 — Vertical slice giocabile** (IN CORSO). Le fasi 1-7
-hanno costruito tutti i sistemi, ma **nessuno può giocare il gioco con la
-tastiera**: `main.tscn` è rimasta la scena di prova della fase 1 (nessuna
-partita avviata, nessun tasto per le abilità, proiettili che non fanno
-danno, recitazione ferma all'1.5%, i 299 ingredienti delle formule che non
-esistono come oggetti, mondo senza nemici né oggetti). La fase 8 collega i
-sistemi già scritti, riempie i dati mancanti e mette una grafica
-provvisoria generata: **zero sistemi nuovi**, save invariato.
+Fase 8 — Vertical slice giocabile: **CHIUSA** (19 story US-801..US-806,
+US-807a..d, US-808, US-809a..c, US-810..US-814, 850 test). PRD in
+`006_PRD/prd-fase-8-vertical-slice.md`; istruzioni operative in
+`006_PRD/prossimi-passi.md`. Le fasi 1-7 avevano costruito tutti i sistemi
+ma nessuno poteva giocare il gioco con la tastiera: `main.tscn` era rimasta
+la scena di prova della fase 1. La fase 8 ha collegato i sistemi già
+scritti, riempito i dati mancanti e messo una grafica provvisoria generata
+(**zero sistemi nuovi**, save `schema_version` **invariato**). 7 blocchi:
+0 avvio + controlli (`GameState.nuova_partita` con scelta del Pathway,
+abilità a tastiera + hotbar, proiettili/mischia che colpiscono davvero),
+A recitazione (payload veri di `enemy_defeated`/`item_crafted`/
+`ritual_completed`/`area_cleared`), B mondo (5 layout ASCII disegnati a
+mano in `data/world/layouts/`, nemici/boss/oggetti dai dati), C economia
+(i 307 ingredienti delle formule diventano oggetti via
+`tools/generate_formula_ingredients.py`, US-808, con fonti nel mondo:
+drop/listini/raccolta, US-809a..c), D pagine del libro (Prepara/Bevi nel
+diagramma, negozio compra/vendi nel dialogo), E grafica (`tools/
+generate_sprites.py`: pixel art procedurale deterministica per personaggio/
+nemico/pet/NPC/oggetti/tileset, 23 fogli — 19 animazioni + npc_popolano/
+oggetti/passaggio/gate —, `tools/build_tileset.gd` per il TileSet a righe-
+per-palette), F verifica giocata end-to-end + chiusura.
 
-- PRD: `006_PRD/prd-fase-8-vertical-slice.md` — 19 story (US-801..US-806,
-  US-807a..d, US-808, US-809a..c, US-810..US-814; US-807 originale
-  spezzata in 4 per regione e US-809 originale spezzata in 3 per
-  meccanica, entrambe il 2026-09-09) in 7 blocchi, ognuna con acceptance
-  criteria verificabili.
-- **Come eseguirlo: `006_PRD/prossimi-passi.md`** — ordine delle
-  operazioni, quando usare `/prd` e `/ralph`, setup dell'ambiente, comandi
-  di verifica, e le trappole già scoperte (isolamento dei test, libro
-  lasciato aperto, nomi reali dei segnali...). **Leggilo prima di toccare
-  qualunque file.**
+**Verdetto** (US-814, `tests/manual/qa_vslice.gd` + `tests/
+test_slice_fase_8.gd`): una partita giocata per davvero con Xvfb — scaffale
+→ creazione con Pathway scelto da `pathway_ids()` → cammina e raccoglie
+oggetti col tasto vero → lancia un'abilità col tasto vero → uccide un boss
+a colpi di mischia (segnale `morto` + evento tracciato `enemy_defeated`
+con payload reale) → compra da un NPC → prepara e beve una pozione (
+`Progression.sequence()` 9 → 8) → attraversa un passaggio verso una
+regione con un layout diverso — con zero righe di codice che nominino un
+Pathway, una regione, un NPC o una formula specifici (checkpoint dinamico:
+la lista vietata è letta da `GameData.pathway_ids()` +
+`data/world/regions.json` + `data/npc/roster.json` +
+`data/potions/formulas.json`, non scritta a mano).
 
 Fase 9 (opzionale, non bloccante): Pathway Non-Standard, avanzamento per
 Boon — il PRD si genera con `/prd` solo quando si decide di farla davvero.

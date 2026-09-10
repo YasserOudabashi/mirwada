@@ -42,6 +42,11 @@ func aggiorna() -> void:
 	_toggle("COLOPHON_MACCHIE_FOLLIA", "video", "macchie_follia", _macchie_def())
 
 	_titolo("COLOPHON_INPUT")
+	var schema := Label.new()
+	schema.text = tr("COLOPHON_SCHEMA_COMANDI")
+	schema.autowrap_mode = TextServer.AUTOWRAP_WORD
+	schema.custom_minimum_size = Vector2(360, 0)
+	_vbox.add_child(schema)
 	for azione in _ss().call("azioni"):
 		_rebind(azione)
 

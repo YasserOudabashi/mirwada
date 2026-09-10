@@ -318,48 +318,59 @@ Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 
 ---
 
-## Fase 8 — Vertical slice giocabile (IN CORSO)
+## Fase 8 — Vertical slice giocabile — CHIUSA (19 story, 850 test)
 
-> PRD: `006_PRD/prd-fase-8-vertical-slice.md` (19 story: US-801..US-806,
+> **PRD**: `006_PRD/prd-fase-8-vertical-slice.md` (19 story: US-801..US-806,
 > US-807a..d, US-808, US-809a..c, US-810..US-814 — US-807 spezzata in 4
-> per regione, US-809 spezzata in 3 per meccanica).
-> Istruzioni operative per eseguirlo: `006_PRD/prossimi-passi.md`.
-
-Le fasi 1-7 hanno costruito **tutti i sistemi** del gioco, provati da 776
-test headless. **Ma nessuno puo' giocarlo con la tastiera**: `main.tscn` e'
-rimasta la scena di prova della fase 1. Diagnosi fatta il 2026-09-09
-giocando davvero il gioco (Xvfb + screenshot) e con tre esplorazioni del
-codice — sei blocchi, tutti verificati `file:riga` nel PRD:
-
-1. L'avvio non avvia una partita (`Book.apri()`/`GameState.nuova_partita()`
-   non sono mai chiamati; nessuna scelta del Pathway alla creazione).
-2. Nessun tasto lancia un'abilita' (`AbilityEngine.execute` esiste, nessun
-   input lo raggiunge).
-3. Proiettili e archi non fanno danno (nessun `collision_mask`, nessun
-   `area_entered`: solo `hitbox.gd` colpisce davvero).
-4. La recitazione si ferma a ~1.5%: `enemy_defeated` e' emesso con payload
-   `{}`, quindi il filtro `senza_abilita` non matcha mai; e
-   `damage_absorbed_for_ally` non ha emettitori (nessun alleato in scena).
-5. **Nessuno puo' salire di Sequenza**: `PotionSystem.concoct/bevi` non ha
-   UI, e i **299 ingredienti** delle 100 formule non esistono come oggetti.
-6. Il mondo e' un pavimento piatto generato dal codice: 0 nemici e 0
-   oggetti nelle 5 regioni, NPC = quadrati blu, sprite diagnostici.
-
-**Cosa fa la fase 8**: collega i sistemi gia' scritti in una partita
-giocabile, riempie i dati mancanti, e mette una grafica provvisoria
-generata. **Zero sistemi nuovi**, zero primitive/eventi/tag nuovi, save
-`schema_version` **22 invariato**.
-
-7 blocchi: 0 avvio + controlli (avvio di partita con scelta del Pathway,
-abilita' a tastiera + hotbar, proiettili che colpiscono), A recitazione
-(payload veri di `enemy_defeated`, `item_crafted`/`ritual_completed`/
-`area_cleared`, `tg_9_protettore` riscritta nei dati), B mondo (mappe ASCII
-disegnate a mano in `data/world/layouts/`, nemici/boss/oggetti dai dati),
-C economia (i 299 ingredienti diventano oggetti con almeno una fonte:
-drop, listini, raccolta), D pagine del libro (sezione Avanzamento con
-Prepara/Bevi, negozio compra/vendi nel dialogo), E grafica (pixel art
-procedurale deterministica, stessa geometria dei fogli attuali), F verifica
-giocata end-to-end + chiusura.
+> per regione, US-809 spezzata in 3 per meccanica). Istruzioni operative
+> per eseguirlo: `006_PRD/prossimi-passi.md`.
+>
+> Le fasi 1-7 avevano costruito **tutti i sistemi** del gioco, provati da
+> 776 test headless. **Ma nessuno poteva giocarlo con la tastiera**:
+> `main.tscn` era rimasta la scena di prova della fase 1. Diagnosi fatta il
+> 2026-09-09 giocando davvero il gioco (Xvfb + screenshot) — sei blocchi,
+> tutti verificati `file:riga` nel PRD: (1) l'avvio non avviava una
+> partita, (2) nessun tasto lanciava un'abilita', (3) proiettili e archi
+> non facevano danno, (4) la recitazione si fermava a ~1.5%
+> (`enemy_defeated` emesso con payload `{}`), (5) nessuno poteva salire di
+> Sequenza (`PotionSystem.concoct/bevi` senza UI, i 299 ingredienti delle
+> formule non esistevano come oggetti), (6) il mondo era un pavimento
+> piatto generato dal codice (0 nemici, 0 oggetti, NPC = quadrati blu).
+>
+> **Cosa ha fatto la fase 8**: ha collegato i sistemi gia' scritti in una
+> partita giocabile, riempito i dati mancanti, messo una grafica
+> provvisoria generata. **Zero sistemi nuovi**, zero primitive/eventi/tag
+> nuovi, save `schema_version` **22 invariato**.
+>
+> **Cosa contiene**:
+> - Blocco 0: avvio di partita vero (`GameState.nuova_partita` con scelta
+>   del Pathway alla creazione), abilita' a tastiera + hotbar, proiettili/
+>   mischia che colpiscono davvero.
+> - Blocco A: payload veri di `enemy_defeated`/`item_crafted`/
+>   `ritual_completed`/`area_cleared`.
+> - Blocco B: 5 regioni con layout ASCII disegnati a mano in
+>   `data/world/layouts/`, nemici/boss/oggetti dai dati.
+> - Blocco C: i 307 ingredienti delle formule diventano oggetti veri
+>   (`tools/generate_formula_ingredients.py`, US-808) con almeno una fonte
+>   nel mondo — drop di nemico, listino di venditore, raccolta a terra
+>   (US-809a..c).
+> - Blocco D: Prepara/Bevi nella pagina diagramma del libro, negozio
+>   compra/vendi nella pagina dialogo.
+> - Blocco E: grafica procedurale deterministica (`tools/
+>   generate_sprites.py`) — personaggio/nemico/pet/NPC/oggetti/tileset, 23
+>   fogli totali; `tools/build_tileset.gd` costruisce il `TileSet` a righe-
+>   per-palette (riga neutra + una per ogni Pathway).
+> - Blocco F: verifica giocata end-to-end (`tests/manual/qa_vslice.gd`,
+>   Xvfb) + checkpoint dinamico (`tests/test_slice_fase_8.gd`) + chiusura.
+> - **Verdetto (US-814)**: una partita giocata per davvero — scaffale,
+>   creazione con Pathway scelto da `pathway_ids()`, raccolta a tasto vero,
+>   abilita' a tasto vero, un boss ucciso a colpi di mischia (`morto` +
+>   `enemy_defeated` con payload reale), un acquisto da un NPC, una pozione
+>   preparata e bevuta (Sequenza 9 -> 8), un passaggio fra regioni — con
+>   zero righe di codice che nominino un Pathway/una regione/un NPC/una
+>   formula specifici. La lista vietata del checkpoint e' letta dai dati
+>   (`pathway_ids()`, `regions.json`, `roster.json`, `formulas.json`), non
+>   scritta a mano come nei checkpoint delle fasi precedenti.
 
 ---
 
@@ -368,5 +379,5 @@ giocata end-to-end + chiusura.
 Pathway Non-Standard (Eternal Aeon, Chaos Primogenitor, Scrooge, Dreamless e
 gli altri bestowers). Meccanica diversa: avanzamento per **Boon** invece che
 per pozione, quindi non e' solo contenuto ma un secondo sistema di
-progressione. Le fasi 1-7 sono chiuse: sbloccata, ma opzionale — il PRD
+progressione. Le fasi 1-8 sono chiuse: sbloccata, ma opzionale — il PRD
 dettagliato si genera con `/prd` solo quando si decide di farla davvero.
