@@ -10556,5 +10556,41 @@ File toccati: scripts/player.gd, scripts/region_scene.gd,
 assets/i18n/strings.csv (+ .translation), tests/test_layouts.gd,
 tests/test_player_abilita.gd, tests/manual/qa_onboarding.gd (nuovo).
 
-PROSSIMA STORIA: traduzione delle 42 stringhe i18n TODO (it.json/en.json),
-poi colophon (tasti abilita'/interagisci rimappabili).
+---
+
+[2026-09-10] Fix post-fase-9 (playtest): le 42 stringhe i18n "TODO ..."
+
+CONTESTO. Il giocatore vedeva "TODO ability.twilight_giant.tg_fendente_pesante"
+sulla hotbar. data/i18n/it.json aveva 42/1718 voci ancora stub "TODO <chiave>"
+(il validator lo segnalava come WARN, non errore - "e' lavoro di traduzione").
+
+COSA FATTO. Tradotte in italiano tutte e 42 le voci (data/i18n/it.json):
+- 20 abilita' del Twilight Giant (Sequenze 9..0: "Fendente pesante",
+  "Stretta ferrea", ..., "Autorita' del crepuscolo");
+- 2 abilita' Darkness (darkness_cancellazione -> "Cancellazione",
+  darkness_sfortuna_cronica -> "Sfortuna cronica"), 1 Hermit
+  (hermit_pergamena -> "Pergamena dell'eremita");
+- 2 forme del TG + le loro .desc (tg_arma_luce, tg_forma_gigante);
+- le 5 Ancore (anchor.mirco/sidon/dimora/promessa/pet);
+- 10 sinergie (incluse 2 anti-sinergie, nominate senza il prefisso "anti_"
+  come le esistenti anti_due_bugiardi/anti_legge_e_caos).
+I nomi seguono l'id (gia' descrittivo) e la 'note'/'primitive' dell'abilita'.
+
+NOTA su en.json. NON toccato: e' incompleto per scelta (284/1718 chiavi,
+tr_data ricade su it.json per le mancanti - test_fallback_en_su_it). Le 42
+chiavi non erano proprio presenti in en. Colmare en.json e' un lavoro a
+parte (1434 chiavi), fuori da questo fix.
+
+COME VERIFICATO.
+- python tools/validate_data.py: 0 errori, 2 warning (era 3: sparito
+  "42/1718 stringhe da tradurre").
+- godot --headless ... run_tests.gd: 887 test (886 + 1 nuovo), tutti
+  passati.
+- Test nuovo: test_i18n_data.test_nessuno_stub_todo_in_it - nessuna voce
+  di it.json inizia piu' con "TODO " (guardia di regressione: riattivando
+  un gruppo differito e rigenerando gli stub, vanno tradotti).
+
+File toccati: data/i18n/it.json, tests/test_i18n_data.gd.
+
+PROSSIMA STORIA: colophon - tasti abilita'/interagisci nella lista dei
+rimappabili + etichette leggibili.
