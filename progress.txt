@@ -9973,3 +9973,73 @@ scripts/game_state.gd, scripts/save_system.gd, tests/test_boon_system.gd
 PROSSIMA STORIA: US-903 — Guardie nei sistemi che assumono Pathway
 standard (PathwayChange, FusionEngine): un Pathway non_standard non deve
 mai apparire come candidato al cambio Pathway o alla fusione.
+
+---
+
+[2026-09-10] Fase 9 — US-903: guardie in PathwayChange/FusionEngine
+
+COSA FATTO.
+- Problema di fondo lasciato aperto da US-902: get_pathway(id) risolveva
+  SOLO i Pathway standard (_pathways), perche' pathway_ids()/_pathways
+  dovevano restare scoped agli standard (vedi nota US-902). Ma questo
+  significava anche che PathwayChange/FusionEngine non avevano NESSUN modo
+  di scoprire che un id e' un Pathway non_standard invece che inesistente
+  - non potevano dare una reason esplicita, solo confonderlo con
+  "pathway_inesistente".
+- scripts/game_data.gd: nuovo registro separato _pathways_non_standard
+  (mai in pathway_ids(), stesso principio del registro standard ma per i
+  non_standard), popolato nello stesso loop di _load_pathways() (con
+  _prune() proprio, stesso pattern di _pathways). get_pathway(id) ora
+  controlla PRIMA _pathways poi, se vuoto, _pathways_non_standard: risolve
+  sempre l'id giusto qualunque sia la categoria, mentre pathway_ids()
+  resta invariato (solo standard). Chi vuole sapere la categoria legge
+  get_pathway(id).get("categoria").
+- scripts/pathway_change.gd::_motivo_rifiuto(): due controlli espliciti
+  nuovi, PRIMA della logica di gruppo esistente - se il Pathway CORRENTE
+  e' non_standard, o se il pathway di DESTINAZIONE lo e', ritorna la
+  reason "pathway_non_standard" (mai "gruppo_diverso"/"pathway_inesistente",
+  che sarebbero fuorvianti per un Pathway che esiste per davvero ma non
+  ha nessun gruppo per costruzione).
+- scripts/fusion_engine.gd::percorso(): guardia a runtime in testa alla
+  funzione - se uno qualunque dei due pathway passati e' non_standard,
+  ritorna {} SEMPRE, a prescindere da cosa dicano i file di data/fusions/
+  (difesa in profondita': anche se PathwayChange.cambia() gia' blocca la
+  chiamata a FusionEngine a monte, percorso()/abilita_fuse() restano
+  sicure se chiamate direttamente, es. da un test o da un futuro
+  chiamante). Nuovo helper privato _e_non_standard(id).
+- Validator (tools/validate_data.py): NESSUNA modifica necessaria - il
+  controllo esistente "pathway_a/pathway_b non sono Pathway attivi" (riga
+  ~412-414) confronta gia' contro pathway_group, un dict costruito SOLO
+  da data/pathways/ (i soli standard): un file di fusione che nominasse
+  un Pathway non_standard fallirebbe gia' quel controllo. Verificato per
+  lettura del codice (non serve una fixture rotta: la logica non e'
+  cambiata da questa story, solo confermata sufficiente).
+- tests/test_pathway_change.gd (+2 test) e tests/test_fusion.gd (+1 test):
+  un Pathway di prova ("fixture_ns", categoria non_standard, group null)
+  iniettato direttamente in GameData._pathways_non_standard (mai su
+  disco, stesso pattern di test_boon_system.gd per _sequences) - ogni
+  test chiama GameData.reload() come ultima riga per non inquinare le
+  altre suite (stesso motivo di US-902).
+
+COME VERIFICATO.
+- godot --headless --path . --import: pulito.
+- godot --headless --path . --script res://tests/run_tests.gd: 870 test
+  (867 + 3 nuovi), tutti passati. Nessuna regressione.
+- python tools/validate_data.py: esce 0, stessi 3 warning di sempre.
+- git status: solo i file toccati elencati sotto.
+
+COSA RESTA APERTO (per le story successive).
+- Selezionabilita' di Eternal Aeon nel menu di creazione: ancora aperta
+  (vedi nota US-902), non tocca questa story.
+- get_pathway(id) ora risolve anche i non_standard: qualunque sistema
+  FUTURO che chiami get_pathway(id) su un id arbitrario (non enumerato
+  via pathway_ids()) deve ricordarsi di controllare 'categoria' se assume
+  implicitamente uno standard (group non nullo, potion invece di boon,
+  ecc.) - non e' un problema oggi perche' nessun altro sistema lo fa
+  ancora, annotato per quando US-904 scrivera' Eternal Aeon davvero.
+
+File toccati: scripts/game_data.gd, scripts/pathway_change.gd,
+scripts/fusion_engine.gd, tests/test_pathway_change.gd, tests/test_fusion.gd.
+
+PROSSIMA STORIA: US-904 — Eternal Aeon, Sequenze 9-5 (blocco A, contenuto
+del primo Pathway Non-Standard).

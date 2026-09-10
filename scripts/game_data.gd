@@ -69,6 +69,11 @@ const PATH_ENDINGS := "res://data/endings.json"
 const ANIM_CATEGORIES: PackedStringArray = ["personaggio", "nemico_base", "pet"]
 
 var _pathways: Dictionary = {}
+## Pathway non_standard (US-903): MAI in pathway_ids()/_pathways (vedi
+## _load_pathways) - un registro separato solo per la risoluzione per id
+## esatto di get_pathway(), a chi (PathwayChange, FusionEngine) deve sapere
+## se un id e' un Pathway non_standard senza poterlo scoprire iterando.
+var _pathways_non_standard: Dictionary = {}
 var _sequences: Dictionary = {}
 var _abilities: Dictionary = {}
 var _synergies: Dictionary = {}
@@ -219,8 +224,11 @@ func load_all() -> void:
 # --- API pubblica ------------------------------------------------------------
 
 ## Restituisce {} se l'id non esiste: il chiamante controlla con is_empty().
+## Risolve sia gli standard che i non_standard (controlla 'categoria' sul
+## risultato, US-903) - solo pathway_ids() resta scoped ai soli standard.
 func get_pathway(id: String) -> Dictionary:
-	return _pathways.get(id, {})
+	var p: Dictionary = _pathways.get(id, {})
+	return p if not p.is_empty() else _pathways_non_standard.get(id, {})
 
 
 func get_sequence(id: String) -> Dictionary:
@@ -725,6 +733,7 @@ func files_loaded() -> int:
 
 func _load_pathways() -> void:
 	var visti_p: Dictionary = {}
+	var visti_pns: Dictionary = {}
 	var visti_s: Dictionary = {}
 	var percorsi: PackedStringArray = _json_files_in(DIR_PATHWAYS)
 	percorsi.append_array(_json_files_in(DIR_PATHWAYS_NON_STANDARD, false))
@@ -746,6 +755,12 @@ func _load_pathways() -> void:
 		if str(doc.get("categoria", "standard")) == "standard":
 			_upsert(_pathways, pid, doc)
 			visti_p[pid] = true
+		else:
+			# US-903: registro separato, MAI in pathway_ids() (vedi sopra) -
+			# solo get_pathway(id) lo risolve, cosi' PathwayChange/FusionEngine
+			# possono riconoscere un Pathway non_standard e rifiutarlo esplicitamente.
+			_upsert(_pathways_non_standard, pid, doc)
+			visti_pns[pid] = true
 
 		for entry in _object_list(doc, "sequences", path):
 			var seq: Dictionary = entry
@@ -756,6 +771,7 @@ func _load_pathways() -> void:
 			_upsert(_sequences, sid, seq)
 			visti_s[sid] = true
 	_prune(_pathways, visti_p)
+	_prune(_pathways_non_standard, visti_pns)
 	_prune(_sequences, visti_s)
 
 

@@ -50,8 +50,8 @@
       ],
       "priority": 3,
       "fase": 9,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto: GameData ha ora un registro separato _pathways_non_standard (mai in pathway_ids(), stesso principio di _pathways ma per i non_standard) e get_pathway(id) controlla entrambi (prima gli standard, poi i non_standard) cosi' chi ha bisogno di sapere la categoria di un id esatto puo' farlo senza doverlo enumerare. PathwayChange._motivo_rifiuto() ha due controlli espliciti nuovi (prima della logica di gruppo): se il Pathway corrente o quello di destinazione e' non_standard, reason 'pathway_non_standard' (mai confuso con 'gruppo_diverso' o 'pathway_inesistente'). FusionEngine.percorso() ha una guardia a runtime in testa: se uno dei due pathway e' non_standard ritorna {} sempre, difesa in profondita' oltre al blocco gia' fatto da PathwayChange a monte. Il validator non e' stato toccato: il controllo esistente su data/fusions/ (pathway_a/b devono essere in pathway_group, costruito solo da data/pathways/) gia' rifiuta un riferimento a un Pathway non_standard, verificato per lettura del codice. tests/test_pathway_change.gd (+2) e tests/test_fusion.gd (+1): un Pathway di prova iniettato direttamente in GameData._pathways_non_standard (mai su disco), GameData.reload() a fine test per non inquinare le altre suite. Verificato: godot --headless --path . --import pulito; godot --headless --path . --script res://tests/run_tests.gd: 870 test, tutti passati (867 + 3 nuovi), nessuna regressione; python tools/validate_data.py esce 0, stessi 3 warning di sempre; git status pulito."
     },
     {
       "id": "US-904",
