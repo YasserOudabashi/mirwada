@@ -82,8 +82,8 @@
       ],
       "priority": 5,
       "fase": 9,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatto: le 5 Sequenze stub di US-904 (nomi gia' fissati allora) ora complete - Unbound Scribe (4, curse), Voice of the Aeon (3, fear), Herald Eternal (2, teleport), Aeon-Touched (1, soul_detach), Eternal Aeon (0, resurrect). Nessuna primitiva nuova. Pattern coerente con US-904: Seq 4 e 2 un solo tipo di requisito (comportamento, poi una quest da sola), 3/1/0 due tipi; ogni requisito comportamento referenzia l'abilita' della Sequenza immediatamente precedente, catena completa 9->0. Le 4 quest esistenti usate una volta ciascuna nell'insieme delle 10 Sequenze. data/i18n/it.json: 5 chiavi nuove (le abilita'; i 10 nomi di Sequenza erano gia' scritti in US-904). tests/test_eternal_aeon.gd riscritto per coprire tutte e 10 le Sequenze (10 abilita' senza warning, nessuna piu' stub, conteggio requisiti per Sequenza, le 10 insieme coprono tutti e tre i tipi - AC esplicito -, id di quest/item/abilita' referenziati esistono davvero). Un problema trovato al primo run: la primitiva curse (Seq 4) puntava a un 'effetto' inventato mai registrato in data/status_effects.json (il validator lo richiede: non e' testo libero come sembrava da un primo giro di lettura in US-904) - riusato 'destino_segnato' gia' esistente (Hermit Seq 1) invece di aggiungere un nuovo status al registro condiviso, calza perfettamente al concept. Verificato: godot --headless --path . --import pulito; godot --headless --path . --script res://tests/run_tests.gd: 878 test, tutti passati, nessuna regressione; python tools/validate_data.py esce 0, stessi 3 warning di sempre; git status pulito (nessun file nuovo, tutto gia' creato in US-904). Resta aperto: Eternal Aeon e' 10/10 completo ma non ancora esposto in UI (US-906 scrive la sezione 'Dono' nel diagramma); US-907 e' il checkpoint + verifica giocata + chiusura fase 9."
     },
     {
       "id": "US-906",

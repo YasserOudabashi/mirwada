@@ -183,11 +183,27 @@
       "name": "Unbound Scribe",
       "name_i18n": "sequence.eternal_aeon.4",
       "tier": "saint",
-      "concept": "Il giocatore comincia a scrivere pagine che l'Aeon non dimentica mai: contenuto completo (boon, abilita') in US-905.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "notes": "Stub dichiarato (US-904): il nome e' definitivo, il resto arriva in US-905 (blocco Sequenze 4-0).",
-      "stub": true
+      "concept": "Il giocatore scrive un verso che il bersaglio non riesce a cancellare: una prova di controllo sulla narrazione altrui, non solo sulla propria.",
+      "stat_modifiers": {
+        "spiritualita_max": 0.22,
+        "hp_max": 100
+      },
+      "abilities": [
+        "ea_verso_che_lega"
+      ],
+      "boon": {
+        "requisiti": [
+          {
+            "tipo": "comportamento",
+            "evento": "ability_used",
+            "filtri": {
+              "ability_id": "ea_sguardo_che_non_dimentica"
+            },
+            "target": 6
+          }
+        ]
+      },
+      "notes": "Un solo requisito (comportamento): prova mastery del dono della Sequenza precedente (5) prima di riceverne uno nuovo."
     },
     {
       "sequence": 3,
@@ -195,11 +211,32 @@
       "name": "Voice of the Aeon",
       "name_i18n": "sequence.eternal_aeon.3",
       "tier": "saint",
-      "concept": "Il giocatore presta la propria voce all'entita' per un istante: contenuto completo (boon, abilita') in US-905.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "notes": "Stub dichiarato (US-904): il nome e' definitivo, il resto arriva in US-905 (blocco Sequenze 4-0).",
-      "stub": true
+      "concept": "Il giocatore presta la gola all'Aeon per un istante: chi ascolta sente una voce che non dovrebbe esistere.",
+      "stat_modifiers": {
+        "spiritualita_max": 0.26,
+        "hp_max": 140,
+        "precisione": 0.08
+      },
+      "abilities": [
+        "ea_voce_che_non_dovrebbe_esistere"
+      ],
+      "boon": {
+        "requisiti": [
+          {
+            "tipo": "quest",
+            "quest_id": "q_mirco_01"
+          },
+          {
+            "tipo": "sacrificio",
+            "costo": {
+              "tipo": "oggetto",
+              "id": "tempo_solidificato",
+              "quantita": 1
+            }
+          }
+        ]
+      },
+      "notes": "Due requisiti (quest + sacrificio)."
     },
     {
       "sequence": 2,
@@ -207,11 +244,24 @@
       "name": "Herald Eternal",
       "name_i18n": "sequence.eternal_aeon.2",
       "tier": "angel",
-      "concept": "Il giocatore porta il messaggio dell'Aeon oltre i confini del tempo umano: contenuto completo (boon, abilita') in US-905.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "notes": "Stub dichiarato (US-904): il nome e' definitivo, il resto arriva in US-905 (blocco Sequenze 4-0).",
-      "stub": true
+      "concept": "Il giocatore attraversa lo spazio come l'Aeon attraversa il tempo: il messaggio arriva prima del messaggero.",
+      "stat_modifiers": {
+        "spiritualita_max": 0.32,
+        "hp_max": 220,
+        "evasione": 0.10
+      },
+      "abilities": [
+        "ea_messaggio_senza_distanza"
+      ],
+      "boon": {
+        "requisiti": [
+          {
+            "tipo": "quest",
+            "quest_id": "q_lena_01"
+          }
+        ]
+      },
+      "notes": "Un solo requisito (quest): ultima prova che un tipo solo basta, stavolta una quest da sola."
     },
     {
       "sequence": 1,
@@ -219,11 +269,35 @@
       "name": "Aeon-Touched",
       "name_i18n": "sequence.eternal_aeon.1",
       "tier": "angel",
-      "concept": "Il giocatore non distingue piu' il proprio ricordo da quello dell'entita': contenuto completo (boon, abilita') in US-905.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "notes": "Stub dichiarato (US-904): il nome e' definitivo, il resto arriva in US-905 (blocco Sequenze 4-0).",
-      "stub": true
+      "concept": "Il giocatore non distingue piu' il proprio ricordo da quello dell'Aeon: il corpo resta indietro per un momento, e cio' che si muove non e' piu' soltanto umano.",
+      "stat_modifiers": {
+        "spiritualita_max": 0.40,
+        "hp_max": 350,
+        "precisione": 0.12
+      },
+      "abilities": [
+        "ea_distacco_dal_presente"
+      ],
+      "boon": {
+        "requisiti": [
+          {
+            "tipo": "comportamento",
+            "evento": "ability_used",
+            "filtri": {
+              "ability_id": "ea_messaggio_senza_distanza"
+            },
+            "target": 5
+          },
+          {
+            "tipo": "sacrificio",
+            "costo": {
+              "tipo": "follia",
+              "quantita": 20
+            }
+          }
+        ]
+      },
+      "notes": "Due requisiti (comportamento + sacrificio)."
     },
     {
       "sequence": 0,
@@ -231,11 +305,36 @@
       "name": "Eternal Aeon",
       "name_i18n": "sequence.eternal_aeon.0",
       "tier": "god",
-      "concept": "Il giocatore diventa un aspetto vivente dell'Aeon stesso: contenuto completo (boon, abilita') in US-905.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "notes": "Stub dichiarato (US-904): il nome (uguale al Pathway, stessa convenzione di Twilight Giant a Sequenza 0) e' definitivo, il resto arriva in US-905.",
-      "stub": true
+      "concept": "Il giocatore diventa un aspetto vivente dell'Aeon stesso: puo' richiamare indietro cio' che il tempo aveva gia' reclamato, al prezzo piu' alto che l'Aeon abbia mai chiesto.",
+      "stat_modifiers": {
+        "spiritualita_max": 0.55,
+        "hp_max": 600,
+        "evasione": 0.15,
+        "precisione": 0.15
+      },
+      "abilities": [
+        "ea_ritorno_che_non_dovrebbe_essere"
+      ],
+      "boon": {
+        "requisiti": [
+          {
+            "tipo": "comportamento",
+            "evento": "ability_used",
+            "filtri": {
+              "ability_id": "ea_distacco_dal_presente"
+            },
+            "target": 5
+          },
+          {
+            "tipo": "sacrificio",
+            "costo": {
+              "tipo": "follia",
+              "quantita": 25
+            }
+          }
+        ]
+      },
+      "notes": "Due requisiti (comportamento + sacrificio), il piu' pesante della catena: chiude l'arco di Eternal Aeon (US-905, decima e ultima Sequenza)."
     }
   ]
 }

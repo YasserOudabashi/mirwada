@@ -115,6 +115,117 @@
         "area"
       ],
       "note": "L'Oracolo Silente non chiede: vede l'intenzione un istante prima che diventi un gesto."
+    },
+    {
+      "schema_version": 1,
+      "id": "ea_verso_che_lega",
+      "name_i18n": "ability.eternal_aeon.ea_verso_che_lega",
+      "sequence_id": "eternal_aeon_4",
+      "costo_spiritualita": 22,
+      "cooldown": 24.0,
+      "primitive": [
+        {
+          "tipo": "curse",
+          "effetto": "destino_segnato",
+          "durata": 18.0,
+          "condizione_rimozione": "purificazione"
+        }
+      ],
+      "tag_sinergia": [
+        "conoscenza",
+        "destino",
+        "singolo"
+      ],
+      "note": "Un verso scritto sul bersaglio non e' una minaccia: e' un fatto che deve ancora accadere (status 'destino_segnato', gia' in data/status_effects.json)."
+    },
+    {
+      "schema_version": 1,
+      "id": "ea_voce_che_non_dovrebbe_esistere",
+      "name_i18n": "ability.eternal_aeon.ea_voce_che_non_dovrebbe_esistere",
+      "sequence_id": "eternal_aeon_3",
+      "costo_spiritualita": 26,
+      "cooldown": 22.0,
+      "primitive": [
+        {
+          "tipo": "fear",
+          "raggio": 8,
+          "durata": 6.0,
+          "soglia_resistenza": 4
+        }
+      ],
+      "tag_sinergia": [
+        "conoscenza",
+        "spirito",
+        "area"
+      ],
+      "note": "Per un istante non parla piu' il giocatore: parla qualcosa che ha visto ogni fine possibile."
+    },
+    {
+      "schema_version": 1,
+      "id": "ea_messaggio_senza_distanza",
+      "name_i18n": "ability.eternal_aeon.ea_messaggio_senza_distanza",
+      "sequence_id": "eternal_aeon_2",
+      "costo_spiritualita": 28,
+      "cooldown": 24.0,
+      "primitive": [
+        {
+          "tipo": "teleport",
+          "distanza": 350,
+          "richiede_visuale": false,
+          "porta_alleati": false
+        }
+      ],
+      "tag_sinergia": [
+        "tempo",
+        "spazio",
+        "singolo"
+      ],
+      "note": "L'Araldo non copre la distanza: la cancella, come l'Aeon cancella l'attesa."
+    },
+    {
+      "schema_version": 1,
+      "id": "ea_distacco_dal_presente",
+      "name_i18n": "ability.eternal_aeon.ea_distacco_dal_presente",
+      "sequence_id": "eternal_aeon_1",
+      "costo_spiritualita": 32,
+      "cooldown": 30.0,
+      "primitive": [
+        {
+          "tipo": "soul_detach",
+          "durata": 10.0,
+          "vulnerabilita_corpo": 0.5,
+          "velocita": 1.5
+        }
+      ],
+      "tag_sinergia": [
+        "tempo",
+        "spirito",
+        "singolo"
+      ],
+      "note": "Il corpo resta indietro per un momento, e cio' che si muove non e' piu' soltanto umano."
+    },
+    {
+      "schema_version": 1,
+      "id": "ea_ritorno_che_non_dovrebbe_essere",
+      "name_i18n": "ability.eternal_aeon.ea_ritorno_che_non_dovrebbe_essere",
+      "sequence_id": "eternal_aeon_0",
+      "costo_spiritualita": 50,
+      "cooldown": 55.0,
+      "primitive": [
+        {
+          "tipo": "resurrect",
+          "bersaglio": "alleato",
+          "hp_ripristinati": 150,
+          "costo_follia": 8.0,
+          "cooldown": 40.0
+        }
+      ],
+      "tag_sinergia": [
+        "tempo",
+        "spirito",
+        "singolo"
+      ],
+      "note": "L'Aeon non chiede il permesso al tempo: richiama indietro cio' che il tempo aveva gia' reclamato."
     }
   ]
 }

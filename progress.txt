@@ -10175,3 +10175,81 @@ tests/test_hot_reload.gd.
 
 PROSSIMA STORIA: US-905 — Eternal Aeon, Sequenze 4-0 (completamento del
 Pathway Non-Standard).
+
+---
+
+[2026-09-10] Fase 9 — US-905: Eternal Aeon, Sequenze 4-0 (completo 10/10)
+
+COSA FATTO.
+- data/pathways_non_standard/eternal_aeon.json: le 5 Sequenze stub di
+  US-904 (nomi gia' fissati allora) ora complete - Unbound Scribe (4,
+  curse: destino_segnato), Voice of the Aeon (3, fear), Herald Eternal
+  (2, teleport), Aeon-Touched (1, soul_detach), Eternal Aeon (0,
+  resurrect). Pattern di boon mantenuto coerente con US-904: Sequenza 4
+  e 2 un solo tipo di requisito (comportamento, poi quest - "un solo
+  tipo basta" provato anche con una quest da sola), 3/1/0 due tipi
+  ciascuna. Ogni requisito 'comportamento' referenzia l'abilita' della
+  Sequenza IMMEDIATAMENTE precedente (stesso principio gia' in US-904:
+  "prova di aver gia' padroneggiato il dono prima di riceverne un
+  altro") - la catena e' completa dalla 9 alla 0. Le 4 quest esistenti
+  (q_sidon_01, q_vesna_01, q_mirco_01, q_lena_01) sono usate esattamente
+  una volta ciascuna nell'insieme delle 10 Sequenze, nessun riuso.
+- data/abilities/eternal_aeon.json: 5 abilita' nuove (10 totali, una per
+  Sequenza) - curse, fear, teleport, soul_detach, resurrect. Nessuna
+  primitiva nuova. Parametri scalati sulla progressione reale gia'
+  osservata in error.json (Sequenze 4-0: costi/cooldown/hp_max crescenti
+  fino a error_0 55/60 - qui eternal_aeon_0 arriva a 50/55, stessa scala).
+- data/i18n/it.json: 5 chiavi nuove (le 5 abilita' - i 10 nomi di
+  Sequenza erano gia' stati scritti in US-904, fissati in anticipo).
+- tests/test_eternal_aeon.gd: riscritto per coprire tutte e 10 le
+  Sequenze invece di 9-5 (10 abilita' eseguono senza warning, nessuna
+  Sequenza e' piu' stub, ogni Sequenza ha il numero di requisiti atteso,
+  le 10 insieme coprono tutti e tre i tipi - AC esplicito di US-905 -,
+  Sequenze 9/6/2 con un solo tipo, id di quest/item/abilita'
+  referenziati dai boon esistono davvero incluso un controllo nuovo che
+  risolve ogni ability_id usato nei filtri comportamento contro
+  GameData.get_ability()).
+
+UN PROBLEMA TROVATO E CORRETTO AL PRIMO RUN (dati, non motore): la
+primitiva 'curse' (ea_verso_che_lega, Sequenza 4) puntava a un 'effetto'
+inventato ('verso_incatenato') mai registrato in data/status_effects.json
+- il validator lo richiede esplicitamente (aura/curse deve puntare a uno
+status REALE, non e' testo libero come avevo capito da un primo giro di
+lettura). Invece di aggiungere un nuovo status (avrebbe richiesto
+toccare un registro condiviso da tutti i Pathway per un solo Pathway
+nuovo), ho riusato 'destino_segnato' gia' esistente (creato per il
+Knowledge Emperor di Hermit Seq 1: "il filo del destino del bersaglio e'
+letto e segnato") - calza perfettamente al concept dell'abilita' (un
+verso scritto sul bersaglio) senza aggiungere nulla al registro.
+
+COME VERIFICATO.
+- godot --headless --path . --import: pulito (dopo l'edit a it.json).
+- godot --headless --path . --script res://tests/run_tests.gd: 878 test
+  (877 + 1: la suite di test_eternal_aeon.gd e' stata riscritta, non
+  solo estesa, quindi il conteggio non e' un semplice +7/+8 - il numero
+  di test METODI e' cambiato da 7 a 8, coerente coi log). Tutti passati,
+  nessuna regressione.
+- python tools/validate_data.py: esce 0, stessi 3 warning di sempre.
+- git status: solo i file elencati sotto (nessun file nuovo, tutto cio'
+  che serviva esisteva gia' da US-904: la cartella data/pathways_non_standard/
+  e i due file dentro, il file dei test).
+
+COSA RESTA APERTO (per le story successive, dichiarato nel PRD).
+- Eternal Aeon e' 10/10 Sequenze complete: il Pathway Non-Standard e'
+  contenuto-completo, ma non ancora raggiungibile/verificabile in
+  partita (nessuna UI lo espone: US-906 scrive la sezione "Dono" nel
+  diagramma del libro).
+- US-906 (sezione "Dono" nel diagramma, bottone "Ricevi il Dono") e
+  US-907 (checkpoint dinamico + verifica giocata Xvfb + chiusura fase 9)
+  restano da fare - sono le uniche due story rimaste del PRD.
+- La questione time_in_state sugli stati mai emessi nei Pathway standard
+  esistenti (segnalata in US-904) resta aperta, fuori scope.
+
+File toccati: data/pathways_non_standard/eternal_aeon.json,
+data/abilities/eternal_aeon.json, data/i18n/it.json,
+tests/test_eternal_aeon.gd.
+
+PROSSIMA STORIA: US-906 — Sezione "Dono" nella pagina diagramma del
+libro (page_diagramma_pathway.gd mostra i requisiti del Boon e un
+bottone "Ricevi il Dono" quando la Sequenza corrente ha 'boon' invece
+di 'potion').
