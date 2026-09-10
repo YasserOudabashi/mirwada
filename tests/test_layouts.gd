@@ -756,4 +756,16 @@ func test_npc_prompt_interazione_appare_e_sparisce_col_player() -> void:
 	scena.call("_npc_allontanato", player, "npc_mirco")
 	assert_false(prompt.visible, "allontanandosi il prompt sparisce")
 
+	# col libro aperto sopra, il prompt non deve restare a schermo
+	var book: Node = _root().get_node("Book")
+	book.call("azzera")
+	scena.call("_npc_avvicinato", player, "npc_mirco")
+	assert_true(prompt.visible, "prompt visibile prima di aprire il libro")
+	book.call("apri")
+	assert_true(bool(book.call("e_aperto")), "il libro si e' aperto")
+	assert_false(prompt.visible, "il prompt sparisce quando si apre il libro")
+	book.call("chiudi")
+	assert_true(prompt.visible, "il prompt torna quando il libro si chiude (ancora vicino)")
+	book.call("azzera")
+
 	(r["cont"] as Node2D).free()

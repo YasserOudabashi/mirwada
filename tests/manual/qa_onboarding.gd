@@ -24,6 +24,7 @@ func _initialize() -> void:
 	await _avvia_e_crea()
 	if _ok: _verifica_nome()
 	if _ok: await _verifica_prompt_npc()
+	if _ok: await _verifica_colophon_comandi()
 
 	if _ok:
 		print("=== qa_onboarding: TUTTI I PASSI OK (", ProjectSettings.globalize_path(OUT), ") ===")
@@ -124,3 +125,38 @@ func _verifica_prompt_npc() -> void:
 	_assert(String(prompt.get("text")).contains("Parla"),
 		"il prompt dice 'Parla': '%s'" % prompt.get("text"))
 	_screenshot("02_prompt_npc")
+
+
+func _verifica_colophon_comandi() -> void:
+	print("=== il colophon elenca i tasti abilita' e interagisci ===")
+	var book: Node = _n("/root/Book")
+	book.call("apri")
+	book.call("vai_a", "colophon")
+	for _i in 60:
+		await process_frame
+	var overlay: Node = _main.get_node_or_null("BookOverlay")
+	var pag: Node = overlay.get_node_or_null("Pagina/Contenuto")
+	var page: Node = pag.get_child(0) if pag != null and pag.get_child_count() > 0 else null
+	if not _assert(page != null and str(page.call("testo_visibile")) == "impostazioni",
+			"la pagina colophon e' viva"):
+		return
+	var testi: Array = []
+	var stack: Array = [page]
+	while not stack.is_empty():
+		var nd: Node = stack.pop_back()
+		for c in nd.get_children():
+			stack.append(c)
+			if c is Label:
+				testi.append((c as Label).text)
+	_assert(testi.has(TranslationServer.translate("COLOPHON_AZIONE_INTERAGISCI")),
+		"c'e' la riga 'Interagisci / parla'")
+	_assert(testi.has(TranslationServer.translate("COLOPHON_AZIONE_ABILITA_1")),
+		"c'e' la riga 'Abilità 1'")
+	# scorri fino alla sezione Comandi per lo screenshot
+	if page is ScrollContainer:
+		await process_frame
+		(page as ScrollContainer).scroll_vertical = 620
+		for _i in 6:
+			await process_frame
+	_screenshot("03_colophon_comandi")
+	book.call("chiudi")

@@ -47,6 +47,21 @@ COLOPHON_RIDUCI_FLASH,Riduci i lampi,Reduce flashing
 COLOPHON_RIDUCI_ANIMAZIONI,Riduci le animazioni,Reduce animations
 COLOPHON_MACCHIE_FOLLIA,Macchie di follia sulle pagine,Madness stains on pages
 COLOPHON_PREMI_TASTO,Premi un tasto...,Press a key...
+COLOPHON_AZIONE_MOVE_UP,Muovi su,Move up
+COLOPHON_AZIONE_MOVE_DOWN,Muovi giù,Move down
+COLOPHON_AZIONE_MOVE_LEFT,Muovi a sinistra,Move left
+COLOPHON_AZIONE_MOVE_RIGHT,Muovi a destra,Move right
+COLOPHON_AZIONE_ATTACCO,Attacco,Attack
+COLOPHON_AZIONE_SCHIVATA,Schivata,Dodge
+COLOPHON_AZIONE_PARATA,Parata,Parry
+COLOPHON_AZIONE_ABILITA_1,Abilità 1,Ability 1
+COLOPHON_AZIONE_ABILITA_2,Abilità 2,Ability 2
+COLOPHON_AZIONE_ABILITA_3,Abilità 3,Ability 3
+COLOPHON_AZIONE_ABILITA_4,Abilità 4,Ability 4
+COLOPHON_AZIONE_INTERAGISCI,Interagisci / parla,Interact / talk
+COLOPHON_AZIONE_LIBRO,Apri il libro,Open the book
+COLOPHON_AZIONE_PAGINA_AVANTI,Pagina avanti,Next page
+COLOPHON_AZIONE_PAGINA_INDIETRO,Pagina indietro,Previous page
 BOOK_MACCHIA_1,questa non è la tua grafia,this is not your handwriting
 BOOK_MACCHIA_2,{0} ti guarda leggere,{0} watches you read
 BOOK_MACCHIA_3,non voltare pagina,do not turn the page

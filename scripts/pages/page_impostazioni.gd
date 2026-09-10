@@ -251,10 +251,18 @@ func _lingua() -> void:
 	_vbox.add_child(o)
 
 
+## Etichetta leggibile per un'azione dell'InputMap. tr() torna la chiave se
+## non c'e' voce: in quel caso si mostra l'id grezzo, mai "COLOPHON_AZIONE_X".
+func _nome_azione(azione: String) -> String:
+	var k: String = "COLOPHON_AZIONE_" + azione.to_upper()
+	var t: String = tr(k)
+	return t if t != k else azione
+
+
 func _rebind(azione: String) -> void:
 	var h := HBoxContainer.new()
 	var l := Label.new()
-	l.text = azione
+	l.text = _nome_azione(azione)
 	l.custom_minimum_size = Vector2(160, 0)
 	var b := Button.new()
 	b.custom_minimum_size = Vector2(140, 0)

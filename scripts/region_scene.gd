@@ -64,6 +64,12 @@ func _ready() -> void:
 	if ts != null and ts.has_signal("momento_cambiato"):
 		ts.momento_cambiato.connect(func(_m): _crea_npc())
 
+	# il prompt "[F] Parla" non deve restare a schermo col libro aperto sopra.
+	var book: Node = get_node_or_null("/root/Book")
+	if book != null:
+		book.libro_aperto.connect(func(_p): _mostra_prompt(_npc_vicino, false))
+		book.libro_chiuso.connect(func(): _mostra_prompt(_npc_vicino, not _npc_vicino.is_empty()))
+
 
 func _regione_dati() -> Dictionary:
 	var gd: Node = get_node_or_null("/root/GameData")

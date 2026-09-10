@@ -10592,5 +10592,53 @@ COME VERIFICATO.
 
 File toccati: data/i18n/it.json, tests/test_i18n_data.gd.
 
-PROSSIMA STORIA: colophon - tasti abilita'/interagisci nella lista dei
-rimappabili + etichette leggibili.
+---
+
+[2026-09-10] Fix post-fase-9 (playtest): colophon - i tasti mancanti
+
+CONTESTO. L'utente: "metti nel colophon i tasti per abilita' e come
+interagire con le persone". La riga riassuntiva COLOPHON_SCHEMA_COMANDI
+(US-814) c'era gia', ma la lista dei tasti RIMAPPABILI
+(SettingsStore.AZIONI, 10 voci) non includeva abilita_1..4 ne'
+interagisci, e le etichette erano l'id grezzo ("move_up", "attacco").
+
+COSA FATTO.
+- scripts/settings_store.gd: AZIONI da 10 a 15 voci - aggiunti
+  abilita_1..4 e interagisci (esistono gia' in project.godot [input];
+  _rimappa guarda gia' InputMap.has_action, nessun altro cambio).
+- scripts/pages/page_impostazioni.gd: nuovo _nome_azione(azione) -
+  etichetta leggibile via tr("COLOPHON_AZIONE_<ID>"), fallback all'id
+  grezzo se la chiave manca (mai "COLOPHON_AZIONE_X" a schermo).
+  _rebind() la usa al posto di `l.text = azione`.
+- assets/i18n/strings.csv: 15 chiavi COLOPHON_AZIONE_* (tutte le azioni,
+  non solo le nuove: ora l'intera sezione Comandi e' leggibile).
+  .translation rigenerati.
+- scripts/region_scene.gd: il prompt "[F] Parla" si nasconde quando si
+  apre il libro (Book.libro_aperto/libro_chiuso) e riappare alla chiusura
+  se si e' ancora vicini - scoperto guardando lo screenshot del colophon
+  (il prompt restava dietro il libro).
+
+COME VERIFICATO.
+- python tools/validate_data.py: 0 errori, 2 warning.
+- godot --headless ... run_tests.gd: 889 test (887 + 2), tutti passati.
+  test_layouts.test_npc_prompt_* esteso (prompt via libro aperto/chiuso).
+- Test nuovi: test_settings.test_azioni_include_hotbar_e_interagisci,
+  test_settings.test_colophon_elenca_i_tasti_abilita_e_interagisci.
+- Verifica a schermo (tests/manual/qa_onboarding.gd, +passo colophon):
+  aperto il libro sul colophon, scrollato alla sezione "Comandi" -
+  screenshot mostra la riga schema + le righe rimappabili con etichette
+  leggibili ("Muovi su [W]", "Attacco [J]", ..., piu' in basso
+  "Abilità 1..4" e "Interagisci / parla"). Screenshot mandato in chat.
+
+APERTO. en.json resta senza le COLOPHON_AZIONE_* in inglese? No: la CSV
+di Godot (tr()) ha entrambe le colonne, quelle sono complete. Resta solo
+il buco di data/i18n/en.json (story i18n, gia' annotato sopra).
+
+File toccati: scripts/settings_store.gd, scripts/pages/page_impostazioni.gd,
+scripts/region_scene.gd, assets/i18n/strings.csv (+ .translation),
+tests/test_settings.gd, tests/test_layouts.gd,
+tests/manual/qa_onboarding.gd.
+
+=== I 3 fix del playtest sono chiusi (onboarding, i18n, colophon). ===
+
+PROSSIMA STORIA: nessuna pianificata.
