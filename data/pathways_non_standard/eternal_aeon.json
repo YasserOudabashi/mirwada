@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "id": "eternal_aeon",
+  "categoria": "non_standard",
+  "name": "Eternal Aeon",
+  "name_i18n": "pathway.eternal_aeon",
+  "group": null,
+  "god_title": "Eternal Aeon",
+  "from_outer_deity": true,
+  "gameplay_verb": "Servire un patto con un'entita' che esiste fuori dal tempo, ricevendo doni in cambio di prove di fedelta'",
+  "tags": [
+    "tempo",
+    "conoscenza",
+    "destino",
+    "spirito",
+    "occulto"
+  ],
+  "sequences": [
+    {
+      "sequence": 9,
+      "id": "eternal_aeon_9",
+      "name": "Vigilant",
+      "name_i18n": "sequence.eternal_aeon.9",
+      "tier": "low",
+      "concept": "Il giocatore impara a percepire il ritmo nascosto degli scontri: parate perfette ripetute rivelano schemi che si ripetono all'infinito.",
+      "stat_modifiers": {
+        "spiritualita_max": 0.08,
+        "evasione": 0.04
+      },
+      "abilities": [
+        "ea_eco_del_colpo"
+      ],
+      "boon": {
+        "requisiti": [
+          {
+            "tipo": "comportamento",
+            "evento": "perfect_parry",
+            "filtri": {},
+            "target": 7
+          }
+        ]
+      },
+      "notes": "Prima Sequenza del Pathway Non-Standard Eternal Aeon (fase 9, US-904): un solo requisito, prova che un Boon a un tipo solo funziona."
+    },
+    {
+      "sequence": 8,
+      "id": "eternal_aeon_8",
+      "name": "Witness",
+      "name_i18n": "sequence.eternal_aeon.8",
+      "tier": "low",
+      "concept": "Il giocatore resta esposto alla notte senza cedere, e cede un piccolo oggetto legato al tempo in cambio della prossima Sequenza.",
+      "stat_modifiers": {
+        "spiritualita_max": 0.10,
+        "precisione": 0.05
+      },
+      "abilities": [
+        "ea_respiro_immutabile"
+      ],
+      "boon": {
+        "requisiti": [
+          {
+            "tipo": "comportamento",
+            "evento": "time_in_state",
+            "filtri": {
+              "stato": "notte"
+            },
+            "target": 600
+          },
+          {
+            "tipo": "sacrificio",
+            "costo": {
+              "tipo": "oggetto",
+              "id": "clessidra_che_cola_all_indietro",
+              "quantita": 1
+            }
+          }
+        ]
+      },
+      "notes": "Due requisiti (comportamento + sacrificio): combinazione parziale, non tutte e tre le fonti."
+    },
+    {
+      "sequence": 7,
+      "id": "eternal_aeon_7",
+      "name": "Archivist",
+      "name_i18n": "sequence.eternal_aeon.7",
+      "tier": "low",
+      "concept": "Il giocatore lascia una traccia concreta nel mondo (un oggetto prodotto) e dimostra di saper gia' usare il primo dono ricevuto.",
+      "stat_modifiers": {
+        "spiritualita_max": 0.12,
+        "evasione": 0.06
+      },
+      "abilities": [
+        "ea_pagina_ritrovata"
+      ],
+      "boon": {
+        "requisiti": [
+          {
+            "tipo": "quest",
+            "quest_id": "q_sidon_01"
+          },
+          {
+            "tipo": "comportamento",
+            "evento": "ability_used",
+            "filtri": {
+              "ability_id": "ea_eco_del_colpo"
+            },
+            "target": 5
+          }
+        ]
+      },
+      "notes": "Due requisiti (quest + comportamento)."
+    },
+    {
+      "sequence": 6,
+      "id": "eternal_aeon_6",
+      "name": "Cycle Warden",
+      "name_i18n": "sequence.eternal_aeon.6",
+      "tier": "mid",
+      "concept": "Il giocatore paga con la propria lucidita' il diritto di toccare un istante gia' passato e riportarlo indietro.",
+      "stat_modifiers": {
+        "spiritualita_max": 0.15,
+        "precisione": 0.07
+      },
+      "abilities": [
+        "ea_richiamo_del_momento_perduto"
+      ],
+      "boon": {
+        "requisiti": [
+          {
+            "tipo": "sacrificio",
+            "costo": {
+              "tipo": "follia",
+              "quantita": 12
+            }
+          }
+        ]
+      },
+      "notes": "Un solo requisito (sacrificio di Follia): seconda prova che un tipo solo basta, stavolta un sacrificio invece di un comportamento."
+    },
+    {
+      "sequence": 5,
+      "id": "eternal_aeon_5",
+      "name": "Silent Oracle",
+      "name_i18n": "sequence.eternal_aeon.5",
+      "tier": "mid",
+      "concept": "Il giocatore dimostra di non usare il proprio potere per incutere paura, padroneggia il dono del ciclo precedente, e cede un ricordo per vedere piu' lontano: tutte e tre le fonti insieme.",
+      "stat_modifiers": {
+        "spiritualita_max": 0.18,
+        "evasione": 0.08
+      },
+      "abilities": [
+        "ea_sguardo_che_non_dimentica"
+      ],
+      "boon": {
+        "requisiti": [
+          {
+            "tipo": "quest",
+            "quest_id": "q_vesna_01"
+          },
+          {
+            "tipo": "comportamento",
+            "evento": "ability_used",
+            "filtri": {
+              "ability_id": "ea_richiamo_del_momento_perduto"
+            },
+            "target": 4
+          },
+          {
+            "tipo": "sacrificio",
+            "costo": {
+              "tipo": "oggetto",
+              "id": "memoria_cristallizzata",
+              "quantita": 2
+            }
+          }
+        ]
+      },
+      "notes": "Tutte e tre le fonti insieme (quest + comportamento + sacrificio): la Sequenza richiesta esplicitamente dall'AC di US-904."
+    },
+    {
+      "sequence": 4,
+      "id": "eternal_aeon_4",
+      "name": "Unbound Scribe",
+      "name_i18n": "sequence.eternal_aeon.4",
+      "tier": "saint",
+      "concept": "Il giocatore comincia a scrivere pagine che l'Aeon non dimentica mai: contenuto completo (boon, abilita') in US-905.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "notes": "Stub dichiarato (US-904): il nome e' definitivo, il resto arriva in US-905 (blocco Sequenze 4-0).",
+      "stub": true
+    },
+    {
+      "sequence": 3,
+      "id": "eternal_aeon_3",
+      "name": "Voice of the Aeon",
+      "name_i18n": "sequence.eternal_aeon.3",
+      "tier": "saint",
+      "concept": "Il giocatore presta la propria voce all'entita' per un istante: contenuto completo (boon, abilita') in US-905.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "notes": "Stub dichiarato (US-904): il nome e' definitivo, il resto arriva in US-905 (blocco Sequenze 4-0).",
+      "stub": true
+    },
+    {
+      "sequence": 2,
+      "id": "eternal_aeon_2",
+      "name": "Herald Eternal",
+      "name_i18n": "sequence.eternal_aeon.2",
+      "tier": "angel",
+      "concept": "Il giocatore porta il messaggio dell'Aeon oltre i confini del tempo umano: contenuto completo (boon, abilita') in US-905.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "notes": "Stub dichiarato (US-904): il nome e' definitivo, il resto arriva in US-905 (blocco Sequenze 4-0).",
+      "stub": true
+    },
+    {
+      "sequence": 1,
+      "id": "eternal_aeon_1",
+      "name": "Aeon-Touched",
+      "name_i18n": "sequence.eternal_aeon.1",
+      "tier": "angel",
+      "concept": "Il giocatore non distingue piu' il proprio ricordo da quello dell'entita': contenuto completo (boon, abilita') in US-905.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "notes": "Stub dichiarato (US-904): il nome e' definitivo, il resto arriva in US-905 (blocco Sequenze 4-0).",
+      "stub": true
+    },
+    {
+      "sequence": 0,
+      "id": "eternal_aeon_0",
+      "name": "Eternal Aeon",
+      "name_i18n": "sequence.eternal_aeon.0",
+      "tier": "god",
+      "concept": "Il giocatore diventa un aspetto vivente dell'Aeon stesso: contenuto completo (boon, abilita') in US-905.",
+      "stat_modifiers": {},
+      "abilities": [],
+      "notes": "Stub dichiarato (US-904): il nome (uguale al Pathway, stessa convenzione di Twilight Giant a Sequenza 0) e' definitivo, il resto arriva in US-905.",
+      "stub": true
+    }
+  ]
+}

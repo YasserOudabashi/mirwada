@@ -356,6 +356,25 @@ def main():
         warn(f"{stub_count} sequenze su {total_sequences} sono stub dichiarati: "
              f"contenuto ancora da scrivere (fase 5), non un errore.")
 
+    # US-904: gli id delle Sequenze dei Pathway non_standard entrano anche
+    # loro in sequence_ids - servono alla validazione delle abilita' (sotto,
+    # sequence_id deve risolvere sia su uno standard che su un non_standard)
+    # e al controllo duplicati subito dopo. La validazione PIENA di questi
+    # file (categoria, group, boon...) resta nel blocco dedicato piu' in
+    # basso, dove quest_ids/item_ids/char_ids sono gia' disponibili: qui e'
+    # solo una raccolta di id, una seconda lettura dei file e' il prezzo di
+    # non riordinare tutto il resto dello script.
+    pnsdir_early = os.path.join(DATA, "pathways_non_standard")
+    if os.path.isdir(pnsdir_early):
+        for fn in sorted(f for f in os.listdir(pnsdir_early) if f.endswith(".json")):
+            _doc_early = load_json(os.path.join(pnsdir_early, fn))
+            if _doc_early is None:
+                continue
+            for _seq_early in _doc_early.get("sequences", []):
+                _sid_early = _seq_early.get("id")
+                if _sid_early:
+                    sequence_ids.append(_sid_early)
+
     for name, values in (("pathway", pathway_ids), ("sequenza", sequence_ids)):
         dupes = [k for k, v in Counter(values).items() if v > 1]
         if dupes:

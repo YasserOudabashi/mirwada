@@ -14,10 +14,16 @@ func test_conteggi_dei_pathway() -> void:
 	if gd == null:
 		assert_true(false, "GameData assente")
 		return
-	# 10 Pathway attivi / 100 Sequenze: e' lo scope deciso in SETUP-2.
-	# Se questi numeri cambiano senza una decisione esplicita, e' un bug.
-	assert_eq(gd.call("pathway_ids").size(), 10, "pathway caricati")
-	assert_eq(gd.call("sequence_count"), 100, "sequenze totali")
+	# 10 Pathway STANDARD attivi: e' lo scope deciso in SETUP-2, pathway_ids()
+	# resta scoped ai soli standard anche dopo fase 9 (US-902/US-903). Se
+	# questo numero cambia senza una decisione esplicita, e' un bug.
+	assert_eq(gd.call("pathway_ids").size(), 10, "pathway STANDARD caricati")
+	# sequence_count() somma anche le Sequenze dei Pathway non_standard
+	# (data/pathways_non_standard/, servono a Progression/BoonSystem): 100
+	# standard + le 10 di Eternal Aeon (US-904) = 110. Se questo numero
+	# cambia senza una decisione esplicita (un nuovo Pathway, standard o
+	# non_standard), e' un bug.
+	assert_eq(gd.call("sequence_count"), 110, "sequenze totali (standard + non_standard)")
 
 
 func test_nessun_errore_di_caricamento() -> void:

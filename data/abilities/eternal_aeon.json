@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "abilities": [
+    {
+      "schema_version": 1,
+      "id": "ea_eco_del_colpo",
+      "name_i18n": "ability.eternal_aeon.ea_eco_del_colpo",
+      "sequence_id": "eternal_aeon_9",
+      "costo_spiritualita": 8,
+      "cooldown": 10.0,
+      "primitive": [
+        {
+          "tipo": "shield",
+          "assorbimento": 25,
+          "durata": 4.0,
+          "riflette": 0.0,
+          "tag_bloccati": [],
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "tempo",
+        "difesa",
+        "singolo"
+      ],
+      "note": "Per un istante il colpo e' gia' accaduto: lo si e' visto, e non fa piu' male allo stesso modo."
+    },
+    {
+      "schema_version": 1,
+      "id": "ea_respiro_immutabile",
+      "name_i18n": "ability.eternal_aeon.ea_respiro_immutabile",
+      "sequence_id": "eternal_aeon_8",
+      "costo_spiritualita": 10,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "heal",
+          "quantita": 20,
+          "istantaneo": false,
+          "durata": 10.0,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "tempo",
+        "spirito",
+        "singolo"
+      ],
+      "note": "Chi impara a restare fermo abbastanza a lungo guarisce come guarisce la pietra: piano, ma senza fretta."
+    },
+    {
+      "schema_version": 1,
+      "id": "ea_pagina_ritrovata",
+      "name_i18n": "ability.eternal_aeon.ea_pagina_ritrovata",
+      "sequence_id": "eternal_aeon_7",
+      "costo_spiritualita": 12,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "reveal_info",
+          "raggio": 8.0,
+          "categoria": "eco_del_passato",
+          "durata": 6.0
+        }
+      ],
+      "tag_sinergia": [
+        "conoscenza",
+        "tempo",
+        "area"
+      ],
+      "note": "L'Archivista non inventa: legge quel che e' gia' stato scritto nel luogo, un'eco alla volta."
+    },
+    {
+      "schema_version": 1,
+      "id": "ea_richiamo_del_momento_perduto",
+      "name_i18n": "ability.eternal_aeon.ea_richiamo_del_momento_perduto",
+      "sequence_id": "eternal_aeon_6",
+      "costo_spiritualita": 18,
+      "cooldown": 24.0,
+      "primitive": [
+        {
+          "tipo": "time_rewind",
+          "secondi": 2.0,
+          "ripristina": [
+            "hp"
+          ],
+          "costo_follia": 3.0
+        }
+      ],
+      "tag_sinergia": [
+        "tempo",
+        "singolo"
+      ],
+      "note": "Riavvolge se stesso di 2 secondi: l'hp torna a com'era. Il prezzo, come sempre con l'Aeon, e' un poco di se'."
+    },
+    {
+      "schema_version": 1,
+      "id": "ea_sguardo_che_non_dimentica",
+      "name_i18n": "ability.eternal_aeon.ea_sguardo_che_non_dimentica",
+      "sequence_id": "eternal_aeon_5",
+      "costo_spiritualita": 14,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "mind_read",
+          "raggio": 10,
+          "profondita": 4,
+          "rivela": "intento_immediato",
+          "categoria": "intento_immediato"
+        }
+      ],
+      "tag_sinergia": [
+        "conoscenza",
+        "mente",
+        "area"
+      ],
+      "note": "L'Oracolo Silente non chiede: vede l'intenzione un istante prima che diventi un gesto."
+    }
+  ]
+}

@@ -10043,3 +10043,135 @@ scripts/fusion_engine.gd, tests/test_pathway_change.gd, tests/test_fusion.gd.
 
 PROSSIMA STORIA: US-904 — Eternal Aeon, Sequenze 9-5 (blocco A, contenuto
 del primo Pathway Non-Standard).
+
+---
+
+[2026-09-10] Fase 9 — US-904: Eternal Aeon, Sequenze 9-5
+
+COSA FATTO.
+- data/pathways_non_standard/eternal_aeon.json (nuovo): il primo Pathway
+  Non-Standard vero. Concept: un'entita' fuori dal tempo che concede doni
+  invece di insegnare una recitazione. 10 Sequenze come richiede lo
+  schema - 9,8,7,6,5 COMPLETE (nome, concept, stat_modifiers, abilita',
+  boon), 4,3,2,1,0 STUB dichiarati (nome gia' definitivo, il resto arriva
+  in US-905): Vigilant, Witness, Archivist, Cycle Warden, Silent Oracle,
+  Unbound Scribe, Voice of the Aeon, Herald Eternal, Aeon-Touched,
+  Eternal Aeon (Sequenza 0 = nome del Pathway, stessa convenzione di
+  "Twilight Giant"). Nomi in inglese: verificato su darkness/death/moon/
+  hermit che e' la convenzione di OGNI Pathway esistente, non un'eccezione.
+  I boon coprono esattamente la combinatoria richiesta dall'AC: Seq 9 e 6
+  un solo tipo di requisito ciascuna (comportamento, poi sacrificio),
+  Seq 8 e 7 due tipi (comportamento+sacrificio, poi quest+comportamento),
+  Seq 5 tutti e tre insieme (quest+comportamento+sacrificio).
+- data/abilities/eternal_aeon.json (nuovo): 5 abilita' (una per Sequenza
+  9-5), primitive dal registro attivo (shield, heal, reveal_info,
+  time_rewind, mind_read) - nessuna primitiva nuova. Parametri tarati sugli
+  esempi reali di Sequenze comparabili gia' in data/abilities/ (hermit/
+  paragon/twilight_giant per shield, darkness/death per heal, death/door/
+  hermit per reveal_info/mind_read, error/fool per time_rewind, scalato
+  giu' perche' error_riavvolgi e' di Sequenza 1, qui siamo a Sequenza 6).
+- data/i18n/it.json: 16 chiavi nuove (pathway.eternal_aeon, le 10
+  sequence.eternal_aeon.N, le 5 ability.eternal_aeon.<id>) scritte a mano
+  (i nomi di Sequenza sono gia' le stringhe finali in inglese; i nomi di
+  abilita', come per ogni altro Pathway verificato, non hanno un campo
+  gemello da cui auto-generarsi). data/i18n/en.json NON toccato: verificato
+  che ha zero chiavi pathway.*/sequence.*/ability.* su 1697 nel catalogo
+  IT corrispondente - l'inglese per queste categorie non e' mai stato
+  tradotto per nessun Pathway, non e' una lacuna introdotta qui.
+- tests/test_eternal_aeon.gd (nuovo, 7 test): stesso schema dei test
+  per-Pathway gia' in uso (test_mother.gd/test_death.gd) - le 5 abilita'
+  eseguono senza warning, get_pathway("eternal_aeon") risolve 10 Sequenze
+  coerenti (9-5 non stub col conteggio giusto di requisiti, 4-0 stub),
+  Sequenza 5 ha tutti e tre i tipi, Sequenze 9/6 ne hanno uno solo, gli id
+  referenziati dal boon (2 quest, 2 item) esistono davvero.
+
+DUE TRAPPOLE TROVATE E EVITATE (verificate leggendo il codice PRIMA di
+scrivere i dati, non dopo un test fallito):
+- Il filtro 'tag_abilita' dichiarato per l'evento ability_used in
+  tracked_events.json non e' MAI popolato da ability_engine.gd (riga 166:
+  emette solo {"ability_id": ...}). Un requisito Boon scritto con
+  tag_abilita sarebbe stato impossibile da soddisfare in partita. Uso solo
+  ability_id (confermato popolato, e gia' 0 Pathway standard lo usa nei
+  loro acting_actions, quindi non e' un problema pre-esistente altrove).
+- Di 5 valori dichiarati per time_in_state.stato (notte, meditazione,
+  trasformato, in_ombra, nel_mondo_spirituale), SOLO 'notte' viene emesso
+  davvero (time_system.gd:116, unico grep positivo su time_in_state in
+  tutto scripts/). Gli altri 4 sono gia' usati in acting_actions di
+  Pathway STANDARD esistenti (error, twilight_giant, door) - quindi
+  quei requisiti sono GIA' impossibili da soddisfare in partita, un
+  problema pre-esistente scoperto per caso. Fuori scope per questa story
+  (non l'ho toccato): lo segnalo sotto in "resta aperto". Il mio Boon
+  (Sequenza 8) usa solo 'notte'.
+
+TRE PROBLEMI TROVATI E CORRETTI AL PRIMO RUN DEI TEST (non nel codice di
+motore: nel validator e nel registro delle primitive, entrambi dati/
+documentazione, coerente con la regola "i dati non sono codice" -
+parametrizzare una primitiva esistente invece di aggiungerne una nuova):
+- tools/validate_data.py: la validazione delle abilita' (sequence_id deve
+  esistere) leggeva sequence_ids SOLO da data/pathways/ (i 10 Pathway
+  standard) - mai esteso a data/pathways_non_standard/ quando US-901 ha
+  creato quella cartella, perche' allora non c'era ancora nessun file li'
+  dentro. Aggiunta una raccolta early dei soli id delle Sequenze non_
+  standard (prima del controllo duplicati), separata dalla validazione
+  PIENA che resta nel blocco tardo (serve quest_ids/item_ids/char_ids).
+- data/schema/primitives.json: mind_read non aveva 'categoria' nel suo
+  registro di parametri, anche se il validator richiede esplicitamente
+  'categoria' per ogni uso della primitiva FUORI da Hermit (US-502: "solo
+  Hermit e' il divinatore sistemico") - lo richiede gia' dal commento
+  d'errore stesso, ma nessun Pathway diverso da Hermit aveva mai usato
+  mind_read prima (verificato via grep), quindi il buco non era mai
+  emerso. reveal_info, la primitiva gemella, ce l'aveva gia'. Aggiunto
+  'categoria' ai parametri dichiarati (non e' una primitiva nuova, e' la
+  stessa correzione minima che CLAUDE.md chiede: "parametrizza quella
+  esistente").
+- Sequenze 6,4,3,2,1: tier sbagliati rispetto a expected_tier() del
+  validator (6 deve essere 'mid' non 'low', 4/3 'saint' non 'mid', 2/1
+  'angel' non 'saint') - errore di battitura mio nella progettazione,
+  corretto.
+
+UN QUARTO PROBLEMA, ATTESO E CORRETTO A COLPO SICURO (non un bug: e' la
+conseguenza diretta di aggiungere un file reale e permanente in data/
+pathways_non_standard/, diverso dai fixture temporanei di US-902/US-903
+che si cancellavano da soli con GameData.reload()): tests/test_game_data.gd
+(test_conteggi_dei_pathway) e tests/test_hot_reload.gd
+(test_dati_ancora_integri_dopo_reload) avevano "100 sequenze totali"
+come tripwire esplicito. Con Eternal Aeon che carica per davvero (10
+Sequenze in piu' in GameData._sequences, necessarie a Progression/
+BoonSystem), il numero vero e permanente e' 110 - aggiornati entrambi i
+test con un commento che spiega il nuovo conto (100 standard + 10 di
+Eternal Aeon), pathway_ids().size() resta 10 (invariato, e' scoped ai
+soli standard da US-902).
+
+COME VERIFICATO.
+- godot --headless --path . --import: pulito (dopo l'edit a it.json).
+- godot --headless --path . --script res://tests/run_tests.gd: 877 test
+  (870 + 7 nuovi di test_eternal_aeon.gd), tutti passati. Nessuna
+  regressione.
+- python tools/validate_data.py: esce 0, stessi 3 warning di sempre (il
+  conteggio "42/1697" e' salito a "42/1713" per via delle nuove chiavi
+  non-TODO aggiunte - non e' un regresso, sono le nuove tradotte).
+- git status: solo i file elencati sotto.
+
+COSA RESTA APERTO (per le story successive).
+- US-905 scrive Eternal Aeon Sequenze 4-0 (boon, abilita' - i nomi sono
+  gia' fissati qui: Unbound Scribe, Voice of the Aeon, Herald Eternal,
+  Aeon-Touched, Eternal Aeon).
+- Segnalato ma NON toccato (fuori scope di questa story): le acting_actions
+  di error_8, twilight_giant_9/6, door_9/6 che usano time_in_state con
+  stato 'meditazione'/'trasformato'/'in_ombra' sono strutturalmente
+  impossibili da soddisfare in partita (nessuno script emette quegli stati
+  - solo 'notte' e' vivo). E' un problema pre-esistente di Pathway
+  STANDARD gia' chiusi (fase 2/5b/6), non della fase 9: andrebbe discusso
+  esplicitamente con l'utente prima di decidere se estendere time_system.gd
+  a emettere quegli stati o riscrivere quelle acting_actions.
+- US-906 (sezione "Dono" nel diagramma) e US-907 (checkpoint + verifica
+  giocata Xvfb + chiusura fase 9) restano da fare.
+
+File toccati: data/pathways_non_standard/eternal_aeon.json (nuovo),
+data/abilities/eternal_aeon.json (nuovo), data/i18n/it.json,
+data/schema/primitives.json, tools/validate_data.py,
+tests/test_eternal_aeon.gd (nuovo), tests/test_game_data.gd,
+tests/test_hot_reload.gd.
+
+PROSSIMA STORIA: US-905 — Eternal Aeon, Sequenze 4-0 (completamento del
+Pathway Non-Standard).
