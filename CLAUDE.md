@@ -237,14 +237,54 @@ la lista vietata è letta da `GameData.pathway_ids()` +
 `data/world/regions.json` + `data/npc/roster.json` +
 `data/potions/formulas.json`, non scritta a mano).
 
-Fase 9 (opzionale, non bloccante): Pathway Non-Standard, avanzamento per
-Boon — il PRD si genera con `/prd` solo quando si decide di farla davvero.
-Roadmap in `006_PRD/roadmap.md`.
+Fase 9 — Pathway Non-Standard: **CHIUSA** (7 story US-901..US-907, 884
+test). PRD in `006_PRD/prd-fase-9-pathway-non-standard.md`. Le fasi 1-8
+avevano un solo sistema di progressione (Sequenza 9→0, Caratteristica +
+formula + concoct + recitazione + bevi). Il materiale di riferimento ha
+anche Pathway "Non-Standard" (bestower come Eternal Aeon) che avanzano
+ricevendo **Boon** da un'entità, non bevendo pozioni. 4 blocchi: 0
+fondamenta (`categoria: "standard"|"non_standard"` su ogni Pathway,
+`data/schema/boon.schema.json`, `BoonSystem` autoload — legge solo il
+campo `boon` della Sequenza corrente, stesso principio di `PotionSystem`
+—, guardie in `PathwayChange`/`FusionEngine` contro un Pathway
+non_standard), A contenuto (**Eternal Aeon completo 10/10 Sequenze**,
+10 abilità dalle primitive attive esistenti, nessuna nuova), B libro
+(sezione "Il Dono" nella pagina diagramma al posto di Prepara/Bevi,
+stessa pagina — un ramo sul dato `boon` vs `potion`, mai un tipo di
+pagina nuovo), C checkpoint + chiusura. Save `schema_version` **22 → 23**
+(US-902, l'unico bump: il campo `boon` — solo la baseline dei requisiti
+`comportamento` — accanto ad `acting`).
+
+Un Boon è un dono **una tantum** per Sequenza: i requisiti (quest
+completata / comportamento contato / sacrificio pagato, combinabili
+per Sequenza, mai tutti e tre per forza) sono dati, mai codice.
+`GameData.pathway_ids()` resta scoped ai soli Pathway standard (ogni
+sistema che itera "ogni Pathway attivo" — VFX, diagramma, siti rituali,
+i18n, gli slice — lo assume): i non_standard vivono in un registro
+GameData separato (`pathway_ids_non_standard()`), usato solo dove serve
+davvero (il selettore di creazione personaggio, così Eternal Aeon si
+sceglie col ciclo standard, deciso con l'utente).
+
+**Verdetto** (US-907, `tests/manual/qa_vslice_eternal_aeon.gd` +
+`tests/test_fase_9_checkpoint.gd`): un personaggio Eternal Aeon creato
+dal selettore vero di `page_creazione_personaggio.gd`, un Boon con
+tutte e tre le fonti insieme soddisfatto e ricevuto dalla pagina
+diagramma vera, `Progression.sequence()` sceso da 5 a 4 — con zero
+righe di codice che nominino "eternal_aeon" o una sua Sequenza/abilità
+(checkpoint dinamico, lista vietata letta da
+`GameData.get_pathway("eternal_aeon")`, non scritta a mano).
 
 Prova che l'architettura regge: `data/abilities/twilight_giant.json` (fase 2),
-i 5 Pathway di fase 5, i 3 del Lord of Mysteries (fase 5b) e l'intero
-endgame di fase 7 sono contenuto/motori completi con **zero righe di
-codice dedicate**. È il modello da imitare per ogni story di dati.
+i 5 Pathway di fase 5, i 3 del Lord of Mysteries (fase 5b), l'intero
+endgame di fase 7 e Eternal Aeon (fase 9, un secondo sistema di
+progressione intero, non solo contenuto) sono motori/contenuto completi
+con **zero righe di codice dedicate**. È il modello da imitare per ogni
+story di dati.
+
+Fase 10 (opzionale, non pianificata): altri Pathway Non-Standard (Chaos
+Primogenitor, Scrooge, Dreamless, altri bestower), stesso schema di
+Eternal Aeon — il PRD si genera con `/prd` solo quando si decide di
+farla davvero. Roadmap in `006_PRD/roadmap.md`.
 
 ## Decisioni prese
 

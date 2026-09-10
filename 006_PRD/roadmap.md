@@ -1,4 +1,4 @@
-# Roadmap — Fasi 2-8
+# Roadmap — Fasi 2-10
 
 Scaletta, non PRD. Ogni fase riceve il suo PRD dettagliato con `/prd`
 **quando la fase precedente e' chiusa**, non prima: scrivere ora il PRD della
@@ -374,10 +374,79 @@ Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 
 ---
 
-## Fase 9 — Opzionale
+## Fase 9 — Pathway Non-Standard — CHIUSA (7 story, 884 test)
 
-Pathway Non-Standard (Eternal Aeon, Chaos Primogenitor, Scrooge, Dreamless e
-gli altri bestowers). Meccanica diversa: avanzamento per **Boon** invece che
-per pozione, quindi non e' solo contenuto ma un secondo sistema di
-progressione. Le fasi 1-8 sono chiuse: sbloccata, ma opzionale — il PRD
-dettagliato si genera con `/prd` solo quando si decide di farla davvero.
+> **PRD**: `006_PRD/prd-fase-9-pathway-non-standard.md` (7 story:
+> US-901..US-907).
+>
+> Le fasi 1-8 avevano costruito un solo sistema di progressione (Sequenza
+> 9→0, Caratteristica + formula + concoct + recitazione + bevi), condiviso
+> da tutti e 10 i Pathway standard attivi senza una riga di codice dedicata.
+> Il materiale di riferimento ha anche Pathway "Non-Standard" (Eternal
+> Aeon, Chaos Primogenitor, Scrooge, Dreamless e altri "bestower") che non
+> salgono di Sequenza bevendo una pozione dopo aver recitato un ruolo:
+> ricevono doni ("Boon") da un'entità superiore. Meccanica diversa,
+> quindi non solo contenuto ma un **secondo sistema di progressione**.
+>
+> **Cosa ha fatto la fase 9**: un motore Boon generico (`BoonSystem`,
+> stesso principio di `PotionSystem`: il codice non sa nulla di
+> "Eternal Aeon", legge solo il campo `boon` della Sequenza corrente) +
+> **un solo Pathway Non-Standard completo, Eternal Aeon** (10/10
+> Sequenze), come prova d'architettura — lo stesso ruolo che il Twilight
+> Giant ha avuto in fase 2. Un Boon è un dono **una tantum** per Sequenza
+> (non a gradini, non ad accumulo continuo — restano spazio per
+> un'eventuale fase futura, non costruiti qui). Save `schema_version`
+> **22 → 23** (un solo bump: la baseline dei requisiti `comportamento` di
+> `BoonSystem`, accanto ad `acting`). Nessuna primitiva nuova, nessun
+> evento tracciato nuovo — coperti tutti dai 28/12 esistenti.
+>
+> **Cosa contiene**:
+> - Blocco 0: `data/schema/boon.schema.json`; campo `categoria`
+>   (`"standard"`/`"non_standard"`) su ogni Pathway esistente (22, edit
+>   meccanico) e su `data/pathways_non_standard/eternal_aeon.json`
+>   (nuova cartella, parallela a `pathways`/`pathways_deferred`);
+>   `BoonSystem` autoload (`requisiti_stato()`/`puo_ricevere()`/
+>   `ricevi_boon()`); guardie esplicite in `PathwayChange`/`FusionEngine`
+>   contro un Pathway `non_standard` (nessun gruppo, nessun vicino,
+>   nessuna fusione).
+> - Blocco A: Eternal Aeon completo — 10 Sequenze con nome proprio
+>   (Vigilant, Witness, Archivist, Cycle Warden, Silent Oracle, Unbound
+>   Scribe, Voice of the Aeon, Herald Eternal, Aeon-Touched, Eternal
+>   Aeon), 10 abilità (`shield`/`heal`/`reveal_info`/`time_rewind`/
+>   `mind_read`/`curse`/`fear`/`teleport`/`soul_detach`/`resurrect`,
+>   nessuna primitiva nuova), un `boon` per Sequenza — la combinatoria
+>   dei tre tipi di requisito (quest/comportamento/sacrificio) è provata
+>   per intero: singoli, doppi, e tutti e tre insieme sulla Sequenza 5.
+> - Blocco B: sezione "Il Dono" nella pagina diagramma del libro al
+>   posto di Prepara/Bevi quando la Sequenza corrente ha `boon` invece
+>   di `potion` — stessa pagina, un ramo sul dato, nessun tipo di pagina
+>   nuovo; bottone "Ricevi il Dono".
+> - Blocco C: checkpoint dinamico (`tests/test_fase_9_checkpoint.gd`,
+>   lista vietata letta da `GameData.get_pathway("eternal_aeon")`) +
+>   verifica giocata (`tests/manual/qa_vslice_eternal_aeon.gd`, Xvfb) +
+>   chiusura.
+> - **Verdetto (US-907)**: un personaggio Eternal Aeon creato dal
+>   selettore VERO di `page_creazione_personaggio.gd` (esteso a
+>   concatenare anche i Pathway `non_standard` — decisione presa con
+>   l'utente: si sceglie come un Pathway standard, stesso ciclo di
+>   creazione, nessun gating narrativo in questa fase), un Boon con
+>   tutte e tre le fonti insieme soddisfatto e ricevuto dalla pagina
+>   diagramma vera, `Progression.sequence()` sceso da 5 a 4 — con zero
+>   righe di codice che nominino "eternal_aeon" o una sua Sequenza/
+>   abilità specifica.
+>
+> `GameData.pathway_ids()` resta scoped ai soli Pathway standard (ogni
+> sistema che itera "ogni Pathway attivo" — VFX, diagramma, siti
+> rituali, i18n, gli slice — lo assume): i non_standard vivono in un
+> registro `GameData` separato (`pathway_ids_non_standard()`), usato
+> solo dove serve davvero (il selettore di creazione).
+
+---
+
+## Fase 10 — Opzionale
+
+Altri Pathway Non-Standard (Chaos Primogenitor, Scrooge, Dreamless e gli
+altri bestowers), stesso schema di Eternal Aeon (fase 9: motore Boon già
+scritto, si tratta solo di contenuto). Le fasi 1-9 sono chiuse: sbloccata,
+ma opzionale — il PRD dettagliato si genera con `/prd` solo quando si
+decide di farla davvero.

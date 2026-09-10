@@ -47,12 +47,17 @@ func _mostra_creazione(gs: Node) -> void:
 
 ## US-801: scelta del Pathway alla creazione. L'elenco e l'ordine vengono
 ## da GameData.pathway_ids(), il default da balance.json.progressione —
-## nessun id di Pathway hardcoded qui.
+## nessun id di Pathway hardcoded qui. US-907: anche i Pathway non_standard
+## (Eternal Aeon) compaiono qui, stesso ciclo di creazione dei Pathway
+## standard (deciso col l'utente, PRD fase 9 §5) - pathway_ids() da solo
+## resta scoped agli standard per ogni altro sistema (vedi il commento su
+## GameData.pathway_ids_non_standard()), questo e' l'unico punto che li
+## concatena.
 func _pathway_scelta() -> void:
 	var gd: Node = _n("/root/GameData")
 	if gd == null:
 		return
-	_pathway_ids = gd.call("pathway_ids")
+	_pathway_ids = gd.call("pathway_ids") + gd.call("pathway_ids_non_standard")
 	if _pathway_ids.is_empty():
 		return
 	add_child(_riga(tr("BOOK_FRONTESPIZIO_PATHWAY")))

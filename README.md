@@ -126,6 +126,27 @@ preparata e bevuta (Sequenza 9 → 8), un passaggio fra regioni — con zero
 righe di codice che nominino un Pathway/regione/NPC/formula specifici
 (`tests/test_slice_fase_8.gd`, lista vietata letta dai dati).
 
+**Fase 9 — Pathway Non-Standard: chiusa.** 7 story, 884 test. Le fasi 1-8
+avevano un solo sistema di progressione (Sequenza 9→0, pozione+recitazione).
+Il materiale di riferimento ha anche Pathway "Non-Standard" (bestower come
+Eternal Aeon) che avanzano ricevendo **Boon** da un'entità invece di bere
+pozioni. Un motore Boon generico (`BoonSystem`, nuovo autoload — legge solo
+il campo `boon` della Sequenza corrente, stesso principio di `PotionSystem`)
++ **Eternal Aeon completo, 10/10 Sequenze**, il primo Pathway Non-Standard
+scritto, come prova d'architettura. Un Boon è un dono una tantum per
+Sequenza: requisiti dichiarati nei dati (quest completata / comportamento
+contato / sacrificio pagato, combinabili per Sequenza). La pagina diagramma
+del libro mostra una sezione "Il Dono" al posto di Prepara/Bevi quando la
+Sequenza corrente ha `boon` invece di `potion` — stessa pagina, un ramo sul
+dato. Save **`schema_version` 22 → 23** (un solo bump: la baseline dei
+requisiti `comportamento`, accanto ad `acting`). Verdetto (US-907):
+`tests/manual/qa_vslice_eternal_aeon.gd` crea un personaggio Eternal Aeon
+dal selettore vero di creazione, soddisfa un Boon con tutte e tre le fonti
+insieme e lo riceve dalla pagina diagramma vera (`Progression.sequence()`
+5 → 4) — con zero righe di codice che nominino "eternal_aeon" o una sua
+Sequenza/abilità (`tests/test_fase_9_checkpoint.gd`, lista vietata letta
+dai dati).
+
 ## Setup
 
 Richiede Godot 4.x e Python 3 (solo per gli strumenti di dati).
@@ -144,6 +165,8 @@ godot --headless --path . --script res://tools/build_tileset.gd  # ricostruisce 
 # Xvfb :99 -screen 0 1280x720x24 &
 # DISPLAY=:99 godot --display-driver x11 --rendering-driver opengl3 \
 #   --path . --script res://tests/manual/qa_vslice.gd
+# Stesso schema per Eternal Aeon (fase 9, US-907):
+#   --script res://tests/manual/qa_vslice_eternal_aeon.gd
 ```
 
 La suite headless include un test che esegue `tools/validate_data.py`: un
@@ -155,15 +178,19 @@ mano. Esce 0 se tutto passa, 1 al primo fallimento.
 Il codice implementa 28 primitive parametriche; i dati JSON le compongono in
 abilita'. Prova: tutti e 10 i Pathway attivi (100/100 Sequenze) sono
 completi dalla Sequenza 9 alla 0 con zero righe di codice dedicate
-(data/abilities/*.json) — e l'intero endgame di fase 7 (cambio Pathway,
-tribolazioni, finali) regge sulla stessa architettura.
+(data/abilities/*.json) — l'intero endgame di fase 7 (cambio Pathway,
+tribolazioni, finali) regge sulla stessa architettura, e in fase 9 anche un
+**secondo sistema di progressione intero** (Boon invece di pozione,
+Eternal Aeon) si aggiunge leggendo solo dati nuovi, zero righe di codice
+di motore che nominino un Pathway specifico.
 
 ## Documenti
 
 - `CLAUDE.md` — regole di lavoro, comandi, decisioni prese
-- `006_PRD/prd-fase-8-vertical-slice.md` — **PRD della fase corrente** (vertical slice giocabile, 19 story)
-- `006_PRD/prossimi-passi.md` — **come eseguirla**: ordine delle operazioni, quando usare `/prd` e `/ralph`, setup, trappole note
-- `006_PRD/prd-fase-7-endgame.md` — PRD dell'ultima fase chiusa (fase 7)
+- `006_PRD/prd-fase-9-pathway-non-standard.md` — **PRD dell'ultima fase chiusa** (Pathway Non-Standard, motore Boon + Eternal Aeon, 7 story)
+- `006_PRD/prd-fase-8-vertical-slice.md` — PRD della fase 8 (chiusa, vertical slice giocabile, 19 story)
+- `006_PRD/prossimi-passi.md` — istruzioni operative della fase 8: ordine delle operazioni, quando usare `/prd` e `/ralph`, setup, trappole note
+- `006_PRD/prd-fase-7-endgame.md` — PRD della fase 7 (chiusa)
 - `006_PRD/prd-fase-5b-lord-of-mysteries.md` — PRD della fase 5b (chiusa)
 - `006_PRD/prd-fase-6-mondo.md` — PRD della fase 6 (chiusa)
 - `006_PRD/prd-fase-2-pathway-core.md` — PRD della fase 2 (chiusa)
@@ -177,8 +204,8 @@ tribolazioni, finali) regge sulla stessa architettura.
 - `006_PRD/design-vfx.md` — identita' visiva delle abilita' (stile manhwa), 10 palette
 - `006_PRD/art-brief-gemini.md` — prompt pronti per generare concept/ritratti/UI con Gemini, con i limiti dichiarati
 - `data/audio.json` — sistema audio data-driven (tell sonori, follia, palette)
-- `006_PRD/roadmap.md` — fasi 2-9
-- `prd.json` — story della fase corrente in formato ralph
+- `006_PRD/roadmap.md` — fasi 2-10
+- `prd.json` — story dell'ultima fase chiusa (fase 9) in formato ralph
 - `progress.txt` — memoria tra le sessioni
 - `docs/documentazione.py` — rigenera la documentazione docx; `diario.py` — diario del progetto
 

@@ -713,6 +713,17 @@ func pathway_ids() -> Array:
 	return _pathways.keys()
 
 
+## Gli id dei Pathway non_standard (US-907): un registro separato apposta
+## (vedi _load_pathways), MAI incluso in pathway_ids() - ogni sistema che
+## itera "ogni Pathway attivo" (VFX, diagramma, siti rituali, i18n, gli
+## slice) continuerebbe ad assumere quell'universo. Solo chi ha
+## esplicitamente bisogno anche dei non_standard (oggi: il selettore di
+## creazione personaggio, cosi' Eternal Aeon si sceglie come un Pathway
+## standard) concatena i due elenchi.
+func pathway_ids_non_standard() -> Array:
+	return _pathways_non_standard.keys()
+
+
 func sequence_count() -> int:
 	return _sequences.size()
 

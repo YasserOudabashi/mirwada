@@ -10357,3 +10357,114 @@ tests/test_page_dono.gd (nuovo), tests/manual/qa_dono_diagramma.gd (nuovo).
 
 PROSSIMA STORIA: US-907 — Checkpoint + verifica giocata + chiusura fase 9
 (ultima story del PRD).
+
+---
+
+[2026-09-10] Fase 9 — US-907: checkpoint + verifica giocata + CHIUSURA FASE 9
+
+COSA FATTO.
+- tests/test_fase_9_checkpoint.gd (nuovo, checkpoint dinamico, stesso
+  schema di test_slice_fase_8.gd): la lista vietata nel motore
+  (res://scripts, res://scripts/pages) e' scoperta da
+  GameData.get_pathway("eternal_aeon") - l'id del Pathway, i 10 id di
+  Sequenza, i 10 id di abilita' - 0 occorrenze attese. Un secondo test
+  conferma che tests/manual/qa_vslice_eternal_aeon.gd esiste e non e'
+  raccolto dalla suite headless (vive in tests/manual/, non ricorsiva).
+- tests/manual/qa_vslice_eternal_aeon.gd (nuovo, script manuale Xvfb,
+  stesso schema di qa_vslice_darkness.gd + qa_dono_diagramma.gd di
+  US-906): avvio REALE di main.tscn, creazione scegliendo "eternal_aeon"
+  dal selettore VERO (non passato a mano a Progression - la prova
+  diretta che e' selezionabile col ciclo standard), scorciatoia
+  dichiarata a Sequenza 5 (il cammino 9->6 non e' richiesto dall'AC di
+  questa story), Boon soddisfatto con tutte e tre le fonti insieme e
+  ricevuto dalla pagina diagramma vera, Progression.sequence() sceso da
+  5 a 4. 4 screenshot mandati in chat (scaffale, dopo la creazione con
+  l'HUD che mostra l'abilita' di Eternal Aeon Sequenza 9 gia' in
+  hotbar, il Dono soddisfatto, il Dono ricevuto con 4 abilita' in
+  hotbar).
+- tools/validate_data.py: blocco "chiusura fase 9" - data/schema/
+  boon.schema.json presente, data/pathways_non_standard/eternal_aeon.json
+  presente con 10 Sequenze NESSUNA stub, data/abilities/eternal_aeon.json
+  presente. Verificato manualmente spostando temporaneamente
+  eternal_aeon.json: l'errore atteso compare (oltre a 5 errori a
+  cascata sulle abilita' che referenziano sequence_id inesistenti,
+  previsto), poi ripristinato e riconfermato 0 errori.
+- CLAUDE.md (§ Fasi): "Fase 9 (opzionale, non bloccante)" -> "Fase 9 —
+  Pathway Non-Standard: CHIUSA" nello stesso stile delle fasi 1-8, con
+  verdetto US-907; aggiunta "Fase 10 (opzionale, non pianificata)" per
+  gli altri bestower futuri (Chaos Primogenitor, Scrooge, Dreamless).
+- README.md: nuovo paragrafo "Fase 9 — Pathway Non-Standard: chiusa."
+  dopo quello della fase 8, stesso stile (story/test count, cosa e'
+  cambiato, verdetto); riga degli screenshot Xvfb con l'esempio di
+  qa_vslice_eternal_aeon.gd; "Architettura in una riga" esteso a
+  menzionare il secondo sistema di progressione; lista "Documenti"
+  aggiornata (PRD fase 9 = ultima fase chiusa, fase 8 non piu' "fase
+  corrente"; roadmap.md e prd.json aggiornati di conseguenza).
+- 006_PRD/roadmap.md: titolo "Fasi 2-8" -> "Fasi 2-10"; blocco "Fase 9 —
+  Opzionale" (mai iniziata) riscritto in "Fase 9 — Pathway Non-Standard
+  — CHIUSA" nello stesso stile del blocco fase 8 (contesto, cosa ha
+  fatto la fase, i 4 blocchi, verdetto); nuovo blocco "Fase 10 —
+  Opzionale" per gli altri bestower, stessa formula gia' usata per la
+  fase 9 prima di essere aperta.
+- prd.json: US-907.passes = true, note compilate. Tutte le 7 story della
+  fase 9 sono ora passes:true.
+
+UN PROBLEMA REALE TROVATO SCRIVENDO LO SCRIPT MANUALE, CORRETTO PRIMA DEL
+COMMIT (non un bug di questa story: la decisione che US-907 doveva
+prendere, gia' segnalata come aperta in OGNI story precedente della
+fase, da US-902 in poi):
+- page_creazione_personaggio.gd::_pathway_scelta() popolava il
+  selettore SOLO da GameData.pathway_ids() (scoped ai soli Pathway
+  standard, decisione presa in US-902/903 per non rompere sette suite
+  scollegate). Risultato: "eternal_aeon" non compariva MAI nel menu di
+  creazione, nonostante il PRD di fase 9 §5 dichiari esplicitamente
+  (deciso con l'utente, 2026-09-10): "Eternal Aeon e' selezionabile
+  alla creazione del personaggio esattamente come i Pathway standard,
+  stesso OptionButton/stesso ciclo di page_creazione_personaggio.gd —
+  nessuna condizione di sblocco per questa fase." Lasciare questo
+  irrisolto avrebbe reso l'AC di US-907 ("crea un personaggio Eternal
+  Aeon [dal selettore]") impossibile da soddisfare per davvero.
+- Risolto SENZA riaprire il problema dei sette sistemi: nuovo accessore
+  GameData.pathway_ids_non_standard() (ritorna
+  _pathways_non_standard.keys(), mai incluso in pathway_ids()), e
+  page_creazione_personaggio.gd::_pathway_scelta() ora concatena
+  `gd.call("pathway_ids") + gd.call("pathway_ids_non_standard")` SOLO
+  per popolare il proprio OptionButton. GameData.pathway_ids() resta
+  invariato ovunque altro (VFX, diagramma, siti rituali, i18n, gli
+  slice, test_game_data/test_hot_reload): verificato non toccando
+  NESSUNO di quei file in questa story, e la suite intera resta verde.
+  Questo e' l'unico punto dell'intero motore che sa che esistono
+  Pathway non_standard oltre a quelli standard - esattamente cio' che
+  serviva, non di piu'.
+
+COME VERIFICATO.
+- godot --headless --path . --import: pulito.
+- godot --headless --path . --script res://tests/run_tests.gd: 884 test
+  (882 + 2 nuovi di test_fase_9_checkpoint.gd), tutti passati. Nessuna
+  regressione.
+- python tools/validate_data.py: esce 0, stessi 3 warning di sempre.
+- tests/manual/qa_vslice_eternal_aeon.gd lanciato per davvero con Xvfb
+  (--display-driver x11 --rendering-driver opengl3): 5 passi OK, 4
+  screenshot prodotti e mandati in chat.
+- git status: solo i file elencati sotto.
+
+COSA RESTA APERTO (per un'eventuale fase 10, non pianificata).
+- Gli altri Pathway Non-Standard (Chaos Primogenitor, Scrooge, Dreamless,
+  altri bestower) restano non scritti - stessa ricetta di Eternal Aeon
+  quando/se richiesta.
+- Una seconda forma di Boon (a gradini progressivi, o ad accumulo
+  continuo) - lo schema dati non la vieta in futuro, non implementata.
+- La limitazione della pagina diagramma (niente ScrollContainer, 640x360:
+  US-906) resta, fuori scope di fase 9.
+- La questione time_in_state sugli stati mai emessi nei Pathway standard
+  esistenti (segnalata in US-904) resta aperta, fuori scope di fase 9.
+
+File toccati: tests/test_fase_9_checkpoint.gd (nuovo),
+tests/manual/qa_vslice_eternal_aeon.gd (nuovo), tools/validate_data.py,
+scripts/game_data.gd, scripts/pages/page_creazione_personaggio.gd,
+CLAUDE.md, README.md, 006_PRD/roadmap.md, prd.json.
+
+=== FASE 9 CHIUSA (US-901..US-907, 884 test) ===
+
+PROSSIMA STORIA: nessuna pianificata. Fase 10 (opzionale, altri Pathway
+Non-Standard) si apre con /prd solo quando richiesta.

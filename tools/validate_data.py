@@ -2585,6 +2585,31 @@ def main():
             err(f"assets/placeholder/{_nome_file}: dimensione {_dim}, attesa "
                 f"({_w_atteso}, {_h_atteso}) (US-814).")
 
+    # --- chiusura fase 9 (US-907): il primo Pathway Non-Standard e' completo ---
+    # La validazione PIENA di data/pathways_non_standard/ (categoria, group,
+    # boon, tier...) e' gia' nel blocco dedicato piu' sopra (US-901): qui solo
+    # il criterio di chiusura, stesso stile delle fasi precedenti.
+    if not os.path.exists(os.path.join(DATA, "schema", "boon.schema.json")):
+        err("data/schema/boon.schema.json: mancante (US-901: schema del motore Boon).")
+    _ea_path = os.path.join(DATA, "pathways_non_standard", "eternal_aeon.json")
+    if not os.path.exists(_ea_path):
+        err("data/pathways_non_standard/eternal_aeon.json: mancante (US-904/905: "
+            "il primo Pathway Non-Standard deve esistere con la fase 9 chiusa).")
+    else:
+        _ea_doc = load_json(_ea_path) or {}
+        _ea_seqs = _ea_doc.get("sequences", [])
+        if len(_ea_seqs) != 10:
+            err(f"data/pathways_non_standard/eternal_aeon.json: {len(_ea_seqs)} sequenze, "
+                f"attese 10 (fase 9 chiusa).")
+        for _ea_seq in _ea_seqs:
+            if bool(_ea_seq.get("stub", False)):
+                err(f"data/pathways_non_standard/eternal_aeon.json [{_ea_seq.get('id')}]: "
+                    f"ancora stub - la fase 9 e' chiusa, ogni Sequenza deve essere completa "
+                    f"(US-904/905).")
+    if not os.path.exists(os.path.join(DATA, "abilities", "eternal_aeon.json")):
+        err("data/abilities/eternal_aeon.json: mancante (US-904/905: le abilita' di "
+            "Eternal Aeon devono esistere con la fase 9 chiusa).")
+
     report()
     return 1 if errors else 0
 
