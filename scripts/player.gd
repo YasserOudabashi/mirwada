@@ -45,6 +45,12 @@ var _dist_accum: float = 0.0  # emettitore distanza_percorsa (US-331)
 
 var _parando: bool = false
 
+## Bug report utente 2026-09-10: a 0 hp il giocatore restava giocabile
+## all'infinito, StatsComponent.died non era collegato a nulla per il
+## giocatore (solo enemy.gd lo ascolta). true durante l'animazione "death":
+## _physics_process si ferma, niente input processato.
+var _morto: bool = false
+
 ## US-802: hotbar. true mentre l'animazione "cast" e' in corso, cosi'
 ## _aggiorna_animazione() non la sovrascrive col walk/idle del frame dopo
 ## (stesso ruolo di _attaccando per l'attacco).
@@ -67,6 +73,7 @@ func _ready() -> void:
 	_hitbox.ha_colpito.connect(_su_colpo_inflitto)
 	_hurtbox.parata_riuscita.connect(_su_parata_riuscita)
 	_hurtbox.colpito.connect(_su_danno_subito)
+	_stats.died.connect(_su_morte)
 
 	# Bonus di Sequenza del Pathway corrente (US-201): il giocatore entra in
 	# scena dopo gli autoload, quindi li richiede lui una volta pronto.
@@ -105,6 +112,8 @@ func _monta_nome() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if _morto:
+		return
 	_dash_cd = maxf(_dash_cd - delta, 0.0)
 
 	if _dashing:
@@ -265,11 +274,56 @@ func _su_evento_anim(nome: String) -> void:
 
 
 func _su_anim_finita(stato: String) -> void:
+	if _morto:
+		# checkpoint di fase 5/7/8: "death" come stringa bare e' vietata fuori
+		# dalla riga "riproduci" (nome di Sequenza di Death). _morto la evita:
+		# nessun altro stato puo' finire mentre e' vero (_physics_process
+		# ferma input/attacco/cast/schivata finche' non torna false).
+		_respawn()
+		return
 	if stato == STATO_ATTACCO:
 		_attaccando = false
 		_hitbox.call("disattiva")
 	elif stato == "cast":
 		_castando = false
+
+
+## StatsComponent.died: hp a 0. Ferma il giocatore e riproduce "death"
+## (gia' nei dati di animations.json, mai suonata finora); il respawn
+## arriva a fine animazione via _su_anim_finita.
+func _su_morte() -> void:
+	_morto = true
+	_attaccando = false
+	_dashing = false
+	_parando = false
+	_castando = false
+	velocity = Vector2.ZERO
+	_hitbox.call("disattiva")
+	_hurtbox.call("set_invulnerabile", true)
+	_anim.call("riproduci", "death", _dir_sguardo)
+
+
+## Torna al punto di spawn della regione corrente (stesso contratto
+## pubblico con cui main.gd riconosce il nodo regione: has_method
+## "viaggia_a") e resuscita a hp pieni.
+func _respawn() -> void:
+	var regione: Node = _regione_corrente()
+	if regione != null and regione.has_method("punto_spawn"):
+		global_position = regione.call("punto_spawn")
+	_stats.call("revivi")
+	_hurtbox.call("set_invulnerabile", false)
+	_morto = false
+	_anim.call("riproduci", "idle", _dir_sguardo)
+
+
+func _regione_corrente() -> Node:
+	var padre: Node = get_parent()
+	if padre == null:
+		return null
+	for c in padre.get_children():
+		if c.has_method("viaggia_a"):
+			return c
+	return null
 
 
 ## Finestre guidate dai frame di animations.json. "iframe": invulnerabilita'

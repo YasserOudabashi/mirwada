@@ -10727,3 +10727,86 @@ File toccati: scripts/region_scene.gd, tests/test_layouts.gd,
 tests/manual/qa_giocabilita.gd.
 
 PROSSIMA STORIA: nessuna pianificata.
+
+---
+
+[2026-09-10] Fix post-fase-9 (playtest, screenshot utente): overlay
+tribolazione sopra la hotbar + morte del giocatore mai scattata
+
+CONTESTO. L'utente ha mandato uno screenshot: il pannello della
+tribolazione ("La citta' non basta piu'", trib_7_6) sfondava sopra la
+hotbar delle abilita' dell'HUD, testo illeggibile per la sovrapposizione.
+Nello stesso screenshot: "Salute 0 / 120" col personaggio ancora in piedi
+e giocabile. Confermato dall'utente: "era a zero ma non morivo".
+
+CAUSA 1 (overlay). scenes/tribulation_overlay.tscn: il Panel aveva
+un'altezza FISSA (84px) mentre la VBoxContainer dentro (nome, descrizione
+con autowrap, effetto, progresso) puo' richiedere molto piu' spazio con
+una descrizione lunga; ne' il Panel ne' la VBox tagliavano o si
+adattavano, il testo continuava a scendere sopra l'HUD sotto.
+
+CAUSA 2 (morte). scripts/stats_component.gd emette il segnale 'died'
+quando hp <= 0 (esisteva da sempre), ma SOLO enemy.gd lo ascolta
+(enemy.gd:74). player.gd non si e' mai collegato: a 0 hp il giocatore
+restava _dead nello stato interno ma pienamente giocabile a schermo,
+nessuna conseguenza.
+
+FIX.
+- scripts/tribulation_overlay.gd: nuova _adatta_altezza(), chiamata a
+  fine _ridisegna() - il Panel cresce con
+  VBoxContainer.get_combined_minimum_size().y (sincrono, nessun await:
+  i test leggono stato_mostrato() subito dopo un segnale), mai sotto gli
+  84px originali. scenes/tribulation_overlay.tscn: il Panel parte piu' in
+  basso (offset_top 8->116, sotto la colonna dell'HUD che finisce a 110)
+  cosi' non entra mai nella zona dell'HUD anche a contenuto corto.
+- scripts/stats_component.gd: nuovo metodo revivi(quantita=-1.0) - resetta
+  _dead e ripristina hp (hp_max se omesso). Necessario perche' il setter
+  di hp emette 'died' solo sulla transizione "not _dead"->0: senza
+  resettare _dead, una morte successiva non scatterebbe mai piu'.
+- scripts/player.gd: si collega a StatsComponent.died (_su_morte): ferma
+  input/movimento (nuovo flag _morto, _physics_process ritorna subito),
+  invulnerabile, riproduce l'animazione "death" (gia' in
+  data/animations.json/personaggio, MAI suonata finora - l'asset
+  c'era gia'). A fine animazione (_su_anim_finita, quando _morto e' vero)
+  _respawn(): torna al punto di spawn della regione corrente (nuovo
+  region_scene.gd::punto_spawn(), la stessa cella che _colloca_giocatore
+  gia' usava all'ingresso, trovata via lo stesso contratto pubblico
+  "has_method('viaggia_a')" che main.gd usa per riconoscere il nodo
+  regione) e richiama stats.revivi() per gli hp pieni.
+- TRAPPOLA EVITATA: i checkpoint di fase 5/7/8 vietano la stringa bare
+  "death" nel codice (e' un nome di Sequenza di Death) con un'eccezione
+  gia' scritta per enemy.gd (solo se la riga contiene "riproduci"). Un
+  primo tentativo con `elif stato == "death":` in _su_anim_finita
+  rompeva i 3 checkpoint. Soluzione: `if _morto: _respawn(); return` in
+  cima a _su_anim_finita - nessun altro stato puo' finire mentre _morto
+  e' vero (tutto il resto e' bloccato da _physics_process), quindi non
+  serve confrontare la stringa. L'unica riga di player.gd con "death" e'
+  dentro _su_morte(), sulla stessa riga di "riproduci": gia' coperta
+  dall'eccezione esistente.
+
+COME VERIFICATO.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- godot --headless ... run_tests.gd: 897 test (891 + 6), tutti passati.
+  Nuovi: test_tribulation_overlay.test_pannello_si_allarga_con_una_
+  descrizione_lunga; test_stats_component.test_revivi_resetta_dead_e_
+  ripristina_hp / test_revivi_con_quantita_esplicita; test_player_morte.gd
+  (nuovo file, 3 test: hp=0 marca morto e ferma il player, _respawn()
+  risuscita a hp pieni, una seconda morte nella stessa sessione scatta
+  ancora - quest'ultimo prova esattamente il bug latente che revivi()
+  evita).
+- Verifica a schermo (Xvfb, script ad-hoc non committato): riprodotto lo
+  scenario esatto dello screenshot (trib_7_6 attiva) - pannello ora sotto
+  la hotbar, testo leggibile, nessuna sovrapposizione (screenshot
+  confrontato prima/dopo). Morte: hp portati a 0 lontano dallo spawn,
+  schermata "Salute 0/150" col player fermo, dopo l'animazione "Salute
+  150/150" e il player di nuovo al punto di spawn (144,144); una seconda
+  morte nella stessa sessione scatta di nuovo.
+
+File toccati: scenes/tribulation_overlay.tscn, scripts/tribulation_overlay.gd,
+scripts/stats_component.gd, scripts/player.gd, scripts/region_scene.gd,
+tests/test_tribulation_overlay.gd, tests/test_stats_component.gd,
+tests/test_player_morte.gd (nuovo).
+
+PROSSIMA STORIA: nessuna pianificata. In sospeso dall'utente: il secondo
+PRD (Atto II/III, 006_PRD/prd-fase-11-atto-2-3.md) era in scrittura
+quando sono arrivati questi bug report - da riprendere.

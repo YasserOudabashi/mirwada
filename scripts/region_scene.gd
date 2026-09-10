@@ -551,10 +551,16 @@ func _colloca_giocatore() -> void:
 	var player := get_parent().get_node_or_null("Player") as Node2D
 	if player == null:
 		return
-	player.global_position = to_global(map_to_local(_spawn))
+	player.global_position = punto_spawn()
 	var cam := player.get_node_or_null("Camera2D")
 	if cam != null and cam.has_method("apply_zone_limits"):
 		cam.call("apply_zone_limits", Rect2(global_position, Vector2(W * TILE, H * TILE)))
+
+
+## Punto di spawn della regione in coordinate globali. Contratto pubblico
+## usato da player.gd per il respawn alla morte (stessa cella di ingresso).
+func punto_spawn() -> Vector2:
+	return to_global(map_to_local(_spawn))
 
 
 func _registra_regione() -> void:

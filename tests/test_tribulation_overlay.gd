@@ -50,6 +50,20 @@ func test_appare_coi_dati_della_prova() -> void:
 	_via(o)
 
 
+## Bug report utente 2026-09-10 (screenshot): il pannello aveva un'altezza
+## fissa e una descrizione lunga (trib_7_6, "La citta' non basta piu'")
+## sfondava sopra la hotbar dell'HUD sotto. Il pannello ora cresce con la
+## VBoxContainer che contiene i 4 Label.
+func test_pannello_si_allarga_con_una_descrizione_lunga() -> void:
+	var o: Node = _overlay()
+	_ts().call("attiva", 7)  # trib_7_6: la descrizione piu' lunga delle 4 prove
+	var pannello: Control = o.get_node("Pannello")
+	var v: Control = o.get_node("Pannello/V")
+	assert_true(pannello.size.y >= v.get_combined_minimum_size().y,
+		"il pannello e' alto almeno quanto il contenuto (nessun testo che sfonda il bordo)")
+	_via(o)
+
+
 func test_progresso_reattivo_e_sparizione_al_superamento() -> void:
 	var o: Node = _overlay()
 	_ts().call("attiva", 5)   # trib_5_4: npc_influenced x3
