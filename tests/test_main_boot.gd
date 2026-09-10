@@ -93,12 +93,17 @@ func test_su_partita_iniziata_ricostruisce_la_regione() -> void:
 	cont.add_child(vecchia)
 	assert_false(vecchia.is_queued_for_deletion(), "la vecchia regione e' viva prima del cambio")
 
+	var idx_vecchia: int = vecchia.get_index()
 	cont.call("_su_partita_iniziata", "Tester")
 
 	assert_true(vecchia.is_queued_for_deletion(), "la vecchia regione viene liberata")
-	var nuova: Node = cont.get_child(cont.get_child_count() - 1)
-	assert_ne(nuova, vecchia, "una nuova istanza prende il posto della vecchia")
-	assert_true(nuova.has_method("viaggia_a"), "la nuova istanza e' una region_scene")
+	var nuova: Node = null
+	for c in cont.get_children():
+		if c != vecchia and c.has_method("viaggia_a"):
+			nuova = c
+	assert_false(nuova == null, "una nuova istanza prende il posto della vecchia")
+	assert_eq(nuova.get_index(), idx_vecchia,
+		"la nuova regione prende l'indice della vecchia: resta sotto Player/HUD nel disegno")
 	assert_eq(str(nuova.get("region_id")), "mirwada",
 		"stessa scena ricaricata: nessun id di regione hardcoded in main.gd")
 

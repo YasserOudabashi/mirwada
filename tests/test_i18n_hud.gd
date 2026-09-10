@@ -92,3 +92,30 @@ func test_hotbar_non_ha_testo_hardcoded() -> void:
 
 	hud.free()
 	host.free()
+
+
+## US-802: lo slot lampeggia quando parte la sua abilita' - feedback a colpo
+## d'occhio che "hai usato un'abilita'", oltre al numero di spiritualita'.
+func test_hotbar_lampeggia_quando_parte_l_abilita() -> void:
+	var host := Node.new()
+	host.add_to_group("player")
+	var stats: Node = StatsComponent.new()
+	stats.name = "StatsComponent"
+	stats.configure_from_balance(9)
+	host.add_child(stats)
+	var root: Node = Engine.get_main_loop().root
+	root.add_child(host)
+	root.get_node("Progression").call("configura", "twilight_giant", 9)
+	root.get_node("AbilityEngine").call("clear_cooldowns")
+	var owned: Array = root.get_node("AbilityEngine").call("owned_abilities", host)
+
+	var hud: CanvasLayer = HudScene.instantiate()
+	root.add_child(hud)
+	var slot0: Label = hud.get_node("Root/VBox/Hotbar/Slot0")
+	slot0.modulate = Color.WHITE
+
+	root.get_node("AbilityEngine").call("execute", str(owned[0]), host)
+	assert_ne(slot0.modulate, Color.WHITE, "lo slot che ha lanciato l'abilita' lampeggia")
+
+	hud.free()
+	host.free()

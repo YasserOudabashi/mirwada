@@ -10641,4 +10641,58 @@ tests/manual/qa_onboarding.gd.
 
 === I 3 fix del playtest sono chiusi (onboarding, i18n, colophon). ===
 
+---
+
+[2026-09-10] Fix post-fase-9 (playtest): il giocatore non si vedeva +
+nessun feedback sulle abilita'
+
+CONTESTO. L'utente, giocando davvero: "il mio personaggio non si vede
+mentre gioco" e "non capisco se sto usando abilita' o no".
+
+CAUSA 1 (BUG, dal US-801). scripts/main.gd::_su_partita_iniziata
+ricaricava la regione con `add_child(nuova)` -> ULTIMO figlio di Main ->
+il suo TileMapLayer (+ tinta) si disegnava SOPRA il Player (che in
+main.tscn e' il figlio subito dopo la regione). Il giocatore era li',
+funzionante, camera che lo seguiva - solo coperto. Non si notava prima
+perche' nessuno aveva mai davvero giocato passando dalla creazione
+personaggio (che e' cio' che scatena il ricaricamento).
+- FIX: `move_child(nuova, regione.get_index())` - la nuova regione
+  prende l'indice della vecchia (0), torna sotto Player/HUD/overlay.
+
+CAUSA 2 (feedback troppo debole). Usare un'abilita' dava: numero di
+spiritualita' che cala, posa di lancio, e un VFX placeholder di 6x6 px
+bianchi che sfumava in 0.25s (invisibile). Nient'altro.
+- scripts/hud.gd: lo slot hotbar che ha lanciato l'abilita' LAMPEGGIA
+  (modulate giallo -> bianco in 0.45s, tween). Segnale a colpo d'occhio
+  di "ho usato l'abilita' N". Nuovo handler _su_abilita_eseguita
+  (sostituisce la lambda che chiamava solo _aggiorna_hotbar).
+- scripts/vfx.gd: il placeholder per-primitiva ora e' 16x16, parte a
+  scala 0.7 e si allarga a 2.4 sfumando in >=0.3s, spostato di 14px nella
+  direzione guardata (caster.get_facing) e ruotato. Grafica ancora
+  provvisoria ma LEGGIBILE. _tex_placeholder 6->16.
+
+COME VERIFICATO.
+- python tools/validate_data.py: 0 errori, 2 warning.
+- godot --headless ... run_tests.gd: 890 test (889 + 1), tutti passati.
+  test_main_boot.test_su_partita_iniziata_ricostruisce_la_regione
+  aggiornato (trova la nuova regione per contratto, non per posizione;
+  verifica che prenda l'indice della vecchia).
+- Test nuovo: test_i18n_hud.test_hotbar_lampeggia_quando_parte_l_abilita.
+- Verifica a schermo (tests/manual/qa_giocabilita.gd, non nella suite):
+  creato "Tester" -> lo sprite del giocatore E' dipinto al centro (19
+  colori distinti nel campione centrale, prima sarebbe stato solo il
+  pavimento); regione a indice 0 < Player a 1; lanciata l'abilita' ->
+  slot hotbar giallo + "2.9s" di cooldown, spiritualita' 50->44, un nodo
+  VFX (bloom chiaro) attorno al giocatore, posa "cast". Screenshot
+  01/02 mandati in chat.
+
+APERTO. La camera resta clampata al bordo mappa allo spawn (il giocatore
+compare in alto a sinistra nel corridoio di spawn, non centrato) finche'
+non ci si muove - e' il comportamento dei limiti di zona, non un bug.
+Grafica VFX ancora placeholder.
+
+File toccati: scripts/main.gd, scripts/hud.gd, scripts/vfx.gd,
+tests/test_main_boot.gd, tests/test_i18n_hud.gd,
+tests/manual/qa_giocabilita.gd (nuovo).
+
 PROSSIMA STORIA: nessuna pianificata.

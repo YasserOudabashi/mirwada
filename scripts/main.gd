@@ -37,6 +37,10 @@ func _su_partita_iniziata(_nome: String) -> void:
 		return
 	var nuova: Node = load(percorso).instantiate()
 	add_child(nuova)
+	# la regione deve stare SOTTO Player/HUD/overlay nell'ordine di disegno,
+	# come in main.tscn (indice 0): add_child la mette per ultima, quindi
+	# coprirebbe il giocatore col proprio tilemap.
+	move_child(nuova, regione.get_index())
 	regione.queue_free()
 
 

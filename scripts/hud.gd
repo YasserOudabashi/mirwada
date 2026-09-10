@@ -35,7 +35,7 @@ func _ready() -> void:
 
 	var ae: Node = get_node_or_null("/root/AbilityEngine")
 	if ae != null:
-		ae.ability_executed.connect(func(_id: String, _c: Node, _r: Dictionary) -> void: _aggiorna_hotbar())
+		ae.ability_executed.connect(_su_abilita_eseguita)
 	var prog: Node = get_node_or_null("/root/Progression")
 	if prog != null and prog.has_signal("sequence_changed"):
 		prog.sequence_changed.connect(func(_n: int, _v: int) -> void: _aggiorna_hotbar())
@@ -97,6 +97,23 @@ func _process(delta: float) -> void:
 	if _cd_accum >= 0.1:
 		_cd_accum = 0.0
 		_aggiorna_hotbar()
+
+
+## US-802: quando parte un'abilita' del giocatore, lo slot che l'ha lanciata
+## lampeggia - cosi' si vede A COLPO D'OCCHIO che si e' usata un'abilita' (e
+## quale), non solo dal numero di spiritualita' che cala.
+func _su_abilita_eseguita(ability_id: String, caster: Node, result: Dictionary) -> void:
+	_aggiorna_hotbar()
+	if caster == null or not caster.is_in_group("player") or not bool(result.get("ok", false)):
+		return
+	var ae: Node = get_node_or_null("/root/AbilityEngine")
+	var owned: Array = ae.call("owned_abilities", caster) if ae != null else []
+	var idx: int = owned.find(ability_id)
+	if idx < 0 or idx >= _hotbar.size():
+		return
+	var lbl: Label = _hotbar[idx]
+	lbl.modulate = Color(1.7, 1.7, 0.5)
+	create_tween().tween_property(lbl, "modulate", Color.WHITE, 0.45)
 
 
 ## US-802: una riga per slot 1-4, dalle abilita' possedute
