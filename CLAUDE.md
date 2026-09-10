@@ -281,7 +281,23 @@ progressione intero, non solo contenuto) sono motori/contenuto completi
 con **zero righe di codice dedicate**. È il modello da imitare per ogni
 story di dati.
 
-Fase 10 (opzionale, non pianificata): altri Pathway Non-Standard (Chaos
+Fase 10 — Mondo Continuo (mappa vera, niente più salti tra quadrati):
+**PIANIFICATA**. PRD in `006_PRD/prd-fase-10-mondo-continuo.md`. Le 5
+regioni diventano un'unica mappa continua (zero caricamenti di scena tra
+loro, il gating diventa una barriera fisica invece che un rifiuto di
+caricamento), più villaggi e strutture grandi con interni visitabili
+(scena separata, come oggi). Nessuna primitiva/evento nuovo.
+
+Fase 11 — Atto II e Atto III (le regioni che si aprono, la soglia):
+**PIANIFICATA**, eseguita dopo la fase 10. PRD in
+`006_PRD/prd-fase-11-atto-2-3.md`. I motori di Atto II/III esistono già
+dalla fase 7 (tribolazioni, rituale di Sequenza 1 con Ancora, duello di
+Aldo ai salti di tier) ma sono quasi senza contenuto narrativo intorno:
+questa fase scrive le quest/scene mancanti (fazioni che prendono
+posizione, "Doran sa, Lena capisce, Vesna sceglie") riusando solo motori
+esistenti (`QuestSystem`, `DialogueEngine`, `FactionSystem`).
+
+Fase 12 (opzionale, non pianificata): altri Pathway Non-Standard (Chaos
 Primogenitor, Scrooge, Dreamless, altri bestower), stesso schema di
 Eternal Aeon — il PRD si genera con `/prd` solo quando si decide di
 farla davvero. Roadmap in `006_PRD/roadmap.md`.

@@ -443,7 +443,47 @@ Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 
 ---
 
-## Fase 10 — Opzionale
+## Fase 10 — Mondo Continuo
+
+> **PRD**: `006_PRD/prd-fase-10-mondo-continuo.md` (generato il
+> 2026-09-10, 14 story `US-1001..US-1014`). **PIANIFICATA**, non ancora
+> eseguita.
+
+Oggi il mondo sono 5 scene separate (`region_scene.gd`), collegate da
+`passaggi` che ricaricano l'intera scena: un salto, non un cammino. La
+fase 10 fa due cose: (1) le 5 regioni diventano zone di un'unica mappa
+continua condivisa (`world_offset` per regione, zero caricamenti di scena
+tra loro, il gating di `AreaGate` diventa una barriera fisica sul confine
+invece che un rifiuto di caricamento); (2) contenuto vero — almeno un
+villaggio e una struttura grande (palazzo/torre/cripta a più stanze) con
+interni visitabili (scena separata e piccola, stessa tecnica di oggi
+applicata agli edifici invece che alle regioni). Nessuna primitiva/evento
+nuovo; nessun bump di `schema_version` se possibile.
+
+---
+
+## Fase 11 — Atto II e Atto III
+
+> **PRD**: `006_PRD/prd-fase-11-atto-2-3.md` (generato il 2026-09-10, 13
+> story `US-1101..US-1113`). **PIANIFICATA**, eseguita dopo la fase 10.
+
+I motori di Atto II (Seq 6-4) e Atto III (Seq 3-1) esistono già dalla fase
+7: `TribulationSystem` (le 4 prove ai salti di fascia), il rituale di
+Sequenza 1 che chiede un'Ancora (`sacrifices: ["ancora_del_giocatore"]`,
+già nei dati del Twilight Giant), il duello di Aldo ai salti di tier
+(`npc_system.gd`, già cablato per ogni NPC `sfida_ai_tier`). Quello che
+manca è il contenuto narrativo intorno: solo 4 quest esistono in tutto il
+gioco (tutte di Atto I), 3 delle 4 tribolazioni hanno solo un contatore
+anonimo o un'unica riga di dialogo, e la prova finale (`trib_1_0`) non ha
+nessuna fonte che scriva il suo flag di superamento — verificato leggendo
+i dati prima di scrivere il PRD, non presunto. La fase 11 scrive quel
+contenuto riusando solo motori esistenti (`QuestSystem`, `DialogueEngine`,
+`FactionSystem`): nessun verbo/evento/condizione/effetto nuovo. Gli
+epiloghi di finale (fase 7) sono già scritti e buoni, fuori scope.
+
+---
+
+## Fase 12 — Opzionale
 
 Altri Pathway Non-Standard (Chaos Primogenitor, Scrooge, Dreamless e gli
 altri bestowers), stesso schema di Eternal Aeon (fase 9: motore Boon già
