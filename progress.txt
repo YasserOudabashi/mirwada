@@ -9628,3 +9628,74 @@ fuori da un US di prd.json)
   (Fool, Hermit, Death, Moon, Paragon, Darkness), stessa ricetta, quando
   richiesto. marche_crepuscolo (unica regione ancora senza un Pathway
   proprio in questo batch) e' tematicamente vicina a Death.
+
+---
+
+[2026-09-10] Livello B batch 2 — tutti i 10 Pathway, i boss e 2 NPC in piu'
+
+- Cosa fatto: 006_PRD/prd-vslice-livello-b-batch-2.md chiude la copertura
+  "gioco reale": i 6 Pathway restanti (Fool, Hermit, Death, Moon, Darkness,
+  Paragon), i 2 boss gia' piazzati ma mai combattuti con input vero (Mother
+  a Valle della Madre, Twilight Giant a Marche del Crepuscolo), e 2 forme
+  di dialogo NPC in piu' (Bruno, secondo venditore; l'Antagonista, l'unico
+  grafo di fase 7). Scoperta chiave: Fool e Hermit avevano GIA' tutto
+  (ingredienti di Sequenza 9 + un boss proprio) nelle stesse regioni gia'
+  usate per Door/Error nel batch 1 - zero dati nuovi per loro. Aggiunti 3
+  ingredienti a testa per Death (Marche del Crepuscolo), Moon (Valle della
+  Madre), Darkness e Paragon (Mirwada, nessun attraversamento: restano
+  all'hub). Il motore di test ora preferisce sempre un boss (Caratteristica
+  + drop garantito) a un nemico generico quando presente in scena: Death
+  finisce per uccidere il boss Twilight Giant di quella regione, Moon
+  quello di Mother, chiudendo il gap senza script dedicati.
+  6 nuovi script `tests/manual/qa_vslice_<pathway>.gd`.
+- Bug scoperti scrivendo/lanciando i 6 script (nessuno del gioco, tutti nel
+  test):
+  1. **Troncamento del mio stesso script di generazione**: la prima
+     riscrittura di `_passo_6_combattimento` per la preferenza-al-boss
+     aveva perso l'intero corpo del ciclo di attacco (sostituzione python
+     che copriva un blocco piu' grande di quanto scritto in rimpiazzo) —
+     causava un loop infinito silenzioso (colpi mai incrementato). Scoperto
+     con print di debug mirati, non a colpo d'occhio.
+  2. **Un boss vero e' troppo lento da uccidere in tempo reale**: HP dalla
+     curva di Sequenza (520 a Seq 5, scalato 1.5x) contro un danno fisso
+     dell'arco di mischia (~12) richiede troppi minuti per uno script di
+     QA. Scorciatoia dichiarata: l'hp di RUNTIME del boss (mai i dati) si
+     abbassa a 40 prima del combattimento, solo per dimostrare che l'attacco
+     vero colpisce e enemy_defeated sale.
+  3. **Alcune abilita' di apertura hanno condizioni che un personaggio
+     appena creato non soddisfa**: Fool Seq 9 richiede acting_progress_min
+     0.1 ("non combatte, osserva"), Darkness Seq 9 richiede e_notte.
+     Risolto con dati veri (si recita per davvero, o si forza il momento
+     via TimeSystem.forza_momento), non con un bypass.
+  4. **Il teletrasporto di avvicinamento assumeva sempre un lato libero ad
+     est**: l'ingrediente fiore_di_luna di Moon a Valle della Madre ha uno
+     specchio d'acqua/muro proprio a est, il teletrasporto ci finiva dentro
+     e il nudge (solo verticale) non bastava ad uscirne. Corretto:
+     `_offset_libero` legge la mappa vera e sceglie il primo lato
+     calpestabile fra est/ovest/sud/nord.
+- Come verificato:
+  - I 6 script lanciati per davvero con Xvfb: "TUTTI I PASSI OK" per tutti
+    e 6 (Fool e Hermit ri-verificati due volte per essere certi dopo le
+    correzioni successive), screenshot mandati in chat.
+  - `godot --headless --path . --script res://tests/run_tests.gd`: 852
+    test, tutti passati (3 asserzioni di test_layouts.gd con conteggi
+    scritti a mano aggiornate: mirwada 10->16, marche 8->11, valle 7->10).
+  - `python tools/validate_data.py`: esce 0, stessi 3 warning di prima.
+- Nota ambiente: un processo Godot precedente (tools/build_tileset.gd,
+  gia' segnalato nel batch 1) NON era piu' in esecuzione stavolta; il
+  rallentamento incontrato qui era genuino (boss troppo lenti da uccidere),
+  risolto con la scorciatoia sull'hp di runtime, non con un altro kill.
+- Verdetto: **tutti e 10 i Pathway hanno ora un test "gioco reale" completo
+  9->8** (Twilight Giant dal batch 8 originale, Mother/Door/Error dal
+  batch 1, Fool/Hermit/Death/Moon/Darkness/Paragon da questo batch). 5 dei
+  5 boss veri piazzati nei dati sono stati uccisi con input reale almeno
+  una volta. NPC coperti: Sidon (batch 1), Bruno e Vesna (venditori),
+  Mirco (dialogo non-venditore con effetti), l'Antagonista (unico grafo
+  gated su tier_min: angel). Non coperti singolarmente: Aldo/Ottavia/Lena/
+  Doran/i 10 generici — condividono lo stesso motore di dialogo gia'
+  provato, testarli uno per uno sarebbe stata ripetizione, non copertura
+  nuova (motivato in dettaglio nel PRD §4).
+- Prossima storia: nessuna pianificata. Se servisse ancora Livello B,
+  resta solo l'idea di dare un Pathway "vero" (con un proprio boss/
+  ingredienti dedicati, non solo un boss altrui incontrato per caso) a
+  Death e Moon nella stessa regione dei loro boss trovati per bonus.

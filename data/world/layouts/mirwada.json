@@ -81,7 +81,13 @@
     {"x": 33, "y": 29, "item_id": "acciaio_stellare", "quantita": 1},
     {"x": 22, "y": 30, "item_id": "polvere_di_arena", "quantita": 1},
     {"x": 40, "y": 10, "item_id": "tendine_di_lupo", "quantita": 1},
-    {"x": 5, "y": 30, "item_id": "moneta_comune", "quantita": 1}
+    {"x": 5, "y": 30, "item_id": "moneta_comune", "quantita": 1},
+    {"x": 12, "y": 2, "item_id": "velo_di_mezzanotte", "quantita": 1},
+    {"x": 34, "y": 5, "item_id": "occhio_che_non_dorme", "quantita": 1},
+    {"x": 22, "y": 10, "item_id": "cenere_di_stella_morta", "quantita": 1},
+    {"x": 11, "y": 13, "item_id": "lente_graduata", "quantita": 1},
+    {"x": 32, "y": 20, "item_id": "polvere_reagente", "quantita": 1},
+    {"x": 17, "y": 24, "item_id": "taccuino_di_appunti", "quantita": 1}
   ],
   "drop": {
     "8": [

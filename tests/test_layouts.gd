@@ -179,7 +179,9 @@ func test_mirwada_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var scena: Node = r["scena"]
 
 	var pickup_list: Array = _pickup_di(scena)
-	assert_eq(pickup_list.size(), 10, "10 oggetti a terra dal layout")
+	# 10 originali + 3 ingredienti di formula_darkness_9 + 3 di
+	# formula_paragon_9 (006_PRD/prd-vslice-livello-b-batch-2.md).
+	assert_eq(pickup_list.size(), 16, "16 oggetti a terra dal layout")
 
 	var inv: Node = _root().get_node("Inventory")
 	var uno = pickup_list[0]
@@ -298,7 +300,9 @@ func test_marche_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var scena: Node = r["scena"]
 
 	var pickup_list: Array = _pickup_di(scena)
-	assert_eq(pickup_list.size(), 8, "8 oggetti a terra dal layout")
+	# 8 originali + 3 ingredienti di formula_death_9
+	# (006_PRD/prd-vslice-livello-b-batch-2.md).
+	assert_eq(pickup_list.size(), 11, "11 oggetti a terra dal layout")
 
 	var inv: Node = _root().get_node("Inventory")
 	var uno = pickup_list[0]
@@ -411,7 +415,9 @@ func test_valle_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var scena: Node = r["scena"]
 
 	var pickup_list: Array = _pickup_di(scena)
-	assert_eq(pickup_list.size(), 7, "7 oggetti a terra dal layout")
+	# 7 originali + 3 ingredienti di formula_moon_9
+	# (006_PRD/prd-vslice-livello-b-batch-2.md).
+	assert_eq(pickup_list.size(), 10, "10 oggetti a terra dal layout")
 
 	var inv: Node = _root().get_node("Inventory")
 	var uno = pickup_list[0]

@@ -81,7 +81,10 @@
     {"x": 41, "y": 11, "item_id": "osso_di_pugile", "quantita": 1},
     {"x": 7, "y": 28, "item_id": "sale_di_roccia", "quantita": 1},
     {"x": 11, "y": 28, "item_id": "acciaio_stellare", "quantita": 1},
-    {"x": 43, "y": 28, "item_id": "polvere_di_arena", "quantita": 1}
+    {"x": 43, "y": 28, "item_id": "polvere_di_arena", "quantita": 1},
+    {"x": 8, "y": 11, "item_id": "terra_di_cimitero", "quantita": 1},
+    {"x": 36, "y": 11, "item_id": "dente_di_teschio", "quantita": 1},
+    {"x": 25, "y": 14, "item_id": "muffa_sepolcrale", "quantita": 1}
   ],
   "drop": {
     "0": [

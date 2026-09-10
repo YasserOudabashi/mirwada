@@ -76,7 +76,10 @@
     {"x": 33, "y": 4, "item_id": "corteccia_febbrifuga", "quantita": 1},
     {"x": 34, "y": 20, "item_id": "fiore_di_camomilla_selvatica", "quantita": 1},
     {"x": 6, "y": 12, "item_id": "radice_amara", "quantita": 1},
-    {"x": 23, "y": 8, "item_id": "acqua_di_fonte_benedetta", "quantita": 1}
+    {"x": 23, "y": 8, "item_id": "acqua_di_fonte_benedetta", "quantita": 1},
+    {"x": 10, "y": 3, "item_id": "radice_di_valeriana", "quantita": 1},
+    {"x": 20, "y": 8, "item_id": "rugiada_notturna", "quantita": 1},
+    {"x": 38, "y": 12, "item_id": "fiore_di_luna", "quantita": 1}
   ],
   "drop": {
     "0": [
