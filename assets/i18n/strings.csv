@@ -135,6 +135,18 @@ BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_CARATTERISTICA_MANCANTE,manca la Caratteristica
 BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_INGREDIENTI_INSUFFICIENTI,ingredienti insufficienti,not enough ingredients
 BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_FORMULA_INESISTENTE,formula inesistente,formula doesn't exist
 BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_NESSUNA_POZIONE,nessuna pozione pronta,no potion ready
+BOOK_DIAGRAMMA_DONO_TITOLO,Il Dono,The Gift
+BOOK_DIAGRAMMA_DONO_NIENTE,Nessun Dono per questa Sequenza,No Gift for this Sequence
+BOOK_DIAGRAMMA_DONO_SODDISFATTO,soddisfatto,fulfilled
+BOOK_DIAGRAMMA_DONO_MANCANTE,mancante,missing
+BOOK_DIAGRAMMA_DONO_QUEST,Quest:,Quest:
+BOOK_DIAGRAMMA_DONO_COMPORTAMENTO,Comportamento:,Behavior:
+BOOK_DIAGRAMMA_DONO_SACRIFICIO,Sacrificio:,Sacrifice:
+BOOK_DIAGRAMMA_DONO_SACRIFICIO_FOLLIA,Follia,Madness
+BOOK_DIAGRAMMA_DONO_RICEVI,Ricevi il Dono,Receive the Gift
+BOOK_DIAGRAMMA_DONO_ESITO_OK,ricevuto,received
+BOOK_DIAGRAMMA_DONO_ESITO_NESSUN_BOON,nessun Dono qui,no Gift here
+BOOK_DIAGRAMMA_DONO_ESITO_REQUISITI_MANCANTI,requisiti non ancora soddisfatti,requirements not yet met
 TRIB_OVERLAY_EFFETTO,Mentre dura:,While it lasts:
 TRIB_OVERLAY_PROGRESSO,Progresso,Progress
 TRIB_EFFETTO_FOLLIA_ACCELERATA,la follia sale piu' in fretta,madness rises faster

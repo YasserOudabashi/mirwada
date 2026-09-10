@@ -41,6 +41,10 @@ var _pozione_stato: Dictionary = {}
 ## US-810: stato della sezione avanzamento per gli accessor di test (mirror
 ## di _vicini), ricalcolato ad ogni aggiorna().
 var _avanzamento: Dictionary = {}
+## US-906: esito dell'ultima ricevi_dono() (dal Dictionary di ritorno di
+## BoonSystem.ricevi_boon()), stesso ruolo di _pozione_stato ma per i
+## Pathway non_standard. NON azzerato in aggiorna(): e' l'ultimo risultato.
+var _dono_stato: Dictionary = {}
 
 
 func aggiorna() -> void:
@@ -178,6 +182,11 @@ func vicini_fondibili() -> Array:
 ## forzato con malus di follia se solo avanzamento_forzabile(), altrimenti
 ## disabilitato). Stesso stile a righe di _sezione_fusione.
 func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, sd: Dictionary) -> void:
+	var boon: Dictionary = sd.get("boon", {})
+	if not boon.is_empty():
+		_sezione_dono(gd)
+		return
+
 	add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_TITOLO")))
 	var potion: Dictionary = sd.get("potion", {})
 	if potion.is_empty():
@@ -251,6 +260,100 @@ func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, s
 		"recitazione": recitazione,
 		"prepara_attivo": not b_prepara.disabled,
 	}
+
+
+# --- sezione "il Dono": Ricevi il Dono per i Pathway non_standard (US-906) --
+## Mostra i requisiti del Boon della Sequenza corrente
+## (BoonSystem.requisiti_stato()) con lo stato di ognuno, e un bottone
+## "Ricevi il Dono" (BoonSystem.ricevi_boon()) disabilitato finche' non sono
+## tutti soddisfatti. Stessa pagina di _sezione_avanzamento (Prepara/Bevi):
+## un ramo sul DATO (boon vs potion sulla Sequenza corrente), mai un tipo di
+## pagina nuovo (FR-5).
+func _sezione_dono(gd: Node) -> void:
+	add_child(_riga(tr("BOOK_DIAGRAMMA_DONO_TITOLO")))
+	var bs: Node = _n("/root/BoonSystem")
+	if bs == null:
+		add_child(_riga(tr("BOOK_DIAGRAMMA_DONO_NIENTE")))
+		return
+
+	var requisiti: Array = bs.call("requisiti_stato")
+	for req in requisiti:
+		add_child(_riga(_riga_requisito(gd, req)))
+
+	var puo_ricevere: bool = bool(bs.call("puo_ricevere"))
+	var b := Button.new()
+	b.text = tr("BOOK_DIAGRAMMA_DONO_RICEVI")
+	b.disabled = not puo_ricevere
+	b.pressed.connect(ricevi_dono)
+	add_child(b)
+
+	if not _dono_stato.is_empty():
+		add_child(_riga(_esito_dono_testo(_dono_stato)))
+
+	_avanzamento = {
+		"boon": true,
+		"requisiti": requisiti,
+		"puo_ricevere": puo_ricevere,
+	}
+
+
+## Testo di un requisito del Boon: tipo + descrizione + stato soddisfatto/no.
+func _riga_requisito(gd: Node, req: Dictionary) -> String:
+	var stato: String = tr("BOOK_DIAGRAMMA_DONO_SODDISFATTO") if bool(req.get("soddisfatto", false)) \
+		else tr("BOOK_DIAGRAMMA_DONO_MANCANTE")
+	match str(req.get("tipo", "")):
+		"quest":
+			var q: Dictionary = gd.call("get_quest", str(req.get("quest_id", "")))
+			var nome: String = str(gd.call("tr_data", q.get("name_i18n", req.get("quest_id", ""))))
+			return "%s %s — %s" % [tr("BOOK_DIAGRAMMA_DONO_QUEST"), nome, stato]
+		"comportamento":
+			var eventi: Dictionary = gd.call("get_tracked_events")
+			var spec: Dictionary = eventi.get(str(req.get("evento", "")), {})
+			var desc: String = str(spec.get("descrizione", req.get("evento", "")))
+			return "%s %s (%d/%d) — %s" % [tr("BOOK_DIAGRAMMA_DONO_COMPORTAMENTO"), desc,
+				int(float(req.get("progresso", 0.0))), int(float(req.get("target", 0.0))), stato]
+		"sacrificio":
+			return "%s %s — %s" % [tr("BOOK_DIAGRAMMA_DONO_SACRIFICIO"),
+				_testo_costo(gd, req.get("costo", {})), stato]
+	return stato
+
+
+func _testo_costo(gd: Node, costo: Dictionary) -> String:
+	var tipo: String = str(costo.get("tipo", ""))
+	var q: int = int(costo.get("quantita", 0))
+	match tipo:
+		"oggetto":
+			var item: Dictionary = gd.call("get_item", str(costo.get("id", "")))
+			return "%s x%d" % [str(gd.call("tr_data", item.get("name_i18n", costo.get("id", "")))), q]
+		"caratteristica":
+			var car: Dictionary = gd.call("get_characteristic", str(costo.get("id", "")))
+			return str(gd.call("tr_data", car.get("name_i18n", costo.get("id", ""))))
+		"follia":
+			return "%s x%d" % [tr("BOOK_DIAGRAMMA_DONO_SACRIFICIO_FOLLIA"), q]
+	return tipo
+
+
+func _esito_dono_testo(stato: Dictionary) -> String:
+	if bool(stato.get("ok", false)):
+		return tr("BOOK_DIAGRAMMA_DONO_ESITO_OK")
+	var chiavi := {
+		"nessun_boon": "BOOK_DIAGRAMMA_DONO_ESITO_NESSUN_BOON",
+		"requisiti_mancanti": "BOOK_DIAGRAMMA_DONO_ESITO_REQUISITI_MANCANTI",
+	}
+	var chiave: String = str(chiavi.get(str(stato.get("reason", "")), ""))
+	return tr(chiave) if not chiave.is_empty() else str(stato.get("reason", ""))
+
+
+## Riceve il Dono della Sequenza corrente. Pubblica, interrogabile dai test.
+func ricevi_dono() -> Dictionary:
+	var bs: Node = _n("/root/BoonSystem")
+	if bs == null:
+		_dono_stato = {"ok": false, "reason": "no_boon_system"}
+		return _dono_stato
+	var res: Dictionary = bs.call("ricevi_boon")
+	_dono_stato = res
+	aggiorna()
+	return res
 
 
 ## '_nota'/'_comment' (prefisso '_') sono documentazione interna dei dati,
