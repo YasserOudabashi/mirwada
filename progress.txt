@@ -9816,3 +9816,160 @@ COSA RESTA APERTO (per le story successive, dichiarato nel PRD).
 
 PROSSIMA STORIA: US-902 — BoonSystem (autoload): requisiti_stato(),
 puo_ricevere(), ricevi_boon().
+
+---
+
+[2026-09-10] Fase 9 — US-902: BoonSystem (autoload)
+
+COSA FATTO.
+- scripts/boon_system.gd (nuovo autoload "BoonSystem", registrato in
+  project.godot subito dopo PotionSystem): legge SOLO
+  Progression.sequence_data().boon (data/schema/boon.schema.json, US-901),
+  non sa nulla di "Eternal Aeon" o di qualunque altro Pathway.
+  - requisiti_stato() -> Array: un dict per requisito dichiarato
+    ({tipo, soddisfatto, + campi propri del tipo: quest_id / evento+
+    filtri+target+progresso / costo}).
+  - puo_ricevere() -> bool: falso se la Sequenza non ha 'boon', falso se
+    anche un solo requisito non e' soddisfatto.
+  - ricevi_boon() -> Dictionary {ok, avanzato, reason}: se puo_ricevere()
+    e' vero paga TUTTI i sacrifici dichiarati poi chiama Progression.avanza()
+    (mai un avanzamento parziale/forzato: un Boon o si riceve intero o
+    resta li'). Se falso non tocca inventario/caratteristiche/follia e non
+    avanza - stesso contratto di forma di PotionSystem.bevi().
+  - comportamento: baseline PROPRIA di BoonSystem (_baseline, chiave
+    "<sequence_id>:<indice_requisito>"), stesso principio di
+    Acting._baseline/_riparti ma un registro separato e non condiviso:
+    mescolarli avrebbe fatto interferire il conteggio della recitazione
+    dei Pathway standard con quello dei requisiti Boon.
+  - sacrificio: "oggetto" (Inventory.conta/rimuovi), "caratteristica"
+    (CharacteristicStore.possiede/consuma), "follia" (sempre "disponibile"
+    - e' un costo che si paga, non una soglia da raggiungere prima;
+    Madness.add() lo applica solo alla riuscita).
+  - quest: QuestSystem.stato(id) == "completata", nessun verbo nuovo.
+  - Salvataggio: solo la baseline (per_salvataggio/da_salvataggio, stesso
+    ruolo minimale di Acting). Nuovo campo top-level "boon" nel save,
+    schema_version 22 -> 23 (save_system.gd: VERSIONE_CORRENTE, migrazione
+    _migra_22_a_23 che lo inizializza vuoto, e — questo e' il punto dove
+    ho trovato un bug reale, vedi sotto — _leggi_snapshot()). game_state.gd:
+    snapshot()/applica() chiamano BoonSystem come chiamano Acting.
+  - tests/test_boon_system.gd (nuovo, 16 test): un Pathway di prova
+    ("fixture_boon_test", MAI su disco - vedi sotto) copre ogni tipo di
+    requisito singolo (quest, comportamento, sacrificio-oggetto,
+    sacrificio-caratteristica, sacrificio-follia) piu' un Boon misto con
+    tutti e tre insieme, il caso "nessun boon dichiarato" (mai pronto),
+    la baseline alla Sequenza corrente, il consumo SOLO alla riuscita
+    (mai parziale), e la persistenza nel save.
+
+BUG TROVATO E CORRETTO IN QUESTA STORIA (non c'entra col motore Boon in
+se', l'ho scoperto scrivendo il test di persistenza).
+- save_system.gd::_leggi_snapshot() e' la funzione "rilettura NON FIDATA"
+  che il load usa per ricostruire il dict "dati" passato a
+  GameState.applica(): avevo aggiunto "boon" al dict scritto da salva() e
+  alla migrazione, ma NON a _leggi_snapshot() - un save v23 scritto da
+  questa stessa sessione tornava quindi SEMPRE con boon:{} al caricamento
+  (il campo esisteva nel file JSON ma _leggi_snapshot() non lo leggeva,
+  quindi GameState.applica() vedeva sempre il default {}). L'effetto:
+  BoonSystem.da_salvataggio({}) interpretava una baseline vuota come "mai
+  salvata prima" e la ricalcolava daccapo con _riparti() usando i conteggi
+  GIA' RESTAURATI di EventTracker (che invece si carica correttamente,
+  essendo un campo di fase 2) - il progresso tornava sempre a 0 invece del
+  valore salvato. Il primo run del test headless l'ha preso subito
+  ("progresso ripristinato dal save: atteso 1, ottenuto 0"). Corretto
+  aggiungendo la riga mancante a _leggi_snapshot(); rifatto girare il test,
+  passa.
+
+DECISIONE RIVISTA RISPETTO ALLA NOTA DI US-902 (COSA RESTA APERTO sopra).
+La nota di chiusura di US-901 diceva: "quando [US-904] crea il file [di
+Eternal Aeon], il loader andra' esteso a scandire anche quella cartella,
+cosi' pathway_ids() lo include automaticamente [...] decisione gia' presa
+con l'utente: nessun accessore parallelo, un solo pathway_ids() che li
+contiene tutti". Ho dovuto correggere QUESTA parte, non solo anticiparla:
+- Ho esteso GameData._load_pathways() a scandire anche
+  data/pathways_non_standard/ (nuova costante DIR_PATHWAYS_NON_STANDARD,
+  _json_files_in() con un parametro obbligatoria:bool=true cosi' una
+  cartella assente - lo stato normale finche' US-904 non scrive Eternal
+  Aeon - non e' un errore di caricamento). Necessario SUBITO, non
+  rimandabile a US-904: senza, un test headless con una Sequenza
+  non_standard vera non ha modo di passare per Progression.sequence_data(),
+  che e' esattamente cio' che BoonSystem legge.
+- MA ho scoperto, provando a scrivere il test con un vero file su disco in
+  data/pathways_non_standard/, che mettere il Pathway di prova anche nel
+  dict _pathways (quello che pathway_ids() restituisce) rompeva SETTE
+  suite di test scollegate da questa story: test_game_data e test_hot_reload
+  (il conteggio "10 pathway / 100 sequenze" e' un tripwire esplicito
+  "se questi numeri cambiano senza una decisione esplicita e' un bug"),
+  test_i18n_data (ogni chiave *_i18n dei "pathway attivi" deve risolvere -
+  un fixture di test non ha traduzioni), test_page_diagramma (la griglia
+  del libro e' 10x10, una colonna per pathway_ids()), test_regions (ogni
+  Pathway attivo deve avere un sito rituale di Sequenza 0), test_vfx (ogni
+  pathway_ids() deve avere una palette colore + un tratto) e
+  test_slice_tutti_i_pathway (gioca l'intero 9->0 di ogni pathway_ids()
+  con pozione+recitazione - un Boon non ha ne' formula ne' recitazione,
+  fallisce per costruzione). Tutti questi sistemi assumono che
+  "pathway_ids()" == "i 10 Pathway standard attivi, ognuno con
+  pozione+recitazione+VFX+sito rituale". Estendere quell'universo a un
+  Pathway non_standard e' un cambiamento che tocca SETTE sistemi, non uno:
+  troppo per questa story (motore Boon + testabilita'), e troppo anche per
+  come e' delimitata US-904 nel PRD (blocco A: "Eternal Aeon Seq 9-5", non
+  "ogni sistema che itera i Pathway").
+- Ho quindi tenuto _pathways/pathway_ids() SOLO standard (filtro
+  categoria=="standard" nel loop di _load_pathways()), mentre _sequences
+  (quello che Progression/BoonSystem usano DAVVERO via get_sequence())
+  resta popolato da ENTRAMBE le cartelle. Risultato: BoonSystem funziona
+  su un Pathway non_standard vero risolto per id esatto, e le sette suite
+  sopra restano verdi perche' non vedono mai comparire un pathway in piu'
+  nell'enumerazione.
+- La domanda "come diventa Eternal Aeon selezionabile nell'OptionButton di
+  creazione" (che l'utente ha confermato in linea di principio: stesso
+  ciclo standard) RESTA APERTA, ma ora con l'informazione concreta di
+  quali sette sistemi andrebbero toccati se si scegliesse la strada "un
+  solo pathway_ids() unificato" contro l'alternativa (un accessore diverso
+  per il solo menu di creazione, che lascia intatti VFX/diagramma/rituali/
+  i18n/slice). Non la decido qui: la registro per quando US-904 scrivera'
+  davvero Eternal Aeon, perche' a quel punto la risposta cambia il lavoro
+  di quella story in modo sostanziale.
+- Per questo stesso motivo test_boon_system.gd NON scrive nessun file in
+  data/pathways_non_standard/: inietta le Sequenze di prova direttamente
+  in GameData._sequences (stesso pattern gia' in uso in
+  test_hot_reload.gd per un id fantasma), e chiama GameData.reload() come
+  ultima riga di OGNI test - reload() pota dai dati in memoria tutto cio'
+  che non e' backed da un file reale (e' il motivo per cui quel test di
+  hot reload esiste), quindi il Pathway di prova non sopravvive oltre il
+  singolo test e non inquina le sette suite sopra quando girano nello
+  stesso processo.
+
+COME VERIFICATO.
+- godot --headless --path . --import: pulito.
+- godot --headless --path . --script res://tests/run_tests.gd: 867 test
+  (852 + i 16 nuovi di test_boon_system.gd meno... in realta' 15 nuovi +
+  1 gia' contato: il conteggio esatto e' 867 stampato dal runner), tutti
+  passati. Zero regressioni - le sette suite del paragrafo sopra sono
+  state verificate FALLIRE con la fixture presente su disco (conferma che
+  il fix e' quello giusto, non un caso), poi VERDI dopo il fix.
+- tests/test_save_system.gd: test_migrazione_v21_a_v22_aggiunge_endgame
+  asseriva "portato a v22" con un intero letterale 22 - con lo
+  schema_version corrente ora a 23 la migrazione arriva fino in fondo
+  (corretto: e' quello che deve fare), quindi l'assert e' stato aggiornato
+  a s.VERSIONE_CORRENTE (stesso pattern gia' usato alla riga 90 dello
+  stesso file) invece di un altro numero letterale che si sarebbe rotto
+  di nuovo al prossimo bump di fase.
+- python tools/validate_data.py: esce 0, stessi 3 warning di sempre (nessun
+  file di test lasciato su disco: la fixture di BoonSystem non tocca mai
+  il filesystem, vedi sopra).
+- git status: solo i file toccati elencati sotto, nessun residuo.
+
+COSA RESTA APERTO (per le story successive).
+- Selezionabilita' di Eternal Aeon nel menu di creazione: vedi "DECISIONE
+  RIVISTA" sopra - da decidere esplicitamente in US-903/US-904, non
+  implicita.
+- US-903 (guardie): PathwayChange/FusionEngine assumono Pathway standard
+  (group non nullo) - vanno resi robusti a un Pathway non_standard nel
+  roster (escluderlo esplicitamente, non un crash silenzioso).
+
+File toccati: scripts/boon_system.gd (nuovo), scripts/game_data.gd,
+scripts/game_state.gd, scripts/save_system.gd, tests/test_boon_system.gd
+(nuovo), tests/test_save_system.gd, project.godot.
+
+PROSSIMA STORIA: US-903 — Guardie nei sistemi che assumono Pathway
+standard (PathwayChange, FusionEngine): un Pathway non_standard non deve
+mai apparire come candidato al cambio Pathway o alla fusione.

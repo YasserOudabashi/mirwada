@@ -100,6 +100,10 @@ func _acting() -> Node:
 	return get_node_or_null("/root/Acting")
 
 
+func _boon() -> Node:
+	return get_node_or_null("/root/BoonSystem")
+
+
 func _caratteristiche() -> Node:
 	return get_node_or_null("/root/CharacteristicStore")
 
@@ -313,6 +317,8 @@ func snapshot() -> Dictionary:
 		"equipaggiamento": _equip().per_salvataggio() if _equip() != null else {},
 		# fase 7: cambio Pathway, fusioni, tribolazioni, eredita', finale.
 		"endgame": _endgame().per_salvataggio() if _endgame() != null else {},
+		# fase 9: baseline dei requisiti 'comportamento' del Boon corrente.
+		"boon": _boon().per_salvataggio() if _boon() != null else {},
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D:
@@ -364,6 +370,9 @@ func applica(dati: Dictionary) -> void:
 	# Acting DOPO progressione ed eventi: legge la Sequenza e i conteggi.
 	if _acting() != null:
 		_acting().da_salvataggio(dati.get("acting", {}))
+	# BoonSystem, stesso motivo di Acting (fase 9).
+	if _boon() != null:
+		_boon().da_salvataggio(dati.get("boon", {}))
 	if _caratteristiche() != null:
 		_caratteristiche().da_salvataggio(dati.get("caratteristiche", []))
 	if _follia() != null:

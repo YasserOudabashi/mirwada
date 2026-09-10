@@ -147,7 +147,7 @@ func test_migrazione_v21_a_v22_aggiunge_endgame() -> void:
 	_scrivi_grezzo('{"schema_version": 21, "nome_personaggio": "pre-endgame", "tempo_gioco": 5.0, "posizione": [0, 0], "statistiche": {}, "mondo": {"terrain_mods": [], "regione": "mirwada"}}')
 	var c: Dictionary = s.carica(SLOT)
 	assert_true(c["ok"] and c["migrato"], "carica ok, migrato")
-	assert_eq(int((c["dati"] as Dictionary)["schema_version"]), 22, "portato a v22")
+	assert_eq(int((c["dati"] as Dictionary)["schema_version"]), s.VERSIONE_CORRENTE, "portato alla versione corrente")
 	var eg: Dictionary = (c["dati"] as Dictionary)["endgame"]
 	assert_eq(str(eg.get("pathway_precedente", "MANCANTE")), "", "endgame.pathway_precedente vuoto")
 	assert_eq((eg.get("fusioni", ["MANCANTE"]) as Array), [], "endgame.fusioni vuoto")

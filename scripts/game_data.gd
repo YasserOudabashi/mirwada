@@ -13,6 +13,10 @@ extends Node
 signal data_reloaded(files_loaded: int, errors: int)
 
 const DIR_PATHWAYS := "res://data/pathways"
+## Fase 9 (US-902): Pathway Non-Standard (Boon). Puo' non esistere ancora
+## (nessun file finche' una story non ne scrive uno, es. Eternal Aeon) -
+## a differenza di DIR_PATHWAYS, una cartella assente qui NON e' un errore.
+const DIR_PATHWAYS_NON_STANDARD := "res://data/pathways_non_standard"
 const DIR_ABILITIES := "res://data/abilities"
 const DIR_SYNERGIES := "res://data/synergies"
 const DIR_FUSIONS := "res://data/fusions"
@@ -722,7 +726,9 @@ func files_loaded() -> int:
 func _load_pathways() -> void:
 	var visti_p: Dictionary = {}
 	var visti_s: Dictionary = {}
-	for path in _json_files_in(DIR_PATHWAYS):
+	var percorsi: PackedStringArray = _json_files_in(DIR_PATHWAYS)
+	percorsi.append_array(_json_files_in(DIR_PATHWAYS_NON_STANDARD, false))
+	for path in percorsi:
 		var doc: Dictionary = _read_json(path)
 		if doc.is_empty():
 			continue
@@ -730,8 +736,16 @@ func _load_pathways() -> void:
 		if pid.is_empty():
 			_fail(path, "manca il campo 'id'")
 			continue
-		_upsert(_pathways, pid, doc)
-		visti_p[pid] = true
+		# US-902: pathway_ids()/_pathways restano SOLO gli standard - ogni
+		# sistema che "itera su ogni Pathway attivo" (VFX, diagramma, siti
+		# rituali, i18n, gli slice) assume quell'universo, e cambiarlo qui
+		# e' fuori scope per questa story (arrivera' quando US-904 scrive
+		# Eternal Aeon e va deciso esplicitamente dove farlo comparire). Le
+		# Sequenze restano visibili a tutti: e' quel che serve a Progression/
+		# BoonSystem per risolvere sequence_data() su un Pathway non_standard.
+		if str(doc.get("categoria", "standard")) == "standard":
+			_upsert(_pathways, pid, doc)
+			visti_p[pid] = true
 
 		for entry in _object_list(doc, "sequences", path):
 			var seq: Dictionary = entry
@@ -995,10 +1009,11 @@ func _prune(index: Dictionary, visti: Dictionary) -> void:
 			index.erase(id)
 
 
-func _json_files_in(dir_path: String) -> PackedStringArray:
+func _json_files_in(dir_path: String, obbligatoria: bool = true) -> PackedStringArray:
 	var out := PackedStringArray()
 	if not DirAccess.dir_exists_absolute(dir_path):
-		_errors.append("cartella mancante: %s" % dir_path)
+		if obbligatoria:
+			_errors.append("cartella mancante: %s" % dir_path)
 		return out
 	var names: PackedStringArray = DirAccess.get_files_at(dir_path)
 	for n in names:
