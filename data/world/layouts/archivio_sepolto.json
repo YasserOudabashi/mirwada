@@ -75,7 +75,10 @@
     {"x": 39, "y": 9, "item_id": "polvere_di_sale_nero", "quantita": 1},
     {"x": 9, "y": 25, "item_id": "cera_di_candela_rituale", "quantita": 1},
     {"x": 24, "y": 25, "item_id": "inchiostro_luminescente", "quantita": 1},
-    {"x": 39, "y": 25, "item_id": "punta_d_argento", "quantita": 1}
+    {"x": 39, "y": 25, "item_id": "punta_d_argento", "quantita": 1},
+    {"x": 11, "y": 12, "item_id": "grimaldello_cantante", "quantita": 1},
+    {"x": 26, "y": 9, "item_id": "guanto_del_borseggiatore", "quantita": 1},
+    {"x": 37, "y": 9, "item_id": "refurtiva_dimenticata", "quantita": 1}
   ],
   "drop": {
     "0": [

@@ -9555,3 +9555,76 @@ fuori da un US di prd.json)
   mancante). Il PRD e' pronto per diventare una fase se l'utente lo chiede.
 - Prossima storia: nessuna pianificata; eventualmente le 9 coppie
   contenuto+script del Livello B elencate nel PRD, una alla volta.
+
+---
+
+[2026-09-10] Livello B batch 1 (Mother, Door, Error) — VS-B1-01/02/03
+
+- Cosa fatto: 006_PRD/prd-vslice-livello-b-batch-1.md (nuovo) sceglie e
+  motiva i primi 3 Pathway per il "gioco reale" oltre il Twilight Giant:
+  Mother -> Valle della Madre (fit tematico diretto, i 3 ingredienti di
+  formula_mother_9 gia' presenti nel layout, zero dati da scrivere), Door ->
+  Frontiera delle Porte (tag soglia/porta_senza_stanza), Error -> Archivio
+  Sepolto (tag biblioteca/biblioteca_di_tutto). Per Door ed Error: 3
+  ingredienti ciascuno aggiunti a `oggetti` nei rispettivi layout (celle
+  calpestabili e libere verificate contro CALPESTABILI_LAYOUT del
+  validator prima di scriverle). Nessun nuovo nemico/boss/venditore: la
+  Caratteristica di Sequenza 9 resta concessa diretta come nello script
+  originale (qa_vslice.gd passo 8), il combattimento usa un nemico
+  generico gia' presente.
+  3 nuovi script `tests/manual/qa_vslice_<mother|door|error>.gd`, stesso
+  schema di qa_vslice.gd ma: creazione con Pathway scelto dal selettore
+  (US-801), attraversamento reale del passaggio da Mirwada verso la
+  regione target, raccolta/abilita'/combattimento/alchimia li', senza il
+  passo del negozio (specifico di Sidon/Mirwada).
+- Bug scoperti scrivendo i 3 script (nessuno pre-esistente nel gioco, tutti
+  nel modo in cui lo script simulava l'input):
+  1. Il primo movimento del personaggio attraversa Mirwada intera verso il
+     bordo: la linea retta puo' incrociare un cluster di decorazioni solide
+     ('o' nella mappa, non calpestabile) senza modo di aggirarlo camminando
+     dritto. _cammina_verso ora nota quando non fa progresso reale per un
+     po' e per una quarantina di frame si muove SOLO in perpendicolare
+     (mai insieme al laterale, altrimenti resta premuta contro il muro),
+     alternando lato se il primo non basta.
+  2. _cammina_verso non si accorgeva di un cambio di regione avvenuto a
+     meta' corsa (il passaggio scatta sull'overlap fisico, quasi sempre
+     PRIMA che la funzione veda "arrivato"): il vecchio target, letto nel
+     nuovo spazio di coordinate, poteva puntare dritto al varco di ritorno
+     della nuova regione e far rimbalzare il personaggio avanti e indietro
+     fino a esaurire i frame. Corretto: la funzione ora rileva il cambio di
+     region_id e si ferma subito.
+  3. Il combattimento sceglieva il primo nemico del gruppo "nemici", non il
+     piu' vicino: a Frontiera delle Porte quello era irraggiungibile nel
+     budget di frame concesso per il riavvicinamento (80 colpi a vuoto).
+     Corretto: si sceglie il nemico piu' vicino al personaggio.
+  Nessuno di questi tre e' un bug del gioco: sono tutti nel modo in cui lo
+  script di QA simulava camminata/riavvicinamento. Documentati nei
+  commenti dei 3 file.
+- test_layouts.gd: 2 asserzioni con "6 oggetti a terra" scritte a mano
+  (archivio_sepolto, frontiera_porte) aggiornate a 9 (i 3 nuovi ingredienti
+  per Error/Door) — non una regressione, solo un numero non piu' aggiornato.
+- Come verificato:
+  - I 3 script lanciati per davvero con Xvfb (--display-driver x11
+    --rendering-driver opengl3): "TUTTI I PASSI OK" per tutti e 3,
+    screenshot prodotti e mandati in chat (creazione, mondo/regione,
+    raccolta ingredienti, abilita', combattimento, Sequenza 8 raggiunta).
+  - `godot --headless --path . --script res://tests/run_tests.gd`: 852
+    test, tutti passati (nessuna regressione dopo la correzione di
+    test_layouts.gd).
+  - `python tools/validate_data.py`: esce 0, stessi 3 warning di prima.
+- Nota ambiente: uno script `godot --headless --path . --script
+  res://tools/build_tileset.gd` lasciato in esecuzione da una sessione/
+  invocazione precedente (probabilmente pre-esistente al riuso di questo
+  container) girava da ore al 98% di CPU con un vero errore
+  (SCRIPT ERROR in tools/build_tileset.gd:58, "Cannot call method
+  'set_collision_polygons_count' on a null value") senza mai uscire:
+  rallentava severamente ogni lancio di Godot in questa sessione (i tempi
+  di attesa "senza motivo" durante il debug della camminata erano in realta'
+  contesa di CPU con questo processo). Terminato (kill -9): non e' uno
+  strumento toccato da questa story, ne' dati/codice del progetto, solo un
+  processo zombie da ripulire. tools/build_tileset.gd stesso ha
+  probabilmente un bug indipendente (quel metodo nullo), non indagato qui.
+- Prossima storia: le 6 coppie contenuto+script rimanenti del Livello B
+  (Fool, Hermit, Death, Moon, Paragon, Darkness), stessa ricetta, quando
+  richiesto. marche_crepuscolo (unica regione ancora senza un Pathway
+  proprio in questo batch) e' tematicamente vicina a Death.

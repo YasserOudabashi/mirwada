@@ -522,7 +522,10 @@ func test_archivio_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var scena: Node = r["scena"]
 
 	var pickup_list: Array = _pickup_di(scena)
-	assert_eq(pickup_list.size(), 6, "6 oggetti a terra dal layout")
+	# 6 originali (US-805/US-809c) + 3 ingredienti di formula_error_9
+	# (006_PRD/prd-vslice-livello-b-batch-1.md, VS-B1-03: non esistevano in
+	# nessun layout prima, servono al Livello B reale del Pathway Error).
+	assert_eq(pickup_list.size(), 9, "9 oggetti a terra dal layout")
 
 	var inv: Node = _root().get_node("Inventory")
 	var uno = pickup_list[0]
@@ -633,7 +636,10 @@ func test_frontiera_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var scena: Node = r["scena"]
 
 	var pickup_list: Array = _pickup_di(scena)
-	assert_eq(pickup_list.size(), 6, "6 oggetti a terra dal layout")
+	# 6 originali (US-805/US-809c) + 3 ingredienti di formula_door_9
+	# (006_PRD/prd-vslice-livello-b-batch-1.md, VS-B1-02: non esistevano in
+	# nessun layout prima, servono al Livello B reale del Pathway Door).
+	assert_eq(pickup_list.size(), 9, "9 oggetti a terra dal layout")
 
 	var inv: Node = _root().get_node("Inventory")
 	var uno = pickup_list[0]
