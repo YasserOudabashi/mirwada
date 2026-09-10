@@ -589,6 +589,12 @@ func get_vfx_palette(pathway_id: String) -> Dictionary:
 	return _dict_or_empty(_dict_or_empty(_vfx.get("pathway_palette_visiva")).get(pathway_id))
 
 
+## Gli id delle 10 palette, nell'ordine di data/vfx.json (US-813: la riga
+## del tileset per un Pathway e' 1 + l'indice qui dentro).
+func vfx_palette_ids() -> Array:
+	return _dict_or_empty(_vfx.get("pathway_palette_visiva")).keys()
+
+
 func get_primitive_vfx(tipo: String) -> Dictionary:
 	return _dict_or_empty(_dict_or_empty(_vfx.get("primitive_vfx")).get(tipo))
 

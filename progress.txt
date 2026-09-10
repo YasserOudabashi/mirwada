@@ -9160,8 +9160,6 @@ considerare la story chiusa, non dopo).
   gioco top-down, notato guardando lo screenshot.
 
 COSA RESTA APERTO (dichiarato, non di questa story).
-- US-813: sprite di NPC/oggetti/passaggi/gate + tileset per palette
-  (valutazione del pack CC0 "Tiny Top Down Pack" per il tileset).
 - La coordinazione arti/braccia del rig quadrupede (pet) e del nemico
   incappucciato resta semplificata (le braccia del cultista sotto il
   cappuccio si leggono poco): accettabile per grafica provvisoria, non
@@ -9170,3 +9168,155 @@ COSA RESTA APERTO (dichiarato, non di questa story).
 
 PROSSIMA STORIA: US-813 — Sprite di NPC, oggetti, passaggi, gate + tileset
 per palette.
+
+=== US-813: NPC/oggetti/passaggi/gate + tileset per palette (fase 8, Blocco E) ===
+
+COSA FATTO.
+- tools/generate_sprites.py esteso: npc_popolano.png (6 righe/varianti,
+  riusa _draw_umanoide con cat="popolano", palette neutra fissa — scelta
+  con un mix di accenti diversi per riga, non una delle 10 palette di
+  Pathway, stesso principio "sono i VFX a dire il Pathway" di US-812);
+  oggetti.png (9 colonne: colonne 0-2 le 3 varianti di "ingrediente" scelte
+  dal tag dominante — crescita->erba, terra->minerale, altrimenti fiala —,
+  colonne 3-8 le altre 6 categorie di data/item_categories.json nel loro
+  ordine); passaggio.png (arco/cartello); gate.png (barriera a tile).
+  tools/generate_placeholders.py: rimosso il vecchio blocco temporaneo che
+  disegnava un tileset placeholder a 4 tile — tileset.png e' ora generato
+  per intero da generate_sprites.py.
+- tileset.png: 8 colonne (TILESET_COLONNE, ordine fisso diverso da quello
+  della legenda: pavimento, muro, ostacolo, acqua, pavimento_variante,
+  sentiero, ostacolo2, decoro) x 11 righe (riga 0 "neutra" + una riga per
+  ognuna delle 10 chiavi di data/vfx.json.pathway_palette_visiva, nel loro
+  ordine — mai un nome hardcoded). tools/build_tileset.gd riscritto: prima
+  faceva un loop su 1 riga x 4 colonne, ora fa righe x 8 colonne, con la
+  collisione piena sulle colonne solide [1,2,3,6] (muro/ostacolo/acqua/
+  ostacolo2) ripetuta su OGNI riga (prima solo sulla riga 0). Rigenerato
+  ed eseguito: 11 righe x 8 colonne, 44 tile solidi (4x11) — confermato dal
+  print del tool. tileset.tres committato (l'engine non lo rigenera).
+- data/schema/npc.schema.json: proprieta' opzionale aspetto.variante
+  (int 0-5). data/npc/roster.json: aggiunto aspetto.variante = i % 6 su
+  tutte le 19 voci (diff pulito, solo aggiunte — verificato che il file
+  fa round-trip senza modifiche spurie con json.dump semplice, a differenza
+  dei file di layout che vanno editati chirurgicamente).
+- scripts/game_data.gd: nuovo metodo vfx_palette_ids() -> Array, gemello di
+  get_vfx_palette(pathway_id) — espone l'ORDINE delle chiavi di
+  pathway_palette_visiva (region_scene.gd lo usa per calcolare l'indice di
+  riga, mai un nome hardcoded).
+- scripts/region_scene.gd:
+  - _dipingi() riscritta: le costanti PAVIMENTO/MURO/_CARATTERI_SOLIDI
+    (US-805, binarie: solido si'/no) sono sostituite da
+    _COLONNA_PER_CARATTERE (dict carattere->colonna, tutti e 8 i caratteri
+    della legenda) + _riga_tileset() (0 se palette_visiva della regione e'
+    "neutra" o assente, altrimenti 1 + l'indice in
+    GameData.vfx_palette_ids()). Il ramo "nessun layout" (bordo di muri +
+    pavimento piatto) usa la stessa riga/colonne.
+  - _crea_npc(): uno Sprite2D da npc_popolano.png (region_rect dalla riga
+    aspetto.variante) + una Label col nome tradotto (GameData.tr_data) al
+    posto del vecchio ColorRect anonimo.
+  - _crea_passaggi(): 2 sprite di passaggio.png impilati sopra l'Area2D
+    del varco (area 1.5x2 tile), invece del ColorRect giallo.
+- scripts/area_gate.gd: sprite di gate.png piastrellati (3x5, 96x160 px)
+  aggiunti PRIMA del _marker esistente, che resta invariato com'e'
+  l'indicatore funzionale aperto/chiuso (verde/rosso trasparente sopra gli
+  sprite).
+- scripts/characteristic_pickup.gd: setup() ora chiama un hook overridabile
+  _crea_marker() (default: il vecchio rombo Polygon2D) invece di costruire
+  il marker inline — un solo punto di estensione per le sottoclassi, nessun
+  duplicato di setup()/Area2D/CollisionShape2D.
+- scripts/item_pickup.gd: override di _crea_marker() che mostra l'icona
+  della categoria dell'item da oggetti.png (colonna scelta da
+  _colonna_icona(), con la variante per gli ingredienti).
+- arte/02_regioni_e_mappe.md § 5 riscritta: 8 colonne/riga-per-palette al
+  posto delle vecchie 4 tile fisse, con riferimento a TILESET_COLONNE e
+  _riga_tileset(); prompt di riferimento aggiornato a 8 tile (aspect 8:1).
+- tests/test_layouts.gd: le costanti MURO/PAVIMENTO (Vector2i fissi, riga
+  0 sempre) sono sostituite da costanti di sola COLONNA
+  (COL_PAVIMENTO/COL_MURO/COL_ACQUA/COL_SENTIERO). I 5 test
+  test_*_dipinta_dal_layout riletti riga per riga sui file JSON dei layout
+  per sapere il carattere ESATTO in ogni cella testata (es. valle_madre
+  (41,5) e' '=' non '.': l'assert ora si aspetta la colonna sentiero, non
+  pavimento) — per mirwada (neutra) la riga resta 0 hardcoded, per le altre
+  4 regioni (palette non neutra) la riga e' letta dalla cella (1,1)/(4,4)/
+  (7,7) della STESSA scena appena istanziata (self-consistente: il test
+  prova che tutte le celle della regione condividono la stessa riga, senza
+  dover indovinare a mano l'indice di ogni palette in vfx.json). Due test
+  NUOVI: test_riga_tileset_per_palette_non_neutra verifica la riga ESATTA
+  (calcolata da GameData.vfx_palette_ids(), non solo auto-consistente) per
+  marche_crepuscolo/darkness; test_npc_ha_sprite_e_nome_tradotto verifica
+  che un NPC (npc_mirco, presente in piazza all'alba) abbia uno Sprite2D
+  su npc_popolano.png e una Label col testo di GameData.tr_data(name_i18n).
+
+DEVIAZIONE DICHIARATA DAL PIANO.
+- Il piano approvato prevedeva di valutare il pack CC0 "Tiny Top Down Pack"
+  (Screaming Brain Studios) per il tileset durante questa story. Scartato
+  in fase di implementazione, non per motivi di qualita' dell'asset ma di
+  fattibilita' pratica in questo ambiente: WebFetch qui converte HTML in
+  markdown, non scarica file binari (uno zip), e itch.io richiede un
+  flusso di download interattivo (pulsante "No thanks, take me to the
+  downloads" + eventuale redirect) che non e' raggiungibile senza un vero
+  browser. Sono rimasto sul tileset procedurale gia' previsto come
+  fallback dall'AC ("texture a rumore deterministico, edge-tileable") —
+  nessun asset di terzi usato, quindi nessuna licenza da dichiarare in
+  arte/README.md.
+
+BUG REALE TROVATO E CORRETTO (non nell'AC, scoperto dalla verifica Xvfb).
+- _draw_umanoide() disegnava la fascia/sciarpa d'accento solo per
+  cat == "personaggio": le 6 varianti di npc_popolano risultavano tutte
+  visivamente identiche (stesso cappotto, nessun accento). Corretto
+  allargando la condizione a cat in ("personaggio", "popolano").
+- Molto piu' serio, scoperto SOLO guardando lo screenshot (nessun test lo
+  controllava): a Mirwada 6 NPC condividono lo stesso location_tag
+  "piazza" all'alba (Mirco + 5 npc_generic_*). _crea_npc() li posizionava
+  tutti su Zona_piazza.position, lo STESSO punto esatto — con i vecchi
+  ColorRect anonimi e identici la sovrapposizione era invisibile (sembrava
+  un unico rettangolo), con sprite+Label diventava un blocco di testo
+  illeggibile: "Mirco" e 5 "Popolano" scritti pixel su pixel uno sopra
+  l'altro, un'accozzaglia di lettere che a un primo sguardo (prima di
+  stampare il testo della Label via debug) ho scambiato per un bug di
+  traduzione ("Popolano" e' la label generica corretta di
+  npc.generic.name, non un errore — il problema era la sovrapposizione,
+  non il testo). Corretto raggruppando gli NPC per location_tag e
+  distribuendoli in fila (spaziatura 1.5 tile) centrata sulla posizione
+  della zona, invece di impilarli tutti nello stesso punto — nessun dato
+  nuovo, solo la disposizione nello script.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tools/build_tileset.gd: "salvato
+  res://assets/placeholder/tileset.tres -> ok (err 0), 11 righe x 8
+  colonne, 44 tile solidi".
+- python tools/validate_data.py: esce 0, 3 warning invariati (fusioni
+  stub di fase 7b, sinergie di gruppi differiti, stringhe TODO — nessun
+  dato di gioco nuovo, solo aspetto.variante additivo sul roster).
+- godot --headless --path . --import: pulito.
+- godot --headless --path . --script res://tests/run_tests.gd: 848 test,
+  tutti passati (846 + 2 nuovi). Nessuna regressione.
+- VERIFICA A SCHERMO REALE: TRAPPOLA NUOVA — godot --headless usa sempre
+  il renderer "dummy" (--display-driver headless --audio-driver Dummy):
+  get_texture().get_image() torna null e save_png fallisce
+  silenziosamente ("Cannot call method 'save_png' on a null value"),
+  anche con Xvfb attivo e DISPLAY impostata. Per uno screenshot vero
+  servono ENTRAMBI `--display-driver x11 --rendering-driver opengl3` al
+  posto di --headless (Xvfb comunque necessaria per il display X11).
+  Con la ricetta corretta: script di QA nello scratchpad (non committato),
+  uno screenshot NPC + uno oggetto per ciascuna delle 5 regioni, mandati
+  in chat. Confermato a schermo: tileset tinto per la palette della
+  regione (Mirwada neutra grigio-bruno; Marche del Crepuscolo/darkness
+  viola-grigio scuro con patch di pavimento_variante; Valle Madre/mother
+  verde bosco con un blocco ostacolo rossastro; Frontiera delle Porte/fool
+  blu-grigio con isola grigia e varco); NPC con Sprite2D + Label leggibile
+  ("Mirco", "Ottavia", 5x "Popolano" distinti e distanziati dopo il fix
+  della sovrapposizione); oggetti a terra con icona di categoria
+  riconoscibile (fiala blu per un ingrediente).
+
+COSA RESTA APERTO (dichiarato, non di questa story).
+- La distribuzione in fila degli NPC dello stesso location_tag e' un
+  fix minimo (non nell'AC): non verifica che gli NPC restino dentro i
+  confini della zona per rettangoli molto stretti — accettabile per
+  grafica provvisoria (nessuna zona attuale e' cosi' stretta da romperlo,
+  verificato a schermo su tutte e 5 le regioni).
+- La coordinazione arti/braccia del rig quadrupede (pet) e del nemico
+  incappucciato (nota gia' aperta da US-812) resta semplificata: non
+  bloccante, stesso motivo di allora.
+
+PROSSIMA STORIA: US-814 — chiusura fase 8 (qa_vslice.gd, test_slice_fase_8,
+blocco validator "chiusura fase 8", documentazione).

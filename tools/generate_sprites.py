@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Genera pixel art procedurale per personaggio/nemico/pet a partire dalla
-geometria di data/animations.json (US-812, fase 8 Blocco E).
+geometria di data/animations.json (US-812, fase 8 Blocco E), piu' NPC/
+oggetti/passaggi/gate/tileset (US-813, stesso Blocco).
 
     python tools/generate_sprites.py
 
@@ -42,6 +43,8 @@ except ImportError:
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 SPEC = os.path.join(ROOT, "data", "animations.json")
 OUT = os.path.join(ROOT, "assets", "placeholder")
+ITEM_CATEGORIES_PATH = os.path.join(ROOT, "data", "schema", "item_categories.json")
+VFX_PATH = os.path.join(ROOT, "data", "vfx.json")
 
 SEED = 20260910
 DIM = 32
@@ -293,8 +296,9 @@ def _draw_umanoide(img, cat, pal, direzione, pose, seed):
     _shape_poly(d, corpo_pts, pal["primario"])
     _rim_light(d, [(cx - 6 + ox * 0.3, corpo_alto + oy + 1), (cx - 5 + ox * 0.3, corpo_basso + oy - 1)],
                _lighten(pal["primario"], 0.55))
-    if cat == "personaggio":
-        # sciarpa: una fascia dell'accento sul petto
+    if cat in ("personaggio", "popolano"):
+        # sciarpa/fascia: una banda dell'accento sul petto (per "popolano"
+        # e' l'unica cosa che distingue le 6 varianti fra loro).
         _shape_rect(d, [cx - 4 + ox, corpo_alto + oy + 2, cx + 4 + ox, corpo_alto + oy + 5],
                     pal["accento"])
 
@@ -377,6 +381,189 @@ def build_frame(cat, direzione, pose, seed):
 PET["_quadrupede"] = True
 
 
+# --- US-813: NPC/oggetti/passaggi/gate + tileset per palette --------------
+
+# 6 varianti di popolano (abiti diversi, palette neutra — non e' un
+# personaggio della storia, non serve la palette fissa del protagonista):
+# solo l'accento del vestito cambia fra varianti.
+POPOLANO_ACCENTI = [
+    (150, 90, 70), (90, 120, 150), (140, 130, 70),
+    (110, 80, 130), (80, 130, 100), (150, 110, 150),
+]
+POPOLANO_PRIMARIO = (76, 72, 66)
+POPOLANO_PRIMARIO_OMBRA = (54, 50, 46)
+
+# Tag dominante -> variante di icona per gli ingredienti (US-813): erba
+# (crescita), minerale (terra), fiala (default, "pozione" e' su ogni
+# ingrediente per costruzione di US-808 quindi non discrimina da solo).
+ICONA_INGREDIENTE_TAG = {"crescita": "erba", "terra": "minerale"}
+
+# Le 6 categorie di item_categories.json diverse da "ingrediente" hanno
+# UNA icona ciascuna; "ingrediente" si espande in 3 varianti (erba/
+# minerale/fiala) inserite al suo posto: 9 colonne totali, questo e'
+# l'ORDINE ESATTO scritto in oggetti.png (un file immagine non ha un
+# campo _comment: la documentazione dell'ordine vive qui e in
+# arte/02_regioni_e_mappe.md).
+OGGETTI_COLONNE = [
+    "ingrediente_erba", "ingrediente_minerale", "ingrediente_fiala",
+    "equip", "sigillo", "pergamena", "materiale", "valuta", "consumabile",
+]
+
+# Le 8 colonne del tileset, nell'ordine deciso dall'AC di US-813 (diverso
+# dall'ordine della legenda di layout.schema.json: qui le 4 solide sono
+# raggruppate a [1,2,3,6] per tools/build_tileset.gd).
+TILESET_COLONNE = [
+    ("pavimento", (58, 54, 48), False),
+    ("muro", (32, 30, 28), True),
+    ("ostacolo", (74, 64, 48), True),
+    ("acqua", (38, 64, 92), True),
+    ("pavimento_variante", (64, 60, 52), False),
+    ("sentiero", (80, 70, 56), False),
+    ("ostacolo2", (54, 60, 44), True),
+    ("decoro", (70, 64, 56), False),
+]
+
+
+def _tinteggia(base, primario, quantita):
+    return tuple(int(base[i] * (1.0 - quantita) + primario[i] * quantita) for i in range(3))
+
+
+def _texture_tile(base, seed):
+    """Texture a rumore deterministico (zlib.crc32 del seed+coordinate, MAI
+    random non seedato): pochi pixel piu' chiari/piu' scuri sparsi sulla
+    tinta base. 'Edge-tileable' per costruzione: il rumore non dipende
+    dalla posizione DENTRO il tile in modo che crei un bordo visibile, solo
+    dalla combinazione seed+x+y, quindi affiancando due tile identici il
+    pattern non mostra una cucitura piu' di quanto non lo faccia gia' il
+    resto della texture."""
+    img = Image.new("RGBA", (DIM, DIM), base + (255,))
+    px = img.load()
+    for y in range(DIM):
+        for x in range(DIM):
+            n = zlib.crc32(f"{seed}:{x}:{y}".encode()) % 100
+            if n < 10:
+                px[x, y] = _darken(base, 0.18) + (255,)
+            elif n < 18:
+                px[x, y] = _lighten(base, 0.12) + (255,)
+    return img
+
+
+def build_tile(nome, base, seed, primario=None):
+    colore = _tinteggia(base, primario, 0.3) if primario is not None else base
+    return _texture_tile(colore, f"{seed}:{nome}")
+
+
+def build_tileset():
+    """tileset.png: colonne = le 8 TILESET_COLONNE, righe = riga 0 neutra +
+    una riga per ogni chiave di vfx.json.pathway_palette_visiva (nel loro
+    ordine, mai un nome hardcoded)."""
+    with open(VFX_PATH, encoding="utf-8") as fh:
+        vfx = json.load(fh)
+    palette_ids = list(vfx.get("pathway_palette_visiva", {}).keys())
+    righe = ["neutra"] + palette_ids
+
+    ts = Image.new("RGBA", (DIM * len(TILESET_COLONNE), DIM * len(righe)), (0, 0, 0, 0))
+    for r, pal_id in enumerate(righe):
+        primario = None
+        if pal_id != "neutra":
+            primario_hex = vfx["pathway_palette_visiva"][pal_id]["primario"].lstrip("#")
+            primario = tuple(int(primario_hex[i:i + 2], 16) for i in (0, 2, 4))
+        for c, (nome, base, _solido) in enumerate(TILESET_COLONNE):
+            tile = build_tile(nome, base, f"{SEED}:{r}:{c}", primario)
+            ts.paste(tile, (c * DIM, r * DIM))
+    return ts, righe
+
+
+def build_npc_popolano():
+    """npc_popolano.png: 6 varianti su 6 righe (US-813), palette neutra
+    (grigio-marrone da lavoro), solo l'accento del vestito cambia — riusa
+    _draw_umanoide con una palette 'popolano' costruita al volo."""
+    sheet = Image.new("RGBA", (DIM, DIM * len(POPOLANO_ACCENTI)), (0, 0, 0, 0))
+    pose = {"bob": 0.0, "stride": 0.0, "lean": 0.0, "arm": 0.0, "guard": False,
+            "weapon": False, "glow": 0.0, "crouch": 0.0, "fallen": 0.0,
+            "seated": False, "perfetta": False}
+    for i, accento in enumerate(POPOLANO_ACCENTI):
+        pal = {
+            "primario": POPOLANO_PRIMARIO, "primario_ombra": POPOLANO_PRIMARIO_OMBRA,
+            "accento": accento, "pelle": PERSONAGGIO["pelle"], "copricapo": None,
+        }
+        img = Image.new("RGBA", (DIM, DIM), (0, 0, 0, 0))
+        _draw_umanoide(img, "popolano", pal, "down", pose, SEED + i)
+        sheet.paste(img, (0, i * DIM), img)
+    return sheet
+
+
+def _icona_generica(nome, primario, accento):
+    img = Image.new("RGBA", (DIM, DIM), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img, "RGBA")
+    cx, cy = DIM // 2, DIM // 2
+    if nome.startswith("ingrediente"):
+        # una fialetta/rametto/pepita: forma diversa per variante.
+        variante = nome.split("_")[1]
+        if variante == "erba":
+            _shape_poly(d, [(cx, cy - 9), (cx - 4, cy + 8), (cx + 4, cy + 8)], primario)
+            _rim_light(d, [(cx - 1, cy - 7), (cx - 1, cy + 6)], _lighten(primario, 0.5))
+        elif variante == "minerale":
+            _shape_poly(d, [(cx, cy - 8), (cx + 7, cy - 1), (cx + 4, cy + 8),
+                             (cx - 4, cy + 8), (cx - 7, cy - 1)], primario)
+        else:  # fiala
+            _shape_rect(d, [cx - 4, cy - 7, cx + 4, cy + 8], primario)
+            _shape_rect(d, [cx - 2, cy - 10, cx + 2, cy - 7], INCHIOSTRO)
+        _glow(d, cx, cy + 2, 1, accento, 0.6)
+    elif nome == "equip":
+        _shape_poly(d, [(cx - 6, cy + 8), (cx + 6, cy - 8), (cx + 8, cy - 6), (cx - 4, cy + 10)], primario)
+        _shape_rect(d, [cx + 2, cy - 12, cx + 8, cy - 6], accento)
+    elif nome == "sigillo":
+        _shape_ellipse(d, [cx - 8, cy - 8, cx + 8, cy + 8], primario)
+        _shape_ellipse(d, [cx - 3, cy - 3, cx + 3, cy + 3], accento)
+    elif nome == "pergamena":
+        _shape_rect(d, [cx - 6, cy - 9, cx + 6, cy + 9], (220, 210, 190))
+        _rim_light(d, [(cx - 4, cy - 6), (cx + 4, cy - 6)], accento)
+        _rim_light(d, [(cx - 4, cy), (cx + 4, cy)], accento)
+    elif nome == "materiale":
+        _shape_poly(d, [(cx - 7, cy + 6), (cx - 2, cy - 8), (cx + 6, cy - 4), (cx + 7, cy + 7)], primario)
+    elif nome == "valuta":
+        _shape_ellipse(d, [cx - 7, cy - 7, cx + 7, cy + 7], accento)
+        _shape_ellipse(d, [cx - 4, cy - 4, cx + 4, cy + 4], _darken(accento, 0.25), outline=None)
+    else:  # consumabile
+        _shape_rect(d, [cx - 5, cy - 8, cx + 5, cy + 8], primario)
+        _shape_rect(d, [cx - 2, cy - 11, cx + 2, cy - 8], accento)
+    return img
+
+
+def build_oggetti():
+    """oggetti.png: 9 colonne (OGGETTI_COLONNE), 1 riga."""
+    sheet = Image.new("RGBA", (DIM * len(OGGETTI_COLONNE), DIM), (0, 0, 0, 0))
+    for i, nome in enumerate(OGGETTI_COLONNE):
+        icona = _icona_generica(nome, PERSONAGGIO["primario"], PERSONAGGIO["accento"])
+        sheet.paste(icona, (i * DIM, 0), icona)
+    return sheet
+
+
+def build_passaggio():
+    """passaggio.png: un arco/cartello, singolo 32x32."""
+    img = Image.new("RGBA", (DIM, DIM), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img, "RGBA")
+    cx = DIM // 2
+    _shape_rect(d, [cx - 10, 10, cx - 6, 28], (90, 80, 66))
+    _shape_rect(d, [cx + 6, 10, cx + 10, 28], (90, 80, 66))
+    _shape_poly(d, [(cx - 11, 12), (cx, 4), (cx + 11, 12), (cx + 7, 12), (cx, 8), (cx - 7, 12)], (70, 62, 50))
+    _glow(d, cx, 18, 1, PERSONAGGIO["accento"], 0.5)
+    return img
+
+
+def build_gate():
+    """gate.png: una barriera, singolo 32x32."""
+    img = Image.new("RGBA", (DIM, DIM), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img, "RGBA")
+    for i in range(4):
+        x = 6 + i * 6
+        _shape_rect(d, [x, 6, x + 3, 27], (70, 64, 56))
+    _shape_rect(d, [4, 9, 28, 13], (52, 48, 42))
+    _shape_rect(d, [4, 20, 28, 24], (52, 48, 42))
+    return img
+
+
 def main():
     with open(SPEC, encoding="utf-8") as fh:
         spec = json.load(fh)
@@ -405,8 +592,20 @@ def main():
             sheet.save(path)
             fogli += 1
 
+    # US-813: NPC/oggetti/passaggi/gate + tileset per palette.
+    build_npc_popolano().save(os.path.join(OUT, "npc_popolano.png"))
+    build_oggetti().save(os.path.join(OUT, "oggetti.png"))
+    build_passaggio().save(os.path.join(OUT, "passaggio.png"))
+    build_gate().save(os.path.join(OUT, "gate.png"))
+    tileset, righe_tileset = build_tileset()
+    tileset.save(os.path.join(OUT, "tileset.png"))
+
     print(f"OK: {fogli} fogli sprite generati in assets/placeholder/ "
           f"(attesi 19: 10 personaggio + 6 nemico_base + 3 pet).")
+    print(f"OK: npc_popolano.png (6 varianti), oggetti.png (9 colonne: "
+          f"{', '.join(OGGETTI_COLONNE)}), passaggio.png, gate.png.")
+    print(f"OK: tileset.png, {len(TILESET_COLONNE)} colonne x {len(righe_tileset)} righe "
+          f"({', '.join(righe_tileset)}).")
     return 0
 
 

@@ -31,7 +31,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_mirco",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 0
+      }
     },
     {
       "id": "npc_sidon",
@@ -129,7 +132,10 @@
         ]
       },
       "dialogue_id": "dlg_sidon",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 1
+      }
     },
     {
       "id": "npc_vesna",
@@ -189,7 +195,10 @@
         ]
       },
       "dialogue_id": "dlg_vesna",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 2
+      }
     },
     {
       "id": "npc_aldo",
@@ -226,7 +235,10 @@
         "ogni_momenti": 8,
         "sequenza_minima": 4
       },
-      "sfida_ai_tier": true
+      "sfida_ai_tier": true,
+      "aspetto": {
+        "variante": 3
+      }
     },
     {
       "id": "npc_ottavia",
@@ -257,7 +269,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_ottavia",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 4
+      }
     },
     {
       "id": "npc_bruno",
@@ -320,7 +335,10 @@
         ]
       },
       "dialogue_id": "dlg_bruno",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 5
+      }
     },
     {
       "id": "npc_lena",
@@ -351,7 +369,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_lena",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 0
+      }
     },
     {
       "id": "npc_doran",
@@ -382,7 +403,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_doran",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 1
+      }
     },
     {
       "id": "npc_generic_01",
@@ -413,7 +437,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 2
+      }
     },
     {
       "id": "npc_generic_02",
@@ -444,7 +471,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 3
+      }
     },
     {
       "id": "npc_generic_03",
@@ -475,7 +505,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 4
+      }
     },
     {
       "id": "npc_generic_04",
@@ -506,7 +539,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 5
+      }
     },
     {
       "id": "npc_generic_05",
@@ -537,7 +573,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 0
+      }
     },
     {
       "id": "npc_generic_06",
@@ -568,7 +607,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 1
+      }
     },
     {
       "id": "npc_generic_07",
@@ -599,7 +641,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 2
+      }
     },
     {
       "id": "npc_generic_08",
@@ -630,7 +675,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 3
+      }
     },
     {
       "id": "npc_generic_09",
@@ -661,7 +709,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 4
+      }
     },
     {
       "id": "npc_generic_10",
@@ -692,7 +743,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 5
+      }
     },
     {
       "id": "npc_antagonista",
@@ -711,7 +765,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_antagonista",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 0
+      }
     }
   ]
 }

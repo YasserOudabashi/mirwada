@@ -22,8 +22,6 @@ const W := 48
 const H := 36
 
 const SORGENTE := 0
-const PAVIMENTO := Vector2i(0, 0)
-const MURO := Vector2i(1, 0)
 
 ## Cella di comparsa del giocatore. Default; _ready() la sovrascrive con
 ## layout.spawn se la regione ha un layout disegnato a mano (US-805).
@@ -79,28 +77,49 @@ func _layout_dati() -> Dictionary:
 	return gd.call("get_layout", region_id) if gd != null else {}
 
 
-## Caratteri solidi (muro/ostacolo/acqua) della legenda di layout.schema.json.
-## L'acqua e' fisicamente solida in questa story: la resa e il comportamento
-## distinti arrivano con US-813.
-const _CARATTERI_SOLIDI := "#ot~"
+## Mappa carattere-legenda (layout.schema.json) -> colonna di tileset.png,
+## stesso ordine di generate_sprites.py.TILESET_COLONNE (US-813). L'acqua e'
+## fisicamente solida in questa story: la resa grafica distinta arriva, il
+## comportamento speciale resta un non-goal.
+const _COLONNA_PER_CARATTERE := {
+	".": 0, "#": 1, "o": 2, "~": 3, ",": 4, "=": 5, "t": 6, "+": 7,
+}
+const _COLONNA_MURO := 1
+const _COLONNA_PAVIMENTO := 0
+
+
+## Riga di tileset.png per questa regione: 0 (neutra) o 1 + indice della sua
+## palette_visiva in vfx.json.pathway_palette_visiva (stesso ordine con cui
+## generate_sprites.py.build_tileset ha disegnato le righe). Nessun nome di
+## Pathway qui: solo l'indice.
+func _riga_tileset() -> int:
+	var pal_id: String = str(_regione_dati().get("palette_visiva", ""))
+	if pal_id.is_empty() or pal_id == "neutra":
+		return 0
+	var gd: Node = get_node_or_null("/root/GameData")
+	var ids: Array = gd.call("vfx_palette_ids") if gd != null else []
+	var i: int = ids.find(pal_id)
+	return 1 + i if i >= 0 else 0
 
 
 func _dipingi() -> void:
+	var riga: int = _riga_tileset()
 	var layout: Dictionary = _layout_dati()
 	var mappa: Array = (layout.get("mappa", []) as Array)
 	if mappa.size() == H:
 		for y in H:
-			var riga: String = str(mappa[y])
-			if riga.length() != W:
+			var stringa: String = str(mappa[y])
+			if stringa.length() != W:
 				continue
 			for x in W:
-				var solido: bool = _CARATTERI_SOLIDI.contains(riga[x])
-				set_cell(Vector2i(x, y), SORGENTE, MURO if solido else PAVIMENTO)
+				var col: int = int(_COLONNA_PER_CARATTERE.get(stringa[x], _COLONNA_PAVIMENTO))
+				set_cell(Vector2i(x, y), SORGENTE, Vector2i(col, riga))
 		return
 	for x in W:
 		for y in H:
 			var bordo: bool = x == 0 or y == 0 or x == W - 1 or y == H - 1
-			set_cell(Vector2i(x, y), SORGENTE, MURO if bordo else PAVIMENTO)
+			var col: int = _COLONNA_MURO if bordo else _COLONNA_PAVIMENTO
+			set_cell(Vector2i(x, y), SORGENTE, Vector2i(col, riga))
 
 
 ## Densita' mistica visiva minima: una tinta di sfondo dalla palette_visiva
@@ -212,12 +231,15 @@ func _crea_passaggi() -> void:
 		rect.size = Vector2(TILE * 1.5, TILE * 2)
 		shape.shape = rect
 		area.add_child(shape)
-		var marker := ColorRect.new()
-		marker.color = Color(0.9, 0.85, 0.3, 0.5)
-		marker.position = -rect.size * 0.5
-		marker.size = rect.size
-		marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		area.add_child(marker)
+		# US-813: passaggio.png (arco/cartello), un tile sopra l'altro per
+		# coprire l'area 1.5x2 tile del varco.
+		var tex: Texture2D = load("res://assets/placeholder/passaggio.png")
+		if tex != null:
+			for cy in 2:
+				var s := Sprite2D.new()
+				s.texture = tex
+				s.position = Vector2(0, -TILE * 0.5 + TILE * cy)
+				area.add_child(s)
 		area.body_entered.connect(_su_passaggio.bind(dest))
 		add_child(area)
 
@@ -311,37 +333,69 @@ func _crea_oggetti() -> void:
 		pickup.set("quantita", int(spec.get("quantita", 1)))
 
 
-## Gli NPC presenti ORA (schedule + momento corrente, US-612): un marker nella
-## zona del loro location_tag. Ricostruito a ogni momento_cambiato - Bruno
-## compare solo di notte, Mirco sparisce a notte_fonda. Entrarci = "incontrato".
+## Gli NPC presenti ORA (schedule + momento corrente, US-612): uno sprite
+## nella zona del loro location_tag, con sopra una Label col nome (US-813:
+## niente piu' un ColorRect anonimo). Ricostruito a ogni momento_cambiato -
+## Bruno compare solo di notte, Mirco sparisce a notte_fonda. Entrarci =
+## "incontrato".
+##
+## US-813: piu' NPC con lo stesso location_tag (es. 6 a "piazza") non vanno
+## impilati sullo stesso punto - prima erano ColorRect anonimi identici e non
+## si notava, ora con sprite+nome l'impilamento e' illeggibile (etichette
+## sovrapposte). Distribuiti in fila, centrati sulla posizione della zona.
 func _crea_npc() -> void:
 	for c in get_children():
 		if c is Area2D and c.has_meta("npc_id"):
 			c.queue_free()
 	var ns: Node = get_node_or_null("/root/NpcSystem")
+	var gd: Node = get_node_or_null("/root/GameData")
 	if ns == null:
 		return
 	var presenti: Dictionary = ns.call("presenti", region_id)
+	var per_zona: Dictionary = {}
 	for id in presenti:
-		var zona: Node2D = get_node_or_null("Zona_%s" % str(presenti[id])) as Node2D
-		var area := Area2D.new()
-		area.name = "Npc_%s" % str(id)
-		area.set_meta("npc_id", str(id))
-		area.position = zona.position if zona != null else Vector2(W, H) * TILE * 0.5
-		var shape := CollisionShape2D.new()
-		var rect := RectangleShape2D.new()
-		rect.size = Vector2(TILE, TILE) * 1.2
-		shape.shape = rect
-		area.add_child(shape)
-		var m := ColorRect.new()
-		m.color = Color(0.4, 0.6, 0.95, 0.8)
-		m.size = Vector2(TILE, TILE)
-		m.position = -0.5 * m.size
-		m.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		area.add_child(m)
-		area.body_entered.connect(_npc_avvicinato.bind(str(id)))
-		area.body_exited.connect(_npc_allontanato.bind(str(id)))
-		add_child(area)
+		var tag: String = str(presenti[id])
+		if not per_zona.has(tag):
+			per_zona[tag] = []
+		(per_zona[tag] as Array).append(str(id))
+
+	for tag in per_zona:
+		var ids: Array = per_zona[tag]
+		var zona: Node2D = get_node_or_null("Zona_%s" % tag) as Node2D
+		var centro: Vector2 = zona.position if zona != null else Vector2(W, H) * TILE * 0.5
+		for i in ids.size():
+			_crea_un_npc(str(ids[i]), gd,
+				centro + Vector2((float(i) - (ids.size() - 1) * 0.5) * TILE * 1.5, 0))
+
+
+func _crea_un_npc(id: String, gd: Node, posizione: Vector2) -> void:
+	var area := Area2D.new()
+	area.name = "Npc_%s" % id
+	area.set_meta("npc_id", id)
+	area.position = posizione
+	var shape := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(TILE, TILE) * 1.2
+	shape.shape = rect
+	area.add_child(shape)
+
+	var npc_dati: Dictionary = gd.call("get_npc", id) if gd != null else {}
+	var variante: int = int((npc_dati.get("aspetto", {}) as Dictionary).get("variante", 0))
+	var sprite := Sprite2D.new()
+	sprite.texture = load("res://assets/placeholder/npc_popolano.png")
+	sprite.region_enabled = true
+	sprite.region_rect = Rect2(0, variante * TILE, TILE, TILE)
+	area.add_child(sprite)
+
+	var nome := Label.new()
+	nome.text = str(gd.call("tr_data", npc_dati.get("name_i18n", id))) if gd != null else id
+	nome.add_theme_font_size_override("font_size", 10)
+	nome.position = Vector2(-TILE, -TILE * 0.95)
+	area.add_child(nome)
+
+	area.body_entered.connect(_npc_avvicinato.bind(id))
+	area.body_exited.connect(_npc_allontanato.bind(id))
+	add_child(area)
 
 
 func _npc_avvicinato(body: Node, id: String) -> void:

@@ -48,7 +48,14 @@
             ]
           },
           "dialogue_id": { "type": "string" },
-          "memoria": { "type": "object" }
+          "memoria": { "type": "object" },
+          "aspetto": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "variante": { "type": "integer", "minimum": 0, "maximum": 5 }
+            }
+          }
         }
       }
     }

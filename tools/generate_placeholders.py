@@ -129,19 +129,6 @@ def main():
             path = os.path.join(OUT, f"{cat}_{name}.png")
             sheet.save(path)
 
-    # tileset placeholder: pavimento, muro, ostacolo, acqua (US-813 lo
-    # sostituisce con le 8 tile per palette generate da generate_sprites.py).
-    tiles = [("pavimento", (60, 55, 50)), ("muro", (30, 28, 26)),
-             ("ostacolo", (80, 70, 55)), ("acqua", (40, 70, 100))]
-    ts = Image.new("RGBA", (size[0] * len(tiles), size[1]), (0, 0, 0, 0))
-    for i, (_, col) in enumerate(tiles):
-        t = Image.new("RGBA", size, col + (255,))
-        dt = ImageDraw.Draw(t)
-        dt.rectangle([0, 0, size[0] - 1, size[1] - 1],
-                     outline=tuple(min(255, c + 30) for c in col) + (255,))
-        ts.paste(t, (i * size[0], 0))
-    ts.save(os.path.join(OUT, "tileset.png"))
-
     print(f"OK: {total} frame placeholder (arte + diagnostica) generati in assets/placeholder/")
     print("Legenda bordi: ROSSO hitbox attiva | GIALLO anticipo/tell | "
           "VERDE parata perfetta | CIANO invulnerabile | GRIGIO recupero")

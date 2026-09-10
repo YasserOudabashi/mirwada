@@ -10,8 +10,19 @@ extends "res://tests/test_case.gd"
 ## Blocco B (tutte e 5 le regioni hanno un layout da qui in poi).
 
 const TILE := 32  # region_scene.gd::TILE
-const PAVIMENTO := Vector2i(0, 0)  # region_scene.gd::PAVIMENTO
-const MURO := Vector2i(1, 0)       # region_scene.gd::MURO
+
+## Colonne di tileset.png (US-813, region_scene.gd::_COLONNA_PER_CARATTERE),
+## stesso ordine di generate_sprites.py.TILESET_COLONNE.
+const COL_PAVIMENTO := 0
+const COL_MURO := 1
+const COL_ACQUA := 3
+const COL_SENTIERO := 5
+
+## Righe di tileset.png: 0 = neutra, poi 1 + indice della palette_visiva in
+## data/vfx.json.pathway_palette_visiva (region_scene.gd::_riga_tileset()).
+## mirwada e' "neutra"; le altre 4 regioni con layout hanno palette diverse
+## -> righe diverse, verificato una volta in test_riga_tileset_per_palette.
+const RIGA_NEUTRA := 0
 
 
 func _root() -> Node: return Engine.get_main_loop().root
@@ -53,10 +64,10 @@ func test_mirwada_dipinta_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("mirwada")
 	var scena: TileMapLayer = r["scena"]
 
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), MURO, "bordo esterno solido")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(1, 1)), PAVIMENTO, "cella '.' interna non solida")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(44, 29)), MURO,
-		"cella '~' (acqua) e' solida in questa story (US-813 le da' la resa vera)")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), Vector2i(COL_MURO, RIGA_NEUTRA), "bordo esterno solido")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(1, 1)), Vector2i(COL_PAVIMENTO, RIGA_NEUTRA), "cella '.' interna non solida")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(44, 29)), Vector2i(COL_ACQUA, RIGA_NEUTRA),
+		"cella '~' (acqua) usa la colonna acqua ed e' solida (US-813)")
 
 	(r["cont"] as Node2D).free()
 
@@ -226,12 +237,13 @@ func test_marche_dipinta_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("marche_crepuscolo")
 	var scena: TileMapLayer = r["scena"]
 
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), MURO, "bordo esterno solido")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(1, 1)), PAVIMENTO, "cella '.' di brughiera non solida")
+	var riga: int = scena.get_cell_atlas_coords(Vector2i(1, 1)).y
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(1, 1)), Vector2i(COL_PAVIMENTO, riga), "cella '.' di brughiera non solida")
 	# muro della cripta (data/world/layouts/marche_crepuscolo.json: zona cripta [20,19,8,8])
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(20, 19)), MURO, "muro della cripta solido")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(20, 19)), Vector2i(COL_MURO, riga), "muro della cripta solido")
 	# varco della cripta sul lato sud (riga 26, colonne 23-24 libere)
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(23, 26)), PAVIMENTO, "il varco della cripta e' calpestabile")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(23, 26)), Vector2i(COL_PAVIMENTO, riga), "il varco della cripta e' calpestabile")
 
 	(r["cont"] as Node2D).free()
 
@@ -336,14 +348,15 @@ func test_valle_dipinta_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("valle_madre")
 	var scena: TileMapLayer = r["scena"]
 
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), MURO, "bordo esterno solido")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(1, 1)), PAVIMENTO, "cella '.' del bosco non solida")
+	var riga: int = scena.get_cell_atlas_coords(Vector2i(1, 1)).y
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(1, 1)), Vector2i(COL_PAVIMENTO, riga), "cella '.' del bosco non solida")
 	# data/world/layouts/valle_madre.json: acqua '~' nella zona grotta_di_marea, es. (40,5)
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(40, 5)), MURO,
-		"cella '~' della grotta di marea e' solida in questa story (US-813 le da' la resa vera)")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(40, 5)), Vector2i(COL_ACQUA, riga),
+		"cella '~' della grotta di marea usa la colonna acqua ed e' solida (US-813)")
 	# il ponte di radici '=' che attraversa l'acqua, es. (41,5), resta calpestabile
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(41, 5)), PAVIMENTO,
-		"il ponte di radici che attraversa la grotta di marea e' calpestabile")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(41, 5)), Vector2i(COL_SENTIERO, riga),
+		"il ponte di radici ('=') che attraversa la grotta di marea e' calpestabile")
 
 	(r["cont"] as Node2D).free()
 
@@ -448,12 +461,13 @@ func test_archivio_dipinta_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("archivio_sepolto")
 	var scena: TileMapLayer = r["scena"]
 
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), MURO, "bordo esterno solido")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(4, 4)), PAVIMENTO, "spawn dentro la sala biblioteca, calpestabile")
+	var riga: int = scena.get_cell_atlas_coords(Vector2i(4, 4)).y
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(4, 4)), Vector2i(COL_PAVIMENTO, riga), "spawn dentro la sala biblioteca, calpestabile")
 	# data/world/layouts/archivio_sepolto.json: muro interno della sala officina
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(17, 5)), MURO, "muro interno di una sala solido")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(17, 5)), Vector2i(COL_MURO, riga), "muro interno di una sala solido")
 	# varco fra biblioteca e officina sul corridoio y=9
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(16, 9)), PAVIMENTO, "varco fra le sale e' calpestabile")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(16, 9)), Vector2i(COL_PAVIMENTO, riga), "varco fra le sale e' calpestabile")
 
 	(r["cont"] as Node2D).free()
 
@@ -558,12 +572,13 @@ func test_frontiera_dipinta_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("frontiera_porte")
 	var scena: TileMapLayer = r["scena"]
 
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), MURO, "bordo esterno solido")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(15, 4)), MURO,
-		"cella '~' (nebbia) fuori da un'isola e' solida in questa story (US-813 le da' la resa vera)")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(7, 7)), PAVIMENTO, "spawn sull'isola soglia, calpestabile")
+	var riga: int = scena.get_cell_atlas_coords(Vector2i(7, 7)).y
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(15, 4)), Vector2i(COL_ACQUA, riga),
+		"cella '~' (nebbia) fuori da un'isola usa la colonna acqua ed e' solida (US-813)")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(7, 7)), Vector2i(COL_PAVIMENTO, riga), "spawn sull'isola soglia, calpestabile")
 	# ponte '=' che collega la crocevia centrale alle isole
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(24, 12)), PAVIMENTO, "il ponte fra isole e' calpestabile")
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(24, 12)), Vector2i(COL_SENTIERO, riga), "il ponte ('=') fra isole e' calpestabile")
 
 	(r["cont"] as Node2D).free()
 
@@ -659,3 +674,51 @@ func test_nemici_di_frontiera_senza_player_restano_inerti() -> void:
 		assert_eq(str(e.call("stato")), "IDLE", "nessun bersaglio -> resta IDLE, nessun crash")
 
 	cont.free()
+
+
+## --- US-813: tileset a righe-per-palette, NPC con sprite + nome ---
+
+
+## Verifica diretta (non auto-consistente come i test sopra) che la riga
+## scelta da region_scene.gd::_riga_tileset() sia proprio 1 + l'indice della
+## palette_visiva della regione in vfx.json.pathway_palette_visiva, non solo
+## una riga qualunque diversa da 0.
+func test_riga_tileset_per_palette_non_neutra() -> void:
+	var pal_id: String = str(_gd().call("get_region", "marche_crepuscolo").get("palette_visiva", ""))
+	var attesa: int = 1 + (_gd().call("vfx_palette_ids") as Array).find(pal_id)
+	assert_true(attesa > 0, "marche_crepuscolo ha una palette_visiva non neutra")
+
+	var r: Dictionary = _istanzia_con_player("marche_crepuscolo")
+	var scena: TileMapLayer = r["scena"]
+	assert_eq(scena.get_cell_atlas_coords(Vector2i(1, 1)).y, attesa,
+		"la riga del tileset e' 1 + l'indice della palette della regione")
+
+	(r["cont"] as Node2D).free()
+
+
+## Un NPC presente in scena e' uno Sprite2D (da npc_popolano.png) con sopra
+## una Label che mostra il nome tradotto (US-813), non piu' un ColorRect
+## anonimo.
+func test_npc_ha_sprite_e_nome_tradotto() -> void:
+	var r: Dictionary = _istanzia_con_player("mirwada")
+	var scena: Node = r["scena"]
+
+	var npc: Node = scena.get_node_or_null("Npc_npc_mirco")
+	assert_false(npc == null, "npc_mirco e' presente in piazza all'alba")
+
+	var sprite: Sprite2D = null
+	var label: Label = null
+	for c in npc.get_children():
+		if c is Sprite2D:
+			sprite = c
+		elif c is Label:
+			label = c
+	assert_false(sprite == null, "l'NPC ha uno Sprite2D")
+	assert_true(sprite.texture != null and sprite.texture.resource_path.ends_with("npc_popolano.png"),
+		"lo sprite usa npc_popolano.png")
+
+	assert_false(label == null, "l'NPC ha una Label col nome")
+	var atteso: String = str(_gd().call("tr_data", _gd().call("get_npc", "npc_mirco").get("name_i18n", "")))
+	assert_eq(label.text, atteso, "il testo della Label e' il nome tradotto (GameData.tr_data)")
+
+	(r["cont"] as Node2D).free()
