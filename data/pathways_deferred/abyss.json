@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "abyss",
+  "categoria": "standard",
   "name": "Abyss",
   "name_i18n": "pathway.abyss",
   "group": "father_of_devils",

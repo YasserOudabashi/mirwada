@@ -9699,3 +9699,120 @@ fuori da un US di prd.json)
   resta solo l'idea di dare un Pathway "vero" (con un proprio boss/
   ingredienti dedicati, non solo un boss altrui incontrato per caso) a
   Death e Moon nella stessa regione dei loro boss trovati per bonus.
+
+---
+
+[2026-09-10] Fase 9 avviata — US-901: vocabolario e schema del motore Boon
+
+COSA FATTO.
+- PRD nuovo: 006_PRD/prd-fase-9-pathway-non-standard.md (7 story
+  US-901..US-907, 4 blocchi: fondamenta del motore Boon, contenuto di
+  Eternal Aeon 10/10 Sequenze, sezione "Dono" nel diagramma, checkpoint +
+  chiusura). Decisioni prese con l'utente: un solo Pathway Non-Standard
+  per ora (Eternal Aeon), meccanica a dono una tantum (non a gradini, non
+  ad accumulo continuo), tre fonti di requisito combinabili per Sequenza
+  (quest/comportamento/sacrificio), stessa scala Sequenza 9->0 dei Pathway
+  standard, Eternal Aeon selezionabile col ciclo standard di creazione
+  (nessun gating narrativo in questa fase). prd.json rigenerato da /ralph
+  (7 story, priority 1..7, fase: 9) - il prd.json di fase 8 (tutto
+  passes:true) e' sostituito, progress.txt storicizza gia' quel lavoro.
+- data/schema/boon.schema.json (nuovo): il campo 'boon' di una Sequenza -
+  requisiti: [] con 3 tipi mutuamente esclusivi per voce (quest/
+  comportamento/sacrificio), ognuno coi propri campi. 'comportamento' ha
+  lo stesso schema di acting_actions (evento/filtri/target) ma letto da
+  BoonSystem con una baseline propria (US-902), non da Acting. 'sacrificio'
+  ha un costo {tipo: oggetto|caratteristica|follia, id, quantita} - id
+  richiesto solo per oggetto/caratteristica, follia e' solo una quantita'.
+- data/schema/pathway.schema.json aggiornato: nuovo campo 'categoria'
+  (standard|non_standard, richiesto su ogni Pathway); 'group' ora accetta
+  null (solo per non_standard: nessun gruppo, nessuna fusione verso di
+  loro, US-903); il campo 'boon' aggiunto come alternativa a 'potion'
+  sulla Sequenza, con un commento che spiega la mutua esclusione (imposta
+  dal validator, non dallo schema-documentazione: questo progetto non usa
+  una libreria jsonschema, vedi header di validate_data.py); la lista
+  'required' della Sequenza allentata (acting_actions/potion/
+  advancement_ritual/madness_on_force non sono piu' incondizionatamente
+  richiesti, dato che una Sequenza non_standard non li ha).
+- tools/add_pathway_categoria.py (nuovo, idempotente, stesso pattern di
+  generate_i18n_stubs.py "riscrive i dati esistenti"): aggiunge
+  categoria:"standard" subito dopo "id" a tutti i 22 Pathway esistenti
+  (10 in data/pathways/ + 12 in data/pathways_deferred/). Eseguito una
+  volta: diff pulito, una riga per file (verificato che un round-trip
+  json.load+json.dump di un file pathway e' byte-identico all'originale
+  prima di scrivere lo script, cosi' l'inserimento chirurgico non
+  introduce differenze di formattazione spurie).
+- tools/validate_data.py esteso:
+  - Nel loop esistente di data/pathways/: ogni file deve avere
+    categoria:"standard" (e' l'unica categoria ammessa li'); una Sequenza
+    con un campo 'boon' e' un errore (il campo e' riservato ai Pathway
+    non_standard, che vivono altrove).
+  - Nuovo loop leggero per data/pathways_deferred/: stesso controllo di
+    categoria (nessun'altra validazione, come prima di questa story - i
+    Pathway differiti restano fuori dalla validazione piena, gia' cosi'
+    da prima).
+  - Nuova funzione valida_boon(): valida boon.requisiti[] contro il
+    vocabolario chiuso dei 3 tipi; per 'quest' verifica che quest_id
+    esista in data/quests/; per 'comportamento' che l'evento sia uno dei
+    12 tracciati e i filtri quelli ammessi per quell'evento, target > 0;
+    per 'sacrificio' che costo.tipo sia uno dei 3 ammessi e costo.id
+    esista nella categoria giusta (item per "oggetto", Caratteristica per
+    "caratteristica"), quantita > 0.
+  - Nuovo loop per data/pathways_non_standard/ (SALTATO senza errore se la
+    cartella non esiste - e' lo stato atteso fino a US-904, che scrivera'
+    il primo file, Eternal Aeon): per ogni Pathway li' dentro, categoria
+    deve essere "non_standard", group deve essere null, 10 Sequenze
+    9..0, ogni Sequenza non-stub deve avere un 'boon' valido (mai un
+    'potion': errore se presente), ogni Sequenza stub NON deve avere un
+    boon (altrimenti a cosa serve lo stub). Chiamata a valida_boon() per
+    ogni boon trovato. Posizionato vicino alla fine del file (prima del
+    blocco "chiusura fase 8") perche' serve quest_docs/item_ids/char_ids,
+    tutti costruiti prima in punti diversi del file - spostare il blocco
+    li' evita di duplicare quelle scansioni o di riordinare blocchi
+    esistenti (diff minimo).
+
+COME VERIFICATO.
+- python tools/validate_data.py PRIMA di eseguire add_pathway_categoria.py:
+  22 errori "categoria deve essere 'standard'" (uno per ogni Pathway,
+  esattamente 10+12) - prova diretta che i nuovi controlli funzionano
+  davvero prima di sistemare i dati, non solo che restano silenziosi.
+- python tools/validate_data.py DOPO: esce 0, stessi 3 warning di sempre.
+- VERIFICA MANUALE dei percorsi di errore di valida_boon() e del loop
+  pathways_non_standard/ (non ci sono "test headless" per questo: e' un
+  controllo di un file Python, non del motore Godot, e nessuna story
+  precedente di validate_data.py ha mai avuto test GDScript dedicati alle
+  sue sole diramazioni interne - il pattern di questo progetto e' il test
+  headless che lancia validate_data.py sui DATI VERI, gia' esistente,
+  invariato da questa story). Creata una cartella data/pathways_non_standard/
+  temporanea con un file "test_fixture.json" apposta rotto in 6 modi
+  diversi contemporaneamente (potion+boon insieme, quest_id inesistente,
+  Sequenza ne' potion ne' boon ne' stub, stub con boon, tipo di requisito
+  inventato, filtro non ammesso, target negativo, item/Caratteristica
+  inesistenti nel sacrificio, tipo di costo inventato, conteggio Sequenze
+  sbagliato, numerazione incompleta): tutti e 14 gli errori attesi sono
+  comparsi, uno per uno, col messaggio giusto - nessun falso negativo,
+  nessun crash (piu' 5 errori di i18n mancante, incidentali: il fixture
+  non aveva traduzioni, non era quello sotto verifica). Cartella e file
+  di prova cancellati subito dopo (git status conferma: nessuna traccia
+  rimasta).
+- godot --headless --path . --import: pulito.
+- godot --headless --path . --script res://tests/run_tests.gd: 852 test,
+  tutti passati. Nessuna regressione (questa story non tocca GDScript:
+  solo dati JSON, schema di documentazione, un tool Python nuovo, e
+  validate_data.py).
+
+COSA RESTA APERTO (per le story successive, dichiarato nel PRD).
+- BoonSystem (il motore vero, US-902) non esiste ancora: il campo 'boon'
+  e' solo dati + validazione, nessun codice lo legge a runtime.
+- GameData non carica ancora data/pathways_non_standard/ (nessun file li'
+  dentro finche' US-904 non scrive Eternal Aeon): quando quella story
+  crea il file, il loader (_load_pathways() in game_data.gd) andra' esteso
+  a scandire anche quella cartella, cosi' pathway_ids() lo include
+  automaticamente nel menu di creazione (decisione gia' presa con
+  l'utente: nessun accessore parallelo, un solo pathway_ids() che li
+  contiene tutti). Annotato qui perche' il PRD lo aveva lasciato come
+  domanda aperta ("da confermare... decisione di implementazione in
+  US-901") - la decisione e' presa, l'implementazione arriva quando il
+  file da caricare esiste davvero (US-904), non prima.
+
+PROSSIMA STORIA: US-902 — BoonSystem (autoload): requisiti_stato(),
+puo_ricevere(), ricevi_boon().

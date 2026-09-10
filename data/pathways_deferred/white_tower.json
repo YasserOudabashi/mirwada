@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "white_tower",
+  "categoria": "standard",
   "name": "White Tower",
   "name_i18n": "pathway.white_tower",
   "group": "god_almighty",

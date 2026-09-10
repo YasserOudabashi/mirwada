@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "hermit",
+  "categoria": "standard",
   "name": "Hermit",
   "name_i18n": "pathway.hermit",
   "group": "demon_of_knowledge",

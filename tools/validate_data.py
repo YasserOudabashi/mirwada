@@ -62,6 +62,59 @@ def expected_tier(seq_num):
     return "god"
 
 
+VALID_BOON_TIPI = {"quest", "comportamento", "sacrificio"}
+VALID_COSTO_TIPI = {"oggetto", "caratteristica", "follia"}
+
+
+def valida_boon(rel, sid, boon, events, quest_ids, item_ids, char_ids):
+    """Valida il campo 'boon' di una Sequenza di un Pathway non_standard
+    (fase 9, US-901: data/schema/boon.schema.json). Ritorna una lista di
+    stringhe di errore, il chiamante le passa a err()."""
+    out = []
+    requisiti = boon.get("requisiti", [])
+    if not isinstance(requisiti, list) or not requisiti:
+        out.append(f"{rel} [{sid}]: boon.requisiti deve essere una lista non vuota")
+        return out
+    for i, req in enumerate(requisiti):
+        etichetta = f"{rel} [{sid}] boon.requisiti[{i}]"
+        tipo = req.get("tipo")
+        if tipo not in VALID_BOON_TIPI:
+            out.append(f"{etichetta}: tipo '{tipo}' non nel vocabolario chiuso {sorted(VALID_BOON_TIPI)}")
+            continue
+        if tipo == "quest":
+            qid = req.get("quest_id")
+            if qid not in quest_ids:
+                out.append(f"{etichetta}: quest_id '{qid}' non esiste in data/quests/")
+        elif tipo == "comportamento":
+            ev = req.get("evento")
+            if ev not in events:
+                out.append(f"{etichetta}: evento '{ev}' non nel vocabolario chiuso di "
+                            f"data/schema/tracked_events.json. Un evento nuovo e' CODICE: "
+                            f"va discusso, non aggiunto di slancio.")
+            else:
+                allowed = set(events[ev].get("filtri", []))
+                for f in req.get("filtri", {}):
+                    if f not in allowed:
+                        out.append(f"{etichetta}: filtro '{f}' non ammesso per l'evento "
+                                    f"'{ev}' (ammessi: {sorted(allowed)})")
+            if not req.get("target", 0) > 0:
+                out.append(f"{etichetta}: target deve essere un numero > 0")
+        elif tipo == "sacrificio":
+            costo = req.get("costo", {})
+            ctipo = costo.get("tipo")
+            if ctipo not in VALID_COSTO_TIPI:
+                out.append(f"{etichetta}: costo.tipo '{ctipo}' non nel vocabolario chiuso "
+                            f"{sorted(VALID_COSTO_TIPI)}")
+            elif ctipo == "oggetto" and costo.get("id") not in item_ids:
+                out.append(f"{etichetta}: costo.id '{costo.get('id')}' non e' un item esistente")
+            elif ctipo == "caratteristica" and costo.get("id") not in char_ids:
+                out.append(f"{etichetta}: costo.id '{costo.get('id')}' non e' una Caratteristica esistente")
+            if ctipo in ("oggetto", "caratteristica") and not (
+                    isinstance(costo.get("quantita"), (int, float)) and costo.get("quantita") > 0):
+                out.append(f"{etichetta}: costo.quantita deve essere un numero > 0")
+    return out
+
+
 def main():
     # --- vocabolari di riferimento ---
     prim_doc = load_json(os.path.join(DATA, "schema", "primitives.json"))
@@ -145,6 +198,12 @@ def main():
             err(f"{rel}: il nome file non corrisponde all'id '{pid}'")
         if doc.get("group") not in VALID_GROUPS:
             err(f"{rel}: gruppo non valido '{doc.get('group')}'")
+        # US-901: distingue Pathway standard (pozione+recitazione) da quelli
+        # non_standard (Boon, data/pathways_non_standard/) - un file qui
+        # dev'essere sempre 'standard', l'altra categoria vive altrove.
+        if doc.get("categoria") != "standard":
+            err(f"{rel}: categoria deve essere 'standard' per un pathway in "
+                f"data/pathways/ (trovato: {doc.get('categoria')!r})")
         if not isinstance(doc.get("gameplay_verb"), str) or len(doc.get("gameplay_verb", "")) < 10:
             err(f"{rel}: gameplay_verb mancante o troppo generico")
         for t in doc.get("tags", []):
@@ -228,6 +287,12 @@ def main():
             pot = seq.get("potion", {})
             if not stub and pot.get("formula_id"):
                 potion_refs.append((rel, sid, n, pot))
+            # US-901: 'boon' e' riservato ai Pathway non_standard (data/
+            # pathways_non_standard/) - qui sarebbe sempre un errore di
+            # collocazione, mai una scelta valida.
+            if seq.get("boon") is not None:
+                err(f"{rel} [{sid}]: 'boon' su un Pathway standard - il campo e' "
+                    f"riservato ai Pathway non_standard (US-901).")
 
             total_prog = 0.0
             for act in seq.get("acting_actions", []):
@@ -295,6 +360,21 @@ def main():
         dupes = [k for k, v in Counter(values).items() if v > 1]
         if dupes:
             err(f"id {name} duplicati: {dupes}")
+
+    # --- categoria dei Pathway differiti (data/pathways_deferred/, US-901) ---
+    # Non sono caricati da GameData e restano fuori dalla validazione piena
+    # dei Pathway attivi (vedi sopra): qui solo il campo 'categoria' aggiunto
+    # in fase 9, per coerenza col resto del vocabolario (sono tutti standard,
+    # nessun Pathway differito e' non_standard).
+    pddir = os.path.join(DATA, "pathways_deferred")
+    if os.path.isdir(pddir):
+        for fn in sorted(f for f in os.listdir(pddir) if f.endswith(".json")):
+            _d = load_json(os.path.join(pddir, fn))
+            if _d is None:
+                continue
+            if _d.get("categoria") != "standard":
+                err(f"data/pathways_deferred/{fn}: categoria deve essere 'standard' "
+                    f"(trovato: {_d.get('categoria')!r})")
 
     # --- percorsi di fusione (data/fusions/, fase 7 US-702) ---
     # Il cambio di Pathway funziona solo tra vicini dello STESSO gruppo. I
@@ -2367,6 +2447,69 @@ def main():
     if _end_ids != {"apoteosi", "consumazione", "rinuncia"}:
         err(f"data/endings.json: attesi esattamente i 3 finali con la fase 7 chiusa, "
             f"trovati {sorted(_end_ids)} (US-721).")
+
+    # --- Pathway Non-Standard (data/pathways_non_standard/, fase 9 US-901) ---
+    # Terza categoria, separata da data/pathways/ (10 standard attivi) e
+    # data/pathways_deferred/ (12 standard differiti): avanzano per Boon, non
+    # per pozione+recitazione (data/schema/boon.schema.json). Non hanno
+    # gruppo (fusione/cambio Pathway restano solo fra Pathway standard,
+    # US-903) e non contano nell'EXPECTED_PATHWAYS/GROUP_SIZES di sopra:
+    # vivono in una cartella diversa, quel codice non li legge mai. La
+    # cartella non esiste finche' US-904 non scrive il primo file (Eternal
+    # Aeon): nessun errore se assente, e' lo stato atteso di questa story.
+    _quest_ids_tutte = set(quest_docs.keys())
+    pnsdir = os.path.join(DATA, "pathways_non_standard")
+    if os.path.isdir(pnsdir):
+        for fn in sorted(f for f in os.listdir(pnsdir) if f.endswith(".json")):
+            _doc = load_json(os.path.join(pnsdir, fn))
+            if _doc is None:
+                continue
+            _rel = f"data/pathways_non_standard/{fn}"
+            _pid = _doc.get("id")
+            if fn != f"{_pid}.json":
+                err(f"{_rel}: il nome file non corrisponde all'id '{_pid}'")
+            if _doc.get("categoria") != "non_standard":
+                err(f"{_rel}: categoria deve essere 'non_standard' (trovato: {_doc.get('categoria')!r})")
+            if _doc.get("group") is not None:
+                err(f"{_rel}: group deve essere null per un Pathway non_standard "
+                    f"(non appartiene a nessun gruppo, US-903).")
+            _seqs = _doc.get("sequences", [])
+            if len(_seqs) != EXPECTED_SEQUENCES_PER_PATHWAY:
+                err(f"{_rel}: {len(_seqs)} sequenze, attese {EXPECTED_SEQUENCES_PER_PATHWAY}")
+            _seen_nums = []
+            for _seq in _seqs:
+                _n = _seq.get("sequence")
+                _seen_nums.append(_n)
+                _sid = _seq.get("id")
+                if _sid != f"{_pid}_{_n}":
+                    err(f"{_rel}: id sequenza '{_sid}' non coerente con pathway/numero")
+                if _seq.get("tier") not in VALID_TIERS:
+                    err(f"{_rel} [{_sid}]: tier non valido '{_seq.get('tier')}'")
+                elif _seq.get("tier") != expected_tier(_n):
+                    err(f"{_rel} [{_sid}]: tier '{_seq.get('tier')}' errato, atteso '{expected_tier(_n)}'")
+                if not _seq.get("name"):
+                    err(f"{_rel} [{_sid}]: nome sequenza mancante")
+                if len(_seq.get("concept", "")) < 20:
+                    err(f"{_rel} [{_sid}]: concept mancante o troppo vago. Ogni sequenza "
+                        f"deve dichiarare COSA FA IL GIOCATORE a quel livello.")
+                _stub = bool(_seq.get("stub"))
+                _has_potion = _seq.get("potion") is not None
+                _has_boon = _seq.get("boon") is not None
+                if _has_potion:
+                    err(f"{_rel} [{_sid}]: 'potion' su un Pathway non_standard - usa 'boon' (US-901).")
+                if _stub:
+                    if _has_boon:
+                        err(f"{_rel} [{_sid}]: marcata stub ma ha un boon: togli il flag o svuotalo.")
+                elif not _has_boon:
+                    err(f"{_rel} [{_sid}]: nessun 'boon' e nessun flag stub: il giocatore "
+                        f"non ha un percorso di avanzamento a questa Sequenza.")
+                elif isinstance(_seq.get("boon"), dict):
+                    for _e in valida_boon(_rel, _sid, _seq["boon"], events,
+                                           _quest_ids_tutte, item_ids, char_ids):
+                        err(_e)
+            if sorted(_seen_nums, reverse=True) != list(range(9, -1, -1)):
+                err(f"{_rel}: le sequenze non coprono esattamente 9..0 "
+                    f"(trovate {sorted(_seen_nums, reverse=True)})")
 
     # --- chiusura fase 8 (US-814): la vertical slice e' giocabile ---
     # "ogni ingrediente attivo ha una fonte" e' gia' il blocco US-809c qui

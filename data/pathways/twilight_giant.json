@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "twilight_giant",
+  "categoria": "standard",
   "name": "Twilight Giant",
   "name_i18n": "pathway.twilight_giant",
   "group": "eternal_darkness",
