@@ -92,14 +92,45 @@
       "description": "Come giocatore, voglio che la citta' hub sia un luogo con un'identita' fisica - non un rettangolo con 5 zone invisibili sovrapposte.",
       "acceptanceCriteria": [
         "Layout ridisegnato piu' grande (dimensione libera, non piu' vincolata a 48x36), con i 5 location_tags di Mirwada (porto, archivio, vicolo, piazza, sotterraneo) come zone fisicamente distinte e riconoscibili (non rettangoli a griglia automatica).",
-        "Almeno 3 edifici visitabili (interni, vedi Blocco B) coerenti coi biomi di design-world.md §2.1 (la casa di Lena, l'archivio di Ottavia, una bettola del porto).",
         "Nessuna regressione: gli 8 NPC esistenti restano raggiungibili, le quest di Atto I restano completabili.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
       "priority": 6,
       "fase": 10,
+      "passes": true,
+      "notes": "SPLIT IN CORSA (segnalato, non un'esecuzione a testa bassa - CLAUDE.md: 'se superi ~200 righe di diff la story era troppo grande, segnalalo e proponi di spezzarla'): l'AC originale ('Almeno 3 edifici visitabili, vedi Blocco B') dipende da un motore che non esiste ancora - US-1010 (Blocco B, 'Vocabolario di un insediamento') era schedulata DOPO US-1006..1009 nel PRD, ma implementare 'edifici visitabili' senza quel motore avrebbe voluto dire scrivere codice specifico per Mirwada (contro Regola 1 di CLAUDE.md: 'i dati non sono codice', mai un caso speciale per un luogo). Riordinato invece di tirare dritto: US-1010 portata avanti a priority 7 (subito dopo questa), nuova US-1005B ('I 3 edifici visitabili di Mirwada', priority 8) usa quel motore per gli edifici veri di questa citta'; US-1006..1009/1011..1014 slittate di conseguenza (vedi le rispettive note). FATTO qui: data/world/layouts/mirwada.json ridisegnato da 48x36 a 64x44 (dimensione libera, US-1001/1002 avevano gia' tolto il vincolo al motore - qui si e' tolto anche dal validator, vedi sotto), 5 quartieri fisicamente distinti e riconoscibili nel terreno (non rettangoli a griglia automatica, gia' veri anche nella versione 48x36 di fase 8 ma qui ridisegnati piu' grandi e piu' ricchi): archivio (edificio murato con scaffali, ovest-nord), vicolo (isolato di casette 'o' con vicoli 'calpestabili tra, canale '=' verso la piazza), piazza (aperta, pavimento ','), sotterraneo (edificio murato con porta, cosmetico per ora - un interno vero arriva con US-1005B/US-1010), porto (banchina + specchio d'acqua '~' + molo '='). I 7 nemici e i 16 oggetti esistenti sono stati riposizionati sulle nuove celle calpestabili (stessi sequenza/scala/override/item_id/quantita', solo x/y cambiati) - nessuna regressione sul contenuto. Rimosso il campo 'passaggi' (morto: US-1002B aveva gia' smesso di leggerlo, sostituito da world_scene.gd::passaggi_verso() generico) da tutti e 5 i layout + dal validator + dallo schema - pulizia piccola ma diretta, notata mentre si toccava il file. tools/validate_data.py: i controlli su mappa/spawn/zone (righe, lunghezza riga, bordo, limiti) erano ancora hardcoded a 48x36 (dimenticati in US-1001/1002, che avevano gia' liberato il motore ma non il validator) - generalizzati a leggere la dimensione vera dalla mappa stessa (riga 0 detta la larghezza), stesso principio del blocco world_offset/non-sovrapposizione (gia' dimension-free da US-1001). data/schema/layout.schema.json aggiornato allo stesso modo + nota sul campo 'passaggi' ritirato. tests/test_layouts.gd + tests/test_world_scene.gd: le due helper _nemici_di/_pickup_di (e i due Rect2 diretti in test_world_scene.gd) usavano Vector2(48,36) hardcoded per isolare gli entità di Mirwada dal resto del mondo continuo - con Mirwada ora piu' grande, generalizzate a leggere la dimensione vera dal layout (nuovo helper _dim(region_id), stesso calcolo di world_scene.gd::_dimensioni_layout). test_mirwada_dipinta_dal_layout (cella acqua) e test_mirwada_zona_dal_rettangolo_del_layout (rettangolo del porto) aggiornati alle nuove coordinate/lette dai dati invece che scritte a mano. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 909 test, tutti passati (nessuna regressione, nessun test nuovo - solo migrazione di quelli esistenti alla nuova geometria); python tools/validate_data.py -> 0 errori, 2 warning (invariati); verifica a schermo con Xvfb (script ad-hoc non committato, screenshot mandati in chat) - le 5 zone si vedono fisicamente (l'edificio del sotterraneo con la sua porta, l'acqua del porto, gli isolati del vicolo), gli 8 NPC nominati + i 10 generici risultano tutti presenti (NpcSystem.presenti('mirwada') -> 16 voci)."
+    },
+    {
+      "id": "US-1010",
+      "title": "Vocabolario di un insediamento (edificio con interno)",
+      "description": "Come sistema, serve un modo dati-driven di dichiarare \"qui c'e' un edificio, ha una porta, dentro c'e' una scena interna\" - riusando la tecnica gia' in campo per i passaggi tra regioni (un'Area2D che carica un'altra scena), applicata a un ambito piccolo e locale.",
+      "acceptanceCriteria": [
+        "Nuovo campo layout (es. edifici: [{x, y, interno_id}]) - un marcatore sulla mappa esterna con una porta, che referenzia un file data/world/interni/<interno_id>.json (stesso schema di un layout, ma tipicamente piccolo: una stanza o poche stanze).",
+        "Entrare nella porta carica la scena interna (piccola, locale - stesso pattern tecnico di _su_passaggio, mai un sistema nuovo); uscire torna nella mappa esterna, alla cella della porta.",
+        "Il validator verifica che ogni interno_id referenziato esista, e che ogni file interno abbia uno spawn valido.",
+        "Nessun nuovo tipo di pagina, nessuna nuova primitiva: un interno e' un layout come un altro, letto dallo stesso region_scene/world_scene.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 7,
+      "fase": 10,
       "passes": false,
-      "notes": ""
+      "notes": "Portata avanti da priority 11 a priority 7 (segnalato in US-1005.notes): US-1005 aveva bisogno proprio di questo motore per 'Almeno 3 edifici visitabili' e non esisteva ancora - piu' sensato costruirlo ora, prima di US-1005B, che verso la fine del Blocco A dove il PRD originale lo aveva schedulato. Nessun'altra modifica al contenuto della story."
+    },
+    {
+      "id": "US-1005B",
+      "title": "I 3 edifici visitabili di Mirwada",
+      "description": "Come giocatore, voglio poter entrare davvero nei 3 edifici promessi dall'AC originale di US-1005 (la casa di Lena, l'archivio di Ottavia, una bettola del porto) - usando il motore generico di US-1010 (edifici: [{x, y, interno_id}] + data/world/interni/<interno_id>.json), non codice dedicato a Mirwada.",
+      "acceptanceCriteria": [
+        "data/world/layouts/mirwada.json: nuovo campo 'edifici' con almeno 3 marcatori (Lena nel quartiere vicolo, Ottavia nell'edificio archivio gia' disegnato in US-1005, una bettola nel porto), ognuno con un interno_id che referenzia un file data/world/interni/<interno_id>.json vero (non uno stub vuoto: almeno uno spawn valido e un elemento riconoscibile per interno - un NPC, un oggetto, o un dettaglio di zona).",
+        "Entrare nella porta di ognuno dei 3 edifici carica il rispettivo interno; uscire torna alla mappa esterna di Mirwada, alla cella della porta - usando esclusivamente il motore di US-1010, zero righe di codice che nominino 'mirwada', 'lena', 'ottavia' o un id di interno specifico.",
+        "L'edificio dell'archivio (gia' disegnato in US-1005 come struttura murata cosmetica) diventa il primo edificio REALMENTE visitabile: l'interno ospita Ottavia (o un suo riferimento/contenuto coerente col gating di conoscenza di design-world.md).",
+        "Verifica a schermo con Xvfb: si entra ed esce da tutti e 3 gli edifici nella partita vera. Screenshot mandati in chat.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 8,
+      "fase": 10,
+      "passes": false,
+      "notes": "Nuova story (inserita qui, US-1005.notes ne spiega il motivo): chiude la promessa di US-1005 ('Almeno 3 edifici visitabili') ora che US-1010 (priority 7) ha costruito il motore generico. Non ancora iniziata."
     },
     {
       "id": "US-1006",
@@ -111,7 +142,7 @@
         "Il gating d'ingresso della regione (se dichiarato) si applica come barriera fisica al confine (US-1002), non piu' come rifiuto di caricamento.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 7,
+      "priority": 9,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -126,7 +157,7 @@
         "Il gating d'ingresso della regione (se dichiarato) si applica come barriera fisica al confine (US-1002), non piu' come rifiuto di caricamento.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 8,
+      "priority": 10,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -141,7 +172,7 @@
         "Il gating d'ingresso della regione (se dichiarato) si applica come barriera fisica al confine (US-1002), non piu' come rifiuto di caricamento.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 9,
+      "priority": 11,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -156,23 +187,7 @@
         "Il gating d'ingresso della regione si applica come barriera fisica al confine (US-1002), non piu' come rifiuto di caricamento - verificato che un personaggio sotto soglia viene fermato fisicamente e uno sopra soglia passa.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 10,
-      "fase": 10,
-      "passes": false,
-      "notes": ""
-    },
-    {
-      "id": "US-1010",
-      "title": "Vocabolario di un insediamento (edificio con interno)",
-      "description": "Come sistema, serve un modo dati-driven di dichiarare \"qui c'e' un edificio, ha una porta, dentro c'e' una scena interna\" - riusando la tecnica gia' in campo per i passaggi tra regioni (un'Area2D che carica un'altra scena), applicata a un ambito piccolo e locale.",
-      "acceptanceCriteria": [
-        "Nuovo campo layout (es. edifici: [{x, y, interno_id}]) - un marcatore sulla mappa esterna con una porta, che referenzia un file data/world/interni/<interno_id>.json (stesso schema di un layout, ma tipicamente piccolo: una stanza o poche stanze).",
-        "Entrare nella porta carica la scena interna (piccola, locale - stesso pattern tecnico di _su_passaggio, mai un sistema nuovo); uscire torna nella mappa esterna, alla cella della porta.",
-        "Il validator verifica che ogni interno_id referenziato esista, e che ogni file interno abbia uno spawn valido.",
-        "Nessun nuovo tipo di pagina, nessuna nuova primitiva: un interno e' un layout come un altro, letto dallo stesso region_scene/world_scene.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
-      ],
-      "priority": 11,
+      "priority": 12,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -188,7 +203,7 @@
         "Verifica a schermo con Xvfb: si entra ed esce da almeno 2 edifici diversi nello stesso villaggio. Screenshot mandati in chat.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 12,
+      "priority": 13,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -203,7 +218,7 @@
         "Se serve una nuova voce nel vocabolario chiuso data/schema/location_tags.json per \"palazzo/struttura\", e' una decisione da dichiarare esplicitamente con motivazione, non presa di nascosto.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 13,
+      "priority": 14,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -217,7 +232,7 @@
         "tests/manual/qa_mondo_continuo.gd (nuovo, Xvfb): cammina da Mirwada a una regione adiacente attraversando il confine SENZA che compaia una schermata di caricamento (nessuna chiamata a get_tree().change_scene_to_* durante l'attraversamento - solo all'avvio), entra in un edificio del villaggio, ne esce, entra nella struttura grande, ne esce. Screenshot mandati in chat.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 14,
+      "priority": 15,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -232,7 +247,7 @@
         "prd.json: tutte le story a passes: true con note compilate.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 15,
+      "priority": 16,
       "fase": 10,
       "passes": false,
       "notes": ""

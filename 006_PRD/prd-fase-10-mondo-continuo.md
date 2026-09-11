@@ -205,20 +205,59 @@ come oggi, senza un nuovo campo.
 
 #### US-1005: Mirwada più grande, con quartieri veri
 
+> **Split in corsa (2026-09-11)**: l'AC originale ("Almeno 3 edifici
+> visitabili, vedi Blocco B") dipende da un motore — US-1010, "Vocabolario
+> di un insediamento" — che nel PRD arrivava DOPO US-1006..1009, cioè dopo
+> questa story. Implementare "edifici visitabili" senza quel motore avrebbe
+> voluto dire scrivere codice specifico per Mirwada (contro la Regola 1 di
+> CLAUDE.md: "i dati non sono codice", mai un caso speciale per un luogo).
+> Riordinato invece di tirare dritto: **US-1010 portata avanti** subito dopo
+> questa story; **nuova US-1005B** ("I 3 edifici visitabili di Mirwada")
+> chiude la promessa usando quel motore. US-1006..1009/1011..1014 slittano
+> di conseguenza (vedi `prd.json` per l'ordine di priorità aggiornato).
+> US-1005 (questa story) chiude solo il layout ridisegnato + la verifica di
+> non-regressione.
+
 **Descrizione:** Come giocatore, voglio che la città hub sia un luogo con
 un'identità fisica — non un rettangolo con 5 zone invisibili sovrapposte.
 
 **Acceptance Criteria:**
-- [ ] Layout ridisegnato più grande (dimensione libera, non più vincolata a
+- [x] Layout ridisegnato più grande (dimensione libera, non più vincolata a
       48×36 — vedi US-1001/1002), con i 5 `location_tags` di Mirwada
       (`porto`, `archivio`, `vicolo`, `piazza`, `sotterraneo`) come zone
       fisicamente distinte e riconoscibili (non rettangoli a griglia
       automatica).
-- [ ] Almeno 3 edifici visitabili (interni, vedi Blocco B) coerenti coi
+- [ ] ~~Almeno 3 edifici visitabili (interni, vedi Blocco B) coerenti coi
       biomi di `design-world.md` §2.1 (la casa di Lena, l'archivio di
-      Ottavia, una bettola del porto).
-- [ ] Nessuna regressione: gli 8 NPC esistenti restano raggiungibili, le
+      Ottavia, una bettola del porto).~~ → spostato in **US-1005B**.
+- [x] Nessuna regressione: gli 8 NPC esistenti restano raggiungibili, le
       quest di Atto I restano completabili.
+
+#### US-1005B: I 3 edifici visitabili di Mirwada
+
+**Descrizione:** Come giocatore, voglio poter entrare davvero nei 3 edifici
+promessi dall'AC originale di US-1005 (la casa di Lena, l'archivio di
+Ottavia, una bettola del porto) — usando il motore generico di US-1010
+(`edifici: [{x, y, interno_id}]` + `data/world/interni/<interno_id>.json`),
+non codice dedicato a Mirwada.
+
+**Acceptance Criteria:**
+- [ ] `data/world/layouts/mirwada.json`: nuovo campo `edifici` con almeno 3
+      marcatori (Lena nel quartiere `vicolo`, Ottavia nell'edificio
+      `archivio` già disegnato in US-1005, una bettola nel `porto`), ognuno
+      con un `interno_id` che referenzia un file
+      `data/world/interni/<interno_id>.json` vero (non uno stub vuoto).
+- [ ] Entrare nella porta di ognuno dei 3 edifici carica il rispettivo
+      interno; uscire torna alla mappa esterna di Mirwada, alla cella della
+      porta — usando esclusivamente il motore di US-1010, zero righe di
+      codice che nominino "mirwada", "lena", "ottavia" o un id di interno
+      specifico.
+- [ ] L'edificio dell'archivio (già disegnato in US-1005 come struttura
+      murata cosmetica) diventa il primo edificio REALMENTE visitabile:
+      l'interno ospita Ottavia (o un suo riferimento coerente col gating di
+      conoscenza di `design-world.md`).
+- [ ] Verifica a schermo con Xvfb: si entra ed esce da tutti e 3 gli
+      edifici nella partita vera. Screenshot mandati in chat.
 
 #### US-1006..US-1009: le altre 4 regioni crescono (una story a testa)
 

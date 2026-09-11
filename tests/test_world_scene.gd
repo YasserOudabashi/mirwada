@@ -28,6 +28,15 @@ func _gd() -> Node: return _root().get_node("GameData")
 func _ws() -> Node: return _root().get_node("WorldState")
 
 
+## Dimensione VERA di un layout (righe x colonne della sua mappa, US-1005:
+## dimensione libera - non piu' 48x36 fisso per ogni regione).
+func _dim(region_id: String) -> Vector2i:
+	var mappa: Array = (_gd().call("get_layout", region_id).get("mappa", []) as Array)
+	if mappa.is_empty():
+		return Vector2i(48, 36)
+	return Vector2i(str(mappa[0]).length(), mappa.size())
+
+
 func prepara() -> void:
 	_ws().call("pulisci")
 
@@ -183,7 +192,7 @@ func test_nemici_di_mirwada_spawnano_alla_posizione_globale_giusta() -> void:
 	# il mondo continuo ospita i nemici di TUTTE e 5 le regioni nello stesso
 	# nodo: si filtrano quelli dentro il rettangolo di Mirwada (offset
 	# incluso), non semplicemente "ogni nemico in scena".
-	var rett := Rect2(Vector2(OFFSET_MIRWADA) * TILE, Vector2(48, 36) * TILE)
+	var rett := Rect2(Vector2(OFFSET_MIRWADA) * TILE, Vector2(_dim("mirwada")) * TILE)
 	var nemici_mirwada: Array = []
 	var totale: int = 0
 	for c in mondo.get_children():
@@ -276,7 +285,7 @@ func test_riavvicinandosi_un_nemico_disattivato_si_riattiva() -> void:
 	var player: Node2D = r["player"]
 
 	mondo.call("_aggiorna_prestazioni")
-	var rett_mirwada := Rect2(Vector2(OFFSET_MIRWADA) * TILE, Vector2(48, 36) * TILE)
+	var rett_mirwada := Rect2(Vector2(OFFSET_MIRWADA) * TILE, Vector2(_dim("mirwada")) * TILE)
 	var nemico_lontano: Node2D = null
 	for e in mondo.get_tree().get_nodes_in_group("nemici"):
 		if rett_mirwada.has_point((e as Node2D).global_position):

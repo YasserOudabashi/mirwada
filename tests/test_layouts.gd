@@ -83,7 +83,9 @@ func test_mirwada_dipinta_dal_layout() -> void:
 
 	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(0, 0)), Vector2i(COL_MURO, RIGA_NEUTRA), "bordo esterno solido")
 	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(1, 1)), Vector2i(COL_PAVIMENTO, RIGA_NEUTRA), "cella '.' interna non solida")
-	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(44, 29)), Vector2i(COL_ACQUA, RIGA_NEUTRA),
+	# specchio d'acqua del porto (US-1005: zone['porto'] = [45, 28, 15, 11], la
+	# banchina d'acqua ne occupa le ultime 4 righe - (50, 36) ci ricade dentro).
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(50, 36)), Vector2i(COL_ACQUA, RIGA_NEUTRA),
 		"cella '~' (acqua) usa la colonna acqua ed e' solida (US-813)")
 
 	(r["cont"] as Node2D).free()
@@ -108,10 +110,13 @@ func test_mirwada_zona_dal_rettangolo_del_layout() -> void:
 
 	var zona: Node2D = scena.get_node_or_null("Zona_mirwada_porto")
 	assert_false(zona == null, "Zona_mirwada_porto esiste")
-	# rettangolo dichiarato in data/world/layouts/mirwada.json: [36, 26, 10, 8]
+	# rettangolo letto dai dati (data/world/layouts/mirwada.json.zone.porto),
+	# mai scritto a mano qui: US-1005 lo ha spostato ridisegnando la mappa.
+	var rect: Array = (_gd().call("get_layout", "mirwada").get("zone", {}) as Dictionary).get("porto", [])
+	assert_eq(rect.size(), 4, "zone.porto e' un rettangolo [x, y, w, h]")
 	var origine: Vector2 = scena.map_to_local(o)
-	var min_atteso: Vector2 = origine + Vector2(36, 26) * TILE
-	var max_atteso: Vector2 = origine + Vector2(36 + 10, 26 + 8) * TILE
+	var min_atteso: Vector2 = origine + Vector2(rect[0], rect[1]) * TILE
+	var max_atteso: Vector2 = origine + Vector2(rect[0] + rect[2], rect[1] + rect[3]) * TILE
 	assert_true(zona.position.x >= min_atteso.x and zona.position.x <= max_atteso.x,
 		"Zona_mirwada_porto.x dentro il rettangolo dichiarato (offset incluso)")
 	assert_true(zona.position.y >= min_atteso.y and zona.position.y <= max_atteso.y,
@@ -131,11 +136,21 @@ func test_tutte_le_regioni_hanno_un_layout() -> void:
 			"la regione '%s' ha un layout disegnato a mano" % rid)
 
 
+## Dimensione VERA di un layout (righe x colonne della sua mappa, US-1005:
+## dimensione libera - non piu' 48x36 fisso per ogni regione). Stesso calcolo
+## di world_scene.gd::_dimensioni_layout, letto dai dati qui nel test.
+func _dim(region_id: String) -> Vector2i:
+	var mappa: Array = (_gd().call("get_layout", region_id).get("mappa", []) as Array)
+	if mappa.is_empty():
+		return Vector2i(48, 36)
+	return Vector2i(str(mappa[0]).length(), mappa.size())
+
+
 ## Trova i nemici/pickup spawnati DENTRO il rettangolo di una regione (non
 ## l'intero mondo continuo: world_scene.gd ospita le 5 regioni nello stesso
 ## nodo, world_offset le separa nello spazio - US-1002B).
-func _nemici_di(scena: Node, offset: Vector2i) -> Array:
-	var rett := Rect2(scena.map_to_local(offset), Vector2(48, 36) * TILE)
+func _nemici_di(scena: Node, offset: Vector2i, region_id: String) -> Array:
+	var rett := Rect2(scena.map_to_local(offset), Vector2(_dim(region_id)) * TILE)
 	var out: Array = []
 	for c in scena.get_children():
 		if c.is_in_group("nemici") and rett.has_point(c.global_position):
@@ -143,8 +158,8 @@ func _nemici_di(scena: Node, offset: Vector2i) -> Array:
 	return out
 
 
-func _pickup_di(scena: Node, offset: Vector2i) -> Array:
-	var rett := Rect2(scena.map_to_local(offset), Vector2(48, 36) * TILE)
+func _pickup_di(scena: Node, offset: Vector2i, region_id: String) -> Array:
+	var rett := Rect2(scena.map_to_local(offset), Vector2(_dim(region_id)) * TILE)
 	var out: Array = []
 	for c in scena.get_children():
 		if c.get_script() == preload("res://scripts/item_pickup.gd") and rett.has_point(c.global_position):
@@ -157,7 +172,7 @@ func test_mirwada_nemici_dal_layout_sequenza_e_boss() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena, o)
+	var nemici: Array = _nemici_di(scena, o, "mirwada")
 	assert_eq(nemici.size(), 7, "6 nemici di Sequenza 9 + 1 boss dal layout")
 
 	var boss = null
@@ -188,7 +203,7 @@ func test_mirwada_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var pickup_list: Array = _pickup_di(scena, o)
+	var pickup_list: Array = _pickup_di(scena, o, "mirwada")
 	# 10 originali + 3 ingredienti di formula_darkness_9 + 3 di
 	# formula_paragon_9 (006_PRD/prd-vslice-livello-b-batch-2.md).
 	assert_eq(pickup_list.size(), 16, "16 oggetti a terra dal layout")
@@ -210,7 +225,7 @@ func test_mirwada_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena, o)
+	var nemici: Array = _nemici_di(scena, o, "mirwada")
 	assert_eq(nemici.size(), 7, "setup: 7 nemici")
 	for i in nemici.size() - 1:
 		nemici[i].get_node("StatsComponent").set("hp", 0.0)
@@ -234,7 +249,7 @@ func test_nemici_di_mirwada_senza_player_restano_inerti() -> void:
 	var scena: Node = load("res://scenes/world_scene.tscn").instantiate()
 	cont.add_child(scena)
 
-	var nemici: Array = _nemici_di(scena, _offset("mirwada"))
+	var nemici: Array = _nemici_di(scena, _offset("mirwada"), "mirwada")
 	assert_eq(nemici.size(), 7, "i nemici si spawnano comunque senza Player")
 	for e in nemici:
 		e.call("_physics_process", 0.016)
@@ -281,7 +296,7 @@ func test_marche_nemici_dal_layout_sequenza_e_boss() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena, o)
+	var nemici: Array = _nemici_di(scena, o, "marche_crepuscolo")
 	assert_eq(nemici.size(), 7, "6 nemici di Sequenza 9/8 + 1 boss dal layout")
 
 	var boss = null
@@ -310,7 +325,7 @@ func test_marche_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var pickup_list: Array = _pickup_di(scena, o)
+	var pickup_list: Array = _pickup_di(scena, o, "marche_crepuscolo")
 	# 8 originali + 3 ingredienti di formula_death_9
 	# (006_PRD/prd-vslice-livello-b-batch-2.md).
 	assert_eq(pickup_list.size(), 11, "11 oggetti a terra dal layout")
@@ -331,7 +346,7 @@ func test_marche_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena, o)
+	var nemici: Array = _nemici_di(scena, o, "marche_crepuscolo")
 	assert_eq(nemici.size(), 7, "setup: 7 nemici")
 	for e in nemici:
 		e.get_node("StatsComponent").set("hp", 0.0)
@@ -348,7 +363,7 @@ func test_nemici_di_marche_senza_player_restano_inerti() -> void:
 	var scena: Node = load("res://scenes/world_scene.tscn").instantiate()
 	cont.add_child(scena)
 
-	var nemici: Array = _nemici_di(scena, _offset("marche_crepuscolo"))
+	var nemici: Array = _nemici_di(scena, _offset("marche_crepuscolo"), "marche_crepuscolo")
 	assert_eq(nemici.size(), 7, "i nemici si spawnano comunque senza Player")
 	for e in nemici:
 		e.call("_physics_process", 0.016)
@@ -395,7 +410,7 @@ func test_valle_nemici_dal_layout_sequenza_e_boss() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena, o)
+	var nemici: Array = _nemici_di(scena, o, "valle_madre")
 	assert_eq(nemici.size(), 7, "6 nemici di Sequenza 9/8 + 1 boss dal layout")
 
 	var boss = null
@@ -424,7 +439,7 @@ func test_valle_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var pickup_list: Array = _pickup_di(scena, o)
+	var pickup_list: Array = _pickup_di(scena, o, "valle_madre")
 	# 7 originali + 3 ingredienti di formula_moon_9
 	# (006_PRD/prd-vslice-livello-b-batch-2.md).
 	assert_eq(pickup_list.size(), 10, "10 oggetti a terra dal layout")
@@ -445,7 +460,7 @@ func test_valle_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena, o)
+	var nemici: Array = _nemici_di(scena, o, "valle_madre")
 	assert_eq(nemici.size(), 7, "setup: 7 nemici")
 	for e in nemici:
 		e.get_node("StatsComponent").set("hp", 0.0)
@@ -462,7 +477,7 @@ func test_nemici_di_valle_senza_player_restano_inerti() -> void:
 	var scena: Node = load("res://scenes/world_scene.tscn").instantiate()
 	cont.add_child(scena)
 
-	var nemici: Array = _nemici_di(scena, _offset("valle_madre"))
+	var nemici: Array = _nemici_di(scena, _offset("valle_madre"), "valle_madre")
 	assert_eq(nemici.size(), 7, "i nemici si spawnano comunque senza Player")
 	for e in nemici:
 		e.call("_physics_process", 0.016)
@@ -507,7 +522,7 @@ func test_archivio_nemici_dal_layout_sequenza_e_boss() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena, o)
+	var nemici: Array = _nemici_di(scena, o, "archivio_sepolto")
 	assert_eq(nemici.size(), 7, "6 nemici di Sequenza 8/7 + 1 boss dal layout")
 
 	var boss = null
@@ -536,7 +551,7 @@ func test_archivio_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var pickup_list: Array = _pickup_di(scena, o)
+	var pickup_list: Array = _pickup_di(scena, o, "archivio_sepolto")
 	# 6 originali (US-805/US-809c) + 3 ingredienti di formula_error_9
 	# (006_PRD/prd-vslice-livello-b-batch-1.md, VS-B1-03: non esistevano in
 	# nessun layout prima, servono al Livello B reale del Pathway Error).
@@ -558,7 +573,7 @@ func test_archivio_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena, o)
+	var nemici: Array = _nemici_di(scena, o, "archivio_sepolto")
 	assert_eq(nemici.size(), 7, "setup: 7 nemici")
 	for e in nemici:
 		e.get_node("StatsComponent").set("hp", 0.0)
@@ -575,7 +590,7 @@ func test_nemici_di_archivio_senza_player_restano_inerti() -> void:
 	var scena: Node = load("res://scenes/world_scene.tscn").instantiate()
 	cont.add_child(scena)
 
-	var nemici: Array = _nemici_di(scena, _offset("archivio_sepolto"))
+	var nemici: Array = _nemici_di(scena, _offset("archivio_sepolto"), "archivio_sepolto")
 	assert_eq(nemici.size(), 7, "i nemici si spawnano comunque senza Player")
 	for e in nemici:
 		e.call("_physics_process", 0.016)
@@ -620,7 +635,7 @@ func test_frontiera_nemici_dal_layout_sequenza_e_boss() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena, o)
+	var nemici: Array = _nemici_di(scena, o, "frontiera_porte")
 	assert_eq(nemici.size(), 7, "6 nemici di Sequenza 7/6 + 1 boss dal layout")
 
 	var boss = null
@@ -649,7 +664,7 @@ func test_frontiera_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var pickup_list: Array = _pickup_di(scena, o)
+	var pickup_list: Array = _pickup_di(scena, o, "frontiera_porte")
 	# 6 originali (US-805/US-809c) + 3 ingredienti di formula_door_9
 	# (006_PRD/prd-vslice-livello-b-batch-1.md, VS-B1-02: non esistevano in
 	# nessun layout prima, servono al Livello B reale del Pathway Door).
@@ -671,7 +686,7 @@ func test_frontiera_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena, o)
+	var nemici: Array = _nemici_di(scena, o, "frontiera_porte")
 	assert_eq(nemici.size(), 7, "setup: 7 nemici")
 	for e in nemici:
 		e.get_node("StatsComponent").set("hp", 0.0)
@@ -688,7 +703,7 @@ func test_nemici_di_frontiera_senza_player_restano_inerti() -> void:
 	var scena: Node = load("res://scenes/world_scene.tscn").instantiate()
 	cont.add_child(scena)
 
-	var nemici: Array = _nemici_di(scena, _offset("frontiera_porte"))
+	var nemici: Array = _nemici_di(scena, _offset("frontiera_porte"), "frontiera_porte")
 	assert_eq(nemici.size(), 7, "i nemici si spawnano comunque senza Player")
 	for e in nemici:
 		e.call("_physics_process", 0.016)

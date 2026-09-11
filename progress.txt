@@ -11167,5 +11167,76 @@ COME VERIFICATO.
 
 APERTO: nessuno per questa story.
 
-PROSSIMA STORIA: US-1005 ("Mirwada piu' grande, con quartieri veri"),
-priority 6.
+PROSSIMA STORIA (chiusa qui sotto, con uno split): US-1005 ("Mirwada piu'
+grande, con quartieri veri"), priority 6.
+
+SPLIT IN CORSA (segnalato, come per US-1002): l'AC originale di US-1005
+("Almeno 3 edifici visitabili, vedi Blocco B") dipende da un motore -
+US-1010 "Vocabolario di un insediamento" - che nel prd.json originale
+veniva DOPO US-1006..1009 (priority 11), cioe' dopo questa story.
+Implementarlo senza quel motore avrebbe voluto dire scrivere codice
+specifico per Mirwada (contro Regola 1 di CLAUDE.md: "i dati non sono
+codice", mai un caso speciale per un luogo). Riordinato: US-1010 portata
+avanti a priority 7 (non ancora iniziata); nuova US-1005B ("I 3 edifici
+visitabili di Mirwada", priority 8, non ancora iniziata) chiudera' la
+promessa usando quel motore. US-1006..1009 (ora priority 9-12) e
+US-1011..1014 (ora priority 13-16) slittate di conseguenza - stesso
+contenuto, solo priority cambiata. Aggiornati: prd.json (US-1005.passes
+= true con AC ridotto, US-1005B nuova, priority di tutte le story
+successive) e 006_PRD/prd-fase-10-mondo-continuo.md (nota di split +
+sezione US-1005B).
+
+FATTO (US-1005, scope ridotto: layout + no regressione).
+- data/world/layouts/mirwada.json: ridisegnato da 48x36 a 64x44
+  (world_offset [220,180] invariato, resta ben dentro il "cuscinetto"
+  verso le 4 regioni esterne - verificato: nessuna sovrapposizione,
+  validate_data.py + test_world_offset_esiste_e_non_si_sovrappone
+  confermano). 5 quartieri fisicamente distinti e riconoscibili nel
+  terreno (non rettangoli a griglia automatica): archivio (edificio
+  murato con scaffali 'o', ovest-nord), vicolo (isolato di casette 'o'
+  con vicoli calpestabili '.', un canale '=' che scende verso la
+  piazza), piazza (aperta, pavimento ','), sotterraneo (edificio murato
+  con porta '+' - cosmetico per ora, un interno vero arriva con
+  US-1005B/US-1010), porto (banchina ',' + specchio d'acqua '~' + molo
+  '='). I 7 nemici e i 16 oggetti esistenti riposizionati su celle
+  calpestabili della mappa nuova (stessi sequenza/scala/override/
+  item_id/quantita', solo x/y cambiati) - zero regressione sul
+  contenuto. Rimosso il campo "passaggi" (morto dopo US-1002B: sostituito
+  da world_scene.gd::passaggi_verso() generico, nessuno script lo legge
+  piu') da tutti e 5 i layout + relativo controllo nel validator +
+  relativa voce nello schema - pulizia piccola e diretta, notata mentre
+  si toccava il file.
+- tools/validate_data.py: il blocco layout (righe/lunghezza riga/bordo/
+  spawn/zone) era rimasto hardcoded a 48x36 nonostante US-1001/1002
+  avessero gia' tolto quel vincolo al motore (world_scene.gd legge le
+  dimensioni vere dalla mappa da sempre) - generalizzato a leggere la
+  dimensione vera dalla mappa stessa (riga 0 detta la larghezza), stesso
+  principio gia' in uso nel blocco world_offset/non-sovrapposizione.
+  data/schema/layout.schema.json aggiornato allo stesso modo.
+- tests/test_layouts.gd + tests/test_world_scene.gd: le helper
+  _nemici_di/_pickup_di (e due Rect2 diretti in test_world_scene.gd)
+  filtravano gli enti di Mirwada con un Rect2 Vector2(48,36) hardcoded -
+  con Mirwada ora piu' grande, generalizzate con un nuovo helper
+  _dim(region_id) che legge la dimensione vera dal layout (stesso calcolo
+  di world_scene.gd::_dimensioni_layout). test_mirwada_dipinta_dal_layout
+  (cella acqua) e test_mirwada_zona_dal_rettangolo_del_layout (rettangolo
+  del porto) aggiornati alle nuove coordinate/lette dai dati.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 909 test,
+  tutti passati (nessuna regressione, nessun test nuovo - solo
+  migrazione di quelli esistenti alla nuova geometria).
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat): partita vera, giro turistico nei 5 quartieri -
+  l'edificio del sotterraneo si vede fisicamente (muri + porta), l'acqua
+  del porto e il suo molo, gli isolati del vicolo. NpcSystem.presenti
+  ('mirwada') torna 16 voci (8 nominati + 10 generici, tutti raggiungibili
+  come prima). I dati confermano: 7 nemici + 16 oggetti ancora dichiarati,
+  layout 64x44 (era 48x36).
+
+APERTO: US-1005B (i 3 edifici visitabili veri) e US-1010 (il motore che
+li abilita) restano da fare - vedi split sopra.
+
+PROSSIMA STORIA: US-1010 ("Vocabolario di un insediamento (edificio con
+interno)"), priority 7.

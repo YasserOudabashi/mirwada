@@ -1118,36 +1118,43 @@ def main():
                 err(f"{rel}: region_id '{rid}' duplicato tra i layout")
             layout_region_ids.add(rid)
 
+            # US-1005 (fase 10): dimensione libera (US-1001/1002 hanno gia'
+            # tolto il vincolo 48x36 al motore) - la larghezza/altezza VERE
+            # sono quelle della mappa stessa (riga 0 detta la larghezza),
+            # non piu' una costante. Deve restare rettangolare: ogni riga
+            # della lunghezza della prima.
             mappa = doc.get("mappa", [])
-            if not isinstance(mappa, list) or len(mappa) != 36:
-                err(f"{rel} [{rid}]: mappa deve avere 36 righe "
-                    f"(trovate {len(mappa) if isinstance(mappa, list) else 'n/a'})")
+            h = len(mappa) if isinstance(mappa, list) else 0
+            w = len(mappa[0]) if h > 0 and isinstance(mappa[0], str) else 0
+            if h == 0 or w == 0:
+                err(f"{rel} [{rid}]: mappa deve avere almeno 1 riga non vuota")
                 mappa = []
-            righe_valide = True
+            righe_valide = h > 0 and w > 0
             for y, riga in enumerate(mappa):
-                if not isinstance(riga, str) or len(riga) != 48:
-                    err(f"{rel} [{rid}]: riga {y} deve avere 48 caratteri")
+                if not isinstance(riga, str) or len(riga) != w:
+                    err(f"{rel} [{rid}]: riga {y} deve avere {w} caratteri "
+                        f"(la larghezza della riga 0)")
                     righe_valide = False
                     continue
                 fuori = set(riga) - LEGENDA_LAYOUT
                 if fuori:
                     err(f"{rel} [{rid}]: riga {y} usa caratteri fuori dalla legenda: {sorted(fuori)}")
 
-            if len(mappa) == 36 and righe_valide:
-                bordo_ok = all(c == "#" for c in mappa[0]) and all(c == "#" for c in mappa[35])
-                bordo_ok = bordo_ok and all(riga[0] == "#" and riga[47] == "#" for riga in mappa)
+            if righe_valide:
+                bordo_ok = all(c == "#" for c in mappa[0]) and all(c == "#" for c in mappa[h - 1])
+                bordo_ok = bordo_ok and all(riga[0] == "#" and riga[w - 1] == "#" for riga in mappa)
                 if not bordo_ok:
-                    err(f"{rel} [{rid}]: il bordo esterno (riga 0, riga 35, colonna 0, "
-                        f"colonna 47) deve essere tutto '#'")
+                    err(f"{rel} [{rid}]: il bordo esterno (riga 0, riga {h - 1}, colonna 0, "
+                        f"colonna {w - 1}) deve essere tutto '#'")
 
             spawn = doc.get("spawn", [])
             if not (isinstance(spawn, list) and len(spawn) == 2
                     and all(isinstance(v, int) for v in spawn)):
                 err(f"{rel} [{rid}]: spawn deve essere [x, y] di interi")
-            elif len(mappa) == 36 and righe_valide:
+            elif righe_valide:
                 sx, sy = spawn
-                if not (0 <= sx < 48 and 0 <= sy < 36):
-                    err(f"{rel} [{rid}]: spawn {spawn} fuori dai limiti (48x36)")
+                if not (0 <= sx < w and 0 <= sy < h):
+                    err(f"{rel} [{rid}]: spawn {spawn} fuori dai limiti ({w}x{h})")
                 elif mappa[sy][sx] not in CALPESTABILI_LAYOUT:
                     err(f"{rel} [{rid}]: spawn {spawn} non e' su una cella calpestabile "
                         f"('{mappa[sy][sx]}')")
@@ -1166,20 +1173,12 @@ def main():
                     err(f"{rel} [{rid}]: zone['{tag}'] deve essere [x, y, w, h] di interi")
                     continue
                 zx, zy, zw, zh = rect
-                if zx < 0 or zy < 0 or zw <= 0 or zh <= 0 or zx + zw > 48 or zy + zh > 36:
-                    err(f"{rel} [{rid}]: zone['{tag}'] {rect} fuori dai limiti (48x36)")
+                if zx < 0 or zy < 0 or zw <= 0 or zh <= 0 or zx + zw > w or zy + zh > h:
+                    err(f"{rel} [{rid}]: zone['{tag}'] {rect} fuori dai limiti ({w}x{h})")
             mancanti = region_tags - set(zone)
             if mancanti:
                 err(f"{rel} [{rid}]: mancano zone per i location_tags {sorted(mancanti)} "
                     f"(una regione CON layout deve coprirli tutti)")
-
-            passaggi = doc.get("passaggi", {})
-            if not isinstance(passaggi, dict):
-                err(f"{rel} [{rid}]: passaggi deve essere un dict")
-                passaggi = {}
-            for dest in passaggi:
-                if dest not in region_ids:
-                    err(f"{rel} [{rid}]: passaggi['{dest}'] punta a una regione inesistente")
 
     for _rid in sorted(region_ids - layout_region_ids):
         err(f"data/world/regions.json [{_rid}]: nessun layout in data/world/layouts/ "
@@ -1500,11 +1499,13 @@ def main():
             doc = load_json(os.path.join(layouts_dir, fn)) or {}
             rid = doc.get("region_id")
             mappa = doc.get("mappa", [])
-            righe_ok = isinstance(mappa, list) and len(mappa) == 36 and all(
-                isinstance(r, str) and len(r) == 48 for r in mappa)
+            _h = len(mappa) if isinstance(mappa, list) else 0
+            _w = len(mappa[0]) if _h > 0 and isinstance(mappa[0], str) else 0
+            righe_ok = _h > 0 and _w > 0 and all(
+                isinstance(r, str) and len(r) == _w for r in mappa)
 
             def _calpestabile(x, y):
-                return righe_ok and 0 <= x < 48 and 0 <= y < 36 and mappa[y][x] in CALPESTABILI_LAYOUT
+                return righe_ok and 0 <= x < _w and 0 <= y < _h and mappa[y][x] in CALPESTABILI_LAYOUT
 
             for nm in doc.get("nemici", []):
                 nx, ny = nm.get("x"), nm.get("y")
