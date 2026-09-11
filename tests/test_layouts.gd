@@ -497,13 +497,14 @@ func test_archivio_dipinta_dal_layout() -> void:
 	var scena: TileMapLayer = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var riga: int = scena.get_cell_atlas_coords(o + Vector2i(4, 4)).y
+	var riga: int = scena.get_cell_atlas_coords(o + Vector2i(36, 4)).y
 	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
-	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(4, 4)), Vector2i(COL_PAVIMENTO, riga), "spawn dentro la sala biblioteca, calpestabile")
-	# data/world/layouts/archivio_sepolto.json: muro interno della sala officina
-	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(17, 5)), Vector2i(COL_MURO, riga), "muro interno di una sala solido")
-	# varco fra biblioteca e officina sul corridoio y=9
-	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(16, 9)), Vector2i(COL_PAVIMENTO, riga), "varco fra le sale e' calpestabile")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(36, 4)), Vector2i(COL_PAVIMENTO, riga), "spawn sulla spina centrale, calpestabile")
+	# data/world/layouts/archivio_sepolto.json: muro del santuario biblioteca_di_tutto
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(41, 36)), Vector2i(COL_MURO, riga), "muro interno di una sala solido")
+	# porta del santuario biblioteca_di_tutto (sito rituale di Sequenza 0 di Hermit/Paragon)
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(55, 35)), Vector2i(COL_PORTA, riga), "la porta del santuario e' una porta")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(54, 35)), Vector2i(COL_PAVIMENTO, riga), "il corridoio davanti alla porta e' calpestabile")
 
 	(r["cont"] as Node2D).free()
 
@@ -513,7 +514,7 @@ func test_archivio_spawn_dal_layout() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var atteso_spawn: Vector2 = scena.to_global(scena.map_to_local(o + Vector2i(4, 4)))
+	var atteso_spawn: Vector2 = scena.to_global(scena.map_to_local(o + Vector2i(36, 4)))
 	assert_eq(scena.call("punto_spawn", "archivio_sepolto"), atteso_spawn,
 		"punto_spawn('archivio_sepolto') usa la cella spawn del layout, offset incluso")
 

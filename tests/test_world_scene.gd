@@ -193,6 +193,46 @@ func test_corridoi_di_valle_madre_sono_calpestabili() -> void:
 	(r["cont"] as Node2D).free()
 
 
+## US-1008: i due corridoi nuovi dell'Archivio Sepolto (il raggio verso
+## mirwada, che usa l'ultimo muro libero di mirwada - est - e il lato
+## marche_crepuscolo-archivio_sepolto dell'anello, il primo lato "superiore"
+## fra due regioni allo stesso world_offset.y).
+func test_corridoi_di_archivio_sepolto_sono_calpestabili() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: TileMapLayer = r["mondo"]
+	_assert_corridoio_calpestabile(mondo, "mirwada", "archivio_sepolto")
+	_assert_corridoio_calpestabile(mondo, "marche_crepuscolo", "archivio_sepolto")
+	(r["cont"] as Node2D).free()
+
+
+## US-1008 (AC "il gating d'ingresso ... si applica come barriera fisica al
+## confine, non piu' come rifiuto di caricamento"): il meccanismo e' generico
+## e gia' esisteva (_crea_gate, richiamato per OGNI regione da _prepara_regione
+## - US-1002/US-1006/US-1007 lo hanno gia' attraversato senza test dedicato).
+## Qui si prova per la prima volta che il Gate_ dell'Archivio (conoscenza:
+## testi_ordine_minore) esiste per davvero nel mondo continuo, e' chiuso senza
+## il flag e si apre quando KnowledgeStore lo registra - la stessa AreaGate
+## gia' provata a livello di dialogo in test_dialoghi_roster.gd, qui verificata
+## viva dentro world_scene.
+func test_gate_dell_archivio_e_una_barriera_fisica_nel_mondo_continuo() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: TileMapLayer = r["mondo"]
+	var ks: Node = _root().get_node("KnowledgeStore")
+	ks.call("dimentica_tutto")
+
+	var gate: Area2D = mondo.get_node_or_null("Gate_archivio_sepolto_ali_interne")
+	assert_true(gate != null, "il Gate dell'Archivio esiste nel mondo continuo")
+	if gate == null:
+		(r["cont"] as Node2D).free()
+		return
+	assert_false(bool(gate.call("e_aperto")), "senza il flag, l'ala interna resta chiusa")
+
+	ks.call("impara", "testi_ordine_minore")
+	assert_true(bool(gate.call("e_aperto")), "col flag, l'ala interna si apre")
+
+	(r["cont"] as Node2D).free()
+
+
 func test_viaggia_a_riposiziona_senza_ricaricare_nulla() -> void:
 	var r: Dictionary = _istanzia_con_player()
 	var mondo: Node = r["mondo"]

@@ -174,8 +174,8 @@
       ],
       "priority": 11,
       "fase": 10,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Layout ridisegnato 48x36 -> 72x44, 6 stanze di forma/dimensione diversa (non piu' la griglia automatica di prima, che l'AC vietava esplicitamente): biblioteca (scaffali), officina (detriti Paragon), torre_di_osservazione (colonnato circolare Hermit), sala_dei_sigilli (cerchio di incisioni), studio (arredo sparso), biblioteca_di_tutto (santuario murato con porta - sito rituale di Sequenza 0 condiviso da Hermit E Paragon, verificato in entrambi i pathway.json). 7 nemici + 9 oggetti riposizionati (collision-avoidance Python, trappola incontrata: 'o' non e' calpestabile - CALPESTABILI_LAYOUT='.,=+' - corretto). 2 corridoi nuovi in corridoi.json: mirwada-archivio_sepolto (il raggio, mirwada usa il suo ultimo muro libero, est) e marche_crepuscolo-archivio_sepolto (lato superiore dell'anello, marche guadagna una seconda porta sul muro est). AC del gating come barriera fisica: gia' generico da prima (world_scene.gd::_crea_gate, chiamato per ogni regione) - l'Archivio non ha mai usato il rifiuto di caricamento (quello resta solo per area=='ingresso', qui l'area e' 'ali_interne'); scritto il primo test che lo prova dentro world_scene. 918/918 test (916+2 nuovi), validate_data.py 0 errori, verifica Xvfb (6 zone, gate chiuso poi aperto, cammino reale Marche->Archivio)."
     },
     {
       "id": "US-1009",

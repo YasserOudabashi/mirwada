@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "_comment": "Corridoi di raccordo del mondo continuo (US-1002, fase 10): collegano due regioni distanti nella griglia condivisa (world_offset, US-1001) con una striscia di terreno calpestabile disegnata a mano. world_scene.gd la dipinge come un percorso a L (un segmento orizzontale + uno verticale) tra il punto di aggancio di ogni regione, aperto scavando la cella corrispondente sul bordo di entrambe. Topologia ad anello (006_PRD/prd-fase-10-mondo-continuo.md §9): 4 raggi verso Mirwada + 4 lati dell'anello fra le regioni esterne adiacenti, un corridoio a testa quando ENTRAMBE le regioni agli estremi hanno gia' un layout vero (Blocco A, US-1005..1009). US-1002 ha aperto mirwada-marche_crepuscolo (il raggio, provato in isolamento); US-1007 (Valle della Madre cresce) ha aggiunto il raggio mirwada-valle_madre e il lato valle_madre-marche_crepuscolo, i primi possibili una volta che Valle ha un layout vero. I rimanenti 4 (i raggi verso Archivio Sepolto/Frontiera delle Porte + i lati che li toccano) arrivano con US-1008/1009.",
+  "_comment": "Corridoi di raccordo del mondo continuo (US-1002, fase 10): collegano due regioni distanti nella griglia condivisa (world_offset, US-1001) con una striscia di terreno calpestabile disegnata a mano. world_scene.gd la dipinge come un percorso a L (un segmento orizzontale + uno verticale) tra il punto di aggancio di ogni regione, aperto scavando la cella corrispondente sul bordo di entrambe. Topologia ad anello (006_PRD/prd-fase-10-mondo-continuo.md §9): 4 raggi verso Mirwada + 4 lati dell'anello fra le regioni esterne adiacenti, un corridoio a testa quando ENTRAMBE le regioni agli estremi hanno gia' un layout vero (Blocco A, US-1005..1009). US-1002 ha aperto mirwada-marche_crepuscolo (il raggio, provato in isolamento); US-1007 (Valle della Madre cresce) ha aggiunto il raggio mirwada-valle_madre e il lato valle_madre-marche_crepuscolo. US-1008 (Archivio Sepolto cresce) ha aggiunto il raggio mirwada-archivio_sepolto (mirwada usa l'ultimo muro libero, quello est - marche a ovest, valle a sud, archivio a est, frontiera a nord seguira' in US-1009) e il lato marche_crepuscolo-archivio_sepolto (le due regioni allo stesso world_offset.y, il lato superiore dell'anello). Il rimanente (il raggio verso Frontiera delle Porte + i due lati che la toccano) arriva con US-1009.",
   "corridoi": [
     {
       "a": "mirwada",
@@ -21,6 +21,20 @@
       "b": "valle_madre",
       "aggancio_a": [35, 47],
       "aggancio_b": [35, 0],
+      "larghezza": 3
+    },
+    {
+      "a": "mirwada",
+      "b": "archivio_sepolto",
+      "aggancio_a": [63, 20],
+      "aggancio_b": [20, 43],
+      "larghezza": 3
+    },
+    {
+      "a": "marche_crepuscolo",
+      "b": "archivio_sepolto",
+      "aggancio_a": [75, 8],
+      "aggancio_b": [0, 8],
       "larghezza": 3
     }
   ]
