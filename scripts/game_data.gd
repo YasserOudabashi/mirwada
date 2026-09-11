@@ -58,6 +58,7 @@ const PATH_SIGILS := "res://data/sigils/core.json"
 const PATH_SIGIL_EFFECT_TYPES := "res://data/schema/sigil_effect_types.json"
 const PATH_BLUEPRINTS := "res://data/forge/blueprints.json"
 const PATH_REGIONS := "res://data/world/regions.json"
+const PATH_CORRIDOI := "res://data/world/corridoi.json"
 const PATH_ROSTER := "res://data/npc/roster.json"
 const PATH_FACTIONS := "res://data/factions.json"
 const PATH_ANTAGONISTI := "res://data/lore/antagonisti.json"
@@ -117,6 +118,7 @@ var _sigils: Dictionary = {}
 var _sigil_effect_types: Dictionary = {}
 var _blueprints: Dictionary = {}
 var _regions: Dictionary = {}
+var _corridoi: Dictionary = {}
 var _roster: Dictionary = {}
 var _dialogues: Dictionary = {}
 var _factions: Dictionary = {}
@@ -204,6 +206,7 @@ func load_all() -> void:
 	_load_single(PATH_SIGIL_EFFECT_TYPES, "effetti", _sigil_effect_types, TYPE_ARRAY)
 	_load_single(PATH_BLUEPRINTS, "blueprints", _blueprints, TYPE_DICTIONARY)
 	_load_single(PATH_REGIONS, "regions", _regions, TYPE_ARRAY)
+	_load_single(PATH_CORRIDOI, "corridoi", _corridoi, TYPE_ARRAY)
 	_load_single(PATH_ROSTER, "npcs", _roster, TYPE_ARRAY)
 	_load_single(PATH_FACTIONS, "factions", _factions, TYPE_ARRAY)
 	_load_single(PATH_ANTAGONISTI, "antagonisti", _antagonisti, TYPE_ARRAY)
@@ -618,6 +621,11 @@ func get_vfx(sezione: String) -> Dictionary:
 ## --- Regioni del mondo (data/world/regions.json, US-601) ---
 func get_regions() -> Array:
 	return _array_or_empty(_regions.get("regions"))
+
+
+## US-1002 (fase 10): i corridoi di raccordo tra regioni del mondo continuo.
+func get_corridoi() -> Array:
+	return _array_or_empty(_corridoi.get("corridoi"))
 
 
 ## {} se l'id non esiste: il chiamante controlla con is_empty().

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "_comment": "Corridoi di raccordo del mondo continuo (US-1002, fase 10): collegano due regioni distanti nella griglia condivisa (world_offset, US-1001) con una striscia di terreno calpestabile disegnata a mano. world_scene.gd la dipinge come un percorso a L (un segmento orizzontale + uno verticale) tra il punto di aggancio di ogni regione, aperto scavando la cella corrispondente sul bordo di entrambe. Questa story ne copre uno solo (mirwada-marche_crepuscolo) come prova del meccanismo; gli altri 7 della topologia ad anello (4 raggi + 4 lati, vedi 006_PRD/prd-fase-10-mondo-continuo.md §9) arrivano nel Blocco A (US-1005..1009), un corridoio a testa quando la regione corrispondente viene disegnata.",
+  "corridoi": [
+    {
+      "a": "mirwada",
+      "b": "marche_crepuscolo",
+      "aggancio_a": [0, 18],
+      "aggancio_b": [47, 18],
+      "larghezza": 3
+    }
+  ]
+}

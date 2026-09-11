@@ -1219,6 +1219,33 @@ def main():
                         f"{region_rects[b]} si sovrappongono nella griglia di mondo condivisa "
                         f"(world_offset, US-1001)")
 
+    # --- corridoi di raccordo (data/world/corridoi.json, US-1002) ---
+    corridoi_doc = load_json(os.path.join(DATA, "world", "corridoi.json"))
+    if corridoi_doc is not None:
+        rel = "data/world/corridoi.json"
+        coppie_viste = set()
+        for c in corridoi_doc.get("corridoi", []):
+            a = c.get("a")
+            b = c.get("b")
+            if a not in region_ids:
+                err(f"{rel}: 'a' punta a una regione inesistente '{a}'")
+            if b not in region_ids:
+                err(f"{rel}: 'b' punta a una regione inesistente '{b}'")
+            if a == b:
+                err(f"{rel}: 'a' e 'b' sono la stessa regione '{a}'")
+            coppia = tuple(sorted([str(a), str(b)]))
+            if coppia in coppie_viste:
+                err(f"{rel}: coppia '{a}'-'{b}' duplicata (in un verso o nell'altro)")
+            coppie_viste.add(coppia)
+            for chiave in ("aggancio_a", "aggancio_b"):
+                v = c.get(chiave)
+                if not (isinstance(v, list) and len(v) == 2
+                        and all(isinstance(x, int) and x >= 0 for x in v)):
+                    err(f"{rel}: {chiave} deve essere [x, y] di interi >= 0")
+            larghezza = c.get("larghezza")
+            if not (isinstance(larghezza, int) and larghezza >= 1):
+                err(f"{rel}: larghezza deve essere un intero >= 1")
+
     # --- fonti di tag di fase 3 (US-334): stanze costruibili, specie di pet
     # (+ comportamenti), tag_grant dei talenti. Rendono raggiungibili le
     # sinergie che pescano da questi sistemi. La VALIDAZIONE piena di quei

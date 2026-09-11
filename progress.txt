@@ -10910,3 +10910,86 @@ COME VERIFICATO.
 PROSSIMA STORIA: US-1002 (una scena, non cinque - il motore dipinge piu'
 layout nella stessa TileMapLayer, world_scene.gd, confini aperti, un
 primo corridoio vero Mirwada-Marche come prova del meccanismo).
+
+---
+
+[2026-09-11] US-1002 (scope ridotto): il motore del mondo continuo, provato in isolamento
+
+CONTESTO. Proseguendo dopo US-1001, ho chiesto alla svelta all'utente due
+cose: topologia (hub-and-spoke vs collegamenti diretti - scelto: anello,
+gia' applicato in US-1001) e se partire subito con US-1002 (si'). Scrivendo
+US-1002 come da PRD e' emerso in corsa che collegarlo DAVVERO a main.tscn
+comporta ritirare region_scene.gd + le 5 scenes/regioni/*.tscn e riscrivere
+tests/test_layouts.gd (~800 righe, 20 test costruiti sulla vecchia
+architettura a scena singola: coordinate locali senza offset, nodi
+"Passaggio_X" che nel mondo continuo non esistono piu') oltre a
+test_area_gate.gd/test_page_mappa.gd/test_main_boot.gd. Da solo, oltre
+la soglia esplicita di CLAUDE.md ("se superi ~200 righe di diff la story
+era troppo grande, segnalalo e proponi di spezzarla invece di tirare
+dritto"). Applicata la regola: story spezzata in corsa, non tirata dritto.
+
+- US-1002 (QUESTA): il motore vero e proprio, provato IN ISOLAMENTO. Il
+  gioco vero continua a girare su region_scene.gd - zero rischio di
+  regressione, region_scene.gd/i 5 .tscn/tutti i loro test restano intatti
+  e passano esattamente come prima.
+- US-1002B (nuova, inserita in prd.json con priority 3, tutte le story da
+  US-1003 in poi spostate di +1): il collegamento vero a main.tscn/
+  main.gd/page_mappa.gd, il ritiro di region_scene.gd e la migrazione dei
+  4 file di test che oggi dipendono dalla vecchia architettura.
+
+FATTO (US-1002).
+- scripts/world_scene.gd (nuovo): le stesse funzioni di region_scene.gd
+  (_dipingi/_tinta_di_fondo/_crea_zone/_crea_gate/_crea_nemici/
+  _crea_oggetti/_crea_npc/_su_ingresso_zona/_npc_avvicinato+allontanato/
+  _unhandled_input), riscritte per prendere una regione + un offset e
+  girare in un ciclo su GameData.get_regions() invece che una volta per
+  scena. Nuovo: _crea_confine (una Area2D grande quanto il rettangolo
+  della regione, aggiorna WorldState.entra_regione al body_entered -
+  sostituisce il vecchio "passaggio" puntuale); _disegna_corridoi/
+  _scava_apertura/_disegna_percorso_a_elle (percorso a L generico, legge
+  data/world/corridoi.json, non conosce nomi di regione); punto_spawn(rid
+  facoltativo, default alla regione corrente di WorldState - stesso
+  contratto a zero argomenti che player.gd::_respawn() gia' chiama, US-9
+  bug fix di ieri, nessuna regressione); viaggia_a(target) ora riposiziona
+  il giocatore invece di ricaricare una scena.
+- scenes/world_scene.tscn (nuovo).
+- data/world/corridoi.json + data/schema/corridoio.schema.json (nuovi):
+  un corridoio dichiarato, mirwada-marche_crepuscolo, aggancio_a [0,18]
+  (parete ovest di Mirwada) / aggancio_b [47,18] (parete est di Marche),
+  larghezza 3.
+- scripts/game_data.gd: PATH_CORRIDOI + _corridoi + get_corridoi() (stesso
+  pattern di _load_single gia' usato per PATH_REGIONS).
+- tools/validate_data.py: nuovo blocco per corridoi.json (a/b esistono e
+  sono diversi, coppie non duplicate in nessun verso, aggancio_a/b [x,y]
+  di interi >=0, larghezza intero >=1).
+- tests/test_world_scene.gd (nuovo, 9 test): dipintura per-regione al
+  proprio offset (righe di palette diverse), spawn per regione,
+  punto_spawn() a vuoto usa la regione corrente, il confine aggiorna
+  WorldState.regione_corrente() (handler chiamato direttamente, stesso
+  pattern gia' in uso nel resto della suite per bypassare la fisica reale
+  nei test headless), un corpo non-player non sposta la regione, il
+  corridoio Mirwada-Marche calpestabile in ogni punto controllato,
+  viaggia_a riposiziona senza liberare il nodo, viaggia_a verso un id
+  inesistente fallisce pulito, i nemici di ogni regione (35 in tutto, 7 a
+  regione) filtrano correttamente per rettangolo.
+- 006_PRD/prd-fase-10-mondo-continuo.md: nota di split su US-1002, nuova
+  sezione US-1002B con i suoi AC.
+- prd.json: US-1002 passes:true con note complete sullo split; US-1002B
+  inserita a priority 3; US-1003..US-1014 spostate a priority 4..15.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 907 test,
+  tutti passati (898 + 9 nuovi), NESSUNA regressione (region_scene.gd e i
+  suoi test restano intatti, non toccati).
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat): Mirwada e Marche del Crepuscolo dipinte con palette
+  diverse ai rispettivi world_offset nello stesso nodo TileMapLayer, il
+  corridoio visibile come striscia calpestabile fra le due, gli NPC di
+  entrambe le regioni compaiono correttamente nelle rispettive zone.
+
+PROSSIMA STORIA: US-1002B (collegare world_scene.gd al gioco vero: main.tscn
++ main.gd + page_mappa.gd, ritirare region_scene.gd/i 5 .tscn, migrare
+tests/test_layouts.gd + test_area_gate.gd + test_page_mappa.gd +
+test_main_boot.gd). E' la story che rende il mondo continuo il gioco
+DAVVERO giocato, non solo provato nei test.

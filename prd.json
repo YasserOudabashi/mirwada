@@ -21,18 +21,36 @@
     },
     {
       "id": "US-1002",
-      "title": "Una scena, non cinque - il motore dipinge piu' layout nella stessa TileMapLayer",
-      "description": "Come giocatore, voglio che il mondo sia una sola scena continua: region_scene.gd (o il suo successore) deve poter dipingere PIU' layout, ognuno al proprio world_offset, nella stessa TileMapLayer.",
+      "title": "Il motore del mondo continuo: world_scene.gd dipinge piu' layout nella stessa TileMapLayer",
+      "description": "Come motore, serve un nodo che dipinga OGNI regione di GameData.get_regions() nella stessa TileMapLayer al proprio world_offset, con un corridoio di raccordo vero e un modo di sapere in quale regione si trova il giocatore senza mai ricaricare una scena. SCOPE RIDOTTO in corsa rispetto al PRD originale (vedi notes): questa story prova il motore in isolamento; collegarlo a main.tscn e ritirare region_scene.gd e' US-1002B.",
       "acceptanceCriteria": [
-        "Il motore (nome di lavoro world_scene.gd, sostituisce region_scene.gd come scena caricata da main.gd) itera GameData.get_regions() e dipinge ogni layout dai suoi dati esistenti (_dipingi(), _crea_nemici(), _crea_oggetti(), _crea_npc(), _crea_zone(), _crea_gate() - tutte le funzioni gia' scritte in region_scene.gd restano, cambia solo il ciclo esterno: una volta per regione invece di una volta per scena).",
-        "Il confine tra due regioni adiacenti (per world_offset) e' aperto: il bordo # obbligatorio del validator vale solo sui lati SENZA una regione vicina (nuovo campo dichiarato, es. layout.confini_aperti: [\"est\", \"nord\", ...], o dedotto dai world_offset - decisione di implementazione, non di design).",
-        "Un corridoio/terreno di raccordo disegnato a mano riempie lo spazio tra il bordo aperto di una regione e quello della vicina (nuovo contenuto minimo per questa story: non serve bello, deve solo esistere e essere calpestabile) - con la topologia ad anello decisa in US-1001, questa story ne copre almeno una coppia (es. Mirwada-Marche) come prova del meccanismo; gli altri 7 collegamenti (3 raggi restanti + 4 lati dell'anello) si aggiungono nel Blocco A (US-1005..1009), un corridoio a testa quando la regione corrispondente viene disegnata.",
-        "WorldState.regione_corrente() si aggiorna quando il giocatore attraversa il confine (nuova Area2D di attraversamento, sostituisce semanticamente il vecchio passaggio - stesso nodo, comportamento diverso: aggiorna _regione e basta, MAI ricarica la scena).",
-        "main.gd: niente piu' partita_iniziata che ricrea la scena regione a ogni viaggio - la scena si crea UNA volta all'avvio/al caricamento.",
-        "Test headless + verifica a schermo con Xvfb: cammina da un capo all'altro di due regioni adiacenti senza che lo schermo lampeggi o che Progression/Inventory/qualunque stato si azzeri a meta'.",
+        "scripts/world_scene.gd (nuovo) + scenes/world_scene.tscn: itera GameData.get_regions() e dipinge ogni layout dai suoi dati esistenti (_dipingi/_crea_nemici/_crea_oggetti/_crea_npc/_crea_zone/_crea_gate - stessa logica di region_scene.gd, riscritta per prendere regione+offset invece di leggere un @export unico e girare in un ciclo invece che una volta per scena).",
+        "data/world/corridoi.json (nuovo) + data/schema/corridoio.schema.json + validator: un corridoio dichiara due regioni (a, b), un punto di aggancio locale per ciascuna e una larghezza; world_scene.gd lo disegna come un percorso a L, con un'apertura scavata su ognuno dei due bordi. Questa story ne copre uno solo (mirwada-marche_crepuscolo) come prova del meccanismo; gli altri 7 della topologia ad anello arrivano nel Blocco A (US-1005..1009).",
+        "WorldState.regione_corrente() si aggiorna quando il giocatore entra nel rettangolo di un'altra regione (una Area2D per regione, grande quanto il suo rettangolo) - mai un reload di scena.",
+        "world_scene.gd::viaggia_a(target) riposiziona il giocatore alla cella di spawn della regione target (rispettando il gating d'ingresso se dichiarato) senza caricare nulla - sostituisce la vecchia semantica di region_scene.gd::viaggia_a che ricaricava la scena.",
+        "Test headless dedicati (tests/test_world_scene.gd) che provano il meccanismo in isolamento: dipintura per-regione al proprio offset, spawn per regione, il confine aggiorna WorldState, il corridoio e' calpestabile, viaggia_a riposiziona senza liberare il nodo, i nemici/oggetti di ogni regione compaiono alla posizione globale giusta.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
       "priority": 2,
+      "fase": 10,
+      "passes": true,
+      "notes": "SPLIT IN CORSA (segnalato, non un'esecuzione a testa bassa - CLAUDE.md: 'se superi ~200 righe di diff la story era troppo grande, segnalalo e proponi di spezzarla'): scrivendo world_scene.gd e' emerso che collegarlo davvero a main.tscn richiede anche ritirare region_scene.gd + le 5 scenes/regioni/*.tscn e RISCRIVERE tests/test_layouts.gd (~800 righe, 20 test che istanziano una regione alla volta con coordinate locali e nodi 'Passaggio_X' ormai inesistenti), oltre a test_area_gate.gd/test_page_mappa.gd/test_main_boot.gd (che caricano scenes/regioni/*.tscn o testano il reload di main.gd::_su_partita_iniziata). Da solo questo supera enormemente la soglia di CLAUDE.md. Story spezzata: QUESTA la chiude provando il motore in isolamento (tests/test_world_scene.gd, mai wired a main.tscn - il gioco vero gira ancora su region_scene.gd, ZERO regressione); US-1002B (appena inserita in prd.json, priority 3) fa il collegamento vero + il ritiro + la migrazione dei test. Fatto: scripts/world_scene.gd (nuovo) - stesse funzioni di region_scene.gd (_dipingi/_tinta_di_fondo/_crea_zone/_crea_gate/_crea_nemici/_crea_oggetti/_crea_npc/_su_ingresso_zona/_npc_avvicinato+allontanato/_unhandled_input), riscritte per prendere reg+offset e girare in un ciclo su GameData.get_regions(); NUOVO: _crea_confine (una Area2D per regione, il rettangolo intero, aggiorna WorldState.entra_regione al body_entered - sostituisce il vecchio passaggio puntuale); _disegna_corridoi/_scava_apertura/_disegna_percorso_a_elle (percorso a L generico, non conosce nomi di regione: legge data/world/corridoi.json); punto_spawn(rid='') (default alla regione corrente di WorldState, stesso contratto a zero argomenti che player.gd::_respawn() gia' chiama); viaggia_a(target) ora riposiziona invece di ricaricare. scenes/world_scene.tscn (nuovo). data/world/corridoi.json + data/schema/corridoio.schema.json (nuovi) - un corridoio mirwada-marche_crepuscolo, aggancio_a [0,18] (parete ovest di Mirwada) / aggancio_b [47,18] (parete est di Marche), larghezza 3. GameData: PATH_CORRIDOI + _corridoi + get_corridoi() (stesso pattern di _load_single di PATH_REGIONS). tools/validate_data.py: nuovo blocco per corridoi.json (a/b esistono e sono diversi, coppie non duplicate, aggancio_a/b [x,y] di interi >=0, larghezza intero >=1). tests/test_world_scene.gd (nuovo, 9 test): dipintura per-regione al proprio offset (righe di palette diverse), spawn per regione, punto_spawn() a vuoto usa la regione corrente, il confine aggiorna WorldState.regione_corrente() (chiamato direttamente come handler, stesso pattern gia' in uso nel resto della suite per bypassare la fisica reale), un corpo non-player non sposta la regione, il corridoio Mirwada-Marche e' calpestabile in ogni punto controllato, viaggia_a riposiziona senza liberare il nodo, viaggia_a verso un id inesistente fallisce pulito, i nemici di ogni regione (35 in tutto, 7 a regione) filtrano correttamente per rettangolo. Verificato: godot --headless --path . --script res://tests/run_tests.gd: 907 test, tutti passati (898 + 9 nuovi), NESSUNA regressione (region_scene.gd/i 5 .tscn/tutti i test esistenti restano intatti e continuano a valere finche' US-1002B non li ritira); python tools/validate_data.py esce 0, stessi 2 warning di sempre; verifica a schermo con Xvfb (script ad-hoc non committato, screenshot mandati in chat) - Mirwada e Marche dipinte con palette diverse ai rispettivi world_offset, il corridoio visibile e attraversabile fra le due."
+    },
+    {
+      "id": "US-1002B",
+      "title": "Collega world_scene.gd al gioco vero: main.tscn, page_mappa.gd, ritiro di region_scene.gd",
+      "description": "Come giocatore, voglio che il gioco VERO usi il mondo continuo (non solo i test): main.tscn carica world_scene.gd invece della singola regione Mirwada, main.gd non ricrea piu' la scena a ogni nuova partita, la pagina mappa (fast travel) trova il nuovo nodo, e region_scene.gd + le 5 scenes/regioni/*.tscn (ormai morti) vengono ritirati insieme ai test che testavano solo la vecchia architettura a scena singola.",
+      "acceptanceCriteria": [
+        "scenes/main.tscn: il nodo regione (oggi 'Mirwada', istanza di scenes/regioni/mirwada.tscn) e' sostituito da un'istanza di scenes/world_scene.tscn; Player resta un fratello, la sua posizione iniziale viene da world_scene.punto_spawn('mirwada') invece di un Vector2 scritto a mano nella scena.",
+        "scripts/main.gd::_su_partita_iniziata: NON ricrea piu' la scena (il mondo e' persistente) - su una nuova partita chiama world_scene.viaggia_a('mirwada') per riposizionare il giocatore, senza liberare/reistanziare nulla. _trova_regione() resta valido (stesso contratto has_method('viaggia_a')).",
+        "scripts/pages/page_mappa.gd::_viaggia: il lookup del nodo mondo passa dal confronto su get_script().resource_path.ends_with('region_scene.gd') allo stesso contratto pubblico has_method('viaggia_a') gia' usato da main.gd (region_scene.gd non esiste piu' in scena, il confronto sul path si romperebbe silenziosamente).",
+        "Ritirati: scripts/region_scene.gd, scenes/regioni/*.tscn (5 file). Nessun altro file in res://scripts fa piu' riferimento a scenes/regioni/ (grep di verifica).",
+        "tests/test_layouts.gd riscritto per instanziare scenes/world_scene.tscn (una sola volta per test, come test_world_scene.gd) invece di una scena per regione: ogni assert di cella/zona/passaggio aggiunge il world_offset della regione in questione; i test sui nodi 'Passaggio_X' (ormai inesistenti, sostituiti dal confine+corridoio) sono rimossi o riformulati sul nuovo meccanismo.",
+        "tests/test_area_gate.gd, tests/test_page_mappa.gd, tests/test_main_boot.gd: le porzioni che caricavano scenes/regioni/*.tscn o testavano il reload di _su_partita_iniziata sono aggiornate allo stesso modo (world_scene.tscn, nessun reload atteso).",
+        "Verifica a schermo con Xvfb: la partita vera (scaffale -> creazione -> mondo) cammina da Mirwada a Marche del Crepuscolo attraverso il corridoio SENZA alcuna chiamata a change_scene_to_* e senza che lo schermo lampeggi o che Progression/Inventory si azzerino a meta'. Screenshot mandati in chat.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+      ],
+      "priority": 3,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -47,7 +65,7 @@
         "Un test manuale/profiling minimo documentato in progress.txt (frame time con le 5 regioni piene vs una sola, prima/dopo).",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 3,
+      "priority": 4,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -63,7 +81,7 @@
         "Test headless: salva a meta' di una regione \"nuova\" (lontana dallo spawn originale), ricarica, il personaggio riappare nello stesso punto del mondo continuo.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 4,
+      "priority": 5,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -78,7 +96,7 @@
         "Nessuna regressione: gli 8 NPC esistenti restano raggiungibili, le quest di Atto I restano completabili.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 5,
+      "priority": 6,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -93,7 +111,7 @@
         "Il gating d'ingresso della regione (se dichiarato) si applica come barriera fisica al confine (US-1002), non piu' come rifiuto di caricamento.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 6,
+      "priority": 7,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -108,7 +126,7 @@
         "Il gating d'ingresso della regione (se dichiarato) si applica come barriera fisica al confine (US-1002), non piu' come rifiuto di caricamento.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 7,
+      "priority": 8,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -123,7 +141,7 @@
         "Il gating d'ingresso della regione (se dichiarato) si applica come barriera fisica al confine (US-1002), non piu' come rifiuto di caricamento.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 8,
+      "priority": 9,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -138,7 +156,7 @@
         "Il gating d'ingresso della regione si applica come barriera fisica al confine (US-1002), non piu' come rifiuto di caricamento - verificato che un personaggio sotto soglia viene fermato fisicamente e uno sopra soglia passa.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 9,
+      "priority": 10,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -154,7 +172,7 @@
         "Nessun nuovo tipo di pagina, nessuna nuova primitiva: un interno e' un layout come un altro, letto dallo stesso region_scene/world_scene.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 10,
+      "priority": 11,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -170,7 +188,7 @@
         "Verifica a schermo con Xvfb: si entra ed esce da almeno 2 edifici diversi nello stesso villaggio. Screenshot mandati in chat.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 11,
+      "priority": 12,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -185,7 +203,7 @@
         "Se serve una nuova voce nel vocabolario chiuso data/schema/location_tags.json per \"palazzo/struttura\", e' una decisione da dichiarare esplicitamente con motivazione, non presa di nascosto.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 12,
+      "priority": 13,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -199,7 +217,7 @@
         "tests/manual/qa_mondo_continuo.gd (nuovo, Xvfb): cammina da Mirwada a una regione adiacente attraversando il confine SENZA che compaia una schermata di caricamento (nessuna chiamata a get_tree().change_scene_to_* durante l'attraversamento - solo all'avvio), entra in un edificio del villaggio, ne esce, entra nella struttura grande, ne esce. Screenshot mandati in chat.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 13,
+      "priority": 14,
       "fase": 10,
       "passes": false,
       "notes": ""
@@ -214,7 +232,7 @@
         "prd.json: tutte le story a passes: true con note compilate.",
         "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
       ],
-      "priority": 14,
+      "priority": 15,
       "fase": 10,
       "passes": false,
       "notes": ""

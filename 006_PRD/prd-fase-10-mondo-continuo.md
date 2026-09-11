@@ -80,11 +80,23 @@ può dipingerle tutte insieme.
 - [ ] Test headless: nessuna sovrapposizione, ogni regione ha un
       `world_offset`.
 
-#### US-1002: Una scena, non cinque — il motore dipinge più layout nella stessa TileMapLayer
+#### US-1002: Il motore del mondo continuo — world_scene.gd dipinge più layout nella stessa TileMapLayer
 
-**Descrizione:** Come giocatore, voglio che il mondo sia una sola scena
-continua: `region_scene.gd` (o il suo successore) deve poter dipingere PIÙ
-layout, ognuno al proprio `world_offset`, nella stessa `TileMapLayer`.
+> **Split in corsa (2026-09-11)**: scrivendo questa story è emerso che
+> collegarla davvero a `main.tscn` richiede anche ritirare `region_scene.gd`
+> + le 5 `scenes/regioni/*.tscn` e riscrivere `tests/test_layouts.gd`
+> (~800 righe, 20 test sulla vecchia architettura a scena singola) oltre a
+> `test_area_gate.gd`/`test_page_mappa.gd`/`test_main_boot.gd` — da solo
+> oltre la soglia di CLAUDE.md ("se superi ~200 righe di diff, segnalalo e
+> proponi di spezzarla"). US-1002 ora prova il motore **in isolamento**
+> (mai collegato a `main.tscn`, il gioco vero continua a girare su
+> `region_scene.gd`, zero regressione); **US-1002B** (nuova) fa il
+> collegamento vero, ritira il codice morto e migra i test.
+
+**Descrizione:** Come motore, serve un nodo che dipinga OGNI regione di
+`GameData.get_regions()` nella stessa `TileMapLayer` al proprio
+`world_offset`, con un corridoio di raccordo vero e un modo di sapere in
+quale regione si trova il giocatore senza mai ricaricare una scena.
 
 **Acceptance Criteria:**
 - [ ] Il motore (nome di lavoro `world_scene.gd`, sostituisce
@@ -111,11 +123,46 @@ layout, ognuno al proprio `world_offset`, nella stessa `TileMapLayer`.
       attraversa il confine (nuova `Area2D` di attraversamento, sostituisce
       semanticamente il vecchio `passaggio` — stesso nodo, comportamento
       diverso: aggiorna `_regione` e basta, MAI ricarica la scena).
-- [ ] `main.gd`: niente più `partita_iniziata` che ricrea la scena regione a
-      ogni viaggio — la scena si crea UNA volta all'avvio/al caricamento.
-- [ ] Test headless + verifica a schermo con Xvfb: cammina da un capo
-      all'altro di due regioni adiacenti senza che lo schermo lampeggi o
-      che `Progression`/`Inventory`/qualunque stato si azzeri a metà.
+- [ ] `world_scene.gd::viaggia_a(target)` riposiziona il giocatore alla
+      cella di spawn della regione target senza caricare nulla — sostituisce
+      la vecchia semantica di `region_scene.gd::viaggia_a` (ricaricava la
+      scena). Il collegamento vero a `main.gd`/`main.tscn` (niente più
+      `partita_iniziata` che ricrea una scena) è US-1002B.
+- [ ] Test headless dedicati (`tests/test_world_scene.gd`) che provano il
+      meccanismo in isolamento: dipintura per-regione al proprio offset,
+      spawn per regione, il confine aggiorna `WorldState`, il corridoio è
+      calpestabile, `viaggia_a` riposiziona senza liberare il nodo, i
+      nemici/oggetti di ogni regione compaiono alla posizione globale giusta.
+
+#### US-1002B: Collega world_scene.gd al gioco vero
+
+**Descrizione:** Come giocatore, voglio che il gioco VERO usi il mondo
+continuo (non solo i test): `main.tscn` carica `world_scene.gd` invece
+della singola regione Mirwada, `main.gd` non ricrea più la scena a ogni
+nuova partita, la pagina mappa (fast travel) trova il nuovo nodo, e
+`region_scene.gd` + le 5 `scenes/regioni/*.tscn` (ormai morti) vengono
+ritirati insieme ai test che testavano solo la vecchia architettura a
+scena singola.
+
+**Acceptance Criteria:**
+- [ ] `scenes/main.tscn`: il nodo regione è sostituito da un'istanza di
+      `scenes/world_scene.tscn`; la posizione iniziale del Player viene da
+      `world_scene.punto_spawn("mirwada")`, non un `Vector2` scritto a mano.
+- [ ] `main.gd::_su_partita_iniziata`: non ricrea più la scena — su una
+      nuova partita chiama `world_scene.viaggia_a("mirwada")`.
+- [ ] `page_mappa.gd::_viaggia`: il lookup del nodo mondo passa dal
+      confronto sul path dello script (`region_scene.gd`, non esiste più)
+      allo stesso contratto pubblico `has_method("viaggia_a")` già usato
+      da `main.gd`.
+- [ ] Ritirati: `scripts/region_scene.gd`, `scenes/regioni/*.tscn` (5 file).
+      Nessun riferimento residuo in `res://scripts` (grep di verifica).
+- [ ] `tests/test_layouts.gd` riscritto per usare `scenes/world_scene.tscn`
+      (coordinate + `world_offset`, nodi `Passaggio_X` rimossi/riformulati
+      sul confine+corridoio); `test_area_gate.gd`/`test_page_mappa.gd`/
+      `test_main_boot.gd` aggiornati allo stesso modo.
+- [ ] Verifica a schermo con Xvfb: la partita vera cammina da Mirwada a
+      Marche attraverso il corridoio SENZA `change_scene_to_*` e senza che
+      `Progression`/`Inventory` si azzerino a metà. Screenshot in chat.
 
 #### US-1003: Prestazioni — non tutto il mondo è vivo insieme
 

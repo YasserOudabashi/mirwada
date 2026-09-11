@@ -1,0 +1,198 @@
+extends "res://tests/test_case.gd"
+## US-1002 (fase 10, mondo continuo) — world_scene.gd sostituisce
+## region_scene.gd come motore che dipinge il mondo: qui si prova il
+## meccanismo in isolamento (dipintura per-regione al proprio world_offset,
+## corridoio di raccordo, aggiornamento di WorldState.regione_corrente() a
+## un attraversamento, viaggia_a senza ricaricare una scena). Il collegamento
+## reale a main.tscn/page_mappa.gd e il ritiro di region_scene.gd (con la
+## migrazione di test_layouts.gd/test_area_gate.gd/test_page_mappa.gd/
+## test_main_boot.gd, che oggi testano ancora l'architettura a scena singola)
+## sono US-1002B: la story si spezza qui perche' quella migrazione da sola
+## tocca ~800 righe di test in un file solo (CLAUDE.md: "se superi ~200
+## righe di diff la story era troppo grande, segnalalo e proponi di
+## spezzarla" - segnalato in progress.txt).
+
+const WorldScene := preload("res://scenes/world_scene.tscn")
+
+const TILE := 32
+const COL_PAVIMENTO := 0
+const COL_MURO := 1
+
+# world_offset di data/world/regions.json (US-1001).
+const OFFSET_MIRWADA := Vector2i(220, 180)
+const OFFSET_MARCHE := Vector2i(0, 0)
+
+
+func _root() -> Node: return Engine.get_main_loop().root
+func _gd() -> Node: return _root().get_node("GameData")
+func _ws() -> Node: return _root().get_node("WorldState")
+
+
+func prepara() -> void:
+	_ws().call("pulisci")
+
+
+## Istanzia il mondo con un Player fittizio come fratello, stesso contratto
+## di main.tscn (Player e mondo sono fratelli) gia' usato da region_scene.gd.
+func _istanzia_con_player() -> Dictionary:
+	var cont := Node2D.new()
+	_root().add_child(cont)
+	var player := Node2D.new()
+	player.name = "Player"
+	player.add_to_group("player")
+	cont.add_child(player)
+	var mondo: Node = WorldScene.instantiate()
+	cont.add_child(mondo)
+	return {"cont": cont, "player": player, "mondo": mondo}
+
+
+func test_dipinge_ogni_regione_al_proprio_offset() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: TileMapLayer = r["mondo"]
+
+	# bordo esterno di Mirwada, al suo offset
+	assert_eq(mondo.get_cell_atlas_coords(OFFSET_MIRWADA), Vector2i(COL_MURO, 0),
+		"bordo esterno di Mirwada solido, al proprio world_offset")
+	assert_eq(mondo.get_cell_atlas_coords(OFFSET_MIRWADA + Vector2i(1, 1)), Vector2i(COL_PAVIMENTO, 0),
+		"cella interna di Mirwada calpestabile")
+
+	# bordo esterno di Marche, al SUO offset (diverso da Mirwada)
+	var riga_marche: int = mondo.get_cell_atlas_coords(OFFSET_MARCHE + Vector2i(1, 1)).y
+	assert_eq(mondo.get_cell_atlas_coords(OFFSET_MARCHE), Vector2i(COL_MURO, riga_marche),
+		"bordo esterno di Marche solido, al proprio world_offset")
+	assert_eq(mondo.get_cell_atlas_coords(OFFSET_MARCHE + Vector2i(1, 1)), Vector2i(COL_PAVIMENTO, riga_marche),
+		"cella interna di Marche calpestabile")
+	assert_ne(riga_marche, 0, "Marche ha una palette_visiva non neutra -> riga diversa da Mirwada")
+
+	(r["cont"] as Node2D).free()
+
+
+func test_spawn_per_regione_rispetta_l_offset() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: TileMapLayer = r["mondo"]
+
+	var layout_m: Dictionary = _gd().call("get_layout", "mirwada")
+	var sp: Array = layout_m.get("spawn", [4, 4])
+	var atteso: Vector2 = mondo.to_global(mondo.map_to_local(OFFSET_MIRWADA + Vector2i(int(sp[0]), int(sp[1]))))
+	assert_eq(mondo.call("punto_spawn", "mirwada"), atteso, "punto_spawn('mirwada') usa il world_offset")
+
+	var layout_march: Dictionary = _gd().call("get_layout", "marche_crepuscolo")
+	var sp2: Array = layout_march.get("spawn", [4, 4])
+	var atteso2: Vector2 = mondo.to_global(mondo.map_to_local(OFFSET_MARCHE + Vector2i(int(sp2[0]), int(sp2[1]))))
+	assert_eq(mondo.call("punto_spawn", "marche_crepuscolo"), atteso2, "punto_spawn('marche_crepuscolo') usa il proprio world_offset")
+	assert_ne(atteso, atteso2, "due regioni diverse hanno uno spawn diverso nel mondo continuo")
+
+	(r["cont"] as Node2D).free()
+
+
+## punto_spawn() senza argomenti usa WorldState.regione_corrente() - stesso
+## contratto che player.gd::_respawn() gia' chiama a zero argomenti.
+func test_punto_spawn_senza_argomenti_usa_la_regione_corrente() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: TileMapLayer = r["mondo"]
+
+	_ws().call("entra_regione", "marche_crepuscolo")
+	assert_eq(mondo.call("punto_spawn"), mondo.call("punto_spawn", "marche_crepuscolo"),
+		"punto_spawn() a vuoto risolve sulla regione corrente")
+
+	(r["cont"] as Node2D).free()
+
+
+func test_confine_di_regione_aggiorna_worldstate() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: Node = r["mondo"]
+	var player: Node = r["player"]
+
+	# stesso pattern gia' in uso nel resto del progetto per i test headless:
+	# si chiama l'handler direttamente invece di aspettare la fisica reale
+	# (Area2D.body_entered non e' affidabile in un test senza frame fisici).
+	mondo.call("_su_ingresso_regione", player, "mirwada")
+	assert_eq(str(_ws().call("regione_corrente")), "mirwada", "attraversare il confine registra la regione")
+	mondo.call("_su_ingresso_regione", player, "marche_crepuscolo")
+	assert_eq(str(_ws().call("regione_corrente")), "marche_crepuscolo",
+		"un secondo attraversamento aggiorna la regione, senza ricaricare nulla")
+
+	(r["cont"] as Node2D).free()
+
+
+func test_confine_ignora_corpi_che_non_sono_il_player() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: Node = r["mondo"]
+	_ws().call("entra_regione", "marche_crepuscolo")
+
+	var estraneo := Node2D.new()
+	mondo.call("_su_ingresso_regione", estraneo, "mirwada")
+	assert_eq(str(_ws().call("regione_corrente")), "marche_crepuscolo",
+		"un corpo che non e' nel gruppo 'player' non sposta la regione corrente")
+	estraneo.free()
+
+	(r["cont"] as Node2D).free()
+
+
+## US-1002: il corridoio Mirwada-Marche (data/world/corridoi.json) esiste
+## davvero ed e' calpestabile per tutta la sua lunghezza - la prova che il
+## meccanismo funziona, richiesta esplicitamente dall'AC di questa story
+## (gli altri 7 collegamenti dell'anello arrivano nel Blocco A).
+func test_corridoio_mirwada_marche_e_calpestabile() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: TileMapLayer = r["mondo"]
+
+	var corridoi: Array = _gd().call("get_corridoi")
+	assert_eq(corridoi.size(), 1, "un solo corridoio dichiarato in questa story")
+	var c: Dictionary = corridoi[0]
+	var pa: Vector2i = OFFSET_MIRWADA + Vector2i((c["aggancio_a"] as Array)[0], (c["aggancio_a"] as Array)[1])
+	var pb: Vector2i = OFFSET_MARCHE + Vector2i((c["aggancio_b"] as Array)[0], (c["aggancio_b"] as Array)[1])
+
+	# gomito del percorso a L: (pb.x, pa.y)
+	var gomito := Vector2i(pb.x, pa.y)
+	for punto in [pa, pb, gomito, (pa + gomito) / 2, (gomito + pb) / 2]:
+		var col: int = mondo.get_cell_atlas_coords(punto).x
+		assert_eq(col, COL_PAVIMENTO, "cella %s del corridoio e' calpestabile" % punto)
+
+	(r["cont"] as Node2D).free()
+
+
+func test_viaggia_a_riposiziona_senza_ricaricare_nulla() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: Node = r["mondo"]
+	var player: Node2D = r["player"]
+
+	var ok: bool = mondo.call("viaggia_a", "marche_crepuscolo")
+	assert_true(ok, "viaggia_a riesce verso una regione senza gating d'ingresso")
+	assert_eq(player.global_position, mondo.call("punto_spawn", "marche_crepuscolo"),
+		"il player e' alla cella di spawn della regione target")
+	assert_false(mondo.is_queued_for_deletion(), "il mondo NON viene ricaricato: stesso nodo di prima")
+
+	(r["cont"] as Node2D).free()
+
+
+func test_viaggia_a_verso_una_regione_inesistente_fallisce() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: Node = r["mondo"]
+	assert_false(bool(mondo.call("viaggia_a", "nonesiste")), "id inesistente -> false, nessun crash")
+	(r["cont"] as Node2D).free()
+
+
+## Nemici/oggetti del layout di Mirwada continuano a spawnare correttamente
+## nel mondo continuo, alla posizione GLOBALE giusta (offset incluso) -
+## stessa attesa gia' provata per region_scene.gd in test_layouts.gd.
+func test_nemici_di_mirwada_spawnano_alla_posizione_globale_giusta() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: Node = r["mondo"]
+
+	# il mondo continuo ospita i nemici di TUTTE e 5 le regioni nello stesso
+	# nodo: si filtrano quelli dentro il rettangolo di Mirwada (offset
+	# incluso), non semplicemente "ogni nemico in scena".
+	var rett := Rect2(Vector2(OFFSET_MIRWADA) * TILE, Vector2(48, 36) * TILE)
+	var nemici_mirwada: Array = []
+	var totale: int = 0
+	for c in mondo.get_children():
+		if not c.is_in_group("nemici"):
+			continue
+		totale += 1
+		if rett.has_point(c.global_position):
+			nemici_mirwada.append(c)
+	assert_eq(nemici_mirwada.size(), 7, "6 nemici di Sequenza 9 + 1 boss dal layout di Mirwada")
+	assert_eq(totale, 35, "7 nemici per ognuna delle 5 regioni, tutte nello stesso mondo continuo")
+
+	(r["cont"] as Node2D).free()
