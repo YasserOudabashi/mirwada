@@ -144,8 +144,8 @@
       ],
       "priority": 9,
       "fase": 10,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/world/layouts/marche_crepuscolo.json: ridisegnato da 48x36 a 76x48 (world_offset invariato, nessuna sovrapposizione). I 10 location_tags sono terreni fisicamente distinti (non piu' 10 rettangoli identici in griglia): rocce/detriti/macerie/palude con densita' e pattern diversi per altura/vetta/luogo_di_battaglia/luogo_di_massacro/rovina/luogo_in_decadenza, mura diroccate per tempio_abbandonato, santuari murati con porta (stesso linguaggio di Mirwada/US-1010) per cripta/trono_del_gigante/soglia_del_crepuscolo (il sito VERO del rituale di Sequenza 0 del TG). 7 nemici + 11 oggetti riposizionati sulle nuove celle calpestabili, stesso contenuto. data/world/corridoi.json: aggancio_b aggiornato da [47,18] a [75,22] (nuovo bordo est di Marche) - stesso corridoio mirwada-marche_crepuscolo, verificato ancora funzionante a piedi dopo il ridimensionamento. Nessuna gating d'ingresso dichiarata per Marche (solo 2 gating interni gia' gestiti da AreaGate dal 2002): AC#3 non richiedeva modifiche. tests/test_layouts.gd: test_marche_dipinta_dal_layout aggiornato alle coordinate vere del nuovo edificio della cripta (muro/porta) - aggiunta la costante COL_PORTA (colonna 7 del tileset, diversa da COL_PAVIMENTO), un refuso scoperto mentre si migrava il test. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 915 test, tutti passati, nessuna regressione (nessun test nuovo, solo migrazione); python tools/validate_data.py -> 0 errori, 2 warning (invariati); verifica a schermo con Xvfb (screenshot in chat, script ad-hoc non committato) - giro fra 5 zone visivamente distinte + cammino reale attraverso l'ultimo tratto del corridoio fino a dentro Mirwada (WorldState.regione_corrente() -> 'mirwada'), prova che l'aggancio_b riposizionato regge davvero. Dettagli completi in progress.txt."
     },
     {
       "id": "US-1007",

@@ -11390,4 +11390,59 @@ provato su 4 casi reali a Mirwada (sotterraneo + i 3 promessi); resta da
 fare il resto del Blocco B - US-1011 (il primo villaggio vero, piu'
 edifici) e US-1012 (la prima struttura grande, interno multi-stanza).
 
-PROSSIMA STORIA: US-1006 ("Marche del Crepuscolo cresce"), priority 9.
+PROSSIMA STORIA (chiusa qui sotto): US-1006 ("Marche del Crepuscolo
+cresce"), priority 9.
+
+FATTO (US-1006).
+- data/world/layouts/marche_crepuscolo.json: ridisegnato da 48x36 a
+  76x48 (world_offset [0,0] invariato - verificato nessuna sovrapposizione
+  con le altre 4 regioni, ampio margine). I 10 location_tags della
+  regione (altura, luogo_di_battaglia, tempio_abbandonato, rovina,
+  luogo_in_decadenza, vetta, luogo_di_massacro, cripta, trono_del_gigante,
+  soglia_del_crepuscolo) sono ora terreni fisicamente distinti, non piu'
+  10 rettangoli vuoti identici in griglia: altura/vetta (rocce sparse
+  rade 't', vetta con uno strapiombo murato su un lato), luogo_di_battaglia
+  (detriti 'o' densi e caotici), luogo_di_massacro (ammassi ancora piu'
+  densi), rovina (frammenti di muro + macerie sparse), luogo_in_decadenza
+  (palude/acqua stagnante '~'), tempio_abbandonato (mura diroccate con
+  brecce, non un rettangolo integro), cripta/trono_del_gigante/
+  soglia_del_crepuscolo (santuari murati con porta, stesso linguaggio
+  delle strutture di Mirwada - US-1005/1010). I 7 nemici + 11 oggetti
+  esistenti riposizionati su celle calpestabili della mappa nuova (stessi
+  sequenza/scala/override/item_id/quantita', solo x/y cambiati), zero
+  regressione sul contenuto.
+- data/world/corridoi.json: aggancio_b di mirwada-marche_crepuscolo
+  aggiornato da [47,18] (bordo est del vecchio 48 di larghezza) a
+  [75,22] (bordo est del nuovo 76 di larghezza, riga scelta nel
+  "viale" aperto fra le due file di quartieri) - stesso principio di
+  US-1005 per Mirwada (nessun altro corridoio esiste ancora verso le
+  altre 3 regioni, arriveranno con US-1007..1009).
+- Il gating d'ingresso: nessuna gating con area "ingresso" e' dichiarata
+  per Marche (solo 2 gating interni: shadow_meld su passaggi_ombra,
+  notte_fonda su cripte) - l'AC #3 non richiedeva alcuna modifica qui,
+  gia' applicato come barriera fisica interna (AreaGate) fin da US-1002.
+- tests/test_layouts.gd: test_marche_dipinta_dal_layout aveva 2 celle
+  hardcoded sul vecchio disegno della cripta (muro a [20,19], varco a
+  [23,26]) - aggiornate alle coordinate vere del nuovo edificio murato
+  (muro a [33,30], porta a [36,38]). Scoperto un piccolo refuso mentre
+  ci si era: la porta ('+') e' una colonna del tileset DIVERSA da quella
+  del pavimento ('.', colonna 0) - aggiunta la costante COL_PORTA := 7,
+  mancante da quando il test controllava un varco semplice invece di una
+  porta vera.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 915 test,
+  tutti passati (nessuna regressione, nessun test nuovo - solo la
+  migrazione di test_marche_dipinta_dal_layout alla nuova geometria).
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat): giro fra 5 zone (battaglia/tempio/cripta/trono/
+  soglia, tutte visivamente distinte) + LA PROVA CHE CONTA - cammino
+  REALE (Input reale, fisica vera) dall'ultimo tratto del corridoio fino
+  a dentro Mirwada, WorldState.regione_corrente() passa a 'mirwada':
+  l'aggancio_b riposizionato regge, il corridoio Mirwada-Marche
+  funziona ancora dopo il ridimensionamento di entrambe le regioni.
+
+APERTO: nessuno per questa story.
+
+PROSSIMA STORIA: US-1007 ("Valle della Madre cresce"), priority 10.

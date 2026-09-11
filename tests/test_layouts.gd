@@ -24,6 +24,7 @@ const COL_PAVIMENTO := 0
 const COL_MURO := 1
 const COL_ACQUA := 3
 const COL_SENTIERO := 5
+const COL_PORTA := 7
 
 ## Righe di tileset.png: 0 = neutra, poi 1 + indice della palette_visiva in
 ## data/vfx.json.pathway_palette_visiva (world_scene.gd::_riga_tileset()).
@@ -269,10 +270,11 @@ func test_marche_dipinta_dal_layout() -> void:
 	var riga: int = scena.get_cell_atlas_coords(o + Vector2i(1, 1)).y
 	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
 	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(1, 1)), Vector2i(COL_PAVIMENTO, riga), "cella '.' di brughiera non solida")
-	# muro della cripta (data/world/layouts/marche_crepuscolo.json: zona cripta [20,19,8,8])
-	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(20, 19)), Vector2i(COL_MURO, riga), "muro della cripta solido")
-	# varco della cripta sul lato sud (riga 26, colonne 23-24 libere)
-	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(23, 26)), Vector2i(COL_PAVIMENTO, riga), "il varco della cripta e' calpestabile")
+	# muro della cripta (US-1006: data/world/layouts/marche_crepuscolo.json,
+	# l'edificio murato dentro la zona 'cripta' [30, 24, 13, 20])
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(33, 30)), Vector2i(COL_MURO, riga), "muro della cripta solido")
+	# la porta della cripta e' calpestabile (colonna '+' del tileset)
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(36, 38)), Vector2i(COL_PORTA, riga), "la porta della cripta e' calpestabile")
 
 	(r["cont"] as Node2D).free()
 
