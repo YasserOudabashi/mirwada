@@ -142,22 +142,54 @@ func test_confine_ignora_corpi_che_non_sono_il_player() -> void:
 ## davvero ed e' calpestabile per tutta la sua lunghezza - la prova che il
 ## meccanismo funziona, richiesta esplicitamente dall'AC di questa story
 ## (gli altri 7 collegamenti dell'anello arrivano nel Blocco A).
-func test_corridoio_mirwada_marche_e_calpestabile() -> void:
-	var r: Dictionary = _istanzia_con_player()
-	var mondo: TileMapLayer = r["mondo"]
+## Cerca un corridoio dichiarato fra due regioni (in un verso o nell'altro) -
+## mai un indice fisso nell'array: US-1007 ne ha aggiunti altri 2, altre
+## story del Blocco A ne aggiungeranno ancora (006_PRD/prd-fase-10-mondo-
+## continuo.md §9, 8 in tutto).
+func _corridoio_tra(ra: String, rb: String) -> Dictionary:
+	for c in (_gd().call("get_corridoi") as Array):
+		var d: Dictionary = c as Dictionary
+		if (str(d.get("a", "")) == ra and str(d.get("b", "")) == rb) or \
+		   (str(d.get("a", "")) == rb and str(d.get("b", "")) == ra):
+			return d
+	return {}
 
-	var corridoi: Array = _gd().call("get_corridoi")
-	assert_eq(corridoi.size(), 1, "un solo corridoio dichiarato in questa story")
-	var c: Dictionary = corridoi[0]
-	var pa: Vector2i = OFFSET_MIRWADA + Vector2i((c["aggancio_a"] as Array)[0], (c["aggancio_a"] as Array)[1])
-	var pb: Vector2i = OFFSET_MARCHE + Vector2i((c["aggancio_b"] as Array)[0], (c["aggancio_b"] as Array)[1])
+
+func _offset_regione(rid: String) -> Vector2i:
+	var wo: Array = (_gd().call("get_region", rid) as Dictionary).get("world_offset", [0, 0])
+	return Vector2i(int(wo[0]), int(wo[1]))
+
+
+func _assert_corridoio_calpestabile(mondo: TileMapLayer, ra: String, rb: String) -> void:
+	var c: Dictionary = _corridoio_tra(ra, rb)
+	assert_false(c.is_empty(), "il corridoio %s-%s e' dichiarato" % [ra, rb])
+	if c.is_empty():
+		return
+	var pa: Vector2i = _offset_regione(str(c["a"])) + Vector2i((c["aggancio_a"] as Array)[0], (c["aggancio_a"] as Array)[1])
+	var pb: Vector2i = _offset_regione(str(c["b"])) + Vector2i((c["aggancio_b"] as Array)[0], (c["aggancio_b"] as Array)[1])
 
 	# gomito del percorso a L: (pb.x, pa.y)
 	var gomito := Vector2i(pb.x, pa.y)
 	for punto in [pa, pb, gomito, (pa + gomito) / 2, (gomito + pb) / 2]:
 		var col: int = mondo.get_cell_atlas_coords(punto).x
-		assert_eq(col, COL_PAVIMENTO, "cella %s del corridoio e' calpestabile" % punto)
+		assert_eq(col, COL_PAVIMENTO, "cella %s del corridoio %s-%s e' calpestabile" % [punto, ra, rb])
 
+
+func test_corridoio_mirwada_marche_e_calpestabile() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: TileMapLayer = r["mondo"]
+	_assert_corridoio_calpestabile(mondo, "mirwada", "marche_crepuscolo")
+	(r["cont"] as Node2D).free()
+
+
+## US-1007: i due corridoi nuovi (il raggio mirwada-valle_madre, il lato
+## marche_crepuscolo-valle_madre dell'anello) - stesso meccanismo, stessa
+## prova, un'altra coppia di regioni.
+func test_corridoi_di_valle_madre_sono_calpestabili() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: TileMapLayer = r["mondo"]
+	_assert_corridoio_calpestabile(mondo, "mirwada", "valle_madre")
+	_assert_corridoio_calpestabile(mondo, "marche_crepuscolo", "valle_madre")
 	(r["cont"] as Node2D).free()
 
 

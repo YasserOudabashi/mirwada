@@ -11445,4 +11445,57 @@ COME VERIFICATO.
 
 APERTO: nessuno per questa story.
 
-PROSSIMA STORIA: US-1007 ("Valle della Madre cresce"), priority 10.
+PROSSIMA STORIA (chiusa qui sotto): US-1007 ("Valle della Madre cresce"),
+priority 10.
+
+FATTO (US-1007).
+- data/world/layouts/valle_madre.json: ridisegnato da 48x36 a 68x50
+  (world_offset [0,360] invariato). I 6 location_tags (bosco_antico,
+  radura_lunare, grotta_di_marea, sorgente, altare_di_radici,
+  radice_del_mondo) sono ora terreni fisicamente distinti: bosco_antico
+  (alberi 't' densi, visuale corta - coerente col "suono conta piu' della
+  vista" di design-world.md), radura_lunare (un anello di pavimento
+  variante al centro, erba rada intorno), grotta_di_marea (semi-chiusa,
+  pareti su 3 lati + acqua '~' dentro, si apre gia' con fase_lunare
+  tramite il gating esistente), sorgente (acqua sorgiva circolare
+  centrale), altare_di_radici (sentieri di radici '=' che convergono da
+  ogni lato verso un altare centrale), radice_del_mondo (santuario murato
+  con porta - IL sito vero del rituale di Sequenza 0 di Mother, condiviso
+  con Moon, stesso gruppo - stesso linguaggio di soglia_del_crepuscolo
+  per Marche, US-1006). 7 nemici + 10 oggetti riposizionati su celle
+  calpestabili, stesso contenuto.
+- data/world/corridoi.json: 2 corridoi nuovi (erano 1, ora 3) - il raggio
+  mirwada-valle_madre (bordo sud di Mirwada / bordo nord di Valle) e il
+  lato valle_madre-marche_crepuscolo dell'anello (bordo sud di Marche /
+  bordo nord di Valle, un corridoio verticale puro visto che entrambe le
+  agganciature condividono la stessa x) - possibili solo ora che Valle ha
+  un layout vero. Gli ultimi 4 (verso Archivio Sepolto/Frontiera delle
+  Porte) arriveranno con US-1008/1009.
+- Nessuna gating d'ingresso dichiarata per Valle (solo 2 gating interni
+  gia' gestiti da AreaGate: plant_growth su ponti_di_radici, fase_lunare
+  su grotte_di_marea) - AC #3 non richiedeva modifiche.
+- tests/test_world_scene.gd: test_corridoio_mirwada_marche_e_calpestabile
+  assumeva un solo corridoio dichiarato (indice 0 fisso) - generalizzato
+  con un nuovo helper _corridoio_tra(ra, rb) che cerca per coppia di
+  regioni invece che per indice, riusabile da qui in avanti man mano che
+  altri corridoi si aggiungono. Nuovo test
+  test_corridoi_di_valle_madre_sono_calpestabili per i 2 corridoi nuovi.
+  tests/test_layouts.gd: test_valle_dipinta_dal_layout aveva 2 celle
+  hardcoded sul vecchio disegno (acqua/ponte nella grotta) - aggiornate
+  alle coordinate vere della nuova mappa (acqua nella grotta_di_marea,
+  sentiero nell'altare_di_radici).
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 916 test,
+  tutti passati (915 + 1 nuovo, il resto migrazioni), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat): giro fra 5 zone visivamente distinte (bosco/grotta/
+  altare/radice del mondo) + cammino REALE (Input reale, fisica vera)
+  attraverso l'ultimo tratto del corridoio Marche-Valle,
+  WorldState.regione_corrente() passa a 'valle_madre': entrambi i
+  corridoi nuovi funzionano davvero, non solo nei dati.
+
+APERTO: nessuno per questa story.
+
+PROSSIMA STORIA: US-1008 ("Archivio Sepolto cresce"), priority 11.

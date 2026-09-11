@@ -385,12 +385,13 @@ func test_valle_dipinta_dal_layout() -> void:
 	var riga: int = scena.get_cell_atlas_coords(o + Vector2i(1, 1)).y
 	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
 	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(1, 1)), Vector2i(COL_PAVIMENTO, riga), "cella '.' del bosco non solida")
-	# data/world/layouts/valle_madre.json: acqua '~' nella zona grotta_di_marea, es. (40,5)
-	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(40, 5)), Vector2i(COL_ACQUA, riga),
+	# US-1007: acqua '~' nella zona grotta_di_marea (data/world/layouts/
+	# valle_madre.json.zone.grotta_di_marea, [44,2,19,21])
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(50, 7)), Vector2i(COL_ACQUA, riga),
 		"cella '~' della grotta di marea usa la colonna acqua ed e' solida (US-813)")
-	# il ponte di radici '=' che attraversa l'acqua, es. (41,5), resta calpestabile
-	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(41, 5)), Vector2i(COL_SENTIERO, riga),
-		"il ponte di radici ('=') che attraversa la grotta di marea e' calpestabile")
+	# i sentieri di radici '=' dell'altare_di_radici ([23,26,19,21]) restano calpestabili
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(32, 28)), Vector2i(COL_SENTIERO, riga),
+		"i sentieri di radici ('=') dell'altare sono calpestabili")
 
 	(r["cont"] as Node2D).free()
 

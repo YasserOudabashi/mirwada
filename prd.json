@@ -159,8 +159,8 @@
       ],
       "priority": 10,
       "fase": 10,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/world/layouts/valle_madre.json: ridisegnato da 48x36 a 68x50 (world_offset invariato). I 6 location_tags sono terreni fisicamente distinti: bosco_antico (alberi densi), radura_lunare (anello aperto al centro), grotta_di_marea (semi-chiusa con acqua, gating fase_lunare gia' esistente), sorgente (acqua circolare), altare_di_radici (sentieri di radici convergenti), radice_del_mondo (santuario murato con porta - il sito vero del rituale di Sequenza 0 di Mother/Moon, stesso linguaggio di soglia_del_crepuscolo per Marche/US-1006). 7 nemici + 10 oggetti riposizionati, stesso contenuto. data/world/corridoi.json: 2 corridoi nuovi (mirwada-valle_madre il raggio, marche_crepuscolo-valle_madre il lato dell'anello) - possibili ora che Valle ha un layout vero; i restanti 4 arrivano con US-1008/1009. Nessuna gating d'ingresso per Valle: AC#3 non richiedeva modifiche. tests/test_world_scene.gd: test_corridoio_mirwada_marche_e_calpestabile generalizzato con un nuovo helper _corridoio_tra(ra, rb) (cercava per indice fisso, rotto aggiungendo corridoi) + nuovo test per i 2 corridoi di Valle. tests/test_layouts.gd: test_valle_dipinta_dal_layout aggiornato alle coordinate vere della nuova mappa. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 916 test, tutti passati, nessuna regressione; python tools/validate_data.py -> 0 errori, 2 warning (invariati); verifica a schermo con Xvfb (screenshot in chat, script ad-hoc non committato) - 5 zone visivamente distinte + cammino reale attraverso l'ultimo tratto del corridoio Marche-Valle, WorldState.regione_corrente() conferma il passaggio. Dettagli completi in progress.txt."
     },
     {
       "id": "US-1008",
