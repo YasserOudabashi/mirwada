@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "_comment": "Documentazione formale di data/world/layouts/*.json (US-805, fase 8 Blocco B). Una mappa disegnata a mano per una regione: sostituisce il rettangolo piatto generato da region_scene.gd::_dipingi() con un layout vero. Una regione SENZA file qui continua a usare il fallback piatto di sempre (nessuna regressione). Controlli veri in tools/validate_data.py.",
+  "_comment": "Documentazione formale di data/world/layouts/*.json (US-805, fase 8 Blocco B). Una mappa disegnata a mano per una regione: sostituisce il rettangolo piatto generato da region_scene.gd::_dipingi() con un layout vero. Una regione SENZA file qui continua a usare il fallback piatto di sempre (nessuna regressione). Controlli veri in tools/validate_data.py. US-1001 (fase 10): la posizione di questa mappa nell'unica griglia di mondo condivisa (world_offset) vive in data/schema/region.schema.json, non qui - un layout resta una mappa locale (coordinate 0..larghezza/0..altezza), e' regions.json a dirle dove sta nel mondo.",
   "layout": {
     "schema_version": "int, sempre 1 in questa fase",
     "region_id": "string: deve esistere in data/world/regions.json",

@@ -73,10 +73,10 @@ può dipingerle tutte insieme.
       si sovrappongano mai.
 - [ ] `data/schema/layout.schema.json`/`region.schema.json` aggiornati con
       la nuova forma.
-- [ ] Nessuna regressione sulle 5 regioni esistenti: `world_offset` iniziale
-      può essere una disposizione semplice (es. Mirwada al centro, le altre
-      4 attorno, stessa topologia hub-and-spoke di oggi — vedi §9 sulla
-      topologia).
+- [ ] Nessuna regressione sulle 5 regioni esistenti: `world_offset`
+      dispone Mirwada al centro e le altre 4 ai quattro angoli, in un
+      anello — collegamenti diretti tra le 4 regioni esterne, non
+      hub-and-spoke puro (decisione presa con l'utente, §9).
 - [ ] Test headless: nessuna sovrapposizione, ogni regione ha un
       `world_offset`.
 
@@ -102,7 +102,11 @@ layout, ognuno al proprio `world_offset`, nella stessa `TileMapLayer`.
 - [ ] Un "corridoio"/terreno di raccordo disegnato a mano riempie lo spazio
       tra il bordo aperto di una regione e quello della vicina (nuovo
       contenuto minimo per questa story: non serve bello, deve solo
-      esistere e essere calpestabile).
+      esistere e essere calpestabile) — con la topologia ad anello (§9),
+      questa story ne copre almeno una coppia (es. Mirwada-Marche) come
+      prova del meccanismo; coprire tutti e 8 i collegamenti (4 raggi + 4
+      lati dell'anello) è lavoro del Blocco A (US-1005..1009, un corridoio
+      a testa quando la regione corrispondente viene disegnata).
 - [ ] `WorldState.regione_corrente()` si aggiorna quando il giocatore
       attraversa il confine (nuova `Area2D` di attraversamento, sostituisce
       semanticamente il vecchio `passaggio` — stesso nodo, comportamento
@@ -298,8 +302,6 @@ esce da edifici, senza una riga di codice che nomini un luogo specifico.
 - **Tutte le regioni "finite" di contenuto**: questa fase le fa crescere e
   costruisce UN villaggio e UNA struttura grande come prova. Riempire ogni
   regione di insediamenti è lavoro per l'Atto II/III (fase 11) o oltre.
-- **Connessioni dirette tra le 4 regioni esterne** (oggi e in questa fase:
-  hub-and-spoke attraverso Mirwada) — vedi Open Questions §9.
 
 ## 6. Design Considerations
 
@@ -336,13 +338,16 @@ esce da edifici, senza una riga di codice che nomini un luogo specifico.
 
 ## 9. Open Questions
 
-- **Topologia**: oggi le 4 regioni esterne si connettono SOLO a Mirwada
-  (hub-and-spoke). Il mondo continuo dovrebbe anche collegarle
-  direttamente tra loro (più "vera mappa", più esplorazione) o restare
-  hub-and-spoke ma percorribile a piedi? Proposta di questo PRD: restare
-  hub-and-spoke per questa fase (coerente col design esistente, meno
-  contenuto da disegnare), con connessioni dirette come possibile lavoro
-  futuro — **da confermare con l'utente prima di iniziare US-1001**.
+- **Topologia — DECISA con l'utente (2026-09-11)**: le 4 regioni esterne
+  NON restano collegate solo a Mirwada. Disposizione scelta: un anello
+  attorno alla città — Mirwada al centro, le 4 regioni esterne ai quattro
+  angoli (Marche del Crepuscolo NO, Archivio Sepolto NE, Frontiera delle
+  Porte SE, Valle della Madre SO) — così ogni coppia di regioni esterne
+  adiacenti nell'anello (Marche-Archivio, Archivio-Frontiera,
+  Frontiera-Valle, Valle-Marche) ha un corridoio diretto, oltre ai 4 raggi
+  verso il centro. `world_offset` (US-1001) è già piazzato secondo questa
+  disposizione; i corridoi di raccordo veri (8 in tutto: 4 raggi + 4 lati
+  dell'anello) restano da disegnare in US-1002.
 - **Vocabolario dei tile**: la legenda chiusa (8 caratteri: pavimento,
   muro, ostacoli, acqua, decoro) basta per disegnare interni di edifici
   (porte, finestre, mobilio)? Ipotesi di lavoro: sì per la prima story

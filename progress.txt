@@ -10858,3 +10858,55 @@ story del ciclo ralph per la fase 10. Da eseguire con
 `bash ~/.claude/skills/ralph.sh 14 --fase 10 --test-cmd "godot --headless --script tests/run_tests.gd"`
 in locale (Docker Desktop attivo) o una story per sessione Claude Code,
 come da 006_PRD/prossimi-passi.md §2/§3.
+
+---
+
+[2026-09-11] US-1001: Coordinate di mondo per le 5 regioni
+
+CONTESTO. Prima story del ciclo ralph di fase 10. Chiesto all'utente
+(era rimasto aperto nel PRD, §9): topologia hub-and-spoke o collegamenti
+diretti tra le 4 regioni esterne? Risposta: collegamenti diretti. Deciso
+un anello attorno a Mirwada (non tutte le 6 coppie possibili tra le 4
+regioni esterne, solo i 4 lati dell'anello + i 4 raggi verso il centro =
+8 collegamenti in tutto) - meno corridoi da disegnare a mano delle 6
+coppie complete, ma comunque "vera mappa" invece di un hub puro.
+
+FATTO.
+- data/world/regions.json: world_offset:[x,y] su tutte e 5 le regioni.
+  Mirwada [220,180] al centro; Marche del Crepuscolo [0,0] NO; Archivio
+  Sepolto [440,0] NE; Frontiera delle Porte [440,360] SE; Valle della
+  Madre [0,360] SO. Distanze ampie apposta (i layout sono oggi fissi
+  48x36 ma US-1005..1009 li fanno crescere a dimensione libera - questo
+  lascia margine senza dover ritoccare gli offset quando succede).
+- data/schema/region.schema.json: world_offset documentato + regola del
+  validator sulla non-sovrapposizione.
+- data/schema/layout.schema.json: nota che world_offset vive in
+  regions.json, non nel layout (un layout resta locale, e' regions.json
+  a dirgli dove sta nel mondo).
+- tools/validate_data.py: nuovo blocco dopo i layout - dimensione vera di
+  ogni regione da len(mappa[0])/len(mappa) se ha un layout, altrimenti il
+  fallback 48x36 gia' in uso nel resto del validator; controllo pairwise
+  di sovrapposizione rettangolare, errore con le coordinate di entrambe
+  le regioni coinvolte.
+- tests/test_regions.gd: nuovo test_world_offset_esiste_e_non_si_sovrappone
+  (ogni regione ha world_offset [x,y]; nessuna coppia di Rect2i, costruiti
+  dalle dimensioni vere via GameData.get_layout(), si sovrappone).
+- 006_PRD/prd-fase-10-mondo-continuo.md: §5 (non-goal "connessioni
+  dirette") rimosso, §9 (Open Question topologia) segnata DECISA con la
+  scelta e la motivazione, AC di US-1001/US-1002 aggiornati di conseguenza
+  (US-1002 ora copre 1 corridoio come prova, gli altri 7 nel Blocco A).
+- prd.json: US-1001 passes:true con note complete; AC di US-1001/US-1002
+  riscritti per riflettere la topologia ad anello invece di hub-and-spoke.
+
+COME VERIFICATO.
+- Rottura deliberata: world_offset di Marche temporaneamente uguagliato
+  a quello di Mirwada -> validate_data.py segnala l'errore di
+  sovrapposizione con le coordinate corrette di entrambe; ripristinato,
+  git status pulito.
+- godot --headless --path . --script res://tests/run_tests.gd: 898 test,
+  tutti passati (897 + 1 nuovo), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+
+PROSSIMA STORIA: US-1002 (una scena, non cinque - il motore dipinge piu'
+layout nella stessa TileMapLayer, world_scene.gd, confini aperti, un
+primo corridoio vero Mirwada-Marche come prova del meccanismo).

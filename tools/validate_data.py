@@ -1178,6 +1178,47 @@ def main():
             f"(US-807d: tutte e 5 le regioni hanno un layout da questa story in poi; "
             f"un layout mancante non e' piu' atteso).")
 
+    # --- world_offset e non-sovrapposizione (US-1001, fase 10) ---
+    # Le 5 regioni condividono un'unica griglia: due rettangoli non possono
+    # mai sovrapporsi, altrimenti la TileMapLayer del mondo continuo
+    # dipingerebbe due regioni sulle stesse celle. La dimensione vera viene
+    # dal layout (mappa e' gia' una lista di righe di uguale lunghezza,
+    # verificato sopra); una regione senza layout valido usa il fallback
+    # 48x36 di region_scene.gd, coerente col resto del validator.
+    if regions_doc is not None:
+        layout_dims_by_id = {}
+        if os.path.isdir(layouts_dir):
+            for fn in sorted(os.listdir(layouts_dir)):
+                if not fn.endswith(".json"):
+                    continue
+                doc = load_json(os.path.join(layouts_dir, fn)) or {}
+                rid = doc.get("region_id")
+                mappa = doc.get("mappa", [])
+                if rid and isinstance(mappa, list) and mappa and all(
+                        isinstance(r, str) and len(r) == len(mappa[0]) for r in mappa):
+                    layout_dims_by_id[rid] = (len(mappa[0]), len(mappa))
+
+        region_rects = {}
+        for reg in regions_doc.get("regions", []):
+            rid = reg.get("id")
+            wo = reg.get("world_offset")
+            if not (isinstance(wo, list) and len(wo) == 2
+                    and all(isinstance(v, int) and v >= 0 for v in wo)):
+                err(f"data/world/regions.json [{rid}]: world_offset deve essere [x, y] di interi >= 0")
+                continue
+            w, h = layout_dims_by_id.get(rid, (48, 36))
+            region_rects[rid] = (wo[0], wo[1], wo[0] + w, wo[1] + h)
+
+        rect_ids = sorted(region_rects)
+        for i, a in enumerate(rect_ids):
+            ax0, ay0, ax1, ay1 = region_rects[a]
+            for b in rect_ids[i + 1:]:
+                bx0, by0, bx1, by1 = region_rects[b]
+                if ax0 < bx1 and bx0 < ax1 and ay0 < by1 and by0 < ay1:
+                    err(f"data/world/regions.json: le regioni '{a}' {region_rects[a]} e '{b}' "
+                        f"{region_rects[b]} si sovrappongono nella griglia di mondo condivisa "
+                        f"(world_offset, US-1001)")
+
     # --- fonti di tag di fase 3 (US-334): stanze costruibili, specie di pet
     # (+ comportamenti), tag_grant dei talenti. Rendono raggiungibili le
     # sinergie che pescano da questi sistemi. La VALIDAZIONE piena di quei

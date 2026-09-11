@@ -138,6 +138,36 @@ func test_ritual_di_sequenza_0_ospitato_da_una_regione() -> void:
 				assert_true(ospitato, "%s Seq 0: location_tag '%s' ospitato da una regione" % [pid, t])
 
 
+## US-1001 (fase 10, mondo continuo): ogni regione dichiara un world_offset
+## nell'unica griglia condivisa, e nessuna coppia di rettangoli si sovrappone
+## (stesso check del validator Python, qui contro i dati veri caricati).
+func test_world_offset_esiste_e_non_si_sovrappone() -> void:
+	var regioni: Array = _gd().call("get_regions")
+	var rettangoli: Dictionary = {}
+	for r in regioni:
+		var rid: String = str((r as Dictionary).get("id", ""))
+		var wo: Variant = (r as Dictionary).get("world_offset")
+		assert_true(typeof(wo) == TYPE_ARRAY and (wo as Array).size() == 2,
+			"'%s' ha un world_offset [x, y]" % rid)
+		if typeof(wo) != TYPE_ARRAY:
+			continue
+		var ox: int = int((wo as Array)[0])
+		var oy: int = int((wo as Array)[1])
+		var layout: Dictionary = _gd().call("get_layout", rid)
+		var mappa: Array = layout.get("mappa", [])
+		var w: int = str(mappa[0]).length() if mappa.size() > 0 else 48
+		var h: int = mappa.size() if mappa.size() > 0 else 36
+		rettangoli[rid] = Rect2i(ox, oy, w, h)
+
+	var ids: Array = rettangoli.keys()
+	for i in ids.size():
+		for j in range(i + 1, ids.size()):
+			var a: Rect2i = rettangoli[ids[i]]
+			var b: Rect2i = rettangoli[ids[j]]
+			assert_false(a.intersects(b),
+				"'%s' %s e '%s' %s non si sovrappongono" % [ids[i], a, ids[j], b])
+
+
 func test_migrazione_save_v20_a_v21() -> void:
 	_pulisci_slot()
 	# un save v20 non ha i campi regione/scoperte/gate_aperti in "mondo"
