@@ -196,3 +196,102 @@ func test_nemici_di_mirwada_spawnano_alla_posizione_globale_giusta() -> void:
 	assert_eq(totale, 35, "7 nemici per ognuna delle 5 regioni, tutte nello stesso mondo continuo")
 
 	(r["cont"] as Node2D).free()
+
+
+## US-1003 (fase 10, prestazioni): con 5 regioni vive nello stesso nodo,
+## nemici/NPC fuori dal raggio (data/balance.json [mondo.raggio_attivo_entita],
+## non hardcoded) vengono disattivati (process_mode = DISABLED, il
+## meccanismo nativo di Godot - ferma script E fisica del sotto-albero) -
+## quelli dentro il raggio restano esattamente come sempre (PROCESS_MODE_
+## INHERIT, il default). Il player fittizio di _istanzia_con_player() resta
+## alla sua posizione di default (0,0): dentro Marche del Crepuscolo
+## (offset [0,0]), abbastanza lontano da ogni nemico di Mirwada (offset
+## [220,180], >7000px) da provare entrambi i casi con gli stessi dati veri.
+func test_nemici_vicini_restano_attivi_e_lontani_si_disattivano() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: Node = r["mondo"]
+	var player: Node2D = r["player"]
+
+	mondo.call("_aggiorna_prestazioni")
+
+	var raggio: float = float((_gd().call("get_balance", "mondo") as Dictionary).get("raggio_attivo_entita", 600.0))
+	var trovato_vicino := false
+	var trovato_lontano := false
+	for e in mondo.get_tree().get_nodes_in_group("nemici"):
+		var dist: float = (e as Node2D).global_position.distance_to(player.global_position)
+		if dist <= raggio:
+			assert_eq(int((e as Node).process_mode), int(Node.PROCESS_MODE_INHERIT),
+				"nemico a %.0fpx (dentro il raggio %.0f) resta attivo" % [dist, raggio])
+			trovato_vicino = true
+		else:
+			assert_eq(int((e as Node).process_mode), int(Node.PROCESS_MODE_DISABLED),
+				"nemico a %.0fpx (fuori dal raggio %.0f) e' disattivato" % [dist, raggio])
+			trovato_lontano = true
+	assert_true(trovato_vicino, "il player ha almeno un nemico dentro il raggio")
+	assert_true(trovato_lontano, "il player ha almeno un nemico fuori dal raggio")
+
+	(r["cont"] as Node2D).free()
+
+
+## Stesso meccanismo per gli NPC (Area2D con meta "npc_id", world_scene.gd::
+## _crea_un_npc) - non sono un sistema separato, la stessa _aggiorna_prestazioni
+## li tratta allo stesso modo. Gli NPC di roster.json stanno quasi tutti a
+## Mirwada: invece di sperare che il player di default ne trovi uno per caso
+## dentro/fuori raggio (dipenderebbe dal layout), lo si sposta esplicitamente
+## sul primo NPC trovato e poi lontano, come per il nemico di riattivazione.
+func test_npc_vicini_restano_attivi_e_lontani_si_disattivano() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: Node = r["mondo"]
+	var player: Node2D = r["player"]
+
+	var npc: Node2D = null
+	for c in mondo.get_children():
+		if c is Area2D and c.has_meta("npc_id"):
+			npc = c as Node2D
+			break
+	assert_true(npc != null, "esiste almeno un npc da usare per la prova")
+	if npc == null:
+		(r["cont"] as Node2D).free()
+		return
+
+	player.global_position = npc.global_position
+	mondo.call("_aggiorna_prestazioni")
+	assert_eq(int((npc as Node).process_mode), int(Node.PROCESS_MODE_INHERIT),
+		"il player e' sull'npc: resta attivo")
+
+	player.global_position = npc.global_position + Vector2(100000, 100000)
+	mondo.call("_aggiorna_prestazioni")
+	assert_eq(int((npc as Node).process_mode), int(Node.PROCESS_MODE_DISABLED),
+		"il player si e' allontanato molto: l'npc si disattiva")
+
+	(r["cont"] as Node2D).free()
+
+
+## Riavvicinandosi un nemico disattivato torna attivo - non e' uno stato
+## permanente deciso allo spawn, si rivaluta ad ogni tick (qui: chiamato a
+## mano, senza aspettare il Timer reale).
+func test_riavvicinandosi_un_nemico_disattivato_si_riattiva() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: Node = r["mondo"]
+	var player: Node2D = r["player"]
+
+	mondo.call("_aggiorna_prestazioni")
+	var rett_mirwada := Rect2(Vector2(OFFSET_MIRWADA) * TILE, Vector2(48, 36) * TILE)
+	var nemico_lontano: Node2D = null
+	for e in mondo.get_tree().get_nodes_in_group("nemici"):
+		if rett_mirwada.has_point((e as Node2D).global_position):
+			nemico_lontano = e as Node2D
+			break
+	assert_true(nemico_lontano != null, "esiste un nemico di Mirwada da usare per la prova")
+	if nemico_lontano == null:
+		(r["cont"] as Node2D).free()
+		return
+	assert_eq(int((nemico_lontano as Node).process_mode), int(Node.PROCESS_MODE_DISABLED),
+		"partenza: il nemico di Mirwada e' disattivato, il player e' a Marche")
+
+	player.global_position = nemico_lontano.global_position
+	mondo.call("_aggiorna_prestazioni")
+	assert_eq(int((nemico_lontano as Node).process_mode), int(Node.PROCESS_MODE_INHERIT),
+		"il player si e' avvicinato: lo stesso nemico torna attivo")
+
+	(r["cont"] as Node2D).free()

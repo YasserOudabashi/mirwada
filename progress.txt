@@ -11082,5 +11082,58 @@ due segmenti) - previsto dal design (US-1002 nota gia' "un corridoio come
 prova del meccanismo"), i restanti 7 della topologia ad anello arrivano nel
 Blocco A (US-1005..1009).
 
-PROSSIMA STORIA: US-1003 ("Prestazioni - non tutto il mondo e' vivo
-insieme"), priority 4.
+PROSSIMA STORIA (chiusa qui sotto): US-1003 ("Prestazioni - non tutto il
+mondo e' vivo insieme"), priority 4.
+
+FATTO (US-1003).
+- data/balance.json: nuova sezione "mondo" - raggio_attivo_entita: 600
+  (pixel, attorno al giocatore; piu' largo di nemico_base.raggio_aggio=140
+  cosi' nessun nemico gia' vicino/in scontro viene mai disattivato).
+- tools/validate_data.py: nuovo controllo su mondo.raggio_attivo_entita
+  (numero > 0).
+- scripts/world_scene.gd: nuovo Timer (0.4s, dettaglio tecnico non di
+  bilanciamento - resta in codice, non nei dati) che chiama
+  _aggiorna_prestazioni() a ogni scatto. La funzione legge il raggio da
+  GameData.get_balance("mondo") e, per ogni nodo del gruppo globale
+  "nemici" e ogni NPC (Area2D con meta "npc_id"), imposta process_mode =
+  PROCESS_MODE_INHERIT se dentro il raggio dal player, PROCESS_MODE_DISABLED
+  se fuori. Nessun sistema nuovo: PROCESS_MODE_DISABLED e' il meccanismo
+  nativo di Godot che ferma sia gli script (_process/_physics_process) sia
+  la fisica dell'intero sotto-albero (Hitbox/Hurtbox incluse, che ereditano
+  PROCESS_MODE_INHERIT dal genitore) - lo stesso principio suggerito
+  dall'AC (VisibleOnScreenNotifier2D), solo a raggio invece che a
+  visibilita' sullo schermo (il mondo e' molto piu' grande della camera).
+- tests/test_world_scene.gd: 3 test nuovi - nemici dentro/fuori raggio
+  hanno il process_mode giusto (usa il player di default a Marche, verifica
+  sia i vicini di Marche sia i lontani di Mirwada con gli stessi dati veri,
+  senza posizioni hardcoded nel test); stesso controllo per gli NPC
+  (posizionati esplicitamente, quasi tutti a Mirwada nel roster); un
+  nemico disattivato si riattiva quando il player gli si avvicina
+  (_aggiorna_prestazioni si puo' richiamare piu' volte, non e' uno stato
+  fissato allo spawn).
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 908 test,
+  tutti passati (905 + 3 nuovi), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Profiling minimo (script ad-hoc non committato, stesso pattern delle
+  verifiche Xvfb precedenti): Time.get_ticks_usec() sul tempo REALE di 240
+  physics_frame si e' rivelato insensibile (in --headless il tick di
+  fisica e' comunque scandito al tick rate fisso del motore, che domina
+  l'attesa a prescindere dal carico - ~3.86s in entrambi i casi, dentro il
+  rumore). Passato a Performance.TIME_PHYSICS_PROCESS (il tempo di CPU che
+  il motore stesso misura di aver speso nel passo di fisica dell'ultimo
+  frame, isola il calcolo dall'attesa del tick): con le 5 regioni piene
+  (35 nemici + 18 NPC) e il player a Mirwada, media di 240 campioni -
+  PRIMA (tutto sempre attivo, il comportamento di ogni story precedente a
+  questa): 23.559 ms/tick; DOPO (_aggiorna_prestazioni applicata, solo
+  cio' che e' entro 600px dal player resta attivo): 20.909 ms/tick.
+  Riduzione ~11%, misurabile e ripetibile nonostante il nemico da banco di
+  prova sia gia' leggerissimo (poco stato, nessun pathfinding) - con AI
+  piu' pesanti in fasi future la riduzione scalera' con la quota di
+  entita' disattivate (28 nemici disattivati su 35 col player a Mirwada:
+  4 regioni intere + il resto del corridoio).
+
+APERTO: nessuno per questa story.
+
+PROSSIMA STORIA: US-1004 ("Il save resta invariato"), priority 5.

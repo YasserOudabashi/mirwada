@@ -196,5 +196,9 @@
     "spawn_per_densita": 4.0,
     "sequenza_percezione": 5,
     "densita_baseline": 0.2
+  },
+  "mondo": {
+    "_comment": "US-1003 (fase 10, mondo continuo): con 5 regioni vive nello stesso nodo, nemici/NPC fuori da questo raggio (in pixel, attorno al giocatore) hanno process_mode = DISABLED finche' non ci si riavvicina - world_scene.gd::_aggiorna_prestazioni. Un solo raggio globale, nessuna eccezione per-regione. Piu' largo di nemico_base.raggio_aggro (140) cosi' nessun nemico gia' vicino viene mai disattivato.",
+    "raggio_attivo_entita": 600
   }
 }

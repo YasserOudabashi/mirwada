@@ -70,10 +70,52 @@ func _ready() -> void:
 		book.libro_aperto.connect(func(_p): _mostra_prompt(_npc_vicino, false))
 		book.libro_chiuso.connect(func(): _mostra_prompt(_npc_vicino, not _npc_vicino.is_empty()))
 
+	var t := Timer.new()
+	t.wait_time = _INTERVALLO_PRESTAZIONI
+	t.autostart = true
+	t.timeout.connect(_aggiorna_prestazioni)
+	add_child(t)
+
 
 func _camera_giocatore() -> Node:
 	var player: Node = get_parent().get_node_or_null("Player") if get_parent() != null else null
 	return player.get_node_or_null("Camera2D") if player != null else null
+
+
+# --- prestazioni (US-1003, fase 10): con 5 regioni vive nello stesso nodo, -
+# nemici/NPC lontani dal giocatore non devono girare fisica/IA a vuoto -----
+
+## Ogni quanto ricontrollare le distanze - dettaglio tecnico, non di
+## bilanciamento (a differenza del raggio, che vive nei dati: balance.json
+## [mondo.raggio_attivo_entita]).
+const _INTERVALLO_PRESTAZIONI := 0.4
+
+
+## Disattiva (process_mode = DISABLED, riusa il meccanismo nativo di Godot -
+## ferma script + fisica dell'intero sotto-albero, Hitbox/Hurtbox incluse)
+## ogni nemico/NPC fuori dal raggio dal giocatore; riattiva chi ci rientra.
+## "nemici" e' un gruppo globale (tutte le regioni condividono lo stesso
+## nodo, US-1002): un nemico di una regione lontana viene disattivato tanto
+## quanto uno della stessa regione ma fuori raggio.
+func _aggiorna_prestazioni() -> void:
+	var player: Node2D = get_parent().get_node_or_null("Player") as Node2D if get_parent() != null else null
+	if player == null:
+		return
+	var gd: Node = get_node_or_null("/root/GameData")
+	var raggio: float = float((gd.call("get_balance", "mondo") as Dictionary).get(
+		"raggio_attivo_entita", 600.0)) if gd != null else 600.0
+	var raggio2: float = raggio * raggio
+
+	for e in get_tree().get_nodes_in_group("nemici"):
+		if not (e is Node2D) or (e as Node).is_queued_for_deletion():
+			continue
+		var vicino: bool = (e as Node2D).global_position.distance_squared_to(player.global_position) <= raggio2
+		(e as Node).process_mode = Node.PROCESS_MODE_INHERIT if vicino else Node.PROCESS_MODE_DISABLED
+
+	for c in get_children():
+		if c is Area2D and c.has_meta("npc_id"):
+			var vicino_npc: bool = (c as Node2D).global_position.distance_squared_to(player.global_position) <= raggio2
+			c.process_mode = Node.PROCESS_MODE_INHERIT if vicino_npc else Node.PROCESS_MODE_DISABLED
 
 
 # --- per-regione: dipingere + popolare -------------------------------------

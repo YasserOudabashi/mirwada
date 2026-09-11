@@ -895,6 +895,14 @@ def main():
         if not isinstance(sp, int) or not (0 <= sp <= 9):
             err("data/balance.json [densita_mistica.sequenza_percezione]: intero 0-9.")
 
+        # US-1003: raggio di attivazione di nemici/NPC nel mondo continuo.
+        mondo = balance_doc.get("mondo", {})
+        raggio_attivo = mondo.get("raggio_attivo_entita")
+        if not isinstance(raggio_attivo, (int, float)) or raggio_attivo <= 0:
+            err("data/balance.json [mondo.raggio_attivo_entita]: deve essere un numero > 0 "
+                "(world_scene.gd::_aggiorna_prestazioni lo usa per disattivare cio' che e' "
+                "lontano dal giocatore, US-1003).")
+
     # --- animazioni ---
     anim_doc = load_json(os.path.join(DATA, "animations.json"))
     if anim_doc:
