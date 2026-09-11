@@ -606,18 +606,23 @@ func test_nemici_di_archivio_senza_player_restano_inerti() -> void:
 ## --- US-807d: Frontiera delle Porte (sesta e ultima regione con layout) ---
 
 
+## US-1009 (Frontiera delle Porte cresce): layout ridisegnato piu' grande
+## (72x44 -> 72x48) con le 6 location_tags come zone fisicamente distinte
+## (soglia santuario murato, teatro/palco strutture gemelle, nebbia_grigia
+## isole scollegate da ponti, crocevia aperta, porta_senza_stanza una
+## soglia isolata senza stanza). Spawn spostato nel santuario di soglia.
 func test_frontiera_dipinta_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("frontiera_porte")
 	var scena: TileMapLayer = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var riga: int = scena.get_cell_atlas_coords(o + Vector2i(7, 7)).y
+	var riga: int = scena.get_cell_atlas_coords(o + Vector2i(11, 15)).y
 	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
-	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(15, 4)), Vector2i(COL_ACQUA, riga),
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(5, 26)), Vector2i(COL_ACQUA, riga),
 		"cella '~' (nebbia) fuori da un'isola usa la colonna acqua ed e' solida (US-813)")
-	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(7, 7)), Vector2i(COL_PAVIMENTO, riga), "spawn sull'isola soglia, calpestabile")
-	# ponte '=' che collega la crocevia centrale alle isole
-	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(24, 12)), Vector2i(COL_SENTIERO, riga), "il ponte ('=') fra isole e' calpestabile")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(11, 15)), Vector2i(COL_PAVIMENTO, riga), "spawn davanti al santuario di soglia, calpestabile")
+	# ponte '=' che collega le isole della nebbia grigia
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(12, 32)), Vector2i(COL_SENTIERO, riga), "il ponte ('=') fra isole e' calpestabile")
 
 	(r["cont"] as Node2D).free()
 
@@ -627,7 +632,7 @@ func test_frontiera_spawn_dal_layout() -> void:
 	var scena: Node = r["scena"]
 	var o: Vector2i = r["offset"]
 
-	var atteso_spawn: Vector2 = scena.to_global(scena.map_to_local(o + Vector2i(7, 7)))
+	var atteso_spawn: Vector2 = scena.to_global(scena.map_to_local(o + Vector2i(11, 15)))
 	assert_eq(scena.call("punto_spawn", "frontiera_porte"), atteso_spawn,
 		"punto_spawn('frontiera_porte') usa la cella spawn del layout, offset incluso")
 

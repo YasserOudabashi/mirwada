@@ -11577,4 +11577,135 @@ COME VERIFICATO.
 
 APERTO: nessuno per questa story.
 
-PROSSIMA STORIA: US-1009 ("Frontiera delle Porte cresce"), priority 12.
+---
+
+[2026-09-11] US-1009 — Frontiera delle Porte cresce
+
+COSA FATTO.
+- data/world/layouts/frontiera_porte.json ridisegnato da 48x36 a 72x48: i 6
+  location_tags della regione (teatro, crocevia, soglia, nebbia_grigia,
+  palco, porta_senza_stanza) sono ora zone fisicamente distinte e
+  riconoscibili, non piu' 6 rettangoli identici in griglia:
+  - soglia: un santuario murato con porta ('+' sul muro sud), dove vive
+    npc_antagonista ("La Soglia", data/npc/roster.json, schedule con
+    location_tag=soglia a notte_fonda) — nessuna modifica al roster serviva,
+    la zona esiste gia' come Area2D generica da GameData.get_region().
+  - teatro: un edificio murato con file di detriti/sedute rotte ('o' a
+    coppie, non calpestabile) intervallate da corsie calpestabili — "un
+    teatro abbandonato dove le cose recitano se stesse" (design-world.md).
+  - palco: una struttura murata separata con la porta rivolta verso il
+    teatro (west), il pavimento della scena ('.', pavimento).
+  - nebbia_grigia: il pattern gia' presente nella vecchia mappa (isole ','
+    in un mare di '~' solido, US-813: '~' fuori da un'isola e' la colonna
+    acqua ed e' SOLIDA) ma ricostruito su scala piu' grande, con un
+    dettaglio nuovo deliberato: un'isola (rect locale 15,28,4,3) resta
+    SENZA alcun ponte '=' che la colleghi — raggiungibile solo con la
+    primitiva teleport, coerente col gating gia' nei dati
+    (regions.json.gating: {"tipo":"primitiva","primitiva":"teleport",
+    "area":"isole_nebbia"}) che prima di questa story non aveva mai avuto
+    un'isola davvero irraggiungibile a piedi.
+  - crocevia: una plazza aperta con un incrocio di sentieri (',' a croce),
+    il naturale punto di raccolta dei percorsi (qui atterra anche il
+    raggio da mirwada, vedi sotto).
+  - porta_senza_stanza: il sito del rituale di Sequenza 0 condiviso da
+    Fool/Error/Door (data/pathways/{fool,error,door}.json, tutti e 3
+    referenziano questo location_tag in advancement_ritual) — reso alla
+    lettera: un breve segmento di muro con UNA porta ('+'), isolato in
+    campo aperto, senza alcuna stanza intorno.
+  I 7 nemici (6 di Sequenza 7/6 + il boss di Sequenza 5, scala 1.5, tag
+  ombra, Caratteristica del gruppo fool garantita) e i 9 oggetti (inclusi
+  i 3 ingredienti di formula_door_9 - chiave_senza_denti,
+  polvere_di_gesso_stellare, cardine_arrugginito_di_una_porta_perduta -
+  usati da tests/manual/qa_vslice_door.gd, VS-B1-02) sono stati
+  riposizionati sulle nuove celle calpestabili: stessi id/sequenze/
+  override/quantita', solo x/y cambiati. Spawn spostato da [7,7] a
+  [11,15], davanti al santuario di soglia (dentro il santuario stesso il
+  pavimento e' ',' non '.': il primo tentativo di spawn a [11,12] ha fatto
+  fallire il test sulla colonna del tileset attesa, corretto spostando lo
+  spawn appena fuori dalla porta, su pavimento '.').
+- data/world/corridoi.json: i 3 corridoi che chiudono l'anello (gli altri
+  5 erano gia' stati aperti da US-1002/1006/1007/1008):
+  - mirwada-frontiera_porte (il raggio): mirwada usa il suo ULTIMO muro
+    libero (nord, x=40 — ovest/sud/est erano gia' presi da marche/valle/
+    archivio, "un raggio a testa" come documentato dalla story
+    precedente); Frontiera usa il suo muro sud (x=36,y=47), che atterra
+    vicino alla zona crocevia.
+  - archivio_sepolto-frontiera_porte (lato destro dell'anello, le due
+    regioni condividono world_offset.x=440): una SECONDA porta sul muro
+    sud dell'Archivio (x=50, diversa dalla x=20 gia' usata per
+    mirwada-archivio) — gia' provato altrove (nota di US-1008) che
+    world_scene.gd non ha alcun limite di una porta per muro; il lato
+    Frontiera usa il suo muro nord (x=36,y=0), vicino a teatro.
+  - valle_madre-frontiera_porte (lato inferiore, world_offset.y=360
+    condiviso): il muro EST di Valle (x=67,y=46), libero finora (nord gia'
+    preso da mirwada+marche); il lato Frontiera usa il suo muro ovest
+    (x=0,y=40), vicino a nebbia_grigia.
+- AC "il gating d'ingresso della regione si applica come barriera fisica
+  al confine (US-1002), non piu' come rifiuto di caricamento - verificato
+  che un personaggio sotto soglia viene fermato fisicamente e uno sopra
+  soglia passa": la Frontiera e' la PRIMA regione con un gating
+  area=="ingresso" (le precedenti — Archivio — avevano solo aree interne
+  come ali_interne, mai un gating che chiude l'INTERA regione). Verificato
+  leggendo il codice che world_scene.gd::_crea_gate e' GIA' generico: itera
+  OGNI voce di reg.gating (nessun filtro su "area"), quindi crea una
+  AreaGate — con la sua StaticBody2D che il player non attraversa quando
+  chiusa, US-611 — anche per il gating "ingresso" della Frontiera, esatta-
+  mente come fa gia' per "ali_interne". NESSUNA modifica al codice serviva:
+  e' proprio il punto della story, lo stesso schema delle 2 story
+  precedenti quando hanno incontrato un meccanismo gia' generico.
+- tests/test_world_scene.gd:
+  - test_corridoi_di_frontiera_delle_porte_sono_calpestabili (stesso
+    schema delle story precedenti, riusa _assert_corridoio_calpestabile
+    per tutti e 3 i corridoi nuovi).
+  - nuovo helper _pr() (Progression, mancava in questo file).
+  - test_gate_ingresso_della_frontiera_e_una_barriera_fisica_nel_mondo_continuo:
+    trova il nodo Gate_frontiera_porte_ingresso dentro world_scene,
+    verifica e_aperto()==false a Sequenza 2 ("sopra" la soglia, respinto)
+    e ==true a Sequenza 9 (sotto soglia, passa) — stessa semantica gia'
+    provata a livello di solo-dato in test_area_gate.gd
+    (test_gate_sequenza_...) e di fast travel in
+    test_page_mappa.gd::test_viaggia_a_rispetta_il_gating_d_ingresso, qui
+    per la PRIMA volta con la barriera viva dentro il mondo continuo.
+- tests/test_layouts.gd: test_frontiera_dipinta_dal_layout e
+  test_frontiera_spawn_dal_layout aggiornati alle nuove coordinate (bordo
+  esterno, una cella '~' solida fuori da un'isola, lo spawn davanti al
+  santuario, un ponte '=' fra le isole). I test su nemici/oggetti/
+  area_cleared/inerzia-senza-player NON hanno richiesto modifiche: dipen-
+  dono dal CONTEGGIO e dai dati (item_id, sequenza, scala), mai dalle
+  coordinate grezze.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 920 test,
+  tutti passati (918 + 2 nuovi), nessuna regressione. Un fallimento
+  intermedio (spawn atteso su COL_PAVIMENTO, trovata la colonna della
+  virgola perche' lo spawn iniziale [11,12] cadeva dentro il santuario)
+  e' stato quello che ha portato a spostare lo spawn a [11,15], appena
+  fuori dalla porta.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati). Un
+  primo tentativo aveva fatto fallire il validator (bordo esterno non
+  tutto '#': un bug nello script generatore aveva disegnato un ponte
+  della nebbia fin dentro la colonna 0, il bordo) — corretto.
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat):
+  - le 6 zone visivamente distinte: nebbia_grigia blu/acquosa con isole
+    marroni e ponti, crocevia aperta con l'incrocio di sentieri, teatro
+    con le file di detriti.
+  - cammino REALE (Input reale, fisica vera) attraverso l'ultimo tratto
+    del corridoio Archivio-Frontiera: WorldState.regione_corrente()
+    diventa "frontiera_porte".
+  - la barriera fisica dell'ingresso provata per davvero, non solo via
+    e_aperto(): a Sequenza 2 il personaggio spinge contro la barriera
+    ROSSA per 120 frame di input reale e si sposta solo di ~35px (y da
+    11867 a 11902, bloccato); a Sequenza 9 la barriera e' VERDE e nello
+    stesso numero di frame il personaggio avanza di ~270px (y arriva a
+    12137, passa). Screenshot 03a/03b/03c mandati in chat mostrano il
+    marcatore della barriera passare da rosso a verde.
+  - bonus non richiesto dall'AC: lo screenshot della crocevia mostra
+    ANCHE il secondo gate della Frontiera (isole_nebbia, primitiva
+    teleport) correttamente chiuso per un Twilight Giant che non possiede
+    quella primitiva — ulteriore riprova che _crea_gate copre ogni voce
+    di gating, non solo "ingresso".
+
+APERTO: nessuno per questa story.
+
+PROSSIMA STORIA: US-1011 ("Il primo villaggio vero"), priority 13.

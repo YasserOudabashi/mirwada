@@ -26,6 +26,7 @@ const OFFSET_MARCHE := Vector2i(0, 0)
 func _root() -> Node: return Engine.get_main_loop().root
 func _gd() -> Node: return _root().get_node("GameData")
 func _ws() -> Node: return _root().get_node("WorldState")
+func _pr() -> Node: return _root().get_node("Progression")
 
 
 ## Dimensione VERA di un layout (righe x colonne della sua mappa, US-1005:
@@ -229,6 +230,50 @@ func test_gate_dell_archivio_e_una_barriera_fisica_nel_mondo_continuo() -> void:
 
 	ks.call("impara", "testi_ordine_minore")
 	assert_true(bool(gate.call("e_aperto")), "col flag, l'ala interna si apre")
+
+	(r["cont"] as Node2D).free()
+
+
+## US-1009: gli ultimi 3 corridoi che chiudono l'anello - il raggio verso
+## mirwada (che usa l'ultimo muro libero di mirwada, nord, e il muro sud di
+## Frontiera vicino alla zona crocevia) e i due lati restanti dell'anello
+## (archivio_sepolto-frontiera_porte, stesso world_offset.x, una SECONDA
+## porta sul muro sud dell'Archivio; valle_madre-frontiera_porte, stesso
+## world_offset.y, il muro est di Valle finora libero).
+func test_corridoi_di_frontiera_delle_porte_sono_calpestabili() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: TileMapLayer = r["mondo"]
+	_assert_corridoio_calpestabile(mondo, "mirwada", "frontiera_porte")
+	_assert_corridoio_calpestabile(mondo, "archivio_sepolto", "frontiera_porte")
+	_assert_corridoio_calpestabile(mondo, "valle_madre", "frontiera_porte")
+	(r["cont"] as Node2D).free()
+
+
+## US-1009 (AC "il gating d'ingresso della regione si applica come barriera
+## fisica al confine, non piu' come rifiuto di caricamento - verificato che
+## un personaggio sotto soglia viene fermato fisicamente e uno sopra soglia
+## passa"): la Frontiera e' la PRIMA regione con un gating area=="ingresso"
+## (chiude l'intera regione, non un'ala interna come l'Archivio) - lo stesso
+## meccanismo generico di _crea_gate copre anche questo caso (nessuna
+## modifica al codice: e' proprio il punto della story), qui verificato per
+## la prima volta con la StaticBody2D viva dentro world_scene invece che
+## solo a livello di dato (test_area_gate.gd) o di fast travel
+## (test_page_mappa.gd::test_viaggia_a_rispetta_il_gating_d_ingresso).
+func test_gate_ingresso_della_frontiera_e_una_barriera_fisica_nel_mondo_continuo() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: TileMapLayer = r["mondo"]
+
+	var gate: Area2D = mondo.get_node_or_null("Gate_frontiera_porte_ingresso")
+	assert_true(gate != null, "il Gate d'ingresso della Frontiera esiste nel mondo continuo")
+	if gate == null:
+		(r["cont"] as Node2D).free()
+		return
+
+	_pr().call("configura", "twilight_giant", 2)   # "sopra" la Sequenza 4: respinto
+	assert_false(bool(gate.call("e_aperto")), "Sequenza 2 (alta) e' fermata: il gate (e la sua StaticBody2D, US-611) resta chiuso")
+
+	_pr().call("configura", "twilight_giant", 9)   # sotto soglia: passa
+	assert_true(bool(gate.call("e_aperto")), "Sequenza 9 (bassa) passa: il gate si apre")
 
 	(r["cont"] as Node2D).free()
 
