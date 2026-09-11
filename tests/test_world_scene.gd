@@ -604,3 +604,73 @@ func test_porta_dell_archivio_e_quella_gia_disegnata_in_us1005() -> void:
 			porta.position.y <= origine.y + (rect[1] + rect[3]) * TILE)
 		assert_true(dentro_zona_archivio, "la porta e' dentro il rettangolo della zona 'archivio'")
 	(r["cont"] as Node2D).free()
+
+
+## US-1011 (fase 10, "il primo villaggio vero"): l'avamposto della sorgente
+## in Valle della Madre, 4 capanne usando lo STESSO motore generico di
+## US-1010/US-1005B (edifici[] + data/world/interni/*.json) - zero codice
+## dedicato al villaggio, solo dati. Nessuna nuova voce nel vocabolario
+## chiuso location_tags.json e' servita: un edificio non e' legato a un
+## location_tag (US-1010), quindi le 4 capanne vivono semplicemente dentro
+## il rettangolo gia' esistente della zona "sorgente" senza bisogno di un
+## tag "villaggio" dedicato - stessa decisione presa (e qui dichiarata
+## esplicitamente, come richiede l'AC) per il sotterraneo/le case di
+## Mirwada in fase 10 Blocco B.
+func test_le_4_capanne_dell_avamposto_di_valle_hanno_una_porta_e_un_interno_vero() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var cont: Node2D = r["cont"]
+	var mondo: Node = r["mondo"]
+	var gd: Node = _gd()
+
+	var attesi := {
+		"valle_avamposto_vedetta": "corno_da_richiamo_intagliato",
+		"valle_avamposto_deposito": "cesto_di_vimini_intrecciato",
+		"valle_avamposto_focolare": "campanaccio_di_capra_smarrita",
+		"valle_avamposto_erborista": "quaderno_di_appunti_sulle_maree",
+	}
+	for iid in attesi:
+		var porta: Area2D = _porta_per_interno(mondo, iid)
+		assert_false(porta == null, "la porta di '%s' esiste in scena" % iid)
+
+		var interno: Dictionary = gd.call("get_interno", iid)
+		assert_false(interno.is_empty(), "'%s' risolve a un interno vero nei dati" % iid)
+		var item_atteso: String = attesi[iid]
+		var trovato := false
+		for o in (interno.get("oggetti", []) as Array):
+			if str((o as Dictionary).get("item_id", "")) == item_atteso:
+				trovato = true
+		assert_true(trovato, "'%s' contiene davvero '%s' (non uno stub vuoto)" % [iid, item_atteso])
+
+	cont.free()
+
+
+## AC "si entra ed esce da almeno 2 edifici diversi nello stesso villaggio":
+## qui con lo stesso meccanismo diretto (_entra_edificio/_esci_edificio, non
+## i wrapper con call_deferred()) gia' usato per il sotterraneo di Mirwada -
+## provato su 2 capanne diverse, non solo una, per coprire davvero l'AC.
+func test_si_entra_ed_esce_da_almeno_2_capanne_dell_avamposto() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var cont: Node2D = r["cont"]
+	var mondo: Node = r["mondo"]
+	var player: Node2D = r["player"]
+
+	for iid in ["valle_avamposto_vedetta", "valle_avamposto_deposito"]:
+		var porta: Area2D = _porta_per_interno(mondo, iid)
+		assert_false(porta == null, "la porta di '%s' esiste" % iid)
+		if porta == null:
+			continue
+
+		mondo.call("_entra_edificio", porta)
+		assert_false(mondo.visible, "world_scene si nasconde entrando in '%s'" % iid)
+		var interno: Node = null
+		for c in cont.get_children():
+			if c.get_script() == InteriorScript:
+				interno = c
+		assert_false(interno == null, "l'interno di '%s' e' stato istanziato" % iid)
+
+		mondo.call("_esci_edificio")
+		assert_true(mondo.visible, "world_scene torna visibile uscendo da '%s'" % iid)
+		assert_eq(player.global_position, porta.global_position,
+			"il player torna alla porta di '%s' uscendo" % iid)
+
+	cont.free()

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "interno_id": "valle_avamposto_erborista",
+  "mappa": [
+    "########",
+    "#......#",
+    "#......#",
+    "#......#",
+    "#......#",
+    "########"
+  ],
+  "spawn": [
+    4,
+    4
+  ],
+  "nemici": [],
+  "oggetti": [
+    {
+      "x": 5,
+      "y": 2,
+      "item_id": "quaderno_di_appunti_sulle_maree",
+      "quantita": 1
+    }
+  ]
+}

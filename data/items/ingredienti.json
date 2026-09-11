@@ -4170,6 +4170,58 @@
       ],
       "impilabile": false,
       "valore": 3
+    },
+    {
+      "id": "cesto_di_vimini_intrecciato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.cesto_di_vimini_intrecciato",
+      "descrizione_i18n": "item.cesto_di_vimini_intrecciato.desc",
+      "name": "Cesto di vimini intrecciato",
+      "descrizione": "Ancora pieno di bacche a meta' raccolte. Chi lo teneva non e' tornato a finire.",
+      "tag": [
+        "crescita"
+      ],
+      "impilabile": false,
+      "valore": 2
+    },
+    {
+      "id": "campanaccio_di_capra_smarrita",
+      "categoria": "ingrediente",
+      "name_i18n": "item.campanaccio_di_capra_smarrita",
+      "descrizione_i18n": "item.campanaccio_di_capra_smarrita.desc",
+      "name": "Campanaccio di capra smarrita",
+      "descrizione": "Il battaglio e' fermo. In fondo alla valle nessuno lo sente piu' suonare.",
+      "tag": [
+        "bestia"
+      ],
+      "impilabile": false,
+      "valore": 2
+    },
+    {
+      "id": "quaderno_di_appunti_sulle_maree",
+      "categoria": "ingrediente",
+      "name_i18n": "item.quaderno_di_appunti_sulle_maree",
+      "descrizione_i18n": "item.quaderno_di_appunti_sulle_maree.desc",
+      "name": "Quaderno di appunti sulle maree",
+      "descrizione": "Righe ordinate per anni, poi una sola frase scritta in fretta e mai piu' seguita da altro.",
+      "tag": [
+        "luna"
+      ],
+      "impilabile": false,
+      "valore": 4
+    },
+    {
+      "id": "corno_da_richiamo_intagliato",
+      "categoria": "ingrediente",
+      "name_i18n": "item.corno_da_richiamo_intagliato",
+      "descrizione_i18n": "item.corno_da_richiamo_intagliato.desc",
+      "name": "Corno da richiamo intagliato",
+      "descrizione": "Il segnale per rientrare prima del buio. Appeso accanto al focolare, non e' mai piu' servito.",
+      "tag": [
+        "bestia"
+      ],
+      "impilabile": false,
+      "valore": 3
     }
   ]
 }

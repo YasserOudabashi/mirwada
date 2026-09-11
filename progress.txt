@@ -11709,3 +11709,91 @@ COME VERIFICATO.
 APERTO: nessuno per questa story.
 
 PROSSIMA STORIA: US-1011 ("Il primo villaggio vero"), priority 13.
+
+---
+
+[2026-09-11] US-1011 — Il primo villaggio vero
+
+COSA FATTO.
+- data/world/layouts/valle_madre.json: aggiunto un avamposto di 4 capanne
+  (vedetta, deposito, focolare comune, erborista) attorno a una piccola
+  piazza, in un'area finora vuota della zona "sorgente" (a sud dello
+  stagno gia' disegnato in US-1007, righe 39-48, che prima era pavimento
+  vuoto) - nessun nemico/oggetto esistente e' stato toccato. Ogni capanna
+  e' un rettangolo murato 5x4 con una porta ('+'), stesso linguaggio
+  visivo gia' usato per gli edifici di Mirwada. Nuovo campo "edifici" (il
+  layout non lo aveva ancora) con le 4 voci [x,y,interno_id].
+- Decisione dichiarata esplicitamente (come richiede l'AC): NESSUNA nuova
+  voce nel vocabolario chiuso data/schema/location_tags.json era
+  necessaria. Un edificio (US-1010, fase 10 Blocco B) non e' legato a un
+  location_tag - vive come semplice marcatore [x,y,interno_id] sul layout,
+  indipendente dalle zone. Le 4 capanne stanno semplicemente dentro il
+  rettangolo gia' esistente della zona "sorgente": stessa scelta gia'
+  presa (senza bisogno di dichiararla allora, qui esplicitata perche' l'AC
+  lo chiede) per il sotterraneo e le 3 case di Mirwada in US-1010/1005B.
+- data/world/interni/valle_avamposto_{vedetta,deposito,focolare,
+  erborista}.json (nuovi): una stanza a testa (stesso schema minimale
+  degli interni di Mirwada), ognuna con UN oggetto reale coerente col
+  tema del luogo (mai stub vuoti):
+  - vedetta -> corno_da_richiamo_intagliato ("il segnale per rientrare
+    prima del buio")
+  - deposito -> cesto_di_vimini_intrecciato ("ancora pieno di bacche a
+    meta' raccolte")
+  - focolare -> campanaccio_di_capra_smarrita ("il battaglio e' fermo")
+  - erborista -> quaderno_di_appunti_sulle_maree ("una sola frase scritta
+    in fretta e mai piu' seguita da altro") - tema luna/maree, coerente
+    col gruppo goddess_of_origin (Mother/Moon) a cui appartiene la Valle.
+  4 item nuovi in data/items/ingredienti.json (categoria "ingrediente",
+  stessa convenzione di US-1005B), tag dal vocabolario chiuso esistente
+  (crescita, bestia, luna - nessun tag nuovo).
+- tools/generate_i18n_stubs.py rilanciato: le chiavi it.json dei 4 item
+  nuovi generate dal testo gia' in chiaro nei dati (name/descrizione),
+  0 TODO residui. Effetto collaterale innocuo notato nel diff: il tool ha
+  anche riordinato alfabeticamente 2 chiavi di US-1005B
+  (trottola_di_legno_intagliata, boccale_dei_contrabbandieri) che erano
+  rimaste appese in coda al file invece che nella loro posizione
+  alfabetica - puro refactor di formattazione, verificato col diff che
+  nessun contenuto e' andato perso (le righe sono spostate, non
+  cancellate).
+- tests/test_world_scene.gd: due test nuovi, stesso schema gia' rodato su
+  Mirwada.
+  - test_le_4_capanne_dell_avamposto_di_valle_hanno_una_porta_e_un_interno_vero
+    (ricalca test_i_3_edifici_di_us1005b_...): ogni capanna ha una porta
+    in scena E un interno vero nei dati che contiene davvero l'oggetto
+    atteso.
+  - test_si_entra_ed_esce_da_almeno_2_capanne_dell_avamposto: chiama
+    _entra_edificio/_esci_edificio direttamente (stesso pattern gia' in
+    uso per il sotterraneo - Godot vieta di disabilitare un
+    CollisionObject2D dentro il callback di fisica) su 2 capanne DIVERSE
+    (vedetta e deposito, non solo una), verifica che world_scene si
+    nasconde/riappare e che il player torna esattamente alla porta uscendo
+    - copre per davvero l'AC "si entra ed esce da almeno 2 edifici
+    diversi", non un solo giro.
+  Zero righe di codice nuove in scripts/: il motore generico di US-1010
+  e' riusato cosi' com'e', nessuna modifica.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 922 test,
+  tutti passati (920 + 2 nuovi), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat): le 4 capanne visibili dall'alto attorno alla piazza
+  (screenshot 01); ingresso reale nella capanna del vedetta - l'interno
+  murato renderizzato correttamente (screenshot 02) - e uscita che
+  riporta il personaggio davanti alla porta (screenshot 03); ripetuto per
+  la capanna del deposito (screenshot 04/05).
+  Nota tecnica scoperta durante la verifica (non un bug del gioco, solo
+  dello script di prova): uno screenshot preso SUBITO dopo un grande
+  teletrasporto (dalle coordinate di Valle della Madre alle coordinate
+  quasi-zero di un interno) mostra la camera ancora a meta' della sua
+  interpolazione di smoothing (game_camera.gd, position_smoothing_speed
+  = 5.0, tarato per il movimento normale del giocatore, non per un salto
+  di migliaia di pixel in un frame) - risolto disabilitando temporaneamente
+  lo smoothing nello script di verifica prima degli screenshot; nessuna
+  modifica al gioco vero, dove il giocatore non si teletrasporta mai in
+  quel modo.
+
+APERTO: nessuno per questa story.
+
+PROSSIMA STORIA: US-1012 ("La prima struttura grande - palazzo/torre/cripta
+a piu' stanze"), priority 14.
