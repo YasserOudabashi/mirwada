@@ -8,10 +8,17 @@ extends "res://tests/test_case.gd"
 ## US-807c — Archivio Sepolto: quarta regione, stesso schema.
 ## US-807d — Frontiera delle Porte: quinta e ultima regione, chiude il
 ## Blocco B (tutte e 5 le regioni hanno un layout da qui in poi).
+## US-1002B (fase 10, mondo continuo) — non c'e' piu' una scena per regione:
+## world_scene.gd dipinge tutte e 5 le regioni nella stessa TileMapLayer,
+## ognuna al proprio world_offset (US-1001). Ogni assert di cella/zona/spawn
+## qui sotto somma l'offset della regione in questione - letto da
+## GameData, mai un numero scritto a mano nel test. I vecchi nodi
+## "Passaggio_X" non esistono piu' (sostituiti dal confine + corridoio,
+## tests/test_world_scene.gd); quei test sono stati tolti.
 
-const TILE := 32  # region_scene.gd::TILE
+const TILE := 32  # world_scene.gd::TILE
 
-## Colonne di tileset.png (US-813, region_scene.gd::_COLONNA_PER_CARATTERE),
+## Colonne di tileset.png (US-813, world_scene.gd::_COLONNA_PER_CARATTERE),
 ## stesso ordine di generate_sprites.py.TILESET_COLONNE.
 const COL_PAVIMENTO := 0
 const COL_MURO := 1
@@ -19,7 +26,7 @@ const COL_ACQUA := 3
 const COL_SENTIERO := 5
 
 ## Righe di tileset.png: 0 = neutra, poi 1 + indice della palette_visiva in
-## data/vfx.json.pathway_palette_visiva (region_scene.gd::_riga_tileset()).
+## data/vfx.json.pathway_palette_visiva (world_scene.gd::_riga_tileset()).
 ## mirwada e' "neutra"; le altre 4 regioni con layout hanno palette diverse
 ## -> righe diverse, verificato una volta in test_riga_tileset_per_palette.
 const RIGA_NEUTRA := 0
@@ -36,9 +43,18 @@ func prepara() -> void:
 	_et().call("azzera")
 
 
-## Istanzia una regione con un Player fittizio come fratello, cosi'
-## _colloca_giocatore() (region_scene.gd) lo posiziona davvero: stesso
-## contratto di main.tscn (Player e regione sono fratelli).
+## world_offset dichiarato in data/world/regions.json (US-1001) per una
+## regione - mai un numero scritto a mano qui, sempre letto dai dati.
+func _offset(region_id: String) -> Vector2i:
+	var reg: Dictionary = _gd().call("get_region", region_id)
+	var wo: Array = reg.get("world_offset", [0, 0])
+	return Vector2i(int(wo[0]), int(wo[1])) if wo.size() == 2 else Vector2i.ZERO
+
+
+## Istanzia il mondo continuo con un Player fittizio come fratello, cosi'
+## world_scene.gd si comporta come in main.tscn (Player e mondo sono
+## fratelli). Ritorna anche l'offset della regione richiesta, per gli
+## assert di cella/posizione dei test che seguono.
 func _istanzia_con_player(region_id: String) -> Dictionary:
 	var cont := Node2D.new()
 	_root().add_child(cont)
@@ -46,9 +62,9 @@ func _istanzia_con_player(region_id: String) -> Dictionary:
 	player.name = "Player"
 	player.add_to_group("player")
 	cont.add_child(player)
-	var scena: Node = load("res://scenes/regioni/%s.tscn" % region_id).instantiate()
+	var scena: Node = load("res://scenes/world_scene.tscn").instantiate()
 	cont.add_child(scena)
-	return {"cont": cont, "player": player, "scena": scena}
+	return {"cont": cont, "player": player, "scena": scena, "offset": _offset(region_id)}
 
 
 func test_get_layout_presente_e_assente() -> void:
@@ -63,10 +79,11 @@ func test_get_layout_presente_e_assente() -> void:
 func test_mirwada_dipinta_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("mirwada")
 	var scena: TileMapLayer = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), Vector2i(COL_MURO, RIGA_NEUTRA), "bordo esterno solido")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(1, 1)), Vector2i(COL_PAVIMENTO, RIGA_NEUTRA), "cella '.' interna non solida")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(44, 29)), Vector2i(COL_ACQUA, RIGA_NEUTRA),
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(0, 0)), Vector2i(COL_MURO, RIGA_NEUTRA), "bordo esterno solido")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(1, 1)), Vector2i(COL_PAVIMENTO, RIGA_NEUTRA), "cella '.' interna non solida")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(44, 29)), Vector2i(COL_ACQUA, RIGA_NEUTRA),
 		"cella '~' (acqua) usa la colonna acqua ed e' solida (US-813)")
 
 	(r["cont"] as Node2D).free()
@@ -75,10 +92,11 @@ func test_mirwada_dipinta_dal_layout() -> void:
 func test_mirwada_spawn_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("mirwada")
 	var scena: TileMapLayer = r["scena"]
-	var player: Node2D = r["player"]
+	var o: Vector2i = r["offset"]
 
-	var atteso: Vector2 = scena.to_global(scena.map_to_local(Vector2i(4, 4)))
-	assert_eq(player.global_position, atteso, "il player compare sulla cella spawn del layout")
+	var atteso: Vector2 = scena.to_global(scena.map_to_local(o + Vector2i(4, 4)))
+	assert_eq(scena.call("punto_spawn", "mirwada"),
+		atteso, "punto_spawn('mirwada') usa la cella spawn del layout, offset incluso")
 
 	(r["cont"] as Node2D).free()
 
@@ -86,30 +104,18 @@ func test_mirwada_spawn_dal_layout() -> void:
 func test_mirwada_zona_dal_rettangolo_del_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("mirwada")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var zona: Node2D = scena.get_node_or_null("Zona_porto")
-	assert_false(zona == null, "Zona_porto esiste")
+	var zona: Node2D = scena.get_node_or_null("Zona_mirwada_porto")
+	assert_false(zona == null, "Zona_mirwada_porto esiste")
 	# rettangolo dichiarato in data/world/layouts/mirwada.json: [36, 26, 10, 8]
-	var min_atteso := Vector2(36, 26) * TILE
-	var max_atteso := Vector2(36 + 10, 26 + 8) * TILE
+	var origine: Vector2 = scena.map_to_local(o)
+	var min_atteso: Vector2 = origine + Vector2(36, 26) * TILE
+	var max_atteso: Vector2 = origine + Vector2(36 + 10, 26 + 8) * TILE
 	assert_true(zona.position.x >= min_atteso.x and zona.position.x <= max_atteso.x,
-		"Zona_porto.x dentro il rettangolo dichiarato")
+		"Zona_mirwada_porto.x dentro il rettangolo dichiarato (offset incluso)")
 	assert_true(zona.position.y >= min_atteso.y and zona.position.y <= max_atteso.y,
-		"Zona_porto.y dentro il rettangolo dichiarato")
-
-	(r["cont"] as Node2D).free()
-
-
-func test_mirwada_passaggio_dalla_cella_del_layout() -> void:
-	var r: Dictionary = _istanzia_con_player("mirwada")
-	var scena: Node = r["scena"]
-
-	# data/world/layouts/mirwada.json: passaggi.marche_crepuscolo = [44, 5]
-	var passaggio: Node2D = scena.get_node_or_null("Passaggio_marche_crepuscolo")
-	assert_false(passaggio == null, "Passaggio_marche_crepuscolo esiste")
-	var atteso := Vector2(44.5, 5.5) * TILE
-	assert_almost_eq(passaggio.position.x, atteso.x, "passaggio.x dalla cella del layout")
-	assert_almost_eq(passaggio.position.y, atteso.y, "passaggio.y dalla cella del layout")
+		"Zona_mirwada_porto.y dentro il rettangolo dichiarato (offset incluso)")
 
 	(r["cont"] as Node2D).free()
 
@@ -125,21 +131,23 @@ func test_tutte_le_regioni_hanno_un_layout() -> void:
 			"la regione '%s' ha un layout disegnato a mano" % rid)
 
 
-## Trova i nemici/pickup spawnati DENTRO la scena regione (non l'intero
-## gruppo globale: altre suite possono lasciarne in giro fra un test e
-## l'altro se qualcosa fallisce a meta').
-func _nemici_di(scena: Node) -> Array:
+## Trova i nemici/pickup spawnati DENTRO il rettangolo di una regione (non
+## l'intero mondo continuo: world_scene.gd ospita le 5 regioni nello stesso
+## nodo, world_offset le separa nello spazio - US-1002B).
+func _nemici_di(scena: Node, offset: Vector2i) -> Array:
+	var rett := Rect2(scena.map_to_local(offset), Vector2(48, 36) * TILE)
 	var out: Array = []
 	for c in scena.get_children():
-		if c.is_in_group("nemici"):
+		if c.is_in_group("nemici") and rett.has_point(c.global_position):
 			out.append(c)
 	return out
 
 
-func _pickup_di(scena: Node) -> Array:
+func _pickup_di(scena: Node, offset: Vector2i) -> Array:
+	var rett := Rect2(scena.map_to_local(offset), Vector2(48, 36) * TILE)
 	var out: Array = []
 	for c in scena.get_children():
-		if c.get_script() == preload("res://scripts/item_pickup.gd"):
+		if c.get_script() == preload("res://scripts/item_pickup.gd") and rett.has_point(c.global_position):
 			out.append(c)
 	return out
 
@@ -147,8 +155,9 @@ func _pickup_di(scena: Node) -> Array:
 func test_mirwada_nemici_dal_layout_sequenza_e_boss() -> void:
 	var r: Dictionary = _istanzia_con_player("mirwada")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, o)
 	assert_eq(nemici.size(), 7, "6 nemici di Sequenza 9 + 1 boss dal layout")
 
 	var boss = null
@@ -177,8 +186,9 @@ func test_mirwada_nemici_dal_layout_sequenza_e_boss() -> void:
 func test_mirwada_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var r: Dictionary = _istanzia_con_player("mirwada")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var pickup_list: Array = _pickup_di(scena)
+	var pickup_list: Array = _pickup_di(scena, o)
 	# 10 originali + 3 ingredienti di formula_darkness_9 + 3 di
 	# formula_paragon_9 (006_PRD/prd-vslice-livello-b-batch-2.md).
 	assert_eq(pickup_list.size(), 16, "16 oggetti a terra dal layout")
@@ -198,8 +208,9 @@ func test_mirwada_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 func test_mirwada_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 	var r: Dictionary = _istanzia_con_player("mirwada")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, o)
 	assert_eq(nemici.size(), 7, "setup: 7 nemici")
 	for i in nemici.size() - 1:
 		nemici[i].get_node("StatsComponent").set("hp", 0.0)
@@ -220,10 +231,10 @@ func test_mirwada_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 func test_nemici_di_mirwada_senza_player_restano_inerti() -> void:
 	var cont := Node2D.new()
 	_root().add_child(cont)
-	var scena: Node = load("res://scenes/regioni/mirwada.tscn").instantiate()
+	var scena: Node = load("res://scenes/world_scene.tscn").instantiate()
 	cont.add_child(scena)
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, _offset("mirwada"))
 	assert_eq(nemici.size(), 7, "i nemici si spawnano comunque senza Player")
 	for e in nemici:
 		e.call("_physics_process", 0.016)
@@ -238,31 +249,29 @@ func test_nemici_di_mirwada_senza_player_restano_inerti() -> void:
 func test_marche_dipinta_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("marche_crepuscolo")
 	var scena: TileMapLayer = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var riga: int = scena.get_cell_atlas_coords(Vector2i(1, 1)).y
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(1, 1)), Vector2i(COL_PAVIMENTO, riga), "cella '.' di brughiera non solida")
+	var riga: int = scena.get_cell_atlas_coords(o + Vector2i(1, 1)).y
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(1, 1)), Vector2i(COL_PAVIMENTO, riga), "cella '.' di brughiera non solida")
 	# muro della cripta (data/world/layouts/marche_crepuscolo.json: zona cripta [20,19,8,8])
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(20, 19)), Vector2i(COL_MURO, riga), "muro della cripta solido")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(20, 19)), Vector2i(COL_MURO, riga), "muro della cripta solido")
 	# varco della cripta sul lato sud (riga 26, colonne 23-24 libere)
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(23, 26)), Vector2i(COL_PAVIMENTO, riga), "il varco della cripta e' calpestabile")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(23, 26)), Vector2i(COL_PAVIMENTO, riga), "il varco della cripta e' calpestabile")
 
 	(r["cont"] as Node2D).free()
 
 
-func test_marche_spawn_e_passaggio_dal_layout() -> void:
+func test_marche_spawn_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("marche_crepuscolo")
 	var scena: Node = r["scena"]
 	var player: Node2D = r["player"]
+	var o: Vector2i = r["offset"]
 
-	var atteso_spawn: Vector2 = scena.to_global(scena.map_to_local(Vector2i(4, 4)))
-	assert_eq(player.global_position, atteso_spawn, "il player compare sulla cella spawn del layout")
-
-	var passaggio: Node2D = scena.get_node_or_null("Passaggio_mirwada")
-	assert_false(passaggio == null, "Passaggio_mirwada esiste (unica destinazione di una regione a raggio)")
-	var atteso_pass := Vector2(4.5, 6.5) * TILE
-	assert_almost_eq(passaggio.position.x, atteso_pass.x, "passaggio.x dalla cella del layout")
-	assert_almost_eq(passaggio.position.y, atteso_pass.y, "passaggio.y dalla cella del layout")
+	var atteso_spawn: Vector2 = scena.to_global(scena.map_to_local(o + Vector2i(4, 4)))
+	assert_eq(scena.call("punto_spawn", "marche_crepuscolo"), atteso_spawn,
+		"punto_spawn('marche_crepuscolo') usa la cella spawn del layout, offset incluso")
+	assert_true(player != null, "il player fittizio esiste (contratto della scena)")
 
 	(r["cont"] as Node2D).free()
 
@@ -270,8 +279,9 @@ func test_marche_spawn_e_passaggio_dal_layout() -> void:
 func test_marche_nemici_dal_layout_sequenza_e_boss() -> void:
 	var r: Dictionary = _istanzia_con_player("marche_crepuscolo")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, o)
 	assert_eq(nemici.size(), 7, "6 nemici di Sequenza 9/8 + 1 boss dal layout")
 
 	var boss = null
@@ -298,8 +308,9 @@ func test_marche_nemici_dal_layout_sequenza_e_boss() -> void:
 func test_marche_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var r: Dictionary = _istanzia_con_player("marche_crepuscolo")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var pickup_list: Array = _pickup_di(scena)
+	var pickup_list: Array = _pickup_di(scena, o)
 	# 8 originali + 3 ingredienti di formula_death_9
 	# (006_PRD/prd-vslice-livello-b-batch-2.md).
 	assert_eq(pickup_list.size(), 11, "11 oggetti a terra dal layout")
@@ -318,8 +329,9 @@ func test_marche_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 func test_marche_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 	var r: Dictionary = _istanzia_con_player("marche_crepuscolo")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, o)
 	assert_eq(nemici.size(), 7, "setup: 7 nemici")
 	for e in nemici:
 		e.get_node("StatsComponent").set("hp", 0.0)
@@ -333,10 +345,10 @@ func test_marche_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 func test_nemici_di_marche_senza_player_restano_inerti() -> void:
 	var cont := Node2D.new()
 	_root().add_child(cont)
-	var scena: Node = load("res://scenes/regioni/marche_crepuscolo.tscn").instantiate()
+	var scena: Node = load("res://scenes/world_scene.tscn").instantiate()
 	cont.add_child(scena)
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, _offset("marche_crepuscolo"))
 	assert_eq(nemici.size(), 7, "i nemici si spawnano comunque senza Player")
 	for e in nemici:
 		e.call("_physics_process", 0.016)
@@ -351,33 +363,29 @@ func test_nemici_di_marche_senza_player_restano_inerti() -> void:
 func test_valle_dipinta_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("valle_madre")
 	var scena: TileMapLayer = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var riga: int = scena.get_cell_atlas_coords(Vector2i(1, 1)).y
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(1, 1)), Vector2i(COL_PAVIMENTO, riga), "cella '.' del bosco non solida")
+	var riga: int = scena.get_cell_atlas_coords(o + Vector2i(1, 1)).y
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(1, 1)), Vector2i(COL_PAVIMENTO, riga), "cella '.' del bosco non solida")
 	# data/world/layouts/valle_madre.json: acqua '~' nella zona grotta_di_marea, es. (40,5)
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(40, 5)), Vector2i(COL_ACQUA, riga),
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(40, 5)), Vector2i(COL_ACQUA, riga),
 		"cella '~' della grotta di marea usa la colonna acqua ed e' solida (US-813)")
 	# il ponte di radici '=' che attraversa l'acqua, es. (41,5), resta calpestabile
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(41, 5)), Vector2i(COL_SENTIERO, riga),
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(41, 5)), Vector2i(COL_SENTIERO, riga),
 		"il ponte di radici ('=') che attraversa la grotta di marea e' calpestabile")
 
 	(r["cont"] as Node2D).free()
 
 
-func test_valle_spawn_e_passaggio_dal_layout() -> void:
+func test_valle_spawn_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("valle_madre")
 	var scena: Node = r["scena"]
-	var player: Node2D = r["player"]
+	var o: Vector2i = r["offset"]
 
-	var atteso_spawn: Vector2 = scena.to_global(scena.map_to_local(Vector2i(4, 4)))
-	assert_eq(player.global_position, atteso_spawn, "il player compare sulla cella spawn del layout")
-
-	var passaggio: Node2D = scena.get_node_or_null("Passaggio_mirwada")
-	assert_false(passaggio == null, "Passaggio_mirwada esiste (unica destinazione di una regione a raggio)")
-	var atteso_pass := Vector2(4.5, 6.5) * TILE
-	assert_almost_eq(passaggio.position.x, atteso_pass.x, "passaggio.x dalla cella del layout")
-	assert_almost_eq(passaggio.position.y, atteso_pass.y, "passaggio.y dalla cella del layout")
+	var atteso_spawn: Vector2 = scena.to_global(scena.map_to_local(o + Vector2i(4, 4)))
+	assert_eq(scena.call("punto_spawn", "valle_madre"), atteso_spawn,
+		"punto_spawn('valle_madre') usa la cella spawn del layout, offset incluso")
 
 	(r["cont"] as Node2D).free()
 
@@ -385,8 +393,9 @@ func test_valle_spawn_e_passaggio_dal_layout() -> void:
 func test_valle_nemici_dal_layout_sequenza_e_boss() -> void:
 	var r: Dictionary = _istanzia_con_player("valle_madre")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, o)
 	assert_eq(nemici.size(), 7, "6 nemici di Sequenza 9/8 + 1 boss dal layout")
 
 	var boss = null
@@ -413,8 +422,9 @@ func test_valle_nemici_dal_layout_sequenza_e_boss() -> void:
 func test_valle_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var r: Dictionary = _istanzia_con_player("valle_madre")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var pickup_list: Array = _pickup_di(scena)
+	var pickup_list: Array = _pickup_di(scena, o)
 	# 7 originali + 3 ingredienti di formula_moon_9
 	# (006_PRD/prd-vslice-livello-b-batch-2.md).
 	assert_eq(pickup_list.size(), 10, "10 oggetti a terra dal layout")
@@ -433,8 +443,9 @@ func test_valle_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 func test_valle_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 	var r: Dictionary = _istanzia_con_player("valle_madre")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, o)
 	assert_eq(nemici.size(), 7, "setup: 7 nemici")
 	for e in nemici:
 		e.get_node("StatsComponent").set("hp", 0.0)
@@ -448,10 +459,10 @@ func test_valle_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 func test_nemici_di_valle_senza_player_restano_inerti() -> void:
 	var cont := Node2D.new()
 	_root().add_child(cont)
-	var scena: Node = load("res://scenes/regioni/valle_madre.tscn").instantiate()
+	var scena: Node = load("res://scenes/world_scene.tscn").instantiate()
 	cont.add_child(scena)
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, _offset("valle_madre"))
 	assert_eq(nemici.size(), 7, "i nemici si spawnano comunque senza Player")
 	for e in nemici:
 		e.call("_physics_process", 0.016)
@@ -466,31 +477,27 @@ func test_nemici_di_valle_senza_player_restano_inerti() -> void:
 func test_archivio_dipinta_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("archivio_sepolto")
 	var scena: TileMapLayer = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var riga: int = scena.get_cell_atlas_coords(Vector2i(4, 4)).y
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(4, 4)), Vector2i(COL_PAVIMENTO, riga), "spawn dentro la sala biblioteca, calpestabile")
+	var riga: int = scena.get_cell_atlas_coords(o + Vector2i(4, 4)).y
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(4, 4)), Vector2i(COL_PAVIMENTO, riga), "spawn dentro la sala biblioteca, calpestabile")
 	# data/world/layouts/archivio_sepolto.json: muro interno della sala officina
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(17, 5)), Vector2i(COL_MURO, riga), "muro interno di una sala solido")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(17, 5)), Vector2i(COL_MURO, riga), "muro interno di una sala solido")
 	# varco fra biblioteca e officina sul corridoio y=9
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(16, 9)), Vector2i(COL_PAVIMENTO, riga), "varco fra le sale e' calpestabile")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(16, 9)), Vector2i(COL_PAVIMENTO, riga), "varco fra le sale e' calpestabile")
 
 	(r["cont"] as Node2D).free()
 
 
-func test_archivio_spawn_e_passaggio_dal_layout() -> void:
+func test_archivio_spawn_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("archivio_sepolto")
 	var scena: Node = r["scena"]
-	var player: Node2D = r["player"]
+	var o: Vector2i = r["offset"]
 
-	var atteso_spawn: Vector2 = scena.to_global(scena.map_to_local(Vector2i(4, 4)))
-	assert_eq(player.global_position, atteso_spawn, "il player compare sulla cella spawn del layout")
-
-	var passaggio: Node2D = scena.get_node_or_null("Passaggio_mirwada")
-	assert_false(passaggio == null, "Passaggio_mirwada esiste (unica destinazione di una regione a raggio)")
-	var atteso_pass := Vector2(4.5, 6.5) * TILE
-	assert_almost_eq(passaggio.position.x, atteso_pass.x, "passaggio.x dalla cella del layout")
-	assert_almost_eq(passaggio.position.y, atteso_pass.y, "passaggio.y dalla cella del layout")
+	var atteso_spawn: Vector2 = scena.to_global(scena.map_to_local(o + Vector2i(4, 4)))
+	assert_eq(scena.call("punto_spawn", "archivio_sepolto"), atteso_spawn,
+		"punto_spawn('archivio_sepolto') usa la cella spawn del layout, offset incluso")
 
 	(r["cont"] as Node2D).free()
 
@@ -498,8 +505,9 @@ func test_archivio_spawn_e_passaggio_dal_layout() -> void:
 func test_archivio_nemici_dal_layout_sequenza_e_boss() -> void:
 	var r: Dictionary = _istanzia_con_player("archivio_sepolto")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, o)
 	assert_eq(nemici.size(), 7, "6 nemici di Sequenza 8/7 + 1 boss dal layout")
 
 	var boss = null
@@ -526,8 +534,9 @@ func test_archivio_nemici_dal_layout_sequenza_e_boss() -> void:
 func test_archivio_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var r: Dictionary = _istanzia_con_player("archivio_sepolto")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var pickup_list: Array = _pickup_di(scena)
+	var pickup_list: Array = _pickup_di(scena, o)
 	# 6 originali (US-805/US-809c) + 3 ingredienti di formula_error_9
 	# (006_PRD/prd-vslice-livello-b-batch-1.md, VS-B1-03: non esistevano in
 	# nessun layout prima, servono al Livello B reale del Pathway Error).
@@ -547,8 +556,9 @@ func test_archivio_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 func test_archivio_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 	var r: Dictionary = _istanzia_con_player("archivio_sepolto")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, o)
 	assert_eq(nemici.size(), 7, "setup: 7 nemici")
 	for e in nemici:
 		e.get_node("StatsComponent").set("hp", 0.0)
@@ -562,10 +572,10 @@ func test_archivio_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 func test_nemici_di_archivio_senza_player_restano_inerti() -> void:
 	var cont := Node2D.new()
 	_root().add_child(cont)
-	var scena: Node = load("res://scenes/regioni/archivio_sepolto.tscn").instantiate()
+	var scena: Node = load("res://scenes/world_scene.tscn").instantiate()
 	cont.add_child(scena)
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, _offset("archivio_sepolto"))
 	assert_eq(nemici.size(), 7, "i nemici si spawnano comunque senza Player")
 	for e in nemici:
 		e.call("_physics_process", 0.016)
@@ -580,31 +590,27 @@ func test_nemici_di_archivio_senza_player_restano_inerti() -> void:
 func test_frontiera_dipinta_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("frontiera_porte")
 	var scena: TileMapLayer = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var riga: int = scena.get_cell_atlas_coords(Vector2i(7, 7)).y
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(15, 4)), Vector2i(COL_ACQUA, riga),
+	var riga: int = scena.get_cell_atlas_coords(o + Vector2i(7, 7)).y
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(0, 0)), Vector2i(COL_MURO, riga), "bordo esterno solido")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(15, 4)), Vector2i(COL_ACQUA, riga),
 		"cella '~' (nebbia) fuori da un'isola usa la colonna acqua ed e' solida (US-813)")
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(7, 7)), Vector2i(COL_PAVIMENTO, riga), "spawn sull'isola soglia, calpestabile")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(7, 7)), Vector2i(COL_PAVIMENTO, riga), "spawn sull'isola soglia, calpestabile")
 	# ponte '=' che collega la crocevia centrale alle isole
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(24, 12)), Vector2i(COL_SENTIERO, riga), "il ponte ('=') fra isole e' calpestabile")
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(24, 12)), Vector2i(COL_SENTIERO, riga), "il ponte ('=') fra isole e' calpestabile")
 
 	(r["cont"] as Node2D).free()
 
 
-func test_frontiera_spawn_e_passaggio_dal_layout() -> void:
+func test_frontiera_spawn_dal_layout() -> void:
 	var r: Dictionary = _istanzia_con_player("frontiera_porte")
 	var scena: Node = r["scena"]
-	var player: Node2D = r["player"]
+	var o: Vector2i = r["offset"]
 
-	var atteso_spawn: Vector2 = scena.to_global(scena.map_to_local(Vector2i(7, 7)))
-	assert_eq(player.global_position, atteso_spawn, "il player compare sulla cella spawn del layout")
-
-	var passaggio: Node2D = scena.get_node_or_null("Passaggio_mirwada")
-	assert_false(passaggio == null, "Passaggio_mirwada esiste (unica destinazione di una regione a raggio)")
-	var atteso_pass := Vector2(7.5, 9.5) * TILE
-	assert_almost_eq(passaggio.position.x, atteso_pass.x, "passaggio.x dalla cella del layout")
-	assert_almost_eq(passaggio.position.y, atteso_pass.y, "passaggio.y dalla cella del layout")
+	var atteso_spawn: Vector2 = scena.to_global(scena.map_to_local(o + Vector2i(7, 7)))
+	assert_eq(scena.call("punto_spawn", "frontiera_porte"), atteso_spawn,
+		"punto_spawn('frontiera_porte') usa la cella spawn del layout, offset incluso")
 
 	(r["cont"] as Node2D).free()
 
@@ -612,8 +618,9 @@ func test_frontiera_spawn_e_passaggio_dal_layout() -> void:
 func test_frontiera_nemici_dal_layout_sequenza_e_boss() -> void:
 	var r: Dictionary = _istanzia_con_player("frontiera_porte")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, o)
 	assert_eq(nemici.size(), 7, "6 nemici di Sequenza 7/6 + 1 boss dal layout")
 
 	var boss = null
@@ -640,8 +647,9 @@ func test_frontiera_nemici_dal_layout_sequenza_e_boss() -> void:
 func test_frontiera_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 	var r: Dictionary = _istanzia_con_player("frontiera_porte")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var pickup_list: Array = _pickup_di(scena)
+	var pickup_list: Array = _pickup_di(scena, o)
 	# 6 originali (US-805/US-809c) + 3 ingredienti di formula_door_9
 	# (006_PRD/prd-vslice-livello-b-batch-1.md, VS-B1-02: non esistevano in
 	# nessun layout prima, servono al Livello B reale del Pathway Door).
@@ -661,8 +669,9 @@ func test_frontiera_oggetti_a_terra_raccolti_finiscono_in_inventory() -> void:
 func test_frontiera_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 	var r: Dictionary = _istanzia_con_player("frontiera_porte")
 	var scena: Node = r["scena"]
+	var o: Vector2i = r["offset"]
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, o)
 	assert_eq(nemici.size(), 7, "setup: 7 nemici")
 	for e in nemici:
 		e.get_node("StatsComponent").set("hp", 0.0)
@@ -676,10 +685,10 @@ func test_frontiera_area_cleared_alla_morte_dell_ultimo_nemico() -> void:
 func test_nemici_di_frontiera_senza_player_restano_inerti() -> void:
 	var cont := Node2D.new()
 	_root().add_child(cont)
-	var scena: Node = load("res://scenes/regioni/frontiera_porte.tscn").instantiate()
+	var scena: Node = load("res://scenes/world_scene.tscn").instantiate()
 	cont.add_child(scena)
 
-	var nemici: Array = _nemici_di(scena)
+	var nemici: Array = _nemici_di(scena, _offset("frontiera_porte"))
 	assert_eq(nemici.size(), 7, "i nemici si spawnano comunque senza Player")
 	for e in nemici:
 		e.call("_physics_process", 0.016)
@@ -692,7 +701,7 @@ func test_nemici_di_frontiera_senza_player_restano_inerti() -> void:
 
 
 ## Verifica diretta (non auto-consistente come i test sopra) che la riga
-## scelta da region_scene.gd::_riga_tileset() sia proprio 1 + l'indice della
+## scelta da world_scene.gd::_riga_tileset() sia proprio 1 + l'indice della
 ## palette_visiva della regione in vfx.json.pathway_palette_visiva, non solo
 ## una riga qualunque diversa da 0.
 func test_riga_tileset_per_palette_non_neutra() -> void:
@@ -702,7 +711,8 @@ func test_riga_tileset_per_palette_non_neutra() -> void:
 
 	var r: Dictionary = _istanzia_con_player("marche_crepuscolo")
 	var scena: TileMapLayer = r["scena"]
-	assert_eq(scena.get_cell_atlas_coords(Vector2i(1, 1)).y, attesa,
+	var o: Vector2i = r["offset"]
+	assert_eq(scena.get_cell_atlas_coords(o + Vector2i(1, 1)).y, attesa,
 		"la riga del tileset e' 1 + l'indice della palette della regione")
 
 	(r["cont"] as Node2D).free()
@@ -732,34 +742,6 @@ func test_npc_ha_sprite_e_nome_tradotto() -> void:
 	assert_eq(label.text, atteso, "il testo della Label e' il nome tradotto (GameData.tr_data)")
 
 	(r["cont"] as Node2D).free()
-
-
-## Cambio regione (passaggio o fast travel): la nuova regione deve restare
-## SOTTO il Player nell'ordine di disegno, come in main.tscn - altrimenti il
-## suo tilemap copre il giocatore (bug scoperto giocando, stesso di
-## main.gd::_su_partita_iniziata).
-func test_cambio_regione_tiene_la_nuova_sotto_il_player() -> void:
-	var cont := Node2D.new()
-	_root().add_child(cont)
-	var scena: Node = load("res://scenes/regioni/mirwada.tscn").instantiate()
-	cont.add_child(scena)                 # indice 0, come in main.tscn
-	var player := Node2D.new()
-	player.name = "Player"
-	player.add_to_group("player")
-	cont.add_child(player)                # indice 1
-
-	scena.call("_viaggia_verso", "marche_crepuscolo")
-
-	var nuova: Node = null
-	for c in cont.get_children():
-		if c != scena and c.has_method("viaggia_a"):
-			nuova = c
-	assert_false(nuova == null, "una nuova regione ha preso il posto della vecchia")
-	assert_true(nuova.get_index() < player.get_index(),
-		"la nuova regione si disegna PRIMA del Player (indice %d < %d)"
-		% [nuova.get_index(), player.get_index()])
-
-	cont.free()
 
 
 ## Onboarding: un NPC con dialogo mostra il prompt "[F] Parla" solo mentre il

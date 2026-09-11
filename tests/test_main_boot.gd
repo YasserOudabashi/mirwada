@@ -84,28 +84,27 @@ func test_nuova_partita_senza_pathway_usa_il_default() -> void:
 	_fine()
 
 
-func test_su_partita_iniziata_ricostruisce_la_regione() -> void:
+## US-1002B (fase 10, mondo continuo): il mondo non si ricarica piu' su
+## partita_iniziata - resta lo stesso nodo, solo il giocatore viene
+## riposizionato a Mirwada (world_scene.gd::viaggia_a).
+func test_su_partita_iniziata_riposiziona_senza_ricaricare() -> void:
 	var cont := Node2D.new()
 	cont.set_script(load("res://scripts/main.gd"))
 	_root().add_child(cont)
 
-	var vecchia: Node = load("res://scenes/regioni/mirwada.tscn").instantiate()
-	cont.add_child(vecchia)
-	assert_false(vecchia.is_queued_for_deletion(), "la vecchia regione e' viva prima del cambio")
+	var mondo: Node = load("res://scenes/world_scene.tscn").instantiate()
+	cont.add_child(mondo)
+	var player := Node2D.new()
+	player.name = "Player"
+	player.add_to_group("player")
+	cont.add_child(player)
+	player.global_position = Vector2(-999, -999)
 
-	var idx_vecchia: int = vecchia.get_index()
 	cont.call("_su_partita_iniziata", "Tester")
 
-	assert_true(vecchia.is_queued_for_deletion(), "la vecchia regione viene liberata")
-	var nuova: Node = null
-	for c in cont.get_children():
-		if c != vecchia and c.has_method("viaggia_a"):
-			nuova = c
-	assert_false(nuova == null, "una nuova istanza prende il posto della vecchia")
-	assert_eq(nuova.get_index(), idx_vecchia,
-		"la nuova regione prende l'indice della vecchia: resta sotto Player/HUD nel disegno")
-	assert_eq(str(nuova.get("region_id")), "mirwada",
-		"stessa scena ricaricata: nessun id di regione hardcoded in main.gd")
+	assert_false(mondo.is_queued_for_deletion(), "il mondo NON viene ricaricato: stesso nodo di prima")
+	assert_eq(player.global_position, mondo.call("punto_spawn", "mirwada"),
+		"il player e' riposizionato alla cella di spawn di Mirwada")
 
 	cont.free()
 	_fine()

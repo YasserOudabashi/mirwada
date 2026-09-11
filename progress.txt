@@ -10988,8 +10988,99 @@ COME VERIFICATO.
   corridoio visibile come striscia calpestabile fra le due, gli NPC di
   entrambe le regioni compaiono correttamente nelle rispettive zone.
 
-PROSSIMA STORIA: US-1002B (collegare world_scene.gd al gioco vero: main.tscn
-+ main.gd + page_mappa.gd, ritirare region_scene.gd/i 5 .tscn, migrare
-tests/test_layouts.gd + test_area_gate.gd + test_page_mappa.gd +
-test_main_boot.gd). E' la story che rende il mondo continuo il gioco
-DAVVERO giocato, non solo provato nei test.
+PROSSIMA STORIA (chiusa qui sotto): US-1002B (collegare world_scene.gd al
+gioco vero: main.tscn + main.gd + page_mappa.gd, ritirare region_scene.gd/i
+5 .tscn, migrare tests/test_layouts.gd + test_area_gate.gd +
+test_page_mappa.gd + test_main_boot.gd). E' la story che rende il mondo
+continuo il gioco DAVVERO giocato, non solo provato nei test.
+
+FATTO (US-1002B).
+- scenes/main.tscn: il nodo regione (era "Mirwada", istanza di
+  scenes/regioni/mirwada.tscn) e' sostituito dal nodo "World", istanza di
+  scenes/world_scene.tscn. Rimosso anche il Vector2 scritto a mano sulla
+  posizione iniziale del Player (era una copia manuale di cio' che
+  punto_spawn('mirwada') calcola gia' da solo): scripts/main.gd::_ready()
+  ora posiziona il Player leggendo world.punto_spawn('mirwada') a runtime,
+  prima di aprire il libro.
+- scripts/main.gd::_su_partita_iniziata: non ricrea piu' nulla - chiama
+  mondo.viaggia_a('mirwada') per riposizionare il giocatore quando parte
+  una nuova partita (anche sopra una sessione gia' in corso nella stessa
+  esecuzione). _trova_regione() resta sullo stesso contratto pubblico
+  has_method('viaggia_a'), gia' in uso da prima.
+- scripts/pages/page_mappa.gd::_viaggia: il lookup del nodo mondo passa da
+  un confronto fragile su get_script().resource_path.ends_with(
+  'region_scene.gd') (si sarebbe rotto silenziosamente, region_scene.gd
+  non esiste piu' in scena) allo stesso contratto has_method('viaggia_a')
+  gia' usato da main.gd.
+- Ritirati: scripts/region_scene.gd, scenes/regioni/{mirwada,
+  marche_crepuscolo,valle_madre,archivio_sepolto,frontiera_porte}.tscn (5
+  file) - cartella scenes/regioni/ rimossa (vuota). Verificato con grep:
+  nessun file in res://scripts o res://scenes fa piu' riferimento a
+  scenes/regioni/ o region_scene.gd (solo commenti storici rimasti in
+  alcuni .gd, dove il nome del vecchio motore e' citato come contesto -
+  non un caricamento).
+- tests/test_layouts.gd riscritto per intero (~800 righe): un solo
+  world_scene.tscn istanziato per test (_istanzia_con_player, stesso
+  pattern di test_world_scene.gd) invece di una scena per regione; ogni
+  assert di cella/zona/spawn aggiunge il world_offset della regione in
+  questione; _nemici_di/_pickup_di filtrano per rettangolo (tutte e 5 le
+  regioni vivono ora nello stesso nodo); i test sui nodi "Passaggio_X"
+  (ormai inesistenti, sostituiti da confine+corridoio, gia' coperti da
+  tests/test_world_scene.gd) sono stati rimossi, non riformulati - non
+  c'era un meccanismo equivalente per-regione da ritestare li'.
+- tests/test_area_gate.gd: la vecchia istanza isolata di ogni
+  scenes/regioni/*.tscn per contare le AreaGate e' sostituita da
+  test_world_scene_crea_una_areagate_per_gating (un solo world_scene.tscn,
+  conta i nodi Gate_<regione>_* per nome).
+- tests/test_page_mappa.gd: test_viaggia_a_rispetta_il_gating_d_ingresso
+  ora instanzia world_scene.tscn e chiama viaggia_a() su di esso invece
+  che su una regione isolata; il comportamento atteso (gating rispettato)
+  e' invariato.
+- tests/test_main_boot.gd: la vecchia asserzione sul reload di scena e'
+  sostituita da test_su_partita_iniziata_riposiziona_senza_ricaricare
+  (world_scene.tscn + Player fittizio come fratelli di main.gd, verifica
+  che il mondo NON sia queued_for_deletion e che il player finisca esattamente
+  su world.punto_spawn('mirwada')).
+- tests/test_regions.gd: le due asserzioni ormai legate alla vecchia
+  architettura sono sostituite da test_ogni_regione_ha_un_confine_e_si_registra
+  (le 5 regioni hanno tutte un nodo Confine_<id> in world_scene.tscn, e
+  attraversarlo aggiorna WorldState.regione_corrente()) e
+  test_passaggi_verso_elenca_tutte_le_regioni (nel mondo continuo ogni
+  regione e' raggiungibile da ogni altra - non esiste piu' un elenco di
+  "passaggi" discreti per singola regione).
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 905 test,
+  tutti passati (907 di US-1002 - 2: la rimozione netta dei test
+  "Passaggio_X"/cambio-regione di test_layouts.gd senza un equivalente
+  1:1 da riscrivere, gia' coperti da test_world_scene.gd). Nessuna
+  regressione sulle story precedenti.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat, /tmp/qa_mondo_continuo/*.png): partita vera avviata da
+  scenes/main.tscn (non un fixture di test) - scaffale -> creazione
+  personaggio "Tester" -> STESSO nodo mondo di prima (world_scene.gd non
+  viene mai liberato/reistanziato) -> WorldState registra 'mirwada'.
+  Teletrasporto (per accorciare l'attraversamento dello spawn cittadino
+  fino al bordo, NON per bypassare il confine) fino a un punto del
+  corridoio ancora fuori dal rettangolo di Marche (y=45 > l'altezza 36 del
+  layout di Marche) -> WorldState ancora su 'mirwada', confermato. Da li'
+  cammino REALE (Input.action_press sui move_*, fisica vera, stesso
+  pattern di tests/manual/qa_vslice.gd) verso nord, attraverso il
+  segmento verticale del corridoio (x~46..48, US-1002), fino a y=25 -
+  dentro il rettangolo di Marche: WorldState.regione_corrente() passa a
+  'marche_crepuscolo' SENZA alcuna chiamata a change_scene_to_* (asserito:
+  il nodo mondo non e' mai queued_for_deletion durante l'attraversamento),
+  Progression.sequence()/pathway() e Inventory.tutto() risultano identici
+  prima e dopo (nessun azzeramento a meta' strada). Screenshot: Mirwada
+  (tinta di sfondo chiara) e l'interno del corridoio/Marche (tinta piu'
+  scura/violacea, US-1002) confermano visivamente il cambio di regione.
+
+APERTO: nessuno per questa story. La geometria del corridoio e' molto piu'
+lunga di un semplice bordo condiviso (percorso a L, ~350 celle totali fra i
+due segmenti) - previsto dal design (US-1002 nota gia' "un corridoio come
+prova del meccanismo"), i restanti 7 della topologia ad anello arrivano nel
+Blocco A (US-1005..1009).
+
+PROSSIMA STORIA: US-1003 ("Prestazioni - non tutto il mondo e' vivo
+insieme"), priority 4.

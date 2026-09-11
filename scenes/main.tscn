@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="0_main"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
-[ext_resource type="PackedScene" path="res://scenes/regioni/mirwada.tscn" id="2_region"]
+[ext_resource type="PackedScene" path="res://scenes/world_scene.tscn" id="2_region"]
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="4_hud"]
 [ext_resource type="PackedScene" path="res://scenes/tell_indicator.tscn" id="5_tell"]
 [ext_resource type="PackedScene" path="res://scenes/madness_overlay.tscn" id="6_madov"]
@@ -14,10 +14,9 @@
 [node name="Main" type="Node2D"]
 script = ExtResource("0_main")
 
-[node name="Mirwada" parent="." instance=ExtResource("2_region")]
+[node name="World" parent="." instance=ExtResource("2_region")]
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
-position = Vector2(320, 180)
 
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
 

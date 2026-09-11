@@ -52,8 +52,8 @@
       ],
       "priority": 3,
       "fase": 10,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "scenes/main.tscn: nodo regione sostituito da 'World' (istanza di scenes/world_scene.tscn); rimosso il Vector2 hardcoded sulla posizione iniziale del Player. scripts/main.gd::_ready() posiziona il Player a runtime via world.punto_spawn('mirwada'); _su_partita_iniziata chiama mondo.viaggia_a('mirwada') invece di ricaricare. scripts/pages/page_mappa.gd::_viaggia: lookup passato al contratto has_method('viaggia_a') (era un confronto fragile sul path dello script). Ritirati: scripts/region_scene.gd, scenes/regioni/*.tscn (5 file, cartella rimossa) - grep di verifica pulito, nessun file in res://scripts o res://scenes vi fa piu' riferimento. tests/test_layouts.gd riscritto per intero su world_scene.tscn (offset-aware, filtraggio per rettangolo, i test 'Passaggio_X' rimossi - coperti da test_world_scene.gd). test_area_gate.gd/test_page_mappa.gd/test_main_boot.gd/test_regions.gd aggiornati allo stesso contratto. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 905 test, tutti passati (907 di US-1002 - 2, la rimozione netta dei test 'Passaggio_X'/cambio-regione senza equivalente 1:1, gia' coperti da test_world_scene.gd), NESSUNA regressione; python tools/validate_data.py -> 0 errori, 2 warning (invariati); verifica a schermo con Xvfb (script ad-hoc non committato, screenshot mandati in chat) - partita vera da scenes/main.tscn, scaffale -> creazione -> STESSO nodo mondo mai ricaricato -> teletrasporto fino a un punto del corridoio ancora fuori dal rettangolo di Marche (WorldState ancora 'mirwada', confermato) -> cammino REALE (Input reale, fisica vera) attraverso il segmento verticale del corridoio fino a dentro Marche: WorldState.regione_corrente() passa a 'marche_crepuscolo' SENZA alcuna change_scene_to_*, Progression.sequence()/pathway() e Inventory.tutto() identici prima e dopo. Dettagli completi in progress.txt."
     },
     {
       "id": "US-1003",
