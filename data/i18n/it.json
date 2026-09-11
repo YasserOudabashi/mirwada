@@ -1716,5 +1716,9 @@
   "ui.page.inventario": "Inventario",
   "ui.page.journal": "Diario",
   "ui.page.mappa": "Mappa",
-  "ui.page.sinergie": "Registro delle sinergie"
+  "ui.page.sinergie": "Registro delle sinergie",
+  "item.trottola_di_legno_intagliata": "Trottola di legno intagliata",
+  "item.trottola_di_legno_intagliata.desc": "Intagliata a mano, consumata dall'uso. La vita che si stava vivendo prima di tutto questo.",
+  "item.boccale_dei_contrabbandieri": "Boccale dei contrabbandieri",
+  "item.boccale_dei_contrabbandieri.desc": "Ancora umido. Chi lo beve di notte al porto non fa mai troppe domande."
 }

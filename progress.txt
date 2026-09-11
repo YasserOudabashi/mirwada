@@ -11324,5 +11324,70 @@ COME VERIFICATO.
 APERTO: US-1005B (i 3 edifici veri promessi da US-1005: casa di Lena,
 archivio di Ottavia, bettola del porto) puo' ora usare questo motore.
 
-PROSSIMA STORIA: US-1005B ("I 3 edifici visitabili di Mirwada"),
-priority 8.
+PROSSIMA STORIA (chiusa qui sotto): US-1005B ("I 3 edifici visitabili di
+Mirwada"), priority 8.
+
+FATTO (US-1005B). Chiude la promessa originale di US-1005 usando SOLO il
+motore di US-1010 - zero righe di codice nuove in scripts/, solo dati.
+- data/world/layouts/mirwada.json: campo "edifici" esteso a 4 voci (il
+  sotterraneo di US-1010 restava valido, non ritirato) + i 3 nuovi:
+  - casa di Lena: un blocco decorativo del vicolo (righe 16-18, gia'
+    "o o . o o" cosmetico) convertito in un vero edificio murato 6x5 con
+    porta sul lato sud, verso l'alley gia' aperta. L'oggetto che ci
+    cadeva dentro (estratto_di_muscolo) spostato alla cella libera piu'
+    vicina, nessun'altra regressione sul contenuto di US-1005/806.
+  - archivio di Ottavia: NESSUNA mappa nuova - la porta gia' disegnata in
+    US-1005 (riga 12, colonna 13, cosmetica) referenzia ora l'interno
+    vero. Stessa porta, stessa posizione, comportamento diverso.
+  - bettola del porto: nuovo edificio murato 6x5 sulla banchina del porto
+    (righe 28-32), porta sul lato nord verso l'area gia' aperta.
+  Verificato con uno script Python usa-e-getta: zero nemici/oggetti
+  esistenti finiscono dentro le pareti dei due edifici nuovi.
+- data/world/interni/{mirwada_casa_di_lena,mirwada_archivio_ottavia,
+  mirwada_bettola_del_porto}.json (nuovi): una stanza piccola a testa
+  (8x6/10x7/9x7), ognuna con UN oggetto reale coerente col personaggio/
+  luogo (mai uno stub vuoto, come richiesto dall'AC):
+  - casa di Lena: nuovo item trottola_di_legno_intagliata ("la vita che
+    si stava vivendo prima di tutto questo" - design-npc-quest.md: Lena
+    e' il personaggio del finale Rinuncia).
+  - archivio di Ottavia: libro_ordine_minore, un item GIA' ESISTENTE
+    (data/items/pergamene.json) mai piazzato nel mondo finora - il
+    "Trattato dell'Ordine Minore" che apre le ali interne dell'Archivio
+    Sepolto (design-world.md), perfettamente coerente col ruolo di
+    Ottavia (gating di conoscenza, fazione ordine_minore). Nessun nuovo
+    item necessario qui: solo la prima collocazione reale di uno gia'
+    scritto.
+  - bettola del porto: nuovo item boccale_dei_contrabbandieri (coerente
+    col porto "notte, contrabbando" di design-world.md).
+  I due item nuovi + le loro chiavi i18n (data/i18n/it.json) seguono la
+  stessa convenzione item.<id>/item.<id>.desc di tutti gli altri 307 item
+  esistenti - nessuna nuova categoria (restano "ingrediente", vocabolario
+  chiuso rispettato).
+- tests/test_world_scene.gd: _porta_sotterraneo generalizzata a
+  _porta_per_interno(mondo, interno_id) (cerca per meta invece che per
+  nome-nodo con indice hardcoded - l'indice nell'array edifici[] cambia
+  quando se ne aggiungono altri, scoperto scrivendo questa story: i 4
+  test di US-1010 sono falliti finche' non ho ripristinato la voce del
+  sotterraneo, persa per errore sovrascrivendo l'intero campo "edifici"
+  invece di aggiungere ad esso - fix immediato, verificato). 2 test
+  nuovi: le 3 porte esistono e i rispettivi interni contengono davvero
+  l'oggetto atteso (non stub vuoti); la porta dell'archivio e' quella
+  gia' disegnata in US-1005 (stessa posizione nella zona 'archivio').
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 915 test,
+  tutti passati (913 + 2 nuovi), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat): partita vera, cammino REALE (Input reale, fisica
+  vera) fino a ognuna delle 3 porte, dentro (l'oggetto reale visibile a
+  schermo in tutti e 3 i casi), cammino reale all'uscita, di nuovo fuori
+  - ripetuto per tutti e 3 gli edifici in sequenza nella stessa partita,
+  zero regressioni fra un edificio e l'altro.
+
+APERTO: nessuno per questa story. Il motore di edifici (US-1010) e' ora
+provato su 4 casi reali a Mirwada (sotterraneo + i 3 promessi); resta da
+fare il resto del Blocco B - US-1011 (il primo villaggio vero, piu'
+edifici) e US-1012 (la prima struttura grande, interno multi-stanza).
+
+PROSSIMA STORIA: US-1006 ("Marche del Crepuscolo cresce"), priority 9.

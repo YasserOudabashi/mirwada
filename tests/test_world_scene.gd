@@ -323,8 +323,18 @@ func test_riavvicinandosi_un_nemico_disattivato_si_riattiva() -> void:
 const InteriorScript := preload("res://scripts/interior_scene.gd")
 
 
+## Cerca la porta per interno_id (meta, world_scene.gd::_crea_edifici) invece
+## che per nome esatto del nodo - il nome include l'indice nell'array
+## edifici[], che cambia se altre story ne aggiungono altri prima o dopo.
+func _porta_per_interno(mondo: Node, interno_id: String) -> Area2D:
+	for c in mondo.get_children():
+		if c is Area2D and str(c.get_meta("interno_id", "")) == interno_id:
+			return c
+	return null
+
+
 func _porta_sotterraneo(mondo: Node) -> Area2D:
-	return mondo.get_node_or_null("Porta_mirwada_mirwada_sotterraneo_0")
+	return _porta_per_interno(mondo, "mirwada_sotterraneo")
 
 
 func test_edificio_mirwada_sotterraneo_ha_una_porta() -> void:
@@ -425,3 +435,55 @@ func test_rientrare_subito_dopo_l_uscita_non_riapre_l_interno() -> void:
 	assert_false(mondo.visible, "un secondo ingresso vero funziona normalmente")
 
 	cont.free()
+
+
+## US-1005B: i 3 edifici promessi dall'AC originale di US-1005 (casa di
+## Lena, archivio di Ottavia, bettola del porto), usando lo stesso motore
+## generico gia' provato sul sotterraneo - una porta a testa, un interno
+## vero con un elemento riconoscibile (un oggetto coerente col personaggio/
+## luogo), zero codice dedicato oltre ai dati.
+func test_i_3_edifici_di_us1005b_hanno_una_porta_e_un_interno_vero() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var cont: Node2D = r["cont"]
+	var mondo: Node = r["mondo"]
+	var gd: Node = _gd()
+
+	var attesi := {
+		"mirwada_casa_di_lena": "trottola_di_legno_intagliata",
+		"mirwada_archivio_ottavia": "libro_ordine_minore",
+		"mirwada_bettola_del_porto": "boccale_dei_contrabbandieri",
+	}
+	for iid in attesi:
+		var porta: Area2D = _porta_per_interno(mondo, iid)
+		assert_false(porta == null, "la porta di '%s' esiste in scena" % iid)
+
+		var interno: Dictionary = gd.call("get_interno", iid)
+		assert_false(interno.is_empty(), "'%s' risolve a un interno vero nei dati" % iid)
+		var item_atteso: String = attesi[iid]
+		var trovato := false
+		for o in (interno.get("oggetti", []) as Array):
+			if str((o as Dictionary).get("item_id", "")) == item_atteso:
+				trovato = true
+		assert_true(trovato, "'%s' contiene davvero '%s' (non uno stub vuoto)" % [iid, item_atteso])
+
+	cont.free()
+
+
+## L'archivio di Ottavia (US-1005B AC #3): la porta gia' disegnata in
+## US-1005 come struttura murata cosmetica punta ora a un interno vero -
+## stessa porta, stessa posizione, comportamento diverso.
+func test_porta_dell_archivio_e_quella_gia_disegnata_in_us1005() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: Node = r["mondo"]
+	var porta: Area2D = _porta_per_interno(mondo, "mirwada_archivio_ottavia")
+	assert_false(porta == null, "la porta dell'archivio esiste")
+	if porta != null:
+		var rect: Array = (_gd().call("get_layout", "mirwada").get("zone", {}) as Dictionary).get("archivio", [])
+		var origine: Vector2 = mondo.map_to_local(OFFSET_MIRWADA)
+		var dentro_zona_archivio: bool = (
+			porta.position.x >= origine.x + rect[0] * TILE and
+			porta.position.x <= origine.x + (rect[0] + rect[2]) * TILE and
+			porta.position.y >= origine.y + rect[1] * TILE and
+			porta.position.y <= origine.y + (rect[1] + rect[3]) * TILE)
+		assert_true(dentro_zona_archivio, "la porta e' dentro il rettangolo della zona 'archivio'")
+	(r["cont"] as Node2D).free()

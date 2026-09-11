@@ -4143,6 +4143,33 @@
       ],
       "impilabile": true,
       "valore": 18
+    },
+    {
+      "id": "trottola_di_legno_intagliata",
+      "categoria": "ingrediente",
+      "name_i18n": "item.trottola_di_legno_intagliata",
+      "descrizione_i18n": "item.trottola_di_legno_intagliata.desc",
+      "name": "Trottola di legno intagliata",
+      "descrizione": "Intagliata a mano, consumata dall'uso. La vita che si stava vivendo prima di tutto questo.",
+      "tag": [
+        "emozione"
+      ],
+      "impilabile": false,
+      "valore": 2
+    },
+    {
+      "id": "boccale_dei_contrabbandieri",
+      "categoria": "ingrediente",
+      "name_i18n": "item.boccale_dei_contrabbandieri",
+      "descrizione_i18n": "item.boccale_dei_contrabbandieri.desc",
+      "name": "Boccale dei contrabbandieri",
+      "descrizione": "Ancora umido. Chi lo beve di notte al porto non fa mai troppe domande.",
+      "tag": [
+        "occultamento",
+        "notte"
+      ],
+      "impilabile": false,
+      "valore": 3
     }
   ]
 }
