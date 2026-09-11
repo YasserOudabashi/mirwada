@@ -17,6 +17,7 @@ const WorldScene := preload("res://scenes/world_scene.tscn")
 const TILE := 32
 const COL_PAVIMENTO := 0
 const COL_MURO := 1
+const COL_ALBERO := 6
 
 # world_offset di data/world/regions.json (US-1001).
 const OFFSET_MIRWADA := Vector2i(220, 180)
@@ -139,70 +140,80 @@ func test_confine_ignora_corpi_che_non_sono_il_player() -> void:
 	(r["cont"] as Node2D).free()
 
 
-## US-1002: il corridoio Mirwada-Marche (data/world/corridoi.json) esiste
-## davvero ed e' calpestabile per tutta la sua lunghezza - la prova che il
-## meccanismo funziona, richiesta esplicitamente dall'AC di questa story
-## (gli altri 7 collegamenti dell'anello arrivano nel Blocco A).
-## Cerca un corridoio dichiarato fra due regioni (in un verso o nell'altro) -
-## mai un indice fisso nell'array: US-1007 ne ha aggiunti altri 2, altre
-## story del Blocco A ne aggiungeranno ancora (006_PRD/prd-fase-10-mondo-
-## continuo.md §9, 8 in tutto).
-func _corridoio_tra(ra: String, rb: String) -> Dictionary:
-	for c in (_gd().call("get_corridoi") as Array):
-		var d: Dictionary = c as Dictionary
-		if (str(d.get("a", "")) == ra and str(d.get("b", "")) == rb) or \
-		   (str(d.get("a", "")) == rb and str(d.get("b", "")) == ra):
-			return d
-	return {}
-
-
 func _offset_regione(rid: String) -> Vector2i:
 	var wo: Array = (_gd().call("get_region", rid) as Dictionary).get("world_offset", [0, 0])
 	return Vector2i(int(wo[0]), int(wo[1]))
 
 
-func _assert_corridoio_calpestabile(mondo: TileMapLayer, ra: String, rb: String) -> void:
-	var c: Dictionary = _corridoio_tra(ra, rb)
-	assert_false(c.is_empty(), "il corridoio %s-%s e' dichiarato" % [ra, rb])
-	if c.is_empty():
+## Addendum fase 10 (US-1015): i vecchi corridoi punto-a-punto (un solo
+## varco a coordinate fisse fra due regioni scelte a mano) sono ritirati -
+## feedback diretto dell'utente: da fuori si vedevano rettangoli isolati
+## uniti da un ponte, non un mondo unico. Sostituiti da due meccanismi
+## generici, provati qui: (1) _riempi_campagna dipinge di terreno vero
+## OGNI cella condivisa fuori da ogni regione (non piu' vuoto); (2)
+## _apri_brecce_perimetro smette di trattare il muro di ogni layout come
+## una scatola sigillata, aprendolo a intervalli su tutti e 4 i lati.
+## Nessuna coppia di regioni hardcoded: si scandisce il muro vero cercando
+## un varco, qualunque regione esista.
+func _lato_ha_una_breccia(mondo: TileMapLayer, offset: Vector2i, dim: Vector2i, orizzontale: bool, fisso: int) -> bool:
+	var lunghezza: int = dim.x if orizzontale else dim.y
+	for i in range(1, lunghezza - 1):
+		var cella: Vector2i = offset + (Vector2i(i, fisso) if orizzontale else Vector2i(fisso, i))
+		if mondo.get_cell_atlas_coords(cella).x == COL_PAVIMENTO:
+			return true
+	return false
+
+
+func test_il_perimetro_di_ogni_regione_ha_almeno_una_breccia_per_lato() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: TileMapLayer = r["mondo"]
+	for reg in (_gd().call("get_regions") as Array):
+		var rid: String = str((reg as Dictionary).get("id", ""))
+		var offset: Vector2i = _offset_regione(rid)
+		var dim: Vector2i = _dim(rid)
+		assert_true(_lato_ha_una_breccia(mondo, offset, dim, true, 0), "%s: il lato nord ha una breccia" % rid)
+		assert_true(_lato_ha_una_breccia(mondo, offset, dim, true, dim.y - 1), "%s: il lato sud ha una breccia" % rid)
+		assert_true(_lato_ha_una_breccia(mondo, offset, dim, false, 0), "%s: il lato ovest ha una breccia" % rid)
+		assert_true(_lato_ha_una_breccia(mondo, offset, dim, false, dim.x - 1), "%s: il lato est ha una breccia" % rid)
+	(r["cont"] as Node2D).free()
+
+
+## La campagna (lo spazio comune fuori dal rettangolo di ogni regione) e'
+## terreno vero, non piu' vuoto: si prova appena fuori dal muro nord di
+## Mirwada, gia' bucato da una breccia (test sopra) - deve essere dipinta
+## (pavimento o un albero sparso), mai una cella senza tile.
+func test_la_campagna_fuori_da_ogni_regione_e_terreno_vero() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: TileMapLayer = r["mondo"]
+	var offset: Vector2i = _offset_regione("mirwada")
+	var fuori: Vector2i = offset + Vector2i(2, -3)
+	var col: int = mondo.get_cell_atlas_coords(fuori).x
+	assert_true(col == COL_PAVIMENTO or col == COL_ALBERO,
+		"la campagna fuori da mirwada e' terreno dipinto (pavimento o albero), non vuoto")
+	(r["cont"] as Node2D).free()
+
+
+## Il popolamento della campagna (data/world/campagna.json, coordinate
+## assolute, offset Vector2i.ZERO): almeno un nemico dichiarato spawna alla
+## posizione globale giusta, stesso principio gia' provato per i nemici di
+## una regione (test_nemici_di_mirwada_spawnano_alla_posizione_globale_giusta).
+func test_un_nemico_della_campagna_spawna_alla_posizione_giusta() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var mondo: TileMapLayer = r["mondo"]
+	var campagna: Dictionary = _gd().call("get_campagna")
+	var nemici: Array = (campagna.get("nemici", []) as Array)
+	assert_true(nemici.size() > 0, "la campagna ha nemici dichiarati")
+	if nemici.is_empty():
+		(r["cont"] as Node2D).free()
 		return
-	var pa: Vector2i = _offset_regione(str(c["a"])) + Vector2i((c["aggancio_a"] as Array)[0], (c["aggancio_a"] as Array)[1])
-	var pb: Vector2i = _offset_regione(str(c["b"])) + Vector2i((c["aggancio_b"] as Array)[0], (c["aggancio_b"] as Array)[1])
-
-	# gomito del percorso a L: (pb.x, pa.y)
-	var gomito := Vector2i(pb.x, pa.y)
-	for punto in [pa, pb, gomito, (pa + gomito) / 2, (gomito + pb) / 2]:
-		var col: int = mondo.get_cell_atlas_coords(punto).x
-		assert_eq(col, COL_PAVIMENTO, "cella %s del corridoio %s-%s e' calpestabile" % [punto, ra, rb])
-
-
-func test_corridoio_mirwada_marche_e_calpestabile() -> void:
-	var r: Dictionary = _istanzia_con_player()
-	var mondo: TileMapLayer = r["mondo"]
-	_assert_corridoio_calpestabile(mondo, "mirwada", "marche_crepuscolo")
-	(r["cont"] as Node2D).free()
-
-
-## US-1007: i due corridoi nuovi (il raggio mirwada-valle_madre, il lato
-## marche_crepuscolo-valle_madre dell'anello) - stesso meccanismo, stessa
-## prova, un'altra coppia di regioni.
-func test_corridoi_di_valle_madre_sono_calpestabili() -> void:
-	var r: Dictionary = _istanzia_con_player()
-	var mondo: TileMapLayer = r["mondo"]
-	_assert_corridoio_calpestabile(mondo, "mirwada", "valle_madre")
-	_assert_corridoio_calpestabile(mondo, "marche_crepuscolo", "valle_madre")
-	(r["cont"] as Node2D).free()
-
-
-## US-1008: i due corridoi nuovi dell'Archivio Sepolto (il raggio verso
-## mirwada, che usa l'ultimo muro libero di mirwada - est - e il lato
-## marche_crepuscolo-archivio_sepolto dell'anello, il primo lato "superiore"
-## fra due regioni allo stesso world_offset.y).
-func test_corridoi_di_archivio_sepolto_sono_calpestabili() -> void:
-	var r: Dictionary = _istanzia_con_player()
-	var mondo: TileMapLayer = r["mondo"]
-	_assert_corridoio_calpestabile(mondo, "mirwada", "archivio_sepolto")
-	_assert_corridoio_calpestabile(mondo, "marche_crepuscolo", "archivio_sepolto")
+	var spec: Dictionary = nemici[0] as Dictionary
+	var atteso: Vector2 = mondo.to_global(mondo.map_to_local(Vector2i(int(spec["x"]), int(spec["y"]))))
+	var trovato := false
+	for c in mondo.get_children():
+		if c.is_in_group("nemici") and (c as Node2D).global_position.distance_to(atteso) < 1.0:
+			trovato = true
+			break
+	assert_true(trovato, "il primo nemico della campagna e' istanziato alla cella dichiarata")
 	(r["cont"] as Node2D).free()
 
 
@@ -231,21 +242,6 @@ func test_gate_dell_archivio_e_una_barriera_fisica_nel_mondo_continuo() -> void:
 	ks.call("impara", "testi_ordine_minore")
 	assert_true(bool(gate.call("e_aperto")), "col flag, l'ala interna si apre")
 
-	(r["cont"] as Node2D).free()
-
-
-## US-1009: gli ultimi 3 corridoi che chiudono l'anello - il raggio verso
-## mirwada (che usa l'ultimo muro libero di mirwada, nord, e il muro sud di
-## Frontiera vicino alla zona crocevia) e i due lati restanti dell'anello
-## (archivio_sepolto-frontiera_porte, stesso world_offset.x, una SECONDA
-## porta sul muro sud dell'Archivio; valle_madre-frontiera_porte, stesso
-## world_offset.y, il muro est di Valle finora libero).
-func test_corridoi_di_frontiera_delle_porte_sono_calpestabili() -> void:
-	var r: Dictionary = _istanzia_con_player()
-	var mondo: TileMapLayer = r["mondo"]
-	_assert_corridoio_calpestabile(mondo, "mirwada", "frontiera_porte")
-	_assert_corridoio_calpestabile(mondo, "archivio_sepolto", "frontiera_porte")
-	_assert_corridoio_calpestabile(mondo, "valle_madre", "frontiera_porte")
 	(r["cont"] as Node2D).free()
 
 
@@ -319,7 +315,11 @@ func test_nemici_di_mirwada_spawnano_alla_posizione_globale_giusta() -> void:
 		if rett.has_point(c.global_position):
 			nemici_mirwada.append(c)
 	assert_eq(nemici_mirwada.size(), 7, "6 nemici di Sequenza 9 + 1 boss dal layout di Mirwada")
-	assert_eq(totale, 35, "7 nemici per ognuna delle 5 regioni, tutte nello stesso mondo continuo")
+	# 7 nemici per ognuna delle 5 regioni + i nemici sparsi della campagna
+	# (addendum US-1015, data/world/campagna.json), tutti nello stesso mondo
+	# continuo - il conteggio della campagna si legge dai dati, non a mano.
+	var attesi_campagna: int = ((_gd().call("get_campagna") as Dictionary).get("nemici", []) as Array).size()
+	assert_eq(totale, 35 + attesi_campagna, "7 nemici per regione + i nemici della campagna")
 
 	(r["cont"] as Node2D).free()
 

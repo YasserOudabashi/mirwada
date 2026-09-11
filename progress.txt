@@ -11990,3 +11990,104 @@ PROSSIMA FASE: Fase 11 — Atto II e Atto III (le regioni che si aprono, la
 soglia). PRD in 006_PRD/prd-fase-11-atto-2-3.md - da generare con /prd
 quando si decide di iniziarla (CLAUDE.md: il PRD di ogni fase si scrive
 solo a fase precedente chiusa, mai prima).
+
+============================================================
+ADDENDUM FASE 10 (2026-09-11): US-1015 - LA CAMPAGNA VERA
+============================================================
+
+CONTESTO. Dopo la chiusura della fase, l'utente ha guardato gli screenshot
+del mondo continuo e ha segnalato con chiarezza il problema: "non e' un
+mondo aperto, sono blocchi di rettangoli collegati da un ponte infinito".
+Aveva ragione. Il mondo continuo (US-1001/1002) piazzava le 5 regioni a
+world_offset lontani fra loro sulla stessa TileMapLayer, e le collegava
+SOLO con un corridoio largo 3 celle a coordinate fisse (data/world/
+corridoi.json) - tutto il resto della griglia condivisa non aveva NESSUNA
+tile dipinta (vuoto vero, nessuna collisione ma anche nessun terreno). Di
+piu': il muro perimetrale di ogni layout (un anello '#' completo, mai
+notato prima come problema) rendeva ogni regione una scatola sigillata,
+apribile solo dal foro puntuale del corridoio. Chiesto all'utente come
+vuole risolvere (AskUserQuestion, 2 round): riempire il vuoto con terreno
+vero (non avvicinare gli offset - i corridoi troppo grandi restano un
+dettaglio secondario rispetto al vuoto), ritirare i vecchi corridoi, e
+popolare la campagna con nemici/oggetti sparsi FIN DA SUBITO (non rimandato
+a una story separata).
+
+FATTO (US-1015).
+- data/world/corridoi.json RITIRATO (cancellato). Ritirato tutto il codice
+  che lo leggeva: world_scene.gd::_disegna_corridoi/_punto_aggancio/
+  _scava_apertura/_disegna_percorso_a_elle, GameData.PATH_CORRIDOI/
+  _corridoi/get_corridoi().
+- world_scene.gd::_riempi_campagna(regioni) (nuovo, chiamato in _ready()
+  PRIMA del ciclo per-regione): calcola il rettangolo che contiene tutte
+  le 5 regioni, e per ogni cella FUORI dal rettangolo di ognuna dipinge
+  terreno vero - pavimento o un albero sparso, deciso da una formula
+  deterministica sulla cella (hash(Vector2i(x,y)) % 100 < 6, nessun seed
+  salvato: la stessa campagna esce identica a ogni avvio). Il ciclo
+  per-regione dipinge sopra come sempre, quindi ogni regione resta intatta.
+- world_scene.gd::_apri_brecce_perimetro(offset, dim) (nuovo, chiamato
+  subito dopo _dipingi per ogni regione): il muro '#' che il layout
+  disegna smette di essere una scatola sigillata - si apre una breccia
+  larga 3 celle ogni 11 celle sui 4 lati. Generico: nessun nome di
+  regione, nessuna coppia scelta a mano (a differenza del vecchio
+  corridoio, che sceglieva UN punto per coppia). Il muro resta visibile
+  fra una breccia e l'altra: legge come un'antica cinta in rovina, non un
+  confine invisibile.
+- data/world/campagna.json (nuovo): stessa forma di un layout (nemici[]/
+  oggetti[]) ma coordinate ASSOLUTE (nessun world_offset proprio - non
+  appartiene a una regione). 36 nemici deboli (sequenza 9, la piu' bassa)
+  + 34 oggetti comuni (10 ingredienti gia' usati altrove, riuso invece di
+  inventare), generati con uno script Python (seed fisso 1008,
+  riproducibile) che scarta ogni punto dentro il rettangolo di una
+  regione e impone una distanza minima fra i punti. world_scene.gd::
+  _ready() li popola con UNA riga: _crea_nemici("campagna", campagna,
+  Vector2i.ZERO) / _crea_oggetti(campagna, Vector2i.ZERO) - le stesse
+  funzioni gia' usate per ogni regione, zero duplicazione (offset zero
+  perche' le coordinate sono gia' assolute).
+- GameData: get_corridoi() rimosso, get_campagna() aggiunto (stessa forma
+  di get_layout(), ma senza un id - la campagna e' una sola, condivisa).
+- tools/validate_data.py: blocco corridoi rimosso, nuovo blocco campagna:
+  ogni nemico/oggetto dichiarato deve stare nel rettangolo che contiene
+  tutte le regioni e FUORI da ognuna di esse (non si valida la
+  calpestabilita' fine contro gli alberi sparsi - sono decorativi,
+  generati a runtime, sovrapporli a uno spawn non e' un bug).
+- tests/test_world_scene.gd: rimossi _corridoio_tra/_assert_corridoio_
+  calpestabile e i 4 test dei corridoi punto-a-punto (US-1002/1007/1008/
+  1009). Aggiunti: test_il_perimetro_di_ogni_regione_ha_almeno_una_
+  breccia_per_lato (generico - scandisce il muro vero di OGNI regione
+  scoperta dai dati, cerca un varco su ognuno dei 4 lati, mai una coppia
+  hardcoded), test_la_campagna_fuori_da_ogni_regione_e_terreno_vero,
+  test_un_nemico_della_campagna_spawna_alla_posizione_giusta. Il
+  conteggio hardcoded "totale nemici == 35" (7 x 5 regioni) e' diventato
+  "35 + i nemici della campagna" (letto da GameData.get_campagna(), non
+  un altro numero scritto a mano).
+- tests/manual/qa_mondo_continuo.gd (script committato per il checkpoint
+  di fase 10, US-1013): il passo 2 non legge piu' get_corridoi() (rimosso)
+  - usa la PRIMA breccia nota del muro est di Marche (stessa formula:
+  meta=1, passo=11 -> y locale 2) come punto di attraversamento.
+- Piccoli aggiornamenti di commenti (interior_scene.gd, il docblock di
+  world_scene.gd) che nominavano ancora "corridoi"/"_disegna_corridoi".
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 924 test,
+  tutti passati (924, il totale e' cambiato per i 3 test dei corridoi
+  rimossi e i 3 nuovi della campagna aggiunti - nessuna regressione sui
+  restanti).
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat): 2 teletrasporti diagnostici in campagna (fra Mirwada
+  e Marche/Archivio, appena fuori dal muro nord di Mirwada) - terreno
+  vero con alberi sparsi, non vuoto - PIU' la prova che conta: cammino
+  REALE (Input reale, fisica vera) da dentro Mirwada, attraverso la prima
+  breccia del suo muro nord, fino in campagna aperta - confermato "il
+  personaggio ha camminato per davvero... attraverso una breccia".
+
+APERTO: i corridoi troppo grandi/gli offset lontani fra le regioni
+restano com'erano (l'utente ha scelto esplicitamente di riempire il vuoto
+piuttosto che avvicinare le regioni) - se in futuro si vuole ANCHE
+ravvicinare gli offset per rendere i tragitti piu' brevi, e' un lavoro
+separato (tocca tutti gli offset + probabilmente i bordi delle mappe gia'
+disegnate), non implicito in questa story.
+
+PROSSIMA STORIA: nessuna schedulata - l'addendum e' chiuso. Prossimo
+passo resta la Fase 11 (Atto II e Atto III), da pianificare con /prd
+quando si decide di iniziarla.

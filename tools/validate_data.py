@@ -1285,32 +1285,41 @@ def main():
                         f"{region_rects[b]} si sovrappongono nella griglia di mondo condivisa "
                         f"(world_offset, US-1001)")
 
-    # --- corridoi di raccordo (data/world/corridoi.json, US-1002) ---
-    corridoi_doc = load_json(os.path.join(DATA, "world", "corridoi.json"))
-    if corridoi_doc is not None:
-        rel = "data/world/corridoi.json"
-        coppie_viste = set()
-        for c in corridoi_doc.get("corridoi", []):
-            a = c.get("a")
-            b = c.get("b")
-            if a not in region_ids:
-                err(f"{rel}: 'a' punta a una regione inesistente '{a}'")
-            if b not in region_ids:
-                err(f"{rel}: 'b' punta a una regione inesistente '{b}'")
-            if a == b:
-                err(f"{rel}: 'a' e 'b' sono la stessa regione '{a}'")
-            coppia = tuple(sorted([str(a), str(b)]))
-            if coppia in coppie_viste:
-                err(f"{rel}: coppia '{a}'-'{b}' duplicata (in un verso o nell'altro)")
-            coppie_viste.add(coppia)
-            for chiave in ("aggancio_a", "aggancio_b"):
-                v = c.get(chiave)
-                if not (isinstance(v, list) and len(v) == 2
-                        and all(isinstance(x, int) and x >= 0 for x in v)):
-                    err(f"{rel}: {chiave} deve essere [x, y] di interi >= 0")
-            larghezza = c.get("larghezza")
-            if not (isinstance(larghezza, int) and larghezza >= 1):
-                err(f"{rel}: larghezza deve essere un intero >= 1")
+    # --- campagna (data/world/campagna.json, addendum fase 10 US-1015) ---
+    # Il popolamento dello spazio comune FUORI da ogni regione (world_scene.gd
+    # lo dipinge di terreno vero, _riempi_campagna): stessa forma di un
+    # layout (nemici[]/oggetti[]) ma coordinate ASSOLUTE, senza un
+    # world_offset proprio. Si valida solo che ogni entry sia dentro il
+    # rettangolo che contiene tutte le regioni e FUORI da ognuna di esse
+    # (dentro una regione ci pensa gia' il suo layout) - non la calpestabilita'
+    # fine contro gli alberi sparsi, che sono decorativi e generati a runtime.
+    campagna_doc = load_json(os.path.join(DATA, "world", "campagna.json"))
+    if campagna_doc is not None and region_rects:
+        rel = "data/world/campagna.json"
+        bx0 = min(r[0] for r in region_rects.values())
+        by0 = min(r[1] for r in region_rects.values())
+        bx1 = max(r[2] for r in region_rects.values())
+        by1 = max(r[3] for r in region_rects.values())
+
+        def _dentro_una_regione(x, y):
+            for (rx0, ry0, rx1, ry1) in region_rects.values():
+                if rx0 <= x < rx1 and ry0 <= y < ry1:
+                    return True
+            return False
+
+        for lista, nome in ((campagna_doc.get("nemici", []), "nemici"),
+                             (campagna_doc.get("oggetti", []), "oggetti")):
+            for i, spec in enumerate(lista):
+                x, y = spec.get("x"), spec.get("y")
+                if not (isinstance(x, int) and isinstance(y, int)):
+                    err(f"{rel}: {nome}[{i}] x/y devono essere interi")
+                    continue
+                if not (bx0 <= x < bx1 and by0 <= y < by1):
+                    err(f"{rel}: {nome}[{i}] ({x},{y}) fuori dal rettangolo che contiene "
+                        f"tutte le regioni")
+                elif _dentro_una_regione(x, y):
+                    err(f"{rel}: {nome}[{i}] ({x},{y}) cade dentro il rettangolo di una "
+                        f"regione (la campagna e' solo lo spazio condiviso fuori da esse)")
 
     # --- fonti di tag di fase 3 (US-334): stanze costruibili, specie di pet
     # (+ comportamenti), tag_grant dei talenti. Rendono raggiungibili le
@@ -2748,8 +2757,8 @@ def main():
 
     # --- chiusura fase 10 (US-1014): il mondo continuo esiste, con un
     # villaggio e una struttura grande veri ---
-    # La validazione PIENA di world_offset/corridoi/edifici/interni e' gia'
-    # nei blocchi dedicati piu' sopra (US-1001/1002/1010): qui solo il
+    # La validazione PIENA di world_offset/campagna/edifici/interni e' gia'
+    # nei blocchi dedicati piu' sopra (US-1001/1010/1015): qui solo il
     # criterio di chiusura, stesso stile delle fasi precedenti.
     _regioni_doc = load_json(os.path.join(DATA, "world", "regions.json")) or {}
     _regioni_fase10 = _regioni_doc.get("regions", [])

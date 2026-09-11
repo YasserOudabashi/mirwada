@@ -1,6 +1,6 @@
 extends TileMapLayer
 ## US-1010 (fase 10, Blocco B): l'interno di un edificio - un layout piccolo
-## e standalone (niente world_offset/corridoi/confine/gating/NPC a orario:
+## e standalone (niente world_offset/campagna/confine/gating/NPC a orario:
 ## quella complessita' e' solo per il mondo esterno continuo, US-1002). Un
 ## interno e' sempre indipendente, mai parte della griglia condivisa:
 ## entrarci e uscirne resta un caricamento di scena locale
@@ -12,7 +12,7 @@ extends TileMapLayer
 ## Painting/nemici/oggetti riusano lo stesso linguaggio dati di
 ## world_scene.gd (stessa legenda di caratteri, stesso formato nemici/
 ## oggetti) ma sono una copia minima apposta: un interno non ha bisogno di
-## _crea_zone/_crea_gate/_crea_npc/_crea_confine/_disegna_corridoi (nessuna
+## _crea_zone/_crea_gate/_crea_npc/_crea_confine/_riempi_campagna (nessuna
 ## di quelle nozioni si applica a una stanza), quindi non vale la pena
 ## condividere codice con world_scene.gd oltre alla legenda.
 ##

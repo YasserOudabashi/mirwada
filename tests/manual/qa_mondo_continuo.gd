@@ -135,14 +135,15 @@ func _passo_1_avvio() -> void:
 	_screenshot("01_scaffale_dopo_creazione")
 
 
-## Il corridoio vero e proprio (data/world/corridoi.json) e' lungo migliaia
-## di pixel (l'anello di fase 10 collega regioni molto distanti nella
-## griglia condivisa) - gia' provato calpestabile end-to-end da
-## tests/test_world_scene.gd::test_corridoio_mirwada_marche_e_calpestabile.
-## Qui il punto NON e' ripercorrerlo tutto, ma dimostrare che ATTRAVERSARE
-## per davvero (Input reale) il confine di una regione non scatena mai una
-## change_scene_to_*: un salto diretto avvicina il personaggio al bordo di
-## Marche (stesso principio "salto diretto poi cammina l'ultimo tratto" di
+## Addendum fase 10 (US-1015): i vecchi corridoi punto-a-punto sono ritirati
+## - la campagna vera fuori da ogni regione e' ora terreno calpestabile, e il
+## muro perimetrale di ogni regione si apre in molte brecce periodiche
+## (world_scene.gd::_apri_brecce_perimetro), non piu' un solo varco a
+## coordinate fisse. Qui il punto NON e' percorrere tutta la campagna, ma
+## dimostrare che ATTRAVERSARE per davvero (Input reale) il confine di una
+## regione non scatena mai una change_scene_to_*: un salto diretto avvicina
+## il personaggio alla PRIMA breccia nota del muro est di Marche (stesso
+## principio "salto diretto poi cammina l'ultimo tratto" di
 ## tests/manual/qa_vslice_door.gd), poi il confine stesso si attraversa
 ## camminando.
 func _passo_2_attraversa_il_confine_camminando() -> void:
@@ -151,25 +152,19 @@ func _passo_2_attraversa_il_confine_camminando() -> void:
 	var ws: Node = _n("/root/WorldState")
 	_assert(str(ws.call("regione_corrente")) == "mirwada", "si parte da Mirwada")
 
-	# aggancio_b del corridoio mirwada-marche_crepuscolo (data/world/
-	# corridoi.json) e' sul muro di Marche: il bordo vero del suo
-	# rettangolo di confine, letto dai dati.
 	var gd: Node = _n("/root/GameData")
-	var corridoio: Dictionary = {}
-	for c in (gd.call("get_corridoi") as Array):
-		var d: Dictionary = c
-		if str(d.get("a", "")) == "mirwada" and str(d.get("b", "")) == "marche_crepuscolo":
-			corridoio = d
-	_assert(not corridoio.is_empty(), "il corridoio mirwada-marche_crepuscolo e' dichiarato nei dati")
-	if corridoio.is_empty():
-		return
-
 	var offset_marche: Array = (gd.call("get_region", "marche_crepuscolo") as Dictionary).get("world_offset", [0, 0])
-	var aggancio: Array = corridoio.get("aggancio_b", [0, 0])
-	var punto_confine := Vector2(offset_marche[0] + aggancio[0], offset_marche[1] + aggancio[1]) * 32.0
+	var mappa_marche: Array = (gd.call("get_layout", "marche_crepuscolo").get("mappa", []) as Array)
+	var larghezza_marche: int = str(mappa_marche[0]).length() if not mappa_marche.is_empty() else 76
 
-	# un salto diretto fino a poco fuori dal rettangolo di Marche (il muro
-	# stesso ne e' il bordo), poi il confine si attraversa camminando.
+	# la prima breccia del muro est di Marche (world_scene.gd::
+	# _apri_brecce_perimetro: meta=1, passo=11 -> la prima e' a y locale 2) -
+	# lo stesso ruolo del vecchio aggancio_b del corridoio, ora uno fra tanti.
+	var y_breccia := 2
+	var punto_confine := Vector2(offset_marche[0] + larghezza_marche - 1, offset_marche[1] + y_breccia) * 32.0
+
+	# un salto diretto fino a poco fuori dal rettangolo di Marche (nella
+	# campagna vera), poi il confine si attraversa camminando.
 	_player.global_position = punto_confine + Vector2(80, 0)
 	await process_frame
 	_screenshot("02a_appena_fuori_dal_confine_di_marche")

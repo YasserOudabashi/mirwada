@@ -1,8 +1,11 @@
 extends TileMapLayer
 ## Mondo continuo (fase 10, US-1002). Sostituisce region_scene.gd come UNICA
 ## scena caricata da main.gd: dipinge OGNI regione di GameData.get_regions()
-## nella stessa TileMapLayer, ciascuna al proprio world_offset (US-1001),
-## piu' i corridoi di raccordo (data/world/corridoi.json). Le funzioni per
+## nella stessa TileMapLayer, ciascuna al proprio world_offset (US-1001).
+## Lo spazio condiviso fuori da ogni regione non resta vuoto: e' campagna
+## vera, dipinta da _riempi_campagna e raggiungibile attraverso le brecce
+## che _apri_brecce_perimetro apre nel muro di ogni regione (addendum
+## US-1015, sostituisce i vecchi corridoi punto-a-punto). Le funzioni per
 ## regione sono le stesse di region_scene.gd (_dipingi/_crea_zone/
 ## _crea_nemici/_crea_oggetti/_crea_npc/_crea_gate) - qui prendono un id di
 ## regione + un offset invece di leggere un @export unico, e girano in un
@@ -60,9 +63,13 @@ func _ready() -> void:
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd == null:
 		return
-	for reg in gd.call("get_regions"):
+	var regioni: Array = gd.call("get_regions")
+	_riempi_campagna(regioni)
+	for reg in regioni:
 		_prepara_regione(reg as Dictionary)
-	_disegna_corridoi()
+	var campagna: Dictionary = gd.call("get_campagna")
+	_crea_nemici("campagna", campagna, Vector2i.ZERO)
+	_crea_oggetti(campagna, Vector2i.ZERO)
 	_ricrea_tutti_npc()
 
 	var cam: Node = _camera_giocatore()
@@ -157,6 +164,7 @@ func _prepara_regione(reg: Dictionary) -> void:
 	var dim: Vector2i = _dimensioni_layout(layout)
 	_dim_per_regione[rid] = dim
 	_dipingi(reg, layout, offset, dim)
+	_apri_brecce_perimetro(offset, dim)
 	_tinta_di_fondo(reg, offset, dim)
 	_crea_confine(rid, offset, dim)
 	_crea_zone(reg, layout, offset, dim)
@@ -578,55 +586,78 @@ func tag_corrente() -> String:
 	return _tag_corrente
 
 
-# --- corridoi di raccordo (US-1002) -----------------------------------------
+# --- campagna (addendum fase 10, US-1015) -----------------------------------
+#
+# I vecchi corridoi (US-1002) erano un percorso a L largo 3 celle fra due
+# punti scelti a mano, con il resto del mondo condiviso lasciato vuoto: da
+# fuori si vedeva un rettangolo per regione unito da un ponte, non un mondo
+# unico (feedback diretto dell'utente). Sostituiti da: (1) _riempi_campagna,
+# che dipinge di terreno vero OGNI cella del rettangolo che contiene tutte
+# le regioni e non appartiene a nessuna di esse - non piu' vuoto; (2)
+# _apri_brecce_perimetro, che smette di trattare il muro perimetrale di ogni
+# layout come una scatola sigillata: lo interrompe a intervalli regolari
+# sui 4 lati, cosi' si esce dalla regione verso la campagna in molti punti
+# invece che da un solo varco a coordinate fisse. Entrambe generiche: nessun
+## nome di regione, nessuna coppia scelta a mano.
 
-## Un percorso a L (un segmento orizzontale + uno verticale, il gomito su
-## (b.x, a.y)) tra il punto di aggancio di due regioni, con una piccola
-## apertura scavata su ognuno dei due bordi. Non deve essere bello (i tile
-## restano procedurali/placeholder): deve solo esistere ed essere
-## calpestabile - la topologia (quali regioni si collegano) e' dato
-## (data/world/corridoi.json), l'algoritmo non conosce nomi di regione.
-func _disegna_corridoi() -> void:
-	var gd: Node = get_node_or_null("/root/GameData")
-	if gd == null:
-		return
-	for c in gd.call("get_corridoi"):
-		var spec: Dictionary = c as Dictionary
-		var pa: Vector2i = _punto_aggancio(gd, str(spec.get("a", "")), spec.get("aggancio_a", []))
-		var pb: Vector2i = _punto_aggancio(gd, str(spec.get("b", "")), spec.get("aggancio_b", []))
-		var larghezza: int = maxi(int(spec.get("larghezza", 3)), 1)
-		_scava_apertura(pa, larghezza)
-		_scava_apertura(pb, larghezza)
-		_disegna_percorso_a_elle(pa, pb, larghezza)
-
-
-func _punto_aggancio(gd: Node, rid: String, aggancio: Array) -> Vector2i:
-	var reg: Dictionary = gd.call("get_region", rid)
-	var offset: Vector2i = _offset_di(reg)
-	var ax: int = int(aggancio[0]) if aggancio.size() > 0 else 0
-	var ay: int = int(aggancio[1]) if aggancio.size() > 1 else 0
-	return offset + Vector2i(ax, ay)
+## Densita' degli alberi sparsi nella campagna (formula deterministica sulla
+## cella via hash() - stessa mappa a ogni avvio, senza salvare un seed).
+const _DENSITA_ALBERI_CAMPAGNA := 6
+const _LARGH_BRECCIA := 3
+const _PASSO_BRECCIA := 11
 
 
-func _scava_apertura(centro: Vector2i, larghezza: int) -> void:
-	var raggio: int = int(larghezza / 2.0)
-	for dx in range(-raggio, raggio + 1):
-		for dy in range(-raggio, raggio + 1):
-			set_cell(centro + Vector2i(dx, dy), SORGENTE, Vector2i(_COLONNA_PAVIMENTO, 0))
+func _riempi_campagna(regioni: Array) -> void:
+	var rettangoli: Array = []
+	var minv := Vector2i(2000000, 2000000)
+	var maxv := Vector2i(-2000000, -2000000)
+	for reg in regioni:
+		var r: Dictionary = reg as Dictionary
+		var offset: Vector2i = _offset_di(r)
+		var dim: Vector2i = _dimensioni_layout(_layout_dati(str(r.get("id", ""))))
+		rettangoli.append(Rect2i(offset, dim))
+		minv = minv.min(offset)
+		maxv = maxv.max(offset + dim)
+
+	for x in range(minv.x, maxv.x):
+		for y in range(minv.y, maxv.y):
+			var cella := Vector2i(x, y)
+			var dentro_regione := false
+			for rect in rettangoli:
+				if (rect as Rect2i).has_point(cella):
+					dentro_regione = true
+					break
+			if dentro_regione:
+				continue
+			var albero: bool = absi(hash(cella)) % 100 < _DENSITA_ALBERI_CAMPAGNA
+			var col: int = _COLONNA_PER_CARATTERE["t"] if albero else _COLONNA_PAVIMENTO
+			set_cell(cella, SORGENTE, Vector2i(col, 0))
 
 
-func _disegna_percorso_a_elle(a: Vector2i, b: Vector2i, larghezza: int) -> void:
-	var meta: int = int(larghezza / 2.0)
-	var x0: int = mini(a.x, b.x)
-	var x1: int = maxi(a.x, b.x)
-	for x in range(x0, x1 + 1):
-		for dy in range(-meta, meta + 1):
-			set_cell(Vector2i(x, a.y + dy), SORGENTE, Vector2i(_COLONNA_PAVIMENTO, 0))
-	var y0: int = mini(a.y, b.y)
-	var y1: int = maxi(a.y, b.y)
-	for y in range(y0, y1 + 1):
-		for dx in range(-meta, meta + 1):
-			set_cell(Vector2i(b.x + dx, y), SORGENTE, Vector2i(_COLONNA_PAVIMENTO, 0))
+## Il perimetro che _dipingi ha appena disegnato (il muro '#' del layout)
+## smette di essere una scatola sigillata: si apre una breccia larga
+## _LARGH_BRECCIA ogni _PASSO_BRECCIA celle sui 4 lati, verso la campagna
+## gia' dipinta da _riempi_campagna. Il muro (1 cella di spessore, come ogni
+## layout di questo progetto) resta visibile fra una breccia e l'altra -
+## legge come un'antica cinta muraria in rovina, non un confine invisibile.
+func _apri_brecce_perimetro(offset: Vector2i, dim: Vector2i) -> void:
+	var meta: int = int(_LARGH_BRECCIA / 2.0)
+	var x: int = meta + 1
+	while x < dim.x - meta - 1:
+		_scava_breccia(offset + Vector2i(x, 0), meta, true)
+		_scava_breccia(offset + Vector2i(x, dim.y - 1), meta, true)
+		x += _PASSO_BRECCIA
+	var y: int = meta + 1
+	while y < dim.y - meta - 1:
+		_scava_breccia(offset + Vector2i(0, y), meta, false)
+		_scava_breccia(offset + Vector2i(dim.x - 1, y), meta, false)
+		y += _PASSO_BRECCIA
+
+
+func _scava_breccia(centro: Vector2i, meta: int, orizzontale: bool) -> void:
+	for d in range(-meta, meta + 1):
+		var cella: Vector2i = centro + (Vector2i(d, 0) if orizzontale else Vector2i(0, d))
+		set_cell(cella, SORGENTE, Vector2i(_COLONNA_PAVIMENTO, 0))
 
 
 # --- viaggio e spawn (fast travel dalla pagina mappa, US-617; niente piu'

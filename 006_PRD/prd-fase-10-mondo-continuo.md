@@ -359,6 +359,44 @@ esce da edifici, senza una riga di codice che nomini un luogo specifico.
       `006_PRD/roadmap.md` aggiornati a "Fase 10: CHIUSA".
 - [ ] `prd.json`: tutte le story a `passes: true`.
 
+> **Addendum in corsa (2026-09-11)**: dopo la chiusura della fase, l'utente
+> ha guardato il mondo continuo (screenshot alla mano) e ha segnalato che
+> non leggeva come un mondo aperto vero: 5 rettangoli isolati a
+> `world_offset` lontani fra loro, uniti solo da un corridoio largo 3 celle
+> a coordinate fisse — tutto il resto della griglia condivisa restava vuoto
+> (nessuna tile dipinta). Da fuori si vedevano "blocchi collegati da un
+> ponte", non "un mondo unico con diverse regioni" (le parole esatte
+> dell'utente). Vedi **US-1015** sotto: la campagna vera sostituisce i
+> corridoi punto-a-punto.
+
+#### US-1015: La campagna vera fra le regioni
+
+**Descrizione:** Come giocatore, voglio che lo spazio condiviso fuori da
+ogni regione sia terreno esplorabile vero (non vuoto) e che ogni regione si
+affacci su di esso in molti punti (non un solo corridoio a coordinate
+fisse), cosi' il mondo legge come un'unica landa con regioni distinte,
+mai come rettangoli isolati uniti da un ponte.
+
+**Acceptance Criteria:**
+- [x] `data/world/corridoi.json` e il codice che lo disegnava
+      (`world_scene.gd::_disegna_corridoi`/`_punto_aggancio`/
+      `_scava_apertura`/`_disegna_percorso_a_elle`, `GameData.get_corridoi`)
+      sono ritirati.
+- [x] Ogni cella del rettangolo che contiene tutte le 5 regioni e che non
+      appartiene a nessuna di esse e' dipinta di terreno vero e
+      calpestabile (pavimento + una spolverata deterministica di alberi
+      sparsi), mai lasciata senza tile.
+- [x] Il muro perimetrale di ogni regione non e' piu' una scatola sigillata:
+      si apre in brecce periodiche sui 4 lati verso la campagna, generiche
+      (nessuna coppia di regioni scelta a mano).
+- [x] La campagna ha nemici/oggetti sparsi (`data/world/campagna.json`,
+      coordinate assolute, riusa `_crea_nemici`/`_crea_oggetti` con offset
+      zero).
+- [x] `python tools/validate_data.py` esce 0. Nessuna regressione. Tests
+      pass. Verifica a schermo con Xvfb (screenshot in chat): si cammina
+      per davvero da dentro una regione, attraverso una breccia, nella
+      campagna.
+
 ## 4. Functional Requirements
 
 - FR-1: Attraversare il confine tra due regioni non deve MAI chiamare
