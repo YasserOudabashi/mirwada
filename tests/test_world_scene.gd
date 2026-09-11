@@ -304,3 +304,124 @@ func test_riavvicinandosi_un_nemico_disattivato_si_riattiva() -> void:
 		"il player si e' avvicinato: lo stesso nemico torna attivo")
 
 	(r["cont"] as Node2D).free()
+
+
+## US-1010 (fase 10, Blocco B): entrare in un edificio carica il suo interno
+## SENZA mai liberare il mondo persistente (world_scene.gd si nasconde e si
+## ferma, l'invariante di US-1002B resta valida) - provato sul primo
+## edificio davvero visitabile (il sotterraneo di Mirwada, gia' disegnato
+## cosmeticamente in US-1005, ora referenziato da un vero data/world/
+## interni/mirwada_sotterraneo.json).
+##
+## I test chiamano _entra_edificio/_esci_edificio DIRETTAMENTE (non i
+## wrapper _su_porta_edificio/_su_uscita_edificio, che le schedulano con
+## call_deferred() - necessario per la fisica reale, scoperto con Xvfb:
+## Godot vieta di disabilitare un CollisionObject2D dentro il callback di
+## fisica che ci porta li'). Stesso principio gia' in uso nel resto della
+## suite: si chiama l'handler/la logica direttamente invece di dipendere
+## dal timing della fisica o, qui, di call_deferred().
+const InteriorScript := preload("res://scripts/interior_scene.gd")
+
+
+func _porta_sotterraneo(mondo: Node) -> Area2D:
+	return mondo.get_node_or_null("Porta_mirwada_mirwada_sotterraneo_0")
+
+
+func test_edificio_mirwada_sotterraneo_ha_una_porta() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var porta: Area2D = _porta_sotterraneo(r["mondo"])
+	assert_false(porta == null, "la porta del sotterraneo di Mirwada esiste in scena")
+	(r["cont"] as Node2D).free()
+
+
+func test_entrare_in_un_edificio_carica_l_interno_senza_liberare_il_mondo() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var cont: Node2D = r["cont"]
+	var mondo: Node = r["mondo"]
+	var player: Node2D = r["player"]
+	var porta: Area2D = _porta_sotterraneo(mondo)
+	assert_false(porta == null, "la porta esiste")
+	if porta == null:
+		cont.free()
+		return
+
+	mondo.call("_entra_edificio", porta)
+
+	assert_false(mondo.visible, "world_scene si nasconde mentre si e' dentro")
+	assert_eq(int(mondo.process_mode), int(Node.PROCESS_MODE_DISABLED),
+		"world_scene si ferma mentre si e' dentro")
+	assert_false(mondo.is_queued_for_deletion(), "world_scene NON viene mai liberato (US-1002B)")
+
+	var interno: Node = null
+	for c in cont.get_children():
+		if c.get_script() == InteriorScript:
+			interno = c
+	assert_false(interno == null, "l'interno e' stato istanziato come fratello del mondo")
+	if interno != null:
+		assert_eq(str(interno.get("interno_id")), "mirwada_sotterraneo", "e' l'interno giusto")
+		assert_eq(player.global_position, interno.call("punto_spawn"),
+			"il player e' alla cella di spawn dell'interno")
+
+	cont.free()
+
+
+func test_uscire_dall_edificio_ripristina_il_mondo_alla_porta() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var cont: Node2D = r["cont"]
+	var mondo: Node = r["mondo"]
+	var player: Node2D = r["player"]
+	var porta: Area2D = _porta_sotterraneo(mondo)
+	assert_false(porta == null, "la porta esiste")
+	if porta == null:
+		cont.free()
+		return
+
+	mondo.call("_entra_edificio", porta)
+	mondo.call("_esci_edificio")
+
+	assert_true(mondo.visible, "world_scene torna visibile uscendo")
+	assert_eq(int(mondo.process_mode), int(Node.PROCESS_MODE_INHERIT), "world_scene torna attivo uscendo")
+	assert_eq(player.global_position, porta.global_position, "il player torna alla cella della porta")
+
+	var interno_ancora_in_scena := false
+	for c in cont.get_children():
+		if c.get_script() == InteriorScript and not c.is_queued_for_deletion():
+			interno_ancora_in_scena = true
+	assert_false(interno_ancora_in_scena, "l'interno e' stato liberato all'uscita")
+
+	cont.free()
+
+
+## Rientrare nella stessa porta subito dopo essere usciti non deve ri-aprire
+## l'interno all'istante: _esci_edificio marca la porta ("ignora_prossimo_
+## ingresso"), _su_porta_edificio la consuma senza schedulare un nuovo
+## ingresso - solo il secondo, genuino tentativo funziona. Qui si prova la
+## logica della guardia stessa (sul wrapper _su_porta_edificio, dove vive);
+## il secondo ingresso genuino e' provato chiamando _entra_edificio in
+## isolamento (stesso principio del resto della suite, non si dipende dal
+## timing reale di call_deferred()).
+func test_rientrare_subito_dopo_l_uscita_non_riapre_l_interno() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var cont: Node2D = r["cont"]
+	var mondo: Node = r["mondo"]
+	var player: Node2D = r["player"]
+	var porta: Area2D = _porta_sotterraneo(mondo)
+	assert_false(porta == null, "la porta esiste")
+	if porta == null:
+		cont.free()
+		return
+
+	mondo.call("_entra_edificio", porta)
+	mondo.call("_esci_edificio")
+	assert_true(bool(porta.get_meta("ignora_prossimo_ingresso", false)),
+		"uscire marca la porta per ignorare il prossimo ingresso spurio")
+
+	mondo.call("_su_porta_edificio", player, porta)
+	assert_false(bool(porta.get_meta("ignora_prossimo_ingresso", false)),
+		"il flag e' stato consumato dal primo re-ingresso spurio")
+	assert_true(mondo.visible, "quel primo re-ingresso spurio non ha aperto nulla")
+
+	mondo.call("_entra_edificio", porta)
+	assert_false(mondo.visible, "un secondo ingresso vero funziona normalmente")
+
+	cont.free()

@@ -31,6 +31,7 @@ const DIR_TALENTS := "res://data/talents"
 const DIR_DIALOGUES := "res://data/dialogues"
 const DIR_QUESTS := "res://data/quests"
 const DIR_LAYOUTS := "res://data/world/layouts"
+const DIR_INTERNI := "res://data/world/interni"
 const PATH_TAGS := "res://data/tags.json"
 const PATH_BALANCE := "res://data/balance.json"
 const PATH_PRIMITIVES := "res://data/schema/primitives.json"
@@ -124,6 +125,7 @@ var _dialogues: Dictionary = {}
 var _factions: Dictionary = {}
 var _quests: Dictionary = {}
 var _layouts: Dictionary = {}
+var _interni: Dictionary = {}
 var _antagonisti: Dictionary = {}
 var _endings: Dictionary = {}
 
@@ -176,6 +178,7 @@ func load_all() -> void:
 	_load_dialogues()
 	_load_quests()
 	_load_layouts()
+	_load_interni()
 	# L'ultimo argomento e' il tipo atteso per la chiave: un file in cui quella
 	# chiave ha la forma sbagliata viene scartato con un errore, non caricato.
 	_load_single(PATH_TAGS, "tags", _tags, TYPE_ARRAY)
@@ -681,6 +684,13 @@ func get_layout(region_id: String) -> Dictionary:
 	return _layouts.get(region_id, {})
 
 
+## --- Interni di edificio (data/world/interni/, US-1010) ---
+## {} se l'id non risolve (non dovrebbe succedere: il validator impone che
+## ogni edifici[].interno_id di un layout esista qui).
+func get_interno(interno_id: String) -> Dictionary:
+	return _interni.get(interno_id, {})
+
+
 ## --- Antagonisti (data/lore/antagonisti.json, US-620) ---
 func get_antagonisti() -> Array:
 	return _array_or_empty(_antagonisti.get("antagonisti"))
@@ -860,6 +870,25 @@ func _load_layouts() -> void:
 		_upsert(_layouts, rid, doc)
 		visti[rid] = true
 	_prune(_layouts, visti)
+
+
+## US-1010: l'interno di un edificio (data/world/interni/*.json), chiave =
+## interno_id - stesso pattern di _load_layouts(), ma senza fallback (un
+## edifici[].interno_id che non risolve e' un errore del validator, non un
+## caso da gestire a runtime).
+func _load_interni() -> void:
+	var visti: Dictionary = {}
+	for path in _json_files_in(DIR_INTERNI):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		var iid: String = str(doc.get("interno_id", ""))
+		if iid.is_empty():
+			_fail(path, "un interno non ha 'interno_id'")
+			continue
+		_upsert(_interni, iid, doc)
+		visti[iid] = true
+	_prune(_interni, visti)
 
 
 func _load_items() -> void:

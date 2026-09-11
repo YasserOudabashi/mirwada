@@ -9,7 +9,8 @@
     "zone": "{location_tag: [x, y, w, h]} in celle. Un rettangolo per ogni location_tag della regione (copertura completa per ogni regione con layout). Rettangoli dentro i limiti, non sovrapposti.",
     "nemici": "array di {x, y, sequenza, scala, override} (US-806). x/y: cella calpestabile. sequenza: 0..9, la Sequenza del nemico (curva HP/SP da StatsComponent.configure_from_balance). scala: fattore di Node2D.scale, in [0.5, 3] (un boss e' 1.5). override: sottoinsieme delle chiavi di data/balance.json.nemico_base (es. danno_attacco, raggio_aggro, tag, caratteristica:{pathway_id, sequence, probabilita}), mergiato su nemico_base per-istanza (enemy.gd::override). Un boss e' dati (sequenza piu' bassa + override piu' duro + scala 1.5), MAI un flag 'boss'.",
     "oggetti": "array di {x, y, item_id, quantita} (US-806). x/y: cella calpestabile. item_id: deve esistere in data/items/. quantita: intero >= 1, va a Inventory.aggiungi(item_id, quantita) alla raccolta. Gli ingredienti delle formule di pozione arrivano nel mondo solo da US-809 (prima non esistono come item): fino ad allora questo campo usa solo item gia' esistenti (es. moneta_comune).",
-    "drop": "dict, vuoto in questa story (US-809 lo popola)"
+    "drop": "dict, vuoto in questa story (US-809 lo popola)",
+    "edifici": "array di {x, y, interno_id} (US-1010, opzionale - solo le mappe esterne con almeno un edificio visitabile lo usano). x/y: cella calpestabile, il marcatore della porta sulla mappa esterna. interno_id: referenzia data/world/interni/<interno_id>.json (stesso schema di questo file, vedi interno.schema.json). Entrarci carica quella scena interna al posto del mondo esterno (che resta in memoria, solo nascosto/fermo - MAI liberato: e' lo stesso nodo persistente di US-1002B); uscire torna alla mappa esterna, alla cella della porta."
   },
   "legenda": {
     ".": "pavimento",
@@ -29,6 +30,7 @@
     "zone: chiavi sottoinsieme di location_tags della regione; per la regione con layout la copertura deve essere completa (ogni location_tag ha una zona); rettangoli dentro i limiti",
     "una regione senza file layout produce solo un warning (atteso finche' US-807 non disegna le altre 4)",
     "nemici: x/y calpestabili; sequenza intero 0..9; chiavi di override sottoinsieme di nemico_base; override.caratteristica.pathway_id (se presente) e' un Pathway attivo; scala in [0.5, 3]",
-    "oggetti: x/y calpestabili; item_id esiste in data/items/"
+    "oggetti: x/y calpestabili; item_id esiste in data/items/",
+    "edifici (US-1010): x/y calpestabili; interno_id esiste in data/world/interni/"
   ]
 }

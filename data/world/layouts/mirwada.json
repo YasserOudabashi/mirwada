@@ -307,5 +307,12 @@
       "terriccio_di_prima_luna",
       "velo_di_mezzanotte"
     ]
-  }
+  },
+  "edifici": [
+    {
+      "x": 31,
+      "y": 31,
+      "interno_id": "mirwada_sotterraneo"
+    }
+  ]
 }

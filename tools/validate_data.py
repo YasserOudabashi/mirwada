@@ -115,6 +115,52 @@ def valida_boon(rel, sid, boon, events, quest_ids, item_ids, char_ids):
     return out
 
 
+## Valida la forma "layout" condivisa da una mappa esterna
+## (data/world/layouts/*.json, US-805) e da un interno di edificio
+## (data/world/interni/*.json, US-1010: "stesso schema di un layout"):
+## righe rettangolari di soli caratteri della legenda, bordo esterno
+## tutto '#', spawn dentro i limiti su una cella calpestabile. Dimensione
+## LIBERA (US-1005): la riga 0 detta la larghezza, non una costante.
+## Ritorna (mappa, w, h, righe_valide) per chi deve controllare anche
+## zone/edifici/nemici/oggetti alle stesse dimensioni vere.
+def valida_mappa_e_spawn(doc, rel, legenda, calpestabili):
+    mappa = doc.get("mappa", [])
+    h = len(mappa) if isinstance(mappa, list) else 0
+    w = len(mappa[0]) if h > 0 and isinstance(mappa[0], str) else 0
+    if h == 0 or w == 0:
+        err(f"{rel}: mappa deve avere almeno 1 riga non vuota")
+        return mappa, w, h, False
+    righe_valide = True
+    for y, riga in enumerate(mappa):
+        if not isinstance(riga, str) or len(riga) != w:
+            err(f"{rel}: riga {y} deve avere {w} caratteri (la larghezza della riga 0)")
+            righe_valide = False
+            continue
+        fuori = set(riga) - legenda
+        if fuori:
+            err(f"{rel}: riga {y} usa caratteri fuori dalla legenda: {sorted(fuori)}")
+
+    if righe_valide:
+        bordo_ok = all(c == "#" for c in mappa[0]) and all(c == "#" for c in mappa[h - 1])
+        bordo_ok = bordo_ok and all(riga[0] == "#" and riga[w - 1] == "#" for riga in mappa)
+        if not bordo_ok:
+            err(f"{rel}: il bordo esterno (riga 0, riga {h - 1}, colonna 0, "
+                f"colonna {w - 1}) deve essere tutto '#'")
+
+    spawn = doc.get("spawn", [])
+    if not (isinstance(spawn, list) and len(spawn) == 2
+            and all(isinstance(v, int) for v in spawn)):
+        err(f"{rel}: spawn deve essere [x, y] di interi")
+    elif righe_valide:
+        sx, sy = spawn
+        if not (0 <= sx < w and 0 <= sy < h):
+            err(f"{rel}: spawn {spawn} fuori dai limiti ({w}x{h})")
+        elif mappa[sy][sx] not in calpestabili:
+            err(f"{rel}: spawn {spawn} non e' su una cella calpestabile ('{mappa[sy][sx]}')")
+
+    return mappa, w, h, righe_valide
+
+
 def main():
     # --- vocabolari di riferimento ---
     prim_doc = load_json(os.path.join(DATA, "schema", "primitives.json"))
@@ -1100,6 +1146,31 @@ def main():
         for reg in regions_doc.get("regions", []):
             region_tags_by_id[reg.get("id")] = set(reg.get("location_tags", []))
 
+    # --- interni di edificio (data/world/interni/*.json, US-1010) ---
+    # "Stesso schema di un layout" (mappa/spawn), ma senza region_id/zone: un
+    # interno e' una scena locale piccola e indipendente, mai parte della
+    # griglia condivisa del mondo continuo. Caricati PRIMA dei layout esterni
+    # perche' il campo layout.edifici[].interno_id (sotto) deve poterli
+    # risolvere.
+    interni_dir = os.path.join(DATA, "world", "interni")
+    interni_ids = set()
+    if os.path.isdir(interni_dir):
+        for fn in sorted(os.listdir(interni_dir)):
+            if not fn.endswith(".json"):
+                continue
+            rel = f"data/world/interni/{fn}"
+            doc = load_json(os.path.join(interni_dir, fn))
+            if doc is None:
+                continue
+            iid = doc.get("interno_id")
+            if not iid:
+                err(f"{rel}: manca 'interno_id'")
+                continue
+            if iid in interni_ids:
+                err(f"{rel}: interno_id '{iid}' duplicato tra gli interni")
+            interni_ids.add(iid)
+            valida_mappa_e_spawn(doc, f"{rel} [{iid}]", LEGENDA_LAYOUT, CALPESTABILI_LAYOUT)
+
     layouts_dir = os.path.join(DATA, "world", "layouts")
     layout_region_ids = set()
     if os.path.isdir(layouts_dir):
@@ -1118,46 +1189,10 @@ def main():
                 err(f"{rel}: region_id '{rid}' duplicato tra i layout")
             layout_region_ids.add(rid)
 
-            # US-1005 (fase 10): dimensione libera (US-1001/1002 hanno gia'
-            # tolto il vincolo 48x36 al motore) - la larghezza/altezza VERE
-            # sono quelle della mappa stessa (riga 0 detta la larghezza),
-            # non piu' una costante. Deve restare rettangolare: ogni riga
-            # della lunghezza della prima.
-            mappa = doc.get("mappa", [])
-            h = len(mappa) if isinstance(mappa, list) else 0
-            w = len(mappa[0]) if h > 0 and isinstance(mappa[0], str) else 0
-            if h == 0 or w == 0:
-                err(f"{rel} [{rid}]: mappa deve avere almeno 1 riga non vuota")
-                mappa = []
-            righe_valide = h > 0 and w > 0
-            for y, riga in enumerate(mappa):
-                if not isinstance(riga, str) or len(riga) != w:
-                    err(f"{rel} [{rid}]: riga {y} deve avere {w} caratteri "
-                        f"(la larghezza della riga 0)")
-                    righe_valide = False
-                    continue
-                fuori = set(riga) - LEGENDA_LAYOUT
-                if fuori:
-                    err(f"{rel} [{rid}]: riga {y} usa caratteri fuori dalla legenda: {sorted(fuori)}")
-
-            if righe_valide:
-                bordo_ok = all(c == "#" for c in mappa[0]) and all(c == "#" for c in mappa[h - 1])
-                bordo_ok = bordo_ok and all(riga[0] == "#" and riga[w - 1] == "#" for riga in mappa)
-                if not bordo_ok:
-                    err(f"{rel} [{rid}]: il bordo esterno (riga 0, riga {h - 1}, colonna 0, "
-                        f"colonna {w - 1}) deve essere tutto '#'")
-
-            spawn = doc.get("spawn", [])
-            if not (isinstance(spawn, list) and len(spawn) == 2
-                    and all(isinstance(v, int) for v in spawn)):
-                err(f"{rel} [{rid}]: spawn deve essere [x, y] di interi")
-            elif righe_valide:
-                sx, sy = spawn
-                if not (0 <= sx < w and 0 <= sy < h):
-                    err(f"{rel} [{rid}]: spawn {spawn} fuori dai limiti ({w}x{h})")
-                elif mappa[sy][sx] not in CALPESTABILI_LAYOUT:
-                    err(f"{rel} [{rid}]: spawn {spawn} non e' su una cella calpestabile "
-                        f"('{mappa[sy][sx]}')")
+            # US-1005 (fase 10): dimensione libera - riusa la stessa validazione
+            # di forma degli interni (US-1010, "stesso schema di un layout").
+            mappa, w, h, righe_valide = valida_mappa_e_spawn(
+                doc, f"{rel} [{rid}]", LEGENDA_LAYOUT, CALPESTABILI_LAYOUT)
 
             region_tags = region_tags_by_id.get(rid, set())
             zone = doc.get("zone", {})
@@ -1179,6 +1214,30 @@ def main():
             if mancanti:
                 err(f"{rel} [{rid}]: mancano zone per i location_tags {sorted(mancanti)} "
                     f"(una regione CON layout deve coprirli tutti)")
+
+            # US-1010: marcatori di edificio - una porta sulla mappa esterna
+            # che referenzia un interno vero.
+            edifici = doc.get("edifici", [])
+            if not isinstance(edifici, list):
+                err(f"{rel} [{rid}]: edifici deve essere un array")
+                edifici = []
+            for i, ed in enumerate(edifici):
+                if not isinstance(ed, dict):
+                    err(f"{rel} [{rid}]: edifici[{i}] deve essere un dict")
+                    continue
+                ex, ey = ed.get("x"), ed.get("y")
+                if not (isinstance(ex, int) and isinstance(ey, int)):
+                    err(f"{rel} [{rid}]: edifici[{i}] x/y devono essere interi")
+                elif righe_valide:
+                    if not (0 <= ex < w and 0 <= ey < h):
+                        err(f"{rel} [{rid}]: edifici[{i}] ({ex},{ey}) fuori dai limiti ({w}x{h})")
+                    elif mappa[ey][ex] not in CALPESTABILI_LAYOUT:
+                        err(f"{rel} [{rid}]: edifici[{i}] ({ex},{ey}) non e' su una cella "
+                            f"calpestabile ('{mappa[ey][ex]}')")
+                iid = ed.get("interno_id")
+                if not iid or iid not in interni_ids:
+                    err(f"{rel} [{rid}]: edifici[{i}].interno_id '{iid}' non esiste in "
+                        f"data/world/interni/")
 
     for _rid in sorted(region_ids - layout_region_ids):
         err(f"data/world/regions.json [{_rid}]: nessun layout in data/world/layouts/ "

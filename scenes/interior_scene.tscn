@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c0interiorscn01"]
+
+[ext_resource type="Script" path="res://scripts/interior_scene.gd" id="1_interior"]
+
+[node name="Interior" type="TileMapLayer"]
+script = ExtResource("1_interior")

@@ -11238,5 +11238,91 @@ COME VERIFICATO.
 APERTO: US-1005B (i 3 edifici visitabili veri) e US-1010 (il motore che
 li abilita) restano da fare - vedi split sopra.
 
-PROSSIMA STORIA: US-1010 ("Vocabolario di un insediamento (edificio con
-interno)"), priority 7.
+PROSSIMA STORIA (chiusa qui sotto): US-1010 ("Vocabolario di un
+insediamento (edificio con interno)"), priority 7.
+
+FATTO (US-1010).
+- data/world/interni/ (nuova cartella) + data/schema/interno.schema.json
+  (nuovo): un interno e' "stesso schema di un layout" per mappa/spawn/
+  nemici/oggetti (riusa la validazione di forma di US-1005 - vedi sotto)
+  ma senza region_id/world_offset/zone/gating/edifici annidati: sempre una
+  TileMapLayer locale e indipendente, mai parte della griglia condivisa
+  del mondo continuo.
+- data/world/layouts/mirwada.json: nuovo campo "edifici":
+  [{x:31, y:31, interno_id:"mirwada_sotterraneo"}] - il primo edificio
+  davvero visitabile, l'esistente sotterraneo (US-1005 l'aveva disegnato
+  come struttura murata cosmetica, "un interno vero arriva con
+  US-1005B/US-1010" - eccolo). data/world/interni/mirwada_sotterraneo.json
+  (nuovo): una stanza 10x8, prova minima del meccanismo (contenuto reale
+  nelle 3 promesse di US-1005B arriva li', non qui).
+- tools/validate_data.py: nuova funzione condivisa valida_mappa_e_spawn()
+  (estratta dal blocco layout esistente, stesso identico comportamento -
+  refactor puro) usata sia per i layout esterni sia per i nuovi interni,
+  cosi' le due forme non divergono mai per errore. Nuovo blocco per
+  data/world/interni/*.json (interno_id presente/univoco, mappa/spawn
+  validi) e per layout.edifici[] (x/y calpestabili, interno_id risolve).
+- data/schema/layout.schema.json: documentato il campo "edifici".
+- scripts/game_data.gd: DIR_INTERNI + _interni + _load_interni() (stesso
+  pattern di _load_layouts, chiave = interno_id) + get_interno(id).
+- scripts/interior_scene.gd (nuovo) + scenes/interior_scene.tscn (nuovo):
+  l'interno di un edificio - una TileMapLayer standalone, MOLTO piu'
+  semplice di world_scene.gd (niente world_offset/corridoi/confine/
+  gating/NPC a orario: nessuna di quelle nozioni si applica a una stanza),
+  copia minima e deliberata del linguaggio dati condiviso (stessa
+  legenda/colonne di world_scene.gd) senza condividere codice - non ne
+  vale la pena per una manciata di funzioni cosi' diverse in scopo. Dipinge
+  mappa/nemici/oggetti, espone punto_spawn(), emette "uscita" quando il
+  player tocca l'Area2D di uscita (sulla stessa cella dello spawn - si
+  rientra dalla stessa porta).
+- scripts/world_scene.gd: _crea_edifici(rid, layout, offset) crea una
+  Area2D "Porta_<rid>_<interno_id>_<i>" per ogni layout.edifici[].
+  _su_porta_edificio (il segnale vero) rimanda il lavoro a _entra_edificio
+  con call_deferred() - BUG SCOPERTO CON XVFB, non dai test headless (che
+  chiamano l'handler a mano fuori da un vero callback di fisica): Godot
+  vieta di disabilitare un CollisionObject2D (qui: l'intero sotto-albero
+  di world_scene, via process_mode, che cascata su decine di Area2D/
+  CharacterBody2D figli) DENTRO il callback di fisica che ci porta li'
+  (body_entered) - "Disabling a CollisionObject node during a physics
+  callback is not allowed". _entra_edificio nasconde/ferma world_scene
+  (MAI liberarlo - l'invariante di US-1002B resta valida, e' solo
+  invisibile/fermo mentre si e' dentro), istanzia interior_scene.tscn
+  come fratello di Main, riposiziona il player al suo spawn.
+  _su_uscita_edificio (anch'esso deferred, stesso motivo) libera l'interno
+  (quello si', era sempre stato pensato come locale) e riposiziona il
+  player alla cella della porta.
+  SECONDO BUG SCOPERTO CON XVFB (i test headless non lo vedevano per lo
+  stesso motivo): la porta esterna E l'uscita interna si "riattivano" un
+  istante dopo l'uso col player gia' sopra (l'Area2D torna monitorabile,
+  Godot lo considera un ingresso nuovo) - senza guardia, entrare
+  ri-usciva all'istante e uscire ri-entrava all'istante. Fix: un flag
+  per-nodo ("ignora_prossimo_ingresso"/"ignora_primo_ingresso") che la
+  guardia consuma una volta sola, poi si comporta normalmente - stesso
+  principio su entrambe le porte (esterna in world_scene.gd, interna in
+  interior_scene.gd).
+- tests/test_world_scene.gd: 4 test nuovi sul sotterraneo di Mirwada (la
+  porta esiste; entrare nasconde/ferma il mondo SENZA liberarlo e
+  posiziona il player allo spawn dell'interno; uscire lo ripristina alla
+  cella della porta; rientrare subito dopo l'uscita non riapre l'interno -
+  provata la guardia stessa). I test chiamano _entra_edificio/
+  _esci_edificio direttamente (non i wrapper con call_deferred - stesso
+  principio gia' in uso nel resto della suite: si testa il meccanismo, non
+  si dipende dal timing di call_deferred() dentro un runner che non
+  await-a le funzioni async, scoperto scrivendo questi test).
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 913 test,
+  tutti passati (909 + 4 nuovi), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat) - QUESTA verifica ha scoperto i due bug reali sopra
+  (mai visti dai test headless, che bypassano la fisica/il timing reali):
+  partita vera, cammino REALE (Input.action_press) fino alla porta del
+  sotterraneo -> dentro (una stanza vera, world_scene invisibile e fermo
+  ma MAI liberato) -> cammino reale verso l'uscita -> di nuovo fuori a
+  Mirwada. Nessuna schermata di caricamento, nessun change_scene_to_*.
+
+APERTO: US-1005B (i 3 edifici veri promessi da US-1005: casa di Lena,
+archivio di Ottavia, bettola del porto) puo' ora usare questo motore.
+
+PROSSIMA STORIA: US-1005B ("I 3 edifici visitabili di Mirwada"),
+priority 8.

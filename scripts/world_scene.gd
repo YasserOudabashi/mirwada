@@ -11,8 +11,10 @@ extends TileMapLayer
 ## Zero caricamenti di scena tra regioni: WorldState.regione_corrente() si
 ## aggiorna quando il giocatore entra nel rettangolo di un'altra regione
 ## (una Area2D per regione, grande quanto il suo rettangolo) - mai un
-## reload. Entrare in un edificio resta un caricamento di scena locale
-## (US-1010, non questa story).
+## reload. Entrare in un edificio (US-1010) resta un caricamento di scena
+## LOCALE: world_scene.gd si nasconde/ferma (mai liberato) mentre
+## scenes/interior_scene.tscn prende il suo posto - vedi _crea_edifici/
+## _su_porta_edificio/_su_uscita_edificio.
 ##
 ## NIENTE class_name: coerente col resto del progetto.
 
@@ -44,6 +46,13 @@ var _dim_per_regione: Dictionary = {}
 ## globale a scena (una sola TileMapLayer ospita tutte e 5).
 var _nemici_vivi_per_regione: Dictionary = {}
 var _area_nemici_senza_abilita_per_regione: Dictionary = {}
+## Edifici visitabili (US-1010): l'interno attualmente in scena (null =
+## siamo fuori), la porta da cui vi si e' entrati (per sapere dove
+## riposizionare il giocatore uscendo) e una guardia contro un doppio
+## attraversamento nello stesso frame fisico.
+var _interno_attivo: Node = null
+var _porta_attiva: Area2D = null
+var _in_transizione_edificio: bool = false
 
 
 func _ready() -> void:
@@ -154,6 +163,7 @@ func _prepara_regione(reg: Dictionary) -> void:
 	_crea_gate(reg, offset, dim)
 	_crea_nemici(rid, layout, offset)
 	_crea_oggetti(layout, offset)
+	_crea_edifici(rid, layout, offset)
 
 
 func _riga_tileset(reg: Dictionary) -> int:
@@ -333,6 +343,103 @@ func _crea_oggetti(layout: Dictionary, offset: Vector2i) -> void:
 		pickup.call("setup", str(spec.get("item_id", "")), to_global(map_to_local(
 			offset + Vector2i(int(spec.get("x", 0)), int(spec.get("y", 0))))))
 		pickup.set("quantita", int(spec.get("quantita", 1)))
+
+
+# --- edifici visitabili (US-1010, Blocco B): una porta sulla mappa esterna
+# che carica un interno - resta un caricamento di scena LOCALE, la stessa
+# tecnica dei passaggi fra regioni PRIMA di US-1002 (mai un sistema nuovo).
+# world_scene.gd non viene MAI liberato mentre si e' dentro (l'invariante di
+# US-1002B): si nasconde e si ferma (process_mode = DISABLED, lo stesso
+# meccanismo gia' in uso per la culling di US-1003), poi torna.
+
+func _crea_edifici(rid: String, layout: Dictionary, offset: Vector2i) -> void:
+	var edifici: Array = (layout.get("edifici", []) as Array)
+	for i in edifici.size():
+		var spec: Dictionary = edifici[i] as Dictionary
+		var iid: String = str(spec.get("interno_id", ""))
+		if iid.is_empty():
+			continue
+		var cella: Vector2i = offset + Vector2i(int(spec.get("x", 0)), int(spec.get("y", 0)))
+		var area := Area2D.new()
+		area.name = "Porta_%s_%s_%d" % [rid, iid, i]
+		area.position = map_to_local(cella)
+		var shape := CollisionShape2D.new()
+		var rect := RectangleShape2D.new()
+		rect.size = Vector2(TILE, TILE)
+		shape.shape = rect
+		area.add_child(shape)
+		area.set_meta("interno_id", iid)
+		area.body_entered.connect(_su_porta_edificio.bind(area))
+		add_child(area)
+
+
+## Entra nell'interno referenziato dalla porta. Il vero lavoro (sotto, in
+## _entra_edificio) e' rimandato con call_deferred(): Godot vieta di
+## disabilitare un CollisionObject2D (qui: l'intero sotto-albero di
+## world_scene, via process_mode) DENTRO il callback di fisica che ci ha
+## portati qui (body_entered) - "Disabling a CollisionObject node during a
+## physics callback is not allowed", scoperto camminando per davvero contro
+## la porta con Xvfb (i test headless, che chiamano l'handler a mano fuori
+## da un vero callback, non lo vedevano).
+func _su_porta_edificio(body: Node, porta: Area2D) -> void:
+	if _in_transizione_edificio or not body.is_in_group("player"):
+		return
+	# La stessa porta si ri-attiva un istante dopo essere usciti (l'area
+	# torna monitorabile con il player gia' sopra: Godot la considera un
+	# ingresso nuovo) - ignorato una sola volta, vedi _esci_edificio.
+	if bool(porta.get_meta("ignora_prossimo_ingresso", false)):
+		porta.set_meta("ignora_prossimo_ingresso", false)
+		return
+	_in_transizione_edificio = true
+	_entra_edificio.call_deferred(porta)
+
+
+## Nasconde/ferma world_scene (MAI liberarlo, l'invariante di US-1002B),
+## istanzia scenes/interior_scene.tscn come fratello di Main, riposiziona il
+## giocatore al suo spawn. Sincrona e sicura se chiamata direttamente (fuori
+## da un callback di fisica reale) - i test la chiamano cosi'.
+func _entra_edificio(porta: Area2D) -> void:
+	var padre: Node = get_parent()
+	var player: Node2D = padre.get_node_or_null("Player") as Node2D if padre != null else null
+	if padre == null or player == null:
+		_in_transizione_edificio = false
+		return
+	_porta_attiva = porta
+	visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
+	var interno: Node = load("res://scenes/interior_scene.tscn").instantiate()
+	interno.set("interno_id", str(porta.get_meta("interno_id", "")))
+	padre.add_child(interno)
+	interno.connect("uscita", _su_uscita_edificio)
+	_interno_attivo = interno
+	player.global_position = interno.call("punto_spawn")
+	_in_transizione_edificio = false
+
+
+## Segnale dell'interno (a sua volta un body_entered sull'Area2D "Uscita",
+## stesso motivo di sopra): rimanda a _esci_edificio con call_deferred().
+func _su_uscita_edificio() -> void:
+	if _interno_attivo != null:
+		_esci_edificio.call_deferred()
+
+
+## Libera l'interno (era una scena locale, non il mondo persistente),
+## riaccende world_scene, riposiziona il giocatore alla cella della porta
+## da cui si era entrati.
+func _esci_edificio() -> void:
+	if _interno_attivo == null:
+		return
+	var padre: Node = get_parent()
+	var player: Node2D = padre.get_node_or_null("Player") as Node2D if padre != null else null
+	_interno_attivo.queue_free()
+	_interno_attivo = null
+	visible = true
+	process_mode = Node.PROCESS_MODE_INHERIT
+	if _porta_attiva != null:
+		_porta_attiva.set_meta("ignora_prossimo_ingresso", true)
+		if player != null:
+			player.global_position = _porta_attiva.global_position
+	_porta_attiva = null
 
 
 # --- NPC (globali a tutte le regioni, ricostruiti a ogni momento) ---------
