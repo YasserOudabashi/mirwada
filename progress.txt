@@ -11856,3 +11856,69 @@ APERTO: nessuno per questa story.
 
 PROSSIMA STORIA: US-1013 ("Checkpoint dinamico + verifica giocata"),
 priority 15.
+
+---
+
+[2026-09-11] US-1013 — Checkpoint dinamico + verifica giocata
+
+COSA FATTO.
+- tests/test_fase_10_checkpoint.gd (nuovo), stesso schema dei checkpoint
+  di fase 8/9 (liste "vietati" SCOPERTE dai dati, mai scritte a mano):
+  - le 4 regioni oltre a "mirwada" (gia' hardcoded da world_scene.gd::HUB
+    fin dalla fase 6 - l'hub per design, eccezione gia' ammessa dal
+    checkpoint di fase 8);
+  - ogni interno_id referenziato da edifici[] in QUALUNQUE layout,
+    scoperto iterando GameData.get_regions() + GameData.get_layout(rid)
+    per ognuna delle 5 regioni - 9 interni in tutto (le 4 case di
+    Mirwada di US-1010/US-1005B, le 4 capanne dell'avamposto di Valle di
+    US-1011, la torre dell'Archivio di US-1012).
+  0 occorrenze nel motore (res://scripts, res://scripts/pages): conferma
+  che world_scene.gd/interior_scene.gd leggono edifici[]/interno_id in
+  un ciclo generico (_crea_edifici), mai un id specifico scritto a mano
+  - la stessa prova gia' fatta story per story qui raccolta in un solo
+    test comprensivo, come le fasi precedenti.
+- tests/manual/qa_mondo_continuo.gd (nuovo, Xvfb): partita vera (scaffale
+  -> creazione -> mondo):
+  1. cammina attraverso il confine di Marche del Crepuscolo con Input
+     reale - il punto di aggancio e' letto da data/world/corridoi.json
+     (non un numero scritto a mano) - verificato che
+     WorldState.regione_corrente() cambia e che il nodo world_scene resta
+     lo STESSO (stesso instance_id, mai liberato/ricaricato - US-1002B)
+     senza alcuna change_scene_to_* nel mezzo (solo all'avvio, per
+     main.tscn).
+  2. entra ed esce da una capanna dell'avamposto di Valle (US-1011),
+     Input reale per l'ultimo tratto (stesso principio "salto diretto poi
+     cammina l'ultimo tratto" gia' in uso da qa_vslice_door.gd per non
+     incrociare ostacoli su un tragitto lungo).
+  3. entra ed esce dalla torre d'osservazione dell'Archivio (US-1012),
+     stesso schema.
+  Due bug SCOPERTI SCRIVENDO LO SCRIPT (non del gioco, dello script
+  stesso, corretti prima di dichiarare la story chiusa):
+  - il valore di ritorno di _cammina_verso() non e' affidabile appena
+    scatta un ingresso a meta' ciclo: il target (in coordinate del mondo
+    esterno) smette di avere senso non appena il personaggio e' dentro
+    l'interno (coordinate locali quasi-zero) - stesso avvertimento gia'
+    documentato in qa_vslice_door.gd. Il vero criterio di successo usato
+    e' il cambio di visibilita' di world_scene, non "arrivato".
+  - il primo tentativo di allontanarsi dallo spawn di una capanna prima
+    di rientrare (per far scattare l'uscita, che ignora il primo
+    ingresso per costruzione) spingeva il personaggio OLTRE il muro sud
+    della stanza: un offset di 80px e' troppo per una stanza di sole 8x6
+    celle (192px di altezza interna). Corretto allontanandosi verso
+    l'unica direzione libera (nord, dentro la stanza) invece che verso
+    il muro piu' vicino.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 925 test,
+  tutti passati (923 + 2 nuovi), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- qa_mondo_continuo.gd lanciato con Xvfb: "=== qa_mondo_continuo: TUTTI I
+  PASSI OK ===". 6 screenshot mandati in chat: scaffale dopo la
+  creazione, appena fuori e appena dentro il confine di Marche del
+  Crepuscolo, dentro e fuori la capanna del villaggio, dentro e fuori la
+  torre d'osservazione.
+
+APERTO: nessuno per questa story.
+
+PROSSIMA STORIA: US-1014 ("Chiusura fase 10"), priority 16 - ULTIMA
+story della fase.
