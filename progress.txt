@@ -10810,3 +10810,51 @@ tests/test_player_morte.gd (nuovo).
 PROSSIMA STORIA: nessuna pianificata. In sospeso dall'utente: il secondo
 PRD (Atto II/III, 006_PRD/prd-fase-11-atto-2-3.md) era in scrittura
 quando sono arrivati questi bug report - da riprendere.
+
+---
+
+[2026-09-11] prd.json generato per la fase 10 (Mondo Continuo)
+
+Convertito 006_PRD/prd-fase-10-mondo-continuo.md nel prd.json che ralph
+esegue, con /ralph. Convenzione seguita (uguale a ogni fase precedente,
+vedi 006_PRD/prossimi-passi.md §2): branchName reale del branch corrente
+(claude/mini-trailer-prompt-adq22o, non un ralph/... sintetico), 14 story
+US-1001..US-1014, fase:10 su ognuna, priority 1..14 nell'ordine di
+dipendenza del PRD (blocco 0 motore -> blocco A le 5 regioni -> blocco B
+insediamenti -> blocco C chiusura), criteri di accettazione presi di peso
+dal PRD con in coda la riga di gate standard ("python tools/validate_data.py
+esce 0. Nessuna regressione. Typecheck passes. Tests pass."). Il prd.json
+precedente (fase 9, 7 story tutte passes:true) e' sostituito: progress.txt
+storicizza gia' quel lavoro (blocco [2026-09-10] e precedenti), e' la
+convenzione tra fasi di questo progetto - nessun archivio separato creato.
+
+US-1006..1009 (una story per regione, il PRD le raggruppa come
+"US-1006..US-1009: le altre 4 regioni crescono") sono state scritte come
+4 story distinte e complete (Marche del Crepuscolo, Valle della Madre,
+Archivio Sepolto, Frontiera delle Porte, in quest'ordine - lo stesso di
+data/world/regions.json e di design-world.md §2.2-2.5), ognuna con gli
+stessi criteri di accettazione del PRD applicati alla propria regione,
+cosi' ogni iterazione di ralph resta focalizzata su un solo file di
+layout invece di doverne toccare 4 in una story sola.
+
+Nota riportata dal PRD, non ancora decisa: la topologia (hub-and-spoke
+attraverso Mirwada, come oggi, vs connessioni dirette tra le 4 regioni
+esterne) e' segnata come "da confermare con l'utente prima di iniziare
+US-1001" (§9 del PRD). Non e' stata posta esplicitamente in questa
+sessione: US-1001 e' scritta assumendo il default proposto dal PRD
+(restare hub-and-spoke), coerente col non-goal esplicito "connessioni
+dirette" del PRD stesso (§5). Se l'utente la vuole diversa va corretta
+prima di lanciare ralph su US-1001, non dopo.
+
+Verificato: python3 -c "json.load(open('prd.json'))" -> branchName
+corretto, 14 story (US-1001..US-1014), fase==10 su tutte, passes==False
+su tutte, priority 1..14 senza buchi ne' duplicati. python tools/
+validate_data.py: 0 errori, 2 warning (invariati, gli stessi di sempre -
+prd.json non e' letto dal validator, controllo di non aver rotto nulla
+nei dati mentre ero nella cartella).
+
+PROSSIMA STORIA: US-1001 (coordinate di mondo per le 5 regioni) - prima
+story del ciclo ralph per la fase 10. Da eseguire con
+`bash ~/.claude/skills/ralph.sh 14 --fase 10 --test-cmd "godot --headless --script tests/run_tests.gd"`
+in locale (Docker Desktop attivo) o una story per sessione Claude Code,
+come da 006_PRD/prossimi-passi.md §2/§3.
