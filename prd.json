@@ -83,8 +83,8 @@
       ],
       "priority": 5,
       "fase": 10,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Story di verifica, zero righe di codice motore toccate. game_state.gd::_snapshot()/applica() salvano/ripristinano gia' Node2D.global_position del player cosi' com'era da sempre - da US-1002 in poi world_scene.gd e' un unico TileMapLayer condiviso con coordinate assolute (world_offset per regione), quindi 'posizione' nel save resta una posizione assoluta, e' solo relativa a un mondo piu' grande. Nessun campo nuovo. WorldState._regione (gia' salvato in mondo.regione da _mondo_snapshot(), US-602) resta la fonte di verita' per la regione corrente, aggiornata dal confine fisico di world_scene.gd invece che dal vecchio passaggio puntuale. schema_version invariato: 23. tests/test_save_system.gd: nuovo test_round_trip_posizione_nel_mondo_continuo - player a un punto lontano dentro Marche del Crepuscolo, WorldState.entra_regione, salva_rapido/carica_rapido - il player riappare esattamente allo stesso punto, regione_corrente() torna quella salvata. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 909 test, tutti passati (908 + 1 nuovo), nessuna regressione; python tools/validate_data.py -> 0 errori, 2 warning (invariati). Dettagli in progress.txt."
     },
     {
       "id": "US-1005",

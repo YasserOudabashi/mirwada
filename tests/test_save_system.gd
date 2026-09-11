@@ -131,6 +131,57 @@ func test_gamestate_round_trip_col_giocatore() -> void:
 	s.cancella(slot)
 
 
+## US-1004 (fase 10, mondo continuo): "posizione" resta Node2D.global_position
+## cosi' com'e' dal round-trip di sempre (test_round_trip sopra) - nessun
+## campo nuovo, nessun bump di schema_version. Cambia solo COSA significano
+## i numeri: da US-1002 in poi sono una posizione ASSOLUTA nell'unico
+## TileMapLayer condiviso, non piu' locale a una scena per regione. Qui si
+## prova il caso che lo dimostra: si salva a meta' di Marche del Crepuscolo
+## (world_offset [0,0], lontano dalla cella di spawn di Mirwada [220,180]),
+## si sposta il player altrove, si ricarica - riappare ESATTAMENTE li'.
+## WorldState.regione_corrente() (gia' salvato da _mondo_snapshot(), US-602)
+## resta la fonte di verita' per la regione, aggiornata dal confine di
+## world_scene.gd (US-1002), non da un campo derivato dalla posizione.
+func test_round_trip_posizione_nel_mondo_continuo() -> void:
+	var gs: Node = Engine.get_main_loop().root.get_node_or_null("GameState")
+	var ws: Node = Engine.get_main_loop().root.get_node_or_null("WorldState")
+	var s: Node = _save()
+	if gs == null or ws == null:
+		assert_true(false, "autoload GameState/WorldState assente")
+		return
+
+	var player := Node2D.new()
+	player.name = "Player"
+	player.add_to_group("player")
+	Engine.get_main_loop().root.add_child(player)
+
+	var punto_lontano := Vector2(600, 700)  # dentro Marche, lontano dallo spawn di Mirwada
+	player.global_position = punto_lontano
+	ws.call("pulisci")
+	ws.call("entra_regione", "marche_crepuscolo")
+
+	var slot: int = gs.SLOT_RAPIDO
+	if s.esiste(slot):
+		s.cancella(slot)
+	var r: Dictionary = gs.salva_rapido()
+	assert_true(r["ok"], "salva_rapido ok")
+
+	# si "perde" la posizione/regione corrente prima di ricaricare, cosi' il
+	# round-trip prova davvero qualcosa (non solo che i valori non cambiano).
+	player.global_position = Vector2.ZERO
+	ws.call("pulisci")
+
+	var c: Dictionary = gs.carica_rapido()
+	assert_true(c["ok"], "carica_rapido ok")
+	assert_eq(player.global_position, punto_lontano,
+		"il personaggio riappare ESATTAMENTE nello stesso punto del mondo continuo")
+	assert_eq(str(ws.call("regione_corrente")), "marche_crepuscolo",
+		"WorldState.regione_corrente() torna quella salvata - nessun campo nuovo")
+
+	player.free()
+	s.cancella(slot)
+
+
 func test_slot_vuoto() -> void:
 	var s: Node = _save()
 	_pulisci()
