@@ -443,22 +443,63 @@ Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 
 ---
 
-## Fase 10 — Mondo Continuo
+## Fase 10 — Mondo Continuo — CHIUSA (16 story, 925 test)
 
 > **PRD**: `006_PRD/prd-fase-10-mondo-continuo.md` (generato il
-> 2026-09-10, 14 story `US-1001..US-1014`). **PIANIFICATA**, non ancora
-> eseguita.
-
-Oggi il mondo sono 5 scene separate (`region_scene.gd`), collegate da
-`passaggi` che ricaricano l'intera scena: un salto, non un cammino. La
-fase 10 fa due cose: (1) le 5 regioni diventano zone di un'unica mappa
-continua condivisa (`world_offset` per regione, zero caricamenti di scena
-tra loro, il gating di `AreaGate` diventa una barriera fisica sul confine
-invece che un rifiuto di caricamento); (2) contenuto vero — almeno un
-villaggio e una struttura grande (palazzo/torre/cripta a più stanze) con
-interni visitabili (scena separata e piccola, stessa tecnica di oggi
-applicata agli edifici invece che alle regioni). Nessuna primitiva/evento
-nuovo; nessun bump di `schema_version` se possibile.
+> 2026-09-10, 14 story `US-1001..US-1014`; spezzate in corsa in
+> `US-1002B` — collegare il motore a `main.tscn` e ritirare
+> `region_scene.gd` — e `US-1005B` — i 3 edifici visitabili di Mirwada
+> promessi dall'AC originale di US-1005 — segnalato invece di tirare
+> dritto, come richiede CLAUDE.md sulle story troppo grandi).
+>
+> Prima di questa fase il mondo erano 5 scene separate
+> (`region_scene.gd`), collegate da `passaggi` che ricaricavano l'intera
+> scena: un salto, non un cammino. Ogni regione era inoltre un rettangolo
+> quasi vuoto senza edifici né villaggi.
+>
+> **Cosa ha fatto la fase 10**: le 5 regioni sono diventate zone di
+> un'unica griglia condivisa dipinta in una sola TileMapLayer persistente
+> (`world_scene.gd`, nuovo, sostituisce `region_scene.gd` — ritirato
+> insieme alle 5 `scenes/regioni/*.tscn`, US-1002B) — zero caricamenti di
+> scena tra regioni, il gating diventa una barriera fisica sul confine
+> invece che un rifiuto di caricamento (provato per la prima volta in
+> US-1009, il meccanismo generico esisteva già). Più contenuto vero: le 5
+> regioni sono cresciute con location_tags fisicamente distinti (non più
+> rettangoli a griglia automatica), un motore data-driven per gli edifici
+> visitabili (`edifici: [{x,y,interno_id}]` su un layout, un interno è un
+> layout come un altro, US-1010) ha dato vita ai primi 3 edifici di
+> Mirwada (US-1005B), al primo villaggio vero (US-1011: l'avamposto della
+> sorgente in Valle della Madre, 4 capanne) e alla prima struttura grande
+> (US-1012: la torre d'osservazione dell'Archivio Sepolto, un interno a 3
+> stanze collegate nella stessa mappa, nessuna catena di caricamenti).
+> Nessuna primitiva/evento nuovo. Save `schema_version` **invariato, 23**
+> (US-1004: la posizione nel mondo continuo era già assoluta, nessun
+> campo nuovo serviva).
+>
+> **Cosa contiene**:
+> - Blocco 0 (fondamenta): `world_offset` per regione (US-1001, Mirwada
+>   al centro di un anello con le 4 regioni esterne ai quattro angoli) +
+>   il motore del mondo continuo provato in isolamento (US-1002) prima di
+>   collegarlo davvero a `main.tscn` (US-1002B).
+> - Blocco A (prestazioni + save): nemici/NPC fuori da un raggio dal
+>   giocatore si disattivano (`process_mode`, US-1003); il save resta
+>   invariato (US-1004).
+> - Blocco B (contenuto): le 5 regioni crescono una a una con location_tags
+>   fisicamente distinti e i corridoi che le collegano (US-1005..1009,
+>   Mirwada → Marche → Valle → Archivio → Frontiera, un anello di 8
+>   corridoi in tutto); il vocabolario di un insediamento (US-1010) + i 3
+>   edifici di Mirwada (US-1005B) + il primo villaggio (US-1011) + la
+>   prima struttura grande (US-1012).
+> - Blocco C: checkpoint dinamico (`tests/test_fase_10_checkpoint.gd`,
+>   lista vietata scoperta dai dati: le 4 regioni oltre a "mirwada" +
+>   i 9 interni esistenti) + verifica giocata
+>   (`tests/manual/qa_mondo_continuo.gd`, Xvfb) + chiusura.
+> - **Verdetto (US-1013)**: una partita vera attraversa il confine di una
+>   regione con Input reale senza alcuna `change_scene_to_*` (solo
+>   all'avvio, per `main.tscn`) — lo stesso nodo `world_scene`, mai
+>   liberato/ricaricato — entra ed esce da una capanna del villaggio e
+>   dalla torre d'osservazione, con zero righe di codice che nominino una
+>   regione o un interno specifico.
 
 ---
 

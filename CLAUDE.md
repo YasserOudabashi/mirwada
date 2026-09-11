@@ -281,12 +281,40 @@ progressione intero, non solo contenuto) sono motori/contenuto completi
 con **zero righe di codice dedicate**. È il modello da imitare per ogni
 story di dati.
 
-Fase 10 — Mondo Continuo (mappa vera, niente più salti tra quadrati):
-**PIANIFICATA**. PRD in `006_PRD/prd-fase-10-mondo-continuo.md`. Le 5
-regioni diventano un'unica mappa continua (zero caricamenti di scena tra
-loro, il gating diventa una barriera fisica invece che un rifiuto di
-caricamento), più villaggi e strutture grandi con interni visitabili
-(scena separata, come oggi). Nessuna primitiva/evento nuovo.
+Fase 10 — Mondo Continuo: **CHIUSA** (16 story US-1001..US-1014 +
+US-1002B/US-1005B, 925 test). PRD in
+`006_PRD/prd-fase-10-mondo-continuo.md`. Le 5 regioni, prima 5 scene
+isolate con un salto ad ogni passaggio, sono diventate un'unica griglia
+condivisa dipinta in una sola TileMapLayer persistente (`world_scene.gd`,
+sostituisce `region_scene.gd` — ritirato insieme alle 5 `scenes/regioni/
+*.tscn`, US-1002B): `world_offset` per regione (US-1001) dispone Mirwada
+al centro di un anello con le 4 regioni esterne ai quattro angoli, 8
+corridoi disegnati a mano collegano ogni coppia adiacente (US-1002/1006/
+1007/1008/1009), il gating d'ingresso diventa per la prima volta una
+barriera fisica vera invece di un rifiuto di caricamento (US-1009,
+Frontiera delle Porte — il meccanismo generico esisteva gia', bastava
+provarlo). Prestazioni: nemici/NPC fuori da un raggio dal giocatore si
+disattivano (US-1003, `process_mode`). Il save resta invariato,
+`schema_version` **23** (US-1004, la posizione nel mondo e' gia'
+assoluta). Le 5 regioni sono cresciute con location_tags fisicamente
+distinti, non piu' rettangoli a griglia automatica (US-1005/1006/1007/
+1008/1009), e un nuovo motore data-driven per gli edifici visitabili
+(US-1010: `edifici: [{x,y,interno_id}]` su un layout, un interno e' un
+layout come un altro, nessuna nuova voce in `location_tags.json` — un
+edificio non e' legato a un location_tag, decisione dichiarata
+esplicitamente ogni volta) ha dato vita ai primi 3 edifici di Mirwada
+(US-1005B), al primo villaggio vero (US-1011: l'avamposto della sorgente
+in Valle della Madre, 4 capanne) e alla prima struttura grande (US-1012:
+la torre d'osservazione dell'Archivio Sepolto, un interno a 3 stanze
+collegate nella stessa mappa, nessuna catena di caricamenti). **Verdetto
+del checkpoint (US-1013)**: `test_fase_10_checkpoint.gd` prova che zero
+righe di codice del motore nominano una regione (oltre a `"mirwada"`,
+l'hub per design fin dalla fase 6) o uno dei 9 interni esistenti — lista
+scoperta dai dati, non scritta a mano; `tests/manual/qa_mondo_continuo.gd`
+gioca la partita vera con Xvfb: cammina attraverso un confine di regione
+con Input reale senza alcuna `change_scene_to_*` (solo all'avvio), entra
+ed esce dal villaggio e dalla struttura grande. Nessuna primitiva/evento
+nuovo.
 
 Fase 11 — Atto II e Atto III (le regioni che si aprono, la soglia):
 **PIANIFICATA**, eseguita dopo la fase 10. PRD in

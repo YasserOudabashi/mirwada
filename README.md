@@ -147,6 +147,30 @@ insieme e lo riceve dalla pagina diagramma vera (`Progression.sequence()`
 Sequenza/abilità (`tests/test_fase_9_checkpoint.gd`, lista vietata letta
 dai dati).
 
+**Fase 10 — Mondo Continuo: chiusa.** 16 story, 925 test. Le fasi 1-9
+avevano 5 regioni come 5 scene isolate, un salto ad ogni passaggio, e
+quasi vuote di contenuto. La fase 10 le fonde in un'unica griglia
+condivisa dipinta in una sola TileMapLayer persistente (`world_scene.gd`
+sostituisce `region_scene.gd`): `world_offset` per regione dispone
+Mirwada al centro di un anello con le 4 regioni esterne ai quattro
+angoli, 8 corridoi disegnati a mano collegano ogni coppia adiacente, il
+gating d'ingresso diventa per la prima volta una barriera fisica vera
+invece di un rifiuto di caricamento. Le 5 regioni crescono con
+location_tags fisicamente distinti (non più rettangoli a griglia
+automatica), e un motore data-driven per gli edifici visitabili
+(`edifici: [{x,y,interno_id}]` su un layout, un interno è un layout come
+un altro) dà vita ai primi edifici di Mirwada, al primo villaggio vero
+(l'avamposto della sorgente in Valle della Madre, 4 capanne) e alla prima
+struttura grande (la torre d'osservazione dell'Archivio Sepolto, un
+interno a 3 stanze nella stessa mappa). **Zero primitive/eventi nuovi**,
+save invariato (`schema_version` 23). Verdetto: `tests/manual/
+qa_mondo_continuo.gd` gioca la partita vera con Xvfb — attraversa un
+confine di regione con Input reale senza alcuna `change_scene_to_*`, entra
+ed esce dal villaggio e dalla struttura grande — con zero righe di codice
+che nominino una regione (oltre a "mirwada", l'hub per design) o un
+interno specifico (`tests/test_fase_10_checkpoint.gd`, lista vietata
+letta dai dati).
+
 ## Setup
 
 Richiede Godot 4.x e Python 3 (solo per gli strumenti di dati).

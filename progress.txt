@@ -11922,3 +11922,71 @@ APERTO: nessuno per questa story.
 
 PROSSIMA STORIA: US-1014 ("Chiusura fase 10"), priority 16 - ULTIMA
 story della fase.
+
+---
+
+[2026-09-11] US-1014 — Chiusura fase 10
+
+COSA FATTO.
+- tools/validate_data.py: nuovo blocco "chiusura fase 10" (dopo il blocco
+  di chiusura fase 9, stesso stile - il criterio di chiusura, non una
+  riscrittura delle validazioni gia' dettagliate nei blocchi US-1001/
+  US-1010 piu' sopra):
+  - ogni regione ha un world_offset valido (5 regioni attese);
+  - almeno una regione ha un villaggio vero (>=3 edifici collegati -
+    Valle della Madre ne ha 4, US-1011);
+  - almeno un interno di edificio e' una struttura grande (area della
+    mappa >=200 celle, ben oltre le 48 celle di una singola stanza del
+    villaggio - la torre dell'Archivio ne ha 297, US-1012).
+  Verificato che il blocco intercetti davvero un'assenza (non solo che
+  non dia mai errore per caso): troncati temporaneamente gli edifici sia
+  di Mirwada sia di Valle sotto 3 a testa (Mirwada da sola ne ha gia' 4
+  dalla US-1005B, serviva toccare ENTRAMBE le regioni per far mancare
+  davvero un villaggio - scoperto proprio provando a rompere solo Valle,
+  che non bastava) - errore atteso ottenuto; troncata la mappa della
+  torre a 6 righe - errore atteso ottenuto (piu' un errore collaterale
+  atteso sul bordo, la mappa troncata non e' piu' rettangolare); tutti e
+  3 i file ripristinati subito dopo, git diff pulito confermato.
+- CLAUDE.md (sezione Fasi): paragrafo Fase 10 riscritto da PIANIFICATA a
+  CHIUSA, stesso stile delle fasi precedenti (16 story, 925 test, blocchi
+  0/A/B/C, verdetto del checkpoint US-1013).
+- README.md: nuovo paragrafo Fase 10 dopo quello della Fase 9 (il file si
+  fermava alla fase 9, mancava del tutto).
+- 006_PRD/roadmap.md: sezione Fase 10 riscritta da "PIANIFICATA, non
+  ancora eseguita" a CHIUSA con blocchi e verdetto, stesso schema della
+  sezione Fase 9 sopra di essa - inclusa la nota sulle 2 story spezzate
+  in corsa (US-1002B, US-1005B) segnalate invece di tirare dritto, come
+  richiede CLAUDE.md sulle story troppo grandi.
+- prd.json: tutte le 16 story (US-1001..US-1014 + US-1002B/US-1005B) a
+  passes:true con note compilate.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 925 test,
+  tutti passati, nessuna regressione (nessun test nuovo per questa story
+  - solo dati/documentazione - ma la suite intera rilanciata comunque
+  per sicurezza).
+- python tools/validate_data.py: 0 errori, 2 warning (invariati); il
+  nuovo blocco di chiusura verificato attivo per davvero (vedi sopra).
+
+APERTO: nessuno per questa story.
+
+===============================================================================
+FASE 10 — MONDO CONTINUO: CHIUSA (16 story, 925 test).
+===============================================================================
+
+Le 5 regioni, prima 5 scene isolate con un salto ad ogni passaggio, sono
+un'unica griglia condivisa dipinta in una sola TileMapLayer persistente.
+world_offset dispone Mirwada al centro di un anello con le 4 regioni
+esterne ai quattro angoli, 8 corridoi disegnati a mano collegano ogni
+coppia adiacente, il gating d'ingresso e' per la prima volta una barriera
+fisica vera. Le 5 regioni sono cresciute con location_tags fisicamente
+distinti; un motore data-driven per gli edifici visitabili ha dato vita
+ai primi 3 edifici di Mirwada, al primo villaggio vero (l'avamposto della
+sorgente in Valle della Madre) e alla prima struttura grande (la torre
+d'osservazione dell'Archivio Sepolto). Nessuna primitiva/evento nuovo,
+save invariato (schema_version 23).
+
+PROSSIMA FASE: Fase 11 — Atto II e Atto III (le regioni che si aprono, la
+soglia). PRD in 006_PRD/prd-fase-11-atto-2-3.md - da generare con /prd
+quando si decide di iniziarla (CLAUDE.md: il PRD di ogni fase si scrive
+solo a fase precedente chiusa, mai prima).

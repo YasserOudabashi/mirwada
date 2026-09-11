@@ -2746,6 +2746,49 @@ def main():
         err("data/abilities/eternal_aeon.json: mancante (US-904/905: le abilita' di "
             "Eternal Aeon devono esistere con la fase 9 chiusa).")
 
+    # --- chiusura fase 10 (US-1014): il mondo continuo esiste, con un
+    # villaggio e una struttura grande veri ---
+    # La validazione PIENA di world_offset/corridoi/edifici/interni e' gia'
+    # nei blocchi dedicati piu' sopra (US-1001/1002/1010): qui solo il
+    # criterio di chiusura, stesso stile delle fasi precedenti.
+    _regioni_doc = load_json(os.path.join(DATA, "world", "regions.json")) or {}
+    _regioni_fase10 = _regioni_doc.get("regions", [])
+    if len(_regioni_fase10) != 5:
+        err(f"data/world/regions.json: {len(_regioni_fase10)} regioni, attese 5 (fase 10 chiusa).")
+    for _reg in _regioni_fase10:
+        _rid10 = _reg.get("id", "?")
+        if len(_reg.get("world_offset", [])) != 2:
+            err(f"data/world/regions.json [{_rid10}]: world_offset mancante o malformato "
+                f"(fase 10 chiusa: ogni regione deve stare nella griglia condivisa, US-1001).")
+
+    _villaggio_trovato = False
+    _struttura_grande_trovata = False
+    for _rid10 in ["mirwada", "marche_crepuscolo", "valle_madre", "archivio_sepolto", "frontiera_porte"]:
+        _lay10_path = os.path.join(layouts_dir, f"{_rid10}.json")
+        if not os.path.exists(_lay10_path):
+            continue
+        _lay10 = load_json(_lay10_path) or {}
+        _edifici10 = _lay10.get("edifici", [])
+        if len(_edifici10) >= 3:
+            _villaggio_trovato = True
+        for _ed in _edifici10:
+            _iid10 = _ed.get("interno_id", "")
+            _int10_path = os.path.join(interni_dir, f"{_iid10}.json")
+            if not os.path.exists(_int10_path):
+                continue
+            _int10 = load_json(_int10_path) or {}
+            _mappa10 = _int10.get("mappa", [])
+            _area10 = len(_mappa10) * (len(_mappa10[0]) if _mappa10 else 0)
+            if _area10 >= 200:
+                _struttura_grande_trovata = True
+    if not _villaggio_trovato:
+        err("fase 10 chiusa: nessuna regione ha almeno 3 edifici collegati (US-1011, "
+            "'il primo villaggio vero') - atteso almeno un insediamento con piu' case.")
+    if not _struttura_grande_trovata:
+        err("fase 10 chiusa: nessun interno di edificio ha un'area di almeno 200 celle "
+            "(US-1012, 'la prima struttura grande') - atteso un interno a piu' stanze, "
+            "non solo una singola stanza come le case di un villaggio.")
+
     report()
     return 1 if errors else 0
 
