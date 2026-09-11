@@ -11797,3 +11797,62 @@ APERTO: nessuno per questa story.
 
 PROSSIMA STORIA: US-1012 ("La prima struttura grande - palazzo/torre/cripta
 a piu' stanze"), priority 14.
+
+---
+
+[2026-09-11] US-1012 — La prima struttura grande (torre d'osservazione dell'Archivio Sepolto)
+
+COSA FATTO.
+- data/world/layouts/archivio_sepolto.json: prima struttura visitabile di
+  questa regione. edifici (era []) ora ha una voce che punta alla torre
+  d'osservazione, con la porta piazzata dentro il rettangolo GIA' esistente
+  della zona "torre_di_osservazione" ([41,3,27,17]), su una cella libera
+  verificata non occupata da nessun nemico/oggetto esistente della regione.
+  Candidato scelto fra quelli suggeriti dall'AC (torre dell'Archivio o
+  tempio delle Marche), coerente con design-world.md 2.4: "torri (Hermit:
+  costellazioni)".
+- Decisione dichiarata esplicitamente (come richiede l'AC): NESSUNA nuova
+  voce nel vocabolario chiuso data/schema/location_tags.json era
+  necessaria - stessa motivazione di US-1010/US-1005B/US-1011: un edificio
+  non e' legato a un location_tag, vive come marcatore [x,y,interno_id]
+  indipendente. La torre sta semplicemente dentro la zona gia' esistente.
+- data/world/interni/archivio_torre_osservazione.json (nuovo): a differenza
+  delle case del villaggio (una stanza sola), questo e' un interno a 3
+  STANZE - il basamento della torre (dove si entra), la sala dei libri
+  astrali, l'osservatorio in cima - collegate da 2 corridoi nella STESSA
+  mappa/file. interior_scene.gd non ha bisogno di sapere nulla di "stanze":
+  disegna semplicemente un layout piu' grande del solito (27x11 invece di
+  8x6), zero codice nuovo, zero catena di caricamenti aggiuntivi - proprio
+  come richiede l'AC ("non un'altra catena di caricamenti").
+- Contenuto reale nell'ultima sala (l'osservatorio, non uno stub vuoto):
+  un nemico (Sequenza 7, un guardiano della torre, override vuoto - nessun
+  boss necessario per questa story) E un oggetto significativo,
+  mappa_delle_costellazioni_perdute (nuovo item in
+  data/items/ingredienti.json, categoria "ingrediente", tag "divinazione"
+  dal vocabolario chiuso esistente - coerente col tema astronomico/Hermit
+  della torre). tools/generate_i18n_stubs.py rilanciato per la chiave
+  i18n del nuovo item, 0 TODO residui.
+- tests/test_world_scene.gd::test_torre_di_osservazione_ha_una_porta_e_un_interno_a_3_stanze:
+  verifica che la porta esista in scena, che l'interno risolva a un
+  layout vero, che le celle delle 3 sale E dei 2 corridoi (tutti sulla
+  stessa riga y=5 del file, la prova diretta che sono davvero collegate
+  nella stessa mappa e non richiedono un'altra scena) siano calpestabili,
+  e che almeno una sala contenga un nemico o un oggetto reale. Zero righe
+  di codice nuove in scripts/.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 923 test,
+  tutti passati (922 + 1 nuovo), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat): cammino REALE (Input reale, fisica vera) attraverso
+  tutte e 3 le sale in un'unica sessione di interior_scene (nessun
+  caricamento intermedio) - il guardiano dell'osservatorio ha colpito per
+  davvero il personaggio (Salute scesa da 100 a 80 fra il secondo e il
+  terzo screenshot), l'oggetto significativo e' visibile a terra nella
+  stessa sala.
+
+APERTO: nessuno per questa story.
+
+PROSSIMA STORIA: US-1013 ("Checkpoint dinamico + verifica giocata"),
+priority 15.

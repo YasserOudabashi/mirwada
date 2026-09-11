@@ -4222,6 +4222,19 @@
       ],
       "impilabile": false,
       "valore": 3
+    },
+    {
+      "id": "mappa_delle_costellazioni_perdute",
+      "categoria": "ingrediente",
+      "name_i18n": "item.mappa_delle_costellazioni_perdute",
+      "descrizione_i18n": "item.mappa_delle_costellazioni_perdute.desc",
+      "name": "Mappa delle costellazioni perdute",
+      "descrizione": "Disegnata dall'osservatorio della torre, prima che qualcosa cambiasse il cielo per sempre.",
+      "tag": [
+        "divinazione"
+      ],
+      "impilabile": false,
+      "valore": 5
     }
   ]
 }

@@ -674,3 +674,44 @@ func test_si_entra_ed_esce_da_almeno_2_capanne_dell_avamposto() -> void:
 			"il player torna alla porta di '%s' uscendo" % iid)
 
 	cont.free()
+
+
+## US-1012 (fase 10, "la prima struttura grande"): la torre d'osservazione
+## dell'Archivio Sepolto - stesso motore di edificio di US-1010, ma
+## l'interno referenziato (data/world/interni/archivio_torre_osservazione.
+## json) e' un layout a 3 stanze collegate da corridoi NELLA STESSA mappa
+## (nessuna catena di caricamenti aggiuntivi: interior_scene.gd non sa
+## nulla di "stanze", disegna semplicemente un layout piu' grande del
+## solito). Nessuna nuova voce in location_tags.json e' servita: la torre
+## vive dentro il rettangolo gia' esistente della zona
+## "torre_di_osservazione" (data/world/layouts/archivio_sepolto.json.zone),
+## stessa decisione di US-1010/US-1005B/US-1011.
+func test_torre_di_osservazione_ha_una_porta_e_un_interno_a_3_stanze() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var cont: Node2D = r["cont"]
+	var mondo: Node = r["mondo"]
+	var gd: Node = _gd()
+
+	var porta: Area2D = _porta_per_interno(mondo, "archivio_torre_osservazione")
+	assert_false(porta == null, "la porta della torre esiste in scena")
+
+	var interno: Dictionary = gd.call("get_interno", "archivio_torre_osservazione")
+	assert_false(interno.is_empty(), "l'interno della torre risolve a un layout vero")
+	if interno.is_empty():
+		cont.free()
+		return
+
+	var mappa: Array = (interno.get("mappa", []) as Array)
+	# le 3 sale (basamento, biblioteca astrale, osservatorio) e i 2 corridoi
+	# che le collegano, tutti sulla riga y=5 dello stesso file - nessuna
+	# porta esterna aggiuntiva, nessun'altra scena da caricare.
+	for x in [3, 8, 13, 17, 22]:
+		var riga: String = str(mappa[5])
+		assert_eq(riga[x], ".", "cella (%d,5) calpestabile: le 3 sale sono collegate nella stessa mappa" % x)
+
+	var nemici: Array = (interno.get("nemici", []) as Array)
+	var oggetti: Array = (interno.get("oggetti", []) as Array)
+	assert_true(nemici.size() > 0 or oggetti.size() > 0,
+		"contenuto reale in almeno una sala (nemico o oggetto, non uno stub vuoto)")
+
+	cont.free()
