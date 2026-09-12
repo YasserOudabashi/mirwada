@@ -503,10 +503,48 @@ Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 
 ---
 
-## Fase 11 — Atto II e Atto III
+## Fase 11 — Villaggi ed Economia — CHIUSA (15 story, 942 test)
 
-> **PRD**: `006_PRD/prd-fase-11-atto-2-3.md` (generato il 2026-09-10, 13
-> story `US-1101..US-1113`). **PIANIFICATA**, eseguita dopo la fase 10.
+> **PRD**: `006_PRD/prd-fase-11-villaggi-ed-economia.md` (generato il
+> 2026-09-12, 15 story `US-1101..US-1114` con lo split US-1108/US-1108B).
+
+Aggiunta a metà fase 10, su richiesta esplicita dell'utente ("villaggi,
+fabbri creatori di pozioni, oggetti rari, un mondo grande da esplorare
+come un Pokémon 2D"): il "mondo continuo" aveva 5 regioni ma nessuna
+economia viva, nessun oggetto raro, e gli NPC di una zona affollata si
+accalcavano su una riga. 5 blocchi: A rarità (`data/schema/
+item_rarity.json`, 4 livelli, retrofit su tutti i 351 oggetti esistenti,
+scala prezzo di vendita e peso del drop), B crafting NPC (7° effetto di
+dialogo `crea_su_richiesta` + segnale `apri_creazione` in
+`dialogue_engine.gd`/`page_dialogo.gd`, `Forge.forgia`/`PotionSystem.
+prepara` con bypass `ignora_scoperta` — un NPC "conosce il suo mestiere"
+a prescindere da cosa ha scoperto il giocatore — Rosalba ed Bram i primi
+due crafter reali, 6 oggetti/3 blueprint/3 ricette nuovi), C due villaggi
+nella campagna (nuovo campo `campagna.json.edifici[]` + `world_scene.gd::
+_disegna_capanne_campagna`, un template fisso 5x4 che dipinge pareti
+vere dove prima c'era solo terreno procedurale: Marche del Crepuscolo con
+Fenwick/Greta, Archivio Sepolto con Orsolya/Dario e un oggetto
+leggendario — Ambrosia — venduto a un prezzo visibilmente più alto), D
+piazzamento NPC a griglia (`_crea_npc_regione` riscritta: una griglia che
+usa il 70% dell'area reale della zona invece di un'unica riga a distanza
+fissa), E chiusura. Nessuna primitiva/evento/tag nuovo: solo un campo
+`rarita` sugli oggetti, un effetto di dialogo, un campo `crafter` sugli
+NPC e un campo `edifici` su campagna.json.
+
+**Verdetto (US-1114)**: `tests/test_fase_11_checkpoint.gd` prova che zero
+righe di codice del motore nominano un NPC, un villaggio, un blueprint o
+una ricetta specifici — lista vietata scoperta da `GameData.get_npcs()` +
+`GameData.get_campagna().edifici` + `GameData.blueprint_ids()`/
+`recipe_ids()`, non scritta a mano.
+
+---
+
+## Fase 12 — Atto II e Atto III
+
+> **PRD**: `006_PRD/prd-fase-12-atto-2-3.md` (generato il 2026-09-10, 13
+> story `US-1201..US-1213` — rinumerate da `US-1101..US-1113` quando la
+> fase 11 vera è diventata "Villaggi ed Economia", vedi sopra).
+> **PIANIFICATA**, eseguita dopo la fase 11.
 
 I motori di Atto II (Seq 6-4) e Atto III (Seq 3-1) esistono già dalla fase
 7: `TribulationSystem` (le 4 prove ai salti di fascia), il rituale di
@@ -517,14 +555,14 @@ manca è il contenuto narrativo intorno: solo 4 quest esistono in tutto il
 gioco (tutte di Atto I), 3 delle 4 tribolazioni hanno solo un contatore
 anonimo o un'unica riga di dialogo, e la prova finale (`trib_1_0`) non ha
 nessuna fonte che scriva il suo flag di superamento — verificato leggendo
-i dati prima di scrivere il PRD, non presunto. La fase 11 scrive quel
+i dati prima di scrivere il PRD, non presunto. La fase 12 scrive quel
 contenuto riusando solo motori esistenti (`QuestSystem`, `DialogueEngine`,
 `FactionSystem`): nessun verbo/evento/condizione/effetto nuovo. Gli
 epiloghi di finale (fase 7) sono già scritti e buoni, fuori scope.
 
 ---
 
-## Fase 12 — Opzionale
+## Fase 13 — Opzionale
 
 Altri Pathway Non-Standard (Chaos Primogenitor, Scrooge, Dreamless e gli
 altri bestowers), stesso schema di Eternal Aeon (fase 9: motore Boon già

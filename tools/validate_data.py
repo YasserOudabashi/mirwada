@@ -2849,6 +2849,61 @@ def main():
             "(US-1012, 'la prima struttura grande') - atteso un interno a piu' stanze, "
             "non solo una singola stanza come le case di un villaggio.")
 
+    # --- chiusura fase 11 (US-1114): rarita'/crafting NPC/villaggi esistono
+    # e sono coerenti --- La validazione PIENA di ogni pezzo (rarita' in
+    # item.schema.json, crea_su_richiesta in DLG_EFFETTI, campagna.edifici)
+    # e' gia' nei blocchi dedicati piu' sopra: qui solo il criterio di
+    # chiusura, stesso stile delle fasi precedenti.
+    _tutti_gli_edifici_fase11 = []
+    for _fn11 in sorted(os.listdir(layouts_dir)) if os.path.isdir(layouts_dir) else []:
+        if _fn11.endswith(".json"):
+            for _ed11 in (load_json(os.path.join(layouts_dir, _fn11)) or {}).get("edifici", []):
+                _tutti_gli_edifici_fase11.append(_ed11.get("interno_id", ""))
+    for _ed11 in (campagna_doc or {}).get("edifici", []):
+        _tutti_gli_edifici_fase11.append(_ed11.get("interno_id", ""))
+
+    _npc_docs11 = {n.get("id"): n for n in (roster_doc or {}).get("npcs", [])}
+    _crafter_raggiungibili = 0
+    for _fn11 in sorted(os.listdir(interni_dir)) if os.path.isdir(interni_dir) else []:
+        if not _fn11.endswith(".json"):
+            continue
+        _int11 = load_json(os.path.join(interni_dir, _fn11)) or {}
+        _iid11 = _int11.get("interno_id", "")
+        if _iid11 not in _tutti_gli_edifici_fase11:
+            continue
+        for _npc11 in _int11.get("npcs", []):
+            _npc_doc11 = _npc_docs11.get(_npc11.get("npc_id", ""), {})
+            if _npc_doc11.get("crafter"):
+                _crafter_raggiungibili += 1
+    if _crafter_raggiungibili < 4:
+        err(f"fase 11 chiusa: solo {_crafter_raggiungibili} crafter raggiungibili (dentro un "
+            f"interno referenziato da un edifici[], layout o campagna) - attesi almeno 4 "
+            f"(Rosalba, Bram, Fenwick, Orsolya).")
+
+    _oggetti_senza_rarita = []
+    for _fn11 in sorted(os.listdir(os.path.join(DATA, "items"))):
+        if not _fn11.endswith(".json"):
+            continue
+        for _it11 in (load_json(os.path.join(DATA, "items", _fn11)) or {}).get("items", []):
+            if "rarita" not in _it11:
+                _oggetti_senza_rarita.append(_it11.get("id", "?"))
+    if _oggetti_senza_rarita:
+        err(f"fase 11 chiusa: {len(_oggetti_senza_rarita)} oggetti senza 'rarita' esplicita "
+            f"(US-1102, il retrofit deve coprire ogni oggetto): {_oggetti_senza_rarita[:5]}...")
+
+    _crea_su_richiesta_usato = False
+    for _fn11 in sorted(os.listdir(dlg_dir)) if os.path.isdir(dlg_dir) else []:
+        if not _fn11.endswith(".json"):
+            continue
+        for _nodo11 in (load_json(os.path.join(dlg_dir, _fn11)) or {}).get("nodes", {}).values():
+            for _sc11 in _nodo11.get("choices", []):
+                for _ef11 in _sc11.get("effetti", []):
+                    if _ef11.get("tipo") == "crea_su_richiesta":
+                        _crea_su_richiesta_usato = True
+    if not _crea_su_richiesta_usato:
+        err("fase 11 chiusa: nessun dialogo usa l'effetto 'crea_su_richiesta' (US-1106) - "
+            "il 7o effetto di dialogo deve essere usato almeno una volta.")
+
     report()
     return 1 if errors else 0
 

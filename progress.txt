@@ -12727,5 +12727,63 @@ COME VERIFICATO.
 
 APERTO: nessuno per questa story.
 
-PROSSIMA STORIA: US-1114 ("Chiusura fase 11"), priority 15 - ultima
-story della fase.
+PROSSIMA STORIA (chiusa qui sotto): US-1114 ("Chiusura fase 11"),
+priority 15 - ultima story della fase.
+
+FATTO (US-1114) — FASE 11 CHIUSA.
+- 006_PRD/prd-fase-11-atto-2-3.md rinominato in prd-fase-12-atto-2-3.md
+  (`git mv`): contenuto invariato salvo un addendum in cima che spiega
+  la rinumerazione, e tutti i suoi id story rinumerati US-1101..US-1113
+  -> US-1201..US-1213 (altrimenti collidevano con i veri US-1101..1114
+  di questa fase, scritti dopo che quel PRD esisteva gia').
+- 006_PRD/roadmap.md: nuova sezione "Fase 11 - Villaggi ed Economia -
+  CHIUSA (15 story, 942 test)" con il riassunto dei 5 blocchi e il
+  verdetto; la vecchia "Fase 11 - Atto II e Atto III" rinumerata "Fase
+  12" (PRD aggiornato nel testo); "Fase 12 - Opzionale" rinumerata
+  "Fase 13".
+- CLAUDE.md (par. Fasi): stessa struttura - Fase 11 chiusa con il
+  riassunto tecnico completo + verdetto del checkpoint, Fase 12/13
+  rinumerate con la nota sulla rinumerazione delle story.
+- README.md: nuovo paragrafo "Fase 11 - Villaggi ed Economia: chiusa."
+  nello stesso stile delle fasi precedenti.
+- tools/validate_data.py: nuovo blocco "chiusura fase 11" -
+  (1) almeno 4 crafter raggiungibili (dentro un interno referenziato da
+  un edifici[] di layout o campagna): trovati esattamente 4 (Rosalba,
+  Bram, Fenwick, Orsolya - Greta e Dario sono mercanti, non crafter,
+  giustamente esclusi); (2) 0 oggetti senza 'rarita' esplicita su tutti
+  gli item.json (il retrofit di US-1102 tenuto); (3) l'effetto
+  'crea_su_richiesta' usato almeno una volta nei dialoghi (trovato in
+  dlg_rosalba/bram/fenwick/orsolya).
+- tests/test_fase_11_checkpoint.gd (nuovo, stesso schema di
+  test_fase_10_checkpoint.gd): lista vietata scoperta da
+  GameData.get_npcs() (ogni id, non solo i nuovi) +
+  GameData.get_campagna().edifici (ogni interno_id di villaggio) +
+  GameData.blueprint_ids()/recipe_ids() (ogni blueprint/ricetta) -
+  verificato che nessuna di queste stringhe compaia in res://scripts o
+  res://scripts/pages fuori dai commenti. 0 colpevoli.
+- prd.json: tutte le 15 story della fase a passes:true con note
+  complete.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 942
+  test, tutti passati (941 + 1 nuovo checkpoint), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati, gli
+  stessi standing warning di sempre: fusioni fase 7b + sinergie dei
+  gruppi differiti).
+- Nessuna verifica Xvfb richiesta per questa story (documentazione +
+  checkpoint dinamico, nessuna UI/gameplay nuova - l'AC di US-1114 non
+  la chiede).
+
+APERTO: nessuno. FASE 11 "VILLAGGI ED ECONOMIA" CHIUSA: 15 story
+(US-1101..US-1114 con lo split US-1108/US-1108B), 942 test totali
+(870 test all'inizio della fase 9 -> 884 fine fase 9 -> 925 fine fase
+10 -> 942 fine fase 11). Rarita' su tutti gli oggetti, 4 NPC crafter
+raggiungibili in 2 nuovi villaggi + 2 gia' esistenti in citta'/avamposto,
+piazzamento NPC a griglia. Nessuna primitiva/evento/tag nuovo: solo un
+campo 'rarita' sugli oggetti, un effetto di dialogo (il 7o), un campo
+'crafter' sugli NPC e un campo 'edifici' su campagna.json. Save
+schema_version invariato (23).
+
+PROSSIMA FASE: Fase 12 - Atto II e Atto III (PRD gia' scritto in
+006_PRD/prd-fase-12-atto-2-3.md, story US-1201..US-1213 - da convertire
+in un nuovo prd.json con /ralph quando si decide di iniziarla).

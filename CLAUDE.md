@@ -316,16 +316,59 @@ con Input reale senza alcuna `change_scene_to_*` (solo all'avvio), entra
 ed esce dal villaggio e dalla struttura grande. Nessuna primitiva/evento
 nuovo.
 
-Fase 11 — Atto II e Atto III (le regioni che si aprono, la soglia):
-**PIANIFICATA**, eseguita dopo la fase 10. PRD in
-`006_PRD/prd-fase-11-atto-2-3.md`. I motori di Atto II/III esistono già
-dalla fase 7 (tribolazioni, rituale di Sequenza 1 con Ancora, duello di
-Aldo ai salti di tier) ma sono quasi senza contenuto narrativo intorno:
-questa fase scrive le quest/scene mancanti (fazioni che prendono
-posizione, "Doran sa, Lena capisce, Vesna sceglie") riusando solo motori
-esistenti (`QuestSystem`, `DialogueEngine`, `FactionSystem`).
+Fase 11 — Villaggi ed Economia: **CHIUSA** (15 story US-1101..US-1114 con
+lo split US-1108/US-1108B, 942 test). PRD in
+`006_PRD/prd-fase-11-villaggi-ed-economia.md`. Aggiunta a metà fase 10 su
+richiesta esplicita dell'utente ("villaggi, fabbri creatori di pozioni,
+oggetti rari, un mondo grande da esplorare"): il mondo continuo aveva 5
+regioni ma nessuna economia viva. 5 blocchi: A **rarità**
+(`data/schema/item_rarity.json`, 4 livelli — comune/non_comune/raro/
+leggendario —, retrofit su tutti i 351 oggetti esistenti derivato dalla
+`characteristic_sequence` della formula che li referenzia, scala il
+prezzo di vendita `_prezzo_con_rarita` e il peso del drop
+`_scegli_drop_pesato`), B **crafting NPC** (7° effetto di dialogo
+`crea_su_richiesta` + segnale `apri_creazione` in
+`dialogue_engine.gd`/`page_dialogo.gd` — un NPC crea l'oggetto al posto
+del giocatore, mai testo dinamico da un effetto; `Forge.forgia`/
+`PotionSystem.prepara` guadagnano un parametro opzionale
+`ignora_scoperta`: l'NPC "conosce il suo mestiere" a prescindere da cosa
+il giocatore ha scoperto, il bypass non insegna nulla al giocatore dopo
+— Rosalba a Valle e Bram a Mirwada i primi due crafter reali, poi 6
+oggetti/3 blueprint/3 ricette nuovi), C **due villaggi nella campagna**
+(nuovo campo `campagna.json.edifici[]` + `world_scene.gd::
+_disegna_capanne_campagna`, un template fisso 5x4 generico che dipinge
+pareti vere — campagna.json non ha una mappa ASCII disegnata a mano come
+i layout di regione — dove prima US-1015 aveva lasciato solo terreno
+procedurale: Marche del Crepuscolo con Fenwick/Greta, Archivio Sepolto
+con Orsolya/Dario e Ambrosia, l'unico oggetto leggendario del gioco,
+venduta a un prezzo visibilmente più alto), D **NPC a griglia**
+(`_crea_npc_regione` riscritta: con N>3 in una zona affollata — mezzogiorno
+in piazza a Mirwada, 9 NPC — una griglia che usa il 70% dell'area reale
+della zona invece di un'unica riga a distanza fissa, la distanza minima
+fra due NPC cresce oltre il vecchio valore fisso), E chiusura. Save
+`schema_version` **invariato**: nessuna primitiva/evento/tag nuovo, solo
+un campo `rarita` sugli oggetti, un effetto di dialogo, un campo
+`crafter` sugli NPC e un campo `edifici` su campagna.json.
 
-Fase 12 (opzionale, non pianificata): altri Pathway Non-Standard (Chaos
+**Verdetto (US-1114)**: `tests/test_fase_11_checkpoint.gd` prova che
+zero righe di codice del motore nominano un NPC, un villaggio, un
+blueprint o una ricetta specifici — lista vietata scoperta da
+`GameData.get_npcs()` + `GameData.get_campagna().edifici` +
+`GameData.blueprint_ids()`/`recipe_ids()`, non scritta a mano.
+
+Fase 12 — Atto II e Atto III (le regioni che si aprono, la soglia):
+**PIANIFICATA**, eseguita dopo la fase 11. PRD in
+`006_PRD/prd-fase-12-atto-2-3.md` (le story erano numerate
+US-1101..US-1113 quando questo PRD era ancora "la fase 11": rinumerate
+US-1201..US-1213 quando la fase 11 vera — Villaggi ed Economia — ha preso
+quei numeri). I motori di Atto II/III esistono già dalla fase 7
+(tribolazioni, rituale di Sequenza 1 con Ancora, duello di Aldo ai salti
+di tier) ma sono quasi senza contenuto narrativo intorno: questa fase
+scrive le quest/scene mancanti (fazioni che prendono posizione, "Doran
+sa, Lena capisce, Vesna sceglie") riusando solo motori esistenti
+(`QuestSystem`, `DialogueEngine`, `FactionSystem`).
+
+Fase 13 (opzionale, non pianificata): altri Pathway Non-Standard (Chaos
 Primogenitor, Scrooge, Dreamless, altri bestower), stesso schema di
 Eternal Aeon — il PRD si genera con `/prd` solo quando si decide di
 farla davvero. Roadmap in `006_PRD/roadmap.md`.

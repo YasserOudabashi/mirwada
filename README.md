@@ -171,6 +171,25 @@ che nominino una regione (oltre a "mirwada", l'hub per design) o un
 interno specifico (`tests/test_fase_10_checkpoint.gd`, lista vietata
 letta dai dati).
 
+**Fase 11 — Villaggi ed Economia: chiusa.** 15 story, 942 test. Aggiunta
+su richiesta esplicita dell'utente: il mondo continuo aveva 5 regioni ma
+nessuna economia viva, nessun oggetto raro, e gli NPC di una zona
+affollata si accalcavano su una riga. Un vocabolario chiuso di 4 livelli
+di rarità (comune/non_comune/raro/leggendario, retrofit su tutti i 351
+oggetti esistenti) scala il prezzo di vendita e il peso del drop; un 7°
+effetto di dialogo (`crea_su_richiesta`) apre un NPC che **crea**
+l'oggetto al posto del giocatore (bypassando la scoperta della ricetta/
+blueprint, mai insegnandola) — Rosalba, Bram, Fenwick e Orsolya i primi
+crafter; due nuovi villaggi nella campagna (Marche del Crepuscolo,
+Archivio Sepolto, con un template generico che dipinge pareti vere dove
+prima c'era solo terreno procedurale) vendono un oggetto leggendario a un
+prezzo visibilmente più alto; il piazzamento NPC diventa una griglia che
+usa lo spazio reale della zona invece di un'unica riga. **Zero
+primitive/eventi nuovi**, save invariato. Verdetto:
+`tests/test_fase_11_checkpoint.gd` prova che zero righe di codice del
+motore nominano un NPC, un villaggio, un blueprint o una ricetta
+specifici — lista vietata letta dai dati.
+
 ## Setup
 
 Richiede Godot 4.x e Python 3 (solo per gli strumenti di dati).
