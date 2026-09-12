@@ -791,6 +791,28 @@
       "aspetto": {
         "variante": 2
       }
+    },
+    {
+      "id": "npc_bram",
+      "name": "Bram",
+      "name_i18n": "npc.bram.name",
+      "role": "Fabbro di Mirwada",
+      "role_i18n": "npc.bram.role",
+      "region_id": "mirwada",
+      "anchor_candidate": false,
+      "faction_id": null,
+      "schedule": [],
+      "vendor": null,
+      "crafter": {
+        "blueprints": [
+          "bp_spada_ferrea"
+        ]
+      },
+      "dialogue_id": "dlg_bram",
+      "memoria": {},
+      "aspetto": {
+        "variante": 3
+      }
     }
   ]
 }

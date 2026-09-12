@@ -146,6 +146,32 @@ func test_creazione_con_rosalba_produce_la_pozione_avanzata() -> void:
 	p.free()
 
 
+## US-1109 (fase 11): il secondo NPC crafter, dentro Mirwada - un fabbro
+## invece di un alchimista, blueprint invece di ricetta. Stesso schema del
+## test di Rosalba, ma su Forge.forgia.
+func test_creazione_con_bram_forgia_la_spada() -> void:
+	var inv: Node = _root().get_node("Inventory")
+	inv.call("pulisci")
+	var p: Node = _monta_pagina()
+	assert_true(_de().call("avvia", "dlg_bram", "npc_bram"), "dlg_bram parte")
+	assert_true(_de().call("scegli", 0), "sceglie 'Fammi vedere cosa sai forgiare'")
+	assert_true(p.call("in_creazione"), "si apre la modalita' creazione")
+
+	var bottone_crea: Button = _bottone_crea(p)
+	assert_true(bottone_crea != null, "il bottone Crea e' a schermo")
+	assert_true(bottone_crea.disabled, "senza materiali il bottone resta disabilitato")
+
+	inv.call("aggiungi", "lingotto_ferro", 3)
+	p.call("aggiorna")
+	bottone_crea = _bottone_crea(p)
+	assert_false(bottone_crea.disabled, "con i materiali il bottone si abilita")
+	bottone_crea.pressed.emit()
+
+	assert_eq(int(inv.call("conta", "spada_ferrea")), 1, "la spada e' stata forgiata")
+	assert_eq(int(inv.call("conta", "lingotto_ferro")), 0, "il materiale e' stato consumato")
+	p.free()
+
+
 func _bottone_crea(p: Node) -> Button:
 	for c in p.get_children():
 		if c is HBoxContainer:

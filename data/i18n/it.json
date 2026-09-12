@@ -1735,5 +1735,10 @@
   "npc.rosalba.role": "Erborista dell'avamposto",
   "dialogue.rosalba.n1": "Le radici parlano, se sai ascoltarle. Portami cio' che serve e ti preparo qualcosa di vero.",
   "dialogue.rosalba.n1.crea": "Fammi vedere cosa sai preparare.",
-  "dialogue.rosalba.n1.congedo": "Magari un'altra volta."
+  "dialogue.rosalba.n1.congedo": "Magari un'altra volta.",
+  "npc.bram.name": "Bram",
+  "npc.bram.role": "Fabbro di Mirwada",
+  "dialogue.bram.n1": "Il ferro non mente. Portamelo giusto e ti forgio quello che serve.",
+  "dialogue.bram.n1.crea": "Fammi vedere cosa sai forgiare.",
+  "dialogue.bram.n1.congedo": "Magari un'altra volta."
 }

@@ -12468,4 +12468,51 @@ COME VERIFICATO.
 APERTO: nessuno per questa story. Chiude il Blocco B core (crafting
 NPC): il motore + il primo esempio reale funzionano end-to-end.
 
-PROSSIMA STORIA: US-1109 ("Un fabbro dentro Mirwada"), priority 10.
+PROSSIMA STORIA (chiusa qui sotto): US-1109 ("Un fabbro dentro Mirwada"),
+priority 10.
+
+FATTO (US-1109).
+- data/world/layouts/mirwada.json: un 5o edifici[] - la bottega del
+  fabbro (7x5, muro nord-est finora libero, porta a [53,6]), carvata
+  nello spazio aperto verificato libero da nemici/oggetti/zone prima di
+  scrivere (nessun conflitto).
+- data/world/interni/mirwada_bottega_del_fabbro.json (nuovo): una stanza
+  con npcs: [{npc_bram}] in un angolo lontano dallo spawn/uscita (5,1
+  contro spawn 3,3 - la prima posizione provata, 3,1, era troppo vicina
+  all'area di Uscita e ha causato un uscita spuria durante il cammino,
+  vedi sotto).
+- data/npc/roster.json: npc_bram (fabbro di Mirwada, schedule: [],
+  crafter.blueprints: ["bp_spada_ferrea"] - il blueprint esistente, gia'
+  nota_da_subito quindi qui ignora_scoperta non fa una differenza
+  osservabile ancora, come gia' annotato in US-1106; una ricetta
+  esclusiva del fabbro arriva con US-1110).
+- data/dialogues/dlg_bram.json (nuovo): stesso schema di dlg_rosalba.
+- data/i18n/it.json: 5 chiavi nuove (npc.bram.*, dialogue.bram.*).
+- tests/test_npc_system.gd: conteggio roster 20->21.
+- tests/test_page_dialogo.gd: nuovo test_creazione_con_bram_forgia_la_spada
+  (stesso schema del test di Rosalba, su Forge.forgia invece di
+  PotionSystem.prepara).
+
+BUG TROVATO SOLO CON XVFB: la prima posizione di Bram (2 celle dallo
+spawn/uscita) faceva si' che camminare verso di lui, dentro
+_cammina_verso dello script di QA, sfiorasse di nuovo l'area di Uscita
+gia' consumata (il flag ignora_primo_ingresso e' un one-shot) - lo script
+falliva con "Cannot call method on a previously freed instance" perche'
+l'interno veniva liberato a meta' cammino. Non un bug del motore: risolto
+allontanando l'NPC dalla cella di spawn/uscita nel dato (5,1 invece di
+3,1) - la stessa cautela andra' rispettata per i prossimi interni con NPC
+(US-1111/1112).
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 937 test,
+  tutti passati (936 + 1 nuovo, 1 aggiornato), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat): cammino REALE dalla porta della bottega fino a
+  dentro, avvicinamento a Bram, dialogo vero, menu di creazione, bottone
+  Crea premuto con i materiali forniti, spada_ferrea confermata
+  nell'inventario.
+
+APERTO: nessuno per questa story.
+
+PROSSIMA STORIA: US-1110 ("Piu' ricette da fabbricare"), priority 11.

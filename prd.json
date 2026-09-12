@@ -144,8 +144,8 @@
       ],
       "priority": 10,
       "fase": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "5o edifici[] su mirwada.json (bottega del fabbro, 7x5), interno nuovo con npc_bram (crafter.blueprints=['bp_spada_ferrea']), dlg_bram.json, 5 chiavi i18n. Bug trovato SOLO con Xvfb: Bram posizionato troppo vicino allo spawn/uscita causava un'uscita spuria durante il cammino di test (l'area Uscita e' un one-shot, ri-attraversarla la fa scattare) - risolto allontanando l'NPC nel dato, non un bug del motore. 937/937 test, validate_data.py 0 errori. Verifica Xvfb end-to-end: entra nella bottega, parla, commissiona, la spada appare nell'inventario (screenshot in chat)."
     },
     {
       "id": "US-1110",
