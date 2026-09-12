@@ -723,6 +723,49 @@ func test_il_villaggio_della_campagna_ha_2_capanne_vere_con_pareti() -> void:
 	cont.free()
 
 
+## US-1113: prima di questa story ogni zona affollata mette i suoi NPC su
+## un'unica riga al centro, a distanza fissa TILE*1.5=48px fra vicini
+## QUALUNQUE fosse N - con tanti NPC nella stessa zona (mezzogiorno in
+## piazza a Mirwada, il caso reale con piu' NPC del gioco: 9) si accalcano.
+## Regressione esplicita sul valore precedente: con N>3 la nuova griglia usa
+## una porzione piu' ampia dell'area reale della zona, quindi la distanza
+## minima fra due NPC qualsiasi cresce oltre il vecchio valore fisso.
+func test_npc_a_griglia_non_in_fila_con_zona_affollata() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var cont: Node2D = r["cont"]
+	var mondo: Node = r["mondo"]
+	var ts: Node = _root().get_node("TimeSystem")
+
+	ts.call("forza_momento", "mezzogiorno")
+
+	var attesi_in_piazza := ["npc_mirco", "npc_aldo", "npc_lena", "npc_doran",
+		"npc_generic_01", "npc_generic_03", "npc_generic_06", "npc_generic_09", "npc_generic_10"]
+	var posizioni: Array = []
+	for c in mondo.get_children():
+		# _ricrea_tutti_npc() (attivata dal segnale momento_cambiato di
+		# forza_momento) rimuove i vecchi NPC con queue_free() - non ancora
+		# liberi in questo stesso frame: scartati esplicitamente, non e'
+		# un test asincrono che puo' aspettare un process_frame.
+		if c is Area2D and c.has_meta("npc_id") and not c.is_queued_for_deletion() \
+				and str(c.get_meta("npc_id")) in attesi_in_piazza:
+			posizioni.append((c as Node2D).global_position)
+	assert_eq(posizioni.size(), attesi_in_piazza.size(),
+		"tutti e 9 gli NPC di mezzogiorno in piazza sono in scena (N>3, il caso dell'AC)")
+
+	var minima := INF
+	for i in posizioni.size():
+		for j in range(i + 1, posizioni.size()):
+			minima = minf(minima, (posizioni[i] as Vector2).distance_to(posizioni[j]))
+	const VECCHIA_DISTANZA_FISSA := 32.0 * 1.5   # TILE * 1.5, la formula a riga unica di prima
+	assert_true(minima > VECCHIA_DISTANZA_FISSA,
+		"la distanza minima fra 2 NPC qualsiasi (%.1fpx) supera il vecchio valore fisso (%.1fpx)"
+			% [minima, VECCHIA_DISTANZA_FISSA])
+
+	ts.call("libera_momento")
+	ts.call("da_salvataggio", {})
+	cont.free()
+
+
 ## US-1012 (fase 10, "la prima struttura grande"): la torre d'osservazione
 ## dell'Archivio Sepolto - stesso motore di edificio di US-1010, ma
 ## l'interno referenziato (data/world/interni/archivio_torre_osservazione.

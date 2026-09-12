@@ -465,6 +465,26 @@ func _ricrea_tutti_npc() -> void:
 		_crea_npc_regione(reg as Dictionary, gd)
 
 
+## Dimensione (in pixel) del rettangolo di una zona, usata per lo spread a
+## griglia sotto - il CollisionShape2D che _crea_zone le attacca porta gia'
+## la misura vera; senza zona (regione senza layout) si usa l'intera regione.
+func _dim_zona(zona: Node2D, dim: Vector2i) -> Vector2:
+	if zona != null:
+		for c in zona.get_children():
+			if c is CollisionShape2D and (c as CollisionShape2D).shape is RectangleShape2D:
+				return ((c as CollisionShape2D).shape as RectangleShape2D).size
+	return Vector2(dim) * TILE
+
+
+## US-1113: gli NPC di una stessa zona non si accalcano piu' su un'unica riga
+## al centro (distanza fissa TILE*1.5 fra vicini, sempre la stessa qualunque
+## fosse N) - ora una griglia righe/colonne che usa una porzione piu' ampia
+## dell'area reale della zona (70%, un margine dai bordi): con N>3 la
+## distanza minima fra due NPC qualsiasi cresce con lo spazio disponibile
+## invece di restare incollata al valore fisso di prima.
+const _MARGINE_GRIGLIA_NPC := 0.7
+
+
 func _crea_npc_regione(reg: Dictionary, gd: Node) -> void:
 	var rid: String = str(reg.get("id", ""))
 	var offset: Vector2i = _offset_di(reg)
@@ -485,9 +505,19 @@ func _crea_npc_regione(reg: Dictionary, gd: Node) -> void:
 		var zona: Node2D = get_node_or_null("Zona_%s_%s" % [rid, tag]) as Node2D
 		var centro: Vector2 = zona.position if zona != null \
 			else map_to_local(offset) + Vector2(dim) * TILE * 0.5
-		for i in ids.size():
-			_crea_un_npc(str(ids[i]), gd,
-				centro + Vector2((float(i) - (ids.size() - 1) * 0.5) * TILE * 1.5, 0))
+		var area_zona: Vector2 = _dim_zona(zona, dim) * _MARGINE_GRIGLIA_NPC
+
+		var n: int = ids.size()
+		var colonne: int = int(ceil(sqrt(float(n))))
+		var righe: int = int(ceil(float(n) / float(colonne)))
+		var passo: Vector2 = Vector2(area_zona.x / float(colonne), area_zona.y / float(righe))
+		for i in n:
+			var col: int = i % colonne
+			var riga: int = i / colonne
+			var punto: Vector2 = centro + Vector2(
+				(float(col) - (colonne - 1) * 0.5) * passo.x,
+				(float(riga) - (righe - 1) * 0.5) * passo.y)
+			_crea_un_npc(str(ids[i]), gd, punto)
 
 
 func _crea_un_npc(id: String, gd: Node, posizione: Vector2) -> void:

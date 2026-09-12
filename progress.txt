@@ -12684,5 +12684,48 @@ stato verificato a schermo in questa story (solo nei dati/test
 headless, stesso schema gia' verificato end-to-end 2 volte per Rosalba
 e Fenwick): resta un pattern ormai consolidato, non un rischio aperto.
 
-PROSSIMA STORIA: US-1113 ("Piazzamento NPC a griglia, non in fila"),
-priority 14.
+PROSSIMA STORIA (chiusa qui sotto): US-1113 ("Piazzamento NPC a griglia,
+non in fila"), priority 14.
+
+FATTO (US-1113).
+- scripts/world_scene.gd::_crea_npc_regione riscritta: la vecchia
+  formula metteva ogni NPC su un'unica riga a distanza fissa
+  TILE*1.5=48px dal vicino, sempre la stessa qualunque fosse N - con
+  tante presenze (mezzogiorno in piazza a Mirwada: 9 NPC) si
+  accalcavano tutti su una riga stretta. Nuova griglia colonne=
+  ceil(sqrt(N))/righe=ceil(N/colonne) che usa il 70% dell'area REALE
+  della zona (nuova _dim_zona: legge il CollisionShape2D/
+  RectangleShape2D che _crea_zone gia' attacca a ogni zona - prima si
+  usava solo la sua posizione, mai la sua dimensione). Nessuna
+  primitiva/vocabolario nuovo: un algoritmo di piazzamento generico,
+  nessun nome di zona/regione nel codice.
+- tests/test_world_scene.gd: nuovo
+  test_npc_a_griglia_non_in_fila_con_zona_affollata - usa lo scenario
+  REALE con piu' NPC del gioco (mezzogiorno in piazza a Mirwada, 9 NPC
+  dal roster, non un fixture sintetico) e verifica che la distanza
+  minima fra due NPC qualsiasi superi il vecchio valore fisso di 48px:
+  la regressione esplicita chiesta dall'AC.
+
+BUG DI TEST TROVATO E RISOLTO (non un bug del motore): il segnale
+momento_cambiato (emesso da TimeSystem.forza_momento, usato per portare
+il test a mezzogiorno) fa scattare _ricrea_tutti_npc(), che rimuove i
+vecchi NPC con queue_free() - non ancora liberi nello stesso frame in
+cui gira l'asserzione, perche' i test di questo file sono sincroni
+(mai un await). Il primo tentativo del test contava 18 NPC invece di 9
+(i vecchi in coda per la liberazione + i nuovi). Risolto scartando
+esplicitamente i nodi con is_queued_for_deletion() invece di aspettare
+un process_frame.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 941
+  test, tutti passati (940 + 1 nuovo), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandato in chat): piazza di Mirwada portata a mezzogiorno, i 9 NPC
+  mostrati a schermo in una griglia 3x3 leggibile (Mirco/Aldo/Lena sulla
+  prima riga, ecc.) invece della vecchia riga unica appiccicata.
+
+APERTO: nessuno per questa story.
+
+PROSSIMA STORIA: US-1114 ("Chiusura fase 11"), priority 15 - ultima
+story della fase.

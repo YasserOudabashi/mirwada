@@ -198,8 +198,8 @@
       ],
       "priority": 14,
       "fase": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "world_scene.gd::_crea_npc_regione riscritta: la vecchia formula metteva ogni NPC su un'unica riga a distanza fissa TILE*1.5=48px dal vicino, sempre la stessa qualunque fosse N. Ora una griglia colonne=ceil(sqrt(N))/righe=ceil(N/colonne) che usa il 70% dell'area REALE della zona (nuova _dim_zona: legge il CollisionShape2D/RectangleShape2D che _crea_zone gia' attacca a ogni zona, non solo la sua posizione) - con N>3 la distanza minima cresce con lo spazio disponibile invece di restare incollata al valore fisso di prima. Nessuna primitiva/vocabolario nuovo, solo un algoritmo di piazzamento generico (nessun nome di zona/regione nel codice). Nuovo test test_npc_a_griglia_non_in_fila_con_zona_affollata: usa lo scenario REALE con piu' NPC del gioco (mezzogiorno in piazza a Mirwada, 9 NPC dal roster) e verifica che la distanza minima fra due NPC qualsiasi superi il vecchio valore fisso di 48px - la regressione esplicita chiesta dall'AC, su dati veri non un fixture sintetico. Scoperto un dettaglio del segnale momento_cambiato -> _ricrea_tutti_npc: i vecchi NPC sono rimossi con queue_free() (non ancora liberi nello stesso frame), quindi il test scarta esplicitamente i nodi is_queued_for_deletion() invece di aspettare un process_frame (i test di questo file sono sincroni, mai await). 941/941 test, validate_data.py 0 errori. Verifica Xvfb: piazza di Mirwada a mezzogiorno, i 9 NPC mostrati a schermo in una griglia 3x3 leggibile invece della vecchia riga unica appiccicata (screenshot in chat)."
     },
     {
       "id": "US-1114",
