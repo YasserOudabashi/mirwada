@@ -1,272 +1,208 @@
 {
   "project": "Mirwada",
   "branchName": "claude/mini-trailer-prompt-adq22o",
-  "description": "Fase 10 - Mondo Continuo. Oggi il mondo sono 5 scene separate (region_scene.gd, griglia isolata 48x36 per regione), collegate da passaggi che ricaricano l'intera scena: un salto, non un cammino. Ogni regione e' inoltre un rettangolo quasi vuoto senza edifici ne' villaggi, nonostante design-world.md (fase 6) abbia gia' un'identita' ricca per ognuna delle 5. Questa fase fa due cose: (1) un solo mondo continuo - le 5 regioni diventano zone di un'unica griglia condivisa dipinte nella stessa TileMapLayer, zero caricamenti di scena tra loro, il gating esistente (AreaGate, 6 modi) diventa una barriera fisica invece di un rifiuto di caricamento; (2) contenuto vero - ogni regione cresce con location_tags fisicamente distinti, almeno un villaggio (3-6 edifici visitabili) e una struttura grande (interno a piu' stanze) costruiti per davvero. Nessuna primitiva nuova, nessun evento tracciato nuovo, nessun bump di schema_version se possibile. Riuso massimo di region_scene.gd: le sue funzioni (_dipingi/_crea_zone/_crea_nemici/_crea_oggetti/_crea_npc/_crea_gate) restano, cambia solo il ciclo esterno (per-regione con offset invece che per-scena).",
+  "description": "Fase 11 - Villaggi ed Economia: rarita' degli oggetti (retrofit + prezzo + drop), crafting NPC (fabbro/alchimista riusano Forge/PotionSystem via un 7o effetto di dialogo), villaggi nuovi in campagna e dentro le regioni esistenti, NPC meno ammassati.",
   "userStories": [
     {
-      "id": "US-1001",
-      "title": "Coordinate di mondo per le 5 regioni",
-      "description": "Come motore, serve che le 5 regioni condividano un'unica griglia di celle invece di 5 griglie isolate, cosi' una sola TileMapLayer puo' dipingerle tutte insieme.",
+      "id": "US-1101",
+      "title": "Vocabolario chiuso della rarita'",
+      "description": "Come motore, ho bisogno di un vocabolario chiuso dei livelli di rarita' e di un campo rarita su ogni oggetto.",
       "acceptanceCriteria": [
-        "data/world/regions.json: nuovo campo world_offset: [x, y] per regione (in celle, dentro l'unica griglia condivisa) - dato, non calcolato a runtime; il validator verifica che i rettangoli [world_offset, world_offset + dimensioni_layout] di due regioni non si sovrappongano mai.",
-        "data/schema/layout.schema.json/region.schema.json aggiornati con la nuova forma.",
-        "Topologia decisa con l'utente (2026-09-11): NON hub-and-spoke puro - un anello attorno a Mirwada. world_offset dispone Mirwada al centro e le 4 regioni esterne ai quattro angoli (Marche NO, Archivio NE, Frontiera SE, Valle SO), cosi' ogni coppia di regioni esterne adiacenti nell'anello ha una distanza percorribile quanto i 4 raggi verso il centro - i corridoi veri restano di US-1002/1005..1009, qui solo la disposizione geometrica.",
-        "Test headless: nessuna sovrapposizione, ogni regione ha un world_offset.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "data/schema/item_rarity.json: 4 livelli (comune, non_comune, raro, leggendario), con un peso di drop e un moltiplicatore di prezzo ciascuno.",
+        "Schema di data/items/*.json esteso con rarita (stringa, default comune se assente in un file - retrocompatibilita').",
+        "tools/validate_data.py: nuovo blocco, ogni oggetto ha una rarita nel vocabolario chiuso.",
+        "Tests pass. python tools/validate_data.py esce 0."
       ],
       "priority": 1,
-      "fase": 10,
-      "passes": true,
-      "notes": "Fatto: data/world/regions.json - world_offset:[x,y] su tutte e 5 le regioni, disposti ad anello (Mirwada [220,180] al centro; Marche del Crepuscolo [0,0] NO; Archivio Sepolto [440,0] NE; Frontiera delle Porte [440,360] SE; Valle della Madre [0,360] SO), con un commento che documenta la topologia decisa con l'utente e il perche' delle distanze ampie (i layout sono oggi 48x36 ma US-1005..1009 li fanno crescere a dimensione libera, il margine evita di dover ritoccare gli offset). data/schema/region.schema.json: campo world_offset documentato + regola del validator sulla non-sovrapposizione. data/schema/layout.schema.json: nota che world_offset vive in regions.json, non nel layout (un layout resta locale). tools/validate_data.py: nuovo blocco dopo la sezione layout - legge le dimensioni vere di ogni layout (len(mappa[0])/len(mappa)) quando esiste, altrimenti il fallback 48x36 gia' in uso altrove nel validator; controllo pairwise di sovrapposizione rettangolare tra tutte le regioni, errore esplicito con le coordinate di entrambe. Verificato manualmente rompendo un world_offset a posta (Marche = stesso offset di Mirwada): l'errore di sovrapposizione compare con le coordinate corrette, poi ripristinato (git diff pulito confermato). tests/test_regions.gd: nuovo test_world_offset_esiste_e_non_si_sovrappone - ogni regione ha un world_offset [x,y], nessuna coppia di Rect2i (costruiti dalle dimensioni vere via GameData.get_layout()) si sovrappone. Verificato: godot --headless --path . --script res://tests/run_tests.gd: 898 test, tutti passati (897 + 1 nuovo), nessuna regressione; python tools/validate_data.py esce 0, stessi 2 warning di sempre; git status pulito a parte i file toccati da questa story. Resta aperto per US-1002: disegnare i corridoi veri (4 raggi verso Mirwada + 4 lati dell'anello, 8 in tutto) e la logica di confini_aperti/attraversamento."
+      "fase": 11,
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-1002",
-      "title": "Il motore del mondo continuo: world_scene.gd dipinge piu' layout nella stessa TileMapLayer",
-      "description": "Come motore, serve un nodo che dipinga OGNI regione di GameData.get_regions() nella stessa TileMapLayer al proprio world_offset, con un corridoio di raccordo vero e un modo di sapere in quale regione si trova il giocatore senza mai ricaricare una scena. SCOPE RIDOTTO in corsa rispetto al PRD originale (vedi notes): questa story prova il motore in isolamento; collegarlo a main.tscn e ritirare region_scene.gd e' US-1002B.",
+      "id": "US-1102",
+      "title": "Retrofit della rarita' su ogni oggetto esistente",
+      "description": "Come giocatore, voglio che gli oggetti che gia' esistono abbiano una rarita' sensata, non tutti comune per pigrizia.",
       "acceptanceCriteria": [
-        "scripts/world_scene.gd (nuovo) + scenes/world_scene.tscn: itera GameData.get_regions() e dipinge ogni layout dai suoi dati esistenti (_dipingi/_crea_nemici/_crea_oggetti/_crea_npc/_crea_zone/_crea_gate - stessa logica di region_scene.gd, riscritta per prendere regione+offset invece di leggere un @export unico e girare in un ciclo invece che una volta per scena).",
-        "data/world/corridoi.json (nuovo) + data/schema/corridoio.schema.json + validator: un corridoio dichiara due regioni (a, b), un punto di aggancio locale per ciascuna e una larghezza; world_scene.gd lo disegna come un percorso a L, con un'apertura scavata su ognuno dei due bordi. Questa story ne copre uno solo (mirwada-marche_crepuscolo) come prova del meccanismo; gli altri 7 della topologia ad anello arrivano nel Blocco A (US-1005..1009).",
-        "WorldState.regione_corrente() si aggiorna quando il giocatore entra nel rettangolo di un'altra regione (una Area2D per regione, grande quanto il suo rettangolo) - mai un reload di scena.",
-        "world_scene.gd::viaggia_a(target) riposiziona il giocatore alla cella di spawn della regione target (rispettando il gating d'ingresso se dichiarato) senza caricare nulla - sostituisce la vecchia semantica di region_scene.gd::viaggia_a che ricaricava la scena.",
-        "Test headless dedicati (tests/test_world_scene.gd) che provano il meccanismo in isolamento: dipintura per-regione al proprio offset, spawn per regione, il confine aggiorna WorldState, il corridoio e' calpestabile, viaggia_a riposiziona senza liberare il nodo, i nemici/oggetti di ogni regione compaiono alla posizione globale giusta.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "Ogni oggetto in data/items/*.json (i ~345 esistenti) ha un campo rarita esplicito.",
+        "Criterio: ingredienti 'da mazzo' (usati in tante formule) restano comune; gli ingredienti che compaiono in una sola formula o in ricette di Sequenza alta diventano non_comune/raro; equip/sigilli/pergamene uniche diventano raro o leggendario - script Python che conta le occorrenze nelle formule/blueprint, non giudizio libero riga per riga.",
+        "python tools/validate_data.py esce 0. Nessuna regressione. Tests pass."
       ],
       "priority": 2,
-      "fase": 10,
-      "passes": true,
-      "notes": "SPLIT IN CORSA (segnalato, non un'esecuzione a testa bassa - CLAUDE.md: 'se superi ~200 righe di diff la story era troppo grande, segnalalo e proponi di spezzarla'): scrivendo world_scene.gd e' emerso che collegarlo davvero a main.tscn richiede anche ritirare region_scene.gd + le 5 scenes/regioni/*.tscn e RISCRIVERE tests/test_layouts.gd (~800 righe, 20 test che istanziano una regione alla volta con coordinate locali e nodi 'Passaggio_X' ormai inesistenti), oltre a test_area_gate.gd/test_page_mappa.gd/test_main_boot.gd (che caricano scenes/regioni/*.tscn o testano il reload di main.gd::_su_partita_iniziata). Da solo questo supera enormemente la soglia di CLAUDE.md. Story spezzata: QUESTA la chiude provando il motore in isolamento (tests/test_world_scene.gd, mai wired a main.tscn - il gioco vero gira ancora su region_scene.gd, ZERO regressione); US-1002B (appena inserita in prd.json, priority 3) fa il collegamento vero + il ritiro + la migrazione dei test. Fatto: scripts/world_scene.gd (nuovo) - stesse funzioni di region_scene.gd (_dipingi/_tinta_di_fondo/_crea_zone/_crea_gate/_crea_nemici/_crea_oggetti/_crea_npc/_su_ingresso_zona/_npc_avvicinato+allontanato/_unhandled_input), riscritte per prendere reg+offset e girare in un ciclo su GameData.get_regions(); NUOVO: _crea_confine (una Area2D per regione, il rettangolo intero, aggiorna WorldState.entra_regione al body_entered - sostituisce il vecchio passaggio puntuale); _disegna_corridoi/_scava_apertura/_disegna_percorso_a_elle (percorso a L generico, non conosce nomi di regione: legge data/world/corridoi.json); punto_spawn(rid='') (default alla regione corrente di WorldState, stesso contratto a zero argomenti che player.gd::_respawn() gia' chiama); viaggia_a(target) ora riposiziona invece di ricaricare. scenes/world_scene.tscn (nuovo). data/world/corridoi.json + data/schema/corridoio.schema.json (nuovi) - un corridoio mirwada-marche_crepuscolo, aggancio_a [0,18] (parete ovest di Mirwada) / aggancio_b [47,18] (parete est di Marche), larghezza 3. GameData: PATH_CORRIDOI + _corridoi + get_corridoi() (stesso pattern di _load_single di PATH_REGIONS). tools/validate_data.py: nuovo blocco per corridoi.json (a/b esistono e sono diversi, coppie non duplicate, aggancio_a/b [x,y] di interi >=0, larghezza intero >=1). tests/test_world_scene.gd (nuovo, 9 test): dipintura per-regione al proprio offset (righe di palette diverse), spawn per regione, punto_spawn() a vuoto usa la regione corrente, il confine aggiorna WorldState.regione_corrente() (chiamato direttamente come handler, stesso pattern gia' in uso nel resto della suite per bypassare la fisica reale), un corpo non-player non sposta la regione, il corridoio Mirwada-Marche e' calpestabile in ogni punto controllato, viaggia_a riposiziona senza liberare il nodo, viaggia_a verso un id inesistente fallisce pulito, i nemici di ogni regione (35 in tutto, 7 a regione) filtrano correttamente per rettangolo. Verificato: godot --headless --path . --script res://tests/run_tests.gd: 907 test, tutti passati (898 + 9 nuovi), NESSUNA regressione (region_scene.gd/i 5 .tscn/tutti i test esistenti restano intatti e continuano a valere finche' US-1002B non li ritira); python tools/validate_data.py esce 0, stessi 2 warning di sempre; verifica a schermo con Xvfb (script ad-hoc non committato, screenshot mandati in chat) - Mirwada e Marche dipinte con palette diverse ai rispettivi world_offset, il corridoio visibile e attraversabile fra le due."
+      "fase": 11,
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-1002B",
-      "title": "Collega world_scene.gd al gioco vero: main.tscn, page_mappa.gd, ritiro di region_scene.gd",
-      "description": "Come giocatore, voglio che il gioco VERO usi il mondo continuo (non solo i test): main.tscn carica world_scene.gd invece della singola regione Mirwada, main.gd non ricrea piu' la scena a ogni nuova partita, la pagina mappa (fast travel) trova il nuovo nodo, e region_scene.gd + le 5 scenes/regioni/*.tscn (ormai morti) vengono ritirati insieme ai test che testavano solo la vecchia architettura a scena singola.",
+      "id": "US-1103",
+      "title": "La rarita' incide sul prezzo",
+      "description": "Come giocatore, voglio che un oggetto raro costi di piu' di uno comune della stessa categoria.",
       "acceptanceCriteria": [
-        "scenes/main.tscn: il nodo regione (oggi 'Mirwada', istanza di scenes/regioni/mirwada.tscn) e' sostituito da un'istanza di scenes/world_scene.tscn; Player resta un fratello, la sua posizione iniziale viene da world_scene.punto_spawn('mirwada') invece di un Vector2 scritto a mano nella scena.",
-        "scripts/main.gd::_su_partita_iniziata: NON ricrea piu' la scena (il mondo e' persistente) - su una nuova partita chiama world_scene.viaggia_a('mirwada') per riposizionare il giocatore, senza liberare/reistanziare nulla. _trova_regione() resta valido (stesso contratto has_method('viaggia_a')).",
-        "scripts/pages/page_mappa.gd::_viaggia: il lookup del nodo mondo passa dal confronto su get_script().resource_path.ends_with('region_scene.gd') allo stesso contratto pubblico has_method('viaggia_a') gia' usato da main.gd (region_scene.gd non esiste piu' in scena, il confronto sul path si romperebbe silenziosamente).",
-        "Ritirati: scripts/region_scene.gd, scenes/regioni/*.tscn (5 file). Nessun altro file in res://scripts fa piu' riferimento a scenes/regioni/ (grep di verifica).",
-        "tests/test_layouts.gd riscritto per instanziare scenes/world_scene.tscn (una sola volta per test, come test_world_scene.gd) invece di una scena per regione: ogni assert di cella/zona/passaggio aggiunge il world_offset della regione in questione; i test sui nodi 'Passaggio_X' (ormai inesistenti, sostituiti dal confine+corridoio) sono rimossi o riformulati sul nuovo meccanismo.",
-        "tests/test_area_gate.gd, tests/test_page_mappa.gd, tests/test_main_boot.gd: le porzioni che caricavano scenes/regioni/*.tscn o testavano il reload di _su_partita_iniziata sono aggiornate allo stesso modo (world_scene.tscn, nessun reload atteso).",
-        "Verifica a schermo con Xvfb: la partita vera (scaffale -> creazione -> mondo) cammina da Mirwada a Marche del Crepuscolo attraverso il corridoio SENZA alcuna chiamata a change_scene_to_* e senza che lo schermo lampeggi o che Progression/Inventory si azzerino a meta'. Screenshot mandati in chat.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "data/balance.json: moltiplicatori di prezzo per rarita'.",
+        "Il prezzo mostrato/applicato in negozio (apri_vendita) usa valore * moltiplicatore(rarita), non piu' valore nudo.",
+        "Test: due oggetti con lo stesso valore base ma rarita' diversa hanno prezzi diversi in negozio.",
+        "Tests pass. python tools/validate_data.py esce 0."
       ],
       "priority": 3,
-      "fase": 10,
-      "passes": true,
-      "notes": "scenes/main.tscn: nodo regione sostituito da 'World' (istanza di scenes/world_scene.tscn); rimosso il Vector2 hardcoded sulla posizione iniziale del Player. scripts/main.gd::_ready() posiziona il Player a runtime via world.punto_spawn('mirwada'); _su_partita_iniziata chiama mondo.viaggia_a('mirwada') invece di ricaricare. scripts/pages/page_mappa.gd::_viaggia: lookup passato al contratto has_method('viaggia_a') (era un confronto fragile sul path dello script). Ritirati: scripts/region_scene.gd, scenes/regioni/*.tscn (5 file, cartella rimossa) - grep di verifica pulito, nessun file in res://scripts o res://scenes vi fa piu' riferimento. tests/test_layouts.gd riscritto per intero su world_scene.tscn (offset-aware, filtraggio per rettangolo, i test 'Passaggio_X' rimossi - coperti da test_world_scene.gd). test_area_gate.gd/test_page_mappa.gd/test_main_boot.gd/test_regions.gd aggiornati allo stesso contratto. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 905 test, tutti passati (907 di US-1002 - 2, la rimozione netta dei test 'Passaggio_X'/cambio-regione senza equivalente 1:1, gia' coperti da test_world_scene.gd), NESSUNA regressione; python tools/validate_data.py -> 0 errori, 2 warning (invariati); verifica a schermo con Xvfb (script ad-hoc non committato, screenshot mandati in chat) - partita vera da scenes/main.tscn, scaffale -> creazione -> STESSO nodo mondo mai ricaricato -> teletrasporto fino a un punto del corridoio ancora fuori dal rettangolo di Marche (WorldState ancora 'mirwada', confermato) -> cammino REALE (Input reale, fisica vera) attraverso il segmento verticale del corridoio fino a dentro Marche: WorldState.regione_corrente() passa a 'marche_crepuscolo' SENZA alcuna change_scene_to_*, Progression.sequence()/pathway() e Inventory.tutto() identici prima e dopo. Dettagli completi in progress.txt."
+      "fase": 11,
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-1003",
-      "title": "Prestazioni - non tutto il mondo e' vivo insieme",
-      "description": "Come motore, con 5 regioni piene di nemici/NPC in scena contemporaneamente serve non far girare la fisica/IA di cio' che e' lontano dal giocatore.",
+      "id": "US-1104",
+      "title": "La rarita' incide sul drop dai nemici",
+      "description": "Come giocatore, voglio che gli oggetti rari droppino piu' di rado di quelli comuni dalla stessa tabella.",
       "acceptanceCriteria": [
-        "Nemici e NPC fuori da un raggio dal giocatore (valore in data/balance.json, non hardcoded) hanno process_mode = DISABLED (o equivalente) finche' il giocatore non si riavvicina - riusa Node2D/VisibleOnScreenNotifier2D di Godot, non un sistema nuovo.",
-        "Nessuna differenza di comportamento osservabile per il giocatore quando e' vicino (i nemici gia' vicini restano esattamente come oggi).",
-        "Un test manuale/profiling minimo documentato in progress.txt (frame time con le 5 regioni piene vs una sola, prima/dopo).",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "La scelta da layout.drop[sequenza] (verificare leggendo enemy.gd prima di scrivere la story se e' oggi uniforme) diventa pesata per rarita' (pesi da data/schema/item_rarity.json).",
+        "Test statistico (tante estrazioni simulate, tolleranza) conferma che un oggetto leggendario esce molto meno spesso di uno comune nella stessa tabella.",
+        "Tests pass. python tools/validate_data.py esce 0."
       ],
       "priority": 4,
-      "fase": 10,
-      "passes": true,
-      "notes": "data/balance.json: nuova sezione 'mondo' - raggio_attivo_entita: 600 (pixel, piu' largo di nemico_base.raggio_aggro=140 cosi' nessun nemico gia' vicino/in scontro viene mai disattivato). tools/validate_data.py: nuovo controllo (numero > 0). scripts/world_scene.gd: un Timer (0.4s, dettaglio tecnico in codice, non di bilanciamento) chiama _aggiorna_prestazioni() che legge il raggio da GameData.get_balance('mondo') e imposta process_mode = PROCESS_MODE_INHERIT/DISABLED su ogni nodo del gruppo globale 'nemici' e ogni NPC (Area2D con meta 'npc_id') a seconda della distanza dal player. Nessun sistema nuovo: PROCESS_MODE_DISABLED e' il meccanismo nativo di Godot (ferma script E fisica del sotto-albero, Hitbox/Hurtbox incluse). tests/test_world_scene.gd: 3 test nuovi (nemici/NPC dentro il raggio restano attivi, fuori si disattivano, riavvicinandosi tornano attivi). Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 908 test, tutti passati (905 + 3 nuovi), nessuna regressione; python tools/validate_data.py -> 0 errori, 2 warning (invariati). Profiling minimo (script ad-hoc non committato): Time.get_ticks_usec() sul tempo reale si e' rivelato insensibile in --headless (il tick di fisica e' comunque scandito al tick rate fisso del motore); passato a Performance.TIME_PHYSICS_PROCESS (tempo di CPU nel passo di fisica dell'ultimo frame) - media di 240 campioni con le 5 regioni piene (35 nemici + 18 NPC) e il player a Mirwada: PRIMA (tutto sempre attivo) 23.559 ms/tick, DOPO (_aggiorna_prestazioni applicata) 20.909 ms/tick, riduzione ~11% (28 nemici su 35 disattivati col player a Mirwada). Dettagli completi in progress.txt."
+      "fase": 11,
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-1004",
-      "title": "Il save resta invariato",
-      "description": "Come sistema, la posizione del giocatore nel mondo continuo e la regione corrente devono salvarsi/ripristinarsi esattamente come oggi, senza un nuovo campo.",
+      "id": "US-1105",
+      "title": "La rarita' si vede nell'inventario",
+      "description": "Come giocatore, voglio riconoscere a colpo d'occhio se un oggetto e' raro.",
       "acceptanceCriteria": [
-        "posizione (gia' Node2D.global_position nel save) diventa naturalmente una posizione assoluta nel mondo continuo - nessuna modifica al formato, cambia solo cosa significano i numeri.",
-        "WorldState._regione (gia' salvata) resta la fonte di verita' per \"in che regione sono\" (gating, musica, densita' mistica) - aggiornata dal trigger di attraversamento di US-1002.",
-        "Nessun bump di schema_version: se durante l'implementazione emerge che serve un campo nuovo, e' una decisione da dichiarare esplicitamente (come ogni bump precedente), non una sorpresa a fine story.",
-        "Test headless: salva a meta' di una regione \"nuova\" (lontana dallo spawn originale), ricarica, il personaggio riappare nello stesso punto del mondo continuo.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "La pagina inventario del libro colora/bordo ogni riquadro secondo rarita' (4 colori distinti, nessun asset nuovo - ColorRect/StyleBox procedurali come il resto della UI).",
+        "Tests pass. Verifica a schermo con Xvfb (screenshot in chat)."
       ],
       "priority": 5,
-      "fase": 10,
-      "passes": true,
-      "notes": "Story di verifica, zero righe di codice motore toccate. game_state.gd::_snapshot()/applica() salvano/ripristinano gia' Node2D.global_position del player cosi' com'era da sempre - da US-1002 in poi world_scene.gd e' un unico TileMapLayer condiviso con coordinate assolute (world_offset per regione), quindi 'posizione' nel save resta una posizione assoluta, e' solo relativa a un mondo piu' grande. Nessun campo nuovo. WorldState._regione (gia' salvato in mondo.regione da _mondo_snapshot(), US-602) resta la fonte di verita' per la regione corrente, aggiornata dal confine fisico di world_scene.gd invece che dal vecchio passaggio puntuale. schema_version invariato: 23. tests/test_save_system.gd: nuovo test_round_trip_posizione_nel_mondo_continuo - player a un punto lontano dentro Marche del Crepuscolo, WorldState.entra_regione, salva_rapido/carica_rapido - il player riappare esattamente allo stesso punto, regione_corrente() torna quella salvata. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 909 test, tutti passati (908 + 1 nuovo), nessuna regressione; python tools/validate_data.py -> 0 errori, 2 warning (invariati). Dettagli in progress.txt."
+      "fase": 11,
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-1005",
-      "title": "Mirwada piu' grande, con quartieri veri",
-      "description": "Come giocatore, voglio che la citta' hub sia un luogo con un'identita' fisica - non un rettangolo con 5 zone invisibili sovrapposte.",
+      "id": "US-1106",
+      "title": "Il 7 effetto di dialogo - crea_su_richiesta",
+      "description": "Come motore, voglio un effetto di dialogo generico che faccia creare un oggetto a un NPC dalle sue ricette, riusando Forge/PotionSystem.",
       "acceptanceCriteria": [
-        "Layout ridisegnato piu' grande (dimensione libera, non piu' vincolata a 48x36), con i 5 location_tags di Mirwada (porto, archivio, vicolo, piazza, sotterraneo) come zone fisicamente distinte e riconoscibili (non rettangoli a griglia automatica).",
-        "Nessuna regressione: gli 8 NPC esistenti restano raggiungibili, le quest di Atto I restano completabili.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "data/schema/dialogue.schema.json: crea_su_richiesta aggiunto al vocabolario chiuso dei 6 effetti (ora 7), valore = un blueprint_id o un formula_id.",
+        "Forge.forgia/PotionSystem.prepara guadagnano un parametro opzionale ignora_scoperta: bool = false (default invariato, nessuna regressione sul crafting del giocatore).",
+        "DialogueEngine esegue l'effetto: risolve se valore e' un blueprint o una formula (esiste in uno solo dei due registri), chiama la funzione giusta con ignora_scoperta: true, il risultato genera il testo di risposta del dialogo dal Dictionary di ritorno gia' esistente.",
+        "Tests pass. python tools/validate_data.py esce 0."
       ],
       "priority": 6,
-      "fase": 10,
-      "passes": true,
-      "notes": "SPLIT IN CORSA (segnalato, non un'esecuzione a testa bassa - CLAUDE.md: 'se superi ~200 righe di diff la story era troppo grande, segnalalo e proponi di spezzarla'): l'AC originale ('Almeno 3 edifici visitabili, vedi Blocco B') dipende da un motore che non esiste ancora - US-1010 (Blocco B, 'Vocabolario di un insediamento') era schedulata DOPO US-1006..1009 nel PRD, ma implementare 'edifici visitabili' senza quel motore avrebbe voluto dire scrivere codice specifico per Mirwada (contro Regola 1 di CLAUDE.md: 'i dati non sono codice', mai un caso speciale per un luogo). Riordinato invece di tirare dritto: US-1010 portata avanti a priority 7 (subito dopo questa), nuova US-1005B ('I 3 edifici visitabili di Mirwada', priority 8) usa quel motore per gli edifici veri di questa citta'; US-1006..1009/1011..1014 slittate di conseguenza (vedi le rispettive note). FATTO qui: data/world/layouts/mirwada.json ridisegnato da 48x36 a 64x44 (dimensione libera, US-1001/1002 avevano gia' tolto il vincolo al motore - qui si e' tolto anche dal validator, vedi sotto), 5 quartieri fisicamente distinti e riconoscibili nel terreno (non rettangoli a griglia automatica, gia' veri anche nella versione 48x36 di fase 8 ma qui ridisegnati piu' grandi e piu' ricchi): archivio (edificio murato con scaffali, ovest-nord), vicolo (isolato di casette 'o' con vicoli 'calpestabili tra, canale '=' verso la piazza), piazza (aperta, pavimento ','), sotterraneo (edificio murato con porta, cosmetico per ora - un interno vero arriva con US-1005B/US-1010), porto (banchina + specchio d'acqua '~' + molo '='). I 7 nemici e i 16 oggetti esistenti sono stati riposizionati sulle nuove celle calpestabili (stessi sequenza/scala/override/item_id/quantita', solo x/y cambiati) - nessuna regressione sul contenuto. Rimosso il campo 'passaggi' (morto: US-1002B aveva gia' smesso di leggerlo, sostituito da world_scene.gd::passaggi_verso() generico) da tutti e 5 i layout + dal validator + dallo schema - pulizia piccola ma diretta, notata mentre si toccava il file. tools/validate_data.py: i controlli su mappa/spawn/zone (righe, lunghezza riga, bordo, limiti) erano ancora hardcoded a 48x36 (dimenticati in US-1001/1002, che avevano gia' liberato il motore ma non il validator) - generalizzati a leggere la dimensione vera dalla mappa stessa (riga 0 detta la larghezza), stesso principio del blocco world_offset/non-sovrapposizione (gia' dimension-free da US-1001). data/schema/layout.schema.json aggiornato allo stesso modo + nota sul campo 'passaggi' ritirato. tests/test_layouts.gd + tests/test_world_scene.gd: le due helper _nemici_di/_pickup_di (e i due Rect2 diretti in test_world_scene.gd) usavano Vector2(48,36) hardcoded per isolare gli entità di Mirwada dal resto del mondo continuo - con Mirwada ora piu' grande, generalizzate a leggere la dimensione vera dal layout (nuovo helper _dim(region_id), stesso calcolo di world_scene.gd::_dimensioni_layout). test_mirwada_dipinta_dal_layout (cella acqua) e test_mirwada_zona_dal_rettangolo_del_layout (rettangolo del porto) aggiornati alle nuove coordinate/lette dai dati invece che scritte a mano. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 909 test, tutti passati (nessuna regressione, nessun test nuovo - solo migrazione di quelli esistenti alla nuova geometria); python tools/validate_data.py -> 0 errori, 2 warning (invariati); verifica a schermo con Xvfb (script ad-hoc non committato, screenshot mandati in chat) - le 5 zone si vedono fisicamente (l'edificio del sotterraneo con la sua porta, l'acqua del porto, gli isolati del vicolo), gli 8 NPC nominati + i 10 generici risultano tutti presenti (NpcSystem.presenti('mirwada') -> 16 voci)."
+      "fase": 11,
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-1010",
-      "title": "Vocabolario di un insediamento (edificio con interno)",
-      "description": "Come sistema, serve un modo dati-driven di dichiarare \"qui c'e' un edificio, ha una porta, dentro c'e' una scena interna\" - riusando la tecnica gia' in campo per i passaggi tra regioni (un'Area2D che carica un'altra scena), applicata a un ambito piccolo e locale.",
+      "id": "US-1107",
+      "title": "NPC crafter - il campo crafter",
+      "description": "Come team, vogliamo dichiarare su un NPC cosa sa creare.",
       "acceptanceCriteria": [
-        "Nuovo campo layout (es. edifici: [{x, y, interno_id}]) - un marcatore sulla mappa esterna con una porta, che referenzia un file data/world/interni/<interno_id>.json (stesso schema di un layout, ma tipicamente piccolo: una stanza o poche stanze).",
-        "Entrare nella porta carica la scena interna (piccola, locale - stesso pattern tecnico di _su_passaggio, mai un sistema nuovo); uscire torna nella mappa esterna, alla cella della porta.",
-        "Il validator verifica che ogni interno_id referenziato esista, e che ogni file interno abbia uno spawn valido.",
-        "Nessun nuovo tipo di pagina, nessuna nuova primitiva: un interno e' un layout come un altro, letto dallo stesso region_scene/world_scene.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "data/schema/npc.schema.json: campo opzionale crafter: { blueprints: [...], formule: [...] } (array di id, ognuno deve esistere nel rispettivo registro - validato).",
+        "tools/validate_data.py: ogni id in crafter.blueprints/crafter.formule esiste davvero.",
+        "Tests pass. python tools/validate_data.py esce 0."
       ],
       "priority": 7,
-      "fase": 10,
-      "passes": true,
-      "notes": "data/world/interni/ (nuova cartella) + data/schema/interno.schema.json: stesso schema di un layout per mappa/spawn/nemici/oggetti, senza region_id/world_offset/zone/gating/edifici (sempre locale e indipendente). data/world/layouts/mirwada.json: nuovo campo edifici con il primo edificio davvero visitabile - il sotterraneo (US-1005 lo aveva disegnato cosmetico, promettendo 'un interno vero arriva con US-1010'). data/world/interni/mirwada_sotterraneo.json: una stanza 10x8, prova minima del meccanismo. tools/validate_data.py: nuova funzione condivisa valida_mappa_e_spawn() (estratta dal blocco layout esistente, refactor puro) usata sia per i layout esterni sia per gli interni; nuovo blocco per data/world/interni/*.json e per layout.edifici[]. scripts/game_data.gd: DIR_INTERNI + _interni + _load_interni() + get_interno(id). scripts/interior_scene.gd (nuovo) + scenes/interior_scene.tscn (nuovo): l'interno di un edificio, una TileMapLayer standalone molto piu' semplice di world_scene.gd (niente world_offset/corridoi/confine/gating/NPC a orario). scripts/world_scene.gd: _crea_edifici crea una Area2D 'Porta_<rid>_<interno_id>_<i>' per edificio; _su_porta_edificio/_su_uscita_edificio rimandano il lavoro vero (_entra_edificio/_esci_edificio) con call_deferred() - BUG SCOPERTO CON XVFB (non dai test headless): Godot vieta di disabilitare un CollisionObject2D dentro il callback di fisica che ci porta li'. _entra_edificio nasconde/ferma world_scene (MAI liberarlo, l'invariante di US-1002B resta valida) e istanzia l'interno come fratello di Main. SECONDO BUG SCOPERTO CON XVFB: porta esterna e uscita interna si 'riattivano' un istante dopo l'uso col player gia' sopra, causando un rientro/riuscita a catena - fix con un flag per-nodo ('ignora_prossimo_ingresso'/'ignora_primo_ingresso') consumato una volta sola. tests/test_world_scene.gd: 4 test nuovi sul sotterraneo di Mirwada (porta esiste; entrare nasconde/ferma il mondo senza liberarlo; uscire lo ripristina; rientrare subito dopo l'uscita non riapre nulla, provata la guardia). Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 913 test, tutti passati (909 + 4 nuovi), nessuna regressione; python tools/validate_data.py -> 0 errori, 2 warning (invariati); verifica a schermo con Xvfb (screenshot in chat, script ad-hoc non committato) - QUESTA verifica ha scoperto i due bug reali sopra: partita vera, cammino reale fino alla porta del sotterraneo, dentro (mondo esterno invisibile/fermo ma mai liberato), cammino reale all'uscita, di nuovo fuori. Dettagli completi in progress.txt."
+      "fase": 11,
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-1005B",
-      "title": "I 3 edifici visitabili di Mirwada",
-      "description": "Come giocatore, voglio poter entrare davvero nei 3 edifici promessi dall'AC originale di US-1005 (la casa di Lena, l'archivio di Ottavia, una bettola del porto) - usando il motore generico di US-1010 (edifici: [{x, y, interno_id}] + data/world/interni/<interno_id>.json), non codice dedicato a Mirwada.",
+      "id": "US-1108",
+      "title": "Il primo fabbro - riempie la capanna erborista di Valle",
+      "description": "Come giocatore, voglio trovare un alchimista vero nella capanna erborista dell'avamposto di Valle della Madre, oggi vuota.",
       "acceptanceCriteria": [
-        "data/world/layouts/mirwada.json: nuovo campo 'edifici' con almeno 3 marcatori (Lena nel quartiere vicolo, Ottavia nell'edificio archivio gia' disegnato in US-1005, una bettola nel porto), ognuno con un interno_id che referenzia un file data/world/interni/<interno_id>.json vero (non uno stub vuoto: almeno uno spawn valido e un elemento riconoscibile per interno - un NPC, un oggetto, o un dettaglio di zona).",
-        "Entrare nella porta di ognuno dei 3 edifici carica il rispettivo interno; uscire torna alla mappa esterna di Mirwada, alla cella della porta - usando esclusivamente il motore di US-1010, zero righe di codice che nominino 'mirwada', 'lena', 'ottavia' o un id di interno specifico.",
-        "L'edificio dell'archivio (gia' disegnato in US-1005 come struttura murata cosmetica) diventa il primo edificio REALMENTE visitabile: l'interno ospita Ottavia (o un suo riferimento/contenuto coerente col gating di conoscenza di design-world.md).",
-        "Verifica a schermo con Xvfb: si entra ed esce da tutti e 3 gli edifici nella partita vera. Screenshot mandati in chat.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "Nuovo NPC nel roster (id, nome, ruolo, region_id: valle_madre, schedule nella capanna erborista, crafter.formule con almeno 1 formula esistente), grafo di dialogo con una scelta crea_su_richiesta.",
+        "data/world/interni/valle_avamposto_erborista.json: l'interno oggi vuoto guadagna l'NPC (posizionato dentro, non fuori).",
+        "Test: il dialogo con l'NPC, con gli ingredienti giusti in inventario, produce la pozione; senza, fallisce col messaggio giusto.",
+        "Tests pass. python tools/validate_data.py esce 0. Verifica a schermo con Xvfb (screenshot in chat): si parla con l'NPC, gli si commissiona la pozione, appare nell'inventario."
       ],
       "priority": 8,
-      "fase": 10,
-      "passes": true,
-      "notes": "Chiude la promessa di US-1005 usando solo il motore di US-1010 - zero righe di codice nuove in scripts/, solo dati. data/world/layouts/mirwada.json: 'edifici' esteso a 4 voci (sotterraneo di US-1010 mantenuto) + 3 nuove: casa di Lena (un blocco decorativo del vicolo convertito in edificio murato 6x5, oggetto in conflitto riposizionato), archivio di Ottavia (nessuna mappa nuova - la porta gia' disegnata in US-1005 referenzia ora l'interno vero, stessa posizione), bettola del porto (nuovo edificio murato 6x5 sulla banchina). Zero nemici/oggetti esistenti finiscono nelle pareti nuove (verificato). data/world/interni/{mirwada_casa_di_lena,mirwada_archivio_ottavia,mirwada_bettola_del_porto}.json (nuovi): una stanza piccola a testa, ognuna con un oggetto reale coerente (mai stub vuoti) - trottola_di_legno_intagliata (nuovo item, tema Lena/design-npc-quest.md), libro_ordine_minore (item GIA' ESISTENTE mai piazzato nel mondo, perfetto per Ottavia/gating di conoscenza), boccale_dei_contrabbandieri (nuovo item, tema porto/contrabbando). I 2 item nuovi + le chiavi i18n seguono la convenzione esistente, nessuna categoria nuova. tests/test_world_scene.gd: _porta_sotterraneo generalizzata a _porta_per_interno() (cerca per meta invece che nome-nodo con indice hardcoded - l'indice cambia aggiungendo edifici, scoperto quando i 4 test di US-1010 sono falliti per un bug reale: la prima stesura di questa story ha sovrascritto l'intero campo 'edifici' invece di aggiungere ad esso, perdendo la voce del sotterraneo - fix immediato). 2 test nuovi: le 3 porte esistono e i rispettivi interni contengono davvero l'oggetto atteso; la porta dell'archivio e' quella gia' disegnata in US-1005. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 915 test, tutti passati (913 + 2 nuovi), nessuna regressione; python tools/validate_data.py -> 0 errori, 2 warning (invariati); verifica a schermo con Xvfb (screenshot in chat, script ad-hoc non committato) - partita vera, cammino reale fino a ognuna delle 3 porte, dentro (oggetto reale visibile), cammino reale all'uscita, di nuovo fuori, ripetuto per tutti e 3 nella stessa partita. Dettagli completi in progress.txt."
+      "fase": 11,
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-1006",
-      "title": "Marche del Crepuscolo cresce",
-      "description": "Come giocatore, voglio che le Marche del Crepuscolo abbiano un'identita' fisica vera, con i propri location_tags come zone distinte nel terreno - stesso trattamento di US-1005 per questa regione, secondo i biomi interni gia' scritti in design-world.md §2.2.",
+      "id": "US-1109",
+      "title": "Un fabbro dentro Mirwada",
+      "description": "Come giocatore, voglio un fabbro raggiungibile dentro Mirwada stessa, non solo nei villaggi lontani.",
       "acceptanceCriteria": [
-        "Layout ridisegnato, dimensione libera, ogni location_tag della regione e' una zona fisicamente distinta e riconoscibile nel terreno (non un rettangolo a griglia automatica).",
-        "I siti gia' esistenti nei dati (es. trono_del_gigante per il Twilight Giant, Sequenza 0) restano ospitati e raggiungibili - nessuna regressione sui rituali/le abilita' che li referenziano.",
-        "Il gating d'ingresso della regione (se dichiarato) si applica come barriera fisica al confine (US-1002), non piu' come rifiuto di caricamento.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "data/world/layouts/mirwada.json: un 5o edifici[] (una bottega), con un nuovo data/world/interni/mirwada_bottega_del_fabbro.json.",
+        "Nuovo NPC fabbro (crafter.blueprints con almeno 1 blueprint esistente + una nuova arma - US-1110), grafo di dialogo con crea_su_richiesta.",
+        "Tests pass. python tools/validate_data.py esce 0. Verifica a schermo con Xvfb."
       ],
       "priority": 9,
-      "fase": 10,
-      "passes": true,
-      "notes": "data/world/layouts/marche_crepuscolo.json: ridisegnato da 48x36 a 76x48 (world_offset invariato, nessuna sovrapposizione). I 10 location_tags sono terreni fisicamente distinti (non piu' 10 rettangoli identici in griglia): rocce/detriti/macerie/palude con densita' e pattern diversi per altura/vetta/luogo_di_battaglia/luogo_di_massacro/rovina/luogo_in_decadenza, mura diroccate per tempio_abbandonato, santuari murati con porta (stesso linguaggio di Mirwada/US-1010) per cripta/trono_del_gigante/soglia_del_crepuscolo (il sito VERO del rituale di Sequenza 0 del TG). 7 nemici + 11 oggetti riposizionati sulle nuove celle calpestabili, stesso contenuto. data/world/corridoi.json: aggancio_b aggiornato da [47,18] a [75,22] (nuovo bordo est di Marche) - stesso corridoio mirwada-marche_crepuscolo, verificato ancora funzionante a piedi dopo il ridimensionamento. Nessuna gating d'ingresso dichiarata per Marche (solo 2 gating interni gia' gestiti da AreaGate dal 2002): AC#3 non richiedeva modifiche. tests/test_layouts.gd: test_marche_dipinta_dal_layout aggiornato alle coordinate vere del nuovo edificio della cripta (muro/porta) - aggiunta la costante COL_PORTA (colonna 7 del tileset, diversa da COL_PAVIMENTO), un refuso scoperto mentre si migrava il test. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 915 test, tutti passati, nessuna regressione (nessun test nuovo, solo migrazione); python tools/validate_data.py -> 0 errori, 2 warning (invariati); verifica a schermo con Xvfb (screenshot in chat, script ad-hoc non committato) - giro fra 5 zone visivamente distinte + cammino reale attraverso l'ultimo tratto del corridoio fino a dentro Mirwada (WorldState.regione_corrente() -> 'mirwada'), prova che l'aggancio_b riposizionato regge davvero. Dettagli completi in progress.txt."
+      "fase": 11,
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-1007",
-      "title": "Valle della Madre cresce",
-      "description": "Come giocatore, voglio che la Valle della Madre abbia un'identita' fisica vera, con i propri location_tags come zone distinte nel terreno - stesso trattamento di US-1005 per questa regione, secondo i biomi interni gia' scritti in design-world.md §2.3.",
+      "id": "US-1110",
+      "title": "Piu' ricette da fabbricare (blueprint/formule nuove)",
+      "description": "Come giocatore, voglio piu' di 3 blueprint e piu' formule fra cui scegliere quando parlo con un artigiano.",
       "acceptanceCriteria": [
-        "Layout ridisegnato, dimensione libera, ogni location_tag della regione e' una zona fisicamente distinta e riconoscibile nel terreno (non un rettangolo a griglia automatica).",
-        "I siti gia' esistenti nei dati restano ospitati e raggiungibili - nessuna regressione sui rituali/le abilita' che li referenziano.",
-        "Il gating d'ingresso della regione (se dichiarato) si applica come barriera fisica al confine (US-1002), non piu' come rifiuto di caricamento.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "Almeno 3 blueprints nuovi in data/forge/blueprints.json (armi/equip diversi da quelli esistenti, ingredienti gia' presenti nel gioco) e 3 formule nuove in data/potions/formulas.json, almeno una con un ingrediente/output di rarita' non_comune+.",
+        "python tools/validate_data.py esce 0. Tests pass."
       ],
       "priority": 10,
-      "fase": 10,
-      "passes": true,
-      "notes": "data/world/layouts/valle_madre.json: ridisegnato da 48x36 a 68x50 (world_offset invariato). I 6 location_tags sono terreni fisicamente distinti: bosco_antico (alberi densi), radura_lunare (anello aperto al centro), grotta_di_marea (semi-chiusa con acqua, gating fase_lunare gia' esistente), sorgente (acqua circolare), altare_di_radici (sentieri di radici convergenti), radice_del_mondo (santuario murato con porta - il sito vero del rituale di Sequenza 0 di Mother/Moon, stesso linguaggio di soglia_del_crepuscolo per Marche/US-1006). 7 nemici + 10 oggetti riposizionati, stesso contenuto. data/world/corridoi.json: 2 corridoi nuovi (mirwada-valle_madre il raggio, marche_crepuscolo-valle_madre il lato dell'anello) - possibili ora che Valle ha un layout vero; i restanti 4 arrivano con US-1008/1009. Nessuna gating d'ingresso per Valle: AC#3 non richiedeva modifiche. tests/test_world_scene.gd: test_corridoio_mirwada_marche_e_calpestabile generalizzato con un nuovo helper _corridoio_tra(ra, rb) (cercava per indice fisso, rotto aggiungendo corridoi) + nuovo test per i 2 corridoi di Valle. tests/test_layouts.gd: test_valle_dipinta_dal_layout aggiornato alle coordinate vere della nuova mappa. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 916 test, tutti passati, nessuna regressione; python tools/validate_data.py -> 0 errori, 2 warning (invariati); verifica a schermo con Xvfb (screenshot in chat, script ad-hoc non committato) - 5 zone visivamente distinte + cammino reale attraverso l'ultimo tratto del corridoio Marche-Valle, WorldState.regione_corrente() conferma il passaggio. Dettagli completi in progress.txt."
+      "fase": 11,
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-1008",
-      "title": "Archivio Sepolto cresce",
-      "description": "Come giocatore, voglio che l'Archivio Sepolto abbia un'identita' fisica vera, con i propri location_tags come zone distinte nel terreno - stesso trattamento di US-1005 per questa regione, secondo i biomi interni gia' scritti in design-world.md §2.4.",
+      "id": "US-1111",
+      "title": "Villaggio nella campagna vicino a Marche del Crepuscolo",
+      "description": "Come giocatore, voglio un piccolo insediamento nella campagna (non dentro nessuna regione), a dimostrazione che la campagna non e' solo alberi sparsi.",
       "acceptanceCriteria": [
-        "Layout ridisegnato, dimensione libera, ogni location_tag della regione e' una zona fisicamente distinta e riconoscibile nel terreno (non un rettangolo a griglia automatica).",
-        "I siti gia' esistenti nei dati restano ospitati e raggiungibili - nessuna regressione sui rituali/le abilita' che li referenziano.",
-        "Il gating d'ingresso della regione (se dichiarato) si applica come barriera fisica al confine (US-1002), non piu' come rifiuto di caricamento.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "data/world/campagna.json esteso con un campo edifici[] (stesso principio di layout.edifici[], coordinate assolute come gia' nemici/oggetti della campagna): 2-3 capanne (fabbro + mercante), fuori dal rettangolo di ogni regione, vicino alla breccia del muro di Marche (US-1015).",
+        "2 nuovi interni in data/world/interni/, con l'NPC fabbro di questo villaggio dentro una delle capanne.",
+        "python tools/validate_data.py esce 0. Tests pass. Verifica a schermo con Xvfb (screenshot in chat): si cammina dalla breccia al villaggio, si entra in una capanna."
       ],
       "priority": 11,
-      "fase": 10,
-      "passes": true,
-      "notes": "Layout ridisegnato 48x36 -> 72x44, 6 stanze di forma/dimensione diversa (non piu' la griglia automatica di prima, che l'AC vietava esplicitamente): biblioteca (scaffali), officina (detriti Paragon), torre_di_osservazione (colonnato circolare Hermit), sala_dei_sigilli (cerchio di incisioni), studio (arredo sparso), biblioteca_di_tutto (santuario murato con porta - sito rituale di Sequenza 0 condiviso da Hermit E Paragon, verificato in entrambi i pathway.json). 7 nemici + 9 oggetti riposizionati (collision-avoidance Python, trappola incontrata: 'o' non e' calpestabile - CALPESTABILI_LAYOUT='.,=+' - corretto). 2 corridoi nuovi in corridoi.json: mirwada-archivio_sepolto (il raggio, mirwada usa il suo ultimo muro libero, est) e marche_crepuscolo-archivio_sepolto (lato superiore dell'anello, marche guadagna una seconda porta sul muro est). AC del gating come barriera fisica: gia' generico da prima (world_scene.gd::_crea_gate, chiamato per ogni regione) - l'Archivio non ha mai usato il rifiuto di caricamento (quello resta solo per area=='ingresso', qui l'area e' 'ali_interne'); scritto il primo test che lo prova dentro world_scene. 918/918 test (916+2 nuovi), validate_data.py 0 errori, verifica Xvfb (6 zone, gate chiuso poi aperto, cammino reale Marche->Archivio)."
+      "fase": 11,
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-1009",
-      "title": "Frontiera delle Porte cresce",
-      "description": "Come giocatore, voglio che la Frontiera delle Porte abbia un'identita' fisica vera, con i propri location_tags come zone distinte nel terreno - stesso trattamento di US-1005 per questa regione, secondo i biomi interni gia' scritti in design-world.md §2.5. Questa regione ha oggi un gating d'ingresso dichiarato (es. sequenza_max ~4): diventa la prima prova reale della barriera fisica al confine (US-1002) invece del rifiuto di caricamento odierno.",
+      "id": "US-1112",
+      "title": "Villaggio nella campagna vicino ad Archivio Sepolto/Frontiera",
+      "description": "Come giocatore, voglio un secondo insediamento in campagna con un alchimista e un mercante di oggetti rari.",
       "acceptanceCriteria": [
-        "Layout ridisegnato, dimensione libera, ogni location_tag della regione e' una zona fisicamente distinta e riconoscibile nel terreno (non un rettangolo a griglia automatica).",
-        "I siti gia' esistenti nei dati (incluso il sito del rituale di Sequenza 0 dell'antagonista, npc_antagonista/location_tag soglia) restano ospitati e raggiungibili - nessuna regressione sui rituali/le abilita' che li referenziano.",
-        "Il gating d'ingresso della regione si applica come barriera fisica al confine (US-1002), non piu' come rifiuto di caricamento - verificato che un personaggio sotto soglia viene fermato fisicamente e uno sopra soglia passa.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "Stesso schema di US-1111: 2-3 capanne in campagna, un alchimista (crafter.formule) + un mercante col listino che include almeno un oggetto raro/leggendario (prezzo alto, US-1103).",
+        "python tools/validate_data.py esce 0. Tests pass. Verifica a schermo con Xvfb."
       ],
       "priority": 12,
-      "fase": 10,
-      "passes": true,
-      "notes": "Layout ridisegnato da 48x36 a 72x48: 6 location_tags come zone fisicamente distinte (soglia: santuario murato con porta, dove risiede npc_antagonista/\"La Soglia\" (roster.json, location_tag=soglia); teatro: edificio murato con file di detriti/sedute \"o\" e corsie calpestabili; palco: struttura murata con porta rivolta verso il teatro; nebbia_grigia: isole \",\" scollegate in un mare di \"~\" solido, collegate da ponti \"=\" - un'isola (15,28,4,3) resta DELIBERATAMENTE senza ponte, raggiungibile solo con la primitiva teleport (coerente col gating primitiva:teleport/area:isole_nebbia gia' nei dati); crocevia: plazza aperta con un incrocio di sentieri \",\"; porta_senza_stanza: un semplice segmento di muro con una porta, isolato in campo aperto, senza stanza intorno. I 7 nemici (6 Sequenza 7/6 + boss Sequenza 5 scala 1.5, tag ombra, Caratteristica fool) e i 9 oggetti (inclusi i 3 ingredienti di formula_door_9 usati da tests/manual/qa_vslice_door.gd: chiave_senza_denti, polvere_di_gesso_stellare, cardine_arrugginito_di_una_porta_perduta) sono stati riposizionati sulle nuove celle calpestabili, stesso contenuto/stessi id. Spawn spostato davanti al santuario di soglia [11,15]. data/world/corridoi.json: i 3 corridoi che chiudono l'anello (US-1001..1008 avevano gia' aperto gli altri 5) - mirwada-frontiera_porte (l'ultimo muro libero di mirwada, nord, verso il muro sud di Frontiera vicino alla zona crocevia); archivio_sepolto-frontiera_porte (lato destro dell'anello, stesso world_offset.x=440 - una SECONDA porta sul muro sud dell'Archivio, gia' provato altrove che world_scene.gd non ha alcun limite di una porta per muro); valle_madre-frontiera_porte (lato inferiore, stesso world_offset.y=360, il muro est di Valle finora libero). AC \"il gating d'ingresso si applica come barriera fisica, non piu' come rifiuto di caricamento\": la Frontiera e' la PRIMA regione con un gating area==\"ingresso\" (le precedenti avevano solo area interne come ali_interne) - verificato leggendo il codice che _crea_gate (world_scene.gd) e' GIA' generico e crea una AreaGate per OGNI voce di reg.gating, ingresso incluso: NESSUNA modifica al codice serviva, e' proprio il punto della story. Scritto il primo test che lo prova per davvero: tests/test_world_scene.gd::test_gate_ingresso_della_frontiera_e_una_barriera_fisica_nel_mondo_continuo - il nodo Gate_frontiera_porte_ingresso esiste nel mondo continuo, e_aperto()==false a Sequenza 2 (\"sopra\" la soglia, respinto) ed ==true a Sequenza 9 (sotto soglia, passa) - stessa semantica gia' testata a livello di solo-dato in test_area_gate.gd e di fast travel in test_page_mappa.gd::test_viaggia_a_rispetta_il_gating_d_ingresso, qui per la prima volta con la StaticBody2D viva dentro world_scene. Aggiunto anche test_corridoi_di_frontiera_delle_porte_sono_calpestabili (stesso schema delle story precedenti). tests/test_layouts.gd: test_frontiera_dipinta_dal_layout/test_frontiera_spawn_dal_layout aggiornati alle nuove coordinate (bordo/cella nebbia solida/spawn/ponte); i test su nemici/oggetti/area_cleared non hanno bisogno di modifiche (dipendono dal CONTEGGIO/dai dati, non dalle coordinate). Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 920 test, tutti passati (918 + 2 nuovi... la story precedente si fermava a 918, i due test nuovi di questa story portano a 920), nessuna regressione; python tools/validate_data.py -> 0 errori, 2 warning (invariati); verifica a schermo con Xvfb (script ad-hoc non committato, screenshot mandati in chat) - le 6 zone visivamente distinte (nebbia_grigia blu/acquosa con isole e ponti, crocevia aperta, teatro con file di detriti), cammino REALE (Input reale, fisica vera) attraverso l'ultimo tratto del corridoio Archivio-Frontiera (WorldState.regione_corrente()==\"frontiera_porte\"), e la barriera fisica dell'ingresso provata per davvero: a Sequenza 2 il personaggio resta bloccato a un pelo dalla barriera rossa (y da 11867 a 11902 in 120 frame di input reale contro il muro), a Sequenza 9 la barriera e' verde e il personaggio la supera (y arriva a 12137 nello stesso numero di frame). Come bonus non richiesto dall'AC, lo screenshot della crocevia mostra ANCHE il secondo gate (isole_nebbia, primitiva teleport) correttamente chiuso per un Twilight Giant senza quella primitiva - ulteriore conferma che _crea_gate copre genericamente OGNI voce di gating, non solo \"ingresso\". Dettagli completi in progress.txt."
+      "fase": 11,
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-1011",
-      "title": "Il primo villaggio vero",
-      "description": "Come giocatore, voglio un villaggio reale da esplorare - non un singolo edificio, un insediamento con piu' case, una piazza, NPC che ci vivono.",
+      "id": "US-1113",
+      "title": "Piazzamento NPC a griglia, non in fila",
+      "description": "Come giocatore, voglio che gli NPC di una stessa zona non siano tutti appiccicati sullo stesso punto.",
       "acceptanceCriteria": [
-        "Un villaggio (3-6 edifici) in una delle regioni (candidato naturale: un avamposto nella Valle della Madre o un borgo minerario nelle Marche - coerente coi biomi gia' scritti).",
-        "Almeno 2 interni visitabili con contenuto reale (un NPC con dialogo, o oggetti raccoglibili, o un piccolo incontro) - non stanze vuote.",
-        "Se in fase di scrittura serve una nuova voce nel vocabolario chiuso data/schema/location_tags.json per \"villaggio\", e' una decisione da dichiarare esplicitamente con motivazione (stessa procedura gia' usata in fase 5), non presa di nascosto.",
-        "Verifica a schermo con Xvfb: si entra ed esce da almeno 2 edifici diversi nello stesso villaggio. Screenshot mandati in chat.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "world_scene.gd::_crea_npc_regione: la formula di piazzamento diventa una griglia che usa una porzione piu' ampia dell'area della zona (righe/colonne in base al numero di NPC), non piu' una riga unica al centro.",
+        "Test: con N>3 NPC nella stessa zona, la distanza minima fra due NPC qualsiasi e' maggiore di quella di oggi (regressione esplicita sul valore precedente).",
+        "Tests pass. python tools/validate_data.py esce 0. Verifica a schermo con Xvfb."
       ],
       "priority": 13,
-      "fase": 10,
-      "passes": true,
-      "notes": "Avamposto della sorgente in Valle della Madre: 4 capanne (vedetta, deposito, focolare comune, erborista) attorno a una piccola piazza, costruite dentro il rettangolo gia' esistente della zona \"sorgente\" (data/world/layouts/valle_madre.json), in un'area finora vuota a sud dello stagno gia' disegnato in US-1007, senza toccare nessuno dei nemici/oggetti esistenti della regione. Nessuna nuova voce nel vocabolario chiuso data/schema/location_tags.json e' servita (decisione dichiarata esplicitamente come richiede l'AC): un edificio (US-1010) non e' legato a un location_tag, vive solo come marcatore [x,y,interno_id] sul layout - le 4 capanne stanno semplicemente dentro una zona esistente, stessa scelta gia' presa per il sotterraneo/le case di Mirwada. Ogni capanna ha un interno vero con un oggetto reale coerente (mai stub vuoti): data/world/interni/valle_avamposto_{vedetta,deposito,focolare,erborista}.json con rispettivamente corno_da_richiamo_intagliato, cesto_di_vimini_intrecciato, campanaccio_di_capra_smarrita, quaderno_di_appunti_sulle_maree - 4 item nuovi (data/items/ingredienti.json, categoria ingrediente, stessa convenzione dei precedenti US-1005B) con tag dal vocabolario chiuso esistente (crescita/bestia/luna). tools/generate_i18n_stubs.py rilanciato: le chiavi it.json dei 4 item nuovi generate dal testo gia' in chiaro nei dati (name/descrizione), nessun TODO residuo; il tool ha anche riordinato alfabeticamente 2 chiavi di US-1005B che erano rimaste in coda al file (refactor di formattazione puro, zero contenuto perso, verificato via diff). tests/test_world_scene.gd: test_le_4_capanne_dell_avamposto_di_valle_hanno_una_porta_e_un_interno_vero (stesso schema di test_i_3_edifici_di_us1005b_..., una porta+un interno vero per capanna) e test_si_entra_ed_esce_da_almeno_2_capanne_dell_avamposto (chiama _entra_edificio/_esci_edificio direttamente su 2 capanne diverse, verifica world_scene che si nasconde/riappare e il player che torna alla porta - copre per davvero l'AC \"si entra ed esce da almeno 2 edifici diversi\", non solo uno). Zero righe di codice nuove in scripts/: il motore di US-1010 e' riusato cosi' com'e'. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 922 test, tutti passati (920 + 2 nuovi), nessuna regressione; python tools/validate_data.py -> 0 errori, 2 warning (invariati); verifica a schermo con Xvfb (script ad-hoc non committato, screenshot mandati in chat) - le 4 capanne visibili dall'alto attorno alla piazza, ingresso reale nella capanna del vedetta (interno murato renderizzato correttamente) e uscita che riporta il personaggio davanti alla porta, ripetuto per la capanna del deposito. Nota tecnica scoperta durante la verifica (non un bug del gioco): uno screenshot preso SUBITO dopo un grande teletrasporto mostra la camera ancora in transizione (position_smoothing_speed=5.0 di game_camera.gd, pensato per il movimento normale, non per salti di migliaia di pixel) - corretto nello script disabilitando temporaneamente lo smoothing prima degli screenshot, nessuna modifica al gioco vero (il giocatore vero non si teletrasporta mai di migliaia di pixel in un frame)."
+      "fase": 11,
+      "passes": false,
+      "notes": ""
     },
     {
-      "id": "US-1012",
-      "title": "La prima struttura grande (palazzo/torre/cripta a piu' stanze)",
-      "description": "Come giocatore, voglio almeno un edificio \"importante\" con un interno a piu' stanze collegate - non solo una singola stanza come le case del villaggio.",
+      "id": "US-1114",
+      "title": "Chiusura fase 11",
+      "description": "Come team, vogliamo la fase chiusa nella documentazione, e Atto II e Atto III rinumerata a fase 12.",
       "acceptanceCriteria": [
-        "Una struttura (candidati coerenti coi dati esistenti: una torre d'osservazione dell'Archivio Sepolto, o il tempio abbandonato delle Marche) con un interno di almeno 3 stanze collegate da porte/corridoi nello stesso file/scena interna (non un'altra catena di caricamenti - l'interno stesso puo' essere un piccolo layout multi-stanza in una sola scena, riusando zone/muri interni).",
-        "Contenuto reale in almeno una stanza (un nemico, un oggetto significativo, o un gating di conoscenza coerente con design-world.md §2.4).",
-        "Se serve una nuova voce nel vocabolario chiuso data/schema/location_tags.json per \"palazzo/struttura\", e' una decisione da dichiarare esplicitamente con motivazione, non presa di nascosto.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "006_PRD/prd-fase-11-atto-2-3.md rinominato in 006_PRD/prd-fase-12-atto-2-3.md, contenuto invariato salvo i riferimenti al numero di fase.",
+        "006_PRD/roadmap.md: 'Fase 11 - Atto II e Atto III' diventa 'Fase 12'; 'Fase 12 - Opzionale' (Pathway Non-Standard) diventa 'Fase 13'.",
+        "tools/validate_data.py: blocco 'chiusura fase 11' (almeno 4 insediamenti con un crafter raggiungibile, rarita' su ogni oggetto, il 7o effetto di dialogo usato almeno una volta).",
+        "progress.txt, CLAUDE.md (par. Fasi), README.md, 006_PRD/roadmap.md aggiornati a 'Fase 11: CHIUSA'.",
+        "prd.json: tutte le story a passes: true.",
+        "Checkpoint dinamico (stesso schema di test_fase_10_checkpoint.gd): zero righe di codice che nominino un villaggio/NPC/blueprint/formula specifici - lista vietata scoperta dai dati.",
+        "Tests pass. python tools/validate_data.py esce 0."
       ],
       "priority": 14,
-      "fase": 10,
-      "passes": true,
-      "notes": "La torre d'osservazione dell'Archivio Sepolto (candidato esplicitamente suggerito dall'AC, coerente con design-world.md 2.4: 'torri (Hermit: costellazioni)'). Porta esterna aggiunta in data/world/layouts/archivio_sepolto.json.edifici (era [], prima struttura visitabile di questa regione) dentro il rettangolo GIA' esistente della zona torre_di_osservazione, in una cella libera non occupata da nemici/oggetti esistenti. Nessuna nuova voce nel vocabolario chiuso data/schema/location_tags.json e' servita (decisione dichiarata esplicitamente come richiede l'AC): un edificio (US-1010) non e' legato a un location_tag, stessa scelta di US-1010/US-1005B/US-1011. data/world/interni/archivio_torre_osservazione.json (nuovo): a differenza delle case del villaggio (una stanza sola), qui l'interno e' un layout a 3 stanze - il basamento (dove si entra), la sala dei libri astrali, l'osservatorio in cima - collegate da 2 corridoi nella STESSA mappa/scena (interior_scene.gd non ha bisogno di sapere nulla di 'stanze': disegna semplicemente un layout piu' grande del solito, nessuna catena di caricamenti aggiuntivi, esattamente come l'AC richiede). Contenuto reale nell'ultima sala (l'osservatorio): un nemico (Sequenza 7, un guardiano della torre) E un oggetto significativo, mappa_delle_costellazioni_perdute (nuovo item in data/items/ingredienti.json, categoria ingrediente, tag divinazione - fitta col tema astronomico/Hermit). tools/generate_i18n_stubs.py rilanciato per la chiave i18n del nuovo item, 0 TODO residui. tests/test_world_scene.gd::test_torre_di_osservazione_ha_una_porta_e_un_interno_a_3_stanze: verifica che la porta esista in scena, che l'interno risolva a un layout vero, che le celle delle 3 sale E dei 2 corridoi (tutti sulla stessa riga y=5 del file) siano calpestabili (prova diretta che sono davvero collegate nella stessa mappa), e che almeno una sala contenga un nemico o un oggetto reale (non uno stub vuoto). Zero righe di codice nuove in scripts/: interior_scene.gd gia' supportava layout di qualunque dimensione, nessuna modifica serviva. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 923 test, tutti passati (922 + 1 nuovo), nessuna regressione; python tools/validate_data.py -> 0 errori, 2 warning (invariati); verifica a schermo con Xvfb (script ad-hoc non committato, screenshot mandati in chat) - cammino REALE (Input reale, fisica vera) attraverso tutte e 3 le sale in un'unica sessione di interior_scene, il guardiano dell'osservatorio ha colpito per davvero il personaggio (Salute scesa da 100 a 80 negli screenshot), l'oggetto e' visibile a terra nella stessa sala."
-    },
-    {
-      "id": "US-1013",
-      "title": "Checkpoint dinamico + verifica giocata",
-      "description": "Come team, vogliamo la prova che il mondo continuo regge davvero: si cammina da una regione all'altra senza stacchi, si entra ed esce da edifici, senza una riga di codice che nomini un luogo specifico.",
-      "acceptanceCriteria": [
-        "tests/test_fase_10_checkpoint.gd (nuovo): grep di res://scripts per gli id delle 5 regioni + i nomi degli insediamenti/interni nuovi, scoperti dai dati (stesso schema del checkpoint di fase 8/9) - 0 occorrenze.",
-        "tests/manual/qa_mondo_continuo.gd (nuovo, Xvfb): cammina da Mirwada a una regione adiacente attraversando il confine SENZA che compaia una schermata di caricamento (nessuna chiamata a get_tree().change_scene_to_* durante l'attraversamento - solo all'avvio), entra in un edificio del villaggio, ne esce, entra nella struttura grande, ne esce. Screenshot mandati in chat.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
-      ],
-      "priority": 15,
-      "fase": 10,
-      "passes": true,
-      "notes": "tests/test_fase_10_checkpoint.gd (nuovo, stesso schema dei checkpoint di fase 8/9): la lista dei nomi vietati nel motore (res://scripts, res://scripts/pages) e' scoperta dai dati - le 4 regioni oltre a 'mirwada' (gia' hardcoded da world_scene.gd::HUB fin dalla fase 6, l'hub per design) e ogni interno_id referenziato da edifici[] in QUALUNQUE layout (letto via GameData.get_layout(rid).edifici per ognuna delle 5 regioni: le 4 case di Mirwada, le 4 capanne dell'avamposto di Valle, la torre dell'Archivio - 9 interni in tutto). 0 occorrenze nel motore: world_scene.gd/interior_scene.gd leggono edifici[]/interno_id in un ciclo generico (_crea_edifici), mai un id specifico scritto a mano. tests/manual/qa_mondo_continuo.gd (nuovo, Xvfb): partita vera (scaffale -> creazione -> mondo), cammina attraverso il confine di Marche del Crepuscolo con Input reale (letto dai dati di data/world/corridoi.json, non un numero scritto a mano) - verificato che WorldState.regione_corrente() cambia e che il nodo world_scene resta LO STESSO (stesso instance_id, mai liberato/ricaricato, US-1002B) senza alcuna change_scene_to_*; entra ed esce da una capanna del villaggio (US-1011) e dalla torre d'osservazione (US-1012), Input reale per l'ultimo tratto di ogni attraversamento (stesso principio 'salto diretto poi cammina l'ultimo tratto' di qa_vslice_door.gd). Scoperta in corsa (non un bug del gioco, uno dello script): il target del cammino post-ingresso in un edificio smette di avere senso nello spazio di coordinate dell'interno (stesso avvertimento gia' documentato in qa_vslice_door.gd) - il vero criterio di successo usato e' il cambio di visibilita' di world_scene, non il valore di ritorno del cammino; e il primo tentativo di allontanarsi dallo spawn di una capanna per poi rientrare (per far scattare l'uscita, che ignora il primo ingresso) aveva spinto il personaggio OLTRE il muro sud della stanza (offset troppo grande per una stanza di 8x6 celle) - corretto allontanandosi verso l'unica direzione libera (nord, dentro la stanza) invece che verso il muro. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 925 test, tutti passati (923 + 2 nuovi), nessuna regressione; python tools/validate_data.py -> 0 errori, 2 warning (invariati); qa_mondo_continuo.gd lanciato con Xvfb -> TUTTI I PASSI OK, 6 screenshot mandati in chat (scaffale dopo creazione, appena fuori/appena dentro il confine di Marche, dentro/fuori la capanna del villaggio, dentro/fuori la torre)."
-    },
-    {
-      "id": "US-1014",
-      "title": "Chiusura fase 10",
-      "description": "Come team, vogliamo la fase chiusa nella documentazione.",
-      "acceptanceCriteria": [
-        "tools/validate_data.py: blocco \"chiusura fase 10\" (world_offset su ogni regione, almeno un villaggio e una struttura grande presenti nei dati).",
-        "progress.txt, CLAUDE.md (§ Fasi), README.md, 006_PRD/roadmap.md aggiornati a \"Fase 10: CHIUSA\" nello stesso stile delle fasi precedenti.",
-        "prd.json: tutte le story a passes: true con note compilate.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
-      ],
-      "priority": 16,
-      "fase": 10,
-      "passes": true,
-      "notes": "tools/validate_data.py: nuovo blocco 'chiusura fase 10' (dopo il blocco di chiusura fase 9, stesso stile) - riverifica che tutte e 5 le regioni abbiano un world_offset valido (gia' controllato in dettaglio dal blocco US-1001, qui solo il criterio di chiusura), che almeno una regione abbia un villaggio vero (>=3 edifici collegati - Valle della Madre ne ha 4, US-1011) e che almeno un interno di edificio sia una struttura grande (area della mappa >=200 celle, ben oltre le 48 celle di una singola stanza del villaggio - la torre dell'Archivio ne ha 297, US-1012). CLAUDE.md (sezione Fasi): paragrafo Fase 10 riscritto da PIANIFICATA a CHIUSA, stesso stile delle fasi precedenti (16 story, 925 test, blocchi, verdetto del checkpoint). README.md: nuovo paragrafo Fase 10 dopo quello della Fase 9 (mancava del tutto, il file si fermava alla fase 9). 006_PRD/roadmap.md: sezione Fase 10 riscritta da PIANIFICATA/non eseguita a CHIUSA con blocchi e verdetto, stesso schema della sezione Fase 9 sopra di essa (inclusa la nota sulle 2 story spezzate in corsa, US-1002B e US-1005B, segnalate invece di tirare dritto come richiede CLAUDE.md). prd.json: tutte le 16 story (US-1001..US-1014 + US-1002B/US-1005B) a passes:true con note compilate. Verificato: godot --headless --path . --script res://tests/run_tests.gd -> 925 test, tutti passati, nessuna regressione (nessun test nuovo per questa story, solo dati e documentazione); python tools/validate_data.py -> 0 errori, 2 warning (invariati) - verificato anche che il nuovo blocco di chiusura intercetti davvero un'assenza (non solo che non dia mai errore per caso): troncati temporaneamente gli edifici sia di Mirwada sia di Valle sotto 3 a testa (Mirwada da sola ne ha gia' 4, serviva toccare entrambe le regioni per far mancare davvero un villaggio) - il validator ha dato l'errore atteso sul villaggio mancante; troncata la mappa della torre a 6 righe - il validator ha dato l'errore atteso sulla struttura grande mancante (piu' un errore collaterale atteso sul bordo, la mappa troncata non e' piu' rettangolare); tutti e 3 i file ripristinati subito dopo, git diff pulito confermato."
-    },
-    {
-      "id": "US-1015",
-      "title": "La campagna vera fra le regioni",
-      "description": "Come giocatore, voglio che lo spazio condiviso fuori da ogni regione sia terreno esplorabile vero (non vuoto) e che ogni regione si affacci su di esso in molti punti (non un solo corridoio a coordinate fisse), cosi' il mondo legge come un'unica landa con regioni distinte, mai come rettangoli isolati uniti da un ponte.",
-      "acceptanceCriteria": [
-        "data/world/corridoi.json e il codice che lo disegnava (world_scene.gd::_disegna_corridoi/_punto_aggancio/_scava_apertura/_disegna_percorso_a_elle, GameData.get_corridoi) sono ritirati.",
-        "Ogni cella del rettangolo che contiene tutte le 5 regioni e che non appartiene a nessuna di esse e' dipinta di terreno vero e calpestabile (pavimento + una spolverata deterministica di alberi sparsi), mai lasciata senza tile.",
-        "Il muro perimetrale di ogni regione non e' piu' una scatola sigillata: si apre in brecce periodiche sui 4 lati verso la campagna, generiche (nessuna coppia di regioni scelta a mano).",
-        "La campagna ha nemici/oggetti sparsi (data/world/campagna.json, coordinate assolute, riusa _crea_nemici/_crea_oggetti con offset zero).",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Tests pass. Verifica a schermo con Xvfb."
-      ],
-      "priority": 17,
-      "fase": 10,
-      "passes": true,
-      "notes": "Addendum post-chiusura (feedback diretto dell'utente sugli screenshot: il mondo leggeva come rettangoli isolati uniti da un ponte, non un mondo unico). Ritirati data/world/corridoi.json e tutto il codice dei corridoi punto-a-punto. Nuovo world_scene.gd::_riempi_campagna: dipinge di terreno vero (pavimento + alberi sparsi via hash deterministico sulla cella, densita' 6%) ogni cella del rettangolo che contiene le 5 regioni e non appartiene a nessuna. Nuovo _apri_brecce_perimetro: il muro '#' di ogni layout (sempre stato una scatola sigillata, aperta solo dal vecchio corridoio) si apre ogni 11 celle con una breccia larga 3, sui 4 lati, generico (nessun nome di regione). Nuovo data/world/campagna.json (coordinate ASSOLUTE, non ha un world_offset proprio): 36 nemici deboli (sequenza 9) + 34 oggetti comuni sparsi fuori da ogni regione, popolati riusando _crea_nemici/_crea_oggetti con offset zero (zero duplicazione). GameData: get_corridoi() rimosso, get_campagna() aggiunto. Validatore: blocco corridoi rimosso, nuovo blocco campagna (bbox + fuori da ogni regione, non la calpestabilita' fine contro gli alberi decorativi). Test: rimossi i test dei corridoi punto-a-punto, aggiunti test_il_perimetro_di_ogni_regione_ha_almeno_una_breccia_per_lato (generico, scandisce il muro vero), test_la_campagna_fuori_da_ogni_regione_e_terreno_vero, test_un_nemico_della_campagna_spawna_alla_posizione_giusta; aggiornato il conteggio totale nemici (35 + quelli della campagna, letto dai dati). tests/manual/qa_mondo_continuo.gd aggiornato (non usa piu' get_corridoi per il punto di attraversamento). 924/924 test, validate_data.py 0 errori. Verifica Xvfb: screenshot della campagna (alberi sparsi, non vuoto) + cammino REALE da dentro Mirwada, attraverso una breccia nel muro nord, alla campagna aperta."
+      "fase": 11,
+      "passes": false,
+      "notes": ""
     }
   ]
 }
