@@ -237,22 +237,54 @@ apra un menu "crea per te" per un NPC, riusando Forge/PotionSystem.
       `crafter.ricette` esiste davvero.
 - [ ] Tests pass. `python tools/validate_data.py` esce 0.
 
-#### US-1108: Il primo fabbro — riempie la capanna erborista di Valle
+#### US-1108: Un NPC dentro un interno
+**Descrizione:** Come motore, serve poter piazzare un NPC DENTRO un
+interno (US-1010) - oggi `interior_scene.gd` sa disegnare nemici/oggetti
+ma non un NPC, e un fabbro/alchimista deve stare nella sua bottega, non
+fuori.
+
+> **Split in corsa (individuato scrivendo US-1108 originale)**: l'AC
+> "posizionato dentro, non fuori" richiedeva un motore che non esiste -
+> `interior_scene.gd` lo dichiara esplicitamente fuori scope nel suo
+> stesso commento di testa ("niente ... NPC a orario"). Stesso schema del
+> motore-poi-contenuto già visto in US-1010→1011/1012 (fase 10): questa
+> story costruisce SOLO il motore (deliberatamente più semplice di quello
+> del mondo esterno — un NPC dentro una stanza non ha bisogno di
+> `schedule`/orario, è sempre lì), il contenuto vero (il primo alchimista)
+> è **US-1108B**.
+
+**Acceptance Criteria:**
+- [ ] `data/schema/interno.schema.json`: campo opzionale `npcs: [{x, y,
+      npc_id}]`.
+- [ ] `interior_scene.gd`: nuova `_crea_npc(layout)` (chiamata da
+      `_ready()`) - stessa forma minima di `world_scene.gd::_crea_un_npc`
+      MA senza schedule/orario (un NPC dentro una stanza è sempre lì):
+      sprite + nome + prompt "interagisci", `body_entered`/`body_exited`
+      per la prossimità, `_unhandled_input` avvia `DialogueEngine.avvia`
+      sul suo `dialogue_id`. Duplicata da `world_scene.gd`, non condivisa
+      — stessa scelta già fatta per `_crea_nemici`/`_crea_oggetti` fra i
+      due script (il commento di testa del file lo dichiara).
+- [ ] `tools/validate_data.py`: ogni `npc_id` in un `npcs[]` di un
+      interno deve esistere in `data/npc/roster.json`.
+- [ ] Tests pass. `python tools/validate_data.py` esce 0.
+
+#### US-1108B: Il primo fabbro — riempie la capanna erborista di Valle
 **Descrizione:** Come giocatore, voglio trovare un alchimista vero nella
 capanna "erborista" dell'avamposto di Valle della Madre, oggi vuota.
 **Acceptance Criteria:**
 - [ ] Nuovo NPC nel roster (id, nome, ruolo, `region_id: valle_madre`,
-      `schedule` nella capanna erborista, `crafter.ricette` con almeno 1
-      formula esistente), grafo di dialogo con una scelta
-      `crea_su_richiesta`.
+      `crafter.ricette` con almeno 1 ricetta esistente), grafo di
+      dialogo con una scelta `crea_su_richiesta`.
 - [ ] `data/world/interni/valle_avamposto_erborista.json`: l'interno
-      oggi vuoto guadagna l'NPC (posizionato dentro, non fuori).
+      oggi vuoto guadagna `npcs: [...]` (posizionato dentro, non fuori -
+      il motore di US-1108).
 - [ ] Test: il dialogo con l'NPC, con gli ingredienti giusti in
-      inventario, produce la pozione; senza, fallisce col messaggio
-      giusto.
+      inventario, produce la pozione; senza, il bottone Crea resta
+      disabilitato.
 - [ ] Tests pass. `python tools/validate_data.py` esce 0. Verifica a
-      schermo con Xvfb (screenshot in chat): si parla con l'NPC, gli si
-      commissiona la pozione, appare nell'inventario.
+      schermo con Xvfb (screenshot in chat): si entra nella capanna, si
+      parla con l'NPC, gli si commissiona la pozione, appare
+      nell'inventario.
 
 #### US-1109: Un fabbro dentro Mirwada
 **Descrizione:** Come giocatore, voglio un fabbro raggiungibile dentro

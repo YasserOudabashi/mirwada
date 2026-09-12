@@ -1154,6 +1154,7 @@ def main():
     # risolvere.
     interni_dir = os.path.join(DATA, "world", "interni")
     interni_ids = set()
+    interni_npc_refs = []   # [(rel, iid, npc_id)] - risolti dopo il roster NPC, sotto
     if os.path.isdir(interni_dir):
         for fn in sorted(os.listdir(interni_dir)):
             if not fn.endswith(".json"):
@@ -1170,6 +1171,8 @@ def main():
                 err(f"{rel}: interno_id '{iid}' duplicato tra gli interni")
             interni_ids.add(iid)
             valida_mappa_e_spawn(doc, f"{rel} [{iid}]", LEGENDA_LAYOUT, CALPESTABILI_LAYOUT)
+            for spec in doc.get("npcs", []):
+                interni_npc_refs.append((rel, iid, spec.get("npc_id")))
 
     layouts_dir = os.path.join(DATA, "world", "layouts")
     layout_region_ids = set()
@@ -1818,6 +1821,14 @@ def main():
                 err(f"{rel}: manca l'NPC del roster '{atteso}' (design-npc-quest cap. 2)")
         if n_generici < 10:
             err(f"{rel}: solo {n_generici} npc_generic_*, attesi >= 10 (fool_9_inganno ne inganna 10)")
+
+        # US-1108 (fase 11): ogni npcs[].npc_id di un interno deve risolvere
+        # a un NPC vero - raccolti sopra, mentre si caricavano gli interni
+        # (npc_ids esiste solo ora, dopo il roster).
+        for irel, iid_int, npc_id in interni_npc_refs:
+            if npc_id not in npc_ids:
+                err(f"{irel} [{iid_int}]: npcs[].npc_id '{npc_id}' non esiste in "
+                    f"data/npc/roster.json")
 
     # --- fonti degli ingredienti (US-809c, chiusura "fonti nel mondo") ---
     # Ogni ingrediente citato da una formula deve avere ALMENO UNA fonte in

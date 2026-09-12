@@ -715,3 +715,60 @@ func test_torre_di_osservazione_ha_una_porta_e_un_interno_a_3_stanze() -> void:
 		"contenuto reale in almeno una sala (nemico o oggetto, non uno stub vuoto)")
 
 	cont.free()
+
+
+## US-1108 (fase 11): un NPC dentro un interno - engine puro (nessun interno
+## reale ha ancora npcs[] nei dati, arriva in US-1108B). Entra davvero nel
+## sotterraneo di Mirwada (US-1010), poi chiama _crea_npc direttamente con un
+## NPC vero del roster per provare sprite/prossimita'/interazione senza
+## aspettare il primo contenuto reale.
+func test_un_npc_dentro_un_interno_si_puo_avvicinare_e_interrogare() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var cont: Node2D = r["cont"]
+	var mondo: Node = r["mondo"]
+	var player: Node2D = r["player"]
+	var porta: Area2D = _porta_sotterraneo(mondo)
+	assert_false(porta == null, "la porta esiste")
+	if porta == null:
+		cont.free()
+		return
+
+	mondo.call("_entra_edificio", porta)
+	var interno: Node = null
+	for c in cont.get_children():
+		if c.get_script() == InteriorScript:
+			interno = c
+	assert_false(interno == null, "l'interno e' stato istanziato")
+	if interno == null:
+		cont.free()
+		return
+
+	interno.call("_crea_npc", {"npcs": [{"x": 2, "y": 2, "npc_id": "npc_mirco"}]})
+	var npc: Area2D = interno.get_node_or_null("Npc_npc_mirco")
+	assert_false(npc == null, "l'NPC e' stato creato dentro l'interno")
+	if npc == null:
+		cont.free()
+		return
+
+	interno.call("_npc_avvicinato", player, "npc_mirco")
+	var prompt: Node = npc.get_node_or_null("Prompt")
+	assert_true(prompt != null and prompt.visible, "il prompt 'interagisci' compare vicino all'NPC")
+
+	var de: Node = _root().get_node("DialogueEngine")
+	de.call("termina")
+	# Book e' un autoload condiviso da tutta la suite - un'altra suite di test
+	# (dialoghi/negozio) puo' lasciarlo aperto se non e' l'ultima a girare.
+	# azzera() qui, non nel prepara() del file (nessun altro test di questo
+	# file lo tocca).
+	_root().get_node("Book").call("azzera")
+	var ev := InputEventAction.new()
+	ev.action = "interagisci"
+	ev.pressed = true
+	interno.call("_unhandled_input", ev)
+	assert_true(bool(de.call("in_corso")), "interagire dentro l'interno avvia davvero il dialogo dell'NPC")
+	de.call("termina")
+
+	interno.call("_npc_allontanato", player, "npc_mirco")
+	assert_false(prompt.visible, "allontanandosi il prompt sparisce")
+
+	cont.free()

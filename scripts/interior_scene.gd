@@ -32,6 +32,10 @@ const CALPESTABILI := [".", ",", "=", "+"]
 ## aggiungerla all'albero, cosi' _ready() lo trova gia' pronto.
 var interno_id: String = ""
 
+## US-1108 (fase 11): l'npc_id vicino al giocatore ("" = nessuno) - stesso
+## principio di world_scene.gd::_npc_vicino, per _unhandled_input.
+var _npc_vicino: String = ""
+
 
 func _ready() -> void:
 	tile_set = load("res://assets/placeholder/tileset.tres")
@@ -47,6 +51,7 @@ func _ready() -> void:
 	_crea_uscita(layout)
 	_crea_nemici(layout)
 	_crea_oggetti(layout)
+	_crea_npc(layout)
 
 
 func _dipingi(layout: Dictionary) -> void:
@@ -123,3 +128,104 @@ func _crea_oggetti(layout: Dictionary) -> void:
 		pickup.call("setup", str(spec.get("item_id", "")), to_global(map_to_local(
 			Vector2i(int(spec.get("x", 0)), int(spec.get("y", 0))))))
 		pickup.set("quantita", int(spec.get("quantita", 1)))
+
+
+# --- NPC (US-1108, fase 11) -------------------------------------------
+## Un fabbro/alchimista dentro la sua bottega. Stessa forma minima di
+## world_scene.gd::_crea_un_npc MA senza schedule/orario: un NPC dentro una
+## stanza e' sempre li', non gira fra location_tag per momento del giorno -
+## duplicata apposta, non condivisa (stessa scelta gia' fatta per
+## _crea_nemici/_crea_oggetti, vedi il commento di testa del file).
+
+func _crea_npc(layout: Dictionary) -> void:
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd == null:
+		return
+	for spec in (layout.get("npcs", []) as Array):
+		var s: Dictionary = spec as Dictionary
+		var id: String = str(s.get("npc_id", ""))
+		if id.is_empty():
+			continue
+		_crea_un_npc(id, gd, map_to_local(Vector2i(int(s.get("x", 0)), int(s.get("y", 0)))))
+
+
+func _crea_un_npc(id: String, gd: Node, posizione: Vector2) -> void:
+	var area := Area2D.new()
+	area.name = "Npc_%s" % id
+	area.set_meta("npc_id", id)
+	area.position = posizione
+	var shape := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(TILE, TILE) * 1.2
+	shape.shape = rect
+	area.add_child(shape)
+
+	var npc_dati: Dictionary = gd.call("get_npc", id)
+	var variante: int = int((npc_dati.get("aspetto", {}) as Dictionary).get("variante", 0))
+	var sprite := Sprite2D.new()
+	sprite.texture = load("res://assets/placeholder/npc_popolano.png")
+	sprite.region_enabled = true
+	sprite.region_rect = Rect2(0, variante * TILE, TILE, TILE)
+	area.add_child(sprite)
+
+	var nome := Label.new()
+	nome.name = "Nome"
+	nome.text = str(gd.call("tr_data", npc_dati.get("name_i18n", id)))
+	nome.add_theme_font_size_override("font_size", 10)
+	nome.position = Vector2(-TILE, -TILE * 0.95)
+	area.add_child(nome)
+
+	if not str(npc_dati.get("dialogue_id", "")).is_empty():
+		var prompt := Label.new()
+		prompt.name = "Prompt"
+		prompt.add_theme_font_size_override("font_size", 10)
+		prompt.position = Vector2(-TILE, TILE * 0.7)
+		prompt.text = tr("HUD_PROMPT_INTERAGISCI").format({"tasto": _tasto_interagisci()})
+		prompt.hide()
+		area.add_child(prompt)
+
+	area.body_entered.connect(_npc_avvicinato.bind(id))
+	area.body_exited.connect(_npc_allontanato.bind(id))
+	add_child(area)
+
+
+func _npc_avvicinato(body: Node, id: String) -> void:
+	if not body.is_in_group("player"):
+		return
+	var ns: Node = get_node_or_null("/root/NpcSystem")
+	if ns != null:
+		ns.call("incontra", id)
+	_npc_vicino = id
+	_mostra_prompt(id, true)
+
+
+func _npc_allontanato(body: Node, id: String) -> void:
+	if body.is_in_group("player") and _npc_vicino == id:
+		_npc_vicino = ""
+		_mostra_prompt(id, false)
+
+
+func _mostra_prompt(id: String, visibile: bool) -> void:
+	var p: Node = get_node_or_null("Npc_%s/Prompt" % id)
+	if p != null:
+		p.visible = visibile
+
+
+func _tasto_interagisci() -> String:
+	for ev in InputMap.action_get_events("interagisci"):
+		if ev is InputEventKey:
+			return OS.get_keycode_string((ev as InputEventKey).physical_keycode)
+	return "F"
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("interagisci") or _npc_vicino.is_empty():
+		return
+	var de: Node = get_node_or_null("/root/DialogueEngine")
+	var book: Node = get_node_or_null("/root/Book")
+	if de == null or bool(de.call("in_corso")) or (book != null and bool(book.call("e_aperto"))):
+		return
+	var gd: Node = get_node_or_null("/root/GameData")
+	var did: String = str(gd.call("get_npc", _npc_vicino).get("dialogue_id", "")) if gd != null else ""
+	if not did.is_empty() and de.call("avvia", did, _npc_vicino):
+		get_viewport().set_input_as_handled()

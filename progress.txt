@@ -12363,5 +12363,58 @@ COME VERIFICATO.
 
 APERTO: nessun NPC ha ancora un crafter reale - US-1108 scrive il primo.
 
-PROSSIMA STORIA: US-1108 ("Il primo fabbro - riempie la capanna erborista
-di Valle"), priority 8.
+PROSSIMA STORIA (chiusa qui sotto, SPEZZATA in corsa): US-1108 ("Il primo
+fabbro - riempie la capanna erborista di Valle"), priority 8.
+
+SPLIT IN CORSA: l'AC "posizionato dentro, non fuori" richiedeva un motore
+che non esiste - interior_scene.gd dichiara esplicitamente nel suo
+commento di testa che gli NPC (a orario) sono fuori scope per un interno.
+Stesso schema motore-poi-contenuto di US-1010->1011/1012 (fase 10):
+US-1108 ora e' SOLO il motore (un NPC dentro una stanza, senza schedule -
+e' sempre li'), il contenuto vero (il primo alchimista) diventa
+**US-1108B** (priority 9, tutto cio' che veniva dopo shiftato di 1: nuovo
+totale 15 story). PRD e prd.json aggiornati.
+
+FATTO (US-1108 - motore).
+- data/schema/interno.schema.json: campo opzionale npcs: [{x, y,
+  npc_id}] - un NPC dentro una stanza e' SEMPRE li' (niente schedule/
+  orario, a differenza del mondo esterno: una bottega non chiude di
+  notte).
+- scripts/interior_scene.gd: nuova _crea_npc(layout) (chiamata da
+  _ready()) + _crea_un_npc/_npc_avvicinato/_npc_allontanato/
+  _mostra_prompt/_tasto_interagisci/_unhandled_input - stessa forma di
+  world_scene.gd::_crea_un_npc e affini, MA senza schedule/orario/
+  _ricrea_tutti_npc. Duplicata apposta (non condivisa), coerente con la
+  scelta gia' fatta per _crea_nemici/_crea_oggetti fra i due script
+  (dichiarata nel commento di testa del file, ora aggiornato).
+- tools/validate_data.py: ogni npcs[].npc_id di un interno deve
+  risolvere in data/npc/roster.json (raccolti mentre si caricano gli
+  interni, risolti dopo il roster - stesso schema gia' in uso per
+  edifici[].interno_id). Verificato manualmente rompendo un npc_id
+  apposta (rifiutato), poi ripristinato.
+- tests/test_world_scene.gd: nuovo test_un_npc_dentro_un_interno_si_puo_
+  avvicinare_e_interrogare - entra per davvero nel sotterraneo di
+  Mirwada (US-1010), chiama _crea_npc con un NPC vero del roster
+  (npc_mirco) iniettato a mano (nessun interno reale ha ancora npcs[]),
+  prova prossimita'/prompt/interazione che avvia il dialogo vero.
+- BUG trovato scrivendo il test: Book e' un autoload condiviso da tutta
+  la suite - un'altra suite (dialoghi/negozio, alfabeticamente prima)
+  lo lascia aperto se non e' l'ultima a girare, e il guard di
+  _unhandled_input ("book aperto -> non interagire, il libro e' gia' in
+  primo piano") bloccava l'interazione per uno stato di un test
+  precedente, non un bug del motore. Fix: Book.azzera() dentro il test
+  stesso (nessun altro test di questo file tocca Book, non serve
+  spostarlo nel prepara() condiviso).
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 935 test,
+  tutti passati (934 + 1 nuovo), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Nessuna verifica a schermo: e' motore puro, nessun interno reale ha
+  ancora un NPC (US-1108B lo mostra per davvero con Xvfb).
+
+APERTO: nessun interno reale usa ancora npcs[] - US-1108B (il vero
+alchimista di Valle) e' la prossima.
+
+PROSSIMA STORIA: US-1108B ("Il primo fabbro - riempie la capanna
+erborista di Valle"), priority 9.

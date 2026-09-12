@@ -105,15 +105,30 @@
     },
     {
       "id": "US-1108",
-      "title": "Il primo fabbro - riempie la capanna erborista di Valle",
-      "description": "Come giocatore, voglio trovare un alchimista vero nella capanna erborista dell'avamposto di Valle della Madre, oggi vuota.",
+      "title": "Un NPC dentro un interno",
+      "description": "Come motore, serve poter piazzare un NPC DENTRO un interno (US-1010) - oggi interior_scene.gd sa disegnare nemici/oggetti ma non un NPC, e un fabbro/alchimista deve stare nella sua bottega, non fuori.",
       "acceptanceCriteria": [
-        "Nuovo NPC nel roster (id, nome, ruolo, region_id: valle_madre, schedule nella capanna erborista, crafter.formule con almeno 1 formula esistente), grafo di dialogo con una scelta crea_su_richiesta.",
-        "data/world/interni/valle_avamposto_erborista.json: l'interno oggi vuoto guadagna l'NPC (posizionato dentro, non fuori).",
-        "Test: il dialogo con l'NPC, con gli ingredienti giusti in inventario, produce la pozione; senza, fallisce col messaggio giusto.",
-        "Tests pass. python tools/validate_data.py esce 0. Verifica a schermo con Xvfb (screenshot in chat): si parla con l'NPC, gli si commissiona la pozione, appare nell'inventario."
+        "data/schema/interno.schema.json: campo opzionale npcs: [{x, y, npc_id}].",
+        "interior_scene.gd: nuova _crea_npc(layout) (chiamata da _ready()) - stessa forma minima di world_scene.gd::_crea_un_npc MA senza schedule/orario (un NPC dentro una stanza e' sempre li'): sprite + nome + prompt \"interagisci\", body_entered/body_exited per la prossimita', _unhandled_input avvia DialogueEngine.avvia sul suo dialogue_id. Duplicata da world_scene.gd, non condivisa - stessa scelta gia' fatta per _crea_nemici/_crea_oggetti fra i due script.",
+        "tools/validate_data.py: ogni npc_id in un npcs[] di un interno deve esistere in data/npc/roster.json.",
+        "Tests pass. python tools/validate_data.py esce 0."
       ],
       "priority": 8,
+      "fase": 11,
+      "passes": true,
+      "notes": "interno.schema.json: npcs: [{x,y,npc_id}] opzionale (senza schedule - un NPC dentro una stanza e' sempre li'). interior_scene.gd: _crea_npc + _crea_un_npc/prossimita'/prompt/_unhandled_input, duplicata da world_scene.gd (stessa scelta gia' fatta per nemici/ oggetti). validate_data.py: npcs[].npc_id deve risolvere nel roster (verificato rompendolo apposta). Nuovo test: entra nel sotterraneo di Mirwada, inietta un NPC vero, prova prossimita'+interazione. Bug trovato e corretto: Book e' un autoload condiviso, un test precedente lo lasciava aperto bloccando l'interazione - fix nel test, non nel motore. 935/935 test, validate_data.py 0 errori."
+    },
+    {
+      "id": "US-1108B",
+      "title": "Il primo fabbro - riempie la capanna erborista di Valle",
+      "description": "Come giocatore, voglio trovare un alchimista vero nella capanna \"erborista\" dell'avamposto di Valle della Madre, oggi vuota.",
+      "acceptanceCriteria": [
+        "Nuovo NPC nel roster (id, nome, ruolo, region_id: valle_madre, crafter.ricette con almeno 1 ricetta esistente), grafo di dialogo con una scelta crea_su_richiesta.",
+        "data/world/interni/valle_avamposto_erborista.json: l'interno oggi vuoto guadagna npcs: [...] (posizionato dentro, non fuori - il motore di US-1108).",
+        "Test: il dialogo con l'NPC, con gli ingredienti giusti in inventario, produce la pozione; senza, il bottone Crea resta disabilitato.",
+        "Tests pass. python tools/validate_data.py esce 0. Verifica a schermo con Xvfb (screenshot in chat): si entra nella capanna, si parla con l'NPC, gli si commissiona la pozione, appare nell'inventario."
+      ],
+      "priority": 9,
       "fase": 11,
       "passes": false,
       "notes": ""
@@ -127,7 +142,7 @@
         "Nuovo NPC fabbro (crafter.blueprints con almeno 1 blueprint esistente + una nuova arma - US-1110), grafo di dialogo con crea_su_richiesta.",
         "Tests pass. python tools/validate_data.py esce 0. Verifica a schermo con Xvfb."
       ],
-      "priority": 9,
+      "priority": 10,
       "fase": 11,
       "passes": false,
       "notes": ""
@@ -140,7 +155,7 @@
         "Almeno 3 blueprints nuovi in data/forge/blueprints.json (armi/equip diversi da quelli esistenti, ingredienti gia' presenti nel gioco) e 3 formule nuove in data/potions/formulas.json, almeno una con un ingrediente/output di rarita' non_comune+.",
         "python tools/validate_data.py esce 0. Tests pass."
       ],
-      "priority": 10,
+      "priority": 11,
       "fase": 11,
       "passes": false,
       "notes": ""
@@ -154,7 +169,7 @@
         "2 nuovi interni in data/world/interni/, con l'NPC fabbro di questo villaggio dentro una delle capanne.",
         "python tools/validate_data.py esce 0. Tests pass. Verifica a schermo con Xvfb (screenshot in chat): si cammina dalla breccia al villaggio, si entra in una capanna."
       ],
-      "priority": 11,
+      "priority": 12,
       "fase": 11,
       "passes": false,
       "notes": ""
@@ -167,7 +182,7 @@
         "Stesso schema di US-1111: 2-3 capanne in campagna, un alchimista (crafter.formule) + un mercante col listino che include almeno un oggetto raro/leggendario (prezzo alto, US-1103).",
         "python tools/validate_data.py esce 0. Tests pass. Verifica a schermo con Xvfb."
       ],
-      "priority": 12,
+      "priority": 13,
       "fase": 11,
       "passes": false,
       "notes": ""
@@ -181,7 +196,7 @@
         "Test: con N>3 NPC nella stessa zona, la distanza minima fra due NPC qualsiasi e' maggiore di quella di oggi (regressione esplicita sul valore precedente).",
         "Tests pass. python tools/validate_data.py esce 0. Verifica a schermo con Xvfb."
       ],
-      "priority": 13,
+      "priority": 14,
       "fase": 11,
       "passes": false,
       "notes": ""
@@ -199,7 +214,7 @@
         "Checkpoint dinamico (stesso schema di test_fase_10_checkpoint.gd): zero righe di codice che nominino un villaggio/NPC/blueprint/formula specifici - lista vietata scoperta dai dati.",
         "Tests pass. python tools/validate_data.py esce 0."
       ],
-      "priority": 14,
+      "priority": 15,
       "fase": 11,
       "passes": false,
       "notes": ""
