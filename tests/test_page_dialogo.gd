@@ -172,6 +172,46 @@ func test_creazione_con_bram_forgia_la_spada() -> void:
 	p.free()
 
 
+## US-1110: bp_anello_di_cristallo e' il primo blueprint con
+## nota_da_subito:false assegnato a un crafter (Bram) - il bottone Crea deve
+## restare disponibile (l'NPC "conosce il suo mestiere" a prescindere) mentre
+## la forgiatura diretta del giocatore, senza bypass, resta bloccata.
+func test_bram_forgia_l_anello_anche_se_il_giocatore_non_lo_conosce() -> void:
+	var forge: Node = _root().get_node("Forge")
+	var inv: Node = _root().get_node("Inventory")
+	inv.call("pulisci")
+	assert_false(bool(forge.call("blueprint_noto", "bp_anello_di_cristallo")),
+		"il giocatore non conosce ancora bp_anello_di_cristallo (nota_da_subito:false)")
+	var senza_bypass: Dictionary = forge.call("forgia", "bp_anello_di_cristallo")
+	assert_false(bool(senza_bypass.get("ok")), "senza bypass la forgiatura diretta fallisce")
+
+	var p: Node = _monta_pagina()
+	assert_true(_de().call("avvia", "dlg_bram", "npc_bram"), "dlg_bram parte")
+	assert_true(_de().call("scegli", 0), "sceglie 'Fammi vedere cosa sai forgiare'")
+	assert_true(p.call("in_creazione"), "si apre la modalita' creazione")
+
+	var ingr: Dictionary = (_root().get_node("GameData").call("get_blueprint", "bp_anello_di_cristallo") as Dictionary).get("materiali", {})
+	for mat in ingr:
+		inv.call("aggiungi", mat, int(ingr[mat]))
+	p.call("aggiorna")
+
+	var bottoni: Array = []
+	for c in p.get_children():
+		if c is HBoxContainer:
+			for cc in c.get_children():
+				if cc is Button and str(cc.text) == tr("BOOK_CREAZIONE_CREA"):
+					bottoni.append(cc)
+	assert_eq(bottoni.size(), 2, "Bram ha 2 blueprint: spada_ferrea + anello_di_cristallo")
+	var bottone_anello: Button = bottoni[1]
+	assert_false(bottone_anello.disabled, "con i materiali il bottone dell'anello e' attivo (bypass dell'NPC)")
+	bottone_anello.pressed.emit()
+
+	assert_eq(int(inv.call("conta", "anello_di_cristallo")), 1, "l'anello e' stato forgiato tramite Bram")
+	assert_false(bool(forge.call("blueprint_noto", "bp_anello_di_cristallo")),
+		"il bypass e' dell'NPC: il giocatore resta senza conoscere il blueprint")
+	p.free()
+
+
 func _bottone_crea(p: Node) -> Button:
 	for c in p.get_children():
 		if c is HBoxContainer:

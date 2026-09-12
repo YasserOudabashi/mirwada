@@ -12515,4 +12515,49 @@ COME VERIFICATO.
 
 APERTO: nessuno per questa story.
 
-PROSSIMA STORIA: US-1110 ("Piu' ricette da fabbricare"), priority 11.
+PROSSIMA STORIA (chiusa qui sotto): US-1110 ("Piu' ricette da fabbricare"),
+priority 11.
+
+FATTO (US-1110).
+- data/items/equip.json: 3 item nuovi - ascia_da_guerra (slot arma,
+  forza+0.15, non_comune), scudo_rinforzato (slot armatura, difesa+0.2,
+  non_comune), anello_di_cristallo (slot accessorio,
+  spiritualita_max+15/evasione+0.05, raro).
+- data/items/consumabili.json: 3 item nuovi - tonico_di_forza (buff_stat
+  forza, non_comune), filtro_di_chiarezza (buff_stat precisione, comune),
+  essenza_rara_di_guarigione (heal 120 istantaneo, raro).
+- data/forge/blueprints.json: bp_ascia_da_guerra, bp_scudo_rinforzato
+  (entrambi nota_da_subito:true), bp_anello_di_cristallo
+  (nota_da_subito:false - il PRIMO blueprint con questo stato assegnato
+  a un crafter: chiude la nota lasciata aperta in US-1109 sul bypass
+  ignora_scoperta non ancora osservabile).
+- data/potions/recipes.json: ric_tonico_di_forza, ric_filtro_di_chiarezza
+  (nota_da_subito:true), ric_essenza_rara_di_guarigione
+  (nota_da_subito:false).
+- data/npc/roster.json: bp_anello_di_cristallo aggiunto a
+  npc_bram.crafter.blueprints (2o blueprint di Bram), ric_filtro_di_chiarezza
+  aggiunto a npc_rosalba.crafter.ricette (2a ricetta di Rosalba) - nessun
+  NPC nuovo, l'AC chiede piu' scelta fra crafter esistenti, non piu' fabbri
+  (quello arriva con i villaggi di US-1111/1112).
+- data/i18n/it.json: 18 chiavi nuove (item.*/.desc per i 6 item,
+  blueprint.* per i 3 blueprint, recipe.* per le 3 ricette).
+- tests/test_page_dialogo.gd: nuovo
+  test_bram_forgia_l_anello_anche_se_il_giocatore_non_lo_conosce - prova
+  che Forge.forgia("bp_anello_di_cristallo") SENZA bypass fallisce
+  (blueprint_ignoto, il giocatore non lo conosce), mentre il 2o bottone
+  Crea nel menu di Bram lo forgia comunque (ignora_scoperta:true passato
+  sempre da page_dialogo.gd), e blueprint_noto() resta false dopo: il
+  bypass e' dell'NPC, non si propaga al giocatore.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 938 test,
+  tutti passati (937 + 1 nuovo), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Nessuna verifica Xvfb richiesta: story di soli dati + un test, nessuna
+  UI nuova (il menu di creazione e le sue righe esistono gia' da
+  US-1106/1108B/1109, qui si aggiungono solo voci alla stessa lista).
+
+APERTO: nessuno per questa story.
+
+PROSSIMA STORIA: US-1111 ("Villaggio nella campagna vicino a Marche del
+Crepuscolo"), priority 12.

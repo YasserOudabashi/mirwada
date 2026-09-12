@@ -783,7 +783,8 @@
       "vendor": null,
       "crafter": {
         "ricette": [
-          "ric_cura_maggiore"
+          "ric_cura_maggiore",
+          "ric_filtro_di_chiarezza"
         ]
       },
       "dialogue_id": "dlg_rosalba",
@@ -805,7 +806,8 @@
       "vendor": null,
       "crafter": {
         "blueprints": [
-          "bp_spada_ferrea"
+          "bp_spada_ferrea",
+          "bp_anello_di_cristallo"
         ]
       },
       "dialogue_id": "dlg_bram",

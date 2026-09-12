@@ -157,8 +157,8 @@
       ],
       "priority": 11,
       "fase": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "3 blueprint nuovi (bp_ascia_da_guerra, bp_scudo_rinforzato, bp_anello_di_cristallo - quest'ultimo nota_da_subito:false, il primo caso reale in cui il bypass ignora_scoperta di un NPC fa la differenza) + 3 ricette nuove (ric_tonico_di_forza, ric_filtro_di_chiarezza, ric_essenza_rara_di_guarigione - quest'ultima nota_da_subito:false), 6 item nuovi con rarita' esplicita (2 non_comune, 1 raro sull'anello, 1 raro sull'essenza). Assegnati come esclusiva ai crafter esistenti: bp_anello_di_cristallo a Bram, ric_filtro_di_chiarezza a Rosalba - nessun NPC nuovo (l'AC chiede solo piu' scelta, non piu' fabbri). 18 chiavi i18n aggiunte. Nuovo test test_bram_forgia_l_anello_anche_se_il_giocatore_non_lo_conosce: prova che Forge.forgia('bp_anello_di_cristallo') senza bypass fallisce (blueprint_ignoto) mentre il bottone Crea nel menu di Bram lo forgia comunque, e il giocatore resta senza conoscerlo dopo - chiude la nota aperta in US-1109. 938/938 test, validate_data.py 0 errori/2 warning invariati."
     },
     {
       "id": "US-1111",
