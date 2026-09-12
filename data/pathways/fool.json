@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "fool",
+  "categoria": "standard",
   "name": "Fool",
   "name_i18n": "pathway.fool",
   "group": "lord_of_mysteries",

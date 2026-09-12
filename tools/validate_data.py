@@ -13,6 +13,7 @@ Gli schema in data/schema/ restano la documentazione formale del formato.
 
 import json
 import os
+import struct
 import sys
 from collections import Counter
 
@@ -59,6 +60,105 @@ def expected_tier(seq_num):
     if seq_num >= 1:
         return "angel"
     return "god"
+
+
+VALID_BOON_TIPI = {"quest", "comportamento", "sacrificio"}
+VALID_COSTO_TIPI = {"oggetto", "caratteristica", "follia"}
+
+
+def valida_boon(rel, sid, boon, events, quest_ids, item_ids, char_ids):
+    """Valida il campo 'boon' di una Sequenza di un Pathway non_standard
+    (fase 9, US-901: data/schema/boon.schema.json). Ritorna una lista di
+    stringhe di errore, il chiamante le passa a err()."""
+    out = []
+    requisiti = boon.get("requisiti", [])
+    if not isinstance(requisiti, list) or not requisiti:
+        out.append(f"{rel} [{sid}]: boon.requisiti deve essere una lista non vuota")
+        return out
+    for i, req in enumerate(requisiti):
+        etichetta = f"{rel} [{sid}] boon.requisiti[{i}]"
+        tipo = req.get("tipo")
+        if tipo not in VALID_BOON_TIPI:
+            out.append(f"{etichetta}: tipo '{tipo}' non nel vocabolario chiuso {sorted(VALID_BOON_TIPI)}")
+            continue
+        if tipo == "quest":
+            qid = req.get("quest_id")
+            if qid not in quest_ids:
+                out.append(f"{etichetta}: quest_id '{qid}' non esiste in data/quests/")
+        elif tipo == "comportamento":
+            ev = req.get("evento")
+            if ev not in events:
+                out.append(f"{etichetta}: evento '{ev}' non nel vocabolario chiuso di "
+                            f"data/schema/tracked_events.json. Un evento nuovo e' CODICE: "
+                            f"va discusso, non aggiunto di slancio.")
+            else:
+                allowed = set(events[ev].get("filtri", []))
+                for f in req.get("filtri", {}):
+                    if f not in allowed:
+                        out.append(f"{etichetta}: filtro '{f}' non ammesso per l'evento "
+                                    f"'{ev}' (ammessi: {sorted(allowed)})")
+            if not req.get("target", 0) > 0:
+                out.append(f"{etichetta}: target deve essere un numero > 0")
+        elif tipo == "sacrificio":
+            costo = req.get("costo", {})
+            ctipo = costo.get("tipo")
+            if ctipo not in VALID_COSTO_TIPI:
+                out.append(f"{etichetta}: costo.tipo '{ctipo}' non nel vocabolario chiuso "
+                            f"{sorted(VALID_COSTO_TIPI)}")
+            elif ctipo == "oggetto" and costo.get("id") not in item_ids:
+                out.append(f"{etichetta}: costo.id '{costo.get('id')}' non e' un item esistente")
+            elif ctipo == "caratteristica" and costo.get("id") not in char_ids:
+                out.append(f"{etichetta}: costo.id '{costo.get('id')}' non e' una Caratteristica esistente")
+            if ctipo in ("oggetto", "caratteristica") and not (
+                    isinstance(costo.get("quantita"), (int, float)) and costo.get("quantita") > 0):
+                out.append(f"{etichetta}: costo.quantita deve essere un numero > 0")
+    return out
+
+
+## Valida la forma "layout" condivisa da una mappa esterna
+## (data/world/layouts/*.json, US-805) e da un interno di edificio
+## (data/world/interni/*.json, US-1010: "stesso schema di un layout"):
+## righe rettangolari di soli caratteri della legenda, bordo esterno
+## tutto '#', spawn dentro i limiti su una cella calpestabile. Dimensione
+## LIBERA (US-1005): la riga 0 detta la larghezza, non una costante.
+## Ritorna (mappa, w, h, righe_valide) per chi deve controllare anche
+## zone/edifici/nemici/oggetti alle stesse dimensioni vere.
+def valida_mappa_e_spawn(doc, rel, legenda, calpestabili):
+    mappa = doc.get("mappa", [])
+    h = len(mappa) if isinstance(mappa, list) else 0
+    w = len(mappa[0]) if h > 0 and isinstance(mappa[0], str) else 0
+    if h == 0 or w == 0:
+        err(f"{rel}: mappa deve avere almeno 1 riga non vuota")
+        return mappa, w, h, False
+    righe_valide = True
+    for y, riga in enumerate(mappa):
+        if not isinstance(riga, str) or len(riga) != w:
+            err(f"{rel}: riga {y} deve avere {w} caratteri (la larghezza della riga 0)")
+            righe_valide = False
+            continue
+        fuori = set(riga) - legenda
+        if fuori:
+            err(f"{rel}: riga {y} usa caratteri fuori dalla legenda: {sorted(fuori)}")
+
+    if righe_valide:
+        bordo_ok = all(c == "#" for c in mappa[0]) and all(c == "#" for c in mappa[h - 1])
+        bordo_ok = bordo_ok and all(riga[0] == "#" and riga[w - 1] == "#" for riga in mappa)
+        if not bordo_ok:
+            err(f"{rel}: il bordo esterno (riga 0, riga {h - 1}, colonna 0, "
+                f"colonna {w - 1}) deve essere tutto '#'")
+
+    spawn = doc.get("spawn", [])
+    if not (isinstance(spawn, list) and len(spawn) == 2
+            and all(isinstance(v, int) for v in spawn)):
+        err(f"{rel}: spawn deve essere [x, y] di interi")
+    elif righe_valide:
+        sx, sy = spawn
+        if not (0 <= sx < w and 0 <= sy < h):
+            err(f"{rel}: spawn {spawn} fuori dai limiti ({w}x{h})")
+        elif mappa[sy][sx] not in calpestabili:
+            err(f"{rel}: spawn {spawn} non e' su una cella calpestabile ('{mappa[sy][sx]}')")
+
+    return mappa, w, h, righe_valide
 
 
 def main():
@@ -144,6 +244,12 @@ def main():
             err(f"{rel}: il nome file non corrisponde all'id '{pid}'")
         if doc.get("group") not in VALID_GROUPS:
             err(f"{rel}: gruppo non valido '{doc.get('group')}'")
+        # US-901: distingue Pathway standard (pozione+recitazione) da quelli
+        # non_standard (Boon, data/pathways_non_standard/) - un file qui
+        # dev'essere sempre 'standard', l'altra categoria vive altrove.
+        if doc.get("categoria") != "standard":
+            err(f"{rel}: categoria deve essere 'standard' per un pathway in "
+                f"data/pathways/ (trovato: {doc.get('categoria')!r})")
         if not isinstance(doc.get("gameplay_verb"), str) or len(doc.get("gameplay_verb", "")) < 10:
             err(f"{rel}: gameplay_verb mancante o troppo generico")
         for t in doc.get("tags", []):
@@ -227,6 +333,12 @@ def main():
             pot = seq.get("potion", {})
             if not stub and pot.get("formula_id"):
                 potion_refs.append((rel, sid, n, pot))
+            # US-901: 'boon' e' riservato ai Pathway non_standard (data/
+            # pathways_non_standard/) - qui sarebbe sempre un errore di
+            # collocazione, mai una scelta valida.
+            if seq.get("boon") is not None:
+                err(f"{rel} [{sid}]: 'boon' su un Pathway standard - il campo e' "
+                    f"riservato ai Pathway non_standard (US-901).")
 
             total_prog = 0.0
             for act in seq.get("acting_actions", []):
@@ -290,10 +402,44 @@ def main():
         warn(f"{stub_count} sequenze su {total_sequences} sono stub dichiarati: "
              f"contenuto ancora da scrivere (fase 5), non un errore.")
 
+    # US-904: gli id delle Sequenze dei Pathway non_standard entrano anche
+    # loro in sequence_ids - servono alla validazione delle abilita' (sotto,
+    # sequence_id deve risolvere sia su uno standard che su un non_standard)
+    # e al controllo duplicati subito dopo. La validazione PIENA di questi
+    # file (categoria, group, boon...) resta nel blocco dedicato piu' in
+    # basso, dove quest_ids/item_ids/char_ids sono gia' disponibili: qui e'
+    # solo una raccolta di id, una seconda lettura dei file e' il prezzo di
+    # non riordinare tutto il resto dello script.
+    pnsdir_early = os.path.join(DATA, "pathways_non_standard")
+    if os.path.isdir(pnsdir_early):
+        for fn in sorted(f for f in os.listdir(pnsdir_early) if f.endswith(".json")):
+            _doc_early = load_json(os.path.join(pnsdir_early, fn))
+            if _doc_early is None:
+                continue
+            for _seq_early in _doc_early.get("sequences", []):
+                _sid_early = _seq_early.get("id")
+                if _sid_early:
+                    sequence_ids.append(_sid_early)
+
     for name, values in (("pathway", pathway_ids), ("sequenza", sequence_ids)):
         dupes = [k for k, v in Counter(values).items() if v > 1]
         if dupes:
             err(f"id {name} duplicati: {dupes}")
+
+    # --- categoria dei Pathway differiti (data/pathways_deferred/, US-901) ---
+    # Non sono caricati da GameData e restano fuori dalla validazione piena
+    # dei Pathway attivi (vedi sopra): qui solo il campo 'categoria' aggiunto
+    # in fase 9, per coerenza col resto del vocabolario (sono tutti standard,
+    # nessun Pathway differito e' non_standard).
+    pddir = os.path.join(DATA, "pathways_deferred")
+    if os.path.isdir(pddir):
+        for fn in sorted(f for f in os.listdir(pddir) if f.endswith(".json")):
+            _d = load_json(os.path.join(pddir, fn))
+            if _d is None:
+                continue
+            if _d.get("categoria") != "standard":
+                err(f"data/pathways_deferred/{fn}: categoria deve essere 'standard' "
+                    f"(trovato: {_d.get('categoria')!r})")
 
     # --- percorsi di fusione (data/fusions/, fase 7 US-702) ---
     # Il cambio di Pathway funziona solo tra vicini dello STESSO gruppo. I
@@ -795,6 +941,14 @@ def main():
         if not isinstance(sp, int) or not (0 <= sp <= 9):
             err("data/balance.json [densita_mistica.sequenza_percezione]: intero 0-9.")
 
+        # US-1003: raggio di attivazione di nemici/NPC nel mondo continuo.
+        mondo = balance_doc.get("mondo", {})
+        raggio_attivo = mondo.get("raggio_attivo_entita")
+        if not isinstance(raggio_attivo, (int, float)) or raggio_attivo <= 0:
+            err("data/balance.json [mondo.raggio_attivo_entita]: deve essere un numero > 0 "
+                "(world_scene.gd::_aggiorna_prestazioni lo usa per disattivare cio' che e' "
+                "lontano dal giocatore, US-1003).")
+
     # --- animazioni ---
     anim_doc = load_json(os.path.join(DATA, "animations.json"))
     if anim_doc:
@@ -980,6 +1134,219 @@ def main():
                 err(f"data/audio.json [music.ambienti]: manca la zona '{mz}' usata dalla "
                     f"regione '{reg.get('id')}' (US-619: ambiente giorno/notte per ogni zona).")
 
+    # --- layout disegnati a mano (data/world/layouts/*.json, US-805) ---
+    # Sostituiscono il rettangolo piatto generato da region_scene.gd per una
+    # regione; una regione SENZA file qui resta piatta come oggi (fallback
+    # esplicito in codice) -> solo un warning, non un errore, finche' US-807
+    # non disegna le altre 4.
+    LEGENDA_LAYOUT = set(".,=#ot~+")
+    CALPESTABILI_LAYOUT = set(".,=+")
+    region_tags_by_id = {}
+    if regions_doc is not None:
+        for reg in regions_doc.get("regions", []):
+            region_tags_by_id[reg.get("id")] = set(reg.get("location_tags", []))
+
+    # --- interni di edificio (data/world/interni/*.json, US-1010) ---
+    # "Stesso schema di un layout" (mappa/spawn), ma senza region_id/zone: un
+    # interno e' una scena locale piccola e indipendente, mai parte della
+    # griglia condivisa del mondo continuo. Caricati PRIMA dei layout esterni
+    # perche' il campo layout.edifici[].interno_id (sotto) deve poterli
+    # risolvere.
+    interni_dir = os.path.join(DATA, "world", "interni")
+    interni_ids = set()
+    interni_npc_refs = []   # [(rel, iid, npc_id)] - risolti dopo il roster NPC, sotto
+    if os.path.isdir(interni_dir):
+        for fn in sorted(os.listdir(interni_dir)):
+            if not fn.endswith(".json"):
+                continue
+            rel = f"data/world/interni/{fn}"
+            doc = load_json(os.path.join(interni_dir, fn))
+            if doc is None:
+                continue
+            iid = doc.get("interno_id")
+            if not iid:
+                err(f"{rel}: manca 'interno_id'")
+                continue
+            if iid in interni_ids:
+                err(f"{rel}: interno_id '{iid}' duplicato tra gli interni")
+            interni_ids.add(iid)
+            valida_mappa_e_spawn(doc, f"{rel} [{iid}]", LEGENDA_LAYOUT, CALPESTABILI_LAYOUT)
+            for spec in doc.get("npcs", []):
+                interni_npc_refs.append((rel, iid, spec.get("npc_id")))
+
+    layouts_dir = os.path.join(DATA, "world", "layouts")
+    layout_region_ids = set()
+    if os.path.isdir(layouts_dir):
+        for fn in sorted(os.listdir(layouts_dir)):
+            if not fn.endswith(".json"):
+                continue
+            rel = f"data/world/layouts/{fn}"
+            doc = load_json(os.path.join(layouts_dir, fn))
+            if doc is None:
+                continue
+            rid = doc.get("region_id")
+            if rid not in region_ids:
+                err(f"{rel}: region_id '{rid}' non esiste in data/world/regions.json")
+                continue
+            if rid in layout_region_ids:
+                err(f"{rel}: region_id '{rid}' duplicato tra i layout")
+            layout_region_ids.add(rid)
+
+            # US-1005 (fase 10): dimensione libera - riusa la stessa validazione
+            # di forma degli interni (US-1010, "stesso schema di un layout").
+            mappa, w, h, righe_valide = valida_mappa_e_spawn(
+                doc, f"{rel} [{rid}]", LEGENDA_LAYOUT, CALPESTABILI_LAYOUT)
+
+            region_tags = region_tags_by_id.get(rid, set())
+            zone = doc.get("zone", {})
+            if not isinstance(zone, dict):
+                err(f"{rel} [{rid}]: zone deve essere un dict")
+                zone = {}
+            for tag, rect in zone.items():
+                if tag not in region_tags:
+                    err(f"{rel} [{rid}]: zone['{tag}'] non e' un location_tag della regione "
+                        f"({sorted(region_tags)})")
+                if not (isinstance(rect, list) and len(rect) == 4
+                        and all(isinstance(v, int) for v in rect)):
+                    err(f"{rel} [{rid}]: zone['{tag}'] deve essere [x, y, w, h] di interi")
+                    continue
+                zx, zy, zw, zh = rect
+                if zx < 0 or zy < 0 or zw <= 0 or zh <= 0 or zx + zw > w or zy + zh > h:
+                    err(f"{rel} [{rid}]: zone['{tag}'] {rect} fuori dai limiti ({w}x{h})")
+            mancanti = region_tags - set(zone)
+            if mancanti:
+                err(f"{rel} [{rid}]: mancano zone per i location_tags {sorted(mancanti)} "
+                    f"(una regione CON layout deve coprirli tutti)")
+
+            # US-1010: marcatori di edificio - una porta sulla mappa esterna
+            # che referenzia un interno vero.
+            edifici = doc.get("edifici", [])
+            if not isinstance(edifici, list):
+                err(f"{rel} [{rid}]: edifici deve essere un array")
+                edifici = []
+            for i, ed in enumerate(edifici):
+                if not isinstance(ed, dict):
+                    err(f"{rel} [{rid}]: edifici[{i}] deve essere un dict")
+                    continue
+                ex, ey = ed.get("x"), ed.get("y")
+                if not (isinstance(ex, int) and isinstance(ey, int)):
+                    err(f"{rel} [{rid}]: edifici[{i}] x/y devono essere interi")
+                elif righe_valide:
+                    if not (0 <= ex < w and 0 <= ey < h):
+                        err(f"{rel} [{rid}]: edifici[{i}] ({ex},{ey}) fuori dai limiti ({w}x{h})")
+                    elif mappa[ey][ex] not in CALPESTABILI_LAYOUT:
+                        err(f"{rel} [{rid}]: edifici[{i}] ({ex},{ey}) non e' su una cella "
+                            f"calpestabile ('{mappa[ey][ex]}')")
+                iid = ed.get("interno_id")
+                if not iid or iid not in interni_ids:
+                    err(f"{rel} [{rid}]: edifici[{i}].interno_id '{iid}' non esiste in "
+                        f"data/world/interni/")
+
+    for _rid in sorted(region_ids - layout_region_ids):
+        err(f"data/world/regions.json [{_rid}]: nessun layout in data/world/layouts/ "
+            f"(US-807d: tutte e 5 le regioni hanno un layout da questa story in poi; "
+            f"un layout mancante non e' piu' atteso).")
+
+    # --- world_offset e non-sovrapposizione (US-1001, fase 10) ---
+    # Le 5 regioni condividono un'unica griglia: due rettangoli non possono
+    # mai sovrapporsi, altrimenti la TileMapLayer del mondo continuo
+    # dipingerebbe due regioni sulle stesse celle. La dimensione vera viene
+    # dal layout (mappa e' gia' una lista di righe di uguale lunghezza,
+    # verificato sopra); una regione senza layout valido usa il fallback
+    # 48x36 di region_scene.gd, coerente col resto del validator.
+    if regions_doc is not None:
+        layout_dims_by_id = {}
+        if os.path.isdir(layouts_dir):
+            for fn in sorted(os.listdir(layouts_dir)):
+                if not fn.endswith(".json"):
+                    continue
+                doc = load_json(os.path.join(layouts_dir, fn)) or {}
+                rid = doc.get("region_id")
+                mappa = doc.get("mappa", [])
+                if rid and isinstance(mappa, list) and mappa and all(
+                        isinstance(r, str) and len(r) == len(mappa[0]) for r in mappa):
+                    layout_dims_by_id[rid] = (len(mappa[0]), len(mappa))
+
+        region_rects = {}
+        for reg in regions_doc.get("regions", []):
+            rid = reg.get("id")
+            wo = reg.get("world_offset")
+            if not (isinstance(wo, list) and len(wo) == 2
+                    and all(isinstance(v, int) and v >= 0 for v in wo)):
+                err(f"data/world/regions.json [{rid}]: world_offset deve essere [x, y] di interi >= 0")
+                continue
+            w, h = layout_dims_by_id.get(rid, (48, 36))
+            region_rects[rid] = (wo[0], wo[1], wo[0] + w, wo[1] + h)
+
+        rect_ids = sorted(region_rects)
+        for i, a in enumerate(rect_ids):
+            ax0, ay0, ax1, ay1 = region_rects[a]
+            for b in rect_ids[i + 1:]:
+                bx0, by0, bx1, by1 = region_rects[b]
+                if ax0 < bx1 and bx0 < ax1 and ay0 < by1 and by0 < ay1:
+                    err(f"data/world/regions.json: le regioni '{a}' {region_rects[a]} e '{b}' "
+                        f"{region_rects[b]} si sovrappongono nella griglia di mondo condivisa "
+                        f"(world_offset, US-1001)")
+
+    # --- campagna (data/world/campagna.json, addendum fase 10 US-1015) ---
+    # Il popolamento dello spazio comune FUORI da ogni regione (world_scene.gd
+    # lo dipinge di terreno vero, _riempi_campagna): stessa forma di un
+    # layout (nemici[]/oggetti[]) ma coordinate ASSOLUTE, senza un
+    # world_offset proprio. Si valida solo che ogni entry sia dentro il
+    # rettangolo che contiene tutte le regioni e FUORI da ognuna di esse
+    # (dentro una regione ci pensa gia' il suo layout) - non la calpestabilita'
+    # fine contro gli alberi sparsi, che sono decorativi e generati a runtime.
+    campagna_doc = load_json(os.path.join(DATA, "world", "campagna.json"))
+    if campagna_doc is not None and region_rects:
+        rel = "data/world/campagna.json"
+        bx0 = min(r[0] for r in region_rects.values())
+        by0 = min(r[1] for r in region_rects.values())
+        bx1 = max(r[2] for r in region_rects.values())
+        by1 = max(r[3] for r in region_rects.values())
+
+        def _dentro_una_regione(x, y):
+            for (rx0, ry0, rx1, ry1) in region_rects.values():
+                if rx0 <= x < rx1 and ry0 <= y < ry1:
+                    return True
+            return False
+
+        for lista, nome in ((campagna_doc.get("nemici", []), "nemici"),
+                             (campagna_doc.get("oggetti", []), "oggetti")):
+            for i, spec in enumerate(lista):
+                x, y = spec.get("x"), spec.get("y")
+                if not (isinstance(x, int) and isinstance(y, int)):
+                    err(f"{rel}: {nome}[{i}] x/y devono essere interi")
+                    continue
+                if not (bx0 <= x < bx1 and by0 <= y < by1):
+                    err(f"{rel}: {nome}[{i}] ({x},{y}) fuori dal rettangolo che contiene "
+                        f"tutte le regioni")
+                elif _dentro_una_regione(x, y):
+                    err(f"{rel}: {nome}[{i}] ({x},{y}) cade dentro il rettangolo di una "
+                        f"regione (la campagna e' solo lo spazio condiviso fuori da esse)")
+
+        # edifici (fase 11, US-1111/1112): stessa forma di layout.edifici[]
+        # (x/y = cella della porta, interno_id) ma senza check di
+        # calpestabilita' contro una mappa ASCII - campagna.json non ne ha
+        # una, le pareti le dipinge world_scene.gd._disegna_capanne_campagna
+        # a runtime con un template fisso.
+        for i, ed in enumerate(campagna_doc.get("edifici", [])):
+            if not isinstance(ed, dict):
+                err(f"{rel}: edifici[{i}] deve essere un dict")
+                continue
+            x, y = ed.get("x"), ed.get("y")
+            if not (isinstance(x, int) and isinstance(y, int)):
+                err(f"{rel}: edifici[{i}] x/y devono essere interi")
+            elif not (bx0 <= x < bx1 and by0 <= y < by1):
+                err(f"{rel}: edifici[{i}] ({x},{y}) fuori dal rettangolo che contiene "
+                    f"tutte le regioni")
+            elif _dentro_una_regione(x, y):
+                err(f"{rel}: edifici[{i}] ({x},{y}) cade dentro il rettangolo di una "
+                    f"regione (la campagna e' solo lo spazio condiviso fuori da esse)")
+            iid = ed.get("interno_id")
+            if not iid or iid not in interni_ids:
+                err(f"{rel}: edifici[{i}].interno_id '{iid}' non esiste in "
+                    f"data/world/interni/")
+
     # --- fonti di tag di fase 3 (US-334): stanze costruibili, specie di pet
     # (+ comportamenti), tag_grant dei talenti. Rendono raggiungibili le
     # sinergie che pescano da questi sistemi. La VALIDAZIONE piena di quei
@@ -1100,6 +1467,8 @@ def main():
     # --- oggetti (data/items/, US-301) ---
     ic_doc = load_json(os.path.join(DATA, "schema", "item_categories.json"))
     item_categories = set((ic_doc or {}).get("item_categories", []))
+    rarity_doc = load_json(os.path.join(DATA, "schema", "item_rarity.json"))
+    item_rarities = set(l.get("id") for l in (rarity_doc or {}).get("livelli", []))
     es_doc = load_json(os.path.join(DATA, "schema", "equip_slots.json"))
     equip_tipi = set((es_doc or {}).get("tipi", []))
     sig_doc = load_json(os.path.join(DATA, "schema", "sigillato_effect_types.json"))
@@ -1142,6 +1511,10 @@ def main():
                     err(f"{rel} [{iid}]: valore deve essere un intero >= 0")
                 if not isinstance(it.get("impilabile"), bool):
                     err(f"{rel} [{iid}]: impilabile deve essere true/false")
+                rar = it.get("rarita")
+                if rar is not None and rar not in item_rarities:
+                    err(f"{rel} [{iid}]: rarita '{rar}' non nel vocabolario chiuso "
+                        f"({sorted(item_rarities)})")
                 if cat == "equip":
                     if it.get("slot") not in equip_tipi:
                         err(f"{rel} [{iid}]: slot '{it.get('slot')}' non in equip_slots.tipi "
@@ -1211,6 +1584,74 @@ def main():
     for c in item_categories:
         if c not in coperte:
             warn(f"data/items/: nessun item di esempio per la categoria '{c}'")
+
+    # --- nemici/oggetti dei layout (US-806) ---
+    # Rilegge data/world/layouts/*.json (item_ids/pathway_ids non erano ancora
+    # pronti nel blocco "layouts" piu' sopra, US-805). Un boss e' dati
+    # (sequenza + override + scala), mai un flag: qui si valida solo la forma.
+    _bal_nemici = load_json(os.path.join(DATA, "balance.json")) or {}
+    nemico_base_keys = set((_bal_nemici.get("nemico_base", {}) or {}).keys())
+    if os.path.isdir(layouts_dir):
+        for fn in sorted(os.listdir(layouts_dir)):
+            if not fn.endswith(".json"):
+                continue
+            rel = f"data/world/layouts/{fn}"
+            doc = load_json(os.path.join(layouts_dir, fn)) or {}
+            rid = doc.get("region_id")
+            mappa = doc.get("mappa", [])
+            _h = len(mappa) if isinstance(mappa, list) else 0
+            _w = len(mappa[0]) if _h > 0 and isinstance(mappa[0], str) else 0
+            righe_ok = _h > 0 and _w > 0 and all(
+                isinstance(r, str) and len(r) == _w for r in mappa)
+
+            def _calpestabile(x, y):
+                return righe_ok and 0 <= x < _w and 0 <= y < _h and mappa[y][x] in CALPESTABILI_LAYOUT
+
+            for nm in doc.get("nemici", []):
+                nx, ny = nm.get("x"), nm.get("y")
+                if not (isinstance(nx, int) and isinstance(ny, int) and _calpestabile(nx, ny)):
+                    err(f"{rel} [{rid}]: nemico a ({nx},{ny}) non e' su una cella calpestabile")
+                seq = nm.get("sequenza")
+                if not (isinstance(seq, int) and 0 <= seq <= 9):
+                    err(f"{rel} [{rid}]: nemico sequenza '{seq}' deve essere un int 0..9")
+                scala = nm.get("scala", 1.0)
+                if not (isinstance(scala, (int, float)) and 0.5 <= scala <= 3):
+                    err(f"{rel} [{rid}]: nemico scala '{scala}' deve essere in [0.5, 3]")
+                ov = nm.get("override", {})
+                if not isinstance(ov, dict):
+                    err(f"{rel} [{rid}]: nemico override deve essere un dict")
+                    ov = {}
+                fuori = set(ov) - nemico_base_keys
+                if fuori:
+                    err(f"{rel} [{rid}]: nemico override ha chiavi fuori da "
+                        f"balance.json.nemico_base: {sorted(fuori)}")
+                car = ov.get("caratteristica")
+                if isinstance(car, dict) and car.get("pathway_id") not in pathway_ids:
+                    err(f"{rel} [{rid}]: nemico override.caratteristica.pathway_id "
+                        f"'{car.get('pathway_id')}' non e' un Pathway attivo")
+
+            for og in doc.get("oggetti", []):
+                ox, oy = og.get("x"), og.get("y")
+                if not (isinstance(ox, int) and isinstance(oy, int) and _calpestabile(ox, oy)):
+                    err(f"{rel} [{rid}]: oggetto a ({ox},{oy}) non e' su una cella calpestabile")
+                if og.get("item_id") not in item_ids:
+                    err(f"{rel} [{rid}]: oggetto item_id '{og.get('item_id')}' non esiste in data/items/")
+
+    # --- ingredienti delle formule (US-808) ---
+    # Ogni ingrediente citato da una formula di potion (tutte quelle in
+    # data/potions/formulas.json appartengono ai 10 Pathway attivi: il file
+    # non ne contiene di differiti) deve esistere come item di categoria
+    # 'ingrediente' in data/items/ — generato da
+    # tools/generate_formula_ingredients.py, mai un id fantasma citato solo
+    # nella formula.
+    for _fid, _f in formulas.items():
+        for _ing in _f.get("ingredients", []):
+            if _ing not in item_cat:
+                err(f"data/potions/formulas.json [{_fid}]: ingrediente '{_ing}' non esiste come item "
+                    f"in data/items/ (lancia tools/generate_formula_ingredients.py)")
+            elif item_cat[_ing] != "ingrediente":
+                err(f"data/potions/formulas.json [{_fid}]: ingrediente '{_ing}' esiste come item ma "
+                    f"con categoria '{item_cat[_ing]}', non 'ingrediente'")
 
     # --- sigilli (data/sigils/, US-315) ---
     set_doc = load_json(os.path.join(DATA, "schema", "sigil_effect_types.json"))
@@ -1381,6 +1822,16 @@ def main():
                 for iid in ven.get("listino", []):
                     if iid not in item_ids:
                         err(f"{rel} [{nid}]: vendor.listino '{iid}' non e' un item esistente")
+            craf = npc.get("crafter")
+            if craf is not None:
+                for bpid in craf.get("blueprints", []):
+                    if bpid not in blueprints:
+                        err(f"{rel} [{nid}]: crafter.blueprints '{bpid}' non esiste in "
+                            f"data/forge/blueprints.json")
+                for ricid in craf.get("ricette", []):
+                    if ricid not in recipes:
+                        err(f"{rel} [{nid}]: crafter.ricette '{ricid}' non esiste in "
+                            f"data/potions/recipes.json")
             fid = npc.get("faction_id")
             if fid is not None and faction_ids and fid not in faction_ids:
                 err(f"{rel} [{nid}]: faction_id '{fid}' non e' in data/factions.json")
@@ -1393,6 +1844,46 @@ def main():
                 err(f"{rel}: manca l'NPC del roster '{atteso}' (design-npc-quest cap. 2)")
         if n_generici < 10:
             err(f"{rel}: solo {n_generici} npc_generic_*, attesi >= 10 (fool_9_inganno ne inganna 10)")
+
+        # US-1108 (fase 11): ogni npcs[].npc_id di un interno deve risolvere
+        # a un NPC vero - raccolti sopra, mentre si caricavano gli interni
+        # (npc_ids esiste solo ora, dopo il roster).
+        for irel, iid_int, npc_id in interni_npc_refs:
+            if npc_id not in npc_ids:
+                err(f"{irel} [{iid_int}]: npcs[].npc_id '{npc_id}' non esiste in "
+                    f"data/npc/roster.json")
+
+    # --- fonti degli ingredienti (US-809c, chiusura "fonti nel mondo") ---
+    # Ogni ingrediente citato da una formula deve avere ALMENO UNA fonte in
+    # gioco: un drop di nemico (US-809a, layout.drop), un venditore (US-809b,
+    # roster.json vendor.listino) o la raccolta a terra (US-809c, layout.
+    # oggetti). roster_doc e' definito subito sopra (blocco NPC); item_ids
+    # gia' in scope dal blocco item piu' in alto.
+    ingredienti_citati = set()
+    for _fid, _f in formulas.items():
+        ingredienti_citati.update(_f.get("ingredients", []))
+
+    fonti_trovate = set()
+    if roster_doc is not None:
+        for npc in roster_doc.get("npcs", []):
+            ven = npc.get("vendor")
+            if ven is not None:
+                fonti_trovate.update(ven.get("listino", []))
+    if os.path.isdir(layouts_dir):
+        for fn in sorted(os.listdir(layouts_dir)):
+            if not fn.endswith(".json"):
+                continue
+            _ldoc = load_json(os.path.join(layouts_dir, fn)) or {}
+            for lst in _ldoc.get("drop", {}).values():
+                fonti_trovate.update(lst)
+            for og in _ldoc.get("oggetti", []):
+                fonti_trovate.add(og.get("item_id"))
+
+    _mancanti = sorted(ingredienti_citati - fonti_trovate)
+    if _mancanti:
+        err(f"data/potions/formulas.json: {len(_mancanti)} ingredienti senza "
+            f"nessuna fonte in gioco (ne' drop, ne' listino, ne' oggetti a "
+            f"terra): {', '.join(_mancanti)}")
 
     # --- fazioni (data/factions.json, US-615) ---
     tracked_ev0 = load_json(os.path.join(DATA, "schema", "tracked_events.json")) or {}
@@ -1479,7 +1970,8 @@ def main():
     DLG_COND = {"acting_progress_min", "madness_max", "madness_min", "e_notte",
                 "fase_lunare", "foundation_min", "tier_min", "in_zona_tag",
                 "follia_min", "reputazione_min", "flag"}
-    DLG_EFFETTI = {"emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest", "impara_sinergia"}
+    DLG_EFFETTI = {"emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest", "impara_sinergia",
+                   "crea_su_richiesta"}
     _dlg_quest_ids = set()   # quest_id nominati da un effetto avvia_quest
     tracked_ev = load_json(os.path.join(DATA, "schema", "tracked_events.json")) or {}
     ev_names = set(tracked_ev.get("events", {}).keys())
@@ -2170,6 +2662,247 @@ def main():
     if _end_ids != {"apoteosi", "consumazione", "rinuncia"}:
         err(f"data/endings.json: attesi esattamente i 3 finali con la fase 7 chiusa, "
             f"trovati {sorted(_end_ids)} (US-721).")
+
+    # --- Pathway Non-Standard (data/pathways_non_standard/, fase 9 US-901) ---
+    # Terza categoria, separata da data/pathways/ (10 standard attivi) e
+    # data/pathways_deferred/ (12 standard differiti): avanzano per Boon, non
+    # per pozione+recitazione (data/schema/boon.schema.json). Non hanno
+    # gruppo (fusione/cambio Pathway restano solo fra Pathway standard,
+    # US-903) e non contano nell'EXPECTED_PATHWAYS/GROUP_SIZES di sopra:
+    # vivono in una cartella diversa, quel codice non li legge mai. La
+    # cartella non esiste finche' US-904 non scrive il primo file (Eternal
+    # Aeon): nessun errore se assente, e' lo stato atteso di questa story.
+    _quest_ids_tutte = set(quest_docs.keys())
+    pnsdir = os.path.join(DATA, "pathways_non_standard")
+    if os.path.isdir(pnsdir):
+        for fn in sorted(f for f in os.listdir(pnsdir) if f.endswith(".json")):
+            _doc = load_json(os.path.join(pnsdir, fn))
+            if _doc is None:
+                continue
+            _rel = f"data/pathways_non_standard/{fn}"
+            _pid = _doc.get("id")
+            if fn != f"{_pid}.json":
+                err(f"{_rel}: il nome file non corrisponde all'id '{_pid}'")
+            if _doc.get("categoria") != "non_standard":
+                err(f"{_rel}: categoria deve essere 'non_standard' (trovato: {_doc.get('categoria')!r})")
+            if _doc.get("group") is not None:
+                err(f"{_rel}: group deve essere null per un Pathway non_standard "
+                    f"(non appartiene a nessun gruppo, US-903).")
+            _seqs = _doc.get("sequences", [])
+            if len(_seqs) != EXPECTED_SEQUENCES_PER_PATHWAY:
+                err(f"{_rel}: {len(_seqs)} sequenze, attese {EXPECTED_SEQUENCES_PER_PATHWAY}")
+            _seen_nums = []
+            for _seq in _seqs:
+                _n = _seq.get("sequence")
+                _seen_nums.append(_n)
+                _sid = _seq.get("id")
+                if _sid != f"{_pid}_{_n}":
+                    err(f"{_rel}: id sequenza '{_sid}' non coerente con pathway/numero")
+                if _seq.get("tier") not in VALID_TIERS:
+                    err(f"{_rel} [{_sid}]: tier non valido '{_seq.get('tier')}'")
+                elif _seq.get("tier") != expected_tier(_n):
+                    err(f"{_rel} [{_sid}]: tier '{_seq.get('tier')}' errato, atteso '{expected_tier(_n)}'")
+                if not _seq.get("name"):
+                    err(f"{_rel} [{_sid}]: nome sequenza mancante")
+                if len(_seq.get("concept", "")) < 20:
+                    err(f"{_rel} [{_sid}]: concept mancante o troppo vago. Ogni sequenza "
+                        f"deve dichiarare COSA FA IL GIOCATORE a quel livello.")
+                _stub = bool(_seq.get("stub"))
+                _has_potion = _seq.get("potion") is not None
+                _has_boon = _seq.get("boon") is not None
+                if _has_potion:
+                    err(f"{_rel} [{_sid}]: 'potion' su un Pathway non_standard - usa 'boon' (US-901).")
+                if _stub:
+                    if _has_boon:
+                        err(f"{_rel} [{_sid}]: marcata stub ma ha un boon: togli il flag o svuotalo.")
+                elif not _has_boon:
+                    err(f"{_rel} [{_sid}]: nessun 'boon' e nessun flag stub: il giocatore "
+                        f"non ha un percorso di avanzamento a questa Sequenza.")
+                elif isinstance(_seq.get("boon"), dict):
+                    for _e in valida_boon(_rel, _sid, _seq["boon"], events,
+                                           _quest_ids_tutte, item_ids, char_ids):
+                        err(_e)
+            if sorted(_seen_nums, reverse=True) != list(range(9, -1, -1)):
+                err(f"{_rel}: le sequenze non coprono esattamente 9..0 "
+                    f"(trovate {sorted(_seen_nums, reverse=True)})")
+
+    # --- chiusura fase 8 (US-814): la vertical slice e' giocabile ---
+    # "ogni ingrediente attivo ha una fonte" e' gia' il blocco US-809c qui
+    # sopra (fonti_trovate/senza fonte): non lo riscrivo.
+    _FASE_8_REGIONI = ["mirwada", "marche_crepuscolo", "valle_madre",
+                        "archivio_sepolto", "frontiera_porte"]
+    for _rid in _FASE_8_REGIONI:
+        if not os.path.exists(os.path.join(layouts_dir, f"{_rid}.json")):
+            err(f"data/world/layouts/{_rid}.json: layout della fase 8 mancante (US-814: "
+                f"le 5 regioni devono avere tutte un layout disegnato a mano).")
+        else:
+            _lay = load_json(os.path.join(layouts_dir, f"{_rid}.json")) or {}
+            _nemici_lay = _lay.get("nemici", [])
+            if not any(float(n.get("scala", 1.0)) > 1.0 for n in _nemici_lay if isinstance(n, dict)):
+                err(f"data/world/layouts/{_rid}.json: nessun nemico con scala > 1.0 - "
+                    f"ogni regione deve avere almeno un boss (US-814/US-806).")
+
+    def _png_size(path):
+        try:
+            with open(path, "rb") as fh:
+                head = fh.read(24)
+            if len(head) < 24 or head[:8] != b"\x89PNG\r\n\x1a\n":
+                return None
+            w, h = struct.unpack(">II", head[16:24])
+            return w, h
+        except OSError:
+            return None
+
+    _PLACEHOLDER = os.path.join(ROOT, "assets", "placeholder")
+    _anim_doc = load_json(os.path.join(DATA, "animations.json")) or {}
+    _n_direzioni = len((_anim_doc.get("convenzioni", {}) or {}).get("direzioni", [])) or 4
+    _fogli_attesi = {}
+    for _cat in ("personaggio", "nemico_base", "pet"):
+        for _nome, _spec in (_anim_doc.get(_cat, {}) or {}).items():
+            _righe = _n_direzioni if _spec.get("direzionale", True) else 1
+            _fogli_attesi[f"{_cat}_{_nome}.png"] = (32 * int(_spec.get("frames", 1)), 32 * _righe)
+    _fogli_attesi.update({
+        "npc_popolano.png": (32, 32 * 6),
+        "oggetti.png": (32 * 9, 32),
+        "passaggio.png": (32, 32),
+        "gate.png": (32, 32),
+    })
+    if len(_fogli_attesi) != 23:
+        err(f"tools/validate_data.py: attesi 19+4=23 fogli sprite, il calcolo ne da' "
+            f"{len(_fogli_attesi)} (US-814: data/animations.json e' cambiato?).")
+    for _nome_file, (_w_atteso, _h_atteso) in _fogli_attesi.items():
+        _path = os.path.join(_PLACEHOLDER, _nome_file)
+        if not os.path.exists(_path):
+            err(f"assets/placeholder/{_nome_file}: foglio sprite mancante (US-814: la fase 8 "
+                f"e' chiusa, i 19+4 fogli devono esistere - rilancia tools/generate_sprites.py).")
+            continue
+        _dim = _png_size(_path)
+        if _dim != (_w_atteso, _h_atteso):
+            err(f"assets/placeholder/{_nome_file}: dimensione {_dim}, attesa "
+                f"({_w_atteso}, {_h_atteso}) (US-814).")
+
+    # --- chiusura fase 9 (US-907): il primo Pathway Non-Standard e' completo ---
+    # La validazione PIENA di data/pathways_non_standard/ (categoria, group,
+    # boon, tier...) e' gia' nel blocco dedicato piu' sopra (US-901): qui solo
+    # il criterio di chiusura, stesso stile delle fasi precedenti.
+    if not os.path.exists(os.path.join(DATA, "schema", "boon.schema.json")):
+        err("data/schema/boon.schema.json: mancante (US-901: schema del motore Boon).")
+    _ea_path = os.path.join(DATA, "pathways_non_standard", "eternal_aeon.json")
+    if not os.path.exists(_ea_path):
+        err("data/pathways_non_standard/eternal_aeon.json: mancante (US-904/905: "
+            "il primo Pathway Non-Standard deve esistere con la fase 9 chiusa).")
+    else:
+        _ea_doc = load_json(_ea_path) or {}
+        _ea_seqs = _ea_doc.get("sequences", [])
+        if len(_ea_seqs) != 10:
+            err(f"data/pathways_non_standard/eternal_aeon.json: {len(_ea_seqs)} sequenze, "
+                f"attese 10 (fase 9 chiusa).")
+        for _ea_seq in _ea_seqs:
+            if bool(_ea_seq.get("stub", False)):
+                err(f"data/pathways_non_standard/eternal_aeon.json [{_ea_seq.get('id')}]: "
+                    f"ancora stub - la fase 9 e' chiusa, ogni Sequenza deve essere completa "
+                    f"(US-904/905).")
+    if not os.path.exists(os.path.join(DATA, "abilities", "eternal_aeon.json")):
+        err("data/abilities/eternal_aeon.json: mancante (US-904/905: le abilita' di "
+            "Eternal Aeon devono esistere con la fase 9 chiusa).")
+
+    # --- chiusura fase 10 (US-1014): il mondo continuo esiste, con un
+    # villaggio e una struttura grande veri ---
+    # La validazione PIENA di world_offset/campagna/edifici/interni e' gia'
+    # nei blocchi dedicati piu' sopra (US-1001/1010/1015): qui solo il
+    # criterio di chiusura, stesso stile delle fasi precedenti.
+    _regioni_doc = load_json(os.path.join(DATA, "world", "regions.json")) or {}
+    _regioni_fase10 = _regioni_doc.get("regions", [])
+    if len(_regioni_fase10) != 5:
+        err(f"data/world/regions.json: {len(_regioni_fase10)} regioni, attese 5 (fase 10 chiusa).")
+    for _reg in _regioni_fase10:
+        _rid10 = _reg.get("id", "?")
+        if len(_reg.get("world_offset", [])) != 2:
+            err(f"data/world/regions.json [{_rid10}]: world_offset mancante o malformato "
+                f"(fase 10 chiusa: ogni regione deve stare nella griglia condivisa, US-1001).")
+
+    _villaggio_trovato = False
+    _struttura_grande_trovata = False
+    for _rid10 in ["mirwada", "marche_crepuscolo", "valle_madre", "archivio_sepolto", "frontiera_porte"]:
+        _lay10_path = os.path.join(layouts_dir, f"{_rid10}.json")
+        if not os.path.exists(_lay10_path):
+            continue
+        _lay10 = load_json(_lay10_path) or {}
+        _edifici10 = _lay10.get("edifici", [])
+        if len(_edifici10) >= 3:
+            _villaggio_trovato = True
+        for _ed in _edifici10:
+            _iid10 = _ed.get("interno_id", "")
+            _int10_path = os.path.join(interni_dir, f"{_iid10}.json")
+            if not os.path.exists(_int10_path):
+                continue
+            _int10 = load_json(_int10_path) or {}
+            _mappa10 = _int10.get("mappa", [])
+            _area10 = len(_mappa10) * (len(_mappa10[0]) if _mappa10 else 0)
+            if _area10 >= 200:
+                _struttura_grande_trovata = True
+    if not _villaggio_trovato:
+        err("fase 10 chiusa: nessuna regione ha almeno 3 edifici collegati (US-1011, "
+            "'il primo villaggio vero') - atteso almeno un insediamento con piu' case.")
+    if not _struttura_grande_trovata:
+        err("fase 10 chiusa: nessun interno di edificio ha un'area di almeno 200 celle "
+            "(US-1012, 'la prima struttura grande') - atteso un interno a piu' stanze, "
+            "non solo una singola stanza come le case di un villaggio.")
+
+    # --- chiusura fase 11 (US-1114): rarita'/crafting NPC/villaggi esistono
+    # e sono coerenti --- La validazione PIENA di ogni pezzo (rarita' in
+    # item.schema.json, crea_su_richiesta in DLG_EFFETTI, campagna.edifici)
+    # e' gia' nei blocchi dedicati piu' sopra: qui solo il criterio di
+    # chiusura, stesso stile delle fasi precedenti.
+    _tutti_gli_edifici_fase11 = []
+    for _fn11 in sorted(os.listdir(layouts_dir)) if os.path.isdir(layouts_dir) else []:
+        if _fn11.endswith(".json"):
+            for _ed11 in (load_json(os.path.join(layouts_dir, _fn11)) or {}).get("edifici", []):
+                _tutti_gli_edifici_fase11.append(_ed11.get("interno_id", ""))
+    for _ed11 in (campagna_doc or {}).get("edifici", []):
+        _tutti_gli_edifici_fase11.append(_ed11.get("interno_id", ""))
+
+    _npc_docs11 = {n.get("id"): n for n in (roster_doc or {}).get("npcs", [])}
+    _crafter_raggiungibili = 0
+    for _fn11 in sorted(os.listdir(interni_dir)) if os.path.isdir(interni_dir) else []:
+        if not _fn11.endswith(".json"):
+            continue
+        _int11 = load_json(os.path.join(interni_dir, _fn11)) or {}
+        _iid11 = _int11.get("interno_id", "")
+        if _iid11 not in _tutti_gli_edifici_fase11:
+            continue
+        for _npc11 in _int11.get("npcs", []):
+            _npc_doc11 = _npc_docs11.get(_npc11.get("npc_id", ""), {})
+            if _npc_doc11.get("crafter"):
+                _crafter_raggiungibili += 1
+    if _crafter_raggiungibili < 4:
+        err(f"fase 11 chiusa: solo {_crafter_raggiungibili} crafter raggiungibili (dentro un "
+            f"interno referenziato da un edifici[], layout o campagna) - attesi almeno 4 "
+            f"(Rosalba, Bram, Fenwick, Orsolya).")
+
+    _oggetti_senza_rarita = []
+    for _fn11 in sorted(os.listdir(os.path.join(DATA, "items"))):
+        if not _fn11.endswith(".json"):
+            continue
+        for _it11 in (load_json(os.path.join(DATA, "items", _fn11)) or {}).get("items", []):
+            if "rarita" not in _it11:
+                _oggetti_senza_rarita.append(_it11.get("id", "?"))
+    if _oggetti_senza_rarita:
+        err(f"fase 11 chiusa: {len(_oggetti_senza_rarita)} oggetti senza 'rarita' esplicita "
+            f"(US-1102, il retrofit deve coprire ogni oggetto): {_oggetti_senza_rarita[:5]}...")
+
+    _crea_su_richiesta_usato = False
+    for _fn11 in sorted(os.listdir(dlg_dir)) if os.path.isdir(dlg_dir) else []:
+        if not _fn11.endswith(".json"):
+            continue
+        for _nodo11 in (load_json(os.path.join(dlg_dir, _fn11)) or {}).get("nodes", {}).values():
+            for _sc11 in _nodo11.get("choices", []):
+                for _ef11 in _sc11.get("effetti", []):
+                    if _ef11.get("tipo") == "crea_su_richiesta":
+                        _crea_su_richiesta_usato = True
+    if not _crea_su_richiesta_usato:
+        err("fase 11 chiusa: nessun dialogo usa l'effetto 'crea_su_richiesta' (US-1106) - "
+            "il 7o effetto di dialogo deve essere usato almeno una volta.")
 
     report()
     return 1 if errors else 0

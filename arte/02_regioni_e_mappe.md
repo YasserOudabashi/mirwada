@@ -64,23 +64,39 @@ un asset di gioco.
 
 ## 5. Tileset di gioco (pixel art reale)
 
-`tools/generate_placeholders.py` genera un tileset placeholder di 4 tile per
-`assets/placeholder/tileset.png`: **pavimento, muro, ostacolo, acqua**, ognuno
-32x32. Quando disegni il tileset vero di una regione:
+`tools/generate_sprites.py` (US-813) genera `assets/placeholder/tileset.png`:
+**8 colonne x N righe**, ogni tile 32x32.
 
-1. Stessa griglia: 4 tile 32x32, edge-tileable (i bordi combaciano tra loro).
-2. Palette della regione (max inchiostro + primario + accento, cap. 4).
-3. Outline scuro 2px, niente anti-aliasing, coerente con lo stile pixel degli
-   sprite (vedi `03_sprite_e_animazioni.md`).
+Le 8 colonne sono gli 8 caratteri della legenda di
+`data/schema/layout.schema.json` (ordine fisso, diverso da quello della
+legenda: pavimento, muro, ostacolo, acqua, pavimento variante, sentiero,
+ostacolo2, decoro — vedi `TILESET_COLONNE` nello script). Le righe sono
+**una per palette visiva**: riga 0 e' "neutra" (nessuna tinta, usata da
+Mirwada), poi una riga per ogni chiave di
+`data/vfx.json.pathway_palette_visiva`, nello stesso ordine del file —
+`scripts/region_scene.gd::_riga_tileset()` sceglie la riga dalla
+`palette_visiva` della regione (`data/world/regions.json`), nessun nome di
+regione o Pathway nel codice. `tools/build_tileset.gd` costruisce il
+`TileSet` (`assets/placeholder/tileset.tres`) leggendo tutte le righe;
+le colonne muro/ostacolo/acqua/ostacolo2 (indici 1,2,3,6) hanno collisione
+piena su OGNI riga.
 
-Prompt di riferimento (`art-brief-gemini.md` cap. 6.5):
+Quando disegni il tileset vero di una regione, stessa griglia e stesso
+significato di colonna/riga: sostituisce `assets/placeholder/tileset.png`
+(e va rilanciato `tools/build_tileset.gd`). Palette della regione (max
+inchiostro + primario + accento, cap. 4); outline scuro 2px, niente
+anti-aliasing, coerente con lo stile pixel degli sprite (vedi
+`03_sprite_e_animazioni.md`).
+
+Prompt di riferimento (`art-brief-gemini.md` cap. 6.5), adattato a 8 tile:
 
 ```
 [BLOCCO STILE PIXEL — vedi 03_sprite_e_animazioni.md]
-A small tileset strip: four 32x32 top-down terrain tiles side by side for
+A small tileset strip: eight 32x32 top-down terrain tiles side by side for
 [regione] — (1) walkable ground, (2) solid wall, (3) a low obstacle,
-(4) water. Each tile self-contained and edge-tileable. Palette [inchiostro +
-primario + accento della regione]. Aspect 4:1.
+(4) water, (5) a ground variant, (6) a path/road, (7) a second obstacle,
+(8) walkable decoration. Each tile self-contained and edge-tileable.
+Palette [inchiostro + primario + accento della regione]. Aspect 8:1.
 ```
 
 Riferimento generato da IA → `assets/concept/sprite_ref/tileset_<regione>.png`.

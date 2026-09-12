@@ -48,7 +48,22 @@
             ]
           },
           "dialogue_id": { "type": "string" },
-          "memoria": { "type": "object" }
+          "memoria": { "type": "object" },
+          "crafter": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "blueprints": { "type": "array", "items": { "type": "string" } },
+              "ricette": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "aspetto": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "variante": { "type": "integer", "minimum": 0, "maximum": 5 }
+            }
+          }
         }
       }
     }

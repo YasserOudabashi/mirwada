@@ -83,6 +83,39 @@ func test_rimappatura_tasti() -> void:
 	_ss().call("set_val", "input", "pagina_indietro", KEY_Q)   # ripristino
 
 
+func test_azioni_include_hotbar_e_interagisci() -> void:
+	var az: Array = _ss().call("azioni")
+	for a in ["abilita_1", "abilita_2", "abilita_3", "abilita_4", "interagisci"]:
+		assert_true(a in az, "'%s' e' fra le azioni rimappabili del colophon" % a)
+
+
+func test_colophon_elenca_i_tasti_abilita_e_interagisci() -> void:
+	var ov: CanvasLayer = OverlayScene.instantiate()
+	Engine.get_main_loop().root.add_child(ov)
+	var b: Node = _n("/root/Book")
+	b.call("apri")
+	b.call("vai_a", "colophon")
+	for i in 4:
+		ov.call("_process", 0.2)
+	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
+
+	var testi: Array = []
+	var da_visitare: Array = [pag.get_child(0)]
+	while not da_visitare.is_empty():
+		var n: Node = da_visitare.pop_back()
+		for c in n.get_children():
+			da_visitare.append(c)
+			if c is Label:
+				testi.append((c as Label).text)
+
+	assert_true(tr("COLOPHON_AZIONE_INTERAGISCI") in testi,
+		"il colophon elenca l'azione 'interagisci' con etichetta leggibile")
+	assert_true(tr("COLOPHON_AZIONE_ABILITA_1") in testi,
+		"il colophon elenca 'Abilità 1'")
+	b.call("chiudi")
+	ov.free()
+
+
 func test_colophon_costruisce_le_sezioni() -> void:
 	var ov: CanvasLayer = OverlayScene.instantiate()
 	Engine.get_main_loop().root.add_child(ov)

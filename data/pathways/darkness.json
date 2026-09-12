@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "darkness",
+  "categoria": "standard",
   "name": "Darkness",
   "name_i18n": "pathway.darkness",
   "group": "eternal_darkness",

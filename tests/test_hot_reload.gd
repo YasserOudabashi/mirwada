@@ -64,8 +64,10 @@ func test_reload_riporta_conteggi_e_errori() -> void:
 func test_dati_ancora_integri_dopo_reload() -> void:
 	var gd: Node = _data()
 	gd.call("reload")
-	assert_eq(gd.call("pathway_ids").size(), 10, "10 pathway dopo il reload")
-	assert_eq(gd.call("sequence_count"), 100, "100 sequenze dopo il reload")
+	assert_eq(gd.call("pathway_ids").size(), 10, "10 pathway STANDARD dopo il reload")
+	# 100 standard + 10 di Eternal Aeon (US-904, non_standard): vedi
+	# test_game_data.gd::test_conteggi_dei_pathway.
+	assert_eq(gd.call("sequence_count"), 110, "110 sequenze dopo il reload")
 	assert_true(gd.call("has_tag", "spirito"), "vocabolario dei tag dopo il reload")
 	assert_false((gd.call("get_primitive", "projectile") as Dictionary).is_empty(),
 		"registro delle primitive dopo il reload")

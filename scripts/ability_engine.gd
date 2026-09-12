@@ -1190,7 +1190,7 @@ func _spawn_projectile(caster: Node, spec: Dictionary) -> bool:
 	if origin == null or not origin.is_inside_tree():
 		return false
 	var node := preload("res://scripts/projectile.gd").new()
-	node.setup(spec, origin.global_position, _facing(origin))
+	node.setup(spec, origin.global_position, _facing(origin), caster)
 	origin.get_parent().add_child(node)
 	return true
 
@@ -1200,7 +1200,7 @@ func _spawn_melee_arc(caster: Node, spec: Dictionary) -> bool:
 	if origin == null or not origin.is_inside_tree():
 		return false
 	var node := preload("res://scripts/melee_arc.gd").new()
-	node.setup(spec, _facing(origin))
+	node.setup(spec, _facing(origin), caster)
 	origin.add_child(node)
 	return true
 

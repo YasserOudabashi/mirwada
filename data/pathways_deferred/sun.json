@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "sun",
+  "categoria": "standard",
   "name": "Sun",
   "name_i18n": "pathway.sun",
   "group": "god_almighty",

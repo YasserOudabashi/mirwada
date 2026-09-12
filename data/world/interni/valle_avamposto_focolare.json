@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "interno_id": "valle_avamposto_focolare",
+  "mappa": [
+    "########",
+    "#......#",
+    "#......#",
+    "#......#",
+    "#......#",
+    "########"
+  ],
+  "spawn": [
+    4,
+    4
+  ],
+  "nemici": [],
+  "oggetti": [
+    {
+      "x": 2,
+      "y": 3,
+      "item_id": "campanaccio_di_capra_smarrita",
+      "quantita": 1
+    }
+  ]
+}

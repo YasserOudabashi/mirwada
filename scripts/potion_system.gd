@@ -190,8 +190,12 @@ func ricetta_nota(recipe_id: String) -> bool:
 
 
 ## Prepara una ricetta nota consumando gli ingredienti dall'inventario.
+## ignora_scoperta (fase 11, US-1106): un NPC alchimista conosce la SUA
+## ricetta a prescindere da cosa il giocatore ha scoperto - salta
+## ricetta_nota(). Default false: nessuna regressione sull'alchimia del
+## giocatore.
 ##   -> { ok, reason, item_id, qualita }
-func prepara(recipe_id: String) -> Dictionary:
+func prepara(recipe_id: String, ignora_scoperta: bool = false) -> Dictionary:
 	var gd: Node = _gd()
 	var inv: Node = get_node_or_null("/root/Inventory")
 	if gd == null or inv == null:
@@ -199,7 +203,7 @@ func prepara(recipe_id: String) -> Dictionary:
 	var r: Dictionary = gd.call("get_recipe", recipe_id)
 	if r.is_empty():
 		return {"ok": false, "reason": "ricetta_inesistente"}
-	if not ricetta_nota(recipe_id):
+	if not ignora_scoperta and not ricetta_nota(recipe_id):
 		return {"ok": false, "reason": "ricetta_ignota"}
 	var ingr: Dictionary = r.get("ingredienti", {})
 	for item_id in ingr:
@@ -212,8 +216,22 @@ func prepara(recipe_id: String) -> Dictionary:
 	var out_id: String = str(r.get("output", {}).get("item_id", ""))
 	if not out_id.is_empty():
 		inv.call("aggiungi", out_id, 1)
+		_traccia_item_crafted(out_id, qualita)
 	pozione_preparata.emit(recipe_id, out_id, qualita)
 	return {"ok": true, "reason": "", "item_id": out_id, "qualita": qualita}
+
+
+## US-804: un oggetto e' stato prodotto (tracked_events.json: categoria,
+## qualita_min). "categoria" viene dai dati dell'item stesso, mai scritta
+## qui. Condiviso da prepara() (questa) e Forge.forgia().
+func _traccia_item_crafted(item_id: String, qualita: String) -> void:
+	var et: Node = get_node_or_null("/root/EventTracker")
+	if et == null:
+		return
+	var gd: Node = _gd()
+	var item: Dictionary = gd.call("get_item", item_id) if gd != null else {}
+	et.call("emit_event", "item_crafted",
+		{"categoria": str(item.get("categoria", "")), "qualita": qualita})
 
 
 signal esperimento_fallito(esito: String)

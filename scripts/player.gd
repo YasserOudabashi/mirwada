@@ -45,10 +45,27 @@ var _dist_accum: float = 0.0  # emettitore distanza_percorsa (US-331)
 
 var _parando: bool = false
 
+## Bug report utente 2026-09-10: a 0 hp il giocatore restava giocabile
+## all'infinito, StatsComponent.died non era collegato a nulla per il
+## giocatore (solo enemy.gd lo ascolta). true durante l'animazione "death":
+## _physics_process si ferma, niente input processato.
+var _morto: bool = false
+
+## US-802: hotbar. true mentre l'animazione "cast" e' in corso, cosi'
+## _aggiorna_animazione() non la sovrascrive col walk/idle del frame dopo
+## (stesso ruolo di _attaccando per l'attacco).
+var _castando: bool = false
+
 @onready var _audio: Node = get_node_or_null("/root/AudioManager")
+
+## Etichetta col nome del personaggio sopra lo sprite: come gli NPC (US-813),
+## cosi' a schermo si distingue quale figura sei. Il testo viene da
+## GameState.nome_personaggio, aggiornato quando parte una partita.
+var _nome_lbl: Label = null
 
 
 func _ready() -> void:
+	_monta_nome()
 	_anim.call("configura", CATEGORIA_ANIM)
 	_anim.evento_frame.connect(_su_evento_anim)
 	_anim.animazione_finita.connect(_su_anim_finita)
@@ -56,6 +73,7 @@ func _ready() -> void:
 	_hitbox.ha_colpito.connect(_su_colpo_inflitto)
 	_hurtbox.parata_riuscita.connect(_su_parata_riuscita)
 	_hurtbox.colpito.connect(_su_danno_subito)
+	_stats.died.connect(_su_morte)
 
 	# Bonus di Sequenza del Pathway corrente (US-201): il giocatore entra in
 	# scena dopo gli autoload, quindi li richiede lui una volta pronto.
@@ -76,7 +94,26 @@ func _ready() -> void:
 	_anim.call("riproduci", "idle", _dir_sguardo)
 
 
+## Nome sopra la testa, stesso stile della Label degli NPC in region_scene.gd.
+func _monta_nome() -> void:
+	var gs: Node = get_node_or_null("/root/GameState")
+	if gs == null:
+		return
+	_nome_lbl = Label.new()
+	_nome_lbl.name = "Nome"
+	_nome_lbl.add_theme_font_size_override("font_size", 10)
+	_nome_lbl.position = Vector2(-32, -34)
+	_nome_lbl.custom_minimum_size = Vector2(64, 0)
+	_nome_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	add_child(_nome_lbl)
+	_nome_lbl.text = str(gs.get("nome_personaggio"))
+	if gs.has_signal("partita_iniziata"):
+		gs.partita_iniziata.connect(func(n: String) -> void: _nome_lbl.text = n)
+
+
 func _physics_process(delta: float) -> void:
+	if _morto:
+		return
 	_dash_cd = maxf(_dash_cd - delta, 0.0)
 
 	if _dashing:
@@ -98,6 +135,8 @@ func _physics_process(delta: float) -> void:
 
 	if Input.is_action_just_pressed("attacco") and not _attaccando and not _parando:
 		_inizia_attacco()
+
+	_gestisci_input_abilita()
 
 	var input: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var vel_max: float = _stats.get_stat("velocita")
@@ -191,6 +230,38 @@ func _inizia_attacco() -> void:
 	_anim.call("riproduci", STATO_ATTACCO, _dir_sguardo)
 
 
+## Hotbar (US-802): abilita_1..4 lanciano la N-esima abilita' posseduta
+## (AbilityEngine.owned_abilities, stesso ordine che mostra l'HUD). Stessi
+## guard di _inizia_attacco (non durante un attacco/parata/cast gia' in
+## corso: schivata e dash tornano prima di arrivare qui).
+func _gestisci_input_abilita() -> void:
+	if _attaccando or _parando or _castando:
+		return
+	for n in 4:
+		if Input.is_action_just_pressed("abilita_%d" % (n + 1)):
+			lancia_abilita_slot(n)
+			return  # un solo tasto abilita' per frame, come attacco/schivata/parata
+
+
+## Lancia la N-esima abilita' posseduta (indice 0-based, stesso ordine di
+## AbilityEngine.owned_abilities e della hotbar dell'HUD). Pubblico, come
+## start_dash: lo usa l'input qui sopra, e i test lo chiamano direttamente
+## bypassando Input (stesso pattern di _su_colpo_inflitto/_su_danno_subito).
+## Nessuna logica di bersaglio: la fa gia' AbilityEngine.execute.
+func lancia_abilita_slot(n: int) -> Dictionary:
+	var ae: Node = get_node_or_null("/root/AbilityEngine")
+	if ae == null:
+		return {"ok": false, "reason": "nessun_ability_engine"}
+	var owned: Array = ae.call("owned_abilities", self)
+	if n < 0 or n >= owned.size():
+		return {"ok": false, "reason": "slot_vuoto"}
+	var risultato: Dictionary = ae.call("execute", str(owned[n]), self)
+	if bool(risultato.get("ok", false)):
+		_castando = true
+		_anim.call("riproduci", "cast", _dir_sguardo)
+	return risultato
+
+
 func _su_evento_anim(nome: String) -> void:
 	match nome:
 		"hitbox_on":
@@ -203,9 +274,56 @@ func _su_evento_anim(nome: String) -> void:
 
 
 func _su_anim_finita(stato: String) -> void:
+	if _morto:
+		# checkpoint di fase 5/7/8: "death" come stringa bare e' vietata fuori
+		# dalla riga "riproduci" (nome di Sequenza di Death). _morto la evita:
+		# nessun altro stato puo' finire mentre e' vero (_physics_process
+		# ferma input/attacco/cast/schivata finche' non torna false).
+		_respawn()
+		return
 	if stato == STATO_ATTACCO:
 		_attaccando = false
 		_hitbox.call("disattiva")
+	elif stato == "cast":
+		_castando = false
+
+
+## StatsComponent.died: hp a 0. Ferma il giocatore e riproduce "death"
+## (gia' nei dati di animations.json, mai suonata finora); il respawn
+## arriva a fine animazione via _su_anim_finita.
+func _su_morte() -> void:
+	_morto = true
+	_attaccando = false
+	_dashing = false
+	_parando = false
+	_castando = false
+	velocity = Vector2.ZERO
+	_hitbox.call("disattiva")
+	_hurtbox.call("set_invulnerabile", true)
+	_anim.call("riproduci", "death", _dir_sguardo)
+
+
+## Torna al punto di spawn della regione corrente (stesso contratto
+## pubblico con cui main.gd riconosce il nodo regione: has_method
+## "viaggia_a") e resuscita a hp pieni.
+func _respawn() -> void:
+	var regione: Node = _regione_corrente()
+	if regione != null and regione.has_method("punto_spawn"):
+		global_position = regione.call("punto_spawn")
+	_stats.call("revivi")
+	_hurtbox.call("set_invulnerabile", false)
+	_morto = false
+	_anim.call("riproduci", "idle", _dir_sguardo)
+
+
+func _regione_corrente() -> Node:
+	var padre: Node = get_parent()
+	if padre == null:
+		return null
+	for c in padre.get_children():
+		if c.has_method("viaggia_a"):
+			return c
+	return null
 
 
 ## Finestre guidate dai frame di animations.json. "iframe": invulnerabilita'
@@ -295,7 +413,7 @@ func _aggiorna_sguardo(input: Vector2) -> void:
 
 
 func _aggiorna_animazione() -> void:
-	if _attaccando or _dashing or _parando:
+	if _attaccando or _dashing or _parando or _castando:
 		return
 	var stato: String = "walk" if velocity.length() > SOGLIA_MOTO else "idle"
 	_anim.call("riproduci", stato, _dir_sguardo)

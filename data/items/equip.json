@@ -18,7 +18,8 @@
       "stat_modifiers": {
         "forza": 0.1
       },
-      "slot_sigilli": 1
+      "slot_sigilli": 1,
+      "rarita": "non_comune"
     },
     {
       "id": "corazza_cuoio",
@@ -35,7 +36,8 @@
       "stat_modifiers": {
         "difesa": 0.15
       },
-      "slot_sigilli": 1
+      "slot_sigilli": 1,
+      "rarita": "non_comune"
     },
     {
       "id": "amuleto_lunare",
@@ -52,7 +54,8 @@
       "stat_modifiers": {
         "spiritualita_max": 20
       },
-      "slot_sigilli": 2
+      "slot_sigilli": 2,
+      "rarita": "non_comune"
     },
     {
       "id": "lama_del_pentimento",
@@ -76,7 +79,8 @@
       "effetto_collaterale": {
         "tipo": "follia_al_secondo",
         "valore": 0.4
-      }
+      },
+      "rarita": "raro"
     },
     {
       "id": "corazza_espiazione",
@@ -98,7 +102,8 @@
       "effetto_collaterale": {
         "tipo": "spiritualita_drain_al_secondo",
         "valore": 0.5
-      }
+      },
+      "rarita": "raro"
     },
     {
       "id": "anello_del_richiamo",
@@ -119,6 +124,57 @@
       "effetto_collaterale": {
         "tipo": "tag_negativo",
         "tag": "maledizione"
+      },
+      "rarita": "raro"
+    },
+    {
+      "id": "ascia_da_guerra",
+      "categoria": "equip",
+      "name_i18n": "item.ascia_da_guerra",
+      "descrizione_i18n": "item.ascia_da_guerra.desc",
+      "tag": [
+        "forza",
+        "arma"
+      ],
+      "impilabile": false,
+      "valore": 55,
+      "rarita": "non_comune",
+      "slot": "arma",
+      "stat_modifiers": {
+        "forza": 0.15
+      }
+    },
+    {
+      "id": "scudo_rinforzato",
+      "categoria": "equip",
+      "name_i18n": "item.scudo_rinforzato",
+      "descrizione_i18n": "item.scudo_rinforzato.desc",
+      "tag": [
+        "difesa"
+      ],
+      "impilabile": false,
+      "valore": 50,
+      "rarita": "non_comune",
+      "slot": "armatura",
+      "stat_modifiers": {
+        "difesa": 0.2
+      }
+    },
+    {
+      "id": "anello_di_cristallo",
+      "categoria": "equip",
+      "name_i18n": "item.anello_di_cristallo",
+      "descrizione_i18n": "item.anello_di_cristallo.desc",
+      "tag": [
+        "spirito"
+      ],
+      "impilabile": false,
+      "valore": 70,
+      "rarita": "raro",
+      "slot": "accessorio",
+      "stat_modifiers": {
+        "spiritualita_max": 15,
+        "evasione": 0.05
       }
     }
   ]

@@ -138,3 +138,20 @@ func test_ogni_abilita_fusa_door_error_esegue_senza_primitiva_fuori_registro() -
 				"%s: nessuna primitiva fuori registro (%s)" % [aid, w])
 	Engine.get_main_loop().root.remove_child(c)
 	c.free()
+
+
+# --- US-903: un Pathway non_standard non ha percorsi di fusione ------------
+
+## Iniettato direttamente nel registro separato di GameData (mai su disco,
+## stesso pattern di test_boon_system.gd): GameData.reload() lo pota via.
+func test_percorso_con_un_pathway_non_standard_e_sempre_vuoto() -> void:
+	var gd: Node = _gd()
+	var m: Dictionary = gd.get("_pathways_non_standard")
+	m["fixture_ns"] = {"id": "fixture_ns", "categoria": "non_standard", "group": null}
+	assert_true((_fe().call("percorso", "error", "fixture_ns") as Dictionary).is_empty(),
+		"un Pathway non_standard non ha percorsi di fusione, anche verso un vicino di gruppo reale")
+	assert_true((_fe().call("percorso", "fixture_ns", "door") as Dictionary).is_empty(),
+		"stesso controllo nell'altro ordine degli argomenti")
+	assert_eq((_fe().call("abilita_fuse", "fixture_ns", "door") as Array).size(), 0,
+		"abilita_fuse con un non_standard -> []")
+	gd.call("reload")

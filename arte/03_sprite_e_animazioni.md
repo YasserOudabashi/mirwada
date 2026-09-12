@@ -15,6 +15,52 @@ lettura comoda del giorno in cui e' stata scritta.
 - Sfondo **trasparente** nell'asset finale (durante la generazione IA si usa
   uno sfondo magenta piatto, da chroma-key-are dopo, vedi cap. 4).
 
+## 1b. Generatore procedurale provvisorio (US-812, fase 8 Blocco E)
+
+`tools/generate_sprites.py` produce GIA' i 19 fogli (personaggio/nemico_base/
+pet) descritti sotto — non piu' ellissi numerate, pixel art a strati
+(ombra/gambe/corpo/braccia/testa/copricapo/arma), deterministica (stesso
+output a ogni run). E' **grafica provvisoria generata**, non arte disegnata a
+mano: resta valida finche' un artista non la sostituisce file per file (la
+specifica di `data/animations.json` non cambia).
+
+**Cosa rispetta** delle regole di questo documento: 32x32px, le 4 direzioni
+(con `right` = specchio ESATTO di `left`, garantito per costruzione — vedi
+sotto), l'origine piedi-centro, la griglia righe=direzioni/colonne=frame, i
+nomi file (`assets/placeholder/<categoria>_<animazione>.png`), il tell del
+nemico visibile dal frame 0 dell'anticipo (FR-8).
+
+**Cosa NON rispetta, deliberatamente**:
+- **Outline 1px, non 2px** (cap. 3 chiede 2px pesante, stile Legend of the
+  Northern Blade). A 32px un personaggio alto ~24px con un bordo 2px perde
+  troppo dettaglio interno (le mani, la sciarpa, il berretto diventano
+  macchie): 1px e' la scelta di questo tool. Un artista che ridisegna a mano
+  puo' tornare a 2px se il resto del design lo permette.
+- **Palette FISSA, non una delle 10 di Pathway** (cap. "arte/04"): "sono i
+  VFX a dire il Pathway, non il cappotto" — personaggio/nemico/pet hanno una
+  loro palette propria (inchiostro/primario/accento) indipendente da quale
+  Pathway il giocatore o il nemico impersonano.
+- **"right" = mirror per costruzione, non per geometria a mano**: la prima
+  versione del tool calcolava le coordinate di "right" separatamente da
+  "left" (stesse formule con un segno diverso) — sembrava simmetrico
+  guardando lo sprite, ma un confronto pixel per pixel ha trovato ~150
+  pixel diversi su 1024 (US-812, scoperto dal test, non a occhio). Corretto
+  disegnando sempre "left" e ribaltando l'immagine per "right": garantisce
+  un mirror esatto qualunque sia la posa, senza dover verificare a mano ogni
+  nuova animazione.
+- **Luci/particellari**: un rim-light sulle forme a colore primario e un
+  bagliore morbido (nucleo pieno + 2 anelli di caduta) sul tell/sulla
+  finestra di parata perfetta/sul rilascio di `cast`, con particelle
+  deterministiche sull'ultimo frame — estensione richiesta esplicitamente
+  dall'utente oltre l'AC originale, resta dentro lo stesso script Pillow
+  (nessun sistema VFX runtime nuovo).
+
+`tools/generate_placeholders.py` importa il corpo pulito da questo script e
+ci disegna sopra SOLO gli overlay diagnostici (bordo colorato + numero del
+frame) — non ridisegna il personaggio da zero. Rilancia
+`generate_sprites.py` dopo aver tarato i tempi col diagnostico, prima di
+committare: altrimenti restano i bordi/numeri nei file veri del gioco.
+
 ## 2. Cosa disegnare, animazione per animazione
 
 ### Personaggio (protagonista) — 156 frame totali col budget a 4 direzioni

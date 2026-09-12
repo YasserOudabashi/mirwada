@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "hanged_man",
+  "categoria": "standard",
   "name": "Hanged Man",
   "name_i18n": "pathway.hanged_man",
   "group": "god_almighty",

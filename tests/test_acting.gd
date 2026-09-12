@@ -39,8 +39,11 @@ func _recita_seq9_completa() -> void:
 		et.call("emit_event", "enemy_defeated", {"senza_abilita": true})
 	# tg_9_allenamento: 2000 danni fisici (progresso 0.30)
 	et.call("emit_event", "damage_dealt", {"tag_danno": "fisico", "quantita": 2000})
-	# tg_9_protettore: 300 danni assorbiti per un alleato (progresso 0.35)
-	et.call("emit_event", "damage_absorbed_for_ally", {"quantita": 300})
+	# tg_9_protettore (US-804, riscritta da damage_absorbed_for_ally --
+	# nessun alleato in scena in questa fase -- a perfect_parry): 12 parate
+	# perfette (progresso 0.35)
+	for i in 12:
+		et.call("emit_event", "perfect_parry", {})
 
 
 func test_accumulo_da_eventi() -> void:
@@ -50,6 +53,24 @@ func test_accumulo_da_eventi() -> void:
 		_et().call("emit_event", "enemy_defeated", {"senza_abilita": true})
 	# solo tg_9_duello_puro completata: contributo = 0.35
 	assert_almost_eq(a.call("acting_progress"), 0.35, "una acting_action completata")
+
+
+## US-804: tg_9_duello_puro (filtro senza_abilita:true) e' l'esempio
+## concreto di come i filtri booleani espliciti (enemy.gd non emette piu'
+## {}) fanno davvero la differenza -- il caso "l'ho ucciso con un'abilita'"
+## e' testato a livello enemy.gd in test_enemy_payload.gd; qui si prova
+## che Acting/EventTracker rispettano il filtro sull'evento cosi' com'e'.
+func test_tg_9_duello_puro_avanza_solo_coi_kill_senza_abilita() -> void:
+	var a: Node = _acting()
+	for i in 3:
+		_et().call("emit_event", "enemy_defeated", {"senza_abilita": false})
+	assert_almost_eq(a.call("acting_progress"), 0.0,
+		"3 kill CON abilita' (senza_abilita:false) non contano per tg_9_duello_puro")
+
+	for i in 3:
+		_et().call("emit_event", "enemy_defeated", {"senza_abilita": true})
+	assert_almost_eq(a.call("acting_progress"), 0.35,
+		"3 kill senza abilita' completano tg_9_duello_puro (0.35)")
 
 
 func test_frazione_parziale() -> void:

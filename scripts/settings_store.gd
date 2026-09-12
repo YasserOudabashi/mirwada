@@ -23,7 +23,9 @@ signal cambiata(sezione: String, chiave: String, valore: Variant)
 
 const PATH := "user://settings.json"
 const AZIONI := ["move_up", "move_down", "move_left", "move_right",
-	"attacco", "schivata", "parata", "libro", "pagina_avanti", "pagina_indietro"]
+	"attacco", "schivata", "parata",
+	"abilita_1", "abilita_2", "abilita_3", "abilita_4", "interagisci",
+	"libro", "pagina_avanti", "pagina_indietro"]
 
 var _dati: Dictionary = {}
 

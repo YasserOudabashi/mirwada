@@ -31,7 +31,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_mirco",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 0
+      }
     },
     {
       "id": "npc_sidon",
@@ -62,14 +65,77 @@
       ],
       "vendor": {
         "listino": [
+          "acqua_sorgiva",
+          "cardine_arrugginito_di_una_porta_perduta",
+          "cenere_di_stella_morta",
+          "cera_di_candela_rituale",
+          "cera_di_veglia",
+          "cerone_da_palcoscenico",
+          "chiave_senza_denti",
+          "chiodo_di_bara",
+          "contratto_con_la_clausola_nascosta",
+          "corda_di_impiccato",
+          "corteccia_febbrifuga",
+          "dado_truccato",
+          "dente_di_teschio",
           "erba_lunare",
-          "radice_crepuscolo",
+          "estratto_di_muscolo",
+          "ferro_temperato",
+          "filo_di_lana_rossa",
+          "filo_teso_tra_due_stanze",
+          "fiore_di_camomilla_selvatica",
+          "fiore_di_luna",
+          "frammento_di_tavoletta",
+          "gessetto_che_disegna_porte",
+          "gesso_consacrato",
+          "goccia_di_linfa",
+          "grimaldello_cantante",
+          "guanto_del_borseggiatore",
+          "inchiostro_di_seppia_abissale",
+          "inchiostro_luminescente",
+          "lacrima_di_vedova",
+          "lente_graduata",
+          "lingua_d_argento_falsa",
+          "mano_di_gloria",
+          "muffa_sepolcrale",
+          "naso_finto_di_ceramica",
+          "occhio_che_non_dorme",
+          "osso_di_pugile",
+          "pelo_di_lupo_bianco",
+          "polvere_di_gesso_stellare",
+          "polvere_di_sale_nero",
+          "polvere_di_specchio_incrinato",
           "polvere_ossa",
-          "acqua_sorgiva"
+          "polvere_reagente",
+          "punta_d_argento",
+          "radice_amara",
+          "radice_crepuscolo",
+          "radice_di_quercia",
+          "radice_di_valeriana",
+          "radice_di_veggente",
+          "refurtiva_dimenticata",
+          "resina_conservante",
+          "rugiada_notturna",
+          "sale_di_roccia",
+          "sangue_di_cervo",
+          "sangue_di_gufo_lunare",
+          "sangue_di_toro",
+          "seme_dormiente",
+          "sonaglio_che_confonde",
+          "spazzola_da_scavo",
+          "specchio_da_borsetta_a_due_facce",
+          "taccuino_di_appunti",
+          "terra_di_cimitero",
+          "terriccio_di_prima_luna",
+          "velo_di_mezzanotte",
+          "zanna_di_latte"
         ]
       },
       "dialogue_id": "dlg_sidon",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 1
+      }
     },
     {
       "id": "npc_vesna",
@@ -100,12 +166,39 @@
       ],
       "vendor": {
         "listino": [
+          "corteccia_febbrifuga",
+          "cuore_di_quercia_madre",
+          "erba_lunare",
+          "fiore_che_sboccia_solo_di_notte",
+          "fiore_di_camomilla_selvatica",
+          "fiore_di_luna",
+          "goccia_di_linfa",
+          "linfa_di_gigante",
+          "muschio_di_caverna",
+          "muschio_luminoso",
+          "petalo_solare",
           "pozione_cura_minore",
-          "erba_lunare"
+          "radice_amara",
+          "radice_che_beve",
+          "radice_di_ferro_lunare",
+          "radice_di_immortelle",
+          "radice_di_mandragora_urlante",
+          "radice_di_quercia",
+          "radice_di_valeriana",
+          "radice_di_veggente",
+          "radice_maestra",
+          "seme_del_primo_giorno",
+          "seme_dell_albero_madre",
+          "seme_di_stella_cadente",
+          "seme_dormiente",
+          "voto_infranto_alla_radice"
         ]
       },
       "dialogue_id": "dlg_vesna",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 2
+      }
     },
     {
       "id": "npc_aldo",
@@ -142,7 +235,10 @@
         "ogni_momenti": 8,
         "sequenza_minima": 4
       },
-      "sfida_ai_tier": true
+      "sfida_ai_tier": true,
+      "aspetto": {
+        "variante": 3
+      }
     },
     {
       "id": "npc_ottavia",
@@ -173,7 +269,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_ottavia",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 4
+      }
     },
     {
       "id": "npc_bruno",
@@ -204,12 +303,42 @@
       ],
       "vendor": {
         "listino": [
+          "acciaio_stellare",
+          "cenere_di_stella_morta",
+          "cera_di_veglia",
+          "chiodo_di_bara",
+          "corda_di_impiccato",
+          "dente_di_teschio",
+          "ectoplasma",
           "elisir_ombra",
-          "polvere_ossa"
+          "estratto_di_muscolo",
+          "ferro_temperato",
+          "inchiostro_di_seppia_abissale",
+          "lacrima_di_vedova",
+          "mano_di_gloria",
+          "moneta_del_traghettatore",
+          "muffa_sepolcrale",
+          "occhio_che_non_dorme",
+          "osso_di_pugile",
+          "piuma_di_civetta_nera",
+          "polvere_di_arena",
+          "polvere_di_incubo",
+          "polvere_ossa",
+          "radice_di_mandragora_urlante",
+          "radice_di_quercia",
+          "sale_di_roccia",
+          "sangue_di_toro",
+          "soffio_di_spettro",
+          "tendine_di_lupo",
+          "terra_di_cimitero",
+          "velo_di_mezzanotte"
         ]
       },
       "dialogue_id": "dlg_bruno",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 5
+      }
     },
     {
       "id": "npc_lena",
@@ -240,7 +369,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_lena",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 0
+      }
     },
     {
       "id": "npc_doran",
@@ -271,7 +403,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_doran",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 1
+      }
     },
     {
       "id": "npc_generic_01",
@@ -302,7 +437,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 2
+      }
     },
     {
       "id": "npc_generic_02",
@@ -333,7 +471,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 3
+      }
     },
     {
       "id": "npc_generic_03",
@@ -364,7 +505,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 4
+      }
     },
     {
       "id": "npc_generic_04",
@@ -395,7 +539,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 5
+      }
     },
     {
       "id": "npc_generic_05",
@@ -426,7 +573,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 0
+      }
     },
     {
       "id": "npc_generic_06",
@@ -457,7 +607,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 1
+      }
     },
     {
       "id": "npc_generic_07",
@@ -488,7 +641,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 2
+      }
     },
     {
       "id": "npc_generic_08",
@@ -519,7 +675,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 3
+      }
     },
     {
       "id": "npc_generic_09",
@@ -550,7 +709,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 4
+      }
     },
     {
       "id": "npc_generic_10",
@@ -581,7 +743,10 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_generic",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 5
+      }
     },
     {
       "id": "npc_antagonista",
@@ -600,7 +765,149 @@
       ],
       "vendor": null,
       "dialogue_id": "dlg_antagonista",
-      "memoria": {}
+      "memoria": {},
+      "aspetto": {
+        "variante": 0
+      }
+    },
+    {
+      "id": "npc_rosalba",
+      "name": "Rosalba",
+      "name_i18n": "npc.rosalba.name",
+      "role": "Erborista dell'avamposto",
+      "role_i18n": "npc.rosalba.role",
+      "region_id": "valle_madre",
+      "anchor_candidate": false,
+      "faction_id": null,
+      "schedule": [],
+      "vendor": null,
+      "crafter": {
+        "ricette": [
+          "ric_cura_maggiore",
+          "ric_filtro_di_chiarezza"
+        ]
+      },
+      "dialogue_id": "dlg_rosalba",
+      "memoria": {},
+      "aspetto": {
+        "variante": 2
+      }
+    },
+    {
+      "id": "npc_bram",
+      "name": "Bram",
+      "name_i18n": "npc.bram.name",
+      "role": "Fabbro di Mirwada",
+      "role_i18n": "npc.bram.role",
+      "region_id": "mirwada",
+      "anchor_candidate": false,
+      "faction_id": null,
+      "schedule": [],
+      "vendor": null,
+      "crafter": {
+        "blueprints": [
+          "bp_spada_ferrea",
+          "bp_anello_di_cristallo"
+        ]
+      },
+      "dialogue_id": "dlg_bram",
+      "memoria": {},
+      "aspetto": {
+        "variante": 3
+      }
+    },
+    {
+      "id": "npc_fenwick",
+      "name": "Fenwick",
+      "name_i18n": "npc.fenwick.name",
+      "role": "Fabbro del villaggio fuori le mura",
+      "role_i18n": "npc.fenwick.role",
+      "region_id": "marche_crepuscolo",
+      "anchor_candidate": false,
+      "faction_id": null,
+      "schedule": [],
+      "vendor": null,
+      "crafter": {
+        "blueprints": [
+          "bp_ascia_da_guerra",
+          "bp_scudo_rinforzato"
+        ]
+      },
+      "dialogue_id": "dlg_fenwick",
+      "memoria": {},
+      "aspetto": {
+        "variante": 4
+      }
+    },
+    {
+      "id": "npc_greta",
+      "name": "Greta",
+      "name_i18n": "npc.greta.name",
+      "role": "Mercante del villaggio fuori le mura",
+      "role_i18n": "npc.greta.role",
+      "region_id": "marche_crepuscolo",
+      "anchor_candidate": false,
+      "faction_id": null,
+      "schedule": [],
+      "vendor": {
+        "listino": [
+          "acqua_sorgiva",
+          "filo_di_lana_rossa",
+          "gesso_consacrato",
+          "pergamena_vigore"
+        ]
+      },
+      "dialogue_id": "dlg_greta",
+      "memoria": {},
+      "aspetto": {
+        "variante": 5
+      }
+    },
+    {
+      "id": "npc_orsolya",
+      "name": "Orsolya",
+      "name_i18n": "npc.orsolya.name",
+      "role": "Alchimista del villaggio dell'Archivio",
+      "role_i18n": "npc.orsolya.role",
+      "region_id": "archivio_sepolto",
+      "anchor_candidate": false,
+      "faction_id": null,
+      "schedule": [],
+      "vendor": null,
+      "crafter": {
+        "ricette": [
+          "ric_tonico_di_forza",
+          "ric_essenza_rara_di_guarigione"
+        ]
+      },
+      "dialogue_id": "dlg_orsolya",
+      "memoria": {},
+      "aspetto": {
+        "variante": 0
+      }
+    },
+    {
+      "id": "npc_dario",
+      "name": "Dario",
+      "name_i18n": "npc.dario.name",
+      "role": "Mercante del villaggio dell'Archivio",
+      "role_i18n": "npc.dario.role",
+      "region_id": "archivio_sepolto",
+      "anchor_candidate": false,
+      "faction_id": null,
+      "schedule": [],
+      "vendor": {
+        "listino": [
+          "acqua_sorgiva",
+          "pergamena_hermit",
+          "ambrosia"
+        ]
+      },
+      "dialogue_id": "dlg_dario",
+      "memoria": {},
+      "aspetto": {
+        "variante": 1
+      }
     }
   ]
 }

@@ -21,10 +21,13 @@ indice comodo, non l'autorita'.
    Nessun nome di Pathway o Sequenza va scritto a mano nel codice o nella UI:
    solo nei dati e nei file immagine (i nomi file seguono le convenzioni gia'
    in uso, es. `personaggio_idle.png`).
-2. **Niente e' definitivo finche' non e' a schermo.** Fase 1-6 del gioco
-   usano placeholder diagnostici generati da `tools/generate_placeholders.py`.
-   L'arte "vera" e' benvenuta ma non blocca nulla: sostituisce i placeholder
-   file per file, quando c'e'.
+2. **Niente e' definitivo finche' non e' a schermo.** Fase 1-7 hanno usato
+   placeholder diagnostici (`tools/generate_placeholders.py`, bordi/numero
+   frame per tarare il combattimento). Dalla fase 8, il gioco gira su arte
+   procedurale "pulita" (`tools/generate_sprites.py`, deterministica):
+   personaggio/nemico/pet/NPC/oggetti/tileset, non piu' solo diagnostica.
+   L'arte "vera" e' benvenuta ma non blocca nulla: sostituisce i
+   placeholder generati file per file, quando c'e'.
 3. **Nota IP** (`CLAUDE.md`): il sistema di riferimento narrativo e' opera di
    terzi. Progetto personale, non distribuibile ne' monetizzabile con i nomi
    attuali. L'arte generata (Gemini/Imagen) e' "alla maniera di", materiale
@@ -60,9 +63,18 @@ con IA), dove salvare il risultato, come verificarlo.
 ## Strumenti
 
 ```bash
+# Arte procedurale "pulita" (fase 8, US-812/US-813): personaggio/nemico/
+# pet/NPC/oggetti/tileset, 23 fogli deterministici (stesso seed = stesso
+# output). E' la fonte reale di assets/placeholder/ oggi.
+python tools/generate_sprites.py
+
 # Rigenera i placeholder diagnostici da data/animations.json — utile per
 # capire la griglia esatta (righe/colonne, dimensioni) prima di disegnare
 python tools/generate_placeholders.py
+
+# Ricostruisce il TileSet (collisioni comprese) da tileset.png dopo
+# averlo rigenerato
+godot --headless --path . --script res://tools/build_tileset.gd
 ```
 
 Richiede Pillow (`pip install pillow`).

@@ -9,6 +9,7 @@
     "tag": ["string dal vocabolario chiuso di data/tags.json; puo' essere vuoto (es. valuta)"],
     "impilabile": "bool - true = un contatore, false = istanze distinte con instance_id",
     "valore": "int >= 0 - per l'economia (US-305). Mai una valuta speciale del giocatore",
+    "rarita": "string opzionale, una di data/schema/item_rarity.json 'livelli' (fase 11, US-1101) - assente = 'comune' (retrocompatibilita'). Incide sul prezzo in negozio (moltiplicatore_prezzo, US-1103) e sul peso nella scelta di un drop (peso_drop, US-1104).",
     "_campi_opzionali_per_categoria": {
       "equip": {
         "slot": "string, uno di data/schema/equip_slots.json 'tipi' (arma|armatura|accessorio)",
