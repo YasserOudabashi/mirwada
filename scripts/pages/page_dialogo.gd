@@ -229,9 +229,9 @@ func _riga_creazione(gd: Node, inv: Node, id: String, dati: Dictionary, costo: D
 	b.disabled = not _coperto(inv, costo)
 	b.pressed.connect(func() -> void:
 		if e_blueprint:
-			_n("/root/Forge").call("forgia", id, true)
+			get_node_or_null("/root/Forge").call("forgia", id, true)
 		else:
-			_n("/root/PotionSystem").call("prepara", id, true)
+			get_node_or_null("/root/PotionSystem").call("prepara", id, true)
 		aggiorna())
 	h.add_child(b)
 	add_child(h)

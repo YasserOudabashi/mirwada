@@ -21,5 +21,12 @@
       "item_id": "quaderno_di_appunti_sulle_maree",
       "quantita": 1
     }
+  ],
+  "npcs": [
+    {
+      "x": 2,
+      "y": 2,
+      "npc_id": "npc_rosalba"
+    }
   ]
 }

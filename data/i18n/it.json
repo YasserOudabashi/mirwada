@@ -1730,5 +1730,10 @@
   "ui.page.inventario": "Inventario",
   "ui.page.journal": "Diario",
   "ui.page.mappa": "Mappa",
-  "ui.page.sinergie": "Registro delle sinergie"
+  "ui.page.sinergie": "Registro delle sinergie",
+  "npc.rosalba.name": "Rosalba",
+  "npc.rosalba.role": "Erborista dell'avamposto",
+  "dialogue.rosalba.n1": "Le radici parlano, se sai ascoltarle. Portami cio' che serve e ti preparo qualcosa di vero.",
+  "dialogue.rosalba.n1.crea": "Fammi vedere cosa sai preparare.",
+  "dialogue.rosalba.n1.congedo": "Magari un'altra volta."
 }

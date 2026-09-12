@@ -12416,5 +12416,56 @@ COME VERIFICATO.
 APERTO: nessun interno reale usa ancora npcs[] - US-1108B (il vero
 alchimista di Valle) e' la prossima.
 
-PROSSIMA STORIA: US-1108B ("Il primo fabbro - riempie la capanna
-erborista di Valle"), priority 9.
+PROSSIMA STORIA (chiusa qui sotto): US-1108B ("Il primo fabbro - riempie
+la capanna erborista di Valle"), priority 9.
+
+FATTO (US-1108B).
+- data/npc/roster.json: nuovo npc_rosalba (erborista dell'avamposto,
+  region_id: valle_madre, schedule: [] - MAI nel mondo esterno, e' solo
+  dentro la sua capanna, US-1108, NpcSystem.presenti() la ignora con
+  schedule vuoto), crafter.ricette: ["ric_cura_maggiore"] (avanzata, NON
+  nota di default - il caso in cui ignora_scoperta conta davvero).
+- data/dialogues/dlg_rosalba.json (nuovo): un nodo, due scelte -
+  crea_su_richiesta (npc_id esplicito) e congedo, stesso schema di
+  dlg_sidon.json per apri_vendita (goto:null su entrambe, l'effetto apre
+  una modalita' che la pagina disegna, non un ramo del grafo).
+- data/world/interni/valle_avamposto_erborista.json: npcs: [{x:2,y:2,
+  npc_id: npc_rosalba}] - il primo interno reale a usare il motore di
+  US-1108.
+- data/i18n/it.json: 5 chiavi nuove (npc.rosalba.name/.role,
+  dialogue.rosalba.n1/.n1.crea/.n1.congedo).
+- tests/test_npc_system.gd: il conteggio hardcoded del roster (19) era
+  diventato sbagliato - aggiornato a 20 con la spiegazione invece di un
+  numero muto.
+- tests/test_page_dialogo.gd: nuovo test end-to-end
+  test_creazione_con_rosalba_produce_la_pozione_avanzata - sceglie la
+  battuta di Rosalba, il bottone Crea e' disabilitato senza ingredienti,
+  si abilita fornendoli, produce la pozione, consuma gli ingredienti, e
+  la ricetta resta ignota al GIOCATORE dopo (il bypass e' dell'NPC).
+- BUG TROVATO SOLO CON XVFB (i test headless non lo vedevano):
+  page_dialogo.gd::_riga_creazione chiamava _n("/root/Forge")/
+  _n("/root/PotionSystem") dentro la callback del bottone Crea, ma
+  _n() non e' mai stato definito in questo script (esiste solo in
+  page_inventario.gd) - un refuso di copia lasciato da US-1106. I test
+  headless lo passavano comunque (Godot degrada la chiamata invece di
+  fallire l'asserzione, per una ragione non del tutto chiara nemmeno
+  dopo aver indagato) ma Xvfb mostrava "SCRIPT ERROR: Function _n() not
+  found" a schermo. Corretto in get_node_or_null(...) diretto - la
+  stessa lezione di US-1010 (bug reali che solo Xvfb prende).
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 936 test,
+  tutti passati (935 + 1 nuovo, 1 aggiornato per il conteggio), nessuna
+  regressione. Zero "SCRIPT ERROR" nell'output dopo il fix di _n().
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat): cammino REALE dalla porta della capanna erborista
+  fino a dentro, avvicinamento a Rosalba, dialogo vero, scelta
+  "Fammi vedere cosa sai preparare", menu di creazione con gli
+  ingredienti gia' forniti, bottone Crea premuto, pozione_cura_maggiore
+  confermata nell'inventario.
+
+APERTO: nessuno per questa story. Chiude il Blocco B core (crafting
+NPC): il motore + il primo esempio reale funzionano end-to-end.
+
+PROSSIMA STORIA: US-1109 ("Un fabbro dentro Mirwada"), priority 10.

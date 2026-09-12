@@ -769,6 +769,28 @@
       "aspetto": {
         "variante": 0
       }
+    },
+    {
+      "id": "npc_rosalba",
+      "name": "Rosalba",
+      "name_i18n": "npc.rosalba.name",
+      "role": "Erborista dell'avamposto",
+      "role_i18n": "npc.rosalba.role",
+      "region_id": "valle_madre",
+      "anchor_candidate": false,
+      "faction_id": null,
+      "schedule": [],
+      "vendor": null,
+      "crafter": {
+        "ricette": [
+          "ric_cura_maggiore"
+        ]
+      },
+      "dialogue_id": "dlg_rosalba",
+      "memoria": {},
+      "aspetto": {
+        "variante": 2
+      }
     }
   ]
 }

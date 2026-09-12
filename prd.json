@@ -130,8 +130,8 @@
       ],
       "priority": 9,
       "fase": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "npc_rosalba (erborista di Valle, schedule:[] - mai nel mondo esterno) con crafter.ricette=['ric_cura_maggiore'] (avanzata, non nota di default). dlg_rosalba.json nuovo (crea_su_richiesta + congedo). npcs:[...] sull'interno erborista. Bug trovato SOLO con Xvfb: page_dialogo.gd usava _n() mai definito in questo script (refuso di US-1106) - i test headless non lo beccavano, Xvfb si'. Corretto in get_node_or_null diretto. 936/936 test, validate_data.py 0 errori. Verifica Xvfb end-to-end: entra nella capanna, parla con Rosalba, commissiona, la pozione appare nell'inventario (screenshot in chat)."
     },
     {
       "id": "US-1109",

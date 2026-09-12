@@ -108,6 +108,53 @@ func test_apri_creazione_mostra_lo_stato_vuoto_senza_un_crafter() -> void:
 	p.free()
 
 
+## US-1108B (fase 11): il primo NPC crafter vero, end-to-end. Rosalba
+## (erborista di Valle) offre ric_cura_maggiore (avanzata, NON nota al
+## giocatore - la trappola che ignora_scoperta risolve). Senza ingredienti
+## il bottone Crea resta disabilitato (AC di US-1108B, non un messaggio di
+## fallimento dinamico); con gli ingredienti produce davvero la pozione e la
+## ricetta resta ignota al giocatore dopo (il bypass e' dell'NPC, non suo).
+func test_creazione_con_rosalba_produce_la_pozione_avanzata() -> void:
+	var gd: Node = _root().get_node("GameData")
+	var inv: Node = _root().get_node("Inventory")
+	var ps: Node = _root().get_node("PotionSystem")
+	inv.call("pulisci")
+	var p: Node = _monta_pagina()
+	assert_true(_de().call("avvia", "dlg_rosalba", "npc_rosalba"), "dlg_rosalba parte")
+	assert_true(_de().call("scegli", 0), "sceglie 'Fammi vedere cosa sai preparare'")
+	assert_true(p.call("in_creazione"), "si apre la modalita' creazione")
+
+	var bottone_crea: Button = _bottone_crea(p)
+	assert_true(bottone_crea != null, "il bottone Crea e' a schermo")
+	assert_true(bottone_crea.disabled, "senza ingredienti il bottone resta disabilitato")
+
+	var ingr: Dictionary = (gd.call("get_recipe", "ric_cura_maggiore") as Dictionary).get("ingredienti", {})
+	assert_false(bool(ps.call("ricetta_nota", "ric_cura_maggiore")), "il giocatore non conosce questa ricetta")
+	for ing in ingr:
+		inv.call("aggiungi", ing, int(ingr[ing]))
+	p.call("aggiorna")
+
+	bottone_crea = _bottone_crea(p)
+	assert_false(bottone_crea.disabled, "con gli ingredienti il bottone si abilita")
+	bottone_crea.pressed.emit()
+
+	assert_eq(int(inv.call("conta", "pozione_cura_maggiore")), 1, "la pozione avanzata e' stata creata")
+	for ing in ingr:
+		assert_eq(int(inv.call("conta", ing)), 0, "l'ingrediente '%s' e' stato consumato" % ing)
+	assert_false(bool(ps.call("ricetta_nota", "ric_cura_maggiore")),
+		"il bypass e' dell'NPC: la ricetta resta ignota al giocatore")
+	p.free()
+
+
+func _bottone_crea(p: Node) -> Button:
+	for c in p.get_children():
+		if c is HBoxContainer:
+			for cc in c.get_children():
+				if cc is Button and str(cc.text) == tr("BOOK_CREAZIONE_CREA"):
+					return cc
+	return null
+
+
 func test_chiudere_il_libro_termina_il_dialogo() -> void:
 	var ov: CanvasLayer = _monta_overlay()
 	_de().call("avvia", "dlg_mirco", "npc_mirco")
