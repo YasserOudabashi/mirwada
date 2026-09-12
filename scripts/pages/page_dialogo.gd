@@ -77,6 +77,16 @@ func aggiorna() -> void:
 ## abbastanza valuta. Vendi: un bottone per ogni item posseduto (categoria
 ## != valuta) a meta' valore (arrotondato per difetto, minimo 1). valuta =
 ## items_per_categoria("valuta")[0].id: nessun id nel codice.
+
+## Prezzo di un oggetto scalato per rarita' (US-1103, fase 11):
+## valore * moltiplicatore_prezzo del suo livello - 'valore' nei dati resta
+## sempre il prezzo BASE di un oggetto 'comune' (GameData.rarita_di torna
+## 'comune' per default sugli oggetti che non dichiarano nulla).
+func _prezzo_con_rarita(gd: Node, item_id: String) -> int:
+	var base: int = int((gd.call("get_item", item_id) as Dictionary).get("valore", 0))
+	var livello: Dictionary = gd.call("get_item_rarity", str(gd.call("rarita_di", item_id)))
+	var mult: float = float(livello.get("moltiplicatore_prezzo", 1.0))
+	return int(round(float(base) * mult))
 func _disegna_negozio() -> void:
 	var gd: Node = get_node_or_null("/root/GameData")
 	var inv: Node = get_node_or_null("/root/Inventory")
@@ -101,7 +111,7 @@ func _disegna_negozio() -> void:
 	for item_id in listino:
 		var iid: String = str(item_id)
 		var it: Dictionary = gd.call("get_item", iid)
-		var valore: int = int(it.get("valore", 0))
+		var valore: int = _prezzo_con_rarita(gd, iid)
 		var h := HBoxContainer.new()
 		var l := Label.new()
 		l.custom_minimum_size = Vector2(200, 0)
@@ -121,7 +131,7 @@ func _disegna_negozio() -> void:
 			var r: Dictionary = riga
 			var iid2: String = str(r.get("item_id", ""))
 			var it2: Dictionary = gd.call("get_item", iid2)
-			var prezzo: int = maxi(1, int(it2.get("valore", 0)) / 2)
+			var prezzo: int = maxi(1, _prezzo_con_rarita(gd, iid2) / 2)
 			var h2 := HBoxContainer.new()
 			var l2 := Label.new()
 			l2.custom_minimum_size = Vector2(200, 0)
@@ -167,7 +177,7 @@ func compra(item_id: String) -> Dictionary:
 	if valuta_items.is_empty():
 		return {"ok": false, "reason": "no_valuta"}
 	var valuta_id: String = str((valuta_items[0] as Dictionary).get("id", ""))
-	var valore: int = int((gd.call("get_item", item_id) as Dictionary).get("valore", 0))
+	var valore: int = _prezzo_con_rarita(gd, item_id)
 	if int(inv.call("conta", valuta_id)) < valore:
 		return {"ok": false, "reason": "fondi_insufficienti"}
 	inv.call("rimuovi", valuta_id, valore)
@@ -188,7 +198,7 @@ func vendi(item_id: String) -> Dictionary:
 	if valuta_items.is_empty():
 		return {"ok": false, "reason": "no_valuta"}
 	var valuta_id: String = str((valuta_items[0] as Dictionary).get("id", ""))
-	var prezzo: int = maxi(1, int((gd.call("get_item", item_id) as Dictionary).get("valore", 0)) / 2)
+	var prezzo: int = maxi(1, _prezzo_con_rarita(gd, item_id) / 2)
 	inv.call("rimuovi", item_id, 1)
 	inv.call("aggiungi", valuta_id, prezzo)
 	aggiorna()

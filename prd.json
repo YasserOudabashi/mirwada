@@ -44,8 +44,8 @@
       ],
       "priority": 3,
       "fase": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "page_dialogo.gd::_prezzo_con_rarita(gd, item_id) = valore * moltiplicatore_prezzo, usato ovunque il negozio leggeva 'valore' nudo (acquisto e meta' vendita). Nuovo test: pergamena_vigore (raro) e sigillo_vento_leggero (non_comune), stesso valore base (25), vendono a prezzi diversi - letti dai moltiplicatori veri, non hardcoded. 928/928 test, validate_data.py 0 errori, nessuna regressione sui test negozio esistenti (comune = moltiplicatore 1.0, invariati)."
     },
     {
       "id": "US-1104",

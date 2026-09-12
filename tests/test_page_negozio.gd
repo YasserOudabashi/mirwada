@@ -80,7 +80,41 @@ func test_vendi_un_item_aggiunge_meta_valore() -> void:
 	assert_true(bool(res.get("ok", false)), "vendita riuscita")
 	assert_eq(int(_inv().call("conta", ITEM_DA_3)), 0, "l'item esce dall'Inventory")
 	# valore 3 / 2 = 1 (arrotondato per difetto, e comunque >= minimo 1).
+	# ITEM_DA_3 e' 'comune' (moltiplicatore 1.0): la rarita' non altera nulla qui.
 	assert_eq(int(_inv().call("conta", "moneta_comune")), 1, "meta' valore arrotondato per difetto")
+	p.free()
+
+
+## US-1103 (fase 11): la rarita' scala il prezzo, non solo 'valore' nudo.
+## pergamena_vigore (valore 25, raro, moltiplicatore 5.0) e
+## sigillo_vento_leggero (valore 25, non_comune, moltiplicatore 2.0) hanno
+## lo STESSO valore base ma finiscono a prezzi diversi - letti dal
+## vocabolario chiuso (data/schema/item_rarity.json), non scritti qui a
+## mano: il test legge i moltiplicatori veri invece di hardcodare 62/25.
+func test_la_rarita_scala_il_prezzo_di_vendita() -> void:
+	var gd: Node = _root().get_node("GameData")
+	assert_eq(int((gd.call("get_item", "pergamena_vigore") as Dictionary).get("valore", -1)),
+		int((gd.call("get_item", "sigillo_vento_leggero") as Dictionary).get("valore", -2)),
+		"le due prove hanno davvero lo stesso valore base")
+
+	var mult_raro: float = float(gd.call("get_item_rarity", "raro").get("moltiplicatore_prezzo", 1.0))
+	var mult_non_comune: float = float(gd.call("get_item_rarity", "non_comune").get("moltiplicatore_prezzo", 1.0))
+	var atteso_raro: int = maxi(1, int(round(25.0 * mult_raro)) / 2)
+	var atteso_non_comune: int = maxi(1, int(round(25.0 * mult_non_comune)) / 2)
+	assert_true(atteso_raro != atteso_non_comune, "i due moltiplicatori producono prezzi diversi")
+
+	var p: Node = _monta_pagina()
+	_inv().call("aggiungi", "pergamena_vigore", 1)
+	_apri_vendita_sidon(p)
+	p.call("vendi", "pergamena_vigore")
+	assert_eq(int(_inv().call("conta", "moneta_comune")), atteso_raro,
+		"pergamena_vigore (raro) vende al prezzo scalato dal suo moltiplicatore")
+	_inv().call("pulisci")
+
+	_inv().call("aggiungi", "sigillo_vento_leggero", 1)
+	p.call("vendi", "sigillo_vento_leggero")
+	assert_eq(int(_inv().call("conta", "moneta_comune")), atteso_non_comune,
+		"sigillo_vento_leggero (non_comune) vende a un prezzo diverso dalla pergamena raro")
 	p.free()
 
 

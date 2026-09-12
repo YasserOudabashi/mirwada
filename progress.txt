@@ -12184,4 +12184,34 @@ COME VERIFICATO.
 APERTO: la rarita' esiste sui dati ma non incide ancora su niente in
 gioco (prezzo/drop/UI sono US-1103/1104/1105, non ancora fatte).
 
-PROSSIMA STORIA: US-1103 ("La rarita' incide sul prezzo"), priority 3.
+PROSSIMA STORIA (chiusa qui sotto): US-1103 ("La rarita' incide sul
+prezzo"), priority 3.
+
+FATTO (US-1103).
+- scripts/pages/page_dialogo.gd: nuovo _prezzo_con_rarita(gd, item_id) ->
+  int (valore * moltiplicatore_prezzo del livello, arrotondato) - usato
+  ovunque il negozio prima leggeva 'valore' nudo: il prezzo di acquisto
+  mostrato/applicato in _disegna_negozio e compra(), il prezzo di vendita
+  (meta' del prezzo scalato, non piu' meta' del valore base) in
+  _disegna_negozio e vendi(). 'valore' nei dati resta sempre il prezzo
+  BASE di un oggetto comune (data/schema/item_rarity.json lo documenta).
+- tests/test_page_negozio.gd: nuovo test_la_rarita_scala_il_prezzo_di_
+  vendita - pergamena_vigore (valore 25, raro) e sigillo_vento_leggero
+  (valore 25, non_comune) hanno lo stesso valore base ma vendono a
+  prezzi diversi, letti dai moltiplicatori veri del vocabolario (non
+  hardcoded 62/25 nel test). I test esistenti (ITEM_DA_3, comune,
+  moltiplicatore 1.0) restano invariati - nessuna regressione.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 928 test,
+  tutti passati (927 + 1 nuovo), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Nessuna verifica a schermo richiesta esplicitamente dall'AC (story di
+  logica di prezzo, gia' provata da un test headless reale sul negozio -
+  la UI del negozio in se' non e' cambiata, solo il numero mostrato).
+
+APERTO: il drop dai nemici (US-1104) e il colore in inventario (US-1105)
+non sono ancora fatti.
+
+PROSSIMA STORIA: US-1104 ("La rarita' incide sul drop dai nemici"),
+priority 4.
