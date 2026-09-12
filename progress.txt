@@ -12213,5 +12213,33 @@ COME VERIFICATO.
 APERTO: il drop dai nemici (US-1104) e il colore in inventario (US-1105)
 non sono ancora fatti.
 
-PROSSIMA STORIA: US-1104 ("La rarita' incide sul drop dai nemici"),
-priority 4.
+PROSSIMA STORIA (chiusa qui sotto): US-1104 ("La rarita' incide sul drop
+dai nemici"), priority 4.
+
+FATTO (US-1104).
+- scripts/enemy.gd::_lascia_oggetto(): la scelta fra piu' oggetti in
+  override.oggetti_a_morte non e' piu' 'oggetti[randi() % oggetti.size()]'
+  (uniforme) ma passa da un nuovo _scegli_drop_pesato(oggetti) - somma
+  cumulativa classica sui peso_drop (GameData.rarita_di + get_item_rarity)
+  di ogni candidato: un leggendario (peso 1) esce molto meno spesso di un
+  comune (peso 100) dalla stessa tabella. Senza GameData resta uniforme
+  (fallback difensivo, comportamento identico a prima).
+- tests/test_enemy_drop.gd: nuovo test_us1104_il_drop_pesa_per_rarita -
+  400 estrazioni dirette di _scegli_drop_pesato (non attraverso _uccidi/
+  pickup, troppo lento per centinaia di prove: chiama il metodo
+  direttamente, stesso principio statistico) fra un item comune e uno
+  leggendario scoperti dai dati (non hardcoded), il comune esce oltre
+  l'80% delle volte (atteso ~99%, tolleranza larga per non rendere il
+  test instabile).
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 929 test,
+  tutti passati (928 + 1 nuovo), nessuna regressione (i test esistenti di
+  drop usano liste da un solo oggetto, quindi la ponderazione non li
+  tocca).
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+
+APERTO: il colore/bordo in inventario (US-1105) non e' ancora fatto.
+
+PROSSIMA STORIA: US-1105 ("La rarita' si vede nell'inventario"),
+priority 5.

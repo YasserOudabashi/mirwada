@@ -58,8 +58,8 @@
       ],
       "priority": 4,
       "fase": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "enemy.gd::_scegli_drop_pesato sostituisce la scelta uniforme con una somma cumulativa sui peso_drop di GameData.get_item_rarity (fallback uniforme senza GameData). Nuovo test statistico (400 estrazioni dirette, item comune/leggendario scoperti dai dati): il comune esce oltre l'80% delle volte. 929/929 test, validate_data.py 0 errori, nessuna regressione (i test di drop esistenti usano liste da un solo oggetto)."
     },
     {
       "id": "US-1105",

@@ -295,19 +295,46 @@ func _lascia_caratteristica() -> void:
 
 
 ## US-809a: alla morte, con probabilita' drop_probabilita, lascia a terra
-## UN item scelto a caso fra quelli di override.oggetti_a_morte (dal
-## layout.drop della regione, via region_scene.gd::_crea_nemici). Vuoto o
-## assente (il nemico da banco di prova, ogni regione senza layout) -> no-op.
+## UN item scelto fra quelli di override.oggetti_a_morte (dal layout.drop
+## della regione, via world_scene.gd::_crea_nemici). Vuoto o assente (il
+## nemico da banco di prova, ogni regione senza layout) -> no-op.
 func _lascia_oggetto() -> void:
 	var oggetti: Array = _cfg.get("oggetti_a_morte", [])
 	if oggetti.is_empty():
 		return
 	if randf() > float(_cfg.get("drop_probabilita", 0.0)):
 		return
-	var item_id: String = str(oggetti[randi() % oggetti.size()])
+	var item_id: String = _scegli_drop_pesato(oggetti)
 	var pickup := preload("res://scripts/item_pickup.gd").new()
 	get_parent().add_child(pickup)
 	pickup.call("setup", item_id, global_position)
+
+
+## US-1104 (fase 11): la scelta pesa per rarita' (data/schema/item_rarity.json
+## 'peso_drop') invece di uniforme - un oggetto raro/leggendario esce molto
+## meno spesso di uno comune dalla stessa tabella. Somma cumulativa
+## classica; senza GameData (non dovrebbe capitare fuori dai test piu'
+## isolati) resta uniforme, comportamento identico a prima di questa story.
+func _scegli_drop_pesato(oggetti: Array) -> String:
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd == null:
+		return str(oggetti[randi() % oggetti.size()])
+	var pesi: Array = []
+	var totale: float = 0.0
+	for iid in oggetti:
+		var rarita: String = str(gd.call("rarita_di", str(iid)))
+		var peso: float = float((gd.call("get_item_rarity", rarita) as Dictionary).get("peso_drop", 1.0))
+		pesi.append(peso)
+		totale += peso
+	if totale <= 0.0:
+		return str(oggetti[randi() % oggetti.size()])
+	var scelta: float = randf() * totale
+	var accumulo: float = 0.0
+	for i in oggetti.size():
+		accumulo += float(pesi[i])
+		if scelta <= accumulo:
+			return str(oggetti[i])
+	return str(oggetti[oggetti.size() - 1])
 
 
 func stato() -> String:

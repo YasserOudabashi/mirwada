@@ -66,3 +66,41 @@ func test_oggetti_a_morte_vuoto_non_lascia_niente() -> void:
 	assert_false(trovato, "il nemico da banco di prova non lascia oggetti")
 	_root().remove_child(enemy)
 	enemy.free()
+
+
+## US-1104 (fase 11): con piu' di un oggetto in oggetti_a_morte, la scelta
+## pesa per rarita' invece di essere uniforme - un comune esce molto piu'
+## spesso di un leggendario dalla stessa tabella. Non chiama _uccidi/pickup
+## (che consuma un frame reale per estrazione, troppo lento per centinaia di
+## prove): chiama direttamente enemy._scegli_drop_pesato in un ciclo, stesso
+## principio statistico, tempo di esecuzione trascurabile.
+func test_us1104_il_drop_pesa_per_rarita() -> void:
+	var gd: Node = _root().get_node("GameData")
+	var comune_id := ""
+	var leggendario_id := ""
+	for cat in (gd.call("item_categories") as Array):
+		for it in (gd.call("items_per_categoria", str(cat)) as Array):
+			var item: Dictionary = it as Dictionary
+			var r: String = str(item.get("rarita", "comune"))
+			if r == "comune" and comune_id.is_empty():
+				comune_id = str(item.get("id", ""))
+			elif r == "leggendario" and leggendario_id.is_empty():
+				leggendario_id = str(item.get("id", ""))
+	assert_false(comune_id.is_empty(), "esiste almeno un item comune")
+	assert_false(leggendario_id.is_empty(), "esiste almeno un item leggendario")
+
+	var enemy: Node = EnemyScene.instantiate()
+	_root().add_child(enemy)
+	var oggetti: Array = [comune_id, leggendario_id]
+	var conteggio_comune := 0
+	const PROVE := 400
+	for _i in PROVE:
+		if str(enemy.call("_scegli_drop_pesato", oggetti)) == comune_id:
+			conteggio_comune += 1
+	# peso_drop: comune=100, leggendario=1 (data/schema/item_rarity.json) ->
+	# il comune ci si aspetta ~99% delle volte. Tolleranza larga (>80%) per
+	# non rendere il test instabile pur restando una prova statistica vera.
+	assert_true(conteggio_comune > PROVE * 0.8,
+		"il comune esce nettamente piu' spesso del leggendario (%d/%d)" % [conteggio_comune, PROVE])
+	_root().remove_child(enemy)
+	enemy.free()
