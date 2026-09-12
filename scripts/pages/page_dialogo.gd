@@ -15,6 +15,11 @@ const C_SPEAKER := Color(0.45, 0.78, 0.82)
 ## q_sidon_01.json), non un doppione: la pagina ascolta entrambi.
 var _negozio_npc_id: String = ""
 
+## US-1106 (fase 11): npc_id dell'artigiano mentre la pagina e' in modalita'
+## "crea per te" ("" = niente). Apribile solo da DialogueEngine.apri_creazione
+## (l'effetto crea_su_richiesta di una scelta) - stesso principio del negozio.
+var _creazione_npc_id: String = ""
+
 
 func _ready() -> void:
 	var de: Node = get_node_or_null("/root/DialogueEngine")
@@ -22,6 +27,7 @@ func _ready() -> void:
 		de.nodo_cambiato.connect(func(_n): aggiorna())
 		de.dialogo_finito.connect(func(_id): aggiorna())
 		de.apri_vendita.connect(_su_apri_vendita)
+		de.apri_creazione.connect(_su_apri_creazione)
 	var qs: Node = get_node_or_null("/root/QuestSystem")
 	if qs != null:
 		qs.apri_vendita.connect(_su_apri_vendita)
@@ -32,6 +38,11 @@ func _su_apri_vendita(npc_id: String) -> void:
 	aggiorna()
 
 
+func _su_apri_creazione(npc_id: String) -> void:
+	_creazione_npc_id = npc_id
+	aggiorna()
+
+
 func aggiorna() -> void:
 	for c in get_children():
 		remove_child(c)   # subito fuori: get_children() non li conta piu' (queue_free e' differito)
@@ -39,6 +50,9 @@ func aggiorna() -> void:
 
 	if not _negozio_npc_id.is_empty():
 		_disegna_negozio()
+		return
+	if not _creazione_npc_id.is_empty():
+		_disegna_creazione()
 		return
 
 	var de: Node = get_node_or_null("/root/DialogueEngine")
@@ -165,6 +179,98 @@ func _chiudi_negozio() -> void:
 		var b: Node = get_node_or_null("/root/Book")
 		if b != null:
 			b.call("chiudi")
+
+
+# --- modalita' "crea per te" (US-1106, fase 11) -------------------------
+## Un bottone Crea per ogni blueprint/ricetta di npc.crafter, attivo se si
+## hanno tutti i materiali/ingredienti richiesti. Riusa Forge.forgia/
+## PotionSystem.prepara con ignora_scoperta:true (l'artigiano conosce il suo
+## mestiere a prescindere da cosa il giocatore ha scoperto) - nessun sistema
+## di crafting nuovo, solo un'altra porta d'ingresso a quello di fase 3.
+func _disegna_creazione() -> void:
+	var gd: Node = get_node_or_null("/root/GameData")
+	var inv: Node = get_node_or_null("/root/Inventory")
+	if gd == null or inv == null:
+		add_child(_riga("· creazione non disponibile ·"))
+		return
+
+	var npc: Dictionary = gd.call("get_npc", _creazione_npc_id)
+	var l_nome := _riga(str(gd.call("tr_data", npc.get("name_i18n", _creazione_npc_id))))
+	l_nome.add_theme_color_override("font_color", C_SPEAKER)
+	add_child(l_nome)
+
+	var crafter: Dictionary = npc.get("crafter", {}) as Dictionary
+	var righe := 0
+	for bp_id in (crafter.get("blueprints", []) as Array):
+		var bp: Dictionary = gd.call("get_blueprint", str(bp_id))
+		_riga_creazione(gd, inv, str(bp_id), bp, bp.get("materiali", {}), true)
+		righe += 1
+	for ric_id in (crafter.get("ricette", []) as Array):
+		var ric: Dictionary = gd.call("get_recipe", str(ric_id))
+		_riga_creazione(gd, inv, str(ric_id), ric, ric.get("ingredienti", {}), false)
+		righe += 1
+	if righe == 0:
+		add_child(_riga(tr("BOOK_CREAZIONE_VUOTO")))
+
+	var b := Button.new()
+	b.text = tr("BOOK_NEGOZIO_CHIUDI")
+	b.pressed.connect(_chiudi_creazione)
+	add_child(b)
+
+
+func _riga_creazione(gd: Node, inv: Node, id: String, dati: Dictionary, costo: Dictionary, e_blueprint: bool) -> void:
+	var h := HBoxContainer.new()
+	var l := Label.new()
+	l.custom_minimum_size = Vector2(280, 0)
+	l.text = "%s — %s" % [str(gd.call("tr_data", dati.get("name_i18n", id))), _riassunto_costo(costo)]
+	h.add_child(l)
+	var b := Button.new()
+	b.text = tr("BOOK_CREAZIONE_CREA")
+	b.disabled = not _coperto(inv, costo)
+	b.pressed.connect(func() -> void:
+		if e_blueprint:
+			_n("/root/Forge").call("forgia", id, true)
+		else:
+			_n("/root/PotionSystem").call("prepara", id, true)
+		aggiorna())
+	h.add_child(b)
+	add_child(h)
+
+
+## Torna al dialogo in corso se ce n'e' uno, altrimenti chiude il libro -
+## stessa logica di _chiudi_negozio.
+func _chiudi_creazione() -> void:
+	_creazione_npc_id = ""
+	var de: Node = get_node_or_null("/root/DialogueEngine")
+	if de != null and bool(de.call("in_corso")):
+		aggiorna()
+	else:
+		var b: Node = get_node_or_null("/root/Book")
+		if b != null:
+			b.call("chiudi")
+
+
+func in_creazione() -> bool:
+	return not _creazione_npc_id.is_empty()
+
+
+## Stessa forma di page_inventario.gd::_coperto/_riassunto_costo (US-326):
+## duplicate qui invece di condivise, coerente con _traccia_item_crafted gia'
+## duplicata fra forge.gd/potion_system.gd - due pagine diverse, poche righe.
+func _coperto(inv: Node, costo: Dictionary) -> bool:
+	for item_id in costo:
+		if int(inv.call("conta", item_id)) < int(costo[item_id]):
+			return false
+	return true
+
+
+func _riassunto_costo(costo: Dictionary) -> String:
+	var gd: Node = get_node_or_null("/root/GameData")
+	var parti: Array = []
+	for item_id in costo:
+		var nome: String = str(gd.call("tr_data", (gd.call("get_item", item_id) as Dictionary).get("name_i18n", item_id)))
+		parti.append("%s x%d" % [nome, int(costo[item_id])])
+	return ", ".join(parti)
 
 
 ## Pubblica, interrogabile dai test (mirror del bottone Compra).

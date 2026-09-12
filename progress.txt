@@ -12270,5 +12270,69 @@ COME VERIFICATO.
 APERTO: nessuno per questa story - il Blocco A (rarita', US-1101..1105)
 e' chiuso.
 
-PROSSIMA STORIA: US-1106 ("Il 7 effetto di dialogo - crea_su_richiesta"),
-priority 6 - inizia il Blocco B (crafting NPC).
+PROSSIMA STORIA (chiusa qui sotto): US-1106 ("Il 7 effetto di dialogo -
+crea_su_richiesta"), priority 6 - inizia il Blocco B (crafting NPC).
+
+FATTO (US-1106).
+CORREZIONE DI ROTTA rispetto al PRD: leggendo dialogue_engine.gd per
+davvero (prima di scrivere codice) ho trovato due cose che il PRD aveva
+sbagliato:
+1. Il PRD parlava di "formula_id" (data/potions/formulas.json) per la
+   parte alchimista - ma quel registro serve alla CONCOCTION di
+   avanzamento di Sequenza (PotionSystem.concoct/bevi), un sistema
+   diverso. Il crafting di un CONSUMABILE (una pozione vera, tipo
+   pozione_cura_minore) usa invece data/potions/recipes.json via
+   PotionSystem.prepara(recipe_id) - quello giusto per un alchimista NPC.
+   Corretto ovunque: il campo si chiama crafter.ricette, non
+   crafter.formule (rinominato anche nel PRD).
+2. Il PRD assumeva che l'effetto potesse "generare il testo di risposta
+   dal Dictionary di ritorno" - ma gli effetti di dialogo in questo motore
+   sono fire-and-forget (un side-effect su una scelta, mai testo dinamico:
+   il testo di un nodo e' sempre statico, scritto nei dati). Corretto
+   seguendo lo STESSO pattern gia' in uso per apri_vendita: l'effetto apre
+   una modalita' che una pagina ascolta via segnale, mostrando un piccolo
+   menu con un bottone Crea per riga (disabilitato se mancano gli
+   ingredienti) - non un singolo blueprint/ricetta per scelta di dialogo,
+   ma TUTTO cio' che l'NPC sa fare in un colpo solo. Riusa quasi tutta
+   l'infrastruttura del negozio (US-811) invece di inventare testo
+   dinamico.
+- scripts/forge.gd::forgia / scripts/potion_system.gd::prepara: nuovo
+  parametro opzionale ignora_scoperta:bool=false - un NPC conosce il SUO
+  mestiere a prescindere da blueprint_noto()/ricetta_nota() del
+  giocatore. Default invariato, zero regressione sul crafting personale.
+- scripts/dialogue_engine.gd: 7o effetto crea_su_richiesta (EFFETTI ora
+  7 voci, non piu' 6 - anche il commento di classe corretto, diceva "5"
+  per errore pregresso), nuovo segnale apri_creazione(npc_id) emesso con
+  l'npc_id esplicito o l'interlocutore corrente.
+- data/schema/dialogue.schema.json, tools/validate_data.py (DLG_EFFETTI):
+  il 7o tipo aggiunto al vocabolario chiuso.
+- scripts/pages/page_dialogo.gd: nuova modalita' "_creazione_npc_id"
+  (mirror di _negozio_npc_id) - _disegna_creazione() elenca
+  npc.crafter.blueprints (via GameData.get_blueprint) e
+  npc.crafter.ricette (via GameData.get_recipe), un bottone Crea per riga
+  (disabled se _coperto() e' falso, stesso helper duplicato da
+  page_inventario.gd - poche righe, stessa scelta gia' fatta per
+  _traccia_item_crafted fra forge.gd/potion_system.gd), che chiama
+  Forge.forgia(id, true)/PotionSystem.prepara(id, true) e si riaggiorna.
+  Stato vuoto (BOOK_CREAZIONE_VUOTO) se l'NPC non ha ancora un crafter.
+  Nuove chiavi assets/i18n/strings.csv: BOOK_CREAZIONE_CREA,
+  BOOK_CREAZIONE_VUOTO (riusa BOOK_NEGOZIO_CHIUDI per il bottone Chiudi).
+- Nessun NPC del roster dichiara ancora un crafter (arriva in US-1108+):
+  questa story e' solo il motore, provato con l'effetto chiamato
+  direttamente/senza un vero grafo di dialogo che lo usi.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 934 test,
+  tutti passati (930 + 4 nuovi: ignora_scoperta su Forge/PotionSystem,
+  l'effetto che emette apri_creazione con/senza npc_id esplicito, lo
+  stato vuoto della pagina), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- godot --headless --path . --import pulito dopo l'edit a strings.csv.
+- Nessuna verifica a schermo: senza un vero NPC crafter (US-1108) non
+  c'e' ancora niente di reale da mostrare oltre allo stato vuoto, gia'
+  provato da un test headless.
+
+APERTO: data/schema/npc.schema.json non ha ancora il campo crafter
+documentato/validato (US-1107); nessun NPC lo usa davvero (US-1108+).
+
+PROSSIMA STORIA: US-1107 ("NPC crafter - il campo crafter"), priority 7.

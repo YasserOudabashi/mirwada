@@ -76,7 +76,7 @@
     },
     {
       "id": "US-1106",
-      "title": "Il 7 effetto di dialogo - crea_su_richiesta",
+      "title": "Il 7° effetto di dialogo - crea_su_richiesta",
       "description": "Come motore, voglio un effetto di dialogo generico che faccia creare un oggetto a un NPC dalle sue ricette, riusando Forge/PotionSystem.",
       "acceptanceCriteria": [
         "data/schema/dialogue.schema.json: crea_su_richiesta aggiunto al vocabolario chiuso dei 6 effetti (ora 7), valore = un blueprint_id o un formula_id.",
@@ -86,8 +86,8 @@
       ],
       "priority": 6,
       "fase": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Correzione di rotta rispetto al PRD originale (dettagliata in progress.txt e nel PRD stesso): 1) l'alchimista usa data/potions/recipes.json (PotionSystem.prepara), non formulas.json (quello serve alla concoction di avanzamento di Sequenza) - crafter.ricette, non crafter.formule; 2) gli effetti di dialogo sono fire-and-forget, nessun testo dinamico possibile - l'effetto apre una modalita' (apri_creazione, mirror di apri_vendita) che page_dialogo.gd ascolta mostrando un bottone Crea per blueprint/ricetta, disabilitato se mancano gli ingredienti. Forge.forgia/PotionSystem.prepara: nuovo ignora_scoperta:bool=false (un NPC conosce il suo mestiere a prescindere dalla scoperta del giocatore). 934/934 test (930+4 nuovi), validate_data.py 0 errori. Nessun NPC ha ancora un crafter reale (US-1108+)."
     },
     {
       "id": "US-1107",

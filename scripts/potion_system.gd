@@ -190,8 +190,12 @@ func ricetta_nota(recipe_id: String) -> bool:
 
 
 ## Prepara una ricetta nota consumando gli ingredienti dall'inventario.
+## ignora_scoperta (fase 11, US-1106): un NPC alchimista conosce la SUA
+## ricetta a prescindere da cosa il giocatore ha scoperto - salta
+## ricetta_nota(). Default false: nessuna regressione sull'alchimia del
+## giocatore.
 ##   -> { ok, reason, item_id, qualita }
-func prepara(recipe_id: String) -> Dictionary:
+func prepara(recipe_id: String, ignora_scoperta: bool = false) -> Dictionary:
 	var gd: Node = _gd()
 	var inv: Node = get_node_or_null("/root/Inventory")
 	if gd == null or inv == null:
@@ -199,7 +203,7 @@ func prepara(recipe_id: String) -> Dictionary:
 	var r: Dictionary = gd.call("get_recipe", recipe_id)
 	if r.is_empty():
 		return {"ok": false, "reason": "ricetta_inesistente"}
-	if not ricetta_nota(recipe_id):
+	if not ignora_scoperta and not ricetta_nota(recipe_id):
 		return {"ok": false, "reason": "ricetta_ignota"}
 	var ingr: Dictionary = r.get("ingredienti", {})
 	for item_id in ingr:

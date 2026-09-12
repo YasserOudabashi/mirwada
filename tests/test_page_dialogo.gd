@@ -82,6 +82,32 @@ func test_il_bottone_fa_avanzare_il_dialogo() -> void:
 	p.free()
 
 
+## US-1106 (fase 11): apri_creazione mette la pagina in modalita' "crea per
+## te". npc_mirco esiste ma non ha ancora un campo 'crafter' (nessun NPC del
+## roster ce l'ha finche' US-1108 non scrive il primo fabbro/alchimista): qui
+## si prova lo stato vuoto + il bottone Chiudi, non una creazione vera (quella
+## end-to-end con ingredienti reali e' l'AC di US-1108).
+func test_apri_creazione_mostra_lo_stato_vuoto_senza_un_crafter() -> void:
+	var p: Node = _monta_pagina()
+	_de().call("avvia", "dlg_mirco", "npc_mirco")
+	_de().apri_creazione.emit("npc_mirco")
+	assert_true(p.call("in_creazione"), "la pagina e' in modalita' creazione")
+
+	var chiudi: Button = null
+	var testo := ""
+	for c in p.get_children():
+		if c is Label:
+			testo += " " + c.text
+		if c is Button and str(c.text) == tr("BOOK_NEGOZIO_CHIUDI"):
+			chiudi = c
+	assert_true(testo.contains(tr("BOOK_CREAZIONE_VUOTO")),
+		"npc_mirco non sa creare nulla - stato vuoto mostrato")
+	assert_true(chiudi != null, "il bottone Chiudi e' a schermo")
+	chiudi.pressed.emit()
+	assert_false(p.call("in_creazione"), "Chiudi esce dalla modalita' creazione")
+	p.free()
+
+
 func test_chiudere_il_libro_termina_il_dialogo() -> void:
 	var ov: CanvasLayer = _monta_overlay()
 	_de().call("avvia", "dlg_mirco", "npc_mirco")

@@ -73,31 +73,42 @@ Ogni oggetto (`data/items/*.json`) guadagna un campo `rarita` (default
 Oggi `Forge.forgia(blueprint_id)` e `PotionSystem.prepara(recipe_id)`
 fanno ESATTAMENTE "controlla ingredienti in Inventory → consumali →
 produci l'oggetto (con qualità da bonus di stanza/talento/sinergia)" — è
-il motore che il libro del giocatore già chiama. Non serve un sistema di
-crafting nuovo: serve un modo per un NPC di offrirlo.
+il motore che il libro del giocatore già chiama (`prepara` legge
+`data/potions/recipes.json`, il registro dei consumabili come
+`pozione_cura_minore` — un registro DIVERSO da `data/potions/formulas.json`,
+che serve solo alla concoction di avanzamento di Sequenza). Non serve un
+sistema di crafting nuovo: serve un modo per un NPC di offrirlo.
+
+> **Corretto in corsa (US-1106)**: le due righe sotto erano sbagliate nella
+> stesura originale del PRD (scritte prima di leggere `dialogue_engine.gd`
+> per davvero). Gli effetti di dialogo in questo motore sono fire-and-forget
+> — un side-effect quando si sceglie un'opzione — e MAI generano testo
+> dinamico: il testo di ogni nodo è sempre statico, scritto nei dati. Non
+> c'è un `Dictionary` di ritorno da mostrare a schermo. La soluzione reale
+> ricalca `apri_vendita` (US-811): l'effetto apre una MODALITÀ che una
+> pagina ascolta via segnale, con un piccolo menu (un bottone "Crea" per
+> blueprint/ricetta noti all'NPC, disabilitato se mancano gli ingredienti) —
+> non un blueprint/ricetta per singola scelta di dialogo.
 
 - `data/schema/dialogue.schema.json`: i tipi di effetto di dialogo sono
   chiusi a 6 (`emit_event`, `flag`, `reputazione`, `apri_vendita`,
   `avvia_quest`, `impara_sinergia`, fase 6). Aggiungiamo il **7°**:
-  `crea_su_richiesta`, `{ "tipo": "crea_su_richiesta", "valore":
-  "bp_spada_ferrea" }` (valore = un blueprint_id O un formula_id — si
-  distingue guardando in quale registro esiste, stesso principio già
-  usato altrove nel motore per non introdurre un campo "genere" in più).
-- `DialogueEngine` esegue l'effetto chiamando `Forge.forgia`/
-  `PotionSystem.prepara` per conto del giocatore, MA bypassando il
-  controllo "ricetta nota/blueprint noto" che si applica al crafting
-  personale del giocatore (l'NPC è un professionista: conosce il SUO
-  mestiere a prescindere da cosa ha scoperto il giocatore) — un
-  parametro opzionale `ignora_scoperta: bool` aggiunto a `forgia()`/
-  `prepara()`, default `false` (nessuna regressione sul crafting del
-  giocatore).
-- Se mancano ingredienti, il dialogo mostra il fallimento con lo stesso
-  `Dictionary` di ritorno che già usano `forgia`/`prepara` (hanno già un
-  esito di errore strutturato, verificato leggendo il codice) — nessun
-  nuovo formato di errore.
+  `crea_su_richiesta`, `{ "tipo": "crea_su_richiesta" }` (npc_id opzionale,
+  come `apri_vendita` — default l'interlocutore corrente). `DialogueEngine`
+  emette un nuovo segnale `apri_creazione(npc_id)`; la pagina del libro
+  ascolta e mostra TUTTO ciò che `npc.crafter` sa fare in un colpo solo.
+- `Forge.forgia`/`PotionSystem.prepara` guadagnano un parametro opzionale
+  `ignora_scoperta: bool` (default `false`, nessuna regressione): un NPC è
+  un professionista, conosce il SUO mestiere a prescindere da cosa ha
+  scoperto il giocatore — salta `blueprint_noto()`/`ricetta_nota()`.
+- Il bottone "Crea" di ogni riga è disabilitato se mancano gli ingredienti
+  (stesso helper `_coperto()` già in uso per il negozio/la base) — non
+  serve mostrare un testo di fallimento dinamico: la UI comunica
+  l'impossibilità come già fa il negozio con "Compra" disabilitato.
 - Gli NPC guadagnano un campo opzionale `crafter: { "blueprints": [...],
-  "formule": [...] }` (id che sa fare), usato solo per popolare le scelte
-  nel suo grafo di dialogo — non un sistema a parte.
+  "ricette": [...] }` (id che sa fare — `ricette` risolve in
+  `data/potions/recipes.json`, MAI `formule`/`formulas.json`), usato solo
+  per popolare il menu di creazione — non un sistema a parte.
 
 ### 3.3 Insediamenti: riusa `edifici[]`/interno di US-1010..1012
 
@@ -199,33 +210,31 @@ un oggetto è raro.
 
 ### Blocco B — Crafting NPC (fabbro/alchimista)
 
-#### US-1106: Il 7° effetto di dialogo — `crea_su_richiesta`
+#### US-1106: Il 7° effetto di dialogo — `crea_su_richiesta` — ✅ FATTO
 **Descrizione:** Come motore, voglio un effetto di dialogo generico che
-faccia creare un oggetto a un NPC dalle sue ricette, riusando
-Forge/PotionSystem.
+apra un menu "crea per te" per un NPC, riusando Forge/PotionSystem.
 **Acceptance Criteria:**
-- [ ] `data/schema/dialogue.schema.json`: `crea_su_richiesta` aggiunto
-      al vocabolario chiuso dei 6 effetti (ora 7), `valore` = un
-      blueprint_id o un formula_id.
-- [ ] `Forge.forgia`/`PotionSystem.prepara` guadagnano un parametro
+- [x] `data/schema/dialogue.schema.json`: `crea_su_richiesta` aggiunto
+      al vocabolario chiuso dei 6 effetti (ora 7). Nessun `valore`
+      obbligatorio (`npc_id` opzionale, come `apri_vendita`).
+- [x] `Forge.forgia`/`PotionSystem.prepara` guadagnano un parametro
       opzionale `ignora_scoperta: bool = false` (default invariato,
       nessuna regressione sul crafting del giocatore).
-- [ ] `DialogueEngine` esegue l'effetto: risolve se `valore` è un
-      blueprint o una formula (esiste in uno solo dei due registri),
-      chiama la funzione giusta con `ignora_scoperta: true`, il
-      risultato (successo/oggetto creato, o fallimento/ingredienti
-      mancanti) genera il testo di risposta del dialogo dal `Dictionary`
-      di ritorno già esistente.
-- [ ] Tests pass. `python tools/validate_data.py` esce 0.
+- [x] `DialogueEngine` emette `apri_creazione(npc_id)`; `page_dialogo.gd`
+      lo ascolta e mostra un bottone "Crea" per ogni blueprint/ricetta di
+      `npc.crafter`, disabilitato se mancano gli ingredienti (`_coperto()`,
+      lo stesso helper del negozio) — non un testo dinamico per esito.
+- [x] Tests pass. `python tools/validate_data.py` esce 0.
 
 #### US-1107: NPC crafter — il campo `crafter`
 **Descrizione:** Come team, vogliamo dichiarare su un NPC cosa sa creare.
 **Acceptance Criteria:**
 - [ ] `data/schema/npc.schema.json`: campo opzionale `crafter: {
-      "blueprints": [...], "formule": [...] }` (array di id, ognuno deve
-      esistere nel rispettivo registro — validato).
+      "blueprints": [...], "ricette": [...] }` (array di id, ognuno deve
+      esistere nel rispettivo registro — `ricette` risolve in
+      `data/potions/recipes.json`, MAI `formule`/`formulas.json` — validato).
 - [ ] `tools/validate_data.py`: ogni id in `crafter.blueprints`/
-      `crafter.formule` esiste davvero.
+      `crafter.ricette` esiste davvero.
 - [ ] Tests pass. `python tools/validate_data.py` esce 0.
 
 #### US-1108: Il primo fabbro — riempie la capanna erborista di Valle
@@ -233,7 +242,7 @@ Forge/PotionSystem.
 capanna "erborista" dell'avamposto di Valle della Madre, oggi vuota.
 **Acceptance Criteria:**
 - [ ] Nuovo NPC nel roster (id, nome, ruolo, `region_id: valle_madre`,
-      `schedule` nella capanna erborista, `crafter.formule` con almeno 1
+      `schedule` nella capanna erborista, `crafter.ricette` con almeno 1
       formula esistente), grafo di dialogo con una scelta
       `crea_su_richiesta`.
 - [ ] `data/world/interni/valle_avamposto_erborista.json`: l'interno
@@ -257,14 +266,16 @@ Mirwada stessa, non solo nei villaggi lontani.
 - [ ] Tests pass. `python tools/validate_data.py` esce 0. Verifica a
       schermo con Xvfb.
 
-#### US-1110: Più ricette da fabbricare (blueprint/formule nuove)
+#### US-1110: Più ricette da fabbricare (blueprint/ricette nuove)
 **Descrizione:** Come giocatore, voglio più di 3 blueprint e più
-formule fra cui scegliere quando parlo con un artigiano.
+ricette fra cui scegliere quando parlo con un artigiano.
 **Acceptance Criteria:**
 - [ ] Almeno 3 `blueprints` nuovi in `data/forge/blueprints.json`
       (armi/equip diversi da quelli esistenti, ingredienti già presenti
-      nel gioco) e 3 `formule` nuove in `data/potions/formulas.json`,
-      almeno una con un ingrediente/output di rarità `non_comune`+.
+      nel gioco) e 3 `ricette` nuove in `data/potions/recipes.json`
+      (MAI `formulas.json`, che serve solo alla concoction di
+      avanzamento di Sequenza), almeno una con un ingrediente/output di
+      rarità `non_comune`+.
 - [ ] `python tools/validate_data.py` esce 0. Tests pass.
 
 ### Blocco C — Villaggi nuovi (campagna + regioni)
@@ -290,7 +301,7 @@ non è solo alberi sparsi.
 campagna con un alchimista e un mercante di oggetti rari.
 **Acceptance Criteria:**
 - [ ] Stesso schema di US-1111: 2-3 capanne in campagna, un alchimista
-      (`crafter.formule`) + un mercante col listino che include almeno
+      (`crafter.ricette`) + un mercante col listino che include almeno
       un oggetto `raro`/`leggendario` (prezzo alto, US-1103).
 - [ ] `python tools/validate_data.py` esce 0. Tests pass. Verifica a
       schermo con Xvfb.
@@ -342,7 +353,7 @@ e "Atto II e Atto III" rinumerata a fase 12.
   rarità, non uniforme.
 - FR-4: Un 7° tipo di effetto di dialogo (`crea_su_richiesta`) invoca
   `Forge.forgia`/`PotionSystem.prepara` con `ignora_scoperta: true`.
-- FR-5: Un NPC può dichiarare `crafter.blueprints`/`crafter.formule`.
+- FR-5: Un NPC può dichiarare `crafter.blueprints`/`crafter.ricette`.
 - FR-6: Almeno 4 insediamenti nuovi/completati (Valle-erborista, Mirwada-
   bottega, 2 villaggi in campagna), ognuno con almeno un NPC crafter
   raggiungibile ed entrabile.

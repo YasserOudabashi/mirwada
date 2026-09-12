@@ -21,8 +21,11 @@ func blueprint_noto(blueprint_id: String) -> bool:
 	return bool(bp.get("nota_da_subito", false))
 
 
+## ignora_scoperta (fase 11, US-1106): un NPC fabbro conosce il SUO mestiere
+## a prescindere da cosa il giocatore ha scoperto - salta blueprint_noto().
+## Default false: nessuna regressione sulla forgiatura del giocatore.
 ## -> { ok, reason, item_id, instance_id, qualita }
-func forgia(blueprint_id: String) -> Dictionary:
+func forgia(blueprint_id: String, ignora_scoperta: bool = false) -> Dictionary:
 	var gd: Node = _gd()
 	var inv: Node = get_node_or_null("/root/Inventory")
 	if gd == null or inv == null:
@@ -30,7 +33,7 @@ func forgia(blueprint_id: String) -> Dictionary:
 	var bp: Dictionary = gd.call("get_blueprint", blueprint_id)
 	if bp.is_empty():
 		return {"ok": false, "reason": "blueprint_inesistente"}
-	if not blueprint_noto(blueprint_id):
+	if not ignora_scoperta and not blueprint_noto(blueprint_id):
 		return {"ok": false, "reason": "blueprint_ignoto"}
 
 	var materiali: Dictionary = bp.get("materiali", {})

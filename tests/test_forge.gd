@@ -44,6 +44,21 @@ func test_blueprint_inesistente_gestito() -> void:
 	assert_eq(r.get("reason"), "blueprint_inesistente", "motivo esplicito")
 
 
+## US-1106 (fase 11): forgia() guadagna ignora_scoperta (default false) per
+## gli NPC fabbro - la stessa firma di prima resta identica (default
+## invariato). I 3 blueprint esistenti sono gia' tutti nota_da_subito:true
+## (nessuno richiede una scoperta oggi), quindi qui si prova solo che il
+## parametro non rompe il percorso normale del giocatore; il bypass vero si
+## osserva con un blueprint NON nota_da_subito (US-1109/1110, il fabbro
+## dentro Mirwada avra' probabilmente il primo).
+func test_ignora_scoperta_non_cambia_un_blueprint_gia_noto() -> void:
+	var inv: Node = _inv()
+	inv.call("aggiungi", "lingotto_ferro", 3)
+	var r: Dictionary = _forge().call("forgia", "bp_spada_ferrea", true)
+	assert_true(bool(r.get("ok")), "forgia riesce anche con ignora_scoperta:true su un blueprint gia' noto")
+	assert_eq(r.get("item_id"), "spada_ferrea", "stesso output di sempre")
+
+
 func test_equip_forgiato_ha_i_tag_del_blueprint() -> void:
 	var gd: Node = _gd()
 	var inv: Node = _inv()

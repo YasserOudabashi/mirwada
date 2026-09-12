@@ -1926,7 +1926,8 @@ def main():
     DLG_COND = {"acting_progress_min", "madness_max", "madness_min", "e_notte",
                 "fase_lunare", "foundation_min", "tier_min", "in_zona_tag",
                 "follia_min", "reputazione_min", "flag"}
-    DLG_EFFETTI = {"emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest", "impara_sinergia"}
+    DLG_EFFETTI = {"emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest", "impara_sinergia",
+                   "crea_su_richiesta"}
     _dlg_quest_ids = set()   # quest_id nominati da un effetto avvia_quest
     tracked_ev = load_json(os.path.join(DATA, "schema", "tracked_events.json")) or {}
     ev_names = set(tracked_ev.get("events", {}).keys())

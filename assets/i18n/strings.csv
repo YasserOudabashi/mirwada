@@ -76,6 +76,8 @@ BOOK_NEGOZIO_COMPRA,Compra,Buy
 BOOK_NEGOZIO_VENDI,Vendi,Sell
 BOOK_NEGOZIO_CHIUDI,Chiudi,Close
 BOOK_NEGOZIO_VALUTA_ASSENTE,Nessuna valuta nel gioco,No currency in the game
+BOOK_CREAZIONE_CREA,Crea,Craft
+BOOK_CREAZIONE_VUOTO,Non sa creare nulla per ora,Nothing to craft for now
 BOOK_INV_USA,Usa,Use
 BOOK_INV_EQUIPAGGIA,Indossa,Equip
 BOOK_INV_TOGLI,Togli,Remove
