@@ -138,3 +138,22 @@ func test_rarita_di_un_item_assente_e_comune_per_default() -> void:
 	var r: String = str(gd.call("rarita_di", un_item_id))
 	assert_true(r == "comune" or (gd.call("get_item_rarity", r) as Dictionary).size() > 0,
 		"rarita_di torna sempre un livello valido del vocabolario")
+
+
+func test_retrofit_rarita_su_ogni_oggetto_esistente() -> void:
+	# fase 11 (US-1102): ogni oggetto del gioco ha ora un campo 'rarita'
+	# esplicito (non piu' solo il default 'comune' di rarita_di()) - conta
+	# le voci mancanti invece di controllare un numero fisso, cosi' il test
+	# non va aggiornato ogni volta che si aggiunge un item.
+	var gd: Node = _data()
+	var senza_rarita: Array = []
+	var trovati_leggendari := 0
+	for cat in (gd.call("item_categories") as Array):
+		for it in (gd.call("items_per_categoria", str(cat)) as Array):
+			var item: Dictionary = it as Dictionary
+			if not item.has("rarita"):
+				senza_rarita.append(item.get("id", "?"))
+			elif str(item.get("rarita", "")) == "leggendario":
+				trovati_leggendari += 1
+	assert_eq(senza_rarita.size(), 0, "oggetti senza rarita' esplicita: %s" % [senza_rarita])
+	assert_gt(float(trovati_leggendari), 0.0, "almeno un oggetto leggendario esiste")

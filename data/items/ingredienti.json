@@ -15,7 +15,8 @@
         "stella"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "acido_da_saggio",
@@ -28,7 +29,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "acqua_dello_stige",
@@ -42,7 +44,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "acqua_di_fonte_benedetta",
@@ -56,7 +59,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "acqua_di_fonte_cieca",
@@ -70,7 +74,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "acqua_di_un_pozzo_che_non_trovi_piu",
@@ -84,7 +89,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "acqua_sorgiva",
@@ -96,7 +102,8 @@
         "purificazione"
       ],
       "impilabile": true,
-      "valore": 1
+      "valore": 1,
+      "rarita": "comune"
     },
     {
       "id": "ago_che_cuce_il_fato",
@@ -110,7 +117,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "ala_di_falena_crepuscolare",
@@ -123,7 +131,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "ambra_grigia",
@@ -136,7 +145,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "angolo_di_stanza_che_non_esiste",
@@ -149,7 +159,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "argento_annerito",
@@ -162,7 +173,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "argento_benedetto",
@@ -175,7 +187,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "argilla_rossa_del_fiume",
@@ -189,7 +202,8 @@
         "terra"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "articolazione_di_marionetta",
@@ -203,7 +217,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "asso_sempre_in_cima_al_mazzo",
@@ -217,7 +232,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "astrolabio_tascabile",
@@ -231,7 +247,8 @@
         "stella"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "balsamo_di_silenzio",
@@ -245,7 +262,8 @@
         "silenzioso"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "battuta_finale_mai_detta",
@@ -258,7 +276,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "biglietto_della_lotteria_vincente",
@@ -272,7 +291,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "biglietto_di_sola_andata_e_ritorno",
@@ -285,7 +305,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "bilancia_di_precisione",
@@ -298,7 +319,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "bussola_che_punta_a_dove_vuoi_tu",
@@ -312,7 +334,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "calice_incrinato",
@@ -325,7 +348,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "campana_incrinata",
@@ -338,7 +362,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "cappello_a_cilindro_senza_fondo",
@@ -351,7 +376,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "caratteristica_del_gigante",
@@ -365,7 +391,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "cardine_arrugginito_di_una_porta_perduta",
@@ -378,7 +405,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "cardine_del_cielo",
@@ -392,7 +420,8 @@
         "stella"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "carta_carbone_dell_anima",
@@ -407,7 +436,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "carta_millimetrata",
@@ -421,7 +451,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "carta_stellare_con_una_stella_in_piu",
@@ -436,7 +467,8 @@
         "stella"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "catalizzatore_proibito",
@@ -449,7 +481,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "cavillo_primordiale",
@@ -462,7 +495,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "cellula_madre",
@@ -475,7 +509,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "cenere_di_bosco",
@@ -489,7 +524,8 @@
         "terra"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "cenere_di_re",
@@ -503,7 +539,8 @@
         "terra"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "cenere_di_spirito",
@@ -518,7 +555,8 @@
         "terra"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "cenere_di_stella_morta",
@@ -533,7 +571,8 @@
         "terra"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "cera_di_candela_rituale",
@@ -547,7 +586,8 @@
         "rituale"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "cera_di_veglia",
@@ -561,7 +601,8 @@
         "sonno"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "cerone_da_palcoscenico",
@@ -574,7 +615,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "chiave_che_chiude_e_non_apre",
@@ -587,7 +629,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "chiave_d_ossa",
@@ -601,7 +644,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "chiave_dell_oltretomba",
@@ -614,7 +658,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "chiave_di_cifrario",
@@ -628,7 +673,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "chiave_di_ogni_serratura",
@@ -641,7 +687,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "chiave_di_soluzione",
@@ -654,7 +701,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "chiave_fatta_di_luce_di_stella",
@@ -669,7 +717,8 @@
         "stella"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "chiave_senza_denti",
@@ -682,7 +731,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "chiodo_arrugginito_di_forca",
@@ -696,7 +746,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "chiodo_di_bara",
@@ -710,7 +761,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "chiodo_di_ferro_freddo",
@@ -724,7 +776,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "chiodo_nell_ingranaggio_del_fato",
@@ -738,7 +791,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "cilindro_a_doppio_fondo",
@@ -751,7 +805,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "clessidra_che_cola_all_indietro",
@@ -765,7 +820,8 @@
         "tempo"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "codice_della_vita_inciso",
@@ -779,7 +835,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "colomba_che_non_esiste",
@@ -792,7 +849,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "contratto_con_la_clausola_nascosta",
@@ -806,7 +864,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "copione_del_mondo_con_le_correzioni",
@@ -819,7 +878,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "corda_di_impiccato",
@@ -832,7 +892,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "corno_di_alce_spettrale",
@@ -846,7 +907,8 @@
         "spirito"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "corona_di_ossa",
@@ -860,7 +922,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "corona_di_papavero_nero",
@@ -873,7 +936,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "corteccia_febbrifuga",
@@ -887,7 +951,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "costante_universale_incrinata",
@@ -900,7 +965,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "creta_del_primo_uomo",
@@ -914,7 +980,8 @@
         "terra"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "cristallo_di_riferimento",
@@ -927,7 +994,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "cristallo_mnemonico",
@@ -940,7 +1008,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "croce_di_legno_del_burattinaio",
@@ -954,7 +1023,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "crogiolo_indistruttibile",
@@ -967,7 +1037,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "cuore_che_non_si_ferma",
@@ -980,7 +1051,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "cuore_condiviso",
@@ -993,7 +1065,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "cuore_del_pianeta",
@@ -1007,7 +1080,8 @@
         "stella"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "cuore_di_montagna",
@@ -1020,7 +1094,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "cuore_di_quercia_madre",
@@ -1034,7 +1109,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "cuscino_di_un_dormiente_inquieto",
@@ -1048,7 +1124,8 @@
         "sonno"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "dado_truccato",
@@ -1062,7 +1139,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "dente_di_teschio",
@@ -1076,7 +1154,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "distanza_ridotta_a_zero",
@@ -1089,7 +1168,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "domanda_senza_risposta",
@@ -1102,7 +1182,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "eco_di_un_istante_gia_passato",
@@ -1116,7 +1197,8 @@
         "spirito"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "eco_di_un_potere_visto_una_volta_sola",
@@ -1130,7 +1212,8 @@
         "spirito"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "ectoplasma",
@@ -1143,7 +1226,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "enzima_dormiente",
@@ -1157,7 +1241,8 @@
         "sonno"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "erba_lunare",
@@ -1171,7 +1256,8 @@
       ],
       "impilabile": true,
       "valore": 3,
-      "coltivabile": true
+      "coltivabile": true,
+      "rarita": "comune"
     },
     {
       "id": "essenza_di_biblioteca",
@@ -1184,7 +1270,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "essenza_spettrale",
@@ -1198,7 +1285,8 @@
         "spirito"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "estratto_di_muscolo",
@@ -1211,7 +1299,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "favilla_del_titano_incatenato",
@@ -1224,7 +1313,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "fegato_sempre_rigenerato",
@@ -1237,7 +1327,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "ferro_delle_lapidi",
@@ -1251,7 +1342,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "ferro_temperato",
@@ -1265,7 +1357,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "fiala_di_luna_piena",
@@ -1279,7 +1372,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "fiele_di_demone",
@@ -1292,7 +1386,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "filo_d_argento_lunare",
@@ -1305,7 +1400,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "filo_del_burattinaio",
@@ -1319,7 +1415,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "filo_dell_oblio",
@@ -1332,7 +1429,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "filo_delle_parche",
@@ -1345,7 +1443,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "filo_di_lana_rossa",
@@ -1358,7 +1457,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "filo_di_lutto",
@@ -1371,7 +1471,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "filo_reciso_dalle_parche",
@@ -1384,7 +1485,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "filo_spirituale_annodato",
@@ -1398,7 +1500,8 @@
         "spirito"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "filo_teso_tra_due_stanze",
@@ -1411,7 +1514,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "fiore_che_sboccia_solo_di_notte",
@@ -1426,7 +1530,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "fiore_di_camomilla_selvatica",
@@ -1440,7 +1545,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "fiore_di_luna",
@@ -1455,7 +1561,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "frammento_di_alba",
@@ -1468,7 +1575,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "frammento_di_cielo_notturno",
@@ -1482,7 +1590,8 @@
         "stella"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "frammento_di_luna",
@@ -1496,7 +1605,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "frammento_di_notte_primordiale",
@@ -1510,7 +1620,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "frammento_di_tavoletta",
@@ -1523,7 +1634,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "frammento_di_una_porta_tra_i_mondi",
@@ -1536,7 +1648,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "fungo_a_specchio",
@@ -1550,7 +1663,8 @@
         "specchio"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "fungo_cavernicolo",
@@ -1563,7 +1677,8 @@
       ],
       "impilabile": true,
       "valore": 2,
-      "coltivabile": true
+      "coltivabile": true,
+      "rarita": "comune"
     },
     {
       "id": "gessetto_che_disegna_porte",
@@ -1576,7 +1691,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "gesso_consacrato",
@@ -1589,7 +1705,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "ghianda_millenaria",
@@ -1602,7 +1719,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "goccia_di_linfa",
@@ -1616,7 +1734,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "goccia_di_prima_pioggia",
@@ -1629,7 +1748,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "grimaldello_cantante",
@@ -1642,7 +1762,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "grimorio_bianco",
@@ -1655,7 +1776,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "guanto_del_borseggiatore",
@@ -1668,7 +1790,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "il_confine_del_mondo",
@@ -1681,7 +1804,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "incenso_dei_riti",
@@ -1694,7 +1818,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "incenso_di_cenere",
@@ -1708,7 +1833,8 @@
         "terra"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "incenso_di_mirra",
@@ -1721,7 +1847,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "inchiostro_che_copia_da_solo",
@@ -1734,7 +1861,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "inchiostro_che_non_si_cancella",
@@ -1747,7 +1875,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "inchiostro_di_due_mondi",
@@ -1760,7 +1889,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "inchiostro_di_seppia_abissale",
@@ -1773,7 +1903,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "inchiostro_ferrogallico",
@@ -1786,7 +1917,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "inchiostro_luminescente",
@@ -1799,7 +1931,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "inchiostro_simpatico_rubato",
@@ -1812,7 +1945,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "inchiostro_stellare",
@@ -1826,7 +1960,8 @@
         "stella"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "ingranaggio_di_precisione",
@@ -1839,7 +1974,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "lacrima_di_amante",
@@ -1852,7 +1988,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "lacrima_di_luna",
@@ -1865,7 +2002,8 @@
         "anima"
       ],
       "impilabile": true,
-      "valore": 30
+      "valore": 30,
+      "rarita": "comune"
     },
     {
       "id": "lacrima_di_paladino",
@@ -1878,7 +2016,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "lacrima_di_vedova",
@@ -1891,7 +2030,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "lama_di_luce_solidificata",
@@ -1906,7 +2046,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "lega_beyonder",
@@ -1919,7 +2060,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "lega_impossibile_da_replicare",
@@ -1932,7 +2074,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "lente_di_lungo_fuoco",
@@ -1946,7 +2089,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "lente_graduata",
@@ -1959,7 +2103,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "lente_puntata_sempre_a_nord",
@@ -1972,7 +2117,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "lettera_mai_consegnata",
@@ -1986,7 +2132,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "linfa_di_gigante",
@@ -2001,7 +2148,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "lingua_d_argento_falsa",
@@ -2014,7 +2162,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "luce_di_luna_imbottigliata",
@@ -2029,7 +2178,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "mano_di_gloria",
@@ -2042,7 +2192,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "mappa_che_si_ripiega_su_se_stessa",
@@ -2055,7 +2206,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "maschera_senza_lineamenti",
@@ -2069,7 +2221,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "memoria_cristallizzata",
@@ -2082,7 +2235,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "mercurio_filosofale",
@@ -2095,7 +2249,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "metallo_impossibile",
@@ -2108,7 +2263,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "miele_selvatico",
@@ -2121,7 +2277,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "mitra_di_vescovo_apostata",
@@ -2134,7 +2291,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "moneta_caduta_sempre_di_taglio",
@@ -2148,7 +2306,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "moneta_del_traghettatore",
@@ -2162,7 +2321,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "muffa_sepolcrale",
@@ -2175,7 +2335,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "muschio_di_caverna",
@@ -2189,7 +2350,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "muschio_luminoso",
@@ -2203,7 +2365,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "muta_di_pelle_altrui",
@@ -2217,7 +2380,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "naso_finto_di_ceramica",
@@ -2230,7 +2394,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "nebbia_del_limbo",
@@ -2244,7 +2409,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "nucleo_del_crepuscolo",
@@ -2257,7 +2423,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "nucleo_spirituale_stabile",
@@ -2271,7 +2438,8 @@
         "spirito"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "numero_che_non_dovrebbe_esistere",
@@ -2284,7 +2452,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "obolo_di_bronzo",
@@ -2297,7 +2466,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "occhio_che_non_dorme",
@@ -2310,7 +2480,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "occhio_del_gufo_del_giudizio",
@@ -2323,7 +2494,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "occhio_di_vetro_nero",
@@ -2336,7 +2508,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "olio_conduttore",
@@ -2349,7 +2522,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "ombra_imbottigliata",
@@ -2363,7 +2537,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "ombra_ritagliata_con_le_forbici",
@@ -2377,7 +2552,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "oro_bianco",
@@ -2390,7 +2566,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "ossa_di_gatto_nero",
@@ -2404,7 +2581,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "ossidiana_decaduta",
@@ -2418,7 +2596,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "osso_di_pugile",
@@ -2432,7 +2611,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "pagina_strappata_da_un_diario",
@@ -2446,7 +2626,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "pelo_di_lupo_bianco",
@@ -2459,7 +2640,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "pergamena_a_doppia_faccia",
@@ -2472,7 +2654,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "pergamena_di_qualita",
@@ -2485,7 +2668,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "petalo_di_belladonna",
@@ -2498,7 +2682,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "petalo_solare",
@@ -2511,7 +2696,8 @@
       ],
       "impilabile": true,
       "valore": 4,
-      "coltivabile": true
+      "coltivabile": true,
+      "rarita": "comune"
     },
     {
       "id": "pietra_di_marea",
@@ -2525,7 +2711,8 @@
         "terra"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "pietra_di_soglia",
@@ -2539,7 +2726,8 @@
         "terra"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "piuma_di_civetta_nera",
@@ -2552,7 +2740,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "placenta_di_pietra",
@@ -2566,7 +2755,8 @@
         "terra"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "platino_rituale",
@@ -2580,7 +2770,8 @@
         "rituale"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "polline_dorato",
@@ -2593,7 +2784,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "polvere_di_arena",
@@ -2606,7 +2798,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "polvere_di_confine",
@@ -2619,7 +2812,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "polvere_di_crepuscolo",
@@ -2632,7 +2826,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "polvere_di_gesso_stellare",
@@ -2646,7 +2841,8 @@
         "stella"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "polvere_di_incubo",
@@ -2660,7 +2856,8 @@
         "sogno"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "polvere_di_meteora",
@@ -2673,7 +2870,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "polvere_di_ossario",
@@ -2686,7 +2884,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "polvere_di_pagine_antiche",
@@ -2699,7 +2898,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "polvere_di_sale_nero",
@@ -2712,7 +2912,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "polvere_di_specchio_incrinato",
@@ -2726,7 +2927,8 @@
         "specchio"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "polvere_di_terza_vista",
@@ -2739,7 +2941,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "polvere_di_un_oggetto_gia_distrutto",
@@ -2752,7 +2955,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "polvere_di_un_piano_gia_chiuso",
@@ -2765,7 +2969,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "polvere_ossa",
@@ -2777,7 +2982,8 @@
         "rituale"
       ],
       "impilabile": true,
-      "valore": 4
+      "valore": 4,
+      "rarita": "comune"
     },
     {
       "id": "polvere_reagente",
@@ -2790,7 +2996,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "porta_che_non_c_e_mai_stata",
@@ -2803,7 +3010,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "prima_notte_del_mondo",
@@ -2817,7 +3025,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "prima_porta_mai_aperta",
@@ -2830,7 +3039,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "prima_ruota_mai_costruita",
@@ -2843,7 +3053,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "primo_libro_mai_scritto",
@@ -2857,7 +3068,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "prisma_che_devia_la_luce",
@@ -2871,7 +3083,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "progetto_del_mondo_perfetto",
@@ -2884,7 +3097,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "punta_d_argento",
@@ -2897,7 +3111,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "quadrifoglio_a_cinque_foglie",
@@ -2910,7 +3125,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "quintessenza_distillata",
@@ -2923,7 +3139,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "radice_amara",
@@ -2937,7 +3154,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "radice_che_beve",
@@ -2951,7 +3169,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "radice_crepuscolo",
@@ -2963,7 +3182,8 @@
         "ombra"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "radice_di_ferro_lunare",
@@ -2978,7 +3198,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "radice_di_immortelle",
@@ -2992,7 +3213,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "radice_di_mandragora_urlante",
@@ -3006,7 +3228,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "radice_di_quercia",
@@ -3020,7 +3243,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "radice_di_valeriana",
@@ -3034,7 +3258,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "radice_di_veggente",
@@ -3049,7 +3274,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "radice_maestra",
@@ -3063,7 +3289,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "refurtiva_dimenticata",
@@ -3076,7 +3303,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "regola_locale_scritta_a_matita",
@@ -3090,7 +3318,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "reliquia_profanata",
@@ -3104,7 +3333,8 @@
         "rituale"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "resina_conservante",
@@ -3117,7 +3347,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "resina_di_ferro",
@@ -3131,7 +3362,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "respiro_dell_oceano",
@@ -3144,7 +3376,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "respiro_della_foresta_del_mondo",
@@ -3157,7 +3390,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "respiro_finale",
@@ -3170,7 +3404,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "ricordo_altrui_in_bottiglia",
@@ -3183,7 +3418,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "riga_bianca_nel_regolamento_del_mondo",
@@ -3196,7 +3432,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "ritratto_che_cambia_faccia",
@@ -3209,7 +3446,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "ritratto_di_te_da_bambino",
@@ -3222,7 +3460,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "rosa_che_non_appassisce",
@@ -3235,7 +3474,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "rugiada_notturna",
@@ -3249,7 +3489,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "sabbia_del_sonno_rubata",
@@ -3264,7 +3505,8 @@
         "terra"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "sabbia_di_due_deserti_lontani",
@@ -3278,7 +3520,8 @@
         "terra"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "sabbia_di_meridiana_notturna",
@@ -3293,7 +3536,8 @@
         "terra"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "sale_della_veglia_eterna",
@@ -3307,7 +3551,8 @@
         "sonno"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "sale_della_vita",
@@ -3320,7 +3565,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "sale_di_roccia",
@@ -3333,7 +3579,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "sale_scarlatto",
@@ -3346,7 +3593,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "sale_versato",
@@ -3359,7 +3607,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "sangue_di_cervo",
@@ -3373,7 +3622,8 @@
         "sangue"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "sangue_di_gufo_lunare",
@@ -3387,7 +3637,8 @@
         "sangue"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "sangue_di_lupo",
@@ -3400,7 +3651,8 @@
         "forza"
       ],
       "impilabile": true,
-      "valore": 6
+      "valore": 6,
+      "rarita": "comune"
     },
     {
       "id": "sangue_di_ogni_bestia",
@@ -3414,7 +3666,8 @@
         "sangue"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "sangue_di_toro",
@@ -3428,7 +3681,8 @@
         "sangue"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "sangue_rappreso",
@@ -3442,7 +3696,8 @@
         "sangue"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "scettro_pallido",
@@ -3455,7 +3710,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "scheggia_divina",
@@ -3468,7 +3724,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "scudo_fuso",
@@ -3481,7 +3738,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "segreto_sigillato_in_cera_nera",
@@ -3494,7 +3752,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "seme_del_primo_giorno",
@@ -3508,7 +3767,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "seme_dell_albero_madre",
@@ -3522,7 +3782,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "seme_di_stella_cadente",
@@ -3537,7 +3798,8 @@
         "stella"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "seme_dormiente",
@@ -3552,7 +3814,8 @@
         "sonno"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "serratura_dell_orizzonte",
@@ -3565,7 +3828,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "sigillo_di_ceralacca",
@@ -3579,7 +3843,8 @@
         "sigillo"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "silenzio_tra_due_battiti",
@@ -3593,7 +3858,8 @@
         "silenzioso"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "sillaba_di_un_nome_non_tuo",
@@ -3606,7 +3872,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "sipario_di_velluto_polveroso",
@@ -3620,7 +3887,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "soffio_di_spettro",
@@ -3634,7 +3902,8 @@
         "spirito"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "soglia_tra_tutto_e_tutto",
@@ -3647,7 +3916,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "sonaglio_che_confonde",
@@ -3660,7 +3930,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "spazzola_da_scavo",
@@ -3673,7 +3944,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "specchio_annerito",
@@ -3687,7 +3959,8 @@
         "specchio"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "specchio_annerito_dal_fumo",
@@ -3701,7 +3974,8 @@
         "specchio"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "specchio_che_non_riflette_nessuno",
@@ -3715,7 +3989,8 @@
         "specchio"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "specchio_che_riflette_un_altro",
@@ -3729,7 +4004,8 @@
         "specchio"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "specchio_da_borsetta_a_due_facce",
@@ -3743,7 +4019,8 @@
         "specchio"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "specchio_da_camerino_incrinato",
@@ -3757,7 +4034,8 @@
         "specchio"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "specchio_di_luna_nera",
@@ -3772,7 +4050,8 @@
         "specchio"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "spiga_dorata",
@@ -3785,7 +4064,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "spina_dell_ultimo_inverno",
@@ -3798,7 +4078,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "spina_di_rovo_antico",
@@ -3811,7 +4092,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "stele_di_rosetta_infranta",
@@ -3824,7 +4106,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "stendardo_lacero",
@@ -3837,7 +4120,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "stilo_di_ossidiana",
@@ -3851,7 +4135,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "suola_consumata_da_mille_strade",
@@ -3864,7 +4149,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "taccuino_di_appunti",
@@ -3877,7 +4163,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "telaio_di_precisione_assoluta",
@@ -3890,7 +4177,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "tempo_solidificato",
@@ -3904,7 +4192,8 @@
         "tempo"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "tendine_di_lupo",
@@ -3917,7 +4206,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "terra_di_cimitero",
@@ -3931,7 +4221,8 @@
         "terra"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "terriccio_di_prima_luna",
@@ -3945,7 +4236,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "timbro_di_ogni_potere",
@@ -3958,7 +4250,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "tredicesimo_grano_di_rosario",
@@ -3971,7 +4264,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "ultima_foglia_dell_autunno",
@@ -3984,7 +4278,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "ultimo_battito",
@@ -3997,7 +4292,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "ultimo_respiro",
@@ -4010,7 +4306,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "ultimo_respiro_del_giorno",
@@ -4023,7 +4320,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 120
+      "valore": 120,
+      "rarita": "leggendario"
     },
     {
       "id": "velo_di_mezzanotte",
@@ -4036,7 +4334,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "verme_che_mangia_i_minuti",
@@ -4049,7 +4348,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "vischio_che_si_aggrappa",
@@ -4062,7 +4362,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 27
+      "valore": 27,
+      "rarita": "non_comune"
     },
     {
       "id": "voce_del_gigante",
@@ -4076,7 +4377,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 90
+      "valore": 90,
+      "rarita": "raro"
     },
     {
       "id": "voce_di_creatura_mai_vista",
@@ -4089,7 +4391,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 40
+      "valore": 40,
+      "rarita": "raro"
     },
     {
       "id": "voce_registrata_su_cera",
@@ -4102,7 +4405,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 12
+      "valore": 12,
+      "rarita": "non_comune"
     },
     {
       "id": "voto_infranto_alla_radice",
@@ -4116,7 +4420,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 60
+      "valore": 60,
+      "rarita": "raro"
     },
     {
       "id": "zanna_di_latte",
@@ -4129,7 +4434,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     },
     {
       "id": "zolfo_delle_fosse",
@@ -4142,7 +4448,8 @@
         "pozione"
       ],
       "impilabile": true,
-      "valore": 18
+      "valore": 18,
+      "rarita": "non_comune"
     },
     {
       "id": "trottola_di_legno_intagliata",
@@ -4155,7 +4462,8 @@
         "emozione"
       ],
       "impilabile": false,
-      "valore": 2
+      "valore": 2,
+      "rarita": "comune"
     },
     {
       "id": "boccale_dei_contrabbandieri",
@@ -4169,7 +4477,8 @@
         "notte"
       ],
       "impilabile": false,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "cesto_di_vimini_intrecciato",
@@ -4182,7 +4491,8 @@
         "crescita"
       ],
       "impilabile": false,
-      "valore": 2
+      "valore": 2,
+      "rarita": "comune"
     },
     {
       "id": "campanaccio_di_capra_smarrita",
@@ -4195,7 +4505,8 @@
         "bestia"
       ],
       "impilabile": false,
-      "valore": 2
+      "valore": 2,
+      "rarita": "comune"
     },
     {
       "id": "quaderno_di_appunti_sulle_maree",
@@ -4208,7 +4519,8 @@
         "luna"
       ],
       "impilabile": false,
-      "valore": 4
+      "valore": 4,
+      "rarita": "comune"
     },
     {
       "id": "corno_da_richiamo_intagliato",
@@ -4221,7 +4533,8 @@
         "bestia"
       ],
       "impilabile": false,
-      "valore": 3
+      "valore": 3,
+      "rarita": "comune"
     },
     {
       "id": "mappa_delle_costellazioni_perdute",
@@ -4234,7 +4547,8 @@
         "divinazione"
       ],
       "impilabile": false,
-      "valore": 5
+      "valore": 5,
+      "rarita": "comune"
     }
   ]
 }

@@ -29,8 +29,8 @@
       ],
       "priority": 2,
       "fase": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Ogni oggetto (345/345) ha ora un campo rarita esplicito. Regola per i 314 ingredienti: derivata dal characteristic_sequence della formula che li usa (verificato: 10 formule per sequenza, 9-7=comune, 6-4=non_comune, 3-1=raro, 0=leggendario) - non giudizio riga per riga, uno script Python scandisce data/potions/formulas.json. I 15 ingredienti mai referenziati da una formula restano comune (sono pickup di flavor gia' nel mondo). Le 31 voci non-ingrediente (equip/pergamena/sigillo/consumabile/valuta/ materiale) non hanno un conteggio a cui appoggiarsi: eccezioni motivate una per una nello script (es. equip con blueprint=non_comune vs equip narrativo senza blueprint=raro, pergamena_ambrosia che insegna la ricetta leggendaria=leggendario, ambrosia stessa=leggendario per potenza dell'effetto). Distribuzione finale: 111 comune, 105 non_comune, 97 raro, 32 leggendario. Nuovo test test_retrofit_rarita_su_ogni_oggetto_esistente (conta le voci senza rarita, non un numero fisso). 927/927 test (926+1), validate_data.py 0 errori, nessuna regressione."
     },
     {
       "id": "US-1103",

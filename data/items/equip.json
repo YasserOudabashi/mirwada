@@ -18,7 +18,8 @@
       "stat_modifiers": {
         "forza": 0.1
       },
-      "slot_sigilli": 1
+      "slot_sigilli": 1,
+      "rarita": "non_comune"
     },
     {
       "id": "corazza_cuoio",
@@ -35,7 +36,8 @@
       "stat_modifiers": {
         "difesa": 0.15
       },
-      "slot_sigilli": 1
+      "slot_sigilli": 1,
+      "rarita": "non_comune"
     },
     {
       "id": "amuleto_lunare",
@@ -52,7 +54,8 @@
       "stat_modifiers": {
         "spiritualita_max": 20
       },
-      "slot_sigilli": 2
+      "slot_sigilli": 2,
+      "rarita": "non_comune"
     },
     {
       "id": "lama_del_pentimento",
@@ -76,7 +79,8 @@
       "effetto_collaterale": {
         "tipo": "follia_al_secondo",
         "valore": 0.4
-      }
+      },
+      "rarita": "raro"
     },
     {
       "id": "corazza_espiazione",
@@ -98,7 +102,8 @@
       "effetto_collaterale": {
         "tipo": "spiritualita_drain_al_secondo",
         "valore": 0.5
-      }
+      },
+      "rarita": "raro"
     },
     {
       "id": "anello_del_richiamo",
@@ -119,7 +124,8 @@
       "effetto_collaterale": {
         "tipo": "tag_negativo",
         "tag": "maledizione"
-      }
+      },
+      "rarita": "raro"
     }
   ]
 }

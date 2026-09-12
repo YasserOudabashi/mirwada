@@ -12136,5 +12136,52 @@ COME VERIFICATO.
 APERTO: il retrofit vero e proprio (ogni oggetto guadagna 'rarita') e'
 US-1102, non ancora fatto.
 
-PROSSIMA STORIA: US-1102 ("Retrofit della rarita' su ogni oggetto
-esistente"), priority 2.
+PROSSIMA STORIA (chiusa qui sotto): US-1102 ("Retrofit della rarita' su
+ogni oggetto esistente"), priority 2.
+
+FATTO (US-1102).
+- Script Python una tantum (non committato - il risultato e' il dato,
+  come ogni story di questo progetto): legge data/potions/formulas.json
+  (100 formule, esattamente 10 per ogni characteristic_sequence 0..9) e
+  assegna la rarita' di ogni ingrediente dalla sequenza della formula che
+  lo usa: 9-7 -> comune, 6-4 -> non_comune, 3-1 -> raro, 0 -> leggendario
+  (se un ingrediente compare in piu' formule - 2 casi su 314 - vince la
+  piu' esigente). I 15 ingredienti mai referenziati da nessuna formula
+  restano 'comune' (sono pickup di flavor gia' piazzati nel mondo, es.
+  trottola_di_legno_intagliata/boccale_dei_contrabbandieri di US-1005B).
+- Le 31 voci non-ingrediente (equip/pergamena/sigillo/consumabile/valuta/
+  materiale) non hanno un conteggio a cui appoggiarsi: una tabella di
+  eccezioni nello stesso script, motivata voce per voce - equip CON
+  blueprint (craftabile) = non_comune, equip narrativo SENZA blueprint
+  (lama_del_pentimento/corazza_espiazione/anello_del_richiamo, gia'
+  esistenti, mai collegati a una ricetta) = raro; le pergamene (concedono
+  un'abilita'/flag una tantum) = raro, tranne pergamena_ambrosia che
+  insegna la ricetta leggendaria di data/potions/recipes.json =
+  leggendario; gli 8 sigilli di forgiatura = non_comune uniforme (nessun
+  segnale li differenzia oggi); i consumabili dalla potenza dell'effetto
+  (pozione_cura_minore/pastura_spirituale = comune, pozione_cura_maggiore/
+  elisir_* = non_comune, ambrosia con heal 200 - la piu' potente del
+  gioco - = leggendario, in coerenza con pergamena_ambrosia); moneta_comune
+  = comune, sigillo_reale (taglio piu' raro di valuta) = non_comune; i 4
+  materiali di forgiatura (lingotto_ferro/cuoio_conciato/cristallo_grezzo/
+  scarto_alchemico) = comune (componenti di base dei 3 blueprint
+  esistenti).
+- Distribuzione finale sui 345 oggetti: 111 comune, 105 non_comune, 97
+  raro, 32 leggendario - una curva credibile, non un'unica rarita' che
+  schiaccia tutto.
+- tests/test_game_data.gd: nuovo test_retrofit_rarita_su_ogni_oggetto_
+  esistente (conta le voci SENZA rarita' invece di un numero fisso di
+  item - non va aggiornato quando si aggiunge un oggetto in futuro;
+  verifica anche che almeno un leggendario esista davvero).
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 927 test,
+  tutti passati (926 + 1 nuovo), nessuna regressione (la riscrittura di
+  345 file di dati non ha rotto nessun test esistente che li legge).
+- python tools/validate_data.py: 0 errori, 2 warning (invariati) - ogni
+  rarita' scritta e' nel vocabolario chiuso di US-1101.
+
+APERTO: la rarita' esiste sui dati ma non incide ancora su niente in
+gioco (prezzo/drop/UI sono US-1103/1104/1105, non ancora fatte).
+
+PROSSIMA STORIA: US-1103 ("La rarita' incide sul prezzo"), priority 3.
