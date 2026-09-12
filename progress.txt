@@ -12335,4 +12335,33 @@ COME VERIFICATO.
 APERTO: data/schema/npc.schema.json non ha ancora il campo crafter
 documentato/validato (US-1107); nessun NPC lo usa davvero (US-1108+).
 
-PROSSIMA STORIA: US-1107 ("NPC crafter - il campo crafter"), priority 7.
+PROSSIMA STORIA (chiusa qui sotto): US-1107 ("NPC crafter - il campo
+crafter"), priority 7.
+
+FATTO (US-1107).
+- data/schema/npc.schema.json: campo opzionale crafter: {blueprints:
+  [...], ricette: [...]} (ricette, non formule - stessa correzione di
+  US-1106: il registro giusto e' data/potions/recipes.json).
+- tools/validate_data.py: ogni id in crafter.blueprints/crafter.ricette
+  deve risolvere rispettivamente in data/forge/blueprints.json /
+  data/potions/recipes.json (riusa i dizionari 'blueprints'/'recipes'
+  gia' in scope dai blocchi di validazione appena sopra, nessun caricamento
+  doppio). GameData.get_npc() non ha bisogno di modifiche: e' gia' un
+  passthrough del JSON grezzo, il campo arriva a page_dialogo.gd (US-1106)
+  senza altro codice.
+- Verificato manualmente rompendo un crafter apposta (blueprint/ricetta
+  inesistenti su npc_mirco): il validator li rifiuta con l'id sbagliato
+  nel messaggio, poi ripristinato (git diff pulito confermato).
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 934 test,
+  tutti passati, nessuna regressione (nessun codice .gd toccato in questa
+  story - solo schema/validator; get_npc() era gia' un passthrough).
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Nessun test nuovo: nessun NPC del roster usa ancora crafter (arriva in
+  US-1108, che lo esercita per davvero con un dialogo/interazione vera).
+
+APERTO: nessun NPC ha ancora un crafter reale - US-1108 scrive il primo.
+
+PROSSIMA STORIA: US-1108 ("Il primo fabbro - riempie la capanna erborista
+di Valle"), priority 8.

@@ -1796,6 +1796,16 @@ def main():
                 for iid in ven.get("listino", []):
                     if iid not in item_ids:
                         err(f"{rel} [{nid}]: vendor.listino '{iid}' non e' un item esistente")
+            craf = npc.get("crafter")
+            if craf is not None:
+                for bpid in craf.get("blueprints", []):
+                    if bpid not in blueprints:
+                        err(f"{rel} [{nid}]: crafter.blueprints '{bpid}' non esiste in "
+                            f"data/forge/blueprints.json")
+                for ricid in craf.get("ricette", []):
+                    if ricid not in recipes:
+                        err(f"{rel} [{nid}]: crafter.ricette '{ricid}' non esiste in "
+                            f"data/potions/recipes.json")
             fid = npc.get("faction_id")
             if fid is not None and faction_ids and fid not in faction_ids:
                 err(f"{rel} [{nid}]: faction_id '{fid}' non e' in data/factions.json")
