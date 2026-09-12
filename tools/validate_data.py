@@ -1441,6 +1441,8 @@ def main():
     # --- oggetti (data/items/, US-301) ---
     ic_doc = load_json(os.path.join(DATA, "schema", "item_categories.json"))
     item_categories = set((ic_doc or {}).get("item_categories", []))
+    rarity_doc = load_json(os.path.join(DATA, "schema", "item_rarity.json"))
+    item_rarities = set(l.get("id") for l in (rarity_doc or {}).get("livelli", []))
     es_doc = load_json(os.path.join(DATA, "schema", "equip_slots.json"))
     equip_tipi = set((es_doc or {}).get("tipi", []))
     sig_doc = load_json(os.path.join(DATA, "schema", "sigillato_effect_types.json"))
@@ -1483,6 +1485,10 @@ def main():
                     err(f"{rel} [{iid}]: valore deve essere un intero >= 0")
                 if not isinstance(it.get("impilabile"), bool):
                     err(f"{rel} [{iid}]: impilabile deve essere true/false")
+                rar = it.get("rarita")
+                if rar is not None and rar not in item_rarities:
+                    err(f"{rel} [{iid}]: rarita '{rar}' non nel vocabolario chiuso "
+                        f"({sorted(item_rarities)})")
                 if cat == "equip":
                     if it.get("slot") not in equip_tipi:
                         err(f"{rel} [{iid}]: slot '{it.get('slot')}' non in equip_slots.tipi "

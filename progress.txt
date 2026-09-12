@@ -12091,3 +12091,50 @@ disegnate), non implicito in questa story.
 PROSSIMA STORIA: nessuna schedulata - l'addendum e' chiuso. Prossimo
 passo resta la Fase 11 (Atto II e Atto III), da pianificare con /prd
 quando si decide di iniziarla.
+
+============================================================
+FASE 11 - VILLAGGI ED ECONOMIA (2026-09-12)
+============================================================
+
+CONTESTO. L'utente ha chiesto un'espansione del mondo: piu' villaggi,
+fabbri/alchimisti che CREANO oggetti (non il personaggio principale),
+oggetti rari/comuni che incidono davvero sul gioco, NPC meno ammassati -
+"come uno di quei giochi Pokemon 2D grandi". Scritto un PRD completo
+(006_PRD/prd-fase-11-villaggi-ed-economia.md, 14 story US-1101..1114,
+dopo 2 round di AskUserQuestion con l'utente su: meccanica di crafting
+(porti gli ingredienti, l'NPC crea - non un semplice acquisto), portata
+della rarita' (incide su prezzo/drop, non solo etichetta), quanti/dove i
+villaggi (anche dentro le regioni esistenti, non solo in campagna), NPC
+nuovi dedicati (non i generici del roster), numerazione (questa diventa
+Fase 11, "Atto II e III" gia' pianificata slitta a Fase 12 in US-1114).
+prd.json rigenerato con /ralph (14 story, fase:11, priority 1..14).
+
+FATTO (US-1101 - Vocabolario chiuso della rarita').
+- data/schema/item_rarity.json (nuovo): 4 livelli chiusi (comune,
+  non_comune, raro, leggendario), ognuno con peso_drop (US-1104) e
+  moltiplicatore_prezzo (US-1103).
+- data/schema/item.schema.json: campo opzionale 'rarita' documentato -
+  assente = 'comune' (retrocompatibilita', il retrofit e' US-1102).
+- tools/validate_data.py: nuovo blocco - se un item dichiara 'rarita',
+  deve essere uno dei 4 livelli del vocabolario chiuso (non obbligatoria
+  ancora: lo diventa di fatto con US-1102, che la scrive su tutti).
+- scripts/game_data.gd: nuovo loader (PATH_ITEM_RARITY), get_item_rarity(id)
+  (torna il Dictionary del livello, {} se ignoto) e rarita_di(item_id)
+  (mai vuoto: 'comune' se l'item non dichiara nulla - il default che userà
+  tutto il resto del motore, US-1103/1104/1105).
+- tests/test_game_data.gd: test_vocabolario_della_rarita (i 4 livelli
+  esistono, leggendario pesa meno di comune nel drop, un id ignoto torna
+  {}), test_rarita_di_un_item_assente_e_comune_per_default.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 926 test,
+  tutti passati (924 + 2 nuovi), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Nessuna verifica a schermo richiesta (story di sole fondamenta dati,
+  nessun UI/gameplay toccato).
+
+APERTO: il retrofit vero e proprio (ogni oggetto guadagna 'rarita') e'
+US-1102, non ancora fatto.
+
+PROSSIMA STORIA: US-1102 ("Retrofit della rarita' su ogni oggetto
+esistente"), priority 2.

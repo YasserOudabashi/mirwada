@@ -54,6 +54,7 @@ const PATH_UI_BOOK := "res://data/ui/book.json"
 const PATH_PAGE_TYPES := "res://data/schema/page_types.json"
 const PATH_VFX := "res://data/vfx.json"
 const PATH_ITEM_CATEGORIES := "res://data/schema/item_categories.json"
+const PATH_ITEM_RARITY := "res://data/schema/item_rarity.json"
 const PATH_EQUIP_SLOTS := "res://data/schema/equip_slots.json"
 const PATH_SIGILS := "res://data/sigils/core.json"
 const PATH_SIGIL_EFFECT_TYPES := "res://data/schema/sigil_effect_types.json"
@@ -114,6 +115,7 @@ var _rooms: Dictionary = {}
 var _tracked_talents: Dictionary = {}
 var _talents: Dictionary = {}
 var _item_categories: Dictionary = {}
+var _item_rarity: Dictionary = {}
 var _equip_slots: Dictionary = {}
 var _sigils: Dictionary = {}
 var _sigil_effect_types: Dictionary = {}
@@ -201,6 +203,7 @@ func load_all() -> void:
 	_load_single(PATH_PAGE_TYPES, "page_types", _page_types, TYPE_ARRAY)
 	_load_single(PATH_VFX, "pathway_palette_visiva", _vfx, TYPE_DICTIONARY)
 	_load_single(PATH_ITEM_CATEGORIES, "item_categories", _item_categories, TYPE_ARRAY)
+	_load_single(PATH_ITEM_RARITY, "livelli", _item_rarity, TYPE_ARRAY)
 	_load_single(PATH_EQUIP_SLOTS, "slots", _equip_slots, TYPE_ARRAY)
 	_load_single(PATH_ROOM_TYPES, "tipi", _room_types, TYPE_ARRAY)
 	_load_single(PATH_ROOMS, "rooms", _rooms, TYPE_DICTIONARY)
@@ -552,6 +555,25 @@ func get_item(id: String) -> Dictionary:
 
 func item_categories() -> Array:
 	return _array_or_empty(_item_categories.get("item_categories"))
+
+
+## data/schema/item_rarity.json (fase 11, US-1101): la rarita' di un oggetto
+## e' un campo opzionale su data/items/*.json - assente = "comune", stesso
+## default del motore in ogni punto che legge get_item_rarity(). Torna {} se
+## l'id non esiste (mai il caso per "comune", sempre nel vocabolario).
+func get_item_rarity(id: String) -> Dictionary:
+	for l in (_array_or_empty(_item_rarity.get("livelli"))):
+		if str((l as Dictionary).get("id", "")) == id:
+			return l as Dictionary
+	return {}
+
+
+## La rarita' di un oggetto (item_id), mai un Dictionary vuoto: un item senza
+## il campo "rarita" e' "comune" per default (retrocompatibilita', US-1101).
+func rarita_di(item_id: String) -> String:
+	var it: Dictionary = get_item(item_id)
+	var r: String = str(it.get("rarita", ""))
+	return r if not r.is_empty() else "comune"
 
 
 func items_per_categoria(categoria: String) -> Array:

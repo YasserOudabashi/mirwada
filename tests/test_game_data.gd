@@ -107,3 +107,34 @@ func test_vocabolario_dei_tag() -> void:
 	var doc: Variant = JSON.parse_string(f.get_as_text())
 	f.close()
 	assert_eq(gd.call("tag_count"), (doc["tags"] as Array).size(), "tutte le voci di tags.json caricate")
+
+
+func test_vocabolario_della_rarita() -> void:
+	# fase 11 (US-1101): 4 livelli chiusi, ognuno con peso di drop e
+	# moltiplicatore di prezzo - letti da data/schema/item_rarity.json,
+	# non scritti qui a mano (solo il conteggio e i due id di comodo).
+	var gd: Node = _data()
+	var comune: Dictionary = gd.call("get_item_rarity", "comune")
+	assert_false(comune.is_empty(), "il livello 'comune' esiste")
+	assert_eq(float(comune.get("moltiplicatore_prezzo", -1.0)), 1.0,
+		"'comune' non altera il prezzo base")
+	var leggendario: Dictionary = gd.call("get_item_rarity", "leggendario")
+	assert_false(leggendario.is_empty(), "il livello 'leggendario' esiste")
+	assert_true(float(leggendario.get("peso_drop", 999.0)) < float(comune.get("peso_drop", 0.0)),
+		"un oggetto leggendario ha un peso di drop minore di uno comune")
+	assert_true((gd.call("get_item_rarity", "non_esiste") as Dictionary).is_empty(),
+		"rarita' ignota")
+
+
+func test_rarita_di_un_item_assente_e_comune_per_default() -> void:
+	# retrocompatibilita' (US-1101): un item scritto prima di questa fase,
+	# senza il campo 'rarita', resta 'comune' - non un errore, non un {}.
+	var gd: Node = _data()
+	var un_item_id: String = ""
+	for id in (gd.call("items_per_categoria", "ingrediente") as Array):
+		un_item_id = str((id as Dictionary).get("id", ""))
+		break
+	assert_false(un_item_id.is_empty(), "esiste almeno un ingrediente da provare")
+	var r: String = str(gd.call("rarita_di", un_item_id))
+	assert_true(r == "comune" or (gd.call("get_item_rarity", r) as Dictionary).size() > 0,
+		"rarita_di torna sempre un livello valido del vocabolario")

@@ -15,8 +15,8 @@
       ],
       "priority": 1,
       "fase": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/schema/item_rarity.json (4 livelli: comune/non_comune/raro/leggendario, ognuno con peso_drop e moltiplicatore_prezzo). item.schema.json documenta il campo opzionale 'rarita' (assente = comune). validate_data.py: nuovo blocco, se dichiarata deve essere nel vocabolario chiuso. game_data.gd: get_item_rarity(id) + rarita_di(item_id) (mai vuoto, default 'comune'). 2 nuovi test in test_game_data.gd. 926/926 test, validate_data.py 0 errori. Nessuna verifica a schermo (story di sole fondamenta dati)."
     },
     {
       "id": "US-1102",
