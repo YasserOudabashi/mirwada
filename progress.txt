@@ -12559,5 +12559,74 @@ COME VERIFICATO.
 
 APERTO: nessuno per questa story.
 
-PROSSIMA STORIA: US-1111 ("Villaggio nella campagna vicino a Marche del
-Crepuscolo"), priority 12.
+PROSSIMA STORIA (chiusa qui sotto): US-1111 ("Villaggio nella campagna
+vicino a Marche del Crepuscolo"), priority 12.
+
+FATTO (US-1111).
+- data/world/campagna.json: nuovo campo edifici[] (stessa forma di
+  layout.edifici[]: x/y = cella della porta, interno_id) - 2 capanne
+  vicino alla breccia sud-est del muro di Marche del Crepuscolo
+  (US-1015): marche_villaggio_fabbro, marche_villaggio_mercante.
+- scripts/world_scene.gd: NUOVA _disegna_capanne_campagna(edifici) -
+  campagna.json non ha una mappa ASCII disegnata a mano come i layout di
+  regione (e' dipinta proceduralmente da _riempi_campagna), quindi le
+  sue capanne non nascono da un '#' gia' scritto da qualche parte:
+  serviva una funzione che le dipinga davvero. Template FISSO 5x4 (muro
+  perimetrale, pavimento dentro, varco al centro del lato sud), riusato
+  identico per ogni voce di campagna.edifici[] - stesso principio
+  generico di _apri_brecce_perimetro (US-1015): nessuna forma per
+  villaggio specifico, solo la posizione viene dai dati. _crea_edifici
+  (gia' generica, US-1010, invariata) riusata as-is per la porta vera
+  (Area2D + segnale) chiamandola con rid="campagna".
+- data/world/interni/marche_villaggio_fabbro.json,
+  marche_villaggio_mercante.json (nuovi): stesso schema minimo delle
+  capanne di Valle (US-1005B) - npc_fenwick a (5,1) nella prima,
+  npc_greta a (5,1) nella seconda (lontano da spawn/uscita (3,3), la
+  cautela di US-1109 applicata subito invece di scoprirla di nuovo).
+- data/npc/roster.json: npc_fenwick (fabbro, crafter.blueprints =
+  [bp_ascia_da_guerra, bp_scudo_rinforzato] - entrambi gia' esistenti e
+  non ancora assegnati a nessuno, nessun blueprint nuovo necessario per
+  questa story) e npc_greta (mercante, vendor.listino con 4 oggetti
+  esistenti) - entrambi region_id:marche_crepuscolo (la regione piu'
+  vicina: la campagna non e' una regione vera, non ha un region_id
+  proprio da usare) e schedule:[] (mai fuori all'aperto, stessa tecnica
+  gia' in uso per Rosalba/Bram).
+- data/dialogues/dlg_fenwick.json (crea_su_richiesta, come dlg_bram),
+  dlg_greta.json (apri_vendita, come dlg_sidon).
+- data/i18n/it.json: 10 chiavi nuove (npc.fenwick.*, dialogue.fenwick.*,
+  npc.greta.*, dialogue.greta.*).
+- tools/validate_data.py: il blocco campagna (US-1015) esteso a
+  validare anche edifici[] (dentro il rettangolo che contiene tutte le
+  regioni, fuori da ognuna di esse, interno_id risolto in
+  data/world/interni/) - stessa struttura del controllo gia' esistente
+  su nemici[]/oggetti[].
+- tests/test_world_scene.gd: nuovo
+  test_il_villaggio_della_campagna_ha_2_capanne_vere_con_pareti - a
+  differenza dei test sugli edifici di regione (che si fidano della
+  mappa ASCII), qui si controlla anche che le pareti siano DAVVERO
+  dipinte sulla TileMapLayer (get_cell_atlas_coords sulla cella della
+  porta = pavimento, sulla cella adiacente dello stesso muro = parete),
+  non solo che la porta/l'interno esistano.
+- tests/test_npc_system.gd: conteggio roster 21->23 (npc_fenwick,
+  npc_greta).
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 939 test,
+  tutti passati (938 + 1 nuovo, 1 aggiornato), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat): dalla breccia sud-est del muro di Marche, cammino
+  REALE fino al villaggio. Il primo tentativo (linea retta verso la
+  porta) ha urtato per davvero il muro della capanna - prova che le
+  pareti dipinte da _disegna_capanne_campagna sono collisione vera, non
+  solo grafica - corretto instradando il cammino di test attorno alle
+  capanne, dal corridoio libero fra le due. Dentro la capanna del
+  fabbro, dialogo con Fenwick avviato con le sue due scelte a schermo.
+
+APERTO: nessuno per questa story. Il mercante (npc_greta) non e' stato
+verificato a schermo in questa story (solo nei dati/test headless): la
+verifica visiva del suo negozio arriva naturalmente con US-1112, che
+aggiunge un secondo villaggio con lo stesso schema mercante+listino.
+
+PROSSIMA STORIA: US-1112 ("Villaggio nella campagna vicino ad Archivio
+Sepolto/Frontiera"), priority 13.

@@ -676,6 +676,49 @@ func test_si_entra_ed_esce_da_almeno_2_capanne_dell_avamposto() -> void:
 	cont.free()
 
 
+## US-1111 (fase 11): il primo villaggio nella campagna - non dentro
+## nessuna regione. campagna.json non ha una mappa ASCII disegnata a mano,
+## quindi (a differenza dei test sopra sugli edifici di regione) qui si
+## prova anche che _disegna_capanne_campagna abbia dipinto pareti vere
+## (non solo che la porta esista): un muro '#' attorno, pavimento dentro,
+## un varco proprio sulla cella della porta.
+func test_il_villaggio_della_campagna_ha_2_capanne_vere_con_pareti() -> void:
+	var r: Dictionary = _istanzia_con_player()
+	var cont: Node2D = r["cont"]
+	var mondo: Node = r["mondo"]
+	var gd: Node = _gd()
+
+	var attesi := {
+		"marche_villaggio_fabbro": "npc_fenwick",
+		"marche_villaggio_mercante": "npc_greta",
+	}
+	for iid in attesi:
+		var porta: Area2D = _porta_per_interno(mondo, iid)
+		assert_false(porta == null, "la porta di '%s' esiste in scena" % iid)
+		if porta == null:
+			continue
+
+		var interno: Dictionary = gd.call("get_interno", iid)
+		assert_false(interno.is_empty(), "'%s' risolve a un interno vero nei dati" % iid)
+		var npc_atteso: String = attesi[iid]
+		var trovato := false
+		for n in (interno.get("npcs", []) as Array):
+			if str((n as Dictionary).get("npc_id", "")) == npc_atteso:
+				trovato = true
+		assert_true(trovato, "'%s' contiene davvero '%s'" % [iid, npc_atteso])
+
+		var cella_porta: Vector2i = mondo.call("local_to_map", mondo.call("to_local", porta.global_position))
+		assert_eq(mondo.get_cell_atlas_coords(cella_porta), Vector2i(0, 0),
+			"la cella della porta di '%s' e' un varco calpestabile, non un muro" % iid)
+		# stesso lato (sud) della capanna, 2 celle a sinistra della porta: nel
+		# template fisso 5x4 e' sempre l'angolo del muro, mai il varco.
+		var muro: Vector2i = cella_porta + Vector2i(-2, 0)
+		assert_eq(mondo.get_cell_atlas_coords(muro), Vector2i(1, 0),
+			"accanto alla porta di '%s' c'e' davvero una parete dipinta" % iid)
+
+	cont.free()
+
+
 ## US-1012 (fase 10, "la prima struttura grande"): la torre d'osservazione
 ## dell'Archivio Sepolto - stesso motore di edificio di US-1010, ma
 ## l'interno referenziato (data/world/interni/archivio_torre_osservazione.

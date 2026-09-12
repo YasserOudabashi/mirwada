@@ -1,6 +1,18 @@
 {
   "schema_version": 1,
-  "_comment": "Addendum fase 10 (US-1015): il popolamento della campagna - lo spazio FUORI dal rettangolo di ogni regione, ora terreno vero e attraversabile invece di vuoto. Stessa forma di un layout (nemici[]/oggetti[]) ma coordinate ASSOLUTE (non ha un world_offset proprio, world_scene.gd lo popola con offset Vector2i.ZERO). Nemici deboli (sequenza 9, la piu' bassa) e oggetti comuni sparsi con distanza minima fra loro, generati una volta con un seed fisso (tools/ non versionato per questo file: e' contenuto, si edita a mano da qui in poi come ogni altro layout).",
+  "_comment": "Addendum fase 10 (US-1015): il popolamento della campagna - lo spazio FUORI dal rettangolo di ogni regione, ora terreno vero e attraversabile invece di vuoto. Stessa forma di un layout (nemici[]/oggetti[]) ma coordinate ASSOLUTE (non ha un world_offset proprio, world_scene.gd lo popola con offset Vector2i.ZERO). Nemici deboli (sequenza 9, la piu' bassa) e oggetti comuni sparsi con distanza minima fra loro, generati una volta con un seed fisso (tools/ non versionato per questo file: e' contenuto, si edita a mano da qui in poi come ogni altro layout). Addendum fase 11 (US-1111/1112): 'edifici' - stessa forma di layout.edifici[] (x/y = cella della porta, interno_id), ma qui world_scene.gd deve anche DIPINGERE le pareti (_disegna_capanne_campagna, un template fisso 5x4 riusato per ogni voce, campagna.json non ha una mappa ASCII disegnata a mano).",
+  "edifici": [
+    {
+      "x": 70,
+      "y": 58,
+      "interno_id": "marche_villaggio_fabbro"
+    },
+    {
+      "x": 80,
+      "y": 58,
+      "interno_id": "marche_villaggio_mercante"
+    }
+  ],
   "nemici": [
     {
       "x": 269,

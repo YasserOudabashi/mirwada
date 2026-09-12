@@ -815,6 +815,53 @@
       "aspetto": {
         "variante": 3
       }
+    },
+    {
+      "id": "npc_fenwick",
+      "name": "Fenwick",
+      "name_i18n": "npc.fenwick.name",
+      "role": "Fabbro del villaggio fuori le mura",
+      "role_i18n": "npc.fenwick.role",
+      "region_id": "marche_crepuscolo",
+      "anchor_candidate": false,
+      "faction_id": null,
+      "schedule": [],
+      "vendor": null,
+      "crafter": {
+        "blueprints": [
+          "bp_ascia_da_guerra",
+          "bp_scudo_rinforzato"
+        ]
+      },
+      "dialogue_id": "dlg_fenwick",
+      "memoria": {},
+      "aspetto": {
+        "variante": 4
+      }
+    },
+    {
+      "id": "npc_greta",
+      "name": "Greta",
+      "name_i18n": "npc.greta.name",
+      "role": "Mercante del villaggio fuori le mura",
+      "role_i18n": "npc.greta.role",
+      "region_id": "marche_crepuscolo",
+      "anchor_candidate": false,
+      "faction_id": null,
+      "schedule": [],
+      "vendor": {
+        "listino": [
+          "acqua_sorgiva",
+          "filo_di_lana_rossa",
+          "gesso_consacrato",
+          "pergamena_vigore"
+        ]
+      },
+      "dialogue_id": "dlg_greta",
+      "memoria": {},
+      "aspetto": {
+        "variante": 5
+      }
     }
   ]
 }

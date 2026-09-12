@@ -1324,6 +1324,29 @@ def main():
                     err(f"{rel}: {nome}[{i}] ({x},{y}) cade dentro il rettangolo di una "
                         f"regione (la campagna e' solo lo spazio condiviso fuori da esse)")
 
+        # edifici (fase 11, US-1111/1112): stessa forma di layout.edifici[]
+        # (x/y = cella della porta, interno_id) ma senza check di
+        # calpestabilita' contro una mappa ASCII - campagna.json non ne ha
+        # una, le pareti le dipinge world_scene.gd._disegna_capanne_campagna
+        # a runtime con un template fisso.
+        for i, ed in enumerate(campagna_doc.get("edifici", [])):
+            if not isinstance(ed, dict):
+                err(f"{rel}: edifici[{i}] deve essere un dict")
+                continue
+            x, y = ed.get("x"), ed.get("y")
+            if not (isinstance(x, int) and isinstance(y, int)):
+                err(f"{rel}: edifici[{i}] x/y devono essere interi")
+            elif not (bx0 <= x < bx1 and by0 <= y < by1):
+                err(f"{rel}: edifici[{i}] ({x},{y}) fuori dal rettangolo che contiene "
+                    f"tutte le regioni")
+            elif _dentro_una_regione(x, y):
+                err(f"{rel}: edifici[{i}] ({x},{y}) cade dentro il rettangolo di una "
+                    f"regione (la campagna e' solo lo spazio condiviso fuori da esse)")
+            iid = ed.get("interno_id")
+            if not iid or iid not in interni_ids:
+                err(f"{rel}: edifici[{i}].interno_id '{iid}' non esiste in "
+                    f"data/world/interni/")
+
     # --- fonti di tag di fase 3 (US-334): stanze costruibili, specie di pet
     # (+ comportamenti), tag_grant dei talenti. Rendono raggiungibili le
     # sinergie che pescano da questi sistemi. La VALIDAZIONE piena di quei

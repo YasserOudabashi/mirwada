@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "dlg_fenwick",
+  "start": "n1",
+  "_comment": "Fabbro del villaggio in campagna vicino a Marche del Crepuscolo (fase 11, US-1111). Terzo NPC crafter del gioco, il primo fuori da ogni regione.",
+  "nodes": {
+    "n1": {
+      "speaker": "npc_fenwick",
+      "text": "Lontano dalle mura si forgia meglio: nessuno viene a controllare la fiamma.",
+      "text_i18n": "dialogue.fenwick.n1",
+      "choices": [
+        {
+          "text": "Fammi vedere cosa sai forgiare.",
+          "text_i18n": "dialogue.fenwick.n1.crea",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "crea_su_richiesta",
+              "npc_id": "npc_fenwick"
+            }
+          ],
+          "goto": null
+        },
+        {
+          "text": "Magari un'altra volta.",
+          "text_i18n": "dialogue.fenwick.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    }
+  }
+}

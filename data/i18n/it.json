@@ -1758,5 +1758,15 @@
   "blueprint.bp_anello_di_cristallo": "Anello di cristallo",
   "recipe.ric_tonico_di_forza": "Tonico di forza",
   "recipe.ric_filtro_di_chiarezza": "Filtro di chiarezza",
-  "recipe.ric_essenza_rara_di_guarigione": "Essenza rara di guarigione"
+  "recipe.ric_essenza_rara_di_guarigione": "Essenza rara di guarigione",
+  "npc.fenwick.name": "Fenwick",
+  "npc.fenwick.role": "Fabbro del villaggio fuori le mura",
+  "dialogue.fenwick.n1": "Lontano dalle mura si forgia meglio: nessuno viene a controllare la fiamma.",
+  "dialogue.fenwick.n1.crea": "Fammi vedere cosa sai forgiare.",
+  "dialogue.fenwick.n1.congedo": "Magari un'altra volta.",
+  "npc.greta.name": "Greta",
+  "npc.greta.role": "Mercante del villaggio fuori le mura",
+  "dialogue.greta.n1": "Chi vive fuori dalle mura impara a portarsi dietro solo cose che valgono davvero.",
+  "dialogue.greta.n1.compra": "Fammi vedere la merce.",
+  "dialogue.greta.n1.congedo": "Devo andare."
 }

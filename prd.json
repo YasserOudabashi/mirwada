@@ -171,8 +171,8 @@
       ],
       "priority": 12,
       "fase": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "campagna.json ha ora un campo edifici[] (x/y=cella porta, interno_id) - campagna.json non ha una mappa ASCII disegnata a mano come i layout di regione, quindi world_scene.gd._disegna_capanne_campagna (nuova, generica: un template fisso 5x4 riusato per ogni voce, mai una forma per villaggio specifico) dipinge davvero le pareti a runtime prima che _crea_edifici (gia' generica, invariata) piazzi la porta. 2 capanne vicino alla breccia sud-est del muro di Marche del Crepuscolo (US-1015): marche_villaggio_fabbro (npc_fenwick, crafter.blueprints=[bp_ascia_da_guerra,bp_scudo_rinforzato], entrambi gia' nota_da_subito - non serviva un nuovo blueprint esclusivo per questa story) e marche_villaggio_mercante (npc_greta, vendor.listino con 4 oggetti esistenti). Entrambi region_id:marche_crepuscolo (la regione piu' vicina - campagna non e' una regione vera, non ha un region_id proprio) e schedule:[] (mai fuori all'aperto, stessa tecnica di Rosalba/Bram). Validator esteso: edifici[] dentro il rettangolo che contiene tutte le regioni, fuori da ognuna, interno_id risolto. Nuovo test headless test_il_villaggio_della_campagna_ha_2_capanne_vere_con_pareti (controlla che le pareti siano DAVVERO dipinte sulla TileMapLayer, non solo che la porta esista - a differenza degli edifici di regione, qui non c'e' una mappa ASCII a garantirlo). tests/test_npc_system.gd: conteggio roster 21->23. 939/939 test, validate_data.py 0 errori. Verifica Xvfb end-to-end: dalla breccia di Marche, cammino REALE attorno alle capanne (non attraverso, hanno pareti vere - il primo tentativo di cammino in linea retta ha urtato il muro, corretto passando dal corridoio libero fra le due capanne), dentro la capanna del fabbro, dialogo con Fenwick avviato (screenshot in chat)."
     },
     {
       "id": "US-1112",

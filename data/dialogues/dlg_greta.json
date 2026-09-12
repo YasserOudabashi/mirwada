@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "dlg_greta",
+  "start": "n1",
+  "_comment": "Mercante del villaggio in campagna vicino a Marche del Crepuscolo (fase 11, US-1111). apri_vendita, stesso schema di dlg_sidon.",
+  "nodes": {
+    "n1": {
+      "speaker": "npc_greta",
+      "text": "Chi vive fuori dalle mura impara a portarsi dietro solo cose che valgono davvero.",
+      "text_i18n": "dialogue.greta.n1",
+      "choices": [
+        {
+          "text": "Fammi vedere la merce.",
+          "text_i18n": "dialogue.greta.n1.compra",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "apri_vendita",
+              "npc_id": "npc_greta"
+            }
+          ],
+          "goto": null
+        },
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.greta.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    }
+  }
+}

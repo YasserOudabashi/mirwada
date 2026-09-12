@@ -70,6 +70,8 @@ func _ready() -> void:
 	var campagna: Dictionary = gd.call("get_campagna")
 	_crea_nemici("campagna", campagna, Vector2i.ZERO)
 	_crea_oggetti(campagna, Vector2i.ZERO)
+	_disegna_capanne_campagna(campagna.get("edifici", []) as Array)
+	_crea_edifici("campagna", campagna, Vector2i.ZERO)
 	_ricrea_tutti_npc()
 
 	var cam: Node = _camera_giocatore()
@@ -632,6 +634,32 @@ func _riempi_campagna(regioni: Array) -> void:
 			var albero: bool = absi(hash(cella)) % 100 < _DENSITA_ALBERI_CAMPAGNA
 			var col: int = _COLONNA_PER_CARATTERE["t"] if albero else _COLONNA_PAVIMENTO
 			set_cell(cella, SORGENTE, Vector2i(col, 0))
+
+
+## Villaggi nella campagna (fase 11, US-1111/1112): campagna.json non ha una
+## mappa ASCII disegnata a mano come i layout di regione, quindi le sue
+## capanne non possono nascere da un carattere '#' gia' scritto da qualche
+## parte - servono dipinte qui. Template FISSO 5x4 (stessa forma per ogni
+## voce di campagna.edifici[], mai una forma per villaggio specifico):
+## muro perimetrale, pavimento dentro, un varco al centro del lato sud dove
+## _crea_edifici (gia' generico, invariato) mette la porta vera. (x,y) di
+## ogni voce e' la cella del varco, stessa convenzione di layout.edifici[]
+## (vedi mirwada_bottega_del_fabbro: porta sul lato sud del rettangolo).
+const _CAPANNA_LARGH := 5
+const _CAPANNA_ALT := 4
+
+
+func _disegna_capanne_campagna(edifici: Array) -> void:
+	for spec in edifici:
+		var porta: Vector2i = Vector2i(int((spec as Dictionary).get("x", 0)), int((spec as Dictionary).get("y", 0)))
+		var origine: Vector2i = porta - Vector2i(_CAPANNA_LARGH / 2, _CAPANNA_ALT - 1)
+		for ry in _CAPANNA_ALT:
+			for rx in _CAPANNA_LARGH:
+				var cella: Vector2i = origine + Vector2i(rx, ry)
+				var e_muro: bool = ry == 0 or rx == 0 or rx == _CAPANNA_LARGH - 1 \
+					or (ry == _CAPANNA_ALT - 1 and cella != porta)
+				var col: int = _COLONNA_MURO if e_muro else _COLONNA_PAVIMENTO
+				set_cell(cella, SORGENTE, Vector2i(col, 0))
 
 
 ## Il perimetro che _dipingi ha appena disegnato (il muro '#' del layout)
