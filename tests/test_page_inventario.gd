@@ -74,6 +74,39 @@ func test_lo_zaino_elenca_gli_item() -> void:
 	_p.free()
 
 
+## US-1105 (fase 11): il nome dell'oggetto nello zaino si colora secondo la
+## sua rarita' - ambrosia (leggendario) e erba_lunare (comune, mai
+## referenziata da una formula - US-1102) devono avere colori DIVERSI, letti
+## dalla stessa tabella della pagina (page_inventario._colore_rarita), non
+## hardcoded due volte.
+func test_la_rarita_colora_il_nome_nello_zaino() -> void:
+	_n("/root/Inventory").call("aggiungi", "erba_lunare", 1)
+	_n("/root/Inventory").call("aggiungi", "ambrosia", 1)
+	var ov: CanvasLayer = OverlayScene.instantiate()
+	Engine.get_main_loop().root.add_child(ov)
+	var pag: Node = _pagina(ov)
+
+	var colore_comune: Variant = null
+	var colore_leggendario: Variant = null
+	for r in _righe(pag):
+		if r is Label:
+			continue
+		for c in r.get_children():
+			if c is Label:
+				if str(c.text).begins_with(str(_n("/root/GameData").call("tr_data", "item.erba_lunare"))):
+					colore_comune = c.get_theme_color("font_color")
+				elif str(c.text).begins_with(str(_n("/root/GameData").call("tr_data", "item.ambrosia"))):
+					colore_leggendario = c.get_theme_color("font_color")
+
+	assert_eq(colore_comune, pag.call("_colore_rarita", "comune"), "erba_lunare (comune) usa il colore comune")
+	assert_eq(colore_leggendario, pag.call("_colore_rarita", "leggendario"),
+		"ambrosia (leggendario) usa il colore leggendario")
+	assert_true(colore_comune != colore_leggendario, "i due colori sono distinti")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	_p.free()
+
+
 func test_equipaggia_dalla_pagina() -> void:
 	_n("/root/Inventory").call("aggiungi", "spada_ferrea", 1)
 	var ov: CanvasLayer = OverlayScene.instantiate()

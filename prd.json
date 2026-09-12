@@ -71,8 +71,8 @@
       ],
       "priority": 5,
       "fase": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "page_inventario.gd::_colore_rarita (4 colori: comune=bianco, non_comune=verde, raro=blu, leggendario=oro) applicato come font_color override sul nome nello Zaino. Nuovo test (erba_lunare vs ambrosia, colori diversi). 930/930 test, validate_data.py 0 errori. Verifica Xvfb: zaino con 4 oggetti di rarita' diversa, colori distinti a schermo (screenshot in chat). Chiude il Blocco A (rarita')."
     },
     {
       "id": "US-1106",

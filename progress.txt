@@ -12241,5 +12241,34 @@ COME VERIFICATO.
 
 APERTO: il colore/bordo in inventario (US-1105) non e' ancora fatto.
 
-PROSSIMA STORIA: US-1105 ("La rarita' si vede nell'inventario"),
-priority 5.
+PROSSIMA STORIA (chiusa qui sotto): US-1105 ("La rarita' si vede
+nell'inventario"), priority 5.
+
+FATTO (US-1105).
+- scripts/pages/page_inventario.gd: nuovo _colore_rarita(rarita) -> Color
+  (dizionario _COLORE_RARITA, 4 colori: comune=bianco, non_comune=verde,
+  raro=blu, leggendario=oro), applicato come font_color override sul
+  nome dell'oggetto in _riga_item (sezione Zaino) - stesso pattern gia'
+  in uso nella pagina per altre righe colorate (modulate delle righe
+  offuscate, font_color delle sinergie appena attivate). Nessun asset
+  nuovo, nessuna StyleBox: la pagina e' gia' tutta Label/HBoxContainer,
+  coerente con lo stile esistente.
+- tests/test_page_inventario.gd: nuovo test_la_rarita_colora_il_nome_
+  nello_zaino - erba_lunare (comune) e ambrosia (leggendario) nello
+  zaino hanno colori diversi, letti da pagina._colore_rarita() (non
+  hardcoded due volte nel test).
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 930 test,
+  tutti passati (929 + 1 nuovo), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandato in chat): zaino con 4 oggetti di rarita' diversa (erba_lunare
+  comune, sigillo_vento_leggero non_comune, pergamena_vigore raro,
+  ambrosia leggendario) - i 4 colori si vedono distinti a schermo.
+
+APERTO: nessuno per questa story - il Blocco A (rarita', US-1101..1105)
+e' chiuso.
+
+PROSSIMA STORIA: US-1106 ("Il 7 effetto di dialogo - crea_su_richiesta"),
+priority 6 - inizia il Blocco B (crafting NPC).
