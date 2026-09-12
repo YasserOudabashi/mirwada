@@ -862,6 +862,52 @@
       "aspetto": {
         "variante": 5
       }
+    },
+    {
+      "id": "npc_orsolya",
+      "name": "Orsolya",
+      "name_i18n": "npc.orsolya.name",
+      "role": "Alchimista del villaggio dell'Archivio",
+      "role_i18n": "npc.orsolya.role",
+      "region_id": "archivio_sepolto",
+      "anchor_candidate": false,
+      "faction_id": null,
+      "schedule": [],
+      "vendor": null,
+      "crafter": {
+        "ricette": [
+          "ric_tonico_di_forza",
+          "ric_essenza_rara_di_guarigione"
+        ]
+      },
+      "dialogue_id": "dlg_orsolya",
+      "memoria": {},
+      "aspetto": {
+        "variante": 0
+      }
+    },
+    {
+      "id": "npc_dario",
+      "name": "Dario",
+      "name_i18n": "npc.dario.name",
+      "role": "Mercante del villaggio dell'Archivio",
+      "role_i18n": "npc.dario.role",
+      "region_id": "archivio_sepolto",
+      "anchor_candidate": false,
+      "faction_id": null,
+      "schedule": [],
+      "vendor": {
+        "listino": [
+          "acqua_sorgiva",
+          "pergamena_hermit",
+          "ambrosia"
+        ]
+      },
+      "dialogue_id": "dlg_dario",
+      "memoria": {},
+      "aspetto": {
+        "variante": 1
+      }
     }
   ]
 }

@@ -118,6 +118,39 @@ func test_la_rarita_scala_il_prezzo_di_vendita() -> void:
 	p.free()
 
 
+## US-1112: il mercante del secondo villaggio (Dario) ha un oggetto
+## leggendario nel listino (ambrosia, valore base 200) - qui si prova che
+## comprarlo costa DAVVERO il prezzo scalato dal moltiplicatore leggendario
+## (US-1103), non il valore base: l'AC "prezzo alto" e' un comportamento
+## verificato, non solo un dato scritto nel JSON.
+func test_il_mercante_dell_archivio_vende_un_leggendario_a_prezzo_alto() -> void:
+	var gd: Node = _root().get_node("GameData")
+	var npc: Dictionary = gd.call("get_npc", "npc_dario")
+	var listino: Array = (npc.get("vendor", {}) as Dictionary).get("listino", [])
+	assert_true("ambrosia" in listino, "ambrosia e' davvero nel listino di Dario")
+	assert_eq(str((gd.call("get_item", "ambrosia") as Dictionary).get("rarita", "")), "leggendario",
+		"ambrosia e' l'oggetto leggendario dell'AC")
+
+	var mult: float = float(gd.call("get_item_rarity", "leggendario").get("moltiplicatore_prezzo", 1.0))
+	var valore_base: int = int((gd.call("get_item", "ambrosia") as Dictionary).get("valore", -1))
+	var prezzo_atteso: int = int(round(float(valore_base) * mult))
+	assert_true(prezzo_atteso > valore_base, "il prezzo scalato e' davvero piu' alto del base")
+
+	var p: Node = _monta_pagina()
+	_de().call("avvia", "dlg_dario", "npc_dario")
+	_de().call("scegli", 0)
+	p.call("aggiorna")
+	assert_true(p.call("in_negozio"), "il negozio di Dario si apre")
+
+	_inv().call("aggiungi", "moneta_comune", prezzo_atteso)
+	var esito: Dictionary = p.call("compra", "ambrosia")
+	assert_true(bool(esito.get("ok")), "l'acquisto riesce con i fondi esatti del prezzo scalato")
+	assert_eq(int(_inv().call("conta", "moneta_comune")), 0,
+		"il prezzo pagato e' quello scalato dal moltiplicatore leggendario, non il valore base")
+	assert_eq(int(_inv().call("conta", "ambrosia")), 1, "ambrosia e' nell'inventario")
+	p.free()
+
+
 func test_chiudi_esce_dal_negozio() -> void:
 	var p: Node = _monta_pagina()
 	_apri_vendita_sidon(p)

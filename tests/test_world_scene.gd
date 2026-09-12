@@ -676,12 +676,14 @@ func test_si_entra_ed_esce_da_almeno_2_capanne_dell_avamposto() -> void:
 	cont.free()
 
 
-## US-1111 (fase 11): il primo villaggio nella campagna - non dentro
-## nessuna regione. campagna.json non ha una mappa ASCII disegnata a mano,
-## quindi (a differenza dei test sopra sugli edifici di regione) qui si
-## prova anche che _disegna_capanne_campagna abbia dipinto pareti vere
-## (non solo che la porta esista): un muro '#' attorno, pavimento dentro,
-## un varco proprio sulla cella della porta.
+## US-1111/1112 (fase 11): i 2 villaggi nella campagna - non dentro nessuna
+## regione, uno vicino alla breccia di Marche del Crepuscolo (fabbro +
+## mercante) e uno vicino a quella dell'Archivio Sepolto (alchimista +
+## mercante con un oggetto leggendario nel listino). campagna.json non ha
+## una mappa ASCII disegnata a mano, quindi (a differenza dei test sopra
+## sugli edifici di regione) qui si prova anche che _disegna_capanne_campagna
+## abbia dipinto pareti vere (non solo che la porta esista): un muro '#'
+## attorno, pavimento dentro, un varco proprio sulla cella della porta.
 func test_il_villaggio_della_campagna_ha_2_capanne_vere_con_pareti() -> void:
 	var r: Dictionary = _istanzia_con_player()
 	var cont: Node2D = r["cont"]
@@ -691,6 +693,8 @@ func test_il_villaggio_della_campagna_ha_2_capanne_vere_con_pareti() -> void:
 	var attesi := {
 		"marche_villaggio_fabbro": "npc_fenwick",
 		"marche_villaggio_mercante": "npc_greta",
+		"archivio_villaggio_alchimista": "npc_orsolya",
+		"archivio_villaggio_mercante": "npc_dario",
 	}
 	for iid in attesi:
 		var porta: Area2D = _porta_per_interno(mondo, iid)

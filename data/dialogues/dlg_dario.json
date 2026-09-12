@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "dlg_dario",
+  "start": "n1",
+  "_comment": "Mercante del villaggio vicino all'Archivio Sepolto (fase 11, US-1112). Il suo listino include un oggetto leggendario (ambrosia) - l'AC di US-1112, un prezzo alto che si vede davvero nel negozio (US-1103).",
+  "nodes": {
+    "n1": {
+      "speaker": "npc_dario",
+      "text": "Chi scava vicino a rovine antiche trova cose che non si vendono a chiunque.",
+      "text_i18n": "dialogue.dario.n1",
+      "choices": [
+        {
+          "text": "Fammi vedere la merce.",
+          "text_i18n": "dialogue.dario.n1.compra",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "apri_vendita",
+              "npc_id": "npc_dario"
+            }
+          ],
+          "goto": null
+        },
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.dario.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    }
+  }
+}

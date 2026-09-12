@@ -12628,5 +12628,61 @@ verificato a schermo in questa story (solo nei dati/test headless): la
 verifica visiva del suo negozio arriva naturalmente con US-1112, che
 aggiunge un secondo villaggio con lo stesso schema mercante+listino.
 
-PROSSIMA STORIA: US-1112 ("Villaggio nella campagna vicino ad Archivio
-Sepolto/Frontiera"), priority 13.
+PROSSIMA STORIA (chiusa qui sotto): US-1112 ("Villaggio nella campagna
+vicino ad Archivio Sepolto/Frontiera"), priority 13.
+
+FATTO (US-1112).
+- Secondo villaggio, stesso schema tecnico di US-1111 (campagna.json.
+  edifici[] + world_scene.gd._disegna_capanne_campagna, entrambi gia'
+  generici da US-1111, invariati) vicino alla breccia sud del muro
+  dell'Archivio Sepolto (nel corridoio di campagna verso Frontiera delle
+  Porte, come chiede il titolo della story).
+- data/world/campagna.json: 2 edifici in piu' -
+  archivio_villaggio_alchimista, archivio_villaggio_mercante.
+- data/world/interni/archivio_villaggio_alchimista.json,
+  archivio_villaggio_mercante.json (nuovi, stesso schema minimo delle
+  capanne di Marche): npc_orsolya e npc_dario a (5,1), lontano da
+  spawn/uscita (3,3).
+- data/npc/roster.json: npc_orsolya (alchimista, crafter.ricette =
+  [ric_tonico_di_forza, ric_essenza_rara_di_guarigione] - entrambe gia'
+  esistenti da US-1110 e non ancora assegnate a nessuno, nessuna ricetta
+  nuova necessaria) e npc_dario (mercante, vendor.listino include
+  'ambrosia' - l'unico consumabile leggendario del gioco, valore base
+  200, l'AC "un oggetto raro/leggendario, prezzo alto"). Entrambi
+  region_id:archivio_sepolto (la regione piu' vicina) e schedule:[].
+- data/dialogues/dlg_orsolya.json (crea_su_richiesta, come dlg_rosalba),
+  dlg_dario.json (apri_vendita, come dlg_sidon).
+- data/i18n/it.json: 10 chiavi nuove.
+- tests/test_world_scene.gd: la stessa
+  test_il_villaggio_della_campagna_ha_2_capanne_vere_con_pareti di
+  US-1111 estesa a 4 voci (invece di un secondo test quasi identico) -
+  stesso controllo generico sulle pareti dipinte, ora su entrambi i
+  villaggi.
+- tests/test_page_negozio.gd: nuovo
+  test_il_mercante_dell_archivio_vende_un_leggendario_a_prezzo_alto -
+  apre il negozio di Dario da un dialogo REALE (non un'emissione diretta
+  del segnale), compra ambrosia e verifica che costi ESATTAMENTE
+  valore_base*moltiplicatore_leggendario (2400, non il valore base 200):
+  l'AC "prezzo alto" verificato come comportamento eseguito, non solo
+  come dato scritto nel JSON.
+- tests/test_npc_system.gd: conteggio roster 23->25.
+
+COME VERIFICATO.
+- godot --headless --path . --script res://tests/run_tests.gd: 940 test,
+  tutti passati (939 + 1 nuovo, 1 esteso), nessuna regressione.
+- python tools/validate_data.py: 0 errori, 2 warning (invariati).
+- Verifica a schermo con Xvfb (script ad-hoc non committato, screenshot
+  mandati in chat): dalla breccia sud dell'Archivio, cammino REALE
+  instradato attorno alle capanne (stessa cautela di US-1111: non si
+  attraversa un tetto) fino alla capanna del mercante, dialogo con
+  Dario, negozio aperto - Ambrosia mostrata a schermo a 2400 monete
+  accanto agli altri oggetti a prezzo normale (1 e 175): la differenza
+  di prezzo e' visibile davvero, non solo nei dati.
+
+APERTO: nessuno per questa story. L'alchimista (npc_orsolya) non e'
+stato verificato a schermo in questa story (solo nei dati/test
+headless, stesso schema gia' verificato end-to-end 2 volte per Rosalba
+e Fenwick): resta un pattern ormai consolidato, non un rischio aperto.
+
+PROSSIMA STORIA: US-1113 ("Piazzamento NPC a griglia, non in fila"),
+priority 14.

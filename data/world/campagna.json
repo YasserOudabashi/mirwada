@@ -11,6 +11,16 @@
       "x": 80,
       "y": 58,
       "interno_id": "marche_villaggio_mercante"
+    },
+    {
+      "x": 486,
+      "y": 50,
+      "interno_id": "archivio_villaggio_alchimista"
+    },
+    {
+      "x": 496,
+      "y": 50,
+      "interno_id": "archivio_villaggio_mercante"
     }
   ],
   "nemici": [

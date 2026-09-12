@@ -184,8 +184,8 @@
       ],
       "priority": 13,
       "fase": 11,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Secondo villaggio, stesso schema tecnico di US-1111 (campagna.json.edifici[] + _disegna_capanne_campagna, gia' generici, invariati) vicino alla breccia sud del muro dell'Archivio Sepolto (nel corridoio di campagna verso Frontiera delle Porte). archivio_villaggio_alchimista (npc_orsolya, crafter.ricette=[ric_tonico_di_forza, ric_essenza_rara_di_guarigione] - entrambe gia' esistenti da US-1110 e non ancora assegnate, nessuna ricetta nuova necessaria) e archivio_villaggio_mercante (npc_dario, vendor.listino include 'ambrosia', l'unico consumabile leggendario del gioco, valore base 200). Entrambi region_id:archivio_sepolto (la regione piu' vicina) e schedule:[]. Nuovo test in test_page_negozio.gd (test_il_mercante_dell_archivio_vende_un_leggendario_a_prezzo_alto): apre il negozio di Dario da un dialogo reale, compra ambrosia e verifica che costi ESATTAMENTE valore_base*moltiplicatore_leggendario (2400, non il valore base 200) - l'AC 'prezzo alto' verificato come comportamento, non solo come dato. test_world_scene.gd: la stessa test_il_villaggio_della_campagna_ha_2_capanne_vere_con_pareti di US-1111 estesa a coprire anche questo villaggio (stesso controllo generico sulle pareti dipinte). tests/test_npc_system.gd: conteggio roster 23->25. 940/940 test, validate_data.py 0 errori. Verifica Xvfb end-to-end: dalla breccia dell'Archivio, cammino reale instradato attorno alle capanne fino alla capanna del mercante, dialogo con Dario, negozio aperto con Ambrosia a 2400 monete (contro il valore base 200) accanto agli altri oggetti a prezzo normale - la differenza di prezzo e' visibile a schermo, non solo nei dati (screenshot in chat)."
     },
     {
       "id": "US-1113",

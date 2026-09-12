@@ -1768,5 +1768,15 @@
   "npc.greta.role": "Mercante del villaggio fuori le mura",
   "dialogue.greta.n1": "Chi vive fuori dalle mura impara a portarsi dietro solo cose che valgono davvero.",
   "dialogue.greta.n1.compra": "Fammi vedere la merce.",
-  "dialogue.greta.n1.congedo": "Devo andare."
+  "dialogue.greta.n1.congedo": "Devo andare.",
+  "npc.orsolya.name": "Orsolya",
+  "npc.orsolya.role": "Alchimista del villaggio dell'Archivio",
+  "dialogue.orsolya.n1": "Le pagine dell'Archivio hanno insegnato piu' loro a me che io a chiunque altro.",
+  "dialogue.orsolya.n1.crea": "Fammi vedere cosa sai preparare.",
+  "dialogue.orsolya.n1.congedo": "Magari un'altra volta.",
+  "npc.dario.name": "Dario",
+  "npc.dario.role": "Mercante del villaggio dell'Archivio",
+  "dialogue.dario.n1": "Chi scava vicino a rovine antiche trova cose che non si vendono a chiunque.",
+  "dialogue.dario.n1.compra": "Fammi vedere la merce.",
+  "dialogue.dario.n1.congedo": "Devo andare."
 }
