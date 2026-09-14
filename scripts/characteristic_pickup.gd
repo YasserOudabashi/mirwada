@@ -22,11 +22,16 @@ func setup(id: String, posizione: Vector2) -> void:
 	cerchio.radius = RAGGIO
 	shape.shape = cerchio
 	add_child(shape)
-	# Segnaposto visivo: un piccolo rombo chiaro.
+	add_child(_crea_marker())
+
+
+## Segnaposto visivo di default: un piccolo rombo chiaro. item_pickup.gd lo
+## sovrascrive con l'icona della categoria dell'item (US-813).
+func _crea_marker() -> Node2D:
 	var marker := Polygon2D.new()
 	marker.polygon = PackedVector2Array([Vector2(0, -6), Vector2(5, 0), Vector2(0, 6), Vector2(-5, 0)])
 	marker.color = Color(0.9, 0.85, 0.5)
-	add_child(marker)
+	return marker
 
 
 func _ready() -> void:

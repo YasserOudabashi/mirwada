@@ -5,10 +5,13 @@ HUD_HP_VALORE,{0} / {1},{0} / {1}
 HUD_RECITAZIONE,Recitazione,Acting
 HUD_AVANZAMENTO_PRONTO,Avanzamento pronto,Advancement ready
 HUD_AVANZAMENTO_FORZATO,Avanzamento solo forzando (fondamenta -25),Advancement only by forcing (foundation -25)
+HUD_HOTBAR_VUOTO,·,·
+HUD_PROMPT_INTERAGISCI,[{tasto}] Parla,[{tasto}] Talk
 BOOK_SCAFFALE_TOMO_NUOVO,Tomo nuovo,New tome
 BOOK_SCAFFALE_TOMO_BRUCIATO,Tomo bruciato,Burnt tome
 BOOK_SCAFFALE_RIPRENDI,Torna alla partita,Back to game
 BOOK_FRONTESPIZIO_INVITO,Scrivi il tuo nome sul frontespizio,Write your name on the title page
+BOOK_FRONTESPIZIO_PATHWAY,Scegli il tuo Pathway,Choose your Pathway
 BOOK_FRONTESPIZIO_CONFERMA,Comincia,Begin
 BOOK_FRONTESPIZIO_SEQUENZA,Sequenza,Sequence
 BOOK_DIAGRAMMA_SEI_QUI,Sei qui:,You are here:
@@ -23,6 +26,7 @@ COLOPHON_FINALE_SCEGLI_OGGETTO,Scegli questo oggetto,Choose this object
 COLOPHON_AUDIO,Audio,Audio
 COLOPHON_VIDEO,Video,Video
 COLOPHON_INPUT,Comandi,Controls
+COLOPHON_SCHEMA_COMANDI,WASD/frecce: movimento · J: attacco · Spazio/Shift: schivata · K: parata · 1-4: abilità · Tab/I: libro · F/Invio: interagisci · Q/E: volta pagina,WASD/arrows: move · J: attack · Space/Shift: dodge · K: parry · 1-4: abilities · Tab/I: book · F/Enter: interact · Q/E: turn page
 COLOPHON_LINGUA,Lingua,Language
 COLOPHON_BUS_MASTER,Volume generale,Master volume
 COLOPHON_BUS_MUSIC,Musica,Music
@@ -43,6 +47,21 @@ COLOPHON_RIDUCI_FLASH,Riduci i lampi,Reduce flashing
 COLOPHON_RIDUCI_ANIMAZIONI,Riduci le animazioni,Reduce animations
 COLOPHON_MACCHIE_FOLLIA,Macchie di follia sulle pagine,Madness stains on pages
 COLOPHON_PREMI_TASTO,Premi un tasto...,Press a key...
+COLOPHON_AZIONE_MOVE_UP,Muovi su,Move up
+COLOPHON_AZIONE_MOVE_DOWN,Muovi giù,Move down
+COLOPHON_AZIONE_MOVE_LEFT,Muovi a sinistra,Move left
+COLOPHON_AZIONE_MOVE_RIGHT,Muovi a destra,Move right
+COLOPHON_AZIONE_ATTACCO,Attacco,Attack
+COLOPHON_AZIONE_SCHIVATA,Schivata,Dodge
+COLOPHON_AZIONE_PARATA,Parata,Parry
+COLOPHON_AZIONE_ABILITA_1,Abilità 1,Ability 1
+COLOPHON_AZIONE_ABILITA_2,Abilità 2,Ability 2
+COLOPHON_AZIONE_ABILITA_3,Abilità 3,Ability 3
+COLOPHON_AZIONE_ABILITA_4,Abilità 4,Ability 4
+COLOPHON_AZIONE_INTERAGISCI,Interagisci / parla,Interact / talk
+COLOPHON_AZIONE_LIBRO,Apri il libro,Open the book
+COLOPHON_AZIONE_PAGINA_AVANTI,Pagina avanti,Next page
+COLOPHON_AZIONE_PAGINA_INDIETRO,Pagina indietro,Previous page
 BOOK_MACCHIA_1,questa non è la tua grafia,this is not your handwriting
 BOOK_MACCHIA_2,{0} ti guarda leggere,{0} watches you read
 BOOK_MACCHIA_3,non voltare pagina,do not turn the page
@@ -52,6 +71,13 @@ BOOK_INV_RICETTARIO,Ricettario,Recipes
 BOOK_INV_TALENTI,Talenti,Talents
 BOOK_INV_BASE,Base,Home
 BOOK_INV_VUOTO,— vuoto —,— empty —
+BOOK_NEGOZIO_MONETE,Monete,Coins
+BOOK_NEGOZIO_COMPRA,Compra,Buy
+BOOK_NEGOZIO_VENDI,Vendi,Sell
+BOOK_NEGOZIO_CHIUDI,Chiudi,Close
+BOOK_NEGOZIO_VALUTA_ASSENTE,Nessuna valuta nel gioco,No currency in the game
+BOOK_CREAZIONE_CREA,Crea,Craft
+BOOK_CREAZIONE_VUOTO,Non sa creare nulla per ora,Nothing to craft for now
 BOOK_INV_USA,Usa,Use
 BOOK_INV_EQUIPAGGIA,Indossa,Equip
 BOOK_INV_TOGLI,Togli,Remove
@@ -111,6 +137,34 @@ BOOK_DIAGRAMMA_FUSIONE_STUB,ancora da rivelare,yet to be revealed
 BOOK_DIAGRAMMA_FUSIONE_CONFERMA,Fondi verso qui,Fuse toward here
 BOOK_DIAGRAMMA_FUSIONE_TROPPO_PRESTO,Troppo presto: avanza ancora,Too soon: advance further
 BOOK_DIAGRAMMA_FUSIONE_NIENTE,Nessun vicino verso cui fondere,No neighbor to fuse toward
+BOOK_DIAGRAMMA_AVANZAMENTO_TITOLO,Avanzamento,Advancement
+BOOK_DIAGRAMMA_AVANZAMENTO_NIENTE,Nessuna pozione per questa Sequenza,No potion for this Sequence
+BOOK_DIAGRAMMA_AVANZAMENTO_CARATTERISTICA,Caratteristica richiesta,Required Characteristic
+BOOK_DIAGRAMMA_AVANZAMENTO_POSSEDUTA,posseduta,possessed
+BOOK_DIAGRAMMA_AVANZAMENTO_MANCANTE,mancante,missing
+BOOK_DIAGRAMMA_AVANZAMENTO_RECITAZIONE,Recitazione,Acting
+BOOK_DIAGRAMMA_AVANZAMENTO_PREPARA,Prepara,Prepare
+BOOK_DIAGRAMMA_AVANZAMENTO_PREPARA_PARZIALE,Prepara (parziale: %s),Prepare (partial: %s)
+BOOK_DIAGRAMMA_AVANZAMENTO_BEVI,Bevi,Drink
+BOOK_DIAGRAMMA_AVANZAMENTO_BEVI_FORZATO,Bevi (forzato: +%d follia),Drink (forced: +%d madness)
+BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_OK,fatto,done
+BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_CARATTERISTICA_INCOERENTE,la Caratteristica non è per questa formula,the Characteristic doesn't match this formula
+BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_CARATTERISTICA_MANCANTE,manca la Caratteristica,missing the Characteristic
+BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_INGREDIENTI_INSUFFICIENTI,ingredienti insufficienti,not enough ingredients
+BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_FORMULA_INESISTENTE,formula inesistente,formula doesn't exist
+BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_NESSUNA_POZIONE,nessuna pozione pronta,no potion ready
+BOOK_DIAGRAMMA_DONO_TITOLO,Il Dono,The Gift
+BOOK_DIAGRAMMA_DONO_NIENTE,Nessun Dono per questa Sequenza,No Gift for this Sequence
+BOOK_DIAGRAMMA_DONO_SODDISFATTO,soddisfatto,fulfilled
+BOOK_DIAGRAMMA_DONO_MANCANTE,mancante,missing
+BOOK_DIAGRAMMA_DONO_QUEST,Quest:,Quest:
+BOOK_DIAGRAMMA_DONO_COMPORTAMENTO,Comportamento:,Behavior:
+BOOK_DIAGRAMMA_DONO_SACRIFICIO,Sacrificio:,Sacrifice:
+BOOK_DIAGRAMMA_DONO_SACRIFICIO_FOLLIA,Follia,Madness
+BOOK_DIAGRAMMA_DONO_RICEVI,Ricevi il Dono,Receive the Gift
+BOOK_DIAGRAMMA_DONO_ESITO_OK,ricevuto,received
+BOOK_DIAGRAMMA_DONO_ESITO_NESSUN_BOON,nessun Dono qui,no Gift here
+BOOK_DIAGRAMMA_DONO_ESITO_REQUISITI_MANCANTI,requisiti non ancora soddisfatti,requirements not yet met
 TRIB_OVERLAY_EFFETTO,Mentre dura:,While it lasts:
 TRIB_OVERLAY_PROGRESSO,Progresso,Progress
 TRIB_EFFETTO_FOLLIA_ACCELERATA,la follia sale piu' in fretta,madness rises faster

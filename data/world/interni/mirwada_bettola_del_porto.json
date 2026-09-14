@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "interno_id": "mirwada_bettola_del_porto",
+  "mappa": [
+    "#########",
+    "#.......#",
+    "#.......#",
+    "#.......#",
+    "#.......#",
+    "#.......#",
+    "#########"
+  ],
+  "spawn": [
+    4,
+    5
+  ],
+  "nemici": [],
+  "oggetti": [
+    {
+      "x": 6,
+      "y": 2,
+      "item_id": "boccale_dei_contrabbandieri",
+      "quantita": 1
+    }
+  ]
+}

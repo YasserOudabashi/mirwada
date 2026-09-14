@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "interno_id": "valle_avamposto_vedetta",
+  "mappa": [
+    "########",
+    "#......#",
+    "#......#",
+    "#......#",
+    "#......#",
+    "########"
+  ],
+  "spawn": [
+    4,
+    4
+  ],
+  "nemici": [],
+  "oggetti": [
+    {
+      "x": 2,
+      "y": 2,
+      "item_id": "corno_da_richiamo_intagliato",
+      "quantita": 1
+    }
+  ]
+}

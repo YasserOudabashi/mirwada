@@ -7,36 +7,50 @@
       "categoria": "materiale",
       "name_i18n": "item.lingotto_ferro",
       "descrizione_i18n": "item.lingotto_ferro.desc",
-      "tag": ["crafting"],
+      "tag": [
+        "crafting"
+      ],
       "impilabile": true,
-      "valore": 8
+      "valore": 8,
+      "rarita": "comune"
     },
     {
       "id": "cuoio_conciato",
       "categoria": "materiale",
       "name_i18n": "item.cuoio_conciato",
       "descrizione_i18n": "item.cuoio_conciato.desc",
-      "tag": ["crafting", "carne"],
+      "tag": [
+        "crafting",
+        "carne"
+      ],
       "impilabile": true,
-      "valore": 6
+      "valore": 6,
+      "rarita": "comune"
     },
     {
       "id": "cristallo_grezzo",
       "categoria": "materiale",
       "name_i18n": "item.cristallo_grezzo",
       "descrizione_i18n": "item.cristallo_grezzo.desc",
-      "tag": ["crafting", "occulto"],
+      "tag": [
+        "crafting",
+        "occulto"
+      ],
       "impilabile": true,
-      "valore": 15
+      "valore": 15,
+      "rarita": "comune"
     },
     {
       "id": "scarto_alchemico",
       "categoria": "materiale",
       "name_i18n": "item.scarto_alchemico",
       "descrizione_i18n": "item.scarto_alchemico.desc",
-      "tag": ["decadimento"],
+      "tag": [
+        "decadimento"
+      ],
       "impilabile": true,
-      "valore": 0
+      "valore": 0,
+      "rarita": "comune"
     }
   ]
 }

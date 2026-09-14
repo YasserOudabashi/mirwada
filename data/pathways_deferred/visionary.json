@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "visionary",
+  "categoria": "standard",
   "name": "Visionary",
   "name_i18n": "pathway.visionary",
   "group": "god_almighty",

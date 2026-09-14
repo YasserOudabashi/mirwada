@@ -14,10 +14,16 @@ func test_conteggi_dei_pathway() -> void:
 	if gd == null:
 		assert_true(false, "GameData assente")
 		return
-	# 10 Pathway attivi / 100 Sequenze: e' lo scope deciso in SETUP-2.
-	# Se questi numeri cambiano senza una decisione esplicita, e' un bug.
-	assert_eq(gd.call("pathway_ids").size(), 10, "pathway caricati")
-	assert_eq(gd.call("sequence_count"), 100, "sequenze totali")
+	# 10 Pathway STANDARD attivi: e' lo scope deciso in SETUP-2, pathway_ids()
+	# resta scoped ai soli standard anche dopo fase 9 (US-902/US-903). Se
+	# questo numero cambia senza una decisione esplicita, e' un bug.
+	assert_eq(gd.call("pathway_ids").size(), 10, "pathway STANDARD caricati")
+	# sequence_count() somma anche le Sequenze dei Pathway non_standard
+	# (data/pathways_non_standard/, servono a Progression/BoonSystem): 100
+	# standard + le 10 di Eternal Aeon (US-904) = 110. Se questo numero
+	# cambia senza una decisione esplicita (un nuovo Pathway, standard o
+	# non_standard), e' un bug.
+	assert_eq(gd.call("sequence_count"), 110, "sequenze totali (standard + non_standard)")
 
 
 func test_nessun_errore_di_caricamento() -> void:
@@ -101,3 +107,53 @@ func test_vocabolario_dei_tag() -> void:
 	var doc: Variant = JSON.parse_string(f.get_as_text())
 	f.close()
 	assert_eq(gd.call("tag_count"), (doc["tags"] as Array).size(), "tutte le voci di tags.json caricate")
+
+
+func test_vocabolario_della_rarita() -> void:
+	# fase 11 (US-1101): 4 livelli chiusi, ognuno con peso di drop e
+	# moltiplicatore di prezzo - letti da data/schema/item_rarity.json,
+	# non scritti qui a mano (solo il conteggio e i due id di comodo).
+	var gd: Node = _data()
+	var comune: Dictionary = gd.call("get_item_rarity", "comune")
+	assert_false(comune.is_empty(), "il livello 'comune' esiste")
+	assert_eq(float(comune.get("moltiplicatore_prezzo", -1.0)), 1.0,
+		"'comune' non altera il prezzo base")
+	var leggendario: Dictionary = gd.call("get_item_rarity", "leggendario")
+	assert_false(leggendario.is_empty(), "il livello 'leggendario' esiste")
+	assert_true(float(leggendario.get("peso_drop", 999.0)) < float(comune.get("peso_drop", 0.0)),
+		"un oggetto leggendario ha un peso di drop minore di uno comune")
+	assert_true((gd.call("get_item_rarity", "non_esiste") as Dictionary).is_empty(),
+		"rarita' ignota")
+
+
+func test_rarita_di_un_item_assente_e_comune_per_default() -> void:
+	# retrocompatibilita' (US-1101): un item scritto prima di questa fase,
+	# senza il campo 'rarita', resta 'comune' - non un errore, non un {}.
+	var gd: Node = _data()
+	var un_item_id: String = ""
+	for id in (gd.call("items_per_categoria", "ingrediente") as Array):
+		un_item_id = str((id as Dictionary).get("id", ""))
+		break
+	assert_false(un_item_id.is_empty(), "esiste almeno un ingrediente da provare")
+	var r: String = str(gd.call("rarita_di", un_item_id))
+	assert_true(r == "comune" or (gd.call("get_item_rarity", r) as Dictionary).size() > 0,
+		"rarita_di torna sempre un livello valido del vocabolario")
+
+
+func test_retrofit_rarita_su_ogni_oggetto_esistente() -> void:
+	# fase 11 (US-1102): ogni oggetto del gioco ha ora un campo 'rarita'
+	# esplicito (non piu' solo il default 'comune' di rarita_di()) - conta
+	# le voci mancanti invece di controllare un numero fisso, cosi' il test
+	# non va aggiornato ogni volta che si aggiunge un item.
+	var gd: Node = _data()
+	var senza_rarita: Array = []
+	var trovati_leggendari := 0
+	for cat in (gd.call("item_categories") as Array):
+		for it in (gd.call("items_per_categoria", str(cat)) as Array):
+			var item: Dictionary = it as Dictionary
+			if not item.has("rarita"):
+				senza_rarita.append(item.get("id", "?"))
+			elif str(item.get("rarita", "")) == "leggendario":
+				trovati_leggendari += 1
+	assert_eq(senza_rarita.size(), 0, "oggetti senza rarita' esplicita: %s" % [senza_rarita])
+	assert_gt(float(trovati_leggendari), 0.0, "almeno un oggetto leggendario esiste")

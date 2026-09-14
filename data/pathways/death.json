@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "death",
+  "categoria": "standard",
   "name": "Death",
   "name_i18n": "pathway.death",
   "group": "eternal_darkness",

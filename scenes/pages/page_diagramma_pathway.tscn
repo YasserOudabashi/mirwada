@@ -2,9 +2,8 @@
 
 [ext_resource type="Script" path="res://scripts/pages/page_diagramma_pathway.gd" id="1_pdp"]
 
-[node name="PageDiagrammaPathway" type="VBoxContainer"]
+[node name="PageDiagrammaPathway" type="ScrollContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme_override_constants/separation = 6
 script = ExtResource("1_pdp")

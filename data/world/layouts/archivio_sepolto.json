@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "region_id": "archivio_sepolto",
+  "mappa": [
+    "########################################################################",
+    "#......................................................................#",
+    "#......................................................................#",
+    "#......................................................................#",
+    "#.....,,,,,,,.,,,,,,,.,,,,,,,.,,,......................................#",
+    "#..................................................,,.,,.,,............#",
+    "#.................................................,........,...........#",
+    "#.....,,,,,,,.,,,,,,,.,,,,,,,.,,,................,..........,..........#",
+    "#......................................................................#",
+    "#...............................................,............,.........#",
+    "#.....,,,,,,,.,,,,,,,.,,,,,,,.,,,...............,............,.........#",
+    "#......................................................................#",
+    "#...............................................,.............,........#",
+    "#.....,,,,,,,.,,,,,,,.,,,,,,,.,,,...............,............,.........#",
+    "#...............................................,............,.........#",
+    "#..............................................................+.......#",
+    "#.....,,,,,,,.,,,,,,,.,,,,,,,.,,,................,..........,..........#",
+    "#.................................................,........,...........#",
+    "#..................................................,,.,,.,,............#",
+    "#.....,,,,,,,.,,,,,,,.,,,,,,,.,,,......................................#",
+    "#......................................................................#",
+    "#......................................................................#",
+    "#......................................................................#",
+    "#...............................................==.....................#",
+    "#.............................................=....=........,..........#",
+    "#............................................=......=..................#",
+    "#..............ooooo........................=........=.................#",
+    "#......oooo....ooooo.............................................,.....#",
+    "#......oooo....ooooo...oooo.................=........=.................#",
+    "#......oooo....ooooo...oooo............................................#",
+    "#......................oooo.................=........=.................#",
+    "#............................................=......=..................#",
+    "#.............................................=....=...................#",
+    "#.....ooooo...............ooooo.................==.....................#",
+    "#.....ooooo......oooooo...ooooo........................................#",
+    "#.....ooooo......oooooo...ooooo..........#############.+.############..#",
+    "#.....ooooo......oooooo...ooooo..........#..........................#..#",
+    "#.........oooo.......oooo................#..........................#..#",
+    "#.........oooo.......oooo................#..,...,...,...,...,...,...#..#",
+    "#........................................#..........................#..#",
+    "#........................................#..........................#..#",
+    "#........................................############################..#",
+    "#......................................................................#",
+    "########################################################################"
+  ],
+  "spawn": [
+    36,
+    4
+  ],
+  "zone": {
+    "biblioteca": [
+      3,
+      2,
+      32,
+      20
+    ],
+    "officina": [
+      3,
+      24,
+      32,
+      17
+    ],
+    "torre_di_osservazione": [
+      41,
+      3,
+      27,
+      17
+    ],
+    "sala_dei_sigilli": [
+      41,
+      22,
+      15,
+      12
+    ],
+    "studio": [
+      58,
+      22,
+      11,
+      9
+    ],
+    "biblioteca_di_tutto": [
+      41,
+      35,
+      28,
+      7
+    ]
+  },
+  "nemici": [
+    {
+      "x": 10,
+      "y": 6,
+      "sequenza": 8,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 25,
+      "y": 16,
+      "sequenza": 8,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 12,
+      "y": 30,
+      "sequenza": 8,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 25,
+      "y": 33,
+      "sequenza": 7,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 50,
+      "y": 8,
+      "sequenza": 7,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 48,
+      "y": 28,
+      "sequenza": 7,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 55,
+      "y": 38,
+      "sequenza": 6,
+      "scala": 1.5,
+      "override": {
+        "danno_attacco": 15,
+        "raggio_aggro": 200,
+        "tag": "spirito",
+        "caratteristica": {
+          "pathway_id": "hermit",
+          "sequence": 6,
+          "probabilita": 1.0
+        },
+        "drop_probabilita": 1.0
+      }
+    }
+  ],
+  "oggetti": [
+    {
+      "x": 8,
+      "y": 8,
+      "item_id": "filo_di_lana_rossa",
+      "quantita": 1
+    },
+    {
+      "x": 28,
+      "y": 18,
+      "item_id": "gesso_consacrato",
+      "quantita": 1
+    },
+    {
+      "x": 12,
+      "y": 32,
+      "item_id": "polvere_di_sale_nero",
+      "quantita": 1
+    },
+    {
+      "x": 25,
+      "y": 35,
+      "item_id": "cera_di_candela_rituale",
+      "quantita": 1
+    },
+    {
+      "x": 48,
+      "y": 6,
+      "item_id": "inchiostro_luminescente",
+      "quantita": 1
+    },
+    {
+      "x": 58,
+      "y": 12,
+      "item_id": "punta_d_argento",
+      "quantita": 1
+    },
+    {
+      "x": 56,
+      "y": 6,
+      "item_id": "grimaldello_cantante",
+      "quantita": 1
+    },
+    {
+      "x": 44,
+      "y": 25,
+      "item_id": "guanto_del_borseggiatore",
+      "quantita": 1
+    },
+    {
+      "x": 52,
+      "y": 30,
+      "item_id": "refurtiva_dimenticata",
+      "quantita": 1
+    }
+  ],
+  "drop": {
+    "0": [
+      "chiave_di_ogni_serratura",
+      "domanda_senza_risposta",
+      "lega_impossibile_da_replicare",
+      "prima_ruota_mai_costruita",
+      "primo_libro_mai_scritto",
+      "progetto_del_mondo_perfetto"
+    ],
+    "1": [
+      "ago_che_cuce_il_fato",
+      "costante_universale_incrinata",
+      "filo_reciso_dalle_parche",
+      "inchiostro_che_non_si_cancella",
+      "numero_che_non_dovrebbe_esistere",
+      "prisma_che_devia_la_luce"
+    ],
+    "2": [
+      "cristallo_mnemonico",
+      "essenza_di_biblioteca",
+      "memoria_cristallizzata",
+      "nucleo_spirituale_stabile",
+      "polvere_di_pagine_antiche",
+      "telaio_di_precisione_assoluta"
+    ],
+    "3": [
+      "inchiostro_di_due_mondi",
+      "occhio_di_vetro_nero",
+      "pergamena_a_doppia_faccia",
+      "polvere_di_terza_vista",
+      "specchio_annerito_dal_fumo",
+      "stilo_di_ossidiana"
+    ],
+    "4": [
+      "catalizzatore_proibito",
+      "chiave_di_soluzione",
+      "crogiolo_indistruttibile",
+      "grimorio_bianco",
+      "mercurio_filosofale",
+      "quintessenza_distillata"
+    ],
+    "5": [
+      "astrolabio_tascabile",
+      "carta_millimetrata",
+      "frammento_di_cielo_notturno",
+      "inchiostro_stellare",
+      "lente_di_lungo_fuoco",
+      "polvere_di_meteora"
+    ],
+    "6": [
+      "inchiostro_ferrogallico",
+      "ingranaggio_di_precisione",
+      "lega_beyonder",
+      "olio_conduttore",
+      "pergamena_di_qualita",
+      "sigillo_di_ceralacca"
+    ],
+    "7": [
+      "acido_da_saggio",
+      "bilancia_di_precisione",
+      "chiodo_di_ferro_freddo",
+      "cristallo_di_riferimento",
+      "incenso_di_mirra",
+      "ossa_di_gatto_nero"
+    ],
+    "8": [
+      "cera_di_candela_rituale",
+      "frammento_di_tavoletta",
+      "inchiostro_luminescente",
+      "punta_d_argento",
+      "resina_conservante",
+      "spazzola_da_scavo"
+    ],
+    "9": [
+      "filo_di_lana_rossa",
+      "gesso_consacrato",
+      "lente_graduata",
+      "polvere_di_sale_nero",
+      "polvere_reagente",
+      "taccuino_di_appunti"
+    ]
+  },
+  "edifici": [
+    {
+      "x": 63,
+      "y": 15,
+      "interno_id": "archivio_torre_osservazione"
+    }
+  ]
+}

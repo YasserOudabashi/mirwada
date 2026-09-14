@@ -7,80 +7,112 @@
       "categoria": "sigillo",
       "name_i18n": "item.sigillo_forza_minore",
       "descrizione_i18n": "item.sigillo_forza_minore.desc",
-      "tag": ["sigillo", "forza"],
+      "tag": [
+        "sigillo",
+        "forza"
+      ],
       "impilabile": false,
       "valore": 20,
-      "sigillo_ref": "sig_forza_1"
+      "sigillo_ref": "sig_forza_1",
+      "rarita": "non_comune"
     },
     {
       "id": "sigillo_ombra_fame",
       "categoria": "sigillo",
       "name_i18n": "item.sigillo_ombra_fame",
       "descrizione_i18n": "item.sigillo_ombra_fame.desc",
-      "tag": ["sigillo", "ombra"],
+      "tag": [
+        "sigillo",
+        "ombra"
+      ],
       "impilabile": false,
       "valore": 45,
-      "sigillo_ref": "sig_ombra_fame"
+      "sigillo_ref": "sig_ombra_fame",
+      "rarita": "non_comune"
     },
     {
       "id": "sigillo_difesa_minore",
       "categoria": "sigillo",
       "name_i18n": "item.sigillo_difesa_minore",
       "descrizione_i18n": "item.sigillo_difesa_minore.desc",
-      "tag": ["sigillo", "difesa"],
+      "tag": [
+        "sigillo",
+        "difesa"
+      ],
       "impilabile": false,
       "valore": 20,
-      "sigillo_ref": "sig_difesa_1"
+      "sigillo_ref": "sig_difesa_1",
+      "rarita": "non_comune"
     },
     {
       "id": "sigillo_vento_leggero",
       "categoria": "sigillo",
       "name_i18n": "item.sigillo_vento_leggero",
       "descrizione_i18n": "item.sigillo_vento_leggero.desc",
-      "tag": ["sigillo", "vento"],
+      "tag": [
+        "sigillo",
+        "vento"
+      ],
       "impilabile": false,
       "valore": 25,
-      "sigillo_ref": "sig_velocita_1"
+      "sigillo_ref": "sig_velocita_1",
+      "rarita": "non_comune"
     },
     {
       "id": "sigillo_mira_ferma",
       "categoria": "sigillo",
       "name_i18n": "item.sigillo_mira_ferma",
       "descrizione_i18n": "item.sigillo_mira_ferma.desc",
-      "tag": ["sigillo", "guerra"],
+      "tag": [
+        "sigillo",
+        "guerra"
+      ],
       "impilabile": false,
       "valore": 20,
-      "sigillo_ref": "sig_precisione_1"
+      "sigillo_ref": "sig_precisione_1",
+      "rarita": "non_comune"
     },
     {
       "id": "sigillo_custode",
       "categoria": "sigillo",
       "name_i18n": "item.sigillo_custode",
       "descrizione_i18n": "item.sigillo_custode.desc",
-      "tag": ["sigillo", "difesa"],
+      "tag": [
+        "sigillo",
+        "difesa"
+      ],
       "impilabile": false,
       "valore": 30,
-      "sigillo_ref": "sig_custode"
+      "sigillo_ref": "sig_custode",
+      "rarita": "non_comune"
     },
     {
       "id": "sigillo_eco_lama",
       "categoria": "sigillo",
       "name_i18n": "item.sigillo_eco_lama",
       "descrizione_i18n": "item.sigillo_eco_lama.desc",
-      "tag": ["sigillo", "guerra"],
+      "tag": [
+        "sigillo",
+        "guerra"
+      ],
       "impilabile": false,
       "valore": 55,
-      "sigillo_ref": "sig_eco_lama"
+      "sigillo_ref": "sig_eco_lama",
+      "rarita": "non_comune"
     },
     {
       "id": "sigillo_sangue_avido",
       "categoria": "sigillo",
       "name_i18n": "item.sigillo_sangue_avido",
       "descrizione_i18n": "item.sigillo_sangue_avido.desc",
-      "tag": ["sigillo", "sangue"],
+      "tag": [
+        "sigillo",
+        "sangue"
+      ],
       "impilabile": false,
       "valore": 50,
-      "sigillo_ref": "sig_sangue_avido"
+      "sigillo_ref": "sig_sangue_avido",
+      "rarita": "non_comune"
     }
   ]
 }

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "interno_id": "mirwada_archivio_ottavia",
+  "mappa": [
+    "##########",
+    "#........#",
+    "#........#",
+    "#........#",
+    "#........#",
+    "#........#",
+    "##########"
+  ],
+  "spawn": [
+    5,
+    5
+  ],
+  "nemici": [],
+  "oggetti": [
+    {
+      "x": 5,
+      "y": 3,
+      "item_id": "libro_ordine_minore",
+      "quantita": 1
+    }
+  ]
+}

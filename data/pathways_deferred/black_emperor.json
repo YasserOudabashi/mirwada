@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "black_emperor",
+  "categoria": "standard",
   "name": "Black Emperor",
   "name_i18n": "pathway.black_emperor",
   "group": "the_anarchy",

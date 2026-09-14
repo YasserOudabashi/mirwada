@@ -4,24 +4,72 @@
   "blueprints": {
     "bp_spada_ferrea": {
       "name_i18n": "blueprint.bp_spada_ferrea",
-      "output": { "item_id": "spada_ferrea" },
-      "materiali": { "lingotto_ferro": 3 },
+      "output": {
+        "item_id": "spada_ferrea"
+      },
+      "materiali": {
+        "lingotto_ferro": 3
+      },
       "qualita_base": "pura",
       "nota_da_subito": true
     },
     "bp_corazza_cuoio": {
       "name_i18n": "blueprint.bp_corazza_cuoio",
-      "output": { "item_id": "corazza_cuoio" },
-      "materiali": { "cuoio_conciato": 4 },
+      "output": {
+        "item_id": "corazza_cuoio"
+      },
+      "materiali": {
+        "cuoio_conciato": 4
+      },
       "qualita_base": "pura",
       "nota_da_subito": true
     },
     "bp_amuleto_lunare": {
       "name_i18n": "blueprint.bp_amuleto_lunare",
-      "output": { "item_id": "amuleto_lunare" },
-      "materiali": { "cristallo_grezzo": 2, "lingotto_ferro": 1 },
+      "output": {
+        "item_id": "amuleto_lunare"
+      },
+      "materiali": {
+        "cristallo_grezzo": 2,
+        "lingotto_ferro": 1
+      },
       "qualita_base": "instabile",
       "nota_da_subito": true
+    },
+    "bp_ascia_da_guerra": {
+      "name_i18n": "blueprint.bp_ascia_da_guerra",
+      "output": {
+        "item_id": "ascia_da_guerra"
+      },
+      "materiali": {
+        "lingotto_ferro": 5
+      },
+      "qualita_base": "pura",
+      "nota_da_subito": true
+    },
+    "bp_scudo_rinforzato": {
+      "name_i18n": "blueprint.bp_scudo_rinforzato",
+      "output": {
+        "item_id": "scudo_rinforzato"
+      },
+      "materiali": {
+        "cuoio_conciato": 3,
+        "lingotto_ferro": 2
+      },
+      "qualita_base": "pura",
+      "nota_da_subito": true
+    },
+    "bp_anello_di_cristallo": {
+      "name_i18n": "blueprint.bp_anello_di_cristallo",
+      "output": {
+        "item_id": "anello_di_cristallo"
+      },
+      "materiali": {
+        "cristallo_grezzo": 3,
+        "scarto_alchemico": 2
+      },
+      "qualita_base": "instabile",
+      "nota_da_subito": false
     }
   }
 }

@@ -72,8 +72,11 @@ func _viaggia(target: String) -> void:
 	var main: Node = get_tree().current_scene
 	if main == null:
 		return
+	# il nodo mondo si riconosce dal suo contratto pubblico (viaggia_a), non
+	# dal nome dello script: world_scene.gd l'ha sostituito a region_scene.gd
+	# (US-1002B, fase 10 - mondo continuo, mai piu' una scena per regione).
 	for c in main.get_children():
-		if c.get_script() != null and c.get_script().resource_path.ends_with("region_scene.gd"):
+		if c.has_method("viaggia_a"):
 			if bool(c.call("viaggia_a", target)):
 				var book: Node = _n("/root/Book")
 				if book != null:

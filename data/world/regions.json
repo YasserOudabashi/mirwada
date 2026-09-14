@@ -1,12 +1,13 @@
 {
   "schema_version": 1,
-  "_comment": "Le 5 regioni del mondo (design-world.md cap. 2, US-601). Una per gruppo di Pathway + la citta' neutra: e' il terzo canale dell'identita' di Pathway dopo primitive e audio. I nomi vivono solo qui e nelle chiavi i18n 'region.*' (FR-1: nessun nome hardcoded). Le scene placeholder giocabili nascono in US-602/603; il gating si applica in US-611.",
+  "_comment": "Le 5 regioni del mondo (design-world.md cap. 2, US-601). Una per gruppo di Pathway + la citta' neutra: e' il terzo canale dell'identita' di Pathway dopo primitive e audio. I nomi vivono solo qui e nelle chiavi i18n 'region.*' (FR-1: nessun nome hardcoded). Le scene placeholder giocabili nascono in US-602/603; il gating si applica in US-611. world_offset (US-1001, fase 10): posizione in celle di ogni regione dentro l'unica griglia di mondo condivisa. Topologia scelta con l'utente (2026-09-11): un anello attorno a Mirwada, non un hub-and-spoke puro - Mirwada al centro [220,180], le 4 regioni esterne ai quattro angoli (Marche NO [0,0], Archivio NE [440,0], Frontiera SE [440,360], Valle SO [0,360]), cosi' ogni coppia di regioni esterne adiacenti nell'anello (Marche-Archivio, Archivio-Frontiera, Frontiera-Valle, Valle-Marche) e' vicina quanto Mirwada a ognuna: i corridoi di raccordo di US-1002 collegano sia i 4 raggi verso il centro sia i 4 lati dell'anello, non solo i raggi. Le distanze (220/180/440/360 celle) sono ampie apposta: i layout di oggi sono 48x36, ma US-1005..1009 li fanno crescere a dimensione libera - questa disposizione lascia margine senza dover ritoccare gli offset quando succede.",
   "regions": [
     {
       "id": "mirwada",
       "name": "Mirwada",
       "name_i18n": "region.mirwada",
       "group_affinity": "neutra",
+      "world_offset": [220, 180],
       "densita_mistica": 0.2,
       "location_tags": [
         "porto",
@@ -24,6 +25,7 @@
       "name": "Marche del Crepuscolo",
       "name_i18n": "region.marche_crepuscolo",
       "group_affinity": "eternal_darkness",
+      "world_offset": [0, 0],
       "densita_mistica": 0.6,
       "location_tags": [
         "altura",
@@ -57,6 +59,7 @@
       "name": "Valle della Madre",
       "name_i18n": "region.valle_madre",
       "group_affinity": "goddess_of_origin",
+      "world_offset": [0, 360],
       "densita_mistica": 0.45,
       "location_tags": [
         "bosco_antico",
@@ -86,6 +89,7 @@
       "name": "Archivio Sepolto",
       "name_i18n": "region.archivio_sepolto",
       "group_affinity": "demon_of_knowledge",
+      "world_offset": [440, 0],
       "densita_mistica": 0.7,
       "location_tags": [
         "biblioteca",
@@ -110,6 +114,7 @@
       "name": "Frontiera delle Porte",
       "name_i18n": "region.frontiera_porte",
       "group_affinity": "lord_of_mysteries",
+      "world_offset": [440, 360],
       "densita_mistica": 0.9,
       "location_tags": [
         "teatro",

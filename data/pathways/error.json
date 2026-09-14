@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "error",
+  "categoria": "standard",
   "name": "Error",
   "name_i18n": "pathway.error",
   "group": "lord_of_mysteries",

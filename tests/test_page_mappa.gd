@@ -87,19 +87,22 @@ func test_un_varco_permanente_del_tg_abilita_il_viaggio() -> void:
 	p.free()
 
 
+## US-1002B (fase 10, mondo continuo): un solo world_scene.gd, viaggia_a
+## riposiziona invece di ricaricare - il gating d'ingresso (US-611) resta
+## lo stesso controllo di prima, solo senza una scena da (ri)caricare.
 func test_viaggia_a_rispetta_il_gating_d_ingresso() -> void:
 	var cont := Node2D.new()
 	_root().add_child(cont)
-	var marche: Node = load("res://scenes/regioni/marche_crepuscolo.tscn").instantiate()
-	cont.add_child(marche)
+	var player := Node2D.new()
+	player.name = "Player"
+	player.add_to_group("player")
+	cont.add_child(player)
+	var mondo: Node = load("res://scenes/world_scene.tscn").instantiate()
+	cont.add_child(mondo)
+
 	_pr().call("configura", "twilight_giant", 9)
-	assert_true(marche.call("viaggia_a", "mirwada"), "Mirwada non ha gating d'ingresso")
-	# ricrea (la prima ha fatto partire un viaggio deferred)
-	cont.free()
-	var cont2 := Node2D.new()
-	_root().add_child(cont2)
-	var m2: Node = load("res://scenes/regioni/marche_crepuscolo.tscn").instantiate()
-	cont2.add_child(m2)
+	assert_true(mondo.call("viaggia_a", "mirwada"), "Mirwada non ha gating d'ingresso")
+
 	_pr().call("configura", "twilight_giant", 2)   # "sopra" la Sequenza 4
-	assert_false(m2.call("viaggia_a", "frontiera_porte"), "la Frontiera respinge chi e' troppo avanti")
-	cont2.free()
+	assert_false(mondo.call("viaggia_a", "frontiera_porte"), "la Frontiera respinge chi e' troppo avanti")
+	cont.free()

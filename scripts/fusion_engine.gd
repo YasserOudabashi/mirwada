@@ -18,6 +18,11 @@ func percorso(pathway_x: String, pathway_y: String) -> Dictionary:
 	var gd: Node = _gd()
 	if gd == null or pathway_x.is_empty() or pathway_y.is_empty():
 		return {}
+	# US-903: un Pathway non_standard non ha gruppo/vicini - nessun percorso
+	# di fusione puo' coinvolgerlo, a prescindere da cosa dicano i dati
+	# (guardia a runtime, oltre al controllo gia' fatto dal validator).
+	if _e_non_standard(pathway_x) or _e_non_standard(pathway_y):
+		return {}
 	var coppia: Array = [pathway_x, pathway_y]
 	for fid in gd.call("fusion_ids"):
 		var doc: Dictionary = gd.call("get_fusion", fid)
@@ -56,6 +61,13 @@ func applica_al_cambio(vecchio_pathway: String, nuovo_pathway: String) -> Array:
 	if not concesse.is_empty():
 		fusione_concessa.emit(str(p.get("id", "")), concesse)
 	return concesse
+
+
+func _e_non_standard(pathway_id: String) -> bool:
+	var gd: Node = _gd()
+	if gd == null:
+		return false
+	return str(gd.call("get_pathway", pathway_id).get("categoria", "")) == "non_standard"
 
 
 func _gd() -> Node:

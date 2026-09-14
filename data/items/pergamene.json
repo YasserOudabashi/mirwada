@@ -7,40 +7,58 @@
       "categoria": "pergamena",
       "name_i18n": "item.pergamena_vigore",
       "descrizione_i18n": "item.pergamena_vigore.desc",
-      "tag": ["occulto", "forza"],
+      "tag": [
+        "occulto",
+        "forza"
+      ],
       "impilabile": false,
       "valore": 25,
-      "stored_ability_id": "tg_stretta_ferrea"
+      "stored_ability_id": "tg_stretta_ferrea",
+      "rarita": "raro"
     },
     {
       "id": "pergamena_alba",
       "categoria": "pergamena",
       "name_i18n": "item.pergamena_alba",
       "descrizione_i18n": "item.pergamena_alba.desc",
-      "tag": ["occulto", "luce"],
+      "tag": [
+        "occulto",
+        "luce"
+      ],
       "impilabile": false,
       "valore": 30,
-      "stored_ability_id": "tg_armatura_alba"
+      "stored_ability_id": "tg_armatura_alba",
+      "rarita": "raro"
     },
     {
       "id": "pergamena_hermit",
       "categoria": "pergamena",
       "name_i18n": "item.pergamena_hermit",
       "descrizione_i18n": "item.pergamena_hermit.desc",
-      "tag": ["occulto", "conoscenza", "rituale"],
+      "tag": [
+        "occulto",
+        "conoscenza",
+        "rituale"
+      ],
       "impilabile": false,
       "valore": 35,
-      "stored_ability_id": "hermit_pergamena"
+      "stored_ability_id": "hermit_pergamena",
+      "rarita": "raro"
     },
     {
       "id": "pergamena_ambrosia",
       "categoria": "pergamena",
       "name_i18n": "item.pergamena_ambrosia",
       "descrizione_i18n": "item.pergamena_ambrosia.desc",
-      "tag": ["conoscenza", "pozione", "luna"],
+      "tag": [
+        "conoscenza",
+        "pozione",
+        "luna"
+      ],
       "impilabile": false,
       "valore": 120,
-      "insegna_ricetta": "ric_ambrosia"
+      "insegna_ricetta": "ric_ambrosia",
+      "rarita": "leggendario"
     },
     {
       "id": "libro_ordine_minore",
@@ -49,10 +67,14 @@
       "name_i18n": "item.libro_ordine_minore",
       "descrizione": "Un tomo scomodo da leggere. Chi lo finisce puo' varcare le ali interne dell'Archivio Sepolto.",
       "descrizione_i18n": "item.libro_ordine_minore.desc",
-      "tag": ["occulto", "conoscenza"],
+      "tag": [
+        "occulto",
+        "conoscenza"
+      ],
       "impilabile": false,
       "valore": 45,
-      "stored_flag": "testi_ordine_minore"
+      "stored_flag": "testi_ordine_minore",
+      "rarita": "raro"
     }
   ]
 }

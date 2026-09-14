@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "paragon",
+  "categoria": "standard",
   "name": "Paragon",
   "name_i18n": "pathway.paragon",
   "group": "demon_of_knowledge",

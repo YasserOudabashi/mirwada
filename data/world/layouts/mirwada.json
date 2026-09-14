@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "region_id": "mirwada",
+  "mappa": [
+    "################################################################",
+    "#..............................................................#",
+    "#.................................................#######......#",
+    "#.....###############.............................#.....#......#",
+    "#.....#,,,,,,,,,,,,,#.............................#.....#......#",
+    "#.....#,o,,o,,o,,o,,#.............................#.....#......#",
+    "#.....#,o,,o,,o,,o,,#.............................###+###......#",
+    "#.....#,o,,o,,o,,o,,#..........................................#",
+    "#.....#,o,,o,,o,,o,,#..........................................#",
+    "#.....#,o,,o,,o,,o,,#..........................................#",
+    "#.....#,,,,,,,,,,,,,#..........................................#",
+    "#.....#,,,,,,,,,,,,,#..........................................#",
+    "#.....#######+#######..........................................#",
+    "#.............=................................................#",
+    "#.............=................................................#",
+    "#..######.....=...........,,,,,,,,,,,,,........................#",
+    "#..#,,,,#.oo.o=...........,,,,,,,,,,,,,........................#",
+    "#..#,,,,#.oo.oo...........,,,,,,,,,,,,,........................#",
+    "#..#,,,,#.oo.oo...........,,,,,,,,,,,,,........................#",
+    "#..###+##.................,,,,,,,,,,,,,........................#",
+    "#...oo.oo.oo.oo...........,,,,,,,,,,,,,........................#",
+    "#...oo.oo.oo.oo...........,,,,,,,,,,,,,........................#",
+    "#...oo.oo.oo.oo...........,,,,,,,,,,,,,........................#",
+    "#.........................,,,,,,,,,,,,,........................#",
+    "#...oo.oo.oo.oo...........,,,,,,,,,,,,,........................#",
+    "#...oo.oo.oo.oo...........,,,,,,,,,,,,,........................#",
+    "#...oo.oo.oo.oo................................................#",
+    "#..............................................................#",
+    "#...oo.oo.oo.oo..............................,,,,,,,,###+##,...#",
+    "#...oo.oo.oo.oo..............................,,,,,,,,#,,,,#,...#",
+    "#...oo.oo.oo.oo..............................,,,,,,,,#,,,,#,...#",
+    "#.........................#####+#####........,,,,,,,,#,,,,#,...#",
+    "#.........................#,,,,,,,,,#........,,,,,,,,######,...#",
+    "#.........................#,,,,,,,,,#........,,,,,,,,,,,,,,,...#",
+    "#.........................#,,,,,,,,,#........,,,,,,,,,,,,,,,...#",
+    "#.........................#,,,,,,,,,#........~~~~~~~~~~~~~~~...#",
+    "#.........................#,,,,,,,,,#........~~~~~~~~~~~~~~~...#",
+    "#.........................#,,,,,,,,,#........===============...#",
+    "#.........................###########........~~~~~~~~~~~~~~~...#",
+    "#..............................................................#",
+    "#..............................................................#",
+    "#..............................................................#",
+    "#..............................................................#",
+    "################################################################"
+  ],
+  "spawn": [
+    4,
+    4
+  ],
+  "zone": {
+    "archivio": [
+      6,
+      3,
+      15,
+      10
+    ],
+    "vicolo": [
+      3,
+      15,
+      13,
+      17
+    ],
+    "piazza": [
+      26,
+      15,
+      13,
+      11
+    ],
+    "sotterraneo": [
+      26,
+      31,
+      11,
+      8
+    ],
+    "porto": [
+      45,
+      28,
+      15,
+      11
+    ]
+  },
+  "nemici": [
+    {
+      "x": 34,
+      "y": 6,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 10,
+      "y": 19,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 30,
+      "y": 20,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 42,
+      "y": 24,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 10,
+      "y": 27,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 52,
+      "y": 32,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 34,
+      "y": 33,
+      "sequenza": 8,
+      "scala": 1.5,
+      "override": {
+        "danno_attacco": 15,
+        "raggio_aggro": 200,
+        "tag": "bestia",
+        "caratteristica": {
+          "pathway_id": "twilight_giant",
+          "sequence": 8,
+          "probabilita": 1.0
+        },
+        "drop_probabilita": 1.0
+      }
+    }
+  ],
+  "oggetti": [
+    {
+      "x": 8,
+      "y": 13,
+      "item_id": "ferro_temperato",
+      "quantita": 1
+    },
+    {
+      "x": 36,
+      "y": 4,
+      "item_id": "radice_di_quercia",
+      "quantita": 1
+    },
+    {
+      "x": 30,
+      "y": 17,
+      "item_id": "sangue_di_toro",
+      "quantita": 1
+    },
+    {
+      "x": 6,
+      "y": 16,
+      "item_id": "estratto_di_muscolo",
+      "quantita": 1
+    },
+    {
+      "x": 28,
+      "y": 22,
+      "item_id": "osso_di_pugile",
+      "quantita": 1
+    },
+    {
+      "x": 11,
+      "y": 27,
+      "item_id": "sale_di_roccia",
+      "quantita": 1
+    },
+    {
+      "x": 50,
+      "y": 30,
+      "item_id": "acciaio_stellare",
+      "quantita": 1
+    },
+    {
+      "x": 30,
+      "y": 34,
+      "item_id": "polvere_di_arena",
+      "quantita": 1
+    },
+    {
+      "x": 44,
+      "y": 9,
+      "item_id": "tendine_di_lupo",
+      "quantita": 1
+    },
+    {
+      "x": 7,
+      "y": 34,
+      "item_id": "moneta_comune",
+      "quantita": 1
+    },
+    {
+      "x": 18,
+      "y": 2,
+      "item_id": "velo_di_mezzanotte",
+      "quantita": 1
+    },
+    {
+      "x": 42,
+      "y": 6,
+      "item_id": "occhio_che_non_dorme",
+      "quantita": 1
+    },
+    {
+      "x": 35,
+      "y": 12,
+      "item_id": "cenere_di_stella_morta",
+      "quantita": 1
+    },
+    {
+      "x": 9,
+      "y": 22,
+      "item_id": "lente_graduata",
+      "quantita": 1
+    },
+    {
+      "x": 48,
+      "y": 20,
+      "item_id": "polvere_reagente",
+      "quantita": 1
+    },
+    {
+      "x": 30,
+      "y": 12,
+      "item_id": "taccuino_di_appunti",
+      "quantita": 1
+    }
+  ],
+  "drop": {
+    "8": [
+      "cera_di_candela_rituale",
+      "cera_di_veglia",
+      "cerone_da_palcoscenico",
+      "chiodo_di_bara",
+      "contratto_con_la_clausola_nascosta",
+      "corda_di_impiccato",
+      "corteccia_febbrifuga",
+      "dado_truccato",
+      "estratto_di_muscolo",
+      "filo_teso_tra_due_stanze",
+      "fiore_di_camomilla_selvatica",
+      "frammento_di_tavoletta",
+      "gessetto_che_disegna_porte",
+      "inchiostro_di_seppia_abissale",
+      "inchiostro_luminescente",
+      "lacrima_di_vedova",
+      "lingua_d_argento_falsa",
+      "mano_di_gloria",
+      "naso_finto_di_ceramica",
+      "osso_di_pugile",
+      "pelo_di_lupo_bianco",
+      "punta_d_argento",
+      "radice_amara",
+      "resina_conservante",
+      "sale_di_roccia",
+      "sangue_di_cervo",
+      "sonaglio_che_confonde",
+      "spazzola_da_scavo",
+      "specchio_da_borsetta_a_due_facce",
+      "zanna_di_latte"
+    ],
+    "9": [
+      "cardine_arrugginito_di_una_porta_perduta",
+      "cenere_di_stella_morta",
+      "chiave_senza_denti",
+      "dente_di_teschio",
+      "ferro_temperato",
+      "filo_di_lana_rossa",
+      "fiore_di_luna",
+      "gesso_consacrato",
+      "goccia_di_linfa",
+      "grimaldello_cantante",
+      "guanto_del_borseggiatore",
+      "lente_graduata",
+      "muffa_sepolcrale",
+      "occhio_che_non_dorme",
+      "polvere_di_gesso_stellare",
+      "polvere_di_sale_nero",
+      "polvere_di_specchio_incrinato",
+      "polvere_reagente",
+      "radice_di_quercia",
+      "radice_di_valeriana",
+      "radice_di_veggente",
+      "refurtiva_dimenticata",
+      "rugiada_notturna",
+      "sangue_di_gufo_lunare",
+      "sangue_di_toro",
+      "seme_dormiente",
+      "taccuino_di_appunti",
+      "terra_di_cimitero",
+      "terriccio_di_prima_luna",
+      "velo_di_mezzanotte"
+    ]
+  },
+  "edifici": [
+    {
+      "x": 31,
+      "y": 31,
+      "interno_id": "mirwada_sotterraneo"
+    },
+    {
+      "x": 6,
+      "y": 19,
+      "interno_id": "mirwada_casa_di_lena"
+    },
+    {
+      "x": 13,
+      "y": 12,
+      "interno_id": "mirwada_archivio_ottavia"
+    },
+    {
+      "x": 56,
+      "y": 28,
+      "interno_id": "mirwada_bettola_del_porto"
+    },
+    {
+      "x": 53,
+      "y": 6,
+      "interno_id": "mirwada_bottega_del_fabbro"
+    }
+  ]
+}

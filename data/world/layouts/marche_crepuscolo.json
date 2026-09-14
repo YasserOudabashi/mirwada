@@ -1,0 +1,361 @@
+{
+  "schema_version": 1,
+  "region_id": "marche_crepuscolo",
+  "mappa": [
+    "############################################################################",
+    "#..........................................................................#",
+    "#..........................................................................#",
+    "#....t..t...........o......o...................#............o....~.........#",
+    "#..........t......o..........................#...............o...o.~.......#",
+    "#....................o..........##.###.##......o...............~...........#",
+    "#...................o...........#,,,,,,,#.............#.....~..............#",
+    "#...............................#,,,,,,,#....o.o.....................~.....#",
+    "#.....t.........................#,,,,,o,#......................o~.~........#",
+    "#...........t.....o...o.o.......#,,,,,,,#..............o.........~~..~.....#",
+    "#..........................o....#,o,,,,,#....oo...#..............o.........#",
+    "#..t.........t....o..o..........#,,o,,,,#......o.......o...~..~..o.~.......#",
+    "#....................o..........#,,,,,,,#......................~...~.......#",
+    "#.................o....o........#,,,,,,,#.......o............o.~...........#",
+    "#...........t.........o.........#,,,,,,,#....o.........o...................#",
+    "#................o......o.o.....#,,,,,,,#......o.oo.........~o~.o.~~~o.....#",
+    "#........t..t..........o........#,,,,,,,#...................~~...~o........#",
+    "#.........................o.....#,,,o,,,#.......o................o~........#",
+    "#......t........................##.###.##.............o....~........~......#",
+    "#......t.....t....o...o.......................#..o.........~.....~...o.....#",
+    "#.........................o......................o.....#........~~~........#",
+    "#..........................................................................#",
+    "#..........................................................................#",
+    "#..........................................................................#",
+    "#..........................................................................#",
+    "#..###########.....o.......................................................#",
+    "#.........t......o.........................................................#",
+    "#..........t............o.o..................###########...#####+#####.....#",
+    "#.....t...t..................................#,,,,,,,,,#...#,,,,,,,,,#.....#",
+    "#.......................o..o.....#######.....#,,,,,,,,,#...#,,,,,,,,,#.....#",
+    "#...........t...........o........#,,,,,#.....#,,,,,,,,,#...#,,,,,,,,,#.....#",
+    "#......t.........................#,,,,,#.....#,,,,,,,,,#...#,,,,,,,,,#.....#",
+    "#........t.........o...o...o.....#,,,,,#.....#,,,,,,,,,#...#,,,,,,,,,#.....#",
+    "#.................o..............#,,,,,#.....#,,,,,,,,,#...#,,,,,,,,,#.....#",
+    "#...........t....o...............#,,,,,#.....#,,,,,,,,,#...#,,,,,,,,,#.....#",
+    "#........t.............oo........#,,,,,#.....#,,,,,,,,,#...#,,,,,,,,,#.....#",
+    "#......t....t....o.o.......o.....#,,,,,#.....#,,,,,,,,,#...#,,,,,,,,,#.....#",
+    "#.......tt.......................#,,,,,#.....#,,,,,,,,,#...#,,,,,,,,,#.....#",
+    "#................oo.....o..o.....###+###.....#,,,,,,,,,#...#,,,,,,,,,#.....#",
+    "#.......t...........o....o...................#,,,,,,,,,#...#,,,,,,,,,#.....#",
+    "#..t...t.....t.....o.o..o....................#####+#####...###########.....#",
+    "#..t.............oo...o....o...............................................#",
+    "#................o.o......o................................................#",
+    "#..........................................................................#",
+    "#..........................................................................#",
+    "#..........................................................................#",
+    "#..........................................................................#",
+    "############################################################################"
+  ],
+  "spawn": [
+    4,
+    4
+  ],
+  "zone": {
+    "altura": [
+      2,
+      2,
+      13,
+      20
+    ],
+    "luogo_di_battaglia": [
+      16,
+      2,
+      13,
+      20
+    ],
+    "tempio_abbandonato": [
+      30,
+      2,
+      13,
+      20
+    ],
+    "rovina": [
+      44,
+      2,
+      13,
+      20
+    ],
+    "luogo_in_decadenza": [
+      58,
+      2,
+      13,
+      20
+    ],
+    "vetta": [
+      2,
+      24,
+      13,
+      20
+    ],
+    "luogo_di_massacro": [
+      16,
+      24,
+      13,
+      20
+    ],
+    "cripta": [
+      30,
+      24,
+      13,
+      20
+    ],
+    "trono_del_gigante": [
+      44,
+      24,
+      13,
+      20
+    ],
+    "soglia_del_crepuscolo": [
+      58,
+      24,
+      13,
+      20
+    ]
+  },
+  "nemici": [
+    {
+      "x": 7,
+      "y": 8,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 20,
+      "y": 10,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 63,
+      "y": 30,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 16,
+      "y": 30,
+      "sequenza": 8,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 48,
+      "y": 12,
+      "sequenza": 8,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 59,
+      "y": 14,
+      "sequenza": 8,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 37,
+      "y": 12,
+      "sequenza": 7,
+      "scala": 1.5,
+      "override": {
+        "danno_attacco": 15,
+        "raggio_aggro": 200,
+        "tag": "non_morto",
+        "caratteristica": {
+          "pathway_id": "twilight_giant",
+          "sequence": 7,
+          "probabilita": 1.0
+        },
+        "drop_probabilita": 1.0
+      }
+    }
+  ],
+  "oggetti": [
+    {
+      "x": 6,
+      "y": 5,
+      "item_id": "ferro_temperato",
+      "quantita": 1
+    },
+    {
+      "x": 18,
+      "y": 8,
+      "item_id": "radice_di_quercia",
+      "quantita": 1
+    },
+    {
+      "x": 25,
+      "y": 14,
+      "item_id": "sangue_di_toro",
+      "quantita": 1
+    },
+    {
+      "x": 5,
+      "y": 9,
+      "item_id": "estratto_di_muscolo",
+      "quantita": 1
+    },
+    {
+      "x": 44,
+      "y": 8,
+      "item_id": "osso_di_pugile",
+      "quantita": 1
+    },
+    {
+      "x": 18,
+      "y": 32,
+      "item_id": "sale_di_roccia",
+      "quantita": 1
+    },
+    {
+      "x": 30,
+      "y": 33,
+      "item_id": "acciaio_stellare",
+      "quantita": 1
+    },
+    {
+      "x": 50,
+      "y": 30,
+      "item_id": "polvere_di_arena",
+      "quantita": 1
+    },
+    {
+      "x": 10,
+      "y": 6,
+      "item_id": "terra_di_cimitero",
+      "quantita": 1
+    },
+    {
+      "x": 39,
+      "y": 9,
+      "item_id": "dente_di_teschio",
+      "quantita": 1
+    },
+    {
+      "x": 52,
+      "y": 33,
+      "item_id": "muffa_sepolcrale",
+      "quantita": 1
+    }
+  ],
+  "drop": {
+    "0": [
+      "caratteristica_del_gigante",
+      "chiave_dell_oltretomba",
+      "frammento_di_notte_primordiale",
+      "il_confine_del_mondo",
+      "nucleo_del_crepuscolo",
+      "occhio_del_gufo_del_giudizio",
+      "respiro_finale",
+      "tempo_solidificato",
+      "ultimo_respiro_del_giorno"
+    ],
+    "1": [
+      "cenere_di_re",
+      "chiodo_arrugginito_di_forca",
+      "metallo_impossibile",
+      "sale_versato",
+      "scettro_pallido",
+      "scheggia_divina",
+      "tredicesimo_grano_di_rosario",
+      "ultimo_battito",
+      "voce_del_gigante"
+    ],
+    "2": [
+      "corona_di_ossa",
+      "filo_dell_oblio",
+      "ossidiana_decaduta",
+      "polvere_di_confine",
+      "polvere_di_crepuscolo",
+      "polvere_di_ossario",
+      "specchio_annerito",
+      "stendardo_lacero",
+      "ultimo_respiro"
+    ],
+    "3": [
+      "acqua_dello_stige",
+      "campana_incrinata",
+      "filo_delle_parche",
+      "incenso_di_cenere",
+      "lacrima_di_paladino",
+      "lama_di_luce_solidificata",
+      "mitra_di_vescovo_apostata",
+      "obolo_di_bronzo",
+      "platino_rituale"
+    ],
+    "4": [
+      "ala_di_falena_crepuscolare",
+      "argento_benedetto",
+      "cenere_di_spirito",
+      "chiodo_di_bara",
+      "cuore_che_non_si_ferma",
+      "fiele_di_demone",
+      "ombra_imbottigliata",
+      "radice_di_immortelle",
+      "sale_della_veglia_eterna"
+    ],
+    "5": [
+      "chiave_d_ossa",
+      "cuore_di_montagna",
+      "filo_di_lutto",
+      "nebbia_del_limbo",
+      "pietra_di_soglia",
+      "reliquia_profanata",
+      "resina_di_ferro",
+      "scudo_fuso",
+      "zolfo_delle_fosse"
+    ],
+    "6": [
+      "acqua_di_fonte_cieca",
+      "balsamo_di_silenzio",
+      "corona_di_papavero_nero",
+      "essenza_spettrale",
+      "ferro_delle_lapidi",
+      "frammento_di_alba",
+      "incenso_dei_riti",
+      "linfa_di_gigante",
+      "oro_bianco"
+    ],
+    "7": [
+      "acciaio_stellare",
+      "ectoplasma",
+      "moneta_del_traghettatore",
+      "piuma_di_civetta_nera",
+      "polvere_di_arena",
+      "polvere_di_incubo",
+      "radice_di_mandragora_urlante",
+      "soffio_di_spettro",
+      "tendine_di_lupo"
+    ],
+    "8": [
+      "cera_di_veglia",
+      "chiodo_di_bara",
+      "corda_di_impiccato",
+      "estratto_di_muscolo",
+      "inchiostro_di_seppia_abissale",
+      "lacrima_di_vedova",
+      "mano_di_gloria",
+      "osso_di_pugile",
+      "sale_di_roccia"
+    ],
+    "9": [
+      "cenere_di_stella_morta",
+      "dente_di_teschio",
+      "ferro_temperato",
+      "muffa_sepolcrale",
+      "occhio_che_non_dorme",
+      "radice_di_quercia",
+      "sangue_di_toro",
+      "terra_di_cimitero",
+      "velo_di_mezzanotte"
+    ]
+  }
+}

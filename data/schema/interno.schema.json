@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "_comment": "Documentazione formale di data/world/interni/*.json (US-1010, fase 10 Blocco B). L'interno di un edificio (una porta su una mappa esterna, data/world/layouts/*.json.edifici[], la referenzia per interno_id): STESSO SCHEMA di un layout esterno per mappa/spawn/nemici/oggetti (riusa valida_mappa_e_spawn() in tools/validate_data.py) - la differenza e' cosa NON ha: nessun region_id/world_offset (un interno e' sempre una TileMapLayer locale e indipendente, mai parte della griglia condivisa del mondo continuo, US-1002), nessuna zone/gating/edifici annidati (un interno e' tipicamente una stanza o poche stanze, non un'altra mappa da popolare di quartieri). Letto da scripts/interior_scene.gd - NON da world_scene.gd: entrare/uscire da un edificio resta un caricamento di scena locale (world_scene.gd si nasconde e si ferma, MAI liberato - resta lo stesso nodo persistente di US-1002B), esattamente come funzionava il passaggio fra regioni PRIMA di US-1002.",
+  "interno": {
+    "schema_version": "int, sempre 1 in questa fase",
+    "interno_id": "string: l'id referenziato da edifici[].interno_id nella mappa esterna. Univoco fra tutti gli interni.",
+    "mappa": "array di stringhe TUTTE della stessa lunghezza (griglia [y][x]), dimensione libera - tipicamente piccola (una stanza o poche stanze). Solo caratteri della legenda di layout.schema.json. Bordo esterno tutto '#'.",
+    "spawn": "[x, y] in celle, dentro i limiti, su una cella calpestabile - dove il giocatore appare entrando dalla porta. E' anche dove si trova l'Area2D di uscita (interior_scene.gd::_crea_uscita): tornare vicino allo spawn riporta alla mappa esterna.",
+    "nemici": "array di {x, y, sequenza, scala, override} - opzionale, stesso formato di un layout esterno (US-806).",
+    "oggetti": "array di {x, y, item_id, quantita} - opzionale, stesso formato di un layout esterno (US-806).",
+    "npcs": "array di {x, y, npc_id} - opzionale (fase 11, US-1108). Un NPC dentro un interno e' SEMPRE li' (niente schedule/orario, a differenza degli NPC del mondo esterno - una bottega non ha bisogno che il suo fabbro sparisca di notte): interior_scene.gd::_crea_npc lo piazza una volta a _ready()."
+  },
+  "regole_validator": [
+    "interno_id presente e univoco fra tutti i file di data/world/interni/",
+    "mappa/spawn: stessa validazione di un layout esterno (righe rettangolari della legenda, bordo tutto '#', spawn dentro i limiti su una cella calpestabile)",
+    "ogni edifici[].interno_id di data/world/layouts/*.json deve risolvere a un interno_id qui presente",
+    "ogni npcs[].npc_id deve esistere in data/npc/roster.json"
+  ]
+}

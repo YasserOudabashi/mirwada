@@ -6,6 +6,7 @@
   "required": [
     "schema_version",
     "id",
+    "categoria",
     "name",
     "name_i18n",
     "group",
@@ -23,6 +24,10 @@
       "type": "string",
       "pattern": "^[a-z][a-z0-9_]*$"
     },
+    "categoria": {
+      "enum": ["standard", "non_standard"],
+      "_comment": "Fase 9 (US-901). 'standard': avanza per pozione+recitazione (data/pathways/, data/pathways_deferred/). 'non_standard': avanza per Boon (data/pathways_non_standard/, vedi boon.schema.json) - group e' sempre null, ogni Sequenza non-stub ha 'boon' invece di 'potion'."
+    },
     "name": {
       "type": "string",
       "minLength": 1
@@ -32,17 +37,23 @@
       "pattern": "^pathway\\.[a-z0-9_]+$"
     },
     "group": {
-      "enum": [
-        "lord_of_mysteries",
-        "god_almighty",
-        "eternal_darkness",
-        "calamity_of_destruction",
-        "demon_of_knowledge",
-        "key_of_light",
-        "goddess_of_origin",
-        "father_of_devils",
-        "the_anarchy"
-      ]
+      "oneOf": [
+        {
+          "enum": [
+            "lord_of_mysteries",
+            "god_almighty",
+            "eternal_darkness",
+            "calamity_of_destruction",
+            "demon_of_knowledge",
+            "key_of_light",
+            "goddess_of_origin",
+            "father_of_devils",
+            "the_anarchy"
+          ]
+        },
+        { "type": "null" }
+      ],
+      "_comment": "null SOLO per categoria:non_standard (nessun gruppo, nessuna fusione/cambio Pathway verso di loro, US-903). Un Pathway standard ha sempre uno dei 9 gruppi."
     },
     "god_title": {
       "type": "string"
@@ -82,12 +93,9 @@
         "concept",
         "stat_modifiers",
         "abilities",
-        "acting_actions",
-        "potion",
-        "advancement_ritual",
-        "madness_on_force",
         "notes"
       ],
+      "_comment": "Una Sequenza STANDARD non-stub ha anche acting_actions, potion, advancement_ritual, madness_on_force (invariato dalle fasi 2-8). Una Sequenza NON_STANDARD non-stub ha 'boon' al loro posto (mai insieme a 'potion': tools/validate_data.py li impone mutuamente esclusivi) - niente acting_actions/advancement_ritual/madness_on_force, il Boon non si puo' forzare a meta' (US-901/US-902).",
       "additionalProperties": false,
       "properties": {
         "sequence": {
@@ -171,6 +179,7 @@
         },
         "potion": {
           "type": "object",
+          "_comment": "Solo Pathway standard. Vedi 'boon' per i non_standard.",
           "required": [
             "characteristic_sequence",
             "ingredients",
@@ -192,6 +201,10 @@
               "type": "string"
             }
           }
+        },
+        "boon": {
+          "$ref": "boon.schema.json",
+          "_comment": "Solo Pathway non_standard. Vedi 'potion' per gli standard."
         },
         "advancement_ritual": {
           "oneOf": [

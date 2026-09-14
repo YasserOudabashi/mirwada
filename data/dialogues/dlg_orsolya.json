@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "dlg_orsolya",
+  "start": "n1",
+  "_comment": "Alchimista del villaggio vicino all'Archivio Sepolto (fase 11, US-1112). Terzo crafter di ricette del gioco, stesso schema di dlg_rosalba.",
+  "nodes": {
+    "n1": {
+      "speaker": "npc_orsolya",
+      "text": "Le pagine dell'Archivio hanno insegnato piu' loro a me che io a chiunque altro.",
+      "text_i18n": "dialogue.orsolya.n1",
+      "choices": [
+        {
+          "text": "Fammi vedere cosa sai preparare.",
+          "text_i18n": "dialogue.orsolya.n1.crea",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "crea_su_richiesta",
+              "npc_id": "npc_orsolya"
+            }
+          ],
+          "goto": null
+        },
+        {
+          "text": "Magari un'altra volta.",
+          "text_i18n": "dialogue.orsolya.n1.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    }
+  }
+}

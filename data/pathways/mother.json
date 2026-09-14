@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "mother",
+  "categoria": "standard",
   "name": "Mother",
   "name_i18n": "pathway.mother",
   "group": "goddess_of_origin",

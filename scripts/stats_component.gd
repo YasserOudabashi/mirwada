@@ -174,6 +174,17 @@ func is_dead() -> bool:
 	return _dead
 
 
+## Riporta l'entita' in vita con l'hp indicato (hp_max se omesso o negativo).
+## Resetta il flag di morte: senza questo, il setter di 'hp' (che emette
+## 'died' solo su una transizione "not _dead" -> 0) non potrebbe mai
+## rilevare una morte successiva alla prima.
+func revivi(quantita: float = -1.0) -> void:
+	var maximum: float = get_stat("hp_max")
+	_dead = false
+	_hp = clampf(quantita if quantita >= 0.0 else maximum, 0.0, maximum)
+	hp_changed.emit(_hp, maximum)
+
+
 func _process(delta: float) -> void:
 	_rigenera_spiritualita(delta)
 	if _statuses.is_empty():

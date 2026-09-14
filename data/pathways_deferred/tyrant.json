@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "tyrant",
+  "categoria": "standard",
   "name": "Tyrant",
   "name_i18n": "pathway.tyrant",
   "group": "god_almighty",

@@ -51,6 +51,22 @@ func test_ricetta_inesistente_e_ignota() -> void:
 	assert_eq(r.get("reason"), "ricetta_ignota", "una avanzata non scoperta non si prepara")
 
 
+## US-1106 (fase 11): ignora_scoperta:true fa preparare una ricetta anche se
+## il GIOCATORE non l'ha ancora scoperta - un NPC alchimista conosce la sua
+## ricetta a prescindere. ric_cura_maggiore (avanzata, non nota di default,
+## US-327) e' lo stesso caso del test sopra: qui il bypass la fa riuscire.
+func test_ignora_scoperta_prepara_una_ricetta_non_ancora_scoperta() -> void:
+	var ps: Node = _n("/root/PotionSystem")
+	var inv: Node = _n("/root/Inventory")
+	_fornisci("ric_cura_maggiore")
+	assert_false(bool(ps.call("ricetta_nota", "ric_cura_maggiore")), "il giocatore non la conosce ancora")
+	var r: Dictionary = ps.call("prepara", "ric_cura_maggiore", true)
+	assert_true(bool(r.get("ok", false)), "con ignora_scoperta:true riesce comunque: %s" % r.get("reason"))
+	assert_eq(inv.call("conta", "pozione_cura_maggiore"), 1, "l'oggetto e' prodotto")
+	assert_false(bool(ps.call("ricetta_nota", "ric_cura_maggiore")),
+		"il bypass NON insegna la ricetta al giocatore (resta ignota dopo)")
+
+
 func test_avanzata_diventa_preparabile_col_flag_conoscenza() -> void:
 	var ps: Node = _n("/root/PotionSystem")
 	assert_false(ps.call("ricetta_nota", "ric_cura_maggiore"), "avanzata: ignota di default")

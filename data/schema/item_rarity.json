@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario chiuso della rarita' degli oggetti (fase 11 'Villaggi ed Economia', US-1101). Ogni oggetto in data/items/*.json puo' dichiarare un campo facoltativo 'rarita' con uno di questi 4 id; se assente, il motore lo tratta come 'comune' (retrocompatibilita' con gli oggetti scritti prima di questa fase - il retrofit di US-1102 la rende esplicita su ognuno). 'peso_drop' e' il peso relativo nella scelta PESATA di un drop da layout.drop[sequenza]/data/world/campagna.json (US-1104, sostituisce la scelta uniforme di prima): un oggetto 'raro' esce molto meno spesso di uno 'comune' dalla stessa tabella. 'moltiplicatore_prezzo' scala 'valore' quando l'oggetto si vende in un negozio (effetto di dialogo apri_vendita, US-1103): 'valore' nei dati resta sempre il prezzo BASE, quello di un oggetto comune.",
+  "livelli": [
+    { "id": "comune", "peso_drop": 100, "moltiplicatore_prezzo": 1.0 },
+    { "id": "non_comune", "peso_drop": 30, "moltiplicatore_prezzo": 2.0 },
+    { "id": "raro", "peso_drop": 8, "moltiplicatore_prezzo": 5.0 },
+    { "id": "leggendario", "peso_drop": 1, "moltiplicatore_prezzo": 12.0 }
+  ]
+}

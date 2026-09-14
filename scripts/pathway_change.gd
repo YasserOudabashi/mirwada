@@ -66,9 +66,18 @@ func _motivo_rifiuto(nuovo_pathway: String) -> String:
 	var gd: Node = _gd()
 	if gd == null:
 		return "no_gamedata"
+
+	# US-903: un Pathway non_standard (Boon) non ha gruppo ne' vicini - il
+	# cambio Pathway resta un concetto SOLO fra Pathway standard, in
+	# entrambe le direzioni (ne' verso ne' da uno non_standard).
+	if str(gd.call("get_pathway", corrente).get("categoria", "")) == "non_standard":
+		return "pathway_non_standard"
+
 	var dati_nuovo: Dictionary = gd.call("get_pathway", nuovo_pathway)
 	if dati_nuovo.is_empty():
 		return "pathway_inesistente"
+	if str(dati_nuovo.get("categoria", "")) == "non_standard":
+		return "pathway_non_standard"
 
 	var gruppo_corrente: String = str(gd.call("get_pathway", corrente).get("group", ""))
 	if gruppo_corrente.is_empty() or str(dati_nuovo.get("group", "")) != gruppo_corrente:

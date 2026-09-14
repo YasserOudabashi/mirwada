@@ -13,6 +13,10 @@ extends Node
 signal data_reloaded(files_loaded: int, errors: int)
 
 const DIR_PATHWAYS := "res://data/pathways"
+## Fase 9 (US-902): Pathway Non-Standard (Boon). Puo' non esistere ancora
+## (nessun file finche' una story non ne scrive uno, es. Eternal Aeon) -
+## a differenza di DIR_PATHWAYS, una cartella assente qui NON e' un errore.
+const DIR_PATHWAYS_NON_STANDARD := "res://data/pathways_non_standard"
 const DIR_ABILITIES := "res://data/abilities"
 const DIR_SYNERGIES := "res://data/synergies"
 const DIR_FUSIONS := "res://data/fusions"
@@ -26,6 +30,8 @@ const PATH_TRACKED_TALENTS := "res://data/schema/tracked_talents.json"
 const DIR_TALENTS := "res://data/talents"
 const DIR_DIALOGUES := "res://data/dialogues"
 const DIR_QUESTS := "res://data/quests"
+const DIR_LAYOUTS := "res://data/world/layouts"
+const DIR_INTERNI := "res://data/world/interni"
 const PATH_TAGS := "res://data/tags.json"
 const PATH_BALANCE := "res://data/balance.json"
 const PATH_PRIMITIVES := "res://data/schema/primitives.json"
@@ -48,11 +54,13 @@ const PATH_UI_BOOK := "res://data/ui/book.json"
 const PATH_PAGE_TYPES := "res://data/schema/page_types.json"
 const PATH_VFX := "res://data/vfx.json"
 const PATH_ITEM_CATEGORIES := "res://data/schema/item_categories.json"
+const PATH_ITEM_RARITY := "res://data/schema/item_rarity.json"
 const PATH_EQUIP_SLOTS := "res://data/schema/equip_slots.json"
 const PATH_SIGILS := "res://data/sigils/core.json"
 const PATH_SIGIL_EFFECT_TYPES := "res://data/schema/sigil_effect_types.json"
 const PATH_BLUEPRINTS := "res://data/forge/blueprints.json"
 const PATH_REGIONS := "res://data/world/regions.json"
+const PATH_CAMPAGNA := "res://data/world/campagna.json"
 const PATH_ROSTER := "res://data/npc/roster.json"
 const PATH_FACTIONS := "res://data/factions.json"
 const PATH_ANTAGONISTI := "res://data/lore/antagonisti.json"
@@ -64,6 +72,11 @@ const PATH_ENDINGS := "res://data/endings.json"
 const ANIM_CATEGORIES: PackedStringArray = ["personaggio", "nemico_base", "pet"]
 
 var _pathways: Dictionary = {}
+## Pathway non_standard (US-903): MAI in pathway_ids()/_pathways (vedi
+## _load_pathways) - un registro separato solo per la risoluzione per id
+## esatto di get_pathway(), a chi (PathwayChange, FusionEngine) deve sapere
+## se un id e' un Pathway non_standard senza poterlo scoprire iterando.
+var _pathways_non_standard: Dictionary = {}
 var _sequences: Dictionary = {}
 var _abilities: Dictionary = {}
 var _synergies: Dictionary = {}
@@ -102,15 +115,19 @@ var _rooms: Dictionary = {}
 var _tracked_talents: Dictionary = {}
 var _talents: Dictionary = {}
 var _item_categories: Dictionary = {}
+var _item_rarity: Dictionary = {}
 var _equip_slots: Dictionary = {}
 var _sigils: Dictionary = {}
 var _sigil_effect_types: Dictionary = {}
 var _blueprints: Dictionary = {}
 var _regions: Dictionary = {}
+var _campagna: Dictionary = {}
 var _roster: Dictionary = {}
 var _dialogues: Dictionary = {}
 var _factions: Dictionary = {}
 var _quests: Dictionary = {}
+var _layouts: Dictionary = {}
+var _interni: Dictionary = {}
 var _antagonisti: Dictionary = {}
 var _endings: Dictionary = {}
 
@@ -162,6 +179,8 @@ func load_all() -> void:
 	_load_talents()
 	_load_dialogues()
 	_load_quests()
+	_load_layouts()
+	_load_interni()
 	# L'ultimo argomento e' il tipo atteso per la chiave: un file in cui quella
 	# chiave ha la forma sbagliata viene scartato con un errore, non caricato.
 	_load_single(PATH_TAGS, "tags", _tags, TYPE_ARRAY)
@@ -184,6 +203,7 @@ func load_all() -> void:
 	_load_single(PATH_PAGE_TYPES, "page_types", _page_types, TYPE_ARRAY)
 	_load_single(PATH_VFX, "pathway_palette_visiva", _vfx, TYPE_DICTIONARY)
 	_load_single(PATH_ITEM_CATEGORIES, "item_categories", _item_categories, TYPE_ARRAY)
+	_load_single(PATH_ITEM_RARITY, "livelli", _item_rarity, TYPE_ARRAY)
 	_load_single(PATH_EQUIP_SLOTS, "slots", _equip_slots, TYPE_ARRAY)
 	_load_single(PATH_ROOM_TYPES, "tipi", _room_types, TYPE_ARRAY)
 	_load_single(PATH_ROOMS, "rooms", _rooms, TYPE_DICTIONARY)
@@ -192,6 +212,7 @@ func load_all() -> void:
 	_load_single(PATH_SIGIL_EFFECT_TYPES, "effetti", _sigil_effect_types, TYPE_ARRAY)
 	_load_single(PATH_BLUEPRINTS, "blueprints", _blueprints, TYPE_DICTIONARY)
 	_load_single(PATH_REGIONS, "regions", _regions, TYPE_ARRAY)
+	_load_single(PATH_CAMPAGNA, "nemici", _campagna, TYPE_ARRAY)
 	_load_single(PATH_ROSTER, "npcs", _roster, TYPE_ARRAY)
 	_load_single(PATH_FACTIONS, "factions", _factions, TYPE_ARRAY)
 	_load_single(PATH_ANTAGONISTI, "antagonisti", _antagonisti, TYPE_ARRAY)
@@ -212,8 +233,11 @@ func load_all() -> void:
 # --- API pubblica ------------------------------------------------------------
 
 ## Restituisce {} se l'id non esiste: il chiamante controlla con is_empty().
+## Risolve sia gli standard che i non_standard (controlla 'categoria' sul
+## risultato, US-903) - solo pathway_ids() resta scoped ai soli standard.
 func get_pathway(id: String) -> Dictionary:
-	return _pathways.get(id, {})
+	var p: Dictionary = _pathways.get(id, {})
+	return p if not p.is_empty() else _pathways_non_standard.get(id, {})
 
 
 func get_sequence(id: String) -> Dictionary:
@@ -533,6 +557,25 @@ func item_categories() -> Array:
 	return _array_or_empty(_item_categories.get("item_categories"))
 
 
+## data/schema/item_rarity.json (fase 11, US-1101): la rarita' di un oggetto
+## e' un campo opzionale su data/items/*.json - assente = "comune", stesso
+## default del motore in ogni punto che legge get_item_rarity(). Torna {} se
+## l'id non esiste (mai il caso per "comune", sempre nel vocabolario).
+func get_item_rarity(id: String) -> Dictionary:
+	for l in (_array_or_empty(_item_rarity.get("livelli"))):
+		if str((l as Dictionary).get("id", "")) == id:
+			return l as Dictionary
+	return {}
+
+
+## La rarita' di un oggetto (item_id), mai un Dictionary vuoto: un item senza
+## il campo "rarita" e' "comune" per default (retrocompatibilita', US-1101).
+func rarita_di(item_id: String) -> String:
+	var it: Dictionary = get_item(item_id)
+	var r: String = str(it.get("rarita", ""))
+	return r if not r.is_empty() else "comune"
+
+
 func items_per_categoria(categoria: String) -> Array:
 	var out: Array = []
 	for id in _items:
@@ -586,6 +629,12 @@ func get_vfx_palette(pathway_id: String) -> Dictionary:
 	return _dict_or_empty(_dict_or_empty(_vfx.get("pathway_palette_visiva")).get(pathway_id))
 
 
+## Gli id delle 10 palette, nell'ordine di data/vfx.json (US-813: la riga
+## del tileset per un Pathway e' 1 + l'indice qui dentro).
+func vfx_palette_ids() -> Array:
+	return _dict_or_empty(_vfx.get("pathway_palette_visiva")).keys()
+
+
 func get_primitive_vfx(tipo: String) -> Dictionary:
 	return _dict_or_empty(_dict_or_empty(_vfx.get("primitive_vfx")).get(tipo))
 
@@ -597,6 +646,16 @@ func get_vfx(sezione: String) -> Dictionary:
 ## --- Regioni del mondo (data/world/regions.json, US-601) ---
 func get_regions() -> Array:
 	return _array_or_empty(_regions.get("regions"))
+
+
+## Addendum fase 10 (US-1015): il popolamento della campagna fuori da ogni
+## regione - stessa forma di un layout (nemici[]/oggetti[]) ma in coordinate
+## di cella ASSOLUTE (non ha un world_offset proprio: e' lo spazio comune a
+## tutte le regioni). Sostituisce i vecchi corridoi punto-a-punto (ritirati:
+## la campagna stessa e' ora calpestabile ovunque, non serve piu' un
+## percorso disegnato a mano fra due regioni).
+func get_campagna() -> Dictionary:
+	return _campagna
 
 
 ## {} se l'id non esiste: il chiamante controlla con is_empty().
@@ -646,6 +705,19 @@ func get_quest(id: String) -> Dictionary:
 	return _quests.get(id, {})
 
 
+## --- Layout disegnati a mano (data/world/layouts/, US-805) ---
+## {} se la regione non ha un layout: il chiamante usa il fallback piatto.
+func get_layout(region_id: String) -> Dictionary:
+	return _layouts.get(region_id, {})
+
+
+## --- Interni di edificio (data/world/interni/, US-1010) ---
+## {} se l'id non risolve (non dovrebbe succedere: il validator impone che
+## ogni edifici[].interno_id di un layout esista qui).
+func get_interno(interno_id: String) -> Dictionary:
+	return _interni.get(interno_id, {})
+
+
 ## --- Antagonisti (data/lore/antagonisti.json, US-620) ---
 func get_antagonisti() -> Array:
 	return _array_or_empty(_antagonisti.get("antagonisti"))
@@ -686,6 +758,17 @@ func pathway_ids() -> Array:
 	return _pathways.keys()
 
 
+## Gli id dei Pathway non_standard (US-907): un registro separato apposta
+## (vedi _load_pathways), MAI incluso in pathway_ids() - ogni sistema che
+## itera "ogni Pathway attivo" (VFX, diagramma, siti rituali, i18n, gli
+## slice) continuerebbe ad assumere quell'universo. Solo chi ha
+## esplicitamente bisogno anche dei non_standard (oggi: il selettore di
+## creazione personaggio, cosi' Eternal Aeon si sceglie come un Pathway
+## standard) concatena i due elenchi.
+func pathway_ids_non_standard() -> Array:
+	return _pathways_non_standard.keys()
+
+
 func sequence_count() -> int:
 	return _sequences.size()
 
@@ -706,8 +789,11 @@ func files_loaded() -> int:
 
 func _load_pathways() -> void:
 	var visti_p: Dictionary = {}
+	var visti_pns: Dictionary = {}
 	var visti_s: Dictionary = {}
-	for path in _json_files_in(DIR_PATHWAYS):
+	var percorsi: PackedStringArray = _json_files_in(DIR_PATHWAYS)
+	percorsi.append_array(_json_files_in(DIR_PATHWAYS_NON_STANDARD, false))
+	for path in percorsi:
 		var doc: Dictionary = _read_json(path)
 		if doc.is_empty():
 			continue
@@ -715,8 +801,22 @@ func _load_pathways() -> void:
 		if pid.is_empty():
 			_fail(path, "manca il campo 'id'")
 			continue
-		_upsert(_pathways, pid, doc)
-		visti_p[pid] = true
+		# US-902: pathway_ids()/_pathways restano SOLO gli standard - ogni
+		# sistema che "itera su ogni Pathway attivo" (VFX, diagramma, siti
+		# rituali, i18n, gli slice) assume quell'universo, e cambiarlo qui
+		# e' fuori scope per questa story (arrivera' quando US-904 scrive
+		# Eternal Aeon e va deciso esplicitamente dove farlo comparire). Le
+		# Sequenze restano visibili a tutti: e' quel che serve a Progression/
+		# BoonSystem per risolvere sequence_data() su un Pathway non_standard.
+		if str(doc.get("categoria", "standard")) == "standard":
+			_upsert(_pathways, pid, doc)
+			visti_p[pid] = true
+		else:
+			# US-903: registro separato, MAI in pathway_ids() (vedi sopra) -
+			# solo get_pathway(id) lo risolve, cosi' PathwayChange/FusionEngine
+			# possono riconoscere un Pathway non_standard e rifiutarlo esplicitamente.
+			_upsert(_pathways_non_standard, pid, doc)
+			visti_pns[pid] = true
 
 		for entry in _object_list(doc, "sequences", path):
 			var seq: Dictionary = entry
@@ -727,6 +827,7 @@ func _load_pathways() -> void:
 			_upsert(_sequences, sid, seq)
 			visti_s[sid] = true
 	_prune(_pathways, visti_p)
+	_prune(_pathways_non_standard, visti_pns)
 	_prune(_sequences, visti_s)
 
 
@@ -778,6 +879,43 @@ func _load_quests() -> void:
 		_upsert(_quests, qid, doc)
 		visti[qid] = true
 	_prune(_quests, visti)
+
+
+## US-805: un file per layout disegnato a mano (data/world/layouts/*.json),
+## chiave = region_id. Una regione senza file qui non ha layout: get_layout
+## torna {} e region_scene.gd usa il fallback piatto di sempre.
+func _load_layouts() -> void:
+	var visti: Dictionary = {}
+	for path in _json_files_in(DIR_LAYOUTS):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		var rid: String = str(doc.get("region_id", ""))
+		if rid.is_empty():
+			_fail(path, "un layout non ha 'region_id'")
+			continue
+		_upsert(_layouts, rid, doc)
+		visti[rid] = true
+	_prune(_layouts, visti)
+
+
+## US-1010: l'interno di un edificio (data/world/interni/*.json), chiave =
+## interno_id - stesso pattern di _load_layouts(), ma senza fallback (un
+## edifici[].interno_id che non risolve e' un errore del validator, non un
+## caso da gestire a runtime).
+func _load_interni() -> void:
+	var visti: Dictionary = {}
+	for path in _json_files_in(DIR_INTERNI):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		var iid: String = str(doc.get("interno_id", ""))
+		if iid.is_empty():
+			_fail(path, "un interno non ha 'interno_id'")
+			continue
+		_upsert(_interni, iid, doc)
+		visti[iid] = true
+	_prune(_interni, visti)
 
 
 func _load_items() -> void:
@@ -962,10 +1100,11 @@ func _prune(index: Dictionary, visti: Dictionary) -> void:
 			index.erase(id)
 
 
-func _json_files_in(dir_path: String) -> PackedStringArray:
+func _json_files_in(dir_path: String, obbligatoria: bool = true) -> PackedStringArray:
 	var out := PackedStringArray()
 	if not DirAccess.dir_exists_absolute(dir_path):
-		_errors.append("cartella mancante: %s" % dir_path)
+		if obbligatoria:
+			_errors.append("cartella mancante: %s" % dir_path)
 		return out
 	var names: PackedStringArray = DirAccess.get_files_at(dir_path)
 	for n in names:

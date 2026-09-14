@@ -112,6 +112,84 @@ zero righe di codice che nominino un Pathway, una coppia di fusione, una
 tribolazione o un finale specifico. `ability_engine.gd` non è stato
 toccato in tutta la fase. PRD: `006_PRD/prd-fase-7-endgame.md`.
 
+**Fase 8 — Vertical slice giocabile: chiusa.** 19 story, 850 test. Le fasi
+1-7 avevano costruito tutti i sistemi ma nessuno poteva giocare il gioco
+con la tastiera; la fase 8 ha collegato i sistemi già scritti, riempito i
+dati mancanti (i 307 ingredienti delle formule diventano oggetti veri con
+fonti nel mondo, 5 regioni con layout disegnati a mano, boss e nemici dai
+dati) e messo una grafica provvisoria generata (`tools/generate_sprites.py`:
+pixel art procedurale deterministica, 23 fogli). **Zero sistemi nuovi**,
+save invariato. Verdetto (US-814): `tests/manual/qa_vslice.gd` gioca
+un'intera partita con Xvfb — creazione, raccolta, abilità a tastiera, un
+boss ucciso a colpi di mischia, un acquisto da un NPC, una pozione
+preparata e bevuta (Sequenza 9 → 8), un passaggio fra regioni — con zero
+righe di codice che nominino un Pathway/regione/NPC/formula specifici
+(`tests/test_slice_fase_8.gd`, lista vietata letta dai dati).
+
+**Fase 9 — Pathway Non-Standard: chiusa.** 7 story, 884 test. Le fasi 1-8
+avevano un solo sistema di progressione (Sequenza 9→0, pozione+recitazione).
+Il materiale di riferimento ha anche Pathway "Non-Standard" (bestower come
+Eternal Aeon) che avanzano ricevendo **Boon** da un'entità invece di bere
+pozioni. Un motore Boon generico (`BoonSystem`, nuovo autoload — legge solo
+il campo `boon` della Sequenza corrente, stesso principio di `PotionSystem`)
++ **Eternal Aeon completo, 10/10 Sequenze**, il primo Pathway Non-Standard
+scritto, come prova d'architettura. Un Boon è un dono una tantum per
+Sequenza: requisiti dichiarati nei dati (quest completata / comportamento
+contato / sacrificio pagato, combinabili per Sequenza). La pagina diagramma
+del libro mostra una sezione "Il Dono" al posto di Prepara/Bevi quando la
+Sequenza corrente ha `boon` invece di `potion` — stessa pagina, un ramo sul
+dato. Save **`schema_version` 22 → 23** (un solo bump: la baseline dei
+requisiti `comportamento`, accanto ad `acting`). Verdetto (US-907):
+`tests/manual/qa_vslice_eternal_aeon.gd` crea un personaggio Eternal Aeon
+dal selettore vero di creazione, soddisfa un Boon con tutte e tre le fonti
+insieme e lo riceve dalla pagina diagramma vera (`Progression.sequence()`
+5 → 4) — con zero righe di codice che nominino "eternal_aeon" o una sua
+Sequenza/abilità (`tests/test_fase_9_checkpoint.gd`, lista vietata letta
+dai dati).
+
+**Fase 10 — Mondo Continuo: chiusa.** 16 story, 925 test. Le fasi 1-9
+avevano 5 regioni come 5 scene isolate, un salto ad ogni passaggio, e
+quasi vuote di contenuto. La fase 10 le fonde in un'unica griglia
+condivisa dipinta in una sola TileMapLayer persistente (`world_scene.gd`
+sostituisce `region_scene.gd`): `world_offset` per regione dispone
+Mirwada al centro di un anello con le 4 regioni esterne ai quattro
+angoli, 8 corridoi disegnati a mano collegano ogni coppia adiacente, il
+gating d'ingresso diventa per la prima volta una barriera fisica vera
+invece di un rifiuto di caricamento. Le 5 regioni crescono con
+location_tags fisicamente distinti (non più rettangoli a griglia
+automatica), e un motore data-driven per gli edifici visitabili
+(`edifici: [{x,y,interno_id}]` su un layout, un interno è un layout come
+un altro) dà vita ai primi edifici di Mirwada, al primo villaggio vero
+(l'avamposto della sorgente in Valle della Madre, 4 capanne) e alla prima
+struttura grande (la torre d'osservazione dell'Archivio Sepolto, un
+interno a 3 stanze nella stessa mappa). **Zero primitive/eventi nuovi**,
+save invariato (`schema_version` 23). Verdetto: `tests/manual/
+qa_mondo_continuo.gd` gioca la partita vera con Xvfb — attraversa un
+confine di regione con Input reale senza alcuna `change_scene_to_*`, entra
+ed esce dal villaggio e dalla struttura grande — con zero righe di codice
+che nominino una regione (oltre a "mirwada", l'hub per design) o un
+interno specifico (`tests/test_fase_10_checkpoint.gd`, lista vietata
+letta dai dati).
+
+**Fase 11 — Villaggi ed Economia: chiusa.** 15 story, 942 test. Aggiunta
+su richiesta esplicita dell'utente: il mondo continuo aveva 5 regioni ma
+nessuna economia viva, nessun oggetto raro, e gli NPC di una zona
+affollata si accalcavano su una riga. Un vocabolario chiuso di 4 livelli
+di rarità (comune/non_comune/raro/leggendario, retrofit su tutti i 351
+oggetti esistenti) scala il prezzo di vendita e il peso del drop; un 7°
+effetto di dialogo (`crea_su_richiesta`) apre un NPC che **crea**
+l'oggetto al posto del giocatore (bypassando la scoperta della ricetta/
+blueprint, mai insegnandola) — Rosalba, Bram, Fenwick e Orsolya i primi
+crafter; due nuovi villaggi nella campagna (Marche del Crepuscolo,
+Archivio Sepolto, con un template generico che dipinge pareti vere dove
+prima c'era solo terreno procedurale) vendono un oggetto leggendario a un
+prezzo visibilmente più alto; il piazzamento NPC diventa una griglia che
+usa lo spazio reale della zona invece di un'unica riga. **Zero
+primitive/eventi nuovi**, save invariato. Verdetto:
+`tests/test_fase_11_checkpoint.gd` prova che zero righe di codice del
+motore nominano un NPC, un villaggio, un blueprint o una ricetta
+specifici — lista vietata letta dai dati.
+
 ## Setup
 
 Richiede Godot 4.x e Python 3 (solo per gli strumenti di dati).
@@ -121,6 +199,17 @@ Richiede Godot 4.x e Python 3 (solo per gli strumenti di dati).
 python tools/validate_data.py      # valida tutti i dati, esce 0 se ok
 godot --headless --path . --script res://tests/run_tests.gd   # suite headless, esce 0 se ok
 python tools/generate_pathways.py  # rigenera la spina dorsale dei 10 pathway
+python tools/generate_formula_ingredients.py  # item mancanti per gli ingredienti delle formule
+python tools/generate_sprites.py      # arte pulita: personaggio/nemico/pet/NPC/oggetti/tileset, 23 fogli (US-812/US-813)
+python tools/generate_placeholders.py # arte + overlay diagnostici (bordi/numero frame) per tarare il combattimento
+godot --headless --path . --script res://tools/build_tileset.gd  # ricostruisce il TileSet dal tileset.png (US-813)
+
+# Verifica a schermo reale della vertical slice (Xvfb, non fa parte della suite headless):
+# Xvfb :99 -screen 0 1280x720x24 &
+# DISPLAY=:99 godot --display-driver x11 --rendering-driver opengl3 \
+#   --path . --script res://tests/manual/qa_vslice.gd
+# Stesso schema per Eternal Aeon (fase 9, US-907):
+#   --script res://tests/manual/qa_vslice_eternal_aeon.gd
 ```
 
 La suite headless include un test che esegue `tools/validate_data.py`: un
@@ -132,15 +221,19 @@ mano. Esce 0 se tutto passa, 1 al primo fallimento.
 Il codice implementa 28 primitive parametriche; i dati JSON le compongono in
 abilita'. Prova: tutti e 10 i Pathway attivi (100/100 Sequenze) sono
 completi dalla Sequenza 9 alla 0 con zero righe di codice dedicate
-(data/abilities/*.json) — e l'intero endgame di fase 7 (cambio Pathway,
-tribolazioni, finali) regge sulla stessa architettura.
+(data/abilities/*.json) — l'intero endgame di fase 7 (cambio Pathway,
+tribolazioni, finali) regge sulla stessa architettura, e in fase 9 anche un
+**secondo sistema di progressione intero** (Boon invece di pozione,
+Eternal Aeon) si aggiunge leggendo solo dati nuovi, zero righe di codice
+di motore che nominino un Pathway specifico.
 
 ## Documenti
 
 - `CLAUDE.md` — regole di lavoro, comandi, decisioni prese
-- `006_PRD/prd-fase-8-vertical-slice.md` — **PRD della fase corrente** (vertical slice giocabile, 14 story)
-- `006_PRD/prossimi-passi.md` — **come eseguirla**: ordine delle operazioni, quando usare `/prd` e `/ralph`, setup, trappole note
-- `006_PRD/prd-fase-7-endgame.md` — PRD dell'ultima fase chiusa (fase 7)
+- `006_PRD/prd-fase-9-pathway-non-standard.md` — **PRD dell'ultima fase chiusa** (Pathway Non-Standard, motore Boon + Eternal Aeon, 7 story)
+- `006_PRD/prd-fase-8-vertical-slice.md` — PRD della fase 8 (chiusa, vertical slice giocabile, 19 story)
+- `006_PRD/prossimi-passi.md` — istruzioni operative della fase 8: ordine delle operazioni, quando usare `/prd` e `/ralph`, setup, trappole note
+- `006_PRD/prd-fase-7-endgame.md` — PRD della fase 7 (chiusa)
 - `006_PRD/prd-fase-5b-lord-of-mysteries.md` — PRD della fase 5b (chiusa)
 - `006_PRD/prd-fase-6-mondo.md` — PRD della fase 6 (chiusa)
 - `006_PRD/prd-fase-2-pathway-core.md` — PRD della fase 2 (chiusa)
@@ -154,8 +247,8 @@ tribolazioni, finali) regge sulla stessa architettura.
 - `006_PRD/design-vfx.md` — identita' visiva delle abilita' (stile manhwa), 10 palette
 - `006_PRD/art-brief-gemini.md` — prompt pronti per generare concept/ritratti/UI con Gemini, con i limiti dichiarati
 - `data/audio.json` — sistema audio data-driven (tell sonori, follia, palette)
-- `006_PRD/roadmap.md` — fasi 2-9
-- `prd.json` — story della fase corrente in formato ralph
+- `006_PRD/roadmap.md` — fasi 2-10
+- `prd.json` — story dell'ultima fase chiusa (fase 9) in formato ralph
 - `progress.txt` — memoria tra le sessioni
 - `docs/documentazione.py` — rigenera la documentazione docx; `diario.py` — diario del progetto
 
