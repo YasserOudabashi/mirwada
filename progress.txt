@@ -5501,3 +5501,27 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   (CLAUDE.md/README) e il conteggio finale sono di US-622.
 - Prossima storia (fuori dai 3 blocchi chiesti): US-611 (BLOCCO D - il motore
   del mondo applica regions.json.gating[] via AreaGate).
+
+[2026-10-12] ARTE (fuori PRD) — guida arte/ allineata a sprite-forge, tempi per frame, scale_mode integer, primo sprite vero.
+- Guida: arte/ + art-brief-gemini.md cap. 6.7 allineati alla skill sprite-forge
+  (contorno 1px inchiostro per sprite/tile, 2px solo VFX; max 16 colori in ramp
+  con hue shift; tileset senza contorno su pavimento/acqua). Key art Gemini
+  rinominate con l'id della regione (assets/concept/regioni/<id>.jpg).
+- Tempi: animations.json accetta durate_ms (un valore per frame) al posto di
+  fps. AnimationSpec.frame_durations_ms(), AnimationMachine usa la durata per
+  frame di Godot (velocita' 1000 = ms). Valori della skill su idle, walk,
+  attacchi (personaggio/nemico/pet). Dash e parata RESTANO a fps: i-frame e
+  parata perfetta sono finestre di gameplay. Validator: durate_ms = 1 valore
+  > 0 per frame. NB: attacchi piu' lenti di prima (light 312 -> 450 ms,
+  heavy 571 -> 850 ms, nemico 250 -> 390 ms): da provare col pad in mano.
+- project.godot: window/stretch/scale_mode="integer".
+- Primo sprite vero: personaggio_idle (Enel, 4 dir x 4 frame, respiro 1px).
+  Sorgente arte/sprite/personaggio_idle.json (sprite-forge), sheet a
+  --padding 0 -> assets/placeholder/personaggio_idle.png (128x128).
+  generate_placeholders.py salta i file che hanno un JSON in arte/sprite/.
+- Come verificato: check.py 0 errori/0 avvisi; 604 test headless verdi
+  (+1: ripiego su fps); validate exit 0; verifica a schermo sotto Xvfb con 4
+  AnimationMachine reali in idle (righe down/up/left/right corrette, pixel
+  netti). Non verificato: il feel dei nuovi tempi in combattimento vero.
+- Aperto: left = right specchiato (luce compresa); gli altri 9 file del
+  personaggio, nemico e pet restano placeholder.

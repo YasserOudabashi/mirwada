@@ -126,6 +126,10 @@ def main():
     for cat, body in BODY.items():
         anims = {k: v for k, v in spec.get(cat, {}).items() if not k.startswith("_")}
         for name, anim in anims.items():
+            # arte vera (sorgente sprite-forge in arte/sprite/): non sovrascrivere
+            if os.path.exists(os.path.join(ROOT, "arte", "sprite", f"{cat}_{name}.json")):
+                print(f"  salto {cat}_{name}: arte vera in arte/sprite/")
+                continue
             dirs = directions if anim.get("direzionale") else ["down"]
             frames = anim["frames"]
             sheet = Image.new("RGBA", (size[0] * frames, size[1] * len(dirs)), (0, 0, 0, 0))

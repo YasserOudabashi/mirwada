@@ -138,6 +138,8 @@ esplicita e correggibile, e le regole del cap. 1 le verifica `check.py`.
 5. Copia `out/personaggio_idle/personaggio_idle_sheet.png` su
    `assets/placeholder/personaggio_idle.png` e verifica la dimensione:
    colonne x 32 per righe x 32 (idle: 128x128, death: 256x32).
+   `tools/generate_placeholders.py` salta i file che hanno un JSON in
+   `arte/sprite/`: rilanciarlo non cancella l'arte vera.
 
 **Tempi.** Le animazioni coperte dalla tabella della skill hanno
 `durate_ms` in `data/animations.json` (una durata per frame): idle
