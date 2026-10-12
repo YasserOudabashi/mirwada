@@ -14,18 +14,31 @@
     ],
     "_comment_direzioni": "4 direzioni, non 8. Le diagonali riusano la direzione orizzontale: dimezza i frame da disegnare e nessuno se ne accorge in un top-down 2D. Decisione da prendere ORA perche' cambiarla dopo significa ridisegnare tutto.",
     "origine": "piedi_centro",
-    "fps_default": 12
+    "fps_default": 12,
+    "_comment_durate_ms": "durate_ms (opzionale): un valore in ms per frame, al posto di fps. Tempi della skill sprite-forge: idle 250-500, walk 100-150 con i contatti tenuti di piu', attacco = anticipo 120-200 (il frame chiave), colpo/smear 40-60, impatto 150-200, recupero 80-150. Dash e parata restano a fps: i loro tempi sono finestre di gameplay (i-frame, parata perfetta), non resa."
   },
   "personaggio": {
     "idle": {
       "frames": 4,
-      "fps": 6,
+      "durate_ms": [
+        400,
+        300,
+        400,
+        300
+      ],
       "loop": true,
       "direzionale": true
     },
     "walk": {
       "frames": 6,
-      "fps": 12,
+      "durate_ms": [
+        120,
+        150,
+        120,
+        120,
+        150,
+        120
+      ],
       "loop": true,
       "direzionale": true,
       "eventi": [
@@ -56,7 +69,13 @@
     },
     "attack_light": {
       "frames": 5,
-      "fps": 16,
+      "durate_ms": [
+        60,
+        120,
+        40,
+        150,
+        80
+      ],
       "loop": false,
       "direzionale": true,
       "anticipo": [
@@ -83,7 +102,16 @@
     },
     "attack_heavy": {
       "frames": 8,
-      "fps": 14,
+      "durate_ms": [
+        70,
+        70,
+        70,
+        180,
+        50,
+        160,
+        100,
+        150
+      ],
       "loop": false,
       "direzionale": true,
       "anticipo": [
@@ -160,7 +188,12 @@
   "nemico_base": {
     "idle": {
       "frames": 4,
-      "fps": 6,
+      "durate_ms": [
+        400,
+        300,
+        400,
+        300
+      ],
       "loop": true,
       "direzionale": true
     },
@@ -189,7 +222,12 @@
     },
     "attack": {
       "frames": 4,
-      "fps": 16,
+      "durate_ms": [
+        60,
+        50,
+        160,
+        120
+      ],
       "loop": false,
       "direzionale": true,
       "attivi": [
@@ -224,19 +262,36 @@
   "pet": {
     "idle": {
       "frames": 4,
-      "fps": 6,
+      "durate_ms": [
+        400,
+        300,
+        400,
+        300
+      ],
       "loop": true,
       "direzionale": true
     },
     "walk": {
       "frames": 6,
-      "fps": 12,
+      "durate_ms": [
+        120,
+        150,
+        120,
+        120,
+        150,
+        120
+      ],
       "loop": true,
       "direzionale": true
     },
     "attack": {
       "frames": 4,
-      "fps": 16,
+      "durate_ms": [
+        60,
+        50,
+        160,
+        120
+      ],
       "loop": false,
       "direzionale": true,
       "attivi": [

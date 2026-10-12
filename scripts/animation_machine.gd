@@ -82,18 +82,20 @@ func configura(categoria: String) -> void:
 			continue
 
 		var righe: Array = direzioni if spec.is_directional() else ["down"]
+		var durate: Array = spec.frame_durations_ms()
 		for riga in righe.size():
 			var chiave: String = nome
 			if spec.is_directional():
 				chiave = "%s_%s" % [nome, direzioni[riga]]
 			sf.add_animation(chiave)
-			sf.set_animation_speed(chiave, spec.fps())
+			# 1000 "fps": la durata di ogni frame e' direttamente in ms.
+			sf.set_animation_speed(chiave, 1000.0)
 			sf.set_animation_loop(chiave, spec.loops())
 			for col in spec.frame_count():
 				var at := AtlasTexture.new()
 				at.atlas = tex
 				at.region = Rect2(col * DIM, riga * DIM, DIM, DIM)
-				sf.add_frame(chiave, at)
+				sf.add_frame(chiave, at, durate[col])
 
 	sprite_frames = sf
 

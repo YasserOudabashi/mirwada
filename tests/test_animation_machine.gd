@@ -27,9 +27,12 @@ func test_spriteframes_costruito_dai_dati() -> void:
 func test_frame_fps_e_loop_dai_dati() -> void:
 	var m: AnimatedSprite2D = _nuova()
 	var sf: SpriteFrames = m.sprite_frames
-	# animations.json personaggio.walk: 6 frame, 12 fps, loop true
+	# animations.json personaggio.walk: 6 frame, durate_ms, loop true.
+	# Velocita' 1000 = la durata di ogni frame e' in ms.
 	assert_eq(sf.get_frame_count("walk_down"), 6, "6 frame in walk")
-	assert_almost_eq(sf.get_animation_speed("walk_down"), 12.0, "12 fps in walk")
+	assert_almost_eq(sf.get_animation_speed("walk_down"), 1000.0, "durate in ms")
+	assert_almost_eq(sf.get_frame_duration("walk_down", 0), 120.0, "frame 0: 120 ms")
+	assert_almost_eq(sf.get_frame_duration("walk_down", 1), 150.0, "frame 1 (contatto): 150 ms")
 	assert_true(sf.get_animation_loop("walk_down"), "walk in loop")
 	# attack_light: 5 frame, non in loop
 	assert_eq(sf.get_frame_count("attack_light_down"), 5, "5 frame in attack_light")

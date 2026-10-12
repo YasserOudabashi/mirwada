@@ -33,13 +33,13 @@ lettura comoda del giorno in cui e' stata scritta.
 
 ### Personaggio (protagonista) — 156 frame totali col budget a 4 direzioni
 
-| Animazione | Frame | fps | Note |
+| Animazione | Frame | fps / ms per frame | Note |
 |---|---|---|---|
-| `idle` | 4 | 6 | loop |
-| `walk` | 6 | 12 | loop; passo suona ai frame 1 e 4 (`footstep`) |
+| `idle` | 4 | 400/300/400/300 ms | loop |
+| `walk` | 6 | 120/150/120/120/150/120 ms | loop; passo suona ai frame 1 e 4 (`footstep`) |
 | `dash` | 4 | 20 | non loop; **i-frame ai frame 0-2** (invulnerabilita' — critico per il gameplay) |
-| `attack_light` | 5 | 16 | anticipo [0,1] · **attivo (hitbox) [2]** · recupero [3,4] |
-| `attack_heavy` | 8 | 14 | anticipo [0-3] (tell al frame 0) · **attivi [4,5]** · recupero [6,7] |
+| `attack_light` | 5 | 60/120/40/150/80 ms | anticipo [0,1] · **attivo (hitbox) [2]** · recupero [3,4] |
+| `attack_heavy` | 8 | 70/70/70/180/50/160/100/150 ms | anticipo [0-3] (tell al frame 0) · **attivi [4,5]** · recupero [6,7] |
 | `parry` | 4 | 18 | **finestra di parata perfetta: frame [0,1]**, cioe' ~111ms. E' il numero piu' importante di tutto il combattimento: disegna i primi 2 frame in modo che si "sentano" diversi dagli altri 2 (postura piu' aperta/pronta) |
 | `hurt` | 3 | 14 | non loop |
 | `death` | 8 | 10 | **non direzionale** (una sola serie, non 4) |
@@ -48,22 +48,22 @@ lettura comoda del giorno in cui e' stata scritta.
 
 ### Nemico base — 98 frame totali
 
-| Animazione | Frame | fps | Note |
+| Animazione | Frame | fps / ms per frame | Note |
 |---|---|---|---|
-| `idle` | 4 | 6 | loop |
+| `idle` | 4 | 400/300/400/300 ms | loop |
 | `walk` | 6 | 10 | loop |
 | `anticipo` | 4 | 8 | **il tell dell'attacco**: parte al frame 0 (audio + visivo), da' al giocatore 4 frame per reagire. E' uno stato separato dall'attacco, non frame interni — cosi' si puo' tarare la durata del tell senza toccare la velocita' del colpo |
-| `attack` | 4 | 16 | **attivo (hitbox) al frame [1]** |
+| `attack` | 4 | 60/50/160/120 ms | **attivo (hitbox) al frame [1]** |
 | `stagger` | 4 | 12 | non loop |
 | `death` | 6 | 10 | **non direzionale** |
 
 ### Pet — 56 frame totali
 
-| Animazione | Frame | fps | Note |
+| Animazione | Frame | fps / ms per frame | Note |
 |---|---|---|---|
-| `idle` | 4 | 6 | loop |
-| `walk` | 6 | 12 | loop |
-| `attack` | 4 | 16 | attivo al frame [1]; **niente tell leggibile**, il pet e' un alleato non una minaccia da schivare |
+| `idle` | 4 | 400/300/400/300 ms | loop |
+| `walk` | 6 | 120/150/120/120/150/120 ms | loop |
+| `attack` | 4 | 60/50/160/120 ms | attivo al frame [1]; **niente tell leggibile**, il pet e' un alleato non una minaccia da schivare |
 
 ## 3. Se generi un turnaround di riferimento con IA
 
@@ -126,8 +126,8 @@ esplicita e correggibile, e le regole del cap. 1 le verifica `check.py`.
    escono gia' nell'ordine che il codice si aspetta. Le animazioni non
    direzionali (`death`, `meditate`) hanno una sola animazione, una sola riga.
 3. **Numero di frame** = quello di `data/animations.json`; `ms` di ogni
-   frame = `1000 / fps` di quel file (es. `idle` a 6 fps -> 167 ms), cosi'
-   l'anteprima gira al tempo vero del gioco.
+   frame = il suo valore in `durate_ms`, o `1000 / fps` se l'animazione non
+   le ha, cosi' l'anteprima gira al tempo vero del gioco.
 4. Controllo e render, **senza padding** (la griglia del gioco non ne ha):
    ```bash
    python scripts/check.py arte/sprite/personaggio_idle.json --out out
@@ -139,12 +139,12 @@ esplicita e correggibile, e le regole del cap. 1 le verifica `check.py`.
    `assets/placeholder/personaggio_idle.png` e verifica la dimensione:
    colonne x 32 per righe x 32 (idle: 128x128, death: 256x32).
 
-**Tempi: non cambiarli da qui.** La skill consiglia idle a 250-500 ms per
-frame, walk a 100-150 ms e attacchi con durate diverse per frame (anticipo
-lento, colpo veloce). Oggi `data/animations.json` ha un solo fps per
-animazione (idle 167 ms, walk 83 ms, attacchi uniformi). Cambiarli tocca il
-feel del combattimento e la finestra di parata; le durate per frame
-richiedono codice nella macchina a stati. E' una story a parte.
+**Tempi.** Le animazioni coperte dalla tabella della skill hanno
+`durate_ms` in `data/animations.json` (una durata per frame): idle
+400/300/400/300, walk con i contatti a 150 ms, attacchi con anticipo lento,
+colpo da 40-50 ms e impatto tenuto. Copia quelle durate nei `ms` dello
+sprite. Dash e parata restano a `fps`: i loro tempi sono finestre di
+gameplay (i-frame, parata perfetta), non resa.
 
 ## 5. Budget di lavoro
 
