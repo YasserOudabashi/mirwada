@@ -141,6 +141,22 @@ esplicita e correggibile, e le regole del cap. 1 le verifica `check.py`.
    `tools/generate_placeholders.py` salta i file che hanno un JSON in
    `arte/sprite/`: rilanciarlo non cancella l'arte vera.
 
+**Enel (protagonista): non si disegna a mano.** I 10 file `personaggio_*`
+li genera `arte/sprite/build_enel.py` (un manichino a parti: teste a mano,
+corpo come forme, luce da alto-sinistra, contorno 1px e ombre calcolati).
+Per cambiare qualcosa (colori, cappotto, una posa) si modifica il
+costruttore e si rigenera tutto:
+
+```bash
+python arte/sprite/build_enel.py --skill <cartella della skill sprite-forge>
+python arte/sprite/build_enel.py --skill <...> attack_heavy   # solo una
+```
+
+Frame e durate li legge da `data/animations.json`. I frame che il codice usa
+si vedono: scia viola del dash solo nei frame di invulnerabilita' (0-2),
+occhi accesi e bagliore sulla lama nella finestra di parata (0-1), smear
+solo sul frame con la hitbox, bagliore del cast che esplode al frame 3.
+
 **Tempi.** Le animazioni coperte dalla tabella della skill hanno
 `durate_ms` in `data/animations.json` (una durata per frame): idle
 400/300/400/300, walk con i contatti a 150 ms, attacchi con anticipo lento,

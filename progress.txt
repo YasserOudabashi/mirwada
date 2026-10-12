@@ -5525,3 +5525,27 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
   netti). Non verificato: il feel dei nuovi tempi in combattimento vero.
 - Aperto: left = right specchiato (luce compresa); gli altri 9 file del
   personaggio, nemico e pet restano placeholder.
+
+[2026-10-12] ARTE (fuori PRD) — Enel ridisegnato "piu' mostruoso" + tutte le 10 animazioni del personaggio.
+- Design (scelte dell'utente: spada pesante, versione piu' mostruosa): cappotto
+  lungo quasi nero a V, coppola calata, viso in ombra con due occhi freddi che
+  brillano e una crepa luminosa dall'occhio (anche sulla nuca), sciarpa rossa
+  lunga, avambracci fasciati con le code strappate, ombra viola che cola
+  dall'orlo + pozza ai piedi, spadone in spalla a riposo. 16 colori in ramp.
+- arte/sprite/build_enel.py: costruttore a manichino (teste a mano, corpo a
+  forme, luce/contorno/ombra portata calcolati) -> 10 JSON sprite-forge ->
+  sheet in assets/placeholder/personaggio_*.png (174 frame). NB: ~800 righe,
+  sopra il limite di diff di CLAUDE.md regola 3: e' uno strumento d'arte, non
+  gameplay; nessuna riga di codice di gioco toccata.
+- Leggibilita' del combat nei dati: dash = scia viola solo nei frame i-frame
+  (0-2); parry = occhi accesi + bagliore sulla lama nei frame 0-1 (finestra
+  perfetta); attacchi = smear solo sul frame attivo; heavy = tell (bagliore
+  sugli occhi) al frame 0, lama carica al 3, crepa nel suolo all'impatto;
+  cast = bagliore che esplode al frame 3 (ability_release).
+- Come verificato: check.py 0 errori su tutti e 10 (avvisi = pixel isolati di
+  occhi/scie/bagliori, voluti); dimensioni degli sheet = frame x 32 per
+  4 righe (1 per death/meditate); generate_placeholders.py li salta tutti;
+  604 test verdi; validate exit 0; mosaico a schermo sotto Xvfb con la vera
+  AnimationMachine (10 animazioni, vista right e down, ogni frame).
+- Aperto: left = right specchiato; i tempi d'attacco nuovi vanno provati
+  giocando; nemico_base e pet restano placeholder.
