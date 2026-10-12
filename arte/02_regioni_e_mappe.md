@@ -58,8 +58,9 @@ Palette: burnt orange horizon, deep violet-blue sky, full black silhouettes,
 gold accents. Aspect 16:9.
 ```
 
-Salva in `assets/concept/regioni/<id>.png` (es. `marche_crepuscolo.png`,
-`trono_del_gigante.png`). Materiale di riferimento per atmosfera/palette, non
+Salva in `assets/concept/regioni/<id>.jpg` (es. `marche_crepuscolo.jpg`,
+`trono_del_gigante.jpg`; il nome e' l'`id` della regione, non quello che
+assegna Gemini). Le 6 key art attuali sono gia' rinominate cosi'. Materiale di riferimento per atmosfera/palette, non
 un asset di gioco.
 
 ## 5. Tileset di gioco (pixel art reale)
@@ -69,9 +70,13 @@ un asset di gioco.
 32x32. Quando disegni il tileset vero di una regione:
 
 1. Stessa griglia: 4 tile 32x32, edge-tileable (i bordi combaciano tra loro).
-2. Palette della regione (max inchiostro + primario + accento, cap. 4).
-3. Outline scuro 2px, niente anti-aliasing, coerente con lo stile pixel degli
-   sprite (vedi `03_sprite_e_animazioni.md`).
+2. Palette della regione (inchiostro + primario + accento, cap. 4), in ramp
+   di 3 toni con hue shift come gli sprite (`03_sprite_e_animazioni.md`).
+3. **Niente contorno su pavimento e acqua**: si ripetono, e un contorno per
+   tile mostrerebbe la griglia. Muro e ostacolo hanno contorno 1px color
+   inchiostro solo dove toccano il pavimento. Luce da alto-sinistra, niente
+   anti-aliasing sul bordo esterno. Il dithering va bene qui (aree grandi e
+   ferme), non sugli sprite.
 
 Prompt di riferimento (`art-brief-gemini.md` cap. 6.5):
 
@@ -79,8 +84,9 @@ Prompt di riferimento (`art-brief-gemini.md` cap. 6.5):
 [BLOCCO STILE PIXEL — vedi 03_sprite_e_animazioni.md]
 A small tileset strip: four 32x32 top-down terrain tiles side by side for
 [regione] — (1) walkable ground, (2) solid wall, (3) a low obstacle,
-(4) water. Each tile self-contained and edge-tileable. Palette [inchiostro +
-primario + accento della regione]. Aspect 4:1.
+(4) water. Each tile self-contained and edge-tileable. No outline on ground
+and water, 1px dark outline only where wall and obstacle meet the ground.
+Palette [inchiostro + primario + accento della regione]. Aspect 4:1.
 ```
 
 Riferimento generato da IA → `assets/concept/sprite_ref/tileset_<regione>.png`.

@@ -8,7 +8,9 @@ struttura resta), `data/animations.json` (timing).
 
 1. **Il tratto a pennello.** I colpi sono calligrafia: linee spesse, cariche,
    con inizio/fine irregolari — sprite a 2-3 frame, outline nero 2px pesante,
-   UN colore di Pathway dentro. Mai gradienti, mai glow morbido.
+   UN colore di Pathway dentro. Mai gradienti, mai glow morbido. Il 2px e'
+   un'eccezione voluta dei soli VFX: personaggi e tile usano 1px
+   (`03_sprite_e_animazioni.md`).
 2. **Il nero come strumento.** Nei momenti forti lo sfondo si mangia di nero
    per qualche frame e restano silhouette + accenti (vedi "nero di scena"
    sotto).

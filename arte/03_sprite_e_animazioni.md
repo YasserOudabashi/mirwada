@@ -15,6 +15,20 @@ lettura comoda del giorno in cui e' stata scritta.
 - Sfondo **trasparente** nell'asset finale (durante la generazione IA si usa
   uno sfondo magenta piatto, da chroma-key-are dopo, vedi cap. 4).
 
+### Regole di disegno (fonte: `art-brief-gemini.md` cap. 6.7)
+
+- **Contorno 1px** color inchiostro (mai `#000000`, mai 2px); sul lato
+  illuminato diventa il tono scuro del materiale (*selout*). Il contorno
+  pesante 2px resta solo nei VFX (`04_combattimento_vfx.md`).
+- **Luce da alto-sinistra**, la stessa in ogni sprite e in ogni frame.
+- **Max 16 colori**, in ramp di 3 toni per materiale con hue shift di 10-20
+  gradi (ombre verso blu/viola, luci verso giallo); l'inchiostro e' il tono
+  piu' scuro di tutte le ramp.
+- **Chibi**: testa 1/3-1/2 dell'altezza, figura al 70-85% della cella.
+- **Niente anti-aliasing sul bordo esterno**, niente pixel isolati.
+- `left` ottenuto specchiando `right` specchia anche la luce: decidilo.
+- In idle/walk i piedi non si muovono: si sposta il busto di 1px.
+
 ## 2. Cosa disegnare, animazione per animazione
 
 ### Personaggio (protagonista) — 156 frame totali col budget a 4 direzioni
@@ -58,9 +72,12 @@ Blocco di stile pixel (diverso da quello delle illustrazioni,
 
 ```
 STYLE: 2D pixel art, low resolution, top-down action-RPG, ~32x32 px
-character proportions, limited palette (black outline + 3 colours), hard 2px
-black outline, no anti-aliasing, no gradients, readable silhouette. Plain
-flat magenta background (per il chroma-key dopo).
+chibi proportions (head about 1/3 of the height), limited palette (at most
+16 colours, grouped in short 3-tone ramps: shadows shift toward blue-violet,
+highlights toward warm yellow), crisp 1px near-black outline (not pure
+black), single light source from the top left, no anti-aliasing on the outer
+edge, no gradients, readable silhouette. Plain flat magenta background (per
+il chroma-key dopo).
 DO NOT: high resolution, painterly, smooth shading, 3D, isometric, text.
 ```
 
@@ -94,6 +111,40 @@ placeholder diagnostici:
 ```bash
 python tools/generate_placeholders.py
 ```
+
+## 4b. Disegnare con la skill `sprite-forge` (consigliato)
+
+`sprite-forge` scrive lo sprite come **dati** (griglie di caratteri +
+palette), lo controlla e lo trasforma in PNG: ogni pixel e' una scelta
+esplicita e correggibile, e le regole del cap. 1 le verifica `check.py`.
+
+1. **Un JSON per file di gioco**, es. `arte/sprite/personaggio_idle.json`,
+   con `"name": "personaggio_idle"`, `"size": [32, 32]`,
+   `"pivot": [16, 31]` (`piedi_centro`) e le ramp dichiarate in `"ramps"`.
+2. **Un'animazione per direzione**, chiamate `down`, `up`, `left`, `right`
+   **in quest'ordine**: lo sheet ha una riga per animazione, quindi le righe
+   escono gia' nell'ordine che il codice si aspetta. Le animazioni non
+   direzionali (`death`, `meditate`) hanno una sola animazione, una sola riga.
+3. **Numero di frame** = quello di `data/animations.json`; `ms` di ogni
+   frame = `1000 / fps` di quel file (es. `idle` a 6 fps -> 167 ms), cosi'
+   l'anteprima gira al tempo vero del gioco.
+4. Controllo e render, **senza padding** (la griglia del gioco non ne ha):
+   ```bash
+   python scripts/check.py arte/sprite/personaggio_idle.json --out out
+   python scripts/render.py arte/sprite/personaggio_idle.json --out out --padding 0
+   ```
+   (`scripts/` e' la cartella della skill.) Guarda `_preview.png` e
+   `_checks.png`, correggi errori e avvisi, rilancia.
+5. Copia `out/personaggio_idle/personaggio_idle_sheet.png` su
+   `assets/placeholder/personaggio_idle.png` e verifica la dimensione:
+   colonne x 32 per righe x 32 (idle: 128x128, death: 256x32).
+
+**Tempi: non cambiarli da qui.** La skill consiglia idle a 250-500 ms per
+frame, walk a 100-150 ms e attacchi con durate diverse per frame (anticipo
+lento, colpo veloce). Oggi `data/animations.json` ha un solo fps per
+animazione (idle 167 ms, walk 83 ms, attacchi uniformi). Cambiarli tocca il
+feel del combattimento e la finestra di parata; le durate per frame
+richiedono codice nella macchina a stati. E' una story a parte.
 
 ## 5. Budget di lavoro
 

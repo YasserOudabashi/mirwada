@@ -6,8 +6,12 @@ Da `006_PRD/art-brief-gemini.md` cap. 7-8, valida per qualunque categoria
 ## Checklist di qualita'
 
 - [ ] **Palette**: inchiostro scuro + massimo 2 colori in piu' per le
-      illustrazioni, outline + 3 colori per la pixel art. Un colore in piu' =
-      rifiuta e ridisegna.
+      illustrazioni e i VFX (un colore in piu' = rifiuta e ridisegna). Sprite
+      e tile: massimo 16 colori in ramp di 3 toni con hue shift.
+- [ ] **Pixel art** (sprite e tile): contorno 1px color inchiostro, luce da
+      alto-sinistra, niente anti-aliasing sul bordo esterno, niente pixel
+      isolati, nessun contorno su pavimento/acqua. Se usi `sprite-forge`,
+      `check.py` deve uscire senza errori.
 - [ ] **Stile**: neri pieni, tratto a pennello, spazio negativo. Se sembra un
       render 3D o un disegno "anime carino" = rifiuta.
 - [ ] Niente testo, watermark, firme o cornici decorative sull'immagine.
@@ -26,9 +30,9 @@ Da `006_PRD/art-brief-gemini.md` cap. 7-8, valida per qualunque categoria
 
 ```
 assets/concept/
-  regioni/       mirwada.png, marche_crepuscolo.png, valle_madre.png,
-                 archivio_sepolto.png, frontiera_porte.png,
-                 trono_del_gigante.png
+  regioni/       mirwada.jpg, marche_crepuscolo.jpg, valle_madre.jpg,
+                 archivio_sepolto.jpg, frontiera_porte.jpg,
+                 trono_del_gigante.jpg
   ritratti/      enel.png, mirco.png, sidon.png, vesna.png, aldo.png,
                  ottavia.png, bruno.png, lena.png, doran.png
   ui/            scaffale.png, pagina_pulita.png, pagina_follia.png,
