@@ -4,6 +4,11 @@ Action-RPG 2D esplorativo con sistema di progressione a Pathway/Sequenze.
 **10 Pathway attivi (4 gruppi completi), 100 Sequenze.**
 Leggi questo file a inizio di ogni sessione, poi `progress.txt` e `prd.json`.
 
+> **Versione 2.** Rispetto alla v1 cambiano le regole sull'arte: tutti gli asset grafici li
+> genera Claude (o Claude Code) con la skill `sprite-forge`, senza artista e senza disegno a mano.
+> Le regole sui dati, il metodo di lavoro e i sistemi di gioco restano quelli di prima.
+> Le decisioni cambiate sono elencate in "Cosa è cambiato rispetto alla v1" in fondo.
+
 ---
 
 ## Le tre regole che non si negoziano
@@ -14,48 +19,200 @@ Il codice implementa **primitive**. I dati compongono **abilità**.
 
 - Il registro delle primitive in `data/schema/primitives.json` è **chiuso**:
   28 attive + 3 differite. Usare una primitiva differita fa fallire il
-  validator: è codice che nessun Pathway attivo richiede. Se un'abilità sembra richiederne una nuova, quasi sempre significa
-  che una primitiva esistente è sottoparametrizzata. Parametrizza quella.
+  validator. Se un'abilità sembra richiederne una nuova, quasi sempre significa
+  che una primitiva esistente è sottoparametrizzata: parametrizza quella.
   Aggiungere una primitiva richiede una discussione esplicita con l'utente.
 - Il vocabolario degli eventi in `data/schema/tracked_events.json` è **chiuso**:
-  12 voci. Le azioni di recitazione sono contatori su questi eventi, mai azioni
-  descritte a parole. Un evento nuovo è **codice**: va discusso.
-- Il vocabolario dei tag in `data/tags.json` è **chiuso**. Serve a impedire
-  che `fiamma` e `fuoco` coesistano rompendo silenziosamente le sinergie.
-- Nessun nome di Pathway o Sequenza hardcoded in script o UI. Solo id e chiavi
-  i18n. Motivo: il flag `SERIAL_NUMBERS_FILED_OFF` deve poter rinominare tutto
-  sostituendo file di dati, mai toccando codice.
+  12 voci. Un evento nuovo è **codice**: va discusso.
+- Il vocabolario dei tag in `data/tags.json` è **chiuso**.
+- Nessun nome di Pathway o Sequenza hardcoded in script, UI o **nomi di file**.
+  Solo id e chiavi i18n. Il flag `SERIAL_NUMBERS_FILED_OFF` deve poter rinominare
+  tutto sostituendo file di dati, mai toccando codice.
 
 **Se ti trovi a scrivere una `if` per un caso specifico di un Pathway, fermati.**
 Quasi certamente è un dato mancante, non un caso speciale.
 
 ### 2. Ponytail
 
-Diff minimo che funziona. Riusa i pattern già presenti nel codebase. Nessuna
-astrazione non richiesta. Se una story si chiude aggiungendo una riga a un
-JSON invece che una classe, si aggiunge la riga al JSON.
+Diff minimo che funziona. Riusa i pattern già presenti. Nessuna astrazione non
+richiesta. Se una story si chiude aggiungendo una riga a un JSON invece che una
+classe, si aggiunge la riga al JSON.
 
 ### 3. Una story, una iterazione
 
 Ogni story deve chiudersi in una context window. Se ne tocchi più di ~4 file o
 superi ~200 righe di diff, la story era troppo grande: segnalalo e proponi di
-spezzarla invece di tirare dritto.
+spezzarla. **Eccezione per l'arte:** i PNG e i JSON generati da `sprite-forge`
+non contano nel conteggio dei file né delle righe, ma il comando che li produce
+va scritto nella story.
+
+---
+
+## Come lavora Claude con l'utente (Asso)
+
+- **Prima di scrivere codice, spiega come funziona e aspetta il via.** Il codice parte solo
+  dopo che l'utente ha accettato la spiegazione. Vale anche per gli script di generazione
+  degli asset. Non vale per file di testo o documentazione.
+- Quando l'utente chiede del codice, lo spieghi bene, con parole semplici e un esempio.
+- Quando c'è un errore, dici **come correggerlo**, non solo che c'è.
+- Rispondi in italiano.
+
+---
+
+## Arte e asset: tutto generato da Claude
+
+### Chi fa cosa
+- **Tutti gli sprite, i tile, gli effetti, i panorami e le mappe li genera Claude** con la skill
+  `sprite-forge` (cartella `scripts/forge3d/`, comando `scripts/forge.py`). Nessuno disegna a mano.
+- I file generati sostituiscono i placeholder **uno a uno**. La specifica in
+  `data/animations.json` non cambia quando arriva l'arte vera.
+- Un asset non è finito finché Claude non l'ha **guardato**: dopo ogni generazione apri
+  l'immagine ingrandita (`forge.py contact FILE --scale 4`) e correggi ciò che non si legge.
+  Mai consegnare un asset visto solo come numeri.
+
+### Come si genera (flusso di ogni story d'arte)
+1. **Brief** in 4 righe: cosa, vista, dimensione, palette, animazioni richieste.
+2. Spiega all'utente cosa genererai e aspetta il via (vedi sopra).
+3. **Genera** con `forge.py` oppure con un piccolo script che importa `forge3d`.
+   Lo script va in `tools/art/` e si può rilanciare: stessi parametri e stesso `seed` = stessi PNG.
+4. **Guarda** il risultato ingrandito, su sfondo chiaro e scuro. Controlla silhouette,
+   viso, arma, direzioni, e che il primo e l'ultimo frame di un ciclo combacino.
+5. **Esporta** in `assets/` con il naming sotto.
+6. `python tools/validate_data.py` esce 0, i test headless passano.
+7. Annota in `progress.txt` il comando usato, il seed e cosa non ti convince ancora.
+
+### Formato dei file
+- Sheet per animazione: `assets/<cartella>/{categoria}_{nome}.png`, frame in **colonne**,
+  direzioni in **righe** nell'ordine `down, up, left, right`. Le animazioni non direzionali
+  hanno una sola riga. È lo stesso formato dei placeholder, quindi `animation_machine.gd` non cambia.
+- Il numero di frame, gli fps, e le fasi (`anticipo`, `attivi`, `recupero`, `iframe_*`,
+  `finestra_perfetta`) restano **solo** in `data/animations.json`. Se cambi i frame di un
+  attacco, cambi il JSON e rigeneri lo sheet: il generatore legge il JSON.
+- Nomi dei file e id: solo id dei dati (`personaggio`, `nemico_base`, `pet`, `fire`, ...).
+  Mai nomi di Pathway o Sequenza nei nomi dei file.
+- Tutte le animazioni di una stessa categoria hanno **la stessa dimensione di frame**.
+  Mai mescolare 32 e 64 nella stessa categoria.
+
+### Risoluzione
+- **Default: 32×32 per frame, tile da 32, viewport 640×360** (come ora). È il formato in cui
+  tutto è già drop-in e testato.
+- **Hi-res 64×64** è consentito, ma è una decisione di progetto, non di singolo asset: si cambia
+  `dimensione_frame` in `data/animations.json`, la dimensione tile e la scala di camera **in una
+  sola story**, poi si rigenerano tutte le categorie con `--size 64 --ppu 2`.
+  **Decisione aperta: 32 o 64.** Finché l'utente non decide, si lavora a 32.
+- Scalatura sempre a **multipli interi**. Mai filtri sfumati.
+
+### Colore e stile
+- Palette master del progetto: **Endesga 32** (stessa di `forge3d/materials.py`). Non inventare
+  colori fuori palette senza motivo. I colori extra (come i grigi-verde di terreni e panorami)
+  vanno nelle rampe di `terrain.py`/`vfx.py`, non sparsi nei file.
+- Ogni materiale è una **rampa di 3–5 tonalità**, con hue shift di circa 15–20° per step:
+  luci verso il caldo, ombre verso il freddo. Niente nero puro tranne il contorno `#181425`.
+- **Una sola luce**, in alto a sinistra e un po' davanti, uguale in tutti gli sprite e frame.
+- Contorno scuro di 1 px, mai 2. Niente anti-aliasing sul bordo esterno: i pixel sono solo
+  trasparenti (alpha 0) o pieni (alpha 255). L'ombra a terra è l'unica eccezione e va
+  composta nel gioco, non cotta nello sprite, se serve cambiare terreno.
+- Gli sfondi sono meno saturi e meno contrastati dei personaggi.
+- Il giocatore deve leggere a colpo d'occhio: **silhouette** riconoscibile in nero pieno,
+  arti separati dal corpo nelle pose chiave, faccia visibile.
+
+### Animazione (valori di partenza, da regolare a occhio)
+Fonti: guide di pratica, non misure ufficiali. In caso di dubbio decide la prova a schermo.
+
+| Animazione | Frame | Durata per frame | Regola |
+|---|---|---|---|
+| idle | 4 | ~170 ms (6 fps) | respiro, mai fermo del tutto |
+| walk | 6 | ~80 ms (12 fps) | contact tenuti un po' più dei passing, bob di 1 px |
+| attack leggero | 5 | ~60 ms (16 fps) | anticipo 2 frame, colpo 1, recupero 2 |
+| attack pesante | 8 | ~70 ms (14 fps) | anticipo di 4 frame **leggibile**: è il tell del combattimento |
+| dash | 4 | ~50 ms (20 fps) | iframe 0–2 |
+| morte | 6–8 | ~100 ms | l'ultimo frame resta a terra |
+
+- I **frame d'impatto** si tengono di più, il passaggio veloce è nel mezzo (ease in/out).
+- Il **tell del nemico** (`nemico_base.anticipo`) deve essere visibile anche in un frame
+  fermo: pose estreme, mai sottili.
+- Il ciclo si chiude: il frame dopo l'ultimo è il primo.
+- Oltre ~15 fps effettivi la pixel art perde carattere.
+
+### Effetti (VFX)
+- Generati con `forge3d/vfx.py` (`slash`, `impact`, `projectile`, `explosion`, `aura`,
+  `lightning`, `circle`, `smoke`). La **forma** è una, il **colore** cambia con la palette.
+- Le palette VFX hanno id neutri (`fire`, `ice`, `arcane`, `shadow`, `holy`, `poison`, `steel`,
+  `blood`, `lightning`, `nature`). Il legame Pathway → palette sta in `data/vfx.json`,
+  mai nel codice.
+- Un effetto d'attacco ha l'impatto in 1 frame bianco più 3–4 frame di dissolvenza.
+- Rispetta `riduci_flash`: gli effetti con flash bianco devono avere una variante attenuata.
+
+### Mondo, mappe e biomi
+- **La generazione procedurale del mondo è consentita come strumento di produzione**:
+  `forge3d/world.py` produce biomi, fiumi, laghi, villaggi, strade, oggetti e spawn dal `seed`.
+- Il risultato **si salva come dati** (`world.json` + atlanti PNG) e si committa. Il gioco
+  carica i dati, non rigenera il mondo a runtime. Il seed e i parametri vanno in `progress.txt`.
+- Le regioni di Mirwada (`data/regions.json`) hanno la precedenza: una regione si genera con un
+  preset di bioma e **poi si ritocca nei dati**. Mai ritoccare il PNG a mano.
+- Terreni: tecnica "dual grid" a livelli, 16 tile per terreno. L'ordine di priorità dei terreni
+  è in `forge3d/terrain.py` (`ORDER`). Un terreno nuovo è una riga lì, non una classe.
+- Nel gioco il mondo si carica con `scripts/world/sprite_forge_world.gd` (copiato da
+  `engines/godot/`). Le PNG si leggono senza import dell'editor.
+- Spawn, insediamenti e NPC usciti dal generatore sono **suggerimenti**: i personaggi veri
+  restano nei dati (`data/npcs`, `data/factions`) e non vengono scritti dal generatore.
+- Panorami (`forge3d/panorama.py`): strati separati per il parallasse (`sky`, `clouds`,
+  `far`, `mid`, `near`, `fg`), con le quattro fasce del `TimeSystem` (alba, giorno,
+  tramonto, notte).
+
+### Impostazioni Godot per la pixel art
+- Default Texture Filter = **Nearest**.
+- Rendering → 2D → **Snap 2D Transforms to Pixel** attivo.
+- Stretch mode **viewport**, scala intera.
+- Se uno sprite è sfocato: reimporta e controlla il filtro prima di toccare il PNG.
+
+### Limiti noti del generatore (da migliorare, non da aggirare a mano)
+- A 32 px il viso è ridotto al minimo; a 48–64 px si legge bene.
+- Nella preparazione degli attacchi l'arma può restare dietro la testa.
+- Il ponte è un rettangolo di legno.
+- I panorami sono ancora piatti.
+- Mancano: acconciature lunghe, animazioni di arrampicata/nuoto, mostri volanti, edifici
+  (castelli, case, ponti dettagliati). Vanno aggiunti a `forge3d`, con una story dedicata.
+- Una correzione al generatore (ad esempio il viso) è una story a sé e **rigenera tutto**
+  con lo stesso seed, poi si confronta il prima e il dopo.
+
+### Checklist automatica di ogni asset
+- [ ] Tutti i colori sono in palette (nessun colore fuori dalle rampe)
+- [ ] Alpha solo 0 o 255, tranne l'ombra a terra
+- [ ] Nessun pixel isolato e nessun contorno doppio
+- [ ] Silhouette leggibile e luce coerente in tutti i frame
+- [ ] Tutti i frame hanno la stessa dimensione e lo stesso pivot (**piedi al centro in basso**)
+- [ ] Numero di frame uguale a quello di `data/animations.json`
+- [ ] Il ciclo si chiude (ultimo → primo)
+- [ ] Anteprima ingrandita su sfondo chiaro e scuro guardata
+- [ ] `python scripts/selftest.py` (di sprite-forge) esce 0
 
 ---
 
 ## Comandi
 
 ```bash
-# Validazione dei dati — DEVE uscire 0 prima di ogni commit
+# Validazione dei dati: DEVE uscire 0 prima di ogni commit
 python tools/validate_data.py
 
-# Rigenera i 324 frame placeholder da data/animations.json
+# Placeholder (restano come ripiego per le animazioni non ancora generate)
 python tools/generate_placeholders.py
 
-# Rigenera la spina dorsale dei pathway (idempotente, preserva il lavoro fatto)
+# Arte vera, da data/animations.json
+python tools/art/generate_all.py            # tutte le categorie
+python tools/art/generate_all.py --only personaggio
+
+# Singoli asset con la skill
+python scripts/forge.py character --spec data/animations.json --category personaggio --out assets/placeholder
+python scripts/forge.py vfx --kind slash --palette fire --out assets/vfx
+python scripts/forge.py world --out assets/world --w 128 --h 96 --seed 4 --godot --preview
+python scripts/forge.py contact FILE.png --scale 4
+
+# Rigenera la spina dorsale dei pathway (idempotente)
 python tools/generate_pathways.py
 
-# Test headless — esce 0 se tutto passa
+# Test headless: esce 0 se tutto passa (Godot 4.3)
+godot --headless --path . --import          # solo dopo aver cambiato le PNG
 godot --headless --path . --script res://tests/run_tests.gd
 ```
 
@@ -66,13 +223,20 @@ godot --headless --path . --script res://tests/run_tests.gd
 data/
   schema/         schemi JSON, registro chiuso delle primitive,
                   vocabolario chiuso dei 12 eventi tracciabili
-  pathways/       10 file, 100 sequenze — la spina dorsale
+  pathways/       10 file, 100 sequenze: la spina dorsale
   pathways_deferred/  12 pathway fuori scope, completi. NON cancellati.
   abilities/      abilità composte dalle primitive
   synergies/      regole di sinergia data-driven
+  animations.json timing e fasi di ogni animazione (unica fonte)
+  vfx.json        effetti per primitiva e legame Pathway → palette
   tags.json       vocabolario chiuso dei tag
-tools/            generatore e validator
-scenes/ scripts/ assets/ tests/    (creati in fase 1)
+tools/            generatore, validator
+tools/art/        script di generazione asset (rilanciabili, con seed)
+scripts/world/    loader del mondo (sprite_forge_world.gd)
+scenes/ scripts/ assets/ tests/
+assets/placeholder/   sheet {categoria}_{nome}.png (ora generati da sprite-forge)
+assets/world/         world.json + terrain_*.png + objects/
+assets/vfx/           sheet degli effetti
 prd.json          story della fase corrente per ralph
 progress.txt      memoria tra le iterazioni
 ```
@@ -84,257 +248,95 @@ progress.txt      memoria tra le iterazioni
 - [ ] `python tools/validate_data.py` esce 0
 - [ ] nessuna regressione sulle story precedenti
 - [ ] story con UI/gameplay: verifica a schermo documentata in `progress.txt`
+- [ ] **story d'arte: comando di generazione + seed in `progress.txt`, asset guardato ingrandito, checklist automatica spuntata**
 - [ ] `progress.txt` aggiornato con cosa fatto, come verificato, cosa resta aperto
 - [ ] `prd.json`: story a `"passes": true` con `notes` compilate
 - [ ] commit dei soli file toccati, messaggio `US-NNN: <cosa>`
 
 ## Fasi
 
-Fase 1 — Fondamenta: **CHIUSA** (27 story, 112 test, CI). PRD storico in
-`006_PRD/prd-fase-1-fondamenta.md`.
+Fasi 1–7 e 5b: **CHIUSE** (776 test). Sistemi, Pathway, sinergie, mondo, endgame completi con
+zero righe di codice dedicate a un contenuto specifico. Dettagli in `progress.txt` e in
+`006_PRD/prd-fase-*.md`.
 
-Fase 2 — Pathway Core: **CHIUSA** (35 story, 318 test). PRD in
-`006_PRD/prd-fase-2-pathway-core.md`. Criterio di uscita verificato in US-219:
-il Twilight Giant va dalla Sequenza 9 alla 5 con zero codice dedicato
-(verdetto in `progress.txt`). Include: motore Pathway/Sequenza, Acting Method
-+ EventTracker, Follia (audio + VFX + Ancore), pozioni e rituali, i18n reale
-(`data/i18n/`, `tr_data`), shell del libro (ogni schermata e' una pagina:
-scaffale, frontespizio, diagramma con fog of war, colophon/impostazioni),
-`data/vfx.json` + renderer VFX per primitiva.
+Fase corrente: **8 — Vertical slice giocabile** (IN CORSO). Collega i sistemi già scritti,
+riempie i dati mancanti, e ora usa **grafica generata da sprite-forge** al posto dei
+quadrati placeholder.
 
-Fase 3 — Sistemi di supporto: **CHIUSA** (35 story US-301..336, 498 test).
-PRD in `006_PRD/prd-fase-3-sistemi-di-supporto.md`. 8 blocchi: inventario/
-equip, alchimia, forgiatura/sigilli, strutture, pet, base building, talenti,
-integrazione. Save da schema_version 12 a 19. Verdetto sull'architettura
-verificato in US-335 (`tests/test_slice_fase_3.gd`): coltivazione, alchimia,
-forgia, sigilli, pet, talenti e sinergie compongono un ciclo completo con
-**zero righe di codice dedicate a un contenuto specifico**. Vocabolari chiusi
-nuovi: `item_categories`, `equip_slots`, `room_types`, `tracked_talents`
-(distinto dai 12 `tracked_events`, invariati), effetti dei sigilli,
-`experiment_outcomes`. Nessuna primitiva nuova. Fonti di tag per la fase 4:
-`SynergySources.tag_sinergia_globali()` (inventario + pet + talenti + stanze).
+- PRD: `006_PRD/prd-fase-8-vertical-slice.md` (14 story, US-801..US-814).
+- Come eseguirlo: `006_PRD/prossimi-passi.md`. Leggilo prima di toccare qualunque file.
 
-Fase 4 — Sinergie: **CHIUSA** (16 story US-401..416, 535 test). PRD in
-`006_PRD/prd-fase-4-sinergie.md`. 3 blocchi: A il motore (`SynergyEngine`
-autoload, i 6 tipi di effetto, priorità/conflitti, anti-sinergie con
-`neutralizza`, save 19 → 20), B il registro nel libro (sezione della pagina
-inventario col fog of war, reattiva dal vivo), C il contenuto (44 sinergie
-di cui 26 raggiungibili; `batch_3.json` punta ai gruppi differiti;
-`sinergia_colpo_del_caso` scritta). Criterio di uscita verificato in
-`tests/test_slice_fase_4.gd`: `sinergia_dottrina_del_guardiano` si attiva solo
-combinando pet + stanza + talento, con zero codice dedicato. Nessuna primitiva
-nuova. `synergy.schema.json` esteso (`priorita`, `effetto` oneOf, `neutralizza`).
+**Proposta di fase 8b — Arte (da approvare):**
+1. Personaggio, nemico base e pet a 32 px con tutte le animazioni di `animations.json`.
+2. Tileset della prima regione e mappa di prova dal generatore.
+3. 2 VFX d'attacco e 1 d'abilità, con palette da `data/vfx.json`.
+4. Decisione 32 o 64 px, poi rigenerazione.
+5. Panorama della schermata iniziale e del libro.
 
-Fase 5 — Espansione contenuti: **CHIUSA** (22 story US-501..522, 570 test).
-PRD in `006_PRD/prd-fase-5-espansione-contenuti.md`. 6 blocchi: 0 fondamenta
-(`location_tags.json`, matrice di proprietà nel validator, `darkness_1` senza
-`probability_shift`, acting = 1.0), 1 Death + **checkpoint**, 2 Moon, 3 Mother,
-4 Paragon, 5 Hermit, 6 chiusura. **5 Pathway nuovi completi** (Death, Moon,
-Mother, Paragon, Hermit, 10/10 Sequenze). **7 primitive implementate** (fear,
-reveal_info, teleport, soul_detach, resurrect, plant_growth, mind_read).
-`paragon_1`/`hermit_1` riscritte senza `rule_bind`. Save invariato.
-
-**Il punto di controllo è stato superato (US-508)**: `test_slice_fase_5.gd`
-gioca Death Seq 8→2 in codice con zero righe che nominano "death"; il `git diff`
-del blocco tocca solo 5 handler `_p_<primitiva>` + `player.teleport_verso`,
-`AbilityEngine.execute` intatto. L'architettura della fase 2 regge oltre il
-Twilight Giant.
-
-Fase 6 — Mondo: **CHIUSA** (22 story US-601..622 + US-613b/US-616b, 669 test).
-PRD in `006_PRD/prd-fase-6-mondo.md`. 9 blocchi (A regioni, B condizioni del
-tempo, C Darkness, D gating, E NPC, F dialoghi, G fazioni + quest, H mappa +
-densità + audio, I narrativa + chiusura). Save `schema_version` **20 → 21**
-(US-602, l'unico bump: tempo/npc/reputazione/quest/flag stanno tutti nel campo
-`mondo` senza bumpare). 5 regioni giocabili data-driven; `TimeSystem`
-(giorno/notte + fasi lunari) che fa valere `e_notte`/`fase_lunare`/`in_zona_tag`
-delle abilità (`Conditions` condiviso da AbilityEngine e DialogueEngine);
-**Darkness completo 10/10** + `shadow_meld`/`illusion` (fase 5b interlacciata);
-`AreaGate` che applica `regions.json.gating[]` (6 modi); 8 NPC + `DialogueEngine`
-+ i 9 grafi; `FactionSystem` (comportamenti automatici dai dati);
-`QuestSystem` (lettore di eventi + flag, zero verbi nuovi) + 4 quest di Atto I +
-Journal; pagina mappa (fog of war, fast travel = potere); densità mistica;
-audio del mondo come **spec** (nessun file audio prodotto);
-`data/lore/antagonisti.json` (antagonista strutturale per Pathway). Vocabolari
-chiusi nuovi: `gate_types.json` (6), effetti dialoghi (6), effetti quest (5),
-livelli di reputazione. Schema nuovi: `npc`/`dialogue`/`quest`/`faction`/`region`.
-
-Fase 5b — Lord of Mysteries: **CHIUSA** (12 story US-5B01..5B12, 713 test).
-PRD in `006_PRD/prd-fase-5b-lord-of-mysteries.md`. 4 blocchi (A Error +
-checkpoint, B Fool, C Door, D chiusura). Save `schema_version` **invariato**.
-**Fool, Error, Door completi 10/10** → con Darkness (chiuso in fase 6) e i 19
-già fatti: **22/22 Pathway attivi completi, 100/100 Sequenze non-stub**.
-3 primitive implementate: `steal` (categoria oggetto/abilita/conoscenza,
-+param `ability_id`/`non_sottrae`), `possess` (status `posseduto`, record
-`corpo_a_terra` come `soul_detach`), `time_rewind` (ring buffer di snapshot
-per-caster in `AbilityEngine`, non tocca il save). `illusion`/`shadow_meld`
-erano già di fase 6; `_p_illusion` esteso (`potenza` per-`tipo_illusione`).
-`chain` resta senza handler (nessuna Sequenza attiva lo richiede).
-`fool_2` riscritta senza `probability_shift` (grep di `data/abilities/` per
-una primitiva differita come `tipo` → **0**). Materia prima `avatar` nuova in
-`ownership.json` (Error: avatar autonomi; Fool: `illusion`). `batch_5.json`:
-6 sinergie del gruppo + `anti_due_bugiardi`. Criterio di uscita verificato in
-`tests/test_slice_fase_5b.gd` (Error 8→2, zero codice che nomina "error";
-diff `.gd` del blocco A = solo `ability_engine.gd` +173 -0, dispatcher
-intatto) e nel validator (check di chiusura fase 5b).
-
-Fase 7 — Endgame: **CHIUSA** (21 story US-701..721, 776 test). PRD in
-`006_PRD/prd-fase-7-endgame.md`. 5 blocchi (0 fondamenta, A cambio Pathway +
-fusione, B tribolazioni, C Sequenze alte/preghiere + siti rituali, D finali +
-eredità, E checkpoint + chiusura). Save `schema_version` **21 → 22**
-(US-701, l'unico bump: cambio Pathway, fusioni, tribolazioni superate,
-eredità, finale stanno tutti nel campo `endgame`). Include: `PathwayChange`
-(cambio solo tra vicini dello stesso gruppo) + `FusionEngine` (1 percorso
-completo `error_door`, 7 stub dichiarati per la fase 7b); `TribulationSystem`
-(lettore di eventi/flag, blocca `Progression.avanza` ai 4 salti di fascia);
-6 abilità di "preghiera" sulle Sequenze alte (campo puramente semantico) +
-4 siti rituali di Sequenza 0 condivisi per gruppo; `data/endings.json` (3
-finali) + `EndingSystem` (nessun tipo di condizione nuovo, la Consumazione
-È il game over per follia); schermata di finale che estende il colophon
-(nessun tipo di pagina nuovo); eredità al personaggio successivo (tutte e
-quattro le voci, scelte dal giocatore, riapplicate a un nuovo personaggio
-sullo stesso slot); fog of war sui nomi di Sequenza nel diagramma (richiesta
-utente in corsa: si conosce al più il nome della Sequenza successiva).
-
-**Verdetto del checkpoint (US-720)**: `test_slice_fase_7.gd` fa attraversare
-a un personaggio l'intero ciclo — cambio Pathway con fusione, una
-tribolazione superata, un finale raggiunto, l'eredità riapplicata a un
-nuovo personaggio — con zero righe di codice che nominino un Pathway, una
-coppia di fusione, una tribolazione o un finale specifico.
-`scripts/ability_engine.gd` non è stato toccato in tutta la fase.
-
-Fase corrente: **8 — Vertical slice giocabile** (IN CORSO). Le fasi 1-7
-hanno costruito tutti i sistemi, ma **nessuno può giocare il gioco con la
-tastiera**: `main.tscn` è rimasta la scena di prova della fase 1 (nessuna
-partita avviata, nessun tasto per le abilità, proiettili che non fanno
-danno, recitazione ferma all'1.5%, i 299 ingredienti delle formule che non
-esistono come oggetti, mondo senza nemici né oggetti). La fase 8 collega i
-sistemi già scritti, riempie i dati mancanti e mette una grafica
-provvisoria generata: **zero sistemi nuovi**, save invariato.
-
-- PRD: `006_PRD/prd-fase-8-vertical-slice.md` — 14 story (US-801..US-814)
-  in 7 blocchi, ognuna con acceptance criteria verificabili.
-- **Come eseguirlo: `006_PRD/prossimi-passi.md`** — ordine delle
-  operazioni, quando usare `/prd` e `/ralph`, setup dell'ambiente, comandi
-  di verifica, e le trappole già scoperte (isolamento dei test, libro
-  lasciato aperto, nomi reali dei segnali...). **Leggilo prima di toccare
-  qualunque file.**
-
-Fase 9 (opzionale, non bloccante): Pathway Non-Standard, avanzamento per
-Boon — il PRD si genera con `/prd` solo quando si decide di farla davvero.
-Roadmap in `006_PRD/roadmap.md`.
-
-Prova che l'architettura regge: `data/abilities/twilight_giant.json` (fase 2),
-i 5 Pathway di fase 5, i 3 del Lord of Mysteries (fase 5b) e l'intero
-endgame di fase 7 sono contenuto/motori completi con **zero righe di
-codice dedicate**. È il modello da imitare per ogni story di dati.
+Fase 9 (opzionale): Pathway Non-Standard, avanzamento per Boon.
 
 ## Decisioni prese
 
-- **Engine**: Godot 4.x, GDScript. Alternativa scartata: Unity 2D (più
-  boilerplate per un sistema così data-driven; le Resource di Godot mappano
-  meglio sul formato JSON).
-- **10 Pathway invece di 22**: scelti come 4 gruppi completi, non come
-  selezione dei più belli. Il cambio di Pathway (fase 7) funziona solo tra
-  vicini dello stesso gruppo: gruppi a metà avrebbero rotto quel sistema.
-  Motivazione completa e cosa si è perso: `006_PRD/design-pathways.md`.
-  Riattivare un Pathway significa riattivare **il suo gruppo intero**.
-- **Pathway della fase 2**: Twilight Giant. Il Fool è più interessante ma
-  richiede `illusion` e `possess` leggibili a schermo, che sono molto più
-  difficili da far funzionare bene come primo Pathway.
-- **Risoluzione**: 32×32 px, base 640×360. Fissata ora perché cambiarla dopo
-  significa rifare ogni asset.
-- **4 direzioni, non 8**: le diagonali riusano gli sprite orizzontali. Dimezza
-  i frame da disegnare, invisibile in un top-down. Stessa logica dei 32×32:
-  irreversibile, quindi decisa subito.
-- **Il timing del combat vive in `data/animations.json`**, non negli script.
-  Frame di anticipo, attivi, recupero, iframe del dash e finestra di parata
-  perfetta sono dati. Tarare il feel deve costare secondi, non ricompilazioni.
-- **i18n dal giorno 1**: nessun testo hardcoded, nemmeno nei placeholder.
+- **Engine**: Godot 4.x, GDScript. (Unity scartato: più boilerplate per un sistema così data-driven.)
+- **10 Pathway invece di 22**: 4 gruppi completi. Riattivare un Pathway significa riattivare **il suo gruppo intero**. Motivazioni in `006_PRD/design-pathways.md`.
+- **4 direzioni, non 8**: le diagonali riusano gli sprite orizzontali.
+- **Il timing del combat vive in `data/animations.json`**, non negli script né nelle immagini.
+- **Arte generata da Claude con `sprite-forge`** (nuova, v2). Vedi sezione dedicata.
+- **i18n dal giorno 1**: nessun testo hardcoded.
+- **Pathway della fase 2**: Twilight Giant.
 
 ## i18n — due sistemi, una convenzione per le stringhe dei dati
 
-Il gioco ha **due** cataloghi di stringhe, per scopi diversi:
+1. **UI chrome** (HUD, etichette del motore): `assets/i18n/strings.csv` → `.translation`, con
+   `tr("HUD_...")`. Chiavi in `SCREAMING_SNAKE`.
+2. **Stringhe dei dati**: `data/i18n/it.json` + `data/i18n/en.json`, con `GameData.tr_data(key)`.
 
-1. **UI chrome** (HUD, etichette del motore): `assets/i18n/strings.csv` →
-   `.translation` compilati, risolti con `tr("HUD_...")` di Godot. Chiavi in
-   `SCREAMING_SNAKE`. Resta com'e'.
-2. **Stringhe dei dati** (nomi di Pathway/Sequenza/abilita', descrizioni delle
-   azioni di recitazione, Ancore, Caratteristiche, forme, sinergie):
-   `data/i18n/it.json` + `data/i18n/en.json`, risolti con
-   `GameData.tr_data(key)`. Le chiavi sono i valori dei campi `*_i18n` sparsi
-   nei file di `data/`.
+Convenzione unica delle chiavi dei dati: `<categoria>[.<pathway_id>].<local>`, con categoria
+`pathway | sequence | ability | acting | characteristic | form | anchor | synergy`.
+Esempi: `pathway.twilight_giant`, `sequence.twilight_giant.9`, `anchor.mirco`.
+`tools/generate_i18n_stubs.py` riscrive le chiavi non canoniche e rigenera i cataloghi.
+Il validator (`R-12`) dà **errore** se una chiave `*_i18n` non ha voce in `it.json`.
+Gli asset non hanno testo: se un'immagine ha bisogno di una scritta, è un dato i18n.
 
-**Convenzione unica delle chiavi dei dati** (`US-220`), una sola forma:
+## Fog of war sulla conoscenza: nomi di Sequenza
 
-```
-<categoria>[.<pathway_id>].<local>
-```
-
-- `categoria`: `pathway` | `sequence` | `ability` | `acting` |
-  `characteristic` | `form` | `anchor` | `synergy`
-- `<pathway_id>` è presente per le entità che appartengono a un Pathway
-  (`sequence`, `ability`, `acting`, `characteristic`, `form`); **assente** per
-  le entità globali (`anchor`, `synergy`) e per `pathway` stesso
-- `local`: l'`id` dell'entità verbatim; il **numero** per `sequence` e
-  `characteristic`; per `pathway` è l'id del Pathway. Per `anchor`/`synergy`
-  si toglie il prefisso di tipo ridondante (`anchor_mirco` → `anchor.mirco`).
-
-Esempi: `pathway.twilight_giant`, `sequence.twilight_giant.9`,
-`ability.twilight_giant.tg_fendente_pesante`,
-`acting.twilight_giant.tg_9_duello_puro`, `anchor.mirco`,
-`synergy.inganno_probabilita`.
-
-`tools/generate_i18n_stubs.py` scandisce `data/` (esclusi `schema/`, `i18n/`,
-`pathways_deferred/`), **riscrive** le chiavi non canoniche nei file di dati,
-e rigenera i due cataloghi: le traduzioni autoriali si preservano, le chiavi
-nuove partono da un eventuale testo in chiaro già nei dati (campo gemello
-`name`/`descrizione`) o da uno stub `TODO <chiave>`. Il validator (`R-12`)
-dà **errore** se una chiave `*_i18n` dei dati attivi non ha voce in `it.json`.
-Riattivi un gruppo differito → rilancia il tool e traduci i nuovi stub.
-
-## Fog of war sulla conoscenza — nomi di Sequenza
-
-Ogni Sequenza di ogni Pathway ha gia' un nome canonico proprio e distinto
-(campo `name` di ogni voce in `data/pathways/*.json`: 100 nomi diversi,
-nessuna fascia condivide un nome generico — es. Twilight Giant 9=Warrior,
-8=Pugilist, ... 0=Twilight Giant). Verificato riga per riga su tutti i 10
-Pathway attivi (2026-09-09): i dati sono gia' corretti, non serve toccarli.
-
-Il giocatore non deve MAI conoscere in anticipo il nome di una Sequenza non
-ancora raggiunta. Unica eccezione: puo' conoscere il nome della Sequenza
-**immediatamente successiva** alla propria sul **proprio** Pathway (un
-presagio/indiscrezione) — mai il nome, ne' altro, di Sequenze piu' lontane,
-ne' quello di Sequenze di altri Pathway (a meno di un flag esplicito in
-KnowledgeStore, gia' previsto dal fog of war esistente). La pagina diagramma
-del libro (`scripts/pages/page_diagramma_pathway.gd`, fase 2 US-224) applica
-il fog of war sulle celle della griglia (colonna propria fino alla Sequenza
-corrente = nota, il resto ignoto salvo flag) ma oggi non renderizza nomi di
-Sequenza da nessuna parte nella griglia; l'eccezione della Sequenza
-successiva (solo nome, mai abilita' o altri dettagli) e' da implementare.
+Il giocatore non deve MAI conoscere in anticipo il nome di una Sequenza non ancora raggiunta.
+Unica eccezione: il nome della Sequenza **immediatamente successiva** sul **proprio** Pathway
+(solo il nome). Vale anche per l'arte: nessuna icona, effetto o panorama deve rivelare una
+Sequenza non ancora raggiunta.
 
 ## Non-goals
 
-Multiplayer, 3D, generazione procedurale del mondo, monetizzazione,
+Multiplayer, 3D **a runtime** (il 3D esiste solo nella produzione degli sprite), monetizzazione,
 **doppiaggio**, mondo aperto senza gating, console port.
-
-L'audio NON e' un non-goal: e' un canale informativo del gioco (tell sonori,
-sussurri della follia, percezione per Sequenza) e ha il suo sistema
-data-driven in `data/audio.json`. Il doppiaggio si', quello resta fuori.
+L'audio NON è un non-goal: ha il suo sistema data-driven in `data/audio.json`.
 
 ## Repo
 
-https://github.com/YasserOudabashi/mirwada (pubblica)
-
-Repo dedicata a questo progetto, aggiunta alla tabella "Repository che uso"
-in ~/.claude/CLAUDE.md come prescrive quel file per ogni repo nuova.
-`Mirwada` è il nome del gioco; `Sequenza`/`Sequenze` nel resto dei documenti
-resta il termine di gameplay (lo scalino di progressione), non il titolo.
+https://github.com/YasserOudabashi/mirwada (pubblica).
 Percorso locale: `D:\005-Friend\Ivan\MEgaProJect`.
 
 ## Nota IP
 
-Il sistema di riferimento è opera protetta di terzi. Progetto personale, non
-distribuibile né monetizzabile con i nomi attuali. Il flag
-`SERIAL_NUMBERS_FILED_OFF` (default `false`) esiste perché la rinominazione
-completa resti un'operazione da un pomeriggio: per questo i nomi vivono solo
-nei dati.
+Il sistema di riferimento è opera protetta di terzi. Progetto personale, non distribuibile né
+monetizzabile con i nomi attuali. Il flag `SERIAL_NUMBERS_FILED_OFF` (default `false`) rende la
+rinominazione completa un'operazione da un pomeriggio: i nomi vivono solo nei dati. Vale anche per
+gli sprite: nessun personaggio o simbolo di opere protette negli asset.
+
+---
+
+## Cosa è cambiato rispetto alla v1
+
+| Tema | v1 | v2 |
+|---|---|---|
+| Chi crea gli asset | artista a mano, placeholder nel frattempo | Claude con `sprite-forge`, rilanciabile con seed |
+| Risoluzione | 32×32 fissa e irreversibile | 32×32 di default; 64×64 possibile come decisione unica di progetto |
+| Palette | 3 colori + nero | Endesga 32, rampe di 3–5 tonalità con hue shift |
+| Mappe | disegnate a mano | generate dal seed, **salvate come dati** e ritoccate nei dati |
+| Generazione procedurale | non-goal | consentita come strumento di produzione, mai a runtime |
+| Regola "una story" | max ~4 file / 200 righe | uguale, tranne PNG/JSON generati |
+| Verifica visiva | non prevista | obbligatoria: ogni asset si guarda ingrandito |
+| Nomi dei file | liberi | solo id dei dati, mai nomi di Pathway |
+
+Se qualcosa qui sopra non ti torna, dimmelo: i punti più discutibili sono la decisione 32/64 px
+e il permesso di generare il mondo in modo procedurale.
