@@ -7962,3 +7962,17 @@ Mirwada (8):
 - Spiagge: MISTE: sabbia nelle calette, ciottoli vicino a porto e scogli.
 - Cimitero e monastero: terreno proprio, GHIAIA BIANCA E MARMO.
 - Acqua bassa: TURCHESE TRASPARENTE (si vede il fondo chiaro).
+Marche (4 domande, 7 scelte):
+- Roccia dei gradoni: ARENARIA ROSSICCIA a strati (si accende al crepuscolo).
+- Suolo: TUTTI E 4 a zone: ghiaia e pietrisco (il piu' diffuso), muschio
+  scuro (zone umide), terra bruciata e cenere (campo di battaglia dei
+  giganti), erica secca (pochi ciuffi).
+- Bordi dei gradoni: PARETI (scalabili con lo sblocco) + FRANE di pietrisco
+  dove passano i sentieri.
+- Neve al nord: NEVE PULITA (la stessa dell'Archivio).
+Valle (4):
+- Sottobosco: A ZONE: felci e foglie nelle zone aperte, radici e muschio
+  vicino agli alberi grandi.
+- Fango: PALUDE VERDE-BRUNA con pozze verdi e canne.
+- Scogliere: ARENARIA ROSSICCIA come le Marche (unisce le due regioni).
+- Radure lunari di notte: ERBA ARGENTATA LUMINOSA (terreno con variante notturna).
