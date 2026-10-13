@@ -141,6 +141,15 @@ giorno. Burroni con fiume (alternativa a nuoto) e senza fondo (radici o volo).
 Altare di radici in una radura isolata. Ingresso principale: galleria di
 alberi. Sorgenti a cascata. Zone delle bestie profonde segnate da ossa e graffi.
 
+**Archivio Sepolto — deciso (12 risposte, 2026-10-13).** In superficie una
+pianura bianca vuota con la scalinata scavata e la torre di osservazione che
+spunta dalla neve. Dentro, 5 piani a mappe separate: sale di lettura, studi,
+officine meccaniche, sala dei sigilli, Biblioteca di Tutto (sfera di libri
+con passerelle). Stile misto barocco + meccanico. Luce da cristalli e glifi.
+Porte sigillate con glifi. Tra i piani solo montacarichi da riattivare e
+pozzi/crolli (si scende senza ritorno: il level design deve garantire che non
+si resti bloccati). Libri, costrutti dormienti, forzieri, fantasmi di studiosi.
+
 **US-8B18b [A] Isole.** Le isole del mare a sud: quante, cosa nascondono, quali
 siti ospitano. *Domande (L).*
 

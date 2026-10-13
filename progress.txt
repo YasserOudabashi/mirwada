@@ -7847,3 +7847,22 @@ Giro 3 (4 risposte, totale Mirwada 12 -> regione definita):
 - Fauna d'atmosfera (non nemici): UCCELLI E FARFALLE, CERVI E ANIMALI GRANDI,
   LUCCIOLE di notte (VFX). -> nuova story US-8B23.
 - Zone delle bestie profonde: avviso nell'ambiente, OSSA E GRAFFI.
+
+[2026-10-13] US-8B17 (in corso) — Archivio Sepolto: risposte (12, regione definita).
+- Ingresso in superficie: SCALINATA SCAVATA nella neve fino a un portone.
+- Interno A PIANI, si scende (ogni piano e' una mappa). 5 PIANI, temi
+  (proposta di Claude accettata): 1 sale di lettura (biblioteca barocca),
+  2 studi degli studiosi, 3 officine meccaniche, 4 sala dei sigilli,
+  5 Biblioteca di Tutto.
+- Stile MISTO: ali di biblioteca barocca + ali di officine meccaniche.
+- Torre di osservazione: SPUNTA DALLA NEVE (unica parte esterna), si sale dal piano 1.
+- Biblioteca di Tutto: SFERA DI LIBRI con passerelle sospese.
+- Porte sigillate (gating di conoscenza): PORTE CON GLIFI che si accendono.
+- Contenuti: libri da leggere, costrutti dormienti, forzieri e scrivanie
+  (US-8B22), fantasmi di studiosi innocui (atmosfera e indizi).
+- Luce: CRISTALLI E GLIFI (luce fredda).
+- Tra i piani: MONTACARICHI MECCANICI da riattivare + POZZI E CROLLI.
+  NB: niente scale -> si scende dai pozzi (senza ritorno) e si risale con i
+  montacarichi riattivati o arrampicandosi. Da verificare nel level design
+  che non si resti bloccati.
+- Superficie: PIANURA BIANCA VUOTA (solo neve, scalinata e torre).
