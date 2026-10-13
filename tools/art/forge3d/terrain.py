@@ -6,6 +6,7 @@ celle hanno livello >= t (maschera a 4 bit = 16 tile). Basta quindi 1 atlante di
 senza autotile 47, e qualunque coppia di terreni si fonde in modo pulito.
 """
 import math
+import zlib
 
 import numpy as np
 
@@ -70,7 +71,7 @@ ORDER = sorted(TERRAINS, key=lambda k: TERRAINS[k]["level"])
 
 def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4):
     d = TERRAINS[name]
-    rs = hash(name) % 1000 + seed
+    rs = zlib.crc32(name.encode()) % 1000 + seed   # hash() cambia a ogni avvio: non riproducibile
     base = pnoise(S, d["period"], rs, 3)
     base = (base - base.min()) / (np.ptp(base) + 1e-6)
     ramp = d["ramp"]

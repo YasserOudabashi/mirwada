@@ -7902,3 +7902,32 @@ Giro 3 (4 risposte, totale Mirwada 12 -> regione definita):
 STATO US-8B10 (struttura del mondo + biomi): DECISO. 5 regioni + 6 isole,
 83 risposte in tutto. Prossimo: spiegare US-8B01 (64 px), US-8B02 (forge3d
 nel repo), US-8B11 (terreni nuovi) e US-8B13 (mappa di prova) e aspettare il via.
+
+[2026-10-13] US-8B02 — forge3d dentro il repo. FATTA.
+- tools/art/forge3d/ = copia di sprite-forge/scripts/forge3d (14 file .py),
+  hash originali in ORIGINE.sha256, note e modifiche in ORIGINE.md.
+- Modifica 1 (bug del generatore): terrain.py usava hash(name), che in
+  Python cambia a ogni avvio -> texture dei terreni diverse a ogni lancio
+  anche con lo stesso seed. Ora zlib.crc32(name.encode()). Da riportare
+  nella skill originale.
+- Aperto: build_enel.py usa ancora render.py/check.py della skill esterna
+  (per i JSON di sprite-forge): da portare nel repo se servira' rigenerare
+  Enel sul PC dell'utente (US-8B30 lo riscrive comunque a 64 px).
+
+[2026-10-13] US-8B13 — mappa di prova del mondo intero (grezza). IN REVISIONE CON L'UTENTE.
+- Comando: python tools/art/build_world.py --seed 4   (~8 s; --senza-ritagli <1 s)
+- Uscita in arte/mondo/: mondo_prova.png (3 px per tile, confini e luoghi),
+  5 ritagli a tile vere (porto, passo, galleria, scalinata, approdo
+  Frontiera). world_prova.json NON committato (.gitignore): si rigenera dal seed.
+- 320x220 tile, variante C. Regioni = Voronoi deformato dal rumore + pulizia
+  delle enclavi; Frontiera e 6 isole = ellissi nel mare. Marche a gradoni che
+  salgono verso nord-ovest; rupi di pietra sul confine con il passo; muro di
+  giungla sul confine della Valle con la galleria; citta' a isolati con mura a
+  tratti; 2 fiumi; strade A* dal porto a passo, galleria, scalinata, archivio
+  dell'ordine e cimitero; 21 luoghi suggeriti.
+- Verificato: stesso seed -> stessi PNG (md5 identico su due lanci, dopo la
+  correzione di terrain.py); validate exit 0; nessun file di gioco toccato.
+- Guardato ingrandito: OK disposizione, passo tra due rupi leggibile, giungla
+  fitta; NON OK ancora: texture dell'erba a righe regolari, neve a strisce
+  (terreni: US-8B11); citta' = griglia rotonda senza moli (edifici: US-8B18);
+  Frontiera con terreni normali (pastello: US-8B11); trono nell'angolo NO.
