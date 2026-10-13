@@ -24,15 +24,8 @@ from forge3d import terrain as T  # noqa: E402
 
 OUT = os.path.join(HERE, "..", "..", "arte", "terreni")
 
-# Solo per mostrare i motivi nuovi: non sono in ORDER, la mappa non li usa.
-PROVE = {
-    "prova:parquet": dict(ramp=["brown_dd", "brown_d", "brown_d", "brown"], period=4, dither=0.3, detail="herringbone",
-                          rim=None, level=99),
-    "prova:lamiera": dict(ramp=["slate_d", "slate", "grey", "grey_l"], period=4, dither=0.3, detail="plates", rim=None,
-                          level=99),
-    "prova:lava": dict(ramp=["ink", "brown_dd", "brown_dd", "slate_d"], period=4, dither=0.4, detail="embers", rim=None,
-                       level=99, accent=["orange", "amber"]),
-}
+# Solo per mostrare motivi nuovi prima che diventino terreni veri: non sono in ORDER, la mappa non li usa.
+PROVE = {}
 
 # Scene di prova: un pezzo di regione disegnato a lettere, per vedere i terreni insieme e i loro bordi.
 SCENE = [
@@ -69,6 +62,37 @@ SCENE = [
       "WWwwwwwwwwwwwwWW"),
      {"f": "felci", "r": "radici_muschio", "g": "erba_argentata", "p": "palude", "A": "arenaria", "w": "water",
       "W": "deep_water"}),
+    ("archivio", "scena dell'Archivio: neve, ghiaccio all'ingresso, sale a parquet, officina a lamiera e grate",
+     ("NNNNNNNNNNNNNNNN",
+      "NNNNNGGGGGGNNNNN",
+      "pppppGGGGGGppppp",
+      "pppppppppppppppp",
+      "pppppppppLLLLLLL",
+      "pppppppppLLLLLLL",
+      "pppppppppLLLLLLL",
+      "pppppppppLLLLLLL"),
+     {"N": "snow", "G": "ghiaccio", "p": "parquet", "L": "lamiera"}),
+    ("frontiera", "scena della Frontiera: nebbia, isolette di erba lilla, sentieri rosa, zona glitch a scacchiera",
+     ("nnnnnnnnnnnnnnnn",
+      "nnllllnnnnnlllln",
+      "nlllrrlnnnllrlln",
+      "nllrrllllllrrlln",
+      "nnlllllnnlcsclnn",
+      "nnnnnnnnnlscslnn",
+      "nnnllllnnllllnnn",
+      "nnnnnnnnnnnnnnnn"),
+     {"n": "nebbia", "l": "erba_lilla", "r": "terra_rosa", "c": "ciottoli_scuri", "s": "snow"}),
+    ("isole", "scena delle isole: vulcanica (cenere, roccia lavica), tropicale (sabbia bianca), rovine sommerse",
+     ("WWWWWWWWWWWWWWWW",
+      "WwwccccwwWwwbbwW",
+      "wccvvvccwwwbbbbw",
+      "wcvvvvvcwwbbggbw",
+      "wccvvvccwwbbbbww",
+      "WwccccwwwwwwwwwW",
+      "WwwwwRRwRRwwwwWW",
+      "WWwwRRRRwRRwwWWW"),
+     {"W": "deep_water", "w": "water", "c": "cenere", "v": "roccia_lavica", "b": "sabbia_bianca", "g": "grass",
+      "R": "lastre_rovine"}),
 ]
 
 
@@ -117,6 +141,12 @@ def main():
         tav.paste(Image.fromarray(sc[..., :3]), (0, y + testa))
         Image.fromarray(sc[..., :3]).save(os.path.join(OUT, f"scena_{sid}.png"))
         y += sc.shape[0] + testa + gap
+    for n in nomi:                                    # i terreni animati anche come GIF, per vederli muoversi
+        nfr = T.TERRAINS[n].get("anim", 1)
+        if nfr > 1:
+            fr = [Image.fromarray(np.tile(T.terrain_texture(n, S, frame=f, nframes=nfr), (3, 3, 1)).astype(np.uint8))
+                  .resize((cella, cella), Image.NEAREST) for f in range(nfr)]
+            fr[0].save(os.path.join(OUT, f"anim_{n}.gif"), save_all=True, append_images=fr[1:], duration=250, loop=0)
     path = os.path.join(OUT, "campioni.png")
     tav.save(path)
     print(f"{len(nomi)} terreni, {S} px -> {os.path.abspath(path)}")

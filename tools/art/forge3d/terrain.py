@@ -86,6 +86,27 @@ TERRAINS = {
                         rimc="navy", level=9.2, contrast=0.5),
     "pontile_legno": dict(ramp=["brown_dd", "brown_d", "brown", "tan"], period=4, dither=0.3, detail="planks", rim="dark",
                           rimc="brown_dd", level=9.4),
+    # --- Archivio, Frontiera, isole (US-8B11d). Pastelli della Frontiera = colori extra (Endesga non ha il lilla) ---
+    "nebbia": dict(ramp=["#b8b0c8", "#cfc8db", "#e0dbe8", "#f0edf4"], period=3, dither=0.6, detail="fog", rim="light",
+                   rimc="#f0edf4", level=0.2, contrast=0.6, anim=4),
+    "sabbia_bianca": dict(ramp=["cream", "white", "white", "white"], period=4, dither=0.5, detail="dots", rim="dark",
+                          rimc="tan", level=2.2, contrast=0.3),
+    "erba_lilla": dict(ramp=["#9a7fb0", "#b9a3cc", "#cdb8dc", "#e2d4ec"], period=4, dither=0.5, detail="tufts", rim="dark",
+                       rimc="#9a7fb0", level=4.4, contrast=0.4),
+    "cenere": dict(ramp=["ink", "slate_d", "slate", "grey"], period=4, dither=0.5, detail="dots", rim="dark", rimc="ink",
+                   level=7.6, contrast=0.3),
+    "parquet": dict(ramp=["brown_dd", "brown_d", "brown_d", "brown"], period=4, dither=0.3, detail="herringbone", listello=4,
+                    rim="dark", rimc="brown_dd", level=8.1),
+    "lamiera": dict(ramp=["slate_d", "slate", "grey", "grey_l"], period=4, dither=0.3, detail="plates", rim="dark",
+                    rimc="navy", level=8.15, contrast=0.4),
+    "terra_rosa": dict(ramp=["#c99a9a", "#ddb3b0", "#e8c6c1", "#f3dcd6"], period=4, dither=0.6, detail="pebbles", rim="dark",
+                       rimc="#c99a9a", level=8.25, contrast=0.3),
+    "lastre_rovine": dict(ramp=["teal_d", "grey", "grey_l", "cream"], period=4, dither=0.4, detail="slabs", slab=(2, 2),
+                          rim="cliff", rimc="teal_d", level=8.9, contrast=0.5),
+    "roccia_lavica": dict(ramp=["ink", "brown_dd", "brown_dd", "slate_d"], period=4, dither=0.4, detail="embers", rim="cliff",
+                          rimc="ink", level=9.1, accent=["orange", "amber"]),
+    "ghiaccio": dict(ramp=["slate", "grey", "grey_l", "grey_l"], period=4, dither=0.4, detail="embers", cells=4, spessore=0.6,
+                     rim="light", rimc="white", level=9.6, contrast=0.4, accent=["white", "white"]),
     # --- Marche e Valle (US-8B11c) ---
     "palude": dict(ramp=["brown_dd", "teal_d", "green_d", "brown_d"], period=3, dither=0.6, detail="puddles", rim="dark",
                    rimc="brown_dd", level=3.2, contrast=0.25, accent=["teal_d", "green_m"]),
@@ -135,6 +156,9 @@ def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4):
     d = TERRAINS[name]
     rs = zlib.crc32(name.encode()) % 1000 + seed   # hash() cambia a ogni avvio: non riproducibile
     base = pnoise(S, d["period"], rs, 3)
+    if d["detail"] == "fog":
+        passo = frame * S // nframes
+        base = 0.6 * np.roll(base, passo, 1) + 0.4 * np.roll(pnoise(S, d["period"] + 1, rs + 5, 2), -passo, 0)
     base = (base - base.min()) / (np.ptp(base) + 1e-6)
     base = 0.5 + (base - 0.5) * d.get("contrast", 1.0)    # <1: macchie piu' tenui, la ripetizione non si vede
     ramp = d["ramp"]
@@ -232,7 +256,7 @@ def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4):
                 put(rng.randint(S), a * ah + 1 + rng.randint(ah - 1), 1)
     elif detail == "herringbone":
         # parquet a spina di pesce: listelli a 45 gradi alternati per colonna
-        lw = max(4, S // 8)
+        lw = max(4, S // d.get("listello", 8))                    # listelli per tile: meno = piu' larghi
         colonna = x // lw
         u = (y + np.where(colonna % 2 == 0, x % lw, lw - 1 - x % lw)) // lw
         img = np.array([_rgb(c) for c in ramp])[1 + (u + colonna) % (n - 1)]

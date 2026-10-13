@@ -8049,3 +8049,23 @@ approvato la spiegazione e il via alla 8B11a.
 - Aperto: radici_muschio mostra ancora un leggero disegno a triangoli
   ripetuto; pietrisco quasi tinta unita da lontano. NON ancora usati da
   build_world.py (si collegano tutti insieme dopo 8B11d, scelta dell'utente).
+
+[2026-10-13] US-8B11d — terreni di Archivio, Frontiera e isole. FATTA (in attesa dell'occhio dell'utente).
+- 10 righe in terrain.py: nebbia 0.2 (animata, 4 frame), sabbia_bianca 2.2,
+  erba_lilla 4.4, cenere 7.6, parquet 8.1, lamiera 8.15, terra_rosa 8.25,
+  lastre_rovine 8.9, roccia_lavica 9.1, ghiaccio 9.6. Totale terreni: 39.
+- Codice: motivo `fog` (il rumore scorre di S/4 per frame: il tile resta
+  raccordato e il 5o frame torna uguale al 1o); `herringbone` con `listello`.
+  Tappeti logori dell'Archivio = oggetti, non terreno. Zone glitch = dati.
+- campioni_terreni.py: PROVE vuoto (tutti i motivi sono ora terreni veri);
+  scene archivio, frontiera, isole; GIF dei terreni animati
+  (arte/terreni/anim_<terreno>.gif).
+- Guardato ingrandito, 2 giri: parquet a listelli minuscoli (stoffa) ->
+  listelli doppi; sabbia bianca color crema -> bianca. Nebbia: 4 frame
+  guardati, scorre senza scatti.
+- Verificato: md5 identico su due lanci; validate exit 0.
+- Aperto: le zone glitch con la dual grid escono ad angoli arrotondati (un
+  glitch vero sarebbe a blocchi: da decidere quando si fanno nei dati della
+  Frontiera); colori pastello extra da confermare guardandoli in gioco.
+- US-8B11 COMPLETA (a, b, c, d): 28 terreni nuovi + 7 ritoccati. Prossimo:
+  collegarli a build_world.py (mappa di prova con i pavimenti veri).
