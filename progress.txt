@@ -7976,3 +7976,15 @@ Valle (4):
 - Fango: PALUDE VERDE-BRUNA con pozze verdi e canne.
 - Scogliere: ARENARIA ROSSICCIA come le Marche (unisce le due regioni).
 - Radure lunari di notte: ERBA ARGENTATA LUMINOSA (terreno con variante notturna).
+Archivio (4):
+- Sale di lettura e studi: PARQUET SCURO a spina di pesce, tappeti logori.
+- Officine (piano 3): LAMIERA RIVETTATA E GRATE (si vede il piano di sotto).
+- Ghiaccio dentro: SOLO ALL'INGRESSO (scalinata e prima sala).
+- Neve in superficie: DUNE DI VENTO (ondulazioni morbide), al posto delle strisce.
+Frontiera e isole (4 domande, 6 scelte):
+- Pastello: ROSA E LILLA (erba lilla chiaro, sentieri rosa cipria).
+- Nebbia tra le isolette: TERRENO ANIMATO che scorre lento, non calpestabile.
+- Zone glitch: TILE MESCOLATI di altre regioni a scacchiera (nei dati, nessun
+  terreno nuovo).
+- Isole: CENERE + ROCCIA LAVICA con crepe arancioni (vulcanica), SABBIA
+  BIANCA (tropicale), LASTRE ANTICHE spaccate (rovine).
