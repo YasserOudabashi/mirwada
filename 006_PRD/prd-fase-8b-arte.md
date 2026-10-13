@@ -150,6 +150,15 @@ Porte sigillate con glifi. Tra i piani solo montacarichi da riattivare e
 pozzi/crolli (si scende senza ritorno: il level design deve garantire che non
 si resti bloccati). Libri, costrutti dormienti, forzieri, fantasmi di studiosi.
 
+**Frontiera delle Porte — decisa (12 risposte, 2026-10-13).** Isola nel mare a
+sud, nascosta dalla nebbia: la si vede bene solo col cannocchiale. Isola
+d'arrivo normale (molo in barca, atterraggio libero in volo), poi l'arcipelago
+di 5–6 isolette sospese nella nebbia, collegate da porte. Colori pastello
+sbiaditi. Teatro dei burattini; la Porta senza Stanza è una porta di scena sul
+palco. Crocevia di strade sospese che finiscono in porte. Zone sbagliate:
+oggetti sospesi, riflessi sbagliati, glitch visivi, tempo fermo. Burattini e
+manichini innocui. Soglia = bordo di un'isoletta sulla nebbia.
+
 **US-8B18b [A] Isole.** Le isole del mare a sud: quante, cosa nascondono, quali
 siti ospitano. *Domande (L).*
 
@@ -182,6 +191,11 @@ il mondo): uccelli e farfalle che volano via quando passi, cervi e animali
 grandi che pascolano e scappano, lucciole di notte (VFX). Non sono nemici né
 pet: niente combattimento, solo un comportamento "fuggi dal giocatore" letto
 dai dati. Story di codice + arte: spiegarla prima. *Domande (M).*
+
+**US-8B24 [C+A] Cannocchiale.** Richiesta per la Frontiera: un cannocchiale fisso
+in cima al faro di Mirwada (il primo) e più avanti uno da tasca. Usandolo la
+camera si sposta lontano e la nebbia si dirada. Il punto panoramico e il
+bersaglio stanno nei dati della mappa. *Domande (M).*
 
 ### Blocco C — Personaggi (rigenerati a 64 px)
 

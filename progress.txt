@@ -7866,3 +7866,21 @@ Giro 3 (4 risposte, totale Mirwada 12 -> regione definita):
   montacarichi riattivati o arrampicandosi. Da verificare nel level design
   che non si resti bloccati.
 - Superficie: PIANURA BIANCA VUOTA (solo neve, scalinata e torre).
+
+[2026-10-13] US-8B18 (in corso) — Frontiera delle Porte: risposte (12, regione definita).
+- Da Mirwada: NEBBIA, per vederla bene serve un CANNOCCHIALE (richiesta
+  dell'utente) -> ENTRAMBI: cannocchiale fisso sul faro (il primo) + uno da
+  tasca trovato piu' avanti. Nuova story US-8B24.
+- Forma: ENTRAMBI: isola d'arrivo normale, poi nebbia e arcipelago sospeso
+  di 5-6 ISOLETTE collegate da porte/teletrasporti.
+- Approdo: DIPENDE: in barca al molo, in volo dove vuoi sull'isola d'arrivo.
+- Teatro: TEATRO DEI BURATTINI (fili dal cielo, quinte di legno dipinte,
+  scala strana).
+- Porta senza Stanza: PORTA DI SCENA SUL PALCO del teatro, si apre su un vuoto vero.
+- Crocevia: INCROCIO DI STRADE SOSPESE, ognuna finisce in una porta.
+- Zone sbagliate (Error): TUTTE: oggetti sospesi, riflessi sbagliati,
+  glitch visivi, tempo fermo.
+- Colore: PASTELLO SBIADITO (vecchia cartolina).
+- Abitanti: BURATTINI E MANICHINI che recitano scene a ripetizione (innocui).
+- Soglia = BORDO di un'isoletta dove il terreno finisce nella nebbia;
+  nebbia_grigia = zona dove la nebbia copre il terreno.
