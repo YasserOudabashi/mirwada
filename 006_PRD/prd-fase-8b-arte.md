@@ -82,6 +82,11 @@ come è fatto il mondo e quali biomi ha ogni regione. Esito: aggiornamento di
 dominante, gli oggetti tipici, dove stanno i `location_tags`. Nessuna PNG.
 *Domande: vedi §5, primo giro già pronto.*
 
+**US-8B11 spezzata in 4 (2026-10-13):** **8B11a** motivi nuovi + ritocchi di erba,
+acqua e neve + tavola dei campioni (FATTA); **8B11b** terreni di Mirwada (8);
+**8B11c** Marche + Valle (9); **8B11d** Archivio + Frontiera + isole (10).
+Le risposte dell'utente sui 27 terreni sono in `progress.txt`.
+
 **US-8B11 [A] Terreni nuovi.** Dai biomi di US-8B10 escono i terreni che
 `terrain.py` non ha ancora (es. selciato, brughiera, cenere, pavimento
 d'archivio, nebbia). Uno per riga in `ORDER`, rampe Endesga 32, 16 tile

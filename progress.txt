@@ -7988,3 +7988,27 @@ Frontiera e isole (4 domande, 6 scelte):
   terreno nuovo).
 - Isole: CENERE + ROCCIA LAVICA con crepe arancioni (vulcanica), SABBIA
   BIANCA (tropicale), LASTRE ANTICHE spaccate (rovine).
+
+[2026-10-13] US-8B11 spezzata in 4 (regola 3): 8B11a motivi + ritocchi +
+tavola campioni; 8B11b Mirwada (8 terreni); 8B11c Marche + Valle (9);
+8B11d Archivio + Frontiera + isole (10, nebbia animata). L'utente ha
+approvato la spiegazione e il via alla 8B11a.
+
+[2026-10-13] US-8B11a — motivi nuovi dei terreni + ritocchi. FATTA (in attesa dell'occhio dell'utente).
+- tools/art/forge3d/terrain.py: campo `contrast` (le macchie di fondo grandi
+  e ripetute ogni tile erano le "righe" dell'erba); 8 motivi nuovi (slabs,
+  rows, planks, herringbone, strata, plates, embers, dunes), misure in
+  frazioni di S; `_voronoi` estratto da cobbles; `accent` e `cells` opzionali.
+- Ritocchi: erba contrast 0.45; acqua bassa turchese (#1fb5d6, colore extra
+  nella rampa); neve a dune sottili e spezzate, rampa con piu' bianco,
+  contrast 0.2.
+- tools/art/campioni_terreni.py -> arte/terreni/campioni.png: ogni terreno
+  ripetuto 3x3 a 64 px x2 + pezzo di mappa con le transizioni. I motivi nuovi
+  sono mostrati con terreni "prova:" che esistono solo nello script.
+- Comandi: python tools/art/campioni_terreni.py ; python tools/art/build_world.py
+- Verificato: guardata la tavola ingrandita (3 giri: neve a zigzag -> a
+  macchie -> ok; piantine dei filari troppo piccole a 64 px -> ingrandite);
+  md5 identico su due lanci; validate exit 0; mappa di prova rigenerata.
+- Aperto: dry_grass, dirt, path e forest hanno ancora macchie che si ripetono
+  (si ritoccano con i terreni delle loro regioni, 8B11b/c); i colori delle
+  "prova:" sono provvisori.

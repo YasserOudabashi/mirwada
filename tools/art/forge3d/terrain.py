@@ -55,18 +55,42 @@ def _quant(field, ramp, dither=0.0, S=TILE):
 # nome: (ramp scuro->chiaro, periodo rumore, contrasto, dither, dettaglio, livello)
 TERRAINS = {
     "deep_water": dict(ramp=["navy", "blue_d", "blue_d", "blue"], period=3, dither=0.5, detail="waves", rim=None, level=0, anim=4),
-    "water": dict(ramp=["blue_d", "blue", "blue", "cyan"], period=3, dither=0.5, detail="waves", rim="foam", level=1, anim=4),
+    "water": dict(ramp=["blue", "#1fb5d6", "#1fb5d6", "cyan"], period=3, dither=0.5, detail="waves", rim="foam", level=1, anim=4),
     "sand": dict(ramp=["tan", "cream", "cream", "skin_l"], period=4, dither=0.5, detail="dots", rim="dark", rimc="orange_d", level=2),
     "mud": dict(ramp=["brown_dd", "brown_d", "brown_d", "brown"], period=3, dither=0.6, detail="puddles", rim="dark", level=3),
-    "grass": dict(ramp=["green_d", "green_m", "green_m", "green"], period=4, dither=0.5, detail="tufts", rim="dark", rimc="green_d", level=4),
+    "grass": dict(ramp=["green_d", "green_m", "green_m", "green"], period=4, dither=0.5, detail="tufts", rim="dark", rimc="green_d", level=4,
+                  contrast=0.45),
     "dry_grass": dict(ramp=["brown_d", "#8a7a38", "#b3a050", "#cdbb64"], period=4, dither=0.5, detail="tufts", rim="dark", rimc="brown", level=5),
     "forest": dict(ramp=["teal_d", "green_d", "green_d", "green_m"], period=4, dither=0.5, detail="leaves", rim="dark", rimc="teal_d", level=6),
     "dirt": dict(ramp=["brown_d", "brown", "brown", "orange_d"], period=4, dither=0.6, detail="pebbles", rim="dark", level=7),
     "path": dict(ramp=["brown_d", "brown", "#c9946a", "#dcb68a"], period=5, dither=0.6, detail="pebbles", rim="dark", rimc="brown_d", level=8),
     "stone": dict(ramp=["slate_d", "slate", "slate", "grey"], period=3, dither=0.5, detail="cobbles", rim="cliff", level=9),
-    "snow": dict(ramp=["grey", "grey_l", "white", "white"], period=4, dither=0.4, detail="sparkle", rim="light", rimc="grey", level=10),
+    "snow": dict(ramp=["grey", "grey_l", "white", "white", "white"], period=4, dither=0.4, detail="dunes", rim="light", rimc="grey", level=10,
+                 contrast=0.2),
 }
 ORDER = sorted(TERRAINS, key=lambda k: TERRAINS[k]["level"])
+
+
+def _voronoi(rng, n, S):
+    """Celle di Voronoi periodiche: (id della cella, distanza dal bordo) per ogni pixel."""
+    y, x = np.mgrid[0:S, 0:S]
+    pts = rng.rand(n, 2) * S
+    dist = np.full((S, S), 1e9); dist2 = np.full((S, S), 1e9)
+    ids = np.zeros((S, S), int)
+    for i, (cx, cy) in enumerate(pts):
+        for ox in (-S, 0, S):
+            for oy in (-S, 0, S):
+                dd = (x - cx - ox) ** 2 + (y - cy - oy) ** 2
+                m = dd < dist
+                dist2 = np.where(m, dist, np.minimum(dist2, dd))
+                ids = np.where(m, i, ids); dist = np.where(m, dd, dist)
+    return ids, np.sqrt(dist2) - np.sqrt(dist)
+
+
+def _accent(d, i=0):
+    """Colore d'accento del terreno (piante dei filari, brace delle crepe...)."""
+    acc = d.get("accent", ["white"])
+    return _rgb(acc[min(i, len(acc) - 1)])
 
 
 def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4):
@@ -74,6 +98,7 @@ def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4):
     rs = zlib.crc32(name.encode()) % 1000 + seed   # hash() cambia a ogni avvio: non riproducibile
     base = pnoise(S, d["period"], rs, 3)
     base = (base - base.min()) / (np.ptp(base) + 1e-6)
+    base = 0.5 + (base - 0.5) * d.get("contrast", 1.0)    # <1: macchie piu' tenui, la ripetizione non si vede
     ramp = d["ramp"]
     detail = d["detail"]
     y, x = np.mgrid[0:S, 0:S]
@@ -119,23 +144,96 @@ def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4):
                 img[py % S, (px + dx) % S] = _rgb("blue_d")
             img[(py + 1) % S, (px - 1) % S] = _rgb("blue"); img[(py + 1) % S, px % S] = _rgb("blue_d")
     elif detail == "cobbles":
-        pts = rng.rand(7, 2) * S
-        dist = np.full((S, S), 1e9); dist2 = np.full((S, S), 1e9)
-        ids = np.zeros((S, S), int)
-        for i, (cx, cy) in enumerate(pts):
-            for ox in (-S, 0, S):
-                for oy in (-S, 0, S):
-                    dd = (x - cx - ox) ** 2 + (y - cy - oy) ** 2
-                    m = dd < dist
-                    dist2 = np.where(m, dist, np.minimum(dist2, dd))
-                    ids = np.where(m, i, ids); dist = np.where(m, dd, dist)
-        edge = (np.sqrt(dist2) - np.sqrt(dist)) < 1.8
+        ids, bordo = _voronoi(rng, d.get("cells", 7), S)
+        edge = bordo < 1.8 * S / 32
         shade = (ids % 3)
         img = np.array([_rgb(ramp[1 + int(s) % 3 if 1 + int(s) % 3 < n else n - 1]) for s in shade.ravel()]).reshape(S, S, 3)
         img[edge] = _rgb(ramp[0])
     elif detail == "sparkle":
         for _ in range(S * S // 90):
             put(rng.randint(S), rng.randint(S), 0)
+    elif detail == "slabs":
+        # lastre di pietra: file sfalsate, ogni lastra un tono, fuga scura, spigolo in luce in alto a sinistra
+        lw, lh = S // 2, S // 4
+        riga = y // lh
+        col = (x + (riga % 2) * (lw // 2)) // lw
+        tono = (riga * 7 + col * 3 + rng.randint(3)) % (n - 1) + 1
+        img = np.array([_rgb(c) for c in ramp])[np.minimum(tono, n - 1)]
+        xr = (x + (riga % 2) * (lw // 2)) % lw
+        img[(y % lh == 0) | (xr == 0)] = _rgb(ramp[0])
+        img[((y % lh == 1) | (xr == 1)) & ~((y % lh == 0) | (xr == 0))] = _rgb(ramp[-1])
+        for _ in range(S // 8):                                     # crepe
+            px, py = rng.randint(S), rng.randint(S)
+            for k in range(rng.randint(2, 4)):
+                put(px + k, py + (k // 2), 0)
+    elif detail == "rows":
+        # filari: solchi orizzontali, piante in fila sulla cresta (accento)
+        passo = max(4, S // 4)
+        img[y % passo == 0] = _rgb(ramp[0])
+        img[y % passo == 1] = _rgb(ramp[1])
+        g = max(1, S // 32)                                        # piantine piu' grandi a 64 px
+        for r in range(0, S, passo):
+            for px in range(rng.randint(3), S, max(3, S // 6)):
+                py = (r + passo // 2) % S
+                for oy in range(-g, g + 1):
+                    for ox in range(-g, g + 2):
+                        if abs(oy) + abs(ox - 0.5) <= g + 0.5:
+                            img[(py + oy) % S, (px + ox) % S] = _accent(d, 0)
+                img[(py - g) % S, px % S] = _accent(d, 1)
+    elif detail == "planks":
+        # assi di legno orizzontali con giunte sfalsate e fessure scure (pontili, pavimenti)
+        ah = max(4, S // 8)
+        asse = y // ah
+        img = np.array([_rgb(c) for c in ramp])[1 + (asse * 5 + rng.randint(2)) % (n - 1)]
+        img[y % ah == 0] = _rgb(ramp[0])
+        for a in range(S // ah):
+            gx = (a * 11 * S // 32 + rng.randint(S // 4)) % S
+            img[a * ah:(a + 1) * ah, gx] = _rgb(ramp[0])
+            for _ in range(2):                                    # venature
+                put(rng.randint(S), a * ah + 1 + rng.randint(ah - 1), 1)
+    elif detail == "herringbone":
+        # parquet a spina di pesce: listelli a 45 gradi alternati per colonna
+        lw = max(4, S // 8)
+        colonna = x // lw
+        u = (y + np.where(colonna % 2 == 0, x % lw, lw - 1 - x % lw)) // lw
+        img = np.array([_rgb(c) for c in ramp])[1 + (u + colonna) % (n - 1)]
+        img[(y + np.where(colonna % 2 == 0, x % lw, lw - 1 - x % lw)) % lw == 0] = _rgb(ramp[0])
+        img[x % lw == 0] = _rgb(ramp[0])
+    elif detail == "strata":
+        # strati di roccia: bande ondulate (periodiche) alternate, con fessure
+        k = 2 * math.pi / S
+        onda = (S / 16) * np.sin(x * k * 2 + rng.rand() * 6) + (S / 32) * np.sin(x * k * 3)
+        banda = ((y + onda) // (S / 6)).astype(int)
+        img = np.array([_rgb(c) for c in ramp])[1 + banda % (n - 1)]
+        img[((y + onda) % (S / 6)) < 1] = _rgb(ramp[0])
+        for _ in range(S // 6):
+            put(rng.randint(S), rng.randint(S), n - 1)
+    elif detail == "plates":
+        # lamiera rivettata a riquadri; un riquadro su due e' una grata (buchi scuri)
+        pw = S // 2
+        img[(x % pw == 0) | (y % pw == 0)] = _rgb(ramp[0])
+        img[((x % pw == 1) | (y % pw == 1)) & (x % pw != 0) & (y % pw != 0)] = _rgb(ramp[-1])
+        grata = ((x // pw + y // pw) % 2 == 1) & (x % pw > 2) & (y % pw > 2) & (x % pw < pw - 2) & (y % pw < pw - 2)
+        img[grata & ((x % 3 == 0) | (y % 3 == 0))] = _rgb(ramp[1])
+        img[grata & (x % 3 != 0) & (y % 3 != 0)] = _rgb("ink")
+        for cx in (3, pw - 3):
+            for cy in (3, pw - 3):
+                for ox in (0, pw):
+                    for oy in (0, pw):
+                        if not ((ox // pw + oy // pw) % 2):
+                            put(cx + ox, cy + oy, n - 1); put(cx + ox + 1, cy + oy + 1, 0)
+    elif detail == "embers":
+        # roccia lavica: crepe (bordi di Voronoi) incandescenti, piu' calde al centro della crepa
+        ids, bordo = _voronoi(rng, d.get("cells", 6), S)
+        img[bordo < 1.5 * S / 32] = _accent(d, 0)
+        img[bordo < 0.6 * S / 32] = _accent(d, 1)
+    elif detail == "dunes":
+        # dune di vento: creste ondulate diagonali, chiare al vento e ombra sottile sotto
+        k = 2 * math.pi / S
+        w = np.sin(k * (2 * x + y) + 0.7 * np.sin(k * 2 * y))
+        spezza = pnoise(S, 3, rs + 1, 2) > 0.45                  # creste interrotte, non righe continue
+        cresta = (w > 0.97) & spezza
+        img[cresta] = _rgb(ramp[1])                                # una linea sottile grigio chiaro
     return img
 
 
