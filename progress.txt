@@ -7812,3 +7812,22 @@ Giro 3 (4 risposte, totale Mirwada 12 -> regione definita):
 - Ingressi alle fogne: TOMBINI in strada, SBOCCO SUL MARE vicino al porto
   (contrabbando), CANTINE SEGRETE con botola (passaggi segreti).
 - Vegetazione: POCA IN CITTA', TANTA FUORI (campagna coltivata).
+
+[2026-10-13] US-8B15 (in corso) — Marche del Crepuscolo: risposte (12, regione definita).
+- Luce: CICLO NORMALE ma toni crepuscolari anche di giorno (le regole sulla
+  notte, es. cripte a notte_fonda, restano valide).
+- Terreno: ALTOPIANO A GRADONI (terrazze di roccia a livelli).
+- Campo di battaglia: di GIGANTI (ossa enormi, armi grandi come alberi).
+- Cripte: MISTO (mausolei in superficie; solo la cripta principale scende
+  in una mappa sotterranea separata).
+- Trono del Gigante: SCOLPITO NELLA MONTAGNA, sul gradone piu' alto, visibile
+  da tutta la regione. Fog of war: nessun nome/scritta sulla mappa.
+- Vegetazione: QUASI NIENTE (roccia, ghiaia, muschio).
+- Abitanti: SOLO EREMITI (capanne isolate); il rifugio-base e' isolato.
+- Tempio abbandonato: TEMPIO DEI GIGANTI (colonne enormi, scale troppo alte).
+- Soglia del Crepuscolo: VORAGINE con scale che scendono nel buio.
+- Tra i gradoni: RAMPE E SENTIERI (sempre), SCALE DEI GIGANTI e PARETI
+  SCALABILI (solo con arrampicata sbloccata).
+- Ingresso principale da Mirwada: PASSO TRA DUE RUPI.
+- Passaggi segreti in ombra (shadow_meld): OMBRE TROPPO SCURE che non si
+  muovono con la luce.

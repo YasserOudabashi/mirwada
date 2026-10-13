@@ -123,6 +123,16 @@ con oggetti casuali. Casa-base vicino al porto. Monumento: il faro. Notte:
 lampioni a gas. Fogne: grande livello interno, ingressi da tombini, sbocco sul
 mare e cantine segrete. Verde: poco in città, tanto fuori.
 
+**Marche del Crepuscolo — decise (12 risposte, 2026-10-13).** Ciclo giorno/notte
+normale con toni crepuscolari. Altopiano a gradoni: rampe e sentieri sempre,
+scale dei giganti e pareti scalabili con l'arrampicata. Campo di battaglia di
+giganti (ossa e armi enormi). Cripte miste: mausolei in superficie, solo la
+principale scende in un interno. Trono del Gigante scolpito nella montagna sul
+gradone più alto (nessuna scritta: fog of war). Vegetazione quasi assente.
+Solo eremiti; rifugio-base isolato. Tempio dei giganti. Soglia del Crepuscolo
+= voragine con scale nel buio. Ingresso principale: passo tra due rupi.
+Passaggi in ombra: ombre troppo scure che non seguono la luce.
+
 **US-8B18b [A] Isole.** Le isole del mare a sud: quante, cosa nascondono, quali
 siti ospitano. *Domande (L).*
 
