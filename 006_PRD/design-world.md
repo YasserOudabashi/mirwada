@@ -11,6 +11,13 @@
 > Valle della Madre / Archivio Sepolto / Frontiera delle Porte — vivono solo
 > nei dati e nelle chiavi `region.*`.
 
+> **Aggiornamento 2026-10-13 (CLAUDE.md v2, PRD fase 8b):** la generazione
+> procedurale è ora consentita **come strumento di produzione** (mai a runtime)
+> e il mondo diventa **unico e collegato**: 5 regioni + 6 isole, disposizione e
+> biomi decisi con l'utente in `006_PRD/prd-fase-8b-arte.md` (§2 e Blocco B),
+> risposte complete in `progress.txt`. Dove questo file e il PRD 8b non
+> coincidono, vince il PRD 8b.
+
 Figlio di `design-master.md`. Materia di fase 6 (le fondamenta dei vocabolari
 si anticipano a fase 5, perche' i rituali le usano gia'). Vincoli ereditati:
 **niente open world senza gating, niente generazione procedurale** (non-goals),

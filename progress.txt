@@ -7884,3 +7884,21 @@ Giro 3 (4 risposte, totale Mirwada 12 -> regione definita):
 - Abitanti: BURATTINI E MANICHINI che recitano scene a ripetizione (innocui).
 - Soglia = BORDO di un'isoletta dove il terreno finisce nella nebbia;
   nebbia_grigia = zona dove la nebbia copre il terreno.
+
+[2026-10-13] US-8B18b (in corso) — Isole: risposte (6, definite).
+- 6 isole piccole (oltre alla Frontiera), CLIMA DIVERSO PER ISOLA. Temi
+  (proposta di Claude accettata): 1 Isola del Relitto (rocciosa, nave
+  naufragata, forzieri dei contrabbandieri), 2 Isola Vulcanica (cenere,
+  ingredienti rari di fuoco), 3 Isola Tropicale (palme, laguna, villaggio di
+  pescatori), 4 Isola delle Rovine (culto antico, indizi sulla Frontiera),
+  5 Scoglio del Faro abbandonato (un eremita), 6 Isola del Boss.
+- Contenuti: forzieri e relitti, ingredienti rari, rovine misteriose, abitanti.
+- ISOLA DEL BOSS (richiesta dell'utente): un boss che comanda mostri piu'
+  piccoli; sconfitto il boss muoiono anche loro. NASCOSTA: si trova solo
+  seguendo un indizio (mappa del tesoro, dialogo). Dettagli della meccanica:
+  DOPO, insieme al PRD dei nemici (decisione 3).
+- Viaggio: BARCA LIBERA + VOLO tra le isole vicine.
+
+STATO US-8B10 (struttura del mondo + biomi): DECISO. 5 regioni + 6 isole,
+94 risposte in tutto. Prossimo: spiegare US-8B01 (64 px), US-8B02 (forge3d
+nel repo), US-8B11 (terreni nuovi) e US-8B13 (mappa di prova) e aspettare il via.

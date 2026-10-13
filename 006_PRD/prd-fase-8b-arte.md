@@ -159,8 +159,13 @@ palco. Crocevia di strade sospese che finiscono in porte. Zone sbagliate:
 oggetti sospesi, riflessi sbagliati, glitch visivi, tempo fermo. Burattini e
 manichini innocui. Soglia = bordo di un'isoletta sulla nebbia.
 
-**US-8B18b [A] Isole.** Le isole del mare a sud: quante, cosa nascondono, quali
-siti ospitano. *Domande (L).*
+**US-8B18b [A] Isole — decise (6 risposte, 2026-10-13).** 6 isole piccole oltre
+alla Frontiera, clima diverso per isola: Relitto (rocciosa, nave naufragata,
+forzieri), Vulcanica (cenere, ingredienti di fuoco), Tropicale (laguna,
+villaggio di pescatori), Rovine (culto antico, indizi sulla Frontiera), Scoglio
+del Faro abbandonato (un eremita), **Isola del Boss** (nascosta, si trova solo
+con un indizio; il boss comanda mostri più piccoli che muoiono con lui:
+meccanica da decidere nel PRD dei nemici). Barca libera + volo tra isole vicine.
 
 **US-8B18 [A+C] Edifici e oggetti di scena.** Il generatore oggi non fa edifici
 né ponti veri: estensione di `forge3d` (case, ponti, templi, torre, scaffali,
