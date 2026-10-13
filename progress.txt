@@ -7779,3 +7779,9 @@ Giro 4 (4 risposte, totale 16):
 - Mare: ISOLE DA ESPLORARE, raggiungibili in barca, con segreti e siti.
 - Prossimo passo: Claude propone la disposizione delle 5 regioni (scelta
   lasciata a Claude), poi un giro di 10-15 domande per regione.
+- DISPOSIZIONE SCELTA: variante C (schizzo a 3 varianti mostrato all'utente).
+  Marche nord-ovest, Archivio nord-est (tutto al chiuso), Mirwada centro-sud
+  sul porto, Valle sud-est sulla costa, FRONTIERA = isola grande e nebbiosa
+  nel mare a sud, solo in barca o volo (gating naturale dell'endgame).
+  Schizzo: script usa-e-getta nello scratchpad, non e' un asset (la mappa
+  vera e' US-8B13 con forge3d e seed).

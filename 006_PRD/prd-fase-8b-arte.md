@@ -196,42 +196,42 @@ scavalca, dove si atterra, costo. Quasi certamente 2–3 story. *Domande (XL).*
 **US-8B94 [C] Base sceglibile e spostabile.** I 4 luoghi, come si sceglie, cosa
 succede alle stanze quando si sposta, la nave come base mobile. *Domande (L).*
 
-## 5. Disposizione proposta delle regioni (US-8B13, da approvare)
+## 5. Disposizione delle regioni (US-8B13) — SCELTA: variante C
 
-Nord freddo, sud caldo; Mirwada sul mare; isole a sud.
+Scelta dall'utente il 2026-10-13 guardando lo schizzo di 3 varianti
+(A: proposta di Claude, B: Marche e Valle scambiate, C: Frontiera oltre il mare).
 
 ```
-                 N  (freddo)
+                 N  (freddo, neve)
    +-------------------------------------------+
-   |   MARCHE DEL         ARCHIVIO    FRONTIERA |
-   |   CREPUSCOLO         SEPOLTO     DELLE     |
-   |   (brughiera,        (ingresso   PORTE     |
-   |    alture, vette     nella neve, (nebbia,  |
-   |    fredde)           tutto       oltre i   |
-   |                      al chiuso)  monti)    |
-   |                                            |
-   |          MIRWADA            VALLE DELLA    |
-   |          (citta' di porto,  MADRE          |
-   |           clima mite)       (foresta umida,|
-   |                             grotte di marea|
-   |                             sulla costa)   |
-   |~~~~~~~~~~~~~ costa ~~~~~~~~~~~~~~~~~~~~~~~ |
-   |      o isola        o isola       o isola  |
+   |   MARCHE DEL              ARCHIVIO         |
+   |   CREPUSCOLO              SEPOLTO          |
+   |   (brughiera, alture,     (ingresso nella  |
+   |    vette fredde)           neve, tutto     |
+   |                            al chiuso)      |
+   |            MIRWADA                         |
+   |            (citta' di porto,  VALLE DELLA  |
+   |             clima mite)       MADRE        |
+   |                               (foresta,    |
+   |                                grotte di   |
+   |~~~~~~~~~~~~~~~ costa ~~~~~~~~~~ marea) ~~~ |
+   |   o isola    o isola   [FRONTIERA]  o isola|
+   |                        (isola grande,      |
+   |                         nebbia)            |
    +-------------------------------------------+
                  S  (caldo, mare)
 ```
 
-Perché così:
-- **Mirwada** al centro-sud: è l'hub, quindi tocca tutte le regioni terrestri ed
-  è sul mare (porto, partenza della barca per le isole).
-- **Valle della Madre** a sud-est: è umida e calda, e le `grotta_di_marea` hanno
-  bisogno della costa.
-- **Marche del Crepuscolo** a nord-ovest: brughiera fredda e ventosa, alture e
-  `vetta`; il tramonto infinito si legge meglio su un orizzonte freddo.
-- **Archivio Sepolto** al nord: una città di studiosi sepolta dalla neve. In
-  superficie c'è solo l'ingresso, tutto il resto è al chiuso.
-- **Frontiera delle Porte** all'estremo nord-est, oltre i monti: la più lontana
-  dall'hub (è l'endgame), visibile da lontano fin dall'inizio (design-world 2.5).
+- **Mirwada** al centro-sud, sul porto: tocca tutte le regioni di terra.
+- **Marche del Crepuscolo** a nord-ovest: brughiera fredda, alture, `vetta`.
+- **Archivio Sepolto** a nord-est: ingresso nella neve, tutto al chiuso.
+- **Valle della Madre** a sud-est, sulla costa (per le `grotta_di_marea`).
+- **Frontiera delle Porte** = **isola grande e nebbiosa nel mare a sud**,
+  raggiungibile **solo in barca o in volo**. Si vede dal porto fin
+  dall'inizio (design-world 2.5: "visibile presto, inaccessibile fino a
+  `sequenza_max: 4` circa"): lo sblocco della barca o del volo è il
+  gating naturale dell'endgame.
+- Le altre isole (piccole) sono quelle di US-8B18b.
 
 Poi un giro di 10–15 domande per ogni regione (US-8B14..18).
 
