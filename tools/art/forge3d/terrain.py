@@ -67,6 +67,25 @@ TERRAINS = {
     "stone": dict(ramp=["slate_d", "slate", "slate", "grey"], period=3, dither=0.5, detail="cobbles", rim="cliff", level=9),
     "snow": dict(ramp=["grey", "grey_l", "white", "white", "white"], period=4, dither=0.4, detail="dunes", rim="light", rimc="grey", level=10,
                  contrast=0.2),
+    # --- Mirwada (US-8B11b). Livelli con la virgola: si inseriscono tra quelli sopra senza rinumerarli ---
+    "ciottoli_spiaggia": dict(ramp=["tan", "grey", "grey_l", "cream"], period=4, dither=0.4, detail="cobbles", cells=16,
+                              rim="dark", rimc="tan", level=2.5),
+    "filari": dict(ramp=["brown_dd", "brown_d", "brown_d", "brown"], period=4, dither=0.5, detail="rows", rim="dark",
+                   rimc="brown_dd", level=5.5, contrast=0.3, accent=["green_m", "green"]),
+    "lastricato_antico": dict(ramp=["green_d", "grey", "grey_l", "cream"], period=4, dither=0.4, detail="cobbles", cells=5,
+                              rim="dark", rimc="green_d", level=8.2),
+    "ghiaia": dict(ramp=["slate", "grey", "grey_l", "white"], period=4, dither=0.6, detail="pebbles", rim="dark", rimc="grey",
+                   level=8.3, contrast=0.15),
+    "marmo": dict(ramp=["grey", "grey_l", "white", "white"], period=4, dither=0.3, detail="slabs", slab=(2, 2), rim="dark",
+                  rimc="slate", level=8.4, contrast=0.4),
+    "ciottoli_scuri": dict(ramp=["brown_dd", "slate_d", "slate", "grey"], period=4, dither=0.4, detail="cobbles", cells=12,
+                           rim="dark", rimc="brown_dd", level=8.6),
+    "lastre_chiare": dict(ramp=["grey", "grey_l", "cream", "cream"], period=4, dither=0.4, detail="slabs", slab=(2, 2),
+                          rim="dark", rimc="slate", level=8.8, contrast=0.5),
+    "molo_pietra": dict(ramp=["navy", "slate_d", "slate", "grey"], period=4, dither=0.4, detail="slabs", rim="cliff",
+                        rimc="navy", level=9.2, contrast=0.5),
+    "pontile_legno": dict(ramp=["brown_dd", "brown_d", "brown", "tan"], period=4, dither=0.3, detail="planks", rim="dark",
+                          rimc="brown_dd", level=9.4),
 }
 ORDER = sorted(TERRAINS, key=lambda k: TERRAINS[k]["level"])
 
@@ -154,10 +173,10 @@ def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4):
             put(rng.randint(S), rng.randint(S), 0)
     elif detail == "slabs":
         # lastre di pietra: file sfalsate, ogni lastra un tono, fuga scura, spigolo in luce in alto a sinistra
-        lw, lh = S // 2, S // 4
+        lw, lh = S // d.get("slab", (2, 4))[0], S // d.get("slab", (2, 4))[1]   # (2,4) blocchi, (2,2) lastre quadrate
         riga = y // lh
         col = (x + (riga % 2) * (lw // 2)) // lw
-        tono = (riga * 7 + col * 3 + rng.randint(3)) % (n - 1) + 1
+        tono = (riga * 7 + col * 5 + (riga * col) % 3 + rng.randint(3)) % (n - 1) + 1   # ogni lastra il suo tono
         img = np.array([_rgb(c) for c in ramp])[np.minimum(tono, n - 1)]
         xr = (x + (riga % 2) * (lw // 2)) % lw
         img[(y % lh == 0) | (xr == 0)] = _rgb(ramp[0])

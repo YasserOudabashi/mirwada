@@ -8012,3 +8012,20 @@ approvato la spiegazione e il via alla 8B11a.
 - Aperto: dry_grass, dirt, path e forest hanno ancora macchie che si ripetono
   (si ritoccano con i terreni delle loro regioni, 8B11b/c); i colori delle
   "prova:" sono provvisori.
+
+[2026-10-13] US-8B11b — terreni di Mirwada. FATTA (in attesa dell'occhio dell'utente).
+- 9 righe in tools/art/forge3d/terrain.py (8 previsti + ghiaia e marmo
+  separati): ciottoli_spiaggia 2.5, filari 5.5, lastricato_antico 8.2,
+  ghiaia 8.3, marmo 8.4, ciottoli_scuri 8.6, lastre_chiare 8.8,
+  molo_pietra 9.2, pontile_legno 9.4 (livelli decimali: nessuna rinumerazione).
+- slabs: parametro `slab` (2,4 blocchi; 2,2 lastre quadrate) e tono per
+  lastra (prima col*3 % 3 = 0 -> fasce dello stesso colore per riga).
+- campioni_terreni.py: tolte le prove gia' diventate terreni veri; nuova
+  "scena di Mirwada" (pontile e molo, porto, centro antico, campagna, cimitero).
+- Guardato ingrandito, 3 giri: lastre arancioni a mattoni -> quadrate chiare;
+  marmo a mattoni -> quadrato; ghiaia a macchie di neve -> sassolini fitti;
+  lastricato squadrato -> pietre irregolari con erba nelle fughe; fasce di
+  tono -> tono per lastra.
+- Verificato: md5 identico su due lanci (campioni + mappa); validate exit 0.
+- NON ancora usati da build_world.py: si collegano dopo il via dell'utente
+  sulla tavola (come concordato).

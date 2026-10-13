@@ -26,12 +26,6 @@ OUT = os.path.join(HERE, "..", "..", "arte", "terreni")
 
 # Solo per mostrare i motivi nuovi: non sono in ORDER, la mappa non li usa.
 PROVE = {
-    "prova:erba_prima": dict(T.TERRAINS["grass"], contrast=1.0),
-    "prova:lastre": dict(ramp=["tan", "cream", "cream", "white"], period=4, dither=0.4, detail="slabs", rim=None, level=99),
-    "prova:filari": dict(ramp=["brown_d", "brown", "brown", "orange_d"], period=4, dither=0.5, detail="rows", rim=None,
-                         contrast=0.4,
-                         level=99, accent=["green_m", "green"]),
-    "prova:assi": dict(ramp=["brown_dd", "brown_d", "brown", "tan"], period=4, dither=0.3, detail="planks", rim=None, level=99),
     "prova:parquet": dict(ramp=["brown_dd", "brown_d", "brown_d", "brown"], period=4, dither=0.3, detail="herringbone",
                           rim=None, level=99),
     "prova:strati": dict(ramp=["brown_dd", "brown_d", "rust", "brown"], period=4, dither=0.4, detail="strata", rim=None,
@@ -61,8 +55,24 @@ def main():
                       [L["water"]] * 3 + [L["sand"]] * 2 + [L["grass"]] * 2 + [L["forest"]] * 2 + [L["stone"]] * 3,
                       [L["water"]] * 2 + [L["sand"]] * 2 + [L["grass"]] * 3 + [L["dirt"]] * 2 + [L["snow"]] * 3])
     trans = T.compose_ground(mappa, S=S)
+    # scena di Mirwada: mare -> pontile e molo -> porto (ciottoli) -> centro (lastre) -> campagna
+    M = [list(r) for r in (
+        "WWWWWWPPWWWWWWWW",
+        "WWWWWWPPWWMMMMWW",
+        "WwwwwwPPwwMMMMww",
+        "bbsscccccccccccc",
+        "bssccclllllllggg",
+        "ssggcclllllllgff",
+        "gggggrrrrgggmmff",
+        "gggggrgggggmhmff")]
+    cod = {"W": "deep_water", "w": "water", "P": "pontile_legno", "M": "molo_pietra", "b": "ciottoli_spiaggia",
+           "s": "sand", "c": "ciottoli_scuri", "l": "lastre_chiare", "g": "grass", "f": "filari",
+           "r": "lastricato_antico", "m": "marmo", "h": "ghiaia"}
+    scena = T.compose_ground(np.array([[L[cod[ch]] for ch in r] for r in M]), S=S)
     larg = cols * cella + (cols - 1) * gap
-    tav = Image.new("RGB", (larg, righe * (cella + testa + gap) + trans.shape[0] + testa + gap), (244, 244, 244))
+    larg = max(larg, scena.shape[1])
+    tav = Image.new("RGB", (larg, righe * (cella + testa + gap) + trans.shape[0] + scena.shape[0] + 2 * (testa + gap)),
+                    (244, 244, 244))
     dr = ImageDraw.Draw(tav)
     for i, n in enumerate(nomi):
         tex = T.terrain_texture(n, S)
@@ -73,6 +83,10 @@ def main():
     y = righe * (cella + testa + gap)
     dr.text((0, y + 2), f"transizioni tra terreni (dual grid), {S} px per tile, 1:1", fill=(24, 20, 37), font=font)
     tav.paste(Image.fromarray(trans[..., :3]), (0, y + testa))
+    y += trans.shape[0] + testa + gap
+    dr.text((0, y + 2), "scena di Mirwada: pontile e molo, porto, centro antico, campagna, cimitero", fill=(24, 20, 37),
+            font=font)
+    tav.paste(Image.fromarray(scena[..., :3]), (0, y + testa))
     os.makedirs(OUT, exist_ok=True)
     path = os.path.join(OUT, "campioni.png")
     tav.save(path)
