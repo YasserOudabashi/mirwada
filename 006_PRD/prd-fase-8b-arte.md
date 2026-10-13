@@ -112,6 +112,17 @@ Ogni `location_tag` della regione deve esistere a schermo. Ingresso principale,
 1–2 passaggi segreti, ~15% chiuso.
 *Domande (XL) per ogni regione: 10–15.*
 
+**Mirwada — decisa (12 risposte, 2026-10-13).** Stile misto: centro antico in
+pietra chiara sulla collina, quartiere operaio industriale e porto con
+ciminiere in basso. Mura vecchie in rovina, città cresciuta fuori. Metà città,
+metà campagna. Grande porto commerciale (moli, navi a vapore e vela, gru,
+magazzini, dogana, cantiere). Archivio dell'ordine minore fuori le mura (ex
+monastero). Campagna: uliveti e vigneti, fattorie e mulini, cimitero
+monumentale, faro e scogliere, piccole caverne con forzieri e mostri, casette
+con oggetti casuali. Casa-base vicino al porto. Monumento: il faro. Notte:
+lampioni a gas. Fogne: grande livello interno, ingressi da tombini, sbocco sul
+mare e cantine segrete. Verde: poco in città, tanto fuori.
+
 **US-8B18b [A] Isole.** Le isole del mare a sud: quante, cosa nascondono, quali
 siti ospitano. *Domande (L).*
 
@@ -132,6 +143,12 @@ Valle, nave. *Domande (L).*
 **US-8B21 [A] Varchi di gating visibili.** Un aspetto per ognuno dei 6 tipi in
 `gate_types.json` (ombra, radici, porta sigillata, ...). Il giocatore deve capire
 *che* c'è un varco, non *come* si apre.
+
+**US-8B22 [C+D] Forzieri e oggetti casuali.** Richiesta dell'utente per Mirwada
+(caverne con forzieri, casette con oggetti casuali). Oggi **non esiste** un
+sistema di bottino: servono un oggetto di scena "forziere" e tabelle di bottino
+nei dati (quali oggetti, con che probabilità, una volta sola o rigenerati).
+Story di codice: spiegarla prima. *Domande (M).*
 
 ### Blocco C — Personaggi (rigenerati a 64 px)
 

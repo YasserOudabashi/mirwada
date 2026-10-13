@@ -7785,3 +7785,30 @@ Giro 4 (4 risposte, totale 16):
   nel mare a sud, solo in barca o volo (gating naturale dell'endgame).
   Schizzo: script usa-e-getta nello scratchpad, non e' un asset (la mappa
   vera e' US-8B13 con forge3d e seed).
+
+[2026-10-13] US-8B14 (in corso) — Mirwada: risposte dell'utente.
+Giro 1-2 (8 risposte):
+- Stile MISTO: centro antico in pietra chiara sulla collina, quartiere
+  operaio industriale e porto con ciminiere in basso.
+- MURA VECCHIE IN ROVINA: la citta' nuova e' cresciuta fuori.
+- META' citta', META' campagna (su 15-20 schermate).
+- Sotterraneo = GRANDE RETE DI FOGNE (livello interno grande quanto mezza
+  citta', scorciatoie sotto i quartieri).
+- GRANDE PORTO COMMERCIALE: moli lunghi, navi a vapore e vela, gru,
+  magazzini, dogana, cantiere navale.
+- Archivio dell'ordine minore (Ottavia) FUORI LE MURA: ex monastero in
+  campagna, primo passo verso l'Archivio Sepolto a nord.
+- Campagna: uliveti e vigneti, fattorie e mulini, cimitero monumentale,
+  faro e scogliere + (aggiunta dell'utente) PICCOLE CAVERNE con forzieri e
+  qualche mostro, CASETTE con oggetti casuali.
+  NB: forzieri e oggetti casuali = oggetti di scena + tabelle di bottino nei
+  dati; se il sistema non c'e' e' una story di codice da spiegare prima.
+  I mostri nelle caverne per ora sono nemico_base (nemici per regione: PRD a parte).
+- Casa-base a Mirwada VICINO AL PORTO (magazzino riadattato).
+Giro 3 (4 risposte, totale Mirwada 12 -> regione definita):
+- Monumento di riferimento: IL FARO sulle scogliere (si vede anche di notte).
+- Notte: LAMPIONI A GAS sulle strade principali, vicoli bui (luci = oggetti
+  nei dati, non dipinte sul terreno).
+- Ingressi alle fogne: TOMBINI in strada, SBOCCO SUL MARE vicino al porto
+  (contrabbando), CANTINE SEGRETE con botola (passaggi segreti).
+- Vegetazione: POCA IN CITTA', TANTA FUORI (campagna coltivata).
