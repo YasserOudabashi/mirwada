@@ -7949,3 +7949,16 @@ nel repo), US-8B11 (terreni nuovi) e US-8B13 (mappa di prova) e aspettare il via
   attorno a H*COSTA), si vede con qualunque seed. md5 ricontrollato.
 - Da ritoccare nei dati (US-8B14/15): nel seed 6 un lobo di Mirwada a
   nord-ovest resta chiuso dalle rupi delle Marche (casetta_1 dentro).
+
+[2026-10-13] US-8B11 (in corso) — terreni nuovi: risposte dell'utente.
+Mirwada (8):
+- Strade: DUE SELCIATI DIVERSI: centro antico in lastre di pietra chiara;
+  quartiere operaio e porto in ciottoli scuri e fango.
+- Banchine: ENTRAMBI: moli di pietra (bitte, anelli) per le navi grandi +
+  pontili di legno su pali per le barche piccole.
+- Uliveti e vigneti: FILARI (righe di terra lavorata, piante in fila).
+- Erba: VERDE BRILLANTE (come ora, ma senza le righe regolari).
+- Strade di campagna: LASTRICATO ANTICO mezzo coperto dall'erba.
+- Spiagge: MISTE: sabbia nelle calette, ciottoli vicino a porto e scogli.
+- Cimitero e monastero: terreno proprio, GHIAIA BIANCA E MARMO.
+- Acqua bassa: TURCHESE TRASPARENTE (si vede il fondo chiaro).
