@@ -7900,5 +7900,5 @@ Giro 3 (4 risposte, totale Mirwada 12 -> regione definita):
 - Viaggio: BARCA LIBERA + VOLO tra le isole vicine.
 
 STATO US-8B10 (struttura del mondo + biomi): DECISO. 5 regioni + 6 isole,
-94 risposte in tutto. Prossimo: spiegare US-8B01 (64 px), US-8B02 (forge3d
+83 risposte in tutto. Prossimo: spiegare US-8B01 (64 px), US-8B02 (forge3d
 nel repo), US-8B11 (terreni nuovi) e US-8B13 (mappa di prova) e aspettare il via.
