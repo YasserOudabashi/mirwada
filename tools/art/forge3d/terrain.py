@@ -60,10 +60,10 @@ TERRAINS = {
     "mud": dict(ramp=["brown_dd", "brown_d", "brown_d", "brown"], period=3, dither=0.6, detail="puddles", rim="dark", level=3),
     "grass": dict(ramp=["green_d", "green_m", "green_m", "green"], period=4, dither=0.5, detail="tufts", rim="dark", rimc="green_d", level=4,
                   contrast=0.45),
-    "dry_grass": dict(ramp=["brown_d", "#8a7a38", "#b3a050", "#cdbb64"], period=4, dither=0.5, detail="tufts", rim="dark", rimc="brown", level=5),
-    "forest": dict(ramp=["teal_d", "green_d", "green_d", "green_m"], period=4, dither=0.5, detail="leaves", rim="dark", rimc="teal_d", level=6),
-    "dirt": dict(ramp=["brown_d", "brown", "brown", "orange_d"], period=4, dither=0.6, detail="pebbles", rim="dark", level=7),
-    "path": dict(ramp=["brown_d", "brown", "#c9946a", "#dcb68a"], period=5, dither=0.6, detail="pebbles", rim="dark", rimc="brown_d", level=8),
+    "dry_grass": dict(ramp=["brown_d", "#8a7a38", "#b3a050", "#cdbb64"], period=4, dither=0.5, detail="tufts", rim="dark", rimc="brown", level=5, contrast=0.45),
+    "forest": dict(ramp=["teal_d", "green_d", "green_d", "green_m"], period=4, dither=0.5, detail="leaves", rim="dark", rimc="teal_d", level=6, contrast=0.45),
+    "dirt": dict(ramp=["brown_d", "brown", "brown", "orange_d"], period=4, dither=0.6, detail="pebbles", rim="dark", level=7, contrast=0.45),
+    "path": dict(ramp=["brown_d", "brown", "#c9946a", "#dcb68a"], period=5, dither=0.6, detail="pebbles", rim="dark", rimc="brown_d", level=8, contrast=0.45),
     "stone": dict(ramp=["slate_d", "slate", "slate", "grey"], period=3, dither=0.5, detail="cobbles", rim="cliff", level=9),
     "snow": dict(ramp=["grey", "grey_l", "white", "white", "white"], period=4, dither=0.4, detail="dunes", rim="light", rimc="grey", level=10,
                  contrast=0.2),
@@ -86,6 +86,25 @@ TERRAINS = {
                         rimc="navy", level=9.2, contrast=0.5),
     "pontile_legno": dict(ramp=["brown_dd", "brown_d", "brown", "tan"], period=4, dither=0.3, detail="planks", rim="dark",
                           rimc="brown_dd", level=9.4),
+    # --- Marche e Valle (US-8B11c) ---
+    "palude": dict(ramp=["brown_dd", "teal_d", "green_d", "brown_d"], period=3, dither=0.6, detail="puddles", rim="dark",
+                   rimc="brown_dd", level=3.2, contrast=0.25, accent=["teal_d", "green_m"]),
+    "erba_argentata": dict(ramp=["slate", "grey", "grey_l", "white"], period=4, dither=0.5, detail="tufts", rim="dark",
+                           rimc="slate", level=4.2, contrast=0.4),
+    "erica_secca": dict(ramp=["brown_dd", "brown_d", "brown_d", "purple"], period=4, dither=0.5, detail="tufts", rim="dark",
+                        rimc="brown_dd", level=5.2, contrast=0.4),
+    "felci": dict(ramp=["teal_d", "green_d", "green_m", "green"], period=4, dither=0.5, detail="leaves", rim="dark",
+                  rimc="teal_d", level=6.2, contrast=0.4),
+    "radici_muschio": dict(ramp=["teal_d", "green_d", "green_m", "green_m"], period=4, dither=0.5, detail="embers", cells=3, spessore=0.7,
+                           rim="dark", rimc="teal_d", level=6.4, contrast=0.4, accent=["brown_dd", "brown_d"]),
+    "muschio_scuro": dict(ramp=["ink", "teal_d", "teal_d", "green_d"], period=4, dither=0.5, detail="dots", rim="dark",
+                          rimc="ink", level=6.6, contrast=0.4),
+    "pietrisco": dict(ramp=["brown_dd", "brown_d", "brown_d", "skin_m"], period=4, dither=0.6, detail="pebbles", rim="dark",
+                      rimc="brown_dd", level=7.2, contrast=0.15),
+    "terra_bruciata": dict(ramp=["ink", "brown_dd", "brown_dd", "slate_d"], period=4, dither=0.5, detail="dots", rim="dark",
+                           rimc="ink", level=7.4, contrast=0.4),
+    "arenaria": dict(ramp=["brown_dd", "brown_d", "brown_d", "rust"], period=4, dither=0.4, detail="strata", bande=4,
+                     rim="cliff", rimc="brown_dd", level=9.0),
 }
 ORDER = sorted(TERRAINS, key=lambda k: TERRAINS[k]["level"])
 
@@ -159,9 +178,10 @@ def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4):
     elif detail == "puddles":
         for _ in range(3):
             px, py = rng.randint(S), rng.randint(S)
+            pozza, luce = (_accent(d, 0), _accent(d, 1)) if "accent" in d else (_rgb("blue_d"), _rgb("blue"))
             for dx in range(-2, 3):
-                img[py % S, (px + dx) % S] = _rgb("blue_d")
-            img[(py + 1) % S, (px - 1) % S] = _rgb("blue"); img[(py + 1) % S, px % S] = _rgb("blue_d")
+                img[py % S, (px + dx) % S] = pozza
+            img[(py + 1) % S, (px - 1) % S] = luce; img[(py + 1) % S, px % S] = pozza
     elif detail == "cobbles":
         ids, bordo = _voronoi(rng, d.get("cells", 7), S)
         edge = bordo < 1.8 * S / 32
@@ -222,9 +242,10 @@ def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4):
         # strati di roccia: bande ondulate (periodiche) alternate, con fessure
         k = 2 * math.pi / S
         onda = (S / 16) * np.sin(x * k * 2 + rng.rand() * 6) + (S / 32) * np.sin(x * k * 3)
-        banda = ((y + onda) // (S / 6)).astype(int)
+        h = S / d.get("bande", 6)                                  # bande per tile: meno bande = piu' spesse
+        banda = ((y + onda) // h).astype(int)
         img = np.array([_rgb(c) for c in ramp])[1 + banda % (n - 1)]
-        img[((y + onda) % (S / 6)) < 1] = _rgb(ramp[0])
+        img[((y + onda) % h) < 1] = _rgb(ramp[0])
         for _ in range(S // 6):
             put(rng.randint(S), rng.randint(S), n - 1)
     elif detail == "plates":
@@ -244,8 +265,9 @@ def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4):
     elif detail == "embers":
         # roccia lavica: crepe (bordi di Voronoi) incandescenti, piu' calde al centro della crepa
         ids, bordo = _voronoi(rng, d.get("cells", 6), S)
-        img[bordo < 1.5 * S / 32] = _accent(d, 0)
-        img[bordo < 0.6 * S / 32] = _accent(d, 1)
+        sp = d.get("spessore", 1.5)                                # radici sottili, crepe di lava larghe
+        img[bordo < sp * S / 32] = _accent(d, 0)
+        img[bordo < sp * 0.4 * S / 32] = _accent(d, 1)
     elif detail == "dunes":
         # dune di vento: creste ondulate diagonali, chiare al vento e ombra sottile sotto
         k = 2 * math.pi / S

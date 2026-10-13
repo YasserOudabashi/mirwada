@@ -8029,3 +8029,23 @@ approvato la spiegazione e il via alla 8B11a.
 - Verificato: md5 identico su due lanci (campioni + mappa); validate exit 0.
 - NON ancora usati da build_world.py: si collegano dopo il via dell'utente
   sulla tavola (come concordato).
+
+[2026-10-13] US-8B11c — terreni di Marche e Valle. FATTA (in attesa dell'occhio dell'utente).
+- 9 righe in terrain.py: palude 3.2, erba_argentata 4.2 (versione notturna
+  delle radure: lo scambio giorno/notte e' codice Godot, US-8B12), erica_secca
+  5.2, felci 6.2, radici_muschio 6.4, muschio_scuro 6.6, pietrisco 7.2,
+  terra_bruciata 7.4, arenaria 9.0 (anche scogliere della Valle).
+- Codice: puddles con colore d'accento (pozze verdi della palude); strata con
+  `bande` (spessore); embers con `spessore` (radici sottili, lava larga).
+  Nessun motivo nuovo. Contrast 0.45 a dry_grass/forest/dirt/path (aperto da 8B11a).
+- campioni_terreni.py: SCENE come lista con id esplicito (mirwada, marche,
+  valle), ognuna salvata anche come arte/terreni/scena_<id>.png; controllo
+  sulle righe di lunghezza diversa (mi era capitato).
+- Guardato ingrandito, 3 giri: Marche troppo vivaci (arenaria a strisce
+  arancioni, pietrisco a cerchi, terra bruciata blu, erica tappeto viola) ->
+  bande spesse brune, cenere nera, erica marrone con punte viola; radici a
+  squame -> celle piu' grandi e linee sottili.
+- Verificato: md5 identico su due lanci; validate exit 0.
+- Aperto: radici_muschio mostra ancora un leggero disegno a triangoli
+  ripetuto; pietrisco quasi tinta unita da lontano. NON ancora usati da
+  build_world.py (si collegano tutti insieme dopo 8B11d, scelta dell'utente).

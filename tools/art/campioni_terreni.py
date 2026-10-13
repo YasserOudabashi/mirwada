@@ -28,13 +28,48 @@ OUT = os.path.join(HERE, "..", "..", "arte", "terreni")
 PROVE = {
     "prova:parquet": dict(ramp=["brown_dd", "brown_d", "brown_d", "brown"], period=4, dither=0.3, detail="herringbone",
                           rim=None, level=99),
-    "prova:strati": dict(ramp=["brown_dd", "brown_d", "rust", "brown"], period=4, dither=0.4, detail="strata", rim=None,
-                         level=99),
     "prova:lamiera": dict(ramp=["slate_d", "slate", "grey", "grey_l"], period=4, dither=0.3, detail="plates", rim=None,
                           level=99),
     "prova:lava": dict(ramp=["ink", "brown_dd", "brown_dd", "slate_d"], period=4, dither=0.4, detail="embers", rim=None,
                        level=99, accent=["orange", "amber"]),
 }
+
+# Scene di prova: un pezzo di regione disegnato a lettere, per vedere i terreni insieme e i loro bordi.
+SCENE = [
+    ("mirwada", "scena di Mirwada: pontile e molo, porto, centro antico, campagna, cimitero",
+     ("WWWWWWPPWWWWWWWW",
+      "WWWWWWPPWWMMMMWW",
+      "WwwwwwPPwwMMMMww",
+      "bbsscccccccccccc",
+      "bssccclllllllggg",
+      "ssggcclllllllgff",
+      "gggggrrrrgggmmff",
+      "gggggrgggggmhmff"),
+     {"W": "deep_water", "w": "water", "P": "pontile_legno", "M": "molo_pietra", "b": "ciottoli_spiaggia",
+      "s": "sand", "c": "ciottoli_scuri", "l": "lastre_chiare", "g": "grass", "f": "filari",
+      "r": "lastricato_antico", "m": "marmo", "h": "ghiaia"}),
+    ("marche", "scena delle Marche: gradoni di arenaria, pietrisco, muschio, campo bruciato, erica, neve",
+     ("NNNNNAAAAAAAAANNN",
+      "NNNAAAppppppAAAAN",
+      "AAAAppppmmppppAAA",
+      "ppppppmmmppppbbbp",
+      "pppeepppppppbbbbp",
+      "peeeeppAAAppbbbpp",
+      "AAAAAAAAAAAAAAAAA",
+      "ppppppppeeepppppp"),
+     {"N": "snow", "A": "arenaria", "p": "pietrisco", "m": "muschio_scuro", "b": "terra_bruciata", "e": "erica_secca"}),
+    ("valle", "scena della Valle: giungla (felci, radici e muschio), palude, radura argentata, scogliera sul mare",
+     ("fffffrrrrfffffff",
+      "fffrrrrrrrrfffpp",
+      "ffrrrrgggrrfpppp",
+      "fffrrgggggrfpppp",
+      "ffffrrgggrrfffpp",
+      "AAAffffrrffffAAA",
+      "wwAAAAAAAAAAAAww",
+      "WWwwwwwwwwwwwwWW"),
+     {"f": "felci", "r": "radici_muschio", "g": "erba_argentata", "p": "palude", "A": "arenaria", "w": "water",
+      "W": "deep_water"}),
+]
 
 
 def main():
@@ -55,23 +90,15 @@ def main():
                       [L["water"]] * 3 + [L["sand"]] * 2 + [L["grass"]] * 2 + [L["forest"]] * 2 + [L["stone"]] * 3,
                       [L["water"]] * 2 + [L["sand"]] * 2 + [L["grass"]] * 3 + [L["dirt"]] * 2 + [L["snow"]] * 3])
     trans = T.compose_ground(mappa, S=S)
-    # scena di Mirwada: mare -> pontile e molo -> porto (ciottoli) -> centro (lastre) -> campagna
-    M = [list(r) for r in (
-        "WWWWWWPPWWWWWWWW",
-        "WWWWWWPPWWMMMMWW",
-        "WwwwwwPPwwMMMMww",
-        "bbsscccccccccccc",
-        "bssccclllllllggg",
-        "ssggcclllllllgff",
-        "gggggrrrrgggmmff",
-        "gggggrgggggmhmff")]
-    cod = {"W": "deep_water", "w": "water", "P": "pontile_legno", "M": "molo_pietra", "b": "ciottoli_spiaggia",
-           "s": "sand", "c": "ciottoli_scuri", "l": "lastre_chiare", "g": "grass", "f": "filari",
-           "r": "lastricato_antico", "m": "marmo", "h": "ghiaia"}
-    scena = T.compose_ground(np.array([[L[cod[ch]] for ch in r] for r in M]), S=S)
+    scene = []
+    for sid, titolo, righe_scena, cod in SCENE:
+        lung = {len(r) for r in righe_scena}
+        assert len(lung) == 1, f"{titolo}: righe di lunghezza diversa {[len(r) for r in righe_scena]}"
+        scene.append((sid, titolo, T.compose_ground(np.array([[L[cod[ch]] for ch in r] for r in righe_scena]), S=S)))
     larg = cols * cella + (cols - 1) * gap
-    larg = max(larg, scena.shape[1])
-    tav = Image.new("RGB", (larg, righe * (cella + testa + gap) + trans.shape[0] + scena.shape[0] + 2 * (testa + gap)),
+    larg = max([larg] + [sc.shape[1] for _, _, sc in scene])
+    alt_scene = sum(sc.shape[0] + testa + gap for _, _, sc in scene)
+    tav = Image.new("RGB", (larg, righe * (cella + testa + gap) + trans.shape[0] + testa + gap + alt_scene),
                     (244, 244, 244))
     dr = ImageDraw.Draw(tav)
     for i, n in enumerate(nomi):
@@ -83,11 +110,13 @@ def main():
     y = righe * (cella + testa + gap)
     dr.text((0, y + 2), f"transizioni tra terreni (dual grid), {S} px per tile, 1:1", fill=(24, 20, 37), font=font)
     tav.paste(Image.fromarray(trans[..., :3]), (0, y + testa))
-    y += trans.shape[0] + testa + gap
-    dr.text((0, y + 2), "scena di Mirwada: pontile e molo, porto, centro antico, campagna, cimitero", fill=(24, 20, 37),
-            font=font)
-    tav.paste(Image.fromarray(scena[..., :3]), (0, y + testa))
     os.makedirs(OUT, exist_ok=True)
+    y += trans.shape[0] + testa + gap
+    for sid, titolo, sc in scene:
+        dr.text((0, y + 2), titolo, fill=(24, 20, 37), font=font)
+        tav.paste(Image.fromarray(sc[..., :3]), (0, y + testa))
+        Image.fromarray(sc[..., :3]).save(os.path.join(OUT, f"scena_{sid}.png"))
+        y += sc.shape[0] + testa + gap
     path = os.path.join(OUT, "campioni.png")
     tav.save(path)
     print(f"{len(nomi)} terreni, {S} px -> {os.path.abspath(path)}")
