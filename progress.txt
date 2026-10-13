@@ -7708,3 +7708,25 @@ correggere i campi come dice prossimi-passi.md § 2. Poi US-801.
   AnimationMachine (10 animazioni, vista right e down, ogni frame).
 - Aperto: left = right specchiato; i tempi d'attacco nuovi vanno provati
   giocando; nemico_base e pet restano placeholder.
+
+[2026-10-13] ARTE (fuori PRD) — nemico base e pet dal set di Claude in Chrome; merge di main.
+- Merge di main nel branch (fase 7 chiusa + PRD fase 8): conflitti solo su
+  arte/*.md (main aveva la guida originale, identica alla base: tenuta la
+  versione aggiornata) e progress.txt (tenute entrambe le parti). 777 test.
+- Zip dell'utente (fatto da Claude in Chrome), 19 fogli + 4 anteprime _x:
+  scelta dell'utente = tenere l'Enel del costruttore (lo zip ha un altro
+  personaggio, 24-25 colori, e lo avrebbe sovrascritto) e prendere nemico
+  base (teppista con mazza ferrata, 17-19 colori) e pet (lupo, 9 colori).
+  Fogli originali in arte/sprite/*.png, copiati in assets/placeholder/.
+- generate_placeholders.py salta anche i fogli con un .png in arte/sprite/
+  (prima solo .json): ora salta tutti e 19 i fogli veri.
+- Come verificato: dimensioni = griglia di animations.json (19/19); mosaico
+  a schermo sotto Xvfb con la vera AnimationMachine per nemico_base e pet
+  (ogni animazione, vista right e down); validate exit 0; 777 test verdi.
+- Aperto: (1) il tell del nemico al frame 0 di 'anticipo' e' debole (36-50
+  pixel diversi dall'idle contro 174-341 al frame 1): FR-8 lo vuole ovvio dal
+  primo frame - c'e' il tell_audio, ma il visivo andrebbe rinforzato;
+  (2) la death del nemico finisce con la sola testa che affonda;
+  (3) CONFLITTO CON US-812 (fase 8): come scritta, generate_sprites.py
+  rigenera tutti i 19 fogli (cancellerebbe l'arte vera), chiede l'outline
+  2px e un Enel diverso da quello scelto. Va aggiornata prima di eseguirla.

@@ -157,6 +157,13 @@ si vedono: scia viola del dash solo nei frame di invulnerabilita' (0-2),
 occhi accesi e bagliore sulla lama nella finestra di parata (0-1), smear
 solo sul frame con la hitbox, bagliore del cast che esplode al frame 3.
 
+**Nemico base e pet** vengono da un set disegnato con Claude in Chrome: i
+fogli originali stanno in `arte/sprite/<categoria>_<animazione>.png` e sono
+copiati tali e quali in `assets/placeholder/`. Per sostituirli si cambia il
+PNG in `arte/sprite/` e lo si ricopia. `tools/generate_placeholders.py` salta
+ogni foglio che ha in `arte/sprite/` un sorgente `.json` (sprite-forge) o un
+foglio `.png`: rilanciarlo non cancella mai l'arte vera.
+
 **Tempi.** Le animazioni coperte dalla tabella della skill hanno
 `durate_ms` in `data/animations.json` (una durata per frame): idle
 400/300/400/300, walk con i contatti a 150 ms, attacchi con anticipo lento,
