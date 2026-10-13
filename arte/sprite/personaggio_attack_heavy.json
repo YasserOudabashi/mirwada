@@ -9,24 +9,24 @@
   31
  ],
  "ppu": 32,
- "_comment": "GENERATO da arte/sprite/build_enel.py: non modificare a mano. Righe nell'ordine di data/animations.json (down, up, left, right); left = right specchiato.",
+ "_comment": "GENERATO da tools/art/build_enel.py: non modificare a mano. Righe nell'ordine di data/animations.json (down, up, left, right); left = right specchiato.",
  "colors": {
-  "o": "#0d0a12",
-  "A": "#1e1a2b",
-  "B": "#2c2d45",
-  "C": "#48546e",
-  "P": "#5c4548",
-  "Q": "#94837f",
-  "R": "#ccbbaf",
-  "S": "#6b1b28",
-  "T": "#b24332",
-  "W": "#807366",
-  "X": "#ccc2a7",
-  "M": "#5e6375",
-  "N": "#a7b3c2",
-  "y": "#549dd1",
-  "e": "#e0fbff",
-  "D": "#412654"
+  "o": "#181425",
+  "A": "#262b44",
+  "B": "#3a4466",
+  "C": "#5a6988",
+  "P": "#733e39",
+  "Q": "#c28569",
+  "R": "#e8b796",
+  "S": "#a22633",
+  "T": "#be4a2f",
+  "W": "#8b9bb4",
+  "X": "#c0cbdc",
+  "M": "#8b9bb4",
+  "N": "#c0cbdc",
+  "y": "#2ce8f5",
+  "e": "#ffffff",
+  "D": "#68386c"
  },
  "ramps": [
   [
@@ -94,7 +94,7 @@
       "oeMo....ooooAAAooBAAooDo........",
       "oMo........oBBAooBBAo.D.........",
       ".o.........oAAAooAAAo...........",
-      ".........DDDoooDDoooDDD........."
+      "............ooo..ooo............"
      ]
     },
     {
@@ -131,7 +131,7 @@
       "...........oBAAooBAAo...........",
       "...........oBBAooBBAo...........",
       "...........oAAAooAAAo...........",
-      ".........DDDoooDDoooDDD........."
+      "............ooo..ooo............"
      ]
     },
     {
@@ -168,7 +168,7 @@
       "...........oBAAooBAAo...........",
       "...........oBBAooBBAo...........",
       "...........oAAAooAAAo...........",
-      ".........DDDoooDDoooDDD........."
+      "............ooo..ooo............"
      ]
     },
     {
@@ -205,7 +205,7 @@
       "...........oBAAooBAAo...........",
       "...........oBBAooBBAo...........",
       "...........oAAAooAAAo...........",
-      ".........DDDoooDDoooDDD........."
+      "............ooo..ooo............"
      ]
     },
     {
@@ -242,7 +242,7 @@
       "...........oBANMeBAAo.D.........",
       "...........oBBNMeyBAo...........",
       "...........oAANMoAAAo...........",
-      ".........DDDooeMooooDDD........."
+      "............ooeMoooo............"
      ]
     },
     {
@@ -279,7 +279,7 @@
       "........oDooAANMoBAAooDo........",
       "...........oBBNMoBBAo...........",
       "...........yAeNyeyAAey..........",
-      ".........DDDyoyMyoyyDDD........."
+      "............yoyMyoyy............"
      ]
     },
     {
@@ -316,7 +316,7 @@
       ".........D.oBANMoBAAo...........",
       "...........oBBNMoBBAo...........",
       "...........oAAeMoAAAo...........",
-      ".........DDDooooDoooDDD........."
+      "............oooo.ooo............"
      ]
     },
     {
@@ -353,7 +353,7 @@
       "...........oBAAooBAAo...........",
       "...........oBBAooBBAo...........",
       "...........oAAAooAAAo...........",
-      ".........DDDoooDDoooDDD........."
+      "............ooo..ooo............"
      ]
     }
    ]
@@ -395,7 +395,7 @@
       "........ooooAAAooBAAooDo...oMeo.",
       "...........oBBAooBBAo.D.....oMo.",
       "...........oAAAooAAAo........o..",
-      ".........DDDoooDDoooDDD........."
+      "............ooo..ooo............"
      ]
     },
     {
@@ -432,7 +432,7 @@
       "...........oBAAooBAAo...........",
       "...........oBBAooBBAo...........",
       "...........oAAAooAAAo...........",
-      ".........DDDoooDDoooDDD........."
+      "............ooo..ooo............"
      ]
     },
     {
@@ -469,7 +469,7 @@
       "...........oBAAooBAAo...........",
       "...........oBBAooBBAo...........",
       "...........oAAAooAAAo...........",
-      ".........DDDoooDDoooDDD........."
+      "............ooo..ooo............"
      ]
     },
     {
@@ -506,7 +506,7 @@
       "...........oBAAooBAAo...........",
       "...........oBBAooBBAo...........",
       "...........oAAAooAAAo...........",
-      ".........DDDoooDDoooDDD........."
+      "............ooo..ooo............"
      ]
     },
     {
@@ -543,7 +543,7 @@
       "...........oBAAMoBAAo.D.........",
       "...........oBBAMoBBAo...........",
       "...........oAAAMoAAAo...........",
-      ".........DDDooMMooooDDD........."
+      "............ooMMoooo............"
      ]
     },
     {
@@ -580,7 +580,7 @@
       "........oDooAAAMoBAAooDo........",
       "...........oBBAMoBBAo...........",
       "...........oAAAMoAAAo...........",
-      ".........DDDooMMooooDDD........."
+      "............ooMMoooo............"
      ]
     },
     {
@@ -617,7 +617,7 @@
       ".........D.oBAAMoBAAo...........",
       "...........oBBAMoBBAo...........",
       "...........oAAAMoAAAo...........",
-      ".........DDDooooDoooDDD........."
+      "............oooo.ooo............"
      ]
     },
     {
@@ -654,7 +654,7 @@
       "...........oBAAooBAAo...........",
       "...........oBBAooBBAo...........",
       "...........oAAAooAAAo...........",
-      ".........DDDoooDDoooDDD........."
+      "............ooo..ooo............"
      ]
     }
    ]
@@ -741,7 +741,7 @@
       ".....oNMo.oooAAAAAAADo..........",
       "....oNMo....oBBBBBBAD...........",
       "...oeMo.....oAAAAAAAo...........",
-      "...oMo..DDDDDoooooooDDD........."
+      "...oMo.......ooooooo............"
      ]
     },
     {
@@ -778,7 +778,7 @@
       "............oBAABAAo............",
       "............oBBBBBBAo...........",
       "............oAAAAAAAo...........",
-      "........DDDDDoooooooDDD........."
+      ".............ooooooo............"
      ]
     },
     {
@@ -815,7 +815,7 @@
       "............oBAABAAo............",
       "............oBBBBBBAo...........",
       "............oAAAAAAAo...........",
-      "........DDDDDoooooooDDD........."
+      ".............ooooooo............"
      ]
     },
     {
@@ -852,7 +852,7 @@
       "............oBAABAAo............",
       "............oBBBBBBAo...........",
       "............oAAAAAAAo...........",
-      "........DDDDDoooooooDDD........."
+      ".............ooooooo............"
      ]
     },
     {
@@ -889,7 +889,7 @@
       "........oBAAAAAo...oDAAo........",
       "........oBBBAoo....oBBBAo.......",
       "........oAAAAo.....oAAAAo.......",
-      "........DooooDDDDDDDoooo........"
+      ".........oooo.......oooo........"
      ]
     },
     {
@@ -926,7 +926,7 @@
       "........oBADAAAAoooADAAoNMo.....",
       "........oBBBAAoo...yBeByeyo.ey..",
       "........oAAAAo.....oyAyAyMyy....",
-      "........DooooDDDDDDDooooeMo....."
+      ".........oooo.......ooooeMo....."
      ]
     },
     {
@@ -963,7 +963,7 @@
       "........oBADAAAo...oBAAooNMo....",
       "........oBBBAoo....oBBBAoeMo....",
       "........oAAAAo.....oAAAAooo.....",
-      "........DooooDDDDDDDoooo........"
+      ".........oooo.......oooo........"
      ]
     },
     {
@@ -1000,7 +1000,7 @@
       "............oBAABAAo.oNMo.......",
       "............oBBBBBBAooeMo.......",
       "............oAAAAAAAo.oo........",
-      "........DDDDDoooooooDDD........."
+      ".............ooooooo............"
      ]
     }
    ]

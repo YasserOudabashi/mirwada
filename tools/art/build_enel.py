@@ -2,8 +2,8 @@
 """
 Costruttore degli sprite di Enel (il protagonista) per la skill sprite-forge.
 
-    python arte/sprite/build_enel.py                  # scrive arte/sprite/personaggio_<anim>.json
-    python arte/sprite/build_enel.py --skill <dir>    # in piu' check.py + render.py della skill
+    python tools/art/build_enel.py                  # scrive arte/sprite/personaggio_<anim>.json
+    python tools/art/build_enel.py --skill <dir>    # in piu' check.py + render.py della skill
                                                       # e copia gli sheet in assets/placeholder/
 
 Enel e' un MANICHINO: le parti (gambe, cappotto, braccia, spada, sciarpa) sono
@@ -18,7 +18,6 @@ Numero di frame e durate vengono da data/animations.json (mai copiati qui).
 """
 
 import argparse
-import colorsys
 import json
 import math
 import os
@@ -28,26 +27,21 @@ import sys
 import tempfile
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-OUT = os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.join(ROOT, "arte", "sprite")
 W = H = 32
 
 
-# --- palette: 16 colori, ramp con hue shift (ombre verso viola, luci verso giallo/ciano) ---
-
-def _hsv(h, s, v):
-    r, g, b = colorsys.hsv_to_rgb(h / 360, s, v)
-    return "#%02x%02x%02x" % (round(r * 255), round(g * 255), round(b * 255))
-
+# --- palette: Endesga 32 (CLAUDE.md v2), rampe con hue shift, contorno #181425 ---
 
 COLORI = {
-    "o": _hsv(262, .45, .07),                                              # inchiostro
-    "A": _hsv(255, .40, .17), "B": _hsv(238, .36, .27), "C": _hsv(222, .34, .43),  # cappotto
-    "P": _hsv(352, .25, .36), "Q": _hsv(10, .14, .58), "R": _hsv(25, .14, .80),    # pelle esausta
-    "S": _hsv(350, .75, .42), "T": _hsv(8, .72, .70),                       # sciarpa
-    "W": _hsv(30, .20, .50), "X": _hsv(44, .18, .80),                       # bende
-    "M": _hsv(228, .20, .46), "N": _hsv(212, .14, .76),                     # acciaio
-    "y": _hsv(205, .60, .82), "e": _hsv(188, .12, 1.0),                     # il freddo che brilla
-    "D": _hsv(275, .55, .33),                                               # ombra che cola
+    "o": "#181425",                                              # inchiostro
+    "A": "#262b44", "B": "#3a4466", "C": "#5a6988",              # cappotto
+    "P": "#733e39", "Q": "#c28569", "R": "#e8b796",              # pelle esausta
+    "S": "#a22633", "T": "#be4a2f",                              # sciarpa
+    "W": "#8b9bb4", "X": "#c0cbdc",                              # bende
+    "M": "#8b9bb4", "N": "#c0cbdc",                              # acciaio
+    "y": "#2ce8f5", "e": "#ffffff",                              # il freddo che brilla
+    "D": "#68386c",                                              # ombra che cola
 }
 RAMPE = [["A", "B", "C"], ["P", "Q", "R"], ["S", "T"], ["W", "X"], ["M", "N"], ["y", "e"]]
 
@@ -268,11 +262,6 @@ def gocce(t, xs, y0, fase, lungo=0):
             t.fx(x, y0 + j, "D")
 
 
-def pozza(t, x0, x1, y=31):
-    for x in range(x0, x1 + 1):
-        t.fx(x, y, "D")
-
-
 def scia(t, c, r, a0, a1):
     """Smear dell'attacco: arco di 2px, bianco freddo dentro e alone fuori."""
     passi = max(8, int(abs(a1 - a0) / 6))
@@ -330,10 +319,8 @@ def figura(view, P, tela=False):
     laterale = view == "right"
 
     for (gx, gy) in P.get("fantasmi", []):
-        posa = dict(P.get("posa_fantasma", {}), fantasmi=[], fx=[], gocce=None, pozza=False)
+        posa = dict(P.get("posa_fantasma", {}), fantasmi=[], fx=[], gocce=None)
         fantasma(t, figura(view, posa, tela=True), gx, gy)
-    if P.get("pozza", True):
-        pozza(t, *((9, 22) if not laterale else (8, 22)))
 
     sp = P.get("spada")
     if sp and sp.get("strato") == "dietro":
@@ -680,7 +667,7 @@ def a_death(view, i):
         sposta_braccio(P, 0, gomito=(20, 20), mano=(23, 26))
     else:
         occhi = "dim" if i == 6 else "off"
-        P = dict(custom=lambda t, U: _sdraiato(t, U, occhi), spada=sw, pozza=False,
+        P = dict(custom=lambda t, U: _sdraiato(t, U, occhi), spada=sw,
                  fx=[lambda t: [t.fx(x, 31, "D") for x in range(3 if i == 7 else 7, 30)],
                      lambda t: [t.fx(x, 30, "D") for x in range(10, 23)] if i == 7 else None])
     return P
@@ -717,7 +704,7 @@ def _seduto(t, U):
 
 def a_meditate(view, i):
     view = "down"
-    P = dict(custom=_seduto, bob=0, gocce=None, pozza=False)
+    P = dict(custom=_seduto, bob=0, gocce=None)
     sciarpa_fine = [(11, 22), (10, 23), (11, 23), (12, 22), (11, 22), (10, 22)][i]
     occhi = ["norm", "bright", "bright", "norm", "dim", "norm"][i]
 
@@ -731,8 +718,7 @@ def a_meditate(view, i):
         spada(t2, (8, 26), (1, 0), 18)
     P["custom"] = lambda t, U: (_seduto(t, U), sopra(t))
     fumo = [(6, 17), (25, 15), (8, 12), (24, 10), (7, 7), (23, 5)]
-    P["fx"] = [lambda t: [t.fx(x, y - (i * 2) % 12 + k, "D") for x, y in fumo[(i % 2)::2] for k in (0, 1)],
-               lambda t: [t.fx(x, 31, "D") for x in range(4 + (i % 2), 28 - (i % 2))]]
+    P["fx"] = [lambda t: [t.fx(x, y - (i * 2) % 12 + k, "D") for x, y in fumo[(i % 2)::2] for k in (0, 1)]]
     return P
 
 
@@ -754,7 +740,7 @@ def costruisci(nome, spec):
     n = int(spec["frames"])
     doc = {
         "name": f"personaggio_{nome}", "size": [W, H], "pivot": [16, 31], "ppu": 32,
-        "_comment": "GENERATO da arte/sprite/build_enel.py: non modificare a mano. "
+        "_comment": "GENERATO da tools/art/build_enel.py: non modificare a mano. "
                     "Righe nell'ordine di data/animations.json (down, up, left, right); "
                     "left = right specchiato.",
         "colors": COLORI, "ramps": RAMPE, "animations": {},

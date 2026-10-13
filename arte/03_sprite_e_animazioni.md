@@ -142,14 +142,15 @@ esplicita e correggibile, e le regole del cap. 1 le verifica `check.py`.
    `arte/sprite/`: rilanciarlo non cancella l'arte vera.
 
 **Enel (protagonista): non si disegna a mano.** I 10 file `personaggio_*`
-li genera `arte/sprite/build_enel.py` (un manichino a parti: teste a mano,
+li genera `tools/art/build_enel.py` (un manichino a parti: teste a mano,
 corpo come forme, luce da alto-sinistra, contorno 1px e ombre calcolati).
 Per cambiare qualcosa (colori, cappotto, una posa) si modifica il
 costruttore e si rigenera tutto:
 
 ```bash
-python arte/sprite/build_enel.py --skill <cartella della skill sprite-forge>
-python arte/sprite/build_enel.py --skill <...> attack_heavy   # solo una
+python tools/art/generate_all.py                      # tutte le categorie
+python tools/art/generate_all.py --only personaggio   # solo Enel
+python tools/art/build_enel.py --skill <...> attack_heavy   # una sola animazione
 ```
 
 Frame e durate li legge da `data/animations.json`. I frame che il codice usa

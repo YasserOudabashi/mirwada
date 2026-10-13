@@ -118,13 +118,15 @@ va scritto nella story.
 
 ### Animazione (valori di partenza, da regolare a occhio)
 Fonti: guide di pratica, non misure ufficiali. In caso di dubbio decide la prova a schermo.
+I valori veri sono in `data/animations.json` (`durate_ms`, una durata per frame); questa
+tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 
 | Animazione | Frame | Durata per frame | Regola |
 |---|---|---|---|
-| idle | 4 | ~170 ms (6 fps) | respiro, mai fermo del tutto |
-| walk | 6 | ~80 ms (12 fps) | contact tenuti un po' più dei passing, bob di 1 px |
-| attack leggero | 5 | ~60 ms (16 fps) | anticipo 2 frame, colpo 1, recupero 2 |
-| attack pesante | 8 | ~70 ms (14 fps) | anticipo di 4 frame **leggibile**: è il tell del combattimento |
+| idle | 4 | 400/300/400/300 ms | respiro, mai fermo del tutto |
+| walk | 6 | 120/150/120/120/150/120 ms | contact (frame 1 e 4) tenuti più dei passing, bob di 1 px |
+| attack leggero | 5 | 60/120/40/150/80 ms | anticipo 2 frame, colpo 1, recupero 2 |
+| attack pesante | 8 | 70/70/70/180/50/160/100/150 ms | anticipo di 4 frame **leggibile**: è il tell del combattimento |
 | dash | 4 | ~50 ms (20 fps) | iframe 0–2 |
 | morte | 6–8 | ~100 ms | l'ultimo frame resta a terra |
 

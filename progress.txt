@@ -7730,3 +7730,24 @@ correggere i campi come dice prossimi-passi.md § 2. Poi US-801.
   (3) CONFLITTO CON US-812 (fase 8): come scritta, generate_sprites.py
   rigenera tutti i 19 fogli (cancellerebbe l'arte vera), chiede l'outline
   2px e un Enel diverso da quello scelto. Va aggiornata prima di eseguirla.
+
+[2026-10-13] ARTE (fuori PRD) — allineamento al CLAUDE.md v2.
+- CLAUDE.md v2 (fornito dall'utente) nel repo. Tabella dei tempi aggiornata ai
+  valori veri di animations.json (scelta dell'utente: tenere i tempi attuali).
+- tools/art/build_enel.py (spostato da arte/sprite/): palette Endesga 32
+  (cappotto #262b44/#3a4466/#5a6988, pelle #733e39/#c28569/#e8b796, sciarpa
+  #a22633/#be4a2f, bende/acciaio #8b9bb4/#c0cbdc, occhi #2ce8f5/#ffffff,
+  gocce #68386c, contorno #181425); tolta la pozza d'ombra cotta (l'ombra a
+  terra la compone il gioco). Restano le gocce: sono il personaggio.
+- tools/art/generate_all.py: personaggio -> build_enel.py; nemico_base/pet ->
+  copia da arte/sprite/*.png verificando la geometria su animations.json;
+  nemico_base.anticipo: contorno esterno -> #e43b44 in tutti i frame (il
+  tell si legge da fermo, dal frame 0).
+- US-812 segnata SUPERATA nel PRD di fase 8 (rigenererebbe l'arte vera).
+- Comando: python tools/art/generate_all.py (deterministico, nessun seed).
+- Come verificato: check.py 0 errori su 10 file; colori fuori Endesga 32 = 0
+  per personaggio/nemico_base/pet; alpha intermedia solo nell'ombra a terra
+  di nemico e pet; mosaico a schermo sotto Xvfb con AnimationMachine.
+- Aperto: rampe bende/acciaio "dritte" (Endesga non ha grigi chiari con hue
+  shift); ombra a terra di nemico e pet ancora cotta nello sprite (ammessa,
+  ma andrebbe composta nel gioco); death del nemico che affonda.

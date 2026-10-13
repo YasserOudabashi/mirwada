@@ -9,24 +9,24 @@
   31
  ],
  "ppu": 32,
- "_comment": "GENERATO da arte/sprite/build_enel.py: non modificare a mano. Righe nell'ordine di data/animations.json (down, up, left, right); left = right specchiato.",
+ "_comment": "GENERATO da tools/art/build_enel.py: non modificare a mano. Righe nell'ordine di data/animations.json (down, up, left, right); left = right specchiato.",
  "colors": {
-  "o": "#0d0a12",
-  "A": "#1e1a2b",
-  "B": "#2c2d45",
-  "C": "#48546e",
-  "P": "#5c4548",
-  "Q": "#94837f",
-  "R": "#ccbbaf",
-  "S": "#6b1b28",
-  "T": "#b24332",
-  "W": "#807366",
-  "X": "#ccc2a7",
-  "M": "#5e6375",
-  "N": "#a7b3c2",
-  "y": "#549dd1",
-  "e": "#e0fbff",
-  "D": "#412654"
+  "o": "#181425",
+  "A": "#262b44",
+  "B": "#3a4466",
+  "C": "#5a6988",
+  "P": "#733e39",
+  "Q": "#c28569",
+  "R": "#e8b796",
+  "S": "#a22633",
+  "T": "#be4a2f",
+  "W": "#8b9bb4",
+  "X": "#c0cbdc",
+  "M": "#8b9bb4",
+  "N": "#c0cbdc",
+  "y": "#2ce8f5",
+  "e": "#ffffff",
+  "D": "#68386c"
  },
  "ramps": [
   [
@@ -94,7 +94,7 @@
       "............oBAABAAo..D.........",
       "............oBBABBAo............",
       "............oAAAAAAo............",
-      ".........DDDDooooooDDDD........."
+      ".............oooooo............."
      ]
     },
     {
@@ -131,7 +131,7 @@
       "........oDoAAAAAoAAAAoDo........",
       "..oooooooooBBAAo.oBBAo..........",
       "ooMNNNNNNNNAAAo..oAAAo..........",
-      "SoMMMMMMMMMMMoDDDDoooDD........."
+      "SoMMMMMMMMMMMo....ooo..........."
      ]
     },
     {
@@ -168,7 +168,7 @@
       ".......oCBBBBBAXBAAAAAAo........",
       ".......oBAAAAAAAoBAAAAAAo.......",
       "........oDoAAAoo.oAAAooo........",
-      ".........DDoooDDDDoooDD........."
+      ".........D.ooo....ooo..........."
      ]
     },
     {
@@ -205,7 +205,7 @@
       ".......oCBBBBBAABBXWAAAAo.......",
       ".......oBAAAAAAAABRQAAAAo.......",
       "........oDAAAAAAAXQPAoDo........",
-      ".........DooooooXooooDD........."
+      ".........DooooooXoooo.D........."
      ]
     },
     {
@@ -242,7 +242,7 @@
       ".......oCBBBBBAABXXXAAAo........",
       ".......oBAAAAAAAABXWAAAAo.......",
       "........oDAAAAAAAARQAoDo........",
-      ".........DooAAAAAXQPoDD........."
+      "..........ooAAAAAXQPo.D........."
      ]
     },
     {
@@ -279,7 +279,7 @@
       ".........DBAAAooooAAAoDCXXo.....",
       ".........DBBAABBBBBBAoDBXXXo....",
       ".........oAAAAABAAAAAo.ooXWo....",
-      ".........DooAAAAAAAAoDD.oXWXo..."
+      "..........ooAAAAAAAAo...oXWXo..."
      ]
     },
     {
