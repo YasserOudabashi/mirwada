@@ -7932,3 +7932,14 @@ nel repo), US-8B11 (terreni nuovi) e US-8B13 (mappa di prova) e aspettare il via
   (terreni: US-8B11); citta' = griglia rotonda senza moli (edifici: US-8B18);
   Frontiera con terreni normali (pastello: US-8B11); trono vicino all'angolo
   nord-ovest (gradone piu' alto = piu' lontano da Mirwada): da confermare.
+- Giro di revisione 1 (risposte dell'utente sulla mappa di prova):
+  altri seed + capire dove sono i villaggi; Archivio in superficie piu'
+  piccolo; trono nell'angolo OK; citta' OK ma "la costa piu' grande".
+  Fatto: --confronto 4 5 6 7 (arte/mondo/confronto_seed.png); villaggi,
+  case e capanne in giallo (villaggio sugli alberi, capanna-base Valle,
+  rifugio-base Marche, 3 eremiti, 3 fattorie, mulino sul fiume, 6 casette,
+  villaggio di pescatori sull'isola tropicale) + 3 caverne in rosso;
+  PESO Archivio 1.45 nel Voronoi; GOLFO davanti al porto (interpretazione
+  di "costa piu' grande", da confermare) + spiagge di Mirwada piu' larghe;
+  faro spostato sulla punta a ovest (era finito dentro il golfo).
+  Determinismo ricontrollato (md5 identico).

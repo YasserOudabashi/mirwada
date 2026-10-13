@@ -4,6 +4,7 @@ Mappa di prova del mondo intero (US-8B13, PRD fase 8b).
 
     python tools/art/build_world.py                 # seed 4
     python tools/art/build_world.py --seed 5        # stessa disposizione, coste e colline diverse
+    python tools/art/build_world.py --confronto 4 5 6 7   # piu' seed affiancati, per scegliere
 
 Disposizione = variante C scelta dall'utente (006_PRD/prd-fase-8b-arte.md, par. 5):
 Marche a nord-ovest, Archivio a nord-est, Mirwada al centro-sud sul porto, Valle a
@@ -42,6 +43,7 @@ COSTA = 0.66                         # frazione di H dove finisce la terraferma
 # Regioni di terra: punto centrale (frazioni del mondo). Ordine = indice nella mappa.
 TERRA = {"mirwada": (0.43, 0.50), "marche_crepuscolo": (0.20, 0.24),
          "archivio_sepolto": (0.72, 0.17), "valle_madre": (0.82, 0.50)}
+PESO = {"archivio_sepolto": 1.45}   # >1 = regione piu' piccola (richiesta: Archivio in superficie ridotto)
 # Isole: (id, cx, cy, raggio in tile, profilo)
 ISOLE = [("frontiera_porte", 0.55, 0.87, 20, "frontiera"),
          ("isola_relitto", 0.12, 0.80, 8, "relitto"),
@@ -137,8 +139,10 @@ def genera(seed):
     # --- terra, regioni (Voronoi deformato dal rumore) e isole ---
     costa = H * COSTA + (n1 - 0.5) * 34 + (n2 - 0.5) * 10
     terra = yy < costa
+    golfo = ((xx - TERRA["mirwada"][0] * W) / 26) ** 2 + ((yy - costa) / 15) ** 2 < 1
+    terra &= ~golfo
     wx, wy = xx + (n2 - 0.5) * 60, yy + (n1 - 0.5) * 60
-    dist = np.stack([np.hypot(wx - cx * W, wy - cy * H) for cx, cy in TERRA.values()])
+    dist = np.stack([np.hypot(wx - cx * W, wy - cy * H) * PESO.get(n, 1.0) for n, (cx, cy) in TERRA.items()])
     reg = pulisci_enclavi(np.where(terra, dist.argmin(0) + 1, 0))
     for i, (rid, cx, cy, r, _) in enumerate(ISOLE):
         isola = (np.hypot(xx - cx * W, (yy - cy * H) * 1.25) < r * (0.75 + 0.5 * n2)) & ~terra
@@ -187,6 +191,7 @@ def genera(seed):
     g[nord & land & ~vl] = L["snow"]
     # coste: sabbia, ma scogliere nella Valle e nelle Marche
     riva = land & (dmare <= 2)
+    riva |= R["mirwada"] & (dmare <= 3)                                   # spiagge di Mirwada piu' larghe
     g[riva] = L["sand"]
     g[riva & (vl | mc)] = L["stone"]
     # isole
@@ -285,7 +290,7 @@ def genera(seed):
     lontano_dal_confine = -np.hypot(xx - TERRA["valle_madre"][0] * W, yy - TERRA["valle_madre"][1] * H)
     luoghi = {
         "porto": porto, "centro_antico": centro, "archivio_ordine": archivio_ordine, "cimitero": cimitero,
-        "faro": migliore(costa_mw, -yy + (xx < px) * 40),
+        "faro": migliore(costa_mw & (xx < px - 20), yy),             # la punta piu' a sud a ovest della citta' 
         "casa_base_porto": (porto[0] + 5, porto[1] - 2),
         "passo_tra_rupi": passo, "trono_del_gigante": migliore(mc, alt),
         "soglia_del_crepuscolo": migliore(mc & (alt > 0.45) & (alt < 0.65), d),
@@ -296,6 +301,45 @@ def genera(seed):
     }
     for rid, cx, cy, r, prof in ISOLE[1:]:
         luoghi[rid] = (int(cx * W), int(cy * H))
+
+    # --- villaggi, case e capanne: dove vive qualcuno (suggerimenti) ---
+    def scegli(z, n, distanza, evita=()):
+        ys, xs = np.nonzero(z & interno)
+        ordine = list(range(len(xs)))
+        rnd.shuffle(ordine)
+        presi = []
+        for i in ordine:
+            q = (int(xs[i]), int(ys[i]))
+            if all((q[0] - o[0]) ** 2 + (q[1] - o[1]) ** 2 >= distanza ** 2 for o in presi + list(evita)):
+                presi.append(q)
+                if len(presi) == n:
+                    break
+        return presi
+
+    def vicino_a(punto, da, a):
+        dd = np.hypot(xx - punto[0], yy - punto[1])
+        return (dd >= da) & (dd <= a)
+
+    fiume = acqua & land
+    riva_fiume = ispessisci(fiume, 1) & ~fiume
+    lontano_citta = ~disco(*centro, 30)
+    campagna = mw & lontano_citta & ~riva & np.isin(g, [L["grass"], L["dry_grass"]])
+    villaggi = {"villaggio_sugli_alberi": migliore(vl & vicino_a(galleria, 30, 45) & (g == L["forest"]), m),
+                "capanna_base_valle": migliore(vl & vicino_a(galleria, 8, 14) & ~riva, d),
+                "rifugio_base_marche": migliore(mc & vicino_a(passo, 10, 16) & ~rupi, d),
+                "mulino": migliore(mw & riva_fiume & lontano_citta, -abs(yy - centro[1])),
+                "villaggio_pescatori": migliore(R["isola_tropicale"] & (dmare == 2), xx)}
+    for i, q in enumerate(scegli(mc & (g == L["dirt"]), 3, 30), 1):
+        villaggi[f"eremita_{i}"] = q
+    for i, q in enumerate(scegli(campagna & (g == L["dry_grass"]), 3, 22), 1):
+        villaggi[f"fattoria_{i}"] = q
+    for i, q in enumerate(scegli(campagna, 6, 16, list(villaggi.values())), 1):
+        villaggi[f"casetta_{i}"] = q
+    for i, q in enumerate(scegli(campagna & (d > 0.6), 3, 25, list(villaggi.values())), 1):
+        luoghi[f"caverna_{i}"] = q
+    for nome, (x, y) in villaggi.items():
+        r = 3 if nome.startswith("villaggio") else 1
+        g[disco(x, y, r) & land & ~acqua] = L["path"] if r == 3 else L["dirt"]
 
     w = World(W, H, seed, g, reg, e, REGIONI, water_mask=acqua)
     w.roads = [[list(map(int, q)) for q in p] for p in strade]
@@ -330,7 +374,7 @@ def genera(seed):
                                   "y": y + rnd.uniform(.3, .9), "seed": rnd.randrange(6),
                                   "size": rnd.choice([0.9, 1.0, 1.1])})
     w.objects.sort(key=lambda o: o["y"])
-    return w, luoghi
+    return w, luoghi, villaggi
 
 
 def colori_terreni():
@@ -343,7 +387,7 @@ def colori_terreni():
     return np.array(out)
 
 
-def anteprima(w, luoghi, path, k=3):
+def anteprima(w, luoghi, villaggi, k=3, etichette=True):
     col = colori_terreni()
     img = col[w.ground].copy()
     reg = w.biome
@@ -368,34 +412,55 @@ def anteprima(w, luoghi, path, k=3):
         scritta(xs.mean() * k - 30, ys.mean() * k - 20, rid.upper(), (254, 231, 97))
     for nome, (x, y) in luoghi.items():
         dr.rectangle([x * k - 3, y * k - 3, x * k + 3, y * k + 3], fill=(228, 59, 68), outline=(24, 20, 37))
-        scritta(x * k + 6, y * k - 6, nome)
+        if etichette:
+            scritta(x * k + 6, y * k - 6, nome)
+    for nome, (x, y) in villaggi.items():
+        r = 6 if nome.startswith("villaggio") else 4
+        dr.ellipse([x * k - r, y * k - r, x * k + r, y * k + r], fill=(254, 231, 97), outline=(24, 20, 37))
+        if etichette:
+            scritta(x * k + 7, y * k - 6, nome, (254, 231, 97))
     scritta(8, 6, f"N (freddo)   seed {w.seed}   {W}x{H} tile")
-    im.save(path)
+    scritta(8, H * k - 30, "quadrato rosso = luogo speciale", (228, 59, 68))
+    scritta(8, H * k - 16, "cerchio giallo = villaggio, casa, capanna", (254, 231, 97))
+    return im
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--seed", type=int, default=4)
     ap.add_argument("--senza-ritagli", action="store_true", help="solo la mappa intera (piu' veloce)")
+    ap.add_argument("--confronto", type=int, nargs="+", metavar="SEED",
+                    help="solo un confronto affiancato tra piu' seed -> arte/mondo/confronto_seed.png")
     a = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
-    w, luoghi = genera(a.seed)
+    if a.confronto:
+        imgs = [anteprima(*genera(sd), etichette=False) for sd in a.confronto]
+        cols = 2
+        righe = (len(imgs) + cols - 1) // cols
+        tav = Image.new("RGB", (imgs[0].width * cols + 10 * (cols - 1), imgs[0].height * righe + 10 * (righe - 1)),
+                        (244, 244, 244))
+        for i, im in enumerate(imgs):
+            tav.paste(im, ((i % cols) * (im.width + 10), (i // cols) * (im.height + 10)))
+        tav.save(os.path.join(OUT, "confronto_seed.png"))
+        print(f"confronto seed {a.confronto} -> {OUT}/confronto_seed.png")
+        return
+    w, luoghi, villaggi = genera(a.seed)
     j = w.to_json()
     j["ground"] = [[int(v) for v in r] for r in j["ground"]]
     j["biome_map"] = [[int(v) for v in r] for r in j["biome_map"]]
     j.pop("biomes")
-    j.update({"regions": REGIONI, "region_map": j.pop("biome_map"), "luoghi": luoghi, "tile": 32,
+    j.update({"regions": REGIONI, "region_map": j.pop("biome_map"), "luoghi": luoghi, "villaggi": villaggi, "tile": 32,
               "layout": {"terra": TERRA, "isole": ISOLE, "costa": COSTA}})
     with open(os.path.join(OUT, "world_prova.json"), "w") as f:
         json.dump(j, f, separators=(",", ":"))
-    anteprima(w, luoghi, os.path.join(OUT, "mondo_prova.png"))
+    anteprima(w, luoghi, villaggi).save(os.path.join(OUT, "mondo_prova.png"))
     if not a.senza_ritagli:
         atl = {n: build_atlas(n, 32) for n in ORDER}
         for nome in ("porto", "passo_tra_rupi", "galleria_di_alberi", "scalinata_archivio", "approdo_frontiera"):
             x, y = luoghi[nome]
             box = (max(0, x - 20), max(0, y - 12), min(W, x + 20), min(H, y + 12))
             save(render_world(w, box, atlases=atl), os.path.join(OUT, f"mondo_prova_{nome}.png"))
-    print(f"seed {a.seed}: {len(w.objects)} oggetti, {len(luoghi)} luoghi -> {OUT}")
+    print(f"seed {a.seed}: {len(w.objects)} oggetti, {len(luoghi)} luoghi, {len(villaggi)} villaggi -> {OUT}")
 
 
 if __name__ == "__main__":
