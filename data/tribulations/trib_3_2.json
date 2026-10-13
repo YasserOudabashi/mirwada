@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "trib_3_2",
+  "name_i18n": "tribulation.trib_3_2.name",
+  "descrizione_i18n": "tribulation.trib_3_2.descrizione",
+  "salto": { "da": 3, "a": 2 },
+  "condizioni": [
+    { "tipo": "tier_min", "valore": "saint" }
+  ],
+  "mentre_in_corso": "follia_accelerata",
+  "superamento": { "flag": "tribolazione_doran_affrontato" }
+}

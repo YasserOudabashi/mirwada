@@ -96,6 +96,24 @@ def main():
     _own_doc = load_json(os.path.join(DATA, "schema", "ownership.json")) or {}
     summon_materie = set(_own_doc.get("summon_materie_prime", []))
     tag_vietati_attivi = set(_own_doc.get("tag_vietati_pathway_attivi", []))
+    # US-703: vocabolari chiusi della fase 7.
+    _trib_doc = load_json(os.path.join(DATA, "schema", "tribulation_effects.json")) or {}
+    valid_tribulation_effects = set(_trib_doc.get("effetti", {}))
+    _pray_doc = load_json(os.path.join(DATA, "schema", "prayer_effects.json")) or {}
+    valid_prayer_effects = set(_pray_doc.get("preghiere", {}))
+    for _nome, _vocab, _chiave in (
+        ("data/schema/tribulation_effects.json", _trib_doc, "effetti"),
+        ("data/schema/prayer_effects.json", _pray_doc, "preghiere"),
+    ):
+        _v = _vocab.get(_chiave, {})
+        if not isinstance(_v, dict) or not _v:
+            err(f"{_nome}: '{_chiave}' deve essere un oggetto non vuoto (US-703).")
+        elif len(_v) > 6:
+            err(f"{_nome}: {len(_v)} voci, atteso <= 6 (vocabolario chiuso, US-703).")
+    for _p, _spec in _pray_doc.get("preghiere", {}).items():
+        if _spec.get("primitiva") not in prim_params:
+            err(f"data/schema/prayer_effects.json [{_p}]: 'primitiva' "
+                f"'{_spec.get('primitiva')}' non e' del registro (US-703).")
     # Tag ottenibili nella build attiva: servono a segnalare le sinergie
     # irraggiungibili (richiedono tag che nessun pathway attivo porta).
     obtainable_tags = set()
@@ -277,6 +295,204 @@ def main():
         if dupes:
             err(f"id {name} duplicati: {dupes}")
 
+    # --- percorsi di fusione (data/fusions/, fase 7 US-702) ---
+    # Il cambio di Pathway funziona solo tra vicini dello STESSO gruppo. I
+    # percorsi possibili sono uno per coppia non ordinata dentro un gruppo
+    # attivo: FusionEngine li legge, il codice non conosce le coppie.
+    pathway_group = {}
+    for _fn in files:
+        _d = load_json(os.path.join(pdir, _fn)) or {}
+        if _d.get("id"):
+            pathway_group[_d["id"]] = _d.get("group")
+    # gruppi attivi (tutti i loro Pathway sono in data/pathways/)
+    _active_groups = {g for g, n in present.items()
+                      if g in GROUP_SIZES and n == GROUP_SIZES[g]}
+    expected_fusions = set()
+    for g in sorted(_active_groups):
+        _members = sorted(p for p, gg in pathway_group.items() if gg == g)
+        for i in range(len(_members)):
+            for j in range(i + 1, len(_members)):
+                expected_fusions.add(f"{_members[i]}_{_members[j]}")
+    fdir = os.path.join(DATA, "fusions")
+    fusion_stub = 0
+    seen_fusions = set()
+    if not os.path.isdir(fdir):
+        err("data/fusions/: cartella mancante (fase 7, US-702).")
+    else:
+        for fn in sorted(f for f in os.listdir(fdir) if f.endswith(".json")):
+            doc = load_json(os.path.join(fdir, fn))
+            if doc is None:
+                continue
+            rel = f"data/fusions/{fn}"
+            fid = doc.get("id")
+            seen_fusions.add(fid)
+            if fn != f"{fid}.json":
+                err(f"{rel}: nome file diverso dall'id '{fid}'")
+            a, b = doc.get("pathway_a"), doc.get("pathway_b")
+            if a not in pathway_group or b not in pathway_group:
+                err(f"{rel}: pathway_a/pathway_b '{a}'/'{b}' non sono Pathway attivi")
+            elif pathway_group[a] != pathway_group[b]:
+                err(f"{rel}: '{a}' e '{b}' non sono dello stesso gruppo "
+                    f"({pathway_group[a]} / {pathway_group[b]}): non sono vicini fondibili")
+            elif doc.get("gruppo") != pathway_group[a]:
+                err(f"{rel}: campo 'gruppo' '{doc.get('gruppo')}' incoerente col gruppo dei Pathway ({pathway_group[a]})")
+            elif fid != f"{min(a, b)}_{max(a, b)}":
+                err(f"{rel}: id '{fid}' non e' '<pathA>_<pathB>' alfabetico ('{min(a, b)}_{max(a, b)}')")
+            is_stub = bool(doc.get("stub"))
+            fuse = doc.get("abilita_fuse", [])
+            if is_stub:
+                fusion_stub += 1
+                if fuse:
+                    err(f"{rel}: marcato stub ma ha abilita_fuse: svuotalo o togli il flag")
+            elif not fuse:
+                err(f"{rel}: non stub ma senza abilita_fuse")
+            for ab in fuse:
+                aid = ab.get("id")
+                dseq = ab.get("da_sequenza")
+                if not isinstance(dseq, int) or not (7 <= dseq <= 9):
+                    err(f"{rel} [{aid}]: da_sequenza '{dseq}' fuori da 7..9 (le Sequenze conservate)")
+                if not str(ab.get("name_i18n", "")).startswith("ability.fusion."):
+                    err(f"{rel} [{aid}]: name_i18n senza prefisso 'ability.fusion.'")
+                for p in ab.get("primitive", []):
+                    tipo = p.get("tipo")
+                    if tipo in deferred_primitives:
+                        err(f"{rel} [{aid}]: primitiva '{tipo}' e' DIFFERITA")
+                    elif tipo not in primitives:
+                        err(f"{rel} [{aid}]: primitiva sconosciuta '{tipo}'")
+                    else:
+                        ignoti = set(p) - {"tipo"} - prim_params[tipo]
+                        if ignoti:
+                            err(f"{rel} [{aid}]: parametri non dichiarati per '{tipo}': {sorted(ignoti)}")
+                    td = p.get("tag_danno")
+                    if td is not None and td not in valid_damage_tags:
+                        err(f"{rel} [{aid}]: tag_danno '{td}' non nel vocabolario")
+                for t in ab.get("tag_sinergia", []):
+                    if t not in valid_tags:
+                        err(f"{rel} [{aid}]: tag_sinergia sconosciuto '{t}'")
+                    obtainable_tags.add(t)
+        _mancanti = sorted(expected_fusions - seen_fusions)
+        if _mancanti:
+            err(f"data/fusions/: mancano i percorsi di fusione {_mancanti} "
+                f"(uno per coppia di Pathway vicini in un gruppo attivo).")
+        _extra = sorted(seen_fusions - expected_fusions)
+        if _extra:
+            err(f"data/fusions/: percorsi di fusione non attesi {_extra} "
+                f"(le coppie devono essere dentro un gruppo attivo).")
+        if fusion_stub:
+            warn(f"{fusion_stub} percorsi di fusione su {len(expected_fusions)} sono stub "
+                 f"dichiarati (fase 7b): contenuto da scrivere, non un errore.")
+
+    # --- tribolazioni (data/tribulations/, fase 7 US-710) ---
+    # Una prova per salto di fascia (7->6, 5->4, 3->2, 1->0). Lettore di
+    # eventi + flag: 'superamento' e' uno dei 12 tracked_events o un flag,
+    # 'condizioni' il vocabolario chiuso di conditions.gd, 'mentre_in_corso'
+    # una voce di tribulation_effects.json. Una sola tribolazione per salto.
+    TRIB_COND = {"e_notte", "fase_lunare", "in_zona_tag", "foundation_min",
+                 "tier_min", "madness_min", "follia_min", "madness_max",
+                 "acting_progress_min", "reputazione_min", "flag"}
+    twelve_events = set(ev_doc.get("events", {}))
+    tdir = os.path.join(DATA, "tribulations")
+    salti_attesi = {7: 6, 5: 4, 3: 2, 1: 0}
+    salti_visti = {}
+    trib_flags = []   # (rel, tid, flag) da riconciliare coi flag scritti (US-712)
+    if not os.path.isdir(tdir):
+        err("data/tribulations/: cartella mancante (fase 7, US-710).")
+    else:
+        for fn in sorted(os.listdir(tdir)):
+            if not fn.endswith(".json"):
+                continue
+            rel = f"data/tribulations/{fn}"
+            doc = load_json(os.path.join(tdir, fn))
+            if doc is None:
+                err(f"{rel}: JSON illeggibile")
+                continue
+            tid = doc.get("id")
+            salto = doc.get("salto", {})
+            da, a = salto.get("da"), salto.get("a")
+            if da not in salti_attesi or salti_attesi[da] != a:
+                err(f"{rel}: salto {da}->{a} non e' un salto di fascia valido "
+                    f"(attesi {salti_attesi})")
+            else:
+                salti_visti.setdefault(da, []).append(tid)
+            for c in doc.get("condizioni", []):
+                ct = c.get("tipo") if isinstance(c, dict) else None
+                if ct not in TRIB_COND:
+                    err(f"{rel} [{tid}]: condizione di tipo sconosciuto '{ct}' "
+                        f"(vocabolario di conditions.gd: {sorted(TRIB_COND)})")
+            mic = doc.get("mentre_in_corso")
+            if mic not in valid_tribulation_effects:
+                err(f"{rel} [{tid}]: mentre_in_corso '{mic}' non e' in "
+                    f"data/schema/tribulation_effects.json")
+            sup = doc.get("superamento", {})
+            has_ev, has_flag = "evento" in sup, "flag" in sup
+            if has_ev == has_flag:
+                err(f"{rel} [{tid}]: 'superamento' deve avere O 'evento' O 'flag', non entrambi/nessuno")
+            if has_ev and sup.get("evento") not in twelve_events:
+                err(f"{rel} [{tid}]: superamento.evento '{sup.get('evento')}' non e' uno dei 12 eventi tracciati")
+            if has_ev and not (isinstance(sup.get("target"), (int, float)) and sup.get("target") >= 1):
+                err(f"{rel} [{tid}]: superamento con 'evento' ha bisogno di 'target' >= 1")
+            if has_flag and not (isinstance(sup.get("flag"), str) and sup.get("flag")):
+                err(f"{rel} [{tid}]: superamento.flag vuoto")
+            elif has_flag:
+                trib_flags.append((rel, tid, sup.get("flag")))
+        for da in salti_attesi:
+            n = len(salti_visti.get(da, []))
+            if n == 0:
+                err(f"data/tribulations/: manca la tribolazione del salto {da}->{salti_attesi[da]}")
+            elif n > 1:
+                err(f"data/tribulations/: {n} tribolazioni per il salto {da}->{salti_attesi[da]} "
+                    f"({salti_visti[da]}): ne serve UNA sola")
+
+    # --- finali (data/endings.json, fase 7 US-716) ---
+    # 3 voci esatte (FR-9), condizioni dal vocabolario di conditions.gd (nessun
+    # tipo nuovo), eredita_profilo nell'enum, epiloghi_per_gruppo copre i 4
+    # gruppi di Pathway attivi. 'rituale_sequenza_0_completato' e' posto dal
+    # CODICE (EndingSystem ascolta RitualSystem, non un dialogo/quest): unico
+    # flag esente dalla riconciliazione con flag_scritti qui sotto.
+    ENDING_COND = TRIB_COND
+    ENDING_IDS = {"apoteosi", "consumazione", "rinuncia"}
+    EREDITA_PROFILI = {"completo", "ancore", "solo_conoscenza"}
+    GRUPPI_ATTIVI = {"eternal_darkness_i18n", "goddess_of_origin_i18n",
+                      "demon_of_knowledge_i18n", "lord_of_mysteries_i18n"}
+    FLAG_ENDING_ESENTI = {"rituale_sequenza_0_completato"}
+    ending_flags = []   # (rel, eid, flag) da riconciliare coi flag scritti (come trib_flags)
+    end_doc = load_json(os.path.join(DATA, "endings.json"))
+    if end_doc is None:
+        err("data/endings.json: mancante o illeggibile (fase 7, US-716).")
+    else:
+        endings = end_doc.get("endings", [])
+        seen_ids = set()
+        for e in endings:
+            eid = e.get("id")
+            rel = "data/endings.json"
+            if eid in seen_ids:
+                err(f"{rel}: id finale duplicato '{eid}'")
+            seen_ids.add(eid)
+            for c in e.get("condizioni", []):
+                ct = c.get("tipo") if isinstance(c, dict) else None
+                if ct not in ENDING_COND:
+                    err(f"{rel} [{eid}]: condizione di tipo sconosciuto '{ct}' "
+                        f"(vocabolario di conditions.gd: {sorted(ENDING_COND)})")
+                if ct == "flag":
+                    flag = c.get("valore")
+                    if not isinstance(flag, str) or not flag:
+                        err(f"{rel} [{eid}]: condizione 'flag' senza 'valore' valido")
+                    elif flag not in FLAG_ENDING_ESENTI:
+                        ending_flags.append((rel, eid, flag))
+            if e.get("eredita_profilo") not in EREDITA_PROFILI:
+                err(f"{rel} [{eid}]: eredita_profilo '{e.get('eredita_profilo')}' "
+                    f"non nell'enum {sorted(EREDITA_PROFILI)}")
+            epg = e.get("epiloghi_per_gruppo", {})
+            mancanti = GRUPPI_ATTIVI - set(epg)
+            extra = set(epg) - GRUPPI_ATTIVI
+            if mancanti:
+                err(f"{rel} [{eid}]: epiloghi_per_gruppo manca {sorted(mancanti)}")
+            if extra:
+                err(f"{rel} [{eid}]: epiloghi_per_gruppo ha gruppi ignoti {sorted(extra)}")
+        if seen_ids != ENDING_IDS:
+            err(f"data/endings.json: attesi esattamente i finali {sorted(ENDING_IDS)}, "
+                f"trovati {sorted(seen_ids)} (FR-9)")
+
     # --- abilita' ---
     adir = os.path.join(DATA, "abilities")
     ability_ids = set()
@@ -379,6 +595,28 @@ def main():
                     obtainable_tags.add(t)
                 if not ab.get("tag_sinergia"):
                     err(f"{rel} [{aid}]: nessun tag_sinergia. Un'abilita' senza tag e' invisibile al motore delle sinergie.")
+
+                # US-714: preghiera (Sequenze alte) - puramente semantica/i18n,
+                # ma deve essere nel vocabolario e coerente con le primitive
+                # dell'abilita' (data/schema/prayer_effects.json).
+                pray = ab.get("preghiera")
+                if pray is not None:
+                    if pray not in valid_prayer_effects:
+                        err(f"{rel} [{aid}]: preghiera '{pray}' non nel vocabolario di "
+                            f"data/schema/prayer_effects.json")
+                    else:
+                        spec = _pray_doc["preghiere"][pray]
+                        prim_richiesta = spec.get("primitiva")
+                        prims_ab = ab.get("primitive", [])
+                        if prim_richiesta and not any(p.get("tipo") == prim_richiesta for p in prims_ab):
+                            err(f"{rel} [{aid}]: preghiera '{pray}' richiede una primitiva "
+                                f"'{prim_richiesta}', assente dall'abilita'")
+                        bersagli_richiesti = spec.get("richiede", {}).get("bersagli")
+                        if bersagli_richiesti and not any(
+                                p.get("tipo") == prim_richiesta and p.get("bersagli") == bersagli_richiesti
+                                for p in prims_ab):
+                            err(f"{rel} [{aid}]: preghiera '{pray}' richiede '{prim_richiesta}' "
+                                f"con bersagli '{bersagli_richiesti}'")
 
     for rel, sid, aid in ability_refs:
         if ability_ids and aid not in ability_ids:
@@ -543,6 +781,20 @@ def main():
             if not isinstance(v, int) or v < 1:
                 err(f"data/balance.json [tempo.{k}]: deve essere un intero >= 1.")
 
+        # US-618: la densita' mistica (recupero spiritualita', forzatura, spawn).
+        dm = balance_doc.get("densita_mistica", {})
+        for k in ("recupero_spiritualita_al_sec", "molt_recupero_per_densita",
+                  "efficacia_forzatura_per_densita", "spawn_base_al_min", "spawn_per_densita"):
+            v = dm.get(k)
+            if not isinstance(v, (int, float)) or v < 0:
+                err(f"data/balance.json [densita_mistica.{k}]: deve essere un numero >= 0 (US-618).")
+        db = dm.get("densita_baseline")
+        if not isinstance(db, (int, float)) or not (0.0 <= db <= 1.0):
+            err("data/balance.json [densita_mistica.densita_baseline]: numero 0..1.")
+        sp = dm.get("sequenza_percezione")
+        if not isinstance(sp, int) or not (0 <= sp <= 9):
+            err("data/balance.json [densita_mistica.sequenza_percezione]: intero 0-9.")
+
     # --- animazioni ---
     anim_doc = load_json(os.path.join(DATA, "animations.json"))
     if anim_doc:
@@ -613,6 +865,38 @@ def main():
         soglie = [x.get("madness_min", -1) for x in audio.get("madness_layer", {}).get("soglie", [])]
         if soglie != sorted(soglie):
             err("data/audio.json [madness_layer]: le soglie non sono in ordine crescente.")
+
+        # US-619: struttura a layer + ambienti giorno/notte.
+        mus = audio.get("music", {})
+        layer = mus.get("layer", {})
+        if layer.get("sempre_attivo") != "base":
+            err("data/audio.json [music.layer.sempre_attivo]: deve essere 'base' (stem sempre attivo).")
+        if not layer.get("in_crossfade"):
+            err("data/audio.json [music.layer.in_crossfade]: elenco degli stem in crossfade vuoto.")
+        stati = set(mus.get("stati", []))
+        sps = layer.get("stato_per_stem", {})
+        if stati and set(sps) != stati:
+            err(f"data/audio.json [music.layer.stato_per_stem]: le chiavi {sorted(sps)} non "
+                f"coincidono con music.stati {sorted(stati)}.")
+        stem_validi = set(layer.get("in_crossfade", [])) | {"base"}
+        for st, elenco in sps.items():
+            for s in elenco:
+                if s not in stem_validi:
+                    err(f"data/audio.json [music.layer.stato_per_stem.{st}]: stem '{s}' non "
+                        f"e' in in_crossfade ({sorted(stem_validi)}).")
+        amb = mus.get("ambienti", {})
+        for zid, z in mus.get("zone", {}).items():
+            if zid.startswith("_"):
+                continue
+            if not isinstance(z, dict):
+                continue
+            if "riverbero" in z and not (0.0 <= float(z["riverbero"]) <= 1.0):
+                err(f"data/audio.json [music.zone.{zid}.riverbero]: fuori da 0..1.")
+        for zid, a in amb.items():
+            if zid.startswith("_"):
+                continue
+            if not isinstance(a, dict) or "giorno" not in a or "notte" not in a:
+                err(f"data/audio.json [music.ambienti.{zid}]: servono 'giorno' e 'notte'.")
 
     # --- regioni (data/world/regions.json, US-601) ---
     # Le regioni sono DATI: gating, audio, NPC, spawn leggono questo vocabolario
@@ -692,6 +976,14 @@ def main():
                 f"rituale non-stub ma nessuna regione li ospita (US-601: le regioni realizzano "
                 f"a schermo i luoghi dei rituali).")
 
+        # US-619: ogni music_zone usata da una regione ha un ambiente giorno/notte.
+        amb_zone = set((audio or {}).get("music", {}).get("ambienti", {}))
+        for reg in regions_doc.get("regions", []):
+            mz = reg.get("music_zone")
+            if mz and mz not in amb_zone:
+                err(f"data/audio.json [music.ambienti]: manca la zona '{mz}' usata dalla "
+                    f"regione '{reg.get('id')}' (US-619: ambiente giorno/notte per ogni zona).")
+
     # --- fonti di tag di fase 3 (US-334): stanze costruibili, specie di pet
     # (+ comportamenti), tag_grant dei talenti. Rendono raggiungibili le
     # sinergie che pescano da questi sistemi. La VALIDAZIONE piena di quei
@@ -725,6 +1017,7 @@ def main():
     recipe_ids_all = set((_rec_for_syn.get("recipes", {}) or {}).keys())
     if os.path.isdir(sdir):
         syn_ids = set()
+        lore_syn_ids = set()   # US-621: sinergie scoperta:"lore" (le insegna una fonte lore)
         syn_neutralizza = {}  # sid -> [id, ...]
         unreachable_syns = []  # (sid, [tag, ...]) - sinergie di gruppi differiti
         for fname in sorted(os.listdir(sdir)):
@@ -739,6 +1032,8 @@ def main():
                 if sid in syn_ids:
                     err(f"{rel}: id sinergia duplicato '{sid}'")
                 syn_ids.add(sid)
+                if syn.get("scoperta") == "lore":
+                    lore_syn_ids.add(sid)
                 for t in list(syn.get("richiede_tag", {})) + list(syn.get("esclude_tag", {})):
                     if t not in valid_tags:
                         err(f"{rel} [{sid}]: tag sconosciuto '{t}'")
@@ -885,6 +1180,15 @@ def main():
                 sab = it.get("stored_ability_id")
                 if sab is not None and ability_ids and sab not in ability_ids:
                     err(f"{rel} [{iid}]: stored_ability_id '{sab}' non risolve a un'abilita'")
+                sfl = it.get("stored_flag")
+                if sfl is not None:
+                    if not isinstance(sfl, str) or not sfl:
+                        err(f"{rel} [{iid}]: stored_flag deve essere una stringa non vuota (US-621)")
+                    if it.get("categoria") != "pergamena":
+                        err(f"{rel} [{iid}]: stored_flag e' per gli item categoria:pergamena (libri)")
+                    if sab is not None or it.get("insegna_ricetta") is not None:
+                        err(f"{rel} [{iid}]: una pergamena porta UNA sola cosa "
+                            f"(stored_ability_id | insegna_ricetta | stored_flag)")
                 ins = it.get("insegna_ricetta")
                 if ins is not None:
                     _r = load_json(os.path.join(DATA, "potions", "recipes.json")) or {}
@@ -1030,6 +1334,287 @@ def main():
                 err(f"{rel} [{bid}]: quantita' di '{mid}' deve essere un intero > 0")
     if len(blueprints) < 1:
         err("data/forge/blueprints.json: nessun blueprint, atteso almeno 1")
+
+    # --- NPC (data/npc/roster.json, US-612) ---
+    # Un NPC e' DATO: schedule sui momenti/location_tags, vendor sugli item.
+    # faction_id -> data/factions.json (US-615) e dialogue_id -> data/dialogues/
+    # (US-614): finche' quei file non esistono il check e' indulgente.
+    roster_doc = load_json(os.path.join(DATA, "npc", "roster.json"))
+    faction_ids = set()
+    _fac_path = os.path.join(DATA, "factions.json")
+    if os.path.exists(_fac_path):
+        _fac_doc = load_json(_fac_path) or {}
+        faction_ids = {f.get("id") for f in _fac_doc.get("factions", [])}
+    dlg_dir = os.path.join(DATA, "dialogues")
+    dlg_ids = set()
+    if os.path.isdir(dlg_dir):
+        for fn in os.listdir(dlg_dir):
+            d = load_json(os.path.join(dlg_dir, fn)) or {}
+            if d.get("id"):
+                dlg_ids.add(d["id"])
+    if roster_doc is None:
+        err("data/npc/roster.json: mancante o illeggibile (US-612).")
+    else:
+        rel = "data/npc/roster.json"
+        npc_ids = set()
+        n_generici = 0
+        for npc in roster_doc.get("npcs", []):
+            nid = npc.get("id", "")
+            if nid in npc_ids:
+                err(f"{rel}: id NPC duplicato '{nid}'")
+            npc_ids.add(nid)
+            if not isinstance(nid, str) or not nid.startswith("npc_"):
+                err(f"{rel} [{nid}]: id deve avere il prefisso 'npc_'")
+            if nid.startswith("npc_generic_"):
+                n_generici += 1
+            for campo in ("name_i18n", "role_i18n"):
+                v = npc.get(campo)
+                if not isinstance(v, str) or not v.startswith("npc."):
+                    err(f"{rel} [{nid}]: {campo} '{v}' deve avere il prefisso 'npc.'")
+            if npc.get("region_id") not in region_ids:
+                err(f"{rel} [{nid}]: region_id '{npc.get('region_id')}' non e' una regione di regions.json")
+            for voce in npc.get("schedule", []):
+                mom = voce.get("momento")
+                if mom not in valid_momenti:
+                    err(f"{rel} [{nid}]: schedule momento '{mom}' non nel vocabolario time.json")
+                lt = voce.get("location_tag")
+                if lt is not None and valid_location_tags and lt not in valid_location_tags:
+                    err(f"{rel} [{nid}]: schedule location_tag '{lt}' fuori dal vocabolario di location_tags.json")
+            ven = npc.get("vendor")
+            if ven is not None:
+                for iid in ven.get("listino", []):
+                    if iid not in item_ids:
+                        err(f"{rel} [{nid}]: vendor.listino '{iid}' non e' un item esistente")
+            fid = npc.get("faction_id")
+            if fid is not None and faction_ids and fid not in faction_ids:
+                err(f"{rel} [{nid}]: faction_id '{fid}' non e' in data/factions.json")
+            did = npc.get("dialogue_id")
+            if dlg_ids and did not in dlg_ids:
+                err(f"{rel} [{nid}]: dialogue_id '{did}' non ha un file in data/dialogues/")
+        for atteso in ("npc_mirco", "npc_sidon", "npc_vesna", "npc_aldo",
+                       "npc_ottavia", "npc_bruno", "npc_lena", "npc_doran"):
+            if atteso not in npc_ids:
+                err(f"{rel}: manca l'NPC del roster '{atteso}' (design-npc-quest cap. 2)")
+        if n_generici < 10:
+            err(f"{rel}: solo {n_generici} npc_generic_*, attesi >= 10 (fool_9_inganno ne inganna 10)")
+
+    # --- fazioni (data/factions.json, US-615) ---
+    tracked_ev0 = load_json(os.path.join(DATA, "schema", "tracked_events.json")) or {}
+    ev_names0 = set(tracked_ev0.get("events", {}).keys())
+    fac_path = os.path.join(DATA, "factions.json")
+    if not os.path.exists(fac_path):
+        err("data/factions.json: mancante o illeggibile (US-615).")
+    else:
+        fdoc = load_json(fac_path) or {}
+        rel = "data/factions.json"
+        ids_visti = set()
+        for f in fdoc.get("factions", []):
+            fid = f.get("id", "")
+            if fid in ids_visti:
+                err(f"{rel}: id fazione duplicato '{fid}'")
+            ids_visti.add(fid)
+            ni = f.get("name_i18n")
+            if not isinstance(ni, str) or not ni.startswith("faction."):
+                err(f"{rel} [{fid}]: name_i18n '{ni}' deve avere il prefisso 'faction.'")
+            soglie = f.get("soglie", {})
+            if not isinstance(soglie, dict) or len(soglie) < 2 or not all(isinstance(v, (int, float)) for v in soglie.values()):
+                err(f"{rel} [{fid}]: 'soglie' deve avere >= 2 nomi di livello con valore numerico")
+            for m in f.get("membri", []):
+                if roster_doc is not None and m not in npc_ids:
+                    err(f"{rel} [{fid}]: membro '{m}' non e' nel roster")
+                elif roster_doc is not None:
+                    m_fid = next((n.get("faction_id") for n in roster_doc.get("npcs", []) if n.get("id") == m), None)
+                    if m_fid != fid:
+                        err(f"{rel} [{fid}]: il membro '{m}' ha faction_id '{m_fid}' nel roster (incoerente)")
+            rp = f.get("reazione_al_potere")
+            if isinstance(rp, dict) and roster_doc is not None and rp.get("membro") not in npc_ids:
+                err(f"{rel} [{fid}]: reazione_al_potere.membro '{rp.get('membro')}' non e' nel roster")
+            sp = f.get("sospetto")
+            if isinstance(sp, dict):
+                if sp.get("evento") not in ev_names0:
+                    err(f"{rel} [{fid}]: sospetto.evento '{sp.get('evento')}' non e' uno dei 12 eventi tracciati")
+                if sp.get("regione") not in region_ids:
+                    err(f"{rel} [{fid}]: sospetto.regione '{sp.get('regione')}' non e' una regione")
+        for atteso in ("ordine_minore", "porto", "quartiere", "giustizia"):
+            if atteso not in ids_visti:
+                err(f"{rel}: manca la fazione '{atteso}' (design-npc-quest cap. 3)")
+
+    # --- antagonisti (data/lore/antagonisti.json, US-620) ---
+    ant_path = os.path.join(DATA, "lore", "antagonisti.json")
+    if not os.path.exists(ant_path):
+        err("data/lore/antagonisti.json: mancante o illeggibile (US-620).")
+    else:
+        adoc = load_json(ant_path) or {}
+        rel = "data/lore/antagonisti.json"
+        coperti = set()
+        for a in adoc.get("antagonisti", []):
+            pid = a.get("pathway_id")
+            coperti.add(pid)
+            if pathway_ids and pid not in pathway_ids:
+                err(f"{rel} [{a.get('id')}]: pathway_id '{pid}' non e' un Pathway attivo")
+            ni = a.get("name_i18n")
+            if not isinstance(ni, str) or not ni.startswith("antagonist."):
+                err(f"{rel} [{a.get('id')}]: name_i18n '{ni}' senza prefisso 'antagonist.'")
+            indizi = a.get("indizi", [])
+            if not indizi:
+                err(f"{rel} [{a.get('id')}]: nessun indizio")
+            for ind in indizi:
+                ti = ind.get("text_i18n") if isinstance(ind, dict) else None
+                if not isinstance(ti, str) or not ti.startswith("antagonist."):
+                    err(f"{rel} [{a.get('id')}]: un indizio senza text_i18n 'antagonist.*'")
+        for pid in pathway_ids:
+            if pid and pid not in coperti:
+                err(f"{rel}: manca l'antagonista per il Pathway attivo '{pid}' (US-620: uno per Pathway).")
+
+    # --- avanzamento_temporale nel roster (US-620) ---
+    if roster_doc is not None:
+        for npc in roster_doc.get("npcs", []):
+            av = npc.get("avanzamento_temporale")
+            if av is not None:
+                for k in ("sequenza_iniziale", "ogni_momenti", "sequenza_minima"):
+                    v = av.get(k)
+                    if not isinstance(v, int) or v < 0:
+                        err(f"data/npc/roster.json [{npc.get('id')}]: avanzamento_temporale.{k} intero >= 0.")
+
+    # --- dialoghi (data/dialogues/, US-613) ---
+    # Un grafo a nodi: start valido, ogni goto verso un nodo esistente o null,
+    # nessun nodo orfano (irraggiungibile dallo start), speaker nel roster,
+    # effetti dal vocabolario chiuso di 5, emit_event solo sui 12 eventi.
+    DLG_COND = {"acting_progress_min", "madness_max", "madness_min", "e_notte",
+                "fase_lunare", "foundation_min", "tier_min", "in_zona_tag",
+                "follia_min", "reputazione_min", "flag"}
+    DLG_EFFETTI = {"emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest", "impara_sinergia"}
+    _dlg_quest_ids = set()   # quest_id nominati da un effetto avvia_quest
+    tracked_ev = load_json(os.path.join(DATA, "schema", "tracked_events.json")) or {}
+    ev_names = set(tracked_ev.get("events", {}).keys())
+    modi_influenced = set(tracked_ev.get("events", {}).get("npc_influenced", {}).get("valori_modo", []))
+    if os.path.isdir(dlg_dir):
+        for fn in sorted(os.listdir(dlg_dir)):
+            if not fn.endswith(".json"):
+                continue
+            rel = f"data/dialogues/{fn}"
+            doc = load_json(os.path.join(dlg_dir, fn)) or {}
+            nodes = doc.get("nodes", {})
+            start = doc.get("start")
+            if start not in nodes:
+                err(f"{rel}: start '{start}' non e' un nodo del grafo")
+            # raggiungibilita' dallo start
+            visti = set()
+            frontiera = [start] if start in nodes else []
+            while frontiera:
+                nid = frontiera.pop()
+                if nid in visti:
+                    continue
+                visti.add(nid)
+                for ch in nodes.get(nid, {}).get("choices", []):
+                    g = ch.get("goto")
+                    if g is not None and g not in nodes:
+                        err(f"{rel} [{nid}]: goto '{g}' verso un nodo inesistente")
+                    elif isinstance(g, str):
+                        frontiera.append(g)
+            orfani = sorted(set(nodes) - visti)
+            if orfani:
+                err(f"{rel}: nodi irraggiungibili dallo start: {orfani}")
+            for nid, nd in nodes.items():
+                sp = nd.get("speaker")
+                if roster_doc is not None and sp not in npc_ids:
+                    err(f"{rel} [{nid}]: speaker '{sp}' non e' nel roster")
+                for ch in nd.get("choices", []):
+                    for cnd in ch.get("condizioni", []):
+                        if cnd.get("tipo") not in DLG_COND:
+                            err(f"{rel} [{nid}]: condizione '{cnd.get('tipo')}' fuori dal vocabolario "
+                                f"({sorted(DLG_COND)})")
+                    for eff in ch.get("effetti", []):
+                        et = eff.get("tipo")
+                        if et not in DLG_EFFETTI:
+                            err(f"{rel} [{nid}]: effetto '{et}' fuori dal vocabolario chiuso "
+                                f"({sorted(DLG_EFFETTI)})")
+                        if et == "emit_event":
+                            if eff.get("evento") not in ev_names:
+                                err(f"{rel} [{nid}]: emit_event.evento '{eff.get('evento')}' non e' "
+                                    f"uno dei 12 eventi tracciati")
+                            if eff.get("evento") == "npc_influenced" and eff.get("modo") not in modi_influenced:
+                                err(f"{rel} [{nid}]: emit_event npc_influenced.modo '{eff.get('modo')}' "
+                                    f"non e' uno dei 5 ({sorted(modi_influenced)})")
+                        if et == "avvia_quest":
+                            _dlg_quest_ids.add(eff.get("quest_id"))
+                        if et == "impara_sinergia" and lore_syn_ids and eff.get("id") not in lore_syn_ids:
+                            err(f"{rel} [{nid}]: impara_sinergia.id '{eff.get('id')}' non e' una "
+                                f"sinergia scoperta:'lore' ({sorted(lore_syn_ids)})")
+
+    # --- quest (data/quests/, US-616) ---
+    # Un lettore di eventi + flag: ogni step e' uno dei 12 eventi (coi filtri
+    # validi come le acting_actions) o un flag. giver nel roster; il flag di
+    # completamento e' scritto da almeno un dialogo o una quest; ricompense reali.
+    quests_dir = os.path.join(DATA, "quests")
+    quest_docs = {}
+    flag_scritti = set()          # flag scritti da un effetto (dialogo o quest on_complete/ricompensa)
+    if os.path.isdir(dlg_dir):
+        for fn in os.listdir(dlg_dir):
+            dd = load_json(os.path.join(dlg_dir, fn)) or {}
+            for nd in dd.get("nodes", {}).values():
+                for ch in nd.get("choices", []):
+                    for eff in ch.get("effetti", []):
+                        if eff.get("tipo") == "flag" and eff.get("valore", True):
+                            flag_scritti.add(eff.get("id"))
+    if os.path.isdir(quests_dir):
+        for fn in sorted(os.listdir(quests_dir)):
+            if fn.endswith(".json"):
+                q = load_json(os.path.join(quests_dir, fn)) or {}
+                quest_docs[q.get("id")] = q
+                for st in q.get("steps", []):
+                    for eff in st.get("on_complete", []) + q.get("ricompense", []):
+                        if eff.get("tipo") == "flag" and eff.get("valore", True):
+                            flag_scritti.add(eff.get("id"))
+    # US-712: il flag di superamento di una tribolazione dev'essere posto da un
+    # dialogo o una quest (nessun verbo nuovo: e' lo stesso contratto delle quest).
+    for rel, tid, flag in trib_flags:
+        if flag not in flag_scritti:
+            err(f"{rel} [{tid}]: superamento.flag '{flag}' non e' scritto da nessun dialogo o quest")
+
+    # US-716: la condizione 'flag' di un finale (eccetto quelli posti dal
+    # codice, FLAG_ENDING_ESENTI) deve essere scritta da un dialogo o una quest.
+    for rel, eid, flag in ending_flags:
+        if flag not in flag_scritti:
+            err(f"{rel} [{eid}]: condizione flag '{flag}' non e' scritta da nessun dialogo o quest")
+
+    QUEST_EFF = {"flag", "item", "reputazione", "ancora", "apri_vendita"}
+    for qid, q in quest_docs.items():
+        rel = f"data/quests/{qid}.json"
+        if roster_doc is not None and q.get("giver") not in npc_ids:
+            err(f"{rel}: giver '{q.get('giver')}' non e' nel roster")
+        for altra in q.get("exclusive_with", []):
+            if altra not in quest_docs:
+                err(f"{rel}: exclusive_with '{altra}' non e' una quest esistente")
+        for st in q.get("steps", []):
+            comp = st.get("completamento", {})
+            if comp.get("tipo") == "evento":
+                ev = comp.get("evento")
+                if ev not in events:
+                    err(f"{rel} [{st.get('id')}]: evento '{ev}' non e' nel vocabolario dei 12")
+                else:
+                    allowed = set(events[ev].get("filtri", []))
+                    for f in comp.get("filtri", {}):
+                        if f not in allowed:
+                            err(f"{rel} [{st.get('id')}]: filtro '{f}' non ammesso per '{ev}' "
+                                f"(ammessi: {sorted(allowed)})")
+            elif comp.get("tipo") == "flag":
+                if comp.get("id") not in flag_scritti:
+                    err(f"{rel} [{st.get('id')}]: completamento.flag '{comp.get('id')}' non e' "
+                        f"scritto da nessun dialogo o quest")
+            for eff in st.get("on_complete", []):
+                if eff.get("tipo") not in QUEST_EFF:
+                    err(f"{rel} [{st.get('id')}]: on_complete effetto '{eff.get('tipo')}' fuori vocabolario")
+        for eff in q.get("ricompense", []):
+            if eff.get("tipo") not in QUEST_EFF:
+                err(f"{rel}: ricompensa effetto '{eff.get('tipo')}' fuori vocabolario ({sorted(QUEST_EFF)})")
+            if eff.get("tipo") == "item" and eff.get("item_id") not in item_ids:
+                err(f"{rel}: ricompensa item '{eff.get('item_id')}' non e' un item esistente")
+            if eff.get("tipo") == "ancora" and roster_doc is not None and eff.get("npc_id") not in npc_ids:
+                err(f"{rel}: ricompensa ancora '{eff.get('npc_id')}' non e' nel roster")
+    for qid in _dlg_quest_ids:
+        if quest_docs and qid not in quest_docs:
+            err(f"data/dialogues/: un effetto avvia_quest punta a '{qid}', quest inesistente")
 
     # --- strutture costruibili (data/structures/, US-319) ---
     struct_dir = os.path.join(DATA, "structures")
@@ -1313,9 +1898,9 @@ def main():
     # --- libro / UI (data/ui/book.json, US-221) ---
     pt_doc = load_json(os.path.join(DATA, "schema", "page_types.json"))
     page_types = set((pt_doc or {}).get("page_types", []))
-    if len(page_types) != 8:
-        err(f"data/schema/page_types.json: vocabolario di {len(page_types)} tipi, attesi 8 "
-            f"(design-ui-libro.md). Un tipo nuovo e' codice: va discusso.")
+    if len(page_types) != 9:
+        err(f"data/schema/page_types.json: vocabolario di {len(page_types)} tipi, attesi 9 "
+            f"(design-ui-libro.md + page_dialogo US-613b). Un tipo nuovo e' codice: va discusso.")
     book = load_json(os.path.join(DATA, "ui", "book.json"))
     if book:
         pages = book.get("pages", [])
@@ -1513,6 +2098,82 @@ def main():
     for _name, _spec in prim_doc["primitives"].items():
         if _spec.get("implemented") and _spec.get("deferred"):
             err(f"data/schema/primitives.json [{_name}]: 'implemented' e 'deferred' insieme.")
+
+    # --- chiusura fase 5b (US-5B12): il gruppo Lord of Mysteries e' completo ---
+    # Fool/Error/Door a 10/10 Sequenze non-stub; le primitive-firma del gruppo
+    # (steal, possess, time_rewind) implementate; nessuna abilita' attiva usa
+    # una primitiva differita.
+    FASE_5B_PATHWAY = ["fool", "error", "door"]
+    for _pid in FASE_5B_PATHWAY:
+        _pw = load_json(os.path.join(pdir, f"{_pid}.json")) or {}
+        _stub = [s.get("sequence") for s in _pw.get("sequences", []) if s.get("stub")]
+        if _stub:
+            err(f"data/pathways/{_pid}.json: Sequenze ancora stub {sorted(_stub)} - "
+                f"la fase 5b e' chiusa, il gruppo Lord of Mysteries deve essere "
+                f"completo (US-5B12).")
+    for _name in ("steal", "possess", "time_rewind"):
+        if not prim_doc["primitives"].get(_name, {}).get("implemented"):
+            err(f"data/schema/primitives.json [{_name}]: primitiva-firma del "
+                f"gruppo Lord of Mysteries non marcata 'implemented' (US-5B12).")
+    if os.path.exists(os.path.join(DATA, "synergies", "batch_5.json")):
+        pass
+    else:
+        err("data/synergies/batch_5.json: mancante (US-5B12: le sinergie del "
+            "gruppo Lord of Mysteries).")
+    # nessuna Sequenza stub in tutto il gioco: 100/100 non-stub (US-5B12).
+    if stub_count:
+        err(f"{stub_count} Sequenze ancora stub su {total_sequences}: con la fase "
+            f"5b chiusa il gioco e' a 100/100 Sequenze non-stub (US-5B12).")
+
+    # --- chiusura fase 6 (US-622): il mondo esiste ed e' coerente ---
+    # (NON si controlla "zero Sequenze stub": lo fa il check di chiusura fase 5b
+    #  qui sopra. Il "22/22 Pathway completi" arriva con la fase 5b.)
+    FASE_6_DATA = [
+        "world/regions.json", "npc/roster.json", "factions.json",
+        "lore/antagonisti.json", "schema/npc.schema.json", "schema/dialogue.schema.json",
+        "schema/quest.schema.json", "schema/faction.schema.json", "schema/gate_types.json",
+    ]
+    for rel in FASE_6_DATA:
+        if not os.path.exists(os.path.join(DATA, rel)):
+            err(f"data/{rel}: file di dati della fase 6 mancante (US-622: la fase e' chiusa).")
+    # ogni dialogue_id del roster ha un file
+    if roster_doc is not None and os.path.isdir(dlg_dir):
+        _dlg_files = {f[:-5] for f in os.listdir(dlg_dir) if f.endswith(".json")}
+        for _npc in roster_doc.get("npcs", []):
+            if _npc.get("dialogue_id") not in _dlg_files:
+                err(f"data/dialogues/: manca il file per dialogue_id '{_npc.get('dialogue_id')}' "
+                    f"dell'NPC '{_npc.get('id')}' (US-622).")
+    # le quest di Atto I esistono
+    for _qid in ("q_mirco_01", "q_sidon_01", "q_vesna_01", "q_lena_01"):
+        if not os.path.exists(os.path.join(DATA, "quests", f"{_qid}.json")):
+            err(f"data/quests/{_qid}.json: quest di Atto I mancante (US-622).")
+
+    # --- chiusura fase 7 (US-721): l'endgame esiste ed e' coerente ---
+    FASE_7_DATA = [
+        "schema/fusion.schema.json", "schema/tribulation.schema.json",
+        "schema/ending.schema.json", "schema/tribulation_effects.json",
+        "schema/prayer_effects.json", "endings.json",
+    ]
+    for rel in FASE_7_DATA:
+        if not os.path.exists(os.path.join(DATA, rel)):
+            err(f"data/{rel}: file di dati della fase 7 mancante (US-721: la fase e' chiusa).")
+    if not os.path.isdir(os.path.join(DATA, "fusions")) or not os.listdir(os.path.join(DATA, "fusions")):
+        err("data/fusions/: cartella mancante o vuota (US-721).")
+    if not os.path.isdir(os.path.join(DATA, "tribulations")) or not os.listdir(os.path.join(DATA, "tribulations")):
+        err("data/tribulations/: cartella mancante o vuota (US-721).")
+    # door_error e' l'UNICO percorso di fusione completo (US-706): gli altri 7
+    # restano stub dichiarati per la fase 7b, il validator li conta (warning).
+    _fus_ed = load_json(os.path.join(DATA, "fusions", "door_error.json"))
+    if _fus_ed is None:
+        err("data/fusions/door_error.json: mancante (US-721: e' il percorso completo).")
+    elif bool(_fus_ed.get("stub", False)):
+        err("data/fusions/door_error.json: ancora stub - la fase 7 e' chiusa, questo "
+            "percorso deve essere completo (US-706/721).")
+    _end_doc = load_json(os.path.join(DATA, "endings.json"))
+    _end_ids = {e.get("id") for e in (_end_doc or {}).get("endings", [])}
+    if _end_ids != {"apoteosi", "consumazione", "rinuncia"}:
+        err(f"data/endings.json: attesi esattamente i 3 finali con la fase 7 chiusa, "
+            f"trovati {sorted(_end_ids)} (US-721).")
 
     report()
     return 1 if errors else 0

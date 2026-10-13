@@ -21,18 +21,65 @@
       "name_i18n": "sequence.error.9",
       "tier": "low",
       "concept": "Scasso, furto da inventario nemico, colpo alle spalle con bonus se non visto.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "velocita": 0.08,
+        "evasione": 0.05
+      },
+      "abilities": [
+        "error_scasso",
+        "error_pugnalata_furtiva"
+      ],
+      "acting_actions": [
+        {
+          "id": "error_9_saccheggio",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_scasso"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_9_saccheggio",
+          "descrizione": "Scassina 15 volte: ogni serratura forzata e' bottino"
+        },
+        {
+          "id": "error_9_agguato",
+          "evento": "enemy_defeated",
+          "filtri": {
+            "senza_subire_danno": true
+          },
+          "target": 10,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_9_agguato",
+          "descrizione": "Abbatti 10 nemici senza incassare un colpo: il Marauder non si fa vedere"
+        },
+        {
+          "id": "error_9_refurtiva",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "fisico"
+          },
+          "target": 1200,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_9_refurtiva",
+          "descrizione": "Infliggi 1200 danni fisici alle spalle dei nemici"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 9,
-        "ingredients": [],
+        "ingredients": [
+          "grimaldello_cantante",
+          "guanto_del_borseggiatore",
+          "refurtiva_dimenticata"
+        ],
         "formula_id": "formula_error_9"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 1.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 8,
@@ -41,18 +88,65 @@
       "name_i18n": "sequence.error.8",
       "tier": "low",
       "concept": "Eloquenza e truffa: estrae denaro e informazioni dagli NPC senza combattere.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "spiritualita_max": 0.08,
+        "precisione": 0.05
+      },
+      "abilities": [
+        "error_parlantina",
+        "error_patto_truffaldino"
+      ],
+      "acting_actions": [
+        {
+          "id": "error_8_raggiro",
+          "evento": "npc_influenced",
+          "filtri": {
+            "modo": "ingannato"
+          },
+          "target": 12,
+          "progresso": 0.45,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_8_raggiro",
+          "descrizione": "Inganna 12 NPC: la truffa e' il mestiere dello Swindler"
+        },
+        {
+          "id": "error_8_persuasione",
+          "evento": "npc_influenced",
+          "filtri": {
+            "modo": "persuaso"
+          },
+          "target": 8,
+          "progresso": 0.3,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_8_persuasione",
+          "descrizione": "Persuadi 8 NPC con la sola parlantina"
+        },
+        {
+          "id": "error_8_dialettica",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_parlantina"
+          },
+          "target": 15,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_8_dialettica",
+          "descrizione": "Usa la parlantina 15 volte per confondere i bersagli"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 8,
-        "ingredients": [],
+        "ingredients": [
+          "lingua_d_argento_falsa",
+          "contratto_con_la_clausola_nascosta",
+          "dado_truccato"
+        ],
         "formula_id": "formula_error_8"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 2.3,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 7,
@@ -61,18 +155,65 @@
       "name_i18n": "sequence.error.7",
       "tier": "low",
       "concept": "Decifra formule, sigilli e testi cifrati; ruba conoscenza invece di oggetti.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "spiritualita_max": 0.1,
+        "precisione": 0.08
+      },
+      "abilities": [
+        "error_decifrazione",
+        "error_lettura_rubata"
+      ],
+      "acting_actions": [
+        {
+          "id": "error_7_cifrario",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_decifrazione"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_7_cifrario",
+          "descrizione": "Decifra 12 formule o sigilli: la conoscenza si prende, non si chiede"
+        },
+        {
+          "id": "error_7_glossa",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_lettura_rubata"
+          },
+          "target": 12,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_7_glossa",
+          "descrizione": "Ruba 12 letture dai testi altrui"
+        },
+        {
+          "id": "error_7_studio",
+          "evento": "time_in_state",
+          "filtri": {
+            "stato": "meditazione"
+          },
+          "target": 300,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_7_studio",
+          "descrizione": "Passa 300 secondi a studiare i cifrari rubati"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 7,
-        "ingredients": [],
+        "ingredients": [
+          "stele_di_rosetta_infranta",
+          "inchiostro_simpatico_rubato",
+          "chiave_di_cifrario"
+        ],
         "formula_id": "formula_error_7"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 3.6,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 6,
@@ -81,20 +222,63 @@
       "name_i18n": "sequence.error.6",
       "tier": "mid",
       "concept": "Ruba temporaneamente un'abilita' Beyonder appena vista e la usa una volta.",
-      "stat_modifiers": {},
+      "stat_modifiers": {
+        "spiritualita_max": 0.12,
+        "precisione": 0.08
+      },
       "abilities": [
-        "error_furto_prometeo"
+        "error_furto_prometeo",
+        "error_scintilla_rubata"
       ],
-      "acting_actions": [],
+      "acting_actions": [
+        {
+          "id": "error_6_prometeo",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_furto_prometeo"
+          },
+          "target": 12,
+          "progresso": 0.45,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_6_prometeo",
+          "descrizione": "Ruba 12 abilita' Beyonder appena viste"
+        },
+        {
+          "id": "error_6_saccheggio_arcano",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "spirito"
+          },
+          "target": 3000,
+          "progresso": 0.3,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_6_saccheggio_arcano",
+          "descrizione": "Infliggi 3000 danni da spirito con poteri non tuoi"
+        },
+        {
+          "id": "error_6_impunito",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 15,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_6_impunito",
+          "descrizione": "Sconfiggi 15 nemici con le loro stesse armi"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 6,
-        "ingredients": [],
+        "ingredients": [
+          "favilla_del_titano_incatenato",
+          "fegato_sempre_rigenerato",
+          "creta_del_primo_uomo"
+        ],
         "formula_id": "formula_error_6"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 5.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 5,
@@ -103,18 +287,65 @@
       "name_i18n": "sequence.error.5",
       "tier": "mid",
       "concept": "Entra nei sogni per rubare ricordi e formule di pozione.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "spiritualita_max": 0.15,
+        "evasione": 0.08
+      },
+      "abilities": [
+        "error_furto_dei_sogni",
+        "error_incubo_parassita"
+      ],
+      "acting_actions": [
+        {
+          "id": "error_5_ladro_di_sogni",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_furto_dei_sogni"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_5_ladro_di_sogni",
+          "descrizione": "Ruba 12 sogni: ricordi e formule prese mentre l'altro dorme"
+        },
+        {
+          "id": "error_5_notturno",
+          "evento": "time_in_state",
+          "filtri": {
+            "stato": "notte"
+          },
+          "target": 600,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_5_notturno",
+          "descrizione": "Passa 600 secondi nella notte, quando i sogni sono raggiungibili"
+        },
+        {
+          "id": "error_5_logorio",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "follia"
+          },
+          "target": 2500,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_5_logorio",
+          "descrizione": "Infliggi 2500 danni da follia con gli incubi impiantati"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 5,
-        "ingredients": [],
+        "ingredients": [
+          "cuscino_di_un_dormiente_inquieto",
+          "sabbia_del_sonno_rubata",
+          "ricordo_altrui_in_bottiglia"
+        ],
         "formula_id": "formula_error_5"
       },
       "advancement_ritual": null,
-      "madness_on_force": 0,
+      "madness_on_force": 6.4,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 4,
@@ -123,24 +354,75 @@
       "name_i18n": "sequence.error.4",
       "tier": "saint",
       "concept": "Si attacca a un ospite: ne usa sensi, movimento e risorse restando nascosto.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 120,
+        "evasione": 0.12,
+        "velocita": 0.1
+      },
+      "abilities": [
+        "error_innesto_parassita",
+        "error_simbiosi_furtiva"
+      ],
+      "acting_actions": [
+        {
+          "id": "error_4_ospite",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_innesto_parassita"
+          },
+          "target": 10,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_4_ospite",
+          "descrizione": "Innestati su 10 ospiti"
+        },
+        {
+          "id": "error_4_nascosto",
+          "evento": "time_in_state",
+          "filtri": {
+            "stato": "in_ombra"
+          },
+          "target": 500,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_4_nascosto",
+          "descrizione": "Passa 500 secondi in ombra: il Parasite non si fa mai vedere"
+        },
+        {
+          "id": "error_4_simbionte",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 15,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_4_simbionte",
+          "descrizione": "Sconfiggi 15 nemici usando i sensi e il movimento di un ospite"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 4,
-        "ingredients": [],
+        "ingredients": [
+          "vischio_che_si_aggrappa",
+          "cuore_condiviso",
+          "muta_di_pelle_altrui"
+        ],
         "formula_id": "formula_error_4"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "nebbia_grigia",
+          "crocevia"
+        ],
+        "momento": "notte_fonda",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "un_ricordo_a_cui_tenevi"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 8.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 3,
@@ -149,24 +431,75 @@
       "name_i18n": "sequence.error.3",
       "tier": "saint",
       "concept": "Crea avatar autonomi che agiscono come lui; inganni a piu' livelli.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 160,
+        "spiritualita_max": 0.2,
+        "precisione": 0.1
+      },
+      "abilities": [
+        "error_proietta_avatar",
+        "error_inganno_stratificato"
+      ],
+      "acting_actions": [
+        {
+          "id": "error_3_mentore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_proietta_avatar"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_3_mentore",
+          "descrizione": "Proietta 12 avatar autonomi"
+        },
+        {
+          "id": "error_3_scacchiera",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 20,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_3_scacchiera",
+          "descrizione": "Sconfiggi 20 nemici muovendo gli altri come pedine"
+        },
+        {
+          "id": "error_3_disinganno",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "follia"
+          },
+          "target": 4000,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_3_disinganno",
+          "descrizione": "Infliggi 4000 danni da follia con gli inganni stratificati"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 3,
-        "ingredients": [],
+        "ingredients": [
+          "specchio_che_riflette_un_altro",
+          "sillaba_di_un_nome_non_tuo",
+          "filo_del_burattinaio"
+        ],
         "formula_id": "formula_error_3"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
+        "location_tags": [
+          "nebbia_grigia",
+          "vicolo"
+        ],
+        "momento": "crepuscolo",
         "fase_lunare": null,
-        "sacrifices": [],
+        "sacrifices": [
+          "la_tua_faccia_vera_per_un_giorno"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 10.0,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 2,
@@ -175,24 +508,75 @@
       "name_i18n": "sequence.error.2",
       "tier": "angel",
       "concept": "Impianta un errore nel destino di un bersaglio: i suoi piani falliscono.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 280,
+        "spiritualita_max": 0.3,
+        "precisione": 0.15
+      },
+      "abilities": [
+        "error_cavallo_di_troia",
+        "error_piano_che_crolla"
+      ],
+      "acting_actions": [
+        {
+          "id": "error_2_troiano",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_cavallo_di_troia"
+          },
+          "target": 12,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_2_troiano",
+          "descrizione": "Impianta 12 errori nel destino altrui"
+        },
+        {
+          "id": "error_2_sabotaggio",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 18,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_2_sabotaggio",
+          "descrizione": "Sconfiggi 18 nemici i cui piani sono gia' crollati"
+        },
+        {
+          "id": "error_2_rovina",
+          "evento": "damage_dealt",
+          "filtri": {
+            "tag_danno": "follia"
+          },
+          "target": 6000,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_2_rovina",
+          "descrizione": "Infliggi 6000 danni da follia mentre i loro piani falliscono"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 2,
-        "ingredients": [],
+        "ingredients": [
+          "chiodo_nell_ingranaggio_del_fato",
+          "lettera_mai_consegnata",
+          "voto_infranto_alla_radice"
+        ],
         "formula_id": "formula_error_2"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "crocevia",
+          "nebbia_grigia"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "calante",
+        "sacrifices": [
+          "un_piano_a_cui_tenevi_davvero"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 11.5,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 1,
@@ -201,24 +585,75 @@
       "name_i18n": "sequence.error.1",
       "tier": "angel",
       "concept": "Riavvolge brevi tratti di tempo in un raggio limitato.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 420,
+        "spiritualita_max": 0.35,
+        "evasione": 0.15
+      },
+      "abilities": [
+        "error_riavvolgi",
+        "error_verme_del_tempo"
+      ],
+      "acting_actions": [
+        {
+          "id": "error_1_riavvolgitore",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_riavvolgi"
+          },
+          "target": 15,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_1_riavvolgitore",
+          "descrizione": "Riavvolgi il tempo 15 volte"
+        },
+        {
+          "id": "error_1_paradosso",
+          "evento": "damage_taken",
+          "filtri": {},
+          "target": 5000,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_1_paradosso",
+          "descrizione": "Subisci 5000 danni che poi il riavvolgimento cancella"
+        },
+        {
+          "id": "error_1_verme",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_verme_del_tempo"
+          },
+          "target": 8,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_1_verme",
+          "descrizione": "Scava 8 gallerie nel tempo (riavvolgimento con posizione)"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 1,
-        "ingredients": [],
+        "ingredients": [
+          "clessidra_che_cola_all_indietro",
+          "eco_di_un_istante_gia_passato",
+          "verme_che_mangia_i_minuti"
+        ],
         "formula_id": "formula_error_1"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "nebbia_grigia",
+          "soglia"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "eclissi",
+        "sacrifices": [
+          "ancora_del_giocatore"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 12.8,
       "notes": "",
-      "stub": true
+      "stub": false
     },
     {
       "sequence": 0,
@@ -227,24 +662,75 @@
       "name_i18n": "sequence.error.0",
       "tier": "god",
       "concept": "Sfrutta i buchi nelle regole del mondo stesso.",
-      "stat_modifiers": {},
-      "abilities": [],
-      "acting_actions": [],
+      "stat_modifiers": {
+        "hp_max": 700,
+        "spiritualita_max": 0.6,
+        "precisione": 0.2,
+        "evasione": 0.2
+      },
+      "abilities": [
+        "error_falla_nelle_regole",
+        "error_ultima_scappatoia"
+      ],
+      "acting_actions": [
+        {
+          "id": "error_0_dominio",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_falla_nelle_regole"
+          },
+          "target": 5,
+          "progresso": 0.4,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_0_dominio",
+          "descrizione": "Apri 5 falle nelle regole del mondo"
+        },
+        {
+          "id": "error_0_impunita",
+          "evento": "enemy_defeated",
+          "filtri": {},
+          "target": 30,
+          "progresso": 0.35,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_0_impunita",
+          "descrizione": "Sconfiggi 30 nemici senza che nessuna regola ti fermi"
+        },
+        {
+          "id": "error_0_scappatoia",
+          "evento": "ability_used",
+          "filtri": {
+            "ability_id": "error_ultima_scappatoia"
+          },
+          "target": 10,
+          "progresso": 0.25,
+          "ripetibile": true,
+          "descrizione_i18n": "acting.error.error_0_scappatoia",
+          "descrizione": "Usa l'ultima scappatoia 10 volte"
+        }
+      ],
       "potion": {
         "characteristic_sequence": 0,
-        "ingredients": [],
+        "ingredients": [
+          "riga_bianca_nel_regolamento_del_mondo",
+          "cavillo_primordiale",
+          "porta_che_non_c_e_mai_stata"
+        ],
         "formula_id": "formula_error_0"
       },
       "advancement_ritual": {
-        "location_tags": [],
-        "momento": null,
-        "fase_lunare": null,
-        "sacrifices": [],
+        "location_tags": [
+          "porta_senza_stanza"
+        ],
+        "momento": "notte_fonda",
+        "fase_lunare": "eclissi",
+        "sacrifices": [
+          "il_detentore_precedente_della_sequenza_0"
+        ],
         "sigils": []
       },
-      "madness_on_force": 0,
+      "madness_on_force": 14.0,
       "notes": "",
-      "stub": true
+      "stub": false
     }
   ]
 }

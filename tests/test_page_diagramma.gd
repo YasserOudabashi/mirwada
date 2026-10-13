@@ -62,6 +62,51 @@ func test_la_propria_colonna_e_nota_fino_alla_sequenza_corrente() -> void:
 	ov.free()
 
 
+func test_prossima_sequenza_rivela_solo_il_nome() -> void:
+	var gd: Node = _n("/root/GameData")
+	var prog: Node = _n("/root/Progression")
+	prog.call("configura", prog.call("pathway"), 7)   # prossima = Sequenza 6
+	var ov: CanvasLayer = _pagina()
+	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
+	var mio: String = str(prog.call("pathway"))
+	assert_eq(pag.call("cella_stato", mio, 6), "prossima", "la Sequenza subito dopo: stato dedicato")
+	assert_eq(pag.call("cella_stato", mio, 5), "ignoto", "due Sequenze dopo: resta offuscata")
+	var seq6: Dictionary = gd.call("get_sequence", "%s_6" % mio)
+	var nome_atteso: String = str(gd.call("tr_data", seq6.get("name_i18n", "")))
+	assert_eq(str(pag.call("prossima_sequenza_nome")), nome_atteso,
+		"il nome mostrato combacia col nome reale della Sequenza 6")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	prog.call("configura", mio, 9)
+
+
+func test_prossima_sequenza_assente_a_sequenza_0() -> void:
+	var prog: Node = _n("/root/Progression")
+	prog.call("configura", prog.call("pathway"), 0)
+	var ov: CanvasLayer = _pagina()
+	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
+	assert_eq(str(pag.call("prossima_sequenza_nome")), "", "a Sequenza 0 non c'e' una prossima")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	prog.call("configura", prog.call("pathway"), 9)
+
+
+func test_prossima_sequenza_non_scrive_in_knowledgestore() -> void:
+	# La "prossima" e' un presagio calcolato al volo, non conoscenza appresa:
+	# non deve MAI comparire come flag persistente (US-719 la eredita' solo
+	# dai flag di KnowledgeStore, questa anteprima non deve influenzarla).
+	var prog: Node = _n("/root/Progression")
+	var kn: Node = _n("/root/KnowledgeStore")
+	prog.call("configura", prog.call("pathway"), 7)
+	var mio: String = str(prog.call("pathway"))
+	var ov: CanvasLayer = _pagina()
+	assert_false(bool(kn.call("conosce", "sequenza:%s:6" % mio)),
+		"vedere la 'prossima' non la scrive in KnowledgeStore")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	prog.call("configura", mio, 9)
+
+
 func test_fog_of_war_sugli_altri_pathway() -> void:
 	var gd: Node = _n("/root/GameData")
 	var prog: Node = _n("/root/Progression")
@@ -93,6 +138,63 @@ func test_abilita_della_sequenza_corrente_elencate() -> void:
 		"le abilita' della Sequenza corrente sono elencate")
 	_n("/root/Book").call("chiudi")
 	ov.free()
+
+
+func test_sezione_fusione_elenca_solo_i_vicini_dello_stesso_gruppo() -> void:
+	var prog: Node = _n("/root/Progression")
+	prog.call("configura", "twilight_giant", 4)   # gruppo eternal_darkness
+	var ov: CanvasLayer = _pagina()
+	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
+	var vicini: Array = pag.call("vicini_fondibili")
+	var ids: Array = []
+	for v in vicini:
+		ids.append(v["id"])
+	assert_true("darkness" in ids and "death" in ids, "i vicini di gruppo del Twilight Giant")
+	assert_false("error" in ids, "nessun Pathway di un altro gruppo")
+	for v in vicini:
+		assert_true(bool(v["puo"]), "Seq 4: puo_cambiare verso ogni vicino")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	prog.call("configura", "twilight_giant", 9)
+
+
+func test_sezione_fusione_troppo_presto_nessuna_conferma() -> void:
+	var prog: Node = _n("/root/Progression")
+	prog.call("configura", "twilight_giant", 9)
+	var ov: CanvasLayer = _pagina()
+	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
+	for v in (pag.call("vicini_fondibili") as Array):
+		assert_false(bool(v["puo"]), "Seq 9: troppo presto, nessun cambio")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+
+
+func test_sezione_fusione_percorso_scritto_vs_da_rivelare() -> void:
+	var prog: Node = _n("/root/Progression")
+	prog.call("configura", "error", 4)
+	var ov: CanvasLayer = _pagina()
+	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
+	var per_id: Dictionary = {}
+	for v in (pag.call("vicini_fondibili") as Array):
+		per_id[v["id"]] = v
+	assert_true(bool(per_id["door"]["scritto"]), "error->door: percorso rivelato")
+	assert_false(bool(per_id["fool"]["scritto"]), "error->fool: ancora da rivelare (stub)")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	prog.call("configura", "twilight_giant", 9)
+
+
+func test_sezione_fusione_conferma_cambia_il_pathway() -> void:
+	var prog: Node = _n("/root/Progression")
+	prog.call("configura", "twilight_giant", 4)
+	var ov: CanvasLayer = _pagina()
+	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
+	var res: Dictionary = pag.call("fondi", "death")
+	assert_true(bool(res["ok"]), "conferma: cambio riuscito")
+	assert_eq(prog.call("pathway"), "death", "ora sul Pathway vicino")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	prog.call("configura", "twilight_giant", 9)
 
 
 func test_conoscenza_nel_save() -> void:

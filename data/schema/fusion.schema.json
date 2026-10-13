@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "fusion.schema.json",
+  "title": "Fusion",
+  "_comment": "Documentazione di data/fusions/*.json (fase 7, US-702). Un file per PERCORSO DI FUSIONE possibile: il cambio di Pathway (design-pathways.md) funziona solo tra Pathway vicini dello STESSO gruppo, quindi i percorsi sono 3 (Lord of Mysteries) + 3 (Eternal Darkness) + 1 (Demon of Knowledge) + 1 (Goddess of Origin) = 8. Il file combina le abilita' delle Sequenze BASSE (9-7) che il giocatore CONSERVA cambiando Pathway, mutandole col sapore del nuovo Pathway. FusionEngine legge questi dati: nessun 'if' per una coppia nel codice. 'id' e nome file = <pathA>_<pathB> con pathA < pathB alfabetico (il gruppo e' un campo, non nell'id, perche' i nomi di gruppo contengono '_'). I controlli veri sono in tools/validate_data.py.",
+  "type": "object",
+  "required": ["schema_version", "id", "gruppo", "pathway_a", "pathway_b", "abilita_fuse", "stub"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*_[a-z][a-z0-9_]*$" },
+    "gruppo": {
+      "type": "string",
+      "enum": ["lord_of_mysteries", "eternal_darkness", "demon_of_knowledge", "goddess_of_origin"]
+    },
+    "pathway_a": { "type": "string" },
+    "pathway_b": { "type": "string" },
+    "abilita_fuse": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "da_sequenza", "name_i18n", "primitive", "tag_sinergia"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^fus_" },
+          "da_sequenza": { "type": "integer", "minimum": 7, "maximum": 9 },
+          "name_i18n": { "type": "string", "pattern": "^ability\\.fusion\\." },
+          "primitive": { "type": "array", "minItems": 1 },
+          "tag_sinergia": { "type": "array", "minItems": 1 },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "stub": {
+      "type": "boolean",
+      "_comment": "true = percorso non ancora scritto: abilita_fuse deve essere []. Il validator conta gli stub in un warning (come le Sequenze). In fase 7 solo door_error e' non-stub (US-706)."
+    },
+    "note": { "type": "string" }
+  }
+}

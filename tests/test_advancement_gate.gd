@@ -15,6 +15,8 @@ func _found() -> Node: return Engine.get_main_loop().root.get_node_or_null("Foun
 
 func prepara() -> void:
 	_prog().configura("", 9)
+	# US-711: questo test e' sul floor delle fondamenta, non sulle tribolazioni.
+	Engine.get_main_loop().root.get_node("TribulationSystem").call("marca_superate_tutte")
 	_store().call("pulisci")
 	_store().call("aggiungi", "char_twilight_giant_9")
 	_et().call("azzera")

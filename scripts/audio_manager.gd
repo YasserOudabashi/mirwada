@@ -81,7 +81,8 @@ var _one_shot_left: float = 0.0
 var _follia_corrente: float = 0.0
 ## Nomi che i sussurri di soglia 55 pronunciano (NPC incontrati, Ancore).
 ## Li popola AnchorSystem / il sistema NPC; se vuoto si usa un set generico.
-var _nomi_sussurro: Array = []
+var _nomi_sussurro: Array = []   # Ancore (AnchorSystem)
+var _nomi_npc: Array = []         # NPC incontrati + Ancore del roster (NpcSystem, US-612)
 const _NOMI_GENERICI := ["...", "torna", "sei qui", "non e' reale"]
 
 
@@ -115,6 +116,17 @@ func _ready() -> void:
 	if follia != null and follia.has_signal("madness_changed"):
 		follia.madness_changed.connect(func(v: float, _s: int) -> void: aggiorna_follia(v))
 	_ripianifica_one_shot()
+
+	# US-619: il ciclo giorno/notte e il cambio regione commutano l'ambiente
+	# sonoro. I file audio sono un non-goal: qui si sceglie lo stream, non lo
+	# si produce.
+	var ts: Node = get_node_or_null("/root/TimeSystem")
+	if ts != null and ts.has_signal("momento_cambiato"):
+		ts.momento_cambiato.connect(func(_m: String) -> void: aggiorna_ambiente())
+	var ws: Node = get_node_or_null("/root/WorldState")
+	if ws != null and ws.has_signal("regione_cambiata"):
+		ws.regione_cambiata.connect(func(_id: String) -> void: aggiorna_ambiente())
+	aggiorna_ambiente.call_deferred()
 
 
 # --- API -----------------------------------------------------------------
@@ -217,6 +229,12 @@ func imposta_nomi_sussurro(nomi: Array) -> void:
 	_nomi_sussurro = nomi.duplicate()
 
 
+## US-612: i nomi degli NPC che il giocatore ha incontrato (e le Ancore del
+## roster). NpcSystem li spinge qui; nomi_sussurro() li unisce alle Ancore.
+func imposta_nomi_npc(nomi: Array) -> void:
+	_nomi_npc = nomi.duplicate()
+
+
 ## Taglio secco al silenzio (US-217): un rituale interrotto muta music,
 ## ambience e whisper per durata_s, poi li ripristina. Il silenzio
 ## improvviso e' il momento piu' spaventoso che il gioco produce.
@@ -267,8 +285,34 @@ func layers_ambientali_attivi() -> Array:
 	return out
 
 
+## US-619: lo stream ambientale attivo = data/audio.json.music.ambienti
+## [music_zone della regione corrente][giorno|notte]. Placeholder: la SCELTA e'
+## registrata (ambiente_corrente()), il file lo mette un musicista.
+var _ambiente_corrente: String = ""
+
+
+func aggiorna_ambiente() -> void:
+	var gd: Node = get_node_or_null("/root/GameData")
+	var ws: Node = get_node_or_null("/root/WorldState")
+	var ts: Node = get_node_or_null("/root/TimeSystem")
+	if gd == null or ws == null:
+		return
+	var zona: String = str(gd.call("get_region", str(ws.call("regione_corrente"))).get("music_zone", ""))
+	var amb: Dictionary = ((gd.call("get_audio", "music") as Dictionary).get("ambienti", {}) as Dictionary).get(zona, {})
+	var quando: String = "notte" if (ts != null and bool(ts.call("e_notte"))) else "giorno"
+	_ambiente_corrente = str(amb.get(quando, ""))
+
+
+func ambiente_corrente() -> String:
+	return _ambiente_corrente
+
+
 func nomi_sussurro() -> Array:
-	return _nomi_sussurro if not _nomi_sussurro.is_empty() else _NOMI_GENERICI
+	var uniti: Array = _nomi_npc.duplicate()
+	for n in _nomi_sussurro:
+		if n not in uniti:
+			uniti.append(n)
+	return uniti if not uniti.is_empty() else _NOMI_GENERICI
 
 
 ## Un one-shot casuale della follia. Pubblico per i test.

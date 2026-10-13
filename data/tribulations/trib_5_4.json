@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "trib_5_4",
+  "name_i18n": "tribulation.trib_5_4.name",
+  "descrizione_i18n": "tribulation.trib_5_4.descrizione",
+  "salto": { "da": 5, "a": 4 },
+  "condizioni": [
+    { "tipo": "tier_min", "valore": "mid" }
+  ],
+  "mentre_in_corso": "spiritualita_dimezzata",
+  "superamento": { "evento": "npc_influenced", "filtri": {}, "target": 3 }
+}

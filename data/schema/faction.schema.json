@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Le fazioni di data/factions.json (design-npc-quest cap. 3, US-615)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "factions"],
+  "properties": {
+    "schema_version": { "type": "integer" },
+    "_comment": { "type": "string" },
+    "factions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name_i18n", "soglie", "membri"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "name_i18n": { "type": "string", "pattern": "^faction\\." },
+          "soglie": {
+            "type": "object",
+            "minProperties": 2,
+            "additionalProperties": { "type": "number" }
+          },
+          "membri": { "type": "array", "items": { "type": "string", "pattern": "^npc_" } },
+          "reazione_al_potere": {
+            "type": ["object", "null"],
+            "additionalProperties": false,
+            "required": ["delta", "membro"],
+            "properties": {
+              "delta": { "type": "number" },
+              "membro": { "type": "string", "pattern": "^npc_" }
+            }
+          },
+          "sospetto": {
+            "type": ["object", "null"],
+            "additionalProperties": false,
+            "required": ["evento", "regione", "delta", "soglia", "flag"],
+            "properties": {
+              "evento": { "type": "string" },
+              "regione": { "type": "string" },
+              "delta": { "type": "number" },
+              "soglia": { "type": "number" },
+              "flag": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

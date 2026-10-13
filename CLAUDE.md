@@ -140,17 +140,93 @@ del blocco tocca solo 5 handler `_p_<primitiva>` + `player.teleport_verso`,
 `AbilityEngine.execute` intatto. L'architettura della fase 2 regge oltre il
 Twilight Giant.
 
-Fase corrente: **5b + 6 — Mondo**. Roadmap in `006_PRD/roadmap.md`; il PRD si
-genera con `/prd`. La fase 5b (Darkness resto, Fool, Error, Door + le primitive
-`illusion`/`possess`/`steal`/`time_rewind`/`chain`/`shadow_meld`) va dentro la
-fase 6, dopo il ciclo giorno/notte e le regioni.
+Fase 6 — Mondo: **CHIUSA** (22 story US-601..622 + US-613b/US-616b, 669 test).
+PRD in `006_PRD/prd-fase-6-mondo.md`. 9 blocchi (A regioni, B condizioni del
+tempo, C Darkness, D gating, E NPC, F dialoghi, G fazioni + quest, H mappa +
+densità + audio, I narrativa + chiusura). Save `schema_version` **20 → 21**
+(US-602, l'unico bump: tempo/npc/reputazione/quest/flag stanno tutti nel campo
+`mondo` senza bumpare). 5 regioni giocabili data-driven; `TimeSystem`
+(giorno/notte + fasi lunari) che fa valere `e_notte`/`fase_lunare`/`in_zona_tag`
+delle abilità (`Conditions` condiviso da AbilityEngine e DialogueEngine);
+**Darkness completo 10/10** + `shadow_meld`/`illusion` (fase 5b interlacciata);
+`AreaGate` che applica `regions.json.gating[]` (6 modi); 8 NPC + `DialogueEngine`
++ i 9 grafi; `FactionSystem` (comportamenti automatici dai dati);
+`QuestSystem` (lettore di eventi + flag, zero verbi nuovi) + 4 quest di Atto I +
+Journal; pagina mappa (fog of war, fast travel = potere); densità mistica;
+audio del mondo come **spec** (nessun file audio prodotto);
+`data/lore/antagonisti.json` (antagonista strutturale per Pathway). Vocabolari
+chiusi nuovi: `gate_types.json` (6), effetti dialoghi (6), effetti quest (5),
+livelli di reputazione. Schema nuovi: `npc`/`dialogue`/`quest`/`faction`/`region`.
 
-Le fasi 6-8 sono in `006_PRD/roadmap.md`. Il PRD dettagliato di una fase si
-genera con `/prd` **solo quando la precedente è chiusa**.
+Fase 5b — Lord of Mysteries: **CHIUSA** (12 story US-5B01..5B12, 713 test).
+PRD in `006_PRD/prd-fase-5b-lord-of-mysteries.md`. 4 blocchi (A Error +
+checkpoint, B Fool, C Door, D chiusura). Save `schema_version` **invariato**.
+**Fool, Error, Door completi 10/10** → con Darkness (chiuso in fase 6) e i 19
+già fatti: **22/22 Pathway attivi completi, 100/100 Sequenze non-stub**.
+3 primitive implementate: `steal` (categoria oggetto/abilita/conoscenza,
++param `ability_id`/`non_sottrae`), `possess` (status `posseduto`, record
+`corpo_a_terra` come `soul_detach`), `time_rewind` (ring buffer di snapshot
+per-caster in `AbilityEngine`, non tocca il save). `illusion`/`shadow_meld`
+erano già di fase 6; `_p_illusion` esteso (`potenza` per-`tipo_illusione`).
+`chain` resta senza handler (nessuna Sequenza attiva lo richiede).
+`fool_2` riscritta senza `probability_shift` (grep di `data/abilities/` per
+una primitiva differita come `tipo` → **0**). Materia prima `avatar` nuova in
+`ownership.json` (Error: avatar autonomi; Fool: `illusion`). `batch_5.json`:
+6 sinergie del gruppo + `anti_due_bugiardi`. Criterio di uscita verificato in
+`tests/test_slice_fase_5b.gd` (Error 8→2, zero codice che nomina "error";
+diff `.gd` del blocco A = solo `ability_engine.gd` +173 -0, dispatcher
+intatto) e nel validator (check di chiusura fase 5b).
 
-Prova che l'architettura regge: `data/abilities/twilight_giant.json` (fase 2) e
-i 5 Pathway di fase 5 sono contenuto completo con **zero righe di codice
-dedicate**. È il modello da imitare per ogni story di dati.
+Fase 7 — Endgame: **CHIUSA** (21 story US-701..721, 776 test). PRD in
+`006_PRD/prd-fase-7-endgame.md`. 5 blocchi (0 fondamenta, A cambio Pathway +
+fusione, B tribolazioni, C Sequenze alte/preghiere + siti rituali, D finali +
+eredità, E checkpoint + chiusura). Save `schema_version` **21 → 22**
+(US-701, l'unico bump: cambio Pathway, fusioni, tribolazioni superate,
+eredità, finale stanno tutti nel campo `endgame`). Include: `PathwayChange`
+(cambio solo tra vicini dello stesso gruppo) + `FusionEngine` (1 percorso
+completo `error_door`, 7 stub dichiarati per la fase 7b); `TribulationSystem`
+(lettore di eventi/flag, blocca `Progression.avanza` ai 4 salti di fascia);
+6 abilità di "preghiera" sulle Sequenze alte (campo puramente semantico) +
+4 siti rituali di Sequenza 0 condivisi per gruppo; `data/endings.json` (3
+finali) + `EndingSystem` (nessun tipo di condizione nuovo, la Consumazione
+È il game over per follia); schermata di finale che estende il colophon
+(nessun tipo di pagina nuovo); eredità al personaggio successivo (tutte e
+quattro le voci, scelte dal giocatore, riapplicate a un nuovo personaggio
+sullo stesso slot); fog of war sui nomi di Sequenza nel diagramma (richiesta
+utente in corsa: si conosce al più il nome della Sequenza successiva).
+
+**Verdetto del checkpoint (US-720)**: `test_slice_fase_7.gd` fa attraversare
+a un personaggio l'intero ciclo — cambio Pathway con fusione, una
+tribolazione superata, un finale raggiunto, l'eredità riapplicata a un
+nuovo personaggio — con zero righe di codice che nominino un Pathway, una
+coppia di fusione, una tribolazione o un finale specifico.
+`scripts/ability_engine.gd` non è stato toccato in tutta la fase.
+
+Fase corrente: **8 — Vertical slice giocabile** (IN CORSO). Le fasi 1-7
+hanno costruito tutti i sistemi, ma **nessuno può giocare il gioco con la
+tastiera**: `main.tscn` è rimasta la scena di prova della fase 1 (nessuna
+partita avviata, nessun tasto per le abilità, proiettili che non fanno
+danno, recitazione ferma all'1.5%, i 299 ingredienti delle formule che non
+esistono come oggetti, mondo senza nemici né oggetti). La fase 8 collega i
+sistemi già scritti, riempie i dati mancanti e mette una grafica
+provvisoria generata: **zero sistemi nuovi**, save invariato.
+
+- PRD: `006_PRD/prd-fase-8-vertical-slice.md` — 14 story (US-801..US-814)
+  in 7 blocchi, ognuna con acceptance criteria verificabili.
+- **Come eseguirlo: `006_PRD/prossimi-passi.md`** — ordine delle
+  operazioni, quando usare `/prd` e `/ralph`, setup dell'ambiente, comandi
+  di verifica, e le trappole già scoperte (isolamento dei test, libro
+  lasciato aperto, nomi reali dei segnali...). **Leggilo prima di toccare
+  qualunque file.**
+
+Fase 9 (opzionale, non bloccante): Pathway Non-Standard, avanzamento per
+Boon — il PRD si genera con `/prd` solo quando si decide di farla davvero.
+Roadmap in `006_PRD/roadmap.md`.
+
+Prova che l'architettura regge: `data/abilities/twilight_giant.json` (fase 2),
+i 5 Pathway di fase 5, i 3 del Lord of Mysteries (fase 5b) e l'intero
+endgame di fase 7 sono contenuto/motori completi con **zero righe di
+codice dedicate**. È il modello da imitare per ogni story di dati.
 
 ## Decisioni prese
 
@@ -216,6 +292,26 @@ nuove partono da un eventuale testo in chiaro già nei dati (campo gemello
 dà **errore** se una chiave `*_i18n` dei dati attivi non ha voce in `it.json`.
 Riattivi un gruppo differito → rilancia il tool e traduci i nuovi stub.
 
+## Fog of war sulla conoscenza — nomi di Sequenza
+
+Ogni Sequenza di ogni Pathway ha gia' un nome canonico proprio e distinto
+(campo `name` di ogni voce in `data/pathways/*.json`: 100 nomi diversi,
+nessuna fascia condivide un nome generico — es. Twilight Giant 9=Warrior,
+8=Pugilist, ... 0=Twilight Giant). Verificato riga per riga su tutti i 10
+Pathway attivi (2026-09-09): i dati sono gia' corretti, non serve toccarli.
+
+Il giocatore non deve MAI conoscere in anticipo il nome di una Sequenza non
+ancora raggiunta. Unica eccezione: puo' conoscere il nome della Sequenza
+**immediatamente successiva** alla propria sul **proprio** Pathway (un
+presagio/indiscrezione) — mai il nome, ne' altro, di Sequenze piu' lontane,
+ne' quello di Sequenze di altri Pathway (a meno di un flag esplicito in
+KnowledgeStore, gia' previsto dal fog of war esistente). La pagina diagramma
+del libro (`scripts/pages/page_diagramma_pathway.gd`, fase 2 US-224) applica
+il fog of war sulle celle della griglia (colonna propria fino alla Sequenza
+corrente = nota, il resto ignoto salvo flag) ma oggi non renderizza nomi di
+Sequenza da nessuna parte nella griglia; l'eccezione della Sequenza
+successiva (solo nome, mai abilita' o altri dettagli) e' da implementare.
+
 ## Non-goals
 
 Multiplayer, 3D, generazione procedurale del mondo, monetizzazione,
@@ -227,7 +323,7 @@ data-driven in `data/audio.json`. Il doppiaggio si', quello resta fuori.
 
 ## Repo
 
-https://github.com/YasserOudabashi/mirwada (privata)
+https://github.com/YasserOudabashi/mirwada (pubblica)
 
 Repo dedicata a questo progetto, aggiunta alla tabella "Repository che uso"
 in ~/.claude/CLAUDE.md come prescrive quel file per ogni repo nuova.

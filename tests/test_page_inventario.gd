@@ -110,3 +110,39 @@ func test_sezione_indosso_mostra_i_quattro_slot() -> void:
 	_n("/root/Book").call("chiudi")
 	ov.free()
 	_p.free()
+
+
+func _testo_righe(pag: Node) -> String:
+	var t := ""
+	for r in _righe(pag):
+		if r is Label:
+			t += " " + r.text
+	return t
+
+
+func test_sezione_journal_riflette_lo_stato_delle_quest() -> void:
+	var qs: Node = _n("/root/QuestSystem")
+	var ks: Node = _n("/root/KnowledgeStore")
+	var et: Node = _n("/root/EventTracker")
+	qs.call("pulisci"); ks.call("dimentica_tutto"); et.call("azzera")
+	var ov: CanvasLayer = OverlayScene.instantiate()
+	Engine.get_main_loop().root.add_child(ov)
+	var pag: Node = _pagina(ov)
+
+	pag.call("_mostra", "journal")
+	assert_true(_testo_righe(pag).contains(tr("BOOK_JOURNAL_VUOTO")), "diario vuoto all'inizio")
+
+	qs.call("avvia", "q_mirco_01")
+	# aperta su 'journal': il segnale ridisegna dal vivo
+	assert_true(_testo_righe(pag).contains("Le basi"), "la quest attiva compare nel diario")
+	assert_true(_testo_righe(pag).contains(tr("BOOK_JOURNAL_ATTIVE")), "sezione 'In corso'")
+
+	for i in 3:
+		et.call("emit_event", "enemy_defeated", {"senza_abilita": true})
+	assert_eq(str(qs.call("stato", "q_mirco_01")), "completata", "quest completata")
+	assert_true(_testo_righe(pag).contains(tr("BOOK_JOURNAL_COMPLETATE")), "ora e' sotto 'Completate'")
+
+	qs.call("pulisci"); ks.call("dimentica_tutto"); et.call("azzera")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	_p.free()

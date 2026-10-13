@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NPC di data/npc/roster.json (design-npc-quest cap. 6.1, US-612)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "npcs"],
+  "properties": {
+    "schema_version": { "type": "integer" },
+    "_comment": { "type": "string" },
+    "npcs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name_i18n", "role_i18n", "region_id", "anchor_candidate", "faction_id", "schedule", "vendor", "dialogue_id", "memoria"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^npc_" },
+          "name": { "type": "string" },
+          "name_i18n": { "type": "string", "pattern": "^npc\\." },
+          "role": { "type": "string" },
+          "role_i18n": { "type": "string", "pattern": "^npc\\." },
+          "region_id": { "type": "string" },
+          "anchor_candidate": { "type": "boolean" },
+          "faction_id": { "type": ["string", "null"] },
+          "schedule": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["momento", "location_tag"],
+              "properties": {
+                "momento": { "type": "string" },
+                "location_tag": { "type": ["string", "null"] }
+              }
+            }
+          },
+          "vendor": {
+            "oneOf": [
+              { "type": "null" },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["listino"],
+                "properties": {
+                  "listino": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            ]
+          },
+          "dialogue_id": { "type": "string" },
+          "memoria": { "type": "object" }
+        }
+      }
+    }
+  }
+}

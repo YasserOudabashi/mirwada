@@ -580,7 +580,8 @@
       },
       "abilities": [
         "mother_natura_risponde",
-        "mother_camminatrice"
+        "mother_camminatrice",
+        "mother_benedizione_della_covata"
       ],
       "acting_actions": [
         {
@@ -706,7 +707,7 @@
       },
       "advancement_ritual": {
         "location_tags": [
-          "altare_di_radici"
+          "radice_del_mondo"
         ],
         "momento": "alba",
         "fase_lunare": "eclissi",

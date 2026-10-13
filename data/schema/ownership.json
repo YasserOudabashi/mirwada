@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "_comment": "MATRICE DI PROPRIETA' (design-master.md cap. 4, resa check in US-502). Quattro meccaniche che piu' Pathway toccano, ma che UNO possiede: gli altri le fanno in modo diverso, dichiarato. Il validator impedisce di violarla in un file di dati.\n\n| Meccanica | Proprietario | Gli altri |\n| Mondo spirituale | Death lo ABITA (death_5: porte vere, permanenza) | Door lo ATTRAVERSA (door_5: scorciatoie istantanee, mai permanenza) |\n| Copia/furto abilita' | Error RUBA (error_6: la prende, uso singolo, il nemico ne resta privo) | Door REGISTRA E RIPRODUCE (fotocopia); Fool FINGE (illusioni di poteri) |\n| Evocazioni permanenti | Quattro fonti, quattro materie prime | Death: cadaveri/non-morti/spiriti; Paragon: costrutti; Moon: pet/bestie; Mother: chimere/omuncoli; ognuna dichiarata nel prefisso di entita_id |\n| Occultamento | Darkness = invisibilita' PERCETTIVA (cancella dalla mente: darkness_2) | Door = invisibilita' SPAZIALE (non sei qui: door_4) |\n| Divinazione | Hermit e' il divinatore sistemico (hermit_9/3) | Fool divina PER INGANNARE, Door divina LO SPAZIO, Paragon MISURA. Fuori da Hermit ogni reveal_info/mind_read rivela solo la CATEGORIA del suo verbo |\n\nIl tag root 'sogno' (di Visionary, differito) NON va usato nei Pathway attivi finche' Visionary resta differito.",
+  "_comment": "MATRICE DI PROPRIETA' (design-master.md cap. 4, resa check in US-502). Quattro meccaniche che piu' Pathway toccano, ma che UNO possiede: gli altri le fanno in modo diverso, dichiarato. Il validator impedisce di violarla in un file di dati.\n\n| Meccanica | Proprietario | Gli altri |\n| Mondo spirituale | Death lo ABITA (death_5: porte vere, permanenza) | Door lo ATTRAVERSA (door_5: scorciatoie istantanee, mai permanenza) |\n| Copia/furto abilita' | Error RUBA (error_6: la prende, uso singolo, il nemico ne resta privo) | Door REGISTRA E RIPRODUCE (fotocopia); Fool FINGE (illusioni di poteri) |\n| Evocazioni permanenti | Cinque fonti, cinque materie prime | Death: cadaveri/non-morti/spiriti; Paragon: costrutti; Moon: pet/bestie; Mother: chimere/omuncoli; Error: avatar (autonomi, non nati da un corpo o un costrutto - il Mentor of Deceit li proietta da se'); ognuna dichiarata nel prefisso di entita_id |\n| Occultamento | Darkness = invisibilita' PERCETTIVA (cancella dalla mente: darkness_2) | Door = invisibilita' SPAZIALE (non sei qui: door_4) |\n| Divinazione | Hermit e' il divinatore sistemico (hermit_9/3) | Fool divina PER INGANNARE, Door divina LO SPAZIO, Paragon MISURA. Fuori da Hermit ogni reveal_info/mind_read rivela solo la CATEGORIA del suo verbo |\n\nIl tag root 'sogno' (di Visionary, differito) NON va usato nei Pathway attivi finche' Visionary resta differito.",
   "summon_materie_prime": [
     "cadavere",
     "non_morto",
@@ -10,7 +10,8 @@
     "bestia",
     "chimera",
     "omuncolo",
-    "evocazione"
+    "evocazione",
+    "avatar"
   ],
   "tag_vietati_pathway_attivi": [
     "sogno"

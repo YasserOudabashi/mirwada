@@ -12,6 +12,14 @@ BOOK_FRONTESPIZIO_INVITO,Scrivi il tuo nome sul frontespizio,Write your name on 
 BOOK_FRONTESPIZIO_CONFERMA,Comincia,Begin
 BOOK_FRONTESPIZIO_SEQUENZA,Sequenza,Sequence
 BOOK_DIAGRAMMA_SEI_QUI,Sei qui:,You are here:
+BOOK_DIAGRAMMA_PROSSIMA,Si dice che verrà:,Rumor says it will be:
+COLOPHON_FINALE_EREDITA_TITOLO,Ciò che passa,What carries on
+COLOPHON_FINALE_EREDITA_CONOSCENZA,Conoscenza: %d frammenti ricordati,Knowledge: %d remembered fragments
+COLOPHON_FINALE_EREDITA_ANCORA,Un'Ancora: %s,An Anchor: %s
+COLOPHON_FINALE_EREDITA_REPUTAZIONE,Reputazione dimezzata con %d fazioni,Reputation halved with %d factions
+COLOPHON_FINALE_EREDITA_OGGETTO,Un oggetto portato con sé: %s,An object carried over: %s
+COLOPHON_FINALE_SCEGLI_ANCORA,Scegli questa Ancora,Choose this Anchor
+COLOPHON_FINALE_SCEGLI_OGGETTO,Scegli questo oggetto,Choose this object
 COLOPHON_AUDIO,Audio,Audio
 COLOPHON_VIDEO,Video,Video
 COLOPHON_INPUT,Comandi,Controls
@@ -85,3 +93,28 @@ BOOK_SYN_CONTATORE,Scoperte: %d / %d,Discovered: %d / %d
 BOOK_SYN_VUOTO,Nessuna sinergia scoperta.,No synergies discovered yet.
 BOOK_SYN_MANCA,manca:,missing:
 BOOK_SYN_NEUTRALIZZA,neutralizza %s,neutralizes %s
+BOOK_INV_JOURNAL,Diario,Journal
+BOOK_JOURNAL_ATTIVE,In corso,Active
+BOOK_JOURNAL_COMPLETATE,Completate,Completed
+BOOK_JOURNAL_FALLITE,Fallite,Failed
+BOOK_JOURNAL_VUOTO,Nessuna impresa nel diario.,Nothing in the journal yet.
+BOOK_MAPPA_VUOTA,Nessuna regione sulla mappa.,No regions on the map yet.
+BOOK_MAPPA_QUI,sei qui,you are here
+BOOK_MAPPA_VIAGGIA,Viaggia,Travel
+BOOK_MAPPA_GATE,varchi:,gates:
+BOOK_MAPPA_MEZZO_SI,Hai un mezzo per viaggiare.,You have a means to travel.
+BOOK_MAPPA_MEZZO_NO,Servono le strade: nessuna scorciatoia.,You need the roads: no shortcuts.
+BOOK_DIAGRAMMA_FUSIONE_TITOLO,Fondere il Pathway,Fuse the Pathway
+BOOK_DIAGRAMMA_FUSIONE_GRUPPO,Gruppo:,Group:
+BOOK_DIAGRAMMA_FUSIONE_SCRITTO,percorso rivelato,path revealed
+BOOK_DIAGRAMMA_FUSIONE_STUB,ancora da rivelare,yet to be revealed
+BOOK_DIAGRAMMA_FUSIONE_CONFERMA,Fondi verso qui,Fuse toward here
+BOOK_DIAGRAMMA_FUSIONE_TROPPO_PRESTO,Troppo presto: avanza ancora,Too soon: advance further
+BOOK_DIAGRAMMA_FUSIONE_NIENTE,Nessun vicino verso cui fondere,No neighbor to fuse toward
+TRIB_OVERLAY_EFFETTO,Mentre dura:,While it lasts:
+TRIB_OVERLAY_PROGRESSO,Progresso,Progress
+TRIB_EFFETTO_FOLLIA_ACCELERATA,la follia sale piu' in fretta,madness rises faster
+TRIB_EFFETTO_SPIRITUALITA_DIMEZZATA,spiritualita' massima dimezzata,max spirit halved
+TRIB_EFFETTO_NEMICI_RINFORZATI,nemici piu' numerosi e forti,enemies more numerous and stronger
+TRIB_EFFETTO_ABILITA_BLOCCATE,abilita' della Sequenza corrente bloccate,current Sequence abilities locked
+TRIB_EFFETTO_NOTTE_PERENNE,la notte non finisce,the night does not end

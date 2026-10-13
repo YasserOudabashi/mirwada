@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "death_twilight_giant",
+  "gruppo": "eternal_darkness",
+  "pathway_a": "death",
+  "pathway_b": "twilight_giant",
+  "abilita_fuse": [],
+  "stub": true,
+  "note": "Il colosso non-morto: carne che non cede e non muore, il decadimento come armatura."
+}

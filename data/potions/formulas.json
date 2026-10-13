@@ -213,7 +213,94 @@
     "voce_del_gigante",
     "voce_di_creatura_mai_vista",
     "zanna_di_latte",
-    "zolfo_delle_fosse"
+    "zolfo_delle_fosse",
+    "grimaldello_cantante",
+    "guanto_del_borseggiatore",
+    "refurtiva_dimenticata",
+    "lingua_d_argento_falsa",
+    "contratto_con_la_clausola_nascosta",
+    "dado_truccato",
+    "stele_di_rosetta_infranta",
+    "inchiostro_simpatico_rubato",
+    "chiave_di_cifrario",
+    "favilla_del_titano_incatenato",
+    "fegato_sempre_rigenerato",
+    "creta_del_primo_uomo",
+    "cuscino_di_un_dormiente_inquieto",
+    "sabbia_del_sonno_rubata",
+    "ricordo_altrui_in_bottiglia",
+    "vischio_che_si_aggrappa",
+    "cuore_condiviso",
+    "muta_di_pelle_altrui",
+    "specchio_che_riflette_un_altro",
+    "sillaba_di_un_nome_non_tuo",
+    "filo_del_burattinaio",
+    "chiodo_nell_ingranaggio_del_fato",
+    "lettera_mai_consegnata",
+    "voto_infranto_alla_radice",
+    "clessidra_che_cola_all_indietro",
+    "eco_di_un_istante_gia_passato",
+    "verme_che_mangia_i_minuti",
+    "riga_bianca_nel_regolamento_del_mondo",
+    "cavillo_primordiale",
+    "porta_che_non_c_e_mai_stata",
+    "naso_finto_di_ceramica",
+    "sonaglio_che_confonde",
+    "cerone_da_palcoscenico",
+    "cilindro_a_doppio_fondo",
+    "colomba_che_non_esiste",
+    "asso_sempre_in_cima_al_mazzo",
+    "maschera_senza_lineamenti",
+    "voce_registrata_su_cera",
+    "ritratto_che_cambia_faccia",
+    "filo_spirituale_annodato",
+    "croce_di_legno_del_burattinaio",
+    "articolazione_di_marionetta",
+    "cappello_a_cilindro_senza_fondo",
+    "specchio_da_camerino_incrinato",
+    "sipario_di_velluto_polveroso",
+    "pagina_strappata_da_un_diario",
+    "polvere_di_un_oggetto_gia_distrutto",
+    "ritratto_di_te_da_bambino",
+    "biglietto_della_lotteria_vincente",
+    "quadrifoglio_a_cinque_foglie",
+    "moneta_caduta_sempre_di_taglio",
+    "angolo_di_stanza_che_non_esiste",
+    "silenzio_tra_due_battiti",
+    "regola_locale_scritta_a_matita",
+    "battuta_finale_mai_detta",
+    "specchio_che_non_riflette_nessuno",
+    "copione_del_mondo_con_le_correzioni",
+    "chiave_senza_denti",
+    "polvere_di_gesso_stellare",
+    "cardine_arrugginito_di_una_porta_perduta",
+    "specchio_da_borsetta_a_due_facce",
+    "gessetto_che_disegna_porte",
+    "filo_teso_tra_due_stanze",
+    "carta_stellare_con_una_stella_in_piu",
+    "sabbia_di_meridiana_notturna",
+    "lente_puntata_sempre_a_nord",
+    "inchiostro_che_copia_da_solo",
+    "carta_carbone_dell_anima",
+    "timbro_di_ogni_potere",
+    "biglietto_di_sola_andata_e_ritorno",
+    "sabbia_di_due_deserti_lontani",
+    "mappa_che_si_ripiega_su_se_stessa",
+    "segreto_sigillato_in_cera_nera",
+    "ombra_ritagliata_con_le_forbici",
+    "chiave_che_chiude_e_non_apre",
+    "suola_consumata_da_mille_strade",
+    "acqua_di_un_pozzo_che_non_trovi_piu",
+    "bussola_che_punta_a_dove_vuoi_tu",
+    "frammento_di_una_porta_tra_i_mondi",
+    "eco_di_un_potere_visto_una_volta_sola",
+    "polvere_di_un_piano_gia_chiuso",
+    "chiave_fatta_di_luce_di_stella",
+    "serratura_dell_orizzonte",
+    "cardine_del_cielo",
+    "prima_porta_mai_aperta",
+    "distanza_ridotta_a_zero",
+    "soglia_tra_tutto_e_tutto"
   ],
   "formulas": {
     "formula_fool_9": {
@@ -1202,6 +1289,412 @@
         "frammento_di_notte_primordiale",
         "occhio_del_gufo_del_giudizio",
         "ultimo_respiro_del_giorno"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_9": {
+      "characteristic_sequence": 9,
+      "ingredients": [
+        "grimaldello_cantante",
+        "guanto_del_borseggiatore",
+        "refurtiva_dimenticata"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_8": {
+      "characteristic_sequence": 8,
+      "ingredients": [
+        "lingua_d_argento_falsa",
+        "contratto_con_la_clausola_nascosta",
+        "dado_truccato"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_7": {
+      "characteristic_sequence": 7,
+      "ingredients": [
+        "stele_di_rosetta_infranta",
+        "inchiostro_simpatico_rubato",
+        "chiave_di_cifrario"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_6": {
+      "characteristic_sequence": 6,
+      "ingredients": [
+        "favilla_del_titano_incatenato",
+        "fegato_sempre_rigenerato",
+        "creta_del_primo_uomo"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_5": {
+      "characteristic_sequence": 5,
+      "ingredients": [
+        "cuscino_di_un_dormiente_inquieto",
+        "sabbia_del_sonno_rubata",
+        "ricordo_altrui_in_bottiglia"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_4": {
+      "characteristic_sequence": 4,
+      "ingredients": [
+        "vischio_che_si_aggrappa",
+        "cuore_condiviso",
+        "muta_di_pelle_altrui"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_3": {
+      "characteristic_sequence": 3,
+      "ingredients": [
+        "specchio_che_riflette_un_altro",
+        "sillaba_di_un_nome_non_tuo",
+        "filo_del_burattinaio"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_2": {
+      "characteristic_sequence": 2,
+      "ingredients": [
+        "chiodo_nell_ingranaggio_del_fato",
+        "lettera_mai_consegnata",
+        "voto_infranto_alla_radice"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_1": {
+      "characteristic_sequence": 1,
+      "ingredients": [
+        "clessidra_che_cola_all_indietro",
+        "eco_di_un_istante_gia_passato",
+        "verme_che_mangia_i_minuti"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_error_0": {
+      "characteristic_sequence": 0,
+      "ingredients": [
+        "riga_bianca_nel_regolamento_del_mondo",
+        "cavillo_primordiale",
+        "porta_che_non_c_e_mai_stata"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_8": {
+      "characteristic_sequence": 8,
+      "ingredients": [
+        "naso_finto_di_ceramica",
+        "sonaglio_che_confonde",
+        "cerone_da_palcoscenico"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_7": {
+      "characteristic_sequence": 7,
+      "ingredients": [
+        "cilindro_a_doppio_fondo",
+        "colomba_che_non_esiste",
+        "asso_sempre_in_cima_al_mazzo"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_6": {
+      "characteristic_sequence": 6,
+      "ingredients": [
+        "maschera_senza_lineamenti",
+        "voce_registrata_su_cera",
+        "ritratto_che_cambia_faccia"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_5": {
+      "characteristic_sequence": 5,
+      "ingredients": [
+        "filo_spirituale_annodato",
+        "croce_di_legno_del_burattinaio",
+        "articolazione_di_marionetta"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_4": {
+      "characteristic_sequence": 4,
+      "ingredients": [
+        "cappello_a_cilindro_senza_fondo",
+        "specchio_da_camerino_incrinato",
+        "sipario_di_velluto_polveroso"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_3": {
+      "characteristic_sequence": 3,
+      "ingredients": [
+        "pagina_strappata_da_un_diario",
+        "polvere_di_un_oggetto_gia_distrutto",
+        "ritratto_di_te_da_bambino"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_2": {
+      "characteristic_sequence": 2,
+      "ingredients": [
+        "biglietto_della_lotteria_vincente",
+        "quadrifoglio_a_cinque_foglie",
+        "moneta_caduta_sempre_di_taglio"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_1": {
+      "characteristic_sequence": 1,
+      "ingredients": [
+        "angolo_di_stanza_che_non_esiste",
+        "silenzio_tra_due_battiti",
+        "regola_locale_scritta_a_matita"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_fool_0": {
+      "characteristic_sequence": 0,
+      "ingredients": [
+        "battuta_finale_mai_detta",
+        "specchio_che_non_riflette_nessuno",
+        "copione_del_mondo_con_le_correzioni"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_9": {
+      "characteristic_sequence": 9,
+      "ingredients": [
+        "chiave_senza_denti",
+        "polvere_di_gesso_stellare",
+        "cardine_arrugginito_di_una_porta_perduta"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_8": {
+      "characteristic_sequence": 8,
+      "ingredients": [
+        "specchio_da_borsetta_a_due_facce",
+        "gessetto_che_disegna_porte",
+        "filo_teso_tra_due_stanze"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_7": {
+      "characteristic_sequence": 7,
+      "ingredients": [
+        "carta_stellare_con_una_stella_in_piu",
+        "sabbia_di_meridiana_notturna",
+        "lente_puntata_sempre_a_nord"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_6": {
+      "characteristic_sequence": 6,
+      "ingredients": [
+        "inchiostro_che_copia_da_solo",
+        "carta_carbone_dell_anima",
+        "timbro_di_ogni_potere"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_5": {
+      "characteristic_sequence": 5,
+      "ingredients": [
+        "biglietto_di_sola_andata_e_ritorno",
+        "sabbia_di_due_deserti_lontani",
+        "mappa_che_si_ripiega_su_se_stessa"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_4": {
+      "characteristic_sequence": 4,
+      "ingredients": [
+        "segreto_sigillato_in_cera_nera",
+        "ombra_ritagliata_con_le_forbici",
+        "chiave_che_chiude_e_non_apre"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_3": {
+      "characteristic_sequence": 3,
+      "ingredients": [
+        "suola_consumata_da_mille_strade",
+        "acqua_di_un_pozzo_che_non_trovi_piu",
+        "bussola_che_punta_a_dove_vuoi_tu"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_2": {
+      "characteristic_sequence": 2,
+      "ingredients": [
+        "frammento_di_una_porta_tra_i_mondi",
+        "eco_di_un_potere_visto_una_volta_sola",
+        "polvere_di_un_piano_gia_chiuso"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_1": {
+      "characteristic_sequence": 1,
+      "ingredients": [
+        "chiave_fatta_di_luce_di_stella",
+        "serratura_dell_orizzonte",
+        "cardine_del_cielo"
+      ],
+      "soglia_parziale": 2,
+      "penalita_parziale": {
+        "follia_extra": 2.0,
+        "qualita": "instabile",
+        "_nota": "Ingredienti mancanti: piu' follia, qualita' ridotta."
+      }
+    },
+    "formula_door_0": {
+      "characteristic_sequence": 0,
+      "ingredients": [
+        "prima_porta_mai_aperta",
+        "distanza_ridotta_a_zero",
+        "soglia_tra_tutto_e_tutto"
       ],
       "soglia_parziale": 2,
       "penalita_parziale": {

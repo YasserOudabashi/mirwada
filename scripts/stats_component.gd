@@ -101,6 +101,30 @@ func configure_from_balance(sequenza: int) -> void:
 
 ## Base + somma dei modificatori attivi. E' il solo valore che i sistemi
 ## devono usare: nessuno legge _base direttamente.
+## US-618: il giocatore recupera spiritualita' nel tempo; il ritmo scala con
+## la densita' mistica del luogo (WorldState) — fuori citta' si recupera di
+## piu'. Solo il giocatore: i nemici non rigenerano.
+func _rigenera_spiritualita(delta: float) -> void:
+	if _dead or delta <= 0.0:
+		return
+	var p: Node = get_parent()
+	if p == null or not p.is_in_group("player"):
+		return
+	var maximum: float = get_stat("spiritualita_max")
+	if _spiritualita >= maximum:
+		return
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd == null:
+		return
+	var c: Dictionary = gd.call("get_balance", "densita_mistica")
+	var base: float = float(c.get("recupero_spiritualita_al_sec", 1.5))
+	var ws: Node = get_node_or_null("/root/WorldState")
+	var d: float = float(ws.call("densita_mistica_corrente")) if ws != null else 0.2
+	var baseline: float = float(c.get("densita_baseline", 0.2))
+	var molt: float = 1.0 + maxf(0.0, d - baseline) * float(c.get("molt_recupero_per_densita", 3.0))
+	spiritualita = minf(_spiritualita + base * molt * delta, maximum)
+
+
 func get_stat(name: String) -> float:
 	var total: float = float(_base.get(name, 0.0))
 	for id in _modifiers:
@@ -151,6 +175,7 @@ func is_dead() -> bool:
 
 
 func _process(delta: float) -> void:
+	_rigenera_spiritualita(delta)
 	if _statuses.is_empty():
 		return
 	for id in _statuses.keys():

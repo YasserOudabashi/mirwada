@@ -1,0 +1,40 @@
+[gd_scene load_steps=2 format=3 uid="uid://c0tribulationov0"]
+
+[ext_resource type="Script" path="res://scripts/tribulation_overlay.gd" id="1_tov"]
+
+[node name="TribulationOverlay" type="CanvasLayer"]
+layer = 85
+script = ExtResource("1_tov")
+
+[node name="Pannello" type="Panel" parent="."]
+visible = false
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -160.0
+offset_top = 8.0
+offset_right = 160.0
+offset_bottom = 92.0
+mouse_filter = 2
+
+[node name="V" type="VBoxContainer" parent="Pannello"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = -8.0
+offset_bottom = -6.0
+
+[node name="Nome" type="Label" parent="Pannello/V"]
+text = "—"
+
+[node name="Descrizione" type="Label" parent="Pannello/V"]
+text = "—"
+autowrap_mode = 3
+
+[node name="Effetto" type="Label" parent="Pannello/V"]
+modulate = Color(1, 0.7, 0.6, 1)
+text = "—"
+
+[node name="Progresso" type="Label" parent="Pannello/V"]
+text = "—"

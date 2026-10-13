@@ -34,7 +34,8 @@
         "vetta",
         "luogo_di_massacro",
         "cripta",
-        "trono_del_gigante"
+        "trono_del_gigante",
+        "soglia_del_crepuscolo"
       ],
       "music_zone": "marche",
       "gating": [
@@ -62,7 +63,8 @@
         "radura_lunare",
         "grotta_di_marea",
         "sorgente",
-        "altare_di_radici"
+        "altare_di_radici",
+        "radice_del_mondo"
       ],
       "music_zone": "valle",
       "gating": [
@@ -90,7 +92,8 @@
         "officina",
         "torre_di_osservazione",
         "sala_dei_sigilli",
-        "studio"
+        "studio",
+        "biblioteca_di_tutto"
       ],
       "music_zone": "archivio",
       "gating": [
@@ -113,7 +116,8 @@
         "crocevia",
         "soglia",
         "nebbia_grigia",
-        "palco"
+        "palco",
+        "porta_senza_stanza"
       ],
       "music_zone": "frontiera",
       "gating": [

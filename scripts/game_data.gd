@@ -15,6 +15,8 @@ signal data_reloaded(files_loaded: int, errors: int)
 const DIR_PATHWAYS := "res://data/pathways"
 const DIR_ABILITIES := "res://data/abilities"
 const DIR_SYNERGIES := "res://data/synergies"
+const DIR_FUSIONS := "res://data/fusions"
+const DIR_TRIBULATIONS := "res://data/tribulations"
 const DIR_ITEMS := "res://data/items"
 const DIR_STRUCTURES := "res://data/structures"
 const DIR_PETS := "res://data/pets"
@@ -22,6 +24,8 @@ const PATH_ROOM_TYPES := "res://data/schema/room_types.json"
 const PATH_ROOMS := "res://data/base/rooms.json"
 const PATH_TRACKED_TALENTS := "res://data/schema/tracked_talents.json"
 const DIR_TALENTS := "res://data/talents"
+const DIR_DIALOGUES := "res://data/dialogues"
+const DIR_QUESTS := "res://data/quests"
 const PATH_TAGS := "res://data/tags.json"
 const PATH_BALANCE := "res://data/balance.json"
 const PATH_PRIMITIVES := "res://data/schema/primitives.json"
@@ -49,6 +53,10 @@ const PATH_SIGILS := "res://data/sigils/core.json"
 const PATH_SIGIL_EFFECT_TYPES := "res://data/schema/sigil_effect_types.json"
 const PATH_BLUEPRINTS := "res://data/forge/blueprints.json"
 const PATH_REGIONS := "res://data/world/regions.json"
+const PATH_ROSTER := "res://data/npc/roster.json"
+const PATH_FACTIONS := "res://data/factions.json"
+const PATH_ANTAGONISTI := "res://data/lore/antagonisti.json"
+const PATH_ENDINGS := "res://data/endings.json"
 
 ## Categorie di animazione in animations.json (le stesse di
 ## generate_placeholders.py). Le altre chiavi di primo livello
@@ -59,6 +67,14 @@ var _pathways: Dictionary = {}
 var _sequences: Dictionary = {}
 var _abilities: Dictionary = {}
 var _synergies: Dictionary = {}
+## Percorsi di fusione (data/fusions/, fase 7). _fusions: doc per id
+## "<pathA>_<pathB>". _fusion_abilities: le abilita' fuse dei percorsi NON stub,
+## indicizzate per il loro id "fus_...", cosi' get_ability() le risolve come
+## un'abilita' qualsiasi senza che finiscano in ability_ids()/ability_count().
+var _fusions: Dictionary = {}
+var _fusion_abilities: Dictionary = {}
+## Tribolazioni ai salti di fascia (data/tribulations/, fase 7). Doc per id.
+var _tribulations: Dictionary = {}
 var _tags: Dictionary = {}
 var _balance: Dictionary = {}
 var _primitives: Dictionary = {}
@@ -91,6 +107,12 @@ var _sigils: Dictionary = {}
 var _sigil_effect_types: Dictionary = {}
 var _blueprints: Dictionary = {}
 var _regions: Dictionary = {}
+var _roster: Dictionary = {}
+var _dialogues: Dictionary = {}
+var _factions: Dictionary = {}
+var _quests: Dictionary = {}
+var _antagonisti: Dictionary = {}
+var _endings: Dictionary = {}
 
 var _errors: PackedStringArray = []
 var _files_loaded: int = 0
@@ -132,10 +154,14 @@ func load_all() -> void:
 	_load_pathways()
 	_load_abilities()
 	_load_synergies()
+	_load_fusions()
+	_load_tribulations()
 	_load_items()
 	_load_structures()
 	_load_pets()
 	_load_talents()
+	_load_dialogues()
+	_load_quests()
 	# L'ultimo argomento e' il tipo atteso per la chiave: un file in cui quella
 	# chiave ha la forma sbagliata viene scartato con un errore, non caricato.
 	_load_single(PATH_TAGS, "tags", _tags, TYPE_ARRAY)
@@ -166,6 +192,10 @@ func load_all() -> void:
 	_load_single(PATH_SIGIL_EFFECT_TYPES, "effetti", _sigil_effect_types, TYPE_ARRAY)
 	_load_single(PATH_BLUEPRINTS, "blueprints", _blueprints, TYPE_DICTIONARY)
 	_load_single(PATH_REGIONS, "regions", _regions, TYPE_ARRAY)
+	_load_single(PATH_ROSTER, "npcs", _roster, TYPE_ARRAY)
+	_load_single(PATH_FACTIONS, "factions", _factions, TYPE_ARRAY)
+	_load_single(PATH_ANTAGONISTI, "antagonisti", _antagonisti, TYPE_ARRAY)
+	_load_single(PATH_ENDINGS, "endings", _endings, TYPE_ARRAY)
 
 	if _errors.is_empty():
 		print("[GameData] %d file, %d pathway, %d sequenze, %d abilita'." % [
@@ -191,7 +221,38 @@ func get_sequence(id: String) -> Dictionary:
 
 
 func get_ability(id: String) -> Dictionary:
-	return _abilities.get(id, {})
+	# Ramo separato per le abilita' fuse (fase 7): un id "fus_*" non e' legato a
+	# una Sequenza, ma esegue come ogni altra abilita'.
+	if _abilities.has(id):
+		return _abilities[id]
+	return _fusion_abilities.get(id, {})
+
+
+## Il percorso di fusione con quell'id ("<pathA>_<pathB>"). {} se non esiste.
+func get_fusion(id: String) -> Dictionary:
+	return _fusions.get(id, {})
+
+
+func fusion_ids() -> Array:
+	return _fusions.keys()
+
+
+## --- Tribolazioni (data/tribulations/, fase 7 US-710) ---
+func get_tribulation(id: String) -> Dictionary:
+	return _tribulations.get(id, {})
+
+
+func tribulation_ids() -> Array:
+	return _tribulations.keys()
+
+
+## La tribolazione del salto che PARTE dalla Sequenza `da` (7/5/3/1). {} se
+## nessuna. Il validator garantisce che ce ne sia una sola per salto.
+func tribulation_per_salto(da: int) -> Dictionary:
+	for t in _tribulations.values():
+		if int((t as Dictionary).get("salto", {}).get("da", -1)) == da:
+			return t
+	return {}
 
 
 func ability_ids() -> Array:
@@ -546,6 +607,70 @@ func get_region(id: String) -> Dictionary:
 	return {}
 
 
+## --- NPC (data/npc/roster.json, US-612) ---
+func get_npcs() -> Array:
+	return _array_or_empty(_roster.get("npcs"))
+
+
+## {} se l'id non esiste: il chiamante controlla con is_empty().
+func get_npc(id: String) -> Dictionary:
+	for n in get_npcs():
+		if typeof(n) == TYPE_DICTIONARY and str((n as Dictionary).get("id", "")) == id:
+			return n
+	return {}
+
+
+## Il grafo di un dialogo (data/dialogues/, US-613). {} se non esiste.
+func get_dialogue(id: String) -> Dictionary:
+	return _dialogues.get(id, {})
+
+
+## --- Fazioni (data/factions.json, US-615) ---
+func get_factions() -> Array:
+	return _array_or_empty(_factions.get("factions"))
+
+
+func get_faction(id: String) -> Dictionary:
+	for f in get_factions():
+		if typeof(f) == TYPE_DICTIONARY and str((f as Dictionary).get("id", "")) == id:
+			return f
+	return {}
+
+
+## --- Quest (data/quests/, US-616) ---
+func get_quests() -> Array:
+	return _quests.values()
+
+
+func get_quest(id: String) -> Dictionary:
+	return _quests.get(id, {})
+
+
+## --- Antagonisti (data/lore/antagonisti.json, US-620) ---
+func get_antagonisti() -> Array:
+	return _array_or_empty(_antagonisti.get("antagonisti"))
+
+
+## L'antagonista del Pathway dato (il detentore precedente della sua Seq 0).
+func get_antagonista(pathway_id: String) -> Dictionary:
+	for a in get_antagonisti():
+		if typeof(a) == TYPE_DICTIONARY and str((a as Dictionary).get("pathway_id", "")) == pathway_id:
+			return a
+	return {}
+
+
+## --- Finali (data/endings.json, fase 7 US-716) ---
+func get_endings() -> Array:
+	return _array_or_empty(_endings.get("endings"))
+
+
+func get_ending(id: String) -> Dictionary:
+	for e in get_endings():
+		if typeof(e) == TYPE_DICTIONARY and str((e as Dictionary).get("id", "")) == id:
+			return e
+	return {}
+
+
 ## La Caratteristica di quel (Pathway, Sequenza). {} se non esiste.
 func characteristic_for(pathway_id: String, sequence: int) -> Dictionary:
 	for c in _array_or_empty(_characteristics.get("characteristics")):
@@ -620,6 +745,39 @@ func _load_abilities() -> void:
 			_upsert(_abilities, aid, ability)
 			visti[aid] = true
 	_prune(_abilities, visti)
+
+
+## US-613: un file per dialogo (data/dialogues/dlg_*.json), l'oggetto e' il
+## grafo intero ({id, start, nodes}). Chiave = doc.id.
+func _load_dialogues() -> void:
+	var visti: Dictionary = {}
+	for path in _json_files_in(DIR_DIALOGUES):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		var did: String = str(doc.get("id", ""))
+		if did.is_empty():
+			_fail(path, "un dialogo non ha 'id'")
+			continue
+		_upsert(_dialogues, did, doc)
+		visti[did] = true
+	_prune(_dialogues, visti)
+
+
+## US-616: un file per quest (data/quests/q_*.json), l'oggetto e' la quest.
+func _load_quests() -> void:
+	var visti: Dictionary = {}
+	for path in _json_files_in(DIR_QUESTS):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		var qid: String = str(doc.get("id", ""))
+		if qid.is_empty():
+			_fail(path, "una quest non ha 'id'")
+			continue
+		_upsert(_quests, qid, doc)
+		visti[qid] = true
+	_prune(_quests, visti)
 
 
 func _load_items() -> void:
@@ -705,6 +863,53 @@ func _load_synergies() -> void:
 			_upsert(_synergies, sid, syn)
 			visti[sid] = true
 	_prune(_synergies, visti)
+
+
+## Percorsi di fusione (fase 7): un file per coppia di Pathway vicini, l'oggetto
+## e' il percorso ({id, gruppo, pathway_a, pathway_b, abilita_fuse[], stub}).
+## Le abilita_fuse dei percorsi non-stub entrano in _fusion_abilities per id.
+func _load_fusions() -> void:
+	var visti: Dictionary = {}
+	var visti_ab: Dictionary = {}
+	for path in _json_files_in(DIR_FUSIONS):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		var fid: String = str(doc.get("id", ""))
+		if fid.is_empty():
+			_fail(path, "un percorso di fusione non ha 'id'")
+			continue
+		_upsert(_fusions, fid, doc)
+		visti[fid] = true
+		if bool(doc.get("stub", false)):
+			continue
+		for entry in _object_list(doc, "abilita_fuse", path):
+			var ab: Dictionary = entry
+			var aid: String = str(ab.get("id", ""))
+			if aid.is_empty():
+				_fail(path, "un'abilita' fusa non ha 'id'")
+				continue
+			_upsert(_fusion_abilities, aid, ab)
+			visti_ab[aid] = true
+	_prune(_fusions, visti)
+	_prune(_fusion_abilities, visti_ab)
+
+
+## Tribolazioni (fase 7): un file per salto di fascia, l'oggetto e' la
+## tribolazione ({id, salto, condizioni, mentre_in_corso, superamento, ...}).
+func _load_tribulations() -> void:
+	var visti: Dictionary = {}
+	for path in _json_files_in(DIR_TRIBULATIONS):
+		var doc: Dictionary = _read_json(path)
+		if doc.is_empty():
+			continue
+		var tid: String = str(doc.get("id", ""))
+		if tid.is_empty():
+			_fail(path, "una tribolazione non ha 'id'")
+			continue
+		_upsert(_tribulations, tid, doc)
+		visti[tid] = true
+	_prune(_tribulations, visti)
 
 
 func _load_single(path: String, key: String, target: Dictionary, key_type: int) -> void:

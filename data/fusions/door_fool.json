@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "door_fool",
+  "gruppo": "lord_of_mysteries",
+  "pathway_a": "door",
+  "pathway_b": "fool",
+  "abilita_fuse": [],
+  "stub": true,
+  "note": "L'illusione che apre una porta: esche che sono soglie, un aspetto rubato che eredita anche i passaggi."
+}

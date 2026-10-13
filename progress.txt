@@ -5502,6 +5502,2165 @@ VERDETTO: L'ARCHITETTURA REGGE OLTRE IL TWILIGHT GIANT.
 - Prossima storia (fuori dai 3 blocchi chiesti): US-611 (BLOCCO D - il motore
   del mondo applica regions.json.gating[] via AreaGate).
 
+[2026-09-07] US-611 — Il motore del mondo applica regions.json.gating[]. FASE 6, BLOCCO D CHIUSO.
+
+- scripts/area_gate.gd (NUOVO, preload non autoload): AreaGate estende Area2D.
+  configura(region_id, gate) + e_aperto() + id() = "<regione>/<area>". Una
+  barriera in scena: StaticBody2D figlio (disabled = e_aperto()) che il player
+  non attraversa da chiuso + marker ColorRect (rosso chiuso / verde aperto),
+  aggiornati in _process.
+- valuta_gate(region_id, gate, root) STATIC, valutazione pura senza nodo (la
+  usano sia la barriera sia il controllo dei passaggi in region_scene). Il
+  match e' sul TIPO (i 6 di data/schema/gate_types.json), MAI sulla regione o
+  sull'area (FR-8, "un modo nuovo e' un ramo qui + una voce in gate_types.json"):
+  * momento      -> TimeSystem.momento() == valore
+  * fase_lunare  -> TimeSystem.fase_lunare() == valore
+  * sequenza     -> Progression.sequence() >= valore (piu' avanti = numero piu'
+                    basso: la Frontiera "respinge chi e' sopra la Sequenza 4")
+  * primitiva    -> _possiede_primitiva: una delle abilita' delle Sequenze
+                    9->corrente del Pathway del giocatore compone quella
+                    primitiva (spina dorsale dai dati, nessun nome di Pathway)
+  * conoscenza   -> KnowledgeStore.conosce(valore) (i flag testi_*, US-613)
+  * npc          -> NpcSystem.ha_influenza(valore) se esiste (US-612), sennò
+                    chiuso: un gate npc si apre solo influenzando l'NPC
+  Sistema assente (TimeSystem/KnowledgeStore/NpcSystem non in albero) ->
+  gate CHIUSO (una barriera non valutabile non lascia passare); gate gia' in
+  WorldState.gate_aperti -> sempre aperto.
+- terrain_modify permanente:true: AreaGate si connette a
+  WorldState.terreno_modificato (emesso SOLO dai permanenti in registra_terreno);
+  se la modifica copre la barriera -> WorldState.apri_gate(id()). L'id entra
+  in gate_aperti, gia' serializzato nel save (US-602, nessun bump).
+- scripts/region_scene.gd: preload AreaGate; _crea_gate() istanzia una AreaGate
+  per ogni voce di regions.json.gating[] (colonna nell'interno, placeholder).
+  _su_passaggio: un gating con area "ingresso" (convenzione nel DATO, non un if
+  per la Frontiera) chiude la regione stessa -> _ingresso_aperto(target) via
+  AreaGate.valuta_gate prima di viaggiare.
+- Nessun cambio a validate_data.py: US-601 valida gia' gating[] a fondo.
+- tests/test_area_gate.gd (NUOVO, 7 test): momento chiuso di giorno / aperto a
+  notte_fonda; fase_lunare chiuso a nuova / aperto a piena; conoscenza si apre
+  col flag; sequenza respinge la Seq 2 e lascia passare la Seq 9; primitiva
+  legge le abilita' del Pathway (TG no shadow_meld, Darkness Seq 4 si',
+  Darkness no plant_growth); terrain_modify permanente apre per sempre e
+  sopravvive al round-trip del save del mondo; region_scene crea 1 AreaGate per
+  voce di gating (Marche 2, Mirwada 0). prepara() ripulisce
+  WorldState/TimeSystem/KnowledgeStore/Progression fra un test e l'altro.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  610 test headless (603 + 7), tutti verdi. Nessun ERROR nuovo rispetto a HEAD.
+  Verifica a schermo (rendering reale, _shot_us611.gd, non headless): nelle
+  Marche il gate 'cripte' e' una barriera ROSSA di giorno (e_aperto=false),
+  diventa VERDE a notte_fonda (e_aperto=true); nell'Archivio Sepolto il gate
+  'ali_interne' e' rosso senza il flag, verde dopo
+  KnowledgeStore.impara('testi_ordine_minore'). Screenshot
+  us611_marche_gate_chiuso/aperto.png, us611_archivio_chiuso/aperto.png.
+- BLOCCO D CHIUSO (un'unica story). Il gating di regions.json ora vale: le aree
+  si aprono per momento/fase lunare/primitiva posseduta/conoscenza/Sequenza, e
+  un varco forzato resta aperto per sempre.
+- Prossima storia: US-612 (roster.json + npc.schema.json + NpcSystem). BLOCCO E.
+
+[2026-09-07] US-612 — roster.json + npc.schema.json + validator + NpcSystem. FASE 6, BLOCCO E.
+
+- data/npc/roster.json (NUOVO): gli 8 del roster (npc_mirco/sidon/vesna/aldo/
+  ottavia/bruno/lena/doran) + npc_generic_01..10 (fool_9_inganno ne inganna 10,
+  tg_6_giuramento ne aiuta 8). Ogni voce: region_id, anchor_candidate,
+  faction_id (null ammesso finche' US-615), schedule[{momento, location_tag|null}]
+  sui vocabolari di time.json/regions.json, vendor (null o {listino:[item_id]}),
+  dialogue_id (-> data/dialogues/, US-614), memoria {}. name/role in chiaro =
+  seme i18n (chiavi npc.<short>.name/role). Bruno ha location_tag solo a
+  crepuscolo/notte_fonda: "esiste solo di notte".
+- data/schema/npc.schema.json (NUOVO): la forma (additionalProperties:false),
+  documentazione come gli altri schema del progetto.
+- scripts/npc_system.gd (NUOVO autoload, dopo AnchorSystem): stato VIVO degli
+  NPC (i dati stanno nel roster). incontra(id)/conosciuti()/conosce(id);
+  influenza(id, modo) -> aggiorna memoria (contatore per uno dei 5 modi di
+  npc_influenced) + EventTracker.emit_event("npc_influenced", {modo}) + segnale
+  npc_influenzato; memoria(id); ha_influenza("<id>[:<modo>]") per i gate npc
+  (US-611); promuovi_ancora(id)/ancore_attive() (solo anchor_candidate);
+  presenti(region_id) -> {id: location_tag} da schedule + TimeSystem.momento();
+  nomi_i18n() (conosciuti + Ancore) spinto ad AudioManager.
+- scripts/game_data.gd: PATH_ROSTER + _roster + load + get_npcs()/get_npc(id).
+- scripts/audio_manager.gd: _nomi_npc + imposta_nomi_npc(); nomi_sussurro() ora
+  UNISCE i nomi NPC (NpcSystem) e le Ancore (AnchorSystem, invariato) -> i
+  sussurri di soglia 55 pronunciano gli uni e le altre (contratto audio.json).
+- scripts/game_state.gd: mondo.npc via _mondo_snapshot/applica (come mondo.tempo,
+  NESSUN bump: US-602 e' l'unico di fase 6). Assente nei save v21 vecchi ->
+  default vuoti.
+- scripts/region_scene.gd: _crea_npc() un marker Area2D per NPC presente ORA
+  (presenti()), nella zona del suo location_tag; ricostruito a ogni
+  TimeSystem.momento_cambiato; entrarci col player = NpcSystem.incontra(id).
+- tools/validate_data.py: sezione NPC (dopo item_ids). id prefisso npc_,
+  name/role_i18n prefisso npc., region_id in regions.json, schedule
+  momento/location_tag nei vocabolari, vendor.listino item reali, faction_id in
+  factions.json SE esiste (US-615), dialogue_id con un file SE data/dialogues/
+  esiste (US-614), gli 8 del roster presenti, >= 10 generici.
+- tools/generate_i18n_stubs.py rilanciato: +18 chiavi npc.* seminate da
+  name/role (it.json 739 -> 757; i 48 TODO invariati).
+- tests/test_npc_system.gd (NUOVO, 8 test): roster 18 caricato; influenza
+  aggiorna memoria + emette npc_influenced + modo fuori dai 5 rifiutato;
+  ha_influenza per i gate; nomi_sussurro include conosciuti e Ancore;
+  presenti() segue lo schedule (Mirco in piazza all'alba, Bruno al porto solo
+  di notte); round-trip del save; da_salvataggio non fidato.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  617 test headless (610 + 7), tutti verdi (test_audio/test_book che leggono
+  nomi_sussurro invariati). 1 SCRIPT ERROR preesistente (non nuovo). Verifica a
+  schermo (rendering reale, _shot_us612.gd): in Mirwada all'alba 16 NPC in scena
+  nella location_tag giusta (Aldo e Bruno assenti, location_tag null); a
+  notte_fonda solo Bruno/Doran/generic_04. Screenshot us612_mirwada_giorno.png,
+  us612_mirwada_notte.png.
+- NOTA dimensione: story fondativa di blocco (schema + dati + autoload + loader
+  + validator + save + audio + spawn), 11 file toccati - inevitabile per un
+  sistema nuovo, ogni pezzo e' piccolo e additivo.
+- Prossima storia: US-613 (motore dialoghi + dialogue.schema.json + FlagStore +
+  pagina page_dialogo). BLOCCO F.
+
+[2026-09-07] US-613 — Motore dialoghi + dialogue.schema.json + FlagStore. FASE 6, BLOCCO F.
+
+- SPEZZATA (regola 3): questa story e' il MOTORE. La pagina del libro
+  page_dialogo (nuovo page_type) + il gancio di interazione col mondo sono
+  US-613b, nuova story in prd.json. Con gioco.fase = 3 la pagina sarebbe
+  comunque bianca; l'engine gira e i test lo coprono.
+- data/schema/dialogue.schema.json (NUOVO): grafo { id, start, nodes:{ speaker,
+  text_i18n, choices:[{ text_i18n, condizioni[], effetti[], goto|null }] } }.
+- scripts/dialogue_engine.gd (NUOVO autoload, dopo NpcSystem):
+  * avvia(dialogue_id, interlocutore_id) -> carica il grafo da GameData, va
+    allo start, FERMA IL MONDO (TimeSystem.imposta_pausa(true)). false se il
+    dialogo o il nodo di start non esistono.
+  * scelte_valide() -> le choices del nodo con Conditions.tutte_soddisfatte
+    (riuso scripts/conditions.gd, FR-3: un dialogo notturno usa la stessa
+    condizione e_notte di un'abilita' notturna). Le nasconde, non le disabilita.
+  * scegli(i) -> applica gli effetti della i-esima scelta VALIDA, poi il goto;
+    goto null / verso un nodo assente -> termina().
+  * termina() -> riavvia il mondo, segnale dialogo_finito.
+  * segnali: dialogo_avviato / nodo_cambiato / dialogo_finito / apri_vendita /
+    avvia_quest (gli ultimi due per la UI e US-615/616).
+- Effetti = vocabolario CHIUSO di 5 (design-npc-quest 1): emit_event, flag,
+  reputazione, apri_vendita, avvia_quest. emit_event con npc_influenced passa
+  da NpcSystem.influenza(interlocutore, modo) (aggiorna la memoria dell'NPC
+  toccato + emette l'evento); gli altri dei 12 -> EventTracker diretto.
+  reputazione: no-op finche' FactionSystem non esiste (US-615). avvia_quest:
+  segnale + QuestSystem.avvia se esiste (US-616).
+- FlagStore UNIFICATO su KnowledgeStore (l'AC permette "FlagStore delega a
+  KnowledgeStore"): aggiunti imposta(flag, bool) e dimentica(flag).
+  L'effetto flag dei dialoghi scrive li'. NIENTE campo mondo.flag: i flag
+  restano nel save "conoscenza" gia' esistente - un solo store, un solo save.
+  Il gate "conoscenza" di US-611 gia' legge KnowledgeStore.conosce.
+- scripts/game_data.gd: DIR_DIALOGUES + _load_dialogues() (un file per dialogo,
+  l'oggetto E' il grafo, chiave = doc.id) + get_dialogue(id).
+- data/dialogues/: dlg_mirco (grafo vero a 3 nodi - tutorial diegetico +
+  bersaglio dei test dell'engine: una scelta con tier_min:mid, un effetto
+  flag, un effetto emit_event npc_influenced, un goto), 7 stub del roster
+  (1 nodo + congedo, US-614 scrive i grafi veri), dlg_generic (scelte
+  aiuta/inganna per tg_6_giuramento e fool_9_inganno).
+- tools/validate_data.py: sezione dialoghi. start dev'essere un nodo; ogni
+  goto verso un nodo esistente o null; nodi ORFANI (irraggiungibili dallo
+  start, BFS) = errore; speaker nel roster; condizioni nel vocabolario
+  condiviso (11 tipi); effetti nei 5; emit_event.evento tra i 12 tracked_events
+  e, per npc_influenced, modo tra i 5. Verificato a mano: un goto rotto + un
+  nodo orfano fanno fallire il validator.
+- tools/generate_i18n_stubs.py rilanciato: +26 chiavi dialogue.* seminate dal
+  campo gemello 'text' (it.json 757 -> 783; i 48 TODO invariati).
+- tests/test_dialogue_engine.gd (NUOVO, 7 test): avvia + nodo di start;
+  tier_min nasconde una scelta a low e la mostra a mid; scegli applica
+  emit_event + aggiorna la memoria + segue il goto; l'effetto flag scrive su
+  KnowledgeStore; il congedo termina e il mondo riparte; goto null non crasha
+  e influenza l'interlocutore giusto; i 9 dialoghi caricati da GameData.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  624 test headless (617 + 7), tutti verdi (test_conditions/test_npc_system/
+  test_area_gate/test_time_system invariati). Runtime (_shot_us613.gd): avvio
+  dlg_mirco -> il tick di TimeSystem resta fermo per 30 frame; scegli(0) ->
+  npc_influenced{persuaso}=1, memoria mirco {persuaso:1}, nodo -> n2; dopo il
+  congedo il tick riparte.
+- Prossima storia: US-613b (page_dialogo + gancio di interazione), poi US-614
+  (i grafi veri degli 8). BLOCCO F.
+
+[2026-09-07] US-613b — Pagina page_dialogo del libro + gancio di interazione. FASE 6, BLOCCO F.
+
+- data/schema/page_types.json: +page_dialogo (9 tipi ora). data/ui/book.json:
+  voce 'dialogo' (ordine 7, "transitoria": true - non diventa l'ultima pagina
+  consultata). validate_data.py: il conteggio dei page_types passa da 8 a 9.
+- scripts/pages/page_dialogo.gd + scenes/pages/page_dialogo.tscn (NUOVI):
+  legge DialogueEngine (nodo_corrente + interlocutore + scelte_valide),
+  mostra il nome di chi parla (tr_data, colore speaker), il testo del nodo e
+  un Button per ogni scelta VALIDA -> il bottone chiama DialogueEngine.scegli(i).
+  Si ridisegna a nodo_cambiato e dialogo_finito. remove_child immediato (non
+  solo queue_free) cosi' i test contano bene i bottoni.
+- scripts/book.gd: apri_a(page_id) apre il libro direttamente su una pagina
+  senza sporcare _ultima; chiudi() NON aggiorna _ultima se la pagina corrente
+  e' "transitoria" (dato in book.json, nessun id hardcoded) -> riaprire il
+  libro a mano torna dov'eri.
+- scripts/book_overlay.gd: PAGINE += page_dialogo. Su DialogueEngine.
+  dialogo_avviato apre/naviga alla pagina di tipo page_dialogo (_pagina_di_tipo,
+  nessun id hardcoded); su dialogo_finito chiude il libro se e' su una pagina
+  transitoria; su libro_chiuso (Tab a mano) termina il dialogo in corso.
+- scripts/region_scene.gd: _npc_vicino tracciato da body_entered/exited dei
+  marker NPC; _unhandled_input su "interagisci" -> DialogueEngine.avvia(
+  roster[_npc_vicino].dialogue_id, _npc_vicino). Nessun if per un NPC: il
+  dialogue_id viene dal roster. No-op se il libro e' aperto o un dialogo e' in
+  corso.
+- project.godot: nuova azione input "interagisci" (F o Invio).
+- data/i18n/it.json: +ui.page.dialogo = "Dialogo" (784 chiavi, 48 TODO
+  invariati).
+- tests/test_page_dialogo.gd (NUOVO, 5 test): book.json dichiara la pagina;
+  un dialogo apre il libro sulla pagina 'dialogo' e a fine dialogo lo chiude;
+  un bottone per scelta valida (2 a tier low, 3 a mid); premere il bottone
+  segue il goto -> n2; chiudere il libro a mano termina il dialogo.
+  test_book.gd: 8 -> 9 tipi di pagina.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  629 test headless (624 + 5), tutti verdi. Verifica a schermo (rendering
+  reale, _shot_us613b.gd): avvicino il giocatore al marker di Mirco, premo
+  "interagisci" -> il libro si apre sulla pagina "Dialogo" con "Mirco" in
+  azzurro, il testo e 2 bottoni (la scelta tier_min:mid nascosta a Seq 9); il
+  tick del tempo resta fermo; scelgo -> nodo n2; congedo -> dialogo finito +
+  libro chiuso. Screenshot us613b_dialogo_n1.png, us613b_dialogo_n2.png.
+- BLOCCO F quasi chiuso: manca US-614 (i grafi veri degli 8; ora sono stub a
+  1 nodo). Il motore + la pagina + il gancio ci sono.
+- Prossima storia: US-614 (gli 8 file dialogo + i popolani). BLOCCO F.
+
+[2026-09-07] US-614 — Gli 8 file dialogo del roster + i popolani generici. FASE 6, BLOCCO F CHIUSO.
+
+- data/dialogues/: 7 grafi veri (dlg_mirco e dlg_generic erano gia' reali da
+  US-613). 2-3 nodi ciascuno, coerenti col ruolo meccanico di
+  design-npc-quest cap. 2:
+  * dlg_sidon: apri_vendita (npc_sidon) + rumor a pagamento (paga -> flag
+    sidon_ha_parlato, punta a Ottavia).
+  * dlg_vesna: la cura chiede reputazione_min ["quartiere", 0] (US-615);
+    "rassicura" abbassa la diffida (flag vesna_diffida=false).
+  * dlg_aldo: la sfida al duello chiede flag aldo_duello_disponibile
+    (lo scrive US-620); provocare intimidisce.
+  * dlg_ottavia: concede flag testi_ordine_minore (apre l'Archivio, US-611)
+    a tier_min mid OPPURE avendo il flag sidon_ha_parlato.
+  * dlg_bruno: "aiuta" e' gated da e_notte:true -> flag bruno_porto_notturno
+    + npc_influenced modo aiutato (apre i passaggi notturni, gate npc US-611).
+  * dlg_lena: nessun servizio, solo "gioca" (flag lena_ricorda_il_gioco,
+    modo aiutato) - misura quanto ne resta.
+  * dlg_doran: collaborare persuade, minacciare intimidisce e alza il
+    sospetto (flag doran_sospetto_alto).
+- Vocabolari: solo condizioni condivise (tier_min/flag/reputazione_min/e_notte)
+  ed effetti dai 5 (emit_event/flag/apri_vendita). Zero verbi nuovi.
+- tools/generate_i18n_stubs.py rilanciato: +40 chiavi dialogue.* seminate dal
+  campo gemello 'text' (it.json 784 -> 824; i 48 TODO invariati - tutti i
+  testi del roster tradotti).
+- tests/test_dialoghi_roster.gd (NUOVO, 4 test): ogni dialogo (9) si gioca
+  fino a un nodo terminale scegliendo sempre il congedo, senza loop; Ottavia
+  concede il flag e quel flag apre davvero l'AreaGate 'conoscenza'
+  dell'Archivio (integrazione US-611); Bruno: "aiuta" nascosta di giorno,
+  visibile e funzionante di notte (flag + memoria); i testi del roster non
+  sono stub TODO.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati,
+  la sezione dialoghi di US-613 valida i 9 grafi: start, goto, orfani,
+  speaker, vocabolari). 633 test headless (629 + 4), tutti verdi.
+- BLOCCO F CHIUSO: US-613 (motore) + US-613b (pagina + gancio) + US-614
+  (contenuto). Si parla con gli 8 NPC di Mirwada, le scelte hanno condizioni
+  e conseguenze, il mondo si ferma.
+- Prossima storia: US-615 (fazioni + reputazione). BLOCCO G.
+
+[2026-09-07] tests/run_tests.gd — un file di test con errore di parse non appende piu' il runner.
+
+- Problema: load() di un file di test con errore di sintassi non restituisce
+  null ma uno script NON istanziabile; script.new() poi sollevava un errore
+  che usciva da _init() e la SceneTree headless non chiamava mai quit() ->
+  il runner restava appeso (visto in US-614: minuti di processo Godot vivo,
+  0 output utile). Costava un kill manuale + rerun.
+- Fix (tests/run_tests.gd): dopo load(), se script == null o non
+  script.can_instantiate() -> lo si segna in all_failures ("script non
+  caricabile (errore di parse?)"), failed += 1, continue. Guard anche su
+  script.new() == null. Il ramo finale "0 test" ora scatta solo se
+  total == 0 AND failed == 0 (un file rotto e nessun test valido = comunque
+  exit 1, non "falso verde").
+- Verificato con un file di test volutamente rotto: exit 1, il file compare
+  come FALLITO, gli altri 633 test girano lo stesso, il processo TERMINA.
+
+[2026-09-07] US-615 — Fazioni + reputazione. FASE 6, BLOCCO G.
+
+- data/schema/faction.schema.json + data/factions.json (NUOVI): 4 fazioni
+  (ordine_minore/porto/quartiere/giustizia) con name_i18n, soglie (nomi di
+  livello -> valore) e membri (id NPC, coerenti col faction_id del roster).
+  Due comportamenti automatici DICHIARATI NEI DATI, nessun if per una fazione
+  nel codice:
+  * quartiere.reazione_al_potere { delta: -5, membro: npc_vesna }: usare un
+    potere mentre Vesna e' presente nella tua stessa location_tag costa -5.
+  * giustizia.sospetto { evento: ability_used, regione: mirwada, delta: 3,
+    soglia: 30, flag: doran_sospetto_alto }: quell'evento in quella regione
+    alza la reputazione; a soglia scrive il flag (che US-616 leggera' per la
+    caccia). Le soglie di giustizia sono INVERTITE (0 = alleato, 45 = ostile):
+    la sua "reputazione" e' il sospetto, sale col malus.
+- scripts/faction_system.gd (NUOVO autoload dopo DialogueEngine):
+  reputazione(id) -> float; modifica(id, delta, sorgente); livello(id) =
+  la soglia col valore piu' alto <= reputazione (ordina per valore, quindi
+  vale sia per le fazioni normali sia per giustizia). _ready connette
+  EventTracker.evento_emesso (-> _su_evento per i blocchi 'sospetto') e
+  AbilityEngine.ability_executed (-> _su_abilita per 'reazione_al_potere',
+  solo se il caster e' nel gruppo player). _applica_soglie scrive il flag.
+- scripts/game_data.gd: PATH_FACTIONS + get_factions()/get_faction(id).
+- scripts/game_state.gd: mondo.reputazione via _mondo_snapshot/applica
+  (come npc/tempo, NESSUN bump).
+- Conditions.reputazione_min (gia' nell'enum da US-605) ora ha un
+  FactionSystem vero da interrogare: valore = [faction_id, soglia].
+  DialogueEngine effetto 'reputazione' -> FactionSystem.modifica (gia'
+  scritto in US-613, ora fa qualcosa).
+- tools/validate_data.py: sezione fazioni. name_i18n prefisso faction.,
+  soglie >= 2 numeriche, membri nel roster + faction_id coerente,
+  reazione_al_potere.membro nel roster, sospetto.evento tra i 12 +
+  sospetto.regione tra le regioni; le 4 fazioni attese presenti. La sezione
+  NPC ora valida davvero i faction_id del roster contro factions.json.
+- generate_i18n_stubs: +4 chiavi faction.* seminate da 'name' (it.json
+  824 -> 828, 48 TODO invariati).
+- tests/test_faction_system.gd (NUOVO, 6 test): modifica cambia il livello;
+  giustizia ha le soglie invertite; il sospetto di Doran sale a ogni
+  ability_used in citta' (e scatta il flag a 30) e NON fuori citta'; un
+  potere davanti a Vesna nella sua zona costa -5 al quartiere, in un'altra
+  zona no; reputazione_min nasconde la scelta "cura" di dlg_vesna sotto
+  soglia; round-trip del save + valore non numerico scartato.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  639 test headless (633 + 6), tutti verdi.
+- Prossima storia: US-616 (motore quest + journal + quest di Atto I). BLOCCO G.
+
+[2026-09-07] US-616 — Motore quest + quest.schema.json + le quest di Atto I. FASE 6, BLOCCO G.
+
+- SPEZZATA (regola 3): questa e' il MOTORE + le quest. La sezione Journal nella
+  pagina inventario del libro + la verifica a schermo sono US-616b.
+- data/schema/quest.schema.json (NUOVO): id, name_i18n, giver, atto (1-3),
+  fallibile, exclusive_with[], steps[{id, desc_i18n, completamento:
+  {tipo:evento, evento, filtri, target} | {tipo:flag, id}, on_complete[]}],
+  ricompense[]. on_complete/ricompense = vocabolario chiuso di 5:
+  flag/item/reputazione/ancora/apri_vendita.
+- scripts/quest_system.gd (NUOVO autoload dopo FactionSystem): un LETTORE.
+  _ready connette EventTracker.evento_emesso e KnowledgeStore.appreso ->
+  _rivaluta. avvia(quest_id) (dall'effetto dialogo avvia_quest); registra la
+  baseline del conteggio dell'evento dello step; le quest di exclusive_with
+  ancora attive e fallibili -> fallite. Uno step 'evento' e' completo quando
+  count(evento, filtri) - baseline >= target (come l'Acting Method); uno step
+  'flag' quando KnowledgeStore.conosce(id). on_complete applicati per step,
+  ricompense alla fine. stato() in non_iniziata/attiva/completata/fallita.
+  fallisci(quest_id) per il fallimento esplicito (NPC morto, tempo scaduto:
+  decide il chiamante). Zero verbi di quest nuovi.
+- data/quests/ (4, atto 1): q_mirco_01 (enemy_defeated senza_abilita x3 ->
+  2 lingotti_ferro), q_sidon_01 (item_crafted x2 -> apri_vendita), q_vesna_01
+  (flag vesna_rassicurata -> Ancora Vesna, fallibile), q_lena_01 (flag
+  lena_ricorda_il_gioco -> Ancora Lena, fallibile).
+- Gancio avvia_quest nei 4 dialoghi dei giver (dlg_mirco/sidon/vesna/lena):
+  una scelta appende {tipo: avvia_quest, quest_id}. dlg_vesna "rassicura" ora
+  scrive il flag POSITIVO vesna_rassicurata (prima azzerava vesna_diffida,
+  che un lettore di flag non puo' osservare).
+- scripts/game_data.gd: DIR_QUESTS + _load_quests() + get_quest(id)/get_quests().
+- scripts/game_state.gd: mondo.quest {attive, completate, fallite} via
+  _mondo_snapshot/applica (come reputazione/npc/tempo, NESSUN bump).
+- tools/validate_data.py: sezione quest. giver nel roster; exclusive_with
+  verso quest esistenti; step 'evento' coi filtri validi come le
+  acting_actions; step 'flag' con id scritto da almeno un effetto flag di un
+  dialogo o di una quest; ricompense item/ancora reali; on_complete/ricompense
+  nel vocabolario di 5. Nel check dialoghi: un effetto avvia_quest deve
+  puntare a una quest esistente.
+- generate_i18n_stubs: +8 chiavi quest.* seminate da name/desc (it.json
+  828 -> 836, 48 TODO invariati).
+- tests/test_quest_system.gd (NUOVO, 7 test): avvia/stato; step evento
+  completa + ricompensa nello zaino + flag; i filtri che non combaciano non
+  contano; step flag completa e rende l'NPC un'Ancora; fallibile (e una quest
+  non fallibile non fallisce); un dialogo avvia la quest (e se il flag e' gia'
+  scritto la chiude subito); round-trip del save.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  646 test headless (639 + 7), tutti verdi (re-entrancy di _rivaluta risolta: applicare un effetto flag emette KnowledgeStore.appreso che rientrava mentre si avanzava).
+- Prossima storia: US-616b (sezione Journal nella pagina inventario), poi
+  US-617 (mappa + fast travel). BLOCCO G/H.
+
+[2026-09-07] US-616b — Sezione Journal nella pagina inventario del libro. FASE 6, BLOCCO G CHIUSO.
+
+- scripts/pages/page_inventario.gd: SEZIONI da 6 a 7 (+"journal", NESSUN nuovo
+  page_type - e' una sezione della pagina inventario come Sinergie di US-410).
+  _journal(): quest attive coi loro step (fatto "✓" attenuato, corrente "▸",
+  da fare "·"), completate (alpha 0.7), fallite (alpha 0.45). Dati da
+  QuestSystem (attive/completate/fallite/passo_corrente) + GameData.get_quest
+  per nomi/desc via tr_data. Nessun verbo di quest qui, solo lettura.
+- _collega_sinergie -> _collega_segnali: oltre a SynergyEngine ora connette
+  QuestSystem (quest_avviata/step_completato/quest_completata/quest_fallita);
+  se la sezione aperta e' "journal" si ridisegna dal vivo (come la sezione
+  Sinergie, US-411).
+- assets/i18n/strings.csv: BOOK_INV_JOURNAL + BOOK_JOURNAL_ATTIVE/COMPLETATE/
+  FALLITE/VUOTO (it+en). Rigenerati strings.it/en.translation con
+  `godot --headless --import`.
+- tests/test_page_inventario.gd +1: la sezione journal parte vuota, mostra la
+  quest attiva quando si avvia (redraw dal vivo), la sposta sotto "Completate"
+  quando i 3 enemy_defeated la chiudono.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  647 test headless (646 + 1), tutti verdi.
+- BLOCCO G CHIUSO: US-615 (fazioni) + US-616 (motore quest) + US-616b (journal).
+- Prossima storia: US-617 (pagina mappa + fast travel come potere). BLOCCO H.
+
+[2026-09-07] US-617 — Pagina mappa del libro + fast travel come potere. FASE 6, BLOCCO H.
+
+- data/ui/book.json: la voce 'mappa' (tipo 'mappa', page_type gia' nel
+  vocabolario) perde 'sbloccata_da: fase 6' - la mappa e' contenuto diegetico
+  del libro come il diagramma, si consulta sempre; mostra solo cio' che hai
+  scoperto (fog of war). Resta 'doppia_pagina: true' (il rendering a doppia
+  pagina vera e' un ponytail rimandato: la pagina rende nell'area contenuto).
+- scripts/pages/page_mappa.gd + .tscn (NUOVI): le regioni SCOPERTE
+  (WorldState.scoperte), la corrente evidenziata "▸ ... (sei qui)", i varchi
+  noti (dai dati). Un bottone "Viaggia" per ogni regione != corrente,
+  ABILITATO solo se _puo_viaggiare(): una primitiva teleport nelle Sequenze
+  gia' raggiunte del Pathway del giocatore (riuso AreaGate._possiede_primitiva:
+  death_5 "passo tra i mondi", door_3 "viaggio lungo") OPPURE un varco
+  permanente 'apre_varco*' inciso nel mondo dal TG. Altrimenti "servono le
+  strade". Il bottone chiama region_scene.viaggia_a(target).
+- scripts/region_scene.gd: viaggia_a(target) pubblico - come _su_passaggio ma
+  senza Area2D di confine (il mezzo lo verifica la pagina), rispetta comunque
+  _ingresso_aperto (gating d'ingresso, US-611). book_overlay.gd: PAGINE +=
+  "mappa".
+- assets/i18n/strings.csv: BOOK_MAPPA_VUOTA/QUI/VIAGGIA/GATE/MEZZO_SI/MEZZO_NO
+  (it+en), .translation rigenerati con --import.
+- test_book.gd / test_book_overlay.gd: 'mappa' non e' piu' l'esempio di pagina
+  bianca (ora e' 'journal').
+- tests/test_page_mappa.gd (NUOVO, 5 test): fog of war (Marche assente finche'
+  non visitata); senza mezzo nessun bottone attivo; con death_5 (primitiva
+  teleport) si viaggia; un varco permanente del TG basta; viaggia_a rispetta
+  il gating d'ingresso della Frontiera.
+- Verifica a schermo (rendering reale, _shot_h.gd): visito Mirwada+Marche, apro
+  la mappa -> vedo solo quelle due (fog of war), "▸ Mirwada (sei qui)", i
+  varchi della Marche elencati; col Twilight Giant a Seq 9 "Servono le strade"
+  e il bottone Viaggia e' disabilitato; passato al Death Seq 5 (primitiva
+  teleport) "Hai un mezzo per viaggiare" e il bottone si abilita. Screenshot
+  h_mappa_senza_mezzo.png / h_mappa_con_mezzo.png.
+
+[2026-09-07] US-618 — Densita' mistica: percezione, recupero, forzatura, spawn. FASE 6, BLOCCO H.
+
+- data/balance.json: sezione 'densita_mistica' (recupero_spiritualita_al_sec,
+  molt_recupero_per_densita, efficacia_forzatura_per_densita, spawn_base_al_min,
+  spawn_per_densita, sequenza_percezione). validate_data.py la controlla.
+- scripts/world_state.gd: densita_mistica_corrente() = densita_mistica della
+  regione corrente (regions.json), con imposta_densita_override(v) per una
+  zona che la modifica localmente (transitorio, azzerato da entra_regione/
+  pulisci). Fuori regione: 0.2 (bassa, come la citta'). spawn_rate_corrente()
+  = base + densita * per_densita (il gancio per lo spawner di fase 7).
+- scripts/stats_component.gd: _rigenera_spiritualita(delta) nel _process -
+  SOLO se il parent e' nel gruppo "player" (i nemici non rigenerano). Ritmo =
+  recupero_al_sec * (1 + densita * molt) * delta. Prima non c'era alcun
+  recupero passivo di spiritualita': ora c'e', e conviene stare fuori citta'.
+- scripts/perception_system.gd: densita_percepita() -> la densita' del luogo
+  se Progression.sequence() <= sequenza_percezione (5), altrimenti -1.0 (non
+  la senti). E' il canale diegetico dell'AC.
+- scripts/foundation.gd: malus_forzatura() = malus_avanzamento_forzato *
+  clamp(1 - densita * efficacia, 0.1, 1). potion_system.gd: bevi(forza) usa
+  malus_forzatura() invece di costante("malus_avanzamento_forzato") - dove la
+  densita' e' alta, forzare l'avanzamento costa meno alle Fondamenta.
+- tests/test_densita_mistica.gd (NUOVO, 6 test): densita dalla regione +
+  override; il recupero a 0.7 > a 0.2; i nemici non recuperano; la percezione
+  parte da Seq 5; forzare alla Frontiera costa meno che in citta'; lo spawn
+  rate sale con la densita'.
+
+[2026-09-07] US-619 — Audio del mondo: zone, ambienti, layer. FASE 6, BLOCCO H.
+
+- LIMITE DICHIARATO: i file audio NON li produce questo lavoro. data/audio.json
+  e' la specifica completa per un musicista o per stem CC0 compatibili con la
+  struttura a layer. Tutti i nomi (mus_*, amb_*) sono placeholder.
+- data/audio.json esteso:
+  * music.zone.{citta,marche,valle,archivio,frontiera}: + pathway_palette +
+    riverbero (0..1) + stem 'boss'.
+  * music.ambienti: {zona: {giorno, notte}} per le 5 zone. Il ciclo del tempo
+    commuta l'attivo.
+  * music.layer: sempre_attivo "base", in_crossfade [tensione, combattimento,
+    boss], stato_per_stem per ognuno dei 6 music.stati, crossfade_ms. Solo
+    struttura, nessun file.
+  * music.rituale: gia' completo da prima (drone build 45s, taglio secco).
+- scripts/audio_manager.gd: aggiorna_ambiente() sceglie lo stream ambientale =
+  music.ambienti[music_zone della regione corrente][giorno|notte];
+  ambiente_corrente() lo espone. Connesso a TimeSystem.momento_cambiato e
+  WorldState.regione_cambiata.
+- tools/validate_data.py: music.layer coerente (sempre_attivo base, stati =
+  stato_per_stem keys, stem in in_crossfade), riverbero in 0..1, ogni
+  music_zone usata da una regione ha un ambiente giorno/notte.
+- tests/test_audio_mondo.gd (NUOVO, 3 test): l'ambiente segue regione e
+  momento (Marche giorno -> notte -> Valle notte); la struttura a layer;
+  ogni music_zone delle regioni ha palette + ambiente.
+- Verifica a schermo (_shot_h.gd): l'ambiente audio passa da amb_citta_giorno a
+  amb_citta_notte quando TimeSystem entra nella notte.
+- BLOCCO H CHIUSO: US-617/618/619. 661 test verdi.
+- Prossima storia: US-620 (indizi dell'antagonista + scene degli atti). BLOCCO I.
+
+[2026-09-08] US-620 — Indizi dell'antagonista + scene degli atti come flag/dati. FASE 6, BLOCCO I.
+
+- data/lore/antagonisti.json (NUOVO): 1 antagonista per Pathway attivo (10).
+  E' il detentore precedente della Sequenza 0 del Pathway del giocatore
+  (design-npc-quest decisione n.9): strutturale, cambia col Pathway scelto,
+  nessun boss (fase 7) - solo 'indizi' (frasi con text_i18n che dialoghi e
+  libri lasceranno cadere). id, pathway_id, name_i18n (antagonist.*),
+  indizi[{text, text_i18n}].
+- scripts/game_data.gd: PATH_ANTAGONISTI + get_antagonisti()/get_antagonista(
+  pathway_id).
+- data/npc/roster.json: npc_aldo + avanzamento_temporale {sequenza_iniziale 9,
+  ogni_momenti 8, sequenza_minima 4} + sfida_ai_tier true.
+- scripts/npc_system.gd: _ready -> _collega_narrativa (differito). _su_momento
+  (TimeSystem.momento_cambiato): conta i momenti e fa scendere la Sequenza
+  degli NPC con avanzamento_temporale (Aldo, lo specchio). _su_rituale
+  (RitualSystem.rituale_completato): sequenza <= 6 -> KnowledgeStore.imposta(
+  atto_1_concluso) - "il primo rituale non basta piu'" (design cap. 5).
+  _su_sequenza_giocatore (Progression.sequence_changed): se cambia il tier del
+  giocatore, gli NPC sfida_ai_tier (Aldo) scrivono <corto>_duello_disponibile
+  (il duello e' una quest, fase 7). sequenza_npc(id); antagonista_del_giocatore().
+  _seq_npc nel save (mondo.npc).
+- tools/validate_data.py: sezione antagonisti (1 per Pathway attivo, prefissi
+  i18n, indizi non vuoti) + avanzamento_temporale del roster.
+- generate_i18n_stubs: +40 chiavi antagonist.* seminate da name/text (it.json
+  836 -> 876, 48 TODO invariati).
+- tests/test_narrativa.gd (NUOVO, 5 test): antagonista per Pathway; Aldo scende
+  fino alla Sequenza minima col tempo mentre gli altri restano fermi; flag
+  aldo_duello_disponibile al passaggio di tier; flag atto_1_concluso al primo
+  rituale di Seq <= 6; round-trip di _seq_npc.
+
+[2026-09-08] US-621 — Sinergie 'lore' + conoscenza dai libri. FASE 6, BLOCCO I.
+
+- scripts/dialogue_engine.gd: effetto 'impara_sinergia' (6o del vocabolario
+  chiuso dei dialoghi) -> SynergyEngine.impara_sinergia(id) (gia' esistente,
+  mette la sinergia in _viste). dialogue.schema.json + validate_data.py
+  aggiornati.
+- data/dialogues/dlg_ottavia.json: il nodo "grazie" ora insegna anche la
+  sinergia lore anti_furia_e_calma (oltre al flag testi_ordine_minore).
+- scripts/inventory.gd: usa(instance_id) ha un ramo 'stored_flag' - un
+  libro/pergamena trovato che al consumo scrive un flag di conoscenza
+  (KnowledgeStore.imposta true) e si consuma. Prima c'erano solo
+  stored_ability_id e insegna_ricetta.
+- data/items/pergamene.json: libro_ordine_minore (categoria pergamena,
+  stored_flag testi_ordine_minore) - un tomo trovato nel mondo che apre le ali
+  interne dell'Archivio Sepolto.
+- tools/validate_data.py: impara_sinergia.id dev'essere una sinergia
+  scoperta:'lore'; stored_flag e' per le pergamene e una pergamena porta UNA
+  sola cosa (ability | ricetta | flag).
+- tests/test_lore_conoscenza.gd (NUOVO, 3 test): il libro scrive il flag e
+  quel flag apre l'AreaGate 'conoscenza' dell'Archivio (integrazione US-611);
+  Ottavia insegna la sinergia lore -> entra in _viste; impara_sinergia di un
+  id ignoto -> false.
+- REGRESSIONI GESTITE: test_items (una pergamena ora puo' avere stored_flag),
+  test_madness_audio (nomi_sussurro unisce Ancore + NPC: il test isola anche
+  _nomi_npc).
+
+[2026-09-08] US-622 — Chiusura fase 6. FASE 6 CHIUSA. BLOCCO I CHIUSO.
+
+- 006_PRD/roadmap.md: "Fase 6 — Mondo — CHIUSA (22 story, 669 test)" con
+  l'elenco completo dei 9 blocchi e la nota che la fase 5b (Fool/Error/Door,
+  29 Seq stub) resta aperta - il "22/22 Pathway completi" arriva con quella.
+- 006_PRD/design-world.md, design-npc-quest.md: intestazione "REALIZZATO in
+  fase 6" con le decisioni prese (nomi regioni, roster 8, antagonista).
+- 006_PRD/design-master.md: Appendice A fase 6 -> CHIUSA; Appendice B
+  decisioni n.1/6/9 -> CHIUSE; Appendice C: le righe dei vocabolari/schema
+  nuovi (gate_types, region, npc, dialogue, quest, faction, antagonisti,
+  page_types +page_dialogo, audio del mondo).
+- CLAUDE.md + README.md: fase 6 chiusa, conteggi, save schema_version 21,
+  "fase corrente: 5b - Lord of Mysteries".
+- tools/validate_data.py: check di chiusura fase 6 - i file di dati della fase
+  esistono (regions/roster/factions/antagonisti + i 5 schema); ogni
+  dialogue_id del roster ha un file; le 4 quest di Atto I esistono. NON si
+  controlla "zero Sequenze stub" (Fool/Error/Door = fase 5b, un PRD a parte).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  669 test headless (661 + 8), tutti verdi.
+- FASE 6 CHIUSA: 22 story (US-601..622 + US-613b/US-616b), 9 blocchi. Il mondo
+  esiste: regioni, tempo, gating, NPC, dialoghi, fazioni, quest, mappa,
+  densita', audio (spec), narrativa. Save 20 -> 21 (un bump).
+- Prossima fase: 5b (Fool, Error, Door). PRD sorgente
+  006_PRD/prd-fase-5b-lord-of-mysteries.md.
+
+[2026-09-08] US-5B01 — Error, Sequenze 9-7 (Marauder / Swindler / Cryptologist) + primitiva steal. FASE 5b, BLOCCO A.
+
+- PRIMITIVA NUOVA steal: _p_steal in scripts/ability_engine.gd (_handlers +1,
+  execute / _esegui_primitive INTATTI). 'categoria' decide cosa:
+  * "oggetto"    -> registra il furto (record applied:true, sottratto:true).
+                    L'aggancio a Inventory con un bersaglio reale e' fase 6
+                    (prd-fase-5b OQ 2).
+  * "abilita"    -> grant_temporary(prim.ability_id, caster, durata_prestito)
+                    - riuso di US-204. In 5B01 nessun dato lo usa (nessun
+                    ability_id nel registro params ancora): l'ability_id di
+                    steal lo aggiunge US-5B02 (Prometheus). Testato via
+                    chiamata diretta _p_steal.
+  * "conoscenza" -> KnowledgeStore.impara("rubata:<ability_id>").
+  Il record segna sempre 'sottratto' (= not non_sottrae): la fotocopia del
+  Door (non_sottrae:true) e' US-5B09, il flag e' gia' letto dall'handler ma
+  non ancora nel registro params.
+  primitives.json: steal -> implemented:true (attive/differite invariate).
+  vfx.json: primitive_vfx.steal = vfx_pilfer (impact_frame + scia verso il
+  caster: l'icona di cio' che e' preso vola in mano).
+- CONTENUTO Error Seq 9/8/7 (stub -> false):
+  * error_9 Marauder: error_scasso (steal oggetto), error_pugnalata_furtiva
+    (melee_arc fisico). stat velocita/evasione. acting: ability_used(scasso)
+    0.4 + enemy_defeated(senza_subire_danno) 0.35 + damage_dealt(fisico) 0.25.
+    madness 1.0.
+  * error_8 Swindler: error_parlantina (debuff precisione), error_patto_
+    truffaldino (buff spiritualita_max). acting: npc_influenced(ingannato)
+    0.45 + npc_influenced(persuaso) 0.30 + ability_used(parlantina) 0.25 -
+    la truffa e' il flusso npc_influenced contato dalla recitazione, NESSUN
+    if per Error. madness 2.3.
+  * error_7 Cryptologist: error_decifrazione (steal conoscenza + reveal_info
+    categoria "formule_cifrate"), error_lettura_rubata (reveal_info
+    "sigilli_nascosti" + debuff difesa). reveal_info fuori da Hermit porta la
+    categoria (matrice di proprieta'). acting: 2x ability_used + time_in_state
+    (meditazione) 300s. madness 3.6.
+- formule formula_error_9/8/7 + 9 ingredienti nuovi (grimaldello_cantante,
+  guanto_del_borseggiatore, refurtiva_dimenticata, lingua_d_argento_falsa,
+  contratto_con_la_clausola_nascosta, dado_truccato, stele_di_rosetta_
+  infranta, inchiostro_simpatico_rubato, chiave_di_cifrario).
+  characteristics char_error_9/8/7.
+- i18n: generate_i18n_stubs.py rilanciato (it.json 878 -> 896). Tradotte in
+  it.json: 6 abilita' + 9 acting (seed da name/descrizione) + 3 caratteristiche
+  ("Essenza di Marauder/Swindler/Cryptologist") + error_furto_prometeo (era
+  TODO da fase 2). TODO netti: 47 pre-esistenti (nomi TG mai tradotti, ecc.),
+  +3 error caratteristiche ora tradotte -> il conteggio TODO in it.json e' 50
+  ma le 3 chiavi error sono tradotte; i 47 restanti sono debito pre-esistente.
+- VERIFICA A SCHERMO / leggibilita' di steal (FR-10). Sessione headless senza
+  display: verifica scriptata come per ogni primitiva di fase 5 (teleport,
+  soul_detach, mind_read -> tutte verificate con asserzioni headless
+  sull'output osservabile, non screenshot). test_error.gd:
+  * steal "abilita": is_granted true per la durata, false dopo tick_effects
+    (il prestito e' ispezionabile -> la UI puo' mostrare un badge col timer).
+  * steal "conoscenza": KnowledgeStore.conosce("rubata:...") -> true (la
+    conoscenza rubata e' un flag leggibile dal libro/diagramma).
+  * steal "oggetto": record { applied:true, sottratto:true }.
+  DICHIARAZIONE FR-10: la leggibilita' PIENA di steal a schermo - l'icona di
+  COSA e' stato preso + il timer di PER QUANTO - richiede l'aggancio combat/HUD
+  di fase 6 (un bersaglio reale da cui rubare, la HUD del prestito). In 5b la
+  primitiva: (a) emette il record con categoria + durata + sottratto, (b) ha
+  la spec VFX vfx_pilfer (impact_frame sullo strappo + scia dell'oggetto verso
+  il caster) che rende leggibile il "qualcosa e' volato via dal bersaglio a
+  te". L'affinamento (badge persistente col countdown per "abilita", icona
+  item per "oggetto") e' lavoro di fase 6, come da prd-fase-5b sez. 5.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: 29->26
+  stub, 18->17 sinergie irraggiungibili [sinergia_colpo_del_caso ora
+  raggiungibile - rivalutazione completa in US-5B11], 48->50 TODO i18n conteggio
+  ma le chiavi nuove sono tradotte). 674 test headless (669 + 5 in
+  test_error.gd), tutti verdi. Nessuna regressione.
+- File .gd toccati: scripts/ability_engine.gd (handler steal + 1 riga _handlers).
+  execute / _esegui_primitive non toccati. Elenco per il checkpoint US-5B04.
+- Prossima storia: US-5B02 - Error Seq 6-4 + primitiva possess.
+
+[2026-09-08] US-5B02 — Error, Sequenze 6-4 (Prometheus / Dream Stealer / Parasite) + primitiva possess. FASE 5b, BLOCCO A.
+
+- PRIMITIVA NUOVA possess: _p_possess in scripts/ability_engine.gd (_handlers
+  +1, execute / _esegui_primitive INTATTI). Applica lo status 'posseduto' allo
+  stats risolto (come soul_detach applica 'anima_recisa') per 'durata';
+  registra 'controllo' (sensi | parziale | totale) e - come soul_detach - il
+  corpo del caster a terra: record { corpo_a_terra:true, vulnerabilita_corpo }.
+  L'ospite che agisce per il caster e' combat (fase 6).
+  primitives.json: possess -> implemented:true, +param vulnerabilita_corpo
+  (condiviso con soul_detach, FR-7). vfx.json: primitive_vfx.possess = vfx_grip
+  (impact_frame sull'atto di afferrare).
+  status_effects.json: NUOVO 'posseduto' (tag possessione, negativo,
+  velocita -0.5 / precisione -0.35 / difesa -0.2).
+- steal: +param ability_id nel registro. error_furto_prometeo ora lo usa:
+  steal { categoria:abilita, ability_id:"tg_fendente_pesante",
+  durata_prestito:12, probabilita:0.7 } - prestito breve, non sempre riesce
+  (la firma dell'Error vs la fotocopia del Door). _p_steal gia' leggeva
+  ability_id da US-5B01: nessuna modifica all'handler.
+- CONTENUTO Error Seq 6/5/4 (stub -> false):
+  * error_6 Prometheus: error_furto_prometeo (steal abilita) +
+    error_scintilla_rubata (projectile spirito). acting: ability_used(furto)
+    0.45 + damage_dealt(spirito) 0.30 + enemy_defeated 0.25. madness 5.0.
+  * error_5 Dream Stealer: error_furto_dei_sogni (steal conoscenza + debuff,
+    condizione e_notte dai dati) + error_incubo_parassita (dot follia +
+    debuff). tag 'sonno' (non 'sogno': 'sogno' e' vietato ai Pathway attivi,
+    matrice di proprieta' - appartiene a Visionary). acting: ability_used
+    0.40 + time_in_state(notte) 0.35 + damage_dealt(follia) 0.25. madness 6.4.
+  * error_4 Parasite (tier saint): error_innesto_parassita (possess
+    controllo:'sensi', vulnerabilita_corpo 0.4) + error_simbiosi_furtiva
+    (shadow_meld + heal self). advancement_ritual: nebbia_grigia + crocevia
+    (ospitati da frontiera_porte), notte_fonda, sacrifica
+    'un_ricordo_a_cui_tenevi'. acting: ability_used 0.40 +
+    time_in_state(in_ombra) 0.35 + enemy_defeated 0.25. madness 8.0.
+- formule formula_error_6/5/4 + 9 ingredienti nuovi. caratteristiche
+  char_error_6/5/4 (Essenza di Prometheus / Dream Stealer / Parasite).
+- i18n: generate_i18n_stubs.py rilanciato (it.json 896 -> 913). 6 abilita' +
+  9 acting seed da name/descrizione; 3 caratteristiche tradotte a mano.
+- VERIFICA A SCHERMO / leggibilita' di possess (FR-10). Sessione headless:
+  verifica scriptata (come teleport/soul_detach/mind_read di fase 5).
+  test_error.gd:
+  * possess: lo status 'posseduto' e' applicato e crolla la velocita' (il
+    bersaglio si muove a scatti -> leggibile a colpo d'occhio); il record
+    dichiara corpo_a_terra + controllo dai dati.
+  * error_furto_prometeo presta tg_fendente_pesante per 12s e il prestito
+    scade.
+  DICHIARAZIONE FR-10: "di chi e' il corpo che controllo? il caster a terra e'
+  visibile e vulnerabile?" - la resa PIENA (il corpo del caster renderizzato a
+  terra e bersagliabile, la camera/HUD che segue l'ospite, l'ospite che
+  attacca per te) e' combat/fase 6, come dichiarato in prd-fase-5b sez. 5.
+  In 5b: (a) lo status 'posseduto' sul bersaglio con il tell del rallentamento,
+  (b) il record { corpo_a_terra, vulnerabilita_corpo } che il combat leggera',
+  (c) la spec VFX vfx_grip. Il pattern e' identico a soul_detach (Death Seq 3),
+  gia' verificato in fase 5.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: stub
+  26->23, sinergie irraggiungibili 17 [invariato: sinergia_sogno_lucido resta
+  irraggiungibile, tag 'sogno' vietato], TODO i18n conteggio 50 ma le chiavi
+  nuove sono tradotte). 678 test headless (674 + 4 netti in test_error.gd),
+  tutti verdi. Nessuna regressione.
+- File .gd toccati nel blocco A finora: scripts/ability_engine.gd
+  (handler steal + handler possess + 2 righe _handlers). execute /
+  _esegui_primitive non toccati. Per il checkpoint US-5B04.
+- Prossima storia: US-5B03 - Error Seq 3-0 + primitiva time_rewind + materia
+  prima avatar in ownership.json.
+
+[2026-09-08] US-5B03 — Error, Sequenze 3-0 (Mentor of Deceit / Trojan Horse of Destiny / Worm of Time / Error) + primitiva time_rewind + materia prima avatar. FASE 5b, BLOCCO A. ERROR COMPLETO 10/10.
+
+- PRIMITIVA NUOVA time_rewind: _p_time_rewind + ring buffer in
+  scripts/ability_engine.gd (execute / _esegui_primitive INTATTI - execute()
+  aggiunge una sola riga: _campiona_snapshot(caster) sul percorso di successo).
+  * _snapshots: instance_id -> Array di { ms, hp, sp, pos }. Ogni caster che
+    esegue un'abilita' entra nel buffer; _process ricampiona ogni
+    _SNAP_PASSO_S (0.5s), buffer max _SNAP_MAX (12). Pubbliche per i test:
+    campiona_snapshots(), clear_snapshots(), snapshot_count(caster).
+  * _p_time_rewind { secondi, ripristina[], costo_follia }: legge lo snapshot
+    piu' vicino (e non successivo) a "secondi fa"; se il buffer non e' cosi'
+    vecchio usa il piu' vecchio. Ripristina i campi in 'ripristina' (default
+    ["hp","spiritualita"]; "posizione" opt-in). Addebita costo_follia a
+    Madness.add(..., "ability:time_rewind", false). NON tocca il save.
+  * sweep_cooldowns() purga anche gli snapshot dei caster morti.
+  primitives.json: time_rewind -> implemented:true. vfx.json:
+  primitive_vfx.time_rewind = vfx_unwind (impact_frame sul punto di ripristino
+  + scia che riavvolge).
+- MATERIA PRIMA avatar: aggiunta a data/schema/ownership.json
+  summon_materie_prime (9a voce) + riga della matrice aggiornata (Error:
+  avatar autonomi, non nati da un corpo/costrutto - il Mentor of Deceit li
+  proietta da se'). Decisione presa con l'utente: avatar per l'Error,
+  illusion per il Fool (Scholar of Yore, US-5B07).
+- CONTENUTO Error Seq 3/2/1/0 (stub -> false). ERROR COMPLETO: 10/10.
+  * error_3 Mentor of Deceit (saint): error_proietta_avatar (summon
+    avatar_error_mentore) + error_inganno_stratificato (illusion copia_nemico
+    + debuff). Rituale nebbia_grigia/vicolo, crepuscolo, sacrifica la faccia
+    vera per un giorno. madness 10.0.
+  * error_2 Trojan Horse of Destiny (angel): error_cavallo_di_troia
+    (curse destino_segnato + debuff forza + dot follia - come hermit_1,
+    SENZA rule_bind) + error_piano_che_crolla (2x debuff). Rituale
+    crocevia/nebbia_grigia, notte_fonda, luna calante. madness 11.5.
+  * error_1 Worm of Time (angel): error_riavvolgi (time_rewind 3s hp/sp) +
+    error_verme_del_tempo (time_rewind 5s hp/sp/posizione + buff velocita).
+    Rituale nebbia_grigia/soglia, notte_fonda, ECLISSI, sacrifica
+    ancora_del_giocatore (come twilight_giant_1). madness 12.8.
+  * error_0 Error (god): error_falla_nelle_regole (aura persistente
+    destino_segnato r15 + debuff - abilita' di dominio come i Seq 0 di fase 5)
+    + error_ultima_scappatoia (time_rewind 6s completo + heal). Rituale
+    nebbia_grigia, notte_fonda, eclissi, sacrifica il detentore precedente.
+    madness 14.0.
+- formule formula_error_3/2/1/0 + 12 ingredienti nuovi. caratteristiche
+  char_error_3/2/1/0 (Essenza di Mentor of Deceit / Trojan Horse of Destiny /
+  Worm of Time / Error). i18n rilanciato (it.json 913 -> 937), tutte le chiavi
+  error tradotte (0 TODO error; 47 TODO totali = baseline pre-esistente).
+- VERIFICA A SCHERMO / leggibilita' di time_rewind (FR-10). Sessione headless:
+  verifica scriptata (come ogni primitiva di fase 5). test_error.gd:
+  * time_rewind: dopo un danno di 80 hp, riavvolgendo di 5s gli hp tornano al
+    valore pieno (lo snapshot piu' vecchio) e la follia sale.
+  * summon avatar_error: il record ha entita_id col prefisso 'avatar_'.
+  * ogni abilita' Seq 3-0 esegue senza warning di primitiva.
+  DICHIARAZIONE FR-10: "cosa e' tornato indietro? un lampo che segna il punto
+  di ripristino" - la resa a schermo (il lampo/segnaposto sul punto di
+  ripristino, il ghost del percorso riavvolto) e' la spec vfx_unwind
+  (impact_frame + scia). Il raggio su ALTRE entita' e la resa combat sono
+  fase 6 (prd-fase-5b sez. 5). In 5b: la primitiva riporta indietro lo stato
+  del caster dal ring buffer, in modo ispezionabile (snapshot_count).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: stub
+  23->19 [Error 10/10 non-stub], sinergie irraggiungibili 17 invariato, TODO
+  i18n 47 = baseline). 682 test headless (678 + 4 netti in test_error.gd),
+  tutti verdi. Nessuna regressione.
+- File .gd toccati in TUTTO il blocco A: SOLO scripts/ability_engine.gd
+  (_handlers +3 righe; _p_steal, _p_possess, _p_time_rewind + il ring buffer
+  di time_rewind e i suoi helper; execute() +1 riga _campiona_snapshot;
+  _process +4 righe; sweep_cooldowns +3 righe) + tests/test_error.gd.
+  execute() / _esegui_primitive NON modificati per un caso specifico
+  dell'Error. Elenco per il checkpoint US-5B04.
+- Prossima storia: US-5B04 - CHECKPOINT: test_slice_fase_5b.gd (Error 8->2) +
+  test_nessun_codice_nomina_error + verdetto sull'architettura.
+
+[2026-09-08] US-5B04 — CHECKPOINT: Error slice 8->2 + verdetto architettura. FASE 5b, BLOCCO A CHIUSO.
+
+- tests/test_slice_fase_5b.gd (NUOVO, 3 test):
+  * test_error_dalla_sequenza_8_alla_2: gioca Error dalla Sequenza 8 alla 2
+    in codice - per ogni salto Caratteristica -> concoct (formula+ingredienti
+    dai dati) -> recitazione via EventTracker (le acting_actions lette dai
+    dati, nessun numero di Error nel test) -> bevi -> avanzamento NORMALE
+    (zero follia da forzatura). Come test_slice_fase_5 per Death (US-508).
+  * test_ogni_abilita_error_si_esegue_senza_warning: le 20 abilita' (2 per
+    Sequenza) eseguono, nessun warning "non implementata" / "fuori registro".
+  * test_nessun_codice_nomina_error: grep di res://scripts e
+    res://scripts/pages per "error_", "\"error\"" e gli 8 nomi di Sequenza
+    dell'Error. ZERO occorrenze fuori dai commenti (unica esclusione:
+    game_data.gd usa parser.get_error_line()/get_error_message() del parser
+    JSON di Godot, non il Pathway).
+
+- GIT DIFF DEL BLOCCO A (file .gd non di test), rispetto a eaf67e2 (inizio
+  fase 5b):
+    scripts/ability_engine.gd  +173, -0   (SOLO aggiunte)
+  Cosa contiene:
+  * _handlers: +3 righe ("steal", "possess", "time_rewind" -> _p_*).
+  * _p_steal (US-5B01): dispaccio su 'categoria' (oggetto/abilita/conoscenza),
+    riuso di grant_temporary (US-204) e KnowledgeStore.impara.
+  * _p_possess (US-5B02): applica lo status 'posseduto', record corpo_a_terra
+    (pattern identico a _p_soul_detach di Death).
+  * _p_time_rewind + ring buffer (US-5B03): _snapshots, _campiona_snapshot,
+    campiona_snapshots, clear_snapshots, snapshot_count.
+  * Hook GENERICI (non un caso Error):
+      - execute(): +1 riga  _campiona_snapshot(caster)  sul percorso di
+        successo (vale per QUALSIASI caster, non nomina Error).
+      - _process(): +4 righe  ricampiona sul passo _SNAP_PASSO_S.
+      - sweep_cooldowns(): +3 righe  purga gli snapshot dei caster morti.
+  * execute() / _esegui_primitive: il DISPATCHER delle primitive (l'iterazione
+    dell'array "primitive", i 3 esiti implementata/non-scritta/fuori-registro,
+    l'hook SynergyEngine) NON e' modificato. Zero righe rimosse in tutto il
+    file. Nessun `if` per un Pathway/Sequenza specifico.
+
+- VERDETTO SULL'ARCHITETTURA (criterio di uscita, prd-fase-5b sez. 8):
+  L'ARCHITETTURA DELLA FASE 2 REGGE anche sui Pathway "difficili" del gruppo
+  Lord of Mysteries.
+  * Error, il Pathway con piu' agganci ai sistemi (grant_temporary per steal
+    "abilita", KnowledgeStore per steal "conoscenza", Madness per time_rewind,
+    ownership.json per la materia prima avatar), e' contenuto COMPLETO 10/10
+    scritto con: 3 handler di primitiva nuovi + il ring buffer di time_rewind,
+    tutti generici. Nessuna riga di AbilityEngine.execute /
+    _esegui_primitive / DialogueEngine / QuestSystem nomina "error".
+  * Le primitive-firma del gruppo (steal, possess, time_rewind) si sono
+    parametrizzate senza inventare eventi (i 12 tracked_events invariati) ne'
+    primitive (registro: steal/possess/time_rewind erano gia' voci senza
+    handler; +2 param a steal e possess, dichiarati). weather_control /
+    probability_shift / rule_bind restano differite e non usate.
+  * L'unico dato NUOVO di vocabolario chiuso: 'avatar' come 9a materia prima
+    di summon (ownership.json) e lo status 'posseduto' (status_effects.json).
+    Entrambi discussi (avatar con l'utente; posseduto e' il gemello di
+    anima_recisa gia' esistente).
+  NIENTE STOP. Fool e Door possono partire.
+
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: 19 stub
+  [restano Fool 9 + Door 10, la fase 5b li chiude], 17 sinergie
+  irraggiungibili, 47 TODO i18n = baseline). 685 test headless (682 + 3 in
+  test_slice_fase_5b.gd), tutti verdi. Nessuna regressione.
+- BLOCCO A CHIUSO: US-5B01/02/03/04. Error 10/10. steal + possess +
+  time_rewind implementate. Prossimo: BLOCCO B - Fool (US-5B05 illusion gia'
+  in fase 6; fool_2 senza probability_shift in US-5B07).
+
+[2026-09-08] US-5B05 — Fool, Sequenze 9-7 (Seer / Clown / Magician) + primitiva illusion. FASE 5b, BLOCCO B.
+
+- illusion: era gia' implemented:true (fase 6, Servant of Concealment del
+  Darkness). _p_illusion ESTESO senza toccare execute:
+  * il SIGNIFICATO di 'potenza' e' per-tipo_illusione (decisione di US-5B05
+    col primo VFX): "copia_nemico" -> potenza = NUMERO di esche (record
+    rec["esche"]); "danno_percepito" -> potenza = intensita' del dot follia
+    (comportamento invariato); altri tipi -> potenza registrata.
+  * match su tipo_illusione al posto dell'if singolo su "danno_percepito".
+  vfx.json: illusion aveva gia' vfx_mirage.
+- CONTENUTO Fool Seq 9/8/7:
+  * fool_9 Seer: era gia' non-stub (audit) - invariato (3 abilita',
+    reveal_info(pericolo/intenzione) + illusion(copia_statica), acting 1.0,
+    madness 1.0).
+  * fool_8 Clown (stub -> false): fool_acrobazia (dash invulnerabile che
+    attraversa) + fool_travestimento_lampo (illusion 'aspetto' + debuff
+    precisione = rompe l'aggro). acting: 2x ability_used + area_cleared
+    (senza_uccidere). madness 2.2.
+  * fool_7 Magician (stub -> false): fool_illusione_solida (illusion
+    'danno_percepito' potenza 3) + fool_oggetto_dal_nulla (illusion
+    'oggetto_evocato' + melee_arc fisico). acting: 2x ability_used +
+    damage_dealt(follia). madness 3.5.
+- formule formula_fool_8/7 + 6 ingredienti nuovi. caratteristiche
+  char_fool_8/7. i18n rilanciato (it.json 937 -> 949); tradotte le 4 abilita'
+  fool pre-esistenti (erano TODO da fase 2) + le 4 nuove + char_fool_8/7.
+- VERIFICA A SCHERMO / leggibilita' di illusion (FR-10, "rischio numero uno").
+  Sessione headless: verifica scriptata (test_fool.gd):
+  * illusion 'danno_percepito' e' un dot a tag follia che TOGLIE hp e che
+    light_purify rimuove (il bersaglio "capisce" -> smette di far male).
+  * illusion 'copia_nemico' registra rec["esche"] = potenza.
+  * illusione_creata emette il tipo_illusione dai dati.
+  DICHIARAZIONE FR-10: il giocatore distingue un'esca da un nemico vero SOLO
+  quando il combat (fase 6) fa comparire le esche con il TELL visivo: bordo
+  tremolante + palette Fool (data/vfx.json: fool ha tratto "assenza", primario
+  #8f7fae, distorsione 0.6 - la piu' alta di tutti i Pathway, apposta). In 5b
+  la primitiva registra il numero di esche e il fatto (illusione_creata); il
+  renderer delle esche con il loro tell e' integrazione combat, prd-fase-5b
+  sez. 5. NON e' un blocco: la meccanica (dot rimovibile, conteggio esche) e'
+  completa e testata; manca solo la resa a schermo, che e' esplicitamente
+  fase 6.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: stub
+  19->17, sinergie 17 invariato, TODO i18n 49 [char_fool tradotte, 4 fool
+  ability ex-TODO risolte, restano i 47 nomi TG baseline meno 4 fool = ~43 +
+  ...]). 690 test headless (685 + 5 in test_fool.gd), tutti verdi. Nessuna
+  regressione.
+- File .gd toccati: scripts/ability_engine.gd (_p_illusion esteso, +~10 righe,
+  execute intatto) + tests/test_fool.gd.
+- Prossima storia: US-5B06 - Fool Seq 6-4 (Faceless / Marionettist / Bizarro
+  Sorcerer).
+
+[2026-09-08] US-5B06 — Fool, Sequenze 6-4 (Faceless / Marionettist / Bizarro Sorcerer). FASE 5b, BLOCCO B.
+
+- Nessuna primitiva nuova: Faceless usa illusion(aspetto), Marionettist usa
+  possess(totale) (implementata US-5B02), Bizarro Sorcerer usa teleport
+  (implementata US-506) + illusion.
+- CONTENUTO Fool Seq 6/5/4 (stub -> false):
+  * fool_6 Faceless: fool_volto_rubato (illusion 'aspetto' + buff evasione)
+    + fool_voce_prestata (2x debuff). "Eredita i permessi sociali" -> il gate
+    npc vero e' fase 6; in 5b e' illusion(aspetto) e la truffa la conta
+    l'acting npc_influenced(ingannato). NESSUN if per Fool. madness 5.0.
+  * fool_5 Marionettist: fool_fili_marionetta (possess controllo "completo" ->
+    "totale", allineato al vocabolario sensi/parziale/totale) + fool_scambio_
+    bersagli (fear area + debuff difesa: gli altri nemici vedono un alleato
+    voltarsi). Il nemico controllato che attacca davvero e' combat (fase 6).
+    madness 6.3.
+  * fool_4 Bizarro Sorcerer (saint): fool_scambio_con_oggetto (teleport +
+    illusion copia_statica lasciata al posto) + fool_prestigio_di_stanza
+    (illusion copia_nemico potenza 2 + debuff). Rituale OBBLIGATORIO:
+    teatro/palco (ospitati da frontiera_porte), crepuscolo, sacrifica
+    "la_certezza_di_sapere_chi_sei". madness 8.0.
+- formule formula_fool_6/5/4 + 9 ingredienti nuovi. caratteristiche
+  char_fool_6/5/4. i18n rilanciato (it.json 949 -> 966), tutte le chiavi fool
+  tradotte (46 TODO totali = baseline TG).
+- VERIFICA A SCHERMO: test_fool.gd - fool_fili_marionetta applica 'posseduto'
+  con controllo:"totale" (distinto dal "sensi" del Parasite dell'Error nel
+  record); le 6 abilita' Seq 6-4 eseguono senza warning; fool_4 ha il rituale
+  di teatro. FR-10 per possess controllo:"totale": "si capisce chi controllo?"
+  - come US-5B02, la resa (camera/HUD che segue l'ospite, l'ospite che
+  attacca) e' fase 6; in 5b lo status 'posseduto' col tell del rallentamento
+  + il record controllo:"totale".
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: stub
+  17->14, sinergie 17, TODO 46). 693 test headless (690 + 3 in test_fool.gd),
+  tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (solo dati + tests/test_fool.gd).
+- Prossima storia: US-5B07 - Fool Seq 3-0 + fool_2 SENZA probability_shift.
+
+[2026-09-08] US-5B07 — Fool, Sequenze 3-0 (Scholar of Yore / Miracle Invoker / Attendant of Mysteries / Fool) — fool_2 SENZA probability_shift. FASE 5b, BLOCCO B CHIUSO. FOOL COMPLETO 10/10.
+
+- Nessuna primitiva nuova. Scholar of Yore usa time_rewind (US-5B03),
+  Attendant of Mysteries usa terrain_modify (fase 2), tutti usano illusion.
+- fool_2 (Miracle Invoker) RISCRITTA SENZA probability_shift (differita, gruppo
+  key_of_light):
+  * fool_miracolo: buff_stat evasione +0.5 / precisione +0.4 a forte varianza
+    DICHIARATA nel note (bonus grande e breve, costa 40 spiritualita' + 3
+    follia). fool_sfortuna_altrui: curse('sfortuna', gia' esistente da
+    darkness_sfortuna_cronica US-503) + debuff evasione. Come darkness_1 /
+    paragon_1 / hermit_1.
+  * grep di data/abilities/ per "tipo": "probability_shift" -> 0. Le sole
+    occorrenze di 'probability_shift' sono in NOTE (darkness.json, spiegazione
+    storica). test_fool.test_fool_2_riscritta_senza_probability_shift lo
+    verifica anche a runtime.
+- CONTENUTO Fool Seq 3/2/1/0 (stub -> false). FOOL COMPLETO 10/10.
+  * fool_3 Scholar of Yore (saint): fool_richiamo_dal_passato (time_rewind +
+    illusion copia_statica - la "versione precedente" e' FINTA: illusion, non
+    la materia prima 'avatar' dell'Error, come da decisione) + fool_eco_di_ieri
+    (illusion copia_nemico + debuff). Rituale nebbia_grigia/biblioteca,
+    notte_fonda. madness 10.0.
+  * fool_2 Miracle Invoker (angel): vedi sopra. Rituale nebbia_grigia/crocevia,
+    notte_fonda, luna piena, sacrifica "tutta_la_fortuna_che_ti_restava".
+    madness 11.5.
+  * fool_1 Attendant of Mysteries (angel): fool_area_di_segretezza
+    (terrain_modify 'area_di_segretezza' NON permanente + illusion 3 esche) +
+    fool_realta_manomessa (2x debuff + curse sfortuna). Rituale
+    nebbia_grigia/soglia, notte_fonda, ECLISSI, sacrifica ancora_del_giocatore.
+    madness 12.8.
+  * fool_0 Fool (god): fool_realta_falsificata (aura persistente 'sfortuna' r15
+    + illusion 4 esche - abilita' di dominio) + fool_nessuno (illusion aspetto
+    + buff evasione). Rituale nebbia_grigia, notte_fonda, eclissi, sacrifica il
+    detentore precedente. madness 14.0.
+- formule formula_fool_3/2/1/0 + 12 ingredienti nuovi. caratteristiche
+  char_fool_3/2/1/0 (tradotte). i18n rilanciato (it.json 966 -> 990). Tutte le
+  chiavi fool tradotte (47 TODO totali = baseline TG, nessuna fool).
+- VERIFICA A SCHERMO: test_fool.gd - le 8 abilita' Seq 3-0 senza warning;
+  fool_2 usa solo primitive del registro attivo; curse(sfortuna) applica lo
+  status; Seq 1 sacrifica un'Ancora; Fool contenuto completo 10/10 con acting
+  1.0 e madness crescente 1.0 -> 14.0.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: stub
+  14->10 [restano solo le 10 Sequenze del Door], sinergie 17, TODO i18n 47 =
+  baseline). 697 test headless (693 + 4 in test_fool.gd), tutti verdi. Nessuna
+  regressione.
+- File .gd toccati in tutto il BLOCCO B: SOLO scripts/ability_engine.gd
+  (_p_illusion esteso in US-5B05, ~10 righe, execute intatto) + i test.
+- BLOCCO B CHIUSO: US-5B05/06/07. Fool 10/10. Prossimo: BLOCCO C - Door
+  (US-5B08 shadow_meld gia' in fase 6; US-5B09 fotocopia via steal non_sottrae;
+  US-5B10 varco_forzato nel WorldState).
+
+[2026-09-08] US-5B08 — Door, Sequenze 9-7 (Apprentice / Trickmaster / Astrologer) + shadow_meld. FASE 5b, BLOCCO C.
+
+- shadow_meld: era gia' implemented:true (fase 6, Nightwatcher del Darkness).
+  Nessuna modifica al codice: door_occhio_nell_ombra (Astrologer) e' la prima
+  Sequenza ATTIVA del Door a usarla, e applica lo status 'occultato' (gia'
+  esistente). vfx.json: shadow_meld aveva gia' vfx_umbra.
+- CONTENUTO Door Seq 9/8/7 (stub -> false):
+  * door_9 Apprentice: door_passo_breve (teleport a vista) + door_grimaldello_
+    mistico (terrain_modify 'serratura_aperta' non permanente + reveal_info
+    'passaggi_bloccati'). madness 1.0.
+  * door_8 Trickmaster: door_via_di_fuga (teleport + buff evasione) +
+    door_scambio_di_posto (teleport + debuff/buff per lo swap - lo swap VERO
+    col bersaglio e' combat, fase 6). madness 2.2.
+  * door_7 Astrologer: door_lettura_stellare (reveal_info categoria "percorso")
+    + door_occhio_nell_ombra (shadow_meld + reveal_info "percorso"). Matrice di
+    proprieta': il Door divina lo SPAZIO (percorsi), non le menti (Hermit) ne'
+    per ingannare (Fool). madness 3.4.
+- formule formula_door_9/8/7 + 9 ingredienti nuovi. caratteristiche
+  char_door_9/8/7. i18n rilanciato (it.json 990 -> 1008); tradotto anche
+  door_viaggio_lungo (ex-TODO di fase 2). 45 TODO totali = baseline TG.
+- VERIFICA A SCHERMO: test_door.gd - shadow_meld applica 'occultato'; il
+  reveal_info del Door emette la categoria "percorso" (matrice); le 6 abilita'
+  Seq 9-7 senza warning. shadow_meld: "il giocatore si vede sbiadire; il tell
+  che e' occultato" - la resa (l'alpha del personaggio, l'icona di stato) e' UI
+  di fase 6; in 5b lo status 'occultato' (+0.25 evasione) e la spec vfx_umbra
+  (scia sfrangiata).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: stub
+  10->7, sinergie 17, TODO 45). 701 test headless (697 + 4 in test_door.gd),
+  tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (solo dati + tests/test_door.gd).
+- Prossima storia: US-5B09 - Door Seq 6-4 (Scribe fotocopia via steal
+  non_sottrae / Traveler / Secrets Sorcerer).
+
+[2026-09-08] US-5B09 — Door, Sequenze 6-4 (Scribe / Traveler / Secrets Sorcerer) — fotocopia via steal non_sottrae. FASE 5b, BLOCCO C.
+
+- steal: +param non_sottrae nel registro (primitives.json). _p_steal lo
+  leggeva gia' da US-5B01: rec["sottratto"] = not non_sottrae. Nessuna
+  modifica all'handler.
+- CONTENUTO Door Seq 6/5/4 (stub -> false):
+  * door_6 Scribe: door_registra_abilita = steal { categoria:"abilita",
+    ability_id:"tg_stretta_ferrea", probabilita:1.0, durata_prestito:20,
+    non_sottrae:true } - FOTOCOPIA: concede l'abilita' al caster (grant_temporary,
+    lo stesso motore di US-204) MA l'originale sul nemico NON e' sottratto.
+    Distinto dallo steal dell'Error (sottrae, probabilita < 1). Un solo
+    vocabolario 'steal' con un flag, NESSUN if per Door. + door_riproduci_copia
+    (projectile). madness 5.0.
+  * door_5 Traveler: door_scorciatoia (teleport distanza 500 + porta_alleati)
+    + door_porta_di_gruppo (teleport 400 + buff velocita). Il fast travel DEL
+    DOOR (design-world cap. 7): scorciatoia istantanea, mai permanenza. Nessun
+    if: teleport coi parametri giusti. madness 6.3.
+  * door_4 Secrets Sorcerer (saint): door_occultamento_totale (shadow_meld
+    lungo 15s + illusion esca) + door_segreto_svanito (shadow_meld + teleport).
+    Rituale soglia/crocevia (frontiera_porte), notte_fonda, sacrifica
+    "un_segreto_che_ti_definiva". madness 8.0.
+- formule formula_door_6/5/4 + 9 ingredienti. caratteristiche char_door_6/5/4
+  (tradotte). i18n rilanciato (it.json 1008 -> 1026). 45 TODO = baseline.
+- VERIFICA A SCHERMO: test_door.gd - la fotocopia dello Scribe concede
+  tg_stretta_ferrea (is_granted true) MA rec["sottratto"] == false (il nemico
+  non e' marcato derubato); il Traveler e' teleport con porta_alleati:true e
+  distanza grande, nessuna primitiva nuova; le 6 abilita' Seq 6-4 senza
+  warning.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: stub
+  7->4, sinergie 17, TODO 45). 704 test headless (701 + 3 in test_door.gd),
+  tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (steal.non_sottrae era gia' letto dall'handler;
+  solo +1 riga nel registro params di primitives.json, che e' un DATO).
+- Prossima storia: US-5B10 - Door Seq 3-0 + varco_forzato nel WorldState.
+
+[2026-09-08] US-5B10 — Door, Sequenze 3-0 (Wanderer / Planeswalker / Key of Stars / Door) + varco_forzato nel WorldState. FASE 5b, BLOCCO C CHIUSO. DOOR COMPLETO 10/10. **100/100 SEQUENZE NON-STUB.**
+
+- Nessuna primitiva nuova. Wanderer/Planeswalker usano teleport; Planeswalker
+  usa steal { non_sottrae:true } (US-5B09); Key of Stars/Door usano
+  terrain_modify tipo_modifica "varco_forzato" permanente:true - entra nel
+  WorldState come i varchi del Twilight Giant (fase 2), NESSUN codice nuovo.
+- CONTENUTO Door Seq 3/2/1/0 (stub -> false). DOOR COMPLETO 10/10.
+  * door_3 Wanderer (saint): door_viaggio_lungo (gia' esistente) +
+    door_passo_del_pellegrino (teleport gruppo + buff difesa). Rituale
+    nebbia_grigia/crocevia, sacrifica "il_posto_che_chiamavi_casa". madness 10.0.
+  * door_2 Planeswalker (angel): door_camminatore_di_piani (teleport 1500 +
+    alleati) + door_replica_nota (steal non_sottrae senza pre-registrazione:
+    "replica cio' che GIA' conosce", distinto dallo Scribe che deve osservare).
+    Rituale crocevia/nebbia_grigia, luna nuova. madness 11.5.
+  * door_1 Key of Stars (angel): door_chiave_di_ogni_luogo (terrain_modify
+    varco_forzato permanente + teleport) + door_porta_dove_non_ce (solo il
+    varco). Rituale nebbia_grigia/soglia, ECLISSI, sacrifica
+    ancora_del_giocatore. madness 12.8.
+  * door_0 Door (god): door_passaggio_senza_limiti (aura persistente
+    gravita_alterata sui nemici r15 + teleport - abilita' di dominio) +
+    door_ogni_soglia (varco_forzato largo + buff velocita). Rituale
+    nebbia_grigia, eclissi, il detentore precedente. madness 14.0.
+- formule formula_door_3/2/1/0 + 12 ingredienti nuovi. caratteristiche
+  char_door_3/2/1/0 (tradotte). i18n rilanciato (it.json 1026 -> 1049); 46
+  TODO totali = baseline TG (nessuna chiave door/error/fool). Il validator NON
+  emette piu' il warning "N sequenze stub": 100/100 non-stub.
+- VERIFICA A SCHERMO: test_door.gd - door_porta_dove_non_ce registra un
+  'varco_forzato' nel WorldState; _p_terrain_modify permanente:true col tipo
+  'varco_forzato' SOPRAVVIVE al round-trip del save (riuso del test di
+  terrain_modify permanente, US-203C); Door contenuto completo 10/10; Seq 1
+  sacrifica un'Ancora.
+- Come verificato: python tools/validate_data.py exit 0 (ORA 2 warning, non
+  piu' 3: sparito "stub", restano sinergie irraggiungibili 17 + TODO i18n 46).
+  708 test headless (704 + 4 in test_door.gd), tutti verdi. Nessuna
+  regressione.
+- File .gd toccati: nessuno (solo dati + tests/test_door.gd).
+- BLOCCO C CHIUSO: US-5B08/09/10. Door 10/10.
+- 100/100 SEQUENZE NON-STUB. 22/22 Pathway attivi completi (Fool + Error +
+  Door + i 19 gia' fatti). Prossimo: BLOCCO D - US-5B11 (sinergie del gruppo)
+  + US-5B12 (chiusura fase 5b, documenti).
+
+[2026-09-08] US-5B11 — Sinergie e caratteristiche del gruppo Lord of Mysteries. FASE 5b, BLOCCO D.
+
+- RIVALUTAZIONE batch_3.json (i tag inganno/furto/spazio/viaggio/destino/
+  contratto ora portati da Fool/Error/Door via 'sequenza'/'abilita'):
+  * sinergia_contratto_solare (contratto + purificazione) e' diventata
+    RAGGIUNGIBILE: il tag 'contratto' ora arriva da error_patto_truffaldino
+    (Error Seq 8). Il conteggio "sinergie irraggiungibili" e' sceso 18 -> 17.
+  * Le altre 17 restano irraggiungibili: OGNUNA richiede un secondo tag da un
+    gruppo ancora differito (disordine/ordine/legge/probabilita'/mutazione/
+    corruzione/tempesta/fuoco/verita'/sogno/giudizio/negazione/sussurro/
+    depravazione/trappola/disastro/demone/desiderio). Nessuna di queste si
+    accende riattivando il solo Lord of Mysteries: e' atteso (US-415).
+  * sinergia_inganno_probabilita (core.json) resta irraggiungibile (serve
+    probabilita', da key_of_light). La sua abilita' concessa
+    sinergia_colpo_del_caso E' scritta e risolve, ma la sinergia che la da'
+    non puo' attivarsi finche' Wheel of Fortune e' differito.
+- data/synergies/batch_5.json (NUOVO): 6 sinergie del gruppo, tutte
+  RAGGIUNGIBILI (i tag arrivano da sequenza/abilita + talento[furto,notte] +
+  pet[divinazione] + stanza[rituale,conoscenza]), i18n completo, fonti >= 2:
+  * sinergia_ladro_di_poteri (Error steal + talento furto -> steal.durata_
+    prestito *1.35)
+  * sinergia_teatro_di_ombre (Fool illusione + pet divinazione -> evasione)
+  * sinergia_rete_di_porte (Door viaggio + stanza rituale -> velocita)
+  * sinergia_debito_temporale (Error tempo + talento notte -> follia -0.6/min)
+  * sinergia_archivio_fotocopiato (Door conoscenza+spazio + biblioteca ->
+    spiritualita_max)
+  * anti_due_bugiardi (ANTI-SINERGIA, priorita 100): inganno + furto insieme
+    (Fool+Error, o l'Error che porta entrambi i tag del suo Pathway) ->
+    follia +1.2/min e NEUTRALIZZA sinergia_ladro_di_poteri. "Due bugiardi non
+    si fidano l'uno dell'altro."
+- data/characteristics.json: le 30 Caratteristiche del gruppo (char_fool_0..9,
+  char_error_0..9, char_door_0..9) esistono gia' - aggiunte nelle story di
+  contenuto US-5B05..5B10 - e sono TUTTE tradotte (0 TODO). Verificato in
+  test_lord_of_mysteries.
+- Diagramma dei Pathway / frontespizio: nessun codice nuovo. Le pagine del
+  libro leggono get_pathway/get_sequence dai dati e i 3 Pathway ora sono
+  contenuto pieno. Verifica a schermo (scriptata): test_lord_of_mysteries.
+  test_si_crea_un_personaggio_su_ognuno_dei_tre - Progression.configura su
+  fool/error/door + le abilita' di Seq 9 esistono dalla creazione.
+- tests/test_lord_of_mysteries.gd (NUOVO, 5 test): le 30 caratteristiche
+  esistono e sono tradotte; Fool/Error/Door senza stub; si crea un
+  personaggio sui 3; le sinergie di batch_5 hanno solo tag ottenibili;
+  anti_due_bugiardi neutralizza sinergia_ladro_di_poteri (soddisfatte /
+  neutralizzate / e_attiva).
+- Come verificato: python tools/validate_data.py exit 0 (2 warning: sinergie
+  irraggiungibili 17, TODO i18n 42). 713 test headless (708 + 5 in
+  test_lord_of_mysteries.gd), tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (solo dati: batch_5.json + i18n + tests).
+- Prossima storia: US-5B12 - chiusura fase 5b (documenti + check di chiusura
+  nel validator).
+
+[2026-09-08] US-5B12 — Chiusura fase 5b. FASE 5b CHIUSA. BLOCCO D CHIUSO.
+
+- 006_PRD/roadmap.md: nuova sezione "Fase 5b — Lord of Mysteries — CHIUSA per
+  il gruppo (12 story, 713 test)" con verdetto del checkpoint, cosa contiene,
+  criterio di uscita nel validator. La nota "Ancora aperto (fase 5b)" della
+  sezione Fase 6 -> "Fase 5b CHIUSA, vedi sotto".
+- 006_PRD/design-pathways.md: sezione "Fase 5b" - Darkness spuntato (fatto in
+  fase 6, blocco C), Fool/Error/Door spuntati (US-5B01..5B12). Nota finale
+  "22/22 Pathway attivi completi, 100/100 Sequenze non-stub".
+- 006_PRD/design-master.md: Appendice A - nuova sottosezione "Fase 5b - CHIUSA"
+  (dopo Fase 5); Fase 6 "Aperto: fase 5b" -> "Poi fase 5b (chiusa) e fase 7".
+  Appendice C: riga Primitive ("27 con handler"; steal/possess/time_rewind
+  implementate, chain no); riga Matrice di proprieta' ("10, +avatar"); riga
+  nuova per batch_5.json.
+- CLAUDE.md: "Fase 5b - Lord of Mysteries: CHIUSA (12 story US-5B01..5B12, 713
+  test)" con il dettaglio delle 3 primitive, fool_2, avatar, batch_5, criterio
+  di uscita. "Fase corrente: 7 - Endgame". "Prova che l'architettura regge"
+  aggiornata coi 3 Pathway del Lord of Mysteries.
+- README.md: "Fase 5b - Lord of Mysteries: chiusa" con 22/22 + 100/100, le 3
+  primitive, il verdetto. "Architettura in una riga": "tutti e 22 i Pathway
+  attivi completi con zero righe di codice dedicate". Lista documenti
+  aggiornata (prd-fase-5b come ultima fase chiusa).
+- tools/validate_data.py: check di chiusura fase 5b (dopo quello di fase 5):
+  * fool/error/door senza Sequenze stub -> errore se ne restano.
+  * steal/possess/time_rewind devono essere 'implemented' -> errore altrimenti.
+  * data/synergies/batch_5.json deve esistere.
+  * stub_count deve essere 0 (100/100 Sequenze non-stub) -> errore altrimenti.
+  Il commento del check di chiusura fase 6 aggiornato ("lo fa il check fase 5b").
+- Come verificato: python tools/validate_data.py exit 0 (2 warning: 17 sinergie
+  irraggiungibili di gruppi differiti, 42 TODO i18n = baseline nomi TG).
+  grep di data/abilities/ per una primitiva differita come "tipo" -> 0.
+  713 test headless, tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (solo docs + validate_data.py + progress/prd).
+
+=== FASE 5b CHIUSA (2026-09-08) ===
+12 story US-5B01..5B12, 4 blocchi. 713 test headless (erano 669 a inizio fase).
+Fool, Error, Door completi 10/10. Con Darkness (fase 6) e i 19 gia' fatti:
+**22/22 PATHWAY ATTIVI COMPLETI, 100/100 SEQUENZE NON-STUB.**
+Primitive implementate: steal, possess, time_rewind (+ _p_illusion esteso).
+chain resta senza handler (nessuna Sequenza attiva lo usa).
+fool_2 senza probability_shift. Materia prima avatar. batch_5.json (6 sinergie).
+Save schema_version INVARIATO.
+Verdetto US-5B04: l'architettura della fase 2 regge sui Pathway difficili -
+diff .gd del blocco A = solo ability_engine.gd +173 -0, dispatcher intatto.
+
+Prossima fase: 7 - Endgame (cambio Pathway, fusioni del gruppo, finali).
+Generare il PRD con /prd.
+
+[2026-09-08] US-701 — Save schema_version 21 -> 22, campo endgame. FASE 7, BLOCCO 0.
+
+- scripts/endgame_state.gd (NUOVO autoload EndgameState, dopo WorldState in
+  project.godot): store del campo 'endgame' del save. { pathway_precedente,
+  fusioni[], tribolazioni_superate[], eredita{}, finale }. Metodi:
+  registra_cambio / aggiungi_fusione / segna_tribolazione /
+  tribolazione_superata / imposta_eredita / imposta_finale / pulisci. I motori
+  di fase 7 (PathwayChange, FusionEngine, TribulationSystem, EndingSystem) ci
+  scriveranno attraverso: il save non li conosce (pattern di 'mondo' di fase 6).
+- da_salvataggio NON FIDATO: pathway_precedente solo stringa; fusioni solo
+  stringhe non vuote; tribolazioni_superate solo interi in {7,5,3,1}; eredita
+  validata campo per campo (_leggi_eredita: conoscenza [flag], ancora
+  {id, forza>=0}, reputazione {fid: float}, oggetto item_id) - e' il pezzo che
+  l'utente modificherebbe per iniziare "ricco"; finale solo stringa.
+- scripts/save_system.gd: VERSIONE_CORRENTE 21 -> 22; _migra_21_a_22 aggiunge
+  doc['endgame'] coi default se assente (idempotente, non tocca gli altri
+  campi); 'endgame' aggiunto a salva() e a _leggi_snapshot() (_campo
+  TYPE_DICTIONARY default {}).
+- scripts/game_state.gd: snapshot() aggiunge "endgame" da
+  EndgameState.per_salvataggio; applica() chiama EndgameState.da_salvataggio
+  prima di SynergyEngine.
+- Come verificato: python tools/validate_data.py exit 0 (2 warning invariati).
+  716 test headless (713 + 3 in test_save_system.gd:
+  test_migrazione_v21_a_v22_aggiunge_endgame [un save v21 senza endgame ->
+  campo aggiunto coi default, il campo 'mondo' pre-esistente non toccato];
+  test_endgame_round_trip; test_endgame_state_scarta_le_voci_malformate).
+  Nessuna regressione (test_characteristic.test_migrazione_da_v6 e
+  test_save_system.test_migrazione_da_versione_vecchia passano ancora: la
+  catena arriva a 22).
+- File .gd toccati: scripts/endgame_state.gd (nuovo), scripts/save_system.gd
+  (+migrazione +campo), scripts/game_state.gd (+wiring), project.godot
+  (+autoload).
+- Prossima storia: US-702 - fusion.schema.json + data/fusions/ (8 file, 7 stub).
+
+[2026-09-08] US-702 — fusion.schema.json + data/fusions/ (8 file, 7 stub). FASE 7, BLOCCO 0.
+
+- data/schema/fusion.schema.json (NUOVO): un file per PERCORSO DI FUSIONE
+  possibile. id = <pathA>_<pathB> alfabetico (il gruppo e' un campo, NON
+  nell'id: i nomi di gruppo contengono '_' e sarebbero ambigui - deviazione
+  motivata dal PRD che proponeva <gruppo>_<pathA>_<pathB>). Campi: gruppo
+  (enum dei 4 gruppi attivi), pathway_a/pathway_b, abilita_fuse[] (id ^fus_,
+  da_sequenza 7..9 = le Sequenze CONSERVATE al cambio, name_i18n
+  ^ability\.fusion\., primitive[], tag_sinergia[]), stub (bool).
+- data/fusions/: 8 file, uno per coppia di Pathway vicini in un gruppo attivo:
+  Lord of Mysteries door_error/door_fool/error_fool; Eternal Darkness
+  darkness_death/darkness_twilight_giant/death_twilight_giant; Demon of
+  Knowledge hermit_paragon; Goddess of Origin moon_mother. TUTTI stub in
+  US-702; door_error lo scrive US-706.
+- tools/validate_data.py: NUOVA sezione "percorsi di fusione" (dopo il check
+  degli id pathway duplicati). Calcola i percorsi ATTESI da tutte le coppie
+  non ordinate dentro un gruppo ATTIVO (4 gruppi -> 3+3+1+1 = 8); verifica id
+  = nome file, pathway_a/b Pathway attivi dello stesso gruppo, campo 'gruppo'
+  coerente, id alfabetico, abilita_fuse vuoto sse stub, per le abilita' fuse
+  non-stub gli stessi controlli delle abilita' (primitive nel registro attivo,
+  parametri dichiarati, tag validi, tag_danno nel vocabolario). Errore se un
+  percorso atteso manca o se ce n'e' uno non atteso. Warning "N percorsi di
+  fusione su 8 sono stub".
+- tests/test_fusion.gd (NUOVO, 2 test): esistono tutti e 8 i file con id
+  coerente e pathway_a < pathway_b; i due Pathway di ogni percorso hanno lo
+  stesso 'group' (via GameData.get_pathway) e il campo 'gruppo' e' coerente.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: +1 nuovo
+  "8 percorsi di fusione su 8 sono stub", + i 2 gia' noti). 718 test headless
+  (716 + 2), tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (solo dati + validator + tests/test_fusion.gd).
+- Prossima storia: US-703 - vocabolari tribulation_effects.json +
+  prayer_effects.json.
+
+[2026-09-08] US-703 — vocabolari chiusi tribulation_effects.json + prayer_effects.json. FASE 7, BLOCCO 0 CHIUSO.
+
+- data/schema/tribulation_effects.json (NUOVO, 5 voci): cosa fa una
+  tribolazione MENTRE E' IN CORSO (handicap temporaneo). follia_accelerata
+  (delta_al_minuto extra a Madness), spiritualita_dimezzata (moltiplicatore
+  0.5 su spiritualita_max), nemici_rinforzati (moltiplicatore_spawn 1.6 sulla
+  densita' mistica), abilita_bloccate (le abilita' della Sequenza corrente
+  inagibili), notte_perenne (TimeSystem bloccato su notte_fonda). NON e' un
+  evento tracciato: e' uno stato temporaneo che si toglie al superamento.
+- data/schema/prayer_effects.json (NUOVO, 4 voci): gli effetti SEMANTICI +
+  i18n delle preghiere delle Sequenze alte. Ogni voce DICHIARA su quale
+  primitiva esistente si appoggia: benedizione_seguaci (aura bersagli:evocati),
+  voto_di_autorita (aura bersagli:nemici), intercessione (heal), anatema
+  (curse). NESSUNA primitiva nuova - il campo 'preghiera' su un'abilita' e'
+  flavour, l'effetto vero lo fanno le sue primitive.
+- tools/validate_data.py: carica entrambi i vocabolari (dopo ownership.json);
+  errore se 'effetti'/'preghiere' e' vuoto o > 6 voci (chiuso); per ogni
+  preghiera 'primitiva' dev'essere del registro. valid_tribulation_effects /
+  valid_prayer_effects disponibili per US-710/US-714.
+- tests/test_endgame_vocab.gd (NUOVO, 2 test): tribulation_effects chiuso e
+  non vuoto, ogni voce ha _comment; ogni prayer_effect si appoggia a una
+  primitiva esistente (via GameData.get_primitive).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  720 test headless (718 + 2), tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (solo dati + validator + tests/test_endgame_vocab.gd).
+- BLOCCO 0 CHIUSO: US-701/702/703 (save 21->22, schema fusioni + 8 file stub,
+  2 vocabolari chiusi). Prossimo: BLOCCO A - US-704 cambio Pathway tra vicini.
+
+[2026-09-08] US-704 — Cambio Pathway solo tra vicini dello stesso gruppo. FASE 7, BLOCCO A.
+
+- scripts/pathway_change.gd (NUOVO autoload PathwayChange, in project.godot
+  subito dopo EndgameState — deps GameData/Progression/AbilityEngine/
+  EndgameState tutte gia' sopra). API:
+  * puo_cambiare(nuovo_pathway) -> bool: true SSE nuovo_pathway esiste nei
+    dati, e' diverso dall'attuale, ha lo STESSO campo 'group' del Pathway
+    corrente (letto da GameData.get_pathway, MAI un id hardcoded) e
+    Progression.sequence() <= soglia_sequenza.
+  * cambia(nuovo_pathway) -> Dictionary: { ok:true, da, a, sequenza,
+    conservate:[ability_id] } oppure { ok:false, reason } senza toccare
+    niente. reason: no_progression / stesso_pathway / no_gamedata /
+    pathway_inesistente / gruppo_diverso / troppo_presto.
+  * cambia: EndgameState.registra_cambio(vecchio); Progression.configura(
+    nuovo, STESSA Sequenza numerica); grant_permanente (AbilityEngine) delle
+    abilita' delle Sequenze conservate_da_sequenza..9 del vecchio Pathway
+    (restano lanciabili dal giocatore via is_granted/_permanenti); poi hook
+    opzionale get_node_or_null("/root/FusionEngine").applica_al_cambio se
+    esiste (lo aggancia US-705, assente ora).
+- data/balance.json: nuova sezione "cambio_pathway" { soglia_sequenza: 4,
+  conservate_da_sequenza: 7 }. I numeri stanno nei dati (FR-1), non nello
+  script. PLAUSIBILI, non bilanciati.
+- tests/test_pathway_change.gd (NUOVO, 4 test):
+  * Error Seq 4 -> Door: puo_cambiare true (stesso gruppo lord_of_mysteries,
+    Seq 4 <= 4).
+  * Error -> Death: puo_cambiare false, cambia -> reason "gruppo_diverso",
+    Progression.pathway() resta "error" (rifiuto non tocca niente).
+  * Error Seq 9 -> Door: reason "troppo_presto" (9 > 4).
+  * dopo cambia("door") da Error Seq 4: Progression su "door" Seq 4;
+    "error_scasso" in res.conservate; AbilityEngine.execute("error_scasso")
+    e execute("door_occultamento_totale") sul giocatore NON danno
+    "abilita_non_posseduta" (vecchia Seq 9 conservata + nuova Seq 4 posseduta).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  724 test headless (720 + 4), tutti verdi. Nessuna regressione.
+- File .gd toccati: scripts/pathway_change.gd (nuovo), project.godot (+autoload),
+  data/balance.json (+sezione), tests/test_pathway_change.gd (nuovo).
+  AbilityEngine.execute / _esegui_primitive NON toccati.
+- Prossima storia: US-705 - FusionEngine (compone le abilita' fuse dai dati).
+
+[2026-09-08] US-705 — FusionEngine (compone le abilita' fuse dai dati). FASE 7, BLOCCO A.
+
+- scripts/fusion_engine.gd (NUOVO autoload FusionEngine, in project.godot
+  dopo PathwayChange). API:
+  * percorso(pathway_x, pathway_y) -> Dictionary: scorre GameData.fusion_ids(),
+    ritorna il doc del file la cui {pathway_a, pathway_b} combacia in
+    QUALSIASI ordine; {} se non esiste o e' stub. Nessun id di coppia nel
+    codice.
+  * abilita_fuse(pathway_x, pathway_y) -> Array: le voci abilita_fuse del
+    percorso, gia' nella forma id/name_i18n/primitive/tag_sinergia. [] per
+    stub/inesistente.
+  * applica_al_cambio(vecchio, nuovo) -> Array: per ogni abilita fusa
+    non-stub -> AbilityEngine.grant_permanente + EndgameState.aggiungi_fusione;
+    segnale fusione_concessa(percorso_id, abilita). [] se stub.
+    PathwayChange.cambia lo chiama gia' (hook opzionale aggiunto in US-704).
+- scripts/game_data.gd:
+  * DIR_FUSIONS + _load_fusions(): _fusions[id] = doc del percorso; per i
+    percorsi NON stub, ogni voce abilita_fuse entra in _fusion_abilities per
+    il suo id "fus_*". _prune su entrambi (reload-safe).
+  * get_ability(id): se non e' in _abilities, fallback su _fusion_abilities.
+    Ramo separato: un id fus_* non e' legato a una Sequenza e NON finisce in
+    ability_ids()/ability_count() (i loop del validator sulle Sequenze non lo
+    vedono).
+  * get_fusion(id) / fusion_ids() nuovi.
+- AbilityEngine.execute / _esegui_primitive NON toccati: un'abilita fusa ha
+  il campo "primitive" e passa dal motore normale. Il giocatore la lancia
+  perche' grant_permanente la mette in _permanenti (is_granted -> true).
+- tests/test_fusion.gd (+4 test): ordine dei due Pathway non conta;
+  percorso stub (hermit_paragon) -> {} e abilita_fuse -> []; coppia fuori
+  gruppo (error/death) -> {}; ogni abilita fusa di un percorso non-stub
+  risolve via GameData.get_ability (vale dopo US-706, ora itera a vuoto).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  728 test headless (724 + 4), tutti verdi. Nessuna regressione (test_game_data
+  invariato: le abilita fuse non entrano nei conteggi).
+- File .gd toccati: scripts/fusion_engine.gd (nuovo), scripts/game_data.gd
+  (+_load_fusions +get_ability fallback +get_fusion/fusion_ids),
+  project.godot (+autoload), tests/test_fusion.gd.
+- Prossima storia: US-706 - percorso di fusione completo error -> door.
+
+[2026-09-08] US-706 — Percorso di fusione completo: error -> door. FASE 7, BLOCCO A.
+
+- data/fusions/door_error.json: stub:false, 6 abilita fuse (da_sequenza
+  9/9/8/8/7/7 = le Sequenze conservate al cambio). Concept: il ladro che ruba
+  DOVE sei, non cosa.
+  * fus_door_error_furto_dislocato (9): steal(oggetto) + teleport(visuale)
+  * fus_door_error_grimaldello_spaziale (9): steal(oggetto, non_sottrae) +
+    terrain_modify(apre_varco)
+  * fus_door_error_refurtiva_scambiata (8): steal(oggetto) + teleport
+  * fus_door_error_nota_dislocata (8): steal(abilita door_passo_breve,
+    non_sottrae) + teleport
+  * fus_door_error_soglia_rubata (7): steal(conoscenza) +
+    terrain_modify(varco_forzato, permanente:true)
+  * fus_door_error_colpo_tra_le_porte (7): teleport + steal(oggetto)
+  Solo primitive del registro attivo (steal, teleport, terrain_modify — tutte
+  implemented). Ogni abilita: id ^fus_door_error_, name_i18n ^ability.fusion.,
+  >= 2 tag_sinergia dal vocabolario.
+- i18n: 6 chiavi "ability.fusion.fus_door_error_*" aggiunte a data/i18n/it.json
+  con traduzione vera (non TODO). generate_i18n_stubs.py rilanciato: le
+  raccoglie verbatim (ramo generico walk(), nessuna canonicalizzazione dato
+  che non sono in /pathways/ ne' /abilities/). data/i18n/en.json resta a 0
+  chiavi (catalogo incompleto per scelta di progetto, come dalle fasi 1-6).
+- VFX: nessun campo dedicato. Il renderer per-primitiva (Vfx, US-226) copre
+  steal/teleport/terrain_modify (test_vfx lo verifica gia'); Door ed Error
+  condividono la palette lord_of_mysteries. Dichiarato nella 'note' del file.
+- GameData._load_fusions (US-705) ora indicizza le 6 abilita in
+  _fusion_abilities: get_ability("fus_door_error_*") le risolve.
+- tests/test_fusion.gd (+2 test):
+  * test_door_error_non_e_piu_stub: stub false, >= 5 abilita, ogni name_i18n
+    ha una traduzione vera (GameData.has_translation).
+  * test_ogni_abilita_fusa_door_error_esegue...: caster con Stats Seq 5, per
+    ogni abilita fusa AbilityEngine.execute -> ok:true e nessun warning che
+    inizia con "primitiva fuori registro".
+  Il test US-705 test_ogni_abilita_fusa_non_stub_risolve_come_abilita ora ha
+  denti (door_error e' non-stub).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati,
+  TODO i18n 42 -> 42: le 6 chiavi nuove sono traduzioni vere). 730 test
+  headless (728 + 2), tutti verdi. Nessuna regressione (test_i18n_data,
+  test_vfx invariati).
+- File .gd toccati: nessuno (dati + i18n + tests). AbilityEngine intatto.
+- Prossima storia: US-707 - gli altri 7 percorsi come stub + check validator.
+
+[2026-09-08] US-707 — Gli altri 7 percorsi come stub + check del validator. FASE 7, BLOCCO A.
+
+- I 7 file stub (darkness_death, darkness_twilight_giant, death_twilight_giant,
+  door_fool, error_fool, hermit_paragon, moon_mother) esistono da US-702:
+  stub:true, abilita_fuse:[], 'note' col concept in una riga. Il check del
+  validator (warning "N percorsi di fusione su 8 sono stub"; errore se un
+  percorso possibile manca del tutto o se ce n'e' uno non atteso) e' gia' in
+  tools/validate_data.py da US-702. FusionEngine.percorso() ritorna {} per uno
+  stub, applica_al_cambio() ritorna [] (US-705).
+- Questa storia aggiunge le PROVE del comportamento:
+  * tests/test_fusion.gd test_gli_altri_7_percorsi_sono_stub_dichiarati_con_una_nota:
+    ogni percorso != door_error ha stub:true, abilita_fuse vuoto, note non vuota.
+  * tests/test_pathway_change.gd test_cambio_verso_percorso_stub_riesce_senza_fusioni:
+    Hermit Seq 4 -> Paragon (percorso hermit_paragon, stub): cambia() -> ok:true,
+    Progression su "paragon", res.conservate non vuoto, EndgameState.fusioni
+    resta []. Il cambio verso un vicino funziona anche senza percorso scritto:
+    conserva le abilita basse, solo non concede abilita fuse.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  732 test headless (730 + 2), tutti verdi. Nessuna regressione.
+- File .gd toccati: nessuno (solo tests).
+- Prossima storia: US-708 - pagina del libro per il cambio di Pathway.
+
+[2026-09-08] US-708 — Pagina del libro per il cambio di Pathway. FASE 7, BLOCCO A.
+
+- scripts/pages/page_diagramma_pathway.gd: nuova sezione _sezione_fusione(),
+  chiamata in coda a aggiorna() dopo l'elenco delle abilita della Sequenza
+  corrente. Mostra:
+  * "Fondere il Pathway  Gruppo: <group>" (il group del Pathway corrente).
+  * per ogni Pathway con lo STESSO campo `group` e != quello corrente: nome
+    (tr_data) + stato: "percorso rivelato" se FusionEngine.percorso(mio, pid)
+    non e' vuoto, altrimenti "ancora da rivelare" con la label modulata come
+    le celle ignote del diagramma (fog of war, come chiede l'AC).
+  * se PathwayChange.puo_cambiare(pid): Button "Fondi verso qui" ->
+    fondi(pid) -> PathwayChange.cambia + aggiorna(). Altrimenti label
+    "Troppo presto: avanza ancora".
+  * se non ci sono vicini: "Nessun vicino verso cui fondere".
+  Nessun nome di Pathway hardcoded: solo id, GameData.tr_data e chiavi HUD.
+- assets/i18n/strings.csv: +7 chiavi BOOK_DIAGRAMMA_FUSIONE_* (it + en).
+  strings.it/en.translation rigenerati con
+  `Godot --headless --import` (i .translation sono binari versionati).
+- Metodi interrogabili nuovi: vicini_fondibili() -> [{id, scritto, puo}];
+  fondi(nuovo_pathway) -> Dictionary (esito di PathwayChange.cambia).
+- tests/test_page_diagramma.gd (+4 test):
+  * TG Seq 4: vicini_fondibili contiene darkness+death (stesso gruppo), non
+    error; ogni vicino puo=true.
+  * TG Seq 9: ogni vicino puo=false (troppo presto).
+  * Error Seq 4: door scritto=true (percorso door_error, US-706),
+    fool scritto=false (stub).
+  * TG Seq 4: pag.fondi("death") -> ok:true, Progression.pathway()=="death".
+- Verifica a schermo: _shot_us708.gd (rendering reale, non headless, poi
+  rimosso). La pagina mostra la griglia 10x10, "Error · Sei qui: S4 · saint",
+  le abilita, "Fondere il Pathway  Gruppo: lord_of_mysteries",
+  "Door — percorso rivelato  [Fondi verso qui]". vicini_fondibili() a schermo
+  = [{door, scritto:true, puo:true}, {fool, scritto:false, puo:true}].
+  NOTA: la pagina del libro non e' scrollabile (debito pre-esistente); con una
+  Sequenza bassa la sezione fusione finisce sotto il viewport. Il contenuto e'
+  corretto e testato; il layout va rivisto in manutenzione (non blocca la
+  storia: il criterio e' "mostra i vicini e cosa otterrei", verificato).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  736 test headless (732 + 4), tutti verdi. Nessuna regressione (gli altri
+  test di test_page_diagramma passano; Progression ripristinata a fine test).
+- File .gd toccati: scripts/pages/page_diagramma_pathway.gd (+sezione),
+  tests/test_page_diagramma.gd. + assets/i18n/strings.csv e i 2 .translation.
+- Prossima storia: US-709 - CHECKPOINT slice del cambio Pathway + verdetto.
+
+[2026-09-08] US-709 — CHECKPOINT: slice del cambio Pathway + verdetto. FASE 7, BLOCCO A CHIUSO.
+
+- tests/test_slice_fase_7.gd (NUOVO, 2 test — US-720 lo estende col ciclo
+  completo):
+  1. test_error_seq4_diventa_door_seq4_con_abilita_basse_e_fuse:
+     personaggio Error Seq 4. Il test NON nomina "door": scorre pathway_ids,
+     prende il vicino con lo stesso `group` di Error e un percorso di fusione
+     NON vuoto (FusionEngine.percorso). PathwayChange.cambia(vicino) -> ok;
+     Progression su quel Pathway, Sequenza 4 invariata; error_scasso (Error
+     Seq 9) NON e' "abilita_non_posseduta"; la prima abilita fusa e' in
+     EndgameState.fusioni ed esegue con ok:true e nessun warning "primitiva
+     fuori registro".
+  2. test_nessun_codice_nomina_un_pathway_o_una_fusione:
+     grep di res://scripts e res://scripts/pages. vietati: i 10 id di Pathway
+     fra virgolette, "fus_", "door_error", "error_door". Commenti esclusi
+     (split su "#"). UNA eccezione: enemy.gd riproduce l'ANIMAZIONE "death"
+     (riproduci ...), non il Pathway. Risultato: 0 occorrenze.
+  prepara() rimuove i nodi rimasti nel gruppo "player" da altri suite:
+  AbilityEngine.grant_permanente aggancia get_first_node_in_group("player"),
+  il checkpoint deve partire pulito.
+
+- VERDETTO: IL CAMBIO PATHWAY E' DATI.
+  git diff del blocco A, file .gd NON di test (caa4275..HEAD):
+    * scripts/fusion_engine.gd       NUOVO  (62 righe) - nessun id di coppia
+    * scripts/pathway_change.gd      NUOVO  (123 righe) - la relazione "vicini"
+      e' il campo `group`, mai un id
+    * scripts/game_data.gd           +52 -1 - _load_fusions, get_ability con
+      fallback su _fusion_abilities, get_fusion/fusion_ids
+    * scripts/pages/page_diagramma_pathway.gd  +72 - la sezione UISOLO id +
+      tr_data + chiavi HUD
+  AbilityEngine.execute / _esegui_primitive NON modificati:
+    git log caa4275..HEAD -- scripts/ability_engine.gd  ->  (vuoto)
+  Un'abilita fusa e' un'abilita come le altre: ha il campo "primitive", passa
+  dal dispatcher tipo->handler intatto, il giocatore la lancia perche'
+  grant_permanente la mette in _permanenti.
+
+- Come verificato: python tools/validate_data.py exit 0 (3 warning invariati).
+  738 test headless (736 + 2), tutti verdi. Nessuna regressione
+  (test_slice_fase_5b, test_progression, test_pathway_change, test_page_diagramma
+  tutti verdi).
+- File .gd toccati: tests/test_slice_fase_7.gd (nuovo).
+
+=== BLOCCO A CHIUSO (2026-09-08) ===
+US-704..709. Cambio Pathway tra vicini dello stesso gruppo (PathwayChange),
+FusionEngine (compone le abilita fuse da data/fusions/), percorso door_error
+completo (6 abilita fuse), 7 percorsi stub dichiarati, pagina del libro,
+checkpoint superato. 738 test (erano 720 a inizio fase 7). Save invariato in
+questo blocco (endgame gia' a v22 da US-701). AbilityEngine intatto.
+Prossimo: BLOCCO B - US-710 tribulation.schema.json + data/tribulations/.
+
+[2026-09-08] US-710 — tribulation.schema.json + data/tribulations/. FASE 7, BLOCCO B.
+
+- data/schema/tribulation.schema.json (NUOVO, additionalProperties:false):
+  id ^trib_, name_i18n/descrizione_i18n ^tribulation., salto {da in [7,5,3,1],
+  a in [6,4,2,0]}, condizioni[] (enum = i tipi di conditions.gd, NESSUN tipo
+  nuovo), mentre_in_corso (chiave di tribulation_effects.json), superamento
+  ({evento, filtri, target>=1} XOR {flag}).
+- data/tribulations/: 4 file, uno per salto di fascia:
+  * trib_7_6: mentre nemici_rinforzati; superamento area_cleared x2.
+  * trib_5_4: mentre spiritualita_dimezzata; superamento npc_influenced x3.
+  * trib_3_2: mentre follia_accelerata; superamento flag
+    "tribolazione_doran_affrontato".
+  * trib_1_0: mentre notte_perenne; superamento flag
+    "tribolazione_soglia_varcata" (US-712 lo pone da un dialogo antagonista).
+  condizioni: un solo tier_min della fascia (low/mid/saint/angel) - sempre
+  vero a quella Sequenza, documenta il requisito senza hard-bloccare.
+- tools/validate_data.py: nuova sezione "tribolazioni" dopo "percorsi di
+  fusione". Controlla: salto.da/a e' un salto di fascia; condizioni.tipo nel
+  vocabolario TRIB_COND (= tutti i tipi di conditions.gd); superamento ha
+  evento XOR flag; evento nei 12 tracked_events; target>=1 se evento;
+  mentre_in_corso in tribulation_effects.json; UNA sola tribolazione per
+  salto; errore se ne manca una.
+- scripts/game_data.gd: DIR_TRIBULATIONS + _load_tribulations() (_tribulations
+  per id, _prune reload-safe); get_tribulation(id), tribulation_ids(),
+  tribulation_per_salto(da) -> la tribolazione del salto che parte da `da`.
+- i18n: 8 chiavi tribulation.* generate come stub "TODO ..." da
+  generate_i18n_stubs.py (TODO 42 -> 50). US-712 le traduce.
+- tests/test_tribulation.gd (NUOVO, 2 test): una tribolazione per ogni salto
+  di fascia (e nessuna per 8->7 / 2->1); ogni tribolazione risolve
+  mentre_in_corso (vocabolario), superamento evento XOR flag, evento nei 12.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning: +8 TODO
+  i18n, gli altri invariati). 740 test headless (738 + 2), tutti verdi.
+  Nessuna regressione (test_data_valida verde: il validator esce 0).
+- File .gd toccati: scripts/game_data.gd (+_load_tribulations +3 getter).
+- Prossima storia: US-711 - TribulationSystem (lettore, blocca l'avanzamento).
+
+[2026-09-08] US-711 — TribulationSystem (lettore, blocca l'avanzamento). FASE 7, BLOCCO B.
+
+- scripts/tribulation_system.gd (NUOVO autoload TribulationSystem, in
+  project.godot dopo Madness). Lettore di eventi + flag, nessun verbo proprio:
+  * _ready: si connette a Progression.sequence_changed (arrivando a Seq 7/5/3/1
+    -> attiva la prova di quel salto), EventTracker.evento_emesso e
+    KnowledgeStore.appreso -> _ricalcola_progresso.
+  * _ricalcola_progresso scansiona TUTTI i salti non superati: una prova puo'
+    essere passata anche PRIMA di essere "attiva" (il flag/l'evento c'e' gia').
+    Al 100% -> EndgameState.segna_tribolazione(da) + (se era l'attiva) toglie
+    l'handicap; emette tribolazione_superata.
+  * API: tribolazione_per(da), avanzamento_bloccato(da) (dati non vuoti AND
+    non superata), superata(da), attiva(da), stato() {in_corso, da, superata,
+    progresso}, moltiplicatore_spawn()/sequenza_bloccata() (handicap esposti),
+    marca_superate_tutte()/azzera() (test/debug).
+  * Effetti mentre_in_corso:
+    - follia_accelerata: _process aggiunge Madness (delta_al_minuto /60 * dt,
+      default 1.5 da tribulation_effects.json).
+    - spiritualita_dimezzata: modifier "tribolazione:spiritualita_dimezzata"
+      = -(1-mult)*spiritualita_max_base sul giocatore; tolto al superamento.
+    - notte_perenne: TimeSystem.forza_momento("notte_fonda").
+    - nemici_rinforzati / abilita_bloccate: esposti come query, nessun
+      consumatore live (come l'audio-come-spec di fase 6).
+- scripts/time_system.gd: forza_momento(m)/libera_momento()/momento_forzato().
+  _ricalcola non tocca _momento_corrente finche' _momento_forzato e' impostato
+  (il ciclo lunare e il tick continuano).
+- scripts/progression.gd: avanza() all'inizio -> se
+  TribulationSystem.avanzamento_bloccato(_sequence) ritorna false (rifiuto).
+- scripts/potion_system.gd bevi(): completo|forza + tribolazione aperta ->
+  { ok:false, reason:"tribolazione_in_corso" }, pozione NON sprecata.
+- scripts/ritual_system.gd avvia(): stesso rifiuto prima di partire.
+- endgame.tribolazioni_superate: gia' serializzato (US-701), round-trip OK.
+- 5 test pre-esistenti attraversano un salto di fascia senza riguardare le
+  tribolazioni (test_advancement_gate, test_narrativa, test_slice_fase_5,
+  test_slice_fase_5b, test_vertical_slice): chiamano
+  TribulationSystem.marca_superate_tutte() in prepara(). E' un aggiornamento
+  legittimo - quei test ora modellano il gioco vero, non una regressione.
+- tests/test_tribulation_system.gd (NUOVO, 4 test):
+  * 3->2 bloccato finche' il flag di superamento non e' posto; poi avanza e
+    endgame.tribolazioni_superate contiene 3.
+  * 5->4: superamento npc_influenced x3, il progresso arriva a 1.0 col tracker.
+  * follia_accelerata: la follia sale in _process mentre la prova e' aperta,
+    si ferma dopo il superamento.
+  * round-trip nel save (snapshot -> pulisci -> applica -> superata torna).
+- NOTA rule 3 (CLAUDE.md): 5 file .gd non di test toccati (> ~4). Sono tutti
+  guard clause piccole di una feature coesa (il gate della tribolazione).
+  Segnalato, non spezzato.
+- Come verificato: python tools/validate_data.py exit 0. 744 test headless
+  (740 + 4), tutti verdi. Nessuna regressione (i 5 test aggiornati passano).
+- File .gd toccati: scripts/tribulation_system.gd (nuovo), progression.gd,
+  potion_system.gd, ritual_system.gd, time_system.gd, project.godot (+autoload)
+  + 5 test.
+- Prossima storia: US-712 - le 4 tribolazioni di contenuto (i18n + flag antagonista).
+
+[2026-09-08] US-712 — Le 4 tribolazioni di contenuto. FASE 7, BLOCCO B.
+
+- i18n reale (name + descrizione) per tutte e 8 le chiavi tribulation.* in
+  data/i18n/it.json: 0 TODO su tribulation.*. Temi:
+  * trib_7_6 "La citta' non basta piu'" - superamento area_cleared x2,
+    mentre nemici_rinforzati.
+  * trib_5_4 "Le fazioni prendono posizione" - npc_influenced x3,
+    mentre spiritualita_dimezzata.
+  * trib_3_2 "Doran sa" - flag tribolazione_doran_affrontato,
+    mentre follia_accelerata.
+  * trib_1_0 "La soglia" - flag tribolazione_soglia_varcata,
+    mentre notte_perenne.
+- I due flag sono posti da un DIALOGO (nessun verbo nuovo):
+  * data/dialogues/dlg_doran.json: scelta nuova in n1 (condizioni
+    tier_min:saint) -> emit npc_influenced:intimidito + flag
+    tribolazione_doran_affrontato, goto n3. A tier basso la scelta e' nascosta
+    (DialogueEngine), quindi test_dialoghi_roster non cambia.
+  * data/dialogues/dlg_antagonista.json (NUOVO): UN solo grafo generico per
+    l'antagonista di OGNI Pathway (NON 22). Il colore del Pathway arriva dal
+    nome in antagonisti.json mostrato come speaker; il testo resta generico.
+    n1 -> scelta "Sono venuto a prendere cio' che era tuo" (condizioni
+    tier_min:angel) pone tribolazione_soglia_varcata, goto n2 -> congedo.
+  * data/npc/roster.json: +npc_antagonista (region frontiera_porte, schedule
+    notte_fonda@soglia, faction null, dialogue_id dlg_antagonista,
+    name/role_i18n npc.antagonista.*). Roster 18 -> 19.
+- tools/validate_data.py: nella sezione tribolazioni raccoglie i
+  superamento.flag in trib_flags; dopo la costruzione di flag_scritti
+  (dialoghi + quest) verifica che ogni flag di superamento sia scritto da un
+  dialogo o una quest - errore altrimenti. Stesso contratto delle quest.
+- tests/test_tribulation.gd (+2 test): ogni tribolazione ha name/descrizione
+  tradotte (non TODO) e condizioni con un tipo; ogni superamento.flag e'
+  posto da un effetto 'flag' in dlg_doran o dlg_antagonista.
+  tests/test_npc_system.gd: 18 -> 19 (npc_antagonista).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning, TODO i18n
+  torna a 42 = baseline). 746 test headless (744 + 2), tutti verdi. Nessuna
+  regressione (test_dialoghi_roster, test_narrativa, test_npc_system verdi).
+- File toccati: data/tribulations/*.json (gia' di US-710, i18n a parte),
+  data/i18n/it.json (+16 chiavi), data/dialogues/dlg_doran.json (+1 scelta),
+  data/dialogues/dlg_antagonista.json (nuovo), data/npc/roster.json
+  (+npc_antagonista), tools/validate_data.py (+riconciliazione flag),
+  tests/test_tribulation.gd, tests/test_npc_system.gd. Nessuno script .gd.
+- Prossima storia: US-713 - overlay del libro per la tribolazione in corso.
+
+[2026-09-08] US-713 — Overlay del libro per la tribolazione in corso. FASE 7, BLOCCO B CHIUSO.
+
+- scripts/tribulation_overlay.gd + scenes/tribulation_overlay.tscn (CanvasLayer
+  layer 85, sotto la follia; Panel centrato in alto + VBox di 4 Label),
+  aggiunto a scenes/main.tscn (load_steps 10->11).
+  Mostra: Nome (GameData.tr_data del name_i18n), Descrizione (tr_data del
+  descrizione_i18n), Effetto (tr("TRIB_OVERLAY_EFFETTO") + tr("TRIB_EFFETTO_" +
+  mentre_in_corso.to_upper())), Progresso ("Progresso N%").
+  Reattivo dal vivo: _ready si connette a TribulationSystem
+  tribolazione_attivata / progresso_cambiato / tribolazione_superata;
+  _sincronizza() riallinea allo stato corrente al boot/load (stato()).
+  Nascosto (_pannello.visible=false) quando nessuna prova e' in corso.
+- assets/i18n/strings.csv: +7 chiavi (TRIB_OVERLAY_EFFETTO, TRIB_OVERLAY_PROGRESSO,
+  TRIB_EFFETTO_FOLLIA_ACCELERATA / SPIRITUALITA_DIMEZZATA / NEMICI_RINFORZATI /
+  ABILITA_BLOCCATE / NOTTE_PERENNE) it+en. .translation rigenerati
+  (Godot --headless --import).
+- Metodi interrogabili: visibile(), stato_mostrato() {da, nome, descrizione,
+  effetto, progresso}.
+- FIX trovato: il parametro di _on_superata si chiamava _da e faceva shadow
+  del membro _da: l'overlay non si nascondeva al superamento. Rinominato
+  _salto.
+- tests/test_tribulation_overlay.gd (NUOVO, 3 test):
+  * nascosto senza prova in corso.
+  * attiva(5) -> visibile; stato_mostrato().nome == tr_data(trib_5_4.name_i18n),
+    descrizione ed effetto non vuoti.
+  * emit npc_influenced x1 -> progresso 1/3 dal vivo; x3 -> superata ->
+    overlay sparisce.
+- Verifica a schermo: scriptata (test headless), come per le primitive di
+  fase 5/5b. Il render windowed non produce cattura in questo ambiente
+  (nessun display); il contenuto e il toggle sono verificati dai 3 test.
+- Come verificato: python tools/validate_data.py exit 0. 749 test headless
+  (746 + 3), tutti verdi. Nessuna regressione.
+- File toccati: scripts/tribulation_overlay.gd (nuovo),
+  scenes/tribulation_overlay.tscn (nuovo), scenes/main.tscn (+istanza),
+  assets/i18n/strings.csv + .translation, tests/test_tribulation_overlay.gd.
+
+=== BLOCCO B CHIUSO (2026-09-08) ===
+US-710..713. tribulation.schema.json + 4 file dati, TribulationSystem (lettore
+di eventi + flag che blocca Progression.avanza ai salti di fascia 7/5/3/1),
+4 tribolazioni di contenuto con i18n reale + 2 flag da dialoghi (dlg_doran +
+dlg_antagonista nuovo), overlay reattivo. 749 test (erano 720 a inizio fase 7).
+Save invariato (endgame gia' a v22). Prossimo: BLOCCO C - US-714 preghiere.
+
+=== US-714: preghiere delle Sequenze alte (2026-09-09) ===
+- ability.schema.json: campo opzionale 'preghiera' (retro-compatibile, solo
+  documentazione: il validator non usa jsonschema, e' Python bespoke).
+- tools/validate_data.py: se 'preghiera' e' presente deve stare nel
+  vocabolario di prayer_effects.json (US-703) E l'abilita' deve portare
+  davvero la primitiva/bersagli che quella voce richiede (non solo
+  appartenenza al vocabolario: coerenza dichiarativa).
+- 6 abilita' nuove di Sequenza 1/0, una per Pathway, sparse sui 4 gruppi:
+  * darkness_anatema_del_vuoto (darkness_0): curse(sfortuna, riusato) +
+    debuff_stat. preghiera: anatema.
+  * tg_giuramento_del_crepuscolo (twilight_giant_0): aura(autorita_decadimento,
+    riusato da death_autorita_finale) su nemici. preghiera: voto_di_autorita.
+  * death_benedizione_dei_caduti (death_1): aura(comando_non_morti, riusato
+    da death_legione) su evocati. preghiera: benedizione_seguaci.
+  * hermit_intercessione_arcana (hermit_1): heal su self. preghiera:
+    intercessione.
+  * mother_benedizione_della_covata (mother_1): aura(area_viva, riusato
+    dall'Harvest Priest) su evocati. preghiera: benedizione_seguaci.
+  * door_anatema_del_varco (door_1): curse(varco_sigillato, NUOVO status in
+    status_effects.json, tag 'spazio') + debuff_stat. preghiera: anatema.
+- darkness_0 e twilight_giant_0 avevano solo 1 abilita': ora 2, nessuna
+  eccezione al conteggio. death_1/hermit_1/mother_1/door_1 passano da 2 a 3
+  (Sequenze angel): eccezione ammessa dall'AC, motivata nella 'note' di ogni
+  abilita' (US-714 la aggiunge come 3a, non sostituisce le 2 esistenti).
+- i18n: 6 chiavi in data/i18n/it.json. en.json resta {} (non validato).
+- tests/test_prayer.gd NUOVO: esecuzione senza warning delle 6 abilita' +
+  il campo preghiera esposto da GameData.get_ability combacia col
+  vocabolario chiuso.
+- Regressione trovata e corretta: tests/test_slice_fase_5.gd contava
+  esattamente 20 abilita' di Death (2 per Sequenza, checkpoint di fase 5).
+  Aggiornato a 21 con una nota che spiega la 21esima (US-714).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning
+  invariati). 751 test headless (749 + 2), tutti verdi.
+- File toccati: data/schema/ability.schema.json, tools/validate_data.py,
+  data/status_effects.json, data/abilities/{darkness,twilight_giant,death,
+  hermit,mother,door}.json, data/pathways/{darkness,twilight_giant,death,
+  hermit,mother,door}.json, data/i18n/it.json, tests/test_prayer.gd (nuovo),
+  tests/test_slice_fase_5.gd.
+
+=== US-715: siti rituali di Sequenza 0 (2026-09-09) ===
+- data/schema/location_tags.json: 4 tag nuovi, uno per GRUPPO (non per
+  Pathway): soglia_del_crepuscolo (eternal_darkness), radice_del_mondo
+  (goddess_of_origin), biblioteca_di_tutto (demon_of_knowledge),
+  porta_senza_stanza (lord_of_mysteries). Motivazione nel _comment del file.
+- data/world/regions.json: ogni tag aggiunto alla regione del proprio
+  gruppo (marche_crepuscolo, valle_madre, archivio_sepolto, frontiera_porte).
+- I 10 Pathway ATTIVI: advancement_ritual.location_tags della Sequenza 0
+  sostituito col tag del gruppo. Prima alcuni erano generici e ospitati
+  dalla citta' neutra invece che dalla regione del gruppo (es. Hermit aveva
+  'archivio', ospitato solo da 'mirwada', non da 'archivio_sepolto').
+  Coerenza con l'antagonista (data/lore/antagonisti.json, US-620) gia'
+  presente nei testi: es. Twilight Giant "il trono in cima alle Marche" ->
+  soglia_del_crepuscolo in marche_crepuscolo; Hermit "l'Archivio Sepolto" ->
+  biblioteca_di_tutto in archivio_sepolto. eternal_darkness e
+  lord_of_mysteries condividono ora lo stesso sito fra i loro Pathway,
+  coerente col cambio Pathway di fase 7 (fonde solo vicini dello stesso
+  gruppo).
+- Scope: SOLO i 10 Pathway attivi. I 12 differiti (data/pathways_deferred/)
+  appartengono a gruppi fuori dai 4 attivi e sono interamente stub: fuori
+  scope, coerente con come le fasi precedenti trattano il differito.
+- tests/test_regions.gd: NUOVO test_ritual_di_sequenza_0_ospitato_da_una_regione
+  (itera i 10 Pathway attivi via GameData.pathway_ids(), verifica che ogni
+  location_tag della Sequenza 0 sia ospitato da almeno una regione).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning
+  invariati). 752 test headless (751 + 1), tutti verdi.
+- File toccati: data/schema/location_tags.json, data/world/regions.json,
+  data/pathways/{darkness,death,twilight_giant,hermit,paragon,mother,moon,
+  fool,error,door}.json, tests/test_regions.gd.
+
+=== BLOCCO C CHIUSO (2026-09-09) ===
+US-714..715. Preghiere delle Sequenze alte (6 abilita' nuove, campo
+'preghiera' puramente semantico) + siti rituali di Sequenza 0 spostati dai
+tag generici ai 4 siti di gruppo, coerenti con l'antagonista e col cambio
+Pathway di fase 7. 752 test (erano 749 a fine Blocco B). Save invariato.
+Prossimo: BLOCCO D - US-716 finali (data/endings.json).
+
+=== RICHIESTA UTENTE: fog of war sui nomi di Sequenza (2026-09-09, APERTA) ===
+L'utente ha chiesto di sistemare i nomi delle Sequenze: non tutte le fasce
+hanno lo stesso nome, e il giocatore deve poter conoscere al massimo il nome
+della Sequenza successiva alla propria, mai delle altre (che restano
+nascoste). Investigazione fatta PRIMA di agire (nessuna modifica al gioco
+ancora):
+- Controllati i campi 'name' di tutte le Sequenze dei 10 Pathway attivi
+  (data/pathways/*.json): sono GIA' tutti distinti e corretti (100 nomi
+  unici, corrispondono al prospetto canonico che l'utente ha allegato in
+  chat - es. Twilight Giant 9=Warrior...0=Twilight Giant). Non c'e' nulla
+  da correggere nei dati.
+- Il gap reale e' nella pagina diagramma del libro
+  (scripts/pages/page_diagramma_pathway.gd, fase 2 US-224): il fog of war
+  sulla griglia gia' funziona (colonna propria nota fino alla Sequenza
+  corrente, resto ignoto salvo flag KnowledgeStore), ma la griglia non
+  mostra MAI il testo del nome di una Sequenza (solo celle colorate) e non
+  esiste alcuna eccezione che riveli il nome della Sequenza immediatamente
+  successiva alla propria.
+- Regola aggiunta a CLAUDE.md (sezione "Fog of war sulla conoscenza — nomi
+  di Sequenza") cosi' resti scritta anche se questa sessione si interrompe.
+- Piano proposto (NON ancora implementato, in attesa di conferma dell'utente
+  in chat): in page_diagramma_pathway.gd aggiungere uno stato "prossima" a
+  _stato() per (mio, mia_seq - 1) quando esiste (mia_seq > 0), mostrarne SOLO
+  il nome (tr_data del campo name_i18n della Sequenza) in una riga nel
+  pannello di dettaglio sotto la Sequenza corrente, senza abilita' ne' altri
+  dati. Nessuna primitiva/vocabolario nuovo, un file + una chiave i18n + un
+  test in tests/test_book_ui.gd (o dove gia' testata questa pagina).
+
+=== IMPLEMENTATO: fog of war sui nomi di Sequenza (2026-09-09) ===
+Controllo di sicurezza PRIMA di agire (chiesto esplicitamente dall'utente):
+grep su tutto il repo per "noto"/"ignoto"/"corrente" -> solo
+page_diagramma_pathway.gd e il suo test le usano, nessun altro codice ne
+dipende. Controllato l'AC originale di US-224 (fase 2): non vieta ne'
+richiede questa eccezione, e' una precisazione legittima. Controllato US-719
+(fase 7, Blocco D, non ancora implementata): eredita SOLO i flag espliciti
+di KnowledgeStore, mai lo stato "vissuto" della Sequenza corrente -> la
+"prossima" doveva restare fuori da KnowledgeStore per non essere ereditata
+per errore da un nuovo personaggio. Controllato che GameData.get_sequence(id)
+gia' esiste e restituisce il dizionario con name_i18n: nessun nuovo metodo.
+Nessun test esistente assumeva "ignoto" proprio sulla cella (mio, seq-1).
+
+Implementazione in scripts/pages/page_diagramma_pathway.gd:
+- Nuovo stato "prossima" in _stato(): SOLO per (proprio Pathway, Sequenza
+  attuale - 1), e SOLO se nessun flag KnowledgeStore la rivela gia' per
+  intero (in quel caso resta "noto", reveal piu' ricco che vince).
+  A Sequenza 0 non c'e' prossima (mia_seq - 1 = -1, nessuna cella la
+  raggiunge: il range di n e' 9..0).
+- _prossima_nome (var interna) calcolato SOLO al render, mai scritto in
+  KnowledgeStore: non e' conoscenza appresa, e' un presagio del proprio
+  cammino. Non entra nell'eredita' di US-719.
+- Riga in piu' nel pannello di dettaglio: "<BOOK_DIAGRAMMA_PROSSIMA> <nome>",
+  mostra SOLO il nome (tr_data di name_i18n), mai abilita' o altri dati
+  della prossima Sequenza.
+- Colore dedicato C_PROSSIMA per la cella nella griglia (tra C_NOTO e
+  C_IGNOTO).
+- Getter prossima_sequenza_nome() interrogabile dai test.
+- assets/i18n/strings.csv: +1 chiave (BOOK_DIAGRAMMA_PROSSIMA) it+en,
+  .translation rigenerati (godot --headless --editor --quit-after 3).
+- tests/test_page_diagramma.gd: 3 test nuovi (rivela solo il nome della
+  Sequenza subito dopo, non quella dopo ancora; assente a Sequenza 0; non
+  scrive in KnowledgeStore).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning
+  invariati - nessuna modifica ai dati di gioco, solo UI/codice + i18n
+  chrome). 755 test headless (752 + 3), tutti verdi, nessuna regressione.
+- File toccati: scripts/pages/page_diagramma_pathway.gd,
+  assets/i18n/strings.csv + .translation, tests/test_page_diagramma.gd.
+
+=== US-716: ending.schema.json + data/endings.json (fase 7, Blocco D) ===
+data/schema/ending.schema.json (nuovo) + data/endings.json (3 voci:
+apoteosi, consumazione, rinuncia). Decisioni prese durante l'investigazione
+(prima di scrivere): "Sequenza 0 raggiunta" = tier_min:god (ogni Seq 0
+attiva e' gia' tier 'god', zero condizioni nuove in conditions.gd, FR-9).
+"Rituale completato" = flag 'rituale_sequenza_0_completato' POSTO DAL
+CODICE in US-717 (EndingSystem ascolta RitualSystem.rituale_completato,
+controlla Progression.sequence()==0 DOPO l'avanzamento - il segnale porta
+la Sequenza di PARTENZA del rituale, non quella di arrivo) - esente dalla
+riconciliazione dialogo/quest che il validator impone agli altri flag.
+"Almeno un'Ancora viva" per Rinuncia non e' un tipo di condizione nuovo:
+sara' una regola generica in EndingSystem su eredita_profilo=='ancore',
+mai un id di finale nominato nel codice (FR-15). Flag 'pozione_distrutta'
+(Rinuncia): aggiunta una terza scelta al dialogo esistente dlg_antagonista
+(nodo n1, stessa condizione tier_min:angel della scelta 'varca' gia'
+scritta in US-712) - riuso del grafo unico, zero NPC/quest nuovi.
+epiloghi_per_gruppo: chiavi con suffisso _i18n (eternal_darkness_i18n
+ecc.) cosi' il validator R-12 le riconosce come riferimenti i18n.
+game_data.gd: PATH_ENDINGS + _load_single (stesso pattern di
+antagonisti.json) + get_endings()/get_ending(id).
+- tests/test_endings.gd NUOVO (4 test): i 3 id esatti; consumazione ha
+  priorita' piu' alta di apoteosi/rinuncia (FR-10, il game over vince);
+  ogni finale risolve name_i18n/eredita_profilo/condizioni/i 4 epiloghi,
+  tutti tradotti; i flag di condizione non esenti sono scritti da un
+  dialogo (stesso pattern di test_tribulation.gd).
+- Come verificato: python tools/validate_data.py exit 0 (3 warning
+  invariati). 759 test headless (755 + 4), tutti verdi.
+- File toccati: data/schema/ending.schema.json (nuovo), data/endings.json
+  (nuovo), data/dialogues/dlg_antagonista.json, data/i18n/it.json,
+  scripts/game_data.gd, tools/validate_data.py, tests/test_endings.gd
+  (nuovo).
+
+=== US-717: EndingSystem - valuta e sceglie (fase 7, Blocco D) ===
+scripts/ending_system.gd (NUOVO autoload, dopo KnowledgeStore in
+project.godot). valuta(): Conditions.tutte_soddisfatte(condizioni) su ogni
+finale + regola generica "eredita_profilo=='ancore' richiede
+AnchorSystem.active() non vuoto" (mai un id di finale nel codice, FR-15).
+Rivaluta live su 3 segnali: Madness.madness_changed, RitualSystem.
+rituale_completato, KnowledgeStore.appreso. Il flag
+'rituale_sequenza_0_completato' e' posto QUI, non da un dialogo: ho
+verificato in ritual_system.gd che rituale_completato(sequenza) porta la
+Sequenza di PARTENZA del rituale (catturata a inizio build, PRIMA di
+Progression.avanza), non quella di arrivo - quindi il controllo vero e'
+Progression.sequence()==0 DOPO l'avanzamento, non il parametro del
+segnale. _raggiungi(id): EndgameState.imposta_finale(id) (round-trip nel
+save gia' garantito da US-701) + segnale finale_raggiunto(id, gruppo) +
+Book.apri_a('colophon') (che gia' mette in pausa da solo). US-718 riempira'
+il colophon col contenuto vero del finale.
+- BUG trovato e corretto durante i test: _rivaluta() e' agganciata a
+  segnali live, quindi un test che spinge la follia a 100 fa scattare
+  _raggiungi() e mette in pausa l'albero (Book si apre). Senza richiudere
+  il libro a fine test, la pausa filtrava nella suite ALFABETICAMENTE
+  SUCCESSIVA (test_equipment.gd) e ne rompeva il round-trip del save (un
+  test apparentemente scollegato falliva). Fix: _fine() in ogni test di
+  test_ending_system.gd richiude il libro se rimasto aperto.
+- tests/test_ending_system.gd NUOVO (7 test): nessuna condizione -> '';
+  follia 100 -> consumazione; Seq 0 da sola non basta (serve anche il
+  rituale) -> apoteosi; entrambe insieme -> vince consumazione (priorita'
+  piu' alta, FR-10 il game over vince sempre); flag pozione_distrutta da
+  solo non basta (serve un'Ancora viva) -> rinuncia; il segnale
+  finale_raggiunto scrive endgame.finale e apre il libro; un finale gia'
+  raggiunto non si sovrascrive.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning
+  invariati). 766 test headless (759 + 7), tutti verdi.
+- File toccati: scripts/ending_system.gd (nuovo), project.godot,
+  tests/test_ending_system.gd (nuovo).
+
+=== US-718: schermata di finale nel libro (fase 7, Blocco D) ===
+Estensione del colophon (scripts/pages/page_impostazioni.gd) invece di un
+tipo di pagina nuovo: page_types.json e' un vocabolario chiuso ("va
+discusso"), estendere una pagina esistente lo evita - l'AC offriva
+esplicitamente questa opzione. _sezione_finale() in cima ad aggiorna():
+nulla se EndgameState.finale e' vuoto; altrimenti nome del finale,
+l'epilogo della variante di gruppo GIUSTA (da Progression.pathway()->group,
+non serve salvarlo: e' statico e non cambia dopo il finale), e un
+riepilogo di endgame.eredita SOLO se non vuoto (niente placeholder finto
+finche' US-719 non lo compila). "L'azione che sceglie l'oggetto da
+ereditare" resta a US-719 come dice l'AC stesso. 5 chiavi UI chrome nuove
+(COLOPHON_FINALE_*) in strings.csv.
+- VERIFICA A SCHERMO REALE (non solo scriptata, per la prima volta in
+  questa sessione): ho scoperto che Xvfb e' installato nel container.
+  Godot NON-headless (software rendering llvmpipe via Mesa) sotto
+  xvfb-run puo' renderizzare davvero e salvare uno screenshot PNG
+  (get_viewport().get_texture().get_image().save_png()) da uno script
+  -s SceneTree standalone (serve un await process_frame x2 in
+  _initialize() prima di toccare gli autoload, altrimenti get_tree() e'
+  ancora null). Due catture mandate all'utente in chat: Apoteosi (solo
+  conoscenza) e Consumazione (le 4 righe di eredita' popolate). Serviva
+  TranslationServer.set_locale('it') esplicito nello script (il boot
+  normale lo fa gia' via SettingsStore, che qui non gira). Trovata una
+  traduzione mancante preesistente non legata a questa story
+  ('anchor.mirco' -> 'TODO ...'), non toccata.
+- tests/test_page_finale.gd NUOVO (4 test): nessun finale -> nessuna
+  sezione; finale raggiunto -> nome ed epilogo del gruppo giusto; eredita
+  vuota -> nessun riepilogo; eredita compilata -> riepilogo col conteggio
+  giusto.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning
+  invariati). 770 test headless (766 + 4), tutti verdi.
+- File toccati: scripts/pages/page_impostazioni.gd, assets/i18n/strings.csv
+  + .translation, tests/test_page_finale.gd (nuovo).
+
+=== US-719: eredita' al personaggio successivo (fase 7, Blocco D chiuso) ===
+EndingSystem._componi_eredita_iniziale(id): parte AUTOMATICA (conoscenza
+sempre, reputazione se profilo 'completo') compilata subito in
+_raggiungi(). Ancora/oggetto sono una scelta esplicita
+(scegli_ancora(id)/scegli_oggetto(item_id)): non potevano essere
+automatiche, il giocatore puo' avere piu' di un'Ancora o oggetto (il test
+ne usa 2). AnchorSystem esteso con un override di forza per-istanza
+(_forza_override + forza_di(id) pubblico) - retrocompatibile, i save
+vecchi restano array di stringhe semplici. EndgameState.eredita_sanitizzata
+e' un wrapper pubblico del sanitizzatore gia' esistente, per leggere
+l'eredita' di UN ALTRO save senza toccare il resto di QUESTO EndgameState.
+
+GameState.nuova_partita(): legge l'eredita' dello slot che sta per
+sovrascrivere PRIMA di azzerare, poi resetta Progression/Follia/
+KnowledgeStore/AnchorSystem/FactionSystem/Inventory/EndgameState e applica
+l'eredita' sanitizzata. Gap preesistente scoperto: nuova_partita() non
+azzerava MAI questi sistemi (funzionava solo perche' si presumeva sempre
+chiamata a boot fresco) - necessario sistemarlo ora che questa story
+introduce davvero la rinascita nello stesso slot, nella stessa sessione.
+
+UI (estende US-718, scripts/pages/page_impostazioni.gd): OptionButton +
+bottone per scegliere Ancora/oggetto quando il profilo del finale li
+richiede e non sono ancora scelti; chiamano EndingSystem.scegli_*() e si
+aggiornano da soli. VERIFICA A SCHERMO REALE (Xvfb, come US-718):
+screenshot mandato in chat - i due selettori ("TODO anchor.mirco" /
+traduzione mancante preesistente, e "Moneta comune") e i bottoni "Scegli
+questa Ancora"/"Scegli questo oggetto" appaiono correttamente sopra il
+riepilogo "Ciò che passa" con "Reputazione dimezzata con 1 fazioni".
+
+- tests/test_eredita.gd NUOVO (3 test): ciclo completo Consumazione con 2
+  Ancore vive + reputazione + oggetto -> eredita compilata -> scelte fatte
+  -> nuovo personaggio -> conoscenza seminata, 1 Ancora a forza/2 (10/2=5),
+  reputazione a meta', oggetto nello zaino, Sequenza di nuovo a 9, endgame
+  azzerato; slot vuoto -> nessuna eredita applicata; contratto con id
+  ignoti (Ancora inesistente, oggetto inesistente, entry non-stringa nella
+  conoscenza) -> tutto scartato senza crash (FR-13).
+- tests/test_page_finale.gd +2 test: i selettori appaiono col profilo
+  'completo'; scegliere l'Ancora aggiorna il riepilogo (forza dimezzata
+  visibile).
+- BUG trovato durante i test (stessa classe del leak di pausa in US-717):
+  nuova_partita()/carica_slot() attivano GameState._partita_attiva senza
+  un modo pubblico per spegnerla - convenzione GIA' documentata e usata da
+  test_creazione_talenti.gd (gs.set("_partita_attiva", false) prima e dopo
+  ogni test), che la mia prima versione di test_eredita.gd non seguiva:
+  ha rotto test_page_scaffale nella suite alfabeticamente successiva (5
+  bottoni invece di 4 - il bottone "Riprendi" extra, mostrato solo a
+  partita in corso). Corretto seguendo la stessa convenzione gia' in uso.
+- Come verificato: python tools/validate_data.py exit 0 (3 warning
+  invariati). 775 test headless (770 + 5), tutti verdi.
+- File toccati: scripts/ending_system.gd, scripts/anchor_system.gd,
+  scripts/endgame_state.gd, scripts/game_state.gd,
+  scripts/pages/page_impostazioni.gd, assets/i18n/strings.csv +
+  .translation, tests/test_eredita.gd (nuovo), tests/test_page_finale.gd.
+
+=== BLOCCO D CHIUSO (2026-09-09) ===
+US-716..719. I 3 finali come dati (Apoteosi/Consumazione/Rinuncia),
+EndingSystem che li valuta e sceglie ascoltando follia/rituale/flag in
+tempo reale, la schermata di finale (estende il colophon), l'eredita' al
+personaggio successivo con scelta esplicita di Ancora/oggetto e
+rinascita sullo stesso slot verificata end-to-end. 775 test (erano 759 a
+inizio Blocco D). Save invariato (endgame gia' a v22 da Blocco 0).
+Prossimo: BLOCCO E - checkpoint + chiusura fase 7.
+
+=== US-720: VERDETTO del criterio di uscita della fase 7 ===
+tests/test_slice_fase_7.gd esteso con test_ciclo_completo_endgame_zero_
+codice_dedicato: LO STESSO personaggio (Error Seq 4) attraversa, in
+sequenza, tutti e quattro i pezzi della fase 7 - cambio Pathway con
+fusione (verso un vicino di gruppo SCOPERTO dai dati), una tribolazione
+attivata e superata (id del salto scoperto da GameData.tribulation_ids,
+superamento forzato leggendo se il dato dichiara 'evento' o 'flag', mai
+scritto a mano), un finale raggiunto (soglia generica Madness=100, l'id
+del finale letto da EndgameState DOPO il fatto, mai assunto), un'Ancora e
+un oggetto scoperti dai dati e scelti per l'eredita', e la riapplicazione
+completa a un nuovo personaggio sullo stesso slot (Sequenza di nuovo a 9,
+follia azzerata, nessun finale residuo). Se un solo passaggio avesse
+richiesto di scrivere un id specifico nel motore, questo test non
+sarebbe stato scrivibile cosi'.
+
+git diff di tutta la fase 7 (d53e9d7~1..HEAD, file .gd non di test):
+  scripts/anchor_system.gd            +53 -x   (override forza per Ancora ereditata)
+  scripts/endgame_state.gd            +154     (NUOVO, US-701)
+  scripts/ending_system.gd            +182     (NUOVO, US-717/719)
+  scripts/fusion_engine.gd            +62      (NUOVO, US-705)
+  scripts/game_data.gd                +107     (loader fusions/tribulations/endings/anchors)
+  scripts/game_state.gd               +70      (nuova_partita legge/applica l'eredita')
+  scripts/pages/page_diagramma_pathway.gd +107 (fusione + fog of war nomi Sequenza)
+  scripts/pages/page_impostazioni.gd  +142     (schermata di finale, estende il colophon)
+  scripts/pathway_change.gd           +123     (NUOVO, US-704)
+  scripts/potion_system.gd            +7       (tribolazione blocca il rituale)
+  scripts/progression.gd              +6       (avanza() legge TribulationSystem)
+  scripts/ritual_system.gd            +5       (idem)
+  scripts/save_system.gd              +24      (schema_version 21->22, US-701)
+  scripts/time_system.gd              +25      (pausa/notte forzata per le tribolazioni)
+  scripts/tribulation_overlay.gd      +84      (NUOVO, US-713)
+  scripts/tribulation_system.gd       +254     (NUOVO, US-711)
+  16 file, 1392 righe aggiunte, 13 tolte.
+
+scripts/ability_engine.gd: ZERO righe toccate in tutta la fase 7 (assente
+dal diff sopra) - il dispatcher execute()/_esegui_primitive resta esattamente
+quello di fase 2. Grep di "twilight_giant"/"darkness"/"death"/"moon"/
+"mother"/"paragon"/"hermit"/"fool"/"error"/"door"/"trib_"/"apoteosi"/
+"consumazione"/"rinuncia" nei 4 motori nuovi (FusionEngine, TribulationSystem,
+EndingSystem, PathwayChange): 0 occorrenze fuori dai commenti.
+
+VERDETTO: l'ENDGAME E' DATI. Cambio Pathway, fusioni, tribolazioni e
+finali si compongono, in un ciclo unico dimostrato dal test sopra, senza
+una riga di codice che nomini un Pathway, una coppia di fusione, una
+tribolazione o un finale specifico. L'architettura verificata nei
+checkpoint di fase 2 (US-219), fase 5 (US-508) e fase 5b (US-5B04) regge
+anche sull'ultimo pezzo, il piu' trasversale: un sistema che compone
+TUTTI gli altri sistemi del gioco (Progression, Madness, KnowledgeStore,
+AnchorSystem, FactionSystem, Inventory, GameState) resta dati quanto loro.
+
+Come verificato: python tools/validate_data.py exit 0 (3 warning
+invariati). 776 test headless (775 + 1), tutti verdi. Nessuna regressione.
+
+=== US-721: chiusura fase 7 (Blocco E chiuso) ===
+Documenti aggiornati nello stesso stile delle chiusure precedenti (fase
+6, fase 5b): 006_PRD/roadmap.md (Fase 7 CHIUSA, 21 story, 776 test, i 5
+blocchi e cosa contiene; Fase 8 sbloccata ma opzionale), design-master.md
+(Appendice A fase 7 -> CHIUSA col verdetto; Appendice B decisione n.8
+eredita' -> CHIUSA; Appendice C +6 righe di vocabolari/schema),
+design-npc-quest.md (Atto III, sezione finali, sezione antagonista ->
+REALIZZATO/CHIUSA in fase 7), CLAUDE.md (paragrafo Fase 7 CHIUSA + Fase
+corrente: 8 opzionale/manutenzione), README.md (paragrafo Fase 7 chiusa +
+corretto un refuso preesistente "22 Pathway attivi" -> "10", non legato a
+questa story). tools/validate_data.py: nuovo blocco di chiusura fase 7
+(file di dati esistono, door_error non-stub, i 3 finali esatti presenti).
+
+=== FASE 7 — ENDGAME: CHIUSA (2026-09-09) ===
+21 story (US-701..721), 776 test (erano 713 a fine fase 5b/inizio fase 7).
+5 blocchi: 0 fondamenta (save 21->22), A cambio Pathway + fusione, B
+tribolazioni, C Sequenze alte/preghiere + siti rituali, D finali +
+eredita', E checkpoint + chiusura. Verdetto del checkpoint (US-720):
+l'endgame e' dati - cambio Pathway con fusione, una tribolazione
+superata, un finale raggiunto, l'eredita' riapplicata a un nuovo
+personaggio, tutto senza una riga di codice che nomini un Pathway/una
+fusione/una tribolazione/un finale specifico. ability_engine.gd mai
+toccato in tutta la fase. Come verificato: python tools/validate_data.py
+exit 0, 776 test headless tutti verdi.
+Prossimo: fase 8 (opzionale, Pathway Non-Standard) solo se si decide di
+farla - PRD con /prd quando serve. Altrimenti il progetto e' in
+manutenzione (arte vera, audio, playtest/bilanciamento, decisione IP
+sul repo pubblico - vedi Nota IP in CLAUDE.md).
+
+=== [2026-09-09] DIAGNOSI: IL GIOCO NON E' GIOCABILE A MANO + PRD FASE 8 ===
+
+CONTESTO. L'utente ha premuto Play su main.tscn e si e' trovato in una
+griglia vuota con un solo nemico: niente da raccogliere, nessun modo di
+lanciare le proprie abilita', la recitazione bloccata. Questa sessione NON
+ha scritto codice: ha capito PERCHE', e ha messo la risposta nel repo come
+PRD di fase 8 + istruzioni operative.
+
+COME E' STATO SCOPERTO. (a) Giocando il gioco per davvero: script SceneTree
+lanciato con xvfb-run che istanzia main.tscn, sintetizza input e legge lo
+stato degli autoload, con screenshot. (b) Tre esplorazioni indipendenti del
+codebase in parallelo (giocabilita' delle scene, pipeline grafica, ciclo di
+avanzamento per un umano). (c) Una revisione critica del disegno prima di
+scriverlo. Ogni riferimento file:riga del PRD e' stato verificato a mano su
+questo commit.
+
+I SEI BLOCCHI TROVATI (nessuno superabile giocando, anche col piano
+iniziale "aggiungi qualche nemico e un pickup"):
+
+1. L'avvio non avvia una partita. Nessuno chiama Book.apri() ne'
+   GameState.nuova_partita(): all'avvio partita_attiva == false,
+   Progression._pathway_id == "" (fallback sul default di balance.json),
+   inventario vuoto, base a 0 stanze. main.tscn e' la scena di prova della
+   fase 1: regione + player + UN Enemy a coordinate fisse (scenes/main.tscn
+   :21-22) + overlay. La creazione del personaggio non fa scegliere il
+   Pathway.
+2. Nessun tasto lancia un'abilita'. player.gd gestisce solo attacco/
+   schivata/parata + movimento. AbilityEngine.execute (ability_engine.gd
+   :110) e' chiamato solo da sistemi interni e dai test; debug_scene.gd
+   lancia primitive grezze, non abilita'. Le due abilita' di Sequenza 9 del
+   Twilight Giant sono possedute dal primo secondo e inutilizzabili.
+3. Le abilita' a proiettile/arco non fanno danno: projectile.gd e
+   melee_arc.gd non hanno collision_mask ne' area_entered (sola
+   cinematica). L'unico che colpisce e' hitbox.gd:52-61, che chiama
+   Hurtbox.subisci(danno, stagger, da, {"tag_danno": tag}).
+4. La recitazione non puo' avanzare. enemy.gd:188 emette enemy_defeated
+   con payload {}: in event_tracker.gd::_corrisponde un filtro booleano
+   pretende == true, quindi senza_abilita non matcha MAI (e con lui la
+   quest q_mirco_01). damage_absorbed_for_ally (35% della Sequenza 9 del
+   TG) non ha emettitori: non esistono alleati in scena. item_crafted,
+   area_cleared, ritual_completed non sono mai emessi dal codice di gioco.
+   Risultato misurato: la barra Recitazione si ferma intorno all'1.5%.
+5. Nessuno puo' salire di Sequenza. PotionSystem.concoct/bevi
+   (potion_system.gd:22,97) non ha nessuna pagina o tasto che li chiami; e
+   i 299 ingredienti delle 100 formule (data/potions/formulas.json,
+   ingredients) NON esistono come oggetti: data/items/ingredienti.json ne
+   ha 8, tutti diversi, e nessun drop/listino/raccolta li fornisce. Il
+   negozio di Sidon esiste nei dati ma nessuno ascolta
+   DialogueEngine.apri_vendita.
+6. Il mondo e' vuoto e senza grafica. region_scene.gd::_dipingi() riempie
+   un rettangolo 48x36 uguale per le 5 regioni; 0 nemici e 0 oggetti da
+   dati; NPC = quadrati blu senza nome; sprite = placeholder diagnostici.
+
+DECISIONI PRESE CON L'UTENTE (2026-09-09):
+- Tutti i 299 ingredienti diventano oggetti con almeno una fonte nel mondo
+  ("deve esserci tutto"), non solo quelli del primo Pathway.
+- tg_9_protettore si riscrive nei DATI (perfect_parry x12): nessun alleato
+  in scena in questa fase. damage_absorbed_for_ally resta nel vocabolario
+  chiuso (lo usano i Pathway differiti).
+- Mappe disegnate a mano in ASCII (data/world/layouts/<region>.json), una
+  per regione: sono dati, si correggono con un editor di testo, il
+  validator le controlla.
+- Negozio (compra/vendi) dentro questo giro.
+- Grafica provvisoria generata proceduralmente (Pillow, deterministica),
+  stessa geometria dei fogli attuali: l'arte vera sostituira' i PNG.
+- Un boss non e' un tipo: e' un nemico con override di dati + scala. Zero
+  "if boss" nel codice.
+- Numerazione: questa e' la FASE 8; "Pathway Non-Standard" slitta a fase 9.
+
+COSA E' STATO SCRITTO (solo documentazione, zero .gd/.tscn/dati di gioco):
+- 006_PRD/prd-fase-8-vertical-slice.md — PRD nel formato delle fasi
+  precedenti (le 9 sezioni): 14 story US-801..US-814 in 7 blocchi (0 avvio
+  + controlli, A recitazione, B mondo dai layout, C economia degli
+  ingredienti, D pagine del libro, E grafica, F verifica giocata), ognuna
+  dimensionata per una context window; 15 FR; non-goals espliciti; una
+  tabella "cose che si riusano" con ~20 righe file:riga verificate;
+  metriche; 6 domande aperte.
+- 006_PRD/prossimi-passi.md — istruzioni operative per le prossime
+  sessioni: stato del repo, /prd NO (il PRD c'e' gia' ed e' piu' preciso di
+  quanto /prd genererebbe) e /ralph SI' (con la tabella dei campi da
+  correggere: branchName, fase 8, id US-8NN), i due modi di eseguire le
+  story, setup di un ambiente nuovo (Godot 4.3 dalla CI, Pillow, Xvfb), la
+  ricetta Xvfb che funziona, e le 10 trappole gia' scoperte (reset di
+  _partita_attiva, libro lasciato aperto che mette in pausa le suite
+  successive, firma di assert_almost_eq, import prima della suite, nomi
+  reali dei segnali, filtri booleani dell'EventTracker...).
+- roadmap.md / CLAUDE.md / README.md allineati alla numerazione nuova.
+
+COME VERIFICATO: python tools/validate_data.py esce 0 (nessun dato
+toccato). Suite non rilanciata: in questo commit non c'e' un solo file
+.gd/.tscn/di dati. prd.json NON toccato (ha ancora le 21 story della fase
+7, tutte passes:true).
+
+PROSSIMO PASSO: mergiare la PR #3 (chiusura fase 7) in main, poi generare
+prd.json dal PRD con /ralph 006_PRD/prd-fase-8-vertical-slice.md e
+correggere i campi come dice prossimi-passi.md § 2. Poi US-801.
+
 [2026-10-12] ARTE (fuori PRD) — guida arte/ allineata a sprite-forge, tempi per frame, scale_mode integer, primo sprite vero.
 - Guida: arte/ + art-brief-gemini.md cap. 6.7 allineati alla skill sprite-forge
   (contorno 1px inchiostro per sprite/tile, 2px solo VFX; max 16 colori in ramp

@@ -98,6 +98,11 @@ func avvia(rituale: Dictionary) -> Dictionary:
 		return {"ok": false, "reason": "recitazione_incompleta"}
 
 	var prog: Node = get_node_or_null("/root/Progression")
+	# US-711: salto di fascia con tribolazione aperta -> il rituale non parte.
+	var trib: Node = get_node_or_null("/root/TribulationSystem")
+	if prog != null and trib != null and bool(trib.call("avanzamento_bloccato", int(prog.call("sequence")))):
+		return {"ok": false, "reason": "tribolazione_in_corso"}
+
 	_sequenza = int(prog.call("sequence")) if prog != null else -1
 	_rituale = rituale.duplicate(true)
 	_durata = _durata_build()

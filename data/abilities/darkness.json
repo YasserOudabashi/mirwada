@@ -642,6 +642,37 @@
       ],
       "costo_follia": 8.0,
       "note": "Darkness (Sequenza 0): la notte come dominio. Aura di terrore permanente + oscurita' che rende notte tutto intorno + il caster raddoppia quasi la forza. Abilita' di dominio come i Seq 0 di fase 5."
+    },
+    {
+      "schema_version": 1,
+      "id": "darkness_anatema_del_vuoto",
+      "name_i18n": "ability.darkness.darkness_anatema_del_vuoto",
+      "sequence_id": "darkness_0",
+      "costo_spiritualita": 40,
+      "cooldown": 45.0,
+      "primitive": [
+        {
+          "tipo": "curse",
+          "effetto": "sfortuna",
+          "durata": 20.0,
+          "condizione_rimozione": "purificazione"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.3,
+          "durata": 20.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "notte",
+        "dominio",
+        "maledizione"
+      ],
+      "costo_follia": 5.0,
+      "preghiera": "anatema",
+      "note": "US-714. Darkness pronuncia l'anatema del vuoto: non e' un rituale, e' la notte stessa che si rivolta contro il bersaglio. curse(sfortuna) + debuff, come le altre maledizioni del Pathway (nessuna primitiva nuova)."
     }
   ]
 }

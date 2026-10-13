@@ -87,6 +87,60 @@
       "name_i18n": "characteristic.fool.9"
     },
     {
+      "id": "char_fool_8",
+      "pathway_id": "fool",
+      "sequence": 8,
+      "name_i18n": "characteristic.fool.8"
+    },
+    {
+      "id": "char_fool_7",
+      "pathway_id": "fool",
+      "sequence": 7,
+      "name_i18n": "characteristic.fool.7"
+    },
+    {
+      "id": "char_fool_6",
+      "pathway_id": "fool",
+      "sequence": 6,
+      "name_i18n": "characteristic.fool.6"
+    },
+    {
+      "id": "char_fool_5",
+      "pathway_id": "fool",
+      "sequence": 5,
+      "name_i18n": "characteristic.fool.5"
+    },
+    {
+      "id": "char_fool_4",
+      "pathway_id": "fool",
+      "sequence": 4,
+      "name_i18n": "characteristic.fool.4"
+    },
+    {
+      "id": "char_fool_3",
+      "pathway_id": "fool",
+      "sequence": 3,
+      "name_i18n": "characteristic.fool.3"
+    },
+    {
+      "id": "char_fool_2",
+      "pathway_id": "fool",
+      "sequence": 2,
+      "name_i18n": "characteristic.fool.2"
+    },
+    {
+      "id": "char_fool_1",
+      "pathway_id": "fool",
+      "sequence": 1,
+      "name_i18n": "characteristic.fool.1"
+    },
+    {
+      "id": "char_fool_0",
+      "pathway_id": "fool",
+      "sequence": 0,
+      "name_i18n": "characteristic.fool.0"
+    },
+    {
       "id": "char_death_6",
       "pathway_id": "death",
       "sequence": 6,
@@ -427,6 +481,126 @@
       "pathway_id": "darkness",
       "sequence": 0,
       "name_i18n": "characteristic.darkness.0"
+    },
+    {
+      "id": "char_error_9",
+      "pathway_id": "error",
+      "sequence": 9,
+      "name_i18n": "characteristic.error.9"
+    },
+    {
+      "id": "char_error_8",
+      "pathway_id": "error",
+      "sequence": 8,
+      "name_i18n": "characteristic.error.8"
+    },
+    {
+      "id": "char_error_7",
+      "pathway_id": "error",
+      "sequence": 7,
+      "name_i18n": "characteristic.error.7"
+    },
+    {
+      "id": "char_error_6",
+      "pathway_id": "error",
+      "sequence": 6,
+      "name_i18n": "characteristic.error.6"
+    },
+    {
+      "id": "char_error_5",
+      "pathway_id": "error",
+      "sequence": 5,
+      "name_i18n": "characteristic.error.5"
+    },
+    {
+      "id": "char_error_4",
+      "pathway_id": "error",
+      "sequence": 4,
+      "name_i18n": "characteristic.error.4"
+    },
+    {
+      "id": "char_error_3",
+      "pathway_id": "error",
+      "sequence": 3,
+      "name_i18n": "characteristic.error.3"
+    },
+    {
+      "id": "char_error_2",
+      "pathway_id": "error",
+      "sequence": 2,
+      "name_i18n": "characteristic.error.2"
+    },
+    {
+      "id": "char_error_1",
+      "pathway_id": "error",
+      "sequence": 1,
+      "name_i18n": "characteristic.error.1"
+    },
+    {
+      "id": "char_error_0",
+      "pathway_id": "error",
+      "sequence": 0,
+      "name_i18n": "characteristic.error.0"
+    },
+    {
+      "id": "char_door_9",
+      "pathway_id": "door",
+      "sequence": 9,
+      "name_i18n": "characteristic.door.9"
+    },
+    {
+      "id": "char_door_8",
+      "pathway_id": "door",
+      "sequence": 8,
+      "name_i18n": "characteristic.door.8"
+    },
+    {
+      "id": "char_door_7",
+      "pathway_id": "door",
+      "sequence": 7,
+      "name_i18n": "characteristic.door.7"
+    },
+    {
+      "id": "char_door_6",
+      "pathway_id": "door",
+      "sequence": 6,
+      "name_i18n": "characteristic.door.6"
+    },
+    {
+      "id": "char_door_5",
+      "pathway_id": "door",
+      "sequence": 5,
+      "name_i18n": "characteristic.door.5"
+    },
+    {
+      "id": "char_door_4",
+      "pathway_id": "door",
+      "sequence": 4,
+      "name_i18n": "characteristic.door.4"
+    },
+    {
+      "id": "char_door_3",
+      "pathway_id": "door",
+      "sequence": 3,
+      "name_i18n": "characteristic.door.3"
+    },
+    {
+      "id": "char_door_2",
+      "pathway_id": "door",
+      "sequence": 2,
+      "name_i18n": "characteristic.door.2"
+    },
+    {
+      "id": "char_door_1",
+      "pathway_id": "door",
+      "sequence": 1,
+      "name_i18n": "characteristic.door.1"
+    },
+    {
+      "id": "char_door_0",
+      "pathway_id": "door",
+      "sequence": 0,
+      "name_i18n": "characteristic.door.0"
     }
   ]
 }

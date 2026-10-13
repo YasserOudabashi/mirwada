@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "_comment": "US-620: un antagonista per Pathway attivo. E' il detentore precedente della Sequenza 0: strutturale, cambia col Pathway scelto (design-npc-quest cap. 5, decisione n.9). Nessun boss (fase 7): gli 'indizi' sono frasi che dialoghi e libri lasciano cadere.",
+  "antagonisti": [
+    {
+      "id": "ant_twilight_giant",
+      "pathway_id": "twilight_giant",
+      "name": "Il Gigante Caduto",
+      "name_i18n": "antagonist.twilight_giant.name",
+      "indizi": [
+        {
+          "text": "Dicono che il trono in cima alle Marche non sia mai stato vuoto.",
+          "text_i18n": "antagonist.twilight_giant.indizio_1"
+        },
+        {
+          "text": "Un'ombra alta quanto una torre, ferma a guardare il crepuscolo.",
+          "text_i18n": "antagonist.twilight_giant.indizio_2"
+        },
+        {
+          "text": "Si sedette, e da allora nessuno lo ha visto alzarsi.",
+          "text_i18n": "antagonist.twilight_giant.indizio_3"
+        }
+      ]
+    },
+    {
+      "id": "ant_death",
+      "pathway_id": "death",
+      "name": "Il Primo Necroforo",
+      "name_i18n": "antagonist.death.name",
+      "indizi": [
+        {
+          "text": "Ogni cripta della citta' porta la stessa mano incisa nella pietra.",
+          "text_i18n": "antagonist.death.indizio_1"
+        },
+        {
+          "text": "Seppelli' tutti quelli che conosceva, poi scavo' un'ultima fossa.",
+          "text_i18n": "antagonist.death.indizio_2"
+        },
+        {
+          "text": "La lapide senza nome nel sotterraneo: la data non e' ancora arrivata.",
+          "text_i18n": "antagonist.death.indizio_3"
+        }
+      ]
+    },
+    {
+      "id": "ant_darkness",
+      "pathway_id": "darkness",
+      "name": "La Notte Che Fu",
+      "name_i18n": "antagonist.darkness.name",
+      "indizi": [
+        {
+          "text": "C'era buio prima che ci fosse qualcosa da illuminare.",
+          "text_i18n": "antagonist.darkness.indizio_1"
+        },
+        {
+          "text": "La prima ombra imparo' a muoversi da sola.",
+          "text_i18n": "antagonist.darkness.indizio_2"
+        },
+        {
+          "text": "Non e' morta: dorme, e i suoi sogni sono le notti.",
+          "text_i18n": "antagonist.darkness.indizio_3"
+        }
+      ]
+    },
+    {
+      "id": "ant_moon",
+      "pathway_id": "moon",
+      "name": "La Luna Spenta",
+      "name_i18n": "antagonist.moon.name",
+      "indizi": [
+        {
+          "text": "Una volta la marea tornava sempre. Poi smise, per una notte.",
+          "text_i18n": "antagonist.moon.indizio_1"
+        },
+        {
+          "text": "Nella grotta di marea l'acqua e' ferma da un'era.",
+          "text_i18n": "antagonist.moon.indizio_2"
+        },
+        {
+          "text": "Chi tenne la Sequenza 0 spense la luna per non essere visto.",
+          "text_i18n": "antagonist.moon.indizio_3"
+        }
+      ]
+    },
+    {
+      "id": "ant_mother",
+      "pathway_id": "mother",
+      "name": "La Radice Marcita",
+      "name_i18n": "antagonist.mother.name",
+      "indizi": [
+        {
+          "text": "Il bosco antico cresce in cerchio, come attorno a qualcosa.",
+          "text_i18n": "antagonist.mother.indizio_1"
+        },
+        {
+          "text": "Il primo giardiniere pianto' se stesso e non germoglio' mai.",
+          "text_i18n": "antagonist.mother.indizio_2"
+        },
+        {
+          "text": "Le radici sotto la Valle si muovono quando nessuno guarda.",
+          "text_i18n": "antagonist.mother.indizio_3"
+        }
+      ]
+    },
+    {
+      "id": "ant_hermit",
+      "pathway_id": "hermit",
+      "name": "L'Ultimo Studioso",
+      "name_i18n": "antagonist.hermit.name",
+      "indizi": [
+        {
+          "text": "L'Archivio Sepolto fu sepolto da chi lo aveva scritto.",
+          "text_i18n": "antagonist.hermit.indizio_1"
+        },
+        {
+          "text": "Lesse l'ultima pagina, e l'ultima pagina lo lesse.",
+          "text_i18n": "antagonist.hermit.indizio_2"
+        },
+        {
+          "text": "Il suo studio e' ancora illuminato, in fondo alle ali interne.",
+          "text_i18n": "antagonist.hermit.indizio_3"
+        }
+      ]
+    },
+    {
+      "id": "ant_paragon",
+      "pathway_id": "paragon",
+      "name": "Il Modello Infranto",
+      "name_i18n": "antagonist.paragon.name",
+      "indizi": [
+        {
+          "text": "C'era una statua perfetta. Si giudico' imperfetta e si spezzo'.",
+          "text_i18n": "antagonist.paragon.indizio_1"
+        },
+        {
+          "text": "Ogni ideale che segui e' un pezzo di lui.",
+          "text_i18n": "antagonist.paragon.indizio_2"
+        },
+        {
+          "text": "Alla Sequenza 0 divento' cio' che tutti dovevano imitare, e spari'.",
+          "text_i18n": "antagonist.paragon.indizio_3"
+        }
+      ]
+    },
+    {
+      "id": "ant_door",
+      "pathway_id": "door",
+      "name": "Il Portinaio Perduto",
+      "name_i18n": "antagonist.door.name",
+      "indizi": [
+        {
+          "text": "Ogni porta della Frontiera fu aperta da lui almeno una volta.",
+          "text_i18n": "antagonist.door.indizio_1"
+        },
+        {
+          "text": "Si chiuse dentro una soglia e la soglia divento' lui.",
+          "text_i18n": "antagonist.door.indizio_2"
+        },
+        {
+          "text": "Bussa, di notte, dall'altra parte del nulla.",
+          "text_i18n": "antagonist.door.indizio_3"
+        }
+      ]
+    },
+    {
+      "id": "ant_error",
+      "pathway_id": "error",
+      "name": "Il Difetto Originale",
+      "name_i18n": "antagonist.error.name",
+      "indizi": [
+        {
+          "text": "Era l'eccezione a una regola. Poi divenne la regola.",
+          "text_i18n": "antagonist.error.indizio_1"
+        },
+        {
+          "text": "Dove la logica del mondo si incrina, e' passato lui.",
+          "text_i18n": "antagonist.error.indizio_2"
+        },
+        {
+          "text": "Alla Sequenza 0 corresse tutto, tranne se stesso.",
+          "text_i18n": "antagonist.error.indizio_3"
+        }
+      ]
+    },
+    {
+      "id": "ant_fool",
+      "pathway_id": "fool",
+      "name": "Il Buffone Silente",
+      "name_i18n": "antagonist.fool.name",
+      "indizi": [
+        {
+          "text": "La maschera del Fool nasconde un'altra maschera, e poi il vuoto.",
+          "text_i18n": "antagonist.fool.indizio_1"
+        },
+        {
+          "text": "Recito' ogni ruolo finche' non ne resto' nessuno da recitare.",
+          "text_i18n": "antagonist.fool.indizio_2"
+        },
+        {
+          "text": "E' seduto in prima fila al teatro della Frontiera, e applaude.",
+          "text_i18n": "antagonist.fool.indizio_3"
+        }
+      ]
+    }
+  ]
+}

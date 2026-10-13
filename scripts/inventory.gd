@@ -104,6 +104,16 @@ func usa(instance_id: String, bersaglio: Node = null) -> Dictionary:
 		rimuovi_istanza(instance_id)
 		return {"ok": true, "reason": "", "risultato": {"ricetta_appresa": ric}}
 
+	# US-621: un libro/pergamena trovato nel mondo che al consumo scrive un
+	# flag di conoscenza (i testi_* che aprono l'Archivio Sepolto, US-611).
+	var sflag: String = str(def.get("stored_flag", ""))
+	if not sflag.is_empty():
+		var ks: Node = get_node_or_null("/root/KnowledgeStore")
+		if ks != null:
+			ks.call("imposta", sflag, true)
+		rimuovi_istanza(instance_id)
+		return {"ok": true, "reason": "", "risultato": {"flag_appreso": sflag}}
+
 	var sab: String = str(def.get("stored_ability_id", ""))
 	if sab.is_empty():
 		return {"ok": false, "reason": "nessuna_abilita", "risultato": {}}

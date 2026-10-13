@@ -52,6 +52,18 @@ func _tempo() -> Node:
 	return get_node_or_null("/root/TimeSystem")
 
 
+func _npc() -> Node:
+	return get_node_or_null("/root/NpcSystem")
+
+
+func _fazioni() -> Node:
+	return get_node_or_null("/root/FactionSystem")
+
+
+func _quest() -> Node:
+	return get_node_or_null("/root/QuestSystem")
+
+
 func _summons() -> Node:
 	return get_node_or_null("/root/SummonRegistry")
 
@@ -120,6 +132,10 @@ func _equip() -> Node:
 	return get_node_or_null("/root/Equipment")
 
 
+func _endgame() -> Node:
+	return get_node_or_null("/root/EndgameState")
+
+
 func salva_rapido() -> Dictionary:
 	return salva_slot(SLOT_RAPIDO)
 
@@ -151,11 +167,37 @@ func carica_slot(slot: int) -> Dictionary:
 ## slot scelto. Il Pathway/Sequenza di partenza vengono dai dati (Progression).
 ## talenti_innati (US-332): id di talenti 'innato' scelti alla creazione — solo
 ## quelli veri entrano in TalentSystem, il resto e' ignorato.
+##
+## US-719: se lo slot ospitava gia' un personaggio che ha raggiunto un finale
+## con un'eredita' compilata, quell'eredita' passa al nuovo prima che il vecchio
+## save venga sovrascritto. Sistemi che l'eredita' tocca (conoscenza, Ancore,
+## reputazione, inventario) e quelli che FR-14 vuole "ripartiti da zero"
+## (Sequenza, follia) si azzerano qui: nuova_partita() puo' essere chiamata
+## nella STESSA sessione di un personaggio appena concluso, i cui autoload
+## portano ancora il suo stato.
 func nuova_partita(nome: String, slot: int, talenti_innati: Array = []) -> Dictionary:
+	var eredita: Dictionary = _eredita_da_slot(slot)
+
 	nome_personaggio = nome.strip_edges() if not nome.strip_edges().is_empty() else NOME_DEFAULT
 	tempo_gioco = 0.0
 	_partita_attiva = true
 	_slot_corrente = slot
+
+	if _progression() != null:
+		_progression().call("configura", "", 9)
+	if _follia() != null:
+		_follia().call("azzera")
+	if _conoscenza() != null:
+		_conoscenza().call("dimentica_tutto")
+	if _ancore() != null:
+		_ancore().call("pulisci")
+	if _fazioni() != null:
+		_fazioni().call("pulisci")
+	if _inventario() != null:
+		_inventario().call("pulisci")
+	if _endgame() != null:
+		_endgame().call("pulisci")
+
 	var ts: Node = _talenti()
 	var gd: Node = get_node_or_null("/root/GameData")
 	if ts != null:
@@ -170,8 +212,44 @@ func nuova_partita(nome: String, slot: int, talenti_innati: Array = []) -> Dicti
 			var t: Dictionary = gd.call("get_talent", str(tid)) if gd != null else {}
 			if str(t.get("tipo", "")) == "innato" and ts.call("concedi", str(tid)):
 				presi += 1
+
+	if not eredita.is_empty():
+		_applica_eredita(eredita)
+
 	partita_iniziata.emit(nome_personaggio)
 	return get_node("/root/SaveSystem").call("salva", slot, snapshot())
+
+
+## Il contratto di eredita' dello slot che sta per essere sovrascritto, gia'
+## sanitizzato (EndgameState.eredita_sanitizzata - id ignoti scartati, valori
+## clampati, FR-13). {} se lo slot e' vuoto o senza un'eredita' compilata.
+func _eredita_da_slot(slot: int) -> Dictionary:
+	var eg: Node = _endgame()
+	if eg == null:
+		return {}
+	var r: Dictionary = get_node("/root/SaveSystem").call("carica", slot)
+	if not r.get("ok", false):
+		return {}
+	var raw_endgame: Variant = (r["dati"] as Dictionary).get("endgame", {})
+	if typeof(raw_endgame) != TYPE_DICTIONARY:
+		return {}
+	return eg.call("eredita_sanitizzata", (raw_endgame as Dictionary).get("eredita", {}))
+
+
+## Applica il contratto (US-719, FR-14) ai sistemi del nuovo personaggio.
+## Chiamata dopo che quei sistemi sono gia' stati azzerati in nuova_partita().
+func _applica_eredita(eredita: Dictionary) -> void:
+	if _conoscenza() != null and typeof(eredita.get("conoscenza")) == TYPE_ARRAY:
+		_conoscenza().call("da_salvataggio", eredita["conoscenza"])
+	if _ancore() != null and typeof(eredita.get("ancora")) == TYPE_DICTIONARY \
+			and not (eredita["ancora"] as Dictionary).is_empty():
+		var a: Dictionary = eredita["ancora"]
+		_ancore().call("register", str(a.get("id", "")), float(a.get("forza", 0.0)))
+	if _fazioni() != null and typeof(eredita.get("reputazione")) == TYPE_DICTIONARY:
+		_fazioni().call("da_salvataggio", eredita["reputazione"])
+	if _inventario() != null and typeof(eredita.get("oggetto")) == TYPE_STRING \
+			and not str(eredita["oggetto"]).is_empty():
+		_inventario().call("aggiungi", str(eredita["oggetto"]), 1)
 
 
 func partita_in_corso() -> bool:
@@ -230,6 +308,8 @@ func snapshot() -> Dictionary:
 		"conoscenza": _conoscenza().per_salvataggio() if _conoscenza() != null else [],
 		"inventario": _inventario().per_salvataggio() if _inventario() != null else {},
 		"equipaggiamento": _equip().per_salvataggio() if _equip() != null else {},
+		# fase 7: cambio Pathway, fusioni, tribolazioni, eredita', finale.
+		"endgame": _endgame().per_salvataggio() if _endgame() != null else {},
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
 	if p is Node2D:
@@ -250,6 +330,12 @@ func _mondo_snapshot() -> Dictionary:
 	var m: Dictionary = _world().per_salvataggio() if _world() != null else {}
 	if _tempo() != null:
 		m["tempo"] = _tempo().per_salvataggio()
+	if _npc() != null:
+		m["npc"] = _npc().per_salvataggio()
+	if _fazioni() != null:
+		m["reputazione"] = _fazioni().per_salvataggio()
+	if _quest() != null:
+		m["quest"] = _quest().per_salvataggio()
 	return m
 
 
@@ -262,6 +348,12 @@ func applica(dati: Dictionary) -> void:
 		_world().da_salvataggio(dati.get("mondo", {}))
 	if _tempo() != null:
 		_tempo().da_salvataggio((dati.get("mondo", {}) as Dictionary).get("tempo", {}))
+	if _npc() != null:
+		_npc().da_salvataggio((dati.get("mondo", {}) as Dictionary).get("npc", {}))
+	if _fazioni() != null:
+		_fazioni().da_salvataggio((dati.get("mondo", {}) as Dictionary).get("reputazione", {}))
+	if _quest() != null:
+		_quest().da_salvataggio((dati.get("mondo", {}) as Dictionary).get("quest", {}))
 	if _summons() != null:
 		_summons().da_salvataggio(dati.get("evocazioni", []))
 	if _eventi() != null:
@@ -305,6 +397,8 @@ func applica(dati: Dictionary) -> void:
 	var s: Dictionary = dati.get("statistiche", {})
 	if stats != null and s.has("hp"):
 		stats.set("hp", float(s["hp"]))
+	if _endgame() != null:
+		_endgame().da_salvataggio(dati.get("endgame", {}))
 	# SynergyEngine PER ULTIMO: legge i tag di tutte le fonti gia' ripristinate.
 	# Le sinergie ATTIVE si riderivano dai tag; il save porta solo le VISTE.
 	if _sinergie() != null:

@@ -93,6 +93,7 @@
     {
       "schema_version": 1,
       "id": "fool_fili_marionetta",
+      "name": "Fili della marionetta",
       "name_i18n": "ability.fool.fool_fili_marionetta",
       "sequence_id": "fool_5",
       "costo_spiritualita": 30,
@@ -102,7 +103,7 @@
           "tipo": "possess",
           "durata": 12.0,
           "soglia_resistenza": 4,
-          "controllo": "completo"
+          "controllo": "totale"
         },
         {
           "tipo": "debuff_stat",
@@ -120,6 +121,527 @@
       ],
       "costo_follia": 2.0,
       "note": "STRESS TEST. Marionettista: possess con soglia legata alla Sequenza del bersaglio. Nessuna primitiva nuova."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_acrobazia",
+      "name": "Acrobazia",
+      "name_i18n": "ability.fool.fool_acrobazia",
+      "sequence_id": "fool_8",
+      "costo_spiritualita": 6,
+      "cooldown": 4.0,
+      "primitive": [
+        {
+          "tipo": "dash",
+          "distanza": 90,
+          "durata": 0.2,
+          "invulnerabile": true,
+          "attraversa_nemici": true
+        }
+      ],
+      "tag_sinergia": [
+        "agilita'",
+        "non_letale",
+        "inganno"
+      ],
+      "note": "Il Clown esce da ogni angolo: uno scatto invulnerabile che attraversa i nemici. Nessuna primitiva nuova."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_travestimento_lampo",
+      "name": "Travestimento lampo",
+      "name_i18n": "ability.fool.fool_travestimento_lampo",
+      "sequence_id": "fool_8",
+      "costo_spiritualita": 10,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 3,
+          "durata": 6.0,
+          "potenza": 1,
+          "tipo_illusione": "aspetto"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.15,
+          "durata": 5.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "inganno",
+        "occultamento"
+      ],
+      "note": "Cambia aspetto per un attimo: i nemici perdono il bersaglio (rompe l'aggro). L'eredita' vera dei permessi sociali e' il Faceless (Seq 6); qui e' solo scena."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_illusione_solida",
+      "name": "Illusione solida",
+      "name_i18n": "ability.fool.fool_illusione_solida",
+      "sequence_id": "fool_7",
+      "costo_spiritualita": 14,
+      "cooldown": 8.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 5,
+          "durata": 8.0,
+          "potenza": 3,
+          "tipo_illusione": "danno_percepito"
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "follia",
+        "singolo"
+      ],
+      "note": "Un'illusione talmente convincente che ferisce: dot a tag follia (potenza = intensita' del danno percepito) che sparisce se il bersaglio capisce. Rimovibile da light_purify come ogni dot."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_oggetto_dal_nulla",
+      "name": "Oggetto dal nulla",
+      "name_i18n": "ability.fool.fool_oggetto_dal_nulla",
+      "sequence_id": "fool_7",
+      "costo_spiritualita": 10,
+      "cooldown": 3.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 2,
+          "durata": 1.0,
+          "potenza": 1,
+          "tipo_illusione": "oggetto_evocato"
+        },
+        {
+          "tipo": "melee_arc",
+          "danno": 20,
+          "angolo": 90,
+          "raggio": 1.8,
+          "stagger": 25,
+          "tag_danno": "fisico"
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "inganno",
+        "singolo"
+      ],
+      "note": "Un bastone, un mattone, una sedia: l'oggetto non c'e' finche' non colpisce. illusion(oggetto_evocato) + melee_arc per il colpo vero."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_volto_rubato",
+      "name": "Volto rubato",
+      "name_i18n": "ability.fool.fool_volto_rubato",
+      "sequence_id": "fool_6",
+      "costo_spiritualita": 18,
+      "cooldown": 25.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 3,
+          "durata": 20.0,
+          "potenza": 1,
+          "tipo_illusione": "aspetto"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 0.2,
+          "durata": 20.0,
+          "moltiplicativo": false
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "inganno",
+        "occultamento"
+      ],
+      "note": "Il Faceless prende aspetto e voce di qualcuno: chi lo cerca non lo trova. L'eredita' dei permessi sociali (gate npc) e' fase 6; in 5b e' illusion(aspetto) + evasione, e la truffa la conta la recitazione (npc_influenced)."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_voce_prestata",
+      "name": "Voce prestata",
+      "name_i18n": "ability.fool.fool_voce_prestata",
+      "sequence_id": "fool_6",
+      "costo_spiritualita": 12,
+      "cooldown": 10.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.25,
+          "durata": 8.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.15,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "mente",
+        "singolo"
+      ],
+      "note": "Parla con una voce di cui il bersaglio si fida: abbassa la guardia."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_scambio_bersagli",
+      "name": "Scambio dei bersagli",
+      "name_i18n": "ability.fool.fool_scambio_bersagli",
+      "sequence_id": "fool_5",
+      "costo_spiritualita": 16,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "fear",
+          "raggio": 6,
+          "durata": 5.0,
+          "soglia_resistenza": 3
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.2,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "controllo",
+        "area"
+      ],
+      "note": "Gli altri nemici vedono un alleato voltarsi contro di loro: panico e guardia rotta. Il nemico controllato che attacca davvero e' combat (fase 6)."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_scambio_con_oggetto",
+      "name": "Scambio con un oggetto",
+      "name_i18n": "ability.fool.fool_scambio_con_oggetto",
+      "sequence_id": "fool_4",
+      "costo_spiritualita": 16,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "teleport",
+          "distanza": 180,
+          "richiede_visuale": true,
+          "porta_alleati": false
+        },
+        {
+          "tipo": "illusion",
+          "raggio": 2,
+          "durata": 6.0,
+          "potenza": 1,
+          "tipo_illusione": "copia_statica"
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "spazio",
+        "inganno"
+      ],
+      "note": "Il Bizarro Sorcerer si scambia con un oggetto a distanza: teleport via, un'esca statica al suo posto. teleport gia' implementata (US-506)."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_prestigio_di_stanza",
+      "name": "Prestigio di stanza",
+      "name_i18n": "ability.fool.fool_prestigio_di_stanza",
+      "sequence_id": "fool_4",
+      "costo_spiritualita": 20,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 8,
+          "durata": 10.0,
+          "potenza": 2,
+          "tipo_illusione": "copia_nemico"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.2,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "inganno",
+        "area"
+      ],
+      "note": "Riempie una stanza di copie: 2 esche (potenza = numero) e chi guarda non sa piu' dove mirare."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_richiamo_dal_passato",
+      "name": "Richiamo dal passato",
+      "name_i18n": "ability.fool.fool_richiamo_dal_passato",
+      "sequence_id": "fool_3",
+      "costo_spiritualita": 24,
+      "cooldown": 22.0,
+      "primitive": [
+        {
+          "tipo": "time_rewind",
+          "secondi": 4.0,
+          "ripristina": [
+            "hp",
+            "spiritualita"
+          ],
+          "costo_follia": 7.0
+        },
+        {
+          "tipo": "illusion",
+          "raggio": 4,
+          "durata": 8.0,
+          "potenza": 1,
+          "tipo_illusione": "copia_statica"
+        }
+      ],
+      "tag_sinergia": [
+        "tempo",
+        "illusione",
+        "singolo"
+      ],
+      "note": "Lo Scholar of Yore richiama una versione precedente di se': time_rewind (gia' implementata, US-5B03) sul caster + un'immagine di com'era. Gli avatar del Fool sono FINTI (decisione: illusion, non la materia prima 'avatar' dell'Error)."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_eco_di_ieri",
+      "name": "Eco di ieri",
+      "name_i18n": "ability.fool.fool_eco_di_ieri",
+      "sequence_id": "fool_3",
+      "costo_spiritualita": 18,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 6,
+          "durata": 10.0,
+          "potenza": 2,
+          "tipo_illusione": "copia_nemico"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.2,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "tempo",
+        "area"
+      ],
+      "note": "Echi di nemici che il bersaglio ha gia' affrontato: 2 esche dal passato che confondono la mira."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_miracolo",
+      "name": "Miracolo",
+      "name_i18n": "ability.fool.fool_miracolo",
+      "sequence_id": "fool_2",
+      "costo_spiritualita": 40,
+      "cooldown": 30.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 0.5,
+          "durata": 6.0,
+          "moltiplicativo": false
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "precisione",
+          "valore": 0.4,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "fortuna",
+        "destino",
+        "singolo"
+      ],
+      "costo_follia": 3.0,
+      "note": "L'improbabile reso risorsa: costa molta spiritualita', dura poco, ma per quei secondi tutto ti riesce. VARIANZA ALTA DICHIARATA: nei dati e' un bonus grande e breve; la manipolazione vera della probabilita' resta a Wheel of Fortune (differito). Nessuna primitiva differita."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_sfortuna_altrui",
+      "name": "Sfortuna altrui",
+      "name_i18n": "ability.fool.fool_sfortuna_altrui",
+      "sequence_id": "fool_2",
+      "costo_spiritualita": 22,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "curse",
+          "effetto": "sfortuna",
+          "durata": 20.0,
+          "condizione_rimozione": ""
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "evasione",
+          "valore": -0.3,
+          "durata": 12.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "fortuna",
+        "maledizione",
+        "singolo"
+      ],
+      "note": "Scarica l'improbabile sul bersaglio: inciampa, manca, si ferisce da solo. curse(sfortuna) gia' esistente (Knight of Misfortune del Darkness) + debuff. Nessuna primitiva differita."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_area_di_segretezza",
+      "name": "Area di segretezza",
+      "name_i18n": "ability.fool.fool_area_di_segretezza",
+      "sequence_id": "fool_1",
+      "costo_spiritualita": 30,
+      "cooldown": 24.0,
+      "primitive": [
+        {
+          "tipo": "terrain_modify",
+          "tipo_modifica": "area_di_segretezza",
+          "raggio": 8,
+          "durata": 15.0,
+          "permanente": false
+        },
+        {
+          "tipo": "illusion",
+          "raggio": 8,
+          "durata": 15.0,
+          "potenza": 3,
+          "tipo_illusione": "copia_nemico"
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "occultamento",
+        "area"
+      ],
+      "note": "Un'area in cui la realta' locale e' manomettibile: terrain_modify a tempo (non permanente) + 3 esche. Cosa la 'segretezza' faccia davvero a schermo e' fase 6; qui e' un campo dichiarato + illusioni."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_realta_manomessa",
+      "name": "Realta' manomessa",
+      "name_i18n": "ability.fool.fool_realta_manomessa",
+      "sequence_id": "fool_1",
+      "costo_spiritualita": 26,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.4,
+          "durata": 10.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.3,
+          "durata": 10.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "curse",
+          "effetto": "sfortuna",
+          "durata": 15.0,
+          "condizione_rimozione": ""
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "maledizione",
+        "area"
+      ],
+      "note": "Dentro l'area di segretezza le regole cedono per chi non e' il Fool."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_realta_falsificata",
+      "name": "Realta' falsificata",
+      "name_i18n": "ability.fool.fool_realta_falsificata",
+      "sequence_id": "fool_0",
+      "costo_spiritualita": 55,
+      "cooldown": 60.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 15,
+          "durata": -1,
+          "effetto": "sfortuna",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        },
+        {
+          "tipo": "illusion",
+          "raggio": 15,
+          "durata": 12.0,
+          "potenza": 4,
+          "tipo_illusione": "copia_nemico"
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "dominio",
+        "area"
+      ],
+      "note": "L'abilita' di dominio del Fool: nel raggio la realta' e' quella che dice lui - sfortuna cronica per i nemici + 4 esche. Aura persistente + illusion, come i Seq 0 di fase 5."
+    },
+    {
+      "schema_version": 1,
+      "id": "fool_nessuno",
+      "name": "Nessuno",
+      "name_i18n": "ability.fool.fool_nessuno",
+      "sequence_id": "fool_0",
+      "costo_spiritualita": 45,
+      "cooldown": 45.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 10,
+          "durata": 10.0,
+          "potenza": 1,
+          "tipo_illusione": "aspetto"
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "evasione",
+          "valore": 0.6,
+          "durata": 10.0,
+          "moltiplicativo": false
+        }
+      ],
+      "tag_sinergia": [
+        "illusione",
+        "occultamento",
+        "dominio"
+      ],
+      "note": "Il Fool non e' nessuno: nessun aspetto fisso, nessun bersaglio possibile."
     }
   ]
 }

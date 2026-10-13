@@ -27,6 +27,20 @@ func conosce(flag: String) -> bool:
 	return _flags.has(flag)
 
 
+## US-613: unico store dei flag booleani del gioco (il fog of war del diagramma
+## e i flag testi_* / *_sa_* dei dialoghi). imposta(f, true) == impara(f);
+## imposta(f, false) dimentica. FlagStore delega qui, non e' un secondo store.
+func imposta(flag: String, valore: bool) -> void:
+	if valore:
+		impara(flag)
+	else:
+		dimentica(flag)
+
+
+func dimentica(flag: String) -> void:
+	_flags.erase(flag)
+
+
 func tutti() -> Array:
 	return _flags.keys()
 

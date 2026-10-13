@@ -21,7 +21,7 @@ func prepara() -> void:
 func test_autoload_e_dati_caricati() -> void:
 	var b: Node = _book()
 	assert_true(b != null, "autoload Book registrato")
-	assert_eq(_data().call("page_types").size(), 8, "8 tipi di pagina nel vocabolario")
+	assert_eq(_data().call("page_types").size(), 9, "9 tipi di pagina nel vocabolario (+ page_dialogo, US-613b)")
 	assert_gt(float((b.call("pagine") as Array).size()), 0.0, "pagine caricate da book.json")
 
 
@@ -34,11 +34,12 @@ func test_tipi_delle_pagine_nel_vocabolario() -> void:
 
 func test_pagine_bianche_vs_sbloccate() -> void:
 	var b: Node = _book()
-	# data/balance.json gioco.fase = 3: queste sono navigabili.
-	for pid in ["copertina", "frontespizio", "diagramma", "colophon", "inventario"]:
+	# data/balance.json gioco.fase = 3: queste sono navigabili (la mappa non ha
+	# gating di fase: e' contenuto diegetico del libro, come il diagramma).
+	for pid in ["copertina", "frontespizio", "diagramma", "colophon", "inventario", "mappa"]:
 		assert_true(b.call("pagina_sbloccata", pid), "%s sbloccata alla fase corrente" % pid)
 	# Queste esistono ma sono bianche finche' la fase non le raggiunge.
-	for pid in ["sinergie", "mappa", "journal"]:
+	for pid in ["sinergie", "journal"]:
 		assert_false(b.call("pagina_sbloccata", pid), "%s ancora bianca (fase > 3)" % pid)
 		assert_false(b.call("pagina", pid).is_empty(), "%s esiste comunque nei dati" % pid)
 

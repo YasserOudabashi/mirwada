@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "_comment": "Pergamene: portano un'abilita' eseguibile al consumo (stored_ability_id, US-304) o insegnano una ricetta leggendaria (insegna_ricetta, US-313). Il motore c'e' gia': AbilityEngine.execute_stored (US-206).",
+  "_comment": "Pergamene: portano un'abilita' eseguibile al consumo (stored_ability_id, US-304), insegnano una ricetta leggendaria (insegna_ricetta, US-313) o scrivono un flag di conoscenza al consumo (stored_flag, US-621: i testi_* che aprono l'Archivio Sepolto). Il motore c'e' gia': AbilityEngine.execute_stored (US-206), Inventory.usa (US-621).",
   "items": [
     {
       "id": "pergamena_vigore",
@@ -41,6 +41,18 @@
       "impilabile": false,
       "valore": 120,
       "insegna_ricetta": "ric_ambrosia"
+    },
+    {
+      "id": "libro_ordine_minore",
+      "categoria": "pergamena",
+      "name": "Trattato dell'Ordine Minore",
+      "name_i18n": "item.libro_ordine_minore",
+      "descrizione": "Un tomo scomodo da leggere. Chi lo finisce puo' varcare le ali interne dell'Archivio Sepolto.",
+      "descrizione_i18n": "item.libro_ordine_minore.desc",
+      "tag": ["occulto", "conoscenza"],
+      "impilabile": false,
+      "valore": 45,
+      "stored_flag": "testi_ordine_minore"
     }
   ]
 }

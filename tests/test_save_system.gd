@@ -138,3 +138,61 @@ func test_slot_vuoto() -> void:
 	assert_false(c["ok"], "slot vuoto non carica")
 	assert_eq(c["reason"], s.ERR_ASSENTE, "motivo slot_vuoto")
 	assert_eq(s.stato_slot(SLOT), s.Slot.VUOTO, "stato VUOTO")
+
+
+func test_migrazione_v21_a_v22_aggiunge_endgame() -> void:
+	# US-701: un save di fase 6 (v21) non aveva il campo 'endgame'.
+	var s: Node = _save()
+	_pulisci()
+	_scrivi_grezzo('{"schema_version": 21, "nome_personaggio": "pre-endgame", "tempo_gioco": 5.0, "posizione": [0, 0], "statistiche": {}, "mondo": {"terrain_mods": [], "regione": "mirwada"}}')
+	var c: Dictionary = s.carica(SLOT)
+	assert_true(c["ok"] and c["migrato"], "carica ok, migrato")
+	assert_eq(int((c["dati"] as Dictionary)["schema_version"]), 22, "portato a v22")
+	var eg: Dictionary = (c["dati"] as Dictionary)["endgame"]
+	assert_eq(str(eg.get("pathway_precedente", "MANCANTE")), "", "endgame.pathway_precedente vuoto")
+	assert_eq((eg.get("fusioni", ["MANCANTE"]) as Array), [], "endgame.fusioni vuoto")
+	assert_eq(str((c["dati"] as Dictionary).get("mondo", {}).get("regione", "")), "mirwada",
+		"il campo mondo pre-esistente non e' stato toccato")
+	_pulisci()
+
+
+func test_endgame_round_trip() -> void:
+	var s: Node = _save()
+	_pulisci()
+	var snap := {
+		"nome_personaggio": "Ereditiere",
+		"endgame": {
+			"pathway_precedente": "error",
+			"fusioni": ["fus_door_error_scasso_spaziale"],
+			"tribolazioni_superate": [7, 3],
+			"eredita": {"conoscenza": ["pathway:door"], "ancora": {"id": "anchor_mirco", "forza": 3.0},
+				"reputazione": {"ordine_minore": 2.5}, "oggetto": "chiave_d_ossa"},
+			"finale": "consumazione",
+		},
+	}
+	assert_true(s.salva(SLOT, snap)["ok"], "salva ok")
+	var d: Dictionary = s.carica(SLOT)["dati"]
+	var eg: Dictionary = d["endgame"]
+	assert_eq(str(eg["pathway_precedente"]), "error", "pathway_precedente round-trip")
+	assert_eq((eg["fusioni"] as Array).size(), 1, "fusioni round-trip")
+	var trib: Array = []
+	for v in (eg["tribolazioni_superate"] as Array):
+		trib.append(int(v))
+	assert_eq(trib, [7, 3], "tribolazioni round-trip")
+	assert_eq(str((eg["eredita"] as Dictionary)["oggetto"]), "chiave_d_ossa", "eredita.oggetto round-trip")
+	assert_eq(str(eg["finale"]), "consumazione", "finale round-trip")
+	_pulisci()
+
+
+func test_endgame_state_scarta_le_voci_malformate() -> void:
+	var es: Node = Engine.get_main_loop().root.get_node_or_null("EndgameState")
+	if es == null:
+		return
+	es.call("da_salvataggio", {"pathway_precedente": 42, "fusioni": ["ok", 7, ""],
+		"tribolazioni_superate": [7, 99, "x"], "eredita": "non un dict", "finale": ["lista"]})
+	assert_eq(str(es.get("pathway_precedente")), "", "pathway_precedente non-stringa -> ''")
+	assert_eq((es.get("fusioni") as Array), ["ok"], "fusioni: solo le stringhe non vuote")
+	assert_eq((es.get("tribolazioni_superate") as Array), [7], "tribolazioni: solo i salti validi")
+	assert_eq((es.get("eredita") as Dictionary), {}, "eredita non-dict -> {}")
+	assert_eq(str(es.get("finale")), "", "finale non-stringa -> ''")
+	es.call("pulisci")

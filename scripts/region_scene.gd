@@ -15,6 +15,8 @@ extends TileMapLayer
 
 signal zona_cambiata(location_tag: String)
 
+const AreaGate := preload("res://scripts/area_gate.gd")
+
 const TILE := 32
 const W := 48
 const H := 36
@@ -33,6 +35,9 @@ const HUB := "mirwada"
 
 var _tag_corrente: String = ""
 var _in_viaggio: bool = false
+## L'NPC nel cui raggio si trova il giocatore ("" = nessuno). Premere
+## "interagisci" qui sopra avvia il suo dialogo (US-613b).
+var _npc_vicino: String = ""
 
 
 func _ready() -> void:
@@ -41,8 +46,13 @@ func _ready() -> void:
 	_tinta_di_fondo()
 	_crea_zone()
 	_crea_passaggi()
+	_crea_gate()
+	_crea_npc()
 	_colloca_giocatore()
 	_registra_regione()
+	var ts: Node = get_node_or_null("/root/TimeSystem")
+	if ts != null and ts.has_signal("momento_cambiato"):
+		ts.momento_cambiato.connect(func(_m): _crea_npc())
 
 
 func _regione_dati() -> Dictionary:
@@ -155,6 +165,87 @@ func _crea_passaggi() -> void:
 		add_child(area)
 
 
+## Una AreaGate per ogni voce di regions.json.gating[]: una barriera che si
+## apre/chiude coi 6 modi di gate_types.json (US-611). Disposte in colonna
+## nell'interno; l'arte vera e la geometria sono un non-goal di fase 6.
+func _crea_gate() -> void:
+	var gates: Array = (_regione_dati().get("gating", []) as Array)
+	for i in gates.size():
+		var g: Variant = gates[i]
+		if typeof(g) != TYPE_DICTIONARY:
+			continue
+		var ag: Area2D = AreaGate.new()
+		ag.name = "Gate_%s" % str((g as Dictionary).get("area", i))
+		ag.position = Vector2(
+			float(W) * 0.5 * TILE,
+			TILE * 4 + (float(H - 8) * TILE) * (float(i) + 0.5) / float(maxi(gates.size(), 1)))
+		ag.call("configura", region_id, g)
+		add_child(ag)
+
+
+## Gli NPC presenti ORA (schedule + momento corrente, US-612): un marker nella
+## zona del loro location_tag. Ricostruito a ogni momento_cambiato - Bruno
+## compare solo di notte, Mirco sparisce a notte_fonda. Entrarci = "incontrato".
+func _crea_npc() -> void:
+	for c in get_children():
+		if c is Area2D and c.has_meta("npc_id"):
+			c.queue_free()
+	var ns: Node = get_node_or_null("/root/NpcSystem")
+	if ns == null:
+		return
+	var presenti: Dictionary = ns.call("presenti", region_id)
+	for id in presenti:
+		var zona: Node2D = get_node_or_null("Zona_%s" % str(presenti[id])) as Node2D
+		var area := Area2D.new()
+		area.name = "Npc_%s" % str(id)
+		area.set_meta("npc_id", str(id))
+		area.position = zona.position if zona != null else Vector2(W, H) * TILE * 0.5
+		var shape := CollisionShape2D.new()
+		var rect := RectangleShape2D.new()
+		rect.size = Vector2(TILE, TILE) * 1.2
+		shape.shape = rect
+		area.add_child(shape)
+		var m := ColorRect.new()
+		m.color = Color(0.4, 0.6, 0.95, 0.8)
+		m.size = Vector2(TILE, TILE)
+		m.position = -0.5 * m.size
+		m.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		area.add_child(m)
+		area.body_entered.connect(_npc_avvicinato.bind(str(id)))
+		area.body_exited.connect(_npc_allontanato.bind(str(id)))
+		add_child(area)
+
+
+func _npc_avvicinato(body: Node, id: String) -> void:
+	if not body.is_in_group("player"):
+		return
+	var ns: Node = get_node_or_null("/root/NpcSystem")
+	if ns != null:
+		ns.call("incontra", id)
+	_npc_vicino = id
+
+
+func _npc_allontanato(body: Node, id: String) -> void:
+	if body.is_in_group("player") and _npc_vicino == id:
+		_npc_vicino = ""
+
+
+## "interagisci" vicino a un NPC -> avvia il suo dialogo (nessun if per un NPC:
+## dialogue_id viene dal roster). No-op se il libro e' gia' aperto o un dialogo
+## e' in corso.
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("interagisci") or _npc_vicino.is_empty():
+		return
+	var de: Node = get_node_or_null("/root/DialogueEngine")
+	var book: Node = get_node_or_null("/root/Book")
+	if de == null or bool(de.call("in_corso")) or (book != null and bool(book.call("e_aperto"))):
+		return
+	var gd: Node = get_node_or_null("/root/GameData")
+	var did: String = str(gd.call("get_npc", _npc_vicino).get("dialogue_id", "")) if gd != null else ""
+	if not did.is_empty() and de.call("avvia", did, _npc_vicino):
+		get_viewport().set_input_as_handled()
+
+
 func _su_ingresso_zona(body: Node, location_tag: String) -> void:
 	if not body.is_in_group("player"):
 		return
@@ -170,8 +261,37 @@ func _su_ingresso_zona(body: Node, location_tag: String) -> void:
 func _su_passaggio(body: Node, target: String) -> void:
 	if _in_viaggio or not body.is_in_group("player"):
 		return
+	if not _ingresso_aperto(target):
+		return  # la regione respinge (es. la Frontiera oltre la Sequenza 4)
 	_in_viaggio = true
 	_viaggia_verso.call_deferred(target)
+
+
+## Un gating con area "ingresso" chiude la regione stessa (US-611): la
+## convenzione e' nel dato, non un caso per una regione. Le altre aree di
+## gating sono barriere interne (AreaGate in scena).
+func _ingresso_aperto(target: String) -> bool:
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd == null:
+		return true
+	for g in (gd.call("get_region", target).get("gating", []) as Array):
+		if typeof(g) == TYPE_DICTIONARY and str((g as Dictionary).get("area", "")) == "ingresso":
+			return AreaGate.valuta_gate(target, g, get_tree().root)
+	return true
+
+
+## US-617: fast travel dalla pagina mappa del libro. Come _su_passaggio ma
+## senza l'Area2D di confine (il "mezzo" lo verifica la pagina). Rispetta
+## comunque il gating d'ingresso. false se un viaggio e' gia' in corso o la
+## regione respinge.
+func viaggia_a(target: String) -> bool:
+	if _in_viaggio or target == region_id or not _ingresso_aperto(target):
+		return false
+	if not ResourceLoader.exists("res://scenes/regioni/%s.tscn" % target):
+		return false
+	_in_viaggio = true
+	_viaggia_verso.call_deferred(target)
+	return true
 
 
 ## Sostituisce questa scena di regione con quella della destinazione. Il player

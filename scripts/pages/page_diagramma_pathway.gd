@@ -7,7 +7,11 @@ extends VBoxContainer
 ##   * la propria colonna, dalle Sequenze 9 fino a quella corrente (le ha
 ##     vissute),
 ##   * oppure un flag in KnowledgeStore ("pathway:<id>" o "sequenza:<id>:<n>").
-## Il resto e' offuscato.
+## Il resto e' offuscato, con UNA eccezione: il nome (solo il nome, mai le
+## abilita') della Sequenza immediatamente successiva alla propria, sul
+## proprio Pathway soltanto ("prossima" - un presagio, non conoscenza
+## acquisita: non entra in KnowledgeStore, quindi non si eredita a fine
+## partita, US-719).
 ##
 ## La Sequenza corrente e' evidenziata e le sue abilita' sono elencate sotto.
 ## Nessun nome di Pathway/Sequenza hardcoded: solo id e chiavi i18n.
@@ -15,9 +19,20 @@ extends VBoxContainer
 const C_NOTO := Color(0.74, 0.67, 0.5)
 const C_IGNOTO := Color(0.22, 0.2, 0.17)
 const C_CORRENTE := Color(0.4, 0.76, 0.82)
+const C_PROSSIMA := Color(0.5, 0.42, 0.3)
 
-var _stati: Dictionary = {}   # "pid:n" -> "noto" | "ignoto" | "corrente"
+var _stati: Dictionary = {}   # "pid:n" -> "noto" | "ignoto" | "corrente" | "prossima"
 var _abilita: Array = []
+## Fog of war sui nomi di Sequenza (CLAUDE.md, richiesta utente 2026-09-09).
+## Il giocatore puo' conoscere al massimo il nome della Sequenza immediatamente
+## successiva alla propria, sul proprio Pathway soltanto: mai le sue abilita'
+## o altri dettagli, mai Sequenze piu' lontane. Calcolato al volo da
+## Progression, MAI scritto in KnowledgeStore: US-719 (eredita' al personaggio
+## successivo, fase 7) eredita solo i flag imparati li', non questa anteprima.
+var _prossima_nome: String = ""
+## US-708: i Pathway vicini verso cui si puo' fondere. Ogni voce:
+## { id, scritto (percorso di fusione non-stub), puo (PathwayChange.puo_cambiare) }.
+var _vicini: Array = []
 
 
 func aggiorna() -> void:
@@ -25,6 +40,8 @@ func aggiorna() -> void:
 		c.queue_free()
 	_stati.clear()
 	_abilita.clear()
+	_vicini.clear()
+	_prossima_nome = ""
 
 	var gd: Node = _n("/root/GameData")
 	var prog: Node = _n("/root/Progression")
@@ -68,6 +85,80 @@ func aggiorna() -> void:
 			_abilita.append(nome)
 			add_child(_riga("· " + nome))
 
+		if mia_seq > 0:
+			var prossima: Dictionary = gd.call("get_sequence", "%s_%d" % [mio, mia_seq - 1])
+			if not prossima.is_empty():
+				_prossima_nome = str(gd.call("tr_data", prossima.get("name_i18n", "")))
+				add_child(_riga("%s %s" % [tr("BOOK_DIAGRAMMA_PROSSIMA"), _prossima_nome]))
+
+		_sezione_fusione(gd, prog, mio, pw)
+
+
+# --- sezione "fondere il Pathway" (US-708) ---------------------------
+## Mostra il gruppo del Pathway corrente, i vicini fondibili e, per ognuno, se
+## il percorso di fusione e' scritto o "ancora da rivelare" (stub -> fog of
+## war, come le celle ignote del diagramma). Se PathwayChange.puo_cambiare e'
+## true un'azione conferma il cambio; altrimenti si mostra il motivo.
+func _sezione_fusione(gd: Node, _prog: Node, mio: String, pw: Dictionary) -> void:
+	var pc: Node = _n("/root/PathwayChange")
+	var fe: Node = _n("/root/FusionEngine")
+	if pc == null:
+		return
+	var gruppo: String = str(pw.get("group", ""))
+	add_child(_riga("%s  %s %s" % [
+		tr("BOOK_DIAGRAMMA_FUSIONE_TITOLO"), tr("BOOK_DIAGRAMMA_FUSIONE_GRUPPO"), gruppo]))
+
+	var ids: Array = gd.call("pathway_ids")
+	ids.sort()
+	for pid in ids:
+		if pid == mio:
+			continue
+		var altro: Dictionary = gd.call("get_pathway", pid)
+		if str(altro.get("group", "")) != gruppo:
+			continue
+		var scritto: bool = fe != null and not (fe.call("percorso", mio, pid) as Dictionary).is_empty()
+		var puo: bool = bool(pc.call("puo_cambiare", pid))
+		_vicini.append({"id": pid, "scritto": scritto, "puo": puo})
+
+		var h := HBoxContainer.new()
+		var l := Label.new()
+		l.custom_minimum_size = Vector2(200, 0)
+		l.text = "%s — %s" % [
+			str(gd.call("tr_data", altro.get("name_i18n", pid))),
+			tr("BOOK_DIAGRAMMA_FUSIONE_SCRITTO") if scritto else tr("BOOK_DIAGRAMMA_FUSIONE_STUB")]
+		if not scritto:
+			l.modulate = C_IGNOTO.lightened(0.5)  # fog of war, come le celle ignote
+		h.add_child(l)
+		if puo:
+			var b := Button.new()
+			b.text = tr("BOOK_DIAGRAMMA_FUSIONE_CONFERMA")
+			b.pressed.connect(fondi.bind(pid))
+			h.add_child(b)
+		else:
+			var m := Label.new()
+			m.modulate = Color(1, 1, 1, 0.55)
+			m.text = tr("BOOK_DIAGRAMMA_FUSIONE_TROPPO_PRESTO")
+			h.add_child(m)
+		add_child(h)
+
+	if _vicini.is_empty():
+		add_child(_riga(tr("BOOK_DIAGRAMMA_FUSIONE_NIENTE")))
+
+
+## Conferma il cambio verso `nuovo_pathway`. Rigenera la pagina dopo.
+## Interrogabile dai test.
+func fondi(nuovo_pathway: String) -> Dictionary:
+	var pc: Node = _n("/root/PathwayChange")
+	if pc == null:
+		return {"ok": false, "reason": "no_pathway_change"}
+	var res: Dictionary = pc.call("cambia", nuovo_pathway)
+	aggiorna()
+	return res
+
+
+func vicini_fondibili() -> Array:
+	return _vicini.duplicate(true)
+
 
 # --- Interrogabile dai test / UI --------------------------------------
 
@@ -77,6 +168,10 @@ func cella_stato(pathway_id: String, n: int) -> String:
 
 func abilita_elencate() -> Array:
 	return _abilita.duplicate()
+
+
+func prossima_sequenza_nome() -> String:
+	return _prossima_nome
 
 
 func testo_visibile() -> String:
@@ -93,13 +188,19 @@ func _stato(pid: String, n: int, mio: String, mia_seq: int, kn: Node) -> String:
 	if kn != null and (kn.call("conosce", "pathway:%s" % pid)
 			or kn.call("conosce", "sequenza:%s:%d" % [pid, n])):
 		return "noto"
+	if pid == mio and n == mia_seq - 1:
+		return "prossima"
 	return "ignoto"
 
 
 func _cella_cella(stato: String) -> Control:
 	var r := ColorRect.new()
 	r.custom_minimum_size = Vector2(44, 13)
-	r.color = C_CORRENTE if stato == "corrente" else (C_NOTO if stato == "noto" else C_IGNOTO)
+	match stato:
+		"corrente": r.color = C_CORRENTE
+		"noto": r.color = C_NOTO
+		"prossima": r.color = C_PROSSIMA
+		_: r.color = C_IGNOTO
 	return r
 
 

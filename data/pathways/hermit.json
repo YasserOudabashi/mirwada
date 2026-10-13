@@ -582,7 +582,8 @@
       },
       "abilities": [
         "hermit_marchio_del_destino",
-        "hermit_riscrittura"
+        "hermit_riscrittura",
+        "hermit_intercessione_arcana"
       ],
       "acting_actions": [
         {
@@ -707,7 +708,7 @@
       },
       "advancement_ritual": {
         "location_tags": [
-          "archivio"
+          "biblioteca_di_tutto"
         ],
         "momento": "notte_fonda",
         "fase_lunare": "eclissi",

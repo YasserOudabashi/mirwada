@@ -77,6 +77,12 @@ func configura(pathway_id: String, sequenza: int) -> void:
 func avanza() -> bool:
 	if _sequence <= 0:
 		return false
+	# US-711: se questo e' un salto di FASCIA con una tribolazione non ancora
+	# superata, l'avanzamento e' rifiutato (nessun verbo nuovo: TribulationSystem
+	# legge eventi + flag). Assente/superata -> passa.
+	var trib: Node = get_node_or_null("/root/TribulationSystem")
+	if trib != null and bool(trib.call("avanzamento_bloccato", _sequence)):
+		return false
 	var vecchia: int = _sequence
 	_sequence -= 1
 	_applica_modificatori(vecchia, _sequence)

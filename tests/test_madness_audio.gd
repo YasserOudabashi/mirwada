@@ -73,6 +73,7 @@ func test_one_shot_casuali_solo_sopra_25() -> void:
 
 func test_nomi_sussurro_con_fallback() -> void:
 	var am: Node = _am()
+	am.call("imposta_nomi_npc", [])   # US-612: nomi_sussurro unisce Ancore + NPC incontrati
 	am.call("imposta_nomi_sussurro", [])
 	assert_gt(float((am.call("nomi_sussurro") as Array).size()), 0.0, "fallback generico se non ci sono nomi")
 	am.call("imposta_nomi_sussurro", ["Mirco", "Ancora del giocatore"])

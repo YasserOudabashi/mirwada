@@ -38,6 +38,8 @@ func prepara() -> void:
 	_store().call("pulisci")
 	_et().call("azzera")
 	_madness().call("azzera")
+	# US-711: lo slice della fase 5 (Death 8->2) non e' sulle tribolazioni.
+	_root().get_node("TribulationSystem").call("marca_superate_tutte")
 	_engine().call("flush_effects")
 	_engine().call("clear_cooldowns")
 	_prog().configura(PID, 8)
@@ -144,7 +146,9 @@ func test_ogni_abilita_death_si_esegue_senza_warning() -> void:
 				assert_false(str(w).contains("fuori registro"),
 					"%s: nessuna primitiva fuori registro (%s)" % [aid, w])
 			provate += 1
-	assert_eq(provate, 20, "tutte e 20 le abilita' di Death (2 per Sequenza) eseguite")
+	# 20 = 2 per Sequenza (fase 5) + 1 = death_benedizione_dei_caduti, la
+	# preghiera di Sequenza 1 aggiunta in US-714 (fase 7, Blocco C).
+	assert_eq(provate, 21, "tutte e 21 le abilita' di Death (2 per Sequenza + 1 preghiera US-714) eseguite")
 	_fine()
 	caster.free()
 

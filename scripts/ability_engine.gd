@@ -49,6 +49,17 @@ var _granted: Dictionary = {}
 ## attiva). { "<instance_id>:<ability_id>": true }. Non scadono in _sweep.
 var _permanenti: Dictionary = {}
 
+## Ring buffer di snapshot per time_rewind (US-5B03, Worm of Time dell'Error):
+## instance_id del caster -> Array di { ms, hp, sp, pos }. Ogni caster che
+## esegue un'abilita' entra nel buffer; _process aggiunge un'istantanea ogni
+## _SNAP_PASSO_S, il buffer tiene le ultime _SNAP_MAX. time_rewind ne rilegge
+## una. Piccolo e per-caster: costo trascurabile. NON serializzato (il save
+## non cambia). I caster morti si purgano con sweep_cooldowns().
+const _SNAP_PASSO_S := 0.5
+const _SNAP_MAX := 12
+var _snapshots: Dictionary = {}
+var _snap_acc: float = 0.0
+
 var _handlers: Dictionary = {}
 ## Effetti a tempo in corso. Una lista processata in _process invece di
 ## await su SceneTreeTimer: gli await lasciano timer appesi se la partita
@@ -82,6 +93,9 @@ func _ready() -> void:
 		"mind_read": _p_mind_read,
 		"shadow_meld": _p_shadow_meld,
 		"illusion": _p_illusion,
+		"steal": _p_steal,
+		"possess": _p_possess,
+		"time_rewind": _p_time_rewind,
 	}
 
 
@@ -144,6 +158,8 @@ func execute(ability_id: String, caster: Node) -> Dictionary:
 
 	result["ok"] = true
 	result["reason"] = OK
+	# US-5B03: il caster che agisce entra nel ring buffer di time_rewind.
+	_campiona_snapshot(caster)
 	# US-210B: un'abilita' eseguita con successo e' un evento tracciato.
 	var et: Node = get_tree().root.get_node_or_null("EventTracker")
 	if et != null:
@@ -278,6 +294,9 @@ func cooldown_entries() -> int:
 func sweep_cooldowns() -> void:
 	_sweep(_cooldowns)
 	_sweep(_granted)
+	for iid in _snapshots.keys():
+		if not is_instance_id_valid(int(iid)):
+			_snapshots.erase(iid)
 
 
 func _sweep(index: Dictionary) -> void:
@@ -629,13 +648,19 @@ func _p_plant_growth(prim: Dictionary, caster: Node, _stats: Node, _ability_id: 
 	return rec
 
 
-## illusion (US-608, primitiva della fase 5b portata qui dal Servant of
-## Concealment del Darkness - fool_velo_illusorio e darkness_cancellazione la
-## usano). Crea un inganno percettivo di 'tipo_illusione' nel raggio per
-## 'durata'. 'potenza' = quante esche / quanto e' convincente. Il consumatore
-## vero (IA, tell visivo) e' combat/fase 6: qui l'abilita' emette il fatto e,
-## per 'danno_percepito', un dot a tag follia che sparisce se il bersaglio
-## "capisce" (rimovibile da light_purify come ogni dot).
+## illusion (US-608 / US-5B05, primitiva-firma del gruppo Lord of Mysteries).
+## Crea un inganno percettivo di 'tipo_illusione' nel raggio per 'durata'. Il
+## SIGNIFICATO di 'potenza' e' per-tipo_illusione (deciso in US-5B05 col primo
+## VFX a schermo):
+##   "copia_nemico"    -> potenza = NUMERO di esche registrate (i "finti" veri
+##                        li fa comparire il combat, fase 6; qui il conteggio).
+##   "danno_percepito" -> potenza = intensita' del dot a tag follia, che
+##                        sparisce se il bersaglio "capisce" (rimovibile da
+##                        light_purify come ogni dot).
+##   altri ("aspetto", "oggetto_evocato", "copia_statica", ...) -> potenza e'
+##                        registrata; l'effetto pieno e' combat/UI (fase 6).
+## Il consumatore vero (IA che ci casca, tell visivo sull'esca - bordo
+## tremolante, palette Fool) e' combat/fase 6: qui l'abilita' emette il fatto.
 func _p_illusion(prim: Dictionary, caster: Node, stats: Node, _ability_id: String) -> Dictionary:
 	var raggio: float = _num(prim.get("raggio"), 0.0)
 	var durata: float = _num(prim.get("durata"), 0.0)
@@ -643,13 +668,169 @@ func _p_illusion(prim: Dictionary, caster: Node, stats: Node, _ability_id: Strin
 	var tipo_illusione: String = str(prim.get("tipo_illusione", ""))
 	var origine: Vector2 = (caster as Node2D).global_position if caster is Node2D and (caster as Node2D).is_inside_tree() else Vector2.ZERO
 
-	if tipo_illusione == "danno_percepito" and durata > 0.0 and stats != null:
-		_pending.append({"kind": "dot", "stats": stats, "danno_tick": float(potenza),
-				"tick_rate": 1.0, "left": durata, "acc": 0.0})
+	var rec: Dictionary = {"tipo": "illusion", "raggio": raggio, "durata": durata,
+			"potenza": potenza, "tipo_illusione": tipo_illusione, "applied": true}
+
+	match tipo_illusione:
+		"danno_percepito":
+			if durata > 0.0 and stats != null:
+				_pending.append({"kind": "dot", "stats": stats, "danno_tick": float(potenza),
+						"tick_rate": 1.0, "left": durata, "acc": 0.0})
+			rec["dot_follia"] = true
+		"copia_nemico":
+			rec["esche"] = potenza
 
 	illusione_creata.emit(tipo_illusione, raggio, origine)
-	return {"tipo": "illusion", "raggio": raggio, "durata": durata, "potenza": potenza,
-			"tipo_illusione": tipo_illusione, "applied": true}
+	return rec
+
+
+## steal (US-5B01, primitiva-firma del gruppo Lord of Mysteries): sottrae
+## qualcosa a un bersaglio. 'categoria' decide COSA:
+##   "oggetto"    -> registra il furto di un item. L'aggancio a Inventory con un
+##                   bersaglio reale e' combat/fase 6 (prd-fase-5b, OQ 2): qui
+##                   si registra il fatto.
+##   "abilita"    -> presta al caster l'ability_id indicato via grant_temporary
+##                   (US-204) per 'durata_prestito' secondi. Il bersaglio da cui
+##                   si ruba lo sceglie il combat (fase 6); l'ability_id nei dati
+##                   dice quale potere questo Beyonder e' capace di copiare.
+##   "conoscenza" -> KnowledgeStore.impara un flag "rubata:<ability_id>".
+## 'probabilita' < 1.0 = non sempre riesce (registrato; il tiro vero e' combat).
+## 'non_sottrae' true (Door, fotocopia): il record segna sottratto:false, cioe'
+##   il bersaglio NON resta privo di cio' che gli e' stato copiato.
+func _p_steal(prim: Dictionary, caster: Node, _stats: Node, ability_id: String) -> Dictionary:
+	var categoria: String = str(prim.get("categoria", ""))
+	var durata_prestito: float = _num(prim.get("durata_prestito"), 0.0)
+	var probabilita: float = _num(prim.get("probabilita"), 1.0)
+	var non_sottrae: bool = _flag(prim.get("non_sottrae"), false)
+
+	var rec: Dictionary = {"tipo": "steal", "categoria": categoria,
+			"durata_prestito": durata_prestito, "probabilita": probabilita,
+			"sottratto": not non_sottrae, "applied": false}
+
+	match categoria:
+		"abilita":
+			var target_id: String = str(prim.get("ability_id", ""))
+			rec["ability_id"] = target_id
+			if not target_id.is_empty() and caster != null:
+				rec["applied"] = grant_temporary(target_id, caster, durata_prestito)
+		"conoscenza":
+			var flag: String = "rubata:" + ability_id
+			rec["flag"] = flag
+			var ks: Node = get_tree().root.get_node_or_null("KnowledgeStore")
+			if ks != null:
+				ks.call("impara", flag)
+				rec["applied"] = true
+		"oggetto":
+			rec["applied"] = true
+
+	return rec
+
+
+# --- Ring buffer di snapshot per time_rewind (US-5B03) -----------------------
+
+## Aggiunge un'istantanea dello stato del caster (hp, spiritualita, posizione,
+## ms) al suo buffer. Chiamata da execute() a ogni abilita' eseguita.
+func _campiona_snapshot(caster: Node) -> void:
+	if caster == null:
+		return
+	var s: Node = find_stats(caster)
+	if s == null:
+		return
+	var pos: Vector2 = Vector2.ZERO
+	if caster is Node2D and (caster as Node2D).is_inside_tree():
+		pos = (caster as Node2D).global_position
+	var iid: int = caster.get_instance_id()
+	var buf: Array = _snapshots.get(iid, [])
+	buf.append({"ms": Time.get_ticks_msec(), "hp": float(s.get("hp")),
+			"sp": float(s.get("spiritualita")), "pos": pos})
+	while buf.size() > _SNAP_MAX:
+		buf.pop_front()
+	_snapshots[iid] = buf
+
+
+## Ri-campiona ogni caster ancora vivo gia' nel buffer. Pubblica: _process la
+## chiama sul passo _SNAP_PASSO_S, i test la chiamano a mano.
+func campiona_snapshots() -> void:
+	for iid in _snapshots.keys():
+		if is_instance_id_valid(int(iid)):
+			_campiona_snapshot(instance_from_id(int(iid)) as Node)
+		else:
+			_snapshots.erase(iid)
+
+
+func clear_snapshots() -> void:
+	_snapshots.clear()
+	_snap_acc = 0.0
+
+
+func snapshot_count(caster: Node) -> int:
+	if caster == null:
+		return 0
+	return (_snapshots.get(caster.get_instance_id(), []) as Array).size()
+
+
+## time_rewind (US-5B03, Worm of Time dell'Error): riporta il caster allo stato
+## di 'secondi' fa letto dal ring buffer e addebita 'costo_follia' a Madness.
+## 'ripristina' e' la lista dei campi da riportare indietro (default hp +
+## spiritualita; "posizione" opt-in). Se il buffer non arriva a 'secondi' fa,
+## si usa l'istantanea piu' vecchia disponibile. Il "raggio limitato" su altre
+## entita' e' combat/fase 6: qui agisce sul caster. Non tocca il save.
+func _p_time_rewind(prim: Dictionary, caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+	var secondi: float = _num(prim.get("secondi"), 3.0)
+	var costo_follia: float = _num(prim.get("costo_follia"), 0.0)
+	var ripristina: Array = prim.get("ripristina") if typeof(prim.get("ripristina")) == TYPE_ARRAY else ["hp", "spiritualita"]
+
+	var rec: Dictionary = {"tipo": "time_rewind", "secondi": secondi,
+			"costo_follia": costo_follia, "ripristina": ripristina, "applied": false}
+	if caster == null or stats == null:
+		return rec
+
+	var buf: Array = _snapshots.get(caster.get_instance_id(), [])
+	if buf.is_empty():
+		return rec
+
+	var target_ms: int = Time.get_ticks_msec() - int(secondi * 1000.0)
+	var snap: Dictionary = buf[0]
+	for e in buf:
+		if int((e as Dictionary)["ms"]) <= target_ms:
+			snap = e
+
+	if "hp" in ripristina:
+		stats.set("hp", float(snap["hp"]))
+	if "spiritualita" in ripristina:
+		stats.set("spiritualita", float(snap["sp"]))
+	if "posizione" in ripristina and caster is Node2D:
+		(caster as Node2D).global_position = snap["pos"]
+
+	if costo_follia > 0.0:
+		var m: Node = get_tree().root.get_node_or_null("Madness")
+		if m != null:
+			m.call("add", costo_follia, "ability:time_rewind", false)
+
+	rec["applied"] = true
+	rec["ripristinato_da_ms"] = int(snap["ms"])
+	return rec
+
+
+## possess (US-5B02): il caster prende il controllo di un ospite. Applica lo
+## status 'posseduto' al bersaglio (lo stats risolto, come soul_detach) per
+## 'durata' e registra 'controllo' (sensi | parziale | totale). Come
+## soul_detach di Death: il CORPO del caster resta a terra vulnerabile durante
+## la possessione - il record lo dichiara ({ corpo_a_terra, vulnerabilita_corpo });
+## la resa combat (il corpo bersagliabile, l'ospite che attacca per te) e'
+## fase 6. Anche il Fool (Marionettist) la usera'.
+func _p_possess(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+	var durata: float = _num(prim.get("durata"), 0.0)
+	var controllo: String = str(prim.get("controllo", ""))
+	var applicato: bool = false
+	if stats != null and stats.has_method("applica_status"):
+		stats.call("applica_status", "posseduto", durata if durata > 0.0 else -1.0)
+		applicato = true
+	return {"tipo": "possess", "durata": durata, "controllo": controllo,
+			"soglia_resistenza": _num(prim.get("soglia_resistenza"), 0.0),
+			"corpo_a_terra": true,
+			"vulnerabilita_corpo": _num(prim.get("vulnerabilita_corpo"), 0.6),
+			"applied": applicato}
 
 
 ## shadow_meld (US-607, primitiva della fase 5b portata qui dal Nightwatcher
@@ -1036,6 +1217,11 @@ func _facing(origin: Node2D) -> Vector2:
 func _process(delta: float) -> void:
 	if not _pending.is_empty():
 		tick_effects(delta)
+	if not _snapshots.is_empty():
+		_snap_acc += delta
+		if _snap_acc >= _SNAP_PASSO_S:
+			_snap_acc = 0.0
+			campiona_snapshots()
 	var now: int = Time.get_ticks_msec()
 	if now >= _prossimo_sweep_ms:
 		_prossimo_sweep_ms = now + _SWEEP_OGNI_MS

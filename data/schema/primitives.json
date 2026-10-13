@@ -150,8 +150,10 @@
       "params": [
         "durata",
         "soglia_resistenza",
-        "controllo"
-      ]
+        "controllo",
+        "vulnerabilita_corpo"
+      ],
+      "implemented": true
     },
     "curse": {
       "params": [
@@ -184,7 +186,8 @@
         "secondi",
         "ripristina",
         "costo_follia"
-      ]
+      ],
+      "implemented": true
     },
     "soul_detach": {
       "params": [
@@ -233,8 +236,11 @@
       "params": [
         "categoria",
         "durata_prestito",
-        "probabilita"
-      ]
+        "probabilita",
+        "ability_id",
+        "non_sottrae"
+      ],
+      "implemented": true
     },
     "rule_bind": {
       "params": [

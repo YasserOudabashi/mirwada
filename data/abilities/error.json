@@ -4,7 +4,163 @@
   "abilities": [
     {
       "schema_version": 1,
+      "id": "error_scasso",
+      "name": "Scasso",
+      "name_i18n": "ability.error.error_scasso",
+      "sequence_id": "error_9",
+      "costo_spiritualita": 5,
+      "cooldown": 8.0,
+      "primitive": [
+        {
+          "tipo": "steal",
+          "categoria": "oggetto",
+          "durata_prestito": 0,
+          "probabilita": 0.8
+        }
+      ],
+      "tag_sinergia": [
+        "furto",
+        "singolo",
+        "cavillo"
+      ],
+      "note": "Il primo furto del Marauder: forza una serratura o alleggerisce un nemico. L'aggancio all'inventario del bersaglio e' combat (fase 6); qui la primitiva registra il colpo."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_pugnalata_furtiva",
+      "name": "Pugnalata furtiva",
+      "name_i18n": "ability.error.error_pugnalata_furtiva",
+      "sequence_id": "error_9",
+      "costo_spiritualita": 6,
+      "cooldown": 4.0,
+      "primitive": [
+        {
+          "tipo": "melee_arc",
+          "danno": 16,
+          "angolo": 55,
+          "raggio": 1.5,
+          "stagger": 22,
+          "tag_danno": "fisico"
+        }
+      ],
+      "tag_sinergia": [
+        "furto",
+        "singolo",
+        "agilita'"
+      ],
+      "note": "Un colpo alle spalle: danno secco se il bersaglio non ti ha visto. Il bonus da invisibilita' e' combat (fase 6)."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_parlantina",
+      "name": "Parlantina",
+      "name_i18n": "ability.error.error_parlantina",
+      "sequence_id": "error_8",
+      "costo_spiritualita": 8,
+      "cooldown": 10.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.2,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "mente",
+        "singolo"
+      ],
+      "note": "Un fiume di parole che distrae: il bersaglio perde il filo e mira peggio. La truffa vera sugli NPC e' il flusso npc_influenced, contato dalla recitazione."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_patto_truffaldino",
+      "name": "Patto truffaldino",
+      "name_i18n": "ability.error.error_patto_truffaldino",
+      "sequence_id": "error_8",
+      "costo_spiritualita": 10,
+      "cooldown": 24.0,
+      "primitive": [
+        {
+          "tipo": "buff_stat",
+          "stat": "spiritualita_max",
+          "valore": 0.15,
+          "durata": 20.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "contratto",
+        "furto"
+      ],
+      "note": "Ogni accordo dello Swindler ha una clausola nascosta a suo favore: ne ricava risorse."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_decifrazione",
+      "name": "Decifrazione",
+      "name_i18n": "ability.error.error_decifrazione",
+      "sequence_id": "error_7",
+      "costo_spiritualita": 12,
+      "cooldown": 18.0,
+      "primitive": [
+        {
+          "tipo": "steal",
+          "categoria": "conoscenza",
+          "durata_prestito": 0,
+          "probabilita": 0.9
+        },
+        {
+          "tipo": "reveal_info",
+          "raggio": 10,
+          "categoria": "formule_cifrate",
+          "durata": 12.0
+        }
+      ],
+      "tag_sinergia": [
+        "furto",
+        "conoscenza",
+        "analisi"
+      ],
+      "note": "Il Cryptologist ruba conoscenza al posto di oggetti: decifra una formula o un sigillo e se lo tiene. reveal_info porta la categoria (divinazione fuori da Hermit, matrice di proprieta')."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_lettura_rubata",
+      "name": "Lettura rubata",
+      "name_i18n": "ability.error.error_lettura_rubata",
+      "sequence_id": "error_7",
+      "costo_spiritualita": 10,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "reveal_info",
+          "raggio": 8,
+          "categoria": "sigilli_nascosti",
+          "durata": 10.0
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.15,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "conoscenza",
+        "divinazione",
+        "singolo"
+      ],
+      "note": "Legge i sigilli difensivi del bersaglio e ne trova il difetto: la difesa cede dove il testo lo dice."
+    },
+    {
+      "schema_version": 1,
       "id": "error_furto_prometeo",
+      "name": "Furto di Prometeo",
       "name_i18n": "ability.error.error_furto_prometeo",
       "sequence_id": "error_6",
       "costo_spiritualita": 25,
@@ -13,8 +169,9 @@
         {
           "tipo": "steal",
           "categoria": "abilita",
-          "durata_prestito": 30.0,
-          "probabilita": 0.75
+          "ability_id": "tg_fendente_pesante",
+          "durata_prestito": 12.0,
+          "probabilita": 0.7
         }
       ],
       "tag_sinergia": [
@@ -23,7 +180,402 @@
         "singolo"
       ],
       "costo_follia": 1.5,
-      "note": "STRESS TEST. Ruba un'abilita' vista e la rende eseguibile. Richiede che AbilityEngine sappia eseguire un'abilita' non posseduta: nessuna primitiva nuova, ma una capacita' del motore da mettere nel PRD di fase 2."
+      "note": "Ruba un'abilita' Beyonder appena vista e la rende eseguibile via grant_temporary (US-204). Il prestito e' breve e non sempre riesce (probabilita 0.7): la firma dell'Error, distinta dallo Scribe del Door (fotocopia, sempre). ability_id nei dati = quale potere questo Beyonder e' capace di copiare; il bersaglio da cui rubare lo sceglie il combat (fase 6)."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_scintilla_rubata",
+      "name": "Scintilla rubata",
+      "name_i18n": "ability.error.error_scintilla_rubata",
+      "sequence_id": "error_6",
+      "costo_spiritualita": 12,
+      "cooldown": 5.0,
+      "primitive": [
+        {
+          "tipo": "projectile",
+          "danno": 24,
+          "velocita": 10,
+          "gittata": 11,
+          "pierce": 1,
+          "tag_danno": "spirito"
+        }
+      ],
+      "tag_sinergia": [
+        "furto",
+        "spirito",
+        "singolo"
+      ],
+      "note": "Un frammento del potere rubato scagliato indietro: il Prometheus non tiene mai a lungo cio' che prende."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_furto_dei_sogni",
+      "name": "Furto dei sogni",
+      "name_i18n": "ability.error.error_furto_dei_sogni",
+      "sequence_id": "error_5",
+      "costo_spiritualita": 16,
+      "cooldown": 20.0,
+      "primitive": [
+        {
+          "tipo": "steal",
+          "categoria": "conoscenza",
+          "durata_prestito": 0,
+          "probabilita": 0.85
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.25,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "condizioni": [
+        {
+          "tipo": "e_notte",
+          "valore": true
+        }
+      ],
+      "tag_sinergia": [
+        "furto",
+        "sonno",
+        "conoscenza"
+      ],
+      "note": "Entra nel sogno di un dormiente e ne porta via ricordi e formule. Solo di notte (condizione dai dati, l'engine la fa valere). Il derubato dei ricordi combatte peggio."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_incubo_parassita",
+      "name": "Incubo parassita",
+      "name_i18n": "ability.error.error_incubo_parassita",
+      "sequence_id": "error_5",
+      "costo_spiritualita": 14,
+      "cooldown": 12.0,
+      "primitive": [
+        {
+          "tipo": "dot",
+          "danno_tick": 6,
+          "tick_rate": 1.5,
+          "durata": 8.0,
+          "tag_danno": "follia"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.2,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "sonno",
+        "parassita",
+        "follia"
+      ],
+      "note": "Lascia un incubo che si nutre da solo: logora la mente del bersaglio finche' dura."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_innesto_parassita",
+      "name": "Innesto parassita",
+      "name_i18n": "ability.error.error_innesto_parassita",
+      "sequence_id": "error_4",
+      "costo_spiritualita": 22,
+      "cooldown": 26.0,
+      "primitive": [
+        {
+          "tipo": "possess",
+          "durata": 10.0,
+          "soglia_resistenza": 4,
+          "controllo": "sensi",
+          "vulnerabilita_corpo": 0.4
+        }
+      ],
+      "tag_sinergia": [
+        "parassita",
+        "possessione",
+        "occultamento"
+      ],
+      "costo_follia": 3.0,
+      "note": "Il Parasite si attacca a un ospite e ne condivide i sensi (controllo 'sensi': nessun controllo motorio). Come soul_detach: il corpo del caster resta a terra, meno vulnerabile del solito perche' nascosto (0.4). L'ospite che agisce e' combat (fase 6)."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_simbiosi_furtiva",
+      "name": "Simbiosi furtiva",
+      "name_i18n": "ability.error.error_simbiosi_furtiva",
+      "sequence_id": "error_4",
+      "costo_spiritualita": 14,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "shadow_meld",
+          "durata": 8.0,
+          "velocita": 0.2,
+          "richiede_ombra": false
+        },
+        {
+          "tipo": "heal",
+          "quantita": 20,
+          "istantaneo": true,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "parassita",
+        "occultamento",
+        "guarigione"
+      ],
+      "note": "Attinge alle risorse dell'ospite per rimarginare le proprie ferite, restando occultato."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_proietta_avatar",
+      "name": "Proietta avatar",
+      "name_i18n": "ability.error.error_proietta_avatar",
+      "sequence_id": "error_3",
+      "costo_spiritualita": 28,
+      "cooldown": 32.0,
+      "primitive": [
+        {
+          "tipo": "summon",
+          "entita_id": "avatar_error_mentore",
+          "quantita": 2,
+          "durata": 30.0,
+          "comportamento": "aggressivo"
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "evocazione",
+        "singolo"
+      ],
+      "costo_follia": 3.5,
+      "note": "Il Mentor of Deceit proietta da se' avatar autonomi (materia prima 'avatar' in ownership.json: non cadaveri, non costrutti, non illusioni - agiscono davvero). Persistenza vera fuori dal combat e' fase 6: qui durata 30s."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_inganno_stratificato",
+      "name": "Inganno stratificato",
+      "name_i18n": "ability.error.error_inganno_stratificato",
+      "sequence_id": "error_3",
+      "costo_spiritualita": 20,
+      "cooldown": 16.0,
+      "primitive": [
+        {
+          "tipo": "illusion",
+          "raggio": 6,
+          "durata": 8.0,
+          "potenza": 2,
+          "tipo_illusione": "copia_nemico"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "precisione",
+          "valore": -0.2,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "illusione",
+        "area"
+      ],
+      "note": "Inganni dentro inganni: esche che sembrano nemici veri, mentre chi guarda perde la mira. Le esche 'vere' nel combat sono fase 6."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_cavallo_di_troia",
+      "name": "Cavallo di Troia",
+      "name_i18n": "ability.error.error_cavallo_di_troia",
+      "sequence_id": "error_2",
+      "costo_spiritualita": 32,
+      "cooldown": 28.0,
+      "primitive": [
+        {
+          "tipo": "curse",
+          "effetto": "destino_segnato",
+          "durata": 15.0,
+          "condizione_rimozione": ""
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "forza",
+          "valore": -0.35,
+          "durata": 12.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "dot",
+          "danno_tick": 10,
+          "tick_rate": 1.0,
+          "durata": 12.0,
+          "tag_danno": "follia"
+        }
+      ],
+      "tag_sinergia": [
+        "inganno",
+        "destino",
+        "maledizione"
+      ],
+      "note": "Un errore impiantato nel destino: da qui in avanti i piani del bersaglio falliscono. Reso con curse(destino_segnato) + debuff + dot follia, come hermit_1 (SENZA rule_bind)."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_piano_che_crolla",
+      "name": "Il piano che crolla",
+      "name_i18n": "ability.error.error_piano_che_crolla",
+      "sequence_id": "error_2",
+      "costo_spiritualita": 22,
+      "cooldown": 14.0,
+      "primitive": [
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.4,
+          "durata": 10.0,
+          "moltiplicativo": true
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "evasione",
+          "valore": -0.3,
+          "durata": 10.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "destino",
+        "singolo",
+        "cavillo"
+      ],
+      "note": "Ogni appiglio che il bersaglio credeva di avere cede nello stesso momento."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_riavvolgi",
+      "name": "Riavvolgi",
+      "name_i18n": "ability.error.error_riavvolgi",
+      "sequence_id": "error_1",
+      "costo_spiritualita": 26,
+      "cooldown": 20.0,
+      "primitive": [
+        {
+          "tipo": "time_rewind",
+          "secondi": 3.0,
+          "ripristina": [
+            "hp",
+            "spiritualita"
+          ],
+          "costo_follia": 6.0
+        }
+      ],
+      "tag_sinergia": [
+        "tempo",
+        "singolo",
+        "cavillo"
+      ],
+      "note": "Il Worm of Time riavvolge se stesso di 3 secondi: hp e spiritualita' tornano a com'erano. Il prezzo e' follia. Il raggio su altre entita' e' fase 6."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_verme_del_tempo",
+      "name": "Verme del tempo",
+      "name_i18n": "ability.error.error_verme_del_tempo",
+      "sequence_id": "error_1",
+      "costo_spiritualita": 34,
+      "cooldown": 40.0,
+      "primitive": [
+        {
+          "tipo": "time_rewind",
+          "secondi": 5.0,
+          "ripristina": [
+            "hp",
+            "spiritualita",
+            "posizione"
+          ],
+          "costo_follia": 10.0
+        },
+        {
+          "tipo": "buff_stat",
+          "stat": "velocita",
+          "valore": 0.2,
+          "durata": 6.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "tempo",
+        "viaggio",
+        "singolo"
+      ],
+      "note": "Un riavvolgimento piu' lungo che riporta anche il corpo dov'era: si esce da una posizione persa. Costa molta follia."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_falla_nelle_regole",
+      "name": "Falla nelle regole",
+      "name_i18n": "ability.error.error_falla_nelle_regole",
+      "sequence_id": "error_0",
+      "costo_spiritualita": 55,
+      "cooldown": 60.0,
+      "primitive": [
+        {
+          "tipo": "aura",
+          "raggio": 15,
+          "durata": -1,
+          "effetto": "destino_segnato",
+          "tick_rate": 2.0,
+          "bersagli": "nemici"
+        },
+        {
+          "tipo": "debuff_stat",
+          "stat": "difesa",
+          "valore": -0.3,
+          "durata": 8.0,
+          "moltiplicativo": true
+        }
+      ],
+      "tag_sinergia": [
+        "dominio",
+        "cavillo",
+        "area"
+      ],
+      "note": "L'abilita' di dominio dell'Error: nel raggio le regole hanno una falla e chiunque vi entri e' gia' segnato dal fato. Aura persistente + debuff, come i Seq 0 di fase 5."
+    },
+    {
+      "schema_version": 1,
+      "id": "error_ultima_scappatoia",
+      "name": "Ultima scappatoia",
+      "name_i18n": "ability.error.error_ultima_scappatoia",
+      "sequence_id": "error_0",
+      "costo_spiritualita": 45,
+      "cooldown": 50.0,
+      "primitive": [
+        {
+          "tipo": "time_rewind",
+          "secondi": 6.0,
+          "ripristina": [
+            "hp",
+            "spiritualita",
+            "posizione"
+          ],
+          "costo_follia": 14.0
+        },
+        {
+          "tipo": "heal",
+          "quantita": 60,
+          "istantaneo": true,
+          "bersaglio": "self"
+        }
+      ],
+      "tag_sinergia": [
+        "tempo",
+        "dominio",
+        "singolo"
+      ],
+      "note": "Non esiste situazione senza uscita per l'Error: riavvolge fino a sei secondi e si rimargina. La follia che costa e' enorme."
     }
   ]
 }

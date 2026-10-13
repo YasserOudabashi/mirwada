@@ -59,7 +59,7 @@ func test_navigazione_cambia_pagina() -> void:
 func test_pagina_bianca_mostra_l_appunto() -> void:
 	var ov: CanvasLayer = _monta()
 	_book().call("apri")
-	_book().call("vai_a", "mappa")   # sbloccata_da fase 6, oggi bianca
+	_book().call("vai_a", "journal")   # sbloccata_da fase 6, oggi bianca
 	_completa_voltata(ov)
 	assert_true(ov.call("corpo").to_lower().contains("appunto a matita"),
 		"una pagina non ancora sbloccata mostra l'appunto a matita, non e' assente")

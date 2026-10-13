@@ -42,6 +42,8 @@ func prepara() -> void:
 	_store().call("pulisci")
 	_et().call("azzera")
 	_madness().call("azzera")
+	# US-711: questo slice e' della fase 2, non delle tribolazioni (fase 7).
+	_root().get_node("TribulationSystem").call("marca_superate_tutte")
 	_engine().call("flush_effects")
 	_engine().call("clear_cooldowns")
 	_prog().configura("", 9)

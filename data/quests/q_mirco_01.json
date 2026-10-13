@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "id": "q_mirco_01",
+  "name": "Le basi",
+  "name_i18n": "quest.q_mirco_01.name",
+  "_comment": "Tutorial diegetico: sconfiggi senza poteri, come tg_9_duello_puro.",
+  "giver": "npc_mirco",
+  "atto": 1,
+  "fallibile": false,
+  "exclusive_with": [],
+  "steps": [
+    {
+      "id": "s1",
+      "desc": "Sconfiggi 3 nemici senza usare abilita'.",
+      "desc_i18n": "quest.q_mirco_01.s1",
+      "completamento": {
+        "tipo": "evento",
+        "evento": "enemy_defeated",
+        "filtri": {
+          "senza_abilita": true
+        },
+        "target": 3
+      },
+      "on_complete": [
+        {
+          "tipo": "flag",
+          "id": "q_mirco_01_s1",
+          "valore": true
+        }
+      ]
+    }
+  ],
+  "ricompense": [
+    {
+      "tipo": "item",
+      "item_id": "lingotto_ferro",
+      "quantita": 2
+    },
+    {
+      "tipo": "flag",
+      "id": "q_mirco_01_done",
+      "valore": true
+    }
+  ]
+}

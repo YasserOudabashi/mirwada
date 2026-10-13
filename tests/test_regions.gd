@@ -116,6 +116,28 @@ func test_passaggi_hub_and_spoke() -> void:
 	ws.call("pulisci")
 
 
+func test_ritual_di_sequenza_0_ospitato_da_una_regione() -> void:
+	# US-715: ogni Pathway attivo ha un sito reale per il rituale di Sequenza
+	# 0 (uno per gruppo, condiviso dai Pathway vicini che si fondono in fase 7).
+	var regioni: Array = _gd().call("get_regions")
+	for pid in _gd().call("pathway_ids"):
+		var pw: Dictionary = _gd().call("get_pathway", pid)
+		for seq in (pw.get("sequences", []) as Array):
+			var s: Dictionary = seq
+			if int(s.get("sequence", -1)) != 0:
+				continue
+			var rit: Dictionary = s.get("advancement_ritual", {})
+			var tags: Array = rit.get("location_tags", [])
+			assert_true(tags.size() > 0, "%s Seq 0 ha almeno un location_tag" % pid)
+			for t in tags:
+				var ospitato := false
+				for r in regioni:
+					if (r as Dictionary).get("location_tags", []).has(t):
+						ospitato = true
+						break
+				assert_true(ospitato, "%s Seq 0: location_tag '%s' ospitato da una regione" % [pid, t])
+
+
 func test_migrazione_save_v20_a_v21() -> void:
 	_pulisci_slot()
 	# un save v20 non ha i campi regione/scoperte/gate_aperti in "mondo"

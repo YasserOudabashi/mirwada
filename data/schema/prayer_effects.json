@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "_comment": "Vocabolario CHIUSO degli effetti delle PREGHIERE delle Sequenze alte (fase 7, US-703). Una preghiera e' un'abilita' di Sequenza 3-0 con un campo 'preghiera' che nomina una di queste voci: il campo e' PURAMENTE SEMANTICO + i18n (il flavour dell'endgame - autorita', seguaci, intercessione, anatema). L'EFFETTO MECCANICO lo fanno le 'primitive' dell'abilita', gia' del registro chiuso. Ogni voce qui dichiara SU QUALE primitiva/parametri si appoggia, cosi' il validator puo' controllare che l'abilita' con quel 'preghiera' usi davvero quella forma. NESSUNA primitiva nuova.",
+  "preghiere": {
+    "benedizione_seguaci": {
+      "_comment": "Il Beyonder benedice i suoi evocati/pet: un'aura persistente sui 'bersagli: evocati'. L'abilita' deve avere una primitiva aura con bersagli 'evocati'.",
+      "primitiva": "aura",
+      "richiede": {"bersagli": "evocati"}
+    },
+    "voto_di_autorita": {
+      "_comment": "Impone la propria autorita' sui nemici nel raggio: un'aura di dominio sui 'bersagli: nemici' (l'effetto e' uno status negativo dal vocabolario). L'abilita' deve avere aura con bersagli 'nemici'.",
+      "primitiva": "aura",
+      "richiede": {"bersagli": "nemici"}
+    },
+    "intercessione": {
+      "_comment": "Prega per se' o per un alleato: cura/scudo. L'abilita' deve avere una primitiva heal o shield con bersaglio 'self'.",
+      "primitiva": "heal",
+      "richiede": {}
+    },
+    "anatema": {
+      "_comment": "Scaglia una maledizione con parola d'autorita': curse + debuff. L'abilita' deve avere una primitiva curse.",
+      "primitiva": "curse",
+      "richiede": {}
+    }
+  }
+}
