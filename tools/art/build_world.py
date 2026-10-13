@@ -2,7 +2,7 @@
 """
 Mappa di prova del mondo intero (US-8B13, PRD fase 8b).
 
-    python tools/art/build_world.py                 # seed 4
+    python tools/art/build_world.py                 # seed 6 (scelto dall'utente)
     python tools/art/build_world.py --seed 5        # stessa disposizione, coste e colline diverse
     python tools/art/build_world.py --confronto 4 5 6 7   # piu' seed affiancati, per scegliere
 
@@ -139,7 +139,7 @@ def genera(seed):
     # --- terra, regioni (Voronoi deformato dal rumore) e isole ---
     costa = H * COSTA + (n1 - 0.5) * 34 + (n2 - 0.5) * 10
     terra = yy < costa
-    golfo = ((xx - TERRA["mirwada"][0] * W) / 26) ** 2 + ((yy - costa) / 15) ** 2 < 1
+    golfo = ((xx - TERRA["mirwada"][0] * W) / 30) ** 2 + ((yy - H * COSTA - 4) / 24) ** 2 < 1 + (n2 - 0.5) * 0.3
     terra &= ~golfo
     wx, wy = xx + (n2 - 0.5) * 60, yy + (n1 - 0.5) * 60
     dist = np.stack([np.hypot(wx - cx * W, wy - cy * H) * PESO.get(n, 1.0) for n, (cx, cy) in TERRA.items()])
@@ -427,7 +427,7 @@ def anteprima(w, luoghi, villaggi, k=3, etichette=True):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--seed", type=int, default=4)
+    ap.add_argument("--seed", type=int, default=6)
     ap.add_argument("--senza-ritagli", action="store_true", help="solo la mappa intera (piu' veloce)")
     ap.add_argument("--confronto", type=int, nargs="+", metavar="SEED",
                     help="solo un confronto affiancato tra piu' seed -> arte/mondo/confronto_seed.png")

@@ -7943,3 +7943,9 @@ nel repo), US-8B11 (terreni nuovi) e US-8B13 (mappa di prova) e aspettare il via
   di "costa piu' grande", da confermare) + spiagge di Mirwada piu' larghe;
   faro spostato sulla punta a ovest (era finito dentro il golfo).
   Determinismo ricontrollato (md5 identico).
+- Giro di revisione 2: l'utente sceglie il SEED 6 (ora default dello script)
+  e conferma il GOLFO. Il golfo nel seed 6 era quasi invisibile (scavato dalla
+  costa locale, che li' e' gia' alta): ora e' a profondita' fissa (30x24 tile
+  attorno a H*COSTA), si vede con qualunque seed. md5 ricontrollato.
+- Da ritoccare nei dati (US-8B14/15): nel seed 6 un lobo di Mirwada a
+  nord-ovest resta chiuso dalle rupi delle Marche (casetta_1 dentro).
