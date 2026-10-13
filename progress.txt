@@ -7831,3 +7831,19 @@ Giro 3 (4 risposte, totale Mirwada 12 -> regione definita):
 - Ingresso principale da Mirwada: PASSO TRA DUE RUPI.
 - Passaggi segreti in ombra (shadow_meld): OMBRE TROPPO SCURE che non si
   muovono con la luce.
+
+[2026-10-13] US-8B16 (in corso) — Valle della Madre: risposte (12, regione definita).
+- GIUNGLA TEMPERATA: liane, felci giganti, fiori grandi, nebbia bassa.
+- Radice del Mondo: ALBERO COLOSSALE (tronco come una montagna, sito tra le radici).
+- Costa: SCOGLIERE E GROTTE (grotte di marea che seguono la luna).
+- Abitanti: VILLAGGIO SUGLI ALBERI (case sui rami, ponti di corda).
+- Radure lunari: NASCOSTE di giorno, si scoprono solo di notte.
+- Burroni dei ponti di radici: ENTRAMBI (con fiume = alternativa a nuoto;
+  senza fondo = solo radici o volo).
+- Altare di radici: in una RADURA ISOLATA, percorso difficile.
+- Ingresso principale da Mirwada: GALLERIA DI ALBERI (arco di rami).
+- Grotte di marea: MISTO (piccole sulla mappa, la grande e' un interno).
+- Sorgenti: CASCATE in conche di felci.
+- Fauna d'atmosfera (non nemici): UCCELLI E FARFALLE, CERVI E ANIMALI GRANDI,
+  LUCCIOLE di notte (VFX). -> nuova story US-8B23.
+- Zone delle bestie profonde: avviso nell'ambiente, OSSA E GRAFFI.

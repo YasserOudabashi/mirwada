@@ -133,6 +133,14 @@ Solo eremiti; rifugio-base isolato. Tempio dei giganti. Soglia del Crepuscolo
 = voragine con scale nel buio. Ingresso principale: passo tra due rupi.
 Passaggi in ombra: ombre troppo scure che non seguono la luce.
 
+**Valle della Madre — decisa (12 risposte, 2026-10-13).** Giungla temperata
+(liane, felci giganti, nebbia bassa). Radice del Mondo = albero colossale.
+Costa a scogliere con grotte di marea (piccole sulla mappa, la grande è un
+interno). Villaggio sugli alberi (capanna-base). Radure lunari nascoste di
+giorno. Burroni con fiume (alternativa a nuoto) e senza fondo (radici o volo).
+Altare di radici in una radura isolata. Ingresso principale: galleria di
+alberi. Sorgenti a cascata. Zone delle bestie profonde segnate da ossa e graffi.
+
 **US-8B18b [A] Isole.** Le isole del mare a sud: quante, cosa nascondono, quali
 siti ospitano. *Domande (L).*
 
@@ -159,6 +167,12 @@ Valle, nave. *Domande (L).*
 sistema di bottino: servono un oggetto di scena "forziere" e tabelle di bottino
 nei dati (quali oggetti, con che probabilità, una volta sola o rigenerati).
 Story di codice: spiegarla prima. *Domande (M).*
+
+**US-8B23 [C+A] Fauna d'atmosfera.** Richiesta per la Valle (vale poi per tutto
+il mondo): uccelli e farfalle che volano via quando passi, cervi e animali
+grandi che pascolano e scappano, lucciole di notte (VFX). Non sono nemici né
+pet: niente combattimento, solo un comportamento "fuggi dal giocatore" letto
+dai dati. Story di codice + arte: spiegarla prima. *Domande (M).*
 
 ### Blocco C — Personaggi (rigenerati a 64 px)
 
