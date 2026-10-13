@@ -20,6 +20,23 @@ Questa fase produce **tutto**, a 64 px, con `sprite-forge`, partendo dalla mappa
 | 2 | **VFX colorati nel gioco** | 27 fogli in scala di grigi (uno per primitiva), il colore lo applica uno shader leggendo `data/vfx.json.pathway_palette_visiva` |
 | 3 | **Nemici per regione: rimandati** | fuori scope di questa fase, da studiare in un PRD dedicato. Qui resta solo `nemico_base` |
 
+### Struttura del mondo (US-8B10, 16 risposte, 2026-10-13)
+
+| Tema | Decisione |
+|---|---|
+| Forma | **Mondo unico collegato**: le regioni confinano, niente caricamenti tra l'una e l'altra |
+| Eccezione | **Archivio Sepolto tutto al chiuso**: mappa interna separata, collegata al mondo da un ingresso |
+| Dimensione | Regioni **grandi**, 15–20 schermate ciascuna (~100×60 tile a 64 px) |
+| Clima | Gradiente: **nord freddo, sud caldo** |
+| Mare | Mirwada è un **porto sul mare**; nel mare ci sono **isole da esplorare** in barca |
+| Disposizione | La propone Claude, l'utente la corregge su una mappa di prova |
+| Confini | **Naturali** (bosco che si dirada, salita, fiume); varchi `AreaGate` solo dove serve |
+| Ingressi | **Uno principale** per regione + 1–2 **segreti** |
+| Chiuso all'inizio | **Poco, ~15%** per regione (segreti e siti rituali) |
+| Movimento | **Nuoto, barca, arrampicata, volo libero**, tutti **da sbloccare** (chiavi del mondo, condizioni di `AreaGate`) |
+| Base | **Si sceglie e si sposta** tra 4 luoghi: casa a Mirwada, rifugio nelle Marche, capanna nella Valle, **nave** |
+| Vegetazione | **Diversa per regione** |
+
 ## 3. Regola di lavoro: le domande
 
 Prima di **ogni** story Claude fa domande all'utente e aspetta le risposte.
@@ -70,17 +87,33 @@ dominante, gli oggetti tipici, dove stanno i `location_tags`. Nessuna PNG.
 d'archivio, nebbia). Uno per riga in `ORDER`, rampe Endesga 32, 16 tile
 dual-grid ciascuno, a 64 px. *Domande (M) per ogni terreno nuovo.*
 
-**US-8B12 [C] Loader del mondo.** `scripts/world/sprite_forge_world.gd`
-(da `engines/godot/`) collegato a `region_scene.gd`: la regione carica
-`assets/world/<regione>/world.json` invece del rettangolo 48×36.
-Collisioni e `AreaGate` restano dati.
+**US-8B12 [C] Loader del mondo unico.** `scripts/world/sprite_forge_world.gd`
+(da `engines/godot/`) carica **un solo** `assets/world/world.json` al posto
+delle 5 scene-rettangolo 48×36. Collisioni e `AreaGate` restano dati.
+**US-8B12b [C] Regione corrente dalla posizione.** Oggi la regione è "la scena
+caricata"; nel mondo unico diventa "l'area in cui sta il giocatore" (una
+maschera di regioni dentro `world.json`). Zona musica, densità mistica e
+gating la leggono da lì. Probabile story da spezzare: si valuta quando la si
+spiega.
+**US-8B12c [C] Interni separati.** L'Archivio Sepolto (e ogni altro interno
+deciso nei giri per regione) è una mappa a sé, collegata al mondo da un
+ingresso con ritorno al punto di partenza.
 
-**US-8B13..17 [A] Una regione per story.** Ordine: `mirwada`,
-`marche_crepuscolo`, `valle_madre`, `archivio_sepolto`, `frontiera_porte`.
-Ognuna: preset di bioma → generazione dal seed → ritocco **nei dati** →
-anteprima ingrandita guardata → `world.json` + atlanti committati.
-Ogni `location_tag` della regione deve esistere a schermo.
+**US-8B13 [D+A] Mappa di prova del mondo intero.** Disposizione delle 5 regioni
+e delle isole (proposta di Claude, §5), generata **grezza** dal seed con una
+maschera per regione, guardata con l'utente e corretta. Solo dopo il via si
+passa alle regioni una per una.
+
+**US-8B14..18 [A] Rifinitura di una regione per story.** Ordine: `mirwada`,
+`marche_crepuscolo`, `valle_madre`, `archivio_sepolto` (interno),
+`frontiera_porte`. Ognuna: preset di bioma → generazione dal seed → ritocco
+**nei dati** → anteprima ingrandita guardata → `world.json` + atlanti committati.
+Ogni `location_tag` della regione deve esistere a schermo. Ingresso principale,
+1–2 passaggi segreti, ~15% chiuso.
 *Domande (XL) per ogni regione: 10–15.*
+
+**US-8B18b [A] Isole.** Le isole del mare a sud: quante, cosa nascondono, quali
+siti ospitano. *Domande (L).*
 
 **US-8B18 [A+C] Edifici e oggetti di scena.** Il generatore oggi non fa edifici
 né ponti veri: estensione di `forge3d` (case, ponti, templi, torre, scaffali,
@@ -92,7 +125,9 @@ altari, rovine). Story a sé, poi si rigenerano le regioni con lo stesso seed.
 *Domande (L) per ognuno.*
 
 **US-8B20 [A] Base del giocatore.** 4 stanze (`laboratorio`, `stanza_rituale`,
-`biblioteca`, `giardino`) e 3 strutture (`palizzata`, `totem_veglia`, `deposito`).
+`biblioteca`, `giardino`) e 3 strutture (`palizzata`, `totem_veglia`, `deposito`),
+in 4 versioni di luogo: casa a Mirwada, rifugio nelle Marche, capanna nella
+Valle, nave. *Domande (L).*
 
 **US-8B21 [A] Varchi di gating visibili.** Un aspetto per ognuno dei 6 tipi in
 `gate_types.json` (ombra, radici, porta sigillata, ...). Il giocatore deve capire
@@ -139,25 +174,66 @@ i segnalibri, la voltata, le macchie, la pagina "follia".
 ### Blocco G — Animazioni nuove di Enel
 
 **US-8B80 [D+A]** interagire, raccogliere, bere, rituale (prima la voce in
-`animations.json`, poi lo sheet). Arrampicata e nuoto solo se una regione li
-richiede (lo decide US-8B10).
+`animations.json`, poi lo sheet).
+**US-8B81 [D+A]** nuoto, arrampicata, volo, in barca (servono a Blocco H).
 
-## 5. Domande del primo giro (US-8B10, struttura del mondo)
+### Blocco H — Movimento e base mobile (nuovo, da US-8B10)
 
-1. Mondo unico collegato o 5 mappe separate?
-2. Quanto è grande una regione (in schermate)?
-3. Come si passa da una regione all'altra?
-4. Mirwada è sul mare?
-5. Dove sta la base del giocatore?
-6. Il mondo ha un "nord freddo" o un clima uniforme?
-7. Quanto deve essere fitta la vegetazione nelle regioni aperte?
-8. Si vede il cielo o le regioni chiuse (archivio, cripte) sono tutte al chiuso?
-9. Si nuota e ci si arrampica?
-10. Strade visibili tra i luoghi o terreno libero?
-11. Ogni regione ha un solo ingresso o più ingressi?
-12. Quanta parte di ogni regione è nascosta dal gating?
+Sono **sistemi di gioco**, non solo arte: ognuno va spiegato prima, con il
+diff stimato, e spezzato se supera i limiti della regola 3. Ogni movimento
+è una **chiave del mondo**: si sblocca, e `AreaGate` lo usa come condizione
+(un tipo nuovo in `gate_types.json`, o una condizione dei tipi esistenti: si
+decide spiegandolo).
 
-Poi un giro di 10–15 domande per ogni regione (US-8B13..17).
+**US-8B90 [C+A] Nuoto.** Acqua bassa percorribile, acqua profonda solo con lo
+sblocco. *Domande (M).*
+**US-8B91 [C+A] Barca.** Salire/scendere al molo, navigare il mare, raggiungere
+le isole. *Domande (L).*
+**US-8B92 [C+A] Arrampicata.** Pareti e scale scalabili segnate nei dati della
+mappa. *Domande (M).*
+**US-8B93 [C+A] Volo libero.** Il più grosso: altezza, ombra a terra, cosa si
+scavalca, dove si atterra, costo. Quasi certamente 2–3 story. *Domande (XL).*
+**US-8B94 [C] Base sceglibile e spostabile.** I 4 luoghi, come si sceglie, cosa
+succede alle stanze quando si sposta, la nave come base mobile. *Domande (L).*
+
+## 5. Disposizione proposta delle regioni (US-8B13, da approvare)
+
+Nord freddo, sud caldo; Mirwada sul mare; isole a sud.
+
+```
+                 N  (freddo)
+   +-------------------------------------------+
+   |   MARCHE DEL         ARCHIVIO    FRONTIERA |
+   |   CREPUSCOLO         SEPOLTO     DELLE     |
+   |   (brughiera,        (ingresso   PORTE     |
+   |    alture, vette     nella neve, (nebbia,  |
+   |    fredde)           tutto       oltre i   |
+   |                      al chiuso)  monti)    |
+   |                                            |
+   |          MIRWADA            VALLE DELLA    |
+   |          (citta' di porto,  MADRE          |
+   |           clima mite)       (foresta umida,|
+   |                             grotte di marea|
+   |                             sulla costa)   |
+   |~~~~~~~~~~~~~ costa ~~~~~~~~~~~~~~~~~~~~~~~ |
+   |      o isola        o isola       o isola  |
+   +-------------------------------------------+
+                 S  (caldo, mare)
+```
+
+Perché così:
+- **Mirwada** al centro-sud: è l'hub, quindi tocca tutte le regioni terrestri ed
+  è sul mare (porto, partenza della barca per le isole).
+- **Valle della Madre** a sud-est: è umida e calda, e le `grotta_di_marea` hanno
+  bisogno della costa.
+- **Marche del Crepuscolo** a nord-ovest: brughiera fredda e ventosa, alture e
+  `vetta`; il tramonto infinito si legge meglio su un orizzonte freddo.
+- **Archivio Sepolto** al nord: una città di studiosi sepolta dalla neve. In
+  superficie c'è solo l'ingresso, tutto il resto è al chiuso.
+- **Frontiera delle Porte** all'estremo nord-est, oltre i monti: la più lontana
+  dall'hub (è l'endgame), visibile da lontano fin dall'inizio (design-world 2.5).
+
+Poi un giro di 10–15 domande per ogni regione (US-8B14..18).
 
 ## 6. Fuori scope
 - Nemici per regione (decisione 3: PRD a parte).

@@ -7751,3 +7751,31 @@ correggere i campi come dice prossimi-passi.md § 2. Poi US-801.
 - Aperto: rampe bende/acciaio "dritte" (Endesga non ha grigi chiari con hue
   shift); ombra a terra di nemico e pet ancora cotta nello sprite (ammessa,
   ma andrebbe composta nel gioco); death del nemico che affonda.
+
+[2026-10-13] US-8B10 (in corso) — struttura del mondo: risposte dell'utente.
+Giro 1-3 (12 risposte):
+- Mondo UNICO collegato (non 5 mappe separate). Regioni GRANDI: 15-20
+  schermate ciascuna (a 64 px una schermata ~20x11 tile -> ~100x60 tile per
+  regione, mondo ~300x200 tile).
+- Mirwada = citta' di porto sul MARE. Clima a gradiente: NORD FREDDO, SUD CALDO.
+- Disposizione delle regioni: la decide Claude, coerente col lore, e la
+  mostra su una mappa di prova da correggere.
+- Passaggi tra regioni: CONFINI NATURALI (le regioni confinano); i varchi
+  chiusi dal gating (AreaGate) solo dove serve bloccare.
+- Base del giocatore: SI SCEGLIE / SI SPOSTA tra piu' luoghi (serve codice:
+  story a parte, da spiegare prima).
+- Movimento: si viaggia anche a NUOTO, in BARCA, ARRAMPICANDOSI e VOLANDO.
+  Tutti e quattro si SBLOCCANO (chiavi del mondo stile metroidvania, usate
+  come condizioni di AreaGate). Volo = VOLO LIBERO sopra la mappa (molto
+  codice e arte: story dedicate).
+- Archivio Sepolto: TUTTO AL CHIUSO (sotterraneo). Le altre regioni all'aperto.
+- Vegetazione: DIVERSA PER REGIONE.
+Giro 4 (4 risposte, totale 16):
+- Ingressi: UNO PRINCIPALE per regione + 1-2 passaggi SEGRETI (che chiedono
+  un movimento sbloccato: nuoto, barca, scalata, volo).
+- Parte chiusa all'inizio: POCA, circa 15% per regione (segreti + siti rituali).
+- Base sceglibile tra TUTTI e 4 i luoghi proposti: casa a Mirwada (porto),
+  rifugio nelle Marche, capanna nella Valle, NAVE (base mobile).
+- Mare: ISOLE DA ESPLORARE, raggiungibili in barca, con segreti e siti.
+- Prossimo passo: Claude propone la disposizione delle 5 regioni (scelta
+  lasciata a Claude), poi un giro di 10-15 domande per regione.
