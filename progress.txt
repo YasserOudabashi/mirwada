@@ -7930,4 +7930,5 @@ nel repo), US-8B11 (terreni nuovi) e US-8B13 (mappa di prova) e aspettare il via
 - Guardato ingrandito: OK disposizione, passo tra due rupi leggibile, giungla
   fitta; NON OK ancora: texture dell'erba a righe regolari, neve a strisce
   (terreni: US-8B11); citta' = griglia rotonda senza moli (edifici: US-8B18);
-  Frontiera con terreni normali (pastello: US-8B11); trono nell'angolo NO.
+  Frontiera con terreni normali (pastello: US-8B11); trono vicino all'angolo
+  nord-ovest (gradone piu' alto = piu' lontano da Mirwada): da confermare.
