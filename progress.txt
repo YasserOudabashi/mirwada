@@ -8069,3 +8069,29 @@ approvato la spiegazione e il via alla 8B11a.
   Frontiera); colori pastello extra da confermare guardandoli in gioco.
 - US-8B11 COMPLETA (a, b, c, d): 28 terreni nuovi + 7 ritoccati. Prossimo:
   collegarli a build_world.py (mappa di prova con i pavimenti veri).
+
+[2026-10-14] Terreni collegati a build_world.py (chiusura di US-8B11). FATTO.
+- Mirwada: filari al posto dell'erba secca; citta' con strade in lastre_chiare
+  (meta' alta, centro antico) e ciottoli_scuri (meta' bassa, porto e
+  quartiere), "stone" resta solo come sedime degli edifici (US-8B18);
+  piazzale del porto in ciottoli; spiagge miste (ciottoli entro 28 tile dal
+  porto e sugli scogli, sabbia nelle calette); 2 moli di pietra (3x7) e 3
+  pontili di legno (2x5-6) nel golfo; strade di campagna in lastricato_antico;
+  cimitero e monastero = disco di ghiaia con centro in marmo.
+- Marche: fondo pietrisco, muschio_scuro nelle zone umide, erica_secca a
+  ciuffi, terra_bruciata nel campo di battaglia (baricentro della regione),
+  arenaria sui bordi dei gradoni, sulle rupi del confine e sulla costa.
+- Valle: felci (al posto di forest), radici_muschio nel cuore della giungla,
+  palude, scogliere di arenaria, muro di felci al confine.
+- Archivio: ghiaccio attorno alla scalinata. Isole: frontiera erba_lilla +
+  sentieri terra_rosa + cuore di nebbia; relitto pietrisco/arenaria;
+  vulcanica cenere + roccia_lavica; tropicale sabbia_bianca; rovine
+  lastre_rovine; faro arenaria; boss foresta + palude.
+- SENZA_ALBERI: lista dei terreni dove non crescono alberi. Frontiera: solo
+  alberi secchi (quelli pastello con gli oggetti).
+- Errori trovati e corretti: villaggi scesi da 17 a 11 (le fattorie si
+  cercavano sull'erba secca, ora filari) ; pontili larghi 1 = "salsicciotti"
+  (la dual grid arrotonda i tile isolati) -> larghi 2.
+- Ritagli in piu': cimitero, trono, radice del mondo, isola vulcanica.
+- Verificato: md5 identico su due lanci; validate exit 0. Radure lunari:
+  di giorno sono erba normale (la versione argentata e' notturna, US-8B12).

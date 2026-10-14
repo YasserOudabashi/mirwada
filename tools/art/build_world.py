@@ -53,6 +53,10 @@ ISOLE = [("frontiera_porte", 0.55, 0.87, 20, "frontiera"),
          ("scoglio_faro", 0.24, 0.76, 4, "faro"),
          ("isola_boss", 0.05, 0.95, 7, "boss")]
 REGIONI = ["mare"] + list(TERRA) + [i[0] for i in ISOLE]
+# Terreni dove non crescono alberi (selciati, rocce, sabbie, cenere, nebbia...)
+SENZA_ALBERI = ["path", "sand", "stone", "lastre_chiare", "ciottoli_scuri", "molo_pietra", "pontile_legno",
+                "lastricato_antico", "marmo", "ghiaia", "ciottoli_spiaggia", "arenaria", "pietrisco", "terra_bruciata",
+                "sabbia_bianca", "cenere", "roccia_lavica", "lastre_rovine", "nebbia", "ghiaccio", "terra_rosa"]
 L = LEVEL
 # alberi per profilo: (densita', [(tipo, foglia)])
 ALBERI = {"campagna": (0.035, [("oak", "leaf_light"), ("oak", "leaf"), ("birch", "leaf_light")]),
@@ -60,7 +64,7 @@ ALBERI = {"campagna": (0.035, [("oak", "leaf_light"), ("oak", "leaf"), ("birch",
           "neve": (0.006, [("pine", "snow")]),
           "tropicale": (0.20, [("palm", "leaf_light")]),
           "boss": (0.30, [("dead", "leaf"), ("oak", "leaf_dark")]),
-          "frontiera": (0.03, [("dead", "leaf"), ("birch", "leaf_light")])}
+          "frontiera": (0.03, [("dead", "leaf")])}                 # alberi pastello: con gli oggetti (US-8B18)
 
 
 def nb4(y, x):
@@ -168,9 +172,9 @@ def genera(seed):
     g = np.full((H, W), L["grass"])
     g[~land] = np.where(dacqua[~land] > 4, L["deep_water"], L["water"])
 
-    # Mirwada: campagna (uliveti = erba secca, boschetti), citta' sul porto
+    # Mirwada: campagna (uliveti e vigneti a filari, boschetti), citta' sul porto
     mw = R["mirwada"]
-    g[mw & (d > 0.66)] = L["dry_grass"]
+    g[mw & (d > 0.66)] = L["filari"]
     g[mw & (d < 0.14)] = L["forest"]
     # Marche: altopiano a gradoni, quasi niente verde
     mc = R["marche_crepuscolo"]
@@ -180,32 +184,46 @@ def genera(seed):
     bordo_grad = np.zeros_like(land)
     for sy, sx in ((1, 0), (0, 1)):
         bordo_grad |= grad != sposta(grad, sy, sx, -1)
-    g[mc] = np.where(grad[mc] % 2 == 0, L["dirt"], L["dry_grass"])
-    g[mc & ((d > 0.72) | bordo_grad)] = L["stone"]
+    g[mc] = L["pietrisco"]
+    g[mc & (m > 0.62)] = L["muschio_scuro"]                               # zone umide
+    g[mc & (d < 0.22)] = L["erica_secca"]                                 # pochi ciuffi
+    ys_mc, xs_mc = np.nonzero(mc)
+    campo = (int(xs_mc.mean()), int(ys_mc.mean()))                       # campo di battaglia dei giganti
+    g[mc & (np.hypot(xx - campo[0], yy - campo[1]) < 12 + (n2 - 0.5) * 10)] = L["terra_bruciata"]
+    g[mc & ((d > 0.72) | bordo_grad)] = L["arenaria"]                    # pareti dei gradoni
     # Archivio: pianura bianca vuota
     g[R["archivio_sepolto"]] = L["snow"]
     # Valle: giungla fitta, radure d'erba, fango nelle zone umide
     vl = R["valle_madre"]
-    g[vl] = np.where(m[vl] > 0.42, L["forest"], L["grass"])
-    g[vl & (m > 0.72)] = L["mud"]
+    g[vl] = np.where(m[vl] > 0.42, L["felci"], L["grass"])
+    cuore = np.hypot(xx - TERRA["valle_madre"][0] * W, yy - TERRA["valle_madre"][1] * H) < 38
+    g[vl & cuore & (m > 0.5)] = L["radici_muschio"]
+    g[vl & (m > 0.72)] = L["palude"]
     g[nord & land & ~vl] = L["snow"]
     # coste: sabbia, ma scogliere nella Valle e nelle Marche
     riva = land & (dmare <= 2)
     riva |= R["mirwada"] & (dmare <= 3)                                   # spiagge di Mirwada piu' larghe
     g[riva] = L["sand"]
-    g[riva & (vl | mc)] = L["stone"]
+    g[riva & (vl | mc)] = L["arenaria"]
     # isole
     for rid, cx, cy, r, prof in ISOLE:
         z = R[rid]
-        base = {"frontiera": L["grass"], "relitto": L["stone"], "vulcanica": L["dirt"], "tropicale": L["grass"],
-                "rovine": L["dry_grass"], "faro": L["stone"], "boss": L["forest"]}[prof]
+        base = {"frontiera": L["erba_lilla"], "relitto": L["pietrisco"], "vulcanica": L["cenere"],
+                "tropicale": L["grass"], "rovine": L["dry_grass"], "faro": L["arenaria"], "boss": L["forest"]}[prof]
         g[z & (dmare > 1)] = base
+        if prof == "relitto":
+            g[z & (dmare > 1) & (d > 0.6)] = L["arenaria"]
         if prof == "vulcanica":
-            g[z & (dmare > 3) & (d > 0.5)] = L["stone"]
-        if prof in ("rovine", "frontiera"):
-            g[z & (dmare > 2) & (d > 0.7)] = L["stone"]
+            g[z & (dmare > 3) & (d > 0.45)] = L["roccia_lavica"]
+        if prof == "tropicale":
+            g[z & (dmare <= 2)] = L["sabbia_bianca"]
+        if prof == "rovine":
+            g[z & (dmare > 1) & (d > 0.6)] = L["lastre_rovine"]
+        if prof == "frontiera":                                           # isola d'arrivo, poi la nebbia dentro
+            g[z & (dmare > 2) & (d > 0.72)] = L["terra_rosa"]
+            g[z & (dmare > 5) & (n2 < 0.5)] = L["nebbia"]
         if prof == "boss":
-            g[z & (dmare > 2) & (m > 0.6)] = L["mud"]
+            g[z & (dmare > 2) & (m > 0.6)] = L["palude"]
 
     # --- confini naturali e ingressi principali ---
     def confine(z):
@@ -230,9 +248,10 @@ def genera(seed):
     galleria = ingresso(vl, "mirwada")
     scalinata = ingresso(R["archivio_sepolto"], "mirwada")
     rupi = ispessisci(confine(mc), 1) & land & ~disco(*passo, 3)
-    g[rupi] = L["stone"]
+    g[rupi] = L["arenaria"]
     muro_verde = ispessisci(confine(vl), 2) & vl & ~disco(*galleria, 2) & ~riva
-    g[muro_verde] = L["forest"]
+    g[muro_verde] = L["felci"]
+    g[disco(*scalinata, 2) & R["archivio_sepolto"]] = L["ghiaccio"]       # ghiaccio solo all'ingresso
 
     # --- Mirwada citta': porto sulla costa, isolati e strade, mura in rovina ---
     px = int(TERRA["mirwada"][0] * W)
@@ -240,11 +259,21 @@ def genera(seed):
     porto, centro = (px, py), (px, py - 18)
     citta = disco(*centro, 22) & mw & (dmare > 1)
     isolati = ((xx % 6) < 4) & ((yy % 5) < 3)
-    g[citta] = np.where(isolati[citta], L["stone"], L["path"])
+    strada = np.where(yy < centro[1], L["lastre_chiare"], L["ciottoli_scuri"])
+    g[citta] = np.where(isolati[citta], L["stone"], strada[citta])     # stone = sedime degli edifici (US-8B18)
     mura = disco(*centro, 23) & ~disco(*centro, 21) & mw & (dmare > 1)
     ang = np.degrees(np.arctan2(yy - centro[1], xx - centro[0])) % 360
     g[mura & ((ang % 40) < 26)] = L["stone"]            # tratti di mura, interrotti (in rovina)
-    g[disco(*porto, 4) & land] = L["path"]               # banchine
+    g[disco(*porto, 4) & land] = L["ciottoli_scuri"]     # piazzale del porto
+    # spiagge miste: ciottoli vicino al porto e dove ci sono scogli, sabbia nelle calette
+    g[riva & mw & ((np.hypot(xx - porto[0], yy - porto[1]) < 28) | (d > 0.62))] = L["ciottoli_spiaggia"]
+    # moli di pietra (navi grandi) e pontili di legno (barche), dalla riva verso il golfo
+    for dx, larg, lung, ter in ((-8, 3, 7, "molo_pietra"), (8, 3, 7, "molo_pietra"),
+                                (-15, 2, 5, "pontile_legno"), (0, 2, 6, "pontile_legno"), (15, 2, 5, "pontile_legno")):
+        x0 = porto[0] + dx
+        y0 = max(y for y in range(H) if land[y, x0])
+        g[y0:y0 + lung + 1, x0:x0 + larg] = L[ter]
+        land[y0:y0 + lung + 1, x0:x0 + larg] = True
 
     # --- fiumi: dal nord verso il mare, uno nella Valle e uno tra citta' e Marche ---
     acqua = ~land
@@ -266,7 +295,7 @@ def genera(seed):
     # --- strade principali dal porto agli ingressi e ai luoghi fuori le mura ---
     archivio_ordine = (centro[0] + 6, centro[1] - 34)
     cimitero = (centro[0] + 30, centro[1] - 4)
-    costo = np.where(g == L["stone"], 25.0, 1.0) + np.where(g == L["forest"], 4.0, 0.0)
+    costo = np.where(np.isin(g, [L["stone"], L["arenaria"]]), 25.0, 1.0) + np.where(g == L["forest"], 4.0, 0.0)
     costo[acqua] = 40.0
     strade, ponti = [], []
     for meta in (passo, galleria, scalinata, archivio_ordine, cimitero):
@@ -276,7 +305,10 @@ def genera(seed):
             if g[y, x] in (L["water"], L["deep_water"]):
                 ponti.append({"type": "bridge", "x": x + .5, "y": y + .5, "variant": 0})
             elif not citta[y, x]:
-                g[y, x] = L["path"]
+                g[y, x] = L["lastricato_antico"]
+    for luogo, r_marmo in ((cimitero, 2), (archivio_ordine, 1)):
+        g[disco(*luogo, 5) & land] = L["ghiaia"]
+        g[disco(*luogo, r_marmo + 1) & land] = L["marmo"]
 
     # --- luoghi (suggerimenti da correggere) ---
     interno = (xx >= 14) & (xx < W - 14) & (yy >= 14) & (yy < H - 14)
@@ -323,15 +355,15 @@ def genera(seed):
     fiume = acqua & land
     riva_fiume = ispessisci(fiume, 1) & ~fiume
     lontano_citta = ~disco(*centro, 30)
-    campagna = mw & lontano_citta & ~riva & np.isin(g, [L["grass"], L["dry_grass"]])
+    campagna = mw & lontano_citta & ~riva & np.isin(g, [L["grass"], L["dry_grass"], L["filari"]])
     villaggi = {"villaggio_sugli_alberi": migliore(vl & vicino_a(galleria, 30, 45) & (g == L["forest"]), m),
                 "capanna_base_valle": migliore(vl & vicino_a(galleria, 8, 14) & ~riva, d),
                 "rifugio_base_marche": migliore(mc & vicino_a(passo, 10, 16) & ~rupi, d),
                 "mulino": migliore(mw & riva_fiume & lontano_citta, -abs(yy - centro[1])),
                 "villaggio_pescatori": migliore(R["isola_tropicale"] & (dmare == 2), xx)}
-    for i, q in enumerate(scegli(mc & (g == L["dirt"]), 3, 30), 1):
+    for i, q in enumerate(scegli(mc & (g == L["pietrisco"]), 3, 30), 1):
         villaggi[f"eremita_{i}"] = q
-    for i, q in enumerate(scegli(campagna & (g == L["dry_grass"]), 3, 22), 1):
+    for i, q in enumerate(scegli(campagna & (g == L["filari"]), 3, 22), 1):
         villaggi[f"fattoria_{i}"] = q
     for i, q in enumerate(scegli(campagna, 6, 16, list(villaggi.values())), 1):
         villaggi[f"casetta_{i}"] = q
@@ -354,11 +386,11 @@ def genera(seed):
         if prof in ALBERI:
             profilo[R[rid]] = prof
     ciuffi = fbm(W, H, 5, 2, seed + 77)
-    occupato = acqua | (g == L["path"]) | (g == L["sand"]) | (g == L["stone"])
+    occupato = acqua | np.isin(g, [L[n] for n in SENZA_ALBERI])
     for y in range(H):
         for x in range(W):
             if occupato[y, x]:
-                if g[y, x] == L["stone"] and mc[y, x] and rnd.random() < 0.05:
+                if g[y, x] == L["arenaria"] and mc[y, x] and rnd.random() < 0.05:
                     w.objects.append({"type": "rock", "x": x + .5, "y": y + .7, "seed": rnd.randrange(6),
                                       "mat": "stone_light", "moss": False})
                 continue
@@ -456,7 +488,8 @@ def main():
     anteprima(w, luoghi, villaggi).save(os.path.join(OUT, "mondo_prova.png"))
     if not a.senza_ritagli:
         atl = {n: build_atlas(n, 32) for n in ORDER}
-        for nome in ("porto", "passo_tra_rupi", "galleria_di_alberi", "scalinata_archivio", "approdo_frontiera"):
+        for nome in ("porto", "cimitero", "passo_tra_rupi", "trono_del_gigante", "galleria_di_alberi",
+                     "radice_del_mondo", "scalinata_archivio", "approdo_frontiera", "isola_vulcanica"):
             x, y = luoghi[nome]
             box = (max(0, x - 20), max(0, y - 12), min(W, x + 20), min(H, y + 12))
             save(render_world(w, box, atlases=atl), os.path.join(OUT, f"mondo_prova_{nome}.png"))
