@@ -8181,3 +8181,15 @@ Domande su isola ghiacciata e sottosuolo (round 3-4):
   mare; strade A* a "L" squadrate che corrono anche lungo la riva; anello
   d'arrivo della Frontiera stretto rispetto alla nebbia; "un terzo" del
   sottosuolo era ~700 sulla stima vecchia, ora e' ~22% della superficie.
+
+[2026-10-14] Risposte dell'utente: artifact "tavolo tattico" + Mirwada grande citta' portuale.
+- Artifact: COME DESCRITTO: sposta/ridimensiona zone e isole, trascina/aggiungi/
+  cancella luoghi, villaggi, ingressi e boss, note sulla mappa, due livelli
+  (sopra/sotto), modifiche salvate nella pagina e lette da Claude. Richiede
+  di spostare la disposizione in tools/art/layout_mondo.json.
+- Mirwada: ~55 SCHERMATE di citta' (~125 tile di diametro). Quartieri: centro
+  antico in collina; CENTRO STORICO con museo, negozi, mercanti, famiglie
+  (richiesta dell'utente); quartiere operaio; BASSIFONDI: un posto abbandonato
+  a se stesso con i suoi abitanti poveri (richiesta dell'utente); porto
+  commerciale; citta' nuova fuori le mura.
+- Porto: DIGA FORANEA (con il faro in punta), CANTIERE NAVALE, LUNGOMARE.
