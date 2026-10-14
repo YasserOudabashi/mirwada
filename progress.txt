@@ -8095,3 +8095,20 @@ approvato la spiegazione e il via alla 8B11a.
 - Ritagli in piu': cimitero, trono, radice del mondo, isola vulcanica.
 - Verificato: md5 identico su due lanci; validate exit 0. Radure lunari:
   di giorno sono erba normale (la versione argentata e' notturna, US-8B12).
+
+[2026-10-14] DECISIONE DELL'UTENTE: il mondo attuale (320x220, ~210 schermate di
+terra) e' troppo piccolo. Proposte mostrate (immagine di confronto alla stessa
+scala): A x2, B x3, C x2 + terre di mezzo + arcipelago, D x2 + sottosuolo.
+SCELTA: C+D, MA con il mondo di base ingrandito davvero ("non che sia sempre la
+stessa grandezza") -> scala x3 (960x660 tile).
+- Regioni x3, piu' TERRE DI MEZZO tra le regioni (zone selvagge di nessun
+  gruppo; nei dati restano 5 regioni, le terre di mezzo sono zone dentro le
+  regioni vicine), ARCIPELAGO di isole vere, FRONTIERA come regione vera.
+- SOTTOSUOLO collegato sotto tutte le regioni (fogne, catacombe, grotte,
+  miniere), tanti ingressi.
+- Stima: ~2.500 schermate sopra + ~1.000 sotto; ~4-5 minuti per attraversarlo.
+- Conseguenze: in Godot serve il CARICAMENTO A PEZZI (story di codice);
+  world.json troppo grande -> salvare le mappe come immagini; nemici attivi
+  solo vicino al giocatore (PRD nemici); viaggi lunghi -> barca, volo, viaggio
+  rapido indispensabili (forse corsa o cavalcatura).
+- Prossimo: domande (XL) su terre di mezzo, arcipelago, sottosuolo.

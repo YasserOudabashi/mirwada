@@ -270,6 +270,24 @@ scavalca, dove si atterra, costo. Quasi certamente 2–3 story. *Domande (XL).*
 **US-8B94 [C] Base sceglibile e spostabile.** I 4 luoghi, come si sceglie, cosa
 succede alle stanze quando si sposta, la nave come base mobile. *Domande (L).*
 
+## 4b. Mondo ingrandito: x3 + C + D (decisione 2026-10-14)
+
+Il mondo di prova (320x220 tile, ~210 schermate di terra) e' troppo piccolo per
+l'utente. Scelta: **mondo di base x3 (960x660 tile)** piu':
+- **terre di mezzo** tra le regioni (zone selvagge di nessun gruppo: nei dati
+  restano 5 regioni, le terre di mezzo sono zone dentro le regioni vicine);
+- **arcipelago** di isole vere e **Frontiera** come regione vera;
+- **sottosuolo collegato** sotto tutte le regioni (fogne, catacombe, grotte,
+  miniere) con tanti ingressi.
+Stima: ~2.500 schermate sopra + ~1.000 sotto, ~4-5 minuti per attraversarlo.
+
+Story nuove (domande XL prima di ognuna):
+- **US-8B13b** mappa di prova x3 con terre di mezzo e arcipelago;
+- **US-8B13c** mappa di prova del sottosuolo;
+- **US-8B12e [C]** caricamento a pezzi in Godot (blocchi attorno al giocatore)
+  e mappe salvate come immagini invece che JSON;
+- **US-8B12d [C]** collegamento superficie-sottosuolo nel gioco.
+
 ## 5. Disposizione delle regioni (US-8B13) — SCELTA: variante C
 
 Scelta dall'utente il 2026-10-13 guardando lo schizzo di 3 varianti
