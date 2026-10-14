@@ -8124,3 +8124,15 @@ Domande sulla terra di mezzo (round 1, + schizzo a 2 varianti):
 - Gating: PERICOLOSA (aperta ma con nemici forti).
 - Nei dati: resta da decidere come rappresentarla (regions.json ha 5 regioni:
   sesta regione "neutra" o zona; data story da spiegare prima).
+Domande sull'arcipelago (round 2):
+- 15-20 ISOLE (oltre alla Frontiera), dimensioni MISTE: qualche grande
+  (30-50 schermate), molte medie (10-20), alcune piccole (2-5) con un segreto.
+- FRONTIERA: LA PIU' GRANDE DI TUTTE (350+ schermate).
+- Isole nuove (oltre alle 6 gia' decise): isola ghiacciata (nave intrappolata),
+  isola dei pirati (covo di contrabbandieri su palafitte, lega con Bruno),
+  isola-mostro (creatura enorme addormentata), atollo con laguna (segreto sul
+  fondo, nuoto).
+- Conseguenza: il mare deve crescere molto (Frontiera 350+ schermate + 15-20
+  isole): il mondo diventa piu' alto verso sud.
+- NB errore mio: avevo proposto l'isola ghiacciata "a sud-ovest", ma il sud e'
+  caldo -> da chiedere all'utente.
