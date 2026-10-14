@@ -246,12 +246,17 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   ognuna divide la casella a modo suo (1, 2 o 4 lastre), tono a caso, fuga di tono medio, spigoli scheggiati,
   crepe; nelle rovine erba nelle fughe. Il caricatore Godot dovrà usare la stessa formula di `variante()`.
 
-### 🟠 3.8 Strade che finiscono nel nulla
+### ✅ 3.8 Strade che finiscono nel nulla — FATTO (2026-10-14)
 - **Cosa:** il lastricato si ferma al bordo della giungla (proprio all'ingresso principale
   della Valle, con un albero sulla fine), al confine delle Marche e a metà della piazza
   delle rovine.
 - **Come correggere:** le strade proseguono dentro la regione fino al luogo; alberi e rocce
   esclusi dalla strada e da 1 tile ai lati.
+- **FATTO (2026-10-14):** una strada che non finisce su una piazza prosegue come sentiero di terra fino al
+  luogo o villaggio più vicino della sua regione (solo da scalini e rampe, mai in acqua o tra le case) e
+  finisce in uno spiazzo: galleria di alberi → capanna della Valle (un corridoio nella giungla), passo →
+  eremita delle Marche, scalinata → torre d'osservazione. Alberi e rocce tolti da strade e sentieri e da una
+  casella ai lati. Nel JSON i sentieri sono in `sentieri`, separati dalle strade.
 
 ### ✅ 3.9 Coste a gradini e luoghi perfettamente rotondi — FATTO (2026-10-14)
 - **Cosa:** la Frontiera è un'ellisse a scalini regolari (sembra una piramide vista
@@ -352,8 +357,8 @@ l'HUD** (dopo US-8B01 le scritte sono lisce).
 1. ~~**Decisioni (nessun codice):** direzione del colore del mondo (3.1) e palette/tratti
    dei VFX (4.1).~~ **Fatto il 2026-10-14:** mondo luminoso, vale `data/vfx.json`.
 2. **Generatore (`forge3d`):** ~~pareti e altezze (3.2), bordi dritti per i terreni
-   costruiti (3.6), coste (3.9), acqua del sottosuolo (3.10)~~ fatti; restano varianti dei
-   tile (3.5), scala degli alberi (3.3), pavimenti a scacchiera (3.7), strade (3.8). Poi si rigenera il
+   costruiti (3.6), coste (3.9), acqua del sottosuolo (3.10), pavimenti (3.7), strade (3.8)~~
+   fatti; restano varianti dei tile per gli altri terreni e mare calmo (3.5), scala degli alberi (3.3). Poi si rigenera il
    mondo con lo stesso seed e si confronta il prima e il dopo.
 3. **Blocco C** con i punti 1.1 e 1.4–1.13 scritti nei brief: Enel (US-8B30), nemico
    (US-8B31, prima possibile per 1.2), pet (US-8B32).

@@ -8531,3 +8531,15 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   varianti=8. molo_pietra resta a blocchi sfalsati.
 - Verificato: rovine del boss e piazza del porto a dimensione vera, campione di tre terreni x2; dati del mondo
   invariati (solo il disegno); md5 uguale su due lanci; validate 0.
+
+[2026-10-14] Revisione arte 3.8 — strade che finiscono nel nulla. FATTO.
+- build_world.py, sentieri() a fine generazione (dopo applica_spostati: usa le posizioni finali): per ogni strada
+  la cui fine non tocca una piazza (PIAZZE: lastre_rovine, marmo, ghiaia, stone, lastre_chiare, ciottoli_scuri),
+  sentiero "path" con A* fino al luogo/villaggio piu' vicino della stessa regione (4-80 caselle). Costi: acqua 1e4,
+  facce e bordi di dislivello 1e6 tranne vicino a scalini/rampe, case/citta' 60, bosco +2. Spiazzo d'arrivo
+  (disco 2.5, stessa quota). Alberi e rocce tolti da strade, sentieri, spiazzi e una casella attorno (8 vicini).
+  Risultato seed 6: passo -> eremita_2 (47), galleria_di_alberi -> capanna_base_valle (98), scalinata_archivio ->
+  torre_osservazione (15). Rovine, cimitero e archivio finiscono gia' sulla loro piazza.
+- JSON: nuovo campo "sentieri" (liste di [x, y]); "roads" invariato.
+- Verificato: rispetto a HEAD cambiano 206 caselle (tutte path) e si tolgono 272 alberi e 1 roccia; il resto e'
+  identico; md5 uguale su due lanci; validate 0. Guardati i tre sentieri e le tre fini a dimensione vera.

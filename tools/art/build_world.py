@@ -752,7 +752,57 @@ def genera(seed):
         if not cambiate:
             break
     applica_spostati(luoghi, villaggi, sotto)
+    w.sentieri = sentieri(w, strade, list(luoghi.values()) + list(villaggi.values()), faccia)
     return w, luoghi, villaggi, sotto
+
+
+PIAZZE = ["lastre_rovine", "marmo", "ghiaia", "stone", "lastre_chiare", "ciottoli_scuri"]
+
+
+def sentieri(w, strade, punti, faccia):
+    """Revisione 3.8: una strada che non finisce su una piazza prosegue come sentiero di terra fino al luogo o
+    villaggio piu' vicino della sua regione (entro 80 caselle): sale solo da scalini e rampe, mai in acqua o tra le
+    case. Poi niente alberi ne' rocce su strade e sentieri e a una casella dai lati. Dopo tutto il resto: strade,
+    alberi e sottosuolo approvati non cambiano (si tolgono solo alberi)."""
+    g, alt, pas = w.ground, w.alt, w.pas
+    piazza = np.isin(g, [L[n] for n in PIAZZE])
+    dritti = np.isin(g, [ORDER.index(n) for n in ORDER if TERRAINS[n].get("bordo") == "dritto"])
+    passo = ispessisci(pas != ".", 1)
+    salto = np.zeros((H, W), bool)                        # bordo di un dislivello: si passa solo dai passaggi
+    for sy, sx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+        salto |= sposta(alt, sy, sx, -9) != alt
+    costo = 1.0 + 2.0 * np.isin(g, [L["forest"], L["felci"], L["radici_muschio"]]) + 60.0 * dritti
+    costo[np.isin(g, [L["water"], L["deep_water"]])] = 1e4
+    costo[(faccia | salto) & ~passo] = 1e6
+    fatti, spiazzi = [], np.zeros((H, W), bool)
+    for p in strade:
+        x, y = p[-1]
+        if piazza[max(0, y - 1):y + 2, max(0, x - 1):x + 2].any():
+            continue
+        cand = [(math.hypot(px - x, py - y), (px, py)) for px, py in punti
+                if w.biome[py, px] == w.biome[y, x] and 4 <= math.hypot(px - x, py - y) <= 80]
+        if not cand:
+            continue
+        q = astar(costo, (x, y), min(cand)[1])
+        if sum(costo[cy, cx] for cx, cy in q) > 1e4:          # niente strada possibile senza saltare o nuotare
+            continue
+        for cx, cy in q[1:]:
+            if not (piazza[cy, cx] or dritti[cy, cx] or faccia[cy, cx] or g[cy, cx] == L["lastricato_antico"]):
+                g[cy, cx] = L["path"]
+        ex, ey = q[-1]                                    # spiazzo d'arrivo: si capisce che li' c'e' un posto
+        spiazzo = disco(ex, ey, 2.5) & ~piazza & ~dritti & ~faccia & ~salto & (costo < 1e4) & (alt == alt[ey, ex])
+        g[spiazzo] = L["path"]
+        spiazzi |= spiazzo
+        fatti.append([list(map(int, c)) for c in q])
+    strada = spiazzi.copy()
+    for p in strade + [[tuple(c) for c in f] for f in fatti]:
+        for x, y in p:
+            strada[y, x] = True
+    margine = strada.copy()
+    for sy, sx in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
+        margine |= sposta(strada, sy, sx)
+    w.objects = [o for o in w.objects if not (o["type"] in ("tree", "rock") and margine[int(o["y"]), int(o["x"])])]
+    return fatti
 
 
 def cerchio_irregolare(g, cx, cy, r, t, fuori, ok, nome):
@@ -1261,7 +1311,7 @@ def main():
               "tile": 32,
               "altezza": w.alt.tolist(), "parete_materiali": MATERIALI_PARETE,
               "parete": [[MATERIALI_PARETE.index(v) for v in r] for r in w.mat_par],
-              "passaggi": ["".join(r) for r in w.pas],
+              "passaggi": ["".join(r) for r in w.pas], "sentieri": w.sentieri,
               "layout": {"terra": TERRA, "mezzo": MEZZO, "isole": ISOLE, "costa": COSTA},
               "sottosuolo": {"ground": [[int(v) for v in r] for r in sotto["ground"]],
                              "ingressi": sotto["ingressi"], "boss": sotto["boss"],
