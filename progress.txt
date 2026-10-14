@@ -8481,3 +8481,20 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   (foci dei fiumi); md5 identico su due lanci; validate 0. Guardati: approdo, porto (uguale all'approvato),
   Frontiera intera, isole, cimitero, archivio, rovine.
 - Non fatto: scogli in mare (servirebbe un oggetto nuovo).
+
+[2026-10-14] Revisione arte 3.10 — acqua del sottosuolo. FATTO.
+- terrain.py: acqua_fogna (brown_dd/teal_d/slate_d, cresta grey) e acqua_grotta (navy/blue_d/blue, cresta grey),
+  livelli 0.5 e 0.6 (sotto l'acqua bassa: le rive si disegnano sopra). Campo "cresta" = colore delle creste delle
+  onde (water: white; prima era un if sul nome). Scelte guardando 8 rampe affiancate a roccia_viva e ciottoli_scuri.
+- build_world.py, genera_sottosuolo, DOPO gli ingressi (ingressi, boss, pavimento identici all'approvato):
+  fogne: la vecchia acqua a pezzi torna ciottoli_scuri; canale al centro di una galleria nord-sud su tre
+  (x % 10 == 1, x // 10 % 3 == 0), mai accanto alla roccia (a nord 2 caselle), mai entro 2 da ingressi e boss;
+  grata (lamiera) agli incroci (y % 9 < 3) solo tra due tratti d'acqua; tratti d'acqua di almeno 3 caselle (ciclo
+  finche' stabile). Il canale ha altezza -1: le pareti disegnano cordolo e gradino. Grotte: water -> acqua_grotta.
+- Trovato e corretto: la moda "terreno piu' comune" (punte, cerchio_irregolare, assorbi_macchie) a pari voti
+  dipendeva dall'ordine interno di un set Python, quindi dalla numerazione dei terreni: aggiungere due terreni
+  cambiava 43 caselle in superficie. Ora sorted(): a pari voti vince il livello piu' basso. Verificato: con e
+  senza i terreni nuovi la superficie e' identica (0 caselle); rispetto alla mappa approvata cambiano solo quelle
+  43 macchioline (oggetti, strade, luoghi identici).
+- Verificato: grate appese 0, ingressi sul canale 0, md5 identico su due lanci, validate 0. Guardati ingranditi:
+  ritaglio fogne, grotte, le due estremita' di un canale, la rete intera.

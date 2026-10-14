@@ -732,7 +732,7 @@ def genera(seed):
             break
         for y, x in zip(*np.nonzero(punte)):
             v = [int(gg[ny, nx]) for ny, nx in nb4(y, x) if gg[ny, nx] != gg[y, x]]
-            gg[y, x] = max(set(v), key=v.count)
+            gg[y, x] = max(sorted(set(v)), key=v.count)
         dritti = np.isin(w.ground, [ORDER.index(n) for n in ORDER if TERRAINS[n].get("bordo") == "dritto"])
     # fessure: una casella naturale stretta tra due costruite (ai lati opposti) diventa costruita (in citta' anche
     # una strada di campagna diventa lastricata: il suo percorso nei dati non cambia). L'acqua no (fiumi), e nemmeno
@@ -775,7 +775,7 @@ def cerchio_irregolare(g, cx, cy, r, t, fuori, ok, nome):
         v = [int(blocco[a_, b_]) for a_ in range(max(0, y - 2), min(blocco.shape[0], y + 3))
              for b_ in range(max(0, x - 2), min(blocco.shape[1], x + 3)) if blocco[a_, b_] != t]
         if v:
-            blocco[y, x] = max(set(v), key=v.count)
+            blocco[y, x] = max(sorted(set(v)), key=v.count)
 
 
 def pezzetto(mask, y, x, limite):
@@ -885,7 +885,7 @@ def assorbi_macchie(g, fisso, minimo=6):
         dentro = set(parte)
         attorno = [int(g[ny, nx]) for y, x in parte for ny, nx in nb4(y, x) if (ny, nx) not in dentro and not fisso[ny, nx]]
         if attorno:
-            nuovo = max(set(attorno), key=attorno.count)
+            nuovo = max(sorted(set(attorno)), key=attorno.count)
             for y, x in parte:
                 g[y, x] = nuovo
 
@@ -1014,8 +1014,37 @@ def genera_sottosuolo(seed, R, land, acqua, centro, rovine_boss, porto, rnd, rng
             dmin = np.min([np.hypot(xs_b - q[0], ys_b - q[1]) for q in presi], axis=0)
             i = int(np.argmax(dmin))
             boss[f"boss_{z_nome}"] = (int(xs_b[i]), int(ys_b[i]))
+    # acqua del sottosuolo (revisione 3.10), dopo gli ingressi (restano quelli approvati): nelle fogne un canale
+    # continuo al centro di una galleria nord-sud su tre, con i camminamenti ai lati e una grata a ogni incrocio;
+    # nelle grotte l'acqua scura
+    fogne = (zona == "fogne") & (s >= 0)
+    s[fogne & (s == L["water"])] = L["ciottoli_scuri"]
+    canale = fogne & fogne_area & (xx % 10 == 1) & (xx // 10 % 3 == 0)
+    roccia = s < 0                                       # il canale non tocca mai la roccia: attorno sempre camminamento
+    canale &= ~(sposta(roccia, 1, 0) | sposta(roccia, 2, 0) | sposta(roccia, -1, 0) | sposta(roccia, 0, 1)
+                | sposta(roccia, 0, -1))                 # a nord due caselle: la faccia della roccia e un pezzo di pavimento
+    for x, y in list(ingressi.values()) + list(boss.values()):
+        canale &= ~disco(x, y, 2)                        # niente acqua sotto un ingresso o un boss
+    croce = yy % 9 < 3                                   # incroci con le gallerie est-ovest: qui la grata
+    base = yy - yy % 9
+    while True:                                          # finche' non cambia: tratti d'acqua di almeno 3 caselle
+        prima = canale.copy()                            # (il primo e' il gradino), grate solo tra due tratti d'acqua
+        acqua_c = canale & ~croce
+        su, giu = sposta(acqua_c, 1, 0), sposta(acqua_c, -1, 0)
+        canale &= croce | (su & sposta(acqua_c, 2, 0)) | (su & giu) | (giu & sposta(acqua_c, -2, 0))
+        acqua_c = canale & ~croce
+        tra = acqua_c[np.clip(base - 1, 0, H - 1), xx] & acqua_c[np.clip(base + 3, 0, H - 1), xx] \
+            & canale[base, xx] & canale[np.clip(base + 1, 0, H - 1), xx] & canale[np.clip(base + 2, 0, H - 1), xx]
+        canale &= ~croce | tra
+        if (canale == prima).all():
+            break
+    grata = canale & croce
+    s[canale] = L["acqua_fogna"]
+    s[grata] = L["lamiera"]
+    s[(zona == "grotte") & (s == L["water"])] = L["acqua_grotta"]
     ground = np.where(s >= 0, s, L["roccia_viva"])
     alt = (s < 0).astype(int)                            # roccia alta 1: pareti sul lato nord delle gallerie
+    alt[canale & ~grata] = -1                            # il canale e' piu' basso: cordolo di pietra ai lati
     ground = terreno_sotto(ground, alt)
     pas = np.full((H, W), ".", "<U1")
     faccia = maschera_pareti(alt)

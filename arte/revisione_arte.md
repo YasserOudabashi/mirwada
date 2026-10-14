@@ -266,6 +266,10 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   l'acqua è a pezzetti staccati invece che in canali continui.
 - **Come correggere:** terreni `acqua_fogna` (verde-bruna torbida) e `acqua_grotta` (scura
   con riflessi); canali continui lungo le gallerie con i camminamenti ai lati.
+- **FATTO (2026-10-14):** terreni `acqua_fogna` (verde-petrolio torbido, riflessi grigi) e `acqua_grotta`
+  (blu profondo, riflessi grigi). Fogne: un canale continuo al centro di una galleria nord-sud su tre, una
+  quota più basso (cordolo di pietra ai lati, gradino dove comincia), grate di metallo (`lamiera`) agli
+  incroci; il canale non tocca mai la roccia e non passa sotto ingressi e boss.
 
 ### 🟢 3.11 Puntini colorati nell'erba
 - Pixel singoli ciano, rosa e bianchi sparsi: a dimensione vera sporcano.

@@ -55,7 +55,13 @@ def _quant(field, ramp, dither=0.0, S=TILE):
 # nome: (ramp scuro->chiaro, periodo rumore, contrasto, dither, dettaglio, livello)
 TERRAINS = {
     "deep_water": dict(ramp=["navy", "blue_d", "blue_d", "blue"], period=3, dither=0.5, detail="waves", rim=None, level=0, anim=4),
-    "water": dict(ramp=["blue", "#1fb5d6", "#1fb5d6", "cyan"], period=3, dither=0.5, detail="waves", rim="foam", level=1, anim=4),
+    "water": dict(ramp=["blue", "#1fb5d6", "#1fb5d6", "cyan"], period=3, dither=0.5, detail="waves", rim="foam", level=1, anim=4,
+                  cresta="white"),
+    # acque del sottosuolo (revisione arte 3.10): torbida nelle fogne, scura con riflessi nelle grotte
+    "acqua_fogna": dict(ramp=["brown_dd", "teal_d", "teal_d", "slate_d"], period=3, dither=0.5, detail="waves", rim=None,
+                        level=0.5, anim=4, cresta="grey"),
+    "acqua_grotta": dict(ramp=["navy", "blue_d", "blue_d", "blue"], period=3, dither=0.5, detail="waves", rim=None,
+                         level=0.6, anim=4, cresta="grey"),
     "sand": dict(ramp=["tan", "cream", "cream", "skin_l"], period=4, dither=0.5, detail="dots", rim="dark", rimc="orange_d", level=2),
     "mud": dict(ramp=["brown_dd", "brown_d", "brown_d", "brown"], period=3, dither=0.6, detail="puddles", rim="dark", level=3),
     "grass": dict(ramp=["green_d", "green_m", "green_m", "green"], period=4, dither=0.5, detail="tufts", rim="dark", rimc="green_d", level=4,
@@ -177,7 +183,7 @@ def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4):
         base = np.clip(0.38 + 0.18 * base + 0.14 * w, 0, 1)
         img, idx = _quant(base, ramp, d["dither"], S)
         crest = (w > 1.25)
-        img[crest] = _rgb("white") if name == "water" else _rgb("cyan")
+        img[crest] = _rgb(d.get("cresta", "cyan"))
         return img
     img, idx = _quant(base, ramp, d["dither"], S)
     n = len(ramp)
