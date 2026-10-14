@@ -64,7 +64,7 @@ TERRAINS = {
     "forest": dict(ramp=["teal_d", "green_d", "green_d", "green_m"], period=4, dither=0.5, detail="leaves", rim="dark", rimc="teal_d", level=6, contrast=0.45),
     "dirt": dict(ramp=["brown_d", "brown", "brown", "orange_d"], period=4, dither=0.6, detail="pebbles", rim="dark", level=7, contrast=0.45),
     "path": dict(ramp=["brown_d", "brown", "#c9946a", "#dcb68a"], period=5, dither=0.6, detail="pebbles", rim="dark", rimc="brown_d", level=8, contrast=0.45),
-    "stone": dict(ramp=["slate_d", "slate", "slate", "grey"], period=3, dither=0.5, detail="cobbles", rim="cliff", level=9),
+    "stone": dict(bordo="dritto", ramp=["slate_d", "slate", "slate", "grey"], period=3, dither=0.5, detail="cobbles", rim="cliff", level=9),
     "snow": dict(ramp=["grey", "grey_l", "white", "white", "white"], period=4, dither=0.4, detail="dunes", rim="light", rimc="grey", level=10,
                  contrast=0.2),
     # --- Mirwada (US-8B11b). Livelli con la virgola: si inseriscono tra quelli sopra senza rinumerarli ---
@@ -76,15 +76,15 @@ TERRAINS = {
                               rim="dark", rimc="green_d", level=8.2),
     "ghiaia": dict(ramp=["slate", "grey", "grey_l", "white"], period=4, dither=0.6, detail="pebbles", rim="dark", rimc="grey",
                    level=8.3, contrast=0.15),
-    "marmo": dict(ramp=["grey", "grey_l", "white", "white"], period=4, dither=0.3, detail="slabs", slab=(2, 2), rim="dark",
+    "marmo": dict(bordo="dritto", ramp=["grey", "grey_l", "white", "white"], period=4, dither=0.3, detail="slabs", slab=(2, 2), rim="dark",
                   rimc="slate", level=8.4, contrast=0.4),
-    "ciottoli_scuri": dict(ramp=["brown_dd", "slate_d", "slate", "grey"], period=4, dither=0.4, detail="cobbles", cells=12,
+    "ciottoli_scuri": dict(bordo="dritto", ramp=["brown_dd", "slate_d", "slate", "grey"], period=4, dither=0.4, detail="cobbles", cells=12,
                            rim="dark", rimc="brown_dd", level=8.6),
-    "lastre_chiare": dict(ramp=["grey", "grey_l", "cream", "cream"], period=4, dither=0.4, detail="slabs", slab=(2, 2),
+    "lastre_chiare": dict(bordo="dritto", ramp=["grey", "grey_l", "cream", "cream"], period=4, dither=0.4, detail="slabs", slab=(2, 2),
                           rim="dark", rimc="slate", level=8.8, contrast=0.5),
-    "molo_pietra": dict(ramp=["navy", "slate_d", "slate", "grey"], period=4, dither=0.4, detail="slabs", rim="cliff",
+    "molo_pietra": dict(bordo="dritto", ramp=["navy", "slate_d", "slate", "grey"], period=4, dither=0.4, detail="slabs", rim="cliff",
                         rimc="navy", level=9.2, contrast=0.5),
-    "pontile_legno": dict(ramp=["brown_dd", "brown_d", "brown", "tan"], period=4, dither=0.3, detail="planks", rim="dark",
+    "pontile_legno": dict(bordo="dritto", ramp=["brown_dd", "brown_d", "brown", "tan"], period=4, dither=0.3, detail="planks", rim="dark",
                           rimc="brown_dd", level=9.4),
     # --- Archivio, Frontiera, isole (US-8B11d). Pastelli della Frontiera = colori extra (Endesga non ha il lilla) ---
     "nebbia": dict(ramp=["#b8b0c8", "#cfc8db", "#e0dbe8", "#f0edf4"], period=3, dither=0.6, detail="fog", rim="light",
@@ -95,9 +95,9 @@ TERRAINS = {
                        rimc="#9a7fb0", level=4.4, contrast=0.4),
     "cenere": dict(ramp=["ink", "slate_d", "slate", "grey"], period=4, dither=0.5, detail="dots", rim="dark", rimc="ink",
                    level=7.6, contrast=0.3),
-    "parquet": dict(ramp=["brown_dd", "brown_d", "brown_d", "brown"], period=4, dither=0.3, detail="herringbone", listello=4,
+    "parquet": dict(bordo="dritto", ramp=["brown_dd", "brown_d", "brown_d", "brown"], period=4, dither=0.3, detail="herringbone", listello=4,
                     rim="dark", rimc="brown_dd", level=8.1),
-    "lamiera": dict(ramp=["slate_d", "slate", "grey", "grey_l"], period=4, dither=0.3, detail="plates", rim="dark",
+    "lamiera": dict(bordo="dritto", ramp=["slate_d", "slate", "grey", "grey_l"], period=4, dither=0.3, detail="plates", rim="dark",
                     rimc="navy", level=8.15, contrast=0.4),
     "terra_rosa": dict(ramp=["#c99a9a", "#ddb3b0", "#e8c6c1", "#f3dcd6"], period=4, dither=0.6, detail="pebbles", rim="dark",
                        rimc="#c99a9a", level=8.25, contrast=0.3),
@@ -337,10 +337,19 @@ def _rim(mask, img, kind, rimc, ramp):
     return out, inner
 
 
+def masks_dritte(S=TILE):
+    """16 maschere a quarti pieni: il bordo cade dritto sul lato della casella (cose costruite: lastre, moli...)."""
+    yy, xx = np.mgrid[0:S, 0:S]
+    alto, sin = yy < S // 2, xx < S // 2
+    return [((m & 1) > 0) & alto & sin | ((m & 2) > 0) & alto & ~sin | ((m & 4) > 0) & ~alto & sin
+            | ((m & 8) > 0) & ~alto & ~sin for m in range(16)]
+
+
 def build_atlas(name, S=TILE, seed=3):
-    """Atlante RGBA 16 tile in una riga (indice = maschera). Per i terreni animati: righe = frame."""
+    """Atlante RGBA 16 tile in una riga (indice = maschera). Per i terreni animati: righe = frame.
+    bordo="dritto" nella riga del terreno: bordi squadrati invece che sfumati (cose costruite dall'uomo)."""
     d = TERRAINS[name]
-    masks = layer_masks(S, seed)
+    masks = masks_dritte(S) if d.get("bordo") == "dritto" else layer_masks(S, seed)
     nfr = d.get("anim", 1)
     atlas = np.zeros((S * nfr, S * 16, 4), np.uint8)
     for f in range(nfr):
@@ -375,6 +384,10 @@ def compose_ground(levels, atlases=None, S=TILE, frame=0, seed=3, strati=None, d
         ge = pad >= ti
         # vertice (i,j) tra le celle pad[i..i+1, j..j+1]
         m = (ge[:-1, :-1] * 1 + ge[:-1, 1:] * 2 + ge[1:, :-1] * 4 + ge[1:, 1:] * 8)
+        # un terreno si disegna solo dove almeno una delle 4 caselle e' davvero di quel terreno: altrimenti un
+        # terreno intermedio (solo "di livello piu' basso") sbordava dagli angoli di un terreno a bordo dritto
+        eq = pad == ti
+        m = np.where(eq[:-1, :-1] | eq[:-1, 1:] | eq[1:, :-1] | eq[1:, 1:], m, 0)
         if ti == 0:
             m = np.full_like(m, 15)
         ys, xs = np.nonzero(m)

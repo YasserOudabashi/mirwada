@@ -8445,3 +8445,21 @@ imperfezioni". CORRETTE alla radice.
   sole fuori dalle pareti = 0; md5 identico su due lanci; validate 0. Ritagli e tavole guardati ingranditi.
 - Restano (altri punti della revisione, NON di questa story): porto con la piazza a macchia e i pontili a punta
   tonda (3.6), coste delle isole a scalini (3.9), acqua turchese nelle fogne a pezzetti (3.10).
+
+[2026-10-14] PREFERENZA DELL'UTENTE: "puoi non spiegarmi come, io servo solo in caso tu non sappia cosa fare o
+come, e se ci sono dettagli di cui vuoi sapere". Per i punti della revisione dell'arte Claude procede da solo e
+chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare imperfezioni, nemmeno piccole.
+
+[2026-10-14] Revisione arte 3.6 — porto: bordi dritti per le cose costruite, moli e pontili rialzati. FATTO.
+- terrain.py: campo bordo="dritto" (stone, marmo, ciottoli_scuri, lastre_chiare, molo_pietra, pontile_legno,
+  parquet, lamiera) -> masks_dritte(): bordo esatto sul lato della casella. compose_ground: un terreno si disegna
+  solo dove una delle 4 caselle e' davvero di quel terreno (prima un terreno intermedio, es. lastre_rovine sotto
+  le case, sbordava a triangolino dagli angoli dei terreni dritti).
+- pareti.py: materiali "molo" (blocchi) e "legno" (assi e pali); il bordo della cima vale anche a quota 0 (moli sul
+  mare a -1); camminamento delle mura solo sopra un muro vero (h > 0).
+- build_world.py: moli, scali del cantiere e diga con materiale (faccia in punta, bordi ai lati); MATERIALI_PARETE
+  + molo, legno; pezzetti di muro abbassati perdono il materiale; terreni dritti: niente punte di 1 casella;
+  fessure: casella naturale stretta tra due costruite -> costruita (anche la strada di campagna in citta': il
+  percorso nei dati non cambia; mai l'acqua; mai la fascia accanto alle mura).
+- Verificato: strade, luoghi, villaggi, regioni, alberi, sottosuolo identici all'approvato; md5 identico su due
+  lanci; validate 0; ritagli porto e mura guardati ingranditi.

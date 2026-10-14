@@ -20,6 +20,8 @@ MATERIALI = {
     "arenaria": dict(ramp=["brown_dd", "brown_d", "rust", "orange_d", "tan"], motivo="strati"),
     "roccia": dict(ramp=["ink", "navy", "slate_d", "slate", "grey"], motivo="fratture"),
     "mura": dict(ramp=["brown_dd", "slate_d", "slate", "grey", "grey_l"], motivo="blocchi"),
+    "molo": dict(ramp=["ink", "navy", "slate_d", "slate", "grey"], motivo="blocchi"),      # moli e diga sul mare
+    "legno": dict(ramp=["ink", "brown_dd", "brown_d", "brown", "tan"], motivo="assi"),      # pontili e scali
 }
 RAMPA = ["brown_dd", "brown_d", "brown", "orange_d"]        # terra e pietrisco della rampa
 OMBRA = (0x18, 0x14, 0x25)                                   # inchiostro: l'ombra a terra e' l'unico alpha intermedio
@@ -59,6 +61,14 @@ def _faccia(mat, X, Yf, Hf, S, seed, Yw=None):
         su = np.roll(bordo, 2, 0)[yp, xp] < 1.5                          # sotto il bordo in alto: faccia in luce
         t = np.where(su, np.minimum(t + 1, n - 1), t)
         t = np.where(bordo[yp, xp] < 1.5, 0, t)
+    elif d["motivo"] == "assi":                                         # pontile: travi e pali verticali di legno
+        pw = max(4, S // 6)
+        palo = (X % (S // 2)) < max(2, S // 12)                          # un palo ogni mezza casella
+        t = 2 + ((X // pw) * 3) % 2
+        t = np.where((X % pw) == 0, 1, t)                                # fessure tra le assi
+        t = np.where(palo, 1, t)
+        t = np.where(palo & ((X % (S // 2)) == 0), 0, t)
+        t = np.where((Yl >= max(2, S // 21) + 1) & (Yl < S // 6), n - 2, t)   # trave in cima
     else:                                                                # mura: blocchi sfalsati
         bh, bw = S // 4, S // 2
         riga = Yf // bh
@@ -166,11 +176,11 @@ def _cima(alt, mat, e, y, x, S, seed, f=None):
     H, W = alt.shape
     h = alt[y, x]
     m = mat[y][x]
-    if h <= 0 or not m:
+    if not m:                                                  # serve un materiale (anche a quota 0: moli sul mare)
         return None
     basso = lambda yy, xx: 0 <= yy < H and 0 <= xx < W and alt[yy, xx] < h
     sx, dx, su = basso(y, x - 1), basso(y, x + 1), basso(y - 1, x)
-    muro = m == "mura"
+    muro = m == "mura" and h > 0                               # camminamento solo sopra un muro vero
     if not (sx or dx or su or muro):
         return None
     pal = np.array([_rgb(c) for c in MATERIALI[m]["ramp"]])

@@ -36,7 +36,7 @@ from PIL import Image, ImageDraw, ImageFont
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from forge3d.pareti import disegna as disegna_pareti, maschera as maschera_pareti, strati as strati_pareti, terreno_sotto  # noqa: E402
-from forge3d.terrain import ORDER, build_atlas  # noqa: E402
+from forge3d.terrain import ORDER, TERRAINS, build_atlas  # noqa: E402
 from forge3d.world import LEVEL, World, fbm  # noqa: E402
 from forge3d.worldrender import render_world, save  # noqa: E402
 
@@ -481,6 +481,7 @@ def genera(seed):
         y0 = int(np.nonzero(mw[:, x0])[0].max())
         g[y0:y0 + lung + 1, x0:x0 + larg] = L[ter]
         land[y0:y0 + lung + 1, x0:x0 + larg] = True
+        mat_par[y0:y0 + lung + 1, x0:x0 + larg] = "molo" if ter == "molo_pietra" else "legno"   # sopra il mare
     # cantiere navale sulla riva est del golfo: piazzale e scali di legno verso l'acqua
     xs_c = px + int(RC * 0.55)
     yc = int(np.nonzero(mw[:, xs_c])[0].max())
@@ -491,6 +492,7 @@ def genera(seed):
         y0 = int(np.nonzero(mw[:, x0])[0].max())
         g[y0:y0 + 8, x0:x0 + 3] = L["pontile_legno"]
         land[y0:y0 + 8, x0:x0 + 3] = True
+        mat_par[y0:y0 + 8, x0:x0 + 3] = "legno"
     # diga foranea: un lungo braccio di pietra dalla punta ovest del golfo, con il faro in fondo
     punta = mw & riva & (xx < px - RC * 0.5) & (xx > px - RC * 2.0)              # punta ovest del golfo
     ys_p, xs_p = np.nonzero(punta)
@@ -503,6 +505,7 @@ def genera(seed):
         yd = int(round(y_a + (y_b - y_a) * t / n_p - math.sin(math.pi * t / n_p) * RC * 0.15))
         g[yd - 1:yd + 2, xd - 1:xd + 2] = L["molo_pietra"]
         land[yd - 1:yd + 2, xd - 1:xd + 2] = True
+        mat_par[yd - 1:yd + 2, xd - 1:xd + 2] = "molo"
     faro_diga = (x_b, y_b)
     diga_meta = ((x_a + x_b) // 2, (y_a + y_b) // 2 - int(RC * 0.15))
 
@@ -625,6 +628,7 @@ def genera(seed):
     # le spiagge (senza materiale) restano spiagge
     altezza[~land & (altezza == 0)] = -1
     assorbi_macchie(altezza, ~land)                     # rialzi o buche di poche caselle = scatolette isolate
+    mat_par[(mat_par == "mura") & (altezza <= 0)] = ""   # pezzetti di muro abbassati: niente piu' muro
     faccia = maschera_pareti(altezza, mat_par)
     pas = np.full((H, W), ".", "<U1")
     # rampa: nasce in cima a un tratto di parete dritto (pareti a sinistra e a destra) e scende per tutta l'altezza
@@ -701,6 +705,33 @@ def genera(seed):
     # macchie troppo piccole (diventerebbero rombi isolati) prendono il terreno attorno
     w.ground = terreno_sotto(w.ground, altezza, mat_par)
     assorbi_macchie(w.ground, faccia)
+    # terreni a bordo dritto: una casella che sporge da sola (punta, vicolo cieco di 1) prende il terreno accanto
+    dritti = np.isin(w.ground, [ORDER.index(n) for n in ORDER if TERRAINS[n].get("bordo") == "dritto"])
+    for _ in range(4):
+        gg = w.ground
+        uguali = sum((sposta(gg, sy, sx, -1) == gg).astype(int) for sy, sx in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+        punte = dritti & (uguali <= 1) & ~faccia & (mat_par == "")
+        if not punte.any():
+            break
+        for y, x in zip(*np.nonzero(punte)):
+            v = [int(gg[ny, nx]) for ny, nx in nb4(y, x) if gg[ny, nx] != gg[y, x]]
+            gg[y, x] = max(set(v), key=v.count)
+        dritti = np.isin(w.ground, [ORDER.index(n) for n in ORDER if TERRAINS[n].get("bordo") == "dritto"])
+    # fessure: una casella naturale stretta tra due costruite (ai lati opposti) diventa costruita (in citta' anche
+    # una strada di campagna diventa lastricata: il suo percorso nei dati non cambia). L'acqua no (fiumi), e nemmeno
+    # la fascia accanto alle mura (resta libera dalle case).
+    for _ in range(3):
+        gg = w.ground
+        dritti = np.isin(gg, [ORDER.index(n) for n in ORDER if TERRAINS[n].get("bordo") == "dritto"])
+        libere = ~dritti & ~np.isin(gg, [L["water"], L["deep_water"]]) & ~faccia & (mat_par == "") & ~vicino
+        cambiate = 0
+        for (ay, ax), (by, bx) in (((0, 1), (0, -1)), ((1, 0), (-1, 0))):
+            stretta = libere & sposta(dritti, ay, ax) & sposta(dritti, by, bx)
+            gg[stretta] = sposta(gg, ay, ax, -1)[stretta]
+            libere &= ~stretta
+            cambiate += int(stretta.sum())
+        if not cambiate:
+            break
     applica_spostati(luoghi, villaggi, sotto)
     return w, luoghi, villaggi, sotto
 
@@ -1009,7 +1040,7 @@ def misure(w, sotto):
     return righe, tot, sotto_tot
 
 
-MATERIALI_PARETE = ["", "arenaria", "roccia", "mura"]
+MATERIALI_PARETE = ["", "arenaria", "roccia", "mura", "molo", "legno"]
 
 
 def ritaglio(w, box, alt, mat, pas, atl, oggetti=True, pareti=True):
