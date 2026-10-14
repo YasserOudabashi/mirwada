@@ -75,8 +75,8 @@ TERRAINS = {
     "dirt": dict(ramp=["brown_d", "brown", "brown", "orange_d"], period=4, dither=0.6, detail="pebbles", rim="dark", level=7, contrast=0.45),
     "path": dict(ramp=["brown_d", "brown", "#c9946a", "#dcb68a"], period=5, dither=0.6, detail="pebbles", rim="dark", rimc="brown_d", level=8, contrast=0.45),
     "stone": dict(bordo="dritto", ramp=["slate_d", "slate", "slate", "grey"], period=3, dither=0.5, detail="cobbles", rim="cliff", level=9),
-    "snow": dict(ramp=["grey", "grey_l", "white", "white", "white"], period=4, dither=0.4, detail="dunes", rim="light", rimc="grey", level=10,
-                 contrast=0.2),
+    "snow": dict(macro=8, ramp=["grey", "grey_l", "white", "white", "white"], period=2, dither=0.4, detail="dunes", rim="light",
+                 rimc="grey", level=10, contrast=0.32),
     # --- Mirwada (US-8B11b). Livelli con la virgola: si inseriscono tra quelli sopra senza rinumerarli ---
     "ciottoli_spiaggia": dict(ramp=["tan", "grey", "grey_l", "cream"], period=4, dither=0.4, detail="cobbles", cells=16,
                               rim="dark", rimc="tan", level=2.5),
@@ -99,8 +99,9 @@ TERRAINS = {
     # --- Archivio, Frontiera, isole (US-8B11d). Pastelli della Frontiera = colori extra (Endesga non ha il lilla) ---
     "nebbia": dict(ramp=["#b8b0c8", "#cfc8db", "#e0dbe8", "#f0edf4"], period=3, dither=0.6, detail="fog", rim="light",
                    rimc="#f0edf4", level=0.2, contrast=0.6, anim=4),
-    "sabbia_bianca": dict(ramp=["cream", "white", "white", "white"], period=4, dither=0.5, detail="dots", rim="dark",
-                          rimc="tan", level=2.2, contrast=0.3),
+    # sabbia corallina: crema e avorio caldi, bianco solo nei riflessi (prima 3 bianchi su 4: sembrava neve)
+    "sabbia_bianca": dict(ramp=["tan", "cream", "#f3e7cf", "white"], period=4, dither=0.5, detail="dots", rim="dark",
+                          rimc="tan", level=2.2, contrast=0.45),
     "erba_lilla": dict(ramp=["#9a7fb0", "#b9a3cc", "#cdb8dc", "#e2d4ec"], period=4, dither=0.5, detail="tufts", rim="dark",
                        rimc="#9a7fb0", level=4.4, contrast=0.4),
     "cenere": dict(ramp=["ink", "slate_d", "slate", "grey"], period=4, dither=0.5, detail="dots", rim="dark", rimc="ink",
@@ -401,12 +402,14 @@ def _texture(name, S, Z, seed, frame, nframes, variante):
                 img[int(py) % Z, int(px) % Z] = _accent(d, 0)
                 img[(int(py) - 1) % Z, int(px) % Z] = _accent(d, 1) if rng.rand() < 0.6 else img[(int(py) - 1) % Z, int(px) % Z]
     elif detail == "dunes":
-        # dune di vento: creste ondulate diagonali, chiare al vento e ombra sottile sotto
-        k = 2 * math.pi / S
-        w = np.sin(k * (2 * x + y) + 0.7 * np.sin(k * 2 * y))
-        spezza = pnoise(Z, 3 * Z // S, rs + 1, 2) > 0.45        # creste interrotte, non righe continue
-        cresta = (w > 0.97) & spezza
-        img[cresta] = _rgb(ramp[1])                                # una linea sottile grigio chiaro
+        # neve: increspature di vento corte e sparse (archetti grigio chiaro con il bianco sopra), non righe continue
+        s1 = max(1, S // 32)
+        for _ in range(Z * Z // 380):
+            px, py, lung = rng.randint(Z), rng.randint(Z), rng.randint(4, 9) * s1
+            for i_ in range(lung):
+                yy_ = py - int(round(1.5 * s1 * math.sin(math.pi * i_ / lung)))   # arco
+                img[yy_ % Z, (px + i_) % Z] = _rgb(ramp[1])
+                img[(yy_ - 1) % Z, (px + i_) % Z] = _rgb(ramp[-1])
     return img
 
 

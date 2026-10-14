@@ -8573,3 +8573,12 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   sulla casella sopra (ciglio). Oggetti: 72383 -> 32104 (alberi 31172, rocce 644, scogli 288).
 - Resta per il gioco (US-8B12, caricatore Godot): ordinamento per profondita' dai piedi, collisione sul tronco.
 - Verificato: galleria di alberi, passo, gradoni a dimensione vera; md5 uguale su due lanci; validate 0.
+
+[2026-10-14] Sabbia corallina e neve (visti dopo il 3.9). FATTO.
+- sabbia_bianca: rampa tan / cream / #f3e7cf (avorio, colore extra nella rampa) / white, contrasto 0.45 (prima crema
+  + tre bianchi: in grandi aree sembrava neve).
+- snow: le dune erano righine diagonali con lunghezza d'onda di un tile (righe uguali in ogni casella). Ora
+  increspature corte e sparse (archetti grigio chiaro col bianco sopra), macro 8, ombre morbide (period 2,
+  contrasto 0.32).
+- Verificato: confronto sand / sabbia_bianca / snow affiancati; isola dei pirati e spiazzo della torre nel mondo;
+  md5 uguale su due lanci; validate 0; campioni_terreni rigenerato.
