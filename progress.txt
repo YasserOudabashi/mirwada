@@ -8422,3 +8422,26 @@ vedo che terreno avra'"). Rifacimento v2, risposte dell'utente:
   validate 0.
 - Aperto: le rampe da 1 casella sembrano tacche scure; i passaggi terreno-terreno al piede di uno scalino
   restano una righina obliqua dentro l'ombra; in Godot il "mare a -1" va letto come acqua, non come buca.
+
+[2026-10-14] Pareti: imperfezioni segnalate dall'utente (screenshot delle mura cerchiato) + regola "mai lasciare
+imperfezioni". CORRETTE alla radice.
+- compose_ground(strati, duri): dove c'e' un dislivello con roccia (la casella piu' alta e' "dura": ha materiale o e'
+  parete) i terreni NON si sfumano: ogni quarto di casella che tocca l'altro strato prende il terreno pieno della sua
+  casella. Spariti gli sbordi al piede delle pareti e gli angoli smussati in cima. Spiagge sul mare (piu' basso ma
+  senza parete) restano sfumate. pareti.strati() da' (strati, duri); render_world(strati=, duri=). In Godot
+  (US-8B12) il caricatore dovra' fare lo stesso.
+- Tolto il triangolo d'ombra al piede (serviva solo a nascondere lo sbordo).
+- Mura: le case (stone) che toccano la fascia accanto al muro vengono tolte INTERE (prima restavano mezze case
+  tagliate); il vuoto prende la strada vicina.
+- assorbi_macchie(): macchie di terreno con meno di 6 caselle (8-connesse: una costa a scalini e' una fascia sola)
+  prendono il terreno attorno -> niente rombi isolati. Stessa regola sulle ALTEZZE prima delle pareti -> niente
+  "scatolette" (rialzi o buche di 1-5 caselle).
+  ERRORE TROVATO E CORRETTO: con la 4-connessione la sabbia lungo le coste a scalini veniva cancellata (4517 ->
+  1883 caselle); con l'8-connessione 4509.
+- Rampe: pendio chiaro con i fianchi tagliati (prima tacca scura).
+- arenaria (terreno, vista dall'alto) = lastre di roccia spaccate invece delle strisce: le strisce sono della
+  parete, e una cima a strisce non si distingueva dalla parete.
+- Verificato: strade, luoghi, villaggi, regioni, alberi, ingressi del sottosuolo identici all'approvato; caselle
+  sole fuori dalle pareti = 0; md5 identico su due lanci; validate 0. Ritagli e tavole guardati ingranditi.
+- Restano (altri punti della revisione, NON di questa story): porto con la piazza a macchia e i pontili a punta
+  tonda (3.6), coste delle isole a scalini (3.9), acqua turchese nelle fogne a pezzetti (3.10).

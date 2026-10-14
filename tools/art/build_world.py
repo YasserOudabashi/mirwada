@@ -35,7 +35,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from forge3d.pareti import disegna as disegna_pareti, maschera as maschera_pareti, terreno_sotto  # noqa: E402
+from forge3d.pareti import disegna as disegna_pareti, maschera as maschera_pareti, strati as strati_pareti, terreno_sotto  # noqa: E402
 from forge3d.terrain import ORDER, build_atlas  # noqa: E402
 from forge3d.world import LEVEL, World, fbm  # noqa: E402
 from forge3d.worldrender import render_world, save  # noqa: E402
@@ -82,6 +82,13 @@ def nb4(y, x):
     for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
         if 0 <= y + dy < H and 0 <= x + dx < W:
             yield y + dy, x + dx
+
+
+def nb8(y, x):
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            if (dy or dx) and 0 <= y + dy < H and 0 <= x + dx < W:
+                yield y + dy, x + dx
 
 
 def sposta(a, dy, dx, fill=False):
@@ -617,6 +624,7 @@ def genera(seed):
     # il mare sta un livello sotto la terra: dove la costa ha un materiale (Valle, Marche) diventa scogliera,
     # le spiagge (senza materiale) restano spiagge
     altezza[~land & (altezza == 0)] = -1
+    assorbi_macchie(altezza, ~land)                     # rialzi o buche di poche caselle = scatolette isolate
     faccia = maschera_pareti(altezza, mat_par)
     pas = np.full((H, W), ".", "<U1")
     # rampa: nasce in cima a un tratto di parete dritto (pareti a sinistra e a destra) e scende per tutta l'altezza
@@ -671,9 +679,59 @@ def genera(seed):
                           "mat": "stone_light", "moss": False})
     w.objects.sort(key=lambda o: o["y"])
     sotto = genera_sottosuolo(seed, R, land, acqua, centro, rovine_boss, porto, rnd, rng, g)
-    w.ground = terreno_sotto(w.ground, altezza, mat_par)       # dopo tutto il resto: strade, alberi e sottosuolo non cambiano
+    # case che toccano le mura: la casella accanto al muro torna strada (il muro non attraversa le case)
+    muro = mat_par == "mura"
+    vicino = np.zeros_like(muro)
+    for sy, sx in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
+        vicino |= sposta(muro, sy, sx)
+    case = (g == L["stone"]) & ~muro
+    lab, _ = componenti(case)
+    via = np.isin(lab, np.unique(lab[vicino & case])[1:])         # la casa intera, non solo la casella accanto
+    while via.any():                                             # il vuoto prende la strada vicina, dai bordi in dentro
+        prima = via.sum()
+        for sy, sx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            da = via & ~sposta(via, sy, sx, True) & ~sposta(muro, sy, sx) & (sposta(g, sy, sx, -1) >= 0) \
+                & (sposta(g, sy, sx, -1) != L["stone"])
+            g[da] = sposta(g, sy, sx, -1)[da]
+            via &= ~da
+        if via.sum() == prima:
+            g[via] = L["ciottoli_scuri"]
+            break
+    # dopo tutto il resto (strade, alberi e sottosuolo non cambiano): terreno della cima sotto le pareti, poi le
+    # macchie troppo piccole (diventerebbero rombi isolati) prendono il terreno attorno
+    w.ground = terreno_sotto(w.ground, altezza, mat_par)
+    assorbi_macchie(w.ground, faccia)
     applica_spostati(luoghi, villaggi, sotto)
     return w, luoghi, villaggi, sotto
+
+
+def assorbi_macchie(g, fisso, minimo=6):
+    """Macchie di terreno con meno di `minimo` caselle: la sfumatura dual grid ne fa rombi isolati. Prendono il
+    terreno piu' comune attorno. Strade, fiumi e pontili sono lunghi e restano. `fisso`: caselle da non toccare."""
+    vista = fisso.copy()
+    piccole = []
+    for y0, x0 in zip(*np.nonzero(~fisso)):
+        if vista[y0, x0]:
+            continue
+        t = g[y0, x0]
+        vista[y0, x0] = True
+        pila, parte = [(y0, x0)], [(y0, x0)]
+        while pila:
+            y, x = pila.pop()
+            for ny, nx in nb8(y, x):                        # anche in diagonale: una costa a scalini e' una fascia sola
+                if not vista[ny, nx] and g[ny, nx] == t:
+                    vista[ny, nx] = True
+                    pila.append((ny, nx))
+                    parte.append((ny, nx))
+        if len(parte) < minimo:
+            piccole.append(parte)
+    for parte in piccole:
+        dentro = set(parte)
+        attorno = [int(g[ny, nx]) for y, x in parte for ny, nx in nb4(y, x) if (ny, nx) not in dentro and not fisso[ny, nx]]
+        if attorno:
+            nuovo = max(set(attorno), key=attorno.count)
+            for y, x in parte:
+                g[y, x] = nuovo
 
 
 def applica_spostati(luoghi, villaggi, sotto):
@@ -957,11 +1015,13 @@ MATERIALI_PARETE = ["", "arenaria", "roccia", "mura"]
 def ritaglio(w, box, alt, mat, pas, atl, oggetti=True, pareti=True):
     """Pezzo di mappa a tile vere (32 px), con le pareti sopra il terreno e sotto gli oggetti."""
     x0, y0, x1, y1 = box
-    strato = None
+    strato, st, du = None, None, None
     if pareti:
         ya = max(0, y0 - 3)                                    # le pareti nascono dalle righe sopra il ritaglio
         strato = disegna_pareti(alt[ya:y1, x0:x1], mat[ya:y1, x0:x1], pas[ya:y1, x0:x1], S=32)[(y0 - ya) * 32:]
-    return render_world(w, box, atlases=atl, with_objects=oggetti, sopra=strato)
+        st, du = np.zeros(alt.shape, int), np.zeros(alt.shape, bool)
+        st[ya:y1, x0:x1], du[ya:y1, x0:x1] = strati_pareti(alt[ya:y1, x0:x1], mat[ya:y1, x0:x1])
+    return render_world(w, box, atlases=atl, with_objects=oggetti, sopra=strato, strati=st, duri=du)
 
 
 def main():

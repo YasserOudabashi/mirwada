@@ -127,8 +127,10 @@ TERRAINS = {
                       rimc="brown_dd", level=7.2, contrast=0.15),
     "terra_bruciata": dict(ramp=["ink", "brown_dd", "brown_dd", "slate_d"], period=4, dither=0.5, detail="dots", rim="dark",
                            rimc="ink", level=7.4, contrast=0.4),
-    "arenaria": dict(ramp=["brown_dd", "brown_d", "brown_d", "rust"], period=4, dither=0.4, detail="strata", bande=4,
-                     rim="cliff", rimc="brown_dd", level=9.0),
+    # vista dall'alto: lastre di roccia spaccate (le strisce sono della PARETE, forge3d/pareti.py: se la cima avesse
+    # le strisce non si capirebbe dove finisce il pianoro e comincia la parete)
+    "arenaria": dict(ramp=["brown_dd", "brown_d", "brown", "rust"], period=4, dither=0.4, detail="cobbles", cells=5,
+                     rim="dark", rimc="brown_dd", level=9.0, contrast=0.6),
 }
 ORDER = sorted(TERRAINS, key=lambda k: TERRAINS[k]["level"])
 
@@ -351,8 +353,13 @@ def build_atlas(name, S=TILE, seed=3):
     return atlas
 
 
-def compose_ground(levels, atlases=None, S=TILE, frame=0, seed=3):
-    """levels: array HxW di nomi/indici (indice in ORDER). Ritorna immagine RGBA (H*S, W*S)."""
+def compose_ground(levels, atlases=None, S=TILE, frame=0, seed=3, strati=None, duri=None):
+    """levels: array HxW di nomi/indici (indice in ORDER). Ritorna immagine RGBA (H*S, W*S).
+    strati: HxW di interi (es. l'altezza). Dove due caselle vicine stanno su strati diversi (un dislivello)
+    i terreni NON si sfumano: ogni quarto di casella che tocca un altro strato prende il terreno pieno della
+    sua casella, con un bordo netto (lo copre il contorno della parete o della cima).
+    duri: HxW booleani, la casella ha un bordo di roccia (materiale da parete). Il bordo netto c'e' solo se la
+    piu' alta delle due caselle e' dura: una spiaggia sul mare (piu' basso ma senza parete) resta sfumata."""
     lv = np.asarray(levels)
     H, W = lv.shape
     if atlases is None:
@@ -377,4 +384,30 @@ def compose_ground(levels, atlases=None, S=TILE, frame=0, seed=3):
             blk = big[i * S:(i + 1) * S, j * S:(j + 1) * S]
             a = tile[..., 3:4] > 0
             blk[...] = np.where(a, tile, blk)
-    return big[h2:h2 + H * S, h2:h2 + W * S].copy()
+    out = big[h2:h2 + H * S, h2:h2 + W * S].copy()
+    if strati is not None:
+        st = np.pad(np.asarray(strati), 1, mode="edge")
+        du = np.pad(np.ones((H, W), bool) if duri is None else np.asarray(duri, bool), 1, mode="edge")
+
+        def netto(a, b):
+            if st[a] == st[b]:
+                return False
+            return bool(du[a] if st[a] > st[b] else du[b])
+
+        for i in range(H):
+            for j in range(W):
+                c = (i + 1, j + 1)
+                for qy in (0, 1):
+                    for qx in (0, 1):
+                        dy, dx = (-1, 1)[qy], (-1, 1)[qx]
+                        if not (netto(c, (i + 1 + dy, j + 1)) or netto(c, (i + 1, j + 1 + dx))
+                                or netto(c, (i + 1 + dy, j + 1 + dx))):
+                            continue
+                        at = atlases[ORDER[lv[i, j]]]
+                        fr = frame % (at.shape[0] // S)
+                        pieno = at[fr * S:(fr + 1) * S, 15 * S:16 * S]    # tile pieno (maschera 15)
+                        y0, x0 = i * S + qy * h2, j * S + qx * h2
+                        # il tile pieno e' allineato ai vertici: nel ritaglio e' spostato di mezzo tile
+                        out[y0:y0 + h2, x0:x0 + h2] = pieno[(qy * h2 + h2) % S:(qy * h2 + h2) % S + h2,
+                                                              (qx * h2 + h2) % S:(qx * h2 + h2) % S + h2]
+    return out

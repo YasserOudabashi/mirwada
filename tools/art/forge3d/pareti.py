@@ -95,13 +95,16 @@ def tile(mat, k, d, sx=None, dx=None, passaggio=None, col=0, S=64, seed=5, base=
         img = pal[np.clip(np.where((Yf % g) < g * 0.35, 1, 3 + ((Yf % g) < g * 0.5)), 0, len(ramp) - 1)]
         img[x < S // 8] = pal[0]; img[x >= S - S // 8] = pal[1]
     elif passaggio == "R":                                     # rampa: sentiero di terra che scende, bordi in ombra
+        # rampa: pendio di terra battuta rivolto verso di noi (quindi in luce), gradini di terra, fianchi tagliati
         pr = np.array([_rgb(c) for c in RAMPA])
-        v = 3 - np.minimum(3, ((Yf + nz[(y * 2) % S, x] * S / 3) * 4) // Hf).astype(int)  # chiara in alto
-        img = pr[np.clip(v, 0, 3)]
+        img = pr[np.where(Yf < Hf // 2, 3, 2)]
+        img[(Yf % (S // 4)) == S // 4 - 1] = pr[1]
         rs = np.random.RandomState(seed * 1000 + col * 7 + k)          # sassi sparsi, deterministici
-        for sx_, sy_ in rs.randint(S // 8, S - S // 8, (6, 2)):
-            img[sy_, sx_:sx_ + 2] = _rgb("grey"); img[sy_ + 1, sx_:sx_ + 2] = pr[0]
-        img[(x < S // 10) | (x >= S - S // 10)] = pr[0]
+        for sx_, sy_ in rs.randint(S // 6, S - S // 6, (4, 2)):
+            img[sy_, sx_:sx_ + 2] = _rgb("grey")
+        fi = max(2, S // 12)
+        img[:, :fi] = pal[1]; img[:, S - fi:] = pal[0]                # fianchi del taglio nella parete
+        img[:, 0] = _rgb("ink"); img[:, S - 1] = _rgb("ink")
     lw = _spessore(S)
     if sx == "est":                                            # spigolo sinistro, in luce
         img[:, 1:lw + 1] = pal[-1]; img[:, lw + 1] = pal[-2]; img[:, 0] = _rgb("ink")
@@ -121,12 +124,9 @@ def _spessore(S):
 
 def tile_ombra(sx=False, dx=False, S=64, angolo=False):
     """Ombra a terra sotto la parete: fascia di inchiostro semitrasparente, spostata a destra (luce a sinistra).
-    angolo: a destra la parete prosegue una riga piu' in basso (gradino): l'angolo sporgente fa ombra anche
-    nel quarto in alto a destra, dove il terreno della cima smussa l'angolo."""
+    angolo: non usato (lo smusso del terreno al piede non c'e' piu': compose_ground(strati=...))."""
     y, x = np.mgrid[0:S, 0:S]
     a = np.where(y < S // 6, 110, np.where(y < S // 3, 55, 0))
-    if angolo:
-        a = np.where((S - 1 - x) + y < S * 0.6, 110, a)              # triangolo verso l'angolo in alto a destra
     if sx:
         a = np.where(x < S // 4, 0, a)
     out = np.zeros((S, S, 4), np.uint8)
@@ -211,6 +211,19 @@ def _estremo(alt, e, y, x, dxx):
     if xx < 0 or xx >= W or e[y, xx]:
         return "cont"
     return "int" if alt[y, xx] > alt[y, x] else "est"
+
+
+def strati(alt, mat=None):
+    """(strati, duri) per compose_ground: lo strato e' l'altezza, ma una casella di parete sta sullo strato della
+    sua cima (il terreno sotto la parete e' quello della cima e non deve sbordare al piede); dura = ha un bordo di
+    roccia (materiale, o parete)."""
+    st = np.array(alt, copy=True)
+    duri = _con_materiale(mat, st.shape).copy()
+    f = facce(alt, mat)
+    for y, x in zip(*np.nonzero(np.vectorize(lambda v: v is not None)(f))):
+        st[y, x] = st[f[y, x][2], x]
+        duri[y, x] = True
+    return st, duri
 
 
 def terreno_sotto(ground, alt, mat=None):

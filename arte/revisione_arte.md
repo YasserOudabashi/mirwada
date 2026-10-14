@@ -192,7 +192,9 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
 > `world_prova.json` (`altezza`, `parete`, `passaggi`), prima/dopo in `arte/mondo/pareti_prima_dopo_*.png`.
 > Raccordi (2026-10-14, dopo due segnalazioni dell'utente): bordo continuo che gira gli angoli, spigoli
 > netti, terreno della cima sotto la parete, mare a -1 per le scogliere, cima delle mura a lastre.
-> In Godot le pareti come muri arrivano con US-8B12.
+> Poi (stesso giorno): niente sfumature attraverso i dislivelli di roccia, case liberate lungo le mura,
+> niente rombi o scatolette isolate, rampe chiare, arenaria vista dall'alto a lastre.
+> In Godot le pareti come muri (e i bordi netti tra strati) arrivano con US-8B12.
 
 - **Cosa:** tutto è una texture vista dall'alto. Al "passo tra due rupi" le rupi sono
   strisce di arenaria per terra; i gradoni delle Marche non si vedono; le scogliere sono
