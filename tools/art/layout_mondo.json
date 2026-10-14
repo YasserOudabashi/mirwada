@@ -1,5 +1,5 @@
 {
- "_comment": "Disposizione del mondo di prova (US-8B13). La legge tools/art/build_world.py, la scrive anche l'artifact 'tavolo tattico'. x, y in frazioni: zone del continente (x di W, y di HC = altezza del continente), isole (x di W, y di H). peso >1 = zona piu' piccola. 'spostati' vince sui suggerimenti del generatore: [x, y] in tile = posizione decisa, null = cancellato.",
+ "_comment": "Disposizione del mondo di prova (US-8B13). La legge tools/art/build_world.py, la scrive anche l'artifact 'tavolo tattico'. x, y in frazioni: zone del continente (x di W, y di HC = altezza del continente), isole (x di W, y di H). peso >1 = zona piu' piccola. 'spostati' vince sui suggerimenti del generatore: [x, y] in tile = posizione decisa, null = cancellato. citta.quartieri: centro di ogni quartiere relativo al centro citta' (x, y in unita' di raggio) e peso. schede: per ogni luogo tipo, descrizione, grandezza (raggio dello spiazzo), terreno, contenuto. tratti: pennellate, strade, fiumi, gallerie (punti in tile, r = raggio).",
  "terra": {
   "mirwada": {
    "x": 0.43,
@@ -167,7 +167,39 @@
   }
  ],
  "citta": {
-  "raggio": 55
+  "raggio": 55,
+  "quartieri": {
+   "porto_commerciale": {
+    "x": 0.0,
+    "y": 0.45,
+    "peso": 0.75
+   },
+   "quartiere_operaio": {
+    "x": -0.55,
+    "y": 0.05,
+    "peso": 1.0
+   },
+   "centro_storico": {
+    "x": 0.2,
+    "y": 0.05,
+    "peso": 1.0
+   },
+   "centro_antico": {
+    "x": 0.05,
+    "y": -0.55,
+    "peso": 1.0
+   },
+   "bassifondi": {
+    "x": -1.05,
+    "y": -0.15,
+    "peso": 1.0
+   },
+   "citta_nuova": {
+    "x": 0.95,
+    "y": -0.5,
+    "peso": 1.0
+   }
+  }
  },
  "spostati": {
   "luoghi": {},
@@ -175,5 +207,12 @@
   "ingressi": {},
   "boss": {}
  },
- "note": []
+ "note": [],
+ "schede": {
+  "luoghi": {},
+  "villaggi": {},
+  "ingressi": {},
+  "boss": {}
+ },
+ "tratti": []
 }

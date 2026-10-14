@@ -8231,3 +8231,26 @@ Domande su isola ghiacciata e sottosuolo (round 3-4):
 - Verificato: sintassi dello script (node --check); dopo la pubblicazione
   una lettura del db (vuoto, atteso: si scrive alla prima modifica). Non
   verificato: il trascinamento a mano (serve l'utente sulla pagina).
+
+[2026-10-14] Tavolo tattico v1: l'utente lo trova poco utile ("aggiungo e ottengo
+solo un quadrato rosso, a destra posso modificare pochissimo, non si capisce
+cosa si e' modificato, il raggio non si vede, la mappa non si crea subito, non
+vedo che terreno avra'"). Rifacimento v2, risposte dell'utente:
+- Anteprima dal vivo a FORME FEDELI (coste, zone, isole, citta', terreni di
+  base); alberi, fiumi e strade automatici solo nella generazione vera.
+- Strumenti: PENNELLO DEI TERRENI, STRADE E FIUMI, QUARTIERI DELLA CITTA'
+  (spostare e ridimensionare), GALLERIE DEL SOTTOSUOLO (+ "something else"
+  senza testo: da chiedere).
+- Dispositivo: PC CON MOUSE.
+- Scheda di luoghi e villaggi: nome e tipo, descrizione, grandezza (cerchio
+  visibile), terreno attorno, COSA CONTIENE (cosa ci sara' dentro).
+- Metodo: la pagina rifa' gli stessi calcoli del generatore Python sulle
+  stesse mappe di rumore (esportate come PNG) -> anteprima uguale nelle forme.
+- Script (parte 1 del tavolo v2): rumore arrotondato a 256 livelli (q8) ed
+  esportato come PNG in arte/tavolo/rumore_*.png (e, m, d, n1, n2, rq);
+  isolette della Frontiera in posizioni fisse; quartieri della citta' come
+  centri con peso in layout_mondo.json (citta.quartieri; porto peso 0.75);
+  applica_ritocchi(): schede (spiazzo di grandezza e terreno attorno a un
+  luogo) e tratti di superficie (pennello, strada, fiume); gallerie del
+  sottosuolo (galleria scava, riempi chiude); punti.json con terreni,
+  colori e regioni. Citta' ora 62 schermate (quartieri fino a 1,3 raggi).

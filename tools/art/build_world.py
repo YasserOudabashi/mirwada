@@ -188,14 +188,74 @@ def galleria(mask, a, b, larg, rnd):
         mask[max(0, y - larg // 2):y + larg - larg // 2, max(0, x - larg // 2):x + larg - larg // 2] = True
 
 
+def q8(a):
+    """Rumore arrotondato a 256 livelli: e' lo stesso che il tavolo tattico legge dai PNG."""
+    return np.round(np.clip(a, 0, 1) * 255) / 255
+
+
+def rumori(seed):
+    return {"e": q8(0.65 * fbm(W, H, 28 * K, 5, seed) + 0.35 * fbm(W, H, 9 * K, 3, seed + 1)),
+            "m": q8(fbm(W, H, 24 * K, 4, seed + 2)), "d": q8(fbm(W, H, 6 * 1.5, 2, seed + 9)),
+            "n1": q8(fbm(W, H, 30 * K, 3, seed + 3)), "n2": q8(fbm(W, H, 12 * K, 2, seed + 4)),
+            "rq": q8(fbm(W, H, 18, 2, seed + 50))}
+
+
+def timbra(punti, r):
+    """Maschera dei tile toccati da un tratto: dischi di raggio r lungo la linea dei punti."""
+    mask = np.zeros((H, W), bool)
+    r = max(0, int(round(r)))
+    oy, ox = np.mgrid[-r:r + 1, -r:r + 1]
+    disco_l = ox * ox + oy * oy <= r * r + r
+    pts = [(float(p[0]), float(p[1])) for p in punti]
+    if len(pts) == 1:
+        pts = pts * 2
+    for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+        n = max(1, int(math.hypot(x1 - x0, y1 - y0) * 2))
+        for t in range(n + 1):
+            x, y = int(round(x0 + (x1 - x0) * t / n)), int(round(y0 + (y1 - y0) * t / n))
+            ya, yb, xa, xb = y - r, y + r + 1, x - r, x + r + 1
+            sy0, sx0 = max(0, -ya), max(0, -xa)
+            sy1, sx1 = disco_l.shape[0] - max(0, yb - H), disco_l.shape[1] - max(0, xb - W)
+            if sy1 <= sy0 or sx1 <= sx0:
+                continue
+            mask[max(0, ya):min(H, yb), max(0, xa):min(W, xb)] |= disco_l[sy0:sy1, sx0:sx1]
+    return mask
+
+
+ACQUE = ("water", "deep_water")
+TERRENO_TRATTO = {"strada": "lastricato_antico", "fiume": "water"}
+
+
+def applica_ritocchi(g, land, acqua, luoghi, villaggi):
+    """Schede (spiazzo attorno a un luogo) e tratti di superficie (pennello, strade, fiumi) dal tavolo tattico."""
+    for cat, dove in (("luoghi", luoghi), ("villaggi", villaggi)):
+        for nome, sc in LAYOUT.get("schede", {}).get(cat, {}).items():
+            if nome in dove and sc.get("terreno") in L and sc.get("grandezza"):
+                m_ = timbra([dove[nome]], sc["grandezza"])
+                g[m_] = L[sc["terreno"]]
+                land |= m_ & (sc["terreno"] not in ACQUE)
+    for tr in LAYOUT.get("tratti", []):
+        if tr.get("livello", "sopra") != "sopra" or tr.get("tipo") not in ("pennello", "strada", "fiume"):
+            continue
+        ter = tr.get("terreno") or TERRENO_TRATTO.get(tr["tipo"])
+        if ter not in L or not tr.get("punti"):
+            continue
+        m_ = timbra(tr["punti"], tr.get("r", 1))
+        g[m_] = L[ter]
+        if ter in ACQUE:
+            land &= ~m_
+            acqua |= m_
+        else:
+            land |= m_
+            acqua &= ~m_
+
+
 def genera(seed):
     rnd = random.Random(seed)
     rng = np.random.RandomState(seed)
     yy, xx = YY, XX
-    e = 0.65 * fbm(W, H, 28 * K, 5, seed) + 0.35 * fbm(W, H, 9 * K, 3, seed + 1)      # altezza (paesaggio)
-    m = fbm(W, H, 24 * K, 4, seed + 2)                                               # umidita'
-    d = fbm(W, H, 6 * 1.5, 2, seed + 9)                                              # macchie (piccole)
-    n1, n2 = fbm(W, H, 30 * K, 3, seed + 3), fbm(W, H, 12 * K, 2, seed + 4)
+    RU = rumori(seed)
+    e, m, d, n1, n2 = RU["e"], RU["m"], RU["d"], RU["n1"], RU["n2"]          # altezza, umidita', macchie, deformazioni
 
     # --- continente, zone (Voronoi deformato), golfo, isole ---
     costa = HC + (n1 - 0.5) * 34 * K + (n2 - 0.5) * 10 * K
@@ -302,7 +362,7 @@ def genera(seed):
             ys_f, xs_f = np.nonzero(interno_f)
             cxf, cyf = int(xs_f.mean()), int(ys_f.mean())
             for k_i in range(6):                     # 5-6 isolette nella nebbia
-                ang = k_i * 2 * math.pi / 6 + rnd.random() * 0.5
+                ang = k_i * 2 * math.pi / 6 + 0.3                                  # fisse: il tavolo le ricalcola
                 ix, iy = int(cxf + math.cos(ang) * 70), int(cyf + math.sin(ang) * 50)
                 g[interno_f & (np.hypot(xx - ix, yy - iy) < 14 + 8 * n2)] = L["erba_lilla"]
             g[interno_f & disco(cxf, cyf, 18)] = L["erba_lilla"]
@@ -332,20 +392,16 @@ def genera(seed):
     # --- Mirwada, grande citta' portuale a quartieri (risposte dell'utente 2026-10-14) ---
     py = int(np.nonzero(mw[:, px])[0].max()) - 1                       # riva nord del golfo (non la Frontiera!)
     porto, centro = (px, py), (px, py - int(RC * 0.6))
-    rq = fbm(W, H, 18, 2, seed + 50) - 0.5                                         # confini irregolari
+    rq = RU["rq"] - 0.5                                                           # confini irregolari
     dxc, dyc = xx - centro[0] + rq * RC * 0.5, yy - centro[1] + rq * RC * 0.4
     dc = np.hypot(dxc, dyc)
     base_citta = mw & (dmare > 1)
-    vecchia = base_citta & (dc < RC * 0.85)                                       # dentro le mura
-    fuori = base_citta & (dc >= RC * 0.9) & (dc < RC * 1.3)
-    Q = {"porto_commerciale": vecchia & (yy > py - RC * 0.32) & (np.abs(xx - px) < RC * 0.75),
-         "quartiere_operaio": vecchia & (dxc < -RC * 0.25),
-         "centro_antico": vecchia & (dyc < -RC * 0.35),
-         "bassifondi": fuori & (dxc < -RC * 0.3),
-         "citta_nuova": fuori & (dxc >= -RC * 0.3) & (yy < py - RC * 0.15)}
-    Q["quartiere_operaio"] &= ~Q["porto_commerciale"]
-    Q["centro_antico"] &= ~Q["quartiere_operaio"]
-    Q["centro_storico"] = vecchia & ~Q["porto_commerciale"] & ~Q["quartiere_operaio"] & ~Q["centro_antico"]
+    # quartieri: ogni tile della citta' va al centro di quartiere piu' vicino (pesato), come le zone
+    QS = LAYOUT["citta"]["quartieri"]
+    area_citta = base_citta & (dc < RC * 1.3)
+    dq = np.stack([np.hypot(dxc - v["x"] * RC, dyc - v["y"] * RC) * v.get("peso", 1.0) for v in QS.values()])
+    iq = dq.argmin(0)
+    Q = {n: area_citta & (iq == i) for i, n in enumerate(QS)}
     citta = np.zeros((H, W), bool)
     for z in Q.values():
         citta |= z
@@ -355,17 +411,18 @@ def genera(seed):
         blocco = ((xx % passo_x) < larg) & ((yy % passo_y) < alt)
         g[z] = np.where(blocco[z], edificio, strada)
 
-    isolati(Q["porto_commerciale"], 12, 9, 9, 6, L["ciottoli_scuri"])            # magazzini grandi
-    isolati(Q["quartiere_operaio"], 5, 4, 4, 3, L["ciottoli_scuri"])             # case strette e fabbriche
-    isolati(Q["centro_storico"], 8, 7, 6, 5, L["lastre_chiare"])                 # negozi, famiglie
-    isolati(Q["centro_antico"], 10, 9, 8, 7, L["lastre_chiare"])                 # palazzi
+    vuoto = np.zeros((H, W), bool)
+    isolati(Q.get("porto_commerciale", vuoto), 12, 9, 9, 6, L["ciottoli_scuri"])  # magazzini grandi
+    isolati(Q.get("quartiere_operaio", vuoto), 5, 4, 4, 3, L["ciottoli_scuri"])   # case strette e fabbriche
+    isolati(Q.get("centro_storico", vuoto), 8, 7, 6, 5, L["lastre_chiare"])       # negozi, famiglie
+    isolati(Q.get("centro_antico", vuoto), 10, 9, 8, 7, L["lastre_chiare"])       # palazzi
     # bassifondi: terra e fango, baracche sparse e case crollate
-    z = Q["bassifondi"]
+    z = Q.get("bassifondi", vuoto)
     g[z] = np.where(d[z] < 0.25, L["mud"], L["dirt"])
     g[z & ((xx % 5) < 3) & ((yy % 4) < 2) & (d > 0.3)] = L["stone"]
     g[z & ((xx % 5) < 3) & ((yy % 4) < 2) & (d > 0.75)] = L["lastre_rovine"]
     # citta' nuova: giardini, ville e viali larghi
-    z = Q["citta_nuova"]
+    z = Q.get("citta_nuova", vuoto)
     g[z] = L["grass"]
     g[z & ((xx % 14) < 5) & ((yy % 12) < 4)] = L["stone"]
     g[z & (((xx % 14) >= 11) | ((yy % 12) >= 9))] = L["lastre_chiare"]
@@ -478,7 +535,7 @@ def genera(seed):
         "approdo_frontiera": migliore(R["frontiera_porte"] & (dmare == 2), -yy),
     }
     for q_nome in ("quartiere_operaio", "bassifondi", "citta_nuova", "centro_antico"):
-        ys_q, xs_q = np.nonzero(Q[q_nome])
+        ys_q, xs_q = np.nonzero(Q.get(q_nome, vuoto))
         if len(xs_q):
             luoghi[q_nome] = (int(xs_q.mean()), int(ys_q.mean()))
     for rid, cx, cy, r, prof in ISOLE[1:]:
@@ -530,8 +587,11 @@ def genera(seed):
         r = 4 if nome.startswith(("villaggio", "accampamento")) else 1
         g[disco(x, y, r) & land & ~acqua] = L["path"] if r > 1 else L["dirt"]
 
+    applica_spostati(luoghi, villaggi, None)
+    applica_ritocchi(g, land, acqua, luoghi, villaggi)
     w = World(W, H, seed, g, reg, e, REGIONI, water_mask=acqua)
     w.citta = citta                                   # per misurare la citta' e disegnarne l'anteprima
+    w.rumori = RU                                     # esportati per il tavolo tattico
     w.roads = [[list(map(int, q)) for q in p] for p in strade]
     w.objects = ponti
 
@@ -569,8 +629,10 @@ def genera(seed):
 
 def applica_spostati(luoghi, villaggi, sotto):
     """Le decisioni dell'utente (tavolo tattico) vincono sui suggerimenti: [x, y] sposta o aggiunge, null cancella."""
-    for chiave, dove in (("luoghi", luoghi), ("villaggi", villaggi), ("ingressi", sotto["ingressi"]),
-                         ("boss", sotto["boss"])):
+    coppie = [("luoghi", luoghi), ("villaggi", villaggi)]
+    if sotto is not None:
+        coppie += [("ingressi", sotto["ingressi"]), ("boss", sotto["boss"])]
+    for chiave, dove in coppie:
         for nome, pos in LAYOUT["spostati"].get(chiave, {}).items():
             if pos is None:
                 dove.pop(nome, None)
@@ -661,6 +723,11 @@ def genera_sottosuolo(seed, R, land, acqua, centro, rovine_boss, porto, rnd, rng
         tunnel = np.zeros((H, W), bool)
         galleria(tunnel, a, b, 2, rnd)
         s[tunnel & (s < 0)] = L["pietrisco"]
+    # gallerie dal tavolo tattico: 'galleria' scava (pavimento), 'riempi' chiude (roccia)
+    for tr in LAYOUT.get("tratti", []):
+        if tr.get("tipo") in ("galleria", "riempi") and tr.get("punti"):
+            m_ = timbra(tr["punti"], tr.get("r", 1))
+            s[m_] = L.get(tr.get("terreno") or "pietrisco", L["pietrisco"]) if tr["tipo"] == "galleria" else -1
     # ingressi (stesso punto sopra e sotto) e boss di zona
     sopra_ok = land & ~acqua & ~np.isin(g_sopra, [L["deep_water"], L["water"], L["stone"]])
     interno = (xx >= 20) & (xx < W - 20) & (yy >= 20) & (yy < H - 20)
@@ -799,12 +866,16 @@ def esporta_tavolo(w, luoghi, villaggi, sotto):
     os.makedirs(TAVOLO, exist_ok=True)
     anteprima(w, luoghi, villaggi, segni=False).save(os.path.join(TAVOLO, "superficie.png"))
     anteprima_sotto(w, sotto, segni=False).save(os.path.join(TAVOLO, "sottosuolo.png"))
+    for nome, a in w.rumori.items():                  # stesse mappe di rumore: la pagina rifa' gli stessi calcoli
+        Image.fromarray(np.round(a * 255).astype(np.uint8), "L").save(os.path.join(TAVOLO, f"rumore_{nome}.png"))
     righe, tot, sotto_tot = misure(w, sotto)
-    punti = {"W": W, "H": H, "HC": HC, "seed": w.seed, "schermata": SCHERMATA,
+    punti = {"W": W, "H": H, "HC": HC, "K": K, "KC": KC, "seed": w.seed, "schermata": SCHERMATA,
+             "terreni": list(ORDER), "colori": colori_terreni().tolist(), "regioni": REGIONI,
              "luoghi": luoghi, "villaggi": villaggi, "ingressi": sotto["ingressi"], "boss": sotto["boss"],
              "misure": {n: round(v, 1) for n, v in righe}, "superficie": round(tot), "sottosuolo": round(sotto_tot),
              "citta": round(int(w.citta.sum()) / SCHERMATA),
-             "layout": {k: LAYOUT[k] for k in ("terra", "mezzo", "isole", "citta", "spostati", "note")}}
+             "layout": {k: LAYOUT.get(k, {} if k != "tratti" else []) for k in
+                        ("terra", "mezzo", "isole", "citta", "spostati", "note", "schede", "tratti")}}
     with open(os.path.join(TAVOLO, "punti.json"), "w", encoding="utf-8") as f:
         json.dump(punti, f, ensure_ascii=False, separators=(",", ":"))
 
