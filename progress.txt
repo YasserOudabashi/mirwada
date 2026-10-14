@@ -8278,3 +8278,5 @@ vedo che terreno avra'"). Rifacimento v2, risposte dell'utente:
 - Risultato: superficie 3360 schermate, sottosuolo 717, città 62; 51 luoghi, 35 villaggi, 47 ingressi. validate exit 0.
 - Da chiedere: isola_nuova_19 e _21 cadono dentro la Frontiera (dischi di bosco nella nebbia, non isole nel mare);
   isola_nuova_20 si fonde con isolotto_1; la pozza (364,307) e' larga 1 tile. Tavolo ripubblicato (versione 3).
+- Su richiesta: tolte isola_nuova_19 e _21 (layout + db, versione 57); tenuto isolotto_1 -> rocciosa (cambiato
+  dall'utente nel tavolo). Rigenerato: superficie 3360, sottosuolo 718, 49 luoghi. validate 0. Tavolo versione 5.

@@ -125,7 +125,7 @@
   },
   {
    "id": "isolotto_1",
-   "profilo": "boschiva",
+   "profilo": "rocciosa",
    "r": 14,
    "x": 0.7,
    "y": 0.56
@@ -166,24 +166,10 @@
    "y": 0.56
   },
   {
-   "id": "isola_nuova_19",
-   "profilo": "boschiva",
-   "r": 20,
-   "x": 0.6533,
-   "y": 0.739
-  },
-  {
    "id": "isola_nuova_20",
    "profilo": "boschiva",
    "r": 20,
    "x": 0.6867,
-   "y": 0.542
-  },
-  {
-   "id": "isola_nuova_21",
-   "profilo": "boschiva",
-   "r": 20,
-   "x": 0.525,
    "y": 0.542
   }
  ],
