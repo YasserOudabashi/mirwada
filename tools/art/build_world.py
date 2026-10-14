@@ -710,14 +710,16 @@ def genera(seed):
     # coste delle spiagge e cerchi dei luoghi irregolari (revisione 3.9): dopo tutto il resto, cosi' strade, alberi e
     # sottosuolo restano quelli approvati (gli alberi finiti su un terreno cambiato si tolgono)
     prima, terra_prima = g.copy(), land.copy()
-    coste_irregolari(g, land, w.biome, altezza, mat_par, faccia, list(luoghi.values()) + list(villaggi.values()),
-                     strade, np.logical_or.reduce(LAGUNE + [np.zeros_like(land)]), seed)
+    scogli = coste_irregolari(g, land, w.biome, altezza, mat_par, faccia,
+                              list(luoghi.values()) + list(villaggi.values()), strade,
+                              np.logical_or.reduce(LAGUNE + [np.zeros_like(land)]), seed)
     for cx, cy, r, t, fuori, ok, nome in cerchi:
         cerchio_irregolare(g, cx, cy, r, L[t], None if fuori is None else L[fuori], ok, nome)
     cambiate = g != prima
     w.water_mask[terra_prima & ~land], w.water_mask[land & ~terra_prima] = True, False
     cambiate |= ispessisci(terra_prima & ~land, 1)          # niente alberi con l'ombra sull'acqua nuova
     w.objects = [o for o in w.objects if not (cambiate[int(o["y"]) % H, int(o["x"]) % W] and o["type"] != "bridge")]
+    w.objects = sorted(w.objects + scogli, key=lambda o: o["y"])
     # dopo tutto il resto (strade, alberi e sottosuolo non cambiano): terreno della cima sotto le pareti, poi le
     # macchie troppo piccole (diventerebbero rombi isolati) prendono il terreno attorno
     w.ground = terreno_sotto(w.ground, altezza, mat_par)
@@ -805,9 +807,12 @@ def coste_irregolari(g, land, reg, altezza, mat_par, faccia, punti, strade, lagu
     """Coste a gradini regolari -> irregolari: la forma della terra si sfuma (i gradini diventano curve) e si
     ritaglia con un rumore fine, spostando il bordo di 1-3 caselle. Fermi: scogliere e moli (materiale), citta'
     (terreni dritti), strade, luoghi e villaggi. Poi la fascia d'acqua bassa, larga 2-6 caselle e arrotondata."""
-    j = 0.6 * fbm(W, H, 6, 3, seed + 311) + 0.4 * fbm(W, H, 16, 2, seed + 312)
+    j = 0.75 * fbm(W, H, 6, 3, seed + 311) + 0.25 * fbm(W, H, 16, 2, seed + 312)
     j = (j - j.mean()) / j.std()
-    nuova = sfuma(sfuma(land, 2), 2) + 0.3 * j > 0.5
+    nuova = sfuma(sfuma(land, 2), 2) + 0.25 * j > 0.5
+    for _ in range(2):                                   # niente punte ne' tacche di una casella (triangoli nel dual grid)
+        n4 = sum(sposta(nuova, sy, sx).astype(int) for sy, sx in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+        nuova = (nuova & (n4 >= 2)) | (~nuova & (n4 >= 3))
     dritti = np.isin(g, [ORDER.index(n) for n in ORDER if TERRAINS[n].get("bordo") == "dritto"])
     fermo = (mat_par != "") | faccia | dritti
     for p in strade:
@@ -817,7 +822,7 @@ def coste_irregolari(g, land, reg, altezza, mat_par, faccia, punti, strade, lagu
     for x, y in punti:
         fermo[max(0, y - 2):y + 3, max(0, x - 2):x + 3] = True
     mare = ~land & (reg == 0)                              # i laghi (ritocchi dei dati) restano come sono
-    vicino = (distanza(mare, 4) <= 4) & (distanza(land, 4) <= 4)
+    vicino = (distanza(mare, 6) <= 6) & (distanza(land, 6) <= 6)
     erodi = land & ~nuova & ~fermo & vicino
     cresci = mare & nuova & ~fermo & vicino
     # niente pozzette d'acqua chiuse ne' briciole di terra staccate (diventerebbero rombi isolati)
@@ -859,6 +864,24 @@ def coste_irregolari(g, land, reg, altezza, mat_par, faccia, punti, strade, lagu
     bassa = sfuma(sfuma(distanza(naturale, 9) <= larga, 2), 1) > 0.5
     g[mare & bassa] = L["water"]
     g[mare & ~bassa & ~lagune] = L["deep_water"]
+    # scogli: nell'acqua bassa a 2-5 caselle dalla riva, a gruppi sui tratti rocciosi (rumore), lontani da citta',
+    # moli e strade, mai due vicini. Numeri casuali propri: il resto del mondo non cambia
+    vietato = ispessisci(dritti | np.isin(mat_par, ["molo", "legno"]) | np.isin(prima_g, [L["molo_pietra"],
+                                                                                         L["pontile_legno"]]), 8)
+    for p in strade:
+        for x, y in p:
+            vietato[max(0, y - 3):y + 4, max(0, x - 3):x + 4] = True
+    d = distanza(naturale, 6)
+    rnd_s = np.random.RandomState(seed + 316)
+    posto = mare & (g == L["water"]) & (d >= 2) & (d <= 5) & ~vietato & ~ispessisci(faccia, 1) \
+        & (fbm(W, H, 20, 2, seed + 315) > 0.62)
+    scogli, preso = [], np.zeros((H, W), bool)
+    for y, x in zip(*np.nonzero(posto & (rnd_s.rand(H, W) < 0.12))):
+        if not preso[max(0, y - 1):y + 2, max(0, x - 1):x + 2].any():           # a gruppetti, mai attaccati
+            preso[y, x] = True
+            scogli.append({"type": "scoglio", "x": x + .5, "y": y + .6, "seed": int(rnd_s.randint(6)),
+                           "size": round(float(rnd_s.uniform(0.8, 1.3)), 2)})
+    return scogli
 
 
 def assorbi_macchie(g, fisso, minimo=6):

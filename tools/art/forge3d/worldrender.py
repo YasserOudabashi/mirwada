@@ -25,6 +25,9 @@ def object_sprite(o, S=TILE):
     elif t == "rock":
         r = rock(o["seed"], o.get("mat", "stone"), size=1.5 * k, moss=o.get("moss", False))
         cw, ch, foot = int(48 * k), int(48 * k), 0.8
+    elif t == "scoglio":                                  # roccia nel mare: schiuma alla base, niente ombra a terra
+        r = rock(o["seed"], "stone", size=2.6 * o.get("size", 1.0) * k, moss=False)
+        cw, ch, foot = int(96 * k), int(72 * k), 0.75
     elif t == "bridge":
         from .rig import Rig
         r = Rig("bridge"); r.joint("b", "root", (0, 0, 0))
@@ -34,9 +37,28 @@ def object_sprite(o, S=TILE):
         cw, ch, foot = S, S, 0.5
     else:
         return None
-    img = render(r.instances({}, 180), size=(cw, ch), ppu=1.0, foot=(0.5, foot), shadow=(t != "bridge"))
+    img = render(r.instances({}, 180), size=(cw, ch), ppu=1.0, foot=(0.5, foot), shadow=(t not in ("bridge", "scoglio")))
+    if t == "scoglio":
+        img = _sommerso(img, int(ch * foot) - max(2, int(3 * k)), o["seed"])
     _cache[key] = (img, cw // 2, int(ch * foot))
     return _cache[key]
+
+
+def _sommerso(img, riga, seed):
+    """La parte sotto `riga` va sott'acqua; lungo la linea dell'acqua schiuma a pezzetti (bianco e grigio chiaro)."""
+    pieno = np.nonzero(img[:riga, :, 3].any(0))[0]
+    img = img.copy()
+    img[riga:] = 0
+    if not len(pieno):
+        return img
+    rng = np.random.RandomState(seed)
+    a, b = int(pieno.min()), int(pieno.max())
+    for x in range(max(0, a - 3), min(img.shape[1], b + 4)):
+        fuori = x < a or x > b
+        for y, p in ((riga - 1, 0.35), (riga, 0.9 if not fuori else 0.55), (riga + 1, 0.3)):
+            if 0 <= y < img.shape[0] and rng.rand() < p:
+                img[y, x] = (255, 255, 255, 255) if rng.rand() < 0.7 else (192, 203, 220, 255)
+    return img
 
 
 def render_world(w, region=None, S=TILE, with_objects=True, frame=0, atlases=None, tint=None, sopra=None, strati=None,

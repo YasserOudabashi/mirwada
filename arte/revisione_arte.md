@@ -226,7 +226,7 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
 - **Come correggere:** 2–4 varianti per tile scelte dal seed nel dual grid; dettagli meno
   contrastati; mare con poche onde sparse e animate.
 
-### 🟠 3.6 Pavimenti e moli con bordi "naturali"
+### ✅ 3.6 Pavimenti e moli con bordi "naturali" — FATTO (2026-10-14)
 - **Cosa:** lastre, piazze, moli e pontili usano la stessa transizione ondulata dell'erba:
   la piazza di lastre chiare del porto sembra una macchia di neve, i pontili hanno le punte
   arrotondate e il bordo dentellato verso la spiaggia, un tile di legno da solo diventa un
@@ -249,7 +249,7 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
 - **Come correggere:** le strade proseguono dentro la regione fino al luogo; alberi e rocce
   esclusi dalla strada e da 1 tile ai lati.
 
-### 🟠 3.9 Coste a gradini e luoghi perfettamente rotondi
+### ✅ 3.9 Coste a gradini e luoghi perfettamente rotondi — FATTO (2026-10-14)
 - **Cosa:** la Frontiera è un'ellisse a scalini regolari (sembra una piramide vista
   dall'alto), la fascia d'acqua bassa è larga sempre uguale, rovine, cimitero, archivio e
   isolette nella nebbia sono cerchi perfetti.
@@ -258,10 +258,11 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
 - **FATTO (2026-10-14):** a fine generazione la forma della terra si sfuma e si ritaglia con un rumore
   (golfi e promontori di 1–3 caselle), la spiaggia segue la costa nuova con larghezza 1–2, l'acqua bassa
   è larga 2–6 caselle con il bordo arrotondato; i cerchi (rovine, cimitero, archivio, isolette) hanno il
-  raggio che ondeggia. Fermi: scogliere, moli, città, strade, luoghi, villaggi, laghi. Gli scogli non
-  sono stati aggiunti (servirebbe un oggetto nuovo nel mare).
+  raggio che ondeggia. Fermi: scogliere, moli, città, strade, luoghi, villaggi, laghi. Niente punte né
+  tacche di una casella. **Scogli** (oggetto `scoglio`): rocce mezze sommerse con schiuma, a gruppetti
+  nell'acqua bassa a 2–5 caselle dalla riva, lontano da città, moli e strade (288 nel mondo di prova).
 
-### 🟠 3.10 Acqua del sottosuolo turchese e a pezzetti
+### ✅ 3.10 Acqua del sottosuolo turchese e a pezzetti — FATTO (2026-10-14)
 - **Cosa:** fogne e grotte usano l'acqua bassa tropicale (turchese brillante); nelle fogne
   l'acqua è a pezzetti staccati invece che in canali continui.
 - **Come correggere:** terreni `acqua_fogna` (verde-bruna torbida) e `acqua_grotta` (scura
@@ -346,8 +347,9 @@ l'HUD** (dopo US-8B01 le scritte sono lisce).
 
 1. ~~**Decisioni (nessun codice):** direzione del colore del mondo (3.1) e palette/tratti
    dei VFX (4.1).~~ **Fatto il 2026-10-14:** mondo luminoso, vale `data/vfx.json`.
-2. **Generatore (`forge3d`):** pareti e altezze (3.2), bordi dritti per i terreni
-   costruiti (3.6), varianti dei tile (3.5), scala degli alberi (3.3). Poi si rigenera il
+2. **Generatore (`forge3d`):** ~~pareti e altezze (3.2), bordi dritti per i terreni
+   costruiti (3.6), coste (3.9), acqua del sottosuolo (3.10)~~ fatti; restano varianti dei
+   tile (3.5), scala degli alberi (3.3), pavimenti a scacchiera (3.7), strade (3.8). Poi si rigenera il
    mondo con lo stesso seed e si confronta il prima e il dopo.
 3. **Blocco C** con i punti 1.1 e 1.4–1.13 scritti nei brief: Enel (US-8B30), nemico
    (US-8B31, prima possibile per 1.2), pet (US-8B32).

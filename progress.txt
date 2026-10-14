@@ -8498,3 +8498,18 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   43 macchioline (oggetti, strade, luoghi identici).
 - Verificato: grate appese 0, ingressi sul canale 0, md5 identico su due lanci, validate 0. Guardati ingranditi:
   ritaglio fogne, grotte, le due estremita' di un canale, la rete intera.
+
+[2026-10-14] Scogli in mare (revisione 3.9, ultimo pezzo) + ritocco coste. FATTO.
+- worldrender.py: oggetto "scoglio" = rock() di pietra scura (size 2.6 x o["size"]), senza ombra a terra; la parte
+  sotto la linea dell'acqua si taglia e lungo il taglio schiuma a pezzetti bianca/grigio chiaro (_sommerso).
+- build_world.py, coste_irregolari() restituisce gli scogli: acqua bassa a 2-5 caselle dalla riva naturale, tratti
+  rocciosi (fbm seed+315 > 0.62), lontano 8 da citta'/moli e 3 da strade, mai su facce di scogliera, mai due
+  attaccati (numeri casuali propri seed+316: il resto non cambia). size 0.8-1.3. 288 scogli, tutti su "water".
+- Coste: spinta del rumore 0.25 (piu' fine che lento), limite 6 caselle (prima 4: dove si raggiungeva il bordo
+  diventava una riga dritta, es. spiaggia bianca dell'isola dei pirati), pulizia delle punte e tacche di una
+  casella (triangoli nel dual grid).
+- Verificato: strade, luoghi, villaggi, spawn, sottosuolo identici; pozze/briciole < 10 caselle 0; md5 uguale su
+  due lanci; validate 0. Guardati: scogli su acqua bassa e profonda (x4), tre gruppi nel mondo, approdo, isola
+  dei pirati, mappa intera.
+- Resta da vedere (non di questo passo): la sabbia_bianca e' quasi bianco pieno e in grandi aree sembra neve;
+  isola ghiacciata e isola del mostro hanno la forma generale a ellisse (la costa e' irregolare, la sagoma no).
