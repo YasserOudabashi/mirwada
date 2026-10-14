@@ -3,605 +3,1299 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral+SC:wght@600&display=swap">
 <style>
-/* Layout: tavolo da cartografo. La mappa e' il piano di lavoro a tutta altezza, il pannello e' il quaderno a lato. */
+/* Layout: tavolo da cartografo. A sinistra la cassetta degli attrezzi, al centro la mappa viva, a destra il quaderno. */
 :root {
-  --carta: #eef0f3;      /* sfondo pagina */
-  --tavolo: #dfe3ea;     /* superficie dei pannelli */
-  --inchiostro: #181425; /* testo e contorni (Endesga 32) */
-  --grafite: #4a5068;    /* testo secondario */
-  --filo: #b8bfcc;       /* bordi sottili */
-  --ambra: #b86a10;      /* accento: selezione, azioni */
-  --ambra-fondo: #fbe7c6;
-  --mare: #10203a;       /* fondo del piano mappa */
-  --rischio: #b3262f;
-  --ok: #2c6e49;
+  --carta: #eef0f3; --tavolo: #e1e5ec; --pannello: #f7f8fa; --inchiostro: #181425; --grafite: #4a5068;
+  --filo: #b8bfcc; --ambra: #a85d06; --ambra-fondo: #fbe7c6; --mare: #10203a; --rischio: #b3262f; --ok: #2c6e49;
   --font-titolo: "Spectral SC", "Iowan Old Style", Georgia, serif;
   --font-testo: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --font-dati: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --carta: #12111a; --tavolo: #1c1b27; --inchiostro: #e9e6f2; --grafite: #a7a3ba; --filo: #353448;
-    --ambra: #feae34; --ambra-fondo: #3a2a12; --mare: #070b14; --rischio: #ff6b72; --ok: #6fcf97;
+    --carta: #12111a; --tavolo: #1b1a26; --pannello: #211f2d; --inchiostro: #e9e6f2; --grafite: #a7a3ba;
+    --filo: #363449; --ambra: #feae34; --ambra-fondo: #3a2a12; --mare: #070b14; --rischio: #ff6b72; --ok: #6fcf97;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --carta: #12111a; --tavolo: #1c1b27; --inchiostro: #e9e6f2; --grafite: #a7a3ba; --filo: #353448;
-  --ambra: #feae34; --ambra-fondo: #3a2a12; --mare: #070b14; --rischio: #ff6b72; --ok: #6fcf97;
+  --carta: #12111a; --tavolo: #1b1a26; --pannello: #211f2d; --inchiostro: #e9e6f2; --grafite: #a7a3ba;
+  --filo: #363449; --ambra: #feae34; --ambra-fondo: #3a2a12; --mare: #070b14; --rischio: #ff6b72; --ok: #6fcf97;
   color-scheme: dark;
 }
 html, body { height: 100%; }
+* { box-sizing: border-box; }
 body {
   background: var(--carta); color: var(--inchiostro); font-family: var(--font-testo); font-size: 14px;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px;
+  padding-block: 10px; display: flex; flex-direction: column; gap: 8px;
 }
-* { box-sizing: border-box; }
-header { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
-h1 { font-family: var(--font-titolo); font-weight: 600; font-size: 22px; margin: 0; letter-spacing: 0.02em; text-wrap: balance; }
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+h1 { font-family: var(--font-titolo); font-weight: 600; font-size: 21px; margin: 0; letter-spacing: 0.02em; }
 .stato { font-family: var(--font-dati); font-size: 12px; color: var(--grafite); }
-.stato.attenzione { color: var(--rischio); }
-.stato.ok { color: var(--ok); }
-.barra { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.stato.attenzione { color: var(--rischio); } .stato.ok { color: var(--ok); }
 .gruppo { display: inline-flex; border: 1px solid var(--filo); border-radius: 6px; overflow: hidden; }
-button, select, input { font: inherit; color: var(--inchiostro); }
-.gruppo button { background: var(--tavolo); border: 0; padding: 6px 10px; cursor: pointer; border-right: 1px solid var(--filo); }
+button, select, input, textarea { font: inherit; color: var(--inchiostro); }
+.gruppo button { background: var(--tavolo); border: 0; padding: 5px 10px; cursor: pointer; border-right: 1px solid var(--filo); }
 .gruppo button:last-child { border-right: 0; }
-.gruppo button[aria-pressed="true"] { background: var(--ambra-fondo); color: var(--inchiostro); box-shadow: inset 0 -2px 0 var(--ambra); }
-button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--ambra); outline-offset: 1px; }
-.tasto { background: var(--tavolo); border: 1px solid var(--filo); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+.gruppo button[aria-pressed="true"] { background: var(--ambra-fondo); box-shadow: inset 0 -2px 0 var(--ambra); }
+button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--ambra); outline-offset: 1px; }
+.tasto { background: var(--tavolo); border: 1px solid var(--filo); border-radius: 6px; padding: 5px 10px; cursor: pointer; }
 .tasto:disabled { opacity: 0.45; cursor: default; }
 .tasto.pericolo { border-color: var(--rischio); color: var(--rischio); }
-main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 12px; }
-.piano { position: relative; min-width: 0; min-height: 320px; background: var(--mare); border: 1px solid var(--filo); border-radius: 8px; overflow: hidden; touch-action: none; }
-canvas { display: block; width: 100%; height: 100%; cursor: grab; }
-canvas.trascina { cursor: grabbing; }
-canvas.aggiungi { cursor: crosshair; }
+.tasto.primario { background: var(--ambra-fondo); border-color: var(--ambra); }
+main { flex: 1; min-height: 0; display: grid; grid-template-columns: 116px minmax(0, 1fr) 340px; gap: 10px; }
+/* cassetta degli attrezzi */
+nav.attrezzi { display: flex; flex-direction: column; gap: 4px; overflow: auto; }
+nav.attrezzi button { display: grid; grid-template-columns: 22px 1fr; align-items: center; gap: 6px; text-align: left; background: var(--tavolo);
+  border: 1px solid var(--filo); border-radius: 6px; padding: 6px 7px; cursor: pointer; font-size: 13px; }
+nav.attrezzi button[aria-pressed="true"] { background: var(--ambra-fondo); border-color: var(--ambra); font-weight: 600; }
+nav.attrezzi button svg { width: 20px; height: 20px; }
+nav.attrezzi .tasto-scorciatoia { font-family: var(--font-dati); font-size: 10px; color: var(--grafite); }
+nav.attrezzi hr { border: 0; border-top: 1px solid var(--filo); margin: 4px 0; width: 100%; }
+/* mappa */
+.piano { position: relative; min-width: 0; min-height: 360px; background: var(--mare); border: 1px solid var(--filo); border-radius: 8px; overflow: hidden; }
+canvas#tela { display: block; width: 100%; height: 100%; cursor: default; }
+canvas#tela.mano { cursor: grab; } canvas#tela.trascina { cursor: grabbing; } canvas#tela.croce { cursor: crosshair; } canvas#tela.nessuno { cursor: none; }
 .zoom { position: absolute; right: 10px; top: 10px; display: flex; flex-direction: column; gap: 4px; }
-.zoom button { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--filo); background: var(--tavolo); cursor: pointer; font-family: var(--font-dati); }
-.legenda { position: absolute; left: 10px; bottom: 10px; display: flex; flex-wrap: wrap; gap: 4px 12px; background: color-mix(in srgb, var(--tavolo) 88%, transparent); border: 1px solid var(--filo); border-radius: 6px; padding: 6px 10px; font-size: 12px; max-width: calc(100% - 70px); }
-.legenda span { display: inline-flex; align-items: center; gap: 6px; }
-.segno { width: 10px; height: 10px; display: inline-block; border: 1px solid #181425; }
-aside { min-width: 0; display: flex; flex-direction: column; gap: 10px; overflow: auto; }
-section.blocco { background: var(--tavolo); border: 1px solid var(--filo); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
-section.blocco h2 { font-family: var(--font-testo); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--grafite); margin: 0; }
-.riga { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 6px; align-items: center; }
+.zoom button { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--filo); background: var(--tavolo); cursor: pointer; font-family: var(--font-dati); }
+.lettura { position: absolute; left: 10px; bottom: 10px; background: color-mix(in srgb, var(--pannello) 92%, transparent); border: 1px solid var(--filo);
+  border-radius: 6px; padding: 6px 10px; font-family: var(--font-dati); font-size: 12px; display: flex; gap: 10px; align-items: center; max-width: calc(100% - 60px); flex-wrap: wrap; }
+.lettura .campione { width: 14px; height: 14px; border: 1px solid #181425; display: inline-block; vertical-align: -2px; margin-right: 4px; }
+.consiglio { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); background: var(--pannello); border: 1px solid var(--ambra);
+  border-radius: 6px; padding: 6px 12px; font-size: 13px; max-width: min(560px, calc(100% - 100px)); text-align: center; }
+.rigenero { position: absolute; right: 50px; top: 10px; font-family: var(--font-dati); font-size: 12px; background: var(--pannello); border: 1px solid var(--filo); border-radius: 6px; padding: 4px 8px; }
+/* quaderno */
+aside { min-width: 0; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.schede-tab { display: flex; gap: 0; }
+.schede-tab button { flex: 1; background: var(--tavolo); border: 1px solid var(--filo); padding: 6px 4px; cursor: pointer; font-size: 13px; }
+.schede-tab button:first-child { border-radius: 6px 0 0 6px; } .schede-tab button:last-child { border-radius: 0 6px 6px 0; }
+.schede-tab button + button { border-left: 0; }
+.schede-tab button[aria-selected="true"] { background: var(--ambra-fondo); font-weight: 600; box-shadow: inset 0 -2px 0 var(--ambra); }
+.contenuto-tab { flex: 1; min-height: 0; overflow: auto; background: var(--pannello); border: 1px solid var(--filo); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+h2 { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--grafite); margin: 0; }
+h3 { font-family: var(--font-titolo); font-size: 18px; margin: 0; font-weight: 600; word-break: break-word; }
+.riga { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 6px; align-items: center; }
 .riga label { color: var(--grafite); font-size: 12px; }
-.riga input, .riga select { width: 100%; padding: 4px 6px; border: 1px solid var(--filo); border-radius: 4px; background: var(--carta); font-family: var(--font-dati); font-size: 12px; }
-.nome-sel { font-family: var(--font-dati); font-weight: 600; word-break: break-all; }
-.vuoto { color: var(--grafite); font-size: 13px; margin: 0; }
-.misure { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; font-family: var(--font-dati); font-size: 12px; font-variant-numeric: tabular-nums; }
-.misure span:nth-child(even) { text-align: right; }
-.note { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.note li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: start; }
-.note textarea { width: 100%; min-height: 40px; resize: vertical; font: inherit; font-size: 13px; padding: 4px 6px; border: 1px solid var(--filo); border-radius: 4px; background: var(--carta); color: var(--inchiostro); }
-.conferma { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 13px; }
+.riga input:not([type="range"]), .riga select, textarea { width: 100%; padding: 4px 6px; border: 1px solid var(--filo); border-radius: 4px; background: var(--carta); font-size: 13px; }
+.riga input[type="number"] { font-family: var(--font-dati); }
+.cursore { display: grid; grid-template-columns: minmax(0, 1fr) 52px; gap: 6px; align-items: center; }
+.cursore output { font-family: var(--font-dati); font-size: 12px; text-align: right; }
+textarea { resize: vertical; min-height: 56px; }
 .aiuto { font-size: 12px; color: var(--grafite); margin: 0; line-height: 1.45; }
-@media (max-width: 820px) {
+.vuoto { color: var(--grafite); margin: 0; }
+.etichetta-mod { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--ambra); border: 1px solid var(--ambra); border-radius: 4px; padding: 0 5px; margin-left: 6px; vertical-align: 2px; }
+.tavolozza { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+.tavolozza button { display: flex; align-items: center; gap: 6px; padding: 4px 6px; border: 1px solid var(--filo); background: var(--carta); border-radius: 4px; cursor: pointer; font-size: 12px; text-align: left; min-width: 0; }
+.tavolozza button span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tavolozza button[aria-pressed="true"] { border-color: var(--ambra); box-shadow: inset 0 0 0 1px var(--ambra); background: var(--ambra-fondo); }
+.sw { width: 16px; height: 16px; flex: 0 0 16px; border: 1px solid #181425; border-radius: 2px; }
+.tipi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+.tipi button { display: flex; gap: 6px; align-items: center; padding: 6px; border: 1px solid var(--filo); background: var(--carta); border-radius: 4px; cursor: pointer; font-size: 12px; text-align: left; }
+.tipi button[aria-pressed="true"] { border-color: var(--ambra); background: var(--ambra-fondo); font-weight: 600; }
+.lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.lista li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; padding: 6px 8px; border: 1px solid var(--filo); border-radius: 6px; background: var(--carta); font-size: 13px; }
+.lista li .sotto { font-size: 11px; color: var(--grafite); }
+.lista li button { font-size: 12px; padding: 3px 8px; }
+.contenuti li { grid-template-columns: 118px minmax(0, 1fr) auto; }
+.misure { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 2px 10px; font-family: var(--font-dati); font-size: 12px; font-variant-numeric: tabular-nums; }
+.misure .num { text-align: right; } .misure .delta { text-align: right; color: var(--ambra); }
+.misure .testa { color: var(--grafite); font-family: var(--font-testo); font-size: 11px; }
+.conferma { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; }
+.azioni { display: flex; flex-wrap: wrap; gap: 6px; }
+@media (max-width: 1100px) { main { grid-template-columns: 104px minmax(0, 1fr) 300px; } }
+@media (max-width: 860px) {
   html, body { height: auto; }
   main { grid-template-columns: minmax(0, 1fr); }
+  nav.attrezzi { flex-direction: row; flex-wrap: wrap; }
+  nav.attrezzi hr { display: none; }
   .piano { height: 62svh; }
+  aside { min-height: 420px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
 <header>
   <h1>Tavolo tattico di Mirwada</h1>
-  <div class="barra" role="toolbar" aria-label="Strumenti">
-    <div class="gruppo" aria-label="Livello">
-      <button id="liv-sopra" aria-pressed="true">Superficie</button>
-      <button id="liv-sotto" aria-pressed="false">Sottosuolo</button>
-    </div>
-    <div class="gruppo" aria-label="Strumento">
-      <button id="mod-sposta" aria-pressed="true">Sposta</button>
-      <button id="mod-aggiungi" aria-pressed="false">Aggiungi</button>
-      <button id="mod-nota" aria-pressed="false">Nota</button>
-    </div>
-    <div class="gruppo" aria-label="Vista">
-      <button id="vis-confini" aria-pressed="false">Confini approssimativi</button>
-      <button id="vis-nomi" aria-pressed="true">Nomi</button>
-    </div>
-    <button class="tasto" id="annulla" disabled>Annulla</button>
+  <div class="gruppo" aria-label="Livello">
+    <button id="liv-sopra" aria-pressed="true">Superficie</button>
+    <button id="liv-sotto" aria-pressed="false">Sottosuolo</button>
   </div>
-  <span class="stato" id="stato">Carico la mappa…</span>
+  <div class="gruppo" aria-label="Vista">
+    <button id="vis-confini" aria-pressed="true">Confini delle zone</button>
+    <button id="vis-nomi" aria-pressed="true">Nomi</button>
+    <button id="vis-prima" aria-pressed="false" title="Tieni premuto per vedere la mappa generata prima delle tue modifiche">Confronta con l'originale</button>
+  </div>
+  <div class="azioni">
+    <button class="tasto" id="annulla" disabled>Annulla <span class="stato">Ctrl+Z</span></button>
+    <button class="tasto" id="rifai" disabled>Rifai</button>
+  </div>
+  <span class="stato" id="stato" role="status">Carico la mappa…</span>
 </header>
 
 <main>
+  <nav class="attrezzi" aria-label="Strumenti" id="attrezzi"></nav>
+
   <div class="piano" id="piano">
-    <canvas id="tela" aria-label="Mappa del mondo: trascina per spostare, rotella o pulsanti per lo zoom"></canvas>
+    <canvas id="tela" aria-label="Mappa del mondo modificabile"></canvas>
+    <div class="consiglio" id="consiglio"></div>
+    <div class="rigenero" id="rigenero" hidden>Ridisegno…</div>
     <div class="zoom">
       <button id="z-piu" aria-label="Avvicina">+</button>
       <button id="z-meno" aria-label="Allontana">−</button>
       <button id="z-tutto" aria-label="Mostra tutta la mappa">⤢</button>
     </div>
-    <div class="legenda" id="legenda"></div>
+    <div class="lettura" id="lettura">Passa il mouse sulla mappa per leggere terreno, zona e coordinate.</div>
   </div>
 
   <aside>
-    <section class="blocco" aria-labelledby="t-sel">
-      <h2 id="t-sel">Selezione</h2>
-      <div id="selezione"><p class="vuoto">Clicca un segno sulla mappa per vederlo qui. Trascinalo per spostarlo.</p></div>
-    </section>
-
-    <section class="blocco" aria-labelledby="t-agg">
-      <h2 id="t-agg">Aggiungi</h2>
-      <div class="riga"><label for="agg-tipo">Tipo</label>
-        <select id="agg-tipo">
-          <option value="luoghi">Luogo speciale</option>
-          <option value="villaggi">Villaggio, casa, accampamento</option>
-          <option value="ingressi">Ingresso al sottosuolo</option>
-          <option value="boss">Boss del sottosuolo</option>
-          <option value="isola">Isola</option>
-        </select></div>
-      <div class="riga"><label for="agg-nome">Nome</label><input id="agg-nome" placeholder="es. torre_del_mago" autocomplete="off"></div>
-      <p class="aiuto">Scegli tipo e nome, premi <b>Aggiungi</b> in alto e clicca sulla mappa. Con <b>Nota</b> lasci un appunto dove clicchi.</p>
-    </section>
-
-    <section class="blocco" aria-labelledby="t-citta">
-      <h2 id="t-citta">Città di Mirwada</h2>
-      <div class="riga"><label for="citta-raggio">Raggio</label><input id="citta-raggio" type="number" min="30" max="110" step="1"></div>
-      <p class="aiuto" id="citta-stima"></p>
-    </section>
-
-    <section class="blocco" aria-labelledby="t-note">
-      <h2 id="t-note">Note</h2>
-      <ul class="note" id="note"></ul>
-      <p class="vuoto" id="note-vuote">Nessuna nota. Premi <b>Nota</b> e clicca sulla mappa.</p>
-    </section>
-
-    <section class="blocco" aria-labelledby="t-mis">
-      <h2 id="t-mis">Misure dell'ultima generazione</h2>
-      <div class="misure" id="misure"></div>
-      <p class="aiuto">In schermate di gioco (20×11 tile a 64 px). Si aggiornano quando Claude rigenera la mappa con le tue modifiche.</p>
-    </section>
-
-    <section class="blocco" aria-labelledby="t-rip">
-      <h2 id="t-rip">Ripristino</h2>
-      <div class="conferma" id="ripristino">
-        <button class="tasto pericolo" id="rip-chiedi">Torna alla mappa generata</button>
-      </div>
-    </section>
+    <div class="schede-tab" role="tablist">
+      <button role="tab" id="tab-scheda" aria-selected="true">Scheda</button>
+      <button role="tab" id="tab-registro" aria-selected="false">Modifiche <span id="n-mod"></span></button>
+      <button role="tab" id="tab-misure" aria-selected="false">Misure</button>
+    </div>
+    <div class="contenuto-tab" id="pannello"></div>
   </aside>
 </main>
 
 <script>
 (() => {
   "use strict";
-  const COLORI_ZONE = { mirwada: [234, 212, 170], marche_crepuscolo: [184, 111, 80], archivio_sepolto: [220, 226, 236],
-    valle_madre: [99, 199, 77], terra_di_mezzo: [230, 160, 60] };
-  const PROFILI = ["frontiera", "vulcanica", "tropicale", "pirati", "relitto", "rovine", "ghiacciata", "mostro",
-    "atollo", "boss", "faro", "boschiva", "rocciosa"];
-  const SEGNI = {
-    luoghi: { colore: "#e43b44", forma: "quadrato", nome: "Luogo speciale", livello: "sopra" },
-    villaggi: { colore: "#fee761", forma: "cerchio", nome: "Villaggio, casa", livello: "sopra" },
-    ingressi: { colore: "#2ce8f5", forma: "quadrato", nome: "Ingresso al sottosuolo", livello: "sotto" },
-    boss: { colore: "#e43b44", forma: "rombo", nome: "Boss del sottosuolo", livello: "sotto" },
-  };
   const $ = (id) => document.getElementById(id);
-  const tela = $("tela"), ctx = tela.getContext("2d"), piano = $("piano");
-
-  let base = null;            // punti.json: suggerimenti del generatore + disposizione di partenza
-  let lay = null;             // la disposizione corrente (stessa forma di layout_mondo.json)
-  let livello = "sopra", modo = "sposta", confini = false, nomi = true;
-  let sel = null;             // {tipo, chiave, ...}
-  let vista = { s: 1, ox: 0, oy: 0 };
-  const img = { sopra: new Image(), sotto: new Image() };
-  let terraMask = null;       // dove c'e' terra (letta dallo sfondo), per i confini approssimativi
-  let confiniCanvas = null;
-  const storia = [];
-  let db = null, docRef = null, salvaTimer = null, inSalvataggio = false, sporco = false, sola = false;
-
+  const crea = (tag, attr = {}, ...figli) => {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(attr)) {
+      if (k === "testo") e.textContent = v; else if (k === "classe") e.className = v;
+      else if (k.startsWith("on")) e.addEventListener(k.slice(2), v); else if (v !== undefined && v !== null) e.setAttribute(k, v);
+    }
+    figli.flat().forEach((f) => f != null && e.append(f));
+    return e;
+  };
+  const metti = (el, ...figli) => el.append(...figli.filter((f) => f != null));   // salta i pezzi facoltativi vuoti
   const clona = (o) => JSON.parse(JSON.stringify(o));
-  const stato = (testo, tipo) => { const e = $("stato"); e.textContent = testo; e.className = "stato" + (tipo ? " " + tipo : ""); };
+  const leggibile = (s) => String(s || "").replace(/_/g, " ");
 
-  // ---------- geometria ----------
-  const W = () => base.W, H = () => base.H, HC = () => base.HC;
+  // ---------- nomi dei terreni in italiano (gli id restano quelli del generatore) ----------
+  const NOMI_TERRENI = { deep_water: "acqua profonda", water: "acqua bassa", sand: "sabbia", mud: "fango", grass: "erba",
+    dry_grass: "erba secca", forest: "bosco", dirt: "terra battuta", path: "sentiero", stone: "pietra (edifici)", snow: "neve" };
+  const nomeTerreno = (id) => NOMI_TERRENI[id] || leggibile(id);
+  const TIPI = {
+    luoghi: { nome: "Luogo speciale", colore: "#e43b44", forma: "quadrato", livello: "sopra" },
+    villaggi: { nome: "Villaggio, casa", colore: "#fee761", forma: "cerchio", livello: "sopra" },
+    ingressi: { nome: "Ingresso al sottosuolo", colore: "#2ce8f5", forma: "quadrato", livello: "sotto" },
+    boss: { nome: "Boss", colore: "#e43b44", forma: "rombo", livello: "sotto" },
+  };
+  const CONTENUTI = ["abitanti", "negozio", "locanda", "forziere", "nemici", "boss", "missione", "segreto", "risorsa", "altro"];
+  const PROFILI = ["frontiera", "vulcanica", "tropicale", "pirati", "relitto", "rovine", "ghiacciata", "mostro", "atollo",
+    "boss", "faro", "boschiva", "rocciosa"];
+  const BASE_PROFILO = { frontiera: "erba_lilla", relitto: "pietrisco", vulcanica: "cenere", tropicale: "grass", rovine: "dry_grass",
+    faro: "arenaria", boss: "forest", pirati: "grass", ghiacciata: "snow", mostro: "muschio_scuro", atollo: "sabbia_bianca",
+    boschiva: "forest", rocciosa: "pietrisco" };
+  const COLORI_ZONE = { mirwada: "#ead4aa", marche_crepuscolo: "#b86f50", archivio_sepolto: "#c0cbdc", valle_madre: "#63c74d", terra_di_mezzo: "#feae34" };
+
+  // ---------- stato ----------
+  let P = null;                 // punti.json (dati fissi del generatore)
+  let RU = null;                // mappe di rumore (Float64Array 0..1)
+  let lay = null;               // disposizione corrente (= layout_mondo.json)
+  let tratti = [];              // pennellate, strade, fiumi, gallerie
+  let gen = null, genBase = null;   // risultato del generatore (corrente / con la disposizione originale)
+  let livello = "sopra", attrezzo = "seleziona", tab = "scheda";
+  let sel = null, vista = { s: 1, ox: 0, oy: 0 };
+  let confini = true, nomi = true, mostraPrima = false;
+  let addTipo = "luoghi", pennTerreno = "water", pennR = 4, lineaR = 1, tratto = null, mouse = null;
+  const img = { sotto: new Image() };
+  let tela, ctx, piano, superficieCanvas = null, primaCanvas = null;
+  const storia = [], futuro = [];
+  let db = null, docRef = null, trattiRef = null, salvaTimer = null, sola = false, inAttesa = 0;
+  let trattiSalvati = new Map();
+
+  const stato = (t, tipo) => { const e = $("stato"); e.textContent = t; e.className = "stato" + (tipo ? " " + tipo : ""); };
+
+  // =====================================================================================
+  // GENERATORE (stessi passaggi di tools/art/build_world.py, sulle stesse mappe di rumore)
+  // =====================================================================================
+  function genera(lay, tratti) {
+    const { W, H, HC, K, KC } = P, N = W * H;
+    const { e, m, d, n1, n2, rq } = RU;
+    const L = {}; P.terreni.forEach((t, i) => (L[t] = i));
+    const nomiTerra = Object.keys(lay.terra);
+    const REG = ["mare", ...nomiTerra, ...lay.isole.map((i) => i.id)];
+    const IR = {}; REG.forEach((r, i) => (IR[r] = i));
+    const RC = lay.citta.raggio;
+    const centroDi = (n) => [Math.trunc(lay.terra[n].x * W), Math.trunc(lay.terra[n].y * HC)];
+    const reg = new Int16Array(N), terra = new Uint8Array(N), laguna = new Uint8Array(N);
+    const wxA = new Float32Array(N), wyA = new Float32Array(N);
+    const px = centroDi("mirwada")[0];
+    const zone = nomiTerra.map((n) => [lay.terra[n].x * W, lay.terra[n].y * HC, lay.terra[n].peso ?? 1]);
+    for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++) {
+      const costa = HC + (n1[i] - 0.5) * 34 * K + (n2[i] - 0.5) * 10 * K;
+      let t = y < costa;
+      const gx = (x - px) / (RC * 1.15), gy = (y - HC - 4) / (RC * 0.8);
+      if (gx * gx + gy * gy < 1 + (n2[i] - 0.5) * 0.3) t = false;
+      terra[i] = t ? 1 : 0;
+      const wx = x + (n2[i] - 0.5) * 60 * K, wy = y + (n1[i] - 0.5) * 60 * K;
+      wxA[i] = wx; wyA[i] = wy;
+      if (t) {
+        let best = 0, bd = Infinity;
+        for (let z = 0; z < zone.length; z++) { const dd = Math.hypot(wx - zone[z][0], wy - zone[z][1]) * zone[z][2]; if (dd < bd) { bd = dd; best = z; } }
+        reg[i] = best + 1;
+      }
+    }
+    lay.isole.forEach((is, k) => {
+      const idx = 1 + nomiTerra.length + k, cx = is.x * W, cy = is.y * H, r = is.r;
+      const ex = is.profilo === "mostro" ? 1.8 : 1;
+      const x0 = Math.max(0, Math.floor(cx - r * 1.2 * ex - 2)), x1 = Math.min(W - 1, Math.ceil(cx + r * 1.2 * ex + 2));
+      const y0 = Math.max(0, Math.floor(cy - r * 1.2 / 1.25 - 2)), y1 = Math.min(H - 1, Math.ceil(cy + r * 1.2 / 1.25 + 2));
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+        const i = y * W + x;
+        let dx = x - cx; const dy = (y - cy) * 1.25;
+        if (is.profilo === "mostro") dx /= 1.8;
+        const rr = Math.hypot(dx, dy);
+        let isola = rr < r * (0.8 + 0.4 * n2[i]) && !terra[i];
+        if (is.profilo === "atollo") { if (rr < r * 0.62 && !terra[i]) laguna[i] = 1; isola = isola && rr > r * 0.62; }
+        if (isola) reg[i] = idx;
+      }
+    });
+    pulisciEnclavi(reg, W, H, Math.trunc(300 * K * K));
+    const land = new Uint8Array(N); for (let i = 0; i < N; i++) land[i] = reg[i] > 0 ? 1 : 0;
+    const acqua0 = new Uint8Array(N); for (let i = 0; i < N; i++) acqua0[i] = land[i] ? 0 : 1;
+    const dmare = bfs(acqua0, W, H, 60), dacqua = bfs(land, W, H, 6);
+    const iMW = IR.mirwada, iMC = IR.marche_crepuscolo, iAR = IR.archivio_sepolto, iVL = IR.valle_madre, iTM = IR.terra_di_mezzo;
+    const g = new Uint8Array(N).fill(L.grass);
+    for (let i = 0; i < N; i++) if (!land[i]) g[i] = dacqua[i] > 4 ? L.deep_water : L.water;
+    for (let i = 0; i < N; i++) if (laguna[i] && !land[i]) g[i] = L.water;
+    // Mirwada campagna
+    for (let i = 0; i < N; i++) if (reg[i] === iMW) { if (d[i] > 0.66) g[i] = L.filari; }
+    for (let i = 0; i < N; i++) if (reg[i] === iMW && d[i] < 0.14) g[i] = L.forest;
+    // Marche
+    const cmw = centroDi("mirwada");
+    const alt = new Float32Array(N), grad = new Int16Array(N);
+    for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++) {
+      const lont = Math.hypot(x - cmw[0], y - cmw[1]);
+      alt[i] = 0.35 * e[i] + 0.65 * Math.min(1, Math.max(0, (lont - 40 * K) / (130 * K)));
+      grad[i] = Math.floor(alt[i] * 6);
+    }
+    let sx = 0, sy = 0, cnt = 0;
+    for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++) if (reg[i] === iMC) {
+      g[i] = L.pietrisco; sx += x; sy += y; cnt++;
+    }
+    for (let i = 0; i < N; i++) if (reg[i] === iMC && m[i] > 0.62) g[i] = L.muschio_scuro;
+    for (let i = 0; i < N; i++) if (reg[i] === iMC && d[i] < 0.22) g[i] = L.erica_secca;
+    const campo = cnt ? [Math.trunc(sx / cnt), Math.trunc(sy / cnt)] : [0, 0];
+    for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++)
+      if (reg[i] === iMC && Math.hypot(x - campo[0], y - campo[1]) < (12 + (n2[i] - 0.5) * 10) * K) g[i] = L.terra_bruciata;
+    for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++) if (reg[i] === iMC) {
+      const bg = grad[i] !== (y > 0 ? grad[i - W] : -1) || grad[i] !== (x > 0 ? grad[i - 1] : -1);
+      if (d[i] > 0.72 || bg) g[i] = L.arenaria;
+    }
+    for (let i = 0; i < N; i++) if (reg[i] === iAR) g[i] = L.snow;
+    // Valle
+    const cvl = centroDi("valle_madre");
+    for (let i = 0; i < N; i++) if (reg[i] === iVL) g[i] = m[i] > 0.42 ? L.felci : L.grass;
+    for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++)
+      if (reg[i] === iVL && Math.hypot(x - cvl[0], y - cvl[1]) < 38 * K && m[i] > 0.5) g[i] = L.radici_muschio;
+    for (let i = 0; i < N; i++) if (reg[i] === iVL && m[i] > 0.72) g[i] = L.palude;
+    // Terra di mezzo
+    const mezzi = Object.entries(lay.mezzo).map(([n, v]) => [n, v.x * W, v.y * HC]);
+    const sub = new Int8Array(N).fill(-1);
+    for (let i = 0; i < N; i++) if (reg[i] === iTM) {
+      let best = 0, bd = Infinity;
+      for (let z = 0; z < mezzi.length; z++) { const dd = Math.hypot(wxA[i] - mezzi[z][1], wyA[i] - mezzi[z][2]); if (dd < bd) { bd = dd; best = z; } }
+      sub[i] = best;
+    }
+    const iSub = {}; mezzi.forEach(([n], z) => (iSub[n] = z));
+    for (let i = 0; i < N; i++) {
+      if (reg[i] !== iTM) continue;
+      const s = mezzi[sub[i]][0];
+      if (s === "steppa") g[i] = d[i] > 0.55 ? L.pietrisco : L.dry_grass;
+      else if (s === "colline") { g[i] = d[i] > 0.74 ? L.lastre_rovine : L.grass; if (d[i] < 0.2) g[i] = L.dry_grass; }
+      else if (s === "foreste") g[i] = m[i] > 0.35 ? L.felci : L.forest;
+      else if (s === "paludi") { g[i] = m[i] > 0.5 ? L.palude : L.erica_secca; if (d[i] > 0.75) g[i] = L.mud; }
+    }
+    const rovine = centroDi("terra_di_mezzo");
+    disco(W, H, rovine[0], rovine[1], 10 * K / 2, (i) => { if (reg[i] === iTM) g[i] = L.lastre_rovine; });
+    for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++)
+      if (land[i] && reg[i] !== iVL && y < HC * 0.10 + (n1[i] - 0.5) * 18 * K) g[i] = L.snow;
+    const riva = new Uint8Array(N);
+    for (let i = 0; i < N; i++) riva[i] = land[i] && (dmare[i] <= 2 || (reg[i] === iMW && dmare[i] <= 3)) ? 1 : 0;
+    for (let i = 0; i < N; i++) if (riva[i]) g[i] = (reg[i] === iVL || reg[i] === iMC) ? L.arenaria : L.sand;
+    // isole
+    lay.isole.forEach((is, k) => {
+      const idx = 1 + nomiTerra.length + k, pr = is.profilo;
+      const baseT = L[BASE_PROFILO[pr]] ?? L.grass;
+      for (let i = 0; i < N; i++) {
+        if (reg[i] !== idx) continue;
+        if (dmare[i] > 1) g[i] = baseT;
+        if ((pr === "relitto" || pr === "rocciosa") && dmare[i] > 1 && d[i] > 0.6) g[i] = L.arenaria;
+        if (pr === "vulcanica" && dmare[i] > 4 * K / 2 && d[i] > 0.4) g[i] = L.roccia_lavica;
+        if ((pr === "tropicale" || pr === "atollo" || pr === "pirati") && dmare[i] <= 2) g[i] = L.sabbia_bianca;
+        if (pr === "rovine" && dmare[i] > 1 && d[i] > 0.6) g[i] = L.lastre_rovine;
+        if (pr === "ghiacciata" && dmare[i] > 6) g[i] = L.ghiaccio;
+        if (pr === "mostro" && dmare[i] > 3 && d[i] > 0.65) g[i] = L.roccia_viva;
+        if (pr === "boss" && dmare[i] > 2 && m[i] > 0.6) g[i] = L.palude;
+        if (pr === "frontiera" && dmare[i] > 2 && d[i] > 0.72) g[i] = L.terra_rosa;
+      }
+      if (pr === "frontiera") {
+        let fx = 0, fy = 0, fc = 0;
+        for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++) if (reg[i] === idx && dmare[i] > 22) { g[i] = L.nebbia; fx += x; fy += y; fc++; }
+        if (fc) {
+          const cxf = Math.trunc(fx / fc), cyf = Math.trunc(fy / fc);
+          for (let k2 = 0; k2 < 6; k2++) {
+            const a = k2 * 2 * Math.PI / 6 + 0.3, ix = Math.trunc(cxf + Math.cos(a) * 70), iy = Math.trunc(cyf + Math.sin(a) * 50);
+            for (let y = Math.max(0, iy - 24); y <= Math.min(H - 1, iy + 24); y++) for (let x = Math.max(0, ix - 24); x <= Math.min(W - 1, ix + 24); x++) {
+              const i = y * W + x; if (reg[i] === idx && dmare[i] > 22 && Math.hypot(x - ix, y - iy) < 14 + 8 * n2[i]) g[i] = L.erba_lilla;
+            }
+          }
+          disco(W, H, cxf, cyf, 18, (i) => { if (reg[i] === idx && dmare[i] > 22) g[i] = L.erba_lilla; });
+        }
+      }
+    });
+    // confini e ingressi
+    const confine = (r) => { const b = new Uint8Array(N); for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++) {
+      if (reg[i] !== r || !land[i]) continue;
+      if ((y > 0 && land[i - W] && reg[i - W] !== r) || (y < H - 1 && land[i + W] && reg[i + W] !== r) ||
+          (x > 0 && land[i - 1] && reg[i - 1] !== r) || (x < W - 1 && land[i + 1] && reg[i + 1] !== r)) b[i] = 1; } return b; };
+    const ingresso = (r, verso) => { const b = confine(r), c = centroDi(verso); let best = null, bd = Infinity;
+      for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++) if (b[i] && !riva[i]) { const dd = (x - c[0]) ** 2 + (y - c[1]) ** 2; if (dd < bd) { bd = dd; best = [x, y]; } }
+      return best || [0, 0]; };
+    const passo = ingresso(iMC, "terra_di_mezzo"), galleria = ingresso(iVL, "mirwada"), scalinata = ingresso(iAR, "terra_di_mezzo");
+    const rupi = dilata(confine(iMC), W, H, 1);
+    for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++)
+      if (rupi[i] && land[i] && (x - passo[0]) ** 2 + (y - passo[1]) ** 2 > 25) g[i] = L.arenaria;
+    const muro = dilata(confine(iVL), W, H, 3);
+    for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++)
+      if (muro[i] && reg[i] === iVL && (x - galleria[0]) ** 2 + (y - galleria[1]) ** 2 > 9 && !riva[i]) g[i] = L.felci;
+    disco(W, H, scalinata[0], scalinata[1], 3, (i) => { if (reg[i] === iAR) g[i] = L.ghiaccio; });
+    // citta'
+    const Q = new Int8Array(N).fill(-1), citta = new Uint8Array(N);
+    const nomiQ = Object.keys(lay.citta.quartieri || {});
+    const der = {};
+    let py = -1; for (let y = H - 1; y >= 0; y--) if (reg[y * W + px] === iMW) { py = y - 1; break; }
+    if (py > 0) {
+      const porto = [px, py], centro = [px, py - Math.trunc(RC * 0.6)];
+      const qs = nomiQ.map((n) => lay.citta.quartieri[n]);
+      const dxc = new Float32Array(N), dyc = new Float32Array(N), dc = new Float32Array(N);
+      for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++) {
+        dxc[i] = x - centro[0] + (rq[i] - 0.5) * RC * 0.5; dyc[i] = y - centro[1] + (rq[i] - 0.5) * RC * 0.4; dc[i] = Math.hypot(dxc[i], dyc[i]);
+        if (reg[i] === iMW && dmare[i] > 1 && dc[i] < RC * 1.3) {
+          let best = 0, bd = Infinity;
+          for (let q = 0; q < qs.length; q++) { const dd = Math.hypot(dxc[i] - qs[q].x * RC, dyc[i] - qs[q].y * RC) * (qs[q].peso ?? 1); if (dd < bd) { bd = dd; best = q; } }
+          Q[i] = best; citta[i] = 1;
+        }
+      }
+      const STILE = { porto_commerciale: [12, 9, 9, 6, "ciottoli_scuri"], quartiere_operaio: [5, 4, 4, 3, "ciottoli_scuri"],
+        centro_storico: [8, 7, 6, 5, "lastre_chiare"], centro_antico: [10, 9, 8, 7, "lastre_chiare"] };
+      for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++) {
+        if (Q[i] < 0) continue;
+        const n = nomiQ[Q[i]];
+        if (n === "bassifondi") {
+          g[i] = d[i] < 0.25 ? L.mud : L.dirt;
+          if (x % 5 < 3 && y % 4 < 2 && d[i] > 0.3) g[i] = L.stone;
+          if (x % 5 < 3 && y % 4 < 2 && d[i] > 0.75) g[i] = L.lastre_rovine;
+        } else if (n === "citta_nuova") {
+          g[i] = L.grass; if (x % 14 < 5 && y % 12 < 4) g[i] = L.stone; if (x % 14 >= 11 || y % 12 >= 9) g[i] = L.lastre_chiare;
+        } else {
+          const s = STILE[n] || STILE.centro_storico;
+          g[i] = (x % s[0] < s[2] && y % s[1] < s[3]) ? L.stone : L[s[4]];
+        }
+      }
+      const piazzaSt = [centro[0] + Math.trunc(RC * 0.2), centro[1] + Math.trunc(RC * 0.05)], catt = [centro[0], centro[1] - Math.trunc(RC * 0.6)];
+      disco(W, H, piazzaSt[0], piazzaSt[1], RC * 0.1, (i) => { if (citta[i]) g[i] = L.marmo; });
+      disco(W, H, catt[0], catt[1], RC * 0.08, (i) => { if (citta[i]) g[i] = L.marmo; });
+      for (let i = 0; i < N; i++) if (reg[i] === iMW && dmare[i] > 1 && dc[i] >= RC * 0.85 && dc[i] < RC * 0.9) {
+        const ang = ((Math.atan2(dyc[i], dxc[i]) * 180 / Math.PI) % 360 + 360) % 360;
+        if (ang % 40 < 26) g[i] = L.stone;
+      }
+      let lx = 0, ly = 0, lc = 0;
+      for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++)
+        if (reg[i] === iMW && dmare[i] >= 2 && dmare[i] <= 4 && Math.abs(x - px) < RC && y > py - RC * 0.5) {
+          g[i] = L.lastre_chiare; citta[i] = 1;
+          if (x > px + RC * 0.1 && x < px + RC * 0.35) { lx += x; ly += y; lc++; }
+        }
+      const mercato = lc ? [Math.trunc(lx / lc), Math.trunc(ly / lc)] : porto;
+      disco(W, H, mercato[0], mercato[1], 5, (i) => { if (reg[i] === iMW) g[i] = L.marmo; });
+      for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++)
+        if (riva[i] && reg[i] === iMW && !citta[i] && (Math.hypot(x - porto[0], y - porto[1]) < RC * 1.4 || d[i] > 0.62)) g[i] = L.ciottoli_spiaggia;
+      const fondo = (x) => { for (let y = H - 1; y >= 0; y--) if (reg[y * W + x] === iMW) return y; return -1; };
+      const rett = (x0, y0, w, h, t) => { for (let y = y0; y < Math.min(H, y0 + h); y++) for (let x = x0; x < Math.min(W, x0 + w); x++) if (x >= 0 && y >= 0) { g[y * W + x] = L[t]; land[y * W + x] = 1; } };
+      let k = 0;
+      for (let dx = -Math.trunc(RC * 0.65); dx < Math.trunc(RC * 0.3); dx += 10, k++) {
+        const x0 = porto[0] + dx, y0 = fondo(x0); if (y0 < 0) continue;
+        if (k % 2 === 0) rett(x0, y0, 4, 15, "molo_pietra"); else rett(x0, y0, 2, 10, "pontile_legno");
+      }
+      const xsC = px + Math.trunc(RC * 0.55), yc = fondo(xsC), cantiere = [xsC, yc];
+      if (yc > 0) {
+        disco(W, H, xsC, yc - 4, 8, (i) => { if (reg[i] === iMW) g[i] = L.pietrisco; });
+        for (let s = 0; s < 4; s++) { const x0 = xsC - 9 + s * 6, y0 = fondo(x0); if (y0 > 0) rett(x0, y0, 3, 8, "pontile_legno"); }
+      }
+      let pa = null;
+      for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++)
+        if (reg[i] === iMW && riva[i] && x < px - RC * 0.5 && x > px - RC * 2.0) { if (!pa || y > pa[1]) pa = [x, y]; }
+      let faro = porto, digaMeta = porto;
+      if (pa) {
+        const [xa, ya] = pa, xb = px + Math.trunc(RC * 0.1), yb = ya + Math.trunc(RC * 0.25);
+        const np = Math.max(Math.abs(xb - xa), Math.abs(yb - ya));
+        for (let t = 0; t <= np; t++) {
+          const xd = Math.round(xa + (xb - xa) * t / np), yd = Math.round(ya + (yb - ya) * t / np - Math.sin(Math.PI * t / np) * RC * 0.15);
+          rett(xd - 1, yd - 1, 3, 3, "molo_pietra");
+        }
+        faro = [xb, yb]; digaMeta = [Math.floor((xa + xb) / 2), Math.floor((ya + yb) / 2) - Math.trunc(RC * 0.15)];
+      }
+      const archivio = [centro[0] + Math.trunc(RC * 0.1), centro[1] - Math.trunc(RC * 1.6)], cimitero = [centro[0] + Math.trunc(RC * 1.5), centro[1] - Math.trunc(RC * 0.1)];
+      for (const [luogo, rm] of [[cimitero, 2 * KC], [archivio, KC]]) {
+        disco(W, H, luogo[0], luogo[1], 5 * KC, (i) => { if (land[i]) g[i] = L.ghiaia; });
+        disco(W, H, luogo[0], luogo[1], rm + 1, (i) => { if (land[i]) g[i] = L.marmo; });
+      }
+      Object.assign(der, { porto, archivio_ordine: archivio, cimitero, faro, diga_foranea: digaMeta, casa_base_porto: [porto[0] + 10, porto[1] - 4],
+        cantiere_navale: cantiere, piazza_mercato: mercato, museo: piazzaSt, cattedrale: catt, dogana: [porto[0] - Math.trunc(RC * 0.2), porto[1] - 3] });
+      nomiQ.forEach((n, q) => { let a = 0, b = 0, c = 0; for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++) if (Q[i] === q) { a += x; b += y; c++; }
+        if (c && ["quartiere_operaio", "bassifondi", "citta_nuova", "centro_antico"].includes(n)) der[n] = [Math.trunc(a / c), Math.trunc(b / c)]; });
+      der._centro = centro;
+    }
+    // luoghi calcolati (come 'migliore' nel generatore)
+    const migliore = (cond, val) => { let best = null, bv = -Infinity;
+      for (let y = 20; y < H - 20; y++) for (let x = 20; x < W - 20; x++) { const i = y * W + x; if (cond(i, x, y)) { const v = val(i, x, y); if (v > bv) { bv = v; best = [x, y]; } } }
+      return best; };
+    Object.assign(der, { passo_tra_rupi: passo, galleria_di_alberi: galleria, scalinata_archivio: scalinata, torre_osservazione: [scalinata[0] + 8, scalinata[1] - 6],
+      rovine_del_boss: rovine, campo_di_battaglia: campo,
+      trono_del_gigante: migliore((i) => reg[i] === iMC, (i) => alt[i]),
+      soglia_del_crepuscolo: migliore((i) => reg[i] === iMC && alt[i] > 0.45 && alt[i] < 0.65, (i) => d[i]),
+      radice_del_mondo: migliore((i) => reg[i] === iVL, (i, x, y) => -Math.hypot(x - cvl[0], y - cvl[1]) + e[i] * 10),
+      grotte_di_marea: migliore((i) => reg[i] === iVL && riva[i], (i, x) => x) });
+    const ifr = IR.frontiera_porte;
+    if (ifr) der.approdo_frontiera = migliore((i) => reg[i] === ifr && dmare[i] === 2, (i, x, y) => -y);
+    lay.isole.forEach((is, k) => { if (is.id === "frontiera_porte") return; const idx = 1 + nomiTerra.length + k; let a = 0, b = 0, c = 0;
+      for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++) if (reg[i] === idx) { a += x; b += y; c++; }
+      if (c) der[is.id] = [Math.trunc(a / c), Math.trunc(b / c)]; });
+    for (const k of Object.keys(der)) if (!der[k]) delete der[k];
+    // villaggi (spiazzi), schede e tratti di superficie
+    const villaggi = posizioni("villaggi", der);
+    for (const [n, p] of Object.entries(villaggi)) {
+      const r = /^(villaggio|accampamento)/.test(n) ? 4 : 1;
+      disco(W, H, p[0], p[1], r, (i) => { if (land[i]) g[i] = r > 1 ? L.path : L.dirt; });
+    }
+    const luoghi = posizioni("luoghi", der);
+    for (const cat of ["luoghi", "villaggi"]) {
+      const pos = cat === "luoghi" ? luoghi : villaggi;
+      for (const [n, sc] of Object.entries(lay.schede?.[cat] || {})) {
+        if (!pos[n] || !(sc.terreno in L) || !sc.grandezza) continue;
+        timbra([pos[n]], sc.grandezza, W, H, (i) => { g[i] = L[sc.terreno]; if (!["water", "deep_water"].includes(sc.terreno)) land[i] = 1; });
+      }
+    }
+    for (const tr of tratti) {
+      if ((tr.livello || "sopra") !== "sopra" || !["pennello", "strada", "fiume"].includes(tr.tipo) || !tr.punti?.length) continue;
+      const ter = tr.terreno || (tr.tipo === "strada" ? "lastricato_antico" : "water");
+      if (!(ter in L)) continue;
+      const acqua = ter === "water" || ter === "deep_water";
+      timbra(tr.punti, tr.r ?? 1, W, H, (i) => { g[i] = L[ter]; land[i] = acqua ? 0 : 1; });
+    }
+    const conta = new Float64Array(REG.length); for (let i = 0; i < N; i++) conta[reg[i]]++;
+    let cittaTot = 0; for (let i = 0; i < N; i++) cittaTot += citta[i];
+    return { g, reg, Q, nomiQ, REG, der, luoghi, villaggi, conta, citta: cittaTot / P.schermata, W, H };
+  }
+  function disco(W, H, cx, cy, r, f) {
+    const r2 = r * r;
+    for (let y = Math.max(0, Math.floor(cy - r)); y <= Math.min(H - 1, Math.ceil(cy + r)); y++)
+      for (let x = Math.max(0, Math.floor(cx - r)); x <= Math.min(W - 1, Math.ceil(cx + r)); x++)
+        if ((x - cx) ** 2 + (y - cy) ** 2 <= r2) f(y * W + x);
+  }
+  function timbra(punti, r, W, H, f) {
+    r = Math.max(0, Math.round(r));
+    const fatto = new Set();
+    const pts = punti.length === 1 ? [punti[0], punti[0]] : punti;
+    for (let s = 0; s < pts.length - 1; s++) {
+      const [x0, y0] = pts[s], [x1, y1] = pts[s + 1], n = Math.max(1, Math.trunc(Math.hypot(x1 - x0, y1 - y0) * 2));
+      for (let t = 0; t <= n; t++) {
+        const x = Math.round(x0 + (x1 - x0) * t / n), y = Math.round(y0 + (y1 - y0) * t / n);
+        for (let oy = -r; oy <= r; oy++) for (let ox = -r; ox <= r; ox++) {
+          if (ox * ox + oy * oy > r * r + r) continue;
+          const X = x + ox, Y = y + oy; if (X < 0 || Y < 0 || X >= W || Y >= H) continue;
+          const i = Y * W + X; if (!fatto.has(i)) { fatto.add(i); f(i); }
+        }
+      }
+    }
+  }
+  function bfs(sorgente, W, H, max) {
+    const N = W * H, dist = new Int16Array(N).fill(999), coda = new Int32Array(N);
+    let a = 0, b = 0;
+    for (let i = 0; i < N; i++) if (sorgente[i]) { dist[i] = 0; coda[b++] = i; }
+    while (a < b) {
+      const i = coda[a++], dd = dist[i]; if (dd >= max) continue;
+      const x = i % W, y = (i / W) | 0;
+      if (y > 0 && dist[i - W] === 999) { dist[i - W] = dd + 1; coda[b++] = i - W; }
+      if (y < H - 1 && dist[i + W] === 999) { dist[i + W] = dd + 1; coda[b++] = i + W; }
+      if (x > 0 && dist[i - 1] === 999) { dist[i - 1] = dd + 1; coda[b++] = i - 1; }
+      if (x < W - 1 && dist[i + 1] === 999) { dist[i + 1] = dd + 1; coda[b++] = i + 1; }
+    }
+    return dist;
+  }
+  function dilata(m, W, H, k) {
+    let a = m;
+    for (let s = 0; s < k; s++) {
+      const b = new Uint8Array(a);
+      for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++) if (!a[i] &&
+        ((y > 0 && a[i - W]) || (y < H - 1 && a[i + W]) || (x > 0 && a[i - 1]) || (x < W - 1 && a[i + 1]))) b[i] = 1;
+      a = b;
+    }
+    return a;
+  }
+  function pulisciEnclavi(reg, W, H, minimo) {
+    const N = W * H, presenti = [...new Set(reg)].filter((r) => r > 0).sort((a, b) => a - b);
+    const lab = new Int32Array(N), coda = new Int32Array(N), anello = new Int32Array(N);
+    let marca = 0;
+    for (const r of presenti) {
+      lab.fill(0); const pezzi = [];
+      for (let i0 = 0; i0 < N; i0++) {
+        if (reg[i0] !== r || lab[i0]) continue;
+        const id = pezzi.length + 1; let a = 0, b = 0; coda[b++] = i0; lab[i0] = id; const celle = [];
+        while (a < b) { const i = coda[a++]; celle.push(i); const x = i % W, y = (i / W) | 0;
+          for (const j of [y > 0 ? i - W : -1, y < H - 1 ? i + W : -1, x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1])
+            if (j >= 0 && reg[j] === r && !lab[j]) { lab[j] = id; coda[b++] = j; } }
+        pezzi.push(celle);
+      }
+      if (pezzi.length < 2) continue;
+      const max = Math.max(...pezzi.map((p) => p.length));
+      for (const celle of pezzi) {
+        if (celle.length >= minimo || celle.length === max) continue;
+        marca++; const voti = new Map();
+        for (const i of celle) { const x = i % W, y = (i / W) | 0;
+          for (const j of [y > 0 ? i - W : -1, y < H - 1 ? i + W : -1, x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1]) {
+            if (j < 0 || reg[j] === r || anello[j] === marca) continue;
+            anello[j] = marca; if (reg[j] > 0) voti.set(reg[j], (voti.get(reg[j]) || 0) + 1); } }
+        if (!voti.size) continue;
+        let best = null, bv = -1; [...voti.entries()].sort((p, q) => p[0] - q[0]).forEach(([k, v]) => { if (v > bv) { bv = v; best = k; } });
+        for (const i of celle) reg[i] = best;
+      }
+    }
+  }
+  // posizione di un segno: decisa dall'utente, oppure ricalcolata dal generatore, oppure il suggerimento
+  function posizioni(cat, der) {
+    const out = {}, sp = lay.spostati[cat] || {};
+    for (const [n, p] of Object.entries(P[cat] || {})) out[n] = (cat === "luoghi" && der && der[n]) ? der[n] : p;
+    for (const [n, p] of Object.entries(sp)) { if (p === null) delete out[n]; else out[n] = p; }
+    return out;
+  }
+
+  // =====================================================================================
+  // DISEGNO
+  // =====================================================================================
+  function immagineDa(gg) {
+    const c = document.createElement("canvas"); c.width = P.W; c.height = P.H;
+    const g2 = c.getContext("2d"), dati = g2.createImageData(P.W, P.H), col = P.colori;
+    for (let i = 0; i < gg.g.length; i++) { const k = col[gg.g[i]], o = i * 4; dati.data[o] = k[0]; dati.data[o + 1] = k[1]; dati.data[o + 2] = k[2]; dati.data[o + 3] = 255; }
+    if (confini) {
+      const r = gg.reg, W = P.W;
+      for (let i = W; i < r.length; i++) {
+        const a = r[i], b = r[i - 1], c2 = r[i - W], q = gg.Q[i];
+        const zona = a > 0 && ((b > 0 && b !== a) || (c2 > 0 && c2 !== a));
+        const quart = q >= 0 && ((gg.Q[i - 1] >= 0 && gg.Q[i - 1] !== q) || (gg.Q[i - W] >= 0 && gg.Q[i - W] !== q));
+        if (zona || quart) {
+          for (const j of [i, i - 1, i - W]) { const o = j * 4; dati.data[o] = 24; dati.data[o + 1] = 20; dati.data[o + 2] = 37; }   // 2 tile: si vede anche da lontano
+        }
+      }
+    }
+    g2.putImageData(dati, 0, 0);
+    return c;
+  }
   const aSchermo = (x, y) => [vista.ox + x * vista.s, vista.oy + y * vista.s];
   const aMondo = (sx, sy) => [(sx - vista.ox) / vista.s, (sy - vista.oy) / vista.s];
   function adatta() {
     const r = piano.getBoundingClientRect();
-    vista.s = Math.min(r.width / W(), r.height / H());
-    vista.ox = (r.width - W() * vista.s) / 2; vista.oy = (r.height - H() * vista.s) / 2;
+    vista.s = Math.min(r.width / P.W, r.height / P.H);
+    vista.ox = (r.width - P.W * vista.s) / 2; vista.oy = (r.height - P.H * vista.s) / 2;
     disegna();
   }
   function zoom(f, cx, cy) {
     const r = piano.getBoundingClientRect();
     if (cx === undefined) { cx = r.width / 2; cy = r.height / 2; }
     const [mx, my] = aMondo(cx, cy);
-    vista.s = Math.max(0.3, Math.min(14, vista.s * f));
+    vista.s = Math.max(0.3, Math.min(16, vista.s * f));
     vista.ox = cx - mx * vista.s; vista.oy = cy - my * vista.s;
     disegna();
   }
 
-  // ---------- elementi sulla mappa ----------
-  function posSegno(cat, nome) {
-    const sp = (lay.spostati[cat] || {});
-    if (nome in sp) return sp[nome];
-    return (base[cat] || {})[nome] || null;
-  }
-  function nomiSegni(cat) {
-    const n = new Set(Object.keys(base[cat] || {}));
-    Object.keys(lay.spostati[cat] || {}).forEach((k) => n.add(k));
-    return [...n].filter((k) => posSegno(cat, k));
-  }
+  // elementi interattivi della vista corrente
   function elementi() {
     const el = [];
+    if (!gen) return el;
     if (livello === "sopra") {
-      lay.isole.forEach((i, idx) => el.push({ tipo: "isola", chiave: idx, x: i.x * W(), y: i.y * H(), r: i.r, nome: i.id }));
-      Object.entries(lay.mezzo).forEach(([k, v]) => el.push({ tipo: "paesaggio", chiave: k, x: v.x * W(), y: v.y * HC(), nome: k }));
-      Object.entries(lay.terra).forEach(([k, v]) => el.push({ tipo: "zona", chiave: k, x: v.x * W(), y: v.y * HC(), nome: k }));
+      lay.isole.forEach((is, k) => el.push({ tipo: "isola", chiave: k, x: is.x * P.W, y: is.y * P.H, r: is.r, nome: is.id }));
+      if (attrezzo === "citta" && gen.der._centro) {
+        const c = gen.der._centro, RC = lay.citta.raggio;
+        el.push({ tipo: "citta", chiave: "raggio", x: c[0], y: c[1], r: RC * 1.3, nome: "città di Mirwada" });
+        Object.entries(lay.citta.quartieri).forEach(([n, q]) => el.push({ tipo: "quartiere", chiave: n, x: c[0] + q.x * RC, y: c[1] + q.y * RC, nome: n }));
+      }
+      Object.entries(lay.mezzo).forEach(([n, v]) => el.push({ tipo: "paesaggio", chiave: n, x: v.x * P.W, y: v.y * P.HC, nome: n }));
+      Object.entries(lay.terra).forEach(([n, v]) => el.push({ tipo: "zona", chiave: n, x: v.x * P.W, y: v.y * P.HC, nome: n }));
     }
-    for (const cat of Object.keys(SEGNI)) {
-      if (SEGNI[cat].livello !== livello && !(cat === "ingressi" && livello === "sopra")) continue;
-      for (const n of nomiSegni(cat)) { const p = posSegno(cat, n); el.push({ tipo: "segno", cat, chiave: n, x: p[0], y: p[1], nome: n }); }
+    tratti.forEach((t) => { if ((t.livello || "sopra") === livello && t.punti?.length) { const p = t.punti[Math.floor(t.punti.length / 2)]; el.push({ tipo: "tratto", chiave: t.id, x: p[0], y: p[1], nome: t.tipo }); } });
+    const pos = { luoghi: gen.luoghi, villaggi: gen.villaggi, ingressi: posizioni("ingressi"), boss: posizioni("boss") };
+    for (const cat of Object.keys(TIPI)) {
+      const vis = TIPI[cat].livello === livello || (cat === "ingressi");
+      if (!vis) continue;
+      for (const [n, p] of Object.entries(pos[cat])) el.push({ tipo: "segno", cat, chiave: n, x: p[0], y: p[1], nome: n, sc: lay.schede?.[cat]?.[n] });
     }
-    lay.note.filter((n) => (n.livello || "sopra") === livello)
-      .forEach((n) => el.push({ tipo: "nota", chiave: n.id, x: n.x, y: n.y, nome: n.testo || "nota" }));
+    lay.note.filter((n) => (n.livello || "sopra") === livello).forEach((n) => el.push({ tipo: "nota", chiave: n.id, x: n.x, y: n.y, nome: n.testo || "nota" }));
     return el;
+  }
+  const uguale = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  function modificato(e) {
+    const b = P.layout;
+    if (e.tipo === "zona") return !uguale(lay.terra[e.chiave], b.terra[e.chiave]);
+    if (e.tipo === "paesaggio") return !uguale(lay.mezzo[e.chiave], b.mezzo[e.chiave]);
+    if (e.tipo === "isola") { const is = lay.isole[e.chiave]; return !uguale(is, b.isole.find((q) => q.id === is.id)); }
+    if (e.tipo === "quartiere") return !uguale(lay.citta.quartieri[e.chiave], b.citta.quartieri?.[e.chiave]);
+    if (e.tipo === "citta") return lay.citta.raggio !== b.citta.raggio;
+    if (e.tipo === "segno") return (e.chiave in (lay.spostati[e.cat] || {})) || !!lay.schede?.[e.cat]?.[e.chiave];
+    return true;
   }
   function trova(sx, sy) {
     const el = elementi();
     for (let i = el.length - 1; i >= 0; i--) {
-      const e = el[i];
-      const [ex, ey] = aSchermo(e.x, e.y);
-      if (e.tipo === "isola") {
-        const [hx, hy] = aSchermo(e.x + e.r, e.y);
-        if (Math.hypot(sx - hx, sy - hy) < 9) return { ...e, maniglia: true };
+      const e = el[i], [ex, ey] = aSchermo(e.x, e.y);
+      if (e.tipo === "isola" || e.tipo === "citta") { const [hx, hy] = aSchermo(e.x + e.r, e.y); if (Math.hypot(sx - hx, sy - hy) < 9) return { ...e, maniglia: true }; }
+      if (e.tipo === "segno" && e.sc?.grandezza && sel?.tipo === "segno" && sel.chiave === e.chiave) {
+        const [hx, hy] = aSchermo(e.x + e.sc.grandezza, e.y); if (Math.hypot(sx - hx, sy - hy) < 9) return { ...e, maniglia: true };
       }
-      const raggio = e.tipo === "zona" ? 14 : e.tipo === "isola" || e.tipo === "paesaggio" ? 11 : 8;
-      if (Math.hypot(sx - ex, sy - ey) < raggio) return e;
+      const rag = e.tipo === "zona" ? 14 : e.tipo === "segno" ? 8 : 11;
+      if (Math.hypot(sx - ex, sy - ey) < rag) return e;
     }
     return null;
   }
-
-  // ---------- disegno ----------
-  function preparaTerra() {
-    const c = document.createElement("canvas");
-    c.width = W(); c.height = H();
-    const g = c.getContext("2d"); g.drawImage(img.sopra, 0, 0);
-    const d = g.getImageData(0, 0, W(), H()).data;
-    terraMask = new Uint8Array(W() * H());
-    for (let i = 0; i < W() * H(); i++) {
-      const r = d[i * 4], gg = d[i * 4 + 1], b = d[i * 4 + 2];
-      terraMask[i] = (b > r + 35 && b > gg - 10 && b > 80) ? 0 : 1;   // l'acqua e' blu
-    }
-  }
-  function calcolaConfini() {
-    if (!terraMask) return;
-    const k = 4, w = Math.ceil(W() / k), h = Math.ceil(HC() * 1.25 / k);
-    const c = document.createElement("canvas"); c.width = w; c.height = h;
-    const g = c.getContext("2d"), dati = g.createImageData(w, h);
-    const zone = Object.entries(lay.terra).map(([n, v]) => [n, v.x * W(), v.y * HC(), v.peso || 1]);
-    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-      const X = x * k, Y = y * k;
-      if (!terraMask[Y * W() + X] || Y > HC() * 1.25) continue;
-      let best = null, bd = Infinity;
-      for (const [n, zx, zy, p] of zone) { const dd = Math.hypot(X - zx, Y - zy) * p; if (dd < bd) { bd = dd; best = n; } }
-      const col = COLORI_ZONE[best] || [255, 255, 255], o = (y * w + x) * 4;
-      dati.data[o] = col[0]; dati.data[o + 1] = col[1]; dati.data[o + 2] = col[2]; dati.data[o + 3] = 120;
-    }
-    g.putImageData(dati, 0, 0);
-    confiniCanvas = c;
-  }
   function disegna() {
-    if (!base) return;
+    if (!gen) return;
     const r = piano.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
-    if (tela.width !== Math.round(r.width * dpr) || tela.height !== Math.round(r.height * dpr)) {
-      tela.width = Math.round(r.width * dpr); tela.height = Math.round(r.height * dpr);
-    }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, r.width, r.height);
-    ctx.imageSmoothingEnabled = false;
-    const sfondo = img[livello];
-    if (sfondo.complete && sfondo.naturalWidth) ctx.drawImage(sfondo, vista.ox, vista.oy, W() * vista.s, H() * vista.s);
-    if (confini && confiniCanvas && livello === "sopra") {
-      ctx.drawImage(confiniCanvas, vista.ox, vista.oy, confiniCanvas.width * 4 * vista.s, confiniCanvas.height * 4 * vista.s);
-    }
-    ctx.font = "600 11px 'IBM Plex Mono', ui-monospace, monospace";
-    ctx.textBaseline = "middle";
+    if (tela.width !== Math.round(r.width * dpr) || tela.height !== Math.round(r.height * dpr)) { tela.width = Math.round(r.width * dpr); tela.height = Math.round(r.height * dpr); }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, r.width, r.height); ctx.imageSmoothingEnabled = false;
+    const sfondo = livello === "sopra" ? (mostraPrima ? primaCanvas : superficieCanvas) : img.sotto;
+    if (sfondo) ctx.drawImage(sfondo, vista.ox, vista.oy, P.W * vista.s, P.H * vista.s);
+    if (livello === "sotto") disegnaGallerie();
+    if (mostraPrima) { etichetta("MAPPA ORIGINALE (rilascia per tornare alla tua)", 60, 20, "#feae34"); return; }
+    ctx.font = "600 11px 'IBM Plex Mono', ui-monospace, monospace"; ctx.textBaseline = "middle";
     for (const e of elementi()) {
       const [x, y] = aSchermo(e.x, e.y);
-      const scelto = sel && sel.tipo === e.tipo && sel.chiave === e.chiave && sel.cat === e.cat;
-      ctx.lineWidth = scelto ? 3 : 1.5;
-      if (e.tipo === "isola") {
-        ctx.strokeStyle = scelto ? "#feae34" : "rgba(255,255,255,0.55)"; ctx.setLineDash([5, 4]);
-        ctx.beginPath(); ctx.ellipse(x, y, e.r * vista.s, e.r * vista.s / 1.25, 0, 0, Math.PI * 2); ctx.stroke();
-        ctx.setLineDash([]);
-        const [hx, hy] = aSchermo(e.x + e.r, e.y);
-        ctx.fillStyle = "#feae34"; ctx.fillRect(hx - 5, hy - 5, 10, 10); ctx.strokeStyle = "#181425"; ctx.lineWidth = 1; ctx.strokeRect(hx - 5, hy - 5, 10, 10);
-        punto(x, y, 7, "#ffffff", "cerchio", scelto);
+      const scelto = sel && sel.tipo === e.tipo && sel.chiave === e.chiave && (sel.cat || null) === (e.cat || null);
+      const mod = modificato(e);
+      if (e.tipo === "isola" || e.tipo === "citta") {
+        ctx.setLineDash([6, 4]); ctx.lineWidth = scelto ? 2.5 : 1.5; ctx.strokeStyle = scelto ? "#feae34" : "rgba(255,255,255,0.7)";
+        ctx.beginPath(); ctx.ellipse(x, y, e.r * vista.s, e.r * vista.s / (e.tipo === "isola" ? 1.25 : 1), 0, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+        const [hx, hy] = aSchermo(e.x + e.r, e.y); maniglia(hx, hy);
+        if (e.tipo === "isola") punto(x, y, 7, "#ffffff", "cerchio", scelto, mod);
       } else if (e.tipo === "zona") {
-        const c = COLORI_ZONE[e.chiave] || [255, 255, 255];
-        punto(x, y, 12, `rgb(${c[0]},${c[1]},${c[2]})`, "cerchio", scelto, true);
-      } else if (e.tipo === "paesaggio") {
-        punto(x, y, 8, "#e6a03c", "rombo", scelto);
-      } else if (e.tipo === "segno") {
-        const s = SEGNI[e.cat], fuori = s.livello !== livello;
-        ctx.globalAlpha = fuori ? 0.45 : 1;
-        punto(x, y, 6, s.colore, s.forma, scelto);
-        ctx.globalAlpha = 1;
-      } else if (e.tipo === "nota") {
-        punto(x, y, 8, "#ffffff", "spillo", scelto);
+        punto(x, y, 13, COLORI_ZONE[e.chiave] || "#fff", "cerchio", scelto, mod, true);
+      } else if (e.tipo === "paesaggio") punto(x, y, 9, "#e6a03c", "rombo", scelto, mod);
+      else if (e.tipo === "quartiere") punto(x, y, 9, "#c0cbdc", "esagono", scelto, mod);
+      else if (e.tipo === "tratto") { if (scelto || attrezzo === "seleziona") punto(x, y, 5, "#ffffff", "rombo", scelto, false); }
+      else if (e.tipo === "nota") punto(x, y, 9, "#ffffff", "spillo", scelto, false);
+      else if (e.tipo === "segno") {
+        const t = TIPI[e.cat], fuori = t.livello !== livello;
+        if (e.sc?.grandezza) {
+          ctx.lineWidth = 1.5; ctx.strokeStyle = scelto ? "#feae34" : "rgba(255,255,255,0.6)"; ctx.setLineDash([4, 3]);
+          ctx.beginPath(); ctx.arc(x, y, e.sc.grandezza * vista.s, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+          if (scelto) { const [hx, hy] = aSchermo(e.x + e.sc.grandezza, e.y); maniglia(hx, hy); }
+        }
+        ctx.globalAlpha = fuori ? 0.4 : 1; punto(x, y, 6.5, t.colore, t.forma, scelto, mod); ctx.globalAlpha = 1;
       }
-      const mostra = nomi && (e.tipo !== "segno" || vista.s > 1.6 || scelto) && !(e.tipo === "segno" && SEGNI[e.cat].livello !== livello);
-      if (mostra || e.tipo === "zona" || e.tipo === "nota" || scelto) etichetta(e.nome, x + 12, y);
+      const vedi = scelto || e.tipo === "zona" || e.tipo === "quartiere" || e.tipo === "nota" ||
+        (nomi && (e.tipo !== "segno" || vista.s > 1.4) && !(e.tipo === "segno" && TIPI[e.cat].livello !== livello) && e.tipo !== "tratto");
+      if (vedi) etichetta(leggibile(e.nome).slice(0, 40) + (mod && e.tipo !== "nota" && e.tipo !== "tratto" ? " ●" : ""), x + 13, y, mod ? "#feae34" : "#ffffff");
+    }
+    // anteprima dell'attrezzo
+    if (tratto && tratto.punti.length) disegnaTratto(tratto, true);
+    if (mouse && ["pennello", "galleria", "riempi"].includes(attrezzo)) {
+      const rr = (attrezzo === "pennello" ? pennR : lineaR) * vista.s;
+      ctx.strokeStyle = "#feae34"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(mouse.sx, mouse.sy, Math.max(3, rr), 0, Math.PI * 2); ctx.stroke();
     }
   }
-  function punto(x, y, r, colore, forma, scelto, grande) {
-    ctx.fillStyle = colore; ctx.strokeStyle = scelto ? "#feae34" : "#181425"; ctx.lineWidth = scelto ? 3 : 1.5;
-    ctx.beginPath();
+  function disegnaTratto(t, anteprima) {
+    const col = t.tipo === "riempi" ? [14, 12, 22] : P.colori[P.terreni.indexOf(t.terreno || (t.tipo === "strada" ? "lastricato_antico" : t.tipo === "fiume" ? "water" : "pietrisco"))] || [255, 255, 255];
+    ctx.strokeStyle = `rgba(${col[0]},${col[1]},${col[2]},${anteprima ? 0.85 : 1})`;
+    ctx.lineWidth = Math.max(2, ((t.r ?? 1) * 2 + 1) * vista.s); ctx.lineCap = "round"; ctx.lineJoin = "round";
+    ctx.beginPath(); t.punti.forEach((p, i) => { const [x, y] = aSchermo(p[0] + 0.5, p[1] + 0.5); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+    if (t.punti.length === 1) { const [x, y] = aSchermo(t.punti[0][0] + 0.5, t.punti[0][1] + 0.5); ctx.lineTo(x + 0.01, y); }
+    ctx.stroke();
+  }
+  function disegnaGallerie() { tratti.filter((t) => t.livello === "sotto").forEach((t) => disegnaTratto(t, false)); }
+  function maniglia(x, y) { ctx.fillStyle = "#feae34"; ctx.fillRect(x - 5, y - 5, 10, 10); ctx.strokeStyle = "#181425"; ctx.lineWidth = 1; ctx.strokeRect(x - 5, y - 5, 10, 10); }
+  function punto(x, y, r, colore, forma, scelto, mod, grande) {
+    if (mod) { ctx.strokeStyle = "#feae34"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, r + 5, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.fillStyle = colore; ctx.strokeStyle = scelto ? "#feae34" : "#181425"; ctx.lineWidth = scelto ? 3 : 1.5; ctx.beginPath();
     if (forma === "quadrato") ctx.rect(x - r, y - r, r * 2, r * 2);
     else if (forma === "rombo") { ctx.moveTo(x, y - r - 1); ctx.lineTo(x + r + 1, y); ctx.lineTo(x, y + r + 1); ctx.lineTo(x - r - 1, y); ctx.closePath(); }
+    else if (forma === "esagono") { for (let k = 0; k < 6; k++) { const a = Math.PI / 3 * k; k ? ctx.lineTo(x + r * Math.cos(a), y + r * Math.sin(a)) : ctx.moveTo(x + r, y); } ctx.closePath(); }
     else if (forma === "spillo") { ctx.moveTo(x, y + r); ctx.lineTo(x - r * 0.7, y - r * 0.3); ctx.arc(x, y - r * 0.4, r * 0.7, Math.PI, 0); ctx.closePath(); }
     else ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
     if (grande) { ctx.fillStyle = "#181425"; ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill(); }
   }
-  function etichetta(t, x, y) {
-    t = String(t).replace(/_/g, " ");
-    ctx.lineWidth = 3; ctx.strokeStyle = "rgba(24,20,37,0.9)"; ctx.strokeText(t, x, y);
-    ctx.fillStyle = "#ffffff"; ctx.fillText(t, x, y);
+  function etichetta(t, x, y, colore) { ctx.font = "600 11px 'IBM Plex Mono', ui-monospace, monospace"; ctx.textBaseline = "middle"; ctx.lineWidth = 3; ctx.strokeStyle = "rgba(24,20,37,0.92)"; ctx.strokeText(t, x, y); ctx.fillStyle = colore || "#fff"; ctx.fillText(t, x, y); }
+
+  // =====================================================================================
+  // RIGENERAZIONE DELL'ANTEPRIMA
+  // =====================================================================================
+  let rigenTimer = null;
+  function rigenera(subito) {
+    clearTimeout(rigenTimer);
+    $("rigenero").hidden = false;
+    rigenTimer = setTimeout(() => {
+      requestAnimationFrame(() => {
+        const t0 = performance.now();
+        gen = genera(lay, tratti);
+        superficieCanvas = immagineDa(gen);
+        $("rigenero").hidden = true;
+        aggiornaPannello(); disegna();
+        $("rigenero").textContent = "Ridisegno…";
+        const ms = Math.round(performance.now() - t0);
+        if (ms > 1500) $("rigenero").title = "Ultimo ridisegno: " + ms + " ms";
+      });
+    }, subito ? 0 : 250);
   }
 
-  // ---------- modifiche ----------
-  function ricorda() { storia.push(clona(lay)); if (storia.length > 60) storia.shift(); $("annulla").disabled = false; }
-  function cambiato() { sporco = true; aggiornaPannello(); disegna(); programmaSalvataggio(); }
+  // =====================================================================================
+  // MODIFICHE, STORIA, SALVATAGGIO
+  // =====================================================================================
+  const istantanea = () => ({ lay: clona(lay), tratti: clona(tratti) });
+  function ricorda() { storia.push(istantanea()); if (storia.length > 80) storia.shift(); futuro.length = 0; aggiornaStoria(); }
+  function aggiornaStoria() { $("annulla").disabled = !storia.length; $("rifai").disabled = !futuro.length; }
+  function cambiato(rigen = true) { if (rigen) rigenera(); else { aggiornaPannello(); disegna(); } programmaSalvataggio(); }
+  function ripristina(s) { lay = s.lay; tratti = s.tratti; sel = null; cambiato(); }
+  function programmaSalvataggio() {
+    if (!docRef || sola) { if (!docRef) stato("Le modifiche restano solo in questa pagina: il database non è disponibile.", "attenzione"); return; }
+    inAttesa = Date.now(); stato("Modifiche da salvare…");
+    clearTimeout(salvaTimer); salvaTimer = setTimeout(salva, 1000);
+  }
+  let salvando = false;
+  async function salva() {
+    if (salvando) { programmaSalvataggio(); return; }
+    salvando = true;
+    try {
+      await docRef.set({ terra: lay.terra, mezzo: lay.mezzo, isole: lay.isole, citta: lay.citta, spostati: lay.spostati, schede: lay.schede, note: lay.note, aggiornato: new Date().toISOString() });
+      const ora = new Map(tratti.map((t) => [t.id, JSON.stringify(t)]));
+      for (const [id] of trattiSalvati) if (!ora.has(id)) await trattiRef.doc(id).delete();
+      for (const [id, s] of ora) if (trattiSalvati.get(id) !== s) await trattiRef.doc(id).set(JSON.parse(s));
+      trattiSalvati = ora; inAttesa = 0;
+      stato("Salvato alle " + new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" }) + ". Quando hai finito, scrivi «fatto» a Claude.", "ok");
+    } catch (e) {
+      if (e?.code === "invalid_argument") { sola = true; stato("Sola lettura: puoi provare, ma le modifiche non si salvano.", "attenzione"); }
+      else stato("Salvataggio non riuscito (" + (e?.code || "errore") + "): riprovo alla prossima modifica.", "attenzione");
+    } finally { salvando = false; }
+  }
+
   function sposta(e, x, y) {
-    x = Math.max(0, Math.min(W() - 1, x)); y = Math.max(0, Math.min(H() - 1, y));
-    if (e.tipo === "zona") { lay.terra[e.chiave].x = +(x / W()).toFixed(4); lay.terra[e.chiave].y = +(y / HC()).toFixed(4); }
-    else if (e.tipo === "paesaggio") { lay.mezzo[e.chiave].x = +(x / W()).toFixed(4); lay.mezzo[e.chiave].y = +(y / HC()).toFixed(4); }
-    else if (e.tipo === "isola") {
-      const i = lay.isole[e.chiave];
-      if (e.maniglia) i.r = Math.max(4, Math.round(Math.hypot(x - i.x * W(), (y - i.y * H()) * 1.25)));
-      else { i.x = +(x / W()).toFixed(4); i.y = +(y / H()).toFixed(4); }
-    } else if (e.tipo === "segno") { (lay.spostati[e.cat] = lay.spostati[e.cat] || {})[e.chiave] = [Math.round(x), Math.round(y)]; }
+    x = Math.max(0, Math.min(P.W - 1, x)); y = Math.max(0, Math.min(P.H - 1, y));
+    if (e.tipo === "zona") { lay.terra[e.chiave].x = +(x / P.W).toFixed(4); lay.terra[e.chiave].y = +(y / P.HC).toFixed(4); }
+    else if (e.tipo === "paesaggio") { lay.mezzo[e.chiave].x = +(x / P.W).toFixed(4); lay.mezzo[e.chiave].y = +(y / P.HC).toFixed(4); }
+    else if (e.tipo === "isola") { const is = lay.isole[e.chiave];
+      if (e.maniglia) is.r = Math.max(4, Math.round(Math.hypot(x - is.x * P.W, (y - is.y * P.H) * 1.25)));
+      else { is.x = +(x / P.W).toFixed(4); is.y = +(y / P.H).toFixed(4); } }
+    else if (e.tipo === "citta") { const c = gen.der._centro; lay.citta.raggio = Math.max(25, Math.min(120, Math.round(Math.hypot(x - c[0], y - c[1]) / 1.3))); }
+    else if (e.tipo === "quartiere") { const c = gen.der._centro, RC = lay.citta.raggio; lay.citta.quartieri[e.chiave].x = +((x - c[0]) / RC).toFixed(3); lay.citta.quartieri[e.chiave].y = +((y - c[1]) / RC).toFixed(3); }
+    else if (e.tipo === "segno") {
+      if (e.maniglia) { const sc = schedaDi(e.cat, e.chiave, true); const p = posDi(e.cat, e.chiave); sc.grandezza = Math.max(1, Math.round(Math.hypot(x - p[0], y - p[1]))); }
+      else (lay.spostati[e.cat] = lay.spostati[e.cat] || {})[e.chiave] = [Math.round(x), Math.round(y)];
+    }
     else if (e.tipo === "nota") { const n = lay.note.find((q) => q.id === e.chiave); if (n) { n.x = Math.round(x); n.y = Math.round(y); } }
-    if (e.tipo === "zona" && confini) calcolaConfini();
+    else if (e.tipo === "tratto") { const t = tratti.find((q) => q.id === e.chiave); if (t) { const p = t.punti[Math.floor(t.punti.length / 2)], dx = Math.round(x - p[0]), dy = Math.round(y - p[1]); t.punti = t.punti.map((q) => [q[0] + dx, q[1] + dy]); } }
+  }
+  const tocca = (e) => ["zona", "paesaggio", "isola", "citta", "quartiere", "tratto"].includes(e.tipo) || (e.tipo === "segno" && (e.maniglia || lay.schede?.[e.cat]?.[e.chiave]?.terreno)) || e.cat === "villaggi";
+  function posDi(cat, n) { return posizioni(cat, cat === "luoghi" ? gen?.der : null)[n]; }   // sempre dai dati correnti, anche prima del ridisegno
+  function schedaDi(cat, n, creaSeManca) {
+    lay.schede = lay.schede || { luoghi: {}, villaggi: {}, ingressi: {}, boss: {} };
+    lay.schede[cat] = lay.schede[cat] || {};
+    if (!lay.schede[cat][n] && creaSeManca) lay.schede[cat][n] = { tipo: cat, descrizione: "", grandezza: 0, terreno: "", contenuto: [] };
+    return lay.schede[cat][n];
+  }
+  function nomePulito(s, cat) {
+    let n = String(s || "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9_]+/g, "_").replace(/^_+|_+$/g, "");
+    if (!n) n = { luoghi: "luogo", villaggi: "villaggio", ingressi: "ingresso", boss: "boss", isola: "isola" }[cat] + "_nuovo";
+    return n;
   }
   function aggiungiQui(x, y) {
     x = Math.round(x); y = Math.round(y);
-    const tipo = $("agg-tipo").value;
-    let nome = $("agg-nome").value.trim().toLowerCase().replace(/[^a-z0-9_]+/g, "_").replace(/^_+|_+$/g, "");
     ricorda();
-    if (tipo === "isola") {
-      nome = nome || "isola_nuova_" + (lay.isole.length + 1);
-      lay.isole.push({ id: nome, x: +(x / W()).toFixed(4), y: +(y / H()).toFixed(4), r: 20, profilo: "boschiva" });
+    if (addTipo === "isola") {
+      let n = nomePulito($("agg-nome")?.value, "isola"), k = 2; while (lay.isole.some((i) => i.id === n)) n = n.replace(/_\d+$/, "") + "_" + k++;
+      lay.isole.push({ id: n, x: +(x / P.W).toFixed(4), y: +(y / P.H).toFixed(4), r: 20, profilo: "boschiva" });
       sel = { tipo: "isola", chiave: lay.isole.length - 1 };
     } else {
-      const cat = tipo, sp = (lay.spostati[cat] = lay.spostati[cat] || {});
-      if (!nome) { let i = 1; while (posSegno(cat, cat.replace(/i$/, "o") + "_nuovo_" + i)) i++; nome = cat.replace(/i$/, "o") + "_nuovo_" + i; }
-      sp[nome] = [x, y];
-      if (SEGNI[cat].livello !== livello) impostaLivello(SEGNI[cat].livello);
-      sel = { tipo: "segno", cat, chiave: nome };
+      const cat = addTipo; let n = nomePulito($("agg-nome")?.value, cat), k = 2;
+      const esiste = (q) => q in (P[cat] || {}) || q in (lay.spostati[cat] || {});
+      while (esiste(n)) n = n.replace(/_\d+$/, "") + "_" + k++;
+      (lay.spostati[cat] = lay.spostati[cat] || {})[n] = [x, y];
+      schedaDi(cat, n, true).grandezza = cat === "villaggi" ? 6 : 0;
+      if (TIPI[cat].livello !== livello) impostaLivello(TIPI[cat].livello);
+      sel = { tipo: "segno", cat, chiave: n };
     }
-    $("agg-nome").value = "";
+    impostaAttrezzo("seleziona"); impostaTab("scheda");
     cambiato();
+    setTimeout(() => $("sc-nome")?.select(), 50);
   }
   function aggiungiNota(x, y) {
-    ricorda();
-    const id = "n" + Date.now().toString(36);
+    ricorda(); const id = "n" + Date.now().toString(36);
     lay.note.push({ id, x: Math.round(x), y: Math.round(y), testo: "", livello });
-    sel = { tipo: "nota", chiave: id };
-    cambiato();
-    const t = document.querySelector(`textarea[data-id="${id}"]`); if (t) t.focus();
+    sel = { tipo: "nota", chiave: id }; impostaAttrezzo("seleziona"); impostaTab("scheda"); cambiato(false);
+    setTimeout(() => $("sc-nota")?.focus(), 50);
   }
-  function cancellaSelezione() {
-    if (!sel) return;
-    ricorda();
-    if (sel.tipo === "segno") {
-      const sp = (lay.spostati[sel.cat] = lay.spostati[sel.cat] || {});
-      if ((base[sel.cat] || {})[sel.chiave]) sp[sel.chiave] = null; else delete sp[sel.chiave];
-    } else if (sel.tipo === "isola") lay.isole.splice(sel.chiave, 1);
+  function cancella() {
+    if (!sel) return; ricorda();
+    if (sel.tipo === "segno") { const sp = (lay.spostati[sel.cat] = lay.spostati[sel.cat] || {});
+      if ((P[sel.cat] || {})[sel.chiave]) sp[sel.chiave] = null; else delete sp[sel.chiave];
+      if (lay.schede?.[sel.cat]) delete lay.schede[sel.cat][sel.chiave]; }
+    else if (sel.tipo === "isola") lay.isole.splice(sel.chiave, 1);
     else if (sel.tipo === "nota") lay.note = lay.note.filter((n) => n.id !== sel.chiave);
+    else if (sel.tipo === "tratto") tratti = tratti.filter((t) => t.id !== sel.chiave);
     sel = null; cambiato();
   }
 
-  // ---------- pannello ----------
-  function aggiornaPannello() {
-    const box = $("selezione");
-    box.replaceChildren();
-    if (!sel) { const p = document.createElement("p"); p.className = "vuoto"; p.textContent = "Clicca un segno sulla mappa per vederlo qui. Trascinalo per spostarlo."; box.append(p); }
-    else {
-      const wrap = document.createElement("div"); wrap.style.display = "flex"; wrap.style.flexDirection = "column"; wrap.style.gap = "8px";
-      const titolo = document.createElement("div"); titolo.className = "nome-sel";
-      const tipoTesto = { zona: "Zona del continente", paesaggio: "Paesaggio della terra di mezzo", isola: "Isola", nota: "Nota" };
-      let nome = "";
-      if (sel.tipo === "isola") nome = lay.isole[sel.chiave]?.id; else if (sel.tipo === "nota") nome = "Nota"; else nome = sel.chiave;
-      titolo.textContent = String(nome || "").replace(/_/g, " ");
-      const sotto = document.createElement("div"); sotto.className = "aiuto";
-      sotto.textContent = sel.tipo === "segno" ? SEGNI[sel.cat].nome : tipoTesto[sel.tipo];
-      wrap.append(titolo, sotto);
-      const campo = (etichettaT, id, valore, attr, onChange, tag = "input") => {
-        const r = document.createElement("div"); r.className = "riga";
-        const l = document.createElement("label"); l.htmlFor = id; l.textContent = etichettaT;
-        const i = document.createElement(tag); i.id = id;
-        Object.assign(i, attr || {});
-        if (tag === "select") (attr.opzioni || []).forEach((o) => { const op = document.createElement("option"); op.value = o; op.textContent = o; i.append(op); });
-        i.value = valore;
-        i.addEventListener("change", () => { ricorda(); onChange(i.value); cambiato(); });
-        r.append(l, i); wrap.append(r);
-      };
-      if (sel.tipo === "zona") {
-        const z = lay.terra[sel.chiave];
-        campo("Peso", "sel-peso", z.peso ?? 1, { type: "number", step: "0.05", min: "0.5", max: "2" }, (v) => { z.peso = +v; if (confini) calcolaConfini(); });
-        const a = document.createElement("p"); a.className = "aiuto"; a.textContent = "Peso più alto = zona più piccola. Trascina il centro per spostarla.";
-        wrap.append(a);
-      } else if (sel.tipo === "isola") {
-        const i = lay.isole[sel.chiave];
-        campo("Raggio", "sel-raggio", i.r, { type: "number", min: "4", max: "400", step: "1" }, (v) => { i.r = Math.max(4, +v); });
-        campo("Profilo", "sel-profilo", i.profilo, { opzioni: PROFILI }, (v) => { i.profilo = v; }, "select");
-        const a = document.createElement("p"); a.className = "aiuto"; a.textContent = "Trascina il quadratino ambra per cambiare il raggio.";
-        wrap.append(a);
-      } else if (sel.tipo === "segno") {
-        const p = posSegno(sel.cat, sel.chiave) || [0, 0];
-        campo("X (tile)", "sel-x", p[0], { type: "number", step: "1" }, (v) => { (lay.spostati[sel.cat] = lay.spostati[sel.cat] || {})[sel.chiave] = [Math.round(+v), posSegno(sel.cat, sel.chiave)[1]]; });
-        campo("Y (tile)", "sel-y", p[1], { type: "number", step: "1" }, (v) => { (lay.spostati[sel.cat] = lay.spostati[sel.cat] || {})[sel.chiave] = [posSegno(sel.cat, sel.chiave)[0], Math.round(+v)]; });
-        const deciso = sel.chiave in (lay.spostati[sel.cat] || {});
-        const a = document.createElement("p"); a.className = "aiuto";
-        a.textContent = deciso ? "Posizione decisa da te: vince sul suggerimento del generatore." : "Suggerimento del generatore. Spostalo per deciderne la posizione.";
-        wrap.append(a);
-      }
-      if (sel.tipo !== "zona" && sel.tipo !== "paesaggio") {
-        const b = document.createElement("button"); b.className = "tasto pericolo"; b.id = "sel-cancella";
-        b.textContent = sel.tipo === "nota" ? "Cancella la nota" : sel.tipo === "isola" ? "Togli l'isola" : "Cancella dalla mappa";
-        b.addEventListener("click", cancellaSelezione);
-        wrap.append(b);
-      }
-      box.append(wrap);
-    }
-    // citta'
-    $("citta-raggio").value = lay.citta.raggio;
-    const stima = Math.round(base.citta * Math.pow(lay.citta.raggio / base.layout.citta.raggio, 2));
-    $("citta-stima").textContent = `Circa ${stima} schermate di città (ora ${base.citta} con raggio ${base.layout.citta.raggio}).`;
-    // note
-    const ul = $("note"); ul.replaceChildren();
-    lay.note.forEach((n) => {
-      const li = document.createElement("li");
-      const t = document.createElement("textarea"); t.dataset.id = n.id; t.id = "nota-" + n.id; t.value = n.testo || "";
-      t.setAttribute("aria-label", "Testo della nota");
-      t.placeholder = "Cosa vuoi qui? (es. un lago, un villaggio più grande)";
-      let primo = true;
-      t.addEventListener("input", () => { if (primo) { ricorda(); primo = false; } n.testo = t.value; sporco = true; disegna(); programmaSalvataggio(); });
-      const b = document.createElement("button"); b.className = "tasto"; b.textContent = "Vai";
-      b.addEventListener("click", () => { if ((n.livello || "sopra") !== livello) impostaLivello(n.livello || "sopra"); centra(n.x, n.y); sel = { tipo: "nota", chiave: n.id }; aggiornaPannello(); disegna(); });
-      li.append(t, b); ul.append(li);
+  // =====================================================================================
+  // ATTREZZI
+  // =====================================================================================
+  const ICONE = {
+    seleziona: '<path d="M4 3l13 6-6 2-2 6z" fill="currentColor"/>',
+    aggiungi: '<circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 6v8M6 10h8" stroke="currentColor" stroke-width="2"/>',
+    pennello: '<path d="M14 3l3 3-8 8-3-3z" fill="currentColor"/><path d="M5 12c-2 1-2 4-3 5 2 0 4 0 5-2z" fill="currentColor"/>',
+    strada: '<path d="M7 2l-3 16M13 2l3 16" stroke="currentColor" stroke-width="2"/><path d="M10 3v3M10 9v3M10 15v3" stroke="currentColor" stroke-width="2"/>',
+    fiume: '<path d="M5 2c6 3-4 6 2 9s-4 5 2 7" fill="none" stroke="currentColor" stroke-width="2.5"/>',
+    citta: '<path d="M2 18V9l4-3 4 3v9M10 18V5l4-3 4 3v13" fill="none" stroke="currentColor" stroke-width="1.8"/>',
+    galleria: '<path d="M3 17V10a7 7 0 0114 0v7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 17v-6a3 3 0 016 0v6" fill="currentColor"/>',
+    riempi: '<rect x="3" y="4" width="14" height="12" rx="2" fill="currentColor"/><path d="M6 8h8M6 12h8" stroke="var(--pannello)" stroke-width="1.5"/>',
+    nota: '<path d="M4 3h12v10l-4 4H4z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 7h6M7 10h6" stroke="currentColor" stroke-width="1.5"/>',
+  };
+  const ATTREZZI = [
+    ["seleziona", "Sposta", "V", "sopra sotto"], ["aggiungi", "Aggiungi", "A", "sopra sotto"], ["citta", "Città", "C", "sopra"],
+    ["pennello", "Pennello", "B", "sopra"], ["strada", "Strada", "S", "sopra"], ["fiume", "Fiume", "F", "sopra"],
+    ["galleria", "Scava", "G", "sotto"], ["riempi", "Chiudi", "R", "sotto"], ["nota", "Nota", "N", "sopra sotto"]];
+  const CONSIGLI = {
+    seleziona: "Clicca un segno per aprirne la scheda; trascinalo per spostarlo. Trascina lo sfondo per muovere la vista.",
+    aggiungi: "Scegli a destra cosa aggiungere, poi clicca sulla mappa.",
+    citta: "Trascina i quartieri (esagoni) e il quadratino ambra per il raggio della città.",
+    pennello: "Scegli un terreno a destra e dipingi tenendo premuto. Rotella + Alt cambia la grandezza.",
+    strada: "Clicca per mettere i punti della strada; doppio clic o Invio per finire, Esc per annullare.",
+    fiume: "Clicca per mettere i punti del fiume; doppio clic o Invio per finire, Esc per annullare.",
+    galleria: "Dipingi tenendo premuto per scavare una galleria.",
+    riempi: "Dipingi tenendo premuto per chiudere gallerie con la roccia.",
+    nota: "Clicca dove vuoi lasciare un appunto.",
+  };
+  function costruisciAttrezzi() {
+    const nav = $("attrezzi"); nav.replaceChildren();
+    ATTREZZI.forEach(([id, nome, tasto, livelli], k) => {
+      if (k === 3 || k === 6 || k === 8) nav.append(crea("hr"));
+      const b = crea("button", { id: "att-" + id, "aria-pressed": attrezzo === id, title: nome + " (" + tasto + ")", onclick: () => impostaAttrezzo(id) });
+      b.innerHTML = `<svg viewBox="0 0 20 20" aria-hidden="true">${ICONE[id]}</svg><span>${nome} <span class="tasto-scorciatoia">${tasto}</span></span>`;
+      b.disabled = !livelli.includes(livello); b.style.opacity = b.disabled ? 0.4 : 1;
+      nav.append(b);
     });
-    $("note-vuote").hidden = lay.note.length > 0;
   }
-  function centra(x, y) { const r = piano.getBoundingClientRect(); vista.s = Math.max(vista.s, 2.5); vista.ox = r.width / 2 - x * vista.s; vista.oy = r.height / 2 - y * vista.s; }
-  function misure() {
-    const m = $("misure"); m.replaceChildren();
-    const righe = Object.entries(base.misure).filter(([, v]) => v >= 5).sort((a, b) => b[1] - a[1]);
-    righe.push(["superficie, totale", base.superficie], ["sottosuolo", base.sottosuolo], ["città di Mirwada", base.citta]);
-    righe.forEach(([n, v]) => { const a = document.createElement("span"); a.textContent = n.replace(/_/g, " "); const b = document.createElement("span"); b.textContent = Math.round(v); m.append(a, b); });
-  }
-  function legenda() {
-    const l = $("legenda"); l.replaceChildren();
-    const voci = livello === "sopra"
-      ? [["#e43b44", "quadrato", "luogo"], ["#fee761", "cerchio", "villaggio"], ["#2ce8f5", "quadrato", "ingresso"], ["#ffffff", "cerchio", "zona / isola"]]
-      : [["#2ce8f5", "quadrato", "ingresso"], ["#e43b44", "rombo", "boss"]];
-    voci.forEach(([c, f, t]) => { const s = document.createElement("span"); const q = document.createElement("i"); q.className = "segno"; q.style.background = c; if (f === "cerchio") q.style.borderRadius = "50%"; if (f === "rombo") q.style.transform = "rotate(45deg) scale(.8)"; s.append(q, document.createTextNode(t)); l.append(s); });
-  }
-
-  // ---------- salvataggio (db) ----------
-  function programmaSalvataggio() {
-    if (!docRef || sola) { if (!docRef) stato("Database non disponibile: le modifiche restano solo in questa pagina finché non la ricarichi.", "attenzione"); return; }
-    stato("Modifiche non ancora salvate…");
-    clearTimeout(salvaTimer);
-    salvaTimer = setTimeout(salva, 1200);
-  }
-  async function salva() {
-    if (inSalvataggio) { programmaSalvataggio(); return; }
-    inSalvataggio = true;
-    try {
-      await docRef.set({ ...clona(lay), aggiornato: new Date().toISOString() });
-      sporco = false;
-      stato("Salvato alle " + new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" }) + ". Di' a Claude di rigenerare la mappa.", "ok");
-    } catch (e) {
-      if (e && e.code === "invalid_argument") { sola = true; stato("Sola lettura: puoi guardare ma non salvare modifiche.", "attenzione"); }
-      else stato("Salvataggio non riuscito (" + (e && e.code || "errore") + "). Riprovo alla prossima modifica.", "attenzione");
-    } finally { inSalvataggio = false; }
+  function impostaAttrezzo(id) {
+    if (tratto) finisciTratto(false);
+    attrezzo = id; costruisciAttrezzi();
+    $("consiglio").textContent = CONSIGLI[id];
+    tela.className = id === "seleziona" || id === "citta" ? "mano" : (["pennello", "galleria", "riempi"].includes(id) ? "nessuno" : "croce");
+    if (id !== "seleziona" && id !== "citta") impostaTab("scheda");
+    aggiornaPannello(); disegna();
   }
   function impostaLivello(l) {
     livello = l; sel = null;
     $("liv-sopra").setAttribute("aria-pressed", l === "sopra"); $("liv-sotto").setAttribute("aria-pressed", l === "sotto");
-    legenda(); aggiornaPannello(); disegna();
+    const ok = ATTREZZI.find((a) => a[0] === attrezzo)[3].includes(l);
+    if (!ok) impostaAttrezzo("seleziona"); else costruisciAttrezzi();
+    aggiornaPannello(); disegna();
+  }
+  function finisciTratto(salvaTratto) {
+    if (tratto && salvaTratto && tratto.punti.length) { ricorda(); tratti.push(tratto); sel = { tipo: "tratto", chiave: tratto.id }; tratto = null; cambiato(); }
+    tratto = null; disegna();
+  }
+  function nuovoTratto(tipo, x, y) {
+    const r = tipo === "pennello" ? pennR : lineaR;
+    tratto = { id: "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), tipo, livello: tipo === "galleria" || tipo === "riempi" ? "sotto" : "sopra",
+      r, terreno: tipo === "pennello" ? pennTerreno : tipo === "strada" ? $("tr-terreno")?.value || "lastricato_antico" : tipo === "fiume" ? "water" : tipo === "galleria" ? "pietrisco" : undefined,
+      punti: [[Math.round(x), Math.round(y)]] };
   }
 
-  // ---------- input ----------
+  // =====================================================================================
+  // PANNELLO
+  // =====================================================================================
+  function impostaTab(t) { tab = t; ["scheda", "registro", "misure"].forEach((k) => $("tab-" + k).setAttribute("aria-selected", k === t)); aggiornaPannello(); }
+  function cursore(id, etichettaT, min, max, passo, valore, onInput, suffisso = "") {
+    const out = crea("output", { for: id, testo: valore + suffisso });
+    const inp = crea("input", { type: "range", id, min, max, step: passo });
+    inp.value = valore;
+    let primo = true;
+    inp.addEventListener("input", () => { if (primo) { ricorda(); primo = false; } out.textContent = inp.value + suffisso; onInput(+inp.value); });
+    inp.addEventListener("change", () => { primo = true; });
+    return crea("div", { classe: "riga" }, crea("label", { for: id, testo: etichettaT }), crea("div", { classe: "cursore" }, inp, out));
+  }
+  function campo(id, etichettaT, valore, onChange, tipo = "text", extra = {}) {
+    const inp = crea("input", { id, type: tipo, ...extra }); inp.value = valore ?? "";
+    inp.addEventListener("change", () => { ricorda(); onChange(inp.value); });
+    return crea("div", { classe: "riga" }, crea("label", { for: id, testo: etichettaT }), inp);
+  }
+  function selettoreTerreno(id, valore, onChange, conVuoto) {
+    const s = crea("select", { id });
+    if (conVuoto) s.append(crea("option", { value: "", testo: "— nessuno —" }));
+    P.terreni.forEach((t) => s.append(crea("option", { value: t, testo: nomeTerreno(t) })));
+    s.value = valore || "";
+    const sw = crea("span", { classe: "sw" }); const colora = () => { const c = P.colori[P.terreni.indexOf(s.value)]; sw.style.background = c ? `rgb(${c})` : "transparent"; };
+    colora();
+    s.addEventListener("change", () => { colora(); ricorda(); onChange(s.value); });
+    return crea("div", { classe: "riga" }, crea("label", { for: id, testo: "Terreno" }), crea("div", { classe: "cursore", style: "grid-template-columns: minmax(0,1fr) 20px" }, s, sw));
+  }
+  function aggiornaPannello() {
+    const p = $("pannello"); p.replaceChildren();
+    const n = registro().length; $("n-mod").textContent = n ? "(" + n + ")" : "";
+    if (!gen) return;
+    if (tab === "registro") return pannelloRegistro(p);
+    if (tab === "misure") return pannelloMisure(p);
+    if (attrezzo === "aggiungi") return pannelloAggiungi(p);
+    if (attrezzo === "pennello") return pannelloPennello(p);
+    if (["strada", "fiume", "galleria", "riempi"].includes(attrezzo)) return pannelloLinea(p);
+    if (!sel) {
+      metti(p, crea("h2", { testo: "Scheda" }), crea("p", { classe: "vuoto", testo: attrezzo === "citta" ? "Clicca un quartiere (esagono) per regolarne il peso, o trascina il quadratino ambra per il raggio della città." : "Clicca un elemento sulla mappa per vederne e cambiarne tutto: posizione, grandezza, terreno, contenuto. I segni con l'anello ambra sono quelli che hai già modificato." }));
+      if (attrezzo === "citta") metti(p, pannelloCitta());
+      return;
+    }
+    if (sel.tipo === "zona") return schedaZona(p);
+    if (sel.tipo === "paesaggio") return schedaPaesaggio(p);
+    if (sel.tipo === "isola") return schedaIsola(p);
+    if (sel.tipo === "quartiere" || sel.tipo === "citta") return schedaQuartiere(p);
+    if (sel.tipo === "segno") return schedaSegno(p);
+    if (sel.tipo === "nota") return schedaNota(p);
+    if (sel.tipo === "tratto") return schedaTratto(p);
+  }
+  const titolo = (testo, mod, sotto) => [crea("h2", { testo: sotto }), crea("h3", {}, leggibile(testo), mod ? crea("span", { classe: "etichetta-mod", testo: "modificato" }) : null)];
+  const schermateDi = (regName) => { const i = gen.REG.indexOf(regName); return i < 0 ? 0 : gen.conta[i] / P.schermata; };
+  const baseSchermate = (regName) => P.misure[regName] ?? null;
+  function confrontoMisura(regName) {
+    const ora = Math.round(schermateDi(regName)), prima = baseSchermate(regName);
+    const t = prima == null ? `${ora} schermate` : `${ora} schermate (all'inizio ${Math.round(prima)})`;
+    return crea("p", { classe: "aiuto" }, "Grandezza: ", crea("b", { testo: t }));
+  }
+  function bottoni(...b) { return crea("div", { classe: "azioni" }, ...b); }
+  function tastoRipristina(onClick) { return crea("button", { classe: "tasto", testo: "Torna com'era", onclick: () => { ricorda(); onClick(); cambiato(); } }); }
+  function schedaZona(p) {
+    const z = lay.terra[sel.chiave], b = P.layout.terra[sel.chiave];
+    metti(p, ...titolo(sel.chiave, !uguale(z, b), "Zona del continente"), confrontoMisura(sel.chiave),
+      cursore("sc-peso", "Peso", 0.5, 2, 0.05, z.peso ?? 1, (v) => { z.peso = v; rigenera(); programmaSalvataggio(); }),
+      crea("p", { classe: "aiuto", testo: "Peso più basso = la zona si allarga e ruba spazio alle vicine. Trascina il cerchio sulla mappa per spostarne il centro: coste e confini si ridisegnano subito." }),
+      bottoni(tastoRipristina(() => { lay.terra[sel.chiave] = clona(b); })));
+  }
+  function schedaPaesaggio(p) {
+    const b = P.layout.mezzo[sel.chiave];
+    metti(p, ...titolo(sel.chiave, !uguale(lay.mezzo[sel.chiave], b), "Paesaggio della terra di mezzo"),
+      crea("p", { classe: "aiuto", testo: "Trascinalo per spostare il confine tra steppa, colline, foreste e paludi dentro la terra di mezzo." }),
+      bottoni(tastoRipristina(() => { lay.mezzo[sel.chiave] = clona(b); })));
+  }
+  function schedaIsola(p) {
+    const is = lay.isole[sel.chiave]; if (!is) { sel = null; return aggiornaPannello(); }
+    const b = P.layout.isole.find((q) => q.id === is.id);
+    const sProf = crea("select", { id: "sc-profilo" }); PROFILI.forEach((pr) => sProf.append(crea("option", { value: pr, testo: pr + " — " + nomeTerreno(BASE_PROFILO[pr]) })));
+    sProf.value = is.profilo; sProf.addEventListener("change", () => { ricorda(); is.profilo = sProf.value; cambiato(); });
+    metti(p, ...titolo(is.id, !uguale(is, b), b ? "Isola" : "Isola aggiunta da te"), confrontoMisura(is.id),
+      campo("sc-nome", "Nome", is.id, (v) => { is.id = nomePulito(v, "isola"); cambiato(); }),
+      cursore("sc-raggio", "Raggio", 4, 300, 1, is.r, (v) => { is.r = v; rigenera(); programmaSalvataggio(); }, " tile"),
+      crea("div", { classe: "riga" }, crea("label", { for: "sc-profilo", testo: "Tipo" }), sProf),
+      crea("p", { classe: "aiuto", testo: "Il tipo decide i terreni dell'isola. Trascina il quadratino ambra per il raggio." }),
+      bottoni(b ? tastoRipristina(() => { lay.isole[sel.chiave] = clona(b); }) : null,
+        crea("button", { classe: "tasto pericolo", testo: "Togli l'isola", onclick: cancella })));
+  }
+  function pannelloCitta() {
+    const wrap = crea("div", { style: "display:flex;flex-direction:column;gap:8px" });
+    wrap.append(crea("p", { classe: "aiuto" }, "Città: ", crea("b", { testo: Math.round(gen.citta) + " schermate" }), ` (all'inizio ${P.citta})`),
+      cursore("sc-rc", "Raggio", 25, 120, 1, lay.citta.raggio, (v) => { lay.citta.raggio = v; rigenera(); programmaSalvataggio(); }, " tile"));
+    return wrap;
+  }
+  function schedaQuartiere(p) {
+    if (sel.tipo === "citta") { metti(p, ...titolo("città di Mirwada", lay.citta.raggio !== P.layout.citta.raggio, "Città"), pannelloCitta()); return; }
+    const q = lay.citta.quartieri[sel.chiave], b = P.layout.citta.quartieri?.[sel.chiave];
+    let celle = 0; const iq = gen.nomiQ.indexOf(sel.chiave); for (let i = 0; i < gen.Q.length; i++) if (gen.Q[i] === iq) celle++;
+    metti(p, ...titolo(sel.chiave, !uguale(q, b), "Quartiere di Mirwada"),
+      crea("p", { classe: "aiuto" }, "Grandezza: ", crea("b", { testo: Math.round(celle / P.schermata) + " schermate" })),
+      cursore("sc-qpeso", "Peso", 0.4, 2, 0.05, q.peso ?? 1, (v) => { q.peso = v; rigenera(); programmaSalvataggio(); }),
+      crea("p", { classe: "aiuto", testo: "Peso più basso = quartiere più grande. Trascina l'esagono per spostarlo dentro la città." }),
+      pannelloCitta(), bottoni(b ? tastoRipristina(() => { lay.citta.quartieri[sel.chiave] = clona(b); }) : null));
+  }
+  function schedaSegno(p) {
+    const cat = sel.cat, n = sel.chiave, pos = posDi(cat, n);
+    if (!pos) { sel = null; return aggiornaPannello(); }
+    const sc = schedaDi(cat, n, true), base = P[cat]?.[n];
+    const sTipo = crea("select", { id: "sc-tipo" }); Object.entries(TIPI).forEach(([k, v]) => sTipo.append(crea("option", { value: k, testo: v.nome })));
+    sTipo.value = cat;
+    sTipo.addEventListener("change", () => { ricorda(); spostaCategoria(cat, n, sTipo.value, n); });
+    const nomeInp = crea("input", { id: "sc-nome", type: "text" }); nomeInp.value = n;
+    nomeInp.addEventListener("change", () => { ricorda(); spostaCategoria(cat, n, cat, nomePulito(nomeInp.value, cat)); });
+    const desc = crea("textarea", { id: "sc-desc", placeholder: "Cos'è questo posto? Chi ci vive, perché conta, che atmosfera ha." }); desc.value = sc.descrizione || "";
+    let primoD = true; desc.addEventListener("input", () => { if (primoD) { ricorda(); primoD = false; } sc.descrizione = desc.value; programmaSalvataggio(); });
+    metti(p, ...titolo(n, modificato({ tipo: "segno", cat, chiave: n }), TIPI[cat].nome + (base ? "" : " · aggiunto da te")),
+      crea("div", { classe: "riga" }, crea("label", { for: "sc-nome", testo: "Nome" }), nomeInp),
+      crea("div", { classe: "riga" }, crea("label", { for: "sc-tipo", testo: "Tipo" }), sTipo),
+      campo("sc-x", "X (tile)", pos[0], (v) => { (lay.spostati[cat] = lay.spostati[cat] || {})[n] = [Math.round(+v), posDi(cat, n)[1]]; cambiato(); }, "number"),
+      campo("sc-y", "Y (tile)", pos[1], (v) => { (lay.spostati[cat] = lay.spostati[cat] || {})[n] = [posDi(cat, n)[0], Math.round(+v)]; cambiato(); }, "number"),
+      crea("div", { classe: "riga" }, crea("label", { for: "sc-desc", testo: "Descrizione" }), desc),
+      cursore("sc-grand", "Grandezza", 0, 60, 1, sc.grandezza || 0, (v) => { sc.grandezza = v; if (sc.terreno) rigenera(); else disegna(); programmaSalvataggio(); }, " tile"),
+      selettoreTerreno("sc-terreno", sc.terreno, (v) => { sc.terreno = v; if (v && !sc.grandezza) sc.grandezza = 5; cambiato(); }, true),
+      crea("p", { classe: "aiuto", testo: "Grandezza e terreno creano lo spiazzo attorno al luogo (cerchio tratteggiato): lo vedi subito sulla mappa." }),
+      crea("h2", { testo: "Cosa contiene" }), listaContenuti(sc),
+      bottoni(crea("button", { classe: "tasto pericolo", testo: "Cancella dalla mappa", onclick: cancella })));
+  }
+  function spostaCategoria(cat, n, cat2, n2) {
+    if (cat === cat2 && n === n2) return;
+    const pos = posDi(cat, n), sc = lay.schede?.[cat]?.[n];
+    const sp = (lay.spostati[cat] = lay.spostati[cat] || {});
+    if ((P[cat] || {})[n]) sp[n] = null; else delete sp[n];
+    if (sc) delete lay.schede[cat][n];
+    const sp2 = (lay.spostati[cat2] = lay.spostati[cat2] || {}); let fin = n2, k = 2;
+    while ((fin in (P[cat2] || {}) && sp2[fin] !== null) || (fin in sp2 && sp2[fin])) fin = n2.replace(/_\d+$/, "") + "_" + k++;
+    sp2[fin] = pos; if (sc) { schedaDi(cat2, fin, true); lay.schede[cat2][fin] = { ...sc, tipo: cat2 }; }
+    sel = { tipo: "segno", cat: cat2, chiave: fin };
+    if (TIPI[cat2].livello !== livello && cat2 !== "ingressi") impostaLivello(TIPI[cat2].livello);
+    cambiato();
+  }
+  function listaContenuti(sc) {
+    sc.contenuto = sc.contenuto || [];
+    const ul = crea("ul", { classe: "lista contenuti" });
+    sc.contenuto.forEach((c, k) => {
+      const s = crea("select", { id: "ct-tipo-" + k, "aria-label": "Tipo di contenuto" }); CONTENUTI.forEach((t) => s.append(crea("option", { value: t, testo: t }))); s.value = c.tipo;
+      s.addEventListener("change", () => { ricorda(); c.tipo = s.value; programmaSalvataggio(); });
+      const t = crea("input", { id: "ct-testo-" + k, type: "text", placeholder: "es. fabbro che vende spade", "aria-label": "Descrizione del contenuto" }); t.value = c.testo || "";
+      t.addEventListener("change", () => { ricorda(); c.testo = t.value; programmaSalvataggio(); });
+      const x = crea("button", { classe: "tasto", testo: "Togli", onclick: () => { ricorda(); sc.contenuto.splice(k, 1); cambiato(false); } });
+      ul.append(crea("li", {}, s, t, x));
+    });
+    const add = crea("button", { classe: "tasto", testo: "+ Aggiungi contenuto", onclick: () => { ricorda(); sc.contenuto.push({ tipo: "abitanti", testo: "" }); cambiato(false); setTimeout(() => $("ct-testo-" + (sc.contenuto.length - 1))?.focus(), 30); } });
+    return crea("div", { style: "display:flex;flex-direction:column;gap:6px" }, sc.contenuto.length ? ul : crea("p", { classe: "vuoto", testo: "Ancora niente. Aggiungi abitanti, negozi, forzieri, nemici, segreti…" }), add);
+  }
+  function schedaNota(p) {
+    const n = lay.note.find((q) => q.id === sel.chiave); if (!n) { sel = null; return aggiornaPannello(); }
+    const t = crea("textarea", { id: "sc-nota", placeholder: "Cosa vuoi qui? (es. un lago con un'isola, un villaggio più grande)" }); t.value = n.testo || "";
+    let primo = true; t.addEventListener("input", () => { if (primo) { ricorda(); primo = false; } n.testo = t.value; disegna(); programmaSalvataggio(); });
+    metti(p, crea("h2", { testo: "Nota" }), t, bottoni(crea("button", { classe: "tasto pericolo", testo: "Cancella la nota", onclick: cancella })));
+  }
+  function schedaTratto(p) {
+    const t = tratti.find((q) => q.id === sel.chiave); if (!t) { sel = null; return aggiornaPannello(); }
+    const nome = { pennello: "Pennellata", strada: "Strada", fiume: "Fiume", galleria: "Galleria scavata", riempi: "Galleria chiusa" }[t.tipo];
+    metti(p, crea("h2", { testo: "Tratto disegnato da te" }), crea("h3", { testo: nome }),
+      t.tipo === "pennello" || t.tipo === "strada" ? selettoreTerreno("sc-tterreno", t.terreno, (v) => { t.terreno = v; cambiato(); }) : null,
+      cursore("sc-tr", "Larghezza", 0, 30, 1, t.r ?? 1, (v) => { t.r = v; rigenera(); programmaSalvataggio(); }, " tile"),
+      crea("p", { classe: "aiuto", testo: `${t.punti.length} punti. Trascina il rombo bianco per spostare tutto il tratto.` }),
+      bottoni(crea("button", { classe: "tasto pericolo", testo: "Cancella il tratto", onclick: cancella })));
+  }
+  function pannelloAggiungi(p) {
+    const tipi = [["luoghi", "Luogo speciale"], ["villaggi", "Villaggio, casa"], ["ingressi", "Ingresso sottosuolo"], ["boss", "Boss"], ["isola", "Isola"]];
+    const box = crea("div", { classe: "tipi" });
+    tipi.forEach(([k, v]) => { const t = TIPI[k] || { colore: "#ffffff", forma: "cerchio" };
+      const sw = crea("span", { classe: "sw", style: `background:${t.colore};${t.forma === "cerchio" ? "border-radius:50%" : ""}` });
+      box.append(crea("button", { "aria-pressed": addTipo === k, onclick: () => { addTipo = k; aggiornaPannello(); } }, sw, v)); });
+    const nome = crea("input", { id: "agg-nome", type: "text", placeholder: "es. torre del mago", autocomplete: "off" });
+    metti(p, crea("h2", { testo: "Aggiungi" }), crea("p", { classe: "aiuto", testo: "1. Scegli cosa. 2. Dagli un nome (puoi cambiarlo dopo). 3. Clicca sulla mappa: si apre subito la sua scheda." }),
+      box, crea("div", { classe: "riga" }, crea("label", { for: "agg-nome", testo: "Nome" }), nome),
+      addTipo === "ingressi" || addTipo === "boss" ? crea("p", { classe: "aiuto", testo: "Ingressi e boss stanno nel sottosuolo: la mappa passa al livello sotto quando li aggiungi." }) : null);
+  }
+  function pannelloPennello(p) {
+    const box = crea("div", { classe: "tavolozza" });
+    P.terreni.forEach((t, k) => { const c = P.colori[k];
+      box.append(crea("button", { "aria-pressed": pennTerreno === t, title: nomeTerreno(t), onclick: () => { pennTerreno = t; aggiornaPannello(); } },
+        crea("span", { classe: "sw", style: `background:rgb(${c})` }), crea("span", { testo: nomeTerreno(t) }))); });
+    metti(p, crea("h2", { testo: "Pennello dei terreni" }),
+      cursore("pn-r", "Grandezza", 0, 40, 1, pennR, (v) => { pennR = v; disegna(); }, " tile"),
+      crea("p", { classe: "aiuto", testo: "Dipingi tenendo premuto. Ogni pennellata è una voce nelle Modifiche e si può annullare da sola. L'acqua dipinta diventa mare o lago; un terreno dipinto sull'acqua crea terra." }), box);
+  }
+  function pannelloLinea(p) {
+    const info = { strada: ["Strada", "Clicca punto per punto; doppio clic o Invio per finire, Esc per annullare."],
+      fiume: ["Fiume", "Clicca punto per punto dalla sorgente al mare; doppio clic o Invio per finire."],
+      galleria: ["Scava galleria", "Dipingi tenendo premuto: la roccia diventa galleria."], riempi: ["Chiudi galleria", "Dipingi tenendo premuto: la galleria torna roccia."] }[attrezzo];
+    metti(p, crea("h2", { testo: info[0] }), crea("p", { classe: "aiuto", testo: info[1] }),
+      cursore("ln-r", "Larghezza", 0, 12, 1, lineaR, (v) => { lineaR = v; if (tratto) tratto.r = v; disegna(); }, " tile"),
+      attrezzo === "strada" ? selettoreTerreno("tr-terreno", "lastricato_antico", () => {}) : null,
+      tratto ? bottoni(crea("button", { classe: "tasto primario", testo: "Finisci (Invio)", onclick: () => finisciTratto(true) }), crea("button", { classe: "tasto", testo: "Annulla (Esc)", onclick: () => finisciTratto(false) })) : null);
+  }
+  // ---------- registro delle modifiche ----------
+  function registro() {
+    if (!P || !lay) return [];
+    const b = P.layout, out = [];
+    for (const [n, z] of Object.entries(lay.terra)) if (!uguale(z, b.terra[n])) out.push({ testo: "Zona " + leggibile(n) + " spostata o ridimensionata", vai: [z.x * P.W, z.y * P.HC], annulla: () => { lay.terra[n] = clona(b.terra[n]); } });
+    for (const [n, z] of Object.entries(lay.mezzo)) if (!uguale(z, b.mezzo[n])) out.push({ testo: "Paesaggio " + leggibile(n) + " spostato", vai: [z.x * P.W, z.y * P.HC], annulla: () => { lay.mezzo[n] = clona(b.mezzo[n]); } });
+    lay.isole.forEach((is) => { const o = b.isole.find((q) => q.id === is.id);
+      if (!o) out.push({ testo: "Isola " + leggibile(is.id) + " aggiunta", vai: [is.x * P.W, is.y * P.H], annulla: () => { lay.isole = lay.isole.filter((q) => q !== is); } });
+      else if (!uguale(is, o)) out.push({ testo: "Isola " + leggibile(is.id) + " cambiata", vai: [is.x * P.W, is.y * P.H], annulla: () => { Object.assign(is, clona(o)); } }); });
+    b.isole.forEach((o) => { if (!lay.isole.some((q) => q.id === o.id)) out.push({ testo: "Isola " + leggibile(o.id) + " tolta", vai: [o.x * P.W, o.y * P.H], annulla: () => { lay.isole.push(clona(o)); } }); });
+    if (lay.citta.raggio !== b.citta.raggio) out.push({ testo: `Raggio della città ${b.citta.raggio} → ${lay.citta.raggio}`, annulla: () => { lay.citta.raggio = b.citta.raggio; } });
+    for (const [n, q] of Object.entries(lay.citta.quartieri || {})) if (!uguale(q, b.citta.quartieri?.[n])) out.push({ testo: "Quartiere " + leggibile(n) + " cambiato", annulla: () => { lay.citta.quartieri[n] = clona(b.citta.quartieri[n]); } });
+    for (const cat of Object.keys(TIPI)) for (const [n, p] of Object.entries(lay.spostati[cat] || {})) {
+      const nuovo = !(n in (P[cat] || {}));
+      out.push({ testo: (p === null ? "Tolto " : nuovo ? "Aggiunto " : "Spostato ") + TIPI[cat].nome.toLowerCase() + ": " + leggibile(n), vai: p || P[cat][n], sotto: TIPI[cat].livello,
+        annulla: () => { delete lay.spostati[cat][n]; if (nuovo && lay.schede?.[cat]) delete lay.schede[cat][n]; } });
+    }
+    for (const cat of Object.keys(TIPI)) for (const [n, sc] of Object.entries(lay.schede?.[cat] || {})) {
+      const piena = sc.descrizione || sc.terreno || (sc.contenuto || []).length || sc.grandezza;
+      if (piena && n in (P[cat] || {})) out.push({ testo: "Scheda di " + leggibile(n) + " compilata", vai: posDi(cat, n), sotto: TIPI[cat].livello, annulla: () => { delete lay.schede[cat][n]; } });
+    }
+    tratti.forEach((t) => out.push({ testo: { pennello: "Pennellata di " + nomeTerreno(t.terreno), strada: "Strada", fiume: "Fiume", galleria: "Galleria scavata", riempi: "Galleria chiusa" }[t.tipo] + ` (${t.punti.length} punti)`,
+      vai: t.punti[Math.floor(t.punti.length / 2)], sotto: t.livello, annulla: () => { tratti = tratti.filter((q) => q !== t); } }));
+    lay.note.forEach((n) => out.push({ testo: "Nota: " + (n.testo || "(vuota)").slice(0, 60), vai: [n.x, n.y], sotto: n.livello || "sopra", annulla: () => { lay.note = lay.note.filter((q) => q !== n); } }));
+    return out;
+  }
+  function pannelloRegistro(p) {
+    const voci = registro();
+    metti(p, crea("h2", { testo: "Le tue modifiche" }));
+    if (!voci.length) { metti(p, crea("p", { classe: "vuoto", testo: "Nessuna modifica: la mappa è quella generata. Ogni cosa che sposti, aggiungi o dipingi comparirà qui." })); return; }
+    const ul = crea("ul", { classe: "lista" });
+    voci.forEach((v) => ul.append(crea("li", {}, crea("div", {}, crea("div", { testo: v.testo })),
+      crea("div", { classe: "azioni" },
+        v.vai ? crea("button", { classe: "tasto", testo: "Vai", onclick: () => { if (v.sotto && v.sotto !== livello) impostaLivello(v.sotto === "sotto" ? "sotto" : "sopra"); centra(v.vai[0], v.vai[1]); disegna(); } }) : null,
+        crea("button", { classe: "tasto", testo: "Annulla", onclick: () => { ricorda(); v.annulla(); sel = null; cambiato(); } })))));
+    const conf = crea("div", { classe: "conferma", id: "rip" }, crea("button", { classe: "tasto pericolo", testo: "Togli tutte le modifiche", onclick: chiediRipristino }));
+    metti(p, ul, conf);
+  }
+  function chiediRipristino() {
+    const box = $("rip"); box.replaceChildren(crea("span", { testo: "Tornare alla mappa generata, senza note né tratti?" }),
+      crea("button", { classe: "tasto pericolo", testo: "Sì, togli tutto", onclick: () => { ricorda(); lay = baseLayout(); tratti = []; sel = null; cambiato(); } }),
+      crea("button", { classe: "tasto", testo: "No", onclick: () => aggiornaPannello() }));
+  }
+  function pannelloMisure(p) {
+    const righe = gen.REG.slice(1).map((n, k) => [n, gen.conta[k + 1] / P.schermata]).filter(([, v]) => v >= 1).sort((a, b) => b[1] - a[1]);
+    const g = crea("div", { classe: "misure" }, crea("span", { classe: "testa", testo: "zona" }), crea("span", { classe: "testa num", testo: "ora" }), crea("span", { classe: "testa num", testo: "inizio" }));
+    let tot = 0;
+    righe.forEach(([n, v]) => { tot += v; const pr = P.misure[n]; g.append(crea("span", { testo: leggibile(n) }), crea("span", { classe: "num", testo: Math.round(v) }), crea("span", { classe: pr != null && Math.round(pr) !== Math.round(v) ? "delta" : "num", testo: pr != null ? Math.round(pr) : "nuova" })); });
+    g.append(crea("span", { testo: "superficie, totale" }), crea("span", { classe: "num", testo: Math.round(tot) }), crea("span", { classe: "num", testo: P.superficie }),
+      crea("span", { testo: "città di Mirwada" }), crea("span", { classe: "num", testo: Math.round(gen.citta) }), crea("span", { classe: "num", testo: P.citta }),
+      crea("span", { testo: "sottosuolo" }), crea("span", { classe: "num", testo: "—" }), crea("span", { classe: "num", testo: P.sottosuolo }));
+    metti(p, crea("h2", { testo: "Misure dal vivo" }), g,
+      crea("p", { classe: "aiuto", testo: "In schermate di gioco (20×11 tile a 64 px), calcolate sull'anteprima. Il sottosuolo si ricalcola quando Claude rigenera la mappa." }));
+  }
+  function centra(x, y) { const r = piano.getBoundingClientRect(); vista.s = Math.max(vista.s, 2.5); vista.ox = r.width / 2 - x * vista.s; vista.oy = r.height / 2 - y * vista.s; }
+
+  // =====================================================================================
+  // INPUT
+  // =====================================================================================
   let trascino = null;
-  tela.addEventListener("pointerdown", (ev) => {
-    const r = tela.getBoundingClientRect(), sx = ev.clientX - r.left, sy = ev.clientY - r.top;
-    const [mx, my] = aMondo(sx, sy);
-    tela.setPointerCapture(ev.pointerId);
-    if (modo === "aggiungi") { aggiungiQui(mx, my); return; }
-    if (modo === "nota") { aggiungiNota(mx, my); return; }
-    const e = trova(sx, sy);
-    if (e) { sel = e; trascino = { tipo: "elemento", e, fatto: false }; aggiornaPannello(); disegna(); }
-    else { trascino = { tipo: "vista", sx, sy, ox: vista.ox, oy: vista.oy }; tela.classList.add("trascina"); }
-  });
-  tela.addEventListener("pointermove", (ev) => {
-    if (!trascino) return;
-    const r = tela.getBoundingClientRect(), sx = ev.clientX - r.left, sy = ev.clientY - r.top;
-    if (trascino.tipo === "vista") { vista.ox = trascino.ox + sx - trascino.sx; vista.oy = trascino.oy + sy - trascino.sy; disegna(); return; }
-    if (!trascino.fatto) { ricorda(); trascino.fatto = true; }
-    const [mx, my] = aMondo(sx, sy);
-    sposta(trascino.e, mx, my); disegna();
-  });
-  const fine = () => {
-    if (trascino && trascino.tipo === "elemento" && trascino.fatto) cambiato();
-    trascino = null; tela.classList.remove("trascina");
-  };
-  tela.addEventListener("pointerup", fine); tela.addEventListener("pointercancel", fine);
-  tela.addEventListener("wheel", (ev) => { ev.preventDefault(); const r = tela.getBoundingClientRect(); zoom(ev.deltaY < 0 ? 1.2 : 1 / 1.2, ev.clientX - r.left, ev.clientY - r.top); }, { passive: false });
-  $("z-piu").onclick = () => zoom(1.4); $("z-meno").onclick = () => zoom(1 / 1.4); $("z-tutto").onclick = adatta;
-  $("liv-sopra").onclick = () => impostaLivello("sopra"); $("liv-sotto").onclick = () => impostaLivello("sotto");
-  const modi = { sposta: "mod-sposta", aggiungi: "mod-aggiungi", nota: "mod-nota" };
-  Object.entries(modi).forEach(([m, id]) => $(id).onclick = () => {
-    modo = m; Object.values(modi).forEach((i) => $(i).setAttribute("aria-pressed", i === id));
-    tela.classList.toggle("aggiungi", m !== "sposta");
-  });
-  $("vis-confini").onclick = () => { confini = !confini; $("vis-confini").setAttribute("aria-pressed", confini); if (confini) calcolaConfini(); disegna(); };
-  $("vis-nomi").onclick = () => { nomi = !nomi; $("vis-nomi").setAttribute("aria-pressed", nomi); disegna(); };
-  $("annulla").onclick = () => { if (!storia.length) return; lay = storia.pop(); $("annulla").disabled = !storia.length; sel = null; if (confini) calcolaConfini(); cambiato(); };
-  $("citta-raggio").addEventListener("change", (ev) => { ricorda(); lay.citta.raggio = Math.max(30, Math.min(110, Math.round(+ev.target.value || 55))); cambiato(); });
-  function ripristinoChiedi() {
-    const box = $("ripristino"); box.replaceChildren();
-    const t = document.createElement("span"); t.textContent = "Togliere tutte le tue modifiche e note?";
-    const si = document.createElement("button"); si.className = "tasto pericolo"; si.textContent = "Sì, togli tutto";
-    const no = document.createElement("button"); no.className = "tasto"; no.textContent = "No";
-    const chiudi = () => {
-      box.replaceChildren();
-      const b = document.createElement("button"); b.className = "tasto pericolo"; b.id = "rip-chiedi";
-      b.textContent = "Torna alla mappa generata"; b.onclick = ripristinoChiedi; box.append(b);
-    };
-    si.onclick = () => {
-      ricorda(); lay = clona(base.layout);
-      lay.spostati = { luoghi: {}, villaggi: {}, ingressi: {}, boss: {} }; lay.note = [];
-      sel = null; if (confini) calcolaConfini(); cambiato(); chiudi();
-    };
-    no.onclick = chiudi;
-    box.append(t, si, no);
+  function lettura(sx, sy) {
+    const [mx, my] = aMondo(sx, sy), x = Math.floor(mx), y = Math.floor(my);
+    const el = $("lettura");
+    if (!gen || x < 0 || y < 0 || x >= P.W || y >= P.H) { el.textContent = "Fuori dalla mappa."; return; }
+    const i = y * P.W + x, t = P.terreni[gen.g[i]], c = P.colori[gen.g[i]];
+    const zona = gen.REG[gen.reg[i]] || "mare", q = gen.Q[i] >= 0 ? gen.nomiQ[gen.Q[i]] : null;
+    el.replaceChildren(crea("span", {}, crea("span", { classe: "campione", style: `background:rgb(${c})` }), crea("b", { testo: livello === "sopra" ? nomeTerreno(t) : "sottosuolo" })),
+      crea("span", { testo: "zona: " + leggibile(zona) + (q ? " · " + leggibile(q) : "") }), crea("span", { testo: `tile ${x}, ${y}` }));
   }
-  $("rip-chiedi").onclick = ripristinoChiedi;
-  document.addEventListener("keydown", (ev) => {
-    if (ev.target.closest("input, textarea, select")) return;
-    if ((ev.key === "Delete" || ev.key === "Backspace") && sel) { ev.preventDefault(); cancellaSelezione(); }
-    if ((ev.ctrlKey || ev.metaKey) && ev.key === "z") { ev.preventDefault(); $("annulla").click(); }
-  });
-  new ResizeObserver(() => disegna()).observe(piano);
+  function puntoMondo(ev) { const r = tela.getBoundingClientRect(); const sx = ev.clientX - r.left, sy = ev.clientY - r.top; return [sx, sy, ...aMondo(sx, sy)]; }
+  function setup() {
+    tela.addEventListener("pointerdown", (ev) => {
+      if (!gen || ev.button > 0) return;
+      const [sx, sy, mx, my] = puntoMondo(ev);
+      tela.setPointerCapture(ev.pointerId);
+      if (attrezzo === "aggiungi") return aggiungiQui(mx, my);
+      if (attrezzo === "nota") return aggiungiNota(mx, my);
+      if (["pennello", "galleria", "riempi"].includes(attrezzo)) { nuovoTratto(attrezzo, mx, my); trascino = { tipo: "pittura" }; disegna(); return; }
+      if (attrezzo === "strada" || attrezzo === "fiume") { if (!tratto) nuovoTratto(attrezzo, mx, my); else tratto.punti.push([Math.round(mx), Math.round(my)]); aggiornaPannello(); disegna(); return; }
+      const e = trova(sx, sy);
+      if (e && (attrezzo === "seleziona" || e.tipo === "quartiere" || e.tipo === "citta")) { sel = e; trascino = { tipo: "elemento", e, fatto: false }; impostaTab("scheda"); disegna(); }
+      else { trascino = { tipo: "vista", sx, sy, ox: vista.ox, oy: vista.oy }; tela.classList.add("trascina"); }
+    });
+    tela.addEventListener("pointermove", (ev) => {
+      const [sx, sy, mx, my] = puntoMondo(ev);
+      mouse = { sx, sy }; lettura(sx, sy);
+      if (!trascino) { if (["pennello", "galleria", "riempi", "strada", "fiume"].includes(attrezzo)) disegna(); return; }
+      if (trascino.tipo === "vista") { vista.ox = trascino.ox + sx - trascino.sx; vista.oy = trascino.oy + sy - trascino.sy; disegna(); return; }
+      if (trascino.tipo === "pittura") { const u = tratto.punti[tratto.punti.length - 1]; if (Math.hypot(mx - u[0], my - u[1]) >= Math.max(1, tratto.r * 0.6)) tratto.punti.push([Math.round(mx), Math.round(my)]); disegna(); return; }
+      if (!trascino.fatto) { ricorda(); trascino.fatto = true; }
+      sposta(trascino.e, mx, my);
+      if (tocca(trascino.e)) rigenera(); else disegna();
+    });
+    const fine = () => {
+      if (trascino?.tipo === "pittura") { const t = tratto; tratto = null; if (t?.punti.length) { ricorda(); tratti.push(t); cambiato(); } }
+      else if (trascino?.tipo === "elemento" && trascino.fatto) { if (tocca(trascino.e)) cambiato(); else cambiato(false); }
+      trascino = null; tela.classList.remove("trascina");
+    };
+    tela.addEventListener("pointerup", fine); tela.addEventListener("pointercancel", fine);
+    tela.addEventListener("pointerleave", () => { mouse = null; if (!trascino) disegna(); });
+    tela.addEventListener("dblclick", () => { if (tratto && (attrezzo === "strada" || attrezzo === "fiume")) { tratto.punti.pop(); finisciTratto(true); } });
+    tela.addEventListener("wheel", (ev) => {
+      ev.preventDefault(); const r = tela.getBoundingClientRect();
+      if (ev.altKey && attrezzo === "pennello") { pennR = Math.max(0, Math.min(40, pennR + (ev.deltaY < 0 ? 1 : -1))); aggiornaPannello(); disegna(); return; }
+      zoom(ev.deltaY < 0 ? 1.2 : 1 / 1.2, ev.clientX - r.left, ev.clientY - r.top);
+    }, { passive: false });
+    $("z-piu").onclick = () => zoom(1.4); $("z-meno").onclick = () => zoom(1 / 1.4); $("z-tutto").onclick = adatta;
+    $("liv-sopra").onclick = () => impostaLivello("sopra"); $("liv-sotto").onclick = () => impostaLivello("sotto");
+    $("vis-confini").onclick = () => { confini = !confini; $("vis-confini").setAttribute("aria-pressed", confini); superficieCanvas = immagineDa(gen); disegna(); };
+    $("vis-nomi").onclick = () => { nomi = !nomi; $("vis-nomi").setAttribute("aria-pressed", nomi); disegna(); };
+    const prima = $("vis-prima");
+    const on = () => { if (!genBase) { genBase = genera(baseLayout(), []); } primaCanvas = immagineDa(genBase); mostraPrima = true; prima.setAttribute("aria-pressed", "true"); disegna(); };
+    const off = () => { mostraPrima = false; prima.setAttribute("aria-pressed", "false"); disegna(); };
+    prima.addEventListener("pointerdown", on); prima.addEventListener("pointerup", off); prima.addEventListener("pointerleave", off);
+    prima.addEventListener("keydown", (ev) => { if (ev.key === " " || ev.key === "Enter") { ev.preventDefault(); on(); } });
+    prima.addEventListener("keyup", off);
+    $("annulla").onclick = () => { if (!storia.length) return; futuro.push(istantanea()); ripristina(storia.pop()); aggiornaStoria(); };
+    $("rifai").onclick = () => { if (!futuro.length) return; storia.push(istantanea()); ripristina(futuro.pop()); aggiornaStoria(); };
+    ["scheda", "registro", "misure"].forEach((t) => $("tab-" + t).onclick = () => impostaTab(t));
+    document.addEventListener("keydown", (ev) => {
+      if (ev.target.closest("input, textarea, select")) return;
+      if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === "z") { ev.preventDefault(); (ev.shiftKey ? $("rifai") : $("annulla")).click(); return; }
+      if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === "y") { ev.preventDefault(); $("rifai").click(); return; }
+      if (ev.key === "Enter" && tratto) { finisciTratto(true); return; }
+      if (ev.key === "Escape") { if (tratto) finisciTratto(false); else { sel = null; aggiornaPannello(); disegna(); } return; }
+      if ((ev.key === "Delete" || ev.key === "Backspace") && sel) { ev.preventDefault(); cancella(); return; }
+      const a = ATTREZZI.find((q) => q[2].toLowerCase() === ev.key.toLowerCase());
+      if (a && !ev.ctrlKey && !ev.metaKey && a[3].includes(livello)) impostaAttrezzo(a[0]);
+    });
+    new ResizeObserver(() => disegna()).observe(piano);
+  }
+  function baseLayout() {
+    const b = clona(P.layout);
+    b.spostati = Object.assign({ luoghi: {}, villaggi: {}, ingressi: {}, boss: {} }, b.spostati || {});
+    b.schede = Object.assign({ luoghi: {}, villaggi: {}, ingressi: {}, boss: {} }, b.schede || {});
+    b.note = b.note || []; delete b.tratti;
+    return b;
+  }
 
-  // ---------- avvio ----------
-  async function avvio() {
-    try {
-      const r = await fetch("punti.json"); base = await r.json();
-    } catch (e) { stato("Non riesco a caricare i dati della mappa. Ricarica la pagina.", "attenzione"); return; }
-    lay = clona(base.layout);
-    lay.spostati = Object.assign({ luoghi: {}, villaggi: {}, ingressi: {}, boss: {} }, lay.spostati || {});
-    lay.note = lay.note || [];
-    await Promise.all(["sopra", "sotto"].map((k) => new Promise((ok) => { img[k].onload = ok; img[k].onerror = ok; img[k].src = k === "sopra" ? "superficie.png" : "sottosuolo.png"; })));
-    try { preparaTerra(); } catch (e) { terraMask = null; }
-    misure(); legenda(); adatta(); aggiornaPannello();
-    stato("Pronta. Le modifiche si salvano da sole.");
-    try {
-      db = await (window.claude?.use ? window.claude.use("db") : Promise.resolve(null));
-      const user = await (window.claude?.use ? window.claude.use("user") : Promise.resolve(null));
-      if (user && user.can && (await user.can("data.write")) === false) { sola = true; stato("Sola lettura: puoi guardare ma non salvare modifiche.", "attenzione"); }
-      if (db) {
-        docRef = db.doc("mappa/layout");
-        docRef.onSnapshot((snap) => {
-          if (!snap.exists || trascino || sporco || inSalvataggio) return;
-          const d = snap.data();
-          lay = clona({ terra: d.terra, mezzo: d.mezzo, isole: d.isole, citta: d.citta,
-            spostati: Object.assign({ luoghi: {}, villaggi: {}, ingressi: {}, boss: {} }, d.spostati || {}), note: d.note || [] });
-          if (confini) calcolaConfini();
-          aggiornaPannello(); disegna();
-          if (!sola) stato("Modifiche caricate" + (d.aggiornato ? " (salvate " + new Date(d.aggiornato).toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" }) + ")" : "") + ".", "ok");
-        }, () => stato("Collegamento al database interrotto: ricarica la pagina prima di altre modifiche.", "attenzione"));
-      } else stato("Database non disponibile: puoi provare le modifiche, ma non restano salvate.", "attenzione");
-    } catch (e) { stato("Database non disponibile: puoi provare le modifiche, ma non restano salvate.", "attenzione"); }
+  // =====================================================================================
+  // AVVIO
+  // =====================================================================================
+  async function caricaRumore(nome) {
+    const im = new Image(); im.src = "rumore_" + nome + ".png";
+    await im.decode();
+    const c = document.createElement("canvas"); c.width = P.W; c.height = P.H;
+    const g2 = c.getContext("2d", { willReadFrequently: true }); g2.drawImage(im, 0, 0);
+    const d = g2.getImageData(0, 0, P.W, P.H).data, out = new Float64Array(P.W * P.H);
+    for (let i = 0; i < out.length; i++) out[i] = d[i * 4] / 255;
+    return out;
   }
+  async function avvio() {
+    tela = $("tela"); ctx = tela.getContext("2d"); piano = $("piano");
+    costruisciAttrezzi(); setup(); impostaAttrezzo("seleziona");
+    try {
+      P = await (await fetch("punti.json")).json();
+      const nomiR = ["e", "m", "d", "n1", "n2", "rq"];
+      const arr = await Promise.all(nomiR.map(caricaRumore));
+      RU = {}; nomiR.forEach((n, k) => (RU[n] = arr[k]));
+      img.sotto.src = "sottosuolo.png"; await img.sotto.decode().catch(() => {});
+    } catch (e) { stato("Non riesco a caricare la mappa: ricarica la pagina.", "attenzione"); return; }
+    lay = baseLayout(); tratti = clona(P.layout.tratti || []);
+    adatta(); rigenera(true);
+    stato("Pronta. Ogni modifica si vede subito e si salva da sola.");
+    try {
+      db = window.claude?.use ? await window.claude.use("db") : null;
+      if (!db) { stato("Database non disponibile: puoi provare tutto, ma le modifiche non restano salvate.", "attenzione"); return; }
+      docRef = db.doc("mappa/layout"); trattiRef = db.collection("tratti");
+      let primoLay = true, primoTr = true;
+      docRef.onSnapshot((snap) => {
+        if (!snap.exists || trascino || (inAttesa && Date.now() - inAttesa < 5000) || salvando) return;
+        const d = snap.data();
+        lay = Object.assign(baseLayout(), clona({ terra: d.terra, mezzo: d.mezzo, isole: d.isole, citta: d.citta, note: d.note || [] }));
+        lay.spostati = Object.assign({ luoghi: {}, villaggi: {}, ingressi: {}, boss: {} }, d.spostati || {});
+        lay.schede = Object.assign({ luoghi: {}, villaggi: {}, ingressi: {}, boss: {} }, d.schede || {});
+        if (!lay.citta.quartieri) lay.citta.quartieri = clona(P.layout.citta.quartieri);
+        rigenera(true);
+        if (primoLay) { primoLay = false; stato("Ho ricaricato le tue modifiche salvate" + (d.aggiornato ? " (" + new Date(d.aggiornato).toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" }) + ")" : "") + ".", "ok"); }
+      }, () => stato("Collegamento al database interrotto: ricarica la pagina prima di altre modifiche.", "attenzione"));
+      trattiRef.onSnapshot((snap) => {
+        if (trascino || tratto || (inAttesa && Date.now() - inAttesa < 5000) || salvando) return;
+        const lista = snap.docs.map((d) => d.data()).filter((t) => t && t.id);
+        trattiSalvati = new Map(lista.map((t) => [t.id, JSON.stringify(t)]));
+        if (primoTr || lista.length) { tratti = clona(lista); primoTr = false; rigenera(true); }
+      }, () => {});
+    } catch (e) { stato("Database non disponibile: puoi provare tutto, ma le modifiche non restano salvate.", "attenzione"); }
+  }
+  window.__tavolo = { gen: () => gen, lay: () => lay };   // per i test automatici: solo lettura
   avvio();
 })();
 </script>

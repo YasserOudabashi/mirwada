@@ -8254,3 +8254,19 @@ vedo che terreno avra'"). Rifacimento v2, risposte dell'utente:
   luogo) e tratti di superficie (pennello, strada, fiume); gallerie del
   sottosuolo (galleria scava, riempi chiude); punti.json con terreni,
   colori e regioni. Citta' ora 62 schermate (quartieri fino a 1,3 raggi).
+
+## Tavolo tattico v2 (parte 2) — pagina nuova, 2026-10-14
+- arte/tavolo/tavolo_tattico.html riscritta: la pagina ricalcola la mappa in JavaScript con le stesse formule di
+  build_world.genera() sulle mappe di rumore esportate (rumore_*.png). Pubblicata sullo stesso URL
+  https://claude.ai/artifact/BzQW6TSVr4Snk6v2x7fpvf (versione 2, capability db).
+- Verifica (Chromium headless, seed 6): zone uguali al 100%, terreni uguali al 99,83%; le 2012 celle diverse sono
+  solo fiumi e strade, che l'anteprima non ricalcola (li fa il Python). Città 62 schermate come in Python.
+- Prove simulate: trascino una zona (ridisegno ~1,7-2,3 s), aggiungo un luogo con scheda (descrizione, grandezza,
+  terreno, contenuto), pennellata, registro modifiche, Ctrl+Z, strumento Città, sottosuolo. Nessun errore JS.
+- Bug trovati e corretti in prova: scheda del luogo nuovo che si chiudeva (cercava la posizione nell'anteprima vecchia),
+  confini delle zone invisibili (condizione sbagliata, poi 1 tile spariva da lontano: ora 2), "nullnull" nei pannelli.
+- Salvataggio: doc mappa/layout (terra, mezzo, isole, citta con quartieri, spostati, schede, note) + collezione
+  "tratti" (un documento per tratto). Quando l'utente dice "fatto": leggere entrambi, scriverli in
+  tools/art/layout_mondo.json (tratti -> chiave "tratti"), rilanciare build_world.py, ripubblicare.
+- Nel db c'erano 4 isole di prova della v1 (isola_nuova_18..21, una sulla terra ferma): lasciate, l'utente decide.
+- Aperto: l'anteprima non disegna fiumi, strade e alberi; il sottosuolo resta l'immagine del Python con i tratti sopra.
