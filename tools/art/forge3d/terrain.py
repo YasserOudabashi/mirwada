@@ -68,7 +68,7 @@ TERRAINS = {
                          level=0.6, anim=4, cresta="grey"),
     "sand": dict(ramp=["tan", "cream", "cream", "skin_l"], period=4, dither=0.5, detail="dots", rim="dark", rimc="orange_d", level=2),
     "mud": dict(ramp=["brown_dd", "brown_d", "brown_d", "brown"], period=3, dither=0.6, detail="puddles", rim="dark", level=3),
-    "grass": dict(ramp=["green_d", "green_m", "green_m", "green"], period=4, dither=0.5, detail="tufts", rim="dark", rimc="green_d", level=4,
+    "grass": dict(fiori=["white", "yellow", "pink"], ramp=["green_d", "green_m", "green_m", "green"], period=4, dither=0.5, detail="tufts", rim="dark", rimc="green_d", level=4,
                   contrast=0.45),
     "dry_grass": dict(ramp=["brown_d", "#8a7a38", "#b3a050", "#cdbb64"], period=4, dither=0.5, detail="tufts", rim="dark", rimc="brown", level=5, contrast=0.45),
     "forest": dict(ramp=["teal_d", "green_d", "green_d", "green_m"], period=4, dither=0.5, detail="leaves", rim="dark", rimc="teal_d", level=6, contrast=0.45),
@@ -278,9 +278,11 @@ def _texture(name, S, Z, seed, frame, nframes, variante):
         for _ in range(Z * Z // 22):
             px, py = rng.randint(Z), rng.randint(Z)
             put(px, py, 0); put(px, py - 1, n - 1) if rng.rand() < .7 else None
-        for _ in range(Z * Z // 160):
-            px, py = rng.randint(Z), rng.randint(Z)
-            img[py, px] = _rgb(["white", "yellow", "pink", "cyan"][rng.randint(4)]) if name == "grass" else img[py, px]
+        fiori = d.get("fiori", [])                         # fiorellini di 3 pixel, rari (prima puntini singoli)
+        for _ in range(Z * Z // 700 if fiori else 0):
+            px, py, c = rng.randint(Z), rng.randint(Z), _rgb(fiori[rng.randint(len(fiori))])
+            img[py % Z, px % Z] = img[py % Z, (px + 1) % Z] = img[(py - 1) % Z, px % Z] = c
+            img[(py + 1) % Z, px % Z] = _rgb(ramp[0])
     elif detail == "leaves":
         for _ in range(Z * Z // 30):
             px, py = rng.randint(Z), rng.randint(Z)

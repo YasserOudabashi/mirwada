@@ -8582,3 +8582,12 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   contrasto 0.32).
 - Verificato: confronto sand / sabbia_bianca / snow affiancati; isola dei pirati e spiazzo della torre nel mondo;
   md5 uguale su due lanci; validate 0; campioni_terreni rigenerato.
+
+[2026-10-14] Revisione arte 3.11 (fiori nell'erba) e 3.12 (ombre degli oggetti). FATTO.
+- terrain.py: tufts con campo "fiori" (grass: white, yellow, pink): fiorellini di 3 pixel con il gambo scuro, uno
+  ogni 700 px quadrati (prima un pixel singolo, anche ciano, ogni 160). Tolto il controllo sul nome "grass".
+- engine.render: parametri shadow_off (spostamento in frazioni dei raggi) e shadow_a (alpha); default uguali a
+  prima, personaggi invariati. worldrender: ombre degli oggetti alpha 80, spostate (0.25, 0.3) in basso a destra,
+  raggi per tipo (alberi 0.15/0.055, palme 0.12/0.045, secchi 0.06/0.03, rocce 0.3/0.12).
+- Verificato: campione con 4 alberi e una roccia su erba x3; galleria di alberi a dimensione vera; md5 uguale su
+  due lanci; validate 0; campioni_terreni rigenerato.

@@ -291,14 +291,18 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   quota più basso (cordolo di pietra ai lati, gradino dove comincia), grate di metallo (`lamiera`) agli
   incroci; il canale non tocca mai la roccia e non passa sotto ingressi e boss.
 
-### 🟢 3.11 Puntini colorati nell'erba
+### ✅ 3.11 Puntini colorati nell'erba — FATTO (2026-10-14)
 - Pixel singoli ciano, rosa e bianchi sparsi: a dimensione vera sporcano.
   **Correggere:** fiori a gruppetti di 2–3 pixel, colori della regione, meno frequenti.
+  **Fatto:** fiorellini di 3 pixel (bianco, giallo, rosa; niente ciano), uno ogni 700 pixel quadrati invece di
+  uno ogni 160, colori nel campo `fiori` della riga del terreno.
 
-### 🟢 3.12 Ombre degli oggetti
+### ✅ 3.12 Ombre degli oggetti — FATTO (2026-10-14)
 - Ellisse uguale per tutti, 4 volte più larga del tronco per gli alberi secchi, scura.
   **Correggere:** ombra in proporzione all'oggetto, più chiara, spostata verso il basso a
   destra (luce in alto a sinistra).
+  **Fatto:** `render(shadow_off, shadow_a)` (default invariati per i personaggi); oggetti con ombra alpha 80
+  spostata in basso a destra, larga quanto la chioma (secchi: quanto il tronco; palme più strette).
 
 ### 🟢 3.13 Strade della città tutte a griglia
 - Anche il centro antico e i bassifondi sono una scacchiera perfetta.

@@ -203,7 +203,8 @@ def _tex(tex, pl):
 
 def render(insts, size=(32, 32), ppu=1.0, ss=4, pitch=32.0, foot=(0.5, 0.9), light=LIGHT,
            outline="selout", outline_color="#181425", inner_lines=True, inner_thr=1.0,
-           cleanup=True, shadow=True, shadow_r=(0.34, 0.14), cover=0.4, levels_bias=0.0,
+           cleanup=True, shadow=True, shadow_r=(0.34, 0.14), cover=0.4, levels_bias=0.0, shadow_off=(0.0, 0.0),
+           shadow_a=105,
            ambient=0.12, mat_resolver=None):
     """Disegna le forme e ritorna un array RGBA uint8 (H, W, 4).
 
@@ -328,7 +329,7 @@ def render(insts, size=(32, 32), ppu=1.0, ss=4, pitch=32.0, foot=(0.5, 0.9), lig
         fin = _cleanup(fin, mats)
 
     return _compose(fin, depth, mats, W, H, ppu, foot, outline, outline_color, inner_lines, inner_thr,
-                    shadow, shadow_r)
+                    shadow, shadow_r, shadow_off, shadow_a)
 
 
 def _neigh4(a, fill=-1):
@@ -359,7 +360,7 @@ def _cleanup(fin, mats):
 
 
 def _compose(fin, depth, mats, W, H, ppu, foot, outline, outline_color, inner_lines, inner_thr,
-             shadow, shadow_r):
+             shadow, shadow_r, shadow_off=(0.0, 0.0), shadow_a=105):
     rgba = np.zeros((H, W, 4), np.uint8)
     opaque = fin >= 0
     mi = np.where(opaque, fin // MAXLV, 0)
@@ -413,10 +414,10 @@ def _compose(fin, depth, mats, W, H, ppu, foot, outline, outline_color, inner_li
 
     if shadow:
         W_, H_ = W, H
-        cx, cy = foot[0] * W_, foot[1] * H_
         rx, ry = shadow_r[0] * W_, shadow_r[1] * W_
+        cx, cy = foot[0] * W_ + shadow_off[0] * rx, foot[1] * H_ + shadow_off[1] * ry   # spostata via dalla luce
         yy, xx = np.mgrid[0:H_, 0:W_]
         e = ((xx + 0.5 - cx) / rx) ** 2 + ((yy + 0.5 - cy) / ry) ** 2 <= 1.0
         free = e & (rgba[..., 3] == 0)
-        rgba[free] = (24, 20, 37, 105)
+        rgba[free] = (24, 20, 37, shadow_a)
     return rgba

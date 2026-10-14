@@ -38,8 +38,11 @@ def object_sprite(o, S=TILE):
         cw, ch, foot = S, S, 0.5
     else:
         return None
+    # ombra in proporzione all'oggetto (chioma, tronco, sasso), chiara e spostata in basso a destra (luce in alto a
+    # sinistra): revisione 3.12
+    sr = {"dead": (0.06, 0.03), "palm": (0.12, 0.045)}.get(o.get("kind"), (0.15, 0.055)) if t == "tree" else (0.3, 0.12)
     img = render(r.instances({}, 180), size=(cw, ch), ppu=1.0, foot=(0.5, foot), shadow=(t not in ("bridge", "scoglio")),
-                 shadow_r=(0.15, 0.055) if t == "tree" else (0.34, 0.14))     # ombra grande quanto la chioma
+                 shadow_r=sr, shadow_off=(0.25, 0.3), shadow_a=80)
     if t == "scoglio":
         img = _sommerso(img, int(ch * foot) - max(2, int(3 * k)), o["seed"])
     _cache[key] = (img, cw // 2, int(ch * foot))
