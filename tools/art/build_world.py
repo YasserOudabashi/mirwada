@@ -704,7 +704,7 @@ def _scritta(dr, font, x, y, s, c=(255, 255, 255)):
     dr.text((x, y), s, fill=c, font=font)
 
 
-def anteprima(w, luoghi, villaggi, k=1, etichette=True):
+def anteprima(w, luoghi, villaggi, k=1, etichette=True, segni=True):
     col = colori_terreni()
     img = col[w.ground].copy()
     reg = w.biome
@@ -718,6 +718,8 @@ def anteprima(w, luoghi, villaggi, k=1, etichette=True):
     im = Image.fromarray(img).resize((W * k, H * k), Image.NEAREST)
     dr = ImageDraw.Draw(im)
     font = ImageFont.load_default()
+    if not segni:                                     # sfondo pulito per il tavolo tattico
+        return im
     for i, rid in enumerate(REGIONI[1:len(TERRA) + 2], start=1):
         ys, xs = np.nonzero(reg == i)
         if len(xs):
@@ -737,7 +739,7 @@ def anteprima(w, luoghi, villaggi, k=1, etichette=True):
     return im
 
 
-def anteprima_sotto(w, sotto, k=1):
+def anteprima_sotto(w, sotto, k=1, segni=True):
     col = colori_terreni()
     img = col[sotto["ground"]].copy()
     img[~sotto["pavimento"]] = (14, 12, 22)
@@ -745,6 +747,8 @@ def anteprima_sotto(w, sotto, k=1):
     bordo = (costa != sposta(costa, 1, 0)) | (costa != sposta(costa, 0, 1))
     img[bordo] = (70, 70, 90)                       # la costa di sopra, per orientarsi
     im = Image.fromarray(img).resize((W * k, H * k), Image.NEAREST)
+    if not segni:
+        return im
     dr = ImageDraw.Draw(im)
     font = ImageFont.load_default()
     for nome, (x, y) in sotto["ingressi"].items():
@@ -785,6 +789,24 @@ def anteprima_citta(w, luoghi, k=4):
             _scritta(dr, font, X + 8, Y - 6, nome)
     _scritta(dr, font, 8, 6, f"MIRWADA   {int(w.citta.sum()) / SCHERMATA:.0f} schermate di citta'   1 tile = {k} px")
     return im
+
+
+TAVOLO = os.path.join(ROOT, "arte", "tavolo")
+
+
+def esporta_tavolo(w, luoghi, villaggi, sotto):
+    """File per l'artifact 'tavolo tattico': due sfondi puliti e i punti suggeriti dal generatore."""
+    os.makedirs(TAVOLO, exist_ok=True)
+    anteprima(w, luoghi, villaggi, segni=False).save(os.path.join(TAVOLO, "superficie.png"))
+    anteprima_sotto(w, sotto, segni=False).save(os.path.join(TAVOLO, "sottosuolo.png"))
+    righe, tot, sotto_tot = misure(w, sotto)
+    punti = {"W": W, "H": H, "HC": HC, "seed": w.seed, "schermata": SCHERMATA,
+             "luoghi": luoghi, "villaggi": villaggi, "ingressi": sotto["ingressi"], "boss": sotto["boss"],
+             "misure": {n: round(v, 1) for n, v in righe}, "superficie": round(tot), "sottosuolo": round(sotto_tot),
+             "citta": round(int(w.citta.sum()) / SCHERMATA),
+             "layout": {k: LAYOUT[k] for k in ("terra", "mezzo", "isole", "citta", "spostati", "note")}}
+    with open(os.path.join(TAVOLO, "punti.json"), "w", encoding="utf-8") as f:
+        json.dump(punti, f, ensure_ascii=False, separators=(",", ":"))
 
 
 def misure(w, sotto):
@@ -831,6 +853,7 @@ def main():
     anteprima(w, luoghi, villaggi).save(os.path.join(OUT, "mondo_prova.png"))
     anteprima_sotto(w, sotto).save(os.path.join(OUT, "sottosuolo_prova.png"))
     anteprima_citta(w, luoghi).save(os.path.join(OUT, "mirwada_citta.png"))
+    esporta_tavolo(w, luoghi, villaggi, sotto)
     if not a.senza_ritagli:
         atl = {n: build_atlas(n, 32) for n in ORDER}
         for nome in ("porto", "passo_tra_rupi", "rovine_del_boss", "galleria_di_alberi", "approdo_frontiera",

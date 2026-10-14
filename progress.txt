@@ -8212,3 +8212,22 @@ Domande su isola ghiacciata e sottosuolo (round 3-4):
   quartieri a spicchi geometrici; diga fuori inquadratura e poi staccata
   dalla costa (ora parte dalla punta ovest vera); mercato sopra il cantiere.
 - Verificato: md5 identico su due lanci; validate exit 0.
+
+[2026-10-14] Artifact "Tavolo tattico di Mirwada". PUBBLICATO.
+- URL: https://claude.ai/artifact/BzQW6TSVr4Snk6v2x7fpvf (privato, dell'utente).
+- Sorgente: arte/tavolo/tavolo_tattico.html + superficie.png, sottosuolo.png,
+  punti.json (sfondi puliti e suggerimenti, esportati da build_world.py ->
+  esporta_tavolo()). Capability db: un solo documento mappa/layout con la
+  stessa forma di tools/art/layout_mondo.json (+ campo "aggiornato").
+- Cosa fa: due livelli, sposta zone (peso), paesaggi della terra di mezzo,
+  isole (centro, raggio con la maniglia ambra, profilo), luoghi, villaggi,
+  ingressi, boss; aggiunge e cancella; note con testo; raggio della citta'
+  con stima delle schermate; confini approssimativi (Voronoi pesato senza
+  deformazione); annulla; ripristino con conferma nella pagina; salvataggio
+  automatico 1,2 s dopo l'ultima modifica.
+- Ciclo di lavoro: l'utente modifica -> Claude legge mappa/layout con
+  ArtifactData -> lo copia in tools/art/layout_mondo.json -> rigenera ->
+  ripubblica il tavolo con sfondi e misure nuovi.
+- Verificato: sintassi dello script (node --check); dopo la pubblicazione
+  una lettura del db (vuoto, atteso: si scrive alla prima modifica). Non
+  verificato: il trascinamento a mano (serve l'utente sulla pagina).
