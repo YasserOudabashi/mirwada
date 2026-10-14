@@ -233,6 +233,8 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   "pallino".
 - **Come correggere:** per i terreni costruiti un bordo **dritto** (con cordolo), scelto
   con un campo nella riga di `terrain.py`; moli e pontili come oggetti, non come terreno.
+- **FATTO (2026-10-14):** `bordo="dritto"` per i terreni costruiti; moli, scali e diga rialzati con la
+  parete (materiali `molo` e `legno`) invece che come oggetti: hanno faccia e bordi come le altre pareti.
 
 ### 🟠 3.7 Pavimenti a scacchiera
 - **Cosa:** `lastre_rovine` e altre lastre alternano giallo e azzurro in modo regolare:
@@ -253,6 +255,11 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   isolette nella nebbia sono cerchi perfetti.
 - **Come correggere:** contorni deformati dal rumore (come già fatto per le regioni),
   fascia d'acqua bassa variabile, qualche scoglio.
+- **FATTO (2026-10-14):** a fine generazione la forma della terra si sfuma e si ritaglia con un rumore
+  (golfi e promontori di 1–3 caselle), la spiaggia segue la costa nuova con larghezza 1–2, l'acqua bassa
+  è larga 2–6 caselle con il bordo arrotondato; i cerchi (rovine, cimitero, archivio, isolette) hanno il
+  raggio che ondeggia. Fermi: scogliere, moli, città, strade, luoghi, villaggi, laghi. Gli scogli non
+  sono stati aggiunti (servirebbe un oggetto nuovo nel mare).
 
 ### 🟠 3.10 Acqua del sottosuolo turchese e a pezzetti
 - **Cosa:** fogne e grotte usano l'acqua bassa tropicale (turchese brillante); nelle fogne

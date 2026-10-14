@@ -29,6 +29,7 @@ import math
 import os
 import random
 import sys
+import zlib
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -352,6 +353,7 @@ def genera(seed):
     g[PAES["paludi"] & (d > 0.75)] = L["mud"]
     rovine_boss = centro_di("terra_di_mezzo")
     g[disco(*rovine_boss, 10 * K / 2) & tm] = L["lastre_rovine"]
+    cerchi = [(*rovine_boss, 10 * K / 2, "lastre_rovine", None, tm, "rovine_boss")]   # resi irregolari alla fine
     g[nord & land & ~vl] = L["snow"]
     # coste: sabbia, scogliere di arenaria nella Valle e nelle Marche
     riva = land & (dmare <= 2)
@@ -392,7 +394,9 @@ def genera(seed):
                 ang = k_i * 2 * math.pi / 6 + 0.3                                  # fisse: il tavolo le ricalcola
                 ix, iy = int(cxf + math.cos(ang) * 70), int(cyf + math.sin(ang) * 50)
                 g[interno_f & (np.hypot(xx - ix, yy - iy) < 14 + 8 * n2)] = L["erba_lilla"]
+                cerchi.append((ix, iy, 14 + 8 * float(n2[iy, ix]), "erba_lilla", "nebbia", interno_f, f"isoletta_{k_i}"))
             g[interno_f & disco(cxf, cyf, 18)] = L["erba_lilla"]
+            cerchi.append((cxf, cyf, 18, "erba_lilla", "nebbia", interno_f, "isoletta_centro"))
 
     # --- confini e ingressi principali (verso Mirwada) ---
     def confine(z):
@@ -543,6 +547,8 @@ def genera(seed):
     for luogo, r_marmo in ((cimitero, 2 * KC), (archivio_ordine, KC)):
         g[disco(*luogo, 5 * KC) & land] = L["ghiaia"]
         g[disco(*luogo, r_marmo + 1) & land] = L["marmo"]
+        cerchi.append((*luogo, 5 * KC, "ghiaia", None, land.copy(), f"ghiaia_{luogo}"))
+        cerchi.append((*luogo, r_marmo + 1, "marmo", "ghiaia", land.copy(), f"marmo_{luogo}"))
 
     # --- luoghi (suggerimenti) ---
     interno = (xx >= 20) & (xx < W - 20) & (yy >= 20) & (yy < H - 20)
@@ -701,6 +707,17 @@ def genera(seed):
         if via.sum() == prima:
             g[via] = L["ciottoli_scuri"]
             break
+    # coste delle spiagge e cerchi dei luoghi irregolari (revisione 3.9): dopo tutto il resto, cosi' strade, alberi e
+    # sottosuolo restano quelli approvati (gli alberi finiti su un terreno cambiato si tolgono)
+    prima, terra_prima = g.copy(), land.copy()
+    coste_irregolari(g, land, w.biome, altezza, mat_par, faccia, list(luoghi.values()) + list(villaggi.values()),
+                     strade, np.logical_or.reduce(LAGUNE + [np.zeros_like(land)]), seed)
+    for cx, cy, r, t, fuori, ok, nome in cerchi:
+        cerchio_irregolare(g, cx, cy, r, L[t], None if fuori is None else L[fuori], ok, nome)
+    cambiate = g != prima
+    w.water_mask[terra_prima & ~land], w.water_mask[land & ~terra_prima] = True, False
+    cambiate |= ispessisci(terra_prima & ~land, 1)          # niente alberi con l'ombra sull'acqua nuova
+    w.objects = [o for o in w.objects if not (cambiate[int(o["y"]) % H, int(o["x"]) % W] and o["type"] != "bridge")]
     # dopo tutto il resto (strade, alberi e sottosuolo non cambiano): terreno della cima sotto le pareti, poi le
     # macchie troppo piccole (diventerebbero rombi isolati) prendono il terreno attorno
     w.ground = terreno_sotto(w.ground, altezza, mat_par)
@@ -734,6 +751,114 @@ def genera(seed):
             break
     applica_spostati(luoghi, villaggi, sotto)
     return w, luoghi, villaggi, sotto
+
+
+def cerchio_irregolare(g, cx, cy, r, t, fuori, ok, nome):
+    """Un luogo disegnato come cerchio perfetto (t) diventa irregolare: il raggio ondeggia con l'angolo (onde lente,
+    fisse per nome). Fuori dal nuovo bordo torna il terreno attorno (o `fuori`); dentro, dove `ok`, diventa t."""
+    rs = zlib.crc32(nome.encode())
+    p1, p2, p3, p4 = (rs % 628) / 100, (rs // 7 % 628) / 100, (rs // 49 % 628) / 100, (rs // 343 % 628) / 100
+    y0, y1 = max(0, int(cy - 1.6 * r) - 2), min(H, int(cy + 1.6 * r) + 3)
+    x0, x1 = max(0, int(cx - 1.6 * r) - 2), min(W, int(cx + 1.6 * r) + 3)
+    yy, xx = YY[y0:y1, x0:x1], XX[y0:y1, x0:x1]
+    a = np.arctan2(yy - cy, xx - cx)
+    reff = r * (1 + 0.10 * np.sin(2 * a + p1) + 0.09 * np.sin(3 * a + p2) + 0.06 * np.sin(5 * a + p3)
+                + 0.04 * np.sin(8 * a + p4))
+    dentro = np.hypot(xx - cx, yy - cy) < reff
+    blocco = g[y0:y1, x0:x1]
+    via = (blocco == t) & ~dentro
+    blocco[dentro & ok[y0:y1, x0:x1] & (blocco != t)] = t
+    for y, x in zip(*np.nonzero(via)):
+        if fuori is not None:
+            blocco[y, x] = fuori
+            continue
+        v = [int(blocco[a_, b_]) for a_ in range(max(0, y - 2), min(blocco.shape[0], y + 3))
+             for b_ in range(max(0, x - 2), min(blocco.shape[1], x + 3)) if blocco[a_, b_] != t]
+        if v:
+            blocco[y, x] = max(set(v), key=v.count)
+
+
+def pezzetto(mask, y, x, limite):
+    """Le caselle della parte connessa di mask che contiene (y, x), se sono meno di `limite`; altrimenti []."""
+    if not mask[y, x]:
+        return []
+    visti, pila = {(y, x)}, [(y, x)]
+    while pila:
+        c = pila.pop()
+        for n in nb4(*c):
+            if mask[n] and n not in visti:
+                if len(visti) >= limite:
+                    return []
+                visti.add(n)
+                pila.append(n)
+    return list(visti)
+
+
+def sfuma(m, r):
+    """Media di m in un quadrato di lato 2r+1 (bordi ripetuti)."""
+    n = 2 * r + 1
+    c = np.pad(np.pad(m.astype(float), r, mode="edge").cumsum(0).cumsum(1), ((1, 0), (1, 0)))
+    return (c[n:, n:] - c[:-n, n:] - c[n:, :-n] + c[:-n, :-n]) / (n * n)
+
+
+def coste_irregolari(g, land, reg, altezza, mat_par, faccia, punti, strade, lagune, seed):
+    """Coste a gradini regolari -> irregolari: la forma della terra si sfuma (i gradini diventano curve) e si
+    ritaglia con un rumore fine, spostando il bordo di 1-3 caselle. Fermi: scogliere e moli (materiale), citta'
+    (terreni dritti), strade, luoghi e villaggi. Poi la fascia d'acqua bassa, larga 2-6 caselle e arrotondata."""
+    j = 0.6 * fbm(W, H, 6, 3, seed + 311) + 0.4 * fbm(W, H, 16, 2, seed + 312)
+    j = (j - j.mean()) / j.std()
+    nuova = sfuma(sfuma(land, 2), 2) + 0.3 * j > 0.5
+    dritti = np.isin(g, [ORDER.index(n) for n in ORDER if TERRAINS[n].get("bordo") == "dritto"])
+    fermo = (mat_par != "") | faccia | dritti
+    for p in strade:
+        for x, y in p:
+            fermo[y, x] = True
+    fermo = ispessisci(fermo, 2)
+    for x, y in punti:
+        fermo[max(0, y - 2):y + 3, max(0, x - 2):x + 3] = True
+    mare = ~land & (reg == 0)                              # i laghi (ritocchi dei dati) restano come sono
+    vicino = (distanza(mare, 4) <= 4) & (distanza(land, 4) <= 4)
+    erodi = land & ~nuova & ~fermo & vicino
+    cresci = mare & nuova & ~fermo & vicino
+    # niente pozzette d'acqua chiuse ne' briciole di terra staccate (diventerebbero rombi isolati)
+    terra = (land & ~erodi) | cresci
+    for y, x in zip(*np.nonzero(erodi)):
+        pozza = pezzetto(~terra, y, x, 12)
+        if pozza:
+            for c in pozza:
+                erodi[c], terra[c] = False, land[c]
+    for y, x in zip(*np.nonzero(~terra & ispessisci(cresci, 1))):   # baia chiusa dalla terra cresciuta: si riempie
+        for c in pezzetto(~terra, y, x, 12):
+            erodi[c], cresci[c], terra[c] = False, not land[c], True
+    for y, x in zip(*np.nonzero(cresci | (terra & ispessisci(erodi, 1)))):
+        briciola = pezzetto(terra, y, x, 12)
+        if briciola and not any(fermo[c] for c in briciola):
+            for c in briciola:
+                cresci[c], erodi[c], terra[c] = False, land[c], False
+    prima_g = g.copy()
+    da = land & ~erodi                                     # le caselle nuove prendono terreno e regione dalla terra
+    for _ in range(4):
+        for sy, sx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            ora = cresci & ~da & sposta(da, sy, sx)
+            g[ora], reg[ora] = sposta(g, sy, sx)[ora], sposta(reg, sy, sx)[ora]
+            da |= ora
+    cresci &= da
+    g[erodi] = L["water"]
+    reg[erodi] = 0
+    land[cresci], land[erodi] = True, False
+    altezza[cresci], altezza[erodi] = 0, -1
+    # la spiaggia segue la costa nuova: lungo il bordo, dove prima c'era spiaggia vicina, torna spiaggia
+    costa = land & ~fermo & (ispessisci(~land & (reg == 0), 1) | (ispessisci(~land & (reg == 0), 2) & (fbm(W, H, 8, 2, seed + 314) > 0.55)))
+    for t in ("ciottoli_spiaggia", "sabbia_bianca", "sand"):
+        vicina = ispessisci(prima_g == L[t], 3)
+        g[costa & vicina & ~np.isin(g, [L["sand"], L["sabbia_bianca"], L["ciottoli_spiaggia"]])] = L[t]
+    # acqua bassa: larghezza variabile, bordo arrotondato (niente punte a rombo della distanza a 4 vicini)
+    mare = ~land & (reg == 0) & np.isin(g, [L["water"], L["deep_water"]])
+    larga = 4 + 2 * np.clip((fbm(W, H, 9, 2, seed + 313) - 0.5) * 3, -1, 1)
+    naturale = land & ~np.isin(prima_g, [L["molo_pietra"], L["pontile_legno"]])   # moli e diga non fanno riva
+    bassa = sfuma(sfuma(distanza(naturale, 9) <= larga, 2), 1) > 0.5
+    g[mare & bassa] = L["water"]
+    g[mare & ~bassa & ~lagune] = L["deep_water"]
 
 
 def assorbi_macchie(g, fisso, minimo=6):

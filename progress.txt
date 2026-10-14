@@ -8463,3 +8463,21 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   percorso nei dati non cambia; mai l'acqua; mai la fascia accanto alle mura).
 - Verificato: strade, luoghi, villaggi, regioni, alberi, sottosuolo identici all'approvato; md5 identico su due
   lanci; validate 0; ritagli porto e mura guardati ingranditi.
+
+[2026-10-14] Revisione arte 3.9 — coste a gradini e luoghi rotondi. FATTO.
+- build_world.py, tutto a fine generazione (strade, luoghi, villaggi, pareti, sottosuolo identici all'approvato):
+  coste_irregolari(): forma della terra sfumata (sfuma, media 5x5 due volte) + rumore (fbm 6 e 16, seed+311/312)
+  -> il bordo col MARE si sposta di 1-3 caselle. Fermi: materiale di parete, facce, terreni dritti, strade (+2),
+  luoghi e villaggi (5x5), laghi (ritocchi dei dati: regione > 0). Niente pozzette chiuse ne' briciole di terra
+  (pezzetto() < 12 caselle: si annulla o si riempie). Le caselle nuove prendono terreno e regione dalla terra
+  accanto; altezza 0 / -1. Spiaggia: lungo la costa nuova dove prima c'era spiaggia entro 3 caselle, larga 1-2
+  (fbm seed+314). Acqua bassa: 2-6 caselle (fbm seed+313), bordo arrotondato, calcolata senza moli e diga
+  (niente alone attorno ai pontili); lagune dell'atollo restano basse.
+  cerchio_irregolare(): rovine del boss, ghiaia e marmo di cimitero/archivio, isolette della Frontiera: raggio
+  che ondeggia con onde 2/3/5/8 (fasi da crc32 del nome).
+- Alberi sulle caselle cambiate o accanto all'acqua nuova tolti (305 su 72616).
+- Verificato: confronto coi dati di HEAD (cambiano solo ground/region_map/altezza lungo le coste e nei cerchi,
+  parete e passaggi 0 differenze); pezzi di terra o mare < 10 caselle = 0 (come prima); celle di lago cambiate 6
+  (foci dei fiumi); md5 identico su due lanci; validate 0. Guardati: approdo, porto (uguale all'approvato),
+  Frontiera intera, isole, cimitero, archivio, rovine.
+- Non fatto: scogli in mare (servirebbe un oggetto nuovo).
