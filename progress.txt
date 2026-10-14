@@ -8562,3 +8562,14 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
 - Verificato: campione di 8 terreni prima/dopo, ritagli porto, galleria, grotte, fogne a dimensione vera;
   campioni_terreni rigenerato (64 px, guardata la scena della Valle); md5 uguale su due lanci; validate 0.
   Generazione del mondo ~45 s (prima ~40).
+
+[2026-10-14] Revisione arte 3.3 — scala degli alberi. FATTO lato arte.
+- worldrender.py: alberi size 3.6 (prima 1.9), riquadro 220x260 (k), piedi a 0.9; ombra degli alberi
+  shadow_r=(0.15, 0.055) (l'ombra del motore e' proporzionale alla larghezza del riquadro: allargato il riquadro
+  diventava larga 5 tile). Altezze misurate a 32 px: quercia 2.56 tile, pino 2.84, betulla 2.44, palma 1.91,
+  secco 1.62; Enel (frame 64 a mezza grandezza) ~1 tile. Confronto affiancato guardato.
+- build_world.py: dirada(oggetti, 1.8) a fine generazione (un albero resta se nessun albero tenuto e' entro 1.8
+  caselle; i numeri casuali non cambiano: rocce e sottosuolo identici); niente alberi/rocce su facce di parete e
+  sulla casella sopra (ciglio). Oggetti: 72383 -> 32104 (alberi 31172, rocce 644, scogli 288).
+- Resta per il gioco (US-8B12, caricatore Godot): ordinamento per profondita' dai piedi, collisione sul tronco.
+- Verificato: galleria di alberi, passo, gradoni a dimensione vera; md5 uguale su due lanci; validate 0.

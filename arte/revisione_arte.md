@@ -205,11 +205,15 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   frontale alta 1–2 tile, bordo superiore e ombra portata; i livelli d'altezza come
   mappa nei dati di `world.json`. Da fare prima della rifinitura delle Marche (US-8B15).
 
-### 🟠 3.3 Scala degli oggetti: gli alberi sono alti come Enel
+### ✅ 3.3 Scala degli oggetti: gli alberi sono alti come Enel — FATTO lato arte (2026-10-14)
 - **Cosa:** gli alberi sono alti 1–1,5 tile, gli alberi secchi meno di Enel: il bosco
   sembra un prato di cespugli.
 - **Come correggere:** alberi alti 2–4 tile, chioma che copre il personaggio quando passa
   dietro (ordinamento per profondità), collisione solo sul tronco.
+- **FATTO lato arte (2026-10-14):** alberi alti 2–3 tile (querce 2,6, pini 2,8, betulle 2,4, palme 1,9,
+  secchi 1,6), ombra grande quanto la chioma, boschi diradati (un albero ogni 1,8 caselle almeno), niente
+  alberi o rocce sulle pareti e sul ciglio sopra. **Resta per il gioco** (caricatore Godot, US-8B12):
+  ordinamento per profondità dai piedi e collisione solo sul tronco.
 
 ### 🟠 3.4 Vegetazione non legata alla regione
 - **Cosa:** alla galleria di alberi (Valle, "giungla temperata con liane e felci giganti")
@@ -364,7 +368,7 @@ l'HUD** (dopo US-8B01 le scritte sono lisce).
    dei VFX (4.1).~~ **Fatto il 2026-10-14:** mondo luminoso, vale `data/vfx.json`.
 2. **Generatore (`forge3d`):** ~~pareti e altezze (3.2), bordi dritti per i terreni
    costruiti (3.6), coste (3.9), acqua del sottosuolo (3.10), pavimenti (3.7), strade (3.8)~~
-   fatti, e anche texture e mare (3.5); resta la scala degli alberi (3.3). Poi si rigenera il
+   fatti, e anche texture e mare (3.5) e alberi (3.3, lato arte). Poi si rigenera il
    mondo con lo stesso seed e si confronta il prima e il dopo.
 3. **Blocco C** con i punti 1.1 e 1.4–1.13 scritti nei brief: Enel (US-8B30), nemico
    (US-8B31, prima possibile per 1.2), pet (US-8B32).

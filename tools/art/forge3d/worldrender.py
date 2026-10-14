@@ -17,8 +17,9 @@ def object_sprite(o, S=TILE):
         return _cache[key]
     k = S / 32.0
     if t == "tree":
-        r = tree(o["kind"], seed=o["seed"], leaf=o["leaf"], size=o.get("size", 1.0) * 1.9 * k)
-        cw, ch, foot = int(120 * k), int(150 * k), 0.93
+        # alberi alti 2-3 tile (revisione 3.3): prima 1,4 tile, alti come il personaggio
+        r = tree(o["kind"], seed=o["seed"], leaf=o["leaf"], size=o.get("size", 1.0) * 3.6 * k)
+        cw, ch, foot = int(220 * k), int(260 * k), 0.9
     elif t == "bush":
         r = bush(o["seed"], o.get("mat", "leaf"), o.get("berries"), size=1.4 * k)
         cw, ch, foot = int(48 * k), int(48 * k), 0.8
@@ -37,7 +38,8 @@ def object_sprite(o, S=TILE):
         cw, ch, foot = S, S, 0.5
     else:
         return None
-    img = render(r.instances({}, 180), size=(cw, ch), ppu=1.0, foot=(0.5, foot), shadow=(t not in ("bridge", "scoglio")))
+    img = render(r.instances({}, 180), size=(cw, ch), ppu=1.0, foot=(0.5, foot), shadow=(t not in ("bridge", "scoglio")),
+                 shadow_r=(0.15, 0.055) if t == "tree" else (0.34, 0.14))     # ombra grande quanto la chioma
     if t == "scoglio":
         img = _sommerso(img, int(ch * foot) - max(2, int(3 * k)), o["seed"])
     _cache[key] = (img, cw // 2, int(ch * foot))

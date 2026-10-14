@@ -752,8 +752,26 @@ def genera(seed):
         if not cambiate:
             break
     applica_spostati(luoghi, villaggi, sotto)
+    ciglio = faccia | sposta(faccia, -1, 0)                # sulla parete o sul ciglio sopra: alberi alti sporgerebbero
+    w.objects = [o for o in dirada(w.objects, 1.8)
+                 if not (o["type"] in ("tree", "rock") and ciglio[int(o["y"]), int(o["x"])])]
     w.sentieri = sentieri(w, strade, list(luoghi.values()) + list(villaggi.values()), faccia)
     return w, luoghi, villaggi, sotto
+
+
+def dirada(oggetti, r):
+    """Alberi alti 2-3 tile (revisione 3.3): un albero resta solo se nessun albero gia' tenuto e' piu' vicino di r
+    caselle, cosi' le chiome grandi non fanno un tappeto unico. A fine generazione: i numeri casuali non cambiano."""
+    tenuti, griglia = [], {}
+    for o in oggetti:
+        if o["type"] == "tree":
+            cx, cy = int(o["x"] // r), int(o["y"] // r)
+            vicini = [q for a in (-1, 0, 1) for b in (-1, 0, 1) for q in griglia.get((cx + a, cy + b), ())]
+            if any((q["x"] - o["x"]) ** 2 + (q["y"] - o["y"]) ** 2 < r * r for q in vicini):
+                continue
+            griglia.setdefault((cx, cy), []).append(o)
+        tenuti.append(o)
+    return tenuti
 
 
 PIAZZE = ["lastre_rovine", "marmo", "ghiaia", "stone", "lastre_chiare", "ciottoli_scuri"]
