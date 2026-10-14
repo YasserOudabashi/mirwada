@@ -215,12 +215,17 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   alberi o rocce sulle pareti e sul ciglio sopra. **Resta per il gioco** (caricatore Godot, US-8B12):
   ordinamento per profondità dai piedi e collisione solo sul tronco.
 
-### 🟠 3.4 Vegetazione non legata alla regione
+### ✅ 3.4 Vegetazione non legata alla regione — FATTO (2026-10-14)
 - **Cosa:** alla galleria di alberi (Valle, "giungla temperata con liane e felci giganti")
   ci sono palme gialle, betulle, abeti e latifoglie mescolati.
 - **Come correggere:** un elenco chiuso di oggetti per regione nei dati dei biomi.
   Esempio: Valle = felci giganti, liane, alberi enormi; Mirwada = ulivi, viti, cipressi;
   Marche = rocce e ossa; palme solo sull'isola tropicale.
+- **FATTO (2026-10-14):** piante nuove in `forge3d/creatures.py`: `gigante` (contrafforti e liane), `felce`
+  (felce gigante), `ulivo` (materiale `leaf_olive`), `cipresso`, e l'oggetto `ossa`. Elenco chiuso per
+  bioma (`ALBERI` in `build_world.py`): Valle = giganti e felci, campagna di Mirwada = ulivi e cipressi,
+  foreste = querce e pini, isole tropicali = palme, Marche = ossa (più le rocce che c'erano). Spazio tra
+  gli alberi per tipo (`SPAZIO`); niente alberi nei filari.
 
 ### ✅ 3.5 Texture che si ripetono a vista — FATTO (2026-10-14)
 - **Cosa:** si vede la griglia dei tile nei ciottoli del porto, nella `roccia_viva` del

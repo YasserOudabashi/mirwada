@@ -129,6 +129,7 @@ define("leaf_light", ["green_d", "green_m", "green", "yellow"], tex=("noise", 1.
 define("leaf_autumn", ["brown_dd", "rust", "orange", "amber"], tex=("noise", 1.3, 0.2))
 define("leaf_pink", ["purple_d", "purple", "pink", "skin_l"], tex=("noise", 1.3, 0.2))
 define("leaf_dead", ["ink", "brown_dd", "brown_d", "brown"], tex=("noise", 1.3, 0.2))
+define("leaf_olive", ["teal_d", "green_d", "green_d", "green_m"], tex=("noise", 1.3, 0.28))   # ulivo: verde spento
 define("grass", ["teal_d", "green_d", "green_m", "green"])
 define("mushroom_red", ["brown_dd", "red_d", "red", "pink"])
 define("snow", ["slate", "grey", "grey_l", "white"])

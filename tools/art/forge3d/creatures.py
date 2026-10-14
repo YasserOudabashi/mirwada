@@ -148,11 +148,60 @@ def tree(kind="oak", seed=1, leaf="leaf", trunk="bark", size=1.0, name=None):
         r.part("trunk", "cylinder", (1.8, 1.8, 7.0), (0, 0, 7.0), mat="leaf_dead" if False else "bark")
         for sx, rz in [(-1, 40), (1, -40)]:
             r.part("trunk", "cylinder", (0.8, 0.8, 4.0), (sx * 3.0, 0, 13), mat="bark", rot=(0, sx * 40, 0))
+    elif kind == "ulivo":                             # tronco basso e contorto, chioma larga e bassa a ciuffi
+        r.part("trunk", "cylinder", (1.6, 1.6, 3.2), (0, 0, 3.2), mat=trunk, rot=(0, 12, 0))
+        r.part("trunk", "cylinder", (1.2, 1.2, 3.0), (1.6, 0, 8.0), mat=trunk, rot=(0, -22, 0))
+        r.part("trunk", "cylinder", (1.0, 1.0, 2.6), (-1.8, 0.5, 8.5), mat=trunk, rot=(0, 30, 0))
+        for k in range(7):
+            a = k * 2 * math.pi / 7 + rnd.uniform(-.3, .3)
+            rad = rnd.uniform(3.6, 4.6)
+            r.part("crown", "ellipsoid", (rad, rad, rad * 0.7),
+                   (math.cos(a) * 5.0, math.sin(a) * 3.5, 12 + rnd.uniform(-1, 1.5)), mat=leaf)
+        r.part("crown", "ellipsoid", (4.5, 4.5, 3.2), (0, 0, 14.5), mat=leaf)
+    elif kind == "cipresso":                          # colonna stretta e alta, punta in cima
+        r.part("trunk", "cylinder", (1.0, 1.0, 2.0), (0, 0, 2.0), mat=trunk)
+        r.part("crown", "ellipsoid", (3.4, 3.4, 11.0), (0, 0, 13.5), mat=leaf)
+        r.part("crown", "cone", (2.2, 2.2, 3.0), (0, 0, 25.5), mat=leaf)
+    elif kind == "felce":                             # felce gigante: fusto corto, fronde lunghe ad arco
+        r.part("trunk", "cylinder", (1.5, 1.5, 5.0), (0, 0, 5.0), mat=trunk)
+        for k in range(10):                           # due giri: fronde alte quasi dritte e fronde basse aperte
+            a = k * 360 / 5 + (36 if k >= 5 else 0) + rnd.uniform(-10, 10)
+            rx, alta = math.radians(a), k < 5
+            r.part("crown", "ellipsoid", (1.5, 8.0, 0.7),
+                   (math.sin(rx) * (4.5 if alta else 7.0), math.cos(rx) * (4.5 if alta else 7.0), 15 if alta else 11),
+                   mat=leaf, rot=(-55 if alta else -25, 0, -a))
+        r.part("crown", "ellipsoid", (2.4, 2.4, 1.8), (0, 0, 10.5), mat=leaf)
+    elif kind == "gigante":                           # albero enorme della giungla: contrafforti e liane che pendono
+        r.part("trunk", "cylinder", (3.2, 3.2, 8.0), (0, 0, 8.0), mat=trunk)
+        for k in range(4):
+            a = k * math.pi / 2 + 0.6
+            r.part("trunk", "cone", (2.2, 1.2, 2.6), (math.cos(a) * 3.0, math.sin(a) * 3.0, 2.4), mat=trunk,
+                   rot=(0, 0, math.degrees(a)))
+        for sx, sy, sz, rad in [(0, 0, 22, 11), (-7.5, 2, 18, 8), (7.5, -1.5, 18.5, 8.5), (1.5, 7, 17.5, 7.5),
+                                (-1.5, -7, 19.5, 8)]:
+            r.part("crown", "ellipsoid", (rad, rad, rad * 0.85), (sx + rnd.uniform(-.8, .8), sy, sz), mat=leaf)
+        for k in range(7):                            # liane: fili dal bordo della chioma, davanti al tronco
+            x = -9.0 + k * 3.0 + rnd.uniform(-1.2, 1.2)
+            lung = rnd.uniform(1.5, 5.5)
+            r.part("crown", "cylinder", (0.4, 0.4, lung), (x, 7.5 + rnd.uniform(-1, 1), 13.5 - lung), mat="leaf")
     elif kind == "mushroom":
         r.part("trunk", "cylinder", (2.0, 2.0, 5.0), (0, 0, 5.0), mat="bone")
         r.part("crown", "ellipsoid", (8.0, 8.0, 5.0), (0, 0, 11), mat="mushroom_red")
         for sx, sy in [(-3, 2), (3, 3), (1, -4)]:
             r.part("crown", "ellipsoid", (1.2, 1.2, 0.6), (sx, sy, 15.4), mat="white", soft=0)
+    return r
+
+
+def ossa(seed=1, size=1.0):
+    """Ossa nella sabbia delle Marche: un teschio di bestia e qualche costola."""
+    rnd = random.Random(seed)
+    r = Rig(f"ossa_{seed}"); r.scale = size
+    r.joint("body", "root", (0, 0, 0))
+    r.part("body", "ellipsoid", (3.0, 2.2, 1.8), (rnd.uniform(-2, 2), 0, 1.4), mat="bone", soft=0.0)
+    for k in range(4):
+        x = -3.5 + k * 2.2
+        r.part("body", "cylinder", (0.45, 0.45, 2.6), (x, 2.5, 1.6), mat="bone", rot=(70, 0, rnd.uniform(-15, 15)))
+    r.part("body", "cylinder", (0.5, 0.5, 4.5), (rnd.uniform(-1, 1), -2.5, 0.5), mat="bone", rot=(0, 90, 20))
     return r
 
 

@@ -8591,3 +8591,19 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   raggi per tipo (alberi 0.15/0.055, palme 0.12/0.045, secchi 0.06/0.03, rocce 0.3/0.12).
 - Verificato: campione con 4 alberi e una roccia su erba x3; galleria di alberi a dimensione vera; md5 uguale su
   due lanci; validate 0; campioni_terreni rigenerato.
+
+[2026-10-14] Revisione arte 3.4 — vegetazione legata alla regione. FATTO.
+- creatures.py: tree kinds "ulivo" (tronco contorto, chioma bassa a ciuffi), "cipresso" (colonna e punta),
+  "felce" (felce gigante: due giri di fronde), "gigante" (tronco con contrafforti, chioma ampia, liane davanti);
+  ossa() (teschio e costole). materials.py: leaf_olive (teal_d, green_d, green_d, green_m: con il grigio la chioma
+  sembrava innevata). worldrender: oggetto "ossa", ombre per i tipi nuovi.
+- build_world.py: ALBERI e' l'elenco chiuso per profilo; il NUMERO di voci per profilo non cambia (la scelta
+  consuma numeri casuali: cambiarlo cambierebbe rocce e sottosuolo). campagna: ulivo, cipresso, ulivo; giungla:
+  gigante, felce, gigante, felce. Ossa nelle Marche (pietrisco ed erica, 0.4%, numeri casuali seed+318).
+  dirada(): spazio per tipo (SPAZIO: gigante 2.8, felce 1.4, cipresso 1.2, altri 1.8). Niente alberi sui filari,
+  niente ossa/alberi/rocce su strade e ciglio. Palme solo dove il profilo e' tropicale (isola tropicale, pirati,
+  isolotto_4).
+- Oggetti: felce 12166, gigante 4554, quercia 4007, pino 2412, ulivo 1942, secco 1734, palma 1511, cipresso 1046,
+  rocce 644, ossa ~319, scogli 288.
+- Verificato: piante affiancate a Enel x2 (due giri di correzioni: ulivo, felce, liane, ossa), giungla, campagna,
+  Marche a dimensione vera; md5 uguale su due lanci; validate 0.

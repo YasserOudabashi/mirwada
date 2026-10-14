@@ -68,8 +68,11 @@ SENZA_ALBERI = ["path", "sand", "stone", "lastre_chiare", "ciottoli_scuri", "mol
                 "sabbia_bianca", "cenere", "roccia_lavica", "lastre_rovine", "nebbia", "ghiaccio", "terra_rosa", "snow"]
 L = LEVEL
 # alberi per profilo: (densita', [(tipo, foglia)])
-ALBERI = {"campagna": (0.035, [("oak", "leaf_light"), ("oak", "leaf"), ("birch", "leaf_light")]),
-          "giungla": (0.32, [("oak", "leaf_dark"), ("palm", "leaf_light"), ("oak", "leaf"), ("birch", "leaf_light")]),
+# vegetazione per profilo di bioma: (densita', [(tipo, foglia)]), elenco chiuso (revisione 3.4). Il numero di voci
+# di ogni profilo non cambia mai: la scelta consuma numeri casuali, e il resto del mondo (rocce, sottosuolo) dipende
+# da quanti ne restano. Per cambiare le proporzioni si ripete una voce, non se ne aggiunge una.
+ALBERI = {"campagna": (0.035, [("ulivo", "leaf_olive"), ("cipresso", "leaf_dark"), ("ulivo", "leaf_olive")]),
+          "giungla": (0.32, [("gigante", "leaf_dark"), ("felce", "leaf"), ("gigante", "leaf"), ("felce", "leaf_light")]),
           "foresta": (0.28, [("oak", "leaf_dark"), ("pine", "leaf_dark"), ("oak", "leaf")]),
           "rado": (0.02, [("dead", "leaf"), ("pine", "leaf_dark")]),
           "neve": (0.006, [("pine", "snow")]),
@@ -753,21 +756,33 @@ def genera(seed):
             break
     applica_spostati(luoghi, villaggi, sotto)
     ciglio = faccia | sposta(faccia, -1, 0)                # sulla parete o sul ciglio sopra: alberi alti sporgerebbero
-    w.objects = [o for o in dirada(w.objects, 1.8)
-                 if not (o["type"] in ("tree", "rock") and ciglio[int(o["y"]), int(o["x"])])]
+    ciglio |= g == L["filari"]                            # e niente alberi in mezzo ai filari del vigneto
+    # ossa nelle Marche (revisione 3.4): rare, sul pietrisco e sull'erica; numeri casuali propri
+    rnd_o = np.random.RandomState(seed + 318)
+    posti = mc & np.isin(g, [L["pietrisco"], L["erica_secca"]]) & (rnd_o.rand(H, W) < 0.004)
+    w.objects += [{"type": "ossa", "x": x + .5, "y": y + .6, "seed": int(rnd_o.randint(6))} for y, x in
+                  zip(*np.nonzero(posti))]
+    w.objects = [o for o in dirada(sorted(w.objects, key=lambda o: o["y"]))
+                 if not (o["type"] in ("tree", "rock", "ossa") and ciglio[int(o["y"]), int(o["x"])])]
     w.sentieri = sentieri(w, strade, list(luoghi.values()) + list(villaggi.values()), faccia)
     return w, luoghi, villaggi, sotto
 
 
-def dirada(oggetti, r):
-    """Alberi alti 2-3 tile (revisione 3.3): un albero resta solo se nessun albero gia' tenuto e' piu' vicino di r
-    caselle, cosi' le chiome grandi non fanno un tappeto unico. A fine generazione: i numeri casuali non cambiano."""
-    tenuti, griglia = [], {}
+SPAZIO = {"gigante": 2.8, "felce": 1.4, "cipresso": 1.2}   # caselle tra un albero e l'altro (default 1.8)
+
+
+def dirada(oggetti, r=1.8):
+    """Alberi alti 2-3 tile (revisione 3.3): un albero resta solo se nessun albero gia' tenuto e' piu' vicino della
+    media dei loro spazi (SPAZIO per tipo, r di default), cosi' le chiome grandi non fanno un tappeto unico.
+    A fine generazione: i numeri casuali non cambiano."""
+    tenuti, griglia, passo = [], {}, max(SPAZIO.values())
     for o in oggetti:
         if o["type"] == "tree":
-            cx, cy = int(o["x"] // r), int(o["y"] // r)
+            ro = SPAZIO.get(o["kind"], r)
+            cx, cy = int(o["x"] // passo), int(o["y"] // passo)
             vicini = [q for a in (-1, 0, 1) for b in (-1, 0, 1) for q in griglia.get((cx + a, cy + b), ())]
-            if any((q["x"] - o["x"]) ** 2 + (q["y"] - o["y"]) ** 2 < r * r for q in vicini):
+            if any((q["x"] - o["x"]) ** 2 + (q["y"] - o["y"]) ** 2 < ((ro + SPAZIO.get(q["kind"], r)) / 2) ** 2
+                   for q in vicini):
                 continue
             griglia.setdefault((cx, cy), []).append(o)
         tenuti.append(o)
@@ -819,7 +834,8 @@ def sentieri(w, strade, punti, faccia):
     margine = strada.copy()
     for sy, sx in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
         margine |= sposta(strada, sy, sx)
-    w.objects = [o for o in w.objects if not (o["type"] in ("tree", "rock") and margine[int(o["y"]), int(o["x"])])]
+    w.objects = [o for o in w.objects
+                 if not (o["type"] in ("tree", "rock", "ossa") and margine[int(o["y"]), int(o["x"])])]
     return fatti
 
 

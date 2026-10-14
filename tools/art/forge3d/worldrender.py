@@ -2,7 +2,7 @@
 import numpy as np
 from PIL import Image
 
-from .creatures import bush, rock, tree
+from .creatures import bush, ossa, rock, tree
 from .engine import render
 from .terrain import ORDER, TILE, build_atlas, compose_ground
 
@@ -26,6 +26,9 @@ def object_sprite(o, S=TILE):
     elif t == "rock":
         r = rock(o["seed"], o.get("mat", "stone"), size=1.5 * k, moss=o.get("moss", False))
         cw, ch, foot = int(48 * k), int(48 * k), 0.8
+    elif t == "ossa":
+        r = ossa(o["seed"], size=2.6 * k)
+        cw, ch, foot = int(64 * k), int(48 * k), 0.75
     elif t == "scoglio":                                  # roccia nel mare: schiuma alla base, niente ombra a terra
         r = rock(o["seed"], "stone", size=2.6 * o.get("size", 1.0) * k, moss=False)
         cw, ch, foot = int(96 * k), int(72 * k), 0.75
@@ -40,7 +43,8 @@ def object_sprite(o, S=TILE):
         return None
     # ombra in proporzione all'oggetto (chioma, tronco, sasso), chiara e spostata in basso a destra (luce in alto a
     # sinistra): revisione 3.12
-    sr = {"dead": (0.06, 0.03), "palm": (0.12, 0.045)}.get(o.get("kind"), (0.15, 0.055)) if t == "tree" else (0.3, 0.12)
+    sr = {"dead": (0.06, 0.03), "palm": (0.12, 0.045), "cipresso": (0.06, 0.03), "felce": (0.13, 0.05),
+          "gigante": (0.2, 0.07)}.get(o.get("kind"), (0.15, 0.055)) if t == "tree" else (0.3, 0.12)
     img = render(r.instances({}, 180), size=(cw, ch), ppu=1.0, foot=(0.5, foot), shadow=(t not in ("bridge", "scoglio")),
                  shadow_r=sr, shadow_off=(0.25, 0.3), shadow_a=80)
     if t == "scoglio":
