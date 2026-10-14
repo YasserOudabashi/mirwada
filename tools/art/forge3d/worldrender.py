@@ -39,10 +39,14 @@ def object_sprite(o, S=TILE):
     return _cache[key]
 
 
-def render_world(w, region=None, S=TILE, with_objects=True, frame=0, atlases=None, tint=None):
-    """region=(x0,y0,x1,y1) in celle. Ritorna un'immagine RGBA."""
+def render_world(w, region=None, S=TILE, with_objects=True, frame=0, atlases=None, tint=None, sopra=None):
+    """region=(x0,y0,x1,y1) in celle. Ritorna un'immagine RGBA.
+    sopra: strato RGBA grande come il terreno (es. pareti), disegnato sopra il terreno e sotto gli oggetti."""
     x0, y0, x1, y1 = region or (0, 0, w.W, w.H)
     g = compose_ground(w.ground[y0:y1, x0:x1], atlases=atlases, S=S, frame=frame)
+    if sopra is not None:
+        a = sopra[..., 3:4].astype(float) / 255.0
+        g[..., :3] = (sopra[..., :3] * a + g[..., :3] * (1 - a)).astype(np.uint8)
     if not with_objects:
         return g
     pad = 4 * S

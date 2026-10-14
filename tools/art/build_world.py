@@ -35,6 +35,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+from forge3d.pareti import disegna as disegna_pareti, maschera as maschera_pareti  # noqa: E402
 from forge3d.terrain import ORDER, build_atlas  # noqa: E402
 from forge3d.world import LEVEL, World, fbm  # noqa: E402
 from forge3d.worldrender import render_world, save  # noqa: E402
@@ -287,6 +288,9 @@ def genera(seed):
                                           "terra_di_mezzo"))
 
     g = np.full((H, W), L["grass"])
+    # altezze (revisione arte 3.2): 0 = pianura; dove l'altezza scende verso sud c'e' una parete
+    altezza = np.zeros((H, W), int)
+    mat_par = np.full((H, W), "", object)
     g[~land] = np.where(dacqua[~land] > 4, L["deep_water"], L["water"])
     for laguna in LAGUNE:
         g[laguna & ~land] = L["water"]
@@ -306,7 +310,22 @@ def genera(seed):
     ys_mc, xs_mc = np.nonzero(mc)
     campo = (int(xs_mc.mean()), int(ys_mc.mean()))
     g[mc & (np.hypot(xx - campo[0], yy - campo[1]) < (12 + (n2 - 0.5) * 10) * K)] = L["terra_bruciata"]
-    g[mc & ((d > 0.72) | bordo_grad)] = L["arenaria"]
+    g[mc & (d > 0.72)] = L["arenaria"]                  # affioramenti; i bordi dei gradoni ora sono pareti
+    # gradoni per le PARETI: salgono verso nord (lontano dal porto) e sono lisciati in orizzontale, cosi' i
+    # bordi corrono lunghi da est a ovest (un bordo in diagonale diventa una fila di blocchetti a scalini)
+    ys_mc = np.nonzero(mc)[0]
+    verso_nord = np.clip((ys_mc.max() - yy) / max(1, ys_mc.max() - ys_mc.min()), 0, 1)
+    gp = np.floor((0.25 * e + 0.75 * verso_nord) * 6).astype(int)
+    finestra = np.lib.stride_tricks.sliding_window_view(np.pad(gp, ((0, 0), (6, 6)), mode="edge"), 13, axis=1)
+    gp = np.median(finestra, axis=-1).astype(int)
+    altezza[mc] = gp[mc] + 1
+    mat_par[mc] = "arenaria"
+    g_marche = g.copy()
+
+    def arenaria_vecchia():
+        """Dove prima c'era arenaria (anche i bordi dei gradoni, ora pareti). Strade, eremiti e rocce la usano
+        ancora: cosi' strade, alberi, villaggi e sottosuolo restano quelli della mappa approvata."""
+        return (g == L["arenaria"]) | (bordo_grad & mc & (g == g_marche))
     # Archivio: pianura bianca
     g[ar] = L["snow"]
     # Valle: felci, radici nel cuore, palude
@@ -332,6 +351,9 @@ def genera(seed):
     riva |= mw & (dmare <= 3)
     g[riva] = L["sand"]
     g[riva & (vl | mc)] = L["arenaria"]
+    scogliera = (vl | mc) & (dmare <= 6)                 # la fascia sul mare sale: la parete cade sull'acqua
+    altezza[scogliera] = np.maximum(altezza[scogliera], 1)
+    mat_par[scogliera] = "arenaria"
 
     # isole
     for rid, cx, cy, r, prof in ISOLE:
@@ -385,6 +407,8 @@ def genera(seed):
     scalinata = ingresso(ar, "terra_di_mezzo")
     rupi = ispessisci(confine(mc), 1) & land & ~disco(*passo, 5)
     g[rupi] = L["arenaria"]
+    altezza[rupi] += 1                                       # le rupi stanno un livello sopra le Marche
+    mat_par[rupi] = "arenaria"
     muro_verde = ispessisci(confine(vl), 3) & vl & ~disco(*galleria_alberi, 3) & ~riva
     g[muro_verde] = L["felci"]
     g[disco(*scalinata, 3) & ar] = L["ghiaccio"]
@@ -435,6 +459,8 @@ def genera(seed):
     mura = base_citta & (dc >= RC * 0.85) & (dc < RC * 0.9)
     ang = np.degrees(np.arctan2(dyc, dxc)) % 360
     g[mura & ((ang % 40) < 26)] = L["stone"]
+    altezza[mura & ((ang % 40) < 26)] = 1
+    mat_par[mura & ((ang % 40) < 26)] = "mura"
     # lungomare: passeggiata lungo il golfo, con la piazza del mercato
     lungomare = mw & (dmare >= 2) & (dmare <= 4) & (np.abs(xx - px) < RC * 1.0) & (yy > py - RC * 0.5)
     g[lungomare] = L["lastre_chiare"]
@@ -495,7 +521,7 @@ def genera(seed):
     # --- strade principali dal porto ---
     archivio_ordine = (centro[0] + int(RC * 0.1), centro[1] - int(RC * 1.6))
     cimitero = (centro[0] + int(RC * 1.5), centro[1] - int(RC * 0.1))
-    costo = np.where(np.isin(g, [L["stone"], L["arenaria"]]), 25.0, 1.0) + np.where(g == L["forest"], 4.0, 0.0)
+    costo = np.where((g == L["stone"]) | arenaria_vecchia(), 25.0, 1.0) + np.where(g == L["forest"], 4.0, 0.0)
     costo[acqua] = 40.0
     strade, ponti = [], []
     for meta in (rovine_boss, passo, galleria_alberi, scalinata, archivio_ordine, cimitero):
@@ -575,7 +601,7 @@ def genera(seed):
             xx - MEZZO[paes][0] * W, yy - MEZZO[paes][1] * HC))
     for i, q in enumerate(scegli(tm & ~disco(*rovine_boss, 25 * K), 4, 25 * K, list(villaggi.values())), 1):
         villaggi[f"accampamento_banditi_{i}"] = q
-    for i, q in enumerate(scegli(mc & (g == L["pietrisco"]), 3, 30 * K), 1):
+    for i, q in enumerate(scegli(mc & (g == L["pietrisco"]) & ~arenaria_vecchia(), 3, 30 * K), 1):
         villaggi[f"eremita_{i}"] = q
     for i, q in enumerate(scegli(campagna & (g == L["filari"]), 3 * 2, 22 * K / 2), 1):
         villaggi[f"fattoria_{i}"] = q
@@ -589,7 +615,17 @@ def genera(seed):
 
     applica_spostati(luoghi, villaggi, None)
     applica_ritocchi(g, land, acqua, luoghi, villaggi)
+    # passaggi: scala dove una strada attraversa una parete, rampa ogni ~15 caselle, rampa davanti al passo
+    faccia = maschera_pareti(altezza)
+    pas = np.full((H, W), ".", "<U1")
+    pas[faccia & ((xx + yy * 7) % 15 == 0)] = "R"
+    pas[faccia & disco(*passo, 6)] = "R"
+    for p in strade:
+        for x, y in p:
+            if faccia[y, x]:
+                pas[y, x] = "S"
     w = World(W, H, seed, g, reg, e, REGIONI, water_mask=acqua)
+    w.alt, w.mat_par, w.pas = altezza, mat_par, pas
     w.citta = citta                                   # per misurare la citta' e disegnarne l'anteprima
     w.rumori = RU                                     # esportati per il tavolo tattico
     w.roads = [[list(map(int, q)) for q in p] for p in strade]
@@ -617,9 +653,15 @@ def genera(seed):
         w.objects.append({"type": "tree", "kind": kind, "leaf": leaf, "x": x + rng.uniform(.2, .8),
                           "y": y + rng.uniform(.3, .9), "seed": int(rng.randint(6)),
                           "size": [0.9, 1.0, 1.1][rng.randint(3)]})
-    rocce = (g == L["arenaria"]) & mc & (rng.rand(H, W) < 0.05)
+    # le rocce consumano i numeri casuali come quando i bordi dei gradoni erano arenaria: cosi' il sottosuolo
+    # (che usa lo stesso rng dopo) resta quello approvato. Sui vecchi bordi, ora pareti, la roccia non si mette.
+    vecchia = arenaria_vecchia()
+    rocce = vecchia & mc & (rng.rand(H, W) < 0.05)
     for y, x in zip(*np.nonzero(rocce)):
-        w.objects.append({"type": "rock", "x": x + .5, "y": y + .7, "seed": int(rng.randint(6)),
+        sd = int(rng.randint(6))
+        if g[y, x] != L["arenaria"]:
+            continue
+        w.objects.append({"type": "rock", "x": x + .5, "y": y + .7, "seed": sd,
                           "mat": "stone_light", "moss": False})
     w.objects.sort(key=lambda o: o["y"])
     sotto = genera_sottosuolo(seed, R, land, acqua, centro, rovine_boss, porto, rnd, rng, g)
@@ -752,7 +794,14 @@ def genera_sottosuolo(seed, R, land, acqua, centro, rovine_boss, porto, rnd, rng
             i = int(np.argmax(dmin))
             boss[f"boss_{z_nome}"] = (int(xs_b[i]), int(ys_b[i]))
     ground = np.where(s >= 0, s, L["roccia_viva"])
-    return {"ground": ground, "zona": zona, "ingressi": ingressi, "boss": boss, "pavimento": s >= 0}
+    alt = (s < 0).astype(int)                            # roccia alta 1: pareti sul lato nord delle gallerie
+    pas = np.full((H, W), ".", "<U1")
+    faccia = maschera_pareti(alt)
+    for x, y in ingressi.values():                       # un ingresso non resta mai dietro una parete
+        if faccia[y, x]:
+            pas[y, x] = "S"
+    return {"ground": ground, "zona": zona, "ingressi": ingressi, "boss": boss, "pavimento": s >= 0,
+            "alt": alt, "pas": pas}
 
 
 def colori_terreni():
@@ -779,6 +828,8 @@ def anteprima(w, luoghi, villaggi, k=1, etichette=True, segni=True):
     bordo[:, 1:] |= reg[:, 1:] != reg[:, :-1]
     bordo[1:, :] |= reg[1:, :] != reg[:-1, :]
     img[bordo & (reg > 0)] = (24, 20, 37)
+    if segni:
+        img[maschera_pareti(w.alt)] = (62, 39, 49)        # pareti (gradoni, rupi, scogliere, mura)
     for o in w.objects:
         if o["type"] == "tree":
             img[int(o["y"]), int(o["x"])] = (25, 60, 62)
@@ -810,6 +861,8 @@ def anteprima_sotto(w, sotto, k=1, segni=True):
     col = colori_terreni()
     img = col[sotto["ground"]].copy()
     img[~sotto["pavimento"]] = (14, 12, 22)
+    if segni:
+        img[maschera_pareti(sotto["alt"])] = (58, 68, 102)   # pareti di roccia sul lato nord delle gallerie
     costa = w.biome > 0
     bordo = (costa != sposta(costa, 1, 0)) | (costa != sposta(costa, 0, 1))
     img[bordo] = (70, 70, 90)                       # la costa di sopra, per orientarsi
@@ -890,6 +943,19 @@ def misure(w, sotto):
     return righe, tot, sotto_tot
 
 
+MATERIALI_PARETE = ["", "arenaria", "roccia", "mura"]
+
+
+def ritaglio(w, box, alt, mat, pas, atl, oggetti=True, pareti=True):
+    """Pezzo di mappa a tile vere (32 px), con le pareti sopra il terreno e sotto gli oggetti."""
+    x0, y0, x1, y1 = box
+    strato = None
+    if pareti:
+        ya = max(0, y0 - 3)                                    # le pareti nascono dalle righe sopra il ritaglio
+        strato = disegna_pareti(alt[ya:y1, x0:x1], mat[ya:y1, x0:x1], pas[ya:y1, x0:x1], S=32)[(y0 - ya) * 32:]
+    return render_world(w, box, atlases=atl, with_objects=oggetti, sopra=strato)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--seed", type=int, default=6)
@@ -916,9 +982,14 @@ def main():
     j["biome_map"] = [[int(v) for v in r] for r in j["biome_map"]]
     j.pop("biomes")
     j.update({"regions": REGIONI, "region_map": j.pop("biome_map"), "luoghi": luoghi, "villaggi": villaggi,
-              "tile": 32, "layout": {"terra": TERRA, "mezzo": MEZZO, "isole": ISOLE, "costa": COSTA},
+              "tile": 32,
+              "altezza": w.alt.tolist(), "parete_materiali": MATERIALI_PARETE,
+              "parete": [[MATERIALI_PARETE.index(v) for v in r] for r in w.mat_par],
+              "passaggi": ["".join(r) for r in w.pas],
+              "layout": {"terra": TERRA, "mezzo": MEZZO, "isole": ISOLE, "costa": COSTA},
               "sottosuolo": {"ground": [[int(v) for v in r] for r in sotto["ground"]],
-                             "ingressi": sotto["ingressi"], "boss": sotto["boss"]}})
+                             "ingressi": sotto["ingressi"], "boss": sotto["boss"],
+                             "altezza": sotto["alt"].tolist(), "passaggi": ["".join(r) for r in sotto["pas"]]}})
     with open(os.path.join(OUT, "world_prova.json"), "w") as f:
         json.dump(j, f, separators=(",", ":"))
     anteprima(w, luoghi, villaggi).save(os.path.join(OUT, "mondo_prova.png"))
@@ -927,17 +998,45 @@ def main():
     esporta_tavolo(w, luoghi, villaggi, sotto)
     if not a.senza_ritagli:
         atl = {n: build_atlas(n, 32) for n in ORDER}
+        def box_di(x, y):
+            return (max(0, x - 20), max(0, y - 12), min(W, x + 20), min(H, y + 12))
+
+        def dove(m):
+            ys, xs = np.nonzero(m)
+            i = len(ys) // 2
+            return int(xs[i]), int(ys[i])
+
         for nome in ("porto", "passo_tra_rupi", "rovine_del_boss", "galleria_di_alberi", "approdo_frontiera",
                      "atollo", "isola_mostro"):
-            x, y = luoghi[nome]
-            box = (max(0, x - 20), max(0, y - 12), min(W, x + 20), min(H, y + 12))
-            save(render_world(w, box, atlases=atl), os.path.join(OUT, f"mondo_prova_{nome}.png"))
+            save(ritaglio(w, box_di(*luoghi[nome]), w.alt, w.mat_par, w.pas, atl),
+                 os.path.join(OUT, f"mondo_prova_{nome}.png"))
         ws = World(W, H, a.seed, sotto["ground"], w.biome, w.elev, REGIONI, water_mask=None)
-        for nome, (x, y) in (("citta_sotterranea", luoghi["rovine_del_boss"]), ("fogne", luoghi["centro_antico"]),
-                             ("grotte", sotto["boss"].get("boss_grotte", luoghi["radice_del_mondo"]))):
-            box = (max(0, x - 20), max(0, y - 12), min(W, x + 20), min(H, y + 12))
-            save(render_world(ws, box, atlases=atl, with_objects=False),
+        mat_sotto = np.full((H, W), "roccia", object)
+        punti_sotto = {"citta_sotterranea": luoghi["rovine_del_boss"], "fogne": luoghi["centro_antico"],
+                       "grotte": sotto["boss"].get("boss_grotte", luoghi["radice_del_mondo"])}
+        for nome, (x, y) in punti_sotto.items():
+            save(ritaglio(ws, box_di(x, y), sotto["alt"], mat_sotto, sotto["pas"], atl, oggetti=False),
                  os.path.join(OUT, f"sottosuolo_prova_{nome}.png"))
+        # prima / dopo delle pareti (revisione arte 3.2): stesso pezzo senza e con le altezze
+        faccia = maschera_pareti(w.alt)
+        mc_i, vl_i = REGIONI.index("marche_crepuscolo"), REGIONI.index("valle_madre")
+        sopra_valle = np.zeros((H, W), bool)
+        sopra_valle[1:] = w.biome[:-1] == vl_i
+        confronti = {
+            "passo": (w, luoghi["passo_tra_rupi"], w.alt, w.mat_par, w.pas, True),
+            "gradoni": (w, dove(faccia & (w.biome == mc_i) & (w.alt >= 3)), w.alt, w.mat_par, w.pas, True),
+            "scogliera": (w, dove(faccia & (w.biome == 0) & sopra_valle), w.alt, w.mat_par, w.pas, True),
+            "mura": (w, dove(w.mat_par == "mura"), w.alt, w.mat_par, w.pas, True),
+            "fogne": (ws, punti_sotto["fogne"], sotto["alt"], mat_sotto, sotto["pas"], False),
+            "grotte": (ws, punti_sotto["grotte"], sotto["alt"], mat_sotto, sotto["pas"], False)}
+        for nome, (mondo, (x, y), al, ma, pa, ogg) in confronti.items():
+            prima = ritaglio(mondo, box_di(x, y), al, ma, pa, atl, ogg, pareti=False)
+            dopo = ritaglio(mondo, box_di(x, y), al, ma, pa, atl, ogg)
+            tav = np.zeros((prima.shape[0], prima.shape[1] * 2 + 16, 4), np.uint8)
+            tav[..., 3] = 255
+            tav[:, :prima.shape[1]] = prima
+            tav[:, prima.shape[1] + 16:] = dopo
+            save(tav, os.path.join(OUT, f"pareti_prima_dopo_{nome}.png"))
     righe, tot, sotto_tot = misure(w, sotto)
     for n, v in righe:
         print(f"  {n:24s} {v:7.1f} schermate")

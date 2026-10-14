@@ -21,7 +21,7 @@ Da `006_PRD/art-brief-gemini.md` cap. 7-8, valida per qualunque categoria
 - [ ] Ritratti in serie: sfondo, luce e inquadratura identici su tutto il
       set (vedi `01_personaggi.md` cap. 3).
 - [ ] Sprite generati con IA: sono un **riferimento**, non un asset — nessuno
-      li droppa in `assets/` senza la post-produzione (griglia 32px esatta,
+      li droppa in `assets/` senza la post-produzione (griglia 64 px esatta,
       sfondo trasparente, frame tagliati agli indici giusti).
 - [ ] Combattimento/VFX: l'effetto resta leggibile anche con
       `riduci_flash`/`riduci_distorsione` attivi.

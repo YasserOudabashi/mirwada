@@ -1,5 +1,10 @@
 # Mirwada — Guida per chi disegna
 
+> **Aggiornata il 2026-10-14.** L'autorita' sull'arte e' `CLAUDE.md` (v2): frame da **64 px**,
+> tutto generato da Claude con `sprite-forge` (nessun disegno a mano). Le parti su Gemini/Imagen
+> valgono solo per le concept art di riferimento. Lo stato dell'arte e cosa migliorare:
+> `revisione_arte.md`.
+
 Questa cartella raccoglie in un posto solo tutto cio' che serve a chi deve
 **disegnare o generare l'arte** del gioco: personaggi, regioni/mappe, sprite,
 combattimento/VFX. Non introduce decisioni nuove — le decisioni sono gia'
@@ -34,7 +39,7 @@ indice comodo, non l'autorita'.
 
 1. **`01_personaggi.md`** — protagonista, 8 NPC, popolani generici.
 2. **`02_regioni_e_mappe.md`** — le 5 regioni del mondo, i tileset, il gating.
-3. **`03_sprite_e_animazioni.md`** — sprite di gioco 32x32, animazioni, timing.
+3. **`03_sprite_e_animazioni.md`** — sprite di gioco 64x64, animazioni, timing.
 4. **`04_combattimento_vfx.md`** — leggibilita' del combattimento, effetti per
    pathway.
 5. **`05_checklist_finale.md`** — checklist unica prima di considerare

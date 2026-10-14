@@ -6,7 +6,8 @@ lettura comoda del giorno in cui e' stata scritta.
 
 ## 1. Regole fisse (decise una volta per tutte, irreversibili)
 
-- **32x32 px** per frame.
+- **64x64 px** per frame (US-8B01, 2026-10-14). I fogli ancora disegnati a 32 vengono
+  ingranditi x2 da `tools/art/generate_all.py` finche' il Blocco C non li ridisegna a 64.
 - **4 direzioni**, non 8: `down`, `up`, `left`, `right`. Le diagonali riusano
   lo sprite orizzontale — dimezza i frame da disegnare, invisibile in un
   top-down 2D.
@@ -119,8 +120,8 @@ palette), lo controlla e lo trasforma in PNG: ogni pixel e' una scelta
 esplicita e correggibile, e le regole del cap. 1 le verifica `check.py`.
 
 1. **Un JSON per file di gioco**, es. `arte/sprite/personaggio_idle.json`,
-   con `"name": "personaggio_idle"`, `"size": [32, 32]`,
-   `"pivot": [16, 31]` (`piedi_centro`) e le ramp dichiarate in `"ramps"`.
+   con `"name": "personaggio_idle"`, `"size": [64, 64]`,
+   `"pivot": [32, 63]` (`piedi_centro`) e le ramp dichiarate in `"ramps"`.
 2. **Un'animazione per direzione**, chiamate `down`, `up`, `left`, `right`
    **in quest'ordine**: lo sheet ha una riga per animazione, quindi le righe
    escono gia' nell'ordine che il codice si aspetta. Le animazioni non
@@ -137,7 +138,7 @@ esplicita e correggibile, e le regole del cap. 1 le verifica `check.py`.
    `_checks.png`, correggi errori e avvisi, rilancia.
 5. Copia `out/personaggio_idle/personaggio_idle_sheet.png` su
    `assets/placeholder/personaggio_idle.png` e verifica la dimensione:
-   colonne x 32 per righe x 32 (idle: 128x128, death: 256x32).
+   colonne x 64 per righe x 64 (idle: 256x256, death: 512x64).
    `tools/generate_placeholders.py` salta i file che hanno un JSON in
    `arte/sprite/`: rilanciarlo non cancella l'arte vera.
 

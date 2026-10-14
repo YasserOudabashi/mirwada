@@ -8352,3 +8352,32 @@ vedo che terreno avra'"). Rifacimento v2, risposte dell'utente:
   terreno alto ha rumore); si sistema nella parte 2 mettendo nella casella di parete il terreno giusto o un
   orlo che sporge. (2) La base della rampa e' molto scura. (3) Non ancora esportato come atlante per Godot
   ne' usato nella mappa: e' la PARTE 2 (altezze del mondo in world.json).
+
+[2026-10-14] Pareti e altezze, PARTE 2 (altezze nel mondo) + PULIZIA (revisione arte 3.2, 4.2, 4.4). FATTA.
+- build_world.py: griglia `altezza` (0 = pianura) e materiale della parete per casella:
+  Marche = gradoni 1..6 (per le pareti: altezza che sale verso NORD, lisciata in orizzontale con una
+  mediana di 13 caselle, cosi' i bordi corrono lunghi est-ovest; con l'altezza "in tondo" i bordi in
+  diagonale diventavano file di blocchetti staccati), rupi del passo +1, scogliere di Valle e Marche
+  (fascia a <= 6 caselle dal mare) alte 1, mura in rovina di Mirwada alte 1 (materiale mura),
+  sottosuolo: roccia 1 / pavimento 0 (pareti sul lato nord delle gallerie).
+  Passaggi: 'S' dove una strada attraversa una parete, 'R' ogni ~15 caselle e davanti al passo,
+  'S' sugli ingressi del sottosuolo che cadono su una parete. Scale 5, rampe ~280.
+- world_prova.json: "altezza", "parete" (indice in "parete_materiali"), "passaggi" (righe di testo);
+  nel sottosuolo "altezza" e "passaggi". Mappa intera con le pareti segnate scure.
+- Ritagli con le pareti (render_world ha `sopra`: strato sopra il terreno, sotto gli oggetti) e
+  prima/dopo: arte/mondo/pareti_prima_dopo_{passo,gradoni,scogliera,mura,fogne,grotte}.png.
+- Tolte dal terreno le strisce di arenaria sui bordi dei gradoni (2480 caselle): ora sono pareti.
+  ERRORE TROVATO E CORRETTO: toglierle cambiava strade (costo A*), eremiti e rocce -> numeri casuali
+  diversi -> sottosuolo diverso (718 -> 728 schermate). Ora strade, eremiti e rocce leggono ancora
+  "arenaria_vecchia()": verificato con la versione di prima che strade, luoghi, villaggi, regioni,
+  alberi e sottosuolo sono IDENTICI; cambiano solo le 2480 caselle e 112 rocce in meno (sui vecchi bordi).
+- pareti.py: un bordo in diagonale si salda (niente spigolo libero se c'e' parete in diagonale);
+  maschera() vettoriale per le mappe grandi (uguale a facce(), verificato).
+- Comando: python tools/art/build_world.py (seed 6, ~37 s). md5 identico su due lanci.
+- Pulizia: arte/.gdignore e assets/concept/.gdignore (Godot non importa anteprime e concept art, che
+  nessuno script carica); guida arte/ aggiornata (64 px, terreni e pareti generati, banner su CLAUDE.md).
+- validate exit 0. Non verificato in Godot (nessun Godot nel container).
+- Aperto: (1) mura e bordi nord-sud mostrano solo la cima (giusto in vista 3/4, ma le mura si leggono
+  poco); (2) al passo le rupi fanno pareti alte 3-4 caselle a colonna; (3) il tavolo tattico ricalcola
+  ancora le strisce di arenaria nell'anteprima JS (superficie.png invece e' aggiornata); (4) pareti come
+  muri in Godot: US-8B12.

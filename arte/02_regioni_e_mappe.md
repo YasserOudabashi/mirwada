@@ -63,35 +63,22 @@ Salva in `assets/concept/regioni/<id>.jpg` (es. `marche_crepuscolo.jpg`,
 assegna Gemini). Le 6 key art attuali sono gia' rinominate cosi'. Materiale di riferimento per atmosfera/palette, non
 un asset di gioco.
 
-## 5. Tileset di gioco (pixel art reale)
+## 5. Terreni e pareti di gioco (generati, non disegnati)
 
-`tools/generate_placeholders.py` genera un tileset placeholder di 4 tile per
-`assets/placeholder/tileset.png`: **pavimento, muro, ostacolo, acqua**, ognuno
-32x32. Quando disegni il tileset vero di una regione:
+Aggiornato il 2026-10-14: niente piu' tileset a 4 tile disegnati a mano.
 
-1. Stessa griglia: 4 tile 32x32, edge-tileable (i bordi combaciano tra loro).
-2. Palette della regione (inchiostro + primario + accento, cap. 4), in ramp
-   di 3 toni con hue shift come gli sprite (`03_sprite_e_animazioni.md`).
-3. **Niente contorno su pavimento e acqua**: si ripetono, e un contorno per
-   tile mostrerebbe la griglia. Muro e ostacolo hanno contorno 1px color
-   inchiostro solo dove toccano il pavimento. Luce da alto-sinistra, niente
-   anti-aliasing sul bordo esterno. Il dithering va bene qui (aree grandi e
-   ferme), non sugli sprite.
-
-Prompt di riferimento (`art-brief-gemini.md` cap. 6.5):
-
-```
-[BLOCCO STILE PIXEL — vedi 03_sprite_e_animazioni.md]
-A small tileset strip: four 32x32 top-down terrain tiles side by side for
-[regione] — (1) walkable ground, (2) solid wall, (3) a low obstacle,
-(4) water. Each tile self-contained and edge-tileable. No outline on ground
-and water, 1px dark outline only where wall and obstacle meet the ground.
-Palette [inchiostro + primario + accento della regione]. Aspect 4:1.
-```
-
-Riferimento generato da IA → `assets/concept/sprite_ref/tileset_<regione>.png`.
-Tileset reale, dopo post-produzione (ritaglio esatto, verifica in gioco) →
-sostituisce `assets/placeholder/tileset.png`.
+- **Terreni:** `tools/art/forge3d/terrain.py`, tecnica *dual grid* a livelli: 16 tile per
+  terreno, un terreno nuovo e' una riga in `TERRAINS` (rampa Endesga 32, motivo, livello).
+  Tavola dei campioni: `python tools/art/campioni_terreni.py` -> `arte/terreni/`.
+- **Pareti (dislivelli):** `tools/art/forge3d/pareti.py`. Ogni casella ha un'altezza intera;
+  dove scende verso sud c'e' una parete alta 1 casella per livello (arenaria, roccia, mura),
+  con scalini `S` e rampe `R`. Tavola: `python tools/art/campioni_pareti.py` -> `arte/pareti/`.
+- **Mappa del mondo:** `python tools/art/build_world.py` (seed 6) -> `arte/mondo/`
+  (`world_prova.json` con terreni, altezze, pareti e passaggi; anteprime e ritagli).
+- Niente contorno su pavimento e acqua (si ripetono). Luce da alto-sinistra. Le correzioni si
+  fanno nei dati o nel generatore, mai sul PNG.
+- `assets/placeholder/tileset.png` resta solo per la stanza di prova: lo sostituisce il mondo
+  vero (US-8B12).
 
 ## 6. Prima di considerarlo fatto
 

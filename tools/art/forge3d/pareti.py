@@ -139,6 +139,14 @@ def facce(alt):
     return f
 
 
+def _vicino(e, y, x):
+    """C'e' parete nella colonna x, nella stessa riga o in quelle accanto? Cosi' un bordo in diagonale
+    diventa una parete a scalini continua invece di blocchetti staccati."""
+    if x < 0 or x >= e.shape[1]:
+        return False
+    return bool(e[max(0, y - 1):y + 2, x].any())
+
+
 def disegna(alt, mat, passaggi=None, S=64, seed=5):
     """Strato RGBA (H*S, W*S) con pareti e ombre, da mettere sopra il terreno.
     mat: H x W di nomi di MATERIALI (conta quello della casella in cima al bordo).
@@ -155,8 +163,20 @@ def disegna(alt, mat, passaggi=None, S=64, seed=5):
                     out[y * S:(y + 1) * S, x * S:(x + 1) * S] = tile_ombra(sx, False, S)
                 continue
             k, d, yb = f[y, x]
-            sx = x == 0 or not e_parete[y, x - 1]
-            dx = x == W - 1 or not e_parete[y, x + 1]
+            sx = not _vicino(e_parete, y, x - 1)               # libero a sinistra (anche in diagonale)
+            dx = not _vicino(e_parete, y, x + 1)
             p = passaggi[y][x] if passaggi is not None and passaggi[y][x] in "SR" else None
             out[y * S:(y + 1) * S, x * S:(x + 1) * S] = tile(mat[yb][x], k, d, sx, dx, p, x, S, seed)
+    return out
+
+
+def maschera(alt):
+    """Come facce(), ma solo vero/falso e senza cicli: per le mappe grandi (1200 x 1000)."""
+    alt = np.asarray(alt)
+    out = np.zeros(alt.shape, bool)
+    salto = np.zeros(alt.shape, int)
+    salto[1:] = alt[:-1] - alt[1:]                         # quanto si scende entrando nella casella da sopra
+    for k in range(int(salto.max()) if salto.size else 0):
+        m = salto > k
+        out[k:] |= m[:alt.shape[0] - k]
     return out

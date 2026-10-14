@@ -187,7 +187,12 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   il contrasto dei **dettagli** delle texture (punto 3.5). La regola di `CLAUDE.md` "sfondi
   meno contrastati dei personaggi" vale ancora: si misura con la prova giorno/notte.
 
-### 🔴 3.2 Nessuna altezza: rupi, gradoni, scogliere e mura sono piatti
+### ✅ 3.2 Nessuna altezza: rupi, gradoni, scogliere e mura sono piatti — FATTO (2026-10-14)
+> Parte 1: `forge3d/pareti.py` + tavola `arte/pareti/`. Parte 2: altezze in `build_world.py` e in
+> `world_prova.json` (`altezza`, `parete`, `passaggi`), prima/dopo in `arte/mondo/pareti_prima_dopo_*.png`.
+> Resta: le mura e i bordi nord-sud mostrano solo la cima (vista 3/4); in Godot le pareti come muri
+> arrivano con US-8B12.
+
 - **Cosa:** tutto è una texture vista dall'alto. Al "passo tra due rupi" le rupi sono
   strisce di arenaria per terra; i gradoni delle Marche non si vedono; le scogliere sono
   bande. In una vista 3/4 un dislivello si capisce dalla **parete verticale** (faccia
@@ -293,7 +298,7 @@ Le differenze che c'erano (per memoria):
 Nel Blocco D (US-8B40) i fogli VFX in grigio seguono il `tratto` di `data/vfx.json`, lo
 shader ne legge i colori.
 
-### 🟢 4.2 La guida `arte/` è superata
+### ✅ 4.2 La guida `arte/` è superata — FATTO (2026-10-14: 64 px, terreni e pareti generati)
 - `arte/01–05` parlano ancora di 32×32, contorno 2 px nei VFX, prompt per Gemini e
   placeholder diagnostici; `CLAUDE.md` v2 dice 64 px e sprite-forge.
   **Correggere:** aggiornare i 5 file (solo documentazione).
@@ -302,7 +307,7 @@ shader ne legge i colori.
 - `build_enel.py` usa ancora `render.py`/`check.py` della skill esterna (già noto); nemico e
   pet non hanno generatore (punto 1.10). Si chiude con il Blocco C.
 
-### 🟢 4.4 Godot importa anche le anteprime e le concept art
+### ✅ 4.4 Godot importa anche le anteprime e le concept art — FATTO (`.gdignore`, 2026-10-14)
 - `arte/` (anteprime, mappe di rumore 1200×1000) e `assets/concept/` vengono importati:
   import più lento e, all'esportazione, finirebbero dentro il gioco (le concept art non
   sono distribuibili: nota IP). Nessuno script le carica.

@@ -28,7 +28,7 @@ struttura resta), `data/animations.json` (timing).
 ## 2. Le 10 palette (valori correnti, `data/vfx.json`)
 
 Regola che non cambia mai: **inchiostro scurissimo + UN primario + UN
-accento**. Un quarto colore a 32x32 e' rumore, va rifiutato.
+accento**. Un quarto colore e' rumore, va rifiutato.
 
 | Pathway | Inchiostro | Primario | Accento | Tratto (firma) |
 |---|---|---|---|---|
