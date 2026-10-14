@@ -36,8 +36,10 @@ def _campi(mat, S, seed):
     return nz, ids, bordo
 
 
-def _faccia(mat, X, Yf, Hf, S, seed):
-    """Indice di tono (0..n-1) per i pixel della faccia. X: x di mondo, Yf: y dal bordo in alto, Hf: altezza."""
+def _faccia(mat, X, Yf, Hf, S, seed, Yw=None):
+    """Indice di tono (0..n-1) per i pixel della faccia. X: x di mondo, Yf: y dal bordo in alto, Hf: altezza.
+    Yw: y di mondo per il disegno (strati, blocchi): cosi' due pareti una sopra l'altra combaciano."""
+    Yl, Yf = Yf, (Yf if Yw is None else Yw)
     d = MATERIALI[mat]
     n = len(d["ramp"])
     nz, ids, bordo = _campi(mat, S, seed)
@@ -67,20 +69,21 @@ def _faccia(mat, X, Yf, Hf, S, seed):
         manca = ((riga * 13 + col * 7) % 17 == 0)                        # qualche blocco caduto: buco in ombra
         t = np.where(manca, np.where(yr < bh // 2, 0, 1), t)
         t = np.where((xr == 0) | (yr == 0), 0, t)                        # fughe
-    t = t - ((Yf > Hf - S * 0.25) & (t > 1))                             # buio alla base
-    t = np.where(Yf < max(2, S // 21), n - 1, t)                         # orlo in luce
-    t = np.where(Yf == max(2, S // 21), n - 2, t)
+    t = t - ((Yl > Hf - S * 0.25) & (t > 1))                             # buio alla base
+    t = np.where(Yl < max(2, S // 21), n - 1, t)                         # orlo in luce
+    t = np.where(Yl == max(2, S // 21), n - 2, t)
     return np.clip(t, 0, n - 1)
 
 
-def tile(mat, k, d, sx=False, dx=False, passaggio=None, col=0, S=64, seed=5):
+def tile(mat, k, d, sx=False, dx=False, passaggio=None, col=0, S=64, seed=5, base=None, riga=None):
     """Una casella di parete RGBA (S x S): riga k (0 = in alto) di una parete alta d caselle.
     sx/dx: la parete finisce a sinistra/destra. passaggio: None, 'S' (scalini) o 'R' (rampa).
+    base: disegna la base (False se sotto c'e' ancora parete: gradini in diagonale). Default: ultima riga.
     col: colonna di mondo (sceglie la variante: col % 3)."""
     y, x = np.mgrid[0:S, 0:S]
     X, Yf, Hf = col * S + x, k * S + y, d * S
     ramp = MATERIALI[mat]["ramp"]
-    t = _faccia(mat, X, Yf, Hf, S, seed)
+    t = _faccia(mat, X, Yf, Hf, S, seed, None if riga is None else riga * S + y)
     pal = np.array([_rgb(c) for c in ramp])
     img = pal[t]
     alpha = np.full((S, S), 255, np.uint8)
@@ -105,7 +108,7 @@ def tile(mat, k, d, sx=False, dx=False, passaggio=None, col=0, S=64, seed=5):
         dentro = x < S - lato
         img[~dentro] = pal[0]                                  # lato in ombra: luce da sinistra
         alpha[x >= S - lato + 2] = 0
-    if k == d - 1 and passaggio is None:                       # base frastagliata, sassi caduti
+    if (k == d - 1 if base is None else base) and passaggio is None:                       # base frastagliata, sassi caduti
         base = S - 1 - (nz[0:1, :S] * 4).astype(int)
         alpha[y > base] = 0
         img[y == base] = _rgb("ink")
@@ -147,6 +150,41 @@ def _vicino(e, y, x):
     return bool(e[max(0, y - 1):y + 2, x].any())
 
 
+def _orli(alt, mat, e, y, x, S, seed):
+    """Caselle alte che NON sono parete: in vista 3/4 un bordo est o ovest non mostra la faccia, solo la
+    cima. Per non vedere pezzi staccati: orlo di roccia sul lato che confina con il basso, e per le mura
+    un camminamento di pietre chiare (altrimenti la cima del muro si confonde con il selciato)."""
+    H, W = alt.shape
+    h = alt[y, x]
+    m = mat[y][x]
+    if h <= 0 or not m:
+        return None
+    basso = lambda yy, xx: 0 <= yy < H and 0 <= xx < W and alt[yy, xx] < h and not e[yy, xx]
+    sx, dx, su = basso(y, x - 1), basso(y, x + 1), basso(y - 1, x)
+    muro = m == "mura"
+    if not (sx or dx or (muro and su)) and not (muro and (basso(y + 1, x) or e[min(y + 1, H - 1), x])):
+        return None
+    ramp = MATERIALI[m]["ramp"]
+    pal = np.array([_rgb(c) for c in ramp])
+    yy, xx = np.mgrid[0:S, 0:S]
+    out = np.zeros((S, S, 4), np.uint8)
+    if muro:                                                   # camminamento: lastre chiare con fughe
+        t = _faccia(m, x * S + xx, yy + S, 3 * S, S, seed, y * S + yy)
+        out[..., :3] = pal[np.clip(t + 1, 1, len(ramp) - 1)]
+        out[..., 3] = 255
+        if su:
+            out[:2, :, :3] = pal[-1]; out[0, :, :3] = _rgb("ink")
+    w = max(3, S // 10)
+    if sx:                                                     # lato in luce (sinistra)
+        out[:, :w, :3] = pal[2]; out[:, :w, 3] = 255
+        out[:, 0, :3] = _rgb("ink")
+    if dx:                                                     # lato in ombra (destra)
+        out[:, S - w:, :3] = pal[0]; out[:, S - w:, 3] = 255
+        out[:, S - w, :3] = pal[1]
+        out[:, S - 1, :3] = _rgb("ink")
+    return out
+
+
 def disegna(alt, mat, passaggi=None, S=64, seed=5):
     """Strato RGBA (H*S, W*S) con pareti e ombre, da mettere sopra il terreno.
     mat: H x W di nomi di MATERIALI (conta quello della casella in cima al bordo).
@@ -158,6 +196,9 @@ def disegna(alt, mat, passaggi=None, S=64, seed=5):
     for y in range(H):
         for x in range(W):
             if f[y, x] is None:
+                orlo = _orli(alt, mat, e_parete, y, x, S, seed)  # cima delle mura e orli laterali
+                if orlo is not None:
+                    out[y * S:(y + 1) * S, x * S:(x + 1) * S] = orlo
                 if y > 0 and e_parete[y - 1, x]:               # ombra sotto la base
                     sx = x == 0 or not e_parete[y - 1, x - 1]
                     out[y * S:(y + 1) * S, x * S:(x + 1) * S] = tile_ombra(sx, False, S)
@@ -166,7 +207,8 @@ def disegna(alt, mat, passaggi=None, S=64, seed=5):
             sx = not _vicino(e_parete, y, x - 1)               # libero a sinistra (anche in diagonale)
             dx = not _vicino(e_parete, y, x + 1)
             p = passaggi[y][x] if passaggi is not None and passaggi[y][x] in "SR" else None
-            out[y * S:(y + 1) * S, x * S:(x + 1) * S] = tile(mat[yb][x], k, d, sx, dx, p, x, S, seed)
+            base = k == d - 1 and not (y + 1 < H and e_parete[y + 1, x])   # sotto c'e' terreno, non altra parete
+            out[y * S:(y + 1) * S, x * S:(x + 1) * S] = tile(mat[yb][x], k, d, sx, dx, p, x, S, seed, base, y)
     return out
 
 

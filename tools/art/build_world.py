@@ -618,8 +618,13 @@ def genera(seed):
     # passaggi: scala dove una strada attraversa una parete, rampa ogni ~15 caselle, rampa davanti al passo
     faccia = maschera_pareti(altezza)
     pas = np.full((H, W), ".", "<U1")
-    pas[faccia & ((xx + yy * 7) % 15 == 0)] = "R"
-    pas[faccia & disco(*passo, 6)] = "R"
+    # rampa: nasce in cima a un tratto di parete dritto (pareti a sinistra e a destra) e scende per tutta l'altezza
+    cima = faccia & ~sposta(faccia, 1, 0)
+    dritto = sposta(faccia, 0, 1) & sposta(faccia, 0, -1)
+    rampa = cima & dritto & ((xx + yy * 7) % 15 == 0) & ~disco(*passo, 8)
+    for _ in range(8):
+        rampa |= sposta(rampa, 1, 0) & faccia
+    pas[rampa] = "R"
     for p in strade:
         for x, y in p:
             if faccia[y, x]:

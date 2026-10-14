@@ -8381,3 +8381,17 @@ vedo che terreno avra'"). Rifacimento v2, risposte dell'utente:
   poco); (2) al passo le rupi fanno pareti alte 3-4 caselle a colonna; (3) il tavolo tattico ricalcola
   ancora le strisce di arenaria nell'anteprima JS (superficie.png invece e' aggiornata); (4) pareti come
   muri in Godot: US-8B12.
+
+[2026-10-14] Pareti: blocchi staccati (segnalato dall'utente: "i blocchi sono ancora distaccati"). CORRETTO.
+- Cause trovate guardando da vicino: (1) ogni gradino in diagonale disegnava base scura + ombra anche
+  sopra un altro pezzo di parete; (2) rampe "R" a tappeto in un raggio di 6 dal passo (colonne chiare
+  staccate); (3) rampe a pezzi su singole righe; (4) disegno degli strati che ripartiva a ogni gradino;
+  (5) mura e bordi est/ovest: in vista 3/4 mostrano solo la cima, e la cima delle mura = selciato.
+- pareti.py: base solo se sotto c'e' terreno; disegno della faccia in coordinate di mondo (strati e
+  blocchi combaciano tra gradini); _orli(): orlo di roccia sui lati est/ovest che confinano con il basso,
+  cima delle mura come camminamento di pietre chiare con bordo.
+- build_world.py: rampa solo in cima a un tratto dritto (pareti a sinistra e a destra), propagata per
+  tutta l'altezza; niente rampe a tappeto davanti al passo (c'e' la scala sulla strada).
+- Verificato: ritagli ingranditi (passo, gradoni, mura); md5 identico su due lanci; validate 0.
+- Aperto: nei bordi molto ripidi (quasi nord-sud) i gradini da 1 casella si toccano solo d'angolo:
+  l'orlo laterale li lega ma restano quadratini; servirebbe un tile "angolo" dedicato.
