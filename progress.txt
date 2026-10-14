@@ -8299,3 +8299,25 @@ vedo che terreno avra'"). Rifacimento v2, risposte dell'utente:
 - Aperto: i fogli sono ancora il disegno a 32 ingrandito (blocchi 2x2): li ridisegna il Blocco C. Le scritte
   dell'HUD ora sono lisce (disegnate a 1280x720) invece che a blocchi: da decidere se serve un font pixel.
   tileset.png della stanza di prova resta a 32 (lo sostituiscono gli atlanti del mondo, US-8B12).
+
+[2026-10-14] REVISIONE GENERALE DELL'ARTE (solo controllo, nessun file di gioco toccato).
+- Lista completa con priorita' e "come correggere": arte/revisione_arte.md. Immagini di prova
+  in arte/revisione/ (personaggi sopra la mappa giorno/notte; attacco del nemico frame per frame).
+- Alta priorita': (1) Enel sparisce sul selciato di Mirwada (stessa rampa blu-ardesia), di notte
+  restano solo gli occhi; (2) nemico_base.attack: il frame attivo (1) mostra la mazza ALZATA,
+  frame 2 = frame 1, frame 3 = idle -> nessuna posa del colpo (FR-8); (3) 19/19 fogli ancora a
+  32 ingranditi; (4) concept art cupe e desaturate vs terreni saturi e allegri (decisione
+  dell'utente); (5) nessuna altezza: rupi, gradoni e scogliere sono texture piatte.
+- Altro: sprite che toccano il bordo della cella; su/giu' di Enel confondibili; effetti ciano
+  cotti negli sprite (vanno nei VFX colorati dallo shader); lampo bianco di hurt che ignora
+  riduci_flash; camminata con 2 coppie di frame quasi uguali; spada che sparisce nella morte;
+  pet troppo piccolo; piedi disegnati 8 unita' sotto la collisione (sprite a (0,-8), origine
+  piedi_centro non usata); alberi alti come Enel; vegetazione non legata alla regione; texture
+  ripetute; moli e lastre con bordi ondulati; strade che finiscono nel nulla; coste a gradini;
+  acqua turchese nel sottosuolo; data/vfx.json diverso da design-vfx.md su 6 Pathway su 10.
+- Come verificato: analisi automatica dei 19 fogli (palette, alpha, duplicati, cicli, pivot,
+  bordi, inchiostro interno) + check.py della skill sui JSON di Enel + ogni foglio, ritaglio e
+  scena guardati ingranditi su chiaro e scuro + prova composita alla scala del gioco + lettura
+  di animation_machine.gd, player/enemy.tscn, enemy.gd, vfx.gd. selftest.py della skill exit 0.
+- Prossimo: decisioni dell'utente su colore del mondo e palette VFX, poi l'ordine del cap. 6
+  della revisione (generatore -> Blocco C -> piccolo codice -> pulizia).

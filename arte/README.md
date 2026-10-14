@@ -39,6 +39,8 @@ indice comodo, non l'autorita'.
    pathway.
 5. **`05_checklist_finale.md`** — checklist unica prima di considerare
    un'immagine "fatta" e sapere dove salvarla.
+6. **`revisione_arte.md`** — revisione generale del 2026-10-14: cosa va
+   migliorato nell'arte esistente, con priorita' e come correggerlo.
 
 Ogni file dice: cosa disegnare, con quali vincoli, con quale prompt (se generi
 con IA), dove salvare il risultato, come verificarlo.
