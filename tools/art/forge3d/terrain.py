@@ -332,13 +332,6 @@ def _rim(mask, img, kind, rimc, ramp):
         out[inner] = _rgb(rimc) if rimc else _rgb(ramp[-1])
     elif kind == "foam":
         out[inner] = _rgb("white")
-    if kind == "cliff":
-        # fronte roccioso: sotto il bordo inferiore aggiungi una fascia scura (profondita')
-        below = np.zeros_like(mask)
-        for k in (1, 2, 3):
-            sh = np.zeros_like(mask); sh[k:, :] = mask[:-k, :] if k else mask
-            below |= sh & ~mask
-        out_rgba = None
     return out, inner
 
 

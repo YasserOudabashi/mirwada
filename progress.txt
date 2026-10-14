@@ -8333,3 +8333,22 @@ vedo che terreno avra'"). Rifacimento v2, risposte dell'utente:
 - Solo documentazione: nessun file di gioco o dato toccato.
 - Prossimo (ordine della revisione, cap. 6): story del generatore (pareti e altezze, bordi dritti
   dei terreni costruiti, varianti dei tile, alberi piu' alti), poi Blocco C.
+
+[2026-10-14] Pareti e altezze, PARTE 1 (revisione arte 3.2): disegno delle pareti + tavola di prova. FATTA (in attesa dell'occhio dell'utente).
+- Risposte dell'utente: materiali arenaria + roccia + mura; passaggi con scalini e rampa; 3 varianti
+  centrali; altezza: prima "2 caselle per livello", poi corretto in 1 CASELLA PER LIVELLO ("per non esagerare").
+- tools/art/forge3d/pareti.py (nuovo): altezza intera per casella; dove una casella e' piu' bassa di quella
+  sopra, la differenza diventa parete nelle caselle basse subito sotto il bordo (non calpestabili), con orlo
+  in luce, buio alla base, spigoli frastagliati a sinistra/destra e ombra a terra (inchiostro alpha 110/55)
+  nella casella sotto. Texture in coordinate di mondo, periodica su 3 caselle (= 3 varianti centrali).
+  Motivi: arenaria a strati ondulati con fessure e crepe, roccia a lastre di Voronoi, mura a blocchi
+  sfalsati con qualche blocco caduto. 'S' = scalini, 'R' = rampa di terra con sassi.
+- tools/art/campioni_pareti.py -> arte/pareti/scena_{arenaria,roccia,mura}.png + campioni.png (x2).
+- terrain.py: tolto il calcolo "cliff" in _rim che non veniva usato (tavola dei terreni identica, md5).
+- Comando: python tools/art/campioni_pareti.py (seed 5 di default in pareti.py; md5 identico su due lanci).
+- Guardato ingrandito, 3 giri: roccia a righe diagonali come stoffa -> lastre di Voronoi; chiazze chiare
+  sulle mura -> tono per blocco; rampa = macchia -> pendio a fasce; sassi in griglia/diagonale -> sparsi.
+- Aperto: (1) sopra l'orlo resta a volte una striscia di 2-6 px del terreno basso (il bordo dual grid del
+  terreno alto ha rumore); si sistema nella parte 2 mettendo nella casella di parete il terreno giusto o un
+  orlo che sporge. (2) La base della rampa e' molto scura. (3) Non ancora esportato come atlante per Godot
+  ne' usato nella mappa: e' la PARTE 2 (altezze del mondo in world.json).
