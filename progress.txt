@@ -8136,3 +8136,18 @@ Domande sull'arcipelago (round 2):
   isole): il mondo diventa piu' alto verso sud.
 - NB errore mio: avevo proposto l'isola ghiacciata "a sud-ovest", ma il sud e'
   caldo -> da chiedere all'utente.
+Domande su isola ghiacciata e sottosuolo (round 3-4):
+- Isola ghiacciata: resta A SUD, ghiaccio MAGICO (maledizione/potere): il
+  mistero fa parte della storia.
+- Sottosuolo: UNA RETE UNICA sotto tutto il continente (da una regione
+  all'altra passando sotto terra). Contenuti: fogne e catacombe (Mirwada,
+  Marche), grotte naturali (Valle), miniere abbandonate (terra di mezzo,
+  Marche), CITTA' SOTTERRANEA sotto la terra di mezzo (popolo antico, sotto le
+  rovine del boss, collegata a tutte le regioni).
+- Luce: PENOMBRA (si vede tutto ma scuro, fonti di luce sparse).
+- Grandezza: UN TERZO della superficie (~700 schermate).
+- Ingressi: TANTI (30-50): tombini, pozzi, grotte, cripte, miniere.
+- Boss: UNO PER ZONA (fogne, catacombe, grotte, miniere).
+- Stima totale: superficie ~1.900 schermate di terra (regioni x3 + terra di
+  mezzo) + arcipelago e Frontiera (350+), sottosuolo ~700. Mondo di
+  superficie ~1200x900 tile (il mare cresce verso sud).
