@@ -8151,3 +8151,33 @@ Domande su isola ghiacciata e sottosuolo (round 3-4):
 - Stima totale: superficie ~1.900 schermate di terra (regioni x3 + terra di
   mezzo) + arcipelago e Frontiera (350+), sottosuolo ~700. Mondo di
   superficie ~1200x900 tile (il mare cresce verso sud).
+
+[2026-10-14] US-8B13b + 8B13c — mappa di prova x3 con terra di mezzo, arcipelago e sottosuolo. FATTA (in revisione).
+- tools/art/build_world.py riscritto: 1200x1000 tile, continente nel 46% alto
+  (K=3.4 scala del paesaggio, KC=2 scala della citta'); LA terra di mezzo al
+  centro con 4 paesaggi (Voronoi interno) e le rovine del boss; Frontiera
+  enorme (raggio 245) con 6 isolette nella nebbia; 16 isole (grandi, medie,
+  piccole; mostro allungata, atollo ad anello con laguna bassa, ghiacciata,
+  pirati con villaggio); sottosuolo sulla stessa griglia (fogne a griglia sotto
+  la citta' + sbocco sul mare, catacombe a 240 stanze sotto le Marche, grotte
+  con laghi sotto la Valle, miniere a gallerie sotto la terra di mezzo,
+  citta' sotterranea sotto le rovine del boss), collegato in UNA rete (ogni
+  parte staccata si unisce con una galleria); 47 ingressi (stesso punto sopra
+  e sotto) e 4 boss di zona; nuovo terreno roccia_viva (pareti).
+- Misure (seed 6): superficie 3.350 schermate (Frontiera 689 = la piu'
+  grande, Marche 670, terra di mezzo 577, Valle 569, Mirwada 448, Archivio
+  196, 16 isole da 1,4 a 37), sottosuolo 731. ~23 s per generare tutto.
+- Niente scipy: distanze ed enclavi con numpy (lo script gira con solo numpy
+  e pillow). Alberi e rocce vettorializzati (72.928 oggetti).
+- Errori trovati guardando e corretti: Frontiera piu' piccola di Marche e terra
+  di mezzo (la mia stima "350+" era di prima dell'ingrandimento); citta' di
+  Mirwada finita sulla Frontiera (il porto cercava l'ultima terra a sud nella
+  colonna: ora solo sulla terra di Mirwada); Valle e Archivio scambiati
+  (ordine di spacchettamento sbagliato); fiumi a righe dritte (spinta verso
+  sud troppo forte per il mondo grande); boss del sottosuolo sul bordo; laguna
+  dell'atollo profonda invece che bassa. Tolti 5 ritagli vecchi.
+- Verificato: md5 identico su due lanci; validate exit 0.
+- Aperto: i fiumi ora fanno curve ma finiscono in laghetti senza arrivare al
+  mare; strade A* a "L" squadrate che corrono anche lungo la riva; anello
+  d'arrivo della Frontiera stretto rispetto alla nebbia; "un terzo" del
+  sottosuolo era ~700 sulla stima vecchia, ora e' ~22% della superficie.

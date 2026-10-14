@@ -107,6 +107,9 @@ TERRAINS = {
                           rimc="ink", level=9.1, accent=["orange", "amber"]),
     "ghiaccio": dict(ramp=["slate", "grey", "grey_l", "grey_l"], period=4, dither=0.4, detail="embers", cells=4, spessore=0.6,
                      rim="light", rimc="white", level=9.6, contrast=0.4, accent=["white", "white"]),
+    # --- Sottosuolo (US-8B13c): la roccia delle pareti di gallerie e caverne ---
+    "roccia_viva": dict(ramp=["ink", "navy", "slate_d", "slate_d"], period=4, dither=0.4, detail="cobbles", cells=6,
+                        rim="cliff", rimc="ink", level=9.8, contrast=0.5),
     # --- Marche e Valle (US-8B11c) ---
     "palude": dict(ramp=["brown_dd", "teal_d", "green_d", "brown_d"], period=3, dither=0.6, detail="puddles", rim="dark",
                    rimc="brown_dd", level=3.2, contrast=0.25, accent=["teal_d", "green_m"]),
