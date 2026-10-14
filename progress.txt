@@ -8607,3 +8607,15 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   rocce 644, ossa ~319, scogli 288.
 - Verificato: piante affiancate a Enel x2 (due giri di correzioni: ulivo, felce, liane, ossa), giungla, campagna,
   Marche a dimensione vera; md5 uguale su due lanci; validate 0.
+
+[2026-10-14] Revisione arte 3.14 — grandi aree tutte uguali. FATTO lato terreno.
+- build_world.py, prima di terreno_sotto: macchie (fbm scala 22, seed+321/323, > 0.66) solo sul terreno di base:
+  Marche pietrisco -> erica_secca / terra_bruciata (scelta da un secondo rumore lento), Frontiera nebbia ->
+  erba_lilla. Lontano 3 caselle da facce di parete, mura, moli, strade e sentieri; 6 da luoghi e villaggi.
+  ERRORE TROVATO E CORRETTO: escludere le caselle con materiale da parete escludeva tutte le Marche (gli altopiani
+  dei gradoni hanno il materiale): ora solo le facce.
+- terrain.py: nebbia ed erba_lilla macro 8 (la nebbia ripeteva un motivo ogni 4 tile, visibile sul chiaro).
+- Quote: Marche pietrisco 53% -> ~47% (+ terra bruciata, erica), Frontiera nebbia 61% -> ~49% (+ lilla).
+- Restano i punti d'interesse (contenuto di gioco, da decidere).
+- Verificato: diff con HEAD (solo ground e ~30 ossa in meno sul terreno cambiato), ritagli a dimensione vera,
+  md5 uguale su due lanci, validate 0, campioni_terreni rigenerato.

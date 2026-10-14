@@ -725,6 +725,18 @@ def genera(seed):
     w.objects = sorted(w.objects + scogli, key=lambda o: o["y"])
     # dopo tutto il resto (strade, alberi e sottosuolo non cambiano): terreno della cima sotto le pareti, poi le
     # macchie troppo piccole (diventerebbero rombi isolati) prendono il terreno attorno
+    # grandi aree uguali (revisione 3.14): una macchia di un altro terreno ogni 2-3 schermate, solo sul terreno di
+    # base e lontano da pareti, strade, luoghi e villaggi. Le macchie: (zona, terreno di base, [terreni], seme)
+    lontano = ispessisci(faccia | np.isin(mat_par, ["mura", "molo", "legno"])
+                         | np.isin(g, [L["lastricato_antico"], L["path"]]), 3)
+    for x, y in list(luoghi.values()) + list(villaggi.values()):
+        lontano[max(0, y - 6):y + 7, max(0, x - 6):x + 7] = True
+    for zona, base, varie, sm in ((mc, "pietrisco", ["erica_secca", "terra_bruciata"], 321),
+                                  (R["frontiera_porte"], "nebbia", ["erba_lilla"], 323)):
+        macchia = (fbm(W, H, 22, 3, seed + sm) > 0.66) & zona & (g == L[base]) & ~lontano
+        quale = fbm(W, H, 60, 1, seed + sm + 1)
+        for i_, t in enumerate(varie):
+            g[macchia & (quale >= i_ / len(varie)) & (quale < (i_ + 1) / len(varie) + (i_ == len(varie) - 1))] = L[t]
     w.ground = terreno_sotto(w.ground, altezza, mat_par)
     assorbi_macchie(w.ground, faccia)
     # terreni a bordo dritto: una casella che sporge da sola (punta, vicolo cieco di 1) prende il terreno accanto

@@ -314,10 +314,13 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   **Da proporre all'utente** (non cambia la disposizione approvata): griglia solo per
   porto e città nuova, vicoli storti nel centro antico e nei bassifondi (con US-8B14/18).
 
-### 🟢 3.14 Grandi aree tutte uguali
+### ✅ 3.14 Grandi aree tutte uguali — FATTO lato terreno (2026-10-14)
 - Marche (pietrisco bruno su ~670 schermate) e interno della Frontiera (lilla su ~690).
   **Correggere** nella rifinitura delle regioni: un punto d'interesse o un cambio di
   terreno ogni 2–3 schermate.
+  **Fatto lato terreno:** macchie di erica e terra bruciata sul pietrisco delle Marche, isolette di erba
+  lilla nella nebbia della Frontiera (rumore, una ogni ~40 caselle, lontano da pareti, strade, luoghi e
+  villaggi); nebbia ed erba lilla con texture 8×8. **Restano** i punti d'interesse veri (contenuto di gioco).
 
 ---
 
