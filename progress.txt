@@ -8270,3 +8270,11 @@ vedo che terreno avra'"). Rifacimento v2, risposte dell'utente:
   tools/art/layout_mondo.json (tratti -> chiave "tratti"), rilanciare build_world.py, ripubblicare.
 - Nel db c'erano 4 isole di prova della v1 (isola_nuova_18..21, una sulla terra ferma): lasciate, l'utente decide.
 - Aperto: l'anteprima non disegna fiumi, strade e alberi; il sottosuolo resta l'immagine del Python con i tratti sopra.
+
+## Modifiche dal tavolo applicate ("fatto"), 2026-10-14
+- Letti da db: mappa/layout (versione 55) + 28 tratti -> tools/art/layout_mondo.json; `python tools/art/build_world.py` (seed 6, 28 s).
+- Cosa ha cambiato l'utente: tolta isola_nuova_18 (era sulla terra), tenute isola_nuova_19/20/21; laghetto d'acqua
+  (pennello r4) attorno a (770,350) nella Valle; pozza d'acqua r0 attorno a (364,307).
+- Risultato: superficie 3360 schermate, sottosuolo 717, città 62; 51 luoghi, 35 villaggi, 47 ingressi. validate exit 0.
+- Da chiedere: isola_nuova_19 e _21 cadono dentro la Frontiera (dischi di bosco nella nebbia, non isole nel mare);
+  isola_nuova_20 si fonde con isolotto_1; la pozza (364,307) e' larga 1 tile. Tavolo ripubblicato (versione 3).
