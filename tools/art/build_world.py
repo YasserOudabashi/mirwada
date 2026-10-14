@@ -45,25 +45,21 @@ W, H = 1200, 1000
 COSTA = 0.46                       # frazione di H dove finisce il continente
 HC = H * COSTA                     # altezza del continente
 K = 3.4                            # scala del paesaggio rispetto alla prima mappa di prova (320x220)
-KC = 2.0                           # scala della citta' (porto, mura, moli)
+KC = 2.0                           # scala di cimitero e monastero
 SCHERMATA = 20 * 11                # tile in una schermata a 64 px
 
 # Continente: centro di ogni zona in frazioni (x di W, y di HC). Ordine = indice nella mappa.
-TERRA = {"mirwada": (0.43, 0.80), "marche_crepuscolo": (0.15, 0.35), "archivio_sepolto": (0.85, 0.18),
-         "valle_madre": (0.87, 0.70), "terra_di_mezzo": (0.52, 0.42)}
-PESO = {"archivio_sepolto": 1.3, "terra_di_mezzo": 1.05, "marche_crepuscolo": 1.1}     # >1 zona piu' piccola, <1 piu' grande
-MEZZO = {"steppa": (0.50, 0.12), "colline": (0.34, 0.45), "foreste": (0.64, 0.60), "paludi": (0.71, 0.30)}
-# Isole: (id, cx, cy in frazioni di W e H, raggio in tile, profilo). Grandi, medie e piccole.
-ISOLE = [("frontiera_porte", 0.52, 0.74, 245, "frontiera"),
-         ("isola_vulcanica", 0.12, 0.88, 55, "vulcanica"), ("isola_tropicale", 0.90, 0.63, 52, "tropicale"),
-         ("isola_pirati", 0.20, 0.64, 48, "pirati"),
-         ("isola_relitto", 0.06, 0.72, 32, "relitto"), ("isola_rovine", 0.93, 0.89, 34, "rovine"),
-         ("isola_ghiacciata", 0.32, 0.93, 34, "ghiacciata"), ("isola_mostro", 0.78, 0.94, 36, "mostro"),
-         ("atollo", 0.27, 0.80, 40, "atollo"), ("isola_boss", 0.05, 0.96, 28, "boss"),
-         ("scoglio_faro", 0.30, 0.53, 12, "faro"),
-         ("isolotto_1", 0.70, 0.56, 14, "boschiva"), ("isolotto_2", 0.38, 0.55, 12, "relitto"),
-         ("isolotto_3", 0.98, 0.76, 16, "rovine"), ("isolotto_4", 0.45, 0.975, 18, "tropicale"),
-         ("isolotto_5", 0.63, 0.97, 15, "rocciosa"), ("isolotto_6", 0.08, 0.56, 13, "boschiva")]
+# Disposizione: tools/art/layout_mondo.json (la scrive anche l'artifact "tavolo tattico").
+LAYOUT_PATH = os.path.join(HERE, "layout_mondo.json")
+with open(LAYOUT_PATH, encoding="utf-8") as _f:
+    LAYOUT = json.load(_f)
+# Continente: centro di ogni zona in frazioni (x di W, y di HC). Ordine = indice nella mappa.
+TERRA = {n: (v["x"], v["y"]) for n, v in LAYOUT["terra"].items()}
+PESO = {n: v.get("peso", 1.0) for n, v in LAYOUT["terra"].items()}     # >1 zona piu' piccola, <1 piu' grande
+MEZZO = {n: (v["x"], v["y"]) for n, v in LAYOUT["mezzo"].items()}
+# Isole: (id, cx, cy in frazioni di W e H, raggio in tile, profilo).
+ISOLE = [(i["id"], i["x"], i["y"], i["r"], i["profilo"]) for i in LAYOUT["isole"]]
+RC = LAYOUT["citta"]["raggio"]      # raggio della citta' di Mirwada in tile (~55 schermate con 55)
 REGIONI = ["mare"] + list(TERRA) + [i[0] for i in ISOLE]
 SENZA_ALBERI = ["path", "sand", "stone", "lastre_chiare", "ciottoli_scuri", "molo_pietra", "pontile_legno",
                 "lastricato_antico", "marmo", "ghiaia", "ciottoli_spiaggia", "arenaria", "pietrisco", "terra_bruciata",
@@ -205,7 +201,7 @@ def genera(seed):
     costa = HC + (n1 - 0.5) * 34 * K + (n2 - 0.5) * 10 * K
     terra = yy < costa
     px = centro_di("mirwada")[0]
-    golfo = ((xx - px) / (30 * KC * 1.1)) ** 2 + ((yy - HC - 4) / (24 * KC * 1.1)) ** 2 < 1 + (n2 - 0.5) * 0.3
+    golfo = ((xx - px) / (RC * 1.15)) ** 2 + ((yy - HC - 4) / (RC * 0.8)) ** 2 < 1 + (n2 - 0.5) * 0.3
     terra &= ~golfo
     wx, wy = xx + (n2 - 0.5) * 60 * K, yy + (n1 - 0.5) * 60 * K
     dist = np.stack([np.hypot(wx - cx * W, wy - cy * HC) * PESO.get(n, 1.0) for n, (cx, cy) in TERRA.items()])
@@ -333,24 +329,94 @@ def genera(seed):
     g[muro_verde] = L["felci"]
     g[disco(*scalinata, 3) & ar] = L["ghiaccio"]
 
-    # --- Mirwada citta': porto sul golfo, centro antico, mura in rovina, moli e pontili ---
+    # --- Mirwada, grande citta' portuale a quartieri (risposte dell'utente 2026-10-14) ---
     py = int(np.nonzero(mw[:, px])[0].max()) - 1                       # riva nord del golfo (non la Frontiera!)
-    porto, centro = (px, py), (px, py - int(18 * KC))
-    citta = disco(*centro, 22 * KC) & mw & (dmare > 1)
-    isolati = ((xx % 6) < 4) & ((yy % 5) < 3)
-    strada = np.where(yy < centro[1], L["lastre_chiare"], L["ciottoli_scuri"])
-    g[citta] = np.where(isolati[citta], L["stone"], strada[citta])     # stone = sedime degli edifici (US-8B18)
-    mura = disco(*centro, 23 * KC) & ~disco(*centro, 21 * KC) & mw & (dmare > 1)
-    ang = np.degrees(np.arctan2(yy - centro[1], xx - centro[0])) % 360
+    porto, centro = (px, py), (px, py - int(RC * 0.6))
+    rq = fbm(W, H, 18, 2, seed + 50) - 0.5                                         # confini irregolari
+    dxc, dyc = xx - centro[0] + rq * RC * 0.5, yy - centro[1] + rq * RC * 0.4
+    dc = np.hypot(dxc, dyc)
+    base_citta = mw & (dmare > 1)
+    vecchia = base_citta & (dc < RC * 0.85)                                       # dentro le mura
+    fuori = base_citta & (dc >= RC * 0.9) & (dc < RC * 1.3)
+    Q = {"porto_commerciale": vecchia & (yy > py - RC * 0.32) & (np.abs(xx - px) < RC * 0.75),
+         "quartiere_operaio": vecchia & (dxc < -RC * 0.25),
+         "centro_antico": vecchia & (dyc < -RC * 0.35),
+         "bassifondi": fuori & (dxc < -RC * 0.3),
+         "citta_nuova": fuori & (dxc >= -RC * 0.3) & (yy < py - RC * 0.15)}
+    Q["quartiere_operaio"] &= ~Q["porto_commerciale"]
+    Q["centro_antico"] &= ~Q["quartiere_operaio"]
+    Q["centro_storico"] = vecchia & ~Q["porto_commerciale"] & ~Q["quartiere_operaio"] & ~Q["centro_antico"]
+    citta = np.zeros((H, W), bool)
+    for z in Q.values():
+        citta |= z
+
+    def isolati(z, passo_x, passo_y, larg, alt, strada, edificio=L["stone"]):
+        """Strade e sedime degli edifici (stone = edifici, US-8B18)."""
+        blocco = ((xx % passo_x) < larg) & ((yy % passo_y) < alt)
+        g[z] = np.where(blocco[z], edificio, strada)
+
+    isolati(Q["porto_commerciale"], 12, 9, 9, 6, L["ciottoli_scuri"])            # magazzini grandi
+    isolati(Q["quartiere_operaio"], 5, 4, 4, 3, L["ciottoli_scuri"])             # case strette e fabbriche
+    isolati(Q["centro_storico"], 8, 7, 6, 5, L["lastre_chiare"])                 # negozi, famiglie
+    isolati(Q["centro_antico"], 10, 9, 8, 7, L["lastre_chiare"])                 # palazzi
+    # bassifondi: terra e fango, baracche sparse e case crollate
+    z = Q["bassifondi"]
+    g[z] = np.where(d[z] < 0.25, L["mud"], L["dirt"])
+    g[z & ((xx % 5) < 3) & ((yy % 4) < 2) & (d > 0.3)] = L["stone"]
+    g[z & ((xx % 5) < 3) & ((yy % 4) < 2) & (d > 0.75)] = L["lastre_rovine"]
+    # citta' nuova: giardini, ville e viali larghi
+    z = Q["citta_nuova"]
+    g[z] = L["grass"]
+    g[z & ((xx % 14) < 5) & ((yy % 12) < 4)] = L["stone"]
+    g[z & (((xx % 14) >= 11) | ((yy % 12) >= 9))] = L["lastre_chiare"]
+    # piazze in marmo: centro storico (museo, mercanti) e centro antico (cattedrale)
+    piazza_storico = (centro[0] + int(RC * 0.2), centro[1] + int(RC * 0.05))
+    cattedrale = (centro[0], centro[1] - int(RC * 0.6))
+    g[disco(*piazza_storico, RC * 0.1) & citta] = L["marmo"]
+    g[disco(*cattedrale, RC * 0.08) & citta] = L["marmo"]
+    # mura in rovina tra la citta' vecchia e quella nuova
+    mura = base_citta & (dc >= RC * 0.85) & (dc < RC * 0.9)
+    ang = np.degrees(np.arctan2(dyc, dxc)) % 360
     g[mura & ((ang % 40) < 26)] = L["stone"]
-    g[disco(*porto, 4 * KC) & land] = L["ciottoli_scuri"]
-    g[riva & mw & ((np.hypot(xx - porto[0], yy - porto[1]) < 28 * KC) | (d > 0.62))] = L["ciottoli_spiaggia"]
-    for i, dx in enumerate(range(-48, 49, 12)):
-        ter, larg, lung = ("molo_pietra", 3, 10) if i % 2 == 0 else ("pontile_legno", 2, 7)
+    # lungomare: passeggiata lungo il golfo, con la piazza del mercato
+    lungomare = mw & (dmare >= 2) & (dmare <= 4) & (np.abs(xx - px) < RC * 1.0) & (yy > py - RC * 0.5)
+    g[lungomare] = L["lastre_chiare"]
+    citta |= lungomare
+    sx_l = np.nonzero(lungomare & (xx > px + RC * 0.1) & (xx < px + RC * 0.35))
+    piazza_mercato = (int(sx_l[1].mean()), int(sx_l[0].mean())) if len(sx_l[0]) else porto
+    g[disco(*piazza_mercato, 5) & mw] = L["marmo"]
+    g[riva & mw & ~citta & ((np.hypot(xx - porto[0], yy - porto[1]) < RC * 1.4) | (d > 0.62))] = L["ciottoli_spiaggia"]
+    # moli di pietra e pontili di legno lungo il porto commerciale
+    for i, dx in enumerate(range(-int(RC * 0.65), int(RC * 0.3), 10)):
+        ter, larg, lung = ("molo_pietra", 4, 14) if i % 2 == 0 else ("pontile_legno", 2, 9)
         x0 = porto[0] + dx
         y0 = int(np.nonzero(mw[:, x0])[0].max())
         g[y0:y0 + lung + 1, x0:x0 + larg] = L[ter]
         land[y0:y0 + lung + 1, x0:x0 + larg] = True
+    # cantiere navale sulla riva est del golfo: piazzale e scali di legno verso l'acqua
+    xs_c = px + int(RC * 0.55)
+    yc = int(np.nonzero(mw[:, xs_c])[0].max())
+    cantiere = (xs_c, yc)
+    g[disco(xs_c, yc - 4, 8) & mw] = L["pietrisco"]
+    for k_s in range(4):
+        x0 = xs_c - 9 + k_s * 6
+        y0 = int(np.nonzero(mw[:, x0])[0].max())
+        g[y0:y0 + 8, x0:x0 + 3] = L["pontile_legno"]
+        land[y0:y0 + 8, x0:x0 + 3] = True
+    # diga foranea: un lungo braccio di pietra dalla punta ovest del golfo, con il faro in fondo
+    punta = mw & riva & (xx < px - RC * 0.5) & (xx > px - RC * 2.0)              # punta ovest del golfo
+    ys_p, xs_p = np.nonzero(punta)
+    i_p = int(np.argmax(ys_p))
+    x_a, y_a = int(xs_p[i_p]), int(ys_p[i_p])
+    x_b, y_b = px + int(RC * 0.1), y_a + int(RC * 0.25)                          # testata, davanti al porto
+    n_p = max(abs(x_b - x_a), abs(y_b - y_a))
+    for t in range(n_p + 1):
+        xd = int(round(x_a + (x_b - x_a) * t / n_p))
+        yd = int(round(y_a + (y_b - y_a) * t / n_p - math.sin(math.pi * t / n_p) * RC * 0.15))
+        g[yd - 1:yd + 2, xd - 1:xd + 2] = L["molo_pietra"]
+        land[yd - 1:yd + 2, xd - 1:xd + 2] = True
+    faro_diga = (x_b, y_b)
+    diga_meta = ((x_a + x_b) // 2, (y_a + y_b) // 2 - int(RC * 0.15))
 
     # --- fiumi: dal nord verso il mare ---
     acqua = ~land
@@ -370,8 +436,8 @@ def genera(seed):
         acqua |= g == L["water"]
 
     # --- strade principali dal porto ---
-    archivio_ordine = (centro[0] + int(6 * KC), centro[1] - int(34 * KC))
-    cimitero = (centro[0] + int(30 * KC), centro[1] - int(4 * KC))
+    archivio_ordine = (centro[0] + int(RC * 0.1), centro[1] - int(RC * 1.6))
+    cimitero = (centro[0] + int(RC * 1.5), centro[1] - int(RC * 0.1))
     costo = np.where(np.isin(g, [L["stone"], L["arenaria"]]), 25.0, 1.0) + np.where(g == L["forest"], 4.0, 0.0)
     costo[acqua] = 40.0
     strade, ponti = [], []
@@ -397,8 +463,10 @@ def genera(seed):
 
     luoghi = {
         "porto": porto, "centro_antico": centro, "archivio_ordine": archivio_ordine, "cimitero": cimitero,
-        "faro": migliore(mw & riva & (xx < px - 20 * KC), yy),
+        "faro": faro_diga, "diga_foranea": diga_meta,
         "casa_base_porto": (porto[0] + 10, porto[1] - 4),
+        "cantiere_navale": cantiere, "piazza_mercato": piazza_mercato, "museo": piazza_storico,
+        "cattedrale": cattedrale, "dogana": (porto[0] - int(RC * 0.2), porto[1] - 3),
         "passo_tra_rupi": passo, "trono_del_gigante": migliore(mc, alt),
         "soglia_del_crepuscolo": migliore(mc & (alt > 0.45) & (alt < 0.65), d),
         "campo_di_battaglia": campo,
@@ -409,6 +477,10 @@ def genera(seed):
         "rovine_del_boss": rovine_boss,
         "approdo_frontiera": migliore(R["frontiera_porte"] & (dmare == 2), -yy),
     }
+    for q_nome in ("quartiere_operaio", "bassifondi", "citta_nuova", "centro_antico"):
+        ys_q, xs_q = np.nonzero(Q[q_nome])
+        if len(xs_q):
+            luoghi[q_nome] = (int(xs_q.mean()), int(ys_q.mean()))
     for rid, cx, cy, r, prof in ISOLE[1:]:
         ys_i, xs_i = np.nonzero(R[rid])
         if len(xs_i):
@@ -433,7 +505,7 @@ def genera(seed):
 
     fiume = acqua & land
     riva_fiume = ispessisci(fiume, 1) & ~fiume
-    lontano_citta = ~disco(*centro, 30 * KC)
+    lontano_citta = ~disco(*centro, RC * 1.4)
     campagna = mw & lontano_citta & ~riva & np.isin(g, [L["grass"], L["dry_grass"], L["filari"]])
     villaggi = {"villaggio_sugli_alberi": migliore(vl & vicino_a(galleria_alberi, 30 * K, 45 * K) & (g == L["felci"]), m),
                 "capanna_base_valle": migliore(vl & vicino_a(galleria_alberi, 8 * K, 14 * K) & ~riva, d),
@@ -459,6 +531,7 @@ def genera(seed):
         g[disco(x, y, r) & land & ~acqua] = L["path"] if r > 1 else L["dirt"]
 
     w = World(W, H, seed, g, reg, e, REGIONI, water_mask=acqua)
+    w.citta = citta                                   # per misurare la citta' e disegnarne l'anteprima
     w.roads = [[list(map(int, q)) for q in p] for p in strade]
     w.objects = ponti
 
@@ -490,7 +563,19 @@ def genera(seed):
                           "mat": "stone_light", "moss": False})
     w.objects.sort(key=lambda o: o["y"])
     sotto = genera_sottosuolo(seed, R, land, acqua, centro, rovine_boss, porto, rnd, rng, g)
+    applica_spostati(luoghi, villaggi, sotto)
     return w, luoghi, villaggi, sotto
+
+
+def applica_spostati(luoghi, villaggi, sotto):
+    """Le decisioni dell'utente (tavolo tattico) vincono sui suggerimenti: [x, y] sposta o aggiunge, null cancella."""
+    for chiave, dove in (("luoghi", luoghi), ("villaggi", villaggi), ("ingressi", sotto["ingressi"]),
+                         ("boss", sotto["boss"])):
+        for nome, pos in LAYOUT["spostati"].get(chiave, {}).items():
+            if pos is None:
+                dove.pop(nome, None)
+            else:
+                dove[nome] = (int(pos[0]), int(pos[1]))
 
 
 def genera_sottosuolo(seed, R, land, acqua, centro, rovine_boss, porto, rnd, rng, g_sopra):
@@ -677,6 +762,31 @@ def anteprima_sotto(w, sotto, k=1):
     return im
 
 
+CITTA_LUOGHI = ("porto", "museo", "piazza_mercato", "cattedrale", "dogana", "cantiere_navale", "faro",
+                "diga_foranea", "casa_base_porto", "quartiere_operaio", "bassifondi", "citta_nuova", "centro_antico")
+
+
+def anteprima_citta(w, luoghi, k=4):
+    """La citta' di Mirwada ingrandita, con i nomi dei quartieri e dei luoghi."""
+    ys, xs = np.nonzero(w.citta)
+    fy = luoghi.get("faro", (0, 0))[1]
+    x0, x1 = max(0, xs.min() - 25), min(W, xs.max() + 25)
+    y0, y1 = max(0, ys.min() - 15), min(H, max(ys.max(), fy) + 15)
+    col = colori_terreni()
+    img = col[w.ground[y0:y1, x0:x1]].copy()
+    im = Image.fromarray(img).resize(((x1 - x0) * k, (y1 - y0) * k), Image.NEAREST)
+    dr = ImageDraw.Draw(im)
+    font = ImageFont.load_default()
+    for nome in CITTA_LUOGHI:
+        if nome in luoghi:
+            x, y = luoghi[nome]
+            X, Y = (x - x0) * k, (y - y0) * k
+            dr.rectangle([X - 4, Y - 4, X + 4, Y + 4], fill=(228, 59, 68), outline=(24, 20, 37))
+            _scritta(dr, font, X + 8, Y - 6, nome)
+    _scritta(dr, font, 8, 6, f"MIRWADA   {int(w.citta.sum()) / SCHERMATA:.0f} schermate di citta'   1 tile = {k} px")
+    return im
+
+
 def misure(w, sotto):
     """Schermate (20x11 tile a 64 px) per zona: per capire quanto e' grande il mondo."""
     righe = []
@@ -720,6 +830,7 @@ def main():
         json.dump(j, f, separators=(",", ":"))
     anteprima(w, luoghi, villaggi).save(os.path.join(OUT, "mondo_prova.png"))
     anteprima_sotto(w, sotto).save(os.path.join(OUT, "sottosuolo_prova.png"))
+    anteprima_citta(w, luoghi).save(os.path.join(OUT, "mirwada_citta.png"))
     if not a.senza_ritagli:
         atl = {n: build_atlas(n, 32) for n in ORDER}
         for nome in ("porto", "passo_tra_rupi", "rovine_del_boss", "galleria_di_alberi", "approdo_frontiera",
@@ -736,6 +847,7 @@ def main():
     righe, tot, sotto_tot = misure(w, sotto)
     for n, v in righe:
         print(f"  {n:24s} {v:7.1f} schermate")
+    print(f"  citta' di Mirwada: {int(w.citta.sum()) / SCHERMATA:.0f} schermate")
     print(f"seed {a.seed}: superficie {tot:.0f} schermate, sottosuolo {sotto_tot:.0f}; {len(w.objects)} oggetti, "
           f"{len(luoghi)} luoghi, {len(villaggi)} villaggi, {len(sotto['ingressi'])} ingressi -> {OUT}")
 

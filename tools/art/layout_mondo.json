@@ -1,0 +1,179 @@
+{
+ "_comment": "Disposizione del mondo di prova (US-8B13). La legge tools/art/build_world.py, la scrive anche l'artifact 'tavolo tattico'. x, y in frazioni: zone del continente (x di W, y di HC = altezza del continente), isole (x di W, y di H). peso >1 = zona piu' piccola. 'spostati' vince sui suggerimenti del generatore: [x, y] in tile = posizione decisa, null = cancellato.",
+ "terra": {
+  "mirwada": {
+   "x": 0.43,
+   "y": 0.8,
+   "peso": 1.0
+  },
+  "marche_crepuscolo": {
+   "x": 0.15,
+   "y": 0.35,
+   "peso": 1.1
+  },
+  "archivio_sepolto": {
+   "x": 0.85,
+   "y": 0.18,
+   "peso": 1.3
+  },
+  "valle_madre": {
+   "x": 0.87,
+   "y": 0.7,
+   "peso": 1.0
+  },
+  "terra_di_mezzo": {
+   "x": 0.52,
+   "y": 0.42,
+   "peso": 1.05
+  }
+ },
+ "mezzo": {
+  "steppa": {
+   "x": 0.5,
+   "y": 0.12
+  },
+  "colline": {
+   "x": 0.34,
+   "y": 0.45
+  },
+  "foreste": {
+   "x": 0.64,
+   "y": 0.6
+  },
+  "paludi": {
+   "x": 0.71,
+   "y": 0.3
+  }
+ },
+ "isole": [
+  {
+   "id": "frontiera_porte",
+   "x": 0.52,
+   "y": 0.74,
+   "r": 245,
+   "profilo": "frontiera"
+  },
+  {
+   "id": "isola_vulcanica",
+   "x": 0.12,
+   "y": 0.88,
+   "r": 55,
+   "profilo": "vulcanica"
+  },
+  {
+   "id": "isola_tropicale",
+   "x": 0.9,
+   "y": 0.63,
+   "r": 52,
+   "profilo": "tropicale"
+  },
+  {
+   "id": "isola_pirati",
+   "x": 0.2,
+   "y": 0.64,
+   "r": 48,
+   "profilo": "pirati"
+  },
+  {
+   "id": "isola_relitto",
+   "x": 0.06,
+   "y": 0.72,
+   "r": 32,
+   "profilo": "relitto"
+  },
+  {
+   "id": "isola_rovine",
+   "x": 0.93,
+   "y": 0.89,
+   "r": 34,
+   "profilo": "rovine"
+  },
+  {
+   "id": "isola_ghiacciata",
+   "x": 0.32,
+   "y": 0.93,
+   "r": 34,
+   "profilo": "ghiacciata"
+  },
+  {
+   "id": "isola_mostro",
+   "x": 0.78,
+   "y": 0.94,
+   "r": 36,
+   "profilo": "mostro"
+  },
+  {
+   "id": "atollo",
+   "x": 0.27,
+   "y": 0.8,
+   "r": 40,
+   "profilo": "atollo"
+  },
+  {
+   "id": "isola_boss",
+   "x": 0.05,
+   "y": 0.96,
+   "r": 28,
+   "profilo": "boss"
+  },
+  {
+   "id": "scoglio_faro",
+   "x": 0.3,
+   "y": 0.53,
+   "r": 12,
+   "profilo": "faro"
+  },
+  {
+   "id": "isolotto_1",
+   "x": 0.7,
+   "y": 0.56,
+   "r": 14,
+   "profilo": "boschiva"
+  },
+  {
+   "id": "isolotto_2",
+   "x": 0.38,
+   "y": 0.55,
+   "r": 12,
+   "profilo": "relitto"
+  },
+  {
+   "id": "isolotto_3",
+   "x": 0.98,
+   "y": 0.76,
+   "r": 16,
+   "profilo": "rovine"
+  },
+  {
+   "id": "isolotto_4",
+   "x": 0.45,
+   "y": 0.975,
+   "r": 18,
+   "profilo": "tropicale"
+  },
+  {
+   "id": "isolotto_5",
+   "x": 0.63,
+   "y": 0.97,
+   "r": 15,
+   "profilo": "rocciosa"
+  },
+  {
+   "id": "isolotto_6",
+   "x": 0.08,
+   "y": 0.56,
+   "r": 13,
+   "profilo": "boschiva"
+  }
+ ],
+ "citta": {
+  "raggio": 55
+ },
+ "spostati": {
+  "luoghi": {},
+  "villaggi": {},
+  "ingressi": {},
+  "boss": {}
+ },
+ "note": []
+}

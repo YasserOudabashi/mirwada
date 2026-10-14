@@ -8193,3 +8193,22 @@ Domande su isola ghiacciata e sottosuolo (round 3-4):
   a se stesso con i suoi abitanti poveri (richiesta dell'utente); porto
   commerciale; citta' nuova fuori le mura.
 - Porto: DIGA FORANEA (con il faro in punta), CANTIERE NAVALE, LUNGOMARE.
+
+[2026-10-14] Mirwada grande citta' portuale + disposizione in layout_mondo.json. FATTO (in revisione).
+- tools/art/layout_mondo.json: zone (centro e peso), paesaggi della terra di
+  mezzo, isole, raggio della citta', "spostati" (posizioni decise
+  dall'utente: vincono sui suggerimenti; null = cancellato), "note". Lo legge
+  build_world.py e lo scrivera' l'artifact tavolo tattico.
+- Citta' (raggio 55 = 57 schermate): dentro le mura porto commerciale
+  (magazzini grandi), quartiere operaio (case strette), centro storico
+  (negozi, piazza del museo in marmo), centro antico in collina (palazzi,
+  cattedrale); fuori le mura bassifondi (terra e fango, baracche e case
+  crollate) e citta' nuova (giardini, ville, viali); mura in rovina;
+  lungomare con la piazza del mercato; 9 moli e pontili; cantiere navale con
+  4 scali; diga foranea dalla punta ovest del golfo con il faro in punta.
+  Golfo proporzionato al raggio. Confini dei quartieri irregolari (rumore).
+- Anteprima nuova: arte/mondo/mirwada_citta.png (x4, quartieri e luoghi).
+- Errori corretti guardando: 71 schermate invece di 55 (raggio 62 -> 55);
+  quartieri a spicchi geometrici; diga fuori inquadratura e poi staccata
+  dalla costa (ora parte dalla punta ovest vera); mercato sopra il cantiere.
+- Verificato: md5 identico su due lanci; validate exit 0.
