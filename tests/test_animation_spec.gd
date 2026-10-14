@@ -22,8 +22,8 @@ func test_convenzioni() -> void:
 	var gd: Node = _data()
 	# JSON legge i numeri come float: confronto elemento per elemento come int.
 	var dim: Array = gd.call("animation_convention", "dimensione_frame")
-	assert_eq(int(dim[0]), 32, "larghezza frame")
-	assert_eq(int(dim[1]), 32, "altezza frame")
+	assert_eq(int(dim[0]), 64, "larghezza frame (US-8B01)")
+	assert_eq(int(dim[1]), 64, "altezza frame (US-8B01)")
 	assert_eq(gd.call("animation_convention", "direzioni"), ["down", "up", "left", "right"], "4 direzioni")
 	assert_eq(gd.call("animation_convention", "chiave_inventata"), null, "chiave assente -> null")
 

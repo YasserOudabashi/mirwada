@@ -8281,3 +8281,21 @@ vedo che terreno avra'"). Rifacimento v2, risposte dell'utente:
 - Su richiesta: tolte isola_nuova_19 e _21 (layout + db, versione 57); tenuto isolotto_1 -> rocciosa (cambiato
   dall'utente nel tavolo). Rigenerato: superficie 3360, sottosuolo 718, 49 luoghi. validate 0. Tavolo versione 5.
 - US-8B13 / 8B13b / 8B13c: disposizione approvata dall'utente ("procedi" dopo le ultime correzioni). CHIUSE.
+
+[2026-10-14] US-8B01 — passaggio a 64 px. FATTA.
+- Scelta tecnica (spiegata e accettata): le unita' di gioco NON cambiano (1 tile = 32 unita', mondo visibile 640x360
+  unita'); Godot disegna a 1280x720 pixel veri (stretch "canvas_items", base 1280x720, scale 2.0, integer) e lo
+  sprite da 64 px si mette a scala 0.5. Velocita', raggi, mappe, HUD e 777 test restano validi.
+- Provato prima in un progetto di prova (scratchpad, Godot 4.3 + Xvfb): con "viewport" + scale 2 Godot disegna a
+  640x360 e perde i dettagli (scartato); con "canvas_items" ogni pixel del 64 si vede. 1280x720 -> x1,
+  1920x1080 -> 1280x720 con bordo nero (scelta dell'utente), 2560x1440 -> x2.
+- File: project.godot, data/animations.json (dimensione_frame 64), scripts/animation_machine.gd (dim dai dati,
+  scala 32/dim), scripts/settings_store.gd + pages/page_impostazioni.gd (scala finestra = 1280x720 x1/x2/x3,
+  default x1), tools/art/generate_all.py (DIM dai dati, fogli a 32 ingranditi x2 NEAREST, contorno del tell
+  calcolato prima di ingrandire), tests (dimensione 64 + test nuovo sulla scala).
+- Comando: `python tools/art/generate_all.py` (nessun seed: build_enel e' deterministico; arte/sprite invariata).
+- Verifica: Godot 4.3 headless 778 test passati; validate_data exit 0; screenshot del gioco vero a 1280x720:
+  personaggio 64x64 pixel veri in un tile, HUD al suo posto.
+- Aperto: i fogli sono ancora il disegno a 32 ingrandito (blocchi 2x2): li ridisegna il Blocco C. Le scritte
+  dell'HUD ora sono lisce (disegnate a 1280x720) invece che a blocchi: da decidere se serve un font pixel.
+  tileset.png della stanza di prova resta a 32 (lo sostituiscono gli atlanti del mondo, US-8B12).

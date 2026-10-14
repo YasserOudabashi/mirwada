@@ -62,7 +62,8 @@ Legenda: **[D]** = solo dati/documenti, **[C]** = codice, **[A]** = generazione 
 **US-8B01 [C] Passaggio a 64 px.** `data/animations.json.convenzioni.dimensione_frame`
 → `[64,64]`; dimensione tile 64; viewport 1280×720 a scala intera; camera.
 Una sola story, come da CLAUDE.md. Test headless verdi con i placeholder
-rigenerati a 64. *Domande (S): conferma 1280×720.*
+rigenerati a 64. *Domande (S): conferma 1280×720.* **FATTA (2026-10-14):** unità di gioco
+invariate (32 per tile), disegno a 1280×720 con `canvas_items` scala 2, Full HD con bordo nero.
 
 **US-8B02 [C] forge3d dentro il repo.** Oggi la skill vive fuori dal repo
 (`~/.claude/skills/...`): sul PC dell'utente la rigenerazione non è

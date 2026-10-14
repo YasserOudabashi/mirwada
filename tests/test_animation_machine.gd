@@ -24,6 +24,17 @@ func test_spriteframes_costruito_dai_dati() -> void:
 	m.free()
 
 
+## US-8B01: frame da 64 px ritagliati a 64 e sprite a mezza grandezza, cosi'
+## occupa sempre un tile (32 unita') e a schermo mostra tutti i suoi pixel.
+func test_frame_a_64_px_occupano_un_tile() -> void:
+	var m: AnimatedSprite2D = _nuova()
+	var tex: Texture2D = m.sprite_frames.get_frame_texture("walk_down", 1)
+	assert_eq(tex.get_size(), Vector2(64, 64), "frame ritagliato a 64x64")
+	assert_eq((tex as AtlasTexture).region.position, Vector2(64, 0), "frame 1 = seconda colonna da 64")
+	assert_almost_eq(m.scale.x, 0.5, "scala 0.5: 64 px -> 32 unita'")
+	assert_eq(tex.get_size() * m.scale, Vector2(32, 32), "a schermo occupa un tile")
+	m.free()
+
 func test_frame_fps_e_loop_dai_dati() -> void:
 	var m: AnimatedSprite2D = _nuova()
 	var sf: SpriteFrames = m.sprite_frames

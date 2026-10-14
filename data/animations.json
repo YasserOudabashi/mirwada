@@ -3,8 +3,8 @@
   "_comment": "Specifica delle animazioni, data-driven come tutto il resto. Il codice implementa una macchina a stati generica; questo file decide quanti frame, a che velocita', quali frame attivano la hitbox e quali emettono eventi. Cambiare il timing di un attacco NON richiede toccare il codice. Serve anche a due altre cose: e' l'input di tools/generate_placeholders.py, ed e' la specifica esatta da consegnare a un pixel artist.",
   "convenzioni": {
     "dimensione_frame": [
-      32,
-      32
+      64,
+      64
     ],
     "direzioni": [
       "down",

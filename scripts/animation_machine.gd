@@ -20,7 +20,9 @@ signal animazione_finita(stato: String)
 signal finestra_cambiata(nome: String, attiva: bool)
 
 const AnimationSpec := preload("res://scripts/animation_spec.gd")
-const DIM := 32
+## Un tile e' 32 unita' di gioco: lo sprite si scala per occupare sempre un
+## tile, qualunque sia la dimensione_frame dei dati (64 px -> scala 0.5).
+const UNITA_TILE := 32.0
 
 var _categoria: String = ""
 var _stato: String = ""
@@ -69,6 +71,10 @@ func configura(categoria: String) -> void:
 	if direzioni == null:
 		direzioni = ["down", "up", "left", "right"]
 
+	var dim_dati = gd.call("animation_convention", "dimensione_frame")
+	var dim: int = int(dim_dati[0]) if dim_dati is Array and not dim_dati.is_empty() else 32
+	scale = Vector2.ONE * (UNITA_TILE / float(dim))
+
 	var sf := SpriteFrames.new()
 	sf.remove_animation("default")
 
@@ -94,7 +100,7 @@ func configura(categoria: String) -> void:
 			for col in spec.frame_count():
 				var at := AtlasTexture.new()
 				at.atlas = tex
-				at.region = Rect2(col * DIM, riga * DIM, DIM, DIM)
+				at.region = Rect2(col * dim, riga * dim, dim, dim)
 				sf.add_frame(chiave, at, durate[col])
 
 	sprite_frames = sf

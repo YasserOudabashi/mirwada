@@ -60,18 +60,20 @@ Book="*res://scripts/book.gd"
 
 [display]
 
-; Viewport logico: e' questa la risoluzione in cui si ragiona.
-window/size/viewport_width=640
-window/size/viewport_height=360
-; Finestra reale all'avvio: 640x360 scalato x2, cosi' e' guardabile.
-window/size/window_width_override=1280
-window/size/window_height_override=720
-; "viewport" rende a 640x360 e poi scala l'immagine intera: i pixel
-; restano quadrati e nessun elemento si disallinea dalla griglia.
-window/stretch/mode="viewport"
+; US-8B01 (64 px): si disegna a 1280x720 pixel veri, ma il mondo resta di
+; 640x360 unita' (scale=2): 1 tile = 32 unita' = 64 pixel. Gameplay, mappe e
+; interfaccia ragionano in unita' come prima; gli sprite da 64 px si mettono a
+; mezza grandezza (animation_machine.gd) e mostrano ogni loro pixel.
+window/size/viewport_width=1280
+window/size/viewport_height=720
+; "canvas_items" disegna alla risoluzione vera della finestra; "viewport"
+; disegnerebbe a 640x360 e perderebbe meta' dei dettagli dei 64 px.
+window/stretch/mode="canvas_items"
 window/stretch/aspect="keep"
-; Solo multipli interi (x2, x3...): con scale non intere alcuni pixel
-; diventerebbero piu' larghi di altri. Lo spazio che avanza resta nero.
+window/stretch/scale=2.0
+; Solo multipli interi di 1280x720 (x1, x2, x3): ogni pixel dello sprite e'
+; sempre 1, 2 o 3 pixel dello schermo. Su Full HD resta 1280x720 con il
+; bordo nero (decisione dell'utente, 2026-10-14).
 window/stretch/scale_mode="integer"
 
 [internationalization]

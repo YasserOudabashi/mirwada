@@ -94,12 +94,13 @@ va scritto nella story.
   Mai mescolare 32 e 64 nella stessa categoria.
 
 ### Risoluzione
-- **Default: 32×32 per frame, tile da 32, viewport 640×360** (come ora). È il formato in cui
-  tutto è già drop-in e testato.
-- **Hi-res 64×64** è consentito, ma è una decisione di progetto, non di singolo asset: si cambia
-  `dimensione_frame` in `data/animations.json`, la dimensione tile e la scala di camera **in una
-  sola story**, poi si rigenerano tutte le categorie con `--size 64 --ppu 2`.
-  **Decisione aperta: 32 o 64.** Finché l'utente non decide, si lavora a 32.
+- **Deciso: 64×64 per frame** (US-8B01, 2026-10-14). `dimensione_frame` in `data/animations.json`
+  è `[64, 64]`. Le **unità di gioco restano 32 per tile** (mondo visibile 640×360 unità): lo sprite
+  si mette a mezza grandezza (`animation_machine.gd`) e a schermo mostra tutti i suoi 64 pixel.
+- Godot disegna a **1280×720 pixel veri** (`canvas_items`, scala 2): 1 unità = 2 pixel.
+  Su Full HD resta 1280×720 nitido con il bordo nero; su 1440p e 4K riempie (×2, ×3).
+- I fogli ancora disegnati a 32 vengono ingranditi ×2 da `generate_all.py` (ripiego): il
+  Blocco C del PRD 8b li ridisegna a 64 con `--size 64 --ppu 2`.
 - Scalatura sempre a **multipli interi**. Mai filtri sfumati.
 
 ### Colore e stile
@@ -165,7 +166,8 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 ### Impostazioni Godot per la pixel art
 - Default Texture Filter = **Nearest**.
 - Rendering → 2D → **Snap 2D Transforms to Pixel** attivo.
-- Stretch mode **viewport**, scala intera.
+- Stretch mode **canvas_items**, base 1280×720, `stretch/scale = 2`, scala intera
+  (mai `viewport`: disegnerebbe a 640×360 e i 64 px perderebbero metà dei dettagli).
 - Se uno sprite è sfocato: reimporta e controlla il filtro prima di toccare il PNG.
 
 ### Limiti noti del generatore (da migliorare, non da aggirare a mano)
