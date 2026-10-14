@@ -168,7 +168,14 @@ def facce(alt, mat=None):
     return f
 
 
-def _cima(alt, mat, e, y, x, S, seed, f=None):
+def _hash(i, j):
+    """Hash a 32 bit di due interi (anche array): stesso numero per la stessa casella in ogni ritaglio."""
+    h = (np.asarray(i, np.int64) * 374761393 + np.asarray(j, np.int64) * 668265263) & 0xFFFFFFFF
+    h = ((h ^ (h >> 13)) * 1274126177) & 0xFFFFFFFF
+    return h ^ (h >> 16)
+
+
+def _cima(alt, mat, e, y, x, S, seed, f=None, origine=(0, 0)):
     """Casella alta che non e' parete: il bordo dell'altopiano. Su ogni lato (sinistra, destra, sopra) che
     confina con una casella piu' bassa - terreno o parete - disegna contorno + linea chiara, come l'orlo in
     cima alle pareti: cosi' il bordo gira l'angolo e lega un gradino al successivo. Le mura hanno in piu'
@@ -185,14 +192,20 @@ def _cima(alt, mat, e, y, x, S, seed, f=None):
         return None
     pal = np.array([_rgb(c) for c in MATERIALI[m]["ramp"]])
     out = np.zeros((S, S, 4), np.uint8)
-    if muro:                                                   # camminamento: lastre quadrate chiare (cima, non faccia)
+    if muro:                                                   # camminamento: lastre chiare (cima, non faccia)
         yy, xx = np.mgrid[0:S, 0:S]
-        q = S // 2
-        X, Y = x * S + xx, y * S + yy
-        tono = 3 + ((X // q) * 7 + (Y // q) * 3) % 2           # due toni chiari, una lastra per quarto di casella
-        out[..., :3] = pal[np.minimum(tono, len(pal) - 1)]
-        out[(X % q == 0) | (Y % q == 0), :3] = pal[1]           # fughe
-        out[((X % q == 1) | (Y % q == 1)) & (X % q != 0) & (Y % q != 0), :3] = pal[-1]   # spigolo in luce
+        # ogni casella divide le lastre a modo suo (1, 2 o 4) e ogni lastra ha il suo tono, da un hash della
+        # posizione: niente scacchiera (prima due toni alternati)
+        wx, wy = x + origine[0], y + origine[1]
+        nx_, ny_ = [(1, 1), (2, 1), (1, 2), (2, 2)][_hash(wx, wy) % 4]
+        lw, lh = S // nx_, S // ny_
+        col, riga = xx // lw, yy // lh
+        scelta = _hash(wx * 4 + col, wy * 4 + riga) % 10
+        tono = np.where(scelta < 1, 2, np.where(scelta < 8, 3, 4))     # quasi sempre il tono medio
+        out[..., :3] = pal[tono]
+        fuga = (xx % lw == 0) | (yy % lh == 0)
+        out[((xx % lw == 1) | (yy % lh == 1)) & ~fuga & (tono < 4), :3] = pal[-1]   # spigolo in luce
+        out[fuga, :3] = pal[1]
         out[..., 3] = 255
     lw = _spessore(S)
     if su:
@@ -246,8 +259,9 @@ def terreno_sotto(ground, alt, mat=None):
     return g
 
 
-def disegna(alt, mat, passaggi=None, S=64, seed=5):
-    """Strato RGBA (H*S, W*S) con pareti e ombre, da mettere sopra il terreno.
+def disegna(alt, mat, passaggi=None, S=64, seed=5, origine=(0, 0)):
+    """Strato RGBA (H*S, W*S) con pareti e ombre, da mettere sopra il terreno. origine = (x0, y0) del ritaglio
+    nel mondo (il camminamento delle mura sceglie le lastre dalla posizione nel mondo).
     mat: H x W di nomi di MATERIALI (conta quello della casella in cima al bordo).
     passaggi: H x W di caratteri ('.', 'S', 'R'), letti sulle caselle di parete."""
     f = facce(alt, mat)
@@ -258,7 +272,7 @@ def disegna(alt, mat, passaggi=None, S=64, seed=5):
     for y in range(H):
         for x in range(W):
             if f[y, x] is None:
-                cima = _cima(alt, mat, e_parete, y, x, S, seed, f)
+                cima = _cima(alt, mat, e_parete, y, x, S, seed, f, origine)
                 if cima is not None:
                     out[y * S:(y + 1) * S, x * S:(x + 1) * S] = cima
                 if y > 0 and e_parete[y - 1, x]:               # ombra al piede della parete

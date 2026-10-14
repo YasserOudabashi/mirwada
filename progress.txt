@@ -8619,3 +8619,14 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
 - Restano i punti d'interesse (contenuto di gioco, da decidere).
 - Verificato: diff con HEAD (solo ground e ~30 ossa in meno sul terreno cambiato), ritagli a dimensione vera,
   md5 uguale su due lanci, validate 0, campioni_terreni rigenerato.
+
+[2026-10-14] Revisione arte 3.13 — vicoli storti (approvato dall'utente: "fai"). FATTO.
+- build_world.py, dopo genera_sottosuolo (strade, luoghi, ingressi approvati invariati): coordinate piegate
+  XW/YW = x/y + (fbm scala 14, seed+331/332 - 0.5) * 10; centro antico: isolati (XW%10<8)&(YW%9<7) su stone e
+  lastre_chiare senza materiale; bassifondi: baracche (XW%5<3)&(YW%4<2)&(d>0.3), una su sei manca (hash del
+  blocco). Strada libera 3x3 attorno a luoghi, villaggi e ingressi. Piazze in marmo e mura restano.
+- pareti.py: camminamento delle mura con lastre da un hash della posizione nel mondo (_hash, disegna(origine=)):
+  ogni casella divisa in 1, 2 o 4 lastre, tono quasi sempre medio (prima due toni alternati: scacchiera).
+- Controllo: il pezzo di "strada chiusa" al porto e' la faccia delle mura che scendono al mare, non un difetto.
+- Verificato: diff con HEAD solo ground in citta' (1560 caselle), il resto identico; anteprima della citta',
+  porto e mura a dimensione vera; md5 uguale su due lanci; validate 0.

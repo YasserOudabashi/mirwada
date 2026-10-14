@@ -309,10 +309,13 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   **Fatto:** `render(shadow_off, shadow_a)` (default invariati per i personaggi); oggetti con ombra alpha 80
   spostata in basso a destra, larga quanto la chioma (secchi: quanto il tronco; palme più strette).
 
-### 🟢 3.13 Strade della città tutte a griglia
+### ✅ 3.13 Strade della città tutte a griglia — FATTO (2026-10-14, approvato dall'utente)
 - Anche il centro antico e i bassifondi sono una scacchiera perfetta.
   **Da proporre all'utente** (non cambia la disposizione approvata): griglia solo per
   porto e città nuova, vicoli storti nel centro antico e nei bassifondi (con US-8B14/18).
+  **Fatto:** centro antico e bassifondi con la griglia piegata da un rumore lento (strade continue che
+  curvano, isolati di forme diverse, qualche baracca mancante); griglia dritta per porto, quartiere operaio,
+  centro storico e città nuova. Il camminamento delle mura non è più a scacchiera (lastre da un hash).
 
 ### ✅ 3.14 Grandi aree tutte uguali — FATTO lato terreno (2026-10-14)
 - Marche (pietrisco bruno su ~670 schermate) e interno della Frontiera (lilla su ~690).

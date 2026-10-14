@@ -692,6 +692,24 @@ def genera(seed):
                           "mat": "stone_light", "moss": False})
     w.objects.sort(key=lambda o: o["y"])
     sotto = genera_sottosuolo(seed, R, land, acqua, centro, rovine_boss, porto, rnd, rng, g)
+    # vicoli storti (revisione 3.13): centro antico e bassifondi con la griglia piegata da un rumore lento (le strade
+    # restano continue ma curvano); griglia dritta solo per porto, quartiere operaio, centro storico e citta' nuova.
+    # Dopo il sottosuolo (strade, luoghi, ingressi approvati non cambiano); piazze e mura restano.
+    XW = xx + (fbm(W, H, 14, 2, seed + 331) - 0.5) * 10
+    YW = yy + (fbm(W, H, 14, 2, seed + 332) - 0.5) * 10
+    za = Q.get("centro_antico", vuoto) & np.isin(g, [L["stone"], L["lastre_chiare"]]) & (mat_par == "")
+    g[za] = np.where((((XW % 10) < 8) & ((YW % 9) < 7))[za], L["stone"], L["lastre_chiare"])
+    zb = Q.get("bassifondi", vuoto) & np.isin(g, [L["stone"], L["mud"], L["dirt"], L["lastre_rovine"]]) & (mat_par == "")
+    baracca = ((XW % 5) < 3) & ((YW % 4) < 2) & (d > 0.3)
+    baracca &= ((np.floor(XW / 5) * 7 + np.floor(YW / 4) * 13) % 6 != 0)      # qualche baracca manca
+    g[zb] = np.where(d[zb] < 0.25, L["mud"], L["dirt"])
+    g[zb & baracca] = L["stone"]
+    g[zb & baracca & (d > 0.75)] = L["lastre_rovine"]
+    for x, y in list(luoghi.values()) + list(villaggi.values()) + list(sotto["ingressi"].values()):
+        libero = np.zeros((H, W), bool)
+        libero[max(0, y - 1):y + 2, max(0, x - 1):x + 2] = True
+        g[libero & za & (g == L["stone"])] = L["lastre_chiare"]
+        g[libero & zb & np.isin(g, [L["stone"], L["lastre_rovine"]])] = L["dirt"]
     # case che toccano le mura: la casella accanto al muro torna strada (il muro non attraversa le case)
     muro = mat_par == "mura"
     vicino = np.zeros_like(muro)
@@ -1322,7 +1340,8 @@ def ritaglio(w, box, alt, mat, pas, atl, oggetti=True, pareti=True):
     strato, st, du = None, None, None
     if pareti:
         ya = max(0, y0 - 3)                                    # le pareti nascono dalle righe sopra il ritaglio
-        strato = disegna_pareti(alt[ya:y1, x0:x1], mat[ya:y1, x0:x1], pas[ya:y1, x0:x1], S=32)[(y0 - ya) * 32:]
+        strato = disegna_pareti(alt[ya:y1, x0:x1], mat[ya:y1, x0:x1], pas[ya:y1, x0:x1], S=32,
+                                origine=(x0, ya))[(y0 - ya) * 32:]
         st, du = np.zeros(alt.shape, int), np.zeros(alt.shape, bool)
         st[ya:y1, x0:x1], du[ya:y1, x0:x1] = strati_pareti(alt[ya:y1, x0:x1], mat[ya:y1, x0:x1])
     return render_world(w, box, atlases=atl, with_objects=oggetti, sopra=strato, strati=st, duri=du)
