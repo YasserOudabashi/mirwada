@@ -288,6 +288,8 @@ Fase 9 (opzionale): Pathway Non-Standard, avanzamento per Boon.
 - **Arte generata da Claude con `sprite-forge`** (nuova, v2). Vedi sezione dedicata.
 - **i18n dal giorno 1**: nessun testo hardcoded.
 - **Pathway della fase 2**: Twilight Giant.
+- **Colore del mondo: luminoso** (come i terreni generati, 2026-10-14). Le concept art valgono per atmosfera e forme, non per i colori. La leggibilità si ottiene dai personaggi, non spegnendo il mondo.
+- **Palette dei VFX: vale `data/vfx.json`** (2026-10-14). `design-vfx.md` è allineato al file dati.
 
 ## i18n — due sistemi, una convenzione per le stringhe dei dati
 

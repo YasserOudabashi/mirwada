@@ -8321,3 +8321,15 @@ vedo che terreno avra'"). Rifacimento v2, risposte dell'utente:
   di animation_machine.gd, player/enemy.tscn, enemy.gd, vfx.gd. selftest.py della skill exit 0.
 - Prossimo: decisioni dell'utente su colore del mondo e palette VFX, poi l'ordine del cap. 6
   della revisione (generatore -> Blocco C -> piccolo codice -> pulizia).
+
+[2026-10-14] DECISIONI DELL'UTENTE sulla revisione dell'arte (punti 3.1 e 4.1).
+- Colore del mondo: LUMINOSO come i terreni attuali. Le concept art restano riferimento per
+  atmosfera e forme, non per i colori. Conseguenza: la leggibilita' si ottiene rinforzando i
+  personaggi (valori, bordo di luce, ombra a terra) e abbassando il contrasto dei DETTAGLI delle
+  texture, non spegnendo i colori.
+- Palette dei VFX: vale data/vfx.json. 006_PRD/design-vfx.md cap. 2 riscritto con i valori del
+  file dati (prima differiva su death, darkness, fool, error, hermit, moon, paragon); la vecchia
+  proposta in art-brief-gemini.md segnata come superata. Decisioni aggiunte in CLAUDE.md.
+- Solo documentazione: nessun file di gioco o dato toccato.
+- Prossimo (ordine della revisione, cap. 6): story del generatore (pareti e altezze, bordi dritti
+  dei terreni costruiti, varianti dei tile, alberi piu' alti), poi Blocco C.

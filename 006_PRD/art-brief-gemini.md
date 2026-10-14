@@ -67,6 +67,9 @@ Per gli sprite (cap. 6) il blocco di stile e' diverso ed e' scritto li'.
 
 ## 2. Palette per Pathway (proposta — da fissare in `data/vfx.json`, US-226)
 
+> **Superata (2026-10-14):** vale `data/vfx.json`, decisione dell'utente. La tabella
+> aggiornata è in `design-vfx.md` cap. 2; questa resta solo come proposta storica.
+
 `design-vfx.md` cap. 2 fissa la regola: **inchiostro scurissimo + UN primario
 + UN accento**, mai un quarto colore. Ecco una proposta di valori concreti,
 coerente con le descrizioni gia' scritte (materiale audio, tratto):

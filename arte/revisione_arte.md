@@ -45,8 +45,9 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
 - **Come correggere** (US-8B30 + rifinitura di Mirwada US-8B14):
   1. Cappotto con un gradino chiaro in più e un **bordo di luce** (selout chiaro, 1 px)
      sul lato in alto a sinistra: resta scuro ma si stacca dal fondo.
-  2. Ciottoli di Mirwada **meno contrastati e non blu** (grigio-bruno della concept art):
-     si cambia la rampa in `terrain.py`, non il PNG.
+  2. Ciottoli di Mirwada **meno contrastati nei dettagli** e di una tinta diversa dal
+     cappotto (es. grigio caldo), restando luminosi (decisione 3.1): si cambia la rampa in
+     `terrain.py`, non il PNG.
   3. **Ombra a terra composta dal gioco** sotto ogni personaggio (vedi 2.2).
   4. Criterio di accettazione: rifare l'immagine di prova giorno/notte; Enel si deve
      leggere su ogni terreno della sua regione.
@@ -85,7 +86,7 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
 - **Cosa:** archi degli attacchi, crepa nel suolo dell'attacco pesante e bagliore della
   parata sono **ciano fisso** dentro il foglio; la scia del dash è viola fissa.
   Ma il Pathway si può cambiare (US-704) e il colore va letto da `data/vfx.json`
-  (`twilight_giant` = oro); per `design-vfx.md` il ciano è la firma di Error.
+  (`twilight_giant` = oro `#e8c34a`; nessun Pathway ha il ciano come primario).
   In più l'arco è un tratteggio sottile di puntini (22–25 pixel isolati per frame), non la
   "pennellata carica" del manhwa.
 - **Come correggere:** in US-8B30 lo sprite tiene **solo la posa** (al massimo una scia
@@ -176,16 +177,15 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
 
 ## 3. Mondo e terreni
 
-### 🔴 3.1 Direzione artistica: concept art e terreni vanno in direzioni opposte
-- **Cosa:** la concept art di Mirwada (`assets/concept/regioni/mirwada.jpg`) e l'art brief
-  ("grigio nebbia, nessun colore domina") sono cupi, desaturati, mattoni e lampioni caldi.
-  I terreni generati sono verde brillante, mare turchese saturo, selciato blu: allegri,
-  "16-bit da cartolina". E sono **più saturi e contrastati dei personaggi**, mentre
-  `CLAUDE.md` chiede il contrario.
-- **Come correggere:** una **story di direzione del colore** prima di rifinire le regioni:
-  per ogni regione 5–8 rampe prese dalla sua concept art, contrasto e saturazione dei
-  terreni abbassati in `terrain.py`, prova con Enel sopra di giorno e di notte.
-  **Decisione dell'utente:** mondo cupo come le concept art, o luminoso come ora?
+### ✅ 3.1 Direzione artistica — DECISO (2026-10-14): mondo luminoso come ora
+- **Cosa era:** le concept art (`assets/concept/regioni/`) sono cupe e desaturate; i
+  terreni generati sono luminosi e saturi.
+- **Decisione dell'utente:** si tiene il mondo **luminoso** dei terreni attuali. Le concept
+  art restano un riferimento per atmosfera e forme, **non per i colori**.
+- **Conseguenza:** la leggibilità non si ottiene spegnendo i colori del mondo, ma
+  rinforzando i personaggi (punto 1.1: valori, bordo di luce, ombra a terra) e abbassando
+  il contrasto dei **dettagli** delle texture (punto 3.5). La regola di `CLAUDE.md` "sfondi
+  meno contrastati dei personaggi" vale ancora: si misura con la prova giorno/notte.
 
 ### 🔴 3.2 Nessuna altezza: rupi, gradoni, scogliere e mura sono piatti
 - **Cosa:** tutto è una texture vista dall'alto. Al "passo tra due rupi" le rupi sono
@@ -275,9 +275,10 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
 
 ## 4. Dati e documenti
 
-### 🟠 4.1 Le palette dei VFX nei dati non coincidono con il design
-`data/vfx.json` (colori "plausibili" di US-226) e la tabella di `006_PRD/design-vfx.md`
-non coincidono su 6 Pathway su 10:
+### ✅ 4.1 Palette dei VFX — DECISO (2026-10-14): vale `data/vfx.json`
+La tabella di `006_PRD/design-vfx.md` cap. 2 è stata riscritta con i valori di
+`data/vfx.json`; la vecchia proposta in `art-brief-gemini.md` è segnata come superata.
+Le differenze che c'erano (per memoria):
 
 | Pathway | `design-vfx.md` | `data/vfx.json` |
 |---|---|---|
@@ -289,9 +290,8 @@ non coincidono su 6 Pathway su 10:
 | moon | argento lunare + rosso sangue | `#6fb0c4` azzurro + `#dff4fa` (niente rosso) |
 | paragon | rame + ottone chiaro | `#c9c2b0` grigio caldo + `#ffffff` |
 
-**Come correggere:** decidere quale dei due vale **prima del Blocco D** (US-8B40): i fogli
-VFX in grigio seguono il `tratto`, lo shader i colori. Poi allineare l'altro file.
-È una decisione dell'utente (il tratto è la firma del Pathway).
+Nel Blocco D (US-8B40) i fogli VFX in grigio seguono il `tratto` di `data/vfx.json`, lo
+shader ne legge i colori.
 
 ### 🟢 4.2 La guida `arte/` è superata
 - `arte/01–05` parlano ancora di 32×32, contorno 2 px nei VFX, prompt per Gemini e
@@ -325,8 +325,8 @@ l'HUD** (dopo US-8B01 le scritte sono lisce).
 
 ## 6. Ordine consigliato
 
-1. **Decisioni (nessun codice):** direzione del colore del mondo (3.1) e palette/tratti
-   dei VFX (4.1).
+1. ~~**Decisioni (nessun codice):** direzione del colore del mondo (3.1) e palette/tratti
+   dei VFX (4.1).~~ **Fatto il 2026-10-14:** mondo luminoso, vale `data/vfx.json`.
 2. **Generatore (`forge3d`):** pareti e altezze (3.2), bordi dritti per i terreni
    costruiti (3.6), varianti dei tile (3.5), scala degli alberi (3.3). Poi si rigenera il
    mondo con lo stesso seed e si confronta il prima e il dopo.
