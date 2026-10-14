@@ -190,8 +190,9 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
 ### ✅ 3.2 Nessuna altezza: rupi, gradoni, scogliere e mura sono piatti — FATTO (2026-10-14)
 > Parte 1: `forge3d/pareti.py` + tavola `arte/pareti/`. Parte 2: altezze in `build_world.py` e in
 > `world_prova.json` (`altezza`, `parete`, `passaggi`), prima/dopo in `arte/mondo/pareti_prima_dopo_*.png`.
-> Resta: le mura e i bordi nord-sud mostrano solo la cima (vista 3/4); in Godot le pareti come muri
-> arrivano con US-8B12.
+> Raccordi (2026-10-14, dopo due segnalazioni dell'utente): bordo continuo che gira gli angoli, spigoli
+> netti, terreno della cima sotto la parete, mare a -1 per le scogliere, cima delle mura a lastre.
+> In Godot le pareti come muri arrivano con US-8B12.
 
 - **Cosa:** tutto è una texture vista dall'alto. Al "passo tra due rupi" le rupi sono
   strisce di arenaria per terra; i gradoni delle Marche non si vedono; le scogliere sono

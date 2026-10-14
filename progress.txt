@@ -8395,3 +8395,30 @@ vedo che terreno avra'"). Rifacimento v2, risposte dell'utente:
 - Verificato: ritagli ingranditi (passo, gradoni, mura); md5 identico su due lanci; validate 0.
 - Aperto: nei bordi molto ripidi (quasi nord-sud) i gradini da 1 casella si toccano solo d'angolo:
   l'orlo laterale li lega ma restano quadratini; servirebbe un tile "angolo" dedicato.
+
+[2026-10-14] Pareti: blocchi ANCORA staccati (2a segnalazione dell'utente: "guarda meglio, pensa meglio"). RIFATTO il raccordo.
+- Diagnosi (scena di prova con bordo a scalini lento, ripido e nord-sud, guardata ingrandita):
+  (1) mancava il pezzo di bordo che, a ogni scalino, gira l'angolo e scende lungo il fianco dell'altopiano
+      fino al gradino dopo: l'"orlo laterale" di prima scattava solo accanto a terreno basso, MAI accanto a
+      una parete, cioe' proprio dove serviva; (2) sotto la parete c'era il terreno basso: la transizione dual
+      grid smussava in diagonale gli angoli dell'altopiano (righine oblique); (3) estremita' frastagliate e
+      trasparenti = pezzi spezzati; (4) la fascia costiera alzata di 1 creava un finto gradino nel bosco.
+- pareti.py:
+  * _cima(): ogni casella alta (con materiale) ha contorno + linea chiara su ogni lato (sinistra, destra,
+    sopra) che confina con una casella piu' bassa, parete compresa; all'angolo la linea chiara prosegue
+    senza pixel di contorno davanti. Mura: camminamento di lastre quadrate chiare su tutta la cima.
+  * tile(): estremita' 'cont' / 'int' (accanto c'e' la cima: il bordo lo fa la cima) / 'est' (spigolo
+    netto: contorno + fascia, chiara a sinistra e scura a destra, che continua il bordo della cima);
+    niente piu' trasparenze frastagliate; piede = riga di contorno.
+  * terreno_sotto(): sotto una parete il terreno della cima (il passaggio tra terreni cade al piede).
+  * ombra al piede: triangolo verso l'angolo sporgente (copre lo smusso del terreno).
+  * facce()/maschera()/terreno_sotto() con `mat`: una parete nasce solo sotto una casella con materiale.
+- build_world.py: il MARE sta a -1 (non piu' la fascia costiera alzata): coste con materiale (Valle, Marche,
+  dmare <= 2) = scogliere, spiagge senza materiale = spiagge; terreno della cima sotto le pareti, applicato
+  DOPO strade/alberi/sottosuolo. Verificato identico all'approvato: strade, luoghi, villaggi, regioni,
+  alberi, ingressi e boss del sottosuolo. Altezze da -1 a 6; scale 8, rampe 145.
+- campioni_pareti.py: nella scena delle mura il materiale "mura" solo sul bordo (un muro, non l'altopiano).
+- Comandi: python tools/art/build_world.py ; python tools/art/campioni_pareti.py. md5 identico su due lanci.
+  validate 0.
+- Aperto: le rampe da 1 casella sembrano tacche scure; i passaggi terreno-terreno al piede di uno scalino
+  restano una righina obliqua dentro l'ombra; in Godot il "mare a -1" va letto come acqua, non come buca.

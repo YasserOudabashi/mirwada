@@ -17,7 +17,7 @@ from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from forge3d import terrain as T  # noqa: E402
-from forge3d.pareti import disegna  # noqa: E402
+from forge3d.pareti import disegna, terreno_sotto  # noqa: E402
 
 OUT = os.path.join(HERE, "..", "..", "arte", "pareti")
 
@@ -62,8 +62,13 @@ def leggi(forma):
 def scena(mat, terreni, S=64):
     alt, pas = leggi(FORMA)
     ground = np.vectorize(lambda h: T.ORDER.index(terreni[min(h, len(terreni) - 1)]))(alt)
-    base = Image.fromarray(T.compose_ground(ground, S=S))
-    strato = Image.fromarray(disegna(alt, [[mat] * alt.shape[1]] * alt.shape[0], pas, S=S))
+    mats = np.full(alt.shape, mat, object)
+    if mat == "mura":                                   # le mura sono un muro sul bordo, non tutto l'altopiano
+        p = np.pad(alt, 1, mode="edge")
+        bordo = (p[2:, 1:-1] < alt) | (p[1:-1, :-2] < alt) | (p[1:-1, 2:] < alt) | (p[:-2, 1:-1] < alt)
+        mats[~bordo] = ""
+    base = Image.fromarray(T.compose_ground(terreno_sotto(ground, alt, mats), S=S))
+    strato = Image.fromarray(disegna(alt, mats, pas, S=S))
     base.alpha_composite(strato)
     return base
 

@@ -35,7 +35,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from forge3d.pareti import disegna as disegna_pareti, maschera as maschera_pareti  # noqa: E402
+from forge3d.pareti import disegna as disegna_pareti, maschera as maschera_pareti, terreno_sotto  # noqa: E402
 from forge3d.terrain import ORDER, build_atlas  # noqa: E402
 from forge3d.world import LEVEL, World, fbm  # noqa: E402
 from forge3d.worldrender import render_world, save  # noqa: E402
@@ -351,9 +351,7 @@ def genera(seed):
     riva |= mw & (dmare <= 3)
     g[riva] = L["sand"]
     g[riva & (vl | mc)] = L["arenaria"]
-    scogliera = (vl | mc) & (dmare <= 6)                 # la fascia sul mare sale: la parete cade sull'acqua
-    altezza[scogliera] = np.maximum(altezza[scogliera], 1)
-    mat_par[scogliera] = "arenaria"
+    mat_par[(vl | mc) & land & (dmare <= 2)] = "arenaria"   # coste rocciose: il mare e' un livello sotto (vedi sotto)
 
     # isole
     for rid, cx, cy, r, prof in ISOLE:
@@ -616,7 +614,10 @@ def genera(seed):
     applica_spostati(luoghi, villaggi, None)
     applica_ritocchi(g, land, acqua, luoghi, villaggi)
     # passaggi: scala dove una strada attraversa una parete, rampa ogni ~15 caselle, rampa davanti al passo
-    faccia = maschera_pareti(altezza)
+    # il mare sta un livello sotto la terra: dove la costa ha un materiale (Valle, Marche) diventa scogliera,
+    # le spiagge (senza materiale) restano spiagge
+    altezza[~land & (altezza == 0)] = -1
+    faccia = maschera_pareti(altezza, mat_par)
     pas = np.full((H, W), ".", "<U1")
     # rampa: nasce in cima a un tratto di parete dritto (pareti a sinistra e a destra) e scende per tutta l'altezza
     cima = faccia & ~sposta(faccia, 1, 0)
@@ -670,6 +671,7 @@ def genera(seed):
                           "mat": "stone_light", "moss": False})
     w.objects.sort(key=lambda o: o["y"])
     sotto = genera_sottosuolo(seed, R, land, acqua, centro, rovine_boss, porto, rnd, rng, g)
+    w.ground = terreno_sotto(w.ground, altezza, mat_par)       # dopo tutto il resto: strade, alberi e sottosuolo non cambiano
     applica_spostati(luoghi, villaggi, sotto)
     return w, luoghi, villaggi, sotto
 
@@ -800,6 +802,7 @@ def genera_sottosuolo(seed, R, land, acqua, centro, rovine_boss, porto, rnd, rng
             boss[f"boss_{z_nome}"] = (int(xs_b[i]), int(ys_b[i]))
     ground = np.where(s >= 0, s, L["roccia_viva"])
     alt = (s < 0).astype(int)                            # roccia alta 1: pareti sul lato nord delle gallerie
+    ground = terreno_sotto(ground, alt)
     pas = np.full((H, W), ".", "<U1")
     faccia = maschera_pareti(alt)
     for x, y in ingressi.values():                       # un ingresso non resta mai dietro una parete
@@ -834,7 +837,7 @@ def anteprima(w, luoghi, villaggi, k=1, etichette=True, segni=True):
     bordo[1:, :] |= reg[1:, :] != reg[:-1, :]
     img[bordo & (reg > 0)] = (24, 20, 37)
     if segni:
-        img[maschera_pareti(w.alt)] = (62, 39, 49)        # pareti (gradoni, rupi, scogliere, mura)
+        img[maschera_pareti(w.alt, w.mat_par)] = (62, 39, 49)        # pareti (gradoni, rupi, scogliere, mura)
     for o in w.objects:
         if o["type"] == "tree":
             img[int(o["y"]), int(o["x"])] = (25, 60, 62)
@@ -1023,7 +1026,7 @@ def main():
             save(ritaglio(ws, box_di(x, y), sotto["alt"], mat_sotto, sotto["pas"], atl, oggetti=False),
                  os.path.join(OUT, f"sottosuolo_prova_{nome}.png"))
         # prima / dopo delle pareti (revisione arte 3.2): stesso pezzo senza e con le altezze
-        faccia = maschera_pareti(w.alt)
+        faccia = maschera_pareti(w.alt, w.mat_par)
         mc_i, vl_i = REGIONI.index("marche_crepuscolo"), REGIONI.index("valle_madre")
         sopra_valle = np.zeros((H, W), bool)
         sopra_valle[1:] = w.biome[:-1] == vl_i
