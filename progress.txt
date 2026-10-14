@@ -8543,3 +8543,22 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
 - JSON: nuovo campo "sentieri" (liste di [x, y]); "roads" invariato.
 - Verificato: rispetto a HEAD cambiano 206 caselle (tutte path) e si tolgono 272 alberi e 1 roccia; il resto e'
   identico; md5 uguale su due lanci; validate 0. Guardati i tre sentieri e le tre fini a dimensione vera.
+
+[2026-10-14] Revisione arte 3.5 — texture che si ripetono. FATTO.
+- terrain.py: campo "macro" = M (default 4 per i dettagli in MACRO_OK: waves, tufts, leaves, dots, pebbles,
+  puddles, cobbles, sparkle, embers, dunes, fog, roots; 1 per lastre, parquet, lamiera, assi, filari). La texture
+  si genera grande M x M tile (_texture(S, Z=S*M): conteggi e celle scalano con l'area, misura dei dettagli dal
+  tile) e si mette in cache; la variante v e' il pezzo (v // M, v % M). scelta(d, i, j): macro -> (i % M) * M + j % M
+  (continua tra tile vicini), varianti -> hash. n_varianti(d) = varianti o M*M; atlante: riga = variante*frame+frame.
+  export_godot: terrain_variants = {n, macro}. Il caricatore Godot deve fare lo stesso.
+- Acque (waves): superficie calma (0.36 + 0.26 * rumore) e creste sparse (una ogni "onde" pixel quadrati: mare 220,
+  profondo 420, fogna 320, grotta 360), visibili 2 frame su 4 e spostate di 1 px. Tolto il vecchio tappeto di onde.
+- radici_muschio: dettaglio nuovo "roots" (linee che serpeggiano, scure con la luce sopra), macro 8. Prima rete di
+  Voronoi: sembrava un mosaico di cocci con i triangoli agli incroci.
+- roccia_viva: macro 8, cells 3 (sassi piu' grandi), fuga_px 1.1 (campo nuovo per cobbles): con 4x4 si vedevano file
+  di triangoli neri agli incroci ogni 4 tile.
+- build_world.py: nel costo dei sentieri il bosco pesa +0.3 (prima +2: il sentiero della galleria di alberi girava
+  attorno alla giungla, parallelo alla strada; ora entra dritto: 68 caselle invece di 98).
+- Verificato: campione di 8 terreni prima/dopo, ritagli porto, galleria, grotte, fogne a dimensione vera;
+  campioni_terreni rigenerato (64 px, guardata la scena della Valle); md5 uguale su due lanci; validate 0.
+  Generazione del mondo ~45 s (prima ~40).

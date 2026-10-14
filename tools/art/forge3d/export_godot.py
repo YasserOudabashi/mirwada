@@ -6,7 +6,7 @@ import shutil
 import numpy as np
 from PIL import Image
 
-from .terrain import ORDER, TILE, TERRAINS, build_atlas
+from .terrain import ORDER, TILE, TERRAINS, build_atlas, n_varianti
 from .worldrender import object_sprite
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -20,7 +20,7 @@ def export_world(w, out_dir, S=TILE, copy_loader=True):
         at = build_atlas(name, S)
         Image.fromarray(at).save(os.path.join(out_dir, f"terrain_{name}.png"))
         frames[name] = TERRAINS[name].get("anim", 1)
-        varianti[name] = TERRAINS[name].get("varianti", 1)
+        varianti[name] = {"n": n_varianti(TERRAINS[name]), "macro": TERRAINS[name]["macro"]}
     sprites, objs = {}, []
     for o in w.objects:
         spr = object_sprite(o, S)

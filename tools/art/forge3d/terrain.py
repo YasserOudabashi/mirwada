@@ -52,15 +52,19 @@ def _quant(field, ramp, dither=0.0, S=TILE):
     return np.array([_rgb(c) for c in ramp])[idx], idx
 
 
+# dettagli che si possono disegnare su una texture grande (macro): niente righe o griglie legate al tile
+MACRO_OK = ("waves", "tufts", "leaves", "dots", "pebbles", "puddles", "cobbles", "sparkle", "embers", "dunes", "fog",
+            "roots")
+
 # nome: (ramp scuro->chiaro, periodo rumore, contrasto, dither, dettaglio, livello)
 TERRAINS = {
-    "deep_water": dict(ramp=["navy", "blue_d", "blue_d", "blue"], period=3, dither=0.5, detail="waves", rim=None, level=0, anim=4),
-    "water": dict(ramp=["blue", "#1fb5d6", "#1fb5d6", "cyan"], period=3, dither=0.5, detail="waves", rim="foam", level=1, anim=4,
+    "deep_water": dict(onde=420, ramp=["navy", "blue_d", "blue_d", "blue"], period=3, dither=0.5, detail="waves", rim=None, level=0, anim=4),
+    "water": dict(onde=220, ramp=["blue", "#1fb5d6", "#1fb5d6", "cyan"], period=3, dither=0.5, detail="waves", rim="foam", level=1, anim=4,
                   cresta="white"),
     # acque del sottosuolo (revisione arte 3.10): torbida nelle fogne, scura con riflessi nelle grotte
-    "acqua_fogna": dict(ramp=["brown_dd", "teal_d", "teal_d", "slate_d"], period=3, dither=0.5, detail="waves", rim=None,
+    "acqua_fogna": dict(onde=320, ramp=["brown_dd", "teal_d", "teal_d", "slate_d"], period=3, dither=0.5, detail="waves", rim=None,
                         level=0.5, anim=4, cresta="grey"),
-    "acqua_grotta": dict(ramp=["navy", "blue_d", "blue_d", "blue"], period=3, dither=0.5, detail="waves", rim=None,
+    "acqua_grotta": dict(onde=360, ramp=["navy", "blue_d", "blue_d", "blue"], period=3, dither=0.5, detail="waves", rim=None,
                          level=0.6, anim=4, cresta="grey"),
     "sand": dict(ramp=["tan", "cream", "cream", "skin_l"], period=4, dither=0.5, detail="dots", rim="dark", rimc="orange_d", level=2),
     "mud": dict(ramp=["brown_dd", "brown_d", "brown_d", "brown"], period=3, dither=0.6, detail="puddles", rim="dark", level=3),
@@ -115,7 +119,8 @@ TERRAINS = {
     "ghiaccio": dict(ramp=["slate", "grey", "grey_l", "grey_l"], period=4, dither=0.4, detail="embers", cells=4, spessore=0.6,
                      rim="light", rimc="white", level=9.6, contrast=0.4, accent=["white", "white"]),
     # --- Sottosuolo (US-8B13c): la roccia delle pareti di gallerie e caverne ---
-    "roccia_viva": dict(ramp=["ink", "navy", "slate_d", "slate_d"], period=4, dither=0.4, detail="cobbles", cells=6,
+    "roccia_viva": dict(macro=8, fuga_px=1.1, ramp=["ink", "navy", "slate_d", "slate_d"], period=4, dither=0.4,
+                        detail="cobbles", cells=3,
                         rim="cliff", rimc="ink", level=9.8, contrast=0.5),
     # --- Marche e Valle (US-8B11c) ---
     "palude": dict(ramp=["brown_dd", "teal_d", "green_d", "brown_d"], period=3, dither=0.6, detail="puddles", rim="dark",
@@ -126,7 +131,7 @@ TERRAINS = {
                         rimc="brown_dd", level=5.2, contrast=0.4),
     "felci": dict(ramp=["teal_d", "green_d", "green_m", "green"], period=4, dither=0.5, detail="leaves", rim="dark",
                   rimc="teal_d", level=6.2, contrast=0.4),
-    "radici_muschio": dict(ramp=["teal_d", "green_d", "green_m", "green_m"], period=4, dither=0.5, detail="embers", cells=3, spessore=0.7,
+    "radici_muschio": dict(macro=8, ramp=["teal_d", "green_d", "green_m", "green_m"], period=4, dither=0.5, detail="roots",
                            rim="dark", rimc="teal_d", level=6.4, contrast=0.4, accent=["brown_dd", "brown_d"]),
     "muschio_scuro": dict(ramp=["ink", "teal_d", "teal_d", "green_d"], period=4, dither=0.5, detail="dots", rim="dark",
                           rimc="ink", level=6.6, contrast=0.4),
@@ -139,6 +144,8 @@ TERRAINS = {
     "arenaria": dict(ramp=["brown_dd", "brown_d", "brown", "rust"], period=4, dither=0.4, detail="cobbles", cells=5,
                      rim="dark", rimc="brown_dd", level=9.0, contrast=0.6),
 }
+for _d in TERRAINS.values():                              # texture grande 4x4 tile dove il dettaglio lo consente:
+    _d.setdefault("macro", 4 if _d["detail"] in MACRO_OK and "varianti" not in _d else 1)   # niente griglia a vista
 ORDER = sorted(TERRAINS, key=lambda k: TERRAINS[k]["level"])
 
 
@@ -212,69 +219,97 @@ def _lastre(d, S, rs, base):
     return img
 
 
+_macro_cache = {}
+
+
+def n_varianti(d):
+    """Righe di varianti nell'atlante: `varianti` (scelte a caso) oppure macro x macro (pezzi di una texture grande)."""
+    return d.get("varianti", d.get("macro", 1) ** 2)
+
+
 def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4, variante=0):
+    """Texture di un tile. Con `macro` = M nella riga del terreno la texture e' grande M x M tile, continua e
+    periodica: la variante v e' il suo pezzo (riga v // M, colonna v % M), scelto dalla posizione nel mondo."""
     d = TERRAINS[name]
+    M = d.get("macro", 1)
+    if M == 1:
+        return _texture(name, S, S, seed, frame, nframes, variante)
+    key = (name, S, seed, frame, nframes)
+    if key not in _macro_cache:
+        _macro_cache[key] = _texture(name, S, S * M, seed, frame, nframes, 0)
+    r, c = divmod(variante, M)
+    return _macro_cache[key][r * S:(r + 1) * S, c * S:(c + 1) * S].copy()
+
+
+def _texture(name, S, Z, seed, frame, nframes, variante):
+    """S = lato del tile (misura dei dettagli), Z = lato della texture (S, o S x macro)."""
+    d = TERRAINS[name]
+    assert Z == S or d["detail"] in MACRO_OK, f"{name}: macro non supportato per {d['detail']}"
+    q = (Z // S) ** 2                                     # quanti tile nella texture: i conteggi scalano con l'area
     rs = zlib.crc32(name.encode()) % 1000 + seed   # hash() cambia a ogni avvio: non riproducibile
-    base = pnoise(S, d["period"], rs, 3)
+    base = pnoise(Z, d["period"] * Z // S, rs, 3)
     if d["detail"] == "fog":
         passo = frame * S // nframes
-        base = 0.6 * np.roll(base, passo, 1) + 0.4 * np.roll(pnoise(S, d["period"] + 1, rs + 5, 2), -passo, 0)
+        base = 0.6 * np.roll(base, passo, 1) + 0.4 * np.roll(pnoise(Z, (d["period"] + 1) * Z // S, rs + 5, 2), -passo, 0)
     base = (base - base.min()) / (np.ptp(base) + 1e-6)
     base = 0.5 + (base - 0.5) * d.get("contrast", 1.0)    # <1: macchie piu' tenui, la ripetizione non si vede
     ramp = d["ramp"]
     detail = d["detail"]
-    y, x = np.mgrid[0:S, 0:S]
+    y, x = np.mgrid[0:Z, 0:Z]
     rng = np.random.RandomState(rs)
     if detail == "waves":
-        ph = frame / nframes * 2 * math.pi
-        k = 2 * math.pi / S
-        w = np.sin((y * 2 * k * 2 + 3.0 * np.sin(x * k + ph)) + ph) + 0.6 * np.sin((x * k * 2 + y * k) - ph * 1.0)
-        base = np.clip(0.38 + 0.18 * base + 0.14 * w, 0, 1)
-        img, idx = _quant(base, ramp, d["dither"], S)
-        crest = (w > 1.25)
-        img[crest] = _rgb(d.get("cresta", "cyan"))
+        # acqua calma: macchie tenui e poche creste sparse che compaiono e scorrono (2 frame su 4), non un tappeto
+        img, idx = _quant(np.clip(0.36 + 0.26 * base, 0, 1), ramp, d["dither"], Z)
+        s1 = max(1, S // 32)
+        for _ in range(Z * Z // d.get("onde", 260)):
+            px, py, fase, lung = rng.randint(Z), rng.randint(Z), rng.randint(nframes), rng.randint(2, 5) * s1
+            t = (frame - fase) % nframes
+            if t >= 2:
+                continue
+            for i_ in range(lung):
+                img[(py - i_ // 2) % Z, (px + i_ + t * s1) % Z] = _rgb(d.get("cresta", "cyan") if t == 0 else ramp[-1])
         return img
-    img, idx = _quant(base, ramp, d["dither"], S)
+    img, idx = _quant(base, ramp, d["dither"], Z)
     n = len(ramp)
     def put(px, py, c):
-        img[py % S, px % S] = _rgb(ramp[c])
+        img[py % Z, px % Z] = _rgb(ramp[c])
     if detail == "tufts":
-        for _ in range(S * S // 22):
-            px, py = rng.randint(S), rng.randint(S)
+        for _ in range(Z * Z // 22):
+            px, py = rng.randint(Z), rng.randint(Z)
             put(px, py, 0); put(px, py - 1, n - 1) if rng.rand() < .7 else None
-        for _ in range(S * S // 160):
-            px, py = rng.randint(S), rng.randint(S)
+        for _ in range(Z * Z // 160):
+            px, py = rng.randint(Z), rng.randint(Z)
             img[py, px] = _rgb(["white", "yellow", "pink", "cyan"][rng.randint(4)]) if name == "grass" else img[py, px]
     elif detail == "leaves":
-        for _ in range(S * S // 30):
-            px, py = rng.randint(S), rng.randint(S)
+        for _ in range(Z * Z // 30):
+            px, py = rng.randint(Z), rng.randint(Z)
             put(px, py, n - 1); put(px + 1, py, n - 2)
-        for _ in range(S * S // 80):
-            px, py = rng.randint(S), rng.randint(S)
+        for _ in range(Z * Z // 80):
+            px, py = rng.randint(Z), rng.randint(Z)
             img[py, px] = _rgb(["orange_d", "amber", "rust"][rng.randint(3)])
     elif detail == "dots":
-        for _ in range(S * S // 18):
-            put(rng.randint(S), rng.randint(S), rng.choice([0, n - 1]))
+        for _ in range(Z * Z // 18):
+            put(rng.randint(Z), rng.randint(Z), rng.choice([0, n - 1]))
     elif detail == "pebbles":
-        for _ in range(S * S // 70):
-            px, py = rng.randint(S), rng.randint(S)
+        for _ in range(Z * Z // 70):
+            px, py = rng.randint(Z), rng.randint(Z)
             put(px, py, n - 1); put(px + 1, py, n - 2); put(px, py + 1, 0)
     elif detail == "puddles":
-        for _ in range(3):
-            px, py = rng.randint(S), rng.randint(S)
+        for _ in range(3 * q):
+            px, py = rng.randint(Z), rng.randint(Z)
             pozza, luce = (_accent(d, 0), _accent(d, 1)) if "accent" in d else (_rgb("blue_d"), _rgb("blue"))
-            for dx in range(-2, 3):
-                img[py % S, (px + dx) % S] = pozza
-            img[(py + 1) % S, (px - 1) % S] = luce; img[(py + 1) % S, px % S] = pozza
+            for dx in range(-2, 3 + rng.randint(3)):              # pozze di lunghezza diversa
+                img[py % Z, (px + dx) % Z] = pozza
+            img[(py + 1) % Z, (px - 1) % Z] = luce; img[(py + 1) % Z, px % Z] = pozza
     elif detail == "cobbles":
-        ids, bordo = _voronoi(rng, d.get("cells", 7), S)
-        edge = bordo < 1.8 * S / 32
+        ids, bordo = _voronoi(rng, d.get("cells", 7) * q, Z)
+        edge = bordo < d.get("fuga_px", 1.8) * S / 32             # spessore della fuga tra i ciottoli
         shade = (ids % 3)
-        img = np.array([_rgb(ramp[1 + int(s) % 3 if 1 + int(s) % 3 < n else n - 1]) for s in shade.ravel()]).reshape(S, S, 3)
+        img = np.array([_rgb(ramp[1 + int(s) % 3 if 1 + int(s) % 3 < n else n - 1]) for s in shade.ravel()]).reshape(Z, Z, 3)
         img[edge] = _rgb(ramp[0])
     elif detail == "sparkle":
-        for _ in range(S * S // 90):
-            put(rng.randint(S), rng.randint(S), 0)
+        for _ in range(Z * Z // 90):
+            put(rng.randint(Z), rng.randint(Z), 0)
     elif detail == "slabs":
         # lastre di pietra: file sfalsate, ogni lastra un tono, fuga scura, spigolo in luce in alto a sinistra
         nx_, ny_ = d.get("slab", (2, 4))
@@ -352,15 +387,24 @@ def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4, variante=0):
                             put(cx + ox, cy + oy, n - 1); put(cx + ox + 1, cy + oy + 1, 0)
     elif detail == "embers":
         # roccia lavica: crepe (bordi di Voronoi) incandescenti, piu' calde al centro della crepa
-        ids, bordo = _voronoi(rng, d.get("cells", 6), S)
+        ids, bordo = _voronoi(rng, d.get("cells", 6) * q, Z)
         sp = d.get("spessore", 1.5)                                # radici sottili, crepe di lava larghe
         img[bordo < sp * S / 32] = _accent(d, 0)
         img[bordo < sp * 0.4 * S / 32] = _accent(d, 1)
+    elif detail == "roots":
+        # radici: linee sottili che serpeggiano (direzione che cambia piano), scure con la luce sopra; sparse
+        for _ in range(Z * Z // 450):
+            px, py, ang = float(rng.randint(Z)), float(rng.randint(Z)), rng.rand() * 2 * math.pi
+            for _ in range(rng.randint(S // 3, S)):
+                ang += rng.uniform(-0.35, 0.35)
+                px, py = px + math.cos(ang), py + math.sin(ang) * 0.6
+                img[int(py) % Z, int(px) % Z] = _accent(d, 0)
+                img[(int(py) - 1) % Z, int(px) % Z] = _accent(d, 1) if rng.rand() < 0.6 else img[(int(py) - 1) % Z, int(px) % Z]
     elif detail == "dunes":
         # dune di vento: creste ondulate diagonali, chiare al vento e ombra sottile sotto
         k = 2 * math.pi / S
         w = np.sin(k * (2 * x + y) + 0.7 * np.sin(k * 2 * y))
-        spezza = pnoise(S, 3, rs + 1, 2) > 0.45                  # creste interrotte, non righe continue
+        spezza = pnoise(Z, 3 * Z // S, rs + 1, 2) > 0.45        # creste interrotte, non righe continue
         cresta = (w > 0.97) & spezza
         img[cresta] = _rgb(ramp[1])                                # una linea sottile grigio chiaro
     return img
@@ -409,7 +453,7 @@ def build_atlas(name, S=TILE, seed=3):
     bordo="dritto" nella riga del terreno: bordi squadrati invece che sfumati (cose costruite dall'uomo)."""
     d = TERRAINS[name]
     masks = masks_dritte(S) if d.get("bordo") == "dritto" else layer_masks(S, seed)
-    nfr, nva = d.get("anim", 1), d.get("varianti", 1)
+    nfr, nva = d.get("anim", 1), n_varianti(d)
     atlas = np.zeros((S * nfr * nva, S * 16, 4), np.uint8)
     for v in range(nva):                                  # riga = variante * frame totali + frame
         for f in range(nfr):
@@ -421,6 +465,14 @@ def build_atlas(name, S=TILE, seed=3):
                 tile[..., :3] = img; tile[..., 3] = np.where(mask, 255, 0)
                 atlas[r0:r0 + S, m * S:(m + 1) * S] = tile
     return atlas
+
+
+def scelta(d, i, j):
+    """Variante del tile al vertice (i, j) del mondo: pezzo della texture grande (macro) o hash (varianti)."""
+    M = d.get("macro", 1)
+    if M > 1:
+        return (i % M) * M + (j % M)
+    return variante(i, j, d.get("varianti", 1))
 
 
 def variante(i, j, n):
@@ -452,7 +504,7 @@ def compose_ground(levels, atlases=None, S=TILE, frame=0, seed=3, strati=None, d
     oy, ox = origine[1] - 1, origine[0] - 1                       # il vertice (i, j) del pad e' (y0-1+i, x0-1+j)
     for ti, name in enumerate(ORDER):
         at = atlases[name]
-        nva = TERRAINS[name].get("varianti", 1)
+        nva = n_varianti(TERRAINS[name])
         nfr = at.shape[0] // S // nva
         fr = frame % nfr
         ge = pad >= ti
@@ -467,7 +519,7 @@ def compose_ground(levels, atlases=None, S=TILE, frame=0, seed=3, strati=None, d
         ys, xs = np.nonzero(m)
         for i, j in zip(ys, xs):
             mk = m[i, j]
-            r0 = (variante(oy + i, ox + j, nva) * nfr + fr) * S
+            r0 = (scelta(TERRAINS[name], oy + i, ox + j) * nfr + fr) * S
             tile = at[r0:r0 + S, mk * S:(mk + 1) * S]
             blk = big[i * S:(i + 1) * S, j * S:(j + 1) * S]
             a = tile[..., 3:4] > 0
@@ -492,9 +544,9 @@ def compose_ground(levels, atlases=None, S=TILE, frame=0, seed=3, strati=None, d
                                 or netto(c, (i + 1 + dy, j + 1 + dx))):
                             continue
                         at = atlases[ORDER[lv[i, j]]]
-                        nva = TERRAINS[ORDER[lv[i, j]]].get("varianti", 1)
-                        nfr = at.shape[0] // S // nva
-                        r0 = (variante(oy + i + qy, ox + j + qx, nva) * nfr + frame % nfr) * S
+                        dq = TERRAINS[ORDER[lv[i, j]]]
+                        nfr = at.shape[0] // S // n_varianti(dq)
+                        r0 = (scelta(dq, oy + i + qy, ox + j + qx) * nfr + frame % nfr) * S
                         pieno = at[r0:r0 + S, 15 * S:16 * S]    # tile pieno (maschera 15) del vertice del quarto
                         y0, x0 = i * S + qy * h2, j * S + qx * h2
                         # il tile pieno e' allineato ai vertici: nel ritaglio e' spostato di mezzo tile

@@ -218,13 +218,19 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   Esempio: Valle = felci giganti, liane, alberi enormi; Mirwada = ulivi, viti, cipressi;
   Marche = rocce e ossa; palme solo sull'isola tropicale.
 
-### 🟠 3.5 Texture che si ripetono a vista
+### ✅ 3.5 Texture che si ripetono a vista — FATTO (2026-10-14)
 - **Cosa:** si vede la griglia dei tile nei ciottoli del porto, nella `roccia_viva` del
   sottosuolo (disegno a rombi come una stoffa), nella palude (macchie uguali ogni tile),
   nelle `radici_muschio` (triangoli) e nel mare (tappeto regolare di lineette).
   Mare e sottosuolo sono le superfici più grandi del mondo: devono essere le più calme.
 - **Come correggere:** 2–4 varianti per tile scelte dal seed nel dual grid; dettagli meno
   contrastati; mare con poche onde sparse e animate.
+- **FATTO (2026-10-14):** texture "macro": per i terreni a dettaglio sparso la texture è grande 4×4 tile
+  (8×8 per radici e roccia del sottosuolo), continua; ogni tile prende il suo pezzo dalla posizione nel mondo
+  (`terrain.scelta()`), la ripetizione passa da 1 a 4–8 tile. Mare e acque: superficie calma e poche creste
+  sparse che compaiono e scorrono (campo `onde`). Radici: linee sottili che serpeggiano (dettaglio `roots`)
+  invece della rete a triangoli. Roccia del sottosuolo: sassi più grandi, fughe sottili. Le lastre usano le
+  varianti a caso del 3.7.
 
 ### ✅ 3.6 Pavimenti e moli con bordi "naturali" — FATTO (2026-10-14)
 - **Cosa:** lastre, piazze, moli e pontili usano la stessa transizione ondulata dell'erba:
@@ -358,7 +364,7 @@ l'HUD** (dopo US-8B01 le scritte sono lisce).
    dei VFX (4.1).~~ **Fatto il 2026-10-14:** mondo luminoso, vale `data/vfx.json`.
 2. **Generatore (`forge3d`):** ~~pareti e altezze (3.2), bordi dritti per i terreni
    costruiti (3.6), coste (3.9), acqua del sottosuolo (3.10), pavimenti (3.7), strade (3.8)~~
-   fatti; restano varianti dei tile per gli altri terreni e mare calmo (3.5), scala degli alberi (3.3). Poi si rigenera il
+   fatti, e anche texture e mare (3.5); resta la scala degli alberi (3.3). Poi si rigenera il
    mondo con lo stesso seed e si confronta il prima e il dopo.
 3. **Blocco C** con i punti 1.1 e 1.4–1.13 scritti nei brief: Enel (US-8B30), nemico
    (US-8B31, prima possibile per 1.2), pet (US-8B32).

@@ -771,7 +771,7 @@ def sentieri(w, strade, punti, faccia):
     salto = np.zeros((H, W), bool)                        # bordo di un dislivello: si passa solo dai passaggi
     for sy, sx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
         salto |= sposta(alt, sy, sx, -9) != alt
-    costo = 1.0 + 2.0 * np.isin(g, [L["forest"], L["felci"], L["radici_muschio"]]) + 60.0 * dritti
+    costo = 1.0 + 0.3 * np.isin(g, [L["forest"], L["felci"], L["radici_muschio"]]) + 60.0 * dritti
     costo[np.isin(g, [L["water"], L["deep_water"]])] = 1e4
     costo[(faccia | salto) & ~passo] = 1e6
     fatti, spiazzi = [], np.zeros((H, W), bool)
