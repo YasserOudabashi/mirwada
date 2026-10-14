@@ -236,11 +236,15 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
 - **FATTO (2026-10-14):** `bordo="dritto"` per i terreni costruiti; moli, scali e diga rialzati con la
   parete (materiali `molo` e `legno`) invece che come oggetti: hanno faccia e bordi come le altre pareti.
 
-### 🟠 3.7 Pavimenti a scacchiera
+### ✅ 3.7 Pavimenti a scacchiera — FATTO (2026-10-14)
 - **Cosa:** `lastre_rovine` e altre lastre alternano giallo e azzurro in modo regolare:
   le rovine del boss sembrano il pavimento di un bagno.
 - **Come correggere:** tono di ogni lastra dal rumore (non alternato), fughe irregolari,
   crepe, erba nelle fughe, lastre mancanti.
+- **FATTO (2026-10-14):** varianti dei tile (campo `varianti` nella riga di `terrain.py`, scelta con un hash
+  della posizione nel mondo, `terrain.variante()`); le lastre (rovine, lastre chiare, marmo) hanno 8 varianti,
+  ognuna divide la casella a modo suo (1, 2 o 4 lastre), tono a caso, fuga di tono medio, spigoli scheggiati,
+  crepe; nelle rovine erba nelle fughe. Il caricatore Godot dovrà usare la stessa formula di `variante()`.
 
 ### 🟠 3.8 Strade che finiscono nel nulla
 - **Cosa:** il lastricato si ferma al bordo della giungla (proprio all'ingresso principale

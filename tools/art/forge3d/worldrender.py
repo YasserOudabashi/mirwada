@@ -68,7 +68,7 @@ def render_world(w, region=None, S=TILE, with_objects=True, frame=0, atlases=Non
     x0, y0, x1, y1 = region or (0, 0, w.W, w.H)
     g = compose_ground(w.ground[y0:y1, x0:x1], atlases=atlases, S=S, frame=frame,
                        strati=None if strati is None else strati[y0:y1, x0:x1],
-                       duri=None if duri is None else duri[y0:y1, x0:x1])
+                       duri=None if duri is None else duri[y0:y1, x0:x1], origine=(x0, y0))
     if sopra is not None:
         a = sopra[..., 3:4].astype(float) / 255.0
         g[..., :3] = (sopra[..., :3] * a + g[..., :3] * (1 - a)).astype(np.uint8)

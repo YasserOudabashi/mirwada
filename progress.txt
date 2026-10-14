@@ -8513,3 +8513,21 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   dei pirati, mappa intera.
 - Resta da vedere (non di questo passo): la sabbia_bianca e' quasi bianco pieno e in grandi aree sembra neve;
   isola ghiacciata e isola del mostro hanno la forma generale a ellisse (la costa e' irregolare, la sagoma no).
+
+[2026-10-14] Revisione arte 3.7 — pavimenti a scacchiera. FATTO (con la prima parte del 3.5: varianti dei tile).
+- Causa: una sola texture per terreno, ripetuta in ogni casella: con 4 lastre per casella qualsiasi scelta di toni
+  diventa un motivo regolare. Servono piu' versioni della stessa texture.
+- terrain.py: campo "varianti" (n) nella riga del terreno; build_atlas: righe = variante * frame + frame;
+  variante(i, j, n) = hash a 32 bit del vertice (righe, colonne) NEL MONDO (h = i*374761393 + j*668265263; h ^= h>>13;
+  h *= 1274126177; h ^= h>>16; tutto & 0xFFFFFFFF; % n). compose_ground(origine=(x0, y0)) per i ritagli; anche i
+  quarti con bordo netto usano la variante del loro vertice. Il caricatore Godot (US-8B12) deve usare la stessa
+  formula; export_godot scrive terrain_frames e terrain_variants.
+  ERRORE TROVATO E CORRETTO: il primo hash ((i*a) ^ (j*b)) % 8 dipendeva solo dagli ultimi 3 bit: motivo
+  diagonale ogni 8 caselle, visibile a dimensione vera.
+- _lastre(): con le varianti le fughe stanno sul bordo della casella (due varianti si accostano senza tagliare una
+  lastra); ogni variante divide la casella in 1, 2 (orizzontali o verticali) o 4 lastre; tono a caso (pesi 2/6/2),
+  ombreggiato dal rumore; fuga di tono medio (campo "fuga"); spigoli scheggiati; crepe; erba nelle fughe (campo
+  "erba", colori accent); lastre mancanti (campo "mancanti", colori "buca"). lastre_rovine, lastre_chiare, marmo:
+  varianti=8. molo_pietra resta a blocchi sfalsati.
+- Verificato: rovine del boss e piazza del porto a dimensione vera, campione di tre terreni x2; dati del mondo
+  invariati (solo il disegno); md5 uguale su due lanci; validate 0.

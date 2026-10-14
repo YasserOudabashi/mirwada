@@ -15,11 +15,12 @@ GD_LOADER = os.path.join(HERE, "..", "..", "engines", "godot", "sprite_forge_wor
 
 def export_world(w, out_dir, S=TILE, copy_loader=True):
     os.makedirs(os.path.join(out_dir, "objects"), exist_ok=True)
-    frames = {}
-    for name in ORDER:
+    frames, varianti = {}, {}
+    for name in ORDER:                                    # righe dell'atlante: variante * frame + frame
         at = build_atlas(name, S)
         Image.fromarray(at).save(os.path.join(out_dir, f"terrain_{name}.png"))
-        frames[name] = at.shape[0] // S
+        frames[name] = TERRAINS[name].get("anim", 1)
+        varianti[name] = TERRAINS[name].get("varianti", 1)
     sprites, objs = {}, []
     for o in w.objects:
         spr = object_sprite(o, S)
@@ -33,7 +34,7 @@ def export_world(w, out_dir, S=TILE, copy_loader=True):
             sprites[key] = {"ax": ax, "ay": ay, "w": img.shape[1], "h": img.shape[0]}
         objs.append({"sprite": key, "x": round(o["x"], 3), "y": round(o["y"], 3), "type": o["type"]})
     j = w.to_json()
-    j.update({"tile": S, "terrain_frames": frames, "sprites": sprites, "objects": objs})
+    j.update({"tile": S, "terrain_frames": frames, "terrain_variants": varianti, "sprites": sprites, "objects": objs})
     j["ground"] = [[int(v) for v in row] for row in j["ground"]]
     j["roads"] = [[list(map(int, p)) for p in r] for r in j["roads"]]
     with open(os.path.join(out_dir, "world.json"), "w") as f:

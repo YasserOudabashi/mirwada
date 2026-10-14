@@ -83,11 +83,11 @@ TERRAINS = {
     "ghiaia": dict(ramp=["slate", "grey", "grey_l", "white"], period=4, dither=0.6, detail="pebbles", rim="dark", rimc="grey",
                    level=8.3, contrast=0.15),
     "marmo": dict(bordo="dritto", ramp=["grey", "grey_l", "white", "white"], period=4, dither=0.3, detail="slabs", slab=(2, 2), rim="dark",
-                  rimc="slate", level=8.4, contrast=0.4),
+                  rimc="slate", level=8.4, contrast=0.4, varianti=8, fuga="grey"),
     "ciottoli_scuri": dict(bordo="dritto", ramp=["brown_dd", "slate_d", "slate", "grey"], period=4, dither=0.4, detail="cobbles", cells=12,
                            rim="dark", rimc="brown_dd", level=8.6),
     "lastre_chiare": dict(bordo="dritto", ramp=["grey", "grey_l", "cream", "cream"], period=4, dither=0.4, detail="slabs", slab=(2, 2),
-                          rim="dark", rimc="slate", level=8.8, contrast=0.5),
+                          rim="dark", rimc="slate", level=8.8, contrast=0.5, varianti=8, fuga="grey"),
     "molo_pietra": dict(bordo="dritto", ramp=["navy", "slate_d", "slate", "grey"], period=4, dither=0.4, detail="slabs", rim="cliff",
                         rimc="navy", level=9.2, contrast=0.5),
     "pontile_legno": dict(bordo="dritto", ramp=["brown_dd", "brown_d", "brown", "tan"], period=4, dither=0.3, detail="planks", rim="dark",
@@ -108,7 +108,8 @@ TERRAINS = {
     "terra_rosa": dict(ramp=["#c99a9a", "#ddb3b0", "#e8c6c1", "#f3dcd6"], period=4, dither=0.6, detail="pebbles", rim="dark",
                        rimc="#c99a9a", level=8.25, contrast=0.3),
     "lastre_rovine": dict(ramp=["teal_d", "grey", "grey_l", "cream"], period=4, dither=0.4, detail="slabs", slab=(2, 2),
-                          rim="cliff", rimc="teal_d", level=8.9, contrast=0.5),
+                          rim="cliff", rimc="teal_d", level=8.9, contrast=0.5, varianti=8, erba=0.35, fuga="slate",
+                          accent=["green_d", "green_m"], mancanti=0.08, buca=["brown_dd", "brown_d"]),
     "roccia_lavica": dict(ramp=["ink", "brown_dd", "brown_dd", "slate_d"], period=4, dither=0.4, detail="embers", rim="cliff",
                           rimc="ink", level=9.1, accent=["orange", "amber"]),
     "ghiaccio": dict(ramp=["slate", "grey", "grey_l", "grey_l"], period=4, dither=0.4, detail="embers", cells=4, spessore=0.6,
@@ -163,7 +164,55 @@ def _accent(d, i=0):
     return _rgb(acc[min(i, len(acc) - 1)])
 
 
-def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4):
+def _lastre(d, S, rs, base):
+    """Lastre con le fughe sul bordo della casella (le varianti si accostano senza tagliare una lastra). Ogni
+    variante divide la casella a modo suo (1 lastra, 2 orizzontali, 2 verticali, 4): il pavimento non fa griglia.
+    Tono di ogni lastra a caso (quasi sempre quello centrale), ombreggiato dal rumore; fuga di un tono medio,
+    spigolo in luce in alto a sinistra, spigoli scheggiati, crepe. Campi della riga: fuga (colore), erba (frazione
+    di fughe con l'erba, colori in accent), mancanti (lastre sparite: buca di terra coi colori in buca)."""
+    ramp = d["ramp"]; n = len(ramp)
+    rng = np.random.RandomState(rs)
+    nx_, ny_ = [(1, 1), (2, 1), (1, 2), (2, 2)][rng.choice(4, p=[0.35, 0.2, 0.2, 0.25])]
+    lw, lh = S // nx_, S // ny_
+    y, x = np.mgrid[0:S, 0:S]
+    riga, col, yr, xr = y // lh, x // lw, y % lh, x % lw
+    pesi = np.array([2, 6, 2][:n - 1], float)
+    toni = rng.choice(np.arange(1, n), size=(ny_, nx_), p=pesi / pesi.sum())
+    tono = toni[riga, col] + np.where(base > 0.72, 1, 0) - np.where(base < 0.28, 1, 0)
+    img = np.array([_rgb(c) for c in ramp])[np.clip(tono, 1, n - 1)]
+    fuga = (yr == 0) | (xr == 0)
+    img[((yr == 1) | (xr == 1)) & (tono < n - 1)] = _rgb(ramp[-1])
+    s1 = max(1, S // 32)
+    scheggia = _rgb(d.get("fuga", ramp[0]))
+    for r in range(ny_):
+        for c in range(nx_):
+            y0, x0 = r * lh, c * lw
+            if rng.rand() < d.get("mancanti", 0) * nx_ * ny_ / 2:   # lastra mancante: buca di terra con sassolini
+                buca = d.get("buca", ["brown_dd", "brown_d"])
+                img[y0 + 1:y0 + lh, x0 + 1:x0 + lw] = _rgb(buca[-1])
+                for _ in range(lw * lh // 10):
+                    img[y0 + 1 + rng.randint(lh - 1), x0 + 1 + rng.randint(lw - 1)] = _rgb(buca[0])
+                continue
+            for _ in range(rng.randint(0, 3)):            # spigolo scheggiato
+                cy, cx = y0 + 1 + (lh - 2) * rng.randint(2), x0 + 1 + (lw - 2) * rng.randint(2)
+                img[max(y0, cy - s1):cy + s1, max(x0, cx - s1):cx + s1] = scheggia
+            if rng.rand() < 0.4:                          # crepa: una linea spezzata dentro la lastra
+                py, px = y0 + 2 + rng.randint(lh - 4), x0 + 2 + rng.randint(max(1, lw // 2))
+                for _ in range(rng.randint(3, 3 + lw // 3)):
+                    img[py, px] = _rgb(ramp[0])
+                    py = int(np.clip(py + rng.randint(-1, 2), y0 + 2, y0 + lh - 2))
+                    px = int(np.clip(px + 1, x0 + 2, x0 + lw - 2))
+    img[fuga] = scheggia
+    if d.get("erba"):                                     # erba nelle fughe, a ciuffi (rumore), anche oltre la fuga
+        ciuffi = pnoise(S, 4, rs + 3, 2) > 1 - d["erba"]
+        verde = ciuffi & (fuga | ((yr == 1) & (rng.rand(S, S) < 0.5)) | ((xr == 1) & (rng.rand(S, S) < 0.5)))
+        acc = d.get("accent", ["green_d", "green_m"])
+        img[verde] = _rgb(acc[0])
+        img[verde & (rng.rand(S, S) < 0.4)] = _rgb(acc[-1])
+    return img
+
+
+def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4, variante=0):
     d = TERRAINS[name]
     rs = zlib.crc32(name.encode()) % 1000 + seed   # hash() cambia a ogni avvio: non riproducibile
     base = pnoise(S, d["period"], rs, 3)
@@ -228,18 +277,22 @@ def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4):
             put(rng.randint(S), rng.randint(S), 0)
     elif detail == "slabs":
         # lastre di pietra: file sfalsate, ogni lastra un tono, fuga scura, spigolo in luce in alto a sinistra
-        lw, lh = S // d.get("slab", (2, 4))[0], S // d.get("slab", (2, 4))[1]   # (2,4) blocchi, (2,2) lastre quadrate
-        riga = y // lh
-        col = (x + (riga % 2) * (lw // 2)) // lw
-        tono = (riga * 7 + col * 5 + (riga * col) % 3 + rng.randint(3)) % (n - 1) + 1   # ogni lastra il suo tono
-        img = np.array([_rgb(c) for c in ramp])[np.minimum(tono, n - 1)]
-        xr = (x + (riga % 2) * (lw // 2)) % lw
-        img[(y % lh == 0) | (xr == 0)] = _rgb(ramp[0])
-        img[((y % lh == 1) | (xr == 1)) & ~((y % lh == 0) | (xr == 0))] = _rgb(ramp[-1])
-        for _ in range(S // 8):                                     # crepe
-            px, py = rng.randint(S), rng.randint(S)
-            for k in range(rng.randint(2, 4)):
-                put(px + k, py + (k // 2), 0)
+        nx_, ny_ = d.get("slab", (2, 4))
+        lw, lh = S // nx_, S // ny_                                  # (2,4) blocchi, (2,2) lastre quadrate
+        if d.get("varianti", 1) > 1:
+            img = _lastre(d, S, rs + 7919 * variante, base)
+        else:
+            riga = y // lh
+            col = (x + (riga % 2) * (lw // 2)) // lw
+            tono = (riga * 7 + col * 5 + (riga * col) % 3 + rng.randint(3)) % (n - 1) + 1   # ogni lastra il suo tono
+            img = np.array([_rgb(c) for c in ramp])[np.minimum(tono, n - 1)]
+            xr = (x + (riga % 2) * (lw // 2)) % lw
+            img[(y % lh == 0) | (xr == 0)] = _rgb(ramp[0])
+            img[((y % lh == 1) | (xr == 1)) & ~((y % lh == 0) | (xr == 0))] = _rgb(ramp[-1])
+            for _ in range(S // 8):                                     # crepe
+                px, py = rng.randint(S), rng.randint(S)
+                for k in range(rng.randint(2, 4)):
+                    put(px + k, py + (k // 2), 0)
     elif detail == "rows":
         # filari: solchi orizzontali, piante in fila sulla cresta (accento)
         passo = max(4, S // 4)
@@ -356,25 +409,38 @@ def build_atlas(name, S=TILE, seed=3):
     bordo="dritto" nella riga del terreno: bordi squadrati invece che sfumati (cose costruite dall'uomo)."""
     d = TERRAINS[name]
     masks = masks_dritte(S) if d.get("bordo") == "dritto" else layer_masks(S, seed)
-    nfr = d.get("anim", 1)
-    atlas = np.zeros((S * nfr, S * 16, 4), np.uint8)
-    for f in range(nfr):
-        tex = terrain_texture(name, S, frame=f, nframes=nfr)
-        for m, mask in enumerate(masks):
-            img, inner = _rim(mask, tex, d["rim"], d.get("rimc"), d["ramp"]) if d["rim"] else (tex, None)
-            tile = np.zeros((S, S, 4), np.uint8)
-            tile[..., :3] = img; tile[..., 3] = np.where(mask, 255, 0)
-            atlas[f * S:(f + 1) * S, m * S:(m + 1) * S] = tile
+    nfr, nva = d.get("anim", 1), d.get("varianti", 1)
+    atlas = np.zeros((S * nfr * nva, S * 16, 4), np.uint8)
+    for v in range(nva):                                  # riga = variante * frame totali + frame
+        for f in range(nfr):
+            tex = terrain_texture(name, S, frame=f, nframes=nfr, variante=v)
+            r0 = (v * nfr + f) * S
+            for m, mask in enumerate(masks):
+                img, inner = _rim(mask, tex, d["rim"], d.get("rimc"), d["ramp"]) if d["rim"] else (tex, None)
+                tile = np.zeros((S, S, 4), np.uint8)
+                tile[..., :3] = img; tile[..., 3] = np.where(mask, 255, 0)
+                atlas[r0:r0 + S, m * S:(m + 1) * S] = tile
     return atlas
 
 
-def compose_ground(levels, atlases=None, S=TILE, frame=0, seed=3, strati=None, duri=None):
+def variante(i, j, n):
+    """Variante del tile al vertice (i, j) del mondo (righe, colonne): un hash fisso, uguale in ogni ritaglio.
+    Il caricatore di Godot deve usare la stessa formula."""
+    if n <= 1:
+        return 0
+    h = (i * 374761393 + j * 668265263) & 0xFFFFFFFF      # hash a 32 bit: mescola tutti i bit (niente motivi)
+    h = ((h ^ (h >> 13)) * 1274126177) & 0xFFFFFFFF
+    return (h ^ (h >> 16)) % n
+
+
+def compose_ground(levels, atlases=None, S=TILE, frame=0, seed=3, strati=None, duri=None, origine=(0, 0)):
     """levels: array HxW di nomi/indici (indice in ORDER). Ritorna immagine RGBA (H*S, W*S).
     strati: HxW di interi (es. l'altezza). Dove due caselle vicine stanno su strati diversi (un dislivello)
     i terreni NON si sfumano: ogni quarto di casella che tocca un altro strato prende il terreno pieno della
     sua casella, con un bordo netto (lo copre il contorno della parete o della cima).
     duri: HxW booleani, la casella ha un bordo di roccia (materiale da parete). Il bordo netto c'e' solo se la
-    piu' alta delle due caselle e' dura: una spiaggia sul mare (piu' basso ma senza parete) resta sfumata."""
+    piu' alta delle due caselle e' dura: una spiaggia sul mare (piu' basso ma senza parete) resta sfumata.
+    origine: (x0, y0) del ritaglio nel mondo, per scegliere le varianti dei tile come nella mappa intera."""
     lv = np.asarray(levels)
     H, W = lv.shape
     if atlases is None:
@@ -383,9 +449,11 @@ def compose_ground(levels, atlases=None, S=TILE, frame=0, seed=3, strati=None, d
     canvas = np.zeros((H * S, W * S, 4), np.uint8)
     h2 = S // 2
     big = np.zeros(((H + 1) * S, (W + 1) * S, 4), np.uint8)       # canvas con mezzo tile di margine
+    oy, ox = origine[1] - 1, origine[0] - 1                       # il vertice (i, j) del pad e' (y0-1+i, x0-1+j)
     for ti, name in enumerate(ORDER):
         at = atlases[name]
-        nfr = at.shape[0] // S
+        nva = TERRAINS[name].get("varianti", 1)
+        nfr = at.shape[0] // S // nva
         fr = frame % nfr
         ge = pad >= ti
         # vertice (i,j) tra le celle pad[i..i+1, j..j+1]
@@ -399,7 +467,8 @@ def compose_ground(levels, atlases=None, S=TILE, frame=0, seed=3, strati=None, d
         ys, xs = np.nonzero(m)
         for i, j in zip(ys, xs):
             mk = m[i, j]
-            tile = at[fr * S:(fr + 1) * S, mk * S:(mk + 1) * S]
+            r0 = (variante(oy + i, ox + j, nva) * nfr + fr) * S
+            tile = at[r0:r0 + S, mk * S:(mk + 1) * S]
             blk = big[i * S:(i + 1) * S, j * S:(j + 1) * S]
             a = tile[..., 3:4] > 0
             blk[...] = np.where(a, tile, blk)
@@ -423,8 +492,10 @@ def compose_ground(levels, atlases=None, S=TILE, frame=0, seed=3, strati=None, d
                                 or netto(c, (i + 1 + dy, j + 1 + dx))):
                             continue
                         at = atlases[ORDER[lv[i, j]]]
-                        fr = frame % (at.shape[0] // S)
-                        pieno = at[fr * S:(fr + 1) * S, 15 * S:16 * S]    # tile pieno (maschera 15)
+                        nva = TERRAINS[ORDER[lv[i, j]]].get("varianti", 1)
+                        nfr = at.shape[0] // S // nva
+                        r0 = (variante(oy + i + qy, ox + j + qx, nva) * nfr + frame % nfr) * S
+                        pieno = at[r0:r0 + S, 15 * S:16 * S]    # tile pieno (maschera 15) del vertice del quarto
                         y0, x0 = i * S + qy * h2, j * S + qx * h2
                         # il tile pieno e' allineato ai vertici: nel ritaglio e' spostato di mezzo tile
                         out[y0:y0 + h2, x0:x0 + h2] = pieno[(qy * h2 + h2) % S:(qy * h2 + h2) % S + h2,
