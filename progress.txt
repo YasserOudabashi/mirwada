@@ -8112,3 +8112,15 @@ stessa grandezza") -> scala x3 (960x660 tile).
   solo vicino al giocatore (PRD nemici); viaggi lunghi -> barca, volo, viaggio
   rapido indispensabili (forse corsa o cavalcatura).
 - Prossimo: domande (XL) su terre di mezzo, arcipelago, sottosuolo.
+Domande sulla terra di mezzo (round 1, + schizzo a 2 varianti):
+- E' LA terra di mezzo (una sola), non 4 fasce: grande zona al centro del
+  continente che tocca tutte le regioni (variante 2 dello schizzo).
+- Dentro, 4 paesaggi: steppa gelata a nord, colline e rovine antiche a ovest,
+  foreste di confine a sud-est, paludi e brughiere a est.
+- Abitanti: villaggi liberi (mercanti, locande), banditi e fuorilegge, mostri
+  erranti + UN BOSS (richiesta dell'utente).
+- Boss: AL CENTRO, tra le rovine antiche; si vede da lontano, si torna a
+  sfidarlo quando si e' pronti.
+- Gating: PERICOLOSA (aperta ma con nemici forti).
+- Nei dati: resta da decidere come rappresentarla (regions.json ha 5 regioni:
+  sesta regione "neutra" o zona; data story da spiegare prima).
