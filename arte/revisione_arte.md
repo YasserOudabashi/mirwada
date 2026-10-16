@@ -35,7 +35,7 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
 
 ## 1. Personaggi (sprite)
 
-### 🔴 1.1 Enel sparisce sul selciato di Mirwada (e di notte quasi del tutto)
+### ✅ 1.1 Enel sparisce sul selciato di Mirwada (e di notte quasi del tutto) — FATTO (2026-10-16)
 - **Cosa:** il cappotto di Enel (`#262b44 / #3a4466 / #5a6988`) usa la stessa rampa
   blu-ardesia dei ciottoli di Mirwada. Messo sopra il ritaglio del porto si vedono solo
   sciarpa e occhi; con la luce di notte resta visibile quasi solo lo sguardo
@@ -51,8 +51,9 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   3. **Ombra a terra composta dal gioco** sotto ogni personaggio (vedi 2.2).
   4. Criterio di accettazione: rifare l'immagine di prova giorno/notte; Enel si deve
      leggere su ogni terreno della sua regione.
+- **Fatto:** cappotto quasi nero a riflessi prugna (non più blu-ardesia), bordo di luce grigio ardesia in alto a sinistra, selciato di Mirwada (`ciottoli_scuri`) in grigio caldo poco contrastato. Prova rifatta: `arte/revisione/leggibilita_personaggi_dopo.png`. L'ombra a terra (2.2) resta codice.
 
-### 🔴 1.2 L'attacco del nemico non ha la posa del colpo
+### ✅ 1.2 L'attacco del nemico non ha la posa del colpo — FATTO (2026-10-16)
 - **Cosa:** `nemico_base.attack` ha `attivi: [1]`, ma il frame 1 mostra la mazza **alzata**
   (carica). Il frame 2 è identico all'1 (0 pixel diversi) e il frame 3 è di nuovo l'idle
   (36–50 pixel diversi). Non esiste un frame con la mazza che scende o colpisce.
@@ -62,27 +63,31 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   0 carica breve, **1 colpo** (mazza davanti al corpo, verso il bersaglio), 2 impatto
   tenuto (160 ms), 3 recupero. I tempi in `durate_ms` restano quelli.
   Non c'è un ripiego senza ridisegnare: la posa del colpo nel foglio non esiste.
+- **Fatto:** frame 0 carica, 1 colpo con la mazza in avanti verso il bersaglio, 2 impatto (scende ancora un poco), 3 recupero.
 
-### 🔴 1.3 Tutti i 19 fogli sono disegni a 32 px ingranditi ×2
+### ✅ 1.3 Tutti i 19 fogli sono disegni a 32 px ingranditi ×2 — FATTO (2026-10-16)
 - Già noto (US-8B01): nessun beneficio dei 64 px finché non arriva il Blocco C.
   **Consiglio:** scrivere i punti 1.1 e 1.4–1.13 dentro i brief di US-8B30/31/32, così il
   ridisegno li risolve in un colpo solo invece di rifare tutto due volte.
+- **Fatto:** tutti e 19 ridisegnati a 64 da `tools/art/build_personaggi.py`.
 
-### 🟠 1.4 Gli sprite toccano il bordo della cella (arma e testa tagliate)
+### ✅ 1.4 Gli sprite toccano il bordo della cella (arma e testa tagliate) — FATTO (2026-10-16)
 - **Cosa:** Enel e il nemico sono alti 32 su 32 px. La spada o il cappello di Enel toccano
   il bordo in 12 frame su 16 dell'idle (e in 24 su 24 del cast); il berretto del nemico
   tocca il bordo in alto in tutti i frame di idle e walk. Il manuale della skill vuole il personaggio al 70–85% della cella.
 - **Come correggere:** a 64 px corpo alto **44–50 px**, 6–8 px liberi sopra e ai lati per
   l'arma. Il fendente grande non va nello sprite: va nei VFX (punto 1.6).
+- **Fatto:** figura alta 35–46 px, nessun pixel sul bordo in nessun frame (controllato su tutti i fogli); spadone di Enel con la lama un po' più corta.
 
-### 🟠 1.5 Su e giù si confondono
+### ✅ 1.5 Su e giù si confondono — FATTO (2026-10-16)
 - **Cosa:** nella vista da dietro (`up`) Enel mostra due punti ciano sulla nuca (la crepa
   luminosa) e la sciarpa che pende come davanti: sembra girato verso di noi. Le sagome
   `down` e `up` sono uguali, cambia solo il lato della spada.
 - **Come correggere** (US-8B30): da dietro la crepa diventa **una sola linea verticale**
   (non due punti a forma di occhi), la sciarpa pende sulla schiena, si vede il colletto.
+- **Fatto:** da dietro niente occhi né crepa, sciarpa che pende sulla schiena, falde del cappotto.
 
-### 🟠 1.6 Effetti colorati "cotti" dentro gli sprite di Enel
+### ✅ 1.6 Effetti colorati "cotti" dentro gli sprite di Enel — FATTO (2026-10-16)
 - **Cosa:** archi degli attacchi, crepa nel suolo dell'attacco pesante e bagliore della
   parata sono **ciano fisso** dentro il foglio; la scia del dash è viola fissa.
   Ma il Pathway si può cambiare (US-704) e il colore va letto da `data/vfx.json`
@@ -93,6 +98,7 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   della lama in grigio neutro); archi, crepe e bagliori diventano VFX in scala di grigi
   colorati dallo shader (US-8B03 + US-8B40). Gli occhi ciano sono design del personaggio:
   restano.
+- **Fatto:** nessun effetto nello sprite (archi, scie, bagliori diventano VFX); restano solo occhi e crepa ciano, che sono design.
 
 ### 🟠 1.7 Il lampo bianco del colpo subito ignora `riduci_flash`
 - **Cosa:** il frame 0 di `personaggio_hurt` è una sagoma tutta bianca disegnata nel
@@ -101,21 +107,25 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
 - **Come correggere:** nel foglio un frame normale di "colpito"; il lampo lo fa il gioco
   con `modulate` (o uno shader) su `AnimationMachine`, leggendo `riduci_flash`.
   Piccola modifica di codice: va spiegata prima.
+- **Fatto lato foglio (2026-10-16):** `personaggio_hurt` non ha più la sagoma bianca. **Resta** il lampo dal
+  gioco con `modulate` che legge `riduci_flash` (codice, da spiegare prima).
 
-### 🟠 1.8 La camminata di Enel va a scatti e le gambe non si vedono
+### ✅ 1.8 La camminata di Enel va a scatti e le gambe non si vedono — FATTO (2026-10-16)
 - **Cosa:** i frame 2–3 e 5–0 sono quasi uguali (50–66 pixel diversi contro i 260–310 degli
   altri passaggi, su tutte e 4 le direzioni): in pratica 4 pose, e la posa "gambe unite"
   resta a schermo 240 ms contro i 150 ms dei contatti. È il contrario della regola
   (contatti tenuti di più). Il cappotto lungo copre quasi tutte le gambe.
 - **Come correggere** (US-8B30): 6 pose diverse (contatto, giù, passaggio, su, ×2),
   cappotto aperto davanti per far vedere le gambe, bob di 1–2 px a 64.
+- **Fatto:** 6 pose diverse, cappotto aperto davanti (gambe visibili), bob.
 
-### 🟠 1.9 La spada sparisce nella morte di Enel
+### ✅ 1.9 La spada sparisce nella morte di Enel — FATTO (2026-10-16)
 - **Cosa:** al frame 1 la spada cade a terra, dal frame 2 non c'è più (i pixel d'acciaio
   passano da ~31 a ~11, restano solo le bende).
 - **Come correggere:** la spada resta a terra accanto al corpo fino all'ultimo frame.
+- **Fatto:** la spada resta in mano fino all'ultimo frame; la morte cade su un fianco e resta distesa.
 
-### 🟠 1.10 Stile diverso tra Enel e nemico/pet
+### ✅ 1.10 Stile diverso tra Enel e nemico/pet — FATTO (2026-10-16)
 - **Cosa:** Enel viene dal costruttore, nemico e pet dallo zip di Claude in Chrome:
   proporzioni diverse (nemico esile con testa enorme), ombra cotta nel nemico e nel pet ma
   non in Enel, **linee d'inchiostro dentro la sagoma** del nemico (~80 px di `#181425` per
@@ -123,26 +133,31 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   Nemico e pet non hanno un generatore: non sono "rilanciabili con seed".
 - **Come correggere:** Blocco C rigenera tutti e tre con lo stesso metodo (stessa luce,
   stesse proporzioni, stessa regola del contorno), senza ombre cotte.
+- **Fatto:** stesso metodo, stessa luce, stesse proporzioni, nessuna ombra cotta, rilanciabili.
 
-### 🟠 1.11 Nemico di profilo: non si capisce dove guarda
+### ✅ 1.11 Nemico di profilo: non si capisce dove guarda — FATTO (2026-10-16)
 - **Cosa:** nelle viste `left`/`right` la testa è tutta berretto (si vede la nuca).
 - **Come correggere** (US-8B31): profilo con viso visibile (naso, mento), berretto più piccolo.
+- **Fatto:** niente berretto, capelli solo su nuca e cima, occhio e naso visibili di profilo.
 
-### 🟠 1.12 Morte del nemico: affonda invece di cadere
+### ✅ 1.12 Morte del nemico: affonda invece di cadere — FATTO (2026-10-16)
 - Già noto. L'ultimo frame è quasi vuoto (181 pixel). **Correggere:** caduta, ultimo frame
   col corpo a terra; la dissolvenza la fa già `enemy.gd` (`modulate:a`).
+- **Fatto:** cade su un fianco, ultimo frame col corpo a terra.
 
-### 🟠 1.13 Il pet non si vede e non sembra un lupo
+### ✅ 1.13 Il pet non si vede e non sembra un lupo — FATTO (2026-10-16)
 - **Cosa:** alto 12–15 px su 32 (occupa il 9–14% della cella), stesso grigio-blu di Enel: sul selciato
   e nel bosco quasi sparisce. Nelle viste su/giù è una macchia senza muso né orecchie.
   Un pixel ciano (l'occhio) compare solo in alcuni frame: lampeggia. Mancano `hurt` e `death`.
 - **Come correggere** (US-8B32): a 64 px alto 28–36 px, colore distinto da Enel, orecchie e
   muso leggibili in tutte le viste, occhio fisso in ogni frame.
+- **Fatto:** lupo alto 26–37 px, dorso cenere scuro e pancia chiara (non il blu di Enel), orecchie grandi, muso lungo, occhi ciano fissi. Gli altri due pet e `hurt`/`death` del pet richiedono voci nuove nei dati: restano a US-8B32.
 
-### 🟢 1.14 Frame duplicati
+### ✅ 1.14 Frame duplicati — FATTO (2026-10-16)
 - `nemico_base.attack` 1 = 2, `nemico_base.stagger` 0 = 1, `pet.attack` 1 = 2 (in tutte le
   direzioni). **Correggere:** pose diverse, oppure un frame solo con durata più lunga in
   `durate_ms` (stessa resa, meno frame da disegnare).
+- **Fatto:** nessun frame uguale al precedente in nessun foglio (le pose tenute diventano un micro-movimento).
 
 ### 🟢 1.15 Avvisi minori di `check.py`
 - Rampe bende/acciaio "dritte" (senza hue shift): già noto.

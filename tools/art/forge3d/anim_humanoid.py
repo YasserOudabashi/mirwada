@@ -62,9 +62,10 @@ def attack_light(n=5):
     """anticipo 0-1, attivo 2, recupero 3-4: colpo diagonale dall'alto a destra verso il basso."""
     windup = _p(torso=(-6, 0, 14), hips=(0, 0, -8), arm_r=(125, 0, 20), fore_r=(25, 0, 0),
                 weapon=(25, 0, 0), head=(-4, 0, 6), leg_l=(10, 0, 0), leg_r=(-14, 0, 0), shin_r=(-10, 0, 0))
-    hit = _p(torso=(10, 0, -22), hips=(0, 0, 12, 0, 1.2, -0.6), arm_r=(70, 0, -12), fore_r=(0, 0, 0), weapon=(-45, 0, 0),
+    # colpo: busto dritto, lama che scende in avanti (vedi attack_heavy)
+    hit = _p(torso=(10, 0, -2), hips=(0, 0, 2, 0, 0.3, -0.6), arm_r=(58, 0, -12), fore_r=(0, 0, 0), weapon=(-118, 0, 0),
              head=(2, 0, -8), leg_l=(-12, 0, 0), leg_r=(22, 0, 0), arm_l=(-20, 0, 0))
-    follow = _p(torso=(8, 0, -14), hips=(0, 0, 8, 0, 0.6, -0.4), arm_r=(55, 0, -18), fore_r=(0, 0, 0), weapon=(-35, 0, 0),
+    follow = _p(torso=(8, 0, -4), hips=(0, 0, 2, 0, 0.6, -0.4), arm_r=(55, 0, -18), fore_r=(0, 0, 0), weapon=(-110, 0, 0),
                 leg_r=(14, 0, 0), leg_l=(-8, 0, 0))
     keys = [(0, _p(), "out"), (1, windup, "in"), (2, hit, "snap"), (3, follow, "out"), (n - 1, REST, "inout")]
     keys = [(min(k[0], n - 1),) + k[1:] for k in keys]
@@ -76,9 +77,11 @@ def attack_heavy(n=8):
     wind1 = _p(torso=(-4, 0, 8), arm_r=(110, 0, 10), fore_r=(30, 0, 0), weapon=(15, 0, 0), hips=(0, 0, -3))
     wind2 = _p(torso=(-14, 0, 20), arm_r=(150, 0, 22), fore_r=(25, 0, 0), weapon=(35, 0, 0), hips=(0, 0, -10, 0, -0.8, -1.0),
                head=(-8, 0, 8), leg_l=(14, 0, 0), leg_r=(-18, 0, 0), shin_r=(-18, 0, 0), arm_l=(40, 0, 0))
-    hit = _p(torso=(16, 0, -26), arm_r=(65, 0, -14), fore_r=(0, 0, 0), weapon=(-55, 0, 0), hips=(0, 0, 16, 0, 1.8, -1.4),
+    # colpo: busto dritto e lama che scende in avanti verso il bersaglio (con il busto ruotato e l'arma a -55 la
+    # lama restava in avanti-in alto, e da sinistra sembrava un montante)
+    hit = _p(torso=(16, 0, 0), arm_r=(55, 0, -14), fore_r=(0, 0, 0), weapon=(-122, 0, 0), hips=(0, 0, 0, 0, 0.6, -1.4),
              head=(6, 0, -10), leg_l=(-20, 0, 0), leg_r=(34, 0, 0), shin_l=(-10, 0, 0), arm_l=(-30, 0, 0))
-    hit2 = _p(torso=(20, 0, -30), arm_r=(50, 0, -18), fore_r=(0, 0, 0), weapon=(-60, 0, 0), hips=(0, 0, 20, 0, 2.2, -1.8),
+    hit2 = _p(torso=(20, 0, -4), arm_r=(50, 0, -18), fore_r=(0, 0, 0), weapon=(-118, 0, 0), hips=(0, 0, 4, 0, 0.8, -1.8),
               head=(8, 0, -12), leg_l=(-22, 0, 0), leg_r=(36, 0, 0), arm_l=(-34, 0, 0))
     keys = [(0, _p(), "inout"), (1, wind1, "inout"), (3, wind2, "hold"), (4, hit, "snap"),
             (5, hit2, "out"), (6, hit2, "inout"), (n - 1, REST, "inout")]
@@ -142,14 +145,20 @@ def anticipo(n=4):
 
 
 def enemy_attack(n=4):
-    hit = _p(torso=(18, 0, -16), arm_r=(70, 0, -8), fore_r=(0, 0, 0), hips=(0, 0, 10, 0, 2.0, -1.0), head=(6, 0, 0))
+    # colpo: braccio teso davanti e arma che scende verso il bersaglio (senza la rotazione dell'arma la mazza
+    # restava dritta davanti alla faccia: revisione 1.2)
+    hit = _p(torso=(18, 0, -16), arm_r=(70, 0, -8), fore_r=(0, 0, 0), weapon=(-75, 0, 0), hips=(0, 0, 10, 0, 2.0, -1.0),
+             head=(6, 0, 0))
+    # 0 carica breve, 1 colpo, 2 impatto tenuto (l'arma scende ancora un poco: niente frame doppio), 3 recupero
+    impatto = add_pose(hit, {"torso": (6, 0, -4), "arm_r": (-12, 0, 0), "hips": (0, 0, 0, 0, 0.3, -0.3)})
     return clip_from_keys([(0, _p(torso=(-14, 0, 6), arm_r=(160, 0, 16), fore_r=(60, 0, 0))), (1, hit, "snap"),
-                           (2, hit), (n - 1, REST)], n)
+                           (2, impatto), (n - 1, REST)], n)
 
 
 def stagger(n=4):
     a = hurt(3)[0]
-    return clip_from_keys([(0, a, "out"), (1, a), (2, add_pose(a, {"torso": (6, 0, -6)})), (n - 1, REST)], n)
+    b = add_pose(a, {"torso": (-8, 0, 6), "head": (-6, 0, 4), "hips": (0, 0, 0, 0, -0.5, 0)})   # barcolla ancora
+    return clip_from_keys([(0, a, "out"), (1, b), (2, add_pose(a, {"torso": (6, 0, -6)})), (n - 1, REST)], n)
 
 
 CLIPS = {"idle": idle, "walk": walk, "run": run, "dash": dash, "attack_light": attack_light,

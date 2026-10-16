@@ -88,8 +88,10 @@ TERRAINS = {
                    level=8.3, contrast=0.15),
     "marmo": dict(bordo="dritto", ramp=["grey", "grey_l", "white", "white"], period=4, dither=0.3, detail="slabs", slab=(2, 2), rim="dark",
                   rimc="slate", level=8.4, contrast=0.4, varianti=8, fuga="grey"),
-    "ciottoli_scuri": dict(bordo="dritto", ramp=["brown_dd", "slate_d", "slate", "grey"], period=4, dither=0.4, detail="cobbles", cells=12,
-                           rim="dark", rimc="brown_dd", level=8.6),
+    # selciato di Mirwada: grigio caldo e poco contrastato (revisione 1.1: il blu-ardesia era il colore del cappotto
+    # di Enel, che ci spariva sopra). Grigi caldi = colori extra della rampa
+    "ciottoli_scuri": dict(bordo="dritto", ramp=["#5e4b4a", "#8a7b72", "#978a80", "#a4988e"], period=4, dither=0.4,
+                           detail="cobbles", cells=12, rim="dark", rimc="#5e4b4a", level=8.6),
     "lastre_chiare": dict(bordo="dritto", ramp=["grey", "grey_l", "cream", "cream"], period=4, dither=0.4, detail="slabs", slab=(2, 2),
                           rim="dark", rimc="slate", level=8.8, contrast=0.5, varianti=8, fuga="grey"),
     "molo_pietra": dict(bordo="dritto", ramp=["navy", "slate_d", "slate", "grey"], period=4, dither=0.4, detail="slabs", rim="cliff",

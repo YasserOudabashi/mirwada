@@ -8630,3 +8630,30 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
 - Controllo: il pezzo di "strada chiusa" al porto e' la faccia delle mura che scendono al mare, non un difetto.
 - Verificato: diff con HEAD solo ground in citta' (1560 caselle), il resto identico; anteprima della citta',
   porto e mura a dimensione vera; md5 uguale su due lanci; validate 0.
+
+[2026-10-16] Revisione arte, punto 2 (Blocco C del PRD 8b): Enel, nemico_base e pet a 64 px. FATTO lato arte.
+- tools/art/build_personaggi.py (nuovo): un metodo solo per i tre (motore 3D di forge3d, stessa luce, contorno
+  1 px, nessuna ombra cotta). Scrive arte/sprite/{categoria}_{nome}.png; generate_all.py li copia in assets/
+  (tell rosso del nemico). Tolti tools/art/build_enel.py e arte/sprite/personaggio_*.json (manichino a 32 px).
+  Comando: python tools/art/build_personaggi.py && python tools/art/generate_all.py. Nessun numero casuale.
+- Enel: humanoid + falde del cappotto aperte davanti, bende, crepa ciano sul viso, sciarpa sulla schiena,
+  spadone con lama 13 (non 16) portato in spalla (SPALLA) in idle/walk/dash/hurt/cast/meditate; attacchi e
+  parata partono e tornano in spalla (da_spalla). Materiali nuovi: coat_enel (quasi nero, riflesso prugna),
+  trou_enel, skin_enel. Bordo di luce grigio ardesia sul contorno in alto a sinistra (bordo_luce). ppu 1.22.
+- Nemico: bandito senza berretto (capelli su nuca e cima), occhio e naso visibili di profilo, giubba verde
+  (cloth_bandito), mazza. ppu 1.4. Lupo: quadruped con orecchie grandi, gorgiera e gola chiare, naso, dorso
+  fur_cinereo; ppu 1.75.
+- Libreria forge3d: enemy_attack (colpo con l'arma che scende, frame 2 diverso dal 1), stagger (frame 1 diverso),
+  attack_light/attack_heavy (busto dritto e lama che scende in avanti: prima la lama restava in avanti-in alto e
+  da sinistra sembrava un montante; braccio e passo ridotti per stare nella cella), quad_attack (balzo corto).
+- Regole verificate su tutti i 19 fogli (script di controllo): nessun pixel sul bordo della cella, nessun frame
+  uguale al precedente (vivi: le pose tenute diventano un micro-movimento), alpha solo 0/255, figure 35-46 px
+  (lupo 26-37). Piedi a 54 px su 64 (PIEDI): per 2.1 (codice) il gioco dovra' usare questo punto.
+- Morte (Enel e nemico): cade su un fianco e resta distesa, spada in mano (prima cadeva all'indietro: vista di
+  fronte restava una testa che affondava).
+- 1.1: selciato di Mirwada (ciottoli_scuri) in grigio caldo poco contrastato (colori extra della rampa). Prova
+  giorno/notte rifatta: arte/revisione/leggibilita_personaggi_dopo.png.
+- Verificato: fogli guardati ingranditi su chiaro e scuro (molti giri: spadone in spalla, profilo del nemico,
+  colpo, morte, lupo); validate 0; godot --import ok; 778 test passati.
+- Restano: 1.7 lampo del colpo dal gioco (codice), 2.1 piedi sull'origine (codice), 2.2 ombra composta (codice),
+  2.3 tell singolo (codice); altri due pet e hurt/death del pet (dati nuovi, US-8B32).

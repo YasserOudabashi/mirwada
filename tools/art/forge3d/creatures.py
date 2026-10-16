@@ -99,7 +99,7 @@ def quad_idle(n=4):
 
 def quad_attack(n=4):
     crouch = {"hips": (6, 0, 0, 0, -1.0, -1.2), "head": (-12, 0, 0), "leg_fl": (-12, 0, 0), "leg_fr": (-12, 0, 0)}
-    lunge = {"hips": (-10, 0, 0, 0, 3.0, 0.4), "head": (14, 0, 0), "leg_fl": (50, 0, 0), "leg_fr": (50, 0, 0),
+    lunge = {"hips": (-10, 0, 0, 0, 0.8, 0.4), "head": (8, 0, 0), "leg_fl": (24, 0, 0), "leg_fr": (24, 0, 0),
              "leg_bl": (-30, 0, 0), "leg_br": (-30, 0, 0), "tail": (20, 0, 0)}
     return clip_from_keys([(0, crouch, "out"), (1, lunge, "snap"), (2, lunge), (n - 1, {})], n)
 

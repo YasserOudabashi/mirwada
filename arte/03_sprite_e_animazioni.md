@@ -142,29 +142,25 @@ esplicita e correggibile, e le regole del cap. 1 le verifica `check.py`.
    `tools/generate_placeholders.py` salta i file che hanno un JSON in
    `arte/sprite/`: rilanciarlo non cancella l'arte vera.
 
-**Enel (protagonista): non si disegna a mano.** I 10 file `personaggio_*`
-li genera `tools/art/build_enel.py` (un manichino a parti: teste a mano,
-corpo come forme, luce da alto-sinistra, contorno 1px e ombre calcolati).
-Per cambiare qualcosa (colori, cappotto, una posa) si modifica il
-costruttore e si rigenera tutto:
+**Enel, nemico base e pet: non si disegnano a mano.** Tutti i fogli `personaggio_*`, `nemico_base_*` e
+`pet_*` li genera `tools/art/build_personaggi.py` (Blocco C del PRD 8b) con il motore 3D di `forge3d`:
+stessa luce in alto a sinistra, contorno 1 px, stesse proporzioni, nessuna ombra cotta (l'ombra a terra la
+mette il gioco). Rig: `enel()` (cappotto quasi nero, coppola, sciarpa rossa, bende, crepa e occhi ciano,
+spadone in spalla), `nemico()` (bandito con la mazza, viso visibile anche di profilo), `lupo()` (lupo
+cinereo). Animazioni dalla libreria `forge3d/anim_humanoid.py` e `creatures.py`. Per cambiare qualcosa si
+modifica il costruttore e si rigenera:
 
 ```bash
-python tools/art/generate_all.py                      # tutte le categorie
-python tools/art/generate_all.py --only personaggio   # solo Enel
-python tools/art/build_enel.py --skill <...> attack_heavy   # una sola animazione
+python tools/art/build_personaggi.py                  # scrive arte/sprite/{categoria}_{nome}.png
+python tools/art/build_personaggi.py --only pet
+python tools/art/generate_all.py                      # poi li copia in assets/ (tell rosso del nemico)
 ```
 
-Frame e durate li legge da `data/animations.json`. I frame che il codice usa
-si vedono: scia viola del dash solo nei frame di invulnerabilita' (0-2),
-occhi accesi e bagliore sulla lama nella finestra di parata (0-1), smear
-solo sul frame con la hitbox, bagliore del cast che esplode al frame 3.
-
-**Nemico base e pet** vengono da un set disegnato con Claude in Chrome: i
-fogli originali stanno in `arte/sprite/<categoria>_<animazione>.png` e sono
-copiati tali e quali in `assets/placeholder/`. Per sostituirli si cambia il
-PNG in `arte/sprite/` e lo si ricopia. `tools/generate_placeholders.py` salta
-ogni foglio che ha in `arte/sprite/` un sorgente `.json` (sprite-forge) o un
-foglio `.png`: rilanciarlo non cancella mai l'arte vera.
+Regole fisse del costruttore: piedi a 54 px su 64 (`PIEDI`), figura alta 35-46 px (lupo 26-37),
+nessun pixel sul bordo della cella, nessun frame identico al precedente (le pose tenute diventano un
+micro-movimento), alpha solo 0/255, bordo di luce grigio ardesia sul contorno in alto a sinistra di Enel.
+Archi, scie e bagliori non stanno nello sprite: sono VFX (US-8B40). Il frame e le durate vengono da
+`data/animations.json`.
 
 **Tempi.** Le animazioni coperte dalla tabella della skill hanno
 `durate_ms` in `data/animations.json` (una durata per frame): idle

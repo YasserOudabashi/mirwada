@@ -99,8 +99,8 @@ va scritto nella story.
   si mette a mezza grandezza (`animation_machine.gd`) e a schermo mostra tutti i suoi 64 pixel.
 - Godot disegna a **1280×720 pixel veri** (`canvas_items`, scala 2): 1 unità = 2 pixel.
   Su Full HD resta 1280×720 nitido con il bordo nero; su 1440p e 4K riempie (×2, ×3).
-- I fogli ancora disegnati a 32 vengono ingranditi ×2 da `generate_all.py` (ripiego): il
-  Blocco C del PRD 8b li ridisegna a 64 con `--size 64 --ppu 2`.
+- Tutti i fogli dei personaggi sono a 64 (Blocco C, `tools/art/build_personaggi.py`, 2026-10-16): figura
+  alta 35–46 px, piedi a 54 px, nessun pixel sul bordo della cella.
 - Scalatura sempre a **multipli interi**. Mai filtri sfumati.
 
 ### Colore e stile
@@ -203,6 +203,7 @@ python tools/validate_data.py
 python tools/generate_placeholders.py
 
 # Arte vera, da data/animations.json
+python tools/art/build_personaggi.py        # Enel, nemico_base, pet a 64 px (fogli sorgente in arte/sprite/)
 python tools/art/generate_all.py            # tutte le categorie
 python tools/art/generate_all.py --only personaggio
 

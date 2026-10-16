@@ -129,6 +129,12 @@ define("leaf_light", ["green_d", "green_m", "green", "yellow"], tex=("noise", 1.
 define("leaf_autumn", ["brown_dd", "rust", "orange", "amber"], tex=("noise", 1.3, 0.2))
 define("leaf_pink", ["purple_d", "purple", "pink", "skin_l"], tex=("noise", 1.3, 0.2))
 define("leaf_dead", ["ink", "brown_dd", "brown_d", "brown"], tex=("noise", 1.3, 0.2))
+# --- personaggi di Mirwada (revisione arte 1.1, 1.10, 1.13): tinte che si staccano dal selciato blu-ardesia ---
+define("coat_enel", ["ink", "ink", "brown_dd", "purple_d"], tex=("noise", 1.2, 0.1))   # quasi nero, riflesso prugna
+define("trou_enel", ["ink", "ink", "navy", "slate_d"])
+define("skin_enel", ["brown_d", "skin_m", "skin_l", "skin_l"])                          # pelle esausta, chiara
+define("cloth_bandito", ["teal_d", "green_d", "green_m", "green"])                      # il nemico: giubba verde
+define("fur_cinereo", ["ink", "brown_dd", "slate_d", "grey"], tex=("noise", 1.6, 0.2))  # lupo: dorso cenere scuro
 define("leaf_olive", ["teal_d", "green_d", "green_d", "green_m"], tex=("noise", 1.3, 0.28))   # ulivo: verde spento
 define("grass", ["teal_d", "green_d", "green_m", "green"])
 define("mushroom_red", ["brown_dd", "red_d", "red", "pink"])
