@@ -35,6 +35,45 @@ func test_frame_a_64_px_occupano_un_tile() -> void:
 	assert_eq(tex.get_size() * m.scale, Vector2(32, 32), "a schermo occupa un tile")
 	m.free()
 
+
+## Revisione arte 2.1: i piedi (riga piedi_px della cella) cadono sull'origine
+## del nodo, dove stanno la collisione e l'ordinamento per profondita'.
+func test_piedi_sull_origine() -> void:
+	var m: AnimatedSprite2D = _nuova()
+	var piedi: float = float(_gd().call("animation_convention", "piedi_px"))
+	# AnimatedSprite2D centrato: riga y della cella -> y - 32 + offset.y
+	assert_almost_eq((piedi - 32.0 + m.offset.y) * m.scale.y, 0.0, "piedi a y = 0")
+	m.free()
+
+
+## Revisione arte 2.2: ombra a terra disegnata dal gioco, dietro lo sprite,
+## misurata in unita' di gioco (annulla la scala 0.5).
+func test_ombra_a_terra_dai_dati() -> void:
+	var m: AnimatedSprite2D = _nuova()
+	var ombra: Node2D = m.get_node_or_null("OmbraTerra")
+	assert_true(ombra != null, "ombra creata")
+	assert_true(ombra.show_behind_parent, "ombra dietro lo sprite")
+	assert_almost_eq(ombra.scale.x * m.scale.x, 1.0, "ombra in unita' di gioco")
+	m.free()
+
+
+## Revisione arte 1.7: il lampo del colpo lo fa il gioco e rispetta riduci_flash.
+func test_lampo_rispetta_riduci_flash() -> void:
+	var am: Node = _gd().get_node("/root/AudioManager")
+	var prima: Variant = am.call("accessibilita", "riduci_flash")
+	var m: AnimatedSprite2D = _nuova()
+	am.call("imposta_accessibilita", "riduci_flash", false)
+	m.call("lampo")
+	var pieno: float = m.self_modulate.r
+	am.call("imposta_accessibilita", "riduci_flash", true)
+	m.call("lampo")
+	var ridotto: float = m.self_modulate.r
+	am.call("imposta_accessibilita", "riduci_flash", bool(prima) if prima != null else false)
+	assert_true(pieno > ridotto, "riduci_flash attenua il lampo")
+	assert_true(ridotto > 1.0, "anche ridotto il colpo si vede")
+	assert_almost_eq(m.modulate.r, 1.0, "le tinte di stato (modulate) restano libere")
+	m.free()
+
 func test_frame_fps_e_loop_dai_dati() -> void:
 	var m: AnimatedSprite2D = _nuova()
 	var sf: SpriteFrames = m.sprite_frames
@@ -112,3 +151,7 @@ func test_stato_inesistente_non_esplode() -> void:
 	m.call("riproduci", "stato_che_non_esiste", "down")
 	assert_eq(m.call("stato_corrente"), "", "nessuno stato impostato")
 	m.free()
+
+
+func _gd() -> Node:
+	return (Engine.get_main_loop() as SceneTree).root.get_node("GameData")

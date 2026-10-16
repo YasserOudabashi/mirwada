@@ -14,6 +14,8 @@
     ],
     "_comment_direzioni": "4 direzioni, non 8. Le diagonali riusano la direzione orizzontale: dimezza i frame da disegnare e nessuno se ne accorge in un top-down 2D. Decisione da prendere ORA perche' cambiarla dopo significa ridisegnare tutto.",
     "origine": "piedi_centro",
+    "piedi_px": 54,
+    "_comment_piedi_px": "Riga di pixel della cella dove poggiano i piedi (sprite-forge: build_personaggi.py, PIEDI). AnimationMachine sposta lo sprite cosi' che i piedi cadano sull'origine del nodo: collisione e ordinamento per profondita' partono da li'.",
     "fps_default": 12,
     "_comment_durate_ms": "durate_ms (opzionale): un valore in ms per frame, al posto di fps. Tempi della skill sprite-forge: idle 250-500, walk 100-150 con i contatti tenuti di piu', attacco = anticipo 120-200 (il frame chiave), colpo/smear 40-60, impatto 150-200, recupero 80-150. Dash e parata restano a fps: i loro tempi sono finestre di gameplay (i-frame, parata perfetta), non resa."
   },

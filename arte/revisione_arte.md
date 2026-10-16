@@ -100,7 +100,7 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   restano.
 - **Fatto:** nessun effetto nello sprite (archi, scie, bagliori diventano VFX); restano solo occhi e crepa ciano, che sono design.
 
-### 🟠 1.7 Il lampo bianco del colpo subito ignora `riduci_flash`
+### ✅ 1.7 Il lampo bianco del colpo subito ignora `riduci_flash` — FATTO (2026-10-16)
 - **Cosa:** il frame 0 di `personaggio_hurt` è una sagoma tutta bianca disegnata nel
   foglio. L'opzione `riduci_flash` non la può spegnere (`CLAUDE.md`: ogni flash bianco
   deve avere una variante attenuata).
@@ -109,6 +109,9 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   Piccola modifica di codice: va spiegata prima.
 - **Fatto lato foglio (2026-10-16):** `personaggio_hurt` non ha più la sagoma bianca. **Resta** il lampo dal
   gioco con `modulate` che legge `riduci_flash` (codice, da spiegare prima).
+- **Fatto lato gioco:** `AnimationMachine.lampo()` schiarisce lo sprite con `self_modulate` (×2.6) e torna
+  normale in 120 ms; con `riduci_flash` ×1.25. Valori in `data/vfx.json.lampo_colpito`. Lo chiamano
+  `player.gd` e `enemy.gd` quando ricevono un colpo.
 
 ### ✅ 1.8 La camminata di Enel va a scatti e le gambe non si vedono — FATTO (2026-10-16)
 - **Cosa:** i frame 2–3 e 5–0 sono quasi uguali (50–66 pixel diversi contro i 260–310 degli
@@ -168,7 +171,7 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
 
 ## 2. Aggancio tra sprite e gioco
 
-### 🟠 2.1 I piedi non stanno sul punto fisico del personaggio
+### ✅ 2.1 I piedi non stanno sul punto fisico del personaggio — FATTO (2026-10-16)
 - **Cosa:** in `player.tscn` ed `enemy.tscn` lo sprite è centrato a `(0, -8)` ed è alto 32
   unità, quindi **i piedi sono disegnati a +8**; il cerchio di collisione (raggio 5) sta a
   `(0, -4)` e copre da -9 a +1. `animations.json` dice `origine: piedi_centro`, ma il codice
@@ -176,17 +179,27 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   entreranno nei muri e gli alberi si disegneranno davanti/dietro nel momento sbagliato.
 - **Come correggere:** sprite a `(0, -16)` (piedi sull'origine del nodo) e collisione ai
   piedi; da provare a schermo. Codice: va spiegato prima.
+- **Fatto:** `animations.json.convenzioni.piedi_px = 54`; `AnimationMachine` sposta lo sprite (`offset`) così
+  che quella riga cada sull'origine del nodo. Nelle scene lo sprite e il cerchio del corpo sono a `(0, 0)`.
+  Hurtbox e hitbox non toccate (sono geometria del combattimento, già tarata).
 
-### 🟢 2.2 Ombra a terra: una regola sola
+### ✅ 2.2 Ombra a terra: una regola sola — FATTO (2026-10-16)
 - **Cosa:** Enel senza ombra, nemico e pet con ombra grigia cotta (alpha 105), alberi con
   ombre cotte molto grandi.
 - **Come correggere:** un'ellisse semitrasparente disegnata dal gioco sotto ogni entità
   (dimensione nei dati), e niente ombre negli sprite del Blocco C.
+- **Fatto:** figlia `OmbraTerra` di `AnimationMachine`, dietro lo sprite, ellisse a righe di un pixel.
+  Colore, alpha e raggi per categoria in `data/vfx.json.ombra_terra`. Le ombre degli alberi restano cotte
+  nel mondo (3.12).
 
-### 🟢 2.3 Tell del nemico doppio
+### ✅ 2.3 Tell del nemico doppio — FATTO (2026-10-16)
 - **Cosa:** contorno rosso nel foglio **e** `modulate (1, 0.5, 0.4)` in `enemy.gd:106`: la
   tinta scurisce proprio il contorno rosso e sporca tutta la figura.
 - **Come correggere:** tenere uno solo dei due (il contorno si legge meglio).
+- **Fatto:** tolta la tinta in `enemy.gd`, resta il contorno rosso del foglio.
+
+Prova a schermo (Godot, xvfb): `arte/revisione/aggancio_sprite_gioco.png`. Da sinistra: Enel, Enel col
+lampo, nemico in anticipo (solo contorno), nemico col lampo, lupo col lampo ridotto.
 
 ---
 

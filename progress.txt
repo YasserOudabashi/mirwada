@@ -8657,3 +8657,24 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   colpo, morte, lupo); validate 0; godot --import ok; 778 test passati.
 - Restano: 1.7 lampo del colpo dal gioco (codice), 2.1 piedi sull'origine (codice), 2.2 ombra composta (codice),
   2.3 tell singolo (codice); altri due pet e hurt/death del pet (dati nuovi, US-8B32).
+
+## Revisione arte 1.7, 2.1, 2.2, 2.3 — aggancio tra sprite e gioco, 2026-10-16
+- 1.7 lampo del colpo: AnimationMachine.lampo() porta self_modulate a x2.6 e torna a 1 in 120 ms (tween); con
+  riduci_flash x1.25. Dati: vfx.json.lampo_colpito. Chiamato da player.gd (_su_danno_subito, danno > 0) e da
+  enemy.gd (hurtbox.colpito). self_modulate e non modulate: le tinte di stato (dash ciano, stagger) restano libere.
+- 2.1 piedi sull'origine: animations.json.convenzioni.piedi_px = 54; configura() mette offset.y = 32 - 54 px
+  (prima della scala 0.5 -> -11 unita'). player.tscn/enemy.tscn: sprite e cerchio del corpo a (0, 0) (erano
+  (0,-8) e (0,-4)). Hurtbox/hitbox non toccate: geometria del combattimento gia' tarata.
+- 2.2 ombra a terra: figlia "OmbraTerra" (show_behind_parent, scala annullata -> unita' di gioco), ellisse a righe
+  di mezza unita' (un pixel di schermo: con draw_circle schiacciato usciva una punta in basso). Dati:
+  vfx.json.ombra_terra (colore #181425, alpha 0.3, raggi personaggio/nemico [6,2], pet [7,2]; partito da [7,2.5]
+  e [9,2.5], troppo larghi a schermo). Segue modulate (la dissolvenza della morte la porta via), non il lampo.
+- 2.3 tell singolo: tolta la tinta (1, 0.5, 0.4) in enemy.gd; resta il contorno rosso del foglio anticipo.
+- Verifica a schermo: Godot con xvfb-run (opengl3), script temporaneo non committato; immagine
+  arte/revisione/aggancio_sprite_gioco.png (Enel, Enel col lampo, nemico in anticipo, nemico col lampo, lupo col
+  lampo ridotto: piedi sulla stessa riga, ombre pulite). Nota: il primo frame dopo il caricamento dura secondi,
+  un lampo chiamato li' finisce subito (solo nella prova, non in gioco).
+- Test nuovi (test_animation_machine): piedi sull'origine, ombra dai dati, lampo con riduci_flash. validate 0;
+  781 test passati.
+- Resta aperto: provare a mano in gioco le collisioni coi muri del mondo vero (US-8B12) con i piedi sull'origine;
+  la hurtbox (0,-4) copre la parte bassa del corpo, da rivedere se i colpi alla testa "mancano".
