@@ -67,6 +67,9 @@ Per gli sprite (cap. 6) il blocco di stile e' diverso ed e' scritto li'.
 
 ## 2. Palette per Pathway (proposta — da fissare in `data/vfx.json`, US-226)
 
+> **Superata (2026-10-14):** vale `data/vfx.json`, decisione dell'utente. La tabella
+> aggiornata è in `design-vfx.md` cap. 2; questa resta solo come proposta storica.
+
 `design-vfx.md` cap. 2 fissa la regola: **inchiostro scurissimo + UN primario
 + UN accento**, mai un quarto colore. Ecco una proposta di valori concreti,
 coerente con le descrizioni gia' scritte (materiale audio, tratto):
@@ -403,8 +406,11 @@ sprite; si fissa il look.
 
 ```
 STYLE: 2D pixel art, low resolution, top-down action-RPG, ~32x32 px
-character proportions, limited palette (black outline + 3 colours), hard
-2px black outline, no anti-aliasing, no gradients, readable silhouette.
+chibi proportions (head about 1/3 of the height), limited palette (at most
+16 colours, grouped in short 3-tone ramps: shadows shift toward blue-violet,
+highlights toward warm yellow), crisp 1px near-black outline (not pure
+black), single light source from the top left, no anti-aliasing on the outer
+edge, no gradients, readable silhouette.
 Manhwa-influenced: heavy blacks, one accent colour. Plain flat background
 (single solid colour, not transparent — describe it as "plain magenta
 background" for easy keying).
@@ -419,8 +425,8 @@ Character reference sheet of the same 30-ish worker in a patched wool coat
 and flat cap, shown in four separate poses on one row: facing down (toward
 camera), facing up (back), facing left, facing right. Identical character in
 all four, neutral standing idle. Plain flat magenta background. Pixel art,
-~32x32 proportions, 2px black outline, palette black + slate blue + grey +
-one warm accent. Aspect 16:9.
+~32x32 proportions, 1px near-black outline, palette: ink + slate blue ramp +
+grey ramp + one warm accent. Aspect 16:9.
 ```
 Poi, separatamente: "same character, facing down, mid dash, leaning
 forward", "same character, facing right, light attack swing" — sapendo che i
@@ -432,8 +438,8 @@ forward", "same character, facing right, light attack swing" — sapendo che i
 [PIXEL STYLE BLOCK]
 Enemy reference: a gaunt hooded cultist figure, four poses on one row —
 facing down, up, left, right. Identical in all four. Plain flat magenta
-background. Pixel art, ~32x32 proportions, 2px black outline, palette black +
-ash grey + one sickly accent. Aspect 16:9.
+background. Pixel art, ~32x32 proportions, 1px near-black outline, palette:
+ink + ash grey ramp + one sickly accent. Aspect 16:9.
 ```
 
 ### 6.5 Tileset per regione (32x32, 4 tile)
@@ -446,10 +452,15 @@ palette del cap. 3:
 [PIXEL STYLE BLOCK]
 A small tileset strip: four 32x32 top-down terrain tiles side by side for
 [regione] — (1) walkable ground, (2) solid wall, (3) a low obstacle,
-(4) water. Each tile self-contained and edge-tileable. Pixel art, 2px dark
-outline per tile, palette [inchiostro + primario + accento della regione].
-Plain background. Aspect 4:1.
+(4) water. Each tile self-contained and edge-tileable. Pixel art, no outline
+on ground and water (they must repeat without a visible grid), 1px dark
+outline only where wall and obstacle meet the ground, palette [inchiostro +
+primario + accento della regione]. Plain background. Aspect 4:1.
 ```
+
+Un contorno su ogni tile e "edge-tileable" si escludono: ripetuto, il
+pavimento mostrerebbe la griglia. Il dithering e' ammesso solo su aree
+grandi e ferme (pavimento, acqua), mai sugli sprite in movimento.
 
 ### 6.6 Post-produzione obbligatoria
 
@@ -460,12 +471,43 @@ Plain background. Aspect 4:1.
    frame).
 4. Verifica in gioco con F5 (hot-reload) prima di considerare fatto un asset.
 
+### 6.7 Regole di disegno degli sprite e dei tile (asset veri)
+
+Valgono per personaggio, nemici, pet e tileset — non per i VFX (cap. 2 e
+`design-vfx.md`, che restano inchiostro + primario + accento con contorno
+pesante 2px: e' il tratto a pennello, un'eccezione voluta).
+
+- **Contorno 1px** nel colore inchiostro (mai `#000000`), mai 2px: a 32x32
+  un contorno doppio si mangia 4px di larghezza. Sul lato illuminato il
+  contorno diventa il tono scuro della ramp di quel materiale (*selout*);
+  dentro la figura le parti si separano con l'ombra, non con il contorno.
+- **Luce unica da alto-sinistra**, uguale in tutti gli sprite. Niente
+  *pillow shading* (scuro sul bordo, chiaro al centro).
+- **Colori**: massimo 16 per sprite, in ramp di 3 toni per materiale (pelle,
+  stoffa, capelli, metallo). In ogni ramp la luminosita' sale e la tinta si
+  sposta di 10-20 gradi per gradino (ombre verso blu/viola, luci verso
+  giallo); tutte le ramp condividono l'inchiostro come tono piu' scuro.
+- **Proporzioni chibi**: testa 1/3-1/2 dell'altezza; la figura occupa il
+  70-85% della cella, 1-2px liberi sopra e ai lati.
+- **Anti-aliasing**: mai sul bordo esterno (alone su sfondi diversi); poco e
+  solo su curve interne.
+- **Pulizia**: niente pixel isolati (tranne occhi e riflessi), linee con
+  segmenti di lunghezza monotona (3-2-1, non 3-1-2-1).
+- **Direzioni**: se `left` si ricava specchiando `right`, si specchia anche
+  la luce. Accettabile a 32px, ma va deciso, non subito.
+- **Animazione**: in idle/walk i piedi restano sulla stessa riga (si muove il
+  busto di 1px); il pivot `piedi_centro` non si sposta mai tra i frame.
+
+Strumento consigliato per scrivere gli sprite come dati e controllarli in
+automatico: la skill `sprite-forge` (workflow in `arte/03_sprite_e_animazioni.md`).
+
 ---
 
 ## 7. Checklist di accettazione di un'immagine
 
-- [ ] Palette: inchiostro scuro + max 2 colori (illustrazione) / outline + 3
-      (pixel). Un quarto colore = rifiuta.
+- [ ] Palette: inchiostro scuro + max 2 colori (illustrazione e VFX: un
+      quarto colore = rifiuta). Sprite e tile: max 16 colori in ramp con hue
+      shift e contorno 1px inchiostro (cap. 6.7).
 - [ ] Stile: neri pieni, tratto a pennello, spazio negativo. Se sembra un
       render 3D o un disegno "anime carino" = rifiuta.
 - [ ] Niente testo, watermark, cornici decorative sull'immagine.
@@ -480,7 +522,7 @@ Plain background. Aspect 4:1.
 
 ```
 assets/concept/
-  regioni/       mirwada.png, marche.png, valle.png, archivio.png, frontiera.png, trono_del_gigante.png
+  regioni/       mirwada.jpg, marche_crepuscolo.jpg, valle_madre.jpg, archivio_sepolto.jpg, frontiera_porte.jpg, trono_del_gigante.jpg
   ritratti/      enel.png, mirco.png, sidon.png, vesna.png, aldo.png, ottavia.png, bruno.png, lena.png, doran.png
   ui/            scaffale.png, pagina_pulita.png, pagina_follia.png, bordi.png, erbario.png, frontespizio.png, voltata.png
   sprite_ref/    enel_turnaround.png, nemico_turnaround.png, tileset_<regione>.png

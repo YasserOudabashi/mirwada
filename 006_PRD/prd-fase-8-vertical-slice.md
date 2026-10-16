@@ -648,6 +648,12 @@ venditore e vendergli quello che non mi serve, dentro il dialogo.
 
 #### US-812: `generate_sprites.py` — personaggio, nemico, pet (19 fogli)
 
+> **SUPERATA (2026-10-13, decisione dell'utente).** I 19 fogli esistono già come arte
+> vera: Enel da `tools/art/build_enel.py`, nemico base e pet dai fogli in `arte/sprite/`,
+> tutti rigenerabili con `python tools/art/generate_all.py` (CLAUDE.md v2). Eseguire
+> questa story cancellerebbe quell'arte: non va fatta. Resta valida solo l'idea dei
+> test (`tests/test_sprites_generati.gd`), da spostare in una story d'arte se serve.
+
 **Description:** Come giocatore, voglio vedere un personaggio, un nemico e
 un pet leggibili invece di ellissi numerate — finché non arriva l'arte
 vera.

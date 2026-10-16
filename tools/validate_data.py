@@ -806,6 +806,10 @@ def main():
                 if n <= 0:
                     err(f"data/animations.json [{cat}.{name}]: frames deve essere > 0")
                     continue
+                durate = an.get("durate_ms")
+                if durate is not None and (len(durate) != n or any(d <= 0 for d in durate)):
+                    err(f"data/animations.json [{cat}.{name}]: durate_ms deve avere {n} valori > 0 "
+                        f"(uno per frame), ne ha {len(durate)}")
                 # ogni indice di frame citato deve esistere davvero
                 for key in ("anticipo", "attivi", "recupero", "finestra_perfetta"):
                     for idx in an.get(key, []):

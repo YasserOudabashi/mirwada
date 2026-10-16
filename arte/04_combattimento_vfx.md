@@ -8,7 +8,9 @@ struttura resta), `data/animations.json` (timing).
 
 1. **Il tratto a pennello.** I colpi sono calligrafia: linee spesse, cariche,
    con inizio/fine irregolari — sprite a 2-3 frame, outline nero 2px pesante,
-   UN colore di Pathway dentro. Mai gradienti, mai glow morbido.
+   UN colore di Pathway dentro. Mai gradienti, mai glow morbido. Il 2px e'
+   un'eccezione voluta dei soli VFX: personaggi e tile usano 1px
+   (`03_sprite_e_animazioni.md`).
 2. **Il nero come strumento.** Nei momenti forti lo sfondo si mangia di nero
    per qualche frame e restano silhouette + accenti (vedi "nero di scena"
    sotto).
@@ -26,7 +28,7 @@ struttura resta), `data/animations.json` (timing).
 ## 2. Le 10 palette (valori correnti, `data/vfx.json`)
 
 Regola che non cambia mai: **inchiostro scurissimo + UN primario + UN
-accento**. Un quarto colore a 32x32 e' rumore, va rifiutato.
+accento**. Un quarto colore e' rumore, va rifiutato.
 
 | Pathway | Inchiostro | Primario | Accento | Tratto (firma) |
 |---|---|---|---|---|

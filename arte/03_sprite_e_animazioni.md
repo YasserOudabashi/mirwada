@@ -6,7 +6,8 @@ lettura comoda del giorno in cui e' stata scritta.
 
 ## 1. Regole fisse (decise una volta per tutte, irreversibili)
 
-- **32x32 px** per frame.
+- **64x64 px** per frame (US-8B01, 2026-10-14). I fogli ancora disegnati a 32 vengono
+  ingranditi x2 da `tools/art/generate_all.py` finche' il Blocco C non li ridisegna a 64.
 - **4 direzioni**, non 8: `down`, `up`, `left`, `right`. Le diagonali riusano
   lo sprite orizzontale — dimezza i frame da disegnare, invisibile in un
   top-down 2D.
@@ -15,17 +16,31 @@ lettura comoda del giorno in cui e' stata scritta.
 - Sfondo **trasparente** nell'asset finale (durante la generazione IA si usa
   uno sfondo magenta piatto, da chroma-key-are dopo, vedi cap. 4).
 
+### Regole di disegno (fonte: `art-brief-gemini.md` cap. 6.7)
+
+- **Contorno 1px** color inchiostro (mai `#000000`, mai 2px); sul lato
+  illuminato diventa il tono scuro del materiale (*selout*). Il contorno
+  pesante 2px resta solo nei VFX (`04_combattimento_vfx.md`).
+- **Luce da alto-sinistra**, la stessa in ogni sprite e in ogni frame.
+- **Max 16 colori**, in ramp di 3 toni per materiale con hue shift di 10-20
+  gradi (ombre verso blu/viola, luci verso giallo); l'inchiostro e' il tono
+  piu' scuro di tutte le ramp.
+- **Chibi**: testa 1/3-1/2 dell'altezza, figura al 70-85% della cella.
+- **Niente anti-aliasing sul bordo esterno**, niente pixel isolati.
+- `left` ottenuto specchiando `right` specchia anche la luce: decidilo.
+- In idle/walk i piedi non si muovono: si sposta il busto di 1px.
+
 ## 2. Cosa disegnare, animazione per animazione
 
 ### Personaggio (protagonista) — 156 frame totali col budget a 4 direzioni
 
-| Animazione | Frame | fps | Note |
+| Animazione | Frame | fps / ms per frame | Note |
 |---|---|---|---|
-| `idle` | 4 | 6 | loop |
-| `walk` | 6 | 12 | loop; passo suona ai frame 1 e 4 (`footstep`) |
+| `idle` | 4 | 400/300/400/300 ms | loop |
+| `walk` | 6 | 120/150/120/120/150/120 ms | loop; passo suona ai frame 1 e 4 (`footstep`) |
 | `dash` | 4 | 20 | non loop; **i-frame ai frame 0-2** (invulnerabilita' — critico per il gameplay) |
-| `attack_light` | 5 | 16 | anticipo [0,1] · **attivo (hitbox) [2]** · recupero [3,4] |
-| `attack_heavy` | 8 | 14 | anticipo [0-3] (tell al frame 0) · **attivi [4,5]** · recupero [6,7] |
+| `attack_light` | 5 | 60/120/40/150/80 ms | anticipo [0,1] · **attivo (hitbox) [2]** · recupero [3,4] |
+| `attack_heavy` | 8 | 70/70/70/180/50/160/100/150 ms | anticipo [0-3] (tell al frame 0) · **attivi [4,5]** · recupero [6,7] |
 | `parry` | 4 | 18 | **finestra di parata perfetta: frame [0,1]**, cioe' ~111ms. E' il numero piu' importante di tutto il combattimento: disegna i primi 2 frame in modo che si "sentano" diversi dagli altri 2 (postura piu' aperta/pronta) |
 | `hurt` | 3 | 14 | non loop |
 | `death` | 8 | 10 | **non direzionale** (una sola serie, non 4) |
@@ -34,22 +49,22 @@ lettura comoda del giorno in cui e' stata scritta.
 
 ### Nemico base — 98 frame totali
 
-| Animazione | Frame | fps | Note |
+| Animazione | Frame | fps / ms per frame | Note |
 |---|---|---|---|
-| `idle` | 4 | 6 | loop |
+| `idle` | 4 | 400/300/400/300 ms | loop |
 | `walk` | 6 | 10 | loop |
 | `anticipo` | 4 | 8 | **il tell dell'attacco**: parte al frame 0 (audio + visivo), da' al giocatore 4 frame per reagire. E' uno stato separato dall'attacco, non frame interni — cosi' si puo' tarare la durata del tell senza toccare la velocita' del colpo |
-| `attack` | 4 | 16 | **attivo (hitbox) al frame [1]** |
+| `attack` | 4 | 60/50/160/120 ms | **attivo (hitbox) al frame [1]** |
 | `stagger` | 4 | 12 | non loop |
 | `death` | 6 | 10 | **non direzionale** |
 
 ### Pet — 56 frame totali
 
-| Animazione | Frame | fps | Note |
+| Animazione | Frame | fps / ms per frame | Note |
 |---|---|---|---|
-| `idle` | 4 | 6 | loop |
-| `walk` | 6 | 12 | loop |
-| `attack` | 4 | 16 | attivo al frame [1]; **niente tell leggibile**, il pet e' un alleato non una minaccia da schivare |
+| `idle` | 4 | 400/300/400/300 ms | loop |
+| `walk` | 6 | 120/150/120/120/150/120 ms | loop |
+| `attack` | 4 | 60/50/160/120 ms | attivo al frame [1]; **niente tell leggibile**, il pet e' un alleato non una minaccia da schivare |
 
 ## 3. Se generi un turnaround di riferimento con IA
 
@@ -58,9 +73,12 @@ Blocco di stile pixel (diverso da quello delle illustrazioni,
 
 ```
 STYLE: 2D pixel art, low resolution, top-down action-RPG, ~32x32 px
-character proportions, limited palette (black outline + 3 colours), hard 2px
-black outline, no anti-aliasing, no gradients, readable silhouette. Plain
-flat magenta background (per il chroma-key dopo).
+chibi proportions (head about 1/3 of the height), limited palette (at most
+16 colours, grouped in short 3-tone ramps: shadows shift toward blue-violet,
+highlights toward warm yellow), crisp 1px near-black outline (not pure
+black), single light source from the top left, no anti-aliasing on the outer
+edge, no gradients, readable silhouette. Plain flat magenta background (per
+il chroma-key dopo).
 DO NOT: high resolution, painterly, smooth shading, 3D, isometric, text.
 ```
 
@@ -94,6 +112,62 @@ placeholder diagnostici:
 ```bash
 python tools/generate_placeholders.py
 ```
+
+## 4b. Disegnare con la skill `sprite-forge` (consigliato)
+
+`sprite-forge` scrive lo sprite come **dati** (griglie di caratteri +
+palette), lo controlla e lo trasforma in PNG: ogni pixel e' una scelta
+esplicita e correggibile, e le regole del cap. 1 le verifica `check.py`.
+
+1. **Un JSON per file di gioco**, es. `arte/sprite/personaggio_idle.json`,
+   con `"name": "personaggio_idle"`, `"size": [64, 64]`,
+   `"pivot": [32, 63]` (`piedi_centro`) e le ramp dichiarate in `"ramps"`.
+2. **Un'animazione per direzione**, chiamate `down`, `up`, `left`, `right`
+   **in quest'ordine**: lo sheet ha una riga per animazione, quindi le righe
+   escono gia' nell'ordine che il codice si aspetta. Le animazioni non
+   direzionali (`death`, `meditate`) hanno una sola animazione, una sola riga.
+3. **Numero di frame** = quello di `data/animations.json`; `ms` di ogni
+   frame = il suo valore in `durate_ms`, o `1000 / fps` se l'animazione non
+   le ha, cosi' l'anteprima gira al tempo vero del gioco.
+4. Controllo e render, **senza padding** (la griglia del gioco non ne ha):
+   ```bash
+   python scripts/check.py arte/sprite/personaggio_idle.json --out out
+   python scripts/render.py arte/sprite/personaggio_idle.json --out out --padding 0
+   ```
+   (`scripts/` e' la cartella della skill.) Guarda `_preview.png` e
+   `_checks.png`, correggi errori e avvisi, rilancia.
+5. Copia `out/personaggio_idle/personaggio_idle_sheet.png` su
+   `assets/placeholder/personaggio_idle.png` e verifica la dimensione:
+   colonne x 64 per righe x 64 (idle: 256x256, death: 512x64).
+   `tools/generate_placeholders.py` salta i file che hanno un JSON in
+   `arte/sprite/`: rilanciarlo non cancella l'arte vera.
+
+**Enel, nemico base e pet: non si disegnano a mano.** Tutti i fogli `personaggio_*`, `nemico_base_*` e
+`pet_*` li genera `tools/art/build_personaggi.py` (Blocco C del PRD 8b) con il motore 3D di `forge3d`:
+stessa luce in alto a sinistra, contorno 1 px, stesse proporzioni, nessuna ombra cotta (l'ombra a terra la
+mette il gioco). Rig: `enel()` (cappotto quasi nero, coppola, sciarpa rossa, bende, crepa e occhi ciano,
+spadone in spalla), `nemico()` (bandito con la mazza, viso visibile anche di profilo), `lupo()` (lupo
+cinereo). Animazioni dalla libreria `forge3d/anim_humanoid.py` e `creatures.py`. Per cambiare qualcosa si
+modifica il costruttore e si rigenera:
+
+```bash
+python tools/art/build_personaggi.py                  # scrive arte/sprite/{categoria}_{nome}.png
+python tools/art/build_personaggi.py --only pet
+python tools/art/generate_all.py                      # poi li copia in assets/ (tell rosso del nemico)
+```
+
+Regole fisse del costruttore: piedi a 54 px su 64 (`PIEDI`), figura alta 35-46 px (lupo 26-37),
+nessun pixel sul bordo della cella, nessun frame identico al precedente (le pose tenute diventano un
+micro-movimento), alpha solo 0/255, bordo di luce grigio ardesia sul contorno in alto a sinistra di Enel.
+Archi, scie e bagliori non stanno nello sprite: sono VFX (US-8B40). Il frame e le durate vengono da
+`data/animations.json`.
+
+**Tempi.** Le animazioni coperte dalla tabella della skill hanno
+`durate_ms` in `data/animations.json` (una durata per frame): idle
+400/300/400/300, walk con i contatti a 150 ms, attacchi con anticipo lento,
+colpo da 40-50 ms e impatto tenuto. Copia quelle durate nei `ms` dello
+sprite. Dash e parata restano a `fps`: i loro tempi sono finestre di
+gameplay (i-frame, parata perfetta), non resa.
 
 ## 5. Budget di lavoro
 

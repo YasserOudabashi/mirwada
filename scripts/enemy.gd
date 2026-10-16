@@ -47,6 +47,8 @@ func _ready() -> void:
 	_anim.evento_frame.connect(_su_evento_anim)
 	_anim.animazione_finita.connect(_su_anim_finita)
 	_hitbox.ha_colpito.connect(_su_colpo_inflitto)
+	_hurtbox.colpito.connect(func(_d: float, _s: float, _da: Node, _t: String) -> void:
+		_anim.call("lampo"))
 	_stats.died.connect(_su_morte)
 	_postura.postura_rotta.connect(_su_postura_rotta)
 	_postura.vulnerabilita_finita.connect(func() -> void:
@@ -103,7 +105,6 @@ func _vai(nuovo: int) -> void:
 	stato_cambiato.emit(Stato.keys()[nuovo])
 	match nuovo:
 		Stato.ANTICIPO:
-			_anim.modulate = Color(1.0, 0.5, 0.4)  # tell visivo
 			_anim.call("riproduci", "anticipo", _dir_sguardo)
 			_anticipo_left = _fai_partire_tell()
 		Stato.ATTACCO:
