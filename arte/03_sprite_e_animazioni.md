@@ -58,13 +58,19 @@ lettura comoda del giorno in cui e' stata scritta.
 | `stagger` | 4 | 12 | non loop |
 | `death` | 6 | 10 | **non direzionale** |
 
-### Pet — 56 frame totali
+### Pet — 92 frame totali (per specie)
+
+Tempi comuni a tutte le specie di `data/pets`; il disegno cambia per specie: fogli
+`pet_<id specie>_<animazione>.png` (es. `pet_capra_lunare_walk.png`). Una specie senza fogli usa il
+segnaposto `pet_<animazione>.png`.
 
 | Animazione | Frame | fps / ms per frame | Note |
 |---|---|---|---|
 | `idle` | 4 | 400/300/400/300 ms | loop |
 | `walk` | 6 | 120/150/120/120/150/120 ms | loop |
 | `attack` | 4 | 60/50/160/120 ms | attivo al frame [1]; **niente tell leggibile**, il pet e' un alleato non una minaccia da schivare |
+| `hurt` | 3 | 14 | non loop, rinculo |
+| `death` | 6 | 10 | **non direzionale**, di profilo, cade sul fianco e resta a terra |
 
 ## 3. Se generi un turnaround di riferimento con IA
 
@@ -146,12 +152,14 @@ esplicita e correggibile, e le regole del cap. 1 le verifica `check.py`.
 `pet_*` li genera `tools/art/build_personaggi.py` (Blocco C del PRD 8b) con il motore 3D di `forge3d`:
 stessa luce in alto a sinistra, contorno 1 px, stesse proporzioni, nessuna ombra cotta (l'ombra a terra la
 mette il gioco). Rig: `enel()` (cappotto quasi nero, coppola, sciarpa rossa, bende, crepa e occhi ciano,
-spadone in spalla), `nemico()` (bandito con la mazza, viso visibile anche di profilo), `lupo()` (lupo
-cinereo). Animazioni dalla libreria `forge3d/anim_humanoid.py` e `creatures.py`. Per cambiare qualcosa si
+spadone in spalla), `nemico()` (bandito con la mazza, viso visibile anche di profilo), e per i pet la tabella `PET`
+(specie di `data/pets` -> costruttore): `lupo()` (lupo cinereo), `capra()` (capra lunare: manto argento,
+muso e zampe scuri, corna ad arco, barbetta, segno ciano). `quadruped(head=...)` regola la grandezza della
+testa. Animazioni dalla libreria `forge3d/anim_humanoid.py` e `creatures.py`. Per cambiare qualcosa si
 modifica il costruttore e si rigenera:
 
 ```bash
-python tools/art/build_personaggi.py                  # scrive arte/sprite/{categoria}_{nome}.png
+python tools/art/build_personaggi.py                  # scrive arte/sprite/{categoria}_{nome}.png (pet: pet_{specie}_{nome})
 python tools/art/build_personaggi.py --only pet
 python tools/art/generate_all.py                      # poi li copia in assets/ (tell rosso del nemico)
 ```

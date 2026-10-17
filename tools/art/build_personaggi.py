@@ -25,7 +25,7 @@ sys.path.insert(0, HERE)
 from forge3d import anim_humanoid as A  # noqa: E402
 from forge3d.creatures import QUAD_CLIPS, quadruped  # noqa: E402
 from forge3d.humanoid import REST, P, humanoid  # noqa: E402
-from forge3d.rig import add_pose  # noqa: E402
+from forge3d.rig import add_pose, clip_from_keys  # noqa: E402
 from forge3d.sheets import export_spec  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
@@ -156,6 +156,52 @@ def lupo():
     return r
 
 
+# --- pet: capra lunare -----------------------------------------------------------------------------------------
+def capra():
+    """Manto argento (ombre fredde, luci crema: il lupo e' scuro, Enel quasi nero), muso lungo e scuro, corna
+    scure ad arco all'indietro, orecchie di lato, barbetta, segno ciano sulla fronte (come gli occhi del lupo)."""
+    r = quadruped(body_mat="fur_lunare", belly="fur_white", legs_mat="fur_grey", snout=3.0, ears="none",
+                  tail="stub", eyes="eye", bulk=0.9, head=0.8, name="capra_lunare")
+    r.part("head", "ellipsoid", (1.25, 1.5, 1.15), (0, 5.4, -0.9), mat="fur_black")             # muso scuro
+    r.part("head", "ellipsoid", (0.55, 0.6, 1.2), (0, 4.6, -2.4), mat="fur_black")            # barbetta
+    for sx in (-1, 1):
+        r.part("head", "ellipsoid", (1.5, 0.6, 0.5), (sx * 2.6, -0.2, 1.1), mat="fur_lunare")    # orecchie di lato
+        # corna ad arco: tratti in catena dalla fronte, ognuno piu' inclinato all'indietro (rot x positiva =
+        # verso la nuca; cilindri e coni hanno mezza altezza come terzo valore)
+        punto = np.array([sx * 0.8, 0.6, 1.8])
+        for gradi, lungo, raggio, forma in ((12, 2.0, 0.5, "cylinder"), (50, 1.8, 0.42, "cylinder"),
+                                            (95, 1.7, 0.36, "cone")):
+            asse = np.array([sx * 0.12, -np.sin(np.radians(gradi)), np.cos(np.radians(gradi))])
+            r.part("head", forma, (raggio, raggio, lungo / 2), tuple(punto + asse * lungo / 2), mat="corno",
+                   rot=(gradi, 0, 0))
+            punto = punto + asse * lungo
+    r.part("head", "ellipsoid", (0.6, 0.35, 0.6), (0, 1.7, 2.3), mat="glow_cyan")             # segno sulla fronte
+    return r
+
+
+def quad_hurt(n=3):
+    """Rinculo: il colpo spinge indietro, muso in alto, coda tesa; poi torna."""
+    colpo = {"hips": (-9, 0, 6, 0, -1.3, 0.2), "head": (-16, 0, 6), "tail": (25, 0, 0),
+             "leg_fl": (18, 0, 0), "leg_fr": (12, 0, 0)}
+    return clip_from_keys([(0, colpo, "out"), (1, add_pose(colpo, {"hips": (4, 0, -2, 0, 0.5, -0.1)})), (n - 1, {})], n)
+
+
+def quad_morte(n=6, verso=1):
+    """Non direzionale: si vede di profilo (girato di 90 gradi), cade sul fianco e resta a terra. Vista di fronte la
+    caduta era una macchia, e la caduta di forge3d affondava il corpo sotto il terreno."""
+    keys = [(0, {"hips": (0, 0, 90)}),
+            (2, {"hips": (0, verso * 25, 90, 0, 0, -1.2), "head": (10, 0, 0)}, "in"),
+            (n - 1, {"hips": (0, verso * 85, 90, 0, 0, -2.9), "head": (14, 0, 0), "leg_fl": (20, 0, 0),
+                     "leg_bl": (-20, 0, 0), "leg_fr": (30, 0, 0), "leg_br": (-10, 0, 0), "tail": (-30, 0, 0)}, "out")]
+    return clip_from_keys(keys, n)
+
+
+CLIP_PET = {k: vivi(v) for k, v in dict(QUAD_CLIPS, hurt=quad_hurt, death=quad_morte).items()}
+
+# specie di data/pets -> (rig, pixel per unita'). Fogli pet_<id>_<animazione>.png, stessi tempi per tutte.
+PET = {"lupo_cinereo": (lupo, 1.75), "capra_lunare": (capra, 1.75)}
+
+
 def bordo_luce(path, colore=(0x8B, 0x9B, 0xB4), cella=64):
     """Revisione 1.1: il contorno che guarda la luce (vuoto sopra o a sinistra) diventa grigio ardesia: Enel resta
     quasi nero ma la sagoma si stacca dal fondo anche di notte."""
@@ -175,7 +221,7 @@ CATEGORIE = {
     # categoria: (rig, clip, pixel per unita', bordo di luce). Enel e nemico alti ~40-47 px su 64, il lupo ~30.
     "personaggio": (enel, CLIP_ENEL, 1.22, True),
     "nemico_base": (nemico, {k: vivi(v) for k, v in dict(A.CLIPS, death=morte_di_lato).items()}, 1.4, False),
-    "pet": (lupo, {k: vivi(v) for k, v in QUAD_CLIPS.items()}, 1.75, False),
+    "pet": (None, CLIP_PET, None, False),                       # una voce per specie: vedi PET
 }
 
 
@@ -192,10 +238,15 @@ def main():
             sys.exit(f"{cat}: animazioni senza clip {mancano}")
         # nessuna ombra cotta: l'ombra a terra la compone il gioco (revisione 1.10, 2.2)
         # piedi a 54 px su 64 (PIEDI): sotto restano 10 px per zampe in avanti e corpi a terra
-        for path in export_spec(costruttore(), SPEC, cat, OUT, clip, ppu=ppu, shadow=False, foot=(0.5, PIEDI)):
-            if luce:
-                bordo_luce(path)
-            print("  " + os.path.relpath(path, ROOT))
+        for aspetto, (costr, p) in (PET.items() if cat == "pet" else [("", (costruttore, ppu))]):
+            for path in export_spec(costr(), SPEC, cat, OUT, clip, ppu=p, shadow=False, foot=(0.5, PIEDI)):
+                if aspetto:                                       # pet_<nome>.png -> pet_<specie>_<nome>.png
+                    nuovo = os.path.join(OUT, os.path.basename(path).replace(cat + "_", f"{cat}_{aspetto}_", 1))
+                    os.replace(path, nuovo)
+                    path = nuovo
+                if luce:
+                    bordo_luce(path)
+                print("  " + os.path.relpath(path, ROOT))
 
 
 if __name__ == "__main__":

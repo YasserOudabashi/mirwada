@@ -29,7 +29,7 @@ def slime_pose(sq):
 
 
 def quadruped(body_mat="fur_grey", belly="fur_white", head_mat=None, size=1.0, snout=2.6, ears="point",
-              tail="bushy", eyes="eye_yellow", legs_mat=None, horns=None, bulk=1.0, name="quadruped"):
+              tail="bushy", eyes="eye_yellow", legs_mat=None, horns=None, bulk=1.0, name="quadruped", head=1.0):
     r = Rig(name); r.scale = size
     hm = head_mat or body_mat
     lm = legs_mat or body_mat
@@ -46,7 +46,7 @@ def quadruped(body_mat="fur_grey", belly="fur_white", head_mat=None, size=1.0, s
     r.part("hips", "ellipsoid", (3.4 * bulk, 6.6, 3.2), (0, 0, 0.6), mat=body_mat)
     r.part("hips", "ellipsoid", (2.4 * bulk, 5.4, 1.8), (0, 0.3, -1.4), mat=belly)
     r.part("hips", "ellipsoid", (3.3 * bulk, 3.0, 3.2), (0, 3.4, 1.0), mat=body_mat)     # spalle
-    r.part("head", "ellipsoid", (2.9 * bulk, 2.9, 2.7), (0, 0, 0), mat=hm)
+    r.part("head", "ellipsoid", (2.9 * bulk * head, 2.9 * head, 2.7 * head), (0, 0, 0), mat=hm)   # head: grandezza
     r.part("head", "ellipsoid", (1.7 * bulk, snout, 1.5), (0, 2.8, -0.7), mat=hm)
     r.part("head", "ellipsoid", (0.7, 0.5, 0.5), (0, 2.8 + snout * 0.85, -0.5), mat="ink", keep=True) if False else None
     for sx in (-1, 1):

@@ -154,7 +154,7 @@ Legenda: 🔴 alta (rovina la leggibilità o va decisa prima del Blocco C/D) ·
   Un pixel ciano (l'occhio) compare solo in alcuni frame: lampeggia. Mancano `hurt` e `death`.
 - **Come correggere** (US-8B32): a 64 px alto 28–36 px, colore distinto da Enel, orecchie e
   muso leggibili in tutte le viste, occhio fisso in ogni frame.
-- **Fatto:** lupo alto 26–37 px, dorso cenere scuro e pancia chiara (non il blu di Enel), orecchie grandi, muso lungo, occhi ciano fissi. Gli altri due pet e `hurt`/`death` del pet richiedono voci nuove nei dati: restano a US-8B32.
+- **Fatto:** lupo alto 26–37 px, dorso cenere scuro e pancia chiara (non il blu di Enel), orecchie grandi, muso lungo, occhi ciano fissi. Gli altri due pet e `hurt`/`death` del pet richiedono voci nuove nei dati: restano a US-8B32. **Poi (2026-10-17, US-8B32 parte a):** `hurt` e `death` del pet nei dati, fogli per specie (`pet_<specie>_<nome>`), lupo con colpito e morte, capra lunare. Resta il corvo (scheletro da uccello, parte b).
 
 ### ✅ 1.14 Frame duplicati — FATTO (2026-10-16)
 - `nemico_base.attack` 1 = 2, `nemico_base.stagger` 0 = 1, `pet.attack` 1 = 2 (in tutte le

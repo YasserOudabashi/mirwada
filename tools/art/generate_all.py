@@ -6,7 +6,8 @@ Rigenera tutta l'arte vera in assets/placeholder/ (CLAUDE.md v2, "Comandi").
     python tools/art/generate_all.py --only personaggio   # una sola
     python tools/art/build_personaggi.py                  # prima: ridisegna i fogli sorgente
 
-- personaggio, nemico_base, pet: fogli sorgente in arte/sprite/<categoria>_<nome>.png, generati da
+- personaggio, nemico_base, pet: fogli sorgente in arte/sprite/<categoria>_<nome>.png (pet: pet_<specie>_<nome>.png,
+  una specie per voce di data/pets), generati da
   tools/art/build_personaggi.py (a 64 px, motore 3D di forge3d, stessa luce per tutti) e copiati tali e
   quali. Unica trasformazione: nei frame dello stato che fa da tell (nemico_base.anticipo) il contorno
   esterno diventa rosso, cosi' il tell si legge anche in un frame fermo (CLAUDE.md, "Animazione").
@@ -66,11 +67,12 @@ def a_dimensione(im, a, nome):
     return im
 
 
-def copia_categoria(cat, spec):
+def copia_categoria(cat, spec, aspetto=""):
+    pre = f"{cat}_{aspetto}_" if aspetto else f"{cat}_"
     for nome, a in spec.items():
         if nome.startswith("_"):
             continue
-        src = os.path.join(SORGENTI, f"{cat}_{nome}.png")
+        src = os.path.join(SORGENTI, f"{pre}{nome}.png")
         im = Image.open(src).convert("RGBA")
         if nome in STATI_TELL.get(cat, []):               # prima di ingrandire: il bordo resta largo come il contorno
             im = contorno_tell(im, im.size[0] // int(a["frames"]))
@@ -78,8 +80,8 @@ def copia_categoria(cat, spec):
         atteso = (DIM * int(a["frames"]), DIM * (4 if a.get("direzionale") else 1))
         if im.size != atteso:
             sys.exit(f"{src}: {im.size}, atteso {atteso} da data/animations.json")
-        im.save(os.path.join(DEST, f"{cat}_{nome}.png"))
-        print(f"  {cat}_{nome}.png")
+        im.save(os.path.join(DEST, f"{pre}{nome}.png"))
+        print(f"  {pre}{nome}.png")
 
 
 def main():
@@ -95,7 +97,17 @@ def main():
         if a.only and a.only != cat:
             continue
         print(cat)
-        copia_categoria(cat, specs[cat])
+        if cat != "pet":
+            copia_categoria(cat, specs[cat])
+            continue
+        # pet: un foglio per specie di data/pets (pet_<id>_<nome>.png), stessi tempi per tutte
+        with open(os.path.join(ROOT, "data", "pets", "core.json"), encoding="utf-8") as fh:
+            specie = [p["id"] for p in json.load(fh)["pets"]]
+        for sp in specie:
+            if not os.path.exists(os.path.join(SORGENTI, f"pet_{sp}_idle.png")):
+                print(f"  {sp}: nessun foglio in arte/sprite/ (resta il segnaposto pet_<nome>.png)")
+                continue
+            copia_categoria(cat, specs[cat], sp)
 
 
 if __name__ == "__main__":

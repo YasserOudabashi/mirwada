@@ -25,6 +25,9 @@ const AnimationSpec := preload("res://scripts/animation_spec.gd")
 const UNITA_TILE := 32.0
 
 var _categoria: String = ""
+## Specie o variante del disegno (es. l'id del pet): stessi tempi della
+## categoria, fogli propri. Vuoto = i fogli della categoria.
+var _aspetto: String = ""
 var _stato: String = ""
 var _spec: RefCounted = null
 var _ultima_fase: String = ""
@@ -58,15 +61,17 @@ func _su_animazione_finita() -> void:
 
 func _su_dati_ricaricati(_files: int, _errors: int) -> void:
 	if not _categoria.is_empty():
-		configura(_categoria)
+		configura(_categoria, _aspetto)
 
 
 ## Costruisce lo SpriteFrames per tutte le animazioni della categoria
 ## ("personaggio", "nemico_base", "pet"). Una sotto-animazione per direzione
 ## sulle animazioni direzionali ("<nome>_<dir>"), una sola ("<nome>") sulle
-## altre.
-func configura(categoria: String) -> void:
+## altre. aspetto (facoltativo) sceglie i fogli "<categoria>_<aspetto>_<nome>";
+## se mancano si ripiega su "<categoria>_<nome>".
+func configura(categoria: String, aspetto: String = "") -> void:
 	_categoria = categoria
+	_aspetto = aspetto
 	_assicura_connessioni()
 	var gd: Node = _game_data()
 	if gd == null:
@@ -92,7 +97,7 @@ func configura(categoria: String) -> void:
 		var spec: RefCounted = AnimationSpec.new(gd.call("get_animation", categoria, nome))
 		if not spec.is_valid():
 			continue
-		var tex: Texture2D = load("res://assets/placeholder/%s_%s.png" % [categoria, nome])
+		var tex: Texture2D = _foglio(categoria, aspetto, nome)
 		if tex == null:
 			push_warning("[AnimationMachine] manca lo spritesheet per %s/%s" % [categoria, nome])
 			continue
@@ -200,6 +205,13 @@ func _processa_frame(f: int) -> void:
 	if parata != _parata_attiva:
 		_parata_attiva = parata
 		finestra_cambiata.emit("parata_perfetta", parata)
+
+
+func _foglio(categoria: String, aspetto: String, nome: String) -> Texture2D:
+	var proprio: String = "res://assets/placeholder/%s_%s_%s.png" % [categoria, aspetto, nome]
+	if not aspetto.is_empty() and ResourceLoader.exists(proprio):
+		return load(proprio)
+	return load("res://assets/placeholder/%s_%s.png" % [categoria, nome])
 
 
 func _configura_ombra(dati: Dictionary) -> void:

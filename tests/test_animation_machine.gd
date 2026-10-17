@@ -153,5 +153,19 @@ func test_stato_inesistente_non_esplode() -> void:
 	m.free()
 
 
+## US-8B32: le specie di pet hanno tempi comuni e fogli propri; una specie
+## senza fogli ripiega sul segnaposto della categoria.
+func test_aspetto_sceglie_i_fogli_della_specie() -> void:
+	var m: AnimatedSprite2D = AnimationMachine.new()
+	m.call("configura", "pet", "lupo_cinereo")
+	var tex: AtlasTexture = m.sprite_frames.get_frame_texture("idle_down", 0)
+	assert_eq(tex.atlas.resource_path, "res://assets/placeholder/pet_lupo_cinereo_idle.png", "foglio della specie")
+	assert_true(m.sprite_frames.has_animation("death"), "death del pet dai dati")
+	m.call("configura", "pet", "specie_senza_fogli")
+	tex = m.sprite_frames.get_frame_texture("idle_down", 0)
+	assert_eq(tex.atlas.resource_path, "res://assets/placeholder/pet_idle.png", "ripiego sul segnaposto")
+	m.free()
+
+
 func _gd() -> Node:
 	return (Engine.get_main_loop() as SceneTree).root.get_node("GameData")

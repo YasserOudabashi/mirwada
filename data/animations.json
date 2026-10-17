@@ -301,7 +301,20 @@
       ],
       "anticipo_in_stato": "idle",
       "_comment": "Il pet non ha bisogno di un tell leggibile: e' un alleato, non una minaccia da schivare."
-    }
+    },
+    "hurt": {
+      "frames": 3,
+      "fps": 14,
+      "loop": false,
+      "direzionale": true
+    },
+    "death": {
+      "frames": 6,
+      "fps": 10,
+      "loop": false,
+      "direzionale": false
+    },
+    "_comment_aspetto": "Tempi comuni a tutte le specie di data/pets: il disegno cambia per specie. Fogli assets/placeholder/pet_<id specie>_<animazione>.png; senza il foglio della specie AnimationMachine ripiega su pet_<animazione>.png (segnaposto)."
   },
   "budget_frame": {
     "_comment": "Conteggio dei frame da disegnare, per capire quanto costa davvero l'arte. Un personaggio completo sono 43 frame x 4 direzioni dove serve. Un artista fa 30-60 frame di qualita' al giorno: e' l'unico numero che dice quanto durera' l'arte.",

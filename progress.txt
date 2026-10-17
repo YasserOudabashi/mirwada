@@ -8678,3 +8678,28 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   781 test passati.
 - Resta aperto: provare a mano in gioco le collisioni coi muri del mondo vero (US-8B12) con i piedi sull'origine;
   la hurtbox (0,-4) copre la parte bassa del corpo, da rivedere se i colpi alla testa "mancano".
+
+## US-8B32 parte (a) — pet per specie, colpito e morte, capra lunare, 2026-10-17
+- Dati: animations.json pet + hurt (3 frame, 14 fps, direzionale) e death (6 frame, 10 fps, non direzionale),
+  stesso formato del nemico. Tempi comuni a tutte le specie di data/pets.
+- Codice: AnimationMachine.configura(categoria, aspetto = "") cerca assets/placeholder/<cat>_<aspetto>_<nome>.png
+  e ripiega su <cat>_<nome>.png (segnaposto). Il pet in gioco non ha ancora una scena: sara' configura("pet", id).
+  Test nuovo test_aspetto_sceglie_i_fogli_della_specie.
+- Generatore: build_personaggi.py tabella PET {lupo_cinereo, capra_lunare} -> fogli arte/sprite/pet_<specie>_<nome>;
+  quad_hurt (rinculo), quad_morte (girato di profilo, cade sul fianco con la schiena verso di noi: di fronte era
+  una macchia; il verso opposto sembrava ancora in piedi; la caduta di forge3d affondava il corpo e toccava il
+  bordo). capra(): manto fur_lunare (slate/grey/grey_l/cream), muso e barbetta fur_black, zampe fur_grey, corna
+  "corno" (ink/brown_dd/slate_d/slate) in tre tratti in catena dalla fronte all'indietro, orecchie di lato, occhi
+  neri (i gialli luminosi di fronte sembravano una luce sul petto), segno glow_cyan. forge3d quadruped(head=1.0):
+  grandezza della testa (capra 0.8: con la testa intera sembrava un orso). generate_all.py copia per specie
+  (salta le specie senza fogli, oggi il corvo). Tolti arte/sprite/pet_{idle,walk,attack}.png; assets/placeholder/
+  pet_<nome>.png ora sono i segnaposto generici (generate_placeholders.py, tileset.png ripristinato).
+- Comando: python tools/art/build_personaggi.py --only pet && python tools/art/generate_all.py --only pet &&
+  python tools/generate_placeholders.py. Nessun numero casuale.
+- Verifica: lupo idle/walk/attack identici byte per byte ai fogli approvati; controllo su tutti i fogli pet: nessun
+  pixel sul bordo, nessun frame doppio, alpha 0/255, alti 23-37 px; guardati ingranditi su chiaro, erba e
+  selciato (molti giri sulla capra: corna, muso, testa, morte). Prova a schermo in Godot (xvfb):
+  arte/revisione/pet_a_schermo.png. validate 0, import ok, 782 test passati.
+- Nota: la zampa anteriore nella vista di fronte arriva a 58-62 px (piu' vicina alla camera): l'origine del nodo
+  resta il centro dell'animale a terra, li' va l'ombra.
+- Resta: parte (b) corvo_veggente (scheletro da uccello in forge3d, volo).
