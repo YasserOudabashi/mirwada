@@ -137,6 +137,7 @@ define("cloth_bandito", ["teal_d", "green_d", "green_m", "green"])              
 define("fur_cinereo", ["ink", "brown_dd", "slate_d", "grey"], tex=("noise", 1.6, 0.2))  # lupo: dorso cenere scuro
 define("fur_lunare", ["slate", "grey", "grey_l", "cream"], tex=("noise", 1.6, 0.14))  # capra: manto argento-crema
 define("corno", ["ink", "brown_dd", "slate_d", "slate"], spec=0.4, shin=20)  # corna scure sul manto chiaro
+define("piume_corvo", ["ink", "ink", "navy", "slate_d"], tex=("noise", 1.4, 0.1))  # corvo: nero, luci grigio-blu
 define("leaf_olive", ["teal_d", "green_d", "green_d", "green_m"], tex=("noise", 1.3, 0.28))   # ulivo: verde spento
 define("grass", ["teal_d", "green_d", "green_m", "green"])
 define("mushroom_red", ["brown_dd", "red_d", "red", "pink"])

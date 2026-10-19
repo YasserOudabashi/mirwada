@@ -117,6 +117,91 @@ QUAD_CLIPS = {"idle": quad_idle, "walk": quad_walk, "attack": quad_attack, "deat
 
 
 # --- alberi, rocce, cespugli (statici; il vento si fa nel viewer/export con sway) ---------------------
+# --- uccello (volatili: vola sopra l'origine, l'ombra a terra la mette il gioco) --------------------------------
+VOLO = 9.0      # quota del corpo in volo (unita'): i piedi a terra sono l'origine del rig
+
+
+def bird(body_mat="fur_black", beak="iron", eyes="eye_yellow", legs="iron", size=1.0, name="uccello"):
+    """Corpo, testa col becco, ali in due segmenti (spalla e punta), coda a ventaglio, zampette. Guarda +y."""
+    r = Rig(name); r.scale = size
+    r.joint("body", "root", (0, 0, VOLO))
+    r.joint("head", "body", (0, 2.6, 1.3))
+    r.joint("tail", "body", (0, -2.6, 0.2))
+    r.part("body", "ellipsoid", (1.7, 3.0, 1.7), (0, 0, 0), mat=body_mat)
+    r.part("body", "ellipsoid", (1.4, 1.8, 1.4), (0, 1.4, 0.4), mat=body_mat)               # petto
+    r.part("head", "ellipsoid", (1.35, 1.45, 1.3), (0, 0.3, 0.3), mat=body_mat)
+    r.part("head", "cone", (0.6, 0.5, 1.3), (0, 2.4, -0.1), mat=beak, rot=(-97, 0, 0))      # becco in avanti
+    for sx in (-1, 1):
+        r.part("head", "ellipsoid", (0.45, 0.45, 0.5), (sx * 0.95, 0.9, 0.55), mat=eyes)
+        w = r.joint("wing_" + ("l" if sx < 0 else "r"), "body", (sx * 1.4, 0.6, 0.9))
+        t = r.joint("tip_" + ("l" if sx < 0 else "r"), w, (sx * 3.4, -0.4, 0))
+        r.part(w, "ellipsoid", (1.9, 1.3, 0.3), (sx * 1.7, -0.3, 0), mat=body_mat)
+        r.part(t, "ellipsoid", (2.1, 0.85, 0.22), (sx * 1.8, -0.7, 0), mat=body_mat, rot=(0, 0, sx * -18))   # punta stretta
+        leg = r.joint("leg_" + ("l" if sx < 0 else "r"), "body", (sx * 0.6, -0.2, -1.3), rest=(-50, 0, 0))
+        r.part(leg, "cylinder", (0.22, 0.22, 0.8), (0, 0, -0.8), mat=legs)
+    r.part("tail", "ellipsoid", (1.2, 1.9, 0.3), (0, -1.6, 0), mat=body_mat)
+    return r
+
+
+def _ali(a, b=0.0):
+    """Ali alzate di a gradi (negativo = abbassate); b piega la punta (positivo = punta piu' su)."""
+    return {"wing_l": (0, a, 0), "wing_r": (0, -a, 0), "tip_l": (0, b, 0), "tip_r": (0, -b, 0)}
+
+
+def bird_idle(n=4):
+    """Sospeso a mezz'aria: battito corto, il corpo sale quando le ali scendono."""
+    out = []
+    for i in range(n):
+        s = math.sin(2 * math.pi * i / n)
+        p = _ali(10 + 35 * s, 10 * s)
+        p["body"] = (0, 0, 0, 0, 0, -0.5 * s)
+        p["tail"] = (6 * s, 0, 0)
+        out.append(p)
+    return out
+
+
+def bird_walk(n=6):
+    """Volo: battito pieno, corpo un po' inclinato in avanti."""
+    out = []
+    for i in range(n):
+        s = math.sin(2 * math.pi * (i + 0.5) / n)     # mezzo frame di sfasamento: nessuna posa ripetuta
+        p = _ali(5 + 55 * s, 25 * s)
+        p["body"] = (-10, 0, 0, 0, 0, -0.8 * s)
+        p["head"] = (8, 0, 0)
+        p["tail"] = (8 * s, 0, 0)
+        out.append(p)
+    return out
+
+
+def bird_attack(n=4):
+    """Picchiata col becco: ali in alto (carica), giu' in avanti a ali chiuse, colpo, risalita."""
+    carica = dict(_ali(60, 20), body=(15, 0, 0, 0, -0.8, 0.8), head=(10, 0, 0))
+    picchiata = dict(_ali(-30, -20), body=(-40, 0, 0, 0, 2.2, -3.0), head=(-15, 0, 0), tail=(15, 0, 0))
+    return clip_from_keys([(0, carica, "out"), (1, picchiata, "snap"),
+                           (2, add_pose(picchiata, _ali(15, 10))), (n - 1, _ali(30, 10))], n)
+
+
+def bird_hurt(n=3):
+    """Colpito: perde quota all'indietro, ali scomposte."""
+    colpo = dict(_ali(70, -30), body=(25, 0, 12, 0, -1.2, -1.2), head=(20, 0, -10), tail=(-20, 0, 0))
+    colpo["wing_r"] = (0, -30, 0)
+    return clip_from_keys([(0, colpo, "out"), (1, add_pose(colpo, {"body": (-8, 0, -4, 0, 0.3, 0.4)})), (n - 1, _ali(20))], n)
+
+
+def bird_death(n=6):
+    """Non direzionale: precipita e resta a terra a pancia in giu', ali aperte stese sul terreno, testa piegata
+    (sul fianco un'ala restava in verticale e sembrava in piedi)."""
+    a_terra = -VOLO + 1.2
+    keys = [(0, dict(_ali(60, 10), body=(20, 0, 0), head=(25, 0, 0))),
+            (2, dict(_ali(85, -25), body=(-25, 15, 20, 0, 0, a_terra * 0.6), head=(30, 0, 15)), "in"),
+            (4, dict(_ali(-12, 0), body=(-8, 6, 25, 0, 0, a_terra), head=(-20, 0, 35)), "in"),
+            (n - 1, dict(_ali(-16, -6), body=(-6, 4, 25, 0, 0, a_terra - 0.1), head=(-28, 0, 40), tail=(-8, 0, 0)), "out")]
+    return clip_from_keys(keys, n)
+
+
+BIRD_CLIPS = {"idle": bird_idle, "walk": bird_walk, "attack": bird_attack, "hurt": bird_hurt, "death": bird_death}
+
+
 def tree(kind="oak", seed=1, leaf="leaf", trunk="bark", size=1.0, name=None):
     rnd = random.Random(seed)
     r = Rig(name or f"tree_{kind}_{seed}"); r.scale = size

@@ -155,7 +155,9 @@ mette il gioco). Rig: `enel()` (cappotto quasi nero, coppola, sciarpa rossa, ben
 spadone in spalla), `nemico()` (bandito con la mazza, viso visibile anche di profilo), e per i pet la tabella `PET`
 (specie di `data/pets` -> costruttore): `lupo()` (lupo cinereo), `capra()` (capra lunare: manto argento,
 muso e zampe scuri, corna ad arco, barbetta, segno ciano). `quadruped(head=...)` regola la grandezza della
-testa. Animazioni dalla libreria `forge3d/anim_humanoid.py` e `creatures.py`. Per cambiare qualcosa si
+testa. `corvo()` (corvo veggente) usa lo scheletro da uccello `forge3d.creatures.bird()` con le animazioni
+`BIRD_CLIPS`: vola a quota `VOLO` sopra l'origine (l'ombra del gioco resta a terra), idle sospeso, walk in volo,
+attack in picchiata, morte a pancia in giu' con le ali stese. Animazioni dalla libreria `forge3d/anim_humanoid.py` e `creatures.py`. Per cambiare qualcosa si
 modifica il costruttore e si rigenera:
 
 ```bash

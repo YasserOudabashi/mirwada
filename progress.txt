@@ -8703,3 +8703,20 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
 - Nota: la zampa anteriore nella vista di fronte arriva a 58-62 px (piu' vicina alla camera): l'origine del nodo
   resta il centro dell'animale a terra, li' va l'ombra.
 - Resta: parte (b) corvo_veggente (scheletro da uccello in forge3d, volo).
+
+## US-8B32 parte (b) — corvo veggente, scheletro da uccello, 2026-10-19
+- forge3d/creatures.py: bird() (corpo, petto, testa con becco a cono in avanti, ali in due segmenti wing_/tip_ con
+  la punta stretta e piegata indietro, coda a ventaglio, zampette ripiegate) e BIRD_CLIPS: idle (sospeso, battito
+  corto), walk (volo, battito pieno sfasato di mezzo frame: con 6 frame la sinusoide dava pose a coppie), attack
+  (ali in alto, picchiata a ali chiuse, colpo, risalita), hurt (perde quota all'indietro), death (precipita e resta
+  a pancia in giu' con le ali stese: sul fianco un'ala restava verticale e sembrava in piedi). VOLO = 9 unita':
+  il corpo vola sopra l'origine, l'ombra del gioco resta a terra.
+- build_personaggi.py: corvo() con piume_corvo (ink/ink/navy/slate_d: con fur_black sembrava grigio, con blu_d un
+  uccello blu), becco e zampe iron, occhi eye_yellow, bordo di luce come Enel; ppu 2.3 (a 1.75 alto 11-22 px).
+  PET ora porta per ogni specie (rig, ppu, clip, bordo di luce).
+- Comando: python tools/art/build_personaggi.py --only pet && python tools/art/generate_all.py --only pet.
+- Verifica: controllo fogli (alto 13-28 px in volo, nessun bordo, nessun frame doppio, alpha 0/255), guardati
+  ingranditi su erba; prova a schermo in Godot: arte/revisione/pet_corvo_a_schermo.png (vola sopra l'ombra, a terra
+  da morto). Lupo e capra invariati.
+- Non mi convince ancora: nella picchiata vista di fronte (attack down, frame 1-2) il corvo e' una croce; dura
+  50 ms, in movimento passa.

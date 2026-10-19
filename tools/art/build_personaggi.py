@@ -23,7 +23,7 @@ from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from forge3d import anim_humanoid as A  # noqa: E402
-from forge3d.creatures import QUAD_CLIPS, quadruped  # noqa: E402
+from forge3d.creatures import BIRD_CLIPS, QUAD_CLIPS, bird, quadruped  # noqa: E402
 from forge3d.humanoid import REST, P, humanoid  # noqa: E402
 from forge3d.rig import add_pose, clip_from_keys  # noqa: E402
 from forge3d.sheets import export_spec  # noqa: E402
@@ -196,10 +196,19 @@ def quad_morte(n=6, verso=1):
     return clip_from_keys(keys, n)
 
 
+# --- pet: corvo veggente ----------------------------------------------------------------------------------------
+def corvo():
+    """Piume nere grigio-blu (Enel e' nero-prugna) col bordo di luce, becco e zampe grigio ferro, occhi gialli.
+    Vola: il corpo sta sopra l'origine e l'ombra del gioco resta a terra."""
+    return bird(body_mat="piume_corvo", beak="iron", eyes="eye_yellow", legs="iron", name="corvo_veggente")
+
+
 CLIP_PET = {k: vivi(v) for k, v in dict(QUAD_CLIPS, hurt=quad_hurt, death=quad_morte).items()}
 
-# specie di data/pets -> (rig, pixel per unita'). Fogli pet_<id>_<animazione>.png, stessi tempi per tutte.
-PET = {"lupo_cinereo": (lupo, 1.75), "capra_lunare": (capra, 1.75)}
+# specie di data/pets -> (rig, pixel per unita', clip, bordo di luce). Fogli pet_<id>_<animazione>.png, stessi
+# tempi per tutte.
+PET = {"lupo_cinereo": (lupo, 1.75, CLIP_PET, False), "capra_lunare": (capra, 1.75, CLIP_PET, False),
+       "corvo_veggente": (corvo, 2.3, {k: vivi(v) for k, v in BIRD_CLIPS.items()}, True)}
 
 
 def bordo_luce(path, colore=(0x8B, 0x9B, 0xB4), cella=64):
@@ -221,7 +230,7 @@ CATEGORIE = {
     # categoria: (rig, clip, pixel per unita', bordo di luce). Enel e nemico alti ~40-47 px su 64, il lupo ~30.
     "personaggio": (enel, CLIP_ENEL, 1.22, True),
     "nemico_base": (nemico, {k: vivi(v) for k, v in dict(A.CLIPS, death=morte_di_lato).items()}, 1.4, False),
-    "pet": (None, CLIP_PET, None, False),                       # una voce per specie: vedi PET
+    "pet": (None, None, None, False),                           # una voce per specie: vedi PET
 }
 
 
@@ -233,12 +242,13 @@ def main():
     for cat, (costruttore, clip, ppu, luce) in CATEGORIE.items():
         if a.only and a.only != cat:
             continue
-        mancano = [n for n in spec[cat] if not n.startswith("_") and n not in clip]
-        if mancano:
-            sys.exit(f"{cat}: animazioni senza clip {mancano}")
         # nessuna ombra cotta: l'ombra a terra la compone il gioco (revisione 1.10, 2.2)
         # piedi a 54 px su 64 (PIEDI): sotto restano 10 px per zampe in avanti e corpi a terra
-        for aspetto, (costr, p) in (PET.items() if cat == "pet" else [("", (costruttore, ppu))]):
+        voci = PET.items() if cat == "pet" else [("", (costruttore, ppu, clip, luce))]
+        for aspetto, (costr, p, clip, luce) in voci:
+            mancano = [n for n in spec[cat] if not n.startswith("_") and n not in clip]
+            if mancano:
+                sys.exit(f"{cat} {aspetto}: animazioni senza clip {mancano}")
             for path in export_spec(costr(), SPEC, cat, OUT, clip, ppu=p, shadow=False, foot=(0.5, PIEDI)):
                 if aspetto:                                       # pet_<nome>.png -> pet_<specie>_<nome>.png
                     nuovo = os.path.join(OUT, os.path.basename(path).replace(cat + "_", f"{cat}_{aspetto}_", 1))

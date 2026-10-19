@@ -175,7 +175,7 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - Nella preparazione degli attacchi l'arma può restare dietro la testa.
 - Il ponte è un rettangolo di legno.
 - I panorami sono ancora piatti.
-- Mancano: acconciature lunghe, animazioni di arrampicata/nuoto, mostri volanti, edifici
+- Mancano: acconciature lunghe, animazioni di arrampicata/nuoto, mostri volanti grandi (c'è solo `bird()` per i volatili piccoli), edifici
   (castelli, case, ponti dettagliati). Vanno aggiunti a `forge3d`, con una story dedicata.
 - Una correzione al generatore (ad esempio il viso) è una story a sé e **rigenera tutto**
   con lo stesso seed, poi si confronta il prima e il dopo.
