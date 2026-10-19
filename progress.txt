@@ -8720,3 +8720,17 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   da morto). Lupo e capra invariati.
 - Non mi convince ancora: nella picchiata vista di fronte (attack down, frame 1-2) il corvo e' una croce; dura
   50 ms, in movimento passa.
+
+## Confronto concept art / mondo generato + prova dell'Archivio Sepolto, 2026-10-19
+- Confronto regione per regione (seed 6, pezzi 40x24 tile centrati sul luogo di ogni concept): arte/confronto_concept.md,
+  tavole in arte/revisione/concept/. Esito: le concept parlano di oggetti/edifici/luoghi simbolo, il generatore fa
+  quasi solo terreno. Archivio: sopra e' neve, sotto non c'e' una zona archivio. Frontiera: isola nel mare invece
+  di isole sospese nel vuoto. Trono del Gigante a (21, 20), nell'angolo della mappa: da verificare.
+- Difetti trovati negli alberi della Valle (non ancora corretti): contorno doppio dietro la chioma delle querce,
+  righe verticali sotto le chiome, felci giallo acceso. arte/revisione/concept/difetti_alberi_valle.png.
+- Prova dell'Archivio Sepolto dalla concept (script nello scratchpad, NON nel repo: codice non ancora spiegato):
+  sala 40x24 con muri "mura" alti 2, cima scura, lastre_rovine, scaffali (in fila e caduti), libri e pergamene,
+  porta sigillata con rune ciano, automa col nucleo ciano, leggio con candele, ingranaggi, macerie e luce dal
+  crollo; variante con l'atmosfera della concept (penombra calda, restano accesi luce, rune, candele).
+  Tavole: archivio_prova_tavola.png, archivio_prova_schermata.png.
+- Nessun dato approvato toccato, nessun asset di gioco cambiato.
