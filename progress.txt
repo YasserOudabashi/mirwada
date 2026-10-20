@@ -8734,3 +8734,17 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   crollo; variante con l'atmosfera della concept (penombra calda, restano accesi luce, rune, candele).
   Tavole: archivio_prova_tavola.png, archivio_prova_schermata.png.
 - Nessun dato approvato toccato, nessun asset di gioco cambiato.
+
+## Difetti degli alberi (dal confronto con le concept), 2026-10-20
+- Contorno doppio: la fascia scura sul bordo delle chiome (5-8 px, in gigante, quercia, pino, cipresso) veniva dalle
+  linee interne di engine._compose: soglia inner_thr = 1 unita' anche sugli alberi ingranditi x3,6, e il bordo ripido
+  di una sfera grande la superava sulla stessa superficie (verificato con la maschera dei pixel cambiati: 2388 pixel).
+  Provato prima un margine dal bordo (non bastava, tolto). Correzione: worldrender.object_sprite passa
+  inner_thr = max(1, scala del modello); restano le linee da 1 px tra lobi e palchi (soglia 4 ok, 8 toglie i palchi
+  del pino). Personaggi e pet non cambiano (non passano da object_sprite).
+- Liane del gigante: 4 fili leaf_dark che escono dalla chioma, mezza lunghezza 1,5-3 (prima 7 cilindri chiari fino a
+  terra: sembravano gocce o gambe di un tavolo).
+- Felci della giungla: leaf invece di leaf_light (la rampa finiva nel giallo). Il numero di voci di ALBERI non cambia.
+- Rigenerato: python tools/art/build_world.py (seed 6). Cambiano solo i ritagli con gli alberi; mondo_prova.png,
+  sottosuolo e citta' identici (dati e posizioni invariati). Guardati ingranditi tutti gli oggetti del mondo prima e
+  dopo (rocce, cespuglio, ossa, scoglio uguali) e la Valle: arte/revisione/concept/alberi_valle_prima_dopo.png.

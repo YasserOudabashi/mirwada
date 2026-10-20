@@ -72,7 +72,7 @@ L = LEVEL
 # di ogni profilo non cambia mai: la scelta consuma numeri casuali, e il resto del mondo (rocce, sottosuolo) dipende
 # da quanti ne restano. Per cambiare le proporzioni si ripete una voce, non se ne aggiunge una.
 ALBERI = {"campagna": (0.035, [("ulivo", "leaf_olive"), ("cipresso", "leaf_dark"), ("ulivo", "leaf_olive")]),
-          "giungla": (0.32, [("gigante", "leaf_dark"), ("felce", "leaf"), ("gigante", "leaf"), ("felce", "leaf_light")]),
+          "giungla": (0.32, [("gigante", "leaf_dark"), ("felce", "leaf"), ("gigante", "leaf"), ("felce", "leaf")]),   # felci: niente giallo
           "foresta": (0.28, [("oak", "leaf_dark"), ("pine", "leaf_dark"), ("oak", "leaf")]),
           "rado": (0.02, [("dead", "leaf"), ("pine", "leaf_dark")]),
           "neve": (0.006, [("pine", "snow")]),

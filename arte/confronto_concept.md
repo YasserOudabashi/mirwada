@@ -53,10 +53,13 @@ Le concept raccontano le regioni con **oggetti, edifici e un luogo simbolo**; il
   **altare di radici** circondato di fiori rossi, un raggio di luce.
 - **Adesso:** alla `radice_del_mondo` un bosco fitto di querce, pini e felci generici, verde saturo; nessuna
   radura, nessun altare.
-- **Difetti trovati** (`difetti_alberi_valle.png`), da correggere a parte:
-  1. **contorno doppio**: dietro la chioma delle querce si vede un anello scuro spesso 2-3 px;
-  2. **righe verticali** sotto le chiome, come gocce;
-  3. felci **giallo acceso**, troppo sature per un bosco antico.
+- **Difetti trovati e corretti** (2026-10-20, `alberi_valle_prima_dopo.png`):
+  1. **contorno doppio** (fascia scura di 5-8 px sul bordo delle chiome, in tutti gli alberi): la soglia delle
+     linee interne era 1 unita' anche per i modelli ingranditi x3,6, e il bordo ripido di una sfera grande la
+     superava sulla stessa superficie. Ora `worldrender.object_sprite` usa `inner_thr = scala del modello`;
+  2. **righe verticali**: erano le liane del `gigante`, dritte, chiare e lunghe fino a terra. Ora 4 fili scuri
+     che escono dalla chioma e pendono fino a meta' tronco;
+  3. felci **giallo acceso**: nella giungla ora `leaf` invece di `leaf_light` (stessa scelta casuale, mappa uguale).
 - **Manca:** un albero "antico" contorto e muschioso (tipo nuovo in `creatures.tree`), radura con altare di
   radici e fiori rossi, nebbia bassa (strato del gioco), raggio di luce.
 
@@ -75,7 +78,7 @@ Le concept raccontano le regioni con **oggetti, edifici e un luogo simbolo**; il
 
 ## Cosa propongo, in ordine
 
-1. **Difetti degli alberi** (contorno doppio, righe, felci gialle): sono imperfezioni, vanno tolte prima di tutto.
+1. ~~Difetti degli alberi~~ (contorno doppio, righe, felci gialle): **fatto** 2026-10-20.
 2. **Decisione sull'atmosfera:** sprite luminosi come ora, ma una **luce d'ambiente per regione** messa dal gioco
    (dato in `regions.json`, come la prova 4 dell'Archivio). Non cambia nessun PNG e avvicina molto le concept.
 3. **Un luogo simbolo per regione**, uno alla volta, con oggetti nuovi in forge3d: sala dell'Archivio (porta

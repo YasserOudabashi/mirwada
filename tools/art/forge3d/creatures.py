@@ -265,10 +265,11 @@ def tree(kind="oak", seed=1, leaf="leaf", trunk="bark", size=1.0, name=None):
         for sx, sy, sz, rad in [(0, 0, 22, 11), (-7.5, 2, 18, 8), (7.5, -1.5, 18.5, 8.5), (1.5, 7, 17.5, 7.5),
                                 (-1.5, -7, 19.5, 8)]:
             r.part("crown", "ellipsoid", (rad, rad, rad * 0.85), (sx + rnd.uniform(-.8, .8), sy, sz), mat=leaf)
-        for k in range(7):                            # liane: fili dal bordo della chioma, davanti al tronco
-            x = -9.0 + k * 3.0 + rnd.uniform(-1.2, 1.2)
-            lung = rnd.uniform(1.5, 5.5)
-            r.part("crown", "cylinder", (0.4, 0.4, lung), (x, 7.5 + rnd.uniform(-1, 1), 13.5 - lung), mat="leaf")
+        for k in range(4):                            # liane: fili scuri che escono da dentro la chioma
+            x = -7.5 + k * 5.0 + rnd.uniform(-1.2, 1.2)
+            lung = rnd.uniform(1.5, 3.0)                # mezza lunghezza: pendono fino a meta' tronco, non a terra
+            r.part("crown", "cylinder", (0.35, 0.35, lung), (x, 6.5 + rnd.uniform(-1, 1), 14.5 - lung),
+                   mat="leaf_dark", rot=(0, rnd.uniform(-8, 8), 0))
     elif kind == "mushroom":
         r.part("trunk", "cylinder", (2.0, 2.0, 5.0), (0, 0, 5.0), mat="bone")
         r.part("crown", "ellipsoid", (8.0, 8.0, 5.0), (0, 0, 11), mat="mushroom_red")
