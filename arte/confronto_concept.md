@@ -76,7 +76,14 @@ Le concept raccontano le regioni con **oggetti, edifici e un luogo simbolo**; il
   niente che lo segni. **Da verificare** se quella posizione è voluta.
 - **Manca:** il trono (un oggetto grande o una parete scolpita), spade e stendardi, una salita.
 
-## Cosa propongo, in ordine
+## Decisioni dell'utente (2026-10-20)
+
+- **Due modalità:** facile = luminosa (l'arte di adesso, tenuta da parte), difficile = cupa e identica alle concept,
+  anche rifacendo tutto.
+- **Frontiera:** vuoto di nebbia; l'asfalto con le strisce è voluto.
+- **Trono del Gigante:** sulla vetta più alta delle Marche.
+
+## Cosa proponevo, in ordine (prima delle decisioni)
 
 1. ~~Difetti degli alberi~~ (contorno doppio, righe, felci gialle): **fatto** 2026-10-20.
 2. **Decisione sull'atmosfera:** sprite luminosi come ora, ma una **luce d'ambiente per regione** messa dal gioco

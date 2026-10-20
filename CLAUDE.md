@@ -289,7 +289,14 @@ Fase 9 (opzionale): Pathway Non-Standard, avanzamento per Boon.
 - **Arte generata da Claude con `sprite-forge`** (nuova, v2). Vedi sezione dedicata.
 - **i18n dal giorno 1**: nessun testo hardcoded.
 - **Pathway della fase 2**: Twilight Giant.
-- **Colore del mondo: luminoso** (come i terreni generati, 2026-10-14). Le concept art valgono per atmosfera e forme, non per i colori. La leggibilità si ottiene dai personaggi, non spegnendo il mondo.
+- **Colore del mondo: due modalità** (2026-10-20, sostituisce "luminoso" del 2026-10-14). **Facile = luminosa**
+  (l'arte attuale, che non si butta: resta com'è e si tiene come riferimento). **Difficile = cupa, identica alle
+  concept** (`assets/concept/regioni/`) per atmosfera, colori, forme e oggetti, anche se serve rifare tutto. La vista
+  resta top-down 3/4: "identica" vuol dire stessi colori, luci, forme e luoghi, non la stessa inquadratura.
+  Le due modalità sono due insiemi di asset generati dallo stesso generatore (rampe diverse), mai PNG ritoccati.
+- **Frontiera delle Porte** (2026-10-20): isole sospese in un **vuoto di nebbia**, non un'isola nel mare (cambia la
+  forma approvata). Le strade d'asfalto con le strisce **sono volute**: sono la stranezza della Frontiera.
+- **Trono del Gigante** (2026-10-20): va sulla **vetta** più alta delle Marche, con salita, spade e stendardi ai piedi.
 - **Palette dei VFX: vale `data/vfx.json`** (2026-10-14). `design-vfx.md` è allineato al file dati.
 
 ## i18n — due sistemi, una convenzione per le stringhe dei dati
