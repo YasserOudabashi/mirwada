@@ -795,6 +795,7 @@ def genera(seed):
     w.objects = [o for o in dirada(sorted(w.objects, key=lambda o: o["y"]))
                  if not (o["type"] in ("tree", "rock", "ossa") and ciglio[int(o["y"]), int(o["x"])])]
     w.sentieri = sentieri(w, strade, list(luoghi.values()) + list(villaggi.values()), faccia)
+    w.sentieri += trono_sulla_vetta(w, luoghi, strade, faccia, mc, seed)
     return w, luoghi, villaggi, sotto
 
 
@@ -867,6 +868,71 @@ def sentieri(w, strade, punti, faccia):
     w.objects = [o for o in w.objects
                  if not (o["type"] in ("tree", "rock", "ossa") and margine[int(o["y"]), int(o["x"])])]
     return fatti
+
+
+def trono_sulla_vetta(w, luoghi, strade, faccia, mc, seed):
+    """Decisione 2026-10-20: il Trono del Gigante sta sulla vetta delle Marche (prima: il punto piu' alto della formula,
+    cioe' l'angolo della mappa). Vetta = gradone piu' alto, ad almeno 40 caselle dal bordo della mappa e 4 dai suoi
+    salti, nel punto piu' in rilievo. Spiazzo di arenaria, sentiero dalla strada o dal sentiero piu' vicino (scale dove
+    attraversa una parete), il trono e ai piedi spade e stendardi. Dopo tutto il resto: il mondo approvato non cambia
+    (si tolgono solo alberi, rocce e ossa sotto il sentiero e lo spiazzo)."""
+    g, alt, pas = w.ground, w.alt, w.pas
+    lontano_bordo = (XX >= 40) & (XX < W - 40) & (YY >= 40) & (YY < H - 40)
+    z = mc & lontano_bordo
+    cima = z & (alt == alt[z].max())
+    salto = np.zeros((H, W), bool)
+    for sy, sx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+        salto |= sposta(alt, sy, sx, -9) != alt
+    dentro = cima & ~ispessisci(salto | faccia, 4)
+    rilievo = sfuma(w.elev.astype(float), 6)
+    y, x = np.unravel_index(int(np.argmax(np.where(dentro, rilievo, -np.inf))), (H, W))
+    spostato = LAYOUT["spostati"].get("luoghi", {}).get("trono_del_gigante")   # il tavolo tattico vince sulla vetta
+    if spostato:
+        x, y = int(spostato[0]), int(spostato[1])
+    vetta = (int(x), int(y))
+    luoghi["trono_del_gigante"] = vetta
+    spiazzo = disco(x, y, 4.5) & cima & ~faccia
+    g[spiazzo] = L["arenaria"]
+    # salita: dalla casella di strada o sentiero piu' vicina nelle Marche; le pareti si passano con una scala
+    rete = [tuple(c) for p in strade + w.sentieri for c in p if mc[c[1], c[0]]]
+    da = min(rete, key=lambda c: (c[0] - x) ** 2 + (c[1] - y) ** 2)
+    dritti = np.isin(g, [ORDER.index(n) for n in ORDER if TERRAINS[n].get("bordo") == "dritto"])
+    costo = 1.0 + 60.0 * dritti + 25.0 * faccia
+    costo[np.isin(g, [L["water"], L["deep_water"]])] = 1e4
+    q = astar(costo, da, vetta)
+    for cx, cy in q:
+        if faccia[cy, cx]:
+            pas[cy, cx] = "S"
+        elif not (dritti[cy, cx] or spiazzo[cy, cx] or g[cy, cx] == L["lastricato_antico"]):
+            g[cy, cx] = L["path"]
+    # la cima si alza di un livello: una rocca con pareti di arenaria, e una scala dove arriva il sentiero
+    alt[spiazzo] += 1
+    w.mat_par[spiazzo] = "arenaria"
+    faccia_nuova = maschera_pareti(alt, w.mat_par) & ~faccia
+    for cx, cy in q:
+        if faccia_nuova[cy, cx]:
+            pas[cy, cx] = "S"
+    libero = spiazzo.copy()
+    for cx, cy in q:
+        libero[max(0, cy - 1):cy + 2, max(0, cx - 1):cx + 2] = True
+    libero = ispessisci(libero, 1)
+    w.objects = [o for o in w.objects if not (o["type"] in ("tree", "rock", "ossa") and libero[int(o["y"]), int(o["x"])])]
+    # trono e, ai piedi, spade piantate e due stendardi (fuori dal sentiero)
+    rnd = np.random.RandomState(seed + 341)
+    nuovi = [{"type": "trono", "x": x + .5, "y": y + .2, "seed": 1}]
+    sentiero = np.zeros((H, W), bool)
+    for cx, cy in q:
+        sentiero[cy, cx] = True
+    sentiero = ispessisci(sentiero, 1)
+    for i in range(14):
+        a_, d_ = rnd.uniform(0, 2 * np.pi), rnd.uniform(3.0, 7.5)
+        sx_, sy_ = x + .5 + np.cos(a_) * d_, y + .5 + np.sin(a_) * d_ * 0.8
+        if cima[int(sy_), int(sx_)] and not (sentiero | faccia_nuova)[int(sy_), int(sx_)] and abs(sx_ - x - .5) > 1.5:
+            nuovi.append({"type": "spada", "x": sx_, "y": sy_, "seed": int(rnd.randint(8))})
+    for sx_ in (-3.2, 3.4):
+        nuovi.append({"type": "stendardo", "x": x + .5 + sx_, "y": y + 1.6, "seed": int(rnd.randint(4))})
+    w.objects = sorted(w.objects + nuovi, key=lambda o: o["y"])
+    return [[list(map(int, c)) for c in q]]
 
 
 def cerchio_irregolare(g, cx, cy, r, t, fuori, ok, nome):

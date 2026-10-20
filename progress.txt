@@ -8748,3 +8748,19 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
 - Rigenerato: python tools/art/build_world.py (seed 6). Cambiano solo i ritagli con gli alberi; mondo_prova.png,
   sottosuolo e citta' identici (dati e posizioni invariati). Guardati ingranditi tutti gli oggetti del mondo prima e
   dopo (rocce, cespuglio, ossa, scoglio uguali) e la Valle: arte/revisione/concept/alberi_valle_prima_dopo.png.
+
+## Story 1 (decisioni 2026-10-20): Trono del Gigante sulla vetta delle Marche, 2026-10-20
+- Prima: luoghi["trono_del_gigante"] = migliore(mc, alt), ma alt cresce con la distanza da Mirwada, quindi il
+  "punto piu' alto" era sempre l'angolo della mappa (21, 20), nella neve.
+- build_world.trono_sulla_vetta (a fine generazione, dopo i sentieri: i numeri casuali e il resto del mondo non
+  cambiano): vetta = gradone piu' alto delle Marche (6), a >= 40 caselle dal bordo mappa e >= 4 dai salti, punto
+  piu' in rilievo (elev sfumata). Spiazzo di arenaria (disco 4,5) rialzato di un livello: rocca con pareti di
+  arenaria. Salita: A* dalla casella di strada/sentiero piu' vicina nelle Marche, sentiero "path", scala "S" dove
+  attraversa una parete. Tolti alberi/rocce/ossa sotto spiazzo e salita. Oggetti nuovi in forge3d/creatures.py e
+  worldrender.py: trono (blocchi di pietra, ~4,5 tile), spada (14 tentativi attorno, seed+341), stendardo (2 ai lati).
+  Se il tavolo tattico sposta il trono (spostati.luoghi), vince la sua posizione.
+- Esito (seed 6): trono a (205, 53); salita di 271 caselle dal sentiero a (426, 102), 1 scala (quella della rocca).
+  Cambia solo il riquadro x 201-423, y 49-102 (320 caselle di terreno); in punti.json cambia solo il trono.
+- Comando: python tools/art/build_world.py. Tavola: arte/revisione/concept/trono_sulla_vetta.png.
+- Notato (gia' presente, non toccato): il villaggio "mulino" sta a (0, 0): il generatore non trova un posto adatto
+  (riva di fiume nella campagna di Mirwada lontana dalla citta').

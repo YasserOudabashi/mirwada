@@ -294,6 +294,8 @@ Fase 9 (opzionale): Pathway Non-Standard, avanzamento per Boon.
   concept** (`assets/concept/regioni/`) per atmosfera, colori, forme e oggetti, anche se serve rifare tutto. La vista
   resta top-down 3/4: "identica" vuol dire stessi colori, luci, forme e luoghi, non la stessa inquadratura.
   Le due modalità sono due insiemi di asset generati dallo stesso generatore (rampe diverse), mai PNG ritoccati.
+  La difficile cambia **anche il gioco** (numeri in un file dati, mai nel codice) e si sceglie **a inizio partita**:
+  resta fissa e va nel salvataggio.
 - **Frontiera delle Porte** (2026-10-20): isole sospese in un **vuoto di nebbia**, non un'isola nel mare (cambia la
   forma approvata). Le strade d'asfalto con le strisce **sono volute**: sono la stranezza della Frontiera.
 - **Trono del Gigante** (2026-10-20): va sulla **vetta** più alta delle Marche, con salita, spade e stendardi ai piedi.

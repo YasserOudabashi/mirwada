@@ -278,6 +278,54 @@ def tree(kind="oak", seed=1, leaf="leaf", trunk="bark", size=1.0, name=None):
     return r
 
 
+def trono(seed=1, size=1.0):
+    """Trono del Gigante (concept marche/trono): blocchi di roccia squadrati e un po' storti, schienale altissimo,
+    braccioli, gradini rotti alla base. Guarda +y."""
+    rnd = random.Random(seed)
+    r = Rig(f"trono_{seed}"); r.scale = size
+    r.joint("t", "root", (0, 0, 0))
+    def blocco(dim, pos, mat="stone"):
+        r.part("t", "box", dim, pos, mat=mat, rot=(rnd.uniform(-3, 3), rnd.uniform(-3, 3), rnd.uniform(-4, 4)))
+    blocco((13, 10, 1.6), (0, 1.5, 1.6))                          # gradini
+    blocco((11, 8, 1.4), (0, 0.5, 4.4))
+    blocco((9, 6.5, 3.2), (0, -0.5, 8.6))                         # seduta
+    blocco((9, 2.6, 13), (0, -6.4, 18), "stone")                  # schienale altissimo
+    blocco((5, 2.2, 5), (-4.5, -6.6, 33.5))                       # cima spezzata, piu' alta a sinistra
+    blocco((3.4, 2.2, 3), (4.6, -6.4, 30.5))
+    for sx in (-1, 1):                                            # braccioli
+        blocco((2.4, 6, 4.2), (sx * 10.2, -0.8, 13.5))
+    for k in range(6):                                            # macerie attorno
+        a = rnd.uniform(0, 2 * math.pi)
+        d = rnd.uniform(11, 15)
+        s_ = rnd.uniform(1.0, 2.2)
+        blocco((s_, s_, s_ * 0.8), (math.cos(a) * d, math.sin(a) * d * 0.7, s_ * 0.6), "stone_light")
+    return r
+
+
+def spada(seed=1, size=1.0):
+    """Spada piantata nel terreno, un po' inclinata (concept marche: campo di battaglia, piedi del trono)."""
+    rnd = random.Random(seed)
+    r = Rig(f"spada_{seed}"); r.scale = size
+    r.joint("s", "root", (0, 0, 0), rest=(rnd.uniform(-18, 18), rnd.uniform(-18, 18), rnd.uniform(0, 180)))
+    r.part("s", "box", (0.25, 0.9, 5.0), (0, 0, 4.2), mat="steel")
+    r.part("s", "box", (0.5, 2.6, 0.45), (0, 0, 9.4), mat="iron")          # guardia
+    r.part("s", "cylinder", (0.45, 0.45, 1.4), (0, 0, 11.2), mat="leather_dark")
+    r.part("s", "ellipsoid", (0.6, 0.6, 0.6), (0, 0, 12.8), mat="iron")    # pomo
+    return r
+
+
+def stendardo(seed=1, size=1.0, mat="cloth_red"):
+    """Asta storta con un drappo strappato (concept marche/trono)."""
+    rnd = random.Random(seed)
+    r = Rig(f"stendardo_{seed}"); r.scale = size
+    r.joint("a", "root", (0, 0, 0), rest=(rnd.uniform(-8, 8), rnd.uniform(-10, 10), rnd.uniform(0, 180)))
+    r.part("a", "cylinder", (0.35, 0.35, 9.0), (0, 0, 9.0), mat="wood")
+    r.part("a", "cone", (0.5, 0.5, 0.8), (0, 0, 18.6), mat="iron")
+    for k, (lung, z) in enumerate(((3.4, 15.5), (2.6, 13.8), (1.8, 12.3))):   # strisce sempre piu' corte: strappato
+        r.part("a", "box", (0.12, lung, 0.8), (0, lung + 0.3, z), mat=mat, rot=(rnd.uniform(-6, 6), 0, 0))
+    return r
+
+
 def ossa(seed=1, size=1.0):
     """Ossa nella sabbia delle Marche: un teschio di bestia e qualche costola."""
     rnd = random.Random(seed)
