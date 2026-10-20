@@ -29,15 +29,15 @@ def object_sprite(o, S=TILE):
     elif t == "ossa":
         r = ossa(o["seed"], size=2.6 * k)
         cw, ch, foot = int(64 * k), int(48 * k), 0.75
-    elif t == "trono":                                    # Trono del Gigante: alto ~4,5 tile, sulla vetta delle Marche
-        r = trono(o["seed"], size=3.8 * k)
-        cw, ch, foot = int(224 * k), int(256 * k), 0.84
+    elif t == "trono":                                    # Trono del Gigante: alto ~9 tile, sulla vetta delle Marche
+        r = trono(o["seed"], size=7.6 * k)
+        cw, ch, foot = int(448 * k), int(512 * k), 0.84
     elif t == "spada":
         r = spada(o["seed"], size=2.2 * k)
         cw, ch, foot = int(48 * k), int(56 * k), 0.8
     elif t == "stendardo":
-        r = stendardo(o["seed"], size=2.6 * k)
-        cw, ch, foot = int(64 * k), int(80 * k), 0.85
+        r = stendardo(o["seed"], size=4.6 * k)
+        cw, ch, foot = int(112 * k), int(136 * k), 0.85
     elif t == "scoglio":                                  # roccia nel mare: schiuma alla base, niente ombra a terra
         r = rock(o["seed"], "stone", size=2.6 * o.get("size", 1.0) * k, moss=False)
         cw, ch, foot = int(96 * k), int(72 * k), 0.75

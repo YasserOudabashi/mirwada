@@ -796,6 +796,7 @@ def genera(seed):
                  if not (o["type"] in ("tree", "rock", "ossa") and ciglio[int(o["y"]), int(o["x"])])]
     w.sentieri = sentieri(w, strade, list(luoghi.values()) + list(villaggi.values()), faccia)
     w.sentieri += trono_sulla_vetta(w, luoghi, strade, faccia, mc, seed)
+    frontiera_nel_vuoto(w)
     return w, luoghi, villaggi, sotto
 
 
@@ -870,6 +871,52 @@ def sentieri(w, strade, punti, faccia):
     return fatti
 
 
+def frontiera_nel_vuoto(w):
+    """Decisione 2026-10-20: la Frontiera delle Porte sta sospesa in un vuoto di nebbia (concept frontiera_porte). Il
+    mare piu' vicino alla Frontiera che a ogni altra terra diventa `vuoto`, due livelli sotto: sul lato sud delle isole
+    il generatore delle pareti disegna la roccia che scende nel vuoto. Sulla riva niente spiaggia (prende il terreno
+    dell'interno). A fine generazione: il resto del mondo non cambia."""
+    g, alt = w.ground, w.alt
+    terra = ~w.water_mask
+    # terra piu' vicina: le regioni di terra si allargano nel mare una casella per volta (anche sulle spiagge rifatte
+    # dalle coste irregolari, che sono terra ma stanno nella regione "mare")
+    chi = np.where(terra & (w.biome != 0), w.biome, -1)
+    while (chi < 0).any():
+        prima = chi.copy()
+        for sy, sx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            vic = sposta(prima, sy, sx, -1)
+            chi = np.where((chi < 0) & (vic >= 0), vic, chi)
+        if (chi == prima).all():
+            break
+    mia = chi == REGIONI.index("frontiera_porte")
+    fr = terra & mia & ~np.isin(w.mat_par, ["molo", "legno", "mura"])   # la punta della diga non e' Frontiera
+    # solo una fascia di ~24 caselle (bordo irregolare): oltre resta mare, lontano dal porto e dal faro di Mirwada
+    largo = 24 + (fbm(W, H, 18, 2, w.seed + 351) - 0.5) * 12
+    vicino, dist = fr.copy(), np.where(fr, 0, 999)
+    for k in range(1, 31):
+        vicino = ispessisci(vicino, 1)
+        dist[vicino & (dist == 999)] = k
+    altra = ispessisci(terra & ~fr, 12)                      # e ad almeno 12 caselle da ogni altra terra (diga, faro)
+    vuoto = ~terra & mia & (dist <= largo) & ~altra
+    g[vuoto] = L["vuoto"]
+    alt[vuoto] = -2
+    riva = fr & ispessisci(vuoto, 2)
+    w.mat_par[riva & (w.mat_par == "")] = "roccia"
+    spiaggia = fr & np.isin(g, [L["sand"], L["sabbia_bianca"], L["water"], L["deep_water"]])
+    for _ in range(40):                                     # la sabbia prende il terreno attorno (non spiaggia)
+        if not spiaggia.any():
+            break
+        for y, x in zip(*np.nonzero(spiaggia)):
+            v = [int(g[ny, nx]) for ny, nx in nb8(y, x) if not spiaggia[ny, nx] and not vuoto[ny, nx]]
+            if v:
+                g[y, x] = max(sorted(set(v)), key=v.count)
+                spiaggia[y, x] = False
+    g[spiaggia] = L["nebbia"]                               # isolotti di sola sabbia: il terreno della Frontiera
+    qui = ispessisci(vuoto, 3)                              # sotto la roccia della riva, il terreno della cima:
+    w.ground = np.where(qui, terreno_sotto(g, alt, w.mat_par), g)   # solo qui (altrove annullerebbe ritocchi gia' fatti)
+    w.objects = [o for o in w.objects if not vuoto[int(o["y"]) % H, int(o["x"]) % W]]
+
+
 def trono_sulla_vetta(w, luoghi, strade, faccia, mc, seed):
     """Decisione 2026-10-20: il Trono del Gigante sta sulla vetta delle Marche (prima: il punto piu' alto della formula,
     cioe' l'angolo della mappa). Vetta = gradone piu' alto, ad almeno 40 caselle dal bordo della mappa e 4 dai suoi
@@ -883,7 +930,7 @@ def trono_sulla_vetta(w, luoghi, strade, faccia, mc, seed):
     salto = np.zeros((H, W), bool)
     for sy, sx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
         salto |= sposta(alt, sy, sx, -9) != alt
-    dentro = cima & ~ispessisci(salto | faccia, 4)
+    dentro = cima & ~ispessisci(salto | faccia, 8)
     rilievo = sfuma(w.elev.astype(float), 6)
     y, x = np.unravel_index(int(np.argmax(np.where(dentro, rilievo, -np.inf))), (H, W))
     spostato = LAYOUT["spostati"].get("luoghi", {}).get("trono_del_gigante")   # il tavolo tattico vince sulla vetta
@@ -891,27 +938,32 @@ def trono_sulla_vetta(w, luoghi, strade, faccia, mc, seed):
         x, y = int(spostato[0]), int(spostato[1])
     vetta = (int(x), int(y))
     luoghi["trono_del_gigante"] = vetta
-    spiazzo = disco(x, y, 4.5) & cima & ~faccia
+    spiazzo = disco(x, y, 8.5) & cima & ~faccia
     g[spiazzo] = L["arenaria"]
-    # salita: dalla casella di strada o sentiero piu' vicina nelle Marche; le pareti si passano con una scala
-    rete = [tuple(c) for p in strade + w.sentieri for c in p if mc[c[1], c[0]]]
-    da = min(rete, key=lambda c: (c[0] - x) ** 2 + (c[1] - y) ** 2)
-    dritti = np.isin(g, [ORDER.index(n) for n in ORDER if TERRAINS[n].get("bordo") == "dritto"])
-    costo = 1.0 + 60.0 * dritti + 25.0 * faccia
-    costo[np.isin(g, [L["water"], L["deep_water"]])] = 1e4
-    q = astar(costo, da, vetta)
-    for cx, cy in q:
-        if faccia[cy, cx]:
-            pas[cy, cx] = "S"
-        elif not (dritti[cy, cx] or spiazzo[cy, cx] or g[cy, cx] == L["lastricato_antico"]):
-            g[cy, cx] = L["path"]
-    # la cima si alza di un livello: una rocca con pareti di arenaria, e una scala dove arriva il sentiero
+    # la cima si alza di un livello: una rocca con pareti di arenaria
     alt[spiazzo] += 1
     w.mat_par[spiazzo] = "arenaria"
-    faccia_nuova = maschera_pareti(alt, w.mat_par) & ~faccia
+    faccia_tot = maschera_pareti(alt, w.mat_par)
+    faccia_nuova = faccia_tot & ~faccia
+    # salita: dalla casella di strada o sentiero piu' vicina nelle Marche. Si sale solo dalla scala (2 caselle) nella
+    # parete sud della rocca piu' vicina alla partenza: i salti di lato, senza parete, non si attraversano
+    rete = [tuple(c) for p in strade + w.sentieri for c in p if mc[c[1], c[0]]]
+    da = min(rete, key=lambda c: (c[0] - x) ** 2 + (c[1] - y) ** 2)
+    piede = faccia_nuova & sposta(faccia_nuova, 0, 1) & ~sposta(faccia_tot, -1, 0)   # due caselle, libero sotto
+    ys_p, xs_p = np.nonzero(piede)
+    i_ = int(np.argmin((xs_p - da[0]) ** 2 + (ys_p - da[1]) ** 2))
+    pas[ys_p[i_], xs_p[i_] - 1:xs_p[i_] + 1] = "S"
+    salto = np.zeros((H, W), bool)
+    for sy, sx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+        salto |= sposta(alt, sy, sx, -9) != alt
+    dritti = np.isin(g, [ORDER.index(n) for n in ORDER if TERRAINS[n].get("bordo") == "dritto"])
+    costo = 1.0 + 60.0 * dritti
+    costo[np.isin(g, [L["water"], L["deep_water"]])] = 1e4
+    costo[(faccia_tot | salto) & ~ispessisci(pas != ".", 1)] = 1e6
+    q = astar(costo, da, vetta)
     for cx, cy in q:
-        if faccia_nuova[cy, cx]:
-            pas[cy, cx] = "S"
+        if not (dritti[cy, cx] or spiazzo[cy, cx] or faccia_tot[cy, cx] or g[cy, cx] == L["lastricato_antico"]):
+            g[cy, cx] = L["path"]
     libero = spiazzo.copy()
     for cx, cy in q:
         libero[max(0, cy - 1):cy + 2, max(0, cx - 1):cx + 2] = True
@@ -925,11 +977,11 @@ def trono_sulla_vetta(w, luoghi, strade, faccia, mc, seed):
         sentiero[cy, cx] = True
     sentiero = ispessisci(sentiero, 1)
     for i in range(14):
-        a_, d_ = rnd.uniform(0, 2 * np.pi), rnd.uniform(3.0, 7.5)
+        a_, d_ = rnd.uniform(0, 2 * np.pi), rnd.uniform(6.0, 12.0)
         sx_, sy_ = x + .5 + np.cos(a_) * d_, y + .5 + np.sin(a_) * d_ * 0.8
-        if cima[int(sy_), int(sx_)] and not (sentiero | faccia_nuova)[int(sy_), int(sx_)] and abs(sx_ - x - .5) > 1.5:
+        if cima[int(sy_), int(sx_)] and not (sentiero | faccia_nuova)[int(sy_), int(sx_)] and abs(sx_ - x - .5) > 3.5:
             nuovi.append({"type": "spada", "x": sx_, "y": sy_, "seed": int(rnd.randint(8))})
-    for sx_ in (-3.2, 3.4):
+    for sx_ in (-6.4, 6.6):
         nuovi.append({"type": "stendardo", "x": x + .5 + sx_, "y": y + 1.6, "seed": int(rnd.randint(4))})
     w.objects = sorted(w.objects + nuovi, key=lambda o: o["y"])
     return [[list(map(int, c)) for c in q]]

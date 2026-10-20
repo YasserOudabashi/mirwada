@@ -8764,3 +8764,26 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
 - Comando: python tools/art/build_world.py. Tavola: arte/revisione/concept/trono_sulla_vetta.png.
 - Notato (gia' presente, non toccato): il villaggio "mulino" sta a (0, 0): il generatore non trova un posto adatto
   (riva di fiume nella campagna di Mirwada lontana dalla citta').
+- Trono piu' grande (richiesta dell'utente): trono x7,6 (~9-10 tile, tela 448x512), rocca raggio 8,5, vetta a >= 8
+  caselle dai salti (resta (205, 53)), spade a 6-12 caselle, stendardi x4,6. La rocca si alza PRIMA di cercare la
+  salita: scala di 2 caselle nella parete sud piu' vicina alla partenza; i salti di lato senza parete costano 1e6
+  (prima il sentiero entrava di lato, dove non si puo' salire).
+
+## Story 2 (decisioni 2026-10-20): Frontiera delle Porte sospesa nel vuoto di nebbia, 2026-10-20
+- Terreno nuovo "vuoto" (terrain.py, una riga, livello -1, fog grigio freddo animato, piu' scuro della terra lilla).
+  Per il gioco resta non calpestabile come l'acqua (water_mask invariata).
+- build_world.frontiera_nel_vuoto (a fine generazione): terra piu' vicina a ogni casella di mare (le regioni si
+  allargano una casella per volta; anche le spiagge rifatte, che sono terra nella regione "mare"). Vuoto = mare piu'
+  vicino alla Frontiera, entro ~24 caselle (+-6, fbm seed+351) e ad almeno 12 da ogni altra terra. Altezza -2; riva
+  con materiale "roccia" (le pareti scendono nel vuoto sul lato sud); niente spiaggia (sabbia e acqua bassa prendono
+  il terreno attorno, isolotti di sola sabbia -> nebbia); terreno_sotto solo vicino al vuoto; via gli oggetti nel vuoto.
+- Errori trovati e corretti per strada: (1) le spiagge rifatte stanno nella regione "mare" -> restavano sabbia e
+  pareti a pezzi; (2) il vuoto arrivava sotto il faro: la punta della diga (terra senza regione) veniva contata come
+  Frontiera -> moli, pontili e mura non sono mai Frontiera; (3) terreno_sotto su tutta la mappa annullava ritocchi
+  gia' fatti nelle Marche (erica/pietrisco a x 0-40) -> solo vicino al vuoto.
+- Verifica casella per casella (codice di prima vs adesso, seed 6): continente 278 caselle cambiate, tutte nel
+  riquadro del trono e della salita; al sud nessuna fuori da Frontiera, vuoto e acqua bassa convertita;
+  mirwada_citta.png identica. Tavole: arte/revisione/concept/trono_sulla_vetta.png, frontiera_nel_vuoto.png.
+- Aperto: l'approdo_frontiera era un attracco di navi; ora davanti c'e' il vuoto: come ci si arriva va deciso (porta,
+  ponte, nave che entra nella nebbia). Nella modalita' cupa la terra lilla della Frontiera andra' scurita (concept:
+  isole di roccia scura e vuoto chiaro).

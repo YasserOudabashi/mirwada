@@ -99,6 +99,10 @@ TERRAINS = {
     "pontile_legno": dict(bordo="dritto", ramp=["brown_dd", "brown_d", "brown", "tan"], period=4, dither=0.3, detail="planks", rim="dark",
                           rimc="brown_dd", level=9.4),
     # --- Archivio, Frontiera, isole (US-8B11d). Pastelli della Frontiera = colori extra (Endesga non ha il lilla) ---
+    # vuoto di nebbia attorno alla Frontiera (decisione 2026-10-20): grigio freddo, piu' scuro della terra lilla e due
+    # livelli sotto; non si calpesta (water_mask). Il livello piu' basso: tutto il resto gli si disegna sopra
+    "vuoto": dict(macro=8, ramp=["slate", "#76839c", "grey", "#a9b3c6"], period=3, dither=0.6, detail="fog", rim=None,
+                  level=-1, contrast=0.35, anim=4),
     "nebbia": dict(macro=8, ramp=["#b8b0c8", "#cfc8db", "#e0dbe8", "#f0edf4"], period=3, dither=0.6, detail="fog", rim="light",
                    rimc="#f0edf4", level=0.2, contrast=0.6, anim=4),
     # sabbia corallina: crema e avorio caldi, bianco solo nei riflessi (prima 3 bianchi su 4: sembrava neve)
