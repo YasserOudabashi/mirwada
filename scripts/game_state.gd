@@ -15,6 +15,8 @@ const NOME_DEFAULT := "Enel"
 signal partita_iniziata(nome: String)
 
 var nome_personaggio: String = NOME_DEFAULT
+## Modalita' scelta a inizio partita (data/modalita.json): fissa, va nel save.
+var modalita: String = "facile"
 var tempo_gioco: float = 0.0
 ## false al boot (sei sul menu del libro), true dopo nuova_partita()/carica_slot().
 var _partita_attiva: bool = false
@@ -175,10 +177,11 @@ func carica_slot(slot: int) -> Dictionary:
 ## (Sequenza, follia) si azzerano qui: nuova_partita() puo' essere chiamata
 ## nella STESSA sessione di un personaggio appena concluso, i cui autoload
 ## portano ancora il suo stato.
-func nuova_partita(nome: String, slot: int, talenti_innati: Array = []) -> Dictionary:
+func nuova_partita(nome: String, slot: int, talenti_innati: Array = [], scelta_modalita: String = "") -> Dictionary:
 	var eredita: Dictionary = _eredita_da_slot(slot)
 
 	nome_personaggio = nome.strip_edges() if not nome.strip_edges().is_empty() else NOME_DEFAULT
+	modalita = _modalita_valida(scelta_modalita)
 	tempo_gioco = 0.0
 	_partita_attiva = true
 	_slot_corrente = slot
@@ -252,6 +255,34 @@ func _applica_eredita(eredita: Dictionary) -> void:
 		_inventario().call("aggiungi", str(eredita["oggetto"]), 1)
 
 
+## Numero della modalita' corrente (data/modalita.json.moltiplicatori): 1 se
+## la modalita' non lo cita. Chi applica danni e cure lo chiede per nome.
+func moltiplicatore(nome: String) -> float:
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd == null:
+		return 1.0
+	var m: Dictionary = (gd.call("get_modalita", modalita) as Dictionary).get("moltiplicatori", {})
+	return float(m.get(nome, 1.0))
+
+
+## Set di asset del mondo per la modalita' corrente ("luminoso" | "cupo").
+func tema_arte() -> String:
+	var gd: Node = get_node_or_null("/root/GameData")
+	var d: Dictionary = gd.call("get_modalita", modalita) if gd != null else {}
+	return str(d.get("tema_arte", "luminoso"))
+
+
+## Una modalita' che non esiste nei dati (o vuota: save vecchio) diventa
+## quella di default dei dati.
+func _modalita_valida(id: String) -> String:
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd == null:
+		return id if not id.is_empty() else "facile"
+	if id in (gd.call("modalita_ids") as Array):
+		return id
+	return str(gd.call("modalita_default"))
+
+
 func partita_in_corso() -> bool:
 	return _partita_attiva
 
@@ -281,6 +312,7 @@ func slot_scelto() -> int:
 func snapshot() -> Dictionary:
 	var dati: Dictionary = {
 		"nome_personaggio": nome_personaggio,
+		"modalita": modalita,
 		"tempo_gioco": tempo_gioco,
 		"posizione": Vector2.ZERO,
 		"statistiche": {},
@@ -341,6 +373,7 @@ func _mondo_snapshot() -> Dictionary:
 
 func applica(dati: Dictionary) -> void:
 	nome_personaggio = str(dati.get("nome_personaggio", NOME_DEFAULT))
+	modalita = _modalita_valida(str(dati.get("modalita", "")))
 	tempo_gioco = float(dati.get("tempo_gioco", 0.0))
 	if _progression() != null:
 		_progression().da_salvataggio(dati.get("progressione", {}))

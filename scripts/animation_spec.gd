@@ -7,7 +7,7 @@ extends RefCounted
 ##   - gli eventi dichiarati su un frame (hitbox_on, tell_audio, footstep...)
 ##   - la finestra di invulnerabilita' del dash (iframe_da/a)
 ##   - la finestra di parata perfetta
-##   - durata reale in secondi (frames / fps)
+##   - durata di ogni frame (durate_ms, o 1000 / fps) e del ciclo
 ##
 ## Cambiare un fps o un indice nel JSON cambia il comportamento senza
 ## toccare il codice: e' l'obiettivo di US-021.
@@ -41,10 +41,23 @@ func is_directional() -> bool:
 	return bool(_a.get("direzionale", false))
 
 
-## Durata di un ciclo in secondi. 0 se fps non valido.
+## Durata in ms di ogni frame: "durate_ms" se c'e' (anticipo lento, colpo
+## veloce), altrimenti 1000 / fps uguale per tutti.
+func frame_durations_ms() -> Array:
+	var out: Array = []
+	var durate: Array = _a.get("durate_ms", [])
+	var uniforme: float = 0.0 if fps() <= 0.0 else 1000.0 / fps()
+	for i in frame_count():
+		out.append(float(durate[i]) if i < durate.size() else uniforme)
+	return out
+
+
+## Durata di un ciclo in secondi.
 func duration_sec() -> float:
-	var f: float = fps()
-	return 0.0 if f <= 0.0 else float(frame_count()) / f
+	var tot: float = 0.0
+	for ms in frame_durations_ms():
+		tot += ms
+	return tot / 1000.0
 
 
 ## "anticipo" | "attivi" | "recupero" | "". La hitbox di US-008 e' aperta

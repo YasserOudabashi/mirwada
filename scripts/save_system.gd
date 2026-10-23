@@ -49,6 +49,9 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		"schema_version": VERSIONE_CORRENTE,
 		"salvato_il": int(Time.get_unix_time_from_system()),
 		"nome_personaggio": str(dati.get("nome_personaggio", "")),
+		# Modalita' scelta a inizio partita (data/modalita.json). Senza bump: un
+		# save vecchio non ce l'ha e GameState usa il default dei dati.
+		"modalita": str(dati.get("modalita", "")),
 		"tempo_gioco": float(dati.get("tempo_gioco", 0.0)),
 		"posizione": _vettore_a_lista(dati.get("posizione", Vector2.ZERO)),
 		"statistiche": (dati.get("statistiche", {}) as Dictionary).duplicate(true),
@@ -425,6 +428,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"schema_version": _campo(raw, "schema_version", TYPE_FLOAT, float(VERSIONE_CORRENTE)),
 		"salvato_il": _campo(raw, "salvato_il", TYPE_FLOAT, 0.0),
 		"nome_personaggio": _campo(raw, "nome_personaggio", TYPE_STRING, ""),
+		"modalita": _campo(raw, "modalita", TYPE_STRING, ""),
 		"tempo_gioco": _campo(raw, "tempo_gioco", TYPE_FLOAT, 0.0),
 		"posizione": _posizione(raw.get("posizione")),
 		"statistiche": _campo(raw, "statistiche", TYPE_DICTIONARY, {}),

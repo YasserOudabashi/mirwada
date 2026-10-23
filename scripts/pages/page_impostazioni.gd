@@ -226,7 +226,7 @@ func _scala() -> void:
 	var o := OptionButton.new()
 	for n in [1, 2, 3]:
 		o.add_item("x%d" % n, n)
-	o.select(o.get_item_index(int(_ss().call("get_val", "video", "scala_finestra", 2))))
+	o.select(o.get_item_index(int(_ss().call("get_val", "video", "scala_finestra", 1))))
 	o.item_selected.connect(func(i: int) -> void:
 		_ss().call("set_val", "video", "scala_finestra", o.get_item_id(i)))
 	h.add_child(l)

@@ -806,6 +806,10 @@ def main():
                 if n <= 0:
                     err(f"data/animations.json [{cat}.{name}]: frames deve essere > 0")
                     continue
+                durate = an.get("durate_ms")
+                if durate is not None and (len(durate) != n or any(d <= 0 for d in durate)):
+                    err(f"data/animations.json [{cat}.{name}]: durate_ms deve avere {n} valori > 0 "
+                        f"(uno per frame), ne ha {len(durate)}")
                 # ogni indice di frame citato deve esistere davvero
                 for key in ("anticipo", "attivi", "recupero", "finestra_perfetta"):
                     for idx in an.get(key, []):
@@ -927,6 +931,10 @@ def main():
             dm = reg.get("densita_mistica")
             if not isinstance(dm, (int, float)) or not (0.0 <= dm <= 1.0):
                 err(f"{rel} [{rid}]: densita_mistica deve essere un numero in [0, 1]")
+            # US-8B12b: luoghi della mappa -> location_tag della regione (nomi diversi)
+            for luogo, t in (reg.get("luoghi_mondo") or {}).items():
+                if t not in reg.get("location_tags", []):
+                    err(f"{rel} [{reg.get('id')}]: luoghi_mondo '{luogo}' -> '{t}', che non e' tra i suoi location_tags")
             for t in reg.get("location_tags", []):
                 if valid_location_tags and t not in valid_location_tags:
                     err(f"{rel} [{rid}]: location_tag '{t}' fuori dal vocabolario di "
@@ -1979,6 +1987,23 @@ def main():
     if stubs:
         warn(f"data/i18n/it.json: {stubs}/{len(i18n_it)} stringhe ancora da tradurre "
              f"(valore 'TODO ...'). Non e' un errore: e' lavoro di traduzione.")
+
+    # --- Modalita' di gioco (data/modalita.json, decisione 2026-10-20) ---
+    # I nomi dei moltiplicatori sono un vocabolario chiuso: il codice li legge per nome (hurtbox, ability_engine).
+    MOLTIPLICATORI = {"danno_al_giocatore", "danno_ai_nemici", "cure"}
+    mod = load_json(os.path.join(DATA, "modalita.json"))
+    if mod:
+        tutte = mod.get("modalita", {})
+        if mod.get("default") not in tutte:
+            err(f"data/modalita.json: default '{mod.get('default')}' non e' tra le modalita' {sorted(tutte)}")
+        for mid, m in tutte.items():
+            if m.get("tema_arte") not in ("luminoso", "cupo"):
+                err(f"data/modalita.json [{mid}]: tema_arte dev'essere 'luminoso' o 'cupo'")
+            for nome, v in m.get("moltiplicatori", {}).items():
+                if nome not in MOLTIPLICATORI:
+                    err(f"data/modalita.json [{mid}]: moltiplicatore '{nome}' sconosciuto (ammessi: {sorted(MOLTIPLICATORI)})")
+                elif not isinstance(v, (int, float)) or isinstance(v, bool) or v <= 0:
+                    err(f"data/modalita.json [{mid}.{nome}]: dev'essere un numero > 0")
 
     # --- VFX (data/vfx.json, US-226) ---
     vfx = load_json(os.path.join(DATA, "vfx.json"))

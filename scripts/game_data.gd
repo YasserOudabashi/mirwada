@@ -47,6 +47,7 @@ const PATH_I18N_EN := "res://data/i18n/en.json"
 const PATH_UI_BOOK := "res://data/ui/book.json"
 const PATH_PAGE_TYPES := "res://data/schema/page_types.json"
 const PATH_VFX := "res://data/vfx.json"
+const PATH_MODALITA := "res://data/modalita.json"
 const PATH_ITEM_CATEGORIES := "res://data/schema/item_categories.json"
 const PATH_EQUIP_SLOTS := "res://data/schema/equip_slots.json"
 const PATH_SIGILS := "res://data/sigils/core.json"
@@ -94,6 +95,7 @@ var _i18n_en: Dictionary = {}
 var _ui_book: Dictionary = {}
 var _page_types: Dictionary = {}
 var _vfx: Dictionary = {}
+var _modalita: Dictionary = {}
 var _items: Dictionary = {}
 var _structures: Dictionary = {}
 var _pets: Dictionary = {}
@@ -183,6 +185,7 @@ func load_all() -> void:
 	_load_single(PATH_UI_BOOK, "pages", _ui_book, TYPE_ARRAY)
 	_load_single(PATH_PAGE_TYPES, "page_types", _page_types, TYPE_ARRAY)
 	_load_single(PATH_VFX, "pathway_palette_visiva", _vfx, TYPE_DICTIONARY)
+	_load_single(PATH_MODALITA, "modalita", _modalita, TYPE_DICTIONARY)
 	_load_single(PATH_ITEM_CATEGORIES, "item_categories", _item_categories, TYPE_ARRAY)
 	_load_single(PATH_EQUIP_SLOTS, "slots", _equip_slots, TYPE_ARRAY)
 	_load_single(PATH_ROOM_TYPES, "tipi", _room_types, TYPE_ARRAY)
@@ -592,6 +595,20 @@ func get_primitive_vfx(tipo: String) -> Dictionary:
 
 func get_vfx(sezione: String) -> Dictionary:
 	return _dict_or_empty(_vfx.get(sezione))
+
+
+## --- Modalita' di gioco (data/modalita.json) ---
+## {tema_arte, moltiplicatori} della modalita'; {} se non esiste.
+func get_modalita(id: String) -> Dictionary:
+	return _dict_or_empty(_dict_or_empty(_modalita.get("modalita")).get(id))
+
+
+func modalita_ids() -> Array:
+	return _dict_or_empty(_modalita.get("modalita")).keys()
+
+
+func modalita_default() -> String:
+	return str(_modalita.get("default", "facile"))
 
 
 ## --- Regioni del mondo (data/world/regions.json, US-601) ---

@@ -264,6 +264,22 @@
     "stile": "inversione",
     "durata_frames": 2
   },
+  "lampo_colpito": {
+    "_comment": "Lampo del colpo subito sullo sprite (revisione arte 1.7): lo fa il gioco, non il foglio. intensita' moltiplica i colori (self_modulate) e torna a 1 in durata_ms; con riduci_flash vale intensita_ridotta.",
+    "durata_ms": 120,
+    "intensita": 2.6,
+    "intensita_ridotta": 1.25
+  },
+  "ombra_terra": {
+    "_comment": "Ellisse disegnata dal gioco sotto i piedi di ogni entita' animata (revisione arte 2.2): gli sprite non hanno ombre cotte. raggi in unita' di gioco (1 tile = 32).",
+    "colore": "#181425",
+    "alpha": 0.3,
+    "raggi": {
+      "personaggio": [6, 2],
+      "nemico_base": [6, 2],
+      "pet": [7, 2]
+    }
+  },
   "nero_di_scena": {
     "_comment": "Lo sfondo si mangia di nero nei momenti forti (design-vfx principio 2).",
     "trigger": [

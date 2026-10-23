@@ -118,3 +118,9 @@ TRIB_EFFETTO_SPIRITUALITA_DIMEZZATA,spiritualita' massima dimezzata,max spirit h
 TRIB_EFFETTO_NEMICI_RINFORZATI,nemici piu' numerosi e forti,enemies more numerous and stronger
 TRIB_EFFETTO_ABILITA_BLOCCATE,abilita' della Sequenza corrente bloccate,current Sequence abilities locked
 TRIB_EFFETTO_NOTTE_PERENNE,la notte non finisce,the night does not end
+BOOK_FRONTESPIZIO_MODALITA,Modalità (per sempre):,Mode (for good):
+BOOK_FRONTESPIZIO_MODALITA_PARTITA,Modalità,Mode
+MODALITA_FACILE,Facile,Easy
+MODALITA_DIFFICILE,Difficile,Hard
+MODALITA_FACILE_DESCR,"Mondo luminoso, combattimento di sempre","Bright world, standard combat"
+MODALITA_DIFFICILE_DESCR,"Mondo cupo come le illustrazioni: nemici più duri, cure più deboli","Dark world like the concept art: tougher enemies, weaker healing"

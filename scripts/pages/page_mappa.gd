@@ -73,7 +73,7 @@ func _viaggia(target: String) -> void:
 	if main == null:
 		return
 	for c in main.get_children():
-		if c.get_script() != null and c.get_script().resource_path.ends_with("region_scene.gd"):
+		if c.has_method("viaggia_a"):          # scena di regione o mondo unico
 			if bool(c.call("viaggia_a", target)):
 				var book: Node = _n("/root/Book")
 				if book != null:

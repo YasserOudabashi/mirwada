@@ -274,6 +274,8 @@ func _su_danno_subito(danno: float, _stagger: float, _da: Node, tag_danno: Strin
 	if danno > 0.0 and _audio != null:
 		_audio.call("feedback", "damage_taken")
 	if danno > 0.0:
+		if _anim != null:
+			_anim.call("lampo")
 		_traccia("damage_taken", {"quantita": danno, "tag_danno": tag_danno})
 
 

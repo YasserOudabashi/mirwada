@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "_comment": "Modalita' di gioco (decisione 2026-10-20). Si sceglie a inizio partita, resta fissa e va nel salvataggio (campo 'modalita'; un save senza il campo e' 'default'). tema_arte: quale set di asset usa il mondo (luminoso = arte di sempre, cupo = come le concept, forge3d/tema.py). moltiplicatori: i numeri della difficolta', letti dal gioco con GameState.moltiplicatore(nome); un nome assente vale 1. Valori di partenza da provare a schermo, non bilanciati.",
+  "default": "facile",
+  "modalita": {
+    "facile": {
+      "tema_arte": "luminoso",
+      "moltiplicatori": {}
+    },
+    "difficile": {
+      "tema_arte": "cupo",
+      "moltiplicatori": {
+        "danno_al_giocatore": 1.5,
+        "danno_ai_nemici": 0.8,
+        "cure": 0.7
+      }
+    }
+  }
+}

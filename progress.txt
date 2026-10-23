@@ -7660,3 +7660,1273 @@ toccato). Suite non rilanciata: in questo commit non c'e' un solo file
 PROSSIMO PASSO: mergiare la PR #3 (chiusura fase 7) in main, poi generare
 prd.json dal PRD con /ralph 006_PRD/prd-fase-8-vertical-slice.md e
 correggere i campi come dice prossimi-passi.md § 2. Poi US-801.
+
+[2026-10-12] ARTE (fuori PRD) — guida arte/ allineata a sprite-forge, tempi per frame, scale_mode integer, primo sprite vero.
+- Guida: arte/ + art-brief-gemini.md cap. 6.7 allineati alla skill sprite-forge
+  (contorno 1px inchiostro per sprite/tile, 2px solo VFX; max 16 colori in ramp
+  con hue shift; tileset senza contorno su pavimento/acqua). Key art Gemini
+  rinominate con l'id della regione (assets/concept/regioni/<id>.jpg).
+- Tempi: animations.json accetta durate_ms (un valore per frame) al posto di
+  fps. AnimationSpec.frame_durations_ms(), AnimationMachine usa la durata per
+  frame di Godot (velocita' 1000 = ms). Valori della skill su idle, walk,
+  attacchi (personaggio/nemico/pet). Dash e parata RESTANO a fps: i-frame e
+  parata perfetta sono finestre di gameplay. Validator: durate_ms = 1 valore
+  > 0 per frame. NB: attacchi piu' lenti di prima (light 312 -> 450 ms,
+  heavy 571 -> 850 ms, nemico 250 -> 390 ms): da provare col pad in mano.
+- project.godot: window/stretch/scale_mode="integer".
+- Primo sprite vero: personaggio_idle (Enel, 4 dir x 4 frame, respiro 1px).
+  Sorgente arte/sprite/personaggio_idle.json (sprite-forge), sheet a
+  --padding 0 -> assets/placeholder/personaggio_idle.png (128x128).
+  generate_placeholders.py salta i file che hanno un JSON in arte/sprite/.
+- Come verificato: check.py 0 errori/0 avvisi; 604 test headless verdi
+  (+1: ripiego su fps); validate exit 0; verifica a schermo sotto Xvfb con 4
+  AnimationMachine reali in idle (righe down/up/left/right corrette, pixel
+  netti). Non verificato: il feel dei nuovi tempi in combattimento vero.
+- Aperto: left = right specchiato (luce compresa); gli altri 9 file del
+  personaggio, nemico e pet restano placeholder.
+
+[2026-10-12] ARTE (fuori PRD) — Enel ridisegnato "piu' mostruoso" + tutte le 10 animazioni del personaggio.
+- Design (scelte dell'utente: spada pesante, versione piu' mostruosa): cappotto
+  lungo quasi nero a V, coppola calata, viso in ombra con due occhi freddi che
+  brillano e una crepa luminosa dall'occhio (anche sulla nuca), sciarpa rossa
+  lunga, avambracci fasciati con le code strappate, ombra viola che cola
+  dall'orlo + pozza ai piedi, spadone in spalla a riposo. 16 colori in ramp.
+- arte/sprite/build_enel.py: costruttore a manichino (teste a mano, corpo a
+  forme, luce/contorno/ombra portata calcolati) -> 10 JSON sprite-forge ->
+  sheet in assets/placeholder/personaggio_*.png (174 frame). NB: ~800 righe,
+  sopra il limite di diff di CLAUDE.md regola 3: e' uno strumento d'arte, non
+  gameplay; nessuna riga di codice di gioco toccata.
+- Leggibilita' del combat nei dati: dash = scia viola solo nei frame i-frame
+  (0-2); parry = occhi accesi + bagliore sulla lama nei frame 0-1 (finestra
+  perfetta); attacchi = smear solo sul frame attivo; heavy = tell (bagliore
+  sugli occhi) al frame 0, lama carica al 3, crepa nel suolo all'impatto;
+  cast = bagliore che esplode al frame 3 (ability_release).
+- Come verificato: check.py 0 errori su tutti e 10 (avvisi = pixel isolati di
+  occhi/scie/bagliori, voluti); dimensioni degli sheet = frame x 32 per
+  4 righe (1 per death/meditate); generate_placeholders.py li salta tutti;
+  604 test verdi; validate exit 0; mosaico a schermo sotto Xvfb con la vera
+  AnimationMachine (10 animazioni, vista right e down, ogni frame).
+- Aperto: left = right specchiato; i tempi d'attacco nuovi vanno provati
+  giocando; nemico_base e pet restano placeholder.
+
+[2026-10-13] ARTE (fuori PRD) — nemico base e pet dal set di Claude in Chrome; merge di main.
+- Merge di main nel branch (fase 7 chiusa + PRD fase 8): conflitti solo su
+  arte/*.md (main aveva la guida originale, identica alla base: tenuta la
+  versione aggiornata) e progress.txt (tenute entrambe le parti). 777 test.
+- Zip dell'utente (fatto da Claude in Chrome), 19 fogli + 4 anteprime _x:
+  scelta dell'utente = tenere l'Enel del costruttore (lo zip ha un altro
+  personaggio, 24-25 colori, e lo avrebbe sovrascritto) e prendere nemico
+  base (teppista con mazza ferrata, 17-19 colori) e pet (lupo, 9 colori).
+  Fogli originali in arte/sprite/*.png, copiati in assets/placeholder/.
+- generate_placeholders.py salta anche i fogli con un .png in arte/sprite/
+  (prima solo .json): ora salta tutti e 19 i fogli veri.
+- Come verificato: dimensioni = griglia di animations.json (19/19); mosaico
+  a schermo sotto Xvfb con la vera AnimationMachine per nemico_base e pet
+  (ogni animazione, vista right e down); validate exit 0; 777 test verdi.
+- Aperto: (1) il tell del nemico al frame 0 di 'anticipo' e' debole (36-50
+  pixel diversi dall'idle contro 174-341 al frame 1): FR-8 lo vuole ovvio dal
+  primo frame - c'e' il tell_audio, ma il visivo andrebbe rinforzato;
+  (2) la death del nemico finisce con la sola testa che affonda;
+  (3) CONFLITTO CON US-812 (fase 8): come scritta, generate_sprites.py
+  rigenera tutti i 19 fogli (cancellerebbe l'arte vera), chiede l'outline
+  2px e un Enel diverso da quello scelto. Va aggiornata prima di eseguirla.
+
+[2026-10-13] ARTE (fuori PRD) — allineamento al CLAUDE.md v2.
+- CLAUDE.md v2 (fornito dall'utente) nel repo. Tabella dei tempi aggiornata ai
+  valori veri di animations.json (scelta dell'utente: tenere i tempi attuali).
+- tools/art/build_enel.py (spostato da arte/sprite/): palette Endesga 32
+  (cappotto #262b44/#3a4466/#5a6988, pelle #733e39/#c28569/#e8b796, sciarpa
+  #a22633/#be4a2f, bende/acciaio #8b9bb4/#c0cbdc, occhi #2ce8f5/#ffffff,
+  gocce #68386c, contorno #181425); tolta la pozza d'ombra cotta (l'ombra a
+  terra la compone il gioco). Restano le gocce: sono il personaggio.
+- tools/art/generate_all.py: personaggio -> build_enel.py; nemico_base/pet ->
+  copia da arte/sprite/*.png verificando la geometria su animations.json;
+  nemico_base.anticipo: contorno esterno -> #e43b44 in tutti i frame (il
+  tell si legge da fermo, dal frame 0).
+- US-812 segnata SUPERATA nel PRD di fase 8 (rigenererebbe l'arte vera).
+- Comando: python tools/art/generate_all.py (deterministico, nessun seed).
+- Come verificato: check.py 0 errori su 10 file; colori fuori Endesga 32 = 0
+  per personaggio/nemico_base/pet; alpha intermedia solo nell'ombra a terra
+  di nemico e pet; mosaico a schermo sotto Xvfb con AnimationMachine.
+- Aperto: rampe bende/acciaio "dritte" (Endesga non ha grigi chiari con hue
+  shift); ombra a terra di nemico e pet ancora cotta nello sprite (ammessa,
+  ma andrebbe composta nel gioco); death del nemico che affonda.
+
+[2026-10-13] US-8B10 (in corso) — struttura del mondo: risposte dell'utente.
+Giro 1-3 (12 risposte):
+- Mondo UNICO collegato (non 5 mappe separate). Regioni GRANDI: 15-20
+  schermate ciascuna (a 64 px una schermata ~20x11 tile -> ~100x60 tile per
+  regione, mondo ~300x200 tile).
+- Mirwada = citta' di porto sul MARE. Clima a gradiente: NORD FREDDO, SUD CALDO.
+- Disposizione delle regioni: la decide Claude, coerente col lore, e la
+  mostra su una mappa di prova da correggere.
+- Passaggi tra regioni: CONFINI NATURALI (le regioni confinano); i varchi
+  chiusi dal gating (AreaGate) solo dove serve bloccare.
+- Base del giocatore: SI SCEGLIE / SI SPOSTA tra piu' luoghi (serve codice:
+  story a parte, da spiegare prima).
+- Movimento: si viaggia anche a NUOTO, in BARCA, ARRAMPICANDOSI e VOLANDO.
+  Tutti e quattro si SBLOCCANO (chiavi del mondo stile metroidvania, usate
+  come condizioni di AreaGate). Volo = VOLO LIBERO sopra la mappa (molto
+  codice e arte: story dedicate).
+- Archivio Sepolto: TUTTO AL CHIUSO (sotterraneo). Le altre regioni all'aperto.
+- Vegetazione: DIVERSA PER REGIONE.
+Giro 4 (4 risposte, totale 16):
+- Ingressi: UNO PRINCIPALE per regione + 1-2 passaggi SEGRETI (che chiedono
+  un movimento sbloccato: nuoto, barca, scalata, volo).
+- Parte chiusa all'inizio: POCA, circa 15% per regione (segreti + siti rituali).
+- Base sceglibile tra TUTTI e 4 i luoghi proposti: casa a Mirwada (porto),
+  rifugio nelle Marche, capanna nella Valle, NAVE (base mobile).
+- Mare: ISOLE DA ESPLORARE, raggiungibili in barca, con segreti e siti.
+- Prossimo passo: Claude propone la disposizione delle 5 regioni (scelta
+  lasciata a Claude), poi un giro di 10-15 domande per regione.
+- DISPOSIZIONE SCELTA: variante C (schizzo a 3 varianti mostrato all'utente).
+  Marche nord-ovest, Archivio nord-est (tutto al chiuso), Mirwada centro-sud
+  sul porto, Valle sud-est sulla costa, FRONTIERA = isola grande e nebbiosa
+  nel mare a sud, solo in barca o volo (gating naturale dell'endgame).
+  Schizzo: script usa-e-getta nello scratchpad, non e' un asset (la mappa
+  vera e' US-8B13 con forge3d e seed).
+
+[2026-10-13] US-8B14 (in corso) — Mirwada: risposte dell'utente.
+Giro 1-2 (8 risposte):
+- Stile MISTO: centro antico in pietra chiara sulla collina, quartiere
+  operaio industriale e porto con ciminiere in basso.
+- MURA VECCHIE IN ROVINA: la citta' nuova e' cresciuta fuori.
+- META' citta', META' campagna (su 15-20 schermate).
+- Sotterraneo = GRANDE RETE DI FOGNE (livello interno grande quanto mezza
+  citta', scorciatoie sotto i quartieri).
+- GRANDE PORTO COMMERCIALE: moli lunghi, navi a vapore e vela, gru,
+  magazzini, dogana, cantiere navale.
+- Archivio dell'ordine minore (Ottavia) FUORI LE MURA: ex monastero in
+  campagna, primo passo verso l'Archivio Sepolto a nord.
+- Campagna: uliveti e vigneti, fattorie e mulini, cimitero monumentale,
+  faro e scogliere + (aggiunta dell'utente) PICCOLE CAVERNE con forzieri e
+  qualche mostro, CASETTE con oggetti casuali.
+  NB: forzieri e oggetti casuali = oggetti di scena + tabelle di bottino nei
+  dati; se il sistema non c'e' e' una story di codice da spiegare prima.
+  I mostri nelle caverne per ora sono nemico_base (nemici per regione: PRD a parte).
+- Casa-base a Mirwada VICINO AL PORTO (magazzino riadattato).
+Giro 3 (4 risposte, totale Mirwada 12 -> regione definita):
+- Monumento di riferimento: IL FARO sulle scogliere (si vede anche di notte).
+- Notte: LAMPIONI A GAS sulle strade principali, vicoli bui (luci = oggetti
+  nei dati, non dipinte sul terreno).
+- Ingressi alle fogne: TOMBINI in strada, SBOCCO SUL MARE vicino al porto
+  (contrabbando), CANTINE SEGRETE con botola (passaggi segreti).
+- Vegetazione: POCA IN CITTA', TANTA FUORI (campagna coltivata).
+
+[2026-10-13] US-8B15 (in corso) — Marche del Crepuscolo: risposte (12, regione definita).
+- Luce: CICLO NORMALE ma toni crepuscolari anche di giorno (le regole sulla
+  notte, es. cripte a notte_fonda, restano valide).
+- Terreno: ALTOPIANO A GRADONI (terrazze di roccia a livelli).
+- Campo di battaglia: di GIGANTI (ossa enormi, armi grandi come alberi).
+- Cripte: MISTO (mausolei in superficie; solo la cripta principale scende
+  in una mappa sotterranea separata).
+- Trono del Gigante: SCOLPITO NELLA MONTAGNA, sul gradone piu' alto, visibile
+  da tutta la regione. Fog of war: nessun nome/scritta sulla mappa.
+- Vegetazione: QUASI NIENTE (roccia, ghiaia, muschio).
+- Abitanti: SOLO EREMITI (capanne isolate); il rifugio-base e' isolato.
+- Tempio abbandonato: TEMPIO DEI GIGANTI (colonne enormi, scale troppo alte).
+- Soglia del Crepuscolo: VORAGINE con scale che scendono nel buio.
+- Tra i gradoni: RAMPE E SENTIERI (sempre), SCALE DEI GIGANTI e PARETI
+  SCALABILI (solo con arrampicata sbloccata).
+- Ingresso principale da Mirwada: PASSO TRA DUE RUPI.
+- Passaggi segreti in ombra (shadow_meld): OMBRE TROPPO SCURE che non si
+  muovono con la luce.
+
+[2026-10-13] US-8B16 (in corso) — Valle della Madre: risposte (12, regione definita).
+- GIUNGLA TEMPERATA: liane, felci giganti, fiori grandi, nebbia bassa.
+- Radice del Mondo: ALBERO COLOSSALE (tronco come una montagna, sito tra le radici).
+- Costa: SCOGLIERE E GROTTE (grotte di marea che seguono la luna).
+- Abitanti: VILLAGGIO SUGLI ALBERI (case sui rami, ponti di corda).
+- Radure lunari: NASCOSTE di giorno, si scoprono solo di notte.
+- Burroni dei ponti di radici: ENTRAMBI (con fiume = alternativa a nuoto;
+  senza fondo = solo radici o volo).
+- Altare di radici: in una RADURA ISOLATA, percorso difficile.
+- Ingresso principale da Mirwada: GALLERIA DI ALBERI (arco di rami).
+- Grotte di marea: MISTO (piccole sulla mappa, la grande e' un interno).
+- Sorgenti: CASCATE in conche di felci.
+- Fauna d'atmosfera (non nemici): UCCELLI E FARFALLE, CERVI E ANIMALI GRANDI,
+  LUCCIOLE di notte (VFX). -> nuova story US-8B23.
+- Zone delle bestie profonde: avviso nell'ambiente, OSSA E GRAFFI.
+
+[2026-10-13] US-8B17 (in corso) — Archivio Sepolto: risposte (12, regione definita).
+- Ingresso in superficie: SCALINATA SCAVATA nella neve fino a un portone.
+- Interno A PIANI, si scende (ogni piano e' una mappa). 5 PIANI, temi
+  (proposta di Claude accettata): 1 sale di lettura (biblioteca barocca),
+  2 studi degli studiosi, 3 officine meccaniche, 4 sala dei sigilli,
+  5 Biblioteca di Tutto.
+- Stile MISTO: ali di biblioteca barocca + ali di officine meccaniche.
+- Torre di osservazione: SPUNTA DALLA NEVE (unica parte esterna), si sale dal piano 1.
+- Biblioteca di Tutto: SFERA DI LIBRI con passerelle sospese.
+- Porte sigillate (gating di conoscenza): PORTE CON GLIFI che si accendono.
+- Contenuti: libri da leggere, costrutti dormienti, forzieri e scrivanie
+  (US-8B22), fantasmi di studiosi innocui (atmosfera e indizi).
+- Luce: CRISTALLI E GLIFI (luce fredda).
+- Tra i piani: MONTACARICHI MECCANICI da riattivare + POZZI E CROLLI.
+  NB: niente scale -> si scende dai pozzi (senza ritorno) e si risale con i
+  montacarichi riattivati o arrampicandosi. Da verificare nel level design
+  che non si resti bloccati.
+- Superficie: PIANURA BIANCA VUOTA (solo neve, scalinata e torre).
+
+[2026-10-13] US-8B18 (in corso) — Frontiera delle Porte: risposte (12, regione definita).
+- Da Mirwada: NEBBIA, per vederla bene serve un CANNOCCHIALE (richiesta
+  dell'utente) -> ENTRAMBI: cannocchiale fisso sul faro (il primo) + uno da
+  tasca trovato piu' avanti. Nuova story US-8B24.
+- Forma: ENTRAMBI: isola d'arrivo normale, poi nebbia e arcipelago sospeso
+  di 5-6 ISOLETTE collegate da porte/teletrasporti.
+- Approdo: DIPENDE: in barca al molo, in volo dove vuoi sull'isola d'arrivo.
+- Teatro: TEATRO DEI BURATTINI (fili dal cielo, quinte di legno dipinte,
+  scala strana).
+- Porta senza Stanza: PORTA DI SCENA SUL PALCO del teatro, si apre su un vuoto vero.
+- Crocevia: INCROCIO DI STRADE SOSPESE, ognuna finisce in una porta.
+- Zone sbagliate (Error): TUTTE: oggetti sospesi, riflessi sbagliati,
+  glitch visivi, tempo fermo.
+- Colore: PASTELLO SBIADITO (vecchia cartolina).
+- Abitanti: BURATTINI E MANICHINI che recitano scene a ripetizione (innocui).
+- Soglia = BORDO di un'isoletta dove il terreno finisce nella nebbia;
+  nebbia_grigia = zona dove la nebbia copre il terreno.
+
+[2026-10-13] US-8B18b (in corso) — Isole: risposte (6, definite).
+- 6 isole piccole (oltre alla Frontiera), CLIMA DIVERSO PER ISOLA. Temi
+  (proposta di Claude accettata): 1 Isola del Relitto (rocciosa, nave
+  naufragata, forzieri dei contrabbandieri), 2 Isola Vulcanica (cenere,
+  ingredienti rari di fuoco), 3 Isola Tropicale (palme, laguna, villaggio di
+  pescatori), 4 Isola delle Rovine (culto antico, indizi sulla Frontiera),
+  5 Scoglio del Faro abbandonato (un eremita), 6 Isola del Boss.
+- Contenuti: forzieri e relitti, ingredienti rari, rovine misteriose, abitanti.
+- ISOLA DEL BOSS (richiesta dell'utente): un boss che comanda mostri piu'
+  piccoli; sconfitto il boss muoiono anche loro. NASCOSTA: si trova solo
+  seguendo un indizio (mappa del tesoro, dialogo). Dettagli della meccanica:
+  DOPO, insieme al PRD dei nemici (decisione 3).
+- Viaggio: BARCA LIBERA + VOLO tra le isole vicine.
+
+STATO US-8B10 (struttura del mondo + biomi): DECISO. 5 regioni + 6 isole,
+83 risposte in tutto. Prossimo: spiegare US-8B01 (64 px), US-8B02 (forge3d
+nel repo), US-8B11 (terreni nuovi) e US-8B13 (mappa di prova) e aspettare il via.
+
+[2026-10-13] US-8B02 — forge3d dentro il repo. FATTA.
+- tools/art/forge3d/ = copia di sprite-forge/scripts/forge3d (14 file .py),
+  hash originali in ORIGINE.sha256, note e modifiche in ORIGINE.md.
+- Modifica 1 (bug del generatore): terrain.py usava hash(name), che in
+  Python cambia a ogni avvio -> texture dei terreni diverse a ogni lancio
+  anche con lo stesso seed. Ora zlib.crc32(name.encode()). Da riportare
+  nella skill originale.
+- Aperto: build_enel.py usa ancora render.py/check.py della skill esterna
+  (per i JSON di sprite-forge): da portare nel repo se servira' rigenerare
+  Enel sul PC dell'utente (US-8B30 lo riscrive comunque a 64 px).
+
+[2026-10-13] US-8B13 — mappa di prova del mondo intero (grezza). IN REVISIONE CON L'UTENTE.
+- Comando: python tools/art/build_world.py --seed 4   (~8 s; --senza-ritagli <1 s)
+- Uscita in arte/mondo/: mondo_prova.png (3 px per tile, confini e luoghi),
+  5 ritagli a tile vere (porto, passo, galleria, scalinata, approdo
+  Frontiera). world_prova.json NON committato (.gitignore): si rigenera dal seed.
+- 320x220 tile, variante C. Regioni = Voronoi deformato dal rumore + pulizia
+  delle enclavi; Frontiera e 6 isole = ellissi nel mare. Marche a gradoni che
+  salgono verso nord-ovest; rupi di pietra sul confine con il passo; muro di
+  giungla sul confine della Valle con la galleria; citta' a isolati con mura a
+  tratti; 2 fiumi; strade A* dal porto a passo, galleria, scalinata, archivio
+  dell'ordine e cimitero; 21 luoghi suggeriti.
+- Verificato: stesso seed -> stessi PNG (md5 identico su due lanci, dopo la
+  correzione di terrain.py); validate exit 0; nessun file di gioco toccato.
+- Guardato ingrandito: OK disposizione, passo tra due rupi leggibile, giungla
+  fitta; NON OK ancora: texture dell'erba a righe regolari, neve a strisce
+  (terreni: US-8B11); citta' = griglia rotonda senza moli (edifici: US-8B18);
+  Frontiera con terreni normali (pastello: US-8B11); trono vicino all'angolo
+  nord-ovest (gradone piu' alto = piu' lontano da Mirwada): da confermare.
+- Giro di revisione 1 (risposte dell'utente sulla mappa di prova):
+  altri seed + capire dove sono i villaggi; Archivio in superficie piu'
+  piccolo; trono nell'angolo OK; citta' OK ma "la costa piu' grande".
+  Fatto: --confronto 4 5 6 7 (arte/mondo/confronto_seed.png); villaggi,
+  case e capanne in giallo (villaggio sugli alberi, capanna-base Valle,
+  rifugio-base Marche, 3 eremiti, 3 fattorie, mulino sul fiume, 6 casette,
+  villaggio di pescatori sull'isola tropicale) + 3 caverne in rosso;
+  PESO Archivio 1.45 nel Voronoi; GOLFO davanti al porto (interpretazione
+  di "costa piu' grande", da confermare) + spiagge di Mirwada piu' larghe;
+  faro spostato sulla punta a ovest (era finito dentro il golfo).
+  Determinismo ricontrollato (md5 identico).
+- Giro di revisione 2: l'utente sceglie il SEED 6 (ora default dello script)
+  e conferma il GOLFO. Il golfo nel seed 6 era quasi invisibile (scavato dalla
+  costa locale, che li' e' gia' alta): ora e' a profondita' fissa (30x24 tile
+  attorno a H*COSTA), si vede con qualunque seed. md5 ricontrollato.
+- Da ritoccare nei dati (US-8B14/15): nel seed 6 un lobo di Mirwada a
+  nord-ovest resta chiuso dalle rupi delle Marche (casetta_1 dentro).
+
+[2026-10-13] US-8B11 (in corso) — terreni nuovi: risposte dell'utente.
+Mirwada (8):
+- Strade: DUE SELCIATI DIVERSI: centro antico in lastre di pietra chiara;
+  quartiere operaio e porto in ciottoli scuri e fango.
+- Banchine: ENTRAMBI: moli di pietra (bitte, anelli) per le navi grandi +
+  pontili di legno su pali per le barche piccole.
+- Uliveti e vigneti: FILARI (righe di terra lavorata, piante in fila).
+- Erba: VERDE BRILLANTE (come ora, ma senza le righe regolari).
+- Strade di campagna: LASTRICATO ANTICO mezzo coperto dall'erba.
+- Spiagge: MISTE: sabbia nelle calette, ciottoli vicino a porto e scogli.
+- Cimitero e monastero: terreno proprio, GHIAIA BIANCA E MARMO.
+- Acqua bassa: TURCHESE TRASPARENTE (si vede il fondo chiaro).
+Marche (4 domande, 7 scelte):
+- Roccia dei gradoni: ARENARIA ROSSICCIA a strati (si accende al crepuscolo).
+- Suolo: TUTTI E 4 a zone: ghiaia e pietrisco (il piu' diffuso), muschio
+  scuro (zone umide), terra bruciata e cenere (campo di battaglia dei
+  giganti), erica secca (pochi ciuffi).
+- Bordi dei gradoni: PARETI (scalabili con lo sblocco) + FRANE di pietrisco
+  dove passano i sentieri.
+- Neve al nord: NEVE PULITA (la stessa dell'Archivio).
+Valle (4):
+- Sottobosco: A ZONE: felci e foglie nelle zone aperte, radici e muschio
+  vicino agli alberi grandi.
+- Fango: PALUDE VERDE-BRUNA con pozze verdi e canne.
+- Scogliere: ARENARIA ROSSICCIA come le Marche (unisce le due regioni).
+- Radure lunari di notte: ERBA ARGENTATA LUMINOSA (terreno con variante notturna).
+Archivio (4):
+- Sale di lettura e studi: PARQUET SCURO a spina di pesce, tappeti logori.
+- Officine (piano 3): LAMIERA RIVETTATA E GRATE (si vede il piano di sotto).
+- Ghiaccio dentro: SOLO ALL'INGRESSO (scalinata e prima sala).
+- Neve in superficie: DUNE DI VENTO (ondulazioni morbide), al posto delle strisce.
+Frontiera e isole (4 domande, 6 scelte):
+- Pastello: ROSA E LILLA (erba lilla chiaro, sentieri rosa cipria).
+- Nebbia tra le isolette: TERRENO ANIMATO che scorre lento, non calpestabile.
+- Zone glitch: TILE MESCOLATI di altre regioni a scacchiera (nei dati, nessun
+  terreno nuovo).
+- Isole: CENERE + ROCCIA LAVICA con crepe arancioni (vulcanica), SABBIA
+  BIANCA (tropicale), LASTRE ANTICHE spaccate (rovine).
+
+[2026-10-13] US-8B11 spezzata in 4 (regola 3): 8B11a motivi + ritocchi +
+tavola campioni; 8B11b Mirwada (8 terreni); 8B11c Marche + Valle (9);
+8B11d Archivio + Frontiera + isole (10, nebbia animata). L'utente ha
+approvato la spiegazione e il via alla 8B11a.
+
+[2026-10-13] US-8B11a — motivi nuovi dei terreni + ritocchi. FATTA (in attesa dell'occhio dell'utente).
+- tools/art/forge3d/terrain.py: campo `contrast` (le macchie di fondo grandi
+  e ripetute ogni tile erano le "righe" dell'erba); 8 motivi nuovi (slabs,
+  rows, planks, herringbone, strata, plates, embers, dunes), misure in
+  frazioni di S; `_voronoi` estratto da cobbles; `accent` e `cells` opzionali.
+- Ritocchi: erba contrast 0.45; acqua bassa turchese (#1fb5d6, colore extra
+  nella rampa); neve a dune sottili e spezzate, rampa con piu' bianco,
+  contrast 0.2.
+- tools/art/campioni_terreni.py -> arte/terreni/campioni.png: ogni terreno
+  ripetuto 3x3 a 64 px x2 + pezzo di mappa con le transizioni. I motivi nuovi
+  sono mostrati con terreni "prova:" che esistono solo nello script.
+- Comandi: python tools/art/campioni_terreni.py ; python tools/art/build_world.py
+- Verificato: guardata la tavola ingrandita (3 giri: neve a zigzag -> a
+  macchie -> ok; piantine dei filari troppo piccole a 64 px -> ingrandite);
+  md5 identico su due lanci; validate exit 0; mappa di prova rigenerata.
+- Aperto: dry_grass, dirt, path e forest hanno ancora macchie che si ripetono
+  (si ritoccano con i terreni delle loro regioni, 8B11b/c); i colori delle
+  "prova:" sono provvisori.
+
+[2026-10-13] US-8B11b — terreni di Mirwada. FATTA (in attesa dell'occhio dell'utente).
+- 9 righe in tools/art/forge3d/terrain.py (8 previsti + ghiaia e marmo
+  separati): ciottoli_spiaggia 2.5, filari 5.5, lastricato_antico 8.2,
+  ghiaia 8.3, marmo 8.4, ciottoli_scuri 8.6, lastre_chiare 8.8,
+  molo_pietra 9.2, pontile_legno 9.4 (livelli decimali: nessuna rinumerazione).
+- slabs: parametro `slab` (2,4 blocchi; 2,2 lastre quadrate) e tono per
+  lastra (prima col*3 % 3 = 0 -> fasce dello stesso colore per riga).
+- campioni_terreni.py: tolte le prove gia' diventate terreni veri; nuova
+  "scena di Mirwada" (pontile e molo, porto, centro antico, campagna, cimitero).
+- Guardato ingrandito, 3 giri: lastre arancioni a mattoni -> quadrate chiare;
+  marmo a mattoni -> quadrato; ghiaia a macchie di neve -> sassolini fitti;
+  lastricato squadrato -> pietre irregolari con erba nelle fughe; fasce di
+  tono -> tono per lastra.
+- Verificato: md5 identico su due lanci (campioni + mappa); validate exit 0.
+- NON ancora usati da build_world.py: si collegano dopo il via dell'utente
+  sulla tavola (come concordato).
+
+[2026-10-13] US-8B11c — terreni di Marche e Valle. FATTA (in attesa dell'occhio dell'utente).
+- 9 righe in terrain.py: palude 3.2, erba_argentata 4.2 (versione notturna
+  delle radure: lo scambio giorno/notte e' codice Godot, US-8B12), erica_secca
+  5.2, felci 6.2, radici_muschio 6.4, muschio_scuro 6.6, pietrisco 7.2,
+  terra_bruciata 7.4, arenaria 9.0 (anche scogliere della Valle).
+- Codice: puddles con colore d'accento (pozze verdi della palude); strata con
+  `bande` (spessore); embers con `spessore` (radici sottili, lava larga).
+  Nessun motivo nuovo. Contrast 0.45 a dry_grass/forest/dirt/path (aperto da 8B11a).
+- campioni_terreni.py: SCENE come lista con id esplicito (mirwada, marche,
+  valle), ognuna salvata anche come arte/terreni/scena_<id>.png; controllo
+  sulle righe di lunghezza diversa (mi era capitato).
+- Guardato ingrandito, 3 giri: Marche troppo vivaci (arenaria a strisce
+  arancioni, pietrisco a cerchi, terra bruciata blu, erica tappeto viola) ->
+  bande spesse brune, cenere nera, erica marrone con punte viola; radici a
+  squame -> celle piu' grandi e linee sottili.
+- Verificato: md5 identico su due lanci; validate exit 0.
+- Aperto: radici_muschio mostra ancora un leggero disegno a triangoli
+  ripetuto; pietrisco quasi tinta unita da lontano. NON ancora usati da
+  build_world.py (si collegano tutti insieme dopo 8B11d, scelta dell'utente).
+
+[2026-10-13] US-8B11d — terreni di Archivio, Frontiera e isole. FATTA (in attesa dell'occhio dell'utente).
+- 10 righe in terrain.py: nebbia 0.2 (animata, 4 frame), sabbia_bianca 2.2,
+  erba_lilla 4.4, cenere 7.6, parquet 8.1, lamiera 8.15, terra_rosa 8.25,
+  lastre_rovine 8.9, roccia_lavica 9.1, ghiaccio 9.6. Totale terreni: 39.
+- Codice: motivo `fog` (il rumore scorre di S/4 per frame: il tile resta
+  raccordato e il 5o frame torna uguale al 1o); `herringbone` con `listello`.
+  Tappeti logori dell'Archivio = oggetti, non terreno. Zone glitch = dati.
+- campioni_terreni.py: PROVE vuoto (tutti i motivi sono ora terreni veri);
+  scene archivio, frontiera, isole; GIF dei terreni animati
+  (arte/terreni/anim_<terreno>.gif).
+- Guardato ingrandito, 2 giri: parquet a listelli minuscoli (stoffa) ->
+  listelli doppi; sabbia bianca color crema -> bianca. Nebbia: 4 frame
+  guardati, scorre senza scatti.
+- Verificato: md5 identico su due lanci; validate exit 0.
+- Aperto: le zone glitch con la dual grid escono ad angoli arrotondati (un
+  glitch vero sarebbe a blocchi: da decidere quando si fanno nei dati della
+  Frontiera); colori pastello extra da confermare guardandoli in gioco.
+- US-8B11 COMPLETA (a, b, c, d): 28 terreni nuovi + 7 ritoccati. Prossimo:
+  collegarli a build_world.py (mappa di prova con i pavimenti veri).
+
+[2026-10-14] Terreni collegati a build_world.py (chiusura di US-8B11). FATTO.
+- Mirwada: filari al posto dell'erba secca; citta' con strade in lastre_chiare
+  (meta' alta, centro antico) e ciottoli_scuri (meta' bassa, porto e
+  quartiere), "stone" resta solo come sedime degli edifici (US-8B18);
+  piazzale del porto in ciottoli; spiagge miste (ciottoli entro 28 tile dal
+  porto e sugli scogli, sabbia nelle calette); 2 moli di pietra (3x7) e 3
+  pontili di legno (2x5-6) nel golfo; strade di campagna in lastricato_antico;
+  cimitero e monastero = disco di ghiaia con centro in marmo.
+- Marche: fondo pietrisco, muschio_scuro nelle zone umide, erica_secca a
+  ciuffi, terra_bruciata nel campo di battaglia (baricentro della regione),
+  arenaria sui bordi dei gradoni, sulle rupi del confine e sulla costa.
+- Valle: felci (al posto di forest), radici_muschio nel cuore della giungla,
+  palude, scogliere di arenaria, muro di felci al confine.
+- Archivio: ghiaccio attorno alla scalinata. Isole: frontiera erba_lilla +
+  sentieri terra_rosa + cuore di nebbia; relitto pietrisco/arenaria;
+  vulcanica cenere + roccia_lavica; tropicale sabbia_bianca; rovine
+  lastre_rovine; faro arenaria; boss foresta + palude.
+- SENZA_ALBERI: lista dei terreni dove non crescono alberi. Frontiera: solo
+  alberi secchi (quelli pastello con gli oggetti).
+- Errori trovati e corretti: villaggi scesi da 17 a 11 (le fattorie si
+  cercavano sull'erba secca, ora filari) ; pontili larghi 1 = "salsicciotti"
+  (la dual grid arrotonda i tile isolati) -> larghi 2.
+- Ritagli in piu': cimitero, trono, radice del mondo, isola vulcanica.
+- Verificato: md5 identico su due lanci; validate exit 0. Radure lunari:
+  di giorno sono erba normale (la versione argentata e' notturna, US-8B12).
+
+[2026-10-14] DECISIONE DELL'UTENTE: il mondo attuale (320x220, ~210 schermate di
+terra) e' troppo piccolo. Proposte mostrate (immagine di confronto alla stessa
+scala): A x2, B x3, C x2 + terre di mezzo + arcipelago, D x2 + sottosuolo.
+SCELTA: C+D, MA con il mondo di base ingrandito davvero ("non che sia sempre la
+stessa grandezza") -> scala x3 (960x660 tile).
+- Regioni x3, piu' TERRE DI MEZZO tra le regioni (zone selvagge di nessun
+  gruppo; nei dati restano 5 regioni, le terre di mezzo sono zone dentro le
+  regioni vicine), ARCIPELAGO di isole vere, FRONTIERA come regione vera.
+- SOTTOSUOLO collegato sotto tutte le regioni (fogne, catacombe, grotte,
+  miniere), tanti ingressi.
+- Stima: ~2.500 schermate sopra + ~1.000 sotto; ~4-5 minuti per attraversarlo.
+- Conseguenze: in Godot serve il CARICAMENTO A PEZZI (story di codice);
+  world.json troppo grande -> salvare le mappe come immagini; nemici attivi
+  solo vicino al giocatore (PRD nemici); viaggi lunghi -> barca, volo, viaggio
+  rapido indispensabili (forse corsa o cavalcatura).
+- Prossimo: domande (XL) su terre di mezzo, arcipelago, sottosuolo.
+Domande sulla terra di mezzo (round 1, + schizzo a 2 varianti):
+- E' LA terra di mezzo (una sola), non 4 fasce: grande zona al centro del
+  continente che tocca tutte le regioni (variante 2 dello schizzo).
+- Dentro, 4 paesaggi: steppa gelata a nord, colline e rovine antiche a ovest,
+  foreste di confine a sud-est, paludi e brughiere a est.
+- Abitanti: villaggi liberi (mercanti, locande), banditi e fuorilegge, mostri
+  erranti + UN BOSS (richiesta dell'utente).
+- Boss: AL CENTRO, tra le rovine antiche; si vede da lontano, si torna a
+  sfidarlo quando si e' pronti.
+- Gating: PERICOLOSA (aperta ma con nemici forti).
+- Nei dati: resta da decidere come rappresentarla (regions.json ha 5 regioni:
+  sesta regione "neutra" o zona; data story da spiegare prima).
+Domande sull'arcipelago (round 2):
+- 15-20 ISOLE (oltre alla Frontiera), dimensioni MISTE: qualche grande
+  (30-50 schermate), molte medie (10-20), alcune piccole (2-5) con un segreto.
+- FRONTIERA: LA PIU' GRANDE DI TUTTE (350+ schermate).
+- Isole nuove (oltre alle 6 gia' decise): isola ghiacciata (nave intrappolata),
+  isola dei pirati (covo di contrabbandieri su palafitte, lega con Bruno),
+  isola-mostro (creatura enorme addormentata), atollo con laguna (segreto sul
+  fondo, nuoto).
+- Conseguenza: il mare deve crescere molto (Frontiera 350+ schermate + 15-20
+  isole): il mondo diventa piu' alto verso sud.
+- NB errore mio: avevo proposto l'isola ghiacciata "a sud-ovest", ma il sud e'
+  caldo -> da chiedere all'utente.
+Domande su isola ghiacciata e sottosuolo (round 3-4):
+- Isola ghiacciata: resta A SUD, ghiaccio MAGICO (maledizione/potere): il
+  mistero fa parte della storia.
+- Sottosuolo: UNA RETE UNICA sotto tutto il continente (da una regione
+  all'altra passando sotto terra). Contenuti: fogne e catacombe (Mirwada,
+  Marche), grotte naturali (Valle), miniere abbandonate (terra di mezzo,
+  Marche), CITTA' SOTTERRANEA sotto la terra di mezzo (popolo antico, sotto le
+  rovine del boss, collegata a tutte le regioni).
+- Luce: PENOMBRA (si vede tutto ma scuro, fonti di luce sparse).
+- Grandezza: UN TERZO della superficie (~700 schermate).
+- Ingressi: TANTI (30-50): tombini, pozzi, grotte, cripte, miniere.
+- Boss: UNO PER ZONA (fogne, catacombe, grotte, miniere).
+- Stima totale: superficie ~1.900 schermate di terra (regioni x3 + terra di
+  mezzo) + arcipelago e Frontiera (350+), sottosuolo ~700. Mondo di
+  superficie ~1200x900 tile (il mare cresce verso sud).
+
+[2026-10-14] US-8B13b + 8B13c — mappa di prova x3 con terra di mezzo, arcipelago e sottosuolo. FATTA (in revisione).
+- tools/art/build_world.py riscritto: 1200x1000 tile, continente nel 46% alto
+  (K=3.4 scala del paesaggio, KC=2 scala della citta'); LA terra di mezzo al
+  centro con 4 paesaggi (Voronoi interno) e le rovine del boss; Frontiera
+  enorme (raggio 245) con 6 isolette nella nebbia; 16 isole (grandi, medie,
+  piccole; mostro allungata, atollo ad anello con laguna bassa, ghiacciata,
+  pirati con villaggio); sottosuolo sulla stessa griglia (fogne a griglia sotto
+  la citta' + sbocco sul mare, catacombe a 240 stanze sotto le Marche, grotte
+  con laghi sotto la Valle, miniere a gallerie sotto la terra di mezzo,
+  citta' sotterranea sotto le rovine del boss), collegato in UNA rete (ogni
+  parte staccata si unisce con una galleria); 47 ingressi (stesso punto sopra
+  e sotto) e 4 boss di zona; nuovo terreno roccia_viva (pareti).
+- Misure (seed 6): superficie 3.350 schermate (Frontiera 689 = la piu'
+  grande, Marche 670, terra di mezzo 577, Valle 569, Mirwada 448, Archivio
+  196, 16 isole da 1,4 a 37), sottosuolo 731. ~23 s per generare tutto.
+- Niente scipy: distanze ed enclavi con numpy (lo script gira con solo numpy
+  e pillow). Alberi e rocce vettorializzati (72.928 oggetti).
+- Errori trovati guardando e corretti: Frontiera piu' piccola di Marche e terra
+  di mezzo (la mia stima "350+" era di prima dell'ingrandimento); citta' di
+  Mirwada finita sulla Frontiera (il porto cercava l'ultima terra a sud nella
+  colonna: ora solo sulla terra di Mirwada); Valle e Archivio scambiati
+  (ordine di spacchettamento sbagliato); fiumi a righe dritte (spinta verso
+  sud troppo forte per il mondo grande); boss del sottosuolo sul bordo; laguna
+  dell'atollo profonda invece che bassa. Tolti 5 ritagli vecchi.
+- Verificato: md5 identico su due lanci; validate exit 0.
+- Aperto: i fiumi ora fanno curve ma finiscono in laghetti senza arrivare al
+  mare; strade A* a "L" squadrate che corrono anche lungo la riva; anello
+  d'arrivo della Frontiera stretto rispetto alla nebbia; "un terzo" del
+  sottosuolo era ~700 sulla stima vecchia, ora e' ~22% della superficie.
+
+[2026-10-14] Risposte dell'utente: artifact "tavolo tattico" + Mirwada grande citta' portuale.
+- Artifact: COME DESCRITTO: sposta/ridimensiona zone e isole, trascina/aggiungi/
+  cancella luoghi, villaggi, ingressi e boss, note sulla mappa, due livelli
+  (sopra/sotto), modifiche salvate nella pagina e lette da Claude. Richiede
+  di spostare la disposizione in tools/art/layout_mondo.json.
+- Mirwada: ~55 SCHERMATE di citta' (~125 tile di diametro). Quartieri: centro
+  antico in collina; CENTRO STORICO con museo, negozi, mercanti, famiglie
+  (richiesta dell'utente); quartiere operaio; BASSIFONDI: un posto abbandonato
+  a se stesso con i suoi abitanti poveri (richiesta dell'utente); porto
+  commerciale; citta' nuova fuori le mura.
+- Porto: DIGA FORANEA (con il faro in punta), CANTIERE NAVALE, LUNGOMARE.
+
+[2026-10-14] Mirwada grande citta' portuale + disposizione in layout_mondo.json. FATTO (in revisione).
+- tools/art/layout_mondo.json: zone (centro e peso), paesaggi della terra di
+  mezzo, isole, raggio della citta', "spostati" (posizioni decise
+  dall'utente: vincono sui suggerimenti; null = cancellato), "note". Lo legge
+  build_world.py e lo scrivera' l'artifact tavolo tattico.
+- Citta' (raggio 55 = 57 schermate): dentro le mura porto commerciale
+  (magazzini grandi), quartiere operaio (case strette), centro storico
+  (negozi, piazza del museo in marmo), centro antico in collina (palazzi,
+  cattedrale); fuori le mura bassifondi (terra e fango, baracche e case
+  crollate) e citta' nuova (giardini, ville, viali); mura in rovina;
+  lungomare con la piazza del mercato; 9 moli e pontili; cantiere navale con
+  4 scali; diga foranea dalla punta ovest del golfo con il faro in punta.
+  Golfo proporzionato al raggio. Confini dei quartieri irregolari (rumore).
+- Anteprima nuova: arte/mondo/mirwada_citta.png (x4, quartieri e luoghi).
+- Errori corretti guardando: 71 schermate invece di 55 (raggio 62 -> 55);
+  quartieri a spicchi geometrici; diga fuori inquadratura e poi staccata
+  dalla costa (ora parte dalla punta ovest vera); mercato sopra il cantiere.
+- Verificato: md5 identico su due lanci; validate exit 0.
+
+[2026-10-14] Artifact "Tavolo tattico di Mirwada". PUBBLICATO.
+- URL: https://claude.ai/artifact/BzQW6TSVr4Snk6v2x7fpvf (privato, dell'utente).
+- Sorgente: arte/tavolo/tavolo_tattico.html + superficie.png, sottosuolo.png,
+  punti.json (sfondi puliti e suggerimenti, esportati da build_world.py ->
+  esporta_tavolo()). Capability db: un solo documento mappa/layout con la
+  stessa forma di tools/art/layout_mondo.json (+ campo "aggiornato").
+- Cosa fa: due livelli, sposta zone (peso), paesaggi della terra di mezzo,
+  isole (centro, raggio con la maniglia ambra, profilo), luoghi, villaggi,
+  ingressi, boss; aggiunge e cancella; note con testo; raggio della citta'
+  con stima delle schermate; confini approssimativi (Voronoi pesato senza
+  deformazione); annulla; ripristino con conferma nella pagina; salvataggio
+  automatico 1,2 s dopo l'ultima modifica.
+- Ciclo di lavoro: l'utente modifica -> Claude legge mappa/layout con
+  ArtifactData -> lo copia in tools/art/layout_mondo.json -> rigenera ->
+  ripubblica il tavolo con sfondi e misure nuovi.
+- Verificato: sintassi dello script (node --check); dopo la pubblicazione
+  una lettura del db (vuoto, atteso: si scrive alla prima modifica). Non
+  verificato: il trascinamento a mano (serve l'utente sulla pagina).
+
+[2026-10-14] Tavolo tattico v1: l'utente lo trova poco utile ("aggiungo e ottengo
+solo un quadrato rosso, a destra posso modificare pochissimo, non si capisce
+cosa si e' modificato, il raggio non si vede, la mappa non si crea subito, non
+vedo che terreno avra'"). Rifacimento v2, risposte dell'utente:
+- Anteprima dal vivo a FORME FEDELI (coste, zone, isole, citta', terreni di
+  base); alberi, fiumi e strade automatici solo nella generazione vera.
+- Strumenti: PENNELLO DEI TERRENI, STRADE E FIUMI, QUARTIERI DELLA CITTA'
+  (spostare e ridimensionare), GALLERIE DEL SOTTOSUOLO (+ "something else"
+  senza testo: da chiedere).
+- Dispositivo: PC CON MOUSE.
+- Scheda di luoghi e villaggi: nome e tipo, descrizione, grandezza (cerchio
+  visibile), terreno attorno, COSA CONTIENE (cosa ci sara' dentro).
+- Metodo: la pagina rifa' gli stessi calcoli del generatore Python sulle
+  stesse mappe di rumore (esportate come PNG) -> anteprima uguale nelle forme.
+- Script (parte 1 del tavolo v2): rumore arrotondato a 256 livelli (q8) ed
+  esportato come PNG in arte/tavolo/rumore_*.png (e, m, d, n1, n2, rq);
+  isolette della Frontiera in posizioni fisse; quartieri della citta' come
+  centri con peso in layout_mondo.json (citta.quartieri; porto peso 0.75);
+  applica_ritocchi(): schede (spiazzo di grandezza e terreno attorno a un
+  luogo) e tratti di superficie (pennello, strada, fiume); gallerie del
+  sottosuolo (galleria scava, riempi chiude); punti.json con terreni,
+  colori e regioni. Citta' ora 62 schermate (quartieri fino a 1,3 raggi).
+
+## Tavolo tattico v2 (parte 2) — pagina nuova, 2026-10-14
+- arte/tavolo/tavolo_tattico.html riscritta: la pagina ricalcola la mappa in JavaScript con le stesse formule di
+  build_world.genera() sulle mappe di rumore esportate (rumore_*.png). Pubblicata sullo stesso URL
+  https://claude.ai/artifact/BzQW6TSVr4Snk6v2x7fpvf (versione 2, capability db).
+- Verifica (Chromium headless, seed 6): zone uguali al 100%, terreni uguali al 99,83%; le 2012 celle diverse sono
+  solo fiumi e strade, che l'anteprima non ricalcola (li fa il Python). Città 62 schermate come in Python.
+- Prove simulate: trascino una zona (ridisegno ~1,7-2,3 s), aggiungo un luogo con scheda (descrizione, grandezza,
+  terreno, contenuto), pennellata, registro modifiche, Ctrl+Z, strumento Città, sottosuolo. Nessun errore JS.
+- Bug trovati e corretti in prova: scheda del luogo nuovo che si chiudeva (cercava la posizione nell'anteprima vecchia),
+  confini delle zone invisibili (condizione sbagliata, poi 1 tile spariva da lontano: ora 2), "nullnull" nei pannelli.
+- Salvataggio: doc mappa/layout (terra, mezzo, isole, citta con quartieri, spostati, schede, note) + collezione
+  "tratti" (un documento per tratto). Quando l'utente dice "fatto": leggere entrambi, scriverli in
+  tools/art/layout_mondo.json (tratti -> chiave "tratti"), rilanciare build_world.py, ripubblicare.
+- Nel db c'erano 4 isole di prova della v1 (isola_nuova_18..21, una sulla terra ferma): lasciate, l'utente decide.
+- Aperto: l'anteprima non disegna fiumi, strade e alberi; il sottosuolo resta l'immagine del Python con i tratti sopra.
+
+## Modifiche dal tavolo applicate ("fatto"), 2026-10-14
+- Letti da db: mappa/layout (versione 55) + 28 tratti -> tools/art/layout_mondo.json; `python tools/art/build_world.py` (seed 6, 28 s).
+- Cosa ha cambiato l'utente: tolta isola_nuova_18 (era sulla terra), tenute isola_nuova_19/20/21; laghetto d'acqua
+  (pennello r4) attorno a (770,350) nella Valle; pozza d'acqua r0 attorno a (364,307).
+- Risultato: superficie 3360 schermate, sottosuolo 717, città 62; 51 luoghi, 35 villaggi, 47 ingressi. validate exit 0.
+- Da chiedere: isola_nuova_19 e _21 cadono dentro la Frontiera (dischi di bosco nella nebbia, non isole nel mare);
+  isola_nuova_20 si fonde con isolotto_1; la pozza (364,307) e' larga 1 tile. Tavolo ripubblicato (versione 3).
+- Su richiesta: tolte isola_nuova_19 e _21 (layout + db, versione 57); tenuto isolotto_1 -> rocciosa (cambiato
+  dall'utente nel tavolo). Rigenerato: superficie 3360, sottosuolo 718, 49 luoghi. validate 0. Tavolo versione 5.
+- US-8B13 / 8B13b / 8B13c: disposizione approvata dall'utente ("procedi" dopo le ultime correzioni). CHIUSE.
+
+[2026-10-14] US-8B01 — passaggio a 64 px. FATTA.
+- Scelta tecnica (spiegata e accettata): le unita' di gioco NON cambiano (1 tile = 32 unita', mondo visibile 640x360
+  unita'); Godot disegna a 1280x720 pixel veri (stretch "canvas_items", base 1280x720, scale 2.0, integer) e lo
+  sprite da 64 px si mette a scala 0.5. Velocita', raggi, mappe, HUD e 777 test restano validi.
+- Provato prima in un progetto di prova (scratchpad, Godot 4.3 + Xvfb): con "viewport" + scale 2 Godot disegna a
+  640x360 e perde i dettagli (scartato); con "canvas_items" ogni pixel del 64 si vede. 1280x720 -> x1,
+  1920x1080 -> 1280x720 con bordo nero (scelta dell'utente), 2560x1440 -> x2.
+- File: project.godot, data/animations.json (dimensione_frame 64), scripts/animation_machine.gd (dim dai dati,
+  scala 32/dim), scripts/settings_store.gd + pages/page_impostazioni.gd (scala finestra = 1280x720 x1/x2/x3,
+  default x1), tools/art/generate_all.py (DIM dai dati, fogli a 32 ingranditi x2 NEAREST, contorno del tell
+  calcolato prima di ingrandire), tests (dimensione 64 + test nuovo sulla scala).
+- Comando: `python tools/art/generate_all.py` (nessun seed: build_enel e' deterministico; arte/sprite invariata).
+- Verifica: Godot 4.3 headless 778 test passati; validate_data exit 0; screenshot del gioco vero a 1280x720:
+  personaggio 64x64 pixel veri in un tile, HUD al suo posto.
+- Aperto: i fogli sono ancora il disegno a 32 ingrandito (blocchi 2x2): li ridisegna il Blocco C. Le scritte
+  dell'HUD ora sono lisce (disegnate a 1280x720) invece che a blocchi: da decidere se serve un font pixel.
+  tileset.png della stanza di prova resta a 32 (lo sostituiscono gli atlanti del mondo, US-8B12).
+
+[2026-10-14] REVISIONE GENERALE DELL'ARTE (solo controllo, nessun file di gioco toccato).
+- Lista completa con priorita' e "come correggere": arte/revisione_arte.md. Immagini di prova
+  in arte/revisione/ (personaggi sopra la mappa giorno/notte; attacco del nemico frame per frame).
+- Alta priorita': (1) Enel sparisce sul selciato di Mirwada (stessa rampa blu-ardesia), di notte
+  restano solo gli occhi; (2) nemico_base.attack: il frame attivo (1) mostra la mazza ALZATA,
+  frame 2 = frame 1, frame 3 = idle -> nessuna posa del colpo (FR-8); (3) 19/19 fogli ancora a
+  32 ingranditi; (4) concept art cupe e desaturate vs terreni saturi e allegri (decisione
+  dell'utente); (5) nessuna altezza: rupi, gradoni e scogliere sono texture piatte.
+- Altro: sprite che toccano il bordo della cella; su/giu' di Enel confondibili; effetti ciano
+  cotti negli sprite (vanno nei VFX colorati dallo shader); lampo bianco di hurt che ignora
+  riduci_flash; camminata con 2 coppie di frame quasi uguali; spada che sparisce nella morte;
+  pet troppo piccolo; piedi disegnati 8 unita' sotto la collisione (sprite a (0,-8), origine
+  piedi_centro non usata); alberi alti come Enel; vegetazione non legata alla regione; texture
+  ripetute; moli e lastre con bordi ondulati; strade che finiscono nel nulla; coste a gradini;
+  acqua turchese nel sottosuolo; data/vfx.json diverso da design-vfx.md su 6 Pathway su 10.
+- Come verificato: analisi automatica dei 19 fogli (palette, alpha, duplicati, cicli, pivot,
+  bordi, inchiostro interno) + check.py della skill sui JSON di Enel + ogni foglio, ritaglio e
+  scena guardati ingranditi su chiaro e scuro + prova composita alla scala del gioco + lettura
+  di animation_machine.gd, player/enemy.tscn, enemy.gd, vfx.gd. selftest.py della skill exit 0.
+- Prossimo: decisioni dell'utente su colore del mondo e palette VFX, poi l'ordine del cap. 6
+  della revisione (generatore -> Blocco C -> piccolo codice -> pulizia).
+
+[2026-10-14] DECISIONI DELL'UTENTE sulla revisione dell'arte (punti 3.1 e 4.1).
+- Colore del mondo: LUMINOSO come i terreni attuali. Le concept art restano riferimento per
+  atmosfera e forme, non per i colori. Conseguenza: la leggibilita' si ottiene rinforzando i
+  personaggi (valori, bordo di luce, ombra a terra) e abbassando il contrasto dei DETTAGLI delle
+  texture, non spegnendo i colori.
+- Palette dei VFX: vale data/vfx.json. 006_PRD/design-vfx.md cap. 2 riscritto con i valori del
+  file dati (prima differiva su death, darkness, fool, error, hermit, moon, paragon); la vecchia
+  proposta in art-brief-gemini.md segnata come superata. Decisioni aggiunte in CLAUDE.md.
+- Solo documentazione: nessun file di gioco o dato toccato.
+- Prossimo (ordine della revisione, cap. 6): story del generatore (pareti e altezze, bordi dritti
+  dei terreni costruiti, varianti dei tile, alberi piu' alti), poi Blocco C.
+
+[2026-10-14] Pareti e altezze, PARTE 1 (revisione arte 3.2): disegno delle pareti + tavola di prova. FATTA (in attesa dell'occhio dell'utente).
+- Risposte dell'utente: materiali arenaria + roccia + mura; passaggi con scalini e rampa; 3 varianti
+  centrali; altezza: prima "2 caselle per livello", poi corretto in 1 CASELLA PER LIVELLO ("per non esagerare").
+- tools/art/forge3d/pareti.py (nuovo): altezza intera per casella; dove una casella e' piu' bassa di quella
+  sopra, la differenza diventa parete nelle caselle basse subito sotto il bordo (non calpestabili), con orlo
+  in luce, buio alla base, spigoli frastagliati a sinistra/destra e ombra a terra (inchiostro alpha 110/55)
+  nella casella sotto. Texture in coordinate di mondo, periodica su 3 caselle (= 3 varianti centrali).
+  Motivi: arenaria a strati ondulati con fessure e crepe, roccia a lastre di Voronoi, mura a blocchi
+  sfalsati con qualche blocco caduto. 'S' = scalini, 'R' = rampa di terra con sassi.
+- tools/art/campioni_pareti.py -> arte/pareti/scena_{arenaria,roccia,mura}.png + campioni.png (x2).
+- terrain.py: tolto il calcolo "cliff" in _rim che non veniva usato (tavola dei terreni identica, md5).
+- Comando: python tools/art/campioni_pareti.py (seed 5 di default in pareti.py; md5 identico su due lanci).
+- Guardato ingrandito, 3 giri: roccia a righe diagonali come stoffa -> lastre di Voronoi; chiazze chiare
+  sulle mura -> tono per blocco; rampa = macchia -> pendio a fasce; sassi in griglia/diagonale -> sparsi.
+- Aperto: (1) sopra l'orlo resta a volte una striscia di 2-6 px del terreno basso (il bordo dual grid del
+  terreno alto ha rumore); si sistema nella parte 2 mettendo nella casella di parete il terreno giusto o un
+  orlo che sporge. (2) La base della rampa e' molto scura. (3) Non ancora esportato come atlante per Godot
+  ne' usato nella mappa: e' la PARTE 2 (altezze del mondo in world.json).
+
+[2026-10-14] Pareti e altezze, PARTE 2 (altezze nel mondo) + PULIZIA (revisione arte 3.2, 4.2, 4.4). FATTA.
+- build_world.py: griglia `altezza` (0 = pianura) e materiale della parete per casella:
+  Marche = gradoni 1..6 (per le pareti: altezza che sale verso NORD, lisciata in orizzontale con una
+  mediana di 13 caselle, cosi' i bordi corrono lunghi est-ovest; con l'altezza "in tondo" i bordi in
+  diagonale diventavano file di blocchetti staccati), rupi del passo +1, scogliere di Valle e Marche
+  (fascia a <= 6 caselle dal mare) alte 1, mura in rovina di Mirwada alte 1 (materiale mura),
+  sottosuolo: roccia 1 / pavimento 0 (pareti sul lato nord delle gallerie).
+  Passaggi: 'S' dove una strada attraversa una parete, 'R' ogni ~15 caselle e davanti al passo,
+  'S' sugli ingressi del sottosuolo che cadono su una parete. Scale 5, rampe ~280.
+- world_prova.json: "altezza", "parete" (indice in "parete_materiali"), "passaggi" (righe di testo);
+  nel sottosuolo "altezza" e "passaggi". Mappa intera con le pareti segnate scure.
+- Ritagli con le pareti (render_world ha `sopra`: strato sopra il terreno, sotto gli oggetti) e
+  prima/dopo: arte/mondo/pareti_prima_dopo_{passo,gradoni,scogliera,mura,fogne,grotte}.png.
+- Tolte dal terreno le strisce di arenaria sui bordi dei gradoni (2480 caselle): ora sono pareti.
+  ERRORE TROVATO E CORRETTO: toglierle cambiava strade (costo A*), eremiti e rocce -> numeri casuali
+  diversi -> sottosuolo diverso (718 -> 728 schermate). Ora strade, eremiti e rocce leggono ancora
+  "arenaria_vecchia()": verificato con la versione di prima che strade, luoghi, villaggi, regioni,
+  alberi e sottosuolo sono IDENTICI; cambiano solo le 2480 caselle e 112 rocce in meno (sui vecchi bordi).
+- pareti.py: un bordo in diagonale si salda (niente spigolo libero se c'e' parete in diagonale);
+  maschera() vettoriale per le mappe grandi (uguale a facce(), verificato).
+- Comando: python tools/art/build_world.py (seed 6, ~37 s). md5 identico su due lanci.
+- Pulizia: arte/.gdignore e assets/concept/.gdignore (Godot non importa anteprime e concept art, che
+  nessuno script carica); guida arte/ aggiornata (64 px, terreni e pareti generati, banner su CLAUDE.md).
+- validate exit 0. Non verificato in Godot (nessun Godot nel container).
+- Aperto: (1) mura e bordi nord-sud mostrano solo la cima (giusto in vista 3/4, ma le mura si leggono
+  poco); (2) al passo le rupi fanno pareti alte 3-4 caselle a colonna; (3) il tavolo tattico ricalcola
+  ancora le strisce di arenaria nell'anteprima JS (superficie.png invece e' aggiornata); (4) pareti come
+  muri in Godot: US-8B12.
+
+[2026-10-14] Pareti: blocchi staccati (segnalato dall'utente: "i blocchi sono ancora distaccati"). CORRETTO.
+- Cause trovate guardando da vicino: (1) ogni gradino in diagonale disegnava base scura + ombra anche
+  sopra un altro pezzo di parete; (2) rampe "R" a tappeto in un raggio di 6 dal passo (colonne chiare
+  staccate); (3) rampe a pezzi su singole righe; (4) disegno degli strati che ripartiva a ogni gradino;
+  (5) mura e bordi est/ovest: in vista 3/4 mostrano solo la cima, e la cima delle mura = selciato.
+- pareti.py: base solo se sotto c'e' terreno; disegno della faccia in coordinate di mondo (strati e
+  blocchi combaciano tra gradini); _orli(): orlo di roccia sui lati est/ovest che confinano con il basso,
+  cima delle mura come camminamento di pietre chiare con bordo.
+- build_world.py: rampa solo in cima a un tratto dritto (pareti a sinistra e a destra), propagata per
+  tutta l'altezza; niente rampe a tappeto davanti al passo (c'e' la scala sulla strada).
+- Verificato: ritagli ingranditi (passo, gradoni, mura); md5 identico su due lanci; validate 0.
+- Aperto: nei bordi molto ripidi (quasi nord-sud) i gradini da 1 casella si toccano solo d'angolo:
+  l'orlo laterale li lega ma restano quadratini; servirebbe un tile "angolo" dedicato.
+
+[2026-10-14] Pareti: blocchi ANCORA staccati (2a segnalazione dell'utente: "guarda meglio, pensa meglio"). RIFATTO il raccordo.
+- Diagnosi (scena di prova con bordo a scalini lento, ripido e nord-sud, guardata ingrandita):
+  (1) mancava il pezzo di bordo che, a ogni scalino, gira l'angolo e scende lungo il fianco dell'altopiano
+      fino al gradino dopo: l'"orlo laterale" di prima scattava solo accanto a terreno basso, MAI accanto a
+      una parete, cioe' proprio dove serviva; (2) sotto la parete c'era il terreno basso: la transizione dual
+      grid smussava in diagonale gli angoli dell'altopiano (righine oblique); (3) estremita' frastagliate e
+      trasparenti = pezzi spezzati; (4) la fascia costiera alzata di 1 creava un finto gradino nel bosco.
+- pareti.py:
+  * _cima(): ogni casella alta (con materiale) ha contorno + linea chiara su ogni lato (sinistra, destra,
+    sopra) che confina con una casella piu' bassa, parete compresa; all'angolo la linea chiara prosegue
+    senza pixel di contorno davanti. Mura: camminamento di lastre quadrate chiare su tutta la cima.
+  * tile(): estremita' 'cont' / 'int' (accanto c'e' la cima: il bordo lo fa la cima) / 'est' (spigolo
+    netto: contorno + fascia, chiara a sinistra e scura a destra, che continua il bordo della cima);
+    niente piu' trasparenze frastagliate; piede = riga di contorno.
+  * terreno_sotto(): sotto una parete il terreno della cima (il passaggio tra terreni cade al piede).
+  * ombra al piede: triangolo verso l'angolo sporgente (copre lo smusso del terreno).
+  * facce()/maschera()/terreno_sotto() con `mat`: una parete nasce solo sotto una casella con materiale.
+- build_world.py: il MARE sta a -1 (non piu' la fascia costiera alzata): coste con materiale (Valle, Marche,
+  dmare <= 2) = scogliere, spiagge senza materiale = spiagge; terreno della cima sotto le pareti, applicato
+  DOPO strade/alberi/sottosuolo. Verificato identico all'approvato: strade, luoghi, villaggi, regioni,
+  alberi, ingressi e boss del sottosuolo. Altezze da -1 a 6; scale 8, rampe 145.
+- campioni_pareti.py: nella scena delle mura il materiale "mura" solo sul bordo (un muro, non l'altopiano).
+- Comandi: python tools/art/build_world.py ; python tools/art/campioni_pareti.py. md5 identico su due lanci.
+  validate 0.
+- Aperto: le rampe da 1 casella sembrano tacche scure; i passaggi terreno-terreno al piede di uno scalino
+  restano una righina obliqua dentro l'ombra; in Godot il "mare a -1" va letto come acqua, non come buca.
+
+[2026-10-14] Pareti: imperfezioni segnalate dall'utente (screenshot delle mura cerchiato) + regola "mai lasciare
+imperfezioni". CORRETTE alla radice.
+- compose_ground(strati, duri): dove c'e' un dislivello con roccia (la casella piu' alta e' "dura": ha materiale o e'
+  parete) i terreni NON si sfumano: ogni quarto di casella che tocca l'altro strato prende il terreno pieno della sua
+  casella. Spariti gli sbordi al piede delle pareti e gli angoli smussati in cima. Spiagge sul mare (piu' basso ma
+  senza parete) restano sfumate. pareti.strati() da' (strati, duri); render_world(strati=, duri=). In Godot
+  (US-8B12) il caricatore dovra' fare lo stesso.
+- Tolto il triangolo d'ombra al piede (serviva solo a nascondere lo sbordo).
+- Mura: le case (stone) che toccano la fascia accanto al muro vengono tolte INTERE (prima restavano mezze case
+  tagliate); il vuoto prende la strada vicina.
+- assorbi_macchie(): macchie di terreno con meno di 6 caselle (8-connesse: una costa a scalini e' una fascia sola)
+  prendono il terreno attorno -> niente rombi isolati. Stessa regola sulle ALTEZZE prima delle pareti -> niente
+  "scatolette" (rialzi o buche di 1-5 caselle).
+  ERRORE TROVATO E CORRETTO: con la 4-connessione la sabbia lungo le coste a scalini veniva cancellata (4517 ->
+  1883 caselle); con l'8-connessione 4509.
+- Rampe: pendio chiaro con i fianchi tagliati (prima tacca scura).
+- arenaria (terreno, vista dall'alto) = lastre di roccia spaccate invece delle strisce: le strisce sono della
+  parete, e una cima a strisce non si distingueva dalla parete.
+- Verificato: strade, luoghi, villaggi, regioni, alberi, ingressi del sottosuolo identici all'approvato; caselle
+  sole fuori dalle pareti = 0; md5 identico su due lanci; validate 0. Ritagli e tavole guardati ingranditi.
+- Restano (altri punti della revisione, NON di questa story): porto con la piazza a macchia e i pontili a punta
+  tonda (3.6), coste delle isole a scalini (3.9), acqua turchese nelle fogne a pezzetti (3.10).
+
+[2026-10-14] PREFERENZA DELL'UTENTE: "puoi non spiegarmi come, io servo solo in caso tu non sappia cosa fare o
+come, e se ci sono dettagli di cui vuoi sapere". Per i punti della revisione dell'arte Claude procede da solo e
+chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare imperfezioni, nemmeno piccole.
+
+[2026-10-14] Revisione arte 3.6 — porto: bordi dritti per le cose costruite, moli e pontili rialzati. FATTO.
+- terrain.py: campo bordo="dritto" (stone, marmo, ciottoli_scuri, lastre_chiare, molo_pietra, pontile_legno,
+  parquet, lamiera) -> masks_dritte(): bordo esatto sul lato della casella. compose_ground: un terreno si disegna
+  solo dove una delle 4 caselle e' davvero di quel terreno (prima un terreno intermedio, es. lastre_rovine sotto
+  le case, sbordava a triangolino dagli angoli dei terreni dritti).
+- pareti.py: materiali "molo" (blocchi) e "legno" (assi e pali); il bordo della cima vale anche a quota 0 (moli sul
+  mare a -1); camminamento delle mura solo sopra un muro vero (h > 0).
+- build_world.py: moli, scali del cantiere e diga con materiale (faccia in punta, bordi ai lati); MATERIALI_PARETE
+  + molo, legno; pezzetti di muro abbassati perdono il materiale; terreni dritti: niente punte di 1 casella;
+  fessure: casella naturale stretta tra due costruite -> costruita (anche la strada di campagna in citta': il
+  percorso nei dati non cambia; mai l'acqua; mai la fascia accanto alle mura).
+- Verificato: strade, luoghi, villaggi, regioni, alberi, sottosuolo identici all'approvato; md5 identico su due
+  lanci; validate 0; ritagli porto e mura guardati ingranditi.
+
+[2026-10-14] Revisione arte 3.9 — coste a gradini e luoghi rotondi. FATTO.
+- build_world.py, tutto a fine generazione (strade, luoghi, villaggi, pareti, sottosuolo identici all'approvato):
+  coste_irregolari(): forma della terra sfumata (sfuma, media 5x5 due volte) + rumore (fbm 6 e 16, seed+311/312)
+  -> il bordo col MARE si sposta di 1-3 caselle. Fermi: materiale di parete, facce, terreni dritti, strade (+2),
+  luoghi e villaggi (5x5), laghi (ritocchi dei dati: regione > 0). Niente pozzette chiuse ne' briciole di terra
+  (pezzetto() < 12 caselle: si annulla o si riempie). Le caselle nuove prendono terreno e regione dalla terra
+  accanto; altezza 0 / -1. Spiaggia: lungo la costa nuova dove prima c'era spiaggia entro 3 caselle, larga 1-2
+  (fbm seed+314). Acqua bassa: 2-6 caselle (fbm seed+313), bordo arrotondato, calcolata senza moli e diga
+  (niente alone attorno ai pontili); lagune dell'atollo restano basse.
+  cerchio_irregolare(): rovine del boss, ghiaia e marmo di cimitero/archivio, isolette della Frontiera: raggio
+  che ondeggia con onde 2/3/5/8 (fasi da crc32 del nome).
+- Alberi sulle caselle cambiate o accanto all'acqua nuova tolti (305 su 72616).
+- Verificato: confronto coi dati di HEAD (cambiano solo ground/region_map/altezza lungo le coste e nei cerchi,
+  parete e passaggi 0 differenze); pezzi di terra o mare < 10 caselle = 0 (come prima); celle di lago cambiate 6
+  (foci dei fiumi); md5 identico su due lanci; validate 0. Guardati: approdo, porto (uguale all'approvato),
+  Frontiera intera, isole, cimitero, archivio, rovine.
+- Non fatto: scogli in mare (servirebbe un oggetto nuovo).
+
+[2026-10-14] Revisione arte 3.10 — acqua del sottosuolo. FATTO.
+- terrain.py: acqua_fogna (brown_dd/teal_d/slate_d, cresta grey) e acqua_grotta (navy/blue_d/blue, cresta grey),
+  livelli 0.5 e 0.6 (sotto l'acqua bassa: le rive si disegnano sopra). Campo "cresta" = colore delle creste delle
+  onde (water: white; prima era un if sul nome). Scelte guardando 8 rampe affiancate a roccia_viva e ciottoli_scuri.
+- build_world.py, genera_sottosuolo, DOPO gli ingressi (ingressi, boss, pavimento identici all'approvato):
+  fogne: la vecchia acqua a pezzi torna ciottoli_scuri; canale al centro di una galleria nord-sud su tre
+  (x % 10 == 1, x // 10 % 3 == 0), mai accanto alla roccia (a nord 2 caselle), mai entro 2 da ingressi e boss;
+  grata (lamiera) agli incroci (y % 9 < 3) solo tra due tratti d'acqua; tratti d'acqua di almeno 3 caselle (ciclo
+  finche' stabile). Il canale ha altezza -1: le pareti disegnano cordolo e gradino. Grotte: water -> acqua_grotta.
+- Trovato e corretto: la moda "terreno piu' comune" (punte, cerchio_irregolare, assorbi_macchie) a pari voti
+  dipendeva dall'ordine interno di un set Python, quindi dalla numerazione dei terreni: aggiungere due terreni
+  cambiava 43 caselle in superficie. Ora sorted(): a pari voti vince il livello piu' basso. Verificato: con e
+  senza i terreni nuovi la superficie e' identica (0 caselle); rispetto alla mappa approvata cambiano solo quelle
+  43 macchioline (oggetti, strade, luoghi identici).
+- Verificato: grate appese 0, ingressi sul canale 0, md5 identico su due lanci, validate 0. Guardati ingranditi:
+  ritaglio fogne, grotte, le due estremita' di un canale, la rete intera.
+
+[2026-10-14] Scogli in mare (revisione 3.9, ultimo pezzo) + ritocco coste. FATTO.
+- worldrender.py: oggetto "scoglio" = rock() di pietra scura (size 2.6 x o["size"]), senza ombra a terra; la parte
+  sotto la linea dell'acqua si taglia e lungo il taglio schiuma a pezzetti bianca/grigio chiaro (_sommerso).
+- build_world.py, coste_irregolari() restituisce gli scogli: acqua bassa a 2-5 caselle dalla riva naturale, tratti
+  rocciosi (fbm seed+315 > 0.62), lontano 8 da citta'/moli e 3 da strade, mai su facce di scogliera, mai due
+  attaccati (numeri casuali propri seed+316: il resto non cambia). size 0.8-1.3. 288 scogli, tutti su "water".
+- Coste: spinta del rumore 0.25 (piu' fine che lento), limite 6 caselle (prima 4: dove si raggiungeva il bordo
+  diventava una riga dritta, es. spiaggia bianca dell'isola dei pirati), pulizia delle punte e tacche di una
+  casella (triangoli nel dual grid).
+- Verificato: strade, luoghi, villaggi, spawn, sottosuolo identici; pozze/briciole < 10 caselle 0; md5 uguale su
+  due lanci; validate 0. Guardati: scogli su acqua bassa e profonda (x4), tre gruppi nel mondo, approdo, isola
+  dei pirati, mappa intera.
+- Resta da vedere (non di questo passo): la sabbia_bianca e' quasi bianco pieno e in grandi aree sembra neve;
+  isola ghiacciata e isola del mostro hanno la forma generale a ellisse (la costa e' irregolare, la sagoma no).
+
+[2026-10-14] Revisione arte 3.7 — pavimenti a scacchiera. FATTO (con la prima parte del 3.5: varianti dei tile).
+- Causa: una sola texture per terreno, ripetuta in ogni casella: con 4 lastre per casella qualsiasi scelta di toni
+  diventa un motivo regolare. Servono piu' versioni della stessa texture.
+- terrain.py: campo "varianti" (n) nella riga del terreno; build_atlas: righe = variante * frame + frame;
+  variante(i, j, n) = hash a 32 bit del vertice (righe, colonne) NEL MONDO (h = i*374761393 + j*668265263; h ^= h>>13;
+  h *= 1274126177; h ^= h>>16; tutto & 0xFFFFFFFF; % n). compose_ground(origine=(x0, y0)) per i ritagli; anche i
+  quarti con bordo netto usano la variante del loro vertice. Il caricatore Godot (US-8B12) deve usare la stessa
+  formula; export_godot scrive terrain_frames e terrain_variants.
+  ERRORE TROVATO E CORRETTO: il primo hash ((i*a) ^ (j*b)) % 8 dipendeva solo dagli ultimi 3 bit: motivo
+  diagonale ogni 8 caselle, visibile a dimensione vera.
+- _lastre(): con le varianti le fughe stanno sul bordo della casella (due varianti si accostano senza tagliare una
+  lastra); ogni variante divide la casella in 1, 2 (orizzontali o verticali) o 4 lastre; tono a caso (pesi 2/6/2),
+  ombreggiato dal rumore; fuga di tono medio (campo "fuga"); spigoli scheggiati; crepe; erba nelle fughe (campo
+  "erba", colori accent); lastre mancanti (campo "mancanti", colori "buca"). lastre_rovine, lastre_chiare, marmo:
+  varianti=8. molo_pietra resta a blocchi sfalsati.
+- Verificato: rovine del boss e piazza del porto a dimensione vera, campione di tre terreni x2; dati del mondo
+  invariati (solo il disegno); md5 uguale su due lanci; validate 0.
+
+[2026-10-14] Revisione arte 3.8 — strade che finiscono nel nulla. FATTO.
+- build_world.py, sentieri() a fine generazione (dopo applica_spostati: usa le posizioni finali): per ogni strada
+  la cui fine non tocca una piazza (PIAZZE: lastre_rovine, marmo, ghiaia, stone, lastre_chiare, ciottoli_scuri),
+  sentiero "path" con A* fino al luogo/villaggio piu' vicino della stessa regione (4-80 caselle). Costi: acqua 1e4,
+  facce e bordi di dislivello 1e6 tranne vicino a scalini/rampe, case/citta' 60, bosco +2. Spiazzo d'arrivo
+  (disco 2.5, stessa quota). Alberi e rocce tolti da strade, sentieri, spiazzi e una casella attorno (8 vicini).
+  Risultato seed 6: passo -> eremita_2 (47), galleria_di_alberi -> capanna_base_valle (98), scalinata_archivio ->
+  torre_osservazione (15). Rovine, cimitero e archivio finiscono gia' sulla loro piazza.
+- JSON: nuovo campo "sentieri" (liste di [x, y]); "roads" invariato.
+- Verificato: rispetto a HEAD cambiano 206 caselle (tutte path) e si tolgono 272 alberi e 1 roccia; il resto e'
+  identico; md5 uguale su due lanci; validate 0. Guardati i tre sentieri e le tre fini a dimensione vera.
+
+[2026-10-14] Revisione arte 3.5 — texture che si ripetono. FATTO.
+- terrain.py: campo "macro" = M (default 4 per i dettagli in MACRO_OK: waves, tufts, leaves, dots, pebbles,
+  puddles, cobbles, sparkle, embers, dunes, fog, roots; 1 per lastre, parquet, lamiera, assi, filari). La texture
+  si genera grande M x M tile (_texture(S, Z=S*M): conteggi e celle scalano con l'area, misura dei dettagli dal
+  tile) e si mette in cache; la variante v e' il pezzo (v // M, v % M). scelta(d, i, j): macro -> (i % M) * M + j % M
+  (continua tra tile vicini), varianti -> hash. n_varianti(d) = varianti o M*M; atlante: riga = variante*frame+frame.
+  export_godot: terrain_variants = {n, macro}. Il caricatore Godot deve fare lo stesso.
+- Acque (waves): superficie calma (0.36 + 0.26 * rumore) e creste sparse (una ogni "onde" pixel quadrati: mare 220,
+  profondo 420, fogna 320, grotta 360), visibili 2 frame su 4 e spostate di 1 px. Tolto il vecchio tappeto di onde.
+- radici_muschio: dettaglio nuovo "roots" (linee che serpeggiano, scure con la luce sopra), macro 8. Prima rete di
+  Voronoi: sembrava un mosaico di cocci con i triangoli agli incroci.
+- roccia_viva: macro 8, cells 3 (sassi piu' grandi), fuga_px 1.1 (campo nuovo per cobbles): con 4x4 si vedevano file
+  di triangoli neri agli incroci ogni 4 tile.
+- build_world.py: nel costo dei sentieri il bosco pesa +0.3 (prima +2: il sentiero della galleria di alberi girava
+  attorno alla giungla, parallelo alla strada; ora entra dritto: 68 caselle invece di 98).
+- Verificato: campione di 8 terreni prima/dopo, ritagli porto, galleria, grotte, fogne a dimensione vera;
+  campioni_terreni rigenerato (64 px, guardata la scena della Valle); md5 uguale su due lanci; validate 0.
+  Generazione del mondo ~45 s (prima ~40).
+
+[2026-10-14] Revisione arte 3.3 — scala degli alberi. FATTO lato arte.
+- worldrender.py: alberi size 3.6 (prima 1.9), riquadro 220x260 (k), piedi a 0.9; ombra degli alberi
+  shadow_r=(0.15, 0.055) (l'ombra del motore e' proporzionale alla larghezza del riquadro: allargato il riquadro
+  diventava larga 5 tile). Altezze misurate a 32 px: quercia 2.56 tile, pino 2.84, betulla 2.44, palma 1.91,
+  secco 1.62; Enel (frame 64 a mezza grandezza) ~1 tile. Confronto affiancato guardato.
+- build_world.py: dirada(oggetti, 1.8) a fine generazione (un albero resta se nessun albero tenuto e' entro 1.8
+  caselle; i numeri casuali non cambiano: rocce e sottosuolo identici); niente alberi/rocce su facce di parete e
+  sulla casella sopra (ciglio). Oggetti: 72383 -> 32104 (alberi 31172, rocce 644, scogli 288).
+- Resta per il gioco (US-8B12, caricatore Godot): ordinamento per profondita' dai piedi, collisione sul tronco.
+- Verificato: galleria di alberi, passo, gradoni a dimensione vera; md5 uguale su due lanci; validate 0.
+
+[2026-10-14] Sabbia corallina e neve (visti dopo il 3.9). FATTO.
+- sabbia_bianca: rampa tan / cream / #f3e7cf (avorio, colore extra nella rampa) / white, contrasto 0.45 (prima crema
+  + tre bianchi: in grandi aree sembrava neve).
+- snow: le dune erano righine diagonali con lunghezza d'onda di un tile (righe uguali in ogni casella). Ora
+  increspature corte e sparse (archetti grigio chiaro col bianco sopra), macro 8, ombre morbide (period 2,
+  contrasto 0.32).
+- Verificato: confronto sand / sabbia_bianca / snow affiancati; isola dei pirati e spiazzo della torre nel mondo;
+  md5 uguale su due lanci; validate 0; campioni_terreni rigenerato.
+
+[2026-10-14] Revisione arte 3.11 (fiori nell'erba) e 3.12 (ombre degli oggetti). FATTO.
+- terrain.py: tufts con campo "fiori" (grass: white, yellow, pink): fiorellini di 3 pixel con il gambo scuro, uno
+  ogni 700 px quadrati (prima un pixel singolo, anche ciano, ogni 160). Tolto il controllo sul nome "grass".
+- engine.render: parametri shadow_off (spostamento in frazioni dei raggi) e shadow_a (alpha); default uguali a
+  prima, personaggi invariati. worldrender: ombre degli oggetti alpha 80, spostate (0.25, 0.3) in basso a destra,
+  raggi per tipo (alberi 0.15/0.055, palme 0.12/0.045, secchi 0.06/0.03, rocce 0.3/0.12).
+- Verificato: campione con 4 alberi e una roccia su erba x3; galleria di alberi a dimensione vera; md5 uguale su
+  due lanci; validate 0; campioni_terreni rigenerato.
+
+[2026-10-14] Revisione arte 3.4 — vegetazione legata alla regione. FATTO.
+- creatures.py: tree kinds "ulivo" (tronco contorto, chioma bassa a ciuffi), "cipresso" (colonna e punta),
+  "felce" (felce gigante: due giri di fronde), "gigante" (tronco con contrafforti, chioma ampia, liane davanti);
+  ossa() (teschio e costole). materials.py: leaf_olive (teal_d, green_d, green_d, green_m: con il grigio la chioma
+  sembrava innevata). worldrender: oggetto "ossa", ombre per i tipi nuovi.
+- build_world.py: ALBERI e' l'elenco chiuso per profilo; il NUMERO di voci per profilo non cambia (la scelta
+  consuma numeri casuali: cambiarlo cambierebbe rocce e sottosuolo). campagna: ulivo, cipresso, ulivo; giungla:
+  gigante, felce, gigante, felce. Ossa nelle Marche (pietrisco ed erica, 0.4%, numeri casuali seed+318).
+  dirada(): spazio per tipo (SPAZIO: gigante 2.8, felce 1.4, cipresso 1.2, altri 1.8). Niente alberi sui filari,
+  niente ossa/alberi/rocce su strade e ciglio. Palme solo dove il profilo e' tropicale (isola tropicale, pirati,
+  isolotto_4).
+- Oggetti: felce 12166, gigante 4554, quercia 4007, pino 2412, ulivo 1942, secco 1734, palma 1511, cipresso 1046,
+  rocce 644, ossa ~319, scogli 288.
+- Verificato: piante affiancate a Enel x2 (due giri di correzioni: ulivo, felce, liane, ossa), giungla, campagna,
+  Marche a dimensione vera; md5 uguale su due lanci; validate 0.
+
+[2026-10-14] Revisione arte 3.14 — grandi aree tutte uguali. FATTO lato terreno.
+- build_world.py, prima di terreno_sotto: macchie (fbm scala 22, seed+321/323, > 0.66) solo sul terreno di base:
+  Marche pietrisco -> erica_secca / terra_bruciata (scelta da un secondo rumore lento), Frontiera nebbia ->
+  erba_lilla. Lontano 3 caselle da facce di parete, mura, moli, strade e sentieri; 6 da luoghi e villaggi.
+  ERRORE TROVATO E CORRETTO: escludere le caselle con materiale da parete escludeva tutte le Marche (gli altopiani
+  dei gradoni hanno il materiale): ora solo le facce.
+- terrain.py: nebbia ed erba_lilla macro 8 (la nebbia ripeteva un motivo ogni 4 tile, visibile sul chiaro).
+- Quote: Marche pietrisco 53% -> ~47% (+ terra bruciata, erica), Frontiera nebbia 61% -> ~49% (+ lilla).
+- Restano i punti d'interesse (contenuto di gioco, da decidere).
+- Verificato: diff con HEAD (solo ground e ~30 ossa in meno sul terreno cambiato), ritagli a dimensione vera,
+  md5 uguale su due lanci, validate 0, campioni_terreni rigenerato.
+
+[2026-10-14] Revisione arte 3.13 — vicoli storti (approvato dall'utente: "fai"). FATTO.
+- build_world.py, dopo genera_sottosuolo (strade, luoghi, ingressi approvati invariati): coordinate piegate
+  XW/YW = x/y + (fbm scala 14, seed+331/332 - 0.5) * 10; centro antico: isolati (XW%10<8)&(YW%9<7) su stone e
+  lastre_chiare senza materiale; bassifondi: baracche (XW%5<3)&(YW%4<2)&(d>0.3), una su sei manca (hash del
+  blocco). Strada libera 3x3 attorno a luoghi, villaggi e ingressi. Piazze in marmo e mura restano.
+- pareti.py: camminamento delle mura con lastre da un hash della posizione nel mondo (_hash, disegna(origine=)):
+  ogni casella divisa in 1, 2 o 4 lastre, tono quasi sempre medio (prima due toni alternati: scacchiera).
+- Controllo: il pezzo di "strada chiusa" al porto e' la faccia delle mura che scendono al mare, non un difetto.
+- Verificato: diff con HEAD solo ground in citta' (1560 caselle), il resto identico; anteprima della citta',
+  porto e mura a dimensione vera; md5 uguale su due lanci; validate 0.
+
+[2026-10-16] Revisione arte, punto 2 (Blocco C del PRD 8b): Enel, nemico_base e pet a 64 px. FATTO lato arte.
+- tools/art/build_personaggi.py (nuovo): un metodo solo per i tre (motore 3D di forge3d, stessa luce, contorno
+  1 px, nessuna ombra cotta). Scrive arte/sprite/{categoria}_{nome}.png; generate_all.py li copia in assets/
+  (tell rosso del nemico). Tolti tools/art/build_enel.py e arte/sprite/personaggio_*.json (manichino a 32 px).
+  Comando: python tools/art/build_personaggi.py && python tools/art/generate_all.py. Nessun numero casuale.
+- Enel: humanoid + falde del cappotto aperte davanti, bende, crepa ciano sul viso, sciarpa sulla schiena,
+  spadone con lama 13 (non 16) portato in spalla (SPALLA) in idle/walk/dash/hurt/cast/meditate; attacchi e
+  parata partono e tornano in spalla (da_spalla). Materiali nuovi: coat_enel (quasi nero, riflesso prugna),
+  trou_enel, skin_enel. Bordo di luce grigio ardesia sul contorno in alto a sinistra (bordo_luce). ppu 1.22.
+- Nemico: bandito senza berretto (capelli su nuca e cima), occhio e naso visibili di profilo, giubba verde
+  (cloth_bandito), mazza. ppu 1.4. Lupo: quadruped con orecchie grandi, gorgiera e gola chiare, naso, dorso
+  fur_cinereo; ppu 1.75.
+- Libreria forge3d: enemy_attack (colpo con l'arma che scende, frame 2 diverso dal 1), stagger (frame 1 diverso),
+  attack_light/attack_heavy (busto dritto e lama che scende in avanti: prima la lama restava in avanti-in alto e
+  da sinistra sembrava un montante; braccio e passo ridotti per stare nella cella), quad_attack (balzo corto).
+- Regole verificate su tutti i 19 fogli (script di controllo): nessun pixel sul bordo della cella, nessun frame
+  uguale al precedente (vivi: le pose tenute diventano un micro-movimento), alpha solo 0/255, figure 35-46 px
+  (lupo 26-37). Piedi a 54 px su 64 (PIEDI): per 2.1 (codice) il gioco dovra' usare questo punto.
+- Morte (Enel e nemico): cade su un fianco e resta distesa, spada in mano (prima cadeva all'indietro: vista di
+  fronte restava una testa che affondava).
+- 1.1: selciato di Mirwada (ciottoli_scuri) in grigio caldo poco contrastato (colori extra della rampa). Prova
+  giorno/notte rifatta: arte/revisione/leggibilita_personaggi_dopo.png.
+- Verificato: fogli guardati ingranditi su chiaro e scuro (molti giri: spadone in spalla, profilo del nemico,
+  colpo, morte, lupo); validate 0; godot --import ok; 778 test passati.
+- Restano: 1.7 lampo del colpo dal gioco (codice), 2.1 piedi sull'origine (codice), 2.2 ombra composta (codice),
+  2.3 tell singolo (codice); altri due pet e hurt/death del pet (dati nuovi, US-8B32).
+
+## Revisione arte 1.7, 2.1, 2.2, 2.3 — aggancio tra sprite e gioco, 2026-10-16
+- 1.7 lampo del colpo: AnimationMachine.lampo() porta self_modulate a x2.6 e torna a 1 in 120 ms (tween); con
+  riduci_flash x1.25. Dati: vfx.json.lampo_colpito. Chiamato da player.gd (_su_danno_subito, danno > 0) e da
+  enemy.gd (hurtbox.colpito). self_modulate e non modulate: le tinte di stato (dash ciano, stagger) restano libere.
+- 2.1 piedi sull'origine: animations.json.convenzioni.piedi_px = 54; configura() mette offset.y = 32 - 54 px
+  (prima della scala 0.5 -> -11 unita'). player.tscn/enemy.tscn: sprite e cerchio del corpo a (0, 0) (erano
+  (0,-8) e (0,-4)). Hurtbox/hitbox non toccate: geometria del combattimento gia' tarata.
+- 2.2 ombra a terra: figlia "OmbraTerra" (show_behind_parent, scala annullata -> unita' di gioco), ellisse a righe
+  di mezza unita' (un pixel di schermo: con draw_circle schiacciato usciva una punta in basso). Dati:
+  vfx.json.ombra_terra (colore #181425, alpha 0.3, raggi personaggio/nemico [6,2], pet [7,2]; partito da [7,2.5]
+  e [9,2.5], troppo larghi a schermo). Segue modulate (la dissolvenza della morte la porta via), non il lampo.
+- 2.3 tell singolo: tolta la tinta (1, 0.5, 0.4) in enemy.gd; resta il contorno rosso del foglio anticipo.
+- Verifica a schermo: Godot con xvfb-run (opengl3), script temporaneo non committato; immagine
+  arte/revisione/aggancio_sprite_gioco.png (Enel, Enel col lampo, nemico in anticipo, nemico col lampo, lupo col
+  lampo ridotto: piedi sulla stessa riga, ombre pulite). Nota: il primo frame dopo il caricamento dura secondi,
+  un lampo chiamato li' finisce subito (solo nella prova, non in gioco).
+- Test nuovi (test_animation_machine): piedi sull'origine, ombra dai dati, lampo con riduci_flash. validate 0;
+  781 test passati.
+- Resta aperto: provare a mano in gioco le collisioni coi muri del mondo vero (US-8B12) con i piedi sull'origine;
+  la hurtbox (0,-4) copre la parte bassa del corpo, da rivedere se i colpi alla testa "mancano".
+
+## US-8B32 parte (a) — pet per specie, colpito e morte, capra lunare, 2026-10-17
+- Dati: animations.json pet + hurt (3 frame, 14 fps, direzionale) e death (6 frame, 10 fps, non direzionale),
+  stesso formato del nemico. Tempi comuni a tutte le specie di data/pets.
+- Codice: AnimationMachine.configura(categoria, aspetto = "") cerca assets/placeholder/<cat>_<aspetto>_<nome>.png
+  e ripiega su <cat>_<nome>.png (segnaposto). Il pet in gioco non ha ancora una scena: sara' configura("pet", id).
+  Test nuovo test_aspetto_sceglie_i_fogli_della_specie.
+- Generatore: build_personaggi.py tabella PET {lupo_cinereo, capra_lunare} -> fogli arte/sprite/pet_<specie>_<nome>;
+  quad_hurt (rinculo), quad_morte (girato di profilo, cade sul fianco con la schiena verso di noi: di fronte era
+  una macchia; il verso opposto sembrava ancora in piedi; la caduta di forge3d affondava il corpo e toccava il
+  bordo). capra(): manto fur_lunare (slate/grey/grey_l/cream), muso e barbetta fur_black, zampe fur_grey, corna
+  "corno" (ink/brown_dd/slate_d/slate) in tre tratti in catena dalla fronte all'indietro, orecchie di lato, occhi
+  neri (i gialli luminosi di fronte sembravano una luce sul petto), segno glow_cyan. forge3d quadruped(head=1.0):
+  grandezza della testa (capra 0.8: con la testa intera sembrava un orso). generate_all.py copia per specie
+  (salta le specie senza fogli, oggi il corvo). Tolti arte/sprite/pet_{idle,walk,attack}.png; assets/placeholder/
+  pet_<nome>.png ora sono i segnaposto generici (generate_placeholders.py, tileset.png ripristinato).
+- Comando: python tools/art/build_personaggi.py --only pet && python tools/art/generate_all.py --only pet &&
+  python tools/generate_placeholders.py. Nessun numero casuale.
+- Verifica: lupo idle/walk/attack identici byte per byte ai fogli approvati; controllo su tutti i fogli pet: nessun
+  pixel sul bordo, nessun frame doppio, alpha 0/255, alti 23-37 px; guardati ingranditi su chiaro, erba e
+  selciato (molti giri sulla capra: corna, muso, testa, morte). Prova a schermo in Godot (xvfb):
+  arte/revisione/pet_a_schermo.png. validate 0, import ok, 782 test passati.
+- Nota: la zampa anteriore nella vista di fronte arriva a 58-62 px (piu' vicina alla camera): l'origine del nodo
+  resta il centro dell'animale a terra, li' va l'ombra.
+- Resta: parte (b) corvo_veggente (scheletro da uccello in forge3d, volo).
+
+## US-8B32 parte (b) — corvo veggente, scheletro da uccello, 2026-10-19
+- forge3d/creatures.py: bird() (corpo, petto, testa con becco a cono in avanti, ali in due segmenti wing_/tip_ con
+  la punta stretta e piegata indietro, coda a ventaglio, zampette ripiegate) e BIRD_CLIPS: idle (sospeso, battito
+  corto), walk (volo, battito pieno sfasato di mezzo frame: con 6 frame la sinusoide dava pose a coppie), attack
+  (ali in alto, picchiata a ali chiuse, colpo, risalita), hurt (perde quota all'indietro), death (precipita e resta
+  a pancia in giu' con le ali stese: sul fianco un'ala restava verticale e sembrava in piedi). VOLO = 9 unita':
+  il corpo vola sopra l'origine, l'ombra del gioco resta a terra.
+- build_personaggi.py: corvo() con piume_corvo (ink/ink/navy/slate_d: con fur_black sembrava grigio, con blu_d un
+  uccello blu), becco e zampe iron, occhi eye_yellow, bordo di luce come Enel; ppu 2.3 (a 1.75 alto 11-22 px).
+  PET ora porta per ogni specie (rig, ppu, clip, bordo di luce).
+- Comando: python tools/art/build_personaggi.py --only pet && python tools/art/generate_all.py --only pet.
+- Verifica: controllo fogli (alto 13-28 px in volo, nessun bordo, nessun frame doppio, alpha 0/255), guardati
+  ingranditi su erba; prova a schermo in Godot: arte/revisione/pet_corvo_a_schermo.png (vola sopra l'ombra, a terra
+  da morto). Lupo e capra invariati.
+- Non mi convince ancora: nella picchiata vista di fronte (attack down, frame 1-2) il corvo e' una croce; dura
+  50 ms, in movimento passa.
+
+## Confronto concept art / mondo generato + prova dell'Archivio Sepolto, 2026-10-19
+- Confronto regione per regione (seed 6, pezzi 40x24 tile centrati sul luogo di ogni concept): arte/confronto_concept.md,
+  tavole in arte/revisione/concept/. Esito: le concept parlano di oggetti/edifici/luoghi simbolo, il generatore fa
+  quasi solo terreno. Archivio: sopra e' neve, sotto non c'e' una zona archivio. Frontiera: isola nel mare invece
+  di isole sospese nel vuoto. Trono del Gigante a (21, 20), nell'angolo della mappa: da verificare.
+- Difetti trovati negli alberi della Valle (non ancora corretti): contorno doppio dietro la chioma delle querce,
+  righe verticali sotto le chiome, felci giallo acceso. arte/revisione/concept/difetti_alberi_valle.png.
+- Prova dell'Archivio Sepolto dalla concept (script nello scratchpad, NON nel repo: codice non ancora spiegato):
+  sala 40x24 con muri "mura" alti 2, cima scura, lastre_rovine, scaffali (in fila e caduti), libri e pergamene,
+  porta sigillata con rune ciano, automa col nucleo ciano, leggio con candele, ingranaggi, macerie e luce dal
+  crollo; variante con l'atmosfera della concept (penombra calda, restano accesi luce, rune, candele).
+  Tavole: archivio_prova_tavola.png, archivio_prova_schermata.png.
+- Nessun dato approvato toccato, nessun asset di gioco cambiato.
+
+## Difetti degli alberi (dal confronto con le concept), 2026-10-20
+- Contorno doppio: la fascia scura sul bordo delle chiome (5-8 px, in gigante, quercia, pino, cipresso) veniva dalle
+  linee interne di engine._compose: soglia inner_thr = 1 unita' anche sugli alberi ingranditi x3,6, e il bordo ripido
+  di una sfera grande la superava sulla stessa superficie (verificato con la maschera dei pixel cambiati: 2388 pixel).
+  Provato prima un margine dal bordo (non bastava, tolto). Correzione: worldrender.object_sprite passa
+  inner_thr = max(1, scala del modello); restano le linee da 1 px tra lobi e palchi (soglia 4 ok, 8 toglie i palchi
+  del pino). Personaggi e pet non cambiano (non passano da object_sprite).
+- Liane del gigante: 4 fili leaf_dark che escono dalla chioma, mezza lunghezza 1,5-3 (prima 7 cilindri chiari fino a
+  terra: sembravano gocce o gambe di un tavolo).
+- Felci della giungla: leaf invece di leaf_light (la rampa finiva nel giallo). Il numero di voci di ALBERI non cambia.
+- Rigenerato: python tools/art/build_world.py (seed 6). Cambiano solo i ritagli con gli alberi; mondo_prova.png,
+  sottosuolo e citta' identici (dati e posizioni invariati). Guardati ingranditi tutti gli oggetti del mondo prima e
+  dopo (rocce, cespuglio, ossa, scoglio uguali) e la Valle: arte/revisione/concept/alberi_valle_prima_dopo.png.
+
+## Story 1 (decisioni 2026-10-20): Trono del Gigante sulla vetta delle Marche, 2026-10-20
+- Prima: luoghi["trono_del_gigante"] = migliore(mc, alt), ma alt cresce con la distanza da Mirwada, quindi il
+  "punto piu' alto" era sempre l'angolo della mappa (21, 20), nella neve.
+- build_world.trono_sulla_vetta (a fine generazione, dopo i sentieri: i numeri casuali e il resto del mondo non
+  cambiano): vetta = gradone piu' alto delle Marche (6), a >= 40 caselle dal bordo mappa e >= 4 dai salti, punto
+  piu' in rilievo (elev sfumata). Spiazzo di arenaria (disco 4,5) rialzato di un livello: rocca con pareti di
+  arenaria. Salita: A* dalla casella di strada/sentiero piu' vicina nelle Marche, sentiero "path", scala "S" dove
+  attraversa una parete. Tolti alberi/rocce/ossa sotto spiazzo e salita. Oggetti nuovi in forge3d/creatures.py e
+  worldrender.py: trono (blocchi di pietra, ~4,5 tile), spada (14 tentativi attorno, seed+341), stendardo (2 ai lati).
+  Se il tavolo tattico sposta il trono (spostati.luoghi), vince la sua posizione.
+- Esito (seed 6): trono a (205, 53); salita di 271 caselle dal sentiero a (426, 102), 1 scala (quella della rocca).
+  Cambia solo il riquadro x 201-423, y 49-102 (320 caselle di terreno); in punti.json cambia solo il trono.
+- Comando: python tools/art/build_world.py. Tavola: arte/revisione/concept/trono_sulla_vetta.png.
+- Notato (gia' presente, non toccato): il villaggio "mulino" sta a (0, 0): il generatore non trova un posto adatto
+  (riva di fiume nella campagna di Mirwada lontana dalla citta').
+- Trono piu' grande (richiesta dell'utente): trono x7,6 (~9-10 tile, tela 448x512), rocca raggio 8,5, vetta a >= 8
+  caselle dai salti (resta (205, 53)), spade a 6-12 caselle, stendardi x4,6. La rocca si alza PRIMA di cercare la
+  salita: scala di 2 caselle nella parete sud piu' vicina alla partenza; i salti di lato senza parete costano 1e6
+  (prima il sentiero entrava di lato, dove non si puo' salire).
+
+## Story 2 (decisioni 2026-10-20): Frontiera delle Porte sospesa nel vuoto di nebbia, 2026-10-20
+- Terreno nuovo "vuoto" (terrain.py, una riga, livello -1, fog grigio freddo animato, piu' scuro della terra lilla).
+  Per il gioco resta non calpestabile come l'acqua (water_mask invariata).
+- build_world.frontiera_nel_vuoto (a fine generazione): terra piu' vicina a ogni casella di mare (le regioni si
+  allargano una casella per volta; anche le spiagge rifatte, che sono terra nella regione "mare"). Vuoto = mare piu'
+  vicino alla Frontiera, entro ~24 caselle (+-6, fbm seed+351) e ad almeno 12 da ogni altra terra. Altezza -2; riva
+  con materiale "roccia" (le pareti scendono nel vuoto sul lato sud); niente spiaggia (sabbia e acqua bassa prendono
+  il terreno attorno, isolotti di sola sabbia -> nebbia); terreno_sotto solo vicino al vuoto; via gli oggetti nel vuoto.
+- Errori trovati e corretti per strada: (1) le spiagge rifatte stanno nella regione "mare" -> restavano sabbia e
+  pareti a pezzi; (2) il vuoto arrivava sotto il faro: la punta della diga (terra senza regione) veniva contata come
+  Frontiera -> moli, pontili e mura non sono mai Frontiera; (3) terreno_sotto su tutta la mappa annullava ritocchi
+  gia' fatti nelle Marche (erica/pietrisco a x 0-40) -> solo vicino al vuoto.
+- Verifica casella per casella (codice di prima vs adesso, seed 6): continente 278 caselle cambiate, tutte nel
+  riquadro del trono e della salita; al sud nessuna fuori da Frontiera, vuoto e acqua bassa convertita;
+  mirwada_citta.png identica. Tavole: arte/revisione/concept/trono_sulla_vetta.png, frontiera_nel_vuoto.png.
+- Aperto: l'approdo_frontiera era un attracco di navi; ora davanti c'e' il vuoto: come ci si arriva va deciso (porta,
+  ponte, nave che entra nella nebbia). Nella modalita' cupa la terra lilla della Frontiera andra' scurita (concept:
+  isole di roccia scura e vuoto chiaro).
+
+## Modalita' cupa, story 1: tema dei colori nel generatore, 2026-10-23
+- Scelta dell'utente: strada B (doppio set di asset, tutto in palette), non il filtro nel gioco.
+- forge3d/tema.py (nuovo): TEMA ("luminoso" | "cupo"), imposta(), colore(hex), CUPO = tabella chiusa colore -> gemello
+  cupo per i 57 colori usati da terreni, pareti, materiali e VFX. Bozza: saturazione x0,55, luce x0,62, ombre verso
+  il blu, aggancio a Endesga 32 se a distanza < 10, altrimenti extra cupo dichiarato li'. Nessun riempimento su
+  #181425 (il contorno): brown_dd e navy -> #231d30. Prima prova raggruppando in 27 colori: scartata (le luci verdi
+  delle chiome diventavano grigie, l'acciottolato blu verde).
+- Collegamenti: terrain._rgb passa da tema.colore; terrain.rampa(d) usa "ramp_cupo" nel tema cupo se il terreno ce
+  l'ha (story 2); cache delle macro-texture e degli oggetti con il tema nella chiave; materials.Material.rgb calcolato
+  al momento (gli emissive non passano dalla tabella: occhi, rune, fuoco restano accesi); build_world --tema cupo
+  scrive solo le immagini in arte/mondo/cupo/ (dati e tavolo tattico sono gli stessi del luminoso).
+- Verifica: build_world luminoso, build_personaggi e generate_all rigenerati -> nessun file cambiato (byte per byte).
+  Cupo guardato su porto, Valle, Marche, Frontiera: tinte conservate, tutto piu' scuro e spento.
+- Prossimo: story 2 (ramp_cupo per l'umore di ogni regione, confronto con le concept), story 3 (Frontiera
+  invertita: terra scura, vuoto chiaro).
+
+## Modalita' cupa, story 2: umore delle regioni, 2026-10-23
+- Palette delle concept estratte (10 colori per concept, senza le linee d'inchiostro). ramp_cupo (stessa lunghezza
+  della ramp) sui terreni tipici di ogni regione: Marche (pietrisco, muschio_scuro, arenaria, terra_bruciata,
+  erica_secca: terra quasi nera, ombre viola, luci ruggine), Mirwada (stone = isolati color mattone, ciottoli_scuri =
+  strade di ciottoli grigi bagnati, lastre_chiare, lastricato_antico, filari), Valle (felci, radici_muschio: verdi-grigi
+  di muschio), neve viola-grigia del tramonto (condivisa da Archivio, Marche e vette). Nessun colore delle ramp_cupo e'
+  anche una voce di tema.CUPO (sarebbe trasformato due volte).
+- Prima prova: isolati e strade di Mirwada nello stesso grigio (non si distinguevano) -> isolati in mattone.
+- Verifica: concept / luminoso / cupo per regione: arte/revisione/concept/cupo_regioni.png. Il luminoso rigenerato e'
+  identico byte per byte.
+- Aperto: gli oggetti seguono solo la tabella (il trono resta pietra grigio-blu, nella concept e' roccia nera con il
+  bordo arancio): servira' una ramp_cupo anche per materiali scelti. Archivio: la concept e' la sala sotterranea, che
+  non esiste ancora.
+
+## Modalita' cupa, story 3: Frontiera invertita, 2026-10-23
+- ramp_cupo dalla palette della concept frontiera_porte: vuoto = nebbia chiara (#939398..#c8cbcf), nebbia (terra della
+  Frontiera) = roccia scura (#231a20..#574244), erba_lilla e terra_rosa = toni intermedi spenti. Stessa lunghezza
+  delle ramp, nessun colore che sia anche voce di tema.CUPO. La roccia delle scogliere segue la tabella (gia' scura).
+- Verifica: arte/revisione/concept/frontiera_cupa.png (concept, riva sud, riva nord): isole scure su nebbia chiara,
+  anche il bordo nord senza scogliera si legge. Luminoso rigenerato identico byte per byte.
+- Aperto: alberi secchi bruni su terra bruna (si leggono meno); nella concept la terra delle isole e' piu' viola.
+- Correzioni (richiesta dell'utente "sistema e procedi"): terra delle isole piu' viola (nebbia #231a20/#352c3f/#4a3f55,
+  erba_lilla e terra_rosa a seguire); alberi leggibili: materials.Material ha ora una ramp_cupo opzionale (nel cupo
+  vince sulla tabella), corteccia "bark" cupa = tronchi muschiosi chiari (concept valle): alberi secchi chiari sulla
+  terra scura della Frontiera, tronchi pallidi in Valle. Trono: materiale proprio "roccia_trono" (nel luminoso uguale a
+  "stone", verificato byte per byte), cupo quasi nero con le facce in luce ruggine; arenaria cupa grigio-viola con
+  riflessi ruggine (prima arancio: il trono scuro si confondeva con la rocca). Tavole: cupo_regioni.png,
+  trono_cupo.png, frontiera_cupa.png in arte/revisione/concept/. Luminoso, personaggi e pet identici byte per byte.
+
+## Modalita' nel gioco, story 1: dati, GameState, salvataggio, 2026-10-23
+- data/modalita.json (nuovo): default "facile"; facile = {tema_arte luminoso, moltiplicatori {}}, difficile =
+  {tema_arte cupo, danno_al_giocatore 1.5, danno_ai_nemici 0.8, cure 0.7} (numeri di partenza proposti e approvati,
+  da provare a schermo).
+- GameData: carica il file (chiave "modalita"), get_modalita(id), modalita_ids(), modalita_default().
+- GameState: var modalita; nuova_partita(nome, slot, talenti, scelta_modalita = "") -> fissa la modalita' (non valida
+  o vuota -> default dei dati); snapshot "modalita"; applica() la rilegge (save vecchio senza campo -> default);
+  moltiplicatore(nome) (assente = 1), tema_arte().
+- SaveSystem: campo "modalita" in scrittura e in lettura (stringa, default ""), senza bump dello schema.
+- Test nuovi: tests/test_modalita.gd (5). validate 0, 787 test passati.
+- Aperto: il validator non controlla ancora data/modalita.json (forma e numeri > 0); i moltiplicatori non sono
+  ancora applicati (story 2: hurtbox.subisci e cura dell'ability_engine); i bottoni nel frontespizio (story 3).
+
+## Modalita' nel gioco, story 2: i numeri si applicano, 2026-10-23
+- hurtbox.subisci: danno x GameState.moltiplicatore("danno_al_giocatore" se il padre e' nel gruppo "player",
+  altrimenti "danno_ai_nemici"), prima di parata, schivata e scudo. ability_engine._p_heal: quantita x
+  moltiplicatore("cure") solo se chi si cura e' il giocatore (la cura di un nemico non cambia).
+- validate_data.py: regola per data/modalita.json (default esistente, tema_arte luminoso|cupo, moltiplicatori di un
+  vocabolario chiuso {danno_al_giocatore, danno_ai_nemici, cure} e > 0). Provata guastando il file: 4 errori trovati.
+- Test nuovi in tests/test_modalita.gd (3): danno al giocatore e ai nemici in difficile, facile invariata, cure del
+  giocatore e di un altro. validate 0, 790 test passati.
+- Aperto: story 3 (bottoni Facile/Difficile nel frontespizio, prova a schermo).
+
+## Modalita' nel gioco, story 3: scelta nel frontespizio, 2026-10-23
+- page_creazione_personaggio.gd: riga "Modalita' (per sempre): [Facile] [Difficile]" (un bottone per modalita' dei
+  dati, ButtonGroup a scelta unica, premuto il default dei dati), sotto la frase della modalita' scelta; conferma()
+  passa la scelta a nuova_partita. A partita in corso il frontespizio mostra anche la modalita'. Testi in
+  assets/i18n/strings.csv (BOOK_FRONTESPIZIO_MODALITA[_PARTITA], MODALITA_<ID>, MODALITA_<ID>_DESCR, it + en),
+  chiavi ricavate dall'id dei dati; .translation rigenerate con godot --import.
+- Prova a schermo (Godot, xvfb): la prima versione usciva dalla pagina (descrizione e bottone Comincia non si
+  vedevano) -> talenti su 2 colonne (GridContainer) ed etichetta della modalita' sulla stessa riga dei bottoni. Ora sta
+  tutto nel libro: arte/revisione/frontespizio_modalita.png (default e Difficile premuto). Il test dei talenti
+  (test_creazione_talenti) ora cerca le caselle anche dentro la griglia.
+- Test nuovi in tests/test_modalita.gd (2): bottoni e partenza in difficile dal frontespizio; testi it/en per ogni
+  modalita'. validate 0, 792 test passati.
+
+## US-8B12 — mondo unico nel gioco (caricatore a blocchi), 2026-10-23
+- Strada scelta: il loader della skill (un TileMapLayer per terreno, mappa intera) non regge 1200x1000 x 43 terreni e
+  non conosce varianti, pareti, strati e bordi. Il terreno si compone in Python come le anteprime e si tengono le
+  caselle diverse: 34.561 tessere (luminoso) e 34.655 (cupo) su 1,2 milioni, 5 fogli 2048x4096 per tema.
+- tools/art/esporta_mondo.py (nuovo): assets/world/mondo.json (misure, partenza = casa_base_porto, luoghi, regioni,
+  sprite e 29.860 oggetti), blocchi.png (255 = non si passa: water_mask, pareti senza scala/rampa, salti verso est,
+  ovest e nord), regioni.png, <tema>/tessere_<k>.png, <tema>/indici.png (R + 256 G), <tema>/oggetti/ (321 sprite).
+  9,1 MB luminoso + 9,4 MB cupo. Comando: python tools/art/esporta_mondo.py (seed 6, ~30 min per tema).
+- scripts/world/mondo.gd (nuovo): legge i dati (PNG dal disco, senza import), tema da GameState.tema_arte(); costruisce
+  terreno (TileMapLayer, un atlante per foglio, tessere create quando servono), ostacoli (TileMapLayer invisibile con
+  una tessera di collisione, strato 1) e oggetti (Sprite2D, y_sort con il giocatore) solo nei blocchi 16x16 attorno al
+  giocatore (raggio 2: 80x80 caselle), libera quelli lontani. colloca(): mette il giocatore e porta subito la
+  telecamera (con lo scorrimento morbido partiva da (0, 0) e attraversava la mappa: trovato con la prova a schermo).
+- scenes/mondo.tscn (nuovo): mondo + giocatore + HUD e overlay. main.tscn non cambia ancora: serve prima la regione
+  dalla posizione (US-8B12b) per musica, gating e densita' mistica.
+- Verifica: tests/test_mondo.gd (6); prova a schermo in Godot (xvfb) facile/difficile su porto, Trono, Frontiera:
+  arte/revisione/mondo_in_gioco.png; prova di fisica: un corpo spinto verso il mare del porto si ferma alla casella
+  prima. validate 0, 798 test passati.
+- Aperto: acqua ferma (frame 0: l'animazione richiede 4 tessere per casella d'acqua); nessuna collisione sui tronchi
+  degli alberi; terreno a 32 px per tessera (i personaggi sono a 64); nessun nemico nella scena del mondo; regione
+  dalla posizione (US-8B12b); sottosuolo e interni (US-8B12c/d).
+
+## US-8B12b — regione e zona dalla posizione nel mondo unico, 2026-10-23
+- scripts/world/mondo.gd: aggiorna_regione(pos), chiamata da _process quando il giocatore cambia casella (non da
+  segui(), cosi' i test del caricatore non toccano WorldState). Regione = regioni.png se e' una regione dei dati
+  (GameData.get_region), altrimenti WorldState.esci_regione() (mare, terra di mezzo, isole: densita' e musica di
+  default). Zona = location_tag del luogo della mappa piu' vicino entro 12 caselle, solo se il tag e' tra i
+  location_tags della regione.
+- data/world/regions.json: "luoghi_mondo" abbina i nomi dei luoghi della mappa che non coincidono col tag
+  (es. campo_di_battaglia -> luogo_di_battaglia, approdo_frontiera -> soglia). Nessun dato approvato cambiato.
+- scripts/world_state.gd: esci_regione() (azzera regione, zona e override; emette regione_cambiata("") se cambia).
+- tools/validate_data.py: ogni valore di luoghi_mondo deve essere tra i location_tags della sua regione.
+- Verifica: 2 test nuovi in tests/test_mondo.gd (porto -> mirwada/porto, trono -> marche/trono e scoperta,
+  abbinamento luoghi_mondo, terra di mezzo -> nessuna regione con densita' 0.2, lontano dai luoghi -> zona vuota).
+  validate 0, 800 test passati.
+- Aperto: il gating delle sotto-aree (gating_subareas) non si applica ancora: sulla mappa non ci sono confini delle
+  sotto-aree. main.tscn usa ancora le scene di regione: il passaggio al mondo unico richiede NPC e porte.
+
+## US-8B12c — il gioco parte dal mondo unico: NPC, gating d'ingresso e viaggio veloce, 2026-10-23
+- scenes/main.tscn: al posto della scena di regione c'e' il nodo Mondo (scripts/world/mondo.gd, y_sort) con dentro
+  Player ed Enemy (il nemico a (526, 406), 8 caselle a nord della partenza, su una casella libera di Mirwada).
+  scenes/mondo.tscn tolta: era uguale al main.
+- mondo.gd:
+  - NPC: crea_npc() mette gli NPC presenti ORA (NpcSystem.presenti, tutte le regioni) al luogo della mappa del loro
+    location_tag (luogo_del_tag, con luoghi_mondo); ricostruiti a ogni momento_cambiato. Ognuno su una casella
+    libera, a 2 caselle dagli altri, scelta fra le libere vicine con l'hash dell'id (deterministico: la prima
+    versione a anelli li metteva in griglia, visto a schermo). Avvicinarsi = incontrato, "interagisci" = dialogo,
+    come nelle scene di regione.
+  - Gating d'ingresso: chi entra in una regione con il gate "ingresso" chiuso torna all'ultima posizione ammessa
+    (la Frontiera respinge chi e' oltre la Sequenza 4), stessa valutazione di AreaGate.valuta_gate.
+  - viaggia_a(target): viaggio veloce dalla pagina mappa: si arriva al primo luogo della regione presente sulla mappa
+    (ordine di location_tags), casella libera piu' vicina. page_mappa cerca un nodo con viaggia_a (regione o mondo).
+  - Limiti della telecamera = tutta la mappa.
+- Verifica: 4 test nuovi in tests/test_mondo.gd (NPC al loro luogo, liberi e non sovrapposti; Frontiera respinge
+  anche col viaggio veloce; viaggio veloce verso le Marche; il main usa il mondo e il nemico sta su terra libera).
+  Prova a schermo (Godot, xvfb): regione mirwada, zona piazza, 16 NPC; arte/revisione/main_mondo_unico.png.
+  validate 0, 804 test passati.
+- Aperto: gli NPC hanno il disegno del personaggio (sembrano il giocatore): serve un aspetto per gli NPC (story
+  d'arte successiva). Le barriere delle sotto-aree (cripte, passaggi_ombra, ponti_di_radici, grotte_di_marea,
+  ali_interne, isole_nebbia) non sono ancora sulla mappa: mancano i loro luoghi nel mondo. Le scene di regione
+  (scenes/regioni/, region_scene.gd) restano solo per i loro test.

@@ -49,7 +49,9 @@ func subisci(danno: float, stagger: float, da: Node, extra: Dictionary = {}) -> 
 		return
 
 	var tag: String = str(extra.get("tag_danno", ""))
-	var d: float = danno
+	# Modalita' di gioco (data/modalita.json): il danno al giocatore e quello ai
+	# nemici hanno ognuno il suo numero; in facile valgono 1.
+	var d: float = danno * _moltiplicatore_modalita()
 	var s: float = stagger
 	if _parata == Parata.PERFETTA:
 		d = 0.0
@@ -82,6 +84,15 @@ func subisci(danno: float, stagger: float, da: Node, extra: Dictionary = {}) -> 
 		postura.call("erodi", s)
 
 	colpito.emit(d, s, da, tag)
+
+
+func _moltiplicatore_modalita() -> float:
+	var gs: Node = Engine.get_main_loop().root.get_node_or_null("GameState")
+	if gs == null:
+		return 1.0
+	var p: Node = get_parent()
+	var del_giocatore: bool = p != null and p.is_in_group("player")
+	return float(gs.call("moltiplicatore", "danno_al_giocatore" if del_giocatore else "danno_ai_nemici"))
 
 
 func _precisione(da: Node) -> float:

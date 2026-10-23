@@ -43,18 +43,22 @@ puo' davvero rubare:
 registro. `data/vfx.json.pathway_palette_visiva` e' il gemello — stessa
 chiave, stessa filosofia ("10 palette invece di 200 sprite"):
 
-| Pathway | Audio (materiale) | Inchiostro + primario + accento | Tratto |
+| Pathway | Audio (materiale) | Inchiostro + primario + accento (`data/vfx.json`) | Tratto |
 |---|---|---|---|
-| twilight_giant | metallo_luce | nero profondo + **oro** + bianco caldo | `pennellata_carica` — piena, pesante, dritta |
-| death | ossa_vento | nero + **verde osso pallido** + grigio freddo | `pennellata_secca` — spezzata, come ossa |
-| darkness | feltro_soffio | nero + **nero-viola** + niente accento (nero su nero: si vede il *buco*, non il colpo) | `assenza` — niente scia: sparisce |
-| fool | carta_corda | seppia + **rosso teatro** + crema | `tratteggio` — doppio segno, come una cosa e la sua finta |
-| error | vetro_scatto | nero + **ciano tagliente** + bianco | `scheggia` — segmenti spigolosi, interrotti |
-| door | aria_risucchio | blu notte + **viola profondo** + argento | `cerchio` — archi e anelli, mai linee dritte |
-| hermit | pergamena_cristallo | nero + **ambra** + azzurro cristallo | `glifo` — il tratto disegna sigilli |
-| paragon | ottone_ingranaggio | nero + **rame** + ottone chiaro | `meccanico` — linee parallele, angoli netti |
-| mother | legno_linfa | terra scura + **verde linfa** + fiore chiaro | `crescita` — il tratto germoglia dal punto d'origine |
-| moon | acqua_pelo | blu abisso + **argento lunare** + rosso sangue | `fluido` — curve continue, come acqua |
+| twilight_giant | metallo_luce | `#0a0a0f` + **oro** `#e8c34a` + bianco caldo `#fff6d8` | `pennellata_carica` — piena, pesante, dritta |
+| death | ossa_vento | `#08090b` + **grigio-azzurro ardesia** `#5f7d8c` + bianco gelido `#d7e9f0` | `glifo` — il tratto disegna sigilli |
+| darkness | feltro_soffio | `#07070a` + **viola scuro** `#4b3b6b` + lilla chiaro `#b9a6e0` | `pennellata_secca` — spezzata, secca |
+| fool | carta_corda | `#0a080c` + **lilla grigio** `#8f7fae` + lilla chiarissimo `#e8e0f2` | `assenza` — niente scia: sparisce |
+| error | vetro_scatto | `#0b0a08` + **ruggine** `#c85a3c` + pesca chiaro `#ffd8c0` | `scheggia` — segmenti spigolosi, interrotti |
+| door | aria_risucchio | `#0a0810` + **viola** `#7a5cc0` + argento-lilla `#e4d6ff` | `cerchio` — archi e anelli, mai linee dritte |
+| hermit | pergamena_cristallo | `#0a0906` + **ambra** `#b98a3e` + pergamena `#f2dcae` | `tratteggio` — doppio segno, come una cosa e la sua finta |
+| paragon | ottone_ingranaggio | `#0a0a0c` + **grigio caldo** `#c9c2b0` + bianco `#ffffff` | `meccanico` — linee parallele, angoli netti |
+| mother | legno_linfa | `#060a07` + **verde linfa** `#5c9a4e` + verde chiaro `#d8f0c8` | `crescita` — il tratto germoglia dal punto d'origine |
+| moon | acqua_pelo | `#070a0c` + **azzurro lunare** `#6fb0c4` + bianco argento `#dff4fa` | `fluido` — curve continue, come acqua |
+
+> **Allineata a `data/vfx.json` il 2026-10-14** (decisione dell'utente: vale il file dati).
+> La tabella precedente aveva colori e tratti diversi per death, darkness, fool, error,
+> hermit, moon e paragon; resta nella storia di git.
 
 I valori esadecimali precisi si fissano in `data/vfx.json` con la prima story
 di fase 2 (e si tarano a schermo, non sulla carta). La regola che non cambia:
