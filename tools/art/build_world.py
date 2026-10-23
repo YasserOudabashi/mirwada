@@ -38,6 +38,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from forge3d.pareti import disegna as disegna_pareti, maschera as maschera_pareti, strati as strati_pareti, terreno_sotto  # noqa: E402
 from forge3d.terrain import ORDER, TERRAINS, build_atlas  # noqa: E402
+from forge3d import tema  # noqa: E402
 from forge3d.world import LEVEL, World, fbm  # noqa: E402
 from forge3d.worldrender import render_world, save  # noqa: E402
 
@@ -1469,9 +1470,15 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--seed", type=int, default=6)
     ap.add_argument("--senza-ritagli", action="store_true", help="solo le mappe intere (piu' veloce)")
+    ap.add_argument("--tema", choices=["luminoso", "cupo"], default="luminoso",
+                    help="cupo = modalita' difficile: stessi dati, colori di forge3d/tema.py, immagini in arte/mondo/cupo/")
     ap.add_argument("--confronto", type=int, nargs="+", metavar="SEED",
                     help="solo un confronto affiancato tra piu' seed -> arte/mondo/confronto_seed.png")
     a = ap.parse_args()
+    global OUT
+    tema.imposta(a.tema)
+    if a.tema == "cupo":                                  # stessi dati del luminoso: cambiano solo le immagini
+        OUT = os.path.join(OUT, "cupo")
     os.makedirs(OUT, exist_ok=True)
     if a.confronto:
         imgs = [anteprima(*genera(sd)[:3], etichette=False).resize((W // 2, H // 2), Image.NEAREST)
@@ -1499,12 +1506,14 @@ def main():
               "sottosuolo": {"ground": [[int(v) for v in r] for r in sotto["ground"]],
                              "ingressi": sotto["ingressi"], "boss": sotto["boss"],
                              "altezza": sotto["alt"].tolist(), "passaggi": ["".join(r) for r in sotto["pas"]]}})
-    with open(os.path.join(OUT, "world_prova.json"), "w") as f:
-        json.dump(j, f, separators=(",", ":"))
+    if a.tema == "luminoso":                              # i dati sono gli stessi nei due temi: si scrivono una volta
+        with open(os.path.join(OUT, "world_prova.json"), "w") as f:
+            json.dump(j, f, separators=(",", ":"))
     anteprima(w, luoghi, villaggi).save(os.path.join(OUT, "mondo_prova.png"))
     anteprima_sotto(w, sotto).save(os.path.join(OUT, "sottosuolo_prova.png"))
     anteprima_citta(w, luoghi).save(os.path.join(OUT, "mirwada_citta.png"))
-    esporta_tavolo(w, luoghi, villaggi, sotto)
+    if a.tema == "luminoso":
+        esporta_tavolo(w, luoghi, villaggi, sotto)
     if not a.senza_ritagli:
         atl = {n: build_atlas(n, 32) for n in ORDER}
         def box_di(x, y):

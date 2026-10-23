@@ -8787,3 +8787,19 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
 - Aperto: l'approdo_frontiera era un attracco di navi; ora davanti c'e' il vuoto: come ci si arriva va deciso (porta,
   ponte, nave che entra nella nebbia). Nella modalita' cupa la terra lilla della Frontiera andra' scurita (concept:
   isole di roccia scura e vuoto chiaro).
+
+## Modalita' cupa, story 1: tema dei colori nel generatore, 2026-10-23
+- Scelta dell'utente: strada B (doppio set di asset, tutto in palette), non il filtro nel gioco.
+- forge3d/tema.py (nuovo): TEMA ("luminoso" | "cupo"), imposta(), colore(hex), CUPO = tabella chiusa colore -> gemello
+  cupo per i 57 colori usati da terreni, pareti, materiali e VFX. Bozza: saturazione x0,55, luce x0,62, ombre verso
+  il blu, aggancio a Endesga 32 se a distanza < 10, altrimenti extra cupo dichiarato li'. Nessun riempimento su
+  #181425 (il contorno): brown_dd e navy -> #231d30. Prima prova raggruppando in 27 colori: scartata (le luci verdi
+  delle chiome diventavano grigie, l'acciottolato blu verde).
+- Collegamenti: terrain._rgb passa da tema.colore; terrain.rampa(d) usa "ramp_cupo" nel tema cupo se il terreno ce
+  l'ha (story 2); cache delle macro-texture e degli oggetti con il tema nella chiave; materials.Material.rgb calcolato
+  al momento (gli emissive non passano dalla tabella: occhi, rune, fuoco restano accesi); build_world --tema cupo
+  scrive solo le immagini in arte/mondo/cupo/ (dati e tavolo tattico sono gli stessi del luminoso).
+- Verifica: build_world luminoso, build_personaggi e generate_all rigenerati -> nessun file cambiato (byte per byte).
+  Cupo guardato su porto, Valle, Marche, Frontiera: tinte conservate, tutto piu' scuro e spento.
+- Prossimo: story 2 (ramp_cupo per l'umore di ogni regione, confronto con le concept), story 3 (Frontiera
+  invertita: terra scura, vuoto chiaro).

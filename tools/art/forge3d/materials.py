@@ -14,7 +14,9 @@ Parametri di un materiale:
     keep      True = i pixel isolati di questo materiale non vengono ripuliti (occhi, riflessi)
     emissive  True = non riceve ombre, usa i toni alti (fuoco, magia, occhi che brillano)
 """
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+
+from . import tema
 
 # --- Endesga 32 -------------------------------------------------------------------------------
 E32 = {
@@ -45,10 +47,12 @@ class Material:
     tex: tuple = None
     keep: bool = False
     emissive: bool = False
-    rgb: list = field(default_factory=list)
 
-    def __post_init__(self):
-        self.rgb = [hex_to_rgb(c) if isinstance(c, str) else tuple(c) for c in self.ramp]
+    @property
+    def rgb(self):
+        """Colori nel tema corrente (forge3d/tema.py). Gli emissive restano accesi anche nel tema cupo."""
+        return [hex_to_rgb(c if self.emissive else tema.colore(c)) if isinstance(c, str) else tuple(c)
+                for c in self.ramp]
 
 
 MATS = {}

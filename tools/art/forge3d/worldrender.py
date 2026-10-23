@@ -2,6 +2,7 @@
 import numpy as np
 from PIL import Image
 
+from . import tema
 from .creatures import bush, ossa, rock, spada, stendardo, tree, trono
 from .engine import render
 from .terrain import ORDER, TILE, build_atlas, compose_ground
@@ -12,7 +13,7 @@ _cache = {}
 def object_sprite(o, S=TILE):
     """RGBA + (ancora_x, ancora_y) dei piedi dell'oggetto, con lo stesso motore dei personaggi."""
     t = o["type"]
-    key = (t, o.get("kind"), o.get("leaf"), o.get("seed"), o.get("mat"), o.get("berries"), o.get("size"), S)
+    key = (t, o.get("kind"), o.get("leaf"), o.get("seed"), o.get("mat"), o.get("berries"), o.get("size"), S, tema.TEMA)
     if key in _cache:
         return _cache[key]
     k = S / 32.0

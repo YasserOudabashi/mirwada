@@ -10,13 +10,19 @@ import zlib
 
 import numpy as np
 
+from . import tema
 from .materials import E32, hex_to_rgb
 
 TILE = 32
 
 
 def _rgb(c):
-    return np.array(hex_to_rgb(E32.get(c, c)), np.uint8)
+    return np.array(hex_to_rgb(tema.colore(E32.get(c, c))), np.uint8)
+
+
+def rampa(d):
+    """La rampa del terreno nel tema corrente: nel cupo vince la sua "ramp_cupo", se c'e' (umore della regione)."""
+    return d.get("ramp_cupo", d["ramp"]) if tema.TEMA == "cupo" else d["ramp"]
 
 
 def pnoise(S, period, seed, octaves=3):
@@ -184,7 +190,7 @@ def _lastre(d, S, rs, base):
     Tono di ogni lastra a caso (quasi sempre quello centrale), ombreggiato dal rumore; fuga di un tono medio,
     spigolo in luce in alto a sinistra, spigoli scheggiati, crepe. Campi della riga: fuga (colore), erba (frazione
     di fughe con l'erba, colori in accent), mancanti (lastre sparite: buca di terra coi colori in buca)."""
-    ramp = d["ramp"]; n = len(ramp)
+    ramp = rampa(d); n = len(ramp)
     rng = np.random.RandomState(rs)
     nx_, ny_ = [(1, 1), (2, 1), (1, 2), (2, 2)][rng.choice(4, p=[0.35, 0.2, 0.2, 0.25])]
     lw, lh = S // nx_, S // ny_
@@ -241,7 +247,7 @@ def terrain_texture(name, S=TILE, seed=7, frame=0, nframes=4, variante=0):
     M = d.get("macro", 1)
     if M == 1:
         return _texture(name, S, S, seed, frame, nframes, variante)
-    key = (name, S, seed, frame, nframes)
+    key = (name, S, seed, frame, nframes, tema.TEMA)
     if key not in _macro_cache:
         _macro_cache[key] = _texture(name, S, S * M, seed, frame, nframes, 0)
     r, c = divmod(variante, M)
@@ -260,7 +266,7 @@ def _texture(name, S, Z, seed, frame, nframes, variante):
         base = 0.6 * np.roll(base, passo, 1) + 0.4 * np.roll(pnoise(Z, (d["period"] + 1) * Z // S, rs + 5, 2), -passo, 0)
     base = (base - base.min()) / (np.ptp(base) + 1e-6)
     base = 0.5 + (base - 0.5) * d.get("contrast", 1.0)    # <1: macchie piu' tenui, la ripetizione non si vede
-    ramp = d["ramp"]
+    ramp = rampa(d)
     detail = d["detail"]
     y, x = np.mgrid[0:Z, 0:Z]
     rng = np.random.RandomState(rs)
@@ -471,7 +477,7 @@ def build_atlas(name, S=TILE, seed=3):
             tex = terrain_texture(name, S, frame=f, nframes=nfr, variante=v)
             r0 = (v * nfr + f) * S
             for m, mask in enumerate(masks):
-                img, inner = _rim(mask, tex, d["rim"], d.get("rimc"), d["ramp"]) if d["rim"] else (tex, None)
+                img, inner = _rim(mask, tex, d["rim"], d.get("rimc"), rampa(d)) if d["rim"] else (tex, None)
                 tile = np.zeros((S, S, 4), np.uint8)
                 tile[..., :3] = img; tile[..., 3] = np.where(mask, 255, 0)
                 atlas[r0:r0 + S, m * S:(m + 1) * S] = tile
