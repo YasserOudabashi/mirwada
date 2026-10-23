@@ -137,3 +137,78 @@ func test_lontano_dai_luoghi_la_zona_e_vuota() -> void:
 	m.free()
 	_ws().call("pulisci")
 	_ws().call("da_salvataggio", prima)
+
+
+# --- US-8B12c: main nel mondo unico, NPC e passaggi -----------------------------
+
+func _pr() -> Node:
+	return Engine.get_main_loop().root.get_node("Progression")
+
+
+func test_gli_npc_stanno_al_luogo_del_loro_tag() -> void:
+	var m: Node2D = _mondo()
+	m.call("crea_npc")
+	var presenti: Dictionary = Engine.get_main_loop().root.get_node("NpcSystem").call("presenti", "mirwada")
+	assert_true(not presenti.is_empty(), "a Mirwada c'e' qualcuno in questo momento")
+	var viste: Dictionary = {}
+	for id in presenti:
+		var a: Node2D = m.get_node_or_null("Npc_%s" % id)
+		assert_true(a != null, "NPC %s nel mondo" % id)
+		if a == null:
+			continue
+		var c: Vector2i = _cella(m, a.position)
+		var l: Vector2i = m.call("luogo_del_tag", "mirwada", str(presenti[id]))
+		assert_true(Vector2(c).distance_to(Vector2(l)) <= 12.0, "%s vicino al suo luogo" % id)
+		assert_false(m.call("bloccata", c.x, c.y), "%s su una casella calpestabile" % id)
+		assert_false(viste.has(c), "%s non sta sopra un altro NPC" % id)
+		viste[c] = true
+		assert_true(a.get_node("AnimationMachine").sprite_frames != null, "%s ha il disegno" % id)
+	m.free()
+
+
+func test_la_frontiera_respinge_chi_e_troppo_avanti() -> void:
+	var prima: Dictionary = _pr().call("per_salvataggio")
+	var m: Node2D = _mondo()
+	_pr().call("configura", "twilight_giant", 2)
+	assert_false(m.call("ingresso_aperto", "frontiera_porte"), "sopra la Sequenza 4 la Frontiera e' chiusa")
+	var f: Array = (m.dati["luoghi"] as Dictionary)["approdo_frontiera"]
+	assert_false(m.call("aggiorna_regione", Vector2((float(f[0]) + 0.5) * m.tile, (float(f[1]) + 0.5) * m.tile)),
+		"entrare nella Frontiera e' respinto")
+	assert_false(m.call("viaggia_a", "frontiera_porte"), "nemmeno col viaggio veloce")
+	_pr().call("configura", "twilight_giant", 9)
+	assert_true(m.call("ingresso_aperto", "frontiera_porte"), "alla Sequenza 9 si entra")
+	assert_true(m.call("ingresso_aperto", "mirwada"), "Mirwada non ha gating d'ingresso")
+	m.free()
+	_ws().call("pulisci")
+	_pr().call("da_salvataggio", prima)
+
+
+func test_il_viaggio_veloce_porta_al_primo_luogo_della_regione() -> void:
+	var prima: Dictionary = _ws().call("per_salvataggio")
+	var m: Node2D = _mondo()
+	var p := Node2D.new()
+	p.add_to_group("player")
+	m.add_child(p)
+	Engine.get_main_loop().root.add_child(m)
+	assert_true(m.call("viaggia_a", "marche_crepuscolo"), "si viaggia verso le Marche")
+	var c: Vector2i = _cella(m, p.position)
+	assert_eq(str(m.call("regione_a", c.x, c.y)), "marche_crepuscolo", "arrivato nelle Marche")
+	assert_false(m.call("bloccata", c.x, c.y), "su una casella calpestabile")
+	assert_eq(str(_ws().call("regione_corrente")), "marche_crepuscolo", "WorldState aggiornato")
+	assert_false(m.call("viaggia_a", "marche_crepuscolo"), "gia' qui: niente viaggio")
+	m.free()
+	_ws().call("pulisci")
+	_ws().call("da_salvataggio", prima)
+
+
+func test_il_main_parte_dal_mondo_unico() -> void:
+	var main: Node = load("res://scenes/main.tscn").instantiate()
+	var m: Node2D = main.get_node("Mondo")
+	assert_true(m.get_script() == Mondo, "il main usa il mondo unico")
+	assert_true(m.get_node_or_null("Player") != null, "il giocatore e' dentro il mondo (y_sort)")
+	var e: Node2D = m.get_node("Enemy")
+	m.call("carica")
+	var c: Vector2i = _cella(m, e.position)
+	assert_false(m.call("bloccata", c.x, c.y), "il nemico sta su una casella calpestabile")
+	assert_eq(str(m.call("regione_a", c.x, c.y)), "mirwada", "il nemico e' a Mirwada, vicino alla partenza")
+	main.free()

@@ -8906,3 +8906,27 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   validate 0, 800 test passati.
 - Aperto: il gating delle sotto-aree (gating_subareas) non si applica ancora: sulla mappa non ci sono confini delle
   sotto-aree. main.tscn usa ancora le scene di regione: il passaggio al mondo unico richiede NPC e porte.
+
+## US-8B12c — il gioco parte dal mondo unico: NPC, gating d'ingresso e viaggio veloce, 2026-10-23
+- scenes/main.tscn: al posto della scena di regione c'e' il nodo Mondo (scripts/world/mondo.gd, y_sort) con dentro
+  Player ed Enemy (il nemico a (526, 406), 8 caselle a nord della partenza, su una casella libera di Mirwada).
+  scenes/mondo.tscn tolta: era uguale al main.
+- mondo.gd:
+  - NPC: crea_npc() mette gli NPC presenti ORA (NpcSystem.presenti, tutte le regioni) al luogo della mappa del loro
+    location_tag (luogo_del_tag, con luoghi_mondo); ricostruiti a ogni momento_cambiato. Ognuno su una casella
+    libera, a 2 caselle dagli altri, scelta fra le libere vicine con l'hash dell'id (deterministico: la prima
+    versione a anelli li metteva in griglia, visto a schermo). Avvicinarsi = incontrato, "interagisci" = dialogo,
+    come nelle scene di regione.
+  - Gating d'ingresso: chi entra in una regione con il gate "ingresso" chiuso torna all'ultima posizione ammessa
+    (la Frontiera respinge chi e' oltre la Sequenza 4), stessa valutazione di AreaGate.valuta_gate.
+  - viaggia_a(target): viaggio veloce dalla pagina mappa: si arriva al primo luogo della regione presente sulla mappa
+    (ordine di location_tags), casella libera piu' vicina. page_mappa cerca un nodo con viaggia_a (regione o mondo).
+  - Limiti della telecamera = tutta la mappa.
+- Verifica: 4 test nuovi in tests/test_mondo.gd (NPC al loro luogo, liberi e non sovrapposti; Frontiera respinge
+  anche col viaggio veloce; viaggio veloce verso le Marche; il main usa il mondo e il nemico sta su terra libera).
+  Prova a schermo (Godot, xvfb): regione mirwada, zona piazza, 16 NPC; arte/revisione/main_mondo_unico.png.
+  validate 0, 804 test passati.
+- Aperto: gli NPC hanno il disegno del personaggio (sembrano il giocatore): serve un aspetto per gli NPC (story
+  d'arte successiva). Le barriere delle sotto-aree (cripte, passaggi_ombra, ponti_di_radici, grotte_di_marea,
+  ali_interne, isole_nebbia) non sono ancora sulla mappa: mancano i loro luoghi nel mondo. Le scene di regione
+  (scenes/regioni/, region_scene.gd) restano solo per i loro test.

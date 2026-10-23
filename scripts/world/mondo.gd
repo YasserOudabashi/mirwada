@@ -12,6 +12,9 @@ extends Node2D
 ##
 ## NIENTE class_name: coerente col progetto.
 
+const AreaGate := preload("res://scripts/area_gate.gd")
+const AnimationMachine := preload("res://scripts/animation_machine.gd")
+
 const BLOCCO := 16                       # caselle per lato di un blocco caricato
 const STRATO_COLLISIONE := 1             # lo stesso dei muri delle scene di regione
 
@@ -39,6 +42,11 @@ var _texture_oggetti: Dictionary = {}
 var _blocco_centro := Vector2i(-9999, -9999)
 var _tema_caricato: String = ""
 var _cella_regione := Vector2i(-9999, -9999)
+## Ultima posizione del giocatore in una regione che lo accetta: chi tocca una
+## regione col gating d'ingresso chiuso torna qui (la Frontiera respinge).
+var _ultima_ammessa := Vector2.INF
+## L'NPC nel cui raggio si trova il giocatore ("" = nessuno), come region_scene.
+var _npc_vicino: String = ""
 
 
 func _ready() -> void:
@@ -48,7 +56,14 @@ func _ready() -> void:
 	for c in get_children():                       # il giocatore della scena parte dalla casa al porto
 		if c.is_in_group("player") and c is Node2D:
 			colloca(c as Node2D, partenza())
+			var cam: Node = c.get_node_or_null("Camera2D")
+			if cam != null and cam.has_method("apply_zone_limits"):
+				cam.call("apply_zone_limits", Rect2(Vector2.ZERO, Vector2(larghezza, altezza) * tile))
 	segui(partenza())
+	crea_npc()
+	var ts: Node = get_node_or_null("/root/TimeSystem")
+	if ts != null and ts.has_signal("momento_cambiato"):
+		ts.momento_cambiato.connect(func(_m): crea_npc())
 
 
 ## Mette un nodo (il giocatore) in una posizione e porta subito li' la sua
@@ -150,7 +165,11 @@ func _process(_delta: float) -> void:
 	if p is Node2D and not dati.is_empty():
 		var pos: Vector2 = (p as Node2D).global_position - global_position
 		segui(pos)
-		aggiorna_regione(pos)
+		if aggiorna_regione(pos):
+			_ultima_ammessa = pos
+		elif _ultima_ammessa != Vector2.INF:
+			(p as Node2D).position = _ultima_ammessa
+			_cella_regione = Vector2i(-9999, -9999)
 
 
 ## Regione e zona dalla posizione (US-8B12b): la regione della casella
@@ -160,25 +179,188 @@ func _process(_delta: float) -> void:
 const RAGGIO_ZONA := 12.0
 
 
-func aggiorna_regione(pos: Vector2) -> void:
+## false = la regione respinge il giocatore (gating d'ingresso chiuso).
+func aggiorna_regione(pos: Vector2) -> bool:
 	var c := Vector2i(floori(pos.x / tile), floori(pos.y / tile))
 	if c == _cella_regione:
-		return
+		return true
 	_cella_regione = c
 	var ws: Node = Engine.get_main_loop().root.get_node_or_null("WorldState")
 	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
 	if ws == null or gd == null:
-		return
+		return true
 	var rid: String = regione_a(c.x, c.y)
 	var reg: Dictionary = gd.call("get_region", rid)
 	if reg.is_empty():
 		ws.call("esci_regione")
-		return
+		return true
+	if not ingresso_aperto(rid):
+		return false
 	if str(ws.call("regione_corrente")) != rid:
 		ws.call("entra_regione", rid)
 	var tag: String = _zona(c, reg)
 	if str(ws.call("zona_corrente")) != tag:
 		ws.call("imposta_zona", tag)
+	return true
+
+
+## Un gating con area "ingresso" chiude la regione stessa (US-611), come nelle
+## scene di regione: la convenzione e' nel dato.
+func ingresso_aperto(rid: String) -> bool:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	if gd == null:
+		return true
+	for g in (gd.call("get_region", rid).get("gating", []) as Array):
+		if typeof(g) == TYPE_DICTIONARY and str((g as Dictionary).get("area", "")) == "ingresso":
+			return AreaGate.valuta_gate(rid, g, Engine.get_main_loop().root)
+	return true
+
+
+## La casella (luogo della mappa) di un location_tag della regione, attraverso
+## luoghi_mondo; Vector2i(-1, -1) se sulla mappa non c'e'.
+func luogo_del_tag(rid: String, tag: String) -> Vector2i:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	var alias: Dictionary = gd.call("get_region", rid).get("luoghi_mondo", {}) if gd != null else {}
+	for luogo in (dati.get("luoghi", {}) as Dictionary):
+		if str(alias.get(luogo, luogo)) == tag and regione_a(int(dati["luoghi"][luogo][0]), int(dati["luoghi"][luogo][1])) == rid:
+			var p: Array = dati["luoghi"][luogo]
+			return Vector2i(int(p[0]), int(p[1]))
+	return Vector2i(-1, -1)
+
+
+## Una casella libera vicino a c, lontana almeno 2 caselle da quelle occupate.
+## Senza chiave: la piu' vicina. Con una chiave (l'id di un NPC): una a caso ma
+## sempre la stessa (hash della chiave) fra le libere entro 4 anelli dalla prima,
+## cosi' un gruppo di NPC non sta in fila come una griglia.
+func cella_libera(c: Vector2i, occupate: Dictionary = {}, chiave: String = "") -> Vector2i:
+	var scelta := c
+	var punteggio: int = 0
+	var primo: int = -1
+	for r in range(0, 24):
+		if primo >= 0 and r > primo + 4:
+			break
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				var q := Vector2i(c.x + dx, c.y + dy)
+				if maxi(absi(dx), absi(dy)) != r or bloccata(q.x, q.y) or _vicino_occupato(q, occupate):
+					continue
+				if chiave.is_empty():
+					return q
+				var h: int = hash(chiave + str(q))
+				if primo < 0 or h < punteggio:
+					scelta = q
+					punteggio = h
+				if primo < 0:
+					primo = r
+	return scelta
+
+
+func _vicino_occupato(q: Vector2i, occupate: Dictionary) -> bool:
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			if occupate.has(q + Vector2i(dx, dy)):
+				return true
+	return false
+
+
+## US-617: fast travel dalla pagina mappa del libro. Si arriva al primo luogo
+## della regione che c'e' sulla mappa (ordine di location_tags), sempre
+## rispettando il gating d'ingresso.
+func viaggia_a(target: String) -> bool:
+	var ws: Node = Engine.get_main_loop().root.get_node_or_null("WorldState")
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	if gd == null or (ws != null and str(ws.call("regione_corrente")) == target) or not ingresso_aperto(target):
+		return false
+	for tag in (gd.call("get_region", target).get("location_tags", []) as Array):
+		var c: Vector2i = luogo_del_tag(target, str(tag))
+		if c.x < 0:
+			continue
+		var q: Vector2i = cella_libera(c)
+		var pos := Vector2((q.x + 0.5) * tile, (q.y + 0.5) * tile)
+		var p: Node = get_tree().get_first_node_in_group("player") if is_inside_tree() else null
+		if p is Node2D:
+			colloca(p as Node2D, pos)
+		_ultima_ammessa = pos
+		aggiorna_regione(pos)
+		return true
+	return false
+
+
+# --- NPC (US-612/613b nel mondo unico) -------------------------------------------
+
+## Gli NPC presenti ORA (schedule + momento, NpcSystem.presenti) di tutte le
+## regioni, al luogo della mappa del loro location_tag. Ricostruiti a ogni
+## momento_cambiato. Il disegno per ora e' quello del personaggio (idle).
+func crea_npc() -> void:
+	for c in get_children():
+		if c is Area2D and c.has_meta("npc_id"):
+			remove_child(c)
+			c.queue_free()
+	var ns: Node = Engine.get_main_loop().root.get_node_or_null("NpcSystem")
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	if ns == null or gd == null:
+		return
+	var occupate: Dictionary = {}
+	for r in gd.call("get_regions"):
+		var rid: String = str((r as Dictionary).get("id", ""))
+		var presenti: Dictionary = ns.call("presenti", rid)
+		var ids: Array = presenti.keys()
+		ids.sort()
+		for id in ids:
+			var c: Vector2i = luogo_del_tag(rid, str(presenti[id]))
+			if c.x < 0:
+				continue
+			var q: Vector2i = cella_libera(c, occupate, str(id))
+			occupate[q] = true
+			add_child(_npc(str(id), Vector2((q.x + 0.5) * tile, (q.y + 0.5) * tile)))
+
+
+func _npc(id: String, pos: Vector2) -> Area2D:
+	var area := Area2D.new()
+	area.name = "Npc_%s" % id
+	area.set_meta("npc_id", id)
+	area.position = pos
+	var shape := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(tile, tile) * 1.2
+	shape.shape = rect
+	area.add_child(shape)
+	var anim: AnimatedSprite2D = AnimationMachine.new()
+	anim.name = "AnimationMachine"
+	area.add_child(anim)
+	anim.call("configura", "personaggio")
+	anim.call("riproduci", "idle", "down")
+	area.body_entered.connect(_npc_avvicinato.bind(id))
+	area.body_exited.connect(_npc_allontanato.bind(id))
+	return area
+
+
+func _npc_avvicinato(body: Node, id: String) -> void:
+	if not body.is_in_group("player"):
+		return
+	var ns: Node = get_node_or_null("/root/NpcSystem")
+	if ns != null:
+		ns.call("incontra", id)
+	_npc_vicino = id
+
+
+func _npc_allontanato(body: Node, id: String) -> void:
+	if body.is_in_group("player") and _npc_vicino == id:
+		_npc_vicino = ""
+
+
+## "interagisci" vicino a un NPC -> il suo dialogo (dialogue_id dal roster).
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("interagisci") or _npc_vicino.is_empty():
+		return
+	var de: Node = get_node_or_null("/root/DialogueEngine")
+	var book: Node = get_node_or_null("/root/Book")
+	if de == null or bool(de.call("in_corso")) or (book != null and bool(book.call("e_aperto"))):
+		return
+	var gd: Node = get_node_or_null("/root/GameData")
+	var did: String = str(gd.call("get_npc", _npc_vicino).get("dialogue_id", "")) if gd != null else ""
+	if not did.is_empty() and de.call("avvia", did, _npc_vicino):
+		get_viewport().set_input_as_handled()
 
 
 func _zona(c: Vector2i, reg: Dictionary) -> String:
