@@ -284,12 +284,12 @@ def trono(seed=1, size=1.0):
     rnd = random.Random(seed)
     r = Rig(f"trono_{seed}"); r.scale = size
     r.joint("t", "root", (0, 0, 0))
-    def blocco(dim, pos, mat="stone"):
+    def blocco(dim, pos, mat="roccia_trono"):
         r.part("t", "box", dim, pos, mat=mat, rot=(rnd.uniform(-3, 3), rnd.uniform(-3, 3), rnd.uniform(-4, 4)))
     blocco((13, 10, 1.6), (0, 1.5, 1.6))                          # gradini
     blocco((11, 8, 1.4), (0, 0.5, 4.4))
     blocco((9, 6.5, 3.2), (0, -0.5, 8.6))                         # seduta
-    blocco((9, 2.6, 13), (0, -6.4, 18), "stone")                  # schienale altissimo
+    blocco((9, 2.6, 13), (0, -6.4, 18))                           # schienale altissimo
     blocco((5, 2.2, 5), (-4.5, -6.6, 33.5))                       # cima spezzata, piu' alta a sinistra
     blocco((3.4, 2.2, 3), (4.6, -6.4, 30.5))
     for sx in (-1, 1):                                            # braccioli

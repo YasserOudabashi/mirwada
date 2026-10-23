@@ -47,10 +47,14 @@ class Material:
     tex: tuple = None
     keep: bool = False
     emissive: bool = False
+    ramp_cupo: list = None
 
     @property
     def rgb(self):
-        """Colori nel tema corrente (forge3d/tema.py). Gli emissive restano accesi anche nel tema cupo."""
+        """Colori nel tema corrente (forge3d/tema.py). Gli emissive restano accesi anche nel tema cupo; nel cupo una
+        ramp_cupo del materiale (scelta sulla concept) vince sulla tabella."""
+        if tema.TEMA == "cupo" and self.ramp_cupo:
+            return [hex_to_rgb(c) for c in self.ramp_cupo]
         return [hex_to_rgb(c if self.emissive else tema.colore(c)) if isinstance(c, str) else tuple(c)
                 for c in self.ramp]
 
@@ -61,6 +65,8 @@ MATS = {}
 def define(name, ramp, **kw):
     """Crea (o sostituisce) un materiale. ramp: nomi della palette E32 oppure #hex."""
     cols = [E32.get(c, c) for c in ramp]
+    if kw.get("ramp_cupo"):
+        kw["ramp_cupo"] = [E32.get(c, c) for c in kw["ramp_cupo"]]
     MATS[name] = Material(name, cols, **kw)
     return MATS[name]
 
@@ -116,13 +122,17 @@ define("leather", ["brown_dd", "brown_d", "brown", "orange_d"])
 define("leather_dark", ["ink", "brown_dd", "brown_d", "brown"])
 define("wood", ["brown_dd", "brown_d", "brown", "orange_d"], tex=("stripes", "z", 1.4, 0.12))
 define("wood_light", ["brown_d", "brown", "tan", "cream"], tex=("stripes", "z", 1.4, 0.1))
-define("bark", ["ink", "brown_dd", "brown_d", "brown"], tex=("noise", 1.2, 0.22))
+define("bark", ["ink", "brown_dd", "brown_d", "brown"], tex=("noise", 1.2, 0.22),
+       ramp_cupo=["#232a24", "#4d5a48", "#798972", "#97a790"])   # cupo: tronchi muschiosi chiari (concept valle)
 define("steel", ["slate_d", "slate", "grey", "grey_l", "white"], spec=0.9, shin=30, contrast=1.1)
 define("iron", ["ink", "navy", "slate_d", "slate", "grey"], spec=0.6, shin=26)
 define("gold", ["brown_d", "orange", "amber", "yellow", "cream"], spec=0.9, shin=30)
 define("bronze", ["brown_dd", "brown_d", "orange_d", "amber", "yellow"], spec=0.6, shin=26)
 define("stone", ["navy", "slate_d", "slate", "grey"], tex=("noise", 1.1, 0.16))
 define("stone_light", ["slate_d", "slate", "grey", "grey_l"], tex=("noise", 1.1, 0.16))
+# Trono del Gigante: come "stone" nel luminoso; nel cupo roccia nera con le luci arancio del tramonto (concept trono)
+define("roccia_trono", ["navy", "slate_d", "slate", "grey"], tex=("noise", 1.1, 0.16),
+       ramp_cupo=["#1f1a1e", "#291f1c", "#3a2b26", "#9e5438"])
 define("brick", ["brown_dd", "brown_d", "rust", "orange_d"], tex=("noise", 0.9, 0.12))
 define("bone", ["slate", "grey", "grey_l", "cream", "white"])
 define("sand", ["brown", "tan", "cream", "skin_l"], tex=("noise", 1.5, 0.1))

@@ -8825,3 +8825,10 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
 - Verifica: arte/revisione/concept/frontiera_cupa.png (concept, riva sud, riva nord): isole scure su nebbia chiara,
   anche il bordo nord senza scogliera si legge. Luminoso rigenerato identico byte per byte.
 - Aperto: alberi secchi bruni su terra bruna (si leggono meno); nella concept la terra delle isole e' piu' viola.
+- Correzioni (richiesta dell'utente "sistema e procedi"): terra delle isole piu' viola (nebbia #231a20/#352c3f/#4a3f55,
+  erba_lilla e terra_rosa a seguire); alberi leggibili: materials.Material ha ora una ramp_cupo opzionale (nel cupo
+  vince sulla tabella), corteccia "bark" cupa = tronchi muschiosi chiari (concept valle): alberi secchi chiari sulla
+  terra scura della Frontiera, tronchi pallidi in Valle. Trono: materiale proprio "roccia_trono" (nel luminoso uguale a
+  "stone", verificato byte per byte), cupo quasi nero con le facce in luce ruggine; arenaria cupa grigio-viola con
+  riflessi ruggine (prima arancio: il trono scuro si confondeva con la rocca). Tavole: cupo_regioni.png,
+  trono_cupo.png, frontiera_cupa.png in arte/revisione/concept/. Luminoso, personaggi e pet identici byte per byte.

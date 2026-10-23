@@ -110,12 +110,12 @@ TERRAINS = {
     # livelli sotto; non si calpesta (water_mask). Il livello piu' basso: tutto il resto gli si disegna sopra
     "vuoto": dict(macro=8, ramp=["slate", "#76839c", "grey", "#a9b3c6"], ramp_cupo=["#939398", "#a6a9ad", "#babcbf", "#c8cbcf"], period=3, dither=0.6, detail="fog", rim=None,
                   level=-1, contrast=0.35, anim=4),
-    "nebbia": dict(macro=8, ramp=["#b8b0c8", "#cfc8db", "#e0dbe8", "#f0edf4"], ramp_cupo=["#231a20", "#3b3037", "#3b3037", "#574244"], period=3, dither=0.6, detail="fog", rim="light",
+    "nebbia": dict(macro=8, ramp=["#b8b0c8", "#cfc8db", "#e0dbe8", "#f0edf4"], ramp_cupo=["#231a20", "#352c3f", "#352c3f", "#4a3f55"], period=3, dither=0.6, detail="fog", rim="light",
                    rimc="#f0edf4", level=0.2, contrast=0.6, anim=4),
     # sabbia corallina: crema e avorio caldi, bianco solo nei riflessi (prima 3 bianchi su 4: sembrava neve)
     "sabbia_bianca": dict(ramp=["tan", "cream", "#f3e7cf", "white"], period=4, dither=0.5, detail="dots", rim="dark",
                           rimc="tan", level=2.2, contrast=0.45),
-    "erba_lilla": dict(macro=8, ramp=["#9a7fb0", "#b9a3cc", "#cdb8dc", "#e2d4ec"], ramp_cupo=["#3b3037", "#574244", "#615961", "#737076"], period=4, dither=0.5, detail="tufts", rim="dark",
+    "erba_lilla": dict(macro=8, ramp=["#9a7fb0", "#b9a3cc", "#cdb8dc", "#e2d4ec"], ramp_cupo=["#352c3f", "#4a3f55", "#615961", "#737076"], period=4, dither=0.5, detail="tufts", rim="dark",
                        rimc="#9a7fb0", level=4.4, contrast=0.4),
     "cenere": dict(ramp=["ink", "slate_d", "slate", "grey"], period=4, dither=0.5, detail="dots", rim="dark", rimc="ink",
                    level=7.6, contrast=0.3),
@@ -123,7 +123,7 @@ TERRAINS = {
                     rim="dark", rimc="brown_dd", level=8.1),
     "lamiera": dict(bordo="dritto", ramp=["slate_d", "slate", "grey", "grey_l"], period=4, dither=0.3, detail="plates", rim="dark",
                     rimc="navy", level=8.15, contrast=0.4),
-    "terra_rosa": dict(ramp=["#c99a9a", "#ddb3b0", "#e8c6c1", "#f3dcd6"], ramp_cupo=["#3b3037", "#574244", "#574244", "#8a8084"], period=4, dither=0.6, detail="pebbles", rim="dark",
+    "terra_rosa": dict(ramp=["#c99a9a", "#ddb3b0", "#e8c6c1", "#f3dcd6"], ramp_cupo=["#352c3f", "#574244", "#574244", "#8a8084"], period=4, dither=0.6, detail="pebbles", rim="dark",
                        rimc="#c99a9a", level=8.25, contrast=0.3),
     "lastre_rovine": dict(ramp=["teal_d", "grey", "grey_l", "cream"], period=4, dither=0.4, detail="slabs", slab=(2, 2),
                           rim="cliff", rimc="teal_d", level=8.9, contrast=0.5, varianti=8, erba=0.35, fuga="slate",
@@ -155,7 +155,7 @@ TERRAINS = {
                            rimc="ink", level=7.4, contrast=0.4),
     # vista dall'alto: lastre di roccia spaccate (le strisce sono della PARETE, forge3d/pareti.py: se la cima avesse
     # le strisce non si capirebbe dove finisce il pianoro e comincia la parete)
-    "arenaria": dict(ramp=["brown_dd", "brown_d", "brown", "rust"], ramp_cupo=["#3b291d", "#5a3823", "#703f36", "#b34e20"], period=4, dither=0.4, detail="cobbles", cells=5,
+    "arenaria": dict(ramp=["brown_dd", "brown_d", "brown", "rust"], ramp_cupo=["#3b3037", "#52435a", "#68494c", "#9e5438"], period=4, dither=0.4, detail="cobbles", cells=5,
                      rim="dark", rimc="brown_dd", level=9.0, contrast=0.6),
 }
 for _d in TERRAINS.values():                              # texture grande 4x4 tile dove il dettaglio lo consente:
