@@ -931,6 +931,10 @@ def main():
             dm = reg.get("densita_mistica")
             if not isinstance(dm, (int, float)) or not (0.0 <= dm <= 1.0):
                 err(f"{rel} [{rid}]: densita_mistica deve essere un numero in [0, 1]")
+            # US-8B12b: luoghi della mappa -> location_tag della regione (nomi diversi)
+            for luogo, t in (reg.get("luoghi_mondo") or {}).items():
+                if t not in reg.get("location_tags", []):
+                    err(f"{rel} [{reg.get('id')}]: luoghi_mondo '{luogo}' -> '{t}', che non e' tra i suoi location_tags")
             for t in reg.get("location_tags", []):
                 if valid_location_tags and t not in valid_location_tags:
                     err(f"{rel} [{rid}]: location_tag '{t}' fuori dal vocabolario di "

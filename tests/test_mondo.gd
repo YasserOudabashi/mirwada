@@ -94,3 +94,46 @@ func test_la_modalita_cupa_usa_i_suoi_fogli() -> void:
 	assert_eq(lum.call("bloccata", c.x, c.y), cup.call("bloccata", c.x, c.y), "stessi dati di gioco")
 	lum.free()
 	cup.free()
+
+
+# --- US-8B12b: regione e zona dalla posizione ---------------------------------
+
+func _ws() -> Node:
+	return Engine.get_main_loop().root.get_node_or_null("WorldState")
+
+
+func _vai(m: Node2D, luogo: String, dx: float = 0.0, dy: float = 0.0) -> void:
+	var p: Array = (m.dati["luoghi"] as Dictionary)[luogo]
+	m.call("aggiorna_regione", Vector2((float(p[0]) + dx + 0.5) * m.tile, (float(p[1]) + dy + 0.5) * m.tile))
+
+
+func test_la_regione_viene_dalla_posizione() -> void:
+	var prima: Dictionary = _ws().call("per_salvataggio")
+	var m: Node2D = _mondo()
+	_vai(m, "porto")
+	assert_eq(str(_ws().call("regione_corrente")), "mirwada", "al porto: Mirwada")
+	assert_eq(str(_ws().call("zona_corrente")), "porto", "zona: il porto")
+	_vai(m, "trono_del_gigante")
+	assert_eq(str(_ws().call("regione_corrente")), "marche_crepuscolo", "al trono: le Marche")
+	assert_eq(str(_ws().call("zona_corrente")), "trono_del_gigante", "zona: il trono")
+	assert_true(_ws().call("e_scoperta", "marche_crepuscolo"), "le Marche risultano scoperte")
+	_vai(m, "campo_di_battaglia")
+	assert_eq(str(_ws().call("zona_corrente")), "luogo_di_battaglia", "luoghi_mondo abbina il nome della mappa al tag")
+	_vai(m, "rovine_del_boss")
+	assert_eq(str(_ws().call("regione_corrente")), "", "terra di mezzo: nessuna regione dei dati")
+	assert_almost_eq(float(_ws().call("densita_mistica_corrente")), 0.2, "densita' di default fuori dalle regioni")
+	m.free()
+	_ws().call("pulisci")
+	_ws().call("da_salvataggio", prima)
+
+
+func test_lontano_dai_luoghi_la_zona_e_vuota() -> void:
+	var prima: Dictionary = _ws().call("per_salvataggio")
+	var m: Node2D = _mondo()
+	_vai(m, "trono_del_gigante")
+	_vai(m, "trono_del_gigante", 0.0, 60.0)
+	assert_eq(str(_ws().call("regione_corrente")), "marche_crepuscolo", "ancora nelle Marche")
+	assert_eq(str(_ws().call("zona_corrente")), "", "nessun luogo vicino")
+	m.free()
+	_ws().call("pulisci")
+	_ws().call("da_salvataggio", prima)

@@ -90,6 +90,17 @@ func entra_regione(id: String) -> void:
 		regione_cambiata.emit(id)
 
 
+## Fuori da ogni regione dei dati (mare, terra di mezzo, isole del mondo unico,
+## US-8B12b): nessuna regione corrente, densita' e ambiente di default.
+func esci_regione() -> void:
+	var cambia: bool = not _regione.is_empty()
+	_regione = ""
+	_zona_tag = ""
+	_densita_override = -1.0
+	if cambia:
+		regione_cambiata.emit("")
+
+
 ## Il location_tag della zona corrente del giocatore, o "" (US-605).
 func zona_corrente() -> String:
 	return _zona_tag

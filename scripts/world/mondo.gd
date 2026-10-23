@@ -38,6 +38,7 @@ var _oggetti_per_blocco: Dictionary = {}
 var _texture_oggetti: Dictionary = {}
 var _blocco_centro := Vector2i(-9999, -9999)
 var _tema_caricato: String = ""
+var _cella_regione := Vector2i(-9999, -9999)
 
 
 func _ready() -> void:
@@ -147,7 +148,54 @@ func segui(pos: Vector2) -> void:
 func _process(_delta: float) -> void:
 	var p: Node = get_tree().get_first_node_in_group("player") if is_inside_tree() else null
 	if p is Node2D and not dati.is_empty():
-		segui((p as Node2D).global_position - global_position)
+		var pos: Vector2 = (p as Node2D).global_position - global_position
+		segui(pos)
+		aggiorna_regione(pos)
+
+
+## Regione e zona dalla posizione (US-8B12b): la regione della casella
+## (regioni.png) se e' una regione dei dati, altrimenti nessuna (mare, terra di
+## mezzo, isole); la zona e' il location_tag del luogo della mappa piu' vicino
+## entro RAGGIO_ZONA caselle (regions.json luoghi_mondo abbina i nomi diversi).
+const RAGGIO_ZONA := 12.0
+
+
+func aggiorna_regione(pos: Vector2) -> void:
+	var c := Vector2i(floori(pos.x / tile), floori(pos.y / tile))
+	if c == _cella_regione:
+		return
+	_cella_regione = c
+	var ws: Node = Engine.get_main_loop().root.get_node_or_null("WorldState")
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	if ws == null or gd == null:
+		return
+	var rid: String = regione_a(c.x, c.y)
+	var reg: Dictionary = gd.call("get_region", rid)
+	if reg.is_empty():
+		ws.call("esci_regione")
+		return
+	if str(ws.call("regione_corrente")) != rid:
+		ws.call("entra_regione", rid)
+	var tag: String = _zona(c, reg)
+	if str(ws.call("zona_corrente")) != tag:
+		ws.call("imposta_zona", tag)
+
+
+func _zona(c: Vector2i, reg: Dictionary) -> String:
+	var tags: Array = reg.get("location_tags", [])
+	var alias: Dictionary = reg.get("luoghi_mondo", {})
+	var migliore: String = ""
+	var dist: float = RAGGIO_ZONA
+	for luogo in (dati.get("luoghi", {}) as Dictionary):
+		var tag: String = str(alias.get(luogo, luogo))
+		if tag not in tags:
+			continue
+		var p: Array = dati["luoghi"][luogo]
+		var d: float = Vector2(c).distance_to(Vector2(float(p[0]), float(p[1])))
+		if d <= dist:
+			dist = d
+			migliore = tag
+	return migliore
 
 
 # --- Interrogabile (giocatore, test, regioni) ---------------------------------

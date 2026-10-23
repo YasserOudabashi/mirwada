@@ -8890,3 +8890,19 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
 - Aperto: acqua ferma (frame 0: l'animazione richiede 4 tessere per casella d'acqua); nessuna collisione sui tronchi
   degli alberi; terreno a 32 px per tessera (i personaggi sono a 64); nessun nemico nella scena del mondo; regione
   dalla posizione (US-8B12b); sottosuolo e interni (US-8B12c/d).
+
+## US-8B12b — regione e zona dalla posizione nel mondo unico, 2026-10-23
+- scripts/world/mondo.gd: aggiorna_regione(pos), chiamata da _process quando il giocatore cambia casella (non da
+  segui(), cosi' i test del caricatore non toccano WorldState). Regione = regioni.png se e' una regione dei dati
+  (GameData.get_region), altrimenti WorldState.esci_regione() (mare, terra di mezzo, isole: densita' e musica di
+  default). Zona = location_tag del luogo della mappa piu' vicino entro 12 caselle, solo se il tag e' tra i
+  location_tags della regione.
+- data/world/regions.json: "luoghi_mondo" abbina i nomi dei luoghi della mappa che non coincidono col tag
+  (es. campo_di_battaglia -> luogo_di_battaglia, approdo_frontiera -> soglia). Nessun dato approvato cambiato.
+- scripts/world_state.gd: esci_regione() (azzera regione, zona e override; emette regione_cambiata("") se cambia).
+- tools/validate_data.py: ogni valore di luoghi_mondo deve essere tra i location_tags della sua regione.
+- Verifica: 2 test nuovi in tests/test_mondo.gd (porto -> mirwada/porto, trono -> marche/trono e scoperta,
+  abbinamento luoghi_mondo, terra di mezzo -> nessuna regione con densita' 0.2, lontano dai luoghi -> zona vuota).
+  validate 0, 800 test passati.
+- Aperto: il gating delle sotto-aree (gating_subareas) non si applica ancora: sulla mappa non ci sono confini delle
+  sotto-aree. main.tscn usa ancora le scene di regione: il passaggio al mondo unico richiede NPC e porte.
