@@ -213,6 +213,7 @@ python scripts/forge.py vfx --kind slash --palette fire --out assets/vfx
 python scripts/forge.py world --out assets/world --w 128 --h 96 --seed 4 --godot --preview
 python tools/art/build_world.py                # mondo di prova (seed 6), modalita' facile/luminosa -> arte/mondo/
 python tools/art/build_world.py --tema cupo    # stessi dati, modalita' difficile/cupa -> arte/mondo/cupo/ (forge3d/tema.py)
+python tools/art/esporta_mondo.py              # mondo per il gioco -> assets/world/ (tutte e due le modalita', ~1 ora)
 python scripts/forge.py contact FILE.png --scale 4
 
 # Rigenera la spina dorsale dei pathway (idempotente)

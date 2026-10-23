@@ -8868,3 +8868,25 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   (test_creazione_talenti) ora cerca le caselle anche dentro la griglia.
 - Test nuovi in tests/test_modalita.gd (2): bottoni e partenza in difficile dal frontespizio; testi it/en per ogni
   modalita'. validate 0, 792 test passati.
+
+## US-8B12 — mondo unico nel gioco (caricatore a blocchi), 2026-10-23
+- Strada scelta: il loader della skill (un TileMapLayer per terreno, mappa intera) non regge 1200x1000 x 43 terreni e
+  non conosce varianti, pareti, strati e bordi. Il terreno si compone in Python come le anteprime e si tengono le
+  caselle diverse: 34.561 tessere (luminoso) e 34.655 (cupo) su 1,2 milioni, 5 fogli 2048x4096 per tema.
+- tools/art/esporta_mondo.py (nuovo): assets/world/mondo.json (misure, partenza = casa_base_porto, luoghi, regioni,
+  sprite e 29.860 oggetti), blocchi.png (255 = non si passa: water_mask, pareti senza scala/rampa, salti verso est,
+  ovest e nord), regioni.png, <tema>/tessere_<k>.png, <tema>/indici.png (R + 256 G), <tema>/oggetti/ (321 sprite).
+  9,1 MB luminoso + 9,4 MB cupo. Comando: python tools/art/esporta_mondo.py (seed 6, ~30 min per tema).
+- scripts/world/mondo.gd (nuovo): legge i dati (PNG dal disco, senza import), tema da GameState.tema_arte(); costruisce
+  terreno (TileMapLayer, un atlante per foglio, tessere create quando servono), ostacoli (TileMapLayer invisibile con
+  una tessera di collisione, strato 1) e oggetti (Sprite2D, y_sort con il giocatore) solo nei blocchi 16x16 attorno al
+  giocatore (raggio 2: 80x80 caselle), libera quelli lontani. colloca(): mette il giocatore e porta subito la
+  telecamera (con lo scorrimento morbido partiva da (0, 0) e attraversava la mappa: trovato con la prova a schermo).
+- scenes/mondo.tscn (nuovo): mondo + giocatore + HUD e overlay. main.tscn non cambia ancora: serve prima la regione
+  dalla posizione (US-8B12b) per musica, gating e densita' mistica.
+- Verifica: tests/test_mondo.gd (6); prova a schermo in Godot (xvfb) facile/difficile su porto, Trono, Frontiera:
+  arte/revisione/mondo_in_gioco.png; prova di fisica: un corpo spinto verso il mare del porto si ferma alla casella
+  prima. validate 0, 798 test passati.
+- Aperto: acqua ferma (frame 0: l'animazione richiede 4 tessere per casella d'acqua); nessuna collisione sui tronchi
+  degli alberi; terreno a 32 px per tessera (i personaggi sono a 64); nessun nemico nella scena del mondo; regione
+  dalla posizione (US-8B12b); sottosuolo e interni (US-8B12c/d).

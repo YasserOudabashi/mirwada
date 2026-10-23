@@ -46,8 +46,17 @@ func _ready() -> void:
 		return
 	for c in get_children():                       # il giocatore della scena parte dalla casa al porto
 		if c.is_in_group("player") and c is Node2D:
-			(c as Node2D).position = partenza()
+			colloca(c as Node2D, partenza())
 	segui(partenza())
+
+
+## Mette un nodo (il giocatore) in una posizione e porta subito li' la sua
+## telecamera: con lo scorrimento morbido scivolerebbe da (0, 0) attraverso la mappa.
+func colloca(nodo: Node2D, pos: Vector2) -> void:
+	nodo.position = pos
+	for cam in nodo.find_children("*", "Camera2D", true, false):
+		(cam as Camera2D).reset_smoothing()
+	segui(pos)
 
 
 ## Legge i dati e prepara i livelli; i blocchi si costruiscono con segui().
