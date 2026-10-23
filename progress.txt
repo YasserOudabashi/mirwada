@@ -8803,3 +8803,17 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   Cupo guardato su porto, Valle, Marche, Frontiera: tinte conservate, tutto piu' scuro e spento.
 - Prossimo: story 2 (ramp_cupo per l'umore di ogni regione, confronto con le concept), story 3 (Frontiera
   invertita: terra scura, vuoto chiaro).
+
+## Modalita' cupa, story 2: umore delle regioni, 2026-10-23
+- Palette delle concept estratte (10 colori per concept, senza le linee d'inchiostro). ramp_cupo (stessa lunghezza
+  della ramp) sui terreni tipici di ogni regione: Marche (pietrisco, muschio_scuro, arenaria, terra_bruciata,
+  erica_secca: terra quasi nera, ombre viola, luci ruggine), Mirwada (stone = isolati color mattone, ciottoli_scuri =
+  strade di ciottoli grigi bagnati, lastre_chiare, lastricato_antico, filari), Valle (felci, radici_muschio: verdi-grigi
+  di muschio), neve viola-grigia del tramonto (condivisa da Archivio, Marche e vette). Nessun colore delle ramp_cupo e'
+  anche una voce di tema.CUPO (sarebbe trasformato due volte).
+- Prima prova: isolati e strade di Mirwada nello stesso grigio (non si distinguevano) -> isolati in mattone.
+- Verifica: concept / luminoso / cupo per regione: arte/revisione/concept/cupo_regioni.png. Il luminoso rigenerato e'
+  identico byte per byte.
+- Aperto: gli oggetti seguono solo la tabella (il trono resta pietra grigio-blu, nella concept e' roccia nera con il
+  bordo arancio): servira' una ramp_cupo anche per materiali scelti. Archivio: la concept e' la sala sotterranea, che
+  non esiste ancora.

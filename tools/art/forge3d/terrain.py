@@ -62,6 +62,7 @@ def _quant(field, ramp, dither=0.0, S=TILE):
 MACRO_OK = ("waves", "tufts", "leaves", "dots", "pebbles", "puddles", "cobbles", "sparkle", "embers", "dunes", "fog",
             "roots")
 
+# ramp_cupo (opzionale): la rampa nella modalita' cupa, dalla palette della concept della sua regione (forge3d/tema.py)
 # nome: (ramp scuro->chiaro, periodo rumore, contrasto, dither, dettaglio, livello)
 TERRAINS = {
     "deep_water": dict(onde=420, ramp=["navy", "blue_d", "blue_d", "blue"], period=3, dither=0.5, detail="waves", rim=None, level=0, anim=4),
@@ -80,15 +81,15 @@ TERRAINS = {
     "forest": dict(ramp=["teal_d", "green_d", "green_d", "green_m"], period=4, dither=0.5, detail="leaves", rim="dark", rimc="teal_d", level=6, contrast=0.45),
     "dirt": dict(ramp=["brown_d", "brown", "brown", "orange_d"], period=4, dither=0.6, detail="pebbles", rim="dark", level=7, contrast=0.45),
     "path": dict(ramp=["brown_d", "brown", "#c9946a", "#dcb68a"], period=5, dither=0.6, detail="pebbles", rim="dark", rimc="brown_d", level=8, contrast=0.45),
-    "stone": dict(bordo="dritto", ramp=["slate_d", "slate", "slate", "grey"], period=3, dither=0.5, detail="cobbles", rim="cliff", level=9),
-    "snow": dict(macro=8, ramp=["grey", "grey_l", "white", "white", "white"], period=2, dither=0.4, detail="dunes", rim="light",
+    "stone": dict(bordo="dritto", ramp=["slate_d", "slate", "slate", "grey"], ramp_cupo=["#2e2524", "#3e3330", "#52403b", "#6b4a3e"], period=3, dither=0.5, detail="cobbles", rim="cliff", level=9),
+    "snow": dict(macro=8, ramp=["grey", "grey_l", "white", "white", "white"], ramp_cupo=["#393753", "#52435a", "#737076", "#8a8084", "#939398"], period=2, dither=0.4, detail="dunes", rim="light",
                  rimc="grey", level=10, contrast=0.32),
     # --- Mirwada (US-8B11b). Livelli con la virgola: si inseriscono tra quelli sopra senza rinumerarli ---
     "ciottoli_spiaggia": dict(ramp=["tan", "grey", "grey_l", "cream"], period=4, dither=0.4, detail="cobbles", cells=16,
                               rim="dark", rimc="tan", level=2.5),
-    "filari": dict(ramp=["brown_dd", "brown_d", "brown_d", "brown"], period=4, dither=0.5, detail="rows", rim="dark",
+    "filari": dict(ramp=["brown_dd", "brown_d", "brown_d", "brown"], ramp_cupo=["#1e1e1e", "#323131", "#323131", "#52403b"], period=4, dither=0.5, detail="rows", rim="dark",
                    rimc="brown_dd", level=5.5, contrast=0.3, accent=["green_m", "green"]),
-    "lastricato_antico": dict(ramp=["green_d", "grey", "grey_l", "cream"], period=4, dither=0.4, detail="cobbles", cells=5,
+    "lastricato_antico": dict(ramp=["green_d", "grey", "grey_l", "cream"], ramp_cupo=["#3e4546", "#52403b", "#6f797d", "#848e91"], period=4, dither=0.4, detail="cobbles", cells=5,
                               rim="dark", rimc="green_d", level=8.2),
     "ghiaia": dict(ramp=["slate", "grey", "grey_l", "white"], period=4, dither=0.6, detail="pebbles", rim="dark", rimc="grey",
                    level=8.3, contrast=0.15),
@@ -96,9 +97,9 @@ TERRAINS = {
                   rimc="slate", level=8.4, contrast=0.4, varianti=8, fuga="grey"),
     # selciato di Mirwada: grigio caldo e poco contrastato (revisione 1.1: il blu-ardesia era il colore del cappotto
     # di Enel, che ci spariva sopra). Grigi caldi = colori extra della rampa
-    "ciottoli_scuri": dict(bordo="dritto", ramp=["#5e4b4a", "#8a7b72", "#978a80", "#a4988e"], period=4, dither=0.4,
+    "ciottoli_scuri": dict(bordo="dritto", ramp=["#5e4b4a", "#8a7b72", "#978a80", "#a4988e"], ramp_cupo=["#3e4546", "#4f5759", "#5d696e", "#6f797d"], period=4, dither=0.4,
                            detail="cobbles", cells=12, rim="dark", rimc="#5e4b4a", level=8.6),
-    "lastre_chiare": dict(bordo="dritto", ramp=["grey", "grey_l", "cream", "cream"], period=4, dither=0.4, detail="slabs", slab=(2, 2),
+    "lastre_chiare": dict(bordo="dritto", ramp=["grey", "grey_l", "cream", "cream"], ramp_cupo=["#4f5759", "#6f797d", "#848e91", "#848e91"], period=4, dither=0.4, detail="slabs", slab=(2, 2),
                           rim="dark", rimc="slate", level=8.8, contrast=0.5, varianti=8, fuga="grey"),
     "molo_pietra": dict(bordo="dritto", ramp=["navy", "slate_d", "slate", "grey"], period=4, dither=0.4, detail="slabs", rim="cliff",
                         rimc="navy", level=9.2, contrast=0.5),
@@ -140,21 +141,21 @@ TERRAINS = {
                    rimc="brown_dd", level=3.2, contrast=0.25, accent=["teal_d", "green_m"]),
     "erba_argentata": dict(ramp=["slate", "grey", "grey_l", "white"], period=4, dither=0.5, detail="tufts", rim="dark",
                            rimc="slate", level=4.2, contrast=0.4),
-    "erica_secca": dict(ramp=["brown_dd", "brown_d", "brown_d", "purple"], period=4, dither=0.5, detail="tufts", rim="dark",
+    "erica_secca": dict(ramp=["brown_dd", "brown_d", "brown_d", "purple"], ramp_cupo=["#303049", "#503943", "#503943", "#9e5438"], period=4, dither=0.5, detail="tufts", rim="dark",
                         rimc="brown_dd", level=5.2, contrast=0.4),
-    "felci": dict(ramp=["teal_d", "green_d", "green_m", "green"], period=4, dither=0.5, detail="leaves", rim="dark",
+    "felci": dict(ramp=["teal_d", "green_d", "green_m", "green"], ramp_cupo=["#232a24", "#2f382f", "#4d5a48", "#616f5b"], period=4, dither=0.5, detail="leaves", rim="dark",
                   rimc="teal_d", level=6.2, contrast=0.4),
-    "radici_muschio": dict(macro=8, ramp=["teal_d", "green_d", "green_m", "green_m"], period=4, dither=0.5, detail="roots",
+    "radici_muschio": dict(macro=8, ramp=["teal_d", "green_d", "green_m", "green_m"], ramp_cupo=["#232a24", "#2f382f", "#3d483a", "#3d483a"], period=4, dither=0.5, detail="roots",
                            rim="dark", rimc="teal_d", level=6.4, contrast=0.4, accent=["brown_dd", "brown_d"]),
-    "muschio_scuro": dict(ramp=["ink", "teal_d", "teal_d", "green_d"], period=4, dither=0.5, detail="dots", rim="dark",
+    "muschio_scuro": dict(ramp=["ink", "teal_d", "teal_d", "green_d"], ramp_cupo=["#201d1b", "#303049", "#303049", "#393753"], period=4, dither=0.5, detail="dots", rim="dark",
                           rimc="ink", level=6.6, contrast=0.4),
-    "pietrisco": dict(ramp=["brown_dd", "brown_d", "brown_d", "skin_m"], period=4, dither=0.6, detail="pebbles", rim="dark",
+    "pietrisco": dict(ramp=["brown_dd", "brown_d", "brown_d", "skin_m"], ramp_cupo=["#3b291d", "#503943", "#503943", "#915532"], period=4, dither=0.6, detail="pebbles", rim="dark",
                       rimc="brown_dd", level=7.2, contrast=0.15),
-    "terra_bruciata": dict(ramp=["ink", "brown_dd", "brown_dd", "slate_d"], period=4, dither=0.5, detail="dots", rim="dark",
+    "terra_bruciata": dict(ramp=["ink", "brown_dd", "brown_dd", "slate_d"], ramp_cupo=["#201d1b", "#3b291d", "#3b291d", "#393753"], period=4, dither=0.5, detail="dots", rim="dark",
                            rimc="ink", level=7.4, contrast=0.4),
     # vista dall'alto: lastre di roccia spaccate (le strisce sono della PARETE, forge3d/pareti.py: se la cima avesse
     # le strisce non si capirebbe dove finisce il pianoro e comincia la parete)
-    "arenaria": dict(ramp=["brown_dd", "brown_d", "brown", "rust"], period=4, dither=0.4, detail="cobbles", cells=5,
+    "arenaria": dict(ramp=["brown_dd", "brown_d", "brown", "rust"], ramp_cupo=["#3b291d", "#5a3823", "#703f36", "#b34e20"], period=4, dither=0.4, detail="cobbles", cells=5,
                      rim="dark", rimc="brown_dd", level=9.0, contrast=0.6),
 }
 for _d in TERRAINS.values():                              # texture grande 4x4 tile dove il dettaglio lo consente:
