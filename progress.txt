@@ -8855,3 +8855,16 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
 - Test nuovi in tests/test_modalita.gd (3): danno al giocatore e ai nemici in difficile, facile invariata, cure del
   giocatore e di un altro. validate 0, 790 test passati.
 - Aperto: story 3 (bottoni Facile/Difficile nel frontespizio, prova a schermo).
+
+## Modalita' nel gioco, story 3: scelta nel frontespizio, 2026-10-23
+- page_creazione_personaggio.gd: riga "Modalita' (per sempre): [Facile] [Difficile]" (un bottone per modalita' dei
+  dati, ButtonGroup a scelta unica, premuto il default dei dati), sotto la frase della modalita' scelta; conferma()
+  passa la scelta a nuova_partita. A partita in corso il frontespizio mostra anche la modalita'. Testi in
+  assets/i18n/strings.csv (BOOK_FRONTESPIZIO_MODALITA[_PARTITA], MODALITA_<ID>, MODALITA_<ID>_DESCR, it + en),
+  chiavi ricavate dall'id dei dati; .translation rigenerate con godot --import.
+- Prova a schermo (Godot, xvfb): la prima versione usciva dalla pagina (descrizione e bottone Comincia non si
+  vedevano) -> talenti su 2 colonne (GridContainer) ed etichetta della modalita' sulla stessa riga dei bottoni. Ora sta
+  tutto nel libro: arte/revisione/frontespizio_modalita.png (default e Difficile premuto). Il test dei talenti
+  (test_creazione_talenti) ora cerca le caselle anche dentro la griglia.
+- Test nuovi in tests/test_modalita.gd (2): bottoni e partenza in difficile dal frontespizio; testi it/en per ogni
+  modalita'. validate 0, 792 test passati.

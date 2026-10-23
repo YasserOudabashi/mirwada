@@ -130,3 +130,57 @@ func test_le_cure_del_giocatore_seguono_i_numeri() -> void:
 	assert_almost_eq(_cura(true, "difficile"), 20.0 * _numero("cure"), "cura del giocatore in difficile")
 	assert_almost_eq(_cura(true, "facile"), 20.0, "cura del giocatore in facile")
 	assert_almost_eq(_cura(false, "difficile"), 20.0, "la cura di un altro non cambia")
+
+
+# --- Story 3: la scelta nel frontespizio ------------------------------------
+
+const OverlayScene := preload("res://scenes/book_overlay.tscn")
+
+
+func _pagina_creazione() -> Array:
+	var ov: CanvasLayer = OverlayScene.instantiate()
+	Engine.get_main_loop().root.add_child(ov)
+	var b: Node = _n("/root/Book")
+	b.call("apri")
+	b.call("vai_a", "frontespizio")
+	for i in 5:
+		ov.call("_process", 0.2)
+	return [ov, ov.get_node("Pagina/Contenuto").get_child(0)]
+
+
+func _bottoni(nodo: Node, out: Array) -> Array:
+	for c in nodo.get_children():
+		if c is Button and str(c.name).begins_with("Modalita_"):
+			out.append(c)
+		_bottoni(c, out)
+	return out
+
+
+func test_il_frontespizio_offre_le_modalita_e_parte_con_quella_scelta() -> void:
+	if bool(_n("/root/GameState").call("partita_in_corso")):
+		return  # un'altra suite ha lasciato una partita attiva: il path dati e' coperto sopra
+	var res: Array = _pagina_creazione()
+	var pag: Node = res[1]
+	var bottoni: Array = _bottoni(pag, [])
+	assert_eq(bottoni.size(), (_n("/root/GameData").call("modalita_ids") as Array).size(), "un bottone per modalita'")
+	var premuti: Array = bottoni.filter(func(b: Button) -> bool: return b.button_pressed)
+	assert_eq(premuti.size(), 1, "uno solo premuto")
+	assert_eq(str(premuti[0].name), "Modalita_facile", "premuto il default dei dati")
+	for b in bottoni:
+		if str(b.name) == "Modalita_difficile":
+			b.button_pressed = true
+			b.pressed.emit()
+	_n("/root/GameState").call("scegli_slot", SLOT)
+	pag.call("conferma")
+	assert_eq(str(_n("/root/GameState").get("modalita")), "difficile", "la partita parte in difficile")
+	res[0].free()
+	_fine()
+
+
+func test_ogni_modalita_ha_i_suoi_testi() -> void:
+	for lingua in ["it", "en"]:
+		TranslationServer.set_locale(lingua)
+		for mid in _n("/root/GameData").call("modalita_ids"):
+			for k in ["MODALITA_%s" % str(mid).to_upper(), "MODALITA_%s_DESCR" % str(mid).to_upper()]:
+				assert_true(tr(k) != k, "%s ha il testo in %s" % [k, lingua])
+	TranslationServer.set_locale("it")
