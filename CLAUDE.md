@@ -50,9 +50,9 @@ va scritto nella story.
 
 ## Come lavora Claude con l'utente (Asso)
 
-- **Prima di scrivere codice, spiega come funziona e aspetta il via.** Il codice parte solo
-  dopo che l'utente ha accettato la spiegazione. Vale anche per gli script di generazione
-  degli asset. Non vale per file di testo o documentazione.
+- **Niente spiegazioni prima del codice** (decisione dell'utente, 2026-10-23: "non mi devi spiegare niente, tu fai
+  e basta"). Si fa, si verifica, e alla fine si riassume cosa è stato fatto. Si chiede solo per le decisioni che
+  spettano all'utente (cambiare cose già approvate, scelte di design o di gioco).
 - Quando l'utente chiede del codice, lo spieghi bene, con parole semplici e un esempio.
 - Quando c'è un errore, dici **come correggerlo**, non solo che c'è.
 - Rispondi in italiano.
