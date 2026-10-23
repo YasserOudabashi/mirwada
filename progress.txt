@@ -8832,3 +8832,16 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   "stone", verificato byte per byte), cupo quasi nero con le facce in luce ruggine; arenaria cupa grigio-viola con
   riflessi ruggine (prima arancio: il trono scuro si confondeva con la rocca). Tavole: cupo_regioni.png,
   trono_cupo.png, frontiera_cupa.png in arte/revisione/concept/. Luminoso, personaggi e pet identici byte per byte.
+
+## Modalita' nel gioco, story 1: dati, GameState, salvataggio, 2026-10-23
+- data/modalita.json (nuovo): default "facile"; facile = {tema_arte luminoso, moltiplicatori {}}, difficile =
+  {tema_arte cupo, danno_al_giocatore 1.5, danno_ai_nemici 0.8, cure 0.7} (numeri di partenza proposti e approvati,
+  da provare a schermo).
+- GameData: carica il file (chiave "modalita"), get_modalita(id), modalita_ids(), modalita_default().
+- GameState: var modalita; nuova_partita(nome, slot, talenti, scelta_modalita = "") -> fissa la modalita' (non valida
+  o vuota -> default dei dati); snapshot "modalita"; applica() la rilegge (save vecchio senza campo -> default);
+  moltiplicatore(nome) (assente = 1), tema_arte().
+- SaveSystem: campo "modalita" in scrittura e in lettura (stringa, default ""), senza bump dello schema.
+- Test nuovi: tests/test_modalita.gd (5). validate 0, 787 test passati.
+- Aperto: il validator non controlla ancora data/modalita.json (forma e numeri > 0); i moltiplicatori non sono
+  ancora applicati (story 2: hurtbox.subisci e cura dell'ability_engine); i bottoni nel frontespizio (story 3).
