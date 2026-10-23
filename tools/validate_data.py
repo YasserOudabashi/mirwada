@@ -1984,6 +1984,23 @@ def main():
         warn(f"data/i18n/it.json: {stubs}/{len(i18n_it)} stringhe ancora da tradurre "
              f"(valore 'TODO ...'). Non e' un errore: e' lavoro di traduzione.")
 
+    # --- Modalita' di gioco (data/modalita.json, decisione 2026-10-20) ---
+    # I nomi dei moltiplicatori sono un vocabolario chiuso: il codice li legge per nome (hurtbox, ability_engine).
+    MOLTIPLICATORI = {"danno_al_giocatore", "danno_ai_nemici", "cure"}
+    mod = load_json(os.path.join(DATA, "modalita.json"))
+    if mod:
+        tutte = mod.get("modalita", {})
+        if mod.get("default") not in tutte:
+            err(f"data/modalita.json: default '{mod.get('default')}' non e' tra le modalita' {sorted(tutte)}")
+        for mid, m in tutte.items():
+            if m.get("tema_arte") not in ("luminoso", "cupo"):
+                err(f"data/modalita.json [{mid}]: tema_arte dev'essere 'luminoso' o 'cupo'")
+            for nome, v in m.get("moltiplicatori", {}).items():
+                if nome not in MOLTIPLICATORI:
+                    err(f"data/modalita.json [{mid}]: moltiplicatore '{nome}' sconosciuto (ammessi: {sorted(MOLTIPLICATORI)})")
+                elif not isinstance(v, (int, float)) or isinstance(v, bool) or v <= 0:
+                    err(f"data/modalita.json [{mid}.{nome}]: dev'essere un numero > 0")
+
     # --- VFX (data/vfx.json, US-226) ---
     vfx = load_json(os.path.join(DATA, "vfx.json"))
     if vfx:

@@ -8845,3 +8845,13 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
 - Test nuovi: tests/test_modalita.gd (5). validate 0, 787 test passati.
 - Aperto: il validator non controlla ancora data/modalita.json (forma e numeri > 0); i moltiplicatori non sono
   ancora applicati (story 2: hurtbox.subisci e cura dell'ability_engine); i bottoni nel frontespizio (story 3).
+
+## Modalita' nel gioco, story 2: i numeri si applicano, 2026-10-23
+- hurtbox.subisci: danno x GameState.moltiplicatore("danno_al_giocatore" se il padre e' nel gruppo "player",
+  altrimenti "danno_ai_nemici"), prima di parata, schivata e scudo. ability_engine._p_heal: quantita x
+  moltiplicatore("cure") solo se chi si cura e' il giocatore (la cura di un nemico non cambia).
+- validate_data.py: regola per data/modalita.json (default esistente, tema_arte luminoso|cupo, moltiplicatori di un
+  vocabolario chiuso {danno_al_giocatore, danno_ai_nemici, cure} e > 0). Provata guastando il file: 4 errori trovati.
+- Test nuovi in tests/test_modalita.gd (3): danno al giocatore e ai nemici in difficile, facile invariata, cure del
+  giocatore e di un altro. validate 0, 790 test passati.
+- Aperto: story 3 (bottoni Facile/Difficile nel frontespizio, prova a schermo).

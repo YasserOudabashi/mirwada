@@ -994,8 +994,13 @@ func annulla_transform(ability_id: String) -> bool:
 	return trovata
 
 
-func _p_heal(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+func _p_heal(prim: Dictionary, caster: Node, stats: Node, _ability_id: String) -> Dictionary:
 	var quantita: float = _num(prim.get("quantita"), 0.0)
+	# Modalita' di gioco (data/modalita.json): le cure del giocatore hanno il loro
+	# numero (1 in facile).
+	var gs: Node = Engine.get_main_loop().root.get_node_or_null("GameState")
+	if gs != null and caster != null and caster.is_in_group("player"):
+		quantita *= float(gs.call("moltiplicatore", "cure"))
 	var istantaneo: bool = _flag(prim.get("istantaneo"), true)
 	var durata: float = _num(prim.get("durata"), 0.0)
 	var bersaglio: String = str(prim.get("bersaglio", "self"))
