@@ -8817,3 +8817,11 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
 - Aperto: gli oggetti seguono solo la tabella (il trono resta pietra grigio-blu, nella concept e' roccia nera con il
   bordo arancio): servira' una ramp_cupo anche per materiali scelti. Archivio: la concept e' la sala sotterranea, che
   non esiste ancora.
+
+## Modalita' cupa, story 3: Frontiera invertita, 2026-10-23
+- ramp_cupo dalla palette della concept frontiera_porte: vuoto = nebbia chiara (#939398..#c8cbcf), nebbia (terra della
+  Frontiera) = roccia scura (#231a20..#574244), erba_lilla e terra_rosa = toni intermedi spenti. Stessa lunghezza
+  delle ramp, nessun colore che sia anche voce di tema.CUPO. La roccia delle scogliere segue la tabella (gia' scura).
+- Verifica: arte/revisione/concept/frontiera_cupa.png (concept, riva sud, riva nord): isole scure su nebbia chiara,
+  anche il bordo nord senza scogliera si legge. Luminoso rigenerato identico byte per byte.
+- Aperto: alberi secchi bruni su terra bruna (si leggono meno); nella concept la terra delle isole e' piu' viola.
