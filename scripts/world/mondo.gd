@@ -290,7 +290,7 @@ func viaggia_a(target: String) -> bool:
 
 ## Gli NPC presenti ORA (schedule + momento, NpcSystem.presenti) di tutte le
 ## regioni, al luogo della mappa del loro location_tag. Ricostruiti a ogni
-## momento_cambiato. Il disegno per ora e' quello del personaggio (idle).
+## momento_cambiato. Il disegno e' l'aspetto del roster (tools/art/build_npc.py).
 func crea_npc() -> void:
 	for c in get_children():
 		if c is Area2D and c.has_meta("npc_id"):
@@ -312,10 +312,11 @@ func crea_npc() -> void:
 				continue
 			var q: Vector2i = cella_libera(c, occupate, str(id))
 			occupate[q] = true
-			add_child(_npc(str(id), Vector2((q.x + 0.5) * tile, (q.y + 0.5) * tile)))
+			var aspetto: String = str(gd.call("get_npc", str(id)).get("aspetto", ""))
+			add_child(_npc(str(id), Vector2((q.x + 0.5) * tile, (q.y + 0.5) * tile), aspetto))
 
 
-func _npc(id: String, pos: Vector2) -> Area2D:
+func _npc(id: String, pos: Vector2, aspetto: String = "") -> Area2D:
 	var area := Area2D.new()
 	area.name = "Npc_%s" % id
 	area.set_meta("npc_id", id)
@@ -328,7 +329,7 @@ func _npc(id: String, pos: Vector2) -> Area2D:
 	var anim: AnimatedSprite2D = AnimationMachine.new()
 	anim.name = "AnimationMachine"
 	area.add_child(anim)
-	anim.call("configura", "personaggio")
+	anim.call("configura", "personaggio", aspetto)
 	anim.call("riproduci", "idle", "down")
 	area.body_entered.connect(_npc_avvicinato.bind(id))
 	area.body_exited.connect(_npc_allontanato.bind(id))

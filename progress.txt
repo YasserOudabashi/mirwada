@@ -8930,3 +8930,23 @@ chiede solo per decisioni vere. Regola dell'utente (2026-10-14): MAI lasciare im
   d'arte successiva). Le barriere delle sotto-aree (cripte, passaggi_ombra, ponti_di_radici, grotte_di_marea,
   ali_interne, isole_nebbia) non sono ancora sulla mappa: mancano i loro luoghi nel mondo. Le scene di regione
   (scenes/regioni/, region_scene.gd) restano solo per i loro test.
+
+## US-8B12d — aspetto degli NPC (story d'arte), 2026-10-24
+- Problema (visto a schermo in US-8B12c): gli NPC usavano i fogli del personaggio e sembravano copie del giocatore.
+- data/npc/roster.json: campo "aspetto" (id neutro, mai il nome dell'NPC): amico, mercante, guaritrice, rivale,
+  archivista, contrabbandiere, bambina, investigatore, soglia; i 10 popolani alternano popolano_a/b/c.
+- tools/art/build_npc.py (nuovo): un rig humanoid per aspetto, stesso motore, luce, ppu (1.22), piedi (54 px) e
+  bordo di luce di Enel; solo idle e walk (gli NPC per ora stanno fermi). Scrive arte/sprite/ e
+  assets/placeholder/personaggio_<aspetto>_{idle,walk}.png. Comando: python tools/art/build_npc.py (nessun numero
+  casuale: stessi parametri = stessi PNG). Esporta in una cartella temporanea: export_spec scrive
+  personaggio_<nome>.png e la prima versione sovrascriveva i fogli di Enel (ripristinati da git).
+- Guardato ingrandito su chiaro e scuro (arte/revisione/npc_aspetti.png): il cappuccio a 64 px copriva tutto il
+  viso (contrabbandiere, soglia) -> berretto e capelli lunghi bianchi con occhi rossi; i capelli "spiky" biondi
+  sembravano un elmetto -> corti. Checklist automatica: alpha solo 0/255, nessun pixel sul bordo della cella,
+  dimensioni = frame di animations.json, colori dalle rampe di materials.py.
+- mondo.gd: AnimationMachine.configura("personaggio", aspetto) (se manca un foglio dell'aspetto ripiega su quello
+  del personaggio). validate_data: l'aspetto deve avere il suo foglio idle.
+- Verifica: test_mondo (ogni NPC presente ha il suo aspetto), prova a schermo arte/revisione/npc_in_gioco.png.
+  validate 0, 804 test passati.
+- Non mi convince ancora: l'archivista col chignon di fronte sembra un cappello a punta; le donne e gli uomini si
+  distinguono solo da capelli e vesti (il rig e' unico); nessuna animazione di dialogo.

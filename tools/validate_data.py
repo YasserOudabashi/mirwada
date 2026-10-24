@@ -1375,6 +1375,10 @@ def main():
                 v = npc.get(campo)
                 if not isinstance(v, str) or not v.startswith("npc."):
                     err(f"{rel} [{nid}]: {campo} '{v}' deve avere il prefisso 'npc.'")
+            # US-8B12d: aspetto = fogli personaggio_<aspetto>_<anim> (tools/art/build_npc.py)
+            asp = npc.get("aspetto")
+            if asp is not None and not os.path.exists(os.path.join(ROOT, "assets", "placeholder", f"personaggio_{asp}_idle.png")):
+                err(f"{rel} [{nid}]: aspetto '{asp}' senza assets/placeholder/personaggio_{asp}_idle.png (tools/art/build_npc.py)")
             if npc.get("region_id") not in region_ids:
                 err(f"{rel} [{nid}]: region_id '{npc.get('region_id')}' non e' una regione di regions.json")
             for voce in npc.get("schedule", []):
