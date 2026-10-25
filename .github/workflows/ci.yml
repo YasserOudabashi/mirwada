@@ -2,36 +2,32 @@ name: CI
 
 # Validator dei dati + suite headless.
 #
-# 2026-09-06: i 2000 min/mese di Actions dell'account sono ESAURITI (2199/2000,
-# reset 1 ottobre 2026). Fino ad allora i trigger automatici sono DISATTIVATI
-# per non generare overage a pagamento: resta solo l'avvio a mano
-# (workflow_dispatch). I test si lanciano comunque in locale a ogni story
-# (Godot headless, vedi progress.txt / regola ralph), quindi la rete di
-# sicurezza non sparisce.
-#
-# PER RIATTIVARE (dopo il reset o dopo aver messo il budget Actions a $0 su
-# github.com/settings/billing) togli il commento a push: e pull_request: qui
-# sotto. La config e' gia' magra: solo main, niente commit di sola doc,
-# concurrency, timeout, cache del binario Godot.
+# Riattivata il 2026-10-25 (i minuti di Actions si sono azzerati il 1 ottobre):
+# gira sui push a main e sulle pull request, salta i commit di sola
+# documentazione. La suite si lancia con tools/run_tests.sh, che fallisce anche
+# sugli errori di script nascosti (un test interrotto a meta' risulterebbe
+# superato).
 
 on:
-  # push:
-  #   branches: [main]
-  #   paths-ignore:
-  #     - "**.md"
-  #     - "006_PRD/**"
-  #     - "docs/**"
-  #     - "diario.py"
-  #     - "progress.txt"
-  #     - "img/**"
-  # pull_request:
-  #   paths-ignore:
-  #     - "**.md"
-  #     - "006_PRD/**"
-  #     - "docs/**"
-  #     - "diario.py"
-  #     - "progress.txt"
-  #     - "img/**"
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "006_PRD/**"
+      - "docs/**"
+      - "arte/**"
+      - "diario.py"
+      - "progress.txt"
+      - "img/**"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+      - "006_PRD/**"
+      - "docs/**"
+      - "arte/**"
+      - "diario.py"
+      - "progress.txt"
+      - "img/**"
   workflow_dispatch:
 
 # Un push nuovo sullo stesso ref annulla la run precedente ancora in coda/corso.
@@ -83,5 +79,5 @@ jobs:
         # L'import headless in 4.3 non sempre esce 0; il gate vero e' la suite.
         run: timeout 120 godot --headless --path . --import || true
 
-      - name: Suite headless
-        run: godot --headless --path . --script res://tests/run_tests.gd
+      - name: Suite headless (con il controllo sugli errori di script)
+        run: bash tools/run_tests.sh
