@@ -163,7 +163,7 @@ func test_gli_npc_stanno_al_luogo_del_loro_tag() -> void:
 		assert_false(viste.has(c), "%s non sta sopra un altro NPC" % id)
 		viste[c] = true
 		assert_true(a.get_node("AnimationMachine").sprite_frames != null, "%s ha il disegno" % id)
-		var asp: String = str(Engine.get_main_loop().root.get_node("GameData").call("get_npc", id).get("aspetto", ""))
+		var asp: String = str((Engine.get_main_loop().root.get_node("GameData").call("get_npc", id).get("aspetto", {}) as Dictionary).get("sprite", ""))
 		assert_true(ResourceLoader.exists("res://assets/placeholder/personaggio_%s_idle.png" % asp),
 			"%s ha il suo aspetto (%s), non il disegno del giocatore" % [id, asp])
 	m.free()

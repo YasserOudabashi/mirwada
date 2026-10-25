@@ -141,6 +141,17 @@ func partenza() -> Vector2:
 	return Vector2((float(p[0]) + 0.5) * tile, (float(p[1]) + 0.5) * tile)
 
 
+## Punto di comparsa in una regione (contratto di world_scene.gd, usato da
+## main.gd): la partenza dei dati se e' in quella regione (o rid vuoto),
+## altrimenti il primo luogo della regione sulla mappa, come viaggia_a.
+func punto_spawn(rid: String = "") -> Vector2:
+	var p: Vector2 = partenza()
+	if rid.is_empty() or regione_a(floori(p.x / tile), floori(p.y / tile)) == rid:
+		return p
+	var c: Vector2i = arrivo_in(rid)
+	return Vector2((c.x + 0.5) * tile, (c.y + 0.5) * tile) if c.x >= 0 else p
+
+
 ## Costruisce i blocchi attorno a una posizione e libera quelli lontani.
 func segui(pos: Vector2) -> void:
 	var c := Vector2i(floori(pos.x / (tile * BLOCCO)), floori(pos.y / (tile * BLOCCO)))
@@ -268,22 +279,31 @@ func _vicino_occupato(q: Vector2i, occupate: Dictionary) -> bool:
 ## rispettando il gating d'ingresso.
 func viaggia_a(target: String) -> bool:
 	var ws: Node = Engine.get_main_loop().root.get_node_or_null("WorldState")
-	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
-	if gd == null or (ws != null and str(ws.call("regione_corrente")) == target) or not ingresso_aperto(target):
+	if (ws != null and str(ws.call("regione_corrente")) == target) or not ingresso_aperto(target):
 		return false
-	for tag in (gd.call("get_region", target).get("location_tags", []) as Array):
-		var c: Vector2i = luogo_del_tag(target, str(tag))
-		if c.x < 0:
-			continue
-		var q: Vector2i = cella_libera(c)
-		var pos := Vector2((q.x + 0.5) * tile, (q.y + 0.5) * tile)
-		var p: Node = get_tree().get_first_node_in_group("player") if is_inside_tree() else null
-		if p is Node2D:
-			colloca(p as Node2D, pos)
-		_ultima_ammessa = pos
-		aggiorna_regione(pos)
-		return true
-	return false
+	var q: Vector2i = arrivo_in(target)
+	if q.x < 0:
+		return false
+	var pos := Vector2((q.x + 0.5) * tile, (q.y + 0.5) * tile)
+	var p: Node = get_tree().get_first_node_in_group("player") if is_inside_tree() else null
+	if p is Node2D:
+		colloca(p as Node2D, pos)
+	_ultima_ammessa = pos
+	aggiorna_regione(pos)
+	return true
+
+
+## La casella d'arrivo in una regione: il primo luogo dei suoi location_tags
+## presente sulla mappa, poi la casella libera piu' vicina. (-1, -1) se nessuno.
+func arrivo_in(rid: String) -> Vector2i:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	if gd == null:
+		return Vector2i(-1, -1)
+	for tag in (gd.call("get_region", rid).get("location_tags", []) as Array):
+		var c: Vector2i = luogo_del_tag(rid, str(tag))
+		if c.x >= 0:
+			return cella_libera(c)
+	return Vector2i(-1, -1)
 
 
 # --- NPC (US-612/613b nel mondo unico) -------------------------------------------
@@ -312,7 +332,8 @@ func crea_npc() -> void:
 				continue
 			var q: Vector2i = cella_libera(c, occupate, str(id))
 			occupate[q] = true
-			var aspetto: String = str(gd.call("get_npc", str(id)).get("aspetto", ""))
+			var asp: Variant = gd.call("get_npc", str(id)).get("aspetto", {})
+			var aspetto: String = str((asp as Dictionary).get("sprite", "")) if asp is Dictionary else ""
 			add_child(_npc(str(id), Vector2((q.x + 0.5) * tile, (q.y + 0.5) * tile), aspetto))
 
 

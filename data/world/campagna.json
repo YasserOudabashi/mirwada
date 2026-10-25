@@ -1,0 +1,486 @@
+{
+  "schema_version": 1,
+  "_comment": "Addendum fase 10 (US-1015): il popolamento della campagna - lo spazio FUORI dal rettangolo di ogni regione, ora terreno vero e attraversabile invece di vuoto. Stessa forma di un layout (nemici[]/oggetti[]) ma coordinate ASSOLUTE (non ha un world_offset proprio, world_scene.gd lo popola con offset Vector2i.ZERO). Nemici deboli (sequenza 9, la piu' bassa) e oggetti comuni sparsi con distanza minima fra loro, generati una volta con un seed fisso (tools/ non versionato per questo file: e' contenuto, si edita a mano da qui in poi come ogni altro layout). Addendum fase 11 (US-1111/1112): 'edifici' - stessa forma di layout.edifici[] (x/y = cella della porta, interno_id), ma qui world_scene.gd deve anche DIPINGERE le pareti (_disegna_capanne_campagna, un template fisso 5x4 riusato per ogni voce, campagna.json non ha una mappa ASCII disegnata a mano).",
+  "edifici": [
+    {
+      "x": 70,
+      "y": 58,
+      "interno_id": "marche_villaggio_fabbro"
+    },
+    {
+      "x": 80,
+      "y": 58,
+      "interno_id": "marche_villaggio_mercante"
+    },
+    {
+      "x": 486,
+      "y": 50,
+      "interno_id": "archivio_villaggio_alchimista"
+    },
+    {
+      "x": 496,
+      "y": 50,
+      "interno_id": "archivio_villaggio_mercante"
+    }
+  ],
+  "nemici": [
+    {
+      "x": 269,
+      "y": 230,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 177,
+      "y": 44,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 365,
+      "y": 395,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 476,
+      "y": 55,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 28,
+      "y": 341,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 367,
+      "y": 75,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 450,
+      "y": 348,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 305,
+      "y": 60,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 306,
+      "y": 179,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 345,
+      "y": 8,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 279,
+      "y": 170,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 135,
+      "y": 116,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 251,
+      "y": 78,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 277,
+      "y": 23,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 114,
+      "y": 76,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 379,
+      "y": 55,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 120,
+      "y": 195,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 182,
+      "y": 58,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 446,
+      "y": 52,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 78,
+      "y": 404,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 227,
+      "y": 372,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 233,
+      "y": 156,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 177,
+      "y": 399,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 464,
+      "y": 68,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 237,
+      "y": 397,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 291,
+      "y": 168,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 347,
+      "y": 213,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 340,
+      "y": 190,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 215,
+      "y": 391,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 186,
+      "y": 27,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 280,
+      "y": 259,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 126,
+      "y": 258,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 76,
+      "y": 156,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 33,
+      "y": 115,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 258,
+      "y": 145,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    },
+    {
+      "x": 166,
+      "y": 234,
+      "sequenza": 9,
+      "scala": 1.0,
+      "override": {}
+    }
+  ],
+  "oggetti": [
+    {
+      "x": 397,
+      "y": 346,
+      "item_id": "filo_di_lana_rossa",
+      "quantita": 1
+    },
+    {
+      "x": 251,
+      "y": 254,
+      "item_id": "gesso_consacrato",
+      "quantita": 1
+    },
+    {
+      "x": 239,
+      "y": 116,
+      "item_id": "polvere_di_sale_nero",
+      "quantita": 1
+    },
+    {
+      "x": 278,
+      "y": 335,
+      "item_id": "cera_di_candela_rituale",
+      "quantita": 1
+    },
+    {
+      "x": 458,
+      "y": 356,
+      "item_id": "inchiostro_luminescente",
+      "quantita": 1
+    },
+    {
+      "x": 376,
+      "y": 60,
+      "item_id": "punta_d_argento",
+      "quantita": 1
+    },
+    {
+      "x": 55,
+      "y": 283,
+      "item_id": "grimaldello_cantante",
+      "quantita": 1
+    },
+    {
+      "x": 400,
+      "y": 248,
+      "item_id": "guanto_del_borseggiatore",
+      "quantita": 1
+    },
+    {
+      "x": 138,
+      "y": 23,
+      "item_id": "refurtiva_dimenticata",
+      "quantita": 1
+    },
+    {
+      "x": 46,
+      "y": 76,
+      "item_id": "acqua_sorgiva",
+      "quantita": 1
+    },
+    {
+      "x": 30,
+      "y": 265,
+      "item_id": "filo_di_lana_rossa",
+      "quantita": 1
+    },
+    {
+      "x": 83,
+      "y": 256,
+      "item_id": "gesso_consacrato",
+      "quantita": 1
+    },
+    {
+      "x": 224,
+      "y": 327,
+      "item_id": "polvere_di_sale_nero",
+      "quantita": 1
+    },
+    {
+      "x": 180,
+      "y": 128,
+      "item_id": "cera_di_candela_rituale",
+      "quantita": 1
+    },
+    {
+      "x": 375,
+      "y": 268,
+      "item_id": "inchiostro_luminescente",
+      "quantita": 1
+    },
+    {
+      "x": 151,
+      "y": 351,
+      "item_id": "punta_d_argento",
+      "quantita": 1
+    },
+    {
+      "x": 54,
+      "y": 87,
+      "item_id": "grimaldello_cantante",
+      "quantita": 1
+    },
+    {
+      "x": 88,
+      "y": 393,
+      "item_id": "guanto_del_borseggiatore",
+      "quantita": 1
+    },
+    {
+      "x": 425,
+      "y": 163,
+      "item_id": "refurtiva_dimenticata",
+      "quantita": 1
+    },
+    {
+      "x": 113,
+      "y": 213,
+      "item_id": "acqua_sorgiva",
+      "quantita": 1
+    },
+    {
+      "x": 179,
+      "y": 323,
+      "item_id": "filo_di_lana_rossa",
+      "quantita": 1
+    },
+    {
+      "x": 343,
+      "y": 358,
+      "item_id": "gesso_consacrato",
+      "quantita": 1
+    },
+    {
+      "x": 435,
+      "y": 286,
+      "item_id": "polvere_di_sale_nero",
+      "quantita": 1
+    },
+    {
+      "x": 446,
+      "y": 76,
+      "item_id": "cera_di_candela_rituale",
+      "quantita": 1
+    },
+    {
+      "x": 10,
+      "y": 198,
+      "item_id": "inchiostro_luminescente",
+      "quantita": 1
+    },
+    {
+      "x": 374,
+      "y": 108,
+      "item_id": "punta_d_argento",
+      "quantita": 1
+    },
+    {
+      "x": 75,
+      "y": 172,
+      "item_id": "grimaldello_cantante",
+      "quantita": 1
+    },
+    {
+      "x": 493,
+      "y": 225,
+      "item_id": "guanto_del_borseggiatore",
+      "quantita": 1
+    },
+    {
+      "x": 378,
+      "y": 278,
+      "item_id": "refurtiva_dimenticata",
+      "quantita": 1
+    },
+    {
+      "x": 378,
+      "y": 290,
+      "item_id": "acqua_sorgiva",
+      "quantita": 1
+    },
+    {
+      "x": 301,
+      "y": 138,
+      "item_id": "filo_di_lana_rossa",
+      "quantita": 1
+    },
+    {
+      "x": 339,
+      "y": 346,
+      "item_id": "gesso_consacrato",
+      "quantita": 1
+    },
+    {
+      "x": 377,
+      "y": 126,
+      "item_id": "polvere_di_sale_nero",
+      "quantita": 1
+    },
+    {
+      "x": 256,
+      "y": 129,
+      "item_id": "cera_di_candela_rituale",
+      "quantita": 1
+    }
+  ]
+}

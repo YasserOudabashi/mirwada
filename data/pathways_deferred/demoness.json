@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "demoness",
+  "categoria": "standard",
   "name": "Demoness",
   "name_i18n": "pathway.demoness",
   "group": "calamity_of_destruction",

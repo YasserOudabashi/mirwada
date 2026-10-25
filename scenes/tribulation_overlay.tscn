@@ -11,9 +11,9 @@ visible = false
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -160.0
-offset_top = 8.0
+offset_top = 116.0
 offset_right = 160.0
-offset_bottom = 92.0
+offset_bottom = 200.0
 mouse_filter = 2
 
 [node name="V" type="VBoxContainer" parent="Pannello"]

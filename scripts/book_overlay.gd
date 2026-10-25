@@ -90,8 +90,12 @@ func _ready() -> void:
 			elif b != null:
 				b.call("apri_a", pid))
 		de.dialogo_finito.connect(func(_id: String) -> void:
+			# US-811: una scelta puo' aprire un negozio E finire il dialogo
+			# nella stessa mossa (es. dlg_sidon.json n1: apri_vendita + goto
+			# null) — non chiudere il libro sotto al negozio appena aperto.
 			if b != null and bool(b.call("e_aperto")) \
-					and bool(b.call("pagina", b.call("pagina_corrente")).get("transitoria", false)):
+					and bool(b.call("pagina", b.call("pagina_corrente")).get("transitoria", false)) \
+					and not _pagina_in_negozio():
 				b.call("chiudi"))
 		if b != null:
 			b.libro_chiuso.connect(func() -> void:
@@ -107,6 +111,16 @@ func _pagina_di_tipo(tipo: String) -> String:
 		if str((p as Dictionary).get("tipo", "")) == tipo:
 			return str((p as Dictionary).get("id", ""))
 	return ""
+
+
+## true se l'istanza di pagina attualmente montata e' un page_dialogo in
+## modalita' negozio (US-811). Non presume quale tipo di pagina sia: si
+## limita a chiedere in_negozio() a chi ce l'ha.
+func _pagina_in_negozio() -> bool:
+	if _contenuto.get_child_count() == 0:
+		return false
+	var inst: Node = _contenuto.get_child(0)
+	return inst.has_method("in_negozio") and bool(inst.call("in_negozio"))
 
 
 func _book() -> Node:

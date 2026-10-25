@@ -6,8 +6,9 @@ extends Node
 ##
 ## Le condizioni riusano il vocabolario condiviso (scripts/conditions.gd, FR-3):
 ## un dialogo che si apre solo di notte usa la stessa condizione di un'abilita'
-## notturna. Gli effetti sono un vocabolario CHIUSO di 5 voci - niente scripting
-## libero: se un dialogo sembra chiedere un effetto nuovo, e' un flag + una quest.
+## notturna. Gli effetti sono un vocabolario CHIUSO di 7 voci (fase 11,
+## US-1106, ha aggiunto crea_su_richiesta) - niente scripting libero: se un
+## dialogo sembra chiedere un effetto nuovo, e' un flag + una quest.
 ##
 ## Nessuna pagina del libro qui (page_dialogo = US-613b): l'engine e' agnostico
 ## dalla UI, emette segnali che una pagina ascoltera'.
@@ -19,9 +20,14 @@ signal nodo_cambiato(node_id: String)
 signal dialogo_finito(dialogue_id: String)
 signal apri_vendita(npc_id: String)
 signal avvia_quest(quest_id: String)
+## US-1106 (fase 11): l'NPC toccato apre la modalita' "crea per te" - la
+## pagina che ascolta elenca i suoi blueprints/ricette (npc.crafter), stesso
+## principio di apri_vendita per il suo listino.
+signal apri_creazione(npc_id: String)
 
 const Conditions := preload("res://scripts/conditions.gd")
-const EFFETTI := ["emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest", "impara_sinergia"]
+const EFFETTI := ["emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest",
+	"impara_sinergia", "crea_su_richiesta"]
 
 var _dialogo: Dictionary = {}
 var _dialogue_id: String = ""
@@ -155,6 +161,8 @@ func _applica_effetto(eff: Variant) -> void:
 			var se: Node = get_node_or_null("/root/SynergyEngine")
 			if se != null:
 				se.call("impara_sinergia", str(e.get("id", "")))
+		"crea_su_richiesta":
+			apri_creazione.emit(str(e.get("npc_id", _interlocutore)))
 
 
 func _ferma_il_mondo(fermo: bool) -> void:

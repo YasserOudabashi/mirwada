@@ -56,15 +56,25 @@ func gioca_primitiva(_tipo: String, caster: Node, pv: Dictionary, pal: Dictionar
 	var madre: Node = (caster as Node2D).get_parent()
 	if madre == null:
 		return
+	var facing: Vector2 = Vector2.DOWN
+	if caster.has_method("get_facing"):
+		facing = caster.call("get_facing")
 	var s := Sprite2D.new()
 	s.texture = _tex_placeholder()
 	s.modulate = _colore(pal, "primario", Color(0.9, 0.9, 0.95))
-	s.global_position = (caster as Node2D).global_position + Vector2(0, -6)
+	s.global_position = (caster as Node2D).global_position + Vector2(0, -6) + facing * 14.0
+	s.rotation = facing.angle()
+	s.scale = Vector2.ONE * 0.7
 	madre.add_child(s)
-	var frames: int = maxi(1, int(pv.get("frames", 3)))
+	# un lampo che si allarga davanti al caster: abbastanza grande e lungo da
+	# vedersi (il 6x6 di prima spariva prima di accorgersene). Grafica ancora
+	# provvisoria, ma leggibile.
+	var durata: float = maxf(0.3, maxi(1, int(pv.get("frames", 3))) * VITA_FRAME)
 	var t := s.create_tween()
-	t.tween_property(s, "modulate:a", 0.0, frames * VITA_FRAME)
-	t.tween_callback(s.queue_free)
+	t.set_parallel(true)
+	t.tween_property(s, "scale", Vector2.ONE * 2.4, durata)
+	t.tween_property(s, "modulate:a", 0.0, durata)
+	t.chain().tween_callback(s.queue_free)
 
 
 func evento_combat(nome: String) -> void:
@@ -118,6 +128,6 @@ func _overlay() -> Node:
 
 
 func _tex_placeholder() -> Texture2D:
-	var img := Image.create(6, 6, false, Image.FORMAT_RGBA8)
+	var img := Image.create(16, 16, false, Image.FORMAT_RGBA8)
 	img.fill(Color.WHITE)
 	return ImageTexture.create_from_image(img)

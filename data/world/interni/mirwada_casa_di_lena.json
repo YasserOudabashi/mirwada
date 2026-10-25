@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "interno_id": "mirwada_casa_di_lena",
+  "mappa": [
+    "########",
+    "#......#",
+    "#......#",
+    "#......#",
+    "#......#",
+    "########"
+  ],
+  "spawn": [
+    4,
+    4
+  ],
+  "nemici": [],
+  "oggetti": [
+    {
+      "x": 2,
+      "y": 2,
+      "item_id": "trottola_di_legno_intagliata",
+      "quantita": 1
+    }
+  ]
+}

@@ -155,6 +155,35 @@ func test_spesa_di_spiritualita() -> void:
 	s.free()
 
 
+## Bug report utente 2026-09-10: player.gd non ascoltava 'died' e con hp=0
+## StatsComponent restava marcato morto per sempre (il setter di hp emette
+## 'died' solo sulla transizione "not _dead" -> 0). revivi() e' il modo
+## generico per uscirne, usato dal respawn del giocatore.
+func test_revivi_resetta_dead_e_ripristina_hp() -> void:
+	var s: Stats = _make()
+	s.hp = 0.0
+	assert_true(s.is_dead(), "morto a 0 hp")
+
+	s.revivi()
+	assert_false(s.is_dead(), "revivi() lo riporta in vita")
+	assert_almost_eq(s.hp, s.get_stat("hp_max"), "hp pieni di default")
+
+	# senza il reset di _dead, questo secondo 'died' non scatterebbe mai piu'.
+	var morti: Array = []
+	s.died.connect(func() -> void: morti.append(1))
+	s.hp = 0.0
+	assert_eq(morti.size(), 1, "died puo' riscattare dopo un revivi()")
+	s.free()
+
+
+func test_revivi_con_quantita_esplicita() -> void:
+	var s: Stats = _make()
+	s.hp = 0.0
+	s.revivi(30.0)
+	assert_almost_eq(s.hp, 30.0, "revivi con una quantita' esplicita")
+	s.free()
+
+
 func test_clear_modifiers() -> void:
 	var s: Stats = _make()
 	s.apply_modifier("a", {"velocita": 10.0})

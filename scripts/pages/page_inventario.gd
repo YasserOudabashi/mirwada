@@ -114,13 +114,15 @@ func _zaino() -> void:
 
 func _riga_item(v: Dictionary) -> HBoxContainer:
 	var gd: Node = _n("/root/GameData")
-	var it: Dictionary = gd.call("get_item", str(v.get("item_id", "")))
+	var item_id: String = str(v.get("item_id", ""))
+	var it: Dictionary = gd.call("get_item", item_id)
 	var h := HBoxContainer.new()
 	var l := Label.new()
 	var nome: String = str(gd.call("tr_data", it.get("name_i18n", v.get("item_id"))))
 	var q: int = int(v.get("quantita", 1))
 	l.text = nome + ("  x%d" % q if q > 1 else "")
 	l.custom_minimum_size = Vector2(300, 0)
+	l.add_theme_color_override("font_color", _colore_rarita(str(gd.call("rarita_di", item_id))))
 	h.add_child(l)
 	var cat: String = str(it.get("categoria", ""))
 	var iid: String = str(v.get("instance_id", ""))
@@ -131,6 +133,21 @@ func _riga_item(v: Dictionary) -> HBoxContainer:
 		h.add_child(_azione(tr("BOOK_INV_USA"), func() -> void:
 			_n("/root/Inventory").call("usa", iid); _mostra("zaino")))
 	return h
+
+
+## US-1105 (fase 11): 4 colori distinti per i 4 livelli di
+## data/schema/item_rarity.json - procedurali (ColorRect/StyleBox pattern
+## gia' in uso altrove nella pagina, es. il modulate delle righe offuscate),
+## nessun asset nuovo. 'comune' e' bianco, il colore di testo neutro.
+const _COLORE_RARITA := {
+	"comune": Color.WHITE,
+	"non_comune": Color(0.30, 0.75, 0.35),
+	"raro": Color(0.30, 0.55, 0.90),
+	"leggendario": Color(0.90, 0.65, 0.15),
+}
+
+func _colore_rarita(rarita: String) -> Color:
+	return _COLORE_RARITA.get(rarita, Color.WHITE)
 
 
 func _ricettario() -> void:

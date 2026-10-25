@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "boon.schema.json",
+  "title": "Boon (fase 9, US-901)",
+  "_comment": "Il campo 'boon' di una Sequenza di un Pathway non_standard (data/pathways_non_standard/), alternativo a 'potion' dei Pathway standard - i due sono mutuamente esclusivi, mai entrambi sulla stessa Sequenza (tools/validate_data.py lo impone). Un Boon e' un dono UNA TANTUM concesso quando TUTTI i requisiti sono soddisfatti (BoonSystem.ricevi_boon(), US-902) - non una scala a gradini, non un accumulo continuo: quei due meccanismi restano fuori da questa fase (vedi 006_PRD/prd-fase-9-pathway-non-standard.md). Una Sequenza non_standard non-stub ha SEMPRE un 'boon' (mai un'assenza silenziosa: il giocatore resterebbe bloccato per sempre); una Sequenza stub non ne ha nessuno.",
+  "type": "object",
+  "required": ["requisiti"],
+  "additionalProperties": false,
+  "properties": {
+    "requisiti": {
+      "type": "array",
+      "minItems": 1,
+      "_comment": "Nessun ordine implicito: TUTTI i requisiti vanno soddisfatti (AND), non ce n'e' uno per volta. Mai tutte e tre le fonti insieme per forza: la combinazione e' una scelta di design per-Sequenza.",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/definitions/requisito_quest" },
+          { "$ref": "#/definitions/requisito_comportamento" },
+          { "$ref": "#/definitions/requisito_sacrificio" }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "requisito_quest": {
+      "type": "object",
+      "required": ["tipo", "quest_id"],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": { "const": "quest" },
+        "quest_id": {
+          "type": "string",
+          "_comment": "Deve esistere in data/quests/ - riusa QuestSystem esistente, zero verbi nuovi (US-901)."
+        }
+      }
+    },
+    "requisito_comportamento": {
+      "type": "object",
+      "required": ["tipo", "evento", "target"],
+      "additionalProperties": false,
+      "_comment": "Stesso schema di acting_actions (pathway.schema.json), ma letto da BoonSystem con una baseline propria per-Sequenza (US-902), non da Acting/PotionSystem.",
+      "properties": {
+        "tipo": { "const": "comportamento" },
+        "evento": {
+          "type": "string",
+          "_comment": "Uno dei 12 eventi di data/schema/tracked_events.json. Un evento nuovo e' CODICE: va discusso, mai aggiunto di slancio."
+        },
+        "filtri": {
+          "type": "object",
+          "_comment": "Sottoinsieme dei filtri ammessi per l'evento scelto (stesso vocabolario di tracked_events.json)."
+        },
+        "target": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "requisito_sacrificio": {
+      "type": "object",
+      "required": ["tipo", "costo"],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": { "const": "sacrificio" },
+        "costo": {
+          "type": "object",
+          "required": ["tipo"],
+          "_comment": "Consumato SOLO al momento di BoonSystem.ricevi_boon() riuscito, mai prima (guardare lo stato di un requisito non deve costare nulla, US-902).",
+          "properties": {
+            "tipo": {
+              "enum": ["oggetto", "caratteristica", "follia"]
+            },
+            "id": {
+              "type": "string",
+              "_comment": "Richiesto per tipo 'oggetto' (esiste in data/items/) e 'caratteristica' (esiste in data/characteristics.json). Assente per 'follia': e' solo una quantita' di Follia, nessun id."
+            },
+            "quantita": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        }
+      }
+    }
+  }
+}

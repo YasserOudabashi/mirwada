@@ -11,6 +11,11 @@ var _max_talenti: int = 0
 ## Modalita' scelta (data/modalita.json): si passa a nuova_partita.
 var _modalita: String = ""
 var _descr_modalita: Label = null
+## US-801: Pathway scelto alla creazione. _pathway_ids[i] <-> voce i
+## dell'OptionButton, cosi' l'indice selezionato si risolve in un id senza
+## nomi hardcoded.
+var _pathway: OptionButton = null
+var _pathway_ids: Array = []
 
 
 func aggiorna() -> void:
@@ -20,6 +25,8 @@ func aggiorna() -> void:
 	_scelti = []
 	_modalita = ""
 	_descr_modalita = null
+	_pathway = null
+	_pathway_ids = []
 
 	var gs: Node = _n("/root/GameState")
 	if gs != null and bool(gs.call("partita_in_corso")):
@@ -34,13 +41,49 @@ func _mostra_creazione(gs: Node) -> void:
 	_campo.text = str(gs.call("nome_default")) if gs != null else "Enel"
 	_campo.custom_minimum_size = Vector2(220, 24)
 	_campo.select_all()
-	add_child(_campo)
+	_campo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# nome e Pathway sulla stessa riga: con talenti e modalita' la pagina resta dentro il libro
+	var riga := HBoxContainer.new()
+	add_child(riga)
+	riga.add_child(_campo)
+	_pathway_scelta(riga)
 	_talenti_innati(gs)
 	_scelta_modalita()
 	var ok := Button.new()
 	ok.text = tr("BOOK_FRONTESPIZIO_CONFERMA")
 	ok.pressed.connect(conferma)
 	add_child(ok)
+
+
+## US-801: scelta del Pathway alla creazione. L'elenco e l'ordine vengono
+## da GameData.pathway_ids(), il default da balance.json.progressione —
+## nessun id di Pathway hardcoded qui. US-907: anche i Pathway non_standard
+## (Eternal Aeon) compaiono qui, stesso ciclo di creazione dei Pathway
+## standard (deciso col l'utente, PRD fase 9 §5) - pathway_ids() da solo
+## resta scoped agli standard per ogni altro sistema (vedi il commento su
+## GameData.pathway_ids_non_standard()), questo e' l'unico punto che li
+## concatena.
+func _pathway_scelta(contenitore: Node) -> void:
+	var gd: Node = _n("/root/GameData")
+	if gd == null:
+		return
+	_pathway_ids = gd.call("pathway_ids") + gd.call("pathway_ids_non_standard")
+	if _pathway_ids.is_empty():
+		return
+	contenitore.add_child(_riga(tr("BOOK_FRONTESPIZIO_PATHWAY")))
+	_pathway = OptionButton.new()
+	_pathway.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var default_id: String = str(
+		(gd.call("get_balance", "progressione") as Dictionary).get("pathway_default", ""))
+	var indice_default: int = 0
+	for i in _pathway_ids.size():
+		var pid: String = str(_pathway_ids[i])
+		var pw: Dictionary = gd.call("get_pathway", pid)
+		_pathway.add_item(str(gd.call("tr_data", pw.get("name_i18n", pid))))
+		if pid == default_id:
+			indice_default = i
+	_pathway.select(indice_default)
+	contenitore.add_child(_pathway)
 
 
 ## La scelta di 1-2 talenti innati (US-332). Il numero e' un dato
@@ -139,7 +182,10 @@ func conferma() -> void:
 	var book: Node = _n("/root/Book")
 	if gs == null or _campo == null:
 		return
-	gs.call("nuova_partita", _campo.text, int(gs.call("slot_scelto")), _scelti, _modalita)
+	var pathway_id: String = ""
+	if _pathway != null and _pathway.selected >= 0 and _pathway.selected < _pathway_ids.size():
+		pathway_id = str(_pathway_ids[_pathway.selected])
+	gs.call("nuova_partita", _campo.text, int(gs.call("slot_scelto")), _scelti, pathway_id, _modalita)
 	if book != null:
 		book.call("chiudi")
 
@@ -155,7 +201,9 @@ func intercetta_avanti() -> bool:
 
 func testo_visibile() -> String:
 	var out: PackedStringArray = []
-	for c in get_children():
+	for c in find_children("*", "", true, false):        # anche dentro le righe (nome + Pathway)
+		if c.is_queued_for_deletion():
+			continue
 		if c is Label:
 			out.append((c as Label).text)
 		elif c is LineEdit:

@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "chained",
+  "categoria": "standard",
   "name": "Chained",
   "name_i18n": "pathway.chained",
   "group": "father_of_devils",

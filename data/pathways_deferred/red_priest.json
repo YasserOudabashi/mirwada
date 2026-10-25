@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "red_priest",
+  "categoria": "standard",
   "name": "Red Priest",
   "name_i18n": "pathway.red_priest",
   "group": "calamity_of_destruction",

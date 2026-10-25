@@ -1,4 +1,4 @@
-# Roadmap — Fasi 2-8
+# Roadmap — Fasi 2-10
 
 Scaletta, non PRD. Ogni fase riceve il suo PRD dettagliato con `/prd`
 **quando la fase precedente e' chiusa**, non prima: scrivere ora il PRD della
@@ -318,53 +318,254 @@ Ordine di implementazione e stress test in `006_PRD/design-pathways.md`.
 
 ---
 
-## Fase 8 — Vertical slice giocabile (IN CORSO)
+## Fase 8 — Vertical slice giocabile — CHIUSA (19 story, 850 test)
 
-> PRD: `006_PRD/prd-fase-8-vertical-slice.md` (14 story, US-801..US-814).
-> Istruzioni operative per eseguirlo: `006_PRD/prossimi-passi.md`.
-
-Le fasi 1-7 hanno costruito **tutti i sistemi** del gioco, provati da 776
-test headless. **Ma nessuno puo' giocarlo con la tastiera**: `main.tscn` e'
-rimasta la scena di prova della fase 1. Diagnosi fatta il 2026-09-09
-giocando davvero il gioco (Xvfb + screenshot) e con tre esplorazioni del
-codice — sei blocchi, tutti verificati `file:riga` nel PRD:
-
-1. L'avvio non avvia una partita (`Book.apri()`/`GameState.nuova_partita()`
-   non sono mai chiamati; nessuna scelta del Pathway alla creazione).
-2. Nessun tasto lancia un'abilita' (`AbilityEngine.execute` esiste, nessun
-   input lo raggiunge).
-3. Proiettili e archi non fanno danno (nessun `collision_mask`, nessun
-   `area_entered`: solo `hitbox.gd` colpisce davvero).
-4. La recitazione si ferma a ~1.5%: `enemy_defeated` e' emesso con payload
-   `{}`, quindi il filtro `senza_abilita` non matcha mai; e
-   `damage_absorbed_for_ally` non ha emettitori (nessun alleato in scena).
-5. **Nessuno puo' salire di Sequenza**: `PotionSystem.concoct/bevi` non ha
-   UI, e i **299 ingredienti** delle 100 formule non esistono come oggetti.
-6. Il mondo e' un pavimento piatto generato dal codice: 0 nemici e 0
-   oggetti nelle 5 regioni, NPC = quadrati blu, sprite diagnostici.
-
-**Cosa fa la fase 8**: collega i sistemi gia' scritti in una partita
-giocabile, riempie i dati mancanti, e mette una grafica provvisoria
-generata. **Zero sistemi nuovi**, zero primitive/eventi/tag nuovi, save
-`schema_version` **22 invariato**.
-
-7 blocchi: 0 avvio + controlli (avvio di partita con scelta del Pathway,
-abilita' a tastiera + hotbar, proiettili che colpiscono), A recitazione
-(payload veri di `enemy_defeated`, `item_crafted`/`ritual_completed`/
-`area_cleared`, `tg_9_protettore` riscritta nei dati), B mondo (mappe ASCII
-disegnate a mano in `data/world/layouts/`, nemici/boss/oggetti dai dati),
-C economia (i 299 ingredienti diventano oggetti con almeno una fonte:
-drop, listini, raccolta), D pagine del libro (sezione Avanzamento con
-Prepara/Bevi, negozio compra/vendi nel dialogo), E grafica (pixel art
-procedurale deterministica, stessa geometria dei fogli attuali), F verifica
-giocata end-to-end + chiusura.
+> **PRD**: `006_PRD/prd-fase-8-vertical-slice.md` (19 story: US-801..US-806,
+> US-807a..d, US-808, US-809a..c, US-810..US-814 — US-807 spezzata in 4
+> per regione, US-809 spezzata in 3 per meccanica). Istruzioni operative
+> per eseguirlo: `006_PRD/prossimi-passi.md`.
+>
+> Le fasi 1-7 avevano costruito **tutti i sistemi** del gioco, provati da
+> 776 test headless. **Ma nessuno poteva giocarlo con la tastiera**:
+> `main.tscn` era rimasta la scena di prova della fase 1. Diagnosi fatta il
+> 2026-09-09 giocando davvero il gioco (Xvfb + screenshot) — sei blocchi,
+> tutti verificati `file:riga` nel PRD: (1) l'avvio non avviava una
+> partita, (2) nessun tasto lanciava un'abilita', (3) proiettili e archi
+> non facevano danno, (4) la recitazione si fermava a ~1.5%
+> (`enemy_defeated` emesso con payload `{}`), (5) nessuno poteva salire di
+> Sequenza (`PotionSystem.concoct/bevi` senza UI, i 299 ingredienti delle
+> formule non esistevano come oggetti), (6) il mondo era un pavimento
+> piatto generato dal codice (0 nemici, 0 oggetti, NPC = quadrati blu).
+>
+> **Cosa ha fatto la fase 8**: ha collegato i sistemi gia' scritti in una
+> partita giocabile, riempito i dati mancanti, messo una grafica
+> provvisoria generata. **Zero sistemi nuovi**, zero primitive/eventi/tag
+> nuovi, save `schema_version` **22 invariato**.
+>
+> **Cosa contiene**:
+> - Blocco 0: avvio di partita vero (`GameState.nuova_partita` con scelta
+>   del Pathway alla creazione), abilita' a tastiera + hotbar, proiettili/
+>   mischia che colpiscono davvero.
+> - Blocco A: payload veri di `enemy_defeated`/`item_crafted`/
+>   `ritual_completed`/`area_cleared`.
+> - Blocco B: 5 regioni con layout ASCII disegnati a mano in
+>   `data/world/layouts/`, nemici/boss/oggetti dai dati.
+> - Blocco C: i 307 ingredienti delle formule diventano oggetti veri
+>   (`tools/generate_formula_ingredients.py`, US-808) con almeno una fonte
+>   nel mondo — drop di nemico, listino di venditore, raccolta a terra
+>   (US-809a..c).
+> - Blocco D: Prepara/Bevi nella pagina diagramma del libro, negozio
+>   compra/vendi nella pagina dialogo.
+> - Blocco E: grafica procedurale deterministica (`tools/
+>   generate_sprites.py`) — personaggio/nemico/pet/NPC/oggetti/tileset, 23
+>   fogli totali; `tools/build_tileset.gd` costruisce il `TileSet` a righe-
+>   per-palette (riga neutra + una per ogni Pathway).
+> - Blocco F: verifica giocata end-to-end (`tests/manual/qa_vslice.gd`,
+>   Xvfb) + checkpoint dinamico (`tests/test_slice_fase_8.gd`) + chiusura.
+> - **Verdetto (US-814)**: una partita giocata per davvero — scaffale,
+>   creazione con Pathway scelto da `pathway_ids()`, raccolta a tasto vero,
+>   abilita' a tasto vero, un boss ucciso a colpi di mischia (`morto` +
+>   `enemy_defeated` con payload reale), un acquisto da un NPC, una pozione
+>   preparata e bevuta (Sequenza 9 -> 8), un passaggio fra regioni — con
+>   zero righe di codice che nominino un Pathway/una regione/un NPC/una
+>   formula specifici. La lista vietata del checkpoint e' letta dai dati
+>   (`pathway_ids()`, `regions.json`, `roster.json`, `formulas.json`), non
+>   scritta a mano come nei checkpoint delle fasi precedenti.
 
 ---
 
-## Fase 9 — Opzionale
+## Fase 9 — Pathway Non-Standard — CHIUSA (7 story, 884 test)
 
-Pathway Non-Standard (Eternal Aeon, Chaos Primogenitor, Scrooge, Dreamless e
-gli altri bestowers). Meccanica diversa: avanzamento per **Boon** invece che
-per pozione, quindi non e' solo contenuto ma un secondo sistema di
-progressione. Le fasi 1-7 sono chiuse: sbloccata, ma opzionale — il PRD
-dettagliato si genera con `/prd` solo quando si decide di farla davvero.
+> **PRD**: `006_PRD/prd-fase-9-pathway-non-standard.md` (7 story:
+> US-901..US-907).
+>
+> Le fasi 1-8 avevano costruito un solo sistema di progressione (Sequenza
+> 9→0, Caratteristica + formula + concoct + recitazione + bevi), condiviso
+> da tutti e 10 i Pathway standard attivi senza una riga di codice dedicata.
+> Il materiale di riferimento ha anche Pathway "Non-Standard" (Eternal
+> Aeon, Chaos Primogenitor, Scrooge, Dreamless e altri "bestower") che non
+> salgono di Sequenza bevendo una pozione dopo aver recitato un ruolo:
+> ricevono doni ("Boon") da un'entità superiore. Meccanica diversa,
+> quindi non solo contenuto ma un **secondo sistema di progressione**.
+>
+> **Cosa ha fatto la fase 9**: un motore Boon generico (`BoonSystem`,
+> stesso principio di `PotionSystem`: il codice non sa nulla di
+> "Eternal Aeon", legge solo il campo `boon` della Sequenza corrente) +
+> **un solo Pathway Non-Standard completo, Eternal Aeon** (10/10
+> Sequenze), come prova d'architettura — lo stesso ruolo che il Twilight
+> Giant ha avuto in fase 2. Un Boon è un dono **una tantum** per Sequenza
+> (non a gradini, non ad accumulo continuo — restano spazio per
+> un'eventuale fase futura, non costruiti qui). Save `schema_version`
+> **22 → 23** (un solo bump: la baseline dei requisiti `comportamento` di
+> `BoonSystem`, accanto ad `acting`). Nessuna primitiva nuova, nessun
+> evento tracciato nuovo — coperti tutti dai 28/12 esistenti.
+>
+> **Cosa contiene**:
+> - Blocco 0: `data/schema/boon.schema.json`; campo `categoria`
+>   (`"standard"`/`"non_standard"`) su ogni Pathway esistente (22, edit
+>   meccanico) e su `data/pathways_non_standard/eternal_aeon.json`
+>   (nuova cartella, parallela a `pathways`/`pathways_deferred`);
+>   `BoonSystem` autoload (`requisiti_stato()`/`puo_ricevere()`/
+>   `ricevi_boon()`); guardie esplicite in `PathwayChange`/`FusionEngine`
+>   contro un Pathway `non_standard` (nessun gruppo, nessun vicino,
+>   nessuna fusione).
+> - Blocco A: Eternal Aeon completo — 10 Sequenze con nome proprio
+>   (Vigilant, Witness, Archivist, Cycle Warden, Silent Oracle, Unbound
+>   Scribe, Voice of the Aeon, Herald Eternal, Aeon-Touched, Eternal
+>   Aeon), 10 abilità (`shield`/`heal`/`reveal_info`/`time_rewind`/
+>   `mind_read`/`curse`/`fear`/`teleport`/`soul_detach`/`resurrect`,
+>   nessuna primitiva nuova), un `boon` per Sequenza — la combinatoria
+>   dei tre tipi di requisito (quest/comportamento/sacrificio) è provata
+>   per intero: singoli, doppi, e tutti e tre insieme sulla Sequenza 5.
+> - Blocco B: sezione "Il Dono" nella pagina diagramma del libro al
+>   posto di Prepara/Bevi quando la Sequenza corrente ha `boon` invece
+>   di `potion` — stessa pagina, un ramo sul dato, nessun tipo di pagina
+>   nuovo; bottone "Ricevi il Dono".
+> - Blocco C: checkpoint dinamico (`tests/test_fase_9_checkpoint.gd`,
+>   lista vietata letta da `GameData.get_pathway("eternal_aeon")`) +
+>   verifica giocata (`tests/manual/qa_vslice_eternal_aeon.gd`, Xvfb) +
+>   chiusura.
+> - **Verdetto (US-907)**: un personaggio Eternal Aeon creato dal
+>   selettore VERO di `page_creazione_personaggio.gd` (esteso a
+>   concatenare anche i Pathway `non_standard` — decisione presa con
+>   l'utente: si sceglie come un Pathway standard, stesso ciclo di
+>   creazione, nessun gating narrativo in questa fase), un Boon con
+>   tutte e tre le fonti insieme soddisfatto e ricevuto dalla pagina
+>   diagramma vera, `Progression.sequence()` sceso da 5 a 4 — con zero
+>   righe di codice che nominino "eternal_aeon" o una sua Sequenza/
+>   abilità specifica.
+>
+> `GameData.pathway_ids()` resta scoped ai soli Pathway standard (ogni
+> sistema che itera "ogni Pathway attivo" — VFX, diagramma, siti
+> rituali, i18n, gli slice — lo assume): i non_standard vivono in un
+> registro `GameData` separato (`pathway_ids_non_standard()`), usato
+> solo dove serve davvero (il selettore di creazione).
+
+---
+
+## Fase 10 — Mondo Continuo — CHIUSA (16 story, 925 test)
+
+> **PRD**: `006_PRD/prd-fase-10-mondo-continuo.md` (generato il
+> 2026-09-10, 14 story `US-1001..US-1014`; spezzate in corsa in
+> `US-1002B` — collegare il motore a `main.tscn` e ritirare
+> `region_scene.gd` — e `US-1005B` — i 3 edifici visitabili di Mirwada
+> promessi dall'AC originale di US-1005 — segnalato invece di tirare
+> dritto, come richiede CLAUDE.md sulle story troppo grandi).
+>
+> Prima di questa fase il mondo erano 5 scene separate
+> (`region_scene.gd`), collegate da `passaggi` che ricaricavano l'intera
+> scena: un salto, non un cammino. Ogni regione era inoltre un rettangolo
+> quasi vuoto senza edifici né villaggi.
+>
+> **Cosa ha fatto la fase 10**: le 5 regioni sono diventate zone di
+> un'unica griglia condivisa dipinta in una sola TileMapLayer persistente
+> (`world_scene.gd`, nuovo, sostituisce `region_scene.gd` — ritirato
+> insieme alle 5 `scenes/regioni/*.tscn`, US-1002B) — zero caricamenti di
+> scena tra regioni, il gating diventa una barriera fisica sul confine
+> invece che un rifiuto di caricamento (provato per la prima volta in
+> US-1009, il meccanismo generico esisteva già). Più contenuto vero: le 5
+> regioni sono cresciute con location_tags fisicamente distinti (non più
+> rettangoli a griglia automatica), un motore data-driven per gli edifici
+> visitabili (`edifici: [{x,y,interno_id}]` su un layout, un interno è un
+> layout come un altro, US-1010) ha dato vita ai primi 3 edifici di
+> Mirwada (US-1005B), al primo villaggio vero (US-1011: l'avamposto della
+> sorgente in Valle della Madre, 4 capanne) e alla prima struttura grande
+> (US-1012: la torre d'osservazione dell'Archivio Sepolto, un interno a 3
+> stanze collegate nella stessa mappa, nessuna catena di caricamenti).
+> Nessuna primitiva/evento nuovo. Save `schema_version` **invariato, 23**
+> (US-1004: la posizione nel mondo continuo era già assoluta, nessun
+> campo nuovo serviva).
+>
+> **Cosa contiene**:
+> - Blocco 0 (fondamenta): `world_offset` per regione (US-1001, Mirwada
+>   al centro di un anello con le 4 regioni esterne ai quattro angoli) +
+>   il motore del mondo continuo provato in isolamento (US-1002) prima di
+>   collegarlo davvero a `main.tscn` (US-1002B).
+> - Blocco A (prestazioni + save): nemici/NPC fuori da un raggio dal
+>   giocatore si disattivano (`process_mode`, US-1003); il save resta
+>   invariato (US-1004).
+> - Blocco B (contenuto): le 5 regioni crescono una a una con location_tags
+>   fisicamente distinti e i corridoi che le collegano (US-1005..1009,
+>   Mirwada → Marche → Valle → Archivio → Frontiera, un anello di 8
+>   corridoi in tutto); il vocabolario di un insediamento (US-1010) + i 3
+>   edifici di Mirwada (US-1005B) + il primo villaggio (US-1011) + la
+>   prima struttura grande (US-1012).
+> - Blocco C: checkpoint dinamico (`tests/test_fase_10_checkpoint.gd`,
+>   lista vietata scoperta dai dati: le 4 regioni oltre a "mirwada" +
+>   i 9 interni esistenti) + verifica giocata
+>   (`tests/manual/qa_mondo_continuo.gd`, Xvfb) + chiusura.
+> - **Verdetto (US-1013)**: una partita vera attraversa il confine di una
+>   regione con Input reale senza alcuna `change_scene_to_*` (solo
+>   all'avvio, per `main.tscn`) — lo stesso nodo `world_scene`, mai
+>   liberato/ricaricato — entra ed esce da una capanna del villaggio e
+>   dalla torre d'osservazione, con zero righe di codice che nominino una
+>   regione o un interno specifico.
+
+---
+
+## Fase 11 — Villaggi ed Economia — CHIUSA (15 story, 942 test)
+
+> **PRD**: `006_PRD/prd-fase-11-villaggi-ed-economia.md` (generato il
+> 2026-09-12, 15 story `US-1101..US-1114` con lo split US-1108/US-1108B).
+
+Aggiunta a metà fase 10, su richiesta esplicita dell'utente ("villaggi,
+fabbri creatori di pozioni, oggetti rari, un mondo grande da esplorare
+come un Pokémon 2D"): il "mondo continuo" aveva 5 regioni ma nessuna
+economia viva, nessun oggetto raro, e gli NPC di una zona affollata si
+accalcavano su una riga. 5 blocchi: A rarità (`data/schema/
+item_rarity.json`, 4 livelli, retrofit su tutti i 351 oggetti esistenti,
+scala prezzo di vendita e peso del drop), B crafting NPC (7° effetto di
+dialogo `crea_su_richiesta` + segnale `apri_creazione` in
+`dialogue_engine.gd`/`page_dialogo.gd`, `Forge.forgia`/`PotionSystem.
+prepara` con bypass `ignora_scoperta` — un NPC "conosce il suo mestiere"
+a prescindere da cosa ha scoperto il giocatore — Rosalba ed Bram i primi
+due crafter reali, 6 oggetti/3 blueprint/3 ricette nuovi), C due villaggi
+nella campagna (nuovo campo `campagna.json.edifici[]` + `world_scene.gd::
+_disegna_capanne_campagna`, un template fisso 5x4 che dipinge pareti
+vere dove prima c'era solo terreno procedurale: Marche del Crepuscolo con
+Fenwick/Greta, Archivio Sepolto con Orsolya/Dario e un oggetto
+leggendario — Ambrosia — venduto a un prezzo visibilmente più alto), D
+piazzamento NPC a griglia (`_crea_npc_regione` riscritta: una griglia che
+usa il 70% dell'area reale della zona invece di un'unica riga a distanza
+fissa), E chiusura. Nessuna primitiva/evento/tag nuovo: solo un campo
+`rarita` sugli oggetti, un effetto di dialogo, un campo `crafter` sugli
+NPC e un campo `edifici` su campagna.json.
+
+**Verdetto (US-1114)**: `tests/test_fase_11_checkpoint.gd` prova che zero
+righe di codice del motore nominano un NPC, un villaggio, un blueprint o
+una ricetta specifici — lista vietata scoperta da `GameData.get_npcs()` +
+`GameData.get_campagna().edifici` + `GameData.blueprint_ids()`/
+`recipe_ids()`, non scritta a mano.
+
+---
+
+## Fase 12 — Atto II e Atto III
+
+> **PRD**: `006_PRD/prd-fase-12-atto-2-3.md` (generato il 2026-09-10, 13
+> story `US-1201..US-1213` — rinumerate da `US-1101..US-1113` quando la
+> fase 11 vera è diventata "Villaggi ed Economia", vedi sopra).
+> **PIANIFICATA**, eseguita dopo la fase 11.
+
+I motori di Atto II (Seq 6-4) e Atto III (Seq 3-1) esistono già dalla fase
+7: `TribulationSystem` (le 4 prove ai salti di fascia), il rituale di
+Sequenza 1 che chiede un'Ancora (`sacrifices: ["ancora_del_giocatore"]`,
+già nei dati del Twilight Giant), il duello di Aldo ai salti di tier
+(`npc_system.gd`, già cablato per ogni NPC `sfida_ai_tier`). Quello che
+manca è il contenuto narrativo intorno: solo 4 quest esistono in tutto il
+gioco (tutte di Atto I), 3 delle 4 tribolazioni hanno solo un contatore
+anonimo o un'unica riga di dialogo, e la prova finale (`trib_1_0`) non ha
+nessuna fonte che scriva il suo flag di superamento — verificato leggendo
+i dati prima di scrivere il PRD, non presunto. La fase 12 scrive quel
+contenuto riusando solo motori esistenti (`QuestSystem`, `DialogueEngine`,
+`FactionSystem`): nessun verbo/evento/condizione/effetto nuovo. Gli
+epiloghi di finale (fase 7) sono già scritti e buoni, fuori scope.
+
+---
+
+## Fase 13 — Opzionale
+
+Altri Pathway Non-Standard (Chaos Primogenitor, Scrooge, Dreamless e gli
+altri bestowers), stesso schema di Eternal Aeon (fase 9: motore Boon già
+scritto, si tratta solo di contenuto). Le fasi 1-9 sono chiuse: sbloccata,
+ma opzionale — il PRD dettagliato si genera con `/prd` solo quando si
+decide di farla davvero.

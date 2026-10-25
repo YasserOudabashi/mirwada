@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "_comment": "Documentazione formale di data/world/corridoi.json (US-1002, fase 10). Un corridoio collega due regioni distanti nella griglia di mondo condivisa (world_offset, US-1001) con una striscia di terreno calpestabile - world_scene.gd la disegna come un percorso a L fra i due punti di aggancio. Controlli veri in tools/validate_data.py.",
+  "corridoio": {
+    "a": "string: id di una regione esistente in data/world/regions.json",
+    "b": "string: id di un'altra regione esistente, diversa da 'a'",
+    "aggancio_a": "[x, y] interi >= 0: cella LOCALE (dentro la griglia propria della regione 'a', non nella griglia di mondo) dove il corridoio si aggancia - world_scene.gd ci somma world_offset",
+    "aggancio_b": "[x, y] interi >= 0: stesso significato per la regione 'b'",
+    "larghezza": "intero >= 1: quante celle e' largo il corridoio"
+  },
+  "regole_validator": [
+    "a e b esistono in data/world/regions.json ed sono diversi tra loro",
+    "aggancio_a/aggancio_b: [x, y] di interi >= 0",
+    "larghezza: intero >= 1",
+    "nessuna coppia (a, b) duplicata (in un verso o nell'altro)"
+  ]
+}

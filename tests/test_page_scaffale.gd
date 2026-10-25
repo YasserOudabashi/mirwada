@@ -14,6 +14,11 @@ func prepara() -> void:
 	if b != null:
 		b.call("azzera")
 	Engine.get_main_loop().root.get_tree().paused = false
+	# nessuna partita in corso: test_tomo_valido_mostra_il_nome_e_carica ne carica una,
+	# e il frontespizio mostrerebbe "chi sei" invece del campo nome
+	var gs: Node = _n("/root/GameState")
+	if gs != null:
+		gs.set("_partita_attiva", false)
 	# slot puliti: lo scaffale legge 0..3 (book.json libro.slot = 4)
 	var ss: Node = _n("/root/SaveSystem")
 	if ss != null:
@@ -27,9 +32,15 @@ func _monta() -> CanvasLayer:
 	return ov
 
 
+## La pagina mostrata: l'ultima figlia non in uscita. Senza far girare frame,
+## la pagina precedente (queue_free) e' ancora figlia: get_child(0) prendeva
+## quella e il test del frontespizio si interrompeva cercando il campo nome.
 func _pagina_corrente_node(ov: CanvasLayer) -> Node:
 	var cont: Node = ov.get_node("Pagina/Contenuto")
-	return cont.get_child(0) if cont.get_child_count() > 0 else null
+	for i in range(cont.get_child_count() - 1, -1, -1):
+		if not cont.get_child(i).is_queued_for_deletion():
+			return cont.get_child(i)
+	return null
 
 
 func test_scaffale_slot_vuoti_offrono_nuova_partita() -> void:
@@ -85,7 +96,7 @@ func test_frontespizio_nome_default_e_conferma() -> void:
 	for i in 4:
 		ov.call("_process", 0.2)
 	var pag: Node = _pagina_corrente_node(ov)
-	var campo: LineEdit = pag.get_children().filter(func(c: Node) -> bool: return c is LineEdit)[0]
+	var campo: LineEdit = pag.find_children("*", "LineEdit", true, false)[0]
 	assert_eq(campo.text, gs.call("nome_default"), "il campo nome parte da 'Enel'")
 	campo.text = "Mirco"
 	pag.call("conferma")
@@ -105,7 +116,7 @@ func test_frontespizio_a_partita_in_corso_mostra_chi_sei() -> void:
 	for i in 4:
 		ov.call("_process", 0.2)
 	var pag: Node = _pagina_corrente_node(ov)
-	var campi: Array = pag.get_children().filter(func(c: Node) -> bool: return c is LineEdit)
+	var campi: Array = pag.find_children("*", "LineEdit", true, false)
 	assert_eq(campi.size(), 0, "a partita in corso non c'e' piu' il campo nome")
 	assert_true(pag.call("testo_visibile").contains("Enel"), "mostra il nome del personaggio")
 	ov.free()

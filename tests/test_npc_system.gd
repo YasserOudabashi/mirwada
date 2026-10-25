@@ -21,7 +21,11 @@ func prepara() -> void:
 
 func test_roster_caricato_da_gamedata() -> void:
 	var npcs: Array = _gd().call("get_npcs")
-	assert_eq(npcs.size(), 19, "8 del roster + 10 npc_generic_* + npc_antagonista (US-712)")
+	# 8 del roster originale + 10 npc_generic_* + npc_antagonista (US-712) +
+	# npc_rosalba (US-1108B) + npc_bram (US-1109) - gli NPC crafter di fase 11 +
+	# npc_fenwick + npc_greta (US-1111) + npc_orsolya + npc_dario (US-1112) -
+	# il primo e il secondo villaggio in campagna.
+	assert_eq(npcs.size(), 25, "10 nominali + 10 npc_generic_* + npc_antagonista")
 	var bruno: Dictionary = _gd().call("get_npc", "npc_bruno")
 	assert_eq(str(bruno.get("faction_id")), "porto", "Bruno e' del porto")
 	assert_true(_gd().call("get_npc", "non_esiste").is_empty(), "id ignoto -> {}")

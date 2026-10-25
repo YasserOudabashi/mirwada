@@ -7,60 +7,167 @@
       "categoria": "consumabile",
       "name_i18n": "item.pozione_cura_minore",
       "descrizione_i18n": "item.pozione_cura_minore.desc",
-      "tag": ["pozione", "guarigione"],
+      "tag": [
+        "pozione",
+        "guarigione"
+      ],
       "impilabile": true,
       "valore": 12,
-      "effetto": { "tipo": "heal", "quantita": 25.0, "istantaneo": true }
+      "effetto": {
+        "tipo": "heal",
+        "quantita": 25.0,
+        "istantaneo": true
+      },
+      "rarita": "comune"
     },
     {
       "id": "elisir_del_vigore",
       "categoria": "consumabile",
       "name_i18n": "item.elisir_del_vigore",
       "descrizione_i18n": "item.elisir_del_vigore.desc",
-      "tag": ["pozione", "forza"],
+      "tag": [
+        "pozione",
+        "forza"
+      ],
       "impilabile": true,
       "valore": 18,
-      "effetto": { "tipo": "buff_stat", "stat": "forza", "valore": 0.15, "durata": 20.0, "moltiplicativo": false }
+      "effetto": {
+        "tipo": "buff_stat",
+        "stat": "forza",
+        "valore": 0.15,
+        "durata": 20.0,
+        "moltiplicativo": false
+      },
+      "rarita": "non_comune"
     },
     {
       "id": "pastura_spirituale",
       "categoria": "consumabile",
       "name_i18n": "item.pastura_spirituale",
       "descrizione_i18n": "item.pastura_spirituale.desc",
-      "tag": ["spirito", "bestia"],
+      "tag": [
+        "spirito",
+        "bestia"
+      ],
       "impilabile": true,
       "valore": 22,
-      "nutre_pet": true
+      "nutre_pet": true,
+      "rarita": "comune"
     },
     {
       "id": "pozione_cura_maggiore",
       "categoria": "consumabile",
       "name_i18n": "item.pozione_cura_maggiore",
       "descrizione_i18n": "item.pozione_cura_maggiore.desc",
-      "tag": ["pozione", "guarigione", "luce"],
+      "tag": [
+        "pozione",
+        "guarigione",
+        "luce"
+      ],
       "impilabile": true,
       "valore": 40,
-      "effetto": { "tipo": "heal", "quantita": 70.0, "istantaneo": true }
+      "effetto": {
+        "tipo": "heal",
+        "quantita": 70.0,
+        "istantaneo": true
+      },
+      "rarita": "non_comune"
     },
     {
       "id": "elisir_ombra",
       "categoria": "consumabile",
       "name_i18n": "item.elisir_ombra",
       "descrizione_i18n": "item.elisir_ombra.desc",
-      "tag": ["pozione", "ombra", "agilita'"],
+      "tag": [
+        "pozione",
+        "ombra",
+        "agilita'"
+      ],
       "impilabile": true,
       "valore": 45,
-      "effetto": { "tipo": "buff_stat", "stat": "evasione", "valore": 0.2, "durata": 15.0, "moltiplicativo": false }
+      "effetto": {
+        "tipo": "buff_stat",
+        "stat": "evasione",
+        "valore": 0.2,
+        "durata": 15.0,
+        "moltiplicativo": false
+      },
+      "rarita": "non_comune"
     },
     {
       "id": "ambrosia",
       "categoria": "consumabile",
       "name_i18n": "item.ambrosia",
       "descrizione_i18n": "item.ambrosia.desc",
-      "tag": ["pozione", "luna", "anima", "guarigione"],
+      "tag": [
+        "pozione",
+        "luna",
+        "anima",
+        "guarigione"
+      ],
       "impilabile": true,
       "valore": 200,
-      "effetto": { "tipo": "heal", "quantita": 200.0, "istantaneo": true }
+      "effetto": {
+        "tipo": "heal",
+        "quantita": 200.0,
+        "istantaneo": true
+      },
+      "rarita": "leggendario"
+    },
+    {
+      "id": "tonico_di_forza",
+      "categoria": "consumabile",
+      "name_i18n": "item.tonico_di_forza",
+      "descrizione_i18n": "item.tonico_di_forza.desc",
+      "tag": [
+        "forza"
+      ],
+      "impilabile": true,
+      "valore": 20,
+      "rarita": "non_comune",
+      "effetto": {
+        "tipo": "buff_stat",
+        "stat": "forza",
+        "valore": 0.2,
+        "durata": 25.0,
+        "moltiplicativo": false
+      }
+    },
+    {
+      "id": "filtro_di_chiarezza",
+      "categoria": "consumabile",
+      "name_i18n": "item.filtro_di_chiarezza",
+      "descrizione_i18n": "item.filtro_di_chiarezza.desc",
+      "tag": [
+        "mente"
+      ],
+      "impilabile": true,
+      "valore": 15,
+      "rarita": "comune",
+      "effetto": {
+        "tipo": "buff_stat",
+        "stat": "precisione",
+        "valore": 0.15,
+        "durata": 20.0,
+        "moltiplicativo": false
+      }
+    },
+    {
+      "id": "essenza_rara_di_guarigione",
+      "categoria": "consumabile",
+      "name_i18n": "item.essenza_rara_di_guarigione",
+      "descrizione_i18n": "item.essenza_rara_di_guarigione.desc",
+      "tag": [
+        "guarigione"
+      ],
+      "impilabile": true,
+      "valore": 45,
+      "rarita": "raro",
+      "effetto": {
+        "tipo": "heal",
+        "quantita": 120,
+        "istantaneo": true
+      }
     }
   ]
 }

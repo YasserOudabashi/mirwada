@@ -263,25 +263,28 @@ progress.txt      memoria tra le iterazioni
 
 ## Fasi
 
-Fasi 1–7 e 5b: **CHIUSE** (776 test). Sistemi, Pathway, sinergie, mondo, endgame completi con
-zero righe di codice dedicate a un contenuto specifico. Dettagli in `progress.txt` e in
-`006_PRD/prd-fase-*.md`.
+Le fasi 1-12 si sono sviluppate su due rami paralleli, uniti il 2026-10-25 (merge della PR #4 nella
+PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
 
-Fase corrente: **8 — Vertical slice giocabile** (IN CORSO). Collega i sistemi già scritti,
-riempie i dati mancanti, e ora usa **grafica generata da sprite-forge** al posto dei
-quadrati placeholder.
+- Fasi 1-7 e 5b: **CHIUSE**. Sistemi, Pathway, sinergie, mondo, endgame.
+- Fase 8 — Vertical slice giocabile: **CHIUSA** (19 story). Avvio di partita con scelta del Pathway,
+  abilita' a tastiera + hotbar, proiettili, recitazione con payload veri, 307 ingredienti come oggetti,
+  fonti nel mondo, Prepara/Bevi, negozio. PRD `prd-fase-8-vertical-slice.md`.
+- Fase 9 — Pathway Non-Standard (Boon): **CHIUSA** (7 story). PRD `prd-fase-9-pathway-non-standard.md`.
+- Fase 10 — Mondo continuo a layout ASCII (`world_scene.gd`, `data/world/layouts/`, edifici e
+  interni): **CHIUSA** sul suo ramo. Dal merge la scena di gioco e' il **mondo generato** (sotto): i
+  layout restano come dati e come fonte del contenuto da portare sul mondo generato.
+- Fase 11 — Villaggi ed economia (rarita', fabbri, interni, villaggi in campagna): **CHIUSA** sul suo
+  ramo; i villaggi e gli edifici vanno portati sul mondo generato come per la fase 10.
+- Fase 8b — Arte con sprite-forge: **IN CORSO**. Fatti: personaggi a 64 px, aspetti degli NPC, terreni,
+  pareti, mondo generato (seed 6) con modalita' luminosa/cupa, mondo unico nel gioco (US-8B12..d).
+  PRD `prd-fase-8b-arte.md`.
+- Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
+  `prd-fase-12-mondo-vivo.md`.
 
-- PRD: `006_PRD/prd-fase-8-vertical-slice.md` (14 story, US-801..US-814).
-- Come eseguirlo: `006_PRD/prossimi-passi.md`. Leggilo prima di toccare qualunque file.
-
-**Proposta di fase 8b — Arte (da approvare):**
-1. Personaggio, nemico base e pet a 32 px con tutte le animazioni di `animations.json`.
-2. Tileset della prima regione e mappa di prova dal generatore.
-3. 2 VFX d'attacco e 1 d'abilità, con palette da `data/vfx.json`.
-4. Decisione 32 o 64 px, poi rigenerazione.
-5. Panorama della schermata iniziale e del libro.
-
-Fase 9 (opzionale): Pathway Non-Standard, avanzamento per Boon.
+**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md`): portare sul mondo generato il contenuto dei
+layout (nemici, oggetti, edifici con porte e interni, villaggi, gate delle sotto-aree), l'accesso alle
+Marche (solo volando o dal sottosuolo, decisione dell'utente del 2026-10-25) e il sottosuolo.
 
 ## Decisioni prese
 

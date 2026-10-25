@@ -83,6 +83,24 @@ func test_goto_verso_nodo_assente_termina_senza_crash() -> void:
 		"l'interlocutore giusto e' stato influenzato")
 
 
+## US-1106 (fase 11): il 7o effetto - crea_su_richiesta emette apri_creazione
+## con l'npc_id esplicito, o l'interlocutore corrente se assente (stesso
+## principio di apri_vendita). Chiamato direttamente (nessun dialogo del
+## roster lo usa ancora - il primo arriva in US-1108).
+func test_effetto_crea_su_richiesta_emette_apri_creazione() -> void:
+	var de: Node = _de()
+	de.call("avvia", "dlg_mirco", "npc_mirco")
+	# un Array (riferimento) invece di una String locale: una lambda in
+	## GDScript cattura le variabili locali per VALORE, riassegnarle dentro
+	# non si vedrebbe fuori - mutare il contenuto di un riferimento si'.
+	var ricevuto := [""]
+	de.apri_creazione.connect(func(npc_id: String): ricevuto[0] = npc_id)
+	de.call("_applica_effetto", {"tipo": "crea_su_richiesta"})
+	assert_eq(ricevuto[0], "npc_mirco", "senza npc_id esplicito usa l'interlocutore corrente")
+	de.call("_applica_effetto", {"tipo": "crea_su_richiesta", "npc_id": "npc_altro"})
+	assert_eq(ricevuto[0], "npc_altro", "un npc_id esplicito ha la precedenza")
+
+
 func test_tutti_i_dialoghi_del_roster_esistono() -> void:
 	var gd: Node = _root().get_node("GameData")
 	for short in ["mirco", "sidon", "vesna", "aldo", "ottavia", "bruno", "lena", "doran", "generic"]:

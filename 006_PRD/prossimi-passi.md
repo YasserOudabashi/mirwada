@@ -3,7 +3,10 @@
 > Scritto il 2026-09-09. Leggilo **dopo** `CLAUDE.md` e **prima** di toccare
 > qualunque file. Dice cosa fare, in che ordine, con quali strumenti, e le
 > trappole già scoperte. Il "cosa" dettagliato è in
-> `006_PRD/prd-fase-8-vertical-slice.md` (14 story, US-801..US-814).
+> `006_PRD/prd-fase-8-vertical-slice.md` (19 story: US-801..US-806,
+> US-807a..d, US-808, US-809a..c, US-810..US-814 — US-807 e US-809
+> originali spezzate rispettivamente in 4 per regione e 3 per meccanica,
+> sempre prima di iniziarle, su richiesta esplicita dell'utente).
 
 ---
 
@@ -156,9 +159,10 @@ definizione).
    sessione), push con `git push -u origin <branch>`.
 9. Se la story supera ~4 file o ~200 righe di diff **dopo** averla letta
    bene: fermati, dillo, proponi lo split (regola 3). Le story del PRD sono
-   già state dimensionate per evitarlo, ma US-807 (4 mappe) e US-812
-   (19 fogli) sono le più grosse: se una non chiude, spezzala per regione
-   / per foglio, aggiornando `prd.json`.
+   già state dimensionate per evitarlo; US-807 (4 mappe) era la più grossa
+   ed è già stata spezzata in US-807a..d (una regione ciascuna) prima di
+   iniziarla. US-812 (19 fogli) resta la candidata più probabile a uno
+   split ulteriore (per foglio) se non dovesse chiudere in un colpo solo.
 
 ---
 
@@ -274,6 +278,38 @@ che gli overlay ricevessero il segnale: sposta `add_child` prima.
 10. **`EventTracker._corrisponde`**: un filtro booleano `true` pretende
     `dati[k] == true`; un payload `{}` non matcha mai. I nuovi payload
     emettono i booleani espliciti (`false` compreso).
+11. **`Input.action_press("azione")` + una sola `await physics_frame` è
+    sufficiente per far scattare `Input.is_action_just_pressed` dentro il
+    normale `_physics_process` di un nodo (verificato: US-802). Nella
+    suite sincrona dei test (`tests/test_case.gd`, nessun frame reale tra
+    una chiamata e l'altra) funziona anche `action_press` seguito
+    dalla chiamata diretta al metodo, senza nessun `await`.
+12. **Un `Area2D` a vita breve creato a runtime che misura la propria
+    durata in `_process(delta)` (idle, non `_physics_process`) può
+    autodistruggersi prima che la fisica registri un overlap, sotto
+    rendering software lento (Xvfb + llvmpipe, headless): un solo frame
+    idle può durare più della vita dichiarata. Successo in `scripts/
+    melee_arc.gd` (vita 0.25s, US-803): il cast funziona (tracciato,
+    costo scalato, cooldown avviato — verificabile a schermo), ma un
+    colpo dal vivo in uno script di QA può non registrarsi per questo
+    motivo, non per un bug. La logica di collisione va provata con un
+    test automatico che chiama `_su_area_entrata`/equivalenti
+    DIRETTAMENTE (pattern già in `tests/test_ability_engine.gd` per
+    `dentro_arco`/`colpi_residui`), non affidandosi a un tick di fisica
+    reale in un ambiente headless lento.
+13. **La `Camera2D` del player (`scripts/game_camera.gd`) ha smoothing
+    attivo** (`position_smoothing_speed = 5.0`): in uno script di QA che
+    teletrasporta il player per fare più screenshot, 2-3 `await
+    process_frame` non bastano a farla arrivare a destinazione (converge
+    esponenzialmente, resta quasi ferma su un salto grande) — gli
+    screenshot vengono tutti uguali, non per un bug del gioco ma dello
+    script di QA. Fix: dopo ogni teletrasporto chiamare
+    `player.get_node("Camera2D").reset_smoothing()` (metodo nativo di
+    `Camera2D`) prima di catturare lo screenshot, invece di aspettare
+    molti frame. Scoperto in US-807b. Nota collaterale: uno script di QA
+    deve istanziare il vero `scenes/player.tscn` (che porta la
+    `Camera2D`), non un `Node2D` nudo come player finto — altrimenti non
+    c'è nessuna telecamera che segua i teletrasporti (US-806/US-807a).
 
 ---
 

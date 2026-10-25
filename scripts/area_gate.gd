@@ -44,6 +44,23 @@ func _ready() -> void:
 	corpo.add_child(_barriera)
 	add_child(corpo)
 
+	# US-813: la barriera fisica in gate.png (32x32), piastrellata a coprire
+	# LARGHxALT — sotto il _marker, che resta l'indicatore FUNZIONALE
+	# aperto/chiuso (verde/rosso) e non cambia.
+	const TILE := 32
+	var tex: Texture2D = load("res://assets/placeholder/gate.png")
+	if tex != null:
+		var cols: int = int(LARGH / TILE)
+		var righe: int = int(ALT / TILE)
+		for cy in righe:
+			for cx in cols:
+				var s := Sprite2D.new()
+				s.texture = tex
+				s.position = Vector2(
+					-0.5 * LARGH + TILE * (cx + 0.5),
+					-0.5 * ALT + TILE * (cy + 0.5))
+				add_child(s)
+
 	_marker = ColorRect.new()
 	_marker.size = Vector2(LARGH, ALT)
 	_marker.position = -0.5 * Vector2(LARGH, ALT)

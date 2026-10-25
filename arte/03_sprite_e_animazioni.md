@@ -30,6 +30,11 @@ lettura comoda del giorno in cui e' stata scritta.
 - `left` ottenuto specchiando `right` specchia anche la luce: decidilo.
 - In idle/walk i piedi non si muovono: si sposta il busto di 1px.
 
+> Il generatore provvisorio `tools/generate_sprites.py` (US-812, fase 8) e' **superato** per
+> personaggio, nemico_base e pet: quei fogli li fa `tools/art/build_personaggi.py` (sprite-forge,
+> 64 px). Lo script resta per i fogli che il gioco usa ancora da li' (tileset degli interni, gate,
+> passaggi, oggetti) e non riscrive piu' i fogli dei personaggi.
+
 ## 2. Cosa disegnare, animazione per animazione
 
 ### Personaggio (protagonista) — 156 frame totali col budget a 4 direzioni

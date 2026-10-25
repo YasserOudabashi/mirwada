@@ -2,7 +2,7 @@
 """
 Aspetti degli NPC a 64 px (US-8B12d): stesso motore, stessa luce e stessi tempi del personaggio
 (data/animations.json "personaggio"), un disegno per aspetto. L'aspetto di un NPC e' un dato:
-data/npc/roster.json "aspetto" (id neutro, mai il nome dell'NPC).
+data/npc/roster.json "aspetto.sprite" (id neutro, mai il nome dell'NPC).
 
     python tools/art/build_npc.py        # arte/sprite/ e assets/placeholder/personaggio_<aspetto>_{idle,walk}.png
 
@@ -58,6 +58,15 @@ ASPETTI = {
                        top="cloth_red", bottom="cloth_cream"),
     "popolano_c": _npc("popolano_c", skin="skin_light", hair="hair_white", hair_style="bald", outfit="tunic",
                        top="cloth_blue", bottom="cloth_cream", build=1.1),
+    # fase 11: gli NPC degli interni e dei villaggi
+    "fabbro": _npc("fabbro", skin="skin_tan", hair="hair_black", hair_style="short", outfit="leather",
+                   top="leather", bottom="cloth_black", boots="leather_dark", build=1.2),
+    "erborista": _npc("erborista", skin="skin_light", hair="hair_brown", hair_style="long", outfit="robe",
+                      top="cloth_green", bottom="cloth_cream", belt="leather"),
+    "alchimista": _npc("alchimista", skin="skin_dark", hair="hair_white", hair_style="bun", outfit="robe",
+                       top="cloth_teal", bottom="cloth_teal", belt="cloth_yellow"),
+    "mercante_b": _npc("mercante_b", skin="skin_light", hair="hair_blond", hair_style="ponytail", outfit="tunic",
+                       top="cloth_yellow", bottom="cloth_grey", scarf="cloth_orange"),
     "soglia": _npc("soglia", skin="skin_grey", hair="hair_white", hair_style="long", outfit="robe",
                    top="cloth_black", bottom="cloth_black", cape="cloth_purple", belt="cloth_purple", eyes="eye_red"),
 }

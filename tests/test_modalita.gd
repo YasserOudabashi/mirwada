@@ -29,7 +29,7 @@ func test_i_dati_hanno_le_due_modalita() -> void:
 
 func test_la_modalita_scelta_resta_e_dice_i_numeri() -> void:
 	var gs: Node = _n("/root/GameState")
-	gs.call("nuova_partita", "Enel", SLOT, [], "difficile")
+	gs.call("nuova_partita", "Enel", SLOT, [], "", "difficile")
 	assert_eq(str(gs.get("modalita")), "difficile", "modalita' scelta")
 	assert_eq(str(gs.call("tema_arte")), "cupo", "tema dell'arte dai dati")
 	var atteso: float = float(((_n("/root/GameData").call("get_modalita", "difficile") as Dictionary)
@@ -41,7 +41,7 @@ func test_la_modalita_scelta_resta_e_dice_i_numeri() -> void:
 
 func test_facile_non_cambia_niente() -> void:
 	var gs: Node = _n("/root/GameState")
-	gs.call("nuova_partita", "Enel", SLOT, [], "facile")
+	gs.call("nuova_partita", "Enel", SLOT, [], "", "facile")
 	for nome in ["danno_al_giocatore", "danno_ai_nemici", "cure"]:
 		assert_almost_eq(float(gs.call("moltiplicatore", nome)), 1.0, "facile: %s = 1" % nome)
 	assert_eq(str(gs.call("tema_arte")), "luminoso", "facile = arte luminosa")
@@ -51,7 +51,7 @@ func test_facile_non_cambia_niente() -> void:
 func test_la_modalita_si_salva_e_si_ricarica() -> void:
 	var gs: Node = _n("/root/GameState")
 	var s: Node = _n("/root/SaveSystem")
-	gs.call("nuova_partita", "Enel", SLOT, [], "difficile")
+	gs.call("nuova_partita", "Enel", SLOT, [], "", "difficile")
 	gs.set("modalita", "facile")
 	var r: Dictionary = s.call("carica", SLOT)
 	gs.call("applica", r["dati"])

@@ -79,6 +79,9 @@ Aggiornato il 2026-10-14: niente piu' tileset a 4 tile disegnati a mano.
   fanno nei dati o nel generatore, mai sul PNG.
 - `assets/placeholder/tileset.png` resta solo per la stanza di prova: lo sostituisce il mondo
   vero (US-8B12).
+- Il tileset a 8 colonne di `tools/generate_sprites.py` (US-813) resta solo per gli interni degli
+  edifici (`interior_scene.gd`) e per la vecchia mappa a layout (`world_scene.gd`, fase 10), che
+  dal merge con l'arte non e' piu' la scena di gioco.
 
 ## 6. Prima di considerarlo fatto
 

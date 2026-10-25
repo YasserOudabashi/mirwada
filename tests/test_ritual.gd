@@ -35,7 +35,10 @@ func _recita_seq9() -> void:
 	for i in 3:
 		_et().call("emit_event", "enemy_defeated", {"senza_abilita": true})
 	_et().call("emit_event", "damage_dealt", {"tag_danno": "fisico", "quantita": 2000})
-	_et().call("emit_event", "damage_absorbed_for_ally", {"quantita": 300})
+	# tg_9_protettore (US-804): riscritta da damage_absorbed_for_ally a
+	# perfect_parry x12 (nessun alleato in scena in questa fase).
+	for i in 12:
+		_et().call("emit_event", "perfect_parry", {})
 
 
 func test_prerequisiti_dal_rituale_dei_dati() -> void:
