@@ -9,6 +9,9 @@ extends Node2D
 ##     l'ordinamento per profondita' (y_sort): il giocatore va messo qui dentro.
 ## La modalita' (luminoso | cupo) viene da GameState.tema_arte(): stessi dati,
 ## altri fogli e altri sprite.
+## Due livelli sulla stessa griglia: la superficie e il sottosuolo (fogne,
+## catacombe, grotte, miniere, citta' sotterranea). Un ingresso ha le stesse
+## coordinate sopra e sotto: "interagisci" sull'ingresso cambia livello.
 ##
 ## NIENTE class_name: coerente col progetto.
 
@@ -52,6 +55,13 @@ var _cella_regione := Vector2i(-9999, -9999)
 var _ultima_ammessa := Vector2.INF
 ## L'NPC nel cui raggio si trova il giocatore ("" = nessuno), come region_scene.
 var _npc_vicino: String = ""
+## Livello mostrato: "superficie" o "sottosuolo" (2026-10-25: alle Marche si arriva
+## anche dal sottosuolo, uscendo dalle catacombe).
+var livello: String = "superficie"
+var _livelli: Dictionary = {}       # nome -> {indici, blocchi, tileset, oggetti}
+var _ingresso_vicino: String = ""
+
+signal livello_cambiato(nuovo: String)
 
 
 func _ready() -> void:
@@ -66,6 +76,7 @@ func _ready() -> void:
 				cam.call("apply_zone_limits", Rect2(Vector2.ZERO, Vector2(larghezza, altezza) * tile))
 	segui(partenza())
 	crea_npc()
+	crea_ingressi()
 	var ts: Node = get_node_or_null("/root/TimeSystem")
 	if ts != null and ts.has_signal("momento_cambiato"):
 		ts.momento_cambiato.connect(func(_m): crea_npc())
@@ -93,21 +104,18 @@ func carica() -> bool:
 	_colonne = int(dati["colonne_foglio"])
 	_per_foglio = _colonne * int(dati["righe_foglio"])
 	_tema_caricato = tema if not tema.is_empty() else _tema_partita()
-	var cart_tema: String = cartella.path_join(_tema_caricato)
-	_indici = _immagine(cart_tema.path_join("indici.png"), Image.FORMAT_RGB8)
-	_blocchi = _immagine(cartella.path_join("blocchi.png"), Image.FORMAT_L8)
 	_regioni = _immagine(cartella.path_join("regioni.png"), Image.FORMAT_L8)
+	var sup: Dictionary = {"indici": _immagine(cartella.path_join(_tema_caricato).path_join("indici.png"), Image.FORMAT_RGB8),
+		"blocchi": _immagine(cartella.path_join("blocchi.png"), Image.FORMAT_L8),
+		"tileset": _tileset(cartella.path_join(_tema_caricato), int((dati["fogli"] as Dictionary).get(_tema_caricato, 0))),
+		"oggetti": {}}
+	_livelli["superficie"] = sup
+	_indici = sup["indici"]
+	_blocchi = sup["blocchi"]
 
-	var ts := TileSet.new()
-	ts.tile_size = Vector2i(tile, tile)
-	for k in int((dati["fogli"] as Dictionary).get(_tema_caricato, 0)):
-		var src := TileSetAtlasSource.new()
-		src.texture = _texture(cart_tema.path_join("tessere_%d.png" % k))
-		src.texture_region_size = Vector2i(tile, tile)
-		ts.add_source(src, k)
 	_terreno = TileMapLayer.new()
 	_terreno.name = "Terreno"
-	_terreno.tile_set = ts
+	_terreno.tile_set = sup["tileset"]
 	_terreno.z_index = -10                    # sotto gli oggetti e il giocatore
 	add_child(_terreno)
 
@@ -142,6 +150,34 @@ func carica() -> bool:
 		if not _oggetti_per_blocco.has(b):
 			_oggetti_per_blocco[b] = []
 		_oggetti_per_blocco[b].append(o)
+	sup["oggetti"] = _oggetti_per_blocco
+	return true
+
+
+## Un atlante per foglio di tessere (tessere_<k>.png); le tessere si creano quando servono.
+func _tileset(cart: String, fogli: int) -> TileSet:
+	var ts := TileSet.new()
+	ts.tile_size = Vector2i(tile, tile)
+	for k in fogli:
+		var src := TileSetAtlasSource.new()
+		src.texture = _texture(cart.path_join("tessere_%d.png" % k))
+		src.texture_region_size = Vector2i(tile, tile)
+		ts.add_source(src, k)
+	return ts
+
+
+## Il sottosuolo si legge la prima volta che serve. false se non e' stato esportato.
+func _prepara_sottosuolo() -> bool:
+	if _livelli.has("sottosuolo"):
+		return true
+	var s: Dictionary = dati.get("sottosuolo", {})
+	var fogli: int = int((s.get("fogli", {}) as Dictionary).get(_tema_caricato, 0))
+	if fogli <= 0:
+		return false
+	var cart: String = cartella.path_join(_tema_caricato).path_join("sotto")
+	_livelli["sottosuolo"] = {"indici": _immagine(cart.path_join("indici.png"), Image.FORMAT_RGB8),
+		"blocchi": _immagine(cartella.path_join("sotto").path_join("blocchi.png"), Image.FORMAT_L8),
+		"tileset": _tileset(cart, fogli), "oggetti": {}}
 	return true
 
 
@@ -249,11 +285,137 @@ func luogo_del_tag(rid: String, tag: String) -> Vector2i:
 	return Vector2i(-1, -1)
 
 
-## Una casella libera vicino a c, lontana almeno 2 caselle da quelle occupate.
-## Senza chiave: la piu' vicina. Con una chiave (l'id di un NPC): una a caso ma
+# --- Sottosuolo: ingressi e cambio di livello (2026-10-25) ------------------------
+
+## Un'Area2D per ingresso (mondo.json sottosuolo.ingressi), con il disegno del
+## livello mostrato: botola o scale in superficie, scala a pioli sotto.
+func crea_ingressi() -> void:
+	var ing: Dictionary = (dati.get("sottosuolo", {}) as Dictionary).get("ingressi", {})
+	for nome in ing:
+		var v: Array = ing[nome]
+		var area := Area2D.new()
+		area.name = "Ingresso_%s" % nome
+		area.set_meta("ingresso", nome)
+		area.position = Vector2((float(v[0]) + 0.5) * tile, (float(v[1]) + 0.5) * tile)
+		var shape := CollisionShape2D.new()
+		var rect := RectangleShape2D.new()
+		rect.size = Vector2(tile, tile) * 1.6
+		shape.shape = rect
+		area.add_child(shape)
+		var spr := Sprite2D.new()
+		spr.name = "Disegno"
+		spr.centered = false
+		area.add_child(spr)
+		var prompt := Label.new()
+		prompt.name = "Prompt"
+		prompt.add_theme_font_size_override("font_size", 10)
+		prompt.position = Vector2(-tile, tile * 0.6)
+		prompt.hide()
+		area.add_child(prompt)
+		area.body_entered.connect(_su_ingresso.bind(str(nome), true))
+		area.body_exited.connect(_su_ingresso.bind(str(nome), false))
+		add_child(area)
+	_aggiorna_ingressi()
+
+
+func _aggiorna_ingressi() -> void:
+	var s: Dictionary = dati.get("sottosuolo", {})
+	var per_zona: Dictionary = s.get("sprite_ingresso", {})
+	for c in get_children():
+		if not c.has_meta("ingresso"):
+			continue
+		var zona: String = str((s["ingressi"][c.get_meta("ingresso")] as Array)[2])
+		var chiave: String = "ingresso_%s" % (str(per_zona.get(zona, "scale")) if livello == "superficie" else "risalita")
+		var meta: Dictionary = (dati["sprite"] as Dictionary).get(chiave, {})
+		var spr: Sprite2D = c.get_node("Disegno")
+		spr.texture = _texture_oggetto(chiave)
+		spr.offset = Vector2(-float(meta.get("ax", 0)), -float(meta.get("ay", 0))) + Vector2(0, tile * 0.5)
+		spr.z_index = -5 if livello == "superficie" else 0      # botola e scale stanno a terra: sotto chi ci passa
+		var chiave_testo: String = "HUD_PROMPT_SCENDI" if livello == "superficie" else "HUD_PROMPT_SALI"
+		(c.get_node("Prompt") as Label).text = tr(chiave_testo).format({"tasto": _tasto_interagisci()})
+
+
+func _su_ingresso(body: Node, nome: String, dentro: bool) -> void:
+	if not body.is_in_group("player"):
+		return
+	if dentro:
+		_ingresso_vicino = nome
+	elif _ingresso_vicino == nome:
+		_ingresso_vicino = ""
+	var a: Node = get_node_or_null("Ingresso_%s/Prompt" % nome)
+	if a != null:
+		a.visible = dentro
+
+
+func _tasto_interagisci() -> String:
+	for ev in InputMap.action_get_events("interagisci"):
+		if ev is InputEventKey:
+			return OS.get_keycode_string((ev as InputEventKey).physical_keycode)
+	return "F"
+
+
+## Passa all'altro livello dall'ingresso 'nome': il giocatore resta nello stesso
+## punto (la casella libera piu' vicina della stessa regione, se quella esatta e'
+## bloccata sull'altro livello). false se il sottosuolo non e' esportato.
+func attraversa(nome: String) -> bool:
+	var ing: Dictionary = (dati.get("sottosuolo", {}) as Dictionary).get("ingressi", {})
+	if not ing.has(nome):
+		return false
+	var nuovo: String = "sottosuolo" if livello == "superficie" else "superficie"
+	if not cambia_livello(nuovo):
+		return false
+	var v: Array = ing[nome]
+	var c := Vector2i(int(v[0]), int(v[1]))
+	var q: Vector2i = cella_libera(c, {}, "", regione_a(c.x, c.y))
+	var pos := Vector2((q.x + 0.5) * tile, (q.y + 0.5) * tile)
+	var p: Node = get_tree().get_first_node_in_group("player") if is_inside_tree() else null
+	if p is Node2D:
+		colloca(p as Node2D, pos)
+	_ultima_ammessa = pos
+	_cella_regione = Vector2i(-9999, -9999)
+	aggiorna_regione(pos)
+	return true
+
+
+## Mostra un livello: libera i blocchi costruiti, cambia tessere, collisioni e
+## oggetti; NPC e nemici della superficie spariscono (e si fermano) sotto terra.
+func cambia_livello(nuovo: String) -> bool:
+	if nuovo == livello:
+		return true
+	if nuovo == "sottosuolo" and not _prepara_sottosuolo():
+		return false
+	for b in _caricati.keys():
+		_scarica(b)
+	var l: Dictionary = _livelli[nuovo]
+	_indici = l["indici"]
+	_blocchi = l["blocchi"]
+	_oggetti_per_blocco = l["oggetti"]
+	_terreno.tile_set = l["tileset"]
+	livello = nuovo
+	_blocco_centro = Vector2i(-9999, -9999)
+	var sopra: bool = livello == "superficie"
+	for c in get_children():
+		if c is Area2D and c.has_meta("npc_id"):
+			_mostra(c, sopra)
+	for e in get_tree().get_nodes_in_group("nemici") if is_inside_tree() else []:
+		if e is Node2D:
+			_mostra(e, str((e as Node).get_meta("livello", "superficie")) == livello)
+	_ingresso_vicino = ""
+	_aggiorna_ingressi()
+	livello_cambiato.emit(livello)
+	return true
+
+
+func _mostra(n: Node, si: bool) -> void:
+	(n as CanvasItem).visible = si
+	n.process_mode = Node.PROCESS_MODE_INHERIT if si else Node.PROCESS_MODE_DISABLED
+
+
+## Una casella libera vicino a c, lontana almeno 2 caselle da quelle occupate
+## (e, se data, nella stessa regione). Senza chiave: la piu' vicina. Con una chiave (l'id di un NPC): una a caso ma
 ## sempre la stessa (hash della chiave) fra le libere entro 4 anelli dalla prima,
 ## cosi' un gruppo di NPC non sta in fila come una griglia.
-func cella_libera(c: Vector2i, occupate: Dictionary = {}, chiave: String = "") -> Vector2i:
+func cella_libera(c: Vector2i, occupate: Dictionary = {}, chiave: String = "", regione: String = "") -> Vector2i:
 	var scelta := c
 	var punteggio: int = 0
 	var primo: int = -1
@@ -264,6 +426,8 @@ func cella_libera(c: Vector2i, occupate: Dictionary = {}, chiave: String = "") -
 			for dx in range(-r, r + 1):
 				var q := Vector2i(c.x + dx, c.y + dy)
 				if maxi(absi(dx), absi(dy)) != r or bloccata(q.x, q.y) or _vicino_occupato(q, occupate):
+					continue
+				if not regione.is_empty() and regione_a(q.x, q.y) != regione:
 					continue
 				if chiave.is_empty():
 					return q
@@ -381,9 +545,18 @@ func _npc_allontanato(body: Node, id: String) -> void:
 		_npc_vicino = ""
 
 
-## "interagisci" vicino a un NPC -> il suo dialogo (dialogue_id dal roster).
+## "interagisci" vicino a un NPC -> il suo dialogo (dialogue_id dal roster);
+## sopra un ingresso del sottosuolo -> l'altro livello.
 func _unhandled_input(event: InputEvent) -> void:
-	if not event.is_action_pressed("interagisci") or _npc_vicino.is_empty():
+	if not event.is_action_pressed("interagisci"):
+		return
+	if _npc_vicino.is_empty() and not _ingresso_vicino.is_empty():
+		var book_i: Node = get_node_or_null("/root/Book")
+		if book_i == null or not bool(book_i.call("e_aperto")):
+			if attraversa(_ingresso_vicino):
+				get_viewport().set_input_as_handled()
+		return
+	if _npc_vicino.is_empty():
 		return
 	var de: Node = get_node_or_null("/root/DialogueEngine")
 	var book: Node = get_node_or_null("/root/Book")

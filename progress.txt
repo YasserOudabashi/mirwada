@@ -14106,3 +14106,31 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   validate 0, 973 test passati (tools/run_tests.sh).
 - Aperto: il passaggio dal sottosuolo (task successivo); chi sa volare; la primitiva teleport sposta il
   giocatore senza controllare le collisioni (puo' saltare un bordo o finire in acqua).
+
+## US-8B12f — il sottosuolo nel gioco: dalle fogne alle catacombe, si sbuca nelle Marche, 2026-10-25
+- Il generatore aveva gia' una sola rete sotterranea sotto il continente (fogne sotto Mirwada, catacombe sotto le
+  Marche, grotte sotto la Valle, miniere sotto la terra di mezzo, citta' sotterranea sotto le rovine del boss),
+  con 47 ingressi alle stesse coordinate sopra e sotto. Verificato sui dati: dalla partenza si arriva a piedi a
+  35 ingressi; da li', sotto terra, al 98,5% del sottosuolo e a 11 uscite delle catacombe su 12, tutte nelle
+  Marche. Quindi "legare" le Marche al sottosuolo non chiedeva nuove gallerie: basta portarlo nel gioco.
+- tools/art/esporta_mondo.py --sottosuolo (5 minuti, luminoso + cupo): assets/world/sotto/blocchi.png (255 roccia
+  e acqua di canali/laghi, 128 facce di roccia senza scala, niente salti di lato: il cordolo dei canali e'
+  camminamento), <tema>/sotto/{tessere_0..1, indici}.png (9.942 / 9.944 tessere; i blocchi tutti roccia anche nei
+  12 dintorni prendono la tessera di roccia senza ricomporli), sprite degli ingressi, mondo.json "sottosuolo"
+  (fogli per tema, ingressi [x, y, zona], boss di zona, sprite per zona). Le funzioni salva_fogli/salva_indici
+  servono ora anche la superficie.
+- forge3d: creatures.ingresso() con tre disegni (botola delle fogne, scale che scendono nel buio, scala a pioli
+  per risalire), worldrender type "ingresso". Guardati ingranditi su chiaro e scuro, nelle due modalita': la
+  prima versione aveva il buco della botola sotto l'anello (il motore usa i semi-lati) e la luce della risalita
+  sporca; corretti.
+- scripts/world/mondo.gd: due livelli sulla stessa griglia (livello, _livelli, _prepara_sottosuolo letto la prima
+  volta che serve). crea_ingressi(): un'Area2D per ingresso con il disegno del livello e il suggerimento
+  "[F] Scendi"/"[F] Sali" (strings.csv HUD_PROMPT_SCENDI/SALI); "interagisci" sopra un ingresso -> attraversa():
+  cambia_livello() libera i blocchi, cambia tessere/collisioni/oggetti, nasconde e ferma NPC e nemici della
+  superficie (meta "livello", default superficie); il giocatore resta nel punto dell'ingresso (la casella libera
+  piu' vicina della stessa regione: due uscite delle catacombe stanno su un dislivello).
+- Verifica: 3 test nuovi in test_mondo (ingressi col disegno; scendere e risalire; dal sottosuolo si sbuca nelle
+  regioni con "sottosuolo" in accesso), prova a schermo arte/revisione/sottosuolo_in_gioco.png (botola, fogne,
+  catacombe, uscita nelle Marche: regione marche_crepuscolo). validate 0, 976 test passati.
+- Aperto: nessun nemico o boss sotto terra (i boss di zona sono in mondo.json, non ancora usati); il livello non
+  si salva (caricando si riparte dalla partenza); niente luci/buio speciali nel sottosuolo.

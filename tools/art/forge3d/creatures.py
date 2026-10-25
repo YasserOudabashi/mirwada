@@ -326,6 +326,36 @@ def stendardo(seed=1, size=1.0, mat="cloth_red"):
     return r
 
 
+def ingresso(kind="scale", seed=1, size=1.0):
+    """Ingressi del sottosuolo (stesso punto sopra e sotto): 'botola' (fogne, grata di ferro in un anello di pietra),
+    'scale' (gradini di pietra che scendono nel buio, catacombe/miniere/grotte/citta' sotterranea), 'risalita' (dal
+    sottosuolo: scala a pioli verso la luce)."""
+    rnd = random.Random(seed)
+    r = Rig(f"ingresso_{kind}_{seed}"); r.scale = size
+    r.joint("b", "root", (0, 0, 0))
+    # misure: box = semi-lati, cylinder = (raggio x, raggio y, mezza altezza)
+    if kind == "botola":
+        r.part("b", "cylinder", (5.4, 5.4, 0.5), (0, 0, 0.5), mat="stone_light", soft=0.4)    # anello, cima a z 1
+        r.part("b", "cylinder", (3.9, 3.9, 0.1), (0, 0, 1.05), mat="shadow_mat")              # il buio sotto la grata
+        for i in (-1, 0, 1):
+            r.part("b", "box", (0.35, 3.7, 0.12), (i * 1.4, 0, 1.25), mat="iron")
+        r.part("b", "box", (3.7, 0.35, 0.12), (0, 0, 1.3), mat="iron")
+    elif kind == "scale":
+        r.part("b", "box", (4.6, 3.8, 0.1), (0, -0.6, 0.1), mat="shadow_mat")                  # il buio in fondo
+        for k, (y, z, mat) in enumerate(((2.5, 0.55, "stone_light"), (1.1, 0.4, "stone"), (-0.3, 0.25, "stone"))):
+            r.part("b", "box", (3.6, 0.7, 0.15), (0, y, z), mat=mat, rot=(0, 0, rnd.uniform(-2, 2)))
+        r.part("b", "box", (5.8, 0.9, 1.0), (0, -4.4, 1.0), mat="stone")                       # muretto in fondo
+        for sx in (-1, 1):                                                                      # spallette
+            r.part("b", "box", (0.9, 4.4, 0.8), (sx * 4.9, -0.5, 0.8), mat="stone", rot=(0, 0, rnd.uniform(-2, 2)))
+    else:                                                                                       # risalita
+        r.part("b", "ellipsoid", (3.4, 2.4, 0.15), (0, 1.4, 0.15), mat="stone_light")          # pietra chiara: la luce
+        for sx in (-1, 1):
+            r.part("b", "cylinder", (0.45, 0.45, 5.5), (sx * 1.6, -1.0, 5.4), mat="wood", rot=(-14, 0, 0))
+        for k in range(5):
+            r.part("b", "box", (1.7, 0.18, 0.18), (0, -0.3 - k * 0.55, 1.4 + k * 2.1), mat="wood_light", rot=(-14, 0, 0))
+    return r
+
+
 def ossa(seed=1, size=1.0):
     """Ossa nella sabbia delle Marche: un teschio di bestia e qualche costola."""
     rnd = random.Random(seed)

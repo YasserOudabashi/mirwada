@@ -42,6 +42,10 @@ def object_sprite(o, S=TILE):
     elif t == "scoglio":                                  # roccia nel mare: schiuma alla base, niente ombra a terra
         r = rock(o["seed"], "stone", size=2.6 * o.get("size", 1.0) * k, moss=False)
         cw, ch, foot = int(96 * k), int(72 * k), 0.75
+    elif t == "ingresso":                                 # sottosuolo: botola, scale, risalita (stesso punto sopra e sotto)
+        from .creatures import ingresso
+        r = ingresso(o.get("kind", "scale"), o.get("seed", 1), size=2.0 * k)
+        cw, ch, foot = int(64 * k), int(72 * k), 0.78
     elif t == "bridge":
         from .rig import Rig
         r = Rig("bridge"); r.joint("b", "root", (0, 0, 0))
@@ -57,7 +61,7 @@ def object_sprite(o, S=TILE):
           "gigante": (0.2, 0.07)}.get(o.get("kind"), (0.15, 0.055)) if t == "tree" else (0.3, 0.12)
     # inner_thr in proporzione alla grandezza del modello: con 1 unita' il bordo ripido di una sfera grande (chioma
     # x3,6) superava la soglia sulla stessa superficie e diventava una fascia scura di 5-8 px (contorno doppio)
-    img = render(r.instances({}, 180), size=(cw, ch), ppu=1.0, foot=(0.5, foot), shadow=(t not in ("bridge", "scoglio")),
+    img = render(r.instances({}, 180), size=(cw, ch), ppu=1.0, foot=(0.5, foot), shadow=(t not in ("bridge", "scoglio") and not (t == "ingresso" and o.get("kind") != "risalita")),
                  shadow_r=sr, shadow_off=(0.25, 0.3), shadow_a=80, inner_thr=max(1.0, r.scale))
     if t == "scoglio":
         img = _sommerso(img, int(ch * foot) - max(2, int(3 * k)), o["seed"])

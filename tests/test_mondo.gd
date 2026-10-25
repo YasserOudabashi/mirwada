@@ -222,32 +222,10 @@ func test_il_main_parte_dal_mondo_unico() -> void:
 ## Caselle raggiungibili dalla partenza: a piedi (solo caselle libere) o in volo
 ## (anche i dislivelli, mai l'acqua o il vuoto).
 func _raggiungibili(m: Node2D, volo: bool) -> PackedByteArray:
-	var b: PackedByteArray = m.call("blocchi_grezzi")
-	var w: int = m.larghezza
-	var h: int = m.altezza
-	var visto := PackedByteArray()
-	visto.resize(w * h)
 	var p: Vector2 = m.call("partenza")
-	var inizio: int = int(p.y / m.tile) * w + int(p.x / m.tile)
-	var coda := PackedInt32Array([inizio])
-	visto[inizio] = 1
-	var i := 0
-	while i < coda.size():
-		var c: int = coda[i]
-		i += 1
-		var x: int = c % w
-		for n in [c - 1 if x > 0 else -1, c + 1 if x < w - 1 else -1, c - w, c + w]:
-			if n < 0 or n >= w * h or visto[n] == 1:
-				continue
-			var k: int = b[n]
-			if k == 0 or (volo and k != 255):
-				visto[n] = 1
-				coda.append(n)
-	return visto
+	return _bfs(m, PackedInt32Array([int(p.y / m.tile) * m.larghezza + int(p.x / m.tile)]), volo)
 
 
-## raggio 2: il luogo o una casella accanto (un luogo puo' stare su un muro);
-## raggio 0: proprio la casella del luogo.
 func _luogo_raggiunto(m: Node2D, visto: PackedByteArray, luogo: String, raggio: int = 2) -> bool:
 	var l: Array = (m.dati["luoghi"] as Dictionary)[luogo]
 	for dy in range(-raggio, raggio + 1):
@@ -322,3 +300,102 @@ func test_chi_vola_passa_i_dislivelli() -> void:
 	assert_true(e.get_collision_mask_value(5), "i nemici non scendono dai dislivelli")
 	p.free()
 	e.free()
+
+
+# --- 2026-10-25: il sottosuolo, secondo livello sulla stessa griglia --------------
+
+func test_gli_ingressi_del_sottosuolo_sono_nel_mondo() -> void:
+	var m: Node2D = _mondo()
+	m.call("crea_ingressi")
+	var ing: Dictionary = (m.dati.get("sottosuolo", {}) as Dictionary).get("ingressi", {})
+	assert_true(ing.size() >= 40, "il sottosuolo ha i suoi ingressi (%d)" % ing.size())
+	for nome in ing:
+		var a: Node2D = m.get_node_or_null("Ingresso_%s" % nome)
+		assert_true(a != null and (a.get_node("Disegno") as Sprite2D).texture != null, "%s ha il suo disegno" % nome)
+	m.free()
+
+
+func test_scendere_e_risalire_da_un_ingresso() -> void:
+	var prima: Dictionary = _ws().call("per_salvataggio")
+	var m: Node2D = _mondo()
+	var p := Node2D.new()
+	p.add_to_group("player")
+	m.add_child(p)
+	Engine.get_main_loop().root.add_child(m)
+	m.call("crea_npc")
+	m.call("crea_ingressi")
+	var v: Array = (m.dati["sottosuolo"]["ingressi"] as Dictionary)["fogne_1"]
+	var c := Vector2i(int(v[0]), int(v[1]))
+	var sopra: int = m.call("tessera_a", c.x, c.y)
+	assert_true(m.call("attraversa", "fogne_1"), "si scende dalla botola")
+	assert_eq(str(m.get("livello")), "sottosuolo", "ora si e' sotto")
+	var q: Vector2i = _cella(m, p.position)
+	assert_false(m.call("bloccata", q.x, q.y), "sotto si arriva su una casella libera")
+	assert_true(Vector2(q).distance_to(Vector2(c)) <= 3.0, "nello stesso punto dell'ingresso")
+	for n in m.get_children():
+		if n is Area2D and n.has_meta("npc_id"):
+			assert_false((n as Area2D).visible, "gli NPC della superficie non si vedono sotto")
+			break
+	assert_true(m.call("attraversa", "fogne_1"), "si risale")
+	assert_eq(str(m.get("livello")), "superficie", "di nuovo in superficie")
+	assert_eq(int(m.call("tessera_a", c.x, c.y)), sopra, "le tessere della superficie tornano")
+	m.free()
+	_ws().call("pulisci")
+	_ws().call("da_salvataggio", prima)
+
+
+## Dalle fogne di Mirwada, camminando sotto terra, si arriva alle catacombe: le
+## loro uscite sono nelle regioni con "sottosuolo" in accesso (le Marche).
+func test_dal_sottosuolo_si_arriva_alle_regioni_che_lo_prevedono() -> void:
+	var m: Node2D = _mondo()
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var piedi: PackedByteArray = _raggiungibili(m, false)
+	var ing: Dictionary = m.dati["sottosuolo"]["ingressi"]
+	var partenze := PackedInt32Array()
+	for nome in ing:
+		if _luogo_cella_raggiunta(m, piedi, ing[nome]):
+			partenze.append(int(ing[nome][1]) * m.larghezza + int(ing[nome][0]))
+	assert_true(partenze.size() > 0, "dalla partenza si arriva a piedi ad almeno un ingresso")
+	assert_true(m.call("cambia_livello", "sottosuolo"), "il sottosuolo e' esportato")
+	var sotto: PackedByteArray = _bfs(m, partenze, false)
+	var regioni_raggiunte := {}
+	for nome in ing:
+		if _luogo_cella_raggiunta(m, sotto, ing[nome]):
+			regioni_raggiunte[str(m.call("regione_a", int(ing[nome][0]), int(ing[nome][1])))] = true
+	for reg in gd.call("get_regions"):
+		if "sottosuolo" in ((reg as Dictionary).get("accesso", []) as Array):
+			assert_true(regioni_raggiunte.has(str(reg["id"])), "dal sottosuolo si sbuca in %s" % reg["id"])
+	m.free()
+
+
+func _luogo_cella_raggiunta(m: Node2D, visto: PackedByteArray, v: Array) -> bool:
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			var x: int = int(v[0]) + dx
+			var y: int = int(v[1]) + dy
+			if x >= 0 and y >= 0 and x < m.larghezza and y < m.altezza and visto[y * m.larghezza + x] == 1:
+				return true
+	return false
+
+
+func _bfs(m: Node2D, partenze: PackedInt32Array, volo: bool) -> PackedByteArray:
+	var b: PackedByteArray = m.call("blocchi_grezzi")
+	var w: int = m.larghezza
+	var visto := PackedByteArray()
+	visto.resize(w * m.altezza)
+	var coda := partenze.duplicate()
+	for c in partenze:
+		visto[c] = 1
+	var i := 0
+	while i < coda.size():
+		var c: int = coda[i]
+		i += 1
+		var x: int = c % w
+		for n in [c - 1 if x > 0 else -1, c + 1 if x < w - 1 else -1, c - w, c + w]:
+			if n < 0 or n >= visto.size() or visto[n] == 1:
+				continue
+			var k: int = b[n]
+			if k == 0 or (volo and k != 255):
+				visto[n] = 1
+				coda.append(n)
+	return visto
