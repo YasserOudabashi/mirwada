@@ -140,10 +140,10 @@ func _riga_item(v: Dictionary) -> HBoxContainer:
 ## gia' in uso altrove nella pagina, es. il modulate delle righe offuscate),
 ## nessun asset nuovo. 'comune' e' bianco, il colore di testo neutro.
 const _COLORE_RARITA := {
-	"comune": Color.WHITE,
-	"non_comune": Color(0.30, 0.75, 0.35),
-	"raro": Color(0.30, 0.55, 0.90),
-	"leggendario": Color(0.90, 0.65, 0.15),
+	"comune": Color("#3e2731"),            # inchiostro del libro (data/ui/book.json tema.colori)
+	"non_comune": Color("#3e8948"),        # leggibili sulla carta (palette Endesga 32)
+	"raro": Color("#124e89"),
+	"leggendario": Color("#be4a2f"),
 }
 
 func _colore_rarita(rarita: String) -> Color:

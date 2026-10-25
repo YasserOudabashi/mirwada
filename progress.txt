@@ -14134,3 +14134,25 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   catacombe, uscita nelle Marche: regione marche_crepuscolo). validate 0, 976 test passati.
 - Aperto: nessun nemico o boss sotto terra (i boss di zona sono in mondo.json, non ancora usati); il livello non
   si salva (caricando si riparte dalla partenza); niente luci/buio speciali nel sottosuolo.
+
+## US-8B70 — il libro ridisegnato (richiesta dell'utente "fai un bel design del libro"), 2026-10-25
+- Prima: un rettangolo beige piatto, testo bianco quasi illeggibile, bottoni grigi, griglia del diagramma nera.
+- tools/art/build_libro.py (nuovo, seed 7, palette Endesga 32 verificata dallo script, alpha 0/255):
+  assets/ui/libro.png (600x340 = la pagina in unita': copertina di cuoio con cuciture, angoli d'ottone con
+  ribattino, pergamena con bordi ingialliti e spessore dei fogli, piega stretta), segnalibro(_su).png (nastri),
+  spunta_no/si.png (caselle con la croce di penna rossa), ornamento.png (filetto col rombo sotto il titolo).
+  Guardato ingrandito: la prima carta era troppo macchiata (testo illeggibile), la seconda troppo piatta, la
+  piega larga tagliava i testi che la attraversano -> 6 px per lato; bottoni pieni sopra la piega.
+- Font: Alegreya (testo) e Alegreya SC Bold (titoli), licenza OFL in assets/ui/font/OFL.txt.
+- data/ui/book.json "tema": immagini, font, dimensioni (13 e 17 unita') e colori (inchiostro, titolo, evidenza,
+  tenue, carta) -> validate_data controlla file e colori. book_overlay.gd _applica_aspetto(): la carta sotto la
+  pagina, titolo col filetto, un Theme per tutte le pagine (Label, Button, CheckBox con le caselle disegnate,
+  LineEdit a riga di quaderno, slider, scrollbar, popup, tooltip), segnalibri a nastro sul bordo della copertina.
+- Colori delle pagine resi leggibili sulla carta: mappa "sei qui" e diagramma "corrente" da ciano a blu/rosso
+  d'inchiostro, celle del diagramma color carta/seppia, nebbia = inchiostro sbiadito, rarita' comune da bianco
+  a inchiostro (non_comune #3e8948, raro #124e89, leggendario #be4a2f), nome di chi parla rosso.
+- Verifica: tests/test_libro_aspetto.gd (2), prova a schermo di tutte le pagine (arte/revisione/libro_pagine.png,
+  libro_prima_dopo.png). validate 0, 978 test.
+- Non mi convince ancora: le pagine sono impaginate sull'intera doppia pagina, quindi testi e griglie passano
+  sopra la piega (un'impaginazione a due colonne vere e' un lavoro pagina per pagina); gli interruttori del
+  colophon (CheckButton) hanno ancora il disegno di Godot; manca una variante cupa del libro per la difficile.

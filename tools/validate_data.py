@@ -13,6 +13,7 @@ Gli schema in data/schema/ restano la documentazione formale del formato.
 
 import json
 import os
+import re
 import struct
 import sys
 from collections import Counter
@@ -2408,6 +2409,14 @@ def main():
             f"(design-ui-libro.md + page_dialogo US-613b). Un tipo nuovo e' codice: va discusso.")
     book = load_json(os.path.join(DATA, "ui", "book.json"))
     if book:
+        # 2026-10-25: aspetto del libro, i file esistono e i colori sono in palette (#rrggbb di Endesga 32)
+        tema_libro = book.get("tema") or {}
+        for k, v in tema_libro.items():
+            if isinstance(v, str) and v.startswith("res://") and not os.path.exists(os.path.join(ROOT, v[6:])):
+                err(f"data/ui/book.json tema.{k}: '{v}' non esiste (tools/art/build_libro.py?)")
+        for k, v in (tema_libro.get("colori") or {}).items():
+            if not (isinstance(v, str) and re.fullmatch(r"#[0-9a-fA-F]{6}", v)):
+                err(f"data/ui/book.json tema.colori.{k}: '{v}' non e' un colore #rrggbb")
         pages = book.get("pages", [])
         seen_ids, seen_ord = Counter(), Counter()
         for p in pages:

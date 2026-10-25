@@ -6,7 +6,7 @@ extends VBoxContainer
 ##
 ## Si ridisegna a ogni nodo_cambiato. Nessun testo hardcoded: GameData.tr_data.
 
-const C_SPEAKER := Color(0.45, 0.78, 0.82)
+const C_SPEAKER := Color("#a22633")       # rosso d'inchiostro sulla carta (prima ciano)
 
 ## US-811: npc_id del venditore mentre la pagina e' in modalita' negozio
 ## ("" = dialogo normale). Apribile da DialogueEngine.apri_vendita (una

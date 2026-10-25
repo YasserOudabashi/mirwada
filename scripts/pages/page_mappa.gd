@@ -13,7 +13,7 @@ extends VBoxContainer
 
 const AreaGate := preload("res://scripts/area_gate.gd")
 
-const C_CORRENTE := Color(0.4, 0.76, 0.82)
+const C_CORRENTE := Color("#124e89")      # inchiostro blu sulla carta (prima ciano)
 
 
 func aggiorna() -> void:

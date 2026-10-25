@@ -20,5 +20,27 @@
     { "id": "dialogo",      "tipo": "page_dialogo",          "name_i18n": "ui.page.dialogo",      "ordine": 7, "transitoria": true },
     { "id": "colophon",     "tipo": "impostazioni",          "name_i18n": "ui.page.colophon",     "ordine": 99 }
   ],
-  "segnalibri": ["mappa", "diagramma", "journal"]
+  "segnalibri": ["mappa", "diagramma", "journal"],
+  "tema": {
+    "_comment": "Aspetto del libro (2026-10-25): carta, ornamento, segnalibri e caselle da tools/art/build_libro.py; font Alegreya e Alegreya SC (licenza OFL, assets/ui/font/OFL.txt). Colori: palette Endesga 32. Le dimensioni sono in unita' di gioco (1 unita' = 2 pixel a schermo).",
+    "carta": "res://assets/ui/libro.png",
+    "ornamento": "res://assets/ui/ornamento.png",
+    "segnalibro": "res://assets/ui/segnalibro.png",
+    "segnalibro_su": "res://assets/ui/segnalibro_su.png",
+    "spunta_no": "res://assets/ui/spunta_no.png",
+    "spunta_si": "res://assets/ui/spunta_si.png",
+    "font": "res://assets/ui/font/Alegreya.ttf",
+    "font_titolo": "res://assets/ui/font/AlegreyaSC-Bold.ttf",
+    "dimensione": 13,
+    "dimensione_titolo": 17,
+    "colori": {
+      "inchiostro": "#3e2731",
+      "titolo": "#733e39",
+      "evidenza": "#a22633",
+      "tenue": "#b86f50",
+      "carta": "#ead4aa",
+      "carta_scura": "#e4a672",
+      "sfondo": "#181425"
+    }
+  }
 }

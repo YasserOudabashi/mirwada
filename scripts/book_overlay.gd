@@ -62,6 +62,7 @@ func _ready() -> void:
 		var cfg: Dictionary = b.call("libro_config")
 		_volta_durata = maxf(0.05, float(cfg.get("voltata_ms", 350)) / 1000.0)
 		_volta_ridotta_s = maxf(0.02, float(cfg.get("dissolvenza_ridotta_ms", 80)) / 1000.0)
+	_applica_aspetto()
 	_costruisci_segnalibri()
 
 	var gd: Node = get_node_or_null("/root/GameData")
@@ -283,6 +284,177 @@ func _nota_margine() -> String:
 	return tr(chiave).format([nome])
 
 
+# --- Aspetto del libro (2026-10-25) -------------------------------------
+# Carta di cuoio e pergamena, titolo col filetto, segnalibri di stoffa e un Theme
+# per tutte le pagine (font Alegreya, inchiostro scuro), dai dati: data/ui/book.json
+# "tema" (immagini da tools/art/build_libro.py). Senza "tema" il libro resta piatto.
+
+var _stili_segnalibro: Dictionary = {}
+
+
+func _applica_aspetto() -> void:
+	var gd: Node = get_node_or_null("/root/GameData")
+	var t: Dictionary = (gd.call("get_ui_book") as Dictionary).get("tema", {}) if gd != null else {}
+	if t.is_empty():
+		return
+	var col: Dictionary = t.get("colori", {})
+	var inchiostro: Color = _colore(col, "inchiostro", Color(0.24, 0.15, 0.19))
+	var titolo: Color = _colore(col, "titolo", Color(0.45, 0.24, 0.22))
+	var evidenza: Color = _colore(col, "evidenza", Color(0.64, 0.15, 0.2))
+	var tenue: Color = _colore(col, "tenue", Color(0.72, 0.44, 0.31))
+	var carta: Color = _colore(col, "carta", Color(0.92, 0.83, 0.67))
+	var carta_scura: Color = _colore(col, "carta_scura", Color(0.89, 0.65, 0.45))
+
+	# la carta disegnata al posto del rettangolo piatto; la piega e' nel disegno
+	var foglio := TextureRect.new()
+	foglio.name = "Carta"
+	foglio.texture = _texture_ui(str(t.get("carta", "")))
+	foglio.set_anchors_preset(Control.PRESET_FULL_RECT)
+	foglio.stretch_mode = TextureRect.STRETCH_SCALE
+	foglio.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	foglio.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_pagina.add_child(foglio)
+	_pagina.move_child(foglio, 0)
+	_pagina.color = Color(0, 0, 0, 0)
+	($Pagina/Piega as CanvasItem).visible = false
+
+	var font: Font = _font_ui(str(t.get("font", "")))
+	var font_titolo: Font = _font_ui(str(t.get("font_titolo", "")))
+	if font_titolo != null:
+		_titolo.add_theme_font_override("font", font_titolo)
+	_titolo.add_theme_font_size_override("font_size", int(t.get("dimensione_titolo", 17)))
+	_titolo.add_theme_color_override("font_color", titolo)
+	var orn := TextureRect.new()
+	orn.name = "Ornamento"
+	orn.texture = _texture_ui(str(t.get("ornamento", "")))
+	orn.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	orn.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	orn.anchor_left = 0.5
+	orn.anchor_right = 0.5
+	if orn.texture != null:
+		orn.offset_left = -orn.texture.get_width() / 2.0
+		orn.offset_right = orn.texture.get_width() / 2.0
+	orn.offset_top = 40.0
+	orn.offset_bottom = 47.0
+	_pagina.add_child(orn)
+
+	var th := Theme.new()
+	if font != null:
+		th.default_font = font
+	th.default_font_size = int(t.get("dimensione", 12))
+	for tipo in ["Label", "Button", "CheckBox", "CheckButton", "OptionButton", "LineEdit", "PopupMenu",
+			"ItemList", "TabBar", "LinkButton", "MenuButton", "TooltipLabel"]:
+		th.set_color("font_color", tipo, inchiostro)
+	th.set_color("default_color", "RichTextLabel", inchiostro)
+	for tipo in ["Button", "OptionButton", "MenuButton"]:
+		th.set_stylebox("normal", tipo, _riquadro(carta_scura, Color(titolo, 0.8)))
+		th.set_stylebox("hover", tipo, _riquadro(carta_scura, evidenza))
+		th.set_stylebox("pressed", tipo, _riquadro(titolo, titolo))
+		th.set_stylebox("disabled", tipo, _riquadro(Color(carta_scura, 0.2), Color(tenue, 0.6)))
+		th.set_stylebox("focus", tipo, _riquadro(Color(0, 0, 0, 0), evidenza))
+		th.set_color("font_hover_color", tipo, evidenza)
+		th.set_color("font_focus_color", tipo, inchiostro)
+		th.set_color("font_pressed_color", tipo, carta)
+		th.set_color("font_hover_pressed_color", tipo, carta)
+		th.set_color("font_disabled_color", tipo, Color(tenue, 0.8))
+	var vuoto := StyleBoxEmpty.new()
+	for tipo in ["CheckBox", "CheckButton"]:
+		th.set_stylebox("normal", tipo, vuoto)
+		th.set_stylebox("pressed", tipo, vuoto)
+		th.set_stylebox("hover", tipo, _riquadro(Color(carta_scura, 0.35), Color(0, 0, 0, 0)))
+		th.set_stylebox("hover_pressed", tipo, _riquadro(Color(carta_scura, 0.35), Color(0, 0, 0, 0)))
+		th.set_stylebox("focus", tipo, vuoto)
+		th.set_color("font_hover_color", tipo, evidenza)
+		th.set_color("font_pressed_color", tipo, inchiostro)
+		th.set_color("font_hover_pressed_color", tipo, evidenza)
+		th.set_color("font_focus_color", tipo, inchiostro)
+		th.set_color("font_disabled_color", tipo, Color(tenue, 0.8))
+	var spunta_no: Texture2D = _texture_ui(str(t.get("spunta_no", "")))
+	var spunta_si: Texture2D = _texture_ui(str(t.get("spunta_si", "")))
+	if spunta_no != null and spunta_si != null:
+		th.set_icon("unchecked", "CheckBox", spunta_no)
+		th.set_icon("checked", "CheckBox", spunta_si)
+		th.set_icon("unchecked_disabled", "CheckBox", spunta_no)
+		th.set_icon("checked_disabled", "CheckBox", spunta_si)
+		th.set_icon("radio_unchecked", "CheckBox", spunta_no)
+		th.set_icon("radio_checked", "CheckBox", spunta_si)
+	var campo := _riquadro(carta, titolo)
+	campo.border_width_top = 0
+	campo.border_width_left = 0
+	campo.border_width_right = 0
+	th.set_stylebox("normal", "LineEdit", campo)
+	var campo_attivo: StyleBoxFlat = campo.duplicate()
+	campo_attivo.border_color = evidenza
+	th.set_stylebox("focus", "LineEdit", campo_attivo)
+	th.set_color("caret_color", "LineEdit", inchiostro)
+	th.set_color("selection_color", "LineEdit", Color(evidenza, 0.3))
+	th.set_color("font_selected_color", "LineEdit", inchiostro)
+	var pista := _riquadro(Color(tenue, 0.45), Color(0, 0, 0, 0))
+	pista.content_margin_top = 2
+	pista.content_margin_bottom = 2
+	th.set_stylebox("slider", "HSlider", pista)
+	th.set_stylebox("grabber_area", "HSlider", _riquadro(titolo, titolo))
+	th.set_stylebox("grabber_area_highlight", "HSlider", _riquadro(evidenza, evidenza))
+	th.set_stylebox("scroll", "VScrollBar", _riquadro(Color(carta_scura, 0.35), Color(0, 0, 0, 0)))
+	th.set_stylebox("grabber", "VScrollBar", _riquadro(Color(titolo, 0.7), Color(0, 0, 0, 0)))
+	th.set_stylebox("grabber_highlight", "VScrollBar", _riquadro(evidenza, Color(0, 0, 0, 0)))
+	th.set_stylebox("grabber_pressed", "VScrollBar", _riquadro(evidenza, Color(0, 0, 0, 0)))
+	th.set_stylebox("panel", "PopupMenu", _riquadro(carta, titolo))
+	th.set_stylebox("hover", "PopupMenu", _riquadro(titolo, titolo))
+	th.set_color("font_hover_color", "PopupMenu", carta)
+	th.set_stylebox("panel", "TooltipPanel", _riquadro(carta, titolo))
+	_pagina.theme = th
+	_segnalibri.theme = th
+
+	# segnalibri: nastri di stoffa che escono dal bordo destro della copertina
+	var nastro: Texture2D = _texture_ui(str(t.get("segnalibro", "")))
+	var nastro_su: Texture2D = _texture_ui(str(t.get("segnalibro_su", "")))
+	if nastro != null:
+		var n := StyleBoxTexture.new()
+		n.texture = nastro
+		var su := StyleBoxTexture.new()
+		su.texture = nastro_su if nastro_su != null else nastro
+		_stili_segnalibro = {"normal": n, "hover": su, "pressed": su, "hover_pressed": su, "focus": StyleBoxEmpty.new()}
+		_segnalibri.offset_left = -23.0
+		_segnalibri.offset_right = -11.0
+
+
+func _riquadro(fondo: Color, bordo: Color) -> StyleBoxFlat:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = fondo
+	sb.border_color = bordo
+	sb.set_border_width_all(1 if bordo.a > 0.0 else 0)
+	sb.set_corner_radius_all(2)
+	sb.content_margin_left = 6
+	sb.content_margin_right = 6
+	sb.content_margin_top = 1
+	sb.content_margin_bottom = 1
+	return sb
+
+
+func _colore(col: Dictionary, k: String, fallback: Color) -> Color:
+	return Color(str(col[k])) if col.has(k) else fallback
+
+
+## Le immagini dell'interfaccia: dalla risorsa importata, o dal disco (headless senza import).
+func _texture_ui(path: String) -> Texture2D:
+	if path.is_empty():
+		return null
+	if ResourceLoader.exists(path):
+		return load(path)
+	var img := Image.load_from_file(ProjectSettings.globalize_path(path))
+	return ImageTexture.create_from_image(img) if img != null else null
+
+
+func _font_ui(path: String) -> Font:
+	if path.is_empty():
+		return null
+	if ResourceLoader.exists(path):
+		return load(path)
+	var f := FontFile.new()
+	return f if f.load_dynamic_font(ProjectSettings.globalize_path(path)) == OK else null
+
+
 func _costruisci_segnalibri() -> void:
 	for c in _segnalibri.get_children():
 		c.queue_free()
@@ -295,6 +467,8 @@ func _costruisci_segnalibri() -> void:
 		var p: Dictionary = b.call("pagina", id)
 		var r := Button.new()
 		r.custom_minimum_size = Vector2(12, 34)
+		for k in _stili_segnalibro:
+			r.add_theme_stylebox_override(k, _stili_segnalibro[k])
 		var nome: String = str(p.get("name_i18n", id))
 		r.tooltip_text = str(gd.call("tr_data", nome)) if gd != null else str(id)
 		r.pressed.connect(func() -> void:

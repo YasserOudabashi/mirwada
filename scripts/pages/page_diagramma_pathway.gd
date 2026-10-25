@@ -23,10 +23,10 @@ extends ScrollContainer
 ## La Sequenza corrente e' evidenziata e le sue abilita' sono elencate sotto.
 ## Nessun nome di Pathway/Sequenza hardcoded: solo id e chiavi i18n.
 
-const C_NOTO := Color(0.74, 0.67, 0.5)
-const C_IGNOTO := Color(0.22, 0.2, 0.17)
-const C_CORRENTE := Color(0.4, 0.76, 0.82)
-const C_PROSSIMA := Color(0.5, 0.42, 0.3)
+const C_NOTO := Color("#b86f50")          # colori della carta (palette Endesga 32)
+const C_IGNOTO := Color("#e4a672")
+const C_CORRENTE := Color("#a22633")
+const C_PROSSIMA := Color("#733e39")
 
 var _stati: Dictionary = {}   # "pid:n" -> "noto" | "ignoto" | "corrente" | "prossima"
 var _abilita: Array = []
@@ -152,7 +152,7 @@ func _sezione_fusione(gd: Node, _prog: Node, mio: String, pw: Dictionary) -> voi
 			str(gd.call("tr_data", altro.get("name_i18n", pid))),
 			tr("BOOK_DIAGRAMMA_FUSIONE_SCRITTO") if scritto else tr("BOOK_DIAGRAMMA_FUSIONE_STUB")]
 		if not scritto:
-			l.modulate = C_IGNOTO.lightened(0.5)  # fog of war, come le celle ignote
+			l.modulate = Color(1, 1, 1, 0.4)  # fog of war: inchiostro sbiadito, come le celle ignote
 		h.add_child(l)
 		if puo:
 			var b := Button.new()
