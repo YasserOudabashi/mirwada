@@ -14,6 +14,7 @@ radius = 5.0
 radius = 7.0
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
+collision_mask = 17
 script = ExtResource("1_player")
 
 [node name="AnimationMachine" type="AnimatedSprite2D" parent="."]

@@ -1086,6 +1086,11 @@ def main():
             if not isinstance(dm, (int, float)) or not (0.0 <= dm <= 1.0):
                 err(f"{rel} [{rid}]: densita_mistica deve essere un numero in [0, 1]")
             # US-8B12b: luoghi della mappa -> location_tag della regione (nomi diversi)
+            # 2026-10-25: come ci si arriva nel mondo generato (assente = anche a piedi). Vocabolario chiuso:
+            # il volo e il sottosuolo sono i soli modi oltre al cammino (tests/test_mondo.gd lo verifica sulla mappa).
+            for modo in (reg.get("accesso") or []):
+                if modo not in ("a_piedi", "volo", "sottosuolo"):
+                    err(f"{rel} [{reg.get('id')}]: accesso '{modo}' fuori vocabolario (a_piedi, volo, sottosuolo)")
             for luogo, t in (reg.get("luoghi_mondo") or {}).items():
                 if t not in reg.get("location_tags", []):
                     err(f"{rel} [{reg.get('id')}]: luoghi_mondo '{luogo}' -> '{t}', che non e' tra i suoi location_tags")

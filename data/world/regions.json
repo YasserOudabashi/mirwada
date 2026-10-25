@@ -28,6 +28,7 @@
       "group_affinity": "eternal_darkness",
       "world_offset": [0, 0],
       "densita_mistica": 0.6,
+      "accesso": ["volo", "sottosuolo"],
       "location_tags": [
         "altura",
         "luogo_di_battaglia",

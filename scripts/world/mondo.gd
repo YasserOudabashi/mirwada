@@ -16,7 +16,12 @@ const AreaGate := preload("res://scripts/area_gate.gd")
 const AnimationMachine := preload("res://scripts/animation_machine.gd")
 
 const BLOCCO := 16                       # caselle per lato di un blocco caricato
-const STRATO_COLLISIONE := 1             # lo stesso dei muri delle scene di regione
+const STRATO_COLLISIONE := 1             # acqua e vuoto: lo stesso strato dei muri (bit 1)
+## Dislivelli (blocchi.png = 128): strato 5 (bit 16). Giocatore e nemici lo hanno
+## nella maschera; chi vola lo toglie e passa (decisione 2026-10-25: alle Marche si
+## arriva solo volando o dal sottosuolo). L'acqua resta invalicabile anche in volo.
+const STRATO_DISLIVELLI := 16
+const DISLIVELLO := 128
 
 @export var cartella: String = "res://assets/world"
 ## "" = quello della modalita' della partita (GameState.tema_arte()).
@@ -106,21 +111,26 @@ func carica() -> bool:
 	_terreno.z_index = -10                    # sotto gli oggetti e il giocatore
 	add_child(_terreno)
 
+	# due tessere quadrate di collisione: (0, 0) acqua/vuoto sullo strato dei muri,
+	# (1, 0) dislivello sullo strato dei dislivelli
 	var ts_ost := TileSet.new()
 	ts_ost.tile_size = Vector2i(tile, tile)
 	ts_ost.add_physics_layer()
 	ts_ost.set_physics_layer_collision_layer(0, STRATO_COLLISIONE)
-	var vuota := Image.create(tile, tile, false, Image.FORMAT_RGBA8)
+	ts_ost.add_physics_layer()
+	ts_ost.set_physics_layer_collision_layer(1, STRATO_DISLIVELLI)
+	var vuota := Image.create(tile * 2, tile, false, Image.FORMAT_RGBA8)
 	var src_ost := TileSetAtlasSource.new()
 	src_ost.texture = ImageTexture.create_from_image(vuota)
 	src_ost.texture_region_size = Vector2i(tile, tile)
-	src_ost.create_tile(Vector2i.ZERO)
 	ts_ost.add_source(src_ost, 0)
-	var td: TileData = src_ost.get_tile_data(Vector2i.ZERO, 0)
 	var h: float = tile / 2.0
-	td.add_collision_polygon(0)
-	td.set_collision_polygon_points(0, 0, PackedVector2Array([
-		Vector2(-h, -h), Vector2(h, -h), Vector2(h, h), Vector2(-h, h)]))
+	for strato in 2:
+		src_ost.create_tile(Vector2i(strato, 0))
+		var td: TileData = src_ost.get_tile_data(Vector2i(strato, 0), 0)
+		td.add_collision_polygon(strato)
+		td.set_collision_polygon_points(strato, 0, PackedVector2Array([
+			Vector2(-h, -h), Vector2(h, -h), Vector2(h, h), Vector2(-h, h)]))
 	_ostacoli = TileMapLayer.new()
 	_ostacoli.name = "Ostacoli"
 	_ostacoli.tile_set = ts_ost
@@ -415,10 +425,20 @@ func bloccata(x: int, y: int) -> bool:
 	return not _dentro(x, y) or _blocchi[y * larghezza + x] > 0
 
 
+## Un dislivello (parete senza scala, bordo alto di un gradone): a piedi no, in volo si'.
+func dislivello(x: int, y: int) -> bool:
+	return _dentro(x, y) and _blocchi[y * larghezza + x] == DISLIVELLO
+
+
 func regione_a(x: int, y: int) -> String:
 	if not _dentro(x, y):
 		return ""
 	return str((dati["regioni"] as Array)[_regioni[y * larghezza + x]])
+
+
+## blocchi.png grezzo (1 byte per casella: 0 libera, 128 dislivello, 255 acqua/vuoto).
+func blocchi_grezzi() -> PackedByteArray:
+	return _blocchi
 
 
 func blocchi_caricati() -> int:
@@ -443,7 +463,7 @@ func _costruisci(b: Vector2i) -> void:
 				src.create_tile(at)
 			_terreno.set_cell(Vector2i(x, y), foglio, at)
 			if bloccata(x, y):
-				_ostacoli.set_cell(Vector2i(x, y), 0, Vector2i.ZERO)
+				_ostacoli.set_cell(Vector2i(x, y), 0, Vector2i(1, 0) if dislivello(x, y) else Vector2i.ZERO)
 	var sprite: Array = []
 	for o in _oggetti_per_blocco.get(b, []):
 		var chiave: String = str(o[0])

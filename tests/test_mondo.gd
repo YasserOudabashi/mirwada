@@ -215,3 +215,110 @@ func test_il_main_parte_dal_mondo_unico() -> void:
 	assert_false(m.call("bloccata", c.x, c.y), "il nemico sta su una casella calpestabile")
 	assert_eq(str(m.call("regione_a", c.x, c.y)), "mirwada", "il nemico e' a Mirwada, vicino alla partenza")
 	main.free()
+
+
+# --- 2026-10-25: le Marche si raggiungono solo volando o dal sottosuolo ----------
+
+## Caselle raggiungibili dalla partenza: a piedi (solo caselle libere) o in volo
+## (anche i dislivelli, mai l'acqua o il vuoto).
+func _raggiungibili(m: Node2D, volo: bool) -> PackedByteArray:
+	var b: PackedByteArray = m.call("blocchi_grezzi")
+	var w: int = m.larghezza
+	var h: int = m.altezza
+	var visto := PackedByteArray()
+	visto.resize(w * h)
+	var p: Vector2 = m.call("partenza")
+	var inizio: int = int(p.y / m.tile) * w + int(p.x / m.tile)
+	var coda := PackedInt32Array([inizio])
+	visto[inizio] = 1
+	var i := 0
+	while i < coda.size():
+		var c: int = coda[i]
+		i += 1
+		var x: int = c % w
+		for n in [c - 1 if x > 0 else -1, c + 1 if x < w - 1 else -1, c - w, c + w]:
+			if n < 0 or n >= w * h or visto[n] == 1:
+				continue
+			var k: int = b[n]
+			if k == 0 or (volo and k != 255):
+				visto[n] = 1
+				coda.append(n)
+	return visto
+
+
+## raggio 2: il luogo o una casella accanto (un luogo puo' stare su un muro);
+## raggio 0: proprio la casella del luogo.
+func _luogo_raggiunto(m: Node2D, visto: PackedByteArray, luogo: String, raggio: int = 2) -> bool:
+	var l: Array = (m.dati["luoghi"] as Dictionary)[luogo]
+	for dy in range(-raggio, raggio + 1):
+		for dx in range(-raggio, raggio + 1):
+			var x: int = int(l[0]) + dx
+			var y: int = int(l[1]) + dy
+			if x >= 0 and y >= 0 and x < m.larghezza and y < m.altezza and visto[y * m.larghezza + x] == 1:
+				return true
+	return false
+
+
+func test_alle_regioni_senza_cammino_non_si_arriva_a_piedi_ma_volando_si() -> void:
+	var m: Node2D = _mondo()
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var piedi: PackedByteArray = _raggiungibili(m, false)
+	var volo: PackedByteArray = _raggiungibili(m, true)
+	var controllate := 0
+	for luogo in (m.dati["luoghi"] as Dictionary):
+		var l: Array = m.dati["luoghi"][luogo]
+		var rid: String = str(m.call("regione_a", int(l[0]), int(l[1])))
+		var reg: Dictionary = gd.call("get_region", rid)
+		if reg.is_empty() or rid == "frontiera_porte":
+			continue                                   # mare/isole; la Frontiera e' ancora da decidere
+		var accesso: Array = reg.get("accesso", ["a_piedi"])
+		if "a_piedi" in accesso:
+			assert_true(_luogo_raggiunto(m, piedi, luogo), "%s (%s) si raggiunge a piedi" % [luogo, rid])
+		else:
+			# la casella esatta: il Passo tra le Rupi sta sul bordo, ai suoi piedi si arriva
+			assert_false(_luogo_raggiunto(m, piedi, luogo, 0), "%s (%s) NON si raggiunge a piedi" % [luogo, rid])
+			if "volo" in accesso:
+				assert_true(_luogo_raggiunto(m, volo, luogo), "%s (%s) si raggiunge volando" % [luogo, rid])
+			controllate += 1
+	assert_true(controllate > 0, "almeno una regione chiusa a piedi (le Marche)")
+	m.free()
+
+
+func test_i_dislivelli_hanno_il_loro_strato_di_collisione() -> void:
+	var m: Node2D = _mondo()
+	var t: Array = (m.dati["luoghi"] as Dictionary)["trono_del_gigante"]
+	var p := Vector2(float(t[0]) * m.tile, float(t[1]) * m.tile)
+	m.call("segui", p)
+	var ost: TileMapLayer = m.get_node("Ostacoli")
+	var dislivelli := 0
+	var acqua := 0
+	var c := Vector2i(int(t[0]), int(t[1]))
+	for y in range(c.y - 24, c.y + 24):                # dentro i blocchi caricati
+		for x in range(c.x - 24, c.x + 24):
+			if not m.call("bloccata", x, y):
+				continue
+			var atlante: Vector2i = ost.get_cell_atlas_coords(Vector2i(x, y))
+			if m.call("dislivello", x, y):
+				assert_eq(atlante, Vector2i(1, 0), "dislivello sulla tessera dei dislivelli (%d, %d)" % [x, y])
+				dislivelli += 1
+			elif ost.get_cell_source_id(Vector2i(x, y)) >= 0:
+				assert_eq(atlante, Vector2i(0, 0), "acqua sulla tessera dei muri (%d, %d)" % [x, y])
+				acqua += 1
+	assert_true(dislivelli > 0, "attorno al Trono ci sono dislivelli")
+	var ts: TileSet = ost.tile_set
+	assert_eq(ts.get_physics_layer_collision_layer(1), 16, "i dislivelli stanno sullo strato 5")
+	m.free()
+
+
+func test_chi_vola_passa_i_dislivelli() -> void:
+	var p: CharacterBody2D = load("res://scenes/player.tscn").instantiate()
+	assert_true(p.get_collision_mask_value(1) and p.get_collision_mask_value(5), "a piedi: muri e dislivelli")
+	assert_false(p.call("in_volo"), "si parte a piedi")
+	p.call("imposta_volo", true)
+	assert_true(p.call("in_volo"), "in volo")
+	assert_false(p.get_collision_mask_value(5), "in volo i dislivelli non fermano")
+	assert_true(p.get_collision_mask_value(1), "in volo l'acqua ferma ancora")
+	var e: CharacterBody2D = load("res://scenes/enemy.tscn").instantiate()
+	assert_true(e.get_collision_mask_value(5), "i nemici non scendono dai dislivelli")
+	p.free()
+	e.free()

@@ -14081,3 +14081,28 @@ schema_version invariato (23).
 PROSSIMA FASE: Fase 12 - Atto II e Atto III (PRD gia' scritto in
 006_PRD/prd-fase-12-atto-2-3.md, story US-1201..US-1213 - da convertire
 in un nuovo prd.json con /ralph quando si decide di iniziarla).
+
+## US-8B12e — collisioni corrette, Marche solo volando o dal sottosuolo (decisione utente), 2026-10-25
+- Trovato nel controllo del progetto: dalla partenza le Marche (Trono, Soglia, Campo di battaglia) non si
+  raggiungevano a piedi, per errore. Due cause in tools/art/esporta_mondo.py blocchi():
+  (1) il vicino "a nord" era quello a sud (B.sposta(alt, -1, 0) = casella sotto): bloccava la fila in cima a
+  ogni scala/rampa e lasciava aperti i bordi nord (si cadeva o si saliva su gradini invisibili);
+  (2) strade e sentieri non attraversavano nessun dislivello: dentro le Marche il sentiero del Trono era rotto.
+- Decisione dell'utente (2026-10-25): alle Marche si arriva solo VOLANDO o dal SOTTOSUOLO. Quindi:
+  - blocchi.png ora ha 3 valori: 0 libera, 128 dislivello (a piedi no, in volo si'), 255 acqua o vuoto (mai);
+  - strade e sentieri passano i dislivelli solo se tutti e 4 i vicini sono della stessa regione: il Passo tra
+    le Rupi (sul confine) resta un salto, il sentiero del Trono (dentro le Marche) si cammina;
+  - regions.json marche_crepuscolo "accesso": ["volo", "sottosuolo"] (vocabolario chiuso nel validator:
+    a_piedi, volo, sottosuolo; assente = a piedi).
+  - Comando: python tools/art/esporta_mondo.py --solo-blocchi (riscrive solo blocchi.png, identico alla prova).
+- Gioco: mondo.gd mette i dislivelli su un loro strato di collisione (5, bit 16), l'acqua resta sullo strato
+  dei muri; giocatore e nemici hanno collision_mask 17; player.gd imposta_volo()/in_volo() toglie lo strato 5.
+  Chi concede il volo e' ancora da decidere (nessuna primitiva di volo nel registro chiuso).
+  Bug del merge sistemato: player._respawn non trovava il mondo (il giocatore ora sta dentro il nodo mondo).
+- Verifica: Python sulla mappa (a piedi: Mirwada/Valle/Archivio/terra di mezzo 100%, Marche 0%; in volo Marche
+  100%; dentro le Marche a piedi 99,6%, Trono compreso, senza uscire); 3 test nuovi in test_mondo (BFS a piedi
+  e in volo guidata da "accesso", strati di collisione, maschere di giocatore e nemici); prova fisica in Godot:
+  spinto verso il Passo il giocatore si ferma a (465, 110) a piedi, in volo arriva a (455, 82) nelle Marche.
+  validate 0, 973 test passati (tools/run_tests.sh).
+- Aperto: il passaggio dal sottosuolo (task successivo); chi sa volare; la primitiva teleport sposta il
+  giocatore senza controllare le collisioni (puo' saltare un bordo o finire in acqua).

@@ -179,6 +179,17 @@ func teleport_verso(spec: Dictionary) -> void:
 	global_position += dir.normalized() * distanza
 
 
+## Volo (decisione 2026-10-25): chi vola passa i dislivelli del mondo generato
+## (strato 5, scripts/world/mondo.gd STRATO_DISLIVELLI) ma non l'acqua ne' il
+## vuoto. Alle Marche del Crepuscolo si arriva solo cosi' o dal sottosuolo.
+func imposta_volo(attivo: bool) -> void:
+	set_collision_mask_value(5, not attivo)
+
+
+func in_volo() -> bool:
+	return not get_collision_mask_value(5)
+
+
 func sta_attaccando() -> bool:
 	return _attaccando
 
@@ -308,7 +319,9 @@ func _su_morte() -> void:
 ## "viaggia_a") e resuscita a hp pieni.
 func _respawn() -> void:
 	var regione: Node = _regione_corrente()
-	if regione != null and regione.has_method("punto_spawn"):
+	if regione != null and regione.has_method("colloca"):
+		regione.call("colloca", self, regione.call("punto_spawn"))   # mondo generato: anche la telecamera
+	elif regione != null and regione.has_method("punto_spawn"):
 		global_position = regione.call("punto_spawn")
 	_stats.call("revivi")
 	_hurtbox.call("set_invulnerabile", false)
@@ -320,6 +333,8 @@ func _regione_corrente() -> Node:
 	var padre: Node = get_parent()
 	if padre == null:
 		return null
+	if padre.has_method("viaggia_a"):          # mondo generato: il giocatore sta dentro il nodo mondo
+		return padre
 	for c in padre.get_children():
 		if c.has_method("viaggia_a"):
 			return c

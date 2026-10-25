@@ -4,6 +4,7 @@ Esporta il mondo di prova (seed 6) per il gioco (US-8B12): Godot carica questi f
 
     python tools/art/esporta_mondo.py                 # tutte e due le modalita' (luminoso + cupo)
     python tools/art/esporta_mondo.py --tema cupo     # una sola
+    python tools/art/esporta_mondo.py --solo-blocchi  # solo le collisioni (blocchi.png), pochi minuti
 
 Il terreno con pareti, bordi e varianti si compone qui in Python, a blocchi, esattamente come le anteprime
 (build_world.ritaglio); poi si tengono solo le caselle 32x32 diverse (34 mila su 1,2 milioni): fogli-atlante + una
@@ -12,7 +13,7 @@ sprite a parte, ordinati per profondita' nel gioco. L'acqua per ora e' ferma (fr
 
 assets/world/
     mondo.json              dati comuni ai due temi: misure, tile, partenza, luoghi, fogli, oggetti
-    blocchi.png             1 px per casella: 255 = non si passa (acqua, vuoto, pareti, salti di lato)
+    blocchi.png             1 px per casella: 255 = acqua o vuoto, 128 = dislivello (a piedi no, in volo si'), 0 = libera
     regioni.png             1 px per casella: indice della regione (mondo.json "regioni")
     <tema>/tessere_<k>.png  fogli-atlante, 64 x 128 tessere da 32 px
     <tema>/indici.png       1 px per casella: indice della tessera (R = byte basso, G = byte alto)
@@ -63,16 +64,33 @@ def tessere(w):
     return lista, indici
 
 
+ACQUA, DISLIVELLO = 255, 128
+
+
 def blocchi(w):
-    """255 = non si passa: acqua e vuoto, pareti senza scala o rampa, e i salti di lato o verso nord (il bordo alto
-    di un gradone: si sale e si scende solo dalle pareti a sud, con scale e rampe)."""
+    """Per casella: 255 = acqua o vuoto (non si passa mai), 128 = dislivello (non si passa a piedi, volando si'),
+    0 = libera. Dislivello: le pareti senza scala o rampa e i bordi alti dei gradoni verso est, ovest e nord (si
+    sale e si scende solo dalle pareti a sud, con scale e rampe). Strade e sentieri attraversano i dislivelli solo
+    dentro una stessa regione: al confine (il Passo tra le Rupi, sotto le Marche) il salto resta.
+    2026-10-25: il vicino "a nord" era quello a sud (sposta(alt, -1, 0) e' la casella sotto): bloccava la fila in
+    cima a ogni scala e lasciava aperti i bordi nord."""
     alt = w.alt
     faccia = maschera_pareti(alt, w.mat_par)
-    b = w.water_mask.copy() | (faccia & (w.pas == "."))
-    for sy, sx in ((0, 1), (0, -1), (-1, 0)):                 # vicino a est, ovest, nord piu' basso
+    salto = faccia & (w.pas == ".")
+    for sy, sx in ((0, 1), (0, -1), (1, 0)):                  # vicino a ovest, est, nord piu' basso
         vic = B.sposta(alt, sy, sx, -99)
-        b |= (vic < alt) & (vic != -99) & ~faccia
-    return np.where(b, 255, 0).astype(np.uint8)
+        salto |= (vic < alt) & (vic != -99) & ~faccia
+    strada = np.zeros(alt.shape, bool)
+    for s in list(w.roads) + list(w.sentieri):
+        for x, y in s:
+            strada[y, x] = True
+    stessa = np.ones(alt.shape, bool)                          # tutti e 4 i vicini nella regione della casella
+    for sy, sx in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+        stessa &= B.sposta(w.biome, sy, sx, -1) == w.biome
+    salto &= ~(strada & stessa)
+    out = np.where(salto, DISLIVELLO, 0).astype(np.uint8)
+    out[w.water_mask] = ACQUA
+    return out
 
 
 def oggetti(w, cartella):
@@ -96,10 +114,14 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--tema", choices=["luminoso", "cupo"])
     ap.add_argument("--seed", type=int, default=6)
+    ap.add_argument("--solo-blocchi", action="store_true", help="riscrive solo blocchi.png (le collisioni)")
     a = ap.parse_args()
     w, luoghi, villaggi, sotto = B.genera(a.seed)
     os.makedirs(OUT, exist_ok=True)
     Image.fromarray(blocchi(w)).save(os.path.join(OUT, "blocchi.png"))
+    if a.solo_blocchi:
+        print("->", os.path.join(OUT, "blocchi.png"))
+        return
     Image.fromarray(w.biome.astype(np.uint8)).save(os.path.join(OUT, "regioni.png"))
     fogli, sprite, lista = {}, {}, []
     for t in ([a.tema] if a.tema else ["luminoso", "cupo"]):
