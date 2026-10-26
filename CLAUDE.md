@@ -229,6 +229,7 @@ python tools/art/esporta_mondo.py --solo-blocchi   # solo le collisioni (blocchi
 python tools/art/esporta_mondo.py --sottosuolo     # solo il sottosuolo (~5 minuti)
 python tools/art/esporta_mondo.py --solo-dati      # solo i riquadri delle regioni in mondo.json
 python tools/art/esporta_mondo.py --edifici        # solo gli edifici: sprite, mondo.json, blocchi.png (~5 minuti)
+python tools/art/esporta_mondo.py --varchi         # solo i disegni dei varchi delle sotto-aree (pochi secondi)
 python tools/art/build_interni.py              # interni: pavimenti, pareti e arredi -> assets/interni/<tema>/
 python tools/art/build_npc.py                  # aspetti degli NPC (personaggio_<aspetto>_{idle,walk}.png)
 python tools/art/build_libro.py                # carta, segnalibri, caselle e filetto del libro (assets/ui/)
@@ -301,7 +302,7 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   pareti, mondo generato (seed 6) con modalita' luminosa/cupa, mondo unico nel gioco (US-8B12..g:
   caricatore, regione dalla posizione, NPC, collisioni, sottosuolo, contenuto dei layout), libro (US-8B73),
   edifici di citta', villaggi e torri con le porte verso i 14 interni (US-8B18a/b), interni disegnati e
-  arredati (US-8B18c/d).
+  arredati (US-8B18c/d), varchi delle sotto-aree come ingressi (US-8B21a).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.

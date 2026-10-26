@@ -83,6 +83,7 @@ func _ready() -> void:
 	crea_ingressi()
 	popola()
 	crea_porte()
+	crea_varchi()
 	var t := Timer.new()
 	t.wait_time = INTERVALLO_ATTIVITA
 	t.autostart = true
@@ -463,6 +464,7 @@ func _su_nemico_morto(chi: Node, rid: String) -> void:
 ## come in world_scene.gd: qui serve anche perche' lontano dal giocatore le collisioni
 ## del terreno non sono costruite (si costruiscono solo i blocchi vicini).
 func _aggiorna_attivita() -> void:
+	_aggiorna_varchi()
 	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D if is_inside_tree() else null
 	if p == null:
 		return
@@ -569,7 +571,12 @@ func _porta(iid: String, c: Vector2i, liv: String) -> Area2D:
 	var prompt := Label.new()
 	prompt.name = "Prompt"
 	prompt.add_theme_font_size_override("font_size", 10)
-	prompt.position = Vector2(-tile, tile * 0.4)
+	prompt.size = Vector2(tile * 6, tile * 0.5)                # centrata sotto la porta, sopra rocce e alberi
+	prompt.position = Vector2(-tile * 3, tile * 0.4)
+	prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	prompt.z_index = 10
+	prompt.add_theme_constant_override("outline_size", 4)    # si legge anche sulla neve
+	prompt.add_theme_color_override("font_outline_color", Color("#181425"))
 	prompt.text = tr("HUD_PROMPT_ENTRA").format({"tasto": _tasto_interagisci()})
 	prompt.hide()
 	area.add_child(prompt)
@@ -593,7 +600,7 @@ func _su_porta(body: Node, area: Area2D, dentro: bool) -> void:
 ## si ferma, mai liberato) ed entra nella stanza, aggiunta accanto al mondo.
 func entra(porta: Area2D) -> bool:
 	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D if is_inside_tree() else null
-	if p == null or _interno != null or get_parent() == null:
+	if p == null or _interno != null or get_parent() == null or not varco_aperto(porta):
 		return false
 	var interno: Node = load("res://scenes/interior_scene.tscn").instantiate()
 	interno.set("interno_id", str(porta.get_meta("interno_id")))
@@ -649,6 +656,117 @@ func riprendi(liv: String, pos: Vector2) -> void:
 	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D
 	if p != null:
 		colloca(p, pos)
+
+
+# --- Varchi verso le sotto-aree (US-8B21a) ----------------------------------------
+# Un'area del gating di regions.json con "varco" {luogo, scostamento, interno, aspetto} e'
+# un ingresso sulla mappa verso il suo interno (decisione dell'utente 2026-10-26): la porta
+# si apre solo se AreaGate.valuta_gate lo dice. Il varco si appoggia a una parete vicina
+# (roccia, acqua) se c'e', altrimenti sta in piedi da solo, con la sua collisione.
+
+const RAGGIO_PARETE := 12
+var _spiazzi: Array = []                    # Rect2i attorno ai varchi: niente alberi o rocce davanti
+
+func crea_varchi() -> void:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	if gd == null:
+		return
+	for reg in gd.call("get_regions"):
+		var rid: String = str((reg as Dictionary).get("id", ""))
+		for g in (reg as Dictionary).get("gating", []):
+			var v: Dictionary = (g as Dictionary).get("varco", {})
+			var base: Vector2i = _luogo_varco(str(v.get("luogo", "")))
+			if v.is_empty() or base.x < 0:
+				continue
+			var sc: Array = v.get("scostamento", [0, 0])
+			var posto: Dictionary = posto_del_varco(base + Vector2i(int(sc[0]), int(sc[1])), rid)
+			var porta: Area2D = _porta(str(v["interno"]), posto["cella"], "superficie")
+			porta.name = "Varco_%s" % str((g as Dictionary).get("area", ""))
+			porta.set_meta("gate", g)
+			porta.set_meta("regione", rid)
+			for stato in ["chiuso", "aperto"]:                # il disegno sta sulla casella dietro la porta
+				var chiave: String = "varco_%s_%s" % [str(v.get("aspetto", "")), stato]
+				var meta: Dictionary = (dati["sprite"] as Dictionary).get(chiave, {})
+				var spr := Sprite2D.new()
+				spr.name = stato.capitalize()
+				spr.texture = _texture_oggetto(chiave)
+				spr.centered = false
+				spr.offset = Vector2(-float(meta.get("ax", 0)), -float(meta.get("ay", 0)) - tile * 0.5)
+				porta.add_child(spr)
+			if not posto["parete"]:                          # in piedi da solo: non ci si passa attraverso
+				var corpo := StaticBody2D.new()
+				corpo.collision_layer = STRATO_COLLISIONE
+				var forma := CollisionShape2D.new()
+				var rect := RectangleShape2D.new()
+				rect.size = Vector2(tile * 3, tile)
+				forma.shape = rect
+				forma.position = Vector2(0, -tile)
+				corpo.add_child(forma)
+				porta.add_child(corpo)
+			add_child(porta)
+			var cv: Vector2i = posto["cella"]
+			_spiazzi.append(Rect2i(cv.x - 3, cv.y - 2, 7, 7))   # le chiome davanti coprirebbero varco e soglia
+	for b in _caricati.keys():                                # i blocchi gia' costruiti si rifanno senza
+		_scarica(b)
+	_blocco_centro = Vector2i(-9999, -9999)
+	_aggiorna_varchi()
+
+
+## La casella del varco vicino a c nella regione rid: davanti a una parete (le 3 caselle
+## a nord bloccate, non una casa) entro RAGGIO_PARETE; se non c'e', la casella libera piu'
+## vicina con libere anche le 3 caselle a nord (ci sta il disegno). Sempre con le 2 sotto
+## libere. -> {cella, parete}
+func posto_del_varco(c: Vector2i, rid: String) -> Dictionary:
+	for parete in [true, false]:
+		for r in range(0, RAGGIO_PARETE if parete else 120):
+			for dy in range(-r, r + 1):
+				for dx in range(-r, r + 1):
+					if maxi(absi(dx), absi(dy)) != r:
+						continue
+					var q := Vector2i(c.x + dx, c.y + dy)
+					if _varco_sta(q, rid, parete):
+						return {"cella": q, "parete": parete}
+	return {"cella": c, "parete": false}
+
+
+func _varco_sta(q: Vector2i, rid: String, parete: bool) -> bool:
+	if q.x < 1 or q.y < 1 or q.x >= larghezza - 1 or q.y >= altezza - 3 or regione_a(q.x, q.y) != rid:
+		return false
+	if bloccata(q.x, q.y) or bloccata(q.x, q.y + 1) or bloccata(q.x, q.y + 2):
+		return false
+	for dx in [-1, 0, 1]:
+		if bloccata(q.x + dx, q.y - 1) != parete or (parete and _in_una_casa(q.x + dx, q.y - 1)):
+			return false
+	return true
+
+
+func _in_una_casa(x: int, y: int) -> bool:
+	for e in dati.get("edifici", []):
+		if x >= int(e[0]) and y >= int(e[1]) and x < int(e[0]) + int(e[2]) and y < int(e[1]) + int(e[3]):
+			return true
+	return false
+
+
+## Un luogo della mappa (mondo.json luoghi) o un punto del sottosuolo (sottosuolo.boss).
+func _luogo_varco(nome: String) -> Vector2i:
+	var p: Array = (dati.get("luoghi", {}) as Dictionary).get(nome, ((dati.get("sottosuolo", {}) as Dictionary).get("boss", {}) as Dictionary).get(nome, []))
+	return Vector2i(int(p[0]), int(p[1])) if p.size() == 2 else Vector2i(-1, -1)
+
+
+## true per una porta senza varco o con il varco aperto ora.
+func varco_aperto(porta: Area2D) -> bool:
+	return not porta.has_meta("gate") or AreaGate.valuta_gate(str(porta.get_meta("regione")),
+			porta.get_meta("gate"), Engine.get_main_loop().root)
+
+
+func _aggiorna_varchi() -> void:
+	for c in get_children():
+		if c is Area2D and c.has_meta("gate"):
+			var ap: bool = varco_aperto(c)
+			(c.get_node("Chiuso") as CanvasItem).visible = not ap
+			(c.get_node("Aperto") as CanvasItem).visible = ap
+			(c.get_node("Prompt") as Label).text = tr("HUD_PROMPT_ENTRA" if ap else "HUD_VARCO_CHIUSO").format(
+					{"tasto": _tasto_interagisci()})
 
 
 # --- Sottosuolo: ingressi e cambio di livello (2026-10-25) ------------------------
@@ -1013,6 +1131,8 @@ func _costruisci(b: Vector2i) -> void:
 				_ostacoli.set_cell(Vector2i(x, y), 0, Vector2i(1, 0) if dislivello(x, y) else Vector2i.ZERO)
 	var sprite: Array = []
 	for o in _oggetti_per_blocco.get(b, []):
+		if livello == "superficie" and _nello_spiazzo(Vector2i(int(o[1]), int(o[2]))):
+			continue
 		var chiave: String = str(o[0])
 		var meta: Dictionary = (dati["sprite"] as Dictionary).get(chiave, {})
 		var s := Sprite2D.new()
@@ -1023,6 +1143,13 @@ func _costruisci(b: Vector2i) -> void:
 		add_child(s)
 		sprite.append(s)
 	_caricati[b] = sprite
+
+
+func _nello_spiazzo(c: Vector2i) -> bool:
+	for r in _spiazzi:
+		if (r as Rect2i).has_point(c):
+			return true
+	return false
 
 
 func _scarica(b: Vector2i) -> void:

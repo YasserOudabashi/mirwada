@@ -300,6 +300,30 @@ def esporta_edifici(w, luoghi, villaggi, temi):
     return lista
 
 
+def esporta_varchi(temi):
+    """US-8B21a: i varchi delle sotto-aree (forge3d.creatures.varco), chiusi e aperti, tra gli oggetti di ogni tema
+    (<tema>/oggetti/varco_<aspetto>_<chiuso|aperto>.png) con le ancore in mondo.json "sprite". Dove stanno lo
+    decidono i dati (regions.json gating[].varco) e mondo.gd crea_varchi()."""
+    from forge3d.creatures import ASPETTI_VARCO
+    sprite = {}
+    for t in temi:
+        tema.imposta(t)
+        cart = os.path.join(OUT, t, "oggetti")
+        for a in ASPETTI_VARCO:
+            for stato, aperto in (("chiuso", False), ("aperto", True)):
+                img, ax, ay = object_sprite({"type": "varco", "kind": a, "aperto": aperto, "seed": 1}, T)
+                k = f"varco_{a}_{stato}"
+                Image.fromarray(img).save(os.path.join(cart, k + ".png"))
+                sprite[k] = {"ax": int(ax), "ay": int(ay)}
+        print(f"  {t}: {len(sprite)} sprite di varchi")
+    path = os.path.join(OUT, "mondo.json")
+    dati = json.load(open(path))
+    dati["sprite"] = {k: v for k, v in dati["sprite"].items() if not k.startswith("varco_")}
+    dati["sprite"].update(sprite)
+    with open(path, "w") as f:
+        json.dump(dati, f, separators=(",", ":"))
+
+
 def blocchi(w, senza_edifici=False):
     """Per casella: 255 = acqua o vuoto (non si passa mai), 128 = dislivello (non si passa a piedi, volando si'),
     0 = libera. Dislivello: le pareti senza scala o rampa e i bordi alti dei gradoni verso est, ovest e nord (si
@@ -449,7 +473,12 @@ def main():
     ap.add_argument("--sottosuolo", action="store_true", help="solo il sottosuolo (secondo livello)")
     ap.add_argument("--solo-dati", action="store_true", help="solo i dati ricavati da regioni.png (riquadri)")
     ap.add_argument("--edifici", action="store_true", help="solo gli edifici della citta' (sprite, dati, collisioni)")
+    ap.add_argument("--varchi", action="store_true", help="solo i disegni dei varchi delle sotto-aree (pochi secondi)")
     a = ap.parse_args()
+    if a.varchi:
+        esporta_varchi([a.tema] if a.tema else ["luminoso", "cupo"])
+        print("->", os.path.join(OUT, "mondo.json"))
+        return
     if a.solo_dati:
         aggiorna_dati()
         print("->", os.path.join(OUT, "mondo.json"))
@@ -496,6 +525,7 @@ def main():
     with open(vecchio, "w") as f:
         json.dump(dati, f, separators=(",", ":"))
     esporta_edifici(w, luoghi, villaggi, [a.tema] if a.tema else ["luminoso", "cupo"])
+    esporta_varchi([a.tema] if a.tema else ["luminoso", "cupo"])
     print("->", OUT)
 
 

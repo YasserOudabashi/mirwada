@@ -14294,3 +14294,28 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   mondo (resta il gating di sequenza). -> US-8B95.
 - Barca: barca libera al molo di Mirwada, in barca l'acqua si attraversa, si sbarca sulle coste. -> US-8B91.
 - Scritte in CLAUDE.md (decisioni prese), prd-fase-8b-arte.md, prossimi-passi.md, prd.json.
+
+## US-8B21a — varchi come ingressi verso le sotto-aree, 2026-10-26
+- Dati: regions.json gating[].varco {luogo, scostamento, interno, aspetto} per le 6 sotto-aree (cripte e passaggi
+  d'ombra nelle Marche, ponti di radici e grotte di marea nella Valle, ali interne dell'Archivio, isole di nebbia
+  della Frontiera). Il luogo e' un luogo di mondo.json o un punto del sottosuolo (la cripta sta sopra le catacombe).
+  Sei interni nuovi (marche_cripta, marche_tempio_ombra, valle_radura_altare, valle_grotta_di_marea,
+  archivio_sala_dei_sigilli, frontiera_isola_nebbia), per ora con stili e arredi gia' esistenti (US-8B21b).
+- Arte: forge3d creatures.varco(aspetto, aperto): mausoleo con la grata, arco di roccia con un'ombra viola che non
+  segue la luce, burrone con radici spezzate / ponte di radici, cumulo di roccia con la bocca allagata dalla marea,
+  porta di pietra con un anello di glifi (la prima versione faceva una croce: cambiata), cornice di porta piena di
+  nebbia / buia con il bordo viola. python tools/art/esporta_mondo.py --varchi (pochi secondi, seed 1): 12 disegni
+  per tema in <tema>/oggetti/, ancore in mondo.json (cambia solo "sprite").
+- mondo.gd crea_varchi(): la porta (stessa di US-8B18b) con i due disegni, si appoggia a una parete vicina (roccia,
+  acqua; non una casa) entro 12 caselle, altrimenti sta in piedi da sola con la sua collisione; attorno uno spiazzo
+  senza alberi e rocce (le chiome coprivano varco e giocatore: visto nella Valle). entra() solo se
+  AreaGate.valuta_gate dice aperto; chiuso/aperto si aggiorna col timer delle attivita'; scritta "Il passaggio e'
+  chiuso" (HUD_VARCO_CHIUSO) senza dire come si apre. Le scritte delle porte ora sono centrate, sopra tutto e con
+  il contorno d'inchiostro (bianche sulla neve non si leggevano).
+- Validator: varco.interno esiste, luogo esiste nel mondo, i disegni chiuso/aperto ci sono nei due temi.
+- Verifica: 2 test nuovi in test_mondo (sei varchi nella loro regione, su caselle libere, verso il loro interno,
+  spiazzo sgombro; chiuso non si entra e lo dice, con la conoscenza si apre, si entra nella sala dei sigilli e si
+  torna davanti al varco). Prova a schermo dei sei varchi chiusi, aperti e da dentro
+  (arte/revisione/varchi_in_gioco.png). validate 0, 992 test.
+- Aperto: il contenuto delle zone legate ai varchi e' ancora all'aperto, gli interni delle sotto-aree hanno stili
+  provvisori (US-8B21b). Il gate di sequenza della Frontiera (area "ingresso") resta sull'ingresso della regione.

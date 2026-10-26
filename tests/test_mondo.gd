@@ -577,3 +577,60 @@ func test_salvare_dentro_un_interno_riporta_davanti_alla_porta() -> void:
 	assert_eq(p.position, sotto, "nel punto salvato")
 	m.call("cambia_livello", "superficie")
 	main.free()
+
+
+# --- US-8B21a: varchi come ingressi verso le sotto-aree -------------------------------
+
+func test_ogni_varco_e_un_ingresso_nella_sua_regione() -> void:
+	var m: Node2D = _mondo()
+	m.call("crea_varchi")
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var visti := 0
+	for reg in gd.call("get_regions"):
+		for g in (reg as Dictionary).get("gating", []):
+			if not (g as Dictionary).has("varco"):
+				continue
+			visti += 1
+			var porta: Area2D = m.get_node_or_null("Varco_%s" % g["area"])
+			assert_true(porta != null, "il varco %s e' sulla mappa" % g["area"])
+			if porta == null:
+				continue
+			var c: Vector2i = _cella(m, porta.position)
+			assert_eq(str(m.call("regione_a", c.x, c.y)), str(reg["id"]), "%s nella sua regione" % g["area"])
+			assert_false(m.call("bloccata", c.x, c.y), "%s su una casella libera" % g["area"])
+			assert_eq(str(porta.get_meta("interno_id")), str(g["varco"]["interno"]), "%s porta al suo interno" % g["area"])
+			assert_false((gd.call("get_interno", str(g["varco"]["interno"])) as Dictionary).is_empty(), "l'interno esiste")
+			assert_true(porta.get_node("Chiuso") != null and porta.get_node("Aperto") != null, "disegno chiuso e aperto")
+			m.call("segui", porta.position)
+			for o in m.get_children():                   # davanti al varco niente alberi o rocce
+				if o is Sprite2D:
+					var co: Vector2i = _cella(m, (o as Sprite2D).position)
+					assert_false(Rect2i(c.x - 3, c.y - 2, 7, 7).has_point(co), "spiazzo sgombro davanti a %s" % g["area"])
+	assert_eq(visti, 6, "sei sotto-aree con un varco")
+	m.free()
+
+
+func test_un_varco_chiuso_non_fa_entrare_e_aperto_si() -> void:
+	var ks: Node = Engine.get_main_loop().root.get_node("KnowledgeStore")
+	ks.call("dimentica", "testi_ordine_minore")
+	var main := Node2D.new()
+	var m: Node2D = _mondo()
+	main.add_child(m)
+	var p := CharacterBody2D.new()
+	p.add_to_group("player")
+	m.add_child(p)
+	Engine.get_main_loop().root.add_child(main)
+	var varco: Area2D = m.get_node("Varco_ali_interne")
+	m.call("_aggiorna_varchi")
+	assert_true((varco.get_node("Chiuso") as CanvasItem).visible, "senza la conoscenza il varco e' chiuso")
+	assert_eq((varco.get_node("Prompt") as Label).text, tr("HUD_VARCO_CHIUSO"), "e lo dice, senza dire come si apre")
+	assert_false(m.call("entra", varco), "chiuso non si entra")
+	ks.call("impara", "testi_ordine_minore")
+	m.call("_aggiorna_varchi")
+	assert_true((varco.get_node("Aperto") as CanvasItem).visible, "con la conoscenza si apre")
+	assert_true(m.call("entra", varco), "aperto si entra")
+	assert_eq(p.get_parent().get("interno_id"), "archivio_sala_dei_sigilli", "nella sala dei sigilli")
+	m.call("esci")
+	assert_true(p.position.distance_to(varco.position) < 1.0, "e si torna davanti al varco")
+	ks.call("dimentica", "testi_ordine_minore")
+	main.free()

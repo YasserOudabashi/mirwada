@@ -441,6 +441,116 @@ def ingresso(kind="scale", seed=1, size=1.0):
     return r
 
 
+ASPETTI_VARCO = ("cancello_cripta", "arco_ombra", "ponte_radici", "grotta", "porta_glifi", "soglia_nebbia")
+
+
+def varco(aspetto, aperto=False, seed=1, size=1.0):
+    """Varchi verso le sotto-aree (US-8B21a): un oggetto che sta in piedi da solo davanti alla sua porta, chiuso o
+    aperto. Misure in unita' (32 per casella), origine al centro del lato davanti, il davanti guarda +y; la
+    profondita' del modello e' divisa per SENO_CAMERA come negli edifici. Il giocatore deve capire che c'e' un
+    passaggio, non come si apre: chiuso = sbarrato (grata, ombra che non segue la luce, radici spezzate, marea alta,
+    glifi accesi, nebbia), aperto = la via libera."""
+    rnd = random.Random(seed)
+    r = Rig(f"varco_{aspetto}_{int(aperto)}"); r.scale = size
+    r.joint("v", "root", (0, 0, 0))
+    P = 1.0 / SENO_CAMERA
+    cy = -16 * P                                          # il centro della casella dietro la porta
+
+    def box(dim, pos, mat, rot=(0, 0, 0)):
+        r.part("v", "box", dim, pos, mat=mat, rot=rot)
+
+    def ell(dim, pos, mat):
+        r.part("v", "ellipsoid", dim, pos, mat=mat)
+
+    if aspetto == "cancello_cripta":                      # mausoleo: zoccolo, colonne, timpano, porta con la grata
+        box((40, 24, 3), (0, cy, 3), "stone_light")
+        box((28, 18, 20), (0, cy - 2, 26), "stone")
+        box((33, 22, 3), (0, cy - 2, 49), "stone_light")
+        box((24, 16, 4), (0, cy - 2, 56), "stone")
+        for sx in (-1, 1):
+            r.part("v", "cylinder", (3, 3, 20), (sx * 23, cy + 12, 26), mat="stone_light")
+        fronte = cy - 2 + 18
+        box((9, 1.0, 14), (0, fronte + 0.6, 20), "shadow_mat")
+        if aperto:
+            box((9, 4, 1), (0, fronte + 4, 4), "stone")
+        else:
+            for k in range(5):
+                box((0.8, 1.2, 13.5), (-8 + k * 4, fronte + 1.6, 20), "iron")
+            box((9.5, 1.2, 0.9), (0, fronte + 1.7, 26), "iron")
+    elif aspetto == "arco_ombra":                         # due pilastri di roccia e un architrave storti
+        for sx in (-1, 1):
+            box((7, 9, 24), (sx * 16, cy, 24), "roccia_trono", rot=(rnd.uniform(-3, 3), 0, rnd.uniform(-4, 4)))
+        box((26, 10, 6), (0, cy, 52), "roccia_trono", rot=(0, rnd.uniform(-4, 4), 0))
+        if aperto:
+            box((9, 8, 0.4), (0, cy, 0.4), "stone")
+        else:                                             # un'ombra troppo scura, che non segue la luce
+            box((9, 2, 23), (0, cy, 23), "shadow_mat")
+            for sx in (-1, 1):
+                box((1.3, 2.2, 22), (sx * 8.2, cy + 0.4, 23), "glow_purple")
+            box((9, 2.2, 1.3), (0, cy + 0.4, 45), "glow_purple")
+            for k in range(4):                            # filamenti che si muovono contro la luce
+                box((0.8, 2.3, 0.8), (rnd.uniform(-5, 5), cy + 0.5, rnd.uniform(8, 40)), "glow_purple")
+    elif aspetto == "ponte_radici":                       # un burrone; aperto: le radici lo attraversano
+        r.part("v", "cylinder", (36, 15 * P, 0.3), (0, cy, 0.2), mat="stone")          # orlo di terra e sassi
+        r.part("v", "cylinder", (32, 13 * P, 0.3), (0, cy, 0.5), mat="shadow_mat")     # il vuoto
+        for sx in (-1, 1):
+            for sy in (-1, 1):
+                r.part("v", "cylinder", (4, 4, 5), (sx * 30, cy + sy * 9 * P, 5), mat="bark")
+        if aperto:                                        # radici intrecciate da un orlo all'altro
+            for k in (-7, -2.5, 2.5, 7):
+                box((2.2, 15 * P, 2.0), (k, cy, 3.5 - abs(k) * 0.15), "wood_light", rot=(0, 0, k * 1.2))
+            for k in range(7):
+                ell((3, 3, 2), (rnd.uniform(-9, 9), cy + rnd.uniform(-11, 11) * P, 6), "leaf")
+        else:                                             # radici spezzate che pendono nel vuoto
+            for sx in (-1, 1):
+                box((2.0, 5 * P, 2.0), (sx * 12, cy + 8 * P, 3), "wood_light", rot=(-35, 0, sx * 15))
+                box((2.0, 5 * P, 2.0), (sx * 10, cy - 8 * P, 3), "wood_light", rot=(35, 0, sx * 15))
+    elif aspetto == "grotta":                             # cumulo di roccia con la bocca; chiuso: la marea alta
+        ell((30, 18, 24), (0, cy - 4, 20), "stone")
+        ell((14, 10, 12), (-20, cy + 4, 10), "stone")
+        ell((12, 9, 10), (21, cy + 2, 9), "stone")
+        bocca = cy - 4 + 17
+        ell((10, 2, 13), (0, bocca, 11), "shadow_mat")
+        if aperto:
+            ell((5, 3, 1.2), (-4, bocca + 5, 1), "stone_light")
+            ell((4, 2.5, 1.0), (5, bocca + 7, 1), "stone_light")
+        else:
+            box((10, 1.5, 6), (0, bocca + 1.2, 5), "water")
+            ell((16, 6, 1.0), (0, bocca + 6, 0.8), "water")
+    elif aspetto == "porta_glifi":                        # porta sigillata con i glifi (Archivio, decisione 13/10)
+        box((22, 10, 2), (0, cy, 2), "stone_light")
+        for sx in (-1, 1):
+            box((4, 6, 22), (sx * 14, cy, 24), "stone")
+        box((18, 6, 4), (0, cy, 49), "stone_light")
+        if aperto:
+            box((10, 1.0, 20), (0, cy + 5.6, 24), "shadow_mat")
+            for k in range(3):
+                box((9, 2, 0.6), (0, cy + 5 - k * 3, 3.5 - k), "stone")
+        else:
+            box((10, 2, 20), (0, cy + 4, 24), "stone")
+            for k in range(8):                            # un anello di glifi e uno al centro
+                a = k * math.pi / 4
+                box((1.6, 0.6, 1.6), (math.cos(a) * 6, cy + 6.2, 24 + math.sin(a) * 7), "glow_cyan")
+            box((1.4, 0.6, 1.4), (0, cy + 6.2, 24), "glow_cyan")
+    elif aspetto == "soglia_nebbia":                      # una cornice di porta sola; chiuso: la nebbia la riempie
+        for sx in (-1, 1):
+            box((2, 3, 25), (sx * 11, cy, 25), "intonaco_bianco")
+        box((13, 3, 2), (0, cy, 51), "intonaco_bianco")
+        box((13, 6, 1), (0, cy + 2, 1), "wood_light")
+        if aperto:                                        # dall'altra parte: il buio di un altro posto
+            box((9, 1, 24), (0, cy, 25), "shadow_mat")
+            for sx in (-1, 1):
+                box((1.2, 1.2, 24), (sx * 8.2, cy + 0.3, 25), "glow_purple")
+            box((9, 1.2, 1.2), (0, cy + 0.3, 48.4), "glow_purple")
+        else:
+            for k in range(9):
+                ell((rnd.uniform(5, 8), 4, rnd.uniform(4, 7)), (rnd.uniform(-6, 6), cy + rnd.uniform(-2, 3),
+                                                               rnd.uniform(4, 46)), "snow")
+    else:
+        raise ValueError(f"varco sconosciuto: {aspetto}")
+    return r
+
+
 def ossa(seed=1, size=1.0):
     """Ossa nella sabbia delle Marche: un teschio di bestia e qualche costola."""
     rnd = random.Random(seed)

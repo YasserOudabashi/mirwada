@@ -47,12 +47,14 @@
         {
           "tipo": "primitiva",
           "primitiva": "shadow_meld",
-          "area": "passaggi_ombra"
+          "area": "passaggi_ombra",
+          "varco": {"luogo": "passo_tra_rupi", "scostamento": [-22, -18], "interno": "marche_tempio_ombra", "aspetto": "arco_ombra"}
         },
         {
           "tipo": "momento",
           "valore": "notte_fonda",
-          "area": "cripte"
+          "area": "cripte",
+          "varco": {"luogo": "boss_catacombe", "scostamento": [0, 0], "interno": "marche_cripta", "aspetto": "cancello_cripta"}
         }
       ],
       "palette_visiva": "darkness"
@@ -78,12 +80,14 @@
         {
           "tipo": "primitiva",
           "primitiva": "plant_growth",
-          "area": "ponti_di_radici"
+          "area": "ponti_di_radici",
+          "varco": {"luogo": "radice_del_mondo", "scostamento": [-14, 16], "interno": "valle_radura_altare", "aspetto": "ponte_radici"}
         },
         {
           "tipo": "fase_lunare",
           "valore": "piena",
-          "area": "grotte_di_marea"
+          "area": "grotte_di_marea",
+          "varco": {"luogo": "grotte_di_marea", "scostamento": [-8, -6], "interno": "valle_grotta_di_marea", "aspetto": "grotta"}
         }
       ],
       "palette_visiva": "mother"
@@ -109,7 +113,8 @@
         {
           "tipo": "conoscenza",
           "valore": "testi_ordine_minore",
-          "area": "ali_interne"
+          "area": "ali_interne",
+          "varco": {"luogo": "scalinata_archivio", "scostamento": [-6, 3], "interno": "archivio_sala_dei_sigilli", "aspetto": "porta_glifi"}
         }
       ],
       "palette_visiva": "hermit"
@@ -140,7 +145,8 @@
         {
           "tipo": "primitiva",
           "primitiva": "teleport",
-          "area": "isole_nebbia"
+          "area": "isole_nebbia",
+          "varco": {"luogo": "approdo_frontiera", "scostamento": [0, 0], "interno": "frontiera_isola_nebbia", "aspetto": "soglia_nebbia"}
         }
       ],
       "palette_visiva": "fool"

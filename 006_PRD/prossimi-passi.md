@@ -29,9 +29,9 @@ sotto-aree, le **icone** degli oggetti, e nessuno sa ancora **volare**.
 
 ## 2. Ordine delle story
 
-1. **US-8B21a Varchi come ingressi** (decisione del 2026-10-26): ogni area del gating di `regions.json` e' un
-   ingresso sulla mappa verso un interno, `AreaGate` decide se si apre, la mappa approvata non cambia.
-   **US-8B21b**: il contenuto delle zone legate ai varchi dentro gli interni, stili e arredi nuovi.
+1. **US-8B21b Dentro le sotto-aree**: il contenuto delle zone legate ai varchi dentro gli interni, stili e arredi
+   nuovi. Fatta la US-8B21a (2026-10-26): i sei varchi sono ingressi sulla mappa (`regions.json` gating[].varco,
+   `mondo.gd crea_varchi`, disegni da `esporta_mondo.py --varchi`).
 2. **US-8B91 Barca dal porto** (molo di Mirwada, in barca l'acqua si attraversa), **US-8B93 Volo** (si sblocca
    con una chiave del mondo, per tutti i Pathway), **US-8B95 Accesso alla Frontiera** (barca, volo, o soglia nel
    faro con una chiave trovata nel mondo; resta il gating di sequenza). Tutto deciso il 2026-10-26.

@@ -185,8 +185,8 @@
       ],
       "priority": 12,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Sei varchi (regions.json gating[].varco), disegni chiuso/aperto (esporta_mondo.py --varchi), mondo.gd crea_varchi con AreaGate, sei interni nuovi con stili provvisori. Prova a schermo in arte/revisione/varchi_in_gioco.png."
     },
     {
       "id": "US-8B21b",

@@ -1245,6 +1245,30 @@ def main():
             for spec in doc.get("npcs", []):
                 interni_npc_refs.append((rel, iid, spec.get("npc_id")))
 
+    # US-8B21a: un'area del gating con "varco" e' un ingresso sulla mappa verso un interno: il luogo esiste nel
+    # mondo generato (luoghi o punti del sottosuolo), l'interno esiste, i disegni chiuso/aperto ci sono nei due temi.
+    mondo_doc = (load_json(_mondo) or {}) if os.path.isfile(_mondo) else None
+    for reg in (regions_doc or {}).get("regions", []):
+        for g in reg.get("gating", []):
+            v = g.get("varco")
+            if v is None:
+                continue
+            ctx = f"data/world/regions.json [{reg.get('id')}] gating '{g.get('area')}'.varco"
+            if v.get("interno") not in interni_ids:
+                err(f"{ctx}: interno '{v.get('interno')}' non esiste in data/world/interni/")
+            sc = v.get("scostamento", [0, 0])
+            if not (isinstance(sc, list) and len(sc) == 2 and all(isinstance(n, int) for n in sc)):
+                err(f"{ctx}: scostamento deve essere [dx, dy] di interi")
+            if mondo_doc is not None:
+                luoghi_mondo = set(mondo_doc.get("luoghi", {})) | set(mondo_doc.get("sottosuolo", {}).get("boss", {}))
+                if v.get("luogo") not in luoghi_mondo:
+                    err(f"{ctx}: luogo '{v.get('luogo')}' non e' un luogo di assets/world/mondo.json")
+                for stato in ("chiuso", "aperto"):
+                    k = f"varco_{v.get('aspetto')}_{stato}"
+                    if k not in mondo_doc.get("sprite", {}) or not all(os.path.isfile(os.path.join(
+                            ROOT, "assets", "world", t, "oggetti", k + ".png")) for t in ("luminoso", "cupo")):
+                        err(f"{ctx}: manca il disegno {k} (python tools/art/esporta_mondo.py --varchi)")
+
     layouts_dir = os.path.join(DATA, "world", "layouts")
     layout_region_ids = set()
     if os.path.isdir(layouts_dir):
