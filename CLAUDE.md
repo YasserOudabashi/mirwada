@@ -168,6 +168,8 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
   sbarca su una costa libera di una regione che lo ammette (le Marche no).
 - Volo (US-8B93): con la piuma dei venti nello zaino (mezzi.json volo.chiave, non vendibile, nell'osservatorio
   dell'Archivio) il tasto V decolla e atterra; in volo non ferma niente, si atterra su terra libera.
+- Soglie (US-8B95, mezzi.json con "arrivo"): la soglia del faro porta alla Frontiera, aperta con la chiave del faro
+  (sull'isola delle Rovine). Alla Frontiera si arriva anche in barca e volando.
 - Il contenuto dei layout delle fasi 8-11 (nemici, boss, oggetti) si riporta sul mondo generato con
   `mondo.gd popola()`: al luogo della zona o nella stessa posizione relativa della regione, mai a mano.
 - Spawn, insediamenti e NPC usciti dal generatore sono **suggerimenti**: i personaggi veri
@@ -312,8 +314,8 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
-**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): accesso alla Frontiera (US-8B95), deciso il
-2026-10-26. Barca (US-8B91) e volo (US-8B93) sono fatti.
+**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): icone degli oggetti, di stato e delle
+primitive (US-8B70..72), panorami (US-8B74), VFX (US-8B40). Varchi, barca, volo e Frontiera sono fatti (2026-10-26).
 
 ## Decisioni prese
 

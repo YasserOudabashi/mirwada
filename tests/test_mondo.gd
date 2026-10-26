@@ -810,3 +810,49 @@ func test_la_piuma_sta_nell_osservatorio() -> void:
 	for o in (gd.call("get_interno", "archivio_torre_osservazione") as Dictionary).get("oggetti", []):
 		trovata = trovata or str(o["item_id"]) == chiave
 	assert_true(trovata, "si trova nella torre di osservazione dell'Archivio, raggiungibile a piedi")
+
+
+# --- US-8B95: accesso alla Frontiera ---------------------------------------------------
+
+func test_la_soglia_del_faro_porta_alla_frontiera_solo_con_la_chiave() -> void:
+	var inv: Node = Engine.get_main_loop().root.get_node("Inventory")
+	inv.call("pulisci")
+	var main := Node2D.new()
+	var m: Node2D = _mondo()
+	main.add_child(m)
+	var p: CharacterBody2D = load("res://scenes/player.tscn").instantiate()
+	m.add_child(p)
+	Engine.get_main_loop().root.add_child(main)
+	var soglia: Area2D = m.get_node("Soglia_faro")
+	var faro: Array = m.dati["luoghi"]["faro"]
+	assert_true(Vector2(_cella(m, soglia.position)).distance_to(Vector2(faro[0], faro[1])) < 12.0, "la soglia e' al faro")
+	var chiave: Node2D = m.get_node_or_null("Chiave_faro")
+	assert_true(chiave != null, "la chiave del faro e' a terra")
+	var cc: Vector2i = _cella(m, chiave.position)
+	assert_eq(str(m.call("regione_a", cc.x, cc.y)), "isola_rovine", "sull'isola delle Rovine")
+	m.call("_aggiorna_varchi")
+	assert_true((soglia.get_node("Chiuso") as CanvasItem).visible, "senza la chiave la soglia e' chiusa")
+	assert_false(m.call("entra", soglia), "e non si passa")
+	inv.call("aggiungi", "chiave_del_faro", 1)
+	m.call("_aggiorna_varchi")
+	assert_true((soglia.get_node("Aperto") as CanvasItem).visible, "con la chiave si apre")
+	assert_true(m.call("entra", soglia), "e si passa")
+	var c: Vector2i = _cella(m, p.position)
+	assert_eq(str(m.call("regione_a", c.x, c.y)), "frontiera_porte", "dall'altra parte c'e' la Frontiera")
+	assert_false(m.call("bloccata", c.x, c.y), "su una casella libera")
+	var l: Array = m.dati["luoghi"]["approdo_frontiera"]
+	assert_true(m.call("_si_arriva", Vector2i(int(l[0]), int(l[1])), "volo"), "alla Frontiera si atterra volando")
+	assert_true(m.call("_si_sbarca", Vector2i(int(l[0]), int(l[1]))), "e si sbarca in barca")
+	inv.call("pulisci")
+	main.free()
+
+
+func test_la_chiave_del_faro_non_ricompare_se_la_si_ha() -> void:
+	var inv: Node = Engine.get_main_loop().root.get_node("Inventory")
+	inv.call("pulisci")
+	inv.call("aggiungi", "chiave_del_faro", 1)
+	var m: Node2D = _mondo()
+	m.call("crea_varchi")
+	assert_true(m.get_node_or_null("Chiave_faro") == null, "gia' presa: non c'e' piu' a terra")
+	inv.call("pulisci")
+	m.free()

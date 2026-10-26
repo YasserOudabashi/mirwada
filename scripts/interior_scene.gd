@@ -222,8 +222,13 @@ func _crea_nemici(layout: Dictionary) -> void:
 
 
 func _crea_oggetti(layout: Dictionary) -> void:
+	var gd: Node = get_node_or_null("/root/GameData")
+	var inv: Node = get_node_or_null("/root/Inventory")
 	for o in (layout.get("oggetti", []) as Array):
 		var spec: Dictionary = o as Dictionary
+		var it: Dictionary = gd.call("get_item", str(spec.get("item_id", ""))) if gd != null else {}
+		if not bool(it.get("vendibile", true)) and inv != null and bool(inv.call("possiede", str(spec["item_id"]))):
+			continue                                   # una chiave del mondo che si ha gia' non ricompare
 		var pickup := preload("res://scripts/item_pickup.gd").new()
 		add_child(pickup)
 		pickup.call("setup", str(spec.get("item_id", "")), to_global(map_to_local(

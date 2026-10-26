@@ -65,6 +65,20 @@
       "valore": 0,
       "rarita": "leggendario",
       "vendibile": false
+    },
+    {
+      "id": "chiave_del_faro",
+      "categoria": "materiale",
+      "name_i18n": "item.chiave_del_faro",
+      "descrizione_i18n": "item.chiave_del_faro.desc",
+      "tag": [
+        "viaggio",
+        "spazio"
+      ],
+      "impilabile": false,
+      "valore": 0,
+      "rarita": "leggendario",
+      "vendibile": false
     }
   ]
 }

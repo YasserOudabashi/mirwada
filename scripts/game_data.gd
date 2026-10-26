@@ -691,6 +691,11 @@ func get_mezzo(id: String) -> Dictionary:
 	return _mezzi.get(id, {}) if typeof(_mezzi.get(id)) == TYPE_DICTIONARY else {}
 
 
+## Gli id dei mezzi (barca, volo, soglie...), senza le chiavi di servizio del file.
+func get_mezzi() -> Array:
+	return _mezzi.keys().filter(func(k): return typeof(_mezzi[k]) == TYPE_DICTIONARY)
+
+
 ## {} se l'id non esiste: il chiamante controlla con is_empty().
 func get_region(id: String) -> Dictionary:
 	for r in get_regions():

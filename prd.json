@@ -254,8 +254,8 @@
       ],
       "priority": 14,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Soglia del faro (mezzi.json soglia_faro, aspetto faro), chiave del faro sulle Rovine, mondo.gd crea_soglie; barca e volo gia' arrivavano. arte/revisione/faro_in_gioco.png."
     },
     {
       "id": "US-8B70",

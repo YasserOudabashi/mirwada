@@ -284,5 +284,7 @@
   "item.zolfo_delle_fosse": "Sulfur of the pits",
   "item.zolfo_delle_fosse.desc": "Alchemical ingredient.",
   "item.piuma_dei_venti": "Feather of the winds",
-  "item.piuma_dei_venti.desc": "Light as a breath. Whoever carries it can rise into the air."
+  "item.piuma_dei_venti.desc": "Light as a breath. Whoever carries it can rise into the air.",
+  "item.chiave_del_faro": "Lighthouse key",
+  "item.chiave_del_faro.desc": "Cold with sea salt. It opens the door at the foot of the lighthouse, the one that doesn't face the sea."
 }

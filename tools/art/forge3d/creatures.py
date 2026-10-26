@@ -441,7 +441,7 @@ def ingresso(kind="scale", seed=1, size=1.0):
     return r
 
 
-ASPETTI_VARCO = ("cancello_cripta", "arco_ombra", "ponte_radici", "grotta", "porta_glifi", "soglia_nebbia")
+ASPETTI_VARCO = ("cancello_cripta", "arco_ombra", "ponte_radici", "grotta", "porta_glifi", "soglia_nebbia", "faro")
 
 
 def varco(aspetto, aperto=False, seed=1, size=1.0):
@@ -546,6 +546,22 @@ def varco(aspetto, aperto=False, seed=1, size=1.0):
             for k in range(9):
                 ell((rnd.uniform(5, 8), 4, rnd.uniform(4, 7)), (rnd.uniform(-6, 6), cy + rnd.uniform(-2, 3),
                                                                rnd.uniform(4, 46)), "snow")
+    elif aspetto == "faro":                               # US-8B95: il faro, con la soglia verso la Frontiera alla base
+        box((13, 9, 2.5), (0, cy, 2.5), "stone")
+        r.part("v", "cylinder", (8, 8, 30), (0, cy, 35), mat="intonaco_bianco")
+        for z in (22, 46):
+            r.part("v", "cylinder", (8.4, 8.4, 3.5), (0, cy, z), mat="cloth_red")
+        r.part("v", "cylinder", (10.5, 10.5, 1.2), (0, cy, 66), mat="iron")
+        r.part("v", "cylinder", (5.5, 5.5, 5), (0, cy, 72.5), mat="glow_yellow")
+        r.part("v", "cone", (7.5, 7.5, 5), (0, cy, 82), mat="cloth_red")
+        porta = cy + 8.2
+        if aperto:                                        # dall'altra parte: il buio delle soglie della Frontiera
+            box((3.8, 1.0, 7), (0, porta, 12), "shadow_mat")
+            for sx in (-1, 1):
+                box((0.8, 1.2, 7), (sx * 3.6, porta + 0.3, 12), "glow_purple")
+        else:
+            box((3.8, 1.0, 7), (0, porta, 12), "wood")
+            box((0.8, 0.6, 0.8), (2.2, porta + 0.8, 12), "gold")
     else:
         raise ValueError(f"varco sconosciuto: {aspetto}")
     return r

@@ -14390,3 +14390,22 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   nell'osservatorio), 1 in test_page_negozio (la piuma non si vende), test del volo aggiornato. Prova a schermo:
   sopra le case, sopra il mare, avviso sull'acqua (arte/revisione/volo_in_gioco.png). validate 0, 1000 test.
 - Aperto: non c'e' un'animazione di volo (si usano idle e walk sollevati); nessun costo ne' durata.
+
+## US-8B95 — accesso alla Frontiera, 2026-10-26
+- Decisione dell'utente: alla Frontiera si arriva in barca, volando, o da una soglia nel faro che si apre solo con
+  una chiave trovata nel mondo. Barca (US-8B91) e volo (US-8B93) ci arrivavano gia'; resta il gating di sequenza.
+- data/world/mezzi.json soglia_faro {luogo faro, aspetto faro, chiave chiave_del_faro, chiave_luogo isola_rovine,
+  arrivo approdo_frontiera, scostamento_arrivo}: GameData.get_mezzi(). Oggetto chiave_del_faro (non vendibile, i18n).
+  La chiave sta sull'isola delle Rovine (culto antico, indizi sulla Frontiera: regione decisa il 13/10).
+- Sul faro non c'era nessun disegno (la torre prevista sulla punta della diga non ci stava): la soglia e' il faro
+  stesso, nuovo aspetto dei varchi in forge3d (torre bianca a fasce rosse, lanterna accesa; chiuso porta di legno,
+  aperto il buio viola delle soglie). python tools/art/esporta_mondo.py --varchi.
+- mondo.gd: crea_soglie() con la stessa posa dei varchi (_varco_sulla_mappa, estratta da crea_varchi); aperta se si ha
+  la chiave (varco_aperto), entra() porta all'arrivo invece che in una stanza; la chiave a terra solo se non la si ha.
+  Le chiavi del mondo (non vendibili) non ricompaiono negli interni se le si ha gia' (la piuma nella torre).
+  L'arrivo era sulla soglia del varco delle isole di nebbia (stesso luogo): spostato di 5 caselle nei dati.
+- Validator: luogo, arrivo e chiave_luogo esistono nel mondo; i disegni della soglia ci sono.
+- Verifica: 2 test nuovi in test_mondo (la soglia e' al faro, la chiave sulle Rovine, senza chiave chiusa e non si
+  passa, con la chiave aperta e si arriva alla Frontiera su una casella libera; alla Frontiera si atterra e si
+  sbarca; la chiave non ricompare se la si ha). Prova a schermo (arte/revisione/faro_in_gioco.png). 1002 test.
+- Aperto: l'icona della chiave a terra e' il segnaposto degli oggetti (US-8B70).

@@ -607,6 +607,11 @@ func entra(porta: Area2D) -> bool:
 	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D if is_inside_tree() else null
 	if p == null or _interno != null or get_parent() == null or not varco_aperto(porta) or in_barca() or in_volo():
 		return false
+	if porta.has_meta("arrivo"):                     # una soglia: si passa dall'altra parte, non in una stanza
+		var a: Vector2i = porta.get_meta("arrivo")
+		_porta_vicina = null
+		colloca(p, Vector2((a.x + 0.5) * tile, (a.y + 0.5) * tile))
+		return true
 	var interno: Node = load("res://scenes/interior_scene.tscn").instantiate()
 	interno.set("interno_id", str(porta.get_meta("interno_id")))
 	if porta.has_meta("gate"):
@@ -702,41 +707,85 @@ func crea_varchi() -> void:
 		var rid: String = str((reg as Dictionary).get("id", ""))
 		for g in (reg as Dictionary).get("gating", []):
 			var v: Dictionary = (g as Dictionary).get("varco", {})
-			var base: Vector2i = _luogo_varco(str(v.get("luogo", "")))
-			if v.is_empty() or base.x < 0:
+			if v.is_empty():
 				continue
-			var sc: Array = v.get("scostamento", [0, 0])
-			var posto: Dictionary = posto_del_varco(base + Vector2i(int(sc[0]), int(sc[1])), rid)
-			var porta: Area2D = _porta(str(v["interno"]), posto["cella"], "superficie")
-			porta.name = "Varco_%s" % str((g as Dictionary).get("area", ""))
-			porta.set_meta("gate", g)
-			porta.set_meta("regione", rid)
-			for stato in ["chiuso", "aperto"]:                # il disegno sta sulla casella dietro la porta
-				var chiave: String = "varco_%s_%s" % [str(v.get("aspetto", "")), stato]
-				var meta: Dictionary = (dati["sprite"] as Dictionary).get(chiave, {})
-				var spr := Sprite2D.new()
-				spr.name = stato.capitalize()
-				spr.texture = _texture_oggetto(chiave)
-				spr.centered = false
-				spr.offset = Vector2(-float(meta.get("ax", 0)), -float(meta.get("ay", 0)) - tile * 0.5)
-				porta.add_child(spr)
-			if not posto["parete"]:                          # in piedi da solo: non ci si passa attraverso
-				var corpo := StaticBody2D.new()
-				corpo.collision_layer = STRATO_COLLISIONE
-				var forma := CollisionShape2D.new()
-				var rect := RectangleShape2D.new()
-				rect.size = Vector2(tile * 3, tile)
-				forma.shape = rect
-				forma.position = Vector2(0, -tile)
-				corpo.add_child(forma)
-				porta.add_child(corpo)
-			add_child(porta)
-			var cv: Vector2i = posto["cella"]
-			_spiazzi.append(Rect2i(cv.x - 3, cv.y - 2, 7, 7))   # le chiome davanti coprirebbero varco e soglia
+			var porta: Area2D = _varco_sulla_mappa(v, str(v["interno"]), "Varco_%s" % str((g as Dictionary).get("area", "")), rid)
+			if porta != null:
+				porta.set_meta("gate", g)
+				porta.set_meta("regione", rid)
+	crea_soglie()
 	for b in _caricati.keys():                                # i blocchi gia' costruiti si rifanno senza
 		_scarica(b)
 	_blocco_centro = Vector2i(-9999, -9999)
 	_aggiorna_varchi()
+
+
+## Un ingresso sulla mappa (varco o soglia) da spec {luogo, scostamento, aspetto}, nella regione
+## rid (vuota: quella del luogo): la porta, i disegni chiuso e aperto sulla casella dietro, la
+## collisione se sta in piedi da sola, uno spiazzo senza alberi davanti. null se il luogo non c'e'.
+func _varco_sulla_mappa(spec: Dictionary, iid: String, nome: String, rid: String = "") -> Area2D:
+	var base: Vector2i = _luogo_varco(str(spec.get("luogo", "")))
+	if base.x < 0:
+		return null
+	if rid.is_empty():
+		rid = regione_a(base.x, base.y)
+	var sc: Array = spec.get("scostamento", [0, 0])
+	var posto: Dictionary = posto_del_varco(base + Vector2i(int(sc[0]), int(sc[1])), rid)
+	var porta: Area2D = _porta(iid, posto["cella"], "superficie")
+	porta.name = nome
+	for stato in ["chiuso", "aperto"]:
+		var chiave: String = "varco_%s_%s" % [str(spec.get("aspetto", "")), stato]
+		var meta: Dictionary = (dati["sprite"] as Dictionary).get(chiave, {})
+		var spr := Sprite2D.new()
+		spr.name = stato.capitalize()
+		spr.texture = _texture_oggetto(chiave)
+		spr.centered = false
+		spr.offset = Vector2(-float(meta.get("ax", 0)), -float(meta.get("ay", 0)) - tile * 0.5)
+		porta.add_child(spr)
+	if not posto["parete"]:                                  # in piedi da solo: non ci si passa attraverso
+		var corpo := StaticBody2D.new()
+		corpo.collision_layer = STRATO_COLLISIONE
+		var forma := CollisionShape2D.new()
+		var rect := RectangleShape2D.new()
+		rect.size = Vector2(tile * 3, tile)
+		forma.shape = rect
+		forma.position = Vector2(0, -tile)
+		corpo.add_child(forma)
+		porta.add_child(corpo)
+	add_child(porta)
+	var cv: Vector2i = posto["cella"]
+	_spiazzi.append(Rect2i(cv.x - 3, cv.y - 2, 7, 7))       # le chiome davanti coprirebbero varco e soglia
+	return porta
+
+
+## US-8B95: le soglie (data/world/mezzi.json con "arrivo"): un ingresso che porta all'arrivo,
+## aperto solo con la chiave nello zaino; la chiave sta a terra in chiave_luogo finche' non la
+## si prende. La soglia del faro porta all'approdo della Frontiera (decisione 2026-10-26).
+func crea_soglie() -> void:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	var inv: Node = Engine.get_main_loop().root.get_node_or_null("Inventory")
+	if gd == null:
+		return
+	for id in gd.call("get_mezzi"):
+		var spec: Dictionary = gd.call("get_mezzo", id)
+		var arrivo: Vector2i = _luogo_varco(str(spec.get("arrivo", "")))
+		if arrivo.x < 0:
+			continue
+		var sa: Array = spec.get("scostamento_arrivo", [0, 0])            # non sulla soglia di un altro varco
+		arrivo += Vector2i(int(sa[0]), int(sa[1]))
+		var porta: Area2D = _varco_sulla_mappa(spec, str(id), "Soglia_%s" % str(id).trim_prefix("soglia_"))
+		if porta == null:
+			continue
+		porta.set_meta("chiave", str(spec.get("chiave", "")))
+		porta.set_meta("arrivo", cella_libera(arrivo, {}, "", regione_a(arrivo.x, arrivo.y)))
+		var dove: Vector2i = _luogo_varco(str(spec.get("chiave_luogo", "")))
+		if dove.x >= 0 and not (inv != null and bool(inv.call("possiede", str(spec.get("chiave", ""))))):
+			var c: Vector2i = cella_libera(dove, {}, "", regione_a(dove.x, dove.y))
+			var pickup: Node2D = preload("res://scripts/item_pickup.gd").new()
+			add_child(pickup)
+			pickup.name = "Chiave_%s" % str(id).trim_prefix("soglia_")
+			pickup.call("setup", str(spec["chiave"]), Vector2((c.x + 0.5) * tile, (c.y + 0.5) * tile))
+			pickup.set_meta("livello", "superficie")
 
 
 ## La casella del varco vicino a c nella regione rid: davanti a una parete (le 3 caselle
@@ -832,15 +881,18 @@ func _luogo_varco(nome: String) -> Vector2i:
 	return Vector2i(int(p[0]), int(p[1])) if p.size() == 2 else Vector2i(-1, -1)
 
 
-## true per una porta senza varco o con il varco aperto ora.
+## true per una porta senza varco o con il varco aperto ora (una soglia: con la sua chiave).
 func varco_aperto(porta: Area2D) -> bool:
+	if porta.has_meta("chiave"):
+		var inv: Node = Engine.get_main_loop().root.get_node_or_null("Inventory")
+		return inv != null and bool(inv.call("possiede", str(porta.get_meta("chiave"))))
 	return not porta.has_meta("gate") or AreaGate.valuta_gate(str(porta.get_meta("regione")),
 			porta.get_meta("gate"), Engine.get_main_loop().root)
 
 
 func _aggiorna_varchi() -> void:
 	for c in get_children():
-		if c is Area2D and c.has_meta("gate"):
+		if c is Area2D and (c.has_meta("gate") or c.has_meta("chiave")):
 			var ap: bool = varco_aperto(c)
 			(c.get_node("Chiuso") as CanvasItem).visible = not ap
 			(c.get_node("Aperto") as CanvasItem).visible = ap

@@ -1780,5 +1780,7 @@
   "dialogue.dario.n1.compra": "Fammi vedere la merce.",
   "dialogue.dario.n1.congedo": "Devo andare.",
   "item.piuma_dei_venti": "Piuma dei venti",
-  "item.piuma_dei_venti.desc": "Leggera come un respiro. Chi la porta con se' puo' alzarsi in volo."
+  "item.piuma_dei_venti.desc": "Leggera come un respiro. Chi la porta con se' puo' alzarsi in volo.",
+  "item.chiave_del_faro": "Chiave del faro",
+  "item.chiave_del_faro.desc": "Fredda di salsedine. Apre la porta in fondo al faro, quella che non da' sul mare."
 }

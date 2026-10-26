@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "_comment": "Mezzi per muoversi nel mondo generato (decisioni dell'utente 2026-10-26). barca (US-8B91): all'inizio e' ormeggiata nell'acqua piu' vicina al luogo (+ scostamento) che tocca la terra; poi resta dove la si lascia (salvataggio, mondo.barca). In barca l'acqua si attraversa e la terra no; si sbarca su una costa libera, ma non in una regione che ha 'accesso' senza 'barca' ne' 'a_piedi' (le Marche: solo volo o sottosuolo). volo (US-8B93): si vola solo con la chiave nello zaino (un oggetto non vendibile); in volo si passa sopra tutto, si atterra su terra libera di una regione che non ha 'accesso' o lo ha con 'volo' o 'a_piedi'.",
+  "_comment": "Mezzi per muoversi nel mondo generato (decisioni dell'utente 2026-10-26). barca (US-8B91): all'inizio e' ormeggiata nell'acqua piu' vicina al luogo (+ scostamento) che tocca la terra; poi resta dove la si lascia (salvataggio, mondo.barca). In barca l'acqua si attraversa e la terra no; si sbarca su una costa libera, ma non in una regione che ha 'accesso' senza 'barca' ne' 'a_piedi' (le Marche: solo volo o sottosuolo). volo (US-8B93): si vola solo con la chiave nello zaino (un oggetto non vendibile); in volo si passa sopra tutto, si atterra su terra libera di una regione che non ha 'accesso' o lo ha con 'volo' o 'a_piedi'. Soglie (US-8B95, con 'arrivo'): una porta in un luogo (aspetto = un varco di forge3d) che porta all'arrivo, aperta solo con la chiave nello zaino; la chiave sta a terra in chiave_luogo finche' non la si prende.",
   "barca": {
     "luogo": "porto",
     "scostamento": [
@@ -10,5 +10,20 @@
   },
   "volo": {
     "chiave": "piuma_dei_venti"
+  },
+  "soglia_faro": {
+    "luogo": "faro",
+    "scostamento": [
+      0,
+      0
+    ],
+    "aspetto": "faro",
+    "chiave": "chiave_del_faro",
+    "chiave_luogo": "isola_rovine",
+    "arrivo": "approdo_frontiera",
+    "scostamento_arrivo": [
+      0,
+      5
+    ]
   }
 }

@@ -1288,6 +1288,17 @@ def main():
                 err(f"data/world/mezzi.json [{_mz}]: chiave '{_spec['chiave']}' non e' un oggetto di data/items/")
             elif _k.get("vendibile", True) is not False:
                 err(f"data/world/mezzi.json [{_mz}]: la chiave '{_spec['chiave']}' deve avere \"vendibile\": false")
+    for _mz, _spec in _mezzi.items():                       # US-8B95: le soglie (con "arrivo")
+        if isinstance(_spec, dict) and "arrivo" in _spec and mondo_doc is not None:
+            _lm = set(mondo_doc.get("luoghi", {})) | set(mondo_doc.get("sottosuolo", {}).get("boss", {}))
+            for _campo in ("luogo", "arrivo", "chiave_luogo"):
+                if _spec.get(_campo) not in _lm:
+                    err(f"data/world/mezzi.json [{_mz}]: {_campo} '{_spec.get(_campo)}' non e' un luogo di "
+                        f"assets/world/mondo.json")
+            for _st in ("chiuso", "aperto"):
+                if f"varco_{_spec.get('aspetto')}_{_st}" not in mondo_doc.get("sprite", {}):
+                    err(f"data/world/mezzi.json [{_mz}]: manca il disegno varco_{_spec.get('aspetto')}_{_st} "
+                        f"(python tools/art/esporta_mondo.py --varchi)")
     if mondo_doc is not None and "barca" in _mezzi:
         if _mezzi["barca"].get("luogo") not in mondo_doc.get("luoghi", {}):
             err(f"data/world/mezzi.json: barca.luogo '{_mezzi['barca'].get('luogo')}' non e' un luogo di "
