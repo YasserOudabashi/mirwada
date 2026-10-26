@@ -5,6 +5,34 @@
 > Questo PRD **non** sostituisce `prd-fase-8-vertical-slice.md`: lo affianca.
 > Le story qui hanno id `US-8B..` per non collidere con `US-801..814`.
 
+## 0. Stato al 2026-10-26
+
+Dettaglio di ogni story in `progress.txt` (cerca la sigla); le aperte sono anche in `prd.json`.
+
+| Story | Stato | Note |
+|---|---|---|
+| US-8B01 64 px | fatta | `dimensione_frame` [64, 64] |
+| US-8B10, 8B11a-d, 8B13, 8B13b, 8B14-18 rifiniture, 8B18b isole | fatte | mondo generato (seed 6), due modalita' luminosa/cupa |
+| US-8B12 loader del mondo unico | fatta | `scripts/world/mondo.gd` (non `sprite_forge_world.gd`): tessere composte in Python, blocchi attorno al giocatore |
+| US-8B12b regione dalla posizione | fatta | `regioni.png`, `regions.json` `luoghi_mondo` |
+| US-8B12c il gioco parte dal mondo unico | fatta | NPC, gating d'ingresso, viaggio veloce |
+| US-8B12d aspetto degli NPC | fatta | `tools/art/build_npc.py`, 16 aspetti, `roster.json` `aspetto.sprite` |
+| US-8B12e collisioni, Marche solo volando o dal sottosuolo | fatta | `blocchi.png` 0/128/255, `regions.json` `accesso` |
+| US-8B12f sottosuolo nel gioco | fatta | secondo livello, 47 ingressi, dalle fogne alle catacombe delle Marche |
+| US-8B12g contenuto dei layout sul mondo | fatta | nemici, boss e oggetti delle fasi 8-11; il boss di Mirwada nelle fogne |
+| US-8B30, 8B31, 8B32 personaggi, nemico, pet a 64 px | fatte | `tools/art/build_personaggi.py` |
+| US-8B33, 8B34 NPC con nome, generici, antagonista | fatte (idle + walk) | dentro US-8B12d |
+| US-8B73 pagine del libro | fatta | cuoio, pergamena, font Alegreya, `book.json` `tema` |
+| US-8B18 edifici e oggetti di scena | **aperta, la prossima** | case sugli isolati di Mirwada, villaggi, porte verso gli interni |
+| US-8B12c interni separati (testo originale) | aperta | gli interni delle fasi 10-11 esistono: manca l'ingresso dal mondo generato (va con US-8B18) |
+| US-8B21 varchi di gating visibili | aperta | anche le barriere delle sotto-aree sul mondo |
+| US-8B93 volo | aperta, **decisione dell'utente** | il meccanismo (strato dei dislivelli) c'e' |
+| US-8B91 barca, accesso alla Frontiera | aperta, **decisione dell'utente** | |
+| US-8B02, 8B03, 8B19, 8B20, 8B22-24, 8B35, 8B40-44, 8B50-65, 8B70-72, 8B74, 8B80-81, 8B90, 8B92, 8B94 | aperte | |
+
+Decisioni nuove: **Marche solo volando o dal sottosuolo** (2026-10-25); **merge della PR #4** nella PR #5
+con il mondo generato come scena di gioco (2026-10-25).
+
 ## 1. Overview
 
 Il gioco ha tutti i sistemi, ma l'arte vera copre solo 3 categorie

@@ -72,7 +72,8 @@ va scritto nella story.
 
 ### Come si genera (flusso di ogni story d'arte)
 1. **Brief** in 4 righe: cosa, vista, dimensione, palette, animazioni richieste.
-2. Spiega all'utente cosa genererai e aspetta il via (vedi sopra).
+2. Niente attesa del via (decisione dell'utente, 2026-10-23): si genera, si guarda e si riassume alla fine.
+   Si chiede solo per le scelte di design che spettano all'utente.
 3. **Genera** con `forge.py` oppure con un piccolo script che importa `forge3d`.
    Lo script va in `tools/art/` e si può rilanciare: stessi parametri e stesso `seed` = stessi PNG.
 4. **Guarda** il risultato ingrandito, su sfondo chiaro e scuro. Controlla silhouette,
@@ -149,14 +150,22 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 ### Mondo, mappe e biomi
 - **La generazione procedurale del mondo è consentita come strumento di produzione**:
   `forge3d/world.py` produce biomi, fiumi, laghi, villaggi, strade, oggetti e spawn dal `seed`.
-- Il risultato **si salva come dati** (`world.json` + atlanti PNG) e si committa. Il gioco
+- Il risultato **si salva come dati** (`assets/world/`, vedi sotto) e si committa. Il gioco
   carica i dati, non rigenera il mondo a runtime. Il seed e i parametri vanno in `progress.txt`.
 - Le regioni di Mirwada (`data/regions.json`) hanno la precedenza: una regione si genera con un
   preset di bioma e **poi si ritocca nei dati**. Mai ritoccare il PNG a mano.
 - Terreni: tecnica "dual grid" a livelli, 16 tile per terreno. L'ordine di priorità dei terreni
   è in `forge3d/terrain.py` (`ORDER`). Un terreno nuovo è una riga lì, non una classe.
-- Nel gioco il mondo si carica con `scripts/world/sprite_forge_world.gd` (copiato da
-  `engines/godot/`). Le PNG si leggono senza import dell'editor.
+- Nel gioco il mondo si carica con `scripts/world/mondo.gd` (US-8B12): tessere gia' composte in
+  Python e deduplicate (`<tema>/tessere_<k>.png` + `indici.png`), costruite solo nei blocchi attorno al
+  giocatore. Le PNG si leggono dal disco, senza import dell'editor. File in `assets/world/`:
+  `mondo.json` (misure, partenza, luoghi, riquadri delle regioni, oggetti, sottosuolo), `blocchi.png`
+  (0 libera, 128 dislivello: a piedi no, in volo si', 255 acqua o vuoto), `regioni.png`, `<tema>/oggetti/`,
+  `sotto/` e `<tema>/sotto/` (il sottosuolo, secondo livello sulla stessa griglia, 47 ingressi).
+- La regione e la zona vengono dalla posizione; `regions.json` dice come ci si arriva (`accesso`:
+  a_piedi, volo, sottosuolo) e abbina i luoghi della mappa ai location_tags (`luoghi_mondo`).
+- Il contenuto dei layout delle fasi 8-11 (nemici, boss, oggetti) si riporta sul mondo generato con
+  `mondo.gd popola()`: al luogo della zona o nella stessa posizione relativa della regione, mai a mano.
 - Spawn, insediamenti e NPC usciti dal generatore sono **suggerimenti**: i personaggi veri
   restano nei dati (`data/npcs`, `data/factions`) e non vengono scritti dal generatore.
 - Panorami (`forge3d/panorama.py`): strati separati per il parallasse (`sky`, `clouds`,
@@ -175,8 +184,9 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - Nella preparazione degli attacchi l'arma può restare dietro la testa.
 - Il ponte è un rettangolo di legno.
 - I panorami sono ancora piatti.
-- Mancano: acconciature lunghe, animazioni di arrampicata/nuoto, mostri volanti grandi (c'è solo `bird()` per i volatili piccoli), edifici
-  (castelli, case, ponti dettagliati). Vanno aggiunti a `forge3d`, con una story dedicata.
+- Mancano: animazioni di arrampicata/nuoto/volo, mostri volanti grandi (c'è solo `bird()` per i volatili
+  piccoli), edifici (case, castelli, ponti dettagliati: la citta' di Mirwada ha i sedimi degli isolati ma
+  nessuna casa). Vanno aggiunti a `forge3d`, con una story dedicata (US-8B18).
 - Una correzione al generatore (ad esempio il viso) è una story a sé e **rigenera tutto**
   con lo stesso seed, poi si confronta il prima e il dopo.
 
@@ -214,6 +224,11 @@ python scripts/forge.py world --out assets/world --w 128 --h 96 --seed 4 --godot
 python tools/art/build_world.py                # mondo di prova (seed 6), modalita' facile/luminosa -> arte/mondo/
 python tools/art/build_world.py --tema cupo    # stessi dati, modalita' difficile/cupa -> arte/mondo/cupo/ (forge3d/tema.py)
 python tools/art/esporta_mondo.py              # mondo per il gioco -> assets/world/ (tutte e due le modalita', ~1 ora)
+python tools/art/esporta_mondo.py --solo-blocchi   # solo le collisioni (blocchi.png)
+python tools/art/esporta_mondo.py --sottosuolo     # solo il sottosuolo (~5 minuti)
+python tools/art/esporta_mondo.py --solo-dati      # solo i riquadri delle regioni in mondo.json
+python tools/art/build_npc.py                  # aspetti degli NPC (personaggio_<aspetto>_{idle,walk}.png)
+python tools/art/build_libro.py                # carta, segnalibri, caselle e filetto del libro (assets/ui/)
 python scripts/forge.py contact FILE.png --scale 4
 
 # Rigenera la spina dorsale dei pathway (idempotente)
@@ -221,7 +236,8 @@ python tools/generate_pathways.py
 
 # Test headless: esce 0 se tutto passa (Godot 4.3)
 godot --headless --path . --import          # solo dopo aver cambiato le PNG
-godot --headless --path . --script res://tests/run_tests.gd
+bash tools/run_tests.sh                     # suite + fallisce sugli errori di script nascosti (usare questo)
+godot --headless --path . --script res://tests/run_tests.gd   # solo la suite
 ```
 
 ## Struttura
@@ -240,10 +256,11 @@ data/
   tags.json       vocabolario chiuso dei tag
 tools/            generatore, validator
 tools/art/        script di generazione asset (rilanciabili, con seed)
-scripts/world/    loader del mondo (sprite_forge_world.gd)
+scripts/world/    loader del mondo unico (mondo.gd: blocchi, livelli, ingressi, NPC, popolamento)
 scenes/ scripts/ assets/ tests/
 assets/placeholder/   sheet {categoria}_{nome}.png (ora generati da sprite-forge)
-assets/world/         world.json + terrain_*.png + objects/
+assets/world/         mondo.json, blocchi/regioni.png, <tema>/tessere+indici+oggetti, sotto/
+assets/ui/            libro (carta, segnalibri, caselle, filetto) e font Alegreya (OFL)
 assets/vfx/           sheet degli effetti
 prd.json          story della fase corrente per ralph
 progress.txt      memoria tra le iterazioni
@@ -277,14 +294,15 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
 - Fase 11 — Villaggi ed economia (rarita', fabbri, interni, villaggi in campagna): **CHIUSA** sul suo
   ramo; i villaggi e gli edifici vanno portati sul mondo generato come per la fase 10.
 - Fase 8b — Arte con sprite-forge: **IN CORSO**. Fatti: personaggi a 64 px, aspetti degli NPC, terreni,
-  pareti, mondo generato (seed 6) con modalita' luminosa/cupa, mondo unico nel gioco (US-8B12..d).
-  PRD `prd-fase-8b-arte.md`.
+  pareti, mondo generato (seed 6) con modalita' luminosa/cupa, mondo unico nel gioco (US-8B12..g:
+  caricatore, regione dalla posizione, NPC, collisioni, sottosuolo, contenuto dei layout), libro (US-8B73).
+  PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
-**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md`): portare sul mondo generato il contenuto dei
-layout (nemici, oggetti, edifici con porte e interni, villaggi, gate delle sotto-aree), l'accesso alle
-Marche (solo volando o dal sottosuolo, decisione dell'utente del 2026-10-25) e il sottosuolo.
+**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): edifici di Mirwada e dei villaggi
+con le porte verso gli interni (US-8B18), varchi delle sotto-aree (US-8B21), poi volo e Frontiera (decisioni
+dell'utente).
 
 ## Decisioni prese
 
@@ -306,6 +324,12 @@ Marche (solo volando o dal sottosuolo, decisione dell'utente del 2026-10-25) e i
   forma approvata). Le strade d'asfalto con le strisce **sono volute**: sono la stranezza della Frontiera.
 - **Trono del Gigante** (2026-10-20): va sulla **vetta** più alta delle Marche, con salita, spade e stendardi ai piedi.
 - **Palette dei VFX: vale `data/vfx.json`** (2026-10-14). `design-vfx.md` è allineato al file dati.
+- **Merge dei due rami** (2026-10-25): la PR #4 (fasi 8-11) e' unita nella PR #5; il mondo generato resta la
+  scena di gioco, i layout della fase 10 sono la fonte del contenuto da riportarci.
+- **Marche del Crepuscolo** (2026-10-25): ci si arriva **solo volando o dal sottosuolo** (le catacombe sbucano
+  nelle Marche). A piedi restano chiuse; `regions.json` `accesso`, verificato da un test di raggiungibilita'.
+- **Libro** (2026-10-25): copertina di cuoio, pergamena, font Alegreya/Alegreya SC, inchiostro scuro; tutto in
+  `data/ui/book.json` `tema`, immagini da `tools/art/build_libro.py`.
 
 ## i18n — due sistemi, una convenzione per le stringhe dei dati
 

@@ -14183,3 +14183,16 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   Prova a schermo: il boss segue e colpisce (salute 70/120), al porto nemici, NPC e oggetti. 982 test passati.
 - Aperto: gli edifici dei layout (porte verso gli interni) aspettano i disegni delle case nel generatore; le
   icone degli oggetti a terra sono ancora i segnaposto di generate_sprites.py (US-8B70).
+
+## Chiusura lavoro 2026-10-26 (documentazione)
+- docs/documentazione.py riscritta in tutte e 5 le sezioni (era ferma alla fase 1, 02.09.2026), AGGIORNATO_AL
+  26.10.2026; diario.py: voce di riepilogo dal 07.09 e del lavoro 23-26.10. Docx rigenerati (serve python-docx).
+- CLAUDE.md: loader mondo.gd e file di assets/world/, comandi (esporta_mondo parziali, build_npc, build_libro,
+  tools/run_tests.sh), struttura, limiti del generatore, fasi, decisioni (merge, Marche, libro); tolta la
+  contraddizione "spiega e aspetta il via" nel flusso d'arte.
+- README: fase 8b, setup con tools/run_tests.sh e tools/art/, documenti, ralph con --test-cmd "bash tools/run_tests.sh".
+- 006_PRD/prossimi-passi.md riscritto (stato, ordine delle story, trappole, regole dell'utente).
+- 006_PRD/prd-fase-8b-arte.md: tabella "Stato al 2026-10-26".
+- prd.json: fase 8b, 19 story (8 fatte con le note dei commit, 11 aperte con i criteri); quello della fase 11
+  resta nella storia di git.
+- Prossima story: US-8B18a, edifici di Mirwada sugli isolati del generatore.

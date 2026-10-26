@@ -190,17 +190,34 @@ primitive/eventi nuovi**, save invariato. Verdetto:
 motore nominano un NPC, un villaggio, un blueprint o una ricetta
 specifici — lista vietata letta dai dati.
 
+**Fase 8b — Arte e mondo generato: in corso** (ramo parallelo alle fasi 8-11,
+unito il 2026-10-25). Tutta l'arte la genera Claude con sprite-forge:
+personaggi a 64 px, aspetti degli NPC, terreni e pareti, un **mondo unico di
+1200 x 1000 caselle** generato dal seed 6 e salvato come dati in
+`assets/world/` (due modalita': luminosa facile, cupa difficile). Nel gioco
+(`scripts/world/mondo.gd`): blocchi costruiti attorno al giocatore, regione
+dalla posizione, NPC al loro luogo, il sottosuolo come secondo livello (dalle
+fogne di Mirwada alle catacombe delle Marche, dove si arriva solo volando o da
+sotto terra), nemici/boss/oggetti dei layout della fase 10 riportati sul mondo,
+il libro ridisegnato (cuoio, pergamena, font Alegreya). 982 test.
+PRD: `006_PRD/prd-fase-8b-arte.md`, story aperte in `prd.json`.
+
 ## Setup
 
-Richiede Godot 4.x e Python 3 (solo per gli strumenti di dati).
-`tools/generate_placeholders.py` richiede anche Pillow (`pip install pillow`).
+Richiede Godot 4.3 e Python 3 (strumenti di dati); numpy e Pillow per
+`tools/art/` (`pip install numpy pillow`).
 
 ```bash
 python tools/validate_data.py      # valida tutti i dati, esce 0 se ok
-godot --headless --path . --script res://tests/run_tests.gd   # suite headless, esce 0 se ok
+godot --headless --path . --import # la prima volta e dopo aver cambiato le PNG
+bash tools/run_tests.sh            # suite headless + errori di script nascosti, esce 0 se ok
+python tools/art/build_personaggi.py  # Enel, nemico_base, pet a 64 px (sprite-forge)
+python tools/art/build_npc.py         # aspetti degli NPC
+python tools/art/build_libro.py       # aspetto del libro (assets/ui/)
+python tools/art/esporta_mondo.py     # il mondo per il gioco (~1 ora; --solo-blocchi, --sottosuolo, --solo-dati)
 python tools/generate_pathways.py  # rigenera la spina dorsale dei 10 pathway
 python tools/generate_formula_ingredients.py  # item mancanti per gli ingredienti delle formule
-python tools/generate_sprites.py      # arte pulita: personaggio/nemico/pet/NPC/oggetti/tileset, 23 fogli (US-812/US-813)
+python tools/generate_sprites.py      # tileset degli interni, gate, passaggi, oggetti (i personaggi li fa tools/art/, 64 px)
 python tools/generate_placeholders.py # arte + overlay diagnostici (bordi/numero frame) per tarare il combattimento
 godot --headless --path . --script res://tools/build_tileset.gd  # ricostruisce il TileSet dal tileset.png (US-813)
 
@@ -230,9 +247,10 @@ di motore che nominino un Pathway specifico.
 ## Documenti
 
 - `CLAUDE.md` — regole di lavoro, comandi, decisioni prese
-- `006_PRD/prd-fase-9-pathway-non-standard.md` — **PRD dell'ultima fase chiusa** (Pathway Non-Standard, motore Boon + Eternal Aeon, 7 story)
+- `006_PRD/prd-fase-8b-arte.md` — **PRD della fase in corso** (arte con sprite-forge e mondo generato)
+- `006_PRD/prd-fase-9-pathway-non-standard.md` — PRD della fase 9 (chiusa, Pathway Non-Standard, motore Boon + Eternal Aeon, 7 story)
 - `006_PRD/prd-fase-8-vertical-slice.md` — PRD della fase 8 (chiusa, vertical slice giocabile, 19 story)
-- `006_PRD/prossimi-passi.md` — istruzioni operative della fase 8: ordine delle operazioni, quando usare `/prd` e `/ralph`, setup, trappole note
+- `006_PRD/prossimi-passi.md` — istruzioni operative per la prossima sessione: stato, ordine delle story, trappole note
 - `006_PRD/prd-fase-7-endgame.md` — PRD della fase 7 (chiusa)
 - `006_PRD/prd-fase-5b-lord-of-mysteries.md` — PRD della fase 5b (chiusa)
 - `006_PRD/prd-fase-6-mondo.md` — PRD della fase 6 (chiusa)
@@ -248,14 +266,14 @@ di motore che nominino un Pathway specifico.
 - `006_PRD/art-brief-gemini.md` — prompt pronti per generare concept/ritratti/UI con Gemini, con i limiti dichiarati
 - `data/audio.json` — sistema audio data-driven (tell sonori, follia, palette)
 - `006_PRD/roadmap.md` — fasi 2-10
-- `prd.json` — story dell'ultima fase chiusa (fase 9) in formato ralph
+- `prd.json` — story della fase 8b (fatte e aperte) in formato ralph
 - `progress.txt` — memoria tra le sessioni
 - `docs/documentazione.py` — rigenera la documentazione docx; `diario.py` — diario del progetto
 
 ## Avvio del ciclo ralph
 
 ```bash
-bash ~/.claude/skills/ralph.sh <N> --fase <F> --test-cmd "godot --headless --script tests/run_tests.gd"
+bash ~/.claude/skills/ralph.sh <N> --fase <F> --test-cmd "bash tools/run_tests.sh"
 ```
 
 Prerequisiti: Docker Desktop attivo, `prd.json` presente in root con le story
