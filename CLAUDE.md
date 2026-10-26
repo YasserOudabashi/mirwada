@@ -159,7 +159,7 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - Nel gioco il mondo si carica con `scripts/world/mondo.gd` (US-8B12): tessere gia' composte in
   Python e deduplicate (`<tema>/tessere_<k>.png` + `indici.png`), costruite solo nei blocchi attorno al
   giocatore. Le PNG si leggono dal disco, senza import dell'editor. File in `assets/world/`:
-  `mondo.json` (misure, partenza, luoghi, riquadri delle regioni, oggetti, sottosuolo), `blocchi.png`
+  `mondo.json` (misure, partenza, luoghi, riquadri delle regioni, oggetti, sottosuolo, edifici, villaggi), `blocchi.png`
   (0 libera, 128 dislivello: a piedi no, in volo si', 255 acqua o vuoto), `regioni.png`, `<tema>/oggetti/`,
   `sotto/` e `<tema>/sotto/` (il sottosuolo, secondo livello sulla stessa griglia, 47 ingressi).
 - La regione e la zona vengono dalla posizione; `regions.json` dice come ci si arriva (`accesso`:
@@ -185,8 +185,9 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - Il ponte è un rettangolo di legno.
 - I panorami sono ancora piatti.
 - Mancano: animazioni di arrampicata/nuoto/volo, mostri volanti grandi (c'è solo `bird()` per i volatili
-  piccoli), edifici (case, castelli, ponti dettagliati: la citta' di Mirwada ha i sedimi degli isolati ma
-  nessuna casa). Vanno aggiunti a `forge3d`, con una story dedicata (US-8B18).
+  piccoli), castelli e ponti dettagliati. Vanno aggiunti a `forge3d`, con una story dedicata.
+- Le case (`creatures.edificio`, US-8B18a) coprono a schermo il loro sedime e sporgono verso nord di 3-4
+  caselle (muro + colmo): dove il generatore ha stradine di 1 casella si vedono i tetti, non le facciate.
 - Una correzione al generatore (ad esempio il viso) è una story a sé e **rigenera tutto**
   con lo stesso seed, poi si confronta il prima e il dopo.
 
@@ -227,6 +228,7 @@ python tools/art/esporta_mondo.py              # mondo per il gioco -> assets/wo
 python tools/art/esporta_mondo.py --solo-blocchi   # solo le collisioni (blocchi.png)
 python tools/art/esporta_mondo.py --sottosuolo     # solo il sottosuolo (~5 minuti)
 python tools/art/esporta_mondo.py --solo-dati      # solo i riquadri delle regioni in mondo.json
+python tools/art/esporta_mondo.py --edifici        # solo gli edifici: sprite, mondo.json, blocchi.png (~5 minuti)
 python tools/art/build_npc.py                  # aspetti degli NPC (personaggio_<aspetto>_{idle,walk}.png)
 python tools/art/build_libro.py                # carta, segnalibri, caselle e filetto del libro (assets/ui/)
 python scripts/forge.py contact FILE.png --scale 4
@@ -295,14 +297,14 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   ramo; i villaggi e gli edifici vanno portati sul mondo generato come per la fase 10.
 - Fase 8b — Arte con sprite-forge: **IN CORSO**. Fatti: personaggi a 64 px, aspetti degli NPC, terreni,
   pareti, mondo generato (seed 6) con modalita' luminosa/cupa, mondo unico nel gioco (US-8B12..g:
-  caricatore, regione dalla posizione, NPC, collisioni, sottosuolo, contenuto dei layout), libro (US-8B73).
+  caricatore, regione dalla posizione, NPC, collisioni, sottosuolo, contenuto dei layout), libro (US-8B73),
+  edifici di citta', villaggi e torri con le porte verso i 14 interni (US-8B18a/b).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
-**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): edifici di Mirwada e dei villaggi
-con le porte verso gli interni (US-8B18), varchi delle sotto-aree (US-8B21), poi volo e Frontiera (decisioni
-dell'utente).
+**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): interni con l'arte vera (US-8B18c),
+varchi delle sotto-aree (US-8B21), poi volo e Frontiera (decisioni dell'utente).
 
 ## Decisioni prese
 

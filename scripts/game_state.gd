@@ -353,7 +353,11 @@ func snapshot() -> Dictionary:
 		"boon": _boon().per_salvataggio() if _boon() != null else {},
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
-	if p is Node2D:
+	var mn: Node = get_tree().get_first_node_in_group("mondo")
+	if mn != null:                                   # mondo generato: fuori dagli interni, col livello
+		dati["posizione"] = mn.call("posizione_da_salvare")
+		(dati["mondo"] as Dictionary)["livello"] = str(mn.get("livello"))
+	elif p is Node2D:
 		dati["posizione"] = (p as Node2D).global_position
 	var stats: Node = p.get_node_or_null("StatsComponent") if p != null else null
 	if stats != null:
@@ -436,7 +440,10 @@ func applica(dati: Dictionary) -> void:
 	if _equip() != null:
 		_equip().da_salvataggio(dati.get("equipaggiamento", {}))
 	var p: Node = get_tree().get_first_node_in_group("player")
-	if p is Node2D and dati.has("posizione"):
+	var mn: Node = get_tree().get_first_node_in_group("mondo")
+	if mn != null and dati.has("posizione"):
+		mn.call("riprendi", str((dati.get("mondo", {}) as Dictionary).get("livello", "superficie")), dati["posizione"])
+	elif p is Node2D and dati.has("posizione"):
 		(p as Node2D).global_position = dati["posizione"]
 	var stats: Node = p.get_node_or_null("StatsComponent") if p != null else null
 	var s: Dictionary = dati.get("statistiche", {})

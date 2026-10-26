@@ -478,3 +478,102 @@ func test_nessun_nemico_vicino_alla_partenza() -> void:
 		if c is CharacterBody2D and c.has_meta("regione_layout"):
 			assert_true((c as Node2D).position.distance_to(sp) / m.tile > r, "%s lontano dalla partenza" % c.name)
 	m.free()
+
+
+# --- US-8B18: edifici e porte verso gli interni -------------------------------------
+
+func test_gli_edifici_stanno_sul_loro_sedime_e_non_si_attraversano() -> void:
+	var m: Node2D = _mondo()
+	var ed: Array = m.dati.get("edifici", [])
+	assert_true(ed.size() > 100, "la citta' e i villaggi hanno i loro edifici (%d)" % ed.size())
+	var sp: Vector2 = m.call("partenza")
+	var cp := Vector2i(int(sp.x / m.tile), int(sp.y / m.tile))
+	for e in ed:
+		var x0: int = int(e[0])
+		var y0: int = int(e[1])
+		assert_true(m.call("bloccata", x0 + int(e[2]) / 2, y0 + int(e[3]) / 2), "il sedime %s non si attraversa" % [e])
+		assert_false(cp.x >= x0 and cp.x < x0 + int(e[2]) and cp.y >= y0 and cp.y < y0 + int(e[3]), "la partenza non e' dentro una casa")
+	var con_sprite := 0
+	for o in m.dati["oggetti"]:
+		if str(o[0]).begins_with("edificio_"):
+			con_sprite += 1
+			assert_true((m.dati["sprite"] as Dictionary).has(str(o[0])), "%s ha il suo disegno" % o[0])
+	assert_eq(con_sprite, ed.size(), "un disegno per edificio")
+	m.free()
+
+
+func test_ogni_interno_ha_la_sua_porta_su_una_casa() -> void:
+	var m: Node2D = _mondo()
+	m.call("crea_porte")
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var interni: Array = []
+	for reg in gd.call("get_regions"):
+		interni.append_array((gd.call("get_layout", str(reg["id"])) as Dictionary).get("edifici", []))
+	interni.append_array((gd.call("get_campagna") as Dictionary).get("edifici", []))
+	assert_eq(interni.size(), 14, "14 interni nei dati")
+	for spec in interni:
+		var iid: String = str(spec["interno_id"])
+		var porta: Area2D = m.get_node_or_null("Porta_%s" % iid)
+		assert_true(porta != null, "%s ha una porta" % iid)
+		if porta == null:
+			continue
+		var c: Vector2i = _cella(m, porta.position)
+		var liv: String = str(porta.get_meta("livello"))
+		m.call("cambia_livello", liv)
+		assert_false(m.call("bloccata", c.x, c.y), "la porta di %s e' su una casella libera (%s)" % [iid, liv])
+		if liv == "superficie":
+			var su_casa := false
+			for e in m.dati["edifici"]:
+				if c == Vector2i(int(e[0]) + int(e[2]) / 2, int(e[1]) + int(e[3])):
+					su_casa = true
+			assert_true(su_casa, "la porta di %s e' davanti a una casa" % iid)
+			for dy in [1, 2, 3]:
+				assert_false(m.call("bloccata", c.x, c.y + dy), "la soglia di %s non e' sotto il tetto di un'altra casa" % iid)
+			if spec.has("villaggio"):
+				var v: Array = m.dati["villaggi"][spec["villaggio"]]
+				assert_true(Vector2(c).distance_to(Vector2(v[0], v[1])) < 16.0, "%s sta nel suo villaggio" % iid)
+		m.call("cambia_livello", "superficie")
+	m.free()
+
+
+func test_entrare_e_uscire_da_un_interno() -> void:
+	var main := Node2D.new()
+	var m: Node2D = _mondo()
+	main.add_child(m)
+	var p := CharacterBody2D.new()
+	p.add_to_group("player")
+	m.add_child(p)
+	Engine.get_main_loop().root.add_child(main)                  # _ready crea anche le porte
+	var porta: Area2D = m.get_node("Porta_mirwada_bettola_del_porto")
+	assert_true(m.call("entra", porta), "si entra nella bettola")
+	assert_true(m.call("in_un_interno"), "dentro")
+	assert_eq(p.get_parent(), main, "il giocatore esce dal nodo mondo")
+	assert_false(m.visible, "il mondo si nasconde")
+	m.call("esci")
+	assert_false(m.call("in_un_interno"), "fuori")
+	assert_eq(p.get_parent(), m, "il giocatore torna nel mondo")
+	assert_true(p.position.distance_to(porta.position) < 1.0, "davanti alla porta")
+	main.free()
+
+
+func test_salvare_dentro_un_interno_riporta_davanti_alla_porta() -> void:
+	var main := Node2D.new()
+	var m: Node2D = _mondo()
+	main.add_child(m)
+	var p := CharacterBody2D.new()
+	p.add_to_group("player")
+	m.add_child(p)
+	Engine.get_main_loop().root.add_child(main)
+	var porta: Area2D = m.get_node("Porta_mirwada_bettola_del_porto")
+	m.call("entra", porta)
+	var dati: Dictionary = Engine.get_main_loop().root.get_node("GameState").call("snapshot")
+	assert_eq(dati["posizione"], porta.position, "si salva la porta, non le coordinate della stanza")
+	assert_eq(str(dati["mondo"]["livello"]), "superficie", "e il livello")
+	var sotto: Vector2 = Vector2(589.5, 371.5) * float(m.tile)
+	m.call("riprendi", "sottosuolo", sotto)
+	assert_false(m.call("in_un_interno"), "caricando si esce dall'interno")
+	assert_eq(m.livello, "sottosuolo", "sul livello salvato")
+	assert_eq(p.get_parent(), m, "il giocatore e' di nuovo nel mondo")
+	assert_eq(p.position, sotto, "nel punto salvato")
+	m.call("cambia_livello", "superficie")
+	main.free()

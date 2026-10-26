@@ -14196,3 +14196,52 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - prd.json: fase 8b, 19 story (8 fatte con le note dei commit, 11 aperte con i criteri); quello della fase 11
   resta nella storia di git.
 - Prossima story: US-8B18a, edifici di Mirwada sugli isolati del generatore.
+
+## US-8B18a — edifici di Mirwada, dei villaggi e torri, 2026-10-26
+- forge3d/creatures.py edificio(tipo, larg, prof, seed): una casa che a schermo copre esattamente il suo sedime
+  (profondita' del modello / sin 32 gradi), muri, tetto a due falde col colmo a 3/4 (la falda davanti in luce, quella
+  dietro una striscia), porta al centro del fronte (la porta di gioco sta li'), finestre per piano, tenda delle
+  botteghe, comignoli, casse dei magazzini contro il muro; torre = cilindro vero + cono. TIPI_EDIFICIO: casa,
+  bottega, palazzo, magazzino, baracca, villa (quartieri), capanna, casale, fienile (villaggi), torre (torre di
+  osservazione e faro). Pareti e tetti possono essere una scelta per variante (case e botteghe: intonaco crema,
+  rosa, ocra; tegole nuove e vecchie). Materiali nuovi in materials.py (rampe Endesga 32).
+- esporta_mondo.py --edifici (~4,5 minuti, seed 6): edifici() sui sedimi degli isolati (stone nei quartieri, alt 0,
+  fuori da acqua e strade), un tipo per quartiere; un sedime piu' profondo di 4 diventa file con un vicolo largo
+  quanto la sporgenza del tetto davanti (sporgenza(): muro + colmo visti a 32 gradi, 3-4 caselle), una fila lunga
+  di case/botteghe/baracche/ville diventa case singole; variante dalla posizione con un hash (con (7x+13y)%4 una
+  colonna della griglia aveva sempre la stessa casa). Case vicino ai villaggi suggeriti (CASE_DI_VILLAGGIO, file a
+  8 caselle, soglia e 3 caselle sotto libere) e torri sui luoghi. Sprite per tema (<tema>/oggetti/edificio_*.png,
+  162 per tema), mondo.json "edifici" [x, y, w, h, tipo] e "villaggi", oggetti di scena dentro i sedimi tolti,
+  blocchi.png con i sedimi a 128. 338 edifici. Gli oggetti di scena si rifanno dal generatore (non da mondo.json):
+  rilanciato partendo dal file gia' con le case, mondo.json, blocchi.png e sprite escono identici byte per byte.
+- Visto ingrandito (campionari su chiaro e scuro, due temi) e a schermo: porto, centro antico, quartiere operaio,
+  villaggio, torre, modalita' cupa (arte/revisione/edifici_in_gioco.png). Corretto in prova: il tetto di una casa
+  2 x 11 era una colonna (-> file), le file attaccate nascondevano le facciate (-> vicoli), le casse sporgevano in
+  strada, tutte le case di una colonna uguali (-> hash), quartiere operaio monotono (-> varianti di muri e tetti).
+- Non mi convince ancora: nel quartiere operaio le stradine di 1 casella del generatore (dati approvati) fanno si'
+  che il tetto di una fila copra la facciata di quella dietro: si vedono i tetti. Il cono della torre ha strisce
+  curve scure. Le case non hanno ancora ombra a terra.
+
+## US-8B18b — porte verso gli interni e villaggi, 2026-10-26
+- mondo.gd crea_porte(): ogni edificio dei layout e della campagna (14 interni) va sulla casa piu' vicina al posto
+  della regola dei layout (posto_dal_layout), nella sua regione, con la soglia e le 3 caselle sotto libere
+  (altrimenti il tetto della casa davanti nasconde il giocatore sulla soglia: visto a schermo). Un edificio con
+  "villaggio" nei dati (avamposto della Valle -> capanna_base_valle, villaggi della campagna -> villaggio_libero_
+  colline e villaggio_libero_paludi) va alle case di quel villaggio del generatore, anche se il villaggio sta sul
+  confine; esporta_mondo.py mette nel villaggio almeno una casa per interno. Il sotterraneo di Mirwada ha una porta
+  nella roccia nelle fogne (ingresso_porta).
+- "interagisci" sulla soglia (prompt HUD_PROMPT_ENTRA): entra() nasconde e ferma il mondo (mai liberato), il
+  giocatore esce dal nodo mondo, interior_scene.tscn si aggiunge sotto di lui (prima la stanza copriva il
+  giocatore), telecamera senza limiti; all'uscita esci() lo riporta davanti alla porta con i limiti del mondo.
+- interior_scene.gd: gli NPC degli interni con il loro aspetto sprite-forge (personaggio_<aspetto>), come nel mondo.
+- Salvataggio (trovato rileggendo il diff): dentro un interno GameState salvava le coordinate della stanza, al
+  caricamento si finiva in un angolo della mappa; e il livello (sottosuolo) non si salvava. Ora mondo.gd e' nel
+  gruppo "mondo": snapshot() prende posizione_da_salvare() (la porta, se si e' dentro) e mondo.livello (sotto-campo
+  senza cambiare lo schema, come mondo.tempo); applica() chiama riprendi(livello, posizione).
+- Validator: edifici[].villaggio deve essere un villaggio di assets/world/mondo.json.
+- Verifica: 3 test nuovi in test_mondo (edifici sul loro sedime e non attraversabili, un disegno per edificio, la
+  partenza fuori dalle case; ogni interno ha la sua porta su una casa con la soglia visibile, nel suo villaggio se
+  ne ha uno; entrare e uscire dalla bettola del porto; salvare dentro un interno e riprendere nel sottosuolo).
+  986 test passati. Prova a schermo: davanti e dentro la bettola, base della
+  Valle e villaggio delle paludi con "[F] Entra".
+- Aperto: gli interni hanno ancora il tileset segnaposto a 32 px (US-8B18c).

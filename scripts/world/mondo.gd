@@ -60,12 +60,16 @@ var _npc_vicino: String = ""
 var livello: String = "superficie"
 var _livelli: Dictionary = {}       # nome -> {indici, blocchi, tileset, oggetti}
 var _ingresso_vicino: String = ""
+var _porta_vicina: Area2D = null
+var _interno: Node = null                   # l'interno caricato (US-8B18b), null fuori
+var _ritorno := Vector2.ZERO                # dove si torna uscendo
 
 signal livello_cambiato(nuovo: String)
 
 
 func _ready() -> void:
 	y_sort_enabled = true
+	add_to_group("mondo")                          # GameState: posizione e livello nel salvataggio
 	if dati.is_empty() and not carica():
 		return
 	for c in get_children():                       # il giocatore della scena parte dalla casa al porto
@@ -78,6 +82,7 @@ func _ready() -> void:
 	crea_npc()
 	crea_ingressi()
 	popola()
+	crea_porte()
 	var t := Timer.new()
 	t.wait_time = INTERVALLO_ATTIVITA
 	t.autostart = true
@@ -315,6 +320,7 @@ func luogo_del_tag(rid: String, tag: String) -> Vector2i:
 const SCALA_LAYOUT := 2.0
 const REGIONE_CAMPAGNA := "terra_di_mezzo"
 const INTERVALLO_ATTIVITA := 0.4
+const SOGLIA_LIBERA := [0, 1, 2, 3]          # la soglia di una porta e le 3 caselle sotto (_casa_piu_vicina)
 
 var _nemici_vivi: Dictionary = {}           # rid -> nemici ancora vivi
 var _senza_abilita: Dictionary = {}         # rid -> nessun nemico ucciso con un'abilita'
@@ -472,6 +478,178 @@ func _aggiorna_attivita() -> void:
 		if c is Area2D and c.has_meta("npc_id") and (c as CanvasItem).visible:
 			var vicino_npc: bool = (c as Node2D).global_position.distance_squared_to(p.global_position) <= r2
 			c.process_mode = Node.PROCESS_MODE_INHERIT if vicino_npc else Node.PROCESS_MODE_DISABLED
+
+
+# --- Porte verso gli interni (US-8B18b) --------------------------------------------
+# Gli edifici dei layout (data/world/layouts, campagna.json: edifici [{x, y, interno_id}])
+# vanno sulla casa del mondo generato (mondo.json "edifici") piu' vicina al posto che
+# la regola dei layout calcola (posto_dal_layout), nella stessa regione; un edificio con
+# "villaggio" (un gruppo di case nei dati, come l'avamposto della Valle) va a una casa di
+# quel villaggio del mondo generato; una zona del sottosuolo mette la porta nella roccia.
+# "interagisci" davanti alla porta carica scenes/interior_scene.tscn; uscendo si torna
+# davanti alla porta.
+
+func crea_porte() -> void:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	if gd == null:
+		return
+	var prese: Dictionary = {}
+	for reg in gd.call("get_regions"):
+		var rid: String = str((reg as Dictionary).get("id", ""))
+		_porte_da(rid, gd.call("get_layout", rid), prese)
+	_porte_da(REGIONE_CAMPAGNA, gd.call("get_campagna"), prese)
+
+
+func _porte_da(rid: String, layout: Dictionary, prese: Dictionary) -> void:
+	for e in layout.get("edifici", []):
+		var spec: Dictionary = e
+		var iid: String = str(spec.get("interno_id", ""))
+		if iid.is_empty() or not (dati.get("riquadri", {}) as Dictionary).has(rid):
+			continue
+		var vil: Array = (dati.get("villaggi", {}) as Dictionary).get(str(spec.get("villaggio", "")), [])
+		var posto: Dictionary = posto_dal_layout(rid, layout, int(spec.get("x", 0)), int(spec.get("y", 0))) \
+				if vil.is_empty() else {"cella": Vector2i(int(vil[0]), int(vil[1])), "livello": "superficie"}
+		var c: Vector2i = posto["cella"]
+		if posto["livello"] == "superficie":
+			var i: int = _casa_piu_vicina(c, rid if vil.is_empty() else "", prese)   # un villaggio puo' stare sul confine
+			if i < 0:
+				continue
+			prese[i] = true
+			var ed: Array = dati["edifici"][i]
+			c = Vector2i(int(ed[0]) + int(ed[2]) / 2, int(ed[1]) + int(ed[3]))      # davanti alla porta
+		add_child(_porta(iid, c, posto["livello"]))
+
+
+## L'indice della casa (mondo.json edifici [x, y, larghezza, altezza, tipo]) libera piu'
+## vicina a c, con la porta nella regione rid ("" = qualunque); -1 se nessuna. La soglia e le caselle
+## sotto devono essere libere: il tetto di una casa davanti sporge fino a ~3 caselle
+## (esporta_mondo.py sporgenza) e nasconderebbe il giocatore sulla soglia.
+func _casa_piu_vicina(c: Vector2i, rid: String, prese: Dictionary) -> int:
+	var migliore: int = -1
+	var dist: float = INF
+	var ed: Array = dati.get("edifici", [])
+	for i in ed.size():
+		if prese.has(i):
+			continue
+		var p := Vector2i(int(ed[i][0]) + int(ed[i][2]) / 2, int(ed[i][1]) + int(ed[i][3]))
+		if (not rid.is_empty() and regione_a(p.x, p.y) != rid) or not _soglia_visibile(p):
+			continue
+		var d: float = Vector2(p).distance_squared_to(Vector2(c))
+		if d < dist:
+			dist = d
+			migliore = i
+	return migliore
+
+
+func _soglia_visibile(p: Vector2i) -> bool:
+	for dy in SOGLIA_LIBERA:
+		if bloccata(p.x, p.y + dy):
+			return false
+	return true
+
+
+func _porta(iid: String, c: Vector2i, liv: String) -> Area2D:
+	var area := Area2D.new()
+	area.name = "Porta_%s" % iid
+	area.set_meta("interno_id", iid)
+	area.set_meta("livello", liv)
+	area.position = Vector2((c.x + 0.5) * tile, (c.y + 0.5) * tile)
+	var shape := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(tile, tile) * 1.4
+	shape.shape = rect
+	area.add_child(shape)
+	if liv == "sottosuolo":                      # nel sottosuolo non c'e' una casa: una porta nella roccia
+		var meta: Dictionary = (dati["sprite"] as Dictionary).get("ingresso_porta", {})
+		var spr := Sprite2D.new()
+		spr.texture = _texture_oggetto("ingresso_porta")
+		spr.centered = false
+		spr.offset = Vector2(-float(meta.get("ax", 0)), -float(meta.get("ay", 0)))
+		area.add_child(spr)
+	var prompt := Label.new()
+	prompt.name = "Prompt"
+	prompt.add_theme_font_size_override("font_size", 10)
+	prompt.position = Vector2(-tile, tile * 0.4)
+	prompt.text = tr("HUD_PROMPT_ENTRA").format({"tasto": _tasto_interagisci()})
+	prompt.hide()
+	area.add_child(prompt)
+	area.body_entered.connect(_su_porta.bind(area, true))
+	area.body_exited.connect(_su_porta.bind(area, false))
+	_mostra(area, liv == livello)
+	return area
+
+
+func _su_porta(body: Node, area: Area2D, dentro: bool) -> void:
+	if not body.is_in_group("player"):
+		return
+	if dentro:
+		_porta_vicina = area
+	elif _porta_vicina == area:
+		_porta_vicina = null
+	(area.get_node("Prompt") as CanvasItem).visible = dentro
+
+
+## Entra nell'interno della porta: il giocatore esce dal nodo mondo (che si nasconde e
+## si ferma, mai liberato), l'interno si aggiunge accanto al mondo.
+func entra(porta: Area2D) -> bool:
+	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D if is_inside_tree() else null
+	if p == null or _interno != null or get_parent() == null:
+		return false
+	var interno: Node = load("res://scenes/interior_scene.tscn").instantiate()
+	interno.set("interno_id", str(porta.get_meta("interno_id")))
+	_ritorno = porta.position
+	_porta_vicina = null
+	(porta.get_node("Prompt") as CanvasItem).visible = false
+	p.reparent(get_parent())
+	visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
+	get_parent().add_child(interno)
+	get_parent().move_child(interno, p.get_index())  # la stanza sotto il giocatore, non sopra
+	interno.connect("uscita", func() -> void: esci.call_deferred())
+	_interno = interno
+	p.global_position = interno.call("punto_spawn")
+	for cam in p.find_children("*", "Camera2D", true, false):
+		if cam.has_method("clear_zone_limits"):
+			cam.call("clear_zone_limits")              # la stanza resta al centro dello schermo
+		(cam as Camera2D).reset_smoothing()
+	return true
+
+
+## Torna dal'interno alla porta da cui si era entrati.
+func esci() -> void:
+	if _interno == null:
+		return
+	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D
+	_interno.queue_free()
+	_interno = null
+	visible = true
+	process_mode = Node.PROCESS_MODE_INHERIT
+	if p != null:
+		p.reparent(self)
+		for cam in p.find_children("*", "Camera2D", true, false):
+			if cam.has_method("apply_zone_limits"):
+				cam.call("apply_zone_limits", Rect2(Vector2.ZERO, Vector2(larghezza, altezza) * tile))
+		colloca(p, _ritorno)
+
+
+func in_un_interno() -> bool:
+	return _interno != null
+
+
+## Salvataggio (GameState): dentro un interno conta la porta da cui si e' entrati, non
+## le coordinate della stanza (al caricamento si finirebbe in un angolo della mappa).
+func posizione_da_salvare() -> Vector2:
+	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D
+	return _ritorno if _interno != null else (p.position if p != null else partenza())
+
+
+## Caricamento: fuori da un eventuale interno, sul livello salvato, nel punto salvato.
+func riprendi(liv: String, pos: Vector2) -> void:
+	esci()
+	cambia_livello(liv)
+	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D
+	if p != null:
+		colloca(p, pos)
 
 
 # --- Sottosuolo: ingressi e cambio di livello (2026-10-25) ------------------------
@@ -743,21 +921,21 @@ func _npc_allontanato(body: Node, id: String) -> void:
 
 
 ## "interagisci" vicino a un NPC -> il suo dialogo (dialogue_id dal roster);
-## sopra un ingresso del sottosuolo -> l'altro livello.
+## davanti a una porta -> l'interno; sopra un ingresso del sottosuolo -> l'altro livello.
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_action_pressed("interagisci"):
 		return
-	if _npc_vicino.is_empty() and not _ingresso_vicino.is_empty():
-		var book_i: Node = get_node_or_null("/root/Book")
-		if book_i == null or not bool(book_i.call("e_aperto")):
-			if attraversa(_ingresso_vicino):
-				get_viewport().set_input_as_handled()
+	var book: Node = get_node_or_null("/root/Book")
+	if book != null and bool(book.call("e_aperto")):
 		return
 	if _npc_vicino.is_empty():
+		if _porta_vicina != null and _interno == null and entra(_porta_vicina):
+			get_viewport().set_input_as_handled()
+		elif not _ingresso_vicino.is_empty() and attraversa(_ingresso_vicino):
+			get_viewport().set_input_as_handled()
 		return
 	var de: Node = get_node_or_null("/root/DialogueEngine")
-	var book: Node = get_node_or_null("/root/Book")
-	if de == null or bool(de.call("in_corso")) or (book != null and bool(book.call("e_aperto"))):
+	if de == null or bool(de.call("in_corso")):
 		return
 	var gd: Node = get_node_or_null("/root/GameData")
 	var did: String = str(gd.call("get_npc", _npc_vicino).get("dialogue_id", "")) if gd != null else ""

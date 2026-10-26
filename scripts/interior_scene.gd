@@ -161,12 +161,22 @@ func _crea_un_npc(id: String, gd: Node, posizione: Vector2) -> void:
 	area.add_child(shape)
 
 	var npc_dati: Dictionary = gd.call("get_npc", id)
-	var variante: int = int((npc_dati.get("aspetto", {}) as Dictionary).get("variante", 0))
-	var sprite := Sprite2D.new()
-	sprite.texture = load("res://assets/placeholder/npc_popolano.png")
-	sprite.region_enabled = true
-	sprite.region_rect = Rect2(0, variante * TILE, TILE, TILE)
-	area.add_child(sprite)
+	var aspetto: Dictionary = npc_dati.get("aspetto", {})
+	var foglio: String = "res://assets/placeholder/personaggio_%s_idle.png" % str(aspetto.get("sprite", ""))
+	if aspetto.has("sprite") and FileAccess.file_exists(foglio):
+		# l'aspetto sprite-forge dell'NPC (tools/art/build_npc.py), come nel mondo generato
+		var anim: AnimatedSprite2D = preload("res://scripts/animation_machine.gd").new()
+		anim.name = "AnimationMachine"
+		area.add_child(anim)
+		anim.call("configura", "personaggio", str(aspetto["sprite"]))
+		anim.call("riproduci", "idle", "down")
+	else:
+		var variante: int = int(aspetto.get("variante", 0))
+		var sprite := Sprite2D.new()
+		sprite.texture = load("res://assets/placeholder/npc_popolano.png")
+		sprite.region_enabled = true
+		sprite.region_rect = Rect2(0, variante * TILE, TILE, TILE)
+		area.add_child(sprite)
 
 	var nome := Label.new()
 	nome.name = "Nome"

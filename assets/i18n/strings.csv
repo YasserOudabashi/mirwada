@@ -9,6 +9,7 @@ HUD_HOTBAR_VUOTO,·,·
 HUD_PROMPT_INTERAGISCI,[{tasto}] Parla,[{tasto}] Talk
 HUD_PROMPT_SCENDI,[{tasto}] Scendi,[{tasto}] Go down
 HUD_PROMPT_SALI,[{tasto}] Sali,[{tasto}] Go up
+HUD_PROMPT_ENTRA,[{tasto}] Entra,[{tasto}] Enter
 BOOK_SCAFFALE_TOMO_NUOVO,Tomo nuovo,New tome
 BOOK_SCAFFALE_TOMO_BRUCIATO,Tomo bruciato,Burnt tome
 BOOK_SCAFFALE_RIPRENDI,Torna alla partita,Back to game

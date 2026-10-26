@@ -1172,6 +1172,9 @@ def main():
     # risolvere.
     interni_dir = os.path.join(DATA, "world", "interni")
     interni_ids = set()
+    # US-8B18b: edifici[].villaggio = un villaggio del mondo generato (assets/world/mondo.json "villaggi")
+    _mondo = os.path.join(ROOT, "assets", "world", "mondo.json")
+    villaggi_mondo = set((load_json(_mondo) or {}).get("villaggi", {})) if os.path.isfile(_mondo) else None
     interni_npc_refs = []   # [(rel, iid, npc_id)] - risolti dopo il roster NPC, sotto
     if os.path.isdir(interni_dir):
         for fn in sorted(os.listdir(interni_dir)):
@@ -1259,6 +1262,9 @@ def main():
                 if not iid or iid not in interni_ids:
                     err(f"{rel} [{rid}]: edifici[{i}].interno_id '{iid}' non esiste in "
                         f"data/world/interni/")
+                if "villaggio" in ed and villaggi_mondo is not None and ed["villaggio"] not in villaggi_mondo:
+                    err(f"{rel} [{rid}]: edifici[{i}].villaggio '{ed['villaggio']}' non e' un villaggio di "
+                        f"assets/world/mondo.json")
 
     for _rid in sorted(region_ids - layout_region_ids):
         err(f"data/world/regions.json [{_rid}]: nessun layout in data/world/layouts/ "
@@ -1364,6 +1370,9 @@ def main():
             if not iid or iid not in interni_ids:
                 err(f"{rel}: edifici[{i}].interno_id '{iid}' non esiste in "
                     f"data/world/interni/")
+            if "villaggio" in ed and villaggi_mondo is not None and ed["villaggio"] not in villaggi_mondo:
+                err(f"{rel}: edifici[{i}].villaggio '{ed['villaggio']}' non e' un villaggio di "
+                    f"assets/world/mondo.json")
 
     # --- fonti di tag di fase 3 (US-334): stanze costruibili, specie di pet
     # (+ comportamenti), tag_grant dei talenti. Rendono raggiungibili le

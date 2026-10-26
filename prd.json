@@ -127,8 +127,8 @@
       ],
       "priority": 9,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "338 edifici (case dei 6 quartieri, villaggi, torri), esporta_mondo.py --edifici seed 6, 162 sprite per tema; prova a schermo in arte/revisione/edifici_in_gioco.png. Aperto: nel quartiere operaio le stradine di 1 casella fanno vedere i tetti, non le facciate."
     },
     {
       "id": "US-8B18b",
@@ -142,8 +142,8 @@
       ],
       "priority": 10,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "14 porte (mondo.gd crea_porte, soglia visibile), entrata/uscita con interior_scene.tscn, campo villaggio nei dati per l'avamposto della Valle e i villaggi della campagna, NPC degli interni con l'aspetto sprite-forge. 3 test in test_mondo."
     },
     {
       "id": "US-8B18c",
