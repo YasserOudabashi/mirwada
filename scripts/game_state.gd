@@ -358,6 +358,7 @@ func snapshot() -> Dictionary:
 		dati["posizione"] = mn.call("posizione_da_salvare")
 		(dati["mondo"] as Dictionary)["livello"] = str(mn.get("livello"))
 		(dati["mondo"] as Dictionary)["barca"] = mn.call("stato_barca")
+		(dati["mondo"] as Dictionary)["volo"] = bool(mn.call("in_volo"))
 	elif p is Node2D:
 		dati["posizione"] = (p as Node2D).global_position
 	var stats: Node = p.get_node_or_null("StatsComponent") if p != null else null
@@ -444,7 +445,8 @@ func applica(dati: Dictionary) -> void:
 	var mn: Node = get_tree().get_first_node_in_group("mondo")
 	if mn != null and dati.has("posizione"):
 		var md: Dictionary = dati.get("mondo", {})
-		mn.call("riprendi", str(md.get("livello", "superficie")), dati["posizione"], md.get("barca", {}))
+		mn.call("riprendi", str(md.get("livello", "superficie")), dati["posizione"], md.get("barca", {}),
+				bool(md.get("volo", false)))
 	elif p is Node2D and dati.has("posizione"):
 		(p as Node2D).global_position = dati["posizione"]
 	var stats: Node = p.get_node_or_null("StatsComponent") if p != null else null

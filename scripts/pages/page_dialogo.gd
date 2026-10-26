@@ -145,6 +145,8 @@ func _disegna_negozio() -> void:
 			var r: Dictionary = riga
 			var iid2: String = str(r.get("item_id", ""))
 			var it2: Dictionary = gd.call("get_item", iid2)
+			if not bool(it2.get("vendibile", true)):   # le chiavi del mondo (US-8B93) non si vendono
+				continue
 			var prezzo: int = maxi(1, _prezzo_con_rarita(gd, iid2) / 2)
 			var h2 := HBoxContainer.new()
 			var l2 := Label.new()
@@ -300,6 +302,8 @@ func vendi(item_id: String) -> Dictionary:
 		return {"ok": false, "reason": "no_inventory"}
 	if int(inv.call("conta", item_id)) < 1:
 		return {"ok": false, "reason": "non_posseduto"}
+	if not bool((gd.call("get_item", item_id) as Dictionary).get("vendibile", true)):
+		return {"ok": false, "reason": "non_vendibile"}
 	var valuta_items: Array = gd.call("items_per_categoria", "valuta")
 	if valuta_items.is_empty():
 		return {"ok": false, "reason": "no_valuta"}

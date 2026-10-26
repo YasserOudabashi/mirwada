@@ -164,3 +164,15 @@ func test_chiudi_esce_dal_negozio() -> void:
 	chiudi.pressed.emit()
 	assert_false(p.call("in_negozio"), "Chiudi esce dalla modalita' negozio")
 	p.free()
+
+
+## US-8B93: la chiave del volo non si vende (venduta, si perderebbe il volo).
+func test_la_piuma_dei_venti_non_si_vende() -> void:
+	var p: Node = _monta_pagina()
+	_inv().call("aggiungi", "piuma_dei_venti", 1)
+	_apri_vendita_sidon(p)
+	var res: Dictionary = p.call("vendi", "piuma_dei_venti")
+	assert_false(bool(res.get("ok", true)), "la vendita e' rifiutata")
+	assert_eq(str(res.get("reason", "")), "non_vendibile", "perche' non si vende")
+	assert_eq(int(_inv().call("conta", "piuma_dei_venti")), 1, "resta nello zaino")
+	p.free()

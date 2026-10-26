@@ -1,5 +1,14 @@
 {
   "schema_version": 1,
-  "_comment": "Mezzi per muoversi nel mondo generato (decisioni dell'utente 2026-10-26). barca (US-8B91): all'inizio e' ormeggiata nell'acqua piu' vicina al luogo (+ scostamento) che tocca la terra; poi resta dove la si lascia (salvataggio, mondo.barca). In barca l'acqua si attraversa e la terra no; si sbarca su una costa libera, ma non in una regione che ha 'accesso' senza 'barca' ne' 'a_piedi' (le Marche: solo volo o sottosuolo).",
-  "barca": {"luogo": "porto", "scostamento": [0, 0]}
+  "_comment": "Mezzi per muoversi nel mondo generato (decisioni dell'utente 2026-10-26). barca (US-8B91): all'inizio e' ormeggiata nell'acqua piu' vicina al luogo (+ scostamento) che tocca la terra; poi resta dove la si lascia (salvataggio, mondo.barca). In barca l'acqua si attraversa e la terra no; si sbarca su una costa libera, ma non in una regione che ha 'accesso' senza 'barca' ne' 'a_piedi' (le Marche: solo volo o sottosuolo). volo (US-8B93): si vola solo con la chiave nello zaino (un oggetto non vendibile); in volo si passa sopra tutto, si atterra su terra libera di una regione che non ha 'accesso' o lo ha con 'volo' o 'a_piedi'.",
+  "barca": {
+    "luogo": "porto",
+    "scostamento": [
+      0,
+      0
+    ]
+  },
+  "volo": {
+    "chiave": "piuma_dei_venti"
+  }
 }

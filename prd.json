@@ -226,8 +226,8 @@
       ],
       "priority": 13,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Piuma dei venti (non vendibile) nell'osservatorio dell'Archivio, mezzi.json volo.chiave, tasto V, player._mezzo (barca/volo), mondo.gd decolla/atterra, salvataggio mondo.volo. arte/revisione/volo_in_gioco.png."
     },
     {
       "id": "US-8B91",

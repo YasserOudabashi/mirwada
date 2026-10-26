@@ -183,30 +183,57 @@ func teleport_verso(spec: Dictionary) -> void:
 	global_position += dir.normalized() * distanza
 
 
-## Volo (decisione 2026-10-25): chi vola passa i dislivelli del mondo generato
-## (strato 5, scripts/world/mondo.gd STRATO_DISLIVELLI) ma non l'acqua ne' il
-## vuoto. Alle Marche del Crepuscolo si arriva solo cosi' o dal sottosuolo.
-func imposta_volo(attivo: bool) -> void:
-	set_collision_mask_value(5, not attivo)
+## Mezzi (US-8B91 barca, US-8B93 volo; decisioni dell'utente 2026-10-25 e 2026-10-26). A piedi
+## fermano l'acqua e il vuoto (strato 1 del mondo) e i dislivelli (strato 5, mondo.gd
+## STRATO_DISLIVELLI). In barca l'acqua non ferma e la terra si'; in volo non ferma niente (alla
+## Frontiera si arriva anche volando). Il mondo passa un vincolo, Callable(Vector2) -> bool, vero
+## dove il mezzo puo' stare (solo acqua, dentro la mappa).
+const ALTEZZA_VOLO := 14.0
+var _mezzo: String = ""                     # "", "barca", "volo"
+var _vincolo: Callable = Callable()
+var _ombra_volo: Sprite2D = null
+
+
+func imposta_volo(attivo: bool, vincolo: Callable = Callable()) -> void:
+	_imposta_mezzo("volo" if attivo else "", vincolo)
 
 
 func in_volo() -> bool:
-	return not get_collision_mask_value(5)
-
-
-## Barca (US-8B91, decisione 2026-10-26): in barca l'acqua (strato 1 del mondo) non ferma piu'
-## e la terra si': il mondo passa un vincolo, Callable(Vector2) -> bool, vero dove la barca
-## puo' stare. Senza vincolo si cammina come sempre.
-var _vincolo: Callable = Callable()
+	return _mezzo == "volo"
 
 
 func imposta_barca(attivo: bool, vincolo: Callable = Callable()) -> void:
-	set_collision_mask_value(1, not attivo)
-	_vincolo = vincolo if attivo else Callable()
+	_imposta_mezzo("barca" if attivo else "", vincolo)
 
 
 func in_barca() -> bool:
-	return _vincolo.is_valid()
+	return _mezzo == "barca"
+
+
+func _imposta_mezzo(mezzo: String, vincolo: Callable) -> void:
+	_mezzo = mezzo
+	_vincolo = vincolo if not mezzo.is_empty() else Callable()
+	set_collision_mask_value(1, mezzo.is_empty())
+	set_collision_mask_value(5, mezzo != "volo")
+	var vola: bool = mezzo == "volo"
+	z_index = 5 if vola else 0                  # in volo sopra case e alberi
+	if _anim != null:
+		_anim.position.y = -ALTEZZA_VOLO if vola else 0.0
+	if _nome_lbl != null:                       # il nome sale con il disegno
+		_nome_lbl.position.y = -34.0 - (ALTEZZA_VOLO if vola else 0.0)
+	if _ombra_volo == null and vola:            # l'ombra a terra, composta nel gioco (CLAUDE.md)
+		var img := Image.create(18, 7, false, Image.FORMAT_RGBA8)
+		for y in 7:
+			for x in 18:
+				if pow((x - 8.5) / 9.0, 2) + pow((y - 3.0) / 3.5, 2) <= 1.0:
+					img.set_pixel(x, y, Color(0.094, 0.078, 0.145, 0.45))
+		_ombra_volo = Sprite2D.new()
+		_ombra_volo.name = "OmbraVolo"
+		_ombra_volo.texture = ImageTexture.create_from_image(img)
+		_ombra_volo.z_index = -1
+		add_child(_ombra_volo)
+	if _ombra_volo != null:
+		_ombra_volo.visible = vola
 
 
 ## In barca un passo che esce dall'acqua scivola lungo la costa (prima solo x, poi solo y).

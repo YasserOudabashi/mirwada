@@ -1778,5 +1778,7 @@
   "npc.dario.role": "Mercante del villaggio dell'Archivio",
   "dialogue.dario.n1": "Chi scava vicino a rovine antiche trova cose che non si vendono a chiunque.",
   "dialogue.dario.n1.compra": "Fammi vedere la merce.",
-  "dialogue.dario.n1.congedo": "Devo andare."
+  "dialogue.dario.n1.congedo": "Devo andare.",
+  "item.piuma_dei_venti": "Piuma dei venti",
+  "item.piuma_dei_venti.desc": "Leggera come un respiro. Chi la porta con se' puo' alzarsi in volo."
 }

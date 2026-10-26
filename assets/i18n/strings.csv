@@ -13,6 +13,7 @@ HUD_PROMPT_ENTRA,[{tasto}] Entra,[{tasto}] Enter
 HUD_VARCO_CHIUSO,Il passaggio è chiuso,The way is closed
 HUD_PROMPT_SALI_BARCA,[{tasto}] Sali in barca,[{tasto}] Board the boat
 HUD_PROMPT_SCENDI_BARCA,[{tasto}] Scendi a terra,[{tasto}] Go ashore
+HUD_VOLO_NON_ATTERRA,Qui non si atterra,You can't land here
 BOOK_SCAFFALE_TOMO_NUOVO,Tomo nuovo,New tome
 BOOK_SCAFFALE_TOMO_BRUCIATO,Tomo bruciato,Burnt tome
 BOOK_SCAFFALE_RIPRENDI,Torna alla partita,Back to game
@@ -68,6 +69,7 @@ COLOPHON_AZIONE_INTERAGISCI,Interagisci / parla,Interact / talk
 COLOPHON_AZIONE_LIBRO,Apri il libro,Open the book
 COLOPHON_AZIONE_PAGINA_AVANTI,Pagina avanti,Next page
 COLOPHON_AZIONE_PAGINA_INDIETRO,Pagina indietro,Previous page
+COLOPHON_AZIONE_VOLA,Vola / atterra,Fly / land
 BOOK_MACCHIA_1,questa non è la tua grafia,this is not your handwriting
 BOOK_MACCHIA_2,{0} ti guarda leggere,{0} watches you read
 BOOK_MACCHIA_3,non voltare pagina,do not turn the page

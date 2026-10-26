@@ -14370,3 +14370,23 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   molo, mare aperto, costa dell'isola vulcanica, sbarco (arte/revisione/barca_in_gioco.png). validate 0, 997 test.
 - Aperto: in barca si va alla velocita' a piedi; la Frontiera si raggiunge gia' in barca (US-8B95 aggiunge il volo
   e la soglia del faro con la chiave).
+
+## US-8B93 — volo da una chiave del mondo, 2026-10-26
+- Decisione dell'utente: il volo si sblocca con una chiave del mondo, per tutti i Pathway, niente primitive nuove.
+- La chiave: oggetto "piuma_dei_venti" (data/items/materiali.json, leggendario, "vendibile": false; i18n it/en),
+  nell'osservatorio della torre dell'Archivio (archivio_torre_osservazione, raggiungibile a piedi).
+  data/world/mezzi.json volo.chiave. Il negozio non elenca e non compra gli oggetti con vendibile false (venduta si
+  perderebbe il volo). Validator: la chiave esiste e non e' vendibile.
+- Tasto "vola" = V (project.godot, rimappabile dalle impostazioni: settings_store AZIONI, COLOPHON_AZIONE_VOLA).
+- player.gd: barca e volo diventano due modi dello stesso meccanismo (_mezzo, un vincolo). In volo non ferma niente
+  (strati 1 e 5): cambia la regola del 25/10 ("in volo l'acqua ferma ancora") perche' la decisione del 26/10 vuole la
+  Frontiera raggiungibile anche volando; il vincolo tiene dentro la mappa. In volo il disegno sale di 14 unita' con
+  il nome, sopra case e alberi (z_index), con l'ombra a terra composta nel gioco.
+- mondo.gd decolla()/atterra(): si decolla con la piuma, in superficie, non in barca ne' in un interno; si atterra
+  su terra libera di una regione che lo ammette (_si_arriva "volo": nelle Marche si', sono "volo"/"sottosuolo"),
+  altrimenti "Qui non si atterra". In volo niente porte, varchi, NPC o barca. Salvataggio: mondo.volo.
+- Verifica: 2 test nuovi in test_mondo (senza piuma non si vola, con la piuma si', sopra l'acqua si vola ma non si
+  atterra, sulla terra si', nelle Marche si atterra, salvato in volo si riprende in volo; la piuma sta
+  nell'osservatorio), 1 in test_page_negozio (la piuma non si vende), test del volo aggiornato. Prova a schermo:
+  sopra le case, sopra il mare, avviso sull'acqua (arte/revisione/volo_in_gioco.png). validate 0, 1000 test.
+- Aperto: non c'e' un'animazione di volo (si usano idle e walk sollevati); nessun costo ne' durata.

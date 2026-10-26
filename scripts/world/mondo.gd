@@ -605,7 +605,7 @@ func _su_porta(body: Node, area: Area2D, dentro: bool) -> void:
 ## si ferma, mai liberato) ed entra nella stanza, aggiunta accanto al mondo.
 func entra(porta: Area2D) -> bool:
 	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D if is_inside_tree() else null
-	if p == null or _interno != null or get_parent() == null or not varco_aperto(porta) or in_barca():
+	if p == null or _interno != null or get_parent() == null or not varco_aperto(porta) or in_barca() or in_volo():
 		return false
 	var interno: Node = load("res://scenes/interior_scene.tscn").instantiate()
 	interno.set("interno_id", str(porta.get_meta("interno_id")))
@@ -658,7 +658,7 @@ func posizione_da_salvare() -> Vector2:
 
 ## Caricamento: fuori da un eventuale interno, sul livello salvato, nel punto salvato; la
 ## barca dove era rimasta, e a bordo se si era salvato in barca (stato_barca()).
-func riprendi(liv: String, pos: Vector2, barca: Dictionary = {}) -> void:
+func riprendi(liv: String, pos: Vector2, barca: Dictionary = {}, volo: bool = false) -> void:
 	esci()
 	cambia_livello(liv)
 	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D
@@ -668,8 +668,10 @@ func riprendi(liv: String, pos: Vector2, barca: Dictionary = {}) -> void:
 	if _barca != null and c.size() == 2:
 		metti_barca(Vector2i(int(c[0]), int(c[1])))
 	if p != null and p.has_method("imposta_barca"):
-		_a_bordo = bool(barca.get("a_bordo", false))
-		if _a_bordo:
+		_a_bordo = bool(barca.get("a_bordo", false)) and not volo
+		if volo:
+			p.call("imposta_volo", true, _nella_mappa)
+		elif _a_bordo:
 			p.call("imposta_barca", true, _solo_acqua)
 		else:
 			p.call("imposta_barca", false)
@@ -965,12 +967,18 @@ func _costa_vicina(c: Vector2i) -> Vector2i:
 
 
 func _si_sbarca(q: Vector2i) -> bool:
+	return _si_arriva(q, "barca")
+
+
+## Si arriva in q con quel modo (barca, volo): la regione non ha "accesso", o lo ha con il
+## modo o con "a_piedi" (le Marche: volo e sottosuolo).
+func _si_arriva(q: Vector2i, modo: String) -> bool:
 	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
 	var reg: Dictionary = gd.call("get_region", regione_a(q.x, q.y)) if gd != null else {}
 	if not reg.has("accesso"):
 		return true
 	var acc: Array = reg["accesso"]
-	return "barca" in acc or "a_piedi" in acc
+	return modo in acc or "a_piedi" in acc
 
 
 ## In barca la barca segue il giocatore (sotto di lui, rivolta dove va); a terra la scritta
@@ -993,6 +1001,70 @@ func _aggiorna_barca(p: Node2D) -> void:
 		metti_barca(_ormeggio_iniziale)
 	prompt.visible = _barca_vicina and livello == "superficie"
 	prompt.text = tr("HUD_PROMPT_SALI_BARCA").format({"tasto": _tasto_interagisci()})
+
+
+# --- Volo (US-8B93) ------------------------------------------------------------------
+# Decisione dell'utente 2026-10-26: il volo si sblocca con una chiave del mondo
+# (data/world/mezzi.json volo.chiave: un oggetto da trovare, che non si vende), per tutti i
+# Pathway. "vola" decolla e atterra; in volo si passa sopra tutto restando nella mappa; si
+# atterra su terra libera di una regione che lo ammette (_si_arriva "volo").
+
+var _avviso: Label = null
+
+
+func puo_volare() -> bool:
+	var root: Node = Engine.get_main_loop().root
+	var gd: Node = root.get_node_or_null("GameData")
+	var inv: Node = root.get_node_or_null("Inventory")
+	var chiave: String = str((gd.call("get_mezzo", "volo") as Dictionary).get("chiave", "")) if gd != null else ""
+	return not chiave.is_empty() and inv != null and bool(inv.call("possiede", chiave))
+
+
+func in_volo() -> bool:
+	var p: Node = get_tree().get_first_node_in_group("player") if is_inside_tree() else null
+	return p != null and p.has_method("in_volo") and bool(p.call("in_volo"))
+
+
+func decolla() -> bool:
+	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D if is_inside_tree() else null
+	if p == null or in_volo() or in_barca() or _interno != null or livello != "superficie" or not puo_volare():
+		return false
+	p.call("imposta_volo", true, _nella_mappa)
+	return true
+
+
+func atterra() -> bool:
+	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D if is_inside_tree() else null
+	if p == null or not in_volo():
+		return false
+	var c := Vector2i(floori(p.position.x / tile), floori(p.position.y / tile))
+	if bloccata(c.x, c.y) or not _si_arriva(c, "volo"):
+		_mostra_avviso(p, tr("HUD_VOLO_NON_ATTERRA"))
+		return false
+	p.call("imposta_volo", false)
+	return true
+
+
+func _nella_mappa(pos: Vector2) -> bool:
+	var c := Vector2i(floori(pos.x / tile), floori(pos.y / tile))
+	return c.x >= 1 and c.y >= 1 and c.x < larghezza - 1 and c.y < altezza - 1
+
+
+## Una scritta sotto il giocatore per un attimo (non si atterra qui).
+func _mostra_avviso(p: Node2D, testo: String) -> void:
+	if _avviso == null:
+		_avviso = Label.new()
+		_avviso.add_theme_font_size_override("font_size", 10)
+		_avviso.size = Vector2(tile * 6, tile * 0.5)
+		_avviso.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_avviso.z_index = 10
+		_avviso.add_theme_constant_override("outline_size", 4)
+		_avviso.add_theme_color_override("font_outline_color", Color("#181425"))
+		add_child(_avviso)
+	_avviso.text = testo
+	_avviso.position = p.position + Vector2(-tile * 3, tile * 0.5)
+	_avviso.show()
+	get_tree().create_timer(1.5).timeout.connect(func() -> void: if is_instance_valid(_avviso): _avviso.hide())
 
 
 # --- Sottosuolo: ingressi e cambio di livello (2026-10-25) ------------------------
@@ -1266,10 +1338,14 @@ func _npc_allontanato(body: Node, id: String) -> void:
 ## "interagisci" vicino a un NPC -> il suo dialogo (dialogue_id dal roster);
 ## davanti a una porta -> l'interno; sopra un ingresso del sottosuolo -> l'altro livello.
 func _unhandled_input(event: InputEvent) -> void:
-	if not event.is_action_pressed("interagisci"):
-		return
 	var book: Node = get_node_or_null("/root/Book")
 	if book != null and bool(book.call("e_aperto")):
+		return
+	if event.is_action_pressed("vola"):
+		if (atterra() if in_volo() else decolla()):
+			get_viewport().set_input_as_handled()
+		return
+	if not event.is_action_pressed("interagisci") or in_volo():   # in volo si atterra prima
 		return
 	if _npc_vicino.is_empty():
 		if in_barca():

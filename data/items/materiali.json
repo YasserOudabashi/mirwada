@@ -51,6 +51,20 @@
       "impilabile": true,
       "valore": 0,
       "rarita": "comune"
+    },
+    {
+      "id": "piuma_dei_venti",
+      "categoria": "materiale",
+      "name_i18n": "item.piuma_dei_venti",
+      "descrizione_i18n": "item.piuma_dei_venti.desc",
+      "tag": [
+        "vento",
+        "viaggio"
+      ],
+      "impilabile": false,
+      "valore": 0,
+      "rarita": "leggendario",
+      "vendibile": false
     }
   ]
 }

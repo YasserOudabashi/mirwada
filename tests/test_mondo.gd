@@ -291,7 +291,7 @@ func test_chi_vola_passa_i_dislivelli() -> void:
 	p.call("imposta_volo", true)
 	assert_true(p.call("in_volo"), "in volo")
 	assert_false(p.get_collision_mask_value(5), "in volo i dislivelli non fermano")
-	assert_true(p.get_collision_mask_value(1), "in volo l'acqua ferma ancora")
+	assert_false(p.get_collision_mask_value(1), "e nemmeno l'acqua e il vuoto (2026-10-26: alla Frontiera anche volando)")
 	var e: CharacterBody2D = load("res://scenes/enemy.tscn").instantiate()
 	assert_true(e.get_collision_mask_value(5), "i nemici non scendono dai dislivelli")
 	p.free()
@@ -763,3 +763,50 @@ func test_in_barca_si_arriva_alle_isole_e_alla_frontiera() -> void:
 		assert_true(sbarchi.has(r), "in barca si arriva a %s" % r)
 	assert_false(sbarchi.has("marche_crepuscolo"), "ma non si sbarca nelle Marche")
 	m.free()
+
+
+# --- US-8B93: volo da una chiave del mondo ---------------------------------------------
+
+func test_si_vola_solo_con_la_piuma_e_si_atterra_sulla_terra() -> void:
+	var inv: Node = Engine.get_main_loop().root.get_node("Inventory")
+	inv.call("pulisci")
+	var main := Node2D.new()
+	var m: Node2D = _mondo()
+	main.add_child(m)
+	var p: CharacterBody2D = load("res://scenes/player.tscn").instantiate()
+	m.add_child(p)
+	Engine.get_main_loop().root.add_child(main)
+	assert_false(m.call("decolla"), "senza la piuma non si vola")
+	inv.call("aggiungi", "piuma_dei_venti", 1)
+	assert_true(m.call("decolla"), "con la piuma si vola")
+	assert_true(p.call("in_volo"), "in volo")
+	assert_false(p.get_collision_mask_value(1) or p.get_collision_mask_value(5), "non ferma niente")
+	var barca: Node2D = m.get_node("Barca")
+	var mare: Vector2i = _cella(m, barca.position)
+	p.global_position = (Vector2(mare) + Vector2(0.5, 0.5)) * m.tile
+	p.call("_resta_dove_si_puo", p.global_position)
+	assert_eq(_cella(m, p.global_position), mare, "si vola sopra l'acqua")
+	assert_false(m.call("atterra"), "sull'acqua non si atterra")
+	assert_true(p.call("in_volo"), "e si resta in volo")
+	var terra: Vector2i = m.call("_costa_vicina", mare)
+	p.global_position = (Vector2(terra) + Vector2(0.5, 0.5)) * m.tile
+	assert_true(m.call("atterra"), "sulla terra si atterra")
+	assert_false(p.call("in_volo"), "a terra")
+	assert_true(p.get_collision_mask_value(1) and p.get_collision_mask_value(5), "a piedi tutto ferma di nuovo")
+	var l: Array = m.dati["luoghi"]["passo_tra_rupi"]
+	assert_true(m.call("_si_arriva", Vector2i(int(l[0]), int(l[1])), "volo"), "nelle Marche si atterra volando")
+	m.call("decolla")
+	m.call("riprendi", "superficie", p.position, {}, true)
+	assert_true(p.call("in_volo"), "salvato in volo: si riprende in volo")
+	inv.call("pulisci")
+	main.free()
+
+
+func test_la_piuma_sta_nell_osservatorio() -> void:
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var chiave: String = str((gd.call("get_mezzo", "volo") as Dictionary).get("chiave", ""))
+	assert_eq(chiave, "piuma_dei_venti", "la chiave del volo e' nei dati")
+	var trovata := false
+	for o in (gd.call("get_interno", "archivio_torre_osservazione") as Dictionary).get("oggetti", []):
+		trovata = trovata or str(o["item_id"]) == chiave
+	assert_true(trovata, "si trova nella torre di osservazione dell'Archivio, raggiungibile a piedi")

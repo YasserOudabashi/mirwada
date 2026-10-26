@@ -1275,6 +1275,19 @@ def main():
 
     # US-8B91: la barca parte ormeggiata vicino a un luogo del mondo generato
     _mezzi = load_json(os.path.join(DATA, "world", "mezzi.json")) or {}
+    # US-8B93: la chiave del volo e' un oggetto che non si vende (venduto, si perderebbe il volo)
+    _items_tutti = {}
+    for _fn in os.listdir(os.path.join(DATA, "items")):
+        if _fn.endswith(".json"):
+            for _it in (load_json(os.path.join(DATA, "items", _fn)) or {}).get("items", []):
+                _items_tutti[_it.get("id")] = _it
+    for _mz, _spec in _mezzi.items():
+        if isinstance(_spec, dict) and "chiave" in _spec:
+            _k = _items_tutti.get(_spec["chiave"])
+            if _k is None:
+                err(f"data/world/mezzi.json [{_mz}]: chiave '{_spec['chiave']}' non e' un oggetto di data/items/")
+            elif _k.get("vendibile", True) is not False:
+                err(f"data/world/mezzi.json [{_mz}]: la chiave '{_spec['chiave']}' deve avere \"vendibile\": false")
     if mondo_doc is not None and "barca" in _mezzi:
         if _mezzi["barca"].get("luogo") not in mondo_doc.get("luoghi", {}):
             err(f"data/world/mezzi.json: barca.luogo '{_mezzi['barca'].get('luogo')}' non e' un luogo di "
