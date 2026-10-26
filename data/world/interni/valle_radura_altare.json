@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "interno_id": "valle_radura_altare",
-  "stile": "capanna",
+  "stile": "radura",
   "mappa": [
     "##########",
     "#........#",
@@ -18,14 +18,24 @@
   ],
   "arredi": [
     {
-      "id": "vaso",
+      "id": "altare",
       "x": 4,
       "y": 1
     },
     {
-      "id": "sacchi",
+      "id": "roccia",
       "x": 1,
       "y": 1
+    },
+    {
+      "id": "roccia",
+      "x": 8,
+      "y": 2
+    },
+    {
+      "id": "roccia",
+      "x": 1,
+      "y": 5
     }
   ],
   "nemici": [],

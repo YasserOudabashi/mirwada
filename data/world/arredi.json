@@ -18,6 +18,11 @@
     "cassa": {"misura": [1, 1], "blocca": true},
     "sacchi": {"misura": [1, 1], "blocca": true},
     "vaso": {"misura": [1, 1], "blocca": true},
-    "tappeto": {"misura": [2, 1], "blocca": false, "a_terra": true}
+    "tappeto": {"misura": [2, 1], "blocca": false, "a_terra": true},
+    "sarcofago": {"misura": [2, 1], "blocca": true},
+    "altare": {"misura": [2, 1], "blocca": true},
+    "roccia": {"misura": [1, 1], "blocca": true},
+    "sigillo": {"misura": [2, 2], "blocca": false, "a_terra": true},
+    "cornice_porta": {"misura": [1, 1], "blocca": true}
   }
 }

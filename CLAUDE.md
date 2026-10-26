@@ -302,13 +302,13 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   pareti, mondo generato (seed 6) con modalita' luminosa/cupa, mondo unico nel gioco (US-8B12..g:
   caricatore, regione dalla posizione, NPC, collisioni, sottosuolo, contenuto dei layout), libro (US-8B73),
   edifici di citta', villaggi e torri con le porte verso i 14 interni (US-8B18a/b), interni disegnati e
-  arredati (US-8B18c/d), varchi delle sotto-aree come ingressi (US-8B21a).
+  arredati (US-8B18c/d), varchi delle sotto-aree come ingressi con il loro contenuto e la loro arte (US-8B21a/b/c).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
-**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): varchi delle sotto-aree come ingressi
-(US-8B21a/b), poi barca (US-8B91), volo (US-8B93) e accesso alla Frontiera (US-8B95), decisi il 2026-10-26.
+**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): barca (US-8B91), volo (US-8B93) e accesso
+alla Frontiera (US-8B95), decisi il 2026-10-26.
 
 ## Decisioni prese
 

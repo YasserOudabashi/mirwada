@@ -64,5 +64,6 @@ func test_gli_arredi_si_vedono_e_bloccano_tranne_i_tappeti() -> void:
 	Engine.get_main_loop().root.add_child(archivio)
 	var tappeto: Sprite2D = archivio.get_node_or_null("Arredo_tappeto_4_3")
 	assert_true(tappeto != null and tappeto.z_index < 0, "il tappeto sta sotto chi ci passa")
+	assert_true(tappeto.z_index > (archivio.get_node("Arte") as Sprite2D).z_index, "ma sopra il pavimento (si vede)")
 	assert_eq(archivio.get_cell_atlas_coords(Vector2i(4, 3)), Vector2i(0, 0), "e non blocca")
 	archivio.free()

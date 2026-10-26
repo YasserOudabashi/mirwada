@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "interno_id": "frontiera_isola_nebbia",
-  "stile": "torre",
+  "stile": "nebbia",
   "mappa": [
     "###########",
     "#.........#",
@@ -18,13 +18,18 @@
   ],
   "arredi": [
     {
-      "id": "vaso",
-      "x": 1,
-      "y": 1
+      "id": "cornice_porta",
+      "x": 2,
+      "y": 2
     },
     {
-      "id": "vaso",
-      "x": 9,
+      "id": "cornice_porta",
+      "x": 8,
+      "y": 2
+    },
+    {
+      "id": "cornice_porta",
+      "x": 5,
       "y": 1
     }
   ],

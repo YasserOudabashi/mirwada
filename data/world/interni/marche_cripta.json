@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "interno_id": "marche_cripta",
-  "stile": "sotterraneo",
+  "stile": "cripta",
   "mappa": [
     "#############",
     "#...........#",
@@ -18,6 +18,26 @@
     7
   ],
   "arredi": [
+    {
+      "id": "sarcofago",
+      "x": 3,
+      "y": 3
+    },
+    {
+      "id": "sarcofago",
+      "x": 8,
+      "y": 3
+    },
+    {
+      "id": "sarcofago",
+      "x": 3,
+      "y": 6
+    },
+    {
+      "id": "sarcofago",
+      "x": 8,
+      "y": 6
+    },
     {
       "id": "vaso",
       "x": 1,

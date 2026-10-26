@@ -62,7 +62,24 @@ STILI = {
     "sotterraneo": {"pavimento": ("lastre", ["navy", "slate_d", "slate_d", "slate"]),
                     "parete": ("pietra", ["navy", "slate_d", "slate"], ["ink"]),
                     "cima": ["ink", "navy"]},
+    # sotto-aree dietro i varchi (US-8B21c)
+    "cripta": {"pavimento": ("lastre", ["navy", "slate_d", "purple_d", "slate"]),
+               "parete": ("pietra", ["purple_d", "slate_d", "slate"], ["ink"]),
+               "cima": ["ink", "navy"]},
+    "tempio": {"pavimento": ("lastre", ["brown_d", "brown", "tan", "tan"]),
+               "parete": ("pietra", ["brown_d", "brown", "tan"], ["brown_dd"]),
+               "cima": ["brown_dd", "brown_d"]},
+    "grotta": {"pavimento": ("roccia", ["navy", "slate_d", "teal_d", "slate"]),
+               "parete": ("roccia", ["teal_d", "slate_d", "slate"], ["navy"]),
+               "cima": ["ink", "navy"]},
+    "radura": {"pavimento": ("erba", ["green_d", "green_m", "green_m", "green"]),
+               "parete": ("radici", ["brown_dd", "brown_d", "brown"], ["green_d"]),
+               "cima": ["teal_d", "green_d"]},
+    "nebbia": {"pavimento": ("lastre", ["slate", "grey", "grey_l", "grey_l"]),
+               "parete": ("nebbia", ["grey", "grey_l", "white"], ["grey"]),
+               "cima": ["slate", "grey"]},
 }
+ACQUA = ["navy", "blue_d", "blue_d", "blue"]          # '~': l'acqua della marea
 
 
 def tavolozza():
@@ -112,7 +129,10 @@ def pavimento(tipo, yy, xx, rng):
         v = 0.55 + (hash2(cx, cy, 100) / 100.0 - 0.5) * 0.4 + (rumore(H, W, 3, rng) - 0.5) * 0.2
         v = np.where(((xx + o) % lato == 0) | (yy % lato == 0), v + 0.15, v)
         return np.where(((xx + o) % lato == lato - 1) | (yy % lato == lato - 1), 0.02, v)
-    # terra battuta con paglia
+    if tipo == "roccia":                                  # roccia viva, con le crepe
+        v = 0.5 + (rumore(H, W, 6, rng) - 0.5) * 0.45 + (rumore(H, W, 2, rng) - 0.5) * 0.2
+        return np.where(rumore(H, W, 4, rng) > 0.82, 0.05, v)
+    # terra battuta con paglia, erba con i fili (in interno())
     v = 0.5 + (rumore(H, W, 9, rng) - 0.5) * 0.3 + (rumore(H, W, 2, rng) - 0.5) * 0.15
     return v
 
@@ -147,6 +167,17 @@ def parete(tipo, yy, xx, rng):
         v = np.where((ly - CAPO) % bh == 0, v + 0.2, v)
         seconda = ((ly - CAPO) % bh == bh - 1) | ((xx + o) % bw == bw - 1)
         return v, seconda
+    if tipo == "roccia":                                  # parete di roccia: massi senza malta, crepe scure
+        v = 0.55 + (rumore(H, W, 4, rng) - 0.5) * 0.5 - (ly - CAPO) / T * 0.2
+        return v, rumore(H, W, 3, rng) > 0.8
+    if tipo == "radici":                                  # radici verticali intrecciate, muschio
+        o = (rumore(H, W, 6, rng) * 6).astype(int)
+        k = (xx + o) % 5
+        v = 0.2 + 0.7 * np.sin(np.pi * (k + 0.5) / 5.0) - (ly - CAPO) / T * 0.2
+        return v, rumore(H, W, 5, rng) > 0.72
+    if tipo == "nebbia":                                  # nebbia che sale: niente pietra, solo grigio che sfuma
+        v = 0.55 + (rumore(H, W, 8, rng) - 0.5) * 0.6 + (ly - CAPO) / T * 0.2
+        return v, np.zeros((H, W), bool)
     # scaffali di libri: montanti ogni 32, ripiani ogni 9, dorsi colorati di 2-3 pixel
     rip = (ly - CAPO) % 9
     v = np.where(rip >= 7, np.where(rip == 7, 0.9, 0.35), 0.1)          # ripiano: bordo in luce, poi legno
@@ -164,7 +195,8 @@ def interno(doc, rng, C):
     mappa = doc["mappa"]
     h, w = len(mappa), len(mappa[0])
     pav = np.array([[ch in PAVIMENTO for ch in r] for r in mappa])
-    muro = ~pav
+    acqua = np.array([[ch == "~" for ch in r] for r in mappa])
+    muro = ~pav & ~acqua
     vicino = np.zeros_like(pav)                           # un pavimento entro 2 caselle: cima del muro
     for dy in range(-2, 3):
         for dx in range(-2, 3):
@@ -183,6 +215,7 @@ def interno(doc, rng, C):
     yy, xx = np.mgrid[0:H, 0:W]
     cy, cx = yy // T, xx // T
     p_pav = pav[cy, cx]
+    p_acqua = acqua[cy, cx]
     p_fronte = fronte[cy, cx] & (yy % T >= CAPO)
     p_cima = muro[cy, cx] & vicino[cy, cx] & ~p_fronte
     if uscita and uscita[3] == 1:                          # porta nel muro a sud: la casella si apre
@@ -201,7 +234,7 @@ def interno(doc, rng, C):
     # --- pavimento: ombra del muro a ovest (luce da sinistra) e un filo d'ombra lungo tutti i muri ---
     tipo_p, rampa_p = st["pavimento"]
     vp = pavimento(tipo_p, yy, xx, rng)
-    non_pav = ~p_pav
+    non_pav = ~p_pav & ~p_acqua                           # i muri fanno ombra, l'acqua no
     ombra = np.zeros((H, W), bool)
     for k in range(1, 6):
         ombra |= sposta(non_pav, 0, k)
@@ -218,6 +251,16 @@ def interno(doc, rng, C):
         paglia = p_pav & (rng.rand(H, W) < 0.012) & ~ombra
         for k in range(3):
             img[sposta(paglia, 0, k) & p_pav] = C["amber"] if k == 1 else C["tan"]
+    if tipo_p == "erba":                                  # fili d'erba in piedi, la punta in luce
+        fili = p_pav & (rng.rand(H, W) < 0.02) & ~ombra
+        img[fili & p_pav] = C["green_m"]
+        img[sposta(fili, -1, 0) & p_pav] = C["green"]
+    if p_acqua.any():                                     # l'acqua: increspature e schiuma sul bordo
+        va = 0.45 + (rumore(H, W, 5, rng) - 0.5) * 0.3
+        va = np.where((yy + (rumore(H, W, 8, rng) * 6).astype(int)) % 7 == 0, va + 0.35, va)
+        colora(img, p_acqua, va, ACQUA, C)
+        riva = p_acqua & (sposta(p_pav, 1, 0) | sposta(p_pav, -1, 0) | sposta(p_pav, 0, 1) | sposta(p_pav, 0, -1))
+        img[riva] = C["grey_l"]
 
     # --- passaggi '+': una soglia di legno di traverso ---
     for y, r in enumerate(mappa):
@@ -242,7 +285,7 @@ def interno(doc, rng, C):
     p_cima_tutta = p_cima | (fronte[cy, cx] & (yy % T < CAPO))
     vc = 0.4 + (rumore(H, W, 6, rng) - 0.5) * 0.15
     colora(img, p_cima_tutta, vc, st["cima"], C)
-    dentro = p_pav | p_fronte
+    dentro = p_pav | p_fronte | p_acqua
     tocca = sposta(dentro, 1, 0) | sposta(dentro, -1, 0) | sposta(dentro, 0, 1) | sposta(dentro, 0, -1)
     img[p_cima_tutta & tocca] = C["ink"]
     tocca2 = (sposta(dentro, 2, 0) | sposta(dentro, -2, 0) | sposta(dentro, 0, 2) | sposta(dentro, 0, -2))

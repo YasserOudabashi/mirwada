@@ -82,6 +82,7 @@ func _arte() -> void:
 	spr.name = "Arte"
 	spr.texture = preload("res://scripts/world/mondo.gd")._texture(path)
 	spr.centered = false
+	spr.z_index = -2                               # sotto tutto, anche sotto i tappeti (-1)
 	add_child(spr)
 	self_modulate = Color(1, 1, 1, 0)
 

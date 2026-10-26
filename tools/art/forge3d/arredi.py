@@ -3,13 +3,15 @@ edifici. Misure in unita' (32 per casella, size = scala); origine al centro del 
 larg x prof caselle, a terra, il davanti guarda +y (come creatures.edificio). La profondita' del modello e' divisa per
 il seno della camera (SENO_CAMERA): una casella di profondita' a schermo = 32 / 0.53 unita' nel modello.
 """
+import math
 import random
 
 from .creatures import SENO_CAMERA
 from .rig import Rig
 
 P = 1.0 / SENO_CAMERA
-ALTEZZA = {"scaffale": 56, "camino": 56, "forgia": 56, "letto": 24, "bancone": 40, "alambicco": 44}  # sopra il sedime
+ALTEZZA = {"scaffale": 56, "camino": 56, "forgia": 56, "letto": 24, "bancone": 40, "alambicco": 44,
+           "cornice_porta": 52}                                   # sopra il sedime
 MURO = 48                  # contro il muro nord niente sale oltre z 48: la cima della parete (a schermo una casella)
 
 
@@ -133,6 +135,38 @@ def arredo(kind, larg, prof, seed=1, size=1.0):
         box((W / 2 - 3, D / 2 - 4, 0.5), (0, cy, 3), "cloth_red", su)
         box((W / 2 - 7, D / 2 - 9, 0.6), (0, cy, 3.3), "cloth_yellow", su)
         box((W / 2 - 9, D / 2 - 12, 0.7), (0, cy, 3.6), "cloth_red", su)
+    elif kind == "sarcofago":                                         # cassa di pietra, coperchio scolpito
+        su = (-16, 0, 0)                                              # piani inclinati verso la luce (piatti: scuri)
+        box((W / 2 - 4, D / 2 - 8, 8), (0, cy, 8), "stone")
+        box((W / 2 - 3, D / 2 - 7, 2), (0, cy, 17.5), "stone_light", su)
+        box((W / 2 - 10, D / 2 - 12, 1.4), (0, cy, 20), "stone_light", su)
+        r.part("a", "ellipsoid", (4.5, 4, 3), (-W / 2 + 12, cy, 22), mat="bone")       # la testa scolpita
+    elif kind == "altare":                                            # blocco di pietra, drappo, due candele
+        su = (-16, 0, 0)
+        box((W / 2 - 4, D / 2 - 8, 10), (0, cy, 10), "stone_light")
+        box((W / 2 - 2, D / 2 - 6, 1.6), (0, cy, 21), "stone_light", su)
+        box((5, D / 2 - 5.5, 0.6), (0, cy, 22.8), "cloth_red", su)
+        for sx in (-1, 1):
+            cyl((1.6, 1.6, 3), (sx * (W / 2 - 8), cy - 4, 25.6), "cloth_white")
+            r.part("a", "ellipsoid", (1.2, 1.2, 2.2), (sx * (W / 2 - 8), cy - 4, 31), mat="fire")
+    elif kind == "roccia":                                            # massi con un po' di muschio
+        r.part("a", "ellipsoid", (11, 8, 9), (-2, cy, 8), mat="stone")
+        r.part("a", "ellipsoid", (7, 6, 6), (7, cy + 4, 5), mat="stone")
+        r.part("a", "ellipsoid", (6, 4, 2), (-4, cy - 2, 16), mat="leaf_dark")
+    elif kind == "sigillo":                                           # cerchio di glifi a terra che brilla
+        su = (-16, 0, 0)                                              # inclinato verso la luce: piatto esce scuro
+        for raggio, z, mat in ((28, 0.4, "glow_cyan"), (25, 0.8, "stone"), (14, 1.1, "glow_cyan"), (12, 1.4, "stone")):
+            r.part("a", "cylinder", (raggio, (raggio - 2) * P * 0.7, 0.3), (0, cy, z + 2), mat=mat, rot=su)
+        for k in range(6):
+            a = k * math.pi / 3
+            box((1.8, 1.8 * P, 0.3), (math.cos(a) * 19, cy + math.sin(a) * 18 * P * 0.7, 3.8), "glow_cyan", su)
+    elif kind == "cornice_porta":                                     # una porta di scena senza muro (Frontiera)
+        for sx in (-1, 1):
+            box((2, 3, 22), (sx * 10, cy, 22), "intonaco_bianco")
+        box((12, 3, 2), (0, cy, 45), "intonaco_bianco")
+        box((8, 1, 21), (0, cy, 22), "shadow_mat")
+        for sx in (-1, 1):
+            box((1.0, 1.2, 21), (sx * 7.6, cy + 0.4, 22), "glow_purple")
     else:
         raise ValueError(f"arredo sconosciuto: {kind}")
     return r

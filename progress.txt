@@ -14333,3 +14333,17 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   cripta c'e' e sta sul pavimento). Prova a schermo dei sei interni con il loro contenuto
   (arte/revisione/varchi_contenuto.png). validate 0, 993 test.
 - Aperto: nelle stanze piccole i nemici arrivano subito addosso; l'arte delle sotto-aree e' provvisoria (US-8B21c).
+
+## US-8B21c — arte delle sotto-aree, 2026-10-26
+- build_interni.py: stili nuovi cripta (pietra violacea), tempio (arenaria), grotta (roccia viva, pavimento e parete
+  "roccia" con le crepe), radura (pavimento "erba" con i fili, parete "radici" con il muschio), nebbia (parete
+  "nebbia" che sfuma); '~' nella mappa = acqua di marea (increspature, schiuma sulla riva, non fa ombra; collisione
+  della colonna 3 del tileset). La grotta di marea ora ha le sue pozze.
+- Arredi nuovi (data/world/arredi.json + forge3d/arredi.py): sarcofago, altare, roccia, sigillo (a terra, cerchio di
+  glifi luminosi), cornice di porta. Piani e coperchi inclinati verso la luce: piatti uscivano quasi neri (visto).
+  I sei interni dei varchi con il loro stile e i loro arredi (sarcofagi nella cripta, altare nel tempio e nella
+  radura, sigillo nella sala dei sigilli, cornici di porta sull'isola di nebbia).
+- Difetto trovato a schermo (nato in US-8B18d): tappeti e sigillo (z_index -1) finivano sotto l'immagine del
+  pavimento e non si vedevano. Ora il pavimento sta a -2; test: il tappeto sta sopra il pavimento.
+- Verifica: prova a schermo dei sei interni (arte/revisione/varchi_contenuto.png) e dei 14 delle case con i tappeti
+  (arte/revisione/interni_in_gioco.png); rilancio del generatore identico. validate 0, 993 test.

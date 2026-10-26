@@ -212,8 +212,8 @@
       ],
       "priority": 12,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Stili cripta, tempio, grotta con acqua, radura, nebbia; arredi sarcofago, altare, roccia, sigillo, cornice di porta (build_interni.py). Corretto: tappeti e sigillo sotto il pavimento. arte/revisione/varchi_contenuto.png."
     },
     {
       "id": "US-8B93",
