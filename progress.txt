@@ -14285,3 +14285,12 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   bloccano, il tappeto no), test_mondo aggiornato (il giocatore entra nella stanza). Prova a schermo dei 14 interni
   (arte/revisione/interni_in_gioco.png), rilancio del generatore identico. validate 0, 990 test.
 - Aperto: gli oggetti raccoglibili a terra hanno ancora le icone segnaposto (US-8B70).
+
+## Decisioni dell'utente, 2026-10-26 (risposte alle domande su varchi, volo, Frontiera, barca)
+- Varchi delle sotto-aree: ogni area del gating e' un ingresso sulla mappa verso un interno; AreaGate decide se si
+  apre; la mappa approvata non cambia; i ponti di radici sono un ponte che compare sul burrone. -> US-8B21a/b.
+- Volo: si sblocca con una chiave del mondo, per tutti i Pathway, niente primitive nuove. -> US-8B93.
+- Frontiera: ci si arriva in barca, volando, o da una soglia nel faro che si apre solo con una chiave trovata nel
+  mondo (resta il gating di sequenza). -> US-8B95.
+- Barca: barca libera al molo di Mirwada, in barca l'acqua si attraversa, si sbarca sulle coste. -> US-8B91.
+- Scritte in CLAUDE.md (decisioni prese), prd-fase-8b-arte.md, prossimi-passi.md, prd.json.

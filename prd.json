@@ -174,13 +174,28 @@
       "notes": "17 arredi (data/world/arredi.json, forge3d/arredi.py), 54 nelle 14 stanze, collisione e y-sort col giocatore dentro la stanza, validator con visita in ampiezza. Prova a schermo in arte/revisione/interni_in_gioco.png."
     },
     {
-      "id": "US-8B21",
-      "title": "Varchi di gating visibili e sotto-aree",
-      "description": "Un aspetto per ognuno dei 6 tipi di gate_types.json; le barriere delle sotto-aree (cripte, passaggi d'ombra, ponti di radici, grotte di marea, ali interne, isole di nebbia) nei punti giusti del mondo generato.",
+      "id": "US-8B21a",
+      "title": "Varchi come ingressi verso le sotto-aree",
+      "description": "Decisione dell'utente 2026-10-26: ogni area del gating di regions.json e' un ingresso sulla mappa verso un interno; AreaGate decide se si apre. Posizione (luogo + scostamento), interno e aspetto nei dati. Aspetto chiuso/aperto per ingresso (mausoleo, arco d'ombra, ponte di radici, grotta, porta coi glifi, soglia nella nebbia). Sei interni nuovi.",
       "acceptanceCriteria": [
         "il giocatore capisce che c'e' un varco, non come si apre",
-        "posizioni nei dati, non nel codice",
-        "test di apertura con AreaGate"
+        "posizioni nei dati, non nel codice; la mappa approvata non cambia",
+        "test di apertura con AreaGate: chiuso non si entra, aperto si entra e si torna",
+        "prova a schermo dei sei ingressi chiusi e aperti; validate 0; bash tools/run_tests.sh esce 0"
+      ],
+      "priority": 12,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B21b",
+      "title": "Dentro le sotto-aree: contenuto e arte",
+      "description": "Il contenuto delle zone dei layout legate a un varco (nemici, oggetti) sta dentro il suo interno, non piu' all'aperto; stili nuovi degli interni (cripta, tempio, grotta con l'acqua, radura, nebbia) e arredi nuovi (sarcofago, altare, roccia, sigillo, cornice di porta).",
+      "acceptanceCriteria": [
+        "la zona di un varco nei dati del varco; popola() non la mette piu' sul mondo",
+        "gli interni delle sotto-aree con lo stile del loro luogo, guardati ingranditi nei due temi",
+        "prova a schermo; validate 0; bash tools/run_tests.sh esce 0"
       ],
       "priority": 12,
       "fase": "8b",
@@ -189,11 +204,12 @@
     },
     {
       "id": "US-8B93",
-      "title": "Volo",
-      "description": "Decisione dell'utente: chi sa volare (Pathway/Sequenza, oggetto, pet), altezza, cosa si scavalca, dove si atterra, costo. Il meccanismo c'e': player.imposta_volo() toglie lo strato dei dislivelli.",
+      "title": "Volo da una chiave del mondo",
+      "description": "Decisione dell'utente 2026-10-26: il volo si sblocca con una chiave del mondo (oggetto o luogo da trovare), per tutti i Pathway, niente primitive nuove. Il meccanismo c'e': player.imposta_volo() toglie lo strato dei dislivelli.",
       "acceptanceCriteria": [
-        "decisione scritta in CLAUDE.md prima del codice",
-        "le Marche si raggiungono volando (test di raggiungibilita' gia' pronto)"
+        "la chiave del volo e dove si trova nei dati",
+        "dopo averla presa si vola e le Marche si raggiungono (test di raggiungibilita' gia' pronto)",
+        "prova a schermo; validate 0; bash tools/run_tests.sh esce 0"
       ],
       "priority": 13,
       "fase": "8b",
@@ -202,11 +218,26 @@
     },
     {
       "id": "US-8B91",
-      "title": "Barca e accesso alla Frontiera",
-      "description": "Decisione dell'utente: come si arriva alle isole e alla Frontiera (sospesa nel vuoto).",
+      "title": "Barca dal porto",
+      "description": "Decisione dell'utente 2026-10-26: barca libera al molo di Mirwada; in barca l'acqua si attraversa, si sbarca sulle coste delle isole.",
       "acceptanceCriteria": [
-        "decisione scritta prima del codice",
-        "test di raggiungibilita' per le isole e la Frontiera"
+        "salire e scendere al molo e sulle coste",
+        "test di raggiungibilita' in barca per le 6 isole",
+        "prova a schermo; validate 0; bash tools/run_tests.sh esce 0"
+      ],
+      "priority": 14,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B95",
+      "title": "Accesso alla Frontiera",
+      "description": "Decisione dell'utente 2026-10-26: alla Frontiera (isole sospese nel vuoto di nebbia) si arriva in barca, volando, o da una soglia nel faro che si apre solo con una chiave trovata nel mondo. Resta il gating di sequenza.",
+      "acceptanceCriteria": [
+        "la chiave del faro e la soglia nei dati",
+        "test di raggiungibilita' della Frontiera nei tre modi",
+        "prova a schermo; validate 0; bash tools/run_tests.sh esce 0"
       ],
       "priority": 14,
       "fase": "8b",

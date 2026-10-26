@@ -25,9 +25,10 @@ Dettaglio di ogni story in `progress.txt` (cerca la sigla); le aperte sono anche
 | US-8B73 pagine del libro | fatta | cuoio, pergamena, font Alegreya, `book.json` `tema` |
 | US-8B18 edifici e oggetti di scena | **aperta, la prossima** | case sugli isolati di Mirwada, villaggi, porte verso gli interni |
 | US-8B12c interni separati (testo originale) | aperta | gli interni delle fasi 10-11 esistono: manca l'ingresso dal mondo generato (va con US-8B18) |
-| US-8B21 varchi di gating visibili | aperta | anche le barriere delle sotto-aree sul mondo |
-| US-8B93 volo | aperta, **decisione dell'utente** | il meccanismo (strato dei dislivelli) c'e' |
-| US-8B91 barca, accesso alla Frontiera | aperta, **decisione dell'utente** | |
+| US-8B21a/b varchi come ingressi verso le sotto-aree | aperta, **la prossima** | decisa il 2026-10-26 |
+| US-8B91 barca dal porto | aperta | decisa il 2026-10-26 |
+| US-8B93 volo da una chiave del mondo | aperta | decisa il 2026-10-26; il meccanismo (strato dei dislivelli) c'e' |
+| US-8B95 accesso alla Frontiera | aperta | decisa il 2026-10-26: barca, volo, soglia del faro con chiave |
 | US-8B02, 8B03, 8B19, 8B20, 8B22-24, 8B35, 8B40-44, 8B50-65, 8B70-72, 8B74, 8B80-81, 8B90, 8B92, 8B94 | aperte | |
 
 Decisioni nuove: **Marche solo volando o dal sottosuolo** (2026-10-25); **merge della PR #4** nella PR #5
@@ -218,6 +219,9 @@ Valle, nave. *Domande (L).*
 **US-8B21 [A] Varchi di gating visibili.** Un aspetto per ognuno dei 6 tipi in
 `gate_types.json` (ombra, radici, porta sigillata, ...). Il giocatore deve capire
 *che* c'è un varco, non *come* si apre.
+*Deciso il 2026-10-26:* ogni sotto-area è un **ingresso** sulla mappa verso un interno; il varco decide se si
+apre, la mappa approvata non cambia; i ponti di radici sono un ponte che compare sul burrone. Spezzata in
+**8B21a** (ingressi, aspetto chiuso/aperto, interni) e **8B21b** (contenuto delle zone dentro gli interni, arte).
 
 **US-8B22 [C+D] Forzieri e oggetti casuali.** Richiesta dell'utente per Mirwada
 (caverne con forzieri, casette con oggetti casuali). Oggi **non esiste** un
@@ -291,11 +295,14 @@ decide spiegandolo).
 **US-8B90 [C+A] Nuoto.** Acqua bassa percorribile, acqua profonda solo con lo
 sblocco. *Domande (M).*
 **US-8B91 [C+A] Barca.** Salire/scendere al molo, navigare il mare, raggiungere
-le isole. *Domande (L).*
+le isole. *Deciso il 2026-10-26:* barca libera al molo di Mirwada, in barca l'acqua si attraversa, si sbarca
+sulle coste. **US-8B95 Accesso alla Frontiera** (2026-10-26): in barca, volando, o da una soglia nel faro che si
+apre solo con una chiave trovata nel mondo.
 **US-8B92 [C+A] Arrampicata.** Pareti e scale scalabili segnate nei dati della
 mappa. *Domande (M).*
 **US-8B93 [C+A] Volo libero.** Il più grosso: altezza, ombra a terra, cosa si
-scavalca, dove si atterra, costo. Quasi certamente 2–3 story. *Domande (XL).*
+scavalca, dove si atterra, costo. Quasi certamente 2–3 story. *Deciso il 2026-10-26:* si sblocca con una chiave
+del mondo (oggetto o luogo da trovare), per tutti i Pathway, niente primitive nuove.
 **US-8B94 [C] Base sceglibile e spostabile.** I 4 luoghi, come si sceglie, cosa
 succede alle stanze quando si sposta, la nave come base mobile. *Domande (L).*
 

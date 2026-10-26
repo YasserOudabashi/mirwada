@@ -306,8 +306,8 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
-**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): varchi delle sotto-aree (US-8B21),
-poi volo e Frontiera (decisioni dell'utente).
+**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): varchi delle sotto-aree come ingressi
+(US-8B21a/b), poi barca (US-8B91), volo (US-8B93) e accesso alla Frontiera (US-8B95), decisi il 2026-10-26.
 
 ## Decisioni prese
 
@@ -335,6 +335,14 @@ poi volo e Frontiera (decisioni dell'utente).
   nelle Marche). A piedi restano chiuse; `regions.json` `accesso`, verificato da un test di raggiungibilita'.
 - **Libro** (2026-10-25): copertina di cuoio, pergamena, font Alegreya/Alegreya SC, inchiostro scuro; tutto in
   `data/ui/book.json` `tema`, immagini da `tools/art/build_libro.py`.
+- **Varchi delle sotto-aree** (2026-10-26): ogni area del gating di `regions.json` e' un **ingresso** sulla mappa
+  verso un interno (cripta, tempio, radura, grotta grande, sala dei sigilli, isola di nebbia); `AreaGate` decide se
+  si apre. La mappa approvata non cambia. I ponti di radici sono un ponte che compare sul burrone.
+- **Volo** (2026-10-26): si sblocca con una **chiave del mondo** (oggetto o luogo da trovare), per tutti i Pathway.
+  Niente primitive nuove.
+- **Barca** (2026-10-26): barca libera al **molo di Mirwada**; in barca l'acqua si attraversa, si sbarca sulle coste.
+- **Frontiera, come si arriva** (2026-10-26): **in barca, volando, o da una soglia nel faro** che si apre solo con
+  una chiave trovata nel mondo. Resta il gating di sequenza (respinge chi e' oltre la Sequenza 4).
 
 ## i18n — due sistemi, una convenzione per le stringhe dei dati
 
