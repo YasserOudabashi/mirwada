@@ -362,6 +362,9 @@ func _su_evento_anim(nome: String) -> void:
 			_hitbox.call("attiva",
 				float(arco.get("danno", 12.0)), float(arco.get("stagger", 6.0)), self,
 				str(arco.get("tag_danno", "")))
+			var vfx: Node = get_node_or_null("/root/Vfx")       # US-8B40: il fendente dell'attacco base
+			if vfx != null:
+				vfx.call("gioca_per", "melee_arc", self)
 		"hitbox_off":
 			_hitbox.call("disattiva")
 

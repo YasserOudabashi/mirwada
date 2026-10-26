@@ -303,8 +303,8 @@
       ],
       "priority": 18,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-26: tools/art/build_vfx.py (seed 40) legge i frame da data/vfx.json e scrive assets/vfx/vfx_slash.png (5 x 96), vfx_bolt.png (2 x 48x32, ciclo), vfx_bolt_scoppio.png (5 x 48), vfx_streak.png (4 x 64x32), a 4 toni di grigio. Fendente e scoppio: primo frame tutto acceso + 4 di dissolvenza a blocchi (contorno solo fuori dalla sagoma). shaders/rampa_pathway.gdshader: parametro lampo (bianco nel frame d'impatto, 0 con riduci_flash). vfx.gd: _foglio/_effetto/_anima, gioca_per (l'attacco base del giocatore usa il fendente), veste_proiettile (il proiettile prima era invisibile), scoppio_proiettile; vfx.json: frames 5/2/4, sul_proiettile, scoppio. 4 test. Fogli arte/revisione/vfx_attacchi.png, prova a schermo vfx_in_gioco.png. Resta il feedback del colpo del PRD (scintilla, parata, polvere, postura)."
     },
     {
       "id": "US-8B74",

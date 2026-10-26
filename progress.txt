@@ -14470,3 +14470,24 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   Prova a schermo con Twilight Giant, Door e Mother (arte/revisione/icone_primitive_in_gioco.png). validate 0, 1013.
 - Aperto: le scritte dell'HUD sono bianche senza contorno (sui fondi chiari si leggono peggio); le palette dei
   Pathway non sono Endesga 32 (vale data/vfx.json, decisione del 2026-10-14).
+
+## US-8B40 — VFX degli attacchi base, 2026-10-26
+- I VFX delle abilita' erano un quadrato bianco 16x16 ingrandito e i proiettili non si vedevano affatto (solo la
+  collisione). tools/art/build_vfx.py (seed 40), frame letti da data/vfx.json primitive_vfx: vfx_slash (mezzaluna di
+  150 gradi attorno al personaggio, 5 frame da 96), vfx_bolt (sfera con la scia che ondeggia, ciclo di 2 frame da
+  48x32), vfx_bolt_scoppio (5 frame da 48: lampo, anello e raggi che si spezzano), vfx_streak (tre linee dietro,
+  4 frame da 64x32). Quattro toni di grigio come i glifi delle primitive. Fendente e scoppio: frame d'impatto tutto
+  acceso + 4 frame di dissolvenza a blocchi di 2 px; il contorno solo fuori dalla sagoma (prima i buchi della
+  dissolvenza avevano puntini scuri). Rilanciato: stessi byte. Fogli con 3 palette: arte/revisione/vfx_attacchi.png.
+- shaders/rampa_pathway.gdshader: parametro lampo (il frame d'impatto bianco, contorno escluso; 0 con riduci_flash).
+- vfx.gd: _foglio (PNG dal disco, una volta), _effetto (a mezza grandezza, z 1, rampa della palette), _anima (un
+  frame ogni 1/12 s, il lampo solo nel primo); gioca_per(tipo, caster); veste_proiettile e scoppio_proiettile. Le
+  primitive senza foglio restano col segnaposto. projectile.gd si veste in setup e scoppia in _finisci (fine
+  gittata o ultimo colpo). player.gd: l'attacco base (hitbox_on) mostra il fendente. vfx.json: frames 5/2/4,
+  projectile.sul_proiettile e scoppio, _comment.
+- Verifica: test_vfx_attacchi (4: fogli con i frame dei dati, lampo bianco e palette, niente lampo con riduci_flash,
+  il proiettile ha il disegno e scoppia, l'attacco base crea il fendente). Prova a schermo nella piazza: lampo e
+  dissolvenza del fendente, proiettile in volo, scoppio, scia (arte/revisione/vfx_in_gioco.png). validate 0, 1017.
+- Aperto: sul marmo bianco il lampo bianco si vede solo dal contorno (e' il lampo); i nemici non hanno ancora il
+  fendente sui loro attacchi; feedback del colpo del PRD (scintilla, parata perfetta, polvere, rottura della
+  postura) da fare; le altre 24 primitive (US-8B41..43).

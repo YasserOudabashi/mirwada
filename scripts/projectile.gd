@@ -42,6 +42,9 @@ func setup(spec: Dictionary, posizione: Vector2, direzione: Vector2, caster: Nod
 	circle.radius = 4.0
 	shape.shape = circle
 	add_child(shape)
+	var vfx: Node = Engine.get_main_loop().root.get_node_or_null("Vfx")   # US-8B40: il disegno in volo
+	if vfx != null:
+		vfx.call("veste_proiettile", self, caster, _direzione)
 
 
 func _ready() -> void:
@@ -63,7 +66,7 @@ func _physics_process(delta: float) -> void:
 	global_position += _direzione * passo
 	_percorso += passo
 	if _percorso >= gittata:
-		queue_free()
+		_finisci()
 
 
 ## Quante entita' puo' ancora attraversare. pierce 0 = si ferma alla prima.
@@ -76,5 +79,13 @@ func registra_colpo(bersaglio: Node) -> bool:
 		return false
 	_colpiti.append(bersaglio)
 	if colpi_residui() <= 0:
-		queue_free()
+		_finisci()
 	return true
+
+
+## Lo scoppio (US-8B40) e via.
+func _finisci() -> void:
+	var vfx: Node = Engine.get_main_loop().root.get_node_or_null("Vfx")
+	if vfx != null and is_inside_tree():
+		vfx.call("scoppio_proiettile", global_position, _caster, get_parent())
+	queue_free()

@@ -255,7 +255,9 @@ estensione del generatore), `capra_lunare`, più `hurt` e `death` nei dati.
 
 **US-8B40 [A] Attacchi base. M.** `vfx_slash`, `vfx_bolt`, `vfx_streak` +
 feedback del colpo (scintilla, scintilla della parata perfetta, polvere,
-rottura della postura).
+rottura della postura). **FATTA in parte (2026-10-26)**: `vfx_slash`, `vfx_bolt` (il proiettile in volo, prima
+invisibile) con `vfx_bolt_scoppio`, `vfx_streak` in `tools/art/build_vfx.py`, colorati dalla rampa; il feedback del
+colpo resta da fare.
 **US-8B41..43 [A] Le altre 24 primitive**, a gruppi di 8. *Domande (M) per gruppo.*
 **US-8B44 [A] Varianti `riduci_flash`** di tutti gli effetti con lampo.
 

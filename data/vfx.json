@@ -96,9 +96,10 @@
     }
   },
   "primitive_vfx": {
+    "_comment": "US-8B40: sprite = foglio assets/vfx/<sprite>.png (tools/art/build_vfx.py), frames = colonne del foglio; se il foglio non c'e' ancora resta il segnaposto. Un effetto d'attacco ha il lampo nel primo frame (bianco, attenuato con riduci_flash) e poi la dissolvenza. sul_proiettile: il foglio veste il proiettile in volo (ciclo), scoppio = l'effetto quando colpisce o finisce la gittata.",
     "melee_arc": {
       "sprite": "vfx_slash",
-      "frames": 3,
+      "frames": 5,
       "impact_frame": true,
       "scia": true
     },
@@ -106,11 +107,13 @@
       "sprite": "vfx_bolt",
       "frames": 2,
       "impact_frame": true,
-      "scia": true
+      "scia": true,
+      "sul_proiettile": true,
+      "scoppio": {"sprite": "vfx_bolt_scoppio", "frames": 5}
     },
     "dash": {
       "sprite": "vfx_streak",
-      "frames": 3,
+      "frames": 4,
       "impact_frame": false,
       "scia": true
     },

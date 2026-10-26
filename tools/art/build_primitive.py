@@ -184,7 +184,7 @@ def glifo(pid):
 
 
 def png(tela):
-    img = np.zeros((LATO, LATO, 4), np.uint8)
+    img = np.zeros(tela.shape + (4,), np.uint8)
     for lv, g in GRIGI.items():
         img[tela == lv] = (g, g, g, 255)
     return img
@@ -195,7 +195,7 @@ def colora(tela, pal):
     hx = lambda h: np.array([int(h[i:i + 2], 16) for i in (1, 3, 5)], float)   # noqa: E731
     ink, pri, acc = hx(pal["inchiostro"]), hx(pal["primario"]), hx(pal["accento"])
     toni = {0: ink, 1: pri + (ink - pri) * 0.45, 2: pri, 3: acc}
-    img = np.zeros((LATO, LATO, 4), np.uint8)
+    img = np.zeros(tela.shape + (4,), np.uint8)
     for lv, c in toni.items():
         img[tela == lv, :3] = c.astype(np.uint8)
         img[tela == lv, 3] = 255
