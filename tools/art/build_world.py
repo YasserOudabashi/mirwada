@@ -655,6 +655,7 @@ def genera(seed):
     w = World(W, H, seed, g, reg, e, REGIONI, water_mask=acqua)
     w.alt, w.mat_par, w.pas = altezza, mat_par, pas
     w.citta = citta                                   # per misurare la citta' e disegnarne l'anteprima
+    w.quartieri = Q                                   # US-8B18: i sedimi degli edifici prendono il tipo dal quartiere
     w.rumori = RU                                     # esportati per il tavolo tattico
     w.roads = [[list(map(int, q)) for q in p] for p in strade]
     w.objects = ponti

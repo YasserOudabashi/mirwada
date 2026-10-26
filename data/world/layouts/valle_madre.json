@@ -304,22 +304,22 @@
     {
       "x": 5,
       "y": 42,
-      "interno_id": "valle_avamposto_vedetta"
+      "interno_id": "valle_avamposto_vedetta", "villaggio": "capanna_base_valle"
     },
     {
       "x": 13,
       "y": 42,
-      "interno_id": "valle_avamposto_deposito"
+      "interno_id": "valle_avamposto_deposito", "villaggio": "capanna_base_valle"
     },
     {
       "x": 5,
       "y": 48,
-      "interno_id": "valle_avamposto_focolare"
+      "interno_id": "valle_avamposto_focolare", "villaggio": "capanna_base_valle"
     },
     {
       "x": 13,
       "y": 48,
-      "interno_id": "valle_avamposto_erborista"
+      "interno_id": "valle_avamposto_erborista", "villaggio": "capanna_base_valle"
     }
   ]
 }

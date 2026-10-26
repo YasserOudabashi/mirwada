@@ -326,6 +326,86 @@ def stendardo(seed=1, size=1.0, mat="cloth_red"):
     return r
 
 
+# Edifici (US-8B18): tipo -> (pareti, tetto, altezza delle pareti in unita', piani, pendenza del tetto)
+CASE_CITTA = ("intonaco", "intonaco", "intonaco_rosa", "intonaco_ocra")   # pareti: una scelta per variante
+TIPI_EDIFICIO = {
+    "casa": (CASE_CITTA, ("tegole", "tegole", "tegole_vecchie"), 54, 2, 20),     # case strette del quartiere operaio
+    "bottega": (CASE_CITTA, ("tegole", "tegole_vecchie"), 72, 2, 18),          # negozi e famiglie del centro storico
+    "palazzo": ("pietra_palazzo", "ardesia", 100, 3, 18), # palazzi del centro antico
+    "magazzino": ("wood_light", "ardesia", 66, 1, 20),    # magazzini del porto commerciale
+    "baracca": ("wood", "paglia", 36, 1, 24),             # baracche dei bassifondi
+    "villa": ("intonaco_bianco", "tegole", 64, 2, 20),    # ville della citta' nuova
+    "capanna": ("wood", "paglia", 40, 1, 26),             # villaggi, Valle, eremi, accampamenti
+    "casale": ("pietra_palazzo", "tegole", 56, 1, 22),    # fattorie e rifugi
+    "fienile": ("wood_light", "tegole", 62, 1, 24),       # fattorie
+    "torre": ("pietra_palazzo", "ardesia", 150, 4, 0),    # torri di vedetta e fari (tetto a cono)
+}
+SENO_CAMERA = 0.5299                                      # sin(32 gradi): la camera di engine.render accorcia y
+
+
+def edificio(tipo, larg, prof, seed=1, size=1.0):
+    """Un edificio che a schermo copre esattamente il suo sedime di larg x prof caselle (32 unita' l'una):
+    nel modello la profondita' e' divisa per il seno della camera. Origine = centro del lato davanti, a terra;
+    il davanti guarda +y (la camera lo gira con yaw 180, come il trono)."""
+    rnd = random.Random(seed)
+    pareti, tetto, hw, piani, pend = TIPI_EDIFICIO[tipo]
+    pareti = rnd.choice(pareti) if isinstance(pareti, tuple) else pareti     # piu' materiali: uno per variante
+    tetto = rnd.choice(tetto) if isinstance(tetto, tuple) else tetto
+    r = Rig(f"edificio_{tipo}_{larg}x{prof}_{seed}"); r.scale = size
+    r.joint("e", "root", (0, 0, 0))
+    W = larg * 32 - 6
+    D = (prof * 32 - 6) / SENO_CAMERA
+    if tipo == "torre":                                   # torre rotonda: cilindro e tetto a cono
+        rx = ry = W / 2                                   # un cerchio vero: a schermo e' un'ellisse bassa
+        r.part("e", "cylinder", (rx, ry, hw / 2), (0, -ry, hw / 2), mat=pareti)
+        r.part("e", "cone", (rx + 2, ry + 2, 30), (0, -ry, hw + 30), mat=tetto)
+        r.part("e", "box", (6, 1.6, 12), (0, 0.6, 12), mat="wood")
+        for f in range(1, piani):
+            r.part("e", "box", (3, 1.2, 5), (rnd.uniform(-rx * 0.3, rx * 0.3), 0.4, hw * f / piani + 8), mat="vetro")
+        return r
+    hw = hw + rnd.choice((0, 0, 4, -2))
+    r.part("e", "box", (W / 2, D / 2, hw / 2), (0, -D / 2, hw / 2), mat=pareti)
+    # tetto a due falde con il colmo lungo x a 3/4 della profondita': la falda davanti (in luce) copre quasi
+    # tutto il sedime, quella dietro (in ombra) resta una striscia
+    a = math.radians(pend)
+    fd = 0.75 * D
+    rh = fd * math.tan(a)
+    b = math.degrees(math.atan2(rh, D - fd))
+    r.part("e", "box", (W / 2 + 4, fd / math.cos(a) / 2 + 3, 2.5), (0, -fd / 2, hw + rh / 2),
+           mat=tetto, rot=(-pend, 0, 0))                  # falda davanti: sale verso il colmo
+    r.part("e", "box", (W / 2 + 4, (D - fd) / math.cos(math.radians(b)) / 2 + 2, 2.5),
+           (0, -fd - (D - fd) / 2, hw + rh / 2), mat=tetto, rot=(b, 0, 0))
+    r.part("e", "box", (W / 2 + 4, 2.5, 2.5), (0, -fd, hw + rh + 1.5), mat=tetto)      # colmo
+    if tipo in ("casa", "bottega", "palazzo", "villa") and rnd.random() < 0.7:          # comignolo
+        cx = rnd.choice((-1, 1)) * W * 0.3
+        r.part("e", "box", (3, 3, 8), (cx, -fd * 0.7, hw + rh * 0.7 + 6), mat="brick")
+    # porta al centro (un po' spostata), con soglia
+    px = 0.0                                              # al centro del fronte: la porta di gioco sta li'
+    rnd.random()                                          # (stessa sequenza casuale di prima per il resto)
+    larg_p = 14 if tipo in ("magazzino", "palazzo") else 9
+    alt_p = min(hw * 0.7, 26 if tipo != "baracca" else 16)
+    r.part("e", "box", (larg_p / 2 + 1.5, 1.2, alt_p / 2 + 1), (px, 0.6, alt_p / 2 + 1), mat="stone" if tipo == "palazzo" else "wood_light")
+    r.part("e", "box", (larg_p / 2, 1.6, alt_p / 2), (px, 1.0, alt_p / 2), mat="wood")
+    # finestre: per piano, distribuite sul fronte lasciando libera la porta
+    for f in range(piani):
+        z = hw * (f + 0.6) / piani
+        n = max(1, int(W // 28))
+        for i in range(n):
+            x = -W / 2 + W * (i + 0.5) / n
+            if f == 0 and abs(x - px) < larg_p:
+                continue
+            if z - 6 < alt_p and abs(x - px) < larg_p + 6:
+                continue
+            r.part("e", "box", (4.5, 1.0, 5.5), (x, 0.5, z), mat="wood_light")
+            r.part("e", "box", (3.2, 1.4, 4.2), (x, 0.8, z), mat="vetro")
+    if tipo == "bottega" and rnd.random() < 0.8:                                         # tenda della bottega
+        r.part("e", "box", (W * 0.35, 5, 1.2), (px, 5, alt_p + 4), mat=rnd.choice(("cloth_red", "cloth_green", "cloth_blue", "cloth_yellow")), rot=(-25, 0, 0))
+    if tipo == "magazzino":                                       # casse contro il muro, dentro il sedime
+        for k in range(rnd.randint(1, 3)):
+            r.part("e", "box", (4, 4, 4), (W / 2 - 8 - k * 9, 2.5, 4), mat="wood_light")
+    return r
+
+
 def ingresso(kind="scale", seed=1, size=1.0):
     """Ingressi del sottosuolo (stesso punto sopra e sotto): 'botola' (fogne, grata di ferro in un anello di pietra),
     'scale' (gradini di pietra che scendono nel buio, catacombe/miniere/grotte/citta' sotterranea), 'risalita' (dal
@@ -347,6 +427,11 @@ def ingresso(kind="scale", seed=1, size=1.0):
         r.part("b", "box", (5.8, 0.9, 1.0), (0, -4.4, 1.0), mat="stone")                       # muretto in fondo
         for sx in (-1, 1):                                                                      # spallette
             r.part("b", "box", (0.9, 4.4, 0.8), (sx * 4.9, -0.5, 0.8), mat="stone", rot=(0, 0, rnd.uniform(-2, 2)))
+    elif kind == "porta":                                                                       # porta nella roccia
+        r.part("b", "box", (6.5, 1.6, 7.5), (0, -0.4, 7.5), mat="stone")                        # stipiti e architrave
+        r.part("b", "box", (4.6, 1.8, 6.0), (0, 0.2, 6.0), mat="wood")
+        r.part("b", "box", (0.5, 2.0, 0.5), (2.6, 0.4, 6.0), mat="iron")                        # maniglia
+        r.part("b", "box", (5.2, 3.0, 0.4), (0, 2.6, 0.4), mat="stone_light")                    # soglia
     else:                                                                                       # risalita
         r.part("b", "ellipsoid", (3.4, 2.4, 0.15), (0, 1.4, 0.15), mat="stone_light")          # pietra chiara: la luce
         for sx in (-1, 1):

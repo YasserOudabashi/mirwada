@@ -134,6 +134,17 @@ define("stone_light", ["slate_d", "slate", "grey", "grey_l"], tex=("noise", 1.1,
 define("roccia_trono", ["navy", "slate_d", "slate", "grey"], tex=("noise", 1.1, 0.16),
        ramp_cupo=["#1f1a1e", "#291f1c", "#3a2b26", "#9e5438"])
 define("brick", ["brown_dd", "brown_d", "rust", "orange_d"], tex=("noise", 0.9, 0.12))
+# edifici (US-8B18): intonaco (crema, bianco, rosa, ocra), tegole (nuove e vecchie), ardesia, paglia, vetro
+define("intonaco", ["brown", "tan", "cream", "cream"])
+define("intonaco_bianco", ["slate", "grey", "grey_l", "white"])
+define("intonaco_rosa", ["brown_d", "brown", "skin_m", "skin_l"])
+define("intonaco_ocra", ["brown_d", "brown", "tan", "amber"])
+define("pietra_palazzo", ["slate_d", "slate", "grey", "grey_l"], tex=("noise", 3.0, 0.05))
+define("tegole", ["brown_dd", "brown_d", "rust", "orange_d"], tex=("stripes", "y", 4.0, 0.4))
+define("tegole_vecchie", ["brown_dd", "brown_dd", "brown_d", "brown"], tex=("stripes", "y", 4.0, 0.4))
+define("ardesia", ["ink", "navy", "slate_d", "slate"], tex=("stripes", "y", 4.0, 0.35))
+define("paglia", ["brown_d", "brown", "tan", "amber"], tex=("stripes", "x", 1.2, 0.2))
+define("vetro", ["ink", "navy", "blue_d", "blue"])
 define("bone", ["slate", "grey", "grey_l", "cream", "white"])
 define("sand", ["brown", "tan", "cream", "skin_l"], tex=("noise", 1.5, 0.1))
 # --- natura --------------------------------------------------------------------------------------

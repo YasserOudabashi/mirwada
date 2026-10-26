@@ -7,6 +7,7 @@ Esporta il mondo di prova (seed 6) per il gioco (US-8B12): Godot carica questi f
     python tools/art/esporta_mondo.py --solo-blocchi  # solo le collisioni (blocchi.png), pochi minuti
     python tools/art/esporta_mondo.py --sottosuolo    # solo il sottosuolo (secondo livello), luminoso e cupo
     python tools/art/esporta_mondo.py --solo-dati     # solo i riquadri delle regioni in mondo.json, pochi secondi
+    python tools/art/esporta_mondo.py --edifici       # solo gli edifici della citta' (sprite, dati, collisioni)
 
 Il terreno con pareti, bordi e varianti si compone qui in Python, a blocchi, esattamente come le anteprime
 (build_world.ritaglio); poi si tengono solo le caselle 32x32 diverse (34 mila su 1,2 milioni): fogli-atlante + una
@@ -35,6 +36,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import build_world as B  # noqa: E402
 from forge3d import tema  # noqa: E402
+from forge3d.creatures import SENO_CAMERA, TIPI_EDIFICIO  # noqa: E402
 from forge3d.pareti import maschera as maschera_pareti  # noqa: E402
 from forge3d.worldrender import object_sprite  # noqa: E402
 
@@ -79,8 +81,226 @@ def tessere(w, alt=None, mat=None, pas=None, pieno=None):
 
 ACQUA, DISLIVELLO = 255, 128
 
+# US-8B18: il tipo di edificio di ogni quartiere della citta' (build_world.py, isolati())
+TIPO_DI_QUARTIERE = {"porto_commerciale": "magazzino", "quartiere_operaio": "casa", "centro_storico": "bottega",
+                     "centro_antico": "palazzo", "bassifondi": "baracca", "citta_nuova": "villa"}
 
-def blocchi(w):
+
+def rettangoli(m):
+    """Copre una maschera con rettangoli pieni (il primo libero in alto a sinistra, largo quanto puo', poi alto
+    quanto puo'). -> [(x0, y0, larghezza, altezza)]"""
+    m = m.copy()
+    out = []
+    for y, x in zip(*np.nonzero(m)):
+        if not m[y, x]:
+            continue
+        x1 = x
+        while x1 + 1 < m.shape[1] and m[y, x1 + 1]:
+            x1 += 1
+        y1 = y
+        while y1 + 1 < m.shape[0] and m[y1 + 1, x:x1 + 1].all():
+            y1 += 1
+        m[y:y1 + 1, x:x1 + 1] = False
+        out.append((int(x), int(y), int(x1 - x + 1), int(y1 - y + 1)))
+    return out
+
+
+PROFONDITA_MAX = 4      # un sedime piu' profondo diventa piu' file di case (il tetto di una casa 2 x 11 era una
+                        # colonna alta tutto lo schermo)
+LARGHEZZA_MAX = {"casa": 4, "bottega": 4, "baracca": 3, "villa": 5}   # case a schiera: una fila lunga diventa case
+                        # singole (altezza, comignolo e porta propri); magazzini e palazzi restano lunghi
+
+
+def sporgenza(tipo, prof=PROFONDITA_MAX):
+    """Quanto un edificio copre a schermo oltre il lato dietro del suo sedime, in unita': il muro piu' alto (+4)
+    visto a 32 gradi, piu' il colmo del tetto se sale oltre (stesse misure di forge3d.creatures.edificio)."""
+    _, _, hw, _, pend = TIPI_EDIFICIO[tipo]
+    cos = (1 - SENO_CAMERA ** 2) ** 0.5
+    d = prof * 32
+    colmo = 0.75 * d + 0.75 * d / SENO_CAMERA * np.tan(np.radians(pend)) * cos
+    return (hw + 4) * cos + max(0.0, colmo - d)
+
+
+def vicolo(tipo):
+    """Caselle libere davanti a una casa perche' la sua soglia resti visibile sotto il tetto di quella davanti."""
+    return int(sporgenza(tipo) / 32 + 0.5) + 1
+
+
+def dividi(y0, lh, massimo, spazio=0):
+    """Divide [y0, y0 + lh) in pezzi lunghi 2..massimo separati da 'spazio' caselle: -> [(inizio, lunghezza)].
+    Un pezzo solo se non ce ne stanno due da 2 con lo spazio in mezzo. (Serve per le file, con il vicolo, e per le
+    case di una fila, senza spazio.)"""
+    n = max(1, min(-(-(lh + spazio) // (massimo + spazio)), (lh + spazio) // (2 + spazio)))
+    case = lh - (n - 1) * spazio
+    out, y = [], y0
+    for k in range(n):
+        p = case * (k + 1) // n - case * k // n
+        out.append((y, p))
+        y += p + spazio
+    return out
+
+
+def variante(x, y, n=6):
+    """Variante 1..n di un edificio dalla sua posizione. Un hash, non una somma: con (7x + 13y) % 4 le case di una
+    griglia a passo 4 avevano tutte la stessa variante lungo la colonna."""
+    return int(hashlib.md5(f"{x},{y}".encode()).hexdigest(), 16) % n + 1
+
+
+def edifici(w):
+    """Gli edifici di Mirwada sui sedimi degli isolati (terreno stone dentro i quartieri, a livello 0, fuori dalle
+    strade): un rettangolo almeno 2 x 2 = edifici del tipo del quartiere. Un sedime profondo diventa file di case
+    con un vicolo in mezzo (vicolo(): il tetto di una fila non copre la soglia di quella dietro), una fila lunga
+    diventa case singole (LARGHEZZA_MAX). Variante (seed) dalla posizione."""
+    strada = np.zeros(w.alt.shape, bool)
+    for s in list(w.roads) + list(w.sentieri):
+        for x, y in s:
+            strada[y, x] = True
+    out = []
+    for q, tipo in TIPO_DI_QUARTIERE.items():
+        zona = getattr(w, "quartieri", {}).get(q)
+        if zona is None:
+            continue
+        sedime = (w.ground == B.L["stone"]) & zona & (w.alt == 0) & ~w.water_mask & ~strada
+        for x_, y_, lw_, lh_ in rettangoli(sedime):
+            if lw_ < 2 or lh_ < 2:
+                continue
+            for y0, lh in dividi(y_, lh_, PROFONDITA_MAX, vicolo(tipo)):
+                for x0, lw in dividi(x_, lw_, LARGHEZZA_MAX.get(tipo, lw_)):
+                    out.append({"type": "edificio", "tipo": tipo, "x": x0, "y": y0, "w": lw, "h": lh,
+                                "seed": variante(x0, y0)})
+    return out
+
+
+# Case dei villaggi suggeriti dal generatore (build_world.genera: villaggi) e torri sui luoghi: prefisso del nome
+# del villaggio -> tipi di edificio, in ordine; misure in caselle per tipo.
+CASE_DI_VILLAGGIO = {"villaggio_libero": ["casale", "casa", "capanna", "fienile", "casa"],
+                     "villaggio_sugli_alberi": ["capanna", "capanna", "capanna", "capanna"],
+                     "villaggio_pescatori": ["capanna", "capanna", "capanna"],
+                     "villaggio_pirati": ["capanna", "casale", "capanna"],
+                     "capanna_base": ["capanna"], "rifugio_base": ["casale"], "fattoria": ["casale", "fienile"],
+                     "casetta": ["casa"], "eremita": ["capanna"], "accampamento_banditi": ["capanna", "capanna"],
+                     "mulino": ["fienile"]}
+TORRI_SUI_LUOGHI = {"torre_osservazione": "torre", "faro": "torre"}
+MISURE = {"casa": (4, 3), "capanna": (3, 2), "casale": (5, 4), "fienile": (5, 3), "torre": (3, 2)}
+
+
+def interni_per_villaggio():
+    """Quanti edifici dei layout (data/world/layouts/*.json, campagna.json: edifici[].villaggio) vanno in ogni
+    villaggio: il villaggio ha almeno tante case (mondo.gd crea_porte ci mette le porte)."""
+    n = {}
+    cart = os.path.join(B.ROOT, "data", "world")
+    for nome in sorted(os.listdir(os.path.join(cart, "layouts"))) + ["../campagna.json"]:
+        if nome.endswith(".json"):
+            for e in json.load(open(os.path.join(cart, "layouts", nome))).get("edifici", []):
+                if "villaggio" in e:
+                    n[e["villaggio"]] = n.get(e["villaggio"], 0) + 1
+    return n
+
+
+def edifici_fuori_citta(w, luoghi, villaggi, gia):
+    """Case vicino a ogni villaggio suggerito e torri sui luoghi: la prima area libera (anelli attorno al punto)
+    larga quanto la casa piu' una casella di margine, con la soglia e le 3 caselle sotto libere (il tetto di una
+    casa davanti non copre la porta), fuori da acqua, dislivelli, strade, luoghi e altre case. Un villaggio
+    nell'angolo (0, 0) e' un posto non trovato dal generatore (il mulino): si salta."""
+    libero = (blocchi(w, senza_edifici=True) == 0)
+    strada = np.zeros(w.alt.shape, bool)
+    for s_ in list(w.roads) + list(w.sentieri):
+        for x, y in s_:
+            strada[y, x] = True
+    libero &= ~strada
+    for x, y in luoghi.values():
+        libero[max(0, y - 2):y + 3, max(0, x - 2):x + 3] = False
+    occ = np.zeros(w.alt.shape, bool)
+    for e in gia:
+        occ[e["y"] - 1:e["y"] + e["h"] + 2, e["x"] - 1:e["x"] + e["w"] + 1] = True
+
+    def posa(cx, cy, tipo, seed):
+        lw, lh = MISURE[tipo]
+        for r in range(0, 40):
+            for dy in range(-r, r + 1):
+                for dx in range(-r, r + 1):
+                    if max(abs(dx), abs(dy)) != r:
+                        continue
+                    x0, y0 = cx + dx - lw // 2, cy + dy - lh
+                    if x0 < 1 or y0 < 1 or x0 + lw + 1 >= B.W or y0 + lh + 4 >= B.H:
+                        continue
+                    area = (slice(y0 - 1, y0 + lh + 4), slice(x0 - 1, x0 + lw + 1))   # + margine, soglia e 3 sotto
+                    if libero[area].all() and not occ[area].any():
+                        occ[area] = True
+                        return {"type": "edificio", "tipo": tipo, "x": int(x0), "y": int(y0), "w": lw, "h": lh,
+                                "seed": seed}
+        return None
+
+    out = []
+    servono = interni_per_villaggio()
+    for nome, (x, y) in sorted(villaggi.items()):
+        if (x, y) == (0, 0):
+            continue
+        tipi = list(next((v for k, v in CASE_DI_VILLAGGIO.items() if nome.startswith(k)), None) or [])
+        tipi += tipi[:1] * (servono.get(nome, 0) - len(tipi))       # una casa per ogni interno del villaggio
+        for i, tipo in enumerate(tipi):
+            e = posa(x + (i % 3 - 1) * 7, y + (i // 3) * 8, tipo, (x * 3 + y + i) % 4 + 1)
+            if e:
+                out.append(e)
+    for luogo, tipo in TORRI_SUI_LUOGHI.items():
+        if luogo in luoghi:
+            e = posa(luoghi[luogo][0], luoghi[luogo][1] + 3, tipo, 1)
+            if e:
+                out.append(e)
+    return out
+
+
+def tutti_gli_edifici(w, luoghi, villaggi):
+    citta = edifici(w)
+    return citta + edifici_fuori_citta(w, luoghi, villaggi, citta)
+
+
+def chiave_edificio(e):
+    return f"edificio_{e['tipo']}_{e['w']}x{e['h']}_{e['seed']}"
+
+
+def esporta_edifici(w, luoghi, villaggi, temi):
+    """Sprite degli edifici per tema (<tema>/oggetti/edificio_*.png), voce "edifici" e oggetti in mondo.json, e i
+    sedimi come ostacolo in blocchi.png. Le tessere del terreno non cambiano. Gli oggetti di scena (alberi, rocce)
+    che starebbero dentro una casa si tolgono."""
+    lista = getattr(w, "edifici", None) or tutti_gli_edifici(w, luoghi, villaggi)
+    w.edifici = lista
+    sprite = {}
+    for t in temi:
+        tema.imposta(t)
+        cart = os.path.join(OUT, t, "oggetti")
+        os.makedirs(cart, exist_ok=True)
+        for e in lista:
+            k = chiave_edificio(e)
+            img, ax, ay = object_sprite(e, T)
+            Image.fromarray(img).save(os.path.join(cart, k + ".png"))
+            sprite[k] = {"ax": int(ax), "ay": int(ay)}
+        img, ax, ay = object_sprite({"type": "ingresso", "kind": "porta", "seed": 3}, T)   # porte nella roccia
+        Image.fromarray(img).save(os.path.join(cart, "ingresso_porta.png"))
+        sprite["ingresso_porta"] = {"ax": int(ax), "ay": int(ay)}
+        print(f"  {t}: {len(sprite)} sprite di edifici")
+    path = os.path.join(OUT, "mondo.json")
+    dati = json.load(open(path))
+    dentro = np.zeros(w.alt.shape, bool)
+    for e in lista:
+        dentro[e["y"]:e["y"] + e["h"] + 1, e["x"]:e["x"] + e["w"]] = True
+    # gli oggetti si rifanno dal generatore (stessi di oggetti()), non da mondo.json: rilanciando, un albero tolto
+    # da una casa che poi si sposta torna al suo posto
+    dati["oggetti"] = [[chiave_oggetto(o), round(float(o["x"]), 3), round(float(o["y"]), 3)] for o in w.objects
+                       if chiave_oggetto(o) in dati["sprite"]
+                       and not dentro[min(int(o["y"]), B.H - 1), min(int(o["x"]), B.W - 1)]]
+    dati["oggetti"] += [[chiave_edificio(e), e["x"] + e["w"] / 2, e["y"] + e["h"]] for e in lista]
+    dati["sprite"] = {k: v for k, v in dati["sprite"].items() if not k.startswith("edificio_") and k != "ingresso_porta"}
+    dati["sprite"].update(sprite)
+    dati["edifici"] = [[e["x"], e["y"], e["w"], e["h"], e["tipo"]] for e in lista]
+    dati["villaggi"] = {k: [int(v[0]), int(v[1])] for k, v in villaggi.items() if tuple(v) != (0, 0)}
+    with open(path, "w") as f:
+        json.dump(dati, f, separators=(",", ":"))
+    Image.fromarray(blocchi(w)).save(os.path.join(OUT, "blocchi.png"))
+    return lista
+
+
+def blocchi(w, senza_edifici=False):
     """Per casella: 255 = acqua o vuoto (non si passa mai), 128 = dislivello (non si passa a piedi, volando si'),
     0 = libera. Dislivello: le pareti senza scala o rampa e i bordi alti dei gradoni verso est, ovest e nord (si
     sale e si scende solo dalle pareti a sud, con scale e rampe). Strade e sentieri attraversano i dislivelli solo
@@ -101,6 +321,9 @@ def blocchi(w):
     for sy, sx in ((0, 1), (0, -1), (1, 0), (-1, 0)):
         stessa &= B.sposta(w.biome, sy, sx, -1) == w.biome
     salto &= ~(strada & stessa)
+    if not senza_edifici:                                      # US-8B18: il sedime di un edificio non si passa
+        for e in getattr(w, "edifici", None) or edifici(w):
+            salto[e["y"]:e["y"] + e["h"], e["x"]:e["x"] + e["w"]] = True
     out = np.where(salto, DISLIVELLO, 0).astype(np.uint8)
     out[w.water_mask] = ACQUA
     return out
@@ -197,6 +420,11 @@ def aggiorna_dati():
         json.dump(dati, f, separators=(",", ":"))
 
 
+def chiave_oggetto(o):
+    return "_".join(str(o.get(k)) for k in ("type", "kind", "leaf", "mat", "berries", "seed", "size")
+                    if o.get(k) is not None).replace(".", "p")
+
+
 def oggetti(w, cartella):
     os.makedirs(cartella, exist_ok=True)
     sprite, lista = {}, []
@@ -204,8 +432,7 @@ def oggetti(w, cartella):
         spr = object_sprite(o, T)
         if spr is None:
             continue
-        chiave = "_".join(str(o.get(k)) for k in ("type", "kind", "leaf", "mat", "berries", "seed", "size")
-                          if o.get(k) is not None).replace(".", "p")
+        chiave = chiave_oggetto(o)
         if chiave not in sprite:
             img, ax, ay = spr
             Image.fromarray(img).save(os.path.join(cartella, chiave + ".png"))
@@ -221,12 +448,14 @@ def main():
     ap.add_argument("--solo-blocchi", action="store_true", help="riscrive solo blocchi.png (le collisioni)")
     ap.add_argument("--sottosuolo", action="store_true", help="solo il sottosuolo (secondo livello)")
     ap.add_argument("--solo-dati", action="store_true", help="solo i dati ricavati da regioni.png (riquadri)")
+    ap.add_argument("--edifici", action="store_true", help="solo gli edifici della citta' (sprite, dati, collisioni)")
     a = ap.parse_args()
     if a.solo_dati:
         aggiorna_dati()
         print("->", os.path.join(OUT, "mondo.json"))
         return
     w, luoghi, villaggi, sotto = B.genera(a.seed)
+    w.edifici = tutti_gli_edifici(w, luoghi, villaggi)          # US-8B18: servono anche alle collisioni
     os.makedirs(OUT, exist_ok=True)
     Image.fromarray(blocchi(w)).save(os.path.join(OUT, "blocchi.png"))
     if a.solo_blocchi:
@@ -235,6 +464,10 @@ def main():
     if a.sottosuolo:
         esporta_sottosuolo(w, sotto, [a.tema] if a.tema else ["luminoso", "cupo"], a.seed)
         print("->", OUT)
+        return
+    if a.edifici:
+        lista = esporta_edifici(w, luoghi, villaggi, [a.tema] if a.tema else ["luminoso", "cupo"])
+        print(f"-> {len(lista)} edifici in", OUT)
         return
     Image.fromarray(w.biome.astype(np.uint8)).save(os.path.join(OUT, "regioni.png"))
     fogli, sprite, lista = {}, {}, []
@@ -262,6 +495,7 @@ def main():
             dati["sprite"].update({k: v for k, v in prima.get("sprite", {}).items() if k.startswith("ingresso_")})
     with open(vecchio, "w") as f:
         json.dump(dati, f, separators=(",", ":"))
+    esporta_edifici(w, luoghi, villaggi, [a.tema] if a.tema else ["luminoso", "cupo"])
     print("->", OUT)
 
 
