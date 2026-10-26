@@ -229,6 +229,7 @@ python tools/art/esporta_mondo.py --solo-blocchi   # solo le collisioni (blocchi
 python tools/art/esporta_mondo.py --sottosuolo     # solo il sottosuolo (~5 minuti)
 python tools/art/esporta_mondo.py --solo-dati      # solo i riquadri delle regioni in mondo.json
 python tools/art/esporta_mondo.py --edifici        # solo gli edifici: sprite, mondo.json, blocchi.png (~5 minuti)
+python tools/art/build_interni.py              # pavimenti e pareti degli interni -> assets/interni/<tema>/<interno_id>.png
 python tools/art/build_npc.py                  # aspetti degli NPC (personaggio_<aspetto>_{idle,walk}.png)
 python tools/art/build_libro.py                # carta, segnalibri, caselle e filetto del libro (assets/ui/)
 python scripts/forge.py contact FILE.png --scale 4
@@ -262,6 +263,7 @@ scripts/world/    loader del mondo unico (mondo.gd: blocchi, livelli, ingressi, 
 scenes/ scripts/ assets/ tests/
 assets/placeholder/   sheet {categoria}_{nome}.png (ora generati da sprite-forge)
 assets/world/         mondo.json, blocchi/regioni.png, <tema>/tessere+indici+oggetti, sotto/
+assets/interni/       <tema>/<interno_id>.png: pavimenti e pareti degli interni (build_interni.py)
 assets/ui/            libro (carta, segnalibri, caselle, filetto) e font Alegreya (OFL)
 assets/vfx/           sheet degli effetti
 prd.json          story della fase corrente per ralph
@@ -298,12 +300,12 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
 - Fase 8b — Arte con sprite-forge: **IN CORSO**. Fatti: personaggi a 64 px, aspetti degli NPC, terreni,
   pareti, mondo generato (seed 6) con modalita' luminosa/cupa, mondo unico nel gioco (US-8B12..g:
   caricatore, regione dalla posizione, NPC, collisioni, sottosuolo, contenuto dei layout), libro (US-8B73),
-  edifici di citta', villaggi e torri con le porte verso i 14 interni (US-8B18a/b).
+  edifici di citta', villaggi e torri con le porte verso i 14 interni (US-8B18a/b), interni disegnati (US-8B18c).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
-**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): interni con l'arte vera (US-8B18c),
+**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): arredi degli interni (US-8B18d),
 varchi delle sotto-aree (US-8B21), poi volo e Frontiera (decisioni dell'utente).
 
 ## Decisioni prese

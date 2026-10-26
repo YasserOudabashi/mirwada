@@ -147,11 +147,26 @@
     },
     {
       "id": "US-8B18c",
-      "title": "Interni con l'arte vera",
+      "title": "Interni con l'arte vera: pavimenti e pareti",
       "description": "Gli interni oggi usano il tileset segnaposto a 32 px: pavimenti, pareti e arredi dal generatore.",
       "acceptanceCriteria": [
         "stesso stile e palette del mondo",
         "prova a schermo di ogni interno"
+      ],
+      "priority": 11,
+      "fase": "8b",
+      "passes": true,
+      "notes": "Pavimenti e pareti: tools/art/build_interni.py (seed 11), stile per interno nei dati, un PNG per interno e modalita'; prova a schermo dei 14 in arte/revisione/interni_in_gioco.png. Arredi spostati in US-8B18d."
+    },
+    {
+      "id": "US-8B18d",
+      "title": "Arredi degli interni",
+      "description": "Gli interni sono stanze vuote: arredi per interno nei dati (arredi: [{id, x, y}]), modelli forge3d (tavoli, panche, botti, scaffali, incudine e forgia, letto, camino, bancone, alambicchi), con collisione e ordine di profondita' col giocatore.",
+      "acceptanceCriteria": [
+        "arredi nei dati degli interni, un vocabolario chiuso di id controllato dal validator",
+        "un modello forge3d per arredo, palette Endesga 32, guardato ingrandito nelle due modalita'",
+        "collisione sugli arredi e il giocatore passa dietro quelli alti",
+        "prova a schermo di ogni interno; validate 0; bash tools/run_tests.sh esce 0"
       ],
       "priority": 11,
       "fase": "8b",

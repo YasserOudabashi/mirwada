@@ -14245,3 +14245,23 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   986 test passati. Prova a schermo: davanti e dentro la bettola, base della
   Valle e villaggio delle paludi con "[F] Entra".
 - Aperto: gli interni hanno ancora il tileset segnaposto a 32 px (US-8B18c).
+
+## US-8B18c — pavimenti e pareti degli interni, 2026-10-26
+- tools/art/build_interni.py (nuovo, seed 11): un'immagine per interno e per modalita' (assets/interni/<tema>/
+  <interno_id>.png, 32 px per casella come il terreno), dalla mappa ASCII dell'interno e dal suo "stile" (campo
+  nuovo nei 14 data/world/interni/*.json): taverna, casa, bottega, fucina, archivio, torre, capanna, sotterraneo.
+  Pavimenti (assi sfalsate, cotto, lastre a corsi, terra con paglia), parete nord vista di fronte (intonaco con
+  boiserie, mattoni, pietra, tronchi, scaffali di libri) con cima e battiscopa, cime dei muri dall'alto con il bordo in
+  luce e il contorno, ombra del muro a ovest, soglie di legno sui passaggi '+', uscita disegnata accanto allo spawn
+  (porta aperta nel muro con la luce che entra e lo zerbino, o scala a pioli nel muro nord del sotterraneo).
+  Palette Endesga 32 / gemelli cupi verificata dallo script.
+- interior_scene.gd _arte(): l'immagine come primo figlio (sotto NPC, nemici, oggetti), le celle del tileset
+  segnaposto restano per le collisioni ma trasparenti (self_modulate). project.godot: colore di fondo = l'inchiostro
+  della palette, fuori dalla stanza c'e' il buio invece del grigio di Godot.
+- Visto ingrandito (campionari su due temi) e a schermo tutti e 14 gli interni (arte/revisione/interni_in_gioco.png).
+  Corretto in prova: un contorno in cima a ogni stanza (np.roll riavvolgeva la porta in basso -> sposta()), cime dei
+  muri troppo granulose, intonaco piatto, terra a macchie troppo scure, libri retinati fra due colori.
+- Verifica: tests/test_interni_arte.gd (2: un'immagine per interno e modalita' grande quanto la mappa; l'interno la
+  mostra sotto tutto e tiene le collisioni). validate 0, 988 test.
+- Aperto: le stanze sono vuote (arredi: US-8B18d); la telecamera segue il giocatore, quindi una stanza piccola non
+  sta al centro dello schermo.

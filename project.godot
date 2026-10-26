@@ -185,6 +185,8 @@ abilita_4={
 
 ; 0 = Nearest. Senza questo la pixel art esce sfocata.
 textures/canvas_textures/default_texture_filter=0
+; fuori dalle stanze degli interni il buio: l'inchiostro della palette (#181425), non il grigio di Godot
+environment/defaults/default_clear_color=Color(0.0941, 0.0784, 0.1451, 1)
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 ; Snap del rendering 2D alla griglia di pixel interi. Con la camera che

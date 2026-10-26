@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "interno_id": "marche_villaggio_fabbro",
+  "interno_id": "marche_villaggio_fabbro", "stile": "fucina",
   "mappa": [
     "#######",
     "#.....#",

@@ -48,6 +48,7 @@ func _ready() -> void:
 	if layout.is_empty():
 		return
 	_dipingi(layout)
+	_arte()
 	_crea_uscita(layout)
 	_crea_nemici(layout)
 	_crea_oggetti(layout)
@@ -61,6 +62,22 @@ func _dipingi(layout: Dictionary) -> void:
 		for x in riga.length():
 			var col: int = int(_COLONNA_PER_CARATTERE.get(riga[x], _COLONNA_PAVIMENTO))
 			set_cell(Vector2i(x, y), SORGENTE, Vector2i(col, 0))
+
+
+## US-8B18c: l'immagine dell'interno (tools/art/build_interni.py, una per modalita') sotto
+## NPC, nemici e oggetti; le celle restano per le collisioni, trasparenti.
+func _arte() -> void:
+	var gs: Node = get_node_or_null("/root/GameState")
+	var tema: String = str(gs.call("tema_arte")) if gs != null else "luminoso"
+	var path: String = "res://assets/interni/%s/%s.png" % [tema, interno_id]
+	if not FileAccess.file_exists(path):
+		return
+	var spr := Sprite2D.new()
+	spr.name = "Arte"
+	spr.texture = preload("res://scripts/world/mondo.gd")._texture(path)
+	spr.centered = false
+	add_child(spr)
+	self_modulate = Color(1, 1, 1, 0)
 
 
 func _cella_spawn(layout: Dictionary) -> Vector2i:
