@@ -14135,7 +14135,7 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - Aperto: nessun nemico o boss sotto terra (i boss di zona sono in mondo.json, non ancora usati); il livello non
   si salva (caricando si riparte dalla partenza); niente luci/buio speciali nel sottosuolo.
 
-## US-8B70 — il libro ridisegnato (richiesta dell'utente "fai un bel design del libro"), 2026-10-25
+## US-8B73 — il libro ridisegnato (nel commit 1bf11a2 chiamata per errore US-8B70: la 70 sono le icone) (richiesta dell'utente "fai un bel design del libro"), 2026-10-25
 - Prima: un rettangolo beige piatto, testo bianco quasi illeggibile, bottoni grigi, griglia del diagramma nera.
 - tools/art/build_libro.py (nuovo, seed 7, palette Endesga 32 verificata dallo script, alpha 0/255):
   assets/ui/libro.png (600x340 = la pagina in unita': copertina di cuoio con cuciture, angoli d'ottone con
@@ -14156,3 +14156,30 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - Non mi convince ancora: le pagine sono impaginate sull'intera doppia pagina, quindi testi e griglie passano
   sopra la piega (un'impaginazione a due colonne vere e' un lavoro pagina per pagina); gli interruttori del
   colophon (CheckButton) hanno ancora il disegno di Godot; manca una variante cupa del libro per la difficile.
+
+## US-8B12g — nemici, boss e oggetti dei layout (fasi 8/10/11) sul mondo generato, 2026-10-25
+- I layout restano la fonte (data/world/layouts/<regione>.json, data/world/campagna.json): mondo.gd popola() li
+  riporta sulla mappa generata, senza toccare ne' il mondo ne' i layout.
+  - Un elemento dentro una zona del layout (zona = [x, y, larghezza, altezza]) va vicino al luogo di quella zona
+    sulla mappa (luoghi_mondo), spostato come nel layout x2; gli altri nella stessa posizione relativa dentro il
+    riquadro della regione (mondo.json "riquadri", da esporta_mondo.py --solo-dati, pochi secondi). Poi la
+    casella libera piu' vicina della stessa regione (ricerca allargata 40/120/300). La campagna va nella terra
+    di mezzo.
+  - Le zone sotterranee vanno nel sottosuolo: regions.json luoghi_mondo "boss_fogne": "sotterraneo" (Mirwada),
+    "boss_catacombe": "cripta" (Marche); il boss di Mirwada (zona sotterraneo) vive nelle fogne. Gli elementi del
+    sottosuolo sono nascosti e fermi in superficie (e viceversa); le aree dell'altro livello non si toccano
+    (monitoring spento: un oggetto sotto non si raccoglie camminando sopra).
+  - Nemici come in world_scene.gd: sequenza, scala (boss 1.5), override, drop per sequenza, evento area_cleared
+    per regione; nemici e NPC lontani fermi (raggio_attivo_entita), che qui serve anche perche' lontano dal
+    giocatore le collisioni del terreno non sono costruite.
+  - balance.json mondo.raggio_partenza_senza_nemici = 16 caselle: la casa al porto e' accanto alla piazza, un
+    nemico finiva a 4 caselle dalla partenza (visto in prova). Validator: intero >= 0.
+  - Tolto il nemico di prova di main.tscn.
+- cella_libera ora scorre solo l'anello (stesso ordine di prima) e confronta i byte della regione: popola() da
+  2,9 s a 0,23 s, test_mondo da 24 a 12 s.
+- Verifica: 4 test nuovi in test_mondo (tutti gli elementi dei layout nel mondo, nella loro regione e livello, su
+  caselle libere e non sovrapposti, un boss per regione; il centro della zona porto finisce al porto; il
+  sotterraneo di Mirwada e' nelle fogne e si vede solo sotto; nessun nemico entro 16 caselle dalla partenza).
+  Prova a schermo: il boss segue e colpisce (salute 70/120), al porto nemici, NPC e oggetti. 982 test passati.
+- Aperto: gli edifici dei layout (porte verso gli interni) aspettano i disegni delle case nel generatore; le
+  icone degli oggetti a terra sono ancora i segnaposto di generate_sprites.py (US-8B70).

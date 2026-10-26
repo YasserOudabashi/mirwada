@@ -198,7 +198,8 @@
     "densita_baseline": 0.2
   },
   "mondo": {
-    "_comment": "US-1003 (fase 10, mondo continuo): con 5 regioni vive nello stesso nodo, nemici/NPC fuori da questo raggio (in pixel, attorno al giocatore) hanno process_mode = DISABLED finche' non ci si riavvicina - world_scene.gd::_aggiorna_prestazioni. Un solo raggio globale, nessuna eccezione per-regione. Piu' largo di nemico_base.raggio_aggro (140) cosi' nessun nemico gia' vicino viene mai disattivato.",
-    "raggio_attivo_entita": 600
+    "_comment": "US-1003 (fase 10, mondo continuo): con 5 regioni vive nello stesso nodo, nemici/NPC fuori da questo raggio (in pixel, attorno al giocatore) hanno process_mode = DISABLED finche' non ci si riavvicina - world_scene.gd::_aggiorna_prestazioni. Un solo raggio globale, nessuna eccezione per-regione. Piu' largo di nemico_base.raggio_aggro (140) cosi' nessun nemico gia' vicino viene mai disattivato. raggio_partenza_senza_nemici (2026-10-25, in caselle): nel mondo generato i nemici dei layout non compaiono cosi' vicino alla partenza (la casa al porto e' accanto alla piazza).",
+    "raggio_attivo_entita": 600,
+    "raggio_partenza_senza_nemici": 16
   }
 }

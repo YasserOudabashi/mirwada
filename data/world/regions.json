@@ -16,7 +16,7 @@
         "piazza",
         "sotterraneo"
       ],
-      "luoghi_mondo": {"archivio_ordine": "archivio", "piazza_mercato": "piazza", "bassifondi": "vicolo"},
+      "luoghi_mondo": {"archivio_ordine": "archivio", "piazza_mercato": "piazza", "bassifondi": "vicolo", "boss_fogne": "sotterraneo"},
       "music_zone": "citta",
       "gating": [],
       "palette_visiva": "neutra"
@@ -41,7 +41,7 @@
         "trono_del_gigante",
         "soglia_del_crepuscolo"
       ],
-      "luoghi_mondo": {"campo_di_battaglia": "luogo_di_battaglia", "passo_tra_rupi": "altura"},
+      "luoghi_mondo": {"campo_di_battaglia": "luogo_di_battaglia", "passo_tra_rupi": "altura", "boss_catacombe": "cripta"},
       "music_zone": "marche",
       "gating": [
         {

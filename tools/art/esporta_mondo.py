@@ -6,6 +6,7 @@ Esporta il mondo di prova (seed 6) per il gioco (US-8B12): Godot carica questi f
     python tools/art/esporta_mondo.py --tema cupo     # una sola
     python tools/art/esporta_mondo.py --solo-blocchi  # solo le collisioni (blocchi.png), pochi minuti
     python tools/art/esporta_mondo.py --sottosuolo    # solo il sottosuolo (secondo livello), luminoso e cupo
+    python tools/art/esporta_mondo.py --solo-dati     # solo i riquadri delle regioni in mondo.json, pochi secondi
 
 Il terreno con pareti, bordi e varianti si compone qui in Python, a blocchi, esattamente come le anteprime
 (build_world.ritaglio); poi si tengono solo le caselle 32x32 diverse (34 mila su 1,2 milioni): fogli-atlante + una
@@ -175,6 +176,27 @@ def esporta_sottosuolo(w, sotto, temi, seed):
         json.dump(dati, f, separators=(",", ":"))
 
 
+def riquadri(regioni_png):
+    """Riquadro [x0, y0, x1, y1] (x1, y1 esclusi) di ogni regione su regioni.png: il gioco ci riporta il contenuto
+    dei layout della fase 10 (nemici e oggetti nella stessa posizione relativa)."""
+    reg = np.array(Image.open(regioni_png))
+    out = {}
+    for i, nome in enumerate(B.REGIONI):
+        ys, xs = np.nonzero(reg == i)
+        if len(xs):
+            out[nome] = [int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1]
+    return out
+
+
+def aggiorna_dati():
+    """Solo i dati ricavati da regioni.png (riquadri): niente generazione, pochi secondi."""
+    path = os.path.join(OUT, "mondo.json")
+    dati = json.load(open(path))
+    dati["riquadri"] = riquadri(os.path.join(OUT, "regioni.png"))
+    with open(path, "w") as f:
+        json.dump(dati, f, separators=(",", ":"))
+
+
 def oggetti(w, cartella):
     os.makedirs(cartella, exist_ok=True)
     sprite, lista = {}, []
@@ -198,7 +220,12 @@ def main():
     ap.add_argument("--seed", type=int, default=6)
     ap.add_argument("--solo-blocchi", action="store_true", help="riscrive solo blocchi.png (le collisioni)")
     ap.add_argument("--sottosuolo", action="store_true", help="solo il sottosuolo (secondo livello)")
+    ap.add_argument("--solo-dati", action="store_true", help="solo i dati ricavati da regioni.png (riquadri)")
     a = ap.parse_args()
+    if a.solo_dati:
+        aggiorna_dati()
+        print("->", os.path.join(OUT, "mondo.json"))
+        return
     w, luoghi, villaggi, sotto = B.genera(a.seed)
     os.makedirs(OUT, exist_ok=True)
     Image.fromarray(blocchi(w)).save(os.path.join(OUT, "blocchi.png"))
@@ -223,10 +250,16 @@ def main():
         print(f"  {len(tess)} tessere in {fogli[t]} fogli, {len(sprite)} sprite, {len(lista)} oggetti")
     dati = {"seed": a.seed, "larghezza": B.W, "altezza": B.H, "tile": T, "colonne_foglio": COL, "righe_foglio": RIG,
             "fogli": fogli, "partenza": luoghi["casa_base_porto"], "regioni": B.REGIONI,
+            "riquadri": riquadri(os.path.join(OUT, "regioni.png")),
             "luoghi": {k: list(v) for k, v in luoghi.items()}, "sprite": sprite, "oggetti": lista}
     vecchio = os.path.join(OUT, "mondo.json")
-    if a.tema and os.path.exists(vecchio):                       # un tema solo: tieni i fogli dell'altro
-        dati["fogli"] = {**json.load(open(vecchio)).get("fogli", {}), **fogli}
+    if os.path.exists(vecchio):
+        prima = json.load(open(vecchio))
+        if a.tema:                                               # un tema solo: tieni i fogli dell'altro
+            dati["fogli"] = {**prima.get("fogli", {}), **fogli}
+        if "sottosuolo" in prima:                                # il sottosuolo si esporta a parte (--sottosuolo)
+            dati["sottosuolo"] = prima["sottosuolo"]
+            dati["sprite"].update({k: v for k, v in prima.get("sprite", {}).items() if k.startswith("ingresso_")})
     with open(vecchio, "w") as f:
         json.dump(dati, f, separators=(",", ":"))
     print("->", OUT)

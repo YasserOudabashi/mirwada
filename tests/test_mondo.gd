@@ -209,11 +209,7 @@ func test_il_main_parte_dal_mondo_unico() -> void:
 	var m: Node2D = main.get_node("Mondo")
 	assert_true(m.get_script() == Mondo, "il main usa il mondo unico")
 	assert_true(m.get_node_or_null("Player") != null, "il giocatore e' dentro il mondo (y_sort)")
-	var e: Node2D = m.get_node("Enemy")
-	m.call("carica")
-	var c: Vector2i = _cella(m, e.position)
-	assert_false(m.call("bloccata", c.x, c.y), "il nemico sta su una casella calpestabile")
-	assert_eq(str(m.call("regione_a", c.x, c.y)), "mirwada", "il nemico e' a Mirwada, vicino alla partenza")
+	assert_true(m.get_node_or_null("Enemy") == null, "niente nemico di prova: i nemici vengono dai layout")
 	main.free()
 
 
@@ -399,3 +395,86 @@ func _bfs(m: Node2D, partenze: PackedInt32Array, volo: bool) -> PackedByteArray:
 				visto[n] = 1
 				coda.append(n)
 	return visto
+
+
+# --- 2026-10-25: il contenuto dei layout (fase 10/11) sul mondo generato ---------
+
+func test_nemici_e_oggetti_dei_layout_stanno_nella_loro_regione() -> void:
+	var m: Node2D = _mondo()
+	m.call("popola")
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var attesi := 0
+	for reg in gd.call("get_regions"):
+		var lay: Dictionary = gd.call("get_layout", str(reg["id"]))
+		attesi += (lay.get("nemici", []) as Array).size() + (lay.get("oggetti", []) as Array).size()
+	var camp: Dictionary = gd.call("get_campagna")
+	attesi += (camp.get("nemici", []) as Array).size() + (camp.get("oggetti", []) as Array).size()
+	var trovati := 0
+	var boss: Dictionary = {}
+	var posti: Dictionary = {}
+	for c in m.get_children():
+		if not c.has_meta("regione_layout"):
+			continue
+		trovati += 1
+		var rid: String = str(c.get_meta("regione_layout"))
+		var cella: Vector2i = _cella(m, (c as Node2D).position)
+		var attesa: String = "terra_di_mezzo" if rid == "campagna" else rid
+		assert_eq(str(m.call("regione_a", cella.x, cella.y)), attesa, "%s sta nella sua regione (%s)" % [c.name, rid])
+		var liv: String = str(c.get_meta("livello", "superficie"))
+		m.call("cambia_livello", liv)
+		assert_false(m.call("bloccata", cella.x, cella.y), "%s su una casella libera del suo livello (%s)" % [c.name, liv])
+		m.call("cambia_livello", "superficie")
+		assert_false(posti.has(cella), "%s non sta sopra un altro" % c.name)
+		posti[cella] = true
+		if c is CharacterBody2D and (c as Node2D).scale.x > 1.0:    # fuori scena: il gruppo arriva in _ready
+			boss[rid] = true
+	assert_eq(trovati, attesi, "tutti i nemici e gli oggetti dei layout sono nel mondo")
+	for reg in gd.call("get_regions"):
+		if not (gd.call("get_layout", str(reg["id"])) as Dictionary).is_empty():
+			assert_true(boss.has(str(reg["id"])), "%s ha il suo boss" % reg["id"])
+	m.free()
+
+
+func test_un_elemento_di_una_zona_va_vicino_al_suo_luogo() -> void:
+	var m: Node2D = _mondo()
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var lay: Dictionary = gd.call("get_layout", "mirwada")
+	var r: Array = (lay["zone"] as Dictionary)["porto"]
+	var posto: Dictionary = m.call("posto_dal_layout", "mirwada", lay, int(r[0]) + int(r[2]) / 2, int(r[1]) + int(r[3]) / 2)
+	var c: Vector2i = posto["cella"]
+	assert_eq(str(posto["livello"]), "superficie", "il porto e' in superficie")
+	var porto: Vector2i = m.call("luogo_del_tag", "mirwada", "porto")
+	assert_true(Vector2(c).distance_to(Vector2(porto)) <= 6.0, "il centro della zona del porto finisce al porto")
+	m.free()
+
+
+func test_il_sotterraneo_di_mirwada_e_nelle_fogne() -> void:
+	var m: Node2D = _mondo()
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var lay: Dictionary = gd.call("get_layout", "mirwada")
+	var r: Array = (lay["zone"] as Dictionary)["sotterraneo"]
+	var posto: Dictionary = m.call("posto_dal_layout", "mirwada", lay, int(r[0]) + int(r[2]) / 2, int(r[1]) + int(r[3]) / 2)
+	assert_eq(str(posto["livello"]), "sottosuolo", "la zona 'sotterraneo' del layout va sotto terra")
+	var boss: Array = m.dati["sottosuolo"]["boss"]["boss_fogne"]
+	assert_true(Vector2(posto["cella"]).distance_to(Vector2(float(boss[0]), float(boss[1]))) <= 8.0, "vicino al boss delle fogne")
+	m.call("popola")
+	for c in m.get_children():
+		if c is CharacterBody2D and str(c.get_meta("livello", "")) == "sottosuolo":
+			assert_false((c as CanvasItem).visible, "un nemico del sottosuolo non si vede in superficie")
+			m.call("cambia_livello", "sottosuolo")
+			assert_true((c as CanvasItem).visible, "sotto terra si vede")
+			break
+	m.free()
+
+
+func test_nessun_nemico_vicino_alla_partenza() -> void:
+	var m: Node2D = _mondo()
+	m.call("popola")
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var r: float = float((gd.call("get_balance", "mondo") as Dictionary).get("raggio_partenza_senza_nemici", 0))
+	assert_true(r > 0.0, "il raggio e' nei dati")
+	var sp: Vector2 = m.call("partenza")
+	for c in m.get_children():
+		if c is CharacterBody2D and c.has_meta("regione_layout"):
+			assert_true((c as Node2D).position.distance_to(sp) / m.tile > r, "%s lontano dalla partenza" % c.name)
+	m.free()

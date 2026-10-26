@@ -949,6 +949,10 @@ def main():
             err("data/balance.json [mondo.raggio_attivo_entita]: deve essere un numero > 0 "
                 "(world_scene.gd::_aggiorna_prestazioni lo usa per disattivare cio' che e' "
                 "lontano dal giocatore, US-1003).")
+        rp = mondo.get("raggio_partenza_senza_nemici", 0)
+        if not isinstance(rp, int) or rp < 0:
+            err("data/balance.json [mondo.raggio_partenza_senza_nemici]: intero >= 0 (caselle attorno alla "
+                "partenza senza nemici dei layout, scripts/world/mondo.gd popola()).")
 
     # --- animazioni ---
     anim_doc = load_json(os.path.join(DATA, "animations.json"))

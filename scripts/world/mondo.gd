@@ -77,6 +77,12 @@ func _ready() -> void:
 	segui(partenza())
 	crea_npc()
 	crea_ingressi()
+	popola()
+	var t := Timer.new()
+	t.wait_time = INTERVALLO_ATTIVITA
+	t.autostart = true
+	t.timeout.connect(_aggiorna_attivita)
+	add_child(t)
 	var ts: Node = get_node_or_null("/root/TimeSystem")
 	if ts != null and ts.has_signal("momento_cambiato"):
 		ts.momento_cambiato.connect(func(_m): crea_npc())
@@ -275,6 +281,19 @@ func ingresso_aperto(rid: String) -> bool:
 
 ## La casella (luogo della mappa) di un location_tag della regione, attraverso
 ## luoghi_mondo; Vector2i(-1, -1) se sulla mappa non c'e'.
+## I luoghi del sottosuolo (mondo.json sottosuolo.boss: i boss di zona) con lo
+## stesso abbinamento a un location_tag (luoghi_mondo: "boss_fogne": "sotterraneo").
+func luogo_sotto_del_tag(rid: String, tag: String) -> Vector2i:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	var alias: Dictionary = gd.call("get_region", rid).get("luoghi_mondo", {}) if gd != null else {}
+	var boss: Dictionary = (dati.get("sottosuolo", {}) as Dictionary).get("boss", {})
+	for luogo in boss:
+		var p: Array = boss[luogo]
+		if str(alias.get(luogo, "")) == tag and regione_a(int(p[0]), int(p[1])) == rid:
+			return Vector2i(int(p[0]), int(p[1]))
+	return Vector2i(-1, -1)
+
+
 func luogo_del_tag(rid: String, tag: String) -> Vector2i:
 	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
 	var alias: Dictionary = gd.call("get_region", rid).get("luoghi_mondo", {}) if gd != null else {}
@@ -283,6 +302,176 @@ func luogo_del_tag(rid: String, tag: String) -> Vector2i:
 			var p: Array = dati["luoghi"][luogo]
 			return Vector2i(int(p[0]), int(p[1]))
 	return Vector2i(-1, -1)
+
+
+# --- Contenuto dei layout della fase 10/11 sul mondo generato (2026-10-25) -----------
+# I layout (data/world/layouts/<regione>.json, data/world/campagna.json) restano la
+# fonte: nemici, boss e oggetti si riportano sulla mappa generata. Un elemento dentro
+# una zona del layout va vicino al luogo di quella zona sulla mappa (luoghi_mondo),
+# spostato come nel layout (x SCALA_LAYOUT); gli altri nella stessa posizione
+# relativa dentro il riquadro della regione. Poi la casella libera piu' vicina della
+# stessa regione. La campagna (fuori dalle regioni) finisce nella terra di mezzo.
+
+const SCALA_LAYOUT := 2.0
+const REGIONE_CAMPAGNA := "terra_di_mezzo"
+const INTERVALLO_ATTIVITA := 0.4
+
+var _nemici_vivi: Dictionary = {}           # rid -> nemici ancora vivi
+var _senza_abilita: Dictionary = {}         # rid -> nessun nemico ucciso con un'abilita'
+
+
+func popola() -> void:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	if gd == null:
+		return
+	var occupate: Dictionary = {}
+	# i nemici non compaiono vicino alla partenza (balance.json mondo.raggio_partenza_senza_nemici)
+	var vietate: Dictionary = {}
+	var r: int = int((gd.call("get_balance", "mondo") as Dictionary).get("raggio_partenza_senza_nemici", 0))
+	var p: Vector2 = partenza()
+	var c0 := Vector2i(floori(p.x / tile), floori(p.y / tile))
+	for dy in range(-r, r + 1):
+		for dx in range(-r, r + 1):
+			if dx * dx + dy * dy <= r * r:
+				vietate[c0 + Vector2i(dx, dy)] = true
+	for reg in gd.call("get_regions"):
+		var rid: String = str((reg as Dictionary).get("id", ""))
+		var layout: Dictionary = gd.call("get_layout", rid)
+		if not layout.is_empty() and (dati.get("riquadri", {}) as Dictionary).has(rid):
+			_popola_da(rid, rid, layout, occupate, vietate)
+	var campagna: Dictionary = gd.call("get_campagna")
+	if not campagna.is_empty():
+		_popola_da("campagna", REGIONE_CAMPAGNA, campagna, occupate, vietate)
+
+
+## rid_eventi: la chiave dell'evento area_cleared (la regione, o "campagna").
+## vietate: caselle dove non mettere nemici (attorno alla partenza); vi si aggiunge
+## ogni casella occupata, cosi' resta l'insieme da evitare per i nemici.
+func _popola_da(rid_eventi: String, rid: String, layout: Dictionary, occupate: Dictionary, vietate: Dictionary) -> void:
+	var nemici: Array = layout.get("nemici", [])
+	var drop: Dictionary = layout.get("drop", {})
+	_nemici_vivi[rid_eventi] = nemici.size()
+	_senza_abilita[rid_eventi] = true
+	for n in nemici:
+		var spec: Dictionary = n
+		var posto: Dictionary = posto_dal_layout(rid, layout, int(spec.get("x", 0)), int(spec.get("y", 0)), vietate)
+		var c: Vector2i = posto["cella"]
+		occupate[c] = true
+		vietate[c] = true
+		var sequenza: int = int(spec.get("sequenza", 9))
+		var override: Dictionary = (spec.get("override", {}) as Dictionary).duplicate(true)
+		if drop.has(str(sequenza)):
+			override["oggetti_a_morte"] = drop[str(sequenza)]
+		var e: Node2D = preload("res://scenes/enemy.tscn").instantiate()
+		e.set("override", override)
+		e.scale = Vector2.ONE * float(spec.get("scala", 1.0))
+		e.position = Vector2((c.x + 0.5) * tile, (c.y + 0.5) * tile)
+		e.set_meta("regione_layout", rid_eventi)
+		e.set_meta("livello", posto["livello"])
+		add_child(e)
+		_mostra(e, posto["livello"] == livello)
+		e.set("sequenza", sequenza)
+		e.get_node("StatsComponent").call("configure_from_balance", sequenza)
+		e.connect("morto", _su_nemico_morto.bind(rid_eventi))
+	for o in layout.get("oggetti", []):
+		var spec_o: Dictionary = o
+		var posto_o: Dictionary = posto_dal_layout(rid, layout, int(spec_o.get("x", 0)), int(spec_o.get("y", 0)), occupate)
+		var c_o: Vector2i = posto_o["cella"]
+		occupate[c_o] = true
+		vietate[c_o] = true
+		var pickup: Node2D = preload("res://scripts/item_pickup.gd").new()
+		add_child(pickup)
+		pickup.call("setup", str(spec_o.get("item_id", "")), Vector2((c_o.x + 0.5) * tile, (c_o.y + 0.5) * tile))
+		pickup.set("quantita", int(spec_o.get("quantita", 1)))
+		pickup.set_meta("regione_layout", rid_eventi)
+		pickup.set_meta("livello", posto_o["livello"])
+		_mostra(pickup, posto_o["livello"] == livello)
+
+
+## La casella del mondo generato per (x, y) di un layout (vedi sopra), con il suo
+## livello: una zona che sulla mappa e' un luogo del sottosuolo (il "sotterraneo" di
+## Mirwada = il boss delle fogne) porta l'elemento sotto terra.
+## -> {"cella": Vector2i, "livello": "superficie" | "sottosuolo"}
+func posto_dal_layout(rid: String, layout: Dictionary, x: int, y: int, occupate: Dictionary = {}) -> Dictionary:
+	var mappa: Array = layout.get("mappa", [])
+	var dim := Vector2(float(str(mappa[0]).length()), float(mappa.size())) if not mappa.is_empty() else Vector2.ZERO
+	var zone: Dictionary = layout.get("zone", {})
+	for tag in zone:                             # zona = [x, y, larghezza, altezza]
+		var r: Array = zone[tag]
+		if x < int(r[0]) or y < int(r[1]) or x >= int(r[0]) + int(r[2]) or y >= int(r[1]) + int(r[3]):
+			continue
+		var centro := Vector2(float(r[0]) + float(r[2]) / 2.0, float(r[1]) + float(r[3]) / 2.0)
+		var d: Vector2 = (Vector2(x, y) - centro) * SCALA_LAYOUT
+		var l: Vector2i = luogo_del_tag(rid, str(tag))
+		if l.x >= 0:
+			return {"cella": _libera_nella_regione(l + Vector2i(roundi(d.x), roundi(d.y)), occupate, rid), "livello": "superficie"}
+		var ls: Vector2i = luogo_sotto_del_tag(rid, str(tag))
+		if ls.x >= 0 and _prepara_sottosuolo():
+			var b: PackedByteArray = _livelli["sottosuolo"]["blocchi"]
+			return {"cella": _libera_nella_regione(ls + Vector2i(roundi(d.x), roundi(d.y)), occupate, rid, b), "livello": "sottosuolo"}
+	var box: Array = (dati.get("riquadri", {}) as Dictionary).get(rid, [0, 0, larghezza, altezza])
+	if dim == Vector2.ZERO:                      # campagna: senza mappa, le coordinate del vecchio mondo
+		dim = _estensione_campagna(layout)
+	var u: float = (float(x) + 0.5) / maxf(dim.x, 1.0)
+	var v: float = (float(y) + 0.5) / maxf(dim.y, 1.0)
+	var c := Vector2i(roundi(lerpf(float(box[0]), float(box[2]), u)), roundi(lerpf(float(box[1]), float(box[3]), v)))
+	return {"cella": _libera_nella_regione(c, occupate, rid), "livello": "superficie"}
+
+
+## La casella libera piu' vicina dentro la regione: prima vicino, poi allargando
+## (un punto del riquadro puo' cadere in un'altra regione o in mare).
+func _libera_nella_regione(c: Vector2i, occupate: Dictionary, rid: String,
+		blocchi: PackedByteArray = PackedByteArray()) -> Vector2i:
+	var b: PackedByteArray = _blocchi if blocchi.is_empty() else blocchi
+	for raggio in [40, 120, 300]:
+		var q: Vector2i = cella_libera(c, occupate, "", rid, raggio, b)
+		if regione_a(q.x, q.y) == rid and b[q.y * larghezza + q.x] == 0:
+			return q
+	return c
+
+
+func _estensione_campagna(layout: Dictionary) -> Vector2:
+	var m := Vector2.ONE
+	for k in ["nemici", "oggetti", "edifici"]:
+		for e in layout.get(k, []):
+			m = Vector2(maxf(m.x, float((e as Dictionary).get("x", 0)) + 1.0), maxf(m.y, float((e as Dictionary).get("y", 0)) + 1.0))
+	return m
+
+
+func _su_nemico_morto(chi: Node, rid: String) -> void:
+	if not bool(chi.call("senza_abilita")):
+		_senza_abilita[rid] = false
+	_nemici_vivi[rid] = int(_nemici_vivi.get(rid, 1)) - 1
+	if int(_nemici_vivi.get(rid, 0)) > 0:
+		return
+	var et: Node = Engine.get_main_loop().root.get_node_or_null("EventTracker")
+	if et != null:
+		et.call("emit_event", "area_cleared", {
+			"senza_alleati_caduti": true,
+			"senza_abilita": bool(_senza_abilita.get(rid, true)),
+			"senza_uccidere": false,
+		})
+
+
+## Nemici e NPC lontani dal giocatore fermi (balance.json mondo.raggio_attivo_entita),
+## come in world_scene.gd: qui serve anche perche' lontano dal giocatore le collisioni
+## del terreno non sono costruite (si costruiscono solo i blocchi vicini).
+func _aggiorna_attivita() -> void:
+	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D if is_inside_tree() else null
+	if p == null:
+		return
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	var raggio: float = float((gd.call("get_balance", "mondo") as Dictionary).get("raggio_attivo_entita", 600.0)) if gd != null else 600.0
+	var r2: float = raggio * raggio
+	for e in get_tree().get_nodes_in_group("nemici"):
+		if not (e is Node2D) or (e as Node).is_queued_for_deletion() or not (e as CanvasItem).visible:
+			continue
+		var vicino: bool = (e as Node2D).global_position.distance_squared_to(p.global_position) <= r2
+		(e as Node).process_mode = Node.PROCESS_MODE_INHERIT if vicino else Node.PROCESS_MODE_DISABLED
+	for c in get_children():
+		if c is Area2D and c.has_meta("npc_id") and (c as CanvasItem).visible:
+			var vicino_npc: bool = (c as Node2D).global_position.distance_squared_to(p.global_position) <= r2
+			c.process_mode = Node.PROCESS_MODE_INHERIT if vicino_npc else Node.PROCESS_MODE_DISABLED
 
 
 # --- Sottosuolo: ingressi e cambio di livello (2026-10-25) ------------------------
@@ -397,9 +586,8 @@ func cambia_livello(nuovo: String) -> bool:
 	for c in get_children():
 		if c is Area2D and c.has_meta("npc_id"):
 			_mostra(c, sopra)
-	for e in get_tree().get_nodes_in_group("nemici") if is_inside_tree() else []:
-		if e is Node2D:
-			_mostra(e, str((e as Node).get_meta("livello", "superficie")) == livello)
+		elif c.has_meta("livello") or c.is_in_group("nemici"):
+			_mostra(c, str(c.get_meta("livello", "superficie")) == livello)
 	_ingresso_vicino = ""
 	_aggiorna_ingressi()
 	livello_cambiato.emit(livello)
@@ -409,25 +597,34 @@ func cambia_livello(nuovo: String) -> bool:
 func _mostra(n: Node, si: bool) -> void:
 	(n as CanvasItem).visible = si
 	n.process_mode = Node.PROCESS_MODE_INHERIT if si else Node.PROCESS_MODE_DISABLED
+	if n is Area2D:                         # un'area dell'altro livello non si tocca (raccolta, incontri)
+		n.set_deferred("monitoring", si)
+		n.set_deferred("monitorable", si)
 
 
 ## Una casella libera vicino a c, lontana almeno 2 caselle da quelle occupate
 ## (e, se data, nella stessa regione). Senza chiave: la piu' vicina. Con una chiave (l'id di un NPC): una a caso ma
 ## sempre la stessa (hash della chiave) fra le libere entro 4 anelli dalla prima,
 ## cosi' un gruppo di NPC non sta in fila come una griglia.
-func cella_libera(c: Vector2i, occupate: Dictionary = {}, chiave: String = "", regione: String = "") -> Vector2i:
+## blocchi: le collisioni di un altro livello (default: quelle mostrate).
+func cella_libera(c: Vector2i, occupate: Dictionary = {}, chiave: String = "", regione: String = "",
+		raggio_max: int = 24, blocchi: PackedByteArray = PackedByteArray()) -> Vector2i:
+	var bl: PackedByteArray = _blocchi if blocchi.is_empty() else blocchi
 	var scelta := c
 	var punteggio: int = 0
 	var primo: int = -1
-	for r in range(0, 24):
+	var idx: int = (dati.get("regioni", []) as Array).find(regione) if not regione.is_empty() else -1
+	for r in range(0, raggio_max):
 		if primo >= 0 and r > primo + 4:
 			break
-		for dy in range(-r, r + 1):
-			for dx in range(-r, r + 1):
+		for dy in range(-r, r + 1):                   # solo l'anello, riga per riga (stesso ordine di sempre)
+			var passo: int = 1 if absi(dy) == r else maxi(2 * r, 1)
+			for dx in range(-r, r + 1, passo):
 				var q := Vector2i(c.x + dx, c.y + dy)
-				if maxi(absi(dx), absi(dy)) != r or bloccata(q.x, q.y) or _vicino_occupato(q, occupate):
+				if q.x < 0 or q.y < 0 or q.x >= larghezza or q.y >= altezza:
 					continue
-				if not regione.is_empty() and regione_a(q.x, q.y) != regione:
+				var i: int = q.y * larghezza + q.x
+				if bl[i] > 0 or (idx >= 0 and _regioni[i] != idx) or _vicino_occupato(q, occupate):
 					continue
 				if chiave.is_empty():
 					return q
