@@ -551,6 +551,22 @@ def varco(aspetto, aperto=False, seed=1, size=1.0):
     return r
 
 
+def barca(seed=1, size=1.0):
+    """Barca a remi (US-8B91), lunga lungo x (a schermo di fianco): scafo basso con prua e poppa a punta,
+    falchetta chiara sui due lati, dentro scuro, una panca. Misure in unita'; origine al centro, sul pelo
+    dell'acqua. Ci sta dentro il giocatore."""
+    r = Rig(f"barca_{seed}"); r.scale = size
+    r.joint("b", "root", (0, 0, 0))
+    r.part("b", "box", (13, 7, 2.5), (0, 0, 2.5), mat="wood")                         # scafo
+    r.part("b", "cone", (2.5, 7, 4.5), (17.5, 0, 2.5), mat="wood", rot=(0, 90, 0))    # prua
+    r.part("b", "cone", (2.5, 7, 3), (-16, 0, 2.5), mat="wood", rot=(0, -90, 0))      # poppa
+    r.part("b", "box", (12.5, 5.6, 0.3), (0, 0, 4.8), mat="shadow_mat")               # dentro
+    for sy in (-1, 1):                                                                 # falchetta
+        r.part("b", "box", (13, 0.9, 0.7), (0, sy * 6.4, 5.2), mat="wood_light")
+    r.part("b", "box", (1.3, 5.6, 0.5), (-3, 0, 5.2), mat="wood_light")               # panca
+    return r
+
+
 def ossa(seed=1, size=1.0):
     """Ossa nella sabbia delle Marche: un teschio di bestia e qualche costola."""
     rnd = random.Random(seed)

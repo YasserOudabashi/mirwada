@@ -14347,3 +14347,26 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   pavimento e non si vedevano. Ora il pavimento sta a -2; test: il tappeto sta sopra il pavimento.
 - Verifica: prova a schermo dei sei interni (arte/revisione/varchi_contenuto.png) e dei 14 delle case con i tappeti
   (arte/revisione/interni_in_gioco.png); rilancio del generatore identico. validate 0, 993 test.
+
+## US-8B91 — barca dal porto, 2026-10-26
+- Decisione dell'utente: barca libera al molo di Mirwada, in barca l'acqua si attraversa, si sbarca sulle coste.
+- data/world/mezzi.json (nuovo): barca {luogo: porto}; GameData.get_mezzo(). La barca parte ormeggiata nell'acqua
+  piu' vicina al porto che tocca una costa libera (mondo.gd ormeggio()).
+- player.gd imposta_barca(attivo, vincolo): in barca lo strato 1 (acqua e vuoto) non ferma piu'; il mondo passa
+  un vincolo "solo acqua" e un passo che esce dall'acqua scivola lungo la costa (_resta_dove_si_puo, anche nello
+  scatto). Alla rinascita si torna a terra e la barca all'ormeggio di partenza.
+- mondo.gd crea_barca(): "[F] Sali in barca" accanto alla barca, in barca la barca segue il giocatore (sotto di
+  lui, rivolta dove va), "[F] Scendi a terra" accanto a una costa libera; la barca resta dove la si lascia. Dalla
+  barca non si entra in case, varchi o ingressi. Lo sbarco segue regions.json accesso: con una lista si sbarca solo
+  se c'e' "barca" o "a_piedi" -> nelle Marche no (decisione del 25/10: solo volo o sottosuolo; in barca le loro
+  coste erano raggiungibili, visto con una visita del mare). Validator: accesso ammette "barca", mezzi.json.
+- Salvataggio: mondo.barca {cella, a_bordo} (sotto-campo, senza cambiare lo schema); riprendi() rimette la barca e
+  il giocatore a bordo o a terra.
+- Arte: forge3d creatures.barca (scafo basso con prua e poppa a punta, falchetta chiara, panca; la prima versione
+  sembrava una cassa, la seconda una scodella). python tools/art/esporta_mondo.py --barca (pochi secondi).
+- Verifica: 4 test nuovi in test_mondo (ormeggiata al porto; si sale, la terra non si attraversa, dalla barca non
+  si entra nelle case, si scende alla costa, la barca resta li', salvataggio a bordo e a terra; nelle Marche non si
+  sbarca; dal porto in barca si arriva alle isole, alla Frontiera e a Mirwada, non nelle Marche). Prova a schermo:
+  molo, mare aperto, costa dell'isola vulcanica, sbarco (arte/revisione/barca_in_gioco.png). validate 0, 997 test.
+- Aperto: in barca si va alla velocita' a piedi; la Frontiera si raggiunge gia' in barca (US-8B95 aggiunge il volo
+  e la soglia del faro con la chiave).

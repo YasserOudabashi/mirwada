@@ -163,7 +163,9 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
   (0 libera, 128 dislivello: a piedi no, in volo si', 255 acqua o vuoto), `regioni.png`, `<tema>/oggetti/`,
   `sotto/` e `<tema>/sotto/` (il sottosuolo, secondo livello sulla stessa griglia, 47 ingressi).
 - La regione e la zona vengono dalla posizione; `regions.json` dice come ci si arriva (`accesso`:
-  a_piedi, volo, sottosuolo) e abbina i luoghi della mappa ai location_tags (`luoghi_mondo`).
+  a_piedi, volo, sottosuolo, barca) e abbina i luoghi della mappa ai location_tags (`luoghi_mondo`).
+- Barca (`data/world/mezzi.json`, US-8B91): ormeggiata al porto; in barca l'acqua si attraversa e la terra no, si
+  sbarca su una costa libera di una regione che lo ammette (le Marche no).
 - Il contenuto dei layout delle fasi 8-11 (nemici, boss, oggetti) si riporta sul mondo generato con
   `mondo.gd popola()`: al luogo della zona o nella stessa posizione relativa della regione, mai a mano.
 - Spawn, insediamenti e NPC usciti dal generatore sono **suggerimenti**: i personaggi veri
@@ -230,6 +232,7 @@ python tools/art/esporta_mondo.py --sottosuolo     # solo il sottosuolo (~5 minu
 python tools/art/esporta_mondo.py --solo-dati      # solo i riquadri delle regioni in mondo.json
 python tools/art/esporta_mondo.py --edifici        # solo gli edifici: sprite, mondo.json, blocchi.png (~5 minuti)
 python tools/art/esporta_mondo.py --varchi         # solo i disegni dei varchi delle sotto-aree (pochi secondi)
+python tools/art/esporta_mondo.py --barca          # solo il disegno della barca (pochi secondi)
 python tools/art/build_interni.py              # interni: pavimenti, pareti e arredi -> assets/interni/<tema>/
 python tools/art/build_npc.py                  # aspetti degli NPC (personaggio_<aspetto>_{idle,walk}.png)
 python tools/art/build_libro.py                # carta, segnalibri, caselle e filetto del libro (assets/ui/)
@@ -307,8 +310,8 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
-**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): barca (US-8B91), volo (US-8B93) e accesso
-alla Frontiera (US-8B95), decisi il 2026-10-26.
+**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): volo da una chiave del mondo (US-8B93) e
+accesso alla Frontiera (US-8B95), decisi il 2026-10-26. La barca (US-8B91) e' fatta.
 
 ## Decisioni prese
 

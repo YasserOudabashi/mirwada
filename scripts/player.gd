@@ -119,7 +119,9 @@ func _physics_process(delta: float) -> void:
 	if _dashing:
 		_dash_left -= delta
 		velocity = _dash_vel
+		var prima_dash: Vector2 = global_position
 		move_and_slide()
+		_resta_dove_si_puo(prima_dash)
 		if _dash_left <= 0.0:
 			_fine_dash()
 		return
@@ -149,7 +151,9 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity = velocity.move_toward(Vector2.ZERO, ATTRITO * delta)
 
+	var prima: Vector2 = global_position
 	move_and_slide()
+	_resta_dove_si_puo(prima)
 	_aggiorna_animazione()
 
 	# emettitore distanza_percorsa (US-331): si accumula e si versa a blocchi
@@ -188,6 +192,32 @@ func imposta_volo(attivo: bool) -> void:
 
 func in_volo() -> bool:
 	return not get_collision_mask_value(5)
+
+
+## Barca (US-8B91, decisione 2026-10-26): in barca l'acqua (strato 1 del mondo) non ferma piu'
+## e la terra si': il mondo passa un vincolo, Callable(Vector2) -> bool, vero dove la barca
+## puo' stare. Senza vincolo si cammina come sempre.
+var _vincolo: Callable = Callable()
+
+
+func imposta_barca(attivo: bool, vincolo: Callable = Callable()) -> void:
+	set_collision_mask_value(1, not attivo)
+	_vincolo = vincolo if attivo else Callable()
+
+
+func in_barca() -> bool:
+	return _vincolo.is_valid()
+
+
+## In barca un passo che esce dall'acqua scivola lungo la costa (prima solo x, poi solo y).
+func _resta_dove_si_puo(prima: Vector2) -> void:
+	if not _vincolo.is_valid() or _vincolo.call(global_position):
+		return
+	var dopo: Vector2 = global_position
+	for prova in [Vector2(dopo.x, prima.y), Vector2(prima.x, dopo.y), prima]:
+		global_position = prova
+		if _vincolo.call(prova):
+			return
 
 
 func sta_attaccando() -> bool:
@@ -318,6 +348,7 @@ func _su_morte() -> void:
 ## pubblico con cui main.gd riconosce il nodo regione: has_method
 ## "viaggia_a") e resuscita a hp pieni.
 func _respawn() -> void:
+	imposta_barca(false)                       # si rinasce a terra (la barca torna al suo ormeggio: mondo.gd)
 	var regione: Node = _regione_corrente()
 	if regione != null and regione.has_method("colloca"):
 		regione.call("colloca", self, regione.call("punto_spawn"))   # mondo generato: anche la telecamera

@@ -324,6 +324,23 @@ def esporta_varchi(temi):
         json.dump(dati, f, separators=(",", ":"))
 
 
+def esporta_barca(temi):
+    """US-8B91: la barca del giocatore (forge3d.creatures.barca) tra gli oggetti di ogni tema, con l'ancora in
+    mondo.json "sprite". Dove sta all'inizio lo dice data/world/mezzi.json."""
+    meta = {}
+    for t in temi:
+        tema.imposta(t)
+        img, ax, ay = object_sprite({"type": "barca", "seed": 1}, T)
+        Image.fromarray(img).save(os.path.join(OUT, t, "oggetti", "barca.png"))
+        meta = {"ax": int(ax), "ay": int(ay)}
+    path = os.path.join(OUT, "mondo.json")
+    dati = json.load(open(path))
+    dati["sprite"]["barca"] = meta
+    with open(path, "w") as f:
+        json.dump(dati, f, separators=(",", ":"))
+    print("  barca:", ", ".join(temi))
+
+
 def blocchi(w, senza_edifici=False):
     """Per casella: 255 = acqua o vuoto (non si passa mai), 128 = dislivello (non si passa a piedi, volando si'),
     0 = libera. Dislivello: le pareti senza scala o rampa e i bordi alti dei gradoni verso est, ovest e nord (si
@@ -474,7 +491,12 @@ def main():
     ap.add_argument("--solo-dati", action="store_true", help="solo i dati ricavati da regioni.png (riquadri)")
     ap.add_argument("--edifici", action="store_true", help="solo gli edifici della citta' (sprite, dati, collisioni)")
     ap.add_argument("--varchi", action="store_true", help="solo i disegni dei varchi delle sotto-aree (pochi secondi)")
+    ap.add_argument("--barca", action="store_true", help="solo il disegno della barca (pochi secondi)")
     a = ap.parse_args()
+    if a.barca:
+        esporta_barca([a.tema] if a.tema else ["luminoso", "cupo"])
+        print("->", os.path.join(OUT, "mondo.json"))
+        return
     if a.varchi:
         esporta_varchi([a.tema] if a.tema else ["luminoso", "cupo"])
         print("->", os.path.join(OUT, "mondo.json"))
@@ -526,6 +548,7 @@ def main():
         json.dump(dati, f, separators=(",", ":"))
     esporta_edifici(w, luoghi, villaggi, [a.tema] if a.tema else ["luminoso", "cupo"])
     esporta_varchi([a.tema] if a.tema else ["luminoso", "cupo"])
+    esporta_barca([a.tema] if a.tema else ["luminoso", "cupo"])
     print("->", OUT)
 
 

@@ -84,6 +84,7 @@ func _ready() -> void:
 	popola()
 	crea_porte()
 	crea_varchi()
+	crea_barca()
 	var t := Timer.new()
 	t.wait_time = INTERVALLO_ATTIVITA
 	t.autostart = true
@@ -234,6 +235,7 @@ func _process(_delta: float) -> void:
 	if p is Node2D and not dati.is_empty():
 		var pos: Vector2 = (p as Node2D).global_position - global_position
 		segui(pos)
+		_aggiorna_barca(p as Node2D)
 		if aggiorna_regione(pos):
 			_ultima_ammessa = pos
 		elif _ultima_ammessa != Vector2.INF:
@@ -603,7 +605,7 @@ func _su_porta(body: Node, area: Area2D, dentro: bool) -> void:
 ## si ferma, mai liberato) ed entra nella stanza, aggiunta accanto al mondo.
 func entra(porta: Area2D) -> bool:
 	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D if is_inside_tree() else null
-	if p == null or _interno != null or get_parent() == null or not varco_aperto(porta):
+	if p == null or _interno != null or get_parent() == null or not varco_aperto(porta) or in_barca():
 		return false
 	var interno: Node = load("res://scenes/interior_scene.tscn").instantiate()
 	interno.set("interno_id", str(porta.get_meta("interno_id")))
@@ -654,13 +656,31 @@ func posizione_da_salvare() -> Vector2:
 	return _ritorno if _interno != null else (p.position if p != null else partenza())
 
 
-## Caricamento: fuori da un eventuale interno, sul livello salvato, nel punto salvato.
-func riprendi(liv: String, pos: Vector2) -> void:
+## Caricamento: fuori da un eventuale interno, sul livello salvato, nel punto salvato; la
+## barca dove era rimasta, e a bordo se si era salvato in barca (stato_barca()).
+func riprendi(liv: String, pos: Vector2, barca: Dictionary = {}) -> void:
 	esci()
 	cambia_livello(liv)
 	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D
 	if p != null:
 		colloca(p, pos)
+	var c: Array = barca.get("cella", [])
+	if _barca != null and c.size() == 2:
+		metti_barca(Vector2i(int(c[0]), int(c[1])))
+	if p != null and p.has_method("imposta_barca"):
+		_a_bordo = bool(barca.get("a_bordo", false))
+		if _a_bordo:
+			p.call("imposta_barca", true, _solo_acqua)
+		else:
+			p.call("imposta_barca", false)
+
+
+## Per il salvataggio (GameState, mondo.barca): dove sta la barca e se si e' a bordo.
+func stato_barca() -> Dictionary:
+	if _barca == null:
+		return {}
+	var c := Vector2i(floori(_barca.position.x / tile), floori(_barca.position.y / tile))
+	return {"cella": [c.x, c.y], "a_bordo": in_barca()}
 
 
 # --- Varchi verso le sotto-aree (US-8B21a) ----------------------------------------
@@ -824,6 +844,155 @@ func _aggiorna_varchi() -> void:
 			(c.get_node("Aperto") as CanvasItem).visible = ap
 			(c.get_node("Prompt") as Label).text = tr("HUD_PROMPT_ENTRA" if ap else "HUD_VARCO_CHIUSO").format(
 					{"tasto": _tasto_interagisci()})
+
+
+# --- Barca (US-8B91) -----------------------------------------------------------------
+# Decisione dell'utente 2026-10-26: una barca libera ormeggiata al porto (data/world/mezzi.json).
+# "interagisci" accanto alla barca: si sale, l'acqua si attraversa e la terra no (vincolo del
+# giocatore); accanto a una costa libera si scende e la barca resta li'. Non si sbarca in una
+# regione con "accesso" senza "barca" ne' "a_piedi" (le Marche: solo volo o sottosuolo).
+
+var _barca: Node2D = null
+var _barca_vicina := false
+var _a_bordo := false                       # per accorgersi di una rinascita in barca
+var _ormeggio_iniziale := Vector2i(-1, -1)
+
+
+func crea_barca() -> void:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	var spec: Dictionary = gd.call("get_mezzo", "barca") if gd != null else {}
+	var base: Vector2i = _luogo_varco(str(spec.get("luogo", "")))
+	if spec.is_empty() or base.x < 0 or not (dati["sprite"] as Dictionary).has("barca"):
+		return
+	var sc: Array = spec.get("scostamento", [0, 0])
+	_ormeggio_iniziale = ormeggio(base + Vector2i(int(sc[0]), int(sc[1])))
+	_barca = Node2D.new()
+	_barca.name = "Barca"
+	_barca.set_meta("livello", "superficie")
+	var meta: Dictionary = dati["sprite"]["barca"]
+	var spr := Sprite2D.new()
+	spr.name = "Disegno"
+	spr.texture = _texture_oggetto("barca")
+	spr.centered = false
+	spr.offset = Vector2(-float(meta.get("ax", 0)), -float(meta.get("ay", 0)) + tile * 0.25)
+	_barca.add_child(spr)
+	var area := Area2D.new()
+	var forma := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(tile * 2.4, tile * 2.0)
+	forma.shape = rect
+	area.add_child(forma)
+	area.body_entered.connect(func(b: Node) -> void: if b.is_in_group("player"): _barca_vicina = true)
+	area.body_exited.connect(func(b: Node) -> void: if b.is_in_group("player"): _barca_vicina = false)
+	_barca.add_child(area)
+	var prompt := Label.new()
+	prompt.name = "Prompt"
+	prompt.add_theme_font_size_override("font_size", 10)
+	prompt.size = Vector2(tile * 6, tile * 0.5)
+	prompt.position = Vector2(-tile * 3, tile * 0.5)
+	prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	prompt.z_index = 10
+	prompt.add_theme_constant_override("outline_size", 4)
+	prompt.add_theme_color_override("font_outline_color", Color("#181425"))
+	prompt.hide()
+	_barca.add_child(prompt)
+	add_child(_barca)
+	metti_barca(_ormeggio_iniziale)
+
+
+func metti_barca(c: Vector2i) -> void:
+	_barca.position = Vector2((c.x + 0.5) * tile, (c.y + 0.5) * tile)
+
+
+## L'acqua piu' vicina a c che tocca una costa libera: dove si ormeggia.
+func ormeggio(c: Vector2i) -> Vector2i:
+	for r in range(0, 60):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				var q := Vector2i(c.x + dx, c.y + dy)
+				if maxi(absi(dx), absi(dy)) == r and acqua(q.x, q.y) and _costa_vicina(q).x >= 0:
+					return q
+	return c
+
+
+## Acqua (o il vuoto della nebbia) in superficie: blocchi.png 255.
+func acqua(x: int, y: int) -> bool:
+	var b: PackedByteArray = _livelli.get("superficie", {}).get("blocchi", _blocchi)
+	return _dentro(x, y) and b[y * larghezza + x] == 255
+
+
+func _solo_acqua(pos: Vector2) -> bool:
+	return acqua(floori(pos.x / tile), floori(pos.y / tile))
+
+
+func in_barca() -> bool:
+	var p: Node = get_tree().get_first_node_in_group("player") if is_inside_tree() else null
+	return p != null and p.has_method("in_barca") and bool(p.call("in_barca"))
+
+
+func sali_in_barca() -> bool:
+	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D if is_inside_tree() else null
+	if p == null or _barca == null or in_barca() or livello != "superficie":
+		return false
+	p.call("imposta_barca", true, _solo_acqua)
+	_a_bordo = true
+	colloca(p, _barca.position)
+	return true
+
+
+func scendi_dalla_barca() -> bool:
+	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D if is_inside_tree() else null
+	if p == null or not in_barca():
+		return false
+	var c := Vector2i(floori(p.position.x / tile), floori(p.position.y / tile))
+	var t: Vector2i = _costa_vicina(c)
+	if t.x < 0:
+		return false
+	metti_barca(c)
+	_a_bordo = false
+	p.call("imposta_barca", false)
+	colloca(p, Vector2((t.x + 0.5) * tile, (t.y + 0.5) * tile))
+	return true
+
+
+## Una casella di terra libera accanto a c dove si puo' sbarcare; (-1, -1) se nessuna.
+func _costa_vicina(c: Vector2i) -> Vector2i:
+	for d in [Vector2i(0, 1), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(1, 0)]:
+		var q: Vector2i = c + d
+		if _dentro(q.x, q.y) and not acqua(q.x, q.y) and not bloccata(q.x, q.y) and _si_sbarca(q):
+			return q
+	return Vector2i(-1, -1)
+
+
+func _si_sbarca(q: Vector2i) -> bool:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	var reg: Dictionary = gd.call("get_region", regione_a(q.x, q.y)) if gd != null else {}
+	if not reg.has("accesso"):
+		return true
+	var acc: Array = reg["accesso"]
+	return "barca" in acc or "a_piedi" in acc
+
+
+## In barca la barca segue il giocatore (sotto di lui, rivolta dove va); a terra la scritta
+## "sali" accanto alla barca. Rinato a terra mentre era in barca: la barca torna all'ormeggio.
+func _aggiorna_barca(p: Node2D) -> void:
+	if _barca == null:
+		return
+	var prompt: Label = _barca.get_node("Prompt")
+	if in_barca():
+		_barca.position = p.position - Vector2(0, 0.5)
+		var f: Vector2 = p.call("get_facing") if p.has_method("get_facing") else Vector2.LEFT
+		if f.x != 0.0:
+			(_barca.get_node("Disegno") as Sprite2D).flip_h = f.x > 0.0
+		var c := Vector2i(floori(p.position.x / tile), floori(p.position.y / tile))
+		prompt.visible = _costa_vicina(c).x >= 0
+		prompt.text = tr("HUD_PROMPT_SCENDI_BARCA").format({"tasto": _tasto_interagisci()})
+		return
+	if _a_bordo:
+		_a_bordo = false
+		metti_barca(_ormeggio_iniziale)
+	prompt.visible = _barca_vicina and livello == "superficie"
+	prompt.text = tr("HUD_PROMPT_SALI_BARCA").format({"tasto": _tasto_interagisci()})
 
 
 # --- Sottosuolo: ingressi e cambio di livello (2026-10-25) ------------------------
@@ -1103,9 +1272,14 @@ func _unhandled_input(event: InputEvent) -> void:
 	if book != null and bool(book.call("e_aperto")):
 		return
 	if _npc_vicino.is_empty():
-		if _porta_vicina != null and _interno == null and entra(_porta_vicina):
+		if in_barca():
+			if scendi_dalla_barca():
+				get_viewport().set_input_as_handled()
+		elif _porta_vicina != null and _interno == null and entra(_porta_vicina):
 			get_viewport().set_input_as_handled()
 		elif not _ingresso_vicino.is_empty() and attraversa(_ingresso_vicino):
+			get_viewport().set_input_as_handled()
+		elif _barca_vicina and sali_in_barca():
 			get_viewport().set_input_as_handled()
 		return
 	var de: Node = get_node_or_null("/root/DialogueEngine")

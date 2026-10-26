@@ -1135,10 +1135,11 @@ def main():
                 err(f"{rel} [{rid}]: densita_mistica deve essere un numero in [0, 1]")
             # US-8B12b: luoghi della mappa -> location_tag della regione (nomi diversi)
             # 2026-10-25: come ci si arriva nel mondo generato (assente = anche a piedi). Vocabolario chiuso:
-            # il volo e il sottosuolo sono i soli modi oltre al cammino (tests/test_mondo.gd lo verifica sulla mappa).
+            # il volo, il sottosuolo e la barca (US-8B91: con una lista, si sbarca solo se c'e' "barca" o "a_piedi")
+            # sono i soli modi oltre al cammino (tests/test_mondo.gd lo verifica sulla mappa).
             for modo in (reg.get("accesso") or []):
-                if modo not in ("a_piedi", "volo", "sottosuolo"):
-                    err(f"{rel} [{reg.get('id')}]: accesso '{modo}' fuori vocabolario (a_piedi, volo, sottosuolo)")
+                if modo not in ("a_piedi", "volo", "sottosuolo", "barca"):
+                    err(f"{rel} [{reg.get('id')}]: accesso '{modo}' fuori vocabolario (a_piedi, volo, sottosuolo, barca)")
             for luogo, t in (reg.get("luoghi_mondo") or {}).items():
                 if t not in reg.get("location_tags", []):
                     err(f"{rel} [{reg.get('id')}]: luoghi_mondo '{luogo}' -> '{t}', che non e' tra i suoi location_tags")
@@ -1271,6 +1272,15 @@ def main():
                     if k not in mondo_doc.get("sprite", {}) or not all(os.path.isfile(os.path.join(
                             ROOT, "assets", "world", t, "oggetti", k + ".png")) for t in ("luminoso", "cupo")):
                         err(f"{ctx}: manca il disegno {k} (python tools/art/esporta_mondo.py --varchi)")
+
+    # US-8B91: la barca parte ormeggiata vicino a un luogo del mondo generato
+    _mezzi = load_json(os.path.join(DATA, "world", "mezzi.json")) or {}
+    if mondo_doc is not None and "barca" in _mezzi:
+        if _mezzi["barca"].get("luogo") not in mondo_doc.get("luoghi", {}):
+            err(f"data/world/mezzi.json: barca.luogo '{_mezzi['barca'].get('luogo')}' non e' un luogo di "
+                f"assets/world/mondo.json")
+        if "barca" not in mondo_doc.get("sprite", {}):
+            err("data/world/mezzi.json: manca il disegno della barca (python tools/art/esporta_mondo.py --barca)")
 
     layouts_dir = os.path.join(DATA, "world", "layouts")
     layout_region_ids = set()

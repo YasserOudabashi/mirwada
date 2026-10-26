@@ -32,9 +32,9 @@ sotto-aree, le **icone** degli oggetti, e nessuno sa ancora **volare**.
 1. Fatte il 2026-10-26 le US-8B21a/b/c: i sei varchi sono ingressi sulla mappa (`regions.json` gating[].varco,
    `mondo.gd crea_varchi`, disegni da `esporta_mondo.py --varchi`), il contenuto delle loro zone sta negli interni,
    gli interni hanno l'arte del loro luogo.
-2. **US-8B91 Barca dal porto** (molo di Mirwada, in barca l'acqua si attraversa), **US-8B93 Volo** (si sblocca
-   con una chiave del mondo, per tutti i Pathway), **US-8B95 Accesso alla Frontiera** (barca, volo, o soglia nel
-   faro con una chiave trovata nel mondo; resta il gating di sequenza). Tutto deciso il 2026-10-26.
+2. **US-8B93 Volo** (si sblocca con una chiave del mondo, per tutti i Pathway), **US-8B95 Accesso alla
+   Frontiera** (barca, volo, o soglia nel faro con una chiave trovata nel mondo; resta il gating di sequenza).
+   Deciso il 2026-10-26. Fatta la **US-8B91 Barca dal porto** (`data/world/mezzi.json`, `mondo.gd crea_barca`).
 3. Icone (US-8B70..72), panorami (US-8B74), VFX (US-8B40..44), ritratti (US-8B35).
 4. Fase 12 (PRD `prd-fase-12-atto-2-3.md`, `prd-fase-12-mondo-vivo.md`).
 

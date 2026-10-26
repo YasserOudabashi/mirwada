@@ -240,8 +240,8 @@
       ],
       "priority": 14,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "data/world/mezzi.json, player.imposta_barca con vincolo solo acqua, mondo.gd crea_barca/sali/scendi, sbarco secondo regions.json accesso (Marche no), salvataggio mondo.barca. arte/revisione/barca_in_gioco.png."
     },
     {
       "id": "US-8B95",

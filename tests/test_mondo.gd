@@ -676,3 +676,90 @@ func test_dentro_la_cripta_c_e_il_contenuto_della_sua_zona() -> void:
 	m.call("esci")
 	ws.call("pulisci")
 	main.free()
+
+
+# --- US-8B91: barca dal porto -------------------------------------------------------
+
+func test_la_barca_e_ormeggiata_al_porto() -> void:
+	var m: Node2D = _mondo()
+	m.call("crea_barca")
+	var barca: Node2D = m.get_node_or_null("Barca")
+	assert_true(barca != null, "la barca c'e'")
+	var c: Vector2i = _cella(m, barca.position)
+	assert_true(m.call("acqua", c.x, c.y), "sta nell'acqua")
+	assert_true((m.call("_costa_vicina", c) as Vector2i).x >= 0, "accanto a una costa dove si scende")
+	var porto: Array = m.dati["luoghi"]["porto"]
+	assert_true(Vector2(c).distance_to(Vector2(porto[0], porto[1])) < 10.0, "vicino al porto")
+	m.free()
+
+
+func test_in_barca_la_terra_non_si_attraversa_e_si_scende_alla_costa() -> void:
+	var main := Node2D.new()
+	var m: Node2D = _mondo()
+	main.add_child(m)
+	var p: CharacterBody2D = load("res://scenes/player.tscn").instantiate()
+	m.add_child(p)
+	Engine.get_main_loop().root.add_child(main)
+	var barca: Node2D = m.get_node("Barca")
+	var ormeggio: Vector2i = _cella(m, barca.position)
+	assert_true(m.call("sali_in_barca"), "si sale")
+	assert_true(p.call("in_barca"), "a bordo")
+	assert_false(p.get_collision_mask_value(1), "l'acqua non ferma piu'")
+	var costa: Vector2i = m.call("_costa_vicina", ormeggio)
+	var prima: Vector2 = p.global_position
+	p.global_position = (Vector2(costa) + Vector2(0.5, 0.5)) * m.tile         # un passo sulla terra...
+	p.call("_resta_dove_si_puo", prima)
+	assert_true(m.call("acqua", _cella(m, p.global_position).x, _cella(m, p.global_position).y), "...non si fa: si resta in acqua")
+	assert_false(m.call("entra", m.get_node("Porta_mirwada_bettola_del_porto")), "dalla barca non si entra nelle case")
+	assert_true(m.call("scendi_dalla_barca"), "accanto alla costa si scende")
+	assert_false(p.call("in_barca"), "a terra")
+	assert_eq(_cella(m, p.position), costa, "sulla costa")
+	assert_eq(_cella(m, barca.position), ormeggio, "la barca resta dove la si lascia")
+	var stato: Dictionary = m.call("stato_barca")
+	assert_eq(stato["cella"], [ormeggio.x, ormeggio.y], "il salvataggio sa dov'e' la barca")
+	m.call("riprendi", "superficie", barca.position, {"cella": stato["cella"], "a_bordo": true})
+	assert_true(p.call("in_barca"), "salvato a bordo: si riprende a bordo")
+	m.call("riprendi", "superficie", (Vector2(costa) + Vector2(0.5, 0.5)) * m.tile, {"cella": stato["cella"], "a_bordo": false})
+	assert_false(p.call("in_barca"), "salvato a terra: si riprende a terra")
+	main.free()
+
+
+func test_nelle_marche_non_si_sbarca() -> void:
+	var m: Node2D = _mondo()
+	var l: Dictionary = m.dati["luoghi"]
+	for nome in ["porto", "isola_vulcanica", "isola_boss", "approdo_frontiera"]:
+		assert_true(m.call("_si_sbarca", Vector2i(int(l[nome][0]), int(l[nome][1]))), "a %s si sbarca" % nome)
+	assert_false(m.call("_si_sbarca", Vector2i(int(l["passo_tra_rupi"][0]), int(l["passo_tra_rupi"][1]))),
+			"nelle Marche no: solo volo o sottosuolo")
+	m.free()
+
+
+func test_in_barca_si_arriva_alle_isole_e_alla_frontiera() -> void:
+	var m: Node2D = _mondo()
+	m.call("crea_barca")
+	var b: PackedByteArray = m.call("blocchi_grezzi")
+	var w: int = m.larghezza
+	var c0: Vector2i = _cella(m, m.get_node("Barca").position)
+	var visto := PackedByteArray()
+	visto.resize(w * m.altezza)
+	var coda := PackedInt32Array([c0.y * w + c0.x])
+	visto[coda[0]] = 1
+	var i := 0
+	while i < coda.size():                           # tutta l'acqua che si raggiunge dal porto
+		var c: int = coda[i]
+		i += 1
+		var x: int = c % w
+		for n in [c - 1 if x > 0 else -1, c + 1 if x < w - 1 else -1, c - w, c + w]:
+			if n >= 0 and n < visto.size() and visto[n] == 0 and b[n] == 255:
+				visto[n] = 1
+				coda.append(n)
+	var sbarchi: Dictionary = {}
+	for c in coda:                                   # dove si puo' scendere, per regione
+		var q: Vector2i = m.call("_costa_vicina", Vector2i(c % w, c / w))
+		if q.x >= 0:
+			sbarchi[str(m.call("regione_a", q.x, q.y))] = true
+	for r in ["isola_vulcanica", "isola_tropicale", "isola_relitto", "isola_rovine", "scoglio_faro", "isola_boss",
+			"isola_pirati", "isola_ghiacciata", "isola_mostro", "atollo", "frontiera_porte", "mirwada"]:
+		assert_true(sbarchi.has(r), "in barca si arriva a %s" % r)
+	assert_false(sbarchi.has("marche_crepuscolo"), "ma non si sbarca nelle Marche")
+	m.free()
