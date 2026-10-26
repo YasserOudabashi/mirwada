@@ -278,8 +278,8 @@
       ],
       "priority": 16,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-26: tools/art/build_stati.py, 14 icone 16x16 da griglie (simbolo 10x10 in un tondo navy, contorno #181425 di 1 px, bordo rosso se lo status e' negativo, verde se e' un vantaggio), solo palette; assets/icone/stati/<status_id>.png, foglio arte/revisione/icone_stati.png. Nel gioco: GameData.icona_stato, scripts/status_icons.gd (fila sopra la testa di giocatore e nemici, segnale StatsComponent.status_cambiati, lampeggia negli ultimi 2 s). Nome del giocatore col contorno (sul marmo non si leggeva). Validator: ogni status ha l'icona. 4 test. Prova a schermo arte/revisione/icone_stati_in_gioco.png."
     },
     {
       "id": "US-8B72",

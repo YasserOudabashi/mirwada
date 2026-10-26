@@ -697,18 +697,25 @@ func get_mezzo(id: String) -> Dictionary:
 
 
 ## US-8B70: l'icona di un oggetto (data/ui/icone.json, disegni di tools/art/build_icone.py): la sua voce in
-## "oggetti", altrimenti quella della sua categoria; null se non c'e'. Ogni PNG si legge dal disco una volta.
+## "oggetti", altrimenti quella della sua categoria; null se non c'e'.
 func icona_oggetto(item_id: String) -> Texture2D:
 	var ic: String = str((_icone.get("oggetti", {}) as Dictionary).get(item_id, ""))
 	if ic.is_empty():
 		ic = str((_icone.get("categorie", {}) as Dictionary).get(str(get_item(item_id).get("categoria", "")), ""))
-	if ic.is_empty():
-		return null
-	if not _icone_tex.has(ic):
-		var path: String = "res://assets/icone/oggetti/%s.png" % ic
+	return null if ic.is_empty() else _icona_png("res://assets/icone/oggetti/%s.png" % ic)
+
+
+## US-8B71: l'icona di uno status (assets/icone/stati/<id>.png, tools/art/build_stati.py); null se non c'e'.
+func icona_stato(status_id: String) -> Texture2D:
+	return _icona_png("res://assets/icone/stati/%s.png" % status_id)
+
+
+## Ogni PNG delle icone si legge dal disco una volta sola (senza l'import dell'editor).
+func _icona_png(path: String) -> Texture2D:
+	if not _icone_tex.has(path):
 		var img: Image = Image.load_from_file(ProjectSettings.globalize_path(path)) if FileAccess.file_exists(path) else null
-		_icone_tex[ic] = ImageTexture.create_from_image(img) if img != null else null
-	return _icone_tex[ic]
+		_icone_tex[path] = ImageTexture.create_from_image(img) if img != null else null
+	return _icone_tex[path]
 
 
 ## Gli id dei mezzi (barca, volo, soglie...), senza le chiavi di servizio del file.

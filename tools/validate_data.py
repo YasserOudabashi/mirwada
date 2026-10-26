@@ -849,6 +849,9 @@ def main():
         for k in (st.get("stat_modifiers") or {}):
             if k not in known_stats_st:
                 err(f"data/status_effects.json [{sid}]: stat_modifiers ha una stat ignota '{k}'")
+        if not os.path.isfile(os.path.join(ROOT, "assets", "icone", "stati", f"{sid}.png")):   # US-8B71
+            err(f"data/status_effects.json [{sid}]: manca l'icona assets/icone/stati/{sid}.png "
+                f"(python tools/art/build_stati.py)")
     for rel, aid, eff in status_refs:
         if eff not in statuses:
             err(f"{rel} [{aid}]: aura/curse punta a effetto '{eff}' inesistente in data/status_effects.json")

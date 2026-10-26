@@ -62,10 +62,13 @@ var _castando: bool = false
 ## cosi' a schermo si distingue quale figura sei. Il testo viene da
 ## GameState.nome_personaggio, aggiornato quando parte una partita.
 var _nome_lbl: Label = null
+var _icone_stato: Node2D = null
 
 
 func _ready() -> void:
 	_monta_nome()
+	_icone_stato = _monta_icone_stato()
+	_posiziona_sopra()
 	_anim.call("configura", CATEGORIA_ANIM)
 	_anim.evento_frame.connect(_su_evento_anim)
 	_anim.animazione_finita.connect(_su_anim_finita)
@@ -94,6 +97,25 @@ func _ready() -> void:
 	_anim.call("riproduci", "idle", _dir_sguardo)
 
 
+## US-8B71: le icone degli status sopra il nome.
+func _monta_icone_stato() -> Node2D:
+	var icone: Node2D = preload("res://scripts/status_icons.gd").new()
+	icone.name = "IconeStato"
+	add_child(icone)
+	icone.call("collega", _stats)
+	return icone
+
+
+## Nome e icone degli status sopra la testa: le icone stanno sopra il nome se c'e', e in volo salgono con il disegno.
+func _posiziona_sopra() -> void:
+	var su: float = ALTEZZA_VOLO if _mezzo == "volo" else 0.0
+	if _nome_lbl != null:
+		_nome_lbl.position.y = -34.0 - su
+	if _icone_stato != null:
+		var con_nome: bool = _nome_lbl != null and not _nome_lbl.text.is_empty()
+		_icone_stato.position.y = (-38.0 if con_nome else -26.0) - su
+
+
 ## Nome sopra la testa, stesso stile della Label degli NPC in region_scene.gd.
 func _monta_nome() -> void:
 	var gs: Node = get_node_or_null("/root/GameState")
@@ -102,13 +124,17 @@ func _monta_nome() -> void:
 	_nome_lbl = Label.new()
 	_nome_lbl.name = "Nome"
 	_nome_lbl.add_theme_font_size_override("font_size", 10)
+	_nome_lbl.add_theme_constant_override("outline_size", 4)       # si legge anche sul marmo e sulla neve
+	_nome_lbl.add_theme_color_override("font_outline_color", Color("#181425"))
 	_nome_lbl.position = Vector2(-32, -34)
 	_nome_lbl.custom_minimum_size = Vector2(64, 0)
 	_nome_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(_nome_lbl)
 	_nome_lbl.text = str(gs.get("nome_personaggio"))
 	if gs.has_signal("partita_iniziata"):
-		gs.partita_iniziata.connect(func(n: String) -> void: _nome_lbl.text = n)
+		gs.partita_iniziata.connect(func(n: String) -> void:
+			_nome_lbl.text = n
+			_posiziona_sopra())
 
 
 func _physics_process(delta: float) -> void:
@@ -219,8 +245,7 @@ func _imposta_mezzo(mezzo: String, vincolo: Callable) -> void:
 	z_index = 5 if vola else 0                  # in volo sopra case e alberi
 	if _anim != null:
 		_anim.position.y = -ALTEZZA_VOLO if vola else 0.0
-	if _nome_lbl != null:                       # il nome sale con il disegno
-		_nome_lbl.position.y = -34.0 - (ALTEZZA_VOLO if vola else 0.0)
+	_posiziona_sopra()                          # nome e icone salgono con il disegno
 	if _ombra_volo == null and vola:            # l'ombra a terra, composta nel gioco (CLAUDE.md)
 		var img := Image.create(18, 7, false, Image.FORMAT_RGBA8)
 		for y in 7:

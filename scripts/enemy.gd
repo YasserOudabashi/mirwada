@@ -74,6 +74,12 @@ func _ready() -> void:
 	_hurtbox.colpito.connect(func(_d: float, _s: float, _da: Node, _t: String) -> void:
 		_anim.call("lampo"))
 	_stats.died.connect(_su_morte)
+	var icone: Node2D = preload("res://scripts/status_icons.gd").new()   # US-8B71: status sopra la testa
+	icone.name = "IconeStato"
+	icone.position = Vector2(0, -26)                                   # 2 unita' sopra la testa
+	add_child(icone)
+	icone.call("collega", _stats)
+	_stats.died.connect(icone.hide)
 	_postura.postura_rotta.connect(_su_postura_rotta)
 	_postura.vulnerabilita_finita.connect(func() -> void:
 		if _stato == Stato.STAGGER:

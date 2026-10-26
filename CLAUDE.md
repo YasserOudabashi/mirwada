@@ -155,6 +155,9 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
   un'icona per ogni oggetto e il disegno di ogni icona usata.
 - Nel gioco: `GameData.icona_oggetto(id)`; a terra a mezza grandezza (come gli sprite a 64) con l'ombra a terra
   (`vfx.json ombra_terra.raggi.oggetto`), nello zaino a 16 unita' (1:1).
+- Icone degli status (`build_stati.py`): pixel art da griglie 10x10 in un tondo 16x16, bordo rosso se `negativo`,
+  verde se e' un vantaggio. Nel gioco `GameData.icona_stato(id)` e `scripts/status_icons.gd`: fila sopra la testa
+  di giocatore e nemici (segnale `StatsComponent.status_cambiati`), lampeggia negli ultimi 2 secondi.
 
 ### Mondo, mappe e biomi
 - **La generazione procedurale del mondo è consentita come strumento di produzione**:
@@ -250,6 +253,7 @@ python tools/art/build_interni.py              # interni: pavimenti, pareti e ar
 python tools/art/build_npc.py                  # aspetti degli NPC (personaggio_<aspetto>_{idle,walk}.png)
 python tools/art/build_libro.py                # carta, segnalibri, caselle e filetto del libro (assets/ui/)
 python tools/art/build_icone.py                # icone degli oggetti: abbina i nuovi in data/ui/icone.json, disegna assets/icone/oggetti/
+python tools/art/build_stati.py                # icone degli status (griglie 16x16) -> assets/icone/stati/<status_id>.png
 python scripts/forge.py contact FILE.png --scale 4
 
 # Rigenera la spina dorsale dei pathway (idempotente)
@@ -284,6 +288,7 @@ assets/world/         mondo.json, blocchi/regioni.png, <tema>/tessere+indici+ogg
 assets/interni/       <tema>/<interno_id>.png (pavimenti e pareti), <tema>/arredi/, arredi.json (build_interni.py)
 assets/ui/            libro (carta, segnalibri, caselle, filetto) e font Alegreya (OFL)
 assets/icone/oggetti/ <forma>_<tinta>.png, 32x32, solo le icone usate (build_icone.py, data/ui/icone.json)
+assets/icone/stati/   <status_id>.png, 16x16 (build_stati.py)
 assets/vfx/           sheet degli effetti
 prd.json          story della fase corrente per ralph
 progress.txt      memoria tra le iterazioni
@@ -321,14 +326,13 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   caricatore, regione dalla posizione, NPC, collisioni, sottosuolo, contenuto dei layout), libro (US-8B73),
   edifici di citta', villaggi e torri con le porte verso i 14 interni (US-8B18a/b), interni disegnati e
   arredati (US-8B18c/d), varchi delle sotto-aree come ingressi con il loro contenuto e la loro arte (US-8B21a/b/c),
-  icone degli oggetti a terra e nello zaino (US-8B70).
+  icone degli oggetti a terra e nello zaino (US-8B70), icone degli status sopra la testa (US-8B71).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
-**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): icone di stato e delle primitive
-(US-8B71..72), panorami (US-8B74), VFX (US-8B40). Varchi, barca, volo, Frontiera e icone degli oggetti sono fatti
-(2026-10-26).
+**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): icone delle primitive (US-8B72), panorami
+(US-8B74), VFX (US-8B40). Varchi, barca, volo, Frontiera, icone degli oggetti e degli status sono fatti (2026-10-26).
 
 ## Decisioni prese
 

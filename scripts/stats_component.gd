@@ -16,6 +16,8 @@ extends Node
 signal hp_changed(hp: float, hp_max: float)
 signal spiritualita_changed(spiritualita: float, spiritualita_max: float)
 signal died
+## US-8B71: uno status e' stato applicato o tolto (le icone sopra la testa si ridisegnano).
+signal status_cambiati
 
 ## Le statistiche modificabili. hp e spiritualita' correnti NON sono qui:
 ## sono risorse che si consumano, non caratteristiche.
@@ -215,6 +217,7 @@ func applica_status(id: String, durata: float = -1.0) -> void:
 	_statuses[id] = {"tag": str(dati.get("tag", "")), "left": d}
 	var mods: Variant = dati.get("stat_modifiers", {})
 	apply_modifier("status:%s" % id, mods if typeof(mods) == TYPE_DICTIONARY else {})
+	status_cambiati.emit()
 
 
 func rimuovi_status(id: String) -> bool:
@@ -222,6 +225,7 @@ func rimuovi_status(id: String) -> bool:
 		return false
 	_statuses.erase(id)
 	remove_modifier("status:%s" % id)
+	status_cambiati.emit()
 	return true
 
 
@@ -237,6 +241,11 @@ func rimuovi_status_per_tag(tag: String) -> int:
 
 func ha_status(id: String) -> bool:
 	return _statuses.has(id)
+
+
+## Secondi rimasti di uno status; < 0 se permanente o assente.
+func status_rimasto(id: String) -> float:
+	return float((_statuses.get(id, {}) as Dictionary).get("left", -1.0))
 
 
 func status_attivi() -> Array:

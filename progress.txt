@@ -14433,3 +14433,20 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - Aperto: le icone sono una sola serie (anche nella modalita' cupa); il negozio e "Indosso" non mostrano ancora le
   icone; assets/placeholder/oggetti.png non e' piu' usato dal gioco (lo scrive ancora generate_sprites.py e il
   validator ne controlla la misura).
+
+## US-8B71 — icone di stato, 2026-10-26
+- Gli status (data/status_effects.json, 14) non si vedevano da nessuna parte. tools/art/build_stati.py: un'icona
+  16x16 per status, pixel art da griglie (simbolo 10x10 in un tondo navy: ferro di cavallo rovesciato, punto
+  esclamativo, goccia di marcio, corona che cola, teschio, fantasma, anima tagliata, cuore, germoglio, masso che
+  sprofonda, mirino, occhio sbarrato, lucchetto, fiamma viola), contorno #181425, bordo rosso se "negativo", verde se
+  e' un vantaggio. Solo palette, alpha 0/255; rilanciato: stessi byte. assets/icone/stati/<status_id>.png.
+- Nel gioco: GameData.icona_stato (stessa cache PNG delle icone degli oggetti, _icona_png); StatsComponent emette
+  status_cambiati e dice status_rimasto(id) (status_attivi c'era gia'); scripts/status_icons.gd mette la fila delle
+  icone (a mezza grandezza, passo 10 unita', centrate) 2 unita' sopra la testa dei nemici e del giocatore (sopra il
+  nome se c'e', in volo sale con il disegno); lampeggia negli ultimi 2 secondi di uno status a tempo.
+- Visto a schermo: il nome del giocatore, bianco senza contorno, sul marmo bianco della piazza non si leggeva: ora ha
+  il contorno scuro come le scritte delle porte.
+- Validator: ogni status ha la sua icona. Verifica: test_icone_stati (4: icone 16x16, la fila segue gli status del
+  nemico, lampeggia solo a tempo, giocatore sopra il nome e in volo). Prova a schermo con tre status su un nemico,
+  uno sull'altro e uno sul giocatore (arte/revisione/icone_stati_in_gioco.png). validate 0, 1011 test.
+- Aperto: nessuna icona degli status nell'HUD o nel libro (solo sopra la testa); i nemici dei layout non hanno nome.
