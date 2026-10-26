@@ -590,7 +590,7 @@ func _su_porta(body: Node, area: Area2D, dentro: bool) -> void:
 
 
 ## Entra nell'interno della porta: il giocatore esce dal nodo mondo (che si nasconde e
-## si ferma, mai liberato), l'interno si aggiunge accanto al mondo.
+## si ferma, mai liberato) ed entra nella stanza, aggiunta accanto al mondo.
 func entra(porta: Area2D) -> bool:
 	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D if is_inside_tree() else null
 	if p == null or _interno != null or get_parent() == null:
@@ -600,11 +600,10 @@ func entra(porta: Area2D) -> bool:
 	_ritorno = porta.position
 	_porta_vicina = null
 	(porta.get_node("Prompt") as CanvasItem).visible = false
-	p.reparent(get_parent())
 	visible = false
 	process_mode = Node.PROCESS_MODE_DISABLED
 	get_parent().add_child(interno)
-	get_parent().move_child(interno, p.get_index())  # la stanza sotto il giocatore, non sopra
+	p.reparent(interno)                            # dentro la stanza: ordinato con gli arredi (y_sort)
 	interno.connect("uscita", func() -> void: esci.call_deferred())
 	_interno = interno
 	p.global_position = interno.call("punto_spawn")

@@ -547,7 +547,7 @@ func test_entrare_e_uscire_da_un_interno() -> void:
 	var porta: Area2D = m.get_node("Porta_mirwada_bettola_del_porto")
 	assert_true(m.call("entra", porta), "si entra nella bettola")
 	assert_true(m.call("in_un_interno"), "dentro")
-	assert_eq(p.get_parent(), main, "il giocatore esce dal nodo mondo")
+	assert_eq(p.get_parent().get("interno_id"), "mirwada_bettola_del_porto", "il giocatore esce dal nodo mondo ed entra nella stanza")
 	assert_false(m.visible, "il mondo si nasconde")
 	m.call("esci")
 	assert_false(m.call("in_un_interno"), "fuori")

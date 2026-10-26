@@ -170,8 +170,8 @@
       ],
       "priority": 11,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "17 arredi (data/world/arredi.json, forge3d/arredi.py), 54 nelle 14 stanze, collisione e y-sort col giocatore dentro la stanza, validator con visita in ampiezza. Prova a schermo in arte/revisione/interni_in_gioco.png."
     },
     {
       "id": "US-8B21",

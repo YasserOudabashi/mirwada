@@ -14265,3 +14265,23 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   mostra sotto tutto e tiene le collisioni). validate 0, 988 test.
 - Aperto: le stanze sono vuote (arredi: US-8B18d); la telecamera segue il giocatore, quindi una stanza piccola non
   sta al centro dello schermo.
+
+## US-8B18d — arredi degli interni, 2026-10-26
+- data/world/arredi.json (nuovo): vocabolario chiuso di 17 arredi con misura, blocca, a_terra; ogni interno li elenca
+  in "arredi": [{id, x, y}] (54 arredi nelle 14 stanze: bancone e botti nella bettola, scaffali e scrittoio
+  nell'archivio, forgia e incudine dai fabbri, banconi dai mercanti, alambicco dall'alchimista, letti, camini e casse
+  nelle capanne, botti e casse nel sotterraneo, tavolo e scaffali nella torre).
+- forge3d/arredi.py (nuovo): un modello per arredo, stesse regole degli edifici (origine al centro del lato davanti,
+  profondita' / sin 32 gradi); worldrender "arredo". Contro il muro nord niente sale oltre la cima della parete
+  (MURO = 48): forgia e scaffali sporgevano nel buio sopra la stanza (visto a schermo). Lenzuola e tappeti appena
+  inclinati verso la luce: le facce piatte in alto uscivano scure.
+- build_interni.py esporta anche i disegni: assets/interni/<tema>/arredi/<id>.png, ancore in assets/interni/arredi.json.
+- GameData.get_arredo(); interior_scene.gd _crea_arredi(): il disegno con i piedi in basso al centro del rettangolo, le
+  caselle di un arredo che blocca diventano muro (collisione), i tappeti sotto chi ci passa; la stanza ordina per
+  profondita' e il giocatore, mentre e' dentro, e' figlio della stanza (mondo.entra) cosi' passa dietro gli arredi.
+- Validator: id nel vocabolario, sul pavimento, senza sovrapporsi, non sopra spawn/NPC/oggetti/nemici/passaggi, e
+  dallo spawn si arriva ancora a tutto (visita in ampiezza). Ha trovato i mercanti chiusi dietro il bancone: spostato.
+- Verifica: 2 test nuovi in test_interni_arte (ogni arredo dei dati ha il suo disegno nei due temi; si vedono,
+  bloccano, il tappeto no), test_mondo aggiornato (il giocatore entra nella stanza). Prova a schermo dei 14 interni
+  (arte/revisione/interni_in_gioco.png), rilancio del generatore identico. validate 0, 990 test.
+- Aperto: gli oggetti raccoglibili a terra hanno ancora le icone segnaposto (US-8B70).

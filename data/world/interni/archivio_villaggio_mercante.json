@@ -12,6 +12,7 @@
     3,
     3
   ],
+  "arredi": [{"id": "scaffale", "x": 1, "y": 1}, {"id": "bancone", "x": 2, "y": 2}, {"id": "sacchi", "x": 1, "y": 3}, {"id": "vaso", "x": 2, "y": 3}],
   "nemici": [],
   "oggetti": [],
   "npcs": [

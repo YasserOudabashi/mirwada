@@ -47,8 +47,10 @@ func _ready() -> void:
 	var layout: Dictionary = gd.call("get_interno", interno_id)
 	if layout.is_empty():
 		return
+	y_sort_enabled = true                          # il giocatore (figlio della stanza) passa dietro gli arredi alti
 	_dipingi(layout)
 	_arte()
+	_crea_arredi(layout)
 	_crea_uscita(layout)
 	_crea_nemici(layout)
 	_crea_oggetti(layout)
@@ -78,6 +80,39 @@ func _arte() -> void:
 	spr.centered = false
 	add_child(spr)
 	self_modulate = Color(1, 1, 1, 0)
+
+
+## US-8B18d: gli arredi dei dati (data/world/arredi.json), disegni di build_interni.py
+## con i piedi in basso al centro; le caselle di un arredo che blocca diventano muro.
+func _crea_arredi(layout: Dictionary) -> void:
+	var gd: Node = get_node_or_null("/root/GameData")
+	var gs: Node = get_node_or_null("/root/GameState")
+	var cartella: String = "res://assets/interni/%s/arredi" % (str(gs.call("tema_arte")) if gs != null else "luminoso")
+	var f := FileAccess.open("res://assets/interni/arredi.json", FileAccess.READ)
+	var ancore: Dictionary = (JSON.parse_string(f.get_as_text()) as Dictionary) if f != null else {}
+	for a in (layout.get("arredi", []) as Array):
+		var spec: Dictionary = a
+		var id: String = str(spec.get("id", ""))
+		var voce: Dictionary = gd.call("get_arredo", id) if gd != null else {}
+		var path: String = cartella.path_join(id + ".png")
+		if voce.is_empty() or not FileAccess.file_exists(path):
+			continue
+		var m: Array = voce["misura"]
+		var c := Vector2i(int(spec.get("x", 0)), int(spec.get("y", 0)))
+		if bool(voce.get("blocca", true)):
+			for dy in int(m[1]):
+				for dx in int(m[0]):
+					set_cell(c + Vector2i(dx, dy), SORGENTE, Vector2i(_COLONNA_PER_CARATTERE["#"], 0))
+		var spr := Sprite2D.new()
+		spr.name = "Arredo_%s_%d_%d" % [id, c.x, c.y]
+		spr.texture = preload("res://scripts/world/mondo.gd")._texture(path)
+		spr.centered = false
+		var an: Array = ancore.get(id, [0, 0])
+		spr.offset = -Vector2(float(an[0]), float(an[1]))
+		spr.position = Vector2((c.x + float(m[0]) / 2.0) * TILE, (c.y + int(m[1])) * TILE)
+		if bool(voce.get("a_terra", false)):
+			spr.z_index = -1                          # i tappeti stanno sotto chi ci passa
+		add_child(spr)
 
 
 func _cella_spawn(layout: Dictionary) -> Vector2i:

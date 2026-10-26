@@ -4,7 +4,7 @@ Interni (US-8B18c): pavimento e pareti di ogni interno (data/world/interni/<id>.
 grana del terreno del mondo (32 px per casella = un texel per unita'), per le due modalita'. Lo stile e' il campo
 "stile" dell'interno (STILI qui sotto); la mappa ASCII resta la fonte di collisioni, nemici, oggetti e NPC.
 
-    python tools/art/build_interni.py      # assets/interni/<tema>/<interno_id>.png
+    python tools/art/build_interni.py      # assets/interni/<tema>/<interno_id>.png e <tema>/arredi/<id>.png
 
 Vista 3/4 come il mondo: la parete con il pavimento davanti (a sud) si vede di fronte, con la cima e il
 battiscopa; le altre dall'alto (la cima del muro, larga fino a 2 caselle dal pavimento). Luce da alto-sinistra: il
@@ -25,6 +25,7 @@ sys.path.insert(0, HERE)
 from build_libro import rumore, soglia  # noqa: E402
 from forge3d import tema  # noqa: E402
 from forge3d.materials import E32  # noqa: E402
+from forge3d.worldrender import object_sprite  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 DATI = os.path.join(ROOT, "data", "world", "interni")
@@ -269,10 +270,28 @@ def interno(doc, rng, C):
     return img
 
 
+def arredi(t):
+    """Un disegno per arredo del vocabolario (data/world/arredi.json, modelli in forge3d/arredi.py):
+    <tema>/arredi/<id>.png; le ancore dei piedi (uguali nei due temi) in assets/interni/arredi.json."""
+    vocab = json.load(open(os.path.join(ROOT, "data", "world", "arredi.json")))["arredi"]
+    cart = os.path.join(OUT, t, "arredi")
+    os.makedirs(cart, exist_ok=True)
+    ancore = {}
+    for aid, a in sorted(vocab.items()):
+        img, ax, ay = object_sprite({"type": "arredo", "kind": aid, "w": a["misura"][0], "h": a["misura"][1],
+                                     "seed": 1}, T)
+        Image.fromarray(img).save(os.path.join(cart, aid + ".png"))
+        ancore[aid] = [int(ax), int(ay)]
+    with open(os.path.join(OUT, "arredi.json"), "w") as f:
+        json.dump(ancore, f, indent=1, sort_keys=True)
+    print(f"  {len(ancore)} arredi in assets/interni/{t}/arredi/")
+
+
 def main():
     temi = ("luminoso", "cupo")
     for t in temi:
         tema.imposta(t)
+        arredi(t)
         C = tavolozza()
         consentiti = {tuple(int(c) for c in v) for v in C.values()}
         os.makedirs(os.path.join(OUT, t), exist_ok=True)

@@ -162,6 +162,49 @@ def valida_mappa_e_spawn(doc, rel, legenda, calpestabili):
     return mappa, w, h, righe_valide
 
 
+def valida_arredi(doc, rel, vocab, calpestabili):
+    """US-8B18d: gli arredi di un interno (data/world/arredi.json): sul pavimento, senza sovrapporsi, non sopra
+    spawn, NPC, oggetti, nemici; e dallo spawn si arriva ancora a ogni NPC, oggetto, nemico e passaggio '+'."""
+    mappa = doc.get("mappa", [])
+    h, w = len(mappa), len(mappa[0]) if mappa else 0
+    occupate = {}
+    for i, a in enumerate(doc.get("arredi", [])):
+        aid, x, y = a.get("id"), a.get("x"), a.get("y")
+        if aid not in vocab:
+            err(f"{rel}: arredi[{i}] '{aid}' non e' nel vocabolario data/world/arredi.json")
+            continue
+        if not (isinstance(x, int) and isinstance(y, int)):
+            err(f"{rel}: arredi[{i}] x/y devono essere interi")
+            continue
+        aw, ah = vocab[aid]["misura"]
+        for cy in range(y, y + ah):
+            for cx in range(x, x + aw):
+                if not (0 <= cx < w and 0 <= cy < h) or mappa[cy][cx] not in calpestabili:
+                    err(f"{rel}: arredi[{i}] '{aid}' esce dal pavimento in ({cx},{cy})")
+                elif (cx, cy) in occupate:
+                    err(f"{rel}: arredi[{i}] '{aid}' si sovrappone a '{occupate[(cx, cy)]}' in ({cx},{cy})")
+                else:
+                    occupate[(cx, cy)] = aid
+    bloccate = {c for c, aid in occupate.items() if vocab[aid].get("blocca", True)}
+    sx, sy = doc.get("spawn", [0, 0])
+    da_raggiungere = {(int(n.get("x", 0)), int(n.get("y", 0))) for k in ("npcs", "oggetti", "nemici")
+                      for n in doc.get(k, [])}
+    da_raggiungere |= {(x, y) for y, r in enumerate(mappa) for x, ch in enumerate(r) if ch == "+"}
+    for c in sorted(da_raggiungere | {(sx, sy)}):
+        if c in occupate and vocab[occupate[c]].get("blocca", True):
+            err(f"{rel}: un arredo ('{occupate[c]}') copre {c} (spawn, NPC, oggetto, nemico o passaggio)")
+    visto, coda = {(sx, sy)}, [(sx, sy)]
+    while coda:
+        cx, cy = coda.pop()
+        for nx, ny in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
+            if (0 <= nx < w and 0 <= ny < h and (nx, ny) not in visto and (nx, ny) not in bloccate
+                    and mappa[ny][nx] in calpestabili):
+                visto.add((nx, ny))
+                coda.append((nx, ny))
+    for c in sorted(da_raggiungere - visto - bloccate):
+        err(f"{rel}: dallo spawn non si arriva a {c}: gli arredi chiudono il passaggio")
+
+
 def main():
     # --- vocabolari di riferimento ---
     prim_doc = load_json(os.path.join(DATA, "schema", "primitives.json"))
@@ -1172,6 +1215,12 @@ def main():
     # risolvere.
     interni_dir = os.path.join(DATA, "world", "interni")
     interni_ids = set()
+    arredi_doc = load_json(os.path.join(DATA, "world", "arredi.json")) or {}
+    vocab_arredi = arredi_doc.get("arredi", {})
+    for aid, a in vocab_arredi.items():
+        m = a.get("misura")
+        if not (isinstance(m, list) and len(m) == 2 and all(isinstance(v, int) and v >= 1 for v in m)):
+            err(f"data/world/arredi.json [{aid}]: misura deve essere [larghezza, profondita'] di interi >= 1")
     # US-8B18b: edifici[].villaggio = un villaggio del mondo generato (assets/world/mondo.json "villaggi")
     _mondo = os.path.join(ROOT, "assets", "world", "mondo.json")
     villaggi_mondo = set((load_json(_mondo) or {}).get("villaggi", {})) if os.path.isfile(_mondo) else None
@@ -1192,6 +1241,7 @@ def main():
                 err(f"{rel}: interno_id '{iid}' duplicato tra gli interni")
             interni_ids.add(iid)
             valida_mappa_e_spawn(doc, f"{rel} [{iid}]", LEGENDA_LAYOUT, CALPESTABILI_LAYOUT)
+            valida_arredi(doc, f"{rel} [{iid}]", vocab_arredi, CALPESTABILI_LAYOUT)
             for spec in doc.get("npcs", []):
                 interni_npc_refs.append((rel, iid, spec.get("npc_id")))
 

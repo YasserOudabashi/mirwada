@@ -11,8 +11,8 @@
 Le fasi 1-11 sono chiuse. L'arte (fase 8b) e' in corso: personaggi a 64 px, NPC, terreni e un
 **mondo unico generato** (seed 6, 1200 x 1000 caselle) che e' la scena di gioco, con le case di
 Mirwada, dei villaggi e le torri, e le porte verso i 14 interni delle fasi 10-11 (US-8B18a/b, 2026-10-26).
-Gli interni hanno pavimenti e pareti disegnati (US-8B18c). Quello che manca di piu' a schermo: gli
-**arredi** degli interni, i **varchi** delle sotto-aree, e nessuno sa ancora **volare**.
+Gli interni sono disegnati e arredati (US-8B18c/d). Quello che manca di piu' a schermo: i **varchi** delle
+sotto-aree, le **icone** degli oggetti, e nessuno sa ancora **volare**.
 
 ---
 
@@ -29,17 +29,14 @@ Gli interni hanno pavimenti e pareti disegnati (US-8B18c). Quello che manca di p
 
 ## 2. Ordine delle story
 
-1. **US-8B18d Arredi degli interni**: le stanze sono vuote. Fatti: a) le case (`esporta_mondo.py --edifici`),
-   b) le porte (`mondo.gd crea_porte`, campo `villaggio` sugli edifici dei layout per i gruppi di case),
-   c) pavimenti e pareti (`build_interni.py`, campo `stile` degli interni).
-2. **US-8B21 Varchi di gating visibili** e barriere delle sotto-aree (cripte, passaggi d'ombra, ponti di
+1. **US-8B21 Varchi di gating visibili** e barriere delle sotto-aree (cripte, passaggi d'ombra, ponti di
    radici, grotte di marea, ali interne, isole di nebbia) nei punti giusti del mondo.
-3. **Decisioni dell'utente** (chiedere, non decidere):
+2. **Decisioni dell'utente** (chiedere, non decidere):
    - chi sa volare e come (US-8B93: altezza, cosa si scavalca, dove si atterra, costo, sblocco);
    - come si arriva alla Frontiera (oggi nessuno ci arriva: e' sospesa nel vuoto);
    - barche e isole (US-8B91).
-4. Icone (US-8B70..72), panorami (US-8B74), VFX (US-8B40..44), ritratti (US-8B35).
-5. Fase 12 (PRD `prd-fase-12-atto-2-3.md`, `prd-fase-12-mondo-vivo.md`).
+3. Icone (US-8B70..72), panorami (US-8B74), VFX (US-8B40..44), ritratti (US-8B35).
+4. Fase 12 (PRD `prd-fase-12-atto-2-3.md`, `prd-fase-12-mondo-vivo.md`).
 
 ---
 

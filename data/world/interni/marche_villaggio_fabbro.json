@@ -12,6 +12,7 @@
     3,
     3
   ],
+  "arredi": [{"id": "forgia", "x": 1, "y": 1}, {"id": "incudine", "x": 2, "y": 2}, {"id": "botte", "x": 5, "y": 3}],
   "nemici": [],
   "oggetti": [],
   "npcs": [

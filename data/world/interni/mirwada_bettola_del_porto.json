@@ -14,6 +14,7 @@
     4,
     5
   ],
+  "arredi": [{"id": "bancone", "x": 1, "y": 1}, {"id": "botte", "x": 6, "y": 1}, {"id": "botte", "x": 7, "y": 1}, {"id": "tavolo", "x": 2, "y": 3}, {"id": "sgabello", "x": 2, "y": 4}, {"id": "sgabello", "x": 3, "y": 4}, {"id": "tavolo_rotondo", "x": 6, "y": 4}],
   "nemici": [],
   "oggetti": [
     {

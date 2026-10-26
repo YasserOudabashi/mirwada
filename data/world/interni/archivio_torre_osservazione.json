@@ -18,6 +18,7 @@
     2,
     5
   ],
+  "arredi": [{"id": "scaffale", "x": 2, "y": 2}, {"id": "scrittoio", "x": 5, "y": 2}, {"id": "tavolo", "x": 12, "y": 3}, {"id": "sgabello", "x": 12, "y": 4}, {"id": "scaffale", "x": 20, "y": 2}, {"id": "cassa", "x": 24, "y": 8}],
   "nemici": [
     {
       "x": 22,

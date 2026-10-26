@@ -13,6 +13,7 @@
     4,
     4
   ],
+  "arredi": [{"id": "cassa", "x": 1, "y": 1}, {"id": "cassa", "x": 2, "y": 1}, {"id": "botte", "x": 6, "y": 1}, {"id": "sacchi", "x": 1, "y": 3}, {"id": "sacchi", "x": 1, "y": 4}],
   "nemici": [],
   "oggetti": [
     {

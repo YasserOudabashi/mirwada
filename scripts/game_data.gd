@@ -62,6 +62,7 @@ const PATH_SIGIL_EFFECT_TYPES := "res://data/schema/sigil_effect_types.json"
 const PATH_BLUEPRINTS := "res://data/forge/blueprints.json"
 const PATH_REGIONS := "res://data/world/regions.json"
 const PATH_CAMPAGNA := "res://data/world/campagna.json"
+const PATH_ARREDI := "res://data/world/arredi.json"
 const PATH_ROSTER := "res://data/npc/roster.json"
 const PATH_FACTIONS := "res://data/factions.json"
 const PATH_ANTAGONISTI := "res://data/lore/antagonisti.json"
@@ -124,6 +125,7 @@ var _sigil_effect_types: Dictionary = {}
 var _blueprints: Dictionary = {}
 var _regions: Dictionary = {}
 var _campagna: Dictionary = {}
+var _arredi: Dictionary = {}
 var _roster: Dictionary = {}
 var _dialogues: Dictionary = {}
 var _factions: Dictionary = {}
@@ -216,6 +218,7 @@ func load_all() -> void:
 	_load_single(PATH_BLUEPRINTS, "blueprints", _blueprints, TYPE_DICTIONARY)
 	_load_single(PATH_REGIONS, "regions", _regions, TYPE_ARRAY)
 	_load_single(PATH_CAMPAGNA, "nemici", _campagna, TYPE_ARRAY)
+	_load_single(PATH_ARREDI, "arredi", _arredi, TYPE_DICTIONARY)
 	_load_single(PATH_ROSTER, "npcs", _roster, TYPE_ARRAY)
 	_load_single(PATH_FACTIONS, "factions", _factions, TYPE_ARRAY)
 	_load_single(PATH_ANTAGONISTI, "antagonisti", _antagonisti, TYPE_ARRAY)
@@ -673,6 +676,11 @@ func get_regions() -> Array:
 ## percorso disegnato a mano fra due regioni).
 func get_campagna() -> Dictionary:
 	return _campagna
+
+
+## US-8B18d: un arredo degli interni {misura, blocca, a_terra}; {} se l'id non esiste.
+func get_arredo(id: String) -> Dictionary:
+	return (_arredi.get("arredi", {}) as Dictionary).get(id, {})
 
 
 ## {} se l'id non esiste: il chiamante controlla con is_empty().

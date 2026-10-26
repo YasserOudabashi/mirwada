@@ -53,6 +53,11 @@ def object_sprite(o, S=TILE):
         alto = (o["h"] * 32 + (hw + tetto + 14) * 0.85) * k
         cw, ch = int((o["w"] * 32 + 16) * k), int(alto + 12 * k)
         foot = 1.0 - 6 * k / ch
+    elif t == "arredo":                                   # US-8B18d: arredi degli interni (o["w"] x o["h"] caselle)
+        from .arredi import ALTEZZA, arredo
+        r = arredo(o["kind"], o["w"], o["h"], o.get("seed", 1), size=k)
+        cw, ch = int((o["w"] * 32 + 16) * k), int((o["h"] * 32 + ALTEZZA.get(o["kind"], 32) + 12) * k)
+        foot = 1.0 - 6 * k / ch
     elif t == "ingresso":                                 # sottosuolo: botola, scale, risalita (stesso punto sopra e sotto)
         from .creatures import ingresso
         r = ingresso(o.get("kind", "scale"), o.get("seed", 1), size=2.0 * k)
@@ -72,7 +77,7 @@ def object_sprite(o, S=TILE):
           "gigante": (0.2, 0.07)}.get(o.get("kind"), (0.15, 0.055)) if t == "tree" else (0.3, 0.12)
     # inner_thr in proporzione alla grandezza del modello: con 1 unita' il bordo ripido di una sfera grande (chioma
     # x3,6) superava la soglia sulla stessa superficie e diventava una fascia scura di 5-8 px (contorno doppio)
-    img = render(r.instances({}, 180), size=(cw, ch), ppu=1.0, foot=(0.5, foot), shadow=(t not in ("bridge", "scoglio", "edificio") and not (t == "ingresso" and o.get("kind") != "risalita")),
+    img = render(r.instances({}, 180), size=(cw, ch), ppu=1.0, foot=(0.5, foot), shadow=(t not in ("bridge", "scoglio", "edificio", "arredo") and not (t == "ingresso" and o.get("kind") != "risalita")),
                  shadow_r=sr, shadow_off=(0.25, 0.3), shadow_a=80, inner_thr=max(1.0, r.scale))
     if t == "scoglio":
         img = _sommerso(img, int(ch * foot) - max(2, int(3 * k)), o["seed"])
