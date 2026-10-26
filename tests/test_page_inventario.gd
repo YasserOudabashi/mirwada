@@ -74,6 +74,25 @@ func test_lo_zaino_elenca_gli_item() -> void:
 	_p.free()
 
 
+## US-8B70: accanto al nome, l'icona dell'oggetto a 1:1.
+func test_lo_zaino_mostra_l_icona_dell_oggetto() -> void:
+	_n("/root/Inventory").call("aggiungi", "erba_lunare", 1)
+	var ov: CanvasLayer = OverlayScene.instantiate()
+	Engine.get_main_loop().root.add_child(ov)
+	var pag: Node = _pagina(ov)
+	var icona: TextureRect = null
+	for r in _righe(pag):
+		if r is HBoxContainer and r.get_node_or_null("Icona") != null:
+			icona = r.get_node("Icona")
+	assert_true(icona != null, "la riga dell'oggetto ha l'icona")
+	if icona != null:
+		assert_true(icona.texture == _n("/root/GameData").call("icona_oggetto", "erba_lunare"), "quella dell'erba lunare")
+		assert_eq(icona.custom_minimum_size, Vector2(16, 16), "16 unita' = i 32 pixel dell'icona")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	_p.free()
+
+
 ## US-1105 (fase 11): il nome dell'oggetto nello zaino si colora secondo la
 ## sua rarita' - ambrosia (leggendario) e erba_lunare (comune, mai
 ## referenziata da una formula - US-1102) devono avere colori DIVERSI, letti

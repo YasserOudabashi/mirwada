@@ -271,7 +271,9 @@ Rispettano il fog of war: nessun dettaglio rivela Sequenze non raggiunte.
 
 ### Blocco F — Icone, libro, panorami
 
-**US-8B70 [A] 39 icone oggetto. S ciascuna.**
+**US-8B70 [A] 39 icone oggetto. S ciascuna.** **FATTA (2026-10-26)**: un'icona per ognuno dei 353 oggetti, da 44 forme
+(`forge3d/icone.py`) e una tinta; 141 icone usate in `assets/icone/oggetti/`, abbinamento in `data/ui/icone.json`
+(`tools/art/build_icone.py`), a terra con l'ombra e nello zaino.
 **US-8B71 [A] 14 icone di stato. S.**
 **US-8B72 [A] 27 icone di primitiva** (colorate dallo shader come i VFX).
 **US-8B73 [A] Pagine del libro. M per pagina.** Le 9 pagine di `data/ui/book.json`,

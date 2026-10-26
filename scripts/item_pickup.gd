@@ -5,37 +5,34 @@ extends "res://scripts/characteristic_pickup.gd"
 ##
 ## NIENTE class_name: coerente col resto del progetto.
 
-## Ordine delle 6 categorie non-ingrediente in oggetti.png, colonne 3-8
-## (le colonne 0-2 sono le varianti di "ingrediente" — vedi
-## tools/generate_sprites.py.OGGETTI_COLONNE, stesso ordine).
-const _CATEGORIE_COLONNA := ["equip", "sigillo", "pergamena", "materiale", "valuta", "consumabile"]
-const _TILE := 32
-
 var quantita: int = 1
 
 
-## US-813: l'icona della categoria dell'item (con variante per gli
-## ingredienti, scelta dal tag dominante) invece del rombo generico.
+## US-8B70: l'icona dell'oggetto (GameData.icona_oggetto, 32 px) a mezza grandezza come gli sprite a 64 px:
+## a schermo mostra tutti i suoi pixel. Sotto, l'ombra a terra dei personaggi (vfx.json ombra_terra, raggi
+## "oggetto") al fondo del disegno. Senza icona resta il rombo del genitore.
 func _crea_marker() -> Node2D:
 	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
-	var it: Dictionary = gd.call("get_item", char_id) if gd != null else {}
+	var tex: Texture2D = gd.call("icona_oggetto", char_id) if gd != null else null
+	if tex == null:
+		return super._crea_marker()
 	var sprite := Sprite2D.new()
-	sprite.texture = load("res://assets/placeholder/oggetti.png")
-	sprite.region_enabled = true
-	sprite.region_rect = Rect2(_colonna_icona(it) * _TILE, 0, _TILE, _TILE)
+	sprite.texture = tex
+	sprite.scale = Vector2(0.5, 0.5)
+	var dati: Dictionary = gd.call("get_vfx", "ombra_terra")
+	var r: Variant = (dati.get("raggi", {}) as Dictionary).get("oggetto")
+	if r is Array and (r as Array).size() >= 2:
+		var colore := Color(str(dati.get("colore", "#181425")))
+		colore.a = float(dati.get("alpha", 0.3))
+		var ombra := Node2D.new()
+		ombra.name = "OmbraTerra"
+		ombra.show_behind_parent = true
+		ombra.position = Vector2(0, tex.get_image().get_used_rect().end.y - tex.get_height() / 2.0 - 2.0)
+		ombra.scale = Vector2(2, 2)                 # in unita' di gioco, come lo sprite a mezza grandezza
+		ombra.draw.connect(func() -> void:
+			preload("res://scripts/animation_machine.gd").ellisse_a_righe(ombra, Vector2(r[0], r[1]), colore))
+		sprite.add_child(ombra)
 	return sprite
-
-
-func _colonna_icona(it: Dictionary) -> int:
-	if str(it.get("categoria", "")) == "ingrediente":
-		var tag: Array = it.get("tag", [])
-		if tag.has("crescita"):
-			return 0  # erba
-		if tag.has("terra"):
-			return 1  # minerale
-		return 2  # fiala
-	var i: int = _CATEGORIE_COLONNA.find(str(it.get("categoria", "")))
-	return 3 + i if i >= 0 else 3 + _CATEGORIE_COLONNA.size() - 1
 
 
 func raccogli() -> bool:

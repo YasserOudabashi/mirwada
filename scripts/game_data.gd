@@ -64,6 +64,7 @@ const PATH_REGIONS := "res://data/world/regions.json"
 const PATH_CAMPAGNA := "res://data/world/campagna.json"
 const PATH_ARREDI := "res://data/world/arredi.json"
 const PATH_MEZZI := "res://data/world/mezzi.json"
+const PATH_ICONE := "res://data/ui/icone.json"
 const PATH_ROSTER := "res://data/npc/roster.json"
 const PATH_FACTIONS := "res://data/factions.json"
 const PATH_ANTAGONISTI := "res://data/lore/antagonisti.json"
@@ -128,6 +129,8 @@ var _regions: Dictionary = {}
 var _campagna: Dictionary = {}
 var _arredi: Dictionary = {}
 var _mezzi: Dictionary = {}
+var _icone: Dictionary = {}
+var _icone_tex: Dictionary = {}
 var _roster: Dictionary = {}
 var _dialogues: Dictionary = {}
 var _factions: Dictionary = {}
@@ -222,6 +225,8 @@ func load_all() -> void:
 	_load_single(PATH_CAMPAGNA, "nemici", _campagna, TYPE_ARRAY)
 	_load_single(PATH_ARREDI, "arredi", _arredi, TYPE_DICTIONARY)
 	_load_single(PATH_MEZZI, "barca", _mezzi, TYPE_DICTIONARY)
+	_load_single(PATH_ICONE, "oggetti", _icone, TYPE_DICTIONARY)
+	_icone_tex.clear()
 	_load_single(PATH_ROSTER, "npcs", _roster, TYPE_ARRAY)
 	_load_single(PATH_FACTIONS, "factions", _factions, TYPE_ARRAY)
 	_load_single(PATH_ANTAGONISTI, "antagonisti", _antagonisti, TYPE_ARRAY)
@@ -689,6 +694,21 @@ func get_arredo(id: String) -> Dictionary:
 ## US-8B91: un mezzo per muoversi nel mondo (data/world/mezzi.json, es. "barca"); {} se non c'e'.
 func get_mezzo(id: String) -> Dictionary:
 	return _mezzi.get(id, {}) if typeof(_mezzi.get(id)) == TYPE_DICTIONARY else {}
+
+
+## US-8B70: l'icona di un oggetto (data/ui/icone.json, disegni di tools/art/build_icone.py): la sua voce in
+## "oggetti", altrimenti quella della sua categoria; null se non c'e'. Ogni PNG si legge dal disco una volta.
+func icona_oggetto(item_id: String) -> Texture2D:
+	var ic: String = str((_icone.get("oggetti", {}) as Dictionary).get(item_id, ""))
+	if ic.is_empty():
+		ic = str((_icone.get("categorie", {}) as Dictionary).get(str(get_item(item_id).get("categoria", "")), ""))
+	if ic.is_empty():
+		return null
+	if not _icone_tex.has(ic):
+		var path: String = "res://assets/icone/oggetti/%s.png" % ic
+		var img: Image = Image.load_from_file(ProjectSettings.globalize_path(path)) if FileAccess.file_exists(path) else null
+		_icone_tex[ic] = ImageTexture.create_from_image(img) if img != null else null
+	return _icone_tex[ic]
 
 
 ## Gli id dei mezzi (barca, volo, soglie...), senza le chiavi di servizio del file.

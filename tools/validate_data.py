@@ -1306,6 +1306,22 @@ def main():
         if "barca" not in mondo_doc.get("sprite", {}):
             err("data/world/mezzi.json: manca il disegno della barca (python tools/art/esporta_mondo.py --barca)")
 
+    # US-8B70: ogni oggetto ha un'icona del vocabolario chiuso, e ogni icona usata ha il suo disegno
+    _ic = load_json(os.path.join(DATA, "ui", "icone.json")) or {}
+    _forme = _ic.get("forme", {})
+    _rif = [("categorie", k, v) for k, v in _ic.get("categorie", {}).items()] + \
+        [("oggetti", k, v) for k, v in _ic.get("oggetti", {}).items()]
+    for _sez, _k, _v in _rif:
+        _f, _, _t = str(_v).partition("_")
+        if _f not in _forme or (_t not in _forme[_f] if _forme[_f] else _t):
+            err(f"data/ui/icone.json {_sez}.{_k}: '{_v}' non e' <forma>_<tinta> del vocabolario 'forme'")
+        elif not os.path.isfile(os.path.join(ROOT, "assets", "icone", "oggetti", f"{_v}.png")):
+            err(f"data/ui/icone.json {_sez}.{_k}: manca assets/icone/oggetti/{_v}.png (python tools/art/build_icone.py)")
+        if _sez == "oggetti" and _k not in _items_tutti:
+            err(f"data/ui/icone.json oggetti.{_k}: non e' un oggetto di data/items/")
+    for _iid in sorted(set(_items_tutti) - set(_ic.get("oggetti", {}))):
+        err(f"data/ui/icone.json: l'oggetto '{_iid}' non ha l'icona (python tools/art/build_icone.py)")
+
     layouts_dir = os.path.join(DATA, "world", "layouts")
     layout_region_ids = set()
     if os.path.isdir(layouts_dir):

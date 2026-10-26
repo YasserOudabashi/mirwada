@@ -147,6 +147,15 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - Un effetto d'attacco ha l'impatto in 1 frame bianco più 3–4 frame di dissolvenza.
 - Rispetta `riduci_flash`: gli effetti con flash bianco devono avere una variante attenuata.
 
+### Icone degli oggetti
+- Una forma per tipo di oggetto in `forge3d/icone.py` (`FORME`, vocabolario chiuso: fiala, cristallo, chiave, ...),
+  la **tinta** colora la parte che cambia (liquido, cristallo, metallo). Icona = `<forma>_<tinta>`, 32x32.
+- L'abbinamento oggetto -> icona e' un **dato** (`data/ui/icone.json` `oggetti`): `build_icone.py` lo propone per gli
+  oggetti nuovi (parole dell'id e tag) e tiene quelli esistenti, quindi si ritocca nel JSON. Il validator vuole
+  un'icona per ogni oggetto e il disegno di ogni icona usata.
+- Nel gioco: `GameData.icona_oggetto(id)`; a terra a mezza grandezza (come gli sprite a 64) con l'ombra a terra
+  (`vfx.json ombra_terra.raggi.oggetto`), nello zaino a 16 unita' (1:1).
+
 ### Mondo, mappe e biomi
 - **La generazione procedurale del mondo è consentita come strumento di produzione**:
   `forge3d/world.py` produce biomi, fiumi, laghi, villaggi, strade, oggetti e spawn dal `seed`.
@@ -240,6 +249,7 @@ python tools/art/esporta_mondo.py --barca          # solo il disegno della barca
 python tools/art/build_interni.py              # interni: pavimenti, pareti e arredi -> assets/interni/<tema>/
 python tools/art/build_npc.py                  # aspetti degli NPC (personaggio_<aspetto>_{idle,walk}.png)
 python tools/art/build_libro.py                # carta, segnalibri, caselle e filetto del libro (assets/ui/)
+python tools/art/build_icone.py                # icone degli oggetti: abbina i nuovi in data/ui/icone.json, disegna assets/icone/oggetti/
 python scripts/forge.py contact FILE.png --scale 4
 
 # Rigenera la spina dorsale dei pathway (idempotente)
@@ -273,6 +283,7 @@ assets/placeholder/   sheet {categoria}_{nome}.png (ora generati da sprite-forge
 assets/world/         mondo.json, blocchi/regioni.png, <tema>/tessere+indici+oggetti, sotto/
 assets/interni/       <tema>/<interno_id>.png (pavimenti e pareti), <tema>/arredi/, arredi.json (build_interni.py)
 assets/ui/            libro (carta, segnalibri, caselle, filetto) e font Alegreya (OFL)
+assets/icone/oggetti/ <forma>_<tinta>.png, 32x32, solo le icone usate (build_icone.py, data/ui/icone.json)
 assets/vfx/           sheet degli effetti
 prd.json          story della fase corrente per ralph
 progress.txt      memoria tra le iterazioni
@@ -309,13 +320,15 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   pareti, mondo generato (seed 6) con modalita' luminosa/cupa, mondo unico nel gioco (US-8B12..g:
   caricatore, regione dalla posizione, NPC, collisioni, sottosuolo, contenuto dei layout), libro (US-8B73),
   edifici di citta', villaggi e torri con le porte verso i 14 interni (US-8B18a/b), interni disegnati e
-  arredati (US-8B18c/d), varchi delle sotto-aree come ingressi con il loro contenuto e la loro arte (US-8B21a/b/c).
+  arredati (US-8B18c/d), varchi delle sotto-aree come ingressi con il loro contenuto e la loro arte (US-8B21a/b/c),
+  icone degli oggetti a terra e nello zaino (US-8B70).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
-**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): icone degli oggetti, di stato e delle
-primitive (US-8B70..72), panorami (US-8B74), VFX (US-8B40). Varchi, barca, volo e Frontiera sono fatti (2026-10-26).
+**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): icone di stato e delle primitive
+(US-8B71..72), panorami (US-8B74), VFX (US-8B40). Varchi, barca, volo, Frontiera e icone degli oggetti sono fatti
+(2026-10-26).
 
 ## Decisioni prese
 

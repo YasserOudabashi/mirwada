@@ -232,16 +232,21 @@ func _configura_ombra(dati: Dictionary) -> void:
 	_ombra.queue_redraw()
 
 
-## Ellisse a righe di un pixel di schermo (mezza unita'): bordo a scalini
-## netti, senza le punte del poligono di draw_circle schiacciato.
 func _disegna_ombra() -> void:
+	ellisse_a_righe(_ombra, _ombra_raggi, _ombra_colore)
+
+
+## Ellisse a righe di un pixel di schermo (mezza unita'): bordo a scalini
+## netti, senza le punte del poligono di draw_circle schiacciato. Statica:
+## la usa anche l'ombra degli oggetti a terra (item_pickup.gd, US-8B70).
+static func ellisse_a_righe(n: CanvasItem, raggi: Vector2, colore: Color) -> void:
 	var px: float = 0.5
-	var righe: int = int(round(_ombra_raggi.y / px))
+	var righe: int = int(round(raggi.y / px))
 	for j in range(-righe, righe):
-		var yc: float = (j + 0.5) * px / _ombra_raggi.y
-		var w: float = snappedf(_ombra_raggi.x * sqrt(maxf(1.0 - yc * yc, 0.0)), px)
+		var yc: float = (j + 0.5) * px / raggi.y
+		var w: float = snappedf(raggi.x * sqrt(maxf(1.0 - yc * yc, 0.0)), px)
 		if w > 0.0:
-			_ombra.draw_rect(Rect2(-w, j * px, 2.0 * w, px), _ombra_colore)
+			n.draw_rect(Rect2(-w, j * px, 2.0 * w, px), colore)
 
 
 func _dict(v: Variant) -> Dictionary:

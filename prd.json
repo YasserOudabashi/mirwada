@@ -266,8 +266,8 @@
       ],
       "priority": 15,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-26: forge3d/icone.py, 44 forme (fiala, goccia, cristallo, polvere, fiore, sfera, stoffa, candela, lingotto, erba, radice, fungo, seme, piuma, osso, zanna, corno, occhio, cuore, pelo, filo, chiave, chiodo, carta, pergamena, libro, specchio, moneta, sigillo, ingranaggio, clessidra, calice, campana, maschera, corona, porta, tavoletta, dado, spada, ascia, corazza, scudo, anello, amuleto) con tinte della palette. tools/art/build_icone.py (seed 1) abbina i 353 oggetti (parole dell'id e tag, poi ritocchi nel JSON: data/ui/icone.json) e disegna le 141 icone usate in assets/icone/oggetti/. GameData.icona_oggetto; a terra a mezza grandezza con l'ombra (vfx.json ombra_terra.raggi.oggetto), nello zaino a 16 unita'. Validator: ogni oggetto ha un'icona del vocabolario e il suo disegno. 5 test. Guardate ingrandite: arte/revisione/icone_oggetti.png, icone_in_gioco.png."
     },
     {
       "id": "US-8B71",

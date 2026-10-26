@@ -14409,3 +14409,27 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   passa, con la chiave aperta e si arriva alla Frontiera su una casella libera; alla Frontiera si atterra e si
   sbarca; la chiave non ricompare se la si ha). Prova a schermo (arte/revisione/faro_in_gioco.png). 1002 test.
 - Aperto: l'icona della chiave a terra e' il segnaposto degli oggetti (US-8B70).
+
+## US-8B70 — icone degli oggetti, 2026-10-26
+- forge3d/icone.py: 44 forme (vocabolario chiuso FORME) con lo stesso motore e la stessa luce dei personaggi; la
+  tinta (TINTE, rampe Endesga 32) colora la parte che cambia (liquido, cristallo, polvere, metallo, nastro...). Le
+  cose piatte (chiavi, piume, fogli, monete) si girano verso la camera con piano(); disegno su tela 48 px, centrato
+  in 32x32. Trappola: le facce piatte rivolte in su vengono scure, si inclinano verso la camera con rotm(+x, ...)
+  (il segno positivo: rotm(-x) le allontana, come era successo a dado e stoffa).
+- tools/art/build_icone.py (seed 1): per ogni oggetto nuovo propone l'icona (prima parola dell'id che dice una
+  forma, parole "deboli" come frammento/prima solo se non c'e' altro; tinta dall'aggettivo subito dopo, poi dalle
+  parole, dai tag e dai ripieghi) e tiene gli abbinamenti esistenti: data/ui/icone.json "oggetti" si ritocca a mano
+  (fatti 9 ritocchi: sale nero, polveri d'ossa, specchio, sigillo reale, suola, cuore di montagna, boccale,
+  crogiolo). --rifai riabbina tutto. Disegna solo le 141 icone usate in assets/icone/oggetti/ (toglie le altre),
+  controlla palette e alpha 0/255, foglio di controllo in arte/revisione/icone_oggetti.png. Rilanciato: stessi byte.
+- GameData.icona_oggetto(id): voce in "oggetti", altrimenti l'icona della categoria; PNG letta dal disco una volta.
+  item_pickup.gd: l'icona a mezza grandezza (16 unita' = 32 pixel a schermo, come gli sprite a 64) con l'ombra a
+  terra dei personaggi (vfx.json ombra_terra.raggi.oggetto; animation_machine.ellisse_a_righe ora statica) sotto il
+  fondo del disegno. page_inventario.gd: l'icona accanto al nome nello zaino (16 unita', 1:1).
+- Validator: ogni oggetto ha un'icona <forma>_<tinta> del vocabolario e il suo disegno; categorie idem.
+- Verifica: test_icone_oggetti (4: tutti i 353 oggetti hanno un'icona 32x32, texture condivisa, a terra a mezza
+  grandezza, senza icona resta il rombo) + 1 in test_page_inventario. Prova a schermo: oggetti a terra nella piazza
+  di Mirwada e zaino aperto (arte/revisione/icone_in_gioco.png). validate 0, 1007 test.
+- Aperto: le icone sono una sola serie (anche nella modalita' cupa); il negozio e "Indosso" non mostrano ancora le
+  icone; assets/placeholder/oggetti.png non e' piu' usato dal gioco (lo scrive ancora generate_sprites.py e il
+  validator ne controlla la misura).

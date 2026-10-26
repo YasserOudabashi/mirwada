@@ -11,8 +11,9 @@
 Le fasi 1-11 sono chiuse. L'arte (fase 8b) e' in corso: personaggi a 64 px, NPC, terreni e un
 **mondo unico generato** (seed 6, 1200 x 1000 caselle) che e' la scena di gioco, con le case di
 Mirwada, dei villaggi e le torri, e le porte verso i 14 interni delle fasi 10-11 (US-8B18a/b, 2026-10-26).
-Gli interni sono disegnati e arredati (US-8B18c/d). Quello che manca di piu' a schermo: i **varchi** delle
-sotto-aree, le **icone** degli oggetti, e nessuno sa ancora **volare**.
+Gli interni sono disegnati e arredati (US-8B18c/d); varchi, barca, volo, soglia del faro e icone degli oggetti
+sono fatti (2026-10-26). Quello che manca di piu' a schermo: le **icone di stato e delle primitive**, i
+**panorami** e i **VFX** degli attacchi.
 
 ---
 
@@ -23,7 +24,7 @@ sotto-aree, le **icone** degli oggetti, e nessuno sa ancora **volare**.
 - La **PR #4** (`claude/mini-trailer-prompt-adq22o`) e' interamente dentro la PR #5: si puo' chiudere.
 - `main` e' ferma alla fase 7: va aggiornata mergiando la PR #5 quando l'utente lo decide.
 - CI GitHub Actions **accesa** su push a `main` e sulle pull request (validator + `tools/run_tests.sh`).
-- Verifica locale: `python tools/validate_data.py` e `bash tools/run_tests.sh` (982 test, ~1 minuto).
+- Verifica locale: `python tools/validate_data.py` e `bash tools/run_tests.sh` (1007 test, ~1 minuto).
 
 ---
 
@@ -35,9 +36,11 @@ sotto-aree, le **icone** degli oggetti, e nessuno sa ancora **volare**.
 2. Fatte il 2026-10-26 anche **US-8B91 Barca dal porto**, **US-8B93 Volo** (piuma dei venti nell'osservatorio) e
    **US-8B95 Accesso alla Frontiera** (barca, volo, soglia del faro con la chiave delle Rovine): `data/world/mezzi.json`,
    `mondo.gd crea_barca`, `decolla`/`atterra`, `crea_soglie`.
-3. **Prossime**: icone (US-8B70..72; anche le chiavi a terra hanno l'icona segnaposto), panorami (US-8B74), VFX
-   (US-8B40..44), ritratti (US-8B35).
-4. Fase 12 (PRD `prd-fase-12-atto-2-3.md`, `prd-fase-12-mondo-vivo.md`).
+3. Fatta il 2026-10-26 **US-8B70 Icone degli oggetti**: 44 forme in `forge3d/icone.py`, abbinamento nei dati
+   (`data/ui/icone.json`, `tools/art/build_icone.py`), a terra con l'ombra e nello zaino.
+4. **Prossime**: icone di stato e delle primitive (US-8B71..72), panorami (US-8B74), VFX (US-8B40..44),
+   ritratti (US-8B35).
+5. Fase 12 (PRD `prd-fase-12-atto-2-3.md`, `prd-fase-12-mondo-vivo.md`).
 
 ---
 

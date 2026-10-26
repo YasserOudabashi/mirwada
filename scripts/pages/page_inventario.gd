@@ -117,6 +117,7 @@ func _riga_item(v: Dictionary) -> HBoxContainer:
 	var item_id: String = str(v.get("item_id", ""))
 	var it: Dictionary = gd.call("get_item", item_id)
 	var h := HBoxContainer.new()
+	h.add_child(_icona(gd.call("icona_oggetto", item_id)))
 	var l := Label.new()
 	var nome: String = str(gd.call("tr_data", it.get("name_i18n", v.get("item_id"))))
 	var q: int = int(v.get("quantita", 1))
@@ -133,6 +134,19 @@ func _riga_item(v: Dictionary) -> HBoxContainer:
 		h.add_child(_azione(tr("BOOK_INV_USA"), func() -> void:
 			_n("/root/Inventory").call("usa", iid); _mostra("zaino")))
 	return h
+
+
+## US-8B70: l'icona dell'oggetto a 1:1 (16 unita' = i 32 pixel dell'icona), centrata sulla riga.
+func _icona(tex: Texture2D) -> TextureRect:
+	var ic := TextureRect.new()
+	ic.name = "Icona"
+	ic.texture = tex
+	ic.custom_minimum_size = Vector2(16, 16)
+	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	ic.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	return ic
 
 
 ## US-1105 (fase 11): 4 colori distinti per i 4 livelli di

@@ -271,13 +271,14 @@
     "intensita_ridotta": 1.25
   },
   "ombra_terra": {
-    "_comment": "Ellisse disegnata dal gioco sotto i piedi di ogni entita' animata (revisione arte 2.2): gli sprite non hanno ombre cotte. raggi in unita' di gioco (1 tile = 32).",
+    "_comment": "Ellisse disegnata dal gioco sotto i piedi di ogni entita' animata (revisione arte 2.2) e sotto gli oggetti a terra (oggetto, US-8B70): gli sprite non hanno ombre cotte. raggi in unita' di gioco (1 tile = 32).",
     "colore": "#181425",
     "alpha": 0.3,
     "raggi": {
       "personaggio": [6, 2],
       "nemico_base": [6, 2],
-      "pet": [7, 2]
+      "pet": [7, 2],
+      "oggetto": [5, 1.5]
     }
   },
   "nero_di_scena": {
