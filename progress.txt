@@ -14450,3 +14450,23 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   nemico, lampeggia solo a tempo, giocatore sopra il nome e in volo). Prova a schermo con tre status su un nemico,
   uno sull'altro e uno sul giocatore (arte/revisione/icone_stati_in_gioco.png). validate 0, 1011 test.
 - Aperto: nessuna icona degli status nell'HUD o nel libro (solo sopra la testa); i nemici dei layout non hanno nome.
+
+## US-8B72 — icone di primitiva, 2026-10-26
+- tools/art/build_primitive.py: un glifo 32x32 per ognuna delle 28 primitive attive (il PRD diceva 27: chain non
+  aveva un VFX), forme 2D (cerchi, poligoni, archi, linee) disegnate a 4x con PIL e ridotte a maggioranza, niente
+  sfumature. Quattro toni di grigio nella PNG (0 contorno, 85 scuro, 170 primario, 255 accento); la luce in alto a
+  sinistra, le linee tra le parti sovrapposte e il contorno di 1 px li mette lo script. Fendente a mezzaluna,
+  cometa, doppia freccia, frecce su/giu', croce, scudo, anelli, fiamma, goccia che si crepa, sole, ciclo, punte di
+  roccia, triangolo del maleficio, cerchio di evocazione, teschio, occhio, varco, anima che lascia il corpo, ankh,
+  germoglio, cervello, figura meta' in ombra, doppio, moneta portata via, marionetta, orologio all'indietro, catena.
+  Rilanciato: stessi byte. Foglio con 4 palette di Pathway in arte/revisione/icone_primitive.png.
+- shaders/rampa_pathway.gdshader: grigio -> inchiostro/scuro/primario/accento della palette del Pathway
+  (data/vfx.json pathway_palette_visiva), cosi' "la forma e' una, il colore cambia con il Pathway" come i VFX (che
+  potranno usarlo in US-8B40). GameData.icona_primitiva. hud.gd: davanti a ogni slot della hotbar il glifo della
+  prima primitiva dell'abilita' (un ShaderMaterial per tutti, aggiornato se cambia il Pathway), attenuato in cooldown,
+  nascosto negli slot vuoti.
+- Validator: ogni primitiva attiva ha il glifo. Verifica: test_icone_primitive (2: 28 glifi 32x32 a soli 4 grigi con
+  il contorno; la hotbar mostra il glifo della prima primitiva con i colori della palette, slot vuoto senza glifo).
+  Prova a schermo con Twilight Giant, Door e Mother (arte/revisione/icone_primitive_in_gioco.png). validate 0, 1013.
+- Aperto: le scritte dell'HUD sono bianche senza contorno (sui fondi chiari si leggono peggio); le palette dei
+  Pathway non sono Endesga 32 (vale data/vfx.json, decisione del 2026-10-14).

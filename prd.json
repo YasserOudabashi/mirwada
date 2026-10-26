@@ -290,8 +290,8 @@
       ],
       "priority": 17,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-26: tools/art/build_primitive.py, 28 glifi 32x32 (le primitive attive sono 28, non 27) disegnati a 4x con PIL e ridotti a maggioranza, a 4 toni di grigio (0 contorno, 85 scuro, 170 primario, 255 accento) con luce in alto a sinistra e contorno di 1 px automatici; assets/icone/primitive/<primitiva>.png. shaders/rampa_pathway.gdshader li colora con la palette del Pathway (data/vfx.json pathway_palette_visiva; scuro = primario verso l'inchiostro). GameData.icona_primitiva; hud.gd: glifo della prima primitiva davanti a ogni slot, attenuato in cooldown. Validator: ogni primitiva attiva ha il glifo. 2 test. Foglio con 4 palette arte/revisione/icone_primitive.png; prova a schermo con 3 Pathway icone_primitive_in_gioco.png."
     },
     {
       "id": "US-8B40",

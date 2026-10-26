@@ -710,6 +710,12 @@ func icona_stato(status_id: String) -> Texture2D:
 	return _icona_png("res://assets/icone/stati/%s.png" % status_id)
 
 
+## US-8B72: il glifo di una primitiva (assets/icone/primitive/<tipo>.png, tools/art/build_primitive.py), a 4 toni
+## di grigio: lo colora shaders/rampa_pathway.gdshader. null se non c'e'.
+func icona_primitiva(tipo: String) -> Texture2D:
+	return _icona_png("res://assets/icone/primitive/%s.png" % tipo)
+
+
 ## Ogni PNG delle icone si legge dal disco una volta sola (senza l'import dell'editor).
 func _icona_png(path: String) -> Texture2D:
 	if not _icone_tex.has(path):

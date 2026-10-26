@@ -218,6 +218,10 @@ def main():
 
     all_primitives = set(prim_doc["primitives"].keys())
     primitives = {k for k, v in prim_doc["primitives"].items() if not v.get("deferred")}
+    for _pid in sorted(primitives):                         # US-8B72: il glifo di ogni primitiva attiva
+        if not os.path.isfile(os.path.join(ROOT, "assets", "icone", "primitive", f"{_pid}.png")):
+            err(f"data/schema/primitives.json [{_pid}]: manca l'icona assets/icone/primitive/{_pid}.png "
+                f"(python tools/art/build_primitive.py)")
     deferred_primitives = all_primitives - primitives
     # Il registro dichiara i parametri di ogni primitiva: un nome sbagliato nei
     # dati diventerebbe silenziosamente il default a runtime (danno a zero).

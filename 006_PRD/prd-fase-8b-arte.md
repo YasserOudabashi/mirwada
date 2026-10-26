@@ -276,7 +276,9 @@ Rispettano il fog of war: nessun dettaglio rivela Sequenze non raggiunte.
 (`tools/art/build_icone.py`), a terra con l'ombra e nello zaino.
 **US-8B71 [A] 14 icone di stato. S.** **FATTA (2026-10-26)**: griglie 16x16 in `tools/art/build_stati.py`, bordo dal campo
 `negativo`; nel gioco in fila sopra la testa di giocatore e nemici (`scripts/status_icons.gd`).
-**US-8B72 [A] 27 icone di primitiva** (colorate dallo shader come i VFX).
+**US-8B72 [A] 27 icone di primitiva** (colorate dallo shader come i VFX). **FATTA (2026-10-26)**: 28 glifi (le primitive attive sono 28) a 4 toni in
+`tools/art/build_primitive.py`, colorati da `shaders/rampa_pathway.gdshader` con la palette di `data/vfx.json`;
+nella hotbar davanti al nome dell'abilita'.
 **US-8B73 [A] Pagine del libro. M per pagina.** Le 9 pagine di `data/ui/book.json`,
 i segnalibri, la voltata, le macchie, la pagina "follia".
 **US-8B74 [A] Panorami. L.** Schermata iniziale e libro: 6 strati × 4 fasce orarie.
