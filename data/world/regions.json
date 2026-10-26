@@ -48,13 +48,13 @@
           "tipo": "primitiva",
           "primitiva": "shadow_meld",
           "area": "passaggi_ombra",
-          "varco": {"luogo": "passo_tra_rupi", "scostamento": [-22, -18], "interno": "marche_tempio_ombra", "aspetto": "arco_ombra"}
+          "varco": {"luogo": "passo_tra_rupi", "scostamento": [-22, -18], "interno": "marche_tempio_ombra", "aspetto": "arco_ombra", "zona": "tempio_abbandonato"}
         },
         {
           "tipo": "momento",
           "valore": "notte_fonda",
           "area": "cripte",
-          "varco": {"luogo": "boss_catacombe", "scostamento": [0, 0], "interno": "marche_cripta", "aspetto": "cancello_cripta"}
+          "varco": {"luogo": "boss_catacombe", "scostamento": [0, 0], "interno": "marche_cripta", "aspetto": "cancello_cripta", "zona": "cripta"}
         }
       ],
       "palette_visiva": "darkness"
@@ -81,13 +81,13 @@
           "tipo": "primitiva",
           "primitiva": "plant_growth",
           "area": "ponti_di_radici",
-          "varco": {"luogo": "radice_del_mondo", "scostamento": [-14, 16], "interno": "valle_radura_altare", "aspetto": "ponte_radici"}
+          "varco": {"luogo": "radice_del_mondo", "scostamento": [-14, 16], "interno": "valle_radura_altare", "aspetto": "ponte_radici", "zona": "altare_di_radici"}
         },
         {
           "tipo": "fase_lunare",
           "valore": "piena",
           "area": "grotte_di_marea",
-          "varco": {"luogo": "grotte_di_marea", "scostamento": [-8, -6], "interno": "valle_grotta_di_marea", "aspetto": "grotta"}
+          "varco": {"luogo": "grotte_di_marea", "scostamento": [-8, -6], "interno": "valle_grotta_di_marea", "aspetto": "grotta", "zona": "grotta_di_marea"}
         }
       ],
       "palette_visiva": "mother"
@@ -114,7 +114,7 @@
           "tipo": "conoscenza",
           "valore": "testi_ordine_minore",
           "area": "ali_interne",
-          "varco": {"luogo": "scalinata_archivio", "scostamento": [-6, 3], "interno": "archivio_sala_dei_sigilli", "aspetto": "porta_glifi"}
+          "varco": {"luogo": "scalinata_archivio", "scostamento": [-6, 3], "interno": "archivio_sala_dei_sigilli", "aspetto": "porta_glifi", "zona": "sala_dei_sigilli"}
         }
       ],
       "palette_visiva": "hermit"
@@ -146,7 +146,7 @@
           "tipo": "primitiva",
           "primitiva": "teleport",
           "area": "isole_nebbia",
-          "varco": {"luogo": "approdo_frontiera", "scostamento": [0, 0], "interno": "frontiera_isola_nebbia", "aspetto": "soglia_nebbia"}
+          "varco": {"luogo": "approdo_frontiera", "scostamento": [0, 0], "interno": "frontiera_isola_nebbia", "aspetto": "soglia_nebbia", "zona": "nebbia_grigia"}
         }
       ],
       "palette_visiva": "fool"

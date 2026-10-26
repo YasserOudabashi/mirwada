@@ -31,6 +31,9 @@ const CALPESTABILI := [".", ",", "=", "+"]
 ## Impostato da chi istanzia questa scena (world_scene.gd) PRIMA di
 ## aggiungerla all'albero, cosi' _ready() lo trova gia' pronto.
 var interno_id: String = ""
+## US-8B21b: il contenuto della zona del layout dietro un varco (mondo.gd ospiti_del_varco),
+## impostato prima di aggiungere la stanza all'albero. {rect, nemici, oggetti}
+var ospiti: Dictionary = {}
 
 ## US-1108 (fase 11): l'npc_id vicino al giocatore ("" = nessuno) - stesso
 ## principio di world_scene.gd::_npc_vicino, per _unhandled_input.
@@ -55,6 +58,7 @@ func _ready() -> void:
 	_crea_nemici(layout)
 	_crea_oggetti(layout)
 	_crea_npc(layout)
+	_crea_ospiti(layout)
 
 
 func _dipingi(layout: Dictionary) -> void:
@@ -113,6 +117,50 @@ func _crea_arredi(layout: Dictionary) -> void:
 		if bool(voce.get("a_terra", false)):
 			spr.z_index = -1                          # i tappeti stanno sotto chi ci passa
 		add_child(spr)
+
+
+## Nemici e oggetti della zona dietro il varco alla stessa posizione relativa nella stanza,
+## sulla casella libera piu' vicina (mai sopra arredi, NPC, oggetti; i nemici non accanto
+## all'ingresso).
+func _crea_ospiti(layout: Dictionary) -> void:
+	if ospiti.is_empty():
+		return
+	var r: Array = ospiti.get("rect", [0, 0, 1, 1])
+	var mappa: Array = layout.get("mappa", [])
+	var w: int = str(mappa[0]).length()
+	var h: int = mappa.size()
+	var sp: Vector2i = _cella_spawn(layout)
+	var prese: Dictionary = {}
+	for k in ["npcs", "oggetti", "nemici"]:
+		for e in layout.get(k, []):
+			prese[Vector2i(int(e.get("x", 0)), int(e.get("y", 0)))] = true
+	var dentro: Dictionary = {"nemici": [], "oggetti": []}
+	for k in ["oggetti", "nemici"]:
+		for e in ospiti.get(k, []):
+			var u: float = (float(e.get("x", 0)) - float(r[0]) + 0.5) / maxf(float(r[2]), 1.0)
+			var v: float = (float(e.get("y", 0)) - float(r[1]) + 0.5) / maxf(float(r[3]), 1.0)
+			var c: Vector2i = _libera_vicina(Vector2i(1 + int(u * (w - 2)), 1 + int(v * (h - 2))), prese, sp,
+					2 if k == "nemici" else 0)
+			prese[c] = true
+			var spec: Dictionary = (e as Dictionary).duplicate(true)
+			spec["x"] = c.x
+			spec["y"] = c.y
+			(dentro[k] as Array).append(spec)
+	_crea_nemici(dentro)
+	_crea_oggetti(dentro)
+
+
+func _libera_vicina(c: Vector2i, prese: Dictionary, spawn: Vector2i, distanza_spawn: int) -> Vector2i:
+	var passi: Array = CALPESTABILI.map(func(ch): return _COLONNA_PER_CARATTERE[ch])
+	for raggio in range(0, 12):
+		for dy in range(-raggio, raggio + 1):
+			for dx in range(-raggio, raggio + 1):
+				var q := c + Vector2i(dx, dy)
+				if maxi(absi(dx), absi(dy)) == raggio and get_cell_source_id(q) >= 0 \
+						and get_cell_atlas_coords(q).x in passi and not prese.has(q) and q != spawn \
+						and maxi(absi(q.x - spawn.x), absi(q.y - spawn.y)) > distanza_spawn:
+					return q
+	return c
 
 
 func _cella_spawn(layout: Dictionary) -> Vector2i:

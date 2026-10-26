@@ -1256,6 +1256,9 @@ def main():
             ctx = f"data/world/regions.json [{reg.get('id')}] gating '{g.get('area')}'.varco"
             if v.get("interno") not in interni_ids:
                 err(f"{ctx}: interno '{v.get('interno')}' non esiste in data/world/interni/")
+            _lay = load_json(os.path.join(DATA, "world", "layouts", f"{reg.get('id')}.json")) or {}
+            if "zona" in v and v["zona"] not in _lay.get("zone", {}):
+                err(f"{ctx}: zona '{v['zona']}' non e' una zona di data/world/layouts/{reg.get('id')}.json")
             sc = v.get("scostamento", [0, 0])
             if not (isinstance(sc, list) and len(sc) == 2 and all(isinstance(n, int) for n in sc)):
                 err(f"{ctx}: scostamento deve essere [dx, dy] di interi")

@@ -404,9 +404,18 @@ func test_nemici_e_oggetti_dei_layout_stanno_nella_loro_regione() -> void:
 	m.call("popola")
 	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
 	var attesi := 0
+	var dietro: Dictionary = m.call("_zone_dei_varchi")         # US-8B21b: quelle stanno negli interni
+	var boss_dietro: Dictionary = {}
 	for reg in gd.call("get_regions"):
 		var lay: Dictionary = gd.call("get_layout", str(reg["id"]))
-		attesi += (lay.get("nemici", []) as Array).size() + (lay.get("oggetti", []) as Array).size()
+		var rects: Array = (dietro.get(str(reg["id"]), {}) as Dictionary).values()
+		for k in ["nemici", "oggetti"]:
+			for e in lay.get(k, []):
+				if m.call("_in_rect", e, rects):
+					if float((e as Dictionary).get("scala", 1.0)) > 1.0:
+						boss_dietro[str(reg["id"])] = true
+				else:
+					attesi += 1
 	var camp: Dictionary = gd.call("get_campagna")
 	attesi += (camp.get("nemici", []) as Array).size() + (camp.get("oggetti", []) as Array).size()
 	var trovati := 0
@@ -431,7 +440,8 @@ func test_nemici_e_oggetti_dei_layout_stanno_nella_loro_regione() -> void:
 	assert_eq(trovati, attesi, "tutti i nemici e gli oggetti dei layout sono nel mondo")
 	for reg in gd.call("get_regions"):
 		if not (gd.call("get_layout", str(reg["id"])) as Dictionary).is_empty():
-			assert_true(boss.has(str(reg["id"])), "%s ha il suo boss" % reg["id"])
+			assert_true(boss.has(str(reg["id"])) or boss_dietro.has(str(reg["id"])),
+					"%s ha il suo boss (all'aperto o dietro un varco)" % reg["id"])
 	m.free()
 
 
@@ -633,4 +643,36 @@ func test_un_varco_chiuso_non_fa_entrare_e_aperto_si() -> void:
 	m.call("esci")
 	assert_true(p.position.distance_to(varco.position) < 1.0, "e si torna davanti al varco")
 	ks.call("dimentica", "testi_ordine_minore")
+	main.free()
+
+
+# --- US-8B21b: il contenuto delle zone dietro i varchi sta negli interni ----------------
+
+func test_dentro_la_cripta_c_e_il_contenuto_della_sua_zona() -> void:
+	var main := Node2D.new()
+	var m: Node2D = _mondo()
+	main.add_child(m)
+	var p := CharacterBody2D.new()
+	p.add_to_group("player")
+	m.add_child(p)
+	Engine.get_main_loop().root.add_child(main)
+	for c in m.get_children():
+		if str(c.get_meta("regione_layout", "")) == "marche_crepuscolo" and c.get("char_id") == "acciaio_stellare":
+			assert_true(false, "l'oggetto della cripta non e' all'aperto")
+	var ws: Node = Engine.get_main_loop().root.get_node("WorldState")
+	ws.call("apri_gate", "marche_crepuscolo/cripte")
+	var varco: Area2D = m.get_node("Varco_cripte")
+	var ospiti: Dictionary = m.call("ospiti_del_varco", varco)
+	assert_eq((ospiti["oggetti"] as Array).size(), 1, "la zona della cripta ha il suo oggetto")
+	assert_true(m.call("entra", varco), "il varco aperto fa entrare")
+	var stanza: Node = p.get_parent()
+	var trovato := false
+	for c in stanza.get_children():
+		if c.get("char_id") == "acciaio_stellare":
+			trovato = true
+			var cella := Vector2i(int((c as Node2D).position.x / 32), int((c as Node2D).position.y / 32))
+			assert_eq((stanza as TileMapLayer).get_cell_atlas_coords(cella).x, 0, "sul pavimento della cripta")
+	assert_true(trovato, "dentro la cripta c'e' l'acciaio stellare")
+	m.call("esci")
+	ws.call("pulisci")
 	main.free()

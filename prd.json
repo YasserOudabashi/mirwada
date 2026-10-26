@@ -190,12 +190,25 @@
     },
     {
       "id": "US-8B21b",
-      "title": "Dentro le sotto-aree: contenuto e arte",
-      "description": "Il contenuto delle zone dei layout legate a un varco (nemici, oggetti) sta dentro il suo interno, non piu' all'aperto; stili nuovi degli interni (cripta, tempio, grotta con l'acqua, radura, nebbia) e arredi nuovi (sarcofago, altare, roccia, sigillo, cornice di porta).",
+      "title": "Il contenuto delle sotto-aree dentro i varchi",
+      "description": "Il contenuto delle zone dei layout legate a un varco (nemici, oggetti) sta dentro il suo interno, non piu' all'aperto, per regola (popola salta la zona, entra passa gli ospiti alla stanza).",
       "acceptanceCriteria": [
         "la zona di un varco nei dati del varco; popola() non la mette piu' sul mondo",
-        "gli interni delle sotto-aree con lo stile del loro luogo, guardati ingranditi nei due temi",
+        "dentro l'interno nemici e oggetti della zona alla stessa posizione relativa, su caselle libere",
         "prova a schermo; validate 0; bash tools/run_tests.sh esce 0"
+      ],
+      "priority": 12,
+      "fase": "8b",
+      "passes": true,
+      "notes": "regions.json gating[].varco.zona; mondo.gd _zone_dei_varchi/ospiti_del_varco; interior_scene.gd _crea_ospiti. Il boss delle Marche e' nel tempio. arte/revisione/varchi_contenuto.png."
+    },
+    {
+      "id": "US-8B21c",
+      "title": "Arte delle sotto-aree",
+      "description": "Gli interni delle sotto-aree hanno stili provvisori: stili nuovi (cripta, tempio dei giganti, grotta con l'acqua, radura con le radici, isola di nebbia) e arredi nuovi (sarcofago, altare, roccia, sigillo, cornice di porta).",
+      "acceptanceCriteria": [
+        "stili e arredi generati da build_interni.py, guardati ingranditi nei due temi",
+        "prova a schermo dei sei interni; validate 0; bash tools/run_tests.sh esce 0"
       ],
       "priority": 12,
       "fase": "8b",

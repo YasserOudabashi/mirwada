@@ -355,7 +355,8 @@ func popola() -> void:
 ## vietate: caselle dove non mettere nemici (attorno alla partenza); vi si aggiunge
 ## ogni casella occupata, cosi' resta l'insieme da evitare per i nemici.
 func _popola_da(rid_eventi: String, rid: String, layout: Dictionary, occupate: Dictionary, vietate: Dictionary) -> void:
-	var nemici: Array = layout.get("nemici", [])
+	var dietro: Array = (_zone_dei_varchi().get(rid, {}) as Dictionary).values()   # quelle stanno negli interni
+	var nemici: Array = (layout.get("nemici", []) as Array).filter(func(n): return not _in_rect(n, dietro))
 	var drop: Dictionary = layout.get("drop", {})
 	_nemici_vivi[rid_eventi] = nemici.size()
 	_senza_abilita[rid_eventi] = true
@@ -382,6 +383,8 @@ func _popola_da(rid_eventi: String, rid: String, layout: Dictionary, occupate: D
 		e.connect("morto", _su_nemico_morto.bind(rid_eventi))
 	for o in layout.get("oggetti", []):
 		var spec_o: Dictionary = o
+		if _in_rect(spec_o, dietro):
+			continue
 		var posto_o: Dictionary = posto_dal_layout(rid, layout, int(spec_o.get("x", 0)), int(spec_o.get("y", 0)), occupate)
 		var c_o: Vector2i = posto_o["cella"]
 		occupate[c_o] = true
@@ -604,6 +607,8 @@ func entra(porta: Area2D) -> bool:
 		return false
 	var interno: Node = load("res://scenes/interior_scene.tscn").instantiate()
 	interno.set("interno_id", str(porta.get_meta("interno_id")))
+	if porta.has_meta("gate"):
+		interno.set("ospiti", ospiti_del_varco(porta))
 	_ritorno = porta.position
 	_porta_vicina = null
 	(porta.get_node("Prompt") as CanvasItem).visible = false
@@ -748,6 +753,58 @@ func _in_una_casa(x: int, y: int) -> bool:
 
 
 ## Un luogo della mappa (mondo.json luoghi) o un punto del sottosuolo (sottosuolo.boss).
+## Le zone dei layout dietro un varco (gating[].varco.zona, US-8B21b): il loro contenuto
+## non sta all'aperto ma nell'interno del varco. -> {rid: {zona: Rect2i}}
+func _zone_dei_varchi() -> Dictionary:
+	var out: Dictionary = {}
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	if gd == null:
+		return out
+	for reg in gd.call("get_regions"):
+		var rid: String = str((reg as Dictionary).get("id", ""))
+		var zone: Dictionary = (gd.call("get_layout", rid) as Dictionary).get("zone", {})
+		for g in (reg as Dictionary).get("gating", []):
+			var z: String = str(((g as Dictionary).get("varco", {}) as Dictionary).get("zona", ""))
+			var r: Array = zone.get(z, [])
+			if r.size() == 4:
+				if not out.has(rid):
+					out[rid] = {}
+				out[rid][z] = Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3]))
+	return out
+
+
+func _in_rect(spec: Dictionary, rects: Array) -> bool:
+	var c := Vector2i(int(spec.get("x", 0)), int(spec.get("y", 0)))
+	for r in rects:
+		if (r as Rect2i).has_point(c):
+			return true
+	return false
+
+
+## Nemici (con il drop del layout) e oggetti della zona dietro il varco, per l'interno
+## (interior_scene.gd ospiti): {rect: [x, y, w, h], nemici, oggetti}; {} senza zona.
+func ospiti_del_varco(porta: Area2D) -> Dictionary:
+	var rid: String = str(porta.get_meta("regione", ""))
+	var z: String = str(((porta.get_meta("gate", {}) as Dictionary).get("varco", {}) as Dictionary).get("zona", ""))
+	var r: Variant = (_zone_dei_varchi().get(rid, {}) as Dictionary).get(z)
+	if r == null:
+		return {}
+	var layout: Dictionary = Engine.get_main_loop().root.get_node("GameData").call("get_layout", rid)
+	var drop: Dictionary = layout.get("drop", {})
+	var nemici: Array = []
+	for n in (layout.get("nemici", []) as Array).filter(func(e): return _in_rect(e, [r])):
+		var spec: Dictionary = (n as Dictionary).duplicate(true)
+		var seq: String = str(int(spec.get("sequenza", 9)))
+		if drop.has(seq):
+			var ov: Dictionary = spec.get("override", {})
+			ov["oggetti_a_morte"] = drop[seq]
+			spec["override"] = ov
+		nemici.append(spec)
+	var rect: Rect2i = r
+	return {"rect": [rect.position.x, rect.position.y, rect.size.x, rect.size.y], "nemici": nemici,
+			"oggetti": (layout.get("oggetti", []) as Array).filter(func(e): return _in_rect(e, [r]))}
+
+
 func _luogo_varco(nome: String) -> Vector2i:
 	var p: Array = (dati.get("luoghi", {}) as Dictionary).get(nome, ((dati.get("sottosuolo", {}) as Dictionary).get("boss", {}) as Dictionary).get(nome, []))
 	return Vector2i(int(p[0]), int(p[1])) if p.size() == 2 else Vector2i(-1, -1)

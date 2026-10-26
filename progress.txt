@@ -14319,3 +14319,17 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   (arte/revisione/varchi_in_gioco.png). validate 0, 992 test.
 - Aperto: il contenuto delle zone legate ai varchi e' ancora all'aperto, gli interni delle sotto-aree hanno stili
   provvisori (US-8B21b). Il gate di sequenza della Frontiera (area "ingresso") resta sull'ingresso della regione.
+
+## US-8B21b — il contenuto delle sotto-aree dentro i varchi, 2026-10-26
+- regions.json gating[].varco.zona: la zona del layout dietro il varco (cripta, tempio_abbandonato,
+  altare_di_radici, grotta_di_marea, sala_dei_sigilli, nebbia_grigia). Validator: la zona esiste nel layout.
+- Per regola, mai a mano (i layout restano la fonte): mondo.gd popola() non mette all'aperto nemici e oggetti di
+  quelle zone (_zone_dei_varchi); entra() passa alla stanza ospiti_del_varco() (nemici con il drop del layout,
+  oggetti, il rettangolo della zona); interior_scene.gd _crea_ospiti() li mette alla stessa posizione relativa
+  nella stanza, sulla casella libera piu' vicina (mai su arredi, NPC, oggetti; nemici ad almeno 3 caselle
+  dall'ingresso). Il boss delle Marche ora sta nel tempio dei giganti, dietro i passaggi d'ombra.
+- Verifica: test_mondo aggiornato (contenuto dei layout all'aperto meno le zone dei varchi; il boss di una regione
+  all'aperto o dietro un varco) e 1 test nuovo (l'acciaio stellare della cripta non e' all'aperto, entrando nella
+  cripta c'e' e sta sul pavimento). Prova a schermo dei sei interni con il loro contenuto
+  (arte/revisione/varchi_contenuto.png). validate 0, 993 test.
+- Aperto: nelle stanze piccole i nemici arrivano subito addosso; l'arte delle sotto-aree e' provvisoria (US-8B21c).
