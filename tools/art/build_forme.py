@@ -28,6 +28,8 @@ FORMS = os.path.join(BP.ROOT, "data", "forms.json")
 # la testa piu' piccola rispetto al corpo, cosi' si legge come un gigante e non come Enel ingrandito.
 FORME = {
     "gigante": (lambda: BP.enel(build=1.18, head=0.74), 1.22 * 1.5, 96),
+    # l'arma di luce: lo stesso Enel con la lama fatta di luce dorata (si vede in ogni animazione, anche da ferma)
+    "arma_luce": (lambda: BP.enel(lama="glow_yellow"), 1.22, 64),
 }
 
 

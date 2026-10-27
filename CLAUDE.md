@@ -366,14 +366,14 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   icone degli oggetti a terra e nello zaino (US-8B70), icone degli status sopra la testa (US-8B71),
   glifi delle primitive nella hotbar (US-8B72), VFX degli attacchi base (US-8B40) e di tutte le primitive
   (US-8B41..43), feedback del colpo (US-8B40b), ritratti nel dialogo (US-8B35a/b), le pagine del libro sulle due
-  facciate (US-8B73b/c/d), la forma gigante di Enel (US-8B50a/b), panorama dell'avvio (US-8B74).
+  facciate (US-8B73b/c/d), le forme di Enel, gigante e arma di luce (US-8B50a/b/c), panorama dell'avvio (US-8B74).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
 **Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): restano
-dal PRD dell'arte l'arma di luce (seconda forma), le creature (evocazioni e antagonisti: aspettano di avere una
-figura nel mondo) e le animazioni nuove di Enel (blocchi E/G).
+dal PRD dell'arte le creature (evocazioni e antagonisti: aspettano di avere una figura nel mondo) e le animazioni
+nuove di Enel (blocchi E/G).
 
 ## Decisioni prese
 

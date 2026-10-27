@@ -16,16 +16,20 @@ func _cella(m: AnimatedSprite2D) -> Vector2:
 
 func test_le_forme_con_aspetto_hanno_tutti_i_fogli() -> void:
 	var gd: Node = _root().get_node("GameData")
-	var forma: Dictionary = gd.call("get_form", "tg_forma_gigante")
-	var aspetto: String = str(forma.get("aspetto", ""))
-	assert_false(aspetto.is_empty(), "la forma gigante ha il suo aspetto nei dati")
-	for nome in gd.call("animation_names", "personaggio"):
-		var path := "res://assets/placeholder/personaggio_%s_%s.png" % [aspetto, nome]
-		var img := Image.load_from_file(ProjectSettings.globalize_path(path))
-		assert_true(img != null and not img.is_empty(), "%s c'e'" % path)
-		if img != null and not img.is_empty():
-			var frames: int = int((gd.call("get_animation", "personaggio", nome) as Dictionary).get("frames", 1))
-			assert_eq(img.get_width() % frames, 0, "%s: %d frame in colonne" % [nome, frames])
+	var con_aspetto := 0
+	for fid in (gd.get("_forms") as Dictionary).get("forms", {}):
+		var aspetto: String = str((gd.call("get_form", fid) as Dictionary).get("aspetto", ""))
+		if aspetto.is_empty():
+			continue
+		con_aspetto += 1
+		for nome in gd.call("animation_names", "personaggio"):
+			var path := "res://assets/placeholder/personaggio_%s_%s.png" % [aspetto, nome]
+			var img := Image.load_from_file(ProjectSettings.globalize_path(path))
+			assert_true(img != null and not img.is_empty(), "%s c'e'" % path)
+			if img != null and not img.is_empty():
+				var frames: int = int((gd.call("get_animation", "personaggio", nome) as Dictionary).get("frames", 1))
+				assert_eq(img.get_width() % frames, 0, "%s: %d frame in colonne" % [nome, frames])
+	assert_eq(con_aspetto, 2, "il gigante e l'arma di luce")
 
 
 func test_la_cella_si_legge_dal_foglio_e_la_grana_resta_quella() -> void:

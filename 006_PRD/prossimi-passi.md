@@ -60,7 +60,8 @@ le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti 
    destra, diagramma con la griglia girata); un test controlla che nessuna facciata chieda piu' spazio di quello che ha.
    E **US-8B50a/b la forma gigante**: Enel una volta e mezza (celle 96, `tools/art/build_forme.py`) quando la
    transform ha una forma con aspetto; torna Enel quando il modificatore finisce.
-4. **Prossime**: l'arma di luce (seconda forma, sovrapposta agli attacchi), animazioni nuove di Enel (blocco G).
+   E **US-8B50c l'arma di luce**: la seconda forma, Enel con la lama di luce dorata.
+4. **Prossime**: animazioni nuove di Enel (blocco G: prima le voci in animations.json, scelte di design).
    Evocazioni e antagonisti (blocco E) aspettano di avere una figura nel mondo (oggi summon scrive solo nel registro).
 5. Fase 12 (PRD `prd-fase-12-atto-2-3.md`, `prd-fase-12-mondo-vivo.md`).
 

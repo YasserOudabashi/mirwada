@@ -34,10 +34,11 @@ OUT = os.path.join(ROOT, "arte", "sprite")
 
 
 # --- Enel -------------------------------------------------------------------------------------------------------
-def enel(**volto):
+def enel(lama="steel", **volto):
     """Cappotto lungo quasi nero aperto davanti (si vedono le gambe), coppola, occhi freddi che brillano, crepa
     luminosa sul viso, sciarpa rossa che dietro pende sulla schiena, bende sugli avambracci, spadone.
-    `volto`: il dettaglio dei ritratti (build_ritratti.py), ad esempio detail=3 e l'espressione."""
+    `volto`: il dettaglio dei ritratti (build_ritratti.py), ad esempio detail=3 e l'espressione. `lama`: il materiale
+    della lama (la forma con l'arma di luce, build_forme.py)."""
     kw = dict(skin="skin_enel", hair="hair_black", hair_style="short", outfit="tunic", top="coat_enel",
               bottom="trou_enel", boots="leather_dark", belt="leather_dark", hat="cap", weapon=None,
               eyes="eye_cyan", scarf="cloth_red", head=0.86, detail=2, name="enel")
@@ -48,8 +49,8 @@ def enel(**volto):
     r.group("weapon", [P("cylinder", (0.85, 0.85, 2.2), (0, 0, 1.0), "leather"),
                        P("ellipsoid", (1.2, 1.2, 1.0), (0, 0, -1.4), "gold"),
                        P("box", (3.4, 1.0, 0.65), (0, 0, 3.2), "gold", soft=0.6),
-                       P("box", (1.6, 0.5, 6.5), (0, 0, 10.2), "steel", soft=0.5),
-                       P("cone", (1.6, 0.5, 1.6), (0, 0, 18.3), "steel")], pos=(0, 0.2, -0.3), rot=(-90, 0, 0))
+                       P("box", (1.6, 0.5, 6.5), (0, 0, 10.2), lama, soft=0.5),
+                       P("cone", (1.6, 0.5, 1.6), (0, 0, 18.3), lama)], pos=(0, 0.2, -0.3), rot=(-90, 0, 0))
     for sx in (-1, 1):                                            # falde del cappotto, dietro e ai lati
         r.part("hips", "ellipsoid", (2.6, 1.6, 6.2), (sx * 3.0, -1.4, -4.6), mat="coat_enel", rot=(6, 0, sx * -4))
     r.part("hips", "ellipsoid", (3.6, 1.2, 6.4), (0, -2.4, -4.4), mat="coat_enel", rot=(8, 0, 0))

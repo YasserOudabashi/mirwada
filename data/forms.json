@@ -13,6 +13,7 @@
       }
     },
     "tg_arma_luce": {
+      "aspetto": "arma_luce",
       "name_i18n": "form.twilight_giant.tg_arma_luce",
       "descrizione_i18n": "form.twilight_giant.tg_arma_luce.desc",
       "stat_modifiers": {

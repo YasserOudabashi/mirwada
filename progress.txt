@@ -14682,3 +14682,13 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   pesante da gigante, annullata la trasformazione torna Enel: arte/revisione/forma_gigante_in_gioco.png.
 - Aperto: tg_arma_luce (forma sovrapposta agli attacchi: un'arma di luce, non un corpo nuovo) e il suono/effetto del
   passaggio di forma (oggi il cambio e' secco).
+
+## US-8B50c — Forma con l'arma di luce, 2026-10-27
+- "Sovrapposta agli attacchi" del PRD: la forma non cambia il corpo ma l'arma. build_personaggi.enel(lama=...) sceglie
+  il materiale della lama (default steel: rigenerati i 10 fogli di Enel, md5 identico); build_forme.py arma_luce =
+  enel(lama="glow_yellow") a celle 64. forms.json tg_arma_luce "aspetto": "arma_luce"; il gioco la mette e la toglie
+  come il gigante (US-8B50b), senza codice nuovo.
+- Comando: python tools/art/build_forme.py (rigenera anche il gigante, md5 uguale). Guardata a 2x su fondo chiaro e
+  scuro (idle e attacco pesante, giu' e destra) e nel mondo (arte/revisione/forma_arma_luce_in_gioco.png).
+- Non mi convince del tutto: sul marmo bianco di Mirwada il cuore bianco della lama si confonde col pavimento (si vede
+  il bordo dorato); su erba e pietra scura si legge benissimo.

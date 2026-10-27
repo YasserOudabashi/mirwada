@@ -418,6 +418,20 @@
       "notes": "2026-10-27: StatsComponent.imposta_forma(mod_id, aspetto) + segnale forma_cambiata: la forma e' legata al suo modificatore e finisce in remove_modifier (copre scadenza, annulla_transform, flush, fine spiritualita'). AbilityEngine._p_transform la imposta se la forma ha un aspetto. Player._su_forma riconfigura l'AnimationMachine con l'aspetto e rimette lo stato; nome e icone salgono di alto_in_piu. tests/test_forme.gd (3). A schermo: arte/revisione/forma_gigante_in_gioco.png (prima, gigante, attacco pesante, di nuovo Enel)."
     },
     {
+      "id": "US-8B50c",
+      "title": "Forma con l'arma di luce",
+      "description": "La seconda forma (tg_arma_luce): Enel con la lama di luce dorata in ogni animazione, aspetto 'arma_luce'.",
+      "acceptanceCriteria": [
+        "fogli da build_forme.py, stessa cella di Enel",
+        "Enel senza forma resta identico",
+        "verifica a schermo"
+      ],
+      "priority": 26,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: build_personaggi.enel(lama=...) (default steel: i fogli di Enel restano identici, md5 uguale); build_forme.py arma_luce = enel(lama='glow_yellow'), celle 64. forms.json tg_arma_luce aspetto 'arma_luce'. test_forme: ogni forma con aspetto ha tutti i fogli (2). A schermo: arte/revisione/forma_arma_luce_in_gioco.png; fogli: forma_arma_luce.png."
+    },
+    {
       "id": "US-8B41",
       "title": "VFX delle primitive, gruppo 1",
       "description": "buff_stat, summon, aura, heal, reveal_info, teleport, debuff_stat, illusion (le 8 piu' usate dalle abilita'): fogli a 4 toni colorati dalla rampa del Pathway, attorno a chi lancia.",
