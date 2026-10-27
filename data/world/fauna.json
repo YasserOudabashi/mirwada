@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "_comment": "US-8B23b: fauna d'atmosfera (non nemici ne' pet). Quando il mondo costruisce un blocco di superficie (16x16 caselle), per ogni specie si tira 'probabilita'' (seme = posizione del blocco: tornando, gli stessi animali); se esce, un gruppo da gruppo[0] a gruppo[1] su caselle libere vicine, solo nelle 'regioni' elencate e nei 'momenti' del giorno elencati (data/schema/time.json). fugge: 'vola' (si alza e va via verso nord svanendo), 'corre' (scappa a terra, gira davanti ai muri), 'resta' (non scappa: le lucciole ondeggiano sul posto). raggio_fuga in caselle, velocita' in unita' al secondo, svanisce in secondi. gira: false = sempre la riga 'down' del foglio (svolazzano senza una direzione). luce: true = si disegna in modo additivo (si somma a cio' che ha sotto: brilla anche sull'erba chiara). Disegni: fauna_<specie>_<idle|fuga>.png (tools/art/build_fauna.py).",
+  "specie": {
+    "uccello": {
+      "regioni": ["mirwada", "valle_madre", "terra_di_mezzo", "archivio_sepolto", "isola_tropicale", "isola_rovine"],
+      "momenti": ["alba", "mezzogiorno", "crepuscolo"],
+      "probabilita": 0.3, "gruppo": [2, 5],
+      "fugge": "vola", "raggio_fuga": 3, "velocita": 110, "svanisce": 1.6, "gira": true
+    },
+    "farfalla": {
+      "regioni": ["valle_madre", "terra_di_mezzo", "isola_tropicale"],
+      "momenti": ["alba", "mezzogiorno"],
+      "probabilita": 0.25, "gruppo": [1, 3],
+      "fugge": "vola", "raggio_fuga": 2, "velocita": 45, "svanisce": 2.2, "gira": false
+    },
+    "cervo": {
+      "regioni": ["valle_madre", "terra_di_mezzo"],
+      "momenti": ["alba", "mezzogiorno", "crepuscolo"],
+      "probabilita": 0.08, "gruppo": [1, 3],
+      "fugge": "corre", "raggio_fuga": 5, "velocita": 150, "svanisce": 2.4, "gira": true
+    },
+    "lepre": {
+      "regioni": ["valle_madre", "terra_di_mezzo", "archivio_sepolto"],
+      "momenti": ["alba", "mezzogiorno", "crepuscolo"],
+      "probabilita": 0.12, "gruppo": [1, 2],
+      "fugge": "corre", "raggio_fuga": 4, "velocita": 170, "svanisce": 1.8, "gira": true
+    },
+    "lucciola": {
+      "regioni": ["valle_madre", "terra_di_mezzo"],
+      "momenti": ["crepuscolo", "notte_fonda"],
+      "probabilita": 0.45, "gruppo": [2, 4],
+      "fugge": "resta", "raggio_fuga": 0, "velocita": 0, "svanisce": 1.0, "gira": false, "luce": true
+    }
+  }
+}

@@ -14791,3 +14791,23 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - Controlli: nessun pixel sul bordo delle celle, alpha 0/255, colori Endesga 32; rilanciato = stessi md5.
 - tests/test_fauna.gd (cella dal foglio, stessa scala dei personaggi). 1051 test, validate 0. arte/revisione/fauna.png.
 - US-8B23b: dove stanno e come scappano (data/world/fauna.json) e il gioco che li posa.
+
+## US-8B23b — Fauna d'atmosfera nel gioco, 2026-10-27
+- data/world/fauna.json: per specie regioni, momenti (time.json), probabilita' per blocco, gruppo, fugge (vola, corre,
+  resta), raggio_fuga in caselle, velocita', svanisce, gira, luce. GameData.get_fauna().
+- scripts/world/fauna.gd, figlio del mondo (mondo.gd: segnali blocco_costruito / blocco_scaricato). Seme = posizione
+  del blocco: tornando, gli stessi animali negli stessi posti. Chi si avvicina li fa scappare; chi vola va via verso
+  nord svanendo, chi corre gira davanti a muri e acqua. Al cambio di momento quelli fuori momento svaniscono e
+  arrivano le specie nuove (lucciole al crepuscolo).
+- Trovati a schermo:
+  - nella Valle (bosco fitto) gli animali stavano sotto le chiome e non si vedevano: _coperto() guarda il disegno degli
+    oggetti di scena piu' a sud e scarta i posti coperti;
+  - un cervo di fronte e' una sagoma stretta: a riposo stanno di profilo;
+  - le lucciole di 3 pixel sparivano tra i fiorellini gialli dell'erba: disegno additivo (luce: true) e picco a 7 pixel;
+  - i 2 "cervi in citta'" del test erano in campagna dentro il riquadro di Mirwada: test corretto, e ora la regione
+    si controlla per ogni animale del gruppo, non solo al centro.
+- Il passero piu' grande non entra: in volo le ali escono dalla cella da 32 (una cella da 40/48 avrebbe i piedi a
+  mezzo pixel). Resta a 2.0.
+- Aperto (decisione dell'utente): il mondo non si scurisce di notte; con il buio le lucciole brilleranno davvero.
+- tests/test_fauna.gd (+3). 1054 test, validate 0. arte/revisione/fauna_in_gioco.png (passeri prima/dopo, cervo in
+  fuga nel bosco, lucciole), arte/revisione/fauna.png rigenerata.

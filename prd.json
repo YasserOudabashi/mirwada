@@ -603,8 +603,8 @@
       ],
       "priority": 35,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-27: data/world/fauna.json (regioni, momenti, probabilita' per blocco, gruppo, fugge vola/corre/resta, raggio, velocita', svanisce, gira, luce). scripts/world/fauna.gd figlio del mondo: mondo.gd emette blocco_costruito/blocco_scaricato; seme = posizione del blocco (tornando, stessi animali); la regione si controlla per ogni animale; niente animali sotto una chioma (_coperto legge il disegno degli oggetti di scena che stanno davanti: nella Valle fitta erano tutti invisibili); a riposo di profilo (di fronte un cervo e' una sagoma stretta). Fuga: vola = via e verso nord svanendo, corre = a terra girando davanti a muri e acqua; comparsa in 0.6 s; al cambio di momento chi non e' del momento sale e svanisce, arrivano le specie nuove (lucciole al crepuscolo). Lucciole additive (luce: true) e piu' grandi al picco: sull'erba piena di fiorellini gialli non si distinguevano. Validator: fogli, regioni del mondo, momenti di time.json, numeri. 3 test. arte/revisione/fauna_in_gioco.png. Aperto: il mondo non si scurisce di notte (decisione dell'utente): le lucciole brilleranno davvero quando ci sara' il buio."
     }
   ]
 }

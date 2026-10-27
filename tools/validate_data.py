@@ -1890,6 +1890,38 @@ def main():
         if _a not in vocab_arredi:
             err(f"data/world/arredi.json: manca '{_a}', il disegno dei forzieri (US-8B22)")
 
+    # --- fauna d'atmosfera (US-8B23b) ---
+    # data/world/fauna.json: ogni specie ha i suoi fogli (assets/placeholder/fauna_<specie>_<animazione>.png per ogni
+    # animazione della categoria fauna), regioni del mondo generato, momenti di data/schema/time.json, numeri sensati.
+    _fau_rel = "data/world/fauna.json"
+    _fau = (load_json(os.path.join(DATA, "world", "fauna.json")) or {}).get("specie", {})
+    _anim_fauna = [k for k in ((load_json(os.path.join(DATA, "animations.json")) or {}).get("fauna", {}))
+                   if not k.startswith("_")]
+    _momenti_t = set((load_json(os.path.join(DATA, "schema", "time.json")) or {}).get("momenti", []))
+    _regioni_mondo = set((load_json(_mondo) or {}).get("regioni", [])) if os.path.isfile(_mondo) else None
+    if not _fau:
+        err(f"{_fau_rel}: 'specie' deve essere un dict non vuoto")
+    for _sid, _s in _fau.items():
+        _ctx = f"{_fau_rel} [{_sid}]"
+        for _a in _anim_fauna:
+            if not os.path.isfile(os.path.join(ROOT, "assets", "placeholder", f"fauna_{_sid}_{_a}.png")):
+                err(f"{_ctx}: manca assets/placeholder/fauna_{_sid}_{_a}.png (tools/art/build_fauna.py)")
+        if _regioni_mondo is not None:
+            for _r in _s.get("regioni", []):
+                if _r not in _regioni_mondo:
+                    err(f"{_ctx}: regione '{_r}' non e' nel mondo generato (mondo.json regioni)")
+        for _m in _s.get("momenti", []):
+            if _m not in _momenti_t:
+                err(f"{_ctx}: momento '{_m}' non e' in data/schema/time.json")
+        if _s.get("fugge") not in ("vola", "corre", "resta"):
+            err(f"{_ctx}: fugge deve essere vola, corre o resta")
+        _pr = _s.get("probabilita")
+        if not (isinstance(_pr, (int, float)) and 0 < _pr <= 1):
+            err(f"{_ctx}: probabilita deve essere in (0, 1]")
+        _g = _s.get("gruppo")
+        if not (isinstance(_g, list) and len(_g) == 2 and all(isinstance(n, int) for n in _g) and 1 <= _g[0] <= _g[1]):
+            err(f"{_ctx}: gruppo deve essere [min, max] con 1 <= min <= max")
+
     # --- ingredienti delle formule (US-808) ---
     # Ogni ingrediente citato da una formula di potion (tutte quelle in
     # data/potions/formulas.json appartengono ai 10 Pathway attivi: il file

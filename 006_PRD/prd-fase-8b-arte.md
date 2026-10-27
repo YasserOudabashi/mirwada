@@ -239,7 +239,8 @@ grandi che pascolano e scappano, lucciole di notte (VFX). Non sono nemici né
 pet: niente combattimento, solo un comportamento "fuggi dal giocatore" letto
 dai dati. Story di codice + arte: spiegarla prima. *Domande (M).*
 *Fatta la US-8B23a (2026-10-27):* cervo, lepre, uccello, farfalla e lucciole (`tools/art/build_fauna.py`, categoria
-`fauna`). Resta la **8B23b**: dove stanno e come scappano, nel gioco.
+`fauna`). Fatta la **8B23b**: `data/world/fauna.json` e `scripts/world/fauna.gd` (posati nei blocchi attorno al giocatore,
+scappano quando si avvicina). Aperto: il mondo non si scurisce di notte, le lucciole brillano poco.
 
 **US-8B24 [C+A] Cannocchiale.** Richiesta per la Frontiera: un cannocchiale fisso
 in cima al faro di Mirwada (il primo) e più avanti uno da tasca. Usandolo la

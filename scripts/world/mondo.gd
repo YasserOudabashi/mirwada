@@ -65,6 +65,9 @@ var _interno: Node = null                   # l'interno caricato (US-8B18b), nul
 var _ritorno := Vector2.ZERO                # dove si torna uscendo
 
 signal livello_cambiato(nuovo: String)
+## US-8B23b: un blocco attorno al giocatore e' stato costruito / tolto (la fauna ci mette e ci toglie gli animali).
+signal blocco_costruito(b: Vector2i)
+signal blocco_scaricato(b: Vector2i)
 
 
 func _ready() -> void:
@@ -86,6 +89,7 @@ func _ready() -> void:
 	crea_varchi()
 	crea_barca()
 	crea_forzieri()
+	add_child(preload("res://scripts/world/fauna.gd").new())
 	var t := Timer.new()
 	t.wait_time = INTERVALLO_ATTIVITA
 	t.autostart = true
@@ -1565,6 +1569,7 @@ func _costruisci(b: Vector2i) -> void:
 		add_child(s)
 		sprite.append(s)
 	_caricati[b] = sprite
+	blocco_costruito.emit(b)
 
 
 func _nello_spiazzo(c: Vector2i) -> bool:
@@ -1582,6 +1587,7 @@ func _scarica(b: Vector2i) -> void:
 	for s in _caricati[b]:
 		(s as Node).queue_free()
 	_caricati.erase(b)
+	blocco_scaricato.emit(b)
 
 
 func _texture_oggetto(chiave: String) -> Texture2D:

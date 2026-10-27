@@ -65,6 +65,7 @@ const PATH_CAMPAGNA := "res://data/world/campagna.json"
 const PATH_ARREDI := "res://data/world/arredi.json"
 const PATH_MEZZI := "res://data/world/mezzi.json"
 const PATH_BOTTINO := "res://data/world/bottino.json"
+const PATH_FAUNA := "res://data/world/fauna.json"
 const PATH_ICONE := "res://data/ui/icone.json"
 const PATH_ROSTER := "res://data/npc/roster.json"
 const PATH_FACTIONS := "res://data/factions.json"
@@ -131,6 +132,7 @@ var _campagna: Dictionary = {}
 var _arredi: Dictionary = {}
 var _mezzi: Dictionary = {}
 var _bottino: Dictionary = {}
+var _fauna: Dictionary = {}
 var _icone: Dictionary = {}
 var _icone_tex: Dictionary = {}
 var _roster: Dictionary = {}
@@ -228,6 +230,7 @@ func load_all() -> void:
 	_load_single(PATH_ARREDI, "arredi", _arredi, TYPE_DICTIONARY)
 	_load_single(PATH_MEZZI, "barca", _mezzi, TYPE_DICTIONARY)
 	_load_single(PATH_BOTTINO, "tabelle", _bottino, TYPE_DICTIONARY)
+	_load_single(PATH_FAUNA, "specie", _fauna, TYPE_DICTIONARY)
 	_load_single(PATH_ICONE, "oggetti", _icone, TYPE_DICTIONARY)
 	_icone_tex.clear()
 	_load_single(PATH_ROSTER, "npcs", _roster, TYPE_ARRAY)
@@ -698,6 +701,11 @@ func get_arredo(id: String) -> Dictionary:
 func get_tabella_bottino(id: String) -> Dictionary:
 	var t: Variant = (_bottino.get("tabelle", {}) as Dictionary).get(id)
 	return t if typeof(t) == TYPE_DICTIONARY else {}
+
+
+## US-8B23b: le specie della fauna d'atmosfera {id: {regioni, momenti, probabilita, gruppo, fugge, ...}}.
+func get_fauna() -> Dictionary:
+	return _fauna.get("specie", {}) as Dictionary
 
 
 ## US-8B22b: i forzieri del sottosuolo del mondo [{id, vicino, tabella}] (data/world/bottino.json).

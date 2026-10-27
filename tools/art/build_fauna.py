@@ -193,9 +193,21 @@ def farfalla_fuga(n=6):
 
 
 # --- lucciola: punti di luce che pulsano (non un modello 3D) -----------------------------------------------------
-GIALLO, VERDE, VERDE_SCURO = (E32["yellow"], E32["green"], E32["green_m"])
-PUNTI = [(9, 10, 0), (21, 6, 1), (15, 17, 2)]          # (x, y, fase): tre lucciole sfasate in una cella di 32
-LUCE = [0, 1, 2, 1, 0, 0]                              # 0 spenta (un puntino verde scuro), 1 accesa, 2 piena
+# Piu' grandi dei fiorellini dell'erba (gialli e bianchi, un pixel): cuore crema, luce gialla, alone verde.
+CREMA, GIALLO, VERDE, VERDE_SCURO = (E32["cream"], E32["yellow"], E32["green"], E32["green_m"])
+PUNTI = [(9, 9, 0), (22, 7, 2), (15, 17, 4)]           # (x, y, fase): tre lucciole sfasate in una cella di 32
+LUCE = [0, 1, 2, 3, 2, 1]                               # 0 spenta (puntino verde scuro) ... 3 piena col suo alone
+FORME = {
+    1: [((0, 0), GIALLO), ((1, 0), VERDE), ((-1, 0), VERDE), ((0, 1), VERDE), ((0, -1), VERDE)],
+    2: [((0, 0), CREMA), ((1, 0), GIALLO), ((-1, 0), GIALLO), ((0, 1), GIALLO), ((0, -1), GIALLO),
+        ((1, 1), VERDE), ((-1, 1), VERDE), ((1, -1), VERDE), ((-1, -1), VERDE)],
+    3: [((0, 0), CREMA), ((1, 0), CREMA), ((-1, 0), CREMA), ((0, 1), CREMA), ((0, -1), CREMA),
+        ((1, 1), GIALLO), ((-1, 1), GIALLO), ((1, -1), GIALLO), ((-1, -1), GIALLO),
+        ((2, 0), GIALLO), ((-2, 0), GIALLO), ((0, 2), GIALLO), ((0, -2), GIALLO),
+        ((3, 0), VERDE), ((-3, 0), VERDE), ((0, 3), VERDE), ((0, -3), VERDE),
+        ((2, 1), VERDE), ((-2, 1), VERDE), ((2, -1), VERDE), ((-2, -1), VERDE),
+        ((1, 2), VERDE), ((-1, 2), VERDE), ((1, -2), VERDE), ((-1, -2), VERDE)],
+}
 
 
 def _hex(c):
@@ -206,14 +218,12 @@ def lucciole(frames, righe=4, cella=32):
     img = np.zeros((cella * righe, cella * frames, 4), np.uint8)
     for f in range(frames):
         for x, y, fase in PUNTI:
-            livello = LUCE[(f * 2 + fase * 2) % len(LUCE)]
+            livello = LUCE[(f + fase) % len(LUCE)]
             dx, dy = (f + fase) % 2, -((f + fase) // 2 % 2)          # una deriva di un pixel
+            forma = FORME.get(livello, [((0, 0), VERDE_SCURO)])
             for r in range(righe):
-                cx, cy = f * cella + x + dx, r * cella + y + dy
-                img[cy, cx] = _hex(VERDE_SCURO if livello == 0 else GIALLO)
-                if livello >= 1:
-                    for ox, oy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                        img[cy + oy, cx + ox] = _hex(VERDE if livello == 2 else VERDE_SCURO)
+                for (ox, oy), colore in forma:
+                    img[r * cella + y + dy + oy, f * cella + x + dx + ox] = _hex(colore)
     return Image.fromarray(img, "RGBA")
 
 
