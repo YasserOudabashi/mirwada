@@ -183,6 +183,66 @@ def arredo(kind, larg, prof, seed=1, size=1.0):
         for sx in (-1, 1):
             cyl((1.6, 1.6, 3), (sx * (W / 2 - 8), cy - 4, 25.6), "cloth_white")
             r.part("a", "ellipsoid", (1.2, 1.2, 2.2), (sx * (W / 2 - 8), cy - 4, 31), mat="fire")
+    elif kind == "cantiere":                                          # US-8B20: una stanza ancora da costruire
+        for sx in (-1, 1):                                            # l'impalcatura contro il muro
+            box((1.0, 1.0, 17), (sx * (W / 2 - 6), dietro + 2, 17), "wood")
+        for z in (14, 30):
+            box((W / 2 - 4, 0.9, 1.0), (0, dietro + 2, z), "wood_light")
+        box((W / 2 - 6, 0.8, 0.9), (0, dietro + 2.2, 22), "wood_light", rot=(0, 28, 0))     # la diagonale
+        su = (-14, 0, 0)
+        for k in range(3):                                            # le assi accatastate davanti
+            r.part("a", "box", (10, 3.2, 0.9), (-W / 2 + 14 + k * 0.8, cy + 3, 1.2 + k * 2), su, "wood_light",
+                   tex=("stripes", "x", 2.0, 0.1))
+        for sx in (-1, 1):                                            # il cavalletto con la sega
+            box((0.8, 0.8, 5.5), (W / 2 - 12 + sx * 4, cy + 4, 5.5), "wood", rot=(0, sx * 16, 0))
+        box((5.5, 1.1, 0.9), (W / 2 - 12, cy + 4, 10.8), "wood_light")
+        box((3.4, 0.4, 1.6), (W / 2 - 11, cy + 5.4, 13), "steel", rot=(0, 0, 25))
+    elif kind.startswith("orto_"):                                    # US-8B20: aiuola del giardino, 4 stati
+        box((12, 9 * P / 1.9, 2.4), (0, cy, 2.4), "wood")              # la cornice di legno
+        r.part("a", "box", (10.6, 7.6 * P / 1.9, 0.6), (0, cy, 4.6), (-14, 0, 0), "leaf_dead",
+               tex=("stripes", "y", 1.6, 0.18))                       # la terra lavorata, a solchi
+        stato = kind[5:]
+        piante = {"vuoto": 0, "germoglio": 1, "pianta": 2, "maturo": 3}[stato]
+        for k in range(6 if piante else 0):
+            x, y = -7 + (k % 3) * 7, (k // 3 - 0.5) * 6
+            if piante == 1:                                           # germogli: due foglioline verdi
+                r.part("a", "cylinder", (0.4, 0.4, 1.2), (x, cy + y, 6.4), mat="grass")
+                for sx in (-1, 1):
+                    r.part("a", "ellipsoid", (1.5, 0.9, 0.8), (x + sx * 1.2, cy + y, 8.0), mat="leaf_light", rot=(0, sx * -35, 0))
+            else:
+                h = 3.2 if piante == 2 else 4.4
+                r.part("a", "ellipsoid", (2.4, 2.0, h), (x, cy + y, 5 + h * 0.8), mat="leaf")
+                if piante == 3:                                       # pronte: i frutti rossi davanti e in cima
+                    r.part("a", "ellipsoid", (1.5, 1.5, 1.5), (x + 0.8, cy + y + 2.2, 5 + h * 1.1), mat="mushroom_red")
+                    r.part("a", "ellipsoid", (1.3, 1.3, 1.3), (x - 1.0, cy + y + 0.6, 5 + h * 1.7), mat="mushroom_red")
+    elif kind == "palizzata":                                         # US-8B20: pali appuntiti legati da due traverse
+        n = larg * 3 + 1
+        for k in range(n):
+            x = -W / 2 + 4 + k * (W - 8) / (n - 1)
+            h = 15 + (k % 2) * 2
+            cyl((2.2, 2.2, h), (x, cy, h), "wood")
+            r.part("a", "cone", (2.2, 2.2, 2.6), (x, cy, 2 * h + 2.4), mat="wood_light")
+        for z in (9, 22):
+            box((W / 2 - 3, 1.0, 1.2), (0, cy + 2.4, z), "leather_dark")
+    elif kind == "totem_veglia":                                      # US-8B20: palo intagliato, occhi accesi
+        cyl((4.2, 4.2, 18), (0, cy, 18), "wood")
+        for z, mat in ((12, "cloth_red"), (24, "cloth_teal"), (34, "wood_light")):
+            cyl((4.6, 4.6, 1.2), (0, cy, z), mat)
+        for sx in (-1, 1):
+            r.part("a", "ellipsoid", (1.1, 0.7, 1.1), (sx * 1.8, cy + 4.4, 29), mat="glow_cyan")      # gli occhi
+            r.part("a", "ellipsoid", (3.6, 1.2, 1.4), (sx * 6.5, cy, 34), mat="cloth_white", rot=(0, sx * -30, 0))  # ali
+        box((2.4, 0.8, 1.2), (0, cy + 4.4, 24), "leather_dark")             # la bocca intagliata
+        r.part("a", "cone", (3.2, 3.2, 3.0), (0, cy, 39), mat="wood_light")
+    elif kind == "deposito":                                          # US-8B20: tettoia aperta con casse e botti
+        for sx in (-1, 1):
+            for sy in (-1, 1):
+                box((1.2, 1.2, 14), (sx * (W / 2 - 4), cy + sy * 7, 14), "wood")
+        r.part("a", "box", (W / 2 - 1, 11, 1.2), (0, cy - 1, 29), (-22, 0, 0), "paglia")    # il tetto di paglia
+        box((7, 5, 6), (-W / 2 + 12, cy, 6), "wood_light")            # una cassa
+        cyl((5, 5, 7), (W / 2 - 12, cy, 7), "wood")                    # una botte
+        for z in (2.5, 11.5):
+            cyl((5.4, 5.4, 0.8), (W / 2 - 12, cy, z), "iron")
+        r.part("a", "ellipsoid", (5, 4, 5), (0, cy + 2, 5), mat="cloth_cream")     # un sacco
     elif kind == "roccia":                                            # massi con un po' di muschio
         r.part("a", "ellipsoid", (11, 8, 9), (-2, cy, 8), mat="stone")
         r.part("a", "ellipsoid", (7, 6, 6), (7, cy + 4, 5), mat="stone")

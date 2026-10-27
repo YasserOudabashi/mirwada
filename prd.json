@@ -648,6 +648,57 @@
       "fase": "8b",
       "passes": true,
       "notes": "2026-10-27, decisione dell'utente: si' al buio di notte. scripts/world/luce.gd (CanvasModulate figlio del mondo): colore del momento (TimeSystem) nella modalita' della partita (GameState.tema_arte), quello del sottosuolo sotto terra; passa piano (transizione 3 s). Negli interni il mondo e' nascosto e la luce con lui. Le lucciole (fauna luce: true) su uno strato loro che segue la telecamera (fauna._strato_luci), nascosto quando il mondo e' nascosto. Colori: luminoso alba #f2dcc6, mezzogiorno bianco, crepuscolo #e2b28e (era rosato, scaldato verso l'arancio), notte #5d6c9e; cupo piu' buio. Validator: un colore per ogni momento di time.json nelle due modalita'. tests/test_luce.gd (3). arte/revisione/luce_del_giorno.png."
+    },
+    {
+      "id": "US-8B20a",
+      "title": "Base del giocatore: arte e interni",
+      "description": "Gli interni delle 4 basi (casa a Mirwada, capanna nella Valle, rifugio nelle Marche, nave) a piu' stanze, con gli arredi di ogni stanza per livello; gli arredi nuovi per cantiere, orto, palizzata, totem di veglia, deposito.",
+      "acceptanceCriteria": [
+        "4 interni base_* con le 3 stanze e l'ingresso",
+        "arredi per livello nei dati (0 = cantiere)",
+        "validator: stanze di rooms.json, arredi dentro la stanza, raggiungibili",
+        "arte guardata ingrandita"
+      ],
+      "priority": 39,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27, decisioni dell'utente: tutte e 4 le basi subito, una casa a piu' stanze (laboratorio, stanza rituale, biblioteca a nord, ingresso col letto a sud; il giardino all'aperto), strutture attorno alla casa, i banchi delle stanze aprono la pagina Base. data/world/interni/base_{casa,capanna,rifugio,nave}.json: stessa pianta 16x8, stili casa, capanna, rifugio (nuovo: assi e pietra) e nave (nuovo: stiva di legno scuro). 'stanze': {tipo: {rect, livelli: [[arredi non costruita], [livello 1], [livello 2]]}}. Arredi nuovi in forge3d/arredi.py: cantiere (impalcatura, assi, cavalletto: la prima versione sembrava una panca), orto_vuoto/germoglio/pianta/maturo (i germogli venivano marroni, i frutti non si vedevano), palizzata, totem_veglia, deposito. Validator valida_stanze. Comando: python tools/art/build_interni.py. arte/revisione/base_interni.png (4 basi x 3 livelli), base_arredi.png."
+    },
+    {
+      "id": "US-8B20b",
+      "title": "La base nel gioco: stanze e sede",
+      "description": "Le porte delle basi sul mondo, le stanze che cambiano col livello, i banchi che aprono la pagina Base, la sede della base che si sposta.",
+      "acceptanceCriteria": [
+        "verifica a schermo"
+      ],
+      "priority": 40,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B20c",
+      "title": "Giardino e strutture attorno alla base",
+      "description": "L'orto all'aperto con le piante che crescono e le strutture (palizzata, totem, deposito) costruite dalla pagina Base.",
+      "acceptanceCriteria": [
+        "verifica a schermo"
+      ],
+      "priority": 40,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B20d",
+      "title": "La nave come base",
+      "description": "Il modello della nave ormeggiata, la passerella, l'interno della nave.",
+      "acceptanceCriteria": [
+        "verifica a schermo"
+      ],
+      "priority": 40,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
     }
   ]
 }

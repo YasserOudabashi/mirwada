@@ -221,6 +221,33 @@ def valida_arredi(doc, rel, vocab, calpestabili):
             err(f"{rel}: dallo spawn non si arriva accanto al forziere in ({x},{y})")
 
 
+def valida_stanze(doc, rel, vocab, calpestabili, rooms):
+    """US-8B20: le stanze della base in un interno ("stanze": {tipo: {rect, livelli}}): il tipo e' una stanza di
+    data/base/rooms.json, un insieme di arredi per ogni livello (0 = non costruita, poi uno per livello dei dati),
+    dentro il rettangolo della stanza; con ognuno dei livelli gli arredi della stanza piu' quelli fissi non si
+    sovrappongono e dallo spawn si arriva ancora a tutto."""
+    stanze = doc.get("stanze", {})
+    if not stanze:
+        return
+    for tipo, st in stanze.items():
+        if tipo not in rooms:
+            err(f"{rel}: stanze.{tipo} non e' una stanza di data/base/rooms.json")
+            continue
+        x0, y0, w, h = st.get("rect", [0, 0, 0, 0])
+        livelli = st.get("livelli", [])
+        if len(livelli) != len(rooms[tipo].get("livelli", [])) + 1:
+            err(f"{rel}: stanze.{tipo} vuole {len(rooms[tipo].get('livelli', [])) + 1} insiemi di arredi "
+                f"(non costruita + un livello per voce di rooms.json), ne ha {len(livelli)}")
+        for lv, arredi in enumerate(livelli):
+            for a in arredi:
+                aw, ah = vocab.get(a.get("id"), {}).get("misura", [1, 1])
+                if not (x0 <= a.get("x", -1) and a.get("x", -1) + aw <= x0 + w and y0 <= a.get("y", -1)
+                        and a.get("y", -1) + ah <= y0 + h):
+                    err(f"{rel}: stanze.{tipo} livello {lv}: '{a.get('id')}' esce dalla stanza {st.get('rect')}")
+            valida_arredi(dict(doc, arredi=list(doc.get("arredi", [])) + list(arredi)),
+                          f"{rel} stanze.{tipo} livello {lv}", vocab, calpestabili)
+
+
 def main():
     # --- vocabolari di riferimento ---
     prim_doc = load_json(os.path.join(DATA, "schema", "primitives.json"))
@@ -1276,6 +1303,8 @@ def main():
             interni_ids.add(iid)
             valida_mappa_e_spawn(doc, f"{rel} [{iid}]", LEGENDA_LAYOUT, CALPESTABILI_LAYOUT)
             valida_arredi(doc, f"{rel} [{iid}]", vocab_arredi, CALPESTABILI_LAYOUT)
+            valida_stanze(doc, f"{rel} [{iid}]", vocab_arredi, CALPESTABILI_LAYOUT,
+                          (load_json(os.path.join(DATA, "base", "rooms.json")) or {}).get("rooms", {}))
             for spec in doc.get("npcs", []):
                 interni_npc_refs.append((rel, iid, spec.get("npc_id")))
 

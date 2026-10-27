@@ -14850,3 +14850,18 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   arte/revisione/luce_del_giorno.png.
 - tests/test_luce.gd (3). 1059 test, validate 0.
 - Aperto: finestre accese, lampioni e la luce del faro di notte (oggi il faro non illumina).
+
+## US-8B20a — Base del giocatore: arte e interni, 2026-10-27
+- Decisioni dell'utente (domande del 2026-10-27): le 4 basi subito (casa a Mirwada, capanna nella Valle, rifugio
+  nelle Marche, nave); una casa a piu' stanze col giardino all'aperto; le strutture (palizzata, totem di veglia,
+  deposito) attorno alla casa, costruite dalla pagina Base; i banchi delle stanze aprono la pagina Base.
+- data/world/interni/base_{casa,capanna,rifugio,nave}.json: pianta 16x8 uguale (3 stanze a nord con la porta '+',
+  ingresso a sud con letto e camino/botti), stile per versione; "stanze" {tipo: {rect, livelli}}: livello 0 = il
+  cantiere, 1 e 2 = gli arredi dei livelli di data/base/rooms.json (alambicco, altare, scrittoio; poi scaffali, vasi,
+  sigillo, botte). build_interni.py: stili nuovi rifugio (assi e pietra) e nave (stiva scura).
+- forge3d/arredi.py: cantiere (rifatto: sembrava una panca), orto in 4 stati (germogli marroni -> verdi e piu' alti,
+  frutti rossi piu' grandi e davanti), palizzata, totem di veglia, deposito.
+- Validator valida_stanze (provato con errori finti: sovrapposizione e arredo fuori stanza trovati).
+- Comando: python tools/art/build_interni.py (i file che c'erano identici). arte/revisione/base_interni.png,
+  base_arredi.png. 1059 test, validate 0.
+- Prossime: 8B20b (porte, stanze per livello, banchi, sede), 8B20c (giardino e strutture), 8B20d (nave).

@@ -62,6 +62,13 @@ STILI = {
     "sotterraneo": {"pavimento": ("lastre", ["navy", "slate_d", "slate_d", "slate"]),
                     "parete": ("pietra", ["navy", "slate_d", "slate"], ["ink"]),
                     "cima": ["ink", "navy"]},
+    # le basi del giocatore (US-8B20): il rifugio delle Marche e la stiva della nave
+    "rifugio": {"pavimento": ("assi", ["brown_dd", "brown_d", "brown", "brown"]),
+                "parete": ("pietra", ["slate_d", "slate", "grey"], ["brown_dd"]),
+                "cima": ["navy", "slate_d"]},
+    "nave": {"pavimento": ("assi", ["brown_dd", "brown_d", "brown_d", "brown"]),
+             "parete": ("tronchi", ["ink", "brown_dd", "brown_d", "brown"], ["navy"]),
+             "cima": ["ink", "brown_dd"]},
     # sotto-aree dietro i varchi (US-8B21c)
     "cripta": {"pavimento": ("lastre", ["navy", "slate_d", "purple_d", "slate"]),
                "parete": ("pietra", ["purple_d", "slate_d", "slate"], ["ink"]),
