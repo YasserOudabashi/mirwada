@@ -77,6 +77,7 @@ func _ready() -> void:
 	_hurtbox.parata_riuscita.connect(_su_parata_riuscita)
 	_hurtbox.colpito.connect(_su_danno_subito)
 	_stats.died.connect(_su_morte)
+	_stats.forma_cambiata.connect(_su_forma)
 
 	# Bonus di Sequenza del Pathway corrente (US-201): il giocatore entra in
 	# scena dopo gli autoload, quindi li richiede lui una volta pronto.
@@ -109,6 +110,8 @@ func _monta_icone_stato() -> Node2D:
 ## Nome e icone degli status sopra la testa: le icone stanno sopra il nome se c'e', e in volo salgono con il disegno.
 func _posiziona_sopra() -> void:
 	var su: float = ALTEZZA_VOLO if _mezzo == "volo" else 0.0
+	if _anim != null:
+		su += float(_anim.get("alto_in_piu"))       # US-8B50: una forma piu' grande
 	if _nome_lbl != null:
 		_nome_lbl.position.y = -34.0 - su
 	if _icone_stato != null:
@@ -496,6 +499,15 @@ func _vfx_evento(nome: String, dove: Node) -> void:
 	var vfx: Node = get_node_or_null("/root/Vfx")
 	if vfx != null and dove is Node2D:
 		vfx.call("evento_combat", nome, dove)
+
+
+## US-8B50: in una forma (data/forms.json "aspetto") Enel ha i suoi fogli; stessi tempi, stesso stato di prima.
+func _su_forma(aspetto: String) -> void:
+	var stato: String = str(_anim.call("stato_corrente"))
+	_anim.call("configura", CATEGORIA_ANIM, aspetto)
+	if not stato.is_empty():
+		_anim.call("riproduci", stato, _dir_sguardo)
+	_posiziona_sopra()                                # il nome sopra la testa della forma
 
 
 func _su_danno_subito(danno: float, _stagger: float, _da: Node, tag_danno: String = "") -> void:

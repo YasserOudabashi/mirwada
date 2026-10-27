@@ -269,7 +269,8 @@ possess, transform, soul_detach, resurrect, decay (chain non e' ancora implement
 ### Blocco E — Creature e trasformazioni
 
 **US-8B50 [A] Forme di Enel. L.** `tg_forma_gigante` (set intero, frame più
-grandi), `tg_arma_luce` (sovrapposta agli attacchi).
+grandi), `tg_arma_luce` (sovrapposta agli attacchi). **Gigante FATTO (US-8B50a/b, 2026-10-27)**: aspetto "gigante",
+celle 96, nel gioco con la transform; l'arma di luce resta.
 **US-8B51..55 [A] Evocazioni, 5 famiglie. L ciascuna.** Non morti, spiriti,
 bestie, chimere, costrutti: uno scheletro per famiglia, varianti per i 22
 `entita_id`.

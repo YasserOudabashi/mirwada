@@ -39,3 +39,24 @@ func test_la_cella_si_legge_dal_foglio_e_la_grana_resta_quella() -> void:
 	assert_almost_eq(gigante.offset.y, enel.offset.y * 1.5, "i piedi restano sull'origine", 0.01)
 	enel.free()
 	gigante.free()
+
+
+func test_la_trasformazione_cambia_i_fogli_e_finisce() -> void:
+	var p: Node = preload("res://scenes/player.tscn").instantiate()
+	_root().add_child(p)
+	var stats: Node = p.get_node("StatsComponent")
+	var anim: AnimatedSprite2D = p.get_node("AnimationMachine") if p.has_node("AnimationMachine") else null
+	if anim == null:
+		for c in p.get_children():
+			if c is AnimatedSprite2D:
+				anim = c
+	var eng: Node = _root().get_node("AbilityEngine")
+	eng.call("_p_transform", {"forma_id": "tg_forma_gigante", "durata": 5.0}, p, stats, "tg_crescita")
+	assert_eq(str(stats.call("forma")), "gigante", "in forma gigante")
+	assert_eq(_cella(anim), Vector2(96, 96), "il player usa i fogli del gigante")
+	assert_gt(float(anim.get("alto_in_piu")), 10.0, "nome e icone salgono sopra la testa del gigante")
+	assert_true(bool(eng.call("annulla_transform", "tg_crescita")), "la trasformazione si annulla")
+	assert_eq(str(stats.call("forma")), "", "finita la trasformazione")
+	assert_eq(_cella(anim), Vector2(64, 64), "torna Enel")
+	eng.call("flush_effects")
+	p.free()

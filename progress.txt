@@ -14669,3 +14669,16 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   pixel hanno la stessa grana degli altri sprite e il gigante e' grande una volta e mezza; piedi e ombra scalano con la
   cella; alto_in_piu dice quanto salgono nome e icone.
 - Test (in US-8B50b, tests/test_forme.gd): fogli dei dati, cella 96 con la stessa scala e i piedi al loro posto.
+
+## US-8B50b — Forma gigante nel gioco, 2026-10-27
+- StatsComponent: _forme (mod_id -> aspetto), imposta_forma(), forma(), segnale forma_cambiata; remove_modifier toglie
+  la forma col suo modificatore: cosi' scadenza, annulla_transform, flush_effects e fine della spiritualita' (tutti
+  passano da remove_modifier) la chiudono senza casi a parte.
+- AbilityEngine._p_transform: se la forma ha "aspetto" lo imposta sullo StatsComponent. Player._su_forma: riconfigura
+  l'AnimationMachine con l'aspetto e rimette lo stato corrente; _posiziona_sopra aggiunge alto_in_piu (con guardia:
+  la prima chiamata arriva prima che l'AnimationMachine sia pronta, il runner l'ha trovata come errore nascosto).
+- Test: tests/test_forme.gd (3). 1039 test, validate 0.
+- A schermo nel mondo: Enel, poi gigante (piedi nello stesso punto, ombra piu' grande, nome sopra la testa), attacco
+  pesante da gigante, annullata la trasformazione torna Enel: arte/revisione/forma_gigante_in_gioco.png.
+- Aperto: tg_arma_luce (forma sovrapposta agli attacchi: un'arma di luce, non un corpo nuovo) e il suono/effetto del
+  passaggio di forma (oggi il cambio e' secco).

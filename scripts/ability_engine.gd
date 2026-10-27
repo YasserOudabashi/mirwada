@@ -531,6 +531,9 @@ func _p_transform(prim: Dictionary, _caster: Node, stats: Node, ability_id: Stri
 	var mods: Dictionary = mods_raw if typeof(mods_raw) == TYPE_DICTIONARY else {}
 	var mod_id: String = "transform:%s" % ability_id
 	stats.call("apply_modifier", mod_id, mods)
+	var aspetto: String = str(forma.get("aspetto", ""))   # US-8B50: la forma si vede (fogli del personaggio)
+	if not aspetto.is_empty() and stats.has_method("imposta_forma"):
+		stats.call("imposta_forma", mod_id, aspetto)
 	rec["applied"] = true
 	rec["modifier_id"] = mod_id
 	rec["stat_modifiers"] = mods

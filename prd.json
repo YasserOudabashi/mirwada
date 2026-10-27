@@ -404,6 +404,20 @@
       "notes": "2026-10-27: build_forme.py: il gigante e' Enel x1.5 (ppu 1.83, celle 96, piedi a 81/96), spalle piu' larghe (build 1.18) e testa piu' piccola (0.74) per leggersi come gigante. 10 fogli in arte/sprite e assets/placeholder (personaggio_gigante_<anim>), nessun pixel sul bordo della cella, alpha 0/255, deterministico. animation_machine: cella = altezza del foglio / righe, scala dai dati (grana uguale), piedi e ombra x cella/dim, alto_in_piu per nome e icone. forms.json aspetto + schema + validator. arte/revisione/forma_gigante.png. tg_arma_luce (sovrapposta agli attacchi) resta da fare."
     },
     {
+      "id": "US-8B50b",
+      "title": "Forma gigante nel gioco",
+      "description": "La transform con una forma che ha un aspetto cambia i fogli di Enel e li rimette quando finisce.",
+      "acceptanceCriteria": [
+        "finisce comunque finisca il modificatore (scadenza, annullata, spiritualita')",
+        "nome e icone sopra la testa della forma",
+        "verifica a schermo"
+      ],
+      "priority": 25,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: StatsComponent.imposta_forma(mod_id, aspetto) + segnale forma_cambiata: la forma e' legata al suo modificatore e finisce in remove_modifier (copre scadenza, annulla_transform, flush, fine spiritualita'). AbilityEngine._p_transform la imposta se la forma ha un aspetto. Player._su_forma riconfigura l'AnimationMachine con l'aspetto e rimette lo stato; nome e icone salgono di alto_in_piu. tests/test_forme.gd (3). A schermo: arte/revisione/forma_gigante_in_gioco.png (prima, gigante, attacco pesante, di nuovo Enel)."
+    },
+    {
       "id": "US-8B41",
       "title": "VFX delle primitive, gruppo 1",
       "description": "buff_stat, summon, aura, heal, reveal_info, teleport, debuff_stat, illusion (le 8 piu' usate dalle abilita'): fogli a 4 toni colorati dalla rampa del Pathway, attorno a chi lancia.",

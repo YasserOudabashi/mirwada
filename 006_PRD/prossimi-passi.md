@@ -25,7 +25,7 @@ le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti 
 - La **PR #4** (`claude/mini-trailer-prompt-adq22o`) e' interamente dentro la PR #5: si puo' chiudere.
 - `main` e' ferma alla fase 7: va aggiornata mergiando la PR #5 quando l'utente lo decide.
 - CI GitHub Actions **accesa** su push a `main` e sulle pull request (validator + `tools/run_tests.sh`).
-- Verifica locale: `python tools/validate_data.py` e `bash tools/run_tests.sh` (1036 test, ~1 minuto).
+- Verifica locale: `python tools/validate_data.py` e `bash tools/run_tests.sh` (1039 test, ~1 minuto).
 
 ---
 
@@ -58,7 +58,10 @@ le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti 
    si compra a sinistra e si vende a destra, con le liste che scorrono.
    E **US-8B73c/d**: tutte le pagine sulle due facciate (scaffale, frontespizio, colophon, inventario con l'indice a
    destra, diagramma con la griglia girata); un test controlla che nessuna facciata chieda piu' spazio di quello che ha.
-4. **Prossime**: creature (blocco E), animazioni nuove di Enel (blocco G).
+   E **US-8B50a/b la forma gigante**: Enel una volta e mezza (celle 96, `tools/art/build_forme.py`) quando la
+   transform ha una forma con aspetto; torna Enel quando il modificatore finisce.
+4. **Prossime**: l'arma di luce (seconda forma, sovrapposta agli attacchi), animazioni nuove di Enel (blocco G).
+   Evocazioni e antagonisti (blocco E) aspettano di avere una figura nel mondo (oggi summon scrive solo nel registro).
 5. Fase 12 (PRD `prd-fase-12-atto-2-3.md`, `prd-fase-12-mondo-vivo.md`).
 
 ---
