@@ -348,6 +348,220 @@ def miraggio(n, S=64):
     return out
 
 
+
+# --- gruppo 2 delle primitive (US-8B42) -----------------------------------------------------------------------------
+
+def maleficio(n, S=64):
+    """curse: il triangolo del maleficio si accende sopra la testa e si stringe, gocce scure che colano giu'."""
+    cx, cy = S / 2, 10
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        r = 9 - 3 * t
+        tri = _forme(S, S, _pol((cx - r, cy - r * 0.6), (cx + r, cy - r * 0.6), (cx, cy + r * 0.9)))
+        dentro = _forme(S, S, _pol((cx - r + 3, cy - r * 0.6 + 1.6), (cx + r - 3, cy - r * 0.6 + 1.6), (cx, cy + r * 0.9 - 3)))
+        _metti(tela, _sfuma(tri & ~dentro, t, SEED + 70, S, S, 0.8), 3 if t < 0.5 else 2)
+        _metti(tela, _forme(S, S, _ell(cx, cy - 0.5, 1.4, 1.4)), 3 if t < 0.7 else 1)
+        for i, x in enumerate((cx - 11, cx + 2, cx + 12)):
+            y = 22 + ((t * 26 + i * 9) % 26)
+            _metti(tela, _forme(S, S, _ell(x, y, 1.4, 2.2)), 1)
+        _metti(tela, _sfuma(_anello(S, S, cx, S / 2 + 12, 13, 1.6), t, SEED + 71, S, S), 1)
+        out.append(_contorno(tela))
+    return out
+
+
+def frattura(n, S=96):
+    """terrain_modify: lampo delle crepe a terra, poi spuntoni di roccia e sassi che saltano e ricadono."""
+    cx, piedi = S / 2, S / 2 + 12
+    rs = np.random.RandomState(SEED + 80)
+    crepe = []
+    for j in range(6):
+        a = j * math.tau / 6 + rs.uniform(-0.3, 0.3)
+        pts, x, y = [(cx, piedi)], cx, piedi
+        for _ in range(4):
+            a += rs.uniform(-0.5, 0.5)
+            x, y = x + math.cos(a) * 6, y + math.sin(a) * 3
+            pts.append((x, y))
+        crepe.append(pts)
+    sassi = [(rs.uniform(-30, 30), rs.uniform(10, 22), rs.uniform(1.5, 3.0)) for _ in range(7)]
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        linee = _forme(S, S, *[_lin(a[0], a[1], b[0], b[1], 1.6) for c in crepe for a, b in zip(c, c[1:])])
+        if k == 0:
+            _metti(tela, linee | _anello(S, S, cx, piedi, 18, 3), 3)
+            out.append(_contorno(tela))
+            continue
+        _metti(tela, _sfuma(linee, t, SEED + 81, S, S, 0.8), 1)
+        h = 14 * math.sin(math.pi * min(1.0, t * 1.5))
+        if h > 1:
+            for dx, hh in ((-16, 0.8), (14, 1.0), (-4, 0.6), (24, 0.5)):
+                spun = _forme(S, S, _pol((cx + dx - 4, piedi + 3), (cx + dx + 4, piedi + 3), (cx + dx + 0.5, piedi + 3 - h * hh)))
+                _metti(tela, spun, 2)
+                _metti(tela, _forme(S, S, _lin(cx + dx - 0.5, piedi + 2, cx + dx + 0.5, piedi + 3 - h * hh, 1)), 3)
+        for dx, salto, r in sassi:                              # i sassi saltano verso fuori e ricadono
+            u = min(1.0, t * 1.25)
+            y = piedi - salto * 4 * u * (1 - u) * 1.6
+            if u < 0.98:
+                _metti(tela, _forme(S, S, _ell(cx + dx * (1 + 0.5 * u), y, r, r * 0.8)), 2)
+        out.append(_contorno(tela))
+    return out
+
+
+def terrore(n, S=64):
+    """fear: fili di fumo scuro che salgono ondeggiando attorno a chi lancia e un teschio sopra la testa."""
+    cx, piedi = S / 2, S / 2 + 12
+    x, y = _griglia(S, S)
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        for i, x0 in enumerate((cx - 18, cx - 11, cx - 5, cx + 6, cx + 12, cx + 19)):
+            base = piedi + 2
+            cima = base - (14 + 18 * math.sin(math.pi * min(1.0, t + 0.25)) * (0.7 + 0.3 * (i % 3) / 2))
+            onda = x0 + 2.4 * np.sin((y + k * 5 + i * 9) * 0.28)
+            spess = 0.6 + 0.9 * np.clip((y - cima) / max(1.0, base - cima), 0, 1)
+            filo = (np.abs(x - onda) < spess) & (y > cima) & (y < base)
+            _metti(tela, _sfuma(filo, max(0.0, t - 0.3), SEED + 90 + i, S, S, 0.9), 1)
+            _metti(tela, filo & (y < cima + 3) & (t < 0.8), 2)
+        a = math.sin(math.pi * min(1.0, t * 1.3 + 0.1))
+        if a > 0.3:
+            te = _forme(S, S, _ell(cx, 9, 6, 5.5), _pol((cx - 3.5, 12), (cx + 3.5, 12), (cx + 3, 17), (cx - 3, 17)))
+            buchi = _forme(S, S, _ell(cx - 2.4, 9, 1.6, 1.8), _ell(cx + 2.4, 9, 1.6, 1.8), _lin(cx, 12, cx, 13, 1))
+            _metti(tela, te & ~buchi, 3 if a > 0.7 else 2)
+        out.append(_contorno(tela))
+    return out
+
+
+def furto(n, S=64):
+    """steal: lampo davanti, poi tre monete che volano verso chi lancia con la scia (disegnato verso destra)."""
+    cx, cy = S / 2, S / 2
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        if k == 0:
+            st = _forme(S, S, _lin(cx + 22, cy - 6, cx + 22, cy + 6, 1.6), _lin(cx + 16, cy, cx + 28, cy, 1.6),
+                        _ell(cx + 22, cy, 2.6, 2.6))
+            _metti(tela, st, 3)
+            out.append(_contorno(tela))
+            continue
+        for i, (dy, ritardo) in enumerate(((-7, 0.0), (0, 0.15), (7, 0.3))):
+            u = min(1.0, max(0.0, t * 1.3 - ritardo))
+            x = cx + 24 - 22 * u
+            y = cy + dy - 8 * math.sin(math.pi * u)
+            if u < 0.98:
+                _metti(tela, _forme(S, S, _lin(x + 2, y, x + 8, y + 2 * math.cos(math.pi * u), 1.2)), 1)
+                _metti(tela, _forme(S, S, _ell(x, y, 2.4, 2.4)), 2)
+                _metti(tela, _forme(S, S, _ell(x - 0.6, y - 0.6, 0.9, 0.9)), 3)
+        out.append(_contorno(tela))
+    return out
+
+
+def brace(n, S=64):
+    """dot: fiamme che guizzano attorno alle gambe e braci che salgono."""
+    cx, piedi = S / 2, S / 2 + 12
+    rs = np.random.RandomState(SEED + 100)
+    braci = [(rs.uniform(-18, 18), rs.uniform(0, 1)) for _ in range(9)]
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        for i, dx in enumerate((-15, -6, 5, 15)):
+            h = 13 + 4 * math.sin(k * 2.1 + i * 1.7) - 5 * t
+            x0 = cx + dx
+            fiamma = _forme(S, S, _ell(x0, piedi, 4.2, 3.6), _pol((x0 - 4.2, piedi - 0.5), (x0 + 4.2, piedi - 0.5),
+                                                                 (x0 + 1.5 * math.sin(k * 1.3 + i), piedi - h)))
+            cuore = _forme(S, S, _ell(x0, piedi + 0.5, 2.0, 1.8), _pol((x0 - 2, piedi), (x0 + 2, piedi),
+                                                                      (x0 + math.sin(k * 1.3 + i), piedi - h * 0.5)))
+            _metti(tela, fiamma, 2)
+            _metti(tela, cuore, 3)
+        for dx, fase in braci:
+            y = piedi - 8 - ((t + fase) % 1.0) * 34
+            _metti(tela, _forme(S, S, _lin(cx + dx, y, cx + dx, y + 1, 1.3)), 3 if (t + fase) % 1.0 < 0.5 else 2)
+        out.append(_contorno(tela))
+    return out
+
+
+def ombra(n, S=64):
+    """shadow_meld: una pozza scura si allarga ai piedi e lingue d'ombra salgono ad avvolgere, poi si richiude."""
+    cx, piedi = S / 2, S / 2 + 12
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        r = 10 + 10 * math.sin(math.pi * t * 0.9 + 0.2)
+        _metti(tela, _forme(S, S, _ell(cx, piedi, r, r * 0.45)), 1)
+        x, y = _griglia(S, S)
+        for i, x0 in enumerate((cx - 9, cx - 3, cx + 4, cx + 10)):
+            alto = piedi - (8 + 22 * math.sin(math.pi * t) * (0.6 + 0.4 * (i % 2)))
+            onda = x0 + 2.2 * np.sin((y - piedi) * 0.3 + i + k)
+            lingua = (np.abs(x - onda) < 1.4 * (y - alto) / max(1.0, piedi - alto) + 0.5) & (y > alto) & (y < piedi)
+            _metti(tela, lingua, 1 if i % 2 else 2)
+        out.append(_contorno(tela))
+    return out
+
+
+def riavvolgi(n, S=96):
+    """time_rewind: lampo di un anello, poi un quadrante con le tacche e una freccia che gira all'indietro."""
+    cx, cy = S / 2, S / 2 - 2
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        anello = _anello(S, S, cx, cy, 26, 2.4, rapp=1.0)
+        if k == 0:
+            _metti(tela, anello, 3)
+            out.append(_contorno(tela))
+            continue
+        tacche = _forme(S, S, *[_lin(cx + math.cos(a) * 22, cy + math.sin(a) * 22, cx + math.cos(a) * 25,
+                                     cy + math.sin(a) * 25, 1.4) for a in np.linspace(0, math.tau, 12, endpoint=False)])
+        _metti(tela, _sfuma(anello | tacche, t, SEED + 110, S, S, 0.8), 2)
+        a0 = -math.pi / 2 - t * math.tau * 0.6                    # la freccia gira in senso antiorario
+        R = 32
+        arco = _forme(S, S, *[_lin(cx + math.cos(a) * R, cy + math.sin(a) * R, cx + math.cos(a + 0.12) * R,
+                                   cy + math.sin(a + 0.12) * R, 3.0) for a in np.linspace(a0, a0 + 1.6, 14)])
+        punta = np.array([cx + math.cos(a0) * R, cy + math.sin(a0) * R])
+        avanti = np.array([math.sin(a0), -math.cos(a0)])         # tangente nel verso antiorario
+        fuori = np.array([math.cos(a0), math.sin(a0)])
+        testa = _forme(S, S, _pol(tuple(punta + avanti * 7), tuple(punta + fuori * 5), tuple(punta - fuori * 5)))
+        _metti(tela, _sfuma(arco | testa, max(0.0, t - 0.4), SEED + 111, S, S, 0.9), 3)
+        out.append(_contorno(tela))
+    return out
+
+
+def fioritura(n, S=64):
+    """plant_growth: germogli che crescono attorno ai piedi, mettono le foglie e i fiori, poi si ritirano."""
+    cx, piedi = S / 2, S / 2 + 12
+    piante = [(-18, 1.0), (-9, 0.75), (9, 0.9), (18, 0.7)]
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        cresce = math.sin(math.pi * min(1.0, 0.18 + t * 0.95))
+        for i, (dx, alt) in enumerate(piante):
+            h = 24 * alt * cresce
+            x0 = cx + dx
+            xt = x0 + math.sin(i * 1.7) * 2
+            _metti(tela, _forme(S, S, _lin(x0, piedi + 2, xt, piedi + 2 - h, 1.8)), 2)
+            if h > 6:
+                for j, f in enumerate((0.45, 0.72)):
+                    ym = piedi + 2 - h * f
+                    xm = x0 + (xt - x0) * f
+                    lato = 1 if (i + j) % 2 else -1
+                    _metti(tela, _forme(S, S, _pol((xm, ym), (xm + lato * 7, ym - 4), (xm + lato * 5, ym + 1))), 3)
+            if h > 14 and i % 2 == 0:
+                yf = piedi + 2 - h
+                petali = _forme(S, S, *[_ell(xt + math.cos(a) * 2.6, yf + math.sin(a) * 2.6, 2.0, 2.0)
+                                        for a in np.linspace(0, math.tau, 5, endpoint=False)])
+                _metti(tela, petali, 3)
+                _metti(tela, _forme(S, S, _ell(xt, yf, 1.4, 1.4)), 2)
+        out.append(_contorno(tela))
+    return out
+
+
 def main():
     pv = json.load(open(os.path.join(ROOT, "data", "vfx.json")))["primitive_vfx"]
     f = lambda tipo: pv[tipo]["frames"]                          # noqa: E731
@@ -367,6 +581,16 @@ def main():
             pv["reveal_info"]["sprite"]: scruta(f("reveal_info")),
             pv["teleport"]["sprite"]: varco(f("teleport")),
             pv["illusion"]["sprite"]: miraggio(f("illusion")),
+        },
+        "vfx_primitive_2": {
+            pv["curse"]["sprite"]: maleficio(f("curse")),
+            pv["terrain_modify"]["sprite"]: frattura(f("terrain_modify")),
+            pv["fear"]["sprite"]: terrore(f("fear")),
+            pv["steal"]["sprite"]: furto(f("steal")),
+            pv["dot"]["sprite"]: brace(f("dot")),
+            pv["shadow_meld"]["sprite"]: ombra(f("shadow_meld")),
+            pv["time_rewind"]["sprite"]: riavvolgi(f("time_rewind")),
+            pv["plant_growth"]["sprite"]: fioritura(f("plant_growth")),
         },
     }
     palette = json.load(open(os.path.join(ROOT, "data", "vfx.json")))["pathway_palette_visiva"]

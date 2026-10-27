@@ -14532,3 +14532,19 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   schermo con la palette di Moon gli 8 effetti attorno a Enel (arte/revisione/vfx_primitive_1_in_gioco.png). 1023.
 - Aperto: gli anelli a terra stanno sopra il personaggio anche nella meta' dietro; sul marmo le palette chiare (Moon)
   hanno poco contrasto, le tiene il contorno.
+
+## US-8B42 — VFX delle primitive, gruppo 2, 2026-10-27
+- tools/art/build_vfx.py (seed 40) gruppo 2, stesso schema del gruppo 1: maleficio (curse: triangolo con l'occhio
+  sopra la testa che si stringe, gocce scure, anello scuro), frattura (terrain_modify, 96: lampo delle crepe a terra,
+  spuntoni di roccia, sassi che saltano verso fuori e ricadono), terrore (fear: sei fili di fumo scuro che salgono
+  ondeggiando, teschio sopra la testa), furto (steal: lampo davanti, tre monete con la scia che volano verso chi
+  lancia; disegnato verso destra, gira), brace (dot: fiamme alle gambe, braci), ombra (shadow_meld: pozza scura che si
+  allarga e lingue d'ombra che salgono), riavvolgi (time_rewind, 96: lampo dell'anello, quadrante con le tacche e una
+  freccia che gira in senso antiorario), fioritura (plant_growth: germogli che crescono con foglie e fiori e si
+  ritirano). Corretti a occhio al primo giro: fumo (erano vermetti), fiamme piccole, piante minuscole e primo frame
+  vuoto, freccia dell'orologio invisibile, sassi fermi. Rilanciato: stessi byte.
+- data/vfx.json: frames curse 4, terrain_modify 5, steal 4, dot 4; steal gira.
+- Verifica: test_vfx_primitive (+1: fogli del gruppo 2). A schermo con la palette di Error
+  (arte/revisione/vfx_primitive_2_in_gioco.png). validate 0, 1024 test.
+- Aperto: gli effetti durano 4-5 frame da 1/12 s: alcuni (furto, fioritura) si vedono poco; il triangolo del
+  maleficio sta dove c'e' il nome del giocatore.

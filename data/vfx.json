@@ -151,7 +151,7 @@
     },
     "dot": {
       "sprite": "vfx_smoulder",
-      "frames": 3,
+      "frames": 4,
       "impact_frame": false,
       "scia": false
     },
@@ -175,13 +175,13 @@
     },
     "terrain_modify": {
       "sprite": "vfx_fracture",
-      "frames": 4,
+      "frames": 5,
       "impact_frame": true,
       "scia": false
     },
     "curse": {
       "sprite": "vfx_hex",
-      "frames": 3,
+      "frames": 4,
       "impact_frame": false,
       "scia": false
     },
@@ -247,9 +247,10 @@
     },
     "steal": {
       "sprite": "vfx_pilfer",
-      "frames": 3,
+      "frames": 4,
       "impact_frame": true,
-      "scia": true
+      "scia": true,
+      "gira": true
     },
     "possess": {
       "sprite": "vfx_grip",

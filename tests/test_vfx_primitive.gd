@@ -2,6 +2,7 @@ extends "res://tests/test_case.gd"
 ## US-8B41..43 — i VFX delle primitive (tools/art/build_vfx.py): un foglio per primitiva, attorno a chi lancia.
 
 const GRUPPO_1 := ["buff_stat", "summon", "aura", "heal", "reveal_info", "teleport", "debuff_stat", "illusion"]
+const GRUPPO_2 := ["curse", "terrain_modify", "fear", "steal", "dot", "shadow_meld", "time_rewind", "plant_growth"]
 
 
 func _root() -> Node:
@@ -9,8 +10,16 @@ func _root() -> Node:
 
 
 func test_il_gruppo_1_ha_i_fogli_con_i_frame_dei_dati() -> void:
+	_fogli(GRUPPO_1)
+
+
+func test_il_gruppo_2_ha_i_fogli_con_i_frame_dei_dati() -> void:
+	_fogli(GRUPPO_2)
+
+
+func _fogli(tipi: Array) -> void:
 	var gd: Node = _root().get_node("GameData")
-	for tipo in GRUPPO_1:
+	for tipo in tipi:
 		var pv: Dictionary = gd.call("get_primitive_vfx", tipo)
 		var path: String = "res://assets/vfx/%s.png" % pv["sprite"]
 		assert_true(FileAccess.file_exists(path), "%s ha il foglio %s" % [tipo, path])

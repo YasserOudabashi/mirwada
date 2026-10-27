@@ -329,8 +329,8 @@
       ],
       "priority": 18,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-27: tools/art/build_vfx.py gruppo 2: vfx_hex (triangolo del maleficio sopra la testa, gocce scure), vfx_fracture (96: lampo delle crepe, spuntoni, sassi che saltano e ricadono), vfx_dread (fili di fumo scuro e teschio), vfx_pilfer (lampo davanti e monete che volano verso chi lancia; gira), vfx_smoulder (fiamme alle gambe e braci), vfx_umbra (pozza d'ombra con le lingue che salgono), vfx_unwind (96: lampo dell'anello, quadrante con freccia antioraria), vfx_bloom (germogli con foglie e fiori). vfx.json: frames curse 4, terrain_modify 5, steal 4, dot 4; steal gira. Primo giro corretto a occhio (fumo, fiamme, piante, freccia, sassi). 1 test. arte/revisione/vfx_primitive_2.png, prova a schermo vfx_primitive_2_in_gioco.png (Error)."
     },
     {
       "id": "US-8B43",

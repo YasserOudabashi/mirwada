@@ -259,7 +259,8 @@ rottura della postura). **FATTA in parte (2026-10-26)**: `vfx_slash`, `vfx_bolt`
 invisibile) con `vfx_bolt_scoppio`, `vfx_streak` in `tools/art/build_vfx.py`, colorati dalla rampa; il feedback del
 colpo resta da fare.
 **US-8B41..43 [A] Le altre 24 primitive**, a gruppi di 8. *Domande (M) per gruppo.* **US-8B41 FATTA (2026-10-27)**: buff_stat, debuff_stat,
-aura, heal, summon, reveal_info, teleport, illusion; gruppi 2 e 3 in `prd.json`.
+aura, heal, summon, reveal_info, teleport, illusion. **US-8B42 FATTA (2026-10-27)**: curse, terrain_modify, fear,
+steal, dot, shadow_meld, time_rewind, plant_growth. Gruppo 3 in `prd.json`.
 **US-8B44 [A] Varianti `riduci_flash`** di tutti gli effetti con lampo.
 
 ### Blocco E — Creature e trasformazioni
