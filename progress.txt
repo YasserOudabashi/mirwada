@@ -14729,3 +14729,25 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   lo scafo (prima della correzione restava sul bordo di poppa). Test test_gesti.test_in_volo_e_in_barca. 1043 test.
 - A schermo: arte/revisione/enel_mezzi_in_gioco.png (barca prima/dopo, volo prima/dopo).
 - Nuoto e arrampicata: arrivano col loro gameplay (US-8B90, US-8B92): oggi non c'e' acqua bassa ne' pareti scalabili.
+
+## US-8B22a — Forzieri e tabelle di bottino, 2026-10-27
+- L'utente ha detto "vai" senza scegliere fra forzieri, fauna e cannocchiale: si fanno in quest'ordine. Scelte di
+  Claude (da correggere nei dati se non vanno): il forziere si apre una volta sola; il bottino va dritto nello zaino
+  (gli oggetti a terra oggi non restano raccolti nel salvataggio: buttati a terra si perderebbero uscendo).
+- data/world/bottino.json: tabelle grotta, fogne, cripta = tiri [min, max] estrazioni pesate, ognuna con quantita'
+  [min, max]; le voci uguali si sommano. GameData.get_tabella_bottino(id).
+- scripts/forziere.gd (Area2D): disegno chiuso/aperto (arredi forziere/forziere_aperto), corpo sul livello dei muri,
+  prompt "[tasto] Apri" SOPRA il forziere (sotto c'e' chi lo apre, col suo nome), scritta "Trovato: ..." che sale se
+  va a capo, apri() / tira() (statico, seme fisso nei test). WorldState.forzieri_aperti nel salvataggio.
+- interior_scene._crea_forzieri: la casella del forziere diventa muro come un arredo (gli ospiti del varco non ci
+  finiscono sopra). Forzieri: valle_grotta_di_marea (10,3) nella nicchia fra l'acqua, mirwada_sotterraneo (1,6),
+  marche_cripta (6,1) al posto della cassa.
+- Arte: forge3d/arredi.py forziere (coperchio a botte: la venatura di "wood" sul cilindro girato andava di traverso,
+  ora "leather" con le doghe lungo il coperchio), forziere_aperto (oro e luccichio, coperchio ribaltato). La cassa
+  sembrava un forziere chiuso (serratura d'oro, ferro): ridisegnata da carico, assi e traversa. Comando:
+  python tools/art/build_interni.py (rigenera tutti gli arredi: cambiano solo cassa e i due forzieri, il resto identico).
+- Trovato a schermo: l'area di 1.6 caselle non arrivava a chi sta nella casella accanto (la forma del giocatore e' ai
+  piedi): ora 2.4. Il prompt sotto il forziere finiva dietro il nome di Enel: spostato sopra.
+- tests/test_forzieri.gd (4). 1047 test, validate 0. arte/revisione/forzieri.png (chiaro e scuro, due modalita'),
+  forzieri_in_gioco.png (cripta prima/dopo, grotta con la cassa nuova accanto al forziere).
+- US-8B22b: forzieri nel sottosuolo del mondo e oggetti casuali nelle casette.

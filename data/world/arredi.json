@@ -16,6 +16,8 @@
     "letto": {"misura": [1, 2], "blocca": true},
     "camino": {"misura": [2, 1], "blocca": true},
     "cassa": {"misura": [1, 1], "blocca": true},
+    "forziere": {"misura": [1, 1], "blocca": true},
+    "forziere_aperto": {"misura": [1, 1], "blocca": true},
     "sacchi": {"misura": [1, 1], "blocca": true},
     "vaso": {"misura": [1, 1], "blocca": true},
     "tappeto": {"misura": [2, 1], "blocca": false, "a_terra": true},

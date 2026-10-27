@@ -64,6 +64,7 @@ const PATH_REGIONS := "res://data/world/regions.json"
 const PATH_CAMPAGNA := "res://data/world/campagna.json"
 const PATH_ARREDI := "res://data/world/arredi.json"
 const PATH_MEZZI := "res://data/world/mezzi.json"
+const PATH_BOTTINO := "res://data/world/bottino.json"
 const PATH_ICONE := "res://data/ui/icone.json"
 const PATH_ROSTER := "res://data/npc/roster.json"
 const PATH_FACTIONS := "res://data/factions.json"
@@ -129,6 +130,7 @@ var _regions: Dictionary = {}
 var _campagna: Dictionary = {}
 var _arredi: Dictionary = {}
 var _mezzi: Dictionary = {}
+var _bottino: Dictionary = {}
 var _icone: Dictionary = {}
 var _icone_tex: Dictionary = {}
 var _roster: Dictionary = {}
@@ -225,6 +227,7 @@ func load_all() -> void:
 	_load_single(PATH_CAMPAGNA, "nemici", _campagna, TYPE_ARRAY)
 	_load_single(PATH_ARREDI, "arredi", _arredi, TYPE_DICTIONARY)
 	_load_single(PATH_MEZZI, "barca", _mezzi, TYPE_DICTIONARY)
+	_load_single(PATH_BOTTINO, "tabelle", _bottino, TYPE_DICTIONARY)
 	_load_single(PATH_ICONE, "oggetti", _icone, TYPE_DICTIONARY)
 	_icone_tex.clear()
 	_load_single(PATH_ROSTER, "npcs", _roster, TYPE_ARRAY)
@@ -689,6 +692,12 @@ func get_campagna() -> Dictionary:
 ## US-8B18d: un arredo degli interni {misura, blocca, a_terra}; {} se l'id non esiste.
 func get_arredo(id: String) -> Dictionary:
 	return (_arredi.get("arredi", {}) as Dictionary).get(id, {})
+
+
+## US-8B22: una tabella di bottino {tiri, voci} (data/world/bottino.json); {} se non c'e'.
+func get_tabella_bottino(id: String) -> Dictionary:
+	var t: Variant = (_bottino.get("tabelle", {}) as Dictionary).get(id)
+	return t if typeof(t) == TYPE_DICTIONARY else {}
 
 
 ## US-8B91: un mezzo per muoversi nel mondo (data/world/mezzi.json, es. "barca"); {} se non c'e'.

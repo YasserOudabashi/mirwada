@@ -34,6 +34,7 @@
       "y": 1
     }
   ],
+  "forzieri": [{"id": "valle_grotta_di_marea_1", "x": 10, "y": 3, "tabella": "grotta"}],
   "nemici": [],
   "oggetti": []
 }

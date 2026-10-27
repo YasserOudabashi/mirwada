@@ -54,6 +54,7 @@ func _ready() -> void:
 	_dipingi(layout)
 	_arte()
 	_crea_arredi(layout)
+	_crea_forzieri(layout)
 	_crea_uscita(layout)
 	_crea_nemici(layout)
 	_crea_oggetti(layout)
@@ -118,6 +119,17 @@ func _crea_arredi(layout: Dictionary) -> void:
 		if bool(voce.get("a_terra", false)):
 			spr.z_index = -1                          # i tappeti stanno sotto chi ci passa
 		add_child(spr)
+
+
+## US-8B22: i forzieri dei dati (scripts/forziere.gd); la loro casella diventa muro come quella di un arredo,
+## cosi' gli ospiti del varco non ci finiscono sopra.
+func _crea_forzieri(layout: Dictionary) -> void:
+	for spec in (layout.get("forzieri", []) as Array):
+		var c := Vector2i(int(spec.get("x", 0)), int(spec.get("y", 0)))
+		set_cell(c, SORGENTE, Vector2i(_COLONNA_PER_CARATTERE["#"], 0))
+		var f: Area2D = preload("res://scripts/forziere.gd").new()
+		f.call("setup", str(spec.get("id", "")), str(spec.get("tabella", "")), map_to_local(c))
+		add_child(f)
 
 
 ## Nemici e oggetti della zona dietro il varco alla stessa posizione relativa nella stanza,

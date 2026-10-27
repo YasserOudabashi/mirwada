@@ -534,6 +534,35 @@
       "fase": "8b",
       "passes": true,
       "notes": "2026-10-27, decisione dell'utente: all'avvio (nessuna partita in corso, scaffale) il libro e' piu' piccolo (440x250, assets/ui/libro_avvio.png da build_libro.py) e intorno scorre il panorama; sulle altre pagine e in partita il libro torna grande (in partita col mondo dietro). forge3d/panorama.py strati(): cielo con sole/luna dove il libro non copre, nuvole, montagne, colline, citta' di mare col faro e le finestre accese di notte, mare e riva; tutto si ripete in orizzontale. tools/art/build_panorami.py (seed 3): assets/ui/panorama/<momento>/<strato>.png per i 4 momenti di data/schema/time.json. book.json tema.avvio e tema.panorama (strati, velocita', ore -> momento). Nessun Pathway o Sequenza nel panorama. Validator: carta piccola, 24 file, ore che coprono il giorno. 4 test. arte/revisione/panorami.png e panorami_in_gioco.png."
+    },
+    {
+      "id": "US-8B22a",
+      "title": "Forzieri e tabelle di bottino",
+      "description": "Un forziere che si apre una volta sola e da' oggetti presi da una tabella di bottino nei dati; i primi forzieri negli interni di grotta, fogne e cripta.",
+      "acceptanceCriteria": [
+        "tabelle di bottino in data/world/bottino.json (oggetti, pesi, quantita', numero di estrazioni)",
+        "il forziere si apre con interagisci, una volta sola, e resta aperto nel salvataggio",
+        "il bottino va nello zaino e una scritta dice cosa c'era",
+        "disegno chiuso e aperto nelle due modalita', la cassa decorativa non sembra un forziere"
+      ],
+      "priority": 31,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27, scelte di Claude (l'utente ha detto 'vai' senza scegliere, CLAUDE.md: si decide e si riassume): il bottino va dritto nello zaino (gli oggetti a terra oggi non restano raccolti nel salvataggio, quelli di un forziere si perderebbero); il forziere si apre una volta sola. scripts/forziere.gd (Area2D: prompt [tasto] Apri sopra il forziere, corpo sul livello dei muri, tira() pesato e statico), data/world/bottino.json (grotta, fogne, cripta), WorldState forzieri_aperti nel salvataggio (niente bump di versione, come gli altri campi di 'mondo'), interior_scene._crea_forzieri (la casella diventa muro come un arredo), interni: valle_grotta_di_marea (nicchia a destra), mirwada_sotterraneo, marche_cripta (al posto della cassa). Arte: arredi forziere e forziere_aperto in forge3d/arredi.py (coperchio a botte con le doghe, ferro, serratura d'oro; aperto con l'oro e un luccichio), la cassa ridisegnata da carico (assi e traversa, niente serratura). Validator: tabelle, item, pesi, quantita', id unici, forziere sul pavimento e raggiungibile. tests/test_forzieri.gd (4). arte/revisione/forzieri.png e forzieri_in_gioco.png."
+    },
+    {
+      "id": "US-8B22b",
+      "title": "Forzieri nelle caverne e oggetti casuali nelle case",
+      "description": "Forzieri nel sottosuolo del mondo (grotte, miniere, fogne, catacombe) vicino ai luoghi dei dati; oggetti casuali una volta sola nelle casette.",
+      "acceptanceCriteria": [
+        "forzieri del sottosuolo posati dai dati vicino a un punto del mondo (ingresso o boss)",
+        "nelle case qualche oggetto tirato da una tabella, che non ricompare una volta preso",
+        "verifica a schermo"
+      ],
+      "priority": 32,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
     }
   ]
 }

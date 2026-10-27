@@ -47,13 +47,9 @@
       "id": "vaso",
       "x": 11,
       "y": 1
-    },
-    {
-      "id": "cassa",
-      "x": 6,
-      "y": 1
     }
   ],
+  "forzieri": [{"id": "marche_cripta_1", "x": 6, "y": 1, "tabella": "cripta"}],
   "nemici": [],
   "oggetti": []
 }

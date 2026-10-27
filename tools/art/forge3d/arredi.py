@@ -34,12 +34,33 @@ def arredo(kind, larg, prof, seed=1, size=1.0):
         for z in (4, 20):
             cyl((10.6, 10.6, 1.2), (0, cy, z), "iron")
         cyl((9.4, 9.4, 0.6), (0, cy, 24.4), "wood")
-    elif kind == "cassa":
-        box((12, 8, 7), (0, cy, 7), "wood")
-        box((12.6, 8.6, 1.4), (0, cy, 14.2), "wood_light")          # coperchio
-        for sx in (-7, 7):
-            box((1.2, 8.8, 8), (sx, cy, 8), "iron")
-        box((2, 0.8, 2.4), (0, cy + 8.6, 10), "gold")                # serratura
+    elif kind == "cassa":                                             # da carico, di assi: niente serratura ne' ferro
+        box((11, 8, 8), (0, cy, 8), "wood_light")                     # (US-8B22: si aprono solo i forzieri)
+        for sx in (-1, 1):
+            box((1.4, 8.4, 8.4), (sx * 10.6, cy, 8.4), "wood")        # i montanti agli spigoli
+        r.part("a", "box", (11.6, 8.2, 1.2), (0, cy, 16.6), (-14, 0, 0), "leather",   # il coperchio di assi,
+               tex=("stripes", "y", 2.6, 0.12))                       # inclinato verso la luce
+        box((12.5, 0.8, 1.3), (0, cy + 8.3, 8), "wood", rot=(0, 34, 0))   # la traversa in diagonale sul davanti
+    elif kind in ("forziere", "forziere_aperto"):                    # US-8B22: coperchio a botte, ferro, serratura d'oro
+        box((13, 8, 7), (0, cy, 7), "wood")
+        for sx in (-8, 8):
+            box((1.2, 8.6, 7.4), (sx, cy, 7.4), "iron")
+        if kind == "forziere":
+            cyl_x = (0, 90, 0)                                        # il cilindro col suo asse lungo x: la botte
+            # le doghe corrono lungo il coperchio: la venatura del legno ("wood") qui andrebbe di traverso
+            r.part("a", "cylinder", (8.4, 8.4, 13), (0, cy, 14), mat="leather", rot=cyl_x, tex=("stripes", "x", 2.8, 0.12))
+            for sx in (-8, 8):
+                r.part("a", "cylinder", (9.0, 9.0, 1.2), (sx, cy, 14), mat="iron", rot=cyl_x)
+            box((2.2, 0.8, 3), (0, cy + 8.8, 13), "gold")             # la serratura sul davanti
+        else:
+            box((12.4, 7.4, 0.4), (0, cy, 13.8), "shadow_mat")         # il buio dentro, con l'oro che affiora
+            for x, y, s in ((-5, -1, 1.0), (1, 2, 1.2), (6, -2, 0.9), (-1, -4, 0.8)):
+                r.part("a", "ellipsoid", (3.2 * s, 2.6 * s, 2.6 * s), (x, cy + y, 15), mat="gold")
+            r.part("a", "ellipsoid", (1.0, 1.0, 1.0), (1, cy + 1, 18.2), mat="glow_yellow")   # il luccichio
+            su = (-58, 0, 0)                                          # il coperchio ribaltato indietro, sui cardini
+            box((13, 4.2, 1.4), (0, cy - 9.8, 17.6), "wood", rot=su)
+            for sx in (-8, 8):
+                box((1.2, 4.6, 1.7), (sx, cy - 9.8, 17.6), "iron", rot=su)
     elif kind in ("tavolo", "scrittoio", "alambicco"):
         hw, hd = W / 2 - 4, min(D / 2 - 6, 24)
         box((hw, hd, 1.6), (0, cy, 17), "wood_light")

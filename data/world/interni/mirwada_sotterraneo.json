@@ -16,6 +16,7 @@
     1
   ],
   "arredi": [{"id": "botte", "x": 1, "y": 1}, {"id": "botte", "x": 2, "y": 1}, {"id": "botte", "x": 1, "y": 2}, {"id": "cassa", "x": 8, "y": 5}, {"id": "cassa", "x": 8, "y": 6}, {"id": "sacchi", "x": 7, "y": 6}],
+  "forzieri": [{"id": "mirwada_sotterraneo_1", "x": 1, "y": 6, "tabella": "fogne"}],
   "nemici": [],
   "oggetti": []
 }

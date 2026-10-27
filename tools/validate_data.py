@@ -185,6 +185,19 @@ def valida_arredi(doc, rel, vocab, calpestabili):
                     err(f"{rel}: arredi[{i}] '{aid}' si sovrappone a '{occupate[(cx, cy)]}' in ({cx},{cy})")
                 else:
                     occupate[(cx, cy)] = aid
+    # US-8B22: un forziere e' una casella piena come un arredo (il disegno e' l'arredo "forziere")
+    forzieri = []
+    for i, f in enumerate(doc.get("forzieri", [])):
+        x, y = f.get("x"), f.get("y")
+        if not (isinstance(x, int) and isinstance(y, int)):
+            err(f"{rel}: forzieri[{i}] x/y devono essere interi")
+        elif not (0 <= x < w and 0 <= y < h) or mappa[y][x] not in calpestabili:
+            err(f"{rel}: forzieri[{i}] non e' sul pavimento in ({x},{y})")
+        elif (x, y) in occupate:
+            err(f"{rel}: forzieri[{i}] si sovrappone a '{occupate[(x, y)]}' in ({x},{y})")
+        elif "forziere" in vocab:
+            occupate[(x, y)] = "forziere"
+            forzieri.append((x, y))
     bloccate = {c for c, aid in occupate.items() if vocab[aid].get("blocca", True)}
     sx, sy = doc.get("spawn", [0, 0])
     da_raggiungere = {(int(n.get("x", 0)), int(n.get("y", 0))) for k in ("npcs", "oggetti", "nemici")
@@ -203,6 +216,9 @@ def valida_arredi(doc, rel, vocab, calpestabili):
                 coda.append((nx, ny))
     for c in sorted(da_raggiungere - visto - bloccate):
         err(f"{rel}: dallo spawn non si arriva a {c}: gli arredi chiudono il passaggio")
+    for x, y in forzieri:
+        if not {(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)} & visto:
+            err(f"{rel}: dallo spawn non si arriva accanto al forziere in ({x},{y})")
 
 
 def main():
@@ -1807,6 +1823,52 @@ def main():
                     err(f"{rel} [{rid}]: oggetto a ({ox},{oy}) non e' su una cella calpestabile")
                 if og.get("item_id") not in item_ids:
                     err(f"{rel} [{rid}]: oggetto item_id '{og.get('item_id')}' non esiste in data/items/")
+
+    # --- bottino e forzieri (US-8B22) ---
+    # data/world/bottino.json: tabelle {tiri: [min, max], voci: [{item_id, peso, quantita: [min, max]}]}. Ogni
+    # forziere di un interno ha un id unico (e' la chiave nel salvataggio) e una tabella che esiste.
+    _bott_rel = "data/world/bottino.json"
+    _bott = load_json(os.path.join(DATA, "world", "bottino.json")) or {}
+    tabelle_bottino = _bott.get("tabelle", {})
+    if not isinstance(tabelle_bottino, dict) or not tabelle_bottino:
+        err(f"{_bott_rel}: 'tabelle' deve essere un dict non vuoto")
+        tabelle_bottino = {}
+
+    def _intervallo(v):
+        return isinstance(v, list) and len(v) == 2 and all(isinstance(n, int) for n in v) and 1 <= v[0] <= v[1]
+
+    for _tid, _t in tabelle_bottino.items():
+        if not _intervallo(_t.get("tiri")):
+            err(f"{_bott_rel} [{_tid}]: tiri deve essere [min, max] di interi con 1 <= min <= max")
+        _voci = _t.get("voci", [])
+        if not isinstance(_voci, list) or not _voci:
+            err(f"{_bott_rel} [{_tid}]: voci deve essere una lista non vuota")
+            continue
+        for _i, _v in enumerate(_voci):
+            if _v.get("item_id") not in item_ids:
+                err(f"{_bott_rel} [{_tid}]: voci[{_i}] item_id '{_v.get('item_id')}' non esiste in data/items/")
+            if not (isinstance(_v.get("peso"), (int, float)) and _v.get("peso") > 0):
+                err(f"{_bott_rel} [{_tid}]: voci[{_i}] peso deve essere un numero > 0")
+            if not _intervallo(_v.get("quantita")):
+                err(f"{_bott_rel} [{_tid}]: voci[{_i}] quantita deve essere [min, max] con 1 <= min <= max")
+    _id_forzieri = {}
+    for fn in sorted(os.listdir(interni_dir)) if os.path.isdir(interni_dir) else []:
+        if not fn.endswith(".json"):
+            continue
+        for _i, _f in enumerate((load_json(os.path.join(interni_dir, fn)) or {}).get("forzieri", [])):
+            _ctx = f"data/world/interni/{fn}: forzieri[{_i}]"
+            _fid = _f.get("id")
+            if not isinstance(_fid, str) or not _fid:
+                err(f"{_ctx}: manca l'id")
+            elif _fid in _id_forzieri:
+                err(f"{_ctx}: id '{_fid}' gia' usato in {_id_forzieri[_fid]}")
+            else:
+                _id_forzieri[_fid] = fn
+            if _f.get("tabella") not in tabelle_bottino:
+                err(f"{_ctx}: tabella '{_f.get('tabella')}' non esiste in {_bott_rel}")
+    for _a in ("forziere", "forziere_aperto"):
+        if _a not in vocab_arredi:
+            err(f"data/world/arredi.json: manca '{_a}', il disegno dei forzieri (US-8B22)")
 
     # --- ingredienti delle formule (US-808) ---
     # Ogni ingrediente citato da una formula di potion (tutte quelle in

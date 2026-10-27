@@ -13,6 +13,8 @@ HUD_PROMPT_ENTRA,[{tasto}] Entra,[{tasto}] Enter
 HUD_VARCO_CHIUSO,Il passaggio è chiuso,The way is closed
 HUD_PROMPT_SALI_BARCA,[{tasto}] Sali in barca,[{tasto}] Board the boat
 HUD_PROMPT_SCENDI_BARCA,[{tasto}] Scendi a terra,[{tasto}] Go ashore
+HUD_PROMPT_APRI,[{tasto}] Apri,[{tasto}] Open
+HUD_FORZIERE_TROVATO,Trovato: {oggetti},Found: {oggetti}
 HUD_VOLO_NON_ATTERRA,Qui non si atterra,You can't land here
 BOOK_SCAFFALE_TOMO_NUOVO,Tomo nuovo,New tome
 BOOK_SCAFFALE_TOMO_BRUCIATO,Tomo bruciato,Burnt tome

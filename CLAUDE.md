@@ -218,6 +218,10 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
   `mondo.gd popola()`: al luogo della zona o nella stessa posizione relativa della regione, mai a mano.
 - Spawn, insediamenti e NPC usciti dal generatore sono **suggerimenti**: i personaggi veri
   restano nei dati (`data/npcs`, `data/factions`) e non vengono scritti dal generatore.
+- Forzieri (US-8B22a): tabelle di bottino in `data/world/bottino.json`, il forziere (`scripts/forziere.gd`) sta nei
+  dati del luogo (`forzieri` [{id, x, y, tabella}] di un interno), si apre una volta sola (`WorldState`, nel
+  salvataggio) e il bottino va nello zaino. Disegni: arredi `forziere`/`forziere_aperto`; la `cassa` non ha serratura
+  (si aprono solo i forzieri).
 - Panorami (`forge3d/panorama.py`): strati separati per il parallasse (`sky`, `clouds`,
   `far`, `mid`, `near`, `fg`), con le quattro fasce del `TimeSystem` (alba, giorno,
   tramonto, notte). `strati()` (US-8B74) fa strati che si ripetono in orizzontale: citta' di mare col faro, montagne,
@@ -370,7 +374,7 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   glifi delle primitive nella hotbar (US-8B72), VFX degli attacchi base (US-8B40) e di tutte le primitive
   (US-8B41..43), feedback del colpo (US-8B40b), ritratti nel dialogo (US-8B35a/b), le pagine del libro sulle due
   facciate (US-8B73b/c/d), le forme di Enel, gigante e arma di luce (US-8B50a/b/c), i gesti di Enel (interagire, raccogliere, bere,
-  rituale: US-8B80a/b), Enel in volo e in barca (US-8B81a/b), panorama dell'avvio (US-8B74).
+  rituale: US-8B80a/b), Enel in volo e in barca (US-8B81a/b), panorama dell'avvio (US-8B74), forzieri (US-8B22a).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
