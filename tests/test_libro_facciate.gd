@@ -39,6 +39,33 @@ func test_il_dialogo_sta_a_sinistra_e_le_scelte_a_destra() -> void:
 	ov.free()
 
 
+## US-8B73c: ogni pagina sta nelle sue facciate: niente chiede piu' larghezza di quella che la facciata ha (una
+## larghezza minima fissa troppo grande, come i 360 dello scaffale, la spingerebbe oltre la piega).
+func test_nessuna_pagina_e_piu_larga_della_sua_facciata() -> void:
+	var b: Node = _root().get_node("Book")
+	b.call("azzera")
+	var ov: CanvasLayer = _monta()
+	b.call("apri")
+	var provate := 0
+	for p in b.call("pagine"):
+		var pid: String = str((p as Dictionary).get("id", ""))
+		if bool((p as Dictionary).get("transitoria", false)):
+			continue                                   # il dialogo: provato sopra, con un dialogo vero
+		b.call("vai_a", pid)
+		for i in 4:
+			ov.call("_process", 0.2)                   # finisce la voltata: la pagina nuova e' disegnata
+		for nodo in ["Pagina/Contenuto", "Pagina/Destra"]:
+			var f: Control = ov.get_node(nodo)
+			if f.visible:
+				assert_true(f.get_combined_minimum_size().x <= f.size.x + 0.5,
+					"%s: %s chiede %d unita', la facciata ne ha %d" % [pid, nodo,
+					int(f.get_combined_minimum_size().x), int(f.size.x)])
+		provate += 1
+	assert_gt(float(provate), 6.0, "tutte le pagine del libro")
+	b.call("chiudi")
+	ov.free()
+
+
 func test_la_mappa_usa_la_doppia_pagina() -> void:
 	var b: Node = _root().get_node("Book")
 	b.call("azzera")

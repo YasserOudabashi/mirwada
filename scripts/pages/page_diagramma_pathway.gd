@@ -23,6 +23,7 @@ extends ScrollContainer
 ## La Sequenza corrente e' evidenziata e le sue abilita' sono elencate sotto.
 ## Nessun nome di Pathway/Sequenza hardcoded: solo id e chiavi i18n.
 
+const PaginaLibro := preload("res://scripts/pages/pagina_libro.gd")
 const C_NOTO := Color("#b86f50")          # colori della carta (palette Endesga 32)
 const C_IGNOTO := Color("#e4a672")
 const C_CORRENTE := Color("#a22633")
@@ -53,14 +54,25 @@ var _avanzamento: Dictionary = {}
 ## Pathway non_standard. NON azzerato in aggiorna(): e' l'ultimo risultato.
 var _dono_stato: Dictionary = {}
 var _vbox: VBoxContainer = null
+## US-8B73d: la griglia sulla facciata sinistra, la Sequenza corrente, la fusione e l'avanzamento sulla destra (la
+## mette li' il libro, book_overlay.gd). La griglia e' girata: una riga per Pathway, le Sequenze da 9 a 0 in colonna,
+## cosi' le 10 colonne stanno in una facciata senza scorrere di lato.
+var destra := ScrollContainer.new()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE and is_instance_valid(destra) and destra.get_parent() == null:
+		destra.free()                                # nessun libro l'ha presa: non resta orfana
 
 
 func aggiorna() -> void:
-	for c in get_children():
-		c.queue_free()
-	_vbox = VBoxContainer.new()
-	_vbox.add_theme_constant_override("separation", 6)
-	add_child(_vbox)
+	for madre in [self, destra]:
+		for c in madre.get_children():
+			c.queue_free()
+	horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	destra.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_vbox = _colonna(self)
+	var colonna_destra: VBoxContainer = _colonna(destra)
 	_stati.clear()
 	_abilita.clear()
 	_vicini.clear()
@@ -79,22 +91,25 @@ func aggiorna() -> void:
 	var mia_seq: int = int(prog.call("sequence")) if prog != null else 9
 
 	var griglia := GridContainer.new()
-	griglia.columns = pathway_ids.size() + 1
+	griglia.columns = 11                              # il nome del Pathway e le Sequenze da 9 a 0
 	griglia.add_theme_constant_override("h_separation", 2)
 	griglia.add_theme_constant_override("v_separation", 2)
 	_vbox.add_child(griglia)
 
-	griglia.add_child(_cella_testo(""))
-	for pid in pathway_ids:
-		var pw: Dictionary = gd.call("get_pathway", pid)
-		griglia.add_child(_cella_testo(str(gd.call("tr_data", pw.get("name_i18n", pid))), true))
-
+	griglia.add_child(_cella_testo("", true))
 	for n in range(9, -1, -1):
 		griglia.add_child(_cella_testo("S%d" % n))
-		for pid in pathway_ids:
+	for pid in pathway_ids:
+		var pw: Dictionary = gd.call("get_pathway", pid)
+		var nome_riga := _cella_testo(str(gd.call("tr_data", pw.get("name_i18n", pid))), true)
+		if pid == mio:
+			nome_riga.add_theme_color_override("font_color", C_CORRENTE)   # la propria riga
+		griglia.add_child(nome_riga)
+		for n in range(9, -1, -1):
 			var stato: String = _stato(pid, n, mio, mia_seq, kn)
 			_stati["%s:%d" % [pid, n]] = stato
 			griglia.add_child(_cella_cella(stato))
+	_vbox = colonna_destra
 
 	# --- dettaglio della Sequenza corrente ---
 	if prog != null and not mio.is_empty():
@@ -147,7 +162,9 @@ func _sezione_fusione(gd: Node, _prog: Node, mio: String, pw: Dictionary) -> voi
 
 		var h := HBoxContainer.new()
 		var l := Label.new()
-		l.custom_minimum_size = Vector2(200, 0)
+		l.custom_minimum_size = Vector2(90, 0)       # prende lo spazio che resta e va a capo: mai oltre la piega
+		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.text = "%s — %s" % [
 			str(gd.call("tr_data", altro.get("name_i18n", pid))),
 			tr("BOOK_DIAGRAMMA_FUSIONE_SCRITTO") if scritto else tr("BOOK_DIAGRAMMA_FUSIONE_STUB")]
@@ -157,11 +174,15 @@ func _sezione_fusione(gd: Node, _prog: Node, mio: String, pw: Dictionary) -> voi
 		if puo:
 			var b := Button.new()
 			b.text = tr("BOOK_DIAGRAMMA_FUSIONE_CONFERMA")
+			b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			b.pressed.connect(fondi.bind(pid))
 			h.add_child(b)
 		else:
 			var m := Label.new()
 			m.modulate = Color(1, 1, 1, 0.55)
+			m.custom_minimum_size = Vector2(60, 0)
+			m.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			m.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			m.text = tr("BOOK_DIAGRAMMA_FUSIONE_TROPPO_PRESTO")
 			h.add_child(m)
 		_vbox.add_child(h)
@@ -241,6 +262,7 @@ func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, s
 		if parziale else tr("BOOK_DIAGRAMMA_AVANZAMENTO_PREPARA")
 	b_prepara.disabled = not (car_posseduta and posseduti.size() >= soglia)
 	b_prepara.pressed.connect(prepara_pozione)
+	PaginaLibro.a_capo(b_prepara)
 	_vbox.add_child(b_prepara)
 
 	var pronta: Dictionary = ps.call("pozione_pronta") if ps != null else {}
@@ -248,6 +270,7 @@ func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, s
 		var disponibile: bool = ps != null and bool(ps.call("avanzamento_disponibile"))
 		var forzabile: bool = ps != null and bool(ps.call("avanzamento_forzabile"))
 		var b_bevi := Button.new()
+		PaginaLibro.a_capo(b_bevi)
 		if disponibile:
 			b_bevi.text = tr("BOOK_DIAGRAMMA_AVANZAMENTO_BEVI")
 			b_bevi.pressed.connect(bevi_pozione.bind(false))
@@ -293,6 +316,7 @@ func _sezione_dono(gd: Node) -> void:
 
 	var puo_ricevere: bool = bool(bs.call("puo_ricevere"))
 	var b := Button.new()
+	PaginaLibro.a_capo(b)
 	b.text = tr("BOOK_DIAGRAMMA_DONO_RICEVI")
 	b.disabled = not puo_ricevere
 	b.pressed.connect(ricevi_dono)
@@ -485,7 +509,7 @@ func _stato(pid: String, n: int, mio: String, mia_seq: int, kn: Node) -> String:
 
 func _cella_cella(stato: String) -> Control:
 	var r := ColorRect.new()
-	r.custom_minimum_size = Vector2(44, 13)
+	r.custom_minimum_size = Vector2(13, 11)
 	match stato:
 		"corrente": r.color = C_CORRENTE
 		"noto": r.color = C_NOTO
@@ -494,10 +518,10 @@ func _cella_cella(stato: String) -> Control:
 	return r
 
 
-func _cella_testo(t: String, ruota: bool = false) -> Control:
+func _cella_testo(t: String, nome: bool = false) -> Control:
 	var l := Label.new()
 	l.text = t
-	l.custom_minimum_size = Vector2(44 if ruota else 24, 13)
+	l.custom_minimum_size = Vector2(70 if nome else 13, 11)
 	l.clip_text = true
 	l.add_theme_font_size_override("font_size", 8)
 	return l
@@ -506,7 +530,16 @@ func _cella_testo(t: String, ruota: bool = false) -> Control:
 func _riga(t: String) -> Label:
 	var l := Label.new()
 	l.text = t
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	return l
+
+
+func _colonna(madre: Node) -> VBoxContainer:
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 6)
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	madre.add_child(v)
+	return v
 
 
 func _n(path: String) -> Node:

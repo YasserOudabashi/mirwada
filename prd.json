@@ -386,8 +386,8 @@
       ],
       "priority": 23,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-27: inventario: elenco della sezione a sinistra, indice delle sezioni (i 7 bottoni, prima una riga larga 406) a destra; righe senza larghezze fisse (_larga). Diagramma: griglia girata, una riga per Pathway con le Sequenze da 9 a 0 in colonna (le 10 colonne stavano in una facciata solo scorrendo di lato), la propria riga in rosso; Sequenza corrente, abilita', prossima, fusione e avanzamento a destra; bottoni e motivi che vanno a capo. Sinergie e diario non hanno ancora una scena (appunto a matita). Test generale test_nessuna_pagina_e_piu_larga_della_sua_facciata (larghezza minima di ogni facciata di ogni pagina). arte/revisione/libro_inventario_diagramma.png."
     },
     {
       "id": "US-8B41",

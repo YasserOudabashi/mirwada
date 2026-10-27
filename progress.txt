@@ -14637,3 +14637,19 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - Test aggiornati: test_creazione_talenti (le checkbox sulla facciata destra), test_settings (i comandi a destra).
 - A schermo: arte/revisione/libro_scaffale_frontespizio_colophon.png (scaffale piccolo all'avvio, creazione, in
   partita, colophon).
+
+## US-8B73d — Inventario e diagramma sulle due facciate, 2026-10-27
+- Inventario (pagina_libro): l'elenco della sezione (ScrollContainer, dove i test lo cercano) a sinistra, l'indice delle
+  7 sezioni in colonna a destra (la riga dei bottoni era larga 406). Righe senza larghezze fisse (300, 220, 200...):
+  _larga() le fa allargare e andare a capo.
+- Diagramma (ScrollContainer con `destra` come il colophon): griglia girata, una riga per Pathway (nome a 70 unita',
+  font 8) e le Sequenze 9..0 in colonna (celle 13x11): le 10 colonne di prima stavano in una facciata solo scorrendo
+  di lato e i nomi erano tagliati. La propria riga ha il nome in rosso. A destra Sequenza corrente, abilita', prossima,
+  fusione (etichette e motivi che vanno a capo, bottoni centrati) e avanzamento/dono (bottoni a_capo). I test del
+  diagramma usano cella_stato/abilita_elencate/vicini_fondibili: non dipendono dal disegno.
+- Test generale (test_libro_facciate): per ogni pagina del libro la larghezza minima di Contenuto e Destra non supera
+  la facciata. Ha trovato da solo inventario (406), colophon (284, poi il finale lasciato da un altro test) e la destra
+  del diagramma (299, 278).
+- Sinergie e diario non hanno ancora una scena di pagina (mostrano l'appunto a matita): quando arrivano, il test le
+  controlla da solo.
+- A schermo: arte/revisione/libro_inventario_diagramma.png (Twilight Giant a Sequenza 4: fusione e avanzamento).

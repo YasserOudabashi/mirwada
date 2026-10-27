@@ -392,7 +392,8 @@ dal PRD dell'arte le creature e le animazioni nuove di Enel (blocchi E/G).
 - **Libro** (2026-10-25): copertina di cuoio, pergamena, font Alegreya/Alegreya SC, inchiostro scuro; tutto in
   `data/ui/book.json` `tema`, immagini da `tools/art/build_libro.py`. Niente si scrive sulla piega (US-8B73b): una
   pagina sta sulla facciata sinistra col titolo, la sua proprieta' `destra` sulla facciata destra; solo le pagine con
-  `doppia_pagina` nei dati (la mappa) usano le due facciate come un foglio.
+  `doppia_pagina` nei dati (la mappa) usano le due facciate come un foglio. Le pagine a colonna estendono
+  `scripts/pages/pagina_libro.gd`; un test vuole che nessuna facciata chieda piu' larghezza di quella che ha.
 - **Varchi delle sotto-aree** (2026-10-26): ogni area del gating di `regions.json` e' un **ingresso** sulla mappa
   verso un interno (cripta, tempio, radura, grotta grande, sala dei sigilli, isola di nebbia); `AreaGate` decide se
   si apre. La mappa approvata non cambia. I ponti di radici sono un ponte che compare sul burrone.

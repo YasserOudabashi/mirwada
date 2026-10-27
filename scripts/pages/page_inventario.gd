@@ -1,4 +1,4 @@
-extends VBoxContainer
+extends "res://scripts/pages/pagina_libro.gd"
 ## Pagina inventario del libro (US-307). Sette sezioni: Zaino, Indosso,
 ## Ricettario, Talenti, Base, Sinergie (US-410), Diario (US-616b).
 ##
@@ -6,7 +6,8 @@ extends VBoxContainer
 
 const SEZIONI := ["zaino", "indosso", "ricettario", "talenti", "base", "sinergie", "journal"]
 
-var _tab: HBoxContainer = null
+## US-8B73d: l'elenco della sezione sulla facciata sinistra, l'indice delle sezioni sulla destra.
+var _tab: VBoxContainer = null
 var _corpo: VBoxContainer = null
 var _sezione: String = "zaino"
 ## US-411: id delle sinergie attivate mentre la pagina e' viva. La riga si
@@ -15,11 +16,10 @@ var _appena_attivate: Array = []
 
 
 func aggiorna() -> void:
-	for c in get_children():
-		c.queue_free()
-	_tab = HBoxContainer.new()
+	svuota()
+	_tab = VBoxContainer.new()
 	_tab.add_theme_constant_override("separation", 4)
-	add_child(_tab)
+	destra.add_child(_tab)
 	for s in SEZIONI:
 		var b := Button.new()
 		b.text = tr("BOOK_INV_" + s.to_upper())
@@ -122,7 +122,7 @@ func _riga_item(v: Dictionary) -> HBoxContainer:
 	var nome: String = str(gd.call("tr_data", it.get("name_i18n", v.get("item_id"))))
 	var q: int = int(v.get("quantita", 1))
 	l.text = nome + ("  x%d" % q if q > 1 else "")
-	l.custom_minimum_size = Vector2(300, 0)
+	_larga(l)
 	l.add_theme_color_override("font_color", _colore_rarita(str(gd.call("rarita_di", item_id))))
 	h.add_child(l)
 	var cat: String = str(it.get("categoria", ""))
@@ -184,7 +184,7 @@ func _ricettario() -> void:
 		if bool(ps.call("ricetta_nota", rid)):
 			var l := Label.new()
 			l.text = "%s  (%s)" % [str(gd.call("tr_data", r.get("name_i18n", rid))), str(r.get("tier"))]
-			l.custom_minimum_size = Vector2(300, 0)
+			_larga(l)
 			h.add_child(l)
 			var ha_tutto := true
 			for ing in ingr:
@@ -214,12 +214,12 @@ func _indosso() -> void:
 		var h := HBoxContainer.new()
 		var l := Label.new()
 		l.text = tr("BOOK_SLOT_" + str(mount).to_upper())
-		l.custom_minimum_size = Vector2(120, 0)
+		l.custom_minimum_size = Vector2(80, 0)
 		h.add_child(l)
 		var it: Dictionary = eq.call("equipaggiato", mount)
 		var n := Label.new()
 		n.text = str(gd.call("tr_data", it.get("name_i18n", ""))) if not it.is_empty() else tr("BOOK_INV_VUOTO")
-		n.custom_minimum_size = Vector2(200, 0)
+		_larga(n)
 		h.add_child(n)
 		if not it.is_empty():
 			h.add_child(_azione(tr("BOOK_INV_TOGLI"), func() -> void:
@@ -269,7 +269,7 @@ func _giardino(bs: Node) -> void:
 		var a: Dictionary = stato[i]
 		var h := HBoxContainer.new()
 		var l := Label.new()
-		l.custom_minimum_size = Vector2(220, 0)
+		_larga(l)
 		if str(a.get("item_id", "")).is_empty():
 			l.text = tr("BOOK_BASE_APPEZZAMENTO_VUOTO")
 		elif bool(a.get("pronto", false)):
@@ -353,12 +353,13 @@ func _talenti() -> void:
 		var h := HBoxContainer.new()
 		var l := Label.new()
 		l.text = str(gd.call("tr_data", t.get("name_i18n", tid)))
-		l.custom_minimum_size = Vector2(160, 0)
+		_larga(l)
 		h.add_child(l)
 		var barra := ProgressBar.new()
 		barra.max_value = target
 		barra.value = minf(conta, target)
-		barra.custom_minimum_size = Vector2(140, 14)
+		barra.custom_minimum_size = Vector2(70, 14)
+		barra.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		h.add_child(barra)
 		var q := Label.new()
 		q.text = "%d / %d" % [int(conta), int(target)]
@@ -472,6 +473,13 @@ func righe_journal() -> int:
 
 
 # --- Costruttori -----------------------------------------------------
+
+## Un'etichetta di riga che prende lo spazio che resta sulla facciata e va a capo: mai oltre la piega.
+func _larga(l: Label) -> void:
+	l.custom_minimum_size = Vector2(90, 0)
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
 
 func _azione(testo: String, cb: Callable) -> Button:
 	var b := Button.new()
