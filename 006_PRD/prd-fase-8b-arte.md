@@ -283,7 +283,9 @@ Rispettano il fog of war: nessun dettaglio rivela Sequenze non raggiunte.
 nella hotbar davanti al nome dell'abilita'.
 **US-8B73 [A] Pagine del libro. M per pagina.** Le 9 pagine di `data/ui/book.json`,
 i segnalibri, la voltata, le macchie, la pagina "follia".
-**US-8B74 [A] Panorami. L.** Schermata iniziale e libro: 6 strati × 4 fasce orarie.
+**US-8B74 [A] Panorami. L.** Schermata iniziale e libro: 6 strati × 4 fasce orarie. **FATTA (2026-10-27)**: decisione dell'utente,
+all'avvio il libro e' piu' piccolo e intorno scorre il panorama (citta' di mare col faro); 6 strati x 4 momenti in
+`tools/art/build_panorami.py`, carta piccola da `build_libro.py`, `book_overlay.gd`.
 
 ### Blocco G — Animazioni nuove di Enel
 

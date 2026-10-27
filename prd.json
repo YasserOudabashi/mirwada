@@ -316,8 +316,8 @@
       ],
       "priority": 19,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-27, decisione dell'utente: all'avvio (nessuna partita in corso, scaffale) il libro e' piu' piccolo (440x250, assets/ui/libro_avvio.png da build_libro.py) e intorno scorre il panorama; sulle altre pagine e in partita il libro torna grande (in partita col mondo dietro). forge3d/panorama.py strati(): cielo con sole/luna dove il libro non copre, nuvole, montagne, colline, citta' di mare col faro e le finestre accese di notte, mare e riva; tutto si ripete in orizzontale. tools/art/build_panorami.py (seed 3): assets/ui/panorama/<momento>/<strato>.png per i 4 momenti di data/schema/time.json. book.json tema.avvio e tema.panorama (strati, velocita', ore -> momento). Nessun Pathway o Sequenza nel panorama. Validator: carta piccola, 24 file, ore che coprono il giorno. 4 test. arte/revisione/panorami.png e panorami_in_gioco.png."
     }
   ]
 }

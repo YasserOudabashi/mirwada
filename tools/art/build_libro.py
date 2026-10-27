@@ -4,7 +4,7 @@ Il libro (design-ui-libro.md): la doppia pagina che fa da cornice a ogni scherma
 dell'arte, senza disegno a mano. Palette Endesga 32 (forge3d/materials.py E32), niente colori fuori palette,
 niente anti-aliasing (pixel pieni o trasparenti), luce da alto-sinistra.
 
-    python tools/art/build_libro.py      # assets/ui/libro.png, segnalibro*.png, spunta_*.png, ornamento.png
+    python tools/art/build_libro.py      # assets/ui/libro.png, libro_avvio.png, segnalibro*.png, spunta_*.png, ornamento.png
 
 libro.png e' grande quanto la pagina del gioco in unita' (600 x 340): un texel = un'unita' = 2 pixel a schermo,
 la stessa grana del terreno. Stesso seed = stessi PNG.
@@ -58,7 +58,8 @@ def rampa(img, maschera, valore, toni):
         img[maschera & (i == k), :3] = C[t]
 
 
-def libro(rng):
+def libro(rng, W=W, H=H):
+    """La doppia pagina con la copertina: W x H unita' (la pagina del gioco; piu' piccola all'avvio, US-8B74)."""
     img = np.zeros((H, W, 4), np.uint8)
     yy, xx = np.mgrid[0:H, 0:W]
     # --- copertina di cuoio, angoli smussati ---
@@ -179,6 +180,8 @@ def main():
         "spunta_no.png": spunta(False),
         "spunta_si.png": spunta(True),
         "ornamento.png": ornamento(),
+        # US-8B74: all'avvio il libro e' piu' piccolo e intorno si vede il panorama (data/ui/book.json tema.avvio)
+        "libro_avvio.png": libro(np.random.RandomState(SEED + 1), 440, 250),
     }
     tavolozza = {tuple(int(c) for c in v) for v in C.values()}
     for nome, img in fogli.items():

@@ -195,7 +195,8 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
   restano nei dati (`data/npcs`, `data/factions`) e non vengono scritti dal generatore.
 - Panorami (`forge3d/panorama.py`): strati separati per il parallasse (`sky`, `clouds`,
   `far`, `mid`, `near`, `fg`), con le quattro fasce del `TimeSystem` (alba, giorno,
-  tramonto, notte).
+  tramonto, notte). `strati()` (US-8B74) fa strati che si ripetono in orizzontale: citta' di mare col faro, montagne,
+  mare davanti; `build_panorami.py` li esporta alla grana del libro (640x360, 1 texel = 1 unita').
 
 ### Impostazioni Godot per la pixel art
 - Default Texture Filter = **Nearest**.
@@ -208,7 +209,7 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - A 32 px il viso è ridotto al minimo; a 48–64 px si legge bene.
 - Nella preparazione degli attacchi l'arma può restare dietro la testa.
 - Il ponte è un rettangolo di legno.
-- I panorami sono ancora piatti.
+- I panorami hanno una sola veduta (la citta' di mare): niente panorami per regione.
 - Mancano: animazioni di arrampicata/nuoto/volo, mostri volanti grandi (c'è solo `bird()` per i volatili
   piccoli), castelli e ponti dettagliati. Vanno aggiunti a `forge3d`, con una story dedicata.
 - Le case (`creatures.edificio`, US-8B18a) coprono a schermo il loro sedime e sporgono verso nord di 3-4
@@ -258,7 +259,8 @@ python tools/art/esporta_mondo.py --varchi         # solo i disegni dei varchi d
 python tools/art/esporta_mondo.py --barca          # solo il disegno della barca (pochi secondi)
 python tools/art/build_interni.py              # interni: pavimenti, pareti e arredi -> assets/interni/<tema>/
 python tools/art/build_npc.py                  # aspetti degli NPC (personaggio_<aspetto>_{idle,walk}.png)
-python tools/art/build_libro.py                # carta, segnalibri, caselle e filetto del libro (assets/ui/)
+python tools/art/build_libro.py                # carta (grande e piccola dell'avvio), segnalibri, caselle e filetto (assets/ui/)
+python tools/art/build_panorami.py             # panorama a 6 strati x 4 momenti dietro il libro all'avvio (assets/ui/panorama/)
 python tools/art/build_icone.py                # icone degli oggetti: abbina i nuovi in data/ui/icone.json, disegna assets/icone/oggetti/
 python tools/art/build_stati.py                # icone degli status (griglie 16x16) -> assets/icone/stati/<status_id>.png
 python tools/art/build_primitive.py            # glifi delle primitive a 4 toni -> assets/icone/primitive/ (colori dallo shader)
@@ -295,7 +297,7 @@ scenes/ scripts/ assets/ tests/
 assets/placeholder/   sheet {categoria}_{nome}.png (ora generati da sprite-forge)
 assets/world/         mondo.json, blocchi/regioni.png, <tema>/tessere+indici+oggetti, sotto/
 assets/interni/       <tema>/<interno_id>.png (pavimenti e pareti), <tema>/arredi/, arredi.json (build_interni.py)
-assets/ui/            libro (carta, segnalibri, caselle, filetto) e font Alegreya (OFL)
+assets/ui/            libro (carta, segnalibri, caselle, filetto) e font Alegreya (OFL); panorama/<momento>/<strato>.png
 assets/icone/oggetti/ <forma>_<tinta>.png, 32x32, solo le icone usate (build_icone.py, data/ui/icone.json)
 assets/icone/stati/   <status_id>.png, 16x16 (build_stati.py)
 assets/icone/primitive/ <primitiva>.png, 32x32 a 4 grigi (build_primitive.py, shaders/rampa_pathway.gdshader)
@@ -337,13 +339,13 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   edifici di citta', villaggi e torri con le porte verso i 14 interni (US-8B18a/b), interni disegnati e
   arredati (US-8B18c/d), varchi delle sotto-aree come ingressi con il loro contenuto e la loro arte (US-8B21a/b/c),
   icone degli oggetti a terra e nello zaino (US-8B70), icone degli status sopra la testa (US-8B71),
-  glifi delle primitive nella hotbar (US-8B72), VFX degli attacchi base (US-8B40).
+  glifi delle primitive nella hotbar (US-8B72), VFX degli attacchi base (US-8B40), panorama dell'avvio (US-8B74).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
-**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): panorami (US-8B74), VFX delle altre
-primitive (US-8B41..43). Varchi, barca, volo, Frontiera, le icone e i VFX degli attacchi base sono fatti (2026-10-26).
+**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): le story di `prd.json` sono chiuse; restano
+dal PRD dell'arte i VFX delle altre primitive (US-8B41..43), il feedback del colpo, ritratti e creature (blocchi C/E/G).
 
 ## Decisioni prese
 
@@ -377,6 +379,8 @@ primitive (US-8B41..43). Varchi, barca, volo, Frontiera, le icone e i VFX degli 
 - **Volo** (2026-10-26): si sblocca con una **chiave del mondo** (oggetto o luogo da trovare), per tutti i Pathway.
   Niente primitive nuove.
 - **Barca** (2026-10-26): barca libera al **molo di Mirwada**; in barca l'acqua si attraversa, si sbarca sulle coste.
+- **Panorama all'avvio** (2026-10-27): all'avvio (nessuna partita, scaffale) il libro e' **piu' piccolo** e intorno
+  scorre il panorama a strati; il momento viene dall'ora del computer. In partita il libro torna grande sopra il mondo.
 - **Frontiera, come si arriva** (2026-10-26): **in barca, volando, o da una soglia nel faro** che si apre solo con
   una chiave trovata nel mondo. Resta il gating di sequenza (respinge chi e' oltre la Sequenza 4).
 

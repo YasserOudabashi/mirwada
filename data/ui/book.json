@@ -41,6 +41,18 @@
       "carta": "#ead4aa",
       "carta_scura": "#e4a672",
       "sfondo": "#181425"
+    },
+    "avvio": {
+      "_comment": "US-8B74: all'avvio (nessuna partita in corso, pagina dello scaffale) il libro e' piu' piccolo e intorno si vede il panorama; misura in unita' (la carta e' disegnata a questa misura, tools/art/build_libro.py).",
+      "carta": "res://assets/ui/libro_avvio.png",
+      "misura": [440, 250]
+    },
+    "panorama": {
+      "_comment": "US-8B74: i 6 strati del panorama (tools/art/build_panorami.py), una cartella per momento del TimeSystem; all'avvio il momento viene dall'ora del computer (ore = [inizio, fine) sull'orologio di 24 ore). velocita in unita' al secondo verso sinistra: piu' vicino, piu' veloce.",
+      "cartella": "res://assets/ui/panorama",
+      "strati": ["sky", "clouds", "far", "mid", "near", "fg"],
+      "velocita": {"sky": 0, "clouds": 3, "far": 1, "mid": 2, "near": 3, "fg": 5},
+      "ore": {"alba": [5, 9], "mezzogiorno": [9, 17], "crepuscolo": [17, 21], "notte_fonda": [21, 5]}
     }
   }
 }

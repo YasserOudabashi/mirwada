@@ -14491,3 +14491,25 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - Aperto: sul marmo bianco il lampo bianco si vede solo dal contorno (e' il lampo); i nemici non hanno ancora il
   fendente sui loro attacchi; feedback del colpo del PRD (scintilla, parata perfetta, polvere, rottura della
   postura) da fare; le altre 24 primitive (US-8B41..43).
+
+## US-8B74 — panorami, 2026-10-27
+- Decisione dell'utente (2026-10-27): all'avvio il libro e' piu' piccolo e intorno si vede il panorama; in partita
+  il libro torna grande sopra il mondo. Prima il libro copriva tutto lo schermo (resterebbero 20 unita' di bordo).
+- forge3d/panorama.py strati(W, H, time, seed): 6 strati (sky, clouds, far, mid, near, fg). Cielo fermo con sole a
+  destra o luna in alto a sinistra (dove il libro non copre); nuvole allungate in orizzontale; montagne e colline
+  con la cresta velata dal cielo; near = citta' di mare (case con tetti a capanna, torri, cupole, il faro a strisce
+  con la lanterna, finestre accese secondo l'ora); fg = mare con i riflessi e una riva bassa con l'erba. Tutti
+  periodici in x (rumore su 2W fuso sul bordo, l'ultima casa finisce sul bordo): la giunta non si vede. Colori:
+  TIMES di panorama.py (rampe proprie dei panorami, nuova voce citta), mare del giorno meno saturo.
+- tools/art/build_panorami.py (seed 3): assets/ui/panorama/<momento>/<strato>.png, 640x360 alla grana del libro, per
+  i momenti di data/schema/time.json; controlla alpha 0/255 e la ripetizione. Rilanciato: stessi byte.
+- build_libro.py: libro(rng, W, H) e libro_avvio.png 440x250 (seed 8); le PNG di prima restano identiche.
+- book_overlay.gd: nodo Panorama (6 Sprite2D con region e texture ripetuta) tra il velo e la pagina, fatto scorrere
+  in _process (velocita' in book.json tema.panorama); momento dall'ora del computer (ore). _disponi(): all'avvio
+  panorama al posto del velo; sullo scaffale libro piccolo con la sua carta e i segnalibri accanto; altrove libro
+  grande. Si ridispone a ogni pagina e a GameState.partita_iniziata.
+- Validator: carta piccola e 24 file, le ore coprono il giorno una volta sola. Verifica: test_panorama (4: ora ->
+  momento, avvio piccolo col panorama, strati che scorrono, in partita grande col velo). A schermo: alba, notte,
+  tramonto sullo scaffale, frontespizio grande; due scatti a 3 secondi: il faro scorre di 18 pixel
+  (arte/revisione/panorami_in_gioco.png). validate 0, 1021 test.
+- Aperto: una sola veduta (niente panorami per regione); il panorama non usa le due modalita' luminosa/cupa.

@@ -43,6 +43,18 @@ const PAGINE := {
 	"mappa": preload("res://scenes/pages/page_mappa.tscn"),
 }
 
+## US-8B74: all'avvio (nessuna partita, scaffale) il libro e' piu' piccolo e intorno scorre il panorama a strati
+## (data/ui/book.json tema.avvio e tema.panorama). In partita il libro torna grande sopra il mondo.
+const PAGINA_GRANDE := Vector2(300, 170)        # meta' della pagina grande, come in book_overlay.tscn
+var _foglio: TextureRect = null
+var _carta_grande: Texture2D = null
+var _carta_avvio: Texture2D = null
+var _meta_avvio: Vector2 = Vector2(220, 125)
+var _panorama: Node2D = null
+var _strati: Array = []                         # [Sprite2D, velocita]
+var _pano_cfg: Dictionary = {}
+var _pagina_id: String = ""
+
 var _volta_durata: float = 0.35
 var _volta_ridotta_s: float = 0.08
 var _volta_left: float = 0.0
@@ -64,6 +76,9 @@ func _ready() -> void:
 		_volta_ridotta_s = maxf(0.02, float(cfg.get("dissolvenza_ridotta_ms", 80)) / 1000.0)
 	_applica_aspetto()
 	_costruisci_segnalibri()
+	var gs: Node = get_node_or_null("/root/GameState")
+	if gs != null and gs.has_signal("partita_iniziata"):
+		gs.partita_iniziata.connect(func(_n: String) -> void: _disponi())
 
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd != null:
@@ -136,6 +151,7 @@ func _apri(pagina: String) -> void:
 	_volta_pagina = pagina
 	_swapped = true
 	_rendi(pagina)
+	_disponi()
 	_aggiorna_macchie()
 	_audio("sfx_apri")
 
@@ -157,6 +173,10 @@ func _volta(pagina: String) -> void:
 
 
 func _process(delta: float) -> void:
+	if _panorama != null and _panorama.visible:
+		for s in _strati:
+			var spr: Sprite2D = s[0]
+			spr.region_rect.position.x = fmod(spr.region_rect.position.x + float(s[1]) * delta, spr.region_rect.size.x)
 	# respiro delle macchie di follia (US-229), solo se attive e non congelate
 	if visible and _macchie.material is ShaderMaterial and _macchie_abilitate() \
 			and not _macchie_congelate() and _follia >= _sog_bordi:
@@ -195,6 +215,8 @@ func _rendi(pagina: String) -> void:
 	if b == null:
 		return
 	var p: Dictionary = b.call("pagina", pagina)
+	_pagina_id = pagina
+	_disponi()
 	var gd: Node = get_node_or_null("/root/GameData")
 	var nome: String = str(p.get("name_i18n", pagina))
 	_titolo.text = str(gd.call("tr_data", nome)) if gd != null else nome
@@ -315,6 +337,13 @@ func _applica_aspetto() -> void:
 	foglio.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_pagina.add_child(foglio)
 	_pagina.move_child(foglio, 0)
+	_foglio = foglio
+	_carta_grande = foglio.texture
+	var cfg_avvio: Dictionary = t.get("avvio", {})
+	_carta_avvio = _texture_ui(str(cfg_avvio.get("carta", "")))
+	var mis: Array = cfg_avvio.get("misura", [440, 250])
+	_meta_avvio = Vector2(float(mis[0]), float(mis[1])) / 2.0
+	_costruisci_panorama(t.get("panorama", {}))
 	_pagina.color = Color(0, 0, 0, 0)
 	($Pagina/Piega as CanvasItem).visible = false
 
@@ -453,6 +482,78 @@ func _font_ui(path: String) -> Font:
 		return load(path)
 	var f := FontFile.new()
 	return f if f.load_dynamic_font(ProjectSettings.globalize_path(path)) == OK else null
+
+
+## I 6 strati del panorama dietro il libro, ognuno ripetuto in orizzontale e fatto scorrere in _process.
+func _costruisci_panorama(cfg: Dictionary) -> void:
+	_pano_cfg = cfg
+	if cfg.is_empty():
+		return
+	_panorama = Node2D.new()
+	_panorama.name = "Panorama"
+	_panorama.visible = false
+	add_child(_panorama)
+	move_child(_panorama, _sfondo.get_index() + 1)
+	var vel: Dictionary = cfg.get("velocita", {})
+	for st in cfg.get("strati", []):
+		var spr := Sprite2D.new()
+		spr.name = str(st)
+		spr.centered = false
+		spr.region_enabled = true
+		spr.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+		spr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		_panorama.add_child(spr)
+		_strati.append([spr, float(vel.get(st, 0.0))])
+
+
+## Il momento del panorama dall'ora (0-23): tema.panorama.ore {momento: [inizio, fine)}, anche a cavallo della mezzanotte.
+func momento_da_ora(ora: int) -> String:
+	var ore: Dictionary = _pano_cfg.get("ore", {})
+	for m in ore:
+		var a: int = int(ore[m][0])
+		var b: int = int(ore[m][1])
+		if (a <= b and ora >= a and ora < b) or (a > b and (ora >= a or ora < b)):
+			return str(m)
+	return str(ore.keys()[0]) if not ore.is_empty() else ""
+
+
+func _carica_panorama(momento: String) -> void:
+	for s in _strati:
+		var spr: Sprite2D = s[0]
+		spr.texture = _texture_ui("%s/%s/%s.png" % [str(_pano_cfg.get("cartella", "")), momento, spr.name])
+		if spr.texture != null:
+			spr.region_rect = Rect2(spr.region_rect.position.x, 0, spr.texture.get_width(), spr.texture.get_height())
+
+
+## Avvio = nessuna partita in corso: dietro il libro il panorama al posto del velo scuro, e sullo scaffale il libro
+## piccolo (la sua carta, i segnalibri accanto); in partita, o sulle altre pagine, il libro grande.
+func avvio() -> bool:
+	var gs: Node = get_node_or_null("/root/GameState")
+	return gs != null and not bool(gs.call("partita_in_corso"))
+
+
+func _disponi() -> void:
+	var in_avvio: bool = avvio() and _panorama != null
+	if _panorama != null and in_avvio != _panorama.visible:
+		if in_avvio:
+			_carica_panorama(momento_da_ora(int(Time.get_datetime_dict_from_system()["hour"])))
+		_panorama.visible = in_avvio
+	_sfondo.visible = not in_avvio
+	var b: Node = _book()
+	var tipo: String = str((b.call("pagina", _pagina_id) as Dictionary).get("tipo", "")) if b != null else ""
+	var piccolo: bool = in_avvio and tipo == "menu_principale" and _carta_avvio != null
+	var meta: Vector2 = _meta_avvio if piccolo else PAGINA_GRANDE
+	_pagina.offset_left = -meta.x
+	_pagina.offset_right = meta.x
+	_pagina.offset_top = -meta.y
+	_pagina.offset_bottom = meta.y
+	if _foglio != null:
+		_foglio.texture = _carta_avvio if piccolo else _carta_grande
+	# i segnalibri restano 6 unita' fuori dal bordo destro e 50 sotto quello alto, come sulla pagina grande
+	_segnalibri.offset_left = meta.x + 6.0 - 320.0
+	_segnalibri.offset_right = _segnalibri.offset_left + 12.0
+	_segnalibri.offset_top = 180.0 - meta.y + 50.0
+	_segnalibri.offset_bottom = _segnalibri.offset_top + 140.0
 
 
 func _costruisci_segnalibri() -> void:

@@ -2564,6 +2564,24 @@ def main():
         for k, v in (tema_libro.get("colori") or {}).items():
             if not (isinstance(v, str) and re.fullmatch(r"#[0-9a-fA-F]{6}", v)):
                 err(f"data/ui/book.json tema.colori.{k}: '{v}' non e' un colore #rrggbb")
+        # US-8B74: la carta piccola dell'avvio e i 6 strati del panorama per ogni momento del TimeSystem
+        _av = tema_libro.get("avvio") or {}
+        if _av and not os.path.exists(os.path.join(ROOT, str(_av.get("carta", ""))[6:])):
+            err(f"data/ui/book.json tema.avvio.carta: '{_av.get('carta')}' non esiste (tools/art/build_libro.py)")
+        _pano = tema_libro.get("panorama") or {}
+        if _pano:
+            _momenti = (load_json(os.path.join(DATA, "schema", "time.json")) or {}).get("momenti", [])
+            if set(_pano.get("ore", {})) != set(_momenti):
+                err(f"data/ui/book.json tema.panorama.ore: i momenti devono essere quelli di time.json {_momenti}")
+            _coperte = Counter()
+            for _m, (_a, _b) in (_pano.get("ore") or {}).items():
+                _coperte.update(range(_a, _b) if _a <= _b else list(range(_a, 24)) + list(range(0, _b)))
+            if sorted(_coperte) != list(range(24)) or any(n != 1 for n in _coperte.values()):
+                err("data/ui/book.json tema.panorama.ore: ogni ora del giorno deve stare in un solo momento")
+            for _m in _momenti:
+                for _st in _pano.get("strati", []):
+                    if not os.path.isfile(os.path.join(ROOT, str(_pano.get("cartella", ""))[6:], _m, f"{_st}.png")):
+                        err(f"data/ui/book.json tema.panorama: manca {_m}/{_st}.png (tools/art/build_panorami.py)")
         pages = book.get("pages", [])
         seen_ids, seen_ord = Counter(), Counter()
         for p in pages:
