@@ -1,8 +1,9 @@
-extends VBoxContainer
+extends "res://scripts/pages/pagina_libro.gd"
 ## Frontespizio (US-223). Partita nuova: campo nome con "Enel" gia' scritto
 ## (design-lore, non un placeholder), si conferma con la voltata o col
 ## bottone -> nuova_partita(nome, slot scelto). Partita in corso: mostra chi
 ## sei (nome, Pathway, Sequenza, tier), sola lettura.
+## US-8B73c: a sinistra nome, Pathway e modalita'; a destra i talenti e Conferma.
 
 var _campo: LineEdit = null
 ## US-332: id dei talenti innati spuntati alla creazione.
@@ -19,8 +20,7 @@ var _pathway_ids: Array = []
 
 
 func aggiorna() -> void:
-	for c in get_children():
-		c.queue_free()
+	svuota()
 	_campo = null
 	_scelti = []
 	_modalita = ""
@@ -39,20 +39,19 @@ func _mostra_creazione(gs: Node) -> void:
 	add_child(_riga(tr("BOOK_FRONTESPIZIO_INVITO")))
 	_campo = LineEdit.new()
 	_campo.text = str(gs.call("nome_default")) if gs != null else "Enel"
-	_campo.custom_minimum_size = Vector2(220, 24)
+	_campo.custom_minimum_size = Vector2(0, 24)
 	_campo.select_all()
 	_campo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	# nome e Pathway sulla stessa riga: con talenti e modalita' la pagina resta dentro il libro
-	var riga := HBoxContainer.new()
+	add_child(_campo)
+	var riga := HBoxContainer.new()                     # "Pathway" e la tendina, sotto il nome
 	add_child(riga)
-	riga.add_child(_campo)
 	_pathway_scelta(riga)
-	_talenti_innati(gs)
 	_scelta_modalita()
+	_talenti_innati(gs)
 	var ok := Button.new()
 	ok.text = tr("BOOK_FRONTESPIZIO_CONFERMA")
 	ok.pressed.connect(conferma)
-	add_child(ok)
+	destra.add_child(ok)
 
 
 ## US-801: scelta del Pathway alla creazione. L'elenco e l'ordine vengono
@@ -95,10 +94,10 @@ func _talenti_innati(gs: Node) -> void:
 	_max_talenti = int((gd.call("get_balance", "talenti") as Dictionary).get("innati_alla_creazione", 0))
 	if _max_talenti <= 0:
 		return
-	add_child(_riga(tr("BOOK_FRONTESPIZIO_TALENTI") % _max_talenti))
-	var griglia := GridContainer.new()                # due colonne: la pagina resta dentro il libro
+	destra.add_child(_riga(tr("BOOK_FRONTESPIZIO_TALENTI") % _max_talenti))
+	var griglia := GridContainer.new()                # due colonne sulla facciata destra
 	griglia.columns = 2
-	add_child(griglia)
+	destra.add_child(griglia)
 	for tid in gd.call("talents_per_tipo", "innato"):
 		var t: Dictionary = gd.call("get_talent", tid)
 		var cb := CheckBox.new()
@@ -133,6 +132,7 @@ func _scelta_modalita() -> void:
 		riga.add_child(b)
 	add_child(riga)
 	_descr_modalita = _riga(tr("MODALITA_%s_DESCR" % _modalita.to_upper()))
+	_descr_modalita.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	add_child(_descr_modalita)
 
 
@@ -172,8 +172,10 @@ func _mostra_identita(gs: Node) -> void:
 		var nomi: Array = []
 		for tid in ts.call("posseduti"):
 			nomi.append(str(gd.call("tr_data", (gd.call("get_talent", tid) as Dictionary).get("name_i18n", tid))))
-		add_child(_riga("%s %s" % [tr("BOOK_FRONTESPIZIO_I_TUOI_TALENTI"),
-			", ".join(nomi) if not nomi.is_empty() else tr("BOOK_FRONTESPIZIO_NESSUN_TALENTO")]))
+		var talenti := _riga("%s %s" % [tr("BOOK_FRONTESPIZIO_I_TUOI_TALENTI"),
+			", ".join(nomi) if not nomi.is_empty() else tr("BOOK_FRONTESPIZIO_NESSUN_TALENTO")])
+		talenti.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		destra.add_child(talenti)
 
 
 ## Conferma la creazione. Chiamata dal bottone e dalla voltata in avanti.
@@ -201,7 +203,10 @@ func intercetta_avanti() -> bool:
 
 func testo_visibile() -> String:
 	var out: PackedStringArray = []
-	for c in find_children("*", "", true, false):        # anche dentro le righe (nome + Pathway)
+	var tutti: Array = find_children("*", "", true, false)   # anche dentro le righe e sulla facciata destra
+	if destra.get_parent() != self:
+		tutti += destra.find_children("*", "", true, false)
+	for c in tutti:
 		if c.is_queued_for_deletion():
 			continue
 		if c is Label:

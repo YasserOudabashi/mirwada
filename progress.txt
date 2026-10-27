@@ -14622,3 +14622,18 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   1035 test, validate 0. A schermo: arte/revisione/libro_dialogo.png, libro_negozio.png.
 - Aperto (US-8B73c/d in prd.json): le altre pagine stanno tutte sulla sinistra (scaffale, frontespizio, colophon;
   inventario, diagramma con la griglia stretta, sinergie, diario) e la facciata destra resta vuota.
+
+## US-8B73c — Scaffale, frontespizio e colophon sulle due facciate, 2026-10-27
+- scripts/pages/pagina_libro.gd: base delle pagine a colonna (VBox) con `destra` (la adotta book_overlay prima che la
+  pagina entri nell'albero; se nessuno la adotta, NOTIFICATION_READY la tiene in fondo alla pagina), svuota() e la
+  funzione statica a_capo() per i Button che vanno a capo (il trucco di US-8B73b, ora in un posto solo).
+- Scaffale: i tomi erano larghi 360 fissi (oltre la piega anche nel libro piccolo dell'avvio): ora larghi quanto la
+  facciata; "riprendi" a destra. Frontespizio: creazione con nome, Pathway (sotto il nome) e modalita' a sinistra,
+  talenti e Conferma a destra; in partita chi sei a sinistra, talenti a destra; la destra prende l'allineamento della
+  pagina. Colophon (ScrollContainer): `destra` e' un secondo ScrollContainer: audio/video a sinistra, comandi/lingua
+  a destra; etichette 110 + slider che si allarga; voci degli interruttori, titolo e righe del finale vanno a capo,
+  tendine del finale che tagliano il testo lungo. Se nessun libro adotta `destra` la pagina la libera in PREDELETE
+  (con is_instance_valid: se il libro l'ha gia' liberata).
+- Test aggiornati: test_creazione_talenti (le checkbox sulla facciata destra), test_settings (i comandi a destra).
+- A schermo: arte/revisione/libro_scaffale_frontespizio_colophon.png (scaffale piccolo all'avvio, creazione, in
+  partita, colophon).

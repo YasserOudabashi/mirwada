@@ -100,7 +100,7 @@ func test_colophon_elenca_i_tasti_abilita_e_interagisci() -> void:
 	var pag: Node = ov.get_node("Pagina/Contenuto").get_child(0)
 
 	var testi: Array = []
-	var da_visitare: Array = [pag.get_child(0)]
+	var da_visitare: Array = [pag.get_child(0), pag.get("destra")]   # comandi sulla facciata destra (US-8B73c)
 	while not da_visitare.is_empty():
 		var n: Node = da_visitare.pop_back()
 		for c in n.get_children():

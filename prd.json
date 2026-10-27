@@ -373,8 +373,8 @@
       ],
       "priority": 22,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-27: scripts/pages/pagina_libro.gd (base delle pagine a colonna: `destra`, svuota(), a_capo() per i Button che vanno a capo); dialogo rifatto su di essa. Scaffale: tomi a sinistra larghi quanto la facciata (erano 360 fissi), Riprendi a destra. Frontespizio: nome, Pathway e modalita' a sinistra, talenti e Conferma a destra; in partita chi sei a sinistra, i talenti a destra; le due facciate allineate allo stesso modo. Colophon: audio e video a sinistra, comandi e lingua a destra, ognuna scorre; righe senza larghezze fisse oltre la facciata; voci degli interruttori e sezione del finale che vanno a capo. arte/revisione/libro_scaffale_frontespizio_colophon.png (anche il libro piccolo dell'avvio)."
     },
     {
       "id": "US-8B73d",

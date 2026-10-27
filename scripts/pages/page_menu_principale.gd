@@ -1,14 +1,14 @@
-extends VBoxContainer
+extends "res://scripts/pages/pagina_libro.gd"
 ## Pagina "scaffale" (US-223): gli slot di SaveSystem come tomi. Tomo vuoto =
 ## nuova partita (porta al frontespizio). Tomo valido = carica. Tomo corrotto
 ## (US-015 stato CORROTTO) = "bruciato": mostrato, non caricabile, mai
 ## cancellato in automatico.
 ##
 ## Nessun testo hardcoded: tutto da GameData.tr_data().
+## US-8B73c: i tomi sulla facciata sinistra, "riprendi" sulla destra.
 
 func aggiorna() -> void:
-	for c in get_children():
-		c.queue_free()
+	svuota()
 
 	var ss: Node = _n("/root/SaveSystem")
 	var gs: Node = _n("/root/GameState")
@@ -21,7 +21,7 @@ func aggiorna() -> void:
 		var info: Dictionary = ss.call("anteprima", slot)
 		var stato: int = int(info.get("stato", 0))
 		var b := Button.new()
-		b.custom_minimum_size = Vector2(360, 26)
+		b.custom_minimum_size = Vector2(0, 26)          # largo quanto la facciata, mai oltre la piega
 
 		match stato:
 			2:  # SaveSystem.Slot.CORROTTO
@@ -42,7 +42,7 @@ func aggiorna() -> void:
 		var chiudi := Button.new()
 		chiudi.text = tr("BOOK_SCAFFALE_RIPRENDI")
 		chiudi.pressed.connect(func() -> void: book.call("chiudi"))
-		add_child(chiudi)
+		destra.add_child(chiudi)
 
 
 func _carica(slot: int) -> void:

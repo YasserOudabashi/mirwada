@@ -1,4 +1,4 @@
-extends VBoxContainer
+extends "res://scripts/pages/pagina_libro.gd"
 ## Pagina "dialogo" del libro (US-613b). Non si sfoglia: ci si finisce quando
 ## DialogueEngine.avvia() parte. Mostra il nome di chi parla, il testo del nodo
 ## corrente e un bottone per ogni scelta VALIDA (le altre non compaiono - la
@@ -20,15 +20,9 @@ var _negozio_npc_id: String = ""
 ## (l'effetto crea_su_richiesta di una scelta) - stesso principio del negozio.
 var _creazione_npc_id: String = ""
 
-## US-8B73b: la facciata destra del libro (le scelte, la vendita, Chiudi). La mette sulla pagina di destra il libro
-## (book_overlay.gd); da sola, ad esempio nei test, resta in fondo a questa pagina.
-var destra := VBoxContainer.new()
 
-
+## Sulla facciata destra (pagina_libro.gd `destra`): le scelte, la vendita, Chiudi.
 func _ready() -> void:
-	destra.name = "Destra"
-	if destra.get_parent() == null:
-		add_child(destra)
 	var de: Node = get_node_or_null("/root/DialogueEngine")
 	if de != null:
 		de.nodo_cambiato.connect(func(_n): aggiorna())
@@ -51,12 +45,7 @@ func _su_apri_creazione(npc_id: String) -> void:
 
 
 func aggiorna() -> void:
-	for madre in [self, destra]:
-		for c in madre.get_children():
-			if c == destra:
-				continue
-			madre.remove_child(c)   # subito fuori: get_children() non li conta piu' (queue_free e' differito)
-			c.queue_free()
+	svuota()
 
 	if not _negozio_npc_id.is_empty():
 		_disegna_negozio()
@@ -86,12 +75,9 @@ func aggiorna() -> void:
 	for i in valide.size():
 		var b := Button.new()
 		b.text = str(gd.call("tr_data", (valide[i] as Dictionary).get("text_i18n", "")))
-		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		a_capo(b)
 		b.pressed.connect(func() -> void: de.call("scegli", i))
 		destra.add_child(b)
-		# un Button che va a capo calcola l'altezza con la larghezza che ha adesso: se la facciata non e' ancora
-		# impaginata (si arriva voltando pagina) sarebbe alto come una colonna di lettere. Si ricalcola dopo.
-		b.resized.connect(_riadatta.bind(b))
 
 
 # --- modalita' negozio (US-811) ----------------------------------------
@@ -373,14 +359,6 @@ func _lista(madre: Node) -> VBoxContainer:
 	sc.add_child(v)
 	madre.add_child(sc)
 	return v
-
-
-func _riadatta(b: Button) -> void:
-	if b.has_meta("largo") and is_equal_approx(float(b.get_meta("largo")), b.size.x):
-		return
-	b.set_meta("largo", b.size.x)
-	b.autowrap_mode = TextServer.AUTOWRAP_OFF        # rifa' l'impaginazione del testo con la larghezza vera
-	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 
 ## L'etichetta di una riga con un bottone accanto (negozio, creazione): prende lo spazio che resta sulla facciata e
