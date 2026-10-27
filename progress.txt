@@ -14692,3 +14692,16 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   scuro (idle e attacco pesante, giu' e destra) e nel mondo (arte/revisione/forma_arma_luce_in_gioco.png).
 - Non mi convince del tutto: sul marmo bianco di Mirwada il cuore bianco della lama si confonde col pavimento (si vede
   il bordo dorato); su erba e pietra scura si legge benissimo.
+
+## US-8B80a — Animazioni nuove di Enel: dati e fogli, 2026-10-27
+- Blocco G (US-8B80): [D+A] vuol dire dati + arte; per la regola dell'utente del 2026-10-23 si fa senza il giro di
+  domande del PRD 8b.
+- forge3d/anim_humanoid.py: interact, pickup, drink, ritual (generiche, aggiunte a CLIPS); build_personaggi CLIP_ENEL le
+  avvolge con lo spadone in spalla (la mano libera fa il gesto). data/animations.json personaggio: interact 4 frame,
+  pickup 5, drink 6, ritual 6 in ciclo, tutte con durate_ms e 4 direzioni; il frame tenuto di piu' e' quello del gesto.
+- Guardate a 3x di fronte e di lato. Corretti: la mano del rituale (rotazione attorno all'asse verticale: restava alla
+  cintura; ora sull'asse in avanti, alzata di lato), accovacciata piu' bassa, mano alla bocca piu' leggibile di fronte.
+- Comandi: python tools/art/build_personaggi.py --only personaggio; python tools/art/generate_all.py --only
+  personaggio; python tools/art/build_forme.py. I fogli di Enel che c'erano restano identici; nuovi i 4 di Enel e gli
+  8 delle forme. Nessun pixel sul bordo, alpha 0/255. arte/revisione/enel_azioni.png.
+- US-8B80b: agganciarle ai momenti del gioco.

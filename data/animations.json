@@ -185,6 +185,31 @@
       "fps": 4,
       "loop": true,
       "direzionale": false
+    },
+    "_comment_azioni": "US-8B80: gesti fuori dal combattimento, la mano libera fa (lo spadone resta in spalla). interact: tende la mano e tocca (porte, leve, NPC); pickup: si piega e raccoglie da terra; drink: porta la fiala alla bocca (Bevi); ritual: mano alzata e testa china, in ciclo (rituale). Il frame tenuto di piu' e' quello del gesto.",
+    "interact": {
+      "frames": 4,
+      "durate_ms": [90, 150, 220, 130],
+      "loop": false,
+      "direzionale": true
+    },
+    "pickup": {
+      "frames": 5,
+      "durate_ms": [100, 120, 260, 120, 100],
+      "loop": false,
+      "direzionale": true
+    },
+    "drink": {
+      "frames": 6,
+      "durate_ms": [100, 140, 200, 360, 140, 100],
+      "loop": false,
+      "direzionale": true
+    },
+    "ritual": {
+      "frames": 6,
+      "durate_ms": [200, 160, 200, 200, 160, 200],
+      "loop": true,
+      "direzionale": true
     }
   },
   "nemico_base": {

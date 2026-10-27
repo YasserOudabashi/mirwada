@@ -161,6 +161,44 @@ def stagger(n=4):
     return clip_from_keys([(0, a, "out"), (1, b), (2, add_pose(a, {"torso": (6, 0, -6)})), (n - 1, REST)], n)
 
 
+def interact(n=4):
+    """US-8B80: la mano libera in avanti a toccare (una porta, una leva, qualcuno), poi indietro."""
+    tende = _p(arm_l=(62, 0, -6), fore_l=(30, 0, 0), torso=(5, 0, 0), head=(4, 0, 0))
+    tocca = _p(arm_l=(84, 0, -2), fore_l=(6, 0, 0), torso=(9, 0, 0), head=(6, 0, 0), hips=(0, 0, 0, 0, 0.5, 0))
+    return clip_from_keys([(0, _p(), "out"), (1, tende, "inout"), (2, tocca, "snap"), (n - 1, _p())], n)
+
+
+def pickup(n=5):
+    """US-8B80: si piega sulle ginocchia, la mano libera arriva a terra, si rialza."""
+    mezzo = _p(hips=(0, 0, 0, 0, 0.3, -1.4), leg_l=(34, 0, 0), shin_l=(-50, 0, 0), leg_r=(22, 0, 0),
+               shin_r=(-36, 0, 0), torso=(16, 0, 0), head=(8, 0, 0), arm_l=(30, 0, -6), fore_l=(20, 0, 0))
+    giu = _p(hips=(0, 0, 0, 0, 0.8, -4.4), leg_l=(84, 0, -8), shin_l=(-120, 0, 0), leg_r=(52, 0, 10),
+             shin_r=(-92, 0, 0), torso=(36, 0, 0), head=(20, 0, 0), arm_l=(52, 0, 18), fore_l=(4, 0, 0))
+    return clip_from_keys([(0, _p(), "out"), (1, mezzo, "inout"), (2, giu, "snap"), (3, mezzo, "inout"),
+                           (n - 1, _p())], n)
+
+
+def drink(n=6):
+    """US-8B80: la mano libera porta la fiala alla bocca, la testa va indietro, poi giu'."""
+    alza = _p(arm_l=(50, 0, -18), fore_l=(70, 0, 0), torso=(-2, 0, 0))
+    bocca = _p(arm_l=(70, 0, -38), fore_l=(100, 0, 0), head=(-8, 0, 0), torso=(-4, 0, 0))
+    beve = _p(arm_l=(84, 0, -40), fore_l=(96, 0, 0), head=(-22, 0, 0), torso=(-10, 0, 0))
+    return clip_from_keys([(0, _p(), "out"), (1, alza, "inout"), (2, bocca, "inout"), (3, beve, "inout"),
+                           (4, alza, "inout"), (n - 1, _p())], n)
+
+
+def ritual(n=6):
+    """US-8B80: in piedi, la mano libera alzata e la testa china; ondeggia piano (in ciclo)."""
+    out = []
+    for i in range(n):
+        s = math.sin(2 * math.pi * i / n)
+        out.append(add_pose(REST, {
+            "arm_l": (10, 140 + 6 * s, 0), "fore_l": (12, 0, 0), "head": (16 + 2.5 * s, 0, 0),
+            "torso": (6 + 1.5 * s, 0, 0), "hips": (0, 0, 0, 0, 0, -0.35 * (1 - s) / 2)}))
+    return out
+
+
 CLIPS = {"idle": idle, "walk": walk, "run": run, "dash": dash, "attack_light": attack_light,
          "attack_heavy": attack_heavy, "parry": parry, "hurt": hurt, "death": death, "cast": cast,
-         "meditate": meditate, "anticipo": anticipo, "attack": enemy_attack, "stagger": stagger}
+         "meditate": meditate, "anticipo": anticipo, "attack": enemy_attack, "stagger": stagger,
+         "interact": interact, "pickup": pickup, "drink": drink, "ritual": ritual}

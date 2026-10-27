@@ -432,6 +432,34 @@
       "notes": "2026-10-27: build_personaggi.enel(lama=...) (default steel: i fogli di Enel restano identici, md5 uguale); build_forme.py arma_luce = enel(lama='glow_yellow'), celle 64. forms.json tg_arma_luce aspetto 'arma_luce'. test_forme: ogni forma con aspetto ha tutti i fogli (2). A schermo: arte/revisione/forma_arma_luce_in_gioco.png; fogli: forma_arma_luce.png."
     },
     {
+      "id": "US-8B80a",
+      "title": "Animazioni nuove di Enel: dati e fogli",
+      "description": "interact, pickup, drink, ritual in data/animations.json (personaggio) e i loro fogli per Enel e per le forme.",
+      "acceptanceCriteria": [
+        "tempi nei dati (durate_ms), 4 direzioni",
+        "clip generiche in forge3d/anim_humanoid.py",
+        "si leggono anche di fronte",
+        "fogli di Enel esistenti identici"
+      ],
+      "priority": 27,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: forge3d/anim_humanoid.py interact (la mano libera tocca), pickup (in ginocchio, mano a terra), drink (mano alla bocca, testa indietro), ritual (mano alzata di lato, testa china, ciclo); build_personaggi CLIP_ENEL con lo spadone in spalla. Corretto a occhio: la mano del rituale alzata verso chi guarda non si vedeva (rotazione sull'asse in avanti), accovacciata piu' bassa, mano alla bocca piu' chiara. animations.json: durate_ms, 4 direzioni, ritual in ciclo. Fogli Enel + gigante + arma di luce, nessun pixel sul bordo, alpha 0/255; gli altri fogli di Enel identici. arte/revisione/enel_azioni.png."
+    },
+    {
+      "id": "US-8B80b",
+      "title": "Animazioni nuove di Enel nel gioco",
+      "description": "interact quando si interagisce, pickup quando si raccoglie, drink quando si beve, ritual durante il rituale.",
+      "acceptanceCriteria": [
+        "agganci ai momenti veri del gioco",
+        "verifica a schermo"
+      ],
+      "priority": 28,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
       "id": "US-8B41",
       "title": "VFX delle primitive, gruppo 1",
       "description": "buff_stat, summon, aura, heal, reveal_info, teleport, debuff_stat, illusion (le 8 piu' usate dalle abilita'): fogli a 4 toni colorati dalla rampa del Pathway, attorno a chi lancia.",
