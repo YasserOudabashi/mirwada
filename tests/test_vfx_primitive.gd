@@ -3,6 +3,7 @@ extends "res://tests/test_case.gd"
 
 const GRUPPO_1 := ["buff_stat", "summon", "aura", "heal", "reveal_info", "teleport", "debuff_stat", "illusion"]
 const GRUPPO_2 := ["curse", "terrain_modify", "fear", "steal", "dot", "shadow_meld", "time_rewind", "plant_growth"]
+const GRUPPO_3 := ["mind_read", "shield", "light_purify", "possess", "transform", "soul_detach", "resurrect", "decay"]
 
 
 func _root() -> Node:
@@ -15,6 +16,18 @@ func test_il_gruppo_1_ha_i_fogli_con_i_frame_dei_dati() -> void:
 
 func test_il_gruppo_2_ha_i_fogli_con_i_frame_dei_dati() -> void:
 	_fogli(GRUPPO_2)
+
+
+func test_il_gruppo_3_ha_i_fogli_con_i_frame_dei_dati() -> void:
+	_fogli(GRUPPO_3)
+
+
+func test_ogni_primitiva_implementata_ha_il_suo_foglio() -> void:
+	var gd: Node = _root().get_node("GameData")
+	for tipo in _root().get_node("AbilityEngine").call("tipi_primitiva_implementati"):
+		var pv: Dictionary = gd.call("get_primitive_vfx", tipo)
+		assert_true(FileAccess.file_exists("res://assets/vfx/%s.png" % pv.get("sprite", "")),
+			"%s non usa piu' il segnaposto" % tipo)
 
 
 func _fogli(tipi: Array) -> void:

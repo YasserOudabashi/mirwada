@@ -14548,3 +14548,18 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   (arte/revisione/vfx_primitive_2_in_gioco.png). validate 0, 1024 test.
 - Aperto: gli effetti durano 4-5 frame da 1/12 s: alcuni (furto, fioritura) si vedono poco; il triangolo del
   maleficio sta dove c'e' il nome del giocatore.
+
+## US-8B43 — VFX delle primitive, gruppo 3, 2026-10-27
+- tools/art/build_vfx.py (seed 40) gruppo 3: intuito (mind_read: bolle di pensiero che salgono fino a una nuvoletta
+  con la spirale che gira; il primo disegno, spirale minuscola e bolle sparse, rifatto), egida (shield: cupola con la
+  maglia e il riflesso in alto a sinistra, che si alza e tremola), purifica (light_purify: lampo del raggio dall'alto,
+  raggio che si stringe, scintille che cadono, anello), presa (possess: lampo della croce del burattinaio, fili che
+  tirano e si spezzano), muta (transform: lampo della sagoma, particelle a spirale, scoppio in alto), recide
+  (soul_detach: lampo del taglio, anima che esce e sale), risorge (resurrect: lampo dell'ankh e dell'anello, luci che
+  salgono), appassisce (decay: macchia di marcio e foglie secche che cadono girando). Rilanciato: stessi byte.
+- data/vfx.json: frames mind_read 4, shield 4, light_purify 5, possess 5, soul_detach 5. chain non ha VFX: non e'
+  implementata (il validator lo chiede solo alle implementate).
+- Verifica: test_vfx_primitive (+2: fogli del gruppo 3; ogni primitiva implementata ha il suo foglio, niente piu'
+  segnaposto). A schermo con la palette di Death (arte/revisione/vfx_primitive_3_in_gioco.png). validate 0, 1026.
+- Aperto: gli effetti di chi bersaglia un altro (maleficio, possessione, anima recisa) stanno su chi lancia: il
+  motore non dice ancora su chi cadono.

@@ -139,7 +139,7 @@
     },
     "shield": {
       "sprite": "vfx_ward",
-      "frames": 3,
+      "frames": 4,
       "impact_frame": false,
       "scia": false
     },
@@ -163,7 +163,7 @@
     },
     "light_purify": {
       "sprite": "vfx_cleanse",
-      "frames": 3,
+      "frames": 5,
       "impact_frame": true,
       "scia": false
     },
@@ -211,7 +211,7 @@
     },
     "soul_detach": {
       "sprite": "vfx_sever",
-      "frames": 4,
+      "frames": 5,
       "impact_frame": true,
       "scia": false
     },
@@ -229,7 +229,7 @@
     },
     "mind_read": {
       "sprite": "vfx_insight",
-      "frames": 3,
+      "frames": 4,
       "impact_frame": false,
       "scia": false
     },
@@ -254,7 +254,7 @@
     },
     "possess": {
       "sprite": "vfx_grip",
-      "frames": 4,
+      "frames": 5,
       "impact_frame": true,
       "scia": false
     },

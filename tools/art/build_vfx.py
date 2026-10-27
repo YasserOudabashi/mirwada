@@ -562,6 +562,211 @@ def fioritura(n, S=64):
     return out
 
 
+
+# --- gruppo 3 delle primitive (US-8B43) -----------------------------------------------------------------------------
+
+def intuito(n, S=64):
+    """mind_read: bolle di pensiero che salgono dalla testa fino a una nuvoletta con una spirale che gira."""
+    cx = S / 2
+    bolle = [(cx + 7, 22, 1.5), (cx + 11, 17, 2.1)]
+    nx, ny = cx + 16, 8                                       # la nuvoletta in alto a destra
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        for i, (x, y, r) in enumerate(bolle):
+            if t * 3 >= i * 0.8:
+                _metti(tela, _sfuma(_forme(S, S, _ell(x, y, r, r)), max(0.0, t - 0.6), SEED + 120 + i, S, S, 0.9), 2)
+        if t > 0.2:
+            nuvola = _forme(S, S, _ell(nx, ny, 9, 6), _ell(nx - 6, ny + 1, 4, 4), _ell(nx + 6, ny + 1, 4, 4))
+            _metti(tela, _sfuma(nuvola, max(0.0, t - 0.6), SEED + 122, S, S, 0.9), 2)
+            fase = k * 1.6
+            punti = [(nx + math.cos(a + fase) * a * 0.6, ny + math.sin(a + fase) * a * 0.42) for a in np.linspace(0.5, 7.0, 20)]
+            spir = _forme(S, S, *[_lin(a[0], a[1], b[0], b[1], 1.3) for a, b in zip(punti, punti[1:])])
+            _metti(tela, spir & nuvola, 3)
+        out.append(_contorno(tela))
+    return out
+
+
+def egida(n, S=64):
+    """shield: una cupola trasparente attorno a chi lancia (bordo acceso, riflesso in alto a sinistra) che si alza e
+    poi tremola."""
+    cx, piedi = S / 2, S / 2 + 12
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        cresce = min(1.0, 0.45 + t * 1.2)
+        rx, ry = 17 * cresce, 25 * cresce
+        cy = piedi - ry + 4
+        cupola = _forme(S, S, _ell(cx, cy, rx, ry)) & ~_forme(S, S, _ell(cx, cy, rx - 1.8, ry - 1.8))
+        cupola &= np.mgrid[0:S, 0:S][0] < piedi + 3
+        x, y = _griglia(S, S)
+        maglia = _forme(S, S, _ell(cx, cy, rx - 1.8, ry - 1.8)) & ((((x - cx) * 0.5 + (y - cy)) % 7 < 0.9)
+                                                                    | (((x - cx) * -0.5 + (y - cy)) % 7 < 0.9))
+        maglia &= y < piedi + 3
+        _metti(tela, _sfuma(maglia, 0.5 + 0.5 * t, SEED + 130, S, S, 0.9), 1)
+        _metti(tela, cupola, 2 if k % 2 else 3)
+        riflesso = _forme(S, S, *[_lin(cx + math.cos(a) * (rx - 4), cy + math.sin(a) * (ry - 4),
+                                       cx + math.cos(a + 0.2) * (rx - 4), cy + math.sin(a + 0.2) * (ry - 4), 1.4)
+                                  for a in np.linspace(math.pi * 1.1, math.pi * 1.4, 5)])
+        _metti(tela, riflesso, 3)
+        out.append(_contorno(tela))
+    return out
+
+
+def purifica(n, S=64):
+    """light_purify: lampo di un raggio dall'alto, poi il raggio che si stringe con scintille che cadono e un anello."""
+    cx, piedi = S / 2, S / 2 + 12
+    rs = np.random.RandomState(SEED + 140)
+    scintille = [(rs.uniform(-14, 14), rs.uniform(0, 1)) for _ in range(10)]
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        if k == 0:
+            _metti(tela, _forme(S, S, _pol((cx - 9, 0), (cx + 9, 0), (cx + 12, piedi), (cx - 12, piedi))), 3)
+            out.append(_contorno(tela))
+            continue
+        w = 8 * (1 - t)
+        if w > 0.8:
+            _metti(tela, _forme(S, S, _pol((cx - w, 0), (cx + w, 0), (cx + w * 1.3, piedi), (cx - w * 1.3, piedi))), 2)
+            _metti(tela, _forme(S, S, _pol((cx - w * 0.4, 0), (cx + w * 0.4, 0), (cx + w * 0.5, piedi), (cx - w * 0.5, piedi))), 3)
+        _metti(tela, _sfuma(_anello(S, S, cx, piedi, 12 + 10 * t, 2.0), t, SEED + 141, S, S, 0.8), 3)
+        for dx, fase in scintille:
+            y = ((t + fase) % 1.0) * piedi
+            s4 = _forme(S, S, _lin(cx + dx - 1.5, y, cx + dx + 1.5, y, 1), _lin(cx + dx, y - 1.5, cx + dx, y + 1.5, 1))
+            _metti(tela, s4, 3)
+        out.append(_contorno(tela))
+    return out
+
+
+def presa(n, S=64):
+    """possess: lampo della croce del burattinaio sopra la testa, poi i fili che scendono e tirano, e si spezzano."""
+    cx = S / 2
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        croce = _forme(S, S, _lin(cx - 12, 4, cx + 12, 4, 2.4), _lin(cx, 1, cx, 9, 2.4))
+        if k == 0:
+            _metti(tela, croce, 3)
+            out.append(_contorno(tela))
+            continue
+        _metti(tela, _sfuma(croce, max(0.0, t - 0.3), SEED + 150, S, S, 0.9), 2)
+        tira = 3 * math.sin(k * 1.9)
+        fili = np.zeros((S, S), bool)
+        for dx, fine in ((-11, 26), (0, 18), (11, 26)):
+            y1 = fine + tira * (1 if dx else -1)
+            fili |= _forme(S, S, _lin(cx + dx, 5, cx + dx * 0.6, y1, 1.0))
+            fili |= _forme(S, S, _ell(cx + dx * 0.6, y1, 1.4, 1.4))
+        _metti(tela, _sfuma(fili, max(0.0, t - 0.25), SEED + 151, S, S, 0.9), 3)
+        out.append(_contorno(tela))
+    return out
+
+
+def muta(n, S=64):
+    """transform: lampo della sagoma, poi particelle che salgono a spirale attorno al corpo e scoppiano in alto."""
+    cx, piedi = S / 2, S / 2 + 12
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        if k == 0:
+            sag = _forme(S, S, _ell(cx, piedi - 34, 6, 6), _pol((cx - 10, piedi), (cx - 8, piedi - 26), (cx - 4, piedi - 29),
+                                                               (cx + 4, piedi - 29), (cx + 8, piedi - 26), (cx + 10, piedi)))
+            _metti(tela, sag, 3)
+            out.append(_contorno(tela))
+            continue
+        for j in range(14):
+            u = (j / 14 + t * 0.6) % 1.0
+            a = u * math.tau * 2 + j
+            y = piedi - u * 44
+            x = cx + math.cos(a) * (14 - 6 * u)
+            dav = math.sin(a) > 0
+            m = _forme(S, S, _ell(x, y, 1.6, 1.6))
+            _metti(tela, _sfuma(m, max(0.0, t - 0.4), SEED + 160 + j, S, S, 0.9), 3 if dav else 1)
+        if t > 0.6:
+            _metti(tela, _sfuma(_forme(S, S, *[_lin(cx, 6, cx + math.cos(a) * 8, 6 + math.sin(a) * 5, 1.2)
+                                              for a in np.linspace(0, math.tau, 8, endpoint=False)]), t - 0.5,
+                                SEED + 175, S, S), 2)
+        out.append(_contorno(tela))
+    return out
+
+
+def recide(n, S=64):
+    """soul_detach: lampo di un taglio di traverso sul corpo, poi l'anima chiara che esce e sale svanendo."""
+    cx, piedi = S / 2, S / 2 + 12
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        taglio = _forme(S, S, _lin(cx - 16, piedi - 30, cx + 16, piedi - 14, 2.4))
+        if k == 0:
+            _metti(tela, taglio, 3)
+            out.append(_contorno(tela))
+            continue
+        _metti(tela, _sfuma(taglio, t, SEED + 180, S, S, 0.8), 2)
+        sale = 6 + 22 * t
+        gy = piedi - 22 - sale
+        anima = _forme(S, S, _ell(cx + 3, gy, 6, 6), _pol((cx - 3, gy), (cx + 9, gy), (cx + 9, gy + 12), (cx + 6, gy + 9),
+                                                         (cx + 3, gy + 13), (cx, gy + 9), (cx - 3, gy + 12)))
+        occhi = _forme(S, S, _ell(cx + 1, gy, 1, 1.4), _ell(cx + 5, gy, 1, 1.4))
+        _metti(tela, _sfuma(anima & ~occhi, max(0.0, t - 0.3), SEED + 181, S, S, 0.9), 3 if t < 0.7 else 2)
+        out.append(_contorno(tela))
+    return out
+
+
+def risorge(n, S=64):
+    """resurrect: lampo dell'ankh sopra la testa, poi luci che salgono da terra dentro un anello e l'ankh che si spegne."""
+    cx, piedi = S / 2, S / 2 + 12
+    rs = np.random.RandomState(SEED + 190)
+    luci = [(rs.uniform(-13, 13), rs.uniform(0, 1)) for _ in range(9)]
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        ankh = (_forme(S, S, _ell(cx, 7, 4, 4.4)) & ~_forme(S, S, _ell(cx, 7, 2, 2.4))) | \
+            _forme(S, S, _lin(cx, 11, cx, 22, 2.2), _lin(cx - 6, 13.5, cx + 6, 13.5, 2.2))
+        if k == 0:
+            _metti(tela, ankh | _anello(S, S, cx, piedi, 16, 3), 3)
+            out.append(_contorno(tela))
+            continue
+        _metti(tela, _sfuma(ankh, max(0.0, t - 0.4), SEED + 191, S, S, 0.9), 3 if t < 0.6 else 2)
+        _metti(tela, _sfuma(_anello(S, S, cx, piedi, 16, 2.2), t, SEED + 192, S, S, 0.8), 2)
+        for dx, fase in luci:
+            u = (t + fase) % 1.0
+            y = piedi - u * 36
+            _metti(tela, _forme(S, S, _lin(cx + dx, y, cx + dx, y + 3, 1.4)), 3 if u < 0.6 else 2)
+        out.append(_contorno(tela))
+    return out
+
+
+def appassisce(n, S=64):
+    """decay: una macchia di marcio che si allarga ai piedi e foglie secche che cadono girando."""
+    cx, piedi = S / 2, S / 2 + 12
+    rs = np.random.RandomState(SEED + 200)
+    foglie = [(rs.uniform(-18, 18), rs.uniform(0, 1), rs.uniform(0, math.tau)) for _ in range(7)]
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        r = 8 + 10 * t
+        macchia = _forme(S, S, _ell(cx, piedi, r, r * 0.45)) & (_rumore(S, S, SEED + 201) > 0.25)
+        _metti(tela, _sfuma(macchia, max(0.0, t - 0.5), SEED + 202, S, S, 0.9), 1)
+        for dx, fase, a0 in foglie:
+            u = (t * 0.8 + fase) % 1.0
+            y = 6 + u * (piedi - 10)
+            x = cx + dx + 3 * math.sin(u * 7 + a0)
+            a = a0 + u * 6
+            v = (math.cos(a) * 3, math.sin(a) * 1.6)
+            foglia = _forme(S, S, _pol((x - v[0], y - v[1]), (x + v[1] * 0.6, y - v[0] * 0.6), (x + v[0], y + v[1]),
+                                       (x - v[1] * 0.6, y + v[0] * 0.6)))
+            _metti(tela, foglia, 2 if u < 0.6 else 1)
+        out.append(_contorno(tela))
+    return out
+
+
 def main():
     pv = json.load(open(os.path.join(ROOT, "data", "vfx.json")))["primitive_vfx"]
     f = lambda tipo: pv[tipo]["frames"]                          # noqa: E731
@@ -591,6 +796,16 @@ def main():
             pv["shadow_meld"]["sprite"]: ombra(f("shadow_meld")),
             pv["time_rewind"]["sprite"]: riavvolgi(f("time_rewind")),
             pv["plant_growth"]["sprite"]: fioritura(f("plant_growth")),
+        },
+        "vfx_primitive_3": {
+            pv["mind_read"]["sprite"]: intuito(f("mind_read")),
+            pv["shield"]["sprite"]: egida(f("shield")),
+            pv["light_purify"]["sprite"]: purifica(f("light_purify")),
+            pv["possess"]["sprite"]: presa(f("possess")),
+            pv["transform"]["sprite"]: muta(f("transform")),
+            pv["soul_detach"]["sprite"]: recide(f("soul_detach")),
+            pv["resurrect"]["sprite"]: risorge(f("resurrect")),
+            pv["decay"]["sprite"]: appassisce(f("decay")),
         },
     }
     palette = json.load(open(os.path.join(ROOT, "data", "vfx.json")))["pathway_palette_visiva"]

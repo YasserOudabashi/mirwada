@@ -341,8 +341,8 @@
       ],
       "priority": 18,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-27: tools/art/build_vfx.py gruppo 3: vfx_insight (bolle di pensiero fino a una nuvoletta con la spirale), vfx_ward (cupola con la maglia e il riflesso), vfx_cleanse (lampo del raggio dall'alto, scintille, anello), vfx_grip (croce del burattinaio e fili), vfx_shift (lampo della sagoma, particelle a spirale), vfx_sever (taglio e anima che sale), vfx_revenant (ankh, luci che salgono), vfx_wither (macchia di marcio e foglie secche). vfx.json: frames mind_read 4, shield 4, light_purify 5, possess 5, soul_detach 5. chain non ha VFX: non e' implementata. Test: ogni primitiva implementata ha il suo foglio. arte/revisione/vfx_primitive_3.png, prova a schermo vfx_primitive_3_in_gioco.png (Death)."
     },
     {
       "id": "US-8B74",

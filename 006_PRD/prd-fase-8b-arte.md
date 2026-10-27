@@ -260,7 +260,8 @@ invisibile) con `vfx_bolt_scoppio`, `vfx_streak` in `tools/art/build_vfx.py`, co
 colpo resta da fare.
 **US-8B41..43 [A] Le altre 24 primitive**, a gruppi di 8. *Domande (M) per gruppo.* **US-8B41 FATTA (2026-10-27)**: buff_stat, debuff_stat,
 aura, heal, summon, reveal_info, teleport, illusion. **US-8B42 FATTA (2026-10-27)**: curse, terrain_modify, fear,
-steal, dot, shadow_meld, time_rewind, plant_growth. Gruppo 3 in `prd.json`.
+steal, dot, shadow_meld, time_rewind, plant_growth. **US-8B43 FATTA (2026-10-27)**: mind_read, shield, light_purify,
+possess, transform, soul_detach, resurrect, decay (chain non e' ancora implementata).
 **US-8B44 [A] Varianti `riduci_flash`** di tutti gli effetti con lampo.
 
 ### Blocco E — Creature e trasformazioni
