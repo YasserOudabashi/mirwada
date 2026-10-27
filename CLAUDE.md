@@ -133,6 +133,7 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 | morte | 6–8 | ~100 ms | l'ultimo frame resta a terra |
 | interact / pickup / drink | 4 / 5 / 6 | il frame del gesto tenuto 220–360 ms | la mano libera, lo spadone resta in spalla |
 | ritual | 6, in ciclo | 160–200 ms | dura quanto il rituale (RitualSystem) |
+| fly / sail | 6, in ciclo | 140–180 ms | al posto di idle/walk in volo e in barca (in barca 4 unita' dentro lo scafo) |
 
 - I **frame d'impatto** si tengono di più, il passaggio veloce è nel mezzo (ease in/out).
 - Il **tell del nemico** (`nemico_base.anticipo`) deve essere visibile anche in un frame
@@ -234,7 +235,7 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - Nella preparazione degli attacchi l'arma può restare dietro la testa.
 - Il ponte è un rettangolo di legno.
 - I panorami hanno una sola veduta (la citta' di mare): niente panorami per regione.
-- Mancano: animazioni di arrampicata/nuoto/volo, mostri volanti grandi (c'è solo `bird()` per i volatili
+- Mancano: animazioni di arrampicata e nuoto (volo e barca ci sono, US-8B81), mostri volanti grandi (c'è solo `bird()` per i volatili
   piccoli), castelli e ponti dettagliati. Vanno aggiunti a `forge3d`, con una story dedicata.
 - Le case (`creatures.edificio`, US-8B18a) coprono a schermo il loro sedime e sporgono verso nord di 3-4
   caselle (muro + colmo): dove il generatore ha stradine di 1 casella si vedono i tetti, non le facciate.
@@ -369,14 +370,14 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   glifi delle primitive nella hotbar (US-8B72), VFX degli attacchi base (US-8B40) e di tutte le primitive
   (US-8B41..43), feedback del colpo (US-8B40b), ritratti nel dialogo (US-8B35a/b), le pagine del libro sulle due
   facciate (US-8B73b/c/d), le forme di Enel, gigante e arma di luce (US-8B50a/b/c), i gesti di Enel (interagire, raccogliere, bere,
-  rituale: US-8B80a/b), panorama dell'avvio (US-8B74).
+  rituale: US-8B80a/b), Enel in volo e in barca (US-8B81a/b), panorama dell'avvio (US-8B74).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
 **Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): restano
 dal PRD dell'arte le creature (evocazioni e antagonisti: aspettano di avere una figura nel mondo) e le animazioni
-di movimento di Enel (nuoto, arrampicata, volo, barca: US-8B81, servono al blocco H).
+di nuoto e arrampicata (arrivano col loro gameplay, US-8B90/92).
 
 ## Decisioni prese
 

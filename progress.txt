@@ -14718,3 +14718,14 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - tests/test_gesti.gd (3). 1042 test, validate 0. A schermo: ogni gesto fermato sul suo frame chiave, di fronte e di
   lato: arte/revisione/enel_azioni_in_gioco.png.
 - Aperto: bere dagli oggetti dello zaino (Inventory.usa) non ha ancora un segnale; i gesti degli NPC (stesse clip).
+
+## US-8B81a/b — Enel in volo e in barca, 2026-10-27
+- Prima: in barca Enel stava in piedi sul bordo di poppa, in volo era in piedi nell'aria (idle/walk alzati di 14 unita').
+- forge3d/anim_humanoid.py: fly (gambe che pendono piegate, braccio libero aperto, su e giu') e sail (in ginocchio, la
+  mano libera rema), in ciclo, nelle 4 direzioni; animations.json con durate_ms. Ritocco: in volo le gambe piu' piegate
+  (di fronte sembrava in piedi). Comandi: build_personaggi.py --only personaggio, generate_all.py --only personaggio,
+  build_forme.py; fogli di Enel che c'erano identici, nessun pixel sul bordo, alpha 0/255.
+- player._aggiorna_animazione: fly in volo, sail in barca (anche fermi). DENTRO_BARCA = 4 unita': in ginocchio dentro
+  lo scafo (prima della correzione restava sul bordo di poppa). Test test_gesti.test_in_volo_e_in_barca. 1043 test.
+- A schermo: arte/revisione/enel_mezzi_in_gioco.png (barca prima/dopo, volo prima/dopo).
+- Nuoto e arrampicata: arrivano col loro gameplay (US-8B90, US-8B92): oggi non c'e' acqua bassa ne' pareti scalabili.

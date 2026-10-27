@@ -231,6 +231,7 @@ func teleport_verso(spec: Dictionary) -> void:
 ## Frontiera si arriva anche volando). Il mondo passa un vincolo, Callable(Vector2) -> bool, vero
 ## dove il mezzo puo' stare (solo acqua, dentro la mappa).
 const ALTEZZA_VOLO := 14.0
+const DENTRO_BARCA := 4.0                     # US-8B81: in ginocchio dentro lo scafo, non sul bordo di poppa
 var _mezzo: String = ""                     # "", "barca", "volo"
 var _vincolo: Callable = Callable()
 var _ombra_volo: Sprite2D = null
@@ -260,7 +261,7 @@ func _imposta_mezzo(mezzo: String, vincolo: Callable) -> void:
 	var vola: bool = mezzo == "volo"
 	z_index = 5 if vola else 0                  # in volo sopra case e alberi
 	if _anim != null:
-		_anim.position.y = -ALTEZZA_VOLO if vola else 0.0
+		_anim.position.y = -ALTEZZA_VOLO if vola else (DENTRO_BARCA if mezzo == "barca" else 0.0)
 	_posiziona_sopra()                          # nome e icone salgono con il disegno
 	if _ombra_volo == null and vola:            # l'ombra a terra, composta nel gioco (CLAUDE.md)
 		var img := Image.create(18, 7, false, Image.FORMAT_RGBA8)
@@ -580,4 +581,6 @@ func _aggiorna_animazione() -> void:
 		return                                          # il gesto finisce da se' (o col rituale)
 	_gesto = ""
 	var stato: String = "walk" if in_moto else "idle"
+	if not _mezzo.is_empty():                       # US-8B81: in volo sospeso, in barca a remare
+		stato = "fly" if _mezzo == "volo" else "sail"
 	_anim.call("riproduci", stato, _dir_sguardo)

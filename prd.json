@@ -460,6 +460,31 @@
       "notes": "2026-10-27: player.gesto(nome)/fine_gesto(nome)/gesto_corrente(): il gesto copre idle e walk finche' dura, camminare lo interrompe, attacchi/parata/scatto/cast/morte hanno la precedenza. interact col tasto interagisci; pickup dai pickup (characteristic_pickup._raccolto_da) solo da fermo; drink su PotionSystem.pozione_bevuta; ritual da RitualSystem rituale_avviato a completato/interrotto. tests/test_gesti.gd (3). A schermo sul frame chiave di ogni gesto, di fronte e di lato: arte/revisione/enel_azioni_in_gioco.png."
     },
     {
+      "id": "US-8B81a",
+      "title": "Enel in volo e in barca: dati e fogli",
+      "description": "fly (sospeso) e sail (in ginocchio, rema) in data/animations.json e i fogli per Enel e le forme. Nuoto e arrampicata arrivano col loro gameplay (US-8B90, US-8B92).",
+      "acceptanceCriteria": [
+        "si leggono in tutte e 4 le direzioni",
+        "fogli di Enel esistenti identici"
+      ],
+      "priority": 29,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: forge3d/anim_humanoid.py fly (gambe che pendono piegate, braccio libero aperto, su e giu') e sail (in ginocchio, la mano libera rema), in ciclo; animations.json con durate_ms. Ritoccato a occhio: in volo le gambe piu' piegate (di fronte sembrava in piedi). Fogli Enel + gigante + arma di luce, nessun pixel sul bordo, alpha 0/255. arte/revisione/enel_mezzi.png."
+    },
+    {
+      "id": "US-8B81b",
+      "title": "Enel in volo e in barca nel gioco",
+      "description": "In volo e in barca fly e sail prendono il posto di idle e walk; in barca Enel sta dentro lo scafo.",
+      "acceptanceCriteria": [
+        "verifica a schermo prima/dopo"
+      ],
+      "priority": 30,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: player._aggiorna_animazione: fly in volo, sail in barca; DENTRO_BARCA = 4 unita' (prima in ginocchio sul bordo di poppa). test_gesti.test_in_volo_e_in_barca. arte/revisione/enel_mezzi_in_gioco.png (barca prima/dopo, volo prima/dopo)."
+    },
+    {
       "id": "US-8B41",
       "title": "VFX delle primitive, gruppo 1",
       "description": "buff_stat, summon, aura, heal, reveal_info, teleport, debuff_stat, illusion (le 8 piu' usate dalle abilita'): fogli a 4 toni colorati dalla rampa del Pathway, attorno a chi lancia.",

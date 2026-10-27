@@ -67,3 +67,24 @@ func test_raccogliere_da_fermo_piega_enel() -> void:
 	assert_ne(_stato(p), "pickup", "camminandoci sopra niente gesto (scivolerebbe)")
 	_root().get_node("Inventory").call("rimuovi", "lingotto_ferro", 2)
 	p.free()
+
+
+## US-8B81: in volo e in barca le animazioni dei mezzi prendono il posto di idle e walk.
+func test_in_volo_e_in_barca() -> void:
+	var p := _player()
+	p.call("imposta_volo", true)
+	p.velocity = Vector2.ZERO
+	p.call("_aggiorna_animazione")
+	assert_eq(_stato(p), "fly", "in volo, sospeso")
+	p.velocity = Vector2(80, 0)
+	p.call("_aggiorna_animazione")
+	assert_eq(_stato(p), "fly", "anche muovendosi")
+	p.call("imposta_volo", false)
+	p.call("imposta_barca", true)
+	p.call("_aggiorna_animazione")
+	assert_eq(_stato(p), "sail", "in barca, a remare")
+	p.call("imposta_barca", false)
+	p.velocity = Vector2.ZERO
+	p.call("_aggiorna_animazione")
+	assert_eq(_stato(p), "idle", "a terra di nuovo")
+	p.free()

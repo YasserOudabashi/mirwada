@@ -25,7 +25,7 @@ le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti 
 - La **PR #4** (`claude/mini-trailer-prompt-adq22o`) e' interamente dentro la PR #5: si puo' chiudere.
 - `main` e' ferma alla fase 7: va aggiornata mergiando la PR #5 quando l'utente lo decide.
 - CI GitHub Actions **accesa** su push a `main` e sulle pull request (validator + `tools/run_tests.sh`).
-- Verifica locale: `python tools/validate_data.py` e `bash tools/run_tests.sh` (1042 test, ~1 minuto).
+- Verifica locale: `python tools/validate_data.py` e `bash tools/run_tests.sh` (1043 test, ~1 minuto).
 
 ---
 
@@ -62,8 +62,9 @@ le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti 
    transform ha una forma con aspetto; torna Enel quando il modificatore finisce.
    E **US-8B50c l'arma di luce**: la seconda forma, Enel con la lama di luce dorata.
    E **US-8B80a/b i gesti di Enel**: interagire, raccogliere (da fermo), bere, rituale, nei dati e nel gioco.
-4. **Prossime**: US-8B81 (nuoto, arrampicata, volo, in barca: servono al blocco H). Evocazioni e antagonisti
-   aspettano di avere una figura nel mondo.
+   E **US-8B81a/b Enel in volo e in barca**: sospeso con le gambe che pendono, in ginocchio dentro lo scafo a remare.
+4. **Prossime**: nuoto e arrampicata col loro gameplay (US-8B90, US-8B92, blocco H, con le animazioni). Evocazioni e
+   antagonisti aspettano di avere una figura nel mondo.
    Evocazioni e antagonisti (blocco E) aspettano di avere una figura nel mondo (oggi summon scrive solo nel registro).
 5. Fase 12 (PRD `prd-fase-12-atto-2-3.md`, `prd-fase-12-mondo-vivo.md`).
 

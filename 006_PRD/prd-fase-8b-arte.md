@@ -298,7 +298,8 @@ all'avvio il libro e' piu' piccolo e intorno scorre il panorama (citta' di mare 
 
 **US-8B80 [D+A]** **FATTA (US-8B80a/b, 2026-10-27)** interagire, raccogliere, bere, rituale (prima la voce in
 `animations.json`, poi lo sheet).
-**US-8B81 [D+A]** nuoto, arrampicata, volo, in barca (servono a Blocco H).
+**US-8B81 [D+A]** nuoto, arrampicata, volo, in barca (servono a Blocco H). **Volo e barca FATTI (US-8B81a/b,
+2026-10-27)**: fly e sail; nuoto e arrampicata col loro gameplay (US-8B90, US-8B92).
 
 ### Blocco H — Movimento e base mobile (nuovo, da US-8B10)
 
