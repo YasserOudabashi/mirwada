@@ -2732,6 +2732,25 @@ def main():
                         if _larg % _fr:
                             err(f"data/vfx.json [primitive_vfx.{name}]: assets/vfx/{_sp}.png non e' fatto di {_fr} "
                                 f"frame (python tools/art/build_vfx.py)")
+        # US-8B40b: il feedback del colpo usa i momenti di audio.json combat_feedback e ha il suo foglio
+        _cf = set((load_json(os.path.join(DATA, "audio.json")) or {}).get("combat_feedback", {}))
+        for _nome, _fb in vfx.get("feedback_colpo", {}).items():
+            if _nome.startswith("_"):
+                continue
+            if _nome not in _cf:
+                err(f"data/vfx.json [feedback_colpo.{_nome}]: momento non in audio.json combat_feedback")
+            _png = os.path.join(ROOT, "assets", "vfx", f"{_fb.get('sprite')}.png")
+            _fr = _fb.get("frames")
+            if not os.path.isfile(_png) or not isinstance(_fr, int) or _fr <= 0:
+                err(f"data/vfx.json [feedback_colpo.{_nome}]: manca assets/vfx/{_fb.get('sprite')}.png o frames "
+                    f"(python tools/art/build_vfx.py)")
+                continue
+            with open(_png, "rb") as _fh:
+                if struct.unpack(">I", _fh.read(24)[16:20])[0] % _fr:
+                    err(f"data/vfx.json [feedback_colpo.{_nome}]: il foglio non e' fatto di {_fr} frame")
+            for _k in ("inchiostro", "primario", "accento"):
+                if not re.fullmatch(r"#[0-9a-fA-F]{6}", str((_fb.get("colori") or {}).get(_k, ""))):
+                    err(f"data/vfx.json [feedback_colpo.{_nome}]: colori.{_k} dev'essere un #rrggbb")
         # nessun campo VFX sulle abilita': ability.schema.json non si tocca
         for fn in sorted(os.listdir(adir)) if os.path.isdir(adir) else []:
             if not fn.endswith(".json"):

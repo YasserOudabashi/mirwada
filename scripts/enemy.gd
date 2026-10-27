@@ -189,10 +189,13 @@ func _su_anim_finita(stato_anim: String) -> void:
 		_vai(Stato.RECUPERO)
 
 
-func _su_colpo_inflitto(_bersaglio: Node, _danno: float, _tag: String = "") -> void:
+func _su_colpo_inflitto(bersaglio: Node, _danno: float, _tag: String = "") -> void:
 	var am: Node = get_node_or_null("/root/AudioManager")
 	if am != null:
 		am.call("feedback", "hit_light")
+	var vfx: Node = get_node_or_null("/root/Vfx")
+	if vfx != null and bersaglio is Node2D:
+		vfx.call("evento_combat", "hit_light", bersaglio)
 
 
 func _su_postura_rotta() -> void:
@@ -201,7 +204,7 @@ func _su_postura_rotta() -> void:
 		am.call("feedback", "posture_break")
 	var vfx: Node = get_node_or_null("/root/Vfx")
 	if vfx != null:
-		vfx.call("evento_combat", "posture_break")
+		vfx.call("evento_combat", "posture_break", self)
 	if _stato != Stato.MORTO:
 		_vai(Stato.STAGGER)
 

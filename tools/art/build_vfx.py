@@ -767,6 +767,99 @@ def appassisce(n, S=64):
     return out
 
 
+
+# --- feedback del colpo (US-8B40b) ----------------------------------------------------------------------------------
+
+def scintilla(n, S=32):
+    """Un colpo a segno: lampo di una stella a quattro punte, poi raggi che si allungano e schegge che volano."""
+    c = S / 2
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        if k == 0:
+            _metti(tela, _forme(S, S, _pol((c, c - 9), (c + 2.5, c - 2.5), (c + 9, c), (c + 2.5, c + 2.5), (c, c + 9),
+                                           (c - 2.5, c + 2.5), (c - 9, c), (c - 2.5, c - 2.5))), 3)
+            out.append(_contorno(tela))
+            continue
+        r0, r1 = 4 + 6 * t, 9 + 5 * t
+        raggi = _forme(S, S, *[_lin(c + math.cos(a) * r0, c + math.sin(a) * r0, c + math.cos(a) * r1,
+                                    c + math.sin(a) * r1, 1.6 - 0.6 * t) for a in np.linspace(0.4, math.tau + 0.4, 6,
+                                                                                               endpoint=False)])
+        _metti(tela, _sfuma(raggi, max(0.0, t - 0.3), SEED + 210, S, S, 0.9), 3 if t < 0.6 else 2)
+        out.append(_contorno(tela))
+    return out
+
+
+def parata(n, S=48):
+    """La parata perfetta: lampo di un rombo con l'anello, poi un anello che si allarga con otto raggi aguzzi."""
+    c = S / 2
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        if k == 0:
+            _metti(tela, _forme(S, S, _pol((c, c - 12), (c + 7, c), (c, c + 12), (c - 7, c))) |
+                   _anello(S, S, c, c, 10, 2.4, rapp=1.0), 3)
+            out.append(_contorno(tela))
+            continue
+        R = 9 + 11 * t
+        _metti(tela, _sfuma(_anello(S, S, c, c, R, 2.2 - t, rapp=1.0), max(0.0, t - 0.3), SEED + 220, S, S, 0.9), 2)
+        punte = _forme(S, S, *[_pol((c + math.cos(a) * (R - 3), c + math.sin(a) * (R - 3)),
+                                    (c + math.cos(a + 0.12) * (R + 3), c + math.sin(a + 0.12) * (R + 3)),
+                                    (c + math.cos(a) * (R + 8 * (1 - t)), c + math.sin(a) * (R + 8 * (1 - t))),
+                                    (c + math.cos(a - 0.12) * (R + 3), c + math.sin(a - 0.12) * (R + 3)))
+                               for a in np.linspace(0, math.tau, 8, endpoint=False)])
+        _metti(tela, _sfuma(punte, max(0.0, t - 0.4), SEED + 221, S, S, 0.9), 3)
+        out.append(_contorno(tela))
+    return out
+
+
+def postura(n, S=48):
+    """La postura si rompe: lampo di uno scudo, poi le schegge volano via e tre stelline girano sopra la testa."""
+    c = S / 2
+    rs = np.random.RandomState(SEED + 230)
+    schegge = [(rs.uniform(0, math.tau), rs.uniform(0.7, 1.0), rs.uniform(0, math.tau)) for _ in range(7)]
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((S, S), -1, int)
+        scudo = _forme(S, S, _pol((c - 7, c - 8), (c + 7, c - 8), (c + 7, c + 1), (c, c + 9), (c - 7, c + 1)))
+        if k == 0:
+            _metti(tela, scudo, 3)
+            out.append(_contorno(tela))
+            continue
+        for a, v, rot in schegge:                                 # schegge triangolari che volano via girando
+            d = 4 + 16 * t * v
+            x, y = c + math.cos(a) * d, c + math.sin(a) * d + 6 * t * t
+            r = rot + t * 4
+            tri = _forme(S, S, _pol((x + math.cos(r) * 3, y + math.sin(r) * 3), (x + math.cos(r + 2.2) * 2.4,
+                         y + math.sin(r + 2.2) * 2.4), (x + math.cos(r + 4.1) * 2.4, y + math.sin(r + 4.1) * 2.4)))
+            _metti(tela, _sfuma(tri, max(0.0, t - 0.5), SEED + 231, S, S, 0.9), 2)
+        for j in range(3):                                        # stelline che girano (stordito)
+            a = t * math.tau + j * math.tau / 3
+            x, y = c + math.cos(a) * 11, c - 14 + math.sin(a) * 3.5
+            st = _forme(S, S, _lin(x - 2, y, x + 2, y, 1.2), _lin(x, y - 2, x, y + 2, 1.2))
+            _metti(tela, st, 3)
+        out.append(_contorno(tela))
+    return out
+
+
+def polvere(n, W=32, H=16):
+    """La polvere dello scatto: sbuffi ai piedi che si gonfiano e si sfaldano."""
+    out = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        tela = np.full((H, W), -1, int)
+        for i, (x, s0) in enumerate(((W / 2 - 7, 3.0), (W / 2, 3.8), (W / 2 + 7, 2.6))):
+            r = s0 + 3 * t
+            sbuffo = _forme(W, H, _ell(x, H - 4 - 2 * t, r, r * 0.7))
+            _metti(tela, _sfuma(sbuffo, t, SEED + 240 + i, W, H, 0.9), 2 if t < 0.5 else 1)
+            _metti(tela, _forme(W, H, _ell(x - r * 0.3, H - 5 - 2 * t, r * 0.4, r * 0.3)) & (tela >= 0), 3 if t < 0.5 else 2)
+        out.append(_contorno(tela))
+    return out
+
+
 def main():
     pv = json.load(open(os.path.join(ROOT, "data", "vfx.json")))["primitive_vfx"]
     f = lambda tipo: pv[tipo]["frames"]                          # noqa: E731
@@ -807,6 +900,13 @@ def main():
             pv["resurrect"]["sprite"]: risorge(f("resurrect")),
             pv["decay"]["sprite"]: appassisce(f("decay")),
         },
+    }
+    fb = json.load(open(os.path.join(ROOT, "data", "vfx.json")))["feedback_colpo"]
+    gruppi["vfx_feedback"] = {
+        fb["hit_light"]["sprite"]: scintilla(fb["hit_light"]["frames"]),
+        fb["parry_perfect"]["sprite"]: parata(fb["parry_perfect"]["frames"]),
+        fb["posture_break"]["sprite"]: postura(fb["posture_break"]["frames"]),
+        fb["dash"]["sprite"]: polvere(fb["dash"]["frames"]),
     }
     palette = json.load(open(os.path.join(ROOT, "data", "vfx.json")))["pathway_palette_visiva"]
     os.makedirs(OUT, exist_ok=True)

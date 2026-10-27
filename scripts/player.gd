@@ -306,6 +306,7 @@ func start_dash(spec: Dictionary) -> void:
 	_anim.call("riproduci", "dash", _dir_sguardo)
 	if _audio != null:
 		_audio.call("feedback", "dash")
+	_vfx_evento("dash", self)
 
 
 func _fine_dash() -> void:
@@ -461,7 +462,7 @@ func _su_parata_riuscita(perfetta: bool, attaccante: Node) -> void:
 		_traccia("perfect_parry", {})
 		var vfx: Node = get_node_or_null("/root/Vfx")
 		if vfx != null:
-			vfx.call("evento_combat", "parry_perfect")
+			vfx.call("evento_combat", "parry_perfect", self)
 	if not perfetta or attaccante == null:
 		return
 	var b: Dictionary = _combat.get("parata", {})
@@ -482,11 +483,19 @@ func _cerca_postura(nodo: Node) -> Node:
 
 ## sfx + hitstop + shake del colpo inferto: tutto in AudioManager, dai dati
 ## (audio.json.combat_feedback). Niente hitstop hardcoded qui.
-func _su_colpo_inflitto(_bersaglio: Node, danno: float, tag_danno: String = "") -> void:
+func _su_colpo_inflitto(bersaglio: Node, danno: float, tag_danno: String = "") -> void:
 	if _audio != null:
 		_audio.call("feedback", "hit_light")
+	_vfx_evento("hit_light", bersaglio)
 	if danno > 0.0:
 		_traccia("damage_dealt", {"quantita": danno, "tag_danno": tag_danno})
+
+
+## US-8B40b: il foglio del momento (vfx.json feedback_colpo) su chi lo vive.
+func _vfx_evento(nome: String, dove: Node) -> void:
+	var vfx: Node = get_node_or_null("/root/Vfx")
+	if vfx != null and dove is Node2D:
+		vfx.call("evento_combat", nome, dove)
 
 
 func _su_danno_subito(danno: float, _stagger: float, _da: Node, tag_danno: String = "") -> void:

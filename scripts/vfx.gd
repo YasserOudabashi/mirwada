@@ -19,6 +19,7 @@ const RAMPA := preload("res://shaders/rampa_pathway.gdshader")
 const FOGLI := "res://assets/vfx/%s.png"
 
 var _fogli: Dictionary = {}
+var _accenti: CanvasLayer = null
 
 
 func _ready() -> void:
@@ -131,16 +132,45 @@ func scoppio_proiettile(posizione: Vector2, caster: Node, madre: Node) -> void:
 	_anima(e, false)
 
 
-func evento_combat(nome: String) -> void:
+## Un momento del combattimento (stesse chiavi di audio.json combat_feedback). Con `dove` (chi colpisce/para/si
+## rompe/scatta, o la hurtbox colpita) compare anche il suo foglio di vfx.json feedback_colpo (US-8B40b).
+func evento_combat(nome: String, dove: Node2D = null) -> void:
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd == null:
 		return
 	var trigger: Array = gd.call("get_vfx", "nero_di_scena").get("trigger", [])
 	if trigger.has(nome):
 		_nero(gd)
+	var fb: Dictionary = gd.call("get_vfx", "feedback_colpo").get(nome, {}) if dove != null else {}
+	var tex: Texture2D = _foglio(str(fb.get("sprite", "")))
+	if tex == null:
+		return
+	var corpo: Node = dove                      # la hurtbox colpita -> il suo personaggio; l'effetto va nel mondo
+	while corpo is CollisionObject2D and corpo.get_parent() is CollisionObject2D:
+		corpo = corpo.get_parent()
+	var madre: Node = _strato_accenti() if trigger.has(nome) else corpo.get_parent()
+	if madre == null:
+		return
+	var e := _effetto(tex, int(fb.get("frames", 1)), fb.get("colori", {}), bool(fb.get("impact_frame", false)))
+	madre.add_child(e)
+	e.global_position = dove.global_position - Vector2(0, float(fb.get("alto", 0.0)))
+	_anima(e, false)
 
 
 # --- Interno ----------------------------------------------------------
+
+## Nel nero di scena restano gli accenti (design-vfx principio 2): uno strato sopra il nero che segue la camera,
+## cosi' l'effetto sta nello stesso punto del mondo.
+func _strato_accenti() -> CanvasLayer:
+	if _accenti == null:
+		_accenti = CanvasLayer.new()
+		_accenti.name = "Accenti"
+		_accenti.follow_viewport_enabled = true
+		add_child(_accenti)
+	var ov: Node = _overlay()
+	_accenti.layer = (ov as CanvasLayer).layer + 1 if ov is CanvasLayer else 89
+	return _accenti
+
 
 func _nero(gd: Node) -> void:
 	_overlay_call("nero", float(gd.call("get_vfx", "nero_di_scena").get("durata_ms", 250)))

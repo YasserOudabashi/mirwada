@@ -14563,3 +14563,23 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   segnaposto). A schermo con la palette di Death (arte/revisione/vfx_primitive_3_in_gioco.png). validate 0, 1026.
 - Aperto: gli effetti di chi bersaglia un altro (maleficio, possessione, anima recisa) stanno su chi lancia: il
   motore non dice ancora su chi cadono.
+
+## US-8B40b — Feedback del colpo, 2026-10-27
+- tools/art/build_vfx.py (seed 40) gruppo vfx_feedback, frame da data/vfx.json feedback_colpo: scintilla (32, 4 frame:
+  stella bianca d'impatto, raggi dorati, briciole), parata (48, 5: lampo dell'anello, anello con 8 punte che si allarga
+  e si spezza), postura (48, 6: lampo dello scudo, schegge che volano, stelline sopra la testa), polvere (32x16, 4:
+  sbuffi ai piedi che si sfaldano). Comando: python tools/art/build_vfx.py (deterministico, md5 uguale due volte).
+- data/vfx.json feedback_colpo: stesse chiavi di audio.json combat_feedback (hit_light, parry_perfect, posture_break,
+  dash), alto sopra il punto, colori della rampa nei dati (non dipendono dal Pathway: il colpo si legge uguale per tutti).
+- scripts/vfx.gd evento_combat(nome, dove): con `dove` (hurtbox colpita o personaggio) mette il foglio nel mondo, nel
+  genitore del personaggio (non lo segue). I momenti del nero di scena (parata perfetta, postura) vanno nello strato
+  "Accenti" (CanvasLayer sopra VfxOverlay, follow_viewport): prima la parata finiva sotto il nero all'85% e non si
+  vedeva; design-vfx principio 2 vuole che restino gli accenti.
+- Agganci: player.gd colpo inflitto (sul bersaglio), parata perfetta (su di se'), scatto (ai piedi); enemy.gd colpo
+  inflitto, postura rotta.
+- Validator: momento in combat_feedback, foglio presente e largo un multiplo dei frame, colori #rrggbb (provato a farlo
+  scattare). Test: tests/test_vfx_feedback.gd (5). 1031 test passano, validate_data 0 errori.
+- Verifica a schermo nel mondo vero al rallentatore (Engine.time_scale 0.1, uno scatto per ogni frame):
+  arte/revisione/vfx_feedback_in_gioco.png. Il nemico e' a fianco del giocatore sul marmo di Mirwada.
+- Aperto: le silhouette nel nero di scena (il principio 2 vuole anche quelle) restano da fare; scintilla piu' forte per i
+  colpi pesanti quando ci sara' hit_heavy in combat_feedback.
