@@ -249,7 +249,9 @@ era al minimo). 10 animazioni, ciclo chiuso, confronto prima/dopo.
 estensione del generatore), `capra_lunare`, più `hurt` e `death` nei dati.
 **US-8B33 [A] 8 NPC con nome. M ciascuno.** idle + walk, 4 direzioni.
 **US-8B34 [A] 10 generici + antagonista. M.** Varianti di 2–3 corpi.
-**US-8B35 [A] 9 ritratti. M.** Stessa luce, inquadratura e sfondo per tutti.
+**US-8B35 [A] 9 ritratti. M.** Stessa luce, inquadratura e sfondo per tutti. **FATTA (US-8B35a/b, 2026-10-27)**:
+17 mezzibusti 64x80 (Enel e tutti gli aspetti degli NPC) dallo stesso modello degli sprite, `tools/art/build_ritratti.py`;
+il generatore ha imparato bocca, sopracciglia, barba e occhiali; nella pagina del dialogo e del negozio.
 
 ### Blocco D — VFX (in scala di grigi, colorati dallo shader)
 

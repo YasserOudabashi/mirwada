@@ -14,7 +14,7 @@ Mirwada, dei villaggi e le torri, e le porte verso i 14 interni delle fasi 10-11
 Gli interni sono disegnati e arredati (US-8B18c/d); varchi, barca, volo, soglia del faro e icone degli oggetti
 e degli status, i glifi delle primitive e i VFX degli attacchi base sono fatti (2026-10-26), il panorama
 dell'avvio, i VFX di tutte le primitive e il feedback del colpo il 2026-10-27. Quello che manca di piu' a schermo:
-i **ritratti** (US-8B35) e le creature.
+le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti sono fatti (US-8B35a/b).
 
 ---
 
@@ -25,7 +25,7 @@ i **ritratti** (US-8B35) e le creature.
 - La **PR #4** (`claude/mini-trailer-prompt-adq22o`) e' interamente dentro la PR #5: si puo' chiudere.
 - `main` e' ferma alla fase 7: va aggiornata mergiando la PR #5 quando l'utente lo decide.
 - CI GitHub Actions **accesa** su push a `main` e sulle pull request (validator + `tools/run_tests.sh`).
-- Verifica locale: `python tools/validate_data.py` e `bash tools/run_tests.sh` (1031 test, ~1 minuto).
+- Verifica locale: `python tools/validate_data.py` e `bash tools/run_tests.sh` (1033 test, ~1 minuto).
 
 ---
 
@@ -52,7 +52,10 @@ i **ritratti** (US-8B35) e le creature.
    trasformazione, anima recisa, resurrezione, decadimento): ogni primitiva implementata ha il suo foglio.
    E **US-8B40b feedback del colpo**: scintilla sul colpito, lampo della parata perfetta, schegge della postura,
    polvere dello scatto (`vfx.json feedback_colpo`); parata e postura restano accese sopra il nero di scena.
-4. **Prossime**: ritratti (US-8B35), creature (blocco E), animazioni nuove di Enel (blocco G).
+   E **US-8B35a/b ritratti**: mezzibusti 64x80 dallo stesso modello degli sprite (`tools/art/build_ritratti.py`),
+   con barba, occhiali ed espressione nei dati degli aspetti; nella pagina del dialogo e del negozio.
+4. **Prossime**: creature (blocco E), animazioni nuove di Enel (blocco G). Aperto: la pagina del dialogo occupa
+   tutte e due le pagine del libro e il testo lungo attraversa la piega centrale.
 5. Fase 12 (PRD `prd-fase-12-atto-2-3.md`, `prd-fase-12-mondo-vivo.md`).
 
 ---

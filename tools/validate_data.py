@@ -1973,6 +1973,14 @@ def main():
             asp = (npc.get("aspetto") or {}).get("sprite") if isinstance(npc.get("aspetto"), dict) else None
             if asp is not None and not os.path.exists(os.path.join(ROOT, "assets", "placeholder", f"personaggio_{asp}_idle.png")):
                 err(f"{rel} [{nid}]: aspetto.sprite '{asp}' senza assets/placeholder/personaggio_{asp}_idle.png (tools/art/build_npc.py)")
+            # US-8B35: e il suo ritratto 64x80 (tools/art/build_ritratti.py), mostrato nella pagina del dialogo
+            _rit = os.path.join(ROOT, "assets", "ritratti", f"{asp}.png")
+            if asp is not None and not os.path.isfile(_rit):
+                err(f"{rel} [{nid}]: aspetto.sprite '{asp}' senza assets/ritratti/{asp}.png (tools/art/build_ritratti.py)")
+            elif asp is not None:
+                with open(_rit, "rb") as _fh:
+                    if struct.unpack(">II", _fh.read(24)[16:24]) != (64, 80):
+                        err(f"{rel} [{nid}]: assets/ritratti/{asp}.png non e' 64x80 (tools/art/build_ritratti.py)")
             if npc.get("region_id") not in region_ids:
                 err(f"{rel} [{nid}]: region_id '{npc.get('region_id')}' non e' una regione di regions.json")
             for voce in npc.get("schedule", []):

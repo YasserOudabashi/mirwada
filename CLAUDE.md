@@ -172,6 +172,15 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
   (contorno, scuro, primario, accento). Il colore lo mette `shaders/rampa_pathway.gdshader` dalla palette del
   Pathway in `data/vfx.json`, come i VFX. Nella hotbar l'abilita' mostra il glifo della sua prima primitiva.
 
+### Ritratti
+- `build_ritratti.py` (US-8B35): un mezzobusto 64x80 per aspetto, dallo **stesso modello 3D dello sprite** con il
+  dettaglio dei ritratti (`detail=3`: sopracciglia, bocca, occhiali). Stessa luce, tre quarti, il centro della testa
+  sempre nello stesso punto, fondo grigio a retino che schiarisce verso la luce, cornice di 1 px.
+- Volto ed espressione sono **dati** dell'aspetto in `build_npc.ASPETTI` (`beard`, `glasses`, `brows` in gradi,
+  `mouth` -1/0/+1); la barba sta anche sullo sprite, il resto solo nel ritratto. File per id dell'aspetto
+  (`assets/ritratti/<aspetto>.png`, `personaggio.png` per il giocatore), mai per nome.
+- Nel gioco `GameData.ritratto(npc_id)`: nella pagina del dialogo e del negozio, a sinistra del nome.
+
 ### Mondo, mappe e biomi
 - **La generazione procedurale del mondo è consentita come strumento di produzione**:
   `forge3d/world.py` produce biomi, fiumi, laghi, villaggi, strade, oggetti e spawn dal `seed`.
@@ -212,7 +221,7 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - Se uno sprite è sfocato: reimporta e controlla il filtro prima di toccare il PNG.
 
 ### Limiti noti del generatore (da migliorare, non da aggirare a mano)
-- A 32 px il viso è ridotto al minimo; a 48–64 px si legge bene.
+- A 32 px il viso è ridotto al minimo; a 48–64 px si legge bene. Bocca, sopracciglia e occhiali solo nei ritratti.
 - Nella preparazione degli attacchi l'arma può restare dietro la testa.
 - Il ponte è un rettangolo di legno.
 - I panorami hanno una sola veduta (la citta' di mare): niente panorami per regione.
@@ -265,6 +274,7 @@ python tools/art/esporta_mondo.py --varchi         # solo i disegni dei varchi d
 python tools/art/esporta_mondo.py --barca          # solo il disegno della barca (pochi secondi)
 python tools/art/build_interni.py              # interni: pavimenti, pareti e arredi -> assets/interni/<tema>/
 python tools/art/build_npc.py                  # aspetti degli NPC (personaggio_<aspetto>_{idle,walk}.png)
+python tools/art/build_ritratti.py             # ritratti 64x80 per aspetto, dallo stesso modello -> assets/ritratti/
 python tools/art/build_libro.py                # carta (grande e piccola dell'avvio), segnalibri, caselle e filetto (assets/ui/)
 python tools/art/build_panorami.py             # panorama a 6 strati x 4 momenti dietro il libro all'avvio (assets/ui/panorama/)
 python tools/art/build_icone.py                # icone degli oggetti: abbina i nuovi in data/ui/icone.json, disegna assets/icone/oggetti/
@@ -308,6 +318,7 @@ assets/icone/oggetti/ <forma>_<tinta>.png, 32x32, solo le icone usate (build_ico
 assets/icone/stati/   <status_id>.png, 16x16 (build_stati.py)
 assets/icone/primitive/ <primitiva>.png, 32x32 a 4 grigi (build_primitive.py, shaders/rampa_pathway.gdshader)
 assets/vfx/           sheet degli effetti
+assets/ritratti/      <aspetto>.png, 64x80 (build_ritratti.py), nella pagina del dialogo
 prd.json          story della fase corrente per ralph
 progress.txt      memoria tra le iterazioni
 ```
@@ -346,13 +357,13 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   arredati (US-8B18c/d), varchi delle sotto-aree come ingressi con il loro contenuto e la loro arte (US-8B21a/b/c),
   icone degli oggetti a terra e nello zaino (US-8B70), icone degli status sopra la testa (US-8B71),
   glifi delle primitive nella hotbar (US-8B72), VFX degli attacchi base (US-8B40) e di tutte le primitive
-  (US-8B41..43), feedback del colpo (US-8B40b), panorama dell'avvio (US-8B74).
+  (US-8B41..43), feedback del colpo (US-8B40b), ritratti nel dialogo (US-8B35a/b), panorama dell'avvio (US-8B74).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
 **Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): restano
-dal PRD dell'arte i ritratti, le creature e le animazioni nuove di Enel (blocchi C/E/G).
+dal PRD dell'arte le creature e le animazioni nuove di Enel (blocchi E/G).
 
 ## Decisioni prese
 

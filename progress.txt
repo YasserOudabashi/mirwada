@@ -14583,3 +14583,24 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   arte/revisione/vfx_feedback_in_gioco.png. Il nemico e' a fianco del giocatore sul marmo di Mirwada.
 - Aperto: le silhouette nel nero di scena (il principio 2 vuole anche quelle) restano da fare; scintilla piu' forte per i
   colpi pesanti quando ci sara' hit_heavy in combat_feedback.
+
+## US-8B35a/b — Ritratti, 2026-10-27
+- Generatore (forge3d/humanoid.py): barba (mascella + pizzo + baffi, materiale a scelta: fur_grey per Mirco, fur_black per
+  Bruno), occhiali e, con detail=3 (solo i ritratti), sopracciglia inclinate di `brows` gradi e bocca a tre tratti
+  (`mouth` -1/0/+1, rossa per leggersi su tutte le pelli); frangia piu' aderente a detail 3 (da vicino sembrava la visiera
+  di un berretto). Occhiali solo nel ritratto: sullo sprite a 64 px coprivano gli occhi (provato: lente bianca = macchia,
+  sola montatura = macchia dorata). materials.py skin_pale: ora brown/skin_m/skin_l/cream/white (era slate/grey: Aldo e
+  Ottavia avevano la faccia grigio-blu).
+- build_npc.ASPETTI: volto ed espressione nei dati di ogni aspetto; `_npc` accetta il dettaglio del ritratto. Sprite
+  rigenerati: cambiano solo amico, archivista, contrabbandiere, rivale (gli altri identici byte per byte); confronto
+  prima/dopo guardato a 5x.
+- tools/art/build_ritratti.py: 17 ritratti 64x80 (personaggio + tutti gli aspetti), yaw 205 (tre quarti), pitch 10, ppu
+  3.6, centro della testa calcolato dal modello (fk del giunto head) e messo a (32, 38): stessa inquadratura per tutti,
+  anche la bambina e gli chignon. Fondo grey_l/grey a retino Bayer, cornice ink. Comando: python
+  tools/art/build_ritratti.py (deterministico, md5 uguale due volte). Foglio: arte/revisione/ritratti.png.
+- Gioco: GameData.ritratto(npc_id); page_dialogo._con_ritratto (dialogo e negozio). Validator: ritratto 64x80 per ogni
+  aspetto usato. tests/test_ritratti.gd (2). 1033 test passano, validate 0 errori. A schermo: arte/revisione/
+  ritratti_in_gioco.png.
+- Aperto: la pagina del dialogo usa tutta la doppia pagina e il testo lungo passa sopra la piega centrale (c'era gia').
+  Mirco e Sidon restano provvisori finche' l'utente non sceglie il loro aspetto (art-brief-gemini.md 4): basta cambiare
+  la loro voce in build_npc.ASPETTI e rilanciare build_npc.py e build_ritratti.py.

@@ -716,6 +716,13 @@ func icona_primitiva(tipo: String) -> Texture2D:
 	return _icona_png("res://assets/icone/primitive/%s.png" % tipo)
 
 
+## US-8B35: il ritratto di un NPC, dal suo aspetto (roster aspetto.sprite -> assets/ritratti/<aspetto>.png,
+## tools/art/build_ritratti.py). null se l'NPC non ha aspetto o il ritratto non c'e'.
+func ritratto(npc_id: String) -> Texture2D:
+	var aspetto: String = str((get_npc(npc_id).get("aspetto", {}) as Dictionary).get("sprite", ""))
+	return null if aspetto.is_empty() else _icona_png("res://assets/ritratti/%s.png" % aspetto)
+
+
 ## Ogni PNG delle icone si legge dal disco una volta sola (senza l'import dell'editor).
 func _icona_png(path: String) -> Texture2D:
 	if not _icone_tex.has(path):

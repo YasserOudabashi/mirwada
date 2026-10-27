@@ -321,6 +321,35 @@
       "notes": "2026-10-27: tools/art/build_vfx.py gruppo vfx_feedback: vfx_scintilla (stella bianca, raggi dorati), vfx_parata (anello con le punte che si allarga e si spezza), vfx_postura (scudo che va in schegge, stelline sopra la testa), vfx_polvere (sbuffi ai piedi). vfx.json feedback_colpo con le chiavi di audio.json combat_feedback e i colori nei dati. Vfx.evento_combat(nome, dove): player colpo/parata perfetta/scatto, enemy colpo/postura. Parata e postura (trigger del nero di scena) nello strato Accenti sopra il nero, che segue la camera. Validator: momento in combat_feedback, foglio e frame, colori #rrggbb. 5 test. Prova a schermo al rallentatore: arte/revisione/vfx_feedback_in_gioco.png."
     },
     {
+      "id": "US-8B35a",
+      "title": "Ritratti: volti nel generatore e mezzibusti",
+      "description": "US-8B35 spezzata in due. Il generatore dei personaggi impara bocca e sopracciglia con l'espressione (solo ai ritratti), barba e occhiali; tools/art/build_ritratti.py fa un mezzobusto 64x80 per aspetto dallo stesso modello dello sprite.",
+      "acceptanceCriteria": [
+        "stessa luce, inquadratura e sfondo per tutti (centro della testa sempre nello stesso punto)",
+        "volto ed espressione sono dati degli aspetti (build_npc.ASPETTI), file per id dell'aspetto",
+        "gli sprite che cambiano (barba, occhiali) rigenerati e riguardati",
+        "deterministico, colori in palette"
+      ],
+      "priority": 19,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: forge3d/humanoid.py: beard (mascella, pizzo, baffi), glasses e, con detail 3 (solo ritratti), sopracciglia inclinate (brows), bocca a tre tratti (mouth -1/0/+1), frangia piu' aderente; skin_pale rifatta calda (era grigio-blu, sembrava un fantasma). build_npc.ASPETTI: volto ed espressione per aspetto (Mirco barba grigia, Ottavia occhiali, Bruno barba nera, Lena sorriso...); rigenerati gli sprite che cambiano (amico, archivista, contrabbandiere, rivale), gli altri identici. Occhiali solo nel ritratto: a 64 px coprivano gli occhi. tools/art/build_ritratti.py: 17 ritratti 64x80, centro della testa calcolato dal modello. Deterministico. arte/revisione/ritratti.png."
+    },
+    {
+      "id": "US-8B35b",
+      "title": "Ritratti nella pagina del dialogo",
+      "description": "La pagina del dialogo (e del negozio) mostra il ritratto di chi parla accanto al nome e alla battuta.",
+      "acceptanceCriteria": [
+        "GameData.ritratto(npc_id) dall'aspetto del roster",
+        "il validator vuole un ritratto 64x80 per ogni aspetto usato",
+        "verifica a schermo nel libro"
+      ],
+      "priority": 20,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: GameData.ritratto(npc_id) dall'aspetto del roster; page_dialogo: ritratto a sinistra di nome e battuta (anche nel negozio), 1 texel = 1 unita', filtro nearest. Validator: ogni aspetto usato ha il ritratto 64x80. 2 test. Prova a schermo: arte/revisione/ritratti_in_gioco.png (Mirco, Ottavia, Lena)."
+    },
+    {
       "id": "US-8B41",
       "title": "VFX delle primitive, gruppo 1",
       "description": "buff_stat, summon, aura, heal, reveal_info, teleport, debuff_stat, illusion (le 8 piu' usate dalle abilita'): fogli a 4 toni colorati dalla rampa del Pathway, attorno a chi lancia.",

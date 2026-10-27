@@ -70,8 +70,7 @@ func aggiorna() -> void:
 
 	var l_nome := _riga(nome)
 	l_nome.add_theme_color_override("font_color", C_SPEAKER)
-	add_child(l_nome)
-	add_child(_riga(str(gd.call("tr_data", nodo.get("text_i18n", "")))))
+	_con_ritratto(gd, chi, [l_nome, _riga(str(gd.call("tr_data", nodo.get("text_i18n", ""))))])
 
 	var vuota := Control.new()
 	vuota.custom_minimum_size = Vector2(0, 8)
@@ -111,8 +110,7 @@ func _disegna_negozio() -> void:
 	var npc: Dictionary = gd.call("get_npc", _negozio_npc_id)
 	var l_nome := _riga(str(gd.call("tr_data", npc.get("name_i18n", _negozio_npc_id))))
 	l_nome.add_theme_color_override("font_color", C_SPEAKER)
-	add_child(l_nome)
-	add_child(_riga("%s: %d" % [tr("BOOK_NEGOZIO_MONETE"), int(inv.call("ricchezza"))]))
+	_con_ritratto(gd, _negozio_npc_id, [l_nome, _riga("%s: %d" % [tr("BOOK_NEGOZIO_MONETE"), int(inv.call("ricchezza"))])])
 
 	var valuta_items: Array = gd.call("items_per_categoria", "valuta")
 	if valuta_items.is_empty():
@@ -327,6 +325,32 @@ func scelte_a_schermo() -> int:
 		if c is Button:
 			n += 1
 	return n
+
+
+## US-8B35: il ritratto di chi parla (GameData.ritratto, 1 texel = 1 unita' come la carta) a sinistra e le righe
+## accanto; senza ritratto le righe vanno da sole, come prima.
+func _con_ritratto(gd: Node, npc_id: String, righe: Array) -> void:
+	var tex: Texture2D = gd.call("ritratto", npc_id)
+	if tex == null:
+		for r in righe:
+			add_child(r)
+		return
+	var h := HBoxContainer.new()
+	h.name = "ConRitratto"
+	h.add_theme_constant_override("separation", 8)
+	var t := TextureRect.new()
+	t.name = "Ritratto"
+	t.texture = tex
+	t.custom_minimum_size = tex.get_size()
+	t.stretch_mode = TextureRect.STRETCH_KEEP
+	t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	h.add_child(t)
+	var v := VBoxContainer.new()
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for r in righe:
+		v.add_child(r)
+	h.add_child(v)
+	add_child(h)
 
 
 func _riga(t: String) -> Label:
