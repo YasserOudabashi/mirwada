@@ -14705,3 +14705,16 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   personaggio; python tools/art/build_forme.py. I fogli di Enel che c'erano restano identici; nuovi i 4 di Enel e gli
   8 delle forme. Nessun pixel sul bordo, alpha 0/255. arte/revisione/enel_azioni.png.
 - US-8B80b: agganciarle ai momenti del gioco.
+
+## US-8B80b — Gesti di Enel nel gioco, 2026-10-27
+- player.gd: _gesto + gesto(nome) / fine_gesto(nome) / gesto_corrente(). _aggiorna_animazione non copre un gesto
+  finche' Enel e' fermo; se si muove il gesto finisce (camminare vince). Attacco, parata, scatto, cast e morte hanno la
+  precedenza (gesto() non parte se uno e' in corso). Il gesto finisce con animazione_finita; il rituale (in ciclo) con
+  RitualSystem.rituale_completato/interrotto.
+- Agganci: interact sul tasto interagisci (anche senza niente vicino: e' un gesto, non un'azione); pickup in
+  characteristic_pickup._raccolto_da solo se chi raccoglie e' fermo (camminandoci sopra si scivolerebbe piegati);
+  drink su PotionSystem.pozione_bevuta (il libro e' aperto: il gesto parte quando si chiude); ritual da
+  RitualSystem.rituale_avviato.
+- tests/test_gesti.gd (3). 1042 test, validate 0. A schermo: ogni gesto fermato sul suo frame chiave, di fronte e di
+  lato: arte/revisione/enel_azioni_in_gioco.png.
+- Aperto: bere dagli oggetti dello zaino (Inventory.usa) non ha ancora un segnale; i gesti degli NPC (stesse clip).

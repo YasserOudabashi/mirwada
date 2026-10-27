@@ -456,8 +456,8 @@
       ],
       "priority": 28,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-27: player.gesto(nome)/fine_gesto(nome)/gesto_corrente(): il gesto copre idle e walk finche' dura, camminare lo interrompe, attacchi/parata/scatto/cast/morte hanno la precedenza. interact col tasto interagisci; pickup dai pickup (characteristic_pickup._raccolto_da) solo da fermo; drink su PotionSystem.pozione_bevuta; ritual da RitualSystem rituale_avviato a completato/interrotto. tests/test_gesti.gd (3). A schermo sul frame chiave di ogni gesto, di fronte e di lato: arte/revisione/enel_azioni_in_gioco.png."
     },
     {
       "id": "US-8B41",

@@ -296,7 +296,7 @@ all'avvio il libro e' piu' piccolo e intorno scorre il panorama (citta' di mare 
 
 ### Blocco G — Animazioni nuove di Enel
 
-**US-8B80 [D+A]** interagire, raccogliere, bere, rituale (prima la voce in
+**US-8B80 [D+A]** **FATTA (US-8B80a/b, 2026-10-27)** interagire, raccogliere, bere, rituale (prima la voce in
 `animations.json`, poi lo sheet).
 **US-8B81 [D+A]** nuoto, arrampicata, volo, in barca (servono a Blocco H).
 

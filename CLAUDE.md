@@ -131,6 +131,8 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 | attack pesante | 8 | 70/70/70/180/50/160/100/150 ms | anticipo di 4 frame **leggibile**: è il tell del combattimento |
 | dash | 4 | ~50 ms (20 fps) | iframe 0–2 |
 | morte | 6–8 | ~100 ms | l'ultimo frame resta a terra |
+| interact / pickup / drink | 4 / 5 / 6 | il frame del gesto tenuto 220–360 ms | la mano libera, lo spadone resta in spalla |
+| ritual | 6, in ciclo | 160–200 ms | dura quanto il rituale (RitualSystem) |
 
 - I **frame d'impatto** si tengono di più, il passaggio veloce è nel mezzo (ease in/out).
 - Il **tell del nemico** (`nemico_base.anticipo`) deve essere visibile anche in un frame
@@ -366,14 +368,15 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   icone degli oggetti a terra e nello zaino (US-8B70), icone degli status sopra la testa (US-8B71),
   glifi delle primitive nella hotbar (US-8B72), VFX degli attacchi base (US-8B40) e di tutte le primitive
   (US-8B41..43), feedback del colpo (US-8B40b), ritratti nel dialogo (US-8B35a/b), le pagine del libro sulle due
-  facciate (US-8B73b/c/d), le forme di Enel, gigante e arma di luce (US-8B50a/b/c), panorama dell'avvio (US-8B74).
+  facciate (US-8B73b/c/d), le forme di Enel, gigante e arma di luce (US-8B50a/b/c), i gesti di Enel (interagire, raccogliere, bere,
+  rituale: US-8B80a/b), panorama dell'avvio (US-8B74).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
 **Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): restano
 dal PRD dell'arte le creature (evocazioni e antagonisti: aspettano di avere una figura nel mondo) e le animazioni
-nuove di Enel (blocchi E/G).
+di movimento di Enel (nuoto, arrampicata, volo, barca: US-8B81, servono al blocco H).
 
 ## Decisioni prese
 

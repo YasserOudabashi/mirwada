@@ -55,6 +55,9 @@ var _morto: bool = false
 ## _aggiorna_animazione() non la sovrascrive col walk/idle del frame dopo
 ## (stesso ruolo di _attaccando per l'attacco).
 var _castando: bool = false
+## US-8B80: il gesto fuori dal combattimento in corso (interact, pickup, drink, ritual; "" = nessuno). Finche' dura
+## l'animazione di camminata/fermo non lo copre; camminare lo interrompe.
+var _gesto: String = ""
 
 @onready var _audio: Node = get_node_or_null("/root/AudioManager")
 
@@ -78,6 +81,14 @@ func _ready() -> void:
 	_hurtbox.colpito.connect(_su_danno_subito)
 	_stats.died.connect(_su_morte)
 	_stats.forma_cambiata.connect(_su_forma)
+	var ps: Node = get_node_or_null("/root/PotionSystem")
+	if ps != null:
+		ps.pozione_bevuta.connect(func(_avanzato: bool, _forzato: bool) -> void: gesto("drink"))
+	var rs: Node = get_node_or_null("/root/RitualSystem")
+	if rs != null:
+		rs.rituale_avviato.connect(func(_s: int) -> void: gesto("ritual"))
+		rs.rituale_completato.connect(func(_s: int) -> void: fine_gesto("ritual"))
+		rs.rituale_interrotto.connect(func(_m: String) -> void: fine_gesto("ritual"))
 
 	# Bonus di Sequenza del Pathway corrente (US-201): il giocatore entra in
 	# scena dopo gli autoload, quindi li richiede lui una volta pronto.
@@ -155,6 +166,8 @@ func _physics_process(delta: float) -> void:
 			_fine_dash()
 		return
 
+	if Input.is_action_just_pressed("interagisci"):
+		gesto("interact")
 	if Input.is_action_just_pressed("parata") and not _attaccando:
 		_inizia_parata()
 	elif Input.is_action_just_released("parata"):
@@ -386,6 +399,8 @@ func _su_anim_finita(stato: String) -> void:
 		_hitbox.call("disattiva")
 	elif stato == "cast":
 		_castando = false
+	elif stato == _gesto:
+		_gesto = ""
 
 
 ## StatsComponent.died: hp a 0. Ferma il giocatore e riproduce "death"
@@ -501,6 +516,27 @@ func _vfx_evento(nome: String, dove: Node) -> void:
 		vfx.call("evento_combat", nome, dove)
 
 
+## US-8B80: un gesto (animations.json personaggio: interact, pickup, drink, ritual), solo se Enel non sta gia'
+## facendo altro. Pubblico: lo chiamano i pickup, i sistemi via segnale e i test.
+func gesto(nome: String) -> void:
+	if _morto or _attaccando or _dashing or _parando or _castando:
+		return
+	_gesto = nome
+	_anim.call("riproduci", nome, _dir_sguardo)
+
+
+## Chiude un gesto in ciclo (il rituale) quando finisce la cosa che lo teneva acceso.
+func fine_gesto(nome: String) -> void:
+	if _gesto != nome:
+		return
+	_gesto = ""
+	_aggiorna_animazione()
+
+
+func gesto_corrente() -> String:
+	return _gesto
+
+
 ## US-8B50: in una forma (data/forms.json "aspetto") Enel ha i suoi fogli; stessi tempi, stesso stato di prima.
 func _su_forma(aspetto: String) -> void:
 	var stato: String = str(_anim.call("stato_corrente"))
@@ -539,5 +575,9 @@ func _aggiorna_sguardo(input: Vector2) -> void:
 func _aggiorna_animazione() -> void:
 	if _attaccando or _dashing or _parando or _castando:
 		return
-	var stato: String = "walk" if velocity.length() > SOGLIA_MOTO else "idle"
+	var in_moto: bool = velocity.length() > SOGLIA_MOTO
+	if not _gesto.is_empty() and not in_moto:
+		return                                          # il gesto finisce da se' (o col rituale)
+	_gesto = ""
+	var stato: String = "walk" if in_moto else "idle"
 	_anim.call("riproduci", stato, _dir_sguardo)

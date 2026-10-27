@@ -41,14 +41,20 @@ func _ready() -> void:
 
 func _su_corpo(body: Node) -> void:
 	if body != null and body.is_in_group("player"):
-		raccogli()
+		_raccolto_da(body)
 
 
 func _su_area(area: Node) -> void:
 	# La Hurtbox del giocatore e' figlia del nodo player.
 	var p: Node = area.get_parent() if area != null else null
 	if p != null and p.is_in_group("player"):
-		raccogli()
+		_raccolto_da(p)
+
+
+## US-8B80: chi raccoglie da fermo si piega a prendere la cosa (camminandoci sopra il gesto non si vede: scivolerebbe).
+func _raccolto_da(chi: Node) -> void:
+	if raccogli() and chi.has_method("gesto") and (chi as CharacterBody2D).velocity.length() < 5.0:
+		chi.call("gesto", "pickup")
 
 
 ## Raccoglie la Caratteristica: la mette nel magazzino e si distrugge. Pubblica
