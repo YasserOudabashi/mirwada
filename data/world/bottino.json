@@ -1,7 +1,20 @@
 {
   "schema_version": 1,
-  "_comment": "US-8B22: tabelle di bottino. Un forziere ha una tabella: aprendolo si fanno da tiri[0] a tiri[1] estrazioni; ogni estrazione sceglie una voce in proporzione al suo peso e ne da' da quantita[0] a quantita[1] (le voci uguali si sommano). Il forziere si apre una volta sola (WorldState, nel salvataggio) e il bottino va nello zaino. I forzieri stanno nei dati dei luoghi: 'forzieri' [{id, x, y, tabella}] negli interni; quelli del sottosuolo del mondo qui sotto in 'forzieri_mondo' [{id, vicino, tabella}], vicino = un ingresso o un boss del sottosuolo (assets/world/mondo.json): il gioco lo posa nel primo vicolo cieco raggiungibile a piedi da li' (US-8B22b). Validator: item_id esistenti, pesi e quantita' positivi, tabelle usate esistenti, id dei forzieri unici.",
+  "_comment": "US-8B22: tabelle di bottino. Un forziere ha una tabella: aprendolo si fanno da tiri[0] a tiri[1] estrazioni; ogni estrazione sceglie una voce in proporzione al suo peso e ne da' da quantita[0] a quantita[1] (le voci uguali si sommano). Il forziere si apre una volta sola (WorldState, nel salvataggio) e il bottino va nello zaino. I forzieri stanno nei dati dei luoghi: 'forzieri' [{id, x, y, tabella}] negli interni; quelli del sottosuolo del mondo qui sotto in 'forzieri_mondo' [{id, vicino, tabella}], vicino = un ingresso o un boss del sottosuolo (assets/world/mondo.json): il gioco lo posa nel primo vicolo cieco raggiungibile a piedi da li' (US-8B22b). Un interno con 'oggetti_casuali': '<tabella>' (le casette, US-8B22c) ha a terra gli oggetti tirati da quella tabella, sempre gli stessi per la stessa casa (seme = id dell'interno); uno preso non ricompare (WorldState, nel salvataggio). Validator: item_id esistenti, pesi e quantita' positivi, tabelle usate esistenti, id dei forzieri unici.",
   "tabelle": {
+    "casa": {
+      "tiri": [1, 2],
+      "voci": [
+        {"item_id": "moneta_comune", "peso": 6, "quantita": [2, 8]},
+        {"item_id": "erba_lunare", "peso": 3, "quantita": [1, 2]},
+        {"item_id": "fiore_di_camomilla_selvatica", "peso": 3, "quantita": [1, 2]},
+        {"item_id": "filo_di_lana_rossa", "peso": 3, "quantita": [1, 1]},
+        {"item_id": "cera_di_veglia", "peso": 3, "quantita": [1, 1]},
+        {"item_id": "miele_selvatico", "peso": 2, "quantita": [1, 1]},
+        {"item_id": "gesso_consacrato", "peso": 2, "quantita": [1, 1]},
+        {"item_id": "pozione_cura_minore", "peso": 2, "quantita": [1, 1]}
+      ]
+    },
     "grotta": {
       "tiri": [2, 3],
       "voci": [

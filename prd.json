@@ -575,8 +575,8 @@
       ],
       "priority": 33,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-27: bottino.json tabella casa (monete, erbe, filo, cera, miele, gesso, pozione; 1-2 estrazioni); 'oggetti_casuali': 'casa' nella casa di Lena e nelle tre capanne dell'avamposto senza bottega (deposito, focolare, vedetta): non nelle botteghe, che vendono. interior_scene._crea_oggetti_casuali: seme = hash dell'id dell'interno, celle '.' libere (non arredi, forzieri, NPC, oggetti fissi) lontane dalla soglia, ordinate prima della scelta; chiave <interno>#<n>, tree_exiting di un oggetto raccolto -> WorldState.prendi (lista 'presi' nel salvataggio). Validator: la tabella esiste. 2 test. arte/revisione/oggetti_casuali.png. Aperto: gli oggetti fissi dei layout e degli interni ricompaiono ancora a ogni caricamento (comportamento di prima)."
     }
   ]
 }

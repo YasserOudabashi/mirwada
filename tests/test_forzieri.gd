@@ -125,3 +125,58 @@ func test_i_forzieri_del_sottosuolo() -> void:
 	m.call("cambia_livello", "sottosuolo")
 	assert_true(forzieri.all(func(f): return (f as CanvasItem).visible), "sotto terra si vedono")
 	m.free()
+
+
+# --- US-8B22c: oggetti a caso nelle casette -----------------------------------------
+
+func _casa(iid: String) -> TileMapLayer:
+	var c: TileMapLayer = InteriorScene.instantiate()
+	c.set("interno_id", iid)
+	_root().add_child(c)
+	return c
+
+
+func _casuali(casa: Node) -> Array:
+	return casa.get_children().filter(func(n): return str(n.name).begins_with("Casuale_"))
+
+
+func _firma(casa: Node) -> Array:
+	return _casuali(casa).map(func(n): return [n.get("char_id"), n.get("quantita"), n.global_position])
+
+
+func test_le_casette_hanno_oggetti_a_caso_sempre_gli_stessi() -> void:
+	var a := _casa("mirwada_casa_di_lena")
+	var prima: Array = _firma(a)
+	assert_gt(prima.size(), 0, "qualcosa a terra")
+	var tab: Dictionary = _root().get_node("GameData").call("get_tabella_bottino", "casa")
+	var ammessi: Array = (tab["voci"] as Array).map(func(v): return v["item_id"])
+	var sp: Array = (_root().get_node("GameData").call("get_interno", "mirwada_casa_di_lena") as Dictionary)["spawn"]
+	for n in _casuali(a):
+		var c: Vector2i = a.local_to_map(a.to_local(n.global_position))
+		assert_eq(a.get_cell_atlas_coords(c), Vector2i(0, 0), "sul pavimento libero (%s)" % c)
+		assert_true(maxi(absi(c.x - int(sp[0])), absi(c.y - int(sp[1]))) > 1, "non sulla soglia")
+		assert_true(str(n.get("char_id")) in ammessi, "%s dalla tabella della casa" % n.get("char_id"))
+	a.free()
+	var b := _casa("mirwada_casa_di_lena")
+	assert_eq(_firma(b), prima, "rientrando: gli stessi oggetti negli stessi posti")
+	b.free()
+
+
+func test_un_oggetto_a_caso_preso_non_ricompare() -> void:
+	var ws: Node = _root().get_node("WorldState")
+	var inv: Node = _root().get_node("Inventory")
+	var a := _casa("valle_avamposto_focolare")
+	var tutti: int = _casuali(a).size()
+	var primo: Node = _casuali(a)[0]
+	var id: String = str(primo.get("char_id"))
+	var q: int = int(primo.get("quantita"))
+	assert_true(bool(primo.call("raccogli")), "si raccoglie")
+	a.free()
+	assert_true(bool(ws.call("preso", "valle_avamposto_focolare#0")), "il mondo sa che e' stato preso")
+	assert_true("valle_avamposto_focolare#0" in (ws.call("per_salvataggio") as Dictionary)["presi"], "nel salvataggio")
+	var b := _casa("valle_avamposto_focolare")
+	assert_eq(_casuali(b).size(), tutti - 1, "non ricompare, gli altri si'")
+	assert_true(b.get_node_or_null("Casuale_0") == null, "proprio quello")
+	b.free()
+	inv.call("rimuovi", id, q)
+	(ws.get("_presi") as Array).erase("valle_avamposto_focolare#0")

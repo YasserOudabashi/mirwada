@@ -24,6 +24,8 @@ var _scoperte: Array = []   # id di regione, stringhe
 var _gate_aperti: Array = []  # id di gate, stringhe
 ## US-8B22: i forzieri gia' aperti (id dei dati): si aprono una volta sola.
 var _forzieri_aperti: Array = []
+## US-8B22c: gli oggetti messi una volta sola (quelli a caso nelle case) gia' presi: non ricompaiono.
+var _presi: Array = []
 ## Il location_tag della zona in cui si trova il giocatore ("" fuori da una
 ## zona nominata). TRANSITORIO: e' posizione, non stato del mondo, non va nel
 ## save. Lo aggiorna region_scene entrando/uscendo dalle Area2D delle zone;
@@ -60,6 +62,7 @@ func pulisci() -> void:
 	_scoperte.clear()
 	_gate_aperti.clear()
 	_forzieri_aperti.clear()
+	_presi.clear()
 	_zona_tag = ""
 	_densita_override = -1.0
 
@@ -168,6 +171,15 @@ func apri_forziere(id: String) -> void:
 		_forzieri_aperti.append(id)
 
 
+func preso(id: String) -> bool:
+	return id in _presi
+
+
+func prendi(id: String) -> void:
+	if not id.is_empty() and id not in _presi:
+		_presi.append(id)
+
+
 # --- Salvataggio ---------------------------------------------------------
 
 func per_salvataggio() -> Dictionary:
@@ -177,6 +189,7 @@ func per_salvataggio() -> Dictionary:
 		"scoperte": _scoperte.duplicate(),
 		"gate_aperti": _gate_aperti.duplicate(),
 		"forzieri_aperti": _forzieri_aperti.duplicate(),
+		"presi": _presi.duplicate(),
 	}
 
 
@@ -192,6 +205,7 @@ func da_salvataggio(raw: Variant) -> void:
 	_scoperte = _solo_stringhe(d.get("scoperte"))
 	_gate_aperti = _solo_stringhe(d.get("gate_aperti"))
 	_forzieri_aperti = _solo_stringhe(d.get("forzieri_aperti"))
+	_presi = _solo_stringhe(d.get("presi"))
 	if not _regione.is_empty() and _regione not in _scoperte:
 		_scoperte.append(_regione)
 

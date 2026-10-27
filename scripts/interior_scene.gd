@@ -59,6 +59,7 @@ func _ready() -> void:
 	_crea_nemici(layout)
 	_crea_oggetti(layout)
 	_crea_npc(layout)
+	_crea_oggetti_casuali(layout)
 	_crea_ospiti(layout)
 
 
@@ -130,6 +131,44 @@ func _crea_forzieri(layout: Dictionary) -> void:
 		var f: Area2D = preload("res://scripts/forziere.gd").new()
 		f.call("setup", str(spec.get("id", "")), str(spec.get("tabella", "")), map_to_local(c))
 		add_child(f)
+
+
+## US-8B22c: gli oggetti a caso di una casetta (layout "oggetti_casuali" = una tabella di data/world/bottino.json),
+## sempre gli stessi e negli stessi posti per la stessa casa (seme = id dell'interno), sul pavimento libero e mai
+## sulla soglia. Uno preso non ricompare (WorldState.prendi, nel salvataggio).
+func _crea_oggetti_casuali(layout: Dictionary) -> void:
+	var gd: Node = get_node_or_null("/root/GameData")
+	var ws: Node = get_node_or_null("/root/WorldState")
+	var tab: String = str(layout.get("oggetti_casuali", ""))
+	if tab.is_empty() or gd == null:
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(interno_id)
+	var bottino: Array = preload("res://scripts/forziere.gd").tira(gd.call("get_tabella_bottino", tab), rng)
+	var sp: Vector2i = _cella_spawn(layout)
+	var prese: Dictionary = {}
+	for k in ["npcs", "oggetti", "nemici"]:
+		for e in layout.get(k, []):
+			prese[Vector2i(int(e.get("x", 0)), int(e.get("y", 0)))] = true
+	var libere: Array = get_used_cells().filter(func(c: Vector2i) -> bool:
+		return get_cell_atlas_coords(c).x == _COLONNA_PER_CARATTERE["."] and not prese.has(c) \
+				and maxi(absi(c.x - sp.x), absi(c.y - sp.y)) > 1)
+	libere.sort()                                  # ordine stabile: get_used_cells non lo promette
+	for i in bottino.size():
+		if libere.is_empty():
+			return
+		var c: Vector2i = libere.pop_at(rng.randi_range(0, libere.size() - 1))
+		var chiave: String = "%s#%d" % [interno_id, i]
+		if ws != null and bool(ws.call("preso", chiave)):
+			continue
+		var pickup := preload("res://scripts/item_pickup.gd").new()
+		pickup.name = "Casuale_%d" % i
+		add_child(pickup)
+		pickup.call("setup", str(bottino[i]["item_id"]), to_global(map_to_local(c)))
+		pickup.set("quantita", int(bottino[i]["quantita"]))
+		pickup.tree_exiting.connect(func() -> void:
+			if bool(pickup.get("_raccolta")) and ws != null:
+				ws.call("prendi", chiave))
 
 
 ## Nemici e oggetti della zona dietro il varco alla stessa posizione relativa nella stanza,

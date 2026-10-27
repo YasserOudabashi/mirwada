@@ -231,7 +231,7 @@ Story di codice: spiegarla prima. *Domande (M).*
 *Fatta la US-8B22a (2026-10-27):* `data/world/bottino.json` (tabelle), `scripts/forziere.gd`, si apre una volta sola e
 il bottino va nello zaino; forzieri nella grotta di marea, nel sotterraneo di Mirwada e nella cripta. Fatta la
 **8B22b**: 9 forzieri nel sottosuolo del mondo (fogne, catacombe, grotte, miniere) in vicoli ciechi vicino ai punti dei
-dati. Resta la **8B22c**: oggetti casuali nelle casette.
+dati. Fatta la **8B22c**: oggetti a caso nelle casette (tabella "casa"), uno preso non ricompare.
 
 **US-8B23 [C+A] Fauna d'atmosfera.** Richiesta per la Valle (vale poi per tutto
 il mondo): uccelli e farfalle che volano via quando passi, cervi e animali

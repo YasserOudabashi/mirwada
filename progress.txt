@@ -14764,3 +14764,15 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   avvisi del mondo. arte/revisione/forzieri_sottosuolo.png (fogne_6 prima e dopo).
 - Test test_forzieri.test_i_forzieri_del_sottosuolo. 1048 test, validate 0.
 - US-8B22c: oggetti casuali nelle casette.
+
+## US-8B22c — Oggetti casuali nelle case, 2026-10-27
+- bottino.json tabella "casa" (1-2 estrazioni: monete, erba lunare, camomilla, filo rosso, cera, miele, gesso, pozione).
+  Interni con 'oggetti_casuali': 'casa': mirwada_casa_di_lena e le capanne deposito, focolare, vedetta (non le
+  botteghe: chi vende non lascia la merce per terra).
+- interior_scene._crea_oggetti_casuali: seme = hash(interno_id), quindi stessa casa = stessi oggetti negli stessi
+  posti; celle di pavimento '.' libere (arredi e forzieri sono gia' muro), mai a una casella dalla soglia. Ogni
+  oggetto ha la chiave <interno>#<n>: quando esce dall'albero gia' raccolto, WorldState.prendi(chiave) ("presi" nel
+  salvataggio) e non ricompare.
+- 1050 test, validate 0. A schermo: arte/revisione/oggetti_casuali.png (candela sul tappeto da Lena, due oggetti
+  nella vedetta).
+- Aperto (di prima, non toccato): gli oggetti fissi di layout e interni ricompaiono a ogni caricamento.

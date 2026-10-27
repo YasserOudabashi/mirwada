@@ -1855,7 +1855,11 @@ def main():
     for fn in sorted(os.listdir(interni_dir)) if os.path.isdir(interni_dir) else []:
         if not fn.endswith(".json"):
             continue
-        for _i, _f in enumerate((load_json(os.path.join(interni_dir, fn)) or {}).get("forzieri", [])):
+        _doc_int = load_json(os.path.join(interni_dir, fn)) or {}
+        if "oggetti_casuali" in _doc_int and _doc_int["oggetti_casuali"] not in tabelle_bottino:
+            err(f"data/world/interni/{fn}: oggetti_casuali '{_doc_int['oggetti_casuali']}' non e' una tabella di "
+                f"{_bott_rel}")
+        for _i, _f in enumerate(_doc_int.get("forzieri", [])):
             _ctx = f"data/world/interni/{fn}: forzieri[{_i}]"
             _fid = _f.get("id")
             if not isinstance(_fid, str) or not _fid:
