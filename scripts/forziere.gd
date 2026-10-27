@@ -17,6 +17,7 @@ var tabella: String = ""
 var rng := RandomNumberGenerator.new()
 
 var _vicino := false
+var _chi: Node2D = null                          # chi sta accanto (il giocatore): la scritta va sotto di lui
 var _sprite: Sprite2D
 var _prompt: Label
 var _scritta: Label
@@ -54,9 +55,8 @@ func _ready() -> void:
 	_prompt = _etichetta(Vector2(-TILE * 1.5, -TILE * 1.45))   # sopra: sotto c'e' chi lo apre, col suo nome
 	_prompt.text = tr("HUD_PROMPT_APRI").format({"tasto": _tasto_interagisci()})
 	_prompt.hide()
-	_scritta = _etichetta(Vector2(-TILE * 3, -TILE * 1.45))
+	_scritta = _etichetta(Vector2(-TILE * 3, TILE * 0.5))
 	_scritta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_scritta.grow_vertical = Control.GROW_DIRECTION_BEGIN   # piu' righe salgono, non coprono il forziere
 	_scritta.hide()
 	_disegna()
 	body_entered.connect(_su_corpo.bind(true))
@@ -88,6 +88,9 @@ func apri() -> Array:
 	_disegna()
 	_prompt.hide()
 	_scritta.text = tr("HUD_FORZIERE_TROVATO").format({"oggetti": ", ".join(nomi)})
+	# sotto chi lo apre, come gli avvisi del mondo (mondo._mostra_avviso): sopra c'e' la barra dell'HUD
+	var piedi: Vector2 = (_chi.global_position - global_position) if is_instance_valid(_chi) else Vector2.ZERO
+	_scritta.position = piedi + Vector2(-TILE * 3, TILE * 0.5)
 	_scritta.show()
 	get_tree().create_timer(DURATA_SCRITTA).timeout.connect(func() -> void:
 		if is_instance_valid(_scritta):
@@ -142,6 +145,7 @@ func _su_corpo(body: Node, dentro: bool) -> void:
 	if not body.is_in_group("player"):
 		return
 	_vicino = dentro
+	_chi = body as Node2D if dentro else null
 	_prompt.visible = dentro and not e_aperto()
 
 

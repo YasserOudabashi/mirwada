@@ -552,14 +552,28 @@
     },
     {
       "id": "US-8B22b",
-      "title": "Forzieri nelle caverne e oggetti casuali nelle case",
-      "description": "Forzieri nel sottosuolo del mondo (grotte, miniere, fogne, catacombe) vicino ai luoghi dei dati; oggetti casuali una volta sola nelle casette.",
+      "title": "Forzieri nel sottosuolo del mondo",
+      "description": "Forzieri nel sottosuolo del mondo (fogne, catacombe, grotte, miniere) vicino ai punti dei dati.",
       "acceptanceCriteria": [
         "forzieri del sottosuolo posati dai dati vicino a un punto del mondo (ingresso o boss)",
-        "nelle case qualche oggetto tirato da una tabella, che non ricompare una volta preso",
+        "non chiudono i passaggi (vicolo cieco o spiazzo) e si vedono solo sotto terra",
         "verifica a schermo"
       ],
       "priority": 32,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: data/world/bottino.json forzieri_mondo [{id, vicino, tabella}] (9: fogne x3, catacombe x2, grotte x2, miniere x2) e tabella miniera. mondo.crea_forzieri / posto_del_forziere: dal punto (boss o ingresso di mondo.json sottosuolo) si cammina fino a 16 passi e si prende il primo vicolo cieco ad almeno 3 passi (un forziere pieno in un corridoio chiuderebbe il passaggio), altrimenti il primo spiazzo. Meta livello sottosuolo: _mostra lo spegne in superficie (niente corpo che blocca). La scritta del bottino ora va sotto chi apre (copriva la barra dell'HUD). Validator: vicino nel sottosuolo, id unici con quelli degli interni. Test test_forzieri.test_i_forzieri_del_sottosuolo. arte/revisione/forzieri_sottosuolo.png."
+    },
+    {
+      "id": "US-8B22c",
+      "title": "Oggetti casuali nelle case",
+      "description": "Nelle casette qualche oggetto tirato da una tabella di bottino, sempre lo stesso per la stessa casa, che una volta preso non ricompare.",
+      "acceptanceCriteria": [
+        "tabella casa nei dati, interni che la usano nei dati",
+        "gli oggetti presi restano presi nel salvataggio",
+        "verifica a schermo"
+      ],
+      "priority": 33,
       "fase": "8b",
       "passes": false,
       "notes": ""

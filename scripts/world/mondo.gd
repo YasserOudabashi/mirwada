@@ -85,6 +85,7 @@ func _ready() -> void:
 	crea_porte()
 	crea_varchi()
 	crea_barca()
+	crea_forzieri()
 	var t := Timer.new()
 	t.wait_time = INTERVALLO_ATTIVITA
 	t.autostart = true
@@ -1117,6 +1118,68 @@ func _mostra_avviso(p: Node2D, testo: String) -> void:
 	_avviso.position = p.position + Vector2(-tile * 3, tile * 0.5)
 	_avviso.show()
 	get_tree().create_timer(1.5).timeout.connect(func() -> void: if is_instance_valid(_avviso): _avviso.hide())
+
+
+# --- Forzieri del sottosuolo (US-8B22b) --------------------------------------------
+
+## I forzieri di data/world/bottino.json "forzieri_mondo", vicino a un punto del sottosuolo (un ingresso o un boss).
+func crea_forzieri() -> void:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	if gd == null or not _prepara_sottosuolo():
+		return
+	var s: Dictionary = dati.get("sottosuolo", {})
+	var b: PackedByteArray = _livelli["sottosuolo"]["blocchi"]
+	var presi: Dictionary = {}
+	for spec in gd.call("get_forzieri_mondo"):
+		var vicino: String = str((spec as Dictionary).get("vicino", ""))
+		var p: Variant = (s.get("boss", {}) as Dictionary).get(vicino, (s.get("ingressi", {}) as Dictionary).get(vicino))
+		if not p is Array:
+			continue
+		var c: Vector2i = posto_del_forziere(Vector2i(int(p[0]), int(p[1])), b, presi)
+		presi[c] = true
+		var f: Area2D = preload("res://scripts/forziere.gd").new()
+		f.call("setup", str(spec.get("id", "")), str(spec.get("tabella", "")), Vector2((c.x + 0.5) * tile, (c.y + 0.5) * tile))
+		f.set_meta("livello", "sottosuolo")
+		add_child(f)
+		_mostra(f, livello == "sottosuolo")
+
+
+## Il forziere e' pieno: in un corridoio chiuderebbe il passaggio. Dal punto c si cammina (caselle libere di b, al piu'
+## 16 passi) e si prende il primo vicolo cieco ad almeno 3 passi; se non c'e', il primo spiazzo (8 vicine libere).
+func posto_del_forziere(c: Vector2i, b: PackedByteArray, presi: Dictionary = {}) -> Vector2i:
+	var passi: Dictionary = {c: 0}
+	var coda: Array = [c]
+	var spiazzo := Vector2i(-1, -1)
+	var lati: Array = [Vector2i.RIGHT, Vector2i.LEFT, Vector2i.DOWN, Vector2i.UP]
+	while not coda.is_empty():
+		var q: Vector2i = coda.pop_front()
+		var n: int = passi[q]
+		if n >= 3 and not presi.has(q):
+			var liberi: int = lati.filter(func(d): return _libera_in(q + d, b)).size()
+			if liberi == 1:
+				return q
+			if spiazzo.x < 0 and _spiazzo_in(q, b):
+				spiazzo = q
+		if n >= 16:
+			continue
+		for d in lati:
+			var v: Vector2i = q + d
+			if _libera_in(v, b) and not passi.has(v):
+				passi[v] = n + 1
+				coda.append(v)
+	return spiazzo if spiazzo.x >= 0 else c
+
+
+func _libera_in(q: Vector2i, b: PackedByteArray) -> bool:
+	return _dentro(q.x, q.y) and b[q.y * larghezza + q.x] == 0
+
+
+func _spiazzo_in(q: Vector2i, b: PackedByteArray) -> bool:
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			if not _libera_in(q + Vector2i(dx, dy), b):
+				return false
+	return true
 
 
 # --- Sottosuolo: ingressi e cambio di livello (2026-10-25) ------------------------

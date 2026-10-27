@@ -1866,6 +1866,22 @@ def main():
                 _id_forzieri[_fid] = fn
             if _f.get("tabella") not in tabelle_bottino:
                 err(f"{_ctx}: tabella '{_f.get('tabella')}' non esiste in {_bott_rel}")
+    # US-8B22b: i forzieri del sottosuolo del mondo, vicino a un ingresso o a un boss di assets/world/mondo.json
+    _sotto = ((load_json(_mondo) or {}).get("sottosuolo", {}) if os.path.isfile(_mondo) else {})
+    _punti_sotto = set(_sotto.get("boss", {})) | set(_sotto.get("ingressi", {}))
+    for _i, _f in enumerate(_bott.get("forzieri_mondo", [])):
+        _ctx = f"{_bott_rel}: forzieri_mondo[{_i}]"
+        _fid = _f.get("id")
+        if not isinstance(_fid, str) or not _fid:
+            err(f"{_ctx}: manca l'id")
+        elif _fid in _id_forzieri:
+            err(f"{_ctx}: id '{_fid}' gia' usato in {_id_forzieri[_fid]}")
+        else:
+            _id_forzieri[_fid] = _bott_rel
+        if _f.get("tabella") not in tabelle_bottino:
+            err(f"{_ctx}: tabella '{_f.get('tabella')}' non esiste")
+        if _sotto and _f.get("vicino") not in _punti_sotto:
+            err(f"{_ctx}: vicino '{_f.get('vicino')}' non e' un ingresso ne' un boss del sottosuolo (mondo.json)")
     for _a in ("forziere", "forziere_aperto"):
         if _a not in vocab_arredi:
             err(f"data/world/arredi.json: manca '{_a}', il disegno dei forzieri (US-8B22)")

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "_comment": "US-8B22: tabelle di bottino. Un forziere ha una tabella: aprendolo si fanno da tiri[0] a tiri[1] estrazioni; ogni estrazione sceglie una voce in proporzione al suo peso e ne da' da quantita[0] a quantita[1] (le voci uguali si sommano). Il forziere si apre una volta sola (WorldState, nel salvataggio) e il bottino va nello zaino. I forzieri stanno nei dati dei luoghi: 'forzieri' [{id, x, y, tabella}] negli interni. Validator: item_id esistenti, pesi e quantita' positivi, tabelle usate esistenti, id dei forzieri unici.",
+  "_comment": "US-8B22: tabelle di bottino. Un forziere ha una tabella: aprendolo si fanno da tiri[0] a tiri[1] estrazioni; ogni estrazione sceglie una voce in proporzione al suo peso e ne da' da quantita[0] a quantita[1] (le voci uguali si sommano). Il forziere si apre una volta sola (WorldState, nel salvataggio) e il bottino va nello zaino. I forzieri stanno nei dati dei luoghi: 'forzieri' [{id, x, y, tabella}] negli interni; quelli del sottosuolo del mondo qui sotto in 'forzieri_mondo' [{id, vicino, tabella}], vicino = un ingresso o un boss del sottosuolo (assets/world/mondo.json): il gioco lo posa nel primo vicolo cieco raggiungibile a piedi da li' (US-8B22b). Validator: item_id esistenti, pesi e quantita' positivi, tabelle usate esistenti, id dei forzieri unici.",
   "tabelle": {
     "grotta": {
       "tiri": [2, 3],
@@ -29,6 +29,18 @@
         {"item_id": "sigillo_reale", "peso": 1, "quantita": [1, 1]}
       ]
     },
+    "miniera": {
+      "tiri": [2, 3],
+      "voci": [
+        {"item_id": "lingotto_ferro", "peso": 5, "quantita": [1, 2]},
+        {"item_id": "sale_di_roccia", "peso": 4, "quantita": [1, 3]},
+        {"item_id": "cristallo_grezzo", "peso": 4, "quantita": [1, 2]},
+        {"item_id": "ferro_temperato", "peso": 3, "quantita": [1, 2]},
+        {"item_id": "moneta_comune", "peso": 4, "quantita": [5, 12]},
+        {"item_id": "cuore_di_montagna", "peso": 1, "quantita": [1, 1]},
+        {"item_id": "elisir_del_vigore", "peso": 1, "quantita": [1, 1]}
+      ]
+    },
     "cripta": {
       "tiri": [2, 4],
       "voci": [
@@ -42,5 +54,16 @@
         {"item_id": "pozione_cura_maggiore", "peso": 1, "quantita": [1, 1]}
       ]
     }
-  }
+  },
+  "forzieri_mondo": [
+    {"id": "sotto_fogne_boss", "vicino": "boss_fogne", "tabella": "fogne"},
+    {"id": "sotto_fogne_6", "vicino": "fogne_6", "tabella": "fogne"},
+    {"id": "sotto_fogne_11", "vicino": "fogne_11", "tabella": "fogne"},
+    {"id": "sotto_catacombe_boss", "vicino": "boss_catacombe", "tabella": "cripta"},
+    {"id": "sotto_catacombe_7", "vicino": "catacombe_7", "tabella": "cripta"},
+    {"id": "sotto_grotte_boss", "vicino": "boss_grotte", "tabella": "grotta"},
+    {"id": "sotto_grotte_2", "vicino": "grotte_2", "tabella": "grotta"},
+    {"id": "sotto_miniere_boss", "vicino": "boss_miniere", "tabella": "miniera"},
+    {"id": "sotto_miniere_3", "vicino": "miniere_3", "tabella": "miniera"}
+  ]
 }

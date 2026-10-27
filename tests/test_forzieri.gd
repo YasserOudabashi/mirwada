@@ -93,3 +93,35 @@ func test_gli_interni_mettono_i_forzieri_dei_dati() -> void:
 	var spr: Sprite2D = f.get("_sprite")
 	assert_true(spr.texture != null, "si vede il disegno del forziere")
 	cripta.free()
+
+
+## US-8B22b: i forzieri del sottosuolo (bottino.json forzieri_mondo) vicino ai loro punti, in un vicolo cieco o in uno
+## spiazzo (il forziere e' pieno: in un corridoio chiuderebbe il passaggio), visibili solo sotto terra.
+func test_i_forzieri_del_sottosuolo() -> void:
+	var m: Node2D = preload("res://scripts/world/mondo.gd").new()
+	m.set("tema", "luminoso")
+	assert_true(m.call("carica"), "mondo caricato")
+	m.call("crea_forzieri")
+	var attesi: Array = _root().get_node("GameData").call("get_forzieri_mondo")
+	var forzieri: Array = m.get_children().filter(func(c): return c.get_script() == Forziere)
+	assert_eq(forzieri.size(), attesi.size(), "uno per voce dei dati")
+	assert_gt(forzieri.size(), 5, "nelle fogne, nelle catacombe, nelle grotte e nelle miniere")
+	var b: PackedByteArray = (m.get("_livelli") as Dictionary)["sottosuolo"]["blocchi"]
+	var w: int = m.larghezza
+	var libera := func(q: Vector2i) -> bool: return b[q.y * w + q.x] == 0
+	for f in forzieri:
+		var c := Vector2i(int(f.position.x / m.tile), int(f.position.y / m.tile))
+		assert_true(libera.call(c), "%s su una casella libera del sottosuolo" % f.get("forziere_id"))
+		var lati: int = [Vector2i.RIGHT, Vector2i.LEFT, Vector2i.DOWN, Vector2i.UP].filter(
+				func(d): return libera.call(c + d)).size()
+		var otto := 0
+		for dy in range(-1, 2):
+			for dx in range(-1, 2):
+				otto += 1 if libera.call(c + Vector2i(dx, dy)) else 0
+		assert_true(lati == 1 or otto == 9, "%s in un vicolo cieco o in uno spiazzo: non chiude passaggi" % f.get("forziere_id"))
+		assert_eq(str(f.get_meta("livello")), "sottosuolo", "sta sotto terra")
+		assert_false((f as CanvasItem).visible, "in superficie non si vede")
+		assert_eq(f.process_mode, Node.PROCESS_MODE_DISABLED, "ne' blocca il passo")
+	m.call("cambia_livello", "sottosuolo")
+	assert_true(forzieri.all(func(f): return (f as CanvasItem).visible), "sotto terra si vedono")
+	m.free()

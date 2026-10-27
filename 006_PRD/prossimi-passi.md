@@ -64,8 +64,9 @@ le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti 
    E **US-8B80a/b i gesti di Enel**: interagire, raccogliere (da fermo), bere, rituale, nei dati e nel gioco.
    E **US-8B81a/b Enel in volo e in barca**: sospeso con le gambe che pendono, in ginocchio dentro lo scafo a remare.
    E **US-8B22a forzieri**: tabelle di bottino in `data/world/bottino.json`, `scripts/forziere.gd` (si apre una volta
-   sola, il bottino nello zaino), forzieri nella grotta di marea, nel sotterraneo di Mirwada e nella cripta.
-4. **Prossime**: US-8B22b (forzieri nel sottosuolo, oggetti casuali nelle case), US-8B23 fauna, US-8B24 cannocchiale;
+   sola, il bottino nello zaino), forzieri nella grotta di marea, nel sotterraneo di Mirwada e nella cripta; e
+   **US-8B22b**: 9 forzieri nel sottosuolo del mondo (`bottino.json forzieri_mondo`, in un vicolo cieco vicino al punto).
+4. **Prossime**: US-8B22c (oggetti casuali nelle case), US-8B23 fauna, US-8B24 cannocchiale;
    nuoto e arrampicata col loro gameplay (US-8B90, US-8B92, blocco H, con le animazioni). Evocazioni e
    antagonisti aspettano di avere una figura nel mondo.
    Evocazioni e antagonisti (blocco E) aspettano di avere una figura nel mondo (oggi summon scrive solo nel registro).

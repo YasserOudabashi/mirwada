@@ -700,6 +700,12 @@ func get_tabella_bottino(id: String) -> Dictionary:
 	return t if typeof(t) == TYPE_DICTIONARY else {}
 
 
+## US-8B22b: i forzieri del sottosuolo del mondo [{id, vicino, tabella}] (data/world/bottino.json).
+func get_forzieri_mondo() -> Array:
+	var f: Variant = _bottino.get("forzieri_mondo", [])
+	return f if typeof(f) == TYPE_ARRAY else []
+
+
 ## US-8B91: un mezzo per muoversi nel mondo (data/world/mezzi.json, es. "barca"); {} se non c'e'.
 func get_mezzo(id: String) -> Dictionary:
 	return _mezzi.get(id, {}) if typeof(_mezzi.get(id)) == TYPE_DICTIONARY else {}

@@ -14751,3 +14751,16 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - tests/test_forzieri.gd (4). 1047 test, validate 0. arte/revisione/forzieri.png (chiaro e scuro, due modalita'),
   forzieri_in_gioco.png (cripta prima/dopo, grotta con la cassa nuova accanto al forziere).
 - US-8B22b: forzieri nel sottosuolo del mondo e oggetti casuali nelle casette.
+
+## US-8B22b — Forzieri nel sottosuolo del mondo, 2026-10-27
+- data/world/bottino.json forzieri_mondo: 9 forzieri vicino a un boss o a un ingresso del sottosuolo (mondo.json),
+  tabella nuova "miniera". mondo.crea_forzieri() dopo crea_barca; posto_del_forziere: dal punto si cammina sulle
+  caselle libere del sottosuolo (al piu' 16 passi) e si prende il primo vicolo cieco ad almeno 3 passi; se non c'e',
+  il primo spiazzo (8 vicine libere). Un forziere pieno in un corridoio largo 1 chiuderebbe il passaggio: i punti dei
+  boss stanno proprio in corridoi. Provato prima in Python: 6 vicoli, 3 spiazzi.
+- Il forziere ha meta livello "sottosuolo": _mostra lo nasconde e lo spegne in superficie (il corpo non blocca).
+- A schermo: nelle fogne il forziere vicino al boss ha il boss accanto (ci ho messo Enel apposta: e' il premio dopo
+  il boss); la scritta "Trovato" sopra il forziere copriva la barra dell'HUD in alto: ora va sotto chi apre, come gli
+  avvisi del mondo. arte/revisione/forzieri_sottosuolo.png (fogne_6 prima e dopo).
+- Test test_forzieri.test_i_forzieri_del_sottosuolo. 1048 test, validate 0.
+- US-8B22c: oggetti casuali nelle casette.
