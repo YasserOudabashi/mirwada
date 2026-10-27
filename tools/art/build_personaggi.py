@@ -34,12 +34,15 @@ OUT = os.path.join(ROOT, "arte", "sprite")
 
 
 # --- Enel -------------------------------------------------------------------------------------------------------
-def enel():
+def enel(**volto):
     """Cappotto lungo quasi nero aperto davanti (si vedono le gambe), coppola, occhi freddi che brillano, crepa
-    luminosa sul viso, sciarpa rossa che dietro pende sulla schiena, bende sugli avambracci, spadone."""
-    r = humanoid(skin="skin_enel", hair="hair_black", hair_style="short", outfit="tunic", top="coat_enel",
-                 bottom="trou_enel", boots="leather_dark", belt="leather_dark", hat="cap", weapon=None,
-                 eyes="eye_cyan", scarf="cloth_red", head=0.86, detail=2, name="enel")
+    luminosa sul viso, sciarpa rossa che dietro pende sulla schiena, bende sugli avambracci, spadone.
+    `volto`: il dettaglio dei ritratti (build_ritratti.py), ad esempio detail=3 e l'espressione."""
+    kw = dict(skin="skin_enel", hair="hair_black", hair_style="short", outfit="tunic", top="coat_enel",
+              bottom="trou_enel", boots="leather_dark", belt="leather_dark", hat="cap", weapon=None,
+              eyes="eye_cyan", scarf="cloth_red", head=0.86, detail=2, name="enel")
+    kw.update(volto)
+    r = humanoid(**kw)
     # spadone con la lama un po' piu' corta del "greatsword" del costruttore (16 -> 13 unita'): col braccio teso
     # il colpo resta nella cella (revisione 1.4: il fendente grande lo fanno i VFX)
     r.group("weapon", [P("cylinder", (0.85, 0.85, 2.2), (0, 0, 1.0), "leather"),

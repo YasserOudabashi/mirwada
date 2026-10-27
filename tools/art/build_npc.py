@@ -28,30 +28,33 @@ CLIP = {k: BP.vivi(A.CLIPS[k]) for k in ANIMAZIONI}
 
 
 def _npc(name, scale=1.0, **kw):
+    """Il rig di un aspetto; `volto` aggiunge il dettaglio dei ritratti (build_ritratti.py: detail=3). La barba sta
+    anche sullo sprite; occhiali, sopracciglia (brows) e bocca (mouth) si vedono solo con detail 3."""
     base = dict(weapon=None, boots="leather_dark", belt="leather", head=0.95, detail=2, name=name, scale=scale)
     base.update(kw)
-    return lambda: humanoid(**base)
+    return lambda **volto: humanoid(**dict(base, **volto))
 
 
 ASPETTI = {
     # aspetto: rig. Colori diversi da Enel (cappotto quasi nero, sciarpa rossa) cosi' nessuno sembra il giocatore.
     "amico": _npc("amico", skin="skin_light", hair="hair_brown", hair_style="short", outfit="tunic",
-                  top="cloth_green", bottom="cloth_grey"),
+                  top="cloth_green", bottom="cloth_grey", beard="fur_grey", mouth=1),
     "mercante": _npc("mercante", skin="skin_tan", hair="hair_black", hair_style="short", outfit="robe",
-                     top="cloth_orange", bottom="cloth_cream", scarf="cloth_yellow", build=1.12),
+                     top="cloth_orange", bottom="cloth_cream", scarf="cloth_yellow", build=1.12, brows=8, mouth=1),
     "guaritrice": _npc("guaritrice", skin="skin_light", hair="hair_red", hair_style="long", outfit="robe",
-                       top="cloth_cream", bottom="cloth_white", belt="cloth_green"),
+                       top="cloth_cream", bottom="cloth_white", belt="cloth_green", brows=14),
     "rivale": _npc("rivale", skin="skin_pale", hair="hair_blond", hair_style="short", outfit="leather",
-                   top="cloth_white", bottom="cloth_grey", weapon="sword"),
+                   top="cloth_white", bottom="cloth_grey", weapon="sword", brows=-6, mouth=1),
     "archivista": _npc("archivista", skin="skin_pale", hair="hair_black", hair_style="bun", outfit="robe",
-                       top="cloth_purple", bottom="cloth_purple", belt="cloth_yellow"),
+                       top="cloth_purple", bottom="cloth_purple", belt="cloth_yellow", glasses="gold", brows=10),
     # niente cappuccio: a 64 px copriva tutto il viso (contact sheet)
     "contrabbandiere": _npc("contrabbandiere", skin="skin_tan", hair="hair_black", hair_style="short",
-                            outfit="leather", top="cloth_grey", bottom="cloth_black", hat="cap", scarf="cloth_teal"),
+                            outfit="leather", top="cloth_grey", bottom="cloth_black", hat="cap", scarf="cloth_teal",
+                            beard="fur_black", brows=6),
     "bambina": _npc("bambina", scale=0.74, skin="skin_light", hair="hair_red", hair_style="ponytail",
-                    outfit="peasant", top="cloth_yellow", bottom="cloth_blue", head=1.15),
+                    outfit="peasant", top="cloth_yellow", bottom="cloth_blue", head=1.15, brows=-14, mouth=1),
     "investigatore": _npc("investigatore", skin="skin_light", hair="hair_brown", hair_style="short", outfit="tunic",
-                          top="cloth_blue", bottom="cloth_grey", hat="cap", scarf="cloth_cream"),
+                          top="cloth_blue", bottom="cloth_grey", hat="cap", scarf="cloth_cream", brows=4),
     "popolano_a": _npc("popolano_a", skin="skin_tan", hair="hair_brown", hair_style="short", outfit="peasant",
                        top="cloth_cream", bottom="cloth_grey"),
     "popolano_b": _npc("popolano_b", skin="skin_dark", hair="hair_black", hair_style="ponytail", outfit="tunic",
@@ -68,7 +71,8 @@ ASPETTI = {
     "mercante_b": _npc("mercante_b", skin="skin_light", hair="hair_blond", hair_style="ponytail", outfit="tunic",
                        top="cloth_yellow", bottom="cloth_grey", scarf="cloth_orange"),
     "soglia": _npc("soglia", skin="skin_grey", hair="hair_white", hair_style="long", outfit="robe",
-                   top="cloth_black", bottom="cloth_black", cape="cloth_purple", belt="cloth_purple", eyes="eye_red"),
+                   top="cloth_black", bottom="cloth_black", cape="cloth_purple", belt="cloth_purple", eyes="eye_red",
+                   brows=16, mouth=-1),
 }
 
 

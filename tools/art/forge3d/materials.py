@@ -89,7 +89,7 @@ def get(m):
 define("skin_light", ["brown_d", "brown", "skin_m", "tan", "skin_l"])
 define("skin_tan", ["brown_dd", "brown_d", "brown", "skin_m", "tan"])
 define("skin_dark", ["ink", "brown_dd", "brown_d", "brown", "skin_m"])
-define("skin_pale", ["slate", "grey", "grey_l", "skin_l", "white"])
+define("skin_pale", ["brown", "skin_m", "skin_l", "cream", "white"])   # prima grigio-blu: sembrava un fantasma
 define("skin_green", ["teal_d", "green_d", "green_m", "green", "yellow"])
 define("skin_grey", ["navy", "slate_d", "slate", "grey", "grey_l"])
 # --- capelli / pelo ------------------------------------------------------------------------------

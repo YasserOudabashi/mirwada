@@ -88,7 +88,8 @@ def _weapon_parts(kind, detail):
 def humanoid(skin="skin_light", hair="hair_brown", hair_style="short", outfit="tunic", top="cloth_blue",
              bottom="cloth_grey", boots="leather_dark", belt="leather", cape=None, hat=None,
              weapon="sword", shield=None, eyes="eye", ears="round", build=1.0, scale=1.0, head=1.0,
-             sleeves=True, gloves=None, scarf=None, detail=1, name="humanoid"):
+             sleeves=True, gloves=None, scarf=None, detail=1, name="humanoid", beard=None, glasses=None,
+             brows=0.0, mouth=0):
     r = Rig(name)
     r.scale = scale
     w = build           # larghezza del corpo
@@ -145,6 +146,27 @@ def humanoid(skin="skin_light", hair="hair_brown", hair_style="short", outfit="t
         if detail >= 2:
             r.part("head", "box", (1.3, 0.3, 0.28), (sx * ex, 5.2 * hs, ez + 2.3 * hs), mat=hair, soft=0.5)
     r.part("head", "ellipsoid", (0.75, 0.75, 0.7), (0, 5.7 * hs, ez - 1.5 * hs), mat="skin_tan" if skin == "skin_light" else skin)
+    if detail >= 3:
+        # ritratti (a 64 px sarebbero pixel sporchi): sopracciglia inclinate di `brows` gradi (+ severe, - preoccupate)
+        # e bocca a tre tratti (`mouth` +1 sorriso, -1 broncio, 0 dritta)
+        for sx in (-1, 1):
+            r.part("head", "box", (1.4 * hs, 0.35, 0.36), (sx * 2.55 * hs, 5.5 * hs, ez + 1.85 * hs),
+                   rot=(0, -sx * brows, 0), mat=hair, soft=0.4)
+        r.part("head", "box", (0.8 * hs, 0.3, 0.3), (0, 5.6 * hs, ez - 2.55 * hs), mat="cloth_red", soft=0.4)
+        for sx in (-1, 1):
+            r.part("head", "box", (0.6 * hs, 0.3, 0.3), (sx * 0.85 * hs, 5.5 * hs, ez - 2.55 * hs + mouth * 0.22 * hs),
+                   rot=(0, -sx * mouth * 28, 0), mat="cloth_red", soft=0.4)
+    if beard:                                    # barba lungo la mascella, pizzo sul mento, baffi sottili
+        r.part("head", "ellipsoid", (5.4 * hs, 3.4, 1.7 * hs), (0, 3.1 * hs, ez - 3.4 * hs), mat=beard)
+        r.part("head", "ellipsoid", (1.9 * hs, 1.3, 1.4 * hs), (0, 4.75 * hs, ez - 3.7 * hs), mat=beard)
+        for sx in (-1, 1):
+            r.part("head", "ellipsoid", (1.0 * hs, 0.5, 0.42), (sx * 0.9 * hs, 5.75 * hs, ez - 2.05 * hs),
+                   rot=(0, sx * 12, 0), mat=beard)
+    if glasses and detail >= 3:                  # occhiali, solo nei ritratti: a 64 px coprono gli occhi con una macchia
+        for sx in (-1, 1):
+            r.part("head", "ellipsoid", (1.6 * hs, 0.2, 1.5 * hs), (sx * 2.55 * hs, 5.5 * hs, ez), mat=glasses)
+            r.part("head", "ellipsoid", (1.25 * hs, 0.25, 1.15 * hs), (sx * 2.55 * hs, 5.62 * hs, ez), mat="cloth_white")
+        r.part("head", "box", (1.4 * hs, 0.25, 0.25), (0, 5.85 * hs, ez + 0.4 * hs), mat=glasses, soft=0.4)
     if ears == "round":
         for sx in (-1, 1):
             r.part("head", "ellipsoid", (1.0, 1.0, 1.4), (sx * 6.1 * hs, 0.2, hz - 0.3), mat=skin)
@@ -162,8 +184,10 @@ def humanoid(skin="skin_light", hair="hair_brown", hair_style="short", outfit="t
         else:
             r.part("head", "ellipsoid", (6.5 * hs, 6.0 * hs, 5.7 * hs), (0, -0.9, hz + 1.5 * hs), mat=hair)
             if hair_style in ("short", "long", "ponytail", "bun", "spiky"):
-                # frangia: copre solo la fronte, lascia liberi occhi e guance
-                r.part("head", "ellipsoid", (5.2 * hs, 1.9, 1.5 * hs), (0.4, 4.6 * hs, hz + 3.5 * hs), mat=hair,
+                # frangia: copre solo la fronte, lascia liberi occhi e guance; nei ritratti (detail 3) piu' aderente,
+                # se no da vicino sembra la visiera di un berretto
+                fy = 4.6 if detail < 3 else 4.05
+                r.part("head", "ellipsoid", (5.2 * hs, 1.9, 1.5 * hs), (0.4, fy * hs, hz + 3.5 * hs), mat=hair,
                        rot=(-15, 0, 8))
                 r.part("head", "ellipsoid", (1.5, 1.6, 2.3), (-4.4 * hs, 3.6 * hs, hz + 1.9 * hs), mat=hair)
             for sx in (-1, 1):
