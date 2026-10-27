@@ -14653,3 +14653,19 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - Sinergie e diario non hanno ancora una scena di pagina (mostrano l'appunto a matita): quando arrivano, il test le
   controlla da solo.
 - A schermo: arte/revisione/libro_inventario_diagramma.png (Twilight Giant a Sequenza 4: fusione e avanzamento).
+
+## US-8B50a — Forma gigante: i fogli, 2026-10-27
+- Blocco E: evocazioni e antagonisti non hanno ancora una figura nel mondo (summon scrive solo in SummonRegistry, i 10
+  antagonisti sono lore): la loro arte aspetta il gameplay che li mette in scena. Le forme invece esistono (transform
+  applica gli stat_modifiers di forms.json) ma non si vedevano: si parte da li'.
+- data/forms.json: tg_forma_gigante ha "aspetto": "gigante" (id neutro; schema e validator: un foglio per ogni
+  animazione di personaggio).
+- tools/art/build_forme.py (come build_npc): Enel x1.5 (ppu 1.22*1.5, celle 96, piedi a PIEDI della cella), build 1.18 e
+  head 0.74 (prima prova solo ingrandita: sembrava Enel visto da vicino). Fogli personaggio_gigante_<anim> in arte/sprite
+  e assets/placeholder; bordo di luce con cella=96. Comando: python tools/art/build_forme.py (md5 uguale due volte).
+  Controlli: nessun pixel sul bordo delle celle, alpha solo 0/255, guardato a 3x (idle 4 direzioni accanto a Enel,
+  attacco pesante giu' e destra).
+- animation_machine: la cella si legge dal foglio (altezza / righe); la scala resta quella di dimensione_frame, cosi' i
+  pixel hanno la stessa grana degli altri sprite e il gigante e' grande una volta e mezza; piedi e ombra scalano con la
+  cella; alto_in_piu dice quanto salgono nome e icone.
+- Test (in US-8B50b, tests/test_forme.gd): fogli dei dati, cella 96 con la stessa scala e i piedi al loro posto.

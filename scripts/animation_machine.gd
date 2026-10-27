@@ -40,6 +40,9 @@ var _ombra: Node2D = null
 var _ombra_raggi: Vector2 = Vector2.ZERO
 var _ombra_colore: Color = Color(0, 0, 0, 0)
 var _lampo: Tween = null
+## US-8B50: unita' in piu' sopra i piedi quando l'aspetto ha celle piu' grandi (una forma piu' grande): nome e icone
+## sopra la testa salgono di tanto.
+var alto_in_piu: float = 0.0
 
 
 ## Connette i segnali una volta sola. Chiamato da configura() e non da
@@ -87,8 +90,10 @@ func configura(categoria: String, aspetto: String = "") -> void:
 	scale = Vector2.ONE * (UNITA_TILE / float(dim))
 	# piedi sull'origine del nodo: offset in pixel della cella, prima della scala
 	var piedi = gd.call("animation_convention", "piedi_px")
-	offset = Vector2(0, dim / 2.0 - float(piedi)) if piedi != null else Vector2.ZERO
 	_configura_ombra(gd.call("get_vfx", "ombra_terra"))
+	# US-8B50: un aspetto puo' avere celle piu' grandi (una forma piu' grande, build_forme.py): la cella si legge dal
+	# foglio. La scala resta quella dei dati, cosi' i pixel hanno la stessa grana degli altri sprite.
+	var cella: int = dim
 
 	var sf := SpriteFrames.new()
 	sf.remove_animation("default")
@@ -103,6 +108,7 @@ func configura(categoria: String, aspetto: String = "") -> void:
 			continue
 
 		var righe: Array = direzioni if spec.is_directional() else ["down"]
+		cella = tex.get_height() / righe.size()
 		var durate: Array = spec.frame_durations_ms()
 		for riga in righe.size():
 			var chiave: String = nome
@@ -115,10 +121,16 @@ func configura(categoria: String, aspetto: String = "") -> void:
 			for col in spec.frame_count():
 				var at := AtlasTexture.new()
 				at.atlas = tex
-				at.region = Rect2(col * dim, riga * dim, dim, dim)
+				at.region = Rect2(col * cella, riga * cella, cella, cella)
 				sf.add_frame(chiave, at, durate[col])
 
 	sprite_frames = sf
+	var k: float = float(cella) / float(dim)          # piedi e ombra crescono con la cella
+	offset = Vector2(0, cella / 2.0 - float(piedi) * k) if piedi != null else Vector2.ZERO
+	alto_in_piu = float(piedi) * (k - 1.0) * scale.y if piedi != null else 0.0
+	_ombra_raggi *= k
+	if _ombra != null:
+		_ombra.queue_redraw()
 
 
 ## Riproduce lo stato nella direzione data (gia' ridotta a 4: le diagonali

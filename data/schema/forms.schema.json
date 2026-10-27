@@ -4,11 +4,13 @@
   "forma": {
     "name_i18n": "string, chiave i18n del nome della forma (obbligatoria)",
     "descrizione_i18n": "string, chiave i18n della descrizione (facoltativa)",
+    "aspetto": "string facoltativa (US-8B50): id neutro dei fogli del personaggio in questa forma, assets/placeholder/personaggio_<aspetto>_<animazione>.png (tools/art/build_forme.py). Senza aspetto la forma non cambia il disegno.",
     "stat_modifiers": "oggetto { nome_stat: numero }: delta additivo sulle statistiche base, applicato come modificatore per id 'transform:<ability_id>' e rimosso a fine trasformazione. Deve contenere almeno un trade-off negativo: nessuna forma e' solo vantaggi."
   },
   "regole_validator": [
     "ogni forma_id referenziato da una primitiva transform in data/abilities/ esiste in forms.json",
     "stat_modifiers e' un oggetto non vuoto di soli numeri",
-    "name_i18n presente e non vuoto"
+    "name_i18n presente e non vuoto",
+    "aspetto, se c'e', ha un foglio per ogni animazione di 'personaggio'"
   ]
 }

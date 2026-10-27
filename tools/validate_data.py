@@ -836,6 +836,16 @@ def main():
                     err(f"data/forms.json [{fid}]: stat_modifiers['{k}'] non e' un numero")
             if all((v if isinstance(v, (int, float)) else 0) >= 0 for v in sm.values()):
                 err(f"data/forms.json [{fid}]: nessun trade-off negativo. Una forma non e' solo vantaggi.")
+        # US-8B50: l'aspetto di una forma e' un set di fogli del personaggio (tools/art/build_forme.py)
+        asp = f.get("aspetto")
+        if asp is not None:
+            spec_anim = (load_json(os.path.join(DATA, "animations.json")) or {}).get("personaggio", {})
+            for nome in spec_anim:
+                if nome.startswith("_"):
+                    continue
+                if not os.path.isfile(os.path.join(ROOT, "assets", "placeholder", f"personaggio_{asp}_{nome}.png")):
+                    err(f"data/forms.json [{fid}]: aspetto '{asp}' senza assets/placeholder/personaggio_{asp}_{nome}.png "
+                        f"(python tools/art/build_forme.py)")
     for rel, aid, fid in transform_forms:
         if fid not in forms:
             err(f"{rel} [{aid}]: transform punta a forma_id '{fid}' inesistente in data/forms.json")

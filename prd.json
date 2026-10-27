@@ -390,6 +390,20 @@
       "notes": "2026-10-27: inventario: elenco della sezione a sinistra, indice delle sezioni (i 7 bottoni, prima una riga larga 406) a destra; righe senza larghezze fisse (_larga). Diagramma: griglia girata, una riga per Pathway con le Sequenze da 9 a 0 in colonna (le 10 colonne stavano in una facciata solo scorrendo di lato), la propria riga in rosso; Sequenza corrente, abilita', prossima, fusione e avanzamento a destra; bottoni e motivi che vanno a capo. Sinergie e diario non hanno ancora una scena (appunto a matita). Test generale test_nessuna_pagina_e_piu_larga_della_sua_facciata (larghezza minima di ogni facciata di ogni pagina). arte/revisione/libro_inventario_diagramma.png."
     },
     {
+      "id": "US-8B50a",
+      "title": "Forma gigante: i fogli",
+      "description": "US-8B50 spezzata. La forma gigante (forms.json aspetto 'gigante') ha i suoi fogli del personaggio a celle di 96 (tools/art/build_forme.py); l'AnimationMachine legge la cella dal foglio.",
+      "acceptanceCriteria": [
+        "stessi tempi e animazioni di personaggio",
+        "stessa grana dei pixel, piedi sull'origine",
+        "validator: un foglio per animazione per ogni aspetto di forma"
+      ],
+      "priority": 24,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: build_forme.py: il gigante e' Enel x1.5 (ppu 1.83, celle 96, piedi a 81/96), spalle piu' larghe (build 1.18) e testa piu' piccola (0.74) per leggersi come gigante. 10 fogli in arte/sprite e assets/placeholder (personaggio_gigante_<anim>), nessun pixel sul bordo della cella, alpha 0/255, deterministico. animation_machine: cella = altezza del foglio / righe, scala dai dati (grana uguale), piedi e ombra x cella/dim, alto_in_piu per nome e icone. forms.json aspetto + schema + validator. arte/revisione/forma_gigante.png. tg_arma_luce (sovrapposta agli attacchi) resta da fare."
+    },
+    {
       "id": "US-8B41",
       "title": "VFX delle primitive, gruppo 1",
       "description": "buff_stat, summon, aura, heal, reveal_info, teleport, debuff_stat, illusion (le 8 piu' usate dalle abilita'): fogli a 4 toni colorati dalla rampa del Pathway, attorno a chi lancia.",
