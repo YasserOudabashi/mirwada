@@ -89,6 +89,7 @@ func _ready() -> void:
 	crea_varchi()
 	crea_barca()
 	crea_forzieri()
+	crea_cannocchiali()
 	add_child(preload("res://scripts/world/fauna.gd").new())
 	var t := Timer.new()
 	t.wait_time = INTERVALLO_ATTIVITA
@@ -239,7 +240,9 @@ func _process(_delta: float) -> void:
 	var p: Node = get_tree().get_first_node_in_group("player") if is_inside_tree() else null
 	if p is Node2D and not dati.is_empty():
 		var pos: Vector2 = (p as Node2D).global_position - global_position
-		segui(pos)
+		# US-8B24: una telecamera del mondo (il cannocchiale) guarda lontano: si costruisce attorno a cio' che si vede
+		var cam: Camera2D = get_viewport().get_camera_2d()
+		segui(cam.global_position - global_position if cam != null and cam.get_parent() == self else pos)
 		_aggiorna_barca(p as Node2D)
 		if aggiorna_regione(pos):
 			_ultima_ammessa = pos
@@ -1122,6 +1125,37 @@ func _mostra_avviso(p: Node2D, testo: String) -> void:
 	_avviso.position = p.position + Vector2(-tile * 3, tile * 0.5)
 	_avviso.show()
 	get_tree().create_timer(1.5).timeout.connect(func() -> void: if is_instance_valid(_avviso): _avviso.hide())
+
+
+# --- Cannocchiali (US-8B24) -------------------------------------------------------
+
+## I cannocchiali di data/world/cannocchiali.json vicino al loro luogo (mai sopra o accanto a una soglia).
+func crea_cannocchiali() -> void:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	if gd == null:
+		return
+	var luoghi: Dictionary = dati.get("luoghi", {})
+	var soglie: Dictionary = {}
+	for c in get_children():
+		if c is Area2D and (str(c.name).begins_with("Soglia_") or str(c.name).begins_with("Varco_")):
+			soglie[Vector2i(floori(c.position.x / tile), floori(c.position.y / tile))] = true
+	var volo: float = float((gd.call("get_vista_cannocchiale") as Dictionary).get("volo", 1.6))
+	var tutti: Dictionary = gd.call("get_cannocchiali")
+	for id in tutti:
+		var spec: Dictionary = tutti[id]
+		var l: Variant = luoghi.get(str(spec.get("luogo", "")))
+		var b: Variant = luoghi.get(str(spec.get("bersaglio", "")))
+		if not (l is Array and b is Array):
+			continue
+		var s: Array = spec.get("scostamento", [0, 0])
+		var sb: Array = spec.get("scostamento_bersaglio", [0, 0])
+		var c := Vector2i(int(l[0]) + int(s[0]), int(l[1]) + int(s[1]))
+		var q: Vector2i = cella_libera(c, soglie, "", regione_a(c.x, c.y))
+		var verso := Vector2((float(b[0]) + float(sb[0]) + 0.5) * tile, (float(b[1]) + float(sb[1]) + 0.5) * tile)
+		var n: Area2D = preload("res://scripts/cannocchiale.gd").new()
+		n.call("setup", str(id), Vector2((q.x + 0.5) * tile, (q.y + 0.5) * tile), verso, volo)
+		n.set_meta("livello", "superficie")
+		add_child(n)
 
 
 # --- Forzieri del sottosuolo (US-8B22b) --------------------------------------------

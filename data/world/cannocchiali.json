@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "_comment": "US-8B24: cannocchiali fissi del mondo generato. Uno sta vicino a un luogo di assets/world/mondo.json (+ scostamento, sulla casella libera piu' vicina, mai sopra una soglia); con 'interagisci' la vista vola fino al bersaglio (un altro luogo + scostamento) in 'vista.volo' secondi, si guarda finche' non si preme di nuovo 'interagisci' (o si esce col tasto per annullare), poi torna. Enel resta fermo intanto. Disegno: l'arredo 'cannocchiale' (tools/art/build_interni.py). Il primo e' quello del faro di Mirwada: guarda la Frontiera delle Porte.",
+  "cannocchiali": {
+    "faro": {
+      "luogo": "faro",
+      "scostamento": [3, 2],
+      "bersaglio": "approdo_frontiera",
+      "scostamento_bersaglio": [0, 5]
+    }
+  },
+  "vista": {
+    "volo": 1.6
+  }
+}

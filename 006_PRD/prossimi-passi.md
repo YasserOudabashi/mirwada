@@ -68,8 +68,9 @@ le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti 
    **US-8B22b**: 9 forzieri nel sottosuolo del mondo (`bottino.json forzieri_mondo`, in un vicolo cieco vicino al punto);
    **US-8B22c**: oggetti a caso nelle casette (`oggetti_casuali` dell'interno), uno preso non ricompare.
    E **US-8B23a/b**: la fauna d'atmosfera (cervo, lepre, uccello, farfalla, lucciole) nel mondo, che scappa quando si
-   avvicina Enel (`data/world/fauna.json`, `scripts/world/fauna.gd`).
-4. **Prossime**: US-8B24 cannocchiale; il buio della notte (decisione dell'utente: oggi il mondo non si scurisce);
+   avvicina Enel (`data/world/fauna.json`, `scripts/world/fauna.gd`). E **US-8B24a**: il cannocchiale sul molo del
+   faro, la vista vola alla Frontiera e torna (`data/world/cannocchiali.json`, `scripts/cannocchiale.gd`).
+4. **Prossime**: US-8B24b lente e nebbia del cannocchiale; il buio della notte (decisione dell'utente: oggi il mondo non si scurisce);
    nuoto e arrampicata col loro gameplay (US-8B90, US-8B92, blocco H, con le animazioni). Evocazioni e
    antagonisti aspettano di avere una figura nel mondo.
    Evocazioni e antagonisti (blocco E) aspettano di avere una figura nel mondo (oggi summon scrive solo nel registro).

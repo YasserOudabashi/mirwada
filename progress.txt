@@ -14811,3 +14811,17 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - Aperto (decisione dell'utente): il mondo non si scurisce di notte; con il buio le lucciole brilleranno davvero.
 - tests/test_fauna.gd (+3). 1054 test, validate 0. arte/revisione/fauna_in_gioco.png (passeri prima/dopo, cervo in
   fuga nel bosco, lucciole), arte/revisione/fauna.png rigenerata.
+
+## US-8B24a — Cannocchiale del faro, 2026-10-27
+- data/world/cannocchiali.json (faro: luogo faro + [3, 2], bersaglio approdo_frontiera + [0, 5]; vista.volo 1.6 s).
+  GameData.get_cannocchiali() / get_vista_cannocchiale(). mondo.crea_cannocchiali() dopo varchi e soglie, sulla
+  casella libera piu' vicina lontana dalle soglie: e' finito sul molo del faro, col mare davanti.
+- scripts/cannocchiale.gd: prompt "[tasto] Guarda" sopra; guarda() crea una Camera2D figlia del mondo, la rende
+  attiva e la fa volare al bersaglio; il giocatore fermo (set_physics_process(false)). interagisci o annulla: torna,
+  la telecamera torna al giocatore, lui si muove. Una telecamera a parte perche' game_camera azzera l'offset.
+- Trovato a schermo: alla Frontiera era tutto nero (i blocchi si costruiscono attorno al giocatore). mondo._process
+  ora segue la telecamera del mondo quando e' quella attiva. Il cannocchiale puntato verso chi guarda sembrava una
+  lampada: di lato.
+- 2 test (tests/test_cannocchiale.gd). 1056 test, validate 0. arte/revisione/cannocchiale_in_gioco.png.
+- Aperto: mentre si guarda, i blocchi attorno al giocatore sono scaricati: un nemico vicino camminerebbe senza muri
+  (il molo del faro non ne ha). Il cannocchiale da tasca (PRD) e' un'altra story. US-8B24b: lente e nebbia.

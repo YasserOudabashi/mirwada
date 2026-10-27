@@ -191,6 +191,11 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - Nel gioco la forma e' legata al suo modificatore (`StatsComponent.imposta_forma`, segnale `forma_cambiata`): il
   player cambia fogli quando comincia e torna Enel quando il modificatore se ne va, in qualunque modo.
 
+### Cannocchiale
+- US-8B24a: cannocchiali fissi in `data/world/cannocchiali.json` (luogo, bersaglio); `scripts/cannocchiale.gd` fa volare
+  una telecamera sua al bersaglio e il mondo si costruisce attorno a quella (mondo._process). Il primo e' sul molo del
+  faro e guarda la Frontiera.
+
 ### Fauna d'atmosfera
 - Animali che non combattono (US-8B23): categoria `fauna` di `data/animations.json` (idle, fuga), una specie = un
   aspetto, fogli da `tools/art/build_fauna.py` (cervo, lepre, uccello, farfalla, lucciola). Nei modelli rx positivo
@@ -385,7 +390,7 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   glifi delle primitive nella hotbar (US-8B72), VFX degli attacchi base (US-8B40) e di tutte le primitive
   (US-8B41..43), feedback del colpo (US-8B40b), ritratti nel dialogo (US-8B35a/b), le pagine del libro sulle due
   facciate (US-8B73b/c/d), le forme di Enel, gigante e arma di luce (US-8B50a/b/c), i gesti di Enel (interagire, raccogliere, bere,
-  rituale: US-8B80a/b), Enel in volo e in barca (US-8B81a/b), panorama dell'avvio (US-8B74), forzieri e oggetti nelle case (US-8B22a/b/c), fauna d'atmosfera (US-8B23a/b).
+  rituale: US-8B80a/b), Enel in volo e in barca (US-8B81a/b), panorama dell'avvio (US-8B74), forzieri e oggetti nelle case (US-8B22a/b/c), fauna d'atmosfera (US-8B23a/b), cannocchiale del faro (US-8B24a).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.

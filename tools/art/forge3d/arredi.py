@@ -61,6 +61,19 @@ def arredo(kind, larg, prof, seed=1, size=1.0):
             box((13, 4.2, 1.4), (0, cy - 9.8, 17.6), "wood", rot=su)
             for sx in (-8, 8):
                 box((1.2, 4.6, 1.7), (sx, cy - 9.8, 17.6), "iron", rot=su)
+    elif kind == "cannocchiale":                                      # US-8B24: d'ottone, su un treppiede di legno
+        for k in range(3):
+            a = math.radians(90 + k * 120)
+            dx, dy = math.cos(a) * 6, math.sin(a) * 6 * P
+            box((0.9, 0.9, 9.5), (dx / 2, cy + dy / 2, 9), "wood", rot=(-math.degrees(math.atan2(dy, 18)),
+                                                                       math.degrees(math.atan2(dx, 18)), 0))
+        cyl((1.6, 1.6, 1.4), (0, cy, 18.5), "bronze")                    # il giunto
+        # di lato, puntato a destra e un po' in su (ry ruota l'asse del cilindro da z verso x): si vede tutto il tubo
+        su = (0, 70, 0)
+        ax, az = math.sin(math.radians(70)), math.cos(math.radians(70))
+        r.part("a", "cylinder", (1.8, 1.8, 7.5), (1.5, cy, 21.5), mat="bronze", rot=su)
+        r.part("a", "cylinder", (2.3, 2.3, 0.9), (1.5 + ax * 7.6, cy, 21.5 + az * 7.6), mat="gold", rot=su)   # la bocca
+        r.part("a", "cylinder", (1.1, 1.1, 1.5), (1.5 - ax * 8.6, cy, 21.5 - az * 8.6), mat="leather_dark", rot=su)
     elif kind in ("tavolo", "scrittoio", "alambicco"):
         hw, hd = W / 2 - 4, min(D / 2 - 6, 24)
         box((hw, hd, 1.6), (0, cy, 17), "wood_light")

@@ -1890,6 +1890,24 @@ def main():
         if _a not in vocab_arredi:
             err(f"data/world/arredi.json: manca '{_a}', il disegno dei forzieri (US-8B22)")
 
+    # --- cannocchiali (US-8B24) ---
+    # data/world/cannocchiali.json: luogo e bersaglio sono luoghi del mondo generato, il disegno c'e' nei due temi.
+    _can_rel = "data/world/cannocchiali.json"
+    _can = load_json(os.path.join(DATA, "world", "cannocchiali.json")) or {}
+    _luoghi_mondo = set((load_json(_mondo) or {}).get("luoghi", {})) if os.path.isfile(_mondo) else None
+    for _cid, _c in (_can.get("cannocchiali", {}) or {}).items():
+        for _k in ("luogo", "bersaglio"):
+            if _luoghi_mondo is not None and _c.get(_k) not in _luoghi_mondo:
+                err(f"{_can_rel} [{_cid}]: {_k} '{_c.get(_k)}' non e' un luogo di assets/world/mondo.json")
+        for _k in ("scostamento", "scostamento_bersaglio"):
+            _v = _c.get(_k, [0, 0])
+            if not (isinstance(_v, list) and len(_v) == 2 and all(isinstance(n, int) for n in _v)):
+                err(f"{_can_rel} [{_cid}]: {_k} deve essere [x, y] di interi")
+    if not (isinstance((_can.get("vista") or {}).get("volo"), (int, float)) and _can["vista"]["volo"] > 0):
+        err(f"{_can_rel}: vista.volo deve essere un numero di secondi > 0")
+    if "cannocchiale" not in vocab_arredi:
+        err("data/world/arredi.json: manca 'cannocchiale', il disegno dei cannocchiali (US-8B24)")
+
     # --- fauna d'atmosfera (US-8B23b) ---
     # data/world/fauna.json: ogni specie ha i suoi fogli (assets/placeholder/fauna_<specie>_<animazione>.png per ogni
     # animazione della categoria fauna), regioni del mondo generato, momenti di data/schema/time.json, numeri sensati.

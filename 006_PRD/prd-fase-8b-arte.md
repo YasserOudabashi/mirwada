@@ -246,6 +246,9 @@ scappano quando si avvicina). Aperto: il mondo non si scurisce di notte, le lucc
 in cima al faro di Mirwada (il primo) e più avanti uno da tasca. Usandolo la
 camera si sposta lontano e la nebbia si dirada. Il punto panoramico e il
 bersaglio stanno nei dati della mappa. *Domande (M).*
+*Fatta la US-8B24a (2026-10-27):* il cannocchiale sul molo del faro (`data/world/cannocchiali.json`,
+`scripts/cannocchiale.gd`), la vista vola alla Frontiera e torna. Resta la **8B24b** (lente e nebbia che si dirada) e
+il cannocchiale da tasca.
 
 ### Blocco C — Personaggi (rigenerati a 64 px)
 

@@ -66,6 +66,7 @@ const PATH_ARREDI := "res://data/world/arredi.json"
 const PATH_MEZZI := "res://data/world/mezzi.json"
 const PATH_BOTTINO := "res://data/world/bottino.json"
 const PATH_FAUNA := "res://data/world/fauna.json"
+const PATH_CANNOCCHIALI := "res://data/world/cannocchiali.json"
 const PATH_ICONE := "res://data/ui/icone.json"
 const PATH_ROSTER := "res://data/npc/roster.json"
 const PATH_FACTIONS := "res://data/factions.json"
@@ -133,6 +134,7 @@ var _arredi: Dictionary = {}
 var _mezzi: Dictionary = {}
 var _bottino: Dictionary = {}
 var _fauna: Dictionary = {}
+var _cannocchiali: Dictionary = {}
 var _icone: Dictionary = {}
 var _icone_tex: Dictionary = {}
 var _roster: Dictionary = {}
@@ -231,6 +233,7 @@ func load_all() -> void:
 	_load_single(PATH_MEZZI, "barca", _mezzi, TYPE_DICTIONARY)
 	_load_single(PATH_BOTTINO, "tabelle", _bottino, TYPE_DICTIONARY)
 	_load_single(PATH_FAUNA, "specie", _fauna, TYPE_DICTIONARY)
+	_load_single(PATH_CANNOCCHIALI, "cannocchiali", _cannocchiali, TYPE_DICTIONARY)
 	_load_single(PATH_ICONE, "oggetti", _icone, TYPE_DICTIONARY)
 	_icone_tex.clear()
 	_load_single(PATH_ROSTER, "npcs", _roster, TYPE_ARRAY)
@@ -701,6 +704,15 @@ func get_arredo(id: String) -> Dictionary:
 func get_tabella_bottino(id: String) -> Dictionary:
 	var t: Variant = (_bottino.get("tabelle", {}) as Dictionary).get(id)
 	return t if typeof(t) == TYPE_DICTIONARY else {}
+
+
+## US-8B24: i cannocchiali fissi {id: {luogo, scostamento, bersaglio, scostamento_bersaglio}} e la vista {volo}.
+func get_cannocchiali() -> Dictionary:
+	return _cannocchiali.get("cannocchiali", {}) as Dictionary
+
+
+func get_vista_cannocchiale() -> Dictionary:
+	return _cannocchiali.get("vista", {}) as Dictionary
 
 
 ## US-8B23b: le specie della fauna d'atmosfera {id: {regioni, momenti, probabilita, gruppo, fugge, ...}}.
