@@ -2722,6 +2722,16 @@ def main():
                     err(f"data/vfx.json [primitive_vfx.{name}]: frames dev'essere un intero > 0")
                 if not isinstance(e.get("impact_frame"), bool):
                     err(f"data/vfx.json [primitive_vfx.{name}]: impact_frame dev'essere true/false")
+                # US-8B41: un foglio vero ha tanti frame in colonna quanti ne dicono i dati
+                for _sp, _fr in ((e.get("sprite"), e.get("frames")),
+                                 ((e.get("scoppio") or {}).get("sprite"), (e.get("scoppio") or {}).get("frames"))):
+                    _png = os.path.join(ROOT, "assets", "vfx", f"{_sp}.png")
+                    if _sp and os.path.isfile(_png) and isinstance(_fr, int) and _fr > 0:
+                        with open(_png, "rb") as _fh:
+                            _larg = struct.unpack(">I", _fh.read(24)[16:20])[0]
+                        if _larg % _fr:
+                            err(f"data/vfx.json [primitive_vfx.{name}]: assets/vfx/{_sp}.png non e' fatto di {_fr} "
+                                f"frame (python tools/art/build_vfx.py)")
         # nessun campo VFX sulle abilita': ability.schema.json non si tocca
         for fn in sorted(os.listdir(adir)) if os.path.isdir(adir) else []:
             if not fn.endswith(".json"):

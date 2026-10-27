@@ -96,12 +96,13 @@
     }
   },
   "primitive_vfx": {
-    "_comment": "US-8B40: sprite = foglio assets/vfx/<sprite>.png (tools/art/build_vfx.py), frames = colonne del foglio; se il foglio non c'e' ancora resta il segnaposto. Un effetto d'attacco ha il lampo nel primo frame (bianco, attenuato con riduci_flash) e poi la dissolvenza. sul_proiettile: il foglio veste il proiettile in volo (ciclo), scoppio = l'effetto quando colpisce o finisce la gittata.",
+    "_comment": "US-8B40: sprite = foglio assets/vfx/<sprite>.png (tools/art/build_vfx.py), frames = colonne del foglio; se il foglio non c'e' ancora resta il segnaposto. Un effetto d'attacco ha il lampo nel primo frame (bianco, attenuato con riduci_flash) e poi la dissolvenza. sul_proiettile: il foglio veste il proiettile in volo (ciclo), scoppio = l'effetto quando colpisce o finisce la gittata. gira: il foglio e' disegnato verso destra e si gira con lo sguardo (gli altri stanno dritti, attorno a chi lancia).",
     "melee_arc": {
       "sprite": "vfx_slash",
       "frames": 5,
       "impact_frame": true,
-      "scia": true
+      "scia": true,
+      "gira": true
     },
     "projectile": {
       "sprite": "vfx_bolt",
@@ -115,7 +116,8 @@
       "sprite": "vfx_streak",
       "frames": 4,
       "impact_frame": false,
-      "scia": true
+      "scia": true,
+      "gira": true
     },
     "buff_stat": {
       "sprite": "vfx_rune_up",
@@ -185,7 +187,7 @@
     },
     "summon": {
       "sprite": "vfx_conjure",
-      "frames": 4,
+      "frames": 5,
       "impact_frame": true,
       "scia": false
     },
@@ -197,13 +199,13 @@
     },
     "reveal_info": {
       "sprite": "vfx_scry",
-      "frames": 3,
+      "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "teleport": {
       "sprite": "vfx_rift",
-      "frames": 3,
+      "frames": 5,
       "impact_frame": true,
       "scia": false
     },

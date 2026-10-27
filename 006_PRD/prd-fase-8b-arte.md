@@ -258,7 +258,8 @@ feedback del colpo (scintilla, scintilla della parata perfetta, polvere,
 rottura della postura). **FATTA in parte (2026-10-26)**: `vfx_slash`, `vfx_bolt` (il proiettile in volo, prima
 invisibile) con `vfx_bolt_scoppio`, `vfx_streak` in `tools/art/build_vfx.py`, colorati dalla rampa; il feedback del
 colpo resta da fare.
-**US-8B41..43 [A] Le altre 24 primitive**, a gruppi di 8. *Domande (M) per gruppo.*
+**US-8B41..43 [A] Le altre 24 primitive**, a gruppi di 8. *Domande (M) per gruppo.* **US-8B41 FATTA (2026-10-27)**: buff_stat, debuff_stat,
+aura, heal, summon, reveal_info, teleport, illusion; gruppi 2 e 3 in `prd.json`.
 **US-8B44 [A] Varianti `riduci_flash`** di tutti gli effetti con lampo.
 
 ### Blocco E — Creature e trasformazioni

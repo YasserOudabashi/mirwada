@@ -81,7 +81,8 @@ func gioca_primitiva(_tipo: String, caster: Node, pv: Dictionary, pal: Dictionar
 	if tex != null:
 		var e := _effetto(tex, int(pv.get("frames", 1)), pal, bool(pv.get("impact_frame", false)))
 		e.global_position = (caster as Node2D).global_position + Vector2(0, -6)
-		e.rotation = facing.angle()
+		if bool(pv.get("gira", false)):
+			e.rotation = facing.angle()
 		madre.add_child(e)
 		_anima(e, false)
 		return

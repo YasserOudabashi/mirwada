@@ -149,7 +149,9 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - Nel gioco (US-8B40) i fogli di `tools/art/build_vfx.py` sono a 4 toni di grigio come i glifi delle primitive e li
   colora `shaders/rampa_pathway.gdshader` con la palette del Pathway; il lampo del primo frame e' il parametro `lampo`
   dello shader (spento con `riduci_flash`). Fatti: fendente (anche sull'attacco base), proiettile in volo e il suo
-  scoppio, scia dello scatto. Le altre primitive restano col segnaposto finche' non hanno il loro foglio.
+  scoppio, scia dello scatto, e le 8 primitive del gruppo 1 (US-8B41: buff/debuff, aura, cura, evocazione, scrutare,
+  varco, illusione), centrate su chi lancia; `gira` nei dati per gli effetti che seguono lo sguardo. Le altre
+  primitive restano col segnaposto finche' non hanno il loro foglio.
 
 ### Icone degli oggetti
 - Una forma per tipo di oggetto in `forge3d/icone.py` (`FORME`, vocabolario chiuso: fiala, cristallo, chiave, ...),
@@ -264,7 +266,7 @@ python tools/art/build_panorami.py             # panorama a 6 strati x 4 momenti
 python tools/art/build_icone.py                # icone degli oggetti: abbina i nuovi in data/ui/icone.json, disegna assets/icone/oggetti/
 python tools/art/build_stati.py                # icone degli status (griglie 16x16) -> assets/icone/stati/<status_id>.png
 python tools/art/build_primitive.py            # glifi delle primitive a 4 toni -> assets/icone/primitive/ (colori dallo shader)
-python tools/art/build_vfx.py                  # VFX degli attacchi base a 4 toni (frame da data/vfx.json) -> assets/vfx/
+python tools/art/build_vfx.py                  # VFX a 4 toni (attacchi base e primitive, frame da data/vfx.json) -> assets/vfx/
 python scripts/forge.py contact FILE.png --scale 4
 
 # Rigenera la spina dorsale dei pathway (idempotente)
@@ -339,13 +341,14 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   edifici di citta', villaggi e torri con le porte verso i 14 interni (US-8B18a/b), interni disegnati e
   arredati (US-8B18c/d), varchi delle sotto-aree come ingressi con il loro contenuto e la loro arte (US-8B21a/b/c),
   icone degli oggetti a terra e nello zaino (US-8B70), icone degli status sopra la testa (US-8B71),
-  glifi delle primitive nella hotbar (US-8B72), VFX degli attacchi base (US-8B40), panorama dell'avvio (US-8B74).
+  glifi delle primitive nella hotbar (US-8B72), VFX degli attacchi base (US-8B40) e del primo gruppo di primitive
+  (US-8B41), panorama dell'avvio (US-8B74).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.
 
-**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): le story di `prd.json` sono chiuse; restano
-dal PRD dell'arte i VFX delle altre primitive (US-8B41..43), il feedback del colpo, ritratti e creature (blocchi C/E/G).
+**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): restano
+i VFX delle primitive dei gruppi 2 e 3 (US-8B42..43), il feedback del colpo, ritratti e creature (blocchi C/E/G).
 
 ## Decisioni prese
 

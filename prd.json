@@ -307,6 +307,44 @@
       "notes": "2026-10-26: tools/art/build_vfx.py (seed 40) legge i frame da data/vfx.json e scrive assets/vfx/vfx_slash.png (5 x 96), vfx_bolt.png (2 x 48x32, ciclo), vfx_bolt_scoppio.png (5 x 48), vfx_streak.png (4 x 64x32), a 4 toni di grigio. Fendente e scoppio: primo frame tutto acceso + 4 di dissolvenza a blocchi (contorno solo fuori dalla sagoma). shaders/rampa_pathway.gdshader: parametro lampo (bianco nel frame d'impatto, 0 con riduci_flash). vfx.gd: _foglio/_effetto/_anima, gioca_per (l'attacco base del giocatore usa il fendente), veste_proiettile (il proiettile prima era invisibile), scoppio_proiettile; vfx.json: frames 5/2/4, sul_proiettile, scoppio. 4 test. Fogli arte/revisione/vfx_attacchi.png, prova a schermo vfx_in_gioco.png. Resta il feedback del colpo del PRD (scintilla, parata, polvere, postura)."
     },
     {
+      "id": "US-8B41",
+      "title": "VFX delle primitive, gruppo 1",
+      "description": "buff_stat, summon, aura, heal, reveal_info, teleport, debuff_stat, illusion (le 8 piu' usate dalle abilita'): fogli a 4 toni colorati dalla rampa del Pathway, attorno a chi lancia.",
+      "acceptanceCriteria": [
+        "un foglio per primitiva in assets/vfx/, frame da data/vfx.json",
+        "guardati ingranditi e in gioco",
+        "lampo spento con riduci_flash dove c'e'"
+      ],
+      "priority": 18,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: tools/art/build_vfx.py (seed 40) gruppo 1, fogli in assets/vfx/: vfx_rune_up e vfx_rune_down (frecce che salgono / scendono e anello ai piedi), vfx_aura_ring (anello che si allarga con scintille, 96), vfx_mend (croci che salgono), vfx_conjure (lampo di una colonna, poi cerchio con le rune, 96), vfx_scry (onde tratteggiate e occhio), vfx_rift (lampo di una fessura, varco col vortice che si richiude), vfx_mirage (due doppi come ologrammi). vfx.json: frames summon 5, teleport 5, reveal_info 4 (lampo + dissolvenza); gira solo su melee_arc e dash (vfx.gd ruota solo quelli). Validator: ogni foglio vero ha i frame dei dati. 2 test. Fogli arte/revisione/vfx_primitive_1.png, prova a schermo vfx_primitive_1_in_gioco.png (Moon)."
+    },
+    {
+      "id": "US-8B42",
+      "title": "VFX delle primitive, gruppo 2",
+      "description": "curse, terrain_modify, fear, steal, dot, shadow_meld, time_rewind, plant_growth.",
+      "acceptanceCriteria": [
+        "come US-8B41"
+      ],
+      "priority": 18,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B43",
+      "title": "VFX delle primitive, gruppo 3",
+      "description": "mind_read, shield, light_purify, possess, transform, soul_detach, resurrect, decay (e chain, che non ha ancora una voce in vfx.json).",
+      "acceptanceCriteria": [
+        "come US-8B41"
+      ],
+      "priority": 18,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
       "id": "US-8B74",
       "title": "Panorami",
       "description": "Schermata iniziale e libro: 6 strati x 4 fasce orarie.",

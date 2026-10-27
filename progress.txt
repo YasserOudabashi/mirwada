@@ -14513,3 +14513,22 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   tramonto sullo scaffale, frontespizio grande; due scatti a 3 secondi: il faro scorre di 18 pixel
   (arte/revisione/panorami_in_gioco.png). validate 0, 1021 test.
 - Aperto: una sola veduta (niente panorami per regione); il panorama non usa le due modalita' luminosa/cupa.
+
+## US-8B41 — VFX delle primitive, gruppo 1, 2026-10-27
+- Le story di prd.json erano chiuse: aggiunte US-8B41..43 (i VFX delle 24 primitive del PRD, a gruppi di 8 per
+  frequenza d'uso nelle abilita'). Il motore non dice su chi cade un effetto e quasi tutti agiscono in un raggio
+  attorno a chi lancia: gli effetti stanno su chi lancia (anelli ai piedi, 12 pixel sotto il centro del foglio).
+- tools/art/build_vfx.py (seed 40): _forme (linee, ellissi, poligoni a 4x ridotti a maggioranza), _anello a terra in
+  prospettiva, _sfuma (dissolvenza a blocchi). rune_su (buff_stat; giu=True per debuff_stat, toni scuri), aura_anello
+  (96), ricuci (heal), evoca (summon, 96: lampo della colonna, cerchio con 8 rune), scruta (reveal_info: onde
+  tratteggiate e un occhio sopra la testa), varco (teleport: lampo della fessura, ovale col vortice, chiusura a
+  pezzi; contorno solo fuori dall'ovale), miraggio (illusion: doppi ai lati col corpo a righe, come ologrammi). Primo
+  giro corretto a occhio: frecce piu' grandi, onde che si spengono, varco senza buchi e puntini scuri, doppi pieni.
+  Rilanciato: stessi byte. Fogli di controllo per gruppo (arte/revisione/vfx_attacchi.png, vfx_primitive_1.png).
+- data/vfx.json: frames summon 5, teleport 5, reveal_info 4; campo gira su melee_arc e dash (vfx.gd ruota solo
+  quelli: gli effetti attorno a chi lancia stanno dritti). Validator: un foglio vero ha tanti frame quanti i dati
+  (larghezza letta dall'intestazione PNG, la CI non ha Pillow).
+- Verifica: test_vfx_primitive (2: fogli del gruppo 1 coi frame dei dati, l'aura sta dritta e il fendente gira). A
+  schermo con la palette di Moon gli 8 effetti attorno a Enel (arte/revisione/vfx_primitive_1_in_gioco.png). 1023.
+- Aperto: gli anelli a terra stanno sopra il personaggio anche nella meta' dietro; sul marmo le palette chiare (Moon)
+  hanno poco contrasto, le tiene il contorno.
