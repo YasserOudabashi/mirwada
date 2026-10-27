@@ -70,8 +70,9 @@ le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti 
    E **US-8B23a/b**: la fauna d'atmosfera (cervo, lepre, uccello, farfalla, lucciole) nel mondo, che scappa quando si
    avvicina Enel (`data/world/fauna.json`, `scripts/world/fauna.gd`). E **US-8B24a**: il cannocchiale sul molo del
    faro, la vista vola alla Frontiera e torna (`data/world/cannocchiali.json`, `scripts/cannocchiale.gd`); **US-8B24b**:
-   la lente con la nebbia che si dirada.
-4. **Prossime**: il cannocchiale da tasca; il buio della notte (decisione dell'utente: oggi il mondo non si scurisce);
+   la lente con la nebbia che si dirada. E **US-8B25**: il buio di notte (`data/world/luce.json`, `scripts/world/luce.gd`).
+4. **Prossime**: la base del giocatore nelle 4 versioni (US-8B20, decisioni dell'utente del 2026-10-27); il
+   cannocchiale da tasca;
    nuoto e arrampicata col loro gameplay (US-8B90, US-8B92, blocco H, con le animazioni). Evocazioni e
    antagonisti aspettano di avere una figura nel mondo.
    Evocazioni e antagonisti (blocco E) aspettano di avere una figura nel mondo (oggi summon scrive solo nel registro).

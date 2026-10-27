@@ -83,7 +83,8 @@ func animali() -> Array:
 func _crea(nome: String, s: Dictionary, q: Vector2i, rng: RandomNumberGenerator) -> AnimatedSprite2D:
 	var a: AnimatedSprite2D = AnimationMachine.new()
 	a.name = "Fauna_%s" % nome
-	_mondo.add_child(a)
+	# US-8B25: una luce sta sopra il buio della notte (uno strato suo, che segue la telecamera), le altre nel mondo
+	(_strato_luci() if bool(s.get("luce", false)) else _mondo).add_child(a)
 	a.call("configura", "fauna", nome)
 	var tile: float = float(_mondo.get("tile"))
 	a.position = Vector2((q.x + rng.randf()) * tile, (q.y + rng.randf()) * tile)
@@ -100,6 +101,24 @@ func _crea(nome: String, s: Dictionary, q: Vector2i, rng: RandomNumberGenerator)
 	a.set_meta("base", a.position)
 	a.set_meta("fase", rng.randf() * TAU)
 	return a
+
+
+var _luci: CanvasLayer = null
+
+
+## Lo strato delle luci (le lucciole): fuori dal mondo, quindi la luce del mondo (scripts/world/luce.gd) non lo
+## scurisce; si vede solo quando si vede il mondo (non dentro un interno).
+func _strato_luci() -> CanvasLayer:
+	if _luci == null:
+		_luci = CanvasLayer.new()
+		_luci.name = "Luci"
+		_luci.follow_viewport_enabled = true
+		add_child(_luci)
+		if _mondo is CanvasItem:
+			(_mondo as CanvasItem).visibility_changed.connect(func() -> void:
+				if is_instance_valid(_luci):
+					_luci.visible = (_mondo as CanvasItem).is_visible_in_tree())
+	return _luci
 
 
 func _process(delta: float) -> void:

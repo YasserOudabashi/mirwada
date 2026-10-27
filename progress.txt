@@ -14836,3 +14836,17 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   sopra il vuoto di nebbia, sotto l'isola con la porta senza muro. arte/revisione/cannocchiale_lente.png (prima, in
   volo con la nebbia, mentre si dirada, arrivati).
 - 1056 test, validate 0. Aperto: il cannocchiale da tasca (PRD: "piu' avanti").
+
+## US-8B25 — Buio di notte nel mondo, 2026-10-27
+- Decisione dell'utente: il mondo si scurisce di notte. data/world/luce.json: un colore (filtro, non palette) per
+  momento di time.json in ogni modalita' (luminoso, cupo piu' buio), quello del sottosuolo, la transizione (3 s).
+- scripts/world/luce.gd: CanvasModulate figlio del mondo; colore_voluto() dal TimeSystem e da GameState.tema_arte(),
+  sotto terra il colore del sottosuolo; _process lo raggiunge piano. Negli interni il mondo si nasconde e la luce
+  con lui: gli interni restano illuminati. HUD e libro sono strati loro.
+- Le lucciole (fauna luce: true) vanno su uno strato loro che segue la telecamera (fauna._strato_luci), fuori dal
+  mondo: il buio non le tocca; lo strato si nasconde quando si nasconde il mondo (entrando in un interno).
+- A schermo: alba calda, mezzogiorno com'era, crepuscolo rosato -> scaldato verso l'arancio (#e2b28e), notte blu
+  scura ma leggibile; nella Valle di notte le lucciole brillano sul buio. Cupo: crepuscolo viola, notte piu' scura.
+  arte/revisione/luce_del_giorno.png.
+- tests/test_luce.gd (3). 1059 test, validate 0.
+- Aperto: finestre accese, lampioni e la luce del faro di notte (oggi il faro non illumina).

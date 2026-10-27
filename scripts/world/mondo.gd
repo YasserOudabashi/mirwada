@@ -91,6 +91,7 @@ func _ready() -> void:
 	crea_forzieri()
 	crea_cannocchiali()
 	add_child(preload("res://scripts/world/fauna.gd").new())
+	add_child(preload("res://scripts/world/luce.gd").new())
 	var t := Timer.new()
 	t.wait_time = INTERVALLO_ATTIVITA
 	t.autostart = true

@@ -203,7 +203,12 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
   alza in avanti (muso, petto, collo).
 - Nel gioco (US-8B23b): `data/world/fauna.json` dice dove (regioni, momenti, probabilita' per blocco) e come scappano
   (vola, corre, resta); `scripts/world/fauna.gd` li posa nei blocchi costruiti (seme = blocco), mai sotto una chioma,
-  a riposo di profilo. Il mondo non si scurisce di notte: le lucciole (additive) si vedono poco finche' non c'e' buio.
+  a riposo di profilo. Le lucciole (additive) stanno su uno strato loro sopra il buio della notte.
+
+### Giorno e notte
+- US-8B25: `data/world/luce.json` (un filtro per momento del giorno e modalita', uno per il sottosuolo) e
+  `scripts/world/luce.gd` (CanvasModulate figlio del mondo, passa piano da un colore all'altro). Negli interni il
+  mondo e' nascosto e la luce con lui; HUD, libro e lucciole non si scuriscono.
 
 ### Mondo, mappe e biomi
 - **La generazione procedurale del mondo è consentita come strumento di produzione**:
@@ -391,7 +396,7 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   glifi delle primitive nella hotbar (US-8B72), VFX degli attacchi base (US-8B40) e di tutte le primitive
   (US-8B41..43), feedback del colpo (US-8B40b), ritratti nel dialogo (US-8B35a/b), le pagine del libro sulle due
   facciate (US-8B73b/c/d), le forme di Enel, gigante e arma di luce (US-8B50a/b/c), i gesti di Enel (interagire, raccogliere, bere,
-  rituale: US-8B80a/b), Enel in volo e in barca (US-8B81a/b), panorama dell'avvio (US-8B74), forzieri e oggetti nelle case (US-8B22a/b/c), fauna d'atmosfera (US-8B23a/b), cannocchiale del faro con la lente (US-8B24a/b).
+  rituale: US-8B80a/b), Enel in volo e in barca (US-8B81a/b), panorama dell'avvio (US-8B74), forzieri e oggetti nelle case (US-8B22a/b/c), fauna d'atmosfera (US-8B23a/b), cannocchiale del faro con la lente (US-8B24a/b), buio di notte (US-8B25).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.

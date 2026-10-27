@@ -1890,6 +1890,25 @@ def main():
         if _a not in vocab_arredi:
             err(f"data/world/arredi.json: manca '{_a}', il disegno dei forzieri (US-8B22)")
 
+    # --- luce del mondo (US-8B25) ---
+    # data/world/luce.json: un colore #rrggbb per ogni momento di time.json in ogni modalita' (luminoso, cupo).
+    _luce_rel = "data/world/luce.json"
+    _luce = load_json(os.path.join(DATA, "world", "luce.json")) or {}
+    _momenti_luce = set((load_json(os.path.join(DATA, "schema", "time.json")) or {}).get("momenti", []))
+
+    def _colore_ok(v):
+        return isinstance(v, str) and len(v) == 7 and v.startswith("#") and all(c in "0123456789abcdefABCDEF" for c in v[1:])
+
+    for _tema in ("luminoso", "cupo"):
+        _per = (_luce.get("momenti", {}) or {}).get(_tema, {})
+        for _m in sorted(_momenti_luce):
+            if not _colore_ok(_per.get(_m)):
+                err(f"{_luce_rel}: momenti.{_tema}.{_m} deve essere un colore #rrggbb")
+    if not _colore_ok(_luce.get("sottosuolo")):
+        err(f"{_luce_rel}: sottosuolo deve essere un colore #rrggbb")
+    if not (isinstance(_luce.get("transizione"), (int, float)) and _luce["transizione"] > 0):
+        err(f"{_luce_rel}: transizione deve essere un numero di secondi > 0")
+
     # --- cannocchiali (US-8B24) ---
     # data/world/cannocchiali.json: luogo e bersaglio sono luoghi del mondo generato, il disegno c'e' nei due temi.
     _can_rel = "data/world/cannocchiali.json"
