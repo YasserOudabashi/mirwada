@@ -28,6 +28,7 @@ var _rampa_di: String = "?"
 
 
 func _ready() -> void:
+	add_to_group("hud")                                # US-8B24b: il cannocchiale lo nasconde mentre si guarda
 	var acting: Node = get_node_or_null("/root/Acting")
 	if acting != null:
 		acting.acting_progress_changed.connect(_su_acting)

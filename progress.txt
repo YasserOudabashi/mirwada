@@ -14825,3 +14825,14 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - 2 test (tests/test_cannocchiale.gd). 1056 test, validate 0. arte/revisione/cannocchiale_in_gioco.png.
 - Aperto: mentre si guarda, i blocchi attorno al giocatore sono scaricati: un nemico vicino camminerebbe senza muri
   (il molo del faro non ne ha). Il cannocchiale da tasca (PRD) e' un'altra story. US-8B24b: lente e nebbia.
+
+## US-8B24b — La lente e la nebbia del cannocchiale, 2026-10-27
+- shaders/lente_cannocchiale.gdshader: fuori dal cerchio il buio del tubo, anello d'ottone, dentro due strati di
+  nebbia che scorrono; tutto a quadretti della grana (640x360) e la nebbia a retino Bayer (alpha 0 o 1).
+- cannocchiale.gd: la lente (CanvasLayer 80) si stringe mentre la vista vola, arrivati la nebbia si dirada in
+  vista.nebbia secondi (2.4); al ritorno la nebbia torna, si vola indietro, la lente si apre. L'HUD (gruppo "hud" in
+  hud.gd) si nasconde mentre si guarda: dentro il cerchio si sarebbe visto.
+- A schermo: il bersaglio inquadrava solo terreno lilla; spostato sul bordo dell'isola (approdo_frontiera + [0, -2]):
+  sopra il vuoto di nebbia, sotto l'isola con la porta senza muro. arte/revisione/cannocchiale_lente.png (prima, in
+  volo con la nebbia, mentre si dirada, arrivati).
+- 1056 test, validate 0. Aperto: il cannocchiale da tasca (PRD: "piu' avanti").

@@ -2,7 +2,8 @@ extends Area2D
 ## US-8B24: un cannocchiale fisso (data/world/cannocchiali.json). "interagisci" vicino: la vista vola fino al bersaglio
 ## (un luogo del mondo) con una telecamera sua, si guarda, e con "interagisci" (o annulla) torna sul giocatore. Intanto il
 ## giocatore resta fermo. Disegno: l'arredo cannocchiale (tools/art/build_interni.py), piedi in basso al centro della
-## casella, che non si attraversa.
+## casella, che non si attraversa. US-8B24b: mentre si guarda, la lente (shaders/lente_cannocchiale.gdshader: fuori
+## buio, anello d'ottone) con la nebbia che si dirada quando la vista e' arrivata; l'HUD (gruppo "hud") si nasconde.
 ##
 ## NIENTE class_name: coerente col progetto.
 
@@ -10,9 +11,14 @@ signal vista_cambiata(aperta: bool)
 
 const TILE := 32
 
+const LENTE_APERTA := 1.2                       # raggio che non copre niente: la lente si stringe da qui
+const STRATO_LENTE := 80                        # sopra il mondo e l'HUD, sotto il libro (85)
+
 var cannocchiale_id: String = ""
 var bersaglio := Vector2.ZERO                  # nelle coordinate del genitore (il mondo), come position
 var durata_volo := 1.6
+## data/world/cannocchiali.json "vista": volo, lente (raggio), nebbia (secondi per diradarsi), colori.
+var vista: Dictionary = {}
 
 var _vicino := false
 var _chi: Node2D = null
@@ -20,14 +26,18 @@ var _guardando := false
 var _camera: Camera2D = null
 var _tween: Tween = null
 var _prompt: Label
+var _lente: CanvasLayer = null
+var _mat: ShaderMaterial = null
+var _tempo := 0.0
 
 
-## Prima di aggiungerlo all'albero: id, centro della casella, bersaglio, secondi del volo della vista.
-func setup(id: String, posizione: Vector2, verso: Vector2, volo: float) -> void:
+## Prima di aggiungerlo all'albero: id, centro della casella, bersaglio, la "vista" dei dati.
+func setup(id: String, posizione: Vector2, verso: Vector2, dati_vista: Dictionary) -> void:
 	cannocchiale_id = id
 	position = posizione
 	bersaglio = verso
-	durata_volo = volo
+	vista = dati_vista
+	durata_volo = float(vista.get("volo", durata_volo))
 
 
 func _ready() -> void:
@@ -90,8 +100,11 @@ func guarda() -> bool:
 		_camera.zoom = sua.zoom
 	_camera.make_current()
 	_prompt.hide()
+	_apri_lente()
 	_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	_tween.tween_property(_camera, "global_position", get_parent().to_global(bersaglio), durata_volo)
+	_tween.parallel().tween_method(_raggio, LENTE_APERTA, float(vista.get("lente", 0.42)), 0.35)
+	_tween.tween_method(_nebbia, 1.0, 0.0, float(vista.get("nebbia", 2.0)))      # arrivati: la nebbia si dirada
 	vista_cambiata.emit(true)
 	return true
 
@@ -103,8 +116,10 @@ func torna() -> void:
 	if _tween != null:
 		_tween.kill()
 	_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_tween.tween_method(_nebbia, _nebbia_ora(), 1.0, 0.25)                         # la nebbia torna, poi si vola
 	_tween.tween_property(_camera, "global_position", _chi.global_position if is_instance_valid(_chi) else global_position,
 			durata_volo * 0.6)
+	_tween.tween_method(_raggio, float(vista.get("lente", 0.42)), LENTE_APERTA, 0.25)
 	_tween.tween_callback(_tornato)
 
 
@@ -118,9 +133,61 @@ func _tornato() -> void:
 	if _camera != null:
 		_camera.queue_free()
 		_camera = null
+	if _lente != null:
+		_lente.queue_free()
+		_lente = null
+		_mat = null
+	_mostra_hud(true)
 	_guardando = false
 	_prompt.visible = _vicino
 	vista_cambiata.emit(false)
+
+
+func _process(delta: float) -> void:
+	if _mat != null:
+		_tempo += delta
+		_mat.set_shader_parameter("tempo", _tempo)
+
+
+## La lente sopra il mondo e l'HUD, colori dai dati; l'HUD si nasconde (dentro il cerchio si vedrebbe).
+func _apri_lente() -> void:
+	_lente = CanvasLayer.new()
+	_lente.name = "Lente"
+	_lente.layer = STRATO_LENTE
+	var vetro := ColorRect.new()
+	vetro.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vetro.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_mat = ShaderMaterial.new()
+	_mat.shader = preload("res://shaders/lente_cannocchiale.gdshader")
+	var colori: Dictionary = vista.get("colori", {})
+	for k in colori:
+		_mat.set_shader_parameter("colore_" + str(k), Color(str(colori[k])))
+	_mat.set_shader_parameter("raggio", LENTE_APERTA)
+	_mat.set_shader_parameter("nebbia", 1.0)
+	vetro.material = _mat
+	_lente.add_child(vetro)
+	add_child(_lente)
+	_mostra_hud(false)
+
+
+func _raggio(r: float) -> void:
+	if _mat != null:
+		_mat.set_shader_parameter("raggio", r)
+
+
+func _nebbia(n: float) -> void:
+	if _mat != null:
+		_mat.set_shader_parameter("nebbia", n)
+
+
+func _nebbia_ora() -> float:
+	return float(_mat.get_shader_parameter("nebbia")) if _mat != null else 1.0
+
+
+func _mostra_hud(si: bool) -> void:
+	if is_inside_tree():
+		for h in get_tree().get_nodes_in_group("hud"):
+			(h as CanvasLayer).visible = si
 
 
 func _unhandled_input(event: InputEvent) -> void:

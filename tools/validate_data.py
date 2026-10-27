@@ -1903,8 +1903,12 @@ def main():
             _v = _c.get(_k, [0, 0])
             if not (isinstance(_v, list) and len(_v) == 2 and all(isinstance(n, int) for n in _v)):
                 err(f"{_can_rel} [{_cid}]: {_k} deve essere [x, y] di interi")
-    if not (isinstance((_can.get("vista") or {}).get("volo"), (int, float)) and _can["vista"]["volo"] > 0):
-        err(f"{_can_rel}: vista.volo deve essere un numero di secondi > 0")
+    for _k in ("volo", "lente", "nebbia"):
+        if not (isinstance((_can.get("vista") or {}).get(_k), (int, float)) and _can["vista"][_k] > 0):
+            err(f"{_can_rel}: vista.{_k} deve essere un numero > 0")
+    for _k, _v in ((_can.get("vista") or {}).get("colori", {}) or {}).items():
+        if not (isinstance(_v, str) and len(_v) == 7 and _v.startswith("#")):
+            err(f"{_can_rel}: vista.colori.{_k} deve essere un colore #rrggbb")
     if "cannocchiale" not in vocab_arredi:
         err("data/world/arredi.json: manca 'cannocchiale', il disegno dei cannocchiali (US-8B24)")
 

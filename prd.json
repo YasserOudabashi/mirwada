@@ -631,8 +631,8 @@
       ],
       "priority": 37,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-27: shaders/lente_cannocchiale.gdshader: fuori dal cerchio il buio, anello d'ottone di un pixel e mezzo, dentro due strati di nebbia che scorrono, a quadretti della grana del gioco (640x360) e a retino Bayer (alpha 0 o 1). cannocchiale.gd: CanvasLayer 80 (sopra mondo e HUD, sotto il libro), la lente si stringe da 1.2 al raggio dei dati mentre la vista vola, arrivati la nebbia si dirada in vista.nebbia secondi; al ritorno la nebbia torna in 0.25 s, poi si vola indietro e la lente si apre. L'HUD (gruppo 'hud', aggiunto in hud.gd) si nasconde mentre si guarda. cannocchiali.json vista: lente 0.42, nebbia 2.4, colori Endesga (buio, anello, nebbia). Bersaglio spostato sul bordo dell'isola: nella lente il vuoto di nebbia sopra, l'isola con la porta senza muro sotto (prima solo terreno lilla). Test esteso. arte/revisione/cannocchiale_lente.png."
     }
   ]
 }

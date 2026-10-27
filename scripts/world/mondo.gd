@@ -1139,7 +1139,7 @@ func crea_cannocchiali() -> void:
 	for c in get_children():
 		if c is Area2D and (str(c.name).begins_with("Soglia_") or str(c.name).begins_with("Varco_")):
 			soglie[Vector2i(floori(c.position.x / tile), floori(c.position.y / tile))] = true
-	var volo: float = float((gd.call("get_vista_cannocchiale") as Dictionary).get("volo", 1.6))
+	var vista: Dictionary = gd.call("get_vista_cannocchiale")
 	var tutti: Dictionary = gd.call("get_cannocchiali")
 	for id in tutti:
 		var spec: Dictionary = tutti[id]
@@ -1153,7 +1153,7 @@ func crea_cannocchiali() -> void:
 		var q: Vector2i = cella_libera(c, soglie, "", regione_a(c.x, c.y))
 		var verso := Vector2((float(b[0]) + float(sb[0]) + 0.5) * tile, (float(b[1]) + float(sb[1]) + 0.5) * tile)
 		var n: Area2D = preload("res://scripts/cannocchiale.gd").new()
-		n.call("setup", str(id), Vector2((q.x + 0.5) * tile, (q.y + 0.5) * tile), verso, volo)
+		n.call("setup", str(id), Vector2((q.x + 0.5) * tile, (q.y + 0.5) * tile), verso, vista)
 		n.set_meta("livello", "superficie")
 		add_child(n)
 
