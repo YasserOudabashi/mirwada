@@ -354,6 +354,21 @@
     },
     "_comment_aspetto": "Tempi comuni a tutte le specie di data/pets: il disegno cambia per specie. Fogli assets/placeholder/pet_<id specie>_<animazione>.png; senza il foglio della specie AnimationMachine ripiega su pet_<animazione>.png (segnaposto)."
   },
+  "fauna": {
+    "_comment": "US-8B23: animali d'atmosfera (non nemici ne' pet: niente combattimento). Stessi tempi per tutte le specie, fogli per specie fauna_<specie>_<animazione>.png (tools/art/build_fauna.py), celle lette dal foglio: 32 px i piccoli, 64 il cervo. idle = tranquilli (pascola, becchetta, ali che si aprono piano, lucciola che pulsa), fuga = scappano (corrono o volano via). Chi scappa e dove sta e' in data/world/fauna.json.",
+    "idle": {
+      "frames": 4,
+      "durate_ms": [420, 300, 420, 300],
+      "loop": true,
+      "direzionale": true
+    },
+    "fuga": {
+      "frames": 6,
+      "durate_ms": [80, 80, 80, 80, 80, 80],
+      "loop": true,
+      "direzionale": true
+    }
+  },
   "budget_frame": {
     "_comment": "Conteggio dei frame da disegnare, per capire quanto costa davvero l'arte. Un personaggio completo sono 43 frame x 4 direzioni dove serve. Un artista fa 30-60 frame di qualita' al giorno: e' l'unico numero che dice quanto durera' l'arte.",
     "personaggio_completo": 156,

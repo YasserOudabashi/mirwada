@@ -577,6 +577,34 @@
       "fase": "8b",
       "passes": true,
       "notes": "2026-10-27: bottino.json tabella casa (monete, erbe, filo, cera, miele, gesso, pozione; 1-2 estrazioni); 'oggetti_casuali': 'casa' nella casa di Lena e nelle tre capanne dell'avamposto senza bottega (deposito, focolare, vedetta): non nelle botteghe, che vendono. interior_scene._crea_oggetti_casuali: seme = hash dell'id dell'interno, celle '.' libere (non arredi, forzieri, NPC, oggetti fissi) lontane dalla soglia, ordinate prima della scelta; chiave <interno>#<n>, tree_exiting di un oggetto raccolto -> WorldState.prendi (lista 'presi' nel salvataggio). Validator: la tabella esiste. 2 test. arte/revisione/oggetti_casuali.png. Aperto: gli oggetti fissi dei layout e degli interni ricompaiono ancora a ogni caricamento (comportamento di prima)."
+    },
+    {
+      "id": "US-8B23a",
+      "title": "Fauna d'atmosfera: dati e fogli",
+      "description": "Cervo, lepre, uccello, farfalla e lucciole come aspetti della categoria fauna (idle, fuga).",
+      "acceptanceCriteria": [
+        "categoria fauna in data/animations.json, fogli per specie",
+        "silhouette leggibili guardate ingrandite, nessun pixel sul bordo, alpha 0/255, palette",
+        "stessa grana dei personaggi (cella letta dal foglio)"
+      ],
+      "priority": 34,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: tools/art/build_fauna.py. Cervo con un modello suo (il quadrupede di forge3d sembrava un orso): zampe lunghe, collo, specchio bianco, palchi chiari ramificati; bruca col collo giu' e il muso parallelo all'erba (di fronte la testa usciva dalla cella), galoppa con la coda alzata. Lepre sua (orecchie lunghe con la punta nera, zampe dietro grandi): seduta e a balzi. Passero dal bird() di forge3d con petto chiaro e ali scure: a terra petto in fuori e becchetta, vola. Farfalla inclinata verso la camera: di fronte le ali arancio e gialle dal dritto. Lucciole: punti di luce disegnati pixel per pixel che pulsano sfasati. Celle 64 (cervo) e 32 (gli altri), piedi a 54/64. Rotazioni: rx positivo alza in avanti (muso, petto). Deterministico (md5 uguali). tests/test_fauna.gd. arte/revisione/fauna.png."
+    },
+    {
+      "id": "US-8B23b",
+      "title": "Fauna d'atmosfera nel gioco",
+      "description": "Dove stanno gli animali (regioni, momenti del giorno) e come scappano, nei dati; li posa il mondo attorno al giocatore.",
+      "acceptanceCriteria": [
+        "data/world/fauna.json: specie, regioni, densita', momenti, comportamento",
+        "uccelli e farfalle volano via, cervi e lepri scappano di corsa, lucciole solo di notte",
+        "verifica a schermo"
+      ],
+      "priority": 35,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
     }
   ]
 }

@@ -191,6 +191,11 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - Nel gioco la forma e' legata al suo modificatore (`StatsComponent.imposta_forma`, segnale `forma_cambiata`): il
   player cambia fogli quando comincia e torna Enel quando il modificatore se ne va, in qualunque modo.
 
+### Fauna d'atmosfera
+- Animali che non combattono (US-8B23): categoria `fauna` di `data/animations.json` (idle, fuga), una specie = un
+  aspetto, fogli da `tools/art/build_fauna.py` (cervo, lepre, uccello, farfalla, lucciola). Nei modelli rx positivo
+  alza in avanti (muso, petto, collo).
+
 ### Mondo, mappe e biomi
 - **La generazione procedurale del mondo è consentita come strumento di produzione**:
   `forge3d/world.py` produce biomi, fiumi, laghi, villaggi, strade, oggetti e spawn dal `seed`.
@@ -291,6 +296,7 @@ python tools/art/esporta_mondo.py --barca          # solo il disegno della barca
 python tools/art/build_interni.py              # interni: pavimenti, pareti e arredi -> assets/interni/<tema>/
 python tools/art/build_npc.py                  # aspetti degli NPC (personaggio_<aspetto>_{idle,walk}.png)
 python tools/art/build_ritratti.py             # ritratti 64x80 per aspetto, dallo stesso modello -> assets/ritratti/
+python tools/art/build_fauna.py                # fauna d'atmosfera: fauna_<specie>_{idle,fuga}.png (cervo 64, gli altri 32)
 python tools/art/build_forme.py                # forme di Enel (forms.json "aspetto"): personaggio_<aspetto>_<anim>.png, celle proprie
 python tools/art/build_libro.py                # carta (grande e piccola dell'avvio), segnalibri, caselle e filetto (assets/ui/)
 python tools/art/build_panorami.py             # panorama a 6 strati x 4 momenti dietro il libro all'avvio (assets/ui/panorama/)

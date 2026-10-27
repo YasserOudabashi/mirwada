@@ -67,7 +67,8 @@ le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti 
    sola, il bottino nello zaino), forzieri nella grotta di marea, nel sotterraneo di Mirwada e nella cripta; e
    **US-8B22b**: 9 forzieri nel sottosuolo del mondo (`bottino.json forzieri_mondo`, in un vicolo cieco vicino al punto);
    **US-8B22c**: oggetti a caso nelle casette (`oggetti_casuali` dell'interno), uno preso non ricompare.
-4. **Prossime**: US-8B23 fauna, US-8B24 cannocchiale;
+   E **US-8B23a**: i fogli della fauna d'atmosfera (cervo, lepre, uccello, farfalla, lucciole).
+4. **Prossime**: US-8B23b fauna nel gioco, US-8B24 cannocchiale;
    nuoto e arrampicata col loro gameplay (US-8B90, US-8B92, blocco H, con le animazioni). Evocazioni e
    antagonisti aspettano di avere una figura nel mondo.
    Evocazioni e antagonisti (blocco E) aspettano di avere una figura nel mondo (oggi summon scrive solo nel registro).

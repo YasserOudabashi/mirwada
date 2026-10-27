@@ -238,6 +238,8 @@ il mondo): uccelli e farfalle che volano via quando passi, cervi e animali
 grandi che pascolano e scappano, lucciole di notte (VFX). Non sono nemici né
 pet: niente combattimento, solo un comportamento "fuggi dal giocatore" letto
 dai dati. Story di codice + arte: spiegarla prima. *Domande (M).*
+*Fatta la US-8B23a (2026-10-27):* cervo, lepre, uccello, farfalla e lucciole (`tools/art/build_fauna.py`, categoria
+`fauna`). Resta la **8B23b**: dove stanno e come scappano, nel gioco.
 
 **US-8B24 [C+A] Cannocchiale.** Richiesta per la Frontiera: un cannocchiale fisso
 in cima al faro di Mirwada (il primo) e più avanti uno da tasca. Usandolo la

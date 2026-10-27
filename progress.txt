@@ -14776,3 +14776,18 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - 1050 test, validate 0. A schermo: arte/revisione/oggetti_casuali.png (candela sul tappeto da Lena, due oggetti
   nella vedetta).
 - Aperto (di prima, non toccato): gli oggetti fissi di layout e interni ricompaiono a ogni caricamento.
+
+## US-8B23a — Fauna d'atmosfera: dati e fogli, 2026-10-27
+- data/animations.json categoria "fauna": idle (4 frame, 420/300 ms) e fuga (6 frame, 80 ms), in ciclo, 4 direzioni;
+  una specie = un aspetto (fauna_<specie>_<animazione>.png), celle lette dal foglio come le forme.
+- tools/art/build_fauna.py (arte/sprite/ e assets/placeholder/): cervo (64), lepre, uccello, farfalla (32) dal motore
+  3D, lucciole pixel per pixel. Guardati ingranditi di lato, di fronte e di spalle; corretti:
+  - il cervo dal quadrupede di forge3d sembrava un orso: modello suo con zampe lunghe e collo; palchi scuri = ciuffo
+    nero, ora chiari e piegati indietro con le punte; brucando la testa restava alta (rx positivo ALZA il muso: avevo
+    il verso al contrario), poi di fronte usciva dalla cella in basso: collo quasi dritto e muso parallelo all'erba;
+  - la lepre sembrava un gatto: modello suo, orecchie lunghe; nella fuga le orecchie piatte la facevano un cane;
+  - il passero a terra era sdraiato (stesso verso sbagliato) e le punte delle ali chiuse finivano sotto terra;
+  - la farfalla di fronte mostrava il rovescio delle ali: inclinata verso la camera.
+- Controlli: nessun pixel sul bordo delle celle, alpha 0/255, colori Endesga 32; rilanciato = stessi md5.
+- tests/test_fauna.gd (cella dal foglio, stessa scala dei personaggi). 1051 test, validate 0. arte/revisione/fauna.png.
+- US-8B23b: dove stanno e come scappano (data/world/fauna.json) e il gioco che li posa.
