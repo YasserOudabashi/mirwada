@@ -210,6 +210,19 @@
       "durate_ms": [200, 160, 200, 200, 160, 200],
       "loop": true,
       "direzionale": true
+    },
+    "_comment_mezzi": "US-8B81: in volo (fly: sospeso, gambe che pendono, su e giu') e in barca (sail: in ginocchio, rema con la mano libera) prendono il posto di idle e walk. Nuoto e arrampicata arrivano col loro gameplay (US-8B90, US-8B92).",
+    "fly": {
+      "frames": 6,
+      "durate_ms": [160, 140, 160, 160, 140, 160],
+      "loop": true,
+      "direzionale": true
+    },
+    "sail": {
+      "frames": 6,
+      "durate_ms": [180, 150, 180, 180, 150, 180],
+      "loop": true,
+      "direzionale": true
     }
   },
   "nemico_base": {

@@ -198,7 +198,32 @@ def ritual(n=6):
     return out
 
 
+def fly(n=6):
+    """US-8B81: sospeso in aria (si vede bene in tutte e 4 le direzioni): gambe che pendono un po' piegate, braccio
+    libero aperto di lato, su e giu' leggero (in ciclo)."""
+    out = []
+    for i in range(n):
+        s = math.sin(2 * math.pi * i / n)
+        out.append(add_pose(REST, {
+            "hips": (0, 0, 0, 0, 0, 0.6 * s), "torso": (5 + 1.5 * s, 0, 0), "head": (-3, 0, 0),
+            "leg_l": (26 + 4 * s, 0, -6), "shin_l": (-58 - 6 * s, 0, 0), "leg_r": (38 - 4 * s, 0, 6),
+            "shin_r": (-72 + 6 * s, 0, 0), "arm_l": (14, 48 + 8 * s, 0), "fore_l": (22, 0, 0)}))
+    return out
+
+
+def sail(n=6):
+    """US-8B81: in ginocchio nella barca, la mano libera rema (in ciclo)."""
+    out = []
+    for i in range(n):
+        s = math.sin(2 * math.pi * i / n)
+        out.append(add_pose(REST, {
+            "hips": (0, 0, 0, 0, 0, -3.6), "leg_l": (70, 0, -6), "shin_l": (-118, 0, 0), "leg_r": (70, 0, 6),
+            "shin_r": (-118, 0, 0), "torso": (10 + 7 * s, 0, 0), "head": (-4 - 3 * s, 0, 0),
+            "arm_l": (40 + 34 * s, 0, -8), "fore_l": (30 - 10 * s, 0, 0)}))
+    return out
+
+
 CLIPS = {"idle": idle, "walk": walk, "run": run, "dash": dash, "attack_light": attack_light,
          "attack_heavy": attack_heavy, "parry": parry, "hurt": hurt, "death": death, "cast": cast,
          "meditate": meditate, "anticipo": anticipo, "attack": enemy_attack, "stagger": stagger,
-         "interact": interact, "pickup": pickup, "drink": drink, "ritual": ritual}
+         "interact": interact, "pickup": pickup, "drink": drink, "ritual": ritual, "fly": fly, "sail": sail}

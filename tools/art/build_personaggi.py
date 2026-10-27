@@ -128,7 +128,8 @@ CLIP_ENEL = {k: vivi(v) for k, v in dict(A.CLIPS, idle=clip_spalla(A.idle), walk
                                           hurt=clip_spalla(A.hurt), cast=clip_spalla(A.cast),
                                           meditate=clip_spalla(A.meditate), death=morte_di_lato,
                                           interact=clip_spalla(A.interact), pickup=clip_spalla(A.pickup),
-                                          drink=clip_spalla(A.drink), ritual=clip_spalla(A.ritual)).items()}
+                                          drink=clip_spalla(A.drink), ritual=clip_spalla(A.ritual),
+                                          fly=clip_spalla(A.fly), sail=clip_spalla(A.sail)).items()}
 
 
 # --- nemico_base ------------------------------------------------------------------------------------------------
