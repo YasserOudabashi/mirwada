@@ -157,8 +157,8 @@ func test_chiudi_esce_dal_negozio() -> void:
 	assert_true(p.call("in_negozio"), "negozio aperto")
 
 	var chiudi: Button = null
-	for c in p.get_children():
-		if c is Button and str(c.text) == tr("BOOK_NEGOZIO_CHIUDI"):
+	for c in p.find_children("*", "Button", true, false):   # sulla facciata destra (US-8B73b)
+		if str(c.text) == tr("BOOK_NEGOZIO_CHIUDI"):
 			chiudi = c
 	assert_true(chiudi != null, "il bottone Chiudi e' a schermo")
 	chiudi.pressed.emit()

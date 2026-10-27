@@ -18,6 +18,7 @@ extends CanvasLayer
 @onready var _pagina: ColorRect = $Pagina
 @onready var _titolo: Label = $Pagina/Titolo
 @onready var _contenuto: MarginContainer = $Pagina/Contenuto
+@onready var _destra: MarginContainer = $Pagina/Destra
 @onready var _voltata: ColorRect = $Pagina/Voltata
 @onready var _macchie: ColorRect = $Pagina/Macchie
 @onready var _note: Label = $Pagina/NoteMargine
@@ -46,6 +47,11 @@ const PAGINE := {
 ## US-8B74: all'avvio (nessuna partita, scaffale) il libro e' piu' piccolo e intorno scorre il panorama a strati
 ## (data/ui/book.json tema.avvio e tema.panorama). In partita il libro torna grande sopra il mondo.
 const PAGINA_GRANDE := Vector2(300, 170)        # meta' della pagina grande, come in book_overlay.tscn
+## US-8B73b: una pagina sta sulla facciata sinistra, col titolo; la sua proprieta' `destra` (se c'e') va sulla
+## facciata destra. Solo le pagine con "doppia_pagina" nei dati (la mappa) usano le due facciate come un foglio.
+## Niente si scrive sulla piega: PIEGA unita' libere da ogni lato del centro.
+const PIEGA := 16.0
+const BORDO := 24.0
 var _foglio: TextureRect = null
 var _carta_grande: Texture2D = null
 var _carta_avvio: Texture2D = null
@@ -222,9 +228,10 @@ func _rendi(pagina: String) -> void:
 	_titolo.text = str(gd.call("tr_data", nome)) if gd != null else nome
 	_aggiorna_macchie()
 
-	for c in _contenuto.get_children():
-		_contenuto.remove_child(c)   # subito fuori: get_child(0) e' sempre la pagina viva
-		c.queue_free()
+	for madre in [_contenuto, _destra]:
+		for c in madre.get_children():
+			madre.remove_child(c)   # subito fuori: get_child(0) e' sempre la pagina viva
+			c.queue_free()
 
 	if not b.call("pagina_sbloccata", pagina):
 		_contenuto.add_child(_riga("· appunto a matita ·\nquesta pagina si aprira' piu' avanti"))
@@ -233,6 +240,9 @@ func _rendi(pagina: String) -> void:
 	var scena: PackedScene = PAGINE.get(str(p.get("tipo", "")), null)
 	if scena != null:
 		var inst: Node = scena.instantiate()
+		var verso: Variant = inst.get("destra")
+		if verso is Control:
+			_destra.add_child(verso)      # prima di entrare nell'albero: la pagina sa che e' gia' a posto
 		_contenuto.add_child(inst)
 		if inst.has_method("aggiorna"):
 			inst.call("aggiorna")
@@ -358,8 +368,8 @@ func _applica_aspetto() -> void:
 	orn.texture = _texture_ui(str(t.get("ornamento", "")))
 	orn.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	orn.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	orn.anchor_left = 0.5
-	orn.anchor_right = 0.5
+	orn.anchor_left = 0.25                      # sotto il titolo, al centro della facciata sinistra
+	orn.anchor_right = 0.25
 	if orn.texture != null:
 		orn.offset_left = -orn.texture.get_width() / 2.0
 		orn.offset_right = orn.texture.get_width() / 2.0
@@ -547,6 +557,10 @@ func _disponi() -> void:
 	_pagina.offset_right = meta.x
 	_pagina.offset_top = -meta.y
 	_pagina.offset_bottom = meta.y
+	var doppia: bool = bool((b.call("pagina", _pagina_id) as Dictionary).get("doppia_pagina", false)) if b != null else false
+	_contenuto.anchor_right = 1.0 if doppia else 0.5
+	_contenuto.offset_right = -BORDO if doppia else -PIEGA
+	_destra.visible = not doppia
 	if _foglio != null:
 		_foglio.texture = _carta_avvio if piccolo else _carta_grande
 	# i segnalibri restano 6 unita' fuori dal bordo destro e 50 sotto quello alto, come sulla pagina grande

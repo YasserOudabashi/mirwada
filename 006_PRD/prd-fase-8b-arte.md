@@ -287,7 +287,8 @@ Rispettano il fog of war: nessun dettaglio rivela Sequenze non raggiunte.
 `tools/art/build_primitive.py`, colorati da `shaders/rampa_pathway.gdshader` con la palette di `data/vfx.json`;
 nella hotbar davanti al nome dell'abilita'.
 **US-8B73 [A] Pagine del libro. M per pagina.** Le 9 pagine di `data/ui/book.json`,
-i segnalibri, la voltata, le macchie, la pagina "follia".
+i segnalibri, la voltata, le macchie, la pagina "follia". **US-8B73b FATTA (2026-10-27)**: le due facciate (niente
+sulla piega, `doppia_pagina` solo la mappa), dialogo e negozio; US-8B73c/d per le altre pagine in `prd.json`.
 **US-8B74 [A] Panorami. L.** Schermata iniziale e libro: 6 strati × 4 fasce orarie. **FATTA (2026-10-27)**: decisione dell'utente,
 all'avvio il libro e' piu' piccolo e intorno scorre il panorama (citta' di mare col faro); 6 strati x 4 momenti in
 `tools/art/build_panorami.py`, carta piccola da `build_libro.py`, `book_overlay.gd`.

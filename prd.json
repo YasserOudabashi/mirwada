@@ -350,6 +350,46 @@
       "notes": "2026-10-27: GameData.ritratto(npc_id) dall'aspetto del roster; page_dialogo: ritratto a sinistra di nome e battuta (anche nel negozio), 1 texel = 1 unita', filtro nearest. Validator: ogni aspetto usato ha il ritratto 64x80. 2 test. Prova a schermo: arte/revisione/ritratti_in_gioco.png (Mirco, Ottavia, Lena)."
     },
     {
+      "id": "US-8B73b",
+      "title": "Le due facciate del libro, dialogo e negozio",
+      "description": "Niente si scrive sulla piega: una pagina sta sulla facciata sinistra col titolo, la sua proprieta' destra sulla facciata destra; solo doppia_pagina (la mappa) usa le due facciate come un foglio.",
+      "acceptanceCriteria": [
+        "book_overlay: facciate Contenuto e Destra, titolo a sinistra, doppia_pagina dai dati",
+        "dialogo: ritratto e battuta a sinistra, scelte a destra; negozio: compra a sinistra, vendi e Chiudi a destra, liste che scorrono",
+        "verifica a schermo voltando pagina"
+      ],
+      "priority": 21,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: book_overlay.tscn nodo Destra, Titolo e Contenuto sulla meta' sinistra (PIEGA 16 unita' libere dal centro); _disponi legge doppia_pagina; _rendi mette la `destra` della pagina sulla facciata destra prima che la pagina entri nell'albero. page_dialogo: var destra, _lista (ScrollContainer) per compra/vendi, _etichetta_riga che va a capo. Trovato e corretto: arrivando voltando pagina i Button con autowrap restavano alti come una colonna di lettere (Godot 4.3 non rifa' il testo al resize): _riadatta li reimpagina quando cambia la larghezza. test_libro_facciate.gd (2), test aggiornati. arte/revisione/libro_dialogo.png, libro_negozio.png."
+    },
+    {
+      "id": "US-8B73c",
+      "title": "Scaffale, frontespizio e colophon sulle due facciate",
+      "description": "Le pagine che oggi stanno tutte a sinistra usano anche la facciata destra.",
+      "acceptanceCriteria": [
+        "niente sulla piega, niente fuori dalla pagina",
+        "verifica a schermo"
+      ],
+      "priority": 22,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B73d",
+      "title": "Inventario, diagramma, sinergie e diario sulle due facciate",
+      "description": "Come US-8B73c per le pagine con le liste lunghe e il diagramma.",
+      "acceptanceCriteria": [
+        "niente sulla piega, niente fuori dalla pagina",
+        "verifica a schermo"
+      ],
+      "priority": 23,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
       "id": "US-8B41",
       "title": "VFX delle primitive, gruppo 1",
       "description": "buff_stat, summon, aura, heal, reveal_info, teleport, debuff_stat, illusion (le 8 piu' usate dalle abilita'): fogli a 4 toni colorati dalla rampa del Pathway, attorno a chi lancia.",

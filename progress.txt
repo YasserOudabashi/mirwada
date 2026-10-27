@@ -14604,3 +14604,21 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - Aperto: la pagina del dialogo usa tutta la doppia pagina e il testo lungo passa sopra la piega centrale (c'era gia').
   Mirco e Sidon restano provvisori finche' l'utente non sceglie il loro aspetto (art-brief-gemini.md 4): basta cambiare
   la loro voce in build_npc.ASPETTI e rilanciare build_npc.py e build_ritratti.py.
+
+## US-8B73b — Le due facciate del libro, dialogo e negozio, 2026-10-27
+- Prima tutte le pagine si stendevano sulle due facciate come un foglio solo: titoli, griglia del diagramma, testo del
+  dialogo e bottoni attraversavano la piega (screenshot di tutte le pagine in partita). design-ui-libro.md dice "una
+  pagina (o doppia pagina)" e book.json ha gia' doppia_pagina (solo la mappa), mai letto dal codice.
+- book_overlay: nodo Destra nella scena; titolo, ornamento e Contenuto sulla facciata sinistra, PIEGA = 16 unita' libere
+  da ogni lato del centro; _disponi legge doppia_pagina; _rendi mette la proprieta' `destra` della pagina sulla facciata
+  destra (prima di aggiungere la pagina, cosi' la pagina sa che e' gia' a posto; da sola, nei test, la tiene in fondo).
+- page_dialogo: ritratto e battuta a sinistra, scelte a destra; negozio: si compra a sinistra e si vende a destra in
+  liste che scorrono (il listino di Sidon usciva dal fondo della pagina), Chiudi a destra.
+- Trappola: un Button con autowrap creato quando la facciata non e' ancora impaginata (si arriva voltando pagina) resta
+  alto come una colonna di lettere: Godot 4.3 non rifa' il testo quando cambia la larghezza. _riadatta lo reimpagina
+  (spegne e riaccende autowrap) quando la larghezza cambia. Nei test headless non si vede (niente impaginazione vera):
+  si vede solo a schermo.
+- Test: test_libro_facciate.gd (2); test_page_dialogo e test_page_negozio cercano scelte e Chiudi sulla facciata destra.
+  1035 test, validate 0. A schermo: arte/revisione/libro_dialogo.png, libro_negozio.png.
+- Aperto (US-8B73c/d in prd.json): le altre pagine stanno tutte sulla sinistra (scaffale, frontespizio, colophon;
+  inventario, diagramma con la griglia stretta, sinergie, diario) e la facciata destra resta vuota.

@@ -71,7 +71,7 @@ func test_il_bottone_fa_avanzare_il_dialogo() -> void:
 	_de().call("avvia", "dlg_mirco", "npc_mirco")
 	p.call("aggiorna")
 	var primo: Button = null
-	for c in p.get_children():
+	for c in (p.get("destra") as Node).get_children():   # US-8B73b: le scelte stanno sulla facciata destra
 		if c is Button:
 			primo = c
 			break
@@ -95,7 +95,7 @@ func test_apri_creazione_mostra_lo_stato_vuoto_senza_un_crafter() -> void:
 
 	var chiudi: Button = null
 	var testo := ""
-	for c in p.get_children():
+	for c in p.find_children("*", "", true, false):     # Chiudi sta sulla facciata destra (US-8B73b)
 		if c is Label:
 			testo += " " + c.text
 		if c is Button and str(c.text) == tr("BOOK_NEGOZIO_CHIUDI"):

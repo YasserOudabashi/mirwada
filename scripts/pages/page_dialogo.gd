@@ -20,8 +20,15 @@ var _negozio_npc_id: String = ""
 ## (l'effetto crea_su_richiesta di una scelta) - stesso principio del negozio.
 var _creazione_npc_id: String = ""
 
+## US-8B73b: la facciata destra del libro (le scelte, la vendita, Chiudi). La mette sulla pagina di destra il libro
+## (book_overlay.gd); da sola, ad esempio nei test, resta in fondo a questa pagina.
+var destra := VBoxContainer.new()
+
 
 func _ready() -> void:
+	destra.name = "Destra"
+	if destra.get_parent() == null:
+		add_child(destra)
 	var de: Node = get_node_or_null("/root/DialogueEngine")
 	if de != null:
 		de.nodo_cambiato.connect(func(_n): aggiorna())
@@ -44,9 +51,12 @@ func _su_apri_creazione(npc_id: String) -> void:
 
 
 func aggiorna() -> void:
-	for c in get_children():
-		remove_child(c)   # subito fuori: get_children() non li conta piu' (queue_free e' differito)
-		c.queue_free()
+	for madre in [self, destra]:
+		for c in madre.get_children():
+			if c == destra:
+				continue
+			madre.remove_child(c)   # subito fuori: get_children() non li conta piu' (queue_free e' differito)
+			c.queue_free()
 
 	if not _negozio_npc_id.is_empty():
 		_disegna_negozio()
@@ -72,17 +82,16 @@ func aggiorna() -> void:
 	l_nome.add_theme_color_override("font_color", C_SPEAKER)
 	_con_ritratto(gd, chi, [l_nome, _riga(str(gd.call("tr_data", nodo.get("text_i18n", ""))))])
 
-	var vuota := Control.new()
-	vuota.custom_minimum_size = Vector2(0, 8)
-	add_child(vuota)
-
 	var valide: Array = de.call("scelte_valide")
 	for i in valide.size():
 		var b := Button.new()
 		b.text = str(gd.call("tr_data", (valide[i] as Dictionary).get("text_i18n", "")))
 		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		b.pressed.connect(func() -> void: de.call("scegli", i))
-		add_child(b)
+		destra.add_child(b)
+		# un Button che va a capo calcola l'altezza con la larghezza che ha adesso: se la facciata non e' ancora
+		# impaginata (si arriva voltando pagina) sarebbe alto come una colonna di lettere. Si ricalcola dopo.
+		b.resized.connect(_riadatta.bind(b))
 
 
 # --- modalita' negozio (US-811) ----------------------------------------
@@ -120,22 +129,24 @@ func _disegna_negozio() -> void:
 	var valuta_id: String = str((valuta_items[0] as Dictionary).get("id", ""))
 
 	var listino: Array = (npc.get("vendor", {}) as Dictionary).get("listino", [])
+	var compra_qui: VBoxContainer = _lista(self)           # a sinistra si compra, a destra si vende (US-8B73b)
 	for item_id in listino:
 		var iid: String = str(item_id)
 		var it: Dictionary = gd.call("get_item", iid)
 		var valore: int = _prezzo_con_rarita(gd, iid)
 		var h := HBoxContainer.new()
-		var l := Label.new()
-		l.custom_minimum_size = Vector2(200, 0)
+		var l := _etichetta_riga()
 		l.text = "%s — %d" % [str(gd.call("tr_data", it.get("name_i18n", iid))), valore]
 		h.add_child(l)
 		var b := Button.new()
 		b.text = tr("BOOK_NEGOZIO_COMPRA")
 		b.disabled = int(inv.call("conta", valuta_id)) < valore
+		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		b.pressed.connect(func() -> void: compra(iid))
 		h.add_child(b)
-		add_child(h)
+		compra_qui.add_child(h)
 
+	var vendi_qui: VBoxContainer = _lista(destra)
 	for categoria in gd.call("item_categories"):
 		if str(categoria) == "valuta":
 			continue
@@ -147,15 +158,15 @@ func _disegna_negozio() -> void:
 				continue
 			var prezzo: int = maxi(1, _prezzo_con_rarita(gd, iid2) / 2)
 			var h2 := HBoxContainer.new()
-			var l2 := Label.new()
-			l2.custom_minimum_size = Vector2(200, 0)
+			var l2 := _etichetta_riga()
 			l2.text = "%s  x%d" % [str(gd.call("tr_data", it2.get("name_i18n", iid2))), int(r.get("quantita", 0))]
 			h2.add_child(l2)
 			var b2 := Button.new()
 			b2.text = "%s (%d)" % [tr("BOOK_NEGOZIO_VENDI"), prezzo]
+			b2.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			b2.pressed.connect(func() -> void: vendi(iid2))
 			h2.add_child(b2)
-			add_child(h2)
+			vendi_qui.add_child(h2)
 
 	_aggiungi_chiudi()
 
@@ -164,7 +175,7 @@ func _aggiungi_chiudi() -> void:
 	var b := Button.new()
 	b.text = tr("BOOK_NEGOZIO_CHIUDI")
 	b.pressed.connect(_chiudi_negozio)
-	add_child(b)
+	destra.add_child(b)
 
 
 ## Torna al dialogo in corso se ce n'e' uno (es. la vendita di una quest
@@ -215,13 +226,12 @@ func _disegna_creazione() -> void:
 	var b := Button.new()
 	b.text = tr("BOOK_NEGOZIO_CHIUDI")
 	b.pressed.connect(_chiudi_creazione)
-	add_child(b)
+	destra.add_child(b)
 
 
 func _riga_creazione(gd: Node, inv: Node, id: String, dati: Dictionary, costo: Dictionary, e_blueprint: bool) -> void:
 	var h := HBoxContainer.new()
-	var l := Label.new()
-	l.custom_minimum_size = Vector2(280, 0)
+	var l := _etichetta_riga()
 	l.text = "%s — %s" % [str(gd.call("tr_data", dati.get("name_i18n", id))), _riassunto_costo(costo)]
 	h.add_child(l)
 	var b := Button.new()
@@ -321,7 +331,7 @@ func in_negozio() -> bool:
 
 func scelte_a_schermo() -> int:
 	var n := 0
-	for c in get_children():
+	for c in destra.get_children():
 		if c is Button:
 			n += 1
 	return n
@@ -351,6 +361,36 @@ func _con_ritratto(gd: Node, npc_id: String, righe: Array) -> void:
 		v.add_child(r)
 	h.add_child(v)
 	add_child(h)
+
+
+## Una lista che scorre e prende l'altezza che resta sulla facciata: il listino lungo non esce dalla pagina.
+func _lista(madre: Node) -> VBoxContainer:
+	var sc := ScrollContainer.new()
+	sc.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var v := VBoxContainer.new()
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(v)
+	madre.add_child(sc)
+	return v
+
+
+func _riadatta(b: Button) -> void:
+	if b.has_meta("largo") and is_equal_approx(float(b.get_meta("largo")), b.size.x):
+		return
+	b.set_meta("largo", b.size.x)
+	b.autowrap_mode = TextServer.AUTOWRAP_OFF        # rifa' l'impaginazione del testo con la larghezza vera
+	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
+
+## L'etichetta di una riga con un bottone accanto (negozio, creazione): prende lo spazio che resta sulla facciata e
+## va a capo, cosi' la riga non esce dalla pagina.
+func _etichetta_riga() -> Label:
+	var l := Label.new()
+	l.custom_minimum_size = Vector2(110, 0)
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	return l
 
 
 func _riga(t: String) -> Label:

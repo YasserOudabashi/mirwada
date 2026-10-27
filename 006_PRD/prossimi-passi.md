@@ -25,7 +25,7 @@ le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti 
 - La **PR #4** (`claude/mini-trailer-prompt-adq22o`) e' interamente dentro la PR #5: si puo' chiudere.
 - `main` e' ferma alla fase 7: va aggiornata mergiando la PR #5 quando l'utente lo decide.
 - CI GitHub Actions **accesa** su push a `main` e sulle pull request (validator + `tools/run_tests.sh`).
-- Verifica locale: `python tools/validate_data.py` e `bash tools/run_tests.sh` (1033 test, ~1 minuto).
+- Verifica locale: `python tools/validate_data.py` e `bash tools/run_tests.sh` (1035 test, ~1 minuto).
 
 ---
 
@@ -54,8 +54,10 @@ le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti 
    polvere dello scatto (`vfx.json feedback_colpo`); parata e postura restano accese sopra il nero di scena.
    E **US-8B35a/b ritratti**: mezzibusti 64x80 dallo stesso modello degli sprite (`tools/art/build_ritratti.py`),
    con barba, occhiali ed espressione nei dati degli aspetti; nella pagina del dialogo e del negozio.
-4. **Prossime**: creature (blocco E), animazioni nuove di Enel (blocco G). Aperto: la pagina del dialogo occupa
-   tutte e due le pagine del libro e il testo lungo attraversa la piega centrale.
+   E **US-8B73b le due facciate del libro**: niente sulla piega; dialogo a sinistra e scelte a destra, nel negozio
+   si compra a sinistra e si vende a destra, con le liste che scorrono.
+4. **Prossime**: US-8B73c/d (le altre pagine sulle due facciate: scaffale, frontespizio, colophon; inventario,
+   diagramma, sinergie, diario), poi creature (blocco E) e animazioni nuove di Enel (blocco G).
 5. Fase 12 (PRD `prd-fase-12-atto-2-3.md`, `prd-fase-12-mondo-vivo.md`).
 
 ---
