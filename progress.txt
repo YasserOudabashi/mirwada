@@ -14888,3 +14888,15 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   il mondo e il validator. Aperto: entrando in un interno la telecamera segue Enel e le stanze a nord finiscono sotto
   l'HUD (vale per tutti gli interni): story a parte.
 
+## US-8B18e — Inquadratura degli interni, 2026-10-28
+- Entrando in un interno la camera seguiva Enel senza limiti: nella casa base le stanze a nord finivano sotto l'HUD.
+  game_camera.gd inquadra_stanza(r): dove la stanza e' piu' piccola dello schermo i limiti si allargano allo schermo
+  (in larghezza a meta' per lato, in altezza tutto sopra) e la stanza sta ferma in basso al centro; sopra resta
+  sempre libera almeno l'altezza dell'HUD (MARGINE_HUD = 104 unita'), cosi' in una stanza alta (la torre
+  dell'Archivio, 352 unita') la camera scorre e la fila in cima arriva sotto la hotbar, non dietro.
+  interior_scene.riquadro() da' il rettangolo della stanza; mondo.entra lo usa al posto di clear_zone_limits;
+  uscendo tornano i bordi del mondo (come prima).
+- A schermo: casa base intera sotto l'HUD, ferma anche nel laboratorio; casa di Lena al centro in basso; torre che
+  scorre. arte/revisione/interni_inquadratura.png. Test test_mondo.test_entrando_la_camera_inquadra_la_stanza.
+  1066 test, validate 0.
+

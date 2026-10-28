@@ -406,7 +406,7 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   (US-8B41..43), feedback del colpo (US-8B40b), ritratti nel dialogo (US-8B35a/b), le pagine del libro sulle due
   facciate (US-8B73b/c/d), le forme di Enel, gigante e arma di luce (US-8B50a/b/c), i gesti di Enel (interagire, raccogliere, bere,
   rituale: US-8B80a/b), Enel in volo e in barca (US-8B81a/b), panorama dell'avvio (US-8B74), forzieri e oggetti nelle case (US-8B22a/b/c), fauna d'atmosfera (US-8B23a/b), cannocchiale del faro con la lente (US-8B24a/b), buio di notte (US-8B25), base del giocatore con le stanze
-  e la sede (US-8B20a/b).
+  e la sede (US-8B20a/b), la camera che inquadra gli interni sotto l'HUD (US-8B18e).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.

@@ -566,6 +566,32 @@ func test_entrare_e_uscire_da_un_interno() -> void:
 	main.free()
 
 
+## US-8B18e: entrando la camera inquadra la stanza: piu' piccola dello schermo sta ferma in basso al centro (l'HUD in
+## alto non copre le stanze a nord); piu' grande la camera la segue dentro i suoi bordi, con l'HUD sopra la fila in cima.
+func test_entrando_la_camera_inquadra_la_stanza() -> void:
+	var main := Node2D.new()
+	var m: Node2D = _mondo()
+	main.add_child(m)
+	var p := CharacterBody2D.new()
+	p.add_to_group("player")
+	var cam: Camera2D = preload("res://scripts/game_camera.gd").new()
+	p.add_child(cam)
+	m.add_child(p)
+	Engine.get_main_loop().root.add_child(main)
+	var vis: Vector2 = cam.get_viewport_rect().size / cam.zoom
+	for iid in ["base_casa", "archivio_torre_osservazione"]:
+		assert_true(m.call("entra", m.get_node("Porta_" + iid)), "si entra in %s" % iid)
+		var r: Rect2 = (m.get("_interno") as Node).call("riquadro")
+		assert_eq(cam.limit_bottom, int(r.end.y), "%s: il fondo della stanza e' il fondo dello schermo" % iid)
+		assert_true(absf((cam.limit_left + cam.limit_right) / 2.0 - r.get_center().x) <= 1.0, "%s: al centro" % iid)
+		assert_eq(cam.limit_right - cam.limit_left, int(maxf(r.size.x, vis.x)), "%s: largo quanto lo schermo o la stanza" % iid)
+		assert_eq(cam.limit_bottom - cam.limit_top, int(r.size.y + maxf(vis.y - r.size.y, cam.get("MARGINE_HUD"))),
+				"%s: lo spazio in piu' sta sopra, almeno quanto l'HUD" % iid)
+		m.call("esci")
+		assert_eq(cam.limit_right, int(m.larghezza * m.tile), "fuori tornano i bordi del mondo")
+	main.free()
+
+
 func test_salvare_dentro_un_interno_riporta_davanti_alla_porta() -> void:
 	var main := Node2D.new()
 	var m: Node2D = _mondo()

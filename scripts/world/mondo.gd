@@ -637,8 +637,8 @@ func entra(porta: Area2D) -> bool:
 	_interno = interno
 	p.global_position = interno.call("punto_spawn")
 	for cam in p.find_children("*", "Camera2D", true, false):
-		if cam.has_method("clear_zone_limits"):
-			cam.call("clear_zone_limits")              # la stanza resta al centro dello schermo
+		if cam.has_method("inquadra_stanza"):
+			cam.call("inquadra_stanza", interno.call("riquadro"))   # US-8B18e: la stanza ferma, sotto l'HUD
 		(cam as Camera2D).reset_smoothing()
 	return true
 

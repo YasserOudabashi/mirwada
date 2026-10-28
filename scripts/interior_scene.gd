@@ -335,6 +335,12 @@ func _cella_spawn(layout: Dictionary) -> Vector2i:
 
 ## Posizione globale di spawn - dove il giocatore appare entrando dalla
 ## porta esterna.
+## US-8B18e: il rettangolo della stanza disegnata, in coordinate mondo (per l'inquadratura della camera).
+func riquadro() -> Rect2:
+	var r: Rect2i = get_used_rect()
+	return Rect2(to_global(Vector2(r.position * TILE)), Vector2(r.size * TILE) * global_scale)
+
+
 func punto_spawn() -> Vector2:
 	var gd: Node = get_node_or_null("/root/GameData")
 	var layout: Dictionary = gd.call("get_interno", interno_id) if gd != null else {}

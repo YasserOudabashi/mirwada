@@ -680,6 +680,21 @@
       "notes": "2026-10-28. Porte dai layout (edifici.villaggio = villaggio o luogo di mondo.json); nella Valle una capanna in piu' (esporta_mondo.py --edifici: una casa per interno del villaggio). Sede in BaseSystem (rooms.json sede_iniziale, sposta, sede_cambiata, salvataggio); interior_scene arreda le stanze dal livello, prompt '[F] Base' solo nella sede, '[F] Sposta qui la base' nell'ingresso delle altre. tests/test_base_scena.gd. arte/revisione/base_in_gioco.png."
     },
     {
+      "id": "US-8B18e",
+      "title": "Inquadratura degli interni",
+      "description": "Entrando in un interno la camera inquadra la stanza: piccola sta ferma in basso al centro, grande scorre; sopra resta libero lo spazio dell'HUD.",
+      "acceptanceCriteria": [
+        "limiti della camera dalla stanza",
+        "l'HUD non copre la fila in cima",
+        "test",
+        "verifica a schermo"
+      ],
+      "priority": 40,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-28. game_camera.inquadra_stanza (MARGINE_HUD 104 unita'), interior_scene.riquadro, mondo.entra. Casa base intera sotto l'HUD, torre dell'Archivio che scorre. arte/revisione/interni_inquadratura.png."
+    },
+    {
       "id": "US-8B20c",
       "title": "Giardino e strutture attorno alla base",
       "description": "L'orto all'aperto con le piante che crescono e le strutture (palizzata, totem, deposito) costruite dalla pagina Base.",
