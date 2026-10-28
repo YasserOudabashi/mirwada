@@ -91,6 +91,7 @@ func _ready() -> void:
 	crea_forzieri()
 	crea_cannocchiali()
 	add_child(preload("res://scripts/world/fauna.gd").new())
+	add_child(preload("res://scripts/world/base_fuori.gd").new())   # US-8B20c: l'orto fuori dalla sede della base
 	add_child(preload("res://scripts/world/luce.gd").new())
 	var t := Timer.new()
 	t.wait_time = INTERVALLO_ATTIVITA
@@ -824,6 +825,38 @@ func _varco_sta(q: Vector2i, rid: String, parete: bool) -> bool:
 		if bloccata(q.x + dx, q.y - 1) != parete or (parete and _in_una_casa(q.x + dx, q.y - 1)):
 			return false
 	return true
+
+
+## Un punto coperto da un oggetto di scena che gli sta davanti (un albero piu' a sud, con la chioma sopra il punto):
+## il disegno dell'oggetto non e' trasparente li'. La fauna (US-8B23b) e l'orto della base (US-8B20c) non ci si mettono.
+func coperto(punto: Vector2) -> bool:
+	var lato: int = BLOCCO
+	var meta: Dictionary = dati.get("sprite", {})
+	var per_blocco: Dictionary = _oggetti_per_blocco
+	var c := Vector2i(floori(punto.x / tile / lato), floori(punto.y / tile / lato))
+	for dy in range(0, 2):                                  # chi copre sta allo stesso blocco o a quello sotto
+		for dx in range(-1, 2):
+			for o in per_blocco.get(c + Vector2i(dx, dy), []):
+				var base := Vector2(float(o[1]) * tile, float(o[2]) * tile)
+				if base.y <= punto.y:
+					continue
+				var img: Image = _immagine_oggetto(str(o[0]))
+				var m: Dictionary = meta.get(str(o[0]), {})
+				var t: Vector2i = Vector2i(punto - base + Vector2(float(m.get("ax", 0)), float(m.get("ay", 0))))
+				if img != null and t.x >= 0 and t.y >= 0 and t.x < img.get_width() and t.y < img.get_height() \
+						and img.get_pixel(t.x, t.y).a > 0.5:
+					return true
+	return false
+
+
+var _immagini_oggetti: Dictionary = {}
+
+
+func _immagine_oggetto(chiave: String) -> Image:
+	if not _immagini_oggetti.has(chiave):
+		var tex: Texture2D = _texture_oggetto(chiave)
+		_immagini_oggetti[chiave] = tex.get_image() if tex != null else null
+	return _immagini_oggetti[chiave]
 
 
 func _in_una_casa(x: int, y: int) -> bool:

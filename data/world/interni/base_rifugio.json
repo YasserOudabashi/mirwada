@@ -38,6 +38,8 @@
       "y": 5
     }
   ],
+  "_comment_esterno": "US-8B20c: fuori dalla porta della base nel mondo, caselle dalla porta (x, y) dove cercare il posto dell'orto (la casella libera piu' vicina).",
+  "esterno": {"giardino": [3, 1]},
   "stanze": {
     "laboratorio": {
       "rect": [

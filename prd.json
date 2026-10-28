@@ -696,8 +696,24 @@
     },
     {
       "id": "US-8B20c",
-      "title": "Giardino e strutture attorno alla base",
-      "description": "L'orto all'aperto con le piante che crescono e le strutture (palizzata, totem, deposito) costruite dalla pagina Base.",
+      "title": "L'orto fuori dalla base",
+      "description": "L'orto all'aperto accanto alla sede, con le piante che crescono; dall'orto la pagina Base.",
+      "acceptanceCriteria": [
+        "un appezzamento per appezzamento del giardino, disegno dello stato di crescita",
+        "cantiere senza giardino",
+        "va con la sede",
+        "test",
+        "verifica a schermo"
+      ],
+      "priority": 40,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-28. scripts/world/base_fuori.gd; posto da 'esterno' dell'interno della base (caselle dalla porta, fila libera, non sotto tetti o chiome: mondo.coperto); stadi da balance giardino.pianta_da. Prompt '[F] Orto' apre la pagina Base. tests/test_base_fuori.gd. arte/revisione/base_orto.png."
+    },
+    {
+      "id": "US-8B20d",
+      "title": "La nave come base",
+      "description": "Il modello della nave ormeggiata, la passerella, l'interno della nave.",
       "acceptanceCriteria": [
         "verifica a schermo"
       ],
@@ -707,10 +723,14 @@
       "notes": ""
     },
     {
-      "id": "US-8B20d",
-      "title": "La nave come base",
-      "description": "Il modello della nave ormeggiata, la passerella, l'interno della nave.",
+      "id": "US-8B20e",
+      "title": "Le strutture attorno alla base",
+      "description": "Palizzata, totem di veglia e deposito: si costruiscono dalla pagina Base (costo nei dati) e compaiono fuori dalla sede, in posti fissi accanto alla casa; vanno con la sede.",
       "acceptanceCriteria": [
+        "costo delle strutture nei dati",
+        "costruisci dalla pagina Base",
+        "disegnate accanto alla sede",
+        "test",
         "verifica a schermo"
       ],
       "priority": 40,

@@ -246,6 +246,12 @@ def valida_stanze(doc, rel, vocab, calpestabili, rooms):
                     err(f"{rel}: stanze.{tipo} livello {lv}: '{a.get('id')}' esce dalla stanza {st.get('rect')}")
             valida_arredi(dict(doc, arredi=list(doc.get("arredi", [])) + list(arredi)),
                           f"{rel} stanze.{tipo} livello {lv}", vocab, calpestabili)
+    # US-8B20c: "esterno" {voce: [dx, dy]} = dove sta fuori dalla porta, voce = una stanza all'aperto (il giardino)
+    for voce, sc in doc.get("esterno", {}).items():
+        if voce not in rooms:
+            err(f"{rel}: esterno.{voce} non e' una stanza di data/base/rooms.json")
+        if not (isinstance(sc, list) and len(sc) == 2 and all(isinstance(v, int) for v in sc)):
+            err(f"{rel}: esterno.{voce} deve essere [dx, dy] interi (caselle dalla porta)")
 
 
 def main():
@@ -2634,6 +2640,9 @@ def main():
 
     # --- giardino (data/balance.json giardino + ingredienti coltivabili, US-328) ---
     giardino = (balance_doc or {}).get("giardino", {})
+    pd = giardino.get("pianta_da", 0.5)
+    if not (isinstance(pd, (int, float)) and 0 < pd < 1):
+        err("data/balance.json [giardino.pianta_da]: deve essere una frazione fra 0 e 1")
     tc = giardino.get("tempo_crescita_s")
     if not isinstance(tc, (int, float)) or tc <= 0:
         err("data/balance.json [giardino.tempo_crescita_s]: deve essere un numero > 0")

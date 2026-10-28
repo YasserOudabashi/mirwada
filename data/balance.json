@@ -28,7 +28,9 @@
   "giardino": {
     "_comment": "Il giardino della base (US-328). tempo_crescita_s: secondi di tempo di gioco (non wall-clock; si ferma col libro aperto) prima che un appezzamento sia pronto. resa_base: item raccolti; il bonus 'resa_raccolto' del giardino si somma. Numeri PLAUSIBILI, non bilanciati.",
     "tempo_crescita_s": 30.0,
-    "resa_base": 2
+    "resa_base": 2,
+    "_comment_pianta_da": "US-8B20c: l'orto all'aperto mostra il germoglio finche' la crescita fatta e' sotto questa frazione, poi la pianta; pronto = maturo.",
+    "pianta_da": 0.5
   },
   "talenti": {
     "_comment": "Talenti (US-330..333). innati_alla_creazione: quanti talenti 'innato' il giocatore sceglie alla creazione personaggio (US-332).",

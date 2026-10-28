@@ -14900,3 +14900,19 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   scorre. arte/revisione/interni_inquadratura.png. Test test_mondo.test_entrando_la_camera_inquadra_la_stanza.
   1066 test, validate 0.
 
+## US-8B20c — L'orto fuori dalla base, 2026-10-28
+- scripts/world/base_fuori.gd (figlio del mondo, "BaseFuori"): accanto alla porta della sede l'orto all'aperto,
+  un appezzamento per ogni appezzamento del giardino (BaseSystem) col disegno del suo stato: orto_vuoto, germoglio
+  (sotto data/balance.json giardino.pianta_da = 0.5 della crescita), pianta, maturo (pronto). Senza giardino il
+  cantiere. Si ridisegna ai segnali di BaseSystem e ogni secondo (la crescita); va con la sede (sede_cambiata); una
+  sede senza porta nel mondo (la nave, per ora) non ha l'orto. Vicino "[F] Orto" apre la pagina Base.
+- Il posto: "esterno".giardino dell'interno della base ([3, 1] caselle dalla porta), la fila libera piu' vicina
+  larga quanto il giardino piu' grande (il cantiere, 2), nella regione della porta, non sul passaggio della porta,
+  non sotto un tetto ne' sotto una chioma.
+- La prova "coperto da una chioma" della fauna e' passata nel mondo (mondo.coperto(punto)): la usano la fauna e
+  l'orto. Validator: esterno.<voce> una stanza di rooms.json e [dx, dy] interi; giardino.pianta_da fra 0 e 1.
+- A schermo: al porto il cantiere, poi germoglio e maturo accanto (luminoso e cupo); nella Valle la prima volta
+  l'orto era sotto un albero (da qui il controllo della chioma), ora in una radura; il prompt prima copriva Enel,
+  poi toccava la hotbar, ora sta una casella sopra le cassette. arte/revisione/base_orto.png.
+- tests/test_base_fuori.gd (3). 1069 test, validate 0.
+

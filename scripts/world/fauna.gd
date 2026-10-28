@@ -59,7 +59,7 @@ func popola(b: Vector2i, solo: Array = [], momento: String = "") -> void:
 					or str(_mondo.call("regione_a", q.x, q.y)) not in (s.get("regioni", []) as Array):
 				continue
 			var a: AnimatedSprite2D = _crea(nome, s, q, rng)
-			if _coperto(a.position + Vector2(0, -8)):          # sotto una chioma non si vedrebbe: niente
+			if _mondo.call("coperto", a.position + Vector2(0, -8)):          # sotto una chioma non si vedrebbe: niente
 				a.free()
 				continue
 			lista.append(a)
@@ -183,39 +183,6 @@ func _gira(da: Vector2, v: Vector2) -> Vector2:
 		if not _muro(da + (w as Vector2).normalized() * float(_mondo.get("tile"))):
 			return w
 	return -v
-
-
-## Un punto coperto da un oggetto di scena che gli sta davanti (un albero piu' a sud, con la chioma sopra il punto):
-## il disegno dell'oggetto non e' trasparente li'.
-func _coperto(punto: Vector2) -> bool:
-	var tile: float = float(_mondo.get("tile"))
-	var lato: int = int(_mondo.get_script().get_script_constant_map().get("BLOCCO", 16))
-	var meta: Dictionary = (_mondo.get("dati") as Dictionary).get("sprite", {})
-	var per_blocco: Dictionary = _mondo.get("_oggetti_per_blocco")
-	var c := Vector2i(floori(punto.x / tile / lato), floori(punto.y / tile / lato))
-	for dy in range(0, 2):                                  # chi copre sta allo stesso blocco o a quello sotto
-		for dx in range(-1, 2):
-			for o in per_blocco.get(c + Vector2i(dx, dy), []):
-				var base := Vector2(float(o[1]) * tile, float(o[2]) * tile)
-				if base.y <= punto.y:
-					continue
-				var img: Image = _immagine(str(o[0]))
-				var m: Dictionary = meta.get(str(o[0]), {})
-				var t: Vector2i = Vector2i(punto - base + Vector2(float(m.get("ax", 0)), float(m.get("ay", 0))))
-				if img != null and t.x >= 0 and t.y >= 0 and t.x < img.get_width() and t.y < img.get_height() \
-						and img.get_pixel(t.x, t.y).a > 0.5:
-					return true
-	return false
-
-
-var _immagini: Dictionary = {}
-
-
-func _immagine(chiave: String) -> Image:
-	if not _immagini.has(chiave):
-		var tex: Texture2D = _mondo.call("_texture_oggetto", chiave)
-		_immagini[chiave] = tex.get_image() if tex != null else null
-	return _immagini[chiave]
 
 
 func _momento() -> String:
