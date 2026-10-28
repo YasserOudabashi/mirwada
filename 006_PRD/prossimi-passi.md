@@ -71,7 +71,10 @@ le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti 
    avvicina Enel (`data/world/fauna.json`, `scripts/world/fauna.gd`). E **US-8B24a**: il cannocchiale sul molo del
    faro, la vista vola alla Frontiera e torna (`data/world/cannocchiali.json`, `scripts/cannocchiale.gd`); **US-8B24b**:
    la lente con la nebbia che si dirada. E **US-8B25**: il buio di notte (`data/world/luce.json`, `scripts/world/luce.gd`).
-4. **Prossime**: la base del giocatore nelle 4 versioni (US-8B20, decisioni dell'utente del 2026-10-27); il
+   E la base del giocatore: **US-8B20a** (gli interni delle 4 basi a piu' stanze, arredi per livello) e **US-8B20b**
+   (porte sul mondo, stanze arredate dal livello della sede, la pagina Base dalle stanze, la sede che si sposta).
+4. **Prossime**: la base: giardino e strutture all'aperto (US-8B20c), la nave (US-8B20d); l'inquadratura degli
+   interni (le stanze a nord finiscono sotto l'HUD); il
    cannocchiale da tasca;
    nuoto e arrampicata col loro gameplay (US-8B90, US-8B92, blocco H, con le animazioni). Evocazioni e
    antagonisti aspettano di avere una figura nel mondo.

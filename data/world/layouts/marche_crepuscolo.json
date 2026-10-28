@@ -357,5 +357,12 @@
       "terra_di_cimitero",
       "velo_di_mezzanotte"
     ]
-  }
+  },
+  "edifici": [
+    {
+      "x": 5,
+      "y": 44,
+      "interno_id": "base_rifugio", "villaggio": "rifugio_base_marche"
+    }
+  ]
 }

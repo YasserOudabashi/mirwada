@@ -341,6 +341,11 @@ func room_levels(tipo: String) -> Array:
 
 
 ## Vocabolario chiuso dei 4 tipi di stanza.
+## US-8B20b: l'interno dove sta la base all'inizio della partita.
+func base_sede_iniziale() -> String:
+	return str(_rooms.get("sede_iniziale", ""))
+
+
 func room_type_ids() -> Array:
 	return _array_or_empty(_room_types.get("tipi"))
 

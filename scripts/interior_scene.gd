@@ -54,6 +54,7 @@ func _ready() -> void:
 	_dipingi(layout)
 	_arte()
 	_crea_arredi(layout)
+	_crea_stanze(layout)
 	_crea_forzieri(layout)
 	_crea_uscita(layout)
 	_crea_nemici(layout)
@@ -91,7 +92,7 @@ func _arte() -> void:
 
 ## US-8B18d: gli arredi dei dati (data/world/arredi.json), disegni di build_interni.py
 ## con i piedi in basso al centro; le caselle di un arredo che blocca diventano muro.
-func _crea_arredi(layout: Dictionary) -> void:
+func _crea_arredi(layout: Dictionary, stanza: String = "") -> void:
 	var gd: Node = get_node_or_null("/root/GameData")
 	var gs: Node = get_node_or_null("/root/GameState")
 	var cartella: String = "res://assets/interni/%s/arredi" % (str(gs.call("tema_arte")) if gs != null else "luminoso")
@@ -119,7 +120,119 @@ func _crea_arredi(layout: Dictionary) -> void:
 		spr.position = Vector2((c.x + float(m[0]) / 2.0) * TILE, (c.y + int(m[1])) * TILE)
 		if bool(voce.get("a_terra", false)):
 			spr.z_index = -1                          # i tappeti stanno sotto chi ci passa
+		if not stanza.is_empty():
+			spr.set_meta("stanza", stanza)            # US-8B20b: si rifanno quando la stanza cambia livello
 		add_child(spr)
+
+
+# --- Base del giocatore (US-8B20b) --------------------------------------------------
+
+var _stanza_vicina: String = ""
+var _sposta_vicino := false
+var _layout_base: Dictionary = {}
+
+
+## Le stanze di una base (layout "stanze" {tipo: {rect, livelli}}): gli arredi del livello costruito di ogni stanza
+## (BaseSystem; in una base che non e' la sede sono tutte cantieri). Stando in una stanza "interagisci" apre la pagina
+## Base del libro; nell'ingresso di una base che non e' la sede, "interagisci" ci sposta la base.
+func _crea_stanze(layout: Dictionary) -> void:
+	var stanze: Dictionary = layout.get("stanze", {})
+	if stanze.is_empty():
+		return
+	_arreda_stanze(layout)
+	for tipo in stanze:
+		var r: Array = (stanze[tipo] as Dictionary).get("rect", [0, 0, 1, 1])
+		add_child(_zona("Stanza_%s" % tipo, Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])), "HUD_PROMPT_BASE",
+				func(dentro: bool) -> void: _stanza_vicina = str(tipo) if dentro else ("" if _stanza_vicina == str(tipo) else _stanza_vicina)))
+	var sp: Vector2i = _cella_spawn(layout)
+	add_child(_zona("Sposta_base", Rect2i(sp.x - 2, sp.y - 1, 5, 2), "HUD_PROMPT_SPOSTA_BASE",
+			func(dentro: bool) -> void: _sposta_vicino = dentro))
+	_layout_base = layout
+	var bs: Node = get_node_or_null("/root/BaseSystem")
+	if bs != null:
+		for sig in ["stanza_costruita", "stanza_potenziata", "sede_cambiata"]:
+			bs.connect(sig, _su_base_cambiata)            # un metodo: si stacca da solo quando la stanza se ne va
+	_aggiorna_prompt_base()
+
+
+func _su_base_cambiata(_a: Variant = null, _b: Variant = null) -> void:
+	_arreda_stanze(_layout_base)
+
+
+## Rifa' gli arredi delle stanze al livello di adesso: il pavimento della stanza torna quello della mappa.
+func _arreda_stanze(layout: Dictionary) -> void:
+	for c in get_children():
+		if c.has_meta("stanza"):
+			remove_child(c)
+			c.queue_free()
+	var mappa: Array = layout.get("mappa", [])
+	var bs: Node = get_node_or_null("/root/BaseSystem")
+	var mia: bool = bs != null and str(bs.call("sede")) == interno_id
+	var stanze: Dictionary = layout.get("stanze", {})
+	for tipo in stanze:
+		var st: Dictionary = stanze[tipo]
+		var r: Array = st.get("rect", [0, 0, 0, 0])
+		for y in range(int(r[1]), int(r[1]) + int(r[3])):
+			for x in range(int(r[0]), int(r[0]) + int(r[2])):
+				set_cell(Vector2i(x, y), SORGENTE, Vector2i(int(_COLONNA_PER_CARATTERE.get(str(mappa[y])[x], 0)), 0))
+		var livelli: Array = st.get("livelli", [[]])
+		var lv: int = clampi(int(bs.call("livello", tipo)) if mia else 0, 0, livelli.size() - 1)
+		_crea_arredi({"arredi": livelli[lv]}, str(tipo))
+	_aggiorna_prompt_base()
+
+
+func _zona(nome: String, r: Rect2i, chiave: String, su_dentro: Callable) -> Area2D:
+	var area := Area2D.new()
+	area.name = nome
+	area.position = Vector2(r.position.x + r.size.x / 2.0, r.position.y + r.size.y / 2.0) * TILE
+	var forma := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(r.size) * TILE
+	forma.shape = rect
+	area.add_child(forma)
+	var prompt := Label.new()
+	prompt.name = "Prompt"
+	prompt.add_theme_font_size_override("font_size", 10)
+	prompt.add_theme_constant_override("outline_size", 4)
+	prompt.add_theme_color_override("font_outline_color", Color("#181425"))
+	prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	prompt.size = Vector2(maxf(r.size.x, 5) * TILE, TILE * 0.5)
+	prompt.position = Vector2(-prompt.size.x / 2.0, r.size.y * TILE / 2.0 - TILE * 0.75)
+	prompt.z_index = 10
+	prompt.text = tr(chiave).format({"tasto": _tasto_interagisci()})
+	prompt.hide()
+	area.add_child(prompt)
+	area.body_entered.connect(func(b: Node) -> void:
+		if b.is_in_group("player"):
+			su_dentro.call(true)
+			_aggiorna_prompt_base())
+	area.body_exited.connect(func(b: Node) -> void:
+		if b.is_in_group("player"):
+			su_dentro.call(false)
+			_aggiorna_prompt_base())
+	return area
+
+
+## Il prompt della stanza in cui si sta (solo nella sede: altrove le stanze sono cantieri); quello dell'ingresso solo
+## se la base non e' qui.
+func _aggiorna_prompt_base() -> void:
+	var bs: Node = get_node_or_null("/root/BaseSystem")
+	var mia: bool = bs != null and str(bs.call("sede")) == interno_id
+	for c in get_children():
+		if str(c.name).begins_with("Stanza_"):
+			(c.get_node("Prompt") as Label).visible = mia and str(c.name) == "Stanza_" + _stanza_vicina
+		elif str(c.name) == "Sposta_base":
+			(c.get_node("Prompt") as Label).visible = _sposta_vicino and not mia
+
+
+## Il libro sulla pagina Base (inventario, sezione base).
+func apri_base() -> bool:
+	var book: Node = get_node_or_null("/root/Book")
+	if book == null or bool(book.call("e_aperto")):
+		return false
+	preload("res://scripts/pages/page_inventario.gd").prossima_sezione = "base"
+	book.call("apri_a", "inventario")
+	return true
 
 
 ## US-8B22: i forzieri dei dati (scripts/forziere.gd); la loro casella diventa muro come quella di un arredo,
@@ -386,11 +499,20 @@ func _tasto_interagisci() -> String:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not event.is_action_pressed("interagisci") or _npc_vicino.is_empty():
+	if not event.is_action_pressed("interagisci"):
 		return
 	var de: Node = get_node_or_null("/root/DialogueEngine")
 	var book: Node = get_node_or_null("/root/Book")
-	if de == null or bool(de.call("in_corso")) or (book != null and bool(book.call("e_aperto"))):
+	if (de != null and bool(de.call("in_corso"))) or (book != null and bool(book.call("e_aperto"))):
+		return
+	var bs: Node = get_node_or_null("/root/BaseSystem")
+	if _sposta_vicino and bs != null and bool(bs.call("sposta", interno_id)):      # US-8B20b
+		get_viewport().set_input_as_handled()
+		return
+	if not _stanza_vicina.is_empty() and bs != null and str(bs.call("sede")) == interno_id and apri_base():
+		get_viewport().set_input_as_handled()
+		return
+	if _npc_vicino.is_empty() or de == null:
 		return
 	var gd: Node = get_node_or_null("/root/GameData")
 	var did: String = str(gd.call("get_npc", _npc_vicino).get("dialogue_id", "")) if gd != null else ""

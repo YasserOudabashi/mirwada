@@ -522,7 +522,8 @@ func _porte_da(rid: String, layout: Dictionary, prese: Dictionary) -> void:
 		var iid: String = str(spec.get("interno_id", ""))
 		if iid.is_empty() or not (dati.get("riquadri", {}) as Dictionary).has(rid):
 			continue
-		var vil: Array = (dati.get("villaggi", {}) as Dictionary).get(str(spec.get("villaggio", "")), [])
+		var vid: String = str(spec.get("villaggio", ""))           # un villaggio, o un luogo (la casa della base, US-8B20b)
+		var vil: Array = (dati.get("villaggi", {}) as Dictionary).get(vid, (dati.get("luoghi", {}) as Dictionary).get(vid, []))
 		var posto: Dictionary = posto_dal_layout(rid, layout, int(spec.get("x", 0)), int(spec.get("y", 0))) \
 				if vil.is_empty() else {"cella": Vector2i(int(vil[0]), int(vil[1])), "livello": "superficie"}
 		var c: Vector2i = posto["cella"]

@@ -210,6 +210,15 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
   `scripts/world/luce.gd` (CanvasModulate figlio del mondo, passa piano da un colore all'altro). Negli interni il
   mondo e' nascosto e la luce con lui; HUD, libro e lucciole non si scuriscono.
 
+### Base del giocatore
+- US-8B20a/b: quattro basi, interni `data/world/interni/base_{casa,capanna,rifugio,nave}.json` con le `stanze`
+  ({tipo: {rect, livelli}}: livello 0 = cantiere, poi gli arredi di ogni livello di `data/base/rooms.json`). Porte sul
+  mondo dai layout (`edifici` con `villaggio` = un villaggio **o un luogo** di `mondo.json`: casa al porto, capanna
+  nella Valle, rifugio nelle Marche). La base vera e' una sola, la **sede** (`BaseSystem.sede()`, all'inizio
+  `rooms.json sede_iniziale`, nel salvataggio): le stanze della sede hanno gli arredi del loro livello, le altre basi
+  sono cantieri; dall'ingresso di un'altra base "interagisci" ci sposta la sede. In una stanza della sede
+  "interagisci" apre il libro sulla pagina Base (`page_inventario.prossima_sezione`).
+
 ### Mondo, mappe e biomi
 - **La generazione procedurale del mondo è consentita come strumento di produzione**:
   `forge3d/world.py` produce biomi, fiumi, laghi, villaggi, strade, oggetti e spawn dal `seed`.
@@ -396,7 +405,8 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   glifi delle primitive nella hotbar (US-8B72), VFX degli attacchi base (US-8B40) e di tutte le primitive
   (US-8B41..43), feedback del colpo (US-8B40b), ritratti nel dialogo (US-8B35a/b), le pagine del libro sulle due
   facciate (US-8B73b/c/d), le forme di Enel, gigante e arma di luce (US-8B50a/b/c), i gesti di Enel (interagire, raccogliere, bere,
-  rituale: US-8B80a/b), Enel in volo e in barca (US-8B81a/b), panorama dell'avvio (US-8B74), forzieri e oggetti nelle case (US-8B22a/b/c), fauna d'atmosfera (US-8B23a/b), cannocchiale del faro con la lente (US-8B24a/b), buio di notte (US-8B25).
+  rituale: US-8B80a/b), Enel in volo e in barca (US-8B81a/b), panorama dell'avvio (US-8B74), forzieri e oggetti nelle case (US-8B22a/b/c), fauna d'atmosfera (US-8B23a/b), cannocchiale del faro con la lente (US-8B24a/b), buio di notte (US-8B25), base del giocatore con le stanze
+  e la sede (US-8B20a/b).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.

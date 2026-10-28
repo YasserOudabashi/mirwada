@@ -520,7 +520,7 @@ func test_ogni_interno_ha_la_sua_porta_su_una_casa() -> void:
 	for reg in gd.call("get_regions"):
 		interni.append_array((gd.call("get_layout", str(reg["id"])) as Dictionary).get("edifici", []))
 	interni.append_array((gd.call("get_campagna") as Dictionary).get("edifici", []))
-	assert_eq(interni.size(), 14, "14 interni nei dati")
+	assert_eq(interni.size(), 17, "17 interni nei dati (14 + 3 basi, US-8B20b)")
 	for spec in interni:
 		var iid: String = str(spec["interno_id"])
 		var porta: Area2D = m.get_node_or_null("Porta_%s" % iid)
@@ -540,7 +540,7 @@ func test_ogni_interno_ha_la_sua_porta_su_una_casa() -> void:
 			for dy in [1, 2, 3]:
 				assert_false(m.call("bloccata", c.x, c.y + dy), "la soglia di %s non e' sotto il tetto di un'altra casa" % iid)
 			if spec.has("villaggio"):
-				var v: Array = m.dati["villaggi"][spec["villaggio"]]
+				var v: Array = (m.dati["villaggi"] as Dictionary).get(spec["villaggio"], m.dati["luoghi"].get(spec["villaggio"]))
 				assert_true(Vector2(c).distance_to(Vector2(v[0], v[1])) < 16.0, "%s sta nel suo villaggio" % iid)
 		m.call("cambia_livello", "superficie")
 	m.free()

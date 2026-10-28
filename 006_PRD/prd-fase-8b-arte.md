@@ -215,6 +215,10 @@ altari, rovine). Story a sé, poi si rigenerano le regioni con lo stesso seed.
 `biblioteca`, `giardino`) e 3 strutture (`palizzata`, `totem_veglia`, `deposito`),
 in 4 versioni di luogo: casa a Mirwada, rifugio nelle Marche, capanna nella
 Valle, nave. *Domande (L).*
+*Deciso il 2026-10-27:* tutte e 4 subito; una casa a piu' stanze (laboratorio, stanza rituale, biblioteca; il
+giardino e' un orto all'aperto), le strutture attorno alla casa, i banchi delle stanze aprono la pagina Base.
+Spezzata in **8B20a** (interni e arredi, fatta), **8B20b** (porte, stanze per livello, sede, fatta), **8B20c**
+(giardino e strutture all'aperto) e **8B20d** (la nave).
 
 **US-8B21 [A] Varchi di gating visibili.** Un aspetto per ognuno dei 6 tipi in
 `gate_types.json` (ombra, radici, porta sigillata, ...). Il giocatore deve capire

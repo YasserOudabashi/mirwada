@@ -10,12 +10,17 @@ const SEZIONI := ["zaino", "indosso", "ricettario", "talenti", "base", "sinergie
 var _tab: VBoxContainer = null
 var _corpo: VBoxContainer = null
 var _sezione: String = "zaino"
+## US-8B20b: chi apre il libro su una sezione (il banco di una stanza della base apre "base") la mette qui prima.
+static var prossima_sezione: String = ""
 ## US-411: id delle sinergie attivate mentre la pagina e' viva. La riga si
 ## evidenzia al primo render, poi torna normale.
 var _appena_attivate: Array = []
 
 
 func aggiorna() -> void:
+	if prossima_sezione in SEZIONI:
+		_sezione = prossima_sezione
+	prossima_sezione = ""
 	svuota()
 	_tab = VBoxContainer.new()
 	_tab.add_theme_constant_override("separation", 4)

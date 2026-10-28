@@ -17,12 +17,16 @@ signal stanza_costruita(tipo: String)
 signal stanza_potenziata(tipo: String, livello: int)
 signal appezzamento_pronto(indice: int)
 signal raccolto(item_id: String, quantita: int)
+## US-8B20b: la base si e' spostata in un'altra delle basi del mondo.
+signal sede_cambiata(interno_id: String)
 
 ## { tipo: livello }. Assente o 0 = non costruita.
 var _base: Dictionary = {}
 ## Appezzamenti del giardino: Array di { item_id: String, crescita: float }
 ## (crescita = secondi di tempo di gioco rimasti; <= 0 = pronto).
 var _appezzamenti: Array = []
+## US-8B20b: l'interno dove sta la base ("" = quello iniziale dei dati, rooms.json sede_iniziale).
+var _sede: String = ""
 
 
 func _ready() -> void:
@@ -128,6 +132,29 @@ func potenzia(tipo: String) -> bool:
 func pulisci() -> void:
 	_base.clear()
 	_appezzamenti.clear()
+	_sede = ""
+
+
+# --- Sede (US-8B20b) ----------------------------------------------
+
+## L'interno dove sta la base: le sue stanze hanno gli arredi dei livelli costruiti.
+func sede() -> String:
+	if not _sede.is_empty():
+		return _sede
+	return str(_gd().call("base_sede_iniziale")) if _gd() != null else ""
+
+
+## Sposta la base in un'altra delle basi del mondo (un interno con "stanze"): stanze, giardino e strutture vanno con
+## lei. false se e' gia' li' o l'interno non e' una base.
+func sposta(interno_id: String) -> bool:
+	if interno_id == sede():
+		return false
+	var doc: Dictionary = _gd().call("get_interno", interno_id) if _gd() != null else {}
+	if (doc.get("stanze", {}) as Dictionary).is_empty():
+		return false
+	_sede = interno_id
+	sede_cambiata.emit(interno_id)
+	return true
 
 
 # --- Giardino (US-328) --------------------------------------------
@@ -222,6 +249,7 @@ func per_salvataggio() -> Dictionary:
 	return {
 		"stanze": _base.duplicate(true),
 		"appezzamenti": _appezzamenti.duplicate(true),
+		"sede": _sede,
 	}
 
 
@@ -230,9 +258,13 @@ func per_salvataggio() -> Dictionary:
 func da_salvataggio(raw: Variant) -> void:
 	_base = {}
 	_appezzamenti = []
+	_sede = ""
 	if typeof(raw) != TYPE_DICTIONARY:
 		return
 	var d: Dictionary = raw
+	if typeof(d.get("sede")) == TYPE_STRING and _gd() != null \
+			and not ((_gd().call("get_interno", str(d["sede"])) as Dictionary).get("stanze", {}) as Dictionary).is_empty():
+		_sede = str(d["sede"])
 	var stanze: Variant = d.get("stanze", d if not d.has("appezzamenti") else {})
 	if typeof(stanze) == TYPE_DICTIONARY:
 		for tipo in stanze:

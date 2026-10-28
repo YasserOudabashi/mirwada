@@ -669,12 +669,15 @@
       "title": "La base nel gioco: stanze e sede",
       "description": "Le porte delle basi sul mondo, le stanze che cambiano col livello, i banchi che aprono la pagina Base, la sede della base che si sposta.",
       "acceptanceCriteria": [
+        "porte delle basi sul mondo (casa al porto, capanna nella Valle, rifugio nelle Marche)",
+        "arredi delle stanze per livello costruito, cantieri nelle basi che non sono la sede",
+        "in una stanza della sede 'interagisci' apre la pagina Base; dall'ingresso di un'altra base si sposta la sede (nel salvataggio)",
         "verifica a schermo"
       ],
       "priority": 40,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-28. Porte dai layout (edifici.villaggio = villaggio o luogo di mondo.json); nella Valle una capanna in piu' (esporta_mondo.py --edifici: una casa per interno del villaggio). Sede in BaseSystem (rooms.json sede_iniziale, sposta, sede_cambiata, salvataggio); interior_scene arreda le stanze dal livello, prompt '[F] Base' solo nella sede, '[F] Sposta qui la base' nell'ingresso delle altre. tests/test_base_scena.gd. arte/revisione/base_in_gioco.png."
     },
     {
       "id": "US-8B20c",

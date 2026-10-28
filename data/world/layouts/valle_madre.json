@@ -320,6 +320,11 @@
       "x": 13,
       "y": 48,
       "interno_id": "valle_avamposto_erborista", "villaggio": "capanna_base_valle"
+    },
+    {
+      "x": 8,
+      "y": 45,
+      "interno_id": "base_capanna", "villaggio": "capanna_base_valle"
     }
   ]
 }

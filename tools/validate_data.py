@@ -1282,10 +1282,13 @@ def main():
         m = a.get("misura")
         if not (isinstance(m, list) and len(m) == 2 and all(isinstance(v, int) and v >= 1 for v in m)):
             err(f"data/world/arredi.json [{aid}]: misura deve essere [larghezza, profondita'] di interi >= 1")
-    # US-8B18b: edifici[].villaggio = un villaggio del mondo generato (assets/world/mondo.json "villaggi")
+    # US-8B18b: edifici[].villaggio = un villaggio del mondo generato (assets/world/mondo.json "villaggi");
+    # US-8B20b: o un suo luogo (la casa della base al porto)
     _mondo = os.path.join(ROOT, "assets", "world", "mondo.json")
-    villaggi_mondo = set((load_json(_mondo) or {}).get("villaggi", {})) if os.path.isfile(_mondo) else None
+    _mondo_doc = (load_json(_mondo) or {}) if os.path.isfile(_mondo) else None
+    villaggi_mondo = (set(_mondo_doc.get("villaggi", {})) | set(_mondo_doc.get("luoghi", {}))) if _mondo_doc is not None else None
     interni_npc_refs = []   # [(rel, iid, npc_id)] - risolti dopo il roster NPC, sotto
+    interni_basi = set()    # gli interni con le stanze della base (US-8B20)
     if os.path.isdir(interni_dir):
         for fn in sorted(os.listdir(interni_dir)):
             if not fn.endswith(".json"):
@@ -1305,8 +1308,14 @@ def main():
             valida_arredi(doc, f"{rel} [{iid}]", vocab_arredi, CALPESTABILI_LAYOUT)
             valida_stanze(doc, f"{rel} [{iid}]", vocab_arredi, CALPESTABILI_LAYOUT,
                           (load_json(os.path.join(DATA, "base", "rooms.json")) or {}).get("rooms", {}))
+            if doc.get("stanze"):
+                interni_basi.add(iid)
             for spec in doc.get("npcs", []):
                 interni_npc_refs.append((rel, iid, spec.get("npc_id")))
+    # US-8B20b: la base da cui si comincia e' un interno con le stanze
+    _sede = (load_json(os.path.join(DATA, "base", "rooms.json")) or {}).get("sede_iniziale")
+    if _sede is not None and _sede not in interni_basi:
+        err(f"data/base/rooms.json: sede_iniziale '{_sede}' non e' un interno con 'stanze' in data/world/interni/")
 
     # US-8B21a: un'area del gating con "varco" e' un ingresso sulla mappa verso un interno: il luogo esiste nel
     # mondo generato (luoghi o punti del sottosuolo), l'interno esiste, i disegni chiuso/aperto ci sono nei due temi.
@@ -1452,7 +1461,7 @@ def main():
                     err(f"{rel} [{rid}]: edifici[{i}].interno_id '{iid}' non esiste in "
                         f"data/world/interni/")
                 if "villaggio" in ed and villaggi_mondo is not None and ed["villaggio"] not in villaggi_mondo:
-                    err(f"{rel} [{rid}]: edifici[{i}].villaggio '{ed['villaggio']}' non e' un villaggio di "
+                    err(f"{rel} [{rid}]: edifici[{i}].villaggio '{ed['villaggio']}' non e' un villaggio ne' un luogo di "
                         f"assets/world/mondo.json")
 
     for _rid in sorted(region_ids - layout_region_ids):
@@ -1560,7 +1569,7 @@ def main():
                 err(f"{rel}: edifici[{i}].interno_id '{iid}' non esiste in "
                     f"data/world/interni/")
             if "villaggio" in ed and villaggi_mondo is not None and ed["villaggio"] not in villaggi_mondo:
-                err(f"{rel}: edifici[{i}].villaggio '{ed['villaggio']}' non e' un villaggio di "
+                err(f"{rel}: edifici[{i}].villaggio '{ed['villaggio']}' non e' un villaggio ne' un luogo di "
                     f"assets/world/mondo.json")
 
     # --- fonti di tag di fase 3 (US-334): stanze costruibili, specie di pet

@@ -14865,3 +14865,26 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - Comando: python tools/art/build_interni.py (i file che c'erano identici). arte/revisione/base_interni.png,
   base_arredi.png. 1059 test, validate 0.
 - Prossime: 8B20b (porte, stanze per livello, banchi, sede), 8B20c (giardino e strutture), 8B20d (nave).
+
+## US-8B20b — La base nel gioco: stanze e sede, 2026-10-28
+- Porte delle basi sul mondo dai layout (edifici con "villaggio"): base_casa al luogo casa_base_porto (mirwada.json),
+  base_capanna al villaggio capanna_base_valle (valle_madre.json), base_rifugio a rifugio_base_marche
+  (marche_crepuscolo.json, primo "edifici" della regione). mondo.gd _porte_da cerca il nome tra i villaggi e poi tra i
+  luoghi; il validator accetta un villaggio o un luogo.
+- Nella Valle le 4 capanne del villaggio erano gia' degli interni dell'avamposto: la base finiva a 76 caselle. Rifatto
+  python tools/art/esporta_mondo.py --edifici (seed 6): il generatore mette una casa per ogni interno del villaggio,
+  quindi una capanna in piu' (793, 394); nient'altro cambia (339 edifici, due felci tolte sotto la capanna).
+- Sede: rooms.json sede_iniziale (base_casa), BaseSystem.sede()/sposta() e segnale sede_cambiata, nel salvataggio
+  (una sede che non e' una base si scarta). Validator: sede_iniziale e' un interno con "stanze".
+- interior_scene.gd: le stanze della sede hanno gli arredi del loro livello (si rifanno ai segnali di BaseSystem,
+  collegati a un metodo cosi' si staccano da soli), le altre basi sono cantieri; zona di ogni stanza col prompt
+  "[F] Base" (solo nella sede) che apre il libro sull'inventario alla sezione Base (page_inventario.prossima_sezione);
+  nell'ingresso di un'altra base "[F] Sposta qui la base".
+- A schermo: la porta di ognuna delle tre basi; casa base ai livelli 0, 1, 2 (cantieri -> alambicco, altare,
+  scrittoio -> scaffali, vasi, sigillo, botte), prompt nella stanza, capanna con "sposta qui" e senza prompt nelle
+  stanze (prima c'era: tolto, li' il tasto non fa niente). arte/revisione/base_in_gioco.png.
+- tests/test_base_scena.gd (6), test_mondo: 17 interni con la porta. 1065 test, validate 0.
+- Story larga (6 file di codice, quasi tutti poche righe): la sede tocca BaseSystem, GameData, la pagina, l'interno,
+  il mondo e il validator. Aperto: entrando in un interno la telecamera segue Enel e le stanze a nord finiscono sotto
+  l'HUD (vale per tutti gli interni): story a parte.
+
