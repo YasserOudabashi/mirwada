@@ -73,8 +73,9 @@ func test_l_orto_cresce_fuori_dalla_sede() -> void:
 	assert_true(c.x >= 0, "l'orto ha un posto")
 	assert_true(Vector2(c).distance_to(Vector2(p)) < 8.0, "vicino alla porta della casa base (%s, porta %s)" % [c, p])
 	for i in 2:
-		for dy in 4:
-			assert_false(m.call("bloccata", c.x + i, c.y + dy), "casella %d libera e non sotto un tetto" % i)
+		assert_false(m.call("bloccata", c.x + i, c.y), "casella %d libera" % i)
+		for dy in range(1, 5):
+			assert_false(m.call("_in_una_casa", c.x + i, c.y + dy), "casella %d non sotto il tetto di una casa" % i)
 	assert_eq(_disegni(fuori), ["cantiere"], "senza giardino il cantiere")
 	_costruisci_giardino()
 	assert_eq(_disegni(fuori), ["orto_vuoto"], "giardino al livello 1: un appezzamento vuoto")
@@ -97,6 +98,7 @@ func test_l_orto_cresce_fuori_dalla_sede() -> void:
 	m.free()
 
 
+## Va con la sede; il posto e' raggiungibile a piedi dalla porta (la nave: dal pontile alla banchina).
 func test_l_orto_va_con_la_sede() -> void:
 	var mf: Array = _mondo()
 	var m: Node2D = mf[0]
@@ -105,13 +107,14 @@ func test_l_orto_va_con_la_sede() -> void:
 	var porta: Node2D = m.get_node("Porta_base_capanna")
 	var c: Vector2i = fuori.call("cella_orto")
 	assert_true(Vector2(c).distance_to(porta.position / m.tile) < 8.0, "l'orto ora sta vicino alla capanna")
-	assert_eq(str(m.call("regione_a", c.x, c.y)), str(m.call("regione_a", int(porta.position.x / m.tile),
-			int(porta.position.y / m.tile))), "nella stessa regione")
+	var vie: Dictionary = fuori.call("_raggiungibili", Vector2i(porta.position / m.tile), 14)
+	assert_true(vie.has(c) and vie.has(c + Vector2i(1, 0)), "ci si arriva a piedi dalla porta")
 	assert_true(bool(_n("/root/BaseSystem").call("sposta", "base_nave")), "base spostata sulla nave")
-	if m.get_node_or_null("Porta_base_nave") == null:
-		assert_eq((fuori.call("cella_orto") as Vector2i).x, -1, "una sede senza porta nel mondo non ha l'orto")
-		assert_eq(_disegni(fuori), [], "ne' disegni")
-		assert_true(fuori.get_node_or_null("Orto") == null, "ne' prompt")
+	var nave: Node2D = m.get_node("Porta_base_nave")
+	var o: Vector2i = fuori.call("cella_orto")
+	assert_true(o.x >= 0, "anche la nave ha l'orto, sulla terra vicina al pontile")
+	vie = fuori.call("_raggiungibili", Vector2i(nave.position / m.tile), 14)
+	assert_true(vie.has(o) and vie.has(o + Vector2i(1, 0)), "raggiungibile a piedi dalla passerella")
 	m.free()
 
 

@@ -583,6 +583,36 @@ def barca(seed=1, size=1.0):
     return r
 
 
+def nave(seed=1, size=1.0):
+    """La nave della base (US-8B20d), ormeggiata: lunga lungo x come la barca (a schermo di fianco), scafo alto con
+    la fascia rossa, prua a punta, castello di poppa col parapetto, un albero con la vela di taglio (si vede di
+    fianco), il bompresso, una bandierina. Origine al centro, sul pelo dell'acqua; a size 1.4 (worldrender) ~6 caselle
+    di lunghezza col bompresso."""
+    r = Rig(f"nave_{seed}"); r.scale = size
+    r.joint("b", "root", (0, 0, 0))
+    r.part("b", "box", (40, 13, 5), (0, 0, 5), mat="wood")                              # scafo
+    r.part("b", "box", (40.2, 13.2, 1.2), (0, 0, 7.5), mat="cloth_red")                 # fascia sotto il ponte
+    r.part("b", "cone", (5, 13, 12), (52, 0, 5), mat="wood", rot=(0, 90, 0))            # prua
+    r.part("b", "box", (39, 11.6, 0.4), (0, 0, 10.2), mat="wood_light")                 # ponte
+    for sy in (-1, 1):                                                                   # murate
+        r.part("b", "box", (40, 1.0, 1.0), (0, sy * 12.4, 11.0), mat="wood")
+    r.part("b", "box", (11, 13, 4), (-29, 0, 13.5), mat="wood")                         # castello di poppa
+    r.part("b", "box", (11, 13.2, 0.8), (-29, 0, 17.8), mat="wood_light")
+    for sy in (-1, 1):
+        r.part("b", "box", (11, 0.8, 1.2), (-29, sy * 12.4, 19.4), mat="wood")
+    r.part("b", "box", (0.8, 4, 2.5), (-40.2, 0, 13.5), mat="vetro")                    # finestra di poppa
+    r.part("b", "box", (2.4, 3.6, 3.0), (-17.5, -9.6, 13.2), mat="shadow_mat")         # porta del castello
+    r.part("b", "cylinder", (1.3, 1.3, 32), (8, 0, 42), mat="wood")                     # albero
+    r.part("b", "cylinder", (0.8, 0.8, 16), (8 - 14, 0, 30), mat="wood", rot=(0, 90, 0))  # boma
+    r.part("b", "box", (14, 0.5, 18), (-6, 0, 50), mat="cloth_cream")                    # vela (randa)
+    r.part("b", "box", (14.2, 0.6, 2.0), (-6, 0, 58), mat="cloth_red")                  # fascia della vela
+    r.part("b", "cylinder", (0.7, 0.7, 13), (62, 0, 13), mat="wood", rot=(0, 70, 0))    # bompresso
+    r.part("b", "box", (4, 0.3, 2.4), (12, 0, 72), mat="cloth_red")                     # bandierina
+    r.part("b", "ellipsoid", (2.0, 2.0, 1.2), (24, -8, 12.2), mat="wood_light")         # botte sul ponte
+    r.part("b", "box", (3, 3, 2.2), (30, 5, 12.5), mat="wood")                          # cassa
+    return r
+
+
 def ossa(seed=1, size=1.0):
     """Ossa nella sabbia delle Marche: un teschio di bestia e qualche costola."""
     rnd = random.Random(seed)

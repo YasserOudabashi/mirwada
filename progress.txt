@@ -14932,3 +14932,21 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   come l'orto); nella Valle davanti alla porta della capanna base c'e' un albero che copre Enel (arte del mondo).
 - tests: test_base_fuori (+2), test_page_base (+1). 1072 test, validate 0.
 
+## US-8B20d — La nave come base, 2026-10-28
+- forge3d/creatures.nave (scafo con la fascia rossa, prua e bompresso, castello di poppa con la porta e la finestra,
+  albero con la vela di taglio, bandierina, botte e cassa sul ponte), worldrender tipo "nave" a size 1.4 (~6 caselle
+  col bompresso, cella 224x190). Comando: python tools/art/esporta_mondo.py --barca (ora fa barca e nave; la barca
+  esce identica, stesso md5).
+- data/world/mezzi.json "nave": luogo cantiere_navale, interno base_nave. mondo.crea_nave(): nell'acqua vicina un
+  tratto di NAVE_CASELLE (6) x 2 tutto acqua con terra libera accanto (a sud, se no a nord) collegata a piedi alla
+  banchina (_a_terra: almeno 60 caselle raggiungibili); li' la passerella = Porta_base_nave verso l'interno.
+- A schermo, tre giri: (1) la nave sembrava piccola accanto ai pontili -> size 1.4; (2) la passerella era in punta a
+  un pontile stretto chiuso alla radice da un dislivello (non ci si arrivava a piedi) -> _a_terra; (3) con la sede
+  sulla nave l'orto non trovava posto: il controllo dei tetti scartava ogni casella con acqua sotto e la regola
+  "stessa regione della porta" (il pontile e' "mare") -> ora conta solo il tetto di una casa e il posto deve essere
+  raggiungibile a piedi dalla porta (base_fuori._raggiungibili). arte/revisione/base_nave.png.
+- Validator: nave.luogo un luogo, nave.interno una base con le stanze, il disegno c'e'.
+- tests: test_base_scena (+1, e la nave nelle porte), test_base_fuori (l'orto della nave). 1073 test, validate 0.
+- Aperto: la nave non si muove (decisione: ormeggiata); i pontili stretti del porto non si raggiungono a piedi
+  (dislivello alla radice: dati del mondo).
+

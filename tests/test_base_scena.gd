@@ -127,15 +127,16 @@ func test_dalla_stanza_si_apre_la_pagina_base() -> void:
 
 
 ## Le quattro basi hanno una porta nel mondo: la casa al porto di Mirwada, la capanna nella Valle, il rifugio nelle
-## Marche (la nave arriva con la sua story).
+## Marche, la passerella della nave ormeggiata al cantiere navale (US-8B20d).
 func test_le_basi_hanno_una_porta_nel_mondo() -> void:
 	var m: Node2D = preload("res://scripts/world/mondo.gd").new()
 	m.set("tema", "luminoso")
 	assert_true(m.call("carica"), "mondo caricato")
 	m.call("crea_porte")
+	m.call("crea_nave")
 	var dati: Dictionary = m.get("dati")
 	for coppia in [["base_casa", "casa_base_porto", "luoghi"], ["base_capanna", "capanna_base_valle", "villaggi"],
-			["base_rifugio", "rifugio_base_marche", "villaggi"]]:
+			["base_rifugio", "rifugio_base_marche", "villaggi"], ["base_nave", "cantiere_navale", "luoghi"]]:
 		var porta: Node2D = m.get_node_or_null("Porta_" + coppia[0])
 		assert_true(porta != null, "la porta di %s c'e'" % coppia[0])
 		if porta == null:
@@ -144,3 +145,29 @@ func test_le_basi_hanno_una_porta_nel_mondo() -> void:
 		var vicino: float = porta.position.distance_to(Vector2(float(p[0]) + 0.5, float(p[1]) + 0.5) * m.tile)
 		assert_true(vicino < 16.0 * m.tile, "%s vicino a %s (%.0f unita')" % [coppia[0], coppia[1], vicino])
 	m.free()
+
+
+## US-8B20d: la nave sta nell'acqua (tutte le sue caselle), la passerella su terra libera accanto.
+func test_la_nave_e_ormeggiata_con_la_passerella() -> void:
+	var m: Node2D = preload("res://scripts/world/mondo.gd").new()
+	m.set("tema", "luminoso")
+	assert_true(m.call("carica"), "mondo caricato")
+	m.call("crea_nave")
+	var nave: Sprite2D = m.get_node_or_null("Nave")
+	var porta: Area2D = m.get_node_or_null("Porta_base_nave")
+	assert_true(nave != null and porta != null, "la nave e la sua passerella")
+	if nave == null or porta == null:
+		m.free()
+		return
+	assert_true(nave.texture != null, "col suo disegno")
+	var q := Vector2i(roundi(nave.position.x / m.tile), floori(nave.position.y / m.tile))
+	for dy in [-1, 0]:
+		for dx in range(-3, 3):
+			assert_true(m.call("acqua", q.x + dx, q.y + dy), "la nave sta sull'acqua (%d, %d)" % [dx, dy])
+	var p := Vector2i(floori(porta.position.x / m.tile), floori(porta.position.y / m.tile))
+	assert_false(m.call("bloccata", p.x, p.y) or m.call("acqua", p.x, p.y), "la passerella sta su terra libera")
+	assert_true(m.call("_a_terra", p), "collegata a piedi alla banchina, non un pontile chiuso")
+	assert_true(absi(p.y - q.y) <= 2 and absi(p.x - q.x) <= 3, "accanto alla nave")
+	assert_eq(str(porta.get_meta("interno_id")), "base_nave", "porta all'interno della nave")
+	m.free()
+

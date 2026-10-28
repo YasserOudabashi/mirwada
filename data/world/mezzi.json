@@ -8,6 +8,12 @@
       0
     ]
   },
+  "nave": {
+    "_comment": "US-8B20d: la nave della base, ormeggiata nell'acqua piu' vicina al luogo (+ scostamento) larga quanto lei e accostata alla terra; la passerella e' una porta verso l'interno (base_nave). Non si muove.",
+    "luogo": "cantiere_navale",
+    "scostamento": [0, 0],
+    "interno": "base_nave"
+  },
   "volo": {
     "chiave": "piuma_dei_venti"
   },

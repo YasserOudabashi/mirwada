@@ -76,7 +76,8 @@ le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti 
    E **US-8B18e**: negli interni la camera inquadra la stanza (ferma in basso al centro, l'HUD sopra).
    E **US-8B20c/e**: l'orto all'aperto accanto alla sede, con le piante che crescono, e le strutture (palizzata,
    totem di veglia, deposito) costruite dalla pagina Base.
-4. **Prossime**: la base: la nave (US-8B20d); il
+   E **US-8B20d**: la nave della base ormeggiata al cantiere navale, con la passerella verso il suo interno.
+4. **Prossime**: il
    cannocchiale da tasca;
    nuoto e arrampicata col loro gameplay (US-8B90, US-8B92, blocco H, con le animazioni). Evocazioni e
    antagonisti aspettano di avere una figura nel mondo.

@@ -326,19 +326,18 @@ def esporta_varchi(temi):
 
 def esporta_barca(temi):
     """US-8B91: la barca del giocatore (forge3d.creatures.barca) tra gli oggetti di ogni tema, con l'ancora in
-    mondo.json "sprite". Dove sta all'inizio lo dice data/world/mezzi.json."""
-    meta = {}
-    for t in temi:
-        tema.imposta(t)
-        img, ax, ay = object_sprite({"type": "barca", "seed": 1}, T)
-        Image.fromarray(img).save(os.path.join(OUT, t, "oggetti", "barca.png"))
-        meta = {"ax": int(ax), "ay": int(ay)}
+    mondo.json "sprite"; US-8B20d: anche la nave della base. Dove stanno lo dice data/world/mezzi.json."""
     path = os.path.join(OUT, "mondo.json")
     dati = json.load(open(path))
-    dati["sprite"]["barca"] = meta
+    for mezzo in ("barca", "nave"):
+        for t in temi:
+            tema.imposta(t)
+            img, ax, ay = object_sprite({"type": mezzo, "seed": 1}, T)
+            Image.fromarray(img).save(os.path.join(OUT, t, "oggetti", mezzo + ".png"))
+            dati["sprite"][mezzo] = {"ax": int(ax), "ay": int(ay)}
     with open(path, "w") as f:
         json.dump(dati, f, separators=(",", ":"))
-    print("  barca:", ", ".join(temi))
+    print("  barca e nave:", ", ".join(temi))
 
 
 def blocchi(w, senza_edifici=False):
@@ -491,7 +490,7 @@ def main():
     ap.add_argument("--solo-dati", action="store_true", help="solo i dati ricavati da regioni.png (riquadri)")
     ap.add_argument("--edifici", action="store_true", help="solo gli edifici della citta' (sprite, dati, collisioni)")
     ap.add_argument("--varchi", action="store_true", help="solo i disegni dei varchi delle sotto-aree (pochi secondi)")
-    ap.add_argument("--barca", action="store_true", help="solo il disegno della barca (pochi secondi)")
+    ap.add_argument("--barca", action="store_true", help="solo i disegni della barca e della nave (pochi secondi)")
     a = ap.parse_args()
     if a.barca:
         esporta_barca([a.tema] if a.tema else ["luminoso", "cupo"])

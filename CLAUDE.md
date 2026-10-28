@@ -224,6 +224,9 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - US-8B20e: palizzata, totem di veglia e deposito si costruiscono dalla pagina Base (`data/structures` `costo`, una
   per tipo, `BaseSystem.costruisci_struttura`) e `base_fuori.gd` li disegna nel loro posto di `esterno` (chiave = id
   della struttura, disegno = l'arredo dello stesso id); la posizione in `StructureRegistry` segue la sede.
+- US-8B20d: la nave (`forge3d.creatures.nave`, `esporta_mondo.py --barca`) e' ormeggiata e ferma vicino al luogo di
+  `mezzi.json nave` (`mondo.crea_nave`): la passerella, su terra collegata a piedi alla banchina, e' la porta verso
+  `base_nave`. I posti di fuori della base devono essere raggiungibili a piedi dalla porta.
 
 ### Mondo, mappe e biomi
 - **La generazione procedurale del mondo è consentita come strumento di produzione**:
@@ -321,7 +324,7 @@ python tools/art/esporta_mondo.py --sottosuolo     # solo il sottosuolo (~5 minu
 python tools/art/esporta_mondo.py --solo-dati      # solo i riquadri delle regioni in mondo.json
 python tools/art/esporta_mondo.py --edifici        # solo gli edifici: sprite, mondo.json, blocchi.png (~5 minuti)
 python tools/art/esporta_mondo.py --varchi         # solo i disegni dei varchi delle sotto-aree (pochi secondi)
-python tools/art/esporta_mondo.py --barca          # solo il disegno della barca (pochi secondi)
+python tools/art/esporta_mondo.py --barca          # solo i disegni della barca e della nave (pochi secondi)
 python tools/art/build_interni.py              # interni: pavimenti, pareti e arredi -> assets/interni/<tema>/
 python tools/art/build_npc.py                  # aspetti degli NPC (personaggio_<aspetto>_{idle,walk}.png)
 python tools/art/build_ritratti.py             # ritratti 64x80 per aspetto, dallo stesso modello -> assets/ritratti/
@@ -412,7 +415,8 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   (US-8B41..43), feedback del colpo (US-8B40b), ritratti nel dialogo (US-8B35a/b), le pagine del libro sulle due
   facciate (US-8B73b/c/d), le forme di Enel, gigante e arma di luce (US-8B50a/b/c), i gesti di Enel (interagire, raccogliere, bere,
   rituale: US-8B80a/b), Enel in volo e in barca (US-8B81a/b), panorama dell'avvio (US-8B74), forzieri e oggetti nelle case (US-8B22a/b/c), fauna d'atmosfera (US-8B23a/b), cannocchiale del faro con la lente (US-8B24a/b), buio di notte (US-8B25), base del giocatore con le stanze,
-  la sede, l'orto e le strutture (US-8B20a/b/c/e), la camera che inquadra gli interni sotto l'HUD (US-8B18e).
+  la sede, l'orto, le strutture e la nave
+  (US-8B20a..e), la camera che inquadra gli interni sotto l'HUD (US-8B18e).
   PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
 - Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
   `prd-fase-12-mondo-vivo.md`.

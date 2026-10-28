@@ -88,6 +88,7 @@ func _ready() -> void:
 	crea_porte()
 	crea_varchi()
 	crea_barca()
+	crea_nave()
 	crea_forzieri()
 	crea_cannocchiali()
 	add_child(preload("res://scripts/world/fauna.gd").new())
@@ -995,6 +996,79 @@ func crea_barca() -> void:
 	_barca.add_child(prompt)
 	add_child(_barca)
 	metti_barca(_ormeggio_iniziale)
+
+
+## US-8B20d: la nave della base (mezzi.json "nave"), ormeggiata e ferma: nell'acqua vicina al luogo un tratto largo
+## quanto lei (NAVE_CASELLE x 2 caselle) con terra libera accanto, a sud (davanti, si vede) o se no a nord, collegata
+## a piedi al resto della terra (_a_terra); su quella terra la passerella e' la porta verso il suo interno.
+const NAVE_CASELLE := 6
+
+
+func crea_nave() -> void:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	var spec: Dictionary = gd.call("get_mezzo", "nave") if gd != null else {}
+	var base: Vector2i = _luogo_varco(str(spec.get("luogo", "")))
+	if spec.is_empty() or base.x < 0 or not (dati["sprite"] as Dictionary).has("nave"):
+		return
+	var sc: Array = spec.get("scostamento", [0, 0])
+	var c := base + Vector2i(int(sc[0]), int(sc[1]))
+	var posto: Array = []
+	for lato in [1, -2]:                           # terra a sud della nave, se no a nord
+		for r in range(0, 40):
+			for dy in range(-r, r + 1):
+				for dx in range(-r, r + 1):
+					if not posto.is_empty() or maxi(absi(dx), absi(dy)) != r:
+						continue
+					var q := Vector2i(c.x + dx, c.y + dy)
+					var passerella: Vector2i = _passerella(q, lato)
+					if passerella.x >= 0:
+						posto = [q, passerella]
+		if not posto.is_empty():
+			break
+	if posto.is_empty():
+		return
+	var q: Vector2i = posto[0]
+	var meta: Dictionary = dati["sprite"]["nave"]
+	var nave := Sprite2D.new()
+	nave.name = "Nave"
+	nave.set_meta("livello", "superficie")
+	nave.texture = _texture_oggetto("nave")
+	nave.centered = false
+	nave.offset = Vector2(-float(meta.get("ax", 0)), -float(meta.get("ay", 0)))
+	nave.position = Vector2(q.x * tile, (q.y + 0.75) * tile)       # il pelo dell'acqua nella riga q.y
+	add_child(nave)
+	add_child(_porta(str(spec.get("interno", "")), posto[1], "superficie"))
+
+
+## La casella della passerella per la nave nella fila q.y (caselle q.x - 3 .. q.x + 2, e la riga sopra): tutta
+## acqua, e terra libera accanto (lato 1 = la riga sotto, -2 = la riga sopra la nave). (-1, -1) se non va.
+func _passerella(q: Vector2i, lato: int) -> Vector2i:
+	for dy in [-1, 0]:
+		for dx in range(-NAVE_CASELLE / 2, NAVE_CASELLE / 2):
+			if not acqua(q.x + dx, q.y + dy):
+				return Vector2i(-1, -1)
+	for dx in [-1, 0, 1, -2]:
+		var t := Vector2i(q.x + dx, q.y + lato)
+		if _dentro(t.x, t.y) and not bloccata(t.x, t.y) and not acqua(t.x, t.y) and _a_terra(t):
+			return t
+	return Vector2i(-1, -1)
+
+
+## Da t si arriva a piedi ad almeno TERRA_MINIMA caselle: non un pezzo di pontile chiuso da un dislivello.
+const TERRA_MINIMA := 60
+
+
+func _a_terra(t: Vector2i) -> bool:
+	var visti: Dictionary = {t: true}
+	var coda: Array = [t]
+	while not coda.is_empty() and visti.size() < TERRA_MINIMA:
+		var q: Vector2i = coda.pop_front()
+		for d in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
+			var n: Vector2i = q + d
+			if not visti.has(n) and _dentro(n.x, n.y) and not bloccata(n.x, n.y):
+				visti[n] = true
+				coda.append(n)
+	return visti.size() >= TERRA_MINIMA
 
 
 func metti_barca(c: Vector2i) -> void:

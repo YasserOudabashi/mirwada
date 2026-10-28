@@ -1378,6 +1378,14 @@ def main():
                 if f"varco_{_spec.get('aspetto')}_{_st}" not in mondo_doc.get("sprite", {}):
                     err(f"data/world/mezzi.json [{_mz}]: manca il disegno varco_{_spec.get('aspetto')}_{_st} "
                         f"(python tools/art/esporta_mondo.py --varchi)")
+    if mondo_doc is not None and "nave" in _mezzi:              # US-8B20d: la nave della base
+        _nave = _mezzi["nave"]
+        if _nave.get("luogo") not in mondo_doc.get("luoghi", {}):
+            err(f"data/world/mezzi.json: nave.luogo '{_nave.get('luogo')}' non e' un luogo di assets/world/mondo.json")
+        if _nave.get("interno") not in interni_basi:
+            err(f"data/world/mezzi.json: nave.interno '{_nave.get('interno')}' non e' un interno con 'stanze'")
+        if "nave" not in mondo_doc.get("sprite", {}):
+            err("data/world/mezzi.json: manca il disegno della nave (python tools/art/esporta_mondo.py --barca)")
     if mondo_doc is not None and "barca" in _mezzi:
         if _mezzi["barca"].get("luogo") not in mondo_doc.get("luoghi", {}):
             err(f"data/world/mezzi.json: barca.luogo '{_mezzi['barca'].get('luogo')}' non e' un luogo di "

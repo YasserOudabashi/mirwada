@@ -218,7 +218,7 @@ Valle, nave. *Domande (L).*
 *Deciso il 2026-10-27:* tutte e 4 subito; una casa a piu' stanze (laboratorio, stanza rituale, biblioteca; il
 giardino e' un orto all'aperto), le strutture attorno alla casa, i banchi delle stanze aprono la pagina Base.
 Spezzata in **8B20a** (interni e arredi, fatta), **8B20b** (porte, stanze per livello, sede, fatta), **8B20c**
-(l'orto all'aperto, fatta), **8B20e** (le strutture all'aperto, fatta) e **8B20d** (la nave).
+(l'orto all'aperto, fatta), **8B20e** (le strutture all'aperto, fatta) e **8B20d** (la nave, fatta).
 
 **US-8B21 [A] Varchi di gating visibili.** Un aspetto per ognuno dei 6 tipi in
 `gate_types.json` (ombra, radici, porta sigillata, ...). Il giocatore deve capire

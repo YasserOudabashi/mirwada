@@ -11,6 +11,7 @@ extends Node2D
 
 const PageInventario := preload("res://scripts/pages/page_inventario.gd")
 const AGGIORNA := 1.0                         # secondi fra un controllo della crescita e l'altro
+const RAGGIO := 14                            # caselle dalla porta entro cui cercare i posti di fuori
 
 var _mondo: Node2D
 var _cella := Vector2i(-1, -1)                # la prima casella dell'orto ((-1, -1) = la sede non ha porta fuori)
@@ -153,8 +154,8 @@ func _larghezza_orto() -> int:
 
 
 ## La casella da cui parte una fila di n caselle per la voce "esterno" della sede: vicino alla porta + lo scostamento
-## dei dati, tutte libere, nella regione della porta, non sotto il tetto di una casa ne' sul passaggio della porta,
-## staccate di una casella da quelle gia' prese (che si aggiungono a prese).
+## dei dati, tutte libere e raggiungibili a piedi dalla porta, non sotto il tetto di una casa ne' sul passaggio della
+## porta, staccate di una casella da quelle gia' prese (che si aggiungono a prese).
 func _posto(chiave: String, n: int, prese: Dictionary = {}) -> Vector2i:
 	var bs: Node = _auto("BaseSystem")
 	var sede: String = str(bs.call("sede")) if bs != null else ""
@@ -166,8 +167,8 @@ func _posto(chiave: String, n: int, prese: Dictionary = {}) -> Vector2i:
 	var s: Array = ((_auto("GameData").call("get_interno", sede) as Dictionary).get("esterno", {}) as Dictionary) \
 			.get(chiave, [2, 1])
 	var c := p + Vector2i(int(s[0]), int(s[1]))
-	var rid: String = str(_mondo.call("regione_a", p.x, p.y))
-	for r in 12:
+	var vie: Dictionary = _raggiungibili(p, RAGGIO)
+	for r in RAGGIO:
 		for dy in range(-r, r + 1):
 			for dx in range(-r, r + 1):
 				if maxi(absi(dx), absi(dy)) != r:
@@ -175,7 +176,8 @@ func _posto(chiave: String, n: int, prese: Dictionary = {}) -> Vector2i:
 				var q := c + Vector2i(dx, dy)
 				var ok := true
 				for i in n:
-					if not _libera(q + Vector2i(i, 0), p, rid) or _vicino_a(q + Vector2i(i, 0), prese):
+					if not vie.has(q + Vector2i(i, 0)) or not _libera(q + Vector2i(i, 0), p) \
+							or _vicino_a(q + Vector2i(i, 0), prese):
 						ok = false
 						break
 				if ok:
@@ -193,13 +195,28 @@ func _vicino_a(q: Vector2i, prese: Dictionary) -> bool:
 	return false
 
 
-func _libera(q: Vector2i, porta: Vector2i, rid: String) -> bool:
+## Le caselle a cui si arriva a piedi dalla porta senza allontanarsi piu' di r (la nave: dal pontile alla banchina).
+func _raggiungibili(da: Vector2i, r: int) -> Dictionary:
+	var visti: Dictionary = {da: true}
+	var coda: Array = [da]
+	while not coda.is_empty():
+		var q: Vector2i = coda.pop_front()
+		for d in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
+			var n: Vector2i = q + d
+			if visti.has(n) or maxi(absi(n.x - da.x), absi(n.y - da.y)) > r or _mondo.call("bloccata", n.x, n.y):
+				continue
+			visti[n] = true
+			coda.append(n)
+	return visti
+
+
+func _libera(q: Vector2i, porta: Vector2i) -> bool:
 	if absi(q.x - porta.x) <= 1 and q.y >= porta.y - 1 and q.y <= porta.y + 3:
 		return false                          # il passaggio davanti alla porta resta libero
-	if str(_mondo.call("regione_a", q.x, q.y)) != rid:
+	if _mondo.call("bloccata", q.x, q.y):
 		return false
-	for dy in 4:                              # una casa sotto coprirebbe la casella col suo tetto
-		if _mondo.call("bloccata", q.x, q.y + dy):
+	for dy in range(1, 5):                    # una casa sotto coprirebbe la casella col suo tetto (l'acqua no)
+		if _mondo.call("_in_una_casa", q.x, q.y + dy):
 			return false
 	var tile: float = float(_mondo.get("tile"))
 	for fy in [0.25, 0.75]:                   # ne' la chioma di un albero piu' a sud

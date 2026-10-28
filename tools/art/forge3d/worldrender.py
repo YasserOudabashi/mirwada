@@ -62,6 +62,10 @@ def object_sprite(o, S=TILE):
         from .creatures import barca
         r = barca(o.get("seed", 1), size=k)
         cw, ch, foot = int(64 * k), int(40 * k), 0.7
+    elif t == "nave":                                     # US-8B20d: la nave della base, ormeggiata
+        from .creatures import nave
+        r = nave(o.get("seed", 1), size=1.4 * k)
+        cw, ch, foot = int(224 * k), int(190 * k), 0.78
     elif t == "varco":                                    # US-8B21a: ingressi delle sotto-aree, chiusi o aperti
         from .creatures import varco
         r = varco(o["kind"], o.get("aperto", False), o.get("seed", 1), size=k)
@@ -85,7 +89,7 @@ def object_sprite(o, S=TILE):
           "gigante": (0.2, 0.07)}.get(o.get("kind"), (0.15, 0.055)) if t == "tree" else (0.3, 0.12)
     # inner_thr in proporzione alla grandezza del modello: con 1 unita' il bordo ripido di una sfera grande (chioma
     # x3,6) superava la soglia sulla stessa superficie e diventava una fascia scura di 5-8 px (contorno doppio)
-    img = render(r.instances({}, 180), size=(cw, ch), ppu=1.0, foot=(0.5, foot), shadow=(t not in ("bridge", "scoglio", "edificio", "arredo", "varco", "barca") and not (t == "ingresso" and o.get("kind") != "risalita")),
+    img = render(r.instances({}, 180), size=(cw, ch), ppu=1.0, foot=(0.5, foot), shadow=(t not in ("bridge", "scoglio", "edificio", "arredo", "varco", "barca", "nave") and not (t == "ingresso" and o.get("kind") != "risalita")),
                  shadow_r=sr, shadow_off=(0.25, 0.3), shadow_a=80, inner_thr=max(1.0, r.scale))
     if t == "scoglio":
         img = _sommerso(img, int(ch * foot) - max(2, int(3 * k)), o["seed"])

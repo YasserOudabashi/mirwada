@@ -715,12 +715,16 @@
       "title": "La nave come base",
       "description": "Il modello della nave ormeggiata, la passerella, l'interno della nave.",
       "acceptanceCriteria": [
+        "modello della nave (forge3d), guardato ingrandito",
+        "ormeggiata vicino al cantiere navale, passerella raggiungibile a piedi",
+        "la passerella porta all'interno base_nave",
+        "test",
         "verifica a schermo"
       ],
       "priority": 40,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-28. forge3d/creatures.nave, esporta_mondo.py --barca (barca e nave); mezzi.json nave; mondo.crea_nave (6x2 d'acqua, passerella su terra collegata: _a_terra). base_fuori: posti raggiungibili a piedi dalla porta al posto della stessa regione. arte/revisione/base_nave.png."
     },
     {
       "id": "US-8B20e",
