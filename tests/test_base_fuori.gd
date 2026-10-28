@@ -13,7 +13,7 @@ func _n(s: String) -> Node:
 
 
 func prepara() -> void:
-	for a in ["/root/Inventory", "/root/BaseSystem"]:
+	for a in ["/root/Inventory", "/root/BaseSystem", "/root/StructureRegistry"]:
 		if _n(a) != null:
 			_n(a).call("pulisci")
 	if _n("/root/Book") != null:
@@ -32,12 +32,19 @@ func _mondo() -> Array:
 	return [m, fuori]
 
 
-func _disegni(fuori: Node) -> Array:
+func _disegni(fuori: Node, prefisso: String = "Orto_") -> Array:
 	var ids: Array = []
 	for c in fuori.get_children():
-		if c is Sprite2D and not c.is_queued_for_deletion():
-			ids.append(str(c.name).trim_prefix("Orto_").rsplit("_", true, 2)[0])
+		if c is Sprite2D and not c.is_queued_for_deletion() and str(c.name).begins_with(prefisso):
+			ids.append(str(c.name).trim_prefix(prefisso).rsplit("_", true, 2)[0])
 	return ids
+
+
+func _costruisci_struttura(sid: String) -> void:
+	var costo: Dictionary = _n("/root/GameData").call("get_structure", sid)["costo"]
+	for item_id in costo:
+		_n("/root/Inventory").call("aggiungi", item_id, int(costo[item_id]))
+	assert_true(bool(_n("/root/BaseSystem").call("costruisci_struttura", sid)), "%s costruita" % sid)
 
 
 func _costruisci_giardino() -> void:
@@ -120,3 +127,56 @@ func test_vicino_all_orto_si_apre_la_pagina_base() -> void:
 	_n("/root/Book").call("azzera")
 	PageInventario.prossima_sezione = ""
 	m.free()
+
+
+# --- US-8B20e: le strutture ---------------------------------------------------------
+
+func test_una_struttura_per_tipo_col_suo_costo() -> void:
+	var bs: Node = _n("/root/BaseSystem")
+	assert_false(bool(bs.call("costruisci_struttura", "palizzata")), "senza materiali no")
+	assert_false(bool(bs.call("costruisci_struttura", "torre_inventata")), "un tipo che non c'e' no")
+	_costruisci_struttura("palizzata")
+	assert_eq(int(_n("/root/Inventory").call("conta", "lingotto_ferro")), 0, "il costo si paga")
+	_n("/root/Inventory").call("aggiungi", "lingotto_ferro", 9)
+	_n("/root/Inventory").call("aggiungi", "moneta_comune", 99)
+	assert_false(bool(bs.call("costruisci_struttura", "palizzata")), "una sola per tipo")
+	assert_eq(int(_n("/root/StructureRegistry").call("conta")), 1, "nel registro una")
+
+
+func test_le_strutture_stanno_fuori_dalla_sede_e_la_seguono() -> void:
+	var mf: Array = _mondo()
+	var m: Node2D = mf[0]
+	var fuori: Node2D = mf[1]
+	for sid in ["palizzata", "totem_veglia", "deposito"]:
+		_costruisci_struttura(sid)
+	var disegni: Array = _disegni(fuori, "Struttura_")
+	disegni.sort()
+	assert_eq(disegni, ["deposito", "palizzata", "totem_veglia"], "tutte e tre disegnate")
+	var prese: Dictionary = {}
+	var orto: Vector2i = fuori.call("cella_orto")
+	for i in 2:
+		prese[orto + Vector2i(i, 0)] = "giardino"
+	var porta: Node2D = m.get_node("Porta_base_casa")
+	for sid in ["palizzata", "totem_veglia", "deposito"]:
+		var c: Vector2i = fuori.call("cella_struttura", sid)
+		assert_true(c.x >= 0 and Vector2(c).distance_to(porta.position / m.tile) < 10.0, "%s vicino alla casa base" % sid)
+		var lato: int = int((_n("/root/GameData").call("get_arredo", sid)["misura"] as Array)[0])
+		for i in lato:
+			var q := c + Vector2i(i, 0)
+			assert_false(m.call("bloccata", q.x, q.y), "%s su una casella libera" % sid)
+			for dy in range(-1, 2):
+				for dx in range(-1, 2):
+					assert_false(prese.has(q + Vector2i(dx, dy)) and prese[q + Vector2i(dx, dy)] != sid,
+							"%s staccata da %s" % [sid, prese.get(q + Vector2i(dx, dy), "")])
+		for i in lato:
+			prese[c + Vector2i(i, 0)] = sid
+	var e: Dictionary = (_n("/root/StructureRegistry").call("attive") as Array)[0]
+	var p: Array = e["posizione"]
+	assert_true(Vector2(p[0], p[1]).distance_to(porta.position) < 10.0 * m.tile, "nel registro sta li' (le abilita' d'area)")
+	assert_true(bool(_n("/root/BaseSystem").call("sposta", "base_rifugio")), "base spostata nelle Marche")
+	var rifugio: Node2D = m.get_node("Porta_base_rifugio")
+	e = (_n("/root/StructureRegistry").call("attive") as Array)[0]
+	p = e["posizione"]
+	assert_true(Vector2(p[0], p[1]).distance_to(rifugio.position) < 10.0 * m.tile, "e segue la sede")
+	m.free()
+

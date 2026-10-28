@@ -14916,3 +14916,19 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   poi toccava la hotbar, ora sta una casella sopra le cassette. arte/revisione/base_orto.png.
 - tests/test_base_fuori.gd (3). 1069 test, validate 0.
 
+## US-8B20e — Le strutture attorno alla base, 2026-10-28
+- data/structures/core.json: "costo" di palizzata, totem di veglia, deposito (materiali che ci sono; numeri
+  plausibili). Validator: costo = oggetti veri con quantita' >= 1; ogni struttura ha l'arredo dello stesso id (il
+  disegno fuori); "esterno" accetta anche gli id delle strutture.
+- BaseSystem.costruisci_struttura(id) (una per tipo, paga il costo, l'istanza va in StructureRegistry) e
+  struttura_costruita(id); StructureRegistry.sposta(id, posizione). Pagina Base: sezione "Strutture" sotto le
+  stanze, col costo e Costruisci, poi "costruita".
+- base_fuori.gd: ogni struttura del registro al suo posto di "esterno" (deposito [3, 3], palizzata [-5, 1], totem
+  [-3, 2] dalla porta), staccata di una casella dall'orto e dalle altre (prima l'orto: il suo posto non cambia
+  costruendo); la posizione nel registro segue il disegno (le abilita' d'area la trovano li') e la sede.
+- A schermo: al porto totem e palizzata a sinistra, orto a destra, deposito sotto (luminoso e cupo); nella Valle
+  fra gli alberi della radura; pagina Base scorsa fino alle strutture. arte/revisione/base_strutture.png.
+- Story larga (5 file di codice, poche righe ciascuno). Aperto: le strutture non bloccano il passo (sono disegni
+  come l'orto); nella Valle davanti alla porta della capanna base c'e' un albero che copre Enel (arte del mondo).
+- tests: test_base_fuori (+2), test_page_base (+1). 1072 test, validate 0.
+

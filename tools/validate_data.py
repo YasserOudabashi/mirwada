@@ -246,10 +246,12 @@ def valida_stanze(doc, rel, vocab, calpestabili, rooms):
                     err(f"{rel}: stanze.{tipo} livello {lv}: '{a.get('id')}' esce dalla stanza {st.get('rect')}")
             valida_arredi(dict(doc, arredi=list(doc.get("arredi", [])) + list(arredi)),
                           f"{rel} stanze.{tipo} livello {lv}", vocab, calpestabili)
-    # US-8B20c: "esterno" {voce: [dx, dy]} = dove sta fuori dalla porta, voce = una stanza all'aperto (il giardino)
+    # US-8B20c/e: "esterno" {voce: [dx, dy]} = dove sta fuori dalla porta, voce = il giardino o una struttura
+    strutture = {st.get("id") for fn in sorted(os.listdir(os.path.join(DATA, "structures")))
+                 if fn.endswith(".json") for st in (load_json(os.path.join(DATA, "structures", fn)) or {}).get("structures", [])}
     for voce, sc in doc.get("esterno", {}).items():
-        if voce not in rooms:
-            err(f"{rel}: esterno.{voce} non e' una stanza di data/base/rooms.json")
+        if voce not in rooms and voce not in strutture:
+            err(f"{rel}: esterno.{voce} non e' una stanza di data/base/rooms.json ne' una struttura di data/structures/")
         if not (isinstance(sc, list) and len(sc) == 2 and all(isinstance(v, int) for v in sc)):
             err(f"{rel}: esterno.{voce} deve essere [dx, dy] interi (caselle dalla porta)")
 
@@ -2512,6 +2514,12 @@ def main():
             for t in s.get("tag", []):
                 if t not in valid_tags:
                     err(f"{rel} [{sid}]: tag sconosciuto '{t}' (aggiungilo a data/tags.json o correggilo)")
+            # US-8B20e: si costruisce dalla pagina Base col suo costo e si disegna fuori con l'arredo dello stesso id
+            for iid, q in (s.get("costo") or {}).items():
+                if iid not in item_ids or not isinstance(q, int) or q < 1:
+                    err(f"{rel} [{sid}]: costo.{iid} deve essere un oggetto di data/items/ con quantita' intera >= 1")
+            if sid not in vocab_arredi:
+                err(f"{rel} [{sid}]: manca l'arredo '{sid}' in data/world/arredi.json (il disegno fuori dalla base)")
     if n_structures < 1:
         err("data/structures/: nessun tipo di struttura, atteso almeno 1 "
             "(tg_2 e il base building parlano tramite questo registro)")

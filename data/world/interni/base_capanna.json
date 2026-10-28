@@ -43,8 +43,8 @@
       "y": 6
     }
   ],
-  "_comment_esterno": "US-8B20c: fuori dalla porta della base nel mondo, caselle dalla porta (x, y) dove cercare il posto dell'orto (la casella libera piu' vicina).",
-  "esterno": {"giardino": [3, 1]},
+  "_comment_esterno": "US-8B20c: fuori dalla porta della base nel mondo, caselle dalla porta (x, y) dove cercare il posto dell'orto e delle strutture (US-8B20e, chiave = id della struttura; la fila libera piu' vicina).",
+  "esterno": {"giardino": [3, 1], "deposito": [3, 3], "palizzata": [-5, 1], "totem_veglia": [-3, 2]},
   "stanze": {
     "laboratorio": {
       "rect": [

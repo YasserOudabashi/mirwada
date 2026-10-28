@@ -261,7 +261,34 @@ func _base() -> void:
 			_n("/root/BaseSystem").call(azione, tipo); _mostra("base"))
 		riga.add_child(b)
 		_corpo.add_child(riga)
+	_strutture(bs)
 	_giardino(bs)
+
+
+## US-8B20e: le strutture (data/structures), una per tipo, costruite fuori dalla sede della base.
+func _strutture(bs: Node) -> void:
+	var gd: Node = _n("/root/GameData")
+	var inv: Node = _n("/root/Inventory")
+	var ids: Array = gd.call("structure_ids")
+	if ids.is_empty():
+		return
+	_corpo.add_child(_titolo(tr("BOOK_BASE_STRUTTURE_TITOLO")))
+	for sid in ids:
+		var tipo: Dictionary = gd.call("get_structure", sid)
+		var nome: String = str(gd.call("tr_data", tipo.get("name_i18n", sid)))
+		if bool(bs.call("struttura_costruita", sid)):
+			_corpo.add_child(_riga("%s — %s" % [nome, tr("BOOK_BASE_COSTRUITA")]))
+			continue
+		var costo: Dictionary = tipo.get("costo", {})
+		_corpo.add_child(_riga("%s — %s %s" % [nome, tr("BOOK_BASE_COSTO"), _riassunto_costo(costo)]))
+		var b := Button.new()
+		b.text = tr("BOOK_BASE_COSTRUISCI")
+		b.disabled = not _coperto(inv, costo)
+		b.pressed.connect(func() -> void:
+			_n("/root/BaseSystem").call("costruisci_struttura", sid); _mostra("base"))
+		var riga := HBoxContainer.new()
+		riga.add_child(b)
+		_corpo.add_child(riga)
 
 
 func _giardino(bs: Node) -> void:

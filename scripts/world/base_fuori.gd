@@ -4,6 +4,8 @@ extends Node2D
 ## germoglio, pianta, maturo: data/balance.json giardino.pianta_da); finche' il giardino non e' costruito, il
 ## cantiere. Dove: "esterno" dell'interno della base (caselle dalla porta; la libera piu' vicina che non stia sotto
 ## un tetto o una chioma ne' davanti alla porta). Vicino all'orto "interagisci" apre la pagina Base del libro. Va con la sede.
+## US-8B20e: anche le strutture costruite dalla pagina Base (StructureRegistry, una per tipo), ognuna nel suo posto di
+## "esterno" (chiave = id della struttura), staccate dall'orto e fra loro; la loro posizione nel registro segue la sede.
 ##
 ## NIENTE class_name: coerente col progetto.
 
@@ -12,6 +14,7 @@ const AGGIORNA := 1.0                         # secondi fra un controllo della c
 
 var _mondo: Node2D
 var _cella := Vector2i(-1, -1)                # la prima casella dell'orto ((-1, -1) = la sede non ha porta fuori)
+var _posti: Dictionary = {}                   # struct_id -> prima casella della struttura fuori dalla sede
 var _area: Area2D
 var _prompt: Label
 var _vicino := false
@@ -29,6 +32,10 @@ func _ready() -> void:
 		for sig in ["stanza_costruita", "stanza_potenziata", "raccolto", "appezzamento_pronto"]:
 			bs.connect(sig, _su_base)
 		bs.connect("sede_cambiata", _su_sede)
+	var sr: Node = _auto("StructureRegistry")
+	if sr != null:
+		sr.connect("struttura_costruita", _su_base)
+		sr.connect("struttura_distrutta", _su_base)
 	_su_sede()
 
 
@@ -44,8 +51,18 @@ func cella_orto() -> Vector2i:
 	return _cella
 
 
+## La casella dove comincia una struttura ((-1, -1) se non ha posto).
+func cella_struttura(struct_id: String) -> Vector2i:
+	return _posti.get(struct_id, Vector2i(-1, -1))
+
+
 func _su_sede(_a: Variant = null) -> void:
-	_cella = _posto("giardino", _larghezza_orto())
+	var prese: Dictionary = {}
+	_cella = _posto("giardino", _larghezza_orto(), prese)
+	_posti = {}
+	var gd: Node = _auto("GameData")
+	for sid in (gd.call("structure_ids") if gd != null else []):
+		_posti[sid] = _posto(str(sid), _misura(str(sid)).x, prese)
 	_crea_area()
 	disegna()
 
@@ -54,7 +71,7 @@ func _su_base(_a: Variant = null, _b: Variant = null) -> void:
 	disegna()
 
 
-## Rifa' i disegni dell'orto dallo stato del giardino.
+## Rifa' i disegni dell'orto dallo stato del giardino e quelli delle strutture costruite.
 func disegna() -> void:
 	for c in get_children():
 		if c is Sprite2D:
@@ -62,6 +79,7 @@ func disegna() -> void:
 			c.queue_free()
 	if _cella.x < 0:
 		return
+	_disegna_strutture()
 	var bs: Node = _auto("BaseSystem")
 	if bs == null:
 		return
@@ -71,6 +89,22 @@ func disegna() -> void:
 	var stato: Array = bs.call("appezzamenti")
 	for i in stato.size():
 		_metti("orto_" + _stadio(stato[i]), _cella + Vector2i(i, 0))
+
+
+## Ogni struttura del registro al suo posto fuori dalla sede (e li' anche nel registro: le abilita' d'area la cercano).
+func _disegna_strutture() -> void:
+	var sr: Node = _auto("StructureRegistry")
+	if sr == null:
+		return
+	var tile: float = float(_mondo.get("tile"))
+	for e in sr.call("attive"):
+		var sid: String = str(e["struct_id"])
+		var c: Vector2i = _posti.get(sid, Vector2i(-1, -1))
+		if c.x < 0:
+			continue
+		var m: Vector2i = _misura(sid)
+		sr.call("sposta", str(e["id"]), Vector2((c.x + m.x / 2.0) * tile, (c.y + m.y / 2.0) * tile))
+		_metti(sid, c, "Struttura")
 
 
 ## vuoto, germoglio, pianta (da giardino.pianta_da della crescita) o maturo.
@@ -84,7 +118,7 @@ func _stadio(a: Dictionary) -> String:
 	return "pianta" if fatta >= float(g.get("pianta_da", 0.5)) else "germoglio"
 
 
-func _metti(id: String, c: Vector2i) -> void:
+func _metti(id: String, c: Vector2i, prefisso: String = "Orto") -> void:
 	var gs: Node = _auto("GameState")
 	var path := "res://assets/interni/%s/arredi/%s.png" % [str(gs.call("tema_arte")) if gs != null else "luminoso", id]
 	var voce: Dictionary = _auto("GameData").call("get_arredo", id)
@@ -95,12 +129,18 @@ func _metti(id: String, c: Vector2i) -> void:
 	var m: Array = voce["misura"]
 	var tile: float = float(_mondo.get("tile"))
 	var spr := Sprite2D.new()
-	spr.name = "Orto_%s_%d_%d" % [id, c.x, c.y]
+	spr.name = "%s_%s_%d_%d" % [prefisso, id, c.x, c.y]
 	spr.texture = preload("res://scripts/world/mondo.gd")._texture(path)
 	spr.centered = false
 	spr.offset = -Vector2(float(an[0]), float(an[1]))
 	spr.position = Vector2((c.x + float(m[0]) / 2.0) * tile, (c.y + int(m[1])) * tile)
 	add_child(spr)
+
+
+## Le caselle del disegno (data/world/arredi.json misura) di una struttura.
+func _misura(id: String) -> Vector2i:
+	var m: Array = (_auto("GameData").call("get_arredo", id) as Dictionary).get("misura", [1, 1])
+	return Vector2i(int(m[0]), int(m[1]))
 
 
 ## Quante caselle in fila servono all'orto: il massimo degli appezzamenti del giardino, almeno quelle del cantiere.
@@ -113,8 +153,9 @@ func _larghezza_orto() -> int:
 
 
 ## La casella da cui parte una fila di n caselle per la voce "esterno" della sede: vicino alla porta + lo scostamento
-## dei dati, tutte libere, nella regione della porta, non sotto il tetto di una casa ne' sul passaggio della porta.
-func _posto(chiave: String, n: int) -> Vector2i:
+## dei dati, tutte libere, nella regione della porta, non sotto il tetto di una casa ne' sul passaggio della porta,
+## staccate di una casella da quelle gia' prese (che si aggiungono a prese).
+func _posto(chiave: String, n: int, prese: Dictionary = {}) -> Vector2i:
 	var bs: Node = _auto("BaseSystem")
 	var sede: String = str(bs.call("sede")) if bs != null else ""
 	var porta: Node2D = _mondo.get_node_or_null("Porta_" + sede) as Node2D
@@ -134,12 +175,22 @@ func _posto(chiave: String, n: int) -> Vector2i:
 				var q := c + Vector2i(dx, dy)
 				var ok := true
 				for i in n:
-					if not _libera(q + Vector2i(i, 0), p, rid):
+					if not _libera(q + Vector2i(i, 0), p, rid) or _vicino_a(q + Vector2i(i, 0), prese):
 						ok = false
 						break
 				if ok:
+					for i in n:
+						prese[q + Vector2i(i, 0)] = true
 					return q
 	return Vector2i(-1, -1)
+
+
+func _vicino_a(q: Vector2i, prese: Dictionary) -> bool:
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			if prese.has(q + Vector2i(dx, dy)):
+				return true
+	return false
 
 
 func _libera(q: Vector2i, porta: Vector2i, rid: String) -> bool:

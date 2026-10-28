@@ -157,6 +157,26 @@ func sposta(interno_id: String) -> bool:
 	return true
 
 
+# --- Strutture (US-8B20e) -----------------------------------------
+
+## Costruisce una struttura della base (data/structures, una per tipo) pagando il suo costo: l'istanza va in
+## StructureRegistry; dove stia la mette il mondo (fuori dalla sede, base_fuori.gd). false se c'e' gia', il tipo non
+## esiste o il costo non e' coperto.
+func costruisci_struttura(struct_id: String) -> bool:
+	var sr: Node = get_node_or_null("/root/StructureRegistry")
+	var tipo: Dictionary = _gd().call("get_structure", struct_id) if _gd() != null else {}
+	if sr == null or tipo.is_empty() or struttura_costruita(struct_id):
+		return false
+	if not _paga(tipo.get("costo", {})):
+		return false
+	return not str(sr.call("costruisci", struct_id, Vector2.ZERO)).is_empty()
+
+
+func struttura_costruita(struct_id: String) -> bool:
+	var sr: Node = get_node_or_null("/root/StructureRegistry")
+	return sr != null and (sr.call("attive") as Array).any(func(e): return str(e["struct_id"]) == struct_id)
+
+
 # --- Giardino (US-328) --------------------------------------------
 
 ## Quanti appezzamenti ha il giardino = bonus 'appezzamenti' del suo livello.

@@ -735,8 +735,8 @@
       ],
       "priority": 40,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-10-28. Costo in data/structures/core.json; BaseSystem.costruisci_struttura (una per tipo), StructureRegistry.sposta; pagina Base sezione Strutture; base_fuori.gd le disegna nei posti 'esterno' della sede (staccate dall'orto), la posizione nel registro segue. arte/revisione/base_strutture.png."
     }
   ]
 }

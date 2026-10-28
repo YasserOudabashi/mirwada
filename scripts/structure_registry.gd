@@ -67,6 +67,13 @@ func distruggi(instance_id: String, volontario: bool) -> bool:
 	return false
 
 
+## US-8B20e: le strutture della base stanno fuori dalla sede e la seguono quando si sposta.
+func sposta(instance_id: String, posizione: Vector2) -> void:
+	var e: Dictionary = _trova(instance_id)
+	if not e.is_empty():
+		e["posizione"] = [posizione.x, posizione.y]
+
+
 func attive() -> Array:
 	return _strutture.duplicate(true)
 

@@ -13,7 +13,7 @@ func prepara() -> void:
 	if _n("/root/Book") != null:
 		_n("/root/Book").call("azzera")
 	Engine.get_main_loop().root.get_tree().paused = false
-	for a in ["/root/Inventory", "/root/BaseSystem"]:
+	for a in ["/root/Inventory", "/root/BaseSystem", "/root/StructureRegistry"]:
 		if _n(a) != null:
 			_n(a).call("pulisci")
 
@@ -114,3 +114,29 @@ func test_raccogli_dalla_pagina_quando_l_appezzamento_e_pronto() -> void:
 	assert_gt(float(_n("/root/Inventory").call("conta", "erba_lunare")), 0.0,
 		"raccolto dalla pagina del libro -> erba lunare in zaino")
 	res[0].free()
+
+
+## US-8B20e: le strutture sotto le stanze, col costo; si costruiscono dalla pagina, poi sono "costruita".
+func test_le_strutture_si_costruiscono_dalla_pagina() -> void:
+	var costo: Dictionary = _n("/root/GameData").call("get_structure", "totem_veglia")["costo"]
+	for item_id in costo:
+		_n("/root/Inventory").call("aggiungi", item_id, int(costo[item_id]))
+	var res: Array = _pagina_base()
+	var t: String = _testo(res[1])
+	assert_true(t.contains(tr("BOOK_BASE_STRUTTURE_TITOLO")), "le strutture hanno la loro sezione")
+	assert_true(t.contains("Totem di veglia") and t.contains("Palizzata") and t.contains("Deposito"), "tutte e tre")
+	for r in res[1]:
+		for c in (r.get_children() if not (r is Label) else []):
+			if c is Button and c.text == tr("BOOK_BASE_COSTRUISCI") and not c.disabled:
+				c.emit_signal("pressed")
+	assert_true(bool(_n("/root/BaseSystem").call("struttura_costruita", "totem_veglia")), "il totem costruito dalla pagina")
+	assert_false(bool(_n("/root/BaseSystem").call("struttura_costruita", "palizzata")), "la palizzata no: mancava il costo")
+	var pag: Node = res[2]
+	pag.call("_mostra", "base")
+	var sc: Node = null
+	for c in pag.get_children():
+		if c is ScrollContainer:
+			sc = c
+	assert_true(_testo(sc.get_child(0).get_children()).contains(tr("BOOK_BASE_COSTRUITA")), "ora dice costruita")
+	res[0].free()
+
