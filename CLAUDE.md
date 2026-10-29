@@ -53,6 +53,8 @@ va scritto nella story.
 - **Niente spiegazioni prima del codice** (decisione dell'utente, 2026-10-23: "non mi devi spiegare niente, tu fai
   e basta"). Si fa, si verifica, e alla fine si riassume cosa è stato fatto. Si chiede solo per le decisioni che
   spettano all'utente (cambiare cose già approvate, scelte di design o di gioco).
+- **Niente controlli automatici** (decisione dell'utente, 2026-10-29): non si programmano controlli periodici della
+  PR o della CI e non ci si iscrive agli eventi della PR; si controlla solo quando lo chiede l'utente.
 - Quando l'utente chiede del codice, lo spieghi bene, con parole semplici e un esempio.
 - Quando c'è un errore, dici **come correggerlo**, non solo che c'è.
 - Rispondi in italiano.
@@ -405,7 +407,7 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   layout restano come dati e come fonte del contenuto da portare sul mondo generato.
 - Fase 11 — Villaggi ed economia (rarita', fabbri, interni, villaggi in campagna): **CHIUSA** sul suo
   ramo; i villaggi e gli edifici vanno portati sul mondo generato come per la fase 10.
-- Fase 8b — Arte con sprite-forge: **IN CORSO**. Fatti: personaggi a 64 px, aspetti degli NPC, terreni,
+- Fase 8b — Arte con sprite-forge: **CHIUSA** (2026-10-29, tutto su `main`). Fatti: personaggi a 64 px, aspetti degli NPC, terreni,
   pareti, mondo generato (seed 6) con modalita' luminosa/cupa, mondo unico nel gioco (US-8B12..g:
   caricatore, regione dalla posizione, NPC, collisioni, sottosuolo, contenuto dei layout), libro (US-8B73),
   edifici di citta', villaggi e torri con le porte verso i 14 interni (US-8B18a/b), interni disegnati e
@@ -416,14 +418,17 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   facciate (US-8B73b/c/d), le forme di Enel, gigante e arma di luce (US-8B50a/b/c), i gesti di Enel (interagire, raccogliere, bere,
   rituale: US-8B80a/b), Enel in volo e in barca (US-8B81a/b), panorama dell'avvio (US-8B74), forzieri e oggetti nelle case (US-8B22a/b/c), fauna d'atmosfera (US-8B23a/b), cannocchiale del faro con la lente (US-8B24a/b), buio di notte (US-8B25), base del giocatore con le stanze,
   la sede, l'orto, le strutture e la nave
-  (US-8B20a..e), la camera che inquadra gli interni sotto l'HUD (US-8B18e).
-  PRD `prd-fase-8b-arte.md`, story aperte in `prd.json`.
-- Fase 12 — Atto II/III e Mondo vivo: **PIANIFICATA**. PRD `prd-fase-12-atto-2-3.md`,
-  `prd-fase-12-mondo-vivo.md`.
+  (US-8B20a..f), la camera che inquadra gli interni sotto l'HUD (US-8B18e), gli oggetti fissi presi una volta sola
+  (US-8B22d), l'HUD leggibile (US-8B75). PRD `prd-fase-8b-arte.md`.
+- Fase 12 — Mondo vivo: **PIANIFICATA**, PRD `prd-fase-12-mondo-vivo.md` da riscrivere sul mondo generato (US-1200).
+- Fase 13 — Atto II e III: **PIANIFICATA**, PRD `prd-fase-12-atto-2-3.md` (story US-1301..US-1313). Va fatta per
+  prima: senza, la prova finale (`trib_1_0`) non si supera e il gioco non si finisce.
+- Fase 14 — altri Pathway Non-Standard: facoltativa.
 
-**Lavoro corrente** (vedi `006_PRD/prossimi-passi.md` e `prd.json`): restano
-dal PRD dell'arte le creature (evocazioni e antagonisti: aspettano di avere una figura nel mondo) e le animazioni
-di nuoto e arrampicata (arrivano col loro gameplay, US-8B90/92).
+**Lavoro corrente** (controllo del 2026-10-29): tutto il lavoro che manca e' in `prd.json` (57 story aperte, con la
+fase e la priorita'), l'ordine in `006_PRD/prossimi-passi.md`: miglioramenti rapidi (US-8B44..), arte rimasta
+(cannocchiale da tasca, luci di notte, panorami per regione, evocazioni, antagonisti, nuoto, arrampicata), Atto II e
+III, Mondo vivo, fusioni (US-7B01..07), inglese (US-EN01..05).
 
 ## Decisioni prese
 
@@ -462,6 +467,8 @@ di nuoto e arrampicata (arrivano col loro gameplay, US-8B90/92).
 - **Barca** (2026-10-26): barca libera al **molo di Mirwada**; in barca l'acqua si attraversa, si sbarca sulle coste.
 - **Panorama all'avvio** (2026-10-27): all'avvio (nessuna partita, scaffale) il libro e' **piu' piccolo** e intorno
   scorre il panorama a strati; il momento viene dall'ora del computer. In partita il libro torna grande sopra il mondo.
+- **Tutto su main, niente controlli automatici** (2026-10-29): la PR #5 (fase 8b, con dentro le fasi 8-11) e' unita
+  in `main`; i controlli della PR e della CI si fanno solo quando li chiede l'utente.
 - **Frontiera, come si arriva** (2026-10-26): **in barca, volando, o da una soglia nel faro** che si apre solo con
   una chiave trovata nel mondo. Resta il gating di sequenza (respinge chi e' oltre la Sequenza 4).
 

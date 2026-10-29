@@ -14975,3 +14975,13 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - A schermo: Enel che cammina verso il deposito si ferma al suo bordo (16734 contro 16736 unita').
   arte/revisione/base_blocca.png. test_base_fuori (corpo e niente ridisegno inutile). 1076 test, validate 0.
 
+## Controllo e chiusura del 2026-10-29
+- Controllo completo (stato.sh del controllo-assoluto): fase 8b 53/53, git pulito, 1073 test e validate 0. Trovati e
+  corretti: oggetti fissi che ricomparivano (US-8B22d), HUD poco leggibile (US-8B75), strutture attraversabili
+  (US-8B20f). Tutto il resto segnato in prd.json (57 story aperte, ordine in 006_PRD/prossimi-passi.md).
+- Decisioni dell'utente: niente controlli automatici della PR o della CI (cancellato il controllo orario e tolta la
+  sottoscrizione agli eventi della PR: si controlla solo su richiesta); tutto su main (PR #5 unita).
+- Numerazione: il PRD prd-fase-12-mondo-vivo.md e' la fase 12 (US-1200 lo riscrive sul mondo generato, poi
+  US-1201..1216); il PRD prd-fase-12-atto-2-3.md e' la fase 13 (US-1301..1313) e va fatta per prima.
+- Documentazione docx e diario al 29.10 (docs/documentazione.py, diario.py), README e CLAUDE.md allineati.
+

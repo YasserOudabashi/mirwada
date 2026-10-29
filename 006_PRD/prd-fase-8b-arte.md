@@ -5,7 +5,13 @@
 > Questo PRD **non** sostituisce `prd-fase-8-vertical-slice.md`: lo affianca.
 > Le story qui hanno id `US-8B..` per non collidere con `US-801..814`.
 
-## 0. Stato al 2026-10-26
+## 0. Stato al 2026-10-29: fase chiusa
+
+La fase 8b e' chiusa e tutto e' su `main`. Quello che il PRD prevedeva e non e' ancora fatto e' passato in
+`prd.json` come story aperte: cannocchiale da tasca (US-8B26), luci di notte (US-8B27), panorami per regione e cupi
+(US-8B74b), evocazioni e antagonisti con la loro figura (US-8B60a/b), nuoto (US-8B90), arrampicata (US-8B92), piu' i
+miglioramenti del controllo del 29.10 (US-8B44, US-8B70b, US-8B91b, US-8B96, US-8B24c, US-8B80c, US-8B21d,
+US-8B73e). La tabella sotto e' lo stato al 2026-10-26.
 
 Dettaglio di ogni story in `progress.txt` (cerca la sigla); le aperte sono anche in `prd.json`.
 

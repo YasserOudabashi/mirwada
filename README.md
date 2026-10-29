@@ -190,17 +190,24 @@ primitive/eventi nuovi**, save invariato. Verdetto:
 motore nominano un NPC, un villaggio, un blueprint o una ricetta
 specifici — lista vietata letta dai dati.
 
-**Fase 8b — Arte e mondo generato: in corso** (ramo parallelo alle fasi 8-11,
-unito il 2026-10-25). Tutta l'arte la genera Claude con sprite-forge:
-personaggi a 64 px, aspetti degli NPC, terreni e pareti, un **mondo unico di
-1200 x 1000 caselle** generato dal seed 6 e salvato come dati in
-`assets/world/` (due modalita': luminosa facile, cupa difficile). Nel gioco
-(`scripts/world/mondo.gd`): blocchi costruiti attorno al giocatore, regione
-dalla posizione, NPC al loro luogo, il sottosuolo come secondo livello (dalle
-fogne di Mirwada alle catacombe delle Marche, dove si arriva solo volando o da
-sotto terra), nemici/boss/oggetti dei layout della fase 10 riportati sul mondo,
-il libro ridisegnato (cuoio, pergamena, font Alegreya). 982 test.
-PRD: `006_PRD/prd-fase-8b-arte.md`, story aperte in `prd.json`.
+**Fase 8b — Arte e mondo generato: chiusa** (ramo parallelo alle fasi 8-11,
+unito il 2026-10-25; tutto su `main` dal 2026-10-29). Tutta l'arte la genera
+Claude con sprite-forge: personaggi a 64 px con tutte le animazioni, aspetti e
+ritratti degli NPC, terreni e pareti, un **mondo unico di 1200 x 1000 caselle**
+generato dal seed 6 e salvato come dati in `assets/world/` (due modalita':
+luminosa facile, cupa difficile). Nel gioco (`scripts/world/mondo.gd`): blocchi
+costruiti attorno al giocatore, case con le porte verso 18 interni arredati, il
+sottosuolo come secondo livello, barca, volo, soglia del faro, varchi delle
+sotto-aree, forzieri, fauna, buio di notte, la base del giocatore (quattro
+versioni, stanze, orto, strutture, nave), icone, VFX di tutte le primitive, il
+libro sulle due facciate. 1076 test.
+PRD: `006_PRD/prd-fase-8b-arte.md`.
+
+**Cosa manca** (tutto in `prd.json`, 57 story aperte; ordine in
+`006_PRD/prossimi-passi.md`): la storia dell'Atto II e III (fase 13: senza, la
+prova finale non si supera), il Mondo vivo (fase 12, da riscrivere sul mondo
+generato), le fusioni ancora stub, la traduzione inglese, un po' di arte
+(creature, luci di notte, nuoto, arrampicata) e alcuni miglioramenti.
 
 ## Setup
 
@@ -247,7 +254,8 @@ di motore che nominino un Pathway specifico.
 ## Documenti
 
 - `CLAUDE.md` — regole di lavoro, comandi, decisioni prese
-- `006_PRD/prd-fase-8b-arte.md` — **PRD della fase in corso** (arte con sprite-forge e mondo generato)
+- `006_PRD/prd-fase-8b-arte.md` — PRD della fase 8b (chiusa: arte con sprite-forge e mondo generato)
+- `006_PRD/prd-fase-12-atto-2-3.md` — PRD dell'Atto II e III (fase 13 in `prd.json`, US-1301..US-1313); `006_PRD/prd-fase-12-mondo-vivo.md` — fase 12 (da riscrivere sul mondo generato)
 - `006_PRD/prd-fase-9-pathway-non-standard.md` — PRD della fase 9 (chiusa, Pathway Non-Standard, motore Boon + Eternal Aeon, 7 story)
 - `006_PRD/prd-fase-8-vertical-slice.md` — PRD della fase 8 (chiusa, vertical slice giocabile, 19 story)
 - `006_PRD/prossimi-passi.md` — istruzioni operative per la prossima sessione: stato, ordine delle story, trappole note
@@ -265,8 +273,8 @@ di motore che nominino un Pathway specifico.
 - `006_PRD/design-vfx.md` — identita' visiva delle abilita' (stile manhwa), 10 palette
 - `006_PRD/art-brief-gemini.md` — prompt pronti per generare concept/ritratti/UI con Gemini, con i limiti dichiarati
 - `data/audio.json` — sistema audio data-driven (tell sonori, follia, palette)
-- `006_PRD/roadmap.md` — fasi 2-10
-- `prd.json` — story della fase 8b (fatte e aperte) in formato ralph
+- `006_PRD/roadmap.md` — fasi 2-14
+- `prd.json` — tutte le story (fatte e aperte, con la fase) in formato ralph
 - `progress.txt` — memoria tra le sessioni
 - `docs/documentazione.py` — rigenera la documentazione docx; `diario.py` — diario del progetto
 
