@@ -741,6 +741,21 @@
       "fase": "8b",
       "passes": true,
       "notes": "2026-10-28. Costo in data/structures/core.json; BaseSystem.costruisci_struttura (una per tipo), StructureRegistry.sposta; pagina Base sezione Strutture; base_fuori.gd le disegna nei posti 'esterno' della sede (staccate dall'orto), la posizione nel registro segue. arte/revisione/base_strutture.png."
+    },
+    {
+      "id": "US-8B22d",
+      "title": "Gli oggetti fissi si prendono una volta sola",
+      "description": "Gli oggetti a terra dei layout e degli interni non ricompaiono dopo essere stati presi (WorldState.presi, nel salvataggio).",
+      "acceptanceCriteria": [
+        "oggetto del mondo preso non ricompare caricando",
+        "oggetto di un interno preso non ricompare rientrando",
+        "nel salvataggio",
+        "test"
+      ],
+      "priority": 41,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-29. Meta preso_id ('<regione>@<i>', '<interno>@<i>', '<interno>:ospiti@<i>'), WorldState.prendi al tree_exiting se raccolto. Non usare la meta 'chiave' (e' delle soglie). tests/test_forzieri.gd."
     }
   ]
 }

@@ -24,7 +24,8 @@ var _scoperte: Array = []   # id di regione, stringhe
 var _gate_aperti: Array = []  # id di gate, stringhe
 ## US-8B22: i forzieri gia' aperti (id dei dati): si aprono una volta sola.
 var _forzieri_aperti: Array = []
-## US-8B22c: gli oggetti messi una volta sola (quelli a caso nelle case) gia' presi: non ricompaiono.
+## US-8B22c: gli oggetti messi una volta sola gia' presi: non ricompaiono (a caso nelle case, e dal 2026-10-29 anche quelli
+## fissi dei layout nel mondo e degli interni).
 var _presi: Array = []
 ## Il location_tag della zona in cui si trova il giocatore ("" fuori da una
 ## zona nominata). TRANSITORIO: e' posizione, non stato del mondo, non va nel

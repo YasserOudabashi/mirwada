@@ -180,3 +180,65 @@ func test_un_oggetto_a_caso_preso_non_ricompare() -> void:
 	b.free()
 	inv.call("rimuovi", id, q)
 	(ws.get("_presi") as Array).erase("valle_avamposto_focolare#0")
+
+
+# --- 2026-10-29: gli oggetti fissi dei layout e degli interni si prendono una volta sola ------------------
+
+func _fissi(nodo: Node) -> Array:
+	return nodo.get_children().filter(func(n): return n.has_meta("preso_id"))
+
+
+func test_un_oggetto_fisso_di_un_interno_preso_non_ricompare() -> void:
+	var ws: Node = _root().get_node("WorldState")
+	var inv: Node = _root().get_node("Inventory")
+	var a := _casa("mirwada_casa_di_lena")
+	var fissi: Array = _fissi(a)
+	assert_eq(fissi.size(), 1, "la trottola dei dati a terra")
+	var chiave: String = str(fissi[0].get_meta("preso_id"))
+	var id: String = str(fissi[0].get("char_id"))
+	var prima: int = int(inv.call("conta", id))
+	assert_true(bool(fissi[0].call("raccogli")), "si raccoglie")
+	a.free()
+	assert_true(bool(ws.call("preso", chiave)), "il mondo sa che e' stato preso")
+	assert_eq(int(inv.call("conta", id)), prima + 1, "nello zaino")
+	var b := _casa("mirwada_casa_di_lena")
+	assert_eq(_fissi(b).size(), 0, "rientrando non c'e' piu'")
+	b.free()
+	var c := _casa("valle_avamposto_vedetta")
+	assert_eq(_fissi(c).size(), 1, "quello di un'altra casa resta")
+	c.free()
+	inv.call("rimuovi", id, 1)
+	(ws.get("_presi") as Array).erase(chiave)
+
+
+func test_un_oggetto_fisso_del_mondo_preso_non_ricompare() -> void:
+	var ws: Node = _root().get_node("WorldState")
+	var inv: Node = _root().get_node("Inventory")
+	var m: Node2D = preload("res://scripts/world/mondo.gd").new()
+	m.set("tema", "luminoso")
+	assert_true(m.call("carica"), "mondo caricato")
+	_root().add_child(m)                            # _ready popola; tree_exiting segna il preso
+	var fissi: Array = _fissi(m)
+	assert_gt(fissi.size(), 20, "gli oggetti dei layout sul mondo")
+	var chiavi: Array = fissi.map(func(n): return str(n.get_meta("preso_id")))
+	assert_eq(chiavi.size(), chiavi.reduce(func(acc, k): return acc if k in acc else acc + [k], []).size(), "chiavi diverse")
+	var o: Node = fissi[0]
+	var chiave: String = str(o.get_meta("preso_id"))
+	var id: String = str(o.get("char_id"))
+	var q: int = int(o.get("quantita"))
+	assert_true(bool(o.call("raccogli")), "si raccoglie")
+	o.free()
+	assert_true(bool(ws.call("preso", chiave)), "segnato come preso")
+	m.free()
+	var m2: Node2D = preload("res://scripts/world/mondo.gd").new()
+	m2.set("tema", "luminoso")
+	m2.call("carica")
+	m2.call("popola")
+	var dopo: Array = _fissi(m2).map(func(n): return str(n.get_meta("preso_id")))
+	assert_false(chiave in dopo, "caricando di nuovo non ricompare")
+	assert_eq(dopo.size(), chiavi.size() - 1, "gli altri si'")
+	var dati: Dictionary = ws.call("per_salvataggio")
+	assert_true(chiave in (dati.get("presi", []) as Array), "e va nel salvataggio")
+	m2.free()
+	inv.call("rimuovi", id, q)
+	(ws.get("_presi") as Array).erase(chiave)

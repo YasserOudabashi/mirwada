@@ -312,7 +312,7 @@ func _crea_ospiti(layout: Dictionary) -> void:
 			spec["y"] = c.y
 			(dentro[k] as Array).append(spec)
 	_crea_nemici(dentro)
-	_crea_oggetti(dentro)
+	_crea_oggetti(dentro, ":ospiti")
 
 
 func _libera_vicina(c: Vector2i, prese: Dictionary, spawn: Vector2i, distanza_spawn: int) -> Vector2i:
@@ -391,19 +391,30 @@ func _crea_nemici(layout: Dictionary) -> void:
 		e.get_node("StatsComponent").call("configure_from_balance", sequenza)
 
 
-func _crea_oggetti(layout: Dictionary) -> void:
+## Gli oggetti a terra dei dati; uno preso non ricompare (WorldState.presi, chiave "<interno>@<i>", per gli ospiti del
+## varco "<interno>:ospiti@<i>"), una chiave del mondo che si ha gia' nemmeno.
+func _crea_oggetti(layout: Dictionary, gruppo: String = "") -> void:
 	var gd: Node = get_node_or_null("/root/GameData")
 	var inv: Node = get_node_or_null("/root/Inventory")
-	for o in (layout.get("oggetti", []) as Array):
-		var spec: Dictionary = o as Dictionary
+	var ws: Node = get_node_or_null("/root/WorldState")
+	var oggetti: Array = layout.get("oggetti", [])
+	for i in oggetti.size():
+		var spec: Dictionary = oggetti[i] as Dictionary
+		var chiave: String = "%s%s@%d" % [interno_id, gruppo, i]
 		var it: Dictionary = gd.call("get_item", str(spec.get("item_id", ""))) if gd != null else {}
 		if not bool(it.get("vendibile", true)) and inv != null and bool(inv.call("possiede", str(spec["item_id"]))):
 			continue                                   # una chiave del mondo che si ha gia' non ricompare
+		if ws != null and bool(ws.call("preso", chiave)):
+			continue
 		var pickup := preload("res://scripts/item_pickup.gd").new()
 		add_child(pickup)
 		pickup.call("setup", str(spec.get("item_id", "")), to_global(map_to_local(
 			Vector2i(int(spec.get("x", 0)), int(spec.get("y", 0))))))
 		pickup.set("quantita", int(spec.get("quantita", 1)))
+		pickup.set_meta("preso_id", chiave)
+		pickup.tree_exiting.connect(func() -> void:
+			if bool(pickup.get("_raccolta")) and ws != null:
+				ws.call("prendi", chiave))
 
 
 # --- NPC (US-1108, fase 11) -------------------------------------------

@@ -14950,3 +14950,12 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
 - Aperto: la nave non si muove (decisione: ormeggiata); i pontili stretti del porto non si raggiungono a piedi
   (dislivello alla radice: dati del mondo).
 
+## US-8B22d — Gli oggetti fissi si prendono una volta sola, 2026-10-29
+- Prima gli oggetti a terra dei layout (sul mondo, mondo._popola_da) e degli interni (_crea_oggetti, anche gli ospiti
+  dei varchi) tornavano a ogni caricamento: si potevano raccogliere all'infinito. Ora ognuno ha un nome stabile
+  ("<regione>@<i>" nel mondo, "<interno>@<i>" e "<interno>:ospiti@<i>" negli interni, meta "preso_id") e raccolto
+  va in WorldState.presi (gia' nel salvataggio, lo usavano gli oggetti a caso delle case): non ricompare.
+- Trappola: la prima versione usava la meta "chiave" sugli oggetti, ma "chiave" e' la meta delle soglie chiuse a
+  chiave (mondo._aggiorna_varchi): il mondo prendeva gli oggetti per porte (SCRIPT ERROR "Chiuso" non trovato).
+- tests/test_forzieri.gd (+2: interno e mondo, anche nel salvataggio). 1075 test, validate 0.
+

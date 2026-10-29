@@ -394,9 +394,12 @@ func _popola_da(rid_eventi: String, rid: String, layout: Dictionary, occupate: D
 		e.set("sequenza", sequenza)
 		e.get_node("StatsComponent").call("configure_from_balance", sequenza)
 		e.connect("morto", _su_nemico_morto.bind(rid_eventi))
-	for o in layout.get("oggetti", []):
-		var spec_o: Dictionary = o
-		if _in_rect(spec_o, dietro):
+	var ws: Node = Engine.get_main_loop().root.get_node_or_null("WorldState")
+	var oggetti: Array = layout.get("oggetti", [])
+	for i in oggetti.size():
+		var spec_o: Dictionary = oggetti[i]
+		var chiave: String = "%s@%d" % [rid_eventi, i]          # stabile: preso una volta, non ricompare
+		if _in_rect(spec_o, dietro) or (ws != null and bool(ws.call("preso", chiave))):
 			continue
 		var posto_o: Dictionary = posto_dal_layout(rid, layout, int(spec_o.get("x", 0)), int(spec_o.get("y", 0)), occupate)
 		var c_o: Vector2i = posto_o["cella"]
@@ -408,6 +411,10 @@ func _popola_da(rid_eventi: String, rid: String, layout: Dictionary, occupate: D
 		pickup.set("quantita", int(spec_o.get("quantita", 1)))
 		pickup.set_meta("regione_layout", rid_eventi)
 		pickup.set_meta("livello", posto_o["livello"])
+		pickup.set_meta("preso_id", chiave)
+		pickup.tree_exiting.connect(func() -> void:
+			if bool(pickup.get("_raccolta")) and ws != null:
+				ws.call("prendi", chiave))
 		_mostra(pickup, posto_o["livello"] == livello)
 
 
