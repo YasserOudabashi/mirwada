@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "interno_id": "base_casa",
+  "stile": "casa",
+  "mappa": [
+    "################",
+    "#....#....#....#",
+    "#....#....#....#",
+    "#....#....#....#",
+    "##+####+####+###",
+    "#..............#",
+    "#..............#",
+    "################"
+  ],
+  "spawn": [
+    8,
+    6
+  ],
+  "arredi": [
+    {
+      "id": "letto",
+      "x": 1,
+      "y": 5
+    },
+    {
+      "id": "camino",
+      "x": 4,
+      "y": 5
+    },
+    {
+      "id": "tappeto",
+      "x": 7,
+      "y": 5
+    },
+    {
+      "id": "cassa",
+      "x": 14,
+      "y": 5
+    }
+  ],
+  "_comment_esterno": "US-8B20c: fuori dalla porta della base nel mondo, caselle dalla porta (x, y) dove cercare il posto dell'orto e delle strutture (US-8B20e, chiave = id della struttura; la fila libera piu' vicina).",
+  "esterno": {"giardino": [3, 1], "deposito": [3, 3], "palizzata": [-5, 1], "totem_veglia": [-3, 2]},
+  "stanze": {
+    "laboratorio": {
+      "rect": [
+        1,
+        1,
+        4,
+        3
+      ],
+      "livelli": [
+        [
+          {
+            "id": "cantiere",
+            "x": 3,
+            "y": 1
+          }
+        ],
+        [
+          {
+            "id": "alambicco",
+            "x": 1,
+            "y": 1
+          }
+        ],
+        [
+          {
+            "id": "alambicco",
+            "x": 1,
+            "y": 1
+          },
+          {
+            "id": "scaffale",
+            "x": 3,
+            "y": 1
+          },
+          {
+            "id": "botte",
+            "x": 4,
+            "y": 3
+          }
+        ]
+      ]
+    },
+    "stanza_rituale": {
+      "rect": [
+        6,
+        1,
+        4,
+        3
+      ],
+      "livelli": [
+        [
+          {
+            "id": "cantiere",
+            "x": 8,
+            "y": 1
+          }
+        ],
+        [
+          {
+            "id": "altare",
+            "x": 7,
+            "y": 1
+          }
+        ],
+        [
+          {
+            "id": "altare",
+            "x": 7,
+            "y": 1
+          },
+          {
+            "id": "sigillo",
+            "x": 7,
+            "y": 2
+          },
+          {
+            "id": "vaso",
+            "x": 6,
+            "y": 1
+          },
+          {
+            "id": "vaso",
+            "x": 9,
+            "y": 1
+          }
+        ]
+      ]
+    },
+    "biblioteca": {
+      "rect": [
+        11,
+        1,
+        4,
+        3
+      ],
+      "livelli": [
+        [
+          {
+            "id": "cantiere",
+            "x": 13,
+            "y": 1
+          }
+        ],
+        [
+          {
+            "id": "scrittoio",
+            "x": 13,
+            "y": 2
+          }
+        ],
+        [
+          {
+            "id": "scrittoio",
+            "x": 13,
+            "y": 2
+          },
+          {
+            "id": "scaffale",
+            "x": 11,
+            "y": 1
+          },
+          {
+            "id": "scaffale",
+            "x": 13,
+            "y": 1
+          }
+        ]
+      ]
+    }
+  },
+  "nemici": [],
+  "oggetti": []
+}

@@ -96,23 +96,28 @@
     }
   },
   "primitive_vfx": {
+    "_comment": "US-8B40: sprite = foglio assets/vfx/<sprite>.png (tools/art/build_vfx.py), frames = colonne del foglio; se il foglio non c'e' ancora resta il segnaposto. Un effetto d'attacco ha il lampo nel primo frame (bianco, attenuato con riduci_flash) e poi la dissolvenza. sul_proiettile: il foglio veste il proiettile in volo (ciclo), scoppio = l'effetto quando colpisce o finisce la gittata. gira: il foglio e' disegnato verso destra e si gira con lo sguardo (gli altri stanno dritti, attorno a chi lancia).",
     "melee_arc": {
       "sprite": "vfx_slash",
-      "frames": 3,
+      "frames": 5,
       "impact_frame": true,
-      "scia": true
+      "scia": true,
+      "gira": true
     },
     "projectile": {
       "sprite": "vfx_bolt",
       "frames": 2,
       "impact_frame": true,
-      "scia": true
+      "scia": true,
+      "sul_proiettile": true,
+      "scoppio": {"sprite": "vfx_bolt_scoppio", "frames": 5}
     },
     "dash": {
       "sprite": "vfx_streak",
-      "frames": 3,
+      "frames": 4,
       "impact_frame": false,
-      "scia": true
+      "scia": true,
+      "gira": true
     },
     "buff_stat": {
       "sprite": "vfx_rune_up",
@@ -134,7 +139,7 @@
     },
     "shield": {
       "sprite": "vfx_ward",
-      "frames": 3,
+      "frames": 4,
       "impact_frame": false,
       "scia": false
     },
@@ -146,7 +151,7 @@
     },
     "dot": {
       "sprite": "vfx_smoulder",
-      "frames": 3,
+      "frames": 4,
       "impact_frame": false,
       "scia": false
     },
@@ -158,7 +163,7 @@
     },
     "light_purify": {
       "sprite": "vfx_cleanse",
-      "frames": 3,
+      "frames": 5,
       "impact_frame": true,
       "scia": false
     },
@@ -170,19 +175,19 @@
     },
     "terrain_modify": {
       "sprite": "vfx_fracture",
-      "frames": 4,
+      "frames": 5,
       "impact_frame": true,
       "scia": false
     },
     "curse": {
       "sprite": "vfx_hex",
-      "frames": 3,
+      "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "summon": {
       "sprite": "vfx_conjure",
-      "frames": 4,
+      "frames": 5,
       "impact_frame": true,
       "scia": false
     },
@@ -194,19 +199,19 @@
     },
     "reveal_info": {
       "sprite": "vfx_scry",
-      "frames": 3,
+      "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "teleport": {
       "sprite": "vfx_rift",
-      "frames": 3,
+      "frames": 5,
       "impact_frame": true,
       "scia": false
     },
     "soul_detach": {
       "sprite": "vfx_sever",
-      "frames": 4,
+      "frames": 5,
       "impact_frame": true,
       "scia": false
     },
@@ -224,7 +229,7 @@
     },
     "mind_read": {
       "sprite": "vfx_insight",
-      "frames": 3,
+      "frames": 4,
       "impact_frame": false,
       "scia": false
     },
@@ -242,13 +247,14 @@
     },
     "steal": {
       "sprite": "vfx_pilfer",
-      "frames": 3,
+      "frames": 4,
       "impact_frame": true,
-      "scia": true
+      "scia": true,
+      "gira": true
     },
     "possess": {
       "sprite": "vfx_grip",
-      "frames": 4,
+      "frames": 5,
       "impact_frame": true,
       "scia": false
     },
@@ -259,10 +265,38 @@
       "scia": true
     }
   },
+  "feedback_colpo": {
+    "_comment": "US-8B40b: il feedback visivo dei momenti del combattimento, con le stesse chiavi di audio.json combat_feedback. sprite = foglio in assets/vfx/ (tools/art/build_vfx.py), alto = unita' sopra il punto (i piedi di chi para, si rompe o scatta; la hurtbox colpita), colori = la rampa (non dipende dal Pathway: chi guarda deve riconoscere il colpo, la parata, la rottura).",
+    "hit_light": {"sprite": "vfx_scintilla", "frames": 4, "impact_frame": true, "alto": 10,
+                  "colori": {"inchiostro": "#181425", "primario": "#feae34", "accento": "#fee761"}},
+    "parry_perfect": {"sprite": "vfx_parata", "frames": 5, "impact_frame": true, "alto": 12,
+                      "colori": {"inchiostro": "#181425", "primario": "#0099db", "accento": "#2ce8f5"}},
+    "posture_break": {"sprite": "vfx_postura", "frames": 6, "impact_frame": true, "alto": 14,
+                      "colori": {"inchiostro": "#181425", "primario": "#e43b44", "accento": "#feae34"}},
+    "dash": {"sprite": "vfx_polvere", "frames": 4, "impact_frame": false, "alto": 0,
+             "colori": {"inchiostro": "#3e2731", "primario": "#c0cbdc", "accento": "#ffffff"}}
+  },
   "impact_frames": {
     "_comment": "Durata legata a combat_feedback.hitstop_ms di audio.json: si tarano insieme (US-227).",
     "stile": "inversione",
     "durata_frames": 2
+  },
+  "lampo_colpito": {
+    "_comment": "Lampo del colpo subito sullo sprite (revisione arte 1.7): lo fa il gioco, non il foglio. intensita' moltiplica i colori (self_modulate) e torna a 1 in durata_ms; con riduci_flash vale intensita_ridotta.",
+    "durata_ms": 120,
+    "intensita": 2.6,
+    "intensita_ridotta": 1.25
+  },
+  "ombra_terra": {
+    "_comment": "Ellisse disegnata dal gioco sotto i piedi di ogni entita' animata (revisione arte 2.2) e sotto gli oggetti a terra (oggetto, US-8B70): gli sprite non hanno ombre cotte. raggi in unita' di gioco (1 tile = 32).",
+    "colore": "#181425",
+    "alpha": 0.3,
+    "raggi": {
+      "personaggio": [6, 2],
+      "nemico_base": [6, 2],
+      "pet": [7, 2],
+      "oggetto": [5, 1.5]
+    }
   },
   "nero_di_scena": {
     "_comment": "Lo sfondo si mangia di nero nei momenti forti (design-vfx principio 2).",

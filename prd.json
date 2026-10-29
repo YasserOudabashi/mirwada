@@ -1,341 +1,1560 @@
 {
   "project": "Mirwada",
-  "branchName": "ralph/fase-7-endgame",
-  "description": "Fase 7 - Endgame. Cambio di Pathway (fusione tra Pathway vicini dello stesso gruppo: FusionEngine data-driven + 1 percorso completo error->door, 7 stub dichiarati), tribolazioni ai salti di fascia (TribulationSystem lettore di eventi + flag, zero verbi nuovi), Sequenze alte come contenuto (vocabolario chiuso prayer_effects.json, nessuna primitiva nuova), finali (data/endings.json: apoteosi/consumazione/rinuncia + 4 epiloghi per gruppo, condizioni da conditions.gd), eredita' al personaggio successivo (endgame.eredita: conoscenza sempre + 1 Ancora a forza/2 + reputazione x0.5 + 1 oggetto scelto). Save schema_version 21 -> 22 (un bump, campo 'endgame'). Antagonista strutturale gia' in antagonisti.json (fase 6): la fase 7 gli da' il sito rituale di Sequenza 0 e il ruolo nel finale, non un boss. I dati non sono codice: 28 primitive e 12 eventi invariati; ogni motore nuovo (PathwayChange, FusionEngine, TribulationSystem, EndingSystem) senza un if per un id di contenuto. Criterio di uscita: test_slice_fase_7.gd - cambio Pathway + fusione + tribolazione + finale + eredita' con zero righe che nominano un Pathway/coppia/tribolazione/finale specifico.",
+  "branchName": "claude/map-creation-resources-g0g7d5",
+  "description": "Fase 8b - Arte con sprite-forge e mondo generato, dopo il merge con le fasi 8-11 (2026-10-25). Fatto: mondo unico nel gioco, sottosuolo, NPC, contenuto dei layout, libro. Aperto: edifici e interni, varchi, volo e Frontiera (decisioni dell'utente), icone, VFX, panorami. Dettaglio in 006_PRD/prd-fase-8b-arte.md e 006_PRD/prossimi-passi.md. Dal 29.10: backlog completo (miglioramenti, arte rimasta, Atto II/III come fase 13, Mondo vivo come fase 12 da riscrivere, fusioni, inglese).",
   "userStories": [
     {
-      "id": "US-701",
-      "title": "Save schema_version 21 -> 22, campo endgame (Blocco 0)",
-      "description": "Come sviluppatore, voglio un solo bump del save per tutta la fase 7, cosi' che cambio Pathway, tribolazioni, finali ed eredita' stiano in un posto solo.",
+      "id": "US-8B12",
+      "title": "Loader del mondo unico",
+      "description": "Il mondo generato (seed 6) nel gioco: tessere composte in Python e deduplicate, blocchi costruiti attorno al giocatore, modalita' luminosa e cupa.",
       "acceptanceCriteria": [
-        "scripts/save_system.gd: VERSIONE_CORRENTE = 22; _migra_21_a_22(doc) aggiunge doc['endgame'] = { pathway_precedente:'', fusioni:[], tribolazioni_superate:[], eredita:{}, finale:'' } se assente. Idempotente, non tocca gli altri campi.",
-        "GameState.snapshot()/applica() includono 'endgame'; la serializzazione usa per_salvataggio/da_salvataggio NON fidati (solo tipi attesi, id ignoti scartati, numeri clampati). Seguire il pattern gia' usato per 'mondo' (WorldState) - un campo di GameState o un autoload EndgameState, scegliere il piu' semplice.",
-        "tests/test_save_system.gd (o nuovo tests/test_endgame_state.gd): un save v21 carica, migrato true, 'endgame' aggiunto coi default; round-trip di un 'endgame' popolato; da_salvataggio scarta le voci malformate.",
-        "python tools/validate_data.py esce 0. Nessuna regressione sui test esistenti. Typecheck passes. Tests pass."
+        "validate 0",
+        "bash tools/run_tests.sh esce 0",
+        "verifica a schermo in progress.txt"
       ],
       "priority": 1,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "Fatto 2026-09-08. EndgameState nuovo autoload (store del campo endgame: pathway_precedente/fusioni/tribolazioni_superate/eredita/finale, da_salvataggio non fidato). save_system.gd VERSIONE_CORRENTE 22 + _migra_21_a_22 + campo in salva()/_leggi_snapshot(). game_state.gd wiring. test_save_system.gd +3 test (migrazione v21->v22, round-trip, scarta voci malformate). validate exit 0. 716 test verdi, nessuna regressione."
+      "notes": "fdf24a3: scripts/world/mondo.gd, tools/art/esporta_mondo.py, assets/world/."
     },
     {
-      "id": "US-702",
-      "title": "fusion.schema.json + data/fusions/ - forma e validator (Blocco 0)",
-      "description": "Come sviluppatore, voglio lo schema dei percorsi di fusione e un file per percorso, cosi' che il motore legga i dati e non conosca le coppie.",
+      "id": "US-8B12b",
+      "title": "Regione e zona dalla posizione",
+      "description": "WorldState segue la regione della casella (regioni.png) e la zona del luogo piu' vicino (luoghi_mondo).",
       "acceptanceCriteria": [
-        "data/schema/fusion.schema.json (additionalProperties:false): id (^<gruppo>_<pathA>_<pathB>$ con pathA<pathB alfabetico), gruppo (uno dei 4 gruppi validi), pathway_a/pathway_b (Pathway attivi dello STESSO gruppo), abilita_fuse[] (ognuna: id con prefisso fus_<id fusione>_, da_sequenza 7..9, name_i18n ^ability\\.fusion\\., primitive[] dal registro attivo, tag_sinergia[], note), stub (bool).",
-        "data/fusions/: 8 file, uno per percorso possibile (Lord of Mysteries: door_error, error_fool, door_fool; Eternal Darkness: darkness_death, darkness_twilight_giant, death_twilight_giant; Demon of Knowledge: hermit_paragon; Goddess of Origin: moon_mother). 7 con stub:true e abilita_fuse:[]; door_error lo scrive US-706.",
-        "tools/validate_data.py: sezione fusioni - id coerente col nome file, pathway_a/pathway_b nello stesso gruppo, da_sequenza 7..9, le primitive delle abilita' fuse non-stub nel registro attivo (stessi controlli delle abilita'), abilita_fuse vuoto sse stub, warning 'N percorsi di fusione su 8 sono stub', errore se un percorso possibile manca.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "validate 0",
+        "bash tools/run_tests.sh esce 0",
+        "verifica a schermo in progress.txt"
       ],
       "priority": 2,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "Fatto 2026-09-08. fusion.schema.json + 8 file data/fusions/ (id <pathA>_<pathB> alfabetico, gruppo come campo - deviazione motivata dal pattern del PRD). Tutti stub, door_error lo scrive US-706. validate_data.py: nuova sezione fusioni (percorsi attesi = coppie dentro un gruppo attivo = 8; controlli su abilita_fuse non-stub uguali alle abilita; warning stub; errore se manca/non atteso). test_fusion.gd 2 test. validate exit 0 (3 warning). 718 test verdi."
+      "notes": "201376a."
     },
     {
-      "id": "US-703",
-      "title": "Vocabolari chiusi tribulation_effects.json e prayer_effects.json (Blocco 0)",
-      "description": "Come sviluppatore, voglio i due vocabolari chiusi nuovi della fase 7 dichiarati e validati prima di usarli.",
+      "id": "US-8B12c",
+      "title": "Il gioco parte dal mondo unico",
+      "description": "main.tscn sul mondo generato, NPC al luogo del loro orario, gating d'ingresso, viaggio veloce.",
       "acceptanceCriteria": [
-        "data/schema/tribulation_effects.json: vocabolario chiuso (<= 6 voci) di cosa fa una tribolazione mentre e' in corso (es. follia_accelerata, spiritualita_dimezzata, nemici_rinforzati, abilita_bloccate, notte_perenne). Ogni voce ha un _comment. NON e' un evento tracciato.",
-        "data/schema/prayer_effects.json: vocabolario chiuso (<= 6 voci) degli effetti delle preghiere delle Sequenze alte (es. benedizione_seguaci, voto_di_autorita, intercessione, anatema). Ogni voce mappa su una PRIMITIVA ESISTENTE con parametri, dichiarato nel _comment (es. benedizione_seguaci = aura su bersagli:'evocati').",
-        "tools/validate_data.py carica entrambi, verifica che siano non vuoti e senza duplicati. Nessun altro dato li referenzia ancora.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "validate 0",
+        "bash tools/run_tests.sh esce 0",
+        "verifica a schermo in progress.txt"
       ],
       "priority": 3,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "Fatto 2026-09-08. tribulation_effects.json (5 voci: follia_accelerata/spiritualita_dimezzata/nemici_rinforzati/abilita_bloccate/notte_perenne). prayer_effects.json (4 voci: benedizione_seguaci/voto_di_autorita/intercessione/anatema, ognuna dichiara la primitiva esistente su cui si appoggia - nessuna primitiva nuova). validate_data.py carica entrambi (chiusi <=6, primitiva nel registro). test_endgame_vocab.gd 2 test. validate exit 0. 720 test verdi. BLOCCO 0 chiuso."
+      "notes": "de82a74."
     },
     {
-      "id": "US-704",
-      "title": "Cambio Pathway solo tra vicini dello stesso gruppo (Blocco A)",
-      "description": "Come giocatore, voglio poter cambiare Pathway verso un vicino dello stesso gruppo, conservando le abilita' delle mie Sequenze basse.",
+      "id": "US-8B12d",
+      "title": "Aspetto degli NPC",
+      "description": "Un disegno per NPC (tools/art/build_npc.py), campo aspetto.sprite nel roster.",
       "acceptanceCriteria": [
-        "scripts/pathway_change.gd (nuovo autoload) o metodi di Progression: puo_cambiare(nuovo_pathway) -> bool true SOLO se nuovo_pathway e' nello stesso 'group' del Pathway corrente (letto dai dati), diverso dall'attuale, e sequenza <= soglia_cambio (dato in balance.json, proposta 4). Nessun id di Pathway hardcoded: la relazione 'vicini' viene dal campo group.",
-        "cambia(nuovo_pathway) -> Dictionary: registra endgame.pathway_precedente, imposta Progression sul nuovo Pathway alla STESSA Sequenza numerica, marca le abilita' delle Sequenze 9..7 del vecchio Pathway come 'conservate' (disponibili al giocatore - riuso di AbilityEngine.grant_permanente o un set in PathwayChange).",
-        "Rifiuto pulito ({ ok:false, reason }) se puo_cambiare e' false. Nessun crash.",
-        "tests/test_pathway_change.gd: Error Seq 4 -> Door OK; Error Seq 4 -> Death rifiutato (gruppo diverso); Error Seq 9 -> Door rifiutato (troppo presto); dopo il cambio un'abilita' di error_9 e' ancora eseguibile dal giocatore e una di door_4 lo e'.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "validate 0",
+        "bash tools/run_tests.sh esce 0",
+        "verifica a schermo in progress.txt"
       ],
       "priority": 4,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "Fatto 2026-09-08. scripts/pathway_change.gd (NUOVO autoload PathwayChange, dopo EndgameState). puo_cambiare(nuovo) true SSE nuovo esiste, e' un altro Pathway con lo STESSO campo 'group' di quello corrente, e Progression.sequence() <= soglia_sequenza (data/balance.json cambio_pathway, 4). cambia(nuovo) -> {ok,da,a,sequenza,conservate} o {ok:false,reason}: registra EndgameState.pathway_precedente, Progression.configura(nuovo, stessa Seq), grant_permanente delle abilita' Seq conservate_da_sequenza(7)..9 del vecchio Pathway, poi hook opzionale FusionEngine.applica_al_cambio (US-705). Nessun id di Pathway nel codice: la relazione 'vicini' e' il group. data/balance.json: sezione cambio_pathway (soglia_sequenza 4, conservate_da_sequenza 7). tests/test_pathway_change.gd 4 test (Error S4->Door ok; Error->Death gruppo_diverso, Pathway non toccato; Error S9->Door troppo_presto; dopo il cambio error_scasso e door_occultamento_totale entrambe non 'abilita_non_posseduta'). validate exit 0. 724 test verdi."
+      "notes": "a65d1f8 + merge 6a539f7 (4 aspetti per gli NPC della fase 11)."
     },
     {
-      "id": "US-705",
-      "title": "FusionEngine - compone le abilita' fuse dai dati (Blocco A)",
-      "description": "Come sviluppatore, voglio che le abilita' fuse nascano da data/fusions/ senza che il codice conosca una singola coppia.",
+      "id": "US-8B12e",
+      "title": "Collisioni corrette, Marche solo volando o dal sottosuolo",
+      "description": "blocchi.png 0/128/255, strato dei dislivelli per il volo, regions.json accesso, test di raggiungibilita'.",
       "acceptanceCriteria": [
-        "scripts/fusion_engine.gd (nuovo autoload): percorso(vecchio, nuovo) -> Dictionary - cerca in data/fusions/ il file la cui coppia {pathway_a, pathway_b} combacia in QUALSIASI ordine. {} se non esiste o e' stub.",
-        "abilita_fuse(vecchio, nuovo) -> Array - le abilita' fuse di quel percorso, risolte come le abilita' normali (stessa forma id/name_i18n/primitive/tag_sinergia). GameData.get_ability sa risolvere un fus_* id (indice parallelo o unito, ramo separato dal check che pretende sequence_id).",
-        "Al PathwayChange.cambia, le abilita' fuse del percorso (se non-stub) vengono concesse al giocatore (grant_permanente), registrate in endgame.fusioni.",
-        "AbilityEngine.execute / _esegui_primitive NON toccati: un'abilita' fusa e' un'abilita' come le altre.",
-        "tests/test_fusion.gd: FusionEngine.abilita_fuse('error','door') non vuota dopo US-706; per un percorso stub -> []; l'ordine dei due Pathway non conta.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "validate 0",
+        "bash tools/run_tests.sh esce 0",
+        "verifica a schermo in progress.txt"
       ],
       "priority": 5,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "Fatto 2026-09-08. scripts/fusion_engine.gd (NUOVO autoload FusionEngine, dopo PathwayChange). percorso(x,y) cerca in data/fusions/ il file la cui {pathway_a,pathway_b} combacia in QUALSIASI ordine; {} se non esiste o stub. abilita_fuse(x,y) -> Array (le voci abilita_fuse, gia' nella forma id/name_i18n/primitive/tag_sinergia). applica_al_cambio(vecchio,nuovo): grant_permanente + EndgameState.aggiungi_fusione per ogni abilita fusa non-stub, segnale fusione_concessa. game_data.gd: DIR_FUSIONS + _load_fusions (doc per id in _fusions; le abilita_fuse dei percorsi NON stub in _fusion_abilities per id fus_*); get_ability() ramo di fallback su _fusion_abilities (fuori da ability_ids/ability_count: un fus_ id non e' legato a una Sequenza); get_fusion/fusion_ids nuovi. pathway_change.gd gia' chiamava l'hook opzionale FusionEngine.applica_al_cambio. AbilityEngine.execute/_esegui_primitive INTATTI: un'abilita fusa ha il campo 'primitive' e passa dal motore normale. tests/test_fusion.gd +4 test (ordine non conta, percorso stub -> {}/[]; coppia fuori gruppo -> {}; ogni abilita fusa non-stub risolve via get_ability - teeth dopo US-706). validate exit 0. 728 test verdi."
+      "notes": "3246e5b. Decisione utente 2026-10-25."
     },
     {
-      "id": "US-706",
-      "title": "Percorso di fusione completo - error -> door (Blocco A)",
-      "description": "Come giocatore che ha cambiato da Error a Door, voglio abilita' che fondono il furto dell'Error con lo spazio del Door.",
+      "id": "US-8B12f",
+      "title": "Sottosuolo nel gioco",
+      "description": "Secondo livello sulla stessa griglia, 47 ingressi con [F] Scendi/Sali, dalle fogne alle catacombe delle Marche.",
       "acceptanceCriteria": [
-        "data/fusions/door_error.json: stub:false, >= 5 abilita' fuse, ognuna con da_sequenza 9/8/7. Concept: rubare DOVE un nemico e' (steal + teleport), fotocopiare un varco (steal non_sottrae + terrain_modify), scambiare la refurtiva con la propria posizione. Solo primitive del registro attivo. Ogni abilita' con name_i18n ^ability\\.fusion\\. e >= 1 tag_sinergia valido.",
-        "i18n: generate_i18n_stubs.py rilanciato; i nomi delle abilita' fuse tradotti in it.json (non TODO).",
-        "data/vfx.json: se serve, la resa visiva della fusione (palette interpolata a runtime o un campo dichiarato per door_error). Se un placeholder basta, si dichiara nella nota.",
-        "tests/test_fusion.gd: ogni abilita' fusa door_error esegue via AbilityEngine.execute senza warning di primitiva.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "validate 0",
+        "bash tools/run_tests.sh esce 0",
+        "verifica a schermo in progress.txt"
       ],
       "priority": 6,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "Fatto 2026-09-08. data/fusions/door_error.json stub:false, 6 abilita fuse (da_sequenza 9/9/8/8/7/7): furto_dislocato (steal+teleport), grimaldello_spaziale (steal non_sottrae + terrain_modify apre_varco), refurtiva_scambiata (steal+teleport), nota_dislocata (steal abilita non_sottrae + teleport), soglia_rubata (steal conoscenza + terrain_modify varco_forzato permanente), colpo_tra_le_porte (teleport+steal). Solo primitive del registro attivo (steal/teleport/terrain_modify, tutte implemented). Ogni abilita: id fus_door_error_*, name_i18n ability.fusion.*, >= 2 tag_sinergia validi. i18n: 6 chiavi ability.fusion.* tradotte in it.json (non TODO); generate_i18n_stubs.py rilanciato (le raccoglie verbatim dal ramo generico, nessuna canonicalizzazione); en.json resta vuoto per scelta di progetto. VFX: nessun campo dedicato, il renderer per-primitiva (Vfx) copre steal/teleport/terrain_modify, palette Door/Error entrambe lord_of_mysteries (dichiarato nella note del file). tests/test_fusion.gd +2 test (door_error non piu' stub, >=5 abilita, tutte tradotte; ognuna esegue via AbilityEngine.execute con ok:true e zero warning 'primitiva fuori registro'). validate exit 0. 730 test verdi."
+      "notes": "d007a25."
     },
     {
-      "id": "US-707",
-      "title": "Gli altri 7 percorsi come stub + check del validator (Blocco A)",
-      "description": "Come sviluppatore, voglio che i 7 percorsi non scritti siano stub dichiarati, non file mancanti.",
+      "id": "US-8B12g",
+      "title": "Contenuto dei layout sul mondo generato",
+      "description": "Nemici, boss e oggetti delle fasi 8-11 al luogo della zona o nella posizione relativa; zone sotterranee nel sottosuolo; nessun nemico vicino alla partenza.",
       "acceptanceCriteria": [
-        "data/fusions/: esistono tutti e 8 i file (i 7 con stub:true, abilita_fuse:[], un 'note' che spiega il concept in una riga).",
-        "tools/validate_data.py: warning 'N percorsi di fusione su 8 sono stub'; errore se un percorso possibile manca del tutto.",
-        "FusionEngine.percorso per uno stub -> {}; PathwayChange.cambia verso un vicino con percorso stub funziona lo stesso (conserva le abilita' basse), solo non concede abilita' fuse.",
-        "tests/test_fusion.gd o test_pathway_change.gd: PathwayChange.cambia Hermit->Paragon (percorso stub) OK, endgame.fusioni resta [].",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "validate 0",
+        "bash tools/run_tests.sh esce 0",
+        "verifica a schermo in progress.txt"
       ],
       "priority": 7,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "Fatto 2026-09-08. I 7 file stub esistevano gia' da US-702 (stub:true, abilita_fuse:[], 'note' col concept in una riga); il check del validator (warning 'N su 8 stub', errore se un percorso possibile manca o e' non atteso) e' di US-702. Questa storia aggiunge le prove del comportamento: tests/test_fusion.gd +1 (i 7 percorsi diversi da door_error sono stub:true, abilita_fuse vuoto, note non vuota); tests/test_pathway_change.gd +1 (Hermit Seq 4 -> Paragon, percorso hermit_paragon stub: cambio ok:true, abilita basse conservate lo stesso, EndgameState.fusioni resta []). FusionEngine.percorso/applica_al_cambio gia' ritornavano {}/[] per uno stub (US-705). validate exit 0. 732 test verdi."
+      "notes": "0ab5d28."
     },
     {
-      "id": "US-708",
-      "title": "Pagina del libro per il cambio di Pathway (Blocco A)",
-      "description": "Come giocatore, voglio una pagina del libro che mostra i Pathway vicini verso cui posso fondere e cosa otterrei.",
+      "id": "US-8B73",
+      "title": "Libro ridisegnato",
+      "description": "Copertina di cuoio, pergamena, font Alegreya, Theme per tutte le pagine dai dati (book.json tema).",
       "acceptanceCriteria": [
-        "Nuova pagina (o sezione di scripts/pages/page_diagramma_pathway.gd): mostra il gruppo del Pathway corrente, i vicini fondibili, e per ognuno se il percorso e' scritto o 'ancora da rivelare' (stub -> fog of war come il diagramma).",
-        "Se PathwayChange.puo_cambiare e' true, un'azione conferma il cambio; altrimenti mostra il motivo (troppo presto / gruppo diverso).",
-        "Nessun nome di Pathway hardcoded: solo id e chiavi i18n.",
-        "Verifica a schermo documentata in progress.txt.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass. Verify in browser using dev-browser skill."
+        "validate 0",
+        "bash tools/run_tests.sh esce 0",
+        "verifica a schermo in progress.txt"
       ],
       "priority": 8,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "Fatto 2026-09-08. scripts/pages/page_diagramma_pathway.gd: nuova sezione _sezione_fusione() in coda a aggiorna() (dopo l'elenco abilita). Mostra 'Fondere il Pathway  Gruppo: <group>' e, per ogni Pathway con lo STESSO campo group != quello corrente: nome + 'percorso rivelato' (FusionEngine.percorso non vuoto) o 'ancora da rivelare' (stub -> testo modulato come le celle ignote, fog of war). Se PathwayChange.puo_cambiare -> Button 'Fondi verso qui' (pressed -> fondi(pid) -> PathwayChange.cambia + aggiorna()); altrimenti label 'Troppo presto: avanza ancora'. Nessun nome hardcoded: solo id + tr_data + chiavi HUD. assets/i18n/strings.csv +7 chiavi BOOK_DIAGRAMMA_FUSIONE_* (it+en), .translation rigenerati (godot --headless --import). Metodi interrogabili: vicini_fondibili() -> [{id,scritto,puo}], fondi(pid). tests/test_page_diagramma.gd +4 test (vicini solo dello stesso gruppo; Seq 9 tutti puo=false; error->door scritto=true, error->fool scritto=false; fondi('death') da TG Seq 4 -> ok, Progression su death). Verifica a schermo (_shot_us708.gd, rendering reale, non headless, poi rimosso): la pagina mostra grid + 'Error Sei qui: S4' + abilita + 'Fondere il Pathway Gruppo: lord_of_mysteries' + 'Door - percorso rivelato [Fondi verso qui]'; vicini_fondibili() = [{door,scritto:true,puo:true},{fool,scritto:false,puo:true}]. Nota: la pagina non e' scrollabile (debito pre-esistente del libro), con Seq bassa la sezione fusione esce sotto il viewport - contenuto corretto, layout da rivedere in manutenzione. validate exit 0. 736 test verdi."
+      "notes": "1bf11a2 (nel commit chiamata per errore US-8B70)."
     },
     {
-      "id": "US-709",
-      "title": "CHECKPOINT - slice del cambio Pathway + verdetto (Blocco A)",
-      "description": "Come sviluppatore, voglio la conferma che il cambio Pathway + fusione non ha richiesto un if per una coppia, prima di andare avanti.",
+      "id": "US-8B18a",
+      "title": "Edifici di Mirwada sugli isolati",
+      "description": "forge3d disegna le case dei quartieri (magazzini, case strette, botteghe, palazzi, baracche, ville) e l'esportazione le mette sui sedimi degli isolati del generatore (terreno stone dentro i quartieri), con collisione.",
       "acceptanceCriteria": [
-        "tests/test_slice_fase_7.gd: un personaggio Error a Seq 4 -> PathwayChange.cambia('door') -> e' su Door Seq 4, ha ancora le abilita' di error_9, ha le abilita' fuse door_error, ne esegue una senza warning.",
-        "test_nessun_codice_nomina_una_fusione: grep di res://scripts e res://scripts/pages per gli id di Pathway e per fus_ / door_error / error_door -> ZERO occorrenze fuori dai commenti.",
-        "git diff del blocco A (file .gd): elenco esatto in progress.txt. AbilityEngine.execute / _esegui_primitive non modificati per la fusione.",
-        "Verdetto in progress.txt: il cambio Pathway e' dati / non lo e'. Se non lo e': correzioni e STOP.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "forge3d: una funzione per tipo di edificio, rilanciabile con seed, palette Endesga 32, guardata ingrandita su chiaro e scuro, nelle due modalita'",
+        "esporta_mondo.py esporta gli edifici come oggetti con il loro rettangolo (senza rigenerare le tessere del terreno)",
+        "mondo.gd: gli edifici bloccano il passaggio sul loro sedime, ordinati per profondita' con il giocatore",
+        "Prova a schermo della citta' documentata in progress.txt; validate 0; bash tools/run_tests.sh esce 0"
       ],
       "priority": 9,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "Fatto 2026-09-08. BLOCCO A CHIUSO. tests/test_slice_fase_7.gd (NUOVO, 2 test): (1) un personaggio Error Seq 4 -> trova il vicino di gruppo con un percorso di fusione scritto (dai dati, non 'door' a mano) -> PathwayChange.cambia -> e' su quel Pathway Seq 4, error_scasso (Seq 9 vecchia) non e' 'abilita_non_posseduta', la prima abilita fusa e' in endgame.fusioni ed esegue con ok:true e zero warning 'primitiva fuori registro'. (2) test_nessun_codice_nomina_un_pathway_o_una_fusione: grep di res://scripts + res://scripts/pages, nessun id di Pathway fra virgolette, nessun 'fus_'/'door_error'/'error_door' fuori dai commenti (eccezione: enemy.gd riproduce l'animazione \"death\"). VERDETTO: il cambio Pathway E' DATI. git diff blocco A (.gd non di test): fusion_engine.gd (nuovo, 62), pathway_change.gd (nuovo, 123), game_data.gd (+52/-1: _load_fusions + get_ability fallback + get_fusion/fusion_ids), pages/page_diagramma_pathway.gd (+72: sezione fusione UI). AbilityEngine.execute / _esegui_primitive NON modificati (git log 81034fc..HEAD -- scripts/ability_engine.gd -> vuoto). prepara() del test pulisce il gruppo 'player' (grant_permanente aggancia get_first_node_in_group). validate exit 0. 738 test verdi."
+      "notes": "338 edifici (case dei 6 quartieri, villaggi, torri), esporta_mondo.py --edifici seed 6, 162 sprite per tema; prova a schermo in arte/revisione/edifici_in_gioco.png. Aperto: nel quartiere operaio le stradine di 1 casella fanno vedere i tetti, non le facciate."
     },
     {
-      "id": "US-710",
-      "title": "tribulation.schema.json + data/tribulations/ (Blocco B)",
-      "description": "Come sviluppatore, voglio lo schema delle tribolazioni e un file per ognuna, prima del motore.",
+      "id": "US-8B18b",
+      "title": "Porte verso gli interni e villaggi",
+      "description": "Gli edifici dei layout e della campagna (14 interni) su una casa vera del mondo generato, con la porta che carica interior_scene.tscn; i villaggi della campagna ai villaggi suggeriti dal generatore.",
       "acceptanceCriteria": [
-        "data/schema/tribulation.schema.json (additionalProperties:false): id, name_i18n (^tribulation\\.), salto ({da:N, a:N-1} con da in {7,5,3,1}), condizioni[] (dal vocabolario di conditions.gd, NESSUN tipo nuovo), mentre_in_corso (una voce di tribulation_effects.json), superamento ({evento:<uno dei 12>, filtri:{}, target:N} OPPURE {flag:'<nome>'}), descrizione_i18n.",
-        "data/tribulations/: 4 file, uno per salto di fascia (7->6, 5->4, 3->2, 1->0).",
-        "tools/validate_data.py: sezione tribolazioni - salto.da valido, condizioni nel vocabolario, superamento.evento nei 12 eventi (o flag stringa), mentre_in_corso in tribulation_effects.json, una sola tribolazione per salto.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "villaggi del generatore in mondo.json; abbinamento interno -> villaggio nei dati (campagna.json)",
+        "ogni interno raggiungibile da una porta sulla mappa, uscita alla stessa porta (giocatore fuori dal nodo mondo mentre e' dentro)",
+        "NPC degli interni con il loro aspetto sprite-forge",
+        "test: ogni interno ha una porta su una casella raggiungibile nella sua regione; prova a schermo"
       ],
       "priority": 10,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "Fatto 2026-09-08. data/schema/tribulation.schema.json (additionalProperties:false): id ^trib_, name_i18n/descrizione_i18n ^tribulation., salto {da in [7,5,3,1], a in [6,4,2,0]}, condizioni[] (enum = vocabolario di conditions.gd), mentre_in_corso (chiave di tribulation_effects.json), superamento ({evento,filtri,target} XOR {flag}). data/tribulations/: 4 file trib_7_6/trib_5_4/trib_3_2/trib_1_0. superamento: 7->6 area_cleared x2, 5->4 npc_influenced x3, 3->2 flag tribolazione_doran_affrontato, 1->0 flag tribolazione_soglia_varcata. mentre_in_corso: nemici_rinforzati / spiritualita_dimezzata / follia_accelerata / notte_perenne. condizioni: tier_min della fascia (low/mid/saint/angel, sempre vere a quella Seq - documentano il requisito). tools/validate_data.py: nuova sezione tribolazioni (dopo fusioni) - salto valido, condizioni nel vocabolario TRIB_COND, superamento evento XOR flag, evento nei 12, target>=1, mentre_in_corso in tribulation_effects, UNA sola per salto, errore se ne manca una. game_data.gd: DIR_TRIBULATIONS + _load_tribulations (_tribulations per id), get_tribulation/tribulation_ids/tribulation_per_salto(da). i18n: 8 chiavi tribulation.* come stub TODO (US-712 le traduce). tests/test_tribulation.gd 2 test (una per salto, 8->7 e 2->1 nessuna; ogni tribolazione risolve mentre_in_corso/evento/flag). validate exit 0. 740 test verdi."
+      "notes": "14 porte (mondo.gd crea_porte, soglia visibile), entrata/uscita con interior_scene.tscn, campo villaggio nei dati per l'avamposto della Valle e i villaggi della campagna, NPC degli interni con l'aspetto sprite-forge. 3 test in test_mondo."
     },
     {
-      "id": "US-711",
-      "title": "TribulationSystem - lettore, blocca l'avanzamento (Blocco B)",
-      "description": "Come giocatore, quando arrivo a un salto di fascia voglio che il gioco mi ponga la prova prima di lasciarmi avanzare.",
+      "id": "US-8B18c",
+      "title": "Interni con l'arte vera: pavimenti e pareti",
+      "description": "Gli interni oggi usano il tileset segnaposto a 32 px: pavimenti, pareti e arredi dal generatore.",
       "acceptanceCriteria": [
-        "scripts/tribulation_system.gd (nuovo autoload): tribolazione_per(da) -> Dictionary (dai dati); attiva(da) all'inizio del salto; stato() -> { in_corso, superata, progresso }; ascolta EventTracker per superamento.evento e KnowledgeStore/flag per superamento.flag.",
-        "Il punto di avanzamento (Progression.avanza o PotionSystem.bevi/RitualSystem): se c'e' una tribolazione per quel salto e non e' superata, l'avanzamento e' RIFIUTATO con un motivo. Nessun verbo nuovo: legge gli eventi che gia' esistono.",
-        "mentre_in_corso applica il suo effetto (dal vocabolario) mentre la tribolazione e' attiva; si toglie al superamento.",
-        "endgame.tribolazioni_superate nel save.",
-        "tests/test_tribulation_system.gd: al salto 3->2 l'avanzamento e' bloccato finche' il superamento non e' raggiunto; poi passa; mentre_in_corso applicato e rimosso; round-trip nel save.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "stesso stile e palette del mondo",
+        "prova a schermo di ogni interno"
       ],
       "priority": 11,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "Fatto 2026-09-08. scripts/tribulation_system.gd (NUOVO autoload TribulationSystem, dopo Madness). Lettore di eventi + flag: si connette a Progression.sequence_changed (attiva la prova arrivando a Seq 7/5/3/1), EventTracker.evento_emesso e KnowledgeStore.appreso (_ricalcola_progresso scansiona TUTTI i salti non superati - una prova puo' essere passata anche prima di essere attiva). API: tribolazione_per(da), avanzamento_bloccato(da) (dati non vuoti AND non superata), superata(da) (EndgameState), attiva(da), stato() {in_corso,da,superata,progresso}, moltiplicatore_spawn()/sequenza_bloccata() (handicap esposti), marca_superate_tutte()/azzera() (test/debug). Effetti mentre_in_corso: follia_accelerata (Madness.add in _process, delta_al_minuto da tribulation_effects.json), spiritualita_dimezzata (modifier -50% su spiritualita_max base del giocatore), notte_perenne (TimeSystem.forza_momento - metodo nuovo, +libera_momento/momento_forzato); nemici_rinforzati/abilita_bloccate esposti come query (nessun consumatore live, come audio-as-spec fase 6). scripts/progression.gd: avanza() rifiuta se TribulationSystem.avanzamento_bloccato(_sequence). scripts/potion_system.gd bevi() e scripts/ritual_system.gd avvia(): reason 'tribolazione_in_corso', pozione non sprecata. endgame.tribolazioni_superate nel save (gia' da US-701). 5 test pre-esistenti che attraversano un salto di fascia senza riguardare le tribolazioni (test_advancement_gate, test_narrativa, test_slice_fase_5/5b, test_vertical_slice) chiamano marca_superate_tutte() in prepara() - aggiornamento legittimo, ora modellano il gioco vero. tests/test_tribulation_system.gd NUOVO 4 test (blocco per flag 3->2; superamento per evento npc_influenced x3 su 5->4; follia_accelerata applicata e tolta; round-trip nel save). 5 file .gd non di test toccati (oltre il ~4: segnalato, ma sono tutti guard clause piccole di una feature coesa). validate exit 0. 744 test verdi."
+      "notes": "Pavimenti e pareti: tools/art/build_interni.py (seed 11), stile per interno nei dati, un PNG per interno e modalita'; prova a schermo dei 14 in arte/revisione/interni_in_gioco.png. Arredi spostati in US-8B18d."
     },
     {
-      "id": "US-712",
-      "title": "Le 4 tribolazioni di contenuto (Blocco B)",
-      "description": "Come giocatore, voglio che ogni salto di fascia abbia una prova a tema con la narrativa dei tre atti.",
+      "id": "US-8B18d",
+      "title": "Arredi degli interni",
+      "description": "Gli interni sono stanze vuote: arredi per interno nei dati (arredi: [{id, x, y}]), modelli forge3d (tavoli, panche, botti, scaffali, incudine e forgia, letto, camino, bancone, alambicchi), con collisione e ordine di profondita' col giocatore.",
       "acceptanceCriteria": [
-        "4 tribolazioni scritte (7->6: 'la citta' non basta piu''; 5->4: le fazioni prendono posizione; 3->2: Doran sa; 1->0: la soglia - l'antagonista). Ognuna con condizioni plausibili, mentre_in_corso da vocabolario, superamento su un evento reale o un flag posto da una quest/dialogo.",
-        "i18n completo (name + descrizione) in it.json, 0 TODO sulle chiavi tribulation.*.",
-        "La tribolazione 1->0 usa un flag posto da un dialogo generico dell'antagonista (uno solo, parametrico sul Pathway via i18n), coordinato con data/lore/antagonisti.json - NON 22 grafi.",
-        "test data-driven che itera i 4 file: ogni tribolazione risolve i suoi riferimenti (evento, flag, effetto, condizioni).",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "arredi nei dati degli interni, un vocabolario chiuso di id controllato dal validator",
+        "un modello forge3d per arredo, palette Endesga 32, guardato ingrandito nelle due modalita'",
+        "collisione sugli arredi e il giocatore passa dietro quelli alti",
+        "prova a schermo di ogni interno; validate 0; bash tools/run_tests.sh esce 0"
+      ],
+      "priority": 11,
+      "fase": "8b",
+      "passes": true,
+      "notes": "17 arredi (data/world/arredi.json, forge3d/arredi.py), 54 nelle 14 stanze, collisione e y-sort col giocatore dentro la stanza, validator con visita in ampiezza. Prova a schermo in arte/revisione/interni_in_gioco.png."
+    },
+    {
+      "id": "US-8B21a",
+      "title": "Varchi come ingressi verso le sotto-aree",
+      "description": "Decisione dell'utente 2026-10-26: ogni area del gating di regions.json e' un ingresso sulla mappa verso un interno; AreaGate decide se si apre. Posizione (luogo + scostamento), interno e aspetto nei dati. Aspetto chiuso/aperto per ingresso (mausoleo, arco d'ombra, ponte di radici, grotta, porta coi glifi, soglia nella nebbia). Sei interni nuovi.",
+      "acceptanceCriteria": [
+        "il giocatore capisce che c'e' un varco, non come si apre",
+        "posizioni nei dati, non nel codice; la mappa approvata non cambia",
+        "test di apertura con AreaGate: chiuso non si entra, aperto si entra e si torna",
+        "prova a schermo dei sei ingressi chiusi e aperti; validate 0; bash tools/run_tests.sh esce 0"
       ],
       "priority": 12,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "Fatto 2026-09-08. Le 4 tribolazioni di data/tribulations/ (US-710) rifinite: i18n reale (name + descrizione) per tutte e 8 le chiavi tribulation.* in it.json (0 TODO). Temi: 7->6 'La citta' non basta piu'' (area_cleared x2), 5->4 'Le fazioni prendono posizione' (npc_influenced x3), 3->2 'Doran sa' (flag), 1->0 'La soglia' (flag). I 2 flag sono posti da un dialogo, nessun verbo nuovo: data/dialogues/dlg_doran.json ha una scelta in piu' (condizioni tier_min:saint) che pone tribolazione_doran_affrontato; data/dialogues/dlg_antagonista.json NUOVO - UN solo grafo generico per l'antagonista di ogni Pathway (non 22), l'ultima scelta (tier_min:angel) pone tribolazione_soglia_varcata; data/npc/roster.json +npc_antagonista (region frontiera_porte, tag soglia, dialogue_id dlg_antagonista). tools/validate_data.py: nuova riconciliazione - ogni superamento.flag di una tribolazione dev'essere scritto da un effetto flag di un dialogo/quest (stesso contratto delle quest). tests/test_tribulation.gd +2 (ogni tribolazione tradotta + condizioni con un tipo; i flag di superamento posti da un dialogo). test_npc_system.gd 18->19. validate exit 0. 746 test verdi."
+      "notes": "Sei varchi (regions.json gating[].varco), disegni chiuso/aperto (esporta_mondo.py --varchi), mondo.gd crea_varchi con AreaGate, sei interni nuovi con stili provvisori. Prova a schermo in arte/revisione/varchi_in_gioco.png."
     },
     {
-      "id": "US-713",
-      "title": "Overlay del libro per la tribolazione in corso (Blocco B)",
-      "description": "Come giocatore, voglio vedere quale prova sto affrontando e a che punto sono.",
+      "id": "US-8B21b",
+      "title": "Il contenuto delle sotto-aree dentro i varchi",
+      "description": "Il contenuto delle zone dei layout legate a un varco (nemici, oggetti) sta dentro il suo interno, non piu' all'aperto, per regola (popola salta la zona, entra passa gli ospiti alla stanza).",
       "acceptanceCriteria": [
-        "Un overlay/pagina mostra: nome della tribolazione, descrizione, l'effetto mentre_in_corso attivo, il progresso verso il superamento.",
-        "Reattivo dal vivo (ascolta i segnali di TribulationSystem).",
-        "Nessun testo hardcoded: chiavi i18n.",
-        "Verifica a schermo documentata in progress.txt.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass. Verify in browser using dev-browser skill."
+        "la zona di un varco nei dati del varco; popola() non la mette piu' sul mondo",
+        "dentro l'interno nemici e oggetti della zona alla stessa posizione relativa, su caselle libere",
+        "prova a schermo; validate 0; bash tools/run_tests.sh esce 0"
+      ],
+      "priority": 12,
+      "fase": "8b",
+      "passes": true,
+      "notes": "regions.json gating[].varco.zona; mondo.gd _zone_dei_varchi/ospiti_del_varco; interior_scene.gd _crea_ospiti. Il boss delle Marche e' nel tempio. arte/revisione/varchi_contenuto.png."
+    },
+    {
+      "id": "US-8B21c",
+      "title": "Arte delle sotto-aree",
+      "description": "Gli interni delle sotto-aree hanno stili provvisori: stili nuovi (cripta, tempio dei giganti, grotta con l'acqua, radura con le radici, isola di nebbia) e arredi nuovi (sarcofago, altare, roccia, sigillo, cornice di porta).",
+      "acceptanceCriteria": [
+        "stili e arredi generati da build_interni.py, guardati ingranditi nei due temi",
+        "prova a schermo dei sei interni; validate 0; bash tools/run_tests.sh esce 0"
+      ],
+      "priority": 12,
+      "fase": "8b",
+      "passes": true,
+      "notes": "Stili cripta, tempio, grotta con acqua, radura, nebbia; arredi sarcofago, altare, roccia, sigillo, cornice di porta (build_interni.py). Corretto: tappeti e sigillo sotto il pavimento. arte/revisione/varchi_contenuto.png."
+    },
+    {
+      "id": "US-8B93",
+      "title": "Volo da una chiave del mondo",
+      "description": "Decisione dell'utente 2026-10-26: il volo si sblocca con una chiave del mondo (oggetto o luogo da trovare), per tutti i Pathway, niente primitive nuove. Il meccanismo c'e': player.imposta_volo() toglie lo strato dei dislivelli.",
+      "acceptanceCriteria": [
+        "la chiave del volo e dove si trova nei dati",
+        "dopo averla presa si vola e le Marche si raggiungono (test di raggiungibilita' gia' pronto)",
+        "prova a schermo; validate 0; bash tools/run_tests.sh esce 0"
       ],
       "priority": 13,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "Fatto 2026-09-08. scripts/tribulation_overlay.gd + scenes/tribulation_overlay.tscn (CanvasLayer layer 85, Panel + VBox di Label), aggiunto a scenes/main.tscn. Mostra nome (tr_data), descrizione (tr_data), handicap mentre_in_corso (chiave HUD TRIB_EFFETTO_<KEY>), progresso %. Reattivo: si connette a TribulationSystem.tribolazione_attivata/progresso_cambiato/tribolazione_superata + _sincronizza() allo stato corrente al boot/load. Nascosto se nessuna prova in corso. assets/i18n/strings.csv +7 chiavi (TRIB_OVERLAY_EFFETTO/PROGRESSO + 5 TRIB_EFFETTO_*), .translation rigenerati. Metodi test: visibile(), stato_mostrato(). Fix: parametro _on_superata rinominato (_da shadowava il membro). tests/test_tribulation_overlay.gd NUOVO 3 test (nascosto senza prova; appare coi dati di trib_5_4 - nome == tr_data, descrizione e effetto non vuoti; progresso 1/3 dal vivo dopo 1 npc_influenced, overlay sparisce al superamento). Verifica: scriptata (test headless, come le primitive di fase 5/5b); il render windowed non cattura in questo ambiente. validate exit 0. 749 test verdi."
+      "notes": "Piuma dei venti (non vendibile) nell'osservatorio dell'Archivio, mezzi.json volo.chiave, tasto V, player._mezzo (barca/volo), mondo.gd decolla/atterra, salvataggio mondo.volo. arte/revisione/volo_in_gioco.png."
     },
     {
-      "id": "US-714",
-      "title": "prayer_effects.json applicato + le preghiere come contenuto (Blocco C)",
-      "description": "Come giocatore alle Sequenze alte, voglio abilita' di 'preghiera' che intercedono per i seguaci e impongono autorita'.",
+      "id": "US-8B91",
+      "title": "Barca dal porto",
+      "description": "Decisione dell'utente 2026-10-26: barca libera al molo di Mirwada; in barca l'acqua si attraversa, si sbarca sulle coste delle isole.",
       "acceptanceCriteria": [
-        "ability.schema.json esteso (retro-compatibile): campo opzionale 'preghiera' che nomina una voce di prayer_effects.json. Il campo e' PURAMENTE semantico + i18n: l'effetto vero lo fanno le 'primitive' dell'abilita' (aura/curse/summon/buff_stat).",
-        ">= 6 abilita' nuove di Sequenza 3-0 su piu' Pathway attivi che usano 'preghiera': benedizione dei seguaci (aura su evocati), voto di autorita' (aura/curse di dominio sui nemici), anatema (curse + debuff_stat). Solo primitive esistenti.",
-        "Rispettato il vincolo del validator sulle abilita' per Sequenza: verificato il check; nel caso ammesse 3 abilita' alle Sequenze god/angel con una nota, o le preghiere come output di sinergia. Decisione documentata in progress.txt.",
-        "i18n completo. tools/validate_data.py: 'preghiera' (se presente) nel vocabolario prayer_effects.json.",
-        "test: ogni abilita' con 'preghiera' esegue senza warning; il campo 'preghiera' non cambia il comportamento del motore.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "salire e scendere al molo e sulle coste",
+        "test di raggiungibilita' in barca per le 6 isole",
+        "prova a schermo; validate 0; bash tools/run_tests.sh esce 0"
       ],
       "priority": 14,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "ability.schema.json: campo opzionale 'preghiera' (US-714), puramente semantico. validate_data.py: check che 'preghiera' sia nel vocabolario di prayer_effects.json E che l'abilita' porti davvero la primitiva/bersagli richiesti dalla voce (coerenza dichiarativa, non solo appartenenza). 6 abilita' nuove di Sequenza 1/0 su 4 gruppi diversi: darkness_anatema_del_vuoto (darkness_0, curse+debuff, riusa status 'sfortuna'), tg_giuramento_del_crepuscolo (twilight_giant_0, aura nemici, riusa 'autorita_decadimento'), death_benedizione_dei_caduti (death_1, aura evocati, riusa 'comando_non_morti'), hermit_intercessione_arcana (hermit_1, heal self), mother_benedizione_della_covata (mother_1, aura evocati, riusa 'area_viva'), door_anatema_del_varco (door_1, curse+debuff, NUOVO status 'varco_sigillato' in status_effects.json, tag 'spazio'). Vincolo abilita'/Sequenza: darkness_0 e twilight_giant_0 avevano solo 1 abilita' -> ora 2, nessuna eccezione; death_1/hermit_1/mother_1/door_1 passano da 2 a 3 (Sequenze angel, eccezione ammessa dal criterio di accettazione, motivata nel campo 'note' di ogni abilita'). i18n: 6 chiavi in data/i18n/it.json (en.json resta {} come per il resto della fase, non validato da R-12). tests/test_prayer.gd NUOVO (2 test: esecuzione senza warning delle 6 abilita'; il campo preghiera esposto da GameData.get_ability combacia col vocabolario chiuso). Regressione: tests/test_slice_fase_5.gd aggiornato (20 -> 21 abilita' di Death, la nuova e' la preghiera di Sequenza 1). validate exit 0 (3 warning invariati). 751 test verdi (749 + 2 nuovi)."
+      "notes": "data/world/mezzi.json, player.imposta_barca con vincolo solo acqua, mondo.gd crea_barca/sali/scendi, sbarco secondo regions.json accesso (Marche no), salvataggio mondo.barca. arte/revisione/barca_in_gioco.png."
     },
     {
-      "id": "US-715",
-      "title": "Siti rituali di Sequenza 0 (Blocco C)",
-      "description": "Come giocatore, voglio che il rituale di Sequenza 0 di ogni Pathway abbia un luogo reale nel mondo.",
+      "id": "US-8B95",
+      "title": "Accesso alla Frontiera",
+      "description": "Decisione dell'utente 2026-10-26: alla Frontiera (isole sospese nel vuoto di nebbia) si arriva in barca, volando, o da una soglia nel faro che si apre solo con una chiave trovata nel mondo. Resta il gating di sequenza.",
       "acceptanceCriteria": [
-        "data/schema/location_tags.json: aggiunte versionate - un location_tag per GRUPPO (non per Pathway): soglia_del_crepuscolo, radice_del_mondo, biblioteca_di_tutto, porta_senza_stanza (4 tag). Ogni aggiunta con motivazione nel _comment.",
-        "I rituali advancement_ritual delle Sequenze 0 dei 22 Pathway puntano al tag del proprio gruppo (modifica dati, nessun codice).",
-        "data/world/regions.json: le regioni giuste elencano i 4 tag nuovi (il validator pretende che le regioni ospitino i location_tags dei rituali non-stub).",
-        "Il sito rituale di Sequenza 0 e' dove si trova l'antagonista (antagonisti.json): coerenza dichiarata nella note.",
-        "test_regions.gd: ogni location_tag di un rituale di Sequenza 0 e' ospitato da una regione.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "la chiave del faro e la soglia nei dati",
+        "test di raggiungibilita' della Frontiera nei tre modi",
+        "prova a schermo; validate 0; bash tools/run_tests.sh esce 0"
+      ],
+      "priority": 14,
+      "fase": "8b",
+      "passes": true,
+      "notes": "Soglia del faro (mezzi.json soglia_faro, aspetto faro), chiave del faro sulle Rovine, mondo.gd crea_soglie; barca e volo gia' arrivavano. arte/revisione/faro_in_gioco.png."
+    },
+    {
+      "id": "US-8B70",
+      "title": "Icone degli oggetti",
+      "description": "Le icone degli oggetti a terra e dell'inventario dal generatore (oggi segnaposto di generate_sprites.py).",
+      "acceptanceCriteria": [
+        "palette, contorno 1 px, guardate ingrandite"
       ],
       "priority": 15,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "4 tag nuovi in data/schema/location_tags.json, uno per GRUPPO (non per Pathway), motivati nel _comment: soglia_del_crepuscolo (eternal_darkness), radice_del_mondo (goddess_of_origin), biblioteca_di_tutto (demon_of_knowledge), porta_senza_stanza (lord_of_mysteries). Ognuno aggiunto alla regione del proprio gruppo in data/world/regions.json. I 10 Pathway ATTIVI puntano il location_tags del proprio advancement_ritual di Sequenza 0 al tag del gruppo (sostituendo i tag generici precedenti, alcuni dei quali erano ospitati solo dalla citta' neutra invece che dalla regione del gruppo: es. Hermit aveva 'archivio', ospitato solo da 'mirwada', non da 'archivio_sepolto'). Scope: SOLO i 10 Pathway attivi, non i 22 dell'AC originale - i 12 differiti in data/pathways_deferred/ appartengono a gruppi fuori dai 4 attivi e sono interamente stub (nessuna regione reale li ospiterebbe); riattivarli e' fuori scope di questa story, coerente con come le fasi precedenti trattano il contenuto differito. Coerenza con l'antagonista (data/lore/antagonisti.json, US-620): ogni antagonista di un Pathway vive gia' nella regione del proprio gruppo (es. Twilight Giant 'il trono in cima alle Marche' -> soglia_del_crepuscolo in marche_crepuscolo; Hermit 'l'Archivio Sepolto' -> biblioteca_di_tutto in archivio_sepolto); ora il sito del rituale di Sequenza 0 e' lo stesso sito, invece di un tag scollegato. Il gruppo eternal_darkness (darkness/death/twilight_giant) e lord_of_mysteries (fool/error/door) ora condividono lo stesso sito di Sequenza 0 fra i loro Pathway, coerente col fatto che il cambio Pathway di fase 7 fonde solo vicini dello stesso gruppo. tests/test_regions.gd: NUOVO test_ritual_di_sequenza_0_ospitato_da_una_regione (itera i 10 Pathway attivi, verifica che ogni location_tag della Sequenza 0 sia ospitato da almeno una regione). validate exit 0 (3 warning invariati). 752 test verdi (751 + 1 nuovo)."
+      "notes": "2026-10-26: forge3d/icone.py, 44 forme (fiala, goccia, cristallo, polvere, fiore, sfera, stoffa, candela, lingotto, erba, radice, fungo, seme, piuma, osso, zanna, corno, occhio, cuore, pelo, filo, chiave, chiodo, carta, pergamena, libro, specchio, moneta, sigillo, ingranaggio, clessidra, calice, campana, maschera, corona, porta, tavoletta, dado, spada, ascia, corazza, scudo, anello, amuleto) con tinte della palette. tools/art/build_icone.py (seed 1) abbina i 353 oggetti (parole dell'id e tag, poi ritocchi nel JSON: data/ui/icone.json) e disegna le 141 icone usate in assets/icone/oggetti/. GameData.icona_oggetto; a terra a mezza grandezza con l'ombra (vfx.json ombra_terra.raggi.oggetto), nello zaino a 16 unita'. Validator: ogni oggetto ha un'icona del vocabolario e il suo disegno. 5 test. Guardate ingrandite: arte/revisione/icone_oggetti.png, icone_in_gioco.png."
     },
     {
-      "id": "US-716",
-      "title": "ending.schema.json + data/endings.json (Blocco D)",
-      "description": "Come sviluppatore, voglio i finali come dati con condizioni dal vocabolario chiuso esistente.",
+      "id": "US-8B71",
+      "title": "Icone di stato",
+      "description": "14 icone di stato.",
       "acceptanceCriteria": [
-        "data/schema/ending.schema.json (additionalProperties:false): id (apoteosi|consumazione|rinuncia), name_i18n (^ending\\.), condizioni[] (dal vocabolario di conditions.gd, NESSUN tipo nuovo), priorita (int), eredita_profilo (completo|ancore|solo_conoscenza), epiloghi_per_gruppo ({ <gruppo>: <text_i18n> }, 4 voci).",
-        "data/endings.json: le 3 voci. Apoteosi: sequence 0 + rituale completato. Consumazione: madness_min 100. Rinuncia: flag 'pozione_distrutta' + almeno un'Ancora viva.",
-        "tools/validate_data.py: i 3 id esatti presenti; condizioni valide; epiloghi_per_gruppo copre i 4 gruppi; eredita_profilo nell'enum.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "palette, contorno 1 px"
       ],
       "priority": 16,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "data/schema/ending.schema.json (nuovo) + data/endings.json (3 voci). 'sequence 0 raggiunta' resa con tier_min:god (ogni Sequenza 0 attiva e' gia' tier 'god', zero condizioni nuove); 'rituale completato' con un flag 'rituale_sequenza_0_completato' POSTO DAL CODICE (EndingSystem, US-717, ascolta RitualSystem.rituale_completato e controlla Progression.sequence()==0 dopo l'avanzamento) - unico flag esente dalla riconciliazione dialogo/quest del validator. 'almeno un'Ancora viva' per Rinuncia NON e' un tipo di condizione nuovo (FR-9): e' una regola generica su eredita_profilo=='ancore' che EndingSystem applichera' (US-717), mai un id di finale nel codice (FR-15). Flag 'pozione_distrutta' (Rinuncia) posto da una nuova scelta nel dialogo esistente dlg_antagonista (terza opzione al nodo n1, stessa condizione tier_min:angel della scelta 'varca' che chiude la tribolazione) - riuso del grafo unico gia' scritto in US-712, zero NPC/quest nuovi. epiloghi_per_gruppo: chiavi rinominate con suffisso _i18n (eternal_darkness_i18n, ecc.) cosi' il validator R-12 le riconosce come riferimenti i18n (altrimenti finivano fra le chiavi orfane). game_data.gd: PATH_ENDINGS + _load_single (come antagonisti.json) + get_endings()/get_ending(id). tests/test_endings.gd NUOVO (4 test: i 3 id esatti; consumazione ha la priorita' piu' alta di apoteosi/rinuncia; ogni finale risolve name_i18n/eredita_profilo/condizioni/i 4 epiloghi tradotti; i flag non esenti sono scritti da un dialogo). validate exit 0 (3 warning invariati). 759 test verdi (755 + 4)."
+      "notes": "2026-10-26: tools/art/build_stati.py, 14 icone 16x16 da griglie (simbolo 10x10 in un tondo navy, contorno #181425 di 1 px, bordo rosso se lo status e' negativo, verde se e' un vantaggio), solo palette; assets/icone/stati/<status_id>.png, foglio arte/revisione/icone_stati.png. Nel gioco: GameData.icona_stato, scripts/status_icons.gd (fila sopra la testa di giocatore e nemici, segnale StatsComponent.status_cambiati, lampeggia negli ultimi 2 s). Nome del giocatore col contorno (sul marmo non si leggeva). Validator: ogni status ha l'icona. 4 test. Prova a schermo arte/revisione/icone_stati_in_gioco.png."
     },
     {
-      "id": "US-717",
-      "title": "EndingSystem - valuta e sceglie (Blocco D)",
-      "description": "Come giocatore, voglio che il gioco riconosca quando ho raggiunto un finale e quale.",
+      "id": "US-8B72",
+      "title": "Icone di primitiva",
+      "description": "27 icone colorate dallo shader come i VFX.",
       "acceptanceCriteria": [
-        "scripts/ending_system.gd (nuovo autoload): valuta() -> String - l'id del finale con priorita' piu' alta le cui condizioni sono tutte soddisfatte (riuso di scripts/conditions.gd), '' se nessuno.",
-        "Segnale finale_raggiunto(id, gruppo); endgame.finale scritto nel save; il gioco entra in uno stato di epilogo (pausa + pagina).",
-        "La Consumazione e' agganciata a Madness (soglia 100 = soglia 'mostro' gia' esistente): il game over per follia E' il finale Consumazione, non un percorso separato.",
-        "tests/test_ending_system.gd: con follia 100 -> consumazione; con Seq 0 + rituale -> apoteosi (priorita' se entrambe); con flag pozione_distrutta + Ancora viva -> rinuncia; nessuna condizione -> ''.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "una forma per primitiva, colore dalla palette di data/vfx.json"
       ],
       "priority": 17,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "scripts/ending_system.gd (NUOVO autoload, registrato dopo KnowledgeStore in project.godot). valuta(): itera GameData.get_endings(), Conditions.tutte_soddisfatte(condizioni) + regola generica eredita_profilo=='ancore' -> richiede AnchorSystem.active() non vuoto (mai un id di finale nel codice, FR-15). Ascolta 3 segnali per rivalutare live: Madness.madness_changed, RitualSystem.rituale_completato, KnowledgeStore.appreso. Il flag 'rituale_sequenza_0_completato' (condizione Apoteosi) e' posto qui: RitualSystem.rituale_completato porta la Sequenza di PARTENZA del rituale (non quella di arrivo, verificato leggendo ritual_system.gd _completa()), quindi si controlla Progression.sequence()==0 DOPO l'avanzamento, non il parametro del segnale. _raggiungi(id): EndgameState.imposta_finale(id) (il round-trip nel save era gia' garantito da US-701) + segnale finale_raggiunto(id, gruppo) + Book.apri_a('colophon') (gia' mette in pausa da solo, book.gd riga 85 - nessuna pausa duplicata). US-718 riempira' il colophon col contenuto del finale. Un finale gia' raggiunto non si sovrascrive (_rivaluta controlla EndgameState.finale non vuoto prima di richiamare valuta()). BUG trovato e corretto in fase di test: _rivaluta() e' agganciata a segnali live, quindi un test che spinge follia a 100 pausa l'albero (Book si apre) - senza richiudere il libro a fine test, la pausa filtrava nella suite alfabeticamente successiva (test_equipment) e ne rompeva il round-trip. Fix: _fine() in ogni test di test_ending_system.gd richiude il libro se aperto. tests/test_ending_system.gd NUOVO (7 test): nessuna condizione -> ''; follia 100 -> consumazione; Seq 0 da sola non basta, +rituale -> apoteosi; entrambe insieme -> vince consumazione (priorita' piu' alta, FR-10); flag pozione_distrutta da solo non basta, +Ancora viva -> rinuncia; il segnale finale_raggiunto scrive endgame.finale e apre il libro; un finale gia' raggiunto non si sovrascrive. validate exit 0 (3 warning invariati). 766 test verdi (759 + 7)."
+      "notes": "2026-10-26: tools/art/build_primitive.py, 28 glifi 32x32 (le primitive attive sono 28, non 27) disegnati a 4x con PIL e ridotti a maggioranza, a 4 toni di grigio (0 contorno, 85 scuro, 170 primario, 255 accento) con luce in alto a sinistra e contorno di 1 px automatici; assets/icone/primitive/<primitiva>.png. shaders/rampa_pathway.gdshader li colora con la palette del Pathway (data/vfx.json pathway_palette_visiva; scuro = primario verso l'inchiostro). GameData.icona_primitiva; hud.gd: glifo della prima primitiva davanti a ogni slot, attenuato in cooldown. Validator: ogni primitiva attiva ha il glifo. 2 test. Foglio con 4 palette arte/revisione/icone_primitive.png; prova a schermo con 3 Pathway icone_primitive_in_gioco.png."
     },
     {
-      "id": "US-718",
-      "title": "Schermata di finale nel libro (Blocco D)",
-      "description": "Come giocatore, alla fine voglio una pagina che mi dice come e' andata e cosa passa al prossimo.",
+      "id": "US-8B40",
+      "title": "VFX degli attacchi base",
+      "description": "vfx_slash, vfx_bolt, vfx_streak in scala di grigi colorati dallo shader.",
       "acceptanceCriteria": [
-        "Una pagina (estensione del colophon o nuova): titolo del finale, epilogo della variante di gruppo, la lista di cosa viene ereditato (da endgame.eredita), e - per Consumazione/Rinuncia - l'azione che sceglie l'oggetto da ereditare (US-719).",
-        "Nessun testo hardcoded: chiavi i18n.",
-        "Verifica a schermo documentata in progress.txt.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass. Verify in browser using dev-browser skill."
+        "impatto 1 frame + 3-4 di dissolvenza",
+        "variante riduci_flash"
       ],
       "priority": 18,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "Estensione del colophon (scripts/pages/page_impostazioni.gd) invece di un tipo di pagina nuovo: page_types.json e' un vocabolario chiuso ('va discusso'), estendere una pagina esistente non lo tocca, coerente con l'opzione che l'AC stesso offriva. _sezione_finale() in cima ad aggiorna(): nulla se EndgameState.finale e' vuoto (il caso normale); altrimenti nome del finale (name_i18n), l'epilogo della VARIANTE DI GIUSTO GRUPPO (ricavato da Progression.pathway() -> group, non salvato a parte: e' statico per Pathway e non cambia dopo il finale), e un riepilogo di endgame.eredita (conoscenza/ancora/reputazione/oggetto) SOLO se non vuoto - finche' US-719 non lo compila non appare nessun placeholder finto. 'L'azione che sceglie l'oggetto da ereditare' resta esplicitamente a US-719 (lo dice l'AC stesso). 5 chiavi UI chrome in assets/i18n/strings.csv (COLOPHON_FINALE_*), .translation rigenerati. Verifica a schermo REALE (non solo scriptata): Xvfb + Godot non-headless con software rendering (llvmpipe), screenshot catturato via get_viewport().get_texture().get_image().save_png() e mandato all'utente in chat - due catture, Apoteosi con sola conoscenza e Consumazione con le 4 righe di eredita' popolate, entrambe rese correttamente in italiano (serviva TranslationServer.set_locale('it') esplicito, il boot normale del gioco lo fa gia' via SettingsStore). Trovata una traduzione mancante preesistente ('anchor.mirco', 'TODO ...') non causata da questa story, non toccata. tests/test_page_finale.gd NUOVO (4 test): nessun finale -> nessuna sezione; finale raggiunto -> nome ed epilogo del gruppo giusto mostrati; eredita vuota -> nessun riepilogo (niente placeholder finto); eredita compilata -> il riepilogo appare col conteggio giusto. validate exit 0 (3 warning invariati). 770 test verdi (766 + 4)."
+      "notes": "2026-10-26: tools/art/build_vfx.py (seed 40) legge i frame da data/vfx.json e scrive assets/vfx/vfx_slash.png (5 x 96), vfx_bolt.png (2 x 48x32, ciclo), vfx_bolt_scoppio.png (5 x 48), vfx_streak.png (4 x 64x32), a 4 toni di grigio. Fendente e scoppio: primo frame tutto acceso + 4 di dissolvenza a blocchi (contorno solo fuori dalla sagoma). shaders/rampa_pathway.gdshader: parametro lampo (bianco nel frame d'impatto, 0 con riduci_flash). vfx.gd: _foglio/_effetto/_anima, gioca_per (l'attacco base del giocatore usa il fendente), veste_proiettile (il proiettile prima era invisibile), scoppio_proiettile; vfx.json: frames 5/2/4, sul_proiettile, scoppio. 4 test. Fogli arte/revisione/vfx_attacchi.png, prova a schermo vfx_in_gioco.png. Resta il feedback del colpo del PRD (scintilla, parata, polvere, postura)."
     },
     {
-      "id": "US-719",
-      "title": "Eredita' al personaggio successivo - il contratto (Blocco D)",
-      "description": "Come giocatore che ha perso (Consumazione) o si e' fermato (Rinuncia), voglio che qualcosa passi al personaggio successivo.",
+      "id": "US-8B40b",
+      "title": "Feedback del colpo",
+      "description": "Il resto di US-8B40 nel PRD: scintilla quando un colpo va a segno, scintilla della parata perfetta, rottura della postura, polvere dello scatto.",
       "acceptanceCriteria": [
-        "Al finale_raggiunto, se eredita_profilo != 'nessuno', EndingSystem compila endgame.eredita: conoscenza = tutti i flag pathway:*/sequenza:* di KnowledgeStore (SEMPRE, tutti i profili); ancora = se >= 1 Ancora viva, il giocatore ne sceglie una -> { id, forza: forza/2 } (profili completo e ancore); reputazione = ogni valore di FactionSystem x0.5 (profilo completo); oggetto = il giocatore sceglie 1 item_id dall'inventario (profilo completo).",
-        "Alla creazione del NUOVO personaggio (nuova partita con un save che ha endgame.eredita non vuoto): KnowledgeStore.da_salvataggio semina i flag; AnchorSystem registra l'Ancora ereditata a forza dimezzata; FactionSystem parte dai valori attenuati; Inventory aggiunge l'oggetto. Tutto il resto (Sequenza, statistiche, follia) riparte da capo.",
-        "endgame.eredita e' NON fidato in lettura: id ignoti scartati, valori fuori range clampati.",
-        "tests/test_eredita.gd: un ciclo completo - finale Consumazione con 2 Ancore vive, reputazione, un oggetto -> endgame.eredita compilato -> nuovo personaggio -> conoscenza seminata, 1 Ancora a forza/2, reputazione a meta', oggetto in inventario, Sequenza di nuovo a 9.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "fogli a 4 toni, colori nei dati (vfx.json feedback_colpo)",
+        "nel punto giusto (bersaglio, chi para, chi si rompe, chi scatta)",
+        "lampo spento con riduci_flash"
+      ],
+      "priority": 18,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: tools/art/build_vfx.py gruppo vfx_feedback: vfx_scintilla (stella bianca, raggi dorati), vfx_parata (anello con le punte che si allarga e si spezza), vfx_postura (scudo che va in schegge, stelline sopra la testa), vfx_polvere (sbuffi ai piedi). vfx.json feedback_colpo con le chiavi di audio.json combat_feedback e i colori nei dati. Vfx.evento_combat(nome, dove): player colpo/parata perfetta/scatto, enemy colpo/postura. Parata e postura (trigger del nero di scena) nello strato Accenti sopra il nero, che segue la camera. Validator: momento in combat_feedback, foglio e frame, colori #rrggbb. 5 test. Prova a schermo al rallentatore: arte/revisione/vfx_feedback_in_gioco.png."
+    },
+    {
+      "id": "US-8B35a",
+      "title": "Ritratti: volti nel generatore e mezzibusti",
+      "description": "US-8B35 spezzata in due. Il generatore dei personaggi impara bocca e sopracciglia con l'espressione (solo ai ritratti), barba e occhiali; tools/art/build_ritratti.py fa un mezzobusto 64x80 per aspetto dallo stesso modello dello sprite.",
+      "acceptanceCriteria": [
+        "stessa luce, inquadratura e sfondo per tutti (centro della testa sempre nello stesso punto)",
+        "volto ed espressione sono dati degli aspetti (build_npc.ASPETTI), file per id dell'aspetto",
+        "gli sprite che cambiano (barba, occhiali) rigenerati e riguardati",
+        "deterministico, colori in palette"
       ],
       "priority": 19,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "EndingSystem._componi_eredita_iniziale(id): la parte AUTOMATICA (conoscenza sempre, reputazione se profilo 'completo') compilata subito in _raggiungi(). Ancora e oggetto sono una scelta esplicita (scegli_ancora(id)/scegli_oggetto(item_id), validano rispettivamente 'attiva adesso'/'posseduto adesso', false altrimenti) - non potevano essere automatiche perche' il giocatore puo' avere piu' di un'Ancora/oggetto (visto nel test: 2 Ancore vive). AnchorSystem esteso con un override di forza per-istanza (_forza_override, retrocompatibile: i save vecchi restano array di stringhe semplici, uno nuovo con override e' {id,forza}) + forza_di(id) pubblico. EndgameState.eredita_sanitizzata(raw) e' un wrapper pubblico del sanitizzatore gia' esistente (_leggi_eredita), riusato da GameState per leggere l'eredita' di UN ALTRO save senza toccare il resto di QUESTO EndgameState. GameState.nuova_partita(): legge l'eredita' dello slot che sta per sovrascrivere PRIMA di azzerare, poi resetta Progression/Follia/KnowledgeStore/AnchorSystem/FactionSystem/Inventory/EndgameState (gap preesistente: nuova_partita non azzerava mai questi sistemi, funzionava solo perche' si presumeva sempre chiamata a boot fresco - necessario per il rinascita-nello-stesso-slot che questa story introduce davvero) e applica l'eredita' sanitizzata. UI (page_impostazioni.gd, estende US-718): OptionButton + bottone per scegliere Ancora/oggetto quando il profilo li richiede e non sono ancora scelti, chiamano EndingSystem.scegli_*() e si aggiornano da soli. Verificato con screenshot reale (Xvfb) mandato in chat: i due selettori appaiono e funzionano. tests/test_eredita.gd NUOVO (3 test: ciclo completo Consumazione con 2 Ancore/reputazione/oggetto -> nuovo personaggio con tutto seminato a meta'/Sequenza 9; slot vuoto -> nessuna eredita; id ignoti in un contratto malformato -> scartati senza crash, FR-13). tests/test_page_finale.gd +2 test (i selettori appaiono nel profilo 'completo'; scegliere aggiorna il riepilogo). BUG trovato in fase di test (stessa classe del leak di US-717): nuova_partita()/carica_slot() attivano GameState._partita_attiva senza un modo pubblico per spegnerla - convenzione gia' documentata in test_creazione_talenti.gd (gs.set('_partita_attiva', false) prima e dopo), che la mia prima versione del test non seguiva: rotto test_page_scaffale nella suite successiva (5 bottoni invece di 4, il bottone 'Riprendi' extra). Corretto seguendo la stessa convenzione. validate exit 0 (3 warning invariati). 775 test verdi (770 + 5)."
+      "notes": "2026-10-27: forge3d/humanoid.py: beard (mascella, pizzo, baffi), glasses e, con detail 3 (solo ritratti), sopracciglia inclinate (brows), bocca a tre tratti (mouth -1/0/+1), frangia piu' aderente; skin_pale rifatta calda (era grigio-blu, sembrava un fantasma). build_npc.ASPETTI: volto ed espressione per aspetto (Mirco barba grigia, Ottavia occhiali, Bruno barba nera, Lena sorriso...); rigenerati gli sprite che cambiano (amico, archivista, contrabbandiere, rivale), gli altri identici. Occhiali solo nel ritratto: a 64 px coprivano gli occhi. tools/art/build_ritratti.py: 17 ritratti 64x80, centro della testa calcolato dal modello. Deterministico. arte/revisione/ritratti.png."
     },
     {
-      "id": "US-720",
-      "title": "CHECKPOINT - verdetto del criterio di uscita della fase 7 (Blocco E)",
-      "description": "Come sviluppatore, voglio la prova che l'endgame e' dati.",
+      "id": "US-8B35b",
+      "title": "Ritratti nella pagina del dialogo",
+      "description": "La pagina del dialogo (e del negozio) mostra il ritratto di chi parla accanto al nome e alla battuta.",
       "acceptanceCriteria": [
-        "tests/test_slice_fase_7.gd (esteso da US-709): copre il ciclo completo - cambio Pathway con fusione, una tribolazione superata, un finale valutato, l'eredita' compilata e riapplicata - SENZA una riga di codice che nomini un Pathway, una coppia di fusione, una tribolazione o un finale specifico.",
-        "git diff di tutta la fase 7 (file .gd non di test): elenco in progress.txt. I motori nuovi (FusionEngine, TribulationSystem, EndingSystem, PathwayChange) non contengono if per un id di contenuto. AbilityEngine.execute / _esegui_primitive intatti.",
-        "Verdetto in progress.txt: l'endgame e' dati / non lo e'.",
-        "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass."
+        "GameData.ritratto(npc_id) dall'aspetto del roster",
+        "il validator vuole un ritratto 64x80 per ogni aspetto usato",
+        "verifica a schermo nel libro"
       ],
       "priority": 20,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "tests/test_slice_fase_7.gd: nuovo test_ciclo_completo_endgame_zero_codice_dedicato che estende quello di US-709. Lo STESSO personaggio (Error Seq 4) attraversa in sequenza cambio Pathway+fusione (vicino scoperto dai dati), una tribolazione attivata e superata (id/superamento scoperti da GameData.tribulation_ids, mai scritti a mano), un finale raggiunto (soglia generica madness_min 100, id letto DOPO da EndgameState), un'Ancora e un oggetto scoperti e scelti per l'eredita', e la riapplicazione a un nuovo personaggio sullo stesso slot (Sequenza 9, follia 0, nessun finale residuo). test_nessun_codice_nomina_un_pathway_o_una_fusione esteso con gli id di tribolazioni/finali. git diff di tutta la fase 7 (16 file .gd non-test, 1392+/-13) in progress.txt: ability_engine.gd MAI toccato (assente dal diff); grep dei 10 Pathway + trib_*/apoteosi/consumazione/rinuncia nei 4 motori nuovi (FusionEngine/TribulationSystem/EndingSystem/PathwayChange) = 0 occorrenze fuori commenti. VERDETTO in progress.txt: l'endgame e' dati. validate exit 0 (3 warning invariati). 776 test verdi (775 + 1)."
+      "notes": "2026-10-27: GameData.ritratto(npc_id) dall'aspetto del roster; page_dialogo: ritratto a sinistra di nome e battuta (anche nel negozio), 1 texel = 1 unita', filtro nearest. Validator: ogni aspetto usato ha il ritratto 64x80. 2 test. Prova a schermo: arte/revisione/ritratti_in_gioco.png (Mirco, Ottavia, Lena)."
     },
     {
-      "id": "US-721",
-      "title": "Chiusura fase 7 (Blocco E)",
-      "description": "Come sviluppatore, voglio che i documenti riflettano la fase 7 chiusa.",
+      "id": "US-8B73b",
+      "title": "Le due facciate del libro, dialogo e negozio",
+      "description": "Niente si scrive sulla piega: una pagina sta sulla facciata sinistra col titolo, la sua proprieta' destra sulla facciata destra; solo doppia_pagina (la mappa) usa le due facciate come un foglio.",
       "acceptanceCriteria": [
-        "006_PRD/roadmap.md: 'Fase 7 - Endgame - CHIUSA (N story, M test)' con l'elenco dei blocchi e la nota sui 7 percorsi di fusione stub (fase 7b).",
-        "006_PRD/design-master.md: Appendice A fase 7 -> CHIUSA; Appendice B decisioni n.8 (eredita') e n.9 (antagonista) -> CHIUSE; Appendice C: righe dei vocabolari/schema nuovi (fusion, tribulation, tribulation_effects, prayer_effects, ending, endgame nel save).",
-        "006_PRD/design-npc-quest.md par. 5: i finali e i tre atti segnati come 'REALIZZATO in fase 7'.",
-        "CLAUDE.md + README.md: fase 7 chiusa, conteggi, save 21 -> 22, 'fase corrente: 8 (opzionale) o manutenzione'.",
-        "tools/validate_data.py: check di chiusura fase 7 - i file di dati della fase esistono (fusions/, tribulations/, endings.json + i 3 schema); door_error non-stub; i 3 finali presenti.",
-        "python tools/validate_data.py esce 0. Tutti i test headless verdi. Typecheck passes. Tests pass."
+        "book_overlay: facciate Contenuto e Destra, titolo a sinistra, doppia_pagina dai dati",
+        "dialogo: ritratto e battuta a sinistra, scelte a destra; negozio: compra a sinistra, vendi e Chiudi a destra, liste che scorrono",
+        "verifica a schermo voltando pagina"
       ],
       "priority": 21,
-      "fase": 7,
+      "fase": "8b",
       "passes": true,
-      "notes": "006_PRD/roadmap.md: 'Fase 7 - Endgame - CHIUSA (21 story, 776 test)' con i 5 blocchi e cosa contiene, nota sui 7 percorsi stub per la fase 7b; Fase 8 aggiornata ('sbloccata, ma opzionale'). design-master.md: sezione Fase 7 in Appendice A -> CHIUSA con verdetto del checkpoint; Appendice B decisione n.8 (eredita') -> CHIUSA (la n.9 antagonista era gia' chiusa da fase 6); Appendice C: 6 righe nuove (fusion, tribulation_effects, tribulation, prayer_effects, ending, campo endgame del save). design-npc-quest.md: nota di testa + Atto III + sezione finali + sezione antagonista marcate REALIZZATO/CHIUSA in fase 7, con riferimento a US-701..721 e al PRD. CLAUDE.md: paragrafo 'Fase 7 - Endgame: CHIUSA' nello stesso stile delle altre fasi chiuse (contenuto, save 21->22, verdetto del checkpoint) + 'Fase corrente: 8 - opzionale' (nessuna fase bloccante, PRD di fase 8 solo se si decide di farla, altrimenti manutenzione). README.md: paragrafo Fase 7 nello stesso stile + corretto un refuso preesistente non legato a questa story ('22 Pathway attivi' -> '10', il progetto ne ha 10 attivi su 22 totali nel design) + riferimento PRD aggiornato all'ultima fase chiusa. tools/validate_data.py: nuovo blocco 'chiusura fase 7' (prima di report()) - i file di dati (fusions/, tribulations/, endings.json + i 3 schema + tribulation_effects/prayer_effects) esistono; data/fusions/door_error.json esiste e non e' stub (nome file verificato su disco, l'AC lo chiama correttamente 'door_error'); i 3 finali esatti presenti in endings.json. validate exit 0 (3 warning invariati). 776 test verdi, nessuna regressione. FASE 7 CHIUSA."
+      "notes": "2026-10-27: book_overlay.tscn nodo Destra, Titolo e Contenuto sulla meta' sinistra (PIEGA 16 unita' libere dal centro); _disponi legge doppia_pagina; _rendi mette la `destra` della pagina sulla facciata destra prima che la pagina entri nell'albero. page_dialogo: var destra, _lista (ScrollContainer) per compra/vendi, _etichetta_riga che va a capo. Trovato e corretto: arrivando voltando pagina i Button con autowrap restavano alti come una colonna di lettere (Godot 4.3 non rifa' il testo al resize): _riadatta li reimpagina quando cambia la larghezza. test_libro_facciate.gd (2), test aggiornati. arte/revisione/libro_dialogo.png, libro_negozio.png."
+    },
+    {
+      "id": "US-8B73c",
+      "title": "Scaffale, frontespizio e colophon sulle due facciate",
+      "description": "Le pagine che oggi stanno tutte a sinistra usano anche la facciata destra.",
+      "acceptanceCriteria": [
+        "niente sulla piega, niente fuori dalla pagina",
+        "verifica a schermo"
+      ],
+      "priority": 22,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: scripts/pages/pagina_libro.gd (base delle pagine a colonna: `destra`, svuota(), a_capo() per i Button che vanno a capo); dialogo rifatto su di essa. Scaffale: tomi a sinistra larghi quanto la facciata (erano 360 fissi), Riprendi a destra. Frontespizio: nome, Pathway e modalita' a sinistra, talenti e Conferma a destra; in partita chi sei a sinistra, i talenti a destra; le due facciate allineate allo stesso modo. Colophon: audio e video a sinistra, comandi e lingua a destra, ognuna scorre; righe senza larghezze fisse oltre la facciata; voci degli interruttori e sezione del finale che vanno a capo. arte/revisione/libro_scaffale_frontespizio_colophon.png (anche il libro piccolo dell'avvio)."
+    },
+    {
+      "id": "US-8B73d",
+      "title": "Inventario, diagramma, sinergie e diario sulle due facciate",
+      "description": "Come US-8B73c per le pagine con le liste lunghe e il diagramma.",
+      "acceptanceCriteria": [
+        "niente sulla piega, niente fuori dalla pagina",
+        "verifica a schermo"
+      ],
+      "priority": 23,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: inventario: elenco della sezione a sinistra, indice delle sezioni (i 7 bottoni, prima una riga larga 406) a destra; righe senza larghezze fisse (_larga). Diagramma: griglia girata, una riga per Pathway con le Sequenze da 9 a 0 in colonna (le 10 colonne stavano in una facciata solo scorrendo di lato), la propria riga in rosso; Sequenza corrente, abilita', prossima, fusione e avanzamento a destra; bottoni e motivi che vanno a capo. Sinergie e diario non hanno ancora una scena (appunto a matita). Test generale test_nessuna_pagina_e_piu_larga_della_sua_facciata (larghezza minima di ogni facciata di ogni pagina). arte/revisione/libro_inventario_diagramma.png."
+    },
+    {
+      "id": "US-8B50a",
+      "title": "Forma gigante: i fogli",
+      "description": "US-8B50 spezzata. La forma gigante (forms.json aspetto 'gigante') ha i suoi fogli del personaggio a celle di 96 (tools/art/build_forme.py); l'AnimationMachine legge la cella dal foglio.",
+      "acceptanceCriteria": [
+        "stessi tempi e animazioni di personaggio",
+        "stessa grana dei pixel, piedi sull'origine",
+        "validator: un foglio per animazione per ogni aspetto di forma"
+      ],
+      "priority": 24,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: build_forme.py: il gigante e' Enel x1.5 (ppu 1.83, celle 96, piedi a 81/96), spalle piu' larghe (build 1.18) e testa piu' piccola (0.74) per leggersi come gigante. 10 fogli in arte/sprite e assets/placeholder (personaggio_gigante_<anim>), nessun pixel sul bordo della cella, alpha 0/255, deterministico. animation_machine: cella = altezza del foglio / righe, scala dai dati (grana uguale), piedi e ombra x cella/dim, alto_in_piu per nome e icone. forms.json aspetto + schema + validator. arte/revisione/forma_gigante.png. tg_arma_luce (sovrapposta agli attacchi) resta da fare."
+    },
+    {
+      "id": "US-8B50b",
+      "title": "Forma gigante nel gioco",
+      "description": "La transform con una forma che ha un aspetto cambia i fogli di Enel e li rimette quando finisce.",
+      "acceptanceCriteria": [
+        "finisce comunque finisca il modificatore (scadenza, annullata, spiritualita')",
+        "nome e icone sopra la testa della forma",
+        "verifica a schermo"
+      ],
+      "priority": 25,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: StatsComponent.imposta_forma(mod_id, aspetto) + segnale forma_cambiata: la forma e' legata al suo modificatore e finisce in remove_modifier (copre scadenza, annulla_transform, flush, fine spiritualita'). AbilityEngine._p_transform la imposta se la forma ha un aspetto. Player._su_forma riconfigura l'AnimationMachine con l'aspetto e rimette lo stato; nome e icone salgono di alto_in_piu. tests/test_forme.gd (3). A schermo: arte/revisione/forma_gigante_in_gioco.png (prima, gigante, attacco pesante, di nuovo Enel)."
+    },
+    {
+      "id": "US-8B50c",
+      "title": "Forma con l'arma di luce",
+      "description": "La seconda forma (tg_arma_luce): Enel con la lama di luce dorata in ogni animazione, aspetto 'arma_luce'.",
+      "acceptanceCriteria": [
+        "fogli da build_forme.py, stessa cella di Enel",
+        "Enel senza forma resta identico",
+        "verifica a schermo"
+      ],
+      "priority": 26,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: build_personaggi.enel(lama=...) (default steel: i fogli di Enel restano identici, md5 uguale); build_forme.py arma_luce = enel(lama='glow_yellow'), celle 64. forms.json tg_arma_luce aspetto 'arma_luce'. test_forme: ogni forma con aspetto ha tutti i fogli (2). A schermo: arte/revisione/forma_arma_luce_in_gioco.png; fogli: forma_arma_luce.png."
+    },
+    {
+      "id": "US-8B80a",
+      "title": "Animazioni nuove di Enel: dati e fogli",
+      "description": "interact, pickup, drink, ritual in data/animations.json (personaggio) e i loro fogli per Enel e per le forme.",
+      "acceptanceCriteria": [
+        "tempi nei dati (durate_ms), 4 direzioni",
+        "clip generiche in forge3d/anim_humanoid.py",
+        "si leggono anche di fronte",
+        "fogli di Enel esistenti identici"
+      ],
+      "priority": 27,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: forge3d/anim_humanoid.py interact (la mano libera tocca), pickup (in ginocchio, mano a terra), drink (mano alla bocca, testa indietro), ritual (mano alzata di lato, testa china, ciclo); build_personaggi CLIP_ENEL con lo spadone in spalla. Corretto a occhio: la mano del rituale alzata verso chi guarda non si vedeva (rotazione sull'asse in avanti), accovacciata piu' bassa, mano alla bocca piu' chiara. animations.json: durate_ms, 4 direzioni, ritual in ciclo. Fogli Enel + gigante + arma di luce, nessun pixel sul bordo, alpha 0/255; gli altri fogli di Enel identici. arte/revisione/enel_azioni.png."
+    },
+    {
+      "id": "US-8B80b",
+      "title": "Animazioni nuove di Enel nel gioco",
+      "description": "interact quando si interagisce, pickup quando si raccoglie, drink quando si beve, ritual durante il rituale.",
+      "acceptanceCriteria": [
+        "agganci ai momenti veri del gioco",
+        "verifica a schermo"
+      ],
+      "priority": 28,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: player.gesto(nome)/fine_gesto(nome)/gesto_corrente(): il gesto copre idle e walk finche' dura, camminare lo interrompe, attacchi/parata/scatto/cast/morte hanno la precedenza. interact col tasto interagisci; pickup dai pickup (characteristic_pickup._raccolto_da) solo da fermo; drink su PotionSystem.pozione_bevuta; ritual da RitualSystem rituale_avviato a completato/interrotto. tests/test_gesti.gd (3). A schermo sul frame chiave di ogni gesto, di fronte e di lato: arte/revisione/enel_azioni_in_gioco.png."
+    },
+    {
+      "id": "US-8B81a",
+      "title": "Enel in volo e in barca: dati e fogli",
+      "description": "fly (sospeso) e sail (in ginocchio, rema) in data/animations.json e i fogli per Enel e le forme. Nuoto e arrampicata arrivano col loro gameplay (US-8B90, US-8B92).",
+      "acceptanceCriteria": [
+        "si leggono in tutte e 4 le direzioni",
+        "fogli di Enel esistenti identici"
+      ],
+      "priority": 29,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: forge3d/anim_humanoid.py fly (gambe che pendono piegate, braccio libero aperto, su e giu') e sail (in ginocchio, la mano libera rema), in ciclo; animations.json con durate_ms. Ritoccato a occhio: in volo le gambe piu' piegate (di fronte sembrava in piedi). Fogli Enel + gigante + arma di luce, nessun pixel sul bordo, alpha 0/255. arte/revisione/enel_mezzi.png."
+    },
+    {
+      "id": "US-8B81b",
+      "title": "Enel in volo e in barca nel gioco",
+      "description": "In volo e in barca fly e sail prendono il posto di idle e walk; in barca Enel sta dentro lo scafo.",
+      "acceptanceCriteria": [
+        "verifica a schermo prima/dopo"
+      ],
+      "priority": 30,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: player._aggiorna_animazione: fly in volo, sail in barca; DENTRO_BARCA = 4 unita' (prima in ginocchio sul bordo di poppa). test_gesti.test_in_volo_e_in_barca. arte/revisione/enel_mezzi_in_gioco.png (barca prima/dopo, volo prima/dopo)."
+    },
+    {
+      "id": "US-8B41",
+      "title": "VFX delle primitive, gruppo 1",
+      "description": "buff_stat, summon, aura, heal, reveal_info, teleport, debuff_stat, illusion (le 8 piu' usate dalle abilita'): fogli a 4 toni colorati dalla rampa del Pathway, attorno a chi lancia.",
+      "acceptanceCriteria": [
+        "un foglio per primitiva in assets/vfx/, frame da data/vfx.json",
+        "guardati ingranditi e in gioco",
+        "lampo spento con riduci_flash dove c'e'"
+      ],
+      "priority": 18,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: tools/art/build_vfx.py (seed 40) gruppo 1, fogli in assets/vfx/: vfx_rune_up e vfx_rune_down (frecce che salgono / scendono e anello ai piedi), vfx_aura_ring (anello che si allarga con scintille, 96), vfx_mend (croci che salgono), vfx_conjure (lampo di una colonna, poi cerchio con le rune, 96), vfx_scry (onde tratteggiate e occhio), vfx_rift (lampo di una fessura, varco col vortice che si richiude), vfx_mirage (due doppi come ologrammi). vfx.json: frames summon 5, teleport 5, reveal_info 4 (lampo + dissolvenza); gira solo su melee_arc e dash (vfx.gd ruota solo quelli). Validator: ogni foglio vero ha i frame dei dati. 2 test. Fogli arte/revisione/vfx_primitive_1.png, prova a schermo vfx_primitive_1_in_gioco.png (Moon)."
+    },
+    {
+      "id": "US-8B42",
+      "title": "VFX delle primitive, gruppo 2",
+      "description": "curse, terrain_modify, fear, steal, dot, shadow_meld, time_rewind, plant_growth.",
+      "acceptanceCriteria": [
+        "come US-8B41"
+      ],
+      "priority": 18,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: tools/art/build_vfx.py gruppo 2: vfx_hex (triangolo del maleficio sopra la testa, gocce scure), vfx_fracture (96: lampo delle crepe, spuntoni, sassi che saltano e ricadono), vfx_dread (fili di fumo scuro e teschio), vfx_pilfer (lampo davanti e monete che volano verso chi lancia; gira), vfx_smoulder (fiamme alle gambe e braci), vfx_umbra (pozza d'ombra con le lingue che salgono), vfx_unwind (96: lampo dell'anello, quadrante con freccia antioraria), vfx_bloom (germogli con foglie e fiori). vfx.json: frames curse 4, terrain_modify 5, steal 4, dot 4; steal gira. Primo giro corretto a occhio (fumo, fiamme, piante, freccia, sassi). 1 test. arte/revisione/vfx_primitive_2.png, prova a schermo vfx_primitive_2_in_gioco.png (Error)."
+    },
+    {
+      "id": "US-8B43",
+      "title": "VFX delle primitive, gruppo 3",
+      "description": "mind_read, shield, light_purify, possess, transform, soul_detach, resurrect, decay (e chain, che non ha ancora una voce in vfx.json).",
+      "acceptanceCriteria": [
+        "come US-8B41"
+      ],
+      "priority": 18,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: tools/art/build_vfx.py gruppo 3: vfx_insight (bolle di pensiero fino a una nuvoletta con la spirale), vfx_ward (cupola con la maglia e il riflesso), vfx_cleanse (lampo del raggio dall'alto, scintille, anello), vfx_grip (croce del burattinaio e fili), vfx_shift (lampo della sagoma, particelle a spirale), vfx_sever (taglio e anima che sale), vfx_revenant (ankh, luci che salgono), vfx_wither (macchia di marcio e foglie secche). vfx.json: frames mind_read 4, shield 4, light_purify 5, possess 5, soul_detach 5. chain non ha VFX: non e' implementata. Test: ogni primitiva implementata ha il suo foglio. arte/revisione/vfx_primitive_3.png, prova a schermo vfx_primitive_3_in_gioco.png (Death)."
+    },
+    {
+      "id": "US-8B74",
+      "title": "Panorami",
+      "description": "Schermata iniziale e libro: 6 strati x 4 fasce orarie.",
+      "acceptanceCriteria": [
+        "strati per il parallasse",
+        "nessuna Sequenza non raggiunta rivelata"
+      ],
+      "priority": 19,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27, decisione dell'utente: all'avvio (nessuna partita in corso, scaffale) il libro e' piu' piccolo (440x250, assets/ui/libro_avvio.png da build_libro.py) e intorno scorre il panorama; sulle altre pagine e in partita il libro torna grande (in partita col mondo dietro). forge3d/panorama.py strati(): cielo con sole/luna dove il libro non copre, nuvole, montagne, colline, citta' di mare col faro e le finestre accese di notte, mare e riva; tutto si ripete in orizzontale. tools/art/build_panorami.py (seed 3): assets/ui/panorama/<momento>/<strato>.png per i 4 momenti di data/schema/time.json. book.json tema.avvio e tema.panorama (strati, velocita', ore -> momento). Nessun Pathway o Sequenza nel panorama. Validator: carta piccola, 24 file, ore che coprono il giorno. 4 test. arte/revisione/panorami.png e panorami_in_gioco.png."
+    },
+    {
+      "id": "US-8B22a",
+      "title": "Forzieri e tabelle di bottino",
+      "description": "Un forziere che si apre una volta sola e da' oggetti presi da una tabella di bottino nei dati; i primi forzieri negli interni di grotta, fogne e cripta.",
+      "acceptanceCriteria": [
+        "tabelle di bottino in data/world/bottino.json (oggetti, pesi, quantita', numero di estrazioni)",
+        "il forziere si apre con interagisci, una volta sola, e resta aperto nel salvataggio",
+        "il bottino va nello zaino e una scritta dice cosa c'era",
+        "disegno chiuso e aperto nelle due modalita', la cassa decorativa non sembra un forziere"
+      ],
+      "priority": 31,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27, scelte di Claude (l'utente ha detto 'vai' senza scegliere, CLAUDE.md: si decide e si riassume): il bottino va dritto nello zaino (gli oggetti a terra oggi non restano raccolti nel salvataggio, quelli di un forziere si perderebbero); il forziere si apre una volta sola. scripts/forziere.gd (Area2D: prompt [tasto] Apri sopra il forziere, corpo sul livello dei muri, tira() pesato e statico), data/world/bottino.json (grotta, fogne, cripta), WorldState forzieri_aperti nel salvataggio (niente bump di versione, come gli altri campi di 'mondo'), interior_scene._crea_forzieri (la casella diventa muro come un arredo), interni: valle_grotta_di_marea (nicchia a destra), mirwada_sotterraneo, marche_cripta (al posto della cassa). Arte: arredi forziere e forziere_aperto in forge3d/arredi.py (coperchio a botte con le doghe, ferro, serratura d'oro; aperto con l'oro e un luccichio), la cassa ridisegnata da carico (assi e traversa, niente serratura). Validator: tabelle, item, pesi, quantita', id unici, forziere sul pavimento e raggiungibile. tests/test_forzieri.gd (4). arte/revisione/forzieri.png e forzieri_in_gioco.png."
+    },
+    {
+      "id": "US-8B22b",
+      "title": "Forzieri nel sottosuolo del mondo",
+      "description": "Forzieri nel sottosuolo del mondo (fogne, catacombe, grotte, miniere) vicino ai punti dei dati.",
+      "acceptanceCriteria": [
+        "forzieri del sottosuolo posati dai dati vicino a un punto del mondo (ingresso o boss)",
+        "non chiudono i passaggi (vicolo cieco o spiazzo) e si vedono solo sotto terra",
+        "verifica a schermo"
+      ],
+      "priority": 32,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: data/world/bottino.json forzieri_mondo [{id, vicino, tabella}] (9: fogne x3, catacombe x2, grotte x2, miniere x2) e tabella miniera. mondo.crea_forzieri / posto_del_forziere: dal punto (boss o ingresso di mondo.json sottosuolo) si cammina fino a 16 passi e si prende il primo vicolo cieco ad almeno 3 passi (un forziere pieno in un corridoio chiuderebbe il passaggio), altrimenti il primo spiazzo. Meta livello sottosuolo: _mostra lo spegne in superficie (niente corpo che blocca). La scritta del bottino ora va sotto chi apre (copriva la barra dell'HUD). Validator: vicino nel sottosuolo, id unici con quelli degli interni. Test test_forzieri.test_i_forzieri_del_sottosuolo. arte/revisione/forzieri_sottosuolo.png."
+    },
+    {
+      "id": "US-8B22c",
+      "title": "Oggetti casuali nelle case",
+      "description": "Nelle casette qualche oggetto tirato da una tabella di bottino, sempre lo stesso per la stessa casa, che una volta preso non ricompare.",
+      "acceptanceCriteria": [
+        "tabella casa nei dati, interni che la usano nei dati",
+        "gli oggetti presi restano presi nel salvataggio",
+        "verifica a schermo"
+      ],
+      "priority": 33,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: bottino.json tabella casa (monete, erbe, filo, cera, miele, gesso, pozione; 1-2 estrazioni); 'oggetti_casuali': 'casa' nella casa di Lena e nelle tre capanne dell'avamposto senza bottega (deposito, focolare, vedetta): non nelle botteghe, che vendono. interior_scene._crea_oggetti_casuali: seme = hash dell'id dell'interno, celle '.' libere (non arredi, forzieri, NPC, oggetti fissi) lontane dalla soglia, ordinate prima della scelta; chiave <interno>#<n>, tree_exiting di un oggetto raccolto -> WorldState.prendi (lista 'presi' nel salvataggio). Validator: la tabella esiste. 2 test. arte/revisione/oggetti_casuali.png. Aperto: gli oggetti fissi dei layout e degli interni ricompaiono ancora a ogni caricamento (comportamento di prima)."
+    },
+    {
+      "id": "US-8B23a",
+      "title": "Fauna d'atmosfera: dati e fogli",
+      "description": "Cervo, lepre, uccello, farfalla e lucciole come aspetti della categoria fauna (idle, fuga).",
+      "acceptanceCriteria": [
+        "categoria fauna in data/animations.json, fogli per specie",
+        "silhouette leggibili guardate ingrandite, nessun pixel sul bordo, alpha 0/255, palette",
+        "stessa grana dei personaggi (cella letta dal foglio)"
+      ],
+      "priority": 34,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: tools/art/build_fauna.py. Cervo con un modello suo (il quadrupede di forge3d sembrava un orso): zampe lunghe, collo, specchio bianco, palchi chiari ramificati; bruca col collo giu' e il muso parallelo all'erba (di fronte la testa usciva dalla cella), galoppa con la coda alzata. Lepre sua (orecchie lunghe con la punta nera, zampe dietro grandi): seduta e a balzi. Passero dal bird() di forge3d con petto chiaro e ali scure: a terra petto in fuori e becchetta, vola. Farfalla inclinata verso la camera: di fronte le ali arancio e gialle dal dritto. Lucciole: punti di luce disegnati pixel per pixel che pulsano sfasati. Celle 64 (cervo) e 32 (gli altri), piedi a 54/64. Rotazioni: rx positivo alza in avanti (muso, petto). Deterministico (md5 uguali). tests/test_fauna.gd. arte/revisione/fauna.png."
+    },
+    {
+      "id": "US-8B23b",
+      "title": "Fauna d'atmosfera nel gioco",
+      "description": "Dove stanno gli animali (regioni, momenti del giorno) e come scappano, nei dati; li posa il mondo attorno al giocatore.",
+      "acceptanceCriteria": [
+        "data/world/fauna.json: specie, regioni, densita', momenti, comportamento",
+        "uccelli e farfalle volano via, cervi e lepri scappano di corsa, lucciole solo di notte",
+        "verifica a schermo"
+      ],
+      "priority": 35,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: data/world/fauna.json (regioni, momenti, probabilita' per blocco, gruppo, fugge vola/corre/resta, raggio, velocita', svanisce, gira, luce). scripts/world/fauna.gd figlio del mondo: mondo.gd emette blocco_costruito/blocco_scaricato; seme = posizione del blocco (tornando, stessi animali); la regione si controlla per ogni animale; niente animali sotto una chioma (_coperto legge il disegno degli oggetti di scena che stanno davanti: nella Valle fitta erano tutti invisibili); a riposo di profilo (di fronte un cervo e' una sagoma stretta). Fuga: vola = via e verso nord svanendo, corre = a terra girando davanti a muri e acqua; comparsa in 0.6 s; al cambio di momento chi non e' del momento sale e svanisce, arrivano le specie nuove (lucciole al crepuscolo). Lucciole additive (luce: true) e piu' grandi al picco: sull'erba piena di fiorellini gialli non si distinguevano. Validator: fogli, regioni del mondo, momenti di time.json, numeri. 3 test. arte/revisione/fauna_in_gioco.png. Aperto: il mondo non si scurisce di notte (decisione dell'utente): le lucciole brilleranno davvero quando ci sara' il buio."
+    },
+    {
+      "id": "US-8B24a",
+      "title": "Cannocchiale del faro",
+      "description": "Un cannocchiale fisso accanto al faro di Mirwada: la vista vola fino alla Frontiera e torna; punto e bersaglio nei dati.",
+      "acceptanceCriteria": [
+        "data/world/cannocchiali.json: luogo, bersaglio, durata del volo",
+        "il giocatore resta fermo mentre guarda",
+        "il mondo si costruisce attorno a cio' che si guarda",
+        "verifica a schermo"
+      ],
+      "priority": 36,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: scripts/cannocchiale.gd (Area2D: disegno = arredo cannocchiale, corpo, prompt '[tasto] Guarda'; guarda(): telescope con una Camera2D sua figlia del mondo che vola al bersaglio, il giocatore fermo con set_physics_process(false); di nuovo interagisci o annulla: torna e rida' la telecamera al giocatore). mondo.crea_cannocchiali (dopo le soglie: mai accanto a una soglia); mondo._process segue la telecamera del mondo se e' quella attiva (la Frontiera era nera: si costruivano solo i blocchi attorno al giocatore). La game_camera azzera l'offset a ogni frame: per questo una telecamera a parte. Disegno: arredo cannocchiale in forge3d/arredi.py (puntato verso chi guarda sembrava una lampada: ora di lato, ottone su treppiede). Sta sul molo del faro. 2 test. arte/revisione/cannocchiale_in_gioco.png."
+    },
+    {
+      "id": "US-8B24b",
+      "title": "La lente e la nebbia del cannocchiale",
+      "description": "Mentre si guarda: il cerchio della lente (fuori nero), la nebbia che si dirada sul bersaglio, l'HUD nascosto.",
+      "acceptanceCriteria": [
+        "lente e nebbia in uno shader, tempi nei dati",
+        "verifica a schermo"
+      ],
+      "priority": 37,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27: shaders/lente_cannocchiale.gdshader: fuori dal cerchio il buio, anello d'ottone di un pixel e mezzo, dentro due strati di nebbia che scorrono, a quadretti della grana del gioco (640x360) e a retino Bayer (alpha 0 o 1). cannocchiale.gd: CanvasLayer 80 (sopra mondo e HUD, sotto il libro), la lente si stringe da 1.2 al raggio dei dati mentre la vista vola, arrivati la nebbia si dirada in vista.nebbia secondi; al ritorno la nebbia torna in 0.25 s, poi si vola indietro e la lente si apre. L'HUD (gruppo 'hud', aggiunto in hud.gd) si nasconde mentre si guarda. cannocchiali.json vista: lente 0.42, nebbia 2.4, colori Endesga (buio, anello, nebbia). Bersaglio spostato sul bordo dell'isola: nella lente il vuoto di nebbia sopra, l'isola con la porta senza muro sotto (prima solo terreno lilla). Test esteso. arte/revisione/cannocchiale_lente.png."
+    },
+    {
+      "id": "US-8B25",
+      "title": "Buio di notte nel mondo",
+      "description": "La luce del mondo cambia col momento del giorno e con la modalita'; sotto terra e negli interni no; le lucciole brillano sopra il buio.",
+      "acceptanceCriteria": [
+        "colori per momento e modalita' in data/world/luce.json",
+        "passaggio graduale",
+        "HUD, libro e lucciole non si scuriscono",
+        "verifica a schermo"
+      ],
+      "priority": 38,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27, decisione dell'utente: si' al buio di notte. scripts/world/luce.gd (CanvasModulate figlio del mondo): colore del momento (TimeSystem) nella modalita' della partita (GameState.tema_arte), quello del sottosuolo sotto terra; passa piano (transizione 3 s). Negli interni il mondo e' nascosto e la luce con lui. Le lucciole (fauna luce: true) su uno strato loro che segue la telecamera (fauna._strato_luci), nascosto quando il mondo e' nascosto. Colori: luminoso alba #f2dcc6, mezzogiorno bianco, crepuscolo #e2b28e (era rosato, scaldato verso l'arancio), notte #5d6c9e; cupo piu' buio. Validator: un colore per ogni momento di time.json nelle due modalita'. tests/test_luce.gd (3). arte/revisione/luce_del_giorno.png."
+    },
+    {
+      "id": "US-8B20a",
+      "title": "Base del giocatore: arte e interni",
+      "description": "Gli interni delle 4 basi (casa a Mirwada, capanna nella Valle, rifugio nelle Marche, nave) a piu' stanze, con gli arredi di ogni stanza per livello; gli arredi nuovi per cantiere, orto, palizzata, totem di veglia, deposito.",
+      "acceptanceCriteria": [
+        "4 interni base_* con le 3 stanze e l'ingresso",
+        "arredi per livello nei dati (0 = cantiere)",
+        "validator: stanze di rooms.json, arredi dentro la stanza, raggiungibili",
+        "arte guardata ingrandita"
+      ],
+      "priority": 39,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-27, decisioni dell'utente: tutte e 4 le basi subito, una casa a piu' stanze (laboratorio, stanza rituale, biblioteca a nord, ingresso col letto a sud; il giardino all'aperto), strutture attorno alla casa, i banchi delle stanze aprono la pagina Base. data/world/interni/base_{casa,capanna,rifugio,nave}.json: stessa pianta 16x8, stili casa, capanna, rifugio (nuovo: assi e pietra) e nave (nuovo: stiva di legno scuro). 'stanze': {tipo: {rect, livelli: [[arredi non costruita], [livello 1], [livello 2]]}}. Arredi nuovi in forge3d/arredi.py: cantiere (impalcatura, assi, cavalletto: la prima versione sembrava una panca), orto_vuoto/germoglio/pianta/maturo (i germogli venivano marroni, i frutti non si vedevano), palizzata, totem_veglia, deposito. Validator valida_stanze. Comando: python tools/art/build_interni.py. arte/revisione/base_interni.png (4 basi x 3 livelli), base_arredi.png."
+    },
+    {
+      "id": "US-8B20b",
+      "title": "La base nel gioco: stanze e sede",
+      "description": "Le porte delle basi sul mondo, le stanze che cambiano col livello, i banchi che aprono la pagina Base, la sede della base che si sposta.",
+      "acceptanceCriteria": [
+        "porte delle basi sul mondo (casa al porto, capanna nella Valle, rifugio nelle Marche)",
+        "arredi delle stanze per livello costruito, cantieri nelle basi che non sono la sede",
+        "in una stanza della sede 'interagisci' apre la pagina Base; dall'ingresso di un'altra base si sposta la sede (nel salvataggio)",
+        "verifica a schermo"
+      ],
+      "priority": 40,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-28. Porte dai layout (edifici.villaggio = villaggio o luogo di mondo.json); nella Valle una capanna in piu' (esporta_mondo.py --edifici: una casa per interno del villaggio). Sede in BaseSystem (rooms.json sede_iniziale, sposta, sede_cambiata, salvataggio); interior_scene arreda le stanze dal livello, prompt '[F] Base' solo nella sede, '[F] Sposta qui la base' nell'ingresso delle altre. tests/test_base_scena.gd. arte/revisione/base_in_gioco.png."
+    },
+    {
+      "id": "US-8B18e",
+      "title": "Inquadratura degli interni",
+      "description": "Entrando in un interno la camera inquadra la stanza: piccola sta ferma in basso al centro, grande scorre; sopra resta libero lo spazio dell'HUD.",
+      "acceptanceCriteria": [
+        "limiti della camera dalla stanza",
+        "l'HUD non copre la fila in cima",
+        "test",
+        "verifica a schermo"
+      ],
+      "priority": 40,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-28. game_camera.inquadra_stanza (MARGINE_HUD 104 unita'), interior_scene.riquadro, mondo.entra. Casa base intera sotto l'HUD, torre dell'Archivio che scorre. arte/revisione/interni_inquadratura.png."
+    },
+    {
+      "id": "US-8B20c",
+      "title": "L'orto fuori dalla base",
+      "description": "L'orto all'aperto accanto alla sede, con le piante che crescono; dall'orto la pagina Base.",
+      "acceptanceCriteria": [
+        "un appezzamento per appezzamento del giardino, disegno dello stato di crescita",
+        "cantiere senza giardino",
+        "va con la sede",
+        "test",
+        "verifica a schermo"
+      ],
+      "priority": 40,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-28. scripts/world/base_fuori.gd; posto da 'esterno' dell'interno della base (caselle dalla porta, fila libera, non sotto tetti o chiome: mondo.coperto); stadi da balance giardino.pianta_da. Prompt '[F] Orto' apre la pagina Base. tests/test_base_fuori.gd. arte/revisione/base_orto.png."
+    },
+    {
+      "id": "US-8B20d",
+      "title": "La nave come base",
+      "description": "Il modello della nave ormeggiata, la passerella, l'interno della nave.",
+      "acceptanceCriteria": [
+        "modello della nave (forge3d), guardato ingrandito",
+        "ormeggiata vicino al cantiere navale, passerella raggiungibile a piedi",
+        "la passerella porta all'interno base_nave",
+        "test",
+        "verifica a schermo"
+      ],
+      "priority": 40,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-28. forge3d/creatures.nave, esporta_mondo.py --barca (barca e nave); mezzi.json nave; mondo.crea_nave (6x2 d'acqua, passerella su terra collegata: _a_terra). base_fuori: posti raggiungibili a piedi dalla porta al posto della stessa regione. arte/revisione/base_nave.png."
+    },
+    {
+      "id": "US-8B20e",
+      "title": "Le strutture attorno alla base",
+      "description": "Palizzata, totem di veglia e deposito: si costruiscono dalla pagina Base (costo nei dati) e compaiono fuori dalla sede, in posti fissi accanto alla casa; vanno con la sede.",
+      "acceptanceCriteria": [
+        "costo delle strutture nei dati",
+        "costruisci dalla pagina Base",
+        "disegnate accanto alla sede",
+        "test",
+        "verifica a schermo"
+      ],
+      "priority": 40,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-28. Costo in data/structures/core.json; BaseSystem.costruisci_struttura (una per tipo), StructureRegistry.sposta; pagina Base sezione Strutture; base_fuori.gd le disegna nei posti 'esterno' della sede (staccate dall'orto), la posizione nel registro segue. arte/revisione/base_strutture.png."
+    },
+    {
+      "id": "US-8B22d",
+      "title": "Gli oggetti fissi si prendono una volta sola",
+      "description": "Gli oggetti a terra dei layout e degli interni non ricompaiono dopo essere stati presi (WorldState.presi, nel salvataggio).",
+      "acceptanceCriteria": [
+        "oggetto del mondo preso non ricompare caricando",
+        "oggetto di un interno preso non ricompare rientrando",
+        "nel salvataggio",
+        "test"
+      ],
+      "priority": 41,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-29. Meta preso_id ('<regione>@<i>', '<interno>@<i>', '<interno>:ospiti@<i>'), WorldState.prendi al tree_exiting se raccolto. Non usare la meta 'chiave' (e' delle soglie). tests/test_forzieri.gd."
+    },
+    {
+      "id": "US-8B75",
+      "title": "HUD leggibile",
+      "description": "Scritte dell'HUD col contorno scuro, barre di vita, spirito e recitazione colorate su fondo scuro.",
+      "acceptanceCriteria": [
+        "contorno su tutte le scritte",
+        "barre colorate e centrate",
+        "test",
+        "verifica a schermo"
+      ],
+      "priority": 41,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-29. hud.gd: outline 4 #181425 su ogni Label, COLORI_BARRE (Endesga 32), fondo #181425. arte/revisione/hud_leggibile.png."
+    },
+    {
+      "id": "US-8B20f",
+      "title": "Orto e strutture bloccano il passo",
+      "description": "Le cose fuori dalla base (orto, cantiere, palizzata, totem, deposito) hanno un corpo che blocca, come gli arredi.",
+      "acceptanceCriteria": [
+        "corpo per ogni disegno che blocca",
+        "niente ridisegno se non cambia niente",
+        "test",
+        "verifica a schermo"
+      ],
+      "priority": 41,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-29. base_fuori._metti: StaticBody2D 'Corpo' (misura x0.9); disegna() con la firma. arte/revisione/base_blocca.png."
+    },
+    {
+      "id": "US-8B44",
+      "title": "Effetti sul bersaglio e piu' visibili",
+      "description": "Gli effetti delle primitive che colpiscono un altro (maleficio, possessione, anima recisa) compaiono sul bersaglio, non su chi lancia; furto e fioritura durano abbastanza da vedersi.",
+      "acceptanceCriteria": [
+        "data/vfx.json dice per ogni effetto se sta su chi lancia o sul bersaglio",
+        "maleficio, possessione, anima recisa sul bersaglio",
+        "furto e fioritura piu' lunghi (frame o durate nei dati)",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 42,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B70b",
+      "title": "Icone nel negozio, in Indosso e nella modalita' cupa",
+      "description": "Il negozio e la pagina Indosso mostrano le icone degli oggetti; le icone hanno anche una serie per la modalita' cupa.",
+      "acceptanceCriteria": [
+        "icona accanto a ogni oggetto del negozio (compra e vendi)",
+        "icona accanto a ogni slot di Indosso",
+        "assets/icone/oggetti/cupo/ generato da build_icone.py e usato con GameState.tema_arte()",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 43,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B91b",
+      "title": "Barca piu' veloce",
+      "description": "In barca si va piu' veloci che a piedi (valore nei dati, mezzi.json).",
+      "acceptanceCriteria": [
+        "mezzi.json barca.velocita (moltiplicatore) letto dal player in barca",
+        "test che in barca la velocita' e' maggiore",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 44,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B96",
+      "title": "Pontili stretti raggiungibili",
+      "description": "I pontili stretti del porto sono chiusi alla radice da un dislivello: si raggiungono a piedi dalla banchina.",
+      "acceptanceCriteria": [
+        "blocchi.png: la radice dei pontili e' libera (correzione nel generatore, esporta_mondo.py --solo-blocchi)",
+        "test di raggiungibilita' dalla banchina a ogni pontile",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 45,
+      "fase": "8b",
+      "passes": false,
+      "notes": "I pontili (pontile_legno) larghi 1 hanno '^' (128) alla radice: vedi progress US-8B20d."
+    },
+    {
+      "id": "US-8B24c",
+      "title": "Cannocchiale senza nemici fuori dai muri",
+      "description": "Mentre si guarda col cannocchiale i blocchi attorno al giocatore restano costruiti (o i nemici vicini si fermano).",
+      "acceptanceCriteria": [
+        "mondo tiene i blocchi del giocatore mentre la camera del cannocchiale e' attiva",
+        "test",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 46,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B80c",
+      "title": "Bere dallo zaino e gesti degli NPC",
+      "description": "Bere un oggetto dallo zaino (Inventory.usa) fa il gesto del bere; gli NPC usano gli stessi gesti.",
+      "acceptanceCriteria": [
+        "segnale di Inventory quando si usa un oggetto da bere",
+        "il player fa 'drink' alla chiusura del libro",
+        "almeno un NPC usa 'interact' nella sua routine",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 47,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B21d",
+      "title": "Nemici nelle stanze piccole non subito addosso",
+      "description": "Entrando in un interno coi nemici, i nemici partono lontani dalla porta e con un attimo di attesa.",
+      "acceptanceCriteria": [
+        "distanza minima dallo spawn per i nemici degli interni (dato)",
+        "attesa iniziale (dato) prima di inseguire",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 48,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B73e",
+      "title": "Sigilli incastonati nella pagina Indosso",
+      "description": "La pagina Indosso mostra i sigilli incastonati invece della scritta 'in arrivo'.",
+      "acceptanceCriteria": [
+        "elenco dei sigilli incastonati (SigilSystem) con nome e icona",
+        "BOOK_INV_SIGILLI_TODO tolta",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 49,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B26",
+      "title": "Cannocchiale da tasca",
+      "description": "Un oggetto cannocchiale nello zaino: usandolo la vista si allunga nella direzione dello sguardo, con la lente di US-8B24b.",
+      "acceptanceCriteria": [
+        "oggetto nei dati (non vendibile o da negozio: decisione dell'utente)",
+        "riusa scripts/cannocchiale.gd con bersaglio davanti al giocatore",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 55,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B27",
+      "title": "Luci di notte",
+      "description": "Di notte le finestre delle case si accendono, i lampioni e il faro fanno luce (strato additivo sopra il buio, come le lucciole).",
+      "acceptanceCriteria": [
+        "luci nei dati (data/world/luce.json: dove e quanto)",
+        "finestre accese dagli edifici, faro con il fascio",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 56,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B74b",
+      "title": "Panorami per regione e modalita' cupa",
+      "description": "Il panorama dell'avvio ha una veduta per regione e la versione cupa.",
+      "acceptanceCriteria": [
+        "forge3d/panorama.py: vedute per le regioni",
+        "build_panorami.py esporta anche il tema cupo",
+        "asset guardati ingranditi",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 57,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B60a",
+      "title": "Evocazioni nel mondo",
+      "description": "La primitiva summon mette nel mondo una figura vera (sprite forge3d) che combatte, invece di scrivere solo nel registro.",
+      "acceptanceCriteria": [
+        "un aspetto per evocazione nei dati",
+        "AnimationMachine con idle/walk/attack",
+        "segue e combatte col giocatore",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 58,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B60b",
+      "title": "Antagonisti con la loro figura",
+      "description": "Gli antagonisti dei dati hanno sprite e ritratto propri.",
+      "acceptanceCriteria": [
+        "un aspetto per antagonista (build_npc/forge3d)",
+        "ritratto in assets/ritratti/",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 59,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B90",
+      "title": "Nuoto",
+      "description": "Si nuota nell'acqua bassa con l'animazione swim (gameplay + arte).",
+      "acceptanceCriteria": [
+        "acqua bassa nei blocchi (valore nuovo nel generatore)",
+        "animazione swim in data/animations.json e foglio generato",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 60,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B92",
+      "title": "Arrampicata",
+      "description": "Ci si arrampica sui dislivelli segnati (gameplay + arte).",
+      "acceptanceCriteria": [
+        "punti di arrampicata nei dati del mondo",
+        "animazione climb in data/animations.json e foglio generato",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 61,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-1301",
+      "title": "Audit del rituale di Sequenza 1 sui 10 Pathway attivi",
+      "description": "Ogni Sequenza 1 dei 10 Pathway attivi ha 'ancora_del_giocatore' tra i sacrifici del rituale.",
+      "acceptanceCriteria": [
+        "tabella dei 10 Pathway (gia' presente / aggiunto) in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 65,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1201)."
+    },
+    {
+      "id": "US-1302",
+      "title": "La prova finale si puo' superare",
+      "description": "Un nodo di dlg_antagonista (tier_min angel) scrive tribolazione_soglia_varcata su una scelta esplicita del giocatore.",
+      "acceptanceCriteria": [
+        "il flag e' scritto da un dialogo raggiungibile nel gioco vero",
+        "npc_antagonista raggiungibile alla soglia della Frontiera di notte",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 66,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1202)."
+    },
+    {
+      "id": "US-1303",
+      "title": "Quest posizione di fazione",
+      "description": "Una quest q_<npc>_02 di un NPC di fazione (Ottavia o Bruno) con eventi e filtri esistenti e un on_complete di reputazione scelto in dialogo.",
+      "acceptanceCriteria": [
+        "offerta solo da tier mid (tier_min sul primo nodo)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 67,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1203)."
+    },
+    {
+      "id": "US-1304",
+      "title": "Il duello con Aldo come scena",
+      "description": "Un dialogo dlg_aldo inquadra il duello offerto da npc_system ai salti di tier, con vittoria e sconfitta come rami dichiarati.",
+      "acceptanceCriteria": [
+        "nessuna regola di combattimento nuova",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 68,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1204)."
+    },
+    {
+      "id": "US-1305",
+      "title": "Rituali dell'Atto II in luoghi veri",
+      "description": "I location_tags dei rituali delle Sequenze 6-4 esistono nelle regioni aperte in Atto II; dove manca, si aggiunge la zona.",
+      "acceptanceCriteria": [
+        "audit in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 69,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1205)."
+    },
+    {
+      "id": "US-1306",
+      "title": "Checkpoint: una partita attraversa l'Atto II",
+      "description": "tests/manual/qa_atto_2.gd: da Sequenza 6 a 4 con la quest di fazione, il duello e trib_5_4.",
+      "acceptanceCriteria": [
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 70,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1206)."
+    },
+    {
+      "id": "US-1307",
+      "title": "Doran sa",
+      "description": "Nuovo nodo di dlg_doran (tier_min saint): Doran ha capito, con flag e reputazione sulla giustizia.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 71,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1207)."
+    },
+    {
+      "id": "US-1308",
+      "title": "Lena capisce",
+      "description": "Nuovo ramo di dlg_lena a tier alto; se Lena e' un'Ancora attiva, effetto dichiarato sulla sua forza.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 72,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1208)."
+    },
+    {
+      "id": "US-1309",
+      "title": "Vesna sceglie",
+      "description": "Nuovo ramo di dlg_vesna: resta o si allontana (flag + reputazione).",
+      "acceptanceCriteria": [
+        "decisione aperta: effetto sul finale Rinuncia (PRD §9)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 73,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1209)."
+    },
+    {
+      "id": "US-1310",
+      "title": "Il rituale di Sequenza 1 nel mondo reale",
+      "description": "L'Ancora sacrificata e il luogo del rituale sono raggiungibili e visibili a schermo.",
+      "acceptanceCriteria": [
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 74,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1210)."
+    },
+    {
+      "id": "US-1311",
+      "title": "Checkpoint: una partita attraversa l'Atto III",
+      "description": "tests/manual/qa_atto_3.gd: da Sequenza 4 a 0 con le 4 tribolazioni e il rituale.",
+      "acceptanceCriteria": [
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 75,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1211)."
+    },
+    {
+      "id": "US-1312",
+      "title": "Checkpoint dinamico della fase",
+      "description": "Test grep-based: quest e nodi nuovi esistono e referenziano solo id validi; nessun nome di Pathway nel codice toccato.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 76,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1212)."
+    },
+    {
+      "id": "US-1313",
+      "title": "Chiusura fase Atto II e III",
+      "description": "progress.txt, CLAUDE.md, roadmap aggiornati; story a passes true.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 77,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1213)."
+    },
+    {
+      "id": "US-1200",
+      "title": "Riscrivere il PRD Mondo vivo sul mondo generato",
+      "description": "Il PRD prd-fase-12-mondo-vivo.md misura le distanze sulla mappa a layout di prima: va rifatto sul mondo generato (34 villaggi, luoghi, sottosuolo), decidendo con l'utente cosa resta da aggiungere.",
+      "acceptanceCriteria": [
+        "PRD aggiornato con i tragitti e i vuoti misurati su assets/world/mondo.json",
+        "story US-1201..US-1216 riallineate in prd.json",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 80,
+      "fase": "12",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-1201",
+      "title": "Verifica e numerazione",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1201), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 81,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1202",
+      "title": "Punto di interesse Mirwada-Archivio",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1202), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 82,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1203",
+      "title": "Punto di interesse Mirwada-Frontiera",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1203), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 83,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1204",
+      "title": "Punto di interesse Mirwada-Marche",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1204), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 84,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1205",
+      "title": "Punto di interesse Mirwada-Valle",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1205), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 85,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1206",
+      "title": "Punto di interesse Marche-Archivio",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1206), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 86,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1207",
+      "title": "Punto di interesse Archivio-Frontiera",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1207), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 87,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1208",
+      "title": "Punto di interesse Frontiera-Valle",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1208), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 88,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1209",
+      "title": "Punto di interesse Valle-Marche",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1209), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 89,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1210",
+      "title": "Villaggio vicino alla Valle",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1210), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 90,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1211",
+      "title": "Villaggio vicino alla Frontiera",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1211), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 91,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1212",
+      "title": "Dungeon nelle Marche",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1212), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 92,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1213",
+      "title": "Dungeon nella Frontiera",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1213), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 93,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1214",
+      "title": "Doran segue le tue tracce fuori Mirwada",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1214), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 94,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1215",
+      "title": "Un secondo mercante apre banco altrove",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1215), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 95,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1216",
+      "title": "Checkpoint e chiusura fase 12",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1216), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 96,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-7B01",
+      "title": "Percorso di fusione darkness_death",
+      "description": "Il percorso di fusione data/fusions/darkness_death.json non e' piu' uno stub: contenuto scritto per intero come door_error.",
+      "acceptanceCriteria": [
+        "stub: false",
+        "validator senza l'avviso del percorso stub",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 100,
+      "fase": "7b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-7B02",
+      "title": "Percorso di fusione darkness_twilight_giant",
+      "description": "Il percorso di fusione data/fusions/darkness_twilight_giant.json non e' piu' uno stub: contenuto scritto per intero come door_error.",
+      "acceptanceCriteria": [
+        "stub: false",
+        "validator senza l'avviso del percorso stub",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 101,
+      "fase": "7b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-7B03",
+      "title": "Percorso di fusione death_twilight_giant",
+      "description": "Il percorso di fusione data/fusions/death_twilight_giant.json non e' piu' uno stub: contenuto scritto per intero come door_error.",
+      "acceptanceCriteria": [
+        "stub: false",
+        "validator senza l'avviso del percorso stub",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 102,
+      "fase": "7b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-7B04",
+      "title": "Percorso di fusione door_fool",
+      "description": "Il percorso di fusione data/fusions/door_fool.json non e' piu' uno stub: contenuto scritto per intero come door_error.",
+      "acceptanceCriteria": [
+        "stub: false",
+        "validator senza l'avviso del percorso stub",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 103,
+      "fase": "7b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-7B05",
+      "title": "Percorso di fusione error_fool",
+      "description": "Il percorso di fusione data/fusions/error_fool.json non e' piu' uno stub: contenuto scritto per intero come door_error.",
+      "acceptanceCriteria": [
+        "stub: false",
+        "validator senza l'avviso del percorso stub",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 104,
+      "fase": "7b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-7B06",
+      "title": "Percorso di fusione hermit_paragon",
+      "description": "Il percorso di fusione data/fusions/hermit_paragon.json non e' piu' uno stub: contenuto scritto per intero come door_error.",
+      "acceptanceCriteria": [
+        "stub: false",
+        "validator senza l'avviso del percorso stub",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 105,
+      "fase": "7b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-7B07",
+      "title": "Percorso di fusione moon_mother",
+      "description": "Il percorso di fusione data/fusions/moon_mother.json non e' piu' uno stub: contenuto scritto per intero come door_error.",
+      "acceptanceCriteria": [
+        "stub: false",
+        "validator senza l'avviso del percorso stub",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 106,
+      "fase": "7b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-EN01",
+      "title": "Inglese: Pathway, Sequenze e mondo",
+      "description": "Le chiavi di data/i18n/it.json delle categorie pathway, sequence, characteristic, form, anchor, region, faction, room, pet, structure, ui, tribulation, ending, quest, talent hanno la traduzione in data/i18n/en.json (oggi mancano 1496 voci su 1784).",
+      "acceptanceCriteria": [
+        "0 chiavi di queste categorie senza voce in en.json",
+        "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 110,
+      "fase": "lingua",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-EN02",
+      "title": "Inglese: abilita' e sinergie",
+      "description": "Le chiavi di data/i18n/it.json delle categorie ability, synergy hanno la traduzione in data/i18n/en.json (oggi mancano 1496 voci su 1784).",
+      "acceptanceCriteria": [
+        "0 chiavi di queste categorie senza voce in en.json",
+        "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 111,
+      "fase": "lingua",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-EN03",
+      "title": "Inglese: recitazione",
+      "description": "Le chiavi di data/i18n/it.json delle categorie acting hanno la traduzione in data/i18n/en.json (oggi mancano 1496 voci su 1784).",
+      "acceptanceCriteria": [
+        "0 chiavi di queste categorie senza voce in en.json",
+        "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 112,
+      "fase": "lingua",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-EN04",
+      "title": "Inglese: oggetti, ricette, progetti, sigilli",
+      "description": "Le chiavi di data/i18n/it.json delle categorie item, recipe, blueprint, sigillo hanno la traduzione in data/i18n/en.json (oggi mancano 1496 voci su 1784).",
+      "acceptanceCriteria": [
+        "0 chiavi di queste categorie senza voce in en.json",
+        "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 113,
+      "fase": "lingua",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-EN05",
+      "title": "Inglese: dialoghi, NPC, antagonisti",
+      "description": "Le chiavi di data/i18n/it.json delle categorie dialogue, npc, antagonist hanno la traduzione in data/i18n/en.json (oggi mancano 1496 voci su 1784).",
+      "acceptanceCriteria": [
+        "0 chiavi di queste categorie senza voce in en.json",
+        "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 114,
+      "fase": "lingua",
+      "passes": false,
+      "notes": ""
     }
   ]
 }

@@ -531,6 +531,9 @@ func _p_transform(prim: Dictionary, _caster: Node, stats: Node, ability_id: Stri
 	var mods: Dictionary = mods_raw if typeof(mods_raw) == TYPE_DICTIONARY else {}
 	var mod_id: String = "transform:%s" % ability_id
 	stats.call("apply_modifier", mod_id, mods)
+	var aspetto: String = str(forma.get("aspetto", ""))   # US-8B50: la forma si vede (fogli del personaggio)
+	if not aspetto.is_empty() and stats.has_method("imposta_forma"):
+		stats.call("imposta_forma", mod_id, aspetto)
 	rec["applied"] = true
 	rec["modifier_id"] = mod_id
 	rec["stat_modifiers"] = mods
@@ -994,8 +997,13 @@ func annulla_transform(ability_id: String) -> bool:
 	return trovata
 
 
-func _p_heal(prim: Dictionary, _caster: Node, stats: Node, _ability_id: String) -> Dictionary:
+func _p_heal(prim: Dictionary, caster: Node, stats: Node, _ability_id: String) -> Dictionary:
 	var quantita: float = _num(prim.get("quantita"), 0.0)
+	# Modalita' di gioco (data/modalita.json): le cure del giocatore hanno il loro
+	# numero (1 in facile).
+	var gs: Node = Engine.get_main_loop().root.get_node_or_null("GameState")
+	if gs != null and caster != null and caster.is_in_group("player"):
+		quantita *= float(gs.call("moltiplicatore", "cure"))
 	var istantaneo: bool = _flag(prim.get("istantaneo"), true)
 	var durata: float = _num(prim.get("durata"), 0.0)
 	var bersaglio: String = str(prim.get("bersaglio", "self"))
@@ -1190,7 +1198,7 @@ func _spawn_projectile(caster: Node, spec: Dictionary) -> bool:
 	if origin == null or not origin.is_inside_tree():
 		return false
 	var node := preload("res://scripts/projectile.gd").new()
-	node.setup(spec, origin.global_position, _facing(origin))
+	node.setup(spec, origin.global_position, _facing(origin), caster)
 	origin.get_parent().add_child(node)
 	return true
 
@@ -1200,7 +1208,7 @@ func _spawn_melee_arc(caster: Node, spec: Dictionary) -> bool:
 	if origin == null or not origin.is_inside_tree():
 		return false
 	var node := preload("res://scripts/melee_arc.gd").new()
-	node.setup(spec, _facing(origin))
+	node.setup(spec, _facing(origin), caster)
 	origin.add_child(node)
 	return true
 

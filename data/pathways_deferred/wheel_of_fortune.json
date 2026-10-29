@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "wheel_of_fortune",
+  "categoria": "standard",
   "name": "Wheel of Fortune",
   "name_i18n": "pathway.wheel_of_fortune",
   "group": "key_of_light",

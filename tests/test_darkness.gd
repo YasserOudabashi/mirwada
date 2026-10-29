@@ -184,7 +184,7 @@ func test_darkness_completo_ritual_seq0_e_i_luoghi() -> void:
 		if n <= 4:
 			var rit: Dictionary = (s as Dictionary).get("advancement_ritual", {})
 			assert_false(rit.is_empty(), "darkness_%d ha un rituale" % n)
-	assert_eq(stub_rimasti.size(), 0, "DARKNESS COMPLETO: 0 Sequenze stub (%s)" % stub_rimasti)
+	assert_eq(stub_rimasti.size(), 0, "DARKNESS COMPLETO: 0 Sequenze stub (%s)" % [stub_rimasti])
 
 
 func test_darkness_tutte_e_10_non_piu_stub_acting_1() -> void:

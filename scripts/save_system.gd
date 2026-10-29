@@ -20,7 +20,7 @@ signal salvato(slot: int)
 signal caricato(slot: int, dati: Dictionary)
 signal errore_save(slot: int, motivo: String)
 
-const VERSIONE_CORRENTE := 22
+const VERSIONE_CORRENTE := 23
 const DIR_SAVES := "user://saves"
 
 const R_OK := "ok"
@@ -49,6 +49,9 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		"schema_version": VERSIONE_CORRENTE,
 		"salvato_il": int(Time.get_unix_time_from_system()),
 		"nome_personaggio": str(dati.get("nome_personaggio", "")),
+		# Modalita' scelta a inizio partita (data/modalita.json). Senza bump: un
+		# save vecchio non ce l'ha e GameState usa il default dei dati.
+		"modalita": str(dati.get("modalita", "")),
 		"tempo_gioco": float(dati.get("tempo_gioco", 0.0)),
 		"posizione": _vettore_a_lista(dati.get("posizione", Vector2.ZERO)),
 		"statistiche": (dati.get("statistiche", {}) as Dictionary).duplicate(true),
@@ -86,6 +89,10 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		# Endgame (US-701): cambio Pathway, fusioni, tribolazioni, eredita',
 		# finale. Un solo bump di fase 7 (schema_version 22).
 		"endgame": (dati.get("endgame", {}) as Dictionary).duplicate(true),
+		# Baseline dei requisiti 'comportamento' del Boon corrente (US-902,
+		# fase 9). Un solo bump di fase 9 (schema_version 23) - stesso ruolo
+		# di "acting" ma per BoonSystem, i Pathway non_standard.
+		"boon": (dati.get("boon", {}) as Dictionary).duplicate(true),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -227,6 +234,8 @@ func _migra(doc: Dictionary, da_versione: int) -> Dictionary:
 				doc = _migra_20_a_21(doc)
 			21:
 				doc = _migra_21_a_22(doc)
+			22:
+				doc = _migra_22_a_23(doc)
 			_:
 				push_warning("[SaveSystem] nessuna migrazione da v%d: salto." % v)
 		v += 1
@@ -418,6 +427,14 @@ func _migra_21_a_22(doc: Dictionary) -> Dictionary:
 	return doc
 
 
+## v22 -> v23: il campo 'boon' non esisteva (fase 9, BoonSystem). Default
+## vuoto: un personaggio senza Pathway non_standard non ne ha mai avuto bisogno.
+func _migra_22_a_23(doc: Dictionary) -> Dictionary:
+	if not doc.has("boon"):
+		doc["boon"] = {"baseline": {}}
+	return doc
+
+
 # --- Lettura non fidata -------------------------------------------------
 
 func _leggi_snapshot(raw: Dictionary) -> Dictionary:
@@ -425,6 +442,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"schema_version": _campo(raw, "schema_version", TYPE_FLOAT, float(VERSIONE_CORRENTE)),
 		"salvato_il": _campo(raw, "salvato_il", TYPE_FLOAT, 0.0),
 		"nome_personaggio": _campo(raw, "nome_personaggio", TYPE_STRING, ""),
+		"modalita": _campo(raw, "modalita", TYPE_STRING, ""),
 		"tempo_gioco": _campo(raw, "tempo_gioco", TYPE_FLOAT, 0.0),
 		"posizione": _posizione(raw.get("posizione")),
 		"statistiche": _campo(raw, "statistiche", TYPE_DICTIONARY, {}),
@@ -447,6 +465,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"inventario": _campo(raw, "inventario", TYPE_DICTIONARY, {}),
 		"equipaggiamento": _campo(raw, "equipaggiamento", TYPE_DICTIONARY, {}),
 		"endgame": _campo(raw, "endgame", TYPE_DICTIONARY, {}),
+		"boon": _campo(raw, "boon", TYPE_DICTIONARY, {}),
 	}
 
 

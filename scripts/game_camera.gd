@@ -14,6 +14,8 @@ const VELOCITA_SMOOTHING := 5.0
 const DECADIMENTO_TRAUMA := 1.6
 ## Ampiezza massima dello scuotimento in px a trauma pieno.
 const AMPIEZZA_MAX := 6.0
+## Unita' in cima allo schermo occupate dall'HUD (vita, spirito, recitazione, hotbar): negli interni restano libere.
+const MARGINE_HUD := 104.0
 
 var _trauma: float = 0.0
 
@@ -59,3 +61,14 @@ func clear_zone_limits() -> void:
 	limit_top = -10000000
 	limit_right = 10000000
 	limit_bottom = 10000000
+
+
+## US-8B18e: inquadra una stanza (rettangolo in coordinate mondo). Dove la stanza e' piu' piccola dello schermo i
+## limiti si allargano fino allo schermo: in larghezza a meta' per lato, in altezza tutto sopra, cosi' la stanza sta
+## ferma in basso al centro. Sopra resta sempre libera almeno l'altezza dell'HUD (MARGINE_HUD): in una stanza alta la
+## camera scorre e la fila in cima arriva sotto l'HUD, non dietro. Dove e' piu' grande la camera la segue dentro.
+func inquadra_stanza(stanza: Rect2) -> void:
+	var visibile: Vector2 = get_viewport_rect().size / zoom
+	var extra := Vector2(maxf(visibile.x - stanza.size.x, 0.0), maxf(visibile.y - stanza.size.y, MARGINE_HUD))
+	apply_zone_limits(Rect2(stanza.position - Vector2(extra.x / 2.0, extra.y), stanza.size + extra))
+

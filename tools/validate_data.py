@@ -13,6 +13,8 @@ Gli schema in data/schema/ restano la documentazione formale del formato.
 
 import json
 import os
+import re
+import struct
 import sys
 from collections import Counter
 
@@ -61,6 +63,199 @@ def expected_tier(seq_num):
     return "god"
 
 
+VALID_BOON_TIPI = {"quest", "comportamento", "sacrificio"}
+VALID_COSTO_TIPI = {"oggetto", "caratteristica", "follia"}
+
+
+def valida_boon(rel, sid, boon, events, quest_ids, item_ids, char_ids):
+    """Valida il campo 'boon' di una Sequenza di un Pathway non_standard
+    (fase 9, US-901: data/schema/boon.schema.json). Ritorna una lista di
+    stringhe di errore, il chiamante le passa a err()."""
+    out = []
+    requisiti = boon.get("requisiti", [])
+    if not isinstance(requisiti, list) or not requisiti:
+        out.append(f"{rel} [{sid}]: boon.requisiti deve essere una lista non vuota")
+        return out
+    for i, req in enumerate(requisiti):
+        etichetta = f"{rel} [{sid}] boon.requisiti[{i}]"
+        tipo = req.get("tipo")
+        if tipo not in VALID_BOON_TIPI:
+            out.append(f"{etichetta}: tipo '{tipo}' non nel vocabolario chiuso {sorted(VALID_BOON_TIPI)}")
+            continue
+        if tipo == "quest":
+            qid = req.get("quest_id")
+            if qid not in quest_ids:
+                out.append(f"{etichetta}: quest_id '{qid}' non esiste in data/quests/")
+        elif tipo == "comportamento":
+            ev = req.get("evento")
+            if ev not in events:
+                out.append(f"{etichetta}: evento '{ev}' non nel vocabolario chiuso di "
+                            f"data/schema/tracked_events.json. Un evento nuovo e' CODICE: "
+                            f"va discusso, non aggiunto di slancio.")
+            else:
+                allowed = set(events[ev].get("filtri", []))
+                for f in req.get("filtri", {}):
+                    if f not in allowed:
+                        out.append(f"{etichetta}: filtro '{f}' non ammesso per l'evento "
+                                    f"'{ev}' (ammessi: {sorted(allowed)})")
+            if not req.get("target", 0) > 0:
+                out.append(f"{etichetta}: target deve essere un numero > 0")
+        elif tipo == "sacrificio":
+            costo = req.get("costo", {})
+            ctipo = costo.get("tipo")
+            if ctipo not in VALID_COSTO_TIPI:
+                out.append(f"{etichetta}: costo.tipo '{ctipo}' non nel vocabolario chiuso "
+                            f"{sorted(VALID_COSTO_TIPI)}")
+            elif ctipo == "oggetto" and costo.get("id") not in item_ids:
+                out.append(f"{etichetta}: costo.id '{costo.get('id')}' non e' un item esistente")
+            elif ctipo == "caratteristica" and costo.get("id") not in char_ids:
+                out.append(f"{etichetta}: costo.id '{costo.get('id')}' non e' una Caratteristica esistente")
+            if ctipo in ("oggetto", "caratteristica") and not (
+                    isinstance(costo.get("quantita"), (int, float)) and costo.get("quantita") > 0):
+                out.append(f"{etichetta}: costo.quantita deve essere un numero > 0")
+    return out
+
+
+## Valida la forma "layout" condivisa da una mappa esterna
+## (data/world/layouts/*.json, US-805) e da un interno di edificio
+## (data/world/interni/*.json, US-1010: "stesso schema di un layout"):
+## righe rettangolari di soli caratteri della legenda, bordo esterno
+## tutto '#', spawn dentro i limiti su una cella calpestabile. Dimensione
+## LIBERA (US-1005): la riga 0 detta la larghezza, non una costante.
+## Ritorna (mappa, w, h, righe_valide) per chi deve controllare anche
+## zone/edifici/nemici/oggetti alle stesse dimensioni vere.
+def valida_mappa_e_spawn(doc, rel, legenda, calpestabili):
+    mappa = doc.get("mappa", [])
+    h = len(mappa) if isinstance(mappa, list) else 0
+    w = len(mappa[0]) if h > 0 and isinstance(mappa[0], str) else 0
+    if h == 0 or w == 0:
+        err(f"{rel}: mappa deve avere almeno 1 riga non vuota")
+        return mappa, w, h, False
+    righe_valide = True
+    for y, riga in enumerate(mappa):
+        if not isinstance(riga, str) or len(riga) != w:
+            err(f"{rel}: riga {y} deve avere {w} caratteri (la larghezza della riga 0)")
+            righe_valide = False
+            continue
+        fuori = set(riga) - legenda
+        if fuori:
+            err(f"{rel}: riga {y} usa caratteri fuori dalla legenda: {sorted(fuori)}")
+
+    if righe_valide:
+        bordo_ok = all(c == "#" for c in mappa[0]) and all(c == "#" for c in mappa[h - 1])
+        bordo_ok = bordo_ok and all(riga[0] == "#" and riga[w - 1] == "#" for riga in mappa)
+        if not bordo_ok:
+            err(f"{rel}: il bordo esterno (riga 0, riga {h - 1}, colonna 0, "
+                f"colonna {w - 1}) deve essere tutto '#'")
+
+    spawn = doc.get("spawn", [])
+    if not (isinstance(spawn, list) and len(spawn) == 2
+            and all(isinstance(v, int) for v in spawn)):
+        err(f"{rel}: spawn deve essere [x, y] di interi")
+    elif righe_valide:
+        sx, sy = spawn
+        if not (0 <= sx < w and 0 <= sy < h):
+            err(f"{rel}: spawn {spawn} fuori dai limiti ({w}x{h})")
+        elif mappa[sy][sx] not in calpestabili:
+            err(f"{rel}: spawn {spawn} non e' su una cella calpestabile ('{mappa[sy][sx]}')")
+
+    return mappa, w, h, righe_valide
+
+
+def valida_arredi(doc, rel, vocab, calpestabili):
+    """US-8B18d: gli arredi di un interno (data/world/arredi.json): sul pavimento, senza sovrapporsi, non sopra
+    spawn, NPC, oggetti, nemici; e dallo spawn si arriva ancora a ogni NPC, oggetto, nemico e passaggio '+'."""
+    mappa = doc.get("mappa", [])
+    h, w = len(mappa), len(mappa[0]) if mappa else 0
+    occupate = {}
+    for i, a in enumerate(doc.get("arredi", [])):
+        aid, x, y = a.get("id"), a.get("x"), a.get("y")
+        if aid not in vocab:
+            err(f"{rel}: arredi[{i}] '{aid}' non e' nel vocabolario data/world/arredi.json")
+            continue
+        if not (isinstance(x, int) and isinstance(y, int)):
+            err(f"{rel}: arredi[{i}] x/y devono essere interi")
+            continue
+        aw, ah = vocab[aid]["misura"]
+        for cy in range(y, y + ah):
+            for cx in range(x, x + aw):
+                if not (0 <= cx < w and 0 <= cy < h) or mappa[cy][cx] not in calpestabili:
+                    err(f"{rel}: arredi[{i}] '{aid}' esce dal pavimento in ({cx},{cy})")
+                elif (cx, cy) in occupate:
+                    err(f"{rel}: arredi[{i}] '{aid}' si sovrappone a '{occupate[(cx, cy)]}' in ({cx},{cy})")
+                else:
+                    occupate[(cx, cy)] = aid
+    # US-8B22: un forziere e' una casella piena come un arredo (il disegno e' l'arredo "forziere")
+    forzieri = []
+    for i, f in enumerate(doc.get("forzieri", [])):
+        x, y = f.get("x"), f.get("y")
+        if not (isinstance(x, int) and isinstance(y, int)):
+            err(f"{rel}: forzieri[{i}] x/y devono essere interi")
+        elif not (0 <= x < w and 0 <= y < h) or mappa[y][x] not in calpestabili:
+            err(f"{rel}: forzieri[{i}] non e' sul pavimento in ({x},{y})")
+        elif (x, y) in occupate:
+            err(f"{rel}: forzieri[{i}] si sovrappone a '{occupate[(x, y)]}' in ({x},{y})")
+        elif "forziere" in vocab:
+            occupate[(x, y)] = "forziere"
+            forzieri.append((x, y))
+    bloccate = {c for c, aid in occupate.items() if vocab[aid].get("blocca", True)}
+    sx, sy = doc.get("spawn", [0, 0])
+    da_raggiungere = {(int(n.get("x", 0)), int(n.get("y", 0))) for k in ("npcs", "oggetti", "nemici")
+                      for n in doc.get(k, [])}
+    da_raggiungere |= {(x, y) for y, r in enumerate(mappa) for x, ch in enumerate(r) if ch == "+"}
+    for c in sorted(da_raggiungere | {(sx, sy)}):
+        if c in occupate and vocab[occupate[c]].get("blocca", True):
+            err(f"{rel}: un arredo ('{occupate[c]}') copre {c} (spawn, NPC, oggetto, nemico o passaggio)")
+    visto, coda = {(sx, sy)}, [(sx, sy)]
+    while coda:
+        cx, cy = coda.pop()
+        for nx, ny in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
+            if (0 <= nx < w and 0 <= ny < h and (nx, ny) not in visto and (nx, ny) not in bloccate
+                    and mappa[ny][nx] in calpestabili):
+                visto.add((nx, ny))
+                coda.append((nx, ny))
+    for c in sorted(da_raggiungere - visto - bloccate):
+        err(f"{rel}: dallo spawn non si arriva a {c}: gli arredi chiudono il passaggio")
+    for x, y in forzieri:
+        if not {(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)} & visto:
+            err(f"{rel}: dallo spawn non si arriva accanto al forziere in ({x},{y})")
+
+
+def valida_stanze(doc, rel, vocab, calpestabili, rooms):
+    """US-8B20: le stanze della base in un interno ("stanze": {tipo: {rect, livelli}}): il tipo e' una stanza di
+    data/base/rooms.json, un insieme di arredi per ogni livello (0 = non costruita, poi uno per livello dei dati),
+    dentro il rettangolo della stanza; con ognuno dei livelli gli arredi della stanza piu' quelli fissi non si
+    sovrappongono e dallo spawn si arriva ancora a tutto."""
+    stanze = doc.get("stanze", {})
+    if not stanze:
+        return
+    for tipo, st in stanze.items():
+        if tipo not in rooms:
+            err(f"{rel}: stanze.{tipo} non e' una stanza di data/base/rooms.json")
+            continue
+        x0, y0, w, h = st.get("rect", [0, 0, 0, 0])
+        livelli = st.get("livelli", [])
+        if len(livelli) != len(rooms[tipo].get("livelli", [])) + 1:
+            err(f"{rel}: stanze.{tipo} vuole {len(rooms[tipo].get('livelli', [])) + 1} insiemi di arredi "
+                f"(non costruita + un livello per voce di rooms.json), ne ha {len(livelli)}")
+        for lv, arredi in enumerate(livelli):
+            for a in arredi:
+                aw, ah = vocab.get(a.get("id"), {}).get("misura", [1, 1])
+                if not (x0 <= a.get("x", -1) and a.get("x", -1) + aw <= x0 + w and y0 <= a.get("y", -1)
+                        and a.get("y", -1) + ah <= y0 + h):
+                    err(f"{rel}: stanze.{tipo} livello {lv}: '{a.get('id')}' esce dalla stanza {st.get('rect')}")
+            valida_arredi(dict(doc, arredi=list(doc.get("arredi", [])) + list(arredi)),
+                          f"{rel} stanze.{tipo} livello {lv}", vocab, calpestabili)
+    # US-8B20c/e: "esterno" {voce: [dx, dy]} = dove sta fuori dalla porta, voce = il giardino o una struttura
+    strutture = {st.get("id") for fn in sorted(os.listdir(os.path.join(DATA, "structures")))
+                 if fn.endswith(".json") for st in (load_json(os.path.join(DATA, "structures", fn)) or {}).get("structures", [])}
+    for voce, sc in doc.get("esterno", {}).items():
+        if voce not in rooms and voce not in strutture:
+            err(f"{rel}: esterno.{voce} non e' una stanza di data/base/rooms.json ne' una struttura di data/structures/")
+        if not (isinstance(sc, list) and len(sc) == 2 and all(isinstance(v, int) for v in sc)):
+            err(f"{rel}: esterno.{voce} deve essere [dx, dy] interi (caselle dalla porta)")
+
+
 def main():
     # --- vocabolari di riferimento ---
     prim_doc = load_json(os.path.join(DATA, "schema", "primitives.json"))
@@ -74,6 +269,10 @@ def main():
 
     all_primitives = set(prim_doc["primitives"].keys())
     primitives = {k for k, v in prim_doc["primitives"].items() if not v.get("deferred")}
+    for _pid in sorted(primitives):                         # US-8B72: il glifo di ogni primitiva attiva
+        if not os.path.isfile(os.path.join(ROOT, "assets", "icone", "primitive", f"{_pid}.png")):
+            err(f"data/schema/primitives.json [{_pid}]: manca l'icona assets/icone/primitive/{_pid}.png "
+                f"(python tools/art/build_primitive.py)")
     deferred_primitives = all_primitives - primitives
     # Il registro dichiara i parametri di ogni primitiva: un nome sbagliato nei
     # dati diventerebbe silenziosamente il default a runtime (danno a zero).
@@ -144,6 +343,12 @@ def main():
             err(f"{rel}: il nome file non corrisponde all'id '{pid}'")
         if doc.get("group") not in VALID_GROUPS:
             err(f"{rel}: gruppo non valido '{doc.get('group')}'")
+        # US-901: distingue Pathway standard (pozione+recitazione) da quelli
+        # non_standard (Boon, data/pathways_non_standard/) - un file qui
+        # dev'essere sempre 'standard', l'altra categoria vive altrove.
+        if doc.get("categoria") != "standard":
+            err(f"{rel}: categoria deve essere 'standard' per un pathway in "
+                f"data/pathways/ (trovato: {doc.get('categoria')!r})")
         if not isinstance(doc.get("gameplay_verb"), str) or len(doc.get("gameplay_verb", "")) < 10:
             err(f"{rel}: gameplay_verb mancante o troppo generico")
         for t in doc.get("tags", []):
@@ -227,6 +432,12 @@ def main():
             pot = seq.get("potion", {})
             if not stub and pot.get("formula_id"):
                 potion_refs.append((rel, sid, n, pot))
+            # US-901: 'boon' e' riservato ai Pathway non_standard (data/
+            # pathways_non_standard/) - qui sarebbe sempre un errore di
+            # collocazione, mai una scelta valida.
+            if seq.get("boon") is not None:
+                err(f"{rel} [{sid}]: 'boon' su un Pathway standard - il campo e' "
+                    f"riservato ai Pathway non_standard (US-901).")
 
             total_prog = 0.0
             for act in seq.get("acting_actions", []):
@@ -290,10 +501,44 @@ def main():
         warn(f"{stub_count} sequenze su {total_sequences} sono stub dichiarati: "
              f"contenuto ancora da scrivere (fase 5), non un errore.")
 
+    # US-904: gli id delle Sequenze dei Pathway non_standard entrano anche
+    # loro in sequence_ids - servono alla validazione delle abilita' (sotto,
+    # sequence_id deve risolvere sia su uno standard che su un non_standard)
+    # e al controllo duplicati subito dopo. La validazione PIENA di questi
+    # file (categoria, group, boon...) resta nel blocco dedicato piu' in
+    # basso, dove quest_ids/item_ids/char_ids sono gia' disponibili: qui e'
+    # solo una raccolta di id, una seconda lettura dei file e' il prezzo di
+    # non riordinare tutto il resto dello script.
+    pnsdir_early = os.path.join(DATA, "pathways_non_standard")
+    if os.path.isdir(pnsdir_early):
+        for fn in sorted(f for f in os.listdir(pnsdir_early) if f.endswith(".json")):
+            _doc_early = load_json(os.path.join(pnsdir_early, fn))
+            if _doc_early is None:
+                continue
+            for _seq_early in _doc_early.get("sequences", []):
+                _sid_early = _seq_early.get("id")
+                if _sid_early:
+                    sequence_ids.append(_sid_early)
+
     for name, values in (("pathway", pathway_ids), ("sequenza", sequence_ids)):
         dupes = [k for k, v in Counter(values).items() if v > 1]
         if dupes:
             err(f"id {name} duplicati: {dupes}")
+
+    # --- categoria dei Pathway differiti (data/pathways_deferred/, US-901) ---
+    # Non sono caricati da GameData e restano fuori dalla validazione piena
+    # dei Pathway attivi (vedi sopra): qui solo il campo 'categoria' aggiunto
+    # in fase 9, per coerenza col resto del vocabolario (sono tutti standard,
+    # nessun Pathway differito e' non_standard).
+    pddir = os.path.join(DATA, "pathways_deferred")
+    if os.path.isdir(pddir):
+        for fn in sorted(f for f in os.listdir(pddir) if f.endswith(".json")):
+            _d = load_json(os.path.join(pddir, fn))
+            if _d is None:
+                continue
+            if _d.get("categoria") != "standard":
+                err(f"data/pathways_deferred/{fn}: categoria deve essere 'standard' "
+                    f"(trovato: {_d.get('categoria')!r})")
 
     # --- percorsi di fusione (data/fusions/, fase 7 US-702) ---
     # Il cambio di Pathway funziona solo tra vicini dello STESSO gruppo. I
@@ -642,6 +887,16 @@ def main():
                     err(f"data/forms.json [{fid}]: stat_modifiers['{k}'] non e' un numero")
             if all((v if isinstance(v, (int, float)) else 0) >= 0 for v in sm.values()):
                 err(f"data/forms.json [{fid}]: nessun trade-off negativo. Una forma non e' solo vantaggi.")
+        # US-8B50: l'aspetto di una forma e' un set di fogli del personaggio (tools/art/build_forme.py)
+        asp = f.get("aspetto")
+        if asp is not None:
+            spec_anim = (load_json(os.path.join(DATA, "animations.json")) or {}).get("personaggio", {})
+            for nome in spec_anim:
+                if nome.startswith("_"):
+                    continue
+                if not os.path.isfile(os.path.join(ROOT, "assets", "placeholder", f"personaggio_{asp}_{nome}.png")):
+                    err(f"data/forms.json [{fid}]: aspetto '{asp}' senza assets/placeholder/personaggio_{asp}_{nome}.png "
+                        f"(python tools/art/build_forme.py)")
     for rel, aid, fid in transform_forms:
         if fid not in forms:
             err(f"{rel} [{aid}]: transform punta a forma_id '{fid}' inesistente in data/forms.json")
@@ -659,6 +914,9 @@ def main():
         for k in (st.get("stat_modifiers") or {}):
             if k not in known_stats_st:
                 err(f"data/status_effects.json [{sid}]: stat_modifiers ha una stat ignota '{k}'")
+        if not os.path.isfile(os.path.join(ROOT, "assets", "icone", "stati", f"{sid}.png")):   # US-8B71
+            err(f"data/status_effects.json [{sid}]: manca l'icona assets/icone/stati/{sid}.png "
+                f"(python tools/art/build_stati.py)")
     for rel, aid, eff in status_refs:
         if eff not in statuses:
             err(f"{rel} [{aid}]: aura/curse punta a effetto '{eff}' inesistente in data/status_effects.json")
@@ -795,6 +1053,18 @@ def main():
         if not isinstance(sp, int) or not (0 <= sp <= 9):
             err("data/balance.json [densita_mistica.sequenza_percezione]: intero 0-9.")
 
+        # US-1003: raggio di attivazione di nemici/NPC nel mondo continuo.
+        mondo = balance_doc.get("mondo", {})
+        raggio_attivo = mondo.get("raggio_attivo_entita")
+        if not isinstance(raggio_attivo, (int, float)) or raggio_attivo <= 0:
+            err("data/balance.json [mondo.raggio_attivo_entita]: deve essere un numero > 0 "
+                "(world_scene.gd::_aggiorna_prestazioni lo usa per disattivare cio' che e' "
+                "lontano dal giocatore, US-1003).")
+        rp = mondo.get("raggio_partenza_senza_nemici", 0)
+        if not isinstance(rp, int) or rp < 0:
+            err("data/balance.json [mondo.raggio_partenza_senza_nemici]: intero >= 0 (caselle attorno alla "
+                "partenza senza nemici dei layout, scripts/world/mondo.gd popola()).")
+
     # --- animazioni ---
     anim_doc = load_json(os.path.join(DATA, "animations.json"))
     if anim_doc:
@@ -806,6 +1076,10 @@ def main():
                 if n <= 0:
                     err(f"data/animations.json [{cat}.{name}]: frames deve essere > 0")
                     continue
+                durate = an.get("durate_ms")
+                if durate is not None and (len(durate) != n or any(d <= 0 for d in durate)):
+                    err(f"data/animations.json [{cat}.{name}]: durate_ms deve avere {n} valori > 0 "
+                        f"(uno per frame), ne ha {len(durate)}")
                 # ogni indice di frame citato deve esistere davvero
                 for key in ("anticipo", "attivi", "recupero", "finestra_perfetta"):
                     for idx in an.get(key, []):
@@ -927,6 +1201,16 @@ def main():
             dm = reg.get("densita_mistica")
             if not isinstance(dm, (int, float)) or not (0.0 <= dm <= 1.0):
                 err(f"{rel} [{rid}]: densita_mistica deve essere un numero in [0, 1]")
+            # US-8B12b: luoghi della mappa -> location_tag della regione (nomi diversi)
+            # 2026-10-25: come ci si arriva nel mondo generato (assente = anche a piedi). Vocabolario chiuso:
+            # il volo, il sottosuolo e la barca (US-8B91: con una lista, si sbarca solo se c'e' "barca" o "a_piedi")
+            # sono i soli modi oltre al cammino (tests/test_mondo.gd lo verifica sulla mappa).
+            for modo in (reg.get("accesso") or []):
+                if modo not in ("a_piedi", "volo", "sottosuolo", "barca"):
+                    err(f"{rel} [{reg.get('id')}]: accesso '{modo}' fuori vocabolario (a_piedi, volo, sottosuolo, barca)")
+            for luogo, t in (reg.get("luoghi_mondo") or {}).items():
+                if t not in reg.get("location_tags", []):
+                    err(f"{rel} [{reg.get('id')}]: luoghi_mondo '{luogo}' -> '{t}', che non e' tra i suoi location_tags")
             for t in reg.get("location_tags", []):
                 if valid_location_tags and t not in valid_location_tags:
                     err(f"{rel} [{rid}]: location_tag '{t}' fuori dal vocabolario di "
@@ -979,6 +1263,330 @@ def main():
             if mz and mz not in amb_zone:
                 err(f"data/audio.json [music.ambienti]: manca la zona '{mz}' usata dalla "
                     f"regione '{reg.get('id')}' (US-619: ambiente giorno/notte per ogni zona).")
+
+    # --- layout disegnati a mano (data/world/layouts/*.json, US-805) ---
+    # Sostituiscono il rettangolo piatto generato da region_scene.gd per una
+    # regione; una regione SENZA file qui resta piatta come oggi (fallback
+    # esplicito in codice) -> solo un warning, non un errore, finche' US-807
+    # non disegna le altre 4.
+    LEGENDA_LAYOUT = set(".,=#ot~+")
+    CALPESTABILI_LAYOUT = set(".,=+")
+    region_tags_by_id = {}
+    if regions_doc is not None:
+        for reg in regions_doc.get("regions", []):
+            region_tags_by_id[reg.get("id")] = set(reg.get("location_tags", []))
+
+    # --- interni di edificio (data/world/interni/*.json, US-1010) ---
+    # "Stesso schema di un layout" (mappa/spawn), ma senza region_id/zone: un
+    # interno e' una scena locale piccola e indipendente, mai parte della
+    # griglia condivisa del mondo continuo. Caricati PRIMA dei layout esterni
+    # perche' il campo layout.edifici[].interno_id (sotto) deve poterli
+    # risolvere.
+    interni_dir = os.path.join(DATA, "world", "interni")
+    interni_ids = set()
+    arredi_doc = load_json(os.path.join(DATA, "world", "arredi.json")) or {}
+    vocab_arredi = arredi_doc.get("arredi", {})
+    for aid, a in vocab_arredi.items():
+        m = a.get("misura")
+        if not (isinstance(m, list) and len(m) == 2 and all(isinstance(v, int) and v >= 1 for v in m)):
+            err(f"data/world/arredi.json [{aid}]: misura deve essere [larghezza, profondita'] di interi >= 1")
+    # US-8B18b: edifici[].villaggio = un villaggio del mondo generato (assets/world/mondo.json "villaggi");
+    # US-8B20b: o un suo luogo (la casa della base al porto)
+    _mondo = os.path.join(ROOT, "assets", "world", "mondo.json")
+    _mondo_doc = (load_json(_mondo) or {}) if os.path.isfile(_mondo) else None
+    villaggi_mondo = (set(_mondo_doc.get("villaggi", {})) | set(_mondo_doc.get("luoghi", {}))) if _mondo_doc is not None else None
+    interni_npc_refs = []   # [(rel, iid, npc_id)] - risolti dopo il roster NPC, sotto
+    interni_basi = set()    # gli interni con le stanze della base (US-8B20)
+    if os.path.isdir(interni_dir):
+        for fn in sorted(os.listdir(interni_dir)):
+            if not fn.endswith(".json"):
+                continue
+            rel = f"data/world/interni/{fn}"
+            doc = load_json(os.path.join(interni_dir, fn))
+            if doc is None:
+                continue
+            iid = doc.get("interno_id")
+            if not iid:
+                err(f"{rel}: manca 'interno_id'")
+                continue
+            if iid in interni_ids:
+                err(f"{rel}: interno_id '{iid}' duplicato tra gli interni")
+            interni_ids.add(iid)
+            valida_mappa_e_spawn(doc, f"{rel} [{iid}]", LEGENDA_LAYOUT, CALPESTABILI_LAYOUT)
+            valida_arredi(doc, f"{rel} [{iid}]", vocab_arredi, CALPESTABILI_LAYOUT)
+            valida_stanze(doc, f"{rel} [{iid}]", vocab_arredi, CALPESTABILI_LAYOUT,
+                          (load_json(os.path.join(DATA, "base", "rooms.json")) or {}).get("rooms", {}))
+            if doc.get("stanze"):
+                interni_basi.add(iid)
+            for spec in doc.get("npcs", []):
+                interni_npc_refs.append((rel, iid, spec.get("npc_id")))
+    # US-8B20b: la base da cui si comincia e' un interno con le stanze
+    _sede = (load_json(os.path.join(DATA, "base", "rooms.json")) or {}).get("sede_iniziale")
+    if _sede is not None and _sede not in interni_basi:
+        err(f"data/base/rooms.json: sede_iniziale '{_sede}' non e' un interno con 'stanze' in data/world/interni/")
+
+    # US-8B21a: un'area del gating con "varco" e' un ingresso sulla mappa verso un interno: il luogo esiste nel
+    # mondo generato (luoghi o punti del sottosuolo), l'interno esiste, i disegni chiuso/aperto ci sono nei due temi.
+    mondo_doc = (load_json(_mondo) or {}) if os.path.isfile(_mondo) else None
+    for reg in (regions_doc or {}).get("regions", []):
+        for g in reg.get("gating", []):
+            v = g.get("varco")
+            if v is None:
+                continue
+            ctx = f"data/world/regions.json [{reg.get('id')}] gating '{g.get('area')}'.varco"
+            if v.get("interno") not in interni_ids:
+                err(f"{ctx}: interno '{v.get('interno')}' non esiste in data/world/interni/")
+            _lay = load_json(os.path.join(DATA, "world", "layouts", f"{reg.get('id')}.json")) or {}
+            if "zona" in v and v["zona"] not in _lay.get("zone", {}):
+                err(f"{ctx}: zona '{v['zona']}' non e' una zona di data/world/layouts/{reg.get('id')}.json")
+            sc = v.get("scostamento", [0, 0])
+            if not (isinstance(sc, list) and len(sc) == 2 and all(isinstance(n, int) for n in sc)):
+                err(f"{ctx}: scostamento deve essere [dx, dy] di interi")
+            if mondo_doc is not None:
+                luoghi_mondo = set(mondo_doc.get("luoghi", {})) | set(mondo_doc.get("sottosuolo", {}).get("boss", {}))
+                if v.get("luogo") not in luoghi_mondo:
+                    err(f"{ctx}: luogo '{v.get('luogo')}' non e' un luogo di assets/world/mondo.json")
+                for stato in ("chiuso", "aperto"):
+                    k = f"varco_{v.get('aspetto')}_{stato}"
+                    if k not in mondo_doc.get("sprite", {}) or not all(os.path.isfile(os.path.join(
+                            ROOT, "assets", "world", t, "oggetti", k + ".png")) for t in ("luminoso", "cupo")):
+                        err(f"{ctx}: manca il disegno {k} (python tools/art/esporta_mondo.py --varchi)")
+
+    # US-8B91: la barca parte ormeggiata vicino a un luogo del mondo generato
+    _mezzi = load_json(os.path.join(DATA, "world", "mezzi.json")) or {}
+    # US-8B93: la chiave del volo e' un oggetto che non si vende (venduto, si perderebbe il volo)
+    _items_tutti = {}
+    for _fn in os.listdir(os.path.join(DATA, "items")):
+        if _fn.endswith(".json"):
+            for _it in (load_json(os.path.join(DATA, "items", _fn)) or {}).get("items", []):
+                _items_tutti[_it.get("id")] = _it
+    for _mz, _spec in _mezzi.items():
+        if isinstance(_spec, dict) and "chiave" in _spec:
+            _k = _items_tutti.get(_spec["chiave"])
+            if _k is None:
+                err(f"data/world/mezzi.json [{_mz}]: chiave '{_spec['chiave']}' non e' un oggetto di data/items/")
+            elif _k.get("vendibile", True) is not False:
+                err(f"data/world/mezzi.json [{_mz}]: la chiave '{_spec['chiave']}' deve avere \"vendibile\": false")
+    for _mz, _spec in _mezzi.items():                       # US-8B95: le soglie (con "arrivo")
+        if isinstance(_spec, dict) and "arrivo" in _spec and mondo_doc is not None:
+            _lm = set(mondo_doc.get("luoghi", {})) | set(mondo_doc.get("sottosuolo", {}).get("boss", {}))
+            for _campo in ("luogo", "arrivo", "chiave_luogo"):
+                if _spec.get(_campo) not in _lm:
+                    err(f"data/world/mezzi.json [{_mz}]: {_campo} '{_spec.get(_campo)}' non e' un luogo di "
+                        f"assets/world/mondo.json")
+            for _st in ("chiuso", "aperto"):
+                if f"varco_{_spec.get('aspetto')}_{_st}" not in mondo_doc.get("sprite", {}):
+                    err(f"data/world/mezzi.json [{_mz}]: manca il disegno varco_{_spec.get('aspetto')}_{_st} "
+                        f"(python tools/art/esporta_mondo.py --varchi)")
+    if mondo_doc is not None and "nave" in _mezzi:              # US-8B20d: la nave della base
+        _nave = _mezzi["nave"]
+        if _nave.get("luogo") not in mondo_doc.get("luoghi", {}):
+            err(f"data/world/mezzi.json: nave.luogo '{_nave.get('luogo')}' non e' un luogo di assets/world/mondo.json")
+        if _nave.get("interno") not in interni_basi:
+            err(f"data/world/mezzi.json: nave.interno '{_nave.get('interno')}' non e' un interno con 'stanze'")
+        if "nave" not in mondo_doc.get("sprite", {}):
+            err("data/world/mezzi.json: manca il disegno della nave (python tools/art/esporta_mondo.py --barca)")
+    if mondo_doc is not None and "barca" in _mezzi:
+        if _mezzi["barca"].get("luogo") not in mondo_doc.get("luoghi", {}):
+            err(f"data/world/mezzi.json: barca.luogo '{_mezzi['barca'].get('luogo')}' non e' un luogo di "
+                f"assets/world/mondo.json")
+        if "barca" not in mondo_doc.get("sprite", {}):
+            err("data/world/mezzi.json: manca il disegno della barca (python tools/art/esporta_mondo.py --barca)")
+
+    # US-8B70: ogni oggetto ha un'icona del vocabolario chiuso, e ogni icona usata ha il suo disegno
+    _ic = load_json(os.path.join(DATA, "ui", "icone.json")) or {}
+    _forme = _ic.get("forme", {})
+    _rif = [("categorie", k, v) for k, v in _ic.get("categorie", {}).items()] + \
+        [("oggetti", k, v) for k, v in _ic.get("oggetti", {}).items()]
+    for _sez, _k, _v in _rif:
+        _f, _, _t = str(_v).partition("_")
+        if _f not in _forme or (_t not in _forme[_f] if _forme[_f] else _t):
+            err(f"data/ui/icone.json {_sez}.{_k}: '{_v}' non e' <forma>_<tinta> del vocabolario 'forme'")
+        elif not os.path.isfile(os.path.join(ROOT, "assets", "icone", "oggetti", f"{_v}.png")):
+            err(f"data/ui/icone.json {_sez}.{_k}: manca assets/icone/oggetti/{_v}.png (python tools/art/build_icone.py)")
+        if _sez == "oggetti" and _k not in _items_tutti:
+            err(f"data/ui/icone.json oggetti.{_k}: non e' un oggetto di data/items/")
+    for _iid in sorted(set(_items_tutti) - set(_ic.get("oggetti", {}))):
+        err(f"data/ui/icone.json: l'oggetto '{_iid}' non ha l'icona (python tools/art/build_icone.py)")
+
+    layouts_dir = os.path.join(DATA, "world", "layouts")
+    layout_region_ids = set()
+    if os.path.isdir(layouts_dir):
+        for fn in sorted(os.listdir(layouts_dir)):
+            if not fn.endswith(".json"):
+                continue
+            rel = f"data/world/layouts/{fn}"
+            doc = load_json(os.path.join(layouts_dir, fn))
+            if doc is None:
+                continue
+            rid = doc.get("region_id")
+            if rid not in region_ids:
+                err(f"{rel}: region_id '{rid}' non esiste in data/world/regions.json")
+                continue
+            if rid in layout_region_ids:
+                err(f"{rel}: region_id '{rid}' duplicato tra i layout")
+            layout_region_ids.add(rid)
+
+            # US-1005 (fase 10): dimensione libera - riusa la stessa validazione
+            # di forma degli interni (US-1010, "stesso schema di un layout").
+            mappa, w, h, righe_valide = valida_mappa_e_spawn(
+                doc, f"{rel} [{rid}]", LEGENDA_LAYOUT, CALPESTABILI_LAYOUT)
+
+            region_tags = region_tags_by_id.get(rid, set())
+            zone = doc.get("zone", {})
+            if not isinstance(zone, dict):
+                err(f"{rel} [{rid}]: zone deve essere un dict")
+                zone = {}
+            for tag, rect in zone.items():
+                if tag not in region_tags:
+                    err(f"{rel} [{rid}]: zone['{tag}'] non e' un location_tag della regione "
+                        f"({sorted(region_tags)})")
+                if not (isinstance(rect, list) and len(rect) == 4
+                        and all(isinstance(v, int) for v in rect)):
+                    err(f"{rel} [{rid}]: zone['{tag}'] deve essere [x, y, w, h] di interi")
+                    continue
+                zx, zy, zw, zh = rect
+                if zx < 0 or zy < 0 or zw <= 0 or zh <= 0 or zx + zw > w or zy + zh > h:
+                    err(f"{rel} [{rid}]: zone['{tag}'] {rect} fuori dai limiti ({w}x{h})")
+            mancanti = region_tags - set(zone)
+            if mancanti:
+                err(f"{rel} [{rid}]: mancano zone per i location_tags {sorted(mancanti)} "
+                    f"(una regione CON layout deve coprirli tutti)")
+
+            # US-1010: marcatori di edificio - una porta sulla mappa esterna
+            # che referenzia un interno vero.
+            edifici = doc.get("edifici", [])
+            if not isinstance(edifici, list):
+                err(f"{rel} [{rid}]: edifici deve essere un array")
+                edifici = []
+            for i, ed in enumerate(edifici):
+                if not isinstance(ed, dict):
+                    err(f"{rel} [{rid}]: edifici[{i}] deve essere un dict")
+                    continue
+                ex, ey = ed.get("x"), ed.get("y")
+                if not (isinstance(ex, int) and isinstance(ey, int)):
+                    err(f"{rel} [{rid}]: edifici[{i}] x/y devono essere interi")
+                elif righe_valide:
+                    if not (0 <= ex < w and 0 <= ey < h):
+                        err(f"{rel} [{rid}]: edifici[{i}] ({ex},{ey}) fuori dai limiti ({w}x{h})")
+                    elif mappa[ey][ex] not in CALPESTABILI_LAYOUT:
+                        err(f"{rel} [{rid}]: edifici[{i}] ({ex},{ey}) non e' su una cella "
+                            f"calpestabile ('{mappa[ey][ex]}')")
+                iid = ed.get("interno_id")
+                if not iid or iid not in interni_ids:
+                    err(f"{rel} [{rid}]: edifici[{i}].interno_id '{iid}' non esiste in "
+                        f"data/world/interni/")
+                if "villaggio" in ed and villaggi_mondo is not None and ed["villaggio"] not in villaggi_mondo:
+                    err(f"{rel} [{rid}]: edifici[{i}].villaggio '{ed['villaggio']}' non e' un villaggio ne' un luogo di "
+                        f"assets/world/mondo.json")
+
+    for _rid in sorted(region_ids - layout_region_ids):
+        err(f"data/world/regions.json [{_rid}]: nessun layout in data/world/layouts/ "
+            f"(US-807d: tutte e 5 le regioni hanno un layout da questa story in poi; "
+            f"un layout mancante non e' piu' atteso).")
+
+    # --- world_offset e non-sovrapposizione (US-1001, fase 10) ---
+    # Le 5 regioni condividono un'unica griglia: due rettangoli non possono
+    # mai sovrapporsi, altrimenti la TileMapLayer del mondo continuo
+    # dipingerebbe due regioni sulle stesse celle. La dimensione vera viene
+    # dal layout (mappa e' gia' una lista di righe di uguale lunghezza,
+    # verificato sopra); una regione senza layout valido usa il fallback
+    # 48x36 di region_scene.gd, coerente col resto del validator.
+    if regions_doc is not None:
+        layout_dims_by_id = {}
+        if os.path.isdir(layouts_dir):
+            for fn in sorted(os.listdir(layouts_dir)):
+                if not fn.endswith(".json"):
+                    continue
+                doc = load_json(os.path.join(layouts_dir, fn)) or {}
+                rid = doc.get("region_id")
+                mappa = doc.get("mappa", [])
+                if rid and isinstance(mappa, list) and mappa and all(
+                        isinstance(r, str) and len(r) == len(mappa[0]) for r in mappa):
+                    layout_dims_by_id[rid] = (len(mappa[0]), len(mappa))
+
+        region_rects = {}
+        for reg in regions_doc.get("regions", []):
+            rid = reg.get("id")
+            wo = reg.get("world_offset")
+            if not (isinstance(wo, list) and len(wo) == 2
+                    and all(isinstance(v, int) and v >= 0 for v in wo)):
+                err(f"data/world/regions.json [{rid}]: world_offset deve essere [x, y] di interi >= 0")
+                continue
+            w, h = layout_dims_by_id.get(rid, (48, 36))
+            region_rects[rid] = (wo[0], wo[1], wo[0] + w, wo[1] + h)
+
+        rect_ids = sorted(region_rects)
+        for i, a in enumerate(rect_ids):
+            ax0, ay0, ax1, ay1 = region_rects[a]
+            for b in rect_ids[i + 1:]:
+                bx0, by0, bx1, by1 = region_rects[b]
+                if ax0 < bx1 and bx0 < ax1 and ay0 < by1 and by0 < ay1:
+                    err(f"data/world/regions.json: le regioni '{a}' {region_rects[a]} e '{b}' "
+                        f"{region_rects[b]} si sovrappongono nella griglia di mondo condivisa "
+                        f"(world_offset, US-1001)")
+
+    # --- campagna (data/world/campagna.json, addendum fase 10 US-1015) ---
+    # Il popolamento dello spazio comune FUORI da ogni regione (world_scene.gd
+    # lo dipinge di terreno vero, _riempi_campagna): stessa forma di un
+    # layout (nemici[]/oggetti[]) ma coordinate ASSOLUTE, senza un
+    # world_offset proprio. Si valida solo che ogni entry sia dentro il
+    # rettangolo che contiene tutte le regioni e FUORI da ognuna di esse
+    # (dentro una regione ci pensa gia' il suo layout) - non la calpestabilita'
+    # fine contro gli alberi sparsi, che sono decorativi e generati a runtime.
+    campagna_doc = load_json(os.path.join(DATA, "world", "campagna.json"))
+    if campagna_doc is not None and region_rects:
+        rel = "data/world/campagna.json"
+        bx0 = min(r[0] for r in region_rects.values())
+        by0 = min(r[1] for r in region_rects.values())
+        bx1 = max(r[2] for r in region_rects.values())
+        by1 = max(r[3] for r in region_rects.values())
+
+        def _dentro_una_regione(x, y):
+            for (rx0, ry0, rx1, ry1) in region_rects.values():
+                if rx0 <= x < rx1 and ry0 <= y < ry1:
+                    return True
+            return False
+
+        for lista, nome in ((campagna_doc.get("nemici", []), "nemici"),
+                             (campagna_doc.get("oggetti", []), "oggetti")):
+            for i, spec in enumerate(lista):
+                x, y = spec.get("x"), spec.get("y")
+                if not (isinstance(x, int) and isinstance(y, int)):
+                    err(f"{rel}: {nome}[{i}] x/y devono essere interi")
+                    continue
+                if not (bx0 <= x < bx1 and by0 <= y < by1):
+                    err(f"{rel}: {nome}[{i}] ({x},{y}) fuori dal rettangolo che contiene "
+                        f"tutte le regioni")
+                elif _dentro_una_regione(x, y):
+                    err(f"{rel}: {nome}[{i}] ({x},{y}) cade dentro il rettangolo di una "
+                        f"regione (la campagna e' solo lo spazio condiviso fuori da esse)")
+
+        # edifici (fase 11, US-1111/1112): stessa forma di layout.edifici[]
+        # (x/y = cella della porta, interno_id) ma senza check di
+        # calpestabilita' contro una mappa ASCII - campagna.json non ne ha
+        # una, le pareti le dipinge world_scene.gd._disegna_capanne_campagna
+        # a runtime con un template fisso.
+        for i, ed in enumerate(campagna_doc.get("edifici", [])):
+            if not isinstance(ed, dict):
+                err(f"{rel}: edifici[{i}] deve essere un dict")
+                continue
+            x, y = ed.get("x"), ed.get("y")
+            if not (isinstance(x, int) and isinstance(y, int)):
+                err(f"{rel}: edifici[{i}] x/y devono essere interi")
+            elif not (bx0 <= x < bx1 and by0 <= y < by1):
+                err(f"{rel}: edifici[{i}] ({x},{y}) fuori dal rettangolo che contiene "
+                    f"tutte le regioni")
+            elif _dentro_una_regione(x, y):
+                err(f"{rel}: edifici[{i}] ({x},{y}) cade dentro il rettangolo di una "
+                    f"regione (la campagna e' solo lo spazio condiviso fuori da esse)")
+            iid = ed.get("interno_id")
+            if not iid or iid not in interni_ids:
+                err(f"{rel}: edifici[{i}].interno_id '{iid}' non esiste in "
+                    f"data/world/interni/")
+            if "villaggio" in ed and villaggi_mondo is not None and ed["villaggio"] not in villaggi_mondo:
+                err(f"{rel}: edifici[{i}].villaggio '{ed['villaggio']}' non e' un villaggio ne' un luogo di "
+                    f"assets/world/mondo.json")
 
     # --- fonti di tag di fase 3 (US-334): stanze costruibili, specie di pet
     # (+ comportamenti), tag_grant dei talenti. Rendono raggiungibili le
@@ -1100,6 +1708,8 @@ def main():
     # --- oggetti (data/items/, US-301) ---
     ic_doc = load_json(os.path.join(DATA, "schema", "item_categories.json"))
     item_categories = set((ic_doc or {}).get("item_categories", []))
+    rarity_doc = load_json(os.path.join(DATA, "schema", "item_rarity.json"))
+    item_rarities = set(l.get("id") for l in (rarity_doc or {}).get("livelli", []))
     es_doc = load_json(os.path.join(DATA, "schema", "equip_slots.json"))
     equip_tipi = set((es_doc or {}).get("tipi", []))
     sig_doc = load_json(os.path.join(DATA, "schema", "sigillato_effect_types.json"))
@@ -1142,6 +1752,10 @@ def main():
                     err(f"{rel} [{iid}]: valore deve essere un intero >= 0")
                 if not isinstance(it.get("impilabile"), bool):
                     err(f"{rel} [{iid}]: impilabile deve essere true/false")
+                rar = it.get("rarita")
+                if rar is not None and rar not in item_rarities:
+                    err(f"{rel} [{iid}]: rarita '{rar}' non nel vocabolario chiuso "
+                        f"({sorted(item_rarities)})")
                 if cat == "equip":
                     if it.get("slot") not in equip_tipi:
                         err(f"{rel} [{iid}]: slot '{it.get('slot')}' non in equip_slots.tipi "
@@ -1211,6 +1825,213 @@ def main():
     for c in item_categories:
         if c not in coperte:
             warn(f"data/items/: nessun item di esempio per la categoria '{c}'")
+
+    # --- nemici/oggetti dei layout (US-806) ---
+    # Rilegge data/world/layouts/*.json (item_ids/pathway_ids non erano ancora
+    # pronti nel blocco "layouts" piu' sopra, US-805). Un boss e' dati
+    # (sequenza + override + scala), mai un flag: qui si valida solo la forma.
+    _bal_nemici = load_json(os.path.join(DATA, "balance.json")) or {}
+    nemico_base_keys = set((_bal_nemici.get("nemico_base", {}) or {}).keys())
+    if os.path.isdir(layouts_dir):
+        for fn in sorted(os.listdir(layouts_dir)):
+            if not fn.endswith(".json"):
+                continue
+            rel = f"data/world/layouts/{fn}"
+            doc = load_json(os.path.join(layouts_dir, fn)) or {}
+            rid = doc.get("region_id")
+            mappa = doc.get("mappa", [])
+            _h = len(mappa) if isinstance(mappa, list) else 0
+            _w = len(mappa[0]) if _h > 0 and isinstance(mappa[0], str) else 0
+            righe_ok = _h > 0 and _w > 0 and all(
+                isinstance(r, str) and len(r) == _w for r in mappa)
+
+            def _calpestabile(x, y):
+                return righe_ok and 0 <= x < _w and 0 <= y < _h and mappa[y][x] in CALPESTABILI_LAYOUT
+
+            for nm in doc.get("nemici", []):
+                nx, ny = nm.get("x"), nm.get("y")
+                if not (isinstance(nx, int) and isinstance(ny, int) and _calpestabile(nx, ny)):
+                    err(f"{rel} [{rid}]: nemico a ({nx},{ny}) non e' su una cella calpestabile")
+                seq = nm.get("sequenza")
+                if not (isinstance(seq, int) and 0 <= seq <= 9):
+                    err(f"{rel} [{rid}]: nemico sequenza '{seq}' deve essere un int 0..9")
+                scala = nm.get("scala", 1.0)
+                if not (isinstance(scala, (int, float)) and 0.5 <= scala <= 3):
+                    err(f"{rel} [{rid}]: nemico scala '{scala}' deve essere in [0.5, 3]")
+                ov = nm.get("override", {})
+                if not isinstance(ov, dict):
+                    err(f"{rel} [{rid}]: nemico override deve essere un dict")
+                    ov = {}
+                fuori = set(ov) - nemico_base_keys
+                if fuori:
+                    err(f"{rel} [{rid}]: nemico override ha chiavi fuori da "
+                        f"balance.json.nemico_base: {sorted(fuori)}")
+                car = ov.get("caratteristica")
+                if isinstance(car, dict) and car.get("pathway_id") not in pathway_ids:
+                    err(f"{rel} [{rid}]: nemico override.caratteristica.pathway_id "
+                        f"'{car.get('pathway_id')}' non e' un Pathway attivo")
+
+            for og in doc.get("oggetti", []):
+                ox, oy = og.get("x"), og.get("y")
+                if not (isinstance(ox, int) and isinstance(oy, int) and _calpestabile(ox, oy)):
+                    err(f"{rel} [{rid}]: oggetto a ({ox},{oy}) non e' su una cella calpestabile")
+                if og.get("item_id") not in item_ids:
+                    err(f"{rel} [{rid}]: oggetto item_id '{og.get('item_id')}' non esiste in data/items/")
+
+    # --- bottino e forzieri (US-8B22) ---
+    # data/world/bottino.json: tabelle {tiri: [min, max], voci: [{item_id, peso, quantita: [min, max]}]}. Ogni
+    # forziere di un interno ha un id unico (e' la chiave nel salvataggio) e una tabella che esiste.
+    _bott_rel = "data/world/bottino.json"
+    _bott = load_json(os.path.join(DATA, "world", "bottino.json")) or {}
+    tabelle_bottino = _bott.get("tabelle", {})
+    if not isinstance(tabelle_bottino, dict) or not tabelle_bottino:
+        err(f"{_bott_rel}: 'tabelle' deve essere un dict non vuoto")
+        tabelle_bottino = {}
+
+    def _intervallo(v):
+        return isinstance(v, list) and len(v) == 2 and all(isinstance(n, int) for n in v) and 1 <= v[0] <= v[1]
+
+    for _tid, _t in tabelle_bottino.items():
+        if not _intervallo(_t.get("tiri")):
+            err(f"{_bott_rel} [{_tid}]: tiri deve essere [min, max] di interi con 1 <= min <= max")
+        _voci = _t.get("voci", [])
+        if not isinstance(_voci, list) or not _voci:
+            err(f"{_bott_rel} [{_tid}]: voci deve essere una lista non vuota")
+            continue
+        for _i, _v in enumerate(_voci):
+            if _v.get("item_id") not in item_ids:
+                err(f"{_bott_rel} [{_tid}]: voci[{_i}] item_id '{_v.get('item_id')}' non esiste in data/items/")
+            if not (isinstance(_v.get("peso"), (int, float)) and _v.get("peso") > 0):
+                err(f"{_bott_rel} [{_tid}]: voci[{_i}] peso deve essere un numero > 0")
+            if not _intervallo(_v.get("quantita")):
+                err(f"{_bott_rel} [{_tid}]: voci[{_i}] quantita deve essere [min, max] con 1 <= min <= max")
+    _id_forzieri = {}
+    for fn in sorted(os.listdir(interni_dir)) if os.path.isdir(interni_dir) else []:
+        if not fn.endswith(".json"):
+            continue
+        _doc_int = load_json(os.path.join(interni_dir, fn)) or {}
+        if "oggetti_casuali" in _doc_int and _doc_int["oggetti_casuali"] not in tabelle_bottino:
+            err(f"data/world/interni/{fn}: oggetti_casuali '{_doc_int['oggetti_casuali']}' non e' una tabella di "
+                f"{_bott_rel}")
+        for _i, _f in enumerate(_doc_int.get("forzieri", [])):
+            _ctx = f"data/world/interni/{fn}: forzieri[{_i}]"
+            _fid = _f.get("id")
+            if not isinstance(_fid, str) or not _fid:
+                err(f"{_ctx}: manca l'id")
+            elif _fid in _id_forzieri:
+                err(f"{_ctx}: id '{_fid}' gia' usato in {_id_forzieri[_fid]}")
+            else:
+                _id_forzieri[_fid] = fn
+            if _f.get("tabella") not in tabelle_bottino:
+                err(f"{_ctx}: tabella '{_f.get('tabella')}' non esiste in {_bott_rel}")
+    # US-8B22b: i forzieri del sottosuolo del mondo, vicino a un ingresso o a un boss di assets/world/mondo.json
+    _sotto = ((load_json(_mondo) or {}).get("sottosuolo", {}) if os.path.isfile(_mondo) else {})
+    _punti_sotto = set(_sotto.get("boss", {})) | set(_sotto.get("ingressi", {}))
+    for _i, _f in enumerate(_bott.get("forzieri_mondo", [])):
+        _ctx = f"{_bott_rel}: forzieri_mondo[{_i}]"
+        _fid = _f.get("id")
+        if not isinstance(_fid, str) or not _fid:
+            err(f"{_ctx}: manca l'id")
+        elif _fid in _id_forzieri:
+            err(f"{_ctx}: id '{_fid}' gia' usato in {_id_forzieri[_fid]}")
+        else:
+            _id_forzieri[_fid] = _bott_rel
+        if _f.get("tabella") not in tabelle_bottino:
+            err(f"{_ctx}: tabella '{_f.get('tabella')}' non esiste")
+        if _sotto and _f.get("vicino") not in _punti_sotto:
+            err(f"{_ctx}: vicino '{_f.get('vicino')}' non e' un ingresso ne' un boss del sottosuolo (mondo.json)")
+    for _a in ("forziere", "forziere_aperto"):
+        if _a not in vocab_arredi:
+            err(f"data/world/arredi.json: manca '{_a}', il disegno dei forzieri (US-8B22)")
+
+    # --- luce del mondo (US-8B25) ---
+    # data/world/luce.json: un colore #rrggbb per ogni momento di time.json in ogni modalita' (luminoso, cupo).
+    _luce_rel = "data/world/luce.json"
+    _luce = load_json(os.path.join(DATA, "world", "luce.json")) or {}
+    _momenti_luce = set((load_json(os.path.join(DATA, "schema", "time.json")) or {}).get("momenti", []))
+
+    def _colore_ok(v):
+        return isinstance(v, str) and len(v) == 7 and v.startswith("#") and all(c in "0123456789abcdefABCDEF" for c in v[1:])
+
+    for _tema in ("luminoso", "cupo"):
+        _per = (_luce.get("momenti", {}) or {}).get(_tema, {})
+        for _m in sorted(_momenti_luce):
+            if not _colore_ok(_per.get(_m)):
+                err(f"{_luce_rel}: momenti.{_tema}.{_m} deve essere un colore #rrggbb")
+    if not _colore_ok(_luce.get("sottosuolo")):
+        err(f"{_luce_rel}: sottosuolo deve essere un colore #rrggbb")
+    if not (isinstance(_luce.get("transizione"), (int, float)) and _luce["transizione"] > 0):
+        err(f"{_luce_rel}: transizione deve essere un numero di secondi > 0")
+
+    # --- cannocchiali (US-8B24) ---
+    # data/world/cannocchiali.json: luogo e bersaglio sono luoghi del mondo generato, il disegno c'e' nei due temi.
+    _can_rel = "data/world/cannocchiali.json"
+    _can = load_json(os.path.join(DATA, "world", "cannocchiali.json")) or {}
+    _luoghi_mondo = set((load_json(_mondo) or {}).get("luoghi", {})) if os.path.isfile(_mondo) else None
+    for _cid, _c in (_can.get("cannocchiali", {}) or {}).items():
+        for _k in ("luogo", "bersaglio"):
+            if _luoghi_mondo is not None and _c.get(_k) not in _luoghi_mondo:
+                err(f"{_can_rel} [{_cid}]: {_k} '{_c.get(_k)}' non e' un luogo di assets/world/mondo.json")
+        for _k in ("scostamento", "scostamento_bersaglio"):
+            _v = _c.get(_k, [0, 0])
+            if not (isinstance(_v, list) and len(_v) == 2 and all(isinstance(n, int) for n in _v)):
+                err(f"{_can_rel} [{_cid}]: {_k} deve essere [x, y] di interi")
+    for _k in ("volo", "lente", "nebbia"):
+        if not (isinstance((_can.get("vista") or {}).get(_k), (int, float)) and _can["vista"][_k] > 0):
+            err(f"{_can_rel}: vista.{_k} deve essere un numero > 0")
+    for _k, _v in ((_can.get("vista") or {}).get("colori", {}) or {}).items():
+        if not (isinstance(_v, str) and len(_v) == 7 and _v.startswith("#")):
+            err(f"{_can_rel}: vista.colori.{_k} deve essere un colore #rrggbb")
+    if "cannocchiale" not in vocab_arredi:
+        err("data/world/arredi.json: manca 'cannocchiale', il disegno dei cannocchiali (US-8B24)")
+
+    # --- fauna d'atmosfera (US-8B23b) ---
+    # data/world/fauna.json: ogni specie ha i suoi fogli (assets/placeholder/fauna_<specie>_<animazione>.png per ogni
+    # animazione della categoria fauna), regioni del mondo generato, momenti di data/schema/time.json, numeri sensati.
+    _fau_rel = "data/world/fauna.json"
+    _fau = (load_json(os.path.join(DATA, "world", "fauna.json")) or {}).get("specie", {})
+    _anim_fauna = [k for k in ((load_json(os.path.join(DATA, "animations.json")) or {}).get("fauna", {}))
+                   if not k.startswith("_")]
+    _momenti_t = set((load_json(os.path.join(DATA, "schema", "time.json")) or {}).get("momenti", []))
+    _regioni_mondo = set((load_json(_mondo) or {}).get("regioni", [])) if os.path.isfile(_mondo) else None
+    if not _fau:
+        err(f"{_fau_rel}: 'specie' deve essere un dict non vuoto")
+    for _sid, _s in _fau.items():
+        _ctx = f"{_fau_rel} [{_sid}]"
+        for _a in _anim_fauna:
+            if not os.path.isfile(os.path.join(ROOT, "assets", "placeholder", f"fauna_{_sid}_{_a}.png")):
+                err(f"{_ctx}: manca assets/placeholder/fauna_{_sid}_{_a}.png (tools/art/build_fauna.py)")
+        if _regioni_mondo is not None:
+            for _r in _s.get("regioni", []):
+                if _r not in _regioni_mondo:
+                    err(f"{_ctx}: regione '{_r}' non e' nel mondo generato (mondo.json regioni)")
+        for _m in _s.get("momenti", []):
+            if _m not in _momenti_t:
+                err(f"{_ctx}: momento '{_m}' non e' in data/schema/time.json")
+        if _s.get("fugge") not in ("vola", "corre", "resta"):
+            err(f"{_ctx}: fugge deve essere vola, corre o resta")
+        _pr = _s.get("probabilita")
+        if not (isinstance(_pr, (int, float)) and 0 < _pr <= 1):
+            err(f"{_ctx}: probabilita deve essere in (0, 1]")
+        _g = _s.get("gruppo")
+        if not (isinstance(_g, list) and len(_g) == 2 and all(isinstance(n, int) for n in _g) and 1 <= _g[0] <= _g[1]):
+            err(f"{_ctx}: gruppo deve essere [min, max] con 1 <= min <= max")
+
+    # --- ingredienti delle formule (US-808) ---
+    # Ogni ingrediente citato da una formula di potion (tutte quelle in
+    # data/potions/formulas.json appartengono ai 10 Pathway attivi: il file
+    # non ne contiene di differiti) deve esistere come item di categoria
+    # 'ingrediente' in data/items/ — generato da
+    # tools/generate_formula_ingredients.py, mai un id fantasma citato solo
+    # nella formula.
+    for _fid, _f in formulas.items():
+        for _ing in _f.get("ingredients", []):
+            if _ing not in item_cat:
+                err(f"data/potions/formulas.json [{_fid}]: ingrediente '{_ing}' non esiste come item "
+                    f"in data/items/ (lancia tools/generate_formula_ingredients.py)")
+            elif item_cat[_ing] != "ingrediente":
+                err(f"data/potions/formulas.json [{_fid}]: ingrediente '{_ing}' esiste come item ma "
+                    f"con categoria '{item_cat[_ing]}', non 'ingrediente'")
 
     # --- sigilli (data/sigils/, US-315) ---
     set_doc = load_json(os.path.join(DATA, "schema", "sigil_effect_types.json"))
@@ -1367,6 +2188,18 @@ def main():
                 v = npc.get(campo)
                 if not isinstance(v, str) or not v.startswith("npc."):
                     err(f"{rel} [{nid}]: {campo} '{v}' deve avere il prefisso 'npc.'")
+            # US-8B12d: aspetto.sprite = fogli personaggio_<sprite>_<anim> (tools/art/build_npc.py)
+            asp = (npc.get("aspetto") or {}).get("sprite") if isinstance(npc.get("aspetto"), dict) else None
+            if asp is not None and not os.path.exists(os.path.join(ROOT, "assets", "placeholder", f"personaggio_{asp}_idle.png")):
+                err(f"{rel} [{nid}]: aspetto.sprite '{asp}' senza assets/placeholder/personaggio_{asp}_idle.png (tools/art/build_npc.py)")
+            # US-8B35: e il suo ritratto 64x80 (tools/art/build_ritratti.py), mostrato nella pagina del dialogo
+            _rit = os.path.join(ROOT, "assets", "ritratti", f"{asp}.png")
+            if asp is not None and not os.path.isfile(_rit):
+                err(f"{rel} [{nid}]: aspetto.sprite '{asp}' senza assets/ritratti/{asp}.png (tools/art/build_ritratti.py)")
+            elif asp is not None:
+                with open(_rit, "rb") as _fh:
+                    if struct.unpack(">II", _fh.read(24)[16:24]) != (64, 80):
+                        err(f"{rel} [{nid}]: assets/ritratti/{asp}.png non e' 64x80 (tools/art/build_ritratti.py)")
             if npc.get("region_id") not in region_ids:
                 err(f"{rel} [{nid}]: region_id '{npc.get('region_id')}' non e' una regione di regions.json")
             for voce in npc.get("schedule", []):
@@ -1381,6 +2214,16 @@ def main():
                 for iid in ven.get("listino", []):
                     if iid not in item_ids:
                         err(f"{rel} [{nid}]: vendor.listino '{iid}' non e' un item esistente")
+            craf = npc.get("crafter")
+            if craf is not None:
+                for bpid in craf.get("blueprints", []):
+                    if bpid not in blueprints:
+                        err(f"{rel} [{nid}]: crafter.blueprints '{bpid}' non esiste in "
+                            f"data/forge/blueprints.json")
+                for ricid in craf.get("ricette", []):
+                    if ricid not in recipes:
+                        err(f"{rel} [{nid}]: crafter.ricette '{ricid}' non esiste in "
+                            f"data/potions/recipes.json")
             fid = npc.get("faction_id")
             if fid is not None and faction_ids and fid not in faction_ids:
                 err(f"{rel} [{nid}]: faction_id '{fid}' non e' in data/factions.json")
@@ -1393,6 +2236,46 @@ def main():
                 err(f"{rel}: manca l'NPC del roster '{atteso}' (design-npc-quest cap. 2)")
         if n_generici < 10:
             err(f"{rel}: solo {n_generici} npc_generic_*, attesi >= 10 (fool_9_inganno ne inganna 10)")
+
+        # US-1108 (fase 11): ogni npcs[].npc_id di un interno deve risolvere
+        # a un NPC vero - raccolti sopra, mentre si caricavano gli interni
+        # (npc_ids esiste solo ora, dopo il roster).
+        for irel, iid_int, npc_id in interni_npc_refs:
+            if npc_id not in npc_ids:
+                err(f"{irel} [{iid_int}]: npcs[].npc_id '{npc_id}' non esiste in "
+                    f"data/npc/roster.json")
+
+    # --- fonti degli ingredienti (US-809c, chiusura "fonti nel mondo") ---
+    # Ogni ingrediente citato da una formula deve avere ALMENO UNA fonte in
+    # gioco: un drop di nemico (US-809a, layout.drop), un venditore (US-809b,
+    # roster.json vendor.listino) o la raccolta a terra (US-809c, layout.
+    # oggetti). roster_doc e' definito subito sopra (blocco NPC); item_ids
+    # gia' in scope dal blocco item piu' in alto.
+    ingredienti_citati = set()
+    for _fid, _f in formulas.items():
+        ingredienti_citati.update(_f.get("ingredients", []))
+
+    fonti_trovate = set()
+    if roster_doc is not None:
+        for npc in roster_doc.get("npcs", []):
+            ven = npc.get("vendor")
+            if ven is not None:
+                fonti_trovate.update(ven.get("listino", []))
+    if os.path.isdir(layouts_dir):
+        for fn in sorted(os.listdir(layouts_dir)):
+            if not fn.endswith(".json"):
+                continue
+            _ldoc = load_json(os.path.join(layouts_dir, fn)) or {}
+            for lst in _ldoc.get("drop", {}).values():
+                fonti_trovate.update(lst)
+            for og in _ldoc.get("oggetti", []):
+                fonti_trovate.add(og.get("item_id"))
+
+    _mancanti = sorted(ingredienti_citati - fonti_trovate)
+    if _mancanti:
+        err(f"data/potions/formulas.json: {len(_mancanti)} ingredienti senza "
+            f"nessuna fonte in gioco (ne' drop, ne' listino, ne' oggetti a "
+            f"terra): {', '.join(_mancanti)}")
 
     # --- fazioni (data/factions.json, US-615) ---
     tracked_ev0 = load_json(os.path.join(DATA, "schema", "tracked_events.json")) or {}
@@ -1479,7 +2362,8 @@ def main():
     DLG_COND = {"acting_progress_min", "madness_max", "madness_min", "e_notte",
                 "fase_lunare", "foundation_min", "tier_min", "in_zona_tag",
                 "follia_min", "reputazione_min", "flag"}
-    DLG_EFFETTI = {"emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest", "impara_sinergia"}
+    DLG_EFFETTI = {"emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest", "impara_sinergia",
+                   "crea_su_richiesta"}
     _dlg_quest_ids = set()   # quest_id nominati da un effetto avvia_quest
     tracked_ev = load_json(os.path.join(DATA, "schema", "tracked_events.json")) or {}
     ev_names = set(tracked_ev.get("events", {}).keys())
@@ -1638,6 +2522,12 @@ def main():
             for t in s.get("tag", []):
                 if t not in valid_tags:
                     err(f"{rel} [{sid}]: tag sconosciuto '{t}' (aggiungilo a data/tags.json o correggilo)")
+            # US-8B20e: si costruisce dalla pagina Base col suo costo e si disegna fuori con l'arredo dello stesso id
+            for iid, q in (s.get("costo") or {}).items():
+                if iid not in item_ids or not isinstance(q, int) or q < 1:
+                    err(f"{rel} [{sid}]: costo.{iid} deve essere un oggetto di data/items/ con quantita' intera >= 1")
+            if sid not in vocab_arredi:
+                err(f"{rel} [{sid}]: manca l'arredo '{sid}' in data/world/arredi.json (il disegno fuori dalla base)")
     if n_structures < 1:
         err("data/structures/: nessun tipo di struttura, atteso almeno 1 "
             "(tg_2 e il base building parlano tramite questo registro)")
@@ -1766,6 +2656,9 @@ def main():
 
     # --- giardino (data/balance.json giardino + ingredienti coltivabili, US-328) ---
     giardino = (balance_doc or {}).get("giardino", {})
+    pd = giardino.get("pianta_da", 0.5)
+    if not (isinstance(pd, (int, float)) and 0 < pd < 1):
+        err("data/balance.json [giardino.pianta_da]: deve essere una frazione fra 0 e 1")
     tc = giardino.get("tempo_crescita_s")
     if not isinstance(tc, (int, float)) or tc <= 0:
         err("data/balance.json [giardino.tempo_crescita_s]: deve essere un numero > 0")
@@ -1899,6 +2792,32 @@ def main():
             f"(design-ui-libro.md + page_dialogo US-613b). Un tipo nuovo e' codice: va discusso.")
     book = load_json(os.path.join(DATA, "ui", "book.json"))
     if book:
+        # 2026-10-25: aspetto del libro, i file esistono e i colori sono in palette (#rrggbb di Endesga 32)
+        tema_libro = book.get("tema") or {}
+        for k, v in tema_libro.items():
+            if isinstance(v, str) and v.startswith("res://") and not os.path.exists(os.path.join(ROOT, v[6:])):
+                err(f"data/ui/book.json tema.{k}: '{v}' non esiste (tools/art/build_libro.py?)")
+        for k, v in (tema_libro.get("colori") or {}).items():
+            if not (isinstance(v, str) and re.fullmatch(r"#[0-9a-fA-F]{6}", v)):
+                err(f"data/ui/book.json tema.colori.{k}: '{v}' non e' un colore #rrggbb")
+        # US-8B74: la carta piccola dell'avvio e i 6 strati del panorama per ogni momento del TimeSystem
+        _av = tema_libro.get("avvio") or {}
+        if _av and not os.path.exists(os.path.join(ROOT, str(_av.get("carta", ""))[6:])):
+            err(f"data/ui/book.json tema.avvio.carta: '{_av.get('carta')}' non esiste (tools/art/build_libro.py)")
+        _pano = tema_libro.get("panorama") or {}
+        if _pano:
+            _momenti = (load_json(os.path.join(DATA, "schema", "time.json")) or {}).get("momenti", [])
+            if set(_pano.get("ore", {})) != set(_momenti):
+                err(f"data/ui/book.json tema.panorama.ore: i momenti devono essere quelli di time.json {_momenti}")
+            _coperte = Counter()
+            for _m, (_a, _b) in (_pano.get("ore") or {}).items():
+                _coperte.update(range(_a, _b) if _a <= _b else list(range(_a, 24)) + list(range(0, _b)))
+            if sorted(_coperte) != list(range(24)) or any(n != 1 for n in _coperte.values()):
+                err("data/ui/book.json tema.panorama.ore: ogni ora del giorno deve stare in un solo momento")
+            for _m in _momenti:
+                for _st in _pano.get("strati", []):
+                    if not os.path.isfile(os.path.join(ROOT, str(_pano.get("cartella", ""))[6:], _m, f"{_st}.png")):
+                        err(f"data/ui/book.json tema.panorama: manca {_m}/{_st}.png (tools/art/build_panorami.py)")
         pages = book.get("pages", [])
         seen_ids, seen_ord = Counter(), Counter()
         for p in pages:
@@ -1980,6 +2899,23 @@ def main():
         warn(f"data/i18n/it.json: {stubs}/{len(i18n_it)} stringhe ancora da tradurre "
              f"(valore 'TODO ...'). Non e' un errore: e' lavoro di traduzione.")
 
+    # --- Modalita' di gioco (data/modalita.json, decisione 2026-10-20) ---
+    # I nomi dei moltiplicatori sono un vocabolario chiuso: il codice li legge per nome (hurtbox, ability_engine).
+    MOLTIPLICATORI = {"danno_al_giocatore", "danno_ai_nemici", "cure"}
+    mod = load_json(os.path.join(DATA, "modalita.json"))
+    if mod:
+        tutte = mod.get("modalita", {})
+        if mod.get("default") not in tutte:
+            err(f"data/modalita.json: default '{mod.get('default')}' non e' tra le modalita' {sorted(tutte)}")
+        for mid, m in tutte.items():
+            if m.get("tema_arte") not in ("luminoso", "cupo"):
+                err(f"data/modalita.json [{mid}]: tema_arte dev'essere 'luminoso' o 'cupo'")
+            for nome, v in m.get("moltiplicatori", {}).items():
+                if nome not in MOLTIPLICATORI:
+                    err(f"data/modalita.json [{mid}]: moltiplicatore '{nome}' sconosciuto (ammessi: {sorted(MOLTIPLICATORI)})")
+                elif not isinstance(v, (int, float)) or isinstance(v, bool) or v <= 0:
+                    err(f"data/modalita.json [{mid}.{nome}]: dev'essere un numero > 0")
+
     # --- VFX (data/vfx.json, US-226) ---
     vfx = load_json(os.path.join(DATA, "vfx.json"))
     if vfx:
@@ -2022,6 +2958,35 @@ def main():
                     err(f"data/vfx.json [primitive_vfx.{name}]: frames dev'essere un intero > 0")
                 if not isinstance(e.get("impact_frame"), bool):
                     err(f"data/vfx.json [primitive_vfx.{name}]: impact_frame dev'essere true/false")
+                # US-8B41: un foglio vero ha tanti frame in colonna quanti ne dicono i dati
+                for _sp, _fr in ((e.get("sprite"), e.get("frames")),
+                                 ((e.get("scoppio") or {}).get("sprite"), (e.get("scoppio") or {}).get("frames"))):
+                    _png = os.path.join(ROOT, "assets", "vfx", f"{_sp}.png")
+                    if _sp and os.path.isfile(_png) and isinstance(_fr, int) and _fr > 0:
+                        with open(_png, "rb") as _fh:
+                            _larg = struct.unpack(">I", _fh.read(24)[16:20])[0]
+                        if _larg % _fr:
+                            err(f"data/vfx.json [primitive_vfx.{name}]: assets/vfx/{_sp}.png non e' fatto di {_fr} "
+                                f"frame (python tools/art/build_vfx.py)")
+        # US-8B40b: il feedback del colpo usa i momenti di audio.json combat_feedback e ha il suo foglio
+        _cf = set((load_json(os.path.join(DATA, "audio.json")) or {}).get("combat_feedback", {}))
+        for _nome, _fb in vfx.get("feedback_colpo", {}).items():
+            if _nome.startswith("_"):
+                continue
+            if _nome not in _cf:
+                err(f"data/vfx.json [feedback_colpo.{_nome}]: momento non in audio.json combat_feedback")
+            _png = os.path.join(ROOT, "assets", "vfx", f"{_fb.get('sprite')}.png")
+            _fr = _fb.get("frames")
+            if not os.path.isfile(_png) or not isinstance(_fr, int) or _fr <= 0:
+                err(f"data/vfx.json [feedback_colpo.{_nome}]: manca assets/vfx/{_fb.get('sprite')}.png o frames "
+                    f"(python tools/art/build_vfx.py)")
+                continue
+            with open(_png, "rb") as _fh:
+                if struct.unpack(">I", _fh.read(24)[16:20])[0] % _fr:
+                    err(f"data/vfx.json [feedback_colpo.{_nome}]: il foglio non e' fatto di {_fr} frame")
+            for _k in ("inchiostro", "primario", "accento"):
+                if not re.fullmatch(r"#[0-9a-fA-F]{6}", str((_fb.get("colori") or {}).get(_k, ""))):
+                    err(f"data/vfx.json [feedback_colpo.{_nome}]: colori.{_k} dev'essere un #rrggbb")
         # nessun campo VFX sulle abilita': ability.schema.json non si tocca
         for fn in sorted(os.listdir(adir)) if os.path.isdir(adir) else []:
             if not fn.endswith(".json"):
@@ -2170,6 +3135,250 @@ def main():
     if _end_ids != {"apoteosi", "consumazione", "rinuncia"}:
         err(f"data/endings.json: attesi esattamente i 3 finali con la fase 7 chiusa, "
             f"trovati {sorted(_end_ids)} (US-721).")
+
+    # --- Pathway Non-Standard (data/pathways_non_standard/, fase 9 US-901) ---
+    # Terza categoria, separata da data/pathways/ (10 standard attivi) e
+    # data/pathways_deferred/ (12 standard differiti): avanzano per Boon, non
+    # per pozione+recitazione (data/schema/boon.schema.json). Non hanno
+    # gruppo (fusione/cambio Pathway restano solo fra Pathway standard,
+    # US-903) e non contano nell'EXPECTED_PATHWAYS/GROUP_SIZES di sopra:
+    # vivono in una cartella diversa, quel codice non li legge mai. La
+    # cartella non esiste finche' US-904 non scrive il primo file (Eternal
+    # Aeon): nessun errore se assente, e' lo stato atteso di questa story.
+    _quest_ids_tutte = set(quest_docs.keys())
+    pnsdir = os.path.join(DATA, "pathways_non_standard")
+    if os.path.isdir(pnsdir):
+        for fn in sorted(f for f in os.listdir(pnsdir) if f.endswith(".json")):
+            _doc = load_json(os.path.join(pnsdir, fn))
+            if _doc is None:
+                continue
+            _rel = f"data/pathways_non_standard/{fn}"
+            _pid = _doc.get("id")
+            if fn != f"{_pid}.json":
+                err(f"{_rel}: il nome file non corrisponde all'id '{_pid}'")
+            if _doc.get("categoria") != "non_standard":
+                err(f"{_rel}: categoria deve essere 'non_standard' (trovato: {_doc.get('categoria')!r})")
+            if _doc.get("group") is not None:
+                err(f"{_rel}: group deve essere null per un Pathway non_standard "
+                    f"(non appartiene a nessun gruppo, US-903).")
+            _seqs = _doc.get("sequences", [])
+            if len(_seqs) != EXPECTED_SEQUENCES_PER_PATHWAY:
+                err(f"{_rel}: {len(_seqs)} sequenze, attese {EXPECTED_SEQUENCES_PER_PATHWAY}")
+            _seen_nums = []
+            for _seq in _seqs:
+                _n = _seq.get("sequence")
+                _seen_nums.append(_n)
+                _sid = _seq.get("id")
+                if _sid != f"{_pid}_{_n}":
+                    err(f"{_rel}: id sequenza '{_sid}' non coerente con pathway/numero")
+                if _seq.get("tier") not in VALID_TIERS:
+                    err(f"{_rel} [{_sid}]: tier non valido '{_seq.get('tier')}'")
+                elif _seq.get("tier") != expected_tier(_n):
+                    err(f"{_rel} [{_sid}]: tier '{_seq.get('tier')}' errato, atteso '{expected_tier(_n)}'")
+                if not _seq.get("name"):
+                    err(f"{_rel} [{_sid}]: nome sequenza mancante")
+                if len(_seq.get("concept", "")) < 20:
+                    err(f"{_rel} [{_sid}]: concept mancante o troppo vago. Ogni sequenza "
+                        f"deve dichiarare COSA FA IL GIOCATORE a quel livello.")
+                _stub = bool(_seq.get("stub"))
+                _has_potion = _seq.get("potion") is not None
+                _has_boon = _seq.get("boon") is not None
+                if _has_potion:
+                    err(f"{_rel} [{_sid}]: 'potion' su un Pathway non_standard - usa 'boon' (US-901).")
+                if _stub:
+                    if _has_boon:
+                        err(f"{_rel} [{_sid}]: marcata stub ma ha un boon: togli il flag o svuotalo.")
+                elif not _has_boon:
+                    err(f"{_rel} [{_sid}]: nessun 'boon' e nessun flag stub: il giocatore "
+                        f"non ha un percorso di avanzamento a questa Sequenza.")
+                elif isinstance(_seq.get("boon"), dict):
+                    for _e in valida_boon(_rel, _sid, _seq["boon"], events,
+                                           _quest_ids_tutte, item_ids, char_ids):
+                        err(_e)
+            if sorted(_seen_nums, reverse=True) != list(range(9, -1, -1)):
+                err(f"{_rel}: le sequenze non coprono esattamente 9..0 "
+                    f"(trovate {sorted(_seen_nums, reverse=True)})")
+
+    # --- chiusura fase 8 (US-814): la vertical slice e' giocabile ---
+    # "ogni ingrediente attivo ha una fonte" e' gia' il blocco US-809c qui
+    # sopra (fonti_trovate/senza fonte): non lo riscrivo.
+    _FASE_8_REGIONI = ["mirwada", "marche_crepuscolo", "valle_madre",
+                        "archivio_sepolto", "frontiera_porte"]
+    for _rid in _FASE_8_REGIONI:
+        if not os.path.exists(os.path.join(layouts_dir, f"{_rid}.json")):
+            err(f"data/world/layouts/{_rid}.json: layout della fase 8 mancante (US-814: "
+                f"le 5 regioni devono avere tutte un layout disegnato a mano).")
+        else:
+            _lay = load_json(os.path.join(layouts_dir, f"{_rid}.json")) or {}
+            _nemici_lay = _lay.get("nemici", [])
+            if not any(float(n.get("scala", 1.0)) > 1.0 for n in _nemici_lay if isinstance(n, dict)):
+                err(f"data/world/layouts/{_rid}.json: nessun nemico con scala > 1.0 - "
+                    f"ogni regione deve avere almeno un boss (US-814/US-806).")
+
+    def _png_size(path):
+        try:
+            with open(path, "rb") as fh:
+                head = fh.read(24)
+            if len(head) < 24 or head[:8] != b"\x89PNG\r\n\x1a\n":
+                return None
+            w, h = struct.unpack(">II", head[16:24])
+            return w, h
+        except OSError:
+            return None
+
+    _PLACEHOLDER = os.path.join(ROOT, "assets", "placeholder")
+    _anim_doc = load_json(os.path.join(DATA, "animations.json")) or {}
+    _n_direzioni = len((_anim_doc.get("convenzioni", {}) or {}).get("direzioni", [])) or 4
+    _fogli_attesi = {}
+    # dimensione_frame dai dati (64 dal 2026-10-14, US-8B01); npc/oggetti/passaggio/gate restano a 32
+    _dim_frame = int(((_anim_doc.get("convenzioni", {}) or {}).get("dimensione_frame") or [32])[0])
+    for _cat in ("personaggio", "nemico_base", "pet"):
+        for _nome, _spec in (_anim_doc.get(_cat, {}) or {}).items():
+            if _nome.startswith("_") or not isinstance(_spec, dict):
+                continue
+            _righe = _n_direzioni if _spec.get("direzionale", True) else 1
+            _fogli_attesi[f"{_cat}_{_nome}.png"] = (_dim_frame * int(_spec.get("frames", 1)), _dim_frame * _righe)
+    _fogli_attesi.update({
+        "npc_popolano.png": (32, 32 * 6),
+        "oggetti.png": (32 * 9, 32),
+        "passaggio.png": (32, 32),
+        "gate.png": (32, 32),
+    })
+    # il numero di fogli segue data/animations.json (con l'arte a 64 px non sono piu' 19+4 fissi):
+    # ogni foglio atteso qui sotto deve esistere con la sua dimensione.
+    for _nome_file, (_w_atteso, _h_atteso) in _fogli_attesi.items():
+        _path = os.path.join(_PLACEHOLDER, _nome_file)
+        if not os.path.exists(_path):
+            err(f"assets/placeholder/{_nome_file}: foglio sprite mancante (US-814: la fase 8 "
+                f"e' chiusa, i 19+4 fogli devono esistere - rilancia tools/generate_sprites.py).")
+            continue
+        _dim = _png_size(_path)
+        if _dim != (_w_atteso, _h_atteso):
+            err(f"assets/placeholder/{_nome_file}: dimensione {_dim}, attesa "
+                f"({_w_atteso}, {_h_atteso}) (US-814).")
+
+    # --- chiusura fase 9 (US-907): il primo Pathway Non-Standard e' completo ---
+    # La validazione PIENA di data/pathways_non_standard/ (categoria, group,
+    # boon, tier...) e' gia' nel blocco dedicato piu' sopra (US-901): qui solo
+    # il criterio di chiusura, stesso stile delle fasi precedenti.
+    if not os.path.exists(os.path.join(DATA, "schema", "boon.schema.json")):
+        err("data/schema/boon.schema.json: mancante (US-901: schema del motore Boon).")
+    _ea_path = os.path.join(DATA, "pathways_non_standard", "eternal_aeon.json")
+    if not os.path.exists(_ea_path):
+        err("data/pathways_non_standard/eternal_aeon.json: mancante (US-904/905: "
+            "il primo Pathway Non-Standard deve esistere con la fase 9 chiusa).")
+    else:
+        _ea_doc = load_json(_ea_path) or {}
+        _ea_seqs = _ea_doc.get("sequences", [])
+        if len(_ea_seqs) != 10:
+            err(f"data/pathways_non_standard/eternal_aeon.json: {len(_ea_seqs)} sequenze, "
+                f"attese 10 (fase 9 chiusa).")
+        for _ea_seq in _ea_seqs:
+            if bool(_ea_seq.get("stub", False)):
+                err(f"data/pathways_non_standard/eternal_aeon.json [{_ea_seq.get('id')}]: "
+                    f"ancora stub - la fase 9 e' chiusa, ogni Sequenza deve essere completa "
+                    f"(US-904/905).")
+    if not os.path.exists(os.path.join(DATA, "abilities", "eternal_aeon.json")):
+        err("data/abilities/eternal_aeon.json: mancante (US-904/905: le abilita' di "
+            "Eternal Aeon devono esistere con la fase 9 chiusa).")
+
+    # --- chiusura fase 10 (US-1014): il mondo continuo esiste, con un
+    # villaggio e una struttura grande veri ---
+    # La validazione PIENA di world_offset/campagna/edifici/interni e' gia'
+    # nei blocchi dedicati piu' sopra (US-1001/1010/1015): qui solo il
+    # criterio di chiusura, stesso stile delle fasi precedenti.
+    _regioni_doc = load_json(os.path.join(DATA, "world", "regions.json")) or {}
+    _regioni_fase10 = _regioni_doc.get("regions", [])
+    if len(_regioni_fase10) != 5:
+        err(f"data/world/regions.json: {len(_regioni_fase10)} regioni, attese 5 (fase 10 chiusa).")
+    for _reg in _regioni_fase10:
+        _rid10 = _reg.get("id", "?")
+        if len(_reg.get("world_offset", [])) != 2:
+            err(f"data/world/regions.json [{_rid10}]: world_offset mancante o malformato "
+                f"(fase 10 chiusa: ogni regione deve stare nella griglia condivisa, US-1001).")
+
+    _villaggio_trovato = False
+    _struttura_grande_trovata = False
+    for _rid10 in ["mirwada", "marche_crepuscolo", "valle_madre", "archivio_sepolto", "frontiera_porte"]:
+        _lay10_path = os.path.join(layouts_dir, f"{_rid10}.json")
+        if not os.path.exists(_lay10_path):
+            continue
+        _lay10 = load_json(_lay10_path) or {}
+        _edifici10 = _lay10.get("edifici", [])
+        if len(_edifici10) >= 3:
+            _villaggio_trovato = True
+        for _ed in _edifici10:
+            _iid10 = _ed.get("interno_id", "")
+            _int10_path = os.path.join(interni_dir, f"{_iid10}.json")
+            if not os.path.exists(_int10_path):
+                continue
+            _int10 = load_json(_int10_path) or {}
+            _mappa10 = _int10.get("mappa", [])
+            _area10 = len(_mappa10) * (len(_mappa10[0]) if _mappa10 else 0)
+            if _area10 >= 200:
+                _struttura_grande_trovata = True
+    if not _villaggio_trovato:
+        err("fase 10 chiusa: nessuna regione ha almeno 3 edifici collegati (US-1011, "
+            "'il primo villaggio vero') - atteso almeno un insediamento con piu' case.")
+    if not _struttura_grande_trovata:
+        err("fase 10 chiusa: nessun interno di edificio ha un'area di almeno 200 celle "
+            "(US-1012, 'la prima struttura grande') - atteso un interno a piu' stanze, "
+            "non solo una singola stanza come le case di un villaggio.")
+
+    # --- chiusura fase 11 (US-1114): rarita'/crafting NPC/villaggi esistono
+    # e sono coerenti --- La validazione PIENA di ogni pezzo (rarita' in
+    # item.schema.json, crea_su_richiesta in DLG_EFFETTI, campagna.edifici)
+    # e' gia' nei blocchi dedicati piu' sopra: qui solo il criterio di
+    # chiusura, stesso stile delle fasi precedenti.
+    _tutti_gli_edifici_fase11 = []
+    for _fn11 in sorted(os.listdir(layouts_dir)) if os.path.isdir(layouts_dir) else []:
+        if _fn11.endswith(".json"):
+            for _ed11 in (load_json(os.path.join(layouts_dir, _fn11)) or {}).get("edifici", []):
+                _tutti_gli_edifici_fase11.append(_ed11.get("interno_id", ""))
+    for _ed11 in (campagna_doc or {}).get("edifici", []):
+        _tutti_gli_edifici_fase11.append(_ed11.get("interno_id", ""))
+
+    _npc_docs11 = {n.get("id"): n for n in (roster_doc or {}).get("npcs", [])}
+    _crafter_raggiungibili = 0
+    for _fn11 in sorted(os.listdir(interni_dir)) if os.path.isdir(interni_dir) else []:
+        if not _fn11.endswith(".json"):
+            continue
+        _int11 = load_json(os.path.join(interni_dir, _fn11)) or {}
+        _iid11 = _int11.get("interno_id", "")
+        if _iid11 not in _tutti_gli_edifici_fase11:
+            continue
+        for _npc11 in _int11.get("npcs", []):
+            _npc_doc11 = _npc_docs11.get(_npc11.get("npc_id", ""), {})
+            if _npc_doc11.get("crafter"):
+                _crafter_raggiungibili += 1
+    if _crafter_raggiungibili < 4:
+        err(f"fase 11 chiusa: solo {_crafter_raggiungibili} crafter raggiungibili (dentro un "
+            f"interno referenziato da un edifici[], layout o campagna) - attesi almeno 4 "
+            f"(Rosalba, Bram, Fenwick, Orsolya).")
+
+    _oggetti_senza_rarita = []
+    for _fn11 in sorted(os.listdir(os.path.join(DATA, "items"))):
+        if not _fn11.endswith(".json"):
+            continue
+        for _it11 in (load_json(os.path.join(DATA, "items", _fn11)) or {}).get("items", []):
+            if "rarita" not in _it11:
+                _oggetti_senza_rarita.append(_it11.get("id", "?"))
+    if _oggetti_senza_rarita:
+        err(f"fase 11 chiusa: {len(_oggetti_senza_rarita)} oggetti senza 'rarita' esplicita "
+            f"(US-1102, il retrofit deve coprire ogni oggetto): {_oggetti_senza_rarita[:5]}...")
+
+    _crea_su_richiesta_usato = False
+    for _fn11 in sorted(os.listdir(dlg_dir)) if os.path.isdir(dlg_dir) else []:
+        if not _fn11.endswith(".json"):
+            continue
+        for _nodo11 in (load_json(os.path.join(dlg_dir, _fn11)) or {}).get("nodes", {}).values():
+            for _sc11 in _nodo11.get("choices", []):
+                for _ef11 in _sc11.get("effetti", []):
+                    if _ef11.get("tipo") == "crea_su_richiesta":
+                        _crea_su_richiesta_usato = True
+    if not _crea_su_richiesta_usato:
+        err("fase 11 chiusa: nessun dialogo usa l'effetto 'crea_su_richiesta' (US-1106) - "
+            "il 7o effetto di dialogo deve essere usato almeno una volta.")
 
     report()
     return 1 if errors else 0

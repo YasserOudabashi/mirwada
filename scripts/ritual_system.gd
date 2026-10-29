@@ -175,6 +175,13 @@ func _completa() -> void:
 	var f: Node = get_node_or_null("/root/Foundation")
 	if f != null:
 		f.call("applica", f.call("costante", "bonus_recitazione_completa"), "rituale_completato")
+	# US-804: nessun dato di rituale porta oggi un "tipo" (tutti sono
+	# advancement_ritual, data/pathways/*.json), quindi nessun filtro
+	# tipo_rituale da popolare -- il filtro resta nel vocabolario per
+	# quando servira'.
+	var et: Node = get_node_or_null("/root/EventTracker")
+	if et != null:
+		et.call("emit_event", "ritual_completed", {})
 	rituale_completato.emit(_sequenza)
 
 

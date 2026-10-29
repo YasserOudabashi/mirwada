@@ -1,0 +1,674 @@
+{
+ "_comment": "Disposizione del mondo di prova (US-8B13). La legge tools/art/build_world.py, la scrive anche l'artifact 'tavolo tattico'. x, y in frazioni: zone del continente (x di W, y di HC = altezza del continente), isole (x di W, y di H). peso >1 = zona piu' piccola. 'spostati' vince sui suggerimenti del generatore: [x, y] in tile = posizione decisa, null = cancellato. citta.quartieri: centro di ogni quartiere relativo al centro citta' (x, y in unita' di raggio) e peso. schede: per ogni luogo tipo, descrizione, grandezza (raggio dello spiazzo), terreno, contenuto. tratti: pennellate, strade, fiumi, gallerie (punti in tile, r = raggio).",
+ "terra": {
+  "archivio_sepolto": {
+   "peso": 1.3,
+   "x": 0.85,
+   "y": 0.18
+  },
+  "marche_crepuscolo": {
+   "peso": 1.1,
+   "x": 0.15,
+   "y": 0.35
+  },
+  "mirwada": {
+   "peso": 1,
+   "x": 0.43,
+   "y": 0.8
+  },
+  "terra_di_mezzo": {
+   "peso": 1.05,
+   "x": 0.52,
+   "y": 0.42
+  },
+  "valle_madre": {
+   "peso": 1,
+   "x": 0.87,
+   "y": 0.7
+  }
+ },
+ "mezzo": {
+  "colline": {
+   "x": 0.34,
+   "y": 0.45
+  },
+  "foreste": {
+   "x": 0.64,
+   "y": 0.6
+  },
+  "paludi": {
+   "x": 0.71,
+   "y": 0.3
+  },
+  "steppa": {
+   "x": 0.5,
+   "y": 0.12
+  }
+ },
+ "isole": [
+  {
+   "id": "frontiera_porte",
+   "profilo": "frontiera",
+   "r": 245,
+   "x": 0.52,
+   "y": 0.74
+  },
+  {
+   "id": "isola_vulcanica",
+   "profilo": "vulcanica",
+   "r": 55,
+   "x": 0.12,
+   "y": 0.88
+  },
+  {
+   "id": "isola_tropicale",
+   "profilo": "tropicale",
+   "r": 52,
+   "x": 0.9,
+   "y": 0.63
+  },
+  {
+   "id": "isola_pirati",
+   "profilo": "pirati",
+   "r": 48,
+   "x": 0.2,
+   "y": 0.64
+  },
+  {
+   "id": "isola_relitto",
+   "profilo": "relitto",
+   "r": 32,
+   "x": 0.06,
+   "y": 0.72
+  },
+  {
+   "id": "isola_rovine",
+   "profilo": "rovine",
+   "r": 34,
+   "x": 0.93,
+   "y": 0.89
+  },
+  {
+   "id": "isola_ghiacciata",
+   "profilo": "ghiacciata",
+   "r": 34,
+   "x": 0.32,
+   "y": 0.93
+  },
+  {
+   "id": "isola_mostro",
+   "profilo": "mostro",
+   "r": 36,
+   "x": 0.78,
+   "y": 0.94
+  },
+  {
+   "id": "atollo",
+   "profilo": "atollo",
+   "r": 40,
+   "x": 0.27,
+   "y": 0.8
+  },
+  {
+   "id": "isola_boss",
+   "profilo": "boss",
+   "r": 28,
+   "x": 0.05,
+   "y": 0.96
+  },
+  {
+   "id": "scoglio_faro",
+   "profilo": "faro",
+   "r": 12,
+   "x": 0.3,
+   "y": 0.53
+  },
+  {
+   "id": "isolotto_1",
+   "profilo": "rocciosa",
+   "r": 14,
+   "x": 0.7,
+   "y": 0.56
+  },
+  {
+   "id": "isolotto_2",
+   "profilo": "relitto",
+   "r": 12,
+   "x": 0.38,
+   "y": 0.55
+  },
+  {
+   "id": "isolotto_3",
+   "profilo": "rovine",
+   "r": 16,
+   "x": 0.98,
+   "y": 0.76
+  },
+  {
+   "id": "isolotto_4",
+   "profilo": "tropicale",
+   "r": 18,
+   "x": 0.45,
+   "y": 0.975
+  },
+  {
+   "id": "isolotto_5",
+   "profilo": "rocciosa",
+   "r": 15,
+   "x": 0.63,
+   "y": 0.97
+  },
+  {
+   "id": "isolotto_6",
+   "profilo": "boschiva",
+   "r": 13,
+   "x": 0.08,
+   "y": 0.56
+  },
+  {
+   "id": "isola_nuova_20",
+   "profilo": "boschiva",
+   "r": 20,
+   "x": 0.6867,
+   "y": 0.542
+  }
+ ],
+ "citta": {
+  "quartieri": {
+   "bassifondi": {
+    "peso": 1,
+    "x": -1.05,
+    "y": -0.15
+   },
+   "centro_antico": {
+    "peso": 1,
+    "x": 0.05,
+    "y": -0.55
+   },
+   "centro_storico": {
+    "peso": 1,
+    "x": 0.2,
+    "y": 0.05
+   },
+   "citta_nuova": {
+    "peso": 1,
+    "x": 0.95,
+    "y": -0.5
+   },
+   "porto_commerciale": {
+    "peso": 0.75,
+    "x": 0,
+    "y": 0.45
+   },
+   "quartiere_operaio": {
+    "peso": 1,
+    "x": -0.55,
+    "y": 0.05
+   }
+  },
+  "raggio": 55
+ },
+ "spostati": {
+  "boss": {},
+  "ingressi": {},
+  "luoghi": {},
+  "villaggi": {}
+ },
+ "note": [],
+ "schede": {
+  "boss": {},
+  "ingressi": {},
+  "luoghi": {},
+  "villaggi": {}
+ },
+ "tratti": [
+  {
+   "id": "tmv7twlp4rmh",
+   "livello": "sopra",
+   "punti": [
+    [
+     766,
+     354
+    ],
+    [
+     767,
+     357
+    ],
+    [
+     769,
+     358
+    ],
+    [
+     771,
+     359
+    ],
+    [
+     773,
+     360
+    ]
+   ],
+   "r": 4,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twm724o9",
+   "livello": "sopra",
+   "punti": [
+    [
+     775,
+     356
+    ]
+   ],
+   "r": 4,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twmctba0",
+   "livello": "sopra",
+   "punti": [
+    [
+     774,
+     355
+    ]
+   ],
+   "r": 4,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twmdwqvx",
+   "livello": "sopra",
+   "punti": [
+    [
+     774,
+     354
+    ]
+   ],
+   "r": 4,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twmhryak",
+   "livello": "sopra",
+   "punti": [
+    [
+     769,
+     346
+    ]
+   ],
+   "r": 4,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twmk57mp",
+   "livello": "sopra",
+   "punti": [
+    [
+     768,
+     344
+    ],
+    [
+     764,
+     344
+    ],
+    [
+     761,
+     344
+    ],
+    [
+     773,
+     358
+    ]
+   ],
+   "r": 4,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twp39iiv",
+   "livello": "sopra",
+   "punti": [
+    [
+     763,
+     347
+    ],
+    [
+     766,
+     349
+    ],
+    [
+     768,
+     350
+    ],
+    [
+     770,
+     351
+    ],
+    [
+     773,
+     352
+    ],
+    [
+     776,
+     354
+    ],
+    [
+     779,
+     355
+    ]
+   ],
+   "r": 4,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twpktb5n",
+   "livello": "sopra",
+   "punti": [
+    [
+     779,
+     355
+    ]
+   ],
+   "r": 4,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twpnghok",
+   "livello": "sopra",
+   "punti": [
+    [
+     779,
+     355
+    ]
+   ],
+   "r": 4,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twppr031",
+   "livello": "sopra",
+   "punti": [
+    [
+     780,
+     354
+    ]
+   ],
+   "r": 4,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twpse3i5",
+   "livello": "sopra",
+   "punti": [
+    [
+     778,
+     353
+    ]
+   ],
+   "r": 4,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twpv179d",
+   "livello": "sopra",
+   "punti": [
+    [
+     776,
+     352
+    ]
+   ],
+   "r": 4,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twpxh4vr",
+   "livello": "sopra",
+   "punti": [
+    [
+     774,
+     351
+    ]
+   ],
+   "r": 4,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twq27xkp",
+   "livello": "sopra",
+   "punti": [
+    [
+     773,
+     350
+    ]
+   ],
+   "r": 4,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twywfk9n",
+   "livello": "sopra",
+   "punti": [
+    [
+     364,
+     307
+    ]
+   ],
+   "r": 0,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twz5a1s1",
+   "livello": "sopra",
+   "punti": [
+    [
+     365,
+     307
+    ]
+   ],
+   "r": 0,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twz8moln",
+   "livello": "sopra",
+   "punti": [
+    [
+     366,
+     307
+    ],
+    [
+     366,
+     306
+    ]
+   ],
+   "r": 0,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twzvsx5c",
+   "livello": "sopra",
+   "punti": [
+    [
+     365,
+     305
+    ]
+   ],
+   "r": 0,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twzvua9w",
+   "livello": "sopra",
+   "punti": [
+    [
+     363,
+     306
+    ]
+   ],
+   "r": 0,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twzvwta8",
+   "livello": "sopra",
+   "punti": [
+    [
+     362,
+     306
+    ]
+   ],
+   "r": 0,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twzvyhdh",
+   "livello": "sopra",
+   "punti": [
+    [
+     362,
+     306
+    ],
+    [
+     361,
+     307
+    ]
+   ],
+   "r": 0,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7twzvzz8e",
+   "livello": "sopra",
+   "punti": [
+    [
+     361,
+     307
+    ],
+    [
+     360,
+     307
+    ],
+    [
+     360,
+     308
+    ]
+   ],
+   "r": 0,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7tx0nu8wa",
+   "livello": "sopra",
+   "punti": [
+    [
+     365,
+     307
+    ],
+    [
+     366,
+     307
+    ],
+    [
+     367,
+     307
+    ]
+   ],
+   "r": 0,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7tx14ec2f",
+   "livello": "sopra",
+   "punti": [
+    [
+     367,
+     307
+    ]
+   ],
+   "r": 0,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7tx15xdoc",
+   "livello": "sopra",
+   "punti": [
+    [
+     367,
+     307
+    ]
+   ],
+   "r": 0,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7tx1advt2",
+   "livello": "sopra",
+   "punti": [
+    [
+     366,
+     306
+    ],
+    [
+     362,
+     306
+    ]
+   ],
+   "r": 0,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7tx2q6bvk",
+   "livello": "sopra",
+   "punti": [
+    [
+     363,
+     306
+    ],
+    [
+     364,
+     307
+    ]
+   ],
+   "r": 0,
+   "terreno": "water",
+   "tipo": "pennello"
+  },
+  {
+   "id": "tmv7tx2qa6kq",
+   "livello": "sopra",
+   "punti": [
+    [
+     365,
+     307
+    ]
+   ],
+   "r": 0,
+   "terreno": "water",
+   "tipo": "pennello"
+  }
+ ]
+}

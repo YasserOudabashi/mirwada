@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "_comment": "US-8B25: la luce del mondo in superficie, per momento del giorno (data/schema/time.json) e per modalita' (luminoso = facile, cupo = difficile, piu' buio). Ogni colore moltiplica tutto il mondo (CanvasModulate): bianco = come di giorno, piu' scuro e piu' blu = notte. Non sono colori della palette degli sprite ma filtri. Il sottosuolo ha la sua luce fissa (il suo disegno e' gia' buio); negli interni il mondo e' nascosto e la luce non conta. HUD, libro e lucciole (fauna con luce: true) stanno sopra e non si scuriscono. transizione = secondi per passare da un momento all'altro.",
+  "momenti": {
+    "luminoso": {"alba": "#f2dcc6", "mezzogiorno": "#ffffff", "crepuscolo": "#e2b28e", "notte_fonda": "#5d6c9e"},
+    "cupo": {"alba": "#cbb8b2", "mezzogiorno": "#e6e6ee", "crepuscolo": "#a8808c", "notte_fonda": "#3e4874"}
+  },
+  "sottosuolo": "#ffffff",
+  "transizione": 3.0
+}

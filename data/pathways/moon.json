@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "moon",
+  "categoria": "standard",
   "name": "Moon",
   "name_i18n": "pathway.moon",
   "group": "goddess_of_origin",

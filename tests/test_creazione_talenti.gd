@@ -75,8 +75,7 @@ func test_la_pagina_creazione_offre_le_checkbox_dei_talenti() -> void:
 	var res: Array = _pagina_creazione()
 	var pag: Node = res[1]
 	var n_checkbox := 0
-	for c in pag.get_children():
-		if c is CheckBox:
-			n_checkbox += 1
+	for c in res[0].get_node("Pagina").find_children("*", "CheckBox", true, false):   # sulla facciata destra
+		n_checkbox += 1
 	assert_true(n_checkbox >= 4, "una checkbox per talento innato (>= 4)")
 	res[0].free()

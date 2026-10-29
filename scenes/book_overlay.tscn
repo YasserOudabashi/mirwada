@@ -37,18 +37,29 @@ offset_right = 1.0
 color = Color(0.6, 0.55, 0.45, 0.5)
 
 [node name="Titolo" type="Label" parent="Pagina"]
-anchor_right = 1.0
+anchor_right = 0.5
 offset_top = 14.0
 offset_bottom = 40.0
 horizontal_alignment = 1
 text = "—"
 
 [node name="Contenuto" type="MarginContainer" parent="Pagina"]
-anchor_right = 1.0
+anchor_right = 0.5
 anchor_bottom = 1.0
 offset_top = 48.0
 offset_bottom = -16.0
 offset_left = 24.0
+offset_right = -16.0
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="Destra" type="MarginContainer" parent="Pagina"]
+anchor_left = 0.5
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 48.0
+offset_bottom = -16.0
+offset_left = 16.0
 offset_right = -24.0
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_right = 8

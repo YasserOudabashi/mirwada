@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "interno_id": "valle_avamposto_vedetta", "stile": "capanna", "oggetti_casuali": "casa",
+  "mappa": [
+    "########",
+    "#......#",
+    "#......#",
+    "#......#",
+    "#......#",
+    "########"
+  ],
+  "spawn": [
+    4,
+    4
+  ],
+  "arredi": [{"id": "cassa", "x": 1, "y": 1}, {"id": "scrittoio", "x": 4, "y": 2}, {"id": "botte", "x": 6, "y": 1}, {"id": "letto", "x": 6, "y": 3}],
+  "nemici": [],
+  "oggetti": [
+    {
+      "x": 2,
+      "y": 2,
+      "item_id": "corno_da_richiamo_intagliato",
+      "quantita": 1
+    }
+  ]
+}

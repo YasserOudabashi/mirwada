@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "door",
+  "categoria": "standard",
   "name": "Door",
   "name_i18n": "pathway.door",
   "group": "lord_of_mysteries",

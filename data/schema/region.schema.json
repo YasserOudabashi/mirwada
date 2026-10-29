@@ -5,6 +5,7 @@
     "id": "string univoco, snake_case",
     "name_i18n": "string, chiave i18n con prefisso 'region.' (categoria globale, come anchor/synergy)",
     "group_affinity": "un gruppo di Pathway valido, oppure 'neutra' (la citta' hub)",
+    "world_offset": "[x, y] interi >= 0 (US-1001, fase 10): posizione in celle di questa regione dentro l'unica griglia di mondo condivisa - il rettangolo [world_offset, world_offset + dimensioni_layout] non deve mai sovrapporsi a quello di un'altra regione. dimensioni_layout viene dal file data/world/layouts/<id>.json (larghezza/altezza vere della mappa) se esiste, altrimenti dal fallback 48x36 di region_scene.gd.",
     "densita_mistica": "numero 0..1: muove recupero spiritualita', efficacia rituali, percezione per Sequenza, frequenza spawn (design-world cap. 6). La citta' e' volutamente bassa (~0.2).",
     "location_tags": ["string dal vocabolario chiuso di data/schema/location_tags.json: la regione realizza a schermo ogni tag qui presente"],
     "music_zone": "string: una zona di data/audio.json music.zone",
@@ -22,6 +23,7 @@
   "regole_validator": [
     "id univoco; name_i18n con prefisso 'region.' e voce in it.json",
     "group_affinity in VALID_GROUPS o 'neutra'",
+    "world_offset: [x, y] di interi >= 0, obbligatorio; il rettangolo di ogni regione (world_offset + dimensioni del suo layout, o 48x36 di fallback) non si sovrappone a quello di nessun'altra regione",
     "densita_mistica numero in [0, 1]",
     "location_tags sottoinsieme del vocabolario di location_tags.json",
     "music_zone esiste in audio.json music.zone",

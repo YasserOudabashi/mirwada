@@ -1,4 +1,4 @@
-extends VBoxContainer
+extends "res://scripts/pages/pagina_libro.gd"
 ## Pagina inventario del libro (US-307). Sette sezioni: Zaino, Indosso,
 ## Ricettario, Talenti, Base, Sinergie (US-410), Diario (US-616b).
 ##
@@ -6,20 +6,25 @@ extends VBoxContainer
 
 const SEZIONI := ["zaino", "indosso", "ricettario", "talenti", "base", "sinergie", "journal"]
 
-var _tab: HBoxContainer = null
+## US-8B73d: l'elenco della sezione sulla facciata sinistra, l'indice delle sezioni sulla destra.
+var _tab: VBoxContainer = null
 var _corpo: VBoxContainer = null
 var _sezione: String = "zaino"
+## US-8B20b: chi apre il libro su una sezione (il banco di una stanza della base apre "base") la mette qui prima.
+static var prossima_sezione: String = ""
 ## US-411: id delle sinergie attivate mentre la pagina e' viva. La riga si
 ## evidenzia al primo render, poi torna normale.
 var _appena_attivate: Array = []
 
 
 func aggiorna() -> void:
-	for c in get_children():
-		c.queue_free()
-	_tab = HBoxContainer.new()
+	if prossima_sezione in SEZIONI:
+		_sezione = prossima_sezione
+	prossima_sezione = ""
+	svuota()
+	_tab = VBoxContainer.new()
 	_tab.add_theme_constant_override("separation", 4)
-	add_child(_tab)
+	destra.add_child(_tab)
 	for s in SEZIONI:
 		var b := Button.new()
 		b.text = tr("BOOK_INV_" + s.to_upper())
@@ -114,13 +119,16 @@ func _zaino() -> void:
 
 func _riga_item(v: Dictionary) -> HBoxContainer:
 	var gd: Node = _n("/root/GameData")
-	var it: Dictionary = gd.call("get_item", str(v.get("item_id", "")))
+	var item_id: String = str(v.get("item_id", ""))
+	var it: Dictionary = gd.call("get_item", item_id)
 	var h := HBoxContainer.new()
+	h.add_child(_icona(gd.call("icona_oggetto", item_id)))
 	var l := Label.new()
 	var nome: String = str(gd.call("tr_data", it.get("name_i18n", v.get("item_id"))))
 	var q: int = int(v.get("quantita", 1))
 	l.text = nome + ("  x%d" % q if q > 1 else "")
-	l.custom_minimum_size = Vector2(300, 0)
+	_larga(l)
+	l.add_theme_color_override("font_color", _colore_rarita(str(gd.call("rarita_di", item_id))))
 	h.add_child(l)
 	var cat: String = str(it.get("categoria", ""))
 	var iid: String = str(v.get("instance_id", ""))
@@ -131,6 +139,34 @@ func _riga_item(v: Dictionary) -> HBoxContainer:
 		h.add_child(_azione(tr("BOOK_INV_USA"), func() -> void:
 			_n("/root/Inventory").call("usa", iid); _mostra("zaino")))
 	return h
+
+
+## US-8B70: l'icona dell'oggetto a 1:1 (16 unita' = i 32 pixel dell'icona), centrata sulla riga.
+func _icona(tex: Texture2D) -> TextureRect:
+	var ic := TextureRect.new()
+	ic.name = "Icona"
+	ic.texture = tex
+	ic.custom_minimum_size = Vector2(16, 16)
+	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	ic.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	return ic
+
+
+## US-1105 (fase 11): 4 colori distinti per i 4 livelli di
+## data/schema/item_rarity.json - procedurali (ColorRect/StyleBox pattern
+## gia' in uso altrove nella pagina, es. il modulate delle righe offuscate),
+## nessun asset nuovo. 'comune' e' bianco, il colore di testo neutro.
+const _COLORE_RARITA := {
+	"comune": Color("#3e2731"),            # inchiostro del libro (data/ui/book.json tema.colori)
+	"non_comune": Color("#3e8948"),        # leggibili sulla carta (palette Endesga 32)
+	"raro": Color("#124e89"),
+	"leggendario": Color("#be4a2f"),
+}
+
+func _colore_rarita(rarita: String) -> Color:
+	return _COLORE_RARITA.get(rarita, Color.WHITE)
 
 
 func _ricettario() -> void:
@@ -153,7 +189,7 @@ func _ricettario() -> void:
 		if bool(ps.call("ricetta_nota", rid)):
 			var l := Label.new()
 			l.text = "%s  (%s)" % [str(gd.call("tr_data", r.get("name_i18n", rid))), str(r.get("tier"))]
-			l.custom_minimum_size = Vector2(300, 0)
+			_larga(l)
 			h.add_child(l)
 			var ha_tutto := true
 			for ing in ingr:
@@ -183,12 +219,12 @@ func _indosso() -> void:
 		var h := HBoxContainer.new()
 		var l := Label.new()
 		l.text = tr("BOOK_SLOT_" + str(mount).to_upper())
-		l.custom_minimum_size = Vector2(120, 0)
+		l.custom_minimum_size = Vector2(80, 0)
 		h.add_child(l)
 		var it: Dictionary = eq.call("equipaggiato", mount)
 		var n := Label.new()
 		n.text = str(gd.call("tr_data", it.get("name_i18n", ""))) if not it.is_empty() else tr("BOOK_INV_VUOTO")
-		n.custom_minimum_size = Vector2(200, 0)
+		_larga(n)
 		h.add_child(n)
 		if not it.is_empty():
 			h.add_child(_azione(tr("BOOK_INV_TOGLI"), func() -> void:
@@ -225,7 +261,34 @@ func _base() -> void:
 			_n("/root/BaseSystem").call(azione, tipo); _mostra("base"))
 		riga.add_child(b)
 		_corpo.add_child(riga)
+	_strutture(bs)
 	_giardino(bs)
+
+
+## US-8B20e: le strutture (data/structures), una per tipo, costruite fuori dalla sede della base.
+func _strutture(bs: Node) -> void:
+	var gd: Node = _n("/root/GameData")
+	var inv: Node = _n("/root/Inventory")
+	var ids: Array = gd.call("structure_ids")
+	if ids.is_empty():
+		return
+	_corpo.add_child(_titolo(tr("BOOK_BASE_STRUTTURE_TITOLO")))
+	for sid in ids:
+		var tipo: Dictionary = gd.call("get_structure", sid)
+		var nome: String = str(gd.call("tr_data", tipo.get("name_i18n", sid)))
+		if bool(bs.call("struttura_costruita", sid)):
+			_corpo.add_child(_riga("%s — %s" % [nome, tr("BOOK_BASE_COSTRUITA")]))
+			continue
+		var costo: Dictionary = tipo.get("costo", {})
+		_corpo.add_child(_riga("%s — %s %s" % [nome, tr("BOOK_BASE_COSTO"), _riassunto_costo(costo)]))
+		var b := Button.new()
+		b.text = tr("BOOK_BASE_COSTRUISCI")
+		b.disabled = not _coperto(inv, costo)
+		b.pressed.connect(func() -> void:
+			_n("/root/BaseSystem").call("costruisci_struttura", sid); _mostra("base"))
+		var riga := HBoxContainer.new()
+		riga.add_child(b)
+		_corpo.add_child(riga)
 
 
 func _giardino(bs: Node) -> void:
@@ -238,7 +301,7 @@ func _giardino(bs: Node) -> void:
 		var a: Dictionary = stato[i]
 		var h := HBoxContainer.new()
 		var l := Label.new()
-		l.custom_minimum_size = Vector2(220, 0)
+		_larga(l)
 		if str(a.get("item_id", "")).is_empty():
 			l.text = tr("BOOK_BASE_APPEZZAMENTO_VUOTO")
 		elif bool(a.get("pronto", false)):
@@ -322,12 +385,13 @@ func _talenti() -> void:
 		var h := HBoxContainer.new()
 		var l := Label.new()
 		l.text = str(gd.call("tr_data", t.get("name_i18n", tid)))
-		l.custom_minimum_size = Vector2(160, 0)
+		_larga(l)
 		h.add_child(l)
 		var barra := ProgressBar.new()
 		barra.max_value = target
 		barra.value = minf(conta, target)
-		barra.custom_minimum_size = Vector2(140, 14)
+		barra.custom_minimum_size = Vector2(70, 14)
+		barra.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		h.add_child(barra)
 		var q := Label.new()
 		q.text = "%d / %d" % [int(conta), int(target)]
@@ -441,6 +505,13 @@ func righe_journal() -> int:
 
 
 # --- Costruttori -----------------------------------------------------
+
+## Un'etichetta di riga che prende lo spazio che resta sulla facciata e va a capo: mai oltre la piega.
+func _larga(l: Label) -> void:
+	l.custom_minimum_size = Vector2(90, 0)
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
 
 func _azione(testo: String, cb: Callable) -> Button:
 	var b := Button.new()

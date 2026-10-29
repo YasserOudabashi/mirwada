@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "interno_id": "frontiera_isola_nebbia",
+  "stile": "nebbia",
+  "mappa": [
+    "###########",
+    "#.........#",
+    "#.........#",
+    "#.........#",
+    "#.........#",
+    "#.........#",
+    "#.........#",
+    "###########"
+  ],
+  "spawn": [
+    5,
+    6
+  ],
+  "arredi": [
+    {
+      "id": "cornice_porta",
+      "x": 2,
+      "y": 2
+    },
+    {
+      "id": "cornice_porta",
+      "x": 8,
+      "y": 2
+    },
+    {
+      "id": "cornice_porta",
+      "x": 5,
+      "y": 1
+    }
+  ],
+  "nemici": [],
+  "oggetti": []
+}

@@ -1,6 +1,13 @@
-extends VBoxContainer
+extends ScrollContainer
 ## Pagina "diagramma dei Pathway" (US-224). 10 colonne (i Pathway attivi) x 10
 ## righe (Sequenze 9->0). Generato dai dati di GameData, mai disegnato a mano.
+##
+## ScrollContainer (non VBoxContainer diretto) perche' il contenuto — griglia
+## 10x10 + dettaglio + fusione + avanzamento/dono — puo' superare i 360px del
+## design: senza scroll la parte bassa finiva fuori pagina (segnalato
+## dall'utente su schermo reale). Stesso pattern gia' in uso in
+## page_impostazioni.gd: un solo VBoxContainer interno (_vbox), ricreato ad
+## ogni aggiorna(), e' l'unico figlio dello ScrollContainer.
 ##
 ## FOG OF WAR sulla conoscenza (design-master cap. 5): una cella e' leggibile
 ## solo se il giocatore la conosce —
@@ -16,10 +23,11 @@ extends VBoxContainer
 ## La Sequenza corrente e' evidenziata e le sue abilita' sono elencate sotto.
 ## Nessun nome di Pathway/Sequenza hardcoded: solo id e chiavi i18n.
 
-const C_NOTO := Color(0.74, 0.67, 0.5)
-const C_IGNOTO := Color(0.22, 0.2, 0.17)
-const C_CORRENTE := Color(0.4, 0.76, 0.82)
-const C_PROSSIMA := Color(0.5, 0.42, 0.3)
+const PaginaLibro := preload("res://scripts/pages/pagina_libro.gd")
+const C_NOTO := Color("#b86f50")          # colori della carta (palette Endesga 32)
+const C_IGNOTO := Color("#e4a672")
+const C_CORRENTE := Color("#a22633")
+const C_PROSSIMA := Color("#733e39")
 
 var _stati: Dictionary = {}   # "pid:n" -> "noto" | "ignoto" | "corrente" | "prossima"
 var _abilita: Array = []
@@ -33,14 +41,42 @@ var _prossima_nome: String = ""
 ## US-708: i Pathway vicini verso cui si puo' fondere. Ogni voce:
 ## { id, scritto (percorso di fusione non-stub), puo (PathwayChange.puo_cambiare) }.
 var _vicini: Array = []
+## US-810: esito dell'ultima prepara_pozione()/bevi_pozione() (dal Dictionary
+## di ritorno di PotionSystem), mostrato nella sezione avanzamento finche' non
+## arriva un'altra azione. NON azzerato in aggiorna(): e' l'ultimo risultato,
+## non uno stato ricalcolato dai dati.
+var _pozione_stato: Dictionary = {}
+## US-810: stato della sezione avanzamento per gli accessor di test (mirror
+## di _vicini), ricalcolato ad ogni aggiorna().
+var _avanzamento: Dictionary = {}
+## US-906: esito dell'ultima ricevi_dono() (dal Dictionary di ritorno di
+## BoonSystem.ricevi_boon()), stesso ruolo di _pozione_stato ma per i
+## Pathway non_standard. NON azzerato in aggiorna(): e' l'ultimo risultato.
+var _dono_stato: Dictionary = {}
+var _vbox: VBoxContainer = null
+## US-8B73d: la griglia sulla facciata sinistra, la Sequenza corrente, la fusione e l'avanzamento sulla destra (la
+## mette li' il libro, book_overlay.gd). La griglia e' girata: una riga per Pathway, le Sequenze da 9 a 0 in colonna,
+## cosi' le 10 colonne stanno in una facciata senza scorrere di lato.
+var destra := ScrollContainer.new()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE and is_instance_valid(destra) and destra.get_parent() == null:
+		destra.free()                                # nessun libro l'ha presa: non resta orfana
 
 
 func aggiorna() -> void:
-	for c in get_children():
-		c.queue_free()
+	for madre in [self, destra]:
+		for c in madre.get_children():
+			c.queue_free()
+	horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	destra.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_vbox = _colonna(self)
+	var colonna_destra: VBoxContainer = _colonna(destra)
 	_stati.clear()
 	_abilita.clear()
 	_vicini.clear()
+	_avanzamento.clear()
 	_prossima_nome = ""
 
 	var gd: Node = _n("/root/GameData")
@@ -55,43 +91,47 @@ func aggiorna() -> void:
 	var mia_seq: int = int(prog.call("sequence")) if prog != null else 9
 
 	var griglia := GridContainer.new()
-	griglia.columns = pathway_ids.size() + 1
+	griglia.columns = 11                              # il nome del Pathway e le Sequenze da 9 a 0
 	griglia.add_theme_constant_override("h_separation", 2)
 	griglia.add_theme_constant_override("v_separation", 2)
-	add_child(griglia)
+	_vbox.add_child(griglia)
 
-	griglia.add_child(_cella_testo(""))
-	for pid in pathway_ids:
-		var pw: Dictionary = gd.call("get_pathway", pid)
-		griglia.add_child(_cella_testo(str(gd.call("tr_data", pw.get("name_i18n", pid))), true))
-
+	griglia.add_child(_cella_testo("", true))
 	for n in range(9, -1, -1):
 		griglia.add_child(_cella_testo("S%d" % n))
-		for pid in pathway_ids:
+	for pid in pathway_ids:
+		var pw: Dictionary = gd.call("get_pathway", pid)
+		var nome_riga := _cella_testo(str(gd.call("tr_data", pw.get("name_i18n", pid))), true)
+		if pid == mio:
+			nome_riga.add_theme_color_override("font_color", C_CORRENTE)   # la propria riga
+		griglia.add_child(nome_riga)
+		for n in range(9, -1, -1):
 			var stato: String = _stato(pid, n, mio, mia_seq, kn)
 			_stati["%s:%d" % [pid, n]] = stato
 			griglia.add_child(_cella_cella(stato))
+	_vbox = colonna_destra
 
 	# --- dettaglio della Sequenza corrente ---
 	if prog != null and not mio.is_empty():
 		var pw: Dictionary = gd.call("get_pathway", mio)
 		var nome_pw: String = str(gd.call("tr_data", pw.get("name_i18n", mio)))
 		var sd: Dictionary = prog.call("sequence_data")
-		add_child(_riga("%s  ·  %s S%d  ·  %s" % [
+		_vbox.add_child(_riga("%s  ·  %s S%d  ·  %s" % [
 			nome_pw, tr("BOOK_DIAGRAMMA_SEI_QUI"), mia_seq, str(prog.call("tier"))]))
 		for aid in sd.get("abilities", []):
 			var ab: Dictionary = gd.call("get_ability", aid)
 			var nome: String = str(gd.call("tr_data", ab.get("name_i18n", aid)))
 			_abilita.append(nome)
-			add_child(_riga("· " + nome))
+			_vbox.add_child(_riga("· " + nome))
 
 		if mia_seq > 0:
 			var prossima: Dictionary = gd.call("get_sequence", "%s_%d" % [mio, mia_seq - 1])
 			if not prossima.is_empty():
 				_prossima_nome = str(gd.call("tr_data", prossima.get("name_i18n", "")))
-				add_child(_riga("%s %s" % [tr("BOOK_DIAGRAMMA_PROSSIMA"), _prossima_nome]))
+				_vbox.add_child(_riga("%s %s" % [tr("BOOK_DIAGRAMMA_PROSSIMA"), _prossima_nome]))
 
 		_sezione_fusione(gd, prog, mio, pw)
+		_sezione_avanzamento(gd, prog, mio, pw, sd)
 
 
 # --- sezione "fondere il Pathway" (US-708) ---------------------------
@@ -105,7 +145,7 @@ func _sezione_fusione(gd: Node, _prog: Node, mio: String, pw: Dictionary) -> voi
 	if pc == null:
 		return
 	var gruppo: String = str(pw.get("group", ""))
-	add_child(_riga("%s  %s %s" % [
+	_vbox.add_child(_riga("%s  %s %s" % [
 		tr("BOOK_DIAGRAMMA_FUSIONE_TITOLO"), tr("BOOK_DIAGRAMMA_FUSIONE_GRUPPO"), gruppo]))
 
 	var ids: Array = gd.call("pathway_ids")
@@ -122,27 +162,33 @@ func _sezione_fusione(gd: Node, _prog: Node, mio: String, pw: Dictionary) -> voi
 
 		var h := HBoxContainer.new()
 		var l := Label.new()
-		l.custom_minimum_size = Vector2(200, 0)
+		l.custom_minimum_size = Vector2(90, 0)       # prende lo spazio che resta e va a capo: mai oltre la piega
+		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.text = "%s — %s" % [
 			str(gd.call("tr_data", altro.get("name_i18n", pid))),
 			tr("BOOK_DIAGRAMMA_FUSIONE_SCRITTO") if scritto else tr("BOOK_DIAGRAMMA_FUSIONE_STUB")]
 		if not scritto:
-			l.modulate = C_IGNOTO.lightened(0.5)  # fog of war, come le celle ignote
+			l.modulate = Color(1, 1, 1, 0.4)  # fog of war: inchiostro sbiadito, come le celle ignote
 		h.add_child(l)
 		if puo:
 			var b := Button.new()
 			b.text = tr("BOOK_DIAGRAMMA_FUSIONE_CONFERMA")
+			b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			b.pressed.connect(fondi.bind(pid))
 			h.add_child(b)
 		else:
 			var m := Label.new()
 			m.modulate = Color(1, 1, 1, 0.55)
+			m.custom_minimum_size = Vector2(60, 0)
+			m.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			m.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			m.text = tr("BOOK_DIAGRAMMA_FUSIONE_TROPPO_PRESTO")
 			h.add_child(m)
-		add_child(h)
+		_vbox.add_child(h)
 
 	if _vicini.is_empty():
-		add_child(_riga(tr("BOOK_DIAGRAMMA_FUSIONE_NIENTE")))
+		_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_FUSIONE_NIENTE")))
 
 
 ## Conferma il cambio verso `nuovo_pathway`. Rigenera la pagina dopo.
@@ -158,6 +204,274 @@ func fondi(nuovo_pathway: String) -> Dictionary:
 
 func vicini_fondibili() -> Array:
 	return _vicini.duplicate(true)
+
+
+# --- sezione "avanzamento": Prepara/Bevi la pozione (US-810) -----------
+## Formula della Sequenza corrente (Progression.sequence_data().potion, gia'
+## in `sd`): Caratteristica richiesta, ingredienti posseduti/1, recitazione,
+## bottoni Prepara (attivo con Caratteristica + ingredienti >= soglia
+## parziale della formula) e Bevi (normale se avanzamento_disponibile(),
+## forzato con malus di follia se solo avanzamento_forzabile(), altrimenti
+## disabilitato). Stesso stile a righe di _sezione_fusione.
+func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, sd: Dictionary) -> void:
+	var boon: Dictionary = sd.get("boon", {})
+	if not boon.is_empty():
+		_sezione_dono(gd)
+		return
+
+	_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_TITOLO")))
+	var potion: Dictionary = sd.get("potion", {})
+	if potion.is_empty():
+		_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_NIENTE")))
+		return
+
+	var ps: Node = _n("/root/PotionSystem")
+	var store: Node = _n("/root/CharacteristicStore")
+	var inv: Node = _n("/root/Inventory")
+	var acting: Node = _n("/root/Acting")
+	var found: Node = _n("/root/Foundation")
+
+	var car: Dictionary = gd.call("characteristic_for", mio, int(potion.get("characteristic_sequence", -1)))
+	var car_posseduta: bool = store != null and not car.is_empty() \
+		and bool(store.call("possiede", str(car.get("id", ""))))
+	_vbox.add_child(_riga("%s: %s (%s)" % [
+		tr("BOOK_DIAGRAMMA_AVANZAMENTO_CARATTERISTICA"),
+		str(gd.call("tr_data", car.get("name_i18n", car.get("id", "")))),
+		tr("BOOK_DIAGRAMMA_AVANZAMENTO_POSSEDUTA") if car_posseduta else tr("BOOK_DIAGRAMMA_AVANZAMENTO_MANCANTE")]))
+
+	var richiesti: Array = potion.get("ingredients", [])
+	var posseduti: Array = []
+	var ingredienti_stato: Array = []
+	for iid in richiesti:
+		var n: int = int(inv.call("conta", iid)) if inv != null else 0
+		if n >= 1:
+			posseduti.append(iid)
+		var nome: String = str(gd.call("tr_data", (gd.call("get_item", iid) as Dictionary).get("name_i18n", iid)))
+		ingredienti_stato.append({"id": iid, "nome": nome, "posseduti": n})
+		_vbox.add_child(_riga("· %s  x %d/1" % [nome, n]))
+
+	var recitazione: float = float(acting.call("acting_progress")) if acting != null else 0.0
+	_vbox.add_child(_riga("%s: %d%%" % [tr("BOOK_DIAGRAMMA_AVANZAMENTO_RECITAZIONE"), int(round(recitazione * 100))]))
+
+	var formula: Dictionary = gd.call("get_formula", str(potion.get("formula_id", "")))
+	var soglia: int = int(formula.get("soglia_parziale", richiesti.size()))
+	var parziale: bool = posseduti.size() < richiesti.size()
+
+	var b_prepara := Button.new()
+	b_prepara.text = (tr("BOOK_DIAGRAMMA_AVANZAMENTO_PREPARA_PARZIALE") % _testo_penalita(formula)) \
+		if parziale else tr("BOOK_DIAGRAMMA_AVANZAMENTO_PREPARA")
+	b_prepara.disabled = not (car_posseduta and posseduti.size() >= soglia)
+	b_prepara.pressed.connect(prepara_pozione)
+	PaginaLibro.a_capo(b_prepara)
+	_vbox.add_child(b_prepara)
+
+	var pronta: Dictionary = ps.call("pozione_pronta") if ps != null else {}
+	if not pronta.is_empty():
+		var disponibile: bool = ps != null and bool(ps.call("avanzamento_disponibile"))
+		var forzabile: bool = ps != null and bool(ps.call("avanzamento_forzabile"))
+		var b_bevi := Button.new()
+		PaginaLibro.a_capo(b_bevi)
+		if disponibile:
+			b_bevi.text = tr("BOOK_DIAGRAMMA_AVANZAMENTO_BEVI")
+			b_bevi.pressed.connect(bevi_pozione.bind(false))
+		elif forzabile:
+			var mult: float = found.call("moltiplicatore_follia") if found != null else 1.0
+			var n_follia: int = int(round(float(sd.get("madness_on_force", 0.0)) * mult))
+			b_bevi.text = tr("BOOK_DIAGRAMMA_AVANZAMENTO_BEVI_FORZATO") % n_follia
+			b_bevi.pressed.connect(bevi_pozione.bind(true))
+		else:
+			b_bevi.disabled = true
+			b_bevi.text = tr("BOOK_DIAGRAMMA_AVANZAMENTO_BEVI")
+		_vbox.add_child(b_bevi)
+
+	if not _pozione_stato.is_empty():
+		_vbox.add_child(_riga(_esito_testo(_pozione_stato)))
+
+	_avanzamento = {
+		"potion": potion.duplicate(true),
+		"caratteristica_posseduta": car_posseduta,
+		"ingredienti": ingredienti_stato,
+		"recitazione": recitazione,
+		"prepara_attivo": not b_prepara.disabled,
+	}
+
+
+# --- sezione "il Dono": Ricevi il Dono per i Pathway non_standard (US-906) --
+## Mostra i requisiti del Boon della Sequenza corrente
+## (BoonSystem.requisiti_stato()) con lo stato di ognuno, e un bottone
+## "Ricevi il Dono" (BoonSystem.ricevi_boon()) disabilitato finche' non sono
+## tutti soddisfatti. Stessa pagina di _sezione_avanzamento (Prepara/Bevi):
+## un ramo sul DATO (boon vs potion sulla Sequenza corrente), mai un tipo di
+## pagina nuovo (FR-5).
+func _sezione_dono(gd: Node) -> void:
+	_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_DONO_TITOLO")))
+	var bs: Node = _n("/root/BoonSystem")
+	if bs == null:
+		_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_DONO_NIENTE")))
+		return
+
+	var requisiti: Array = bs.call("requisiti_stato")
+	for req in requisiti:
+		_vbox.add_child(_riga(_riga_requisito(gd, req)))
+
+	var puo_ricevere: bool = bool(bs.call("puo_ricevere"))
+	var b := Button.new()
+	PaginaLibro.a_capo(b)
+	b.text = tr("BOOK_DIAGRAMMA_DONO_RICEVI")
+	b.disabled = not puo_ricevere
+	b.pressed.connect(ricevi_dono)
+	_vbox.add_child(b)
+
+	if not _dono_stato.is_empty():
+		_vbox.add_child(_riga(_esito_dono_testo(_dono_stato)))
+
+	_avanzamento = {
+		"boon": true,
+		"requisiti": requisiti,
+		"puo_ricevere": puo_ricevere,
+	}
+
+
+## Testo di un requisito del Boon: tipo + descrizione + stato soddisfatto/no.
+func _riga_requisito(gd: Node, req: Dictionary) -> String:
+	var stato: String = tr("BOOK_DIAGRAMMA_DONO_SODDISFATTO") if bool(req.get("soddisfatto", false)) \
+		else tr("BOOK_DIAGRAMMA_DONO_MANCANTE")
+	match str(req.get("tipo", "")):
+		"quest":
+			var q: Dictionary = gd.call("get_quest", str(req.get("quest_id", "")))
+			var nome: String = str(gd.call("tr_data", q.get("name_i18n", req.get("quest_id", ""))))
+			return "%s %s — %s" % [tr("BOOK_DIAGRAMMA_DONO_QUEST"), nome, stato]
+		"comportamento":
+			var eventi: Dictionary = gd.call("get_tracked_events")
+			var spec: Dictionary = eventi.get(str(req.get("evento", "")), {})
+			var desc: String = str(spec.get("descrizione", req.get("evento", "")))
+			return "%s %s (%d/%d) — %s" % [tr("BOOK_DIAGRAMMA_DONO_COMPORTAMENTO"), desc,
+				int(float(req.get("progresso", 0.0))), int(float(req.get("target", 0.0))), stato]
+		"sacrificio":
+			return "%s %s — %s" % [tr("BOOK_DIAGRAMMA_DONO_SACRIFICIO"),
+				_testo_costo(gd, req.get("costo", {})), stato]
+	return stato
+
+
+func _testo_costo(gd: Node, costo: Dictionary) -> String:
+	var tipo: String = str(costo.get("tipo", ""))
+	var q: int = int(costo.get("quantita", 0))
+	match tipo:
+		"oggetto":
+			var item: Dictionary = gd.call("get_item", str(costo.get("id", "")))
+			return "%s x%d" % [str(gd.call("tr_data", item.get("name_i18n", costo.get("id", "")))), q]
+		"caratteristica":
+			var car: Dictionary = gd.call("get_characteristic", str(costo.get("id", "")))
+			return str(gd.call("tr_data", car.get("name_i18n", costo.get("id", ""))))
+		"follia":
+			return "%s x%d" % [tr("BOOK_DIAGRAMMA_DONO_SACRIFICIO_FOLLIA"), q]
+	return tipo
+
+
+func _esito_dono_testo(stato: Dictionary) -> String:
+	if bool(stato.get("ok", false)):
+		return tr("BOOK_DIAGRAMMA_DONO_ESITO_OK")
+	var chiavi := {
+		"nessun_boon": "BOOK_DIAGRAMMA_DONO_ESITO_NESSUN_BOON",
+		"requisiti_mancanti": "BOOK_DIAGRAMMA_DONO_ESITO_REQUISITI_MANCANTI",
+	}
+	var chiave: String = str(chiavi.get(str(stato.get("reason", "")), ""))
+	return tr(chiave) if not chiave.is_empty() else str(stato.get("reason", ""))
+
+
+## Riceve il Dono della Sequenza corrente. Pubblica, interrogabile dai test.
+func ricevi_dono() -> Dictionary:
+	var bs: Node = _n("/root/BoonSystem")
+	if bs == null:
+		_dono_stato = {"ok": false, "reason": "no_boon_system"}
+		return _dono_stato
+	var res: Dictionary = bs.call("ricevi_boon")
+	_dono_stato = res
+	aggiorna()
+	return res
+
+
+## '_nota'/'_comment' (prefisso '_') sono documentazione interna dei dati,
+## mai testo per il giocatore — stessa convenzione gia' usata altrove nei
+## file data/ (es. items_doc._comment).
+func _testo_penalita(formula: Dictionary) -> String:
+	var pen: Dictionary = formula.get("penalita_parziale", {})
+	var parti: Array = []
+	for k in pen:
+		if str(k).begins_with("_"):
+			continue
+		parti.append("%s %s" % [str(k), str(pen[k])])
+	return ", ".join(parti) if not parti.is_empty() else "?"
+
+
+func _esito_testo(stato: Dictionary) -> String:
+	if bool(stato.get("ok", false)):
+		return tr("BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_OK")
+	var chiavi := {
+		"caratteristica_incoerente": "BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_CARATTERISTICA_INCOERENTE",
+		"caratteristica_mancante": "BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_CARATTERISTICA_MANCANTE",
+		"ingredienti_insufficienti": "BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_INGREDIENTI_INSUFFICIENTI",
+		"formula_inesistente": "BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_FORMULA_INESISTENTE",
+		"nessuna_pozione": "BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_NESSUNA_POZIONE",
+	}
+	var chiave: String = str(chiavi.get(str(stato.get("reason", "")), ""))
+	return tr(chiave) if not chiave.is_empty() else str(stato.get("reason", ""))
+
+
+## Prepara la pozione della Sequenza corrente: PotionSystem.concoct() legge
+## solo l'Array di ingredienti passato e consuma la Caratteristica — NON
+## tocca l'Inventory (:22-57) — quindi qui, dopo un esito riuscito, si
+## rimuove dall'Inventory un'unita' di ciascun ingrediente effettivamente
+## posseduto e passato a concoct(). Pubblica, interrogabile dai test.
+func prepara_pozione() -> Dictionary:
+	var prog: Node = _n("/root/Progression")
+	var gd: Node = _n("/root/GameData")
+	var ps: Node = _n("/root/PotionSystem")
+	var inv: Node = _n("/root/Inventory")
+	if prog == null or gd == null or ps == null:
+		_pozione_stato = {"ok": false, "reason": "no_potion_system"}
+		return _pozione_stato
+
+	var mio: String = str(prog.call("pathway"))
+	var sd: Dictionary = prog.call("sequence_data")
+	var potion: Dictionary = sd.get("potion", {})
+	if potion.is_empty():
+		_pozione_stato = {"ok": false, "reason": "nessuna_formula"}
+		aggiorna()
+		return _pozione_stato
+
+	var car: Dictionary = gd.call("characteristic_for", mio, int(potion.get("characteristic_sequence", -1)))
+	var richiesti: Array = potion.get("ingredients", [])
+	var posseduti: Array = []
+	for iid in richiesti:
+		if inv != null and int(inv.call("conta", iid)) >= 1:
+			posseduti.append(iid)
+
+	var res: Dictionary = ps.call("concoct", str(potion.get("formula_id", "")), str(car.get("id", "")), posseduti)
+	if bool(res.get("ok", false)) and inv != null:
+		for iid in posseduti:
+			inv.call("rimuovi", iid, 1)
+	_pozione_stato = res
+	aggiorna()
+	return res
+
+
+## Beve la pozione pronta (forza: avanza comunque con malus se la
+## recitazione non e' completa, vedi PotionSystem.bevi). Pubblica,
+## interrogabile dai test.
+func bevi_pozione(forza: bool = false) -> Dictionary:
+	var ps: Node = _n("/root/PotionSystem")
+	if ps == null:
+		_pozione_stato = {"ok": false, "reason": "no_potion_system"}
+		return _pozione_stato
+	var res: Dictionary = ps.call("bevi", forza)
+	_pozione_stato = res
+	aggiorna()
+	return res
+
+
+func avanzamento_stato() -> Dictionary:
+	return _avanzamento.duplicate(true)
 
 
 # --- Interrogabile dai test / UI --------------------------------------
@@ -195,7 +509,7 @@ func _stato(pid: String, n: int, mio: String, mia_seq: int, kn: Node) -> String:
 
 func _cella_cella(stato: String) -> Control:
 	var r := ColorRect.new()
-	r.custom_minimum_size = Vector2(44, 13)
+	r.custom_minimum_size = Vector2(13, 11)
 	match stato:
 		"corrente": r.color = C_CORRENTE
 		"noto": r.color = C_NOTO
@@ -204,10 +518,10 @@ func _cella_cella(stato: String) -> Control:
 	return r
 
 
-func _cella_testo(t: String, ruota: bool = false) -> Control:
+func _cella_testo(t: String, nome: bool = false) -> Control:
 	var l := Label.new()
 	l.text = t
-	l.custom_minimum_size = Vector2(44 if ruota else 24, 13)
+	l.custom_minimum_size = Vector2(70 if nome else 13, 11)
 	l.clip_text = true
 	l.add_theme_font_size_override("font_size", 8)
 	return l
@@ -216,7 +530,16 @@ func _cella_testo(t: String, ruota: bool = false) -> Control:
 func _riga(t: String) -> Label:
 	var l := Label.new()
 	l.text = t
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	return l
+
+
+func _colonna(madre: Node) -> VBoxContainer:
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 6)
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	madre.add_child(v)
+	return v
 
 
 func _n(path: String) -> Node:

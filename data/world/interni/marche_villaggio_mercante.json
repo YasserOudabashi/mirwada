@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "interno_id": "marche_villaggio_mercante", "stile": "bottega",
+  "mappa": [
+    "#######",
+    "#.....#",
+    "#.....#",
+    "#.....#",
+    "#######"
+  ],
+  "spawn": [
+    3,
+    3
+  ],
+  "arredi": [{"id": "scaffale", "x": 1, "y": 1}, {"id": "bancone", "x": 2, "y": 2}, {"id": "cassa", "x": 1, "y": 3}, {"id": "sacchi", "x": 2, "y": 3}],
+  "nemici": [],
+  "oggetti": [],
+  "npcs": [
+    {
+      "x": 5,
+      "y": 1,
+      "npc_id": "npc_greta"
+    }
+  ]
+}

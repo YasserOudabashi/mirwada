@@ -99,9 +99,11 @@
       "params": [
         "raggio",
         "profondita",
-        "rivela"
+        "rivela",
+        "categoria"
       ],
-      "implemented": true
+      "implemented": true,
+      "_comment": "US-502: 'categoria' richiesto dal validator per ogni uso fuori da Hermit (solo Hermit e' il divinatore sistemico) - mancava nel registro anche se reveal_info, la primitiva gemella, ce l'ha gia' dalla fase 5 (US-904, Eternal Aeon, primo Pathway non-Hermit a usare mind_read)."
     },
     "teleport": {
       "params": [

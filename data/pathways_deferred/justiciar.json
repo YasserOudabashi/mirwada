@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "id": "justiciar",
+  "categoria": "standard",
   "name": "Justiciar",
   "name_i18n": "pathway.justiciar",
   "group": "the_anarchy",

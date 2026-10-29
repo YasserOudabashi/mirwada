@@ -95,3 +95,38 @@ func test_cambio_verso_percorso_stub_riesce_senza_fusioni() -> void:
 	assert_gt(float((res["conservate"] as Array).size()), 0.0, "abilita basse conservate lo stesso")
 	assert_eq((eg.get("fusioni") as Array).size(), 0, "percorso stub: endgame.fusioni resta []")
 	_cleanup(g)
+
+
+# --- US-903: un Pathway non_standard non ha gruppo/vicini -------------------
+
+func _gd() -> Node:
+	return Engine.get_main_loop().root.get_node_or_null("GameData")
+
+
+## Un Pathway non_standard di prova, iniettato direttamente nel registro
+## separato di GameData (mai su disco, stesso pattern di test_boon_system.gd):
+## GameData.reload() lo pota via alla fine di ogni test qui sotto.
+func _inietta_pathway_non_standard() -> void:
+	var m: Dictionary = _gd().get("_pathways_non_standard")
+	m["fixture_ns"] = {"id": "fixture_ns", "categoria": "non_standard", "group": null}
+
+
+func test_cambio_verso_un_pathway_non_standard_e_rifiutato() -> void:
+	_inietta_pathway_non_standard()
+	_prog().configura("error", 4)
+	assert_false(_pc().call("puo_cambiare", "fixture_ns"), "non si cambia verso un Pathway non_standard")
+	var res: Dictionary = _pc().call("cambia", "fixture_ns")
+	assert_false(res["ok"], "cambia rifiuta")
+	assert_eq(res["reason"], "pathway_non_standard", "motivo esplicito")
+	assert_eq(_prog().call("pathway"), "error", "Pathway non toccato dal rifiuto")
+	_gd().call("reload")
+
+
+func test_cambio_da_un_pathway_non_standard_e_rifiutato() -> void:
+	_inietta_pathway_non_standard()
+	_prog().configura("fixture_ns", 4)
+	assert_false(_pc().call("puo_cambiare", "error"), "non si cambia da un Pathway non_standard")
+	var res: Dictionary = _pc().call("cambia", "error")
+	assert_false(res["ok"], "cambia rifiuta")
+	assert_eq(res["reason"], "pathway_non_standard", "motivo esplicito")
+	_gd().call("reload")

@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "interno_id": "marche_cripta",
+  "stile": "cripta",
+  "mappa": [
+    "#############",
+    "#...........#",
+    "#.#..#.#..#.#",
+    "#...........#",
+    "#...........#",
+    "#.#..#.#..#.#",
+    "#...........#",
+    "#...........#",
+    "#############"
+  ],
+  "spawn": [
+    6,
+    7
+  ],
+  "arredi": [
+    {
+      "id": "sarcofago",
+      "x": 3,
+      "y": 3
+    },
+    {
+      "id": "sarcofago",
+      "x": 8,
+      "y": 3
+    },
+    {
+      "id": "sarcofago",
+      "x": 3,
+      "y": 6
+    },
+    {
+      "id": "sarcofago",
+      "x": 8,
+      "y": 6
+    },
+    {
+      "id": "vaso",
+      "x": 1,
+      "y": 1
+    },
+    {
+      "id": "vaso",
+      "x": 11,
+      "y": 1
+    }
+  ],
+  "forzieri": [{"id": "marche_cripta_1", "x": 6, "y": 1, "tabella": "cripta"}],
+  "nemici": [],
+  "oggetti": []
+}

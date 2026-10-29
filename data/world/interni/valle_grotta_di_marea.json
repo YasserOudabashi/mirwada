@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "interno_id": "valle_grotta_di_marea",
+  "stile": "grotta",
+  "mappa": [
+    "############",
+    "#~~~....~~~#",
+    "#~~..#...~~#",
+    "#~.......#.#",
+    "#..........#",
+    "#....#.....#",
+    "#~.........#",
+    "#~~........#",
+    "############"
+  ],
+  "spawn": [
+    5,
+    7
+  ],
+  "arredi": [
+    {
+      "id": "roccia",
+      "x": 10,
+      "y": 5
+    },
+    {
+      "id": "roccia",
+      "x": 3,
+      "y": 4
+    },
+    {
+      "id": "cassa",
+      "x": 7,
+      "y": 1
+    }
+  ],
+  "forzieri": [{"id": "valle_grotta_di_marea_1", "x": 10, "y": 3, "tabella": "grotta"}],
+  "nemici": [],
+  "oggetti": []
+}

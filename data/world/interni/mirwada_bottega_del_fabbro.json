@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "interno_id": "mirwada_bottega_del_fabbro", "stile": "fucina",
+  "mappa": [
+    "#######",
+    "#.....#",
+    "#.....#",
+    "#.....#",
+    "#######"
+  ],
+  "spawn": [
+    3,
+    3
+  ],
+  "arredi": [{"id": "forgia", "x": 1, "y": 1}, {"id": "incudine", "x": 2, "y": 2}, {"id": "botte", "x": 5, "y": 3}],
+  "nemici": [],
+  "oggetti": [],
+  "npcs": [
+    {
+      "x": 5,
+      "y": 1,
+      "npc_id": "npc_bram"
+    }
+  ]
+}

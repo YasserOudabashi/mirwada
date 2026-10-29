@@ -1,319 +1,129 @@
 # Prossimi passi — istruzioni per la prossima sessione di Claude Code
 
-> Scritto il 2026-09-09. Leggilo **dopo** `CLAUDE.md` e **prima** di toccare
-> qualunque file. Dice cosa fare, in che ordine, con quali strumenti, e le
-> trappole già scoperte. Il "cosa" dettagliato è in
-> `006_PRD/prd-fase-8-vertical-slice.md` (14 story, US-801..US-814).
+> Riscritto il 2026-10-26 (la versione del 2026-09-09 descriveva la fase 8 prima del merge); aggiornato il 2026-10-29.
+> Leggilo **dopo** `CLAUDE.md` e **prima** di toccare qualunque file. Il dettaglio di ogni story
+> fatta e' in `progress.txt` (cerca la sigla), le story aperte in `prd.json`.
 
 ---
 
 ## 0. Il quadro in tre righe
 
-Le fasi 1-7 sono chiuse (776 test). **Nessuno può però giocare il gioco con
-la tastiera**: `main.tscn` è una scena di prova della fase 1 (un nemico,
-nessuna partita avviata, nessun tasto per le abilità, 299 ingredienti che
-non esistono come oggetti). La fase 8 collega i sistemi già scritti in una
-partita giocabile, riempie i dati mancanti e mette una grafica provvisoria
-generata. **Zero sistemi nuovi, zero primitive/eventi/tag nuovi, save
-invariato.**
+Le fasi 1-11 e la fase 8b (arte) sono chiuse: dal 2026-10-29 tutto e' su `main`. Il gioco si gioca nel mondo
+generato con arte vera, interni, base, mezzi, fauna, notte. Quello che manca per **finirlo** e' soprattutto la
+storia dell'Atto II e III (la prova finale oggi non si puo' superare): il lavoro che resta e' tutto in `prd.json`.
 
 ---
 
-## 1. Stato del repo (verificato il 2026-09-09)
+## 1. Stato del repo (2026-10-29)
 
-- Branch di lavoro: `claude/mini-trailer-prompt-adq22o` (l'utente lo
-  rinomina da GitHub, probabilmente in `fase-7-8`; il rename da GitHub
-  conserva la PR). Contiene la **chiusura della fase 7** (US-714..721) +
-  questo PRD.
-- **PR #3** aperta (draft) su quel branch → `main`:
-  https://github.com/YasserOudabashi/mirwada/pull/3. `mergeable_state:
-  clean` all'ultima verifica.
-- `main` è fermo a `9ee3ded` (US-713): la fase 7 **non è ancora in main**.
-- Branch `claude/map-creation-resources-g0g7d5`: stantio (basato su un
-  main pre-fase-7); il suo unico contenuto, la cartella `arte/`, è **già
-  identico in main**. Si può cancellare; non ripartire da lì.
-- CI GitHub Actions **disattivata** (minuti esauriti fino al 1° ottobre
-  2026, vedi `.github/workflows/ci.yml`): i test si lanciano in locale a
-  ogni story, senza eccezioni.
-- Repo **pubblico**: vedi "Nota IP" in `CLAUDE.md` — non è un problema
-  tecnico, ma va tenuto presente per ogni cosa che si scrive nei dati.
+- `main` contiene tutto (la PR #5 unita il 2026-10-29, con dentro la PR #4 delle fasi 8-11).
+- CI GitHub Actions accesa su push a `main` e sulle pull request (validator + `tools/run_tests.sh`).
+- Verifica locale: `python tools/validate_data.py` e `bash tools/run_tests.sh` (1076 test, ~5 minuti).
+- **Niente controlli automatici** della PR o della CI (decisione dell'utente, 2026-10-29): si controlla solo quando
+  lo chiede l'utente.
 
 ---
 
-## 2. Ordine delle operazioni
+## 2. Ordine delle story
 
-### Passo 0 — prima di iniziare la fase 8 (decisione dell'utente)
-
-Mergiare la **PR #3** in `main`, così la fase 8 parte dalla fase 7 chiusa.
-Poi aprire (o farsi indicare) il branch per la fase 8. Se l'utente preferisce
-continuare sullo stesso branch rinominato (`fase-7-8`), va bene: le story
-US-8NN si accodano lì e la PR #3 continua a raccoglierle.
-
-**Non** spezzare la storia del branch (niente rebase/force-push su un branch
-con PR aperta).
-
-### Passo 1 — `/prd`: NON serve
-
-Il PRD della fase 8 è **già scritto** nel formato che `/prd` produrrebbe
-(le 9 sezioni: overview, goals, user stories con acceptance criteria,
-FR, non-goals, design, technical, metrics, open questions) ed è **più
-preciso** di quanto `/prd` possa generare: ogni riferimento `file:riga` è
-stato verificato sul codice. Rilanciare `/prd` lo rigenererebbe da zero
-perdendo quel lavoro.
-
-Usa `/prd` **solo** se l'utente vuole cambiare lo scope (es. togliere la
-grafica, aggiungere la persistenza): in quel caso dagli in input questo
-PRD e chiedigli di **modificarlo**, non di riscriverlo.
-
-### Passo 2 — `/ralph`: SÌ, per generare `prd.json`
-
-`prd.json` contiene oggi le 21 story della fase 7, tutte `passes: true`
-(storico: il PRD `.md` è il documento, `prd.json` è la coda di lavoro della
-fase corrente, e viene sovrascritto a ogni fase — così è stato fatto per
-le fasi 2→7).
-
-Lancia:
-
-```
-/ralph 006_PRD/prd-fase-8-vertical-slice.md
-```
-
-e poi **controlla e correggi** il `prd.json` prodotto, perché la skill ha
-dei default diversi dalle convenzioni di questo repo:
-
-| Campo | Deve essere | Perché |
-|---|---|---|
-| `project` | `"Mirwada"` | come le fasi precedenti |
-| `branchName` | il branch di lavoro reale (es. `fase-7-8`), **non** `ralph/...` | ralph.sh e le regole di push del repo usano quello |
-| `description` | una riga dalla sezione 1 del PRD | |
-| `userStories[*].id` | `US-801` … `US-814`, **identici** al PRD | i commit si chiamano `US-8NN: <cosa>` |
-| `userStories[*].fase` | `8` (numero) | il campo esiste in tutte le story precedenti; `ralph.sh --fase 8` |
-| `userStories[*].priority` | 1..14 nell'ordine del PRD | le dipendenze vanno solo all'indietro |
-| `userStories[*].acceptanceCriteria` | gli AC del PRD, **compresa** la riga finale "python tools/validate_data.py esce 0. Nessuna regressione. Typecheck passes. Tests pass." | è il gate di ogni iterazione |
-| `passes` / `notes` | `false` / `""` | |
-
-Verifica veloce dopo il fix:
-
-```bash
-python3 -c "import json; d=json.load(open('prd.json')); print(d['branchName'], len(d['userStories']), [s['id'] for s in d['userStories']], all(s['fase']==8 for s in d['userStories']))"
-```
-
-Commit: `docs: prd.json della fase 8 (14 story) generato da /ralph`.
-
-### Passo 3 — eseguire le story
-
-Due modi, equivalenti nel risultato:
-
-**A. Ciclo ralph in locale** (sul PC dell'utente, Docker Desktop attivo —
-non nel container remoto, dove `~/.claude/skills/ralph.sh` non c'è):
-
-```bash
-bash ~/.claude/skills/ralph.sh 14 --fase 8 --test-cmd "godot --headless --script tests/run_tests.gd"
-```
-
-`--test-cmd` è **obbligatorio** in questo progetto (README § "Avvio del
-ciclo ralph": senza, ralph ripiega su `pytest`, che qui non esiste).
-
-**B. Una story per sessione Claude Code** (web o CLI). Prompt suggerito:
-
-```
-Leggi CLAUDE.md, progress.txt, prd.json e 006_PRD/prossimi-passi.md.
-Fai la prossima story di prd.json con passes:false a priorità più bassa
-(è US-8NN), seguendo la sua sezione in 006_PRD/prd-fase-8-vertical-slice.md.
-Prima di scrivere codice spiegami in breve cosa farai e aspetta il mio ok.
-Alla fine: validator 0, suite verde, verifica Xvfb se la story tocca UI o
-gameplay, progress.txt, prd.json (passes:true + notes), commit
-"US-8NN: <cosa>", push.
-```
-
-La riga "spiegami e aspetta il mio ok" è la **preferenza dichiarata
-dell'utente** (vale in modalità B; in modalità A ralph è autonomo per
-definizione).
-
-### Passo 4 — la sequenza consigliata dentro ogni story
-
-1. Leggi `CLAUDE.md` (regole), `progress.txt` (ultime 100 righe bastano),
-   `prd.json` (la story), la sezione della story nel PRD, e la tabella
-   "Cose che si riusano" (PRD § 7): **contiene i file e le righe** da cui
-   partire.
-2. Apri i file citati e verifica che le righe siano ancora quelle (il PRD
-   è stato scritto su `d7d450e`; se qualcuno ha toccato quei file, i numeri
-   possono essere scivolati — cerca la funzione per nome).
-3. Scrivi **prima il test** (o estendi quello indicato), poi il codice
-   minimo che lo fa passare. Niente astrazioni non richieste (Ponytail).
-4. `python tools/validate_data.py` → 0. Se una story tocca dati, aggiungi
-   al validator il check che la story chiede (i blocchi sono in fondo al
-   file, prima di `report()`; segui lo stile dei blocchi "chiusura fase N").
-5. `godot --headless --path . --import` (se hai toccato PNG/tscn/tres),
-   poi la suite. Tutta verde, **compresi** i test nuovi.
-6. Story con UI/gameplay → verifica a schermo con Xvfb (§ 5) e scrivi in
-   `progress.txt` **cosa hai osservato**, non "ok".
-7. `progress.txt`: blocco `=== US-8NN: <titolo> ===` con cosa fatto, come
-   verificato, cosa resta aperto. `prd.json`: `passes: true`, `notes`
-   compilate con le decisioni prese (non un riassunto del titolo).
-8. Commit dei **soli file toccati**: `git add <file...>` esplicito,
-   messaggio `US-8NN: <cosa>` (+ il footer di attribuzione richiesto dalla
-   sessione), push con `git push -u origin <branch>`.
-9. Se la story supera ~4 file o ~200 righe di diff **dopo** averla letta
-   bene: fermati, dillo, proponi lo split (regola 3). Le story del PRD sono
-   già state dimensionate per evitarlo, ma US-807 (4 mappe) e US-812
-   (19 fogli) sono le più grosse: se una non chiude, spezzala per regione
-   / per foglio, aggiornando `prd.json`.
+1. Fatte il 2026-10-26 le US-8B21a/b/c: i sei varchi sono ingressi sulla mappa (`regions.json` gating[].varco,
+   `mondo.gd crea_varchi`, disegni da `esporta_mondo.py --varchi`), il contenuto delle loro zone sta negli interni,
+   gli interni hanno l'arte del loro luogo.
+2. Fatte il 2026-10-26 anche **US-8B91 Barca dal porto**, **US-8B93 Volo** (piuma dei venti nell'osservatorio) e
+   **US-8B95 Accesso alla Frontiera** (barca, volo, soglia del faro con la chiave delle Rovine): `data/world/mezzi.json`,
+   `mondo.gd crea_barca`, `decolla`/`atterra`, `crea_soglie`.
+3. Fatta il 2026-10-26 **US-8B70 Icone degli oggetti**: 44 forme in `forge3d/icone.py`, abbinamento nei dati
+   (`data/ui/icone.json`, `tools/art/build_icone.py`), a terra con l'ombra e nello zaino. E **US-8B71 Icone di
+   stato**: 14 icone da griglie (`tools/art/build_stati.py`), in fila sopra la testa (`scripts/status_icons.gd`).
+   E **US-8B72 Icone di primitiva**: 28 glifi a 4 toni (`tools/art/build_primitive.py`) colorati dallo shader
+   `shaders/rampa_pathway.gdshader` con la palette del Pathway, nella hotbar.
+   E **US-8B40 VFX degli attacchi base**: fendente (anche sull'attacco base), proiettile in volo con lo scoppio,
+   scia dello scatto (`tools/art/build_vfx.py`, colorati dalla rampa, lampo spento con riduci_flash).
+   Fatta il 2026-10-27 **US-8B74 Panorami**: all'avvio il libro piccolo (`assets/ui/libro_avvio.png`) e intorno il
+   panorama a 6 strati che scorre (`tools/art/build_panorami.py`, `book_overlay.gd`), momento dall'ora del computer.
+   Fatta il 2026-10-27 **US-8B41 VFX delle primitive, gruppo 1** (buff/debuff, aura, cura, evocazione, scrutare,
+   varco, illusione) in `tools/art/build_vfx.py`, e **US-8B42 gruppo 2** (maleficio, frattura, paura, furto, brace,
+   ombra, tempo all'indietro, fioritura) e **US-8B43 gruppo 3** (pensiero, scudo, purificazione, possessione,
+   trasformazione, anima recisa, resurrezione, decadimento): ogni primitiva implementata ha il suo foglio.
+   E **US-8B40b feedback del colpo**: scintilla sul colpito, lampo della parata perfetta, schegge della postura,
+   polvere dello scatto (`vfx.json feedback_colpo`); parata e postura restano accese sopra il nero di scena.
+   E **US-8B35a/b ritratti**: mezzibusti 64x80 dallo stesso modello degli sprite (`tools/art/build_ritratti.py`),
+   con barba, occhiali ed espressione nei dati degli aspetti; nella pagina del dialogo e del negozio.
+   E **US-8B73b le due facciate del libro**: niente sulla piega; dialogo a sinistra e scelte a destra, nel negozio
+   si compra a sinistra e si vende a destra, con le liste che scorrono.
+   E **US-8B73c/d**: tutte le pagine sulle due facciate (scaffale, frontespizio, colophon, inventario con l'indice a
+   destra, diagramma con la griglia girata); un test controlla che nessuna facciata chieda piu' spazio di quello che ha.
+   E **US-8B50a/b la forma gigante**: Enel una volta e mezza (celle 96, `tools/art/build_forme.py`) quando la
+   transform ha una forma con aspetto; torna Enel quando il modificatore finisce.
+   E **US-8B50c l'arma di luce**: la seconda forma, Enel con la lama di luce dorata.
+   E **US-8B80a/b i gesti di Enel**: interagire, raccogliere (da fermo), bere, rituale, nei dati e nel gioco.
+   E **US-8B81a/b Enel in volo e in barca**: sospeso con le gambe che pendono, in ginocchio dentro lo scafo a remare.
+   E **US-8B22a forzieri**: tabelle di bottino in `data/world/bottino.json`, `scripts/forziere.gd` (si apre una volta
+   sola, il bottino nello zaino), forzieri nella grotta di marea, nel sotterraneo di Mirwada e nella cripta; e
+   **US-8B22b**: 9 forzieri nel sottosuolo del mondo (`bottino.json forzieri_mondo`, in un vicolo cieco vicino al punto);
+   **US-8B22c**: oggetti a caso nelle casette (`oggetti_casuali` dell'interno), uno preso non ricompare.
+   E **US-8B23a/b**: la fauna d'atmosfera (cervo, lepre, uccello, farfalla, lucciole) nel mondo, che scappa quando si
+   avvicina Enel (`data/world/fauna.json`, `scripts/world/fauna.gd`). E **US-8B24a**: il cannocchiale sul molo del
+   faro, la vista vola alla Frontiera e torna (`data/world/cannocchiali.json`, `scripts/cannocchiale.gd`); **US-8B24b**:
+   la lente con la nebbia che si dirada. E **US-8B25**: il buio di notte (`data/world/luce.json`, `scripts/world/luce.gd`).
+   E la base del giocatore: **US-8B20a** (gli interni delle 4 basi a piu' stanze, arredi per livello) e **US-8B20b**
+   (porte sul mondo, stanze arredate dal livello della sede, la pagina Base dalle stanze, la sede che si sposta).
+   E **US-8B18e**: negli interni la camera inquadra la stanza (ferma in basso al centro, l'HUD sopra).
+   E **US-8B20c/e**: l'orto all'aperto accanto alla sede, con le piante che crescono, e le strutture (palizzata,
+   totem di veglia, deposito) costruite dalla pagina Base.
+   E **US-8B20d**: la nave della base ormeggiata al cantiere navale, con la passerella verso il suo interno.
+4. Fatte il 2026-10-29 (dal controllo dello stesso giorno): **US-8B22d** gli oggetti fissi si prendono una volta sola,
+   **US-8B75** HUD leggibile (contorno alle scritte, barre colorate), **US-8B20f** orto e strutture bloccano il passo.
+5. **Prossime, in quest'ordine** (tutte in `prd.json`, `passes: false`):
+   1. Miglioramenti rapidi (priorita' 42-49): effetti sul bersaglio (US-8B44), icone nel negozio, in Indosso e
+      nella modalita' cupa (US-8B70b), barca piu' veloce (US-8B91b), pontili stretti raggiungibili (US-8B96),
+      cannocchiale senza nemici fuori dai muri (US-8B24c), bere dallo zaino e gesti degli NPC (US-8B80c), nemici
+      nelle stanze piccole (US-8B21d), sigilli in Indosso (US-8B73e).
+   2. Arte rimasta (55-61): cannocchiale da tasca (US-8B26), luci di notte (US-8B27), panorami per regione e cupi
+      (US-8B74b), evocazioni (US-8B60a) e antagonisti (US-8B60b) con la loro figura, nuoto (US-8B90), arrampicata
+      (US-8B92).
+   3. **Atto II e III (65-77, fase 13, US-1301..US-1313)**: e' quello che serve per arrivare alla fine. PRD
+      `prd-fase-12-atto-2-3.md` (vi si chiamano US-1201..US-1213: rinumerate come chiede US-1216 del Mondo vivo).
+   4. Mondo vivo (80-96, fase 12): prima **US-1200** riscrive il PRD sul mondo generato (quello di oggi misura la
+      mappa a layout di prima), poi US-1201..US-1216.
+   5. Fusioni (100-106, fase 7b): i 7 percorsi ancora stub (US-7B01..07).
+   6. Inglese (110-114): mancano 1496 voci su 1784 di `data/i18n/en.json` (US-EN01..05).
+   7. Facoltativa: altri Pathway Non-Standard (ex "fase 13" della roadmap, ora 14).
+6. **Controlli che spettano all'utente** (non si fanno in headless): giocare per provare i tempi d'attacco nuovi
+   (leggero 450 ms, pesante 850 ms), la durata dei tragitti, la base, il caricamento del mondo su Windows.
 
 ---
 
-## 3. Setup di un ambiente nuovo (container remoto o PC pulito)
+## 3. Trappole gia' scoperte
 
-Cosa serve e come lo verifichi:
-
-```bash
-godot --version            # atteso: 4.3.stable.official
-python3 --version          # 3.10+
-python3 -c "import PIL; print(PIL.__version__)"   # Pillow, per i generatori
-which xvfb-run             # per la verifica a schermo (opzionale ma richiesto dalle story UI)
-```
-
-Se Godot manca (stesse righe della CI, `.github/workflows/ci.yml`):
-
-```bash
-mkdir -p ~/godot && cd ~/godot
-curl -fsSL -o godot.zip "https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip"
-unzip -q godot.zip && mv Godot_v4.3-stable_linux.x86_64 godot && chmod +x godot
-sudo ln -sf ~/godot/godot /usr/local/bin/godot
-cd - && timeout 120 godot --headless --path . --import || true   # l'import in 4.3 non sempre esce 0: il gate è la suite
-```
-
-Se mancano Pillow / Xvfb: `pip install pillow` e `apt-get install -y xvfb`
-(nel container remoto `apt-get` funziona; su Windows Xvfb non serve: si
-lancia Godot normalmente e si guarda).
-
----
-
-## 4. Comandi di verifica (copia-incolla)
-
-```bash
-python tools/validate_data.py                                   # DEVE uscire 0
-godot --headless --path . --import || true                      # dopo PNG/tscn/tres
-godot --headless --path . --script res://tests/run_tests.gd     # DEVE uscire 0 (776 + i nuovi)
-python tools/generate_i18n_stubs.py                             # dopo aver aggiunto chiavi *_i18n
-python tools/generate_placeholders.py                           # rigenera i frame (fase 8: sopra generate_sprites.py)
-```
-
-Un solo test: la suite non ha filtro per nome; il modo più rapido è un
-`--script` che carica solo quel file, oppure lanciare tutto (≈ 1-2 min).
+- **Un test che va in errore risulta superato**: GDScript non ha eccezioni. Usa sempre
+  `bash tools/run_tests.sh`, che fallisce se nell'output compare `SCRIPT ERROR` o un errore di
+  formattazione. Mai `"%s" % lista` con un Array: si scrive `"%s" % [lista]`.
+- **Zone dei layout** = `[x, y, larghezza, altezza]`, non due angoli.
+- **Il giocatore sta dentro il nodo mondo** (`Mondo`, y_sort): chi lo cerca usa il gruppo `player`;
+  chi lo sposta usa `mondo.colloca()` (porta anche la telecamera).
+- **Le collisioni esistono solo nei blocchi caricati** attorno al giocatore: i nemici lontani vanno
+  fermati (`_aggiorna_attivita`), altrimenti attraversano i muri.
+- **Livelli**: un'area dell'altro livello (superficie/sottosuolo) va spenta (`monitoring`), non solo
+  nascosta, altrimenti si raccoglie un oggetto sotterraneo camminandoci sopra.
+- **forge3d**: `box` usa i semi-lati, `cylinder` (raggio x, raggio y, mezza altezza).
+- **Esportare il mondo** costa ~1 ora e ~18 MB nel repo: usare le opzioni parziali
+  (`--solo-blocchi`, `--sottosuolo`, `--solo-dati`, `--edifici`) quando bastano. `--edifici` (~5 minuti) rifa' gli
+  oggetti di scena dal generatore e toglie quelli dentro le case: rilanciato da' gli stessi file byte per byte.
+- **Il tetto di una casa sporge verso nord** di 3-4 caselle (muro + colmo): una porta va dove la soglia e le 3
+  caselle sotto sono libere, altrimenti il giocatore sulla soglia sparisce sotto il tetto della casa davanti.
+- `export_spec` di forge3d scrive `<categoria>_<nome>.png`: esportare in una cartella temporanea
+  quando il nome coincide con fogli gia' esistenti (e' successo con gli NPC: sovrascriveva Enel).
+- `tools/generate_sprites.py` (fase 8) non riscrive piu' i fogli dei personaggi: quelli li fa
+  `tools/art/build_personaggi.py` a 64 px.
+- Il libro prende colori, font e immagini da `data/ui/book.json` `tema`: un colore nuovo in una pagina
+  deve leggersi sulla pergamena (niente bianco, niente ciano).
 
 ---
 
-## 5. Verifica a schermo con Xvfb (ricetta che funziona in questo repo)
+## 4. Regole dell'utente da ricordare
 
-Uno script `SceneTree` (non un test della suite), lanciato con:
-
-```bash
-xvfb-run -a -s "-screen 0 1280x720x24" godot --path . -s res://tests/manual/<nome>.gd
-```
-
-Scheletro che **funziona** (già usato per la schermata di finale e per la
-diagnosi di `main.tscn`):
-
-```gdscript
-extends SceneTree
-
-func _initialize() -> void:
-    await process_frame
-    await process_frame                      # senza, get_tree() è null negli autoload
-    TranslationServer.set_locale("it")       # SettingsStore._ready non gira qui
-    var main: Node = load("res://scenes/main.tscn").instantiate()
-    get_root().add_child(main)               # gli overlay vanno aggiunti PRIMA di scatenare ciò che devono mostrare
-    await process_frame
-    await process_frame
-    # ... azioni: Input.action_press("move_right"); await process_frame ×N; Input.action_release(...)
-    # ... asserzioni: assert(get_root().get_node("Inventory").call("conta", id) == 1)
-    get_root().get_texture().get_image().save_png("/tmp/qa/01_passo.png")
-    quit()
-```
-
-Poi guarda davvero il PNG (`Read` del file nel tool) e scrivi in
-`progress.txt` cosa si vede. Uno screenshot grigio = hai scattato prima
-che gli overlay ricevessero il segnale: sposta `add_child` prima.
-
----
-
-## 6. Trappole già scoperte (costano ore, leggile)
-
-1. **`GameState._partita_attiva` non ha reset pubblico.** Un test che chiama
-   `nuova_partita()`/`carica_slot()` lo lascia `true` e fa fallire
-   `test_page_scaffale` (si aspetta 4 bottoni, ne trova 5: compare
-   "Riprendi"). Convenzione (da `tests/test_creazione_talenti.gd`):
-   `gs.set("_partita_attiva", false)` in `prepara()` **e** in `_fine()`.
-2. **Libro lasciato aperto = albero in pausa** per tutte le suite
-   successive in ordine alfabetico (`test_equipment` è la prima vittima).
-   Ogni test che apre il libro (`Book.apri`, `apri_a`, o un finale che lo
-   apre) lo chiude in `_fine()`; `_fine()` va chiamata in **ogni** test,
-   anche quelli che falliscono a metà (il runner non ha teardown).
-3. **`assert_almost_eq(got, want, what: String, epsilon = 0.0001)`**: il
-   messaggio è il terzo argomento, non l'epsilon.
-4. **Import prima della suite** dopo aver toccato asset o scene; e
-   `.import` è gitignorato: non committarli.
-5. **Le scene regione vengono istanziate headless** da `test_regions.gd`,
-   `test_area_gate.gd` (conta i figli per script) e `test_page_mappa.gd`:
-   tutto ciò che `region_scene.gd` crea in `_ready()` deve funzionare
-   senza player e senza cambiare tipo dei nodi contati.
-6. **Nomi dei file di fusione**: coppia in ordine alfabetico
-   (`door_error.json`, non `error_door`). Prima di scrivere un check sul
-   nome di un file, `ls`.
-7. **`generate_i18n_stubs.py` riscrive le chiavi non canoniche nei file di
-   dati**: lancialo consapevolmente e guarda il diff.
-8. **Il validator è fatto a mano** (`tools/validate_data.py`), non usa
-   `jsonschema`: gli schema in `data/schema/*.schema.json` sono
-   documentazione. Un check nuovo si scrive come `err()`/`warn()` nello
-   stile dei blocchi esistenti.
-9. **Segnali e nomi reali** (verificati): `GameState.partita_iniziata(nome)`,
-   `Progression.sequence_changed(nuova, vecchia)` (non
-   `sequenza_cambiata`), `AbilityEngine.ability_executed(id, caster,
-   result)`, `Inventory.tutto()` (non `tutti()`), `enemy.morto(chi)`.
-10. **`EventTracker._corrisponde`**: un filtro booleano `true` pretende
-    `dati[k] == true`; un payload `{}` non matcha mai. I nuovi payload
-    emettono i booleani espliciti (`false` compreso).
-
----
-
-## 7. Le regole che non si negoziano (recap; il testo vero è in `CLAUDE.md`)
-
-- **I dati non sono codice**: primitive (28), eventi (12), tag (82) sono
-  chiusi. Se una story sembra chiederne uno nuovo, è un dato mancante o
-  una primitiva sottoparametrizzata: fermati e chiedi all'utente.
-- **Nessun nome di contenuto nel codice** (Pathway, NPC, regione, oggetto,
-  formula, palette): solo id dai dati e chiavi i18n. US-814 lo controlla
-  col grep.
-- **Ponytail**: diff minimo, riusa i pattern citati nel PRD § 7, niente
-  astrazioni "per dopo".
-- **Una story, una iterazione**: se non chiude in una context window, era
-  troppo grossa — dillo e spezzala.
-- **i18n dal giorno 1**: chiavi in `strings.csv` (UI) o `data/i18n/*.json`
-  (dati), mai testo in chiaro, nemmeno provvisorio.
-
----
-
-## 8. Cosa consegnare all'utente
-
-- A ogni story con UI/gameplay: **lo screenshot** (via `SendUserFile`) e
-  due righe su cosa si vede. L'utente vuole vedere il gioco, non leggere
-  che "i test passano".
-- A fine fase (US-814): gli screenshot del giro completo, lo **schema dei
-  comandi** (movimento WASD/frecce; attacco/schivata/parata come in
-  `project.godot`; 1-4 abilità; Tab/I libro; F/Invio interagisci; Q/E
-  pagine) e l'elenco onesto di cosa resta fuori (PRD § 5).
-- Se emerge una decisione di design (PRD § 9 "Open Questions" o una nuova):
-  **chiedi**, con opzioni chiare, prima di implementare. Non decidere da
-  solo cosa "deve esserci" nel gioco: è la regola con cui questo PRD è
-  stato scritto.
-
----
-
-## 9. Dopo la fase 8
-
-Aggiornare `CLAUDE.md` § Fasi ("Fase 8 — Vertical slice: CHIUSA"),
-`roadmap.md` (Fase 9 opzionale = Pathway Non-Standard), `README.md`. Il
-primo vero playtest umano produrrà la lista di bilanciamento e la
-decisione su persistenza/spawner (PRD § 5): quello è materiale per un
-nuovo PRD, da generare **allora** con `/prd`.
+- "Non mi devi spiegare niente, tu fai e basta": si fa, si verifica, si riassume. Si chiede solo per le
+  decisioni di design o di gioco e per cambiare cose gia' approvate (strade, luoghi, villaggi, sottosuolo).
+- Mai lasciare imperfezioni: ogni asset si guarda ingrandito, ogni story di gioco si prova a schermo.
+- Rispondere in italiano, con parole semplici.

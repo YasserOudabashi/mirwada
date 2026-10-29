@@ -14,14 +14,13 @@ radius = 5.0
 radius = 7.0
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
+collision_mask = 17
 script = ExtResource("1_player")
 
 [node name="AnimationMachine" type="AnimatedSprite2D" parent="."]
-position = Vector2(0, -8)
 script = ExtResource("4_anim")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -4)
 shape = SubResource("CircleShape2D_body")
 
 [node name="StatsComponent" type="Node" parent="."]

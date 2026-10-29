@@ -114,7 +114,7 @@ func test_composizione_di_due_primitive() -> void:
 	var effects: Array = r["effects"]
 	assert_eq(effects.size(), 2, "due primitive eseguite davvero")
 	var tipi: Array = [(effects[0] as Dictionary)["tipo"], (effects[1] as Dictionary)["tipo"]]
-	assert_true(tipi.has("illusion") and tipi.has("buff_stat"), "illusion + buff_stat: %s" % tipi)
+	assert_true(tipi.has("illusion") and tipi.has("buff_stat"), "illusion + buff_stat: %s" % [tipi])
 
 	# evasione +0.15 dal JSON, applicata come modificatore
 	assert_almost_eq(float(s.call("get_stat", "evasione")), 0.15, "evasione buffata")

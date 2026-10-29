@@ -3,6 +3,7 @@
   "_comment": "Forme della primitiva 'transform'. Ogni forma_id referenziato da un'abilita' (data/abilities/) deve esistere qui. stat_modifiers e' additivo sulle statistiche base dello StatsComponent, applicato come modificatore per id 'transform:<ability_id>' e tolto quando la trasformazione finisce. I numeri sono PLAUSIBILI, NON BILANCIATI. Il trade-off e' esplicito nei dati: nessuna forma e' solo vantaggi.",
   "forms": {
     "tg_forma_gigante": {
+      "aspetto": "gigante",
       "name_i18n": "form.twilight_giant.tg_forma_gigante",
       "descrizione_i18n": "form.twilight_giant.tg_forma_gigante.desc",
       "stat_modifiers": {
@@ -12,6 +13,7 @@
       }
     },
     "tg_arma_luce": {
+      "aspetto": "arma_luce",
       "name_i18n": "form.twilight_giant.tg_arma_luce",
       "descrizione_i18n": "form.twilight_giant.tg_arma_luce.desc",
       "stat_modifiers": {

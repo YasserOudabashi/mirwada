@@ -1,0 +1,134 @@
+{
+ "alambicco": [
+  40,
+  82
+ ],
+ "altare": [
+  40,
+  70
+ ],
+ "bancone": [
+  56,
+  78
+ ],
+ "botte": [
+  24,
+  70
+ ],
+ "camino": [
+  40,
+  94
+ ],
+ "cannocchiale": [
+  24,
+  70
+ ],
+ "cantiere": [
+  40,
+  70
+ ],
+ "cassa": [
+  24,
+  70
+ ],
+ "cornice_porta": [
+  24,
+  90
+ ],
+ "deposito": [
+  40,
+  70
+ ],
+ "forgia": [
+  40,
+  94
+ ],
+ "forziere": [
+  24,
+  70
+ ],
+ "forziere_aperto": [
+  24,
+  70
+ ],
+ "incudine": [
+  24,
+  70
+ ],
+ "letto": [
+  24,
+  94
+ ],
+ "orto_germoglio": [
+  24,
+  70
+ ],
+ "orto_maturo": [
+  24,
+  70
+ ],
+ "orto_pianta": [
+  24,
+  70
+ ],
+ "orto_vuoto": [
+  24,
+  70
+ ],
+ "palizzata": [
+  40,
+  70
+ ],
+ "panca": [
+  40,
+  70
+ ],
+ "roccia": [
+  24,
+  70
+ ],
+ "sacchi": [
+  24,
+  70
+ ],
+ "sarcofago": [
+  40,
+  70
+ ],
+ "scaffale": [
+  40,
+  94
+ ],
+ "scrittoio": [
+  40,
+  70
+ ],
+ "sgabello": [
+  24,
+  70
+ ],
+ "sigillo": [
+  40,
+  102
+ ],
+ "tappeto": [
+  40,
+  70
+ ],
+ "tavolo": [
+  40,
+  70
+ ],
+ "tavolo_rotondo": [
+  24,
+  70
+ ],
+ "totem_veglia": [
+  24,
+  70
+ ],
+ "vaso": [
+  24,
+  70
+ ]
+}

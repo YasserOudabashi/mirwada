@@ -9,7 +9,7 @@ extends Node
 ## Sezioni:
 ##   audio  -> volume_<bus> (float dB), piu' i toggle di accessibilita' di
 ##             data/audio.json.accessibilita
-##   video  -> scala_finestra (1/2/3), fullscreen (bool), + toggle vfx
+##   video  -> scala_finestra (1/2/3 volte 1280x720), fullscreen (bool), + toggle vfx
 ##   input  -> <azione> -> physical_keycode (int) che sostituisce il primo
 ##             evento tastiera dell'azione
 ##   lingua -> "it" | "en"
@@ -23,7 +23,9 @@ signal cambiata(sezione: String, chiave: String, valore: Variant)
 
 const PATH := "user://settings.json"
 const AZIONI := ["move_up", "move_down", "move_left", "move_right",
-	"attacco", "schivata", "parata", "libro", "pagina_avanti", "pagina_indietro"]
+	"attacco", "schivata", "parata",
+	"abilita_1", "abilita_2", "abilita_3", "abilita_4", "interagisci",
+	"libro", "pagina_avanti", "pagina_indietro", "vola"]
 
 var _dati: Dictionary = {}
 
@@ -122,13 +124,13 @@ func _applica(sezione: String, chiave: String, valore: Variant) -> void:
 
 
 func _applica_video() -> void:
-	var scala: int = int(get_val("video", "scala_finestra", 2))
+	var scala: int = int(get_val("video", "scala_finestra", 1))
 	var full: bool = bool(get_val("video", "fullscreen", false))
 	if full:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-		DisplayServer.window_set_size(Vector2i(640 * scala, 360 * scala))
+		DisplayServer.window_set_size(Vector2i(1280 * scala, 720 * scala))
 	# i toggle vfx passano dallo stesso canale accessibilita' di AudioManager
 	var am: Node = _n("/root/AudioManager")
 	if am != null:

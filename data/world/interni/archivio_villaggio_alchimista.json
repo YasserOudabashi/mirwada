@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "interno_id": "archivio_villaggio_alchimista", "stile": "bottega",
+  "mappa": [
+    "#######",
+    "#.....#",
+    "#.....#",
+    "#.....#",
+    "#######"
+  ],
+  "spawn": [
+    3,
+    3
+  ],
+  "arredi": [{"id": "alambicco", "x": 1, "y": 1}, {"id": "scaffale", "x": 3, "y": 1}, {"id": "vaso", "x": 1, "y": 3}],
+  "nemici": [],
+  "oggetti": [],
+  "npcs": [
+    {
+      "x": 5,
+      "y": 1,
+      "npc_id": "npc_orsolya"
+    }
+  ]
+}

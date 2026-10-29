@@ -22,8 +22,8 @@ func test_convenzioni() -> void:
 	var gd: Node = _data()
 	# JSON legge i numeri come float: confronto elemento per elemento come int.
 	var dim: Array = gd.call("animation_convention", "dimensione_frame")
-	assert_eq(int(dim[0]), 32, "larghezza frame")
-	assert_eq(int(dim[1]), 32, "altezza frame")
+	assert_eq(int(dim[0]), 64, "larghezza frame (US-8B01)")
+	assert_eq(int(dim[1]), 64, "altezza frame (US-8B01)")
 	assert_eq(gd.call("animation_convention", "direzioni"), ["down", "up", "left", "right"], "4 direzioni")
 	assert_eq(gd.call("animation_convention", "chiave_inventata"), null, "chiave assente -> null")
 
@@ -32,10 +32,18 @@ func test_campi_base_walk() -> void:
 	var s: RefCounted = _spec("personaggio", "walk")
 	assert_true(s.is_valid(), "walk valida")
 	assert_eq(s.frame_count(), 6, "6 frame")
-	assert_eq(s.fps(), 12.0, "12 fps")
+	# durate_ms: i contatti (frame 1 e 4, footstep) sono tenuti di piu'
+	assert_eq(s.frame_durations_ms(), [120.0, 150.0, 120.0, 120.0, 150.0, 120.0], "durate per frame")
 	assert_true(s.loops(), "walk in loop")
 	assert_true(s.is_directional(), "walk direzionale")
-	assert_almost_eq(s.duration_sec(), 0.5, "durata 6/12 s")
+	assert_almost_eq(s.duration_sec(), 0.78, "durata = somma delle durate")
+
+
+func test_senza_durate_ms_vale_fps() -> void:
+	# dash e' a fps (20): le finestre di i-frame non cambiano con la resa
+	var s: RefCounted = _spec("personaggio", "dash")
+	assert_eq(s.frame_durations_ms(), [50.0, 50.0, 50.0, 50.0], "1000/20 ms per frame")
+	assert_almost_eq(s.duration_sec(), 0.2, "durata 4/20 s")
 
 
 func test_animazione_inesistente() -> void:

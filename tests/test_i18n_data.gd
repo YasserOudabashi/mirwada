@@ -22,6 +22,18 @@ func test_chiave_presente_traduce() -> void:
 	assert_false(s.begins_with("TODO "), "e' testo vero, non uno stub")
 
 
+## Nessuna voce di it.json e' ancora uno stub "TODO ..." (it.json copre solo
+## i dati attivi - pathways_deferred esclusi dal generatore). Il giocatore
+## non deve mai vedere "TODO ability.xxx" a schermo.
+func test_nessuno_stub_todo_in_it() -> void:
+	var gd: Node = _data()
+	var stub: Array = []
+	for k in gd.call("i18n_keys"):
+		if str(gd.call("tr_data", str(k), "it")).begins_with("TODO "):
+			stub.append(k)
+	assert_eq(stub.size(), 0, "chiavi ancora da tradurre in it.json: %s" % [stub])
+
+
 func test_chiave_mancante_torna_la_chiave() -> void:
 	var gd: Node = _data()
 	assert_eq(gd.call("tr_data", "chiave.inventata.xyz"), "chiave.inventata.xyz",

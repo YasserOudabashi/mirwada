@@ -15,6 +15,8 @@ const NOME_DEFAULT := "Enel"
 signal partita_iniziata(nome: String)
 
 var nome_personaggio: String = NOME_DEFAULT
+## Modalita' scelta a inizio partita (data/modalita.json): fissa, va nel save.
+var modalita: String = "facile"
 var tempo_gioco: float = 0.0
 ## false al boot (sei sul menu del libro), true dopo nuova_partita()/carica_slot().
 var _partita_attiva: bool = false
@@ -100,6 +102,10 @@ func _acting() -> Node:
 	return get_node_or_null("/root/Acting")
 
 
+func _boon() -> Node:
+	return get_node_or_null("/root/BoonSystem")
+
+
 func _caratteristiche() -> Node:
 	return get_node_or_null("/root/CharacteristicStore")
 
@@ -164,7 +170,9 @@ func carica_slot(slot: int) -> Dictionary:
 
 
 ## Creazione personaggio (US-223): fissa il nome, riparte da zero, salva sullo
-## slot scelto. Il Pathway/Sequenza di partenza vengono dai dati (Progression).
+## slot scelto. La Sequenza di partenza viene dai dati (Progression); il
+## Pathway e' quello scelto (US-801) o, con "" (compatibilita' coi chiamanti
+## esistenti/i test), il default di balance.json.progressione.
 ## talenti_innati (US-332): id di talenti 'innato' scelti alla creazione — solo
 ## quelli veri entrano in TalentSystem, il resto e' ignorato.
 ##
@@ -175,16 +183,18 @@ func carica_slot(slot: int) -> Dictionary:
 ## (Sequenza, follia) si azzerano qui: nuova_partita() puo' essere chiamata
 ## nella STESSA sessione di un personaggio appena concluso, i cui autoload
 ## portano ancora il suo stato.
-func nuova_partita(nome: String, slot: int, talenti_innati: Array = []) -> Dictionary:
+func nuova_partita(nome: String, slot: int, talenti_innati: Array = [],
+		pathway_id: String = "", scelta_modalita: String = "") -> Dictionary:
 	var eredita: Dictionary = _eredita_da_slot(slot)
 
 	nome_personaggio = nome.strip_edges() if not nome.strip_edges().is_empty() else NOME_DEFAULT
+	modalita = _modalita_valida(scelta_modalita)
 	tempo_gioco = 0.0
 	_partita_attiva = true
 	_slot_corrente = slot
 
 	if _progression() != null:
-		_progression().call("configura", "", 9)
+		_progression().call("configura", pathway_id, 9)
 	if _follia() != null:
 		_follia().call("azzera")
 	if _conoscenza() != null:
@@ -252,6 +262,34 @@ func _applica_eredita(eredita: Dictionary) -> void:
 		_inventario().call("aggiungi", str(eredita["oggetto"]), 1)
 
 
+## Numero della modalita' corrente (data/modalita.json.moltiplicatori): 1 se
+## la modalita' non lo cita. Chi applica danni e cure lo chiede per nome.
+func moltiplicatore(nome: String) -> float:
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd == null:
+		return 1.0
+	var m: Dictionary = (gd.call("get_modalita", modalita) as Dictionary).get("moltiplicatori", {})
+	return float(m.get(nome, 1.0))
+
+
+## Set di asset del mondo per la modalita' corrente ("luminoso" | "cupo").
+func tema_arte() -> String:
+	var gd: Node = get_node_or_null("/root/GameData")
+	var d: Dictionary = gd.call("get_modalita", modalita) if gd != null else {}
+	return str(d.get("tema_arte", "luminoso"))
+
+
+## Una modalita' che non esiste nei dati (o vuota: save vecchio) diventa
+## quella di default dei dati.
+func _modalita_valida(id: String) -> String:
+	var gd: Node = get_node_or_null("/root/GameData")
+	if gd == null:
+		return id if not id.is_empty() else "facile"
+	if id in (gd.call("modalita_ids") as Array):
+		return id
+	return str(gd.call("modalita_default"))
+
+
 func partita_in_corso() -> bool:
 	return _partita_attiva
 
@@ -281,6 +319,7 @@ func slot_scelto() -> int:
 func snapshot() -> Dictionary:
 	var dati: Dictionary = {
 		"nome_personaggio": nome_personaggio,
+		"modalita": modalita,
 		"tempo_gioco": tempo_gioco,
 		"posizione": Vector2.ZERO,
 		"statistiche": {},
@@ -310,9 +349,17 @@ func snapshot() -> Dictionary:
 		"equipaggiamento": _equip().per_salvataggio() if _equip() != null else {},
 		# fase 7: cambio Pathway, fusioni, tribolazioni, eredita', finale.
 		"endgame": _endgame().per_salvataggio() if _endgame() != null else {},
+		# fase 9: baseline dei requisiti 'comportamento' del Boon corrente.
+		"boon": _boon().per_salvataggio() if _boon() != null else {},
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
-	if p is Node2D:
+	var mn: Node = get_tree().get_first_node_in_group("mondo")
+	if mn != null:                                   # mondo generato: fuori dagli interni, col livello
+		dati["posizione"] = mn.call("posizione_da_salvare")
+		(dati["mondo"] as Dictionary)["livello"] = str(mn.get("livello"))
+		(dati["mondo"] as Dictionary)["barca"] = mn.call("stato_barca")
+		(dati["mondo"] as Dictionary)["volo"] = bool(mn.call("in_volo"))
+	elif p is Node2D:
 		dati["posizione"] = (p as Node2D).global_position
 	var stats: Node = p.get_node_or_null("StatsComponent") if p != null else null
 	if stats != null:
@@ -341,6 +388,7 @@ func _mondo_snapshot() -> Dictionary:
 
 func applica(dati: Dictionary) -> void:
 	nome_personaggio = str(dati.get("nome_personaggio", NOME_DEFAULT))
+	modalita = _modalita_valida(str(dati.get("modalita", "")))
 	tempo_gioco = float(dati.get("tempo_gioco", 0.0))
 	if _progression() != null:
 		_progression().da_salvataggio(dati.get("progressione", {}))
@@ -361,6 +409,9 @@ func applica(dati: Dictionary) -> void:
 	# Acting DOPO progressione ed eventi: legge la Sequenza e i conteggi.
 	if _acting() != null:
 		_acting().da_salvataggio(dati.get("acting", {}))
+	# BoonSystem, stesso motivo di Acting (fase 9).
+	if _boon() != null:
+		_boon().da_salvataggio(dati.get("boon", {}))
 	if _caratteristiche() != null:
 		_caratteristiche().da_salvataggio(dati.get("caratteristiche", []))
 	if _follia() != null:
@@ -391,7 +442,12 @@ func applica(dati: Dictionary) -> void:
 	if _equip() != null:
 		_equip().da_salvataggio(dati.get("equipaggiamento", {}))
 	var p: Node = get_tree().get_first_node_in_group("player")
-	if p is Node2D and dati.has("posizione"):
+	var mn: Node = get_tree().get_first_node_in_group("mondo")
+	if mn != null and dati.has("posizione"):
+		var md: Dictionary = dati.get("mondo", {})
+		mn.call("riprendi", str(md.get("livello", "superficie")), dati["posizione"], md.get("barca", {}),
+				bool(md.get("volo", false)))
+	elif p is Node2D and dati.has("posizione"):
 		(p as Node2D).global_position = dati["posizione"]
 	var stats: Node = p.get_node_or_null("StatsComponent") if p != null else null
 	var s: Dictionary = dati.get("statistiche", {})

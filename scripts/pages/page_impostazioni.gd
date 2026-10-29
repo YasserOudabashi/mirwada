@@ -8,6 +8,7 @@ extends ScrollContainer
 ## un vocabolario chiuso, "va discusso" - estendere una pagina esistente non
 ## lo tocca). La sezione finale appare per prima, sopra tutto il resto.
 
+const PaginaLibro := preload("res://scripts/pages/pagina_libro.gd")
 const BUS := ["master", "music", "sfx", "ambience", "ui", "whisper"]
 const ACC_AUDIO := ["sottotitoli_effetti", "indicatore_visivo_tell",
 	"indicatore_direzione_suono", "disattiva_sussurri"]
@@ -15,16 +16,26 @@ const ACC_VIDEO := ["disattiva_shake", "riduci_hitstop", "riduci_distorsione",
 	"riduci_flash", "riduci_animazioni"]
 
 var _vbox: VBoxContainer = null
+## US-8B73c: audio e video sulla facciata sinistra, comandi e lingua sulla destra (la mette li' il libro,
+## book_overlay.gd); ognuna scorre per conto suo.
+var destra := ScrollContainer.new()
 var _rimappa_azione: String = ""
 var _rimappa_btn: Button = null
 
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE and is_instance_valid(destra) and destra.get_parent() == null:
+		destra.free()                                # nessun libro l'ha presa: non resta orfana
+
+
 func aggiorna() -> void:
-	for c in get_children():
-		c.queue_free()
-	_vbox = VBoxContainer.new()
-	_vbox.add_theme_constant_override("separation", 3)
-	add_child(_vbox)
+	for madre in [self, destra]:
+		for c in madre.get_children():
+			c.queue_free()
+	destra.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_vbox = _colonna(self)
+	var colonna_destra: VBoxContainer = _colonna(destra)
 
 	_sezione_finale()
 
@@ -41,7 +52,13 @@ func aggiorna() -> void:
 		_toggle("COLOPHON_%s" % k.to_upper(), "video", k, _acc_def(k))
 	_toggle("COLOPHON_MACCHIE_FOLLIA", "video", "macchie_follia", _macchie_def())
 
+	_vbox = colonna_destra
 	_titolo("COLOPHON_INPUT")
+	var schema := Label.new()
+	schema.text = tr("COLOPHON_SCHEMA_COMANDI")
+	schema.autowrap_mode = TextServer.AUTOWRAP_WORD
+	schema.custom_minimum_size = Vector2(0, 0)
+	_vbox.add_child(schema)
 	for azione in _ss().call("azioni"):
 		_rebind(azione)
 
@@ -71,12 +88,13 @@ func _sezione_finale() -> void:
 	var titolo := Label.new()
 	titolo.text = str(gd.call("tr_data", ending.get("name_i18n", finale_id)))
 	titolo.add_theme_font_size_override("font_size", 18)
+	titolo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_vbox.add_child(titolo)
 
 	var epilogo := Label.new()
 	epilogo.text = str(gd.call("tr_data", _chiave_epilogo(gd, ending)))
 	epilogo.autowrap_mode = TextServer.AUTOWRAP_WORD
-	epilogo.custom_minimum_size = Vector2(360, 0)
+	epilogo.custom_minimum_size = Vector2(0, 0)
 	_vbox.add_child(epilogo)
 
 	_riepilogo_eredita(eg, gd, ending)
@@ -122,6 +140,7 @@ func _riepilogo_eredita(eg: Node, gd: Node, ending: Dictionary) -> void:
 	for r in righe:
 		var l := Label.new()
 		l.text = "· " + str(r)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_vbox.add_child(l)
 	if serve_ancora:
 		_scelta_ancora()
@@ -152,9 +171,7 @@ func _scelta_ancora() -> void:
 		if es != null:
 			es.call("scegli_ancora", str(attive[o.get_selected()]))
 		aggiorna())
-	h.add_child(o)
-	h.add_child(b)
-	_vbox.add_child(h)
+	_riga_scelta(h, o, b)
 
 
 ## Un item impilabile dallo zaino scelto per l'eredita' (US-719). Nulla se lo
@@ -179,12 +196,30 @@ func _scelta_oggetto() -> void:
 		if es != null:
 			es.call("scegli_oggetto", str(ids[o.get_selected()]))
 		aggiorna())
+	_riga_scelta(h, o, b)
+
+
+# --- Costruttori di riga --------------------------------------------
+
+## Tendina e bottone su una riga che non esce dalla facciata: la tendina taglia il testo lungo, il bottone va a capo.
+func _riga_scelta(h: HBoxContainer, o: OptionButton, b: Button) -> void:
+	o.clip_text = true
+	o.custom_minimum_size = Vector2(60, 0)
+	o.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	PaginaLibro.a_capo(b)
+	b.custom_minimum_size = Vector2(80, 0)
 	h.add_child(o)
 	h.add_child(b)
 	_vbox.add_child(h)
 
 
-# --- Costruttori di riga --------------------------------------------
+func _colonna(madre: Node) -> VBoxContainer:
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 3)
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL   # largo quanto la facciata, mai oltre la piega
+	madre.add_child(v)
+	return v
+
 
 func _titolo(chiave: String) -> void:
 	var l := Label.new()
@@ -196,6 +231,7 @@ func _titolo(chiave: String) -> void:
 func _toggle(chiave: String, sez: String, opt: String, default: bool) -> void:
 	var cb := CheckButton.new()
 	cb.text = tr(chiave)
+	PaginaLibro.a_capo(cb)                             # le voci lunghe vanno a capo, non oltre la piega
 	cb.button_pressed = bool(_ss().call("get_val", sez, opt, default))
 	cb.toggled.connect(func(v: bool) -> void: _ss().call("set_val", sez, opt, v))
 	_vbox.add_child(cb)
@@ -205,13 +241,15 @@ func _slider(chiave: String, sez: String, opt: String, default: float, lo: float
 	var h := HBoxContainer.new()
 	var l := Label.new()
 	l.text = tr(chiave)
-	l.custom_minimum_size = Vector2(160, 0)
+	l.custom_minimum_size = Vector2(110, 0)
 	var s := HSlider.new()
 	s.min_value = lo
 	s.max_value = hi
 	s.step = 1.0
 	s.value = float(_ss().call("get_val", sez, opt, default))
-	s.custom_minimum_size = Vector2(180, 0)
+	s.custom_minimum_size = Vector2(80, 0)
+	s.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	s.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	s.value_changed.connect(func(v: float) -> void: _ss().call("set_val", sez, opt, v))
 	h.add_child(l)
 	h.add_child(s)
@@ -222,11 +260,11 @@ func _scala() -> void:
 	var h := HBoxContainer.new()
 	var l := Label.new()
 	l.text = tr("COLOPHON_SCALA")
-	l.custom_minimum_size = Vector2(160, 0)
+	l.custom_minimum_size = Vector2(110, 0)
 	var o := OptionButton.new()
 	for n in [1, 2, 3]:
 		o.add_item("x%d" % n, n)
-	o.select(o.get_item_index(int(_ss().call("get_val", "video", "scala_finestra", 2))))
+	o.select(o.get_item_index(int(_ss().call("get_val", "video", "scala_finestra", 1))))
 	o.item_selected.connect(func(i: int) -> void:
 		_ss().call("set_val", "video", "scala_finestra", o.get_item_id(i)))
 	h.add_child(l)
@@ -246,13 +284,22 @@ func _lingua() -> void:
 	_vbox.add_child(o)
 
 
+## Etichetta leggibile per un'azione dell'InputMap. tr() torna la chiave se
+## non c'e' voce: in quel caso si mostra l'id grezzo, mai "COLOPHON_AZIONE_X".
+func _nome_azione(azione: String) -> String:
+	var k: String = "COLOPHON_AZIONE_" + azione.to_upper()
+	var t: String = tr(k)
+	return t if t != k else azione
+
+
 func _rebind(azione: String) -> void:
 	var h := HBoxContainer.new()
 	var l := Label.new()
-	l.text = azione
-	l.custom_minimum_size = Vector2(160, 0)
+	l.text = _nome_azione(azione)
+	l.custom_minimum_size = Vector2(110, 0)
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var b := Button.new()
-	b.custom_minimum_size = Vector2(140, 0)
+	b.custom_minimum_size = Vector2(90, 0)
 	b.text = _tasto_di(azione)
 	b.pressed.connect(func() -> void:
 		_rimappa_azione = azione

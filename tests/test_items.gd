@@ -62,6 +62,18 @@ func test_pergamena_ha_stored_ability_che_risolve() -> void:
 				"%s: una pergamena ha stored_ability_id, insegna_ricetta o stored_flag" % d.get("id"))
 
 
+## US-808: i 299 ingredienti citati dalle formule dei 10 Pathway attivi
+## sono item veri (tools/generate_formula_ingredients.py), non stringhe
+## fantasma solo nelle formule.
+func test_ingredienti_delle_formule_sono_item_veri() -> void:
+	var gd: Node = _gd()
+	var ferro: Dictionary = gd.call("get_item", "ferro_temperato")
+	assert_false(ferro.is_empty(), "ferro_temperato (formula_twilight_giant_9) esiste come item")
+	assert_eq(ferro.get("categoria"), "ingrediente", "categoria corretta")
+	assert_gt(float((gd.call("items_per_categoria", "ingrediente") as Array).size()), 306.0,
+		">= 307 ingredienti (299 dalle formule + 8 scritti a mano)")
+
+
 func test_ogni_name_i18n_degli_item_risolve() -> void:
 	var gd: Node = _gd()
 	var rotte: Array = []

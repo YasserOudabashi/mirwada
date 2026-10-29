@@ -16,6 +16,10 @@ extends Node
 signal hp_changed(hp: float, hp_max: float)
 signal spiritualita_changed(spiritualita: float, spiritualita_max: float)
 signal died
+## US-8B71: uno status e' stato applicato o tolto (le icone sopra la testa si ridisegnano).
+signal status_cambiati
+## US-8B50: la forma (data/forms.json "aspetto") e' cambiata; "" = quella di sempre. Il player cambia i fogli.
+signal forma_cambiata(aspetto: String)
 
 ## Le statistiche modificabili. hp e spiritualita' correnti NON sono qui:
 ## sono risorse che si consumano, non caratteristiche.
@@ -38,6 +42,8 @@ const _FALLBACK := {
 var _base: Dictionary = {}
 ## id del modificatore -> { nome_stat: delta }
 var _modifiers: Dictionary = {}
+## mod_id -> aspetto della forma (US-8B50), nell'ordine in cui sono state prese.
+var _forme: Dictionary = {}
 ## status nominato -> { tag: String, left: float }  (left < 0 = permanente)
 var _statuses: Dictionary = {}
 var _hp: float = 0.0
@@ -174,6 +180,17 @@ func is_dead() -> bool:
 	return _dead
 
 
+## Riporta l'entita' in vita con l'hp indicato (hp_max se omesso o negativo).
+## Resetta il flag di morte: senza questo, il setter di 'hp' (che emette
+## 'died' solo su una transizione "not _dead" -> 0) non potrebbe mai
+## rilevare una morte successiva alla prima.
+func revivi(quantita: float = -1.0) -> void:
+	var maximum: float = get_stat("hp_max")
+	_dead = false
+	_hp = clampf(quantita if quantita >= 0.0 else maximum, 0.0, maximum)
+	hp_changed.emit(_hp, maximum)
+
+
 func _process(delta: float) -> void:
 	_rigenera_spiritualita(delta)
 	if _statuses.is_empty():
@@ -204,6 +221,7 @@ func applica_status(id: String, durata: float = -1.0) -> void:
 	_statuses[id] = {"tag": str(dati.get("tag", "")), "left": d}
 	var mods: Variant = dati.get("stat_modifiers", {})
 	apply_modifier("status:%s" % id, mods if typeof(mods) == TYPE_DICTIONARY else {})
+	status_cambiati.emit()
 
 
 func rimuovi_status(id: String) -> bool:
@@ -211,6 +229,7 @@ func rimuovi_status(id: String) -> bool:
 		return false
 	_statuses.erase(id)
 	remove_modifier("status:%s" % id)
+	status_cambiati.emit()
 	return true
 
 
@@ -226,6 +245,11 @@ func rimuovi_status_per_tag(tag: String) -> int:
 
 func ha_status(id: String) -> bool:
 	return _statuses.has(id)
+
+
+## Secondi rimasti di uno status; < 0 se permanente o assente.
+func status_rimasto(id: String) -> float:
+	return float((_statuses.get(id, {}) as Dictionary).get("left", -1.0))
 
 
 func status_attivi() -> Array:
@@ -292,7 +316,21 @@ func remove_modifier(id: String) -> bool:
 		return false
 	_modifiers.erase(id)
 	_clamp_hp()
+	if _forme.erase(id):                              # la forma finisce col suo modificatore, comunque se ne vada
+		forma_cambiata.emit(forma())
 	return true
+
+
+## US-8B50: l'aspetto di una forma legato al suo modificatore (transform:<ability_id>).
+func imposta_forma(mod_id: String, aspetto: String) -> void:
+	_forme.erase(mod_id)
+	_forme[mod_id] = aspetto
+	forma_cambiata.emit(forma())
+
+
+## L'aspetto dell'ultima forma presa ancora attiva; "" se nessuna.
+func forma() -> String:
+	return str(_forme.values().back()) if not _forme.is_empty() else ""
 
 
 func has_modifier(id: String) -> bool:

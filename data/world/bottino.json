@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "_comment": "US-8B22: tabelle di bottino. Un forziere ha una tabella: aprendolo si fanno da tiri[0] a tiri[1] estrazioni; ogni estrazione sceglie una voce in proporzione al suo peso e ne da' da quantita[0] a quantita[1] (le voci uguali si sommano). Il forziere si apre una volta sola (WorldState, nel salvataggio) e il bottino va nello zaino. I forzieri stanno nei dati dei luoghi: 'forzieri' [{id, x, y, tabella}] negli interni; quelli del sottosuolo del mondo qui sotto in 'forzieri_mondo' [{id, vicino, tabella}], vicino = un ingresso o un boss del sottosuolo (assets/world/mondo.json): il gioco lo posa nel primo vicolo cieco raggiungibile a piedi da li' (US-8B22b). Un interno con 'oggetti_casuali': '<tabella>' (le casette, US-8B22c) ha a terra gli oggetti tirati da quella tabella, sempre gli stessi per la stessa casa (seme = id dell'interno); uno preso non ricompare (WorldState, nel salvataggio). Validator: item_id esistenti, pesi e quantita' positivi, tabelle usate esistenti, id dei forzieri unici.",
+  "tabelle": {
+    "casa": {
+      "tiri": [1, 2],
+      "voci": [
+        {"item_id": "moneta_comune", "peso": 6, "quantita": [2, 8]},
+        {"item_id": "erba_lunare", "peso": 3, "quantita": [1, 2]},
+        {"item_id": "fiore_di_camomilla_selvatica", "peso": 3, "quantita": [1, 2]},
+        {"item_id": "filo_di_lana_rossa", "peso": 3, "quantita": [1, 1]},
+        {"item_id": "cera_di_veglia", "peso": 3, "quantita": [1, 1]},
+        {"item_id": "miele_selvatico", "peso": 2, "quantita": [1, 1]},
+        {"item_id": "gesso_consacrato", "peso": 2, "quantita": [1, 1]},
+        {"item_id": "pozione_cura_minore", "peso": 2, "quantita": [1, 1]}
+      ]
+    },
+    "grotta": {
+      "tiri": [2, 3],
+      "voci": [
+        {"item_id": "fungo_cavernicolo", "peso": 6, "quantita": [1, 3]},
+        {"item_id": "muschio_di_caverna", "peso": 4, "quantita": [1, 2]},
+        {"item_id": "sale_di_roccia", "peso": 4, "quantita": [1, 2]},
+        {"item_id": "cristallo_grezzo", "peso": 3, "quantita": [1, 1]},
+        {"item_id": "lingotto_ferro", "peso": 3, "quantita": [1, 1]},
+        {"item_id": "moneta_comune", "peso": 5, "quantita": [4, 12]},
+        {"item_id": "pozione_cura_minore", "peso": 2, "quantita": [1, 1]},
+        {"item_id": "muschio_luminoso", "peso": 2, "quantita": [1, 1]},
+        {"item_id": "pietra_di_marea", "peso": 1, "quantita": [1, 1]},
+        {"item_id": "ambra_grigia", "peso": 1, "quantita": [1, 1]}
+      ]
+    },
+    "fogne": {
+      "tiri": [2, 3],
+      "voci": [
+        {"item_id": "moneta_comune", "peso": 6, "quantita": [5, 15]},
+        {"item_id": "chiave_senza_denti", "peso": 3, "quantita": [1, 1]},
+        {"item_id": "cardine_arrugginito_di_una_porta_perduta", "peso": 3, "quantita": [1, 1]},
+        {"item_id": "polvere_di_sale_nero", "peso": 3, "quantita": [1, 2]},
+        {"item_id": "olio_conduttore", "peso": 2, "quantita": [1, 1]},
+        {"item_id": "pozione_cura_minore", "peso": 3, "quantita": [1, 1]},
+        {"item_id": "sigillo_reale", "peso": 1, "quantita": [1, 1]}
+      ]
+    },
+    "miniera": {
+      "tiri": [2, 3],
+      "voci": [
+        {"item_id": "lingotto_ferro", "peso": 5, "quantita": [1, 2]},
+        {"item_id": "sale_di_roccia", "peso": 4, "quantita": [1, 3]},
+        {"item_id": "cristallo_grezzo", "peso": 4, "quantita": [1, 2]},
+        {"item_id": "ferro_temperato", "peso": 3, "quantita": [1, 2]},
+        {"item_id": "moneta_comune", "peso": 4, "quantita": [5, 12]},
+        {"item_id": "cuore_di_montagna", "peso": 1, "quantita": [1, 1]},
+        {"item_id": "elisir_del_vigore", "peso": 1, "quantita": [1, 1]}
+      ]
+    },
+    "cripta": {
+      "tiri": [2, 4],
+      "voci": [
+        {"item_id": "polvere_ossa", "peso": 5, "quantita": [1, 3]},
+        {"item_id": "dente_di_teschio", "peso": 4, "quantita": [1, 2]},
+        {"item_id": "cera_di_candela_rituale", "peso": 4, "quantita": [1, 2]},
+        {"item_id": "incenso_di_mirra", "peso": 3, "quantita": [1, 1]},
+        {"item_id": "moneta_del_traghettatore", "peso": 3, "quantita": [1, 2]},
+        {"item_id": "chiodo_di_bara", "peso": 2, "quantita": [1, 1]},
+        {"item_id": "obolo_di_bronzo", "peso": 1, "quantita": [1, 1]},
+        {"item_id": "pozione_cura_maggiore", "peso": 1, "quantita": [1, 1]}
+      ]
+    }
+  },
+  "forzieri_mondo": [
+    {"id": "sotto_fogne_boss", "vicino": "boss_fogne", "tabella": "fogne"},
+    {"id": "sotto_fogne_6", "vicino": "fogne_6", "tabella": "fogne"},
+    {"id": "sotto_fogne_11", "vicino": "fogne_11", "tabella": "fogne"},
+    {"id": "sotto_catacombe_boss", "vicino": "boss_catacombe", "tabella": "cripta"},
+    {"id": "sotto_catacombe_7", "vicino": "catacombe_7", "tabella": "cripta"},
+    {"id": "sotto_grotte_boss", "vicino": "boss_grotte", "tabella": "grotta"},
+    {"id": "sotto_grotte_2", "vicino": "grotte_2", "tabella": "grotta"},
+    {"id": "sotto_miniere_boss", "vicino": "boss_miniere", "tabella": "miniera"},
+    {"id": "sotto_miniere_3", "vicino": "miniere_3", "tabella": "miniera"}
+  ]
+}

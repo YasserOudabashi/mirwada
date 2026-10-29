@@ -37,6 +37,7 @@ TribulationSystem="*res://scripts/tribulation_system.gd"
 Foundation="*res://scripts/foundation.gd"
 Acting="*res://scripts/acting.gd"
 PotionSystem="*res://scripts/potion_system.gd"
+BoonSystem="*res://scripts/boon_system.gd"
 Forge="*res://scripts/forge.gd"
 AudioManager="*res://scripts/audio_manager.gd"
 AnchorSystem="*res://scripts/anchor_system.gd"
@@ -60,16 +61,21 @@ Book="*res://scripts/book.gd"
 
 [display]
 
-; Viewport logico: e' questa la risoluzione in cui si ragiona.
-window/size/viewport_width=640
-window/size/viewport_height=360
-; Finestra reale all'avvio: 640x360 scalato x2, cosi' e' guardabile.
-window/size/window_width_override=1280
-window/size/window_height_override=720
-; "viewport" rende a 640x360 e poi scala l'immagine intera: i pixel
-; restano quadrati e nessun elemento si disallinea dalla griglia.
-window/stretch/mode="viewport"
+; US-8B01 (64 px): si disegna a 1280x720 pixel veri, ma il mondo resta di
+; 640x360 unita' (scale=2): 1 tile = 32 unita' = 64 pixel. Gameplay, mappe e
+; interfaccia ragionano in unita' come prima; gli sprite da 64 px si mettono a
+; mezza grandezza (animation_machine.gd) e mostrano ogni loro pixel.
+window/size/viewport_width=1280
+window/size/viewport_height=720
+; "canvas_items" disegna alla risoluzione vera della finestra; "viewport"
+; disegnerebbe a 640x360 e perderebbe meta' dei dettagli dei 64 px.
+window/stretch/mode="canvas_items"
 window/stretch/aspect="keep"
+window/stretch/scale=2.0
+; Solo multipli interi di 1280x720 (x1, x2, x3): ogni pixel dello sprite e'
+; sempre 1, 2 o 3 pixel dello schermo. Su Full HD resta 1280x720 con il
+; bordo nero (decisione dell'utente, 2026-10-14).
+window/stretch/scale_mode="integer"
 
 [internationalization]
 
@@ -152,10 +158,40 @@ pagina_avanti={
 ]
 }
 
+; Hotbar delle abilita' possedute (US-802). 1-4: la N-esima abilita' di
+; AbilityEngine.owned_abilities(player). Vedi scripts/player.gd.
+abilita_1={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":49,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
+abilita_2={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":50,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
+abilita_3={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":51,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
+abilita_4={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":52,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
+vola={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":86,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
+
 [rendering]
 
 ; 0 = Nearest. Senza questo la pixel art esce sfocata.
 textures/canvas_textures/default_texture_filter=0
+; fuori dalle stanze degli interni il buio: l'inchiostro della palette (#181425), non il grigio di Godot
+environment/defaults/default_clear_color=Color(0.0941, 0.0784, 0.1451, 1)
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 ; Snap del rendering 2D alla griglia di pixel interi. Con la camera che
