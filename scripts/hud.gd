@@ -20,6 +20,8 @@ extends CanvasLayer
 ## la hotbar ogni 0.1s invece che ogni frame (60 volte al secondo sarebbe
 ## sprecato per un numero che cambia percettibilmente una volta ogni tanto).
 var _cd_accum: float = 0.0
+## Il colore del pieno di ogni barra (Endesga 32): vita rossa, spirito blu, recitazione gialla.
+const COLORI_BARRE := {"HP": "#e43b44", "SP": "#0099db", "Acting": "#feae34"}
 ## US-8B72: davanti a ogni slot il glifo della prima primitiva dell'abilita', colorato dalla palette del Pathway
 ## (shaders/rampa_pathway.gdshader, data/vfx.json): un materiale per tutti, si aggiorna se cambia il Pathway.
 var _icone: Array = []
@@ -29,6 +31,20 @@ var _rampa_di: String = "?"
 
 func _ready() -> void:
 	add_to_group("hud")                                # US-8B24b: il cannocchiale lo nasconde mentre si guarda
+	for l in find_children("*", "Label", true, false):  # contorno scuro come i prompt: si legge su ogni fondo
+		(l as Label).add_theme_constant_override("outline_size", 4)
+		(l as Label).add_theme_color_override("font_outline_color", Color("#181425"))
+	for nome in COLORI_BARRE:                          # barre piene di colore su fondo scuro (Endesga 32)
+		var fondo := StyleBoxFlat.new()
+		fondo.bg_color = Color("#181425")
+		fondo.border_color = Color("#3a4466")
+		fondo.set_border_width_all(1)
+		var pieno := StyleBoxFlat.new()
+		pieno.bg_color = Color(COLORI_BARRE[nome])
+		var barra: ProgressBar = get_node("Root/VBox/%s/Barra" % nome)
+		barra.add_theme_stylebox_override("background", fondo)
+		barra.add_theme_stylebox_override("fill", pieno)
+		barra.size_flags_vertical = Control.SIZE_SHRINK_CENTER    # in mezzo alla scritta, non in cima
 	var acting: Node = get_node_or_null("/root/Acting")
 	if acting != null:
 		acting.acting_progress_changed.connect(_su_acting)

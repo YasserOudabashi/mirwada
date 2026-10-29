@@ -756,6 +756,21 @@
       "fase": "8b",
       "passes": true,
       "notes": "2026-10-29. Meta preso_id ('<regione>@<i>', '<interno>@<i>', '<interno>:ospiti@<i>'), WorldState.prendi al tree_exiting se raccolto. Non usare la meta 'chiave' (e' delle soglie). tests/test_forzieri.gd."
+    },
+    {
+      "id": "US-8B75",
+      "title": "HUD leggibile",
+      "description": "Scritte dell'HUD col contorno scuro, barre di vita, spirito e recitazione colorate su fondo scuro.",
+      "acceptanceCriteria": [
+        "contorno su tutte le scritte",
+        "barre colorate e centrate",
+        "test",
+        "verifica a schermo"
+      ],
+      "priority": 41,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-29. hud.gd: outline 4 #181425 su ogni Label, COLORI_BARRE (Endesga 32), fondo #181425. arte/revisione/hud_leggibile.png."
     }
   ]
 }

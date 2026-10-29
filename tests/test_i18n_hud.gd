@@ -119,3 +119,19 @@ func test_hotbar_lampeggia_quando_parte_l_abilita() -> void:
 
 	hud.free()
 	host.free()
+
+
+## 2026-10-29: le scritte dell'HUD hanno il contorno scuro dei prompt e le barre un colore pieno (bianche senza contorno non si leggevano sui
+## fondi chiari: marmo, neve, sabbia).
+func test_le_scritte_dell_hud_hanno_il_contorno() -> void:
+	var hud: CanvasLayer = HudScene.instantiate()
+	Engine.get_main_loop().root.add_child(hud)
+	var etichette: Array = hud.find_children("*", "Label", true, false)
+	assert_gt(etichette.size(), 6, "vita, spirito, recitazione, hotbar, avanzamento")
+	for l in etichette:
+		assert_eq((l as Label).get_theme_constant("outline_size"), 4, "%s col contorno" % l.name)
+		assert_eq((l as Label).get_theme_color("font_outline_color"), Color("#181425"), "%s del colore del contorno" % l.name)
+	for nome in ["HP", "SP", "Acting"]:
+		var pieno: StyleBoxFlat = (hud.get_node("Root/VBox/%s/Barra" % nome) as ProgressBar).get_theme_stylebox("fill")
+		assert_eq(pieno.bg_color, Color(hud.get("COLORI_BARRE")[nome]), "la barra %s piena del suo colore" % nome)
+	hud.free()

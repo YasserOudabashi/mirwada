@@ -14959,3 +14959,11 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   chiave (mondo._aggiorna_varchi): il mondo prendeva gli oggetti per porte (SCRIPT ERROR "Chiuso" non trovato).
 - tests/test_forzieri.gd (+2: interno e mondo, anche nel salvataggio). 1075 test, validate 0.
 
+## US-8B75 — HUD leggibile, 2026-10-29
+- Le scritte dell'HUD erano bianche senza contorno (sui fondi chiari non si leggevano) e le barre di vita, spirito e
+  recitazione avevano lo stile grigio trasparente di Godot: il pieno non si distingueva dal vuoto.
+- hud.gd _ready: ogni Label col contorno scuro dei prompt (outline 4, #181425); le barre con un fondo scuro (#181425,
+  bordo #3a4466) e il pieno colorato (COLORI_BARRE: vita #e43b44, spirito #0099db, recitazione #feae34, Endesga 32),
+  centrate in verticale sulla scritta.
+- A schermo sul molo di pietra del faro: arte/revisione/hud_leggibile.png. test_i18n_hud (+1). 1076 test, validate 0.
+
