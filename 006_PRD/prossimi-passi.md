@@ -1,6 +1,6 @@
 # Prossimi passi — istruzioni per la prossima sessione di Claude Code
 
-> Riscritto il 2026-10-26 (la versione del 2026-09-09 descriveva la fase 8 prima del merge).
+> Riscritto il 2026-10-26 (la versione del 2026-09-09 descriveva la fase 8 prima del merge); aggiornato il 2026-10-29.
 > Leggilo **dopo** `CLAUDE.md` e **prima** di toccare qualunque file. Il dettaglio di ogni story
 > fatta e' in `progress.txt` (cerca la sigla), le story aperte in `prd.json`.
 
@@ -8,24 +8,19 @@
 
 ## 0. Il quadro in tre righe
 
-Le fasi 1-11 sono chiuse. L'arte (fase 8b) e' in corso: personaggi a 64 px, NPC, terreni e un
-**mondo unico generato** (seed 6, 1200 x 1000 caselle) che e' la scena di gioco, con le case di
-Mirwada, dei villaggi e le torri, e le porte verso i 14 interni delle fasi 10-11 (US-8B18a/b, 2026-10-26).
-Gli interni sono disegnati e arredati (US-8B18c/d); varchi, barca, volo, soglia del faro e icone degli oggetti
-e degli status, i glifi delle primitive e i VFX degli attacchi base sono fatti (2026-10-26), il panorama
-dell'avvio, i VFX di tutte le primitive e il feedback del colpo il 2026-10-27. Quello che manca di piu' a schermo:
-le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti sono fatti (US-8B35a/b).
+Le fasi 1-11 e la fase 8b (arte) sono chiuse: dal 2026-10-29 tutto e' su `main`. Il gioco si gioca nel mondo
+generato con arte vera, interni, base, mezzi, fauna, notte. Quello che manca per **finirlo** e' soprattutto la
+storia dell'Atto II e III (la prova finale oggi non si puo' superare): il lavoro che resta e' tutto in `prd.json`.
 
 ---
 
-## 1. Stato del repo (2026-10-26)
+## 1. Stato del repo (2026-10-29)
 
-- Branch di lavoro: `claude/map-creation-resources-g0g7d5`, **PR #5** (draft) verso `main`.
-  Contiene l'arte, il mondo generato e il merge della PR #4 (fasi 8-11, 2026-10-25).
-- La **PR #4** (`claude/mini-trailer-prompt-adq22o`) e' interamente dentro la PR #5: si puo' chiudere.
-- `main` e' ferma alla fase 7: va aggiornata mergiando la PR #5 quando l'utente lo decide.
-- CI GitHub Actions **accesa** su push a `main` e sulle pull request (validator + `tools/run_tests.sh`).
-- Verifica locale: `python tools/validate_data.py` e `bash tools/run_tests.sh` (1043 test, ~1 minuto).
+- `main` contiene tutto (la PR #5 unita il 2026-10-29, con dentro la PR #4 delle fasi 8-11).
+- CI GitHub Actions accesa su push a `main` e sulle pull request (validator + `tools/run_tests.sh`).
+- Verifica locale: `python tools/validate_data.py` e `bash tools/run_tests.sh` (1076 test, ~5 minuti).
+- **Niente controlli automatici** della PR o della CI (decisione dell'utente, 2026-10-29): si controlla solo quando
+  lo chiede l'utente.
 
 ---
 
@@ -77,12 +72,25 @@ le **creature** (blocco E) e le animazioni nuove di Enel (blocco G); i ritratti 
    E **US-8B20c/e**: l'orto all'aperto accanto alla sede, con le piante che crescono, e le strutture (palizzata,
    totem di veglia, deposito) costruite dalla pagina Base.
    E **US-8B20d**: la nave della base ormeggiata al cantiere navale, con la passerella verso il suo interno.
-4. **Prossime**: il
-   cannocchiale da tasca;
-   nuoto e arrampicata col loro gameplay (US-8B90, US-8B92, blocco H, con le animazioni). Evocazioni e
-   antagonisti aspettano di avere una figura nel mondo.
-   Evocazioni e antagonisti (blocco E) aspettano di avere una figura nel mondo (oggi summon scrive solo nel registro).
-5. Fase 12 (PRD `prd-fase-12-atto-2-3.md`, `prd-fase-12-mondo-vivo.md`).
+4. Fatte il 2026-10-29 (dal controllo dello stesso giorno): **US-8B22d** gli oggetti fissi si prendono una volta sola,
+   **US-8B75** HUD leggibile (contorno alle scritte, barre colorate), **US-8B20f** orto e strutture bloccano il passo.
+5. **Prossime, in quest'ordine** (tutte in `prd.json`, `passes: false`):
+   1. Miglioramenti rapidi (priorita' 42-49): effetti sul bersaglio (US-8B44), icone nel negozio, in Indosso e
+      nella modalita' cupa (US-8B70b), barca piu' veloce (US-8B91b), pontili stretti raggiungibili (US-8B96),
+      cannocchiale senza nemici fuori dai muri (US-8B24c), bere dallo zaino e gesti degli NPC (US-8B80c), nemici
+      nelle stanze piccole (US-8B21d), sigilli in Indosso (US-8B73e).
+   2. Arte rimasta (55-61): cannocchiale da tasca (US-8B26), luci di notte (US-8B27), panorami per regione e cupi
+      (US-8B74b), evocazioni (US-8B60a) e antagonisti (US-8B60b) con la loro figura, nuoto (US-8B90), arrampicata
+      (US-8B92).
+   3. **Atto II e III (65-77, fase 13, US-1301..US-1313)**: e' quello che serve per arrivare alla fine. PRD
+      `prd-fase-12-atto-2-3.md` (vi si chiamano US-1201..US-1213: rinumerate come chiede US-1216 del Mondo vivo).
+   4. Mondo vivo (80-96, fase 12): prima **US-1200** riscrive il PRD sul mondo generato (quello di oggi misura la
+      mappa a layout di prima), poi US-1201..US-1216.
+   5. Fusioni (100-106, fase 7b): i 7 percorsi ancora stub (US-7B01..07).
+   6. Inglese (110-114): mancano 1496 voci su 1784 di `data/i18n/en.json` (US-EN01..05).
+   7. Facoltativa: altri Pathway Non-Standard (ex "fase 13" della roadmap, ora 14).
+6. **Controlli che spettano all'utente** (non si fanno in headless): giocare per provare i tempi d'attacco nuovi
+   (leggero 450 ms, pesante 850 ms), la durata dei tragitti, la base, il caricamento del mondo su Windows.
 
 ---
 

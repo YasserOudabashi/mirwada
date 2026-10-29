@@ -539,7 +539,13 @@ una ricetta specifici — lista vietata scoperta da `GameData.get_npcs()` +
 
 ---
 
-## Fase 12 — Atto II e Atto III
+## Fase 12 — Mondo vivo e Fase 13 — Atto II e Atto III (aggiornato il 2026-10-29)
+
+> Le story sono in `prd.json`. Il PRD `prd-fase-12-mondo-vivo.md` diventa la fase 12 (prima va riscritto sul mondo
+> generato: US-1200); il PRD `prd-fase-12-atto-2-3.md` e' la fase 13 (story US-1301..US-1313, come chiede US-1216)
+> e va fatto per primo: senza, la prova finale non si supera. La vecchia "Fase 13 — Opzionale" diventa la 14.
+
+## (testo originale) Fase 12 — Atto II e Atto III
 
 > **PRD**: `006_PRD/prd-fase-12-atto-2-3.md` (generato il 2026-09-10, 13
 > story `US-1201..US-1213` — rinumerate da `US-1101..US-1113` quando la
@@ -562,7 +568,7 @@ epiloghi di finale (fase 7) sono già scritti e buoni, fuori scope.
 
 ---
 
-## Fase 13 — Opzionale
+## Fase 14 — Opzionale (era la 13)
 
 Altri Pathway Non-Standard (Chaos Primogenitor, Scrooge, Dreamless e gli
 altri bestowers), stesso schema di Eternal Aeon (fase 9: motore Boon già

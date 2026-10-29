@@ -1,7 +1,7 @@
 {
   "project": "Mirwada",
   "branchName": "claude/map-creation-resources-g0g7d5",
-  "description": "Fase 8b - Arte con sprite-forge e mondo generato, dopo il merge con le fasi 8-11 (2026-10-25). Fatto: mondo unico nel gioco, sottosuolo, NPC, contenuto dei layout, libro. Aperto: edifici e interni, varchi, volo e Frontiera (decisioni dell'utente), icone, VFX, panorami. Dettaglio in 006_PRD/prd-fase-8b-arte.md e 006_PRD/prossimi-passi.md.",
+  "description": "Fase 8b - Arte con sprite-forge e mondo generato, dopo il merge con le fasi 8-11 (2026-10-25). Fatto: mondo unico nel gioco, sottosuolo, NPC, contenuto dei layout, libro. Aperto: edifici e interni, varchi, volo e Frontiera (decisioni dell'utente), icone, VFX, panorami. Dettaglio in 006_PRD/prd-fase-8b-arte.md e 006_PRD/prossimi-passi.md. Dal 29.10: backlog completo (miglioramenti, arte rimasta, Atto II/III come fase 13, Mondo vivo come fase 12 da riscrivere, fusioni, inglese).",
   "userStories": [
     {
       "id": "US-8B12",
@@ -786,6 +786,775 @@
       "fase": "8b",
       "passes": true,
       "notes": "2026-10-29. base_fuori._metti: StaticBody2D 'Corpo' (misura x0.9); disegna() con la firma. arte/revisione/base_blocca.png."
+    },
+    {
+      "id": "US-8B44",
+      "title": "Effetti sul bersaglio e piu' visibili",
+      "description": "Gli effetti delle primitive che colpiscono un altro (maleficio, possessione, anima recisa) compaiono sul bersaglio, non su chi lancia; furto e fioritura durano abbastanza da vedersi.",
+      "acceptanceCriteria": [
+        "data/vfx.json dice per ogni effetto se sta su chi lancia o sul bersaglio",
+        "maleficio, possessione, anima recisa sul bersaglio",
+        "furto e fioritura piu' lunghi (frame o durate nei dati)",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 42,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B70b",
+      "title": "Icone nel negozio, in Indosso e nella modalita' cupa",
+      "description": "Il negozio e la pagina Indosso mostrano le icone degli oggetti; le icone hanno anche una serie per la modalita' cupa.",
+      "acceptanceCriteria": [
+        "icona accanto a ogni oggetto del negozio (compra e vendi)",
+        "icona accanto a ogni slot di Indosso",
+        "assets/icone/oggetti/cupo/ generato da build_icone.py e usato con GameState.tema_arte()",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 43,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B91b",
+      "title": "Barca piu' veloce",
+      "description": "In barca si va piu' veloci che a piedi (valore nei dati, mezzi.json).",
+      "acceptanceCriteria": [
+        "mezzi.json barca.velocita (moltiplicatore) letto dal player in barca",
+        "test che in barca la velocita' e' maggiore",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 44,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B96",
+      "title": "Pontili stretti raggiungibili",
+      "description": "I pontili stretti del porto sono chiusi alla radice da un dislivello: si raggiungono a piedi dalla banchina.",
+      "acceptanceCriteria": [
+        "blocchi.png: la radice dei pontili e' libera (correzione nel generatore, esporta_mondo.py --solo-blocchi)",
+        "test di raggiungibilita' dalla banchina a ogni pontile",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 45,
+      "fase": "8b",
+      "passes": false,
+      "notes": "I pontili (pontile_legno) larghi 1 hanno '^' (128) alla radice: vedi progress US-8B20d."
+    },
+    {
+      "id": "US-8B24c",
+      "title": "Cannocchiale senza nemici fuori dai muri",
+      "description": "Mentre si guarda col cannocchiale i blocchi attorno al giocatore restano costruiti (o i nemici vicini si fermano).",
+      "acceptanceCriteria": [
+        "mondo tiene i blocchi del giocatore mentre la camera del cannocchiale e' attiva",
+        "test",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 46,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B80c",
+      "title": "Bere dallo zaino e gesti degli NPC",
+      "description": "Bere un oggetto dallo zaino (Inventory.usa) fa il gesto del bere; gli NPC usano gli stessi gesti.",
+      "acceptanceCriteria": [
+        "segnale di Inventory quando si usa un oggetto da bere",
+        "il player fa 'drink' alla chiusura del libro",
+        "almeno un NPC usa 'interact' nella sua routine",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 47,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B21d",
+      "title": "Nemici nelle stanze piccole non subito addosso",
+      "description": "Entrando in un interno coi nemici, i nemici partono lontani dalla porta e con un attimo di attesa.",
+      "acceptanceCriteria": [
+        "distanza minima dallo spawn per i nemici degli interni (dato)",
+        "attesa iniziale (dato) prima di inseguire",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 48,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B73e",
+      "title": "Sigilli incastonati nella pagina Indosso",
+      "description": "La pagina Indosso mostra i sigilli incastonati invece della scritta 'in arrivo'.",
+      "acceptanceCriteria": [
+        "elenco dei sigilli incastonati (SigilSystem) con nome e icona",
+        "BOOK_INV_SIGILLI_TODO tolta",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 49,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B26",
+      "title": "Cannocchiale da tasca",
+      "description": "Un oggetto cannocchiale nello zaino: usandolo la vista si allunga nella direzione dello sguardo, con la lente di US-8B24b.",
+      "acceptanceCriteria": [
+        "oggetto nei dati (non vendibile o da negozio: decisione dell'utente)",
+        "riusa scripts/cannocchiale.gd con bersaglio davanti al giocatore",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 55,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B27",
+      "title": "Luci di notte",
+      "description": "Di notte le finestre delle case si accendono, i lampioni e il faro fanno luce (strato additivo sopra il buio, come le lucciole).",
+      "acceptanceCriteria": [
+        "luci nei dati (data/world/luce.json: dove e quanto)",
+        "finestre accese dagli edifici, faro con il fascio",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 56,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B74b",
+      "title": "Panorami per regione e modalita' cupa",
+      "description": "Il panorama dell'avvio ha una veduta per regione e la versione cupa.",
+      "acceptanceCriteria": [
+        "forge3d/panorama.py: vedute per le regioni",
+        "build_panorami.py esporta anche il tema cupo",
+        "asset guardati ingranditi",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 57,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B60a",
+      "title": "Evocazioni nel mondo",
+      "description": "La primitiva summon mette nel mondo una figura vera (sprite forge3d) che combatte, invece di scrivere solo nel registro.",
+      "acceptanceCriteria": [
+        "un aspetto per evocazione nei dati",
+        "AnimationMachine con idle/walk/attack",
+        "segue e combatte col giocatore",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 58,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B60b",
+      "title": "Antagonisti con la loro figura",
+      "description": "Gli antagonisti dei dati hanno sprite e ritratto propri.",
+      "acceptanceCriteria": [
+        "un aspetto per antagonista (build_npc/forge3d)",
+        "ritratto in assets/ritratti/",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 59,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B90",
+      "title": "Nuoto",
+      "description": "Si nuota nell'acqua bassa con l'animazione swim (gameplay + arte).",
+      "acceptanceCriteria": [
+        "acqua bassa nei blocchi (valore nuovo nel generatore)",
+        "animazione swim in data/animations.json e foglio generato",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 60,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8B92",
+      "title": "Arrampicata",
+      "description": "Ci si arrampica sui dislivelli segnati (gameplay + arte).",
+      "acceptanceCriteria": [
+        "punti di arrampicata nei dati del mondo",
+        "animazione climb in data/animations.json e foglio generato",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 61,
+      "fase": "8b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-1301",
+      "title": "Audit del rituale di Sequenza 1 sui 10 Pathway attivi",
+      "description": "Ogni Sequenza 1 dei 10 Pathway attivi ha 'ancora_del_giocatore' tra i sacrifici del rituale.",
+      "acceptanceCriteria": [
+        "tabella dei 10 Pathway (gia' presente / aggiunto) in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 65,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1201)."
+    },
+    {
+      "id": "US-1302",
+      "title": "La prova finale si puo' superare",
+      "description": "Un nodo di dlg_antagonista (tier_min angel) scrive tribolazione_soglia_varcata su una scelta esplicita del giocatore.",
+      "acceptanceCriteria": [
+        "il flag e' scritto da un dialogo raggiungibile nel gioco vero",
+        "npc_antagonista raggiungibile alla soglia della Frontiera di notte",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 66,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1202)."
+    },
+    {
+      "id": "US-1303",
+      "title": "Quest posizione di fazione",
+      "description": "Una quest q_<npc>_02 di un NPC di fazione (Ottavia o Bruno) con eventi e filtri esistenti e un on_complete di reputazione scelto in dialogo.",
+      "acceptanceCriteria": [
+        "offerta solo da tier mid (tier_min sul primo nodo)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 67,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1203)."
+    },
+    {
+      "id": "US-1304",
+      "title": "Il duello con Aldo come scena",
+      "description": "Un dialogo dlg_aldo inquadra il duello offerto da npc_system ai salti di tier, con vittoria e sconfitta come rami dichiarati.",
+      "acceptanceCriteria": [
+        "nessuna regola di combattimento nuova",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 68,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1204)."
+    },
+    {
+      "id": "US-1305",
+      "title": "Rituali dell'Atto II in luoghi veri",
+      "description": "I location_tags dei rituali delle Sequenze 6-4 esistono nelle regioni aperte in Atto II; dove manca, si aggiunge la zona.",
+      "acceptanceCriteria": [
+        "audit in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 69,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1205)."
+    },
+    {
+      "id": "US-1306",
+      "title": "Checkpoint: una partita attraversa l'Atto II",
+      "description": "tests/manual/qa_atto_2.gd: da Sequenza 6 a 4 con la quest di fazione, il duello e trib_5_4.",
+      "acceptanceCriteria": [
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 70,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1206)."
+    },
+    {
+      "id": "US-1307",
+      "title": "Doran sa",
+      "description": "Nuovo nodo di dlg_doran (tier_min saint): Doran ha capito, con flag e reputazione sulla giustizia.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 71,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1207)."
+    },
+    {
+      "id": "US-1308",
+      "title": "Lena capisce",
+      "description": "Nuovo ramo di dlg_lena a tier alto; se Lena e' un'Ancora attiva, effetto dichiarato sulla sua forza.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 72,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1208)."
+    },
+    {
+      "id": "US-1309",
+      "title": "Vesna sceglie",
+      "description": "Nuovo ramo di dlg_vesna: resta o si allontana (flag + reputazione).",
+      "acceptanceCriteria": [
+        "decisione aperta: effetto sul finale Rinuncia (PRD §9)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 73,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1209)."
+    },
+    {
+      "id": "US-1310",
+      "title": "Il rituale di Sequenza 1 nel mondo reale",
+      "description": "L'Ancora sacrificata e il luogo del rituale sono raggiungibili e visibili a schermo.",
+      "acceptanceCriteria": [
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 74,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1210)."
+    },
+    {
+      "id": "US-1311",
+      "title": "Checkpoint: una partita attraversa l'Atto III",
+      "description": "tests/manual/qa_atto_3.gd: da Sequenza 4 a 0 con le 4 tribolazioni e il rituale.",
+      "acceptanceCriteria": [
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 75,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1211)."
+    },
+    {
+      "id": "US-1312",
+      "title": "Checkpoint dinamico della fase",
+      "description": "Test grep-based: quest e nodi nuovi esistono e referenziano solo id validi; nessun nome di Pathway nel codice toccato.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 76,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1212)."
+    },
+    {
+      "id": "US-1313",
+      "title": "Chiusura fase Atto II e III",
+      "description": "progress.txt, CLAUDE.md, roadmap aggiornati; story a passes true.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 77,
+      "fase": "13",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1213)."
+    },
+    {
+      "id": "US-1200",
+      "title": "Riscrivere il PRD Mondo vivo sul mondo generato",
+      "description": "Il PRD prd-fase-12-mondo-vivo.md misura le distanze sulla mappa a layout di prima: va rifatto sul mondo generato (34 villaggi, luoghi, sottosuolo), decidendo con l'utente cosa resta da aggiungere.",
+      "acceptanceCriteria": [
+        "PRD aggiornato con i tragitti e i vuoti misurati su assets/world/mondo.json",
+        "story US-1201..US-1216 riallineate in prd.json",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 80,
+      "fase": "12",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-1201",
+      "title": "Verifica e numerazione",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1201), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 81,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1202",
+      "title": "Punto di interesse Mirwada-Archivio",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1202), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 82,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1203",
+      "title": "Punto di interesse Mirwada-Frontiera",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1203), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 83,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1204",
+      "title": "Punto di interesse Mirwada-Marche",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1204), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 84,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1205",
+      "title": "Punto di interesse Mirwada-Valle",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1205), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 85,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1206",
+      "title": "Punto di interesse Marche-Archivio",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1206), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 86,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1207",
+      "title": "Punto di interesse Archivio-Frontiera",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1207), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 87,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1208",
+      "title": "Punto di interesse Frontiera-Valle",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1208), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 88,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1209",
+      "title": "Punto di interesse Valle-Marche",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1209), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 89,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1210",
+      "title": "Villaggio vicino alla Valle",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1210), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 90,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1211",
+      "title": "Villaggio vicino alla Frontiera",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1211), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 91,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1212",
+      "title": "Dungeon nelle Marche",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1212), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 92,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1213",
+      "title": "Dungeon nella Frontiera",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1213), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 93,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1214",
+      "title": "Doran segue le tue tracce fuori Mirwada",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1214), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 94,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1215",
+      "title": "Un secondo mercante apre banco altrove",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1215), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 95,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-1216",
+      "title": "Checkpoint e chiusura fase 12",
+      "description": "Vedi 006_PRD/prd-fase-12-mondo-vivo.md (US-1216), dopo la riscrittura di US-1200.",
+      "acceptanceCriteria": [
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 96,
+      "fase": "12",
+      "passes": false,
+      "notes": "Da riallineare al mondo generato (US-1200) prima di farla."
+    },
+    {
+      "id": "US-7B01",
+      "title": "Percorso di fusione darkness_death",
+      "description": "Il percorso di fusione data/fusions/darkness_death.json non e' piu' uno stub: contenuto scritto per intero come door_error.",
+      "acceptanceCriteria": [
+        "stub: false",
+        "validator senza l'avviso del percorso stub",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 100,
+      "fase": "7b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-7B02",
+      "title": "Percorso di fusione darkness_twilight_giant",
+      "description": "Il percorso di fusione data/fusions/darkness_twilight_giant.json non e' piu' uno stub: contenuto scritto per intero come door_error.",
+      "acceptanceCriteria": [
+        "stub: false",
+        "validator senza l'avviso del percorso stub",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 101,
+      "fase": "7b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-7B03",
+      "title": "Percorso di fusione death_twilight_giant",
+      "description": "Il percorso di fusione data/fusions/death_twilight_giant.json non e' piu' uno stub: contenuto scritto per intero come door_error.",
+      "acceptanceCriteria": [
+        "stub: false",
+        "validator senza l'avviso del percorso stub",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 102,
+      "fase": "7b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-7B04",
+      "title": "Percorso di fusione door_fool",
+      "description": "Il percorso di fusione data/fusions/door_fool.json non e' piu' uno stub: contenuto scritto per intero come door_error.",
+      "acceptanceCriteria": [
+        "stub: false",
+        "validator senza l'avviso del percorso stub",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 103,
+      "fase": "7b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-7B05",
+      "title": "Percorso di fusione error_fool",
+      "description": "Il percorso di fusione data/fusions/error_fool.json non e' piu' uno stub: contenuto scritto per intero come door_error.",
+      "acceptanceCriteria": [
+        "stub: false",
+        "validator senza l'avviso del percorso stub",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 104,
+      "fase": "7b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-7B06",
+      "title": "Percorso di fusione hermit_paragon",
+      "description": "Il percorso di fusione data/fusions/hermit_paragon.json non e' piu' uno stub: contenuto scritto per intero come door_error.",
+      "acceptanceCriteria": [
+        "stub: false",
+        "validator senza l'avviso del percorso stub",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 105,
+      "fase": "7b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-7B07",
+      "title": "Percorso di fusione moon_mother",
+      "description": "Il percorso di fusione data/fusions/moon_mother.json non e' piu' uno stub: contenuto scritto per intero come door_error.",
+      "acceptanceCriteria": [
+        "stub: false",
+        "validator senza l'avviso del percorso stub",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 106,
+      "fase": "7b",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-EN01",
+      "title": "Inglese: Pathway, Sequenze e mondo",
+      "description": "Le chiavi di data/i18n/it.json delle categorie pathway, sequence, characteristic, form, anchor, region, faction, room, pet, structure, ui, tribulation, ending, quest, talent hanno la traduzione in data/i18n/en.json (oggi mancano 1496 voci su 1784).",
+      "acceptanceCriteria": [
+        "0 chiavi di queste categorie senza voce in en.json",
+        "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 110,
+      "fase": "lingua",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-EN02",
+      "title": "Inglese: abilita' e sinergie",
+      "description": "Le chiavi di data/i18n/it.json delle categorie ability, synergy hanno la traduzione in data/i18n/en.json (oggi mancano 1496 voci su 1784).",
+      "acceptanceCriteria": [
+        "0 chiavi di queste categorie senza voce in en.json",
+        "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 111,
+      "fase": "lingua",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-EN03",
+      "title": "Inglese: recitazione",
+      "description": "Le chiavi di data/i18n/it.json delle categorie acting hanno la traduzione in data/i18n/en.json (oggi mancano 1496 voci su 1784).",
+      "acceptanceCriteria": [
+        "0 chiavi di queste categorie senza voce in en.json",
+        "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 112,
+      "fase": "lingua",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-EN04",
+      "title": "Inglese: oggetti, ricette, progetti, sigilli",
+      "description": "Le chiavi di data/i18n/it.json delle categorie item, recipe, blueprint, sigillo hanno la traduzione in data/i18n/en.json (oggi mancano 1496 voci su 1784).",
+      "acceptanceCriteria": [
+        "0 chiavi di queste categorie senza voce in en.json",
+        "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 113,
+      "fase": "lingua",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-EN05",
+      "title": "Inglese: dialoghi, NPC, antagonisti",
+      "description": "Le chiavi di data/i18n/it.json delle categorie dialogue, npc, antagonist hanno la traduzione in data/i18n/en.json (oggi mancano 1496 voci su 1784).",
+      "acceptanceCriteria": [
+        "0 chiavi di queste categorie senza voce in en.json",
+        "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 114,
+      "fase": "lingua",
+      "passes": false,
+      "notes": ""
     }
   ]
 }
