@@ -6,6 +6,7 @@ extends Node2D
 ## un tetto o una chioma ne' davanti alla porta). Vicino all'orto "interagisci" apre la pagina Base del libro. Va con la sede.
 ## US-8B20e: anche le strutture costruite dalla pagina Base (StructureRegistry, una per tipo), ognuna nel suo posto di
 ## "esterno" (chiave = id della struttura), staccate dall'orto e fra loro; la loro posizione nel registro segue la sede.
+## Orto, cantiere e strutture bloccano il passo come gli arredi ("blocca" in data/world/arredi.json).
 ##
 ## NIENTE class_name: coerente col progetto.
 
@@ -20,6 +21,7 @@ var _area: Area2D
 var _prompt: Label
 var _vicino := false
 var _tempo := 0.0
+var _firma := ""                              # cosa e' disegnato adesso (si ridisegna solo se cambia)
 
 
 func _ready() -> void:
@@ -72,32 +74,43 @@ func _su_base(_a: Variant = null, _b: Variant = null) -> void:
 	disegna()
 
 
-## Rifa' i disegni dell'orto dallo stato del giardino e quelli delle strutture costruite.
+## Rifa' i disegni dell'orto dallo stato del giardino e quelli delle strutture costruite, solo se qualcosa e' cambiato
+## (si controlla ogni secondo per la crescita).
 func disegna() -> void:
+	var voci: Array = []                               # [prefisso, id, casella]
+	if _cella.x >= 0:
+		voci = _voci_strutture() + _voci_orto()
+	if str(voci) == _firma:
+		return
+	_firma = str(voci)
 	for c in get_children():
 		if c is Sprite2D:
 			remove_child(c)
 			c.queue_free()
-	if _cella.x < 0:
-		return
-	_disegna_strutture()
+	for v in voci:
+		_metti(v[1], v[2], v[0])
+
+
+func _voci_orto() -> Array:
 	var bs: Node = _auto("BaseSystem")
 	if bs == null:
-		return
+		return []
 	if int(bs.call("livello", "giardino")) <= 0:
-		_metti("cantiere", _cella)
-		return
+		return [["Orto", "cantiere", _cella]]
+	var voci: Array = []
 	var stato: Array = bs.call("appezzamenti")
 	for i in stato.size():
-		_metti("orto_" + _stadio(stato[i]), _cella + Vector2i(i, 0))
+		voci.append(["Orto", "orto_" + _stadio(stato[i]), _cella + Vector2i(i, 0)])
+	return voci
 
 
 ## Ogni struttura del registro al suo posto fuori dalla sede (e li' anche nel registro: le abilita' d'area la cercano).
-func _disegna_strutture() -> void:
+func _voci_strutture() -> Array:
 	var sr: Node = _auto("StructureRegistry")
 	if sr == null:
-		return
+		return []
 	var tile: float = float(_mondo.get("tile"))
+	var voci: Array = []
 	for e in sr.call("attive"):
 		var sid: String = str(e["struct_id"])
 		var c: Vector2i = _posti.get(sid, Vector2i(-1, -1))
@@ -105,7 +118,8 @@ func _disegna_strutture() -> void:
 			continue
 		var m: Vector2i = _misura(sid)
 		sr.call("sposta", str(e["id"]), Vector2((c.x + m.x / 2.0) * tile, (c.y + m.y / 2.0) * tile))
-		_metti(sid, c, "Struttura")
+		voci.append(["Struttura", sid, c])
+	return voci
 
 
 ## vuoto, germoglio, pianta (da giardino.pianta_da della crescita) o maturo.
@@ -135,6 +149,16 @@ func _metti(id: String, c: Vector2i, prefisso: String = "Orto") -> void:
 	spr.centered = false
 	spr.offset = -Vector2(float(an[0]), float(an[1]))
 	spr.position = Vector2((c.x + float(m[0]) / 2.0) * tile, (c.y + int(m[1])) * tile)
+	if bool(voce.get("blocca", true)):                 # le sue caselle sono piene, come un arredo negli interni
+		var corpo := StaticBody2D.new()
+		corpo.name = "Corpo"
+		corpo.position = Vector2(0, -int(m[1]) * tile / 2.0)
+		var forma := CollisionShape2D.new()
+		var rect := RectangleShape2D.new()
+		rect.size = Vector2(float(m[0]), float(m[1])) * tile * 0.9
+		forma.shape = rect
+		corpo.add_child(forma)
+		spr.add_child(corpo)
 	add_child(spr)
 
 

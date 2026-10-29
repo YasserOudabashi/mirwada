@@ -14967,3 +14967,11 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   centrate in verticale sulla scritta.
 - A schermo sul molo di pietra del faro: arte/revisione/hud_leggibile.png. test_i18n_hud (+1). 1076 test, validate 0.
 
+## US-8B20f — Orto e strutture bloccano il passo, 2026-10-29
+- base_fuori._metti: ogni disegno con "blocca" (data/world/arredi.json: cantiere, orto, palizzata, totem, deposito) ha
+  uno StaticBody2D figlio grande quanto le sue caselle (x0.9), come i forzieri e il cannocchiale.
+- disegna() ridisegna solo se cambia qualcosa (firma delle voci [prefisso, id, casella]): prima rifaceva tutto ogni
+  secondo per la crescita, ora anche i corpi restano fermi.
+- A schermo: Enel che cammina verso il deposito si ferma al suo bordo (16734 contro 16736 unita').
+  arte/revisione/base_blocca.png. test_base_fuori (corpo e niente ridisegno inutile). 1076 test, validate 0.
+

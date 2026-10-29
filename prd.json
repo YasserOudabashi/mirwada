@@ -771,6 +771,21 @@
       "fase": "8b",
       "passes": true,
       "notes": "2026-10-29. hud.gd: outline 4 #181425 su ogni Label, COLORI_BARRE (Endesga 32), fondo #181425. arte/revisione/hud_leggibile.png."
+    },
+    {
+      "id": "US-8B20f",
+      "title": "Orto e strutture bloccano il passo",
+      "description": "Le cose fuori dalla base (orto, cantiere, palizzata, totem, deposito) hanno un corpo che blocca, come gli arredi.",
+      "acceptanceCriteria": [
+        "corpo per ogni disegno che blocca",
+        "niente ridisegno se non cambia niente",
+        "test",
+        "verifica a schermo"
+      ],
+      "priority": 41,
+      "fase": "8b",
+      "passes": true,
+      "notes": "2026-10-29. base_fuori._metti: StaticBody2D 'Corpo' (misura x0.9); disegna() con la firma. arte/revisione/base_blocca.png."
     }
   ]
 }

@@ -155,6 +155,13 @@ func test_le_strutture_stanno_fuori_dalla_sede_e_la_seguono() -> void:
 	var disegni: Array = _disegni(fuori, "Struttura_")
 	disegni.sort()
 	assert_eq(disegni, ["deposito", "palizzata", "totem_veglia"], "tutte e tre disegnate")
+	var sprite: Array = fuori.get_children().filter(func(c): return c is Sprite2D and not c.is_queued_for_deletion())
+	for spr in sprite:
+		var corpo: StaticBody2D = spr.get_node_or_null("Corpo")
+		assert_true(corpo != null, "%s blocca il passo" % spr.name)
+	fuori.call("disegna")
+	assert_eq(fuori.get_children().filter(func(c): return c is Sprite2D and not c.is_queued_for_deletion()), sprite,
+			"se non cambia niente non si ridisegna")
 	var prese: Dictionary = {}
 	var orto: Vector2i = fuori.call("cella_orto")
 	for i in 2:
