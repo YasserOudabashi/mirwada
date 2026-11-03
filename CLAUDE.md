@@ -170,8 +170,10 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - L'abbinamento oggetto -> icona e' un **dato** (`data/ui/icone.json` `oggetti`): `build_icone.py` lo propone per gli
   oggetti nuovi (parole dell'id e tag) e tiene quelli esistenti, quindi si ritocca nel JSON. Il validator vuole
   un'icona per ogni oggetto e il disegno di ogni icona usata.
-- Nel gioco: `GameData.icona_oggetto(id)`; a terra a mezza grandezza (come gli sprite a 64) con l'ombra a terra
-  (`vfx.json ombra_terra.raggi.oggetto`), nello zaino a 16 unita' (1:1).
+- Nel gioco: `GameData.icona_oggetto(id, tema)`; a terra a mezza grandezza (come gli sprite a 64) con l'ombra a terra
+  (`vfx.json ombra_terra.raggi.oggetto`) e la serie del mondo (`assets/icone/oggetti/cupo/` nella modalita' cupa,
+  US-8B70b); nel libro (zaino, Indosso, negozio) a 16 unita' (1:1) e sempre la serie luminosa: il libro e' uguale
+  nelle due modalita'.
 - Icone degli status (`build_stati.py`): pixel art da griglie 10x10 in un tondo 16x16, bordo rosso se `negativo`,
   verde se e' un vantaggio. Nel gioco `GameData.icona_stato(id)` e `scripts/status_icons.gd`: fila sopra la testa
   di giocatore e nemici (segnale `StatsComponent.status_cambiati`), lampeggia negli ultimi 2 secondi.

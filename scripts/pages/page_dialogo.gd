@@ -121,6 +121,7 @@ func _disegna_negozio() -> void:
 		var it: Dictionary = gd.call("get_item", iid)
 		var valore: int = _prezzo_con_rarita(gd, iid)
 		var h := HBoxContainer.new()
+		h.add_child(_icona(gd.call("icona_oggetto", iid)))     # US-8B70b
 		var l := _etichetta_riga()
 		l.text = "%s — %d" % [str(gd.call("tr_data", it.get("name_i18n", iid))), valore]
 		h.add_child(l)
@@ -144,6 +145,7 @@ func _disegna_negozio() -> void:
 				continue
 			var prezzo: int = maxi(1, _prezzo_con_rarita(gd, iid2) / 2)
 			var h2 := HBoxContainer.new()
+			h2.add_child(_icona(gd.call("icona_oggetto", iid2)))
 			var l2 := _etichetta_riga()
 			l2.text = "%s  x%d" % [str(gd.call("tr_data", it2.get("name_i18n", iid2))), int(r.get("quantita", 0))]
 			h2.add_child(l2)

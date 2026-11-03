@@ -746,11 +746,17 @@ func get_mezzo(id: String) -> Dictionary:
 
 ## US-8B70: l'icona di un oggetto (data/ui/icone.json, disegni di tools/art/build_icone.py): la sua voce in
 ## "oggetti", altrimenti quella della sua categoria; null se non c'e'.
-func icona_oggetto(item_id: String) -> Texture2D:
+func icona_oggetto(item_id: String, tema: String = "luminoso") -> Texture2D:
 	var ic: String = str((_icone.get("oggetti", {}) as Dictionary).get(item_id, ""))
 	if ic.is_empty():
 		ic = str((_icone.get("categorie", {}) as Dictionary).get(str(get_item(item_id).get("categoria", "")), ""))
-	return null if ic.is_empty() else _icona_png("res://assets/icone/oggetti/%s.png" % ic)
+	if ic.is_empty():
+		return null
+	# US-8B70b: nel mondo cupo la serie cupa (assets/icone/oggetti/cupo/); il libro e' uguale nei due temi.
+	var cupa: String = "res://assets/icone/oggetti/%s/%s.png" % [tema, ic]
+	if tema != "luminoso" and FileAccess.file_exists(cupa):
+		return _icona_png(cupa)
+	return _icona_png("res://assets/icone/oggetti/%s.png" % ic)
 
 
 ## US-8B71: l'icona di uno status (assets/icone/stati/<id>.png, tools/art/build_stati.py); null se non c'e'.

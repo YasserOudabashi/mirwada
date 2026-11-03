@@ -164,6 +164,28 @@ func test_sezione_indosso_mostra_i_quattro_slot() -> void:
 	_p.free()
 
 
+## US-8B70b: accanto a ogni slot l'icona dell'oggetto indossato (vuota se lo slot e' vuoto).
+func test_indosso_ha_l_icona_dell_oggetto() -> void:
+	_n("/root/Inventory").call("aggiungi", "spada_ferrea", 1)
+	_n("/root/Equipment").call("equipaggia", str((_n("/root/Inventory").call("per_categoria", "equip") as Array)[0]["instance_id"]))
+	var ov: CanvasLayer = OverlayScene.instantiate()
+	Engine.get_main_loop().root.add_child(ov)
+	var pag: Node = _pagina(ov)
+	pag.call("_mostra", "indosso")
+	var icone: Array = []
+	for r in _righe(pag):
+		var ic: Node = r.get_node_or_null("Icona")
+		if ic != null:
+			icone.append((ic as TextureRect).texture)
+	assert_eq(icone.size(), 4, "un'icona per slot")
+	assert_true(icone.has(_n("/root/GameData").call("icona_oggetto", "spada_ferrea")), "la spada indossata ha la sua")
+	assert_eq(icone.filter(func(t): return t == null).size(), 3, "gli slot vuoti senza disegno")
+	_n("/root/Equipment").call("pulisci")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	_p.free()
+
+
 func _testo_righe(pag: Node) -> String:
 	var t := ""
 	for r in _righe(pag):

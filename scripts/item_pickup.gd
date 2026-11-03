@@ -13,7 +13,9 @@ var quantita: int = 1
 ## "oggetto") al fondo del disegno. Senza icona resta il rombo del genitore.
 func _crea_marker() -> Node2D:
 	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
-	var tex: Texture2D = gd.call("icona_oggetto", char_id) if gd != null else null
+	var gs: Node = Engine.get_main_loop().root.get_node_or_null("GameState")
+	var tema: String = str(gs.call("tema_arte")) if gs != null else "luminoso"     # US-8B70b: la serie del mondo
+	var tex: Texture2D = gd.call("icona_oggetto", char_id, tema) if gd != null else null
 	if tex == null:
 		return super._crea_marker()
 	var sprite := Sprite2D.new()

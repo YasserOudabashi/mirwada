@@ -47,6 +47,29 @@ func test_apri_vendita_da_dialogo_reale() -> void:
 	p.free()
 
 
+## US-8B70b: nel negozio ogni oggetto, da comprare e da vendere, ha la sua icona accanto.
+func test_il_negozio_ha_le_icone() -> void:
+	var p: Node = _monta_pagina()
+	_inv().call("aggiungi", ITEM_DA_3, 1)
+	_apri_vendita_sidon(p)
+	var gd: Node = _root().get_node("GameData")
+	var compra: Array = []
+	var vendi: Array = []
+	for h in p.find_children("*", "HBoxContainer", true, false):
+		var ic: TextureRect = h.get_node_or_null("Icona")
+		var b: Button = null
+		for c in h.get_children():
+			if c is Button:
+				b = c
+		if b == null:
+			continue
+		assert_true(ic != null and ic.texture != null, "la riga '%s' ha l'icona" % b.text)
+		(compra if b.text == tr("BOOK_NEGOZIO_COMPRA") else vendi).append(ic.texture if ic != null else null)
+	assert_true(compra.size() > 10, "il listino di Sidon, ognuno con l'icona")
+	assert_eq(vendi, [gd.call("icona_oggetto", ITEM_DA_3)], "e quello che si vende, con la sua")
+	p.free()
+
+
 func test_compra_un_item_scala_le_monete() -> void:
 	var p: Node = _monta_pagina()
 	_inv().call("aggiungi", "moneta_comune", 10)
