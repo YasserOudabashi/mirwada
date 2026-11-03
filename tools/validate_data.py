@@ -1374,6 +1374,10 @@ def main():
         if _fn.endswith(".json"):
             for _it in (load_json(os.path.join(DATA, "items", _fn)) or {}).get("items", []):
                 _items_tutti[_it.get("id")] = _it
+    for _mz, _spec in _mezzi.items():                       # US-8B91b: il moltiplicatore della velocita' sul mezzo
+        _vz = _spec.get("velocita", 1.0) if isinstance(_spec, dict) else 1.0
+        if not isinstance(_vz, (int, float)) or not (0 < _vz <= 3):
+            err(f"data/world/mezzi.json [{_mz}]: velocita '{_vz}' deve essere un numero fra 0 e 3")
     for _mz, _spec in _mezzi.items():
         if isinstance(_spec, dict) and "chiave" in _spec:
             _k = _items_tutti.get(_spec["chiave"])
