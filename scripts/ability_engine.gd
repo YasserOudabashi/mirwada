@@ -259,6 +259,8 @@ func _esegui_primitive(ability: Dictionary, caster: Node, stats: Node, ability_i
 		var handler: Callable = _handlers[tipo]
 		var su: Node = find_stats(bersaglio) if bersaglio != null and _sul_nemico(prim) else stats
 		var effect: Dictionary = handler.call(prim, caster, su, ability_id)
+		if su != stats:
+			effect["su_bersaglio"] = true      # US-8B44b: il VFX va sul bersaglio (data/vfx.json su)
 		(result["effects"] as Array).append(effect)
 
 

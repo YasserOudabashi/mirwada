@@ -7,6 +7,10 @@ const PlayerScene := preload("res://scenes/player.tscn")
 const EnemyScene := preload("res://scenes/enemy.tscn")
 
 
+## Lontano dall'origine: altri test lasciano nemici nell'albero, e il bersaglio e' il piu' vicino.
+const QUI := Vector2(70000, 70000)
+
+
 func _n(s: String) -> Node:
 	return Engine.get_main_loop().root.get_node_or_null(s)
 
@@ -21,6 +25,7 @@ func _giocatore(pathway: String, sequenza: int) -> Node2D:
 	_n("/root/Progression").call("configura", pathway, sequenza)
 	var p: Node2D = PlayerScene.instantiate()
 	Engine.get_main_loop().root.add_child(p)
+	p.global_position = QUI
 	var s: Node = p.get_node("StatsComponent")
 	s.set("spiritualita", float(s.call("get_stat", "spiritualita_max")))
 	assert_eq(p.call("get_facing"), Vector2.DOWN, "guarda in giu'")
@@ -30,7 +35,7 @@ func _giocatore(pathway: String, sequenza: int) -> Node2D:
 func _nemico(pos: Vector2) -> Node2D:
 	var e: Node2D = EnemyScene.instantiate()
 	Engine.get_main_loop().root.add_child(e)
-	e.global_position = pos
+	e.global_position = QUI + pos
 	return e
 
 

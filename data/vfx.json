@@ -96,9 +96,10 @@
     }
   },
   "primitive_vfx": {
-    "_comment": "US-8B40: sprite = foglio assets/vfx/<sprite>.png (tools/art/build_vfx.py), frames = colonne del foglio; se il foglio non c'e' ancora resta il segnaposto. Un effetto d'attacco ha il lampo nel primo frame (bianco, attenuato con riduci_flash) e poi la dissolvenza. sul_proiettile: il foglio veste il proiettile in volo (ciclo), scoppio = l'effetto quando colpisce o finisce la gittata. gira: il foglio e' disegnato verso destra e si gira con lo sguardo (gli altri stanno dritti, attorno a chi lancia).",
+    "_comment": "US-8B40: sprite = foglio assets/vfx/<sprite>.png (tools/art/build_vfx.py), frames = colonne del foglio; se il foglio non c'e' ancora resta il segnaposto. Un effetto d'attacco ha il lampo nel primo frame (bianco, attenuato con riduci_flash) e poi la dissolvenza. sul_proiettile: il foglio veste il proiettile in volo (ciclo), scoppio = l'effetto quando colpisce o finisce la gittata. gira: il foglio e' disegnato verso destra e si gira con lo sguardo (gli altri stanno dritti, attorno a chi lancia). US-8B44b: su = dove si disegna: chi_lancia, oppure bersaglio = sul nemico su cui la primitiva e' caduta (AbilityEngine result.bersaglio), che segue; se e' caduta su chi lancia, li'. fps = frame al secondo (12 se manca; meno per gli effetti che devono vedersi piu' a lungo).",
     "melee_arc": {
       "sprite": "vfx_slash",
+      "su": "chi_lancia",
       "frames": 5,
       "impact_frame": true,
       "scia": true,
@@ -106,6 +107,7 @@
     },
     "projectile": {
       "sprite": "vfx_bolt",
+      "su": "chi_lancia",
       "frames": 2,
       "impact_frame": true,
       "scia": true,
@@ -114,6 +116,7 @@
     },
     "dash": {
       "sprite": "vfx_streak",
+      "su": "chi_lancia",
       "frames": 4,
       "impact_frame": false,
       "scia": true,
@@ -121,132 +124,156 @@
     },
     "buff_stat": {
       "sprite": "vfx_rune_up",
+      "su": "chi_lancia",
       "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "debuff_stat": {
       "sprite": "vfx_rune_down",
+      "su": "bersaglio",
       "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "heal": {
       "sprite": "vfx_mend",
+      "su": "chi_lancia",
       "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "shield": {
       "sprite": "vfx_ward",
+      "su": "chi_lancia",
       "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "aura": {
       "sprite": "vfx_aura_ring",
+      "su": "chi_lancia",
       "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "dot": {
       "sprite": "vfx_smoulder",
+      "su": "bersaglio",
       "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "decay": {
       "sprite": "vfx_wither",
+      "su": "chi_lancia",
       "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "light_purify": {
       "sprite": "vfx_cleanse",
+      "su": "chi_lancia",
       "frames": 5,
       "impact_frame": true,
       "scia": false
     },
     "transform": {
       "sprite": "vfx_shift",
+      "su": "chi_lancia",
       "frames": 5,
       "impact_frame": true,
       "scia": false
     },
     "terrain_modify": {
       "sprite": "vfx_fracture",
+      "su": "chi_lancia",
       "frames": 5,
       "impact_frame": true,
       "scia": false
     },
     "curse": {
       "sprite": "vfx_hex",
+      "su": "bersaglio",
       "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "summon": {
       "sprite": "vfx_conjure",
+      "su": "chi_lancia",
       "frames": 5,
       "impact_frame": true,
       "scia": false
     },
     "fear": {
       "sprite": "vfx_dread",
+      "su": "bersaglio",
       "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "reveal_info": {
       "sprite": "vfx_scry",
+      "su": "chi_lancia",
       "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "teleport": {
       "sprite": "vfx_rift",
+      "su": "chi_lancia",
       "frames": 5,
       "impact_frame": true,
       "scia": false
     },
     "soul_detach": {
       "sprite": "vfx_sever",
+      "su": "bersaglio",
       "frames": 5,
       "impact_frame": true,
       "scia": false
     },
     "resurrect": {
       "sprite": "vfx_revenant",
+      "su": "chi_lancia",
       "frames": 5,
       "impact_frame": true,
       "scia": false
     },
     "plant_growth": {
       "sprite": "vfx_bloom",
+      "su": "chi_lancia",
+      "fps": 6,
       "frames": 5,
       "impact_frame": false,
       "scia": false
     },
     "mind_read": {
       "sprite": "vfx_insight",
+      "su": "chi_lancia",
       "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "shadow_meld": {
       "sprite": "vfx_umbra",
+      "su": "chi_lancia",
       "frames": 4,
       "impact_frame": false,
       "scia": true
     },
     "illusion": {
       "sprite": "vfx_mirage",
+      "su": "chi_lancia",
       "frames": 4,
       "impact_frame": false,
       "scia": false
     },
     "steal": {
       "sprite": "vfx_pilfer",
+      "su": "chi_lancia",
+      "fps": 6,
       "frames": 4,
       "impact_frame": true,
       "scia": true,
@@ -254,12 +281,14 @@
     },
     "possess": {
       "sprite": "vfx_grip",
+      "su": "bersaglio",
       "frames": 5,
       "impact_frame": true,
       "scia": false
     },
     "time_rewind": {
       "sprite": "vfx_unwind",
+      "su": "chi_lancia",
       "frames": 5,
       "impact_frame": true,
       "scia": true

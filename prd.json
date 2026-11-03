@@ -817,8 +817,8 @@
       ],
       "priority": 42,
       "fase": "8b",
-      "passes": false,
-      "notes": "Il bersaglio vero lo da' US-8B44a (result['bersaglio'])."
+      "passes": true,
+      "notes": "Fatta il 2026-11-03. vfx.json su (chi_lancia | bersaglio) e fps (furto e fioritura a 6); effetti figli del nemico su cui la primitiva e' caduta (result.bersaglio, effetto su_bersaglio, US-8B44a). tests/test_vfx_primitive.gd (+4). arte/revisione/vfx_sul_bersaglio.png."
     },
     {
       "id": "US-8B70b",

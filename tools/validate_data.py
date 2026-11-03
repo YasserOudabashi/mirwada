@@ -2972,6 +2972,13 @@ def main():
                     err(f"data/vfx.json [primitive_vfx.{name}]: frames dev'essere un intero > 0")
                 if not isinstance(e.get("impact_frame"), bool):
                     err(f"data/vfx.json [primitive_vfx.{name}]: impact_frame dev'essere true/false")
+                # US-8B44b: dove si disegna; sul bersaglio solo le primitive che possono cadere su un altro
+                if e.get("su") not in ("chi_lancia", "bersaglio") or \
+                        (e.get("su") == "bersaglio" and "bersaglio" not in spec):
+                    err(f"data/vfx.json [primitive_vfx.{name}]: su '{e.get('su')}' dev'essere chi_lancia o bersaglio "
+                        f"(bersaglio solo se primitives.json gli da' un bersaglio)")
+                if "fps" in e and (not isinstance(e["fps"], (int, float)) or not (1 <= e["fps"] <= 15)):
+                    err(f"data/vfx.json [primitive_vfx.{name}]: fps fra 1 e 15 (oltre la pixel art perde carattere)")
                 # US-8B41: un foglio vero ha tanti frame in colonna quanti ne dicono i dati
                 for _sp, _fr in ((e.get("sprite"), e.get("frames")),
                                  ((e.get("scoppio") or {}).get("sprite"), (e.get("scoppio") or {}).get("frames"))):

@@ -15012,3 +15012,22 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   il nome compare "Nessun bersaglio". tests/test_bersaglio.gd (6).
 - Aperto: l'effetto grafico sta ancora su chi lancia (US-8B44b); un bersaglio solo anche per le abilita' "d'area"
   (giogo della malasorte, terrore notturno): l'area la fanno le aure e i campi.
+
+## US-8B44b — Effetti sul bersaglio e piu' visibili, 2026-11-03
+- data/vfx.json primitive_vfx: ogni effetto ha "su" (chi_lancia | bersaglio): sul bersaglio curse, possess,
+  soul_detach, debuff_stat, dot, fear (le primitive col bersaglio nemico di primitives.json). "fps" per gli effetti che
+  devono vedersi piu' a lungo: furto (steal) e fioritura (plant_growth) a 6 (0.67 e 0.83 s invece di 0.33 e 0.42).
+- scripts/ability_engine.gd: l'effetto di una primitiva caduta sul bersaglio ha su_bersaglio true.
+- scripts/vfx.gd: _su_abilita scorre result.effects (le primitive eseguite, ognuna col suo tipo: controllato su tutte
+  le 27); con su "bersaglio" e su_bersaglio il foglio e' figlio del nemico (lo segue) a (0, -6); un costo su di se'
+  (patto di sangue) resta su chi lancia. _anima ha il passo per frame (1 / fps).
+- Validator: su in {chi_lancia, bersaglio}, bersaglio solo per le primitive che lo hanno nel registro; fps fra 1 e 15
+  (provati tutti e due a farli scattare).
+- Verifica a schermo a Mirwada al rallentatore (Engine.time_scale 0.25, 4 scatti per effetto, nemico fermo 60 unita'
+  sotto Enel): arte/revisione/vfx_sul_bersaglio.png. Recisione (lo spirito che sale e il logorio), sfortuna altrui
+  (cerchi e runa) e innesto parassita (la croce del burattinaio) sul nemico; scasso (il bottino vola verso Enel) e
+  germoglio rapido (i germogli fioriscono) restano a schermo per 3-4 scatti. tests/test_vfx_primitive.gd (+4).
+- Trappola dei test: nella suite intera altri test lasciano nemici nell'albero vicino all'origine, e il bersaglio e' il
+  piu' vicino: le scene di prova di test_bersaglio e test_vfx_primitive stanno lontano (70000 / 60000). 1086 test.
+- Aperto: un effetto sul bersaglio sta sopra il nemico anche se il nemico passa dietro un albero (e' figlio suo, con
+  z_index 1).
