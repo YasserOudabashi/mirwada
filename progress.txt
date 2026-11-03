@@ -14985,3 +14985,30 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   US-1201..1216); il PRD prd-fase-12-atto-2-3.md e' la fase 13 (US-1301..1313) e va fatta per prima.
 - Documentazione docx e diario al 29.10 (docs/documentazione.py, diario.py), README e CLAUDE.md allineati.
 
+
+## US-8B44a — Le abilita' colpiscono il bersaglio, 2026-11-03
+- Trovato lavorando a US-8B44: le primitive che colpiscono un altro (curse, possess, soul_detach, debuff_stat, dot,
+  fear) mettevano lo status su chi lanciava (AbilityEngine passava agli handler lo stats del caster; il bersaglio vero
+  era rimandato alla "fase 6"). Esempio: Recisione (Death) dava anima_recisa al giocatore. ~90 usi in 50 abilita'.
+- Decisioni dell'utente (2026-11-03): colpiscono il nemico piu' vicino davanti; senza nemico l'abilita' non parte e non
+  costa.
+- data/schema/primitives.json: le sei primitive hanno "bersaglio": "nemico" (default) e il parametro "bersaglio"
+  (nemico | self); illusion ha il parametro con default self. Dati: "self" su moon_patto_di_sangue (debuff hp_max),
+  tg_postura_inviolabile (debuff velocita) ed ea_distacco_dal_presente (soul_detach: il corpo che resta indietro e' il
+  suo); "nemico" sull'illusione di fool_illusione_solida (il danno percepito feriva chi la creava).
+- data/balance.json combattimento.bersaglio: raggio 160 unita' (5 caselle), cono di 120 gradi attorno allo sguardo.
+- scripts/ability_engine.gd: bersaglio_di(caster) = il nemico vivo e visibile piu' vicino nel cono (gruppo nemici per il
+  giocatore, player per i nemici); execute ed execute_stored lo cercano prima di pagare (ERR_NESSUN_BERSAGLIO); in
+  _esegui_primitive le primitive col bersaglio nemico ricevono lo stats del bersaglio; result["bersaglio"] e' lui. Un
+  caster senza fazione (manichini e test isolati) non e' soggetto, come per le condizioni: resta su di se'.
+- scripts/player.gd _avvisa(motivo): se l'abilita' non parte e il motivo ha una voce HUD_ABILITA_<MOTIVO> (strings.csv:
+  HUD_ABILITA_NESSUN_BERSAGLIO), la scritta rossa sale sopra la testa e svanisce. Provato prima nello slot della
+  hotbar: la hotbar esce dallo schermo a destra coi nomi lunghi (gia' prima: "4 Stretta della te..."; 48 nomi su 218
+  oltre 18 lettere, fino a 31) -> story US-8B75b.
+- Validator: bersaglio in {nemico, self} sulle primitive che lo hanno nel registro (provato a farlo scattare con
+  "alleato"), default del registro valido e anche parametro, combattimento.bersaglio raggio/angolo > 0.
+- Verifica a schermo a Mirwada (arte/revisione/bersaglio_in_gioco.png): un nemico 70 unita' sotto Enel, Recisione ->
+  l'icona di anima recisa sopra il nemico, nessuna sopra Enel; poi senza nemici la Stretta della terra non parte e sopra
+  il nome compare "Nessun bersaglio". tests/test_bersaglio.gd (6).
+- Aperto: l'effetto grafico sta ancora su chi lancia (US-8B44b); un bersaglio solo anche per le abilita' "d'area"
+  (giogo della malasorte, terrore notturno): l'area la fanno le aure e i campi.

@@ -304,7 +304,8 @@
           "stat": "velocita",
           "valore": -0.5,
           "durata": 6.0,
-          "moltiplicativo": true
+          "moltiplicativo": true,
+          "bersaglio": "self"
         },
         {
           "tipo": "aura",

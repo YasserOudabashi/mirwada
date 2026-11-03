@@ -31,6 +31,8 @@ const ERR_NON_POSSEDUTA := "abilita_non_posseduta"
 ## US-605: una condizione dell'abilita' (e_notte, fase_lunare, ...) non e'
 ## soddisfatta. Rifiuto SENZA pagare il costo, come spiritualita_insufficiente.
 const ERR_CONDIZIONE := "condizione_non_soddisfatta"
+## US-8B44a: l'abilita' deve colpire un nemico e davanti non ce n'e' nessuno abbastanza vicino. Rifiuto SENZA pagare.
+const ERR_NESSUN_BERSAGLIO := "nessun_bersaglio"
 
 const Conditions := preload("res://scripts/conditions.gd")
 
@@ -145,6 +147,13 @@ func execute(ability_id: String, caster: Node) -> Dictionary:
 		result["reason"] = ERR_CONDIZIONE
 		return result
 
+	var bersaglio: Node = null
+	if _serve_bersaglio(ability, caster):
+		bersaglio = bersaglio_di(caster)
+		if bersaglio == null:
+			result["reason"] = ERR_NESSUN_BERSAGLIO
+			return result
+
 	# Il costo si paga PRIMA di eseguire, e se non basta non si esegue niente:
 	# meglio un'abilita' che non parte che una che parte a meta'.
 	var cost: float = _num(ability.get("costo_spiritualita"), 0.0)
@@ -154,7 +163,7 @@ func execute(ability_id: String, caster: Node) -> Dictionary:
 
 	_start_cooldown(caster, ability_id, _num(ability.get("cooldown"), 0.0))
 
-	_esegui_primitive(ability, caster, stats, ability_id, result)
+	_esegui_primitive(ability, caster, stats, ability_id, result, bersaglio)
 
 	result["ok"] = true
 	result["reason"] = OK
@@ -191,7 +200,14 @@ func execute_stored(stored_ability_id: String, consumer: Node) -> Dictionary:
 		push_error("[AbilityEngine] execute_stored: %s non ha uno StatsComponent" % consumer)
 		return result
 
-	_esegui_primitive(ability, consumer, stats, stored_ability_id, result)
+	var bersaglio: Node = null
+	if _serve_bersaglio(ability, consumer):
+		bersaglio = bersaglio_di(consumer)
+		if bersaglio == null:
+			result["reason"] = ERR_NESSUN_BERSAGLIO   # l'oggetto non si consuma (Inventory.usa guarda ok)
+			return result
+
+	_esegui_primitive(ability, consumer, stats, stored_ability_id, result, bersaglio)
 	result["ok"] = true
 	result["reason"] = OK
 	var tt: Node = get_node_or_null("/root/TalentTracker")
@@ -204,8 +220,12 @@ func execute_stored(stored_ability_id: String, consumer: Node) -> Dictionary:
 ## Il motore delle primitive, condiviso da execute() e execute_stored():
 ## itera l'array "primitive", dispaccia sulla tabella tipo->handler, e
 ## distingue i TRE esiti (implementata / nel registro ma non scritta / fuori
-## registro). Riempie result["effects"] e result["warnings"].
-func _esegui_primitive(ability: Dictionary, caster: Node, stats: Node, ability_id: String, result: Dictionary) -> void:
+## registro). Riempie result["effects"] e result["warnings"]. Con un `bersaglio` (US-8B44a) le primitive che
+## colpiscono un altro ricevono il suo StatsComponent al posto di quello di chi lancia; result["bersaglio"] e' lui.
+func _esegui_primitive(ability: Dictionary, caster: Node, stats: Node, ability_id: String, result: Dictionary,
+		bersaglio: Node = null) -> void:
+	if bersaglio != null:
+		result["bersaglio"] = bersaglio
 	var prim_list: Variant = ability.get("primitive", [])
 	if typeof(prim_list) != TYPE_ARRAY:
 		push_error("[AbilityEngine] %s: 'primitive' non e' una lista, abilita' senza effetti" % ability_id)
@@ -237,8 +257,69 @@ func _esegui_primitive(ability: Dictionary, caster: Node, stats: Node, ability_i
 			continue
 
 		var handler: Callable = _handlers[tipo]
-		var effect: Dictionary = handler.call(prim, caster, stats, ability_id)
+		var su: Node = find_stats(bersaglio) if bersaglio != null and _sul_nemico(prim) else stats
+		var effect: Dictionary = handler.call(prim, caster, su, ability_id)
 		(result["effects"] as Array).append(effect)
+
+
+## US-8B44a: le primitive che colpiscono un altro hanno "bersaglio": "nemico" nel registro (primitives.json);
+## l'abilita' puo' cambiarlo nei suoi dati ("self" per un costo voluto su di se', come il patto di sangue).
+func _sul_nemico(prim: Dictionary) -> bool:
+	var di_base: String = str((_game_data().call("get_primitive", str(prim.get("tipo", ""))) as Dictionary).get("bersaglio", "self"))
+	return str(prim.get("bersaglio", di_base)) == "nemico"
+
+
+## Serve un bersaglio se almeno una primitiva colpisce un nemico e chi lancia ha una fazione (player o nemici):
+## un caster senza fazione (manichini, test isolati) non e' soggetto, come per le condizioni, e resta su di se'.
+func _serve_bersaglio(ability: Dictionary, caster: Node) -> bool:
+	if _gruppo_avversario(caster).is_empty():
+		return false
+	for entry in ability.get("primitive", []):
+		if typeof(entry) == TYPE_DICTIONARY and _sul_nemico(entry):
+			return true
+	return false
+
+
+## Il bersaglio di chi lancia: il nemico vivo e visibile piu' vicino davanti (cono di combattimento.bersaglio.angolo
+## gradi attorno allo sguardo) entro combattimento.bersaglio.raggio unita' (data/balance.json). null se non c'e'.
+func bersaglio_di(caster: Node) -> Node:
+	var gruppo: String = _gruppo_avversario(caster)
+	if gruppo.is_empty() or not (caster is Node2D) or not caster.is_inside_tree():
+		return null
+	var c: Variant = (_game_data().call("get_balance", "combattimento") as Dictionary).get("bersaglio")
+	var cfg: Dictionary = c if c is Dictionary else {}
+	var raggio: float = _num(cfg.get("raggio"), 160.0)
+	var coseno: float = cos(deg_to_rad(_num(cfg.get("angolo"), 120.0) / 2.0))
+	var da: Vector2 = (caster as Node2D).global_position
+	var sguardo: Vector2 = Vector2.ZERO
+	if caster.has_method("get_facing"):
+		sguardo = (caster.call("get_facing") as Vector2).normalized()
+	var migliore: Node = null
+	var vicino: float = raggio
+	for n in caster.get_tree().get_nodes_in_group(gruppo):
+		if n == caster or not (n is Node2D) or not (n as Node2D).is_visible_in_tree():
+			continue
+		var s: Node = find_stats(n)
+		if s == null or float(s.get("hp")) <= 0.0:
+			continue
+		var verso: Vector2 = (n as Node2D).global_position - da
+		var d: float = verso.length()
+		if d > vicino or (sguardo != Vector2.ZERO and d > 0.0 and sguardo.dot(verso / d) < coseno):
+			continue
+		migliore = n
+		vicino = d
+	return migliore
+
+
+## Il gruppo di chi sta dall'altra parte: il giocatore colpisce i nemici, i nemici il giocatore.
+func _gruppo_avversario(caster: Node) -> String:
+	if not is_instance_valid(caster):
+		return ""
+	if caster.is_in_group("player"):
+		return "nemici"
+	if caster.is_in_group("nemici"):
+		return "player"
+	return ""
 
 
 ## Esegue UNA primitiva isolata, saltando costo e cooldown. Per la scena di

@@ -471,6 +471,10 @@ III, Mondo vivo, fusioni (US-7B01..07), inglese (US-EN01..05).
   in `main`; i controlli della PR e della CI si fanno solo quando li chiede l'utente.
 - **Frontiera, come si arriva** (2026-10-26): **in barca, volando, o da una soglia nel faro** che si apre solo con
   una chiave trovata nel mondo. Resta il gating di sequenza (respinge chi e' oltre la Sequenza 4).
+- **Bersaglio delle abilita'** (2026-11-03): le primitive che colpiscono un altro (maledizione, possessione, anima
+  recisa, debuff, danno nel tempo, paura) cadono sul **nemico piu' vicino davanti** (`balance.json
+  combattimento.bersaglio`); **senza nemico l'abilita' non parte e non costa**. I costi voluti su di se' sono
+  `"bersaglio": "self"` nei dati dell'abilita' (`primitives.json` da' il default).
 
 ## i18n — due sistemi, una convenzione per le stringhe dei dati
 

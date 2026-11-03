@@ -788,7 +788,24 @@
       "notes": "2026-10-29. base_fuori._metti: StaticBody2D 'Corpo' (misura x0.9); disegna() con la firma. arte/revisione/base_blocca.png."
     },
     {
-      "id": "US-8B44",
+      "id": "US-8B44a",
+      "title": "Le abilita' colpiscono il bersaglio",
+      "description": "Le primitive che colpiscono un altro (maleficio, possessione, anima recisa, debuff, danno nel tempo, paura) cadono sul nemico piu' vicino davanti, non su chi lancia; senza nemico l'abilita' non parte e non costa (decisioni dell'utente del 2026-11-03).",
+      "acceptanceCriteria": [
+        "data/schema/primitives.json: bersaglio di default (nemico) sulle sei primitive, parametro bersaglio (nemico | self) nelle abilita'",
+        "i costi voluti su di se' restano su chi lancia (bersaglio self nei dati)",
+        "data/balance.json combattimento.bersaglio: raggio e cono davanti",
+        "senza nemico: non parte, non costa, la ricarica non parte, avviso sopra la testa",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 41,
+      "fase": "8b",
+      "passes": true,
+      "notes": "Fatta il 2026-11-03. AbilityEngine.bersaglio_di (gruppo avversario, cono, vivo e visibile); result['bersaglio']; self su patto di sangue, postura inviolabile, distacco dal presente; nemico sull'illusione solida. Avviso sopra la testa (player._avvisa, HUD_ABILITA_NESSUN_BERSAGLIO). tests/test_bersaglio.gd (6). arte/revisione/bersaglio_in_gioco.png."
+    },
+    {
+      "id": "US-8B44b",
       "title": "Effetti sul bersaglio e piu' visibili",
       "description": "Gli effetti delle primitive che colpiscono un altro (maleficio, possessione, anima recisa) compaiono sul bersaglio, non su chi lancia; furto e fioritura durano abbastanza da vedersi.",
       "acceptanceCriteria": [
@@ -801,7 +818,7 @@
       "priority": 42,
       "fase": "8b",
       "passes": false,
-      "notes": ""
+      "notes": "Il bersaglio vero lo da' US-8B44a (result['bersaglio'])."
     },
     {
       "id": "US-8B70b",
@@ -909,6 +926,21 @@
       "fase": "8b",
       "passes": false,
       "notes": ""
+    },
+    {
+      "id": "US-8B75b",
+      "title": "Hotbar che non esce dallo schermo",
+      "description": "Coi nomi lunghi la hotbar su una riga esce dallo schermo a destra (48 nomi su 218 oltre 18 lettere, fino a 31): gia' 'Stretta della terra' nello slot 4 si taglia.",
+      "acceptanceCriteria": [
+        "i 4 slot stanno nello schermo con il nome piu' lungo dei dati (due righe, nomi brevi nei dati o carattere piu' piccolo: da decidere a schermo)",
+        "la camera degli interni tiene conto dell'altezza dell'HUD (game_camera MARGINE_HUD)",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 50,
+      "fase": "8b",
+      "passes": false,
+      "notes": "Visto in US-8B44a: lo slot 4 mostrava '4  Stretta della te' tagliato al bordo (progress.txt)."
     },
     {
       "id": "US-8B26",

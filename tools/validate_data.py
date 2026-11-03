@@ -21,6 +21,7 @@ from collections import Counter
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DATA = os.path.join(ROOT, "data")
 
+BERSAGLI_PRIMITIVA = {"nemico", "self"}   # US-8B44a: su chi cade una primitiva che colpisce un altro
 EXPECTED_PATHWAYS = 10  # 4 gruppi completi. Gli altri 12 sono in data/pathways_deferred/ (fuori scope, non cancellati).
 EXPECTED_SEQUENCES_PER_PATHWAY = 10
 VALID_GROUPS = {
@@ -277,6 +278,14 @@ def main():
     # Il registro dichiara i parametri di ogni primitiva: un nome sbagliato nei
     # dati diventerebbe silenziosamente il default a runtime (danno a zero).
     prim_params = {k: set(v.get("params", [])) for k, v in prim_doc["primitives"].items()}
+    for _k, _v in prim_doc["primitives"].items():
+        if "bersaglio" in _v and (_v["bersaglio"] not in BERSAGLI_PRIMITIVA or "bersaglio" not in _v.get("params", [])):
+            err(f"data/schema/primitives.json [{_k}]: bersaglio '{_v['bersaglio']}' deve stare in "
+                f"{sorted(BERSAGLI_PRIMITIVA)} ed essere anche un parametro")
+    _bers = load_json(os.path.join(DATA, "balance.json")).get("combattimento", {}).get("bersaglio", {})
+    for _k in ("raggio", "angolo"):
+        if not isinstance(_bers.get(_k), (int, float)) or _bers.get(_k) <= 0:
+            err(f"data/balance.json combattimento.bersaglio.{_k} deve essere un numero > 0 (US-8B44a)")
     events = ev_doc["events"]
     valid_tags = set(tags_doc["tags"])
     # Il vocabolario e' chiuso: un doppione e' un errore (di solito un
@@ -773,6 +782,11 @@ def main():
                         if ignoti:
                             err(f"{rel} [{aid}]: parametri non dichiarati per '{tipo}': "
                                 f"{sorted(ignoti)} (registro: {sorted(prim_params[tipo])})")
+                        # US-8B44a: su chi cade una primitiva che colpisce un altro (il registro ne da' il default).
+                        if "bersaglio" in prim_doc["primitives"][tipo] and \
+                                p.get("bersaglio", "nemico") not in BERSAGLI_PRIMITIVA:
+                            err(f"{rel} [{aid}]: '{tipo}' bersaglio '{p.get('bersaglio')}' non in "
+                                f"{sorted(BERSAGLI_PRIMITIVA)}")
                     if tipo == "transform" and p.get("forma_id"):
                         transform_forms.append((rel, aid, p.get("forma_id")))
                     if tipo == "terrain_modify":
