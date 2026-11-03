@@ -277,7 +277,8 @@
           "stat": "hp_max",
           "valore": -0.15,
           "durata": 12.0,
-          "moltiplicativo": true
+          "moltiplicativo": true,
+          "bersaglio": "self"
         }
       ],
       "tag_sinergia": [

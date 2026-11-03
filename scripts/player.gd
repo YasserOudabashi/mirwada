@@ -358,7 +358,8 @@ func _gestisci_input_abilita() -> void:
 ## AbilityEngine.owned_abilities e della hotbar dell'HUD). Pubblico, come
 ## start_dash: lo usa l'input qui sopra, e i test lo chiamano direttamente
 ## bypassando Input (stesso pattern di _su_colpo_inflitto/_su_danno_subito).
-## Nessuna logica di bersaglio: la fa gia' AbilityEngine.execute.
+## Il bersaglio lo sceglie AbilityEngine.execute (US-8B44a); se non parte per un motivo che il giocatore deve sapere,
+## lo dice sopra la testa (_avvisa).
 func lancia_abilita_slot(n: int) -> Dictionary:
 	var ae: Node = get_node_or_null("/root/AbilityEngine")
 	if ae == null:
@@ -370,7 +371,38 @@ func lancia_abilita_slot(n: int) -> Dictionary:
 	if bool(risultato.get("ok", false)):
 		_castando = true
 		_anim.call("riproduci", "cast", _dir_sguardo)
+	else:
+		_avvisa(str(risultato.get("reason", "")))
 	return risultato
+
+
+## US-8B44a: un'abilita' che non parte lo dice sopra la testa, in rosso, se il motivo ha la sua voce
+## (HUD_ABILITA_<MOTIVO> in strings.csv: oggi nessun_bersaglio); poi sale e svanisce. La hotbar ha i nomi lunghi.
+func _avvisa(motivo: String) -> void:
+	var chiave: String = "HUD_ABILITA_" + motivo.to_upper()
+	if tr(chiave) == chiave:
+		return
+	var vecchio: Node = get_node_or_null("Avviso")
+	if vecchio != null:
+		vecchio.free()
+	var l := Label.new()
+	l.name = "Avviso"
+	l.text = tr(chiave)
+	l.add_theme_font_size_override("font_size", 10)
+	l.add_theme_constant_override("outline_size", 4)
+	l.add_theme_color_override("font_outline_color", Color("#181425"))
+	l.add_theme_color_override("font_color", Color("#e43b44"))
+	l.custom_minimum_size = Vector2(96, 0)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.position = Vector2(-48, -54.0 - (ALTEZZA_VOLO if _mezzo == "volo" else 0.0))   # sopra il nome e le icone
+	l.z_index = 10
+	add_child(l)
+	var t := l.create_tween()
+	t.tween_interval(0.7)
+	t.set_parallel(true)
+	t.tween_property(l, "position:y", l.position.y - 8.0, 0.5)
+	t.tween_property(l, "modulate:a", 0.0, 0.5)
+	t.chain().tween_callback(l.queue_free)
 
 
 func _su_evento_anim(nome: String) -> void:

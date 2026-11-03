@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "_comment": "Registro CHIUSO delle primitive. Il codice implementa queste e solo queste. 28 attive + 3 differite = 31. Aggiungerne una richiede discussione esplicita: se un'abilita' sembra richiederne una nuova, quasi sempre significa che una primitiva esistente e' sottoparametrizzata.",
+  "_comment": "Registro CHIUSO delle primitive. Il codice implementa queste e solo queste. 28 attive + 3 differite = 31. Aggiungerne una richiede discussione esplicita: se un'abilita' sembra richiederne una nuova, quasi sempre significa che una primitiva esistente e' sottoparametrizzata. US-8B44a: 'bersaglio' (nemico | self) dice su chi cade una primitiva che colpisce un altro: 'nemico' = il nemico piu' vicino davanti (balance.json combattimento.bersaglio); il parametro 'bersaglio' dell'abilita' lo cambia (self per un costo voluto su di se').",
   "primitives": {
     "projectile": {
       "params": [
@@ -37,9 +37,11 @@
         "danno_tick",
         "tick_rate",
         "durata",
-        "tag_danno"
+        "tag_danno",
+        "bersaglio"
       ],
-      "implemented": true
+      "implemented": true,
+      "bersaglio": "nemico"
     },
     "heal": {
       "params": [
@@ -64,9 +66,11 @@
         "stat",
         "valore",
         "durata",
-        "moltiplicativo"
+        "moltiplicativo",
+        "bersaglio"
       ],
-      "implemented": true
+      "implemented": true,
+      "bersaglio": "nemico"
     },
     "dash": {
       "params": [
@@ -91,9 +95,11 @@
         "raggio",
         "durata",
         "potenza",
-        "tipo_illusione"
+        "tipo_illusione",
+        "bersaglio"
       ],
-      "implemented": true
+      "implemented": true,
+      "bersaglio": "self"
     },
     "mind_read": {
       "params": [
@@ -153,17 +159,21 @@
         "durata",
         "soglia_resistenza",
         "controllo",
-        "vulnerabilita_corpo"
+        "vulnerabilita_corpo",
+        "bersaglio"
       ],
-      "implemented": true
+      "implemented": true,
+      "bersaglio": "nemico"
     },
     "curse": {
       "params": [
         "effetto",
         "durata",
-        "condizione_rimozione"
+        "condizione_rimozione",
+        "bersaglio"
       ],
-      "implemented": true
+      "implemented": true,
+      "bersaglio": "nemico"
     },
     "reveal_info": {
       "params": [
@@ -195,9 +205,11 @@
       "params": [
         "durata",
         "vulnerabilita_corpo",
-        "velocita"
+        "velocita",
+        "bersaglio"
       ],
-      "implemented": true
+      "implemented": true,
+      "bersaglio": "nemico"
     },
     "plant_growth": {
       "params": [
@@ -276,9 +288,11 @@
       "params": [
         "raggio",
         "durata",
-        "soglia_resistenza"
+        "soglia_resistenza",
+        "bersaglio"
       ],
-      "implemented": true
+      "implemented": true,
+      "bersaglio": "nemico"
     }
   }
 }

@@ -194,7 +194,8 @@
           "tipo": "soul_detach",
           "durata": 10.0,
           "vulnerabilita_corpo": 0.5,
-          "velocita": 1.5
+          "velocita": 1.5,
+          "bersaglio": "self"
         }
       ],
       "tag_sinergia": [

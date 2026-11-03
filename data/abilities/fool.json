@@ -191,7 +191,8 @@
           "raggio": 5,
           "durata": 8.0,
           "potenza": 3,
-          "tipo_illusione": "danno_percepito"
+          "tipo_illusione": "danno_percepito",
+          "bersaglio": "nemico"
         }
       ],
       "tag_sinergia": [

@@ -155,7 +155,9 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
   colora `shaders/rampa_pathway.gdshader` con la palette del Pathway; il lampo del primo frame e' il parametro `lampo`
   dello shader (spento con `riduci_flash`). Fatti: fendente (anche sull'attacco base), proiettile in volo e il suo
   scoppio, scia dello scatto, e tutte le altre primitive implementate (US-8B41..43, tre gruppi di 8), centrate su chi
-  lancia; `gira` nei dati per gli effetti che seguono lo sguardo. Una primitiva nuova senza foglio usa il segnaposto
+  lancia; `gira` nei dati per gli effetti che seguono lo sguardo; `su` (US-8B44b) li mette sul nemico su cui la
+  primitiva e' caduta (maleficio, possessione, anima recisa, debuff, logorio, paura), `fps` rallenta quelli che devono
+  vedersi di piu' (furto, fioritura). Una primitiva nuova senza foglio usa il segnaposto
   finche' non ha il suo (un test controlla che le implementate lo abbiano).
 - Feedback del colpo (US-8B40b): `vfx.json feedback_colpo`, con le chiavi di `audio.json combat_feedback` (scintilla
   sulla hurtbox colpita, parata perfetta e rottura della postura, polvere dello scatto ai piedi). Colori suoi nei dati,
@@ -471,6 +473,10 @@ III, Mondo vivo, fusioni (US-7B01..07), inglese (US-EN01..05).
   in `main`; i controlli della PR e della CI si fanno solo quando li chiede l'utente.
 - **Frontiera, come si arriva** (2026-10-26): **in barca, volando, o da una soglia nel faro** che si apre solo con
   una chiave trovata nel mondo. Resta il gating di sequenza (respinge chi e' oltre la Sequenza 4).
+- **Bersaglio delle abilita'** (2026-11-03): le primitive che colpiscono un altro (maledizione, possessione, anima
+  recisa, debuff, danno nel tempo, paura) cadono sul **nemico piu' vicino davanti** (`balance.json
+  combattimento.bersaglio`); **senza nemico l'abilita' non parte e non costa**. I costi voluti su di se' sono
+  `"bersaglio": "self"` nei dati dell'abilita' (`primitives.json` da' il default).
 
 ## i18n — due sistemi, una convenzione per le stringhe dei dati
 

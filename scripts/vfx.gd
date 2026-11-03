@@ -28,7 +28,7 @@ func _ready() -> void:
 		eng.ability_executed.connect(_su_abilita)
 
 
-func _su_abilita(ability_id: String, caster: Node, _result: Dictionary) -> void:
+func _su_abilita(ability_id: String, caster: Node, result: Dictionary) -> void:
 	var gd: Node = get_node_or_null("/root/GameData")
 	if gd == null or caster == null:
 		return
@@ -37,14 +37,21 @@ func _su_abilita(ability_id: String, caster: Node, _result: Dictionary) -> void:
 		return
 	var pal: Dictionary = gd.call("get_vfx_palette", _pathway_di(caster))
 
-	for entry in ability.get("primitive", []):
+	# Un effetto per primitiva eseguita (result.effects, nell'ordine dei dati). US-8B44b: con su "bersaglio" nei dati
+	# e la primitiva caduta sul nemico (su_bersaglio), il foglio va su di lui.
+	var bersaglio: Variant = result.get("bersaglio")
+	for entry in result.get("effects", []):
 		if typeof(entry) != TYPE_DICTIONARY:
 			continue
 		var tipo: String = str((entry as Dictionary).get("tipo", ""))
 		var pv: Dictionary = gd.call("get_primitive_vfx", tipo)
 		if pv.is_empty():
 			continue   # primitiva non ancora coperta dai VFX
-		gioca_primitiva(tipo, caster, pv, pal)
+		var su: Node2D = null
+		if str(pv.get("su", "")) == "bersaglio" and bool((entry as Dictionary).get("su_bersaglio", false)) \
+				and is_instance_valid(bersaglio) and bersaglio is Node2D:
+			su = bersaglio
+		gioca_primitiva(tipo, caster, pv, pal, su)
 		if bool(pv.get("impact_frame", false)):
 			_overlay_call("impatto")
 
@@ -66,8 +73,9 @@ func gioca_per(tipo: String, caster: Node) -> void:
 
 
 ## Riproduce il VFX di UNA primitiva. Pubblico: quando ci sara' l'animazione
-## di lancio, il player lo chiamera' sull'evento ability_release.
-func gioca_primitiva(_tipo: String, caster: Node, pv: Dictionary, pal: Dictionary) -> void:
+## di lancio, il player lo chiamera' sull'evento ability_release. Con `su` (US-8B44b) il foglio sta sul bersaglio e
+## lo segue (figlio suo), altrimenti attorno a chi lancia.
+func gioca_primitiva(_tipo: String, caster: Node, pv: Dictionary, pal: Dictionary, su: Node2D = null) -> void:
 	if not (caster is Node2D):
 		return
 	var madre: Node = (caster as Node2D).get_parent()
@@ -81,11 +89,15 @@ func gioca_primitiva(_tipo: String, caster: Node, pv: Dictionary, pal: Dictionar
 	var tex: Texture2D = _foglio(str(pv.get("sprite", "")))
 	if tex != null:
 		var e := _effetto(tex, int(pv.get("frames", 1)), pal, bool(pv.get("impact_frame", false)))
-		e.global_position = (caster as Node2D).global_position + Vector2(0, -6)
 		if bool(pv.get("gira", false)):
 			e.rotation = facing.angle()
-		madre.add_child(e)
-		_anima(e, false)
+		if su != null:
+			su.add_child(e)
+			e.position = Vector2(0, -6)
+		else:
+			madre.add_child(e)
+			e.global_position = (caster as Node2D).global_position + Vector2(0, -6)
+		_anima(e, false, 1.0 / maxf(1.0, float(pv.get("fps", 1.0 / VITA_FRAME))))
 		return
 	var s := Sprite2D.new()
 	s.texture = _tex_placeholder()
@@ -211,17 +223,18 @@ func _effetto(tex: Texture2D, frames: int, pal: Dictionary, lampo: bool) -> Spri
 	return e
 
 
-## Un frame ogni VITA_FRAME: una volta sola (poi sparisce, il lampo solo nel primo frame) o in ciclo.
-func _anima(e: Sprite2D, ciclo: bool) -> void:
+## Un frame ogni `passo` secondi (VITA_FRAME, o 1 / fps dei dati): una volta sola (poi sparisce, il lampo solo nel
+## primo frame) o in ciclo.
+func _anima(e: Sprite2D, ciclo: bool, passo: float = VITA_FRAME) -> void:
 	var t := e.create_tween()
 	if ciclo:
 		t.set_loops()
 	for k in range(1, e.hframes):
-		t.tween_interval(VITA_FRAME)
+		t.tween_interval(passo)
 		t.tween_callback(e.set.bind("frame", k))
 		if k == 1 and not ciclo:
 			t.tween_callback((e.material as ShaderMaterial).set_shader_parameter.bind("lampo", 0.0))
-	t.tween_interval(VITA_FRAME)
+	t.tween_interval(passo)
 	t.tween_callback(e.set.bind("frame", 0) if ciclo else e.queue_free)
 
 
