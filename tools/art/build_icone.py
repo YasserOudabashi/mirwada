@@ -7,6 +7,8 @@ L'abbinamento oggetto -> icona e' un dato: data/ui/icone.json "oggetti" (id dell
 o "<forma>"). Lo propone questo script con le regole qui sotto (la prima parola dell'id che dice una forma, le
 parole e i tag che dicono un colore); poi si ritocca nel JSON e un nuovo lancio lo lascia com'e'. Le icone vanno
 in assets/icone/oggetti/<icona>.png (solo quelle usate) e il foglio di controllo in arte/revisione/.
+US-8B70b: la serie della modalita' cupa (forge3d/tema.py, stessi modelli e stesso seed) in assets/icone/oggetti/cupo/,
+per gli oggetti a terra nel mondo cupo; il foglio in arte/revisione/icone_oggetti_cupo.png.
 """
 import glob
 import json
@@ -18,6 +20,7 @@ from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from forge3d import materials as M  # noqa: E402
+from forge3d import tema  # noqa: E402
 from forge3d.icone import FORME, LATO, icona  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -236,9 +239,20 @@ def main():
         f.write("\n")
 
     usate = sorted(set(abbinati.values()) | set(categorie.values()))
-    consentiti = {M.hex_to_rgb(c) for c in M.E32.values()}
-    os.makedirs(OUT, exist_ok=True)
-    for vecchia in glob.glob(os.path.join(OUT, "*.png")):
+    for t, cartella, revisione in (("luminoso", OUT, REVISIONE),
+                                   ("cupo", os.path.join(OUT, "cupo"), REVISIONE.replace(".png", "_cupo.png"))):
+        tema.imposta(t)
+        disegna(usate, cartella, revisione)
+    tema.imposta("luminoso")
+    print(f"{len(abbinati)} oggetti ({nuovi} abbinati ora), {len(usate)} icone in assets/icone/oggetti/ e /cupo/, "
+          f"fogli in {os.path.relpath(REVISIONE, ROOT)} e _cupo")
+
+
+def disegna(usate, cartella, revisione):
+    """Le icone usate nel tema corrente: Endesga 32 (nel cupo i suoi gemelli; gli emissive restano accesi)."""
+    consentiti = {M.hex_to_rgb(c) for c in M.E32.values()} | {M.hex_to_rgb(tema.colore(c)) for c in M.E32.values()}
+    os.makedirs(cartella, exist_ok=True)
+    for vecchia in glob.glob(os.path.join(cartella, "*.png")):
         if os.path.basename(vecchia)[:-4] not in usate:
             os.remove(vecchia)
             if os.path.exists(vecchia + ".import"):
@@ -252,11 +266,9 @@ def main():
         assert set(np.unique(img[..., 3])) <= {0, 255}, f"{ic}: alpha non 0/255"
         fuori = {tuple(int(c) for c in p) for p in img[piene][:, :3]} - consentiti
         assert not fuori, f"{ic}: colori fuori palette {sorted(fuori)[:4]}"
-        Image.fromarray(img).save(os.path.join(OUT, ic + ".png"))
+        Image.fromarray(img).save(os.path.join(cartella, ic + ".png"))
         disegni.append((ic, img))
-    foglio(disegni, REVISIONE)
-    print(f"{len(abbinati)} oggetti ({nuovi} abbinati ora), {len(usate)} icone in assets/icone/oggetti/, "
-          f"foglio in {os.path.relpath(REVISIONE, ROOT)}")
+    foglio(disegni, revisione)
 
 
 if __name__ == "__main__":

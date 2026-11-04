@@ -37,3 +37,17 @@ func svuota() -> void:
 				continue
 			madre.remove_child(c)
 			c.queue_free()
+
+
+## US-8B70: l'icona dell'oggetto a 1:1 (16 unita' = i 32 pixel dell'icona), centrata sulla riga: zaino, Indosso e
+## negozio (US-8B70b).
+func _icona(tex: Texture2D) -> TextureRect:
+	var ic := TextureRect.new()
+	ic.name = "Icona"
+	ic.texture = tex
+	ic.custom_minimum_size = Vector2(16, 16)
+	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	ic.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	return ic

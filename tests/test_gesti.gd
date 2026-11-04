@@ -88,3 +88,19 @@ func test_in_volo_e_in_barca() -> void:
 	p.call("_aggiorna_animazione")
 	assert_eq(_stato(p), "idle", "a terra di nuovo")
 	p.free()
+
+
+## US-8B91b: in barca si va piu' veloci che a piedi (mezzi.json barca.velocita); scesi si torna al passo di prima.
+func test_in_barca_si_va_piu_veloci() -> void:
+	var p := _player()
+	var a_piedi: float = float(p.call("velocita_massima"))
+	var molt: float = float((_root().get_node("GameData").call("get_mezzo", "barca") as Dictionary)["velocita"])
+	assert_true(molt > 1.0, "la barca ha un moltiplicatore piu' alto di 1")
+	p.call("imposta_barca", true)
+	assert_almost_eq(float(p.call("velocita_massima")), a_piedi * molt, "in barca la velocita' per il moltiplicatore")
+	p.call("imposta_barca", false)
+	assert_almost_eq(float(p.call("velocita_massima")), a_piedi, "a terra il passo di prima")
+	p.call("imposta_volo", true)
+	assert_almost_eq(float(p.call("velocita_massima")), a_piedi, "il volo non dice niente: come a piedi")
+	p.call("imposta_volo", false)
+	p.free()

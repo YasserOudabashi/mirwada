@@ -46,3 +46,32 @@ func test_senza_icona_resta_il_rombo() -> void:
 		rombo = rombo or c is Polygon2D
 	assert_true(rombo, "un id senza icona non rompe niente: il segnaposto di characteristic_pickup")
 	p.free()
+
+
+# --- US-8B70b ----------------------------------------------------------------------------
+
+## La serie della modalita' cupa (assets/icone/oggetti/cupo/): ogni oggetto la ha, 32 x 32, diversa dalla luminosa.
+func test_la_serie_cupa_c_e_per_ogni_oggetto() -> void:
+	var gd: Node = _gd()
+	for iid in gd.call("item_ids"):
+		var tex: Texture2D = gd.call("icona_oggetto", str(iid), "cupo")
+		assert_true(tex != null and tex.get_size() == Vector2(32, 32), "%s ha l'icona cupa" % iid)
+	assert_true(gd.call("icona_oggetto", "pozione_cura_minore", "cupo") != gd.call("icona_oggetto", "pozione_cura_minore"),
+		"un disegno suo, non la luminosa")
+
+
+## A terra l'oggetto ha l'icona del mondo (GameState.tema_arte()); il libro resta sulla luminosa.
+func test_a_terra_nel_mondo_cupo_l_icona_cupa() -> void:
+	var gs: Node = Engine.get_main_loop().root.get_node("GameState")
+	var prima: String = str(gs.get("modalita"))
+	gs.set("modalita", "difficile")
+	assert_eq(str(gs.call("tema_arte")), "cupo", "la modalita' difficile ha il mondo cupo")
+	var p: Area2D = ItemPickup.new()
+	p.call("setup", "piuma_dei_venti", Vector2(10, 20))
+	var spr: Sprite2D = null
+	for c in p.get_children():
+		if c is Sprite2D:
+			spr = c
+	assert_true(spr != null and spr.texture == _gd().call("icona_oggetto", "piuma_dei_venti", "cupo"), "l'icona cupa")
+	gs.set("modalita", prima)
+	p.free()

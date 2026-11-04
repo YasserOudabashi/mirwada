@@ -15031,3 +15031,30 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   piu' vicino: le scene di prova di test_bersaglio e test_vfx_primitive stanno lontano (70000 / 60000). 1086 test.
 - Aperto: un effetto sul bersaglio sta sopra il nemico anche se il nemico passa dietro un albero (e' figlio suo, con
   z_index 1).
+
+## US-8B70b — Icone nel negozio, in Indosso e nel mondo cupo, 2026-11-03
+- tools/art/build_icone.py: dopo la serie luminosa (identica byte per byte a prima) la serie della modalita' cupa,
+  stessi modelli e stesso seed 1 con forge3d/tema.py "cupo" -> assets/icone/oggetti/cupo/ (141 icone), foglio
+  arte/revisione/icone_oggetti_cupo.png (su carta e su fondo scuro, guardato x4: forme uguali, colori spenti come il
+  mondo cupo, le fiamme delle candele restano accese). Comando: python tools/art/build_icone.py. Palette: Endesga 32 e
+  i gemelli cupi (controllo nello script), alpha 0/255.
+- GameData.icona_oggetto(id, tema = "luminoso"): con "cupo" la serie cupa (se c'e'). A terra (item_pickup.gd) il tema
+  del mondo, GameState.tema_arte(); il libro resta sulla luminosa: e' lo stesso nelle due modalita' e sulla carta le
+  icone cupe sono troppo scure (guardato sul foglio).
+- pagina_libro.gd _icona (spostata da page_inventario): l'icona accanto a ogni oggetto del negozio (compra e vendi,
+  page_dialogo.gd) e a ogni slot di Indosso (vuota se lo slot e' vuoto).
+- Validator: ogni icona usata ha anche il disegno cupo.
+- Verifica a schermo (arte/revisione/icone_negozio_indosso_cupo.png): negozio di Sidon con le icone nelle due liste,
+  Indosso con la spada, quattro oggetti a terra a Mirwada nella modalita' difficile. Test: test_icone_oggetti (+2),
+  test_page_inventario (+1), test_page_negozio (+1). 1090 test, validate 0. Sette file di codice toccati, ma poche righe ciascuno
+  (148 righe in tutto, test compresi): la story non andava spezzata.
+
+## US-8B91b — Barca piu' veloce, 2026-11-03
+- data/world/mezzi.json barca.velocita 1.6: moltiplica la velocita' di chi cammina finche' si sta sul mezzo (un mezzo
+  senza velocita' va al passo, come il volo). scripts/player.gd: _imposta_mezzo legge il moltiplicatore,
+  velocita_massima() = StatsComponent velocita x moltiplicatore, usata dal movimento.
+- Validator: velocita di un mezzo fra 0 e 3. tests/test_gesti.gd (+1).
+- Verifica nel gioco (Xvfb, tasto di movimento tenuto ~1 s): a piedi a Mirwada 140 unita'/s, in barca in mare davanti
+  alla diga 224 (x1.60), 223 unita' percorse. 1091 test, validate 0.
+- Aperto: la barca resta disegnata di traverso anche quando va su o giu' (un solo disegno, US-8B91): servirebbero le
+  quattro direzioni della barca in forge3d.

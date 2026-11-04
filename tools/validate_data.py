@@ -1374,6 +1374,10 @@ def main():
         if _fn.endswith(".json"):
             for _it in (load_json(os.path.join(DATA, "items", _fn)) or {}).get("items", []):
                 _items_tutti[_it.get("id")] = _it
+    for _mz, _spec in _mezzi.items():                       # US-8B91b: il moltiplicatore della velocita' sul mezzo
+        _vz = _spec.get("velocita", 1.0) if isinstance(_spec, dict) else 1.0
+        if not isinstance(_vz, (int, float)) or not (0 < _vz <= 3):
+            err(f"data/world/mezzi.json [{_mz}]: velocita '{_vz}' deve essere un numero fra 0 e 3")
     for _mz, _spec in _mezzi.items():
         if isinstance(_spec, dict) and "chiave" in _spec:
             _k = _items_tutti.get(_spec["chiave"])
@@ -1416,8 +1420,11 @@ def main():
         _f, _, _t = str(_v).partition("_")
         if _f not in _forme or (_t not in _forme[_f] if _forme[_f] else _t):
             err(f"data/ui/icone.json {_sez}.{_k}: '{_v}' non e' <forma>_<tinta> del vocabolario 'forme'")
-        elif not os.path.isfile(os.path.join(ROOT, "assets", "icone", "oggetti", f"{_v}.png")):
-            err(f"data/ui/icone.json {_sez}.{_k}: manca assets/icone/oggetti/{_v}.png (python tools/art/build_icone.py)")
+        else:
+            for _cart in ("", "cupo/"):           # US-8B70b: anche la serie della modalita' cupa
+                if not os.path.isfile(os.path.join(ROOT, "assets", "icone", "oggetti", f"{_cart}{_v}.png")):
+                    err(f"data/ui/icone.json {_sez}.{_k}: manca assets/icone/oggetti/{_cart}{_v}.png "
+                        f"(python tools/art/build_icone.py)")
         if _sez == "oggetti" and _k not in _items_tutti:
             err(f"data/ui/icone.json oggetti.{_k}: non e' un oggetto di data/items/")
     for _iid in sorted(set(_items_tutti) - set(_ic.get("oggetti", {}))):

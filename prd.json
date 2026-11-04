@@ -833,8 +833,8 @@
       ],
       "priority": 43,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatta il 2026-11-03. Serie cupa da build_icone.py (assets/icone/oggetti/cupo/), usata a terra col tema del mondo; il libro resta sulla luminosa (uguale nelle due modalita'). Icone nel negozio (compra e vendi) e in Indosso (pagina_libro._icona). arte/revisione/icone_negozio_indosso_cupo.png."
     },
     {
       "id": "US-8B91b",
@@ -848,8 +848,8 @@
       ],
       "priority": 44,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatta il 2026-11-03. mezzi.json barca.velocita 1.6, player.velocita_massima(); nel gioco 140 -> 224 unita'/s. Aperto: la barca ha un solo disegno (di traverso anche andando su o giu')."
     },
     {
       "id": "US-8B96",

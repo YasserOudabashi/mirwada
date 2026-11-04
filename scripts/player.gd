@@ -183,7 +183,7 @@ func _physics_process(delta: float) -> void:
 	_gestisci_input_abilita()
 
 	var input: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	var vel_max: float = _stats.get_stat("velocita")
+	var vel_max: float = velocita_massima()
 
 	if input != Vector2.ZERO:
 		# get_vector normalizza gia' la diagonale: nessuna spinta extra in obliquo.
@@ -234,6 +234,7 @@ const ALTEZZA_VOLO := 14.0
 const DENTRO_BARCA := 4.0                     # US-8B81: in ginocchio dentro lo scafo, non sul bordo di poppa
 var _mezzo: String = ""                     # "", "barca", "volo"
 var _vincolo: Callable = Callable()
+var _passo_mezzo: float = 1.0                # US-8B91b: mezzi.json <mezzo>.velocita (la barca va piu' veloce)
 var _ombra_volo: Sprite2D = null
 
 
@@ -253,8 +254,15 @@ func in_barca() -> bool:
 	return _mezzo == "barca"
 
 
+## La velocita' di chi cammina (StatsComponent), per il moltiplicatore del mezzo su cui si sta.
+func velocita_massima() -> float:
+	return float(_stats.get_stat("velocita")) * _passo_mezzo
+
+
 func _imposta_mezzo(mezzo: String, vincolo: Callable) -> void:
 	_mezzo = mezzo
+	var gd: Node = get_node_or_null("/root/GameData")
+	_passo_mezzo = float((gd.call("get_mezzo", mezzo) as Dictionary).get("velocita", 1.0)) if gd != null and not mezzo.is_empty() else 1.0
 	_vincolo = vincolo if not mezzo.is_empty() else Callable()
 	set_collision_mask_value(1, mezzo.is_empty())
 	set_collision_mask_value(5, mezzo != "volo")

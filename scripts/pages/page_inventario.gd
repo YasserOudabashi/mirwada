@@ -141,19 +141,6 @@ func _riga_item(v: Dictionary) -> HBoxContainer:
 	return h
 
 
-## US-8B70: l'icona dell'oggetto a 1:1 (16 unita' = i 32 pixel dell'icona), centrata sulla riga.
-func _icona(tex: Texture2D) -> TextureRect:
-	var ic := TextureRect.new()
-	ic.name = "Icona"
-	ic.texture = tex
-	ic.custom_minimum_size = Vector2(16, 16)
-	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	ic.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	return ic
-
-
 ## US-1105 (fase 11): 4 colori distinti per i 4 livelli di
 ## data/schema/item_rarity.json - procedurali (ColorRect/StyleBox pattern
 ## gia' in uso altrove nella pagina, es. il modulate delle righe offuscate),
@@ -222,6 +209,7 @@ func _indosso() -> void:
 		l.custom_minimum_size = Vector2(80, 0)
 		h.add_child(l)
 		var it: Dictionary = eq.call("equipaggiato", mount)
+		h.add_child(_icona(gd.call("icona_oggetto", str(it.get("id", ""))) if not it.is_empty() else null))   # US-8B70b
 		var n := Label.new()
 		n.text = str(gd.call("tr_data", it.get("name_i18n", ""))) if not it.is_empty() else tr("BOOK_INV_VUOTO")
 		_larga(n)
