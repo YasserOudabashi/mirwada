@@ -863,8 +863,8 @@
       ],
       "priority": 45,
       "fase": "8b",
-      "passes": false,
-      "notes": "I pontili (pontile_legno) larghi 1 hanno '^' (128) alla radice: vedi progress US-8B20d."
+      "passes": true,
+      "notes": "Fatta il 2026-11-04. Un vicino d'acqua non fa dislivello (esporta_mondo.blocchi; le case dei villaggi si posano con la regola di prima e non si spostano). --solo-blocchi: 5433 caselle liberate, tutte accanto all'acqua; Marche ancora chiuse. Test sulle 10 punte del porto. arte/revisione/pontile_raggiunto.png."
     },
     {
       "id": "US-8B24c",

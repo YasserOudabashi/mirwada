@@ -202,7 +202,7 @@ def edifici_fuori_citta(w, luoghi, villaggi, gia):
     larga quanto la casa piu' una casella di margine, con la soglia e le 3 caselle sotto libere (il tetto di una
     casa davanti non copre la porta), fuori da acqua, dislivelli, strade, luoghi e altre case. Un villaggio
     nell'angolo (0, 0) e' un posto non trovato dal generatore (il mulino): si salta."""
-    libero = (blocchi(w, senza_edifici=True) == 0)
+    libero = (blocchi(w, senza_edifici=True, riva_libera=False) == 0)     # le case non si posano sulla riva
     strada = np.zeros(w.alt.shape, bool)
     for s_ in list(w.roads) + list(w.sentieri):
         for x, y in s_:
@@ -340,19 +340,24 @@ def esporta_barca(temi):
     print("  barca e nave:", ", ".join(temi))
 
 
-def blocchi(w, senza_edifici=False):
+def blocchi(w, senza_edifici=False, riva_libera=True):
     """Per casella: 255 = acqua o vuoto (non si passa mai), 128 = dislivello (non si passa a piedi, volando si'),
     0 = libera. Dislivello: le pareti senza scala o rampa e i bordi alti dei gradoni verso est, ovest e nord (si
     sale e si scende solo dalle pareti a sud, con scale e rampe). Strade e sentieri attraversano i dislivelli solo
     dentro una stessa regione: al confine (il Passo tra le Rupi, sotto le Marche) il salto resta.
     2026-10-25: il vicino "a nord" era quello a sud (sposta(alt, -1, 0) e' la casella sotto): bloccava la fila in
-    cima a ogni scala e lasciava aperti i bordi nord."""
+    cima a ogni scala e lasciava aperti i bordi nord.
+    US-8B96: un vicino d'acqua (o di vuoto) non fa dislivello: blocca gia' da solo. Prima i pontili larghi 2 (acqua
+    ai due lati) erano tutti dislivello e gli scali del cantiere chiusi alla radice; ora si cammina sul bordo.
+    riva_libera=False tiene la regola di prima: serve a posare le case dei villaggi (non sulla riva), che cosi' non
+    si spostano."""
     alt = w.alt
     faccia = maschera_pareti(alt, w.mat_par)
     salto = faccia & (w.pas == ".")
     for sy, sx in ((0, 1), (0, -1), (1, 0)):                  # vicino a ovest, est, nord piu' basso
         vic = B.sposta(alt, sy, sx, -99)
-        salto |= (vic < alt) & (vic != -99) & ~faccia
+        acqua = B.sposta(w.water_mask, sy, sx, False) if riva_libera else np.zeros(alt.shape, bool)
+        salto |= (vic < alt) & (vic != -99) & ~faccia & ~acqua
     strada = np.zeros(alt.shape, bool)
     for s in list(w.roads) + list(w.sentieri):
         for x, y in s:
