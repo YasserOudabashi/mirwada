@@ -15058,3 +15058,20 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   alla diga 224 (x1.60), 223 unita' percorse. 1091 test, validate 0.
 - Aperto: la barca resta disegnata di traverso anche quando va su o giu' (un solo disegno, US-8B91): servirebbero le
   quattro direzioni della barca in forge3d.
+
+## US-8B96 — Pontili stretti raggiungibili, 2026-11-04
+- Causa: in esporta_mondo.blocchi() una casella con un vicino piu' basso a ovest, est o nord era dislivello anche se
+  quel vicino era acqua. I pontili di legno del porto (larghi 2, acqua ai due lati) erano tutti dislivello; uno scalo
+  del cantiere navale (largo 3) era chiuso alla radice.
+- Correzione nel generatore: un vicino d'acqua (o di vuoto) non fa dislivello, l'acqua blocca gia' da sola.
+  blocchi(w, riva_libera=False) tiene la regola di prima solo per posare le case dei villaggi (edifici_fuori_citta),
+  che cosi' restano dove sono: senza, due gruppi di capanne sulle isole si spostavano verso l'acqua e non
+  coincidevano piu' con mondo.json.
+- Comando: python tools/art/esporta_mondo.py --solo-blocchi (seed 6, 30 s). Confronto col mondo di prima (stesso
+  seed, mondo in cache): cambiano 5433 caselle, tutte da 128 a 0 e tutte accanto all'acqua o al vuoto (rive, moli,
+  bordi delle isole; 1873 nella Frontiera); niente altro. A piedi dalla casa del porto si arriva alle stesse regioni
+  di prima, nelle Marche alle stesse 32 caselle di confine su 147 mila (restano chiuse).
+- tests/test_mondo.gd test_dal_porto_si_arriva_in_punta_a_ogni_pontile: 10 punte di moli, pontili e scali attorno al
+  porto e al cantiere, tutte raggiunte a piedi dal porto; con il blocchi.png di prima fallisce sulle 4 punte chiuse.
+- Verifica nel gioco: Enel dalla banchina cammina verso sud lungo un pontile di legno fino alla punta (512, 428), con
+  l'acqua sotto. arte/revisione/pontile_raggiunto.png. 1092 test, validate 0.
