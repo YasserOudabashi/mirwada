@@ -882,3 +882,50 @@ func test_la_chiave_del_faro_non_ricompare_se_la_si_ha() -> void:
 	assert_true(m.get_node_or_null("Chiave_faro") == null, "gia' presa: non c'e' piu' a terra")
 	inv.call("pulisci")
 	m.free()
+
+
+## US-8B96: dal porto si arriva a piedi in punta a ogni molo, pontile e scalo del porto e del cantiere navale. Una
+## punta = la casella di terra con l'acqua a sud, in una fila di terra larga al massimo 4 con l'acqua ai due capi
+## (anche 3 righe piu' su: e' un braccio nell'acqua, non la riva). Prima i pontili larghi 2 erano tutti dislivello.
+func test_dal_porto_si_arriva_in_punta_a_ogni_pontile() -> void:
+	var m: Node2D = _mondo()
+	var luoghi: Dictionary = m.dati["luoghi"]
+	var pp: Array = luoghi["porto"]
+	var cn: Array = luoghi["cantiere_navale"]
+	var x0: int = mini(int(pp[0]), int(cn[0])) - 80
+	var x1: int = maxi(int(pp[0]), int(cn[0])) + 40
+	var y0: int = mini(int(pp[1]), int(cn[1])) - 20
+	var y1: int = maxi(int(pp[1]), int(cn[1])) + 30
+	var punte: Array = []
+	for y in range(y0, y1):
+		for x in range(x0, x1):
+			if m.call("acqua", x, y) or not m.call("acqua", x, y + 1):
+				continue
+			var a: int = x
+			while not m.call("acqua", a - 1, y) and x - a < 5:
+				a -= 1
+			var c: int = x
+			while not m.call("acqua", c + 1, y) and c - x < 5:
+				c += 1
+			if m.call("acqua", a - 1, y) and m.call("acqua", c + 1, y) and c - a + 1 <= 4 \
+					and m.call("acqua", a - 1, y - 3) and m.call("acqua", c + 1, y - 3) and not punte.has(Vector3i(a, c, y)):
+				punte.append(Vector3i(a, c, y))
+	assert_true(punte.size() >= 8, "i moli, i pontili e gli scali del porto (%d)" % punte.size())
+	var visto := {Vector2i(int(pp[0]), int(pp[1])): true}
+	var coda: Array = [Vector2i(int(pp[0]), int(pp[1]))]
+	var i := 0
+	while i < coda.size():
+		var q: Vector2i = coda[i]
+		i += 1
+		for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			var n: Vector2i = q + d
+			if n.x >= x0 - 20 and n.x < x1 + 20 and n.y >= y0 - 20 and n.y < y1 + 20 and not visto.has(n) \
+					and not m.call("bloccata", n.x, n.y):
+				visto[n] = true
+				coda.append(n)
+	for p in punte:
+		var raggiunta := false
+		for x in range(p.x, p.y + 1):
+			raggiunta = raggiunta or visto.has(Vector2i(x, p.z))
+		assert_true(raggiunta, "la punta (%d..%d, %d) si raggiunge a piedi dal porto" % [p.x, p.y, p.z])
+	m.free()
