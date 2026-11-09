@@ -878,8 +878,8 @@
       ],
       "priority": 46,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Fatta il 2026-11-09. mondo.segui(pos, anche): mentre il cannocchiale guarda restano costruiti anche i blocchi del giocatore (nel gioco 50 blocchi durante la vista, 25 al ritorno). tests/test_cannocchiale.gd (+1)."
     },
     {
       "id": "US-8B80c",
