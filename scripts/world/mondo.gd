@@ -47,7 +47,7 @@ var _ostacoli: TileMapLayer
 var _caricati: Dictionary = {}      # Vector2i blocco -> Array di Sprite2D
 var _oggetti_per_blocco: Dictionary = {}
 var _texture_oggetti: Dictionary = {}
-var _blocco_centro := Vector2i(-9999, -9999)
+var _blocco_centro: Array = []         # i blocchi centrali di segui() (uno, o due col cannocchiale)
 var _tema_caricato: String = ""
 var _cella_regione := Vector2i(-9999, -9999)
 ## Ultima posizione del giocatore in una regione che lo accetta: chi tocca una
@@ -220,17 +220,21 @@ func punto_spawn(rid: String = "") -> Vector2:
 	return Vector2((c.x + 0.5) * tile, (c.y + 0.5) * tile) if c.x >= 0 else p
 
 
-## Costruisce i blocchi attorno a una posizione e libera quelli lontani.
-func segui(pos: Vector2) -> void:
-	var c := Vector2i(floori(pos.x / (tile * BLOCCO)), floori(pos.y / (tile * BLOCCO)))
-	if c == _blocco_centro:
+## Costruisce i blocchi attorno a una posizione e libera quelli lontani. Con `anche` (US-8B24c: il giocatore mentre il
+## cannocchiale guarda lontano) tiene costruiti anche quelli attorno a lui: i nemici vicini restano tra i muri.
+func segui(pos: Vector2, anche: Vector2 = Vector2.INF) -> void:
+	var centri: Array = [Vector2i(floori(pos.x / (tile * BLOCCO)), floori(pos.y / (tile * BLOCCO)))]
+	if anche != Vector2.INF:
+		centri.append(Vector2i(floori(anche.x / (tile * BLOCCO)), floori(anche.y / (tile * BLOCCO))))
+	if centri == _blocco_centro:
 		return
-	_blocco_centro = c
+	_blocco_centro = centri
 	var voluti: Dictionary = {}
-	for by in range(c.y - raggio_blocchi, c.y + raggio_blocchi + 1):
-		for bx in range(c.x - raggio_blocchi, c.x + raggio_blocchi + 1):
-			if bx >= 0 and by >= 0 and bx * BLOCCO < larghezza and by * BLOCCO < altezza:
-				voluti[Vector2i(bx, by)] = true
+	for c in centri:
+		for by in range(c.y - raggio_blocchi, c.y + raggio_blocchi + 1):
+			for bx in range(c.x - raggio_blocchi, c.x + raggio_blocchi + 1):
+				if bx >= 0 and by >= 0 and bx * BLOCCO < larghezza and by * BLOCCO < altezza:
+					voluti[Vector2i(bx, by)] = true
 	for b in _caricati.keys():
 		if not voluti.has(b):
 			_scarica(b)
@@ -245,7 +249,10 @@ func _process(_delta: float) -> void:
 		var pos: Vector2 = (p as Node2D).global_position - global_position
 		# US-8B24: una telecamera del mondo (il cannocchiale) guarda lontano: si costruisce attorno a cio' che si vede
 		var cam: Camera2D = get_viewport().get_camera_2d()
-		segui(cam.global_position - global_position if cam != null and cam.get_parent() == self else pos)
+		if cam != null and cam.get_parent() == self:
+			segui(cam.global_position - global_position, pos)     # US-8B24c: e attorno al giocatore
+		else:
+			segui(pos)
 		_aggiorna_barca(p as Node2D)
 		if aggiorna_regione(pos):
 			_ultima_ammessa = pos
@@ -735,7 +742,7 @@ func crea_varchi() -> void:
 	crea_soglie()
 	for b in _caricati.keys():                                # i blocchi gia' costruiti si rifanno senza
 		_scarica(b)
-	_blocco_centro = Vector2i(-9999, -9999)
+	_blocco_centro = []
 	_aggiorna_varchi()
 
 
@@ -1443,7 +1450,7 @@ func cambia_livello(nuovo: String) -> bool:
 	_oggetti_per_blocco = l["oggetti"]
 	_terreno.tile_set = l["tileset"]
 	livello = nuovo
-	_blocco_centro = Vector2i(-9999, -9999)
+	_blocco_centro = []
 	var sopra: bool = livello == "superficie"
 	for c in get_children():
 		if c is Area2D and c.has_meta("npc_id"):

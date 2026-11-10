@@ -15075,3 +15075,14 @@ in un nuovo prd.json con /ralph quando si decide di iniziarla).
   porto e al cantiere, tutte raggiunte a piedi dal porto; con il blocchi.png di prima fallisce sulle 4 punte chiuse.
 - Verifica nel gioco: Enel dalla banchina cammina verso sud lungo un pontile di legno fino alla punta (512, 428), con
   l'acqua sotto. arte/revisione/pontile_raggiunto.png. 1092 test, validate 0.
+
+## US-8B24c — Il cannocchiale tiene i blocchi del giocatore, 2026-11-09
+- scripts/world/mondo.gd segui(pos, anche): con una seconda posizione costruisce i blocchi attorno a tutte e due;
+  _process, quando la telecamera attiva e' una del mondo (il cannocchiale), segue la vista e anche il giocatore.
+  _blocco_centro e' ora la lista dei blocchi centrali (uno, o due col cannocchiale). Prima, mentre si guardava, i
+  blocchi attorno al giocatore si scaricavano: un nemico vicino avrebbe camminato senza muri ne' dislivelli.
+- tests/test_cannocchiale.gd (+1): con la vista alla Frontiera restano caricati il blocco della vista e quello del
+  giocatore; tornati, quello lontano si libera. Senza la correzione il test fallisce.
+- Verifica nel gioco (Xvfb): Enel al cannocchiale del faro, la vista vola alla Frontiera (vuoto di nebbia, porta,
+  isola): 50 blocchi costruiti, quello della vista (38, 32) e quello di Enel (32, 30); tornati 25, col blocco di Enel.
+  1093 test, validate 0.

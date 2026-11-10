@@ -60,3 +60,37 @@ func test_la_vista_vola_al_bersaglio_e_torna() -> void:
 	assert_eq(mondo.get_viewport().get_camera_2d(), p.get_node("Camera2D"), "con la sua telecamera")
 	assert_true(c.get("_lente") == null, "la lente se ne va")
 	mondo.free()
+
+
+## US-8B24c: mentre la vista del cannocchiale e' lontana restano costruiti anche i blocchi attorno al giocatore
+## (muri e dislivelli: un nemico vicino non cammina nel vuoto); quando la vista torna, quelli lontani si liberano.
+func test_mentre_si_guarda_i_blocchi_del_giocatore_restano() -> void:
+	var m: Node2D = preload("res://scripts/world/mondo.gd").new()
+	m.set("tema", "luminoso")
+	assert_true(m.call("carica"), "mondo caricato")
+	_root().add_child(m)
+	var p: CharacterBody2D = preload("res://scenes/player.tscn").instantiate()
+	m.add_child(p)
+	p.global_position = m.call("partenza")
+	var lato: float = float(m.tile) * float(preload("res://scripts/world/mondo.gd").BLOCCO)
+	var blocco := func(pos: Vector2) -> Vector2i:
+		return Vector2i(floori(pos.x / lato), floori(pos.y / lato))
+	var luoghi: Dictionary = m.dati["luoghi"]
+	var lontano: Vector2 = Vector2(float(luoghi["approdo_frontiera"][0]) + 0.5, float(luoghi["approdo_frontiera"][1]) + 0.5) * lato / 16.0
+	assert_true(Vector2(blocco.call(lontano)).distance_to(Vector2(blocco.call(p.global_position))) > 4.0, "la Frontiera e' lontana")
+	m.call("_process", 0.0)
+	var caricati: Dictionary = m.get("_caricati")
+	assert_true(caricati.has(blocco.call(p.global_position)), "attorno al giocatore il mondo c'e'")
+	var cam := Camera2D.new()
+	m.add_child(cam)
+	cam.global_position = lontano
+	cam.make_current()
+	m.call("_process", 0.0)
+	caricati = m.get("_caricati")
+	assert_true(caricati.has(blocco.call(lontano)), "si costruisce dove guarda il cannocchiale")
+	assert_true(caricati.has(blocco.call(p.global_position)), "e restano i blocchi del giocatore")
+	cam.free()
+	p.get_node("Camera2D").make_current()
+	m.call("_process", 0.0)
+	assert_false((m.get("_caricati") as Dictionary).has(blocco.call(lontano)), "tornati, la Frontiera si libera")
+	m.free()
