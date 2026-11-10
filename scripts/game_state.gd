@@ -199,6 +199,7 @@ func nuova_partita(nome: String, slot: int, talenti_innati: Array = [],
 
 	if _progression() != null:
 		_progression().call("configura", pathway_id, 9)
+	get_node("/root/AbilityEngine").call("slot_da_salvataggio", [])
 	if _follia() != null:
 		_follia().call("azzera")
 	if _conoscenza() != null:
@@ -361,6 +362,7 @@ func snapshot() -> Dictionary:
 		"endgame": _endgame().per_salvataggio() if _endgame() != null else {},
 		# fase 9: baseline dei requisiti 'comportamento' del Boon corrente.
 		"boon": _boon().per_salvataggio() if _boon() != null else {},
+		"hotbar": get_node("/root/AbilityEngine").call("slot_per_salvataggio"),
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
 	var mn: Node = get_tree().get_first_node_in_group("mondo")
@@ -422,6 +424,7 @@ func applica(dati: Dictionary) -> void:
 	# BoonSystem, stesso motivo di Acting (fase 9).
 	if _boon() != null:
 		_boon().da_salvataggio(dati.get("boon", {}))
+	get_node("/root/AbilityEngine").call("slot_da_salvataggio", dati.get("hotbar", []))
 	if _caratteristiche() != null:
 		_caratteristiche().da_salvataggio(dati.get("caratteristiche", []))
 	if _follia() != null:

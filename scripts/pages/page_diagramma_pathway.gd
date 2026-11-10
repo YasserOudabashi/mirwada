@@ -109,6 +109,7 @@ func aggiorna() -> void:
 			var stato: String = _stato(pid, n, mio, mia_seq, kn)
 			_stati["%s:%d" % [pid, n]] = stato
 			griglia.add_child(_cella_cella(stato))
+	_sezione_tasti(gd)
 	_vbox = colonna_destra
 
 	# --- dettaglio della Sequenza corrente ---
@@ -554,3 +555,33 @@ func _etichetta(tipo: String, id: String) -> String:
 	var e: Dictionary = book.call("config", "etichette", {}) if book != null else {}
 	var chiave: String = str(((e.get(tipo, {}) as Dictionary).get(id, {}) as Dictionary).get("name_i18n", id))
 	return str(gd.call("tr_data", chiave)) if gd != null else id
+
+
+## US-8B75c: quali abilita' stanno nei tasti. Una riga per abilita' posseduta, un bottone per tasto: quello acceso
+## e' il tasto che la lancia, premerne un altro la sposta li' (scambiandola con quella che c'era).
+func _sezione_tasti(gd: Node) -> void:
+	var ae: Node = _n("/root/AbilityEngine")
+	var p: Node = get_tree().get_first_node_in_group("player")
+	var possedute: Array = ae.call("owned_abilities", p) if ae != null and p != null else []
+	if possedute.is_empty():
+		return
+	_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_TASTI")))
+	var nei_tasti: Array = ae.call("hotbar", p)
+	for aid in possedute:
+		var h := HBoxContainer.new()
+		h.add_theme_constant_override("separation", 2)
+		var l := Label.new()
+		l.text = str(gd.call("tr_data", (gd.call("get_ability", aid) as Dictionary).get("name_i18n", aid)))
+		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		l.clip_text = true
+		h.add_child(l)
+		for n in nei_tasti.size():
+			var b := Button.new()
+			b.name = "Tasto%d" % (n + 1)
+			b.text = str(n + 1)
+			b.toggle_mode = true
+			b.button_pressed = nei_tasti[n] == aid
+			b.pressed.connect(func() -> void:
+				ae.call("assegna_slot", p, n, aid); aggiorna())
+			h.add_child(b)
+		_vbox.add_child(h)

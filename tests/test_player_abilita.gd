@@ -93,3 +93,38 @@ func test_giocatore_ha_una_label_col_nome() -> void:
 
 	player.free()
 	gs.set("nome_personaggio", salvato)
+
+
+## US-8B75c: i tasti lanciano l'abilita' scelta per lo slot, la scelta si salva.
+func test_la_hotbar_si_sceglie_e_i_tasti_la_seguono() -> void:
+	var ae: Node = _n("/root/AbilityEngine")
+	ae.call("slot_da_salvataggio", [])
+	_n("/root/Progression").call("configura", "twilight_giant", 5)
+	var player: Node = _giocatore()
+	var owned: Array = ae.call("owned_abilities", player)
+	assert_gt(float(owned.size()), 4.0, "alla Sequenza 5 le abilita' sono piu' dei tasti")
+	assert_eq(ae.call("hotbar", player), owned.slice(0, 4), "senza scelte: le prime quattro")
+	var sesta: String = str(owned[5])
+	assert_true(ae.call("assegna_slot", player, 0, sesta), "un'abilita' posseduta va nel tasto 1")
+	var hb: Array = ae.call("hotbar", player)
+	assert_eq(str(hb[0]), sesta, "il tasto 1 ha l'abilita' scelta")
+	assert_eq(hb.slice(1), owned.slice(1, 4), "gli altri tasti restano")
+	assert_true(ae.call("assegna_slot", player, 2, sesta), "spostarla in un altro tasto")
+	hb = ae.call("hotbar", player)
+	assert_eq(str(hb[2]), sesta, "la sposta")
+	assert_eq(str(hb[0]), str(owned[2]), "e scambia con quella che c'era")
+	assert_false(ae.call("assegna_slot", player, 1, "abilita_inesistente"), "una non posseduta no")
+	_n("/root/EventTracker").call("azzera")
+	player.call("lancia_abilita_slot", 2)
+	assert_almost_eq(_n("/root/EventTracker").call("count", "ability_used", {"ability_id": sesta}), 1.0,
+		"il tasto 3 lancia l'abilita' scelta")
+	var salvato: Array = ae.call("slot_per_salvataggio")
+	ae.call("slot_da_salvataggio", [])
+	assert_eq(ae.call("hotbar", player), owned.slice(0, 4), "azzerata torna quella di sempre")
+	ae.call("slot_da_salvataggio", salvato)
+	assert_eq(str((ae.call("hotbar", player) as Array)[2]), sesta, "dal salvataggio torna la scelta")
+	_n("/root/Progression").call("configura", "twilight_giant", 9)
+	assert_eq((ae.call("hotbar", player) as Array).slice(0, 2), owned.slice(0, 2),
+		"un'abilita' scelta che non si possiede piu' lascia il posto alle possedute")
+	ae.call("slot_da_salvataggio", [])
+	player.free()

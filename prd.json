@@ -906,10 +906,10 @@
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 45,
+      "priority": 114,
       "fase": "8b",
       "passes": false,
-      "notes": "Spezzata da US-8B80c il 2026-11-10 (regola 3: arte + routine + codice)."
+      "notes": "Spezzata da US-8B80c il 2026-11-10 (regola 3: arte + routine + codice). Spostata tra le rifiniture d'arte (2026-11-10): e' solo estetica."
     },
     {
       "id": "US-8B21d",
@@ -955,6 +955,22 @@
       "fase": "8b",
       "passes": true,
       "notes": "Visto in US-8B44a: lo slot 4 mostrava '4  Stretta della te' tagliato al bordo (progress.txt). 2026-11-10: hotbar a griglia 2x2 col corpo 12 (hud.gd CORPO_HOTBAR); un test la misura col nome piu' lungo dei dati. La camera degli interni chiede l'altezza all'HUD (hud.altezza(), game_camera.margine_hud())."
+    },
+    {
+      "id": "US-8B75c",
+      "title": "Scegliere le abilita' della hotbar",
+      "description": "I tasti sono 4 ma le abilita' possedute crescono (Twilight Giant alla Sequenza 5 ne ha 11): oggi si usano solo le prime 4 e le altre non si possono lanciare. Dal libro si sceglie quale abilita' sta in ogni slot.",
+      "acceptanceCriteria": [
+        "la scelta degli slot sta nel salvataggio",
+        "dal diagramma (o da una pagina del libro) si assegna un'abilita' posseduta a uno slot",
+        "i tasti 1-4 lanciano l'abilita' dello slot, non le prime 4",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 46,
+      "fase": "8b",
+      "passes": true,
+      "notes": "Trovata il 2026-11-10 facendo US-8B75b: senza, la maggior parte delle abilita' del gioco non si puo' usare. Fatta il 2026-11-10: AbilityEngine.hotbar/assegna_slot, 'hotbar' nel salvataggio (senza bump, come 'modalita'), sezione 'Abilita' nei tasti' nel diagramma."
     },
     {
       "id": "US-8B26",

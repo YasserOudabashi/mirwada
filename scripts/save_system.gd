@@ -93,6 +93,9 @@ func salva(slot: int, dati: Dictionary) -> Dictionary:
 		# fase 9). Un solo bump di fase 9 (schema_version 23) - stesso ruolo
 		# di "acting" ma per BoonSystem, i Pathway non_standard.
 		"boon": (dati.get("boon", {}) as Dictionary).duplicate(true),
+		# US-8B75c: le abilita' scelte per i 4 tasti. Senza bump, come "modalita": un save senza il campo ha la
+		# hotbar di sempre (le prime abilita' possedute).
+		"hotbar": (dati.get("hotbar", []) as Array).duplicate(),
 	}
 
 	DirAccess.make_dir_recursive_absolute(DIR_SAVES)
@@ -466,6 +469,7 @@ func _leggi_snapshot(raw: Dictionary) -> Dictionary:
 		"equipaggiamento": _campo(raw, "equipaggiamento", TYPE_DICTIONARY, {}),
 		"endgame": _campo(raw, "endgame", TYPE_DICTIONARY, {}),
 		"boon": _campo(raw, "boon", TYPE_DICTIONARY, {}),
+		"hotbar": _campo(raw, "hotbar", TYPE_ARRAY, []),
 	}
 
 

@@ -377,8 +377,8 @@ func lancia_abilita_slot(n: int) -> Dictionary:
 	var ae: Node = get_node_or_null("/root/AbilityEngine")
 	if ae == null:
 		return {"ok": false, "reason": "nessun_ability_engine"}
-	var owned: Array = ae.call("owned_abilities", self)
-	if n < 0 or n >= owned.size():
+	var owned: Array = ae.call("hotbar", self)           # US-8B75c: l'abilita' scelta per quel tasto
+	if n < 0 or n >= owned.size() or str(owned[n]).is_empty():
 		return {"ok": false, "reason": "slot_vuoto"}
 	var risultato: Dictionary = ae.call("execute", str(owned[n]), self)
 	if bool(risultato.get("ok", false)):

@@ -1107,3 +1107,17 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   dallo schermo; nella casa del porto la stanza sta sotto l'HUD. arte/revisione/hotbar_due_righe.png. 1101 test, validate 0.
 - Aperto: gli slot oltre il quarto non si vedono (11 abilita' possedute alla Sequenza 5, 4 tasti): scegliere quali
   abilita' stanno nella hotbar e' una story che non c'e' ancora.
+
+## US-8B75c — Scegliere le abilita' della hotbar, 2026-11-10
+- Trovata facendo US-8B75b: i tasti sono 4, le abilita' possedute crescono (Twilight Giant alla Sequenza 5: 11) e
+  si potevano lanciare solo le prime 4.
+- scripts/ability_engine.gd: TASTI_HOTBAR, hotbar(caster) (lo slot ha l'abilita' scelta se la si possiede ancora, gli
+  altri si riempiono con le prime possedute libere), assegna_slot (scambia se era in un altro tasto), segnale
+  hotbar_cambiata, slot_per_salvataggio/slot_da_salvataggio. Salvataggio: campo "hotbar" senza bump di versione (come
+  "modalita"); nuova_partita la azzera. player.gd e hud.gd usano hotbar() al posto delle prime possedute.
+- Libro, diagramma, facciata sinistra sotto la griglia: "Abilita' nei tasti", una riga per abilita' con i bottoni
+  1-4 (acceso quello che la lancia).
+- tests/test_player_abilita.gd (+1): default, scelta, scambio, non posseduta rifiutata, il tasto lancia la scelta,
+  giro dal salvataggio, un'abilita' non piu' posseduta lascia il posto.
+- Verifica nel gioco (Xvfb): alla Sequenza 5 messe Turbine nel tasto 1 e Scudo del compagno nel 4; il libro mostra
+  i bottoni accesi e l'HUD i nomi nuovi. arte/revisione/hotbar_scelta_tasti.png. 1102 test, validate 0.

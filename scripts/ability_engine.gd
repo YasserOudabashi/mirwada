@@ -39,6 +39,11 @@ const Conditions := preload("res://scripts/conditions.gd")
 ## Chiave "<instance_id>:<ability_id>" -> istante di fine in ms. Le voci dei
 ## caster non piu' validi o gia' scadute vengono rimosse da sweep_cooldowns():
 ## senza, una partita lunga accumulerebbe una voce per ogni entita' morta.
+## US-8B75c: quanti tasti di abilita' ha il giocatore (abilita_1..4 in project.godot) e le abilita' scelte per slot.
+const TASTI_HOTBAR := 4
+signal hotbar_cambiata()
+var _slot: Array = []
+
 var _cooldowns: Dictionary = {}
 const _SWEEP_OGNI_MS := 5000
 var _prossimo_sweep_ms: int = 0
@@ -474,6 +479,49 @@ func owned_abilities(caster: Node) -> Array:
 		for a in sd.get("abilities", []):
 			out.append(str(a))
 	return out
+
+
+## US-8B75c: le abilita' dei tasti 1..TASTI_HOTBAR. Ogni slot ha l'abilita' scelta (se la si possiede ancora),
+## gli slot senza scelta si riempiono con le prime possedute non gia' in un altro slot.
+func hotbar(caster: Node) -> Array:
+	var possedute: Array = owned_abilities(caster)
+	var out: Array = []
+	for i in TASTI_HOTBAR:
+		var scelta: String = str(_slot[i]) if i < _slot.size() else ""
+		out.append(scelta if scelta in possedute and not (scelta in out) else "")
+	for i in TASTI_HOTBAR:
+		if str(out[i]).is_empty():
+			for a in possedute:
+				if not (a in out):
+					out[i] = a
+					break
+	return out
+
+
+## Mette un'abilita' posseduta in uno slot (0-based). Se stava in un altro slot i due si scambiano.
+func assegna_slot(caster: Node, n: int, ability_id: String) -> bool:
+	if n < 0 or n >= TASTI_HOTBAR or not (ability_id in owned_abilities(caster)):
+		return false
+	var ora: Array = hotbar(caster)
+	var da: int = ora.find(ability_id)
+	if da >= 0:
+		ora[da] = ora[n]
+	ora[n] = ability_id
+	_slot = ora
+	hotbar_cambiata.emit()
+	return true
+
+
+func slot_per_salvataggio() -> Array:
+	return _slot.duplicate()
+
+
+func slot_da_salvataggio(raw: Variant) -> void:
+	_slot = []
+	if raw is Array:
+		for a in (raw as Array).slice(0, TASTI_HOTBAR):
+			_slot.append(str(a))
+	hotbar_cambiata.emit()
 
 
 func _puo_lanciare(caster: Node, ability_id: String) -> bool:

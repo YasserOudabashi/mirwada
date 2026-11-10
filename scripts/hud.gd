@@ -64,6 +64,7 @@ func _ready() -> void:
 	var ae: Node = get_node_or_null("/root/AbilityEngine")
 	if ae != null:
 		ae.ability_executed.connect(_su_abilita_eseguita)
+		ae.hotbar_cambiata.connect(_aggiorna_hotbar)          # US-8B75c
 	var prog: Node = get_node_or_null("/root/Progression")
 	if prog != null and prog.has_signal("sequence_changed"):
 		prog.sequence_changed.connect(func(_n: int, _v: int) -> void: _aggiorna_hotbar())
@@ -135,7 +136,7 @@ func _su_abilita_eseguita(ability_id: String, caster: Node, result: Dictionary) 
 	if caster == null or not caster.is_in_group("player") or not bool(result.get("ok", false)):
 		return
 	var ae: Node = get_node_or_null("/root/AbilityEngine")
-	var owned: Array = ae.call("owned_abilities", caster) if ae != null else []
+	var owned: Array = ae.call("hotbar", caster) if ae != null else []
 	var idx: int = owned.find(ability_id)
 	if idx < 0 or idx >= _hotbar.size():
 		return
@@ -201,12 +202,12 @@ func _aggiorna_hotbar() -> void:
 	var ae: Node = get_node_or_null("/root/AbilityEngine")
 	var gd: Node = get_node_or_null("/root/GameData")
 	var p: Node = get_tree().get_first_node_in_group("player")
-	var owned: Array = ae.call("owned_abilities", p) if ae != null and p != null else []
+	var owned: Array = ae.call("hotbar", p) if ae != null and p != null else []
 	_aggiorna_rampa(gd)
 	for i in _hotbar.size():
 		var lbl: Label = _hotbar[i]
 		var ic: TextureRect = _icone[i] if i < _icone.size() else null
-		if i >= owned.size():
+		if i >= owned.size() or str(owned[i]).is_empty():
 			lbl.text = "%d  %s" % [i + 1, tr("HUD_HOTBAR_VUOTO")]
 			if ic != null:
 				ic.visible = false
