@@ -1,7 +1,7 @@
 {
   "project": "Mirwada",
   "branchName": "claude/map-creation-resources-g0g7d5",
-  "description": "Fase 8b - Arte con sprite-forge e mondo generato, dopo il merge con le fasi 8-11 (2026-10-25). Fatto: mondo unico nel gioco, sottosuolo, NPC, contenuto dei layout, libro. Aperto: edifici e interni, varchi, volo e Frontiera (decisioni dell'utente), icone, VFX, panorami. Dettaglio in 006_PRD/prd-fase-8b-arte.md e 006_PRD/prossimi-passi.md. Dal 29.10: backlog completo (miglioramenti, arte rimasta, Atto II/III come fase 13, Mondo vivo come fase 12 da riscrivere, fusioni, inglese).",
+  "description": "Backlog di tutto il gioco (riordinato il 2026-11-10). Ordine: ritocchi rapidi 8b (41-44), Atto II e III fase 13 (50-63, senza la prova finale non si supera), nemici e boss fase 15 (65-72), audio fase 16 (75-79), Mondo vivo fase 12 (80-96), fusioni fase 7b (100-106), rilascio fase 17 (108-111: partita intera, bilanciamento, primi minuti, eseguibile), rifiniture d'arte (115-119), inglese (125-129). Dettaglio in 006_PRD/prossimi-passi.md e 006_PRD/prd-fasi-15-17-gioco-completo.md.",
   "userStories": [
     {
       "id": "US-8B12",
@@ -892,7 +892,7 @@
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 47,
+      "priority": 41,
       "fase": "8b",
       "passes": false,
       "notes": ""
@@ -907,7 +907,7 @@
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 48,
+      "priority": 42,
       "fase": "8b",
       "passes": false,
       "notes": ""
@@ -922,7 +922,7 @@
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 49,
+      "priority": 43,
       "fase": "8b",
       "passes": false,
       "notes": ""
@@ -937,7 +937,7 @@
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 50,
+      "priority": 44,
       "fase": "8b",
       "passes": false,
       "notes": "Visto in US-8B44a: lo slot 4 mostrava '4  Stretta della te' tagliato al bordo (progress.txt)."
@@ -952,7 +952,7 @@
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 55,
+      "priority": 115,
       "fase": "8b",
       "passes": false,
       "notes": ""
@@ -967,7 +967,7 @@
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 56,
+      "priority": 116,
       "fase": "8b",
       "passes": false,
       "notes": ""
@@ -982,7 +982,7 @@
         "asset guardati ingranditi",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 57,
+      "priority": 117,
       "fase": "8b",
       "passes": false,
       "notes": ""
@@ -998,10 +998,10 @@
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 58,
-      "fase": "8b",
+      "priority": 72,
+      "fase": "15",
       "passes": false,
-      "notes": ""
+      "notes": "Spostata coi nemici (2026-11-10): oggi summon scrive solo nel registro, i Pathway che evocano non vedono niente."
     },
     {
       "id": "US-8B60b",
@@ -1013,10 +1013,10 @@
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 59,
-      "fase": "8b",
+      "priority": 52,
+      "fase": "13",
       "passes": false,
-      "notes": ""
+      "notes": "Spostata nell'Atto II/III (2026-11-10): l'antagonista compare alla soglia della Frontiera (US-1302)."
     },
     {
       "id": "US-8B90",
@@ -1028,7 +1028,7 @@
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 60,
+      "priority": 118,
       "fase": "8b",
       "passes": false,
       "notes": ""
@@ -1043,7 +1043,7 @@
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 61,
+      "priority": 119,
       "fase": "8b",
       "passes": false,
       "notes": ""
@@ -1056,10 +1056,10 @@
         "tabella dei 10 Pathway (gia' presente / aggiunto) in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 65,
+      "priority": 50,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1201)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1201)."
     },
     {
       "id": "US-1302",
@@ -1070,10 +1070,10 @@
         "npc_antagonista raggiungibile alla soglia della Frontiera di notte",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 66,
+      "priority": 51,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1202)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1202)."
     },
     {
       "id": "US-1303",
@@ -1083,10 +1083,10 @@
         "offerta solo da tier mid (tier_min sul primo nodo)",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 67,
+      "priority": 53,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1203)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1203)."
     },
     {
       "id": "US-1304",
@@ -1096,10 +1096,10 @@
         "nessuna regola di combattimento nuova",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 68,
+      "priority": 54,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1204)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1204)."
     },
     {
       "id": "US-1305",
@@ -1109,10 +1109,10 @@
         "audit in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 69,
+      "priority": 55,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1205)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1205)."
     },
     {
       "id": "US-1306",
@@ -1122,10 +1122,10 @@
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 70,
+      "priority": 56,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1206)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1206)."
     },
     {
       "id": "US-1307",
@@ -1134,10 +1134,10 @@
       "acceptanceCriteria": [
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 71,
+      "priority": 57,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1207)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1207)."
     },
     {
       "id": "US-1308",
@@ -1146,10 +1146,10 @@
       "acceptanceCriteria": [
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 72,
+      "priority": 58,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1208)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1208)."
     },
     {
       "id": "US-1309",
@@ -1159,10 +1159,10 @@
         "decisione aperta: effetto sul finale Rinuncia (PRD §9)",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 73,
+      "priority": 59,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1209)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1209)."
     },
     {
       "id": "US-1310",
@@ -1172,10 +1172,10 @@
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 74,
+      "priority": 60,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1210)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1210)."
     },
     {
       "id": "US-1311",
@@ -1185,10 +1185,10 @@
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 75,
+      "priority": 61,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1211)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1211)."
     },
     {
       "id": "US-1312",
@@ -1197,10 +1197,10 @@
       "acceptanceCriteria": [
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 76,
+      "priority": 62,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1212)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1212)."
     },
     {
       "id": "US-1313",
@@ -1209,10 +1209,10 @@
       "acceptanceCriteria": [
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 77,
+      "priority": 63,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-12-atto-2-3.md (vi si chiamano US-1213)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1213)."
     },
     {
       "id": "US-1200",
@@ -1527,7 +1527,7 @@
         "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 110,
+      "priority": 125,
       "fase": "lingua",
       "passes": false,
       "notes": ""
@@ -1541,7 +1541,7 @@
         "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 111,
+      "priority": 126,
       "fase": "lingua",
       "passes": false,
       "notes": ""
@@ -1555,7 +1555,7 @@
         "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 112,
+      "priority": 127,
       "fase": "lingua",
       "passes": false,
       "notes": ""
@@ -1569,7 +1569,7 @@
         "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 113,
+      "priority": 128,
       "fase": "lingua",
       "passes": false,
       "notes": ""
@@ -1583,10 +1583,250 @@
         "il nome di una Sequenza resta nascosto come in italiano (fog of war)",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
-      "priority": 114,
+      "priority": 129,
       "fase": "lingua",
       "passes": false,
       "notes": ""
+    },
+    {
+      "id": "US-1501",
+      "title": "Tipi di nemico nei dati",
+      "description": "Oggi i 72 nemici del mondo e i boss sono tutti nemico_base ingrandito con qualche numero cambiato. Un tipo di nemico diventa un dato: balance.json nemici_tipi {tipo: statistiche, tell, comportamento, aspetto}; i nemici dei layout e del mondo hanno 'tipo', l'override per istanza resta sopra.",
+      "acceptanceCriteria": [
+        "balance.json nemici_tipi con almeno 6 tipi (uno per regione e uno per il sottosuolo), nemico_base resta il default",
+        "enemy.gd unisce tipo e poi override, nessun if per tipo",
+        "il validator vuole un tipo esistente per ogni nemico posato",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 65,
+      "fase": "15",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1502",
+      "title": "Nemico che colpisce da lontano",
+      "description": "Comportamento 'distanza': il nemico si tiene a distanza e tira un proiettile dopo un tell leggibile, riusando i proiettili delle abilita'.",
+      "acceptanceCriteria": [
+        "comportamento nei dati del tipo (raggi, tell, proiettile)",
+        "il proiettile si para e si schiva come gli altri attacchi",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 66,
+      "fase": "15",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1503",
+      "title": "Nemico che carica e nemico che vola",
+      "description": "Comportamenti 'carica' (tell lungo, scatto in linea, recupero lungo: si punisce) e 'volo' (ignora i dislivelli, non l'acqua profonda).",
+      "acceptanceCriteria": [
+        "i due comportamenti nei dati dei tipi",
+        "test: la carica si ferma contro un muro, il volante passa un dislivello",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 67,
+      "fase": "15",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1504",
+      "title": "Arte dei tipi di nemico",
+      "description": "Un aspetto per tipo di nemico generato con forge3d (stessi frame e tempi di nemico_base in animations.json), uno per regione e uno per il sottosuolo, con le due modalita' (luminosa e cupa).",
+      "acceptanceCriteria": [
+        "fogli nemico_<aspetto>_<anim>.png per ogni tipo, stessa cella in tutta la categoria",
+        "tell leggibile anche in un frame fermo",
+        "asset guardati ingranditi, checklist d'arte spuntata, comando e seed in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 68,
+      "fase": "15",
+      "passes": false,
+      "notes": "Story d'arte: i PNG non contano nel limite dei file. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1505",
+      "title": "Boss con le fasi",
+      "description": "Un boss e' un dato: fasi a soglie di vita, con attacchi e tell diversi, gregari evocati e un'arena che si chiude finche' non e' finita. Barra della vita del boss nell'HUD col nome (chiave i18n).",
+      "acceptanceCriteria": [
+        "balance.json boss {id: fasi, arena, gregari}",
+        "l'arena si chiude all'ingaggio e si riapre alla morte o alla fuga del giocatore",
+        "barra del boss nell'HUD",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 69,
+      "fase": "15",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1506",
+      "title": "I sei boss con la loro figura",
+      "description": "I boss delle cinque regioni e dei sotterranei hanno una figura grande propria (celle 96 o 128, come le forme di Enel) e i loro dati di fasi.",
+      "acceptanceCriteria": [
+        "un boss nei dati e un aspetto per ognuno dei 6",
+        "figura grande con la grana dei pixel di sempre",
+        "asset guardati ingranditi, comando e seed in progress.txt",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 70,
+      "fase": "15",
+      "passes": false,
+      "notes": "Story d'arte: i PNG non contano nel limite dei file. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1507",
+      "title": "Nemici giusti al posto giusto",
+      "description": "Ogni regione e il sottosuolo mettono i loro tipi di nemico, con la Sequenza che sale verso le zone difficili (dati della regione, mondo.gd popola).",
+      "acceptanceCriteria": [
+        "regions.json dice quali tipi in quale regione",
+        "test: ogni regione ha almeno 3 tipi e un boss",
+        "nessuna regione ha nemici di una Sequenza che il giocatore non puo' ancora affrontare all'ingresso",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 71,
+      "fase": "15",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1601",
+      "title": "Suoni degli effetti",
+      "description": "I 18 effetti sonori di data/audio.json diventano file: assets/audio/sfx/<id>.wav. Oggi AudioManager li sintetizza al volo come bip di prova.",
+      "acceptanceCriteria": [
+        "un file per ogni sfx di audio.json, rilanciabile con seed (stesso comando = stessi file)",
+        "AudioManager usa il file se c'e', altrimenti il bip di oggi",
+        "ascoltati uno per uno, comando in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 75,
+      "fase": "16",
+      "passes": false,
+      "notes": "Da decidere con l'utente prima di cominciare: suoni generati da Claude con uno script (come gli sprite) oppure presi da librerie libere CC0. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1602",
+      "title": "Musica a strati per zona",
+      "description": "Le 26 tracce di data/audio.json music (strato di base e strati per tensione, combattimento, boss, rituale, base) per le 6 zone, in loop che si chiudono.",
+      "acceptanceCriteria": [
+        "un file .ogg per traccia in assets/audio/musica/",
+        "i loop si chiudono senza scatti",
+        "il crossfade di audio.json funziona passando da esplorazione a combattimento",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 76,
+      "fase": "16",
+      "passes": false,
+      "notes": "Stessa decisione di US-1601. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1603",
+      "title": "Suoni d'ambiente e della follia",
+      "description": "I 18 ambienti di audio.json (mare, vento, notte, sottosuolo...) e i sussurri dello strato della follia.",
+      "acceptanceCriteria": [
+        "un file per ambiente in assets/audio/ambiente/",
+        "l'ambiente cambia con la regione e il momento del giorno (lo fa gia' AudioManager)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 77,
+      "fase": "16",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1604",
+      "title": "Suoni dei gesti e del libro",
+      "description": "Passi per terreno, pagina del libro, raccolta, bere, forziere, porta, barca, decollo: le voci mancanti si aggiungono ad audio.json e hanno il loro file.",
+      "acceptanceCriteria": [
+        "nuove voci in audio.json, nessun nome di suono nel codice",
+        "ogni gesto di Enel e ogni pagina del libro ha il suo suono",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 78,
+      "fase": "16",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1605",
+      "title": "Mix e impostazioni dell'audio",
+      "description": "Volumi dei bus tarati a orecchio, cursori musica/effetti/ambiente nelle impostazioni, accessibilita' di audio.json rispettata.",
+      "acceptanceCriteria": [
+        "volumi nei dati (audio.json buses)",
+        "cursori nella pagina Impostazioni, salvati",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 79,
+      "fase": "16",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1701",
+      "title": "Una partita intera per gruppo",
+      "description": "Quattro partite, un Pathway per gruppo, dalla nuova partita al finale (Sequenza 0), con uno script di prova in tests/manual/ che gioca il percorso. Ogni blocco trovato diventa una story di correzione in prd.json.",
+      "acceptanceCriteria": [
+        "4 partite arrivano al finale nella modalita' facile e almeno una nella difficile",
+        "l'elenco dei blocchi trovati e' in progress.txt e in prd.json",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 108,
+      "fase": "17",
+      "passes": false,
+      "notes": "Va fatta dopo Atto II/III, nemici e fusioni. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1702",
+      "title": "Ritmo e bilanciamento",
+      "description": "Tempo per salire di Sequenza, vita e danno dei nemici per Sequenza, prezzi e bottino tarati sulle partite di US-1701; facile e difficile separate.",
+      "acceptanceCriteria": [
+        "numeri solo in balance.json e modalita.json",
+        "tabella prima/dopo in progress.txt",
+        "una Sequenza non chiede ore di ripetizione",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 109,
+      "fase": "17",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1703",
+      "title": "I primi dieci minuti chiari",
+      "description": "Chi comincia capisce cosa fare: primo obiettivo, comandi spiegati nel libro, primo nemico e prima pozione guidati. Testi nei dati i18n.",
+      "acceptanceCriteria": [
+        "primo obiettivo visibile dall'avvio",
+        "i comandi sono scritti nel libro e seguono i tasti delle impostazioni",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 110,
+      "fase": "17",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-1704",
+      "title": "Eseguibile per Windows",
+      "description": "Il gioco si esporta e parte fuori dall'editor: preset di esportazione committato (senza segreti), dati e immagini dentro il pacchetto, salvataggi in user://.",
+      "acceptanceCriteria": [
+        "export_presets.cfg con il preset Windows tolto dal .gitignore",
+        "l'eseguibile parte da un'altra cartella, carica il mondo, salva e ricarica",
+        "comando di esportazione in README",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 111,
+      "fase": "17",
+      "passes": false,
+      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
     }
   ]
 }

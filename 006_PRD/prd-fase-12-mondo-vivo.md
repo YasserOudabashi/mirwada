@@ -71,7 +71,7 @@ fase 10). Nessuna primitiva, evento tracciato o tipo di dato nuovo.
 
 **Descrizione:** Come team, vogliamo confermare che nessun meccanismo
 nuovo serva davvero prima di scrivere contenuto, e fissare la
-numerazione (questa fase è la Fase 12; `006_PRD/prd-fase-12-atto-2-3.md`
+numerazione (questa fase è la Fase 12; `006_PRD/prd-fase-13-atto-2-3.md`
 slitta a Fase 13, l'opzionale Pathway Non-Standard a Fase 14 — stessa
 procedura già usata per la fase 11).
 
@@ -291,7 +291,7 @@ con lo stesso rigore delle fasi precedenti.
       nominano uno dei nuovi punti di interesse/NPC — lista vietata
       scoperta dai dati (`GameData.get_campagna().edifici` esteso,
       `GameData.get_npcs()`).
-- [ ] `006_PRD/prd-fase-12-atto-2-3.md` rinominato in
+- [ ] `006_PRD/prd-fase-13-atto-2-3.md` rinominato in
       `006_PRD/prd-fase-13-atto-2-3.md` (story id `US-1201..US-1213` di
       quel PRD rinumerate `US-1301..US-1313`), `006_PRD/roadmap.md`
       "Fase 12 — Atto II e Atto III" diventa "Fase 13", "Fase 13 —

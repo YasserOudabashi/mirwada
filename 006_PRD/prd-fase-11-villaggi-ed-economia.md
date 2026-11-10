@@ -361,7 +361,7 @@ non siano tutti appiccicati sullo stesso punto.
 e "Atto II e Atto III" rinumerata a fase 12.
 **Acceptance Criteria:**
 - [ ] `006_PRD/prd-fase-11-atto-2-3.md` rinominato in
-      `006_PRD/prd-fase-12-atto-2-3.md`, contenuto invariato salvo i
+      `006_PRD/prd-fase-13-atto-2-3.md`, contenuto invariato salvo i
       riferimenti al numero di fase.
 - [ ] `006_PRD/roadmap.md`: "Fase 11 — Atto II e Atto III" diventa
       "Fase 12"; "Fase 12 — Opzionale" (Pathway Non-Standard) diventa

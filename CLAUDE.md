@@ -2,7 +2,7 @@
 
 Action-RPG 2D esplorativo con sistema di progressione a Pathway/Sequenze.
 **10 Pathway attivi (4 gruppi completi), 100 Sequenze.**
-Leggi questo file a inizio di ogni sessione, poi `progress.txt` e `prd.json`.
+Leggi questo file a inizio di ogni sessione, poi `progress.txt` (le fasi 1-11 sono in `archive/progress-fasi-1-11.txt`) e `prd.json`.
 
 > **Versione 2.** Rispetto alla v1 cambiano le regole sull'arte: tutti gli asset grafici li
 > genera Claude (o Claude Code) con la skill `sprite-forge`, senza artista e senza disegno a mano.
@@ -425,14 +425,16 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   (US-8B20a..f), la camera che inquadra gli interni sotto l'HUD (US-8B18e), gli oggetti fissi presi una volta sola
   (US-8B22d), l'HUD leggibile (US-8B75). PRD `prd-fase-8b-arte.md`.
 - Fase 12 — Mondo vivo: **PIANIFICATA**, PRD `prd-fase-12-mondo-vivo.md` da riscrivere sul mondo generato (US-1200).
-- Fase 13 — Atto II e III: **PIANIFICATA**, PRD `prd-fase-12-atto-2-3.md` (story US-1301..US-1313). Va fatta per
+- Fase 13 — Atto II e III: **PIANIFICATA**, PRD `prd-fase-13-atto-2-3.md` (story US-1301..US-1313). Va fatta per
   prima: senza, la prova finale (`trib_1_0`) non si supera e il gioco non si finisce.
 - Fase 14 — altri Pathway Non-Standard: facoltativa.
+- Fasi 15-17 — Nemici e boss, Audio, Rilascio: **PIANIFICATE** (2026-11-10), PRD `prd-fasi-15-17-gioco-completo.md`
+  (US-1501..1507, US-1601..1605, US-1701..1704). Servono per giocare tutto il gioco: oggi ogni nemico e' `nemico_base`
+  ingrandito, non c'e' nessun file audio, e nessuno ha giocato una partita intera fino al finale.
 
-**Lavoro corrente** (controllo del 2026-10-29): tutto il lavoro che manca e' in `prd.json` (57 story aperte, con la
-fase e la priorita'), l'ordine in `006_PRD/prossimi-passi.md`: miglioramenti rapidi (US-8B44..), arte rimasta
-(cannocchiale da tasca, luci di notte, panorami per regione, evocazioni, antagonisti, nuoto, arrampicata), Atto II e
-III, Mondo vivo, fusioni (US-7B01..07), inglese (US-EN01..05).
+**Lavoro corrente** (controllo del 2026-11-10): tutto il lavoro che manca e' in `prd.json` (69 story aperte, con la
+fase e la priorita'), l'ordine in `006_PRD/prossimi-passi.md`: ritocchi rapidi 8b, **Atto II e III**, nemici e boss,
+audio, Mondo vivo, fusioni, rilascio (qui il gioco e' finito in italiano), poi rifiniture d'arte e inglese.
 
 ## Decisioni prese
 
