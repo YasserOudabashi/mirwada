@@ -29,6 +29,8 @@ var _recupero_left: float = 0.0
 ## Tempo rimasto nella fase di anticipo. La durata la fissa il tell sonoro
 ## (audio.json.telegraph[...].anticipo_ms), non l'animazione: US-020.
 var _anticipo_left: float = 0.0
+## US-8B21d: secondi prima di accorgersi del giocatore (_cfg.attesa_iniziale_s, 0 fuori dagli interni).
+var _attesa_left: float = 0.0
 
 ## Sequenza di questo nemico (US-804): il default combacia con
 ## StatsComponent.SEQUENZA_INIZIALE finche' nessun layout la sovrascrive
@@ -60,6 +62,7 @@ func _ready() -> void:
 		# nemico_base per ogni altro nemico dell'intera partita.
 		_cfg = (gd.call("get_balance", "nemico_base") as Dictionary).duplicate(true)
 	_cfg.merge(override, true)
+	_attesa_left = float(_cfg.get("attesa_iniziale_s", 0.0))
 
 	_postura.call("configura",
 		float(_cfg.get("postura_massimo", 60.0)), 3.0, 15.0)
@@ -72,6 +75,7 @@ func _ready() -> void:
 	_anim.animazione_finita.connect(_su_anim_finita)
 	_hitbox.ha_colpito.connect(_su_colpo_inflitto)
 	_hurtbox.colpito.connect(func(_d: float, _s: float, _da: Node, _t: String) -> void:
+		_attesa_left = 0.0                          # un colpo lo sveglia
 		_anim.call("lampo"))
 	_stats.died.connect(_su_morte)
 	var icone: Node2D = preload("res://scripts/status_icons.gd").new()   # US-8B71: status sopra la testa
@@ -101,7 +105,8 @@ func _physics_process(delta: float) -> void:
 	match _stato:
 		Stato.IDLE:
 			velocity = Vector2.ZERO
-			if dist <= float(_cfg.get("raggio_aggro", 140.0)):
+			_attesa_left = maxf(_attesa_left - delta, 0.0)
+			if _attesa_left <= 0.0 and dist <= float(_cfg.get("raggio_aggro", 140.0)):
 				_vai(Stato.INSEGUIMENTO)
 		Stato.INSEGUIMENTO:
 			if dist <= float(_cfg.get("raggio_attacco", 26.0)):

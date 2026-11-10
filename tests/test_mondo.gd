@@ -704,6 +704,44 @@ func test_dentro_la_cripta_c_e_il_contenuto_della_sua_zona() -> void:
 	main.free()
 
 
+## US-8B21d: nelle stanze dei varchi i nemici partono lontani dalla porta e aspettano un attimo.
+func test_i_nemici_dei_varchi_partono_lontani_dalla_porta_e_aspettano() -> void:
+	var main := Node2D.new()
+	var m: Node2D = _mondo()
+	main.add_child(m)
+	var p := CharacterBody2D.new()
+	p.add_to_group("player")
+	m.add_child(p)
+	Engine.get_main_loop().root.add_child(main)
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var ws: Node = Engine.get_main_loop().root.get_node("WorldState")
+	var bm: Dictionary = gd.call("get_balance", "mondo")
+	var lontano: int = int(bm.get("interni_distanza_nemici_porta", 0))
+	assert_gt(float(lontano), 2.0, "la distanza dalla porta e' un dato")
+	var visti: int = 0
+	for r in gd.call("get_regions"):
+		for g in (r as Dictionary).get("gating", []):
+			var varco: Area2D = m.get_node_or_null("Varco_" + str((g as Dictionary).get("area", "")))
+			if varco == null:
+				continue
+			ws.call("apri_gate", "%s/%s" % [str((r as Dictionary).get("id", "")), str((g as Dictionary).get("area", ""))])
+			if not m.call("entra", varco):
+				continue
+			var stanza: Node2D = p.get_parent()
+			for c in stanza.get_children():
+				if c.is_in_group("nemici"):
+					visti += 1
+					var d: Vector2 = ((c as Node2D).global_position - p.global_position) / 32.0
+					assert_gt(maxf(absf(d.x), absf(d.y)), float(lontano) - 0.01,
+						"%s: il nemico e' a piu' di %d caselle dalla porta" % [varco.name, lontano])
+					assert_almost_eq(float(c.get("_attesa_left")), float(bm.get("interni_attesa_nemici_s", 0.0)),
+						"e aspetta prima di inseguire")
+			m.call("esci")
+	assert_gt(float(visti), 0.0, "almeno un varco ha dei nemici")
+	ws.call("pulisci")
+	main.free()
+
+
 # --- US-8B91: barca dal porto -------------------------------------------------------
 
 func test_la_barca_e_ormeggiata_al_porto() -> void:

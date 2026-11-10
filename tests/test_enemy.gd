@@ -74,3 +74,28 @@ func test_anticipo_ms_dei_dati_fissa_la_durata_della_fase() -> void:
 	e.call("_physics_process", 0.2)
 	assert_eq(e.stato(), "ATTACCO", "dopo i 300 ms passa ad ATTACCO")
 	e.free()
+
+
+## US-8B21d: con un'attesa iniziale il nemico non insegue subito chi ha accanto; un colpo lo sveglia.
+func test_l_attesa_iniziale_ritarda_l_inseguimento() -> void:
+	var p := Node2D.new()
+	p.add_to_group("player")
+	Engine.get_main_loop().root.add_child(p)
+	var e: CharacterBody2D = EnemyScene.instantiate()
+	e.set("override", {"attesa_iniziale_s": 1.0})
+	Engine.get_main_loop().root.add_child(e)
+	e.global_position = Vector2(60, 0)
+	e.call("_physics_process", 0.5)
+	assert_eq(e.stato(), "IDLE", "a meta' dell'attesa sta fermo")
+	e.call("_physics_process", 0.6)
+	assert_eq(e.stato(), "INSEGUIMENTO", "finita l'attesa insegue")
+	e.free()
+	e = EnemyScene.instantiate()
+	e.set("override", {"attesa_iniziale_s": 5.0})
+	Engine.get_main_loop().root.add_child(e)
+	e.global_position = Vector2(60, 0)
+	e.get_node("Hurtbox").colpito.emit(1.0, 0.0, p, "")
+	e.call("_physics_process", 0.1)
+	assert_eq(e.stato(), "INSEGUIMENTO", "un colpo lo sveglia subito")
+	e.free()
+	p.free()

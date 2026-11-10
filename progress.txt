@@ -1075,3 +1075,14 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - tests/test_gesti.gd (+1): senza pozione no; con la pozione cura, se ne consuma una, Enel beve; un lingotto no.
 - Verifica nel gioco (Xvfb): zaino con "Pozione di cura minore x2 [Bevi]", bevuta a 40 di salute -> 65/120, chiuso il
   libro Enel alza la fiala (stato drink per ~0,5 s, poi idle). arte/revisione/bere_dallo_zaino.png. 1097 test, validate 0.
+
+## US-8B21d — Nemici nelle stanze piccole non subito addosso, 2026-11-10
+- data/balance.json mondo: interni_distanza_nemici_porta 4 (caselle; prima era 2 scritto nel codice) e
+  interni_attesa_nemici_s 1.2. scripts/interior_scene.gd li legge: la distanza per i nemici del varco (_crea_ospiti),
+  l'attesa per ogni nemico della stanza (override attesa_iniziale_s, se i dati del nemico non ne hanno una loro).
+- scripts/enemy.gd: _attesa_left, in IDLE scala col tempo e solo a zero il nemico guarda il raggio d'aggro; un colpo
+  ricevuto lo azzera. Fuori dagli interni e' 0: nel mondo non cambia niente.
+- tests/test_enemy.gd (+1), tests/test_mondo.gd (+1: in ogni varco coi nemici, piu' di 4 caselle dalla porta e attesa).
+- Verifica nel gioco (Xvfb): tempio delle Marche (varco passaggi_ombra), il nemico nasce in fondo alla stanza davanti
+  all'altare e sta fermo (IDLE a 0,3 s), a 1,9 s insegue. arte/revisione/nemici_stanza_attesa.png. 1099 test, validate 0.
+- Aperto: nella stanza l'HUD copre la parete in alto (US-8B75b).

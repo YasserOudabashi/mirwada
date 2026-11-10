@@ -207,6 +207,9 @@
   "mondo": {
     "_comment": "US-1003 (fase 10, mondo continuo): con 5 regioni vive nello stesso nodo, nemici/NPC fuori da questo raggio (in pixel, attorno al giocatore) hanno process_mode = DISABLED finche' non ci si riavvicina - world_scene.gd::_aggiorna_prestazioni. Un solo raggio globale, nessuna eccezione per-regione. Piu' largo di nemico_base.raggio_aggro (140) cosi' nessun nemico gia' vicino viene mai disattivato. raggio_partenza_senza_nemici (2026-10-25, in caselle): nel mondo generato i nemici dei layout non compaiono cosi' vicino alla partenza (la casa al porto e' accanto alla piazza).",
     "raggio_attivo_entita": 600,
-    "raggio_partenza_senza_nemici": 16
+    "raggio_partenza_senza_nemici": 16,
+    "_comment_interni": "US-8B21d: negli interni i nemici del varco non stanno a meno di interni_distanza_nemici_porta caselle dalla porta, e ogni nemico di una stanza aspetta interni_attesa_nemici_s secondi prima di accorgersi di chi entra (un colpo lo sveglia subito).",
+    "interni_distanza_nemici_porta": 4,
+    "interni_attesa_nemici_s": 1.2
   }
 }

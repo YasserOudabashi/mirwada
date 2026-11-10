@@ -923,8 +923,8 @@
       ],
       "priority": 42,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-11-10. balance.json mondo.interni_distanza_nemici_porta (4 caselle) e interni_attesa_nemici_s (1,2 s): i nemici del varco non nascono vicino alla porta, ogni nemico di una stanza aspetta prima di inseguire, un colpo lo sveglia."
     },
     {
       "id": "US-8B73e",

@@ -1074,6 +1074,9 @@ def main():
             err("data/balance.json [mondo.raggio_attivo_entita]: deve essere un numero > 0 "
                 "(world_scene.gd::_aggiorna_prestazioni lo usa per disattivare cio' che e' "
                 "lontano dal giocatore, US-1003).")
+        for _k in ("interni_distanza_nemici_porta", "interni_attesa_nemici_s"):   # US-8B21d
+            if not isinstance(mondo.get(_k, 0), (int, float)) or mondo.get(_k, 0) < 0:
+                err(f"data/balance.json [mondo.{_k}]: numero >= 0 (scripts/interior_scene.gd).")
         rp = mondo.get("raggio_partenza_senza_nemici", 0)
         if not isinstance(rp, int) or rp < 0:
             err("data/balance.json [mondo.raggio_partenza_senza_nemici]: intero >= 0 (caselle attorno alla "
