@@ -883,19 +883,33 @@
     },
     {
       "id": "US-8B80c",
-      "title": "Bere dallo zaino e gesti degli NPC",
-      "description": "Bere un oggetto dallo zaino (Inventory.usa) fa il gesto del bere; gli NPC usano gli stessi gesti.",
+      "title": "Bere dallo zaino",
+      "description": "Un consumabile col suo 'effetto' (pozioni, elisir, tonici) si beve dallo zaino: l'effetto parte, l'oggetto si consuma, Enel fa il gesto del bere.",
       "acceptanceCriteria": [
         "segnale di Inventory quando si usa un oggetto da bere",
         "il player fa 'drink' alla chiusura del libro",
-        "almeno un NPC usa 'interact' nella sua routine",
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
       ],
       "priority": 41,
       "fase": "8b",
+      "passes": true,
+      "notes": "2026-11-10. Prima le pozioni di cura non si potevano usare affatto (l'effetto dei consumabili non lo eseguiva nessuno). Inventory.usa_oggetto + segnale oggetto_usato, campo 'gesto' nei dati, bottone Bevi nello zaino. I gesti degli NPC sono diventati US-8B80d (servono i fogli 'interact' degli aspetti: story d'arte)."
+    },
+    {
+      "id": "US-8B80d",
+      "title": "Gesti degli NPC",
+      "description": "Gli NPC usano i gesti di Enel: almeno uno fa 'interact' nella sua routine (il fabbro all'incudine, la mercante al banco).",
+      "acceptanceCriteria": [
+        "fogli 'interact' degli aspetti che lo usano (tools/art/build_npc.py), guardati ingranditi",
+        "chi fa il gesto e ogni quanto sta nei dati dell'NPC",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 45,
+      "fase": "8b",
       "passes": false,
-      "notes": ""
+      "notes": "Spezzata da US-8B80c il 2026-11-10 (regola 3: arte + routine + codice)."
     },
     {
       "id": "US-8B21d",

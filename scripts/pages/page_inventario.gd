@@ -138,6 +138,9 @@ func _riga_item(v: Dictionary) -> HBoxContainer:
 	elif cat == "pergamena" and not iid.is_empty():
 		h.add_child(_azione(tr("BOOK_INV_USA"), func() -> void:
 			_n("/root/Inventory").call("usa", iid); _mostra("zaino")))
+	elif it.get("effetto") is Dictionary:               # US-8B80c: pozioni, elisir, tonici
+		h.add_child(_azione(tr("BOOK_INV_BEVI") if str(it.get("gesto", "")) == "drink" else tr("BOOK_INV_USA"),
+			func() -> void: _n("/root/Inventory").call("usa_oggetto", item_id); _mostra("zaino")))
 	return h
 
 

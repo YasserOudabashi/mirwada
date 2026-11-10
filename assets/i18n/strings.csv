@@ -93,6 +93,7 @@ BOOK_NEGOZIO_VALUTA_ASSENTE,Nessuna valuta nel gioco,No currency in the game
 BOOK_CREAZIONE_CREA,Crea,Craft
 BOOK_CREAZIONE_VUOTO,Non sa creare nulla per ora,Nothing to craft for now
 BOOK_INV_USA,Usa,Use
+BOOK_INV_BEVI,Bevi,Drink
 BOOK_INV_EQUIPAGGIA,Indossa,Equip
 BOOK_INV_TOGLI,Togli,Remove
 BOOK_INV_ARRIVA,Questa sezione si scrive più avanti.,This section is written later.

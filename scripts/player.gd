@@ -84,6 +84,11 @@ func _ready() -> void:
 	var ps: Node = get_node_or_null("/root/PotionSystem")
 	if ps != null:
 		ps.pozione_bevuta.connect(func(_avanzato: bool, _forzato: bool) -> void: gesto("drink"))
+	var inv: Node = get_node_or_null("/root/Inventory")
+	if inv != null and inv.has_signal("oggetto_usato"):       # US-8B80c: bere dallo zaino
+		inv.oggetto_usato.connect(func(_id: String, g: String) -> void:
+			if not g.is_empty():
+				gesto(g))
 	var rs: Node = get_node_or_null("/root/RitualSystem")
 	if rs != null:
 		rs.rituale_avviato.connect(func(_s: int) -> void: gesto("ritual"))

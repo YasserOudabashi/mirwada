@@ -13,7 +13,7 @@
       ],
       "impilabile": true,
       "valore": 12,
-      "effetto": {
+      "gesto": "drink", "effetto": {
         "tipo": "heal",
         "quantita": 25.0,
         "istantaneo": true
@@ -31,7 +31,7 @@
       ],
       "impilabile": true,
       "valore": 18,
-      "effetto": {
+      "gesto": "drink", "effetto": {
         "tipo": "buff_stat",
         "stat": "forza",
         "valore": 0.15,
@@ -66,7 +66,7 @@
       ],
       "impilabile": true,
       "valore": 40,
-      "effetto": {
+      "gesto": "drink", "effetto": {
         "tipo": "heal",
         "quantita": 70.0,
         "istantaneo": true
@@ -85,7 +85,7 @@
       ],
       "impilabile": true,
       "valore": 45,
-      "effetto": {
+      "gesto": "drink", "effetto": {
         "tipo": "buff_stat",
         "stat": "evasione",
         "valore": 0.2,
@@ -107,7 +107,7 @@
       ],
       "impilabile": true,
       "valore": 200,
-      "effetto": {
+      "gesto": "drink", "effetto": {
         "tipo": "heal",
         "quantita": 200.0,
         "istantaneo": true
@@ -125,7 +125,7 @@
       "impilabile": true,
       "valore": 20,
       "rarita": "non_comune",
-      "effetto": {
+      "gesto": "drink", "effetto": {
         "tipo": "buff_stat",
         "stat": "forza",
         "valore": 0.2,
@@ -144,7 +144,7 @@
       "impilabile": true,
       "valore": 15,
       "rarita": "comune",
-      "effetto": {
+      "gesto": "drink", "effetto": {
         "tipo": "buff_stat",
         "stat": "precisione",
         "valore": 0.15,
@@ -163,7 +163,7 @@
       "impilabile": true,
       "valore": 45,
       "rarita": "raro",
-      "effetto": {
+      "gesto": "drink", "effetto": {
         "tipo": "heal",
         "quantita": 120,
         "istantaneo": true

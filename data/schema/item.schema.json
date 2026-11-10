@@ -24,6 +24,7 @@
       },
       "consumabile": {
         "effetto": "{ tipo: primitiva_implementata, ... } - eseguito bevendo (US-310)",
+        "gesto": "string opzionale - animazione del personaggio quando lo si usa dallo zaino (US-8B80c: 'drink')",
         "qualita": "string opzionale, una di data/potions scala qualita' (US-308)",
         "nutre_pet": "bool opzionale - consumabile che fa avanzare il pet (US-324)"
       },

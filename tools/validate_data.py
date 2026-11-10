@@ -1836,6 +1836,10 @@ def main():
                         err(f"{rel} [{iid}]: effetto usa la primitiva DIFFERITA '{et}'")
                     elif et not in primitives:
                         err(f"{rel} [{iid}]: effetto usa la primitiva sconosciuta '{et}'")
+                # US-8B80c: il gesto di chi usa l'oggetto e' un'animazione del personaggio
+                if "gesto" in it and it["gesto"] not in (
+                        (load_json(os.path.join(DATA, "animations.json")) or {}).get("personaggio", {})):
+                    err(f"{rel} [{iid}]: gesto '{it['gesto']}' non e' un'animazione di personaggio in animations.json")
     if len(item_ids) < 12:
         err(f"data/items/: solo {len(item_ids)} item, attesi >= 12 che coprano le 7 categorie")
     if n_sigillati < 3:

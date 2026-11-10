@@ -1063,3 +1063,15 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Verifica nel gioco (Xvfb): partita difficile al porto col mondo cupo (arte/revisione/modalita_cupa_in_partita.png),
   mappa "Passaggi d'ombra, Cripte", diagramma "Sequenza bassa", colophon "Spazio", Salute 120/120. 1096 test, validate 0.
 - Aperto: nella mappa la riga dei varchi passa sopra la piega del libro; di notte faro e finestre spenti (US-8B27).
+
+## US-8B80c — Bere dallo zaino, 2026-11-10
+- Scoperto facendola: i consumabili con "effetto" (pozione di cura, elisir, tonici: 8 oggetti) non si potevano usare.
+  Inventory.usa() gestiva solo pergamene e oggetti con stored_ability_id, e lo zaino non aveva il bottone.
+- scripts/inventory.gd usa_oggetto(item_id): esegue l'effetto (una primitiva, AbilityEngine.esegui_primitiva) sul
+  giocatore, toglie un oggetto, emette oggetto_usato(item_id, gesto). Il gesto e' un dato dell'oggetto
+  (consumabili.json "gesto": "drink"; il validator vuole un'animazione di personaggio). scripts/player.gd fa il gesto.
+  page_inventario: bottone "Bevi" (BOOK_INV_BEVI) sui consumabili con effetto.
+- Spezzata (regola 3): i gesti degli NPC sono US-8B80d, servono i fogli "interact" degli aspetti.
+- tests/test_gesti.gd (+1): senza pozione no; con la pozione cura, se ne consuma una, Enel beve; un lingotto no.
+- Verifica nel gioco (Xvfb): zaino con "Pozione di cura minore x2 [Bevi]", bevuta a 40 di salute -> 65/120, chiuso il
+  libro Enel alza la fiala (stato drink per ~0,5 s, poi idle). arte/revisione/bere_dallo_zaino.png. 1097 test, validate 0.
