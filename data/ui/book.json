@@ -2,6 +2,7 @@
   "schema_version": 1,
   "_comment": "La shell del libro (design-ui-libro.md cap. 4). Il codice implementa UN controller (scripts/book.gd) + un tipo di pagina per ogni voce del vocabolario chiuso data/schema/page_types.json. Aggiungere una schermata = aggiungere una voce a 'pages'. Le pagine si sbloccano per fase dal dato: 'sbloccata_da.fase' > gioco.fase in balance.json => la pagina esiste ma e' bianca (un appunto a matita), mai assente.",
   "libro": {
+    "etichette": {"_comment": "Nomi mostrati nel libro per gli id dei dati che non hanno un file loro: fasce di Sequenza (tier) e gruppi di Pathway.", "tier": {"low": {"name_i18n": "tier.low"}, "mid": {"name_i18n": "tier.mid"}, "saint": {"name_i18n": "tier.saint"}, "angel": {"name_i18n": "tier.angel"}, "god": {"name_i18n": "tier.god"}}, "group": {"lord_of_mysteries": {"name_i18n": "group.lord_of_mysteries"}, "eternal_darkness": {"name_i18n": "group.eternal_darkness"}, "demon_of_knowledge": {"name_i18n": "group.demon_of_knowledge"}, "goddess_of_origin": {"name_i18n": "group.goddess_of_origin"}}},
     "voltata_ms": 350,
     "dissolvenza_ridotta_ms": 80,
     "sfx_apri": "sfx_ui_book_open",

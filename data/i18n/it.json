@@ -1782,5 +1782,21 @@
   "item.piuma_dei_venti": "Piuma dei venti",
   "item.piuma_dei_venti.desc": "Leggera come un respiro. Chi la porta con se' puo' alzarsi in volo.",
   "item.chiave_del_faro": "Chiave del faro",
-  "item.chiave_del_faro.desc": "Fredda di salsedine. Apre la porta in fondo al faro, quella che non da' sul mare."
+  "item.chiave_del_faro.desc": "Fredda di salsedine. Apre la porta in fondo al faro, quella che non da' sul mare.",
+  "tier.low": "Sequenza bassa",
+  "tier.mid": "Sequenza media",
+  "tier.saint": "Santo",
+  "tier.angel": "Angelo",
+  "tier.god": "Divinità",
+  "group.eternal_darkness": "Eternal Darkness",
+  "group.lord_of_mysteries": "Lord of Mysteries",
+  "group.demon_of_knowledge": "Demon of Knowledge",
+  "group.goddess_of_origin": "Goddess of Origin",
+  "area.passaggi_ombra": "Passaggi d'ombra",
+  "area.cripte": "Cripte",
+  "area.ponti_di_radici": "Ponti di radici",
+  "area.grotte_di_marea": "Grotte di marea",
+  "area.ali_interne": "Ali interne",
+  "area.ingresso": "Ingresso",
+  "area.isole_nebbia": "Isole di nebbia"
 }

@@ -1043,3 +1043,23 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Verifica nel gioco (Xvfb): Enel al cannocchiale del faro, la vista vola alla Frontiera (vuoto di nebbia, porta,
   isola): 50 blocchi costruiti, quello della vista (38, 32) e quello di Enel (32, 30); tornati 25, col blocco di Enel.
   1093 test, validate 0.
+
+## Controllo del 2026-11-10 — bug visti negli screenshot del gioco
+- Giro di screenshot dal gioco vero: tests/manual/qa_screenshot.gd (Xvfb, cartella e modalita' dopo "--"): avvio, nuova
+  partita, le cinque regioni, combattimento, notte, crepuscolo, un interno, tutte le pagine del libro.
+- BUG modalita' difficile: il mondo sceglieva le immagini (mondo.gd carica(), _tema_caricato) all'avvio, prima della
+  partita, e restava luminoso anche in una partita difficile (nuova o caricata). main.gd _mondo_della_modalita(): su
+  partita_iniziata, se il tema del mondo non e' quello della partita, il mondo si rifa' (nodo nuovo, stesso nome e
+  posto, giocatore spostato dentro, riprendi() con livello/posizione/barca/volo). Il vecchio si libera subito (free):
+  con queue_free i suoi figli (orto, strutture) ascoltavano ancora i segnali e spostavano le strutture.
+- BUG caricamento: main.gd riportava al punto di partenza anche una partita caricata. GameState.da_salvataggio (true
+  da carica_slot, false da nuova_partita): la partita caricata resta dove si era salvato.
+- BUG salute: una partita nuova partiva a 100/120 (hp di base sotto l'hp_max del Pathway). nuova_partita fa revivi().
+- Libro senza id dei dati: i varchi della mappa hanno name_i18n (regions.json gating, area.*); fascia di Sequenza e
+  gruppo nel diagramma da data/ui/book.json libro.etichette (tier.*, group.*), in it.json e en.json.
+- Impostazioni: il tasto si legge tradotto (TASTO_SPACE -> Spazio, strings.csv), "Q ed E" non va piu' a capo a meta'.
+- tests/test_main_boot.gd (+2: mondo cupo con la partita difficile e ritorno al luminoso, salute piena; partita
+  caricata cupa e ferma dove si era salvato), tests/test_book.gd (+1: varchi, fasce e gruppi hanno un nome).
+- Verifica nel gioco (Xvfb): partita difficile al porto col mondo cupo (arte/revisione/modalita_cupa_in_partita.png),
+  mappa "Passaggi d'ombra, Cripte", diagramma "Sequenza bassa", colophon "Spazio", Salute 120/120. 1096 test, validate 0.
+- Aperto: nella mappa la riga dei varchi passa sopra la piega del libro; di notte faro e finestre spenti (US-8B27).

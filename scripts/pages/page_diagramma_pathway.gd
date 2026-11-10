@@ -117,7 +117,7 @@ func aggiorna() -> void:
 		var nome_pw: String = str(gd.call("tr_data", pw.get("name_i18n", mio)))
 		var sd: Dictionary = prog.call("sequence_data")
 		_vbox.add_child(_riga("%s  ·  %s S%d  ·  %s" % [
-			nome_pw, tr("BOOK_DIAGRAMMA_SEI_QUI"), mia_seq, str(prog.call("tier"))]))
+			nome_pw, tr("BOOK_DIAGRAMMA_SEI_QUI"), mia_seq, _etichetta("tier", str(prog.call("tier")))]))
 		for aid in sd.get("abilities", []):
 			var ab: Dictionary = gd.call("get_ability", aid)
 			var nome: String = str(gd.call("tr_data", ab.get("name_i18n", aid)))
@@ -146,7 +146,7 @@ func _sezione_fusione(gd: Node, _prog: Node, mio: String, pw: Dictionary) -> voi
 		return
 	var gruppo: String = str(pw.get("group", ""))
 	_vbox.add_child(_riga("%s  %s %s" % [
-		tr("BOOK_DIAGRAMMA_FUSIONE_TITOLO"), tr("BOOK_DIAGRAMMA_FUSIONE_GRUPPO"), gruppo]))
+		tr("BOOK_DIAGRAMMA_FUSIONE_TITOLO"), tr("BOOK_DIAGRAMMA_FUSIONE_GRUPPO"), _etichetta("group", gruppo)]))
 
 	var ids: Array = gd.call("pathway_ids")
 	ids.sort()
@@ -544,3 +544,13 @@ func _colonna(madre: Node) -> VBoxContainer:
 
 func _n(path: String) -> Node:
 	return get_node_or_null(path)
+
+
+## Il nome da mostrare per un id senza file suo (fascia di Sequenza, gruppo di Pathway): data/ui/book.json
+## libro.etichette. Senza voce resta l'id.
+func _etichetta(tipo: String, id: String) -> String:
+	var book: Node = get_node_or_null("/root/Book")
+	var gd: Node = get_node_or_null("/root/GameData")
+	var e: Dictionary = book.call("config", "etichette", {}) if book != null else {}
+	var chiave: String = str(((e.get(tipo, {}) as Dictionary).get(id, {}) as Dictionary).get("name_i18n", id))
+	return str(gd.call("tr_data", chiave)) if gd != null else id

@@ -286,5 +286,21 @@
   "item.piuma_dei_venti": "Feather of the winds",
   "item.piuma_dei_venti.desc": "Light as a breath. Whoever carries it can rise into the air.",
   "item.chiave_del_faro": "Lighthouse key",
-  "item.chiave_del_faro.desc": "Cold with sea salt. It opens the door at the foot of the lighthouse, the one that doesn't face the sea."
+  "item.chiave_del_faro.desc": "Cold with sea salt. It opens the door at the foot of the lighthouse, the one that doesn't face the sea.",
+  "tier.low": "Low Sequence",
+  "tier.mid": "Mid Sequence",
+  "tier.saint": "Saint",
+  "tier.angel": "Angel",
+  "tier.god": "God",
+  "group.eternal_darkness": "Eternal Darkness",
+  "group.lord_of_mysteries": "Lord of Mysteries",
+  "group.demon_of_knowledge": "Demon of Knowledge",
+  "group.goddess_of_origin": "Goddess of Origin",
+  "area.passaggi_ombra": "Shadow passages",
+  "area.cripte": "Crypts",
+  "area.ponti_di_radici": "Root bridges",
+  "area.grotte_di_marea": "Tidal caves",
+  "area.ali_interne": "Inner wings",
+  "area.ingresso": "Entrance",
+  "area.isole_nebbia": "Mist isles"
 }

@@ -86,3 +86,23 @@ func test_segnalibri_puntano_a_pagine_esistenti() -> void:
 	var b: Node = _book()
 	for s in b.call("segnalibri"):
 		assert_false(b.call("pagina", s).is_empty(), "segnalibro '%s' e' una pagina" % s)
+
+
+## Controllo del 2026-11-10: nel libro non si leggono id dei dati. Varchi (mappa), fascia di Sequenza e gruppo
+## (diagramma) hanno un nome tradotto.
+func test_varchi_fasce_e_gruppi_hanno_un_nome() -> void:
+	var gd: Node = _data()
+	for r in gd.call("get_regions"):
+		for g in (r as Dictionary).get("gating", []):
+			var k: String = str((g as Dictionary).get("name_i18n", ""))
+			assert_true(not k.is_empty() and str(gd.call("tr_data", k)) != k,
+				"il varco '%s' ha un nome tradotto" % str((g as Dictionary).get("area", "")))
+	var et: Dictionary = _book().call("config", "etichette", {})
+	for pid in gd.call("pathway_ids"):
+		var pw: Dictionary = gd.call("get_pathway", pid)
+		var k: String = str(((et.get("group", {}) as Dictionary).get(str(pw.get("group", "")), {}) as Dictionary).get("name_i18n", ""))
+		assert_true(not k.is_empty() and str(gd.call("tr_data", k)) != k, "il gruppo di %s ha un nome" % str(pid))
+		for s in pw.get("sequences", []):
+			var t: String = str((s as Dictionary).get("tier", ""))
+			var kt: String = str(((et.get("tier", {}) as Dictionary).get(t, {}) as Dictionary).get("name_i18n", ""))
+			assert_true(not kt.is_empty() and str(gd.call("tr_data", kt)) != kt, "la fascia '%s' ha un nome" % t)
