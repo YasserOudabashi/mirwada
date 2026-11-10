@@ -938,8 +938,8 @@
       ],
       "priority": 43,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-11-10. Sotto ogni oggetto indossato con alloggi: 'Sigilli n/m', i sigilli incastonati (Estrai) e quelli dello zaino (Incastona). Prima i sigilli non si potevano incastonare da nessuna parte del gioco: Equipment.incastona non lo chiamava nessuno."
     },
     {
       "id": "US-8B75b",

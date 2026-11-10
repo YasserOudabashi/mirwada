@@ -1086,3 +1086,12 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Verifica nel gioco (Xvfb): tempio delle Marche (varco passaggi_ombra), il nemico nasce in fondo alla stanza davanti
   all'altare e sta fermo (IDLE a 0,3 s), a 1,9 s insegue. arte/revisione/nemici_stanza_attesa.png. 1099 test, validate 0.
 - Aperto: nella stanza l'HUD copre la parete in alto (US-8B75b).
+
+## US-8B73e — Sigilli incastonati nella pagina Indosso, 2026-11-10
+- Scoperto facendola: Equipment.incastona/rimuovi_sigillo non li chiamava nessuna pagina, i sigilli non si potevano
+  usare. scripts/pages/page_inventario.gd _sigilli_di(): sotto l'oggetto indossato che ha slot_sigilli la riga
+  "Sigilli n/m", i sigilli incastonati con icona, nome e "Estrai", e (con un alloggio libero) quelli dello zaino con
+  "Incastona". Tolta BOOK_INV_SIGILLI_TODO; nuove BOOK_INV_SIGILLI, BOOK_INV_INCASTONA, BOOK_INV_ESTRAI.
+- tests/test_page_inventario.gd (+1): dalla pagina si incastona (il sigillo lascia lo zaino) e si estrae (ci torna).
+- Verifica nel gioco (Xvfb): spada con "Sigilli 1/1" e il sigillo di forza [Estrai], amuleto con "Sigilli 0/2" e due
+  sigilli dello zaino [Incastona]. arte/revisione/indosso_sigilli.png. 1100 test, validate 0.

@@ -97,7 +97,9 @@ BOOK_INV_BEVI,Bevi,Drink
 BOOK_INV_EQUIPAGGIA,Indossa,Equip
 BOOK_INV_TOGLI,Togli,Remove
 BOOK_INV_ARRIVA,Questa sezione si scrive più avanti.,This section is written later.
-BOOK_INV_SIGILLI_TODO,Sigilli incastonati: in arrivo.,Set sigils: coming.
+BOOK_INV_SIGILLI,Sigilli,Sigils
+BOOK_INV_INCASTONA,Incastona,Set
+BOOK_INV_ESTRAI,Estrai,Extract
 BOOK_CAT_INGREDIENTE,Ingredienti,Ingredients
 BOOK_CAT_EQUIP,Equipaggiamento,Equipment
 BOOK_CAT_SIGILLO,Sigilli,Sigils
