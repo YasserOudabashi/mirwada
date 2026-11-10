@@ -29,6 +29,11 @@ var _rampa := ShaderMaterial.new()
 var _rampa_di: String = "?"
 
 
+## US-8B75b: corpo dei nomi della hotbar. Piu' piccolo delle barre: la hotbar e' una griglia 2x2 (icona + nome) e col
+## nome piu' lungo dei dati due slot affiancati stanno nello schermo (lo controlla un test).
+const CORPO_HOTBAR := 12
+
+
 func _ready() -> void:
 	add_to_group("hud")                                # US-8B24b: il cannocchiale lo nasconde mentre si guarda
 	for l in find_children("*", "Label", true, false):  # contorno scuro come i prompt: si legge su ogni fondo
@@ -139,9 +144,16 @@ func _su_abilita_eseguita(ability_id: String, caster: Node, result: Dictionary) 
 	create_tween().tween_property(lbl, "modulate", Color.WHITE, 0.45)
 
 
+## US-8B75b: unita' di schermo occupate dall'HUD dall'alto (la camera degli interni le lascia libere).
+func altezza() -> float:
+	var v: Control = $Root/VBox
+	return ($Root as Control).position.y + v.get_combined_minimum_size().y
+
+
 func _monta_icone() -> void:
 	_rampa.shader = preload("res://shaders/rampa_pathway.gdshader")
 	for lbl in _hotbar:
+		(lbl as Label).add_theme_font_size_override("font_size", CORPO_HOTBAR)   # US-8B75b: due slot per riga
 		var ic := TextureRect.new()
 		ic.name = "Icona" + str((lbl as Node).name).trim_prefix("Slot")
 		ic.custom_minimum_size = Vector2(16, 16)

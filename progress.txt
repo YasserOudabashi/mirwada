@@ -1095,3 +1095,15 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - tests/test_page_inventario.gd (+1): dalla pagina si incastona (il sigillo lascia lo zaino) e si estrae (ci torna).
 - Verifica nel gioco (Xvfb): spada con "Sigilli 1/1" e il sigillo di forza [Estrai], amuleto con "Sigilli 0/2" e due
   sigilli dello zaino [Incastona]. arte/revisione/indosso_sigilli.png. 1100 test, validate 0.
+
+## US-8B75b — Hotbar che non esce dallo schermo, 2026-11-10
+- scenes/hud.tscn: la Hotbar e' una griglia a 4 colonne (icona, nome, icona, nome): due slot per riga, due righe.
+  scripts/hud.gd: CORPO_HOTBAR 12 per i nomi (le barre restano col corpo di prima), altezza() = unita' occupate
+  dall'alto. scripts/game_camera.gd margine_hud(): negli interni lo spazio sopra la stanza e' l'altezza vera
+  dell'HUD (123 unita'), MARGINE_HUD resta come ripiego dove l'HUD non c'e'.
+- tests/test_icone_primitive.gd (+1): col nome di abilita' piu' lungo di it.json e la ricarica accanto, i 4 slot sono
+  larghi meno dello schermo (640 unita'). tests/test_mondo.gd: il test della camera usa margine_hud().
+- Verifica nel gioco (Xvfb): Twilight Giant portato alla Sequenza 5, 4 slot su due righe sotto le barre, niente fuori
+  dallo schermo; nella casa del porto la stanza sta sotto l'HUD. arte/revisione/hotbar_due_righe.png. 1101 test, validate 0.
+- Aperto: gli slot oltre il quarto non si vedono (11 abilita' possedute alla Sequenza 5, 4 tasti): scegliere quali
+  abilita' stanno nella hotbar e' una story che non c'e' ancora.

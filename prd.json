@@ -953,8 +953,8 @@
       ],
       "priority": 44,
       "fase": "8b",
-      "passes": false,
-      "notes": "Visto in US-8B44a: lo slot 4 mostrava '4  Stretta della te' tagliato al bordo (progress.txt)."
+      "passes": true,
+      "notes": "Visto in US-8B44a: lo slot 4 mostrava '4  Stretta della te' tagliato al bordo (progress.txt). 2026-11-10: hotbar a griglia 2x2 col corpo 12 (hud.gd CORPO_HOTBAR); un test la misura col nome piu' lungo dei dati. La camera degli interni chiede l'altezza all'HUD (hud.altezza(), game_camera.margine_hud())."
     },
     {
       "id": "US-8B26",

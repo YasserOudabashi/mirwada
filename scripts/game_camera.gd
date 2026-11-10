@@ -63,12 +63,18 @@ func clear_zone_limits() -> void:
 	limit_bottom = 10000000
 
 
+## US-8B75b: l'altezza vera dell'HUD in scena (cambia con la hotbar); MARGINE_HUD dove l'HUD non c'e'.
+func margine_hud() -> float:
+	var hud: Node = get_tree().get_first_node_in_group("hud") if is_inside_tree() else null
+	return float(hud.call("altezza")) if hud != null and hud.has_method("altezza") else MARGINE_HUD
+
+
 ## US-8B18e: inquadra una stanza (rettangolo in coordinate mondo). Dove la stanza e' piu' piccola dello schermo i
 ## limiti si allargano fino allo schermo: in larghezza a meta' per lato, in altezza tutto sopra, cosi' la stanza sta
 ## ferma in basso al centro. Sopra resta sempre libera almeno l'altezza dell'HUD (MARGINE_HUD): in una stanza alta la
 ## camera scorre e la fila in cima arriva sotto l'HUD, non dietro. Dove e' piu' grande la camera la segue dentro.
 func inquadra_stanza(stanza: Rect2) -> void:
 	var visibile: Vector2 = get_viewport_rect().size / zoom
-	var extra := Vector2(maxf(visibile.x - stanza.size.x, 0.0), maxf(visibile.y - stanza.size.y, MARGINE_HUD))
+	var extra := Vector2(maxf(visibile.x - stanza.size.x, 0.0), maxf(visibile.y - stanza.size.y, margine_hud()))
 	apply_zone_limits(Rect2(stanza.position - Vector2(extra.x / 2.0, extra.y), stanza.size + extra))
 

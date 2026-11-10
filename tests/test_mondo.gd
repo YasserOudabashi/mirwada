@@ -585,7 +585,7 @@ func test_entrando_la_camera_inquadra_la_stanza() -> void:
 		assert_eq(cam.limit_bottom, int(r.end.y), "%s: il fondo della stanza e' il fondo dello schermo" % iid)
 		assert_true(absf((cam.limit_left + cam.limit_right) / 2.0 - r.get_center().x) <= 1.0, "%s: al centro" % iid)
 		assert_eq(cam.limit_right - cam.limit_left, int(maxf(r.size.x, vis.x)), "%s: largo quanto lo schermo o la stanza" % iid)
-		assert_eq(cam.limit_bottom - cam.limit_top, int(r.size.y + maxf(vis.y - r.size.y, cam.get("MARGINE_HUD"))),
+		assert_eq(cam.limit_bottom - cam.limit_top, int(r.size.y + maxf(vis.y - r.size.y, float(cam.call("margine_hud")))),
 				"%s: lo spazio in piu' sta sopra, almeno quanto l'HUD" % iid)
 		m.call("esci")
 		assert_eq(cam.limit_right, int(m.larghezza * m.tile), "fuori tornano i bordi del mondo")
