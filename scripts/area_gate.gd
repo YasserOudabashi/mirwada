@@ -127,10 +127,18 @@ static func valuta_gate(region_id: String, gate: Dictionary, root: Node) -> bool
 			var ts2: Node = root.get_node_or_null("TimeSystem")
 			return ts2 != null and str(ts2.call("fase_lunare")) == str(gate.get("valore"))
 		"sequenza":
-			# La Frontiera "respinge chi e' sopra la Sequenza N": piu' avanti =
-			# numero piu' basso. Aperto se la Sequenza corrente e' >= N.
+			# Decisione dell'utente (2026-11-10, corregge il verso di prima): la Frontiera e' la regione finale e
+			# si apre a chi ha RAGGIUNTO la Sequenza N (numero piu' basso = piu' avanti). Aperto se la Sequenza
+			# corrente e' <= N: l'Atto III e la prova finale (Sequenze 3-1) si svolgono li'.
+			# "gruppo_di_casa" (dato del gate): chi e' di quel gruppo di Pathway entra a qualunque Sequenza
+			# (Fool, Error e Door hanno nella Frontiera ingredienti e rituali fin dall'inizio).
 			var pr: Node = root.get_node_or_null("Progression")
-			return pr == null or int(pr.call("sequence")) >= int(gate.get("valore", 0))
+			if pr == null or int(pr.call("sequence")) <= int(gate.get("valore", 0)):
+				return true
+			var gd: Node = root.get_node_or_null("GameData")
+			var casa: String = str(gate.get("gruppo_di_casa", ""))
+			return not casa.is_empty() and gd != null \
+					and str((gd.call("get_pathway", str(pr.call("pathway"))) as Dictionary).get("group", "")) == casa
 		"primitiva":
 			return _possiede_primitiva(root, str(gate.get("primitiva", "")))
 		"conoscenza":

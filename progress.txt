@@ -1121,3 +1121,23 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   giro dal salvataggio, un'abilita' non piu' posseduta lascia il posto.
 - Verifica nel gioco (Xvfb): alla Sequenza 5 messe Turbine nel tasto 1 e Scudo del compagno nel 4; il libro mostra
   i bottoni accesi e l'HUD i nomi nuovi. arte/revisione/hotbar_scelta_tasti.png. 1102 test, validate 0.
+
+## US-1301 e US-1302 — La prova finale si puo' superare, 2026-11-11
+- US-1301: 'ancora_del_giocatore' e' gia' nei sacrifici del rituale di Sequenza 1 di tutti e 10 i Pathway attivi
+  (darkness, death, door, error, fool, hermit, moon, mother, paragon, twilight_giant: gia' presente in tutti, nessuno
+  aggiunto). tests/test_ritual.gd (+1) lo tiene fermo.
+- US-1302: il nodo di dlg_antagonista che scrive tribolazione_soglia_varcata (tier angel) c'era gia' (US-712). Il
+  blocco vero: il gate "sequenza" della Frontiera era al contrario (area_gate.gd apriva con Sequenza >= 4: aperta
+  dalla 9 alla 4, chiusa dalla 3 alla 0), mentre l'antagonista e tutto l'Atto III stanno li' alle Sequenze 3-1.
+- Decisioni dell'utente (2026-11-11): (1) nella Frontiera si entra dalla Sequenza 4 in poi, come dice design-world;
+  (2) Fool, Error e Door entrano sempre: e' la loro regione di casa, li' trovano i 36 ingredienti delle formule di
+  Sequenza 7-4 e fanno i rituali dalla Sequenza 4 (verificato sui dati prima di chiedere).
+- scripts/area_gate.gd: gate "sequenza" aperto con Sequenza <= valore, oppure se il gruppo del Pathway del giocatore
+  e' il "gruppo_di_casa" del gate (dato in regions.json, il validator vuole un gruppo di un Pathway attivo).
+- Test aggiornati al verso nuovo (test_area_gate, test_mondo, test_page_mappa, test_world_scene) e nuovi:
+  test_mondo test_alla_soglia_di_notte_c_e_l_antagonista_e_ci_si_arriva (Sequenza 1, notte_fonda: Npc_npc_antagonista
+  nella Frontiera, raggiungibile a piedi dall'arrivo della soglia del faro, il suo dialogo scrive il flag di trib_1_0).
+  1104 test, validate 0.
+- Conseguenze aperte: i nemici della Frontiera sono di Sequenza 7-5 (troppo deboli per chi entra dalla 4: fase 15,
+  US-1507); un Twilight Giant alla Sequenza 9 che ci arriva in barca viene respinto (giusto, ma senza una scritta che
+  dica perche': da vedere in US-1703); CLAUDE.md e design-world.md aggiornati.

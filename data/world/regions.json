@@ -140,6 +140,7 @@
         {
           "tipo": "sequenza",
           "valore": 4,
+          "gruppo_di_casa": "lord_of_mysteries",
           "area": "ingresso", "name_i18n": "area.ingresso"
         },
         {

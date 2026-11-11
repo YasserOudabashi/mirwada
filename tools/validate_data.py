@@ -1257,6 +1257,12 @@ def main():
                 elif gt == "sequenza":
                     if not isinstance(g.get("valore"), int) or not (0 <= g.get("valore") <= 9):
                         err(f"{rel} [{rid}]: gating sequenza.valore deve essere un int 0..9")
+                    _casa = g.get("gruppo_di_casa")
+                    if _casa is not None:
+                        _gruppi = {(load_json(os.path.join(DATA, "pathways", _pf)) or {}).get("group")
+                                   for _pf in os.listdir(os.path.join(DATA, "pathways")) if _pf.endswith(".json")}
+                        if _casa not in _gruppi:
+                            err(f"{rel} [{rid}]: gating sequenza.gruppo_di_casa '{_casa}' non e' il gruppo di nessun Pathway attivo")
         # check informativo: le regioni devono ospitare i luoghi dei rituali
         rituali_tags = set()
         for _fn in files:

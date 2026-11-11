@@ -432,8 +432,8 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   (US-1501..1507, US-1601..1605, US-1701..1704). Servono per giocare tutto il gioco: oggi ogni nemico e' `nemico_base`
   ingrandito, non c'e' nessun file audio, e nessuno ha giocato una partita intera fino al finale.
 
-**Lavoro corrente** (controllo del 2026-11-10): tutto il lavoro che manca e' in `prd.json` (69 story aperte, con la
-fase e la priorita'), l'ordine in `006_PRD/prossimi-passi.md`: ritocchi rapidi 8b, **Atto II e III**, nemici e boss,
+**Lavoro corrente** (aggiornato il 2026-11-11): tutto il lavoro che manca e' in `prd.json` (64 story aperte, con la
+fase e la priorita'), l'ordine in `006_PRD/prossimi-passi.md`: **Atto II e III** (fatte US-1301 e US-1302, si riparte da US-8B60b), nemici e boss,
 audio, Mondo vivo, fusioni, rilascio (qui il gioco e' finito in italiano), poi rifiniture d'arte e inglese.
 
 ## Decisioni prese
@@ -476,7 +476,10 @@ audio, Mondo vivo, fusioni, rilascio (qui il gioco e' finito in italiano), poi r
 - **Tutto su main, niente controlli automatici** (2026-10-29): la PR #5 (fase 8b, con dentro le fasi 8-11) e' unita
   in `main`; i controlli della PR e della CI si fanno solo quando li chiede l'utente.
 - **Frontiera, come si arriva** (2026-10-26): **in barca, volando, o da una soglia nel faro** che si apre solo con
-  una chiave trovata nel mondo. Resta il gating di sequenza (respinge chi e' oltre la Sequenza 4).
+  una chiave trovata nel mondo. Gating di sequenza (corretto il 2026-11-11, prima era al contrario): la Frontiera e'
+  la regione finale, **si entra dalla Sequenza 4 in poi** (4..0: l'Atto III e la prova finale sono li'); **Fool, Error
+  e Door entrano sempre** perche' e' la loro regione di casa (`regions.json` gating `gruppo_di_casa`): li' hanno
+  ingredienti e rituali fin dalla Sequenza 8.
 - **Bersaglio delle abilita'** (2026-11-03): le primitive che colpiscono un altro (maledizione, possessione, anima
   recisa, debuff, danno nel tempo, paura) cadono sul **nemico piu' vicino davanti** (`balance.json
   combattimento.bersaglio`); **senza nemico l'abilita' non parte e non costa**. I costi voluti su di se' sono

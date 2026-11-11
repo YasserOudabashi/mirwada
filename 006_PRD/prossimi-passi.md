@@ -20,7 +20,7 @@ giocarlo tutto mancano anche **nemici diversi**, l'**audio** e una **partita int
 - CI GitHub Actions accesa su push a `main` e sulle pull request (validator + `tools/run_tests.sh`).
 - Verifica locale: `python tools/validate_data.py` e `bash tools/run_tests.sh` (1093 test, ~5 minuti).
 - **Niente controlli automatici** della PR o della CI (decisione dell'utente, 2026-10-29).
-- 131 story in `prd.json`: 62 fatte, 69 aperte.
+- 133 story in `prd.json`: 69 fatte, 64 aperte (2026-11-11).
 
 ---
 
@@ -30,14 +30,14 @@ Tutto in `prd.json` (`passes: false`), la priorita' e' il numero tra parentesi.
 
 | # | Blocco | Story | Perche' |
 |---|---|---|---|
-| 1 | Ritocchi rapidi (41-44) | US-8B80c, 8B21d, 8B73e, 8B75b | piccoli, chiudono la fase 8b |
-| 2 | **Atto II e III** (50-63), fase 13 | US-1301..1313 + US-8B60b | **senza, il gioco non si finisce**: la prova finale `trib_1_0` non si supera nel mondo vero; solo 4 quest in tutto il gioco, tutte dell'Atto I |
+| 1 | Ritocchi rapidi (41-46) | **fatti** il 2026-11-10: US-8B80c, 8B21d, 8B73e, 8B75b, 8B75c | bere dallo zaino, nemici delle stanze, sigilli, hotbar su due righe e a scelta |
+| 2 | **Atto II e III** (50-63), fase 13 | US-8B60b, US-1303..1313 (fatte US-1301 e US-1302: la Frontiera si apre dalla Sequenza 4, Fool/Error/Door sempre) | **senza, il gioco non si finisce**: la prova finale `trib_1_0` non si supera nel mondo vero; solo 4 quest in tutto il gioco, tutte dell'Atto I |
 | 3 | **Nemici e boss** (65-72), fase 15 | US-1501..1507 + US-8B60a | i 72 nemici e i 6 boss sono tutti `nemico_base` ingrandito; le evocazioni non si vedono |
 | 4 | **Audio** (75-79), fase 16 | US-1601..1605 | nessun file audio: bip di prova e musiche mute |
 | 5 | Mondo vivo (80-96), fase 12 | US-1200..1216 | punti d'interesse, villaggi, dungeon tra le regioni; prima US-1200 riscrive il PRD sul mondo generato |
 | 6 | Fusioni (100-106), fase 7b | US-7B01..07 | 7 percorsi di fusione su 8 sono vuoti (stub) |
 | 7 | **Rilascio** (108-111), fase 17 | US-1701..1704 | quattro partite intere fino al finale, bilanciamento, primi minuti chiari, eseguibile per Windows |
-| 8 | Rifiniture d'arte (115-119) | US-8B26, 8B27, 8B74b, 8B90, 8B92 | cannocchiale da tasca, luci di notte, panorami per regione, nuoto, arrampicata: non bloccano niente |
+| 8 | Rifiniture d'arte (114-119) | US-8B80d, 8B26, 8B27, 8B74b, 8B90, 8B92 | cannocchiale da tasca, luci di notte, panorami per regione, nuoto, arrampicata: non bloccano niente |
 | 9 | Inglese (125-129) | US-EN01..05 | mancano 1496 voci su 1784 di `data/i18n/en.json` |
 | — | Facoltativa | fase 14 | altri Pathway Non-Standard |
 

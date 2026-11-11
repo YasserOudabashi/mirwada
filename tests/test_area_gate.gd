@@ -59,14 +59,26 @@ func test_gate_conoscenza_si_apre_col_flag() -> void:
 	ag.free()
 
 
-func test_gate_sequenza_respinge_chi_e_troppo_avanti() -> void:
+## Decisione dell'utente del 2026-11-10: il gate di sequenza si apre a chi ha raggiunto la Sequenza (numero <= N).
+func test_gate_sequenza_si_apre_a_chi_ha_raggiunto_la_sequenza() -> void:
 	var ag: Area2D = _gate_in_scena("frontiera_porte",
 		{"tipo": "sequenza", "valore": 4, "area": "ingresso"})
 	_pr().call("configura", "twilight_giant", 9)
-	assert_true(ag.call("e_aperto"), "Sequenza 9 (bassa) puo' entrare")
-	_pr().call("configura", "twilight_giant", 2)
-	assert_false(ag.call("e_aperto"), "Sequenza 2 (alta) e' respinta")
+	assert_false(ag.call("e_aperto"), "alla Sequenza 9 e' chiuso")
+	_pr().call("configura", "twilight_giant", 5)
+	assert_false(ag.call("e_aperto"), "alla Sequenza 5 ancora chiuso")
+	_pr().call("configura", "twilight_giant", 4)
+	assert_true(ag.call("e_aperto"), "raggiunta la Sequenza 4 si apre")
+	_pr().call("configura", "twilight_giant", 1)
+	assert_true(ag.call("e_aperto"), "e resta aperto piu' avanti (la prova finale e' li')")
 	ag.free()
+	var casa: Area2D = _gate_in_scena("frontiera_porte",
+		{"tipo": "sequenza", "valore": 4, "area": "ingresso", "gruppo_di_casa": "lord_of_mysteries"})
+	_pr().call("configura", "fool", 9)
+	assert_true(casa.call("e_aperto"), "chi e' del gruppo di casa entra anche alla Sequenza 9")
+	_pr().call("configura", "twilight_giant", 9)
+	assert_false(casa.call("e_aperto"), "gli altri no")
+	casa.free()
 
 
 func test_gate_primitiva_legge_le_abilita_del_pathway() -> void:

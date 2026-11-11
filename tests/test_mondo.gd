@@ -169,19 +169,67 @@ func test_gli_npc_stanno_al_luogo_del_loro_tag() -> void:
 	m.free()
 
 
-func test_la_frontiera_respinge_chi_e_troppo_avanti() -> void:
+func test_la_frontiera_si_apre_dalla_sequenza_4() -> void:
 	var prima: Dictionary = _pr().call("per_salvataggio")
 	var m: Node2D = _mondo()
-	_pr().call("configura", "twilight_giant", 2)
-	assert_false(m.call("ingresso_aperto", "frontiera_porte"), "sopra la Sequenza 4 la Frontiera e' chiusa")
+	_pr().call("configura", "twilight_giant", 9)
+	assert_false(m.call("ingresso_aperto", "frontiera_porte"), "prima della Sequenza 4 la Frontiera e' chiusa")
 	var f: Array = (m.dati["luoghi"] as Dictionary)["approdo_frontiera"]
 	assert_false(m.call("aggiorna_regione", Vector2((float(f[0]) + 0.5) * m.tile, (float(f[1]) + 0.5) * m.tile)),
 		"entrare nella Frontiera e' respinto")
 	assert_false(m.call("viaggia_a", "frontiera_porte"), "nemmeno col viaggio veloce")
-	_pr().call("configura", "twilight_giant", 9)
-	assert_true(m.call("ingresso_aperto", "frontiera_porte"), "alla Sequenza 9 si entra")
+	_pr().call("configura", "twilight_giant", 4)
+	assert_true(m.call("ingresso_aperto", "frontiera_porte"), "alla Sequenza 4 si entra")
+	_pr().call("configura", "twilight_giant", 1)
+	assert_true(m.call("ingresso_aperto", "frontiera_porte"), "e alla Sequenza 1 anche: la prova finale e' li'")
+	for pid in ["fool", "error", "door"]:
+		_pr().call("configura", pid, 9)
+		assert_true(m.call("ingresso_aperto", "frontiera_porte"), "%s e' di casa: entra dalla Sequenza 9" % pid)
 	assert_true(m.call("ingresso_aperto", "mirwada"), "Mirwada non ha gating d'ingresso")
 	m.free()
+	_ws().call("pulisci")
+	_pr().call("da_salvataggio", prima)
+
+
+## US-1302: la prova finale si puo' superare nel gioco vero. Alla Sequenza 1 la Frontiera e' aperta, di notte
+## l'antagonista sta alla soglia su una casella dove si arriva a piedi dall'arrivo della soglia del faro, e la sua
+## scelta (tier angel) scrive il flag che chiude la tribolazione 1->0.
+func test_alla_soglia_di_notte_c_e_l_antagonista_e_ci_si_arriva() -> void:
+	var prima: Dictionary = _pr().call("per_salvataggio")
+	var root: Node = Engine.get_main_loop().root
+	var ts: Node = root.get_node("TimeSystem")
+	var gd: Node = root.get_node("GameData")
+	_pr().call("configura", "twilight_giant", 1)
+	ts.call("forza_momento", "notte_fonda")
+	var m: Node2D = _mondo()
+	assert_true(m.call("ingresso_aperto", "frontiera_porte"), "alla Sequenza 1 nella Frontiera si entra")
+	m.call("crea_npc")
+	var a: Node2D = m.get_node_or_null("Npc_npc_antagonista")
+	assert_true(a != null, "di notte l'antagonista e' nel mondo")
+	if a != null:
+		var c: Vector2i = _cella(m, a.position)
+		assert_eq(str(m.call("regione_a", c.x, c.y)), "frontiera_porte", "nella Frontiera")
+		var sf: Dictionary = gd.call("get_mezzo", "soglia_faro")
+		var arr: Array = (m.dati["luoghi"] as Dictionary)[str(sf.get("arrivo", ""))]
+		var sc: Array = sf.get("scostamento_arrivo", [0, 0])
+		var da: Vector2i = m.call("cella_libera", Vector2i(int(arr[0]) + int(sc[0]), int(arr[1]) + int(sc[1])))
+		var visto: PackedByteArray = _bfs(m, PackedInt32Array([da.y * m.larghezza + da.x]), false)
+		var vicino := false
+		for d in [Vector2i.ZERO, Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
+			var q: Vector2i = c + d
+			vicino = vicino or visto[q.y * m.larghezza + q.x] == 1
+		assert_true(vicino, "dall'arrivo della soglia del faro ci si arriva a piedi")
+	var dlg: Dictionary = gd.call("get_dialogue", str(gd.call("get_npc", "npc_antagonista").get("dialogue_id", "")))
+	var scrive := false
+	for s in ((dlg.get("nodes", {}) as Dictionary).get(str(dlg.get("start", "")), {}) as Dictionary).get("choices", []):
+		for e in (s as Dictionary).get("effetti", []):
+			scrive = scrive or str((e as Dictionary).get("id", "")) == "tribolazione_soglia_varcata"
+	assert_true(scrive, "una scelta del suo dialogo scrive il flag della prova finale")
+	var trib: Dictionary = gd.call("get_tribulation", "trib_1_0") if gd.has_method("get_tribulation") else {}
+	if not trib.is_empty():
+		assert_true(JSON.stringify(trib).contains("tribolazione_soglia_varcata"), "ed e' il flag che la prova 1->0 aspetta")
+	m.free()
+	ts.call("libera_momento")
 	_ws().call("pulisci")
 	_pr().call("da_salvataggio", prima)
 
