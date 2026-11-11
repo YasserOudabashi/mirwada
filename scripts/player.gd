@@ -84,6 +84,11 @@ func _ready() -> void:
 	var ps: Node = get_node_or_null("/root/PotionSystem")
 	if ps != null:
 		ps.pozione_bevuta.connect(func(_avanzato: bool, _forzato: bool) -> void: gesto("drink"))
+	var inv: Node = get_node_or_null("/root/Inventory")
+	if inv != null and inv.has_signal("oggetto_usato"):       # US-8B80c: bere dallo zaino
+		inv.oggetto_usato.connect(func(_id: String, g: String) -> void:
+			if not g.is_empty():
+				gesto(g))
 	var rs: Node = get_node_or_null("/root/RitualSystem")
 	if rs != null:
 		rs.rituale_avviato.connect(func(_s: int) -> void: gesto("ritual"))
@@ -372,8 +377,8 @@ func lancia_abilita_slot(n: int) -> Dictionary:
 	var ae: Node = get_node_or_null("/root/AbilityEngine")
 	if ae == null:
 		return {"ok": false, "reason": "nessun_ability_engine"}
-	var owned: Array = ae.call("owned_abilities", self)
-	if n < 0 or n >= owned.size():
+	var owned: Array = ae.call("hotbar", self)           # US-8B75c: l'abilita' scelta per quel tasto
+	if n < 0 or n >= owned.size() or str(owned[n]).is_empty():
 		return {"ok": false, "reason": "slot_vuoto"}
 	var risultato: Dictionary = ae.call("execute", str(owned[n]), self)
 	if bool(risultato.get("ok", false)):

@@ -351,7 +351,9 @@ func _tasto_di(azione: String) -> String:
 		return "—"
 	for ev in InputMap.action_get_events(azione):
 		if ev is InputEventKey:
-			return OS.get_keycode_string((ev as InputEventKey).physical_keycode)
+			var nome: String = OS.get_keycode_string((ev as InputEventKey).physical_keycode)
+			var chiave: String = "TASTO_" + nome.to_upper().replace(" ", "_")
+			return tr(chiave) if tr(chiave) != chiave else nome      # Space -> Spazio; le lettere restano
 	return "—"
 
 

@@ -104,3 +104,23 @@ func test_in_barca_si_va_piu_veloci() -> void:
 	assert_almost_eq(float(p.call("velocita_massima")), a_piedi, "il volo non dice niente: come a piedi")
 	p.call("imposta_volo", false)
 	p.free()
+
+
+## US-8B80c: una pozione di cura bevuta dallo zaino cura, si consuma e fa bere Enel.
+func test_bere_dallo_zaino_cura_e_fa_il_gesto() -> void:
+	var p := _player()
+	var inv: Node = _root().get_node("Inventory")
+	var st: Node = p.get_node("StatsComponent")
+	inv.call("pulisci")
+	assert_false(bool(inv.call("usa_oggetto", "pozione_cura_minore").get("ok", false)), "senza pozione non si beve")
+	inv.call("aggiungi", "pozione_cura_minore", 2)
+	st.set("hp", 40.0)
+	assert_true(bool(inv.call("usa_oggetto", "pozione_cura_minore").get("ok", false)), "la pozione si beve")
+	assert_gt(float(st.get("hp")), 40.0, "e cura")
+	assert_eq(int(inv.call("conta", "pozione_cura_minore")), 1, "se ne consuma una")
+	assert_eq(_stato(p), "drink", "Enel fa il gesto del bere")
+	inv.call("aggiungi", "lingotto_ferro", 1)
+	assert_false(bool(inv.call("usa_oggetto", "lingotto_ferro").get("ok", false)), "un lingotto non si beve")
+	assert_eq(int(inv.call("conta", "lingotto_ferro")), 1, "e resta nello zaino")
+	inv.call("pulisci")
+	p.free()

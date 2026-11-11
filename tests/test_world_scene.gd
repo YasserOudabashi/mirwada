@@ -265,11 +265,11 @@ func test_gate_ingresso_della_frontiera_e_una_barriera_fisica_nel_mondo_continuo
 		(r["cont"] as Node2D).free()
 		return
 
-	_pr().call("configura", "twilight_giant", 2)   # "sopra" la Sequenza 4: respinto
-	assert_false(bool(gate.call("e_aperto")), "Sequenza 2 (alta) e' fermata: il gate (e la sua StaticBody2D, US-611) resta chiuso")
+	_pr().call("configura", "twilight_giant", 9)   # prima della Sequenza 4: respinto
+	assert_false(bool(gate.call("e_aperto")), "Sequenza 9 e' fermata: il gate (e la sua StaticBody2D, US-611) resta chiuso")
 
-	_pr().call("configura", "twilight_giant", 9)   # sotto soglia: passa
-	assert_true(bool(gate.call("e_aperto")), "Sequenza 9 (bassa) passa: il gate si apre")
+	_pr().call("configura", "twilight_giant", 2)   # raggiunta la Sequenza 4: passa
+	assert_true(bool(gate.call("e_aperto")), "Sequenza 2 passa: il gate si apre")
 
 	(r["cont"] as Node2D).free()
 

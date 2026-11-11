@@ -305,7 +305,7 @@ func _crea_ospiti(layout: Dictionary) -> void:
 			var u: float = (float(e.get("x", 0)) - float(r[0]) + 0.5) / maxf(float(r[2]), 1.0)
 			var v: float = (float(e.get("y", 0)) - float(r[1]) + 0.5) / maxf(float(r[3]), 1.0)
 			var c: Vector2i = _libera_vicina(Vector2i(1 + int(u * (w - 2)), 1 + int(v * (h - 2))), prese, sp,
-					2 if k == "nemici" else 0)
+					int(_balance_interni("interni_distanza_nemici_porta", 2)) if k == "nemici" else 0)
 			prese[c] = true
 			var spec: Dictionary = (e as Dictionary).duplicate(true)
 			spec["x"] = c.x
@@ -313,6 +313,11 @@ func _crea_ospiti(layout: Dictionary) -> void:
 			(dentro[k] as Array).append(spec)
 	_crea_nemici(dentro)
 	_crea_oggetti(dentro, ":ospiti")
+
+
+func _balance_interni(chiave: String, fallback: float) -> float:
+	var gd: Node = get_node_or_null("/root/GameData")
+	return float((gd.call("get_balance", "mondo") as Dictionary).get(chiave, fallback)) if gd != null else fallback
 
 
 func _libera_vicina(c: Vector2i, prese: Dictionary, spawn: Vector2i, distanza_spawn: int) -> Vector2i:
@@ -382,7 +387,10 @@ func _crea_nemici(layout: Dictionary) -> void:
 		var spec: Dictionary = n as Dictionary
 		var sequenza: int = int(spec.get("sequenza", 9))
 		var e: Node = preload("res://scenes/enemy.tscn").instantiate()
-		e.set("override", (spec.get("override", {}) as Dictionary).duplicate(true))
+		var ov: Dictionary = (spec.get("override", {}) as Dictionary).duplicate(true)
+		if not ov.has("attesa_iniziale_s"):           # US-8B21d: chi entra ha un attimo per guardarsi attorno
+			ov["attesa_iniziale_s"] = _balance_interni("interni_attesa_nemici_s", 0.0)
+		e.set("override", ov)
 		e.set("scale", Vector2.ONE * float(spec.get("scala", 1.0)))
 		add_child(e)
 		e.set("global_position", to_global(map_to_local(

@@ -542,12 +542,12 @@ una ricetta specifici — lista vietata scoperta da `GameData.get_npcs()` +
 ## Fase 12 — Mondo vivo e Fase 13 — Atto II e Atto III (aggiornato il 2026-10-29)
 
 > Le story sono in `prd.json`. Il PRD `prd-fase-12-mondo-vivo.md` diventa la fase 12 (prima va riscritto sul mondo
-> generato: US-1200); il PRD `prd-fase-12-atto-2-3.md` e' la fase 13 (story US-1301..US-1313, come chiede US-1216)
+> generato: US-1200); il PRD `prd-fase-13-atto-2-3.md` e' la fase 13 (story US-1301..US-1313, come chiede US-1216)
 > e va fatto per primo: senza, la prova finale non si supera. La vecchia "Fase 13 — Opzionale" diventa la 14.
 
 ## (testo originale) Fase 12 — Atto II e Atto III
 
-> **PRD**: `006_PRD/prd-fase-12-atto-2-3.md` (generato il 2026-09-10, 13
+> **PRD**: `006_PRD/prd-fase-13-atto-2-3.md` (generato il 2026-09-10, 13
 > story `US-1201..US-1213` — rinumerate da `US-1101..US-1113` quando la
 > fase 11 vera è diventata "Villaggi ed Economia", vedi sopra).
 > **PIANIFICATA**, eseguita dopo la fase 11.
@@ -575,3 +575,9 @@ altri bestowers), stesso schema di Eternal Aeon (fase 9: motore Boon già
 scritto, si tratta solo di contenuto). Le fasi 1-9 sono chiuse: sbloccata,
 ma opzionale — il PRD dettagliato si genera con `/prd` solo quando si
 decide di farla davvero.
+
+## Fasi 15-17 — Nemici e boss, Audio, Rilascio (aggiunte il 2026-11-10)
+
+> **PRD**: `006_PRD/prd-fasi-15-17-gioco-completo.md`. Dal controllo generale del 2026-11-10: per giocare tutto il
+> gioco servono nemici diversi (oggi tutti `nemico_base`), i file audio (oggi nessuno) e una partita intera provata
+> fino al finale con l'eseguibile per Windows. Ordine di tutto il backlog in `006_PRD/prossimi-passi.md`.

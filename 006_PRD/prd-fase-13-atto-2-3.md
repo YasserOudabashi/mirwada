@@ -1,4 +1,7 @@
-# PRD: Fase 12 — Atto II e Atto III (le regioni che si aprono, la soglia)
+# PRD: Fase 13 — Atto II e Atto III (le regioni che si aprono, la soglia)
+
+> **Ora e' la Fase 13 (2026-11-10).** Il file si chiamava `prd-fase-12-atto-2-3.md`. Qui dentro le story hanno ancora i
+> numeri US-1201..US-1213: in `prd.json` sono **US-1301..US-1313** (stesso ordine, US-12NN = US-13NN).
 
 > **Rinumerata in corsa (2026-09-12, US-1114)**: questa fase era la
 > "Fase 11" pianificata quando questo PRD è stato scritto. L'utente ha poi

@@ -169,19 +169,67 @@ func test_gli_npc_stanno_al_luogo_del_loro_tag() -> void:
 	m.free()
 
 
-func test_la_frontiera_respinge_chi_e_troppo_avanti() -> void:
+func test_la_frontiera_si_apre_dalla_sequenza_4() -> void:
 	var prima: Dictionary = _pr().call("per_salvataggio")
 	var m: Node2D = _mondo()
-	_pr().call("configura", "twilight_giant", 2)
-	assert_false(m.call("ingresso_aperto", "frontiera_porte"), "sopra la Sequenza 4 la Frontiera e' chiusa")
+	_pr().call("configura", "twilight_giant", 9)
+	assert_false(m.call("ingresso_aperto", "frontiera_porte"), "prima della Sequenza 4 la Frontiera e' chiusa")
 	var f: Array = (m.dati["luoghi"] as Dictionary)["approdo_frontiera"]
 	assert_false(m.call("aggiorna_regione", Vector2((float(f[0]) + 0.5) * m.tile, (float(f[1]) + 0.5) * m.tile)),
 		"entrare nella Frontiera e' respinto")
 	assert_false(m.call("viaggia_a", "frontiera_porte"), "nemmeno col viaggio veloce")
-	_pr().call("configura", "twilight_giant", 9)
-	assert_true(m.call("ingresso_aperto", "frontiera_porte"), "alla Sequenza 9 si entra")
+	_pr().call("configura", "twilight_giant", 4)
+	assert_true(m.call("ingresso_aperto", "frontiera_porte"), "alla Sequenza 4 si entra")
+	_pr().call("configura", "twilight_giant", 1)
+	assert_true(m.call("ingresso_aperto", "frontiera_porte"), "e alla Sequenza 1 anche: la prova finale e' li'")
+	for pid in ["fool", "error", "door"]:
+		_pr().call("configura", pid, 9)
+		assert_true(m.call("ingresso_aperto", "frontiera_porte"), "%s e' di casa: entra dalla Sequenza 9" % pid)
 	assert_true(m.call("ingresso_aperto", "mirwada"), "Mirwada non ha gating d'ingresso")
 	m.free()
+	_ws().call("pulisci")
+	_pr().call("da_salvataggio", prima)
+
+
+## US-1302: la prova finale si puo' superare nel gioco vero. Alla Sequenza 1 la Frontiera e' aperta, di notte
+## l'antagonista sta alla soglia su una casella dove si arriva a piedi dall'arrivo della soglia del faro, e la sua
+## scelta (tier angel) scrive il flag che chiude la tribolazione 1->0.
+func test_alla_soglia_di_notte_c_e_l_antagonista_e_ci_si_arriva() -> void:
+	var prima: Dictionary = _pr().call("per_salvataggio")
+	var root: Node = Engine.get_main_loop().root
+	var ts: Node = root.get_node("TimeSystem")
+	var gd: Node = root.get_node("GameData")
+	_pr().call("configura", "twilight_giant", 1)
+	ts.call("forza_momento", "notte_fonda")
+	var m: Node2D = _mondo()
+	assert_true(m.call("ingresso_aperto", "frontiera_porte"), "alla Sequenza 1 nella Frontiera si entra")
+	m.call("crea_npc")
+	var a: Node2D = m.get_node_or_null("Npc_npc_antagonista")
+	assert_true(a != null, "di notte l'antagonista e' nel mondo")
+	if a != null:
+		var c: Vector2i = _cella(m, a.position)
+		assert_eq(str(m.call("regione_a", c.x, c.y)), "frontiera_porte", "nella Frontiera")
+		var sf: Dictionary = gd.call("get_mezzo", "soglia_faro")
+		var arr: Array = (m.dati["luoghi"] as Dictionary)[str(sf.get("arrivo", ""))]
+		var sc: Array = sf.get("scostamento_arrivo", [0, 0])
+		var da: Vector2i = m.call("cella_libera", Vector2i(int(arr[0]) + int(sc[0]), int(arr[1]) + int(sc[1])))
+		var visto: PackedByteArray = _bfs(m, PackedInt32Array([da.y * m.larghezza + da.x]), false)
+		var vicino := false
+		for d in [Vector2i.ZERO, Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
+			var q: Vector2i = c + d
+			vicino = vicino or visto[q.y * m.larghezza + q.x] == 1
+		assert_true(vicino, "dall'arrivo della soglia del faro ci si arriva a piedi")
+	var dlg: Dictionary = gd.call("get_dialogue", str(gd.call("get_npc", "npc_antagonista").get("dialogue_id", "")))
+	var scrive := false
+	for s in ((dlg.get("nodes", {}) as Dictionary).get(str(dlg.get("start", "")), {}) as Dictionary).get("choices", []):
+		for e in (s as Dictionary).get("effetti", []):
+			scrive = scrive or str((e as Dictionary).get("id", "")) == "tribolazione_soglia_varcata"
+	assert_true(scrive, "una scelta del suo dialogo scrive il flag della prova finale")
+	var trib: Dictionary = gd.call("get_tribulation", "trib_1_0") if gd.has_method("get_tribulation") else {}
+	if not trib.is_empty():
+		assert_true(JSON.stringify(trib).contains("tribolazione_soglia_varcata"), "ed e' il flag che la prova 1->0 aspetta")
+	m.free()
+	ts.call("libera_momento")
 	_ws().call("pulisci")
 	_pr().call("da_salvataggio", prima)
 
@@ -585,7 +633,7 @@ func test_entrando_la_camera_inquadra_la_stanza() -> void:
 		assert_eq(cam.limit_bottom, int(r.end.y), "%s: il fondo della stanza e' il fondo dello schermo" % iid)
 		assert_true(absf((cam.limit_left + cam.limit_right) / 2.0 - r.get_center().x) <= 1.0, "%s: al centro" % iid)
 		assert_eq(cam.limit_right - cam.limit_left, int(maxf(r.size.x, vis.x)), "%s: largo quanto lo schermo o la stanza" % iid)
-		assert_eq(cam.limit_bottom - cam.limit_top, int(r.size.y + maxf(vis.y - r.size.y, cam.get("MARGINE_HUD"))),
+		assert_eq(cam.limit_bottom - cam.limit_top, int(r.size.y + maxf(vis.y - r.size.y, float(cam.call("margine_hud")))),
 				"%s: lo spazio in piu' sta sopra, almeno quanto l'HUD" % iid)
 		m.call("esci")
 		assert_eq(cam.limit_right, int(m.larghezza * m.tile), "fuori tornano i bordi del mondo")
@@ -700,6 +748,44 @@ func test_dentro_la_cripta_c_e_il_contenuto_della_sua_zona() -> void:
 			assert_eq((stanza as TileMapLayer).get_cell_atlas_coords(cella).x, 0, "sul pavimento della cripta")
 	assert_true(trovato, "dentro la cripta c'e' l'acciaio stellare")
 	m.call("esci")
+	ws.call("pulisci")
+	main.free()
+
+
+## US-8B21d: nelle stanze dei varchi i nemici partono lontani dalla porta e aspettano un attimo.
+func test_i_nemici_dei_varchi_partono_lontani_dalla_porta_e_aspettano() -> void:
+	var main := Node2D.new()
+	var m: Node2D = _mondo()
+	main.add_child(m)
+	var p := CharacterBody2D.new()
+	p.add_to_group("player")
+	m.add_child(p)
+	Engine.get_main_loop().root.add_child(main)
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var ws: Node = Engine.get_main_loop().root.get_node("WorldState")
+	var bm: Dictionary = gd.call("get_balance", "mondo")
+	var lontano: int = int(bm.get("interni_distanza_nemici_porta", 0))
+	assert_gt(float(lontano), 2.0, "la distanza dalla porta e' un dato")
+	var visti: int = 0
+	for r in gd.call("get_regions"):
+		for g in (r as Dictionary).get("gating", []):
+			var varco: Area2D = m.get_node_or_null("Varco_" + str((g as Dictionary).get("area", "")))
+			if varco == null:
+				continue
+			ws.call("apri_gate", "%s/%s" % [str((r as Dictionary).get("id", "")), str((g as Dictionary).get("area", ""))])
+			if not m.call("entra", varco):
+				continue
+			var stanza: Node2D = p.get_parent()
+			for c in stanza.get_children():
+				if c.is_in_group("nemici"):
+					visti += 1
+					var d: Vector2 = ((c as Node2D).global_position - p.global_position) / 32.0
+					assert_gt(maxf(absf(d.x), absf(d.y)), float(lontano) - 0.01,
+						"%s: il nemico e' a piu' di %d caselle dalla porta" % [varco.name, lontano])
+					assert_almost_eq(float(c.get("_attesa_left")), float(bm.get("interni_attesa_nemici_s", 0.0)),
+						"e aspetta prima di inseguire")
+			m.call("esci")
+	assert_gt(float(visti), 0.0, "almeno un varco ha dei nemici")
 	ws.call("pulisci")
 	main.free()
 

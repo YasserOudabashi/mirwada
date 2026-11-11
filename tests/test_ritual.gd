@@ -135,3 +135,14 @@ func test_persistenza_di_sigilli_e_sacrifici() -> void:
 	gs.applica(c["dati"])
 	assert_true("sigillo_del_guardiano" in (rs.sigilli() as Array), "sigillo ripristinato dal save")
 	save.cancella(SLOT)
+
+
+## US-1301: il rituale di Sequenza 1 di ogni Pathway attivo chiede un'Ancora del giocatore.
+func test_ogni_rituale_di_sequenza_1_chiede_un_ancora() -> void:
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var ids: Array = gd.call("pathway_ids")
+	assert_eq(ids.size(), 10, "10 Pathway attivi")
+	for pid in ids:
+		var s: Dictionary = gd.call("get_sequence", "%s_1" % pid)
+		var sac: Array = (s.get("advancement_ritual", {}) as Dictionary).get("sacrifices", [])
+		assert_true("ancora_del_giocatore" in sac, "%s: il rituale di Sequenza 1 sacrifica un'Ancora" % pid)

@@ -333,7 +333,7 @@ esplorare zone diverse della stessa regione.
   design completo del mondo (CLAUDE.md, mondo continuo fase 10).
 - Il contenuto narrativo di Atto II/III (fazioni che prendono posizione,
   quest legate alle regioni) è fuori scope qui: vive nella Fase 12
-  pianificata (`006_PRD/prd-fase-12-atto-2-3.md`), non in questo
+  pianificata (`006_PRD/prd-fase-13-atto-2-3.md`), non in questo
   documento di catalogo.
 - L'audio del mondo (tell sonori per zona) resta una **spec**
   (`data/audio.json`), nessun file audio prodotto: non ripetuto qui.

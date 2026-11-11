@@ -1074,6 +1074,9 @@ def main():
             err("data/balance.json [mondo.raggio_attivo_entita]: deve essere un numero > 0 "
                 "(world_scene.gd::_aggiorna_prestazioni lo usa per disattivare cio' che e' "
                 "lontano dal giocatore, US-1003).")
+        for _k in ("interni_distanza_nemici_porta", "interni_attesa_nemici_s"):   # US-8B21d
+            if not isinstance(mondo.get(_k, 0), (int, float)) or mondo.get(_k, 0) < 0:
+                err(f"data/balance.json [mondo.{_k}]: numero >= 0 (scripts/interior_scene.gd).")
         rp = mondo.get("raggio_partenza_senza_nemici", 0)
         if not isinstance(rp, int) or rp < 0:
             err("data/balance.json [mondo.raggio_partenza_senza_nemici]: intero >= 0 (caselle attorno alla "
@@ -1254,6 +1257,12 @@ def main():
                 elif gt == "sequenza":
                     if not isinstance(g.get("valore"), int) or not (0 <= g.get("valore") <= 9):
                         err(f"{rel} [{rid}]: gating sequenza.valore deve essere un int 0..9")
+                    _casa = g.get("gruppo_di_casa")
+                    if _casa is not None:
+                        _gruppi = {(load_json(os.path.join(DATA, "pathways", _pf)) or {}).get("group")
+                                   for _pf in os.listdir(os.path.join(DATA, "pathways")) if _pf.endswith(".json")}
+                        if _casa not in _gruppi:
+                            err(f"{rel} [{rid}]: gating sequenza.gruppo_di_casa '{_casa}' non e' il gruppo di nessun Pathway attivo")
         # check informativo: le regioni devono ospitare i luoghi dei rituali
         rituali_tags = set()
         for _fn in files:
@@ -1836,6 +1845,10 @@ def main():
                         err(f"{rel} [{iid}]: effetto usa la primitiva DIFFERITA '{et}'")
                     elif et not in primitives:
                         err(f"{rel} [{iid}]: effetto usa la primitiva sconosciuta '{et}'")
+                # US-8B80c: il gesto di chi usa l'oggetto e' un'animazione del personaggio
+                if "gesto" in it and it["gesto"] not in (
+                        (load_json(os.path.join(DATA, "animations.json")) or {}).get("personaggio", {})):
+                    err(f"{rel} [{iid}]: gesto '{it['gesto']}' non e' un'animazione di personaggio in animations.json")
     if len(item_ids) < 12:
         err(f"data/items/: solo {len(item_ids)} item, attesi >= 12 che coprano le 7 categorie")
     if n_sigillati < 3:

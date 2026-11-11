@@ -31,7 +31,38 @@ func _ready() -> void:
 
 
 func _su_partita_iniziata(_nome: String) -> void:
-	_al_punto_di_partenza()
+	_mondo_della_modalita()
+	var gs: Node = get_node_or_null("/root/GameState")
+	if gs == null or not bool(gs.get("da_salvataggio")):   # una partita caricata resta dove si era salvato
+		_al_punto_di_partenza()
+
+
+## Il mondo sceglie le sue immagini (luminoso | cupo) quando nasce, all'avvio, prima che si sappia la modalita'
+## della partita: se la partita ne vuole un'altra il mondo si rifa' con quelle giuste, col giocatore dov'era.
+func _mondo_della_modalita() -> void:
+	var vecchio: Node = _trova_regione()
+	var gs: Node = get_node_or_null("/root/GameState")
+	if vecchio == null or gs == null or not vecchio.has_method("tema_caricato") \
+			or str(vecchio.call("tema_caricato")) == str(gs.call("tema_arte")):
+		return
+	var player: Node2D = get_tree().get_first_node_in_group("player") as Node2D
+	if player == null:
+		return
+	vecchio.call("esci")
+	var stato: Array = [str(vecchio.get("livello")), vecchio.call("posizione_da_salvare"), vecchio.call("stato_barca"),
+			bool(vecchio.call("in_volo"))]
+	var indice: int = vecchio.get_index()
+	var nome: String = vecchio.name
+	var nuovo := Node2D.new()
+	nuovo.set_script(vecchio.get_script())
+	vecchio.remove_child(player)
+	remove_child(vecchio)
+	vecchio.free()        # subito, non queue_free: i suoi figli ascoltano ancora i segnali dei sistemi (orto, strutture)
+	nuovo.name = nome
+	nuovo.add_child(player)
+	add_child(nuovo)
+	move_child(nuovo, indice)
+	nuovo.callv("riprendi", stato)
 
 
 ## Il giocatore al punto di partenza del mondo (mondo unico generato, US-8B12:

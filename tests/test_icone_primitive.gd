@@ -56,3 +56,25 @@ func test_la_hotbar_mostra_il_glifo_colorato_dal_pathway() -> void:
 	assert_false(hud.get_node("Root/VBox/Hotbar/Icona3").visible, "lo slot vuoto non ha glifo")
 	hud.free()
 	host.free()
+
+
+## US-8B75b: i 4 slot stanno nello schermo anche col nome di abilita' piu' lungo dei dati e la ricarica accanto.
+func test_la_hotbar_sta_nello_schermo_col_nome_piu_lungo() -> void:
+	var lungo := ""
+	var cat: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n/it.json"))
+	for k in cat:
+		if str(k).begins_with("ability.") and not str(k).ends_with(".desc") and str(cat[k]).length() > lungo.length():
+			lungo = str(cat[k])
+	assert_gt(float(lungo.length()), 25.0, "nei dati ci sono nomi lunghi (%s)" % lungo)
+	var hud: CanvasLayer = HudScene.instantiate()
+	Engine.get_main_loop().root.add_child(hud)
+	for i in 4:
+		(hud.get_node("Root/VBox/Hotbar/Slot%d" % i) as Label).text = "%d  %s  12.3s" % [i + 1, lungo]
+		(hud.get_node("Root/VBox/Hotbar/Icona%d" % i) as Control).visible = true
+	var barra: Control = hud.get_node("Root/VBox/Hotbar")
+	var larghezza: float = (hud.get_node("Root") as Control).position.x + barra.get_combined_minimum_size().x
+	var schermo: float = float(ProjectSettings.get_setting("display/window/size/viewport_width")) \
+			/ float(ProjectSettings.get_setting("display/window/stretch/scale"))
+	assert_true(larghezza <= schermo, "la hotbar e' larga %d unita' su %d di schermo" % [int(larghezza), int(schermo)])
+	assert_gt(float(hud.call("altezza")), 60.0, "l'HUD dice quanto e' alto (per la camera degli interni)")
+	hud.free()

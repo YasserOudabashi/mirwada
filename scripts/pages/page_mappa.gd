@@ -52,7 +52,7 @@ func aggiorna() -> void:
 		# gate noti della regione (dai dati; il fog of war vero sui gate e' US-621)
 		var gate_txt: Array = []
 		for g in (r as Dictionary).get("gating", []):
-			gate_txt.append(str((g as Dictionary).get("area", "")))
+			gate_txt.append(str(gd.call("tr_data", str((g as Dictionary).get("name_i18n", (g as Dictionary).get("area", ""))))))
 		if not gate_txt.is_empty():
 			var gl := Label.new()
 			gl.text = tr("BOOK_MAPPA_GATE") + " " + ", ".join(gate_txt)

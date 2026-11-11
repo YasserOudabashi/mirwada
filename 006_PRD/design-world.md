@@ -157,7 +157,7 @@ Vocabolario chiuso dei tipi di gate (entra in `region.schema.json`):
 | `fase_lunare` | grotta di marea con luna `piena` | ciclo lunare |
 | `npc` | Bruno sblocca il porto notturno (modo `aiutato`) | `npc_influenced`, gia' nel vocabolario eventi |
 | `conoscenza` | flag `testi_ordine_minore` | dialoghi, libri, sinergie lore |
-| `sequenza` | la Frontiera respinge chi e' sopra Sequenza ~4 | stato di progressione |
+| `sequenza` | la Frontiera si apre a chi ha raggiunto la Sequenza 4 (4..0); il gruppo di casa (`gruppo_di_casa`: Fool, Error, Door) entra sempre | stato di progressione |
 
 `terrain_modify` con `permanente: true` (tg_mano_divina, tg_spezza_barriera)
 **apre gate in modo permanente e salvato**: la mappa alterata fa parte dello

@@ -17,6 +17,9 @@ signal partita_iniziata(nome: String)
 var nome_personaggio: String = NOME_DEFAULT
 ## Modalita' scelta a inizio partita (data/modalita.json): fissa, va nel save.
 var modalita: String = "facile"
+## true se la partita in corso viene da un salvataggio (carica_slot), false se e' nuova: chi ascolta
+## partita_iniziata (main.gd) non riporta al punto di partenza una partita caricata.
+var da_salvataggio: bool = false
 var tempo_gioco: float = 0.0
 ## false al boot (sei sul menu del libro), true dopo nuova_partita()/carica_slot().
 var _partita_attiva: bool = false
@@ -165,6 +168,7 @@ func carica_slot(slot: int) -> Dictionary:
 		applica(r["dati"])
 		_partita_attiva = true
 		_slot_corrente = slot
+		da_salvataggio = true
 		partita_iniziata.emit(nome_personaggio)
 	return r
 
@@ -195,6 +199,7 @@ func nuova_partita(nome: String, slot: int, talenti_innati: Array = [],
 
 	if _progression() != null:
 		_progression().call("configura", pathway_id, 9)
+	get_node("/root/AbilityEngine").call("slot_da_salvataggio", [])
 	if _follia() != null:
 		_follia().call("azzera")
 	if _conoscenza() != null:
@@ -226,6 +231,12 @@ func nuova_partita(nome: String, slot: int, talenti_innati: Array = [],
 	if not eredita.is_empty():
 		_applica_eredita(eredita)
 
+	# Si comincia in piena salute: il Pathway appena configurato puo' aver alzato hp_max sopra gli hp di base.
+	var giocatore: Node = get_tree().get_first_node_in_group("player")
+	var st: Node = giocatore.get_node_or_null("StatsComponent") if giocatore != null else null
+	if st != null and st.has_method("revivi"):
+		st.call("revivi")
+	da_salvataggio = false
 	partita_iniziata.emit(nome_personaggio)
 	return get_node("/root/SaveSystem").call("salva", slot, snapshot())
 
@@ -351,6 +362,7 @@ func snapshot() -> Dictionary:
 		"endgame": _endgame().per_salvataggio() if _endgame() != null else {},
 		# fase 9: baseline dei requisiti 'comportamento' del Boon corrente.
 		"boon": _boon().per_salvataggio() if _boon() != null else {},
+		"hotbar": get_node("/root/AbilityEngine").call("slot_per_salvataggio"),
 	}
 	var p: Node = get_tree().get_first_node_in_group("player")
 	var mn: Node = get_tree().get_first_node_in_group("mondo")
@@ -412,6 +424,7 @@ func applica(dati: Dictionary) -> void:
 	# BoonSystem, stesso motivo di Acting (fase 9).
 	if _boon() != null:
 		_boon().da_salvataggio(dati.get("boon", {}))
+	get_node("/root/AbilityEngine").call("slot_da_salvataggio", dati.get("hotbar", []))
 	if _caratteristiche() != null:
 		_caratteristiche().da_salvataggio(dati.get("caratteristiche", []))
 	if _follia() != null:

@@ -103,6 +103,5 @@ func test_viaggia_a_rispetta_il_gating_d_ingresso() -> void:
 	_pr().call("configura", "twilight_giant", 9)
 	assert_true(mondo.call("viaggia_a", "mirwada"), "Mirwada non ha gating d'ingresso")
 
-	_pr().call("configura", "twilight_giant", 2)   # "sopra" la Sequenza 4
-	assert_false(mondo.call("viaggia_a", "frontiera_porte"), "la Frontiera respinge chi e' troppo avanti")
+	assert_false(mondo.call("viaggia_a", "frontiera_porte"), "la Frontiera e' chiusa prima della Sequenza 4")
 	cont.free()

@@ -138,6 +138,9 @@ func _riga_item(v: Dictionary) -> HBoxContainer:
 	elif cat == "pergamena" and not iid.is_empty():
 		h.add_child(_azione(tr("BOOK_INV_USA"), func() -> void:
 			_n("/root/Inventory").call("usa", iid); _mostra("zaino")))
+	elif it.get("effetto") is Dictionary:               # US-8B80c: pozioni, elisir, tonici
+		h.add_child(_azione(tr("BOOK_INV_BEVI") if str(it.get("gesto", "")) == "drink" else tr("BOOK_INV_USA"),
+			func() -> void: _n("/root/Inventory").call("usa_oggetto", item_id); _mostra("zaino")))
 	return h
 
 
@@ -218,7 +221,40 @@ func _indosso() -> void:
 			h.add_child(_azione(tr("BOOK_INV_TOGLI"), func() -> void:
 				eq.call("rimuovi_slot", mount); _mostra("indosso")))
 		_corpo.add_child(h)
-	_corpo.add_child(_riga(tr("BOOK_INV_SIGILLI_TODO")))
+		_sigilli_di(str(mount), int(it.get("slot_sigilli", 0)))
+
+
+## US-8B73e: sotto un oggetto indossato coi suoi alloggi, i sigilli incastonati (si estraggono) e, finche' c'e' un
+## alloggio libero, quelli dello zaino (si incastonano).
+func _sigilli_di(mount: String, alloggi: int) -> void:
+	if alloggi <= 0:
+		return
+	var eq: Node = _n("/root/Equipment")
+	var messi: Array = eq.call("sigilli_incastonati", mount)
+	_corpo.add_child(_riga("    %s %d/%d" % [tr("BOOK_INV_SIGILLI"), messi.size(), alloggi]))
+	for s in messi:
+		_corpo.add_child(_riga_sigillo(str((s as Dictionary).get("item_id", "")), tr("BOOK_INV_ESTRAI"), func() -> void:
+			eq.call("rimuovi_sigillo", mount, str((s as Dictionary).get("instance_id", ""))); _mostra("indosso")))
+	if messi.size() >= alloggi:
+		return
+	for v in _n("/root/Inventory").call("per_categoria", "sigillo"):
+		_corpo.add_child(_riga_sigillo(str((v as Dictionary).get("item_id", "")), tr("BOOK_INV_INCASTONA"), func() -> void:
+			eq.call("incastona", mount, str((v as Dictionary).get("instance_id", ""))); _mostra("indosso")))
+
+
+func _riga_sigillo(item_id: String, azione: String, cb: Callable) -> HBoxContainer:
+	var gd: Node = _n("/root/GameData")
+	var h := HBoxContainer.new()
+	var rientro := Control.new()
+	rientro.custom_minimum_size = Vector2(16, 0)
+	h.add_child(rientro)
+	h.add_child(_icona(gd.call("icona_oggetto", item_id)))
+	var l := Label.new()
+	l.text = str(gd.call("tr_data", (gd.call("get_item", item_id) as Dictionary).get("name_i18n", item_id)))
+	_larga(l)
+	h.add_child(l)
+	h.add_child(_azione(azione, cb))
+	return h
 
 
 func _base() -> void:

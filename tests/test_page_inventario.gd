@@ -220,3 +220,38 @@ func test_sezione_journal_riflette_lo_stato_delle_quest() -> void:
 	_n("/root/Book").call("chiudi")
 	ov.free()
 	_p.free()
+
+
+## US-8B73e: sotto l'oggetto indossato i suoi sigilli; si incastonano dallo zaino e si estraggono.
+func _premi(pag: Node, testo: String) -> bool:
+	for r in _righe(pag):
+		for c in r.get_children():
+			if c is Button and (c as Button).text == testo:
+				(c as Button).pressed.emit()
+				return true
+	return false
+
+
+func test_indosso_incastona_ed_estrae_i_sigilli() -> void:
+	var inv: Node = _n("/root/Inventory")
+	var eq: Node = _n("/root/Equipment")
+	inv.call("aggiungi", "spada_ferrea", 1)
+	eq.call("equipaggia", str((inv.call("per_categoria", "equip") as Array)[0]["instance_id"]))
+	inv.call("aggiungi", "sigillo_forza_minore", 1)
+	var ov: CanvasLayer = OverlayScene.instantiate()
+	Engine.get_main_loop().root.add_child(ov)
+	var pag: Node = _pagina(ov)
+	pag.call("_mostra", "indosso")
+	assert_true(_testo_righe(pag).contains("0/1"), "la spada mostra il suo alloggio libero")
+	assert_true(_premi(pag, "Incastona"), "il sigillo dello zaino si puo' incastonare")
+	assert_eq((eq.call("sigilli_incastonati", "arma") as Array).size(), 1, "incastonato nella spada")
+	assert_eq((inv.call("per_categoria", "sigillo") as Array).size(), 0, "e non e' piu' nello zaino")
+	assert_true(_testo_righe(pag).contains("1/1"), "l'alloggio risulta pieno")
+	assert_true(_premi(pag, "Estrai"), "il sigillo incastonato si puo' estrarre")
+	assert_eq((eq.call("sigilli_incastonati", "arma") as Array).size(), 0, "tolto dalla spada")
+	assert_eq((inv.call("per_categoria", "sigillo") as Array).size(), 1, "e torna nello zaino")
+	eq.call("pulisci")
+	inv.call("pulisci")
+	_n("/root/Book").call("chiudi")
+	ov.free()
+	_p.free()

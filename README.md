@@ -255,7 +255,8 @@ di motore che nominino un Pathway specifico.
 
 - `CLAUDE.md` — regole di lavoro, comandi, decisioni prese
 - `006_PRD/prd-fase-8b-arte.md` — PRD della fase 8b (chiusa: arte con sprite-forge e mondo generato)
-- `006_PRD/prd-fase-12-atto-2-3.md` — PRD dell'Atto II e III (fase 13 in `prd.json`, US-1301..US-1313); `006_PRD/prd-fase-12-mondo-vivo.md` — fase 12 (da riscrivere sul mondo generato)
+- `006_PRD/prd-fase-13-atto-2-3.md` — PRD dell'Atto II e III (fase 13 in `prd.json`, US-1301..US-1313); `006_PRD/prd-fase-12-mondo-vivo.md` — fase 12 (da riscrivere sul mondo generato)
+- `006_PRD/prd-fasi-15-17-gioco-completo.md` — nemici e boss (fase 15), audio (fase 16), rilascio (fase 17): quello che manca per giocare tutto il gioco
 - `006_PRD/prd-fase-9-pathway-non-standard.md` — PRD della fase 9 (chiusa, Pathway Non-Standard, motore Boon + Eternal Aeon, 7 story)
 - `006_PRD/prd-fase-8-vertical-slice.md` — PRD della fase 8 (chiusa, vertical slice giocabile, 19 story)
 - `006_PRD/prossimi-passi.md` — istruzioni operative per la prossima sessione: stato, ordine delle story, trappole note

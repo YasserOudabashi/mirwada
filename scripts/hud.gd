@@ -29,6 +29,11 @@ var _rampa := ShaderMaterial.new()
 var _rampa_di: String = "?"
 
 
+## US-8B75b: corpo dei nomi della hotbar. Piu' piccolo delle barre: la hotbar e' una griglia 2x2 (icona + nome) e col
+## nome piu' lungo dei dati due slot affiancati stanno nello schermo (lo controlla un test).
+const CORPO_HOTBAR := 12
+
+
 func _ready() -> void:
 	add_to_group("hud")                                # US-8B24b: il cannocchiale lo nasconde mentre si guarda
 	for l in find_children("*", "Label", true, false):  # contorno scuro come i prompt: si legge su ogni fondo
@@ -59,6 +64,7 @@ func _ready() -> void:
 	var ae: Node = get_node_or_null("/root/AbilityEngine")
 	if ae != null:
 		ae.ability_executed.connect(_su_abilita_eseguita)
+		ae.hotbar_cambiata.connect(_aggiorna_hotbar)          # US-8B75c
 	var prog: Node = get_node_or_null("/root/Progression")
 	if prog != null and prog.has_signal("sequence_changed"):
 		prog.sequence_changed.connect(func(_n: int, _v: int) -> void: _aggiorna_hotbar())
@@ -130,7 +136,7 @@ func _su_abilita_eseguita(ability_id: String, caster: Node, result: Dictionary) 
 	if caster == null or not caster.is_in_group("player") or not bool(result.get("ok", false)):
 		return
 	var ae: Node = get_node_or_null("/root/AbilityEngine")
-	var owned: Array = ae.call("owned_abilities", caster) if ae != null else []
+	var owned: Array = ae.call("hotbar", caster) if ae != null else []
 	var idx: int = owned.find(ability_id)
 	if idx < 0 or idx >= _hotbar.size():
 		return
@@ -139,9 +145,16 @@ func _su_abilita_eseguita(ability_id: String, caster: Node, result: Dictionary) 
 	create_tween().tween_property(lbl, "modulate", Color.WHITE, 0.45)
 
 
+## US-8B75b: unita' di schermo occupate dall'HUD dall'alto (la camera degli interni le lascia libere).
+func altezza() -> float:
+	var v: Control = $Root/VBox
+	return ($Root as Control).position.y + v.get_combined_minimum_size().y
+
+
 func _monta_icone() -> void:
 	_rampa.shader = preload("res://shaders/rampa_pathway.gdshader")
 	for lbl in _hotbar:
+		(lbl as Label).add_theme_font_size_override("font_size", CORPO_HOTBAR)   # US-8B75b: due slot per riga
 		var ic := TextureRect.new()
 		ic.name = "Icona" + str((lbl as Node).name).trim_prefix("Slot")
 		ic.custom_minimum_size = Vector2(16, 16)
@@ -189,12 +202,12 @@ func _aggiorna_hotbar() -> void:
 	var ae: Node = get_node_or_null("/root/AbilityEngine")
 	var gd: Node = get_node_or_null("/root/GameData")
 	var p: Node = get_tree().get_first_node_in_group("player")
-	var owned: Array = ae.call("owned_abilities", p) if ae != null and p != null else []
+	var owned: Array = ae.call("hotbar", p) if ae != null and p != null else []
 	_aggiorna_rampa(gd)
 	for i in _hotbar.size():
 		var lbl: Label = _hotbar[i]
 		var ic: TextureRect = _icone[i] if i < _icone.size() else null
-		if i >= owned.size():
+		if i >= owned.size() or str(owned[i]).is_empty():
 			lbl.text = "%d  %s" % [i + 1, tr("HUD_HOTBAR_VUOTO")]
 			if ic != null:
 				ic.visible = false

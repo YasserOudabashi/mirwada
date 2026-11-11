@@ -15,6 +15,8 @@ extends Node
 
 signal item_aggiunto(item_id: String, quantita: int)
 signal item_rimosso(item_id: String, quantita: int)
+## US-8B80c: un oggetto consumato dallo zaino; gesto = il campo "gesto" dell'oggetto ("drink" per cio' che si beve).
+signal oggetto_usato(item_id: String, gesto: String)
 
 var _stack: Dictionary = {}      # item_id -> int
 var _istanze: Array = []         # [{ instance_id: String, item_id: String }]
@@ -127,6 +129,24 @@ func usa(instance_id: String, bersaglio: Node = null) -> Dictionary:
 	if not bool(r.get("ok", false)):
 		return {"ok": false, "reason": str(r.get("reason", "esecuzione_fallita")), "risultato": r}
 	rimuovi_istanza(instance_id)   # consumo: 1 uso
+	return {"ok": true, "reason": "", "risultato": r}
+
+
+## US-8B80c: consuma un oggetto impilabile col suo "effetto" (una primitiva, item.schema consumabile: pozioni,
+## elisir, tonici) sul giocatore. Se l'effetto non parte l'oggetto resta nello zaino.
+func usa_oggetto(item_id: String) -> Dictionary:
+	var eff: Variant = _def(item_id).get("effetto")
+	if conta(item_id) <= 0 or not (eff is Dictionary):
+		return {"ok": false, "reason": "non_usabile", "risultato": {}}
+	var giocatore: Node = get_tree().get_first_node_in_group("player")
+	var eng: Node = get_node_or_null("/root/AbilityEngine")
+	if giocatore == null or eng == null:
+		return {"ok": false, "reason": "nessun_giocatore", "risultato": {}}
+	var r: Dictionary = eng.call("esegui_primitiva", str((eff as Dictionary).get("tipo", "")), eff, giocatore)
+	if not bool(r.get("ok", false)):
+		return {"ok": false, "reason": str(r.get("reason", "esecuzione_fallita")), "risultato": r}
+	rimuovi(item_id, 1)
+	oggetto_usato.emit(item_id, str(_def(item_id).get("gesto", "")))
 	return {"ok": true, "reason": "", "risultato": r}
 
 

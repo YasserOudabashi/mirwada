@@ -14,6 +14,8 @@ func _n(s: String) -> Node: return _root().get_node_or_null(s)
 func prepara() -> void:
 	_n("/root/Book").call("azzera")
 	_n("/root/GameState").set("_partita_attiva", false)
+	_n("/root/GameState").set("da_salvataggio", false)
+	_n("/root/GameState").set("modalita", "facile")
 	if bool(_n("/root/SaveSystem").call("esiste", SLOT)):
 		_n("/root/SaveSystem").call("cancella", SLOT)
 
@@ -24,6 +26,8 @@ func prepara() -> void:
 func _fine() -> void:
 	_n("/root/Book").call("chiudi")
 	_n("/root/GameState").set("_partita_attiva", false)
+	_n("/root/GameState").set("da_salvataggio", false)
+	_n("/root/GameState").set("modalita", "facile")
 	if bool(_n("/root/SaveSystem").call("esiste", SLOT)):
 		_n("/root/SaveSystem").call("cancella", SLOT)
 
@@ -107,4 +111,51 @@ func test_su_partita_iniziata_riposiziona_senza_ricaricare() -> void:
 		"il player e' riposizionato alla cella di spawn di Mirwada")
 
 	cont.free()
+	_fine()
+
+
+## Controllo del 2026-11-10: il mondo nasce all'avvio con le immagini luminose; una partita difficile (nuova o
+## caricata) lo rifa' con quelle cupe, e una partita caricata resta dove si era salvato.
+func _main_col_mondo() -> Node:
+	var main: Node = load("res://scenes/main.tscn").instantiate()
+	_root().add_child(main)
+	return main
+
+
+func test_la_partita_difficile_rifa_il_mondo_cupo() -> void:
+	var main: Node = _main_col_mondo()
+	var gs: Node = _n("/root/GameState")
+	assert_eq(str(main.get_node("Mondo").call("tema_caricato")), "luminoso", "all'avvio il mondo e' luminoso")
+	gs.call("nuova_partita", "Tester", SLOT, [], "", "difficile")
+	var mondo: Node2D = main.get_node("Mondo")
+	assert_eq(str(mondo.call("tema_caricato")), "cupo", "con la partita difficile il mondo e' cupo")
+	var player: Node2D = mondo.get_node_or_null("Player")
+	assert_true(player != null, "il giocatore e' dentro il mondo nuovo")
+	assert_eq(player.position, mondo.call("punto_spawn", "mirwada"), "e parte dal punto di partenza")
+	assert_eq(_root().get_tree().get_nodes_in_group("mondo").size(), 1, "un mondo solo")
+	var st: Node = player.get_node("StatsComponent")
+	assert_eq(float(st.get("hp")), float(st.call("get_stat", "hp_max")), "si comincia in piena salute")
+	gs.call("nuova_partita", "Tester", SLOT, [], "", "facile")
+	assert_eq(str(main.get_node("Mondo").call("tema_caricato")), "luminoso", "e torna luminoso con una partita facile")
+	main.free()
+	_fine()
+
+
+func test_la_partita_caricata_resta_dove_si_era_salvato() -> void:
+	var main: Node = _main_col_mondo()
+	var gs: Node = _n("/root/GameState")
+	gs.call("nuova_partita", "Tester", SLOT, [], "", "difficile")
+	var mondo: Node2D = main.get_node("Mondo")
+	var c: Array = (mondo.get("dati")["luoghi"] as Dictionary)["piazza_mercato"]
+	var q: Vector2i = mondo.call("cella_libera", Vector2i(int(c[0]), int(c[1])))
+	var dove := Vector2((q.x + 0.5) * 32, (q.y + 0.5) * 32)
+	mondo.call("colloca", mondo.get_node("Player"), dove)
+	gs.call("salva_slot", SLOT)
+	gs.call("nuova_partita", "Altro", SLOT + 1, [], "", "facile")     # un'altra partita, luminosa, alla partenza
+	assert_true(bool(gs.call("carica_slot", SLOT).get("ok", false)), "slot caricato")
+	mondo = main.get_node("Mondo")
+	assert_eq(str(mondo.call("tema_caricato")), "cupo", "la partita difficile caricata ha il mondo cupo")
+	assert_eq((mondo.get_node("Player") as Node2D).position, dove, "e il giocatore sta dove aveva salvato")
+	_n("/root/SaveSystem").call("cancella", SLOT + 1)
+	main.free()
 	_fine()
