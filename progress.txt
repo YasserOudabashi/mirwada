@@ -1141,3 +1141,20 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Conseguenze aperte: i nemici della Frontiera sono di Sequenza 7-5 (troppo deboli per chi entra dalla 4: fase 15,
   US-1507); un Twilight Giant alla Sequenza 9 che ci arriva in barca viene respinto (giusto, ma senza una scritta che
   dica perche': da vedere in US-1703); CLAUDE.md e design-world.md aggiornati.
+
+## Difetti piccoli dal controllo, 2026-11-11/13 (richieste dell'utente)
+- Frontiera: chi viene respinto legge perche' (mondo.gd motivo_respinto, strings.csv MONDO_RESPINTO_<TIPO>: "La nebbia
+  ti respinge: torna alla Sequenza 4").
+- Libro: nessun testo sulla piega. La mappa non e' piu' una doppia pagina (regioni e viaggio a sinistra, varchi a
+  destra); test_libro_facciate controlla ogni pagina.
+- Abilita' d'area (tag_sinergia "area"): le primitive "sul nemico" cadono su tutti gli avversari vivi entro
+  balance.json combattimento.bersaglio.raggio_area (72) dal bersaglio (AbilityEngine.bersagli_attorno); ogni effetto
+  porta il suo nemico ("nodo") e il VFX va su ognuno.
+- Effetti: non stanno piu' sopra tutto (z_index 1) ma nell'ordine di profondita' del mondo, un albero davanti li copre;
+  i segni a terra (vfx.json "a_terra": aura, terrain_modify, plant_growth, decay, summon) stanno sotto i piedi.
+- Status: nome tradotto per i 14 status (status_effects.json name_i18n) e riga nell'HUD con icona, nome e secondi.
+- Nemici: ogni nemico di layout, campagna e interni ha un nome (override.name_i18n, enemy.*) sopra la testa. Nomi
+  provvisori scelti da Claude, in attesa delle risposte dell'utente sul bestiario (artifact "Bestiario di Mirwada").
+- Pulizia: via 117 foto di verifica vecchie e prove del mondo (arte/), 3 script usati una volta.
+- Persi e rifatti: il container e' ripartito prima del push. Da ora si fa push a ogni commit.
+- 1107 test, validate 0. Verifica a schermo di questi punti: da fare col giro di screenshot (qa_screenshot.gd).

@@ -150,7 +150,7 @@
       "impact_frame": false,
       "scia": false
     },
-    "aura": {
+    "aura": { "a_terra": true,
       "sprite": "vfx_aura_ring",
       "su": "chi_lancia",
       "frames": 4,
@@ -164,7 +164,7 @@
       "impact_frame": false,
       "scia": false
     },
-    "decay": {
+    "decay": { "a_terra": true,
       "sprite": "vfx_wither",
       "su": "chi_lancia",
       "frames": 4,
@@ -185,7 +185,7 @@
       "impact_frame": true,
       "scia": false
     },
-    "terrain_modify": {
+    "terrain_modify": { "a_terra": true,
       "sprite": "vfx_fracture",
       "su": "chi_lancia",
       "frames": 5,
@@ -199,7 +199,7 @@
       "impact_frame": false,
       "scia": false
     },
-    "summon": {
+    "summon": { "a_terra": true,
       "sprite": "vfx_conjure",
       "su": "chi_lancia",
       "frames": 5,
@@ -241,7 +241,7 @@
       "impact_frame": true,
       "scia": false
     },
-    "plant_growth": {
+    "plant_growth": { "a_terra": true,
       "sprite": "vfx_bloom",
       "su": "chi_lancia",
       "fps": 6,

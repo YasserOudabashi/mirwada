@@ -257,7 +257,10 @@ func _process(_delta: float) -> void:
 		if aggiorna_regione(pos):
 			_ultima_ammessa = pos
 		elif _ultima_ammessa != Vector2.INF:
+			var respinto: String = motivo_respinto(regione_a(floori(pos.x / tile), floori(pos.y / tile)))
 			(p as Node2D).position = _ultima_ammessa
+			if not respinto.is_empty():
+				_mostra_avviso(p as Node2D, respinto)
 			_cella_regione = Vector2i(-9999, -9999)
 
 
@@ -303,6 +306,20 @@ func ingresso_aperto(rid: String) -> bool:
 		if typeof(g) == TYPE_DICTIONARY and str((g as Dictionary).get("area", "")) == "ingresso":
 			return AreaGate.valuta_gate(rid, g, Engine.get_main_loop().root)
 	return true
+
+
+## Perche' la regione respinge chi entra, in parole per il giocatore ("" se non respinge). Il testo dipende dal
+## tipo di gate (strings.csv MONDO_RESPINTO_<TIPO>, con il valore del gate dove serve).
+func motivo_respinto(rid: String) -> String:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	if gd == null or ingresso_aperto(rid):
+		return ""
+	for g in (gd.call("get_region", rid).get("gating", []) as Array):
+		if typeof(g) == TYPE_DICTIONARY and str((g as Dictionary).get("area", "")) == "ingresso":
+			var chiave: String = "MONDO_RESPINTO_" + str((g as Dictionary).get("tipo", "")).to_upper()
+			var testo: String = tr(chiave) if tr(chiave) != chiave else tr("MONDO_RESPINTO")
+			return testo % [(g as Dictionary).get("valore", "")] if testo.contains("%") else testo
+	return ""
 
 
 ## La casella (luogo della mappa) di un location_tag della regione, attraverso
@@ -1238,16 +1255,16 @@ func _mostra_avviso(p: Node2D, testo: String) -> void:
 	if _avviso == null:
 		_avviso = Label.new()
 		_avviso.add_theme_font_size_override("font_size", 10)
-		_avviso.size = Vector2(tile * 6, tile * 0.5)
+		_avviso.size = Vector2(tile * 10, tile * 0.5)
 		_avviso.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_avviso.z_index = 10
 		_avviso.add_theme_constant_override("outline_size", 4)
 		_avviso.add_theme_color_override("font_outline_color", Color("#181425"))
 		add_child(_avviso)
 	_avviso.text = testo
-	_avviso.position = p.position + Vector2(-tile * 3, tile * 0.5)
+	_avviso.position = p.position + Vector2(-tile * 5, tile * 0.5)
 	_avviso.show()
-	get_tree().create_timer(1.5).timeout.connect(func() -> void: if is_instance_valid(_avviso): _avviso.hide())
+	get_tree().create_timer(2.5).timeout.connect(func() -> void: if is_instance_valid(_avviso): _avviso.hide())
 
 
 # --- Cannocchiali (US-8B24) -------------------------------------------------------

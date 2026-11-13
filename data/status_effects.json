@@ -2,7 +2,7 @@
   "schema_version": 1,
   "_comment": "Status sulle entita' (US-218C). aura e curse applicano uno di questi 'effetto'; light_purify li rimuove per TAG. tag e' del vocabolario di data/tags.json. stat_modifiers (opzionale) riusa i modificatori per id di US-007, applicati come 'status:<id>'. durata_default -1 = permanente finche' qualcosa non lo toglie. negativo:true = un purify lo rimuove.",
   "statuses": {
-    "sfortuna": {
+    "sfortuna": { "name_i18n": "status.sfortuna",
       "tag": "maledizione",
       "durata_default": 20.0,
       "negativo": true,
@@ -11,13 +11,13 @@
       },
       "descrizione": "Inciampi, manchi il colpo, ti ferisci da solo. E' l'effetto della 'Knight of Misfortune' del Darkness resa senza probability_shift (curse + debuff_stat + dot): il feel e' sfortuna, la manipolazione vera della probabilita' resta a Wheel of Fortune."
     },
-    "taunt": {
+    "taunt": { "name_i18n": "status.taunt",
       "tag": "provocazione",
       "durata_default": 4.0,
       "negativo": false,
       "stat_modifiers": {}
     },
-    "decadimento": {
+    "decadimento": { "name_i18n": "status.decadimento",
       "tag": "decadimento",
       "durata_default": 8.0,
       "negativo": true,
@@ -26,7 +26,7 @@
         "velocita": -0.1
       }
     },
-    "autorita_decadimento": {
+    "autorita_decadimento": { "name_i18n": "status.autorita_decadimento",
       "tag": "dominio",
       "durata_default": -1,
       "negativo": true,
@@ -34,13 +34,13 @@
         "difesa": -0.1
       }
     },
-    "comando_non_morti": {
+    "comando_non_morti": { "name_i18n": "status.comando_non_morti",
       "tag": "non_morto",
       "durata_default": -1,
       "negativo": false,
       "stat_modifiers": {}
     },
-    "paura": {
+    "paura": { "name_i18n": "status.paura",
       "tag": "spirito",
       "durata_default": 6.0,
       "negativo": true,
@@ -50,7 +50,7 @@
       },
       "descrizione": "Il bersaglio e' spaventato: colpisce peggio e para peggio. Il 'fuggire' vero e' comportamento IA (fase 6); qui l'effetto e' lo status. Lo applica la primitiva fear (Death Seq 7, lamento dei morti)."
     },
-    "anima_recisa": {
+    "anima_recisa": { "name_i18n": "status.anima_recisa",
       "tag": "anima",
       "durata_default": 8.0,
       "negativo": true,
@@ -61,7 +61,7 @@
       },
       "descrizione": "Anima e corpo separati: il corpo abbandonato combatte a malapena. Lo applica soul_detach (Ferryman, Death Seq 3)."
     },
-    "affascinato": {
+    "affascinato": { "name_i18n": "status.affascinato",
       "tag": "mente",
       "durata_default": 12.0,
       "negativo": true,
@@ -71,7 +71,7 @@
       },
       "descrizione": "Il bersaglio e' incantato: non attacca chi lo ha affascinato e combatte distratto. Lo applica curse(\"affascinato\") della Beauty Goddess (Moon Seq 1). Non e' possess (quello e' del Fool)."
     },
-    "area_viva": {
+    "area_viva": { "name_i18n": "status.area_viva",
       "tag": "guarigione",
       "durata_default": 20.0,
       "negativo": false,
@@ -80,7 +80,7 @@
       },
       "descrizione": "Il terreno benedetto dallo Harvest Priest: chi vi sta sopra e' protetto e si rigenera lentamente (la cura nel tempo la fa il campo dell aura)."
     },
-    "gravita_alterata": {
+    "gravita_alterata": { "name_i18n": "status.gravita_alterata",
       "tag": "invenzione",
       "durata_default": -1,
       "negativo": true,
@@ -90,7 +90,7 @@
       },
       "descrizione": "Dentro il campo dell'Illuminator le leggi fisiche locali sono sospese: chi si muove contro la volonta' del Paragon rallenta e schiva peggio. Reso senza rule_bind (primitiva differita): aura + terrain_modify, feel equivalente."
     },
-    "destino_segnato": {
+    "destino_segnato": { "name_i18n": "status.destino_segnato",
       "tag": "destino",
       "durata_default": 15.0,
       "negativo": true,
@@ -100,7 +100,7 @@
       },
       "descrizione": "Il Knowledge Emperor ha letto e segnato il filo del destino del bersaglio: subisce di piu' e schiva peggio. Reso senza rule_bind (differita): curse + debuff_stat + reveal_info."
     },
-    "occultato": {
+    "occultato": { "name_i18n": "status.occultato",
       "tag": "occultamento",
       "durata_default": 6.0,
       "negativo": false,
@@ -109,7 +109,7 @@
       },
       "descrizione": "Il Beyonder si e' fuso con l'ombra: sfugge al rilevamento (anche mistico) e para meno visibile. Lo applica shadow_meld (Door Secrets Sorcerer, Darkness Nightwatcher). Non negativo: e' un vantaggio."
     },
-    "varco_sigillato": {
+    "varco_sigillato": { "name_i18n": "status.varco_sigillato",
       "tag": "spazio",
       "durata_default": 15.0,
       "negativo": true,
@@ -119,7 +119,7 @@
       },
       "descrizione": "Lo spazio intorno al bersaglio si richiude su se stesso: si muove impacciato e schiva peggio. Lo applica l'anatema della Key of Stars (Door Seq 1): il tuo stesso potere di aprire varchi, usato per sigillarne uno intorno a un nemico."
     },
-    "posseduto": {
+    "posseduto": { "name_i18n": "status.posseduto",
       "tag": "possessione",
       "durata_default": 6.0,
       "negativo": true,

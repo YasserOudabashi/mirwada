@@ -89,6 +89,7 @@ func _ready() -> void:
 		if _stato == Stato.STAGGER:
 			_vai(Stato.IDLE))
 
+	_monta_nome()
 	_bersaglio = get_tree().get_first_node_in_group("player")
 	_vai(Stato.IDLE)
 
@@ -383,3 +384,29 @@ func _aggiorna_anim_locomozione() -> void:
 		_anim.call("riproduci", "idle", _dir_sguardo)
 	elif _stato == Stato.INSEGUIMENTO:
 		_anim.call("riproduci", "walk", _dir_sguardo)
+
+
+## 2026-11-11: il nome del nemico sopra la testa (override.name_i18n nei dati del layout), nello stile del nome del
+## giocatore. Senza nome nei dati non c'e' scritta. La scala del nodo (i boss) non ingrandisce la scritta.
+func nome() -> String:
+	var k: String = str(_cfg.get("name_i18n", ""))
+	var gd: Node = get_node_or_null("/root/GameData")
+	return str(gd.call("tr_data", k)) if gd != null and not k.is_empty() else ""
+
+
+func _monta_nome() -> void:
+	if nome().is_empty():
+		return
+	var l := Label.new()
+	l.name = "Nome"
+	l.text = nome()
+	l.add_theme_font_size_override("font_size", 9)
+	l.add_theme_constant_override("outline_size", 4)
+	l.add_theme_color_override("font_outline_color", Color("#181425"))
+	l.add_theme_color_override("font_color", Color("#f7d9d0"))
+	l.custom_minimum_size = Vector2(120, 0)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.scale = Vector2.ONE / maxf(scale.x, 0.01)
+	l.position = Vector2(-60, -40) / maxf(scale.x, 0.01)
+	add_child(l)
+	_stats.died.connect(l.hide)

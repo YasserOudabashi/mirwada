@@ -163,7 +163,7 @@
       "durata_vulnerabile": 3.0,
       "recupero_al_secondo": 15
     },
-    "bersaglio": {
+    "bersaglio": {"raggio_area": 72, 
       "_comment": "US-8B44a: su chi cadono le primitive col bersaglio 'nemico' (data/schema/primitives.json): il nemico vivo piu' vicino entro raggio (unita', 32 = una casella) dentro un cono di angolo gradi attorno allo sguardo. Nessuno: l'abilita' non parte e non costa.",
       "raggio": 160,
       "angolo": 120

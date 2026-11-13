@@ -33,6 +33,9 @@ var _rampa_di: String = "?"
 ## nome piu' lungo dei dati due slot affiancati stanno nello schermo (lo controlla un test).
 const CORPO_HOTBAR := 12
 
+var _stats: Node = null
+var _stati: HBoxContainer = null
+
 
 func _ready() -> void:
 	add_to_group("hud")                                # US-8B24b: il cannocchiale lo nasconde mentre si guarda
@@ -76,10 +79,57 @@ func _ready() -> void:
 		push_warning("[HUD] nessun giocatore con StatsComponent in scena")
 		return
 
+	_stats = stats                                         # 2026-11-11: gli status del giocatore anche nell'HUD
+	_stati = HBoxContainer.new()
+	_stati.name = "Stati"
+	_stati.add_theme_constant_override("separation", 4)
+	$Root/VBox.add_child(_stati)
+	$Root/VBox.move_child(_stati, $Root/VBox/Hotbar.get_index())
+	stats.status_cambiati.connect(_aggiorna_stati)
+	_aggiorna_stati()
 	stats.hp_changed.connect(_su_hp)
 	stats.spiritualita_changed.connect(_su_sp)
 	_su_hp(float(stats.get("hp")), stats.get_stat("hp_max"))
 	_su_sp(float(stats.get("spiritualita")), stats.get_stat("spiritualita_max"))
+
+
+## Una voce per status attivo del giocatore: icona, nome e secondi che restano (senza numero se non scade).
+## La riga sparisce quando non ce ne sono, cosi' l'HUD non si allunga a vuoto.
+func _aggiorna_stati() -> void:
+	for c in _stati.get_children():
+		_stati.remove_child(c)
+		c.queue_free()
+	var gd: Node = get_node_or_null("/root/GameData")
+	var ids: Array = _stats.call("status_attivi") if _stats != null else []
+	ids.sort()
+	for id in ids:
+		var ic := TextureRect.new()
+		ic.texture = gd.call("icona_stato", id) if gd != null else null
+		ic.custom_minimum_size = Vector2(12, 12)
+		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		ic.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		_stati.add_child(ic)
+		var l := Label.new()
+		l.name = str(id)
+		l.add_theme_font_size_override("font_size", CORPO_HOTBAR)
+		l.add_theme_constant_override("outline_size", 4)
+		l.add_theme_color_override("font_outline_color", Color("#181425"))
+		_stati.add_child(l)
+	_stati.visible = not ids.is_empty()
+	_aggiorna_tempi_stati()
+
+
+func _aggiorna_tempi_stati() -> void:
+	var gd: Node = get_node_or_null("/root/GameData")
+	for l in _stati.get_children():
+		if not (l is Label) or gd == null:
+			continue
+		var def: Dictionary = gd.call("get_status_effect", str(l.name))
+		var nome: String = str(gd.call("tr_data", str(def.get("name_i18n", l.name))))
+		var resta: float = float(_stats.call("status_rimasto", str(l.name)))
+		(l as Label).text = "%s %ds" % [nome, ceili(resta)] if resta >= 0.0 else nome
 
 
 func _su_hp(hp: float, hp_max: float) -> void:
@@ -126,6 +176,8 @@ func _process(delta: float) -> void:
 	if _cd_accum >= 0.1:
 		_cd_accum = 0.0
 		_aggiorna_hotbar()
+		if _stati != null and _stati.visible:
+			_aggiorna_tempi_stati()
 
 
 ## US-802: quando parte un'abilita' del giocatore, lo slot che l'ha lanciata

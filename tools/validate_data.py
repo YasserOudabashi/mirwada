@@ -1896,7 +1896,7 @@ def main():
                 if not isinstance(ov, dict):
                     err(f"{rel} [{rid}]: nemico override deve essere un dict")
                     ov = {}
-                fuori = set(ov) - nemico_base_keys
+                fuori = set(ov) - nemico_base_keys - {"name_i18n"}   # il nome del nemico (2026-11-11), non un numero
                 if fuori:
                     err(f"{rel} [{rid}]: nemico override ha chiavi fuori da "
                         f"balance.json.nemico_base: {sorted(fuori)}")

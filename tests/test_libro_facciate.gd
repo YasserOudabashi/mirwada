@@ -66,15 +66,32 @@ func test_nessuna_pagina_e_piu_larga_della_sua_facciata() -> void:
 	ov.free()
 
 
-func test_la_mappa_usa_la_doppia_pagina() -> void:
+## 2026-11-11 (richiesta dell'utente): nessun testo passa sopra la piega. Nemmeno la mappa e' piu' una doppia pagina:
+## le regioni a sinistra, i varchi a destra.
+func test_nessuna_pagina_scrive_sulla_piega() -> void:
 	var b: Node = _root().get_node("Book")
 	b.call("azzera")
+	_root().get_node("WorldState").call("entra_regione", "marche_crepuscolo")
+	_root().get_node("WorldState").call("entra_regione", "mirwada")
 	var ov: CanvasLayer = _monta()
 	b.call("apri_a", "mappa")
 	var pagina: Control = ov.get_node("Pagina")
-	var sx: Control = ov.get_node("Pagina/Contenuto")
-	assert_true(bool((b.call("pagina", "mappa") as Dictionary).get("doppia_pagina", false)), "dato in book.json")
-	assert_true(sx.position.x + sx.size.x > pagina.size.x / 2.0, "il contenuto attraversa le due facciate")
-	assert_false((ov.get_node("Pagina/Destra") as Control).visible, "niente facciata destra separata")
+	for p in b.call("pagine"):
+		assert_false(bool((p as Dictionary).get("doppia_pagina", false)),
+			"%s non e' una doppia pagina" % str((p as Dictionary).get("id", "")))
+		b.call("vai_a", str((p as Dictionary).get("id", "")))
+		for i in 4:
+			ov.call("_process", 0.2)
+		var sx: Control = ov.get_node("Pagina/Contenuto")
+		var dx: Control = ov.get_node("Pagina/Destra")
+		var centro: float = pagina.size.x / 2.0          # all'avvio (scaffale) il libro e' piu' piccolo
+		assert_true(sx.position.x + sx.size.x <= centro - 8.0, "%s: la sinistra finisce prima della piega" % str(p.get("id")))
+		assert_true(dx.position.x >= centro + 8.0, "%s: la destra comincia dopo la piega" % str(p.get("id")))
+	b.call("vai_a", "mappa")
+	for i in 4:
+		ov.call("_process", 0.2)
+	var varchi: Array = (ov.get_node("Pagina/Destra") as Control).find_children("*", "Label", true, false)
+	assert_gt(float(varchi.size()), 0.0, "i varchi delle regioni scoperte stanno sulla facciata destra")
+	_root().get_node("WorldState").call("pulisci")
 	b.call("chiudi")
 	ov.free()

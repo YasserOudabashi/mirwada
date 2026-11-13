@@ -48,9 +48,10 @@ func _su_abilita(ability_id: String, caster: Node, result: Dictionary) -> void:
 		if pv.is_empty():
 			continue   # primitiva non ancora coperta dai VFX
 		var su: Node2D = null
+		var nodo: Variant = (entry as Dictionary).get("nodo", bersaglio)    # d'area: ogni effetto ha il suo nemico
 		if str(pv.get("su", "")) == "bersaglio" and bool((entry as Dictionary).get("su_bersaglio", false)) \
-				and is_instance_valid(bersaglio) and bersaglio is Node2D:
-			su = bersaglio
+				and is_instance_valid(nodo) and nodo is Node2D:
+			su = nodo
 		gioca_primitiva(tipo, caster, pv, pal, su)
 		if bool(pv.get("impact_frame", false)):
 			_overlay_call("impatto")
@@ -91,12 +92,18 @@ func gioca_primitiva(_tipo: String, caster: Node, pv: Dictionary, pal: Dictionar
 		var e := _effetto(tex, int(pv.get("frames", 1)), pal, bool(pv.get("impact_frame", false)))
 		if bool(pv.get("gira", false)):
 			e.rotation = facing.angle()
+		# 2026-11-11: l'effetto sta nell'ordine di profondita' del mondo (y_sort), non sopra tutto: un albero davanti
+		# lo copre. Il disegno resta 6 unita' sopra i piedi (offset), il punto d'ordine e' ai piedi: appena davanti
+		# a chi lo porta, o appena dietro se e' un segno a terra (data/vfx.json "a_terra": cerchi, crepe, fioriture).
+		var a_terra: bool = bool(pv.get("a_terra", false))
+		e.offset = Vector2(0, 0.0 if a_terra else -12.0)
 		if su != null:
 			su.add_child(e)
-			e.position = Vector2(0, -6)
+			e.position = Vector2.ZERO
+			e.show_behind_parent = a_terra
 		else:
 			madre.add_child(e)
-			e.global_position = (caster as Node2D).global_position + Vector2(0, -6)
+			e.global_position = (caster as Node2D).global_position + Vector2(0, -0.5 if a_terra else 0.5)
 		_anima(e, false, 1.0 / maxf(1.0, float(pv.get("fps", 1.0 / VITA_FRAME))))
 		return
 	var s := Sprite2D.new()
@@ -209,7 +216,6 @@ func _effetto(tex: Texture2D, frames: int, pal: Dictionary, lampo: bool) -> Spri
 	e.texture = tex
 	e.hframes = maxi(1, frames)
 	e.scale = Vector2(0.5, 0.5)
-	e.z_index = 1
 	var m := ShaderMaterial.new()
 	m.shader = RAMPA
 	var ink := _colore(pal, "inchiostro", Color("#181425"))

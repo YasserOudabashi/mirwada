@@ -1,5 +1,6 @@
-extends VBoxContainer
-## Pagina mappa del libro (US-617). Doppia pagina: le regioni SCOPERTE
+extends "res://scripts/pages/pagina_libro.gd"
+## Pagina mappa del libro (US-617). A sinistra le regioni SCOPERTE col viaggio, a destra i loro varchi (2026-11-11:
+## prima era una doppia pagina e la riga dei varchi passava sopra la piega). Le regioni SCOPERTE
 ## (WorldState), la posizione corrente, i gate noti. Le regioni mai visitate
 ## sono assenti - fog of war, come il diagramma dei Pathway.
 ##
@@ -17,8 +18,7 @@ const C_CORRENTE := Color("#124e89")      # inchiostro blu sulla carta (prima ci
 
 
 func aggiorna() -> void:
-	for c in get_children():
-		c.queue_free()
+	svuota()
 
 	var gd: Node = _n("/root/GameData")
 	var ws: Node = _n("/root/WorldState")
@@ -41,7 +41,9 @@ func aggiorna() -> void:
 		var h := HBoxContainer.new()
 		var nome: String = str(gd.call("tr_data", (r as Dictionary).get("name_i18n", rid)))
 		var l := Label.new()
-		l.custom_minimum_size = Vector2(220, 0)
+		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.custom_minimum_size = Vector2(90, 0)
 		if rid == corrente:
 			l.text = "▸ " + nome + "  (" + tr("BOOK_MAPPA_QUI") + ")"
 			l.add_theme_color_override("font_color", C_CORRENTE)
@@ -54,10 +56,9 @@ func aggiorna() -> void:
 		for g in (r as Dictionary).get("gating", []):
 			gate_txt.append(str(gd.call("tr_data", str((g as Dictionary).get("name_i18n", (g as Dictionary).get("area", ""))))))
 		if not gate_txt.is_empty():
-			var gl := Label.new()
-			gl.text = tr("BOOK_MAPPA_GATE") + " " + ", ".join(gate_txt)
-			gl.modulate = Color(1, 1, 1, 0.55)
-			h.add_child(gl)
+			var gl := _riga("%s — %s %s" % [nome, tr("BOOK_MAPPA_GATE"), ", ".join(gate_txt)])
+			gl.modulate = Color(1, 1, 1, 0.7)
+			destra.add_child(gl)
 
 		if rid != corrente:
 			var b := Button.new()

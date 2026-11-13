@@ -123,49 +123,49 @@
       "y": 8,
       "sequenza": 9,
       "scala": 1.0,
-      "override": {}
+      "override": { "name_i18n": "enemy.soldato_caduto"}
     },
     {
       "x": 20,
       "y": 10,
       "sequenza": 9,
       "scala": 1.0,
-      "override": {}
+      "override": { "name_i18n": "enemy.soldato_caduto"}
     },
     {
       "x": 63,
       "y": 30,
       "sequenza": 9,
       "scala": 1.0,
-      "override": {}
+      "override": { "name_i18n": "enemy.soldato_caduto"}
     },
     {
       "x": 16,
       "y": 30,
       "sequenza": 8,
       "scala": 1.0,
-      "override": {}
+      "override": { "name_i18n": "enemy.alfiere_spettrale"}
     },
     {
       "x": 48,
       "y": 12,
       "sequenza": 8,
       "scala": 1.0,
-      "override": {}
+      "override": { "name_i18n": "enemy.alfiere_spettrale"}
     },
     {
       "x": 59,
       "y": 14,
       "sequenza": 8,
       "scala": 1.0,
-      "override": {}
+      "override": { "name_i18n": "enemy.alfiere_spettrale"}
     },
     {
       "x": 37,
       "y": 12,
       "sequenza": 7,
       "scala": 1.5,
-      "override": {
+      "override": { "name_i18n": "enemy.capitano_senza_riposo",
         "danno_attacco": 15,
         "raggio_aggro": 200,
         "tag": "non_morto",

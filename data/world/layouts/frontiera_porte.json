@@ -99,42 +99,54 @@
       "y": 8,
       "sequenza": 7,
       "scala": 1.0,
-      "override": {}
+      "override": {
+        "name_i18n": "enemy.maschera_senza_volto"
+      }
     },
     {
       "x": 35,
       "y": 30,
       "sequenza": 7,
       "scala": 1.0,
-      "override": {}
+      "override": {
+        "name_i18n": "enemy.maschera_senza_volto"
+      }
     },
     {
       "x": 55,
       "y": 40,
       "sequenza": 7,
       "scala": 1.0,
-      "override": {}
+      "override": {
+        "name_i18n": "enemy.maschera_senza_volto"
+      }
     },
     {
       "x": 3,
       "y": 36,
       "sequenza": 6,
       "scala": 1.0,
-      "override": {}
+      "override": {
+        "name_i18n": "enemy.viandante_delle_porte"
+      }
     },
     {
       "x": 58,
       "y": 8,
       "sequenza": 6,
       "scala": 1.0,
-      "override": {}
+      "override": {
+        "name_i18n": "enemy.viandante_delle_porte"
+      }
     },
     {
       "x": 14,
       "y": 3,
       "sequenza": 6,
       "scala": 1.0,
-      "override": {}
+      "override": {
+        "name_i18n": "enemy.viandante_delle_porte"
+      }
     },
     {
       "x": 42,
@@ -150,7 +162,8 @@
           "sequence": 5,
           "probabilita": 1.0
         },
-        "drop_probabilita": 1.0
+        "drop_probabilita": 1.0,
+        "name_i18n": "enemy.burattinaio"
       }
     }
   ],

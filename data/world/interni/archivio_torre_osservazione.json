@@ -57,7 +57,9 @@
       "y": 3,
       "sequenza": 7,
       "scala": 1.0,
-      "override": {}
+      "override": {
+        "name_i18n": "enemy.automa_custode"
+      }
     }
   ],
   "oggetti": [

@@ -101,49 +101,49 @@
       "y": 9,
       "sequenza": 9,
       "scala": 1.0,
-      "override": {}
+      "override": { "name_i18n": "enemy.lupo_della_luna"}
     },
     {
       "x": 25,
       "y": 10,
       "sequenza": 9,
       "scala": 1.0,
-      "override": {}
+      "override": { "name_i18n": "enemy.lupo_della_luna"}
     },
     {
       "x": 45,
       "y": 10,
       "sequenza": 9,
       "scala": 1.0,
-      "override": {}
+      "override": { "name_i18n": "enemy.lupo_della_luna"}
     },
     {
       "x": 10,
       "y": 32,
       "sequenza": 8,
       "scala": 1.0,
-      "override": {}
+      "override": { "name_i18n": "enemy.guardiana_delle_radici"}
     },
     {
       "x": 28,
       "y": 32,
       "sequenza": 8,
       "scala": 1.0,
-      "override": {}
+      "override": { "name_i18n": "enemy.guardiana_delle_radici"}
     },
     {
       "x": 50,
       "y": 32,
       "sequenza": 8,
       "scala": 1.0,
-      "override": {}
+      "override": { "name_i18n": "enemy.guardiana_delle_radici"}
     },
     {
       "x": 44,
       "y": 31,
       "sequenza": 7,
       "scala": 1.5,
-      "override": {
+      "override": { "name_i18n": "enemy.madre_dei_lupi",
         "danno_attacco": 15,
         "raggio_aggro": 200,
         "tag": "bestia",

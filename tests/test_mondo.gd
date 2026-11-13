@@ -178,6 +178,8 @@ func test_la_frontiera_si_apre_dalla_sequenza_4() -> void:
 	assert_false(m.call("aggiorna_regione", Vector2((float(f[0]) + 0.5) * m.tile, (float(f[1]) + 0.5) * m.tile)),
 		"entrare nella Frontiera e' respinto")
 	assert_false(m.call("viaggia_a", "frontiera_porte"), "nemmeno col viaggio veloce")
+	assert_true(str(m.call("motivo_respinto", "frontiera_porte")).contains("4"), "e la scritta dice a quale Sequenza tornare")
+	assert_eq(str(m.call("motivo_respinto", "mirwada")), "", "dove si entra non c'e' scritta")
 	_pr().call("configura", "twilight_giant", 4)
 	assert_true(m.call("ingresso_aperto", "frontiera_porte"), "alla Sequenza 4 si entra")
 	_pr().call("configura", "twilight_giant", 1)

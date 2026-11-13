@@ -78,3 +78,30 @@ func test_la_hotbar_sta_nello_schermo_col_nome_piu_lungo() -> void:
 	assert_true(larghezza <= schermo, "la hotbar e' larga %d unita' su %d di schermo" % [int(larghezza), int(schermo)])
 	assert_gt(float(hud.call("altezza")), 60.0, "l'HUD dice quanto e' alto (per la camera degli interni)")
 	hud.free()
+
+
+## 2026-11-11: gli status del giocatore si leggono anche nell'HUD, con nome e secondi; ogni status ha un nome tradotto.
+func test_gli_status_del_giocatore_stanno_nell_hud_col_nome() -> void:
+	var gd: Node = _gd()
+	var doc: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/status_effects.json"))
+	for id in doc["statuses"]:
+		var k: String = str((doc["statuses"][id] as Dictionary).get("name_i18n", ""))
+		assert_true(not k.is_empty() and str(gd.call("tr_data", k)) != k, "lo status %s ha un nome" % id)
+	var host := Node.new()
+	host.add_to_group("player")
+	var stats: Node = StatsComponent.new()
+	stats.name = "StatsComponent"
+	stats.configure_from_balance(9)
+	host.add_child(stats)
+	var root: Node = Engine.get_main_loop().root
+	root.add_child(host)
+	var hud: CanvasLayer = HudScene.instantiate()
+	root.add_child(hud)
+	var riga: Control = hud.get_node("Root/VBox/Stati")
+	assert_false(riga.visible, "senza status la riga non c'e'")
+	stats.call("applica_status", "paura", 6.0)
+	assert_true(riga.visible, "con uno status compare")
+	var l: Label = riga.get_node("paura")
+	assert_true(l.text.begins_with(str(gd.call("tr_data", "status.paura"))) and l.text.ends_with("6s"), "nome e secondi: %s" % l.text)
+	hud.free()
+	host.free()

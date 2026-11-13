@@ -99,3 +99,26 @@ func test_l_attesa_iniziale_ritarda_l_inseguimento() -> void:
 	assert_eq(e.stato(), "INSEGUIMENTO", "un colpo lo sveglia subito")
 	e.free()
 	p.free()
+
+
+## 2026-11-11: ogni nemico dei layout, della campagna e degli interni ha un nome tradotto, mostrato sopra la testa.
+func test_i_nemici_hanno_un_nome() -> void:
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var visti: int = 0
+	var fonti: Array = [gd.call("get_campagna")]
+	for r in gd.call("get_regions"):
+		fonti.append(gd.call("get_layout", str((r as Dictionary).get("id", ""))))
+	for layout in fonti:
+		for n in (layout as Dictionary).get("nemici", []):
+			var k: String = str(((n as Dictionary).get("override", {}) as Dictionary).get("name_i18n", ""))
+			assert_true(not k.is_empty() and str(gd.call("tr_data", k)) != k, "nemico con un nome (%s)" % k)
+			visti += 1
+	assert_gt(float(visti), 60.0, "tutti i nemici dei dati")
+	var e: CharacterBody2D = EnemyScene.instantiate()
+	e.set("override", {"name_i18n": "enemy.tagliaborse"})
+	Engine.get_main_loop().root.add_child(e)
+	assert_eq((e.get_node("Nome") as Label).text, str(gd.call("tr_data", "enemy.tagliaborse")), "il nome sopra la testa")
+	e.free()
+	e = _nemico()
+	assert_true(e.get_node_or_null("Nome") == null, "senza nome nei dati nessuna scritta")
+	e.free()
