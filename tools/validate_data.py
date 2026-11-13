@@ -1383,6 +1383,13 @@ def main():
         if _fn.endswith(".json"):
             for _it in (load_json(os.path.join(DATA, "items", _fn)) or {}).get("items", []):
                 _items_tutti[_it.get("id")] = _it
+    _volo = _mezzi.get("volo") or {}                        # 2026-11-11: costi del volo e Pathway che volano per natura
+    for _k in ("costo_decollo", "costo_al_secondo", "velocita_esausto"):
+        if not isinstance(_volo.get(_k, 0), (int, float)) or _volo.get(_k, 0) < 0:
+            err(f"data/world/mezzi.json [volo]: {_k} deve essere un numero >= 0")
+    for _pw in (_volo.get("innato") or []):
+        if not os.path.exists(os.path.join(DATA, "pathways", f"{_pw}.json")):
+            err(f"data/world/mezzi.json [volo]: innato '{_pw}' non e' un Pathway attivo")
     for _mz, _spec in _mezzi.items():                       # US-8B91b: il moltiplicatore della velocita' sul mezzo
         _vz = _spec.get("velocita", 1.0) if isinstance(_spec, dict) else 1.0
         if not isinstance(_vz, (int, float)) or not (0 < _vz <= 3):

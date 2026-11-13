@@ -53,6 +53,8 @@ var _cella_regione := Vector2i(-9999, -9999)
 ## Ultima posizione del giocatore in una regione che lo accetta: chi tocca una
 ## regione col gating d'ingresso chiuso torna qui (la Frontiera respinge).
 var _ultima_ammessa := Vector2.INF
+var _volo_debito: float = 0.0               # spiritualita' consumata in volo e non ancora tolta
+var _volo_esausto: bool = false             # forze finite: si plana fino al primo punto dove si atterra
 ## L'NPC nel cui raggio si trova il giocatore ("" = nessuno), come region_scene.
 var _npc_vicino: String = ""
 ## Livello mostrato: "superficie" o "sottosuolo" (2026-10-25: alle Marche si arriva
@@ -254,6 +256,7 @@ func _process(_delta: float) -> void:
 		else:
 			segui(pos)
 		_aggiorna_barca(p as Node2D)
+		_aggiorna_volo(p as Node2D, _delta)
 		if aggiorna_regione(pos):
 			_ultima_ammessa = pos
 		elif _ultima_ammessa != Vector2.INF:
@@ -1213,6 +1216,8 @@ var _avviso: Label = null
 
 
 func puo_volare() -> bool:
+	if volo_innato():
+		return true
 	var root: Node = Engine.get_main_loop().root
 	var gd: Node = root.get_node_or_null("GameData")
 	var inv: Node = root.get_node_or_null("Inventory")
@@ -1229,8 +1234,54 @@ func decolla() -> bool:
 	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D if is_inside_tree() else null
 	if p == null or in_volo() or in_barca() or _interno != null or livello != "superficie" or not puo_volare():
 		return false
+	if not volo_innato():                              # con la piuma alzarsi costa (mezzi.json volo.costo_decollo)
+		var st: Node = p.get_node_or_null("StatsComponent")
+		if st != null and not bool(st.call("spend_spiritualita", float(_cfg_volo().get("costo_decollo", 0.0)))):
+			_mostra_avviso(p, tr("HUD_VOLO_SENZA_FORZE"))
+			return false
+	_volo_esausto = false
+	_volo_debito = 0.0
 	p.call("imposta_volo", true, _nella_mappa)
 	return true
+
+
+func _cfg_volo() -> Dictionary:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	return gd.call("get_mezzo", "volo") if gd != null else {}
+
+
+## Il Pathway del giocatore vola per natura (mezzi.json volo.innato): senza chiave, senza costi, senza limiti.
+func volo_innato() -> bool:
+	var pr: Node = Engine.get_main_loop().root.get_node_or_null("Progression")
+	return pr != null and str(pr.call("pathway")) in (_cfg_volo().get("innato", []) as Array)
+
+
+## In aria con la piuma la spiritualita' cala (costo_al_secondo). Finita, si plana piano e si atterra da soli sul
+## primo punto dove si puo'.
+func _aggiorna_volo(p: Node2D, delta: float) -> void:
+	if not in_volo() or volo_innato():
+		return
+	var st: Node = p.get_node_or_null("StatsComponent")
+	if st == null:
+		return
+	if not _volo_esausto:
+		_volo_debito += float(_cfg_volo().get("costo_al_secondo", 0.0)) * delta
+		if _volo_debito >= 1.0:
+			if bool(st.call("spend_spiritualita", _volo_debito)):
+				_volo_debito = 0.0
+			else:
+				_volo_esausto = true
+				_mostra_avviso(p, tr("HUD_VOLO_SENZA_FORZE"))
+	if _volo_esausto:
+		var c := Vector2i(floori(p.position.x / tile), floori(p.position.y / tile))
+		if not bloccata(c.x, c.y) and _si_arriva(c, "volo"):
+			p.call("imposta_volo", false)
+			_volo_esausto = false
+
+
+## Moltiplicatore della velocita' in volo: piu' piano quando le forze sono finite.
+func velocita_volo() -> float:
+	return float(_cfg_volo().get("velocita_esausto", 1.0)) if _volo_esausto else 1.0
 
 
 func atterra() -> bool:

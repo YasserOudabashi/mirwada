@@ -208,3 +208,4 @@ TASTO_RIGHT,Destra,Right
 BOOK_DIAGRAMMA_TASTI,Abilità nei tasti,Abilities on keys
 MONDO_RESPINTO,Qualcosa ti respinge: non è ancora il momento.,Something pushes you back: not yet.
 MONDO_RESPINTO_SEQUENZA,La nebbia ti respinge: torna alla Sequenza %s.,The mist pushes you back: return at Sequence %s.
+HUD_VOLO_SENZA_FORZE,Non hai più forze per volare,You have no strength left to fly

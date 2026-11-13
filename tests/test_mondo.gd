@@ -916,6 +916,47 @@ func test_si_vola_solo_con_la_piuma_e_si_atterra_sulla_terra() -> void:
 	main.free()
 
 
+## 2026-11-11 (richiesta dell'utente): volare con la piuma costa spiritualita' (decollo e ogni secondo in aria);
+## finita, si plana piano e si atterra da soli sul primo punto buono. I Pathway di mezzi.json volo.innato non pagano.
+func test_il_volo_con_la_piuma_costa_e_a_forze_finite_si_atterra() -> void:
+	var root: Node = Engine.get_main_loop().root
+	var inv: Node = root.get_node("Inventory")
+	var gd: Node = root.get_node("GameData")
+	inv.call("pulisci")
+	var cfg: Dictionary = gd.call("get_mezzo", "volo")
+	assert_gt(float(cfg.get("costo_decollo", 0)), 0.0, "il decollo ha un costo nei dati")
+	assert_gt(float(cfg.get("costo_al_secondo", 0)), 0.0, "e il volo un costo al secondo")
+	var main := Node2D.new()
+	var m: Node2D = _mondo()
+	main.add_child(m)
+	var p: CharacterBody2D = load("res://scenes/player.tscn").instantiate()
+	m.add_child(p)
+	root.add_child(main)
+	p.position = m.call("partenza")
+	inv.call("aggiungi", "piuma_dei_venti", 1)
+	var st: Node = p.get_node("StatsComponent")
+	st.set("spiritualita", 2.0)
+	assert_false(m.call("decolla"), "senza forze per il decollo non ci si alza")
+	st.set("spiritualita", 20.0)
+	assert_true(m.call("decolla"), "con le forze si decolla")
+	assert_almost_eq(float(st.get("spiritualita")), 20.0 - float(cfg["costo_decollo"]), "il decollo costa")
+	var prima: float = float(st.get("spiritualita"))
+	m.call("_aggiorna_volo", p, 2.0)
+	assert_almost_eq(float(st.get("spiritualita")), prima - 2.0 * float(cfg["costo_al_secondo"]), "due secondi in aria costano")
+	var piena: float = float(p.call("velocita_massima"))
+	var mare: Vector2i = _cella(m, (m.get_node("Barca") as Node2D).position)
+	p.position = (Vector2(mare) + Vector2(0.5, 0.5)) * m.tile
+	st.set("spiritualita", 0.0)
+	m.call("_aggiorna_volo", p, 2.0)
+	assert_true(p.call("in_volo"), "sull'acqua a forze finite si resta in aria")
+	assert_true(float(p.call("velocita_massima")) < piena, "ma si plana piu' piano")
+	p.position = (Vector2(m.call("_costa_vicina", mare) as Vector2i) + Vector2(0.5, 0.5)) * m.tile
+	m.call("_aggiorna_volo", p, 0.1)
+	assert_false(p.call("in_volo"), "sul primo punto buono si atterra da soli")
+	inv.call("pulisci")
+	main.free()
+
+
 func test_la_piuma_sta_nell_osservatorio() -> void:
 	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
 	var chiave: String = str((gd.call("get_mezzo", "volo") as Dictionary).get("chiave", ""))

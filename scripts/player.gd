@@ -261,7 +261,10 @@ func in_barca() -> bool:
 
 ## La velocita' di chi cammina (StatsComponent), per il moltiplicatore del mezzo su cui si sta.
 func velocita_massima() -> float:
-	return float(_stats.get_stat("velocita")) * _passo_mezzo
+	var planata: float = 1.0                    # in volo a forze finite si va piu' piano (mondo.gd velocita_volo)
+	if _mezzo == "volo" and get_parent() != null and get_parent().has_method("velocita_volo"):
+		planata = float(get_parent().call("velocita_volo"))
+	return float(_stats.get_stat("velocita")) * _passo_mezzo * planata
 
 
 func _imposta_mezzo(mezzo: String, vincolo: Callable) -> void:
