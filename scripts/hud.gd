@@ -42,6 +42,10 @@ func _ready() -> void:
 	for l in find_children("*", "Label", true, false):  # contorno scuro come i prompt: si legge su ogni fondo
 		(l as Label).add_theme_constant_override("outline_size", 4)
 		(l as Label).add_theme_color_override("font_outline_color", Color("#181425"))
+		# 2026-11-11: tutto l'HUD col corpo della hotbar. Era alto un terzo dello schermo e negli interni copriva
+		# la parete in cima alla stanza; cosi' le stanze fino a 8 caselle si vedono intere sotto l'HUD.
+		(l as Label).add_theme_font_size_override("font_size", CORPO_HOTBAR)
+	($Root/VBox as VBoxContainer).add_theme_constant_override("separation", 1)
 	for nome in COLORI_BARRE:                          # barre piene di colore su fondo scuro (Endesga 32)
 		var fondo := StyleBoxFlat.new()
 		fondo.bg_color = Color("#181425")
