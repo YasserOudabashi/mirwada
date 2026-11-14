@@ -1158,3 +1158,20 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Pulizia: via 117 foto di verifica vecchie e prove del mondo (arte/), 3 script usati una volta.
 - Persi e rifatti: il container e' ripartito prima del push. Da ora si fa push a ogni commit.
 - 1107 test, validate 0. Verifica a schermo di questi punti: da fare col giro di screenshot (qa_screenshot.gd).
+
+## Volo con costi, HUD basso, US-8B27 luci di notte — 2026-11-13/14
+- Volo (richiesta dell'utente): mezzi.json volo costo_decollo 6, costo_al_secondo 1.5, velocita_esausto 0.5, innato []
+  (Pathway che volano senza chiave e senza costi: oggi nessuno, nessun Pathway ha il volo tra le abilita').
+  mondo.gd decolla/_aggiorna_volo/velocita_volo: a spiritualita' finita si plana a meta' velocita' e si atterra da soli
+  sul primo punto buono. tests/test_mondo.gd (+1).
+- HUD: tutte le scritte col corpo 12 e righe strette: da 123 a ~97 unita' (114 con la riga degli status). Nella casa
+  del porto la stanza si vede intera sotto l'HUD. arte/revisione/difetti_piccoli_2026_11.png (nome del nemico, status
+  nell'HUD, interno, mappa su due facciate, scritta della Frontiera).
+- US-8B27: scripts/world/luci_notte.gd (figlio del mondo), dati luce.json "luci" (forza per momento, finestre, faro).
+  Aloni tondi a 4 gradini netti e fascio a cuneo, disegnati in codice (1 texel = 2 unita'), additivi su uno strato
+  sopra il buio e sotto l'HUD. Finestre: hash della casella della casa < probabilita' 0.55, davanti alla facciata.
+  Faro: sopra il nodo Soglia_faro, 92 unita' piu' su, fascio a 5 giri al minuto. tests/test_luce.gd (+1).
+- Verifica nel gioco (Xvfb, notte_fonda, facile e difficile): il faro col suo alone e il fascio, in piazza due case
+  con l'alone caldo alla porta. arte/revisione/luci_di_notte.png. 1109 test, validate 0.
+- Ambiente: il container nuovo aveva Pillow rotto per Python 3.11: `python3 -m pip install --ignore-installed pillow`
+  (Pillow 13; numpy c'e'). Da ricordare prima di rigenerare arte: confrontare un foglio prima/dopo.

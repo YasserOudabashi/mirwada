@@ -977,7 +977,7 @@
       "title": "Cannocchiale da tasca",
       "description": "Un oggetto cannocchiale nello zaino: usandolo la vista si allunga nella direzione dello sguardo, con la lente di US-8B24b.",
       "acceptanceCriteria": [
-        "oggetto nei dati (non vendibile o da negozio: decisione dell'utente)",
+        "oggetto nei dati, in vendita da un mercante di Mirwada (decisione dell'utente 2026-11-11)",
         "riusa scripts/cannocchiale.gd con bersaglio davanti al giocatore",
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
@@ -985,7 +985,7 @@
       "priority": 115,
       "fase": "8b",
       "passes": false,
-      "notes": ""
+      "notes": "Decisione dell'utente (2026-11-11): il cannocchiale da tasca si compra a Mirwada."
     },
     {
       "id": "US-8B27",
@@ -999,8 +999,8 @@
       ],
       "priority": 116,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-11-14 (richiesta dell'utente: 'metti faro e finestre accesi'). scripts/world/luci_notte.gd, dati in luce.json 'luci': aloni a gradini additivi sopra il buio; una casa su due con le finestre accese (sempre le stesse), la lanterna del faro con l'alone e il fascio che gira. Forza per momento del giorno. Aperto: i lampioni (il mondo generato non ne ha)."
     },
     {
       "id": "US-8B74b",

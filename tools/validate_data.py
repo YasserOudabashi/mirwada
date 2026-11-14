@@ -1994,6 +1994,16 @@ def main():
     def _colore_ok(v):
         return isinstance(v, str) and len(v) == 7 and v.startswith("#") and all(c in "0123456789abcdefABCDEF" for c in v[1:])
 
+    _luci = _luce.get("luci") or {}                         # US-8B27: luci della notte
+    for _m in sorted(_momenti_luce):
+        _f = (_luci.get("forza") or {}).get(_m)
+        if not isinstance(_f, (int, float)) or not (0 <= _f <= 1):
+            err(f"{_luce_rel}: luci.forza.{_m} deve essere un numero fra 0 e 1")
+    for _k in ("finestre", "faro"):
+        if not _colore_ok((_luci.get(_k) or {}).get("colore")):
+            err(f"{_luce_rel}: luci.{_k}.colore deve essere un colore #rrggbb")
+    if not (0 <= (_luci.get("finestre") or {}).get("probabilita", -1) <= 1):
+        err(f"{_luce_rel}: luci.finestre.probabilita deve essere fra 0 e 1")
     for _tema in ("luminoso", "cupo"):
         _per = (_luce.get("momenti", {}) or {}).get(_tema, {})
         for _m in sorted(_momenti_luce):
