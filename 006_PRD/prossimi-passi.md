@@ -42,7 +42,7 @@ Tutto in `prd.json` (`passes: false`), la priorita' e' il numero tra parentesi.
 | — | Facoltativa | fase 14 | altri Pathway Non-Standard |
 
 Il **gioco e' finito e giocabile al 100% in italiano** alla fine del blocco 7. PRD dei blocchi:
-`prd-fase-13-atto-2-3.md` (vi si chiamano ancora US-1201..1213), `prd-fasi-15-17-gioco-completo.md` (nemici, audio,
+`prd-fase-13-atto-2-3.md`, `prd-fasi-15-17-gioco-completo.md` (nemici, audio,
 rilascio), `prd-fase-12-mondo-vivo.md` (da riscrivere con US-1200).
 
 **Decisioni che spettano all'utente** prima di cominciare il blocco:

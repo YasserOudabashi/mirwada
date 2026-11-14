@@ -1,7 +1,8 @@
 # PRD: Fase 13 — Atto II e Atto III (le regioni che si aprono, la soglia)
 
-> **Ora e' la Fase 13 (2026-11-10).** Il file si chiamava `prd-fase-12-atto-2-3.md`. Qui dentro le story hanno ancora i
-> numeri US-1201..US-1213: in `prd.json` sono **US-1301..US-1313** (stesso ordine, US-12NN = US-13NN).
+> **Fase 13.** Il file si chiamava `prd-fase-12-atto-2-3.md` (2026-11-10). Il 2026-11-14 le story sono state
+> rinumerate qui dentro da US-12NN a US-13NN, come in `prd.json` (US-1301..US-1313). La nota sotto e' la storia
+> delle rinumerazioni precedenti.
 
 > **Rinumerata in corsa (2026-09-12, US-1114)**: questa fase era la
 > "Fase 11" pianificata quando questo PRD è stato scritto. L'utente ha poi
@@ -103,7 +104,7 @@ dall'altra, ma l'ordine consigliato resta mappa-prima.
 
 ### Blocco 0 — fondamenta e audit
 
-**US-1201 — Audit del rituale di Sequenza 1 sui 10 Pathway attivi**
+**US-1301 — Audit del rituale di Sequenza 1 sui 10 Pathway attivi**
 - Grep di `advancement_ritual.sacrifices` sulla Sequenza 1 di ognuno dei
   10 Pathway attivi (`data/pathways/*.json`, esclusi i deferred).
 - Per ogni Pathway senza `"ancora_del_giocatore"` tra i sacrifici: aggiunta
@@ -113,7 +114,7 @@ dall'altra, ma l'ordine consigliato resta mappa-prima.
   `progress.txt`.
 - `python tools/validate_data.py` esce 0.
 
-**US-1202 — Contenuto per `trib_1_0`: chi scrive `tribolazione_soglia_varcata`**
+**US-1302 — Contenuto per `trib_1_0`: chi scrive `tribolazione_soglia_varcata`**
 - Oggi nessun dialogo/quest scrive questo flag: la prova finale (Seq 1→0)
   è tecnicamente insuperabile in una partita normale.
 - Un nuovo nodo in `dlg_antagonista.json` (già esiste, già ha 2 occorrenze
@@ -125,9 +126,9 @@ dall'altra, ma l'ordine consigliato resta mappa-prima.
   `region_id: frontiera_porte`, `location_tag: soglia`, `momento:
   notte_fonda`) sono raggiungibili nel gioco reale (non solo nei test).
 
-### Blocco A — Atto II: le regioni che si aprono (US-1203..1106)
+### Blocco A — Atto II: le regioni che si aprono (US-1303..1306)
 
-**US-1203 — Quest "posizione di fazione"**
+**US-1303 — Quest "posizione di fazione"**
 - Una quest nuova (`q_<npc>_02` su uno degli NPC di fazione già esistenti,
   candidato: Ottavia/`ordine_minore` o Bruno/`porto`) i cui step usano
   `evento`+`filtri` esistenti (niente di nuovo) e il cui `on_complete`
@@ -137,7 +138,7 @@ dall'altra, ma l'ordine consigliato resta mappa-prima.
 - Il giver è raggiungibile in Atto II (tier mid), non prima: condizione
   `tier_min` sul primo nodo di dialogo che offre la quest.
 
-**US-1204 — Il duello con Aldo diventa contenuto, non solo un flag**
+**US-1304 — Il duello con Aldo diventa contenuto, non solo un flag**
 - `npc_system.gd` già offre il duello ai salti di tier per gli NPC
   `sfida_ai_tier` (solo Aldo oggi). Verificare ESATTAMENTE quale flag/
   segnale espone oggi (letto dal codice, non dal roadmap) e usarlo come
@@ -148,22 +149,22 @@ dall'altra, ma l'ordine consigliato resta mappa-prima.
   (il "duello" è narrativo — un nemico istanziato con la Sequenza di Aldo,
   stesso pattern di ogni altro nemico dai dati).
 
-**US-1205 — Rituali che chiedono luoghi veri (Atto II)**
+**US-1305 — Rituali che chiedono luoghi veri (Atto II)**
 - Verifica che gli `advancement_ritual.location_tags` delle Sequenze 6-4
   dei 10 Pathway puntino a `location_tags` che esistono per davvero nelle
   regioni aperte in Atto II (non solo Mirwada) — audit, non necessariamente
   nuovi dati. Dove manca una zona coerente, la aggiunge (riuso del
   meccanismo di zone della Fase 10/6, non un tipo nuovo).
 
-**US-1206 — Checkpoint di blocco: una partita attraversa l'Atto II per
+**US-1306 — Checkpoint di blocco: una partita attraversa l'Atto II per
 davvero**
 - `tests/manual/qa_atto_2.gd` (Xvfb): un personaggio a Sequenza 6 fa la
   quest di fazione, affronta il duello con Aldo, supera `trib_5_4`, arriva
   a Sequenza 4. Screenshot in chat.
 
-### Blocco B — Atto III: la soglia (US-1207..1111)
+### Blocco B — Atto III: la soglia (US-1307..1111)
 
-**US-1207 — "Doran sa"**
+**US-1307 — "Doran sa"**
 - Nuovo nodo in `dlg_doran.json`, condizionato `tier_min: saint` (coerente
   con la condizione già presente sull'unica scelta di Atto III che ha),
   che espande la reazione oggi ridotta a una riga ("Interessante
@@ -172,7 +173,7 @@ davvero**
   `giustizia`), senza toccare `trib_3_2` (il flag di superamento resta
   quello esistente).
 
-**US-1208 — "Lena capisce"**
+**US-1308 — "Lena capisce"**
 - Nuovo ramo in `dlg_lena.json` condizionato a un tier alto (`saint` o
   `angel`, da decidere in story guardando il resto dei suoi nodi): la
   scena che il design cap. 5 promette — l'Ancora più fragile del roster
@@ -181,36 +182,36 @@ davvero**
   Ancora, riusando l'effetto di riduzione già esistente in negativo o
   positivo — non un tipo di effetto nuovo).
 
-**US-1209 — "Vesna sceglie"**
+**US-1309 — "Vesna sceglie"**
 - Nuovo ramo in `dlg_vesna.json`: la sua diffidenza verso i Beyonder
   (`reazione_al_potere` già in `factions.json`) arriva a un bivio
   esplicito a tier alto — resta o si allontana, scritto come `flag` +
   `reputazione`, letto più avanti da un `open question` su un possibile
   effetto sul finale Rinuncia (§9).
 
-**US-1210 — Il rituale di Sequenza 1 nel mondo reale**
+**US-1310 — Il rituale di Sequenza 1 nel mondo reale**
 - Verifica giocata (non solo dati): l'Ancora sacrificata al rituale di
   Sequenza 1 è raggiungibile e osservabile a schermo (il `location_tag`
   del rituale esiste nella Frontiera delle Porte/regione corretta,
   raggiungibile senza gating rotto).
 
-**US-1211 — Checkpoint di blocco: una partita attraversa l'Atto III per
+**US-1311 — Checkpoint di blocco: una partita attraversa l'Atto III per
 davvero**
 - `tests/manual/qa_atto_3.gd` (Xvfb): Sequenza 4 → 0, tutte e 4 le
   tribolazioni superate con le loro scene (non solo i contatori nudi),
   il rituale di Sequenza 1 con l'Ancora, arrivo a Sequenza 0. Screenshot
   in chat.
 
-### Blocco C — chiusura (US-1212..1113)
+### Blocco C — chiusura (US-1312..1113)
 
-**US-1212 — Checkpoint dinamico dell'intera fase**
+**US-1312 — Checkpoint dinamico dell'intera fase**
 - `tests/test_fase_11_checkpoint.gd`: grep-based come i checkpoint delle
   fasi precedenti — verifica che le nuove quest/nodi di dialogo esistano,
   che referenzino solo id validi (giver nel roster, `evento` nei 12
   tracciati, `flag` coerenti), che nessun nome di Pathway sia hardcoded
   nel codice `.gd` toccato da questa fase (stesso pattern delle fasi 5/7/8).
 
-**US-1213 — Chiusura fase 12**
+**US-1313 — Chiusura fase 12**
 - `progress.txt`/`CLAUDE.md`/`006_PRD/roadmap.md` aggiornati a "Fase 12:
   CHIUSA". `prd.json` tutto `passes: true`.
 
@@ -251,15 +252,15 @@ davvero**
   frasi brevi, un bivio per nodo, mai più di 3-4 scelte.
 - Le condizioni `tier_min` sui nuovi nodi devono essere coerenti con
   quelle già presenti sullo stesso NPC (es. `dlg_doran.json` usa già
-  `saint` per la sua scelta più alta: US-1207 aggancia lì, non altrove).
+  `saint` per la sua scelta più alta: US-1307 aggancia lì, non altrove).
 
 ## 7. Technical Considerations
 
 - Tutta la fase tocca solo `data/dialogues/`, `data/quests/`,
-  `data/i18n/`, e — solo se l'audit US-1201 lo richiede — `data/pathways/`
+  `data/i18n/`, e — solo se l'audit US-1301 lo richiede — `data/pathways/`
   (un campo `sacrifices` per Sequenza 1). Nessun file `.gd` nuovo fuori
   dai due script di verifica Xvfb e dal checkpoint.
-- I duelli (US-1204) riusano l'istanziazione nemico esistente dai dati
+- I duelli (US-1304) riusano l'istanziazione nemico esistente dai dati
   (stesso meccanismo di ogni boss/nemico piazzato nei layout, fase 8):
   nessun sistema di "duello 1v1" speciale.
 
@@ -273,18 +274,18 @@ davvero**
 
 ## 9. Open Questions
 
-- **US-1209 (Vesna)**: se "si allontana" deve avere un effetto meccanico
+- **US-1309 (Vesna)**: se "si allontana" deve avere un effetto meccanico
   sul finale Rinuncia (che richiede "almeno un'Ancora viva", FR-9 di fase
   7) — da decidere quando si scrive quel nodo, guardando quante Ancore ha
   in media un giocatore a quel punto. Proposta di default: nessun effetto
   automatico sul finale, solo narrativo (Vesna non è mai stata una delle
   3 candidate Ancora "di sistema" più forti — Mirco, Lena — quindi il
   rischio di rompere Rinuncia è basso, ma va verificato in story).
-- **US-1203 (quale fazione)**: proposta Ottavia/`ordine_minore` (meno
+- **US-1303 (quale fazione)**: proposta Ottavia/`ordine_minore` (meno
   sviluppata delle altre nel roster attuale) o Bruno/`porto` — da
   confermare quando si scrive la story, guardando quale NPC ha meno
   contenuto oggi.
-- Se la Fase 10 non è ancora chiusa quando questa fase parte, US-1205/
-  US-1210 restano su `location_tags` esistenti invece che sui nuovi siti
+- Se la Fase 10 non è ancora chiusa quando questa fase parte, US-1305/
+  US-1310 restano su `location_tags` esistenti invece che sui nuovi siti
   fisici — nessun blocco, solo meno "vero" fino a quando la mappa
   continua non arriva.

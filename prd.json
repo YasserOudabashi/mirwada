@@ -1089,7 +1089,7 @@
       "priority": 50,
       "fase": "13",
       "passes": true,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1201). 2026-11-10: gia' presente in tutti e 10 (darkness, death, door, error, fool, hermit, moon, mother, paragon, twilight_giant); un test lo tiene fermo (tests/test_ritual.gd)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md. 2026-11-10: gia' presente in tutti e 10 (darkness, death, door, error, fool, hermit, moon, mother, paragon, twilight_giant); un test lo tiene fermo (tests/test_ritual.gd)."
     },
     {
       "id": "US-1302",
@@ -1103,7 +1103,7 @@
       "priority": 51,
       "fase": "13",
       "passes": true,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1202). 2026-11-11: il nodo del dialogo c'era gia'; il blocco vero era il gate della Frontiera al contrario (aperta alle Sequenze 9-4, chiusa dalla 3). Decisioni dell'utente: si entra dalla Sequenza 4; Fool, Error e Door (gruppo di casa) entrano sempre. Test: di notte l'antagonista e' alla soglia e ci si arriva a piedi dall'arrivo della soglia del faro."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md. 2026-11-11: il nodo del dialogo c'era gia'; il blocco vero era il gate della Frontiera al contrario (aperta alle Sequenze 9-4, chiusa dalla 3). Decisioni dell'utente: si entra dalla Sequenza 4; Fool, Error e Door (gruppo di casa) entrano sempre. Test: di notte l'antagonista e' alla soglia e ci si arriva a piedi dall'arrivo della soglia del faro."
     },
     {
       "id": "US-1303",
@@ -1116,7 +1116,7 @@
       "priority": 53,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1203)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
     },
     {
       "id": "US-1304",
@@ -1129,7 +1129,7 @@
       "priority": 54,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1204)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
     },
     {
       "id": "US-1305",
@@ -1142,7 +1142,7 @@
       "priority": 55,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1205)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
     },
     {
       "id": "US-1306",
@@ -1155,7 +1155,7 @@
       "priority": 56,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1206)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
     },
     {
       "id": "US-1307",
@@ -1167,7 +1167,7 @@
       "priority": 57,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1207)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
     },
     {
       "id": "US-1308",
@@ -1179,7 +1179,7 @@
       "priority": 58,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1208)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
     },
     {
       "id": "US-1309",
@@ -1192,7 +1192,7 @@
       "priority": 59,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1209)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
     },
     {
       "id": "US-1310",
@@ -1205,7 +1205,7 @@
       "priority": 60,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1210)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
     },
     {
       "id": "US-1311",
@@ -1218,7 +1218,7 @@
       "priority": 61,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1211)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
     },
     {
       "id": "US-1312",
@@ -1230,7 +1230,7 @@
       "priority": 62,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1212)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
     },
     {
       "id": "US-1313",
@@ -1242,7 +1242,7 @@
       "priority": 63,
       "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1213)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
     },
     {
       "id": "US-1200",
