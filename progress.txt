@@ -1175,3 +1175,14 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   con l'alone caldo alla porta. arte/revisione/luci_di_notte.png. 1109 test, validate 0.
 - Ambiente: il container nuovo aveva Pillow rotto per Python 3.11: `python3 -m pip install --ignore-installed pillow`
   (Pillow 13; numpy c'e'). Da ricordare prima di rigenerare arte: confrontare un foglio prima/dopo.
+
+## Barca ridisegnata e nelle tre direzioni, 2026-11-14 (richiesta dell'utente: "disegna meglio la barca")
+- tools/art/forge3d/creatures.py barca(): scafo panciuto (ellissoide), prua a punta con l'asta, specchio di poppa,
+  falchetta chiara, due panche, due remi a riposo. worldrender: kind "su"/"giu" la gira (yaw 90/270) in una cella alta.
+- Comando: python tools/art/esporta_mondo.py --barca (seed 1, pochi secondi): barca.png, barca_su.png, barca_giu.png
+  in assets/world/<tema>/oggetti/ e le ancore in mondo.json "sprite". nave.png e' uscita identica a prima.
+- scripts/world/mondo.gd _gira_barca(): il disegno segue lo sguardo di chi rema (di fianco specchiata, di prua, di
+  poppa). tests/test_mondo.gd (+1).
+- Guardata ingrandita x6 su fondo acqua e su fondo chiaro; nel gioco (Xvfb) remando a sinistra, in su e in giu':
+  arte/revisione/barca_tre_direzioni.png. Non mi convince ancora: di prua e di poppa la barca e' corta (schiacciata
+  dall'inclinazione della vista) e Enel in ginocchio la copre quasi tutta.

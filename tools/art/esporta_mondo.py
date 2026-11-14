@@ -329,12 +329,14 @@ def esporta_barca(temi):
     mondo.json "sprite"; US-8B20d: anche la nave della base. Dove stanno lo dice data/world/mezzi.json."""
     path = os.path.join(OUT, "mondo.json")
     dati = json.load(open(path))
-    for mezzo in ("barca", "nave"):
+    # 2026-11-14: la barca anche di prua e di poppa (barca_su, barca_giu), per quando va su o giu'
+    for nome, spec in (("barca", {"type": "barca"}), ("barca_su", {"type": "barca", "kind": "su"}),
+                       ("barca_giu", {"type": "barca", "kind": "giu"}), ("nave", {"type": "nave"})):
         for t in temi:
             tema.imposta(t)
-            img, ax, ay = object_sprite({"type": mezzo, "seed": 1}, T)
-            Image.fromarray(img).save(os.path.join(OUT, t, "oggetti", mezzo + ".png"))
-            dati["sprite"][mezzo] = {"ax": int(ax), "ay": int(ay)}
+            img, ax, ay = object_sprite(dict(spec, seed=1), T)
+            Image.fromarray(img).save(os.path.join(OUT, t, "oggetti", nome + ".png"))
+            dati["sprite"][nome] = {"ax": int(ax), "ay": int(ay)}
     with open(path, "w") as f:
         json.dump(dati, f, separators=(",", ":"))
     print("  barca e nave:", ", ".join(temi))

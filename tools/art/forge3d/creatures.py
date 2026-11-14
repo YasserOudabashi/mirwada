@@ -568,18 +568,24 @@ def varco(aspetto, aperto=False, seed=1, size=1.0):
 
 
 def barca(seed=1, size=1.0):
-    """Barca a remi (US-8B91), lunga lungo x (a schermo di fianco): scafo basso con prua e poppa a punta,
-    falchetta chiara sui due lati, dentro scuro, una panca. Misure in unita'; origine al centro, sul pelo
-    dell'acqua. Ci sta dentro il giocatore."""
+    """Barca a remi (US-8B91, ridisegnata il 2026-11-14), lunga lungo x: scafo panciuto (un ellissoide tagliato dal
+    piano dell'acqua) con la chiglia scura, prua alta con la sua asta, poppa a specchio, falchetta chiara, dentro
+    scuro, due panche e due remi a riposo lungo lo scafo. Misure in unita'; origine al centro, sul
+    pelo dell'acqua. Ci sta dentro il giocatore. Di fianco con yaw 180, di prua con yaw 90 (worldrender kind "v")."""
     r = Rig(f"barca_{seed}"); r.scale = size
     r.joint("b", "root", (0, 0, 0))
-    r.part("b", "box", (13, 7, 2.5), (0, 0, 2.5), mat="wood")                         # scafo
-    r.part("b", "cone", (2.5, 7, 4.5), (17.5, 0, 2.5), mat="wood", rot=(0, 90, 0))    # prua
-    r.part("b", "cone", (2.5, 7, 3), (-16, 0, 2.5), mat="wood", rot=(0, -90, 0))      # poppa
-    r.part("b", "box", (12.5, 5.6, 0.3), (0, 0, 4.8), mat="shadow_mat")               # dentro
+    r.part("b", "ellipsoid", (16.5, 7.0, 3.4), (0, 0, 1.6), mat="wood")              # scafo panciuto
+    r.part("b", "cone", (2.6, 6.0, 4.6), (17.6, 0, 2.9), mat="wood", rot=(0, 90, 0))  # prua a punta
+    r.part("b", "box", (0.7, 0.7, 1.6), (15.4, 0, 6.0), mat="wood_light")             # asta di prua
+    r.part("b", "box", (0.9, 5.6, 2.2), (-15.0, 0, 3.2), mat="wood")                  # specchio di poppa
+    r.part("b", "box", (13.4, 5.6, 0.4), (0, 0, 4.9), mat="shadow_mat")               # dentro
     for sy in (-1, 1):                                                                 # falchetta
-        r.part("b", "box", (13, 0.9, 0.7), (0, sy * 6.4, 5.2), mat="wood_light")
-    r.part("b", "box", (1.3, 5.6, 0.5), (-3, 0, 5.2), mat="wood_light")               # panca
+        r.part("b", "box", (14.4, 0.8, 0.7), (0, sy * 6.3, 5.3), mat="wood_light")
+    for px in (-7.0, 5.0):                                                             # due panche
+        r.part("b", "box", (1.2, 5.6, 0.45), (px, 0, 5.4), mat="wood_light")
+    for sy in (-1, 1):                                                                 # remi a riposo lungo lo scafo
+        r.part("b", "box", (6.5, 0.4, 0.35), (-1.0, sy * 2.6, 5.95), mat="wood_light")
+        r.part("b", "box", (1.8, 0.9, 0.3), (-8.6, sy * 2.6, 5.9), mat="wood")
     return r
 
 

@@ -1058,3 +1058,24 @@ func test_dal_porto_si_arriva_in_punta_a_ogni_pontile() -> void:
 			raggiunta = raggiunta or visto.has(Vector2i(x, p.z))
 		assert_true(raggiunta, "la punta (%d..%d, %d) si raggiunge a piedi dal porto" % [p.x, p.y, p.z])
 	m.free()
+
+
+## 2026-11-14: la barca ha il disegno di fianco, di prua e di poppa, e segue lo sguardo di chi rema.
+func test_la_barca_si_gira_con_chi_rema() -> void:
+	var m: Node2D = _mondo()
+	m.call("crea_barca")
+	for nome in ["barca", "barca_su", "barca_giu"]:
+		assert_true((m.dati["sprite"] as Dictionary).has(nome), "il disegno %s e' nel mondo" % nome)
+		for tema in ["luminoso", "cupo"]:
+			assert_true(FileAccess.file_exists("res://assets/world/%s/oggetti/%s.png" % [tema, nome]), "%s/%s.png" % [tema, nome])
+	var spr: Sprite2D = m.get_node("Barca/Disegno")
+	m.call("_gira_barca", Vector2.UP)
+	assert_eq(str(spr.get_meta("disegno")), "barca_su", "verso nord: di prua")
+	m.call("_gira_barca", Vector2.DOWN)
+	assert_eq(str(spr.get_meta("disegno")), "barca_giu", "verso sud: di poppa")
+	m.call("_gira_barca", Vector2.RIGHT)
+	assert_eq(str(spr.get_meta("disegno")), "barca", "di lato: di fianco")
+	assert_true(spr.flip_h, "specchiata verso destra")
+	m.call("_gira_barca", Vector2.UP)
+	assert_false(spr.flip_h, "di prua non e' specchiata")
+	m.free()

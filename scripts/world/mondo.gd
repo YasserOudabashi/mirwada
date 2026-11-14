@@ -1033,6 +1033,26 @@ func crea_barca() -> void:
 	metti_barca(_ormeggio_iniziale)
 
 
+## 2026-11-14: la barca ha tre disegni (di fianco, di prua "barca_su", di poppa "barca_giu"): segue lo sguardo di
+## chi rema. Di fianco il disegno guarda a sinistra e si specchia verso destra.
+func _gira_barca(f: Vector2) -> void:
+	var spr: Sprite2D = _barca.get_node("Disegno")
+	var nome: String = "barca"
+	if absf(f.y) > absf(f.x):
+		nome = "barca_su" if f.y < 0.0 else "barca_giu"
+	if not (dati["sprite"] as Dictionary).has(nome):
+		nome = "barca"
+	if nome == "barca" and f.x != 0.0:
+		spr.flip_h = f.x > 0.0
+	if str(spr.get_meta("disegno", "barca")) == nome:
+		return
+	var meta: Dictionary = dati["sprite"][nome]
+	spr.set_meta("disegno", nome)
+	spr.texture = _texture_oggetto(nome)
+	spr.flip_h = spr.flip_h and nome == "barca"
+	spr.offset = Vector2(-float(meta.get("ax", 0)), -float(meta.get("ay", 0)) + tile * 0.25)
+
+
 ## US-8B20d: la nave della base (mezzi.json "nave"), ormeggiata e ferma: nell'acqua vicina al luogo un tratto largo
 ## quanto lei (NAVE_CASELLE x 2 caselle) con terra libera accanto, a sud (davanti, si vede) o se no a nord, collegata
 ## a piedi al resto della terra (_a_terra); su quella terra la passerella e' la porta verso il suo interno.
@@ -1194,8 +1214,7 @@ func _aggiorna_barca(p: Node2D) -> void:
 	if in_barca():
 		_barca.position = p.position - Vector2(0, 0.5)
 		var f: Vector2 = p.call("get_facing") if p.has_method("get_facing") else Vector2.LEFT
-		if f.x != 0.0:
-			(_barca.get_node("Disegno") as Sprite2D).flip_h = f.x > 0.0
+		_gira_barca(f)
 		var c := Vector2i(floori(p.position.x / tile), floori(p.position.y / tile))
 		prompt.visible = _costa_vicina(c).x >= 0
 		prompt.text = tr("HUD_PROMPT_SCENDI_BARCA").format({"tasto": _tasto_interagisci()})
