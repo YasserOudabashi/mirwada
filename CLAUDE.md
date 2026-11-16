@@ -432,8 +432,10 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   (US-1501..1507, US-1601..1605, US-1701..1704). Servono per giocare tutto il gioco: oggi ogni nemico e' `nemico_base`
   ingrandito, non c'e' nessun file audio, e nessuno ha giocato una partita intera fino al finale.
 
-**Lavoro corrente** (aggiornato il 2026-11-11): tutto il lavoro che manca e' in `prd.json` (64 story aperte, con la
-fase e la priorita'), l'ordine in `006_PRD/prossimi-passi.md`: **Atto II e III** (fatte US-1301 e US-1302, si riparte da US-8B60b), nemici e boss,
+**Lavoro corrente** (aggiornato il 2026-11-16): tutto il lavoro che manca e' in `prd.json` (58 story aperte, con la
+fase e la priorita'), l'ordine in `006_PRD/prossimi-passi.md`: **Atto II e III** (Atto II chiuso: fatte US-1301..1309 e
+US-8B60b; restano i rituali nel mondo US-1305b/c/d, che aspettano le regole dall'utente, poi US-1310..1313), nemici e boss
+(bestiario deciso dall'utente: `prd-fasi-15-17-gioco-completo.md` 2.1),
 audio, Mondo vivo, fusioni, rilascio (qui il gioco e' finito in italiano), poi rifiniture d'arte e inglese.
 
 ## Decisioni prese
@@ -480,6 +482,10 @@ audio, Mondo vivo, fusioni, rilascio (qui il gioco e' finito in italiano), poi r
   la regione finale, **si entra dalla Sequenza 4 in poi** (4..0: l'Atto III e la prova finale sono li'); **Fool, Error
   e Door entrano sempre** perche' e' la loro regione di casa (`regions.json` gating `gruppo_di_casa`): li' hanno
   ingredienti e rituali fin dalla Sequenza 8.
+- **Rituali** (2026-11-16): dalla Sequenza 4 in giu' la pozione si prepara come sempre ma **si beve solo dentro il
+  rituale**, nel luogo e all'ora giusti (dura, si puo' interrompere). Dei luoghi indicati da un rituale **ne basta uno**.
+  I sacrifici si pagano **davvero dove il gioco ha un costo** (Ancora, oggetto, salute o spiritualita' massima, base);
+  gli altri sono una scelta scritta che si conferma nel rituale. I luoghi mancanti si aggiungono senza rigenerare la mappa.
 - **Bersaglio delle abilita'** (2026-11-03): le primitive che colpiscono un altro (maledizione, possessione, anima
   recisa, debuff, danno nel tempo, paura) cadono sul **nemico piu' vicino davanti** (`balance.json
   combattimento.bersaglio`); **senza nemico l'abilita' non parte e non costa**. I costi voluti su di se' sono

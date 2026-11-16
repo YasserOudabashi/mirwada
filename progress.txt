@@ -1305,3 +1305,9 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   data/anchors.json) e un'Ancora persa esce dalle Ancore dell'NPC. I salvataggi vecchi non si aggiornano da soli.
 - tests/test_atto_3_dialoghi.gd (8). 1128 test, validate 0. Schermo: i tre nodi lunghi stanno nella facciata, le
   risposte su tre righe non si sovrappongono. arte/revisione/atto_3_scene.png.
+
+## Bestiario e rituali: decisioni dell'utente, 2026-11-16
+- Le 20 risposte del questionario (11 novembre) sono in 006_PRD/prd-fasi-15-17-gioco-completo.md 2.1: regole, i 36
+  tipi per regione, la proposta dei 6 boss e dei 2 segreti (da confermare). Due idee cambiate per la Nota IP.
+- Rituali (chiesto oggi): pozione dentro il rituale; basta uno dei luoghi; sacrifici a costo vero dove esiste.
+  Scritto in CLAUDE.md "Decisioni prese". CLAUDE.md e prossimi-passi.md aggiornati. Disiscritto dalla PR #11.
