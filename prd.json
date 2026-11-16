@@ -1215,8 +1215,8 @@
       ],
       "priority": 56,
       "fase": "13",
-      "passes": false,
-      "notes": "Trovata il 2026-11-16 col controllo di US-1305. Serve prima di US-1310 e US-1311."
+      "passes": true,
+      "notes": "FATTA 2026-11-16 con la decisione dell'utente (costo vero dove c'e'). balance.json rituale.sacrifici: per ognuno dei 33 il tipo di costo (ancora, flag, oggetto, equip, struttura, salute, follia, fondamenta). RitualSystem: costo(), pagabile(), offri(), _paga() a fine rituale; i sacrifici scelti dal giocatore si offrono dal libro (bottone Offri, spento se non hai di che pagare). I sigilli dei rituali sono oggetti dello zaino che non si consumano: 5 nuovi + l'arma spezzata in data/items/materiali.json, venduti da Greta (Marche) e Dario (Archivio). Equipment.distruggi_slot. tests/test_ritual.gd (+3). Schermo: arte/revisione/rituale_sacrifici.png. Aperto: il pet non si puo' ancora avere nel gioco, quindi i sacrifici che parlano di creature pesano sulla follia; i sigilli si comprano soltanto."
     },
     {
       "id": "US-1307",

@@ -55,10 +55,14 @@ func test_prerequisiti_dal_rituale_dei_dati() -> void:
 
 	rs.imposta_luogo(rit["location_tags"])
 	rs.imposta_tempo(str(rit.get("momento", "")), str(rit.get("fase_lunare", "")))
-	for sig in rit["sigils"]:
-		rs.aggiungi_sigillo(sig)
+	var inv: Node = Engine.get_main_loop().root.get_node("Inventory")
+	inv.call("pulisci")
+	for sig in rit["sigils"]:                      # US-1305d: il sigillo e' un oggetto dello zaino
+		inv.call("aggiungi", sig, 1)
+	assert_false(rs.offri(rit["sacrifices"][0]), "senza l'arma spezzata il sacrificio non si puo' offrire")
+	inv.call("aggiungi", "arma_spezzata", 1)
 	for sac in rit["sacrifices"]:
-		rs.fornisci_sacrificio(sac)
+		assert_true(rs.offri(sac), "con l'oggetto nello zaino si offre")
 	var pre2: Dictionary = rs.prerequisiti(rit)
 	assert_true(pre2["ok"], "tutti i prerequisiti soddisfatti: %s" % pre2.get("mancanti"))
 
@@ -175,10 +179,13 @@ func _pronto_alla_4() -> Dictionary:
 		else:
 			dati["quantita"] = float((a as Dictionary).get("target", 1))
 			_et().call("emit_event", ev, dati)
+	var inv: Node = _root().get_node("Inventory")
+	inv.call("pulisci")
 	for s in rituale.get("sigils", []):
-		_rs().call("aggiungi_sigillo", s)
+		inv.call("aggiungi", s, 1)
+	inv.call("aggiungi", "arma_spezzata", 1)
 	for s in rituale.get("sacrifices", []):
-		_rs().call("fornisci_sacrificio", s)
+		_rs().call("offri", s)
 	return rituale
 
 
@@ -234,6 +241,10 @@ func test_compiere_il_rituale_nel_posto_giusto_fa_avanzare() -> void:
 	rs.call("_process", 500.0)
 	assert_eq(_prog().call("sequence"), 3, "finito il rituale la pozione e' bevuta: Sequenza 3")
 	assert_true((_root().get_node("PotionSystem").call("pozione_pronta") as Dictionary).is_empty(), "la pozione e' consumata")
+	var inv: Node = _root().get_node("Inventory")
+	assert_eq(int(inv.call("conta", "arma_spezzata")), 0, "il sacrificio e' pagato: l'arma spezzata non c'e' piu'")
+	for s in rituale.get("sigils", []):
+		assert_eq(int(inv.call("conta", s)), 1, "il sigillo resta")
 	_fine_mondo()
 
 
@@ -242,3 +253,48 @@ func test_senza_pozione_il_rituale_non_si_compie() -> void:
 	_root().get_node("PotionSystem").call("scarta_pozione")
 	assert_eq(str(_rs().call("compi").get("reason", "")), "manca_la_pozione", "prima la pozione")
 	_fine_mondo()
+
+
+# --- US-1305d: come si pagano i sacrifici ---
+
+func test_ogni_sacrificio_dei_rituali_ha_il_suo_costo() -> void:
+	for pid in _gd().call("pathway_ids"):
+		for s in _gd().call("get_pathway", pid).get("sequences", []):
+			var r: Variant = (s as Dictionary).get("advancement_ritual")
+			if r is Dictionary:
+				for sac in (r as Dictionary).get("sacrifices", []):
+					assert_false((_rs().call("costo", str(sac)) as Dictionary).is_empty(), "%s: costo di '%s' nei dati" % [(s as Dictionary).get("id"), sac])
+
+
+func test_un_sacrificio_scritto_pesa_sulla_mente_solo_se_offerto() -> void:
+	var rs: Node = _rs()
+	_recita_seq9()
+	var r := {"location_tags": [], "sacrifices": ["un_ricordo_a_cui_tenevi"], "sigils": []}
+	assert_false(rs.prerequisiti(r)["ok"], "finche' il giocatore non lo offre, manca")
+	assert_true(rs.offri("un_ricordo_a_cui_tenevi"), "lo conferma dal libro")
+	var prima: float = _m().call("valore")
+	rs.avvia(r)
+	rs.call("_process", 500.0)
+	assert_gt(float(_m().call("valore")), prima, "finito il rituale il ricordo e' dato: la follia sale")
+	assert_false(rs.prerequisiti(r)["ok"], "e per un altro rituale andrebbe offerto di nuovo")
+
+
+func test_l_armatura_sacrificata_va_distrutta() -> void:
+	var rs: Node = _rs()
+	var inv: Node = Engine.get_main_loop().root.get_node("Inventory")
+	var eq: Node = Engine.get_main_loop().root.get_node("Equipment")
+	inv.call("pulisci")
+	eq.call("pulisci")
+	var sac := "armatura_indossata_per_100_battaglie"
+	assert_false(rs.offri(sac), "senza armatura addosso non si offre")
+	var armatura: String = "corazza_cuoio"                       # un'armatura di data/items/equip.json
+	var creati: Array = inv.call("aggiungi", armatura, 1)
+	eq.call("equipaggia", str(creati[0]))
+	assert_true(rs.offri(sac), "con l'armatura addosso si'")
+	_recita_seq9()
+	rs.avvia({"location_tags": [], "sacrifices": [sac], "sigils": []})
+	rs.call("_process", 500.0)
+	assert_true((eq.call("equipaggiato", "armatura") as Dictionary).is_empty(), "l'armatura non e' piu' addosso")
+	assert_eq(int(inv.call("conta", armatura)), 0, "ne' nello zaino")
+	inv.call("pulisci")
+	eq.call("pulisci")

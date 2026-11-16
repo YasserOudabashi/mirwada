@@ -1343,3 +1343,24 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Schermo (Xvfb, Fool alla Sequenza 4): la porta del teatro sulla mappa, dentro la zona e' "teatro" e la riga del
   luogo del rituale ha il segno. arte/revisione/teatro_frontiera.png. Non mi convince: da fuori il teatro e' solo una
   porta di pietra, non un edificio; il passo tra le rupi resta sul bordo della regione.
+
+## US-1305d: i sacrifici e i sigilli dei rituali, 2026-11-16
+- Decisione dell'utente: costo vero dove il gioco ne ha uno, gli altri una scelta scritta che si conferma.
+- Dati: data/balance.json rituale.sacrifici, una voce per ognuno dei 33 sacrifici. Costi veri: una tua Ancora
+  (distrutta), il detentore della Sequenza 0 (flag tribolazione_soglia_varcata), l'arma spezzata (oggetto nuovo),
+  l'armatura e lo strumento migliore (cio' che indossi, distrutto), una struttura costruita (distrutta), il sangue
+  (meta' della salute di adesso), tutta la fortuna (tutte le monete). Gli altri pesano su follia (4-15) o fondamenta
+  (-6..-10).
+- Oggetti nuovi in data/items/materiali.json: arma_spezzata e i 5 sigilli dei rituali (guardiano, argenteo, declino,
+  mano, autorita'); venduti da Greta e Dario (roster.json). Icone: python tools/art/build_icone.py (sigillo_viola,
+  spada_ferro: forme gia' esistenti, nessun disegno nuovo).
+- Codice: scripts/ritual_system.gd costo(), pagabile(), offri(), _paga() (alla fine del rituale; un sacrificio dato
+  va offerto di nuovo la volta dopo); un sigillo c'e' se e' nello zaino. scripts/equipment.gd distruggi_slot().
+  Libro: accanto a ogni sacrificio che cosa costa, e il bottone "Offri" (spento, "Non hai di che offrirlo").
+- tests/test_ritual.gd (+3): ogni sacrificio dei 50 rituali ha il suo costo; uno scritto pesa sulla follia solo se
+  offerto; l'armatura sacrificata sparisce. 1138 test, validate 0.
+- Schermo (Xvfb, Sequenza 4): senza oggetti il bottone e' spento; con sigillo e arma nello zaino si offre; sul campo
+  di battaglia all'alba il rituale si compie: Sequenza 3, arma spezzata consumata, sigillo rimasto.
+  arte/revisione/rituale_sacrifici.png.
+- Non mi convince: i sigilli e l'arma spezzata si comprano e basta (meglio trovarli: forzieri, nemici della fase 15);
+  i sacrifici "di creature" sono solo follia perche' il pet non si puo' ancora avere nel gioco.

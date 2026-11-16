@@ -312,8 +312,19 @@ func _sezione_rituale(gd: Node, rs: Node, rituale: Dictionary, pozione_pronta: b
 		var nomi: Array = []
 		for id in ids:
 			nomi.append(_etichetta(str(r["tipo"]), str(id)))
-		_vbox.add_child(_riga("%s %s: %s" % ["✓" if bool(r["ok"]) else "·",
-			tr("BOOK_DIAGRAMMA_RITUALE_" + str(r["tipo"]).to_upper()), (" " + tr("BOOK_DIAGRAMMA_RITUALE_O") + " ").join(nomi)]))
+		var testo: String = "%s %s: %s" % ["✓" if bool(r["ok"]) else "·",
+			tr("BOOK_DIAGRAMMA_RITUALE_" + str(r["tipo"]).to_upper()), (" " + tr("BOOK_DIAGRAMMA_RITUALE_O") + " ").join(nomi)]
+		var costo: String = _etichetta("costo", str((r as Dictionary).get("costo", "")))
+		if (r as Dictionary).has("costo") and costo != str(r["costo"]):
+			testo += " (%s)" % costo                           # US-1305d: che cosa costa
+		_vbox.add_child(_riga(testo))
+		if bool((r as Dictionary).get("da_offrire", false)) and not bool(r["ok"]):
+			var b_offri := Button.new()                        # la scelta scritta che il giocatore conferma
+			b_offri.name = "Offri_" + str(r["id"])
+			b_offri.text = tr("BOOK_DIAGRAMMA_RITUALE_OFFRI") if bool(r["pagabile"]) else tr("BOOK_DIAGRAMMA_RITUALE_NON_HAI")
+			b_offri.disabled = not bool(r["pagabile"])
+			b_offri.pressed.connect(offri_sacrificio.bind(str(r["id"])))
+			_vbox.add_child(b_offri)
 		tutto = tutto and bool(r["ok"])
 	var acting: Node = _n("/root/Acting")
 	tutto = tutto and acting != null and bool(acting.call("e_completo"))
@@ -324,6 +335,13 @@ func _sezione_rituale(gd: Node, rs: Node, rituale: Dictionary, pozione_pronta: b
 	b.disabled = not tutto or bool(rs.call("in_corso"))
 	b.pressed.connect(compi_rituale)
 	_vbox.add_child(b)
+
+
+func offri_sacrificio(id: String) -> bool:
+	var rs: Node = _n("/root/RitualSystem")
+	var ok: bool = rs != null and bool(rs.call("offri", id))
+	aggiorna()
+	return ok
 
 
 ## Compie il rituale e chiude il libro: il rituale dura, e intanto Enel si vede (e si puo' colpire).

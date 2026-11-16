@@ -889,7 +889,10 @@
           "acqua_sorgiva",
           "filo_di_lana_rossa",
           "gesso_consacrato",
-          "pergamena_vigore"
+          "pergamena_vigore",
+          "arma_spezzata",
+          "sigillo_del_guardiano",
+          "sigillo_del_declino"
         ]
       },
       "dialogue_id": "dlg_greta",
@@ -937,7 +940,10 @@
         "listino": [
           "acqua_sorgiva",
           "pergamena_hermit",
-          "ambrosia"
+          "ambrosia",
+          "sigillo_argenteo",
+          "sigillo_della_mano",
+          "sigillo_dell_autorita"
         ]
       },
       "dialogue_id": "dlg_dario",

@@ -275,6 +275,29 @@
         "una_teoria_a_cui_tenevi_dimostrata_falsa_da_te_stesso": {
           "name_i18n": "ritual.sacrificio.una_teoria_a_cui_tenevi_dimostrata_falsa_da_te_stesso"
         }
+      },
+      "costo": {
+        "ancora": {
+          "name_i18n": "ritual.costo.ancora"
+        },
+        "oggetto": {
+          "name_i18n": "ritual.costo.oggetto"
+        },
+        "equip": {
+          "name_i18n": "ritual.costo.equip"
+        },
+        "struttura": {
+          "name_i18n": "ritual.costo.struttura"
+        },
+        "salute": {
+          "name_i18n": "ritual.costo.salute"
+        },
+        "follia": {
+          "name_i18n": "ritual.costo.follia"
+        },
+        "fondamenta": {
+          "name_i18n": "ritual.costo.fondamenta"
+        }
       }
     },
     "voltata_ms": 350,

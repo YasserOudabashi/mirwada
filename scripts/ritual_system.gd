@@ -108,10 +108,15 @@ func richieste(rituale: Dictionary) -> Array:
 	var fase: Variant = rituale.get("fase_lunare")
 	if fase != null:
 		out.append({"tipo": "fase_lunare", "id": str(fase), "ok": str(fase) == _fase_ora()})
-	for s in rituale.get("sigils", []):
-		out.append({"tipo": "sigillo", "id": str(s), "ok": _sigilli.has(s)})
+	var inv: Node = get_node_or_null("/root/Inventory")
+	for s in rituale.get("sigils", []):          # US-1305d: un sigillo e' un oggetto dello zaino (non si consuma)
+		out.append({"tipo": "sigillo", "id": str(s),
+			"ok": _sigilli.has(s) or (inv != null and int(inv.call("conta", str(s))) >= 1)})
 	for sac in rituale.get("sacrifices", []):
-		out.append({"tipo": "sacrificio", "id": str(sac), "ok": _sacrificio_disponibile(str(sac))})
+		var c: Dictionary = costo(str(sac))
+		out.append({"tipo": "sacrificio", "id": str(sac), "ok": _sacrificio_disponibile(str(sac)),
+			"costo": str(c.get("tipo", "")), "pagabile": pagabile(str(sac)),
+			"da_offrire": str(c.get("tipo", "")) not in ["ancora", "flag"]})
 	return out
 
 
@@ -219,14 +224,8 @@ func _completa() -> void:
 	var rituale: Dictionary = _rituale
 	_rituale = {}
 
-	# consuma i sacrifici modellati (l'Ancora)
-	for sac in rituale.get("sacrifices", []):
-		if str(sac) == SACRIFICIO_ANCORA:
-			var anc: Node = get_node_or_null("/root/AnchorSystem")
-			if anc != null:
-				var attive: Array = anc.call("active")
-				if not attive.is_empty():
-					anc.call("destroy", attive[0])
+	for sac in rituale.get("sacrifices", []):       # US-1305d: ogni sacrificio si paga col suo costo
+		_paga(str(sac))
 
 	# US-1305b: se c'e' la pozione pronta la si beve adesso, dentro il rituale (e' lei che fa avanzare e da' il
 	# bonus della recitazione); senza PotionSystem o senza pozione (rituali simulati) si avanza come prima.
@@ -252,11 +251,88 @@ func _completa() -> void:
 
 # --- Interno ----------------------------------------------------------
 
+## US-1305d: un sacrificio c'e' quando si puo' pagare e, se e' una scelta del giocatore, quando l'ha offerto
+## (offri, dal libro). L'Ancora e le cose gia' fatte (flag) non si offrono: ci sono o non ci sono.
 func _sacrificio_disponibile(sac: String) -> bool:
+	var tipo: String = str(costo(sac).get("tipo", ""))
+	if tipo in ["ancora", "flag"]:
+		return pagabile(sac)
+	return _sacrifici_forniti.has(sac) and pagabile(sac)
+
+
+## Come si paga un sacrificio (balance.json rituale.sacrifici); {} = non descritto, lo dichiara chi chiama.
+func costo(sac: String) -> Dictionary:
 	if sac == SACRIFICIO_ANCORA:
-		var anc: Node = get_node_or_null("/root/AnchorSystem")
-		return anc != null and not (anc.call("active") as Array).is_empty()
-	return _sacrifici_forniti.has(sac)
+		return {"tipo": "ancora"}
+	var c: Variant = (_balance().get("sacrifici", {}) as Dictionary).get(sac)
+	return c if c is Dictionary else {}
+
+
+## Il giocatore ha di che pagarlo adesso?
+func pagabile(sac: String) -> bool:
+	var c: Dictionary = costo(sac)
+	match str(c.get("tipo", "")):
+		"ancora":
+			var anc: Node = get_node_or_null("/root/AnchorSystem")
+			return anc != null and not (anc.call("active") as Array).is_empty()
+		"flag":
+			var ks: Node = get_node_or_null("/root/KnowledgeStore")
+			return ks != null and bool(ks.call("conosce", str(c.get("id", ""))))
+		"oggetto":
+			var inv: Node = get_node_or_null("/root/Inventory")
+			return inv != null and int(inv.call("conta", str(c.get("item_id", "")))) >= 1
+		"equip":
+			var eq: Node = get_node_or_null("/root/Equipment")
+			return eq != null and not (eq.call("equipaggiato", str(c.get("slot", ""))) as Dictionary).is_empty()
+		"struttura":
+			var sr: Node = get_node_or_null("/root/StructureRegistry")
+			return sr != null and int(sr.call("conta")) >= 1
+	return true                                   # salute, follia, fondamenta, non descritto: si puo' sempre
+
+
+## Il giocatore offre un sacrificio (la scelta scritta che conferma nel libro). false se non puo' pagarlo.
+func offri(sac: String) -> bool:
+	if not pagabile(sac):
+		return false
+	fornisci_sacrificio(sac)
+	return true
+
+
+## Paga un sacrificio alla fine del rituale.
+func _paga(sac: String) -> void:
+	var c: Dictionary = costo(sac)
+	match str(c.get("tipo", "")):
+		"ancora":
+			var anc: Node = get_node_or_null("/root/AnchorSystem")
+			if anc != null and not (anc.call("active") as Array).is_empty():
+				anc.call("destroy", (anc.call("active") as Array)[0])
+		"oggetto":
+			var inv: Node = get_node_or_null("/root/Inventory")
+			if inv != null:
+				var iid: String = str(c.get("item_id", ""))
+				inv.call("rimuovi", iid, int(inv.call("conta", iid)) if bool(c.get("tutti", false)) else 1)
+		"equip":
+			var eq: Node = get_node_or_null("/root/Equipment")
+			if eq != null:
+				eq.call("distruggi_slot", str(c.get("slot", "")))
+		"struttura":
+			var sr: Node = get_node_or_null("/root/StructureRegistry")
+			if sr != null and int(sr.call("conta")) >= 1:
+				sr.call("distruggi", str((sr.call("attive") as Array)[0]["id"]), true)
+		"salute":
+			var p: Node = get_tree().get_first_node_in_group("player")
+			var st: Node = p.get_node_or_null("StatsComponent") if p != null else null
+			if st != null:
+				st.set("hp", maxf(1.0, float(st.get("hp")) * (1.0 - float(c.get("frazione", 0.0)))))
+		"follia":
+			var m: Node = get_node_or_null("/root/Madness")
+			if m != null:
+				m.call("add", float(c.get("quantita", 0.0)), "sacrificio", false)
+		"fondamenta":
+			var f: Node = get_node_or_null("/root/Foundation")
+			if f != null:
+				f.call("applica", float(c.get("delta", 0.0)), "sacrificio")
+	_sacrifici_forniti.erase(sac)                  # dato una volta: il prossimo rituale lo richiede di nuovo
 
 
 func _durata_build() -> float:
