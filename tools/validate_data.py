@@ -1383,6 +1383,17 @@ def main():
         if _fn.endswith(".json"):
             for _it in (load_json(os.path.join(DATA, "items", _fn)) or {}).get("items", []):
                 _items_tutti[_it.get("id")] = _it
+    # data/audio_fonti.json (2026-11-14): ogni suono di audio.json ha una voce; uno "scaricato" ha il file e la licenza
+    _fonti = (load_json(os.path.join(DATA, "audio_fonti.json")) or {}).get("suoni", {})
+    import re as _re
+    for _sid in sorted(set(_re.findall(r'"((?:sfx|mus|amb)_[a-z_0-9]+)"', json.dumps(load_json(os.path.join(DATA, "audio.json")) or {})))):
+        if _sid not in _fonti:
+            err(f"data/audio_fonti.json: manca la voce di '{_sid}' (scaricato, da_scegliere o da_generare)")
+    for _sid, _v in _fonti.items():
+        if _v.get("stato") not in ("scaricato", "da_scegliere", "da_generare"):
+            err(f"data/audio_fonti.json [{_sid}]: stato '{_v.get('stato')}' fuori vocabolario")
+        if _v.get("stato") == "scaricato" and not (os.path.exists(os.path.join(ROOT, _v.get("file", "x"))) and _v.get("licenza") and _v.get("pagina")):
+            err(f"data/audio_fonti.json [{_sid}]: scaricato ma senza file, licenza o pagina")
     _volo = _mezzi.get("volo") or {}                        # 2026-11-11: costi del volo e Pathway che volano per natura
     for _k in ("costo_decollo", "costo_al_secondo", "velocita_esausto"):
         if not isinstance(_volo.get(_k, 0), (int, float)) or _volo.get(_k, 0) < 0:

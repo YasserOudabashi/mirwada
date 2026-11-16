@@ -1186,3 +1186,19 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Guardata ingrandita x6 su fondo acqua e su fondo chiaro; nel gioco (Xvfb) remando a sinistra, in su e in giu':
   arte/revisione/barca_tre_direzioni.png. Non mi convince ancora: di prua e di poppa la barca e' corta (schiacciata
   dall'inclinazione della vista) e Enel in ginocchio la copre quasi tutta.
+
+## Audio: ricerca e primi suoni veri, 2026-11-14 (decisione dell'utente: gratis dove ci sono, il resto da generare)
+- Rete: kenney.nl e opengameart.org aggiunti agli host dell'ambiente "Ivan" (approvato dall'utente). kenney.nl da'
+  la pagina ma lo zip sta dietro uno script: gli stessi pacchetti si prendono da opengameart.org/sites/default/files/.
+- Pacchetti CC0 scaricati (fuori dal repo): RPGsounds_Kenney.zip (50 suoni), kenney_interfaceSounds.zip (100),
+  rpg_sound_pack.zip di artisticdude (95 wav: battaglia, inventario, versi di mostri), piu' tre ambienti singoli.
+- Nel repo: assets/audio/<id>.ogg|.wav (27 file, 7,8 MB) e data/audio_fonti.json: per ognuno dei 62 suoni di
+  audio.json (+2 del libro) lo stato: 27 scaricati (autore, licenza, pagina, file originale), 36 da_scegliere (26
+  musiche e 10 ambienti di regione, con i candidati), 1 da_generare (sfx_breath). "riserva": cosa c'e' gia' nei
+  pacchetti per US-1604 e per i versi dei nemici.
+- scripts/audio_manager.gd _stream_per: se esiste assets/audio/<id>.ogg|.wav lo usa (gli amb_* in ciclo), altrimenti
+  il bip di prova. Il validator vuole una voce per ogni suono e file + licenza per gli scaricati. tests/test_audio.gd (+1).
+- NON ascoltati: qui non c'e' modo di sentire l'audio, i file sono scelti dal nome (knifeSlice = colpo leggero, chop =
+  colpo pesante, shade = sussurri...). Vanno ascoltati nel gioco dall'utente; per cambiarne uno basta sostituire il
+  file e la voce in audio_fonti.json. La musica non suona ancora: manca il lettore (US-1602).
+- 1111 test, validate 0.
