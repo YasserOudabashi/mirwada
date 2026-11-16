@@ -1131,8 +1131,8 @@
       ],
       "priority": 53,
       "fase": "13",
-      "passes": false,
-      "notes": "Trovata il 2026-11-16 facendo US-1303."
+      "passes": true,
+      "notes": "FATTA 2026-11-16. Il Diario c'era gia' come sezione della pagina inventario (US-616b); le pagine Diario e Sinergie del libro erano due appunti a matita. Ora in book.json sono tipo inventario con 'sezione': book_overlay la passa a apri_sezione(). Il segnalibro del Diario porta alle quest. tests/test_book.gd, test_book_overlay.gd (+1). Schermo: arte/revisione/diario_quest.png. 1117 test."
     },
     {
       "id": "US-1304",

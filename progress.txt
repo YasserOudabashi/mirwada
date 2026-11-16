@@ -1236,3 +1236,13 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   porto: reputazione porto 25, Ordine -15. arte/revisione/quest_fazione.png.
 - Trovato: la pagina Diario del libro e' ancora l'appunto a matita ("si aprira' piu' avanti"): le quest non si
   vedono da nessuna parte. Story nuova US-1303b. Anche il registro delle sinergie e' bianco (da decidere quando).
+
+## US-1303b: il Diario e le Sinergie del libro non sono piu' pagine bianche, 2026-11-16
+- Il Diario delle quest e il registro delle sinergie esistevano gia' come sezioni della pagina inventario; le due
+  pagine del libro con quel nome (e il segnalibro "Diario") portavano all'appunto a matita.
+- data/ui/book.json: le due pagine sono tipo "inventario" con "sezione"; scripts/book_overlay.gd la passa alla
+  pagina (apri_sezione) prima di disegnarla; page_inventario.gd apri_sezione(). Nessun tipo di pagina nuovo.
+- tests: test_book (le due pagine sono aperte e dicono la sezione), test_book_overlay (+1: il Diario mostra la quest
+  in corso; la regola della pagina bianca si prova chiudendo una pagina a una fase lontana). 1117 test, validate 0.
+- Schermo (Xvfb): Diario con "Carte che camminano" in corso e i suoi due passi; dopo la scelta "Carte che restano"
+  completata e "Carte che camminano" fallita. arte/revisione/diario_quest.png.
