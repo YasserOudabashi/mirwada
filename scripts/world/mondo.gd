@@ -1660,8 +1660,7 @@ func crea_npc() -> void:
 				continue
 			var q: Vector2i = cella_libera(c, occupate, str(id))
 			occupate[q] = true
-			var asp: Variant = gd.call("get_npc", str(id)).get("aspetto", {})
-			var aspetto: String = str((asp as Dictionary).get("sprite", "")) if asp is Dictionary else ""
+			var aspetto: String = str(gd.call("aspetto_npc", str(id)))      # US-8B60b: la Soglia ha il volto del suo Pathway
 			add_child(_npc(str(id), Vector2((q.x + 0.5) * tile, (q.y + 0.5) * tile), aspetto))
 
 

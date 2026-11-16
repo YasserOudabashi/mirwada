@@ -1202,3 +1202,21 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   colpo pesante, shade = sussurri...). Vanno ascoltati nel gioco dall'utente; per cambiarne uno basta sostituire il
   file e la voce in audio_fonti.json. La musica non suona ancora: manca il lettore (US-1602).
 - 1111 test, validate 0.
+
+## US-8B60b: gli antagonisti hanno la loro figura, 2026-11-16
+- Brief: 10 figure umane a 64 px come gli NPC, una per Pathway, id neutri soglia_01..10 (ordine di antagonisti.json:
+  twilight_giant, death, darkness, moon, mother, hermit, paragon, door, error, fool); idle e walk; ritratto 64x80.
+- Comandi: python tools/art/build_npc.py ; python tools/art/build_ritratti.py (stesso seed degli altri aspetti; i
+  fogli degli aspetti di prima sono usciti identici). build_ritratti: i cappelli alti possono uscire dall'alto del
+  ritratto (l'assert ora vuole solo che la testa ci stia).
+- Dati: data/lore/antagonisti.json "aspetto" per antagonista; data/npc/roster.json npc_antagonista
+  "da_antagonista": true. Codice: GameData.aspetto_npc(npc_id) (l'aspetto dell'antagonista del Pathway del
+  giocatore), usato da mondo.crea_npc, interior_scene e GameData.ritratto. Nessun nome di Pathway nel codice.
+- Validator: ogni antagonista ha aspetto, fogli idle/walk e ritratto. tests/test_mondo.gd (+1).
+- Trovato guardando il dialogo: una scelta su due righe finiva sopra quella sotto. pagina_libro.gd a_capo() ora da'
+  al bottone l'altezza del testo a capo (vale per tutte le pagine del libro).
+- Schermo (Xvfb, Sequenza 1, notte fonda, Pathway twilight_giant / darkness / fool): alla soglia della Frontiera la
+  figura e il ritratto cambiano col Pathway, le tre scelte stanno una sotto l'altra. arte/revisione/soglia_antagonisti.png,
+  arte/revisione/ritratti.png.
+- Non mi convince ancora: soglia_02 col cappuccio ha il viso che e' una macchia scura; soglia_02 e soglia_03 si
+  somigliano (tutte e due scure e incappucciate). 1112 test, validate 0.

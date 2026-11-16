@@ -786,7 +786,8 @@
       "memoria": {},
       "aspetto": {
         "variante": 0,
-        "sprite": "soglia"
+        "sprite": "soglia",
+        "da_antagonista": true
       }
     },
     {

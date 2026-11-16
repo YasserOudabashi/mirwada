@@ -773,8 +773,22 @@ func icona_primitiva(tipo: String) -> Texture2D:
 ## US-8B35: il ritratto di un NPC, dal suo aspetto (roster aspetto.sprite -> assets/ritratti/<aspetto>.png,
 ## tools/art/build_ritratti.py). null se l'NPC non ha aspetto o il ritratto non c'e'.
 func ritratto(npc_id: String) -> Texture2D:
-	var aspetto: String = str((get_npc(npc_id).get("aspetto", {}) as Dictionary).get("sprite", ""))
+	var aspetto: String = aspetto_npc(npc_id)
 	return null if aspetto.is_empty() else _icona_png("res://assets/ritratti/%s.png" % aspetto)
+
+
+## L'aspetto (sprite e ritratto) di un NPC: quello dei suoi dati, oppure, se l'aspetto ha "da_antagonista" (US-8B60b:
+## la Soglia), quello dell'antagonista del Pathway del giocatore (data/lore/antagonisti.json "aspetto"). "" se manca.
+func aspetto_npc(npc_id: String) -> String:
+	var asp: Variant = get_npc(npc_id).get("aspetto", {})
+	if not (asp is Dictionary):
+		return ""
+	if bool((asp as Dictionary).get("da_antagonista", false)):
+		var pr: Node = get_node_or_null("/root/Progression")
+		var suo: String = str(get_antagonista(str(pr.call("pathway")) if pr != null else "").get("aspetto", ""))
+		if not suo.is_empty():
+			return suo
+	return str((asp as Dictionary).get("sprite", ""))
 
 
 ## Ogni PNG delle icone si legge dal disco una volta sola (senza l'import dell'editor).

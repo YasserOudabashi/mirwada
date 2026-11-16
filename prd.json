@@ -1045,8 +1045,8 @@
       ],
       "priority": 52,
       "fase": "13",
-      "passes": false,
-      "notes": "Spostata nell'Atto II/III (2026-11-10): l'antagonista compare alla soglia della Frontiera (US-1302)."
+      "passes": true,
+      "notes": "FATTA 2026-11-16. Dieci aspetti soglia_01..10 in build_npc.ASPETTI (uno per Pathway, id neutri), fogli idle/walk e ritratti; antagonisti.json 'aspetto', roster npc_antagonista 'da_antagonista': GameData.aspetto_npc() sceglie quello del Pathway del giocatore (mondo, interni, ritratto). Validator: fogli e ritratto per ogni antagonista. Corretto anche l'altezza dei bottoni a capo (pagina_libro.a_capo). Schermo: arte/revisione/soglia_antagonisti.png. 1112 test."
     },
     {
       "id": "US-8B90",

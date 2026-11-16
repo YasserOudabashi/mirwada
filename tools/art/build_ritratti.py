@@ -61,7 +61,9 @@ def busto(rig, posa):
     dx, su = _testa(rig, posa)
     y0 = int(round(piedi * GRANDE - su * PPU)) - TESTA_Y
     x0 = int(round(W + dx * PPU)) - W // 2
-    assert y0 >= 0 and not tela[:y0, :, 3].any(), "il ritratto taglia la testa"
+    # US-8B60b: il cranio sta sempre dentro; un cappello alto (la punta del mago, il cimiero) puo' uscire dal bordo
+    # in alto, come in un ritratto vero. Prima un aspetto col cappello a punta non si poteva fare.
+    assert y0 >= 0, "il ritratto taglia la testa"
     return tela[y0:y0 + H, x0:x0 + W]
 
 

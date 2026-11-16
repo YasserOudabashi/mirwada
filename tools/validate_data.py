@@ -1394,6 +1394,12 @@ def main():
             err(f"data/audio_fonti.json [{_sid}]: stato '{_v.get('stato')}' fuori vocabolario")
         if _v.get("stato") == "scaricato" and not (os.path.exists(os.path.join(ROOT, _v.get("file", "x"))) and _v.get("licenza") and _v.get("pagina")):
             err(f"data/audio_fonti.json [{_sid}]: scaricato ma senza file, licenza o pagina")
+    # US-8B60b: ogni antagonista ha il suo aspetto, con i fogli e il ritratto
+    for _ant in (load_json(os.path.join(DATA, "lore", "antagonisti.json")) or {}).get("antagonisti", []):
+        _asp = _ant.get("aspetto", "")
+        if not _asp or not os.path.exists(os.path.join(ROOT, "assets", "placeholder", f"personaggio_{_asp}_idle.png")) \
+                or not os.path.exists(os.path.join(ROOT, "assets", "ritratti", f"{_asp}.png")):
+            err(f"data/lore/antagonisti.json [{_ant.get('id')}]: aspetto '{_asp}' senza fogli o ritratto (tools/art/build_npc.py, build_ritratti.py)")
     _volo = _mezzi.get("volo") or {}                        # 2026-11-11: costi del volo e Pathway che volano per natura
     for _k in ("costo_decollo", "costo_al_secondo", "velocita_esausto"):
         if not isinstance(_volo.get(_k, 0), (int, float)) or _volo.get(_k, 0) < 0:

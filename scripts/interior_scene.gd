@@ -457,6 +457,9 @@ func _crea_un_npc(id: String, gd: Node, posizione: Vector2) -> void:
 
 	var npc_dati: Dictionary = gd.call("get_npc", id)
 	var aspetto: Dictionary = npc_dati.get("aspetto", {})
+	if aspetto.has("sprite"):                           # US-8B60b: l'aspetto risolto (la Soglia cambia col Pathway)
+		aspetto = aspetto.duplicate()
+		aspetto["sprite"] = str(gd.call("aspetto_npc", id))
 	var foglio: String = "res://assets/placeholder/personaggio_%s_idle.png" % str(aspetto.get("sprite", ""))
 	if aspetto.has("sprite") and FileAccess.file_exists(foglio):
 		# l'aspetto sprite-forge dell'NPC (tools/art/build_npc.py), come nel mondo generato

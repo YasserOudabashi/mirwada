@@ -1079,3 +1079,31 @@ func test_la_barca_si_gira_con_chi_rema() -> void:
 	m.call("_gira_barca", Vector2.UP)
 	assert_false(spr.flip_h, "di prua non e' specchiata")
 	m.free()
+
+
+## US-8B60b: ogni antagonista ha la sua figura e il suo ritratto; la Soglia prende quelli del Pathway del giocatore.
+func test_la_soglia_ha_il_volto_dell_antagonista_del_pathway() -> void:
+	var prima: Dictionary = _pr().call("per_salvataggio")
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var ts: Node = Engine.get_main_loop().root.get_node("TimeSystem")
+	var visti: Dictionary = {}
+	for pid in gd.call("pathway_ids"):
+		_pr().call("configura", str(pid), 1)
+		var asp: String = str(gd.call("aspetto_npc", "npc_antagonista"))
+		assert_eq(asp, str(gd.call("get_antagonista", str(pid)).get("aspetto", "")), "%s: l'aspetto dei dati" % pid)
+		assert_false(visti.has(asp), "%s: un aspetto solo suo (%s)" % [pid, asp])
+		visti[asp] = true
+		assert_false(asp.contains(str(pid)), "il nome dell'aspetto non contiene il nome del Pathway")
+		assert_true(FileAccess.file_exists("res://assets/placeholder/personaggio_%s_idle.png" % asp), "%s: fogli" % asp)
+		assert_true(gd.call("ritratto", "npc_antagonista") != null, "%s: ritratto" % asp)
+	assert_eq(str(gd.call("aspetto_npc", "npc_mirco")), str(gd.call("get_npc", "npc_mirco")["aspetto"]["sprite"]),
+		"gli altri NPC tengono il loro aspetto")
+	_pr().call("configura", "death", 1)
+	ts.call("forza_momento", "notte_fonda")
+	var m: Node2D = _mondo()
+	m.call("crea_npc")
+	var a: Node2D = m.get_node_or_null("Npc_npc_antagonista")
+	assert_true(a != null and a.get_node("AnimationMachine").sprite_frames != null, "nel mondo, col suo disegno")
+	m.free()
+	ts.call("libera_momento")
+	_pr().call("da_salvataggio", prima)
