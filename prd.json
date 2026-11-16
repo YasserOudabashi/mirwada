@@ -1201,8 +1201,8 @@
       ],
       "priority": 56,
       "fase": "13",
-      "passes": false,
-      "notes": "Trovata il 2026-11-16 col controllo di US-1305. Serve prima di US-1310 e US-1311. 2026-11-16: il luogo 'passo_tra_rupi' (altura) sta su una casella al bordo della regione: chi ci arriva puo' risultare fuori regione, quindi senza zona."
+      "passes": true,
+      "notes": "FATTA 2026-11-16. Dentro un interno si e' nella sua zona (varco.zona, o 'zona' nei dati dell'interno: sotterraneo, archivio, officina, torre di osservazione, teatro); regions.json 'zone_anche' fa valere una zona anche come altri luoghi (Trono del Gigante = vetta, campo di battaglia = luogo di massacro, tempio = luogo in decadenza e rovina, altare di radici = radura lunare, Radice del Mondo = sorgente, sala dei sigilli = Biblioteca di Tutto, soglia = crocevia, nebbia = porta senza stanza, teatro = palco). Nuovo: il teatro abbandonato della Frontiera (interno frontiera_teatro, varco sempre aperto vicino all'approdo). Il validator vuole un posto per ogni luogo di ogni rituale. tests/test_luoghi_rituali.gd (2). Foto: arte/revisione/teatro_frontiera.png. Resta: il punto 'passo_tra_rupi' e' sul bordo della regione."
     },
     {
       "id": "US-1305d",

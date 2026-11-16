@@ -1375,6 +1375,38 @@ def main():
                             ROOT, "assets", "world", t, "oggetti", k + ".png")) for t in ("luminoso", "cupo")):
                         err(f"{ctx}: manca il disegno {k} (python tools/art/esporta_mondo.py --varchi)")
 
+    # US-1305c: ogni luogo chiesto da un rituale e' un posto dove il giocatore puo' stare: un luogo della mappa
+    # (luoghi_mondo o stesso nome), la zona di un varco, la "zona" di un interno, o una zona che vale anche come lui.
+    if mondo_doc is not None and regions_doc is not None:
+        _raggiungibili = set()
+        _zone_interni = set()
+        for _fn in os.listdir(interni_dir):
+            _zi = (load_json(os.path.join(interni_dir, _fn)) or {}).get("zona")
+            if _zi:
+                _zone_interni.add(_zi)
+        _nomi_luoghi = set(mondo_doc.get("luoghi", {})) | set(mondo_doc.get("sottosuolo", {}).get("boss", {}))
+        for reg in regions_doc.get("regions", []):
+            _alias = reg.get("luoghi_mondo") or {}
+            _qui = {(_alias.get(l, l)) for l in _nomi_luoghi} & set(reg.get("location_tags", []))
+            _qui |= {g["varco"]["zona"] for g in reg.get("gating", []) if g.get("varco", {}).get("zona")}
+            _qui |= _zone_interni & set(reg.get("location_tags", []))
+            for _z, _altri in (reg.get("zone_anche") or {}).items():
+                if _z not in reg.get("location_tags", []):
+                    err(f"data/world/regions.json [{reg.get('id')}]: zone_anche '{_z}' non e' tra i suoi location_tags")
+                for _a in _altri:
+                    if _a not in reg.get("location_tags", []):
+                        err(f"data/world/regions.json [{reg.get('id')}]: zone_anche '{_z}' -> '{_a}', che non e' tra i suoi location_tags")
+                if _z in _qui:
+                    _qui |= set(_altri)
+            _raggiungibili |= _qui
+        for _pf in sorted(os.listdir(os.path.join(DATA, "pathways"))):
+            for _s in (load_json(os.path.join(DATA, "pathways", _pf)) or {}).get("sequences", []):
+                _tags = (_s.get("advancement_ritual") or {}).get("location_tags") or []
+                for _t in _tags:
+                    if _t not in _raggiungibili:
+                        err(f"data/pathways/{_pf} [{_s.get('id')}]: il luogo '{_t}' del rituale non e' un posto del mondo "
+                            f"(regions.json luoghi_mondo / zone_anche, zona di un varco o di un interno)")
+
     # US-8B91: la barca parte ormeggiata vicino a un luogo del mondo generato
     _mezzi = load_json(os.path.join(DATA, "world", "mezzi.json")) or {}
     # US-8B93: la chiave del volo e' un oggetto che non si vende (venduto, si perderebbe il volo)

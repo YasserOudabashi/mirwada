@@ -692,7 +692,7 @@ func test_ogni_varco_e_un_ingresso_nella_sua_regione() -> void:
 				if o is Sprite2D:
 					var co: Vector2i = _cella(m, (o as Sprite2D).position)
 					assert_false(Rect2i(c.x - 3, c.y - 2, 7, 7).has_point(co), "spiazzo sgombro davanti a %s" % g["area"])
-	assert_eq(visti, 6, "sei sotto-aree con un varco")
+	assert_eq(visti, 7, "sette sotto-aree con un varco (la settima e' il teatro della Frontiera, US-1305c)")
 	m.free()
 
 

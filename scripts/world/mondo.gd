@@ -675,6 +675,17 @@ func entra(porta: Area2D) -> bool:
 	p.reparent(interno)                            # dentro la stanza: ordinato con gli arredi (y_sort)
 	interno.connect("uscita", func() -> void: esci.call_deferred())
 	_interno = interno
+	# US-1305c: dentro si e' nella zona dell'interno (quella del varco, o "zona" nei dati dell'interno): i rituali
+	# che chiedono una cripta o un teatro si compiono qui.
+	var ws: Node = get_node_or_null("/root/WorldState")
+	var gd: Node = get_node_or_null("/root/GameData")
+	var zona: String = str(((porta.get_meta("gate", {}) as Dictionary).get("varco", {}) as Dictionary).get("zona", ""))
+	if zona.is_empty() and gd != null:
+		zona = str((gd.call("get_interno", str(porta.get_meta("interno_id"))) as Dictionary).get("zona", ""))
+	if ws != null and not zona.is_empty():
+		if porta.has_meta("regione") and str(ws.call("regione_corrente")) != str(porta.get_meta("regione")):
+			ws.call("entra_regione", str(porta.get_meta("regione")))
+		ws.call("imposta_zona", zona)
 	p.global_position = interno.call("punto_spawn")
 	for cam in p.find_children("*", "Camera2D", true, false):
 		if cam.has_method("inquadra_stanza"):
@@ -698,6 +709,7 @@ func esci() -> void:
 			if cam.has_method("apply_zone_limits"):
 				cam.call("apply_zone_limits", Rect2(Vector2.ZERO, Vector2(larghezza, altezza) * tile))
 		colloca(p, _ritorno)
+		_cella_regione = Vector2i(-9999, -9999)          # fuori: la zona torna quella della mappa
 
 
 func in_un_interno() -> bool:

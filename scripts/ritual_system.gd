@@ -66,6 +66,15 @@ func _luoghi_ora() -> Array:
 	var zona: String = str(ws.call("zona_corrente")) if ws != null else ""
 	if not zona.is_empty() and not tags.has(zona):
 		tags.append(zona)
+	# US-1305c: una zona vale anche come altri luoghi (regions.json "zone_anche": il tempio abbandonato e' anche
+	# un luogo in decadenza).
+	var gd: Node = get_node_or_null("/root/GameData")
+	if ws != null and gd != null:
+		var anche: Dictionary = gd.call("get_region", str(ws.call("regione_corrente"))).get("zone_anche", {})
+		for t in tags.duplicate():
+			for altro in anche.get(t, []):
+				if not tags.has(altro):
+					tags.append(altro)
 	return tags
 
 

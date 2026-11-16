@@ -1327,3 +1327,19 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   rituale Sequenza 3 e compare la tribolazione successiva. arte/revisione/rituale_nel_mondo.png.
 - Scorciatoia della prova: sigillo e sacrificio dati a mano (US-1305d). Da sapere: 15 rituali su 50 chiedono
   un'eclissi, che nel gioco capita di rado (ogni 8 cicli di luna): va deciso se resta cosi'.
+
+## US-1305c: i luoghi dei rituali sono posti veri, 2026-11-16
+- La mappa non e' stata rigenerata. Tre modi, tutti nei dati:
+  1. dentro un interno si e' nella sua zona: mondo.gd entra() mette in WorldState la zona del varco (gating.varco.zona:
+     cripta, tempio abbandonato, altare di radici, grotta di marea, sala dei sigilli, nebbia grigia) o la "zona" del
+     file dell'interno (aggiunta a mirwada_sotterraneo, mirwada_archivio_ottavia, archivio_villaggio_alchimista =
+     officina, archivio_torre_osservazione); uscendo torna quella della mappa.
+  2. data/world/regions.json "zone_anche" per regione: una zona vale anche come altri luoghi (RitualSystem._luoghi_ora).
+  3. un posto nuovo: il teatro abbandonato della Frontiera. data/world/interni/frontiera_teatro.json (stile torre,
+     palco di tappeti, panche), varco "teatro" nel gating della Frontiera (sempre aperto, 14 caselle dall'approdo,
+     disegno porta_glifi gia' esistente). Comando: python tools/art/build_interni.py (gli altri interni identici).
+- Validator: ogni luogo di ogni rituale deve essere un posto del mondo; zone_anche solo fra location_tags della regione.
+- tests/test_luoghi_rituali.gd (2); aggiornati i conteggi di interni (25) e varchi (7). 1135 test, validate 0.
+- Schermo (Xvfb, Fool alla Sequenza 4): la porta del teatro sulla mappa, dentro la zona e' "teatro" e la riga del
+  luogo del rituale ha il segno. arte/revisione/teatro_frontiera.png. Non mi convince: da fuori il teatro e' solo una
+  porta di pietra, non un edificio; il passo tra le rupi resta sul bordo della regione.
