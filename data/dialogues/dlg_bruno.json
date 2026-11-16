@@ -33,6 +33,18 @@
           "goto": "n2"
         },
         {
+          "text": "Cerco delle carte uscite dall'Archivio.",
+          "text_i18n": "dialogue.bruno.n1.carte",
+          "condizioni": [
+            {
+              "tipo": "flag",
+              "valore": "carte_porto_si_fida"
+            }
+          ],
+          "effetti": [],
+          "goto": "n3"
+        },
+        {
           "text": "Fammi vedere cosa hai.",
           "text_i18n": "dialogue.bruno.n1.merce",
           "condizioni": [],
@@ -61,6 +73,78 @@
         {
           "text": "Devo andare.",
           "text_i18n": "dialogue.bruno.n2.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n3": {
+      "speaker": "npc_bruno",
+      "text": "Le ho io. L'Ordine le chiude a chiave; io le faccio leggere a chi ne ha bisogno, e ci campa mezzo molo. Decidi tu dove vanno: ma poi si sapra' da che parte stai.",
+      "text_i18n": "dialogue.bruno.n3",
+      "choices": [
+        {
+          "text": "Tornano all'Archivio.",
+          "text_i18n": "dialogue.bruno.n3.ordine",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "carte_all_ordine",
+              "valore": true
+            }
+          ],
+          "goto": "n4"
+        },
+        {
+          "text": "Restano al porto. Ottavia non le rivedra'.",
+          "text_i18n": "dialogue.bruno.n3.porto",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "carte_al_porto",
+              "valore": true
+            },
+            {
+              "tipo": "avvia_quest",
+              "quest_id": "q_bruno_02"
+            }
+          ],
+          "goto": "n5"
+        },
+        {
+          "text": "Ci devo pensare.",
+          "text_i18n": "dialogue.bruno.n3.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n4": {
+      "speaker": "npc_bruno",
+      "text": "Prendile. Il molo ha la memoria lunga, ricordatelo.",
+      "text_i18n": "dialogue.bruno.n4",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.bruno.n4.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n5": {
+      "speaker": "npc_bruno",
+      "text": "Allora sei dei nostri. All'Archivio non farti vedere per un po'.",
+      "text_i18n": "dialogue.bruno.n5",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.bruno.n5.congedo",
           "condizioni": [],
           "effetti": [],
           "goto": null

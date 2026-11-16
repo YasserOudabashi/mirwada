@@ -1115,8 +1115,24 @@
       ],
       "priority": 53,
       "fase": "13",
+      "passes": true,
+      "notes": "FATTA 2026-11-16. q_ottavia_02 'Carte che camminano' (Ottavia la offre da tier mid, col lasciapassare) e q_bruno_02 'Carte che restano', exclusive_with fra loro: passo 1 evento npc_influenced modo aiutato (una mano a Bruno di notte), poi nel dialogo di Bruno si sceglie Ordine (+25/-15) o porto (+25/-15). La reputazione sta nelle ricompense: una volta sola. QuestSystem.avvia non parte se una exclusive_with e' completata. tests/test_quest_fazione.gd (4). Schermo: arte/revisione/quest_fazione.png. Trovato: la pagina Diario e' vuota (US-1303b)."
+    },
+    {
+      "id": "US-1303b",
+      "title": "Il Diario mostra le quest",
+      "description": "La pagina Diario del libro (tipo journal_quest, gia' nel vocabolario) e' un appunto a matita: il giocatore non vede le quest che ha. Mostra le quest in corso col passo corrente e quelle concluse o fallite.",
+      "acceptanceCriteria": [
+        "a sinistra le quest in corso: nome, passo corrente, conteggio per i passi a evento",
+        "a destra le concluse e le fallite",
+        "niente testo sulla piega",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 53,
+      "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
+      "notes": "Trovata il 2026-11-16 facendo US-1303."
     },
     {
       "id": "US-1304",

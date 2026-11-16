@@ -1220,3 +1220,19 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   arte/revisione/ritratti.png.
 - Non mi convince ancora: soglia_02 col cappuccio ha il viso che e' una macchia scura; soglia_02 e soglia_03 si
   somigliano (tutte e due scure e incappucciate). 1112 test, validate 0.
+
+## US-1303: la posizione di fazione dell'Atto II, 2026-11-16
+- Storia: delle carte escono dall'Archivio di notte e finiscono al porto. Ottavia (Ordine Minore) chiede di
+  riportarle; Bruno (porto) le ha e ci campa mezzo molo. Si sceglie nel dialogo di Bruno.
+- Dati: data/quests/q_ottavia_02.json (atto 2; passo 1 evento npc_influenced filtro modo=aiutato, che mette il flag
+  carte_porto_si_fida; passo 2 flag carte_all_ordine; ricompense Ordine +25, porto -15) e q_bruno_02.json (flag
+  carte_al_porto; porto +25, Ordine -15), exclusive_with l'una dell'altra. dlg_ottavia: scelta nuova con tier_min mid
+  e il lasciapassare, nodo n3; dlg_bruno: scelta "cerco delle carte" (flag carte_porto_si_fida), nodi n3-n5. Testi in it.json.
+- Codice (una riga di regola): QuestSystem.avvia non parte se una quest di exclusive_with e' gia' completata. Cosi'
+  il lato scelto resta quello e la reputazione, che sta nelle ricompense, si prende una volta sola.
+- tests/test_quest_fazione.gd (4): solo da tier mid; Bruno ne parla solo dopo l'aiuto; i due lati con la loro
+  reputazione; ripensarci non cambia niente. 1116 test, validate 0.
+- Schermo (Xvfb, Sequenza 6, notte fonda): Ottavia offre e si accetta, Bruno mette davanti alla scelta, scelto il
+  porto: reputazione porto 25, Ordine -15. arte/revisione/quest_fazione.png.
+- Trovato: la pagina Diario del libro e' ancora l'appunto a matita ("si aprira' piu' avanti"): le quest non si
+  vedono da nessuna parte. Story nuova US-1303b. Anche il registro delle sinergie e' bianco (da decidere quando).

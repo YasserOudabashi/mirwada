@@ -46,11 +46,14 @@ func stato(quest_id: String) -> String:
 	return "non_iniziata"
 
 
-## Avvia una quest. No-op se non e' 'non_iniziata' o se il dato non esiste.
+## Avvia una quest. No-op se non e' 'non_iniziata', se il dato non esiste o se una exclusive_with e' completata.
 ## Le quest di exclusive_with ancora attive e fallibili diventano 'fallite'.
 func avvia(quest_id: String) -> bool:
 	if stato(quest_id) != "non_iniziata" or _quest(quest_id).is_empty():
 		return false
+	for altra in _quest(quest_id).get("exclusive_with", []):
+		if stato(str(altra)) == "completata":
+			return false   # US-1303: il lato e' gia' scelto, l'altra quest non parte piu'
 	for altra in _quest(quest_id).get("exclusive_with", []):
 		if stato(str(altra)) == "attiva" and bool(_quest(str(altra)).get("fallibile", false)):
 			_fallisci_interno(str(altra))
