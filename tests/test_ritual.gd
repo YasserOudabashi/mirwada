@@ -146,3 +146,99 @@ func test_ogni_rituale_di_sequenza_1_chiede_un_ancora() -> void:
 		var s: Dictionary = gd.call("get_sequence", "%s_1" % pid)
 		var sac: Array = (s.get("advancement_ritual", {}) as Dictionary).get("sacrifices", [])
 		assert_true("ancora_del_giocatore" in sac, "%s: il rituale di Sequenza 1 sacrifica un'Ancora" % pid)
+
+
+# --- US-1305b: il rituale nel mondo (decisioni dell'utente del 2026-11-16) ---
+
+func _root() -> Node: return Engine.get_main_loop().root
+
+
+## Alla Sequenza 4 col rituale dei dati: pozione pronta, recitazione completa, sigilli e sacrifici dati.
+func _pronto_alla_4() -> Dictionary:
+	var pid: String = str(_prog().call("pathway"))
+	_prog().configura(pid, 4)
+	_root().get_node("EndgameState").call("da_salvataggio", {})
+	var rituale: Dictionary = _rs().call("rituale_corrente")
+	var potion: Dictionary = _prog().call("sequence_data").get("potion", {})
+	var car: Dictionary = _gd().call("characteristic_for", pid, int(potion.get("characteristic_sequence", -1)))
+	_root().get_node("CharacteristicStore").call("aggiungi", str(car.get("id", "")))
+	_root().get_node("PotionSystem").call("concoct", str(potion.get("formula_id", "")), str(car.get("id", "")), potion.get("ingredients", []))
+	_acting().call("_riparti")
+	for a in (_prog().call("sequence_data").get("acting_actions", []) as Array):
+		var dati: Dictionary = {}                     # come i test di slice: un filtro _min/_max diventa il dato
+		for k in ((a as Dictionary).get("filtri", {}) as Dictionary):
+			dati[str(k).trim_suffix("_max").trim_suffix("_min")] = (a as Dictionary)["filtri"][k]
+		var ev: String = str((a as Dictionary).get("evento", ""))
+		if str(_gd().call("get_tracked_event", ev).get("misura", "conteggio")) == "conteggio":
+			for _i in int(ceil(float((a as Dictionary).get("target", 1)))):
+				_et().call("emit_event", ev, dati.duplicate())
+		else:
+			dati["quantita"] = float((a as Dictionary).get("target", 1))
+			_et().call("emit_event", ev, dati)
+	for s in rituale.get("sigils", []):
+		_rs().call("aggiungi_sigillo", s)
+	for s in rituale.get("sacrifices", []):
+		_rs().call("fornisci_sacrificio", s)
+	return rituale
+
+
+func _fine_mondo() -> void:
+	_root().get_node("WorldState").call("imposta_zona", "")
+	_root().get_node("TimeSystem").call("libera_momento")
+	_root().get_node("PotionSystem").call("scarta_pozione")
+	prepara()
+
+
+func test_dei_luoghi_ne_basta_uno() -> void:
+	var rs: Node = _rs()
+	var r := {"location_tags": ["cripta", "vetta"], "sacrifices": [], "sigils": []}
+	assert_false(rs.prerequisiti(r)["ok"], "in nessuno dei due luoghi: no")
+	rs.imposta_luogo(["vetta"])
+	assert_true(rs.prerequisiti(r)["ok"], "in uno dei due: basta")
+
+
+func test_il_luogo_e_l_ora_vengono_dal_mondo() -> void:
+	var rs: Node = _rs()
+	var r := {"location_tags": ["altura"], "momento": "alba", "sacrifices": [], "sigils": []}
+	_root().get_node("TimeSystem").call("forza_momento", "mezzogiorno")
+	_root().get_node("WorldState").call("imposta_zona", "piazza")
+	assert_eq(Array(rs.prerequisiti(r)["mancanti"]), ["luogo:altura", "momento:alba"], "in piazza a mezzogiorno mancano luogo e ora")
+	_root().get_node("WorldState").call("imposta_zona", "altura")
+	_root().get_node("TimeSystem").call("forza_momento", "alba")
+	assert_true(rs.prerequisiti(r)["ok"], "sull'altura all'alba il mondo basta, senza dirlo a mano al rituale")
+	_fine_mondo()
+
+
+func test_dalla_4_la_pozione_si_beve_solo_nel_rituale() -> void:
+	var rituale: Dictionary = _pronto_alla_4()
+	assert_false(rituale.is_empty(), "la Sequenza 4 ha il suo rituale")
+	var ps: Node = _root().get_node("PotionSystem")
+	var e: Dictionary = ps.call("bevi", false)
+	assert_eq(str(e.get("reason", "")), "serve_il_rituale", "fuori dal rituale la pozione non si beve")
+	assert_eq(_prog().call("sequence"), 4, "e non si avanza")
+	assert_false((ps.call("pozione_pronta") as Dictionary).is_empty(), "la pozione non va sprecata")
+	_fine_mondo()
+
+
+func test_compiere_il_rituale_nel_posto_giusto_fa_avanzare() -> void:
+	var rituale: Dictionary = _pronto_alla_4()
+	var rs: Node = _rs()
+	assert_eq(str(rs.call("compi").get("reason", "")), "prerequisiti_mancanti", "nel posto sbagliato non parte")
+	_root().get_node("WorldState").call("imposta_zona", str((rituale.get("location_tags", [""]) as Array)[-1]))
+	if rituale.get("momento") != null:
+		_root().get_node("TimeSystem").call("forza_momento", str(rituale["momento"]))
+	if rituale.get("fase_lunare") != null:
+		rs.imposta_tempo(str(rituale.get("momento", "")), str(rituale["fase_lunare"]))
+	var esito: Dictionary = rs.call("compi")
+	assert_true(esito["ok"], "nel secondo dei suoi luoghi, all'ora giusta, comincia (%s)" % str(esito))
+	rs.call("_process", 500.0)
+	assert_eq(_prog().call("sequence"), 3, "finito il rituale la pozione e' bevuta: Sequenza 3")
+	assert_true((_root().get_node("PotionSystem").call("pozione_pronta") as Dictionary).is_empty(), "la pozione e' consumata")
+	_fine_mondo()
+
+
+func test_senza_pozione_il_rituale_non_si_compie() -> void:
+	_pronto_alla_4()
+	_root().get_node("PotionSystem").call("scarta_pozione")
+	assert_eq(str(_rs().call("compi").get("reason", "")), "manca_la_pozione", "prima la pozione")
+	_fine_mondo()

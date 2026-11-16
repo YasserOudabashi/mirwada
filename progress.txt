@@ -1311,3 +1311,19 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   tipi per regione, la proposta dei 6 boss e dei 2 segreti (da confermare). Due idee cambiate per la Nota IP.
 - Rituali (chiesto oggi): pozione dentro il rituale; basta uno dei luoghi; sacrifici a costo vero dove esiste.
   Scritto in CLAUDE.md "Decisioni prese". CLAUDE.md e prossimi-passi.md aggiornati. Disiscritto dalla PR #11.
+
+## US-1305b: il rituale si compie nel mondo, 2026-11-16
+- Regole dell'utente: pozione dentro il rituale, basta uno dei luoghi.
+- scripts/ritual_system.gd: luogo e tempo dal mondo (zona di WorldState, momento e fase di TimeSystem; quelli messi a
+  mano restano per i test); richieste(rituale) = [{tipo, id, ids, ok}]; rituale_corrente(); compi() (vuole la pozione
+  pronta) e alla fine bevi_nel_rituale. scripts/potion_system.gd: bevi() fuori dal rituale risponde serve_il_rituale
+  dove la Sequenza ha un rituale (la pozione non si spreca). scripts/player.gd: un colpo subito interrompe il rituale.
+- Libro: page_diagramma_pathway.gd _sezione_rituale (una riga per richiesta col segno, bottone "Compi il rituale" che
+  chiude il libro). Testi: strings.csv BOOK_DIAGRAMMA_RITUALE_*; nomi in data/ui/book.json libro.etichette (luogo,
+  momento, fase_lunare, sigillo, sacrificio) e it.json ritual.*.
+- Test: tests/test_ritual.gd (+5); i tre test di slice dalla 9 alla 0 bevono nel rituale dalla 4 in giu'. 1133 test.
+- Schermo (Xvfb, Sequenza 4): in citta' la riga del luogo non ha il segno e il bottone e' spento; sul campo di
+  battaglia delle Marche all'alba tutto ha il segno, "Compi il rituale" chiude il libro, Enel fa il gesto, a fine
+  rituale Sequenza 3 e compare la tribolazione successiva. arte/revisione/rituale_nel_mondo.png.
+- Scorciatoia della prova: sigillo e sacrificio dati a mano (US-1305d). Da sapere: 15 rituali su 50 chiedono
+  un'eclissi, che nel gioco capita di rado (ogni 8 cicli di luna): va deciso se resta cosi'.

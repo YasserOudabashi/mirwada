@@ -209,3 +209,18 @@ BOOK_DIAGRAMMA_TASTI,Abilità nei tasti,Abilities on keys
 MONDO_RESPINTO,Qualcosa ti respinge: non è ancora il momento.,Something pushes you back: not yet.
 MONDO_RESPINTO_SEQUENZA,La nebbia ti respinge: torna alla Sequenza %s.,The mist pushes you back: return at Sequence %s.
 HUD_VOLO_SENZA_FORZE,Non hai più forze per volare,You have no strength left to fly
+BOOK_DIAGRAMMA_RITUALE_TITOLO,Il rituale: la pozione si beve qui dentro,The ritual: the potion is drunk within it
+BOOK_DIAGRAMMA_RITUALE_POZIONE,la pozione pronta,the potion ready
+BOOK_DIAGRAMMA_RITUALE_LUOGO,luogo,place
+BOOK_DIAGRAMMA_RITUALE_MOMENTO,ora,time
+BOOK_DIAGRAMMA_RITUALE_FASE_LUNARE,luna,moon
+BOOK_DIAGRAMMA_RITUALE_SIGILLO,sigillo,sigil
+BOOK_DIAGRAMMA_RITUALE_SACRIFICIO,sacrificio,sacrifice
+BOOK_DIAGRAMMA_RITUALE_O,oppure,or
+BOOK_DIAGRAMMA_RITUALE_COMPI,Compi il rituale,Perform the ritual
+BOOK_DIAGRAMMA_RITUALE_IN_CORSO,Il rituale e' in corso,The ritual is under way
+BOOK_DIAGRAMMA_RITUALE_ESITO_SERVE,questa pozione si beve solo dentro il rituale,this potion can only be drunk within the ritual
+BOOK_DIAGRAMMA_RITUALE_ESITO_POZIONE,prima prepara la pozione,prepare the potion first
+BOOK_DIAGRAMMA_RITUALE_ESITO_MANCA,manca qualcosa di cio' che il rituale chiede,something the ritual asks for is missing
+BOOK_DIAGRAMMA_RITUALE_ESITO_RECITAZIONE,la recitazione non e' completa,the acting is not complete
+BOOK_DIAGRAMMA_RITUALE_ESITO_TRIBOLAZIONE,prima va superata la tribolazione,the tribulation must be passed first

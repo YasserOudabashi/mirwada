@@ -91,12 +91,28 @@ func scarta_pozione() -> void:
 
 # --- Bere -------------------------------------------------------------
 
+var _nel_rituale: bool = false
+
+
+## La bevuta che chiude un rituale (RitualSystem._completa).
+func bevi_nel_rituale() -> Dictionary:
+	_nel_rituale = true
+	var esito: Dictionary = bevi(false)
+	_nel_rituale = false
+	return esito
+
+
 ## forza: se true e l'Acting non e' completo, avanza COMUNQUE con un malus
 ## pesante alle fondamenta (US-212). Se false, con Acting incompleto la
 ## pozione e' sprecata ("digerita male").
 func bevi(forza: bool = false) -> Dictionary:
 	if _pozione.is_empty():
 		return {"ok": false, "reason": "nessuna_pozione"}
+	# US-1305b (decisione dell'utente, 2026-11-16): dove la Sequenza ha un rituale, la pozione si beve solo dentro
+	# il rituale (RitualSystem.compi -> bevi_nel_rituale), nel luogo e all'ora giusti.
+	var rs: Node = get_node_or_null("/root/RitualSystem")
+	if not _nel_rituale and rs != null and not (rs.call("rituale_corrente") as Dictionary).is_empty():
+		return {"ok": false, "reason": "serve_il_rituale"}
 
 	var prog: Node = get_node_or_null("/root/Progression")
 	if prog == null:

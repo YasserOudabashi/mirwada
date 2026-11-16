@@ -6,8 +6,8 @@ extends Node
 ## Il formato di advancement_ritual e' gia' nei dati (data/pathways/):
 ##   location_tags, momento, fase_lunare, sacrifices[], sigils[]
 ##
-## Fino al mondo di fase 6 il luogo e il tempo si simulano (imposta_luogo /
-## imposta_tempo). I sacrifici non ancora modellati (strutture, oggetti) si
+## Il luogo e il tempo vengono dal mondo (WorldState, TimeSystem: US-1305b); imposta_luogo /
+## imposta_tempo restano per i test. I sacrifici non ancora modellati (strutture, oggetti) si
 ## dichiarano disponibili con fornisci_sacrificio; 'ancora_del_giocatore'
 ## passa da AnchorSystem.
 ##
@@ -58,30 +58,80 @@ func sigilli() -> Array:
 
 # --- Prerequisiti e avvio -------------------------------------------------
 
+## Il luogo e il tempo veri (US-1305b): la zona di WorldState e il momento e la fase di TimeSystem. Quelli messi a
+## mano con imposta_luogo / imposta_tempo (test, simulazioni) si aggiungono o vincono.
+func _luoghi_ora() -> Array:
+	var tags: Array = _luogo_tags.duplicate()
+	var ws: Node = get_node_or_null("/root/WorldState")
+	var zona: String = str(ws.call("zona_corrente")) if ws != null else ""
+	if not zona.is_empty() and not tags.has(zona):
+		tags.append(zona)
+	return tags
+
+
+func _momento_ora() -> String:
+	var ts: Node = get_node_or_null("/root/TimeSystem")
+	return _momento if not _momento.is_empty() or ts == null else str(ts.call("momento"))
+
+
+func _fase_ora() -> String:
+	var ts: Node = get_node_or_null("/root/TimeSystem")
+	return _fase_lunare if not _fase_lunare.is_empty() or ts == null else str(ts.call("fase_lunare"))
+
+
+## Che cosa chiede il rituale, voce per voce, e se c'e': [{tipo, id, ok}] con tipo luogo | momento | fase_lunare |
+## sigillo | sacrificio. Dei luoghi ne basta uno (decisione dell'utente, 2026-11-16): la voce "luogo" e' una sola,
+## con "ids" = tutti quelli che vanno bene. La pagina del diagramma la mostra cosi' com'e'.
+func richieste(rituale: Dictionary) -> Array:
+	var out: Array = []
+	var luoghi: Array = rituale.get("location_tags", [])
+	if not luoghi.is_empty():
+		var qui: Array = _luoghi_ora()
+		var trovato: String = ""
+		for t in luoghi:
+			if qui.has(t):
+				trovato = str(t)
+		out.append({"tipo": "luogo", "id": trovato if not trovato.is_empty() else str(luoghi[0]),
+			"ids": luoghi.duplicate(), "ok": not trovato.is_empty()})
+	var mom: Variant = rituale.get("momento")
+	if mom != null:
+		out.append({"tipo": "momento", "id": str(mom), "ok": str(mom) == _momento_ora()})
+	var fase: Variant = rituale.get("fase_lunare")
+	if fase != null:
+		out.append({"tipo": "fase_lunare", "id": str(fase), "ok": str(fase) == _fase_ora()})
+	for s in rituale.get("sigils", []):
+		out.append({"tipo": "sigillo", "id": str(s), "ok": _sigilli.has(s)})
+	for sac in rituale.get("sacrifices", []):
+		out.append({"tipo": "sacrificio", "id": str(sac), "ok": _sacrificio_disponibile(str(sac))})
+	return out
+
+
 ## { ok: bool, mancanti: PackedStringArray }
 func prerequisiti(rituale: Dictionary) -> Dictionary:
 	var mancanti := PackedStringArray()
-
-	for t in rituale.get("location_tags", []):
-		if not _luogo_tags.has(t):
-			mancanti.append("luogo:%s" % t)
-
-	var mom: Variant = rituale.get("momento")
-	if mom != null and str(mom) != _momento:
-		mancanti.append("momento:%s" % mom)
-	var fase: Variant = rituale.get("fase_lunare")
-	if fase != null and str(fase) != _fase_lunare:
-		mancanti.append("fase_lunare:%s" % fase)
-
-	for s in rituale.get("sigils", []):
-		if not _sigilli.has(s):
-			mancanti.append("sigillo:%s" % s)
-
-	for sac in rituale.get("sacrifices", []):
-		if not _sacrificio_disponibile(str(sac)):
-			mancanti.append("sacrificio:%s" % sac)
-
+	for r in richieste(rituale):
+		if not bool(r["ok"]):
+			mancanti.append("%s:%s" % [r["tipo"], r["id"]])
 	return {"ok": mancanti.is_empty(), "mancanti": mancanti}
+
+
+## Il rituale della Sequenza corrente ({} se non ne ha: fino alla 5 si avanza con la sola pozione).
+func rituale_corrente() -> Dictionary:
+	var prog: Node = get_node_or_null("/root/Progression")
+	var r: Variant = prog.call("sequence_data").get("advancement_ritual") if prog != null else null
+	return r if r is Dictionary else {}
+
+
+## US-1305b: compie il rituale della Sequenza corrente, come lo fa il giocatore dal libro. La pozione si beve dentro
+## il rituale (decisione dell'utente): deve essere pronta, e si beve quando il rituale finisce.
+func compi() -> Dictionary:
+	var rituale: Dictionary = rituale_corrente()
+	if rituale.is_empty():
+		return {"ok": false, "reason": "nessun_rituale"}
+	var ps: Node = get_node_or_null("/root/PotionSystem")
+	if ps != null and (ps.call("pozione_pronta") as Dictionary).is_empty():
+		return {"ok": false, "reason": "manca_la_pozione"}
+	return avvia(rituale)
 
 
 ## Avvia la fase di build. Richiede prerequisiti E acting_progress 1.0
@@ -169,12 +219,18 @@ func _completa() -> void:
 				if not attive.is_empty():
 					anc.call("destroy", attive[0])
 
-	var prog: Node = get_node_or_null("/root/Progression")
-	if prog != null:
-		prog.call("avanza")
-	var f: Node = get_node_or_null("/root/Foundation")
-	if f != null:
-		f.call("applica", f.call("costante", "bonus_recitazione_completa"), "rituale_completato")
+	# US-1305b: se c'e' la pozione pronta la si beve adesso, dentro il rituale (e' lei che fa avanzare e da' il
+	# bonus della recitazione); senza PotionSystem o senza pozione (rituali simulati) si avanza come prima.
+	var ps: Node = get_node_or_null("/root/PotionSystem")
+	if ps != null and not (ps.call("pozione_pronta") as Dictionary).is_empty():
+		ps.call("bevi_nel_rituale")
+	else:
+		var prog: Node = get_node_or_null("/root/Progression")
+		if prog != null:
+			prog.call("avanza")
+		var f: Node = get_node_or_null("/root/Foundation")
+		if f != null:
+			f.call("applica", f.call("costante", "bonus_recitazione_completa"), "rituale_completato")
 	# US-804: nessun dato di rituale porta oggi un "tipo" (tutti sono
 	# advancement_ritual, data/pathways/*.json), quindi nessun filtro
 	# tipo_rituale da popolare -- il filtro resta nel vocabolario per

@@ -1186,8 +1186,8 @@
       ],
       "priority": 56,
       "fase": "13",
-      "passes": false,
-      "notes": "Trovata il 2026-11-16 col controllo di US-1305. Serve prima di US-1310 e US-1311."
+      "passes": true,
+      "notes": "FATTA 2026-11-16 con le decisioni dell'utente. RitualSystem prende luogo e tempo dal mondo (WorldState.zona_corrente, TimeSystem), dei luoghi ne basta uno, richieste() elenca cosa chiede e cosa c'e', compi() lo avvia con la pozione pronta e alla fine la beve (PotionSystem.bevi_nel_rituale). Fuori dal rituale, dove la Sequenza ne ha uno, la pozione non si beve (serve_il_rituale). Un colpo subito lo interrompe. Pagina del diagramma: sezione del rituale con i segni e il bottone 'Compi il rituale' (chiude il libro). Nomi di luoghi, ore, lune, sigilli e sacrifici in book.json etichette. tests/test_ritual.gd (+5). Schermo: arte/revisione/rituale_nel_mondo.png. Aperto per US-1305c/d: luoghi mancanti (e il passo tra le rupi sta sul bordo della regione), sacrifici e sigilli ancora dati a mano nei test."
     },
     {
       "id": "US-1305c",
@@ -1202,7 +1202,7 @@
       "priority": 56,
       "fase": "13",
       "passes": false,
-      "notes": "Trovata il 2026-11-16 col controllo di US-1305. Serve prima di US-1310 e US-1311."
+      "notes": "Trovata il 2026-11-16 col controllo di US-1305. Serve prima di US-1310 e US-1311. 2026-11-16: il luogo 'passo_tra_rupi' (altura) sta su una casella al bordo della regione: chi ci arriva puo' risultare fuori regione, quindi senza zona."
     },
     {
       "id": "US-1305d",

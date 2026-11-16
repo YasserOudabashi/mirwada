@@ -94,6 +94,10 @@ func _ready() -> void:
 		rs.rituale_avviato.connect(func(_s: int) -> void: gesto("ritual"))
 		rs.rituale_completato.connect(func(_s: int) -> void: fine_gesto("ritual"))
 		rs.rituale_interrotto.connect(func(_m: String) -> void: fine_gesto("ritual"))
+		# US-1305b: un colpo subito spezza il rituale (follia e fondamenta: RitualSystem.interrompi)
+		_hurtbox.colpito.connect(func(_d: float, _s: float, _da: Node, _t: String) -> void:
+			if bool(rs.call("in_corso")):
+				rs.call("interrompi", "danno"))
 
 	# Bonus di Sequenza del Pathway corrente (US-201): il giocatore entra in
 	# scena dopo gli autoload, quindi li richiede lui una volta pronto.

@@ -2,7 +2,281 @@
   "schema_version": 1,
   "_comment": "La shell del libro (design-ui-libro.md cap. 4). Il codice implementa UN controller (scripts/book.gd) + un tipo di pagina per ogni voce del vocabolario chiuso data/schema/page_types.json. Aggiungere una schermata = aggiungere una voce a 'pages'. Le pagine si sbloccano per fase dal dato: 'sbloccata_da.fase' > gioco.fase in balance.json => la pagina esiste ma e' bianca (un appunto a matita), mai assente.",
   "libro": {
-    "etichette": {"_comment": "Nomi mostrati nel libro per gli id dei dati che non hanno un file loro: fasce di Sequenza (tier) e gruppi di Pathway.", "tier": {"low": {"name_i18n": "tier.low"}, "mid": {"name_i18n": "tier.mid"}, "saint": {"name_i18n": "tier.saint"}, "angel": {"name_i18n": "tier.angel"}, "god": {"name_i18n": "tier.god"}}, "group": {"lord_of_mysteries": {"name_i18n": "group.lord_of_mysteries"}, "eternal_darkness": {"name_i18n": "group.eternal_darkness"}, "demon_of_knowledge": {"name_i18n": "group.demon_of_knowledge"}, "goddess_of_origin": {"name_i18n": "group.goddess_of_origin"}}},
+    "etichette": {
+      "_comment": "Nomi mostrati nel libro per gli id dei dati che non hanno un file loro: fasce di Sequenza (tier), gruppi di Pathway, e cio' che chiede un rituale (luogo, momento, fase_lunare, sigillo, sacrificio: US-1305b).",
+      "tier": {
+        "low": {
+          "name_i18n": "tier.low"
+        },
+        "mid": {
+          "name_i18n": "tier.mid"
+        },
+        "saint": {
+          "name_i18n": "tier.saint"
+        },
+        "angel": {
+          "name_i18n": "tier.angel"
+        },
+        "god": {
+          "name_i18n": "tier.god"
+        }
+      },
+      "group": {
+        "lord_of_mysteries": {
+          "name_i18n": "group.lord_of_mysteries"
+        },
+        "eternal_darkness": {
+          "name_i18n": "group.eternal_darkness"
+        },
+        "demon_of_knowledge": {
+          "name_i18n": "group.demon_of_knowledge"
+        },
+        "goddess_of_origin": {
+          "name_i18n": "group.goddess_of_origin"
+        }
+      },
+      "luogo": {
+        "altare_di_radici": {
+          "name_i18n": "ritual.luogo.altare_di_radici"
+        },
+        "altura": {
+          "name_i18n": "ritual.luogo.altura"
+        },
+        "archivio": {
+          "name_i18n": "ritual.luogo.archivio"
+        },
+        "biblioteca": {
+          "name_i18n": "ritual.luogo.biblioteca"
+        },
+        "biblioteca_di_tutto": {
+          "name_i18n": "ritual.luogo.biblioteca_di_tutto"
+        },
+        "bosco_antico": {
+          "name_i18n": "ritual.luogo.bosco_antico"
+        },
+        "cripta": {
+          "name_i18n": "ritual.luogo.cripta"
+        },
+        "crocevia": {
+          "name_i18n": "ritual.luogo.crocevia"
+        },
+        "grotta_di_marea": {
+          "name_i18n": "ritual.luogo.grotta_di_marea"
+        },
+        "luogo_di_battaglia": {
+          "name_i18n": "ritual.luogo.luogo_di_battaglia"
+        },
+        "luogo_di_massacro": {
+          "name_i18n": "ritual.luogo.luogo_di_massacro"
+        },
+        "luogo_in_decadenza": {
+          "name_i18n": "ritual.luogo.luogo_in_decadenza"
+        },
+        "nebbia_grigia": {
+          "name_i18n": "ritual.luogo.nebbia_grigia"
+        },
+        "officina": {
+          "name_i18n": "ritual.luogo.officina"
+        },
+        "palco": {
+          "name_i18n": "ritual.luogo.palco"
+        },
+        "porta_senza_stanza": {
+          "name_i18n": "ritual.luogo.porta_senza_stanza"
+        },
+        "radice_del_mondo": {
+          "name_i18n": "ritual.luogo.radice_del_mondo"
+        },
+        "radura_lunare": {
+          "name_i18n": "ritual.luogo.radura_lunare"
+        },
+        "rovina": {
+          "name_i18n": "ritual.luogo.rovina"
+        },
+        "sala_dei_sigilli": {
+          "name_i18n": "ritual.luogo.sala_dei_sigilli"
+        },
+        "soglia": {
+          "name_i18n": "ritual.luogo.soglia"
+        },
+        "soglia_del_crepuscolo": {
+          "name_i18n": "ritual.luogo.soglia_del_crepuscolo"
+        },
+        "sorgente": {
+          "name_i18n": "ritual.luogo.sorgente"
+        },
+        "sotterraneo": {
+          "name_i18n": "ritual.luogo.sotterraneo"
+        },
+        "studio": {
+          "name_i18n": "ritual.luogo.studio"
+        },
+        "teatro": {
+          "name_i18n": "ritual.luogo.teatro"
+        },
+        "tempio_abbandonato": {
+          "name_i18n": "ritual.luogo.tempio_abbandonato"
+        },
+        "torre_di_osservazione": {
+          "name_i18n": "ritual.luogo.torre_di_osservazione"
+        },
+        "vetta": {
+          "name_i18n": "ritual.luogo.vetta"
+        },
+        "vicolo": {
+          "name_i18n": "ritual.luogo.vicolo"
+        }
+      },
+      "momento": {
+        "alba": {
+          "name_i18n": "ritual.momento.alba"
+        },
+        "crepuscolo": {
+          "name_i18n": "ritual.momento.crepuscolo"
+        },
+        "mezzogiorno": {
+          "name_i18n": "ritual.momento.mezzogiorno"
+        },
+        "notte_fonda": {
+          "name_i18n": "ritual.momento.notte_fonda"
+        }
+      },
+      "fase_lunare": {
+        "calante": {
+          "name_i18n": "ritual.fase_lunare.calante"
+        },
+        "crescente": {
+          "name_i18n": "ritual.fase_lunare.crescente"
+        },
+        "eclissi": {
+          "name_i18n": "ritual.fase_lunare.eclissi"
+        },
+        "nuova": {
+          "name_i18n": "ritual.fase_lunare.nuova"
+        },
+        "piena": {
+          "name_i18n": "ritual.fase_lunare.piena"
+        }
+      },
+      "sigillo": {
+        "sigillo_argenteo": {
+          "name_i18n": "ritual.sigillo.sigillo_argenteo"
+        },
+        "sigillo_del_declino": {
+          "name_i18n": "ritual.sigillo.sigillo_del_declino"
+        },
+        "sigillo_del_guardiano": {
+          "name_i18n": "ritual.sigillo.sigillo_del_guardiano"
+        },
+        "sigillo_dell_autorita": {
+          "name_i18n": "ritual.sigillo.sigillo_dell_autorita"
+        },
+        "sigillo_della_mano": {
+          "name_i18n": "ritual.sigillo.sigillo_della_mano"
+        }
+      },
+      "sacrificio": {
+        "ancora_del_giocatore": {
+          "name_i18n": "ritual.sacrificio.ancora_del_giocatore"
+        },
+        "arma_spezzata_di_un_nemico_ucciso": {
+          "name_i18n": "ritual.sacrificio.arma_spezzata_di_un_nemico_ucciso"
+        },
+        "armatura_indossata_per_100_battaglie": {
+          "name_i18n": "ritual.sacrificio.armatura_indossata_per_100_battaglie"
+        },
+        "dieci_anni_della_propria_eta": {
+          "name_i18n": "ritual.sacrificio.dieci_anni_della_propria_eta"
+        },
+        "dieci_libri_che_avevi_amato_letti_e_poi_bruciati": {
+          "name_i18n": "ritual.sacrificio.dieci_libri_che_avevi_amato_letti_e_poi_bruciati"
+        },
+        "il_detentore_precedente_della_sequenza_0": {
+          "name_i18n": "ritual.sacrificio.il_detentore_precedente_della_sequenza_0"
+        },
+        "il_nome_di_un_morto_che_amavi": {
+          "name_i18n": "ritual.sacrificio.il_nome_di_un_morto_che_amavi"
+        },
+        "il_posto_che_chiamavi_casa": {
+          "name_i18n": "ritual.sacrificio.il_posto_che_chiamavi_casa"
+        },
+        "il_primo_costrutto_che_avevi_creato_e_a_cui_ti_eri_affezionato": {
+          "name_i18n": "ritual.sacrificio.il_primo_costrutto_che_avevi_creato_e_a_cui_ti_eri_affezionato"
+        },
+        "il_proprio_nome_sussurrato_a_un_morto": {
+          "name_i18n": "ritual.sacrificio.il_proprio_nome_sussurrato_a_un_morto"
+        },
+        "il_richiamo_di_un_amico_che_non_verra_piu": {
+          "name_i18n": "ritual.sacrificio.il_richiamo_di_un_amico_che_non_verra_piu"
+        },
+        "il_ricordo_del_proprio_volto": {
+          "name_i18n": "ritual.sacrificio.il_ricordo_del_proprio_volto"
+        },
+        "il_ricordo_del_volto_di_una_persona_a_cui_volevi_bene": {
+          "name_i18n": "ritual.sacrificio.il_ricordo_del_volto_di_una_persona_a_cui_volevi_bene"
+        },
+        "il_tuo_strumento_migliore_distrutto_di_tua_mano": {
+          "name_i18n": "ritual.sacrificio.il_tuo_strumento_migliore_distrutto_di_tua_mano"
+        },
+        "la_certezza_di_sapere_chi_sei": {
+          "name_i18n": "ritual.sacrificio.la_certezza_di_sapere_chi_sei"
+        },
+        "la_forza_vitale_di_un_bosco_che_hai_fatto_crescere": {
+          "name_i18n": "ritual.sacrificio.la_forza_vitale_di_un_bosco_che_hai_fatto_crescere"
+        },
+        "la_possibilita_di_restare_fermo": {
+          "name_i18n": "ritual.sacrificio.la_possibilita_di_restare_fermo"
+        },
+        "la_tua_faccia_vera_per_un_giorno": {
+          "name_i18n": "ritual.sacrificio.la_tua_faccia_vera_per_un_giorno"
+        },
+        "la_voce_di_un_coro": {
+          "name_i18n": "ritual.sacrificio.la_voce_di_un_coro"
+        },
+        "sangue_del_giocatore": {
+          "name_i18n": "ritual.sacrificio.sangue_del_giocatore"
+        },
+        "struttura_costruita_dal_giocatore": {
+          "name_i18n": "ritual.sacrificio.struttura_costruita_dal_giocatore"
+        },
+        "tutta_la_fortuna_che_ti_restava": {
+          "name_i18n": "ritual.sacrificio.tutta_la_fortuna_che_ti_restava"
+        },
+        "un_alleato_evocato_a_cui_ti_eri_affezionato": {
+          "name_i18n": "ritual.sacrificio.un_alleato_evocato_a_cui_ti_eri_affezionato"
+        },
+        "un_incantesimo_che_avevi_inventato_tu_bruciato_davanti_a_un_maestro": {
+          "name_i18n": "ritual.sacrificio.un_incantesimo_che_avevi_inventato_tu_bruciato_davanti_a_un_maestro"
+        },
+        "un_organo_donato_da_un_alleato_consenziente": {
+          "name_i18n": "ritual.sacrificio.un_organo_donato_da_un_alleato_consenziente"
+        },
+        "un_pelo_del_tuo_pet": {
+          "name_i18n": "ritual.sacrificio.un_pelo_del_tuo_pet"
+        },
+        "un_piano_a_cui_tenevi_davvero": {
+          "name_i18n": "ritual.sacrificio.un_piano_a_cui_tenevi_davvero"
+        },
+        "un_ricordo_a_cui_tenevi": {
+          "name_i18n": "ritual.sacrificio.un_ricordo_a_cui_tenevi"
+        },
+        "un_segreto_che_ti_definiva": {
+          "name_i18n": "ritual.sacrificio.un_segreto_che_ti_definiva"
+        },
+        "una_creatura_che_avevi_evocato_e_amato": {
+          "name_i18n": "ritual.sacrificio.una_creatura_che_avevi_evocato_e_amato"
+        },
+        "una_delle_tue_chimere_persistenti": {
+          "name_i18n": "ritual.sacrificio.una_delle_tue_chimere_persistenti"
+        },
+        "una_pagina_del_tuo_passato": {
+          "name_i18n": "ritual.sacrificio.una_pagina_del_tuo_passato"
+        },
+        "una_teoria_a_cui_tenevi_dimostrata_falsa_da_te_stesso": {
+          "name_i18n": "ritual.sacrificio.una_teoria_a_cui_tenevi_dimostrata_falsa_da_te_stesso"
+        }
+      }
+    },
     "voltata_ms": 350,
     "dissolvenza_ridotta_ms": 80,
     "sfx_apri": "sfx_ui_book_open",
@@ -11,17 +285,73 @@
     "slot": 4
   },
   "pages": [
-    { "id": "copertina",    "tipo": "menu_principale",       "name_i18n": "ui.page.copertina",    "ordine": 0 },
-    { "id": "frontespizio", "tipo": "creazione_personaggio", "name_i18n": "ui.page.frontespizio", "ordine": 1 },
-    { "id": "mappa",        "tipo": "mappa",                 "name_i18n": "ui.page.mappa",        "ordine": 2 },
-    { "id": "diagramma",    "tipo": "diagramma_pathway",     "name_i18n": "ui.page.diagramma",    "ordine": 3, "fog_of_war": true },
-    { "id": "inventario",   "tipo": "inventario",            "name_i18n": "ui.page.inventario",   "ordine": 4, "sbloccata_da": { "fase": 3 } },
-    { "id": "sinergie",     "tipo": "inventario",            "name_i18n": "ui.page.sinergie",     "ordine": 5, "sezione": "sinergie" },
-    { "id": "journal",      "tipo": "inventario",            "name_i18n": "ui.page.journal",      "ordine": 6, "sezione": "journal" },
-    { "id": "dialogo",      "tipo": "page_dialogo",          "name_i18n": "ui.page.dialogo",      "ordine": 7, "transitoria": true },
-    { "id": "colophon",     "tipo": "impostazioni",          "name_i18n": "ui.page.colophon",     "ordine": 99 }
+    {
+      "id": "copertina",
+      "tipo": "menu_principale",
+      "name_i18n": "ui.page.copertina",
+      "ordine": 0
+    },
+    {
+      "id": "frontespizio",
+      "tipo": "creazione_personaggio",
+      "name_i18n": "ui.page.frontespizio",
+      "ordine": 1
+    },
+    {
+      "id": "mappa",
+      "tipo": "mappa",
+      "name_i18n": "ui.page.mappa",
+      "ordine": 2
+    },
+    {
+      "id": "diagramma",
+      "tipo": "diagramma_pathway",
+      "name_i18n": "ui.page.diagramma",
+      "ordine": 3,
+      "fog_of_war": true
+    },
+    {
+      "id": "inventario",
+      "tipo": "inventario",
+      "name_i18n": "ui.page.inventario",
+      "ordine": 4,
+      "sbloccata_da": {
+        "fase": 3
+      }
+    },
+    {
+      "id": "sinergie",
+      "tipo": "inventario",
+      "name_i18n": "ui.page.sinergie",
+      "ordine": 5,
+      "sezione": "sinergie"
+    },
+    {
+      "id": "journal",
+      "tipo": "inventario",
+      "name_i18n": "ui.page.journal",
+      "ordine": 6,
+      "sezione": "journal"
+    },
+    {
+      "id": "dialogo",
+      "tipo": "page_dialogo",
+      "name_i18n": "ui.page.dialogo",
+      "ordine": 7,
+      "transitoria": true
+    },
+    {
+      "id": "colophon",
+      "tipo": "impostazioni",
+      "name_i18n": "ui.page.colophon",
+      "ordine": 99
+    }
   ],
-  "segnalibri": ["mappa", "diagramma", "journal"],
+  "segnalibri": [
+    "mappa",
+    "diagramma",
+    "journal"
+  ],
   "tema": {
     "_comment": "Aspetto del libro (2026-10-25): carta, ornamento, segnalibri e caselle da tools/art/build_libro.py; font Alegreya e Alegreya SC (licenza OFL, assets/ui/font/OFL.txt). Colori: palette Endesga 32. Le dimensioni sono in unita' di gioco (1 unita' = 2 pixel a schermo).",
     "carta": "res://assets/ui/libro.png",
@@ -46,14 +376,48 @@
     "avvio": {
       "_comment": "US-8B74: all'avvio (nessuna partita in corso, pagina dello scaffale) il libro e' piu' piccolo e intorno si vede il panorama; misura in unita' (la carta e' disegnata a questa misura, tools/art/build_libro.py).",
       "carta": "res://assets/ui/libro_avvio.png",
-      "misura": [440, 250]
+      "misura": [
+        440,
+        250
+      ]
     },
     "panorama": {
       "_comment": "US-8B74: i 6 strati del panorama (tools/art/build_panorami.py), una cartella per momento del TimeSystem; all'avvio il momento viene dall'ora del computer (ore = [inizio, fine) sull'orologio di 24 ore). velocita in unita' al secondo verso sinistra: piu' vicino, piu' veloce.",
       "cartella": "res://assets/ui/panorama",
-      "strati": ["sky", "clouds", "far", "mid", "near", "fg"],
-      "velocita": {"sky": 0, "clouds": 3, "far": 1, "mid": 2, "near": 3, "fg": 5},
-      "ore": {"alba": [5, 9], "mezzogiorno": [9, 17], "crepuscolo": [17, 21], "notte_fonda": [21, 5]}
+      "strati": [
+        "sky",
+        "clouds",
+        "far",
+        "mid",
+        "near",
+        "fg"
+      ],
+      "velocita": {
+        "sky": 0,
+        "clouds": 3,
+        "far": 1,
+        "mid": 2,
+        "near": 3,
+        "fg": 5
+      },
+      "ore": {
+        "alba": [
+          5,
+          9
+        ],
+        "mezzogiorno": [
+          9,
+          17
+        ],
+        "crepuscolo": [
+          17,
+          21
+        ],
+        "notte_fonda": [
+          21,
+          5
+        ]
+      }
     }
   }
 }
