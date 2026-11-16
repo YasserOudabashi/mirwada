@@ -45,6 +45,8 @@ func _su_apri_creazione(npc_id: String) -> void:
 
 
 func aggiorna() -> void:
+	if not is_inside_tree():     # la pagina appena voltata via sente ancora i segnali finche' non e' liberata
+		return
 	svuota()
 
 	if not _negozio_npc_id.is_empty():

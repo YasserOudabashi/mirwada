@@ -1263,3 +1263,28 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   arte/revisione/duello_aldo.png.
 - Non mi convince ancora: l'avversario ha la figura di nemico_base (verde), non quella di Aldo: si sistema con i
   nemici veri della fase 15. All'inizio della partita Aldo e' Sequenza 9 (sale col tempo fino alla 4).
+
+## US-1305: controllo dei rituali, 2026-11-16 (con tre buchi trovati)
+- Atto II (Sequenze 6 -> 4): nessun rituale, si avanza con la pozione. Niente da aggiungere per l'Atto II.
+- I rituali (advancement_ritual) stanno sulle Sequenze 4..0: 50 in tutto. Controllati contro il mondo generato:
+  1. Nel gioco nessuno chiama RitualSystem.imposta_luogo / imposta_tempo / avvia: il rituale non si puo' compiere.
+     Si avanza solo con la pozione, a ogni Sequenza. Il finale dell'Apoteosi chiede rituale_sequenza_0_completato,
+     che scrive solo il rituale: oggi non si raggiunge. -> US-1305b
+  2. Ogni rituale chiede due luoghi e RitualSystem li vuole tutti e due insieme; il mondo da' una zona alla volta.
+     E 19 luoghi non sono sulla mappa (elenco nella story). Gli interni dei varchi non impostano la zona. -> US-1305c
+  3. I sacrifici sono 33 frasi, non oggetti; i 5 sigilli dei rituali non sono oggetti. Solo l'Ancora e' modellata.
+     -> US-1305d
+- Sono scelte di gioco (pozione e rituale insieme? un luogo o due? come si paga un sacrificio?): chieste all'utente.
+
+## US-1306: l'Atto II giocato per intero, 2026-11-16
+- tests/manual/qa_atto_2.gd, comando nel file (Xvfb). Cammino: Sequenza 7 -> 6 con Prepara e Bevi della pagina del
+  diagramma (salto di tier: Aldo offre il duello); a mezzogiorno in piazza duello accettato, avversario battuto,
+  dialogo della vittoria; Ottavia da' il lasciapassare e la quest; di notte una mano a Bruno, le carte, scelta
+  "tornano all'Archivio" (quest completata, Ordine > porto); 6 -> 5; la tribolazione del salto 5 -> 4 (smuovere tre
+  persone) risulta superata; 5 -> 4, tier saint. 26 controlli ok, esce 0.
+- Scorciatoie dichiarate: partenza alla Sequenza 7, ingredienti e Caratteristiche concessi, recitazione riempita con
+  gli eventi, colpo finale del duello dato azzerando la salute dell'avversario.
+- Corretto: "Can't use get_node() with absolute paths" a ogni dialogo: la pagina del dialogo voltata via sentiva
+  ancora i segnali (page_dialogo.gd aggiorna() esce se non e' nell'albero).
+- Foto: arte/revisione/qa_atto_2.png. Visto: dopo l'avanzamento la salute resta 90/180 (non si riempie col nuovo
+  massimo) e la hotbar tiene le quattro abilita' scelte prima. 1120 test, validate 0.

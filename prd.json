@@ -1157,8 +1157,8 @@
       ],
       "priority": 55,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
+      "passes": true,
+      "notes": "FATTA come controllo 2026-11-16. Nell'Atto II (Sequenze 6 -> 4) non c'e' nessun rituale: si avanza con la pozione, e la partita di US-1306 lo prova. I rituali cominciano dalla Sequenza 4 in giu' (50: 5 per Pathway) e li' il controllo ha trovato tre buchi veri, che sono story nuove: nel gioco nessuno avvia un rituale (US-1305b), 19 luoghi chiesti dai rituali non sono sulla mappa (US-1305c), i 33 sacrifici sono frasi e non cose che il giocatore puo' dare (US-1305d)."
     },
     {
       "id": "US-1306",
@@ -1170,8 +1170,53 @@
       ],
       "priority": 56,
       "fase": "13",
+      "passes": true,
+      "notes": "FATTA 2026-11-16. tests/manual/qa_atto_2.gd (Xvfb): Sequenza 7 -> 6 con la pozione (salto di tier, Aldo offre il duello), duello vinto e dialogo, quest di fazione con Ottavia e Bruno (carte all'Ordine), 6 -> 5, tribolazione del salto 5 -> 4 superata, 5 -> 4. 26 controlli, tutti ok. Scorciatoie dichiarate nel file. Foto: arte/revisione/qa_atto_2.png. Corretto un errore nei log: la pagina del dialogo voltata via rispondeva ancora ai segnali."
+    },
+    {
+      "id": "US-1305b",
+      "title": "Il rituale si compie nel mondo",
+      "description": "Dalla Sequenza 4 l'avanzamento e' un rituale (RitualSystem, US-217), ma nel gioco nessuno lo avvia: il mondo non dice al rituale dove e quando si e', e nel libro non c'e' il gesto. Oggi si avanza solo con la pozione, e il finale dell'Apoteosi (flag rituale_sequenza_0_completato) non si puo' raggiungere.",
+      "acceptanceCriteria": [
+        "il mondo passa a RitualSystem il luogo (zona) e il tempo (TimeSystem)",
+        "nella pagina del diagramma si vede cosa chiede il rituale e cosa manca, e si puo' compierlo",
+        "regole decise dall'utente: pozione e rituale, luogo (uno dei due o tutti e due)",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 56,
+      "fase": "13",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
+      "notes": "Trovata il 2026-11-16 col controllo di US-1305. Serve prima di US-1310 e US-1311."
+    },
+    {
+      "id": "US-1305c",
+      "title": "I luoghi dei rituali sulla mappa",
+      "description": "19 location_tags chiesti dai rituali non hanno un posto sul mondo generato (marche: cripta, luogo_di_massacro, luogo_in_decadenza, rovina, tempio_abbandonato, vetta; valle: altare_di_radici, radura_lunare, sorgente; archivio: biblioteca_di_tutto, officina, sala_dei_sigilli, studio; frontiera: crocevia, nebbia_grigia, palco, porta_senza_stanza, teatro; mirwada: sotterraneo). Gli interni dei varchi (cripta, tempio, radura, sala dei sigilli) non dicono al mondo la loro zona.",
+      "acceptanceCriteria": [
+        "ogni luogo di un rituale non-stub e' un posto dove il giocatore puo' stare: un luogo della mappa (luoghi_mondo) o un interno che dichiara la sua zona",
+        "la mappa approvata non si rigenera",
+        "un test lo controlla per tutti i 50 rituali",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 56,
+      "fase": "13",
+      "passes": false,
+      "notes": "Trovata il 2026-11-16 col controllo di US-1305. Serve prima di US-1310 e US-1311."
+    },
+    {
+      "id": "US-1305d",
+      "title": "I sacrifici dei rituali",
+      "description": "I 33 sacrifici dei rituali sono frasi ('un ricordo a cui tenevi', 'dieci anni della propria eta''): solo l'Ancora e' modellata. Vanno resi cose che il giocatore puo' dare, come deciso dall'utente.",
+      "acceptanceCriteria": [
+        "ogni sacrificio ha un modo dichiarato nei dati di essere dato (costo vero dove esiste, altrimenti scelta narrata)",
+        "i 5 sigilli dei rituali si possono avere nel gioco",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 56,
+      "fase": "13",
+      "passes": false,
+      "notes": "Trovata il 2026-11-16 col controllo di US-1305. Serve prima di US-1310 e US-1311."
     },
     {
       "id": "US-1307",
