@@ -97,6 +97,9 @@ func _ready() -> void:
 	add_child(preload("res://scripts/world/base_fuori.gd").new())   # US-8B20c: l'orto fuori dalla sede della base
 	add_child(preload("res://scripts/world/luce.gd").new())
 	add_child(preload("res://scripts/world/luci_notte.gd").new())    # US-8B27: finestre e faro accesi di notte
+	var duelli: Node = preload("res://scripts/world/duelli.gd").new()  # US-1304: il duello di un NPC (Aldo) come scena
+	duelli.name = "Duelli"
+	add_child(duelli)
 	var t := Timer.new()
 	t.wait_time = INTERVALLO_ATTIVITA
 	t.autostart = true

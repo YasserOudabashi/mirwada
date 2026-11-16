@@ -1246,3 +1246,20 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   in corso; la regola della pagina bianca si prova chiudendo una pagina a una fase lontana). 1117 test, validate 0.
 - Schermo (Xvfb): Diario con "Carte che camminano" in corso e i suoi due passi; dopo la scelta "Carte che restano"
   completata e "Carte che camminano" fallita. arte/revisione/diario_quest.png.
+
+## US-1304: il duello con Aldo e' una scena, 2026-11-16
+- Letto dal codice: npc_system scrive <npc>_duello_disponibile ai salti di tier per gli NPC sfida_ai_tier; dlg_aldo
+  "Battiamoci" scriveva aldo_duello_accettato e basta: non succedeva niente.
+- Dati: data/npc/roster.json npc_aldo "duello" {flag_inizio, flag_offerta, dialogo_vinto, dialogo_perso, pausa_s,
+  override (nome e attesa iniziale)}. Dialoghi nuovi dlg_aldo_vinto.json e dlg_aldo_perso.json (i rami: scrivono
+  aldo_duello_vinto / aldo_duello_perso, e aldo_rispetto se gli si tende la mano); dlg_aldo n2 "In guardia.".
+- Codice: scripts/world/duelli.gd (nodo "Duelli" del mondo, 90 righe, vale per ogni NPC con "duello"): a dialogo
+  finito, se il flag_inizio c'e', l'NPC si nasconde e al suo posto nasce un nemico (enemy.tscn, override dei dati,
+  Sequenza da NpcSystem.sequenza_npc); "morto" = vinto, StatsComponent.died del giocatore = perso; poi l'NPC torna e
+  dopo pausa_s parte il dialogo. I due flag dell'offerta si spengono all'inizio. Nessuna regola di combattimento nuova.
+- Validator: i due dialoghi e i due flag del duello ci sono. tests/test_duelli.gd (3). 1120 test, validate 0.
+- Schermo (Xvfb, mezzogiorno, piazza di Mirwada): Aldo in piazza, accettato il duello compare l'avversario col nome
+  "Aldo" e attacca (Enel perde salute), battuto torna Aldo e si apre "Basta, hai vinto" con le due risposte.
+  arte/revisione/duello_aldo.png.
+- Non mi convince ancora: l'avversario ha la figura di nemico_base (verde), non quella di Aldo: si sistema con i
+  nemici veri della fase 15. All'inizio della partita Aldo e' Sequenza 9 (sale col tempo fino alla 4).

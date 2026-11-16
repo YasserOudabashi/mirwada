@@ -1144,8 +1144,8 @@
       ],
       "priority": 54,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
+      "passes": true,
+      "notes": "FATTA 2026-11-16. Prima accettare il duello scriveva solo un flag. Ora roster npc_aldo 'duello' (flag_inizio, flag_offerta, dialogo_vinto, dialogo_perso, override, pausa_s) e scripts/world/duelli.gd (figlio del mondo): finito il dialogo che ha scritto il flag, Aldo lascia il posto a un nemico con la sua Sequenza e il suo nome; battuto lui o caduto il giocatore, Aldo torna e parte dlg_aldo_vinto o dlg_aldo_perso, che scrivono aldo_duello_vinto/perso (e aldo_rispetto). L'offerta si spende e torna al prossimo salto di tier. Nessuna regola di combattimento nuova. tests/test_duelli.gd (3). Schermo: arte/revisione/duello_aldo.png. Aperto: in combattimento Aldo ha la figura di nemico_base (fase 15)."
     },
     {
       "id": "US-1305",

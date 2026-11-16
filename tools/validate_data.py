@@ -2298,6 +2298,15 @@ def main():
             did = npc.get("dialogue_id")
             if dlg_ids and did not in dlg_ids:
                 err(f"{rel} [{nid}]: dialogue_id '{did}' non ha un file in data/dialogues/")
+            # US-1304: il duello di un NPC (scripts/world/duelli.gd): i due dialoghi della fine e i flag ci sono
+            due = npc.get("duello")
+            if due is not None:
+                for k in ("dialogo_vinto", "dialogo_perso"):
+                    if dlg_ids and due.get(k) not in dlg_ids:
+                        err(f"{rel} [{nid}]: duello.{k} '{due.get(k)}' non ha un file in data/dialogues/")
+                for k in ("flag_inizio", "flag_offerta"):
+                    if not due.get(k):
+                        err(f"{rel} [{nid}]: duello.{k} mancante")
         for atteso in ("npc_mirco", "npc_sidon", "npc_vesna", "npc_aldo",
                        "npc_ottavia", "npc_bruno", "npc_lena", "npc_doran"):
             if atteso not in npc_ids:

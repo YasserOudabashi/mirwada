@@ -242,6 +242,18 @@
       "aspetto": {
         "variante": 3,
         "sprite": "rivale"
+      },
+      "duello": {
+        "_comment": "US-1304: accettato il duello nel dialogo (flag_inizio), Aldo si batte come un nemico con la sua Sequenza (scripts/world/duelli.gd). Dopo, il dialogo della vittoria o della sconfitta.",
+        "flag_inizio": "aldo_duello_accettato",
+        "flag_offerta": "aldo_duello_disponibile",
+        "dialogo_vinto": "dlg_aldo_vinto",
+        "dialogo_perso": "dlg_aldo_perso",
+        "pausa_s": 1.5,
+        "override": {
+          "name_i18n": "npc.aldo.name",
+          "attesa_iniziale_s": 1.0
+        }
       }
     },
     {

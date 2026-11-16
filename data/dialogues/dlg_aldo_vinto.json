@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "dlg_aldo_vinto",
+  "start": "n1",
+  "_comment": "US-1304: dopo il duello vinto. Lo avvia scripts/world/duelli.gd (roster npc_aldo 'duello').",
+  "nodes": {
+    "n1": {
+      "speaker": "npc_aldo",
+      "text": "Basta. Basta, hai vinto. Sei salito piu' in fretta di me, e non so ancora come.",
+      "text_i18n": "dialogue.aldo_vinto.n1",
+      "choices": [
+        {
+          "text": "Potevi esserci tu al mio posto. La scala e' lunga per tutti e due.",
+          "text_i18n": "dialogue.aldo_vinto.n1.rispetto",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "aldo_duello_vinto",
+              "valore": true
+            },
+            {
+              "tipo": "flag",
+              "id": "aldo_rispetto",
+              "valore": true
+            },
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "persuaso"
+            }
+          ],
+          "goto": null
+        },
+        {
+          "text": "Resta a terra, Aldo. E smetti di seguirmi.",
+          "text_i18n": "dialogue.aldo_vinto.n1.freddo",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "aldo_duello_vinto",
+              "valore": true
+            },
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "intimidito"
+            }
+          ],
+          "goto": null
+        }
+      ]
+    }
+  }
+}

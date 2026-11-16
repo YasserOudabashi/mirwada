@@ -672,8 +672,7 @@
   "dialogue.aldo.n1.congedo": "Devo andare.",
   "dialogue.aldo.n1.provoca": "Sei tu che guardi indietro.",
   "dialogue.aldo.n1.sfida": "Battiamoci, allora.",
-  "dialogue.aldo.n2": "Finalmente. Non deludermi.",
-  "dialogue.aldo.n2.congedo": "Devo andare.",
+  "dialogue.aldo.n2": "Finalmente. Qui, adesso, davanti a tutti. Non deludermi.",
   "dialogue.aldo.n3": "Vedremo chi arriva prima in fondo alla scala.",
   "dialogue.aldo.n3.congedo": "Devo andare.",
   "dialogue.antagonista.n1": "Sei arrivato dove mi sono fermato io. La stessa Sequenza, la stessa soglia. Cosa ti fa credere di poterla varcare?",
@@ -1845,5 +1844,12 @@
   "dialogue.bruno.n4.congedo": "Devo andare.",
   "dialogue.bruno.n4": "Prendile. Il molo ha la memoria lunga, ricordatelo.",
   "dialogue.bruno.n5.congedo": "Devo andare.",
-  "dialogue.bruno.n5": "Allora sei dei nostri. All'Archivio non farti vedere per un po'."
+  "dialogue.bruno.n5": "Allora sei dei nostri. All'Archivio non farti vedere per un po'.",
+  "dialogue.aldo.n2.inizia": "In guardia.",
+  "dialogue.aldo_vinto.n1.rispetto": "Potevi esserci tu al mio posto. La scala e' lunga per tutti e due.",
+  "dialogue.aldo_vinto.n1.freddo": "Resta a terra, Aldo. E smetti di seguirmi.",
+  "dialogue.aldo_vinto.n1": "Basta. Basta, hai vinto. Sei salito piu' in fretta di me, e non so ancora come.",
+  "dialogue.aldo_perso.n1.ancora": "La prossima volta finisce diversamente.",
+  "dialogue.aldo_perso.n1.grazie": "Lo ricordero'.",
+  "dialogue.aldo_perso.n1": "Ti ho rimesso in piedi io. Non ringraziarmi: volevo che lo ricordassi da sveglio. Torna quando avrai fatto un altro gradino."
 }
