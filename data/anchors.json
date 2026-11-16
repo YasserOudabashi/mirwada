@@ -35,6 +35,19 @@
       "forza": 7,
       "penalita": 16,
       "_nota": "Il pet (US-321): e' un'Ancora come le altre. La sua morte (US-325) passa da AnchorSystem e aggiunge 'penalita' follia."
+    },
+    {
+      "id": "anchor_vesna",
+      "name_i18n": "anchor.vesna",
+      "forza": 9,
+      "penalita": 16
+    },
+    {
+      "id": "anchor_lena",
+      "name_i18n": "anchor.lena",
+      "forza": 5,
+      "penalita": 22,
+      "_nota": "L'Ancora piu' fragile: regge poco, e perderla costa piu' di tutte tranne la promessa."
     }
   ]
 }

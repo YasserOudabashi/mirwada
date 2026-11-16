@@ -53,6 +53,22 @@
           "goto": "n3"
         },
         {
+          "text": "Vesna, devo dirti cosa sono diventato.",
+          "text_i18n": "dialogue.vesna.n1.bivio",
+          "condizioni": [
+            {
+              "tipo": "tier_min",
+              "valore": "saint"
+            },
+            {
+              "tipo": "flag_assente",
+              "valore": "vesna_ha_scelto"
+            }
+          ],
+          "effetti": [],
+          "goto": "n4"
+        },
+        {
           "text": "Devo andare.",
           "text_i18n": "dialogue.vesna.n1.congedo",
           "condizioni": [],
@@ -83,6 +99,97 @@
         {
           "text": "Devo andare.",
           "text_i18n": "dialogue.vesna.n3.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n4": {
+      "speaker": "npc_vesna",
+      "text": "Lo vedo da sola. Ti ho ricucito quando sanguinavi come tutti; adesso le ferite ti si chiudono prima che io trovi l'ago. Dammi una ragione per non fare i bagagli stanotte.",
+      "text_i18n": "dialogue.vesna.n4",
+      "choices": [
+        {
+          "text": "Qui c'e' gente che ha bisogno di te. E io ho bisogno che qualcuno mi guardi come guardi i feriti.",
+          "text_i18n": "dialogue.vesna.n4.resta",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "vesna_ha_scelto",
+              "valore": true
+            },
+            {
+              "tipo": "flag",
+              "id": "vesna_resta",
+              "valore": true
+            },
+            {
+              "tipo": "reputazione",
+              "faction_id": "quartiere",
+              "delta": 15
+            },
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "persuaso"
+            }
+          ],
+          "goto": "n5"
+        },
+        {
+          "text": "Non te la do. Vai, finche' puoi.",
+          "text_i18n": "dialogue.vesna.n4.vai",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "vesna_ha_scelto",
+              "valore": true
+            },
+            {
+              "tipo": "flag",
+              "id": "vesna_se_ne_va",
+              "valore": true
+            },
+            {
+              "tipo": "reputazione",
+              "faction_id": "quartiere",
+              "delta": -10
+            },
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "intimidito"
+            }
+          ],
+          "goto": "n6"
+        }
+      ]
+    },
+    "n5": {
+      "speaker": "npc_vesna",
+      "text": "Resto. Ma la porta la tengo aperta, e non per farti entrare.",
+      "text_i18n": "dialogue.vesna.n5",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.vesna.n5.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n6": {
+      "speaker": "npc_vesna",
+      "text": "Almeno sei onesto. Il quartiere si arrangera'. Addio.",
+      "text_i18n": "dialogue.vesna.n6",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.vesna.n6.congedo",
           "condizioni": [],
           "effetti": [],
           "goto": null

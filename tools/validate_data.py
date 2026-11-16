@@ -2438,7 +2438,7 @@ def main():
     # effetti dal vocabolario chiuso di 5, emit_event solo sui 12 eventi.
     DLG_COND = {"acting_progress_min", "madness_max", "madness_min", "e_notte",
                 "fase_lunare", "foundation_min", "tier_min", "in_zona_tag",
-                "follia_min", "reputazione_min", "flag"}
+                "follia_min", "reputazione_min", "flag", "flag_assente"}
     DLG_EFFETTI = {"emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest", "impara_sinergia",
                    "crea_su_richiesta"}
     _dlg_quest_ids = set()   # quest_id nominati da un effetto avvia_quest

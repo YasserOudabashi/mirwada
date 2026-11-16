@@ -39,6 +39,22 @@
           "goto": "n3"
         },
         {
+          "text": "Lena. Mi riconosci ancora?",
+          "text_i18n": "dialogue.lena.n1.riconosci",
+          "condizioni": [
+            {
+              "tipo": "tier_min",
+              "valore": "saint"
+            },
+            {
+              "tipo": "flag_assente",
+              "valore": "lena_ha_scelto"
+            }
+          ],
+          "effetti": [],
+          "goto": "n4"
+        },
+        {
           "text": "Devo andare.",
           "text_i18n": "dialogue.lena.n1.congedo",
           "condizioni": [],
@@ -69,6 +85,95 @@
         {
           "text": "Devo andare.",
           "text_i18n": "dialogue.lena.n3.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n4": {
+      "speaker": "npc_lena",
+      "text": "Hai gli occhi di quando piove e non c'e' nessuno in strada. Pero' la voce e' la tua. Sei ancora tu, vero?",
+      "text_i18n": "dialogue.lena.n4",
+      "choices": [
+        {
+          "text": "Sono ancora io. Guarda: so ancora giocare.",
+          "text_i18n": "dialogue.lena.n4.ancora_io",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "lena_ha_scelto",
+              "valore": true
+            },
+            {
+              "tipo": "flag",
+              "id": "lena_ha_capito",
+              "valore": true
+            },
+            {
+              "tipo": "avvia_quest",
+              "quest_id": "q_lena_02"
+            },
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "aiutato"
+            }
+          ],
+          "goto": "n5"
+        },
+        {
+          "text": "Non del tutto, Lena. Stammi lontana.",
+          "text_i18n": "dialogue.lena.n4.non_del_tutto",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "lena_ha_scelto",
+              "valore": true
+            },
+            {
+              "tipo": "flag",
+              "id": "lena_ha_paura",
+              "valore": true
+            },
+            {
+              "tipo": "avvia_quest",
+              "quest_id": "q_lena_03"
+            },
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "intimidito"
+            }
+          ],
+          "goto": "n6"
+        }
+      ]
+    },
+    "n5": {
+      "speaker": "npc_lena",
+      "text": "Lo sapevo. I grandi cambiano faccia, tu hai cambiato solo gli occhi. Domani porto la palla.",
+      "text_i18n": "dialogue.lena.n5",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.lena.n5.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n6": {
+      "speaker": "npc_lena",
+      "text": "Va bene. Pero' io ti guardo lo stesso, da lontano.",
+      "text_i18n": "dialogue.lena.n6",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.lena.n6.congedo",
           "condizioni": [],
           "effetti": [],
           "goto": null

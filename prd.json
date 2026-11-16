@@ -1227,8 +1227,8 @@
       ],
       "priority": 57,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
+      "passes": true,
+      "notes": "FATTA 2026-11-16. dlg_doran: affrontarlo a tier saint porta al nodo n4 (Doran ha un fascicolo e chiede: devo venire io a fermarti?), con due rami: patto (doran_patto, giustizia +20) o sfida (doran_nemico, giustizia -20). Il flag della tribolazione resta quello di prima. Condizione nuova dei dialoghi 'flag_assente' (conditions.gd): la scena si fa una volta. tests/test_atto_3_dialoghi.gd."
     },
     {
       "id": "US-1308",
@@ -1239,8 +1239,8 @@
       ],
       "priority": 58,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
+      "passes": true,
+      "notes": "FATTA 2026-11-16. dlg_lena a tier saint: 'Mi riconosci ancora?' -> due rami che avviano q_lena_02 (forza dell'Ancora a 10) o q_lena_03 (a 2), exclusive fra loro. L'effetto 'ancora' delle quest con 'forza' regola un'Ancora gia' attiva. Trovato e corretto: le Ancore-persona (Mirco, Vesna, Lena) erano solo un nome in NpcSystem, non entravano in AnchorSystem: non fermavano la follia e non si potevano sacrificare. Ora promuovi_ancora le registra (anchors.json: aggiunte anchor_vesna e anchor_lena)."
     },
     {
       "id": "US-1309",
@@ -1252,8 +1252,8 @@
       ],
       "priority": 59,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
+      "passes": true,
+      "notes": "FATTA 2026-11-16. dlg_vesna a tier saint: il bivio, resta (vesna_resta, quartiere +15) o se ne va (vesna_se_ne_va, quartiere -10), una volta sola. Che cosa cambi nel finale Rinuncia resta la domanda aperta del PRD. Foto delle tre scene: arte/revisione/atto_3_scene.png."
     },
     {
       "id": "US-1310",

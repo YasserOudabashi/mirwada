@@ -1288,3 +1288,20 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   ancora i segnali (page_dialogo.gd aggiorna() esce se non e' nell'albero).
 - Foto: arte/revisione/qa_atto_2.png. Visto: dopo l'avanzamento la salute resta 90/180 (non si riempie col nuovo
   massimo) e la hotbar tiene le quattro abilita' scelte prima. 1120 test, validate 0.
+
+## US-1307, US-1308, US-1309: Doran sa, Lena capisce, Vesna sceglie, 2026-11-16
+- Tre story di soli dialoghi fatte insieme (stessa forma, stessi file di testo): scene a tier saint, due rami l'una.
+- Codice comune: condizione 'flag_assente' in scripts/conditions.gd (il contrario di 'flag', ammessa nei dialoghi dal
+  validator): una scena sparisce quando ha scritto il suo flag. Usata anche su Bruno (la domanda sulle carte non
+  resta dopo la scelta).
+- Doran (dlg_doran n4-n6): patto o sfida, flag doran_sa + doran_patto / doran_nemico, giustizia +20 / -20.
+- Lena (dlg_lena n4-n6, q_lena_02 / q_lena_03): riconosciuta, la sua Ancora va a forza 10; allontanata, a 2. Effetto
+  "ancora" delle quest con "forza" = regola un'Ancora attiva (QuestSystem -> NpcSystem.forza_ancora ->
+  AnchorSystem.imposta_forza). Chi non ha Lena come Ancora ha la scena ma nessun effetto.
+- Vesna (dlg_vesna n4-n6): resta (quartiere +15) o se ne va (quartiere -10).
+- Trovato e corretto: diventare l'Ancora di un NPC (quest con effetto "ancora") non registrava niente in
+  AnchorSystem: nessun riparo dalla follia e niente da sacrificare al rituale di Sequenza 1. Ora
+  NpcSystem.promuovi_ancora registra "anchor_<nome>" (aggiunte anchor_vesna forza 9 e anchor_lena forza 5 in
+  data/anchors.json) e un'Ancora persa esce dalle Ancore dell'NPC. I salvataggi vecchi non si aggiornano da soli.
+- tests/test_atto_3_dialoghi.gd (8). 1128 test, validate 0. Schermo: i tre nodi lunghi stanno nella facciata, le
+  risposte su tre righe non si sovrappongono. arte/revisione/atto_3_scene.png.

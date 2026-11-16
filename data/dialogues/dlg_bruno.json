@@ -39,6 +39,14 @@
             {
               "tipo": "flag",
               "valore": "carte_porto_si_fida"
+            },
+            {
+              "tipo": "flag_assente",
+              "valore": "q_ottavia_02_done"
+            },
+            {
+              "tipo": "flag_assente",
+              "valore": "q_bruno_02_done"
             }
           ],
           "effetti": [],

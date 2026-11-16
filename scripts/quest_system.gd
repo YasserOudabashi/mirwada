@@ -163,7 +163,9 @@ func _applica_effetto(eff: Variant) -> void:
 				fs.call("modifica", str(e.get("faction_id", "")), float(e.get("delta", 0.0)), "quest")
 		"ancora":
 			var ns: Node = get_node_or_null("/root/NpcSystem")
-			if ns != null:
+			if ns != null and e.has("forza"):       # US-1308: regola la forza di un'Ancora gia' attiva, non ne crea una
+				ns.call("forza_ancora", str(e.get("npc_id", "")), float(e.get("forza", 0.0)))
+			elif ns != null:
 				ns.call("promuovi_ancora", str(e.get("npc_id", "")))
 		"apri_vendita":
 			apri_vendita.emit(str(e.get("npc_id", "")))

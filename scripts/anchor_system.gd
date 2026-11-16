@@ -41,6 +41,14 @@ func register(anchor_id: String, forza_override: float = -1.0) -> bool:
 	return true
 
 
+## US-1308: cambia la forza di un'Ancora attiva (resta nel salvataggio come le Ancore ereditate). false se non lo e'.
+func imposta_forza(anchor_id: String, forza: float) -> bool:
+	if not _active.has(anchor_id):
+		return false
+	_forza_override[anchor_id] = maxf(0.0, forza)
+	return true
+
+
 ## Distrugge un'Ancora attiva: emette anchor_lost e aggiunge follia
 ## (sorgente "anchor_lost", NON bufferizzata dalle altre Ancore).
 func destroy(anchor_id: String) -> bool:

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "q_lena_02",
+  "name": "Sei ancora tu",
+  "name_i18n": "quest.q_lena_02.name",
+  "_comment": "US-1308, Atto III: Lena riconosce il giocatore. Se Lena e' un'Ancora attiva la sua forza raddoppia (effetto 'ancora' con 'forza': regola la forza di un'Ancora gia' attiva, non ne crea una).",
+  "giver": "npc_lena",
+  "atto": 3,
+  "fallibile": true,
+  "exclusive_with": [
+    "q_lena_03"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "desc": "Rispondi a Lena.",
+      "desc_i18n": "quest.q_lena_02.s1",
+      "completamento": {
+        "tipo": "flag",
+        "id": "lena_ha_capito"
+      },
+      "on_complete": [
+        {
+          "tipo": "ancora",
+          "npc_id": "npc_lena",
+          "forza": 10
+        }
+      ]
+    }
+  ],
+  "ricompense": [
+    {
+      "tipo": "flag",
+      "id": "q_lena_02_done",
+      "valore": true
+    }
+  ]
+}
