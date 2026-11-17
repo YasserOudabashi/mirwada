@@ -1926,6 +1926,26 @@ def main():
     # (sequenza + override + scala), mai un flag: qui si valida solo la forma.
     _bal_nemici = load_json(os.path.join(DATA, "balance.json")) or {}
     nemico_base_keys = set((_bal_nemici.get("nemico_base", {}) or {}).keys())
+    # US-1501: i tipi di nemico: chiavi di nemico_base piu' nome, rarita', comportamento e aspetto
+    nemici_tipi = {k: v for k, v in (_bal_nemici.get("nemici_tipi", {}) or {}).items() if not k.startswith("_")}
+    _tipo_extra = {"name_i18n", "rarita", "comportamento", "aspetto"}
+    for _tid, _td in nemici_tipi.items():
+        _ctx = f"data/balance.json nemici_tipi [{_tid}]"
+        _fuori = set(_td) - nemico_base_keys - _tipo_extra
+        if _fuori:
+            err(f"{_ctx}: chiavi fuori da nemico_base: {sorted(_fuori)}")
+        if _td.get("rarita") not in ("comune", "raro", "elite"):
+            err(f"{_ctx}: rarita '{_td.get('rarita')}' (comune, raro, elite)")
+        if _td.get("comportamento") not in ("mischia", "distanza", "carica", "volo"):
+            err(f"{_ctx}: comportamento '{_td.get('comportamento')}' fuori vocabolario (mischia, distanza, carica, volo)")
+        if _td.get("tag") and _td["tag"] not in valid_tags:
+            err(f"{_ctx}: tag '{_td['tag']}' fuori dal vocabolario di data/tags.json")
+        if not os.path.isfile(os.path.join(ROOT, "assets", "placeholder", f"{_td.get('aspetto')}_idle.png")):
+            err(f"{_ctx}: aspetto '{_td.get('aspetto')}' senza foglio assets/placeholder/<aspetto>_idle.png")
+
+    def _controlla_tipo(rel, nm):
+        if nm.get("tipo") not in nemici_tipi:
+            err(f"{rel}: nemico a ({nm.get('x')},{nm.get('y')}) senza un tipo di balance.json nemici_tipi ('{nm.get('tipo')}')")
     if os.path.isdir(layouts_dir):
         for fn in sorted(os.listdir(layouts_dir)):
             if not fn.endswith(".json"):
@@ -1952,6 +1972,7 @@ def main():
                 scala = nm.get("scala", 1.0)
                 if not (isinstance(scala, (int, float)) and 0.5 <= scala <= 3):
                     err(f"{rel} [{rid}]: nemico scala '{scala}' deve essere in [0.5, 3]")
+                _controlla_tipo(rel, nm)
                 ov = nm.get("override", {})
                 if not isinstance(ov, dict):
                     err(f"{rel} [{rid}]: nemico override deve essere un dict")
@@ -1971,6 +1992,11 @@ def main():
                     err(f"{rel} [{rid}]: oggetto a ({ox},{oy}) non e' su una cella calpestabile")
                 if og.get("item_id") not in item_ids:
                     err(f"{rel} [{rid}]: oggetto item_id '{og.get('item_id')}' non esiste in data/items/")
+
+    for _f in [os.path.join(DATA, "world", "campagna.json")] + [
+            os.path.join(interni_dir, _x) for _x in sorted(os.listdir(interni_dir)) if _x.endswith(".json")]:
+        for _nm in (load_json(_f) or {}).get("nemici", []):
+            _controlla_tipo(os.path.relpath(_f, ROOT), _nm)
 
     # --- bottino e forzieri (US-8B22) ---
     # data/world/bottino.json: tabelle {tiri: [min, max], voci: [{item_id, peso, quantita: [min, max]}]}. Ogni

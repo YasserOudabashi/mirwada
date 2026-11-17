@@ -320,6 +320,7 @@ func _crea_nemici(rid: String, layout: Dictionary, offset: Vector2i) -> void:
 			override["oggetti_a_morte"] = drop[str(sequenza)]
 		var e: Node = preload("res://scenes/enemy.tscn").instantiate()
 		e.set("override", override)
+		e.set("tipo", str(spec.get("tipo", "")))
 		e.set("scale", Vector2.ONE * float(spec.get("scala", 1.0)))
 		add_child(e)
 		e.set("global_position", to_global(map_to_local(

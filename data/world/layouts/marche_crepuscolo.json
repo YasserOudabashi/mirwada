@@ -119,56 +119,54 @@
   },
   "nemici": [
     {
+      "tipo": "soldato_caduto",
       "x": 7,
       "y": 8,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.soldato_caduto"}
+      "scala": 1.0
     },
     {
+      "tipo": "soldato_caduto",
       "x": 20,
       "y": 10,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.soldato_caduto"}
+      "scala": 1.0
     },
     {
+      "tipo": "soldato_caduto",
       "x": 63,
       "y": 30,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.soldato_caduto"}
+      "scala": 1.0
     },
     {
+      "tipo": "alfiere_spettrale",
       "x": 16,
       "y": 30,
       "sequenza": 8,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.alfiere_spettrale"}
+      "scala": 1.0
     },
     {
+      "tipo": "alfiere_spettrale",
       "x": 48,
       "y": 12,
       "sequenza": 8,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.alfiere_spettrale"}
+      "scala": 1.0
     },
     {
+      "tipo": "alfiere_spettrale",
       "x": 59,
       "y": 14,
       "sequenza": 8,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.alfiere_spettrale"}
+      "scala": 1.0
     },
     {
+      "tipo": "capitano_senza_riposo",
       "x": 37,
       "y": 12,
       "sequenza": 7,
       "scala": 1.5,
-      "override": { "name_i18n": "enemy.capitano_senza_riposo",
-        "danno_attacco": 15,
-        "raggio_aggro": 200,
-        "tag": "non_morto",
+      "override": {
         "caratteristica": {
           "pathway_id": "twilight_giant",
           "sequence": 7,
@@ -362,7 +360,8 @@
     {
       "x": 5,
       "y": 44,
-      "interno_id": "base_rifugio", "villaggio": "rifugio_base_marche"
+      "interno_id": "base_rifugio",
+      "villaggio": "rifugio_base_marche"
     }
   ]
 }

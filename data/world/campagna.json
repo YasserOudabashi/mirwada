@@ -5,276 +5,280 @@
     {
       "x": 70,
       "y": 58,
-      "interno_id": "marche_villaggio_fabbro", "villaggio": "villaggio_libero_colline"
+      "interno_id": "marche_villaggio_fabbro",
+      "villaggio": "villaggio_libero_colline"
     },
     {
       "x": 80,
       "y": 58,
-      "interno_id": "marche_villaggio_mercante", "villaggio": "villaggio_libero_colline"
+      "interno_id": "marche_villaggio_mercante",
+      "villaggio": "villaggio_libero_colline"
     },
     {
       "x": 486,
       "y": 50,
-      "interno_id": "archivio_villaggio_alchimista", "villaggio": "villaggio_libero_paludi"
+      "interno_id": "archivio_villaggio_alchimista",
+      "villaggio": "villaggio_libero_paludi"
     },
     {
       "x": 496,
       "y": 50,
-      "interno_id": "archivio_villaggio_mercante", "villaggio": "villaggio_libero_paludi"
+      "interno_id": "archivio_villaggio_mercante",
+      "villaggio": "villaggio_libero_paludi"
     }
   ],
   "nemici": [
     {
+      "tipo": "brigante",
       "x": 269,
       "y": 230,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 177,
       "y": 44,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 365,
       "y": 395,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 476,
       "y": 55,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 28,
       "y": 341,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 367,
       "y": 75,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 450,
       "y": 348,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 305,
       "y": 60,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 306,
       "y": 179,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 345,
       "y": 8,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 279,
       "y": 170,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 135,
       "y": 116,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 251,
       "y": 78,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 277,
       "y": 23,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 114,
       "y": 76,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 379,
       "y": 55,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 120,
       "y": 195,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 182,
       "y": 58,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 446,
       "y": 52,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 78,
       "y": 404,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 227,
       "y": 372,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 233,
       "y": 156,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 177,
       "y": 399,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 464,
       "y": 68,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 237,
       "y": 397,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 291,
       "y": 168,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 347,
       "y": 213,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 340,
       "y": 190,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 215,
       "y": 391,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 186,
       "y": 27,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 280,
       "y": 259,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 126,
       "y": 258,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 76,
       "y": 156,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 33,
       "y": 115,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 258,
       "y": 145,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     },
     {
+      "tipo": "brigante",
       "x": 166,
       "y": 234,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.brigante"}
+      "scala": 1.0
     }
   ],
   "oggetti": [

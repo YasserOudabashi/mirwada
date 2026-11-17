@@ -91,75 +91,60 @@
   },
   "nemici": [
     {
+      "tipo": "scrivano_di_carta",
       "x": 10,
       "y": 6,
       "sequenza": 8,
-      "scala": 1.0,
-      "override": {
-        "name_i18n": "enemy.scrivano_di_carta"
-      }
+      "scala": 1.0
     },
     {
+      "tipo": "scrivano_di_carta",
       "x": 25,
       "y": 16,
       "sequenza": 8,
-      "scala": 1.0,
-      "override": {
-        "name_i18n": "enemy.scrivano_di_carta"
-      }
+      "scala": 1.0
     },
     {
+      "tipo": "scrivano_di_carta",
       "x": 12,
       "y": 30,
       "sequenza": 8,
-      "scala": 1.0,
-      "override": {
-        "name_i18n": "enemy.scrivano_di_carta"
-      }
+      "scala": 1.0
     },
     {
+      "tipo": "automa_custode",
       "x": 25,
       "y": 33,
       "sequenza": 7,
-      "scala": 1.0,
-      "override": {
-        "name_i18n": "enemy.automa_custode"
-      }
+      "scala": 1.0
     },
     {
+      "tipo": "automa_custode",
       "x": 50,
       "y": 8,
       "sequenza": 7,
-      "scala": 1.0,
-      "override": {
-        "name_i18n": "enemy.automa_custode"
-      }
+      "scala": 1.0
     },
     {
+      "tipo": "automa_custode",
       "x": 48,
       "y": 28,
       "sequenza": 7,
-      "scala": 1.0,
-      "override": {
-        "name_i18n": "enemy.automa_custode"
-      }
+      "scala": 1.0
     },
     {
+      "tipo": "custode_del_sapere",
       "x": 55,
       "y": 38,
       "sequenza": 6,
       "scala": 1.5,
       "override": {
-        "danno_attacco": 15,
-        "raggio_aggro": 200,
-        "tag": "spirito",
         "caratteristica": {
           "pathway_id": "hermit",
           "sequence": 6,
           "probabilita": 1.0
         },
-        "drop_probabilita": 1.0,
-        "name_i18n": "enemy.custode_del_sapere"
+        "drop_probabilita": 1.0
       }
     }
   ],

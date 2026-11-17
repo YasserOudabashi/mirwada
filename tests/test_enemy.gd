@@ -110,7 +110,9 @@ func test_i_nemici_hanno_un_nome() -> void:
 		fonti.append(gd.call("get_layout", str((r as Dictionary).get("id", ""))))
 	for layout in fonti:
 		for n in (layout as Dictionary).get("nemici", []):
-			var k: String = str(((n as Dictionary).get("override", {}) as Dictionary).get("name_i18n", ""))
+			# US-1501: il nome sta nel tipo (balance.json nemici_tipi), l'override puo' ancora cambiarlo
+			var tipo: Dictionary = (gd.call("get_balance", "nemici_tipi") as Dictionary).get(str((n as Dictionary).get("tipo", "")), {})
+			var k: String = str(((n as Dictionary).get("override", {}) as Dictionary).get("name_i18n", tipo.get("name_i18n", "")))
 			assert_true(not k.is_empty() and str(gd.call("tr_data", k)) != k, "nemico con un nome (%s)" % k)
 			visti += 1
 	assert_gt(float(visti), 60.0, "tutti i nemici dei dati")

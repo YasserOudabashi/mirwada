@@ -1,7 +1,8 @@
 {
   "schema_version": 1,
   "interno_id": "archivio_torre_osservazione",
-  "stile": "torre", "zona": "torre_di_osservazione",
+  "stile": "torre",
+  "zona": "torre_di_osservazione",
   "mappa": [
     "###########################",
     "###########################",
@@ -53,13 +54,11 @@
   ],
   "nemici": [
     {
+      "tipo": "automa_custode",
       "x": 22,
       "y": 3,
       "sequenza": 7,
-      "scala": 1.0,
-      "override": {
-        "name_i18n": "enemy.automa_custode"
-      }
+      "scala": 1.0
     }
   ],
   "oggetti": [

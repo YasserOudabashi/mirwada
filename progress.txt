@@ -1422,3 +1422,20 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Schermo: qa_atto_3 rilanciato fino in fondo (tutti ok): l'ultimo rituale alla Soglia del Crepuscolo con Ancora e
   detentore, poi Apoteosi, il viaggio, i crediti, "Grazie per aver giocato", il colophon. arte/revisione/titoli_di_coda.png.
 - Da fare piu' avanti: la musica dei titoli (manca il lettore, US-1602); i titoli in inglese con il resto (US-EN).
+
+## US-1501: i tipi di nemico sono dati, 2026-11-17 (fase 15 cominciata)
+- data/balance.json "nemici_tipi": 42 tipi. I 36 del bestiario deciso dall'utente (6 Mirwada, 5+1 Marche, 5+1 Valle,
+  5+1 Archivio, 5+1 Frontiera, 5 sottosuolo, 4+1 mare con la barca senza nessuno), il coccodrillo che rima, i 5 capi
+  gia' posati nel mondo (belva dei moli, capitano senza riposo, madre dei lupi, custode del sapere, burattinaio) e il
+  brigante della campagna. Ognuno: name_i18n, rarita (comune/raro/elite), comportamento (mischia/distanza/carica/volo),
+  aspetto, telegraph (comune: wind_up_heavy 700 ms, leggibile; raro/elite: wind_up_light 300 ms, teso: decisione
+  dell'utente nel bestiario), tag e i numeri che cambiano. Nomi in it.json (enemy.*). Numeri plausibili, non bilanciati.
+- scripts/enemy.gd: var tipo; _cfg = nemico_base, poi il tipo, poi l'override. mondo.gd, interior_scene.gd e
+  world_scene.gd passano spec.tipo. I nemici posati (layout, campagna, interni: 72) hanno "tipo" al posto di
+  override.name_i18n (script fatto una volta; campagna.json riformattata con un campo per riga).
+- Validator: ogni nemico posato ha un tipo esistente; i tipi solo con chiavi di nemico_base + name_i18n, rarita,
+  comportamento, aspetto; vocabolari di rarita' e comportamento; tag del vocabolario; foglio dell'aspetto esistente.
+- tests/test_nemici_tipi.gd (3), test_enemy aggiornato. 1146 test, validate 0.
+- Schermo (Xvfb): nel mondo 14 tipi diversi posati (gli altri entrano con US-1507); il lupo della luna ha il suo nome,
+  i suoi numeri e il tell lungo, e attacca. arte/revisione/nemici_tipi.png. Tutti hanno ancora la figura di nemico_base
+  (US-1504) e combattono in mischia (US-1502/1503).

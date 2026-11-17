@@ -44,6 +44,8 @@ var sequenza: int = 9
 ## gia' legge con _cfg.get(...) diventa sovrascrivibile per-istanza senza
 ## altre righe. {} = comportamento di sempre (il nemico da banco di prova).
 var override: Dictionary = {}
+## US-1501: il tipo di nemico (balance.json nemici_tipi): sta fra nemico_base e l'override dell'istanza. "" = nemico_base.
+var tipo: String = ""
 
 ## US-804: dal momento in cui il nemico entra in INSEGUIMENTO (l'inizio
 ## dello scontro) fino alla morte, se il player ha lanciato un'abilita' o
@@ -61,6 +63,9 @@ func _ready() -> void:
 		# non una copia (US-806) — mergiare l'override lì dentro corromperebbe
 		# nemico_base per ogni altro nemico dell'intera partita.
 		_cfg = (gd.call("get_balance", "nemico_base") as Dictionary).duplicate(true)
+	if gd != null and not tipo.is_empty():
+		var tipi: Dictionary = gd.call("get_balance", "nemici_tipi")
+		_cfg.merge((tipi.get(tipo, {}) as Dictionary).duplicate(true), true)
 	_cfg.merge(override, true)
 	_attesa_left = float(_cfg.get("attesa_iniziale_s", 0.0))
 

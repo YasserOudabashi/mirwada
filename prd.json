@@ -1737,8 +1737,8 @@
       ],
       "priority": 65,
       "fase": "15",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+      "passes": true,
+      "notes": "FATTA 2026-11-17. balance.json nemici_tipi: 42 tipi (i 36 del bestiario dell'utente, il coccodrillo, la barca senza nessuno, i 5 capi gia' nel mondo e il brigante) con nome, rarita' (comune: tell lungo wind_up_heavy; raro ed elite: tell corto wind_up_light, come ha deciso l'utente), comportamento (mischia/distanza/carica/volo: per ora tutti in mischia, US-1502/1503), aspetto (nemico_base finche' non c'e' l'arte, US-1504), tag e numeri. enemy.gd: nemico_base + tipo + override. I 72 nemici posati (layout, campagna, interni) hanno 'tipo', il nome e' passato dall'override al tipo. Validator: tipo esistente per ogni nemico, chiavi e vocabolari dei tipi. tests/test_nemici_tipi.gd (3). Schermo: arte/revisione/nemici_tipi.png."
     },
     {
       "id": "US-1502",

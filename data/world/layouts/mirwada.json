@@ -85,56 +85,54 @@
   },
   "nemici": [
     {
+      "tipo": "tagliaborse",
       "x": 34,
       "y": 6,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.tagliaborse"}
+      "scala": 1.0
     },
     {
+      "tipo": "tagliaborse",
       "x": 10,
       "y": 19,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.tagliaborse"}
+      "scala": 1.0
     },
     {
+      "tipo": "tagliaborse",
       "x": 30,
       "y": 20,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.tagliaborse"}
+      "scala": 1.0
     },
     {
+      "tipo": "tagliaborse",
       "x": 42,
       "y": 24,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.tagliaborse"}
+      "scala": 1.0
     },
     {
+      "tipo": "tagliaborse",
       "x": 10,
       "y": 27,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.tagliaborse"}
+      "scala": 1.0
     },
     {
+      "tipo": "tagliaborse",
       "x": 52,
       "y": 32,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": { "name_i18n": "enemy.tagliaborse"}
+      "scala": 1.0
     },
     {
+      "tipo": "belva_dei_moli",
       "x": 34,
       "y": 33,
       "sequenza": 8,
       "scala": 1.5,
-      "override": { "name_i18n": "enemy.belva_dei_moli",
-        "danno_attacco": 15,
-        "raggio_aggro": 200,
-        "tag": "bestia",
+      "override": {
         "caratteristica": {
           "pathway_id": "twilight_giant",
           "sequence": 8,
@@ -337,7 +335,8 @@
     {
       "x": 56,
       "y": 28,
-      "interno_id": "base_casa", "villaggio": "casa_base_porto"
+      "interno_id": "base_casa",
+      "villaggio": "casa_base_porto"
     }
   ]
 }

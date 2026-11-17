@@ -416,6 +416,7 @@ func _popola_da(rid_eventi: String, rid: String, layout: Dictionary, occupate: D
 			override["oggetti_a_morte"] = drop[str(sequenza)]
 		var e: Node2D = preload("res://scenes/enemy.tscn").instantiate()
 		e.set("override", override)
+		e.set("tipo", str(spec.get("tipo", "")))          # US-1501
 		e.scale = Vector2.ONE * float(spec.get("scala", 1.0))
 		e.position = Vector2((c.x + 0.5) * tile, (c.y + 0.5) * tile)
 		e.set_meta("regione_layout", rid_eventi)

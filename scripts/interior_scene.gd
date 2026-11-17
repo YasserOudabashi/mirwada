@@ -391,6 +391,7 @@ func _crea_nemici(layout: Dictionary) -> void:
 		if not ov.has("attesa_iniziale_s"):           # US-8B21d: chi entra ha un attimo per guardarsi attorno
 			ov["attesa_iniziale_s"] = _balance_interni("interni_attesa_nemici_s", 0.0)
 		e.set("override", ov)
+		e.set("tipo", str(spec.get("tipo", "")))          # US-1501
 		e.set("scale", Vector2.ONE * float(spec.get("scala", 1.0)))
 		add_child(e)
 		e.set("global_position", to_global(map_to_local(

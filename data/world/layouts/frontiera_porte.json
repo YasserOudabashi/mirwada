@@ -95,75 +95,60 @@
   },
   "nemici": [
     {
+      "tipo": "maschera_senza_volto",
       "x": 30,
       "y": 8,
       "sequenza": 7,
-      "scala": 1.0,
-      "override": {
-        "name_i18n": "enemy.maschera_senza_volto"
-      }
+      "scala": 1.0
     },
     {
+      "tipo": "maschera_senza_volto",
       "x": 35,
       "y": 30,
       "sequenza": 7,
-      "scala": 1.0,
-      "override": {
-        "name_i18n": "enemy.maschera_senza_volto"
-      }
+      "scala": 1.0
     },
     {
+      "tipo": "maschera_senza_volto",
       "x": 55,
       "y": 40,
       "sequenza": 7,
-      "scala": 1.0,
-      "override": {
-        "name_i18n": "enemy.maschera_senza_volto"
-      }
+      "scala": 1.0
     },
     {
+      "tipo": "viandante_delle_porte",
       "x": 3,
       "y": 36,
       "sequenza": 6,
-      "scala": 1.0,
-      "override": {
-        "name_i18n": "enemy.viandante_delle_porte"
-      }
+      "scala": 1.0
     },
     {
+      "tipo": "viandante_delle_porte",
       "x": 58,
       "y": 8,
       "sequenza": 6,
-      "scala": 1.0,
-      "override": {
-        "name_i18n": "enemy.viandante_delle_porte"
-      }
+      "scala": 1.0
     },
     {
+      "tipo": "viandante_delle_porte",
       "x": 14,
       "y": 3,
       "sequenza": 6,
-      "scala": 1.0,
-      "override": {
-        "name_i18n": "enemy.viandante_delle_porte"
-      }
+      "scala": 1.0
     },
     {
+      "tipo": "burattinaio",
       "x": 42,
       "y": 40,
       "sequenza": 5,
       "scala": 1.5,
       "override": {
-        "danno_attacco": 15,
-        "raggio_aggro": 200,
-        "tag": "ombra",
         "caratteristica": {
           "pathway_id": "fool",
           "sequence": 5,
           "probabilita": 1.0
         },
-        "drop_probabilita": 1.0,
-        "name_i18n": "enemy.burattinaio"
+        "drop_probabilita": 1.0
       }
     }
   ],
