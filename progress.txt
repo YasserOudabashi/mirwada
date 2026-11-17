@@ -1451,3 +1451,16 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   (cerchio azzurro), tira, il colpo arriva su Enel; tre tiri in 4 secondi. arte/revisione/nemico_distanza.png.
 - Non mi convince: il proiettile ha la palette neutra (bianco) e i nomi lunghi sopra la testa ("Contrabbandiere con
   la balestra") sono larghi: da guardare con l'arte dei nemici (US-1504).
+
+## US-1503: il nemico che carica e quello che vola, 2026-11-17
+- Dati: balance.json nemico_base.carica {da 110, velocita 340, durata_s 0.6, recupero_s 1.4} e .volo {maschera 1,
+  quota 8, ondeggio 1.5}; valgono per i tipi con comportamento carica (3) e volo (4).
+- scripts/enemy.gd: la carica comincia il tell a portata "da", in ATTACCO scatta in linea con la hitbox attiva davanti
+  e finisce al muro / addosso al giocatore / a tempo, poi il recupero lungo (l'animazione non la chiude); chi vola ha
+  collision_mask senza lo strato dei dislivelli (16) e la figura alzata che ondeggia.
+- tests/test_nemico_carica_volo.gd (2): la carica si ferma contro un muro e resta scoperta; il volante passa i
+  dislivelli ma non l'acqua. 1152 test, validate 0.
+- Schermo (Xvfb, Mirwada): lo scaricatore ubriaco fa il tell a 100 unita', in un attimo e' addosso a Enel (colpo),
+  poi resta fermo un secondo e mezzo; il corvo vola alto e colpisce. arte/revisione/nemico_carica_volo.png.
+- Non mi convince: i nomi sopra la testa di nemici vicini si accavallano (da sistemare con l'arte dei nemici, US-1504,
+  o mostrando il nome solo del nemico ingaggiato).

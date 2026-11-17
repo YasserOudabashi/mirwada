@@ -1767,8 +1767,8 @@
       ],
       "priority": 67,
       "fase": "15",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+      "passes": true,
+      "notes": "FATTA 2026-11-17. 'carica' (scaricatore, colosso, cervo): dentro 'da' fa il tell, scatta in linea verso il giocatore con l'arco attivo davanti, si ferma contro un muro, addosso al giocatore o a fine durata, poi resta scoperto recupero_s (1,4 s). 'volo' (corvo, sciame, pipistrello, gabbiano): maschera delle collisioni senza lo strato dei dislivelli (l'acqua ferma ancora), figura piu' in alto che ondeggia. Numeri in balance.json nemico_base.carica e .volo. tests/test_nemico_carica_volo.gd (2). Schermo: arte/revisione/nemico_carica_volo.png."
     },
     {
       "id": "US-1504",

@@ -68,6 +68,13 @@ func _ready() -> void:
 		_cfg.merge((tipi.get(tipo, {}) as Dictionary).duplicate(true), true)
 	_cfg.merge(override, true)
 	_attesa_left = float(_cfg.get("attesa_iniziale_s", 0.0))
+	if str(_cfg.get("comportamento", "")) == "volo":    # US-1503: sopra i dislivelli, non sopra l'acqua
+		var vo: Dictionary = _cfg.get("volo", {})
+		collision_mask = int(vo.get("maschera", 1))
+		_anim.position.y -= float(vo.get("quota", 8.0))
+		var t := create_tween().set_loops()
+		t.tween_property(_anim, "position:y", _anim.position.y - float(vo.get("ondeggio", 1.5)), 0.6).set_trans(Tween.TRANS_SINE)
+		t.tween_property(_anim, "position:y", _anim.position.y, 0.6).set_trans(Tween.TRANS_SINE)
 
 	_postura.call("configura",
 		float(_cfg.get("postura_massimo", 60.0)), 3.0, 15.0)
@@ -117,7 +124,7 @@ func _physics_process(delta: float) -> void:
 		Stato.INSEGUIMENTO:
 			if _a_distanza():
 				_insegui_a_distanza(dist, delta)
-			elif dist <= float(_cfg.get("raggio_attacco", 26.0)):
+			elif dist <= (float((_cfg.get("carica", {}) as Dictionary).get("da", 110.0)) if _carica() else float(_cfg.get("raggio_attacco", 26.0))):
 				_vai(Stato.ANTICIPO)
 			elif dist > float(_cfg.get("raggio_aggro", 140.0)) * 1.3:
 				_vai(Stato.IDLE)
@@ -129,7 +136,13 @@ func _physics_process(delta: float) -> void:
 			_anticipo_left -= delta
 			if _anticipo_left <= 0.0:
 				_vai(Stato.ATTACCO)
-		Stato.ATTACCO, Stato.STAGGER:
+		Stato.ATTACCO:
+			if _carica():                           # US-1503: lo scatto in linea
+				velocity = _carica_dir * float((_cfg.get("carica", {}) as Dictionary).get("velocita", 340.0))
+				_carica_left -= delta
+			else:
+				velocity = Vector2.ZERO
+		Stato.STAGGER:
 			velocity = Vector2.ZERO
 		Stato.RECUPERO:
 			velocity = Vector2.ZERO
@@ -138,6 +151,8 @@ func _physics_process(delta: float) -> void:
 				_vai(Stato.IDLE)
 
 	move_and_slide()
+	if _stato == Stato.ATTACCO and _carica() and (_carica_left <= 0.0 or get_slide_collision_count() > 0):
+		_vai(Stato.RECUPERO)                         # US-1503: fine della carica (tempo, muro o giocatore)
 	_aggiorna_anim_locomozione()
 
 
@@ -158,13 +173,23 @@ func _vai(nuovo: int) -> void:
 				_tira()
 				_anim.call("riproduci", "attack", _dir_sguardo)
 				return
+			if _carica():                           # US-1503: scatta in linea con l'arco attivo davanti
+				_carica_dir = global_position.direction_to(_bersaglio.global_position) if is_instance_valid(_bersaglio) else _vettore_sguardo()
+				_carica_left = float((_cfg.get("carica", {}) as Dictionary).get("durata_s", 0.6))
+				_hitbox.position = _carica_dir * 6.0
+				_hitbox.rotation = _carica_dir.angle()
+				_hitbox.call("attiva", float(_cfg.get("danno_attacco", 10.0)), float(_cfg.get("stagger_attacco", 8.0)), self,
+					str(_cfg.get("tag_danno_attacco", "fisico")))
+				_anim.call("riproduci", "attack", _dir_sguardo)
+				return
 			var facing: Vector2 = _vettore_sguardo()
 			_hitbox.position = facing * 6.0
 			_hitbox.rotation = facing.angle()
 			_anim.call("riproduci", "attack", _dir_sguardo)
 		Stato.RECUPERO:
 			_hitbox.call("disattiva")
-			_recupero_left = float(_cfg.get("recupero_s", 0.6))
+			_recupero_left = float((_cfg.get("carica", {}) as Dictionary).get("recupero_s", 1.4)) if _carica() \
+				else float(_cfg.get("recupero_s", 0.6))
 		Stato.STAGGER:
 			_anim.modulate = Color(0.7, 0.7, 1.0)
 			_hitbox.call("disattiva")
@@ -174,7 +199,7 @@ func _vai(nuovo: int) -> void:
 
 
 func _su_evento_anim(nome: String) -> void:
-	if _a_distanza():
+	if _a_distanza() or _carica():
 		return                                      # chi tira non colpisce con l'arco di mischia
 	match nome:
 		"hitbox_on":
@@ -184,6 +209,16 @@ func _su_evento_anim(nome: String) -> void:
 				str(_cfg.get("tag_danno_attacco", "fisico")))
 		"hitbox_off":
 			_hitbox.call("disattiva")
+
+
+# --- US-1503: il comportamento "carica" (dati: blocco "carica" di nemico_base) ---
+
+var _carica_dir: Vector2 = Vector2.ZERO
+var _carica_left: float = 0.0
+
+
+func _carica() -> bool:
+	return str(_cfg.get("comportamento", "mischia")) == "carica"
 
 
 # --- US-1502: il comportamento "distanza" (dati: comportamento del tipo e blocco "distanza" di nemico_base) ---
@@ -244,7 +279,7 @@ func _su_anim_finita(stato_anim: String) -> void:
 	# L'anticipo NON e' piu' guidato dall'animazione: la sua durata la fissa
 	# anticipo_ms del tell (US-020). L'anim 'anticipo' e' solo cosmetica e puo'
 	# finire prima o dopo la fase reale.
-	if stato_anim == "attack":
+	if stato_anim == "attack" and not _carica():     # la carica finisce quando si ferma, non con l'animazione
 		_vai(Stato.RECUPERO)
 
 
