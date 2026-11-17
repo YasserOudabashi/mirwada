@@ -434,7 +434,7 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   (US-1501..1507, US-1601..1605, US-1701..1704). Servono per giocare tutto il gioco: oggi ogni nemico e' `nemico_base`
   ingrandito, non c'e' nessun file audio, e nessuno ha giocato una partita intera fino al finale.
 
-**Lavoro corrente** (aggiornato il 2026-11-17): tutto il lavoro che manca e' in `prd.json` (51 story aperte, con la
+**Lavoro corrente** (aggiornato il 2026-11-17): tutto il lavoro che manca e' in `prd.json` (52 story aperte, con la
 fase e la priorita'), l'ordine in `006_PRD/prossimi-passi.md`: **HUD nuovo** (US-8B75d, chiesto dall'utente), nemici e boss
 (bestiario deciso dall'utente: `prd-fasi-15-17-gioco-completo.md` 2.1),
 audio, Mondo vivo, fusioni, rilascio (qui il gioco e' finito in italiano), poi rifiniture d'arte e inglese.
