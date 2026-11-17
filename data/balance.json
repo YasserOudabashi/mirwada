@@ -638,6 +638,7 @@
   },
   "nemico_base": {
     "_comment": "Nemico da banco di prova. La DURATA della fase di anticipo la fissa il tell in data/audio.json.telegraph[telegraph].anticipo_ms (US-020): l'animazione 'anticipo' e' solo cosmetica. Qui raggi, danno, recupero e quale tell usa. PLAUSIBILI, non bilanciati. 'tag' (US-806) e' vuoto di default: un nemico dei layout lo sovrascrive per-istanza via override.tag e finisce in enemy_defeated.tag_nemico. 'drop_probabilita' (US-809a): probabilita' di lasciare un item da override.oggetti_a_morte alla morte (enemy.gd::_lascia_oggetto); un boss la sovrascrive a 1.0 per-istanza via override.",
+    "distanza": {"_comment": "US-1502: il comportamento 'distanza' (tipi con comportamento distanza): si tiene a 'tiene' unita' dal giocatore, tira da 'tiro' in giu' un proiettile (danno = danno_attacco) dopo il suo tell; se resta troppo vicino per 'ritirata_s' secondi tira lo stesso.", "tiene": 80, "tiro": 170, "ritirata_s": 1.2, "velocita_proiettile": 170, "gittata": 240, "tag_danno": "fisico"},
     "telegraph": "wind_up_light",
     "raggio_aggro": 140,
     "raggio_attacco": 26,

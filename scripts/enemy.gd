@@ -115,7 +115,9 @@ func _physics_process(delta: float) -> void:
 			if _attesa_left <= 0.0 and dist <= float(_cfg.get("raggio_aggro", 140.0)):
 				_vai(Stato.INSEGUIMENTO)
 		Stato.INSEGUIMENTO:
-			if dist <= float(_cfg.get("raggio_attacco", 26.0)):
+			if _a_distanza():
+				_insegui_a_distanza(dist, delta)
+			elif dist <= float(_cfg.get("raggio_attacco", 26.0)):
 				_vai(Stato.ANTICIPO)
 			elif dist > float(_cfg.get("raggio_aggro", 140.0)) * 1.3:
 				_vai(Stato.IDLE)
@@ -152,6 +154,10 @@ func _vai(nuovo: int) -> void:
 			_anticipo_left = _fai_partire_tell()
 		Stato.ATTACCO:
 			_anim.modulate = Color.WHITE
+			if _a_distanza():                       # US-1502: tira invece di colpire con l'arco
+				_tira()
+				_anim.call("riproduci", "attack", _dir_sguardo)
+				return
 			var facing: Vector2 = _vettore_sguardo()
 			_hitbox.position = facing * 6.0
 			_hitbox.rotation = facing.angle()
@@ -168,6 +174,8 @@ func _vai(nuovo: int) -> void:
 
 
 func _su_evento_anim(nome: String) -> void:
+	if _a_distanza():
+		return                                      # chi tira non colpisce con l'arco di mischia
 	match nome:
 		"hitbox_on":
 			_hitbox.call("attiva",
@@ -176,6 +184,46 @@ func _su_evento_anim(nome: String) -> void:
 				str(_cfg.get("tag_danno_attacco", "fisico")))
 		"hitbox_off":
 			_hitbox.call("disattiva")
+
+
+# --- US-1502: il comportamento "distanza" (dati: comportamento del tipo e blocco "distanza" di nemico_base) ---
+
+var _ritirata: float = 0.0
+
+
+func _a_distanza() -> bool:
+	return str(_cfg.get("comportamento", "mischia")) == "distanza"
+
+
+## Si tiene a distanza: si avvicina fino a tiro, indietreggia sotto "tiene"; da li' (o dopo ritirata_s di ritirata
+## che non basta, in un angolo) comincia il tell e tira.
+func _insegui_a_distanza(dist: float, delta: float) -> void:
+	var d: Dictionary = _cfg.get("distanza", {})
+	var v: float = _stats.get_stat("velocita")
+	var verso: Vector2 = global_position.direction_to(_bersaglio.global_position) if is_instance_valid(_bersaglio) else Vector2.ZERO
+	if dist > float(_cfg.get("raggio_aggro", 140.0)) * 1.3:
+		_vai(Stato.IDLE)
+	elif dist > float(d.get("tiro", 170.0)):
+		velocity = verso * v
+		_ritirata = 0.0
+	elif dist < float(d.get("tiene", 80.0)) and _ritirata < float(d.get("ritirata_s", 1.2)):
+		velocity = -verso * v
+		_ritirata += delta
+	else:
+		velocity = Vector2.ZERO
+		_ritirata = 0.0
+		_vai(Stato.ANTICIPO)
+
+
+## Il proiettile verso il giocatore (lo stesso delle abilita': si para e si schiva come gli altri colpi).
+func _tira() -> void:
+	var d: Dictionary = _cfg.get("distanza", {})
+	var p := preload("res://scripts/projectile.gd").new()
+	var verso: Vector2 = global_position.direction_to(_bersaglio.global_position) if is_instance_valid(_bersaglio) else _vettore_sguardo()
+	p.setup({"danno": float(_cfg.get("danno_attacco", 10.0)), "velocita": float(d.get("velocita_proiettile", 170.0)),
+		"gittata": float(d.get("gittata", 240.0)), "tag_danno": str(d.get("tag_danno", "fisico")), "origine": "nemico"},
+		global_position + verso * 8.0, verso, self)
+	get_parent().add_child(p)
 
 
 ## Fa partire il tell sonoro dell'attacco e restituisce la durata della fase

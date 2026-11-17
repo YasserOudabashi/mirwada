@@ -1752,8 +1752,8 @@
       ],
       "priority": 66,
       "fase": "15",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+      "passes": true,
+      "notes": "FATTA 2026-11-17. Comportamento 'distanza' (i tipi con comportamento distanza: balestriere, devoto, germoglio, guardiana, scrivano, lettore, ladro di tempo, voce dell'acqua, barca, burattinaio, coccodrillo): si avvicina fino a tiro, indietreggia sotto 'tiene', dopo il tell del suo tipo tira il proiettile delle abilita' (scripts/projectile.gd: si para e si schiva come ogni colpo); chiuso in un angolo tira lo stesso dopo ritirata_s. Numeri in balance.json nemico_base.distanza. Il tiro di un nemico non colpisce gli altri nemici. tests/test_nemico_distanza.gd (4). Schermo: arte/revisione/nemico_distanza.png."
     },
     {
       "id": "US-1503",

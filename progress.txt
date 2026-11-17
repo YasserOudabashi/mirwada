@@ -1439,3 +1439,15 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Schermo (Xvfb): nel mondo 14 tipi diversi posati (gli altri entrano con US-1507); il lupo della luna ha il suo nome,
   i suoi numeri e il tell lungo, e attacca. arte/revisione/nemici_tipi.png. Tutti hanno ancora la figura di nemico_base
   (US-1504) e combattono in mischia (US-1502/1503).
+
+## US-1502: il nemico che colpisce da lontano, 2026-11-17
+- Dati: balance.json nemico_base.distanza {tiene 80, tiro 170, ritirata_s 1.2, velocita_proiettile 170, gittata 240,
+  tag_danno}; vale per i tipi con comportamento "distanza" (11 tipi), il danno e' danno_attacco del tipo.
+- scripts/enemy.gd: _a_distanza(), _insegui_a_distanza() (si avvicina fino a tiro, indietreggia sotto tiene, poi il
+  tell), _tira() (scripts/projectile.gd, lo stesso delle abilita': parata e schivata come gli altri colpi); niente
+  arco di mischia per chi tira. scripts/projectile.gd: il tiro di un nemico non colpisce un altro nemico.
+- tests/test_nemico_distanza.gd (4). 1150 test, validate 0.
+- Schermo (Xvfb, Mirwada): un contrabbandiere con la balestra a 50 unita' da Enel indietreggia a 80, fa il tell
+  (cerchio azzurro), tira, il colpo arriva su Enel; tre tiri in 4 secondi. arte/revisione/nemico_distanza.png.
+- Non mi convince: il proiettile ha la palette neutra (bianco) e i nomi lunghi sopra la testa ("Contrabbandiere con
+  la balestra") sono larghi: da guardare con l'arte dei nemici (US-1504).
