@@ -1406,3 +1406,19 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   la hotbar). arte/revisione/hud_nuovo.png.
 - Da guardare insieme all'utente: grandezza degli emblemi (12 px), posizione della hotbar, se i numeri devono restare
   sempre visibili (oggi spariscono dopo 1,6 s).
+
+## US-1314 e US-1315: il rituale finale sulla Sequenza 1, i titoli di coda, 2026-11-17 (richiesta dell'utente)
+- Rituale della Sequenza 0: non si usava mai (nel progetto i dati della Sequenza N dicono come si LASCIA la N). Per i
+  10 Pathway il rituale della Sequenza 1 ora ha luogo, ora, luna e sigilli del vecchio rituale della 0 (il luogo
+  dell'apoteosi: Soglia del Crepuscolo, porta senza stanza, Biblioteca di Tutto, Radice del Mondo) e chiede insieme
+  l'Ancora e il detentore precedente (= la prova dell'antagonista). La Sequenza 0 ha advancement_ritual null e il
+  validator lo vuole cosi'; alla 0 PotionSystem.bevi rifiuta e il libro scrive "non c'e' un gradino oltre".
+  Script dei dati fatto a mano una volta (merge 1+0, ordine dei sacrifici: Ancora, detentore).
+- Titoli di coda: data/ui/titoli.json (velocita', colori, corpi, testi, scelte {flag, testo_i18n}, crediti),
+  scripts/titoli_coda.gd, testi titoli.* in it.json. EndingSystem: al finale partono i titoli, alla fine (o con Esc /
+  interagisci) il libro si apre sul colophon come prima. Crediti: ideazione Asso; codice, arte e testi Asso con Claude
+  Code; Godot; Alegreya (OFL); autori dei suoni CC0 letti da audio_fonti.json.
+- tests/test_titoli_coda.gd (1), test_ending_system, test_regions, test_darkness aggiornati. 1143 test, validate 0.
+- Schermo: qa_atto_3 rilanciato fino in fondo (tutti ok): l'ultimo rituale alla Soglia del Crepuscolo con Ancora e
+  detentore, poi Apoteosi, il viaggio, i crediti, "Grazie per aver giocato", il colophon. arte/revisione/titoli_di_coda.png.
+- Da fare piu' avanti: la musica dei titoli (manca il lettore, US-1602); i titoli in inglese con il resto (US-EN).

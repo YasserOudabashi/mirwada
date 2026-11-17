@@ -97,9 +97,15 @@ func _raggiungi(id: String) -> void:
 	eg.call("imposta_eredita", _componi_eredita_iniziale(id))
 	var gruppo: String = _gruppo_corrente()
 	finale_raggiunto.emit(id, gruppo)
-	var book: Node = _n("/root/Book")
-	if book != null:
-		book.call("apri_a", "colophon")
+	# 2026-11-17: prima i titoli di coda, poi il libro sul colophon (le scelte dell'eredita').
+	var titoli: CanvasLayer = preload("res://scripts/titoli_coda.gd").new()
+	titoli.name = "TitoliDiCoda"
+	titoli.set("finale_id", id)
+	titoli.connect("finiti", func() -> void:
+		var book: Node = _n("/root/Book")
+		if book != null:
+			book.call("apri_a", "colophon"))
+	get_tree().root.add_child.call_deferred(titoli)
 
 
 ## US-719, FR-14: la parte AUTOMATICA del contratto di eredita', compilata

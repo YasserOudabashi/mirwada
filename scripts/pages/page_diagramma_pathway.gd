@@ -221,6 +221,9 @@ func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, s
 		return
 
 	_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_TITOLO")))
+	if int(_prog.call("sequence")) <= 0:              # 2026-11-17: dalla Sequenza 0 non si va oltre
+		_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_FINE")))
+		return
 	var potion: Dictionary = sd.get("potion", {})
 	if potion.is_empty():
 		_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_NIENTE")))

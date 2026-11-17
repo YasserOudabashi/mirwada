@@ -129,16 +129,28 @@ func _passo_4_la_soglia() -> void:
 
 
 func _passo_5_dalla_1_alla_0() -> void:
-	print("=== 5. Sequenza 1 -> 0: il campo di battaglia durante l'eclissi, si sacrifica l'Ancora ===")
+	print("=== 5. Sequenza 1 -> 0: il rituale dell'apoteosi alla Soglia del Crepuscolo durante l'eclissi: l'Ancora e il detentore ===")
 	var follia: float = float(_n("/root/Madness").call("valore"))
 	_n("/root/TimeSystem").call("forza_eclissi")
-	await _rituale("campo_di_battaglia", "marche_crepuscolo", "", true, "05")
+	await _rituale("soglia_del_crepuscolo", "marche_crepuscolo", "", true, "05")
 	_assert(int(_n("/root/Progression").call("sequence")) == 0, "Sequenza 0")
 	_assert(not ("anchor_lena" in _n("/root/AnchorSystem").call("active")), "l'Ancora (Lena) e' sacrificata")
 	_assert(float(_n("/root/Madness").call("valore")) > follia, "perderla pesa sulla mente")
 	_assert(bool(_n("/root/KnowledgeStore").call("conosce", "rituale_sequenza_0_completato")), "il rituale della Sequenza 0 e' compiuto")
-	await _aspetta(60)
-	_screenshot("06_finale")
+	await _aspetta(150)                                 # la pausa e i titoli che cominciano a salire
+	_screenshot("06a_titoli")
+	var titoli: Node = get_root().get_node_or_null("TitoliDiCoda")
+	_assert(titoli != null, "dopo il finale scorrono i titoli di coda")
+	if titoli != null:
+		for i in 4:
+			for _f in 200:
+				titoli.call("_process", 0.1)
+			await _aspetta(5)
+			_screenshot("06b_titoli_%d" % i)
+		titoli.call("finisci")
+	await _aspetta(90)
+	_assert(bool(_n("/root/Book").call("e_aperto")), "finiti i titoli, il libro si apre sul finale")
+	_screenshot("06c_finale_nel_libro")
 	print("  finale: ", _n("/root/EndgameState").get("finale") if _n("/root/EndgameState") != null else "?")
 
 

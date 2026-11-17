@@ -89,7 +89,13 @@ func test_finale_raggiunto_scrive_endgame_e_apre_il_libro() -> void:
 	assert_eq(str(visti[0][0]), "consumazione", "id del finale")
 	assert_eq(str(visti[0][1]), "eternal_darkness", "gruppo del Pathway corrente")
 	assert_eq(str(_eg().call("get", "finale")), "consumazione", "endgame.finale scritto")
-	assert_true(bool(_book().call("e_aperto")), "il libro si apre sul finale")
+	await Engine.get_main_loop().process_frame
+	var titoli: Node = Engine.get_main_loop().root.get_node_or_null("TitoliDiCoda")
+	assert_true(titoli != null, "partono i titoli di coda (2026-11-17)")
+	if titoli != null:
+		titoli.call("finisci")
+		await Engine.get_main_loop().create_timer(1.0).timeout
+	assert_true(bool(_book().call("e_aperto")), "finiti i titoli il libro si apre sul finale")
 	_fine()
 
 

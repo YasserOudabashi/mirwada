@@ -410,8 +410,12 @@ def main():
 
             # rituale obbligatorio da Sequenza 4 in giu' (avanzamento da 5 in su)
             ritual = seq.get("advancement_ritual")
-            if n <= 4 and ritual is None:
-                err(f"{rel} [{sid}]: advancement_ritual obbligatorio per Sequenza <= 4")
+            # 2026-11-17: i dati della Sequenza N dicono come si LASCIA la N; dalla 0 non si va oltre, quindi la 0 non
+            # ha rituale (il rituale finale, quello dell'apoteosi, e' sulla 1).
+            if 1 <= n <= 4 and ritual is None:
+                err(f"{rel} [{sid}]: advancement_ritual obbligatorio per Sequenza 1..4")
+            if n == 0 and ritual is not None:
+                err(f"{rel} [{sid}]: la Sequenza 0 non ha rituale (non c'e' una Sequenza dopo): il rituale finale sta sulla 1")
             if n > 4 and ritual is not None:
                 warn(f"{rel} [{sid}]: advancement_ritual presente sopra Sequenza 4 (inatteso ma non fatale)")
             if isinstance(ritual, dict):

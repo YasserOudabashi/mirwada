@@ -1306,6 +1306,36 @@
       "notes": "FATTA 2026-11-17. Fase 13 chiusa: progress.txt, CLAUDE.md (fasi e lavoro corrente), 006_PRD/prossimi-passi.md."
     },
     {
+      "id": "US-1314",
+      "title": "Il rituale finale sulla Sequenza 1",
+      "description": "Il rituale scritto sulla Sequenza 0 non si usava mai (i dati della Sequenza N dicono come si lascia la N). Spostato sulla Sequenza 1: e' il rituale dell'apoteosi.",
+      "acceptanceCriteria": [
+        "la Sequenza 0 non ha rituale (il validator lo vuole)",
+        "il rituale della 1 chiede l'Ancora e il detentore precedente, nel luogo dell'apoteosi",
+        "dalla 0 non si beve piu' niente",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 63,
+      "fase": "13",
+      "passes": true,
+      "notes": "FATTA 2026-11-17 (chiesta dall'utente). Per ognuno dei 10 Pathway il rituale della Sequenza 1 prende luogo, ora, luna e sigilli del vecchio rituale della 0 e somma i sacrifici (Ancora + detentore precedente); la 0 ha advancement_ritual null. PotionSystem.bevi rifiuta alla Sequenza 0, il libro dice 'non c'e' un gradino oltre'. Test aggiornati (test_regions, test_darkness). qa_atto_3: l'ultimo rituale alla Soglia del Crepuscolo."
+    },
+    {
+      "id": "US-1315",
+      "title": "Titoli di coda",
+      "description": "Dopo il finale scorrono su fondo nero il nome del finale e l'epilogo, il viaggio del giocatore (Pathway, Ancore rimaste, scelte fatte) e i crediti; poi il libro sul colophon.",
+      "acceptanceCriteria": [
+        "tutto dai dati (data/ui/titoli.json, endings.json, audio_fonti.json)",
+        "si saltano con Esc o interagisci",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 63,
+      "fase": "13",
+      "passes": true,
+      "notes": "FATTA 2026-11-17 (chiesta dall'utente). scripts/titoli_coda.gd (CanvasLayer, gira anche col mondo fermo), lanciato da EndingSystem._raggiungi; alla fine apre il colophon (le scelte dell'eredita'). tests/test_titoli_coda.gd, test_ending_system aggiornato. Schermo: arte/revisione/titoli_di_coda.png."
+    },
+    {
       "id": "US-8B75d",
       "title": "HUD nuovo: barre belle e abilita' solo a simboli",
       "description": "Richiesta dell'utente (2026-11-17): l'interfaccia di gioco ridisegnata, molto piu' bella e pulita, che non stanchi l'occhio e stia bene col mondo. Barra della vita piu' bella (come si riempie e come si vede), barra della spiritualita' (mana) uguale; mentre si gioca le abilita' non hanno piu' il nome, solo il simbolo (il nome resta nel libro).",

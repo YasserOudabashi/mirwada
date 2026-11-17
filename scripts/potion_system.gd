@@ -117,6 +117,8 @@ func bevi(forza: bool = false) -> Dictionary:
 	var prog: Node = get_node_or_null("/root/Progression")
 	if prog == null:
 		return {"ok": false, "reason": "no_progression"}
+	if int(prog.call("sequence")) <= 0:              # 2026-11-17: dalla Sequenza 0 non si va oltre, la pozione resta
+		return {"ok": false, "reason": "sequenza_finale"}
 	if int(_pozione.get("da_sequenza", -1)) != int(prog.call("sequence")):
 		return {"ok": false, "reason": "pozione_per_un'altra_sequenza"}
 

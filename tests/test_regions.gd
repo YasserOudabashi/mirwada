@@ -125,16 +125,21 @@ func test_passaggi_verso_elenca_tutte_le_regioni() -> void:
 
 
 func test_ritual_di_sequenza_0_ospitato_da_una_regione() -> void:
-	# US-715: ogni Pathway attivo ha un sito reale per il rituale di Sequenza
-	# 0 (uno per gruppo, condiviso dai Pathway vicini che si fondono in fase 7).
+	# US-715: ogni Pathway attivo ha un sito reale per il rituale che porta alla Sequenza
+	# 0 (uno per gruppo, condiviso dai Pathway vicini che si fondono in fase 7). Dal 2026-11-17 sta sui dati della
+	# Sequenza 1 (i dati della N dicono come si lascia la N) e chiede il detentore precedente.
 	var regioni: Array = _gd().call("get_regions")
 	for pid in _gd().call("pathway_ids"):
 		var pw: Dictionary = _gd().call("get_pathway", pid)
 		for seq in (pw.get("sequences", []) as Array):
 			var s: Dictionary = seq
-			if int(s.get("sequence", -1)) != 0:
+			if int(s.get("sequence", -1)) == 0:
+				assert_eq(s.get("advancement_ritual"), null, "%s Seq 0: nessun rituale (non c'e' una Sequenza dopo)" % pid)
+			if int(s.get("sequence", -1)) != 1:
 				continue
 			var rit: Dictionary = s.get("advancement_ritual", {})
+			assert_true("il_detentore_precedente_della_sequenza_0" in rit.get("sacrifices", []), "%s: il rituale finale chiede il detentore" % pid)
+			assert_true("ancora_del_giocatore" in rit.get("sacrifices", []), "%s: e un'Ancora" % pid)
 			var tags: Array = rit.get("location_tags", [])
 			assert_true(tags.size() > 0, "%s Seq 0 ha almeno un location_tag" % pid)
 			for t in tags:
