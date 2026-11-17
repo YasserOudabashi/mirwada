@@ -2893,6 +2893,25 @@ def main():
         if o.get("produce") is not None and o["produce"] not in item_ids:
             err(f"data/potions/experiment_outcomes.json [{name}]: produce '{o.get('produce')}' non risolve a un item")
 
+    # --- HUD di gioco (data/ui/hud.json, US-8B75d): le icone ci sono, i colori sono #rrggbb ---
+    _hud = load_json(os.path.join(DATA, "ui", "hud.json"))
+    if _hud is None:
+        err("data/ui/hud.json: mancante o illeggibile (US-8B75d)")
+    else:
+        _icone_hud = [b.get("emblema") for b in _hud.get("barre", {}).values()] + [_hud.get("avanzamento", {}).get("icona")]
+        _icone_hud += ["cifra_%d" % i for i in range(1, 5)]
+        for _ic in _icone_hud:
+            if not os.path.isfile(os.path.join(ROOT, "assets", "ui", "hud", f"{_ic}.png")):
+                err(f"data/ui/hud.json: manca assets/ui/hud/{_ic}.png (python tools/art/build_hud.py)")
+        for _id in ("vita", "spirito", "recitazione"):
+            _b = _hud.get("barre", {}).get(_id)
+            if _b is None:
+                err(f"data/ui/hud.json: manca la barra '{_id}'")
+                continue
+            for _c in list(_b.get("toni", [])) + [_b.get("scia")]:
+                if not re.fullmatch(r"#[0-9a-fA-F]{6}", str(_c)):
+                    err(f"data/ui/hud.json barre.{_id}: '{_c}' non e' un colore #rrggbb")
+
     # --- libro / UI (data/ui/book.json, US-221) ---
     pt_doc = load_json(os.path.join(DATA, "schema", "page_types.json"))
     page_types = set((pt_doc or {}).get("page_types", []))

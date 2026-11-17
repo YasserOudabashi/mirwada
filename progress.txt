@@ -1386,3 +1386,23 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   - due rituali su cinque del Twilight Giant chiedono un'eclissi (rara nel gioco): chiesto all'utente.
   - il finale sta in cima al colophon, sopra le impostazioni: meriterebbe una pagina sua (titoli di coda).
   - durante il rituale (45 secondi) i nemici attorno possono interromperlo: sul campo di battaglia ce ne sono.
+
+## US-8B75d: HUD nuovo, pulito, abilita' a soli simboli, 2026-11-17 (richiesta dell'utente)
+- Brief: HUD piccolo e calmo che stia col mondo pixel art. In alto a sinistra le barre, in basso al centro la hotbar.
+  Mai nomi di abilita' o di status a schermo (stanno nel libro). Numeri solo quando servono.
+- Arte: python tools/art/build_hud.py (nessun seed: griglie) -> assets/ui/hud/{cuore,goccia,maschera,fiala}.png 12x12 e
+  cifra_1..4.png 6x8; foglio arte/revisione/hud_icone.png guardato x8 su fondo chiaro e scuro. Palette Endesga 32,
+  contorno #181425, alpha 0/255.
+- Dati: data/ui/hud.json (angolo, colori e misure delle tre barre, tempi della scia, soglia e battito della vita bassa,
+  numeri, avanzamento, stati, hotbar); GameData.get_ui_hud(); il validator controlla icone e colori.
+- Codice: scripts/hud_barra.gd (la barra disegnata a pixel di 0.5 unita': contorno, fondo, scia, pieno in 3 toni,
+  bordo acceso, tacche; scia che aspetta 0.45 s e scende; cura che sale in 0.25 s; battito sotto il 30%),
+  scripts/hud_slot.gd (cornice con luce in alto a sinistra, glifo con la rampa del Pathway, cifra, velo della ricarica
+  che si apre dall'alto, velo blu senza spiritualita', lampo al lancio), scripts/hud.gd e scenes/hud.tscn riscritti.
+  game_camera.inquadra_stanza lascia libero anche il basso (hud.altezza_sotto).
+- Test aggiornati (test_i18n_hud, test_icone_primitive): scia e numeri che spariscono, hotbar senza scritte, in basso al
+  centro, HUD in cima sotto un quinto dello schermo, status senza nomi. 1142 test, validate 0.
+- Schermo (Xvfb): luminosa e cupa, giorno e notte, dopo un colpo (scia) e in un interno (la stanza sta fra le barre e
+  la hotbar). arte/revisione/hud_nuovo.png.
+- Da guardare insieme all'utente: grandezza degli emblemi (12 px), posizione della hotbar, se i numeri devono restare
+  sempre visibili (oggi spariscono dopo 1,6 s).

@@ -51,6 +51,7 @@ const PATH_STATUS := "res://data/status_effects.json"
 const PATH_I18N_IT := "res://data/i18n/it.json"
 const PATH_I18N_EN := "res://data/i18n/en.json"
 const PATH_UI_BOOK := "res://data/ui/book.json"
+const PATH_UI_HUD := "res://data/ui/hud.json"
 const PATH_PAGE_TYPES := "res://data/schema/page_types.json"
 const PATH_VFX := "res://data/vfx.json"
 const PATH_MODALITA := "res://data/modalita.json"
@@ -113,6 +114,7 @@ var _statuses: Dictionary = {}
 var _i18n_it: Dictionary = {}
 var _i18n_en: Dictionary = {}
 var _ui_book: Dictionary = {}
+var _ui_hud: Dictionary = {}
 var _page_types: Dictionary = {}
 var _vfx: Dictionary = {}
 var _modalita: Dictionary = {}
@@ -217,6 +219,7 @@ func load_all() -> void:
 	_load_flat(PATH_I18N_IT, _i18n_it)
 	_load_flat(PATH_I18N_EN, _i18n_en)
 	_load_single(PATH_UI_BOOK, "pages", _ui_book, TYPE_ARRAY)
+	_load_single(PATH_UI_HUD, "barre", _ui_hud, TYPE_DICTIONARY)
 	_load_single(PATH_PAGE_TYPES, "page_types", _page_types, TYPE_ARRAY)
 	_load_single(PATH_VFX, "pathway_palette_visiva", _vfx, TYPE_DICTIONARY)
 	_load_single(PATH_MODALITA, "modalita", _modalita, TYPE_DICTIONARY)
@@ -570,6 +573,11 @@ func i18n_keys() -> Array:
 ## (autoload Book) e' l'unico lettore.
 func get_ui_book() -> Dictionary:
 	return _ui_book
+
+
+## US-8B75d: misure e colori dell'HUD di gioco (data/ui/hud.json).
+func get_ui_hud() -> Dictionary:
+	return _ui_hud
 
 
 ## Vocabolario chiuso degli 8 tipi di pagina (data/schema/page_types.json).

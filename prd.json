@@ -1318,8 +1318,8 @@
       ],
       "priority": 63,
       "fase": "8b",
-      "passes": false,
-      "notes": "Chiesta dall'utente il 2026-11-17. Va fatta dopo la chiusura dell'Atto III."
+      "passes": true,
+      "notes": "FATTA 2026-11-17. HUD nuovo: in alto a sinistra tre barre a pixel (vita, spiritualita', recitazione) con emblema, contorno di 1 px, pieno in tre toni, tacche ogni quarto, la scia del danno che resta e scende piano, la cura che sale morbida, la vita bassa che batte; i numeri solo quando il valore cambia (poi sfumano). Status a sole icone con la linea del tempo che resta. La fiala al posto della scritta 'Avanzamento pronto'. In basso al centro la hotbar a soli simboli: cornice a pixel, glifo colorato dal Pathway, cifra del tasto, velo della ricarica, velo blu se manca la spiritualita', lampo al lancio. Nessun nome a schermo. data/ui/hud.json (misure e colori), scripts/hud_barra.gd, hud_slot.gd, tools/art/build_hud.py. La camera degli interni lascia libero anche il basso. Schermo: arte/revisione/hud_nuovo.png."
     },
     {
       "id": "US-1200",

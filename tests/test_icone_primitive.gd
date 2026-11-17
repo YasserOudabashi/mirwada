@@ -44,43 +44,40 @@ func test_la_hotbar_mostra_il_glifo_colorato_dal_pathway() -> void:
 	var owned: Array = root.get_node("AbilityEngine").call("owned_abilities", host)
 	var hud: CanvasLayer = HudScene.instantiate()
 	root.add_child(hud)
-	var ic: TextureRect = hud.get_node("Root/VBox/Hotbar/Icona0")
+	var ic: TextureRect = hud.get_node("Root/Hotbar/Slot0/Glifo")
 	var ab: Dictionary = _gd().call("get_ability", str(owned[0]))
 	var tipo: String = str((ab["primitive"][0] as Dictionary)["tipo"])
 	assert_true(ic.visible and ic.texture == _gd().call("icona_primitiva", tipo), "il glifo della prima primitiva")
-	assert_eq(ic.get_index() + 1, hud.get_node("Root/VBox/Hotbar/Slot0").get_index(), "prima del nome")
 	var pal: Dictionary = _gd().call("get_vfx_palette", "twilight_giant")
 	var mat: ShaderMaterial = ic.material
 	assert_eq(mat.get_shader_parameter("primario"), Color.from_string(str(pal["primario"]), Color.BLACK),
 		"i colori dalla palette del Pathway in data/vfx.json")
-	assert_false(hud.get_node("Root/VBox/Hotbar/Icona3").visible, "lo slot vuoto non ha glifo")
+	if owned.size() < 4:
+		assert_false(hud.get_node("Root/Hotbar/Slot3/Glifo").visible, "lo slot vuoto non ha glifo")
 	hud.free()
 	host.free()
 
 
-## US-8B75b: i 4 slot stanno nello schermo anche col nome di abilita' piu' lungo dei dati e la ricarica accanto.
-func test_la_hotbar_sta_nello_schermo_col_nome_piu_lungo() -> void:
-	var lungo := ""
-	var cat: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/i18n/it.json"))
-	for k in cat:
-		if str(k).begins_with("ability.") and not str(k).ends_with(".desc") and str(cat[k]).length() > lungo.length():
-			lungo = str(cat[k])
-	assert_gt(float(lungo.length()), 25.0, "nei dati ci sono nomi lunghi (%s)" % lungo)
+## US-8B75d: la hotbar sta in basso al centro, dentro lo schermo, e l'HUD dice quanto occupa sopra e sotto (per la
+## camera degli interni). In alto resta piccolo: meno di un quinto dello schermo.
+func test_la_hotbar_sta_in_basso_al_centro() -> void:
 	var hud: CanvasLayer = HudScene.instantiate()
 	Engine.get_main_loop().root.add_child(hud)
-	for i in 4:
-		(hud.get_node("Root/VBox/Hotbar/Slot%d" % i) as Label).text = "%d  %s  12.3s" % [i + 1, lungo]
-		(hud.get_node("Root/VBox/Hotbar/Icona%d" % i) as Control).visible = true
-	var barra: Control = hud.get_node("Root/VBox/Hotbar")
-	var larghezza: float = (hud.get_node("Root") as Control).position.x + barra.get_combined_minimum_size().x
-	var schermo: float = float(ProjectSettings.get_setting("display/window/size/viewport_width")) \
+	var schermo := Vector2(float(ProjectSettings.get_setting("display/window/size/viewport_width")),
+			float(ProjectSettings.get_setting("display/window/size/viewport_height"))) \
 			/ float(ProjectSettings.get_setting("display/window/stretch/scale"))
-	assert_true(larghezza <= schermo, "la hotbar e' larga %d unita' su %d di schermo" % [int(larghezza), int(schermo)])
-	assert_gt(float(hud.call("altezza")), 60.0, "l'HUD dice quanto e' alto (per la camera degli interni)")
+	var barra: Control = hud.get_node("Root/Hotbar")
+	var r: Rect2 = barra.get_global_rect()
+	assert_true(r.position.x >= 0.0 and r.end.x <= schermo.x and r.end.y <= schermo.y, "dentro lo schermo: %s" % r)
+	assert_almost_eq(r.get_center().x, schermo.x / 2.0, "al centro", 1.0)
+	assert_gt(r.position.y, schermo.y * 0.8, "in basso")
+	assert_gt(float(hud.call("altezza")), 15.0, "l'HUD dice quanto e' alto in cima")
+	assert_true(float(hud.call("altezza")) < schermo.y / 5.0, "e resta piccolo (%d unita')" % int(hud.call("altezza")))
+	assert_gt(float(hud.call("altezza_sotto")), 20.0, "e quanto occupa in basso")
 	hud.free()
 
 
-## 2026-11-11: gli status del giocatore si leggono anche nell'HUD, con nome e secondi; ogni status ha un nome tradotto.
+## 2026-11-11: gli status del giocatore stanno anche nell'HUD (US-8B75d: solo l'icona e la linea del tempo); ogni status ha un nome tradotto.
 func test_gli_status_del_giocatore_stanno_nell_hud_col_nome() -> void:
 	var gd: Node = _gd()
 	var doc: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/status_effects.json"))
@@ -97,11 +94,14 @@ func test_gli_status_del_giocatore_stanno_nell_hud_col_nome() -> void:
 	root.add_child(host)
 	var hud: CanvasLayer = HudScene.instantiate()
 	root.add_child(hud)
-	var riga: Control = hud.get_node("Root/VBox/Stati")
+	var riga: Control = hud.get_node("Root/Vitali/Stati")
 	assert_false(riga.visible, "senza status la riga non c'e'")
 	stats.call("applica_status", "paura", 6.0)
 	assert_true(riga.visible, "con uno status compare")
-	var l: Label = riga.get_node("paura")
-	assert_true(l.text.begins_with(str(gd.call("tr_data", "status.paura"))) and l.text.ends_with("6s"), "nome e secondi: %s" % l.text)
+	var ic: TextureRect = riga.get_node("paura/Icona")
+	assert_true(ic.texture == gd.call("icona_stato", "paura"), "con la sua icona, senza scritte (US-8B75d)")
+	hud.call("_process", 0.1)
+	assert_true((riga.get_node("paura/Tempo") as Control).visible, "e sotto la linea del tempo che resta")
+	assert_eq(riga.find_children("*", "Label", true, false).size(), 0, "nessun nome")
 	hud.free()
 	host.free()
