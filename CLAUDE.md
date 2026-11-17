@@ -177,6 +177,8 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - Icone degli status (`build_stati.py`): pixel art da griglie 10x10 in un tondo 16x16, bordo rosso se `negativo`,
   verde se e' un vantaggio. Nel gioco `GameData.icona_stato(id)` e `scripts/status_icons.gd`: fila sopra la testa
   di giocatore e nemici (segnale `StatsComponent.status_cambiati`), lampeggia negli ultimi 2 secondi.
+- HUD di gioco (US-8B75d, `build_hud.py`, `data/ui/hud.json`): barre a pixel con emblema e scia del danno, numeri solo
+  quando cambiano, hotbar in basso al centro **a soli simboli** (mai nomi di abilita' o status a schermo: stanno nel libro).
 - Glifi delle primitive (`build_primitive.py`): forme 2D disegnate a 4x e ridotte a maggioranza, a 4 toni di grigio
   (contorno, scuro, primario, accento). Il colore lo mette `shaders/rampa_pathway.gdshader` dalla palette del
   Pathway in `data/vfx.json`, come i VFX. Nella hotbar l'abilita' mostra il glifo della sua prima primitiva.
@@ -434,8 +436,8 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   (US-1501..1507, US-1601..1605, US-1701..1704). Servono per giocare tutto il gioco: oggi ogni nemico e' `nemico_base`
   ingrandito, non c'e' nessun file audio, e nessuno ha giocato una partita intera fino al finale.
 
-**Lavoro corrente** (aggiornato il 2026-11-17): tutto il lavoro che manca e' in `prd.json` (52 story aperte, con la
-fase e la priorita'), l'ordine in `006_PRD/prossimi-passi.md`: **HUD nuovo** (US-8B75d, chiesto dall'utente), nemici e boss
+**Lavoro corrente** (aggiornato il 2026-11-17): tutto il lavoro che manca e' in `prd.json` (51 story aperte, con la
+fase e la priorita'), l'ordine in `006_PRD/prossimi-passi.md`: nemici e boss
 (bestiario deciso dall'utente: `prd-fasi-15-17-gioco-completo.md` 2.1),
 audio, Mondo vivo, fusioni, rilascio (qui il gioco e' finito in italiano), poi rifiniture d'arte e inglese.
 
