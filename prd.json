@@ -1306,6 +1306,22 @@
       "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
     },
     {
+      "id": "US-8B75d",
+      "title": "HUD nuovo: barre belle e abilita' solo a simboli",
+      "description": "Richiesta dell'utente (2026-11-17): l'interfaccia di gioco ridisegnata, molto piu' bella e pulita, che non stanchi l'occhio e stia bene col mondo. Barra della vita piu' bella (come si riempie e come si vede), barra della spiritualita' (mana) uguale; mentre si gioca le abilita' non hanno piu' il nome, solo il simbolo (il nome resta nel libro).",
+      "acceptanceCriteria": [
+        "barre di vita e spiritualita' disegnate con forge3d/build_libro (cornice, rampa di colore, perdita che scende piano dietro, numeri solo se servono)",
+        "hotbar a sole icone (glifo della primitiva, tasto, ricarica), niente nomi a schermo",
+        "HUD compatto in un angolo, poca carta e poco contrasto, leggibile su ogni regione e di notte",
+        "Verifica a schermo documentata in progress.txt (luminosa e cupa, giorno e notte, interno)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 63,
+      "fase": "8b",
+      "passes": false,
+      "notes": "Chiesta dall'utente il 2026-11-17. Va fatta dopo la chiusura dell'Atto III."
+    },
+    {
       "id": "US-1200",
       "title": "Riscrivere il PRD Mondo vivo sul mondo generato",
       "description": "Il PRD prd-fase-12-mondo-vivo.md misura le distanze sulla mappa a layout di prima: va rifatto sul mondo generato (34 villaggi, luoghi, sottosuolo), decidendo con l'utente cosa resta da aggiungere.",
