@@ -1265,8 +1265,8 @@
       ],
       "priority": 60,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
+      "passes": true,
+      "notes": "FATTA 2026-11-17 dentro qa_atto_3.gd (passo 5): alla Sequenza 1 il rituale si compie sul campo di battaglia (luogo di massacro) durante l'eclissi; l'Ancora (Lena, diventata Ancora giocandoci) e' sacrificata: sparisce dalle Ancore e la follia sale. Si vede nel libro (riga 'una tua Ancora va perduta') e a schermo. arte/revisione/qa_atto_3.png."
     },
     {
       "id": "US-1311",
@@ -1278,8 +1278,8 @@
       ],
       "priority": 61,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
+      "passes": true,
+      "notes": "FATTA 2026-11-17. tests/manual/qa_atto_3.gd (Xvfb): Sequenza 4 -> 0 col Twilight Giant: campo di battaglia all'alba (arma spezzata), Doran affrontato (tribolazione 3->2), altura all'alba (armatura), palizzata costruita e cripta al crepuscolo (struttura), l'antagonista alla soglia della Frontiera di notte (tribolazione 1->0), campo di battaglia durante l'eclissi (Ancora). Finale: Apoteosi. 46 controlli ok. Scorciatoie dichiarate nel file."
     },
     {
       "id": "US-1312",
@@ -1290,8 +1290,8 @@
       ],
       "priority": 62,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
+      "passes": true,
+      "notes": "FATTA 2026-11-17. tests/test_fase_13_checkpoint.gd (4): le 4 quest dell'Atto II/III e le 7 scene esistono e puntano a id validi (giver, eventi, flag scritti da qualcuno, goto, quest avviate, dialoghi del duello); nessun id di Pathway, NPC, quest o flag della storia nel codice (scripts, pages, world; world_scene.gd escluso, va tolto); le due partite manuali ci sono."
     },
     {
       "id": "US-1313",
@@ -1302,8 +1302,8 @@
       ],
       "priority": 63,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md."
+      "passes": true,
+      "notes": "FATTA 2026-11-17. Fase 13 chiusa: progress.txt, CLAUDE.md (fasi e lavoro corrente), 006_PRD/prossimi-passi.md."
     },
     {
       "id": "US-8B75d",

@@ -31,7 +31,7 @@ Tutto in `prd.json` (`passes: false`), la priorita' e' il numero tra parentesi.
 | # | Blocco | Story | Perche' |
 |---|---|---|---|
 | 1 | Ritocchi rapidi (41-46) | **fatti** il 2026-11-10: US-8B80c, 8B21d, 8B73e, 8B75b, 8B75c | bere dallo zaino, nemici delle stanze, sigilli, hotbar su due righe e a scelta |
-| 2 | **Atto II e III** (50-63), fase 13 | US-1305b/c/d (i rituali nel mondo: aspettano le regole dall'utente), US-1310..1313 (fatte al 2026-11-16: US-1301..1309, US-8B60b; l'Atto II si gioca per intero, `tests/manual/qa_atto_2.gd`) | **senza, il gioco non si finisce**: la prova finale `trib_1_0` non si supera nel mondo vero; solo 4 quest in tutto il gioco, tutte dell'Atto I |
+| 2 | **Atto II e III**, fase 13 | **CHIUSA il 2026-11-17** | si gioca dalla Sequenza 4 alla 0 fino al finale (`qa_atto_2.gd`, `qa_atto_3.gd`); prossimo: HUD nuovo (US-8B75d), poi nemici e boss |
 | 3 | **Nemici e boss** (65-72), fase 15 | US-1501..1507 + US-8B60a | i 72 nemici e i 6 boss sono tutti `nemico_base` ingrandito; le evocazioni non si vedono |
 | 4 | **Audio** (75-79), fase 16 | US-1601..1605 | nessun file audio: bip di prova e musiche mute |
 | 5 | Mondo vivo (80-96), fase 12 | US-1200..1216 | punti d'interesse, villaggi, dungeon tra le regioni; prima US-1200 riscrive il PRD sul mondo generato |

@@ -1364,3 +1364,25 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   arte/revisione/rituale_sacrifici.png.
 - Non mi convince: i sigilli e l'arma spezzata si comprano e basta (meglio trovarli: forzieri, nemici della fase 15);
   i sacrifici "di creature" sono solo follia perche' il pet non si puo' ancora avere nel gioco.
+
+## US-1310, US-1311, US-1312, US-1313: l'Atto III giocato fino al finale, fase 13 chiusa, 2026-11-17
+- tests/manual/qa_atto_3.gd (comando nel file, Xvfb), Pathway di default (Twilight Giant), dalla Sequenza 4:
+  0. giocando con Lena diventa un'Ancora (ora vera, in AnchorSystem);
+  1. 4 -> 3: campo di battaglia all'alba, si offre l'arma spezzata dal libro, rituale compiuto;
+  2. Doran affrontato (patto): la tribolazione 3 -> 2 e' superata; 3 -> 2 sull'altura (vicino al passo tra le rupi,
+     dentro la regione) all'alba, l'armatura indossata se ne va;
+  3. palizzata costruita dalla pagina Base; a notte fonda si entra nella cripta, al crepuscolo il rituale: 2 -> 1,
+     la palizzata se ne va;
+  4. alla soglia della Frontiera, di notte, l'antagonista del Pathway: "Sono venuto a prendere..." chiude la prova 1 -> 0;
+  5. 1 -> 0 sul campo di battaglia (luogo di massacro) durante l'eclissi, si sacrifica l'Ancora: Lena se ne va, la
+     follia sale, rituale_sequenza_0_completato, finale Apoteosi nel colophon del libro.
+  46 controlli ok. Foto: arte/revisione/qa_atto_3.png (Doran, rituale nella cripta, la soglia, l'antagonista, il
+  rituale dell'Ancora nel libro, il finale).
+- tests/test_fase_13_checkpoint.gd (4). 1142 test, validate 0.
+- Da sapere (non corretto, da decidere):
+  - il rituale scritto sulla Sequenza 0 nei dati (soglia del crepuscolo, il detentore precedente) non si usa mai: nel
+    progetto i dati della Sequenza N dicono come si lascia la N, e dalla 0 non si va oltre. Il "detentore" e' gia'
+    la prova 1 -> 0 (l'antagonista). Si puo' togliere o spostare.
+  - due rituali su cinque del Twilight Giant chiedono un'eclissi (rara nel gioco): chiesto all'utente.
+  - il finale sta in cima al colophon, sopra le impostazioni: meriterebbe una pagina sua (titoli di coda).
+  - durante il rituale (45 secondi) i nemici attorno possono interromperlo: sul campo di battaglia ce ne sono.

@@ -425,16 +425,17 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   (US-8B20a..f), la camera che inquadra gli interni sotto l'HUD (US-8B18e), gli oggetti fissi presi una volta sola
   (US-8B22d), l'HUD leggibile (US-8B75). PRD `prd-fase-8b-arte.md`.
 - Fase 12 — Mondo vivo: **PIANIFICATA**, PRD `prd-fase-12-mondo-vivo.md` da riscrivere sul mondo generato (US-1200).
-- Fase 13 — Atto II e III: **PIANIFICATA**, PRD `prd-fase-13-atto-2-3.md` (story US-1301..US-1313). Va fatta per
-  prima: senza, la prova finale (`trib_1_0`) non si supera e il gioco non si finisce.
+- Fase 13 — Atto II e III: **CHIUSA** (2026-11-17), PRD `prd-fase-13-atto-2-3.md`. Quest di fazione (carte fra
+  l'Ordine e il porto), duello con Aldo come scena (`scripts/world/duelli.gd`), scene di Doran, Lena e Vesna, antagonisti
+  con la loro figura, Diario nel libro, rituali nel mondo (pozione dentro il rituale, luoghi veri, sacrifici pagati,
+  sigilli come oggetti). Il gioco si gioca dalla Sequenza 4 alla 0 fino al finale: `tests/manual/qa_atto_2.gd`, `qa_atto_3.gd`.
 - Fase 14 — altri Pathway Non-Standard: facoltativa.
 - Fasi 15-17 — Nemici e boss, Audio, Rilascio: **PIANIFICATE** (2026-11-10), PRD `prd-fasi-15-17-gioco-completo.md`
   (US-1501..1507, US-1601..1605, US-1701..1704). Servono per giocare tutto il gioco: oggi ogni nemico e' `nemico_base`
   ingrandito, non c'e' nessun file audio, e nessuno ha giocato una partita intera fino al finale.
 
-**Lavoro corrente** (aggiornato il 2026-11-16): tutto il lavoro che manca e' in `prd.json` (58 story aperte, con la
-fase e la priorita'), l'ordine in `006_PRD/prossimi-passi.md`: **Atto II e III** (Atto II chiuso: fatte US-1301..1309 e
-US-8B60b; restano i rituali nel mondo US-1305b/c/d, che aspettano le regole dall'utente, poi US-1310..1313), nemici e boss
+**Lavoro corrente** (aggiornato il 2026-11-17): tutto il lavoro che manca e' in `prd.json` (51 story aperte, con la
+fase e la priorita'), l'ordine in `006_PRD/prossimi-passi.md`: **HUD nuovo** (US-8B75d, chiesto dall'utente), nemici e boss
 (bestiario deciso dall'utente: `prd-fasi-15-17-gioco-completo.md` 2.1),
 audio, Mondo vivo, fusioni, rilascio (qui il gioco e' finito in italiano), poi rifiniture d'arte e inglese.
 
