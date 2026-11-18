@@ -19,7 +19,10 @@ import tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import build_personaggi as BP  # noqa: E402
-from forge3d.creatures import BIRD_CLIPS, QUAD_CLIPS, bird, bird_hurt, quadruped  # noqa: E402
+import math  # noqa: E402
+
+from forge3d.creatures import BIRD_CLIPS, QUAD_CLIPS, barca, bird, bird_hurt, quadruped, slime  # noqa: E402
+from forge3d.rig import Rig  # noqa: E402
 from forge3d.humanoid import humanoid  # noqa: E402
 from forge3d.rig import add_pose, clip_from_keys  # noqa: E402
 from forge3d.sheets import export_spec  # noqa: E402
@@ -208,6 +211,169 @@ CLIP_QUAD = {k: BP.vivi(v) for k, v in dict(QUAD_CLIPS, death=BP.quad_morte, ant
 CLIP_BIRD = {k: BP.vivi(v) for k, v in dict(BIRD_CLIPS, anticipo=_bird_anticipo,
                                              stagger=lambda n=4: bird_hurt(n)).items()}
 
+# --- US-1504c: forme senza arti (melma, granchio, germoglio, sciame, glifo, barca) ---------------------------------
+def clip_corpo(j="body", extra=None, volo=0.0, morte="fianco", a_terra=-1.6):
+    """Clip di un corpo solo, sul giunto `j`: respiro, saltelli, indietro (anticipo, rx positivo alza il davanti),
+    affondo, barcollo, e la morte di lato (non direzionale) che cade sul fianco o, se vola, cade a terra. `extra`:
+    pose da sommare per clip (chele alzate, spore che girano...), una funzione (i, n) -> posa o una posa fissa."""
+    extra = extra or {}
+
+    def ex(nome, i, n):
+        e = extra.get(nome, {})
+        return e(i, n) if callable(e) else e
+
+    # fianco: cade di lato e a_terra alza (o abbassa) dove si posa; pozza: si affloscia sul posto
+    indietro = {j: (14, 0, 0, 0, -1.3, -0.6)}
+    affondo = {j: (-18, 0, 0, 0, 2.6, -0.3)}
+
+    def idle(n=4):
+        return [add_pose({j: (0, 0, 0, 0, 0, 0.4 * math.sin(2 * math.pi * i / n))}, ex("idle", i, n)) for i in range(n)]
+
+    def walk(n=6):
+        out = []
+        for i in range(n):
+            p = 2 * math.pi * i / n
+            out.append(add_pose({j: (5 * math.sin(p), 0, 0, 0, 0, 1.0 * abs(math.sin(p)))}, ex("walk", i, n)))
+        return out
+
+    def anticipo(n=4):
+        tieni = add_pose(indietro, ex("anticipo", 0, n))
+        return clip_from_keys([(0, {}), (2, tieni, "out"), (n - 1, add_pose(tieni, {j: (2, 0, 0, 0, 0, 0.2)}))], n)
+
+    def attack(n=4):
+        tieni = add_pose(indietro, ex("anticipo", 0, n))
+        colpo = add_pose(affondo, ex("attack", 0, n))
+        return clip_from_keys([(0, tieni, "out"), (1, colpo, "snap"), (2, add_pose(colpo, {j: (3, 0, 0)})),
+                               (n - 1, {})], n)
+
+    def stagger(n=4):
+        return clip_from_keys([(0, {j: (14, 0, 10, 0, -1.6, 0.2)}, "out"), (n - 1, {})], n)
+
+    def death(n=6):
+        if morte == "pozza":                             # si affloscia sul posto: largo e basso (voce "~" di rig.py)
+            return clip_from_keys([(0, {}), (2, {"~" + j: (0.25, 0.25, -0.35)}, "in"),
+                                   (n - 1, {"~" + j: (0.55, 0.55, -0.8), j: (0, 0, 0, 0, 0, 0)}, "out")], n)
+        giu = -volo
+        return clip_from_keys([(0, {j: (0, 0, 90)}), (2, {j: (0, 25, 90, 0, 0, giu * 0.5 - 0.6)}, "in"),
+                               (n - 1, add_pose({j: (0, 80, 90, 0, 0, giu + a_terra)}, ex("death", 0, n)), "out")], n)
+
+    return {"idle": idle, "walk": walk, "anticipo": anticipo, "attack": attack, "stagger": stagger, "death": death}
+
+
+def melma():
+    r = slime(mat="slime_green", eyes="eye", name="melma")
+    for x, z in ((-3.0, 6.5), (2.6, 3.0), (0.4, 8.6)):                     # bolle dentro la gelatina
+        r.part("body", "ellipsoid", (0.7, 0.7, 0.7), (x, 4.6, z), mat="slime_blue")
+    return r
+
+
+def granchio():
+    r = Rig("granchio_corazzato")
+    r.joint("body", "root", (0, 0, 3.0))
+    r.part("body", "ellipsoid", (5.4, 4.0, 2.2), (0, 0, 0.6), mat="scale_red")              # carapace
+    r.part("body", "ellipsoid", (4.4, 3.2, 1.2), (0, 0, -0.8), mat="sand")                  # ventre
+    for sx in (-1, 1):
+        r.part("body", "cylinder", (0.3, 0.3, 1.0), (sx * 1.3, 3.0, 2.4), mat="scale_red")  # peduncoli
+        r.part("body", "ellipsoid", (0.55, 0.55, 0.55), (sx * 1.3, 3.1, 3.5), mat="eye")
+        for i in range(3):                                                                  # zampe
+            r.part("body", "cylinder", (0.45, 0.45, 2.2), (sx * 5.6, -2.0 + 1.6 * i, -1.6), mat="scale_red",
+                   rot=(0, sx * 50, 0))
+        c = r.joint("chela_" + ("l" if sx < 0 else "r"), "body", (sx * 4.0, 3.0, 0.2))
+        r.part(c, "ellipsoid", (1.0, 1.9, 0.9), (0, 1.4, 0), mat="scale_red")
+        r.part(c, "ellipsoid", (1.7, 2.1, 1.3), (sx * 0.3, 3.8, 0.4), mat="scale_red")
+        r.part(c, "cone", (0.6, 0.6, 1.0), (sx * 0.6, 6.1, 0.4), mat="bone", rot=(-90, 0, 0))
+    return r
+
+
+def germoglio():
+    r = Rig("germoglio_spinoso")
+    r.joint("body", "root", (0, 0, 0))
+    r.part("body", "ellipsoid", (3.6, 3.4, 4.0), (0, 0, 4.2), mat="leaf_dark")              # bulbo
+    for k in range(8):                                                                       # spine tutt'intorno
+        a = 2 * math.pi * k / 8
+        r.part("body", "cone", (0.55, 0.55, 1.3), (3.9 * math.cos(a), 3.7 * math.sin(a), 4.4), mat="bone",
+               rot=(0, 90, math.degrees(a)))
+    for k in range(5):                                                                       # corolla rossa
+        a = 2 * math.pi * k / 5
+        r.part("body", "ellipsoid", (1.4, 0.7, 1.9), (1.1 * math.cos(a), 1.1 * math.sin(a), 8.6), mat="mushroom_red",
+               rot=(25 * math.sin(a), -25 * math.cos(a), 0))
+    r.part("body", "ellipsoid", (0.9, 0.9, 0.9), (0, 0, 8.4), mat="glow_yellow")
+    for k in range(4):                                                                       # foglie a terra
+        a = 2 * math.pi * (k + 0.5) / 4
+        r.part("body", "ellipsoid", (3.0, 1.2, 0.4), (3.0 * math.cos(a), 3.0 * math.sin(a), 0.6), mat="leaf",
+               rot=(0, 0, math.degrees(a)))
+    for sx in (-1, 1):
+        r.part("body", "ellipsoid", (0.6, 0.5, 0.8), (sx * 1.3, 3.1, 5.2), mat="eye_yellow")
+    return r
+
+
+SPORE = [(-2.4, 0.6, 1.2, 1.3), (2.0, -0.4, 2.4, 1.1), (0.2, 1.2, -0.6, 1.4), (-1.0, -1.4, 3.4, 0.9),
+         (2.8, 0.9, -0.2, 0.9), (-3.0, -0.6, 3.0, 0.8), (0.8, -1.6, 4.4, 0.8), (-0.4, 0.2, 5.2, 0.7)]
+
+
+def sciame():
+    r = Rig("sciame_di_spore")
+    r.joint("body", "root", (0, 0, 6.0))
+    for k, (x, y, z, d) in enumerate(SPORE):
+        j = r.joint(f"spora_{k}", "body", (x, y, z - 2.0))
+        r.part(j, "ellipsoid", (d, d, d), (0, 0, 0), mat="glow_yellow" if k % 3 == 0 else "leaf_olive")
+    r.part("body", "ellipsoid", (1.6, 1.6, 1.6), (0, 0.6, 0.4), mat="mushroom_red")          # cuore della nube
+    r.part("body", "ellipsoid", (0.5, 0.4, 0.5), (0, 2.0, 0.8), mat="eye_red")
+    return r
+
+
+def _spore_girano(i, n):
+    return {f"spora_{k}": (0, 0, 0, 0.9 * math.cos(2 * math.pi * i / n + k), 0.9 * math.sin(2 * math.pi * i / n + k),
+                           0.5 * math.sin(2 * math.pi * i / n + 2 * k)) for k in range(len(SPORE))}
+
+
+def glifo():
+    """Pietra sospesa col segno inciso su tutte e quattro le facce (si legge da ogni direzione) e frammenti viola
+    che le girano attorno in orizzontale."""
+    r = Rig("glifo_vivente")
+    r.joint("body", "root", (0, 0, 8.0))
+    r.part("body", "box", (2.4, 2.4, 3.2), (0, 0, 0), mat="ardesia", soft=0.3)
+    for k in range(4):
+        a = math.pi / 2 * k
+        cx, cy = math.sin(a), math.cos(a)
+        rz = -math.degrees(a)
+        r.part("body", "box", (0.4, 0.3, 2.2), (2.5 * cx, 2.5 * cy, 0), mat="glow_yellow", rot=(0, 0, rz))
+        for sx in (-1, 1):
+            r.part("body", "box", (0.35, 0.3, 1.3), (2.5 * cx + sx * 1.0 * cy, 2.5 * cy - sx * 1.0 * cx, -0.7),
+                   mat="glow_yellow", rot=(0, sx * 35, rz))
+    r.part("body", "ellipsoid", (0.7, 0.4, 0.7), (0, 2.6, 1.9), mat="eye_red")
+    r.joint("orbita", "body", (0, 0, 0))
+    for k in range(6):
+        a = 2 * math.pi * k / 6
+        r.part("orbita", "box", (0.7, 0.7, 0.7), (5.0 * math.cos(a), 5.0 * math.sin(a), -0.4), mat="slime_purple",
+               rot=(0, 45, 0))
+    return r
+
+
+def barca_fantasma():
+    r = barca(seed=1, size=0.95)
+    r.name = "barca_fantasma"
+    r.joints["b"].rest = (0, 0, 90)                     # la prua verso +y come gli altri modelli (guarda in basso)
+    for p in r.parts:                                   # legno marcio e fosforescente
+        p.mat = {"wood": "ardesia", "wood_light": "ghost"}.get(p.mat, p.mat)
+    r.part("b", "cylinder", (1.1, 1.1, 2.6), (12.0, 0, 7.0), mat="iron", rot=(0, 90, 0))      # cannone a prua
+    r.part("b", "box", (0.4, 0.4, 3.5), (-13.0, 0, 8.5), mat="ardesia")                        # palo di poppa
+    r.part("b", "ellipsoid", (1.1, 1.1, 1.3), (-13.0, 0, 12.4), mat="glow_cyan")               # lanterna
+    return r
+
+
+def coccodrillo():
+    r = humanoid(skin="scale_green", hair="hair_black", hair_style="bald", outfit="tunic", top="cloth_purple",
+                 bottom="cloth_yellow", boots="leather_dark", belt="leather_dark", hat="cap", weapon=None,
+                 eyes="eye_yellow", head=0.95, detail=2, name="coccodrillo_rapper")
+    r.part("head", "ellipsoid", (1.6, 2.8, 1.0), (0, 3.0, -0.9), mat="scale_green")          # muso lungo
+    for sx in (-1, 1):
+        r.part("head", "cone", (0.25, 0.25, 0.4), (sx * 0.9, 4.6, -1.8), mat="bone", rot=(180, 0, 0))
+    r.part("torso", "cylinder", (3.0, 2.6, 0.3), (0, 0.7, 6.0), mat="gold", soft=0.3)       # catena d'oro
+    r.part("hips", "cone", (1.5, 1.5, 3.2), (0, -3.6, -1.0), mat="scale_green", rot=(-70, 0, 0))   # coda
+    return r
+
+
 # aspetto -> (rig, pixel per unita', clip). I lupi come il pet (1.75), i volatili come il corvo del pet (2.3).
 BESTIE = {
     "lupo_della_luna": (lupo_luna, 1.75, CLIP_QUAD),
@@ -218,6 +384,18 @@ BESTIE = {
     "corvo_della_battaglia": (corvo_battaglia, 2.3, CLIP_BIRD),
     "pipistrello_cieco": (pipistrello, 2.3, CLIP_BIRD),
     "gabbiano_ladro": (gabbiano, 2.3, CLIP_BIRD),
+    "melma": (melma, 1.6, clip_corpo(morte="pozza", extra={
+        "walk": lambda i, n: {"~body": tuple(k * (1 - abs(math.sin(2 * math.pi * i / n))) for k in (0.12, 0.12, -0.18))},
+        "anticipo": {"~body": (0.2, 0.2, -0.28)}, "attack": {"~body": (-0.1, 0.2, 0.1)}})),
+    "granchio_corazzato": (granchio, 1.7, clip_corpo(extra={
+        "anticipo": {"chela_l": (45, 0, -20), "chela_r": (45, 0, 20)},
+        "attack": {"chela_l": (-10, 0, 10), "chela_r": (-10, 0, -10)}})),
+    "germoglio_spinoso": (germoglio, 2.3, clip_corpo(morte="pozza", extra={"anticipo": {"~body": (0.1, 0.1, -0.15)}})),
+    "sciame_di_spore": (sciame, 2.6, clip_corpo(volo=6.0, extra={k: _spore_girano for k in ("idle", "walk")})),
+    "glifo_vivente": (glifo, 2.2, clip_corpo(volo=8.0, a_terra=2.6, extra={k: (lambda i, n: {"orbita": (0, 0, 60 * i / n)})
+                                                               for k in ("idle", "walk")})),
+    "barca_fantasma": (barca_fantasma, 1.4, clip_corpo(j="b", volo=3.0)),
+    "coccodrillo_rapper": (coccodrillo, 1.4, CLIP),
 }
 
 

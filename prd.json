@@ -1798,8 +1798,8 @@
       ],
       "priority": 68,
       "fase": "15",
-      "passes": false,
-      "notes": "Story d'arte: i PNG non contano nel limite dei file. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md. Spezzata il 2026-11-18 in US-1504a (figure umane), US-1504b (bestie a quattro zampe e volatili), US-1504c (forme strane: melma, germoglio, glifo, sciame, barca, coccodrillo): si chiude con l'ultima."
+      "passes": true,
+      "notes": "Story d'arte: i PNG non contano nel limite dei file. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md. Spezzata il 2026-11-18 in US-1504a (figure umane), US-1504b (bestie a quattro zampe e volatili), US-1504c (forme strane: melma, germoglio, glifo, sciame, barca, coccodrillo): si chiude con l'ultima. Chiusa il 2026-11-18 con US-1504a/b/c: 41 tipi su 42 hanno la loro figura."
     },
     {
       "id": "US-1504a",
@@ -1843,8 +1843,8 @@
       ],
       "priority": 68,
       "fase": "15",
-      "passes": false,
-      "notes": "Da US-1504. Chiude US-1504."
+      "passes": true,
+      "notes": "Fatta il 2026-11-18. 7 forme in build_nemici.py: melma (forge3d slime), granchio corazzato (chele che si alzano nel tell), germoglio spinoso, sciame di spore (spore che girano), glifo vivente (pietra col segno sulle 4 facce, frammenti in orbita), barca fantasma (la barca di forge3d marcia, col cannone), coccodrillo rapper (umano col muso, coda, berretto e catena). Clip comuni clip_corpo(); forge3d rig.py: voce di posa '~<giunto>' per schiacciare (melma e germoglio muoiono afflosciandosi). Solo il brigante resta il foglio base."
     },
     {
       "id": "US-1505",

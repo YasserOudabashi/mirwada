@@ -81,4 +81,4 @@ func test_ogni_tipo_ha_la_sua_figura() -> void:
 		if asp != "nemico_base":
 			propri += 1
 		e.free()
-	assert_true(propri >= 34, "umani e bestie hanno il loro aspetto (%d)" % propri)
+	assert_true(propri >= 41, "tutti i tipi tranne il brigante hanno il loro aspetto (%d)" % propri)

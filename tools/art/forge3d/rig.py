@@ -82,10 +82,13 @@ class Rig:
         res = []
         for p in self.parts:
             Rj, oj = fk[p.joint]
-            c = oj + Rj @ p.pos
+            # "~<giunto>": (dx, dy, dz) schiaccia o allunga le forme del giunto (1 + d per asse, nel suo sistema):
+            # la melma che si spiaccica. Si interpola e si somma come le altre voci della posa.
+            sq = 1.0 + np.asarray(_pad(pose.get("~" + p.joint, ()), 3), float)
+            c = oj + Rj @ (p.pos * sq)
             Rp = p.rot if isinstance(p.rot, np.ndarray) else rotm(*p.rot)
             R = Rj @ Rp
-            res.append(Inst(p.shape, (Ry @ c) * s, Ry @ R, p.size * s, p.mat, p.soft, p.tex))
+            res.append(Inst(p.shape, (Ry @ c) * s, Ry @ R, p.size * sq * s, p.mat, p.soft, p.tex))
         return res
 
 

@@ -1553,3 +1553,23 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   belva (era arancio come il cervo: ora grigia), il ratto (troppo piccolo: size 0.9), l'anticipo dei lupi. A schermo
   (Xvfb, piazza di partenza): lupi, cervo e uccelli in volo con l'ombra a terra si leggono.
 - 1095 test verdi, validator 0 errori. Aperto: granchio e forme strane in US-1504c.
+
+## US-1504c — Figure delle forme strane (e chiusura di US-1504), 2026-11-18
+- `tools/art/build_nemici.py`: melma (slime di forge3d con bolle), granchio corazzato (carapace rosso, chele su giunti
+  propri: nel tell si alzano, nel colpo scattano), germoglio spinoso (bulbo con spine e corolla), sciame di spore
+  (8 spore su giunti propri che girano), glifo vivente (pietra col segno su tutte e 4 le facce, cosi' si legge da ogni
+  lato: il primo disco in piedi di lato era una linea; 6 frammenti in orbita, ciclo chiuso a 60 gradi), barca fantasma
+  (`creatures.barca` con legno ardesia e fosforescente, cannone a prua, lanterna; prua verso +y), coccodrillo rapper
+  (humanoid con muso lungo, denti, coda, berretto, catena d'oro; clip degli umani).
+- Clip comuni `clip_corpo(j, extra, volo, morte, a_terra)` su un giunto solo: respiro, saltelli, indietro (tell),
+  affondo, barcollo, morte di lato o "pozza".
+- forge3d `rig.py` (annotato in ORIGINE.md): voce di posa `"~<giunto>": (dx, dy, dz)` che scala le forme del
+  giunto; senza la voce i fogli restano identici. Serve alla melma (si schiaccia saltando e nel tell, muore a
+  pozzanghera) e al germoglio (appassisce).
+- Comandi: `python tools/art/build_nemici.py --solo melma granchio_corazzato germoglio_spinoso sciame_di_spore
+  glifo_vivente barca_fantasma coccodrillo_rapper` (~12 s), `python tools/art/generate_all.py --only nemico_base`.
+- Guardati a x3 (idle/attack/anticipo/walk/death, giu' e di lato): ingranditi germoglio, sciame e glifo (erano 12 px),
+  barca a 0.95, frammenti del glifo piu' viola, morte del glifo che si posa nella cella. A schermo (Xvfb): si leggono.
+- 41 tipi su 42 con la loro figura (resta il brigante, che e' il foglio base). 1095 test verdi, validator 0 errori.
+- Aperto: la barca vista di prua e' corta (limite noto); morendo affonda e il fondo della cella la taglia (si legge
+  come l'acqua). Le figure dei boss sono US-1506.

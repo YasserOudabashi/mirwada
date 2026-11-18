@@ -337,6 +337,7 @@ python tools/art/esporta_mondo.py --barca          # solo i disegni della barca 
 python tools/art/build_interni.py              # interni: pavimenti, pareti e arredi -> assets/interni/<tema>/
 python tools/art/build_npc.py                  # aspetti degli NPC (personaggio_<aspetto>_{idle,walk}.png)
 python tools/art/build_ritratti.py             # ritratti 64x80 per aspetto, dallo stesso modello -> assets/ritratti/
+python tools/art/build_nemici.py               # figure dei tipi di nemico (nemico_base_<aspetto>_<anim>.png), poi generate_all.py --only nemico_base
 python tools/art/build_fauna.py                # fauna d'atmosfera: fauna_<specie>_{idle,fuga}.png (cervo 64, gli altri 32)
 python tools/art/build_forme.py                # forme di Enel (forms.json "aspetto"): personaggio_<aspetto>_<anim>.png, celle proprie
 python tools/art/build_libro.py                # carta (grande e piccola dell'avvio), segnalibri, caselle e filetto (assets/ui/)
