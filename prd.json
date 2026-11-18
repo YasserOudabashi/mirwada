@@ -1799,7 +1799,52 @@
       "priority": 68,
       "fase": "15",
       "passes": false,
-      "notes": "Story d'arte: i PNG non contano nel limite dei file. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+      "notes": "Story d'arte: i PNG non contano nel limite dei file. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md. Spezzata il 2026-11-18 in US-1504a (figure umane), US-1504b (bestie a quattro zampe e volatili), US-1504c (forme strane: melma, germoglio, glifo, sciame, barca, coccodrillo): si chiude con l'ultima."
+    },
+    {
+      "id": "US-1504a",
+      "title": "Figure dei nemici umani",
+      "description": "Un aspetto per ogni tipo umano di balance.json nemici_tipi (26 su 42), con le animazioni e i tempi di nemico_base, a 64 px.",
+      "acceptanceCriteria": [
+        "tools/art/build_nemici.py rilanciabile, fogli nemico_base_<aspetto>_<anim>.png",
+        "aspetto del tipo nei dati, enemy.gd lo passa all'AnimationMachine",
+        "tell rosso come nemico_base (generate_all.py)",
+        "asset guardati ingranditi, verifica a schermo",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 68,
+      "fase": "15",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18. 26 aspetti (forge3d humanoid, nessun seme casuale), il Doppio e' Enel con occhi rossi e lama viola. Il brigante resta il foglio base. Test test_nemici_tipi.test_ogni_tipo_ha_la_sua_figura."
+    },
+    {
+      "id": "US-1504b",
+      "title": "Figure delle bestie",
+      "description": "Aspetti per le bestie di nemici_tipi (lupo, cervo, ratto, granchio, belva dei moli, madre dei lupi; corvo, pipistrello, gabbiano) con le animazioni di nemico_base: quadrupedi e volatili di forge3d.",
+      "acceptanceCriteria": [
+        "fogli nemico_base_<aspetto>_<anim>.png, stessa cella",
+        "tell leggibile in un frame fermo",
+        "asset guardati ingranditi",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 68,
+      "fase": "15",
+      "passes": false,
+      "notes": "Da US-1504."
+    },
+    {
+      "id": "US-1504c",
+      "title": "Figure delle forme strane",
+      "description": "Aspetti per melma, germoglio spinoso, sciame di spore, glifo vivente, barca fantasma e coccodrillo rapper: forme nuove in forge3d dove servono (una story per forma se il diff cresce).",
+      "acceptanceCriteria": [
+        "fogli nemico_base_<aspetto>_<anim>.png, stessa cella",
+        "asset guardati ingranditi",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 68,
+      "fase": "15",
+      "passes": false,
+      "notes": "Da US-1504. Chiude US-1504."
     },
     {
       "id": "US-1505",

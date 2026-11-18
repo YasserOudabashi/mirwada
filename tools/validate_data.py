@@ -1951,8 +1951,11 @@ def main():
             err(f"{_ctx}: palette '{_td['palette']}' non e' una palette di data/vfx.json")
         if _td.get("tag") and _td["tag"] not in valid_tags:
             err(f"{_ctx}: tag '{_td['tag']}' fuori dal vocabolario di data/tags.json")
-        if not os.path.isfile(os.path.join(ROOT, "assets", "placeholder", f"{_td.get('aspetto')}_idle.png")):
-            err(f"{_ctx}: aspetto '{_td.get('aspetto')}' senza foglio assets/placeholder/<aspetto>_idle.png")
+        # US-1504: aspetto "nemico_base" = il foglio di base, altrimenti i fogli nemico_base_<aspetto>_<anim> (build_nemici.py)
+        _asp_t = _td.get("aspetto")
+        _foglio_t = "nemico_base_idle.png" if _asp_t == "nemico_base" else f"nemico_base_{_asp_t}_idle.png"
+        if not os.path.isfile(os.path.join(ROOT, "assets", "placeholder", _foglio_t)):
+            err(f"{_ctx}: aspetto '{_asp_t}' senza foglio assets/placeholder/{_foglio_t} (tools/art/build_nemici.py)")
 
     def _controlla_tipo(rel, nm):
         if nm.get("tipo") not in nemici_tipi:

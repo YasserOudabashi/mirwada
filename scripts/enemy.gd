@@ -82,7 +82,9 @@ func _ready() -> void:
 		float(_cfg.get("angolo_arco", 90.0)), float(_cfg.get("raggio_arco", 24.0)))
 	_hitbox.collision_mask = 4  # colpisce le hurtbox (layer 3)
 
-	_anim.call("configura", CATEGORIA_ANIM)
+	# US-1504: l'aspetto del tipo sceglie i fogli nemico_base_<aspetto>_<anim> (build_nemici.py); senza, il foglio base
+	var aspetto: String = str(_cfg.get("aspetto", CATEGORIA_ANIM))
+	_anim.call("configura", CATEGORIA_ANIM, "" if aspetto == CATEGORIA_ANIM else aspetto)
 	_anim.evento_frame.connect(_su_evento_anim)
 	_anim.animazione_finita.connect(_su_anim_finita)
 	_hitbox.ha_colpito.connect(_su_colpo_inflitto)

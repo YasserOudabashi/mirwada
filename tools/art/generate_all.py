@@ -99,6 +99,11 @@ def main():
         print(cat)
         if cat != "pet":
             copia_categoria(cat, specs[cat])
+            if cat == "nemico_base":                      # US-1504: un aspetto per tipo (balance.json nemici_tipi)
+                with open(os.path.join(ROOT, "data", "balance.json"), encoding="utf-8") as fh:
+                    tipi = json.load(fh)["nemici_tipi"]
+                for asp in sorted({t["aspetto"] for k, t in tipi.items() if not k.startswith("_")} - {cat}):
+                    copia_categoria(cat, specs[cat], asp)
             continue
         # pet: un foglio per specie di data/pets (pet_<id>_<nome>.png), stessi tempi per tutte
         with open(os.path.join(ROOT, "data", "pets", "core.json"), encoding="utf-8") as fh:

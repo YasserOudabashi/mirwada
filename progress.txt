@@ -1518,3 +1518,23 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Validator: il luogo esiste e la figura c'e'. tests/test_pet_mondo.gd (4). 1094 test, validate 0.
 - Schermo (Xvfb, Moon, cimitero di Mirwada): il corvo selvatico col prompt, domato al primo tentativo, poi segue Enel.
   arte/revisione/pet_nel_mondo.png. Resta: il pet non combatte (con i nemici, fase 15).
+
+## US-1504a — Figure dei nemici umani, 2026-11-18
+- US-1504 spezzata in a (umani), b (bestie), c (forme strane). Qui i 26 tipi umani di `balance.json nemici_tipi`:
+  `tools/art/build_nemici.py` (ASPETTI: argomenti di forge3d `humanoid` per tipo, nessun numero casuale: stessi
+  parametri = stessi PNG), stesse clip e ppu 1.4 di nemico_base in `build_personaggi.py`, esporta in una cartella
+  temporanea (export_spec scrive `nemico_base_<anim>.png`, che in arte/sprite e' il foglio base: la prima prova lo
+  aveva spostato, ripristinato da git) e rinomina in `arte/sprite/nemico_base_<aspetto>_<anim>.png`.
+- Comandi: `python tools/art/build_nemici.py` (~80 s), poi `python tools/art/generate_all.py --only nemico_base`
+  (ora copia anche un aspetto per ogni "aspetto" dei tipi, col contorno rosso del tell sull'anticipo).
+- Dati: `aspetto` dei 26 tipi = id del tipo; il brigante e le bestie/forme restano "nemico_base". `enemy.gd` passa
+  l'aspetto all'AnimationMachine (`configura(categoria, aspetto)`); il validator vuole
+  `assets/placeholder/nemico_base_<aspetto>_idle.png`.
+- Scelte: colori diversi da Enel (nessuno col cappotto nero e la sciarpa rossa) tranne il Doppio, che e' Enel con
+  occhi rossi e lama viola; corazze con scudo tondo (guardia, custode della cripta) o a goccia (soldato caduto);
+  colosso e custode della cripta piu' grossi (`build`, `scale`).
+- Guardati: idle di tutti a x4 su fondo scuro e chiaro, attack/anticipo/walk di guardia, Doppio, pirata. A schermo
+  (Xvfb, 27 nemici posati sulla piazza di partenza, 3 foto): si leggono, ognuno diverso, la cella e i piedi uguali.
+- Test: `test_nemici_tipi.test_ogni_tipo_ha_la_sua_figura`. 1095 test verdi, validator 0 errori.
+- Aperto: come per Enel e gli NPC i fogli sono gli stessi nelle due modalita' (luminosa e cupa); nell'anticipo l'arma
+  a volte resta dietro la testa (limite noto del generatore). Bestie e forme strane: US-1504b/c.

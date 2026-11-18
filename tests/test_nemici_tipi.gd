@@ -63,3 +63,22 @@ func test_ogni_nemico_posato_ha_il_suo_tipo() -> void:
 			visti += 1
 			assert_true(tipi.has(str((nm as Dictionary).get("tipo", ""))), "%s: il nemico in (%s, %s) ha un tipo" % [f, nm.get("x"), nm.get("y")])
 	assert_true(visti >= 70, "i nemici del mondo (%d)" % visti)
+
+
+## US-1504: ogni tipo con un aspetto suo usa i suoi fogli (nemico_base_<aspetto>_<anim>), gli altri il foglio base.
+func test_ogni_tipo_ha_la_sua_figura() -> void:
+	var tipi: Dictionary = _gd().call("get_balance", "nemici_tipi")
+	var propri := 0
+	for tid in tipi:
+		if str(tid).begins_with("_"):
+			continue
+		var asp: String = str((tipi[tid] as Dictionary).get("aspetto", "nemico_base"))
+		var e: Node = _nemico(str(tid))
+		var tex: Texture2D = (e.get("_anim") as AnimatedSprite2D).sprite_frames.get_frame_texture("idle_down", 0)
+		var atteso: String = "nemico_base_idle.png" if asp == "nemico_base" else "nemico_base_%s_idle.png" % asp
+		var at: AtlasTexture = tex as AtlasTexture
+		assert_true(at != null and at.atlas.resource_path.ends_with(atteso), "%s usa %s" % [tid, atteso])
+		if asp != "nemico_base":
+			propri += 1
+		e.free()
+	assert_true(propri >= 26, "le figure umane hanno il loro aspetto (%d)" % propri)
