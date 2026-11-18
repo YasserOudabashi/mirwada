@@ -31,12 +31,12 @@ func test_convenzioni() -> void:
 func test_campi_base_walk() -> void:
 	var s: RefCounted = _spec("personaggio", "walk")
 	assert_true(s.is_valid(), "walk valida")
-	assert_eq(s.frame_count(), 6, "6 frame")
-	# durate_ms: i contatti (frame 1 e 4, footstep) sono tenuti di piu'
-	assert_eq(s.frame_durations_ms(), [120.0, 150.0, 120.0, 120.0, 150.0, 120.0], "durate per frame")
+	assert_eq(s.frame_count(), 8, "8 frame (fotogrammi ricchi, 2026-11-18)")
+	# durate_ms: i contatti (frame 0 e 4, footstep) sono tenuti di piu'
+	assert_eq(s.frame_durations_ms(), [140.0, 110.0, 110.0, 110.0, 140.0, 110.0, 110.0, 110.0], "durate per frame")
 	assert_true(s.loops(), "walk in loop")
 	assert_true(s.is_directional(), "walk direzionale")
-	assert_almost_eq(s.duration_sec(), 0.78, "durata = somma delle durate")
+	assert_almost_eq(s.duration_sec(), 0.94, "durata = somma delle durate")
 
 
 func test_senza_durate_ms_vale_fps() -> void:
@@ -55,18 +55,18 @@ func test_animazione_inesistente() -> void:
 
 func test_fasi_del_combat_attack_light() -> void:
 	var s: RefCounted = _spec("personaggio", "attack_light")
-	# animations.json: anticipo [0,1], attivi [2], recupero [3,4]
+	# animations.json: anticipo [0,1,2], attivi [3], recupero [4..7]
 	assert_eq(s.phase_of(0), "anticipo", "frame 0 = anticipo")
-	assert_eq(s.phase_of(1), "anticipo", "frame 1 = anticipo")
-	assert_eq(s.phase_of(2), "attivi", "frame 2 = attivi")
-	assert_eq(s.phase_of(3), "recupero", "frame 3 = recupero")
+	assert_eq(s.phase_of(2), "anticipo", "frame 2 = anticipo")
+	assert_eq(s.phase_of(3), "attivi", "frame 3 = attivi")
 	assert_eq(s.phase_of(4), "recupero", "frame 4 = recupero")
+	assert_eq(s.phase_of(7), "recupero", "frame 7 = recupero")
 
 
 func test_eventi_hitbox_attack_light() -> void:
 	var s: RefCounted = _spec("personaggio", "attack_light")
-	assert_true(s.has_event_at(2, "hitbox_on"), "hitbox_on al frame 2")
-	assert_true(s.has_event_at(3, "hitbox_off"), "hitbox_off al frame 3")
+	assert_true(s.has_event_at(3, "hitbox_on"), "hitbox_on al frame 3")
+	assert_true(s.has_event_at(4, "hitbox_off"), "hitbox_off al frame 4")
 	assert_false(s.has_event_at(0, "hitbox_on"), "niente hitbox al frame 0")
 
 

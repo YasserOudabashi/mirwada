@@ -737,7 +737,7 @@ function provaStile() {
   if (!inc || !D.figure.enel) return null;
   let pw = null, ab = null;
   for (const p of T.pathway) for (const s of p.sequenze) for (const a of s.abilita) if (a.id === "hermit_incantesimo_tradizionale") { pw = p; ab = a; }
-  const abil = ab ? [{...ab, effetto: "vfx_incantesimo", danno: 18, cosa: ab.cosa || []}] : [];
+  const abil = ab ? [{...ab, prim: ab.primitive, effetto: "vfx_incantesimo", danno: 18, cosa: ab.cosa || []}] : [];
   const pezzo = (k, nome, fid) => h("button", {class: "chip", onclick: () => apriFiguraProva(k, nome, fid)}, nome);
   return h("div", {class: "sezione"}, h("h3", {text: "Prova del nuovo stile: da giudicare"}),
     h("p", {class: "intro", text: "Enel e il lupo della luna disegnati a griglia (3 teste, contorno nero, 3 toni, fotogrammi ricchi); il fendente pesante (tasto K) e l'Incantesimo tradizionale dell'Eremita (tasto 1) con un disegno tutto loro. Gli altri personaggi restano col disegno vecchio finché non approvi questo."}),

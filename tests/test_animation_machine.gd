@@ -77,15 +77,15 @@ func test_lampo_rispetta_riduci_flash() -> void:
 func test_frame_fps_e_loop_dai_dati() -> void:
 	var m: AnimatedSprite2D = _nuova()
 	var sf: SpriteFrames = m.sprite_frames
-	# animations.json personaggio.walk: 6 frame, durate_ms, loop true.
+	# animations.json personaggio.walk: 8 frame, durate_ms, loop true.
 	# Velocita' 1000 = la durata di ogni frame e' in ms.
-	assert_eq(sf.get_frame_count("walk_down"), 6, "6 frame in walk")
+	assert_eq(sf.get_frame_count("walk_down"), 8, "8 frame in walk")
 	assert_almost_eq(sf.get_animation_speed("walk_down"), 1000.0, "durate in ms")
-	assert_almost_eq(sf.get_frame_duration("walk_down", 0), 120.0, "frame 0: 120 ms")
-	assert_almost_eq(sf.get_frame_duration("walk_down", 1), 150.0, "frame 1 (contatto): 150 ms")
+	assert_almost_eq(sf.get_frame_duration("walk_down", 0), 140.0, "frame 0 (contatto): 140 ms")
+	assert_almost_eq(sf.get_frame_duration("walk_down", 1), 110.0, "frame 1: 110 ms")
 	assert_true(sf.get_animation_loop("walk_down"), "walk in loop")
-	# attack_light: 5 frame, non in loop
-	assert_eq(sf.get_frame_count("attack_light_down"), 5, "5 frame in attack_light")
+	# attack_light: 8 frame, non in loop
+	assert_eq(sf.get_frame_count("attack_light_down"), 8, "8 frame in attack_light")
 	assert_false(sf.get_animation_loop("attack_light_down"), "attack_light non in loop")
 	m.free()
 
@@ -97,11 +97,11 @@ func test_eventi_per_frame_emessi() -> void:
 	m.evento_frame.connect(func(n: String) -> void: eventi.append(n))
 
 	m.call("riproduci", "attack_light", "right")
-	m.frame = 2  # animations.json: hitbox_on al frame 2
-	m.frame = 3  # hitbox_off al frame 3
+	m.frame = 3  # animations.json: hitbox_on al frame 3
+	m.frame = 4  # hitbox_off al frame 4
 
-	assert_true(eventi.has("hitbox_on"), "hitbox_on emesso al frame 2")
-	assert_true(eventi.has("hitbox_off"), "hitbox_off emesso al frame 3")
+	assert_true(eventi.has("hitbox_on"), "hitbox_on emesso al frame 3")
+	assert_true(eventi.has("hitbox_off"), "hitbox_off emesso al frame 4")
 	m.free()
 
 
@@ -112,8 +112,8 @@ func test_cambio_di_fase_del_combat() -> void:
 	m.fase_cambiata.connect(func(f: String) -> void: fasi.append(f))
 
 	m.call("riproduci", "attack_light", "down")  # frame 0 -> anticipo
-	m.frame = 2  # -> attivi
-	m.frame = 3  # -> recupero
+	m.frame = 3  # -> attivi
+	m.frame = 4  # -> recupero
 
 	assert_eq(fasi, ["anticipo", "attivi", "recupero"], "fasi in ordine")
 	m.free()

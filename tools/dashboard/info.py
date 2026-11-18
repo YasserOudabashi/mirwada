@@ -245,6 +245,10 @@ def costruisci(dati, tr):
                 add(k, "Note di design", [a["note"]])
                 add(k, "Costo", [f"{a['costo']} spiritualita'" if a["costo"] is not None else None, f"ricarica {a['cd']} secondi" if a["cd"] else None])
     for e in dati["tecniche"]["effetti"]:
+        if e.get("unico"):
+            add("effetto:" + e["sprite"], "Cos'e'", [f"Disegno unico (nuovo stile, in prova) dell'abilita' {e['abilita']}: "
+                                                      "non e' la forma della primitiva ricolorata."])
+            continue
         add("effetto:" + e["sprite"], "Cos'e'", [f"L'effetto che si vede quando parte la primitiva {e['primitiva'].replace('_', ' ')}: {spiega({'tipo': e['primitiva']})[1]}",
                                                   "Colori: quelli del Pathway di chi la lancia."])
     for sid, s in dati["stati"].items():

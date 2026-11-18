@@ -17,35 +17,40 @@
     "piedi_px": 54,
     "_comment_piedi_px": "Riga di pixel della cella dove poggiano i piedi (sprite-forge: build_personaggi.py, PIEDI). AnimationMachine sposta lo sprite cosi' che i piedi cadano sull'origine del nodo: collisione e ordinamento per profondita' partono da li'.",
     "fps_default": 12,
-    "_comment_durate_ms": "durate_ms (opzionale): un valore in ms per frame, al posto di fps. Tempi della skill sprite-forge: idle 250-500, walk 100-150 con i contatti tenuti di piu', attacco = anticipo 120-200 (il frame chiave), colpo/smear 40-60, impatto 150-200, recupero 80-150. Dash e parata restano a fps: i loro tempi sono finestre di gameplay (i-frame, parata perfetta), non resa."
+    "_comment_durate_ms": "durate_ms (opzionale): un valore in ms per frame, al posto di fps. Tempi della skill sprite-forge: idle 250-500, walk 100-150 con i contatti tenuti di piu', attacco = anticipo 120-200 (il frame chiave), colpo/smear 40-60, impatto 150-200, recupero 80-150. Dash e parata restano a fps: i loro tempi sono finestre di gameplay (i-frame, parata perfetta), non resa.",
+    "_comment_frame_ricchi": "Scelta dell'utente del 2026-11-18: fotogrammi ricchi (camminata 8, idle 6, attacco leggero 8, pesante 12, morte 10; il nemico attacca in 6). Tutti i fogli di una categoria seguono questi numeri."
   },
   "personaggio": {
     "idle": {
-      "frames": 4,
+      "frames": 6,
       "durate_ms": [
-        400,
+        380,
+        260,
         300,
-        400,
+        380,
+        260,
         300
       ],
       "loop": true,
       "direzionale": true
     },
     "walk": {
-      "frames": 6,
+      "frames": 8,
       "durate_ms": [
-        120,
-        150,
-        120,
-        120,
-        150,
-        120
+        140,
+        110,
+        110,
+        110,
+        140,
+        110,
+        110,
+        110
       ],
       "loop": true,
       "direzionale": true,
       "eventi": [
         {
-          "frame": 1,
+          "frame": 0,
           "evento": "footstep"
         },
         {
@@ -70,49 +75,59 @@
       "_comment": "iframe_da/a definiscono la finestra di invulnerabilita' in FRAME, non in secondi: cosi' resta agganciata all'animazione anche se cambi gli fps."
     },
     "attack_light": {
-      "frames": 5,
+      "frames": 8,
       "durate_ms": [
-        60,
-        120,
         40,
-        150,
-        80
+        50,
+        80,
+        40,
+        70,
+        80,
+        60,
+        50
       ],
       "loop": false,
       "direzionale": true,
       "anticipo": [
         0,
-        1
-      ],
-      "attivi": [
+        1,
         2
       ],
+      "attivi": [
+        3
+      ],
       "recupero": [
-        3,
-        4
+        4,
+        5,
+        6,
+        7
       ],
       "eventi": [
         {
-          "frame": 2,
+          "frame": 3,
           "evento": "hitbox_on"
         },
         {
-          "frame": 3,
+          "frame": 4,
           "evento": "hitbox_off"
         }
       ]
     },
     "attack_heavy": {
-      "frames": 8,
+      "frames": 12,
       "durate_ms": [
+        60,
+        60,
+        60,
         70,
+        90,
+        170,
+        40,
+        60,
+        110,
+        80,
         70,
-        70,
-        180,
-        50,
-        160,
-        100,
-        150
+        70
       ],
       "loop": false,
       "direzionale": true,
@@ -120,15 +135,19 @@
         0,
         1,
         2,
-        3
-      ],
-      "attivi": [
+        3,
         4,
         5
       ],
-      "recupero": [
+      "attivi": [
         6,
         7
+      ],
+      "recupero": [
+        8,
+        9,
+        10,
+        11
       ],
       "eventi": [
         {
@@ -136,11 +155,11 @@
           "evento": "tell_visivo"
         },
         {
-          "frame": 4,
+          "frame": 6,
           "evento": "hitbox_on"
         },
         {
-          "frame": 6,
+          "frame": 8,
           "evento": "hitbox_off"
         }
       ]
@@ -163,7 +182,7 @@
       "direzionale": true
     },
     "death": {
-      "frames": 8,
+      "frames": 10,
       "fps": 10,
       "loop": false,
       "direzionale": false
@@ -189,57 +208,98 @@
     "_comment_azioni": "US-8B80: gesti fuori dal combattimento, la mano libera fa (lo spadone resta in spalla). interact: tende la mano e tocca (porte, leve, NPC); pickup: si piega e raccoglie da terra; drink: porta la fiala alla bocca (Bevi); ritual: mano alzata e testa china, in ciclo (rituale). Il frame tenuto di piu' e' quello del gesto.",
     "interact": {
       "frames": 4,
-      "durate_ms": [90, 150, 220, 130],
+      "durate_ms": [
+        90,
+        150,
+        220,
+        130
+      ],
       "loop": false,
       "direzionale": true
     },
     "pickup": {
       "frames": 5,
-      "durate_ms": [100, 120, 260, 120, 100],
+      "durate_ms": [
+        100,
+        120,
+        260,
+        120,
+        100
+      ],
       "loop": false,
       "direzionale": true
     },
     "drink": {
       "frames": 6,
-      "durate_ms": [100, 140, 200, 360, 140, 100],
+      "durate_ms": [
+        100,
+        140,
+        200,
+        360,
+        140,
+        100
+      ],
       "loop": false,
       "direzionale": true
     },
     "ritual": {
       "frames": 6,
-      "durate_ms": [200, 160, 200, 200, 160, 200],
+      "durate_ms": [
+        200,
+        160,
+        200,
+        200,
+        160,
+        200
+      ],
       "loop": true,
       "direzionale": true
     },
     "_comment_mezzi": "US-8B81: in volo (fly: sospeso, gambe che pendono, su e giu') e in barca (sail: in ginocchio, rema con la mano libera) prendono il posto di idle e walk. Nuoto e arrampicata arrivano col loro gameplay (US-8B90, US-8B92).",
     "fly": {
       "frames": 6,
-      "durate_ms": [160, 140, 160, 160, 140, 160],
+      "durate_ms": [
+        160,
+        140,
+        160,
+        160,
+        140,
+        160
+      ],
       "loop": true,
       "direzionale": true
     },
     "sail": {
       "frames": 6,
-      "durate_ms": [180, 150, 180, 180, 150, 180],
+      "durate_ms": [
+        180,
+        150,
+        180,
+        180,
+        150,
+        180
+      ],
       "loop": true,
       "direzionale": true
     }
   },
   "nemico_base": {
     "idle": {
-      "frames": 4,
+      "frames": 6,
       "durate_ms": [
         400,
-        300,
+        280,
+        320,
         400,
-        300
+        280,
+        320
       ],
       "loop": true,
       "direzionale": true
     },
     "walk": {
-      "frames": 6,
-      "fps": 10,
+      "frames": 8,
+      "fps": 13,
       "loop": true,
       "direzionale": true
     },
@@ -261,25 +321,27 @@
       "_comment": "Il tell parte al frame 0 dell'anticipo, non dell'attacco. E' cio' che rende il combattimento leggibile: il giocatore ha 4 frame per decidere."
     },
     "attack": {
-      "frames": 4,
+      "frames": 6,
       "durate_ms": [
-        60,
+        40,
+        40,
         50,
-        160,
-        120
+        150,
+        110,
+        90
       ],
       "loop": false,
       "direzionale": true,
       "attivi": [
-        1
+        2
       ],
       "eventi": [
         {
-          "frame": 1,
+          "frame": 2,
           "evento": "hitbox_on"
         },
         {
-          "frame": 2,
+          "frame": 3,
           "evento": "hitbox_off"
         }
       ],
@@ -293,7 +355,7 @@
       "direzionale": true
     },
     "death": {
-      "frames": 6,
+      "frames": 10,
       "fps": 10,
       "loop": false,
       "direzionale": false
@@ -358,13 +420,25 @@
     "_comment": "US-8B23: animali d'atmosfera (non nemici ne' pet: niente combattimento). Stessi tempi per tutte le specie, fogli per specie fauna_<specie>_<animazione>.png (tools/art/build_fauna.py), celle lette dal foglio: 32 px i piccoli, 64 il cervo. idle = tranquilli (pascola, becchetta, ali che si aprono piano, lucciola che pulsa), fuga = scappano (corrono o volano via). Chi scappa e dove sta e' in data/world/fauna.json.",
     "idle": {
       "frames": 4,
-      "durate_ms": [420, 300, 420, 300],
+      "durate_ms": [
+        420,
+        300,
+        420,
+        300
+      ],
       "loop": true,
       "direzionale": true
     },
     "fuga": {
       "frames": 6,
-      "durate_ms": [80, 80, 80, 80, 80, 80],
+      "durate_ms": [
+        80,
+        80,
+        80,
+        80,
+        80,
+        80
+      ],
       "loop": true,
       "direzionale": true
     }
