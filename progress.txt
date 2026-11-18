@@ -1681,3 +1681,24 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   una scheda da approvare per ogni cosa nuova (Enel e ognuna delle 16 animazioni, le 4 schivate, il lupo e le sue 6,
   fendente, carica, incantesimo, scoppio): chiavi `prova:<id>`. Verificata con Playwright, nessun errore.
 - Aperto: nel gioco il fendente pesante usa ancora l'effetto melee_arc (non il disegno nuovo) finche' non e' approvato.
+
+## Giro 3 della prova: le note dell'utente sulle schede, 2026-11-18 (US-8C03)
+- Lette tutte le note (giudizi/prova:*, enel, boss:re_dei_ratti, nemico:barca_fantasma). Causa del "si china
+  all'indietro dappertutto": segno sbagliato in corpo.py (su = _rx(up, +piega) portava il busto indietro); ora -piega,
+  e le braccia seguono il busto. Carica del pesante rifatta col peso sulla gamba davanti (destra e sinistra guardate).
+- Carica: si carica SOLO tenendo premuto (anche durante la preparazione); lasciato prima del frame della carica il
+  colpo parte subito (player.gd _tieni_carica, arena del sito uguale). Test nuovo: un tocco non carica.
+- Enel: schivata a 8 frame chinata in avanti (animations.json dash 8 frame a 32 fps, i-frame 0-5); hurt piegato in
+  avanti con la faccia del dolore e il sangue; death in 4 direzioni (animations.json direzionale) con sangue e pozza;
+  cast con una mano e la luce che si forma; drink stappa e porta alla bocca; parry con la lama dritta avanti e la
+  scintilla; pickup accucciato col sacchetto a terra; walk con le ginocchia alte nel passaggio.
+- Schivate: 8 frame; capriola rifatta dopo una ricerca (abbassarsi, tuffo, palla che rotola sul bacino, piedi a
+  terra, rialzarsi); scivolata su un ginocchio; ombra con copie viola e blu ben visibili.
+- Lupo: la falce gira col corpo (regola nuova: ogni disegno sul corpo gira col corpo), morte in 4 direzioni col
+  sangue, sangue nello stagger. nemico_base death direzionale: rigenerati i 41 tipi (3D vecchio) e le forme.
+- Sito: arena sul terreno vero del gioco (tessere del mondo a 64 px per casella, scelta del luogo), schizzi di sangue
+  sui colpi, velocita' e fotogramma per fotogramma nelle schede. Due modifiche erano finite per errore nel campo di
+  prova dei personaggi (stesso codice): spostate nell'arena.
+- Regole nuove nella skill arte-personaggi. 1103 test verdi, validator 0 errori, Playwright senza errori.
+- Aperto (per il rifacimento di tutti): il contorno rosso del tell (Re dei Ratti) - va spiegato o tolto; la barca
+  fantasma deve avere un cannone che spara; nel gioco il fendente pesante usa ancora il disegno melee_arc.

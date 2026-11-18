@@ -380,12 +380,23 @@ func inizia_pesante() -> void:
 	_anim.call("riproduci", "attack_heavy", _dir_sguardo)
 
 
-## Pubblico per i test: `tenuto` = il tasto e' ancora premuto. Sul frame della carica l'animazione resta ferma
-## finche' si tiene premuto (fino al massimo); Enel si schiarisce man mano che la carica cresce.
+## Pubblico per i test: `tenuto` = il tasto e' ancora premuto. La carica cresce solo tenendo premuto (anche durante
+## la preparazione); sul frame della carica l'animazione resta ferma finche' si tiene premuto (fino al massimo); Enel
+## si schiarisce man mano. Lasciato prima, il colpo parte subito.
 func _tieni_carica(delta: float, tenuto: bool) -> void:
 	var pz: Dictionary = _combat.get("attacco_pesante", {})
 	var massimo: float = float(pz.get("carica_max_s", 1.5))
-	if _anim.frame == int(pz.get("frame_carica", 5)) and tenuto and _carica < massimo:
+	var frame_carica: int = int(pz.get("frame_carica", 5))
+	# si carica SOLO finche' si tiene premuto (giudizio dell'utente, 2026-11-18): lasciato prima del frame della
+	# carica, il colpo parte subito con la carica che c'e', senza finire da solo la preparazione
+	if not tenuto and _anim.frame < frame_carica:
+		_anim.frame = frame_carica + 1
+		if not _anim.is_playing():
+			_anim.play()
+		return
+	if tenuto and _anim.frame < frame_carica:
+		_carica = minf(_carica + delta, massimo)
+	if _anim.frame == frame_carica and tenuto and _carica < massimo:
 		_anim.pause()
 		_carica = minf(_carica + delta, massimo)
 		var k: float = _carica / massimo

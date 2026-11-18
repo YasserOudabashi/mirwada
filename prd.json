@@ -2135,6 +2135,23 @@
       "fase": "8c",
       "passes": true,
       "notes": "Fatta il 2026-11-18; dettagli in progress.txt. Aspetta il giudizio dell'utente e la scelta della schivata."
+    },
+    {
+      "id": "US-8C03",
+      "title": "Prova di stile, giro 3: note dell'utente sulle schede",
+      "description": "Correzioni dalle note sulla pagina Da testare.",
+      "acceptanceCriteria": [
+        "nessuno si china all'indietro",
+        "carica solo tenendo premuto",
+        "morte in 4 direzioni col sangue",
+        "gesti chiari (bere, raccogliere, magia, parata)",
+        "arena sul terreno vero",
+        "test e validator verdi"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18; dettagli in progress.txt."
     }
   ]
 }

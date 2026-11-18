@@ -37,6 +37,8 @@ FIGURE = {
 
 
 def rendi(mod, posa, direzione, lato):
+    if "per_vista" in posa:                      # valori diversi per direzione (chi e' sdraiato resta nella cella)
+        posa = {**posa, **posa["per_vista"].get(direzione, {})}
     t = Tela(lato, lato)
     v = Vista(direzione, cx=lato / 2, piedi=getattr(mod, "PIEDI", 54) * lato / 64)
     g = mod.CORPO.giunture(posa)
@@ -46,9 +48,9 @@ def rendi(mod, posa, direzione, lato):
     if posa.get("scia"):                         # copie scure dietro (la schivata "ombra"): sagome piene, sotto
         fondo = Image.new("RGBA", im.size)
         for k in range(int(posa["scia"]), 0, -1):
-            p2 = dict(posa, scia=0, avanti=posa.get("avanti", 0) - 5 * k)
+            p2 = dict(posa, scia=0, avanti=posa.get("avanti", 0) - 7 * k)
             sag = rendi(mod, p2, direzione, lato).split()[3]
-            col = (38, 43, 68, 255) if k > 1 else (58, 68, 102, 255)
+            col = ((104, 56, 108, 255), (58, 68, 102, 255), (38, 43, 68, 255))[min(k - 1, 2)]   # viola, poi blu
             fondo.paste(Image.new("RGBA", im.size, col), (0, 0), sag)
         fondo.alpha_composite(im)
         im = fondo

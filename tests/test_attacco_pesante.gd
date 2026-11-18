@@ -51,3 +51,13 @@ func test_piu_carica_piu_danno_e_area() -> void:
 	assert_false(bool(p.call("sta_attaccando")), "finita l'animazione si puo' attaccare di nuovo")
 	assert_almost_eq(float(p.call("carica_pesante")), 0.0, "la carica si azzera")
 	p.free()
+
+
+func test_un_tocco_colpisce_subito_senza_caricarsi_da_solo() -> void:
+	var p := _player()
+	var anim: AnimatedSprite2D = p.get_node("AnimationMachine")
+	p.call("inizia_pesante")
+	p.call("_tieni_carica", 0.05, false)
+	assert_eq(anim.frame, int(_numeri()["frame_carica"]) + 1, "lasciato subito: si salta al colpo")
+	assert_almost_eq(float(p.call("carica_pesante")), 0.0, "nessuna carica senza tenere premuto")
+	p.free()

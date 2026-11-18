@@ -18,6 +18,25 @@ Questa skill dice **come devono venire**; i comandi e i dati restano quelli di C
 3 teste, pixel art a griglia su scheletro 2D (niente 3D), contorno nero 1 px, 3 toni per materiale, fotogrammi ricchi
 (camminata 8, idle 6, leggero 8, pesante 12, morte 10), boss fino a 192 px. Dettaglio in CLAUDE.md "Decisioni prese".
 
+## Regole dai giudizi della prova (2026-11-18, valgono per TUTTI i personaggi, nemici e boss)
+- **Mai chinarsi all'indietro** per attaccare, caricare o scattare: il peso va sulla gamba davanti, il busto avanti.
+  Controlla OGNI vista di profilo (sinistra E destra): la gamba vicina a chi guarda domina il disegno.
+  (C'era un segno sbagliato nello scheletro: `su = _rx(up, -piega)`; ora piega positiva = avanti.)
+- **Morte in tutte e 4 le direzioni**, come ogni altra animazione; l'ultimo frame resta a terra.
+- **Sangue**: chi viene colpito schizza sangue, chi muore lascia una pozza (`sangue`, `pozza` nelle pose).
+- **Faccia**: il dolore si vede in faccia (occhi strizzati, bocca aperta: `faccia="dolore"`).
+- **Ogni disegno sul corpo gira col corpo** (marchi, fiale, falce del lupo, testa): quando cade o rotola, ruota con
+  lui o sparisce se va dalla parte nascosta.
+- **Gesti chiari**: bere = la fiala si stappa e va alla BOCCA, testa indietro; raccogliere = si accuccia in avanti, mano
+  sull'oggetto (disegnato a terra), si rialza con l'oggetto; magia = una mano sola verso il nemico con qualcosa che si
+  forma e parte; parata = la lama va avanti incontro al colpo, scintilla dove arriva; camminando su e giu' le gambe si
+  devono vedere salire (ginocchio alto nel passaggio).
+- **Mosse che non conosci** (capriola, salti, arrampicate...): prima cerca come le fanno le persone vere e come le
+  disegnano gli animatori (pose chiave, numero di frame), poi disegna. Piu' fotogrammi se il movimento e' complesso.
+- **Il tell del nemico deve avere un senso visibile** (una posa estrema), non solo un contorno colorato.
+- **Ogni nemico si prova sul terreno vero** nell'arena della dashboard, e ogni attacco deve far capire cosa fa
+  (se spara, si vede l'arma che spara).
+
 ## Regole
 1. **Silhouette prima di tutto.** Riempi la figura di nero: deve restare riconoscibile (testa, due braccia, due gambe,
    arma). Se no, cambia la posa o le proporzioni, non i colori.

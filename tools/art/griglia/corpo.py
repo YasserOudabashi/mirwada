@@ -65,7 +65,9 @@ class Umano:
         bac = np.array([p.get("lato", 0.0), p.get("avanti", 0.0), m["anca"] + p.get("bob", 0.0)])
         g["bacino"] = bac
         piega, gira, incl = (math.radians(p.get(k, 0.0)) for k in ("piega", "gira", "inclina"))
-        su = _rz(_ry(_rx(np.array([0, 0, 1.0]), piega), incl), gira)
+        # _rx porta -z in avanti e quindi +z indietro: il busto si piega in avanti con -piega (era il segno sbagliato
+        # che faceva chinare tutti all'indietro, giudizio dell'utente del 2026-11-18). Le braccia seguono il busto.
+        su = _rz(_ry(_rx(np.array([0, 0, 1.0]), -piega), incl), gira)
         destra = _rz(np.array([1.0, 0, 0]), gira)
         busto = m["busto"] - p.get("respiro", 0.0)
         g["collo"] = bac + su * busto
@@ -76,8 +78,8 @@ class Umano:
         for lato, s in (("r", 1), ("l", -1)):
             sp = g["spalle_c"] + destra * s * m["spalle"]
             av, fu, gom = p.get(f"braccio_{lato}", (0, 8, 10))
-            d1 = _rz(_ry(_rx(arto(av, fu, s), piega * 0.6), incl), gira)
-            d2 = _rz(_ry(_rx(arto(av + gom, fu * 0.6, s), piega * 0.6), incl), gira)
+            d1 = _rz(_ry(_rx(arto(av, fu, s), -piega * 0.6), incl), gira)
+            d2 = _rz(_ry(_rx(arto(av + gom, fu * 0.6, s), -piega * 0.6), incl), gira)
             g[f"spalla_{lato}"] = sp
             g[f"gomito_{lato}"] = sp + d1 * m["braccio"]
             g[f"mano_{lato}"] = g[f"gomito_{lato}"] + d2 * m["avambraccio"]

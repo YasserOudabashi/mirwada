@@ -19,8 +19,8 @@ func test_spriteframes_costruito_dai_dati() -> void:
 	assert_true(sf.has_animation("walk_up"), "walk_up presente")
 	assert_true(sf.has_animation("attack_light_right"), "attack_light_right presente")
 	# non direzionale -> una sola
-	assert_true(sf.has_animation("death"), "death (non direzionale) presente")
-	assert_false(sf.has_animation("death_down"), "death non ha varianti di direzione")
+	assert_true(sf.has_animation("death_down"), "death in 4 direzioni (giudizio dell'utente, 2026-11-18)")
+	assert_true(sf.has_animation("death_left"), "death anche di lato")
 	m.free()
 
 
@@ -126,9 +126,9 @@ func test_finestra_iframe_del_dash_segnalata() -> void:
 	m.finestra_cambiata.connect(func(nome: String, attiva: bool) -> void:
 		eventi.append([nome, attiva]))
 
-	m.call("riproduci", "dash", "left")  # animations.json: iframe 0..2
+	m.call("riproduci", "dash", "left")  # animations.json: iframe 0..5
 	# frame 0 e' gia' dentro la finestra -> primo evento (iframe, true)
-	m.frame = 3  # fuori -> (iframe, false)
+	m.frame = 6  # fuori -> (iframe, false)
 
 	assert_true(eventi.has(["iframe", true]), "iframe apre entrando nel dash")
 	assert_true(eventi.has(["iframe", false]), "iframe chiude uscendo dalla finestra")
@@ -141,7 +141,7 @@ func test_spec_corrente_espone_le_finestre() -> void:
 	m.call("riproduci", "dash", "left")
 	var spec: RefCounted = m.call("spec_corrente")
 	assert_true(spec != null, "spec del dash disponibile")
-	assert_eq(spec.iframe_window(), Vector2i(0, 2), "finestra i-frame del dash da spec_corrente")
+	assert_eq(spec.iframe_window(), Vector2i(0, 5), "finestra i-frame del dash da spec_corrente")
 	m.free()
 
 

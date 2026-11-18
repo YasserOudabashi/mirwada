@@ -60,8 +60,8 @@
       ]
     },
     "dash": {
-      "frames": 4,
-      "fps": 20,
+      "frames": 8,
+      "fps": 32,
       "loop": false,
       "direzionale": true,
       "eventi": [
@@ -71,7 +71,7 @@
         }
       ],
       "iframe_da": 0,
-      "iframe_a": 2,
+      "iframe_a": 5,
       "_comment": "iframe_da/a definiscono la finestra di invulnerabilita' in FRAME, non in secondi: cosi' resta agganciata all'animazione anche se cambi gli fps."
     },
     "attack_light": {
@@ -185,7 +185,7 @@
       "frames": 10,
       "fps": 10,
       "loop": false,
-      "direzionale": false
+      "direzionale": true
     },
     "cast": {
       "frames": 6,
@@ -358,7 +358,7 @@
       "frames": 10,
       "fps": 10,
       "loop": false,
-      "direzionale": false
+      "direzionale": true
     }
   },
   "pet": {

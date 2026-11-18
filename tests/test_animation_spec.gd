@@ -40,10 +40,10 @@ func test_campi_base_walk() -> void:
 
 
 func test_senza_durate_ms_vale_fps() -> void:
-	# dash e' a fps (20): le finestre di i-frame non cambiano con la resa
+	# dash e' a fps (32, 8 frame dal 2026-11-18): le finestre di i-frame non cambiano con la resa
 	var s: RefCounted = _spec("personaggio", "dash")
-	assert_eq(s.frame_durations_ms(), [50.0, 50.0, 50.0, 50.0], "1000/20 ms per frame")
-	assert_almost_eq(s.duration_sec(), 0.2, "durata 4/20 s")
+	assert_eq(s.frame_durations_ms(), [31.25, 31.25, 31.25, 31.25, 31.25, 31.25, 31.25, 31.25], "1000/32 ms per frame")
+	assert_almost_eq(s.duration_sec(), 0.25, "durata 8/32 s")
 
 
 func test_animazione_inesistente() -> void:
@@ -72,11 +72,11 @@ func test_eventi_hitbox_attack_light() -> void:
 
 func test_iframe_del_dash() -> void:
 	var s: RefCounted = _spec("personaggio", "dash")
-	# animations.json: iframe_da 0, iframe_a 2
-	assert_eq(s.iframe_window(), Vector2i(0, 2), "finestra i-frame 0..2")
+	# animations.json: iframe_da 0, iframe_a 5
+	assert_eq(s.iframe_window(), Vector2i(0, 5), "finestra i-frame 0..5")
 	assert_true(s.is_invulnerable_at(0), "invulnerabile al frame 0")
-	assert_true(s.is_invulnerable_at(2), "invulnerabile al frame 2")
-	assert_false(s.is_invulnerable_at(3), "vulnerabile al frame 3")
+	assert_true(s.is_invulnerable_at(5), "invulnerabile al frame 5")
+	assert_false(s.is_invulnerable_at(6), "vulnerabile al frame 6")
 
 
 func test_niente_iframe_dove_non_dichiarati() -> void:

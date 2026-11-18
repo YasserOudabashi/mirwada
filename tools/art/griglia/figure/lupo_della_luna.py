@@ -17,7 +17,9 @@ R = {
     "zampa": Rampa("slate_d", "slate", "grey"),
     "sella": Rampa("navy", "slate_d", "slate"),
     "luna": Rampa("amber", "yellow", "white"),
+    "sangue": Rampa("red_d", "red_d", "red"),
 }
+SANGUE = {"r": colore("red"), "R": colore("red_d"), "p": colore("pink")}
 M = {"g": colore("grey"), "l": colore("grey_l"), "s": colore("slate"), "S": colore("slate_d"), "w": colore("white"),
      "K": colore("ink"), "y": colore("amber"), "Y": colore("yellow"), "m": colore("red_d"), "t": colore("white"),
      "p": colore("purple_d")}
@@ -115,8 +117,9 @@ def disegna(tela, v, g, posa):
         segmento(tela, s, c, 5.0, 4.4, R["pelo"] if v.dir == "up" else R["criniera"], "criniera")
         if v.dir in ("left", "right"):           # falce di luna gialla sul fianco
             fx, fy = v.xy((g["anche"] + g["spalle"]) / 2 + g["su"] * 0.5)
+            q = int(round(posa.get("cade", 0) / 90.0)) % 4      # ogni disegno sul corpo gira col corpo
             griglia(tela, [".YY.", "Y...", "Y...", ".YY."], {"Y": colore("yellow")}, int(round(fx - 2)),
-                    int(round(fy - 2)), "luna", specchia=v.dir == "right", separa=False)
+                    int(round(fy - 2)), "luna", specchia=v.dir == "right", ruota=q, separa=False)
         for k in range(5):                       # criniera a punte bianche sul collo e sulle spalle
             base = g["spalle"] + g["su"] * (2.0 + k * 0.3) + np.array([(k - 2) * 1.6, 1.2 - k * 0.8, 0])
             tip = base + g["su"] * 4.4 + np.array([(k - 2) * 1.6, -2.6, 0])
@@ -132,7 +135,7 @@ def disegna(tela, v, g, posa):
             righe = (APERTA if aperta and v.dir == "down" else TESTA)[v.dir]
             spec = False
         gira = 0
-        if abs(posa.get("cade", 0)) > 50:
+        if abs(posa.get("cade", 0)) > 50 and v.dir in ("left", "right"):
             gira = 1 if v.dir != "right" else 3
         x, y = v.xy(g["testa"])
         w, h = len(righe[0]), len(righe)
@@ -142,6 +145,24 @@ def disegna(tela, v, g, posa):
         griglia(tela, righe, M, int(round(x - w / 2 + dx)), int(round(y - h / 2)), "testa", specchia=spec,
                 ruota=gira, uniti=("criniera",))
     parti.append((v.prof(g["testa"]) + (8.0 if v.dir == "up" else 2.0), 3, testa))
+
+    sangue = posa.get("sangue", 0)               # gocce dal fianco (stagger, death)
+    if sangue:
+        def gocce():
+            c = (g["anche"] + g["spalle"]) / 2 + g["su"] * 2
+            for i, (dx, dz) in enumerate(((1.0, 0.6), (1.6, -0.2), (0.6, 1.2), (2.0, 0.4), (1.3, -0.8))):
+                p = c + np.array([(i - 2) * 2.2 * sangue, -dx * sangue * 2.0, 2.0 + dz * sangue * 3.0])
+                x, y = v.xy(p)
+                griglia(tela, ["pr", "rR"] if i % 2 else [".r.", "rRr", ".R."], SANGUE, int(round(x)), int(round(y)),
+                        "sangue", separa=False)
+        parti.append((99, 7, gocce))
+    pozza = posa.get("pozza", 0)
+    if pozza:
+        def pozza_a_terra():
+            x, y = v.xy((g["anche"] + g["spalle"]) / 2 * np.array([1, 1, 0]))
+            segmento(tela, (x - pozza * 2.6, y), (x + pozza * 2.6, y), pozza * 1.3, pozza * 1.3, R["sangue"], "pozza",
+                     separa=False)
+        parti.append((-99, -9, pozza_a_terra))
 
     for _, _, f in sorted(parti, key=lambda p: (p[0], p[1])):
         f()
@@ -178,16 +199,16 @@ ANIM = {
         (1.0, dict(FERMO))]},
     "stagger": {"chiavi": [
         (0.0, dict(FERMO, piega=-14, testa=(-25, 0), avanti=-2, coda=(-10, 0), ant_l=(30, 6, 40),
-                   ant_r=(30, 6, 40), bocca=1)),
-        (0.5, dict(FERMO, piega=-8, testa=(-15, 10), avanti=-2.5, coda=(-20, 0))),
+                   ant_r=(30, 6, 40), bocca=1, sangue=0.7)),
+        (0.5, dict(FERMO, piega=-8, testa=(-15, 10), avanti=-2.5, coda=(-20, 0), sangue=1.3)),
         (1.0, dict(FERMO, coda=(0, 0)))]},
-    "death": {"vista": "left", "chiavi": [
-        (0.0, dict(FERMO, piega=-10, testa=(-25, 0), bocca=1)),
-        (2 / 9, dict(FERMO, piega=12, testa=(30, 0), ant_l=(30, 4, 70), ant_r=(30, 4, 70), bocca=1)),
+    "death": {"chiavi": [
+        (0.0, dict(FERMO, piega=-10, testa=(-25, 0), bocca=1, sangue=0.8)),
+        (2 / 9, dict(FERMO, piega=12, testa=(30, 0), ant_l=(30, 4, 70), ant_r=(30, 4, 70), bocca=1, sangue=1.4)),
         (4 / 9, dict(FERMO, piega=20, testa=(40, 0), ant_l=(60, 4, 120), ant_r=(60, 4, 120), post_l=(20, 4, 40),
-                     post_r=(20, 4, 40), cade=30)),
+                     post_r=(20, 4, 40), cade=30, pozza=1.2)),
         (7 / 9, dict(FERMO, testa=(10, 0), ant_l=(20, 10, 20), ant_r=(30, 10, 20), post_l=(-10, 10, 20),
-                     post_r=(0, 10, 20), cade=85, coda=(-30, 0))),
+                     post_r=(0, 10, 20), cade=85, coda=(-30, 0), pozza=2.8)),
         (1.0, dict(FERMO, testa=(10, 0), ant_l=(24, 10, 24), ant_r=(34, 10, 24), post_l=(-12, 10, 22),
-                   post_r=(0, 10, 22), cade=90, coda=(-34, 0)))]},
+                   post_r=(0, 10, 22), cade=90, coda=(-34, 0), pozza=3.6))]},
 }
