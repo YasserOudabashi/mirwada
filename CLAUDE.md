@@ -522,6 +522,20 @@ audio, Mondo vivo, fusioni, rilascio (qui il gioco e' finito in italiano), poi r
   combattimento.bersaglio`); **senza nemico l'abilita' non parte e non costa**. I costi voluti su di se' sono
   `"bersaglio": "self"` nei dati dell'abilita' (`primitives.json` da' il default).
 
+- **Scelte artistiche per rifare tutta l'arte** (2026-11-18, decise dall'utente; valgono sopra le regole d'arte qui
+  sopra dove si contraddicono, che si aggiornano story per story):
+  - personaggi a **3 teste** (testa grande, faccia leggibile), **pixel art a griglia** (parti disegnate a griglia e
+    montate su uno scheletro 2D, rilanciabile col seed; il 3D di forge3d non si usa piu' per le figure);
+  - **contorno nero pieno 1 px** (`#181425`), **3 toni** per materiale (luce, base, ombra; riflesso solo sul metallo);
+  - fotogrammi **ricchi**: camminata 8, idle 6, attacco leggero 8, pesante 12, morte 10 (ferma a terra); si cambia
+    `data/animations.json` e si rigenera;
+  - effetti: **un disegno unico per ogni abilita'** (oltre a una forma propria per primitiva), colore dal Pathway;
+  - boss **enormi, fino a 192 px**;
+  - mondo (terreni, alberi, case, arredi) **a griglia** nello stesso stile; mappa, biomi e villaggi approvati restano;
+  - modalita' cupa con **disegni propri** (piu' rovine, nebbia, forme delle concept), non solo un'altra palette;
+  - icone: **ogni oggetto il suo disegno** 32x32, famiglie riconoscibili (la maggiore piu' grande e decorata);
+  - ordine: prima **Enel + un nemico + un effetto**, giudicati dall'utente nella dashboard, poi tutto il resto.
+
 ## i18n — due sistemi, una convenzione per le stringhe dei dati
 
 1. **UI chrome** (HUD, etichette del motore): `assets/i18n/strings.csv` → `.translation`, con

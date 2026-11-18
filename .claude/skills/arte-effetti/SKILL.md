@@ -3,6 +3,9 @@ name: arte-effetti
 description: Effetti delle abilita' di Mirwada (VFX) con una forma e un movimento propri per ogni primitiva, non solo un colore diverso. Usala prima di toccare forge3d/vfx.py, tools/art/build_vfx.py o data/vfx.json.
 ---
 
+
+> Scelta dell'utente (2026-11-18): **ogni abilita' ha un disegno unico**, piu' una forma propria per primitiva; colore dal Pathway; contorno nero 1 px e 3 toni come le figure.
+
 # Effetti con individualita'
 
 ## Giudizio dell'utente (2026-11-18)

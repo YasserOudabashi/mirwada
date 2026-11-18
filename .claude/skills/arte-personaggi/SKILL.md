@@ -14,6 +14,10 @@ Questa skill dice **come devono venire**; i comandi e i dati restano quelli di C
 - le pose (chinarsi, meditare, raccogliere) non si capiscono;
 - i boss non dicono cosa fanno.
 
+## Scelte dell'utente (2026-11-18, vincolanti)
+3 teste, pixel art a griglia su scheletro 2D (niente 3D), contorno nero 1 px, 3 toni per materiale, fotogrammi ricchi
+(camminata 8, idle 6, leggero 8, pesante 12, morte 10), boss fino a 192 px. Dettaglio in CLAUDE.md "Decisioni prese".
+
 ## Regole
 1. **Silhouette prima di tutto.** Riempi la figura di nero: deve restare riconoscibile (testa, due braccia, due gambe,
    arma). Se no, cambia la posa o le proporzioni, non i colori.

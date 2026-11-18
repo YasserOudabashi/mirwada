@@ -3,6 +3,9 @@ name: arte-architettura
 description: Case, botteghe, edifici speciali e citta' di Mirwada (vista top-down 3/4): ogni edificio con il suo carattere, porte su lati diversi, insegne, monumenti riconoscibili (cattedrale, faro, museo, mercato, dogana, cantiere navale, centro antico). Usala prima di toccare forge3d/creatures.py edificio(), esporta_mondo.py --edifici o gli interni.
 ---
 
+
+> Scelta dell'utente (2026-11-18): case ed edifici **a griglia**, contorno nero 1 px, 3 toni; nella modalita' cupa disegni propri (rovine, nebbia).
+
 # Architettura (Mirwada)
 
 ## Giudizi dell'utente (2026-11-18), da rispettare

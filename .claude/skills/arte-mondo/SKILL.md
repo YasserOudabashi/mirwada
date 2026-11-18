@@ -3,6 +3,9 @@ name: arte-mondo
 description: Rendere il mondo di Mirwada pieno e vivo - dettagli per bioma e quartiere, scene raccontate dai luoghi (campo di battaglia con resti, cantiere con navi), gente e animali, sottosuolo con stanze diverse. Usala prima di toccare forge3d/world.py, esporta_mondo.py, fauna.json o il popolamento del mondo.
 ---
 
+
+> Scelta dell'utente (2026-11-18): terreni, alberi e arredi **a griglia** nello stesso stile delle figure; la modalita' cupa ha **disegni propri** (rovine, nebbia, forme delle concept); mappa e biomi approvati restano.
+
 # Mondo pieno e vivo
 
 ## Giudizi dell'utente (2026-11-18)

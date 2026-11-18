@@ -3,6 +3,9 @@ name: arte-icone
 description: Icone degli oggetti di Mirwada, ognuna riconoscibile - niente due oggetti con lo stesso disegno, famiglie leggibili (minore/maggiore, ingredienti diversi). Usala prima di toccare forge3d/icone.py, tools/art/build_icone.py o data/ui/icone.json.
 ---
 
+
+> Scelta dell'utente (2026-11-18): **ogni oggetto il suo disegno** 32x32 a griglia, contorno nero 1 px, 3 toni, famiglie riconoscibili (la maggiore piu' grande e decorata della minore).
+
 # Icone riconoscibili
 
 ## Giudizio dell'utente (2026-11-18)
