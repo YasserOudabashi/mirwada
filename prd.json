@@ -1829,13 +1829,13 @@
       ],
       "priority": 68,
       "fase": "15",
-      "passes": false,
-      "notes": "Da US-1504."
+      "passes": true,
+      "notes": "Fatta il 2026-11-18. 8 bestie in build_nemici.py BESTIE: lupo della luna, madre dei lupi, belva dei moli, cervo dalle corna rosse, ratto (quadrupedi, clip dei pet con un anticipo acquattato piu' marcato), corvo della battaglia, pipistrello, gabbiano (volatili, anticipo = ali alzate, barcollo = colpito). Il granchio va in US-1504c (non e' un quadrupede)."
     },
     {
       "id": "US-1504c",
       "title": "Figure delle forme strane",
-      "description": "Aspetti per melma, germoglio spinoso, sciame di spore, glifo vivente, barca fantasma e coccodrillo rapper: forme nuove in forge3d dove servono (una story per forma se il diff cresce).",
+      "description": "Aspetti per granchio corazzato, melma, germoglio spinoso, sciame di spore, glifo vivente, barca fantasma e coccodrillo rapper: forme nuove in forge3d dove servono (una story per forma se il diff cresce).",
       "acceptanceCriteria": [
         "fogli nemico_base_<aspetto>_<anim>.png, stessa cella",
         "asset guardati ingranditi",

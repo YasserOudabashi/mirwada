@@ -1538,3 +1538,18 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Test: `test_nemici_tipi.test_ogni_tipo_ha_la_sua_figura`. 1095 test verdi, validator 0 errori.
 - Aperto: come per Enel e gli NPC i fogli sono gli stessi nelle due modalita' (luminosa e cupa); nell'anticipo l'arma
   a volte resta dietro la testa (limite noto del generatore). Bestie e forme strane: US-1504b/c.
+
+## US-1504b — Figure delle bestie, 2026-11-18
+- `tools/art/build_nemici.py` BESTIE (aspetto -> rig, pixel per unita', clip): lupo della luna (manto argento,
+  falce ciano in fronte), madre dei lupi (nera, grande, criniera), belva dei moli (grigia, larga, zanne e collare),
+  cervo dalle corna rosse (palco rosso), ratto delle fogne (bruno, coda nuda) a 1.75-1.6 come i pet; corvo della
+  battaglia (straccio rosso), pipistrello cieco (orecchie), gabbiano ladro a 2.3 come il corvo del pet.
+- Clip: quelle dei pet di forge3d piu' due nuove nel file: `_quad_anticipo` (acquattato, testa bassa, groppa alta:
+  quello di forge3d non si leggeva da fermo) e per i volatili anticipo = ali alzate della picchiata, barcollo =
+  `bird_hurt`. Morte di lato come i pet.
+- Comandi: `python tools/art/build_nemici.py --solo <aspetti>` (~14 s le 8 bestie), poi
+  `python tools/art/generate_all.py --only nemico_base`. `aspetto` degli 8 tipi in balance.json.
+- Guardati: idle nelle 4 direzioni a x3, attack/anticipo/walk/death/stagger di lato su fondo chiaro; corretti la
+  belva (era arancio come il cervo: ora grigia), il ratto (troppo piccolo: size 0.9), l'anticipo dei lupi. A schermo
+  (Xvfb, piazza di partenza): lupi, cervo e uccelli in volo con l'ombra a terra si leggono.
+- 1095 test verdi, validator 0 errori. Aperto: granchio e forme strane in US-1504c.
