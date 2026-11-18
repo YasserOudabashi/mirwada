@@ -1635,3 +1635,28 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - La prova con stacco e group_lines all'utente sembra peggio di prima: la testa diventa una palla e la faccia
   sparisce. Conclusione: ritoccare i parametri del 3D non basta; serve una scelta di stile con l'utente prima di
   rifare (prossimo passo, non iniziato per sua richiesta).
+
+## Scelte artistiche e prima prova del nuovo stile, 2026-11-18 (US-8C01)
+- Scelte dell'utente (CLAUDE.md "Decisioni prese"): 3 teste, pixel art a griglia su scheletro, contorno nero 1 px,
+  3 toni, fotogrammi ricchi, un effetto unico per ogni abilita', boss fino a 192 px, mondo a griglia, cupa con
+  disegni propri, icone uniche. Chiarito con l'utente: in comune c'e' SOLO lo scheletro (giunture e pose); testa,
+  faccia, corpo, vestiti, arma e animazioni sono di ogni personaggio.
+- Motore nuovo `tools/art/griglia/` (pixel.py tela/rampe/segmenti/griglie/contorno anche fra le parti, corpo.py
+  scheletro umano e a quattro zampe con proiezione 3/4, pose.py chiavi a tempo normalizzato, effetti.py) e
+  `tools/art/build_griglia.py`. Figure: `griglia/figure/personaggio.py` (Enel: coppola, crepa di luce, sciarpa,
+  bende, spadone sulla schiena che impugna solo negli attacchi), `griglia/figure/lupo_della_luna.py`.
+- Comandi (niente caso, nessun seme): `python tools/art/build_griglia.py` (figure -> arte/sprite/, controllo in
+  arte/revisione/griglia_<id>.png), `python tools/art/build_griglia.py --effetti` (vfx_fendente_pesante,
+  vfx_incantesimo, vfx_incantesimo_scoppio -> assets/vfx/), poi `python tools/art/generate_all.py`.
+- Fotogrammi ricchi in data/animations.json: personaggio idle 6, walk 8 (contatti 0 e 4), attack_light 8 (colpo 3),
+  attack_heavy 12 (anticipo 0-5, colpo 6-7), death 10; nemico_base idle 6, walk 8, attack 6 (colpo 2), death 10.
+  Gli altri fogli (NPC, forme, 40 nemici) rigenerati col 3D di prima solo per i nuovi numeri: si rifanno dopo.
+- Guardato a x3-x5 su chiaro e scuro: Enel in tutte le 16 animazioni e 4 viste, lupo in 6, effetti ricolorati
+  (Twilight Giant, Eremita). Corretti: crepa che sembrava una lacrima, coppola troppo tonda, spadone davanti alla
+  faccia (ora sulla schiena), caduta della morte in avanti (ora all'indietro e dentro la cella), lupo stretto di
+  fronte, coda bianca enorme da dietro, lampo del fendente vuoto.
+- Dashboard: in "Oggi" la prova del nuovo stile (arena con Enel, il lupo come bersaglio, K fendente pesante,
+  1 Incantesimo tradizionale con lo scoppio), e il dettaglio delle due figure da giudicare.
+- Non mi convince ancora: il lupo da dietro e' un ovale con le orecchie; raccogliere di profilo sembra un inchino;
+  le rune dell'incantesimo a 1x sono puntini; nel gioco il fendente pesante e l'incantesimo non sono ancora
+  collegati (servono i dati per abilita' in vfx.json: dopo il giudizio).

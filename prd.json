@@ -2103,6 +2103,22 @@
       "fase": "strumenti",
       "passes": true,
       "notes": "Fatta il 2026-11-18 (richiesta dell'utente: una dashboard per vedere tutto e dire se va bene). Pagina https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3, script in tools/dashboard/."
+    },
+    {
+      "id": "US-8C01",
+      "title": "Nuovo stile: prova con Enel, lupo della luna, fendente pesante e una magia",
+      "description": "Prima prova delle scelte artistiche del 2026-11-18 (pixel art a griglia su scheletro, 3 teste, contorno nero, 3 toni, fotogrammi ricchi, effetti unici), da far giudicare all'utente nella dashboard prima di rifare il resto.",
+      "acceptanceCriteria": [
+        "Enel con tutte le animazioni a griglia, frame da data/animations.json",
+        "il lupo della luna a quattro zampe con il tell estremo",
+        "fendente pesante e Incantesimo tradizionale con un disegno proprio",
+        "provabili nell'arena della dashboard",
+        "test e validator verdi"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18: tools/art/griglia/ e tools/art/build_griglia.py; dettagli e cosa non convince in progress.txt. Prossimo passo: giudizio dell'utente."
     }
   ]
 }

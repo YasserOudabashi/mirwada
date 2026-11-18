@@ -500,7 +500,7 @@ function arena(opz) {
   const B = opz.boss;
   if (B || opz.bersaglio) {
     const tipo = B ? D.nemici.find(n => n.id === B.posato.tipo) : null;
-    const fid = B ? B.figura : "nemico_base";
+    const fid = B ? B.figura : typeof opz.bersaglio === "string" ? opz.bersaglio : "nemico_base";
     nemico = {l: new Lettore(fid, {scala: 1, giro: false, anim: "idle"}), x: 260, y: 130, dir: 2, vita: 1, max: 1, azione: null, attesa: 1200,
       cfg: {...(tipo ? tipo.numeri : {}), comportamento: tipo ? tipo.comportamento : "mischia"}, scala: B ? 1.5 : 1, fermo: !B};
   }
@@ -518,8 +518,8 @@ function arena(opz) {
     P.spirito -= ab.costo || 0; cd[ab.id] = (ab.cd || 1) * 1000;
     const mischia = ab.prim.includes("melee_arc");
     P.azione = mischia ? "attack_light" : "cast"; eroe.scegli(eroe.ha(P.azione) ? P.azione : "attack_light", () => { P.azione = null; eroe.scegli("idle"); });
-    ab.prim.forEach((pr, i) => {
-      const e = T.effetti.find(x => x.primitiva === pr && !x.scoppio_di) || T.effetti.find(x => x.primitiva === pr); if (!e) return;
+    (ab.effetto ? [ab.effetto] : ab.prim).forEach((pr, i) => {
+      const e = ab.effetto ? T.effetti.find(x => x.sprite === pr) : T.effetti.find(x => x.primitiva === pr && !x.scoppio_di) || T.effetti.find(x => x.primitiva === pr); if (!e) return;
       const fx = P.dir === 2 ? -1 : P.dir === 3 ? 1 : 0, fy = P.dir === 0 ? 1 : P.dir === 1 ? -1 : 0;
       const sulNemico = e.su && e.su !== "chi_lancia" && nemico;
       foglioColorato(e, pal).then(img => img && effetti.push({img, e, f: 0, t: -i * 120, x: sulNemico ? nemico.x : P.x + fx * 18, y: (sulNemico ? nemico.y : P.y) - 14 + fy * 10,
@@ -541,6 +541,12 @@ function arena(opz) {
     if (e.repeat) return;
     if (k === "j" && P.vivo) { P.azione = "attack_light"; eroe.scegli("attack_light", () => { P.azione = null; eroe.scegli("idle"); });
       if (nemico && Math.hypot(nemico.x - P.x, nemico.y - P.y) < 46) colpisci(16); }
+    if (k === "k" && P.vivo && !P.azione && eroe.ha("attack_heavy")) { P.azione = "attack_heavy"; eroe.scegli("attack_heavy", () => { P.azione = null; eroe.scegli("idle"); });
+      const a = D.figure.enel.anims.find(x => x.nome === "attack_heavy"), ritardo = a ? a.durate.slice(0, 6).reduce((x, y) => x + y, 0) : 400;
+      const e = T.effetti.find(x => x.sprite === "vfx_fendente_pesante");
+      const fx = P.dir === 2 ? -1 : P.dir === 3 ? 1 : 0, fy = P.dir === 0 ? 1 : P.dir === 1 ? -1 : 0;
+      if (e) foglioColorato(e, opz.palette || {}).then(img => img && effetti.push({img, e, f: 0, t: -ritardo, x: P.x + fx * 20, y: P.y - 18 + fy * 12, gira: P.dir === 2, vita: e.frames * 90}));
+      setTimeout(() => { if (nemico && Math.hypot(nemico.x - P.x, nemico.y - P.y) < 56) colpisci(40); }, ritardo); }
     if (k === " " && P.vivo) { P.azione = "dash"; eroe.scegli("dash", () => { P.azione = null; eroe.scegli("idle"); }); }
     if (k === "q" && nemico) colpisci(9999 * 0.1 * (B ? 600 * B.vita_x / 5 : 200) / 9999);
     if (k === "enter") { P.vivo = true; P.vita = 100; P.azione = null; eroe.scegli("idle"); if (nemico) { nemico.vita = 1; nemico.azione = null; nemico.l.scegli("idle"); gregari = []; if (B) { Object.assign(nemico.cfg, (D.nemici.find(n => n.id === B.posato.tipo) || {}).numeri || {}); entraFase(0); } } }
@@ -589,6 +595,9 @@ function arena(opz) {
       gg.dir = Math.abs(ddx) > Math.abs(ddy) ? (ddx < 0 ? 2 : 3) : (ddy < 0 ? 1 : 0); gg.l.passo(dt * velocita); }
     for (const e of effetti) { e.t += dt * velocita; e.x += (e.vx || 0) * dt / 1000 * velocita; e.y += (e.vy || 0) * dt / 1000 * velocita;
       if (e.colpo && Math.hypot(P.x - e.x, P.y - 14 - e.y) < 12 && P.azione !== "dash") { ferisci(nemico.cfg.danno_attacco || 8); e.vita = 0; } }
+    for (const e of effetti) if (e.e && e.e.vola && e.e.scoppio && !e.finito && e.t > 0 && (e.t > e.vita - 20 || (nemico && nemico.vita > 0 && Math.hypot(nemico.x - e.x, nemico.y - 14 - e.y) < 14))) {
+      e.finito = true; e.vita = 0; const s2 = T.effetti.find(x => x.sprite === e.e.scoppio);
+      if (s2) foglioColorato(s2, e.pal).then(img => img && effetti.push({img, e: s2, f: 0, t: 0, x: e.x, y: e.y, vita: s2.frames * 90})); }
     for (let i = effetti.length - 1; i >= 0; i--) if (effetti[i].t > effetti[i].vita) effetti.splice(i, 1);
     // disegno
     g.imageSmoothingEnabled = false; g.fillStyle = "#3e8948"; g.fillRect(0, 0, W, H); g.fillStyle = "#3a8244";
@@ -614,7 +623,7 @@ function arena(opz) {
   const log = h("pre", {class: "sotto", style: "white-space:pre-wrap;margin:0;min-height:3em"});
   const vel = h("input", {type: "range", min: "0.1", max: "2", step: "0.05", value: "1", id: "avel"}); vel.addEventListener("input", () => { velocita = +vel.value; });
   return h("div", {class: "sezione"}, c, log,
-    h("div", {class: "tasti"}, h("span", {}, h("kbd", {text: "W A S D"}), " muovi"), h("span", {}, h("kbd", {text: "J"}), " attacca"), h("span", {}, h("kbd", {text: "Spazio"}), " scatto (schiva)"),
+    h("div", {class: "tasti"}, h("span", {}, h("kbd", {text: "W A S D"}), " muovi"), h("span", {}, h("kbd", {text: "J"}), " attacca"), h("span", {}, h("kbd", {text: "K"}), " attacco pesante"), h("span", {}, h("kbd", {text: "Spazio"}), " scatto (schiva)"),
       opz.abilita ? h("span", {}, h("kbd", {text: "1–" + opz.abilita.length}), " abilità") : null, nemico ? h("span", {}, h("kbd", {text: "Q"}), " -10% di vita al nemico") : null,
       h("span", {}, h("kbd", {text: "Invio"}), " ricomincia"), h("span", {}, h("kbd", {text: "Esc"}), " esci")),
     h("div", {class: "controlli"}, h("label", {for: "avel"}, "Velocità", vel)));
@@ -714,11 +723,28 @@ VISTE.oggi = () => {
       h("div", {}, h("h3", {text: "Da rifare: le tue note"}), h("div", {class: "filtri"}, q), h("div", {class: "scorri basso"}, listaDr)),
       h("div", {}, h("h3", {text: "Prossime story"}), h("div", {class: "scorri basso"}, h("div", {class: "lista"}, aperte.slice(0, 25).map(s =>
         h("div", {class: "cliccabile", onclick: () => apriStoria(s)}, h("span", {class: "id", text: s.id}), h("span", {class: "tx", text: s.titolo}), h("span", {class: "dx", text: "fase " + s.fase}))))))),
+    provaStile(),
     h("h3", {text: "Previsti, non ancora fatti (INCOMPLETO)"}), h("div", {class: "scorri basso"}, h("div", {class: "lista"}, D.previsti.map(x => h("div", {}, INC(), h("span", {class: "tx", text: x.nome + " — " + x.cosa}), h("span", {class: "dx", text: x.story}))))),
     h("h3", {text: "Quanto hai guardato, per sezione"}), h("div", {class: "lista"}, Object.entries(G).map(([nome, ks]) => { const v = ks.filter(k => statoDi(k)).length, no = ks.filter(k => statoDi(k) === "no").length;
       return h("div", {}, h("span", {class: "tx", text: nome}), h("span", {style: "flex:2"}, h("div", {class: "barra"}, h("i", {style: "width:" + (ks.length ? v / ks.length * 100 : 0) + "%"}))),
         h("span", {class: "dx", text: v + " / " + ks.length + (no ? " · " + no + " da rifare" : "")})); }))];
 };
+
+// Prova del nuovo stile (scelte del 2026-11-18): Enel e il lupo della luna a griglia, il fendente pesante e
+// l'Incantesimo tradizionale con un disegno tutto loro. Si giudicano qui prima di rifare il resto.
+function provaStile() {
+  const T = D.tecniche, inc = T.effetti.find(x => x.sprite === "vfx_incantesimo");
+  if (!inc || !D.figure.enel) return null;
+  let pw = null, ab = null;
+  for (const p of T.pathway) for (const s of p.sequenze) for (const a of s.abilita) if (a.id === "hermit_incantesimo_tradizionale") { pw = p; ab = a; }
+  const abil = ab ? [{...ab, effetto: "vfx_incantesimo", danno: 18, cosa: ab.cosa || []}] : [];
+  const pezzo = (k, nome, fid) => h("button", {class: "chip", onclick: () => apriFiguraProva(k, nome, fid)}, nome);
+  return h("div", {class: "sezione"}, h("h3", {text: "Prova del nuovo stile: da giudicare"}),
+    h("p", {class: "intro", text: "Enel e il lupo della luna disegnati a griglia (3 teste, contorno nero, 3 toni, fotogrammi ricchi); il fendente pesante (tasto K) e l'Incantesimo tradizionale dell'Eremita (tasto 1) con un disegno tutto loro. Gli altri personaggi restano col disegno vecchio finché non approvi questo."}),
+    arena({abilita: abil, palette: pw ? pw.palette : {}, bersaglio: D.figure.nem_lupo_della_luna ? "nem_lupo_della_luna" : true}),
+    h("div", {class: "filtri"}, pezzo("personaggio:enel", "Enel: tutte le animazioni", "enel"), D.figure.nem_lupo_della_luna ? pezzo("nemico:lupo_della_luna", "Lupo della luna", "nem_lupo_della_luna") : null));
+}
+function apriFiguraProva(k, nome, fid) { ELENCO = [{k, titolo: nome, media: () => studioFigura(fid, 5)}]; apriElemento(0); }
 
 VISTE.avanzamento = () => {
   const av = D.avanzamento, st = stato("avanzamento"); st.fatte = st.fatte || "aperte";

@@ -347,6 +347,17 @@ def tecniche():
                                 "lampo": bool(e.get("impact_frame")), "su": e.get("su", "chi_lancia"),
                                 "gira": bool(e.get("gira")), "vola": bool(e.get("sul_proiettile")),
                                 "scoppio": (e.get("scoppio") or {}).get("sprite") if nome == e.get("sprite") else None})
+    # effetti unici del nuovo stile (tools/art/griglia/effetti.py): uno per abilita', non per primitiva
+    for nome, fr, ab, vola, scoppio in (("vfx_fendente_pesante", 8, "attack_heavy", False, None),
+                                        ("vfx_incantesimo", 4, "hermit_incantesimo_tradizionale", True,
+                                         "vfx_incantesimo_scoppio"),
+                                        ("vfx_incantesimo_scoppio", 7, "hermit_incantesimo_tradizionale", False, None)):
+        src = os.path.join(ROOT, "assets", "vfx", nome + ".png")
+        if os.path.isfile(src):
+            shutil.copy(src, os.path.join(IMG, nome + ".png"))
+            effetti.append({"primitiva": None, "abilita": ab, "sprite": nome, "file": f"img/{nome}.png", "frames": fr,
+                            "lampo": True, "su": "chi_lancia", "gira": not vola, "vola": vola, "scoppio": scoppio,
+                            "unico": True})
     return {"pathway": pw, "effetti": effetti}
 
 
