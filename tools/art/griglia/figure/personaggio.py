@@ -10,8 +10,9 @@ from ..corpo import Umano
 from ..pixel import Rampa, colore, griglia, segmento
 
 ALTEZZA = 42
-CORPO = Umano(anca=14.0, busto=10.5, spalle=5.6, fianchi=2.4, braccio=5.0, avambraccio=4.6,
-              coscia=7.0, stinco=7.0, piede=2.0, collo=0.5)
+# gambe corte e busto largo (giudizio dell'utente, 2026-11-18): la figura si legge dal busto, non dalle gambe
+CORPO = Umano(anca=10.5, busto=12.5, spalle=6.8, fianchi=2.9, braccio=5.4, avambraccio=4.8,
+              coscia=5.2, stinco=5.3, piede=2.2, collo=0.5)
 
 R = {
     "pelle": Rampa("skin_m", "skin_l", "cream"),
@@ -94,8 +95,8 @@ def disegna(tela, v, g, posa):
     for lato in "lr":
         def gamba(lato=lato):
             a, k, c, t = (v.xy(g[f"{n}_{lato}"]) for n in ("anca", "ginocchio", "caviglia", "punta"))
-            segmento(tela, a, k, 2.1, 1.9, R["pantaloni"], f"gamba_{lato}")
-            segmento(tela, k, c, 1.9, 1.8, R["pantaloni"], f"gamba_{lato}")
+            segmento(tela, a, k, 2.5, 2.2, R["pantaloni"], f"gamba_{lato}")
+            segmento(tela, k, c, 2.2, 2.0, R["pantaloni"], f"gamba_{lato}")
             cs = (c[0], c[1] - 1.2)
             segmento(tela, cs, c, 2.0, 2.0, R["stivali"], f"gamba_{lato}", uniti=(f"gamba_{lato}",))
             segmento(tela, c, t, 1.9, 1.5, R["stivali"], f"gamba_{lato}")
@@ -103,9 +104,9 @@ def disegna(tela, v, g, posa):
 
         def braccio(lato=lato):
             s, e, m = (v.xy(g[f"{n}_{lato}"]) for n in ("spalla", "gomito", "mano"))
-            segmento(tela, s, e, 1.9, 1.7, R["cappotto"], f"braccio_{lato}")
-            segmento(tela, e, m, 1.6, 1.5, R["bende"], f"braccio_{lato}")
-            segmento(tela, m, m, 1.7, 1.7, R["pelle"], f"braccio_{lato}")
+            segmento(tela, s, e, 2.3, 2.0, R["cappotto"], f"braccio_{lato}")
+            segmento(tela, e, m, 1.8, 1.6, R["bende"], f"braccio_{lato}")
+            segmento(tela, m, m, 1.9, 1.9, R["pelle"], f"braccio_{lato}")
         dp = v.prof(g[f"gomito_{lato}"]) * 0.5 + v.prof(g[f"mano_{lato}"]) * 0.5
         parti.append((dp + (0.6 if vis == lato else 0) + 0.2, 2, braccio))
 
@@ -113,23 +114,29 @@ def disegna(tela, v, g, posa):
         b = g["bacino"] - g["su"] * 0.5
         dietro_v = -np.array([0, 1.0, 0])
         a = v.xy(b + dietro_v * 0.8)
-        z = v.xy(b - np.array([0, 0, 7.5]) + dietro_v * 1.6)
-        segmento(tela, a, z, 4.4, 5.2, R["cappotto"], "falde", tappi=False, piatto=0.5)
+        z = v.xy(b - np.array([0, 0, 6.0]) + dietro_v * (1.6 + posa.get("vento", 0.0) * 0.8))
+        segmento(tela, a, z, 5.4, 6.4, R["cappotto"], "falde", tappi=False, piatto=0.5)
     parti.append((dietro - 0.5, -1, falde))
 
     def busto():
         a, b = v.xy(g["bacino"] + g["su"] * 0.5), v.xy(g["collo"])
-        segmento(tela, a, b, 4.4, 5.3, R["cappotto"], "busto", tappi=False, piatto=0.35)
-        if v.dir == "down":                      # cappotto aperto: camicia scura e cintura
-            segmento(tela, (a[0], a[1] - 1), (b[0], b[1] + 1), 1.4, 1.6, R["camicia"], "camicia", tappi=False)
-            segmento(tela, (a[0] - 3.5, a[1] - 0.5), (a[0] + 3.5, a[1] - 0.5), 0.8, 0.8, R["cuoio"], "cintura",
+        segmento(tela, a, b, 5.6, 6.6, R["cappotto"], "busto", tappi=False, piatto=0.35)
+        if v.dir == "down":                      # cappotto aperto: camicia scura, cintura con due fiale
+            segmento(tela, (a[0], a[1] - 1), (b[0], b[1] + 1), 1.8, 2.0, R["camicia"], "camicia", tappi=False)
+            segmento(tela, (a[0] - 4.6, a[1] - 0.5), (a[0] + 4.6, a[1] - 0.5), 0.9, 0.9, R["cuoio"], "cintura",
                      tappi=False, separa=False)
+            for dx, liq in ((-3.4, "red"), (-1.6, "cyan")):
+                griglia(tela, [".K.", "lLl", "LLL"], {"K": colore("brown_d"), "L": colore(liq), "l": colore("white")},
+                        int(round(a[0] + dx * (1 if v.dir == "down" else -1) - 1)), int(round(a[1] - 1)), "fiale")
         elif v.dir in ("left", "right"):
             segmento(tela, (a[0], a[1] - 0.5), (b[0], b[1] + 1), 0.7, 0.7, R["camicia"], "camicia",
                      tappi=False, separa=False)
         # sciarpa intorno al collo
         c = v.xy(g["collo"] - g["su"] * 0.8)
-        segmento(tela, (c[0] - 3.8, c[1]), (c[0] + 3.8, c[1]), 1.6, 1.6, R["sciarpa"], "sciarpa")
+        segmento(tela, (c[0] - 4.8, c[1]), (c[0] + 4.8, c[1]), 1.9, 1.9, R["sciarpa"], "sciarpa")
+        if v.dir == "down":                      # un capo della sciarpa che pende sul petto, da una parte sola
+            segmento(tela, (c[0] + 2.6, c[1] + 1), (c[0] + 3.4 + posa.get("vento", 0.0), c[1] + 6.5), 1.3, 1.1,
+                     R["sciarpa"], "sciarpa", uniti=("sciarpa",))
     parti.append((v.prof(g["bacino"]), 1, busto))
 
     if v.dir != "down":                          # coda della sciarpa sulla schiena
@@ -145,9 +152,7 @@ def disegna(tela, v, g, posa):
             righe, spec = TESTA["left"], v.dir == "right"
         else:
             righe, spec = TESTA[v.dir], False
-        gira = 0
-        if abs(posa.get("cade", 0)) > 50:
-            gira = 3 if posa.get("cade", 0) > 0 else 1
+        gira = int(-round(posa.get("cade", 0) / 90.0)) % 4    # la testa gira a quarti con il corpo
         w, h = len(righe[0]), len(righe)
         if gira:
             w, h = h, w
@@ -228,17 +233,20 @@ ANIM = {
                      avanti=2, piega=14, gamba_l=(26, 4, 16))),
         (6 / 7, dict(PRONTO, gira=-12, arma=(10, 10), avanti=1)),
         (1.0, dict(PRONTO))]},
+    # carica raccolta IN AVANTI (mai all'indietro): piedi larghi, peso sulla gamba davanti, spadone alto dietro la
+    # spalla destra. Il frame 5 e' quello che il gioco tiene fermo mentre si carica (tenendo premuto il tasto).
     "attack_heavy": {"chiavi": [
         (0.0, dict(PRONTO)),
-        (2 / 11, dict(PRONTO, arma=(80, 10), braccio_r=(110, 12, 40), braccio_l=(105, -12, 40), piega=0)),
-        (5 / 11, dict(PRONTO, arma=(140, 0), braccio_r=(165, 14, 34), braccio_l=(160, -12, 34), piega=-14,
-                      bob=1, gamba_l=(10, 4, 4), gamba_r=(-14, 4, 6), tieni=True)),
-        (6 / 11, dict(PRONTO, arma=(10, 0), braccio_r=(110, 8, 6), braccio_l=(108, -8, 6), piega=18, avanti=2.5,
-                      gamba_l=(30, 4, 30), gamba_r=(-18, 4, 12))),
+        (2 / 11, dict(PRONTO, arma=(40, 150), braccio_r=(70, 34, 90), braccio_l=(72, 4, 80), gira=18, piega=10,
+                      gamba_l=(20, 6, 20), gamba_r=(-14, 6, 16))),
+        (5 / 11, dict(PRONTO, arma=(70, 175), braccio_r=(140, 30, 80), braccio_l=(135, 6, 80), gira=26, piega=12,
+                      gamba_l=(26, 8, 34), gamba_r=(-20, 8, 26), tieni=True)),
+        (6 / 11, dict(PRONTO, arma=(10, 0), braccio_r=(105, 8, 6), braccio_l=(102, -8, 6), gira=-4, piega=22,
+                      avanti=2.5, gamba_l=(32, 6, 34), gamba_r=(-20, 6, 14))),
         (7 / 11, dict(PRONTO, arma=(-40, 0), braccio_r=(70, 6, 2), braccio_l=(68, -8, 2), piega=30, avanti=3,
-                      gamba_l=(32, 4, 40), gamba_r=(-20, 4, 14))),
+                      gamba_l=(34, 6, 42), gamba_r=(-22, 6, 14))),
         (9 / 11, dict(PRONTO, arma=(-30, 5), braccio_r=(64, 8, 10), braccio_l=(62, -8, 10), piega=24, avanti=2,
-                      gamba_l=(26, 4, 30), gamba_r=(-16, 4, 12))),
+                      gamba_l=(26, 6, 30), gamba_r=(-16, 6, 12))),
         (1.0, dict(PRONTO))]},
     "parry": {"chiavi": [
         (0.0, dict(PRONTO, arma=(70, 25), braccio_r=(70, 20, 70), braccio_l=(68, -14, 70), piega=-4,
@@ -304,4 +312,41 @@ ANIM = {
                    braccio_r=(30, 14, 70), piega=10)),
         (0.5, dict(SCH, gamba_l=(85, 8, 160), gamba_r=(85, 8, 160), braccio_l=(10, 24, 20),
                    braccio_r=(30, 14, 70), piega=16))]},
+}
+
+
+# --- Versioni da scegliere (l'utente sceglie, poi una diventa "dash" in ANIM) ----------------------------------------
+# Stessi frame e tempi di data/animations.json personaggio.dash (4 frame, i-frame 0-2). `scia`: copie scure dietro.
+_TUCK = dict(SCH, gamba_l=(95, 6, 140), gamba_r=(95, 6, 140), braccio_l=(70, 10, 120), braccio_r=(70, 10, 120),
+             piega=40, perno=9.0)
+VARIANTI = {
+    "dash": {
+        "scivolata": {"nome": "Scivolata bassa", "chiavi": [
+            (0.0, dict(SCH, piega=22, gamba_l=(55, 4, 20), gamba_r=(-30, 4, 90), braccio_l=(-30, 30, 30),
+                       braccio_r=(20, 40, 40), avanti=3, vento=3)),
+            (0.66, dict(SCH, piega=26, gamba_l=(70, 4, 10), gamba_r=(-20, 4, 110), braccio_l=(-40, 34, 30),
+                        braccio_r=(30, 44, 40), avanti=5, vento=4)),
+            (1.0, dict(SCH, piega=10, gamba_l=(20, 4, 20), gamba_r=(-10, 4, 30), braccio_l=(-10, 16, 20),
+                       braccio_r=(-10, 16, 20), avanti=2, vento=1))]},
+        "capriola": {"nome": "Capriola in avanti", "chiavi": [
+            (0.0, dict(_TUCK, cade=-60, avanti=1, a_terra=False, bob=0)),
+            (1 / 3, dict(_TUCK, cade=-180, avanti=3, a_terra=False, bob=0)),
+            (2 / 3, dict(_TUCK, cade=-300, avanti=5, a_terra=False, bob=0)),
+            (1.0, dict(SCH, piega=14, gamba_l=(30, 6, 50), gamba_r=(10, 6, 60), braccio_l=(20, 20, 30),
+                       braccio_r=(20, 20, 30), avanti=4))]},
+        "affondo": {"nome": "Passo d'affondo", "chiavi": [
+            (0.0, dict(SCH, piega=34, gamba_l=(50, 2, 10), gamba_r=(-45, 2, 10), braccio_l=(-60, 14, 10),
+                       braccio_r=(-60, 14, 10), avanti=4, vento=4)),
+            (0.66, dict(SCH, piega=30, gamba_l=(45, 2, 40), gamba_r=(-50, 2, 5), braccio_l=(-70, 18, 10),
+                        braccio_r=(-70, 18, 10), avanti=6, vento=4)),
+            (1.0, dict(SCH, piega=12, gamba_l=(18, 4, 16), gamba_r=(-14, 4, 10), braccio_l=(-10, 14, 20),
+                       braccio_r=(-10, 14, 20), avanti=2, vento=1))]},
+        "ombra": {"nome": "Passo d'ombra (con le copie dietro)", "chiavi": [
+            (0.0, dict(SCH, piega=24, gamba_l=(30, 2, 30), gamba_r=(-30, 2, 20), braccio_l=(-50, 24, 10),
+                       braccio_r=(-50, 24, 10), avanti=3, vento=4, scia=3)),
+            (0.66, dict(SCH, piega=28, gamba_l=(20, 2, 50), gamba_r=(-36, 2, 30), braccio_l=(-60, 26, 10),
+                        braccio_r=(-60, 26, 10), avanti=5, vento=4, scia=3)),
+            (1.0, dict(SCH, piega=10, gamba_l=(16, 4, 14), gamba_r=(-12, 4, 10), braccio_l=(-10, 14, 20),
+                       braccio_r=(-10, 14, 20), avanti=2, vento=1, scia=1))]},
+    },
 }

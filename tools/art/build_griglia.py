@@ -27,6 +27,7 @@ from griglia.pose import frame  # noqa: E402
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 OUT = os.path.join(ROOT, "arte", "sprite")
 REV = os.path.join(ROOT, "arte", "revisione")
+PROVA = os.path.join(ROOT, "arte", "prova")          # versioni da scegliere: non vanno nel gioco
 
 # id -> (modulo in griglia/figure, categoria di animations.json, aspetto: "" per il foglio base della categoria)
 FIGURE = {
@@ -41,7 +42,17 @@ def rendi(mod, posa, direzione, lato):
     g = mod.CORPO.giunture(posa)
     mod.disegna(t, v, g, posa)
     t.contorno()
-    return t.immagine()
+    im = t.immagine()
+    if posa.get("scia"):                         # copie scure dietro (la schivata "ombra"): sagome piene, sotto
+        fondo = Image.new("RGBA", im.size)
+        for k in range(int(posa["scia"]), 0, -1):
+            p2 = dict(posa, scia=0, avanti=posa.get("avanti", 0) - 5 * k)
+            sag = rendi(mod, p2, direzione, lato).split()[3]
+            col = (38, 43, 68, 255) if k > 1 else (58, 68, 102, 255)
+            fondo.paste(Image.new("RGBA", im.size, col), (0, 0), sag)
+        fondo.alpha_composite(im)
+        im = fondo
+    return im
 
 
 def costruisci(fid, spec):
@@ -65,6 +76,17 @@ def costruisci(fid, spec):
         im.save(os.path.join(OUT, f"{pre}{nome}.png"))
         fogli.append((nome, im))
         print(f"  {pre}{nome}.png  {n} frame x {len(righe)}")
+    for anim, vv in getattr(mod, "VARIANTI", {}).items():   # versioni da scegliere -> arte/prova/
+        a = spec[cat][anim]
+        n = int(a["frames"])
+        for vid, an in vv.items():
+            pose = frame(an["chiavi"], n, bool(a.get("loop")), {})
+            righe = DIREZIONI if a.get("direzionale") else (an.get("vista", "down"),)
+            im = foglio([[rendi(mod, p, d, lato) for p in pose] for d in righe], n)
+            os.makedirs(PROVA, exist_ok=True)
+            im.save(os.path.join(PROVA, f"{pre}{anim}_{vid}.png"))
+            fogli.append((f"{anim} ({vid})", im))
+            print(f"  prova: {pre}{anim}_{vid}.png")
     controllo(fid, fogli, lato)
 
 

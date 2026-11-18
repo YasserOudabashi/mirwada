@@ -1,5 +1,6 @@
-"""Il lupo della luna (nemico_base, aspetto lupo_della_luna), a griglia: lupo grigio-argento con le ombre azzurre,
-criniera chiara sul petto, la falce di luna bianca sulla fronte, occhi ambra. Il tell (anticipo) e' estremo: si
+"""Il lupo della luna (nemico_base, aspetto lupo_della_luna), a griglia: lupo grigio-argento gobbo da predatore
+(spalle grosse, fianchi stretti), sella scura sul dorso, criniera a punte scure, falce di luna gialla sulla fronte
+e sul fianco, occhi gialli, zanne fuori, coda folta. Il tell (anticipo) e' estremo: si
 abbassa sulle zampe anteriori, testa bassa, coda dritta in su, bocca aperta.
 """
 import numpy as np
@@ -14,6 +15,8 @@ R = {
     "pelo_scuro": Rampa("slate_d", "slate", "grey"),
     "criniera": Rampa("grey", "grey_l", "white"),
     "zampa": Rampa("slate_d", "slate", "grey"),
+    "sella": Rampa("navy", "slate_d", "slate"),
+    "luna": Rampa("amber", "yellow", "white"),
 }
 M = {"g": colore("grey"), "l": colore("grey_l"), "s": colore("slate"), "S": colore("slate_d"), "w": colore("white"),
      "K": colore("ink"), "y": colore("amber"), "Y": colore("yellow"), "m": colore("red_d"), "t": colore("white"),
@@ -25,8 +28,8 @@ TESTA = {
         ".lll........sss.",
         ".lpl........sps.",
         ".lppl......spps.",
-        "llggllwwwggggggs",
-        "lgggggwwgggggggs",
+        "llggllYYYggggggs",
+        "lgggggYYgggggggs",
         "lggYYKggggYYKggs",
         "lggYKKggggYKKgss",
         "lgggggllllgggggs",
@@ -52,12 +55,12 @@ TESTA = {
         "......ls......",
         ".....lls......",
         "....lpgs......",
-        "...lggwgggs...",
-        "..lgwgggggggs.",
+        "...lggYgggs...",
+        "..lgYgggggggs.",
         ".lgYKggggggss.",
         "llllgggggggs..",
         "Klllllgggggs..",
-        ".slllllgggs...",
+        ".tsllllgggs...",
         "..ssllggs.....",
     ],
 }
@@ -93,19 +96,31 @@ def disegna(tela, v, g, posa):
             d = v.prof(g[f"{nome}_{lato}_1"]) + (0.4 if lato == vis else 0)
             parti.append((d, 0, zampa))
 
-    def coda():
+    def coda():                                  # coda folta che si alza, punta bianca
         a, b, c = (v.xy(g[f"coda_{i}"]) for i in range(3))
-        segmento(tela, a, b, 1.8, 2.2, R["pelo"], "coda")
+        segmento(tela, a, b, 2.0, 3.2, R["pelo"], "coda")
         m = (b[0] * 0.4 + c[0] * 0.6, b[1] * 0.4 + c[1] * 0.6)
-        segmento(tela, b, m, 2.2, 1.6, R["pelo"], "coda", uniti=("coda",))
-        segmento(tela, m, c, 1.6, 0.7, R["criniera"], "coda", uniti=("coda",))
+        segmento(tela, b, m, 3.2, 2.4, R["pelo"], "coda", uniti=("coda",))
+        segmento(tela, m, c, 2.4, 0.8, R["criniera"], "coda", uniti=("coda",))
     parti.append((v.prof(g["coda_1"]), 0.5, coda))
 
-    def corpo():
+    def corpo():                                 # gobbo da predatore: spalle grosse, fianchi stretti
         a, s = v.xy(g["anche"]), v.xy(g["spalle"])
-        segmento(tela, a, s, 5.8, 6.8, R["pelo"], "corpo", piatto=0.2)
+        segmento(tela, a, s, 4.6, 7.6, R["pelo"], "corpo", piatto=0.2)
+        su = g["su"] * 3.2                       # sella scura sul dorso
+        if v.dir != "down":
+            segmento(tela, v.xy(g["anche"] + su), v.xy(g["spalle"] + su * 1.3), 2.0, 3.2, R["sella"], "sella",
+                     uniti=("corpo",), separa=False)
         c = v.xy(g["collo"])
-        segmento(tela, s, c, 4.6, 4.2, R["pelo"] if v.dir == "up" else R["criniera"], "criniera")          # criniera chiara sul petto e collo
+        segmento(tela, s, c, 5.0, 4.4, R["pelo"] if v.dir == "up" else R["criniera"], "criniera")
+        if v.dir in ("left", "right"):           # falce di luna gialla sul fianco
+            fx, fy = v.xy((g["anche"] + g["spalle"]) / 2 + g["su"] * 0.5)
+            griglia(tela, [".YY.", "Y...", "Y...", ".YY."], {"Y": colore("yellow")}, int(round(fx - 2)),
+                    int(round(fy - 2)), "luna", specchia=v.dir == "right", separa=False)
+        for k in range(5):                       # criniera a punte bianche sul collo e sulle spalle
+            base = g["spalle"] + g["su"] * (2.0 + k * 0.3) + np.array([(k - 2) * 1.6, 1.2 - k * 0.8, 0])
+            tip = base + g["su"] * 4.4 + np.array([(k - 2) * 1.6, -2.6, 0])
+            segmento(tela, v.xy(base), v.xy(tip), 1.7, 0.3, R["sella"], "punte", uniti=("criniera", "sella"))
     parti.append((v.prof((g["anche"] + g["spalle"]) / 2), 1, corpo))
 
     def testa():

@@ -14,6 +14,7 @@ Posa (tutti gli angoli in gradi, tutto facoltativo):
   arma                   (alzata, direzione): direzione dell'arma dalla mano destra; alzata 90 = in su,
                          direzione 0 = davanti, 90 = a destra, 180 = dietro
   cade                   tutto il corpo ruota intorno ai piedi: positivo = all'indietro
+  perno                  altezza del punto intorno a cui ruota `cade` (la capriola gira sul bacino)
   scivola                dopo la caduta sposta tutto in avanti (y), per restare nella cella
   a_terra                True (default): il piede piu' basso tocca terra
 """
@@ -99,9 +100,10 @@ class Umano:
                     g[k] = v - np.array([0, 0, basso])
         cade = math.radians(p.get("cade", 0.0))
         if cade:
+            perno = np.array([0, 0, p.get("perno", 0.0)])
             for k, v in list(g.items()):
                 if isinstance(v, np.ndarray):
-                    g[k] = _rx(v, cade)
+                    g[k] = _rx(v - perno, cade) + perno if k not in ("arma_dir", "su", "destra") else _rx(v, cade)
         if p.get("scivola"):                     # dopo la caduta: il corpo resta nella cella
             for k, v in list(g.items()):
                 if isinstance(v, np.ndarray) and k not in ("arma_dir", "su", "destra"):

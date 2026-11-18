@@ -181,6 +181,18 @@
       "raggio": 22,
       "tag_danno": "fisico"
     },
+    "attacco_pesante": {
+      "_comment": "US-8C02 (richiesta dell'utente, 2026-11-18): tenendo premuto il tasto il colpo si carica. Il TIMING e' in animations.json personaggio.attack_heavy; frame_carica e' il frame tenuto fermo mentre si carica. Piu' a lungo (fino a carica_max_s secondi) = piu' danno e area piu' grande, fino a danno_x e area_x volte.",
+      "danno": 24,
+      "stagger": 18,
+      "angolo": 140,
+      "raggio": 26,
+      "tag_danno": "fisico",
+      "frame_carica": 5,
+      "carica_max_s": 1.5,
+      "danno_x": 2.5,
+      "area_x": 1.8
+    },
     "cap_schivata": 0.85,
     "schivata": {
       "_comment": "La finestra di invulnerabilita' NON e' qui: sono i frame iframe_da/iframe_a di animations.json personaggio.dash. Qui distanza, durata e cooldown.",
