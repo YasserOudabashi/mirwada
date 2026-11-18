@@ -386,6 +386,9 @@ def main():
     dati["tecniche"] = tecniche()
     dati["oggetti"], dati["stati"] = oggetti()
     dati["mondo"] = mondo()
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import info
+    dati["info"] = info.costruisci(dati, tr)
     dati["figure"] = FIGURE
     dati["atlanti"] = ATLANTI
     with open(os.path.join(OUT, "dati.json"), "w", encoding="utf-8") as f:

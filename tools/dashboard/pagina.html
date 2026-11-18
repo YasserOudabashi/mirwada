@@ -4,23 +4,23 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
 /* Officina: la pergamena del libro di Mirwada in chiaro, l'inchiostro #181425 di Endesga 32 in scuro.
-   Barra in alto con le schede, sotto una scheda per volta; le figure del gioco a 2x, senza sfumare. */
+   Barra in alto con le schede; il dettaglio di ogni cosa si apre grande al centro e si sfoglia con le frecce. */
 :root {
   --bg: #eef0f4; --pannello: #ffffff; --fondo2: #e3e7ef; --linea: #c0cbdc; --testo: #262b44; --tenue: #5a6988;
-  --accento: #be4a2f; --accento-t: #fff; --ok: #3e8948; --no: #e43b44; --attesa: #f77622; --scacco1: #dfe4ec; --scacco2: #c9d1de;
+  --accento: #be4a2f; --ok: #3e8948; --no: #e43b44; --attesa: #c26a12; --scacco1: #dfe4ec; --scacco2: #c9d1de; --velo: rgba(24,20,37,.6);
   --f-titolo: "Alegreya SC", Georgia, serif; --f-testo: "Inter", system-ui, sans-serif; --f-dati: "JetBrains Mono", ui-monospace, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #181425; --pannello: #262b44; --fondo2: #1f1d33; --linea: #3a4466; --testo: #e3e7ef; --tenue: #8b9bb4;
-  --accento: #feae34; --accento-t: #181425; --ok: #63c74d; --no: #f6757a; --attesa: #feae34; --scacco1: #2c3150; --scacco2: #232741; color-scheme: dark } }
+  --accento: #feae34; --ok: #63c74d; --no: #f6757a; --attesa: #feae34; --scacco1: #2c3150; --scacco2: #232741; --velo: rgba(10,8,18,.75); color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #181425; --pannello: #262b44; --fondo2: #1f1d33; --linea: #3a4466; --testo: #e3e7ef; --tenue: #8b9bb4;
-  --accento: #feae34; --accento-t: #181425; --ok: #63c74d; --no: #f6757a; --attesa: #feae34; --scacco1: #2c3150; --scacco2: #232741; color-scheme: dark }
+  --accento: #feae34; --ok: #63c74d; --no: #f6757a; --attesa: #feae34; --scacco1: #2c3150; --scacco2: #232741; --velo: rgba(10,8,18,.75); color-scheme: dark }
 * { box-sizing: border-box }
 body { background: var(--bg); color: var(--testo); font: 14px/1.45 var(--f-testo); margin: 0 }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--pannello) }
 .gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
-header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--pannello); border-bottom: 1px solid var(--linea) }
+header.alto { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--pannello); border-bottom: 1px solid var(--linea) }
 .testata { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-block: 10px 4px }
 .testata h1 { font: 700 22px/1.1 var(--f-titolo); margin: 0; letter-spacing: .02em }
 .testata .meta { color: var(--tenue); font: 12px var(--f-dati) }
@@ -30,117 +30,150 @@ nav a:hover { color: var(--testo) }
 nav a[aria-current="page"] { color: var(--testo); border-color: var(--accento) }
 main { padding-block: 16px 64px; max-width: 1400px; margin: 0 auto }
 h2 { font: 700 20px var(--f-titolo); margin: 0 0 4px; text-wrap: balance }
-h3 { font: 600 13px var(--f-testo); text-transform: uppercase; letter-spacing: .06em; color: var(--tenue); margin: 20px 0 8px }
-p.intro { color: var(--tenue); margin: 0 0 14px; max-width: 70ch }
-.sezione { display: flex; flex-direction: column; gap: 6px }
-.griglia { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 10px }
-.griglia.larga { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) }
-.scheda { background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px; padding: 8px; display: flex; flex-direction: column; gap: 6px; min-width: 0; cursor: pointer; text-align: left; color: inherit; font: inherit }
+h3 { font: 600 12px var(--f-testo); text-transform: uppercase; letter-spacing: .07em; color: var(--tenue); margin: 18px 0 8px }
+p.intro { color: var(--tenue); margin: 0 0 14px; max-width: 75ch }
+.sezione { display: flex; flex-direction: column; gap: 8px }
+.scorri { max-height: 68vh; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--linea); border-radius: 6px; padding: 10px; background: var(--fondo2) }
+.scorri.basso { max-height: 42vh }
+.griglia { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px }
+.griglia.larga { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) }
+.scheda { background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px; padding: 8px; display: flex; flex-direction: column; gap: 6px; min-width: 0; cursor: pointer; position: relative }
 .scheda:hover { border-color: var(--tenue) }
-.scheda:focus-visible, button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accento); outline-offset: 2px }
-.scheda .nome { font-weight: 600; overflow-wrap: anywhere }
-.scheda .sotto { color: var(--tenue); font-size: 12px }
+.scheda.st-ok { box-shadow: inset 3px 0 0 var(--ok) } .scheda.st-no { box-shadow: inset 3px 0 0 var(--no) }
+:focus-visible { outline: 2px solid var(--accento); outline-offset: 2px }
+.nome { font-weight: 600; overflow-wrap: anywhere }
+.sotto { color: var(--tenue); font-size: 12px }
 .vetrina { background-color: var(--scacco1); background-image: conic-gradient(var(--scacco2) 25%, transparent 0 50%, var(--scacco2) 0 75%, transparent 0); background-size: 16px 16px; border-radius: 4px; display: grid; place-items: center; min-height: 128px; overflow: hidden }
-.vetrina.scuro { --scacco1: #181425; --scacco2: #262b44 }
-.vetrina.chiaro { --scacco1: #f4f4f4; --scacco2: #dcdcdc }
-canvas.px, img.px { image-rendering: pixelated; image-rendering: crisp-edges; display: block; max-width: 100% }
+.vetrina.chiaro { --scacco1: #f4f4f4; --scacco2: #dcdcdc } .vetrina.scuro { --scacco1: #181425; --scacco2: #262b44 } .vetrina.erba { --scacco1: #3e8948; --scacco2: #3a8244 }
+canvas.px, img.px { image-rendering: pixelated; image-rendering: crisp-edges; display: block; max-width: none }
 img.foto { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 4px; background: var(--fondo2); display: block }
 .chips { display: flex; flex-wrap: wrap; gap: 4px }
 .chip { font-size: 11px; padding: 1px 6px; border-radius: 999px; background: var(--fondo2); color: var(--tenue); border: 1px solid var(--linea) }
 .chip.ok { color: var(--ok); border-color: var(--ok) } .chip.no { color: var(--no); border-color: var(--no) } .chip.att { color: var(--attesa); border-color: var(--attesa) }
-.giudizio { display: flex; gap: 4px; align-items: center }
-.giudizio button { flex: 1; white-space: nowrap; border: 1px solid var(--linea); background: var(--fondo2); color: var(--testo); border-radius: 4px; padding: 3px 0; cursor: pointer; font: 600 12px var(--f-testo) }
+.giudizio { display: flex; gap: 4px }
+.giudizio button { flex: 1; white-space: nowrap; border: 1px solid var(--linea); background: var(--fondo2); color: var(--testo); border-radius: 4px; padding: 4px 0; cursor: pointer; font: 600 12px var(--f-testo) }
 .giudizio button[aria-pressed="true"].si { background: var(--ok); border-color: var(--ok); color: #fff }
 .giudizio button[aria-pressed="true"].no { background: var(--no); border-color: var(--no); color: #fff }
 .giudizio button:disabled { opacity: .45; cursor: default }
-.strisce { position: relative } .strisce::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; border-radius: 6px 0 0 6px }
-.st-ok::before { background: var(--ok) } .st-no::before { background: var(--no) }
-.filtri { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px }
+.nota-card { font-size: 12px; color: var(--no); overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden }
+.nota-card:empty { display: none }
+.filtri { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px }
 .filtri input[type=search], .filtri select { font: inherit; padding: 5px 8px; border: 1px solid var(--linea); border-radius: 4px; background: var(--pannello); color: var(--testo); min-width: 0 }
 .filtri input[type=search] { flex: 1 1 220px }
-.seg { display: inline-flex; border: 1px solid var(--linea); border-radius: 4px; overflow: hidden }
+.conta { color: var(--tenue); font: 12px var(--f-dati); white-space: nowrap }
+.seg { display: inline-flex; border: 1px solid var(--linea); border-radius: 4px; overflow: hidden; flex-wrap: wrap }
 .seg button { border: 0; background: var(--pannello); color: var(--tenue); padding: 5px 9px; cursor: pointer; font: 500 12px var(--f-testo) }
 .seg button[aria-pressed="true"] { background: var(--testo); color: var(--pannello) }
+.btn { font: 500 12px var(--f-testo); padding: 5px 10px; border: 1px solid var(--linea); border-radius: 4px; background: var(--fondo2); color: var(--testo); cursor: pointer }
+.btn:hover { border-color: var(--tenue) }
 .numeri { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 8px }
 .numero { background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px; padding: 10px 12px }
 .numero b { display: block; font: 600 24px var(--f-dati); font-variant-numeric: tabular-nums }
 .numero span { color: var(--tenue); font-size: 12px }
-.lista { background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px; overflow: hidden }
+.lista { background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px }
 .lista > div { padding: 8px 12px; border-top: 1px solid var(--linea); display: flex; gap: 10px; align-items: baseline; min-width: 0 }
 .lista > div:first-child { border-top: 0 }
+.lista > div.cliccabile { cursor: pointer } .lista > div.cliccabile:hover { background: var(--fondo2) }
 .lista .id { font: 600 12px var(--f-dati); color: var(--accento); white-space: nowrap }
 .lista .tx { min-width: 0; overflow-wrap: anywhere; flex: 1 }
 .lista .dx { color: var(--tenue); font: 12px var(--f-dati); white-space: nowrap }
 .due { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px }
 @media (max-width: 860px) { .due { grid-template-columns: 1fr } }
 .barra { height: 8px; background: var(--fondo2); border-radius: 4px; overflow: hidden } .barra i { display: block; height: 100%; background: var(--accento) }
-.fase { display: grid; grid-template-columns: 70px 1fr 64px; gap: 8px; align-items: center; font-size: 13px; padding: 4px 0 }
-.fase .n { font: 12px var(--f-dati); color: var(--tenue); text-align: right; font-variant-numeric: tabular-nums }
 .grafico { background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px; padding: 10px; overflow-x: auto }
 .grafico svg { display: block; width: 100%; height: auto; min-width: 420px }
 .grafico text { fill: var(--tenue); font: 10px var(--f-dati) }
 .mappa-wrap { position: relative; overflow: auto; background: #124e89; border: 1px solid var(--linea); border-radius: 6px; max-height: 72vh }
 .mappa-wrap .tela { position: relative; transform-origin: 0 0 }
-.mappa-wrap img { display: block; image-rendering: pixelated }
+.mappa-wrap img { display: block; image-rendering: pixelated; max-width: none }
 .segno { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; border: 2px solid #181425; cursor: pointer; padding: 0 }
 .segno.luogo { background: #fee761 } .segno.villaggio { background: #feae34; border-radius: 2px } .segno.ingresso { background: #8b9bb4; width: 9px; height: 9px; margin: -4px 0 0 -4px }
 .segno.bosssotto { background: #e43b44 } .segno.partenza { background: #fff; width: 14px; height: 14px; margin: -7px 0 0 -7px }
-.segno.ok { box-shadow: 0 0 0 2px var(--ok) } .segno.no { box-shadow: 0 0 0 2px #e43b44 }
+.segno.ok { box-shadow: 0 0 0 2px #63c74d } .segno.no { box-shadow: 0 0 0 2px #e43b44 }
 .riquadro { position: absolute; border: 1px dashed rgba(255,255,255,.55); pointer-events: none; font: 11px var(--f-dati); color: #fff; text-shadow: 0 1px 2px #000; padding: 2px 4px }
 .legenda { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 12px; color: var(--tenue) }
 .legenda label { display: inline-flex; gap: 4px; align-items: center; cursor: pointer }
 .pw { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px }
 .pw button { border: 1px solid var(--linea); background: var(--pannello); color: var(--testo); border-radius: 999px; padding: 4px 10px; cursor: pointer; font: 500 12px var(--f-testo); display: inline-flex; gap: 6px; align-items: center }
 .pw button[aria-pressed="true"] { border-color: var(--testo); background: var(--testo); color: var(--pannello) }
-.pw .pallino { width: 10px; height: 10px; border-radius: 50%; display: inline-block; border: 1px solid #181425 }
+.pallino { width: 10px; height: 10px; border-radius: 50%; display: inline-block; border: 1px solid #181425 }
 .seq { background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px; padding: 12px; display: flex; flex-direction: column; gap: 8px }
-.seq header { position: static; background: none; border: 0; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap }
+.seq .testa { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap }
 .seq .num { font: 700 18px var(--f-dati); color: var(--accento) }
 .seq .titolo { font: 700 17px var(--f-titolo) }
-.abilita { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px }
-.ab { border: 1px solid var(--linea); border-radius: 4px; padding: 8px; display: flex; flex-direction: column; gap: 6px; min-width: 0 }
-.ab .glifi { display: flex; gap: 4px; flex-wrap: wrap }
-.ab .glifi canvas { width: 32px; height: 32px; background: var(--fondo2); border-radius: 3px }
-.pannello-dett { position: fixed; z-index: 20; inset: 0; background: rgba(24,20,37,.55); display: flex; justify-content: flex-end }
-.pannello-dett[hidden] { display: none !important }
-.dett { background: var(--pannello); width: min(560px, 100%); height: 100%; overflow-y: auto; padding: calc(16px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) 16px; display: flex; flex-direction: column; gap: 12px; border-left: 1px solid var(--linea) }
-.dett .chiudi { align-self: flex-end; border: 1px solid var(--linea); background: var(--fondo2); color: var(--testo); border-radius: 4px; padding: 4px 10px; cursor: pointer; font: inherit }
-.dett table { border-collapse: collapse; width: 100%; font-size: 13px }
-.dett td { border-top: 1px solid var(--linea); padding: 5px 4px; vertical-align: top }
-.dett td:first-child { color: var(--tenue); width: 38%; }
-.dett textarea { font: inherit; width: 100%; min-height: 70px; padding: 8px; border: 1px solid var(--linea); border-radius: 4px; background: var(--fondo2); color: var(--testo); resize: vertical }
-.controlli { display: flex; flex-wrap: wrap; gap: 6px; align-items: center }
-.controlli select, .controlli button { font: inherit; font-size: 12px; padding: 4px 8px; border: 1px solid var(--linea); border-radius: 4px; background: var(--fondo2); color: var(--testo); cursor: pointer }
-.avviso { background: var(--fondo2); border: 1px solid var(--linea); border-radius: 6px; padding: 10px 12px; color: var(--tenue) }
+.glifi { display: flex; gap: 4px; flex-wrap: wrap }
+/* la finestra di dettaglio, al centro */
+.modale { position: fixed; z-index: 20; inset: 0; background: var(--velo); display: grid; place-items: center; padding: calc(12px + env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)) }
+.modale[hidden] { display: none !important }
+.finestra { background: var(--pannello); border: 1px solid var(--linea); border-radius: 8px; width: min(1240px, 100%); height: min(94vh, 100%); display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden }
+.barra-alta { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--linea); min-width: 0 }
+.barra-alta h2 { margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.corpo { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); min-height: 0 }
+.corpo > div { overflow-y: auto; padding: 14px; min-width: 0 }
+.corpo .info { border-left: 1px solid var(--linea); display: flex; flex-direction: column; gap: 12px }
+@media (max-width: 820px) { .corpo { grid-template-columns: 1fr; overflow-y: auto } .corpo > div { overflow: visible } .corpo .info { border-left: 0; border-top: 1px solid var(--linea) } }
+.info textarea { font: inherit; width: 100%; min-height: 84px; padding: 8px; border: 1px solid var(--linea); border-radius: 4px; background: var(--fondo2); color: var(--testo); resize: vertical }
+.salvato { font: 11px var(--f-dati); color: var(--tenue); min-height: 14px }
+.blocco h4 { margin: 0 0 4px; font: 600 12px var(--f-testo); text-transform: uppercase; letter-spacing: .06em; color: var(--tenue) }
+.blocco ul { margin: 0; padding-left: 18px } .blocco li { margin: 2px 0; overflow-wrap: anywhere }
+.dati table { border-collapse: collapse; width: 100%; font-size: 13px }
+.dati td { border-top: 1px solid var(--linea); padding: 5px 4px; vertical-align: top; overflow-wrap: anywhere }
+.dati td:first-child { color: var(--tenue); width: 40% }
+.visore { overflow: auto; background: var(--fondo2); border-radius: 6px; max-height: 70vh; display: grid; place-items: center }
+.visore img { image-rendering: pixelated; max-width: none; cursor: zoom-in }
+.visore.adatta img { max-width: 100%; max-height: 68vh }
+.controlli { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0 }
+.controlli label { font-size: 12px; color: var(--tenue); display: inline-flex; gap: 6px; align-items: center }
+.controlli input[type=range] { width: 140px }
+.mini { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px }
+.mini button { border: 1px solid var(--linea); background: var(--fondo2); border-radius: 4px; padding: 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--testo); font: 11px var(--f-testo) }
+.mini button[aria-pressed="true"] { border-color: var(--accento); box-shadow: 0 0 0 1px var(--accento) }
+.campo { display: block; width: 100%; border-radius: 6px; image-rendering: pixelated; background: #3e8948; outline: none; cursor: pointer }
+.campo:focus { box-shadow: 0 0 0 3px var(--accento) }
+.tasti { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: var(--tenue) }
+.tasti kbd { font: 600 11px var(--f-dati); border: 1px solid var(--linea); border-bottom-width: 2px; border-radius: 3px; padding: 0 4px; background: var(--fondo2); color: var(--testo) }
+.sfoglia { display: grid; gap: 8px }
+.sfoglia .pagina { background: var(--fondo2); border-radius: 6px; overflow: hidden; cursor: zoom-in }
+.sfoglia .pagina img { width: 100%; display: block }
+.striscia { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px }
+.striscia button { flex: 0 0 140px; border: 2px solid transparent; padding: 0; border-radius: 4px; cursor: pointer; background: none }
+.striscia button[aria-current="true"] { border-color: var(--accento) }
+.striscia img { width: 100%; display: block; border-radius: 2px }
 .tab-tbl { overflow-x: auto; background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px }
 .tab-tbl table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 520px }
-.tab-tbl th, .tab-tbl td { padding: 6px 10px; border-top: 1px solid var(--linea); text-align: left }
+.tab-tbl th, .tab-tbl td { padding: 6px 10px; border-top: 1px solid var(--linea); text-align: left; vertical-align: top }
 .tab-tbl th { color: var(--tenue); font-weight: 600; font-size: 12px; border-top: 0 }
 .tab-tbl td.n { font-family: var(--f-dati); text-align: right; font-variant-numeric: tabular-nums }
+.avviso { background: var(--fondo2); border: 1px solid var(--linea); border-radius: 6px; padding: 10px 12px; color: var(--tenue) }
 .vuoto { color: var(--tenue); padding: 20px; text-align: center }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important } }
 </style>
 
-<header class="gutter">
+<header class="alto gutter">
   <div class="testata"><h1>Officina di Mirwada</h1><span class="meta" id="meta">caricamento…</span></div>
   <nav id="nav" aria-label="Sezioni"></nav>
 </header>
 <main class="gutter" id="main"><p class="vuoto">Carico i dati del progetto…</p></main>
-<div class="pannello-dett" id="dettaglio" hidden><div class="dett" id="dett" role="dialog" aria-modal="true" aria-label="Dettaglio"></div></div>
+<div class="modale" id="modale" hidden><div class="finestra" role="dialog" aria-modal="true" aria-labelledby="mod-titolo">
+  <div class="barra-alta">
+    <button class="btn" type="button" id="mod-prima" title="Precedente (← o A)">◀</button>
+    <button class="btn" type="button" id="mod-dopo" title="Successivo (→ o D)">▶</button>
+    <h2 id="mod-titolo"></h2><span class="conta" id="mod-conta"></span>
+    <button class="btn" type="button" id="mod-chiudi" title="Chiudi (Esc)">Chiudi</button>
+  </div>
+  <div class="corpo"><div id="mod-media"></div><div class="info" id="mod-info"></div></div>
+</div></div>
 
 <script>
 "use strict";
-const SEZIONI = [
-  ["oggi", "Oggi"], ["avanzamento", "Avanzamento"], ["mondo", "Mondo"], ["paesi", "Paesi e case"],
-  ["personaggi", "Personaggi"], ["bestiario", "Bestiario"], ["tecniche", "Tecniche"], ["oggetti", "Oggetti"],
-  ["libro", "Libro e HUD"], ["consumo", "Consumo"]];
+const SEZIONI = [["oggi", "Oggi"], ["avanzamento", "Avanzamento"], ["mondo", "Mondo"], ["paesi", "Paesi e case"], ["personaggi", "Personaggi"],
+  ["bestiario", "Bestiario"], ["tecniche", "Tecniche"], ["oggetti", "Oggetti"], ["libro", "Libro e HUD"], ["consumo", "Consumo"]];
 const DIREZ = ["giù", "su", "sinistra", "destra"];
-let D = null;                 // dati.json
-const GIU = new Map();        // giudizi: chiave -> {stato, nota, quando}
-let CONSUMO = [];             // documenti consumo/*
-let db = null, user = null, posso = false, dbStato = "attesa";
+let D = null;
+const GIU = new Map();
+let CONSUMO = [], db = null, posso = false, dbStato = "attesa";
 
-// ---------- piccoli aiuti ----------
+// ---------- aiuti ----------
 function h(tag, att, ...figli) {
   const e = document.createElement(tag);
   for (const [k, v] of Object.entries(att || {})) {
@@ -148,438 +181,527 @@ function h(tag, att, ...figli) {
     if (k === "class") e.className = v; else if (k === "text") e.textContent = v;
     else if (k.startsWith("on")) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? "" : v);
   }
-  for (const f of figli.flat()) if (f !== null && f !== undefined && f !== false) e.append(f instanceof Node ? f : document.createTextNode(String(f)));
+  for (const f of figli.flat(Infinity)) if (f !== null && f !== undefined && f !== false) e.append(f instanceof Node ? f : document.createTextNode(String(f)));
   return e;
 }
 const nf = new Intl.NumberFormat("it-IT");
-const euro = n => (n === null || n === undefined) ? "—" : "$" + (Math.round(n * 100) / 100).toLocaleString("it-IT", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const euro = n => (n === null || n === undefined) ? "—" : "$" + Number(n).toLocaleString("it-IT", {minimumFractionDigits: 2, maximumFractionDigits: 2});
 const mil = n => (n / 1e6).toLocaleString("it-IT", {maximumFractionDigits: 2}) + " M";
-const bello = s => String(s || "").replace(/_/g, " ");
+const bello = s => String(s ?? "").replace(/_/g, " ");
 const data = s => s ? new Date(s).toLocaleString("it-IT", {day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit"}) : "";
-function chip(t, cls) { return h("span", {class: "chip" + (cls ? " " + cls : ""), text: t}); }
-
-// ---------- immagini e animazioni ----------
-const IMMAGINI = new Map();
-function immagine(src) {
-  if (!IMMAGINI.has(src)) IMMAGINI.set(src, new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; }));
-  return IMMAGINI.get(src);
+const chip = (t, cls) => h("span", {class: "chip" + (cls ? " " + cls : ""), text: t});
+function segmento(voci, attiva, scegli) {
+  const s = h("div", {class: "seg"}, voci.map(([v, t]) => h("button", {type: "button", "aria-pressed": String(v === attiva), onclick: ev => {
+    for (const b of s.children) b.setAttribute("aria-pressed", String(b === ev.currentTarget)); scegli(v); }}, t)));
+  return s;
 }
-const LETTORI = new Set();
+
+// ---------- immagini, animazioni ----------
+const IMMAGINI = new Map();
+const immagine = src => { if (!IMMAGINI.has(src)) IMMAGINI.set(src, new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; })); return IMMAGINI.get(src); };
+const ATTIVI = new Set();
+let ultimo = performance.now();
+(function ciclo(t) { const dt = Math.min(t - ultimo, 200); ultimo = t; for (const l of ATTIVI) l.passo(dt); requestAnimationFrame(ciclo); })(performance.now());
+const visibili = new IntersectionObserver(es => { for (const e of es) if (e.target._lett) e.isIntersecting ? ATTIVI.add(e.target._lett) : ATTIVI.delete(e.target._lett); });
+function guarda(el, lett) { el._lett = lett; visibili.observe(el); return el; }
+
 class Lettore {
-  constructor(fid, opz = {}) {
-    this.f = D.figure[fid]; this.scala = opz.scala || 2; this.dir = opz.dir ?? 0; this.ciclo = opz.ciclo ?? true;
-    this.anim = 0; this.frame = 0; this.t = 0; this.giri = 0;
-    const maxw = Math.max(...(this.f ? this.f.anims.map(a => a.w) : [64])), maxh = Math.max(...(this.f ? this.f.anims.map(a => a.h) : [64]));
-    this.c = h("canvas", {class: "px", width: maxw, height: maxh});
-    this.c.style.width = maxw * this.scala + "px";
-    if (opz.anim) this.scegli(opz.anim);
-    if (this.f) immagine(this.f.file).then(i => { this.img = i; this.disegna(); });
+  constructor(fid, o = {}) {
+    this.f = D.figure[fid]; this.scala = o.scala || 2; this.dir = o.dir ?? 0; this.giro = o.giro ?? true; this.velocita = 1; this.pausa = false;
+    this.anim = 0; this.frame = 0; this.t = 0; this.giri = 0; this.alFinire = null;
+    const W = Math.max(...this.f.anims.map(a => a.w)), H = Math.max(...this.f.anims.map(a => a.h));
+    this.c = h("canvas", {class: "px", width: W, height: H}); this.c.style.width = W * this.scala + "px";
+    if (o.anim) this.scegli(o.anim);
+    immagine(this.f.file).then(i => { this.img = i; this.disegna(); });
   }
-  scegli(nome) { const i = this.f.anims.findIndex(a => a.nome === nome); if (i >= 0) { this.anim = i; this.frame = 0; this.t = 0; this.disegna(); } }
+  get a() { return this.f.anims[this.anim]; }
+  scegli(nome, alFinire = null) { const i = typeof nome === "number" ? nome : this.f.anims.findIndex(a => a.nome === nome); if (i >= 0) { this.anim = i; this.frame = 0; this.t = 0; this.alFinire = alFinire; this.disegna(); this.cambiato?.(); } }
+  ha(nome) { return this.f.anims.some(a => a.nome === nome); }
+  ingrandisci(s) { this.scala = s; this.c.style.width = this.c.width * s + "px"; }
+  avanza(n) { const a = this.a; this.frame = (this.frame + n + a.frames) % a.frames; this.t = 0; this.disegna(); this.cambiato?.(); }
   passo(dt) {
-    if (!this.img) return;
-    const a = this.f.anims[this.anim]; this.t += dt;
-    const dur = a.durate[this.frame] || 120;
+    if (!this.img || this.pausa) return;
+    this.t += dt * this.velocita;
+    const dur = this.a.durate[this.frame] || 120;
     if (this.t < dur) return;
     this.t -= dur; this.frame++;
-    if (this.frame >= a.frames) {
+    if (this.frame >= this.a.frames) {
+      if (this.alFinire) { const f = this.alFinire; this.alFinire = null; this.frame = this.a.frames - 1; f(); return; }
       this.frame = 0;
-      if (this.ciclo && (!a.loop || ++this.giri > 2)) { this.giri = 0; this.anim = (this.anim + 1) % this.f.anims.length; }
+      if (this.giro && (!this.a.loop || ++this.giri > 2)) { this.giri = 0; this.anim = (this.anim + 1) % this.f.anims.length; }
     }
-    this.disegna();
+    this.disegna(); this.cambiato?.();
   }
   disegna() {
     if (!this.img) return;
-    const a = this.f.anims[this.anim], g = this.c.getContext("2d");
-    g.imageSmoothingEnabled = false; g.clearRect(0, 0, this.c.width, this.c.height);
-    const riga = a.righe > 1 ? this.dir : 0;
-    g.drawImage(this.img, this.frame * a.w, a.y + riga * a.h, a.w, a.h, (this.c.width - a.w) / 2, this.c.height - a.h, a.w, a.h);
+    const a = this.a, g = this.c.getContext("2d"); g.imageSmoothingEnabled = false; g.clearRect(0, 0, this.c.width, this.c.height);
+    g.drawImage(this.img, this.frame * a.w, a.y + (a.righe > 1 ? this.dir : 0) * a.h, a.w, a.h, (this.c.width - a.w) / 2, this.c.height - a.h, a.w, a.h);
   }
 }
-const visibili = new IntersectionObserver(es => { for (const e of es) e.target._lett && (e.isIntersecting ? LETTORI.add(e.target._lett) : LETTORI.delete(e.target._lett)); });
-function lettore(fid, opz) {
-  if (!D.figure[fid]) return h("div", {class: "sotto", text: "senza figura"});
-  const l = new Lettore(fid, opz); l.c._lett = l; visibili.observe(l.c); return l.c;
-}
-let ultimo = performance.now();
-function ciclo(t) { const dt = Math.min(t - ultimo, 200); ultimo = t; for (const l of LETTORI) l.passo(dt); requestAnimationFrame(ciclo); }
-requestAnimationFrame(ciclo);
+function lettore(fid, o) { if (!D.figure[fid]) return h("div", {class: "sotto", text: "senza figura"}); const l = new Lettore(fid, o); return guarda(l.c, l); }
 
-// atlanti e ricolorazione a 4 toni (shaders/rampa_pathway.gdshader)
 function daAtlante(nome, id, scala = 1) {
   const a = D.atlanti[nome]; const c = h("canvas", {class: "px", width: a ? a.w : 1, height: a ? a.h : 1});
   if (!a || a.indice[id] === undefined) return c;
   c.style.width = a.w * scala + "px";
   immagine(a.file).then(i => { if (!i) return; const n = a.indice[id], g = c.getContext("2d"); g.imageSmoothingEnabled = false;
-    g.drawImage(i, (n % a.cols) * a.w, Math.floor(n / a.cols) * a.h, a.w, a.h, 0, 0, a.w, a.h); });
+    g.drawImage(i, (n % a.cols) * a.w, Math.floor(n / a.cols) * a.h, a.w, a.h, 0, 0, a.w, a.h); c.dispatchEvent(new Event("pronto")); });
   return c;
 }
-function hex(s) { const n = parseInt(String(s || "#888888").slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
-function rampa(pal) {
-  const ink = hex(pal.inchiostro || "#181425"), pri = hex(pal.primario || "#8b9bb4"), acc = hex(pal.accento || "#ffffff");
-  return [ink, pri.map((v, i) => Math.round(v + (ink[i] - v) * 0.45)), pri, acc];
-}
-function ricolora(g, w, h_, pal) {
-  const r = rampa(pal), px = g.getImageData(0, 0, w, h_), d = px.data;
+const hex = s => { const n = parseInt(String(s || "#888888").slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+function rampa(p) { const ink = hex(p.inchiostro || "#181425"), pri = hex(p.primario || "#8b9bb4"), acc = hex(p.accento || "#ffffff");
+  return [ink, pri.map((v, i) => Math.round(v + (ink[i] - v) * .45)), pri, acc]; }
+function ricolora(g, w, hh, pal) { const r = rampa(pal), px = g.getImageData(0, 0, w, hh), d = px.data;
   for (let i = 0; i < d.length; i += 4) { if (!d[i + 3]) continue; const l = d[i] / 255 * 3, k = l < .5 ? 0 : l < 1.5 ? 1 : l < 2.5 ? 2 : 3; d[i] = r[k][0]; d[i + 1] = r[k][1]; d[i + 2] = r[k][2]; }
-  g.putImageData(px, 0, 0);
-}
-function glifo(prim, pal) {
-  const c = daAtlante("primitive", prim); const a = D.atlanti.primitive;
-  if (a && a.indice[prim] !== undefined) immagine(a.file).then(() => requestAnimationFrame(() => ricolora(c.getContext("2d"), c.width, c.height, pal)));
-  c.title = bello(prim); return c;
-}
-const EFFETTI = new Set();
-function effetto(e, pal, scala = 2) {
-  const c = h("canvas", {class: "px"}); let img = null, f = 0, t = 0, w = 0, hh = 0;
-  immagine(e.file).then(i => { if (!i) return; img = i; w = i.width / e.frames; hh = i.height; c.width = w; c.height = hh; c.style.width = w * scala + "px"; disegna(); });
-  function disegna() { const g = c.getContext("2d"); g.imageSmoothingEnabled = false; g.clearRect(0, 0, w, hh); g.drawImage(img, f * w, 0, w, hh, 0, 0, w, hh); ricolora(g, w, hh, pal); }
-  const lett = {passo(dt) { if (!img) return; t += dt; if (t > 90) { t = 0; f = (f + 1) % e.frames; disegna(); } }};
-  c._lett = lett; visibili.observe(c); return c;
+  g.putImageData(px, 0, 0); }
+function glifo(prim, pal, scala = 1) { const c = daAtlante("primitive", prim, scala); c.addEventListener("pronto", () => ricolora(c.getContext("2d"), c.width, c.height, pal)); c.title = bello(prim); return c; }
+function effetto(e, pal, scala = 2, ctrl = null) {
+  const c = h("canvas", {class: "px"}); let img = null, w = 0, hh = 0;
+  const l = {f: 0, t: 0, velocita: 1, passo(dt) { if (!img) return; this.t += dt * this.velocita; if (this.t > 90) { this.t = 0; this.f = (this.f + 1) % e.frames; dis(); } }};
+  function dis() { const g = c.getContext("2d"); g.imageSmoothingEnabled = false; g.clearRect(0, 0, w, hh); g.drawImage(img, l.f * w, 0, w, hh, 0, 0, w, hh); ricolora(g, w, hh, pal); }
+  immagine(e.file).then(i => { if (!i) return; img = i; w = i.width / e.frames; hh = i.height; c.width = w; c.height = hh; c.style.width = w * scala + "px"; dis(); });
+  if (ctrl) ctrl.l = l;
+  return guarda(c, l);
 }
 
-// ---------- giudizi (db) ----------
-function statoDi(k) { return (GIU.get(k) || {}).stato || null; }
+// ---------- giudizi ----------
+const statoDi = k => (GIU.get(k) || {}).stato || null;
+const notaDi = k => (GIU.get(k) || {}).nota || "";
 async function salva(k, campi) {
-  if (!db || !posso) return;
-  const prima = GIU.get(k) || {};
-  const nuovo = {...prima, ...campi, quando: new Date().toISOString()};
+  if (!db || !posso) return false;
+  const prima = GIU.get(k) || {}, nuovo = {...prima, ...campi, quando: new Date().toISOString()};
   GIU.set(k, nuovo); aggiornaGiudizi();
-  try { await db.doc("giudizi/" + k).set(nuovo); } catch (e) { GIU.set(k, prima); aggiornaGiudizi(); avvisoDb("Il giudizio non è stato salvato (" + (e.code || "errore") + ")."); }
+  try { await db.doc("giudizi/" + k).set(nuovo); return true; } catch (e) { GIU.set(k, prima); aggiornaGiudizi(); avviso("Non salvato: " + (e.code || "errore")); return false; }
 }
-function avvisoDb(t) { const el = document.getElementById("meta"); if (el) el.textContent = t; }
-function bottoniGiudizio(k, piccoli = true) {
+function avviso(t) { document.getElementById("meta").textContent = t; }
+function bottoniGiudizio(k, perCarta = true) {
   const st = statoDi(k);
   const si = h("button", {class: "si", type: "button", "aria-pressed": String(st === "ok"), disabled: !posso, title: posso ? "Va bene" : "Solo il proprietario può giudicare",
     onclick: ev => { ev.stopPropagation(); salva(k, {stato: statoDi(k) === "ok" ? null : "ok"}); }}, "✓ Va bene");
-  const no = h("button", {class: "no", type: "button", "aria-pressed": String(st === "no"), disabled: !posso, title: posso ? "Da rifare" : "Solo il proprietario può giudicare",
-    onclick: ev => { ev.stopPropagation(); salva(k, {stato: statoDi(k) === "no" ? null : "no"}); }}, "✗ Rifare");
-  const g = h("div", {class: "giudizio", "data-g": k}, si, no);
-  return g;
+  const no = h("button", {class: "no", type: "button", "aria-pressed": String(st === "no"), disabled: !posso, title: posso ? "Da rifare: si apre la nota" : "Solo il proprietario può giudicare",
+    onclick: ev => { ev.stopPropagation(); if (statoDi(k) !== "no") salva(k, {stato: "no"});
+      if (perCarta) { const c = ev.currentTarget.closest("[data-i]"); apriElemento(c ? +c.dataset.i : 0, true); }
+      else document.getElementById("nota")?.focus(); }}, "✗ Rifare");
+  return h("div", {class: "giudizio", "data-g": k}, si, no);
 }
 function aggiornaGiudizi() {
   for (const g of document.querySelectorAll("[data-g]")) {
-    const st = statoDi(g.dataset.g); const [si, no] = g.querySelectorAll("button");
+    const k = g.dataset.g, st = statoDi(k), [si, no] = g.querySelectorAll("button");
     si.setAttribute("aria-pressed", String(st === "ok")); no.setAttribute("aria-pressed", String(st === "no"));
-    const s = g.closest(".strisce"); if (s) { s.classList.toggle("st-ok", st === "ok"); s.classList.toggle("st-no", st === "no"); }
+    const s = g.closest(".scheda"); if (s) { s.classList.toggle("st-ok", st === "ok"); s.classList.toggle("st-no", st === "no");
+      const n = s.querySelector(".nota-card"); if (n) n.textContent = st === "no" ? notaDi(k) : ""; }
   }
   for (const m of document.querySelectorAll(".segno[data-k]")) { const st = statoDi(m.dataset.k); m.classList.toggle("ok", st === "ok"); m.classList.toggle("no", st === "no"); }
-  if (VISTA === "oggi") rendi();
-}
-function schedaGiudicabile(k, contenuto, onapri) {
-  const st = statoDi(k);
-  const el = h("div", {class: "scheda strisce" + (st === "ok" ? " st-ok" : st === "no" ? " st-no" : ""), tabindex: "0", role: "button",
-    onclick: onapri, onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onapri(); } }}, contenuto, bottoniGiudizio(k));
-  el.dataset.k = k; return el;
 }
 
-// ---------- pannello di dettaglio ----------
-const PANNELLO = document.getElementById("dettaglio"), DETT = document.getElementById("dett");
-function apri(titolo, k, ...corpo) {
-  DETT.replaceChildren(h("button", {class: "chiudi", type: "button", onclick: chiudi}, "Chiudi"), h("h2", {text: titolo}), ...corpo);
-  if (k) {
-    const g = GIU.get(k) || {};
-    const ta = h("textarea", {id: "nota-" + k.replace(/[^a-z0-9]/gi, "-"), placeholder: posso ? "Cosa non va, cosa cambiare…" : "Solo il proprietario scrive le note", disabled: !posso});
-    ta.value = g.nota || "";
-    const salvaNota = h("button", {type: "button", class: "chiudi", style: "align-self:flex-start", disabled: !posso, onclick: () => { salva(k, {nota: ta.value.trim()}); salvaNota.textContent = "Nota salvata"; }}, "Salva la nota");
-    DETT.append(h("h3", {text: "Il tuo giudizio"}), bottoniGiudizio(k), ta, salvaNota,
-      g.quando ? h("div", {class: "sotto", text: "Ultimo cambio: " + data(g.quando)}) : null);
-  }
-  PANNELLO.hidden = false; DETT.querySelector(".chiudi").focus();
+// ---------- elenco della vista e carte ----------
+// Ogni vista mette i suoi elementi in ELENCO: il dettaglio si sfoglia con le frecce in quell'ordine.
+let ELENCO = [];
+function carta(el, ...contenuto) {
+  let i = ELENCO.indexOf(el); if (i < 0) i = ELENCO.push(el) - 1;
+  const st = statoDi(el.k);
+  return h("div", {class: "scheda" + (st === "ok" ? " st-ok" : st === "no" ? " st-no" : ""), tabindex: "0", role: "button", "data-i": i,
+    onclick: () => apriElemento(i), onkeydown: e => { if (e.key === "Enter") apriElemento(i); }},
+    ...contenuto, el.k ? h("div", {class: "nota-card", text: st === "no" ? notaDi(el.k) : ""}) : null, el.k ? bottoniGiudizio(el.k) : null);
 }
-function chiudi() { PANNELLO.hidden = true; }
-PANNELLO.addEventListener("click", e => { if (e.target === PANNELLO) chiudi(); });
-document.addEventListener("keydown", e => { if (e.key === "Escape" && !PANNELLO.hidden) chiudi(); });
-function tabella(righe) { return h("table", {}, h("tbody", {}, righe.filter(r => r && r[1] !== undefined && r[1] !== null && r[1] !== "").map(([a, b]) => h("tr", {}, h("td", {text: a}), h("td", {}, b))))); }
-function vetrinaDettaglio(fid, scala = 3) {
-  const l = new Lettore(fid, {scala, ciclo: false}); l.c._lett = l; visibili.observe(l.c);
-  const v = h("div", {class: "vetrina"}, l.c);
-  const sel = h("select", {id: "anim-" + fid, onchange: () => l.scegli(sel.value)}, l.f.anims.map(a => h("option", {value: a.nome, text: bello(a.nome) + " · " + a.frames + " frame"})));
-  const dir = h("div", {class: "seg"}, DIREZ.map((d, i) => h("button", {type: "button", "aria-pressed": String(i === 0), onclick: ev => { l.dir = i; l.disegna(); for (const b of dir.children) b.setAttribute("aria-pressed", String(b === ev.currentTarget)); }}, d)));
-  const sf = h("div", {class: "seg"}, ["scacchi", "chiaro", "scuro"].map((n, i) => h("button", {type: "button", "aria-pressed": String(i === 0), onclick: ev => { v.classList.toggle("chiaro", n === "chiaro"); v.classList.toggle("scuro", n === "scuro"); for (const b of sf.children) b.setAttribute("aria-pressed", String(b === ev.currentTarget)); }}, n)));
-  const tempi = h("div", {class: "sotto"});
-  const aggTempi = () => { const a = l.f.anims[l.anim]; tempi.textContent = "Tempi: " + a.durate.join(" / ") + " ms" + (a.loop ? " · ciclo" : ""); };
-  sel.addEventListener("change", aggTempi); aggTempi();
-  return h("div", {class: "sezione"}, v, h("div", {class: "controlli"}, sel, dir, sf), tempi);
-}
-
-// ---------- filtri comuni ----------
-function filtroGiudizio(stato, k) { return stato === "tutti" || (stato === "da_vedere" ? !statoDi(k) : statoDi(k) === stato); }
+function filtroG(st, k) { const g = st.g || "tutti"; return g === "tutti" || (g === "da_vedere" ? !statoDi(k) : statoDi(k) === g); }
 function barraFiltri(st, opzioni, aggiorna) {
-  const q = h("input", {type: "search", id: "cerca-" + VISTA, placeholder: "Cerca per nome…", value: st.q || ""});
+  const q = h("input", {type: "search", id: "cerca-" + VISTA, placeholder: "Filtra per nome…", value: st.q || ""});
   q.addEventListener("input", () => { st.q = q.value.toLowerCase(); aggiorna(); });
-  const seg = h("div", {class: "seg", role: "group", "aria-label": "Giudizio"}, [["tutti", "Tutti"], ["da_vedere", "Da vedere"], ["ok", "Vanno bene"], ["no", "Da rifare"]].map(([v, t]) =>
-    h("button", {type: "button", "aria-pressed": String((st.g || "tutti") === v), onclick: ev => { st.g = v; for (const b of seg.children) b.setAttribute("aria-pressed", String(b === ev.currentTarget)); aggiorna(); }}, t)));
   const sel = (opzioni || []).map(([chiave, etichetta, valori]) => {
     const s = h("select", {id: "f-" + VISTA + "-" + chiave, "aria-label": etichetta}, h("option", {value: "", text: etichetta + ": tutti"}), valori.map(v => h("option", {value: v, text: bello(v)})));
-    s.value = st[chiave] || ""; s.addEventListener("change", () => { st[chiave] = s.value; aggiorna(); }); return s;
-  });
-  return h("div", {class: "filtri"}, q, ...sel, seg);
+    s.value = st[chiave] || ""; s.addEventListener("change", () => { st[chiave] = s.value; aggiorna(); }); return s; });
+  const conta = h("span", {class: "conta"}); st._conta = conta;
+  return h("div", {class: "filtri"}, q, ...sel, segmento([["tutti", "Tutti"], ["da_vedere", "Da vedere"], ["ok", "Vanno bene"], ["no", "Da rifare"]], st.g || "tutti", v => { st.g = v; aggiorna(); }), conta);
 }
-const STATO = {};
-function stato(v) { return STATO[v] || (STATO[v] = {g: "tutti", q: ""}); }
+const STATI = {};
+const stato = v => STATI[v] || (STATI[v] = {});
+const cerca = (st, ...testi) => !st.q || testi.join(" ").toLowerCase().includes(st.q);
+function riempi(contenitore, st, elementi) { contenitore.replaceChildren(...(elementi.length ? elementi : [h("div", {class: "vuoto", text: "Niente con questi filtri."})])); if (st._conta) st._conta.textContent = elementi.length + " elementi"; }
+
+// ---------- finestra di dettaglio ----------
+const MOD = document.getElementById("modale"), MMEDIA = document.getElementById("mod-media"), MINFO = document.getElementById("mod-info");
+let IDX = -1, ESCI = [];
+function apriElemento(i, focusNota = false) {
+  if (i < 0 || i >= ELENCO.length) return;
+  for (const f of ESCI) f(); ESCI = [];
+  IDX = i; const el = ELENCO[i];
+  document.getElementById("mod-titolo").textContent = el.titolo;
+  document.getElementById("mod-conta").textContent = (i + 1) + " / " + ELENCO.length;
+  MMEDIA.replaceChildren(...[el.media ? el.media() : null].flat().filter(Boolean));
+  MINFO.replaceChildren(...[pannelloGiudizio(el.k), el.extra ? el.extra() : null, el.dati ? tabella(el.dati()) : null, schedeInfo(el.k)].flat().filter(Boolean));
+  MMEDIA.scrollTop = 0; MINFO.scrollTop = 0;
+  const era = MOD.hidden; MOD.hidden = false;
+  if (focusNota) document.getElementById("nota")?.focus(); else if (era) document.getElementById("mod-dopo").focus();
+}
+function chiudi() { for (const f of ESCI) f(); ESCI = []; MOD.hidden = true; document.querySelector(`[data-i="${IDX}"]`)?.focus(); }
+document.getElementById("mod-chiudi").onclick = chiudi;
+document.getElementById("mod-prima").onclick = () => apriElemento((IDX - 1 + ELENCO.length) % ELENCO.length);
+document.getElementById("mod-dopo").onclick = () => apriElemento((IDX + 1) % ELENCO.length);
+MOD.addEventListener("click", e => { if (e.target === MOD) chiudi(); });
+let TASTI_CAMPO = false;     // mentre si prova un personaggio i tasti vanno a lui
+document.addEventListener("keydown", e => {
+  const scrivo = /^(TEXTAREA|INPUT|SELECT)$/.test(document.activeElement?.tagName || "");
+  const sx = e.key === "ArrowLeft" || e.key === "a" || e.key === "A", dx = e.key === "ArrowRight" || e.key === "d" || e.key === "D";
+  if (!MOD.hidden) {
+    if (e.key === "Escape") { chiudi(); return; }
+    if (scrivo || TASTI_CAMPO) return;
+    if (sx) { e.preventDefault(); document.getElementById("mod-prima").click(); }
+    if (dx) { e.preventDefault(); document.getElementById("mod-dopo").click(); }
+  } else if (!scrivo && SFOGLIA) { if (sx) SFOGLIA(-1); if (dx) SFOGLIA(1); }
+});
+function pannelloGiudizio(k) {
+  if (!k) return null;
+  const ta = h("textarea", {id: "nota", placeholder: posso ? "Scrivi cosa non va: si salva da sola e segna «da rifare»" : "Solo il proprietario scrive le note", disabled: !posso});
+  ta.value = notaDi(k);
+  const info = h("div", {class: "salvato", text: GIU.get(k)?.quando ? "Ultimo cambio: " + data(GIU.get(k).quando) : ""});
+  let timer = null;
+  const scrivi = async () => { timer = null; const v = ta.value.trim(); if (v === notaDi(k)) return; const ok = await salva(k, v ? {nota: v, stato: "no"} : {nota: ""}); info.textContent = ok ? "Nota salvata" + (v ? " · segnato da rifare" : "") : "Non salvata"; };
+  ta.addEventListener("input", () => { info.textContent = "…"; clearTimeout(timer); timer = setTimeout(scrivi, 700); });
+  ESCI.push(() => { if (timer) { clearTimeout(timer); scrivi(); } });
+  return h("div", {class: "blocco"}, h("h4", {text: "Il tuo giudizio"}), bottoniGiudizio(k, false), h("div", {style: "height:6px"}), ta, info);
+}
+function tabella(righe) { const r = righe.filter(x => x && x[1] !== undefined && x[1] !== null && x[1] !== ""); if (!r.length) return null;
+  return h("div", {class: "blocco dati"}, h("h4", {text: "Dati"}), h("table", {}, h("tbody", {}, r.map(([a, b]) => h("tr", {}, h("td", {text: a}), h("td", {}, b)))))); }
+function schedeInfo(k) {
+  const I = (D.info || {})[k]; if (!I) return null;
+  return I.map(([t, righe]) => h("div", {class: "blocco"}, h("h4", {text: t}), righe.length === 1 ? h("p", {style: "margin:0", text: righe[0]}) : h("ul", {}, righe.map(r => h("li", {text: r})))));
+}
+
+// visore di immagini con zoom
+function visore(src, alt) {
+  const img = h("img", {src, alt: alt || ""}), v = h("div", {class: "visore adatta"}, img);
+  const zoom = z => { if (!z) { v.classList.add("adatta"); img.style.width = ""; } else { v.classList.remove("adatta"); img.style.width = img.naturalWidth * z + "px"; } };
+  let z = 0; img.addEventListener("click", () => { z = z ? 0 : 2; zoom(z); });
+  return [h("div", {class: "controlli"}, h("span", {class: "sotto", text: "Zoom:"}), segmento([[0, "Adatta"], [1, "100%"], [2, "200%"], [3, "300%"]], 0, x => { z = x; zoom(x); }),
+    h("span", {class: "sotto", text: "Clic sull'immagine per ingrandire, poi scorri."})), v];
+}
+function icona(fn) { const v = h("div", {class: "vetrina", style: "min-height:260px"}, fn());
+  return [v, h("div", {class: "controlli"}, h("span", {class: "sotto", text: "Sfondo:"}), segmento([["", "Scacchi"], ["chiaro", "Chiaro"], ["scuro", "Scuro"]], "", s => { v.className = "vetrina " + s; }))]; }
+
+// lettore grande: tutte le animazioni, frecce, direzioni, velocita', frame per frame, prova coi tasti
+function studioFigura(fid, scala = 4) {
+  const l = new Lettore(fid, {scala, giro: false});
+  const v = h("div", {class: "vetrina", style: "min-height:300px"}, guarda(l.c, l));
+  const nome = h("b", {style: "min-width:120px;text-align:center"}), info = h("span", {class: "sotto"});
+  const mini = h("div", {class: "mini"});
+  l.cambiato = () => { const a = l.a; nome.textContent = bello(a.nome); info.textContent = `frame ${l.frame + 1}/${a.frames} · ${a.durate[l.frame]} ms · ${a.loop ? "ciclo" : "una volta"}`;
+    for (const b of mini.children) b.setAttribute("aria-pressed", String(b.dataset.a === a.nome)); };
+  const vel = h("input", {type: "range", min: "0.1", max: "2", step: "0.05", value: "1", id: "vel-fig"}), velT = h("span", {text: "100%"});
+  vel.addEventListener("input", () => { l.velocita = +vel.value; velT.textContent = Math.round(vel.value * 100) + "%"; for (const b of mini.children) { const c = b.querySelector("canvas"); if (c?._lett) c._lett.velocita = +vel.value; } });
+  const play = h("button", {class: "btn", type: "button", onclick: () => { l.pausa = !l.pausa; play.textContent = l.pausa ? "▶ Avvia" : "❚❚ Pausa"; }}, "❚❚ Pausa");
+  const ferma = () => { l.pausa = true; play.textContent = "▶ Avvia"; };
+  mini.append(...l.f.anims.map((a, i) => { const m = new Lettore(fid, {scala: 1, giro: false, anim: a.nome});
+    return h("button", {type: "button", "data-a": a.nome, title: "Mostra " + bello(a.nome), onclick: () => l.scegli(i)}, guarda(m.c, m), h("span", {text: bello(a.nome)})); }));
+  const dir = segmento(DIREZ.map((d, i) => [i, d]), 0, i => { l.dir = i; l.disegna(); for (const b of mini.children) { const c = b.querySelector("canvas"); if (c?._lett) { c._lett.dir = i; c._lett.disegna(); } } });
+  l.cambiato();
+  return [v,
+    h("div", {class: "controlli"}, h("button", {class: "btn", type: "button", title: "Animazione precedente", onclick: () => l.scegli((l.anim - 1 + l.f.anims.length) % l.f.anims.length)}, "◀"), nome,
+      h("button", {class: "btn", type: "button", title: "Animazione successiva", onclick: () => l.scegli((l.anim + 1) % l.f.anims.length)}, "▶"), dir),
+    h("div", {class: "controlli"}, play, h("button", {class: "btn", type: "button", onclick: () => { ferma(); l.avanza(-1); }}, "⏮ frame"), h("button", {class: "btn", type: "button", onclick: () => { ferma(); l.avanza(1); }}, "frame ⏭"),
+      h("label", {for: "vel-fig"}, "Velocità", vel, velT), info),
+    h("div", {class: "controlli"}, h("span", {class: "sotto", text: "Sfondo:"}), segmento([["", "Scacchi"], ["chiaro", "Chiaro"], ["scuro", "Scuro"], ["erba", "Erba"]], "", s => { v.className = "vetrina " + s; }),
+      h("span", {class: "sotto", text: "Zoom:"}), segmento([[2, "2×"], [3, "3×"], [4, "4×"], [6, "6×"]], scala, s => l.ingrandisci(s))),
+    h("h3", {text: "Tutte le animazioni (clic per vederla grande)"}), mini, h("h3", {text: "Provalo coi tasti"}), provaFigura(fid)];
+}
+// Campo di prova: la figura si muove e fa le sue animazioni coi tasti, coi tempi veri di animations.json.
+const TASTI = [["j", "attack_light", "attacco"], ["j", "attack", "attacco"], ["k", "attack_heavy", "pesante"], [" ", "dash", "scatto"], ["l", "parry", "parata"],
+  ["h", "hurt", "colpito"], ["h", "stagger", "barcolla"], ["c", "cast", "lancia"], ["m", "meditate", "medita"], ["e", "interact", "interagisci"], ["p", "pickup", "raccogli"],
+  ["b", "drink", "bevi"], ["r", "ritual", "rituale"], ["f", "fuga", "fuga"], ["x", "death", "morte"]];
+function provaFigura(fid) {
+  const f = D.figure[fid], W = 320, H = 180;
+  const c = h("canvas", {class: "campo", width: W, height: H, tabindex: "0", "aria-label": "Campo di prova: clicca e usa i tasti"});
+  const l = new Lettore(fid, {scala: 1, giro: false, anim: "idle"});
+  const p = {x: W / 2, y: H / 2 + 20, dir: 0, azione: null, vivo: true}, giu = new Set();
+  const vel = h("input", {type: "range", min: "0.1", max: "2", step: "0.05", value: "1", id: "pvel"});
+  vel.addEventListener("input", () => { l.velocita = +vel.value; });
+  const azioni = TASTI.filter(([, a]) => f.anims.some(x => x.nome === a)).filter((t, i, ar) => ar.findIndex(x => x[0] === t[0]) === i);
+  const cammina = f.anims.some(a => a.nome === "walk") ? "walk" : (f.anims.some(a => a.nome === "fuga") ? "fuga" : "idle");
+  function fai(nome) {
+    if (!p.vivo) return;
+    if (nome === "attack" && l.ha("anticipo")) { p.azione = "anticipo"; l.scegli("anticipo", () => { p.azione = "attack"; l.scegli("attack", () => { p.azione = null; l.scegli("idle"); }); }); return; }
+    const a = f.anims.find(x => x.nome === nome); if (!a) return;
+    if (nome === "death") { p.vivo = false; p.azione = "death"; l.scegli("death", () => {}); return; }
+    if (a.loop) { p.azione = p.azione === nome ? null : nome; l.scegli(p.azione || "idle"); return; }
+    p.azione = nome; l.scegli(nome, () => { p.azione = null; l.scegli("idle"); });
+  }
+  const DT = {w: [0, -1, 1], arrowup: [0, -1, 1], s: [0, 1, 0], arrowdown: [0, 1, 0], a: [-1, 0, 2], arrowleft: [-1, 0, 2], d: [1, 0, 3], arrowright: [1, 0, 3]};
+  c.addEventListener("keydown", e => { const k = e.key.toLowerCase(); if (DT[k] || azioni.some(t => t[0] === k) || k === "enter") e.preventDefault();
+    if (DT[k]) giu.add(k); const t = azioni.find(t => t[0] === k); if (t && !e.repeat) fai(t[1]);
+    if (k === "enter") { p.vivo = true; p.azione = null; l.scegli("idle"); } });
+  c.addEventListener("keyup", e => giu.delete(e.key.toLowerCase()));
+  c.addEventListener("focus", () => { TASTI_CAMPO = true; }); c.addEventListener("blur", () => { TASTI_CAMPO = false; giu.clear(); });
+  c.addEventListener("click", () => c.focus());
+  ESCI.push(() => { TASTI_CAMPO = false; });
+  const g = c.getContext("2d");
+  const muovi = (dx, dy, v, dt) => { const n = Math.hypot(dx, dy); p.x = Math.max(20, Math.min(W - 20, p.x + dx / n * v * dt / 1000 * l.velocita)); p.y = Math.max(40, Math.min(H - 6, p.y + dy / n * v * dt / 1000 * l.velocita)); };
+  guarda(c, {passo(dt) {
+    let dx = 0, dy = 0; for (const k of giu) { const d = DT[k]; dx += d[0]; dy += d[1]; p.dir = d[2]; }
+    if (!p.azione && p.vivo) { const voluto = dx || dy ? cammina : "idle"; if (l.a.nome !== voluto) l.scegli(voluto); if (dx || dy) muovi(dx, dy, 45, dt); }
+    else if (p.azione === "dash" && (dx || dy)) muovi(dx, dy, 160, dt);
+    l.dir = p.dir; l.passo(dt);
+    g.imageSmoothingEnabled = false; g.fillStyle = "#3e8948"; g.fillRect(0, 0, W, H); g.fillStyle = "#3a8244";
+    for (let y = 0; y < H; y += 16) for (let x = (y / 16 % 2) * 16; x < W; x += 32) g.fillRect(x, y, 16, 16);
+    g.fillStyle = "rgba(24,20,37,.35)"; g.beginPath(); g.ellipse(p.x, p.y, 9, 3, 0, 0, Math.PI * 2); g.fill();
+    if (l.img) { const a = l.a; g.drawImage(l.img, l.frame * a.w, a.y + (a.righe > 1 ? l.dir : 0) * a.h, a.w, a.h, Math.round(p.x - a.w / 2), Math.round(p.y - a.h * 54 / 64), a.w, a.h); }
+    g.fillStyle = "#fff"; g.font = "8px monospace"; g.fillText(bello(l.a.nome) + " " + (l.frame + 1) + "/" + l.a.frames + (document.activeElement === c ? "" : "  (clicca qui per usare i tasti)"), 4, 10);
+  }});
+  return h("div", {class: "sezione"}, c,
+    h("div", {class: "tasti"}, h("span", {}, h("kbd", {text: "W A S D"}), " o frecce: muovi"),
+      azioni.map(([k, , t]) => h("span", {}, h("kbd", {text: k === " " ? "Spazio" : k.toUpperCase()}), " " + t)), h("span", {}, h("kbd", {text: "Invio"}), " rialzati"), h("span", {}, h("kbd", {text: "Esc"}), " esci")),
+    h("div", {class: "controlli"}, h("label", {for: "pvel"}, "Velocità della prova", vel)));
+}
 
 // ---------- viste ----------
 const VISTE = {};
-let VISTA = "oggi";
+let VISTA = "oggi", SFOGLIA = null;
+
+function gruppi() {
+  const P = D.personaggi, M = D.mondo;
+  return {"Nemici": D.nemici.map(n => "nemico:" + n.id), "Boss": D.boss.map(b => "boss:" + b.id), "Enel e le forme": ["enel", ...P.forme.map(f => "forma:" + f.id)],
+    "Personaggi": [...P.npc.map(n => "npc:" + n.id), ...P.antagonisti.map(a => "npc:" + a.id)], "Pet e fauna": [...P.pet.map(p => "pet:" + p.id), ...P.fauna.map(f => "fauna:" + f.id)],
+    "Luoghi": M.luoghi.map(l => "luogo:" + l.id), "Villaggi": M.villaggi.map(v => "villaggio:" + v.id), "Interni": M.interni.map(i => "interno:" + i.id),
+    "Abilità": D.tecniche.pathway.flatMap(p => p.sequenze.flatMap(s => s.abilita.map(a => "abilita:" + a.id))), "Effetti": D.tecniche.effetti.map(e => "effetto:" + e.sprite),
+    "Oggetti": D.oggetti.map(o => "oggetto:" + o.id), "Stati": Object.keys(D.stati).map(s => "stato:" + s), "Libro e HUD": M.libro.map(l => "libro:" + l.id)};
+}
 
 VISTE.oggi = () => {
   const av = D.avanzamento, aperte = av.storie.filter(s => !s.fatta).sort((a, b) => a.priorita - b.priorita);
-  const fatte = av.storie.filter(s => s.fatta).length;
-  const tutti = chiaviGiudicabili(), visti = tutti.filter(k => statoDi(k)).length, dr = [...GIU.entries()].filter(([, g]) => g.stato === "no");
-  const costo = CONSUMO.reduce((a, s) => a + (s.costo || 0), 0);
-  return [
-    h("h2", {text: "Oggi"}), h("p", {class: "intro", text: "Cosa viene dopo, cosa aspetta te, e quanto manca da guardare."}),
+  const G = gruppi(), tutti = Object.values(G).flat(), visti = tutti.filter(k => statoDi(k)).length;
+  const dr = [...GIU.entries()].filter(([, g]) => g.stato === "no").sort((a, b) => String(b[1].quando).localeCompare(String(a[1].quando)));
+  const st = stato("oggi"), listaDr = h("div", {class: "lista"});
+  const q = h("input", {type: "search", id: "cerca-dr", placeholder: "Filtra le note…", value: st.q || ""});
+  const popDr = () => { const r = dr.filter(([k, g]) => cerca(st, k, g.nota || "")).map(([k, g]) => h("div", {}, h("span", {class: "id", text: k}), h("span", {class: "tx", text: g.nota || "senza nota"}), h("span", {class: "dx", text: data(g.quando)})));
+    listaDr.replaceChildren(...(r.length ? r : [h("div", {class: "vuoto", text: dbStato === "ok" ? "Nessun elemento da rifare." : "Giudizi non leggibili (" + dbStato + ")."})])); };
+  q.addEventListener("input", () => { st.q = q.value.toLowerCase(); popDr(); }); popDr();
+  return [h("h2", {text: "Oggi"}), h("p", {class: "intro", text: "Cosa viene dopo, cosa hai segnato da rifare, e quanto manca da guardare."}),
     h("div", {class: "numeri"},
-      h("div", {class: "numero"}, h("b", {text: fatte + " / " + av.storie.length}), h("span", {text: "story fatte"})),
-      h("div", {class: "numero"}, h("b", {text: nf.format(av.test)}), h("span", {text: "test nella suite"})),
-      h("div", {class: "numero"}, h("b", {text: av.validator_ok ? "0 errori" : "errori", style: "color:" + (av.validator_ok ? "var(--ok)" : "var(--no)")}), h("span", {text: "validator dei dati"})),
+      h("div", {class: "numero"}, h("b", {text: av.storie.filter(s => s.fatta).length + " / " + av.storie.length}), h("span", {text: "story fatte"})),
+      h("div", {class: "numero"}, h("b", {text: nf.format(av.test)}), h("span", {text: "test"})),
+      h("div", {class: "numero"}, h("b", {text: av.validator_ok ? "0 errori" : "errori", style: "color:" + (av.validator_ok ? "var(--ok)" : "var(--no)")}), h("span", {text: "validator"})),
       h("div", {class: "numero"}, h("b", {text: visti + " / " + tutti.length}), h("span", {text: "elementi giudicati"})),
       h("div", {class: "numero"}, h("b", {text: dr.length, style: dr.length ? "color:var(--no)" : ""}), h("span", {text: "da rifare"})),
-      h("div", {class: "numero"}, h("b", {text: euro(costo)}), h("span", {text: "costo API stimato, tutte le sessioni"}))),
+      h("div", {class: "numero"}, h("b", {text: euro(CONSUMO.reduce((a, s) => a + (s.costo || 0), 0))}), h("span", {text: "costo API stimato"}))),
     h("div", {class: "due"},
-      h("div", {}, h("h3", {text: "Prossime story"}), h("div", {class: "lista"}, aperte.slice(0, 6).map(s =>
-        h("div", {}, h("span", {class: "id", text: s.id}), h("span", {class: "tx", text: s.titolo}), h("span", {class: "dx", text: "fase " + s.fase}))))),
-      h("div", {}, h("h3", {text: "Da rifare (i tuoi ✗)"}), dr.length ? h("div", {class: "lista"}, dr.map(([k, g]) =>
-        h("div", {}, h("span", {class: "id", text: k}), h("span", {class: "tx", text: g.nota || "senza nota"}), h("span", {class: "dx", text: data(g.quando)}))))
-        : h("div", {class: "avviso", text: dbStato === "ok" ? "Nessun elemento segnato da rifare." : "I giudizi non si leggono ancora (" + dbStato + ")."}))),
-    h("h3", {text: "Quanto hai guardato, per sezione"}), h("div", {class: "lista"}, Object.entries(gruppiGiudicabili()).map(([nome, ks]) => {
-      const v = ks.filter(k => statoDi(k)).length;
-      return h("div", {}, h("span", {class: "tx", text: nome}), h("span", {style: "flex:2"}, h("div", {class: "barra"}, h("i", {style: "width:" + (ks.length ? v / ks.length * 100 : 0) + "%"}))), h("span", {class: "dx", text: v + " / " + ks.length}));
-    })),
-    h("h3", {text: "Ultime note di lavoro (progress.txt)"}), h("div", {class: "lista"}, av.progress.slice(-8).reverse().map(t => h("div", {}, h("span", {class: "tx", text: t}))))];
+      h("div", {}, h("h3", {text: "Da rifare: le tue note"}), h("div", {class: "filtri"}, q), h("div", {class: "scorri basso"}, listaDr)),
+      h("div", {}, h("h3", {text: "Prossime story"}), h("div", {class: "scorri basso"}, h("div", {class: "lista"}, aperte.slice(0, 25).map(s =>
+        h("div", {class: "cliccabile", onclick: () => apriStoria(s)}, h("span", {class: "id", text: s.id}), h("span", {class: "tx", text: s.titolo}), h("span", {class: "dx", text: "fase " + s.fase}))))))),
+    h("h3", {text: "Quanto hai guardato, per sezione"}), h("div", {class: "lista"}, Object.entries(G).map(([nome, ks]) => { const v = ks.filter(k => statoDi(k)).length, no = ks.filter(k => statoDi(k) === "no").length;
+      return h("div", {}, h("span", {class: "tx", text: nome}), h("span", {style: "flex:2"}, h("div", {class: "barra"}, h("i", {style: "width:" + (ks.length ? v / ks.length * 100 : 0) + "%"}))),
+        h("span", {class: "dx", text: v + " / " + ks.length + (no ? " · " + no + " da rifare" : "")})); }))];
 };
-
-function gruppiGiudicabili() {
-  const P = D.personaggi, M = D.mondo;
-  return {
-    "Nemici": D.nemici.map(n => "nemico:" + n.id), "Boss": D.boss.map(b => "boss:" + b.id),
-    "Enel e le forme": ["enel", ...P.forme.map(f => "forma:" + f.id)], "Personaggi": [...P.npc.map(n => "npc:" + n.id), ...P.antagonisti.map(a => "npc:" + a.id)],
-    "Pet e fauna": [...P.pet.map(p => "pet:" + p.id), ...P.fauna.map(f => "fauna:" + f.id)],
-    "Luoghi": M.luoghi.map(l => "luogo:" + l.id), "Villaggi": M.villaggi.map(v => "villaggio:" + v.id), "Interni": M.interni.map(i => "interno:" + i.id),
-    "Abilità": D.tecniche.pathway.flatMap(p => p.sequenze.flatMap(s => s.abilita.map(a => "abilita:" + a.id))),
-    "Effetti": D.tecniche.effetti.map(e => "effetto:" + e.sprite), "Oggetti": D.oggetti.map(o => "oggetto:" + o.id),
-    "Stati": Object.keys(D.stati).map(s => "stato:" + s), "Libro e HUD": M.libro.map(l => "libro:" + l.id)};
-}
-function chiaviGiudicabili() { return Object.values(gruppiGiudicabili()).flat(); }
 
 VISTE.avanzamento = () => {
-  const av = D.avanzamento, st = stato("avanzamento");
+  const av = D.avanzamento, st = stato("avanzamento"); st.fatte = st.fatte || "aperte";
   const fasi = {}; for (const s of av.storie) { const f = fasi[s.fase] || (fasi[s.fase] = {tot: 0, fatte: 0}); f.tot++; if (s.fatta) f.fatte++; }
-  const ordinate = Object.entries(fasi).sort((a, b) => String(a[0]).localeCompare(String(b[0]), "it", {numeric: true}));
-  // commit al giorno, ultime 6 settimane
+  const ord = Object.entries(fasi).sort((a, b) => String(a[0]).localeCompare(String(b[0]), "it", {numeric: true}));
   const giorni = {}; for (const c of av.commit) { const d = c.data.slice(0, 10); giorni[d] = (giorni[d] || 0) + 1; }
-  const oggi = new Date(D.generato), serie = [];
-  for (let i = 41; i >= 0; i--) { const d = new Date(oggi - i * 864e5).toISOString().slice(0, 10); serie.push([d, giorni[d] || 0]); }
+  const oggi = new Date(D.generato), serie = []; for (let i = 41; i >= 0; i--) { const d = new Date(oggi - i * 864e5).toISOString().slice(0, 10); serie.push([d, giorni[d] || 0]); }
   const max = Math.max(1, ...serie.map(s => s[1])), W = 840, H = 160, bw = W / serie.length;
-  const svg = `<svg viewBox="0 0 ${W} ${H + 24}" role="img" aria-label="Commit al giorno"><g>` +
-    [0, .5, 1].map(f => `<line x1="0" x2="${W}" y1="${H - f * H}" y2="${H - f * H}" stroke="var(--linea)" stroke-width="1"/>`).join("") +
+  const graf = h("div", {class: "grafico"}); graf.innerHTML = `<svg viewBox="0 0 ${W} ${H + 24}" role="img" aria-label="Commit al giorno">` +
+    [0, .5, 1].map(f => `<line x1="0" x2="${W}" y1="${H - f * H}" y2="${H - f * H}" stroke="var(--linea)"/>`).join("") +
     serie.map(([d, n], i) => `<rect x="${i * bw + 2}" y="${H - n / max * H}" width="${bw - 4}" height="${n / max * H}" fill="var(--accento)"><title>${d}: ${n} commit</title></rect>`).join("") +
-    serie.filter((_, i) => i % 7 === 0).map(([d], k) => `<text x="${k * 7 * bw + 2}" y="${H + 16}">${d.slice(5)}</text>`).join("") +
-    `<text x="${W - 4}" y="12" text-anchor="end">max ${max}</text></g></svg>`;
-  const graf = h("div", {class: "grafico"}); graf.innerHTML = svg;
-  const lista = h("div", {class: "lista"});
-  const aggiorna = () => {
-    const sel = av.storie.filter(s => (st.fatte || "aperte") === "tutte" || (st.fatte || "aperte") === (s.fatta ? "fatte" : "aperte"))
-      .filter(s => !st.fase || s.fase === st.fase).filter(s => !st.q || (s.id + s.titolo).toLowerCase().includes(st.q)).sort((a, b) => a.priorita - b.priorita);
-    lista.replaceChildren(...(sel.length ? sel.map(s => h("div", {style: "cursor:pointer", tabindex: "0", onclick: () => apriStoria(s)},
-      h("span", {class: "id", text: s.id}), h("span", {class: "tx", text: s.titolo}), chip(s.fatta ? "fatta" : "aperta", s.fatta ? "ok" : "att"), h("span", {class: "dx", text: "fase " + s.fase})))
-      : [h("div", {class: "vuoto", text: "Nessuna story con questi filtri."})]));
-  };
-  const q = h("input", {type: "search", id: "cerca-storie", placeholder: "Cerca una story…"}); q.addEventListener("input", () => { st.q = q.value.toLowerCase(); aggiorna(); });
-  const sf = h("select", {id: "f-fase", "aria-label": "Fase"}, h("option", {value: "", text: "Fase: tutte"}), ordinate.map(([f]) => h("option", {value: f, text: "Fase " + f})));
-  sf.addEventListener("change", () => { st.fase = sf.value; aggiorna(); });
-  const seg = h("div", {class: "seg"}, ["aperte", "fatte", "tutte"].map(v => h("button", {type: "button", "aria-pressed": String((st.fatte || "aperte") === v), onclick: ev => { st.fatte = v; for (const b of seg.children) b.setAttribute("aria-pressed", String(b === ev.currentTarget)); aggiorna(); }}, v)));
-  aggiorna();
-  return [h("h2", {text: "Avanzamento"}), h("p", {class: "intro", text: `Dati di prd.json, git e della suite al commit ${D.commit} (${D.ramo}).`}),
-    h("div", {class: "due"},
-      h("div", {}, h("h3", {text: "Story per fase"}), h("div", {class: "lista", style: "padding:6px 12px"}, ordinate.map(([f, v]) =>
-        h("div", {class: "fase", style: "border:0;padding:3px 0"}, h("span", {text: "Fase " + f}), h("div", {class: "barra"}, h("i", {style: "width:" + v.fatte / v.tot * 100 + "%"})), h("span", {class: "n", text: v.fatte + "/" + v.tot}))))),
-      h("div", {}, h("h3", {text: "Commit al giorno"}), graf, h("h3", {text: "Ultimi commit"}), h("div", {class: "lista"}, av.commit.slice(0, 8).map(c =>
-        h("div", {}, h("span", {class: "id", text: c.sha}), h("span", {class: "tx", text: c.msg}), h("span", {class: "dx", text: data(c.data)})))))),
-    h("h3", {text: "Story"}), h("div", {class: "filtri"}, q, sf, seg), lista];
+    serie.filter((_, i) => i % 7 === 0).map(([d], k) => `<text x="${k * 7 * bw + 2}" y="${H + 16}">${d.slice(5)}</text>`).join("") + `<text x="${W - 4}" y="12" text-anchor="end">max ${max}</text></svg>`;
+  const lista = h("div", {class: "lista"}), conta = h("span", {class: "conta"});
+  const pop = () => { const sel = av.storie.filter(s => st.fatte === "tutte" || st.fatte === (s.fatta ? "fatte" : "aperte")).filter(s => !st.fase || s.fase === st.fase).filter(s => cerca(st, s.id, s.titolo)).sort((a, b) => a.priorita - b.priorita);
+    lista.replaceChildren(...(sel.length ? sel.map(s => h("div", {class: "cliccabile", tabindex: "0", onclick: () => apriStoria(s)}, h("span", {class: "id", text: s.id}), h("span", {class: "tx", text: s.titolo}),
+      chip(s.fatta ? "fatta" : "aperta", s.fatta ? "ok" : "att"), h("span", {class: "dx", text: "fase " + s.fase}))) : [h("div", {class: "vuoto", text: "Nessuna story."})])); conta.textContent = sel.length + " story"; };
+  const q = h("input", {type: "search", id: "cerca-storie", placeholder: "Filtra le story…"}); q.addEventListener("input", () => { st.q = q.value.toLowerCase(); pop(); });
+  const sf = h("select", {id: "f-fase", "aria-label": "Fase"}, h("option", {value: "", text: "Fase: tutte"}), ord.map(([f]) => h("option", {value: f, text: "Fase " + f})));
+  sf.addEventListener("change", () => { st.fase = sf.value; pop(); }); pop();
+  return [h("h2", {text: "Avanzamento"}), h("p", {class: "intro", text: `prd.json, git e la suite al commit ${D.commit} (${D.ramo}).`}),
+    h("div", {class: "due"}, h("div", {}, h("h3", {text: "Story per fase"}), h("div", {class: "scorri basso"}, h("div", {class: "lista"}, ord.map(([f, v]) =>
+      h("div", {}, h("span", {style: "width:70px", text: "Fase " + f}), h("span", {style: "flex:1"}, h("div", {class: "barra"}, h("i", {style: "width:" + v.fatte / v.tot * 100 + "%"}))), h("span", {class: "dx", text: v.fatte + "/" + v.tot})))))),
+      h("div", {}, h("h3", {text: "Commit al giorno"}), graf)),
+    h("h3", {text: "Story"}), h("div", {class: "filtri"}, q, sf, segmento([["aperte", "Aperte"], ["fatte", "Fatte"], ["tutte", "Tutte"]], st.fatte, v => { st.fatte = v; pop(); }), conta), h("div", {class: "scorri"}, lista),
+    h("h3", {text: "Ultimi commit"}), h("div", {class: "scorri basso"}, h("div", {class: "lista"}, av.commit.slice(0, 80).map(c => h("div", {}, h("span", {class: "id", text: c.sha}), h("span", {class: "tx", text: c.msg}), h("span", {class: "dx", text: data(c.data)})))))];
 };
 function apriStoria(s) {
-  apri(s.id + " · " + s.titolo, null, tabella([["Fase", s.fase], ["Priorità", s.priorita], ["Stato", s.fatta ? "fatta" : "aperta"]]),
-    h("p", {text: s.descrizione}), s.criteri.length ? h("ul", {}, s.criteri.map(c => h("li", {text: c}))) : null,
-    s.note ? h("div", {class: "avviso", text: s.note}) : null);
+  ELENCO = [{k: null, titolo: s.id + " · " + s.titolo, media: () => [h("p", {text: s.descrizione}), s.criteri.length ? h("ul", {}, s.criteri.map(c => h("li", {text: c}))) : null, s.note ? h("div", {class: "avviso", text: s.note}) : null],
+    dati: () => [["Fase", s.fase], ["Priorità", s.priorita], ["Stato", s.fatta ? "fatta" : "aperta"]]}];
+  apriElemento(0);
 }
 
+function elLuogo(l, tipo) { return {k: tipo + ":" + l.id, titolo: bello(l.id), media: () => l.foto ? visore(l.foto, bello(l.id)) : h("div", {class: "avviso", text: "Nessuna foto."}),
+  dati: () => [["Tipo", tipo], ["Casella", l.x + ", " + l.y]]}; }
 VISTE.mondo = () => {
-  const M = D.mondo, st = stato("mondo"); st.zoom = st.zoom || 0.5; st.strati = st.strati || {luogo: true, villaggio: true, ingresso: false, bosssotto: true, riquadri: false};
-  const tela = h("div", {class: "tela"}), img = h("img", {src: M.mappa.file, alt: "Mappa del mondo", width: M.mappa.w * 2, height: M.mappa.h * 2});
-  tela.append(img);
-  const px = (x, y) => ({left: x * 2 + "px", top: y * 2 + "px"});
-  const segni = [];
-  const segno = (cls, x, y, k, titolo, onclick) => { const b = h("button", {class: "segno " + cls, type: "button", title: titolo, "aria-label": titolo, onclick}); Object.assign(b.style, px(x, y)); if (k) b.dataset.k = k; b.dataset.strato = cls; segni.push(b); tela.append(b); };
-  for (const [rid, r] of Object.entries(M.riquadri)) { const reg = M.regioni[rid]; if (!reg) continue;
-    const q = h("div", {class: "riquadro", text: reg.nome}); Object.assign(q.style, {left: r[0] * 2 + "px", top: r[1] * 2 + "px", width: (r[2] - r[0]) * 2 + "px", height: (r[3] - r[1]) * 2 + "px"}); q.dataset.strato = "riquadri"; segni.push(q); tela.append(q); }
-  for (const l of M.luoghi) segno("luogo", l.x, l.y, "luogo:" + l.id, bello(l.id), () => apriLuogo(l, "luogo"));
-  for (const v of M.villaggi) segno("villaggio", v.x, v.y, "villaggio:" + v.id, bello(v.id), () => apriLuogo(v, "villaggio"));
-  for (const i of M.ingressi) segno("ingresso", i.x, i.y, null, "Ingresso del sottosuolo verso " + bello(i.verso), null);
-  for (const b of M.boss_sotto) segno("bosssotto", b.x, b.y, null, "Boss del sottosuolo: " + bello(b.id), null);
-  segno("partenza", M.partenza[0], M.partenza[1], null, "Partenza", null);
-  const applica = () => { tela.style.transform = `scale(${st.zoom})`; tela.style.width = M.mappa.w * 2 + "px"; tela.style.height = M.mappa.h * 2 + "px";
-    wrap.firstChild.style.width = M.mappa.w * 2 * st.zoom + "px"; wrap.firstChild.style.height = M.mappa.h * 2 * st.zoom + "px";
-    for (const s of segni) s.hidden = !(s.dataset.strato === "partenza" || st.strati[s.dataset.strato]); };
-  const wrap = h("div", {class: "mappa-wrap"}, h("div", {}, tela));
-  const zoom = h("div", {class: "seg"}, [[0.25, "¼"], [0.5, "½"], [1, "1:1"]].map(([z, t]) => h("button", {type: "button", "aria-pressed": String(st.zoom === z), onclick: ev => { st.zoom = z; for (const b of zoom.children) b.setAttribute("aria-pressed", String(b === ev.currentTarget)); applica(); }}, t)));
+  const M = D.mondo, st = stato("mondo"); st.zoom = st.zoom || .5; st.strati = st.strati || {luogo: true, villaggio: true, ingresso: false, bosssotto: true, riquadri: false};
+  const tutti = [...M.luoghi.map(l => elLuogo(l, "luogo")), ...M.villaggi.map(v => elLuogo(v, "villaggio"))];
+  const tela = h("div", {class: "tela"}, h("img", {src: M.mappa.file, alt: "Mappa del mondo", width: M.mappa.w * 2, height: M.mappa.h * 2}));
+  const segni = [], posa = (el, x, y) => { el.style.left = x * 2 + "px"; el.style.top = y * 2 + "px"; segni.push(el); tela.append(el); };
+  for (const [rid, r] of Object.entries(M.riquadri)) { const reg = M.regioni[rid]; if (!reg) continue; const q = h("div", {class: "riquadro", text: reg.nome, "data-strato": "riquadri"});
+    q.style.width = (r[2] - r[0]) * 2 + "px"; q.style.height = (r[3] - r[1]) * 2 + "px"; posa(q, r[0], r[1]); }
+  const apriK = k => { ELENCO = tutti; apriElemento(tutti.findIndex(e => e.k === k)); };
+  for (const l of M.luoghi) posa(h("button", {class: "segno luogo", type: "button", title: bello(l.id), "aria-label": bello(l.id), "data-strato": "luogo", "data-k": "luogo:" + l.id, onclick: () => apriK("luogo:" + l.id)}), l.x, l.y);
+  for (const v of M.villaggi) posa(h("button", {class: "segno villaggio", type: "button", title: bello(v.id), "aria-label": bello(v.id), "data-strato": "villaggio", "data-k": "villaggio:" + v.id, onclick: () => apriK("villaggio:" + v.id)}), v.x, v.y);
+  for (const i of M.ingressi) posa(h("span", {class: "segno ingresso", title: "Ingresso del sottosuolo: " + bello(i.verso), "data-strato": "ingresso"}), i.x, i.y);
+  for (const b of M.boss_sotto) posa(h("span", {class: "segno bosssotto", title: "Boss del sottosuolo: " + bello(b.id), "data-strato": "bosssotto"}), b.x, b.y);
+  posa(h("span", {class: "segno partenza", title: "Partenza", "data-strato": "partenza"}), M.partenza[0], M.partenza[1]);
+  const box = h("div", {}, tela), wrap = h("div", {class: "mappa-wrap"}, box);
+  const applica = () => { tela.style.transform = `scale(${st.zoom})`; box.style.width = M.mappa.w * 2 * st.zoom + "px"; box.style.height = M.mappa.h * 2 * st.zoom + "px";
+    for (const s of segni) s.hidden = !(s.dataset.strato === "partenza" || st.strati[s.dataset.strato]); aggiornaGiudizi(); };
   const strati = h("div", {class: "legenda"}, [["luogo", "Luoghi"], ["villaggio", "Villaggi"], ["ingresso", "Ingressi del sottosuolo"], ["bosssotto", "Boss sotto"], ["riquadri", "Regioni"]].map(([k, t]) => {
     const c = h("input", {type: "checkbox", id: "strato-" + k}); c.checked = !!st.strati[k]; c.addEventListener("change", () => { st.strati[k] = c.checked; applica(); });
     return h("label", {for: "strato-" + k}, c, h("span", {class: "segno " + k, style: "position:static;margin:0;display:inline-block"}), t); }));
-  setTimeout(applica, 0); setTimeout(() => { wrap.scrollLeft = (M.partenza[0] * 2 * st.zoom) - wrap.clientWidth / 2; wrap.scrollTop = (M.partenza[1] * 2 * st.zoom) - wrap.clientHeight / 2; }, 50);
-  const grigliaLuoghi = h("div", {class: "griglia larga"});
-  const filtri = barraFiltri(st, [], () => pop()); const pop = () => grigliaLuoghi.replaceChildren(...M.luoghi.filter(l => (!st.q || l.id.includes(st.q)) && filtroGiudizio(st.g, "luogo:" + l.id))
-    .map(l => schedaGiudicabile("luogo:" + l.id, [l.foto ? h("img", {class: "foto", src: l.foto, alt: bello(l.id), loading: "lazy"}) : null, h("div", {class: "nome", text: bello(l.id)}), h("div", {class: "sotto", text: `casella ${l.x}, ${l.y}`})], () => apriLuogo(l, "luogo"))));
-  pop();
-  return [h("h2", {text: "Mondo"}), h("p", {class: "intro", text: `${M.w} × ${M.h} caselle, ${nf.format(M.edifici)} edifici, ${nf.format(M.oggetti_scena)} oggetti di scena. La mappa ha i colori veri delle tessere (modalità luminosa), 2 pixel per casella. Clicca un segno per la foto dal gioco.`}),
-    h("div", {class: "filtri"}, zoom, strati), wrap, h("h3", {text: "Luoghi, con la foto dal gioco"}), filtri, grigliaLuoghi];
+  const grigliaL = h("div", {class: "griglia larga"});
+  const pop = () => { ELENCO = tutti; riempi(grigliaL, st, M.luoghi.filter(l => cerca(st, l.id) && filtroG(st, "luogo:" + l.id)).map(l => carta(tutti.find(e => e.k === "luogo:" + l.id),
+    l.foto ? h("img", {class: "foto", src: l.foto, alt: bello(l.id), loading: "lazy"}) : null, h("div", {class: "nome", text: bello(l.id)})))); };
+  const filtri = barraFiltri(st, [], pop); pop();
+  setTimeout(() => { applica(); wrap.scrollLeft = M.partenza[0] * 2 * st.zoom - wrap.clientWidth / 2; wrap.scrollTop = M.partenza[1] * 2 * st.zoom - wrap.clientHeight / 2; }, 0);
+  return [h("h2", {text: "Mondo"}), h("p", {class: "intro", text: `${M.w} × ${M.h} caselle, ${nf.format(M.edifici)} edifici, ${nf.format(M.oggetti_scena)} oggetti di scena. Colori veri delle tessere (modalità luminosa). Clicca un segno: si apre la foto dal gioco, con le frecce passi agli altri luoghi.`}),
+    h("div", {class: "filtri"}, segmento([[.25, "¼"], [.5, "½"], [1, "1:1"]], st.zoom, z => { st.zoom = z; applica(); }), strati), wrap,
+    h("h3", {text: "Luoghi, con la foto dal gioco"}), filtri, h("div", {class: "scorri"}, grigliaL)];
 };
-function apriLuogo(l, tipo) {
-  const reg = Object.entries(D.mondo.riquadri).find(([, r]) => l.x >= r[0] && l.x < r[2] && l.y >= r[1] && l.y < r[3]);
-  apri(bello(l.id), tipo + ":" + l.id, l.foto ? h("img", {class: "foto", src: l.foto, alt: bello(l.id), style: "aspect-ratio:auto;object-fit:contain"}) : h("div", {class: "avviso", text: "Nessuna foto."}),
-    tabella([["Tipo", tipo], ["Casella", l.x + ", " + l.y], ["Regione (riquadro)", reg ? (D.mondo.regioni[reg[0]] || {}).nome || reg[0] : ""],
-      ["Edifici vicini", l.edifici ? Object.entries(l.edifici).map(([t, n]) => n + " " + bello(t)).join(", ") : ""], ["Porte verso", l.porte && l.porte.length ? l.porte.map(bello).join(", ") : ""]]));
-}
 
 VISTE.paesi = () => {
-  const M = D.mondo, st = stato("paesi");
-  const gv = h("div", {class: "griglia larga"}), gi = h("div", {class: "griglia larga"});
-  const pop = () => {
-    gv.replaceChildren(...M.villaggi.filter(v => (!st.q || v.id.includes(st.q)) && filtroGiudizio(st.g, "villaggio:" + v.id)).map(v => schedaGiudicabile("villaggio:" + v.id, [
-      v.foto ? h("img", {class: "foto", src: v.foto, alt: bello(v.id), loading: "lazy"}) : null, h("div", {class: "nome", text: bello(v.id)}),
-      h("div", {class: "chips"}, Object.entries(v.edifici).map(([t, n]) => chip(n + " " + bello(t))))], () => apriLuogo(v, "villaggio"))));
-    gi.replaceChildren(...M.interni.filter(i => (!st.q || i.id.includes(st.q)) && filtroGiudizio(st.g, "interno:" + i.id)).map(i => schedaGiudicabile("interno:" + i.id, [
-      i.foto ? h("img", {class: "foto", src: i.foto, alt: bello(i.nome), loading: "lazy"}) : h("div", {class: "vetrina", text: "senza porta nel mondo"}),
-      h("div", {class: "nome", text: bello(i.nome)}), h("div", {class: "chips"}, i.nemici ? chip(i.nemici + " nemici") : null, i.oggetti ? chip(i.oggetti + " oggetti") : null, i.forzieri ? chip(i.forzieri + " forzieri") : null, i.npc.length ? chip(i.npc.length + " NPC") : null)],
-      () => apri(bello(i.nome), "interno:" + i.id, i.foto ? h("img", {class: "foto", src: i.foto, alt: "", style: "aspect-ratio:auto"}) : null, tabella([["Id", i.id], ["Nemici", i.nemici], ["Oggetti a terra", i.oggetti], ["Forzieri", i.forzieri], ["NPC", i.npc.map(bello).join(", ")]])))));
-  };
-  pop();
-  return [h("h2", {text: "Paesi e case"}), h("p", {class: "intro", text: `${M.villaggi.length} villaggi e ${M.interni.length} interni. Le foto vengono dal gioco vero, a mezzogiorno, modalità luminosa.`}),
-    barraFiltri(st, [], pop), h("h3", {text: "Villaggi"}), gv, h("h3", {text: "Interni"}), gi];
+  const M = D.mondo, st = stato("paesi"), gv = h("div", {class: "griglia larga"}), gi = h("div", {class: "griglia larga"});
+  const pop = () => { ELENCO = [];
+    riempi(gv, {}, M.villaggi.filter(v => cerca(st, v.id) && filtroG(st, "villaggio:" + v.id)).map(v => carta(elLuogo(v, "villaggio"),
+      v.foto ? h("img", {class: "foto", src: v.foto, alt: bello(v.id), loading: "lazy"}) : null, h("div", {class: "nome", text: bello(v.id)}), h("div", {class: "chips"}, Object.entries(v.edifici).map(([t, n]) => chip(n + " " + bello(t)))))));
+    riempi(gi, {}, M.interni.filter(i => cerca(st, i.id, i.nome) && filtroG(st, "interno:" + i.id)).map(i => carta({k: "interno:" + i.id, titolo: bello(i.nome),
+      media: () => i.foto ? visore(i.foto, i.nome) : h("div", {class: "avviso", text: "Questo interno non ha una porta nel mondo: niente foto."}), dati: () => [["Id", i.id]]},
+      i.foto ? h("img", {class: "foto", src: i.foto, alt: bello(i.nome), loading: "lazy"}) : h("div", {class: "vetrina", text: "senza porta nel mondo"}), h("div", {class: "nome", text: bello(i.nome)}),
+      h("div", {class: "chips"}, i.nemici ? chip(i.nemici + " nemici") : null, i.oggetti ? chip(i.oggetti + " oggetti") : null, i.forzieri ? chip(i.forzieri + " forzieri") : null)))); };
+  const f = barraFiltri(st, [], pop); pop();
+  return [h("h2", {text: "Paesi e case"}), h("p", {class: "intro", text: `${M.villaggi.length} villaggi e ${M.interni.length} interni, fotografati dal gioco vero a mezzogiorno (modalità luminosa).`}), f,
+    h("h3", {text: "Villaggi"}), h("div", {class: "scorri"}, gv), h("h3", {text: "Interni"}), h("div", {class: "scorri"}, gi)];
 };
 
+function elFigura(k, titolo, fid, dati, extra) { return {k, titolo, media: () => D.figure[fid] ? studioFigura(fid) : h("div", {class: "avviso", text: "Nessuna figura."}), dati, extra}; }
 VISTE.personaggi = () => {
-  const P = D.personaggi, st = stato("personaggi");
-  const ritratto = id => id && D.atlanti.ritratti && D.atlanti.ritratti.indice[id] !== undefined ? daAtlante("ritratti", id, 1.5) : null;
+  const P = D.personaggi, st = stato("personaggi"), gn = h("div", {class: "griglia"});
+  const rit = (id, s = 1.5) => id && D.atlanti.ritratti?.indice[id] !== undefined ? daAtlante("ritratti", id, s) : null;
+  const ritBlocco = id => rit(id) ? h("div", {class: "blocco"}, h("h4", {text: "Ritratto"}), h("div", {class: "vetrina", style: "min-height:0;padding:10px;justify-items:start"}, rit(id, 3))) : null;
   const regioni = [...new Set(P.npc.map(n => n.regione).filter(Boolean))];
-  const gn = h("div", {class: "griglia"}), ga = h("div", {class: "griglia"});
-  const schedaNpc = n => schedaGiudicabile("npc:" + n.id, [h("div", {class: "vetrina"}, n.figura ? lettore(n.figura) : ritratto(n.ritratto)), h("div", {class: "nome", text: n.nome}), h("div", {class: "sotto", text: n.ruolo || bello(n.pathway || "")})], () => apriNpc(n));
-  const pop = () => {
-    gn.replaceChildren(...P.npc.filter(n => (!st.q || n.nome.toLowerCase().includes(st.q)) && (!st.regione || n.regione === st.regione) && filtroGiudizio(st.g, "npc:" + n.id)).map(schedaNpc));
-    ga.replaceChildren(...P.antagonisti.filter(n => (!st.q || n.nome.toLowerCase().includes(st.q)) && filtroGiudizio(st.g, "npc:" + n.id)).map(schedaNpc));
-  };
-  pop();
-  return [h("h2", {text: "Personaggi"}), h("p", {class: "intro", text: "Enel e le sue forme, gli NPC con figura e ritratto, gli antagonisti, i pet e la fauna. Clicca per scegliere animazione e direzione."}),
-    h("h3", {text: "Enel"}), h("div", {class: "griglia"}, schedaGiudicabile("enel", [h("div", {class: "vetrina"}, lettore("enel")), h("div", {class: "nome", text: "Enel"}), h("div", {class: "sotto", text: D.figure.enel.anims.length + " animazioni"})], () => apri("Enel", "enel", vetrinaDettaglio("enel"), ritratto("personaggio"))),
-      ...P.forme.map(f => schedaGiudicabile("forma:" + f.id, [h("div", {class: "vetrina"}, lettore(f.figura)), h("div", {class: "nome", text: f.nome}), h("div", {class: "sotto", text: "forma"})], () => apri(f.nome, "forma:" + f.id, vetrinaDettaglio(f.figura))))),
-    barraFiltri(st, [["regione", "Regione", regioni]], pop), h("h3", {text: "NPC"}), gn, h("h3", {text: "Antagonisti"}), ga,
-    h("h3", {text: "Pet"}), h("div", {class: "griglia"}, P.pet.map(p => schedaGiudicabile("pet:" + p.id, [h("div", {class: "vetrina"}, lettore(p.figura)), h("div", {class: "nome", text: p.nome}), h("div", {class: "sotto", text: "domabilità " + p.domabilita})], () => apri(p.nome, "pet:" + p.id, vetrinaDettaglio(p.figura), tabella([["Tag", p.tag.join(", ")], ["Domabilità", p.domabilita]]))))),
-    h("h3", {text: "Fauna"}), h("div", {class: "griglia"}, P.fauna.map(f => schedaGiudicabile("fauna:" + f.id, [h("div", {class: "vetrina"}, lettore(f.figura)), h("div", {class: "nome", text: bello(f.id)})], () => apri(bello(f.id), "fauna:" + f.id, vetrinaDettaglio(f.figura)))))];
+  const tuttiNpc = [...P.npc.map(n => ({...n, tipo: "NPC"})), ...P.antagonisti.map(a => ({...a, tipo: "antagonista", ruolo: "Antagonista di " + bello(a.pathway)}))];
+  ELENCO = [];
+  const fissi = [carta(elFigura("enel", "Enel", "enel", () => [["Animazioni", D.figure.enel.anims.length]], () => ritBlocco("personaggio")), h("div", {class: "vetrina"}, lettore("enel")), h("div", {class: "nome", text: "Enel"})),
+    ...P.forme.map(f => carta(elFigura("forma:" + f.id, f.nome, f.figura, () => [["Forma", f.id]]), h("div", {class: "vetrina"}, lettore(f.figura)), h("div", {class: "nome", text: f.nome}), h("div", {class: "sotto", text: "forma"}))),
+    ...P.pet.map(p => carta(elFigura("pet:" + p.id, p.nome, p.figura, () => [["Tag", p.tag.join(", ")], ["Domabilità", p.domabilita]]), h("div", {class: "vetrina"}, lettore(p.figura)), h("div", {class: "nome", text: p.nome}), h("div", {class: "sotto", text: "pet"}))),
+    ...P.fauna.map(f => carta(elFigura("fauna:" + f.id, bello(f.id), f.figura), h("div", {class: "vetrina"}, lettore(f.figura)), h("div", {class: "nome", text: bello(f.id)}), h("div", {class: "sotto", text: "fauna"})))];
+  const quanti = ELENCO.length;
+  const pop = () => { ELENCO = ELENCO.slice(0, quanti);
+    riempi(gn, st, tuttiNpc.filter(n => cerca(st, n.nome, n.ruolo) && (!st.regione || n.regione === st.regione) && filtroG(st, "npc:" + n.id)).map(n =>
+      carta(elFigura("npc:" + n.id, n.nome, n.figura, () => [["Tipo", n.tipo], ["Regione", bello(n.regione)], ["Fazione", bello(n.fazione)], ["Negozio", n.negozio ? "sì" : ""], ["Dialogo", n.dialogo]], () => ritBlocco(n.ritratto)),
+        h("div", {class: "vetrina"}, n.figura ? lettore(n.figura) : rit(n.ritratto)), h("div", {class: "nome", text: n.nome}), h("div", {class: "sotto", text: n.ruolo})))); };
+  const f = barraFiltri(st, [["regione", "Regione", regioni]], pop); pop();
+  return [h("h2", {text: "Personaggi"}), h("p", {class: "intro", text: "Clicca un personaggio: lo vedi grande con tutte le animazioni, cambi velocità, vai frame per frame e lo provi coi tasti per sentire i tempi."}),
+    h("h3", {text: "Enel, forme, pet e fauna"}), h("div", {class: "griglia"}, fissi), h("h3", {text: "NPC e antagonisti"}), f, h("div", {class: "scorri"}, gn)];
 };
-function apriNpc(n) {
-  const r = n.ritratto && D.atlanti.ritratti.indice[n.ritratto] !== undefined ? h("div", {class: "vetrina", style: "min-height:0;padding:8px;justify-self:start"}, daAtlante("ritratti", n.ritratto, 2)) : null;
-  apri(n.nome, "npc:" + n.id, r, n.figura ? vetrinaDettaglio(n.figura) : null, tabella([["Ruolo", n.ruolo], ["Regione", bello(n.regione)], ["Fazione", bello(n.fazione)], ["Pathway", bello(n.pathway)],
-    ["Può diventare Ancora", n.ancora === undefined ? "" : n.ancora ? "sì" : "no"], ["Negozio", n.negozio ? "sì" : ""], ["Dialogo", n.dialogo], ["Quest", (n.quest || []).join(", ")],
-    ["Orari", (n.orari || []).map(o => bello(o.momento) + ": " + (o.location_tag ? bello(o.location_tag) : "non c'è")).join(" · ")]]));
-}
 
+// i boss: le fasi spiegate a parole
+const SPIEGA_CFG = {danno_attacco: v => `colpisce più forte (danno ${v})`, recupero_s: v => `si riprende più in fretta dopo un colpo (${v} s scoperto)`,
+  telegraph: v => v === "wind_up_light" ? "prepara i colpi più in fretta (tell corto)" : "prepara i colpi con calma (tell lungo)", postura_massimo: v => `postura ${v}: ${v > 200 ? "quasi impossibile sbilanciarlo" : "si sbilancia più facilmente"}`,
+  comportamento: v => ({mischia: "combatte da vicino", distanza: "si allontana e tira da lontano", carica: "prende la rincorsa e carica"})[v] || v, raggio_aggro: v => `ti vede da ${v} unità`};
+function fasiAParole(b) { return b.fasi.map((f, i) => { const cose = Object.entries(f.cfg || {}).map(([k, v]) => (SPIEGA_CFG[k] || (x => bello(k) + " " + x))(v));
+  if (f.gregari) cose.push(`chiama ${f.gregari.quanti} ${bello(f.gregari.tipo)}`);
+  return `Fase ${i + 1}, da ${Math.round(f.da * 100)}% di vita: ` + (cose.length ? cose.join("; ") : "combatte come il suo tipo") + "."; }); }
 VISTE.bestiario = () => {
   const st = stato("bestiario"), g = h("div", {class: "griglia"});
   const regioni = [...new Set(D.nemici.flatMap(n => Object.keys(n.dove)).filter(r => !r.startsWith("interno:")))].sort();
-  const pop = () => g.replaceChildren(...D.nemici.filter(n => (!st.q || n.nome.toLowerCase().includes(st.q)) && (!st.rarita || n.rarita === st.rarita) && (!st.comportamento || n.comportamento === st.comportamento)
-    && (!st.regione || n.dove[st.regione]) && filtroGiudizio(st.g, "nemico:" + n.id)).map(n => schedaGiudicabile("nemico:" + n.id, [
-      h("div", {class: "vetrina"}, lettore(n.figura)), h("div", {class: "nome", text: n.nome}),
-      h("div", {class: "chips"}, chip(n.rarita, n.rarita === "comune" ? "" : "att"), chip(n.comportamento), n.figura === "nemico_base" ? chip("figura di base", "no") : null)], () => apriNemico(n))));
-  pop();
-  return [h("h2", {text: "Bestiario"}), h("p", {class: "intro", text: `${D.nemici.length} tipi di nemico e ${D.boss.length} boss. Le figure girano tutte le animazioni (fermo, passo, carica col bordo rosso del tell, colpo, barcollo, morte).`}),
-    barraFiltri(st, [["rarita", "Rarità", ["comune", "raro", "elite"]], ["comportamento", "Comportamento", ["mischia", "distanza", "carica", "volo"]], ["regione", "Regione", regioni]], pop), g,
-    h("h3", {text: "Boss"}), h("div", {class: "griglia larga"}, D.boss.map(b => schedaGiudicabile("boss:" + b.id, [h("div", {class: "vetrina"}, lettore(b.figura, {scala: 3})), h("div", {class: "nome", text: b.nome}),
-      h("div", {class: "chips"}, chip(b.fasi.length + " fasi"), chip("vita ×" + b.vita_x), b.posato.regione ? chip(bello(b.posato.regione)) : chip("non posato", "no"), chip("figura provvisoria", "att"))], () => apriBoss(b))))];
+  ELENCO = [];
+  const boss = D.boss.map(b => carta({k: "boss:" + b.id, titolo: b.nome, media: () => studioFigura(b.figura, 5),
+    dati: () => [["Vita", "×" + b.vita_x], ["Arena", b.arena.raggio + " unità"], ["Posato", b.posato.regione ? bello(b.posato.regione) + ", Sequenza " + b.posato.sequenza : "no"], ["Figura", "provvisoria: quella del " + bello(b.posato.tipo)]],
+    extra: () => h("div", {class: "blocco"}, h("h4", {text: "Cosa fa, fase per fase"}), h("ul", {}, fasiAParole(b).map(t => h("li", {text: t}))))},
+    h("div", {class: "vetrina"}, lettore(b.figura, {scala: 3})), h("div", {class: "nome", text: b.nome}), h("div", {class: "chips"}, chip(b.fasi.length + " fasi"), chip("vita ×" + b.vita_x), chip("figura provvisoria", "att")),
+    h("ul", {class: "sotto", style: "margin:0;padding-left:16px"}, fasiAParole(b).map(t => h("li", {text: t})))));
+  const quanti = ELENCO.length;
+  const pop = () => { ELENCO = ELENCO.slice(0, quanti);
+    riempi(g, st, D.nemici.filter(n => cerca(st, n.nome) && (!st.rarita || n.rarita === st.rarita) && (!st.comportamento || n.comportamento === st.comportamento) && (!st.regione || n.dove[st.regione]) && filtroG(st, "nemico:" + n.id))
+      .map(n => carta({k: "nemico:" + n.id, titolo: n.nome, media: () => studioFigura(n.figura),
+        dati: () => [["Rarità", n.rarita], ["Comportamento", n.comportamento], ["Tag", n.tag], ["Tell", bello(n.numeri.telegraph)], ["Danno", n.numeri.danno_attacco], ["Vista", n.numeri.raggio_aggro], ["Postura", n.numeri.postura_massimo], ["Recupero (s)", n.numeri.recupero_s]]},
+        h("div", {class: "vetrina"}, lettore(n.figura)), h("div", {class: "nome", text: n.nome}), h("div", {class: "chips"}, chip(n.rarita, n.rarita === "comune" ? "" : "att"), chip(n.comportamento))))); };
+  const f = barraFiltri(st, [["rarita", "Rarità", ["comune", "raro", "elite"]], ["comportamento", "Comportamento", ["mischia", "distanza", "carica", "volo"]], ["regione", "Regione", regioni]], pop); pop();
+  return [h("h2", {text: "Bestiario"}), h("p", {class: "intro", text: `${D.boss.length} boss e ${D.nemici.length} tipi di nemico. Clicca per vederli grandi, a velocità scelta, e provarli coi tasti.`}),
+    h("h3", {text: "Boss: cosa fanno"}), h("div", {class: "griglia larga"}, boss), h("h3", {text: "Nemici"}), f, h("div", {class: "scorri"}, g)];
 };
-function apriNemico(n) {
-  const N = n.numeri;
-  apri(n.nome, "nemico:" + n.id, vetrinaDettaglio(n.figura), tabella([["Id", n.id], ["Rarità", n.rarita], ["Comportamento", n.comportamento], ["Tag", n.tag], ["Tell", bello(N.telegraph)],
-    ["Danno", N.danno_attacco], ["Raggio di aggro", N.raggio_aggro], ["Postura", N.postura_massimo], ["Recupero (s)", N.recupero_s],
-    ["Dove", Object.entries(n.dove).map(([r, k]) => bello(r) + " ×" + k).join(", ") || "non posato"], ["Figura", n.figura === "nemico_base" ? "quella di base" : n.aspetto]]));
-}
-function apriBoss(b) {
-  apri(b.nome, "boss:" + b.id, vetrinaDettaglio(b.figura, 4), tabella([["Id", b.id], ["Vita", "×" + b.vita_x], ["Arena", b.arena.raggio + " unità"], ["Posato", b.posato.regione ? bello(b.posato.regione) + " (Sequenza " + b.posato.sequenza + ", tipo " + bello(b.posato.tipo) + ")" : "no"]]),
-    h("h3", {text: "Fasi"}), h("div", {class: "tab-tbl"}, h("table", {}, h("thead", {}, h("tr", {}, ["Da vita", "Cambia", "Gregari"].map(t => h("th", {text: t})))),
-      h("tbody", {}, b.fasi.map(f => h("tr", {}, h("td", {text: Math.round(f.da * 100) + "%"}), h("td", {text: Object.entries(f.cfg || {}).map(([k, v]) => bello(k) + " " + v).join(", ") || "—"}),
-        h("td", {text: f.gregari ? f.gregari.quanti + " " + bello(f.gregari.tipo) : "—"})))))));
-}
 
 VISTE.tecniche = () => {
-  const st = stato("tecniche"); const T = D.tecniche; st.pw = st.pw || T.pathway[0].id;
-  const corpo = h("div", {class: "sezione"});
-  const sceltaPw = h("div", {class: "pw"}, T.pathway.map(p => h("button", {type: "button", "aria-pressed": String(st.pw === p.id), onclick: ev => { st.pw = p.id; for (const b of sceltaPw.children) b.setAttribute("aria-pressed", String(b === ev.currentTarget)); pop(); }},
-    h("span", {class: "pallino", style: "background:" + (p.palette.primario || "#888")}), p.nome)));
-  const pop = () => {
-    const p = T.pathway.find(x => x.id === st.pw);
+  const st = stato("tecniche"), T = D.tecniche; st.pw = st.pw || T.pathway[0].id;
+  const corpo = h("div", {class: "sezione"}), eff = h("div", {class: "griglia"});
+  const pal = () => (T.pathway.find(x => x.id === st.pw) || {}).palette || {};
+  const mediaEffetto = e => { const ctrl = {}; const big = effetto(e, pal(), 6, ctrl); const vel = h("input", {type: "range", min: "0.1", max: "2", step: "0.05", value: "1", id: "evel"});
+    vel.addEventListener("input", () => { ctrl.l.velocita = +vel.value; });
+    return [h("div", {class: "vetrina scuro", style: "min-height:300px"}, big), h("div", {class: "controlli"}, h("label", {for: "evel"}, "Velocità", vel)),
+      h("h3", {text: "Nei colori di ogni Pathway"}), h("div", {class: "griglia"}, T.pathway.map(p => h("div", {class: "sezione"}, h("div", {class: "vetrina scuro", style: "min-height:96px"}, effetto(e, p.palette, 2)), h("span", {class: "sotto", text: p.nome}))))]; };
+  const pop = () => { ELENCO = []; const p = T.pathway.find(x => x.id === st.pw);
     corpo.replaceChildren(h("p", {class: "intro", text: `Gruppo ${bello(p.gruppo)} · ${p.verbo}`}), ...p.sequenze.map(s => h("div", {class: "seq"},
-      h("header", {}, h("span", {class: "num", text: "S" + s.n}), h("span", {class: "titolo", text: s.nome}), chip(s.tier || "")),
-      h("div", {class: "sotto", text: s.concetto}),
-      h("div", {class: "abilita"}, s.abilita.filter(a => (!st.q || a.nome.toLowerCase().includes(st.q)) && filtroGiudizio(st.g, "abilita:" + a.id)).map(a => {
-        const k = "abilita:" + a.id;
-        const el = h("div", {class: "ab strisce" + (statoDi(k) === "ok" ? " st-ok" : statoDi(k) === "no" ? " st-no" : "")},
-          h("div", {class: "glifi"}, a.primitive.map(pr => glifo(pr, p.palette))), h("div", {class: "nome", text: a.nome}),
-          h("div", {class: "chips"}, a.costo !== null && a.costo !== undefined ? chip(a.costo + " spirito") : null, a.cd ? chip(a.cd + " s") : null, a.primitive.map(pr => chip(bello(pr)))),
-          a.note ? h("div", {class: "sotto", text: a.note}) : null, bottoniGiudizio(k));
-        return el; })),
-      s.recitazione.length ? h("div", {class: "sotto", text: "Recitazione: " + s.recitazione.join(" · ")}) : null)));
-  };
-  pop();
-  return [h("h2", {text: "Tecniche"}), h("p", {class: "intro", text: "Ogni Pathway dalla Sequenza 9 alla 0: abilità, primitive (coi glifi nei colori del Pathway), costo e ricarica. Sotto, gli effetti animati."}),
-    sceltaPw, barraFiltri(st, [], pop), corpo, h("h3", {text: "Effetti delle primitive, nei colori del Pathway scelto"}),
-    h("div", {class: "griglia"}, T.effetti.map(e => schedaGiudicabile("effetto:" + e.sprite, [h("div", {class: "vetrina scuro"}, effetto(e, (T.pathway.find(x => x.id === st.pw) || {}).palette || {})), h("div", {class: "nome", text: bello(e.primitiva)}), h("div", {class: "sotto", text: e.sprite + " · " + e.frames + " frame"})],
-      () => apri(bello(e.primitiva), "effetto:" + e.sprite, h("div", {class: "vetrina scuro"}, effetto(e, (T.pathway.find(x => x.id === st.pw) || {}).palette || {}, 4)), tabella([["Foglio", e.sprite], ["Frame", e.frames], ["Lampo d'impatto", e.lampo ? "sì" : "no"]])))))];
+      h("div", {class: "testa"}, h("span", {class: "num", text: "S" + s.n}), h("span", {class: "titolo", text: s.nome}), chip(s.tier || "")), h("div", {class: "sotto", text: s.concetto}),
+      h("div", {class: "griglia larga"}, s.abilita.filter(a => cerca(st, a.nome, a.primitive.join(" ")) && filtroG(st, "abilita:" + a.id)).map(a => carta({k: "abilita:" + a.id, titolo: a.nome,
+        media: () => [h("div", {class: "vetrina scuro", style: "min-height:200px;gap:16px;grid-auto-flow:column"}, a.primitive.map(pr => { const e = T.effetti.find(x => x.primitiva === pr); return e ? effetto(e, p.palette, 4) : glifo(pr, p.palette, 4); })),
+          h("div", {class: "glifi", style: "margin-top:8px"}, a.primitive.map(pr => glifo(pr, p.palette, 2)))],
+        dati: () => [["Pathway", p.nome], ["Sequenza", s.n + " · " + s.nome], ["Costo", a.costo], ["Ricarica (s)", a.cd], ["Tag", a.tag.join(", ")]]},
+        h("div", {class: "glifi"}, a.primitive.map(pr => glifo(pr, p.palette))), h("div", {class: "nome", text: a.nome}),
+        h("div", {class: "chips"}, a.costo != null ? chip(a.costo + " spirito") : null, a.cd ? chip(a.cd + " s") : null)))))));
+    eff.replaceChildren(...T.effetti.map(e => carta({k: "effetto:" + e.sprite, titolo: bello(e.primitiva), media: () => mediaEffetto(e), dati: () => [["Foglio", e.sprite], ["Frame", e.frames], ["Lampo d'impatto", e.lampo ? "sì" : "no"]]},
+      h("div", {class: "vetrina scuro"}, effetto(e, pal())), h("div", {class: "nome", text: bello(e.primitiva)})))); };
+  const scelta = h("div", {class: "pw"}, T.pathway.map(p => h("button", {type: "button", "aria-pressed": String(st.pw === p.id), onclick: ev => { st.pw = p.id; for (const b of scelta.children) b.setAttribute("aria-pressed", String(b === ev.currentTarget)); pop(); }},
+    h("span", {class: "pallino", style: "background:" + (p.palette.primario || "#888")}), p.nome)));
+  const f = barraFiltri(st, [], pop); pop();
+  return [h("h2", {text: "Tecniche"}), h("p", {class: "intro", text: "Ogni Pathway dalla Sequenza 9 alla 0. Clicca un'abilità per vederne gli effetti grandi e cosa fa."}), scelta, f, h("div", {class: "scorri"}, corpo),
+    h("h3", {text: "Effetti delle primitive (colori del Pathway scelto)"}), h("div", {class: "scorri basso"}, eff)];
 };
 
 VISTE.oggetti = () => {
   const st = stato("oggetti"), g = h("div", {class: "griglia"});
   const cat = [...new Set(D.oggetti.map(o => o.categoria).filter(Boolean))].sort(), rar = [...new Set(D.oggetti.map(o => o.rarita).filter(Boolean))];
-  const pop = () => g.replaceChildren(...D.oggetti.filter(o => (!st.q || o.nome.toLowerCase().includes(st.q)) && (!st.categoria || o.categoria === st.categoria) && (!st.rarita || o.rarita === st.rarita) && filtroGiudizio(st.g, "oggetto:" + o.id)).slice(0, 400)
-    .map(o => schedaGiudicabile("oggetto:" + o.id, [h("div", {class: "vetrina", style: "min-height:80px"}, daAtlante("oggetti", o.icona, 2)), h("div", {class: "nome", text: o.nome}), h("div", {class: "chips"}, chip(bello(o.categoria)), o.rarita ? chip(o.rarita) : null)],
-      () => apri(o.nome, "oggetto:" + o.id, h("div", {class: "vetrina", style: "min-height:0;padding:16px"}, daAtlante("oggetti", o.icona, 4)), h("p", {text: o.descrizione}),
-        tabella([["Id", o.id], ["Categoria", bello(o.categoria)], ["Rarità", o.rarita], ["Valore", o.valore], ["Tag", o.tag.join(", ")], ["Icona", o.icona], ["File dei dati", "data/items/" + o.file + ".json"]])))));
-  pop();
-  return [h("h2", {text: "Oggetti"}), h("p", {class: "intro", text: `${D.oggetti.length} oggetti con la loro icona (le prime 400 dopo i filtri), e sotto le icone degli stati.`}),
-    barraFiltri(st, [["categoria", "Categoria", cat], ["rarita", "Rarità", rar]], pop), g,
-    h("h3", {text: "Stati"}), h("div", {class: "griglia"}, Object.entries(D.stati).map(([id, s]) => schedaGiudicabile("stato:" + id, [h("div", {class: "vetrina", style: "min-height:64px"}, daAtlante("stati", id, 3)), h("div", {class: "nome", text: s.nome}), h("div", {class: "chips"}, chip(s.negativo ? "negativo" : "vantaggio", s.negativo ? "no" : "ok"))],
-      () => apri(s.nome, "stato:" + id, h("div", {class: "vetrina", style: "min-height:0;padding:16px"}, daAtlante("stati", id, 6)), h("p", {text: s.descrizione})))))];
+  const uso = {}; for (const o of D.oggetti) uso[o.icona] = (uso[o.icona] || 0) + 1;
+  ELENCO = [];
+  const sg = h("div", {class: "griglia"}, Object.entries(D.stati).map(([id, s]) => carta({k: "stato:" + id, titolo: s.nome, media: () => icona(() => daAtlante("stati", id, 12)), dati: () => [["Tipo", s.negativo ? "negativo" : "vantaggio"]]},
+    h("div", {class: "vetrina", style: "min-height:64px"}, daAtlante("stati", id, 3)), h("div", {class: "nome", text: s.nome}), h("div", {class: "chips"}, chip(s.negativo ? "negativo" : "vantaggio", s.negativo ? "no" : "ok")))));
+  const quanti = ELENCO.length;
+  const pop = () => { ELENCO = ELENCO.slice(0, quanti);
+    riempi(g, st, D.oggetti.filter(o => cerca(st, o.nome, o.id) && (!st.categoria || o.categoria === st.categoria) && (!st.rarita || o.rarita === st.rarita) && (!st.doppie || uso[o.icona] > 1) && filtroG(st, "oggetto:" + o.id))
+      .map(o => carta({k: "oggetto:" + o.id, titolo: o.nome, media: () => icona(() => daAtlante("oggetti", o.icona, 8)),
+        dati: () => [["Id", o.id], ["Categoria", bello(o.categoria)], ["Rarità", o.rarita], ["Valore", o.valore], ["Tag", o.tag.join(", ")], ["File", "data/items/" + o.file + ".json"]]},
+        h("div", {class: "vetrina", style: "min-height:80px"}, daAtlante("oggetti", o.icona, 2)), h("div", {class: "nome", text: o.nome}),
+        h("div", {class: "chips"}, chip(bello(o.categoria)), o.rarita ? chip(o.rarita) : null, uso[o.icona] > 1 ? chip("icona uguale ad altri " + (uso[o.icona] - 1), "no") : null)))); };
+  const cb = h("input", {type: "checkbox", id: "f-doppie"}); cb.checked = !!st.doppie; cb.addEventListener("change", () => { st.doppie = cb.checked; pop(); });
+  const f = barraFiltri(st, [["categoria", "Categoria", cat], ["rarita", "Rarità", rar]], pop); f.append(h("label", {for: "f-doppie", class: "sotto", style: "display:inline-flex;gap:4px;align-items:center"}, cb, "solo icone uguali ad altre")); pop();
+  return [h("h2", {text: "Oggetti"}), h("p", {class: "intro", text: `${D.oggetti.length} oggetti. In rosso le icone uguali per oggetti diversi: da distinguere. Ogni dettaglio dice dove si trova l'oggetto e a cosa serve.`}), f, h("div", {class: "scorri"}, g),
+    h("h3", {text: "Stati"}), h("div", {class: "scorri basso"}, sg)];
 };
 
-VISTE.libro = () => [h("h2", {text: "Libro e HUD"}), h("p", {class: "intro", text: "Ogni pagina del libro e l'HUD in combattimento, fotografati dal gioco vero a 1280×720."}),
-  h("div", {class: "griglia larga"}, D.mondo.libro.map(l => schedaGiudicabile("libro:" + l.id, [h("img", {class: "foto", src: l.foto, alt: bello(l.id), loading: "lazy"}), h("div", {class: "nome", text: bello(l.id)})],
-    () => apri(bello(l.id), "libro:" + l.id, h("img", {class: "foto", src: l.foto, alt: "", style: "aspect-ratio:auto"})))))];
+VISTE.libro = () => {
+  const L = D.mondo.libro; let i = 0; ELENCO = L.map(l => ({k: "libro:" + l.id, titolo: bello(l.id), media: () => visore(l.foto, bello(l.id))}));
+  const img = h("img", {alt: ""}), titolo = h("b"), conta = h("span", {class: "conta"}), giud = h("div", {style: "max-width:320px"});
+  const pagina = h("div", {class: "pagina", title: "Clic per vederla grande", onclick: () => apriElemento(i)}, img);
+  const striscia = h("div", {class: "striscia"}, L.map((l, k) => h("button", {type: "button", title: bello(l.id), onclick: () => vai(k - i)}, h("img", {src: l.foto, alt: bello(l.id), loading: "lazy"}))));
+  function vai(d) { i = (i + d + L.length) % L.length; img.src = L[i].foto; titolo.textContent = bello(L[i].id); conta.textContent = (i + 1) + " / " + L.length;
+    giud.replaceChildren(bottoniGiudizio("libro:" + L[i].id, false));
+    [...striscia.children].forEach((b, k) => b.setAttribute("aria-current", String(k === i))); striscia.children[i].scrollIntoView({block: "nearest", inline: "center"}); }
+  SFOGLIA = vai; setTimeout(() => vai(0), 0);
+  return [h("h2", {text: "Libro e HUD"}), h("p", {class: "intro", text: "Sfoglia il libro come nel gioco: frecce o A/D. Clic sulla pagina per vederla grande con lo zoom e scrivere la nota."}),
+    h("div", {class: "controlli"}, h("button", {class: "btn", type: "button", onclick: () => vai(-1)}, "◀ Pagina prima"), titolo, conta, h("button", {class: "btn", type: "button", onclick: () => vai(1)}, "Pagina dopo ▶")),
+    h("div", {class: "sfoglia"}, pagina, giud, striscia)];
+};
 
 VISTE.consumo = () => {
-  if (!CONSUMO.length) return [h("h2", {text: "Consumo"}), h("div", {class: "avviso", text: dbStato === "ok" ? "Ancora nessuna sessione registrata. Le scrive Claude a fine lavoro con tools/dashboard/consumo.py." : "Il consumo si legge dall'archivio della pagina, che ora non risponde (" + dbStato + ")."})];
+  if (!CONSUMO.length) return [h("h2", {text: "Consumo"}), h("div", {class: "avviso", text: dbStato === "ok" ? "Ancora nessuna sessione registrata." : "Il consumo si legge dall'archivio della pagina, che ora non risponde (" + dbStato + ")."})];
   const tot = {}; let costo = 0; const giorni = {}, storie = {};
   for (const s of CONSUMO) { costo += s.costo || 0;
     for (const [m, t] of Object.entries(s.modelli || {})) { const x = tot[m] || (tot[m] = {chiamate: 0, input: 0, output: 0, cache_letta: 0, cache_1h: 0, cache_5m: 0, costo: 0}); for (const k in x) x[k] += t[k] || 0; }
     for (const [d, c] of Object.entries(s.giorni || {})) giorni[d] = (giorni[d] || 0) + c;
-    for (const [st, c] of Object.entries(s.storie || {})) storie[st] = (storie[st] || 0) + c; }
+    for (const [x, c] of Object.entries(s.storie || {})) storie[x] = (storie[x] || 0) + c; }
   const serie = Object.entries(giorni).sort(), max = Math.max(1, ...serie.map(s => s[1])), W = 840, H = 160, bw = W / Math.max(serie.length, 1);
-  const graf = h("div", {class: "grafico"}); graf.innerHTML = `<svg viewBox="0 0 ${W} ${H + 24}" role="img" aria-label="Costo stimato al giorno">` +
-    [0, .5, 1].map(f => `<line x1="0" x2="${W}" y1="${H - f * H}" y2="${H - f * H}" stroke="var(--linea)"/>`).join("") +
+  const graf = h("div", {class: "grafico"}); graf.innerHTML = `<svg viewBox="0 0 ${W} ${H + 24}" role="img" aria-label="Costo stimato al giorno">` + [0, .5, 1].map(f => `<line x1="0" x2="${W}" y1="${H - f * H}" y2="${H - f * H}" stroke="var(--linea)"/>`).join("") +
     serie.map(([d, c], i) => `<rect x="${i * bw + 3}" y="${H - c / max * H}" width="${Math.max(bw - 6, 2)}" height="${c / max * H}" fill="var(--accento)"><title>${d}: $${c.toFixed(2)}</title></rect><text x="${i * bw + bw / 2}" y="${H + 16}" text-anchor="middle">${d.slice(5)}</text>`).join("") +
     `<text x="${W - 4}" y="12" text-anchor="end">max $${max.toFixed(0)}</text></svg>`;
   const tok = Object.values(tot).reduce((a, t) => a + t.input + t.output + t.cache_letta + t.cache_1h + t.cache_5m, 0);
-  const listino = (CONSUMO[0] || {}).listino || "";
-  return [h("h2", {text: "Consumo"}), h("p", {class: "intro", text: `Token delle sessioni di Claude Code su questo progetto e quanto costerebbero all'API (${listino}). Con l'abbonamento non si paga questa cifra. Una risposta conta per la prima story chiusa dopo di lei.`}),
+  const st = stato("consumo"), lst = h("div", {class: "lista"});
+  const titoloDi = s => (D.avanzamento.storie.find(x => x.id === s) || {}).titolo || "";
+  const pop = () => lst.replaceChildren(...Object.entries(storie).sort((a, b) => b[1] - a[1]).filter(([s]) => cerca(st, s, titoloDi(s))).map(([s, c]) =>
+    h("div", {}, h("span", {class: "id", text: s}), h("span", {class: "tx", text: titoloDi(s)}), h("span", {class: "dx", text: euro(c)}))));
+  const q = h("input", {type: "search", id: "cerca-consumo", placeholder: "Filtra le story…"}); q.addEventListener("input", () => { st.q = q.value.toLowerCase(); pop(); }); pop();
+  return [h("h2", {text: "Consumo"}), h("p", {class: "intro", text: `Token delle sessioni di Claude Code su questo progetto e quanto costerebbero all'API (${(CONSUMO[0] || {}).listino || ""}). Con l'abbonamento non si paga questa cifra. Una risposta conta per la prima story chiusa dopo di lei.`}),
     h("div", {class: "numeri"}, h("div", {class: "numero"}, h("b", {text: euro(costo)}), h("span", {text: "costo API stimato"})), h("div", {class: "numero"}, h("b", {text: CONSUMO.length}), h("span", {text: "sessioni"})),
-      h("div", {class: "numero"}, h("b", {text: mil(tok)}), h("span", {text: "token in tutto (con la cache)"})),
-      h("div", {class: "numero"}, h("b", {text: mil(Object.values(tot).reduce((a, t) => a + t.output, 0))}), h("span", {text: "token scritti da Claude"}))),
+      h("div", {class: "numero"}, h("b", {text: mil(tok)}), h("span", {text: "token (con la cache)"})), h("div", {class: "numero"}, h("b", {text: mil(Object.values(tot).reduce((a, t) => a + t.output, 0))}), h("span", {text: "token scritti da Claude"}))),
     h("h3", {text: "Per modello"}), h("div", {class: "tab-tbl"}, h("table", {}, h("thead", {}, h("tr", {}, ["Modello", "Risposte", "Entrata", "Cache scritta", "Cache letta", "Uscita", "Costo"].map(t => h("th", {text: t})))),
       h("tbody", {}, Object.entries(tot).map(([m, t]) => h("tr", {}, h("td", {text: m}), h("td", {class: "n", text: nf.format(t.chiamate)}), h("td", {class: "n", text: nf.format(t.input)}), h("td", {class: "n", text: mil(t.cache_1h + t.cache_5m)}),
         h("td", {class: "n", text: mil(t.cache_letta)}), h("td", {class: "n", text: mil(t.output)}), h("td", {class: "n", text: euro(t.costo)})))))),
-    h("div", {class: "due"}, h("div", {}, h("h3", {text: "Costo stimato al giorno"}), graf),
-      h("div", {}, h("h3", {text: "Le story che sono costate di più"}), h("div", {class: "lista"}, Object.entries(storie).sort((a, b) => b[1] - a[1]).slice(0, 12).map(([s, c]) =>
-        h("div", {}, h("span", {class: "id", text: s}), h("span", {class: "tx", text: (D.avanzamento.storie.find(x => x.id === s) || {}).titolo || ""}), h("span", {class: "dx", text: euro(c)})))))),
-    h("h3", {text: "Sessioni"}), h("div", {class: "lista"}, CONSUMO.slice().sort((a, b) => String(b.fine).localeCompare(String(a.fine))).map(s =>
-      h("div", {}, h("span", {class: "id", text: String(s.id).slice(0, 8)}), h("span", {class: "tx", text: data(s.inizio) + " → " + data(s.fine) + " · " + Object.keys(s.modelli || {}).join(", ")}), h("span", {class: "dx", text: euro(s.costo)}))))];
+    h("div", {class: "due"}, h("div", {}, h("h3", {text: "Costo stimato al giorno"}), graf), h("div", {}, h("h3", {text: "Costo per story"}), h("div", {class: "filtri"}, q), h("div", {class: "scorri basso"}, lst))),
+    h("h3", {text: "Sessioni"}), h("div", {class: "scorri basso"}, h("div", {class: "lista"}, CONSUMO.slice().sort((a, b) => String(b.fine).localeCompare(String(a.fine))).map(s =>
+      h("div", {}, h("span", {class: "id", text: String(s.id).slice(0, 8)}), h("span", {class: "tx", text: data(s.inizio) + " → " + data(s.fine) + " · " + Object.keys(s.modelli || {}).join(", ")}), h("span", {class: "dx", text: euro(s.costo)})))))];
 };
 
 // ---------- navigazione ----------
@@ -587,33 +709,25 @@ const NAV = document.getElementById("nav"), MAIN = document.getElementById("main
 for (const [id, t] of SEZIONI) NAV.append(h("a", {href: "#" + id, text: t, "data-v": id}));
 function rendi() {
   if (!D) return;
-  LETTORI.clear();
-  for (const a of NAV.children) a.toggleAttribute("aria-current", a.dataset.v === VISTA), a.dataset.v === VISTA ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current");
-  try { MAIN.replaceChildren(...[VISTE[VISTA]()].flat()); }
-  catch (e) { MAIN.replaceChildren(h("div", {class: "avviso", text: "Questa sezione non si è aperta: " + e.message})); console.error(e); }
+  ATTIVI.clear(); ELENCO = []; SFOGLIA = null;
+  for (const a of NAV.children) { if (a.dataset.v === VISTA) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }
+  try { MAIN.replaceChildren(...[VISTE[VISTA]()].flat()); } catch (e) { MAIN.replaceChildren(h("div", {class: "avviso", text: "Questa sezione non si è aperta: " + e.message})); console.error(e); }
 }
-function daHash() { const v = location.hash.slice(1); VISTA = SEZIONI.some(s => s[0] === v) ? v : "oggi"; rendi(); window.scrollTo(0, 0); }
+function daHash() { const v = location.hash.slice(1); VISTA = SEZIONI.some(s => s[0] === v) ? v : "oggi"; if (!MOD.hidden) chiudi(); rendi(); window.scrollTo(0, 0); }
 window.addEventListener("hashchange", daHash);
-
-// ---------- avvio ----------
-fetch("dati.json").then(r => r.json()).then(d => {
-  D = d;
-  document.getElementById("meta").textContent = `commit ${d.commit} · ${d.ramo} · aggiornata ${data(d.generato)}`;
-  daHash();
-}).catch(e => { MAIN.replaceChildren(h("div", {class: "avviso", text: "I dati del progetto (dati.json) non si sono caricati: " + e.message})); });
-
+fetch("dati.json").then(r => r.json()).then(d => { D = d; avviso(`commit ${d.commit} · ${d.ramo} · aggiornata ${data(d.generato)}`); daHash(); })
+  .catch(e => MAIN.replaceChildren(h("div", {class: "avviso", text: "I dati del progetto (dati.json) non si sono caricati: " + e.message})));
 (async () => {
-  if (!window.claude || !window.claude.use) { dbStato = "fuori da claude.ai"; return; }
-  const timer = setTimeout(() => { if (dbStato === "attesa") { dbStato = "l'archivio non risponde"; if (VISTA === "oggi" || VISTA === "consumo") rendi(); } }, 10000);
+  if (!window.claude?.use) { dbStato = "fuori da claude.ai"; return; }
+  const timer = setTimeout(() => { if (dbStato === "attesa") { dbStato = "l'archivio non risponde"; if ((VISTA === "oggi" || VISTA === "consumo") && MOD.hidden) rendi(); } }, 10000);
   try {
-    [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+    const [d, user] = await Promise.all([claude.use("db"), claude.use("user")]); db = d;
     posso = !!(user && await user.isOwner());
-    if (!db) { dbStato = "archivio non disponibile"; clearTimeout(timer); rendi(); return; }
-    db.collection("giudizi").onSnapshot(snap => {
-      clearTimeout(timer); dbStato = "ok"; GIU.clear(); for (const d of snap.docs) GIU.set(d.id, d.data()); aggiornaGiudizi(); if (VISTA === "oggi") rendi();
-    }, e => { dbStato = "errore " + e.code; rendi(); });
-    db.collection("consumo").onSnapshot(snap => { CONSUMO = snap.docs.map(d => d.data()); if (VISTA === "consumo" || VISTA === "oggi") rendi(); }, () => {});
-    rendi();
+    if (!db) { dbStato = "archivio non disponibile"; clearTimeout(timer); if (MOD.hidden) rendi(); return; }
+    let primo = true;
+    db.collection("giudizi").onSnapshot(snap => { clearTimeout(timer); dbStato = "ok"; GIU.clear(); for (const x of snap.docs) GIU.set(x.id, x.data());
+      if ((primo || VISTA === "oggi") && MOD.hidden) rendi(); primo = false; aggiornaGiudizi(); }, e => { dbStato = "errore " + e.code; });
+    db.collection("consumo").onSnapshot(snap => { CONSUMO = snap.docs.map(x => x.data()); if ((VISTA === "consumo" || VISTA === "oggi") && MOD.hidden) rendi(); }, () => {});
   } catch (e) { dbStato = "errore"; clearTimeout(timer); }
 })();
 </script>
