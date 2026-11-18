@@ -24,3 +24,5 @@ stessi parametri + stesso seed = stessi PNG, anche su un altro PC.
 | 2026-10-14 | `pareti.py` (nuovo) | faccia verticale dei dislivelli: altezza intera per casella, 1 casella di parete per livello, 3 materiali (`arenaria`, `roccia`, `mura`), 3 varianti centrali, scalini `S` e rampa `R`, ombra a terra | Revisione arte 3.2: rupi, gradoni e scogliere erano piatti. |
 | 2026-10-14 | `terrain.py` | tolto in `_rim` il calcolo dell'ombra "cliff" mai usato (codice morto) | Le ombre delle pareti le fa `pareti.py`. |
 | 2026-11-18 | `rig.py` | voce di posa `"~<giunto>": (dx, dy, dz)` in `instances()`: scala le forme del giunto di 1 + d | US-1504c: la melma si schiaccia (saltelli, carica, morte a pozzanghera) senza forme nuove. Senza la voce non cambia niente. |
+| 2026-11-18 | `engine.py`, `rig.py` | `render(group_lines=True)`: linea scura tra parti del corpo diverse (Inst.grp da `Rig.gruppi()`); spenta di default | Prova per staccare gli arti (skill arte-personaggi). Da sola non basta: vedi progress.txt. |
+| 2026-11-18 | `humanoid.py` | parametro `stacco` (spazio fra braccia e busto, fra le gambe), 0 di default | Come sopra. |

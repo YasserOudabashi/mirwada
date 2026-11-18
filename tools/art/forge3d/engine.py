@@ -34,7 +34,7 @@ def rotm(rx=0.0, ry=0.0, rz=0.0):
 
 class Inst:
     """Una forma gia' posizionata nello spazio del modello."""
-    __slots__ = ("shape", "c", "R", "size", "mat", "soft", "tex", "rad", "mi")
+    __slots__ = ("shape", "c", "R", "size", "mat", "soft", "tex", "rad", "mi", "grp")
 
     def __init__(self, shape, c, R, size, mat, soft=0.0, tex=None):
         self.shape, self.c, self.R, self.size = shape, np.asarray(c, float), R, np.asarray(size, float)
@@ -47,6 +47,7 @@ class Inst:
         else:  # cylinder / cone: size = (rx, ry, mezza altezza)
             self.rad = float(math.hypot(max(s[0], s[1]), s[2]))
         self.mi = 0
+        self.grp = 0            # parte del corpo (rig.instances): le linee tra parti diverse le staccano
 
 
 # ------------------------------------------------------------------------------------------------
@@ -205,7 +206,7 @@ def render(insts, size=(32, 32), ppu=1.0, ss=4, pitch=32.0, foot=(0.5, 0.9), lig
            outline="selout", outline_color="#181425", inner_lines=True, inner_thr=1.0,
            cleanup=True, shadow=True, shadow_r=(0.34, 0.14), cover=0.4, levels_bias=0.0, shadow_off=(0.0, 0.0),
            shadow_a=105,
-           ambient=0.12, mat_resolver=None):
+           ambient=0.12, mat_resolver=None, group_lines=False, group_thr=0.15):
     """Disegna le forme e ritorna un array RGBA uint8 (H, W, 4).
 
     size      (larghezza, altezza) in pixel del frame finale
@@ -214,6 +215,10 @@ def render(insts, size=(32, 32), ppu=1.0, ss=4, pitch=32.0, foot=(0.5, 0.9), lig
     pitch     inclinazione della camera in gradi (40 = vista 3/4 dall'alto, 90 = dall'alto, 0 = laterale)
     foot      posizione dei piedi nel frame (frazioni di larghezza e altezza)
     outline   "selout" (colorato sul lato in luce) | "dark" | "none"
+    group_lines  linea scura di 1 px dove si toccano due parti diverse del corpo (braccio davanti al busto, gamba
+                 contro gamba, testa sul collo): il pixel della parte piu' lontana diventa il tono piu' scuro del
+                 suo materiale. Stacca gli arti anche quando hanno lo stesso colore (manica = busto). La parte la
+                 decide rig.instances (Inst.grp); group_thr e' la differenza minima di profondita'.
     """
     W, H = size
     gw, gh = W * ss, H * ss
@@ -234,6 +239,7 @@ def render(insts, size=(32, 32), ppu=1.0, ss=4, pitch=32.0, foot=(0.5, 0.9), lig
     buf_p = np.zeros((gh, gw, 3))
     buf_m = np.full((gh, gw), -1, int)
     buf_i = np.full((gh, gw), -1, int)
+    buf_g = np.full((gh, gw), -1, int)
 
     # materiali usati
     mats = []
@@ -273,6 +279,7 @@ def render(insts, size=(32, 32), ppu=1.0, ss=4, pitch=32.0, foot=(0.5, 0.9), lig
         buf_p[r0:r1, c0:c1][better] = pl.reshape(shp + (3,))[better]
         buf_m[r0:r1, c0:c1][better] = ins.mi
         buf_i[r0:r1, c0:c1][better] = k
+        buf_g[r0:r1, c0:c1][better] = ins.grp
 
     # --- illuminazione a livelli discreti -------------------------------------------------------
     hit = buf_m >= 0
@@ -327,9 +334,20 @@ def render(insts, size=(32, 32), ppu=1.0, ss=4, pitch=32.0, foot=(0.5, 0.9), lig
 
     if cleanup:
         fin = _cleanup(fin, mats)
+    # la parte del corpo di ogni pixel: quella piu' presente fra i campioni del pixel
+    grp = None
+    if group_lines:
+        gb = buf_g.reshape(H, ss, W, ss).transpose(0, 2, 1, 3).reshape(H, W, ss * ss)
+        grp = np.full((H, W), -1, int)
+        best = np.zeros((H, W), int)
+        for gv in np.unique(gb[gb >= 0]):
+            cnt = (gb == gv).sum(2)
+            m = cnt > best
+            best[m] = cnt[m]
+            grp[m] = gv
 
     return _compose(fin, depth, mats, W, H, ppu, foot, outline, outline_color, inner_lines, inner_thr,
-                    shadow, shadow_r, shadow_off, shadow_a)
+                    shadow, shadow_r, shadow_off, shadow_a, grp, group_thr)
 
 
 def _neigh4(a, fill=-1):
@@ -360,7 +378,7 @@ def _cleanup(fin, mats):
 
 
 def _compose(fin, depth, mats, W, H, ppu, foot, outline, outline_color, inner_lines, inner_thr,
-             shadow, shadow_r, shadow_off=(0.0, 0.0), shadow_a=105):
+             shadow, shadow_r, shadow_off=(0.0, 0.0), shadow_a=105, grp=None, group_thr=0.15):
     rgba = np.zeros((H, W, 4), np.uint8)
     opaque = fin >= 0
     mi = np.where(opaque, fin // MAXLV, 0)
@@ -386,6 +404,14 @@ def _compose(fin, depth, mats, W, H, ppu, foot, outline, outline_color, inner_li
             if dx == -1: edge[:, 0] = False
             if dx == 1: edge[:, -1] = False
             # solo i pixel con livello non gia' al minimo (evita righe doppie)
+            if grp is not None:          # due parti diverse del corpo che si toccano: stacco anche se vicine
+                nb_g = np.roll(grp, (dy, dx), (0, 1))
+                tocco = opaque & nb_o & (grp != nb_g) & (grp >= 0) & (nb_g >= 0) & (depth - nb_d > group_thr)
+                if dy == -1: tocco[0, :] = False
+                if dy == 1: tocco[-1, :] = False
+                if dx == -1: tocco[:, 0] = False
+                if dx == 1: tocco[:, -1] = False
+                edge = edge | tocco
             sel = edge & (lv > 0)
             rgba[sel, :3] = dark[mi[sel]]
 

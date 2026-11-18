@@ -80,6 +80,7 @@ class Rig:
         Ry = rotm(0, 0, yaw)
         s = self.scale * scale
         res = []
+        gruppo = self.gruppi()
         for p in self.parts:
             Rj, oj = fk[p.joint]
             # "~<giunto>": (dx, dy, dz) schiaccia o allunga le forme del giunto (1 + d per asse, nel suo sistema):
@@ -88,8 +89,22 @@ class Rig:
             c = oj + Rj @ (p.pos * sq)
             Rp = p.rot if isinstance(p.rot, np.ndarray) else rotm(*p.rot)
             R = Rj @ Rp
-            res.append(Inst(p.shape, (Ry @ c) * s, Ry @ R, p.size * sq * s, p.mat, p.soft, p.tex))
+            ins = Inst(p.shape, (Ry @ c) * s, Ry @ R, p.size * sq * s, p.mat, p.soft, p.tex)
+            ins.grp = gruppo[p.joint]
+            res.append(ins)
         return res
+
+    TRONCO = ("root", "hips", "torso", "body", "b", "e")
+
+    def gruppi(self):
+        """La parte del corpo di ogni giunto, per le linee che staccano gli arti (render group_lines): un giunto
+        attaccato al tronco (root, bacino, busto, corpo) apre una parte sua; i suoi figli ne fanno parte (braccio,
+        avambraccio e arma sono un pezzo solo, la gamba col suo stinco)."""
+        out = {}
+        for i, n in enumerate(self.order):
+            j = self.joints[n]
+            out[n] = i if (j.parent is None or j.parent in self.TRONCO) else out.get(j.parent, i)
+        return out
 
 
 # --- pose e animazione ---------------------------------------------------------------------------

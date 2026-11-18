@@ -1619,3 +1619,19 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Regola nuova in CLAUDE.md: a fine sessione consumo.py, scrittura nell'archivio, build.py e ripubblicazione.
 - Aperto: le foto sono della modalita' luminosa e a mezzogiorno; mancano foto della cupa e del sottosuolo; gli
   oggetti mostrano le prime 400 dopo i filtri.
+
+## Dashboard rifatta e skill dell'arte divise, 2026-11-18
+- Dashboard (US-D07): dettaglio grande al centro, frecce e A/D per passare all'elemento accanto, zoom delle foto,
+  "Rifare" apre la nota, la nota si salva da sola e segna "da rifare", liste e griglie in riquadri scorrevoli con
+  filtro, schede informative per ogni cosa (tools/dashboard/info.py: dove si trova, chi c'e', cosa lascia, a cosa
+  serve, icone uguali), personaggi con tutte le animazioni, velocita', frame per frame e campo di prova coi tasti,
+  boss con le fasi spiegate a parole, libro da sfogliare. Pubblicata allo stesso link (versione 3).
+- Giudizi letti dall'archivio: 10 "rifare" sui luoghi di Mirwada (case tutte uguali, cattedrale, museo, mercato,
+  dogana, faro, cantiere, centro antico, campo di battaglia) e 6 "va bene". Poi l'utente: "e' tutto da rifare dove non
+  ho cliccato"; boss poco chiari; effetti delle abilita' tutti uguali tranne il colore.
+- Skill: sprite-forge divisa in sei skill di progetto (.claude/skills/arte-personaggi, arte-architettura, arte-mondo,
+  arte-effetti, arte-icone, arte-revisione) con le note dell'utente, le regole trovate (SLYNYRD, Lospec, guida VFX di
+  LoL) e i controlli. Motore: group_lines e stacco (spenti di default).
+- La prova con stacco e group_lines all'utente sembra peggio di prima: la testa diventa una palla e la faccia
+  sparisce. Conclusione: ritoccare i parametri del 3D non basta; serve una scelta di stile con l'utente prima di
+  rifare (prossimo passo, non iniziato per sua richiesta).
