@@ -227,3 +227,8 @@ BOOK_DIAGRAMMA_RITUALE_ESITO_TRIBOLAZIONE,prima va superata la tribolazione,the 
 BOOK_DIAGRAMMA_RITUALE_OFFRI,Offri,Offer
 BOOK_DIAGRAMMA_RITUALE_NON_HAI,Non hai di che offrirlo,You have nothing to offer for it
 BOOK_DIAGRAMMA_AVANZAMENTO_FINE,Sei alla Sequenza 0: non c'e' un gradino oltre,You are at Sequence 0: there is no step beyond
+HUD_PROMPT_DOMA,[{tasto}] Avvicinati piano,[{tasto}] Approach slowly
+HUD_DOMA_SERVE,Ti serve: %s,You need: %s
+HUD_DOMA_RIUSCITA,%s ora ti segue.,%s now follows you.
+HUD_DOMA_FALLITA,Si e' spaventato ed e' scappato.,It got scared and ran off.
+HUD_DOMA_HAI_GIA,Hai gia' un compagno.,You already have a companion.

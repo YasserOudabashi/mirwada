@@ -1411,6 +1411,15 @@ def main():
                         err(f"data/pathways/{_pf} [{_s.get('id')}]: il luogo '{_t}' del rituale non e' un posto del mondo "
                             f"(regions.json luoghi_mondo / zone_anche, zona di un varco o di un interno)")
 
+    # 2026-11-18: dove vive ogni specie di pet selvatica (un luogo del mondo generato) e il suo nutrimento
+    for _pf in sorted(os.listdir(os.path.join(DATA, "pets"))):
+        for _pet in (load_json(os.path.join(DATA, "pets", _pf)) or {}).get("pets", []):
+            _sel = _pet.get("selvatico")
+            if _sel and mondo_doc is not None and _sel.get("luogo") not in mondo_doc.get("luoghi", {}):
+                err(f"data/pets/{_pf} [{_pet.get('id')}]: selvatico.luogo '{_sel.get('luogo')}' non e' un luogo di assets/world/mondo.json")
+            if _sel and not os.path.isfile(os.path.join(ROOT, "assets", "placeholder", f"pet_{_pet.get('id')}_idle.png")):
+                err(f"data/pets/{_pf} [{_pet.get('id')}]: manca la figura pet_{_pet.get('id')}_idle.png")
+
     # US-8B91: la barca parte ormeggiata vicino a un luogo del mondo generato
     _mezzi = load_json(os.path.join(DATA, "world", "mezzi.json")) or {}
     # US-8B93: la chiave del volo e' un oggetto che non si vende (venduto, si perderebbe il volo)

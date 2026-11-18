@@ -1771,6 +1771,22 @@
       "notes": "FATTA 2026-11-17. 'carica' (scaricatore, colosso, cervo): dentro 'da' fa il tell, scatta in linea verso il giocatore con l'arco attivo davanti, si ferma contro un muro, addosso al giocatore o a fine durata, poi resta scoperto recupero_s (1,4 s). 'volo' (corvo, sciame, pipistrello, gabbiano): maschera delle collisioni senza lo strato dei dislivelli (l'acqua ferma ancora), figura piu' in alto che ondeggia. Numeri in balance.json nemico_base.carica e .volo. tests/test_nemico_carica_volo.gd (2). Schermo: arte/revisione/nemico_carica_volo.png."
     },
     {
+      "id": "US-1503b",
+      "title": "Il pet si doma nel mondo",
+      "description": "Il compagno animale c'era nei sistemi (PetSystem) ma nel gioco non si poteva avere. Decisione dell'utente (2026-11-18): si doma nel mondo.",
+      "acceptanceCriteria": [
+        "ogni specie vive in un luogo dei dati (data/pets selvatico)",
+        "con il suo nutrimento nello zaino interagisci prova a domarla (domabilita' dei dati); se va male scappa fino al prossimo momento",
+        "domata ti segue con la sua figura ed e' un'Ancora",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 67,
+      "fase": "15",
+      "passes": true,
+      "notes": "FATTA 2026-11-18. data/pets/core.json 'selvatico' (lupo cinereo alla galleria di alberi della Valle, corvo veggente al cimitero di Mirwada, capra lunare alla scalinata dell'Archivio); pastura spirituale in vendita da Sidon e Vesna. scripts/world/pet_mondo.gd (figlio del mondo): i selvatici, prova_a_domare, il compagno che segue. tests/test_pet_mondo.gd (4). Schermo: arte/revisione/pet_nel_mondo.png. Il pet non combatte ancora (i comportamenti 'difendi' ecc. dei dati restano da fare con i nemici)."
+    },
+    {
       "id": "US-1504",
       "title": "Arte dei tipi di nemico",
       "description": "Un aspetto per tipo di nemico generato con forge3d (stessi frame e tempi di nemico_base in animations.json), uno per regione e uno per il sottosuolo, con le due modalita' (luminosa e cupa).",

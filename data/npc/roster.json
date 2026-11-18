@@ -129,7 +129,8 @@
           "terra_di_cimitero",
           "terriccio_di_prima_luna",
           "velo_di_mezzanotte",
-          "zanna_di_latte"
+          "zanna_di_latte",
+          "pastura_spirituale"
         ]
       },
       "dialogue_id": "dlg_sidon",
@@ -193,7 +194,8 @@
           "seme_dell_albero_madre",
           "seme_di_stella_cadente",
           "seme_dormiente",
-          "voto_infranto_alla_radice"
+          "voto_infranto_alla_radice",
+          "pastura_spirituale"
         ]
       },
       "dialogue_id": "dlg_vesna",

@@ -1505,3 +1505,16 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Lasciato e scritto fra i limiti del generatore in CLAUDE.md: la barca di prua e di poppa resta corta (la vista la
   schiaccia).
 - 1090 test, validate 0.
+
+## Cose aperte messe a posto (4): il pet si doma nel mondo, 2026-11-18 (decisione dell'utente)
+- Prima PetSystem.doma non lo chiamava nessuno: il compagno, l'Ancora del pet e i sacrifici "di creature" erano
+  irraggiungibili. Ora (US-1503b): data/pets/core.json "selvatico" {luogo, scostamento} per specie: lupo cinereo
+  (galleria di alberi, Valle), corvo veggente (cimitero, Mirwada), capra lunare (scalinata dell'Archivio). Pastura
+  spirituale in vendita da Sidon e Vesna.
+- scripts/world/pet_mondo.gd (nodo "Pet" del mondo): i selvatici con la loro figura e il prompt "Avvicinati piano";
+  interagisci: senza pastura "Ti serve: ...", altrimenti se ne consuma una e PetSystem.doma (domabilita' dei dati);
+  se va male "Si e' spaventato" e la specie torna al prossimo momento del giorno; se va bene il compagno segue Enel
+  (aspetta fuori dagli interni, raggiunge dopo un viaggio) ed e' un'Ancora. Testi in strings.csv HUD_DOMA_*.
+- Validator: il luogo esiste e la figura c'e'. tests/test_pet_mondo.gd (4). 1094 test, validate 0.
+- Schermo (Xvfb, Moon, cimitero di Mirwada): il corvo selvatico col prompt, domato al primo tentativo, poi segue Enel.
+  arte/revisione/pet_nel_mondo.png. Resta: il pet non combatte (con i nemici, fase 15).

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "_comment": "Specie di pet (US-321). Lo stato del pet attivo (bond/hp/sequenza correnti) sta in PetSystem + save, non qui. Un solo pet per volta (US-322). Il pet E' un'Ancora: ancora_id punta a data/anchors.json. avanzamento (US-324): soglia_bond + nutrimento (un consumabile con nutre_pet) + hp_per_sequenza (la curva, nei dati non nel codice; 9 = hp_max).",
+  "_comment": "Specie di pet (US-321). Lo stato del pet attivo (bond/hp/sequenza correnti) sta in PetSystem + save, non qui. Un solo pet per volta (US-322). Il pet E' un'Ancora: ancora_id punta a data/anchors.json. avanzamento (US-324): soglia_bond + nutrimento (un consumabile con nutre_pet) + hp_per_sequenza (la curva, nei dati non nel codice; 9 = hp_max). 'selvatico' (2026-11-18, decisione dell'utente: il pet si doma nel mondo): dove vive la specie (un luogo di assets/world/mondo.json piu' uno scostamento in caselle). Ci si avvicina con il suo nutrimento nello zaino e si preme interagisci: se ne consuma uno e si tira la domabilita'; se va male scappa e torna al prossimo momento del giorno (scripts/world/pet_mondo.gd).",
   "pets": [
     {
       "id": "lupo_cinereo",
@@ -10,6 +10,7 @@
       "hp_max": 60,
       "sequenza_iniziale": 9,
       "domabilita": 0.35,
+      "selvatico": {"luogo": "galleria_di_alberi", "scostamento": [6, -4]},
       "ancora_id": "anchor_pet",
       "abilita": ["tg_carica_spalla"],
       "comportamenti": [
@@ -30,6 +31,7 @@
       "hp_max": 28,
       "sequenza_iniziale": 9,
       "domabilita": 0.5,
+      "selvatico": {"luogo": "cimitero", "scostamento": [3, 2]},
       "ancora_id": "anchor_pet",
       "abilita": ["fool_divinazione_pendolo"],
       "comportamenti": [
@@ -50,6 +52,7 @@
       "hp_max": 34,
       "sequenza_iniziale": 9,
       "domabilita": 0.6,
+      "selvatico": {"luogo": "scalinata_archivio", "scostamento": [-5, 4]},
       "ancora_id": "anchor_pet",
       "abilita": ["mother_dominio_druidico"],
       "comportamenti": [
