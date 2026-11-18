@@ -9,7 +9,8 @@
   "barre": {
     "vita":        {"larghezza": 100, "altezza": 6, "toni": ["#a22633", "#e43b44", "#f6757a"], "scia": "#ead4aa", "emblema": "cuore"},
     "spirito":     {"larghezza": 84, "altezza": 4, "toni": ["#124e89", "#0099db", "#2ce8f5"], "scia": "#c0cbdc", "emblema": "goccia"},
-    "recitazione": {"larghezza": 84, "altezza": 2, "toni": ["#be4a2f", "#feae34", "#fee761"], "scia": "#feae34", "emblema": "maschera"}
+    "recitazione": {"larghezza": 84, "altezza": 2, "toni": ["#be4a2f", "#feae34", "#fee761"], "scia": "#feae34", "emblema": "maschera"},
+    "boss":        {"larghezza": 200, "altezza": 5, "toni": ["#68386c", "#b55088", "#f6757a"], "scia": "#ead4aa", "dall_alto": 8}
   },
   "scia": {"attesa_s": 0.45, "discesa_per_s": 0.55, "salita_s": 0.25},
   "poca_vita": {"soglia": 0.3, "battito_s": 0.9},

@@ -21,6 +21,7 @@ extends TileMapLayer
 signal uscita
 
 const TILE := 32
+const Boss := preload("res://scripts/boss.gd")
 const SORGENTE := 0
 const _COLONNA_PER_CARATTERE := {
 	".": 0, "#": 1, "o": 2, "~": 3, ",": 4, "=": 5, "t": 6, "+": 7,
@@ -385,6 +386,8 @@ func _su_ingresso_uscita(body: Node, area: Area2D) -> void:
 func _crea_nemici(layout: Dictionary) -> void:
 	for n in (layout.get("nemici", []) as Array):
 		var spec: Dictionary = n as Dictionary
+		if Boss.vinto(spec):                              # US-1505: un boss battuto non torna
+			continue
 		var sequenza: int = int(spec.get("sequenza", 9))
 		var e: Node = preload("res://scenes/enemy.tscn").instantiate()
 		var ov: Dictionary = (spec.get("override", {}) as Dictionary).duplicate(true)
@@ -398,6 +401,7 @@ func _crea_nemici(layout: Dictionary) -> void:
 			Vector2i(int(spec.get("x", 0)), int(spec.get("y", 0))))))
 		e.set("sequenza", sequenza)
 		e.get_node("StatsComponent").call("configure_from_balance", sequenza)
+		Boss.monta(e, spec)
 
 
 ## Gli oggetti a terra dei dati; uno preso non ricompare (WorldState.presi, chiave "<interno>@<i>", per gli ospiti del

@@ -1573,3 +1573,27 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - 41 tipi su 42 con la loro figura (resta il brigante, che e' il foglio base). 1095 test verdi, validator 0 errori.
 - Aperto: la barca vista di prua e' corta (limite noto); morendo affonda e il fondo della cella la taglia (si legge
   come l'acqua). Le figure dei boss sono US-1506.
+
+## US-1505 — Boss con le fasi, 2026-11-18
+- Dati: `balance.json boss` coi 6 boss confermati dall'utente (Re dei Ratti, Madre delle Radici, Archivista Capo,
+  Custode senza Nome, Gigante sul Trono, Burattinaio): `vita_x`, `fasi` (3 i primi, 4 Gigante e Burattinaio) con
+  `cfg` (danno, tell, recupero, postura, comportamento che cambia: il Gigante alterna mischia e carica) e `gregari`
+  (ratti, germogli, scrivani e glifi, scheletri, soldati e alfieri, marionette, maschere e il Doppio), `arena`.
+  Nomi `boss.<id>` in it/en. Layout: `"boss"` su belva->scaricatore (fogne), madre dei lupi->guardiana (Valle),
+  custode del sapere (Archivio), burattinaio (Frontiera); due nuovi nelle Marche: custode della cripta alla cripta
+  (finisce nell'interno del varco: per questo `Boss.monta` anche in interior_scene.gd) e colosso al trono.
+- Codice: `scripts/boss.gd` (nodo dentro il nemico): vita moltiplicata, fase 0 all'ingaggio, poi a ogni soglia la
+  cfg si somma alla cfg del nemico e arrivano i gregari in cerchio (un colpo grosso fa tutte le fasi saltate);
+  arena: si chiude all'ingaggio, il bordo non si passa, si riapre alla morte del boss o del giocatore o se si finisce
+  oltre raggio x fuga_x (porta, teletrasporto); battuto non torna. `scripts/boss_arena.gd`: cerchio a trattini con
+  contorno scuro (il primo, sottile e verde, sul bosco non si vedeva), z -4 (sopra il terreno, sotto le figure).
+  `hud.gd mostra_boss/nascondi_boss`: nome e barra in alto al centro (hud.json barre.boss). `mondo.gd _radura`: il
+  boss va nella casella libera piu' vicina non coperta da chiome (la Madre stava sotto gli alberi e non si vedeva).
+- Validator: fasi (>=3, da 1.0 a scendere), chiavi della cfg, comportamento (mai volo), tipo dei gregari, arena;
+  `boss` dei layout esiste. Barra boss nei colori dell'HUD.
+- Verifica: `tests/test_boss.gd` (5 test). A schermo `tests/manual/qa_boss.gd` (Xvfb): Madre delle Radici e Archivista
+  Capo: nome e barra in alto, arena tratteggiata, scrivani alla seconda fase, giocatore portato a 400 unita' tenuto a
+  170 (il raggio), alla morte arena aperta e boss segnato come battuto. 1100 test verdi, validator 0 errori.
+- Note: il Burattinaio e l'Archivista non si raggiungono a Sequenza 9 (gating delle regioni: la prova a schermo li ha
+  fatti tornare alla partenza, corretto cosi'). Aperto: figure grandi dei boss (US-1506); i boss di zona del
+  sottosuolo (fogne) si vedono solo scendendo, da provare giocando.

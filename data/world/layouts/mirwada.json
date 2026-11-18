@@ -127,11 +127,12 @@
       "scala": 1.0
     },
     {
-      "tipo": "belva_dei_moli",
+      "tipo": "scaricatore_ubriaco",
       "x": 34,
       "y": 33,
       "sequenza": 8,
       "scala": 1.5,
+      "boss": "re_dei_ratti",
       "override": {
         "caratteristica": {
           "pathway_id": "twilight_giant",

@@ -139,11 +139,12 @@
       "scala": 1.0
     },
     {
-      "tipo": "madre_dei_lupi",
+      "tipo": "guardiana_delle_radici",
       "x": 44,
       "y": 31,
       "sequenza": 7,
       "scala": 1.5,
+      "boss": "madre_delle_radici",
       "override": {
         "caratteristica": {
           "pathway_id": "mother",

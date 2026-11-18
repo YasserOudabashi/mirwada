@@ -138,6 +138,7 @@
       "y": 38,
       "sequenza": 6,
       "scala": 1.5,
+      "boss": "archivista_capo",
       "override": {
         "caratteristica": {
           "pathway_id": "hermit",

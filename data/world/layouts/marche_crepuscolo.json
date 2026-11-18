@@ -119,6 +119,28 @@
   },
   "nemici": [
     {
+      "tipo": "custode_della_cripta",
+      "x": 36,
+      "y": 34,
+      "sequenza": 6,
+      "scala": 1.5,
+      "boss": "custode_senza_nome",
+      "override": {
+        "drop_probabilita": 1.0
+      }
+    },
+    {
+      "tipo": "colosso_arrugginito",
+      "x": 50,
+      "y": 34,
+      "sequenza": 5,
+      "scala": 1.5,
+      "boss": "gigante_sul_trono",
+      "override": {
+        "drop_probabilita": 1.0
+      }
+    },
+    {
       "tipo": "soldato_caduto",
       "x": 7,
       "y": 8,

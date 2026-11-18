@@ -1859,8 +1859,8 @@
       ],
       "priority": 69,
       "fase": "15",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+      "passes": true,
+      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md. Fatta il 2026-11-18: balance.json boss (6 boss, 3 fasi i primi e 4 i finali), scripts/boss.gd (vita_x, fasi con cfg e gregari, arena, un boss battuto non torna: WorldState 'boss:<id>'), scripts/boss_arena.gd, barra nell'HUD (hud.json barre.boss). Nei layout 'boss': <id> su 6 nemici (due nuovi nelle Marche: cripta e trono). Le figure proprie sono US-1506. Diff sopra le 200 righe (sistema + dati + test), tenuto insieme perche' le parti non si provano separate."
     },
     {
       "id": "US-1506",

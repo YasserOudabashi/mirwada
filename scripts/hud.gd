@@ -24,6 +24,8 @@ var _stati: HBoxContainer = null
 var _cd_accum: float = 0.0
 var _tempo: float = 0.0
 var _durate: Dictionary = {}       # status -> durata vista quando e' comparso (per la linea del tempo)
+var _boss: VBoxContainer = null    # US-1505: nome e barra del boss in alto al centro, solo ad arena chiusa
+var _boss_stats: Node = null
 
 
 func _ready() -> void:
@@ -309,3 +311,49 @@ func _aggiorna_hotbar() -> void:
 		var cd_tot: float = maxf(float(ab.get("cooldown", 0.0)), cd)
 		s.call("imposta", aid, _icona_abilita(gd, ab), cd / cd_tot if cd_tot > 0.0 else 0.0,
 			float(ab.get("costo_spiritualita", 0.0)) > sp)
+
+
+## US-1505: la barra del boss (hud.json barre.boss) col suo nome, in alto al centro. La chiama scripts/boss.gd quando
+## l'arena si chiude; nascondi_boss quando si riapre.
+func mostra_boss(nome: String, stats: Node) -> void:
+	nascondi_boss()
+	_boss = VBoxContainer.new()
+	_boss.name = "Boss"
+	_boss.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_boss.add_theme_constant_override("separation", 1)
+	var dati: Dictionary = (_cfg.get("barre", {}) as Dictionary).get("boss", {})
+	var larg: float = float(dati.get("larghezza", 200))
+	_boss.anchor_left = 0.5
+	_boss.anchor_right = 0.5
+	_boss.offset_left = -larg / 2.0
+	_boss.offset_right = larg / 2.0
+	_boss.offset_top = float(dati.get("dall_alto", 10))
+	var l := Label.new()
+	l.text = nome
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.add_theme_font_size_override("font_size", int((_cfg.get("numeri", {}) as Dictionary).get("corpo", 8)))
+	l.add_theme_constant_override("outline_size", 3)
+	l.add_theme_color_override("font_outline_color", Color(str(_cfg.get("contorno", "#181425"))))
+	_boss.add_child(l)
+	var b: Control = Barra.new()
+	b.name = "Barra"
+	b.call("configura", dati, _cfg)
+	_boss.add_child(b)
+	$Root.add_child(_boss)
+	_boss_stats = stats
+	b.call("imposta", float(stats.get("hp")) / maxf(stats.get_stat("hp_max"), 1.0), true)
+	stats.hp_changed.connect(_su_hp_boss)
+
+
+func nascondi_boss() -> void:
+	if _boss_stats != null and is_instance_valid(_boss_stats) and _boss_stats.hp_changed.is_connected(_su_hp_boss):
+		_boss_stats.hp_changed.disconnect(_su_hp_boss)
+	_boss_stats = null
+	if _boss != null and is_instance_valid(_boss):
+		_boss.queue_free()
+	_boss = null
+
+
+func _su_hp_boss(hp: float, hp_max: float) -> void:
+	if _boss != null and is_instance_valid(_boss):
+		_boss.get_node("Barra").call("imposta", hp / maxf(hp_max, 1.0))

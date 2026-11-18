@@ -1957,7 +1957,30 @@ def main():
         if not os.path.isfile(os.path.join(ROOT, "assets", "placeholder", _foglio_t)):
             err(f"{_ctx}: aspetto '{_asp_t}' senza foglio assets/placeholder/{_foglio_t} (tools/art/build_nemici.py)")
 
+    # US-1505: i boss (balance.json boss; il nome lo controlla R-12): fasi a soglie che scendono da 1.0, cfg con chiavi di nemico_base
+    # (piu' comportamento, mai volo), gregari di un tipo vero, arena con raggio e colore
+    boss_dati = {k: v for k, v in (_bal_nemici.get("boss", {}) or {}).items() if not k.startswith("_")}
+    for _bid, _bd in boss_dati.items():
+        _ctx = f"data/balance.json boss [{_bid}]"
+        _soglie = [float(f.get("da", -1)) for f in _bd.get("fasi", [])]
+        if len(_soglie) < 3 or _soglie[0] != 1.0 or any(a <= b for a, b in zip(_soglie, _soglie[1:])) or _soglie[-1] <= 0:
+            err(f"{_ctx}: fasi {_soglie}: almeno 3, la prima da 1.0, poi soglie che scendono sopra 0")
+        for _f in _bd.get("fasi", []):
+            _cfg_f = _f.get("cfg", {})
+            _fuori = set(_cfg_f) - nemico_base_keys - {"comportamento"}
+            if _fuori:
+                err(f"{_ctx}: cfg di una fase con chiavi fuori da nemico_base: {sorted(_fuori)}")
+            if _cfg_f.get("comportamento") not in (None, "mischia", "distanza", "carica"):
+                err(f"{_ctx}: comportamento '{_cfg_f.get('comportamento')}' in una fase (mischia, distanza, carica)")
+            if _f.get("gregari") and _f["gregari"].get("tipo") not in nemici_tipi:
+                err(f"{_ctx}: gregari di tipo '{_f['gregari'].get('tipo')}' fuori da nemici_tipi")
+        _ar = _bd.get("arena", {})
+        if float(_ar.get("raggio", 0)) <= 0 or not re.fullmatch(r"#[0-9a-fA-F]{6}", str(_ar.get("colore", ""))):
+            err(f"{_ctx}: arena senza raggio o colore #rrggbb")
+
     def _controlla_tipo(rel, nm):
+        if nm.get("boss") is not None and nm["boss"] not in boss_dati:
+            err(f"{rel}: nemico a ({nm.get('x')},{nm.get('y')}) con boss '{nm['boss']}' fuori da balance.json boss")
         if nm.get("tipo") not in nemici_tipi:
             err(f"{rel}: nemico a ({nm.get('x')},{nm.get('y')}) senza un tipo di balance.json nemici_tipi ('{nm.get('tipo')}')")
     if os.path.isdir(layouts_dir):
@@ -2942,12 +2965,12 @@ def main():
     if _hud is None:
         err("data/ui/hud.json: mancante o illeggibile (US-8B75d)")
     else:
-        _icone_hud = [b.get("emblema") for b in _hud.get("barre", {}).values()] + [_hud.get("avanzamento", {}).get("icona")]
+        _icone_hud = [b.get("emblema") for b in _hud.get("barre", {}).values() if b.get("emblema")] + [_hud.get("avanzamento", {}).get("icona")]
         _icone_hud += ["cifra_%d" % i for i in range(1, 5)]
         for _ic in _icone_hud:
             if not os.path.isfile(os.path.join(ROOT, "assets", "ui", "hud", f"{_ic}.png")):
                 err(f"data/ui/hud.json: manca assets/ui/hud/{_ic}.png (python tools/art/build_hud.py)")
-        for _id in ("vita", "spirito", "recitazione"):
+        for _id in ("vita", "spirito", "recitazione", "boss"):
             _b = _hud.get("barre", {}).get(_id)
             if _b is None:
                 err(f"data/ui/hud.json: manca la barra '{_id}'")

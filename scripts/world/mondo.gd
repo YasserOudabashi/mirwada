@@ -366,6 +366,7 @@ func luogo_del_tag(rid: String, tag: String) -> Vector2i:
 # stessa regione. La campagna (fuori dalle regioni) finisce nella terra di mezzo.
 
 const SCALA_LAYOUT := 2.0
+const Boss := preload("res://scripts/boss.gd")
 const REGIONE_CAMPAGNA := "terra_di_mezzo"
 const INTERVALLO_ATTIVITA := 0.4
 const SOGLIA_LIBERA := [0, 1, 2, 3]          # la soglia di una porta e le 3 caselle sotto (_casa_piu_vicina)
@@ -403,7 +404,7 @@ func popola() -> void:
 ## ogni casella occupata, cosi' resta l'insieme da evitare per i nemici.
 func _popola_da(rid_eventi: String, rid: String, layout: Dictionary, occupate: Dictionary, vietate: Dictionary) -> void:
 	var dietro: Array = (_zone_dei_varchi().get(rid, {}) as Dictionary).values()   # quelle stanno negli interni
-	var nemici: Array = (layout.get("nemici", []) as Array).filter(func(n): return not _in_rect(n, dietro))
+	var nemici: Array = (layout.get("nemici", []) as Array).filter(func(n): return not _in_rect(n, dietro) and not Boss.vinto(n))
 	var drop: Dictionary = layout.get("drop", {})
 	_nemici_vivi[rid_eventi] = nemici.size()
 	_senza_abilita[rid_eventi] = true
@@ -411,6 +412,8 @@ func _popola_da(rid_eventi: String, rid: String, layout: Dictionary, occupate: D
 		var spec: Dictionary = n
 		var posto: Dictionary = posto_dal_layout(rid, layout, int(spec.get("x", 0)), int(spec.get("y", 0)), vietate)
 		var c: Vector2i = posto["cella"]
+		if spec.has("boss") and posto["livello"] == "superficie":   # US-1505: il boss si vede, mai sotto le chiome
+			c = _radura(c)
 		occupate[c] = true
 		vietate[c] = true
 		var sequenza: int = int(spec.get("sequenza", 9))
@@ -428,6 +431,7 @@ func _popola_da(rid_eventi: String, rid: String, layout: Dictionary, occupate: D
 		_mostra(e, posto["livello"] == livello)
 		e.set("sequenza", sequenza)
 		e.get_node("StatsComponent").call("configure_from_balance", sequenza)
+		Boss.monta(e, spec)                              # US-1505: fasi, gregari, arena e barra (balance.json boss)
 		e.connect("morto", _su_nemico_morto.bind(rid_eventi))
 	var ws: Node = Engine.get_main_loop().root.get_node_or_null("WorldState")
 	var oggetti: Array = layout.get("oggetti", [])
@@ -1611,6 +1615,20 @@ func cella_libera(c: Vector2i, occupate: Dictionary = {}, chiave: String = "", r
 				if primo < 0:
 					primo = r
 	return scelta
+
+
+## La casella libera piu' vicina a c che nessun oggetto di scena copre, lei e quella sopra (la testa di un boss).
+func _radura(c: Vector2i, raggio_max: int = 16) -> Vector2i:
+	for r in range(0, raggio_max):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				if maxi(absi(dx), absi(dy)) != r:
+					continue
+				var q := Vector2i(c.x + dx, c.y + dy)
+				if not bloccata(q.x, q.y) and not coperto((Vector2(q) + Vector2(0.5, 0.5)) * tile) \
+						and not coperto((Vector2(q) + Vector2(0.5, -0.5)) * tile):
+					return q
+	return c
 
 
 func _vicino_occupato(q: Vector2i, occupate: Dictionary) -> bool:

@@ -205,6 +205,53 @@
       "angolo": 120
     }
   },
+  "boss": {
+    "_comment": "US-1505: un boss e' un dato. Nel layout un nemico con 'boss': <id> prende questo (scripts/boss.gd): vita_x moltiplica la sua vita; 'fasi' a soglie di vita ('da' = frazione da cui comincia, la prima 1.0): entrando in una fase la sua 'cfg' (chiavi di nemico_base, piu' 'comportamento' tranne volo) si somma al nemico e arrivano i 'gregari' (un tipo di nemici_tipi, quanti) in cerchio a gregari_distanza unita'. 'arena': quando il boss ti affronta si chiude un cerchio di 'raggio' unita' (colore Endesga 32) che non si lascia; si riapre alla sua morte, alla tua, o se finisci piu' lontano di raggio x fuga_x (una porta, un teletrasporto). Tre fasi i primi boss, quattro i finali (bestiario dell'utente). La figura propria e' US-1506: per ora quella del tipo del layout. Numeri plausibili, non bilanciati.",
+    "re_dei_ratti": {"name_i18n": "boss.re_dei_ratti", "vita_x": 5, "gregari_distanza": 40,
+      "arena": {"raggio": 150, "colore": "#b86f50"},
+      "fasi": [
+        {"da": 1.0},
+        {"da": 0.66, "cfg": {"recupero_s": 0.45}, "gregari": {"tipo": "ratto_delle_fogne", "quanti": 3}},
+        {"da": 0.33, "cfg": {"danno_attacco": 18, "telegraph": "wind_up_light", "recupero_s": 0.3}, "gregari": {"tipo": "ratto_delle_fogne", "quanti": 4}}
+      ]},
+    "madre_delle_radici": {"name_i18n": "boss.madre_delle_radici", "vita_x": 6, "gregari_distanza": 48,
+      "arena": {"raggio": 170, "colore": "#fee761"},
+      "fasi": [
+        {"da": 1.0},
+        {"da": 0.66, "cfg": {"danno_attacco": 11}, "gregari": {"tipo": "germoglio_spinoso", "quanti": 2}},
+        {"da": 0.33, "cfg": {"comportamento": "mischia", "danno_attacco": 16, "recupero_s": 0.4}, "gregari": {"tipo": "germoglio_spinoso", "quanti": 3}}
+      ]},
+    "archivista_capo": {"name_i18n": "boss.archivista_capo", "vita_x": 6, "gregari_distanza": 44,
+      "arena": {"raggio": 160, "colore": "#b55088"},
+      "fasi": [
+        {"da": 1.0},
+        {"da": 0.66, "cfg": {"comportamento": "distanza"}, "gregari": {"tipo": "scrivano_di_carta", "quanti": 2}},
+        {"da": 0.33, "cfg": {"comportamento": "mischia", "danno_attacco": 20, "recupero_s": 0.35}, "gregari": {"tipo": "glifo_vivente", "quanti": 2}}
+      ]},
+    "custode_senza_nome": {"name_i18n": "boss.custode_senza_nome", "vita_x": 7, "gregari_distanza": 44,
+      "arena": {"raggio": 150, "colore": "#8b9bb4"},
+      "fasi": [
+        {"da": 1.0, "cfg": {"postura_massimo": 260}},
+        {"da": 0.66, "cfg": {"postura_massimo": 200}, "gregari": {"tipo": "scheletro_catacombe", "quanti": 3}},
+        {"da": 0.33, "cfg": {"postura_massimo": 140, "danno_attacco": 24, "recupero_s": 0.5}, "gregari": {"tipo": "scheletro_catacombe", "quanti": 2}}
+      ]},
+    "gigante_sul_trono": {"name_i18n": "boss.gigante_sul_trono", "vita_x": 9, "gregari_distanza": 56,
+      "arena": {"raggio": 200, "colore": "#feae34"},
+      "fasi": [
+        {"da": 1.0, "cfg": {"comportamento": "mischia"}},
+        {"da": 0.75, "cfg": {"comportamento": "carica"}, "gregari": {"tipo": "soldato_caduto", "quanti": 2}},
+        {"da": 0.5, "cfg": {"comportamento": "mischia", "danno_attacco": 26}, "gregari": {"tipo": "alfiere_spettrale", "quanti": 2}},
+        {"da": 0.25, "cfg": {"comportamento": "carica", "danno_attacco": 30, "recupero_s": 0.35}}
+      ]},
+    "burattinaio": {"name_i18n": "boss.burattinaio", "vita_x": 9, "gregari_distanza": 52,
+      "arena": {"raggio": 190, "colore": "#68386c"},
+      "fasi": [
+        {"da": 1.0, "gregari": {"tipo": "marionetta_del_teatro", "quanti": 2}},
+        {"da": 0.75, "gregari": {"tipo": "maschera_senza_volto", "quanti": 2}},
+        {"da": 0.5, "cfg": {"danno_attacco": 20}, "gregari": {"tipo": "il_doppio", "quanti": 1}},
+        {"da": 0.25, "cfg": {"comportamento": "mischia", "danno_attacco": 24, "recupero_s": 0.3}, "gregari": {"tipo": "marionetta_del_teatro", "quanti": 3}}
+      ]}
+  },
   "nemici_tipi": {
     "_comment": "US-1501: un tipo di nemico e' un dato. enemy.gd parte da nemico_base, ci mette sopra il tipo e poi l'override dell'istanza (posto del layout). 'rarita': comune (tell lungo, leggibile: wind_up_heavy), raro ed elite (tell corto, teso: wind_up_light), come ha deciso l'utente nel bestiario. 'comportamento' (vocabolario chiuso: mischia, distanza, carica, volo): fino a US-1502/1503 tutti combattono in mischia. 'aspetto': i fogli nemico_base_<aspetto>_<anim> di tools/art/build_nemici.py (US-1504), 'nemico_base' = il foglio di base. Numeri plausibili, non bilanciati.",
     "tagliaborse": {

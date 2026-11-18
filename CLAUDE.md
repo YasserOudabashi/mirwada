@@ -199,6 +199,13 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - Nel gioco la forma e' legata al suo modificatore (`StatsComponent.imposta_forma`, segnale `forma_cambiata`): il
   player cambia fogli quando comincia e torna Enel quando il modificatore se ne va, in qualunque modo.
 
+### Boss
+- US-1505: un boss e' un dato (`balance.json boss.<id>`): `vita_x`, `fasi` a soglie di vita (`da`; la `cfg` con chiavi di
+  `nemico_base` piu' `comportamento`, i `gregari` di un tipo), `arena` (raggio, colore). Nel layout un nemico con
+  `"boss": <id>`; `scripts/boss.gd` (`Boss.monta` dal mondo e dagli interni) chiude l'arena all'ingaggio, la riapre
+  alla morte di uno dei due o se si finisce lontano, e mostra la barra in alto (`hud.gd mostra_boss`). Battuto non
+  torna (`WorldState` "boss:<id>"). Nel mondo il boss va nella radura piu' vicina, mai sotto una chioma.
+
 ### Cannocchiale
 - US-8B24a: cannocchiali fissi in `data/world/cannocchiali.json` (luogo, bersaglio); `scripts/cannocchiale.gd` fa volare
   una telecamera sua al bersaglio e il mondo si costruisce attorno a quella (mondo._process). Il primo e' sul molo del
