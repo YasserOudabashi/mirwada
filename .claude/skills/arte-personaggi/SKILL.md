@@ -17,9 +17,10 @@ Questa skill dice **come devono venire**; i comandi e i dati restano quelli di C
 ## Regole
 1. **Silhouette prima di tutto.** Riempi la figura di nero: deve restare riconoscibile (testa, due braccia, due gambe,
    arma). Se no, cambia la posa o le proporzioni, non i colori.
-2. **Arti staccati.** `humanoid(..., stacco=1.0..1.5)` allarga spalle e anche; il render con `group_lines=True` traccia
-   1 px scuro dove una parte del corpo tocca un'altra (braccio sul busto, gamba sulla gamba, testa sul collo).
-   Le maniche dello stesso colore del busto vanno comunque staccate: usa `group_lines`, non un colore a caso.
+2. **Arti staccati.** NON usare `stacco` + `group_lines=True` cosi' come sono: provati il 2026-11-18, l'utente li ha
+   bocciati ("fa ancora piu' pena": la testa diventa una palla marrone, le linee sporcano). Prima di ridisegnare si
+   decidono le scelte artistiche con l'utente (proporzioni, contorno, quante tinte), poi si prova su UNA figura,
+   la si fa giudicare nella dashboard e solo dopo si rifanno tutte.
 3. **Faccia.** Testa grande (`head` 1.0-1.15 per gli umani a 64 px), occhi di almeno 2 px con il bianco, capelli che
    lasciano libera la fronte (mai `hair_style` che copre tutta la testa vista di fronte). La pelle deve staccare dai
    capelli di almeno due toni.
@@ -32,7 +33,11 @@ Questa skill dice **come devono venire**; i comandi e i dati restano quelli di C
    - *rituale*: braccia alzate sopra la testa, aperte;
    - *tell del nemico* (`anticipo`): carica all'indietro esagerata, arma lontana dal corpo.
    Prova sempre la posa di lato: se di lato non si capisce, non si capisce.
-6. **Tempi.** I frame d'impatto si tengono (`durate_ms` in data/animations.json); il ciclo si chiude.
+6. **Tempi e numero di frame.** I frame d'impatto si tengono (`durate_ms` in data/animations.json); il ciclo si chiude.
+   L'utente vuole piu' frame (2026-11-18): walk 8, attacco leggero 6, pesante 8-10, morte 8 (l'ultimo resta a terra,
+   mai in ciclo), idle 4-6. Costo: un frame 64x64 RGBA e' 16 KB in memoria, 4 direzioni x 8 frame ~0.5 MB per
+   animazione; gli fps del gioco non cambiano (si disegna sempre un frame). Oltre ~15 fps effettivi la pixel art perde
+   carattere: piu' frame = movimento piu' morbido, non piu' veloce. Si cambia prima il JSON, poi si rigenera.
 7. **Boss.** Una figura grande (celle 96-128) con un segno che dice il suo modo di combattere: il Re dei Ratti e' coperto di
    ratti, la Madre delle Radici ha radici che toccano terra, il Custode senza Nome e' tutto armatura, il Gigante ha la
    spada piantata, il Burattinaio ha i fili. Ogni fase cambia qualcosa di **visibile** (colore degli occhi, arma, postura).

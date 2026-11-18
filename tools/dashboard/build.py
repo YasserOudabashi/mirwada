@@ -152,6 +152,48 @@ def mappa(mondo, tema="luminoso"):
     return {"file": "img/mappa.png", "w": W, "h": H, "scala": 2}
 
 
+def mappa_dettaglio(mondo, tema="luminoso"):
+    """La mappa da ingrandire fino alle caselle vere: le tessere del gioco e gli indici (la pagina compone solo il
+    pezzo che si vede), e gli oggetti di scena impacchettati in pochi atlanti con la loro ancora (come mondo.gd)."""
+    cart = os.path.join(ROOT, "assets", "world", tema)
+    dest = os.path.join(OUT, "img", "mondo")
+    os.makedirs(dest, exist_ok=True)
+    tessere = []
+    for k in range(int(mondo["fogli"][tema])):
+        shutil.copy(os.path.join(cart, f"tessere_{k}.png"), os.path.join(dest, f"tessere_{k}.png"))
+        tessere.append(f"img/mondo/tessere_{k}.png")
+    shutil.copy(os.path.join(cart, "indici.png"), os.path.join(dest, "indici.png"))
+    nomi = sorted({o[0] for o in mondo["oggetti"]})
+    ims = {n: Image.open(os.path.join(cart, "oggetti", n + ".png")).convert("RGBA") for n in nomi
+           if os.path.isfile(os.path.join(cart, "oggetti", n + ".png"))}
+    LARGO, atlanti, sprite = 2048, [], {}
+    fogli, x, y, riga = [Image.new("RGBA", (LARGO, LARGO))], 0, 0, 0
+    for n in sorted(ims, key=lambda n: -ims[n].height):        # scaffali: prima i piu' alti
+        im = ims[n]
+        if x + im.width > LARGO:
+            x, y, riga = 0, y + riga, 0
+        if y + im.height > LARGO:
+            fogli.append(Image.new("RGBA", (LARGO, LARGO)))
+            x, y, riga = 0, 0, 0
+        fogli[-1].paste(im, (x, y))
+        m = mondo["sprite"].get(n, {})
+        sprite[n] = [len(fogli) - 1, x, y, im.width, im.height, m.get("ax", 0), m.get("ay", 0)]
+        x += im.width
+        riga = max(riga, im.height)
+    for i, f in enumerate(fogli):
+        f.save(os.path.join(dest, f"oggetti_{i}.png"), optimize=True)
+        atlanti.append(f"img/mondo/oggetti_{i}.png")
+    nomi_ok = [n for n in nomi if n in sprite]
+    idx = {n: i for i, n in enumerate(nomi_ok)}
+    ogg = [[idx[o[0]], round(o[1], 2), round(o[2], 2)] for o in mondo["oggetti"] if o[0] in idx]
+    ogg.sort(key=lambda o: o[2])
+    with open(os.path.join(OUT, "mondo.json"), "w", encoding="utf-8") as f:
+        json.dump({"tile": mondo["tile"], "colonne": mondo["colonne_foglio"], "righe": mondo["righe_foglio"],
+                   "tessere": tessere, "indici": "img/mondo/indici.png", "atlanti": atlanti,
+                   "sprite": [sprite[n] for n in nomi_ok], "nomi": nomi_ok, "oggetti": ogg}, f, separators=(",", ":"))
+    return "mondo.json"
+
+
 # --- avanzamento ------------------------------------------------------------------------------------------------
 def git(*a):
     return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True).stdout
@@ -285,7 +327,7 @@ def tecniche():
                 a = abil.get(aid, {})
                 ab.append({"id": aid, "nome": tr(a.get("name_i18n"), aid), "costo": a.get("costo_spiritualita"),
                            "cd": a.get("cooldown"), "primitive": [x.get("tipo") for x in a.get("primitive", [])],
-                           "tag": a.get("tag_sinergia", []), "note": a.get("note", "")})
+                           "tag": a.get("tag_sinergia", []), "note": a.get("note", ""), "_prim": a.get("primitive", [])})
             seq.append({"n": s["sequence"], "nome": tr(s.get("name_i18n"), s.get("name")), "tier": s.get("tier"),
                         "concetto": s.get("concept", ""), "abilita": ab,
                         "recitazione": [x.get("descrizione", "") for x in s.get("acting_actions", [])]})
@@ -302,7 +344,9 @@ def tecniche():
             if os.path.isfile(src) and not any(x["sprite"] == nome for x in effetti):
                 shutil.copy(src, os.path.join(IMG, nome + ".png"))
                 effetti.append({"primitiva": pid, "sprite": nome, "file": f"img/{nome}.png", "frames": fr or 1,
-                                "lampo": bool(e.get("impact_frame"))})
+                                "lampo": bool(e.get("impact_frame")), "su": e.get("su", "chi_lancia"),
+                                "gira": bool(e.get("gira")), "vola": bool(e.get("sul_proiettile")),
+                                "scoppio": (e.get("scoppio") or {}).get("sprite") if nome == e.get("sprite") else None})
     return {"pathway": pw, "effetti": effetti}
 
 
@@ -357,7 +401,7 @@ def mondo():
             edifici_per_villaggio.setdefault(vic[0], {}).setdefault(tipo, 0)
             edifici_per_villaggio[vic[0]][tipo] += 1
     return {"w": m["larghezza"], "h": m["altezza"], "partenza": m["partenza"], "regioni": reg,
-            "riquadri": m["riquadri"], "mappa": mappa(m),
+            "riquadri": m["riquadri"], "mappa": mappa(m), "dettaglio": mappa_dettaglio(m),
             "luoghi": [{"id": k, "x": v[0], "y": v[1], "foto": foto.get("luogo:" + k)} for k, v in m["luoghi"].items()],
             "villaggi": [{"id": k, "x": v[0], "y": v[1], "foto": foto.get("villaggio:" + k),
                           "edifici": edifici_per_villaggio.get(k, {}), "porte": porte.get(k, [])} for k, v in m["villaggi"].items()],
@@ -389,6 +433,11 @@ def main():
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import info
     dati["info"] = info.costruisci(dati, tr)
+    for pw in dati["tecniche"]["pathway"]:                     # la frase precisa va anche sulla carta e nella prova
+        for sq in pw["sequenze"]:
+            for ab in sq["abilita"]:
+                ab["cosa"] = [info.spiega(p) for p in ab.pop("_prim")]
+    dati["previsti"] = json.load(open(os.path.join(ROOT, "tools", "dashboard", "previsti.json"), encoding="utf-8"))["voci"]
     dati["figure"] = FIGURE
     dati["atlanti"] = ATLANTI
     with open(os.path.join(OUT, "dati.json"), "w", encoding="utf-8") as f:

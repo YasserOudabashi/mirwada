@@ -14,20 +14,59 @@ from PIL import Image
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 DATA = os.path.join(ROOT, "data")
 
-# Cosa fa ogni primitiva, in parole semplici (solo per la dashboard: il gioco usa i parametri dei dati).
-PRIMITIVE = {
-    "projectile": "tira un colpo che vola dritto e colpisce il primo nemico", "melee_arc": "colpo a semicerchio davanti a se'",
-    "aura": "cerchio attorno a chi lancia che fa effetto a chi c'e' dentro", "dot": "danno a poco a poco nel tempo",
-    "heal": "cura", "buff_stat": "alza per un po' una statistica di chi lancia", "debuff_stat": "abbassa una statistica del nemico",
-    "dash": "scatto veloce in una direzione", "summon": "chiama una creatura che aiuta", "shield": "scudo che assorbe danno",
-    "transform": "cambia forma (fogli e statistiche della forma)", "teleport": "sparisce e ricompare poco piu' in la'",
-    "reveal_info": "mostra cose nascoste (pericoli, tesori, intenzioni)", "illusion": "crea un'immagine falsa che inganna",
-    "curse": "maledizione sul nemico", "possess": "prende il controllo di un nemico per un po'", "soul_sever": "strappa via l'anima: danno grosso",
-    "fear": "spaventa: il nemico scappa", "light_purify": "luce che toglie gli stati negativi", "steal": "ruba un oggetto o un effetto",
-    "bloom": "fa crescere piante: cura o intralcia", "decay": "fa marcire: danno spalmato nel tempo", "time_shift": "rallenta o accelera il tempo vicino",
-    "gate": "apre un passaggio", "conjure": "crea un oggetto", "mirage": "copia ingannevole", "grip": "trattiene il nemico sul posto",
-    "ward": "barriera che protegge un luogo",
-}
+# Cosa fa ogni primitiva: una frase precisa coi numeri dei dati e una semplice (solo per la dashboard).
+STAT = {"spiritualita_max": "spiritualita' massima", "hp_max": "vita massima", "velocita": "velocita'", "difesa": "difesa",
+        "evasione": "schivata", "precisione": "precisione", "percezione": "percezione", "danno": "danno", "forza": "forza"}
+
+
+def _pc(v, molt):
+    if v is None:
+        return ""
+    return f"{v * 100:+.0f}%" if molt else f"{v:+g}"
+
+
+def _s(v):
+    return "per sempre (finche' resta attiva)" if v in (-1, None) else ("all'istante" if v == 0 else f"per {v:g} secondi")
+
+
+def spiega(p):
+    """-> (frase precisa, frase semplice) per una primitiva coi suoi parametri."""
+    t, g = p.get("tipo"), p.get
+    st = STAT.get(g("stat"), str(g("stat", "")).replace("_", " "))
+    tag = f" ({str(g('tag_danno')).replace('_', ' ')})" if g("tag_danno") else ""
+    D = {
+        "projectile": (f"Tira un colpo da {g('danno')} di danno{tag} a velocita' {g('velocita')}, fino a {g('gittata')} caselle; "
+                       f"attraversa {g('pierce', 1)} nemic{'o' if g('pierce', 1) == 1 else 'i'}.", "Un colpo che vola dritto davanti a te."),
+        "melee_arc": (f"Colpo a ventaglio di {g('angolo')} gradi, raggio {g('raggio')} caselle: {g('danno')} di danno{tag}, "
+                      f"{g('stagger')} di sbilanciamento.", "Un fendente davanti a te."),
+        "aura": (f"Cerchio di {g('raggio')} caselle attorno a te {_s(g('durata'))}: ogni {g('tick_rate')} s applica "
+                 f"'{str(g('effetto')).replace('_', ' ')}' a {str(g('bersagli', '')).replace('_', ' ')}.", "Un'area attorno a te che fa effetto a chi ci sta dentro."),
+        "buff_stat": (f"{st.capitalize()} {_pc(g('valore'), g('moltiplicativo'))} {_s(g('durata'))}.", f"Ti rende piu' forte in {st} per un tempo."),
+        "debuff_stat": (f"{st.capitalize()} del bersaglio {_pc(g('valore'), g('moltiplicativo'))} {_s(g('durata'))}.", f"Indebolisce il nemico in {st}."),
+        "curse": (f"Maledizione '{str(g('effetto')).replace('_', ' ')}' {_s(g('durata'))}" + (f"; si toglie con {g('condizione_rimozione')}." if g("condizione_rimozione") else "."), "Una maledizione sul nemico."),
+        "dash": (f"Scatto di {g('distanza')} caselle in {g('durata')} s" + ("; invulnerabile" if g("invulnerabile") else "") + ("; passa attraverso i nemici" if g("attraversa_nemici") else "") + ".", "Uno scatto veloce."),
+        "decay": (f"{g('danno')} di danno spalmati in {g('durata')} s su un raggio di {g('raggio')} caselle" + (", rovina anche gli oggetti" if g("colpisce_oggetti") else "") + ".", "Fa marcire tutto attorno, piano piano."),
+        "dot": (f"{g('danno_tick')} di danno{tag} ogni {g('tick_rate')} s {_s(g('durata'))} (in tutto circa {round(g('danno_tick', 0) * g('durata', 0) / max(g('tick_rate', 1), 0.01))}).", "Danno a poco a poco."),
+        "fear": (f"Paura {_s(g('durata'))}" + (f" in un raggio di {g('raggio')} caselle" if g("raggio") else " sul bersaglio") + f"; resiste chi supera {g('soglia_resistenza')}.", "Il nemico scappa spaventato."),
+        "heal": (f"Cura {g('quantita')} di vita " + ("subito" if g("istantaneo") else _s(g("durata"))) + f" a {'te' if g('bersaglio') in (None, 'self') else g('bersaglio')}.", "Ti cura."),
+        "illusion": (f"Illusione '{str(g('tipo_illusione')).replace('_', ' ')}' di potenza {g('potenza')}, raggio {g('raggio')} caselle, {_s(g('durata'))}.", "Un'immagine falsa che inganna i nemici."),
+        "light_purify": (f"Luce di potenza {g('potenza')} in {g('raggio')} caselle: toglie gli stati negativi" + (" e abbassa la Sequenza" if g("riduce_sequenza") else "") + ".", "Luce che pulisce i mali."),
+        "mind_read": (f"Legge {str(g('rivela', '')).replace('_', ' ')} (profondita' {g('profondita')}) entro {g('raggio')} caselle.", "Capisci cosa pensa il nemico."),
+        "plant_growth": (f"Fa crescere {str(g('specie', '')).replace('_', ' ')} in {g('raggio')} caselle a velocita' {g('velocita')}" + (", restano" if g("persistente") else "") + ".", "Fa spuntare piante."),
+        "possess": (f"Prende i {str(g('controllo', '')).replace('_', ' ')} del bersaglio {_s(g('durata'))}; il tuo corpo prende {g('vulnerabilita_corpo', 0) * 100:.0f}% di danno in piu'; resiste oltre {g('soglia_resistenza')}.", "Controlli un nemico."),
+        "reveal_info": (f"Mostra {str(g('categoria', '')).replace('_', ' ')} entro {g('raggio')} caselle {_s(g('durata'))}.", "Vedi cose nascoste."),
+        "resurrect": (f"Riporta in vita {str(g('bersaglio', '')).replace('_', ' ')} con {g('hp_ripristinati')} di vita; costa {g('costo_follia')} di follia; ricarica {g('cooldown')} s.", "Fa risorgere."),
+        "shadow_meld": (f"Ti fondi nell'ombra {_s(g('durata'))}, velocita' x{g('velocita')}" + (", solo nell'ombra" if g("richiede_ombra") else "") + ".", "Sparisci nell'ombra."),
+        "shield": (f"Scudo che assorbe {g('assorbimento')} di danno {_s(g('durata'))}" + (f", rimanda il {g('riflette') * 100:.0f}%" if g("riflette") else "") + (f"; blocca {', '.join(g('tag_bloccati'))}" if g("tag_bloccati") else "") + ".", "Uno scudo che para i colpi."),
+        "soul_detach": (f"L'anima esce dal corpo {_s(g('durata'))} a velocita' x{g('velocita')}; il corpo prende {g('vulnerabilita_corpo', 0) * 100:.0f}% di danno in piu'.", "Lasci il corpo e vai in giro come spirito."),
+        "steal": (f"Ruba {str(g('categoria', '')).replace('_', ' ')} con probabilita' {g('probabilita', 0) * 100:.0f}%" + (f", per {g('durata_prestito')} s" if g("durata_prestito") else "") + ".", "Rubi qualcosa al nemico."),
+        "summon": (f"Chiama {g('quantita')} {str(g('entita_id', '')).replace('_', ' ')} ({g('comportamento')}) {_s(g('durata'))}.", "Chiami aiuto."),
+        "teleport": ("Ti sposti " + ("ovunque" if g("distanza", 0) >= 999 else f"fino a {g('distanza')} caselle") + (" anche senza vederlo" if not g("richiede_visuale") else "") + (", con gli alleati" if g("porta_alleati") else "") + ".", "Sparisci e ricompari altrove."),
+        "terrain_modify": (f"{str(g('tipo_modifica', '')).capitalize()} il terreno in {g('raggio')} caselle" + (", per sempre" if g("permanente") else f" {_s(g('durata'))}") + ".", "Cambia il terreno."),
+        "time_rewind": (f"Torna indietro di {g('secondi')} s ({', '.join(g('ripristina', []))}); costa {g('costo_follia')} di follia.", "Torni indietro nel tempo."),
+        "transform": (f"Diventi {str(g('forma_id', '')).replace('_', ' ')} {_s(g('durata'))}, costa {g('costo_al_secondo')} di spiritualita' al secondo.", "Cambi forma."),
+    }
+    return D.get(t, (f"{t}: " + ", ".join(f"{k} {v}" for k, v in p.items() if k != "tipo"), t.replace("_", " ")))
 
 
 def j(*p):
@@ -200,10 +239,13 @@ def costruisci(dati, tr):
             for a in s["abilita"]:
                 k = "abilita:" + a["id"]
                 add(k, "Di chi e'", [f"{pw['nome']}, Sequenza {s['n']} ({s['nome']})"])
-                add(k, "Cosa fa", [f"{p.replace('_', ' ')}: {PRIMITIVE.get(p, '')}" for p in a["primitive"]] + [a["note"]])
+                prim = a.get("_prim", [])
+                add(k, "Cosa fa, in breve", [spiega(p)[1] for p in prim])
+                add(k, "Cosa fa, nel dettaglio", [spiega(p)[0] for p in prim])
+                add(k, "Note di design", [a["note"]])
                 add(k, "Costo", [f"{a['costo']} spiritualita'" if a["costo"] is not None else None, f"ricarica {a['cd']} secondi" if a["cd"] else None])
     for e in dati["tecniche"]["effetti"]:
-        add("effetto:" + e["sprite"], "Cos'e'", [f"L'effetto che si vede quando parte la primitiva {e['primitiva'].replace('_', ' ')}: {PRIMITIVE.get(e['primitiva'], '')}",
+        add("effetto:" + e["sprite"], "Cos'e'", [f"L'effetto che si vede quando parte la primitiva {e['primitiva'].replace('_', ' ')}: {spiega({'tipo': e['primitiva']})[1]}",
                                                   "Colori: quelli del Pathway di chi la lancia."])
     for sid, s in dati["stati"].items():
         add("stato:" + sid, "Cos'e'", [s["descrizione"]])

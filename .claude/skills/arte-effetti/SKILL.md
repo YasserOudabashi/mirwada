@@ -21,6 +21,14 @@ description: Effetti delle abilita' di Mirwada (VFX) con una forma e un moviment
 4. **Leggibile a 32-64 px**: tratti larghi, pochi elementi, impatto in 1 frame bianco (spento con riduci_flash).
 5. **Per Pathway** si possono aggiungere motivi (il "tratto" di vfx.json: pennellata carica, secca...).
 
+6. **Effetti unici per abilita' (richiesta dell'utente, 2026-11-18).** Oggi c'e' un foglio per primitiva (28) colorato
+   dallo shader: e' economico e data-driven, ma le abilita' si somigliano. Si va verso: forma propria per primitiva
+   (regole 1-3) e, dove serve, un foglio per abilita' (`vfx.json` per abilita' che sovrascrive quello della primitiva).
+   Il colore del Pathway resta dallo shader, cosi' non servono 10 copie di ogni foglio. Da decidere con l'utente
+   quante abilita' meritano un foglio proprio (le firme di ogni Sequenza, i boss) prima di disegnare.
+7. **La dashboard deve dire quale disegno e' di quale abilita'**: Tecniche mostra per ogni primitiva il glifo, l'effetto
+   e il testo preciso (numeri veri) piu' una frase semplice. Un effetto nuovo si guarda li' e nell'arena di prova.
+
 ## Controllo
 - Dashboard, scheda Tecniche: ogni effetto grande, in tutti i colori dei Pathway, velocita' regolabile.
 - Test: metti due effetti in scala di grigi uno accanto all'altro; se sembrano uguali, rifai.
