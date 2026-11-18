@@ -78,11 +78,13 @@ ASPETTI = {
     "soglia_01": _npc("soglia_01", scale=1.22, build=1.3, skin="skin_grey", hair="hair_white", hair_style="short",
                       outfit="armor", top="cloth_grey", bottom="cloth_black", cape="cloth_red", hat="helmet",
                       eyes="eye_yellow", weapon="sword", brows=14, mouth=-1),
-    "soglia_02": _npc("soglia_02", skin="skin_pale", hair="hair_black", hair_style="hood", outfit="robe",
-                      top="cloth_black", bottom="cloth_black", belt="bone", scarf="cloth_grey", eyes="eye_white",
-                      beard="fur_grey", brows=8, mouth=-1),
-    "soglia_03": _npc("soglia_03", skin="skin_grey", hair="hair_black", hair_style="long", outfit="robe",
-                      top="cloth_black", bottom="cloth_black", cape="cloth_black", belt="cloth_black",
+    # 2026-11-18: capelli bianchi lunghi, saio grigio cenere e sciarpa d'osso (prima il cappuccio nero copriva il volto)
+    "soglia_02": _npc("soglia_02", skin="skin_pale", hair="hair_white", hair_style="long", outfit="robe",
+                      top="cloth_grey", bottom="cloth_black", belt="bone", scarf="bone", eyes="eye_cyan",
+                      brows=8, mouth=-1),
+    # 2026-11-18: la veste viola sotto il mantello nero, capelli viola (prima era troppo simile a soglia_02)
+    "soglia_03": _npc("soglia_03", skin="skin_grey", hair="hair_purple", hair_style="long", outfit="robe",
+                      top="cloth_purple", bottom="cloth_black", cape="cloth_black", belt="bone",
                       eyes="eye_cyan", brows=10),
     "soglia_04": _npc("soglia_04", skin="skin_pale", hair="hair_white", hair_style="long", outfit="robe",
                       top="cloth_white", bottom="cloth_white", belt="cloth_red", hat="crown", eyes="eye_red",
