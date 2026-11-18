@@ -285,6 +285,7 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - A 32 px il viso è ridotto al minimo; a 48–64 px si legge bene. Bocca, sopracciglia e occhiali solo nei ritratti.
 - Nella preparazione degli attacchi l'arma può restare dietro la testa.
 - Il ponte è un rettangolo di legno.
+- La barca vista di prua o di poppa (US-8B91) è corta: l'inclinazione della vista la schiaccia, e Enel seduto la copre quasi tutta.
 - I panorami hanno una sola veduta (la citta' di mare): niente panorami per regione.
 - Mancano: animazioni di arrampicata e nuoto (volo e barca ci sono, US-8B81), mostri volanti grandi (c'è solo `bird()` per i volatili
   piccoli), castelli e ponti dettagliati. Vanno aggiunti a `forge3d`, con una story dedicata.

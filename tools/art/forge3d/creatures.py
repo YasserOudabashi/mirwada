@@ -441,7 +441,8 @@ def ingresso(kind="scale", seed=1, size=1.0):
     return r
 
 
-ASPETTI_VARCO = ("cancello_cripta", "arco_ombra", "ponte_radici", "grotta", "porta_glifi", "soglia_nebbia", "faro")
+ASPETTI_VARCO = ("cancello_cripta", "arco_ombra", "ponte_radici", "grotta", "porta_glifi", "soglia_nebbia", "faro",
+                 "teatro")
 
 
 def varco(aspetto, aperto=False, seed=1, size=1.0):
@@ -546,6 +547,23 @@ def varco(aspetto, aperto=False, seed=1, size=1.0):
             for k in range(9):
                 ell((rnd.uniform(5, 8), 4, rnd.uniform(4, 7)), (rnd.uniform(-6, 6), cy + rnd.uniform(-2, 3),
                                                                rnd.uniform(4, 46)), "snow")
+    elif aspetto == "teatro":                             # 2026-11-18: il teatro abbandonato della Frontiera
+        box((23, 11, 1.5), (0, cy, 1.5), "pietra_palazzo")                    # gradino (misure: mezze larghezze)
+        box((20, 8, 17), (0, cy - 2, 20), "intonaco_rosa")                    # facciata
+        box((22, 9, 1.5), (0, cy - 2, 38.5), "stone_light")                   # cornicione
+        r.part("v", "cone", (12, 6, 6), (0, cy - 2, 46), mat="tegole_vecchie")      # frontone
+        fronte = cy - 2 + 8
+        for sx in (-1, 1):                                                    # colonne
+            r.part("v", "cylinder", (1.5, 1.5, 17), (sx * 16.5, fronte + 1.5, 20), mat="stone_light")
+        box((11, 0.6, 13), (0, fronte + 0.6, 16), "gold")                     # l'arco del proscenio
+        if aperto:                                                            # sipario aperto: il buio della sala
+            box((9.5, 0.7, 12), (0, fronte + 1.1, 15), "shadow_mat")
+            for sx in (-1, 1):
+                box((2.2, 0.9, 12), (sx * 7.4, fronte + 1.4, 15), "cloth_red")
+        else:                                                                 # sipario chiuso: pieghe e frangia d'oro
+            for k in range(6):
+                box((1.6, 0.9 + (k % 2) * 0.3, 12), (-7.9 + k * 3.16, fronte + 1.2, 15), "cloth_red")
+            box((9.6, 1.0, 0.9), (0, fronte + 1.5, 26.5), "gold")
     elif aspetto == "faro":                               # US-8B95: il faro, con la soglia verso la Frontiera alla base
         box((13, 9, 2.5), (0, cy, 2.5), "stone")
         r.part("v", "cylinder", (8, 8, 30), (0, cy, 35), mat="intonaco_bianco")

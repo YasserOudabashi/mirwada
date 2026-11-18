@@ -1491,3 +1491,17 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   in tests/test_mondo.gd (regione dalla posizione, varchi, nemici e oggetti dei layout, viaggio, NPC).
 - Commenti aggiornati (main.gd, mondo.gd, page_mappa.gd, enemy.gd, interior_scene.gd, CLAUDE.md).
 - 1090 test (66 tolti col vecchio mondo, 1 nuovo), tutti passati; validate 0.
+
+## Cose aperte messe a posto (3): arte, 2026-11-18
+- Antagonisti: soglia_02 (prima un cappuccio nero che copriva tutto il volto) ora ha capelli bianchi lunghi, saio
+  grigio cenere e sciarpa d'osso; soglia_03 la veste e i capelli viola sotto il mantello nero: i due non si somigliano
+  piu'. Comandi: python tools/art/build_npc.py ; python tools/art/build_ritratti.py (gli altri aspetti identici).
+  Foglio prima/dopo: arte/revisione/soglie_02_03.png. Visto: lo stile "hood" di forge3d mette il cappuccio davanti al
+  volto (va bene per una figura senza faccia, non per un personaggio che parla).
+- Teatro della Frontiera: aspetto di varco nuovo "teatro" in forge3d/creatures.py varco() (facciata rosa, colonne,
+  frontone, arco d'oro del proscenio, sipario rosso chiuso o aperto sul buio). Comando: python tools/art/esporta_mondo.py
+  --varchi (pochi secondi; gli altri varchi identici). regions.json: il varco del teatro usa "teatro". Guardato x4 nelle
+  due modalita' e nel gioco: arte/revisione/teatro_fuori.png.
+- Lasciato e scritto fra i limiti del generatore in CLAUDE.md: la barca di prua e di poppa resta corta (la vista la
+  schiaccia).
+- 1090 test, validate 0.
