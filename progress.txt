@@ -1660,3 +1660,24 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Non mi convince ancora: il lupo da dietro e' un ovale con le orecchie; raccogliere di profilo sembra un inchino;
   le rune dell'incantesimo a 1x sono puntini; nel gioco il fendente pesante e l'incantesimo non sono ancora
   collegati (servono i dati per abilita' in vfx.json: dopo il giudizio).
+
+## Giro 2 della prova di stile, 2026-11-18 (US-8C02)
+- Note dell'utente: si piegava indietro per caricare il colpo (non ha senso); vuole la carica tenendo premuto
+  (piu' tieni, piu' forte e piu' largo) sul sito e nel gioco; Enel poco unico, gambe troppo lunghe, busto piccolo;
+  la schivata "fa pena" (piu' versioni, sceglie lui); lupo piu' unico; una pagina nuova con ogni cosa da approvare;
+  la prova a schermo intero.
+- Enel: anca 10.5, busto 12.5, spalle 6.8, arti piu' spessi, falde piu' corte; capo della sciarpa sul petto, due
+  fiale (rossa e azzurra) alla cintura. Attacco pesante rifatto: carica raccolta in avanti (piega +10/+12, piedi
+  larghi, spadone alto dietro la spalla destra), mai indietro.
+- Schivata: 4 versioni in griglia/figure/personaggio.py VARIANTI (scivolata, capriola con `perno`, affondo, ombra
+  con le copie scure `scia`) -> arte/prova/personaggio_dash_<id>.png. Nel gioco resta "dash" finche' non sceglie.
+- Lupo: gobbo (spalle 7.6, anche 4.6), sella scura sul dorso, criniera a punte scure, falce di luna gialla su fronte
+  e fianco, zanne, coda folta. Da dietro resta debole.
+- Gioco: azione `attacco_pesante` (K), player.gd inizia_pesante/_tieni_carica/carica_pesante/_fine_pesante: sul
+  frame_carica l'animazione si ferma finche' si tiene premuto, Enel si schiarisce; al rilascio danno e raggio
+  crescono con la carica (balance.json combattimento.attacco_pesante: danno 24, x2.5 e area x1.8 in 1.5 s).
+  Test tests/test_attacco_pesante.gd (2). 1102 test verdi, validator 0 errori.
+- Dashboard: pagina "Da testare" (#provare) con l'arena (K tenuto = carica con anello e barra, Schermo intero) e
+  una scheda da approvare per ogni cosa nuova (Enel e ognuna delle 16 animazioni, le 4 schivate, il lupo e le sue 6,
+  fendente, carica, incantesimo, scoppio): chiavi `prova:<id>`. Verificata con Playwright, nessun errore.
+- Aperto: nel gioco il fendente pesante usa ancora l'effetto melee_arc (non il disegno nuovo) finche' non e' approvato.

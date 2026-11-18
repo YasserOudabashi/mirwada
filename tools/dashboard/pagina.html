@@ -130,6 +130,9 @@ img.foto { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 
 .mini button[aria-pressed="true"] { border-color: var(--accento); box-shadow: 0 0 0 1px var(--accento) }
 .campo { display: block; width: 100%; border-radius: 6px; image-rendering: pixelated; background: #3e8948; outline: none; cursor: pointer }
 .campo:focus { box-shadow: 0 0 0 3px var(--accento) }
+.arena-box.grande { position: fixed; inset: 0; z-index: 50; background: #181425; padding: 12px; overflow: auto; display: flex; flex-direction: column; gap: 8px }
+.arena-box.grande .campo, .arena-box:fullscreen .campo { width: auto; height: calc(100vh - 140px); max-width: 100%; margin: 0 auto; aspect-ratio: 9 / 5 }
+.arena-box:fullscreen { background: #181425; padding: 12px; overflow: auto }
 .tasti { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: var(--tenue) }
 .tasti kbd { font: 600 11px var(--f-dati); border: 1px solid var(--linea); border-bottom-width: 2px; border-radius: 3px; padding: 0 4px; background: var(--fondo2); color: var(--testo) }
 .sfoglia { display: grid; gap: 8px; margin: 0 auto }
@@ -180,7 +183,7 @@ img.foto { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 
 
 <script>
 "use strict";
-const SEZIONI = [["oggi", "Oggi"], ["avanzamento", "Avanzamento"], ["mondo", "Mondo"], ["paesi", "Paesi e case"], ["personaggi", "Personaggi"],
+const SEZIONI = [["oggi", "Oggi"], ["provare", "Da testare"], ["avanzamento", "Avanzamento"], ["mondo", "Mondo"], ["paesi", "Paesi e case"], ["personaggi", "Personaggi"],
   ["bestiario", "Bestiario"], ["tecniche", "Tecniche"], ["oggetti", "Oggetti"], ["libro", "Libro e HUD"], ["consumo", "Consumo"]];
 const DIREZ = ["giù", "su", "sinistra", "destra"];
 let D = null;
@@ -454,7 +457,7 @@ function provaFigura(fid) {
   c.addEventListener("keydown", e => { const k = e.key.toLowerCase(); if (DT[k] || azioni.some(t => t[0] === k) || k === "enter") e.preventDefault();
     if (DT[k]) giu.add(k); const t = azioni.find(t => t[0] === k); if (t && !e.repeat) fai(t[1]);
     if (k === "enter") { p.vivo = true; p.azione = null; l.scegli("idle"); } });
-  c.addEventListener("keyup", e => giu.delete(e.key.toLowerCase()));
+  c.addEventListener("keyup", e => { const k = e.key.toLowerCase(); giu.delete(k); if (k === "k") P.tenuto = false; });
   c.addEventListener("focus", () => { TASTI_CAMPO = true; }); c.addEventListener("blur", () => { TASTI_CAMPO = false; giu.clear(); });
   c.addEventListener("click", () => c.focus());
   ESCI.push(() => { TASTI_CAMPO = false; });
@@ -541,12 +544,9 @@ function arena(opz) {
     if (e.repeat) return;
     if (k === "j" && P.vivo) { P.azione = "attack_light"; eroe.scegli("attack_light", () => { P.azione = null; eroe.scegli("idle"); });
       if (nemico && Math.hypot(nemico.x - P.x, nemico.y - P.y) < 46) colpisci(16); }
-    if (k === "k" && P.vivo && !P.azione && eroe.ha("attack_heavy")) { P.azione = "attack_heavy"; eroe.scegli("attack_heavy", () => { P.azione = null; eroe.scegli("idle"); });
-      const a = D.figure.enel.anims.find(x => x.nome === "attack_heavy"), ritardo = a ? a.durate.slice(0, 6).reduce((x, y) => x + y, 0) : 400;
-      const e = T.effetti.find(x => x.sprite === "vfx_fendente_pesante");
-      const fx = P.dir === 2 ? -1 : P.dir === 3 ? 1 : 0, fy = P.dir === 0 ? 1 : P.dir === 1 ? -1 : 0;
-      if (e) foglioColorato(e, opz.palette || {}).then(img => img && effetti.push({img, e, f: 0, t: -ritardo, x: P.x + fx * 20, y: P.y - 18 + fy * 12, gira: P.dir === 2, vita: e.frames * 90}));
-      setTimeout(() => { if (nemico && Math.hypot(nemico.x - P.x, nemico.y - P.y) < 56) colpisci(40); }, ritardo); }
+    if (k === "k" && P.vivo && !P.azione && eroe.ha("attack_heavy")) {   // tieni premuto: carica (come nel gioco)
+      P.azione = "attack_heavy"; P.carica = 0; P.tenuto = true; P.colpito = false;
+      eroe.scegli("attack_heavy", () => { P.azione = null; P.carica = 0; eroe.scegli("idle"); }); }
     if (k === " " && P.vivo) { P.azione = "dash"; eroe.scegli("dash", () => { P.azione = null; eroe.scegli("idle"); }); }
     if (k === "q" && nemico) colpisci(9999 * 0.1 * (B ? 600 * B.vita_x / 5 : 200) / 9999);
     if (k === "enter") { P.vivo = true; P.vita = 100; P.azione = null; eroe.scegli("idle"); if (nemico) { nemico.vita = 1; nemico.azione = null; nemico.l.scegli("idle"); gregari = []; if (B) { Object.assign(nemico.cfg, (D.nemici.find(n => n.id === B.posato.tipo) || {}).numeri || {}); entraFase(0); } } }
@@ -588,7 +588,18 @@ function arena(opz) {
     const v = P.azione === "dash" ? 160 : P.azione ? 30 : 45;
     if (P.vivo && (dx || dy) && !["meditate", "ritual"].includes(P.azione)) { const n = Math.hypot(dx, dy); P.x = Math.max(16, Math.min(W - 16, P.x + dx / n * v * dt / 1000 * velocita)); P.y = Math.max(40, Math.min(H - 6, P.y + dy / n * v * dt / 1000 * velocita)); }
     if (!P.azione && P.vivo) { const want = dx || dy ? "walk" : "idle"; if (eroe.a.nome !== want) eroe.scegli(want); }
-    eroe.passo(dt * velocita); P.spirito = Math.min(100, P.spirito + dt / 1000 * 4 * velocita);
+    const CARICA = (D.combattimento || {}).attacco_pesante || {frame_carica: 5, carica_max_s: 1.5, danno: 24, danno_x: 2.5, raggio: 26, area_x: 1.8};
+    if (P.azione === "attack_heavy" && P.tenuto && eroe.frame >= CARICA.frame_carica && P.carica < CARICA.carica_max_s * 1000) P.carica = Math.min(CARICA.carica_max_s * 1000, P.carica + dt * velocita);
+    else eroe.passo(dt * velocita);
+    if (P.azione === "attack_heavy" && !P.colpito && eroe.frame >= CARICA.frame_carica + 1) { P.colpito = true;
+      const kk = P.carica / (CARICA.carica_max_s * 1000), scala = 1 + (CARICA.area_x - 1) * kk;
+      const e = T.effetti.find(x => x.sprite === "vfx_fendente_pesante");
+      const fx = P.dir === 2 ? -1 : P.dir === 3 ? 1 : 0, fy = P.dir === 0 ? 1 : P.dir === 1 ? -1 : 0;
+      if (e) foglioColorato(e, opz.palette || {}).then(img => img && effetti.push({img, e, f: 0, t: 0, x: P.x + fx * 20 * scala, y: P.y - 18 + fy * 12 * scala, gira: P.dir === 2, vita: e.frames * 90, scala}));
+      const danno = CARICA.danno * (1 + (CARICA.danno_x - 1) * kk);
+      if (nemico && Math.hypot(nemico.x - P.x, nemico.y - P.y) < 30 + CARICA.raggio * scala) colpisci(danno);
+      testo.unshift(`Colpo pesante: carica ${Math.round(kk * 100)}%, danno ${Math.round(danno)}, area x${scala.toFixed(2)}`); }
+    P.spirito = Math.min(100, P.spirito + dt / 1000 * 4 * velocita);
     for (const k in cd) cd[k] = Math.max(0, cd[k] - dt * velocita);
     if (nemico) ai(nemico, dt);
     for (const gg of gregari) { const ddx = P.x - gg.x, ddy = P.y - gg.y, dd = Math.hypot(ddx, ddy); if (dd > 24) { gg.x += ddx / dd * 24 * dt / 1000 * velocita; gg.y += ddy / dd * 24 * dt / 1000 * velocita; }
@@ -609,7 +620,10 @@ function arena(opz) {
     for (const e of effetti) { if (e.t < 0) continue;
       if (e.colpo) { g.fillStyle = "#e43b44"; g.fillRect(Math.round(e.x) - 2, Math.round(e.y) - 2, 4, 4); continue; }
       const w = e.img.width / e.e.frames, hh = e.img.height, f = e.e.vola ? Math.floor(e.t / 90) % e.e.frames : Math.min(e.e.frames - 1, Math.floor(e.t / 90));
-      g.save(); g.translate(Math.round(e.x), Math.round(e.y)); if (e.gira) g.scale(-1, 1); g.drawImage(e.img, f * w, 0, w, hh, -w / 2, -hh / 2, w, hh); g.restore(); }
+      g.save(); g.translate(Math.round(e.x), Math.round(e.y)); if (e.gira) g.scale(-1, 1); if (e.scala) g.scale(e.scala, e.scala); g.drawImage(e.img, f * w, 0, w, hh, -w / 2, -hh / 2, w, hh); g.restore(); }
+    if (P.azione === "attack_heavy" && P.carica > 0) { const CARICA = (D.combattimento || {}).attacco_pesante || {carica_max_s: 1.5}, kk = P.carica / (CARICA.carica_max_s * 1000);
+      g.strokeStyle = kk >= 1 ? "#fee761" : "#feae34"; g.lineWidth = 2; g.beginPath(); g.ellipse(P.x, P.y, 10 + 16 * kk, 4 + 6 * kk, 0, 0, Math.PI * 2); g.stroke();
+      g.fillStyle = "#181425"; g.fillRect(P.x - 13, P.y - 46, 26, 5); g.fillStyle = kk >= 1 ? "#fee761" : "#feae34"; g.fillRect(P.x - 12, P.y - 45, 24 * kk, 3); }
     // barre
     const barra = (x, y, w, v, col) => { g.fillStyle = "#181425"; g.fillRect(x - 1, y - 1, w + 2, 5); g.fillStyle = col; g.fillRect(x, y, w * v, 3); };
     barra(6, 6, 80, P.vita / 100, "#e43b44"); barra(6, 13, 80, P.spirito / 100, "#0099db");
@@ -622,11 +636,18 @@ function arena(opz) {
   }});
   const log = h("pre", {class: "sotto", style: "white-space:pre-wrap;margin:0;min-height:3em"});
   const vel = h("input", {type: "range", min: "0.1", max: "2", step: "0.05", value: "1", id: "avel"}); vel.addEventListener("input", () => { velocita = +vel.value; });
-  return h("div", {class: "sezione"}, c, log,
-    h("div", {class: "tasti"}, h("span", {}, h("kbd", {text: "W A S D"}), " muovi"), h("span", {}, h("kbd", {text: "J"}), " attacca"), h("span", {}, h("kbd", {text: "K"}), " attacco pesante"), h("span", {}, h("kbd", {text: "Spazio"}), " scatto (schiva)"),
+  const box = h("div", {class: "sezione arena-box"});
+  const grande = h("button", {class: "chip", onclick: () => {
+    if (box.classList.contains("grande") || document.fullscreenElement) { if (document.fullscreenElement) document.exitFullscreen(); box.classList.remove("grande"); grande.textContent = "Schermo intero"; }
+    else { (box.requestFullscreen ? box.requestFullscreen() : Promise.reject()).catch(() => box.classList.add("grande")); box.classList.add("grande"); grande.textContent = "Esci dallo schermo intero"; }
+    c.focus(); }}, "Schermo intero");
+  ESCI.push(() => { box.classList.remove("grande"); if (document.fullscreenElement) document.exitFullscreen(); });
+  box.append(h("div", {class: "filtri"}, grande), c, log,
+    h("div", {class: "tasti"}, h("span", {}, h("kbd", {text: "W A S D"}), " muovi"), h("span", {}, h("kbd", {text: "J"}), " attacca"), h("span", {}, h("kbd", {text: "K"}), " attacco pesante (tieni premuto: più carica, più danno e area)"), h("span", {}, h("kbd", {text: "Spazio"}), " scatto (schiva)"),
       opz.abilita ? h("span", {}, h("kbd", {text: "1–" + opz.abilita.length}), " abilità") : null, nemico ? h("span", {}, h("kbd", {text: "Q"}), " -10% di vita al nemico") : null,
       h("span", {}, h("kbd", {text: "Invio"}), " ricomincia"), h("span", {}, h("kbd", {text: "Esc"}), " esci")),
     h("div", {class: "controlli"}, h("label", {for: "avel"}, "Velocità", vel)));
+  return box;
 }
 
 // ---------- mappa navigabile: dall'intero mondo alle caselle vere ----------
@@ -723,28 +744,67 @@ VISTE.oggi = () => {
       h("div", {}, h("h3", {text: "Da rifare: le tue note"}), h("div", {class: "filtri"}, q), h("div", {class: "scorri basso"}, listaDr)),
       h("div", {}, h("h3", {text: "Prossime story"}), h("div", {class: "scorri basso"}, h("div", {class: "lista"}, aperte.slice(0, 25).map(s =>
         h("div", {class: "cliccabile", onclick: () => apriStoria(s)}, h("span", {class: "id", text: s.id}), h("span", {class: "tx", text: s.titolo}), h("span", {class: "dx", text: "fase " + s.fase}))))))),
-    provaStile(),
+    h("div", {class: "avviso"}, "Le cose nuove da provare e approvare una per una sono nella pagina ", h("a", {href: "#provare", text: "Da testare"}), "."),
     h("h3", {text: "Previsti, non ancora fatti (INCOMPLETO)"}), h("div", {class: "scorri basso"}, h("div", {class: "lista"}, D.previsti.map(x => h("div", {}, INC(), h("span", {class: "tx", text: x.nome + " — " + x.cosa}), h("span", {class: "dx", text: x.story}))))),
     h("h3", {text: "Quanto hai guardato, per sezione"}), h("div", {class: "lista"}, Object.entries(G).map(([nome, ks]) => { const v = ks.filter(k => statoDi(k)).length, no = ks.filter(k => statoDi(k) === "no").length;
       return h("div", {}, h("span", {class: "tx", text: nome}), h("span", {style: "flex:2"}, h("div", {class: "barra"}, h("i", {style: "width:" + (ks.length ? v / ks.length * 100 : 0) + "%"}))),
         h("span", {class: "dx", text: v + " / " + ks.length + (no ? " · " + no + " da rifare" : "")})); }))];
 };
 
-// Prova del nuovo stile (scelte del 2026-11-18): Enel e il lupo della luna a griglia, il fendente pesante e
-// l'Incantesimo tradizionale con un disegno tutto loro. Si giudicano qui prima di rifare il resto.
-function provaStile() {
+// ---------- Da testare: ogni cosa nuova, da provare e approvare una per una ----------
+// Le chiavi dei giudizi sono "prova:<id>" (stesso archivio delle altre pagine). Le versioni da scegliere (la schivata)
+// sono una scheda per versione: "va bene" su quella che vuoi, "rifare" sulle altre.
+function effettoVivo(e, pal, scala = 4) {
+  const c = h("canvas", {class: "px"}); let img = null, f = 0, t = 0;
+  foglioColorato(e, pal).then(i => { if (!i) return; img = i; c.width = i.width / e.frames; c.height = i.height; c.style.width = c.width * scala + "px"; });
+  return guarda(c, {passo(dt) { if (!img) return; t += dt; if (t < 110) return; t = 0; f = (f + 1) % (e.frames + 3);
+    const g = c.getContext("2d"); g.imageSmoothingEnabled = false; g.clearRect(0, 0, c.width, c.height); if (f < e.frames) g.drawImage(img, f * c.width, 0, c.width, c.height, 0, 0, c.width, c.height); }});
+}
+function figuraAnim(fid, nome, scala = 5) {
+  const l = new Lettore(fid, {scala, giro: false, anim: nome}); const dir = segmento([[0, "Giù"], [1, "Su"], [2, "Sinistra"], [3, "Destra"]], 0, v => { l.dir = +v; l.disegna(); });
+  return [guarda(l.c, l), l.a.righe > 1 ? dir : null];
+}
+const SPIEGA_ANIM = {idle: "Fermo: respira.", walk: "Cammina (8 fotogrammi).", dash: "Schivata in uso nel gioco.", attack_light: "Attacco leggero (tasto J).",
+  attack_heavy: "Attacco pesante (tasto K): si carica in avanti, spadone alto dietro la spalla; tenendo premuto resta sulla carica.", parry: "Parata.", hurt: "Colpito.",
+  death: "Morte: cade all'indietro e resta a terra.", cast: "Lancia un'abilità.", meditate: "Medita seduto.", interact: "Tocca porte, leve, persone.", pickup: "Raccoglie da terra.",
+  drink: "Beve una fiala.", ritual: "Rituale, braccia alzate.", fly: "In volo.", sail: "In barca.", anticipo: "Il segnale prima dell'attacco: si abbassa, bocca aperta, coda dritta.",
+  attack: "Morso in salto.", stagger: "Colpito, barcolla."};
+VISTE.provare = () => {
+  ELENCO = [];
   const T = D.tecniche, inc = T.effetti.find(x => x.sprite === "vfx_incantesimo");
-  if (!inc || !D.figure.enel) return null;
   let pw = null, ab = null;
   for (const p of T.pathway) for (const s of p.sequenze) for (const a of s.abilita) if (a.id === "hermit_incantesimo_tradizionale") { pw = p; ab = a; }
-  const abil = ab ? [{...ab, prim: ab.primitive, effetto: "vfx_incantesimo", danno: 18, cosa: ab.cosa || []}] : [];
-  const pezzo = (k, nome, fid) => h("button", {class: "chip", onclick: () => apriFiguraProva(k, nome, fid)}, nome);
-  return h("div", {class: "sezione"}, h("h3", {text: "Prova del nuovo stile: da giudicare"}),
-    h("p", {class: "intro", text: "Enel e il lupo della luna disegnati a griglia (3 teste, contorno nero, 3 toni, fotogrammi ricchi); il fendente pesante (tasto K) e l'Incantesimo tradizionale dell'Eremita (tasto 1) con un disegno tutto loro. Gli altri personaggi restano col disegno vecchio finché non approvi questo."}),
-    arena({abilita: abil, palette: pw ? pw.palette : {}, bersaglio: D.figure.nem_lupo_della_luna ? "nem_lupo_della_luna" : true}),
-    h("div", {class: "filtri"}, pezzo("personaggio:enel", "Enel: tutte le animazioni", "enel"), D.figure.nem_lupo_della_luna ? pezzo("nemico:lupo_della_luna", "Lupo della luna", "nem_lupo_della_luna") : null));
-}
-function apriFiguraProva(k, nome, fid) { ELENCO = [{k, titolo: nome, media: () => studioFigura(fid, 5)}]; apriElemento(0); }
+  const pal = pw ? pw.palette : {}, palTG = (T.pathway.find(p => p.id === "twilight_giant") || {}).palette || pal;
+  const abil = ab && inc ? [{...ab, prim: ab.primitive, effetto: "vfx_incantesimo", danno: 18, cosa: ab.cosa || []}] : [];
+  const sezioni = [];
+  const gruppo = (titolo, intro, elementi) => { sezioni.push(h("h3", {text: titolo}), intro ? h("p", {class: "intro", text: intro}) : null,
+    h("div", {class: "griglia"}, elementi.map(el => carta(el, el.anteprima(), h("b", {text: el.titolo}), h("span", {class: "sotto", text: el.breve || ""}))))); };
+  const anim = (fid, chiave, nome) => ({k: `prova:${chiave}_${nome}`, titolo: bello(nome), breve: SPIEGA_ANIM[nome] || "",
+    anteprima: () => lettore(fid, {scala: 2, giro: false, anim: nome}),
+    media: () => [h("p", {text: SPIEGA_ANIM[nome] || ""}), ...figuraAnim(fid, nome, 5)]});
+  if (D.figure.enel) {
+    const tutto = {k: "prova:enel", titolo: "Enel: proporzioni e aspetto", breve: "Gambe corte, busto e spalle larghi, sciarpa sul petto, fiale alla cintura, spadone sulla schiena.",
+      anteprima: () => lettore("enel", {scala: 2, giro: false, anim: "idle"}), media: () => studioFigura("enel", 5)};
+    gruppo("Enel", "Ogni animazione è una scheda: aprila, guarda le 4 direzioni, poi Va bene o Rifare con la nota.",
+      [tutto, ...D.figure.enel.anims.map(a => anim("enel", "enel", a.nome))]);
+  }
+  const varianti = Object.keys(D.figure).filter(f => f.startsWith("dash_"));
+  if (varianti.length) gruppo("Schivata: scegli la versione", "Quattro versioni. Metti Va bene su quella che vuoi nel gioco (Rifare sulle altre, o una nota per cambiarla).",
+    varianti.map(fid => ({k: "prova:schivata_" + fid.slice(5), titolo: (D.figure[fid].nome || fid.slice(5)), breve: "4 fotogrammi, invulnerabile nei primi 3.",
+      anteprima: () => lettore(fid, {scala: 2, giro: false, anim: "dash"}), media: () => figuraAnim(fid, "dash", 6)})));
+  if (D.figure.nem_lupo_della_luna) gruppo("Lupo della luna", "Gobbo da predatore, criniera a punte scure, sella sul dorso, falce di luna gialla, zanne, coda folta.",
+    [{k: "prova:lupo", titolo: "Lupo: aspetto", breve: "La figura intera in tutte le animazioni.", anteprima: () => lettore("nem_lupo_della_luna", {scala: 2, giro: false, anim: "idle"}), media: () => studioFigura("nem_lupo_della_luna", 5)},
+     ...D.figure.nem_lupo_della_luna.anims.map(a => anim("nem_lupo_della_luna", "lupo", a.nome))]);
+  const effetto = (sprite, k, titolo, breve, p) => { const e = T.effetti.find(x => x.sprite === sprite); return e ? {k, titolo, breve, anteprima: () => effettoVivo(e, p, 1.5), media: () => [h("p", {text: breve}), effettoVivo(e, p, 5)]} : null; };
+  gruppo("Effetti con un disegno tutto loro", "Colorati col Pathway (qui Twilight Giant per il fendente, Eremita per l'incantesimo).", [
+    effetto("vfx_fendente_pesante", "prova:fendente_pesante", "Fendente pesante", "Mezzaluna che cala dall'alto e spacca il terreno; con la carica diventa più grande.", palTG),
+    {k: "prova:carica", titolo: "Carica dell'attacco pesante", breve: "Tieni premuto K: Enel resta sulla posa di carica, l'anello e la barra crescono; al rilascio colpisce più forte e più largo (fino a 2,5 volte il danno e 1,8 volte l'area in 1,5 secondi). C'è anche nel gioco vero.",
+     anteprima: () => lettore("enel", {scala: 2, giro: false, anim: "attack_heavy"}), media: () => [h("p", {text: "Provala nell'arena qui sotto la pagina (tasto K tenuto premuto)."}), ...figuraAnim("enel", "attack_heavy", 5)]},
+    effetto("vfx_incantesimo", "prova:incantesimo", "Incantesimo tradizionale (in volo)", "Sigillo con 4 rune che gira, scia di scintille.", pal),
+    effetto("vfx_incantesimo_scoppio", "prova:incantesimo_scoppio", "Incantesimo tradizionale (scoppio)", "Il sigillo si apre in un cerchio di rune e si spezza in schegge.", pal)].filter(Boolean));
+  return [h("h2", {text: "Da testare"}), h("p", {class: "intro", text: "Tutte le cose nuove, una per scheda: provale, poi Va bene o Rifare con una nota. Sotto c'è l'arena: Schermo intero per giocarla in grande."}),
+    h("h3", {text: "Arena di prova"}), arena({abilita: abil, palette: pal, bersaglio: D.figure.nem_lupo_della_luna ? "nem_lupo_della_luna" : true}), ...sezioni];
+};
 
 VISTE.avanzamento = () => {
   const av = D.avanzamento, st = stato("avanzamento"); st.fatte = st.fatte || "aperte";

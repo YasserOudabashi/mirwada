@@ -2119,6 +2119,22 @@
       "fase": "8c",
       "passes": true,
       "notes": "Fatta il 2026-11-18: tools/art/griglia/ e tools/art/build_griglia.py; dettagli e cosa non convince in progress.txt. Prossimo passo: giudizio dell'utente."
+    },
+    {
+      "id": "US-8C02",
+      "title": "Prova di stile, giro 2: carica dell'attacco pesante, Enel piu' compatto, 4 schivate, lupo, pagina Da testare",
+      "description": "Note dell'utente sul primo giro della prova di stile.",
+      "acceptanceCriteria": [
+        "nel gioco tenendo premuto K il colpo si carica (danno e area crescono)",
+        "Enel con gambe corte e busto largo, la carica in avanti",
+        "4 versioni della schivata da scegliere",
+        "pagina Da testare con ogni cosa nuova da approvare e l'arena a schermo intero",
+        "test e validator verdi"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18; dettagli in progress.txt. Aspetta il giudizio dell'utente e la scelta della schivata."
     }
   ]
 }

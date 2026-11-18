@@ -52,6 +52,25 @@ ANIM = j("data", "animations.json")
 FIGURE = {}
 
 
+def varianti_schivata():
+    """Le versioni della schivata da scegliere (tools/art/build_griglia.py -> arte/prova/): una figura ciascuna."""
+    import importlib
+    sys.path.insert(0, os.path.join(ROOT, "tools", "art"))
+    mod = importlib.import_module("griglia.figure.personaggio")
+    a = ANIM["personaggio"]["dash"]
+    for vid, v in getattr(mod, "VARIANTI", {}).get("dash", {}).items():
+        src = os.path.join(ROOT, "arte", "prova", f"personaggio_dash_{vid}.png")
+        if not os.path.isfile(src):
+            continue
+        im = Image.open(src)
+        nome_file = f"img/fig_dash_{vid}.png"
+        im.save(os.path.join(OUT, nome_file), optimize=True)
+        n = int(a["frames"])
+        FIGURE["dash_" + vid] = {"file": nome_file, "nome": v["nome"], "anims": [{
+            "nome": "dash", "y": 0, "righe": 4, "frames": n, "w": im.width // n, "h": im.height // 4,
+            "durate": [int(1000 / float(a.get("fps", 20)))] * n, "loop": True}]}
+
+
 def figura(fid, categoria, aspetto="", spec_cat=None):
     """Un foglio unico con tutte le animazioni di <categoria>[_<aspetto>]_<anim>.png una sotto l'altra."""
     spec = senza_commenti(ANIM[spec_cat or categoria])
@@ -265,6 +284,7 @@ def nemici():
 # --- personaggi --------------------------------------------------------------------------------------------------
 def personaggi():
     figura("enel", "personaggio")
+    varianti_schivata()
     forme = []
     for fid_, f in senza_commenti(j("data", "forms.json").get("forms", {})).items():
         if f.get("aspetto") and figura("forma_" + f["aspetto"], "personaggio", f["aspetto"]):
@@ -439,6 +459,7 @@ def main():
     dati["nemici"], dati["boss"] = nemici()
     dati["personaggi"] = personaggi()
     dati["tecniche"] = tecniche()
+    dati["combattimento"] = senza_commenti(json.load(open(os.path.join(DATA, "balance.json"), encoding="utf-8"))["combattimento"])
     dati["oggetti"], dati["stati"] = oggetti()
     dati["mondo"] = mondo()
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
