@@ -1597,3 +1597,25 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Note: il Burattinaio e l'Archivista non si raggiungono a Sequenza 9 (gating delle regioni: la prova a schermo li ha
   fatti tornare alla partenza, corretto cosi'). Aperto: figure grandi dei boss (US-1506); i boss di zona del
   sottosuolo (fogne) si vedono solo scendendo, da provare giocando.
+
+## US-D01..D06 — Dashboard del progetto (Officina di Mirwada), 2026-11-18
+- Richiesta dell'utente: una dashboard per vedere ogni cosa del gioco e dire se va bene, col consumo di token e il
+  costo API. Scelte dell'utente: pagina privata su claude.ai, tutte le parti di fila, poi fermarsi e aspettare le note.
+- `tools/dashboard/build.py` -> `build/dashboard/` (fuori dal repo): dati.json (prd, git, test, validator, nemici e
+  boss, personaggi, Pathway e abilita', oggetti, stati, mondo), 79 figure animate (ogni aspetto in un foglio unico con
+  tutte le animazioni e i tempi di animations.json), atlanti (ritratti, oggetti, stati, glifi), i fogli VFX, la mappa
+  2 px per casella coi colori medi delle tessere vere e degli oggetti di scena.
+- `tests/manual/qa_dashboard_foto.gd` (Xvfb, ~4 minuti): 113 foto 1280x720 dal gioco vero (49 luoghi, 34 villaggi,
+  19 interni con porta, 11 pagine del libro, HUD in combattimento), giocatore a Sequenza 0 perche' nessuna regione
+  lo respinga. Solo l'atollo arriva a 14 caselle dal punto (la cella libera piu' vicina).
+- `tools/dashboard/consumo.py`: token dai file di sessione di Claude Code (una risposta una volta, per id), cache a
+  5 minuti e a 1 ora separate, listino API (Opus 5.5 4/20 $, Fable 5.2 8/40 $ per milione, cache letta 0,20 $),
+  per giorno e per story (la prima story chiusa dopo la risposta). Questa sessione (3-18 novembre): circa 219 $.
+- `tools/dashboard/pagina.html`: dieci schede, figure animate a 2x (scegli animazione, direzione e sfondo nel
+  dettaglio), glifi ed effetti ricolorati come fa lo shader del Pathway, giudizi va bene / rifare con nota
+  nell'archivio della pagina (`giudizi/<tipo>:<id>`, scrive solo il proprietario), consumo da `consumo/<sessione>`.
+- Verifica: Playwright sulle dieci schede in chiaro e in scuro, nessun errore di script, a 400 px niente scorrimento
+  orizzontale; pubblicata, consumo scritto e riletto, una scrittura da Contributor rifiutata come voluto.
+- Regola nuova in CLAUDE.md: a fine sessione consumo.py, scrittura nell'archivio, build.py e ripubblicazione.
+- Aperto: le foto sono della modalita' luminosa e a mezzogiorno; mancano foto della cupa e del sottosuolo; gli
+  oggetti mostrano le prime 400 dopo i filtri.

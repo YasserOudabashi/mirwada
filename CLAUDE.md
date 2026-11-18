@@ -314,6 +314,23 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 
 ---
 
+## Dashboard del progetto (Officina di Mirwada)
+
+- Pagina privata su claude.ai: https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3 (si apre solo col tuo account).
+  Mostra tutto da guardare e giudicare: Oggi, Avanzamento, Mondo (mappa coi colori veri e foto dal gioco), Paesi e
+  case, Personaggi, Bestiario, Tecniche, Oggetti, Libro e HUD, Consumo di token.
+- Si costruisce con `python tools/dashboard/build.py` (-> `build/dashboard/`, non nel repo; `--foto` rifa le foto
+  dal gioco con `tests/manual/qa_dashboard_foto.gd`, ~5 minuti) e si ripubblica allo **stesso link** (Artifact con
+  `url` e `root` = `build/dashboard`, `files` = img/, foto/*.jpg, dati.json; al massimo 255 file per volta).
+- Giudizi dell'utente: archivio della pagina, `giudizi/<tipo>:<id>` = {stato: "ok"|"no", nota, quando}. A inizio
+  sessione si leggono (ArtifactData `list` su `giudizi`): ogni "no" con la nota e' lavoro da fare (una story).
+- **A fine di ogni sessione di lavoro** (regola chiesta dall'utente): `python tools/dashboard/consumo.py`, poi
+  ArtifactData `set` di `consumo/<id sessione>` per ogni sessione nuova o cresciuta (file
+  `build/dashboard/consumo.json`), poi `build.py` e ripubblica. Il costo e' una stima al listino API (nello
+  script, `PREZZI`): con l'abbonamento non si paga.
+
+---
+
 ## Comandi
 
 ```bash

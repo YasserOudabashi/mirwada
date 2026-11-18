@@ -2025,6 +2025,84 @@
       "fase": "17",
       "passes": false,
       "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-D01",
+      "title": "Dashboard: base, avanzamento, consumo e pubblicazione",
+      "description": "Pagina privata su claude.ai con le schede Oggi, Avanzamento e Consumo; build.py e consumo.py rilanciabili.",
+      "acceptanceCriteria": [
+        "si vede nella pagina pubblicata",
+        "verificata in chiaro, scuro e a 400 px di larghezza"
+      ],
+      "priority": 60,
+      "fase": "strumenti",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18 (richiesta dell'utente: una dashboard per vedere tutto e dire se va bene). Pagina https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3, script in tools/dashboard/."
+    },
+    {
+      "id": "US-D02",
+      "title": "Dashboard: giudizi dell'utente",
+      "description": "Bottoni va bene / rifare e una nota su ogni elemento, salvati nell'archivio della pagina; Claude li legge a inizio sessione.",
+      "acceptanceCriteria": [
+        "si vede nella pagina pubblicata",
+        "verificata in chiaro, scuro e a 400 px di larghezza"
+      ],
+      "priority": 60,
+      "fase": "strumenti",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18 (richiesta dell'utente: una dashboard per vedere tutto e dire se va bene). Pagina https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3, script in tools/dashboard/."
+    },
+    {
+      "id": "US-D03",
+      "title": "Dashboard: bestiario, personaggi, oggetti",
+      "description": "Figure animate di nemici, boss, Enel e forme, NPC con ritratto, antagonisti, pet, fauna; icone di oggetti e stati.",
+      "acceptanceCriteria": [
+        "si vede nella pagina pubblicata",
+        "verificata in chiaro, scuro e a 400 px di larghezza"
+      ],
+      "priority": 60,
+      "fase": "strumenti",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18 (richiesta dell'utente: una dashboard per vedere tutto e dire se va bene). Pagina https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3, script in tools/dashboard/."
+    },
+    {
+      "id": "US-D04",
+      "title": "Dashboard: mondo, paesi e case",
+      "description": "Mappa coi colori veri delle tessere e i segni dei luoghi; foto dal gioco di ogni luogo, villaggio e interno.",
+      "acceptanceCriteria": [
+        "si vede nella pagina pubblicata",
+        "verificata in chiaro, scuro e a 400 px di larghezza"
+      ],
+      "priority": 60,
+      "fase": "strumenti",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18 (richiesta dell'utente: una dashboard per vedere tutto e dire se va bene). Pagina https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3, script in tools/dashboard/."
+    },
+    {
+      "id": "US-D05",
+      "title": "Dashboard: tecniche",
+      "description": "Ogni Pathway dalla Sequenza 9 alla 0 con abilita', primitive coi glifi nei colori del Pathway ed effetti animati.",
+      "acceptanceCriteria": [
+        "si vede nella pagina pubblicata",
+        "verificata in chiaro, scuro e a 400 px di larghezza"
+      ],
+      "priority": 60,
+      "fase": "strumenti",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18 (richiesta dell'utente: una dashboard per vedere tutto e dire se va bene). Pagina https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3, script in tools/dashboard/."
+    },
+    {
+      "id": "US-D06",
+      "title": "Dashboard: libro e HUD",
+      "description": "Foto di ogni pagina del libro e dell'HUD in combattimento dal gioco vero.",
+      "acceptanceCriteria": [
+        "si vede nella pagina pubblicata",
+        "verificata in chiaro, scuro e a 400 px di larghezza"
+      ],
+      "priority": 60,
+      "fase": "strumenti",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18 (richiesta dell'utente: una dashboard per vedere tutto e dire se va bene). Pagina https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3, script in tools/dashboard/."
     }
   ]
 }
