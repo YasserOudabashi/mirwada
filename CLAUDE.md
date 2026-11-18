@@ -408,9 +408,9 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   abilita' a tastiera + hotbar, proiettili, recitazione con payload veri, 307 ingredienti come oggetti,
   fonti nel mondo, Prepara/Bevi, negozio. PRD `prd-fase-8-vertical-slice.md`.
 - Fase 9 — Pathway Non-Standard (Boon): **CHIUSA** (7 story). PRD `prd-fase-9-pathway-non-standard.md`.
-- Fase 10 — Mondo continuo a layout ASCII (`world_scene.gd`, `data/world/layouts/`, edifici e
-  interni): **CHIUSA** sul suo ramo. Dal merge la scena di gioco e' il **mondo generato** (sotto): i
-  layout restano come dati e come fonte del contenuto da portare sul mondo generato.
+- Fase 10 — Mondo continuo a layout ASCII (`data/world/layouts/`, edifici e interni): **CHIUSA** sul suo ramo. Dal
+  merge la scena di gioco e' il **mondo generato** (sotto): i layout restano come dati e come fonte del contenuto da
+  portare sul mondo generato. `world_scene.gd` (il mondo a layout) e' stato tolto il 2026-11-18.
 - Fase 11 — Villaggi ed economia (rarita', fabbri, interni, villaggi in campagna): **CHIUSA** sul suo
   ramo; i villaggi e gli edifici vanno portati sul mondo generato come per la fase 10.
 - Fase 8b — Arte con sprite-forge: **CHIUSA** (2026-10-29, tutto su `main`). Fatti: personaggi a 64 px, aspetti degli NPC, terreni,

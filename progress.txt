@@ -1479,3 +1479,15 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - tests/test_cose_a_posto.gd (4). 1156 test, validate 0.
 - Controllato e lasciato: il punto "passo tra le rupi" sta al bordo della regione, ma la zona "altura" si prende da
   tutte le caselle vicine dentro la regione (qa_atto_3 ci fa il rituale): non e' un problema.
+
+## Cose aperte messe a posto (2): via il mondo a layout, 2026-11-18
+- Tolti scripts/world_scene.gd, scenes/world_scene.tscn, tests/test_world_scene.gd (28 test) e
+  tests/manual/qa_mondo_continuo.gd: il mondo a layout della fase 10, che il gioco non usa piu' dal merge (la scena e'
+  il mondo generato). I layout restano come dati (fonte di nemici, oggetti, zone, edifici per mondo.gd popola()).
+- tests/test_layouts.gd ridotto ai test sui dati (2) piu' uno nuovo sul mondo vero: area_cleared alla morte
+  dell'ultimo nemico di una regione. Tolti i test che istanziavano world_scene in test_regions (2), test_area_gate (1),
+  test_main_boot (1) e il controllo di qa_mondo_continuo in test_fase_10_checkpoint; test_page_mappa: il viaggio con
+  il gating d'ingresso ora sul mondo vero (mondo.gd viaggia_a). Gli stessi comportamenti sul mondo generato sono gia'
+  in tests/test_mondo.gd (regione dalla posizione, varchi, nemici e oggetti dei layout, viaggio, NPC).
+- Commenti aggiornati (main.gd, mondo.gd, page_mappa.gd, enemy.gd, interior_scene.gd, CLAUDE.md).
+- 1090 test (66 tolti col vecchio mondo, 1 nuovo), tutti passati; validate 0.

@@ -74,8 +74,7 @@ func _viaggia(target: String) -> void:
 	if main == null:
 		return
 	# il nodo mondo si riconosce dal suo contratto pubblico (viaggia_a), non
-	# dal nome dello script: world_scene.gd l'ha sostituito a region_scene.gd
-	# (US-1002B, fase 10 - mondo continuo, mai piu' una scena per regione).
+	# dal nome dello script (oggi scripts/world/mondo.gd).
 	for c in main.get_children():
 		if c.has_method("viaggia_a"):
 			if bool(c.call("viaggia_a", target)):

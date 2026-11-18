@@ -4,17 +4,17 @@ extends TileMapLayer
 ## quella complessita' e' solo per il mondo esterno continuo, US-1002). Un
 ## interno e' sempre indipendente, mai parte della griglia condivisa:
 ## entrarci e uscirne resta un caricamento di scena locale
-## (world_scene.gd::_su_porta_edificio/_su_uscita_edificio), esattamente
-## come funzionavano i passaggi fra regioni PRIMA di US-1002. world_scene.gd
+## (mondo.gd::entra/esci), esattamente
+## come funzionavano i passaggi fra regioni PRIMA di US-1002. il vecchio world_scene.gd (tolto il 2026-11-18)
 ## non viene MAI liberato mentre si e' dentro (resta lo stesso nodo
 ## persistente di US-1002B): si nasconde e ferma, poi torna.
 ##
 ## Painting/nemici/oggetti riusano lo stesso linguaggio dati di
-## world_scene.gd (stessa legenda di caratteri, stesso formato nemici/
+## il vecchio world_scene.gd (tolto il 2026-11-18) (stessa legenda di caratteri, stesso formato nemici/
 ## oggetti) ma sono una copia minima apposta: un interno non ha bisogno di
 ## _crea_zone/_crea_gate/_crea_npc/_crea_confine/_riempi_campagna (nessuna
 ## di quelle nozioni si applica a una stanza), quindi non vale la pena
-## condividere codice con world_scene.gd oltre alla legenda.
+## condividere codice con il vecchio world_scene.gd (tolto il 2026-11-18) oltre alla legenda.
 ##
 ## NIENTE class_name: coerente col resto del progetto.
 
@@ -28,7 +28,7 @@ const _COLONNA_PER_CARATTERE := {
 const _COLONNA_PAVIMENTO := 0
 const CALPESTABILI := [".", ",", "=", "+"]
 
-## Impostato da chi istanzia questa scena (world_scene.gd) PRIMA di
+## Impostato da chi istanzia questa scena (mondo.gd) PRIMA di
 ## aggiungerla all'albero, cosi' _ready() lo trova gia' pronto.
 var interno_id: String = ""
 ## US-8B21b: il contenuto della zona del layout dietro un varco (mondo.gd ospiti_del_varco),
@@ -36,7 +36,7 @@ var interno_id: String = ""
 var ospiti: Dictionary = {}
 
 ## US-1108 (fase 11): l'npc_id vicino al giocatore ("" = nessuno) - stesso
-## principio di world_scene.gd::_npc_vicino, per _unhandled_input.
+## principio di mondo.gd::_npc_vicino, per _unhandled_input.
 var _npc_vicino: String = ""
 
 
@@ -366,7 +366,7 @@ func _crea_uscita(layout: Dictionary) -> void:
 	# Il player appare GIA' su questa cella entrando (e' anche lo spawn):
 	# il primo body_entered che l'Area2D vede, appena aggiunta all'albero,
 	# e' quel corpo gia' presente - non un vero ritorno alla porta. Stesso
-	# problema (e stessa soluzione) della porta esterna, world_scene.gd::
+	# problema (e stessa soluzione) della porta esterna, il vecchio world_scene.gd (tolto il 2026-11-18)::
 	# _su_porta_edificio/ignora_prossimo_ingresso.
 	area.set_meta("ignora_primo_ingresso", true)
 	area.body_entered.connect(_su_ingresso_uscita.bind(area))
@@ -428,7 +428,7 @@ func _crea_oggetti(layout: Dictionary, gruppo: String = "") -> void:
 
 # --- NPC (US-1108, fase 11) -------------------------------------------
 ## Un fabbro/alchimista dentro la sua bottega. Stessa forma minima di
-## world_scene.gd::_crea_un_npc MA senza schedule/orario: un NPC dentro una
+## mondo.gd::crea_npc MA senza schedule/orario: un NPC dentro una
 ## stanza e' sempre li', non gira fra location_tag per momento del giorno -
 ## duplicata apposta, non condivisa (stessa scelta gia' fatta per
 ## _crea_nemici/_crea_oggetti, vedi il commento di testa del file).

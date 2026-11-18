@@ -75,55 +75,6 @@ func test_da_salvataggio_non_fidato() -> void:
 	ws.call("pulisci")
 
 
-## US-1002B (fase 10, mondo continuo): non c'e' piu' una scena per regione -
-## world_scene.gd le dipinge tutte nello stesso nodo, ognuna con un confine
-## (Area2D grande quanto il suo rettangolo) che registra WorldState quando
-## il giocatore lo attraversa (qui: chiamata diretta all'handler, stesso
-## pattern gia' in uso nel resto della suite per bypassare la fisica reale
-## nei test headless - vedi tests/test_world_scene.gd).
-func test_ogni_regione_ha_un_confine_e_si_registra() -> void:
-	var ws: Node = _ws()
-	ws.call("pulisci")
-	var cont := Node2D.new()
-	_root().add_child(cont)
-	var player := Node2D.new()
-	player.name = "Player"
-	player.add_to_group("player")
-	cont.add_child(player)
-	var mondo: Node = load("res://scenes/world_scene.tscn").instantiate()
-	cont.add_child(mondo)
-
-	for r in _gd().call("get_regions"):
-		var rid: String = str((r as Dictionary).get("id", ""))
-		var confine: Node = mondo.get_node_or_null("Confine_%s" % rid)
-		assert_false(confine == null, "la regione '%s' ha un confine nel mondo continuo" % rid)
-		mondo.call("_su_ingresso_regione", player, rid)
-		assert_eq(str(ws.call("regione_corrente")), rid,
-			"attraversare il confine di '%s' registra la regione corrente" % rid)
-
-	cont.free()
-	ws.call("pulisci")
-
-
-## Nel mondo continuo ogni regione e' raggiungibile a piedi da ogni altra
-## (world_scene.gd::passaggi_verso, US-1002B): non esiste piu' un elenco di
-## "passaggi" discreti per singola regione, hub-and-spoke o meno.
-func test_passaggi_verso_elenca_tutte_le_regioni() -> void:
-	var cont := Node2D.new()
-	_root().add_child(cont)
-	var mondo: Node = load("res://scenes/world_scene.tscn").instantiate()
-	cont.add_child(mondo)
-
-	var ids_attesi: Array = []
-	for r in _gd().call("get_regions"):
-		ids_attesi.append(str((r as Dictionary).get("id", "")))
-	var raggiungibili: Array = mondo.call("passaggi_verso")
-	assert_eq(raggiungibili.size(), ids_attesi.size(), "tutte le regioni sono raggiungibili")
-	for rid in ids_attesi:
-		assert_true(raggiungibili.has(rid), "'%s' e' fra le regioni raggiungibili" % rid)
-	cont.free()
-
-
 func test_ritual_di_sequenza_0_ospitato_da_una_regione() -> void:
 	# US-715: ogni Pathway attivo ha un sito reale per il rituale che porta alla Sequenza
 	# 0 (uno per gruppo, condiviso dai Pathway vicini che si fondono in fase 7). Dal 2026-11-17 sta sui dati della

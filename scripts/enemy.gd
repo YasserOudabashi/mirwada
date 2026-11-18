@@ -406,7 +406,7 @@ func _lascia_caratteristica() -> void:
 
 ## US-809a: alla morte, con probabilita' drop_probabilita, lascia a terra
 ## UN item scelto fra quelli di override.oggetti_a_morte (dal layout.drop
-## della regione, via world_scene.gd::_crea_nemici). Vuoto o assente (il
+## della regione, via mondo.gd::_popola_da). Vuoto o assente (il
 ## nemico da banco di prova, ogni regione senza layout) -> no-op.
 func _lascia_oggetto() -> void:
 	var oggetti: Array = _cfg.get("oggetti_a_morte", [])

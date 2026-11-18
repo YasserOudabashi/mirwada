@@ -84,7 +84,7 @@ func test_nessun_codice_nomina_pathway_npc_quest_o_flag_della_storia() -> void:
 	var colpevoli: PackedStringArray = []
 	for dir in ["res://scripts", "res://scripts/pages", "res://scripts/world"]:
 		for f in DirAccess.get_files_at(dir):
-			if not f.ends_with(".gd") or f == "world_scene.gd":   # il mondo a layout della fase 10, da togliere
+			if not f.ends_with(".gd"):
 				continue
 			var righe: PackedStringArray = FileAccess.get_file_as_string(dir + "/" + f).split("\n")
 			for i in righe.size():

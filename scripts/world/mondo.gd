@@ -215,7 +215,7 @@ func partenza() -> Vector2:
 	return Vector2((float(p[0]) + 0.5) * tile, (float(p[1]) + 0.5) * tile)
 
 
-## Punto di comparsa in una regione (contratto di world_scene.gd, usato da
+## Punto di comparsa in una regione (contratto del nodo mondo, usato da
 ## main.gd): la partenza dei dati se e' in quella regione (o rid vuoto),
 ## altrimenti il primo luogo della regione sulla mappa, come viaggia_a.
 func punto_spawn(rid: String = "") -> Vector2:
@@ -516,7 +516,7 @@ func _su_nemico_morto(chi: Node, rid: String) -> void:
 
 
 ## Nemici e NPC lontani dal giocatore fermi (balance.json mondo.raggio_attivo_entita),
-## come in world_scene.gd: qui serve anche perche' lontano dal giocatore le collisioni
+## qui serve anche perche' lontano dal giocatore le collisioni
 ## del terreno non sono costruite (si costruiscono solo i blocchi vicini).
 func _aggiorna_attivita() -> void:
 	_aggiorna_varchi()
