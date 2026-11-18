@@ -1464,3 +1464,18 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   poi resta fermo un secondo e mezzo; il corvo vola alto e colpisce. arte/revisione/nemico_carica_volo.png.
 - Non mi convince: i nomi sopra la testa di nemici vicini si accavallano (da sistemare con l'arte dei nemici, US-1504,
   o mostrando il nome solo del nemico ingaggiato).
+
+## Cose aperte messe a posto (1), 2026-11-18 (richiesta dell'utente: "metti a posto le cose da mettere a posto")
+- Decisioni dell'utente: l'eclissi resta rara (non cambia niente); i boss proposti sono confermati (CLAUDE.md, PRD).
+- Nomi dei nemici: si vedono solo sul nemico che ti affronta e, fra questi, sul piu' vicino (enemy.gd _nome_visibile,
+  5 volte al secondo); prima si accavallavano. Foto: arte/revisione/nomi_nemici.png.
+- Tiri dei nemici: colorati dalla palette del tipo (balance.json nemici_tipi.<tipo>.palette, id di vfx.json; Vfx
+  la chiede a enemy.palette_vfx()). Il validator controlla la palette.
+- Vita e spiritualita' salendo di Sequenza restano alla stessa frazione (Progression._applica_modificatori): prima
+  90/100 diventava 90/180.
+- Salvataggi di prima del 2026-11-16: le Ancore-persona entrano in AnchorSystem al caricamento (NpcSystem.riallinea_ancore).
+- Sigilli dei rituali e arma spezzata anche nei forzieri (bottino.json cripta, miniera, grotta, fogne, peso basso) e
+  l'arma spezzata dai nemici delle Marche di Sequenza 9-7 (drop del layout).
+- tests/test_cose_a_posto.gd (4). 1156 test, validate 0.
+- Controllato e lasciato: il punto "passo tra le rupi" sta al bordo della regione, ma la zona "altura" si prende da
+  tutte le caselle vicine dentro la regione (qa_atto_3 ci fa il rituale): non e' un problema.

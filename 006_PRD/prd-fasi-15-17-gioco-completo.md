@@ -66,7 +66,7 @@ Due idee dell'utente cambiate per la Nota IP di `CLAUDE.md` (niente personaggi o
 - il boss segreto che "appare a caso davanti a te" si tiene come **idea di gioco** (una figura nera che colpita si
   divide in tante copie e le rifonde in una piu' grande), con nome e aspetto nostri: non il personaggio di un manga.
 
-Boss ("decidili tu e proponimeli"): proposta da confermare prima di US-1505.
+Boss ("decidili tu e proponimeli"): proposta **confermata dall'utente il 2026-11-18**.
 1. **Mirwada, fogne** — il Re dei Ratti: un uomo cucito al suo branco (3 fasi; chiama ratti, poi si divide).
 2. **Valle** — la Madre delle Radici: albero che cammina, cura se stessa dalle radici che vanno tagliate (3 fasi).
 3. **Archivio** — l'Archivista Capo: riscrive le regole della stanza (zittisce, ricopia le tue abilita') (3 fasi).

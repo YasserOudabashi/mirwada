@@ -182,6 +182,16 @@ func _su_ancora_persa(anchor_id: String) -> void:
 	_aggiorna_sussurri()
 
 
+## Le Ancore-persona di un salvataggio fatto prima del 2026-11-16 non erano in AnchorSystem: si registrano ora.
+func riallinea_ancore() -> void:
+	var anc: Node = get_node_or_null("/root/AnchorSystem")
+	if anc == null:
+		return
+	for id in _ancore:
+		if not ((anc.call("active") as Array).has(_id_ancora(str(id)))):
+			anc.call("register", _id_ancora(str(id)))
+
+
 func _id_ancora(npc_id: String) -> String:
 	return "anchor_" + npc_id.trim_prefix("npc_")
 

@@ -255,6 +255,8 @@ func _pathway_di(caster: Node) -> String:
 	if caster.is_in_group("player"):
 		var prog: Node = get_node_or_null("/root/Progression")
 		return str(prog.call("pathway")) if prog != null else ""
+	if caster.has_method("palette_vfx"):                 # US-1502: i tiri dei nemici, colorati dal loro tipo
+		return str(caster.call("palette_vfx"))
 	return ""
 
 

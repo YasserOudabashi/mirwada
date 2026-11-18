@@ -1928,7 +1928,7 @@ def main():
     nemico_base_keys = set((_bal_nemici.get("nemico_base", {}) or {}).keys())
     # US-1501: i tipi di nemico: chiavi di nemico_base piu' nome, rarita', comportamento e aspetto
     nemici_tipi = {k: v for k, v in (_bal_nemici.get("nemici_tipi", {}) or {}).items() if not k.startswith("_")}
-    _tipo_extra = {"name_i18n", "rarita", "comportamento", "aspetto"}
+    _tipo_extra = {"name_i18n", "rarita", "comportamento", "aspetto", "palette"}
     for _tid, _td in nemici_tipi.items():
         _ctx = f"data/balance.json nemici_tipi [{_tid}]"
         _fuori = set(_td) - nemico_base_keys - _tipo_extra
@@ -1938,6 +1938,8 @@ def main():
             err(f"{_ctx}: rarita '{_td.get('rarita')}' (comune, raro, elite)")
         if _td.get("comportamento") not in ("mischia", "distanza", "carica", "volo"):
             err(f"{_ctx}: comportamento '{_td.get('comportamento')}' fuori vocabolario (mischia, distanza, carica, volo)")
+        if _td.get("palette") and _td["palette"] not in ((load_json(os.path.join(DATA, "vfx.json")) or {}).get("pathway_palette_visiva", {})):
+            err(f"{_ctx}: palette '{_td['palette']}' non e' una palette di data/vfx.json")
         if _td.get("tag") and _td["tag"] not in valid_tags:
             err(f"{_ctx}: tag '{_td['tag']}' fuori dal vocabolario di data/tags.json")
         if not os.path.isfile(os.path.join(ROOT, "assets", "placeholder", f"{_td.get('aspetto')}_idle.png")):

@@ -150,6 +150,7 @@ func _physics_process(delta: float) -> void:
 			if _recupero_left <= 0.0:
 				_vai(Stato.IDLE)
 
+	_aggiorna_nome(delta)
 	move_and_slide()
 	if _stato == Stato.ATTACCO and _carica() and (_carica_left <= 0.0 or get_slide_collision_count() > 0):
 		_vai(Stato.RECUPERO)                         # US-1503: fine della carica (tempo, muro o giocatore)
@@ -224,6 +225,11 @@ func _carica() -> bool:
 # --- US-1502: il comportamento "distanza" (dati: comportamento del tipo e blocco "distanza" di nemico_base) ---
 
 var _ritirata: float = 0.0
+
+
+## La palette dei suoi tiri (balance.json nemici_tipi.<tipo>.palette): la usa Vfx per colorare il proiettile.
+func palette_vfx() -> String:
+	return str(_cfg.get("palette", ""))
 
 
 func _a_distanza() -> bool:
@@ -482,6 +488,35 @@ func nome() -> String:
 	return str(gd.call("tr_data", k)) if gd != null and not k.is_empty() else ""
 
 
+## 2026-11-18: il nome si vede solo sul nemico che ti sta affrontando e, fra questi, sul piu' vicino: prima i nomi di
+## nemici vicini si accavallavano. Si controlla 5 volte al secondo.
+var _nome_t: float = 0.0
+
+
+func _aggiorna_nome(delta: float) -> void:
+	var l: Node = get_node_or_null("Nome")
+	_nome_t -= delta
+	if l == null or _nome_t > 0.0:
+		return
+	_nome_t = 0.2
+	(l as CanvasItem).visible = _nome_visibile()
+
+
+func _ingaggiato() -> bool:
+	return _stato != Stato.IDLE and _stato != Stato.MORTO and is_instance_valid(_bersaglio)
+
+
+func _nome_visibile() -> bool:
+	if not _ingaggiato():
+		return false
+	var mia: float = global_position.distance_squared_to(_bersaglio.global_position)
+	for n in get_tree().get_nodes_in_group("nemici"):
+		if n != self and n.has_method("_ingaggiato") and bool(n.call("_ingaggiato")) \
+				and (n as Node2D).global_position.distance_squared_to(_bersaglio.global_position) < mia:
+			return false
+	return true
+
+
 func _monta_nome() -> void:
 	if nome().is_empty():
 		return
@@ -496,5 +531,6 @@ func _monta_nome() -> void:
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.scale = Vector2.ONE / maxf(scale.x, 0.01)
 	l.position = Vector2(-60, -40) / maxf(scale.x, 0.01)
+	l.visible = false
 	add_child(l)
 	_stats.died.connect(l.hide)

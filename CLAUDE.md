@@ -489,6 +489,8 @@ audio, Mondo vivo, fusioni, rilascio (qui il gioco e' finito in italiano), poi r
   rituale**, nel luogo e all'ora giusti (dura, si puo' interrompere). Dei luoghi indicati da un rituale **ne basta uno**.
   I sacrifici si pagano **davvero dove il gioco ha un costo** (Ancora, oggetto, salute o spiritualita' massima, base);
   gli altri sono una scelta scritta che si conferma nel rituale. I luoghi mancanti si aggiungono senza rigenerare la mappa.
+- **Eclissi** (2026-11-18): resta **rara** (ogni 8 cicli di luna): il rituale finale e gli altri che la chiedono costano
+  tempo, per scelta. **Boss** (2026-11-18): confermata la proposta di `prd-fasi-15-17-gioco-completo.md` 2.1 (6 boss + 2 segreti).
 - **Bersaglio delle abilita'** (2026-11-03): le primitive che colpiscono un altro (maledizione, possessione, anima
   recisa, debuff, danno nel tempo, paura) cadono sul **nemico piu' vicino davanti** (`balance.json
   combattimento.bersaglio`); **senza nemico l'abilita' non parte e non costa**. I costi voluti su di se' sono
