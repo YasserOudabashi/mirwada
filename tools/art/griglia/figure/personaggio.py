@@ -238,7 +238,7 @@ def disegna(tela, v, g, posa):
             x, y = v.xy(pomo + d * 12)
             griglia(tela, ["..Y..", ".YWY.", "YWWWY", ".YWY.", "..Y.."], {"Y": colore("yellow"), "W": colore("white")},
                     int(round(x - 2)), int(round(y - 2)), "scintilla", separa=False)
-        parti.append((99, 6, scintilla))
+        parti.append((v.prof(pomo + d * 12) + 0.1, 6, scintilla))       # alla profondita' della lama
 
     sangue = posa.get("sangue", 0)               # gocce che schizzano dal petto (hurt, death)
     if sangue:
@@ -323,13 +323,14 @@ ANIM = {
         (9 / 11, dict(PRONTO, arma=(-30, 5), braccio_r=(64, 8, 10), braccio_l=(62, -8, 10), piega=24, avanti=2,
                       gamba_l=(26, 6, 30), gamba_r=(-16, 6, 12))),
         (1.0, dict(PRONTO))]},
-    # parry: lama dritta davanti al corpo, braccia avanti, incontro al colpo; la scintilla e' dove il colpo arriva
+    # parry: la lama DAVANTI a lui, di traverso fra lui e il colpo (mani avanti all'altezza del petto, lama che sale in
+    # diagonale verso la sua sinistra); la scintilla e' sulla lama, davanti, dove arriva il colpo
     "parry": {"chiavi": [
-        (0.0, dict(PRONTO, arma=(72, 15), braccio_r=(78, 18, 40), braccio_l=(76, -14, 44), piega=10, avanti=1.5,
+        (0.0, dict(PRONTO, arma=(30, -75), braccio_r=(74, 14, 24), braccio_l=(72, -24, 38), piega=10, avanti=1.5,
                    gamba_l=(22, 6, 18), gamba_r=(-18, 6, 14))),
-        (1 / 3, dict(PRONTO, arma=(76, 12), braccio_r=(84, 18, 34), braccio_l=(82, -14, 38), piega=12, avanti=2,
+        (1 / 3, dict(PRONTO, arma=(30, -75), braccio_r=(78, 14, 18), braccio_l=(76, -24, 32), piega=12, avanti=2,
                      gamba_l=(24, 6, 22), gamba_r=(-20, 6, 16), scintilla=True)),
-        (2 / 3, dict(PRONTO, arma=(66, 18), braccio_r=(72, 18, 46), braccio_l=(70, -14, 50), piega=6, avanti=0.5,
+        (2 / 3, dict(PRONTO, arma=(32, -70), braccio_r=(70, 14, 30), braccio_l=(68, -24, 42), piega=8, avanti=1,
                      gamba_l=(20, 6, 18), gamba_r=(-16, 6, 14))),
         (1.0, dict(PRONTO))]},
     "hurt": {"chiavi": [

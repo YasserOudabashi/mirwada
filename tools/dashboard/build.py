@@ -52,6 +52,66 @@ ANIM = j("data", "animations.json")
 FIGURE = {}
 
 
+# --- versioni delle cose da testare ------------------------------------------------------------------------------
+# Ogni cosa della pagina "Da testare" ha un'impronta del suo disegno (sha dei file). Quando cambia, il registro
+# (tools/dashboard/versioni.json, nel repo) segna da quando: un giudizio dato prima torna "da testare" e la sua nota
+# va fra quelle sistemate. Cosi' una nota mandata, appena la cosa e' rifatta, lascia il posto a una nuova prova.
+REGISTRO = os.path.join(ROOT, "tools", "dashboard", "versioni.json")
+GIUDICATO = "e501670"         # il commit che l'utente ha giudicato per primo (la pagina Da testare del 2026-11-18)
+
+
+def _sha(*blobs):
+    import hashlib
+    h = hashlib.sha256()
+    for b in blobs:
+        h.update(b)
+    return h.hexdigest()[:12]
+
+
+def _file_prova():
+    """chiave -> lista di percorsi (dalla radice del repo) che fanno quella cosa."""
+    out = {}
+    pers = [n for n, a in senza_commenti(ANIM["personaggio"]).items() if isinstance(a, dict) and "frames" in a]
+    lupo = [n for n, a in senza_commenti(ANIM["nemico_base"]).items() if isinstance(a, dict) and "frames" in a]
+    for n in pers:
+        out[f"prova:enel_{n}"] = [f"assets/placeholder/personaggio_{n}.png"]
+    out["prova:enel"] = [f"assets/placeholder/personaggio_{n}.png" for n in pers]
+    for n in lupo:
+        out[f"prova:lupo_{n}"] = [f"assets/placeholder/nemico_base_lupo_della_luna_{n}.png"]
+    out["prova:lupo"] = [f"assets/placeholder/nemico_base_lupo_della_luna_{n}.png" for n in lupo]
+    for f in glob.glob(os.path.join(ROOT, "arte", "prova", "personaggio_dash_*.png")):
+        vid = os.path.basename(f)[len("personaggio_dash_"):-4]
+        out[f"prova:schivata_{vid}"] = [f"arte/prova/personaggio_dash_{vid}.png"]
+    for k, sp in (("fendente_pesante", "vfx_fendente_pesante"), ("incantesimo", "vfx_incantesimo"),
+                  ("incantesimo_scoppio", "vfx_incantesimo_scoppio")):
+        out[f"prova:{k}"] = [f"assets/vfx/{sp}.png"]
+    out["prova:carica"] = ["assets/placeholder/personaggio_attack_heavy.png", "scripts/player.gd"]
+    return out
+
+
+def versioni():
+    reg = json.load(open(REGISTRO, encoding="utf-8")) if os.path.isfile(REGISTRO) else {}
+    adesso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    out = {}
+    for k, files in _file_prova().items():
+        dati = [open(os.path.join(ROOT, f), "rb").read() for f in files if os.path.isfile(os.path.join(ROOT, f))]
+        if not dati:
+            continue
+        v = _sha(*dati)
+        if k not in reg:                          # prima volta: com'era al commit giudicato?
+            prima = []
+            for f in files:
+                r = subprocess.run(["git", "show", f"{GIUDICATO}:{f}"], cwd=ROOT, capture_output=True)
+                prima.append(r.stdout if r.returncode == 0 else b"")
+            reg[k] = {"v": v, "dal": "2026-11-18T00:00:00Z" if _sha(*prima) == v else adesso}
+        elif reg[k]["v"] != v:
+            reg[k] = {"v": v, "dal": adesso}
+        out[k] = reg[k]
+    with open(REGISTRO, "w", encoding="utf-8") as fh:
+        json.dump(reg, fh, ensure_ascii=False, indent=1, sort_keys=True)
+    return out
+
+
 def varianti_schivata():
     """Le versioni della schivata da scegliere (tools/art/build_griglia.py -> arte/prova/): una figura ciascuna."""
     import importlib
@@ -459,6 +519,7 @@ def main():
     dati["nemici"], dati["boss"] = nemici()
     dati["personaggi"] = personaggi()
     dati["tecniche"] = tecniche()
+    dati["versioni"] = versioni()
     dati["combattimento"] = senza_commenti(json.load(open(os.path.join(DATA, "balance.json"), encoding="utf-8"))["combattimento"])
     dati["oggetti"], dati["stati"] = oggetti()
     dati["mondo"] = mondo()

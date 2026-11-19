@@ -1702,3 +1702,15 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Regole nuove nella skill arte-personaggi. 1103 test verdi, validator 0 errori, Playwright senza errori.
 - Aperto (per il rifacimento di tutti): il contorno rosso del tell (Re dei Ratti) - va spiegato o tolto; la barca
   fantasma deve avere un cannone che spara; nel gioco il fendente pesante usa ancora il disegno melee_arc.
+
+## Parata davanti e note che tornano da testare, 2026-11-19 (US-8C04)
+- Parata: la lama di traverso DAVANTI a Enel (mani avanti al petto, lama in diagonale verso la sua sinistra), la
+  scintilla alla profondita' della lama (da dietro non copre piu' la testa). Guardata nelle 4 viste.
+- Sito, richiesta dell'utente: una nota scritta e' una "nota mandata"; quando la cosa e' rifatta torna "da testare",
+  la nota scende fra quelle "gia' sistemate" e se ne scrive una nuova; le approvate stanno in "Testate".
+  Come: build.py versioni() fa un'impronta (sha) dei file di ogni scheda; il registro tools/dashboard/versioni.json
+  (nel repo) ricorda da quando ogni versione c'e'; un giudizio vale per la sua versione (campo `versione`, o per i
+  giudizi vecchi la data contro `dal`). La pagina Da testare ha tre parti: Da testare, Note mandate, Testate.
+  Il registro e' partito confrontando col commit giudicato (e501670): le cose non cambiate tengono il giudizio.
+- Verificato con Playwright (giudizi finti nella pagina): la parata torna da testare con la nota sistemata, l'idle
+  approvato resta in Testate, una nota nuova resta in Note mandate. Nessun errore.

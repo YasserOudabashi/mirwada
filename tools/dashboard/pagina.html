@@ -128,6 +128,7 @@ img.foto { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 
 .mini { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px }
 .mini button { border: 1px solid var(--linea); background: var(--fondo2); border-radius: 4px; padding: 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--testo); font: 11px var(--f-testo) }
 .mini button[aria-pressed="true"] { border-color: var(--accento); box-shadow: 0 0 0 1px var(--accento) }
+.storia { margin-top: 10px; border-top: 1px solid var(--bordo, #ccc); padding-top: 6px } .storia ul { margin: 4px 0 0; padding-left: 18px }
 .campo { display: block; width: 100%; border-radius: 6px; image-rendering: pixelated; background: #3e8948; outline: none; cursor: pointer }
 .campo:focus { box-shadow: 0 0 0 3px var(--accento) }
 .arena-box.grande { position: fixed; inset: 0; z-index: 50; background: #181425; padding: 12px; overflow: auto; display: flex; flex-direction: column; gap: 8px }
@@ -285,11 +286,19 @@ function effetto(e, pal, scala = 2, ctrl = null) {
 }
 
 // ---------- giudizi ----------
-const statoDi = k => (GIU.get(k) || {}).stato || null;
-const notaDi = k => (GIU.get(k) || {}).nota || "";
+// Versioni (build.py versioni): un giudizio vale solo per la versione che hai visto. Se la cosa e' stata rifatta dopo,
+// torna "da testare" e la nota scende fra quelle gia' sistemate (storia); ne puoi scrivere una nuova.
+const VER = k => (D && D.versioni || {})[k];
+const attuale = (g, V) => !V || (g.versione ? g.versione === V.v : (g.quando || "") >= V.dal);
+const statoDi = k => { const g = GIU.get(k) || {}; return attuale(g, VER(k)) ? g.stato || null : null; };
+const notaDi = k => { const g = GIU.get(k) || {}; return attuale(g, VER(k)) ? g.nota || "" : ""; };
+const storiaDi = k => { const g = GIU.get(k) || {}, st = [...(g.storia || [])];
+  if (!attuale(g, VER(k)) && g.nota) st.push({nota: g.nota, quando: g.quando}); return st; };
 async function salva(k, campi) {
   if (!db || !posso) return false;
-  const prima = GIU.get(k) || {}, nuovo = {...prima, ...campi, quando: new Date().toISOString()};
+  let prima = GIU.get(k) || {}; const V = VER(k);
+  if (V && !attuale(prima, V)) prima = {storia: storiaDi(k)};          // versione nuova: si riparte, la nota scende
+  const nuovo = {...prima, ...campi, quando: new Date().toISOString(), ...(V ? {versione: V.v} : {})};
   GIU.set(k, nuovo); aggiornaGiudizi();
   try { await db.doc("giudizi/" + k).set(nuovo); return true; } catch (e) { GIU.set(k, prima); aggiornaGiudizi(); avviso("Non salvato: " + (e.code || "errore")); return false; }
 }
@@ -301,7 +310,7 @@ function bottoniGiudizio(k, perCarta = true) {
   const no = h("button", {class: "no", type: "button", "aria-pressed": String(st === "no"), disabled: !posso, title: posso ? "Da rifare: si apre la nota" : "Solo il proprietario può giudicare",
     onclick: ev => { ev.stopPropagation(); if (statoDi(k) !== "no") salva(k, {stato: "no"});
       if (perCarta) { const c = ev.currentTarget.closest("[data-i]"); apriElemento(c ? +c.dataset.i : 0, true); }
-      else document.getElementById("nota")?.focus(); }}, "✗ Rifare");
+      else document.getElementById("nota")?.focus(); }}, "✎ Nota da sistemare");
   return h("div", {class: "giudizio", "data-g": k}, si, no);
 }
 function aggiornaGiudizi() {
@@ -312,6 +321,7 @@ function aggiornaGiudizi() {
       const n = s.querySelector(".nota-card"); if (n) n.textContent = st === "no" ? notaDi(k) : ""; }
   }
   for (const m of document.querySelectorAll(".segno[data-k]")) { const st = statoDi(m.dataset.k); m.classList.toggle("ok", st === "ok"); m.classList.toggle("no", st === "no"); }
+  if (VISTA === "provare" && MOD.hidden) rendi();               // le schede passano da una sezione all'altra
 }
 
 // ---------- elenco della vista e carte ----------
@@ -355,7 +365,7 @@ function apriElemento(i, focusNota = false) {
   const era = MOD.hidden; MOD.hidden = false;
   if (focusNota) document.getElementById("nota")?.focus(); else if (era) document.getElementById("mod-dopo").focus();
 }
-function chiudi() { for (const f of ESCI) f(); ESCI = []; MOD.hidden = true; document.querySelector(`[data-i="${IDX}"]`)?.focus(); }
+function chiudi() { for (const f of ESCI) f(); ESCI = []; MOD.hidden = true; if (VISTA === "provare") rendi(); document.querySelector(`[data-i="${IDX}"]`)?.focus(); }
 document.getElementById("mod-chiudi").onclick = chiudi;
 document.getElementById("mod-prima").onclick = () => apriElemento((IDX - 1 + ELENCO.length) % ELENCO.length);
 document.getElementById("mod-dopo").onclick = () => apriElemento((IDX + 1) % ELENCO.length);
@@ -373,14 +383,17 @@ document.addEventListener("keydown", e => {
 });
 function pannelloGiudizio(k) {
   if (!k) return null;
-  const ta = h("textarea", {id: "nota", placeholder: posso ? "Scrivi cosa non va: si salva da sola e segna «da rifare»" : "Solo il proprietario scrive le note", disabled: !posso});
+  const ta = h("textarea", {id: "nota", placeholder: posso ? "Scrivi cosa non va: si salva da sola e diventa una nota mandata" : "Solo il proprietario scrive le note", disabled: !posso});
   ta.value = notaDi(k);
   const info = h("div", {class: "salvato", text: GIU.get(k)?.quando ? "Ultimo cambio: " + data(GIU.get(k).quando) : ""});
   let timer = null;
-  const scrivi = async () => { timer = null; const v = ta.value.trim(); if (v === notaDi(k)) return; const ok = await salva(k, v ? {nota: v, stato: "no"} : {nota: ""}); info.textContent = ok ? "Nota salvata" + (v ? " · segnato da rifare" : "") : "Non salvata"; };
+  const scrivi = async () => { timer = null; const v = ta.value.trim(); if (v === notaDi(k)) return; const ok = await salva(k, v ? {nota: v, stato: "no"} : {nota: ""}); info.textContent = ok ? (v ? "Nota mandata: la sistemo e torna da testare" : "Nota tolta") : "Non salvata"; };
   ta.addEventListener("input", () => { info.textContent = "…"; clearTimeout(timer); timer = setTimeout(scrivi, 700); });
   ESCI.push(() => { if (timer) { clearTimeout(timer); scrivi(); } });
-  return h("div", {class: "blocco"}, h("h4", {text: "Il tuo giudizio"}), bottoniGiudizio(k, false), h("div", {style: "height:6px"}), ta, info);
+  const vecchie = storiaDi(k);
+  return h("div", {class: "blocco"}, h("h4", {text: "Il tuo giudizio"}), bottoniGiudizio(k, false), h("div", {style: "height:6px"}), ta, info,
+    vecchie.length ? h("div", {class: "storia"}, h("h4", {text: "Note già sistemate"}), h("ul", {}, vecchie.slice().reverse().map(n =>
+      h("li", {}, h("span", {class: "sotto", text: data(n.quando) + " · sistemata · "}), n.nota))) ) : null);
 }
 function tabella(righe) { const r = righe.filter(x => x && x[1] !== undefined && x[1] !== null && x[1] !== ""); if (!r.length) return null;
   return h("div", {class: "blocco dati"}, h("h4", {text: "Dati"}), h("table", {}, h("tbody", {}, r.map(([a, b]) => h("tr", {}, h("td", {text: a}), h("td", {}, valoreColorato(a, b))))))); }
@@ -758,7 +771,7 @@ function gruppi() {
 VISTE.oggi = () => {
   const av = D.avanzamento, aperte = av.storie.filter(s => !s.fatta).sort((a, b) => a.priorita - b.priorita);
   const G = gruppi(), tutti = Object.values(G).flat(), visti = tutti.filter(k => statoDi(k)).length;
-  const dr = [...GIU.entries()].filter(([, g]) => g.stato === "no").sort((a, b) => String(b[1].quando).localeCompare(String(a[1].quando)));
+  const dr = [...GIU.entries()].filter(([k]) => statoDi(k) === "no").sort((a, b) => String(b[1].quando).localeCompare(String(a[1].quando)));
   const st = stato("oggi"), listaDr = h("div", {class: "lista"});
   const q = h("input", {type: "search", id: "cerca-dr", placeholder: "Filtra le note…", value: st.q || ""});
   const popDr = () => { const r = dr.filter(([k, g]) => cerca(st, k, g.nota || "")).map(([k, g]) => h("div", {}, h("span", {class: "id", text: k}), h("span", {class: "tx", text: g.nota || "senza nota"}), h("span", {class: "dx", text: data(g.quando)})));
@@ -773,7 +786,7 @@ VISTE.oggi = () => {
       h("div", {class: "numero"}, h("b", {text: dr.length, style: dr.length ? "color:var(--no)" : ""}), h("span", {text: "da rifare"})),
       h("div", {class: "numero"}, h("b", {text: euro(CONSUMO.reduce((a, s) => a + (s.costo || 0), 0))}), h("span", {text: "costo API stimato"}))),
     h("div", {class: "due"},
-      h("div", {}, h("h3", {text: "Da rifare: le tue note"}), h("div", {class: "filtri"}, q), h("div", {class: "scorri basso"}, listaDr)),
+      h("div", {}, h("h3", {text: "Note mandate (le sto sistemando)"}), h("div", {class: "filtri"}, q), h("div", {class: "scorri basso"}, listaDr)),
       h("div", {}, h("h3", {text: "Prossime story"}), h("div", {class: "scorri basso"}, h("div", {class: "lista"}, aperte.slice(0, 25).map(s =>
         h("div", {class: "cliccabile", onclick: () => apriStoria(s)}, h("span", {class: "id", text: s.id}), h("span", {class: "tx", text: s.titolo}), h("span", {class: "dx", text: "fase " + s.fase}))))))),
     h("div", {class: "avviso"}, "Le cose nuove da provare e approvare una per una sono nella pagina ", h("a", {href: "#provare", text: "Da testare"}), "."),
@@ -800,7 +813,7 @@ function figuraAnim(fid, nome, scala = 5) {
   return [guarda(l.c, l), l.a.righe > 1 ? dir : null, h("div", {class: "controlli"}, h("label", {for: "vel-prova"}, "Velocità", vel), testo, passo, gioca)];
 }
 const SPIEGA_ANIM = {idle: "Fermo: respira.", walk: "Cammina (8 fotogrammi).", dash: "Schivata in uso nel gioco.", attack_light: "Attacco leggero (tasto J).",
-  attack_heavy: "Attacco pesante (tasto K): si carica in avanti, spadone alto dietro la spalla; tenendo premuto resta sulla carica.", parry: "Parata.", hurt: "Colpito.",
+  attack_heavy: "Attacco pesante (tasto K): si carica in avanti, spadone alto dietro la spalla; tenendo premuto resta sulla carica.", parry: "Parata: la lama davanti a lui, di traverso, incontro al colpo; la scintilla dove arriva.", hurt: "Colpito: si piega, faccia del dolore, sangue.",
   death: "Morte: cade all'indietro e resta a terra.", cast: "Lancia un'abilità.", meditate: "Medita seduto.", interact: "Tocca porte, leve, persone.", pickup: "Raccoglie da terra.",
   drink: "Beve una fiala.", ritual: "Rituale, braccia alzate.", fly: "In volo.", sail: "In barca.", anticipo: "Il segnale prima dell'attacco: si abbassa, bocca aperta, coda dritta.",
   attack: "Morso in salto.", stagger: "Colpito, barcolla."};
@@ -811,9 +824,8 @@ VISTE.provare = () => {
   for (const p of T.pathway) for (const s of p.sequenze) for (const a of s.abilita) if (a.id === "hermit_incantesimo_tradizionale") { pw = p; ab = a; }
   const pal = pw ? pw.palette : {}, palTG = (T.pathway.find(p => p.id === "twilight_giant") || {}).palette || pal;
   const abil = ab && inc ? [{...ab, prim: ab.primitive, effetto: "vfx_incantesimo", danno: 18, cosa: ab.cosa || []}] : [];
-  const sezioni = [];
-  const gruppo = (titolo, intro, elementi) => { sezioni.push(h("h3", {text: titolo}), intro ? h("p", {class: "intro", text: intro}) : null,
-    h("div", {class: "griglia"}, elementi.map(el => carta(el, el.anteprima(), h("b", {text: el.titolo}), h("span", {class: "sotto", text: el.breve || ""}))))); };
+  const tutti = [];
+  const gruppo = (titolo, intro, elementi) => { for (const el of elementi) tutti.push({...el, gruppo: titolo}); };
   const anim = (fid, chiave, nome) => ({k: `prova:${chiave}_${nome}`, titolo: bello(nome), breve: SPIEGA_ANIM[nome] || "",
     anteprima: () => lettore(fid, {scala: 2, giro: false, anim: nome}),
     media: () => [h("p", {text: SPIEGA_ANIM[nome] || ""}), ...figuraAnim(fid, nome, 5)]});
@@ -837,8 +849,16 @@ VISTE.provare = () => {
      anteprima: () => lettore("enel", {scala: 2, giro: false, anim: "attack_heavy"}), media: () => [h("p", {text: "Provala nell'arena qui sotto la pagina (tasto K tenuto premuto)."}), ...figuraAnim("enel", "attack_heavy", 5)]},
     effetto("vfx_incantesimo", "prova:incantesimo", "Incantesimo tradizionale (in volo)", "Sigillo con 4 rune che gira, scia di scintille.", pal),
     effetto("vfx_incantesimo_scoppio", "prova:incantesimo_scoppio", "Incantesimo tradizionale (scoppio)", "Il sigillo si apre in un cerchio di rune e si spezza in schegge.", pal)].filter(Boolean));
-  return [h("h2", {text: "Da testare"}), h("p", {class: "intro", text: "Tutte le cose nuove, una per scheda: provale, poi Va bene o Rifare con una nota. Sotto c'è l'arena: Schermo intero per giocarla in grande."}),
-    h("h3", {text: "Arena di prova"}), arena({abilita: abil, palette: pal, bersaglio: D.figure.nem_lupo_della_luna ? "nem_lupo_della_luna" : true}), ...sezioni];
+  const scheda = el => carta(el, el.anteprima(), h("b", {text: el.titolo}), h("span", {class: "sotto", text: el.gruppo + (el.breve ? " · " + el.breve : "")}),
+    storiaDi(el.k).length && !statoDi(el.k) ? h("span", {class: "chip", text: "rifatta: riprovala"}) : null);
+  const parte = (titolo, intro, els) => [h("h3", {text: `${titolo} (${els.length})`}), h("p", {class: "intro", text: intro}),
+    els.length ? h("div", {class: "griglia"}, els.map(scheda)) : h("div", {class: "vuoto", text: "Niente qui."})];
+  const da = tutti.filter(e => !statoDi(e.k)), mandate = tutti.filter(e => statoDi(e.k) === "no"), fatte = tutti.filter(e => statoDi(e.k) === "ok");
+  return [h("h2", {text: "Da testare"}), h("p", {class: "intro", text: "Prova ogni scheda: Va bene la manda in Testate; una nota la manda in Note mandate. Quando la sistemo torna qui da testare, con la tua nota fra quelle già sistemate, e ne puoi scrivere una nuova."}),
+    h("h3", {text: "Arena di prova"}), arena({abilita: abil, palette: pal, bersaglio: D.figure.nem_lupo_della_luna ? "nem_lupo_della_luna" : true}),
+    ...parte("Da testare", "Nuove o rifatte dopo la tua ultima nota.", da),
+    ...parte("Note mandate", "Le tue note: le sto sistemando.", mandate),
+    ...parte("Testate", "Approvate. Se una cambia, torna da testare.", fatte)];
 };
 
 VISTE.avanzamento = () => {

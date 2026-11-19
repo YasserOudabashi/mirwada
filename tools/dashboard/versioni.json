@@ -1,0 +1,130 @@
+{
+ "prova:carica": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "7e7b344df683"
+ },
+ "prova:enel": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "53792505983e"
+ },
+ "prova:enel_attack_heavy": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "6a94752e4541"
+ },
+ "prova:enel_attack_light": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "63ef625076a3"
+ },
+ "prova:enel_cast": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "495f0aba2c1b"
+ },
+ "prova:enel_dash": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "4a13b346fb29"
+ },
+ "prova:enel_death": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "a65b9f454985"
+ },
+ "prova:enel_drink": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "0131bb3323ad"
+ },
+ "prova:enel_fly": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "74aa6aacc78c"
+ },
+ "prova:enel_hurt": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "cfc6d1e4027e"
+ },
+ "prova:enel_idle": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "9f03c2235873"
+ },
+ "prova:enel_interact": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "af5342eba5d1"
+ },
+ "prova:enel_meditate": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "657c6f5cf4a4"
+ },
+ "prova:enel_parry": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "ff2da31bc537"
+ },
+ "prova:enel_pickup": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "d544fb81ddb1"
+ },
+ "prova:enel_ritual": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "1adbc23c69ff"
+ },
+ "prova:enel_sail": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "c855d92f7e1f"
+ },
+ "prova:enel_walk": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "358af96200d1"
+ },
+ "prova:fendente_pesante": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "83883e65ac2d"
+ },
+ "prova:incantesimo": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "fd33da056117"
+ },
+ "prova:incantesimo_scoppio": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "aac06e0799c2"
+ },
+ "prova:lupo": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "ef28592e28fc"
+ },
+ "prova:lupo_anticipo": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "dc4d9044a86b"
+ },
+ "prova:lupo_attack": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "2d3d549114d3"
+ },
+ "prova:lupo_death": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "aabb368f303e"
+ },
+ "prova:lupo_idle": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "6209dc07bd92"
+ },
+ "prova:lupo_stagger": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "01c1ffa0bf93"
+ },
+ "prova:lupo_walk": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "e0fba0ad3b12"
+ },
+ "prova:schivata_affondo": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "be01449173ff"
+ },
+ "prova:schivata_capriola": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "0ce8222fc25a"
+ },
+ "prova:schivata_ombra": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "743e9ae1a604"
+ },
+ "prova:schivata_scivolata": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "d67353a7b0e7"
+ }
+}

@@ -2152,6 +2152,21 @@
       "fase": "8c",
       "passes": true,
       "notes": "Fatta il 2026-11-18; dettagli in progress.txt."
+    },
+    {
+      "id": "US-8C04",
+      "title": "Parata con la lama davanti; note mandate che tornano da testare quando la cosa e' rifatta",
+      "description": "Note dell'utente del 2026-11-19.",
+      "acceptanceCriteria": [
+        "la lama della parata sta davanti a Enel",
+        "una nota diventa nota mandata",
+        "rifatta la cosa, torna da testare con la nota fra le sistemate",
+        "le approvate in Testate"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-19; dettagli in progress.txt."
     }
   ]
 }
