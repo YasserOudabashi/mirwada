@@ -33,6 +33,9 @@ DEST = os.path.join(ROOT, "assets", "placeholder")
 DIM = 64                                  # sovrascritta in main() da data/animations.json
 ROSSO_TELL = (0xE4, 0x3B, 0x44, 255)      # Endesga 32
 STATI_TELL = {"nemico_base": ["anticipo"]}
+# il tell delle figure a griglia e' il lampo negli occhi, disegnato nella figura (scelta dell'utente, 2026-11-19): niente
+# contorno rosso. Le altre lo tengono finche' non sono rifatte.
+GRIGLIA = {"lupo_della_luna"}
 
 
 def contorno_tell(im, cella):
@@ -74,7 +77,7 @@ def copia_categoria(cat, spec, aspetto=""):
             continue
         src = os.path.join(SORGENTI, f"{pre}{nome}.png")
         im = Image.open(src).convert("RGBA")
-        if nome in STATI_TELL.get(cat, []):               # prima di ingrandire: il bordo resta largo come il contorno
+        if nome in STATI_TELL.get(cat, []) and aspetto not in GRIGLIA:  # le figure a griglia hanno il lampo negli occhi
             im = contorno_tell(im, im.size[0] // int(a["frames"]))
         im = a_dimensione(im, a, src)
         atteso = (DIM * int(a["frames"]), DIM * (4 if a.get("direzionale") else 1))

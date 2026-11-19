@@ -128,6 +128,9 @@ img.foto { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 
 .mini { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px }
 .mini button { border: 1px solid var(--linea); background: var(--fondo2); border-radius: 4px; padding: 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--testo); font: 11px var(--f-testo) }
 .mini button[aria-pressed="true"] { border-color: var(--accento); box-shadow: 0 0 0 1px var(--accento) }
+.cartella { border: 1px solid var(--linea, #ccc); border-radius: 8px; padding: 6px 10px; margin: 8px 0 } .cartella > summary { cursor: pointer; font-size: 1.05em }
+.sottocartella { margin: 6px 0 6px 14px } .sottocartella > summary { cursor: pointer; font-weight: 600 }
+.chip.domanda { background: #feae34; color: #181425 } .msg { border-left: 3px solid #feae34; padding: 4px 8px; margin: 6px 0 } .msg.spiegazione { border-color: #0099db }
 .storia { margin-top: 10px; border-top: 1px solid var(--bordo, #ccc); padding-top: 6px } .storia ul { margin: 4px 0 0; padding-left: 18px }
 .campo { display: block; width: 100%; border-radius: 6px; image-rendering: pixelated; background: #3e8948; outline: none; cursor: pointer }
 .campo:focus { box-shadow: 0 0 0 3px var(--accento) }
@@ -184,7 +187,7 @@ img.foto { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 
 
 <script>
 "use strict";
-const SEZIONI = [["oggi", "Oggi"], ["provare", "Da testare"], ["avanzamento", "Avanzamento"], ["mondo", "Mondo"], ["paesi", "Paesi e case"], ["personaggi", "Personaggi"],
+const SEZIONI = [["oggi", "Oggi"], ["provare", "Da testare"], ["note", "Note e testate"], ["avanzamento", "Avanzamento"], ["mondo", "Mondo"], ["paesi", "Paesi e case"], ["personaggi", "Personaggi"],
   ["bestiario", "Bestiario"], ["tecniche", "Tecniche"], ["oggetti", "Oggetti"], ["libro", "Libro e HUD"], ["consumo", "Consumo"]];
 const DIREZ = ["giù", "su", "sinistra", "destra"];
 let D = null;
@@ -321,7 +324,7 @@ function aggiornaGiudizi() {
       const n = s.querySelector(".nota-card"); if (n) n.textContent = st === "no" ? notaDi(k) : ""; }
   }
   for (const m of document.querySelectorAll(".segno[data-k]")) { const st = statoDi(m.dataset.k); m.classList.toggle("ok", st === "ok"); m.classList.toggle("no", st === "no"); }
-  if (VISTA === "provare" && MOD.hidden) rendi();               // le schede passano da una sezione all'altra
+  if ((VISTA === "provare" || VISTA === "note") && MOD.hidden) rendi();               // le schede passano da una sezione all'altra
 }
 
 // ---------- elenco della vista e carte ----------
@@ -365,7 +368,7 @@ function apriElemento(i, focusNota = false) {
   const era = MOD.hidden; MOD.hidden = false;
   if (focusNota) document.getElementById("nota")?.focus(); else if (era) document.getElementById("mod-dopo").focus();
 }
-function chiudi() { for (const f of ESCI) f(); ESCI = []; MOD.hidden = true; if (VISTA === "provare") rendi(); document.querySelector(`[data-i="${IDX}"]`)?.focus(); }
+function chiudi() { for (const f of ESCI) f(); ESCI = []; MOD.hidden = true; if (VISTA === "provare" || VISTA === "note") rendi(); document.querySelector(`[data-i="${IDX}"]`)?.focus(); }
 document.getElementById("mod-chiudi").onclick = chiudi;
 document.getElementById("mod-prima").onclick = () => apriElemento((IDX - 1 + ELENCO.length) % ELENCO.length);
 document.getElementById("mod-dopo").onclick = () => apriElemento((IDX + 1) % ELENCO.length);
@@ -391,9 +394,9 @@ function pannelloGiudizio(k) {
   ta.addEventListener("input", () => { info.textContent = "…"; clearTimeout(timer); timer = setTimeout(scrivi, 700); });
   ESCI.push(() => { if (timer) { clearTimeout(timer); scrivi(); } });
   const vecchie = storiaDi(k);
-  return h("div", {class: "blocco"}, h("h4", {text: "Il tuo giudizio"}), bottoniGiudizio(k, false), h("div", {style: "height:6px"}), ta, info,
+  return h("div", {}, pannelloDomande(k), h("div", {class: "blocco"}, h("h4", {text: "Il tuo giudizio"}), bottoniGiudizio(k, false), h("div", {style: "height:6px"}), ta, info,
     vecchie.length ? h("div", {class: "storia"}, h("h4", {text: "Note già sistemate"}), h("ul", {}, vecchie.slice().reverse().map(n =>
-      h("li", {}, h("span", {class: "sotto", text: data(n.quando) + " · sistemata · "}), n.nota))) ) : null);
+      h("li", {}, h("span", {class: "sotto", text: data(n.quando) + " · sistemata · "}), n.nota))) ) : null));
 }
 function tabella(righe) { const r = righe.filter(x => x && x[1] !== undefined && x[1] !== null && x[1] !== ""); if (!r.length) return null;
   return h("div", {class: "blocco dati"}, h("h4", {text: "Dati"}), h("table", {}, h("tbody", {}, r.map(([a, b]) => h("tr", {}, h("td", {text: a}), h("td", {}, valoreColorato(a, b))))))); }
@@ -812,13 +815,15 @@ function figuraAnim(fid, nome, scala = 5) {
   const passo = h("button", {class: "chip", onclick: () => { l.pausa = true; l.avanza(1); }}, "Fotogramma dopo"), gioca = h("button", {class: "chip", onclick: () => { l.pausa = false; }}, "Riprendi");
   return [guarda(l.c, l), l.a.righe > 1 ? dir : null, h("div", {class: "controlli"}, h("label", {for: "vel-prova"}, "Velocità", vel), testo, passo, gioca)];
 }
+const NOMI_ANIM = {idle: "Fermo", walk: "Camminata", dash: "Schivata", attack_light: "Attacco leggero", attack_heavy: "Attacco pesante", parry: "Parata",
+  hurt: "Colpito", death: "Morte", cast: "Magia", meditate: "Meditazione", interact: "Interagire", pickup: "Raccogliere", drink: "Bere", ritual: "Rituale",
+  fly: "Volo", sail: "In barca", anticipo: "Segnale prima dell'attacco", attack: "Attacco", stagger: "Barcolla"};
 const SPIEGA_ANIM = {idle: "Fermo: respira.", walk: "Cammina (8 fotogrammi).", dash: "Schivata in uso nel gioco.", attack_light: "Attacco leggero (tasto J).",
   attack_heavy: "Attacco pesante (tasto K): si carica in avanti, spadone alto dietro la spalla; tenendo premuto resta sulla carica.", parry: "Parata: la lama davanti a lui, di traverso, incontro al colpo; la scintilla dove arriva.", hurt: "Colpito: si piega, faccia del dolore, sangue.",
   death: "Morte: cade all'indietro e resta a terra.", cast: "Lancia un'abilità.", meditate: "Medita seduto.", interact: "Tocca porte, leve, persone.", pickup: "Raccoglie da terra.",
   drink: "Beve una fiala.", ritual: "Rituale, braccia alzate.", fly: "In volo.", sail: "In barca.", anticipo: "Il segnale prima dell'attacco: si abbassa, bocca aperta, coda dritta.",
   attack: "Morso in salto.", stagger: "Colpito, barcolla."};
-VISTE.provare = () => {
-  ELENCO = [];
+function elementiProva() {
   const T = D.tecniche, inc = T.effetti.find(x => x.sprite === "vfx_incantesimo");
   let pw = null, ab = null;
   for (const p of T.pathway) for (const s of p.sequenze) for (const a of s.abilita) if (a.id === "hermit_incantesimo_tradizionale") { pw = p; ab = a; }
@@ -826,7 +831,7 @@ VISTE.provare = () => {
   const abil = ab && inc ? [{...ab, prim: ab.primitive, effetto: "vfx_incantesimo", danno: 18, cosa: ab.cosa || []}] : [];
   const tutti = [];
   const gruppo = (titolo, intro, elementi) => { for (const el of elementi) tutti.push({...el, gruppo: titolo}); };
-  const anim = (fid, chiave, nome) => ({k: `prova:${chiave}_${nome}`, titolo: bello(nome), breve: SPIEGA_ANIM[nome] || "",
+  const anim = (fid, chiave, nome) => ({k: `prova:${chiave}_${nome}`, titolo: NOMI_ANIM[nome] || bello(nome), breve: SPIEGA_ANIM[nome] || "",
     anteprima: () => lettore(fid, {scala: 2, giro: false, anim: nome}),
     media: () => [h("p", {text: SPIEGA_ANIM[nome] || ""}), ...figuraAnim(fid, nome, 5)]});
   if (D.figure.enel) {
@@ -849,17 +854,71 @@ VISTE.provare = () => {
      anteprima: () => lettore("enel", {scala: 2, giro: false, anim: "attack_heavy"}), media: () => [h("p", {text: "Provala nell'arena qui sotto la pagina (tasto K tenuto premuto)."}), ...figuraAnim("enel", "attack_heavy", 5)]},
     effetto("vfx_incantesimo", "prova:incantesimo", "Incantesimo tradizionale (in volo)", "Sigillo con 4 rune che gira, scia di scintille.", pal),
     effetto("vfx_incantesimo_scoppio", "prova:incantesimo_scoppio", "Incantesimo tradizionale (scoppio)", "Il sigillo si apre in un cerchio di rune e si spezza in schegge.", pal)].filter(Boolean));
-  const scheda = el => carta(el, el.anteprima(), h("b", {text: el.titolo}), h("span", {class: "sotto", text: el.gruppo + (el.breve ? " · " + el.breve : "")}),
-    storiaDi(el.k).length && !statoDi(el.k) ? h("span", {class: "chip", text: "rifatta: riprovala"}) : null);
-  const parte = (titolo, intro, els) => [h("h3", {text: `${titolo} (${els.length})`}), h("p", {class: "intro", text: intro}),
-    els.length ? h("div", {class: "griglia"}, els.map(scheda)) : h("div", {class: "vuoto", text: "Niente qui."})];
-  const da = tutti.filter(e => !statoDi(e.k)), mandate = tutti.filter(e => statoDi(e.k) === "no"), fatte = tutti.filter(e => statoDi(e.k) === "ok");
-  return [h("h2", {text: "Da testare"}), h("p", {class: "intro", text: "Prova ogni scheda: Va bene la manda in Testate; una nota la manda in Note mandate. Quando la sistemo torna qui da testare, con la tua nota fra quelle già sistemate, e ne puoi scrivere una nuova."}),
+  return {tutti, abil, pal};
+}
+const domandaAperta = k => (D.domande || []).some(d => d.k === k && d.tipo === "domanda" && !RISPOSTE.has(d.id));
+const schedaProva = el => carta(el, el.anteprima(), h("b", {text: el.titolo}), h("span", {class: "sotto", text: el.gruppo + (el.breve ? " · " + el.breve : "")}),
+  storiaDi(el.k).length && !statoDi(el.k) ? h("span", {class: "chip", text: "rifatta: riprovala"}) : null,
+  domandaAperta(el.k) ? h("span", {class: "chip domanda", text: "❓ ti ho fatto una domanda"}) : null);
+VISTE.provare = () => {
+  ELENCO = [];
+  const {tutti, abil, pal} = elementiProva(), da = tutti.filter(e => !statoDi(e.k));
+  return [h("h2", {text: "Da testare"}), h("p", {class: "intro", text: "Solo le cose da provare. Va bene le manda in «Note e testate» fra le approvate; una nota le manda fra le note mandate. Quando le sistemo tornano qui."}),
+    (D.domande || []).some(d => d.tipo === "domanda" && !RISPOSTE.has(d.id)) ? h("div", {class: "avviso"}, "❓ Ti ho fatto delle domande: le trovi nelle schede segnate e nella pagina ", h("a", {href: "#note", text: "Note e testate"}), ".") : null,
     h("h3", {text: "Arena di prova"}), arena({abilita: abil, palette: pal, bersaglio: D.figure.nem_lupo_della_luna ? "nem_lupo_della_luna" : true}),
-    ...parte("Da testare", "Nuove o rifatte dopo la tua ultima nota.", da),
-    ...parte("Note mandate", "Le tue note: le sto sistemando.", mandate),
-    ...parte("Testate", "Approvate. Se una cambia, torna da testare.", fatte)];
+    h("h3", {text: `Da testare (${da.length})`}), da.length ? h("div", {class: "griglia"}, da.map(schedaProva)) : h("div", {class: "vuoto", text: "Niente da testare: tutto approvato o in attesa delle mie correzioni."})];
 };
+
+// ---------- Note e testate: cartelle per argomento, dentro le note mandate e le approvate ----------
+const CARTELLE = [["prova:enel", "Enel"], ["prova:schivata", "Schivate"], ["prova:lupo", "Lupo della luna"], ["prova:", "Effetti e combattimento"],
+  ["boss:", "Boss"], ["nemico:", "Nemici"], ["personaggio:", "Personaggi"], ["luogo:", "Luoghi"], ["villaggio:", "Paesi e case"], ["interno:", "Interni"],
+  ["libro:", "Libro e HUD"], ["oggetto:", "Oggetti"], ["", "Altro"]];
+const cartellaDi = k => CARTELLE.find(([p]) => k.startsWith(p))[1];
+VISTE.note = () => {
+  ELENCO = [];
+  const prove = elementiProva().tutti, perK = new Map(prove.map(e => [e.k, e]));
+  const chiavi = new Set([...GIU.keys(), ...(D.domande || []).map(d => d.k).filter(Boolean)]);
+  const cart = new Map();
+  for (const k of chiavi) { const st = statoDi(k), dom = (D.domande || []).some(d => d.k === k); if (!st && !dom) continue;
+    const c = cartellaDi(k); if (!cart.has(c)) cart.set(c, {no: [], ok: [], dom: [], msg: []});
+    const x = cart.get(c); if (st === "no") x.no.push(k); else if (st === "ok") x.ok.push(k);
+    if ((D.domande || []).some(d => d.k === k && d.tipo === "domanda")) x.dom.push(k); else if (dom) x.msg.push(k); }
+  const riga = k => { const el = perK.get(k), g = GIU.get(k) || {}, st = statoDi(k);
+    const i = el ? (ELENCO.indexOf(el) >= 0 ? ELENCO.indexOf(el) : ELENCO.push(el) - 1) : -1;
+    return h("div", {class: i >= 0 ? "cliccabile" : "", onclick: i >= 0 ? () => apriElemento(i) : null},
+      h("span", {class: "id", text: el ? el.titolo : bello(k.split(":").pop())}),
+      h("span", {class: "tx", text: st === "no" ? notaDi(k) : (storiaDi(k).length === 1 ? "1 nota sistemata" : storiaDi(k).length ? storiaDi(k).length + " note sistemate" : "")}),
+      domandaAperta(k) ? h("span", {class: "chip domanda", text: "❓ domanda"}) : null,
+      h("span", {class: "dx", text: g.quando ? data(g.quando) : ""})); };
+  const sotto = (titolo, ks) => ks.length ? h("details", {class: "sottocartella", open: ""}, h("summary", {text: `${titolo} (${ks.length})`}), h("div", {class: "lista"}, ks.map(riga))) : null;
+  const ordine = CARTELLE.map(c => c[1]).filter(c => cart.has(c));
+  return [h("h2", {text: "Note e testate"}), h("p", {class: "intro", text: "Una cartella per argomento. Dentro: le tue note mandate (le sto sistemando), le domande che ti ho fatto, e le cose approvate. Clicca una riga della prova per riaprirla."}),
+    ...(ordine.length ? ordine.map(c => { const x = cart.get(c);
+      return h("details", {class: "cartella", open: ""}, h("summary", {}, h("b", {text: "📁 " + c}), h("span", {class: "sotto", text: `  ${x.no.length} note · ${x.dom.length} domande · ${x.msg.length} messaggi · ${x.ok.length} approvate`})),
+        sotto("❓ Domande per te", x.dom), sotto("💬 Messaggi di Claude", x.msg), sotto("✎ Note mandate", x.no), sotto("✓ Testate", x.ok)); })
+      : [h("div", {class: "vuoto", text: dbStato === "ok" ? "Ancora niente." : "Giudizi non leggibili (" + dbStato + ")."})])];
+};
+
+// ---------- domande e spiegazioni di Claude, sulle schede ----------
+// D.domande da tools/dashboard/domande.json: {id, k, tipo: domanda|spiegazione, testo, opzioni}; le risposte stanno
+// nell'archivio della pagina, risposte/<id> = {scelta, testo, quando}.
+const RISPOSTE = new Map();
+function pannelloDomande(k) {
+  const ds = (D.domande || []).filter(d => d.k === k); if (!ds.length) return null;
+  return h("div", {class: "blocco"}, h("h4", {text: "Claude ti scrive"}), ...ds.map(d => {
+    const r = RISPOSTE.get(d.id) || {}, box = h("div", {class: "msg " + d.tipo}, h("p", {style: "margin:0 0 6px", text: (d.tipo === "domanda" ? "❓ " : "💬 ") + d.testo}));
+    if (d.tipo === "domanda") {
+      const stato = h("span", {class: "sotto", text: r.quando ? "Risposta mandata " + data(r.quando) : "Aspetto la tua risposta"});
+      const manda = async campi => { if (!db || !posso) return; const nuovo = {...(RISPOSTE.get(d.id) || {}), ...campi, k, quando: new Date().toISOString()};
+        RISPOSTE.set(d.id, nuovo); try { await db.doc("risposte/" + d.id).set(nuovo); stato.textContent = "Risposta mandata"; } catch (e) { stato.textContent = "Non salvata: " + (e.code || "errore"); } };
+      const opz = (d.opzioni || []).map(o => h("button", {class: "chip", "aria-pressed": String(r.scelta === o), disabled: !posso, onclick: ev => { manda({scelta: o});
+        for (const b of ev.currentTarget.parentNode.querySelectorAll("button")) b.setAttribute("aria-pressed", String(b === ev.currentTarget)); }}, o));
+      const ta = h("textarea", {placeholder: "Oppure scrivi la tua risposta (si salva da sola)", disabled: !posso}); ta.value = r.testo || "";
+      let t = null; ta.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => manda({testo: ta.value.trim()}), 700); });
+      box.append(h("div", {class: "filtri"}, ...opz), ta, stato);
+    }
+    return box; }));
+}
 
 VISTE.avanzamento = () => {
   const av = D.avanzamento, st = stato("avanzamento"); st.fatte = st.fatte || "aperte";
@@ -1110,6 +1169,7 @@ fetch("dati.json").then(r => r.json()).then(d => { D = d; avviso(`commit ${d.com
     let primo = true;
     db.collection("giudizi").onSnapshot(snap => { clearTimeout(timer); dbStato = "ok"; GIU.clear(); for (const x of snap.docs) GIU.set(x.id, x.data());
       if ((primo || VISTA === "oggi") && MOD.hidden) rendi(); primo = false; aggiornaGiudizi(); }, e => { dbStato = "errore " + e.code; });
+    db.collection("risposte").onSnapshot(snap => { RISPOSTE.clear(); for (const x of snap.docs) RISPOSTE.set(x.id, x.data()); if ((VISTA === "provare" || VISTA === "note") && MOD.hidden) rendi(); }, () => {});
     db.collection("consumo").onSnapshot(snap => { CONSUMO = snap.docs.map(x => x.data()); if ((VISTA === "consumo" || VISTA === "oggi") && MOD.hidden) rendi(); }, () => {});
   } catch (e) { dbStato = "errore"; clearTimeout(timer); }
 })();

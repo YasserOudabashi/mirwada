@@ -97,8 +97,30 @@ def _p(v, g):
     return v.xy(g)
 
 
+def _due_mani(g):
+    """La mano sinistra sull'elsa, sotto la destra (spadone a due mani): il gomito si trova dalle due lunghezze del
+    braccio (due ossa), piegato verso il basso e in fuori."""
+    d = g["arma_dir"]
+    meta = g["mano_r"] - d * 2.0
+    s = g["spalla_l"]
+    a, b = CORPO.m["braccio"], CORPO.m["avambraccio"]
+    v = meta - s
+    dist = min(np.linalg.norm(v), a + b - 0.01)
+    v = v / max(np.linalg.norm(v), 1e-6)
+    meta = s + v * dist
+    x = (a * a - b * b + dist * dist) / (2 * dist)
+    h = np.sqrt(max(a * a - x * x, 0.0))
+    giu = np.array([-0.4, 0.0, -1.0])            # il gomito va in basso e un po' in fuori (verso la sua sinistra)
+    perp = giu - v * np.dot(giu, v)
+    perp = perp / max(np.linalg.norm(perp), 1e-6)
+    g["gomito_l"] = s + v * x + perp * h
+    g["mano_l"] = meta
+
+
 def disegna(tela, v, g, posa):
     """Ordina le parti per profondita' e le posa sulla tela."""
+    if posa.get("due_mani") and posa.get("arma_su", "mano") != "schiena":
+        _due_mani(g)
     parti = []
     vis = v.lato_visibile()
     dietro = v.prof(g["bacino"] - np.array([0, 1.5, 0]))
@@ -167,7 +189,7 @@ def disegna(tela, v, g, posa):
         # la testa gira a quarti con il corpo, ma solo di profilo: da davanti chi e' sdraiato all'indietro si vede in
         # faccia (dritto), da dietro a testa in giu'
         q = int(-round(posa.get("cade", 0) / 90.0)) % 4
-        gira = q if v.dir in ("left", "right") else (0 if v.dir == "down" else (2 * q) % 4)
+        gira = q if v.dir == "left" else (-q) % 4 if v.dir == "right" else (0 if v.dir == "down" else (2 * q) % 4)
         w, h = len(righe[0]), len(righe)
         if gira:
             w, h = h, w
@@ -312,15 +334,15 @@ ANIM = {
     # spalla destra. Il frame 5 e' quello che il gioco tiene fermo mentre si carica (tenendo premuto il tasto).
     "attack_heavy": {"chiavi": [
         (0.0, dict(PRONTO)),
-        (2 / 11, dict(PRONTO, arma=(45, 160), braccio_r=(95, 30, 90), braccio_l=(95, 4, 85), gira=12, piega=18,
+        (2 / 11, dict(PRONTO, due_mani=True, arma=(45, 160), braccio_r=(95, 30, 90), braccio_l=(95, 4, 85), gira=12, piega=18,
                       avanti=1.0, gamba_l=(28, 6, 34), gamba_r=(-8, 6, 14))),
-        (5 / 11, dict(PRONTO, arma=(65, 175), braccio_r=(125, 26, 95), braccio_l=(122, 4, 95), gira=14, piega=24,
+        (5 / 11, dict(PRONTO, due_mani=True, arma=(65, 175), braccio_r=(125, 26, 95), braccio_l=(122, 4, 95), gira=14, piega=24,
                       avanti=2.0, gamba_l=(32, 8, 46), gamba_r=(-8, 8, 18), tieni=True)),
-        (6 / 11, dict(PRONTO, arma=(10, 0), braccio_r=(105, 8, 6), braccio_l=(102, -8, 6), gira=-4, piega=22,
+        (6 / 11, dict(PRONTO, due_mani=True, arma=(10, 0), braccio_r=(105, 8, 6), braccio_l=(102, -8, 6), gira=-4, piega=22,
                       avanti=2.5, gamba_l=(32, 6, 34), gamba_r=(-20, 6, 14))),
-        (7 / 11, dict(PRONTO, arma=(-40, 0), braccio_r=(70, 6, 2), braccio_l=(68, -8, 2), piega=30, avanti=3,
+        (7 / 11, dict(PRONTO, due_mani=True, arma=(-40, 0), braccio_r=(70, 6, 2), braccio_l=(68, -8, 2), piega=30, avanti=3,
                       gamba_l=(34, 6, 42), gamba_r=(-22, 6, 14))),
-        (9 / 11, dict(PRONTO, arma=(-30, 5), braccio_r=(64, 8, 10), braccio_l=(62, -8, 10), piega=24, avanti=2,
+        (9 / 11, dict(PRONTO, due_mani=True, arma=(-30, 5), braccio_r=(64, 8, 10), braccio_l=(62, -8, 10), piega=24, avanti=2,
                       gamba_l=(26, 6, 30), gamba_r=(-16, 6, 12))),
         (1.0, dict(PRONTO))]},
     # parry: la lama DAVANTI a lui, di traverso fra lui e il colpo (mani avanti all'altezza del petto, lama che sale in

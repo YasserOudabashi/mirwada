@@ -1714,3 +1714,16 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   Il registro e' partito confrontando col commit giudicato (e501670): le cose non cambiate tengono il giudizio.
 - Verificato con Playwright (giudizi finti nella pagina): la parata torna da testare con la nota sistemata, l'idle
   approvato resta in Testate, una nota nuova resta in Note mandate. Nessun errore.
+
+## Note del 2026-11-19 e domande sul sito (US-8C05)
+- Lette le note nuove: pesante a due mani; morte di Enel vista da destra con la testa in giu'; lupo morto con la luna
+  ancora visibile e la testa dritta di profilo; "cosa sono i punti rossi" (sangue) sul lupo che barcolla.
+- Fatto: `_due_mani` (IK a due ossa della mano sinistra sull'elsa) in tutto attack_heavy; testa da sdraiato a destra
+  ruotata al contrario (lo specchio inverte il verso); morte del lupo rifatta (zampe che cedono, corpo a terra, muso
+  al suolo, occhi spenti e falce nascosta); tell = lampo negli occhi (scelta dell'utente) col bagliore, niente contorno
+  rosso per le figure a griglia (generate_all GRIGLIA).
+- Sito: domande e messaggi di Claude sulle schede (tools/dashboard/domande.json, risposte in risposte/<id>, scheda
+  segnata "❓"); "Da testare" mostra solo quello da provare; pagina nuova "Note e testate" a cartelle (Enel, Schivate,
+  Lupo, Effetti, Boss, Nemici, Luoghi, Libro...) con domande, messaggi, note mandate e approvate; nomi italiani delle
+  animazioni. Domande aperte: sangue del lupo, quale schivata va nel gioco.
+- 1103 test verdi, validator 0 errori, Playwright senza errori.

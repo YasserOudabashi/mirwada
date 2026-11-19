@@ -322,8 +322,14 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - Si costruisce con `python tools/dashboard/build.py` (-> `build/dashboard/`, non nel repo; `--foto` rifa le foto
   dal gioco con `tests/manual/qa_dashboard_foto.gd`, ~5 minuti) e si ripubblica allo **stesso link** (Artifact con
   `url` e `root` = `build/dashboard`, `files` = img/, foto/*.jpg, dati.json; al massimo 255 file per volta).
-- Giudizi dell'utente: archivio della pagina, `giudizi/<tipo>:<id>` = {stato: "ok"|"no", nota, quando}. A inizio
-  sessione si leggono (ArtifactData `list` su `giudizi`): ogni "no" con la nota e' lavoro da fare (una story).
+- Giudizi dell'utente: archivio della pagina, `giudizi/<tipo>:<id>` = {stato: "ok"|"no", nota, quando, versione, storia}.
+  A inizio sessione e ogni volta che l'utente dice di guardare le note si leggono (ArtifactData `query` su `giudizi`):
+  ogni "no" con la nota e' lavoro da fare. Un giudizio vale per la versione del disegno (`tools/dashboard/versioni.json`):
+  rifatta la cosa, torna "Da testare" e la nota va fra le sistemate.
+- **Le domande all'utente si fanno sul sito** (richiesta dell'utente, 2026-11-19), non solo in chat: una voce in
+  `tools/dashboard/domande.json` ({id, k, tipo: domanda|spiegazione, testo, opzioni}); la scheda e' segnata
+  "❓ domanda"; le risposte stanno in `risposte/<id>` (leggerle con ArtifactData). Pagine: "Da testare" (solo da
+  provare) e "Note e testate" (cartelle per argomento: domande, messaggi, note mandate, approvate).
 - **A fine di ogni sessione di lavoro** (regola chiesta dall'utente): `python tools/dashboard/consumo.py`, poi
   ArtifactData `set` di `consumo/<id sessione>` per ogni sessione nuova o cresciuta (file
   `build/dashboard/consumo.json`), poi `build.py` e ripubblica. Il costo e' una stima al listino API (nello

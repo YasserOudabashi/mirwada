@@ -115,7 +115,7 @@ def disegna(tela, v, g, posa):
                      uniti=("corpo",), separa=False)
         c = v.xy(g["collo"])
         segmento(tela, s, c, 5.0, 4.4, R["pelo"] if v.dir == "up" else R["criniera"], "criniera")
-        if v.dir in ("left", "right"):           # falce di luna gialla sul fianco
+        if v.dir in ("left", "right") and not posa.get("senza_luna"):   # falce di luna gialla sul fianco
             fx, fy = v.xy((g["anche"] + g["spalle"]) / 2 + g["su"] * 0.5)
             q = int(round(posa.get("cade", 0) / 90.0)) % 4      # ogni disegno sul corpo gira col corpo
             griglia(tela, [".YY.", "Y...", "Y...", ".YY."], {"Y": colore("yellow")}, int(round(fx - 2)),
@@ -142,11 +142,26 @@ def disegna(tela, v, g, posa):
         if gira:
             w, h = h, w
         dx = {"left": -2, "right": 2}.get(v.dir, 0)
-        griglia(tela, righe, M, int(round(x - w / 2 + dx)), int(round(y - h / 2)), "testa", specchia=spec,
+        mappa = M
+        if posa.get("lampo_occhi"):              # il tell: gli occhi (e la falce) si accendono di bianco
+            mappa = {**M, "Y": colore("white"), "K": colore("yellow")}
+        if posa.get("senza_luna"):               # morto: occhi spenti, la falce non si vede
+            mappa = {**M, "Y": colore("slate"), "K": colore("slate_d")}
+        griglia(tela, righe, mappa, int(round(x - w / 2 + dx)), int(round(y - h / 2)), "testa", specchia=spec,
                 ruota=gira, uniti=("criniera",))
     parti.append((v.prof(g["testa"]) + (8.0 if v.dir == "up" else 2.0), 3, testa))
 
     sangue = posa.get("sangue", 0)               # gocce dal fianco (stagger, death)
+    if posa.get("lampo_occhi"):                  # bagliore attorno agli occhi: si legge anche piccolo e fermo
+        def bagliore():
+            x, y = v.xy(g["testa"])
+            dx = {"left": -4, "right": 4}.get(v.dir, 0)
+            punti = ((-3, -1), (3, -1)) if v.dir in ("down", "up") else ((0, -1),)
+            for px, py in punti:
+                griglia(tela, ["..w..", ".wYw.", "wYWYw", ".wYw.", "..w.."], {"w": colore("yellow"), "Y": colore("white"),
+                        "W": colore("white")}, int(round(x + dx + px - 2)), int(round(y + py - 3)), "bagliore", separa=False)
+        if v.dir != "up":
+            parti.append((v.prof(g["testa"]) + 9, 8, bagliore))
     if sangue:
         def gocce():
             c = (g["anche"] + g["spalle"]) / 2 + g["su"] * 2
@@ -184,9 +199,9 @@ ANIM = {
                         _trotto(0.75, 4, 0, 0.8)]},
     "anticipo": {"chiavi": [
         (0.0, dict(FERMO, piega=10, testa=(20, 0), coda=(40, 0))),
-        (0.5, dict(FERMO, piega=22, testa=(34, 0), coda=(70, 0), bocca=1, ant_l=(30, 6, 60), ant_r=(30, 6, 60),
+        (0.5, dict(FERMO, lampo_occhi=True, piega=22, testa=(34, 0), coda=(70, 0), bocca=1, ant_l=(30, 6, 60), ant_r=(30, 6, 60),
                    post_l=(-12, 4, 20), post_r=(-12, 4, 20), avanti=-1.5, tieni=True)),
-        (1.0, dict(FERMO, piega=24, testa=(36, 0), coda=(75, 0), bocca=1, ant_l=(32, 6, 64), ant_r=(32, 6, 64),
+        (1.0, dict(FERMO, lampo_occhi=True, piega=24, testa=(36, 0), coda=(75, 0), bocca=1, ant_l=(32, 6, 64), ant_r=(32, 6, 64),
                    post_l=(-14, 4, 24), post_r=(-14, 4, 24), avanti=-2))]},
     "attack": {"chiavi": [
         (0.0, dict(FERMO, piega=20, testa=(30, 0), bocca=1, coda=(60, 0), ant_l=(30, 6, 60), ant_r=(30, 6, 60),
@@ -202,13 +217,15 @@ ANIM = {
                    ant_r=(30, 6, 40), bocca=1, sangue=0.7)),
         (0.5, dict(FERMO, piega=-8, testa=(-15, 10), avanti=-2.5, coda=(-20, 0), sangue=1.3)),
         (1.0, dict(FERMO, coda=(0, 0)))]},
+    # morte: le zampe cedono, il corpo va a terra, il muso si appoggia al suolo (anche di profilo); a terra la falce
+    # non si vede (giudizio dell'utente: ogni disegno sul corpo segue il corpo)
     "death": {"chiavi": [
         (0.0, dict(FERMO, piega=-10, testa=(-25, 0), bocca=1, sangue=0.8)),
-        (2 / 9, dict(FERMO, piega=12, testa=(30, 0), ant_l=(30, 4, 70), ant_r=(30, 4, 70), bocca=1, sangue=1.4)),
-        (4 / 9, dict(FERMO, piega=20, testa=(40, 0), ant_l=(60, 4, 120), ant_r=(60, 4, 120), post_l=(20, 4, 40),
-                     post_r=(20, 4, 40), cade=30, pozza=1.2)),
-        (7 / 9, dict(FERMO, testa=(10, 0), ant_l=(20, 10, 20), ant_r=(30, 10, 20), post_l=(-10, 10, 20),
-                     post_r=(0, 10, 20), cade=85, coda=(-30, 0), pozza=2.8)),
-        (1.0, dict(FERMO, testa=(10, 0), ant_l=(24, 10, 24), ant_r=(34, 10, 24), post_l=(-12, 10, 22),
-                   post_r=(0, 10, 22), cade=90, coda=(-34, 0), pozza=3.6))]},
+        (2 / 9, dict(FERMO, piega=14, testa=(30, 0), ant_l=(40, 6, 100), ant_r=(40, 6, 100), bocca=1, sangue=1.4)),
+        (4 / 9, dict(FERMO, piega=8, testa=(55, 0), ant_l=(70, 20, 150), ant_r=(70, 20, 150), post_l=(40, 20, 120),
+                     post_r=(40, 20, 120), coda=(-10, 0), pozza=1.4)),
+        (7 / 9, dict(FERMO, piega=0, testa=(75, 10), ant_l=(80, 50, 150), ant_r=(70, 40, 150), post_l=(60, 50, 140),
+                     post_r=(50, 40, 140), coda=(-30, 10), cade=25, pozza=2.8, senza_luna=True)),
+        (1.0, dict(FERMO, piega=0, testa=(80, 12), ant_l=(85, 55, 150), ant_r=(75, 45, 150), post_l=(65, 55, 140),
+                   post_r=(55, 45, 140), coda=(-34, 12), cade=28, pozza=3.6, senza_luna=True))]},
 }

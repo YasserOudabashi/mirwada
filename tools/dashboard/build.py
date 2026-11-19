@@ -520,6 +520,7 @@ def main():
     dati["personaggi"] = personaggi()
     dati["tecniche"] = tecniche()
     dati["versioni"] = versioni()
+    dati["domande"] = json.load(open(os.path.join(ROOT, "tools", "dashboard", "domande.json"), encoding="utf-8"))
     dati["combattimento"] = senza_commenti(json.load(open(os.path.join(DATA, "balance.json"), encoding="utf-8"))["combattimento"])
     dati["oggetti"], dati["stati"] = oggetti()
     dati["mondo"] = mondo()

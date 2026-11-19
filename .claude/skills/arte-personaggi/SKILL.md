@@ -33,7 +33,12 @@ Questa skill dice **come devono venire**; i comandi e i dati restano quelli di C
   devono vedere salire (ginocchio alto nel passaggio).
 - **Mosse che non conosci** (capriola, salti, arrampicate...): prima cerca come le fanno le persone vere e come le
   disegnano gli animatori (pose chiave, numero di frame), poi disegna. Piu' fotogrammi se il movimento e' complesso.
-- **Il tell del nemico deve avere un senso visibile** (una posa estrema), non solo un contorno colorato.
+- **Il tell del nemico e' il lampo negli occhi** (scelta dell'utente, 2026-11-19): gli occhi si accendono di bianco e
+  giallo con un bagliore attorno, piu' la posa estrema. Niente contorno rosso (generate_all lo salta per le figure a
+  griglia, elenco GRIGLIA).
+- **Spadone a due mani** negli attacchi pesanti (`due_mani=True`: la mano sinistra sull'elsa, gomito da due ossa).
+- **Chi muore si appoggia a terra**: anche il muso o la testa scendono al suolo in ogni vista; da sdraiati i marchi
+  sul fianco non si vedono e gli occhi si spengono.
 - **Ogni nemico si prova sul terreno vero** nell'arena della dashboard, e ogni attacco deve far capire cosa fa
   (se spara, si vede l'arma che spara).
 

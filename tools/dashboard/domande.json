@@ -1,0 +1,12 @@
+[
+ {"id": "d1-lupo-sangue", "k": "prova:lupo_stagger", "tipo": "domanda", "quando": "2026-11-19",
+  "testo": "I punti rossi sono gocce di sangue: quando il lupo viene colpito schizzano dal fianco (avevi chiesto il sangue su tutti). Come li vuoi?",
+  "opzioni": ["Vanno bene così", "Più grandi e più rossi", "Che colino fino a terra", "Toglili"]},
+ {"id": "d2-schivata-quale", "k": "prova:enel_dash", "tipo": "domanda", "quando": "2026-11-19",
+  "testo": "Hai approvato la schivata attuale e anche le quattro versioni. Quale va nel gioco?",
+  "opzioni": ["Quella attuale (chinato in avanti)", "Scivolata", "Capriola", "Affondo", "Passo d'ombra", "Diversa per ogni Pathway"]},
+ {"id": "s1-tell-occhi", "k": "boss:re_dei_ratti", "tipo": "spiegazione", "quando": "2026-11-19",
+  "testo": "Fatto: il segnale prima dell'attacco ora è il lampo negli occhi (bianco e giallo), senza la linea rossa. Lo vedi già sul lupo; il Re dei Ratti e gli altri nemici lo avranno quando li rifaccio nel nuovo stile."},
+ {"id": "s2-pesante-due-mani", "k": "prova:enel_attack_heavy", "tipo": "spiegazione", "quando": "2026-11-19",
+  "testo": "Ora lo spadone è tenuto a due mani in tutto l'attacco pesante: la mano sinistra va sull'elsa sotto la destra."}
+]

@@ -2167,6 +2167,22 @@
       "fase": "8c",
       "passes": true,
       "notes": "Fatta il 2026-11-19; dettagli in progress.txt."
+    },
+    {
+      "id": "US-8C05",
+      "title": "Due mani nel pesante, morte del lupo a terra, lampo negli occhi, domande e Note e testate sul sito",
+      "description": "Note dell'utente del 2026-11-19.",
+      "acceptanceCriteria": [
+        "spadone a due mani",
+        "morte: testa giusta in tutte le viste, luna nascosta",
+        "tell = lampo negli occhi",
+        "domande sul sito con risposte",
+        "pagina Note e testate a cartelle"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-19; dettagli in progress.txt."
     }
   ]
 }
