@@ -3,6 +3,26 @@
   "dal": "2026-11-19T14:43:08Z",
   "v": "2fe72bfb262e"
  },
+ "prova:cervo": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "4eeb9b8d1cb0"
+ },
+ "prova:cervo_fuga": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "17f812583703"
+ },
+ "prova:cervo_idle": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "3b024933e254"
+ },
+ "prova:edificio_casa_antica": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "74092ec0ef29"
+ },
+ "prova:edificio_museo": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "ca258a719ae6"
+ },
  "prova:enel": {
   "dal": "2026-11-19T14:43:08Z",
   "v": "213e631add86"
@@ -111,6 +131,18 @@
   "dal": "2026-11-18T00:00:00Z",
   "v": "e0fba0ad3b12"
  },
+ "prova:mercante": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "20133cdb7ad8"
+ },
+ "prova:mercante_idle": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "d8254db7eb2a"
+ },
+ "prova:mercante_walk": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "34da0c22419f"
+ },
  "prova:schivata_affondo": {
   "dal": "2026-11-19T14:14:58Z",
   "v": "be01449173ff"
@@ -126,5 +158,9 @@
  "prova:schivata_scivolata": {
   "dal": "2026-11-19T14:14:58Z",
   "v": "d67353a7b0e7"
+ },
+ "prova:stretta_ferrea": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "889362bd4c04"
  }
 }

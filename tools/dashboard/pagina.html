@@ -563,7 +563,8 @@ function arena(opz) {
       const e = ab.effetto ? T.effetti.find(x => x.sprite === pr) : T.effetti.find(x => x.primitiva === pr && !x.scoppio_di) || T.effetti.find(x => x.primitiva === pr); if (!e) return;
       const fx = P.dir === 2 ? -1 : P.dir === 3 ? 1 : 0, fy = P.dir === 0 ? 1 : P.dir === 1 ? -1 : 0;
       const sulNemico = e.su && e.su !== "chi_lancia" && nemico;
-      foglioColorato(e, pal).then(img => img && effetti.push({img, e, f: 0, t: -i * 120, x: sulNemico ? nemico.x : P.x + fx * 18, y: (sulNemico ? nemico.y : P.y) - 14 + fy * 10,
+      const cen = e.centro ? 0 : 1;
+      foglioColorato(e, pal).then(img => img && effetti.push({img, e, f: 0, t: -i * 120, x: sulNemico ? nemico.x : P.x + fx * 18 * cen, y: (sulNemico ? nemico.y : P.y) - (e.centro ? 22 : 14) + fy * 10 * cen,
         vx: e.vola ? fx * 160 : 0, vy: e.vola ? fy * 160 : 0, gira: e.gira && P.dir === 2, vita: e.vola ? 1400 : e.frames * 90, danno: ab.danno, pal}));
     });
     if (nemico && ab.danno) colpisci(ab.danno);
@@ -591,7 +592,7 @@ function arena(opz) {
     if (k === " " && P.vivo) { P.azione = "dash"; eroe.scegli("dash", () => { P.azione = null; eroe.scegli("idle"); }); }
     if (k === "q" && nemico) colpisci(9999 * 0.1 * (B ? 600 * B.vita_x / 5 : 200) / 9999);
     if (k === "enter") { P.vivo = true; P.vita = 100; P.azione = null; eroe.scegli("idle"); if (nemico) { nemico.vita = 1; nemico.azione = null; nemico.l.scegli("idle"); gregari = []; if (B) { Object.assign(nemico.cfg, (D.nemici.find(n => n.id === B.posato.tipo) || {}).numeri || {}); entraFase(0); } } }
-    const n = +k; if (opz.abilita && n >= 1 && n <= opz.abilita.length) lancia(opz.abilita[n - 1], opz.palette);
+    const n = +k; if (opz.abilita && n >= 1 && n <= opz.abilita.length) lancia(opz.abilita[n - 1], opz.abilita[n - 1].palette || opz.palette);
   });
   c.addEventListener("keyup", e => { const k = e.key.toLowerCase(); giu.delete(k); if (k === "k") P.tenuto = false; });
   c.addEventListener("focus", () => { TASTI_CAMPO = true; }); c.addEventListener("blur", () => { TASTI_CAMPO = false; giu.clear(); });
@@ -817,7 +818,7 @@ function figuraAnim(fid, nome, scala = 5) {
 }
 const NOMI_ANIM = {idle: "Fermo", walk: "Camminata", dash: "Schivata", attack_light: "Attacco leggero", attack_heavy: "Attacco pesante", parry: "Parata",
   hurt: "Colpito", death: "Morte", cast: "Magia", meditate: "Meditazione", interact: "Interagire", pickup: "Raccogliere", drink: "Bere", ritual: "Rituale",
-  fly: "Volo", sail: "In barca", anticipo: "Segnale prima dell'attacco", attack: "Attacco", stagger: "Barcolla"};
+  fly: "Volo", sail: "In barca", anticipo: "Segnale prima dell'attacco", attack: "Attacco", stagger: "Barcolla", fuga: "Fuga"};
 const SPIEGA_ANIM = {idle: "Fermo: respira.", walk: "Cammina (8 fotogrammi).", dash: "Schivata in uso nel gioco.", attack_light: "Attacco leggero (tasto J).",
   attack_heavy: "Attacco pesante (tasto K): si carica in avanti, spadone alto dietro la spalla; tenendo premuto resta sulla carica.", parry: "Parata: la lama davanti a lui, di traverso, incontro al colpo; la scintilla dove arriva.", hurt: "Colpito: si piega, faccia del dolore, sangue.",
   death: "Morte: cade all'indietro e resta a terra.", cast: "Lancia un'abilità.", meditate: "Medita seduto.", interact: "Tocca porte, leve, persone.", pickup: "Raccoglie da terra.",
@@ -829,6 +830,8 @@ function elementiProva() {
   for (const p of T.pathway) for (const s of p.sequenze) for (const a of s.abilita) if (a.id === "hermit_incantesimo_tradizionale") { pw = p; ab = a; }
   const pal = pw ? pw.palette : {}, palTG = (T.pathway.find(p => p.id === "twilight_giant") || {}).palette || pal;
   const abil = ab && inc ? [{...ab, prim: ab.primitive, effetto: "vfx_incantesimo", danno: 18, cosa: ab.cosa || []}] : [];
+  let abSF = null; for (const p of T.pathway) for (const s of p.sequenze) for (const a of s.abilita) if (a.id === "tg_stretta_ferrea") abSF = a;
+  if (abSF && T.effetti.some(x => x.sprite === "vfx_stretta_ferrea")) abil.push({...abSF, prim: abSF.primitive, effetto: "vfx_stretta_ferrea", danno: 0, cosa: abSF.cosa || [], palette: (T.pathway.find(p => p.id === "twilight_giant") || {}).palette});
   const tutti = [];
   const gruppo = (titolo, intro, elementi) => { for (const el of elementi) tutti.push({...el, gruppo: titolo}); };
   const anim = (fid, chiave, nome) => ({k: `prova:${chiave}_${nome}`, titolo: NOMI_ANIM[nome] || bello(nome), breve: SPIEGA_ANIM[nome] || "",
@@ -847,13 +850,27 @@ function elementiProva() {
   if (D.figure.nem_lupo_della_luna) gruppo("Lupo della luna", "Gobbo da predatore, criniera a punte scure, sella sul dorso, falce di luna gialla, zanne, coda folta.",
     [{k: "prova:lupo", titolo: "Lupo: aspetto", breve: "La figura intera in tutte le animazioni.", anteprima: () => lettore("nem_lupo_della_luna", {scala: 2, giro: false, anim: "idle"}), media: () => studioFigura("nem_lupo_della_luna", 5)},
      ...D.figure.nem_lupo_della_luna.anims.map(a => anim("nem_lupo_della_luna", "lupo", a.nome))]);
+  // giro del 2026-11-21: un edificio, un personaggio, un animale, un'abilita' alla volta
+  const imgEdificio = (e, scala) => { const i = h("img", {src: e.file, alt: e.id, class: "px"}); i.style.width = e.w * scala + "px"; i.style.imageRendering = "pixelated"; return i; };
+  const SPIEGA_EDIFICI = {edificio_casa_antica: "Centro antico: casa di arenaria di un'antica civiltà. Terrazza con l'angolo crollato e le macerie, botola ad arco, colonna spezzata, grande arco con la chiave scolpita, mezze colonne, fregio di glifi, finestre ad arco, crepe, muschio ed edera.",
+    edificio_museo: "Museo: un tempio di marmo bianco. Scalinata, sei colonne scanalate, frontone con l'anfora a rilievo e le statue in cima, lucernario sul tetto di ardesia, portone di bronzo, stendardi rossi con l'anfora (il simbolo del museo, senza scritte)."};
+  if ((D.edifici_prova || []).length) gruppo("Edifici (stile delle case)", "Lo stile nuovo delle case: ogni edificio ha il suo disegno. 64 pixel per casella, come i personaggi.",
+    D.edifici_prova.map(e => ({k: "prova:" + e.id, titolo: ({edificio_casa_antica: "Casa del centro antico", edificio_museo: "Museo"})[e.id] || bello(e.id.replace("edificio_", "")), breve: SPIEGA_EDIFICI[e.id] || "",
+      anteprima: () => imgEdificio(e, 0.5), media: () => [h("p", {text: SPIEGA_EDIFICI[e.id] || ""}), h("div", {style: "overflow:auto;max-height:70vh"}, imgEdificio(e, 2))]})));
+  for (const [fid, chiave, titolo, breve] of [["npc_mercante", "mercante", "Mercante", "Tarchiato con la pancia, turbante viola con la gemma, baffi a manubrio, panciotto verde, grembiule con la borsa delle monete, pantaloni a sbuffo, babbucce gialle. Da fermo si sfrega le mani; cammina dondolando."],
+                                           ["fauna_cervo", "cervo", "Cervo", "Zampe lunghe, collo lungo, corna ramificate, manto bruno con macchie chiare, coda col fiocco bianco. Da fermo bruca e alza la testa; in fuga salta."]]) {
+    if (!D.figure[fid]) continue;
+    gruppo(titolo, breve, [{k: "prova:" + chiave, titolo: titolo + ": aspetto", breve, anteprima: () => lettore(fid, {scala: 2, giro: false, anim: D.figure[fid].anims[0].nome}), media: () => studioFigura(fid, 5)},
+      ...D.figure[fid].anims.map(a => anim(fid, chiave, a.nome))]);
+  }
   const effetto = (sprite, k, titolo, breve, p) => { const e = T.effetti.find(x => x.sprite === sprite); return e ? {k, titolo, breve, anteprima: () => effettoVivo(e, p, 1.5), media: () => [h("p", {text: breve}), effettoVivo(e, p, 5)]} : null; };
   gruppo("Effetti con un disegno tutto loro", "Colorati col Pathway (qui Twilight Giant per il fendente, Eremita per l'incantesimo).", [
     effetto("vfx_fendente_pesante", "prova:fendente_pesante", "Fendente pesante", "Mezzaluna che cala dall'alto e spacca il terreno; con la carica diventa più grande.", palTG),
     {k: "prova:carica", titolo: "Carica dell'attacco pesante", breve: "Tieni premuto K: Enel resta sulla posa di carica, l'anello e la barra crescono; al rilascio colpisce più forte e più largo (fino a 2,5 volte il danno e 1,8 volte l'area in 1,5 secondi). C'è anche nel gioco vero.",
      anteprima: () => lettore("enel", {scala: 2, giro: false, anim: "attack_heavy"}), media: () => [h("p", {text: "Provala nell'arena qui sotto la pagina (tasto K tenuto premuto)."}), ...figuraAnim("enel", "attack_heavy", 5)]},
     effetto("vfx_incantesimo", "prova:incantesimo", "Incantesimo tradizionale (in volo)", "Sigillo con 4 rune che gira, scia di scintille.", pal),
-    effetto("vfx_incantesimo_scoppio", "prova:incantesimo_scoppio", "Incantesimo tradizionale (scoppio)", "Il sigillo si apre in un cerchio di rune e si spezza in schegge.", pal)].filter(Boolean));
+    effetto("vfx_incantesimo_scoppio", "prova:incantesimo_scoppio", "Incantesimo tradizionale (scoppio)", "Il sigillo si apre in un cerchio di rune e si spezza in schegge.", pal),
+    effetto("vfx_stretta_ferrea", "prova:stretta_ferrea", "Stretta ferrea (Gigante, Sequenza 9)", "Difesa +25% per 5 secondi: quattro piastre di ferro arrivano ai lati, si chiudono a guscio con un clang di scintille, il guscio brilla e un riflesso scorre e si spegne. Provala nell'arena col tasto 2.", palTG)].filter(Boolean));
   return {tutti, abil, pal};
 }
 const domandaAperta = k => (D.domande || []).some(d => d.k === k && d.tipo === "domanda" && !RISPOSTE.has(d.id));
@@ -870,7 +887,7 @@ VISTE.provare = () => {
 };
 
 // ---------- Note e testate: cartelle per argomento, dentro le note mandate e le approvate ----------
-const CARTELLE = [["prova:enel", "Enel"], ["prova:schivata", "Schivate"], ["prova:lupo", "Lupo della luna"], ["prova:", "Effetti e combattimento"],
+const CARTELLE = [["prova:enel", "Enel"], ["prova:schivata", "Schivate"], ["prova:lupo", "Lupo della luna"], ["prova:edificio", "Edifici"], ["prova:mercante", "Mercante"], ["prova:cervo", "Cervo"], ["prova:", "Effetti e combattimento"],
   ["boss:", "Boss"], ["nemico:", "Nemici"], ["personaggio:", "Personaggi"], ["luogo:", "Luoghi"], ["villaggio:", "Paesi e case"], ["interno:", "Interni"],
   ["libro:", "Libro e HUD"], ["oggetto:", "Oggetti"], ["", "Altro"]];
 const cartellaDi = k => CARTELLE.find(([p]) => k.startsWith(p))[1];

@@ -4,6 +4,7 @@
     python tools/art/build_griglia.py                       # tutte le figure a griglia
     python tools/art/build_griglia.py --only personaggio
     python tools/art/build_griglia.py --effetti             # effetti unici -> assets/vfx/
+    python tools/art/build_griglia.py --edifici             # edifici a griglia -> arte/prova/ (da giudicare)
     python tools/art/generate_all.py --only personaggio     # poi in assets/ (con il tell del nemico)
 
 Scrive arte/sprite/<categoria>[_<aspetto>]_<anim>.png (frame in colonne, direzioni in righe down, up, left, right)
@@ -33,6 +34,8 @@ PROVA = os.path.join(ROOT, "arte", "prova")          # versioni da scegliere: no
 FIGURE = {
     "personaggio": ("personaggio", "personaggio", ""),
     "lupo_della_luna": ("lupo_della_luna", "nemico_base", "lupo_della_luna"),
+    "mercante": ("mercante", "personaggio", "mercante"),
+    "cervo": ("cervo", "fauna", "cervo"),
 }
 
 
@@ -66,6 +69,8 @@ def costruisci(fid, spec):
     for nome, a in spec[cat].items():
         if not isinstance(a, dict) or "frames" not in a:
             continue
+        if nome not in getattr(mod, "SOLO", (nome,)):      # gli NPC hanno solo idle e walk
+            continue
         if nome not in mod.ANIM:
             sys.exit(f"{fid}: manca l'animazione {nome} in griglia/figure/{nome_mod}.py")
         an = mod.ANIM[nome]
@@ -76,6 +81,8 @@ def costruisci(fid, spec):
         im = foglio([[rendi(mod, p, d, lato) for p in pose] for d in righe], n)
         os.makedirs(OUT, exist_ok=True)
         im.save(os.path.join(OUT, f"{pre}{nome}.png"))
+        if hasattr(mod, "SOLO") or cat == "fauna":       # NPC e fauna: come build_npc/build_fauna, dritti nel gioco
+            im.save(os.path.join(ROOT, "assets", "placeholder", f"{pre}{nome}.png"))
         fogli.append((nome, im))
         print(f"  {pre}{nome}.png  {n} frame x {len(righe)}")
     for anim, vv in getattr(mod, "VARIANTI", {}).items():   # versioni da scegliere -> arte/prova/
@@ -122,13 +129,37 @@ def effetti():
         print(f"  {nome}.png  {n} frame {fr[0].width}x{fr[0].height}")
 
 
+def edifici():
+    """Gli edifici a griglia (griglia/edifici.py) -> arte/prova/edificio_<id>.png (da giudicare prima di andare nel
+    mondo) e un controllo x2 su prato in arte/revisione/griglia_edifici.png."""
+    from griglia.edifici import EDIFICI
+    os.makedirs(PROVA, exist_ok=True)
+    ims = []
+    for nome, f in EDIFICI.items():
+        im = f()
+        im.save(os.path.join(PROVA, f"edificio_{nome}.png"))
+        ims.append(im)
+        print(f"  prova: edificio_{nome}.png  {im.width}x{im.height}")
+    w, h = sum(i.width for i in ims) + 20 * len(ims), max(i.height for i in ims)
+    out = Image.new("RGBA", (w, h), (110, 150, 90, 255))
+    x = 0
+    for im in ims:
+        out.alpha_composite(im, (x, h - im.height))
+        x += im.width + 20
+    out.resize((w * 2, h * 2), Image.NEAREST).save(os.path.join(REV, "griglia_edifici.png"))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--only", choices=sorted(FIGURE))
     ap.add_argument("--effetti", action="store_true", help="solo gli effetti (griglia/effetti.py)")
+    ap.add_argument("--edifici", action="store_true", help="solo gli edifici (griglia/edifici.py) -> arte/prova/")
     a = ap.parse_args()
     if a.effetti:
         effetti()
+        return
+    if a.edifici:
+        edifici()
         return
     with open(os.path.join(ROOT, "data", "animations.json"), encoding="utf-8") as fh:
         spec = json.load(fh)

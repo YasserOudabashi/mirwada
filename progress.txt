@@ -1727,3 +1727,23 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   Lupo, Effetti, Boss, Nemici, Luoghi, Libro...) con domande, messaggi, note mandate e approvate; nomi italiani delle
   animazioni. Domande aperte: sangue del lupo, quale schivata va nel gioco.
 - 1103 test verdi, validator 0 errori, Playwright senza errori.
+
+## Primo giro "uno per tipo": case, mercante, cervo, Stretta ferrea, 2026-11-21 (US-8C06)
+- Metodo deciso dall'utente: a ogni giro un edificio (o due dello stesso stile), un personaggio, un animale e
+  un'abilita', finche' non li ha confermati tutti.
+- Edifici a griglia: tools/art/griglia/edifici.py (64 px per casella come le figure; tessiture blocchi, marmo,
+  tegole, lastre; pezzi colonna, arco, porta di legno o bronzo, finestra, gradini, fregio, crepe, muschio). Casa del
+  centro antico (4x3: arenaria, terrazza con l'angolo crollato e le macerie, botola, colonna spezzata, arco con la
+  chiave, mezze colonne, fregio di glifi, edera) e museo (6x4: tempio di marmo, scalinata, sei colonne, frontone con
+  l'anfora e le statue, lucernario, portone di bronzo, stendardi con l'anfora). Comando:
+  `python tools/art/build_griglia.py --edifici` -> arte/prova/edificio_<id>.png (non ancora nel mondo).
+- Mercante a griglia (griglia/figure/mercante.py, SOLO idle e walk come gli NPC): turbante viola con la gemma, baffi,
+  pancia col panciotto verde, grembiule con la borsa, pantaloni rossi a sbuffo, babbucce; si sfrega le mani, cammina
+  dondolando. Prima versione tutta arancione: ricolorata. Va dritto nel gioco (assets/placeholder).
+- Cervo a griglia (griglia/figure/cervo.py, fauna idle 4 e fuga 6): bruca e alza la testa, salta in fuga.
+- Stretta ferrea (tg_stretta_ferrea, difesa +25% per 5 s): effetti.py stretta_ferrea (piastre ai lati, clang,
+  guscio, riflesso) -> assets/vfx/vfx_stretta_ferrea.png; nell'arena tasto 2, centrata su Enel. Prima versione con le
+  piastre che coprivano Enel e uscivano dalla cella: rimpicciolite e messe ai lati.
+- Guardati ingranditi; sito verificato con Playwright (nessun errore); 1103 test, validator 0 errori.
+- Aperto: il cervo da davanti e' sottile; nel gioco l'effetto unico dell'abilita' non e' ancora collegato (va fatto
+  quando ce ne saranno di piu': vfx.json per abilita').

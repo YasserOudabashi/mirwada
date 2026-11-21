@@ -194,9 +194,50 @@ def incantesimo_scoppio(n, S=64):
     return out
 
 
+# --- Stretta ferrea (tg_stretta_ferrea: difesa +25% per 5 s) -----------------------------------------------------------
+def stretta_ferrea(n, S=64):
+    """Quattro piastre di ferro arrivano dagli angoli, si chiudono a guscio attorno a chi lancia con un clang di
+    scintille, il guscio brilla (rivetti), poi resta un riflesso che si spegne. Disegnato sul corpo (centro = busto)."""
+    X, Y = _xy(S, S)
+    cx, cy = S / 2, S * 0.55
+    out = []
+    for i in range(n):
+        t = i / max(n - 1, 1)
+        liv = np.full((S, S), VUOTO, np.int8)
+        if i == 0:                                         # lampo
+            _metti(liv, np.hypot((X - cx) / 1.3, Y - cy) <= 10, ACCENTO)
+            out.append(_png(liv))
+            continue
+        k = min(t / 0.45, 1.0)                             # 0 -> 1: le piastre arrivano
+        for q, (ax, ay) in enumerate(((-1, -1), (1, -1), (-1, 1), (1, 1))):
+            dist = (1 - k) * 12
+            px, py = cx + ax * (15 + dist), cy + ay * (12 + dist * 0.8)
+            piastra = (np.abs(X - px) <= 4) & (np.abs(Y - py) <= 6)
+            if t < 0.85:
+                _metti(liv, piastra, PRIMARIO if t < 0.7 else SCURO)
+                _metti(liv, piastra & ((X - px) * ax < -4), ACCENTO if t < 0.7 else PRIMARIO)  # bordo in luce
+                for rx, ry in ((px - 2 * ax, py - 3), (px - 2 * ax, py + 3)):                 # rivetti
+                    _metti(liv, (np.abs(X - rx) <= 0.6) & (np.abs(Y - ry) <= 0.6), SCURO)
+        if 0.4 <= t <= 0.65:                               # clang: scintille dove le piastre si toccano
+            for ang in range(0, 360, 45):
+                a = np.radians(ang)
+                r0 = 18 + (t - 0.4) * 24
+                x0, y0 = cx + np.cos(a) * r0, cy + np.sin(a) * r0 * 1.2
+                _metti(liv, _lin(X, Y, x0, y0, x0 + np.cos(a) * 3, y0 + np.sin(a) * 3, 0.7), ACCENTO)
+        if t > 0.6:                                        # riflesso che scorre sul guscio e si spegne
+            fase = (t - 0.6) / 0.4
+            banda = np.abs((X - cx) + (Y - cy) * 0.6 - (-20 + fase * 40)) <= 1.5
+            guscio = np.abs(np.hypot((X - cx) / 17, (Y - cy) / 20) - 0.95) <= 0.08
+            _metti(liv, guscio, SCURO if fase < 0.7 else VUOTO)
+            _metti(liv, banda & guscio, ACCENTO)
+        out.append(_png(liv))
+    return out
+
+
 EFFETTI = {
     # nome del foglio -> (funzione, frame, dimensione di una cella)
     "vfx_fendente_pesante": (fendente_pesante, 8),
     "vfx_incantesimo": (incantesimo, 4),
     "vfx_incantesimo_scoppio": (incantesimo_scoppio, 7),
+    "vfx_stretta_ferrea": (stretta_ferrea, 8),
 }

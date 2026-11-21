@@ -2183,6 +2183,22 @@
       "fase": "8c",
       "passes": true,
       "notes": "Fatta il 2026-11-19; dettagli in progress.txt."
+    },
+    {
+      "id": "US-8C06",
+      "title": "Giro 1 uno per tipo: casa del centro antico e museo, mercante, cervo, Stretta ferrea",
+      "description": "Metodo dell'utente: un edificio, un personaggio, un animale e un'abilita' alla volta.",
+      "acceptanceCriteria": [
+        "case con il loro disegno a griglia",
+        "mercante unico",
+        "cervo",
+        "effetto unico di Stretta ferrea",
+        "tutto sulla pagina Da testare"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-21; dettagli in progress.txt. Aspetta il giudizio."
     }
   ]
 }

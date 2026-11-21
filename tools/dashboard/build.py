@@ -86,6 +86,14 @@ def _file_prova():
                   ("incantesimo_scoppio", "vfx_incantesimo_scoppio")):
         out[f"prova:{k}"] = [f"assets/vfx/{sp}.png"]
     out["prova:carica"] = ["assets/placeholder/personaggio_attack_heavy.png", "scripts/player.gd"]
+    out["prova:stretta_ferrea"] = ["assets/vfx/vfx_stretta_ferrea.png"]
+    for f in glob.glob(os.path.join(ROOT, "arte", "prova", "edificio_*.png")):          # edifici a griglia
+        out["prova:" + os.path.basename(f)[:-4]] = [os.path.relpath(f, ROOT)]
+    for asp, cat, anims in (("mercante", "personaggio", ("idle", "walk")), ("cervo", "fauna", ("idle", "fuga"))):
+        fs = [f"assets/placeholder/{cat}_{asp}_{n}.png" for n in anims]
+        out[f"prova:{asp}"] = fs
+        for n, f in zip(anims, fs):
+            out[f"prova:{asp}_{n}"] = [f]
     return out
 
 
@@ -109,6 +117,17 @@ def versioni():
         out[k] = reg[k]
     with open(REGISTRO, "w", encoding="utf-8") as fh:
         json.dump(reg, fh, ensure_ascii=False, indent=1, sort_keys=True)
+    return out
+
+
+def edifici_prova():
+    """Gli edifici a griglia da giudicare (arte/prova/edificio_<id>.png, tools/art/build_griglia.py --edifici)."""
+    out = []
+    for f in sorted(glob.glob(os.path.join(ROOT, "arte", "prova", "edificio_*.png"))):
+        nome = os.path.basename(f)[:-4]
+        shutil.copy(f, os.path.join(IMG, nome + ".png"))
+        im = Image.open(f)
+        out.append({"id": nome, "file": f"img/{nome}.png", "w": im.width, "h": im.height})
     return out
 
 
@@ -431,13 +450,14 @@ def tecniche():
     for nome, fr, ab, vola, scoppio in (("vfx_fendente_pesante", 8, "attack_heavy", False, None),
                                         ("vfx_incantesimo", 4, "hermit_incantesimo_tradizionale", True,
                                          "vfx_incantesimo_scoppio"),
-                                        ("vfx_incantesimo_scoppio", 7, "hermit_incantesimo_tradizionale", False, None)):
+                                        ("vfx_incantesimo_scoppio", 7, "hermit_incantesimo_tradizionale", False, None),
+                                        ("vfx_stretta_ferrea", 8, "tg_stretta_ferrea", False, None)):
         src = os.path.join(ROOT, "assets", "vfx", nome + ".png")
         if os.path.isfile(src):
             shutil.copy(src, os.path.join(IMG, nome + ".png"))
             effetti.append({"primitiva": None, "abilita": ab, "sprite": nome, "file": f"img/{nome}.png", "frames": fr,
                             "lampo": True, "su": "chi_lancia", "gira": not vola, "vola": vola, "scoppio": scoppio,
-                            "unico": True})
+                            "unico": True, "centro": nome == "vfx_stretta_ferrea"})
     return {"pathway": pw, "effetti": effetti}
 
 
@@ -519,6 +539,7 @@ def main():
     dati["nemici"], dati["boss"] = nemici()
     dati["personaggi"] = personaggi()
     dati["tecniche"] = tecniche()
+    dati["edifici_prova"] = edifici_prova()
     dati["versioni"] = versioni()
     dati["domande"] = json.load(open(os.path.join(ROOT, "tools", "dashboard", "domande.json"), encoding="utf-8"))
     dati["combattimento"] = senza_commenti(json.load(open(os.path.join(DATA, "balance.json"), encoding="utf-8"))["combattimento"])

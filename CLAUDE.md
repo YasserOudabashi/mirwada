@@ -543,6 +543,10 @@ audio, Mondo vivo, fusioni, rilascio (qui il gioco e' finito in italiano), poi r
   - modalita' cupa con **disegni propri** (piu' rovine, nebbia, forme delle concept), non solo un'altra palette;
   - icone: **ogni oggetto il suo disegno** 32x32, famiglie riconoscibili (la maggiore piu' grande e decorata);
   - ordine: prima **Enel + un nemico + un effetto**, giudicati dall'utente nella dashboard, poi tutto il resto.
+  - **Metodo da qui in avanti** (2026-11-21, scelta dell'utente): **un giro alla volta**, in ogni giro un edificio (o
+    due dello stesso stile), un personaggio, un animale e un'abilita', tutti sulla pagina "Da testare"; si va avanti
+    cosi' finche' l'utente non li ha confermati tutti. Primo giro: casa del centro antico, museo, mercante, cervo,
+    Stretta ferrea. Gli edifici restano in `arte/prova/` finche' non sono approvati (poi vanno nel mondo).
 
 ## i18n — due sistemi, una convenzione per le stringhe dei dati
 
