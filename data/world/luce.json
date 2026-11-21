@@ -6,5 +6,31 @@
     "cupo": {"alba": "#cbb8b2", "mezzogiorno": "#e6e6ee", "crepuscolo": "#a8808c", "notte_fonda": "#3e4874"}
   },
   "sottosuolo": "#ffffff",
-  "transizione": 3.0
+  "transizione": 3.0,
+  "luci": {
+    "_comment": "US-8B27: le luci della notte (scripts/world/luci_notte.gd), aloni a gradini che si sommano sopra il buio. forza: quanto sono accese in ogni momento del giorno (0 = spente). finestre: una casa su 'probabilita' ha le finestre accese (sempre le stesse), alone di 'raggio' caselle davanti alla facciata. faro: sopra il nodo della soglia del faro, spostato di 'scostamento' unita' fino alla lanterna, con un alone di 'raggio' caselle e un fascio lungo 'lunghezza' caselle che fa 'giri_al_minuto'.",
+    "forza": {
+      "alba": 0.25,
+      "mezzogiorno": 0.0,
+      "crepuscolo": 0.6,
+      "notte_fonda": 1.0
+    },
+    "transizione": 3.0,
+    "finestre": {
+      "probabilita": 0.55,
+      "colore": "#ffc46b",
+      "raggio": 1.5
+    },
+    "faro": {
+      "nodo": "Soglia_faro",
+      "scostamento": [
+        0,
+        -92
+      ],
+      "colore": "#fff2c2",
+      "raggio": 3.5,
+      "lunghezza": 10,
+      "giri_al_minuto": 5
+    }
+  }
 }

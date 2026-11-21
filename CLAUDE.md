@@ -177,6 +177,8 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - Icone degli status (`build_stati.py`): pixel art da griglie 10x10 in un tondo 16x16, bordo rosso se `negativo`,
   verde se e' un vantaggio. Nel gioco `GameData.icona_stato(id)` e `scripts/status_icons.gd`: fila sopra la testa
   di giocatore e nemici (segnale `StatsComponent.status_cambiati`), lampeggia negli ultimi 2 secondi.
+- HUD di gioco (US-8B75d, `build_hud.py`, `data/ui/hud.json`): barre a pixel con emblema e scia del danno, numeri solo
+  quando cambiano, hotbar in basso al centro **a soli simboli** (mai nomi di abilita' o status a schermo: stanno nel libro).
 - Glifi delle primitive (`build_primitive.py`): forme 2D disegnate a 4x e ridotte a maggioranza, a 4 toni di grigio
   (contorno, scuro, primario, accento). Il colore lo mette `shaders/rampa_pathway.gdshader` dalla palette del
   Pathway in `data/vfx.json`, come i VFX. Nella hotbar l'abilita' mostra il glifo della sua prima primitiva.
@@ -196,6 +198,13 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
   L'AnimationMachine legge la cella dal foglio e tiene la scala dei dati: la grana dei pixel non cambia.
 - Nel gioco la forma e' legata al suo modificatore (`StatsComponent.imposta_forma`, segnale `forma_cambiata`): il
   player cambia fogli quando comincia e torna Enel quando il modificatore se ne va, in qualunque modo.
+
+### Boss
+- US-1505: un boss e' un dato (`balance.json boss.<id>`): `vita_x`, `fasi` a soglie di vita (`da`; la `cfg` con chiavi di
+  `nemico_base` piu' `comportamento`, i `gregari` di un tipo), `arena` (raggio, colore). Nel layout un nemico con
+  `"boss": <id>`; `scripts/boss.gd` (`Boss.monta` dal mondo e dagli interni) chiude l'arena all'ingaggio, la riapre
+  alla morte di uno dei due o se si finisce lontano, e mostra la barra in alto (`hud.gd mostra_boss`). Battuto non
+  torna (`WorldState` "boss:<id>"). Nel mondo il boss va nella radura piu' vicina, mai sotto una chioma.
 
 ### Cannocchiale
 - US-8B24a: cannocchiali fissi in `data/world/cannocchiali.json` (luogo, bersaglio); `scripts/cannocchiale.gd` fa volare
@@ -283,6 +292,7 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - A 32 px il viso è ridotto al minimo; a 48–64 px si legge bene. Bocca, sopracciglia e occhiali solo nei ritratti.
 - Nella preparazione degli attacchi l'arma può restare dietro la testa.
 - Il ponte è un rettangolo di legno.
+- La barca vista di prua o di poppa (US-8B91) è corta: l'inclinazione della vista la schiaccia, e Enel seduto la copre quasi tutta.
 - I panorami hanno una sola veduta (la citta' di mare): niente panorami per regione.
 - Mancano: animazioni di arrampicata e nuoto (volo e barca ci sono, US-8B81), mostri volanti grandi (c'è solo `bird()` per i volatili
   piccoli), castelli e ponti dettagliati. Vanno aggiunti a `forge3d`, con una story dedicata.
@@ -301,6 +311,29 @@ tabella li ricopia. Dash e parata restano a `fps`: sono finestre di gameplay.
 - [ ] Il ciclo si chiude (ultimo → primo)
 - [ ] Anteprima ingrandita su sfondo chiaro e scuro guardata
 - [ ] `python scripts/selftest.py` (di sprite-forge) esce 0
+
+---
+
+## Dashboard del progetto (Officina di Mirwada)
+
+- Pagina privata su claude.ai: https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3 (si apre solo col tuo account).
+  Mostra tutto da guardare e giudicare: Oggi, Avanzamento, Mondo (mappa coi colori veri e foto dal gioco), Paesi e
+  case, Personaggi, Bestiario, Tecniche, Oggetti, Libro e HUD, Consumo di token.
+- Si costruisce con `python tools/dashboard/build.py` (-> `build/dashboard/`, non nel repo; `--foto` rifa le foto
+  dal gioco con `tests/manual/qa_dashboard_foto.gd`, ~5 minuti) e si ripubblica allo **stesso link** (Artifact con
+  `url` e `root` = `build/dashboard`, `files` = img/, foto/*.jpg, dati.json; al massimo 255 file per volta).
+- Giudizi dell'utente: archivio della pagina, `giudizi/<tipo>:<id>` = {stato: "ok"|"no", nota, quando, versione, storia}.
+  A inizio sessione e ogni volta che l'utente dice di guardare le note si leggono (ArtifactData `query` su `giudizi`):
+  ogni "no" con la nota e' lavoro da fare. Un giudizio vale per la versione del disegno (`tools/dashboard/versioni.json`):
+  rifatta la cosa, torna "Da testare" e la nota va fra le sistemate.
+- **Le domande all'utente si fanno sul sito** (richiesta dell'utente, 2026-11-19), non solo in chat: una voce in
+  `tools/dashboard/domande.json` ({id, k, tipo: domanda|spiegazione, testo, opzioni}); la scheda e' segnata
+  "❓ domanda"; le risposte stanno in `risposte/<id>` (leggerle con ArtifactData). Pagine: "Da testare" (solo da
+  provare) e "Note e testate" (cartelle per argomento: domande, messaggi, note mandate, approvate).
+- **A fine di ogni sessione di lavoro** (regola chiesta dall'utente): `python tools/dashboard/consumo.py`, poi
+  ArtifactData `set` di `consumo/<id sessione>` per ogni sessione nuova o cresciuta (file
+  `build/dashboard/consumo.json`), poi `build.py` e ripubblica. Il costo e' una stima al listino API (nello
+  script, `PREZZI`): con l'abbonamento non si paga.
 
 ---
 
@@ -334,6 +367,9 @@ python tools/art/esporta_mondo.py --barca          # solo i disegni della barca 
 python tools/art/build_interni.py              # interni: pavimenti, pareti e arredi -> assets/interni/<tema>/
 python tools/art/build_npc.py                  # aspetti degli NPC (personaggio_<aspetto>_{idle,walk}.png)
 python tools/art/build_ritratti.py             # ritratti 64x80 per aspetto, dallo stesso modello -> assets/ritratti/
+python tools/art/build_griglia.py              # NUOVO STILE (2026-11-18): figure a griglia su scheletro (tools/art/griglia/figure/<id>.py) -> arte/sprite/
+python tools/art/build_griglia.py --effetti    # effetti unici a 4 grigi (tools/art/griglia/effetti.py) -> assets/vfx/
+python tools/art/build_nemici.py               # figure dei tipi di nemico (nemico_base_<aspetto>_<anim>.png), poi generate_all.py --only nemico_base
 python tools/art/build_fauna.py                # fauna d'atmosfera: fauna_<specie>_{idle,fuga}.png (cervo 64, gli altri 32)
 python tools/art/build_forme.py                # forme di Enel (forms.json "aspetto"): personaggio_<aspetto>_<anim>.png, celle proprie
 python tools/art/build_libro.py                # carta (grande e piccola dell'avvio), segnalibri, caselle e filetto (assets/ui/)
@@ -406,9 +442,9 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   abilita' a tastiera + hotbar, proiettili, recitazione con payload veri, 307 ingredienti come oggetti,
   fonti nel mondo, Prepara/Bevi, negozio. PRD `prd-fase-8-vertical-slice.md`.
 - Fase 9 — Pathway Non-Standard (Boon): **CHIUSA** (7 story). PRD `prd-fase-9-pathway-non-standard.md`.
-- Fase 10 — Mondo continuo a layout ASCII (`world_scene.gd`, `data/world/layouts/`, edifici e
-  interni): **CHIUSA** sul suo ramo. Dal merge la scena di gioco e' il **mondo generato** (sotto): i
-  layout restano come dati e come fonte del contenuto da portare sul mondo generato.
+- Fase 10 — Mondo continuo a layout ASCII (`data/world/layouts/`, edifici e interni): **CHIUSA** sul suo ramo. Dal
+  merge la scena di gioco e' il **mondo generato** (sotto): i layout restano come dati e come fonte del contenuto da
+  portare sul mondo generato. `world_scene.gd` (il mondo a layout) e' stato tolto il 2026-11-18.
 - Fase 11 — Villaggi ed economia (rarita', fabbri, interni, villaggi in campagna): **CHIUSA** sul suo
   ramo; i villaggi e gli edifici vanno portati sul mondo generato come per la fase 10.
 - Fase 8b — Arte con sprite-forge: **CHIUSA** (2026-10-29, tutto su `main`). Fatti: personaggi a 64 px, aspetti degli NPC, terreni,
@@ -425,15 +461,18 @@ PR #5). Il dettaglio di ogni fase e' in `progress.txt` e nei PRD di `006_PRD/`.
   (US-8B20a..f), la camera che inquadra gli interni sotto l'HUD (US-8B18e), gli oggetti fissi presi una volta sola
   (US-8B22d), l'HUD leggibile (US-8B75). PRD `prd-fase-8b-arte.md`.
 - Fase 12 — Mondo vivo: **PIANIFICATA**, PRD `prd-fase-12-mondo-vivo.md` da riscrivere sul mondo generato (US-1200).
-- Fase 13 — Atto II e III: **PIANIFICATA**, PRD `prd-fase-13-atto-2-3.md` (story US-1301..US-1313). Va fatta per
-  prima: senza, la prova finale (`trib_1_0`) non si supera e il gioco non si finisce.
+- Fase 13 — Atto II e III: **CHIUSA** (2026-11-17), PRD `prd-fase-13-atto-2-3.md`. Quest di fazione (carte fra
+  l'Ordine e il porto), duello con Aldo come scena (`scripts/world/duelli.gd`), scene di Doran, Lena e Vesna, antagonisti
+  con la loro figura, Diario nel libro, rituali nel mondo (pozione dentro il rituale, luoghi veri, sacrifici pagati,
+  sigilli come oggetti). Il gioco si gioca dalla Sequenza 4 alla 0 fino al finale: `tests/manual/qa_atto_2.gd`, `qa_atto_3.gd`.
 - Fase 14 — altri Pathway Non-Standard: facoltativa.
 - Fasi 15-17 — Nemici e boss, Audio, Rilascio: **PIANIFICATE** (2026-11-10), PRD `prd-fasi-15-17-gioco-completo.md`
   (US-1501..1507, US-1601..1605, US-1701..1704). Servono per giocare tutto il gioco: oggi ogni nemico e' `nemico_base`
   ingrandito, non c'e' nessun file audio, e nessuno ha giocato una partita intera fino al finale.
 
-**Lavoro corrente** (aggiornato il 2026-11-11): tutto il lavoro che manca e' in `prd.json` (64 story aperte, con la
-fase e la priorita'), l'ordine in `006_PRD/prossimi-passi.md`: **Atto II e III** (fatte US-1301 e US-1302, si riparte da US-8B60b), nemici e boss,
+**Lavoro corrente** (aggiornato il 2026-11-17): tutto il lavoro che manca e' in `prd.json` (51 story aperte, con la
+fase e la priorita'), l'ordine in `006_PRD/prossimi-passi.md`: nemici e boss
+(bestiario deciso dall'utente: `prd-fasi-15-17-gioco-completo.md` 2.1),
 audio, Mondo vivo, fusioni, rilascio (qui il gioco e' finito in italiano), poi rifiniture d'arte e inglese.
 
 ## Decisioni prese
@@ -480,10 +519,39 @@ audio, Mondo vivo, fusioni, rilascio (qui il gioco e' finito in italiano), poi r
   la regione finale, **si entra dalla Sequenza 4 in poi** (4..0: l'Atto III e la prova finale sono li'); **Fool, Error
   e Door entrano sempre** perche' e' la loro regione di casa (`regions.json` gating `gruppo_di_casa`): li' hanno
   ingredienti e rituali fin dalla Sequenza 8.
+- **Rituali** (2026-11-16): dalla Sequenza 4 in giu' la pozione si prepara come sempre ma **si beve solo dentro il
+  rituale**, nel luogo e all'ora giusti (dura, si puo' interrompere). Dei luoghi indicati da un rituale **ne basta uno**.
+  I sacrifici si pagano **davvero dove il gioco ha un costo** (Ancora, oggetto, salute o spiritualita' massima, base);
+  gli altri sono una scelta scritta che si conferma nel rituale. I luoghi mancanti si aggiungono senza rigenerare la mappa.
+- **Eclissi** (2026-11-18): resta **rara** (ogni 8 cicli di luna): il rituale finale e gli altri che la chiedono costano
+  tempo, per scelta. **Boss** (2026-11-18): confermata la proposta di `prd-fasi-15-17-gioco-completo.md` 2.1 (6 boss + 2 segreti).
 - **Bersaglio delle abilita'** (2026-11-03): le primitive che colpiscono un altro (maledizione, possessione, anima
   recisa, debuff, danno nel tempo, paura) cadono sul **nemico piu' vicino davanti** (`balance.json
   combattimento.bersaglio`); **senza nemico l'abilita' non parte e non costa**. I costi voluti su di se' sono
   `"bersaglio": "self"` nei dati dell'abilita' (`primitives.json` da' il default).
+
+- **Scelte artistiche per rifare tutta l'arte** (2026-11-18, decise dall'utente; valgono sopra le regole d'arte qui
+  sopra dove si contraddicono, che si aggiornano story per story):
+  - personaggi a **3 teste** (testa grande, faccia leggibile), **pixel art a griglia** (parti disegnate a griglia e
+    montate su uno scheletro 2D, rilanciabile col seed; il 3D di forge3d non si usa piu' per le figure);
+  - **contorno nero pieno 1 px** (`#181425`), **3 toni** per materiale (luce, base, ombra; riflesso solo sul metallo);
+  - fotogrammi **ricchi**: camminata 8, idle 6, attacco leggero 8, pesante 12, morte 10 (ferma a terra); si cambia
+    `data/animations.json` e si rigenera;
+  - effetti: **un disegno unico per ogni abilita'** (oltre a una forma propria per primitiva), colore dal Pathway;
+  - boss **enormi, fino a 192 px**;
+  - mondo (terreni, alberi, case, arredi) **a griglia** nello stesso stile; mappa, biomi e villaggi approvati restano;
+  - modalita' cupa con **disegni propri** (piu' rovine, nebbia, forme delle concept), non solo un'altra palette;
+  - icone: **ogni oggetto il suo disegno** 32x32, famiglie riconoscibili (la maggiore piu' grande e decorata);
+  - ordine: prima **Enel + un nemico + un effetto**, giudicati dall'utente nella dashboard, poi tutto il resto.
+  - **Metodo da qui in avanti** (2026-11-21, scelta dell'utente): **un giro alla volta**, in ogni giro un edificio (o
+    due dello stesso stile), un personaggio, un animale e un'abilita', tutti sulla pagina "Da testare"; si va avanti
+    cosi' finche' l'utente non li ha confermati tutti. Primo giro: casa del centro antico, museo, mercante, cervo,
+    Stretta ferrea. Gli edifici restano in `arte/prova/` finche' non sono approvati (poi vanno nel mondo).
+  - **"Prepara i prossimi disegni test"** (2026-11-21, regola dell'utente, sostituisce il giro "uno per tipo"): ogni
+    volta che l'utente lo chiede si prepara un giro con **1 personaggio completo** (tutte le mosse della sua categoria),
+    **5 edifici, 5 animali, 5 nemici, 1 boss, 10 abilita' e 10 oggetti**, tutti sulla pagina "Da testare".
+  - **Equipaggiamento visibile** (2026-11-21, scelta dell'utente): quello che il giocatore indossa o tiene si vede
+    sulla figura (arma, armatura, oggetto in mano), non cambia solo i numeri. Il legame oggetto -> disegno e' un dato (US-8C08).
 
 ## i18n — due sistemi, una convenzione per le stringhe dei dati
 

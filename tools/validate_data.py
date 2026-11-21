@@ -410,8 +410,12 @@ def main():
 
             # rituale obbligatorio da Sequenza 4 in giu' (avanzamento da 5 in su)
             ritual = seq.get("advancement_ritual")
-            if n <= 4 and ritual is None:
-                err(f"{rel} [{sid}]: advancement_ritual obbligatorio per Sequenza <= 4")
+            # 2026-11-17: i dati della Sequenza N dicono come si LASCIA la N; dalla 0 non si va oltre, quindi la 0 non
+            # ha rituale (il rituale finale, quello dell'apoteosi, e' sulla 1).
+            if 1 <= n <= 4 and ritual is None:
+                err(f"{rel} [{sid}]: advancement_ritual obbligatorio per Sequenza 1..4")
+            if n == 0 and ritual is not None:
+                err(f"{rel} [{sid}]: la Sequenza 0 non ha rituale (non c'e' una Sequenza dopo): il rituale finale sta sulla 1")
             if n > 4 and ritual is not None:
                 warn(f"{rel} [{sid}]: advancement_ritual presente sopra Sequenza 4 (inatteso ma non fatale)")
             if isinstance(ritual, dict):
@@ -1375,6 +1379,47 @@ def main():
                             ROOT, "assets", "world", t, "oggetti", k + ".png")) for t in ("luminoso", "cupo")):
                         err(f"{ctx}: manca il disegno {k} (python tools/art/esporta_mondo.py --varchi)")
 
+    # US-1305c: ogni luogo chiesto da un rituale e' un posto dove il giocatore puo' stare: un luogo della mappa
+    # (luoghi_mondo o stesso nome), la zona di un varco, la "zona" di un interno, o una zona che vale anche come lui.
+    if mondo_doc is not None and regions_doc is not None:
+        _raggiungibili = set()
+        _zone_interni = set()
+        for _fn in os.listdir(interni_dir):
+            _zi = (load_json(os.path.join(interni_dir, _fn)) or {}).get("zona")
+            if _zi:
+                _zone_interni.add(_zi)
+        _nomi_luoghi = set(mondo_doc.get("luoghi", {})) | set(mondo_doc.get("sottosuolo", {}).get("boss", {}))
+        for reg in regions_doc.get("regions", []):
+            _alias = reg.get("luoghi_mondo") or {}
+            _qui = {(_alias.get(l, l)) for l in _nomi_luoghi} & set(reg.get("location_tags", []))
+            _qui |= {g["varco"]["zona"] for g in reg.get("gating", []) if g.get("varco", {}).get("zona")}
+            _qui |= _zone_interni & set(reg.get("location_tags", []))
+            for _z, _altri in (reg.get("zone_anche") or {}).items():
+                if _z not in reg.get("location_tags", []):
+                    err(f"data/world/regions.json [{reg.get('id')}]: zone_anche '{_z}' non e' tra i suoi location_tags")
+                for _a in _altri:
+                    if _a not in reg.get("location_tags", []):
+                        err(f"data/world/regions.json [{reg.get('id')}]: zone_anche '{_z}' -> '{_a}', che non e' tra i suoi location_tags")
+                if _z in _qui:
+                    _qui |= set(_altri)
+            _raggiungibili |= _qui
+        for _pf in sorted(os.listdir(os.path.join(DATA, "pathways"))):
+            for _s in (load_json(os.path.join(DATA, "pathways", _pf)) or {}).get("sequences", []):
+                _tags = (_s.get("advancement_ritual") or {}).get("location_tags") or []
+                for _t in _tags:
+                    if _t not in _raggiungibili:
+                        err(f"data/pathways/{_pf} [{_s.get('id')}]: il luogo '{_t}' del rituale non e' un posto del mondo "
+                            f"(regions.json luoghi_mondo / zone_anche, zona di un varco o di un interno)")
+
+    # 2026-11-18: dove vive ogni specie di pet selvatica (un luogo del mondo generato) e il suo nutrimento
+    for _pf in sorted(os.listdir(os.path.join(DATA, "pets"))):
+        for _pet in (load_json(os.path.join(DATA, "pets", _pf)) or {}).get("pets", []):
+            _sel = _pet.get("selvatico")
+            if _sel and mondo_doc is not None and _sel.get("luogo") not in mondo_doc.get("luoghi", {}):
+                err(f"data/pets/{_pf} [{_pet.get('id')}]: selvatico.luogo '{_sel.get('luogo')}' non e' un luogo di assets/world/mondo.json")
+            if _sel and not os.path.isfile(os.path.join(ROOT, "assets", "placeholder", f"pet_{_pet.get('id')}_idle.png")):
+                err(f"data/pets/{_pf} [{_pet.get('id')}]: manca la figura pet_{_pet.get('id')}_idle.png")
+
     # US-8B91: la barca parte ormeggiata vicino a un luogo del mondo generato
     _mezzi = load_json(os.path.join(DATA, "world", "mezzi.json")) or {}
     # US-8B93: la chiave del volo e' un oggetto che non si vende (venduto, si perderebbe il volo)
@@ -1383,6 +1428,30 @@ def main():
         if _fn.endswith(".json"):
             for _it in (load_json(os.path.join(DATA, "items", _fn)) or {}).get("items", []):
                 _items_tutti[_it.get("id")] = _it
+    # data/audio_fonti.json (2026-11-14): ogni suono di audio.json ha una voce; uno "scaricato" ha il file e la licenza
+    _fonti = (load_json(os.path.join(DATA, "audio_fonti.json")) or {}).get("suoni", {})
+    import re as _re
+    for _sid in sorted(set(_re.findall(r'"((?:sfx|mus|amb)_[a-z_0-9]+)"', json.dumps(load_json(os.path.join(DATA, "audio.json")) or {})))):
+        if _sid not in _fonti:
+            err(f"data/audio_fonti.json: manca la voce di '{_sid}' (scaricato, da_scegliere o da_generare)")
+    for _sid, _v in _fonti.items():
+        if _v.get("stato") not in ("scaricato", "da_scegliere", "da_generare"):
+            err(f"data/audio_fonti.json [{_sid}]: stato '{_v.get('stato')}' fuori vocabolario")
+        if _v.get("stato") == "scaricato" and not (os.path.exists(os.path.join(ROOT, _v.get("file", "x"))) and _v.get("licenza") and _v.get("pagina")):
+            err(f"data/audio_fonti.json [{_sid}]: scaricato ma senza file, licenza o pagina")
+    # US-8B60b: ogni antagonista ha il suo aspetto, con i fogli e il ritratto
+    for _ant in (load_json(os.path.join(DATA, "lore", "antagonisti.json")) or {}).get("antagonisti", []):
+        _asp = _ant.get("aspetto", "")
+        if not _asp or not os.path.exists(os.path.join(ROOT, "assets", "placeholder", f"personaggio_{_asp}_idle.png")) \
+                or not os.path.exists(os.path.join(ROOT, "assets", "ritratti", f"{_asp}.png")):
+            err(f"data/lore/antagonisti.json [{_ant.get('id')}]: aspetto '{_asp}' senza fogli o ritratto (tools/art/build_npc.py, build_ritratti.py)")
+    _volo = _mezzi.get("volo") or {}                        # 2026-11-11: costi del volo e Pathway che volano per natura
+    for _k in ("costo_decollo", "costo_al_secondo", "velocita_esausto"):
+        if not isinstance(_volo.get(_k, 0), (int, float)) or _volo.get(_k, 0) < 0:
+            err(f"data/world/mezzi.json [volo]: {_k} deve essere un numero >= 0")
+    for _pw in (_volo.get("innato") or []):
+        if not os.path.exists(os.path.join(DATA, "pathways", f"{_pw}.json")):
+            err(f"data/world/mezzi.json [volo]: innato '{_pw}' non e' un Pathway attivo")
     for _mz, _spec in _mezzi.items():                       # US-8B91b: il moltiplicatore della velocita' sul mezzo
         _vz = _spec.get("velocita", 1.0) if isinstance(_spec, dict) else 1.0
         if not isinstance(_vz, (int, float)) or not (0 < _vz <= 3):
@@ -1866,6 +1935,54 @@ def main():
     # (sequenza + override + scala), mai un flag: qui si valida solo la forma.
     _bal_nemici = load_json(os.path.join(DATA, "balance.json")) or {}
     nemico_base_keys = set((_bal_nemici.get("nemico_base", {}) or {}).keys())
+    # US-1501: i tipi di nemico: chiavi di nemico_base piu' nome, rarita', comportamento e aspetto
+    nemici_tipi = {k: v for k, v in (_bal_nemici.get("nemici_tipi", {}) or {}).items() if not k.startswith("_")}
+    _tipo_extra = {"name_i18n", "rarita", "comportamento", "aspetto", "palette"}
+    for _tid, _td in nemici_tipi.items():
+        _ctx = f"data/balance.json nemici_tipi [{_tid}]"
+        _fuori = set(_td) - nemico_base_keys - _tipo_extra
+        if _fuori:
+            err(f"{_ctx}: chiavi fuori da nemico_base: {sorted(_fuori)}")
+        if _td.get("rarita") not in ("comune", "raro", "elite"):
+            err(f"{_ctx}: rarita '{_td.get('rarita')}' (comune, raro, elite)")
+        if _td.get("comportamento") not in ("mischia", "distanza", "carica", "volo"):
+            err(f"{_ctx}: comportamento '{_td.get('comportamento')}' fuori vocabolario (mischia, distanza, carica, volo)")
+        if _td.get("palette") and _td["palette"] not in ((load_json(os.path.join(DATA, "vfx.json")) or {}).get("pathway_palette_visiva", {})):
+            err(f"{_ctx}: palette '{_td['palette']}' non e' una palette di data/vfx.json")
+        if _td.get("tag") and _td["tag"] not in valid_tags:
+            err(f"{_ctx}: tag '{_td['tag']}' fuori dal vocabolario di data/tags.json")
+        # US-1504: aspetto "nemico_base" = il foglio di base, altrimenti i fogli nemico_base_<aspetto>_<anim> (build_nemici.py)
+        _asp_t = _td.get("aspetto")
+        _foglio_t = "nemico_base_idle.png" if _asp_t == "nemico_base" else f"nemico_base_{_asp_t}_idle.png"
+        if not os.path.isfile(os.path.join(ROOT, "assets", "placeholder", _foglio_t)):
+            err(f"{_ctx}: aspetto '{_asp_t}' senza foglio assets/placeholder/{_foglio_t} (tools/art/build_nemici.py)")
+
+    # US-1505: i boss (balance.json boss; il nome lo controlla R-12): fasi a soglie che scendono da 1.0, cfg con chiavi di nemico_base
+    # (piu' comportamento, mai volo), gregari di un tipo vero, arena con raggio e colore
+    boss_dati = {k: v for k, v in (_bal_nemici.get("boss", {}) or {}).items() if not k.startswith("_")}
+    for _bid, _bd in boss_dati.items():
+        _ctx = f"data/balance.json boss [{_bid}]"
+        _soglie = [float(f.get("da", -1)) for f in _bd.get("fasi", [])]
+        if len(_soglie) < 3 or _soglie[0] != 1.0 or any(a <= b for a, b in zip(_soglie, _soglie[1:])) or _soglie[-1] <= 0:
+            err(f"{_ctx}: fasi {_soglie}: almeno 3, la prima da 1.0, poi soglie che scendono sopra 0")
+        for _f in _bd.get("fasi", []):
+            _cfg_f = _f.get("cfg", {})
+            _fuori = set(_cfg_f) - nemico_base_keys - {"comportamento"}
+            if _fuori:
+                err(f"{_ctx}: cfg di una fase con chiavi fuori da nemico_base: {sorted(_fuori)}")
+            if _cfg_f.get("comportamento") not in (None, "mischia", "distanza", "carica"):
+                err(f"{_ctx}: comportamento '{_cfg_f.get('comportamento')}' in una fase (mischia, distanza, carica)")
+            if _f.get("gregari") and _f["gregari"].get("tipo") not in nemici_tipi:
+                err(f"{_ctx}: gregari di tipo '{_f['gregari'].get('tipo')}' fuori da nemici_tipi")
+        _ar = _bd.get("arena", {})
+        if float(_ar.get("raggio", 0)) <= 0 or not re.fullmatch(r"#[0-9a-fA-F]{6}", str(_ar.get("colore", ""))):
+            err(f"{_ctx}: arena senza raggio o colore #rrggbb")
+
+    def _controlla_tipo(rel, nm):
+        if nm.get("boss") is not None and nm["boss"] not in boss_dati:
+            err(f"{rel}: nemico a ({nm.get('x')},{nm.get('y')}) con boss '{nm['boss']}' fuori da balance.json boss")
+        if nm.get("tipo") not in nemici_tipi:
+            err(f"{rel}: nemico a ({nm.get('x')},{nm.get('y')}) senza un tipo di balance.json nemici_tipi ('{nm.get('tipo')}')")
     if os.path.isdir(layouts_dir):
         for fn in sorted(os.listdir(layouts_dir)):
             if not fn.endswith(".json"):
@@ -1892,11 +2009,12 @@ def main():
                 scala = nm.get("scala", 1.0)
                 if not (isinstance(scala, (int, float)) and 0.5 <= scala <= 3):
                     err(f"{rel} [{rid}]: nemico scala '{scala}' deve essere in [0.5, 3]")
+                _controlla_tipo(rel, nm)
                 ov = nm.get("override", {})
                 if not isinstance(ov, dict):
                     err(f"{rel} [{rid}]: nemico override deve essere un dict")
                     ov = {}
-                fuori = set(ov) - nemico_base_keys
+                fuori = set(ov) - nemico_base_keys - {"name_i18n"}   # il nome del nemico (2026-11-11), non un numero
                 if fuori:
                     err(f"{rel} [{rid}]: nemico override ha chiavi fuori da "
                         f"balance.json.nemico_base: {sorted(fuori)}")
@@ -1911,6 +2029,11 @@ def main():
                     err(f"{rel} [{rid}]: oggetto a ({ox},{oy}) non e' su una cella calpestabile")
                 if og.get("item_id") not in item_ids:
                     err(f"{rel} [{rid}]: oggetto item_id '{og.get('item_id')}' non esiste in data/items/")
+
+    for _f in [os.path.join(DATA, "world", "campagna.json")] + [
+            os.path.join(interni_dir, _x) for _x in sorted(os.listdir(interni_dir)) if _x.endswith(".json")]:
+        for _nm in (load_json(_f) or {}).get("nemici", []):
+            _controlla_tipo(os.path.relpath(_f, ROOT), _nm)
 
     # --- bottino e forzieri (US-8B22) ---
     # data/world/bottino.json: tabelle {tiri: [min, max], voci: [{item_id, peso, quantita: [min, max]}]}. Ogni
@@ -1987,6 +2110,16 @@ def main():
     def _colore_ok(v):
         return isinstance(v, str) and len(v) == 7 and v.startswith("#") and all(c in "0123456789abcdefABCDEF" for c in v[1:])
 
+    _luci = _luce.get("luci") or {}                         # US-8B27: luci della notte
+    for _m in sorted(_momenti_luce):
+        _f = (_luci.get("forza") or {}).get(_m)
+        if not isinstance(_f, (int, float)) or not (0 <= _f <= 1):
+            err(f"{_luce_rel}: luci.forza.{_m} deve essere un numero fra 0 e 1")
+    for _k in ("finestre", "faro"):
+        if not _colore_ok((_luci.get(_k) or {}).get("colore")):
+            err(f"{_luce_rel}: luci.{_k}.colore deve essere un colore #rrggbb")
+    if not (0 <= (_luci.get("finestre") or {}).get("probabilita", -1) <= 1):
+        err(f"{_luce_rel}: luci.finestre.probabilita deve essere fra 0 e 1")
     for _tema in ("luminoso", "cupo"):
         _per = (_luce.get("momenti", {}) or {}).get(_tema, {})
         for _m in sorted(_momenti_luce):
@@ -2264,6 +2397,15 @@ def main():
             did = npc.get("dialogue_id")
             if dlg_ids and did not in dlg_ids:
                 err(f"{rel} [{nid}]: dialogue_id '{did}' non ha un file in data/dialogues/")
+            # US-1304: il duello di un NPC (scripts/world/duelli.gd): i due dialoghi della fine e i flag ci sono
+            due = npc.get("duello")
+            if due is not None:
+                for k in ("dialogo_vinto", "dialogo_perso"):
+                    if dlg_ids and due.get(k) not in dlg_ids:
+                        err(f"{rel} [{nid}]: duello.{k} '{due.get(k)}' non ha un file in data/dialogues/")
+                for k in ("flag_inizio", "flag_offerta"):
+                    if not due.get(k):
+                        err(f"{rel} [{nid}]: duello.{k} mancante")
         for atteso in ("npc_mirco", "npc_sidon", "npc_vesna", "npc_aldo",
                        "npc_ottavia", "npc_bruno", "npc_lena", "npc_doran"):
             if atteso not in npc_ids:
@@ -2395,7 +2537,7 @@ def main():
     # effetti dal vocabolario chiuso di 5, emit_event solo sui 12 eventi.
     DLG_COND = {"acting_progress_min", "madness_max", "madness_min", "e_notte",
                 "fase_lunare", "foundation_min", "tier_min", "in_zona_tag",
-                "follia_min", "reputazione_min", "flag"}
+                "follia_min", "reputazione_min", "flag", "flag_assente"}
     DLG_EFFETTI = {"emit_event", "flag", "reputazione", "apri_vendita", "avvia_quest", "impara_sinergia",
                    "crea_su_richiesta"}
     _dlg_quest_ids = set()   # quest_id nominati da un effetto avvia_quest
@@ -2817,6 +2959,25 @@ def main():
             err(f"data/potions/experiment_outcomes.json [{name}]: 'mostruoso' deve essere true/false")
         if o.get("produce") is not None and o["produce"] not in item_ids:
             err(f"data/potions/experiment_outcomes.json [{name}]: produce '{o.get('produce')}' non risolve a un item")
+
+    # --- HUD di gioco (data/ui/hud.json, US-8B75d): le icone ci sono, i colori sono #rrggbb ---
+    _hud = load_json(os.path.join(DATA, "ui", "hud.json"))
+    if _hud is None:
+        err("data/ui/hud.json: mancante o illeggibile (US-8B75d)")
+    else:
+        _icone_hud = [b.get("emblema") for b in _hud.get("barre", {}).values() if b.get("emblema")] + [_hud.get("avanzamento", {}).get("icona")]
+        _icone_hud += ["cifra_%d" % i for i in range(1, 5)]
+        for _ic in _icone_hud:
+            if not os.path.isfile(os.path.join(ROOT, "assets", "ui", "hud", f"{_ic}.png")):
+                err(f"data/ui/hud.json: manca assets/ui/hud/{_ic}.png (python tools/art/build_hud.py)")
+        for _id in ("vita", "spirito", "recitazione", "boss"):
+            _b = _hud.get("barre", {}).get(_id)
+            if _b is None:
+                err(f"data/ui/hud.json: manca la barra '{_id}'")
+                continue
+            for _c in list(_b.get("toni", [])) + [_b.get("scia")]:
+                if not re.fullmatch(r"#[0-9a-fA-F]{6}", str(_c)):
+                    err(f"data/ui/hud.json barre.{_id}: '{_c}' non e' un colore #rrggbb")
 
     # --- libro / UI (data/ui/book.json, US-221) ---
     pt_doc = load_json(os.path.join(DATA, "schema", "page_types.json"))

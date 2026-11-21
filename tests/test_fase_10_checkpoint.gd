@@ -12,10 +12,8 @@ extends "res://tests/test_case.gd"
 ## esserci un dato: world_scene.gd/interior_scene.gd leggono edifici[] in
 ## un ciclo generico (_crea_edifici), mai un id specifico.
 ##
-## tests/manual/qa_mondo_continuo.gd (US-1013) e' il compagno di questo
-## checkpoint: la partita giocata per davvero con Xvfb, screenshot alla
-## mano. Non e' raccolto dalla suite headless (run_tests.gd legge solo
-## res://tests, non le sottocartelle) - il secondo test qui sotto lo conferma.
+## tests/manual/qa_mondo_continuo.gd (US-1013) era il compagno di questo checkpoint: tolto il 2026-11-18 insieme a
+## world_scene.gd, il mondo a layout sostituito dal mondo generato.
 
 func _root() -> Node: return Engine.get_main_loop().root
 func _gd() -> Node: return _root().get_node("GameData")
@@ -56,17 +54,3 @@ func test_nessun_codice_nomina_una_regione_un_villaggio_o_un_interno_specifico()
 						colpevoli.append("%s:%d %s" % [f, i + 1, righe[i].strip_edges()])
 	assert_eq(colpevoli.size(), 0,
 		"nessun nome di regione/villaggio/interno specifico nel codice (checkpoint fase 10): %s" % colpevoli)
-
-
-## qa_mondo_continuo.gd si gioca con Xvfb a parte (non ha senso in
-## headless: usa lo schermo vero). Qui si conferma solo che esista e che
-## run_tests.gd non lo raccolga mai (legge solo res://tests, non le
-## sottocartelle - DirAccess.get_files_at non e' ricorsivo).
-func test_qa_mondo_continuo_esiste_ed_e_uno_script_manuale() -> void:
-	assert_true(FileAccess.file_exists("res://tests/manual/qa_mondo_continuo.gd"),
-		"tests/manual/qa_mondo_continuo.gd esiste")
-	var raccolti: PackedStringArray = DirAccess.get_files_at("res://tests")
-	assert_false("manual" in raccolti, "res://tests/manual e' una sottocartella, non un file")
-	for f in raccolti:
-		assert_false(f == "qa_mondo_continuo.gd",
-			"qa_mondo_continuo.gd non e' raccolto direttamente da res://tests (vive in tests/manual/)")

@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "dlg_aldo_perso",
+  "start": "n1",
+  "_comment": "US-1304: dopo il duello perso (il giocatore e' caduto e si e' rialzato). Lo avvia scripts/world/duelli.gd.",
+  "nodes": {
+    "n1": {
+      "speaker": "npc_aldo",
+      "text": "Ti ho rimesso in piedi io. Non ringraziarmi: volevo che lo ricordassi da sveglio. Torna quando avrai fatto un altro gradino.",
+      "text_i18n": "dialogue.aldo_perso.n1",
+      "choices": [
+        {
+          "text": "La prossima volta finisce diversamente.",
+          "text_i18n": "dialogue.aldo_perso.n1.ancora",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "aldo_duello_perso",
+              "valore": true
+            },
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "intimidito"
+            }
+          ],
+          "goto": null
+        },
+        {
+          "text": "Lo ricordero'.",
+          "text_i18n": "dialogue.aldo_perso.n1.grazie",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "aldo_duello_perso",
+              "valore": true
+            }
+          ],
+          "goto": null
+        }
+      ]
+    }
+  }
+}

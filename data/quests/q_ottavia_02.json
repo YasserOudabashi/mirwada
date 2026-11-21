@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "q_ottavia_02",
+  "name": "Carte che camminano",
+  "name_i18n": "quest.q_ottavia_02.name",
+  "_comment": "US-1303, Atto II: posizione di fazione. Le carte dell'Archivio finiscono al porto: riportarle = stare con l'Ordine. La scelta si fa nel dialogo di Bruno; scegliere il porto avvia q_bruno_02, che fa fallire questa. La reputazione sta nelle ricompense: si prende una volta sola.",
+  "giver": "npc_ottavia",
+  "atto": 2,
+  "fallibile": true,
+  "exclusive_with": [
+    "q_bruno_02"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "desc": "Dai una mano al porto di notte: li' qualcuno sa dove finiscono le carte.",
+      "desc_i18n": "quest.q_ottavia_02.s1",
+      "completamento": {
+        "tipo": "evento",
+        "evento": "npc_influenced",
+        "filtri": {
+          "modo": "aiutato"
+        },
+        "target": 1
+      },
+      "on_complete": [
+        {
+          "tipo": "flag",
+          "id": "carte_porto_si_fida",
+          "valore": true
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "desc": "Riporta le carte all'Archivio.",
+      "desc_i18n": "quest.q_ottavia_02.s2",
+      "completamento": {
+        "tipo": "flag",
+        "id": "carte_all_ordine"
+      },
+      "on_complete": []
+    }
+  ],
+  "ricompense": [
+    {
+      "tipo": "reputazione",
+      "faction_id": "ordine_minore",
+      "delta": 25
+    },
+    {
+      "tipo": "reputazione",
+      "faction_id": "porto",
+      "delta": -15
+    },
+    {
+      "tipo": "flag",
+      "id": "q_ottavia_02_done",
+      "valore": true
+    }
+  ]
+}

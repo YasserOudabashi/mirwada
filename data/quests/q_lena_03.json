@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "q_lena_03",
+  "name": "Da lontano",
+  "name_i18n": "quest.q_lena_03.name",
+  "_comment": "US-1308: l'altro lato. Lena ha paura: se e' un'Ancora attiva la sua forza scende quasi a niente.",
+  "giver": "npc_lena",
+  "atto": 3,
+  "fallibile": true,
+  "exclusive_with": [
+    "q_lena_02"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "desc": "Allontana Lena.",
+      "desc_i18n": "quest.q_lena_03.s1",
+      "completamento": {
+        "tipo": "flag",
+        "id": "lena_ha_paura"
+      },
+      "on_complete": [
+        {
+          "tipo": "ancora",
+          "npc_id": "npc_lena",
+          "forza": 2
+        }
+      ]
+    }
+  ],
+  "ricompense": [
+    {
+      "tipo": "flag",
+      "id": "q_lena_03_done",
+      "valore": true
+    }
+  ]
+}

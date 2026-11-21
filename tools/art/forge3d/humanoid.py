@@ -89,7 +89,9 @@ def humanoid(skin="skin_light", hair="hair_brown", hair_style="short", outfit="t
              bottom="cloth_grey", boots="leather_dark", belt="leather", cape=None, hat=None,
              weapon="sword", shield=None, eyes="eye", ears="round", build=1.0, scale=1.0, head=1.0,
              sleeves=True, gloves=None, scarf=None, detail=1, name="humanoid", beard=None, glasses=None,
-             brows=0.0, mouth=0):
+             brows=0.0, mouth=0, stacco=0.0):
+    """stacco: unita' di spazio fra braccia e busto e fra le gambe (0 = come prima). Con 0.8-1.5 e il render a
+    group_lines le braccia non si fondono col busto e le gambe restano due (skill arte-personaggi)."""
     r = Rig(name)
     r.scale = scale
     w = build           # larghezza del corpo
@@ -99,13 +101,13 @@ def humanoid(skin="skin_light", hair="hair_brown", hair_style="short", outfit="t
     r.joint("hips", "root", (0, 0, 10.8))
     r.joint("torso", "hips", (0, 0, 1.2))
     r.joint("head", "torso", (0, 0, 7.6), rest=(9, 0, 0))
-    r.joint("arm_l", "torso", (-5.0 * w, 0, 6.4))
-    r.joint("arm_r", "torso", (5.0 * w, 0, 6.4))
+    r.joint("arm_l", "torso", (-5.0 * w - stacco, 0, 6.4))
+    r.joint("arm_r", "torso", (5.0 * w + stacco, 0, 6.4))
     r.joint("fore_l", "arm_l", (0, 0, -4.4))
     r.joint("fore_r", "arm_r", (0, 0, -4.4))
     r.joint("weapon", "fore_r", (0, 0, -4.7))
-    r.joint("leg_l", "hips", (-2.5 * w, 0, -0.2))
-    r.joint("leg_r", "hips", (2.5 * w, 0, -0.2))
+    r.joint("leg_l", "hips", (-2.5 * w - stacco * 0.5, 0, -0.2))
+    r.joint("leg_r", "hips", (2.5 * w + stacco * 0.5, 0, -0.2))
     r.joint("shin_l", "leg_l", (0, 0, -5.0))
     r.joint("shin_r", "leg_r", (0, 0, -5.0))
     r.joint("cape", "torso", (0, -2.7, 6.8))

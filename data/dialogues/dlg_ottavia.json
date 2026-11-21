@@ -34,6 +34,22 @@
           "goto": "n2"
         },
         {
+          "text": "C'e' qualcosa che posso fare per l'Ordine?",
+          "text_i18n": "dialogue.ottavia.n1.ordine",
+          "condizioni": [
+            {
+              "tipo": "tier_min",
+              "valore": "mid"
+            },
+            {
+              "tipo": "flag",
+              "valore": "testi_ordine_minore"
+            }
+          ],
+          "effetti": [],
+          "goto": "n3"
+        },
+        {
           "text": "Devo andare.",
           "text_i18n": "dialogue.ottavia.n1.congedo",
           "condizioni": [],
@@ -72,6 +88,32 @@
         {
           "text": "Devo andare.",
           "text_i18n": "dialogue.ottavia.n2.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n3": {
+      "speaker": "npc_ottavia",
+      "text": "Delle carte escono dall'Archivio di notte e finiscono al porto. Chi scarica le casse sa chi le compra. Riportamele, e l'Ordine se ne ricordera'.",
+      "text_i18n": "dialogue.ottavia.n3",
+      "choices": [
+        {
+          "text": "Le cerco io.",
+          "text_i18n": "dialogue.ottavia.n3.accetta",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "avvia_quest",
+              "quest_id": "q_ottavia_02"
+            }
+          ],
+          "goto": null
+        },
+        {
+          "text": "Non adesso.",
+          "text_i18n": "dialogue.ottavia.n3.congedo",
           "condizioni": [],
           "effetti": [],
           "goto": null

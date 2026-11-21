@@ -53,6 +53,8 @@ var _cella_regione := Vector2i(-9999, -9999)
 ## Ultima posizione del giocatore in una regione che lo accetta: chi tocca una
 ## regione col gating d'ingresso chiuso torna qui (la Frontiera respinge).
 var _ultima_ammessa := Vector2.INF
+var _volo_debito: float = 0.0               # spiritualita' consumata in volo e non ancora tolta
+var _volo_esausto: bool = false             # forze finite: si plana fino al primo punto dove si atterra
 ## L'NPC nel cui raggio si trova il giocatore ("" = nessuno), come region_scene.
 var _npc_vicino: String = ""
 ## Livello mostrato: "superficie" o "sottosuolo" (2026-10-25: alle Marche si arriva
@@ -94,6 +96,13 @@ func _ready() -> void:
 	add_child(preload("res://scripts/world/fauna.gd").new())
 	add_child(preload("res://scripts/world/base_fuori.gd").new())   # US-8B20c: l'orto fuori dalla sede della base
 	add_child(preload("res://scripts/world/luce.gd").new())
+	add_child(preload("res://scripts/world/luci_notte.gd").new())    # US-8B27: finestre e faro accesi di notte
+	var pet: Node = preload("res://scripts/world/pet_mondo.gd").new()  # 2026-11-18: il pet si doma nel mondo e ti segue
+	pet.name = "Pet"
+	add_child(pet)
+	var duelli: Node = preload("res://scripts/world/duelli.gd").new()  # US-1304: il duello di un NPC (Aldo) come scena
+	duelli.name = "Duelli"
+	add_child(duelli)
 	var t := Timer.new()
 	t.wait_time = INTERVALLO_ATTIVITA
 	t.autostart = true
@@ -209,7 +218,7 @@ func partenza() -> Vector2:
 	return Vector2((float(p[0]) + 0.5) * tile, (float(p[1]) + 0.5) * tile)
 
 
-## Punto di comparsa in una regione (contratto di world_scene.gd, usato da
+## Punto di comparsa in una regione (contratto del nodo mondo, usato da
 ## main.gd): la partenza dei dati se e' in quella regione (o rid vuoto),
 ## altrimenti il primo luogo della regione sulla mappa, come viaggia_a.
 func punto_spawn(rid: String = "") -> Vector2:
@@ -254,10 +263,14 @@ func _process(_delta: float) -> void:
 		else:
 			segui(pos)
 		_aggiorna_barca(p as Node2D)
+		_aggiorna_volo(p as Node2D, _delta)
 		if aggiorna_regione(pos):
 			_ultima_ammessa = pos
 		elif _ultima_ammessa != Vector2.INF:
+			var respinto: String = motivo_respinto(regione_a(floori(pos.x / tile), floori(pos.y / tile)))
 			(p as Node2D).position = _ultima_ammessa
+			if not respinto.is_empty():
+				_mostra_avviso(p as Node2D, respinto)
 			_cella_regione = Vector2i(-9999, -9999)
 
 
@@ -305,6 +318,20 @@ func ingresso_aperto(rid: String) -> bool:
 	return true
 
 
+## Perche' la regione respinge chi entra, in parole per il giocatore ("" se non respinge). Il testo dipende dal
+## tipo di gate (strings.csv MONDO_RESPINTO_<TIPO>, con il valore del gate dove serve).
+func motivo_respinto(rid: String) -> String:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	if gd == null or ingresso_aperto(rid):
+		return ""
+	for g in (gd.call("get_region", rid).get("gating", []) as Array):
+		if typeof(g) == TYPE_DICTIONARY and str((g as Dictionary).get("area", "")) == "ingresso":
+			var chiave: String = "MONDO_RESPINTO_" + str((g as Dictionary).get("tipo", "")).to_upper()
+			var testo: String = tr(chiave) if tr(chiave) != chiave else tr("MONDO_RESPINTO")
+			return testo % [(g as Dictionary).get("valore", "")] if testo.contains("%") else testo
+	return ""
+
+
 ## La casella (luogo della mappa) di un location_tag della regione, attraverso
 ## luoghi_mondo; Vector2i(-1, -1) se sulla mappa non c'e'.
 ## I luoghi del sottosuolo (mondo.json sottosuolo.boss: i boss di zona) con lo
@@ -339,6 +366,7 @@ func luogo_del_tag(rid: String, tag: String) -> Vector2i:
 # stessa regione. La campagna (fuori dalle regioni) finisce nella terra di mezzo.
 
 const SCALA_LAYOUT := 2.0
+const Boss := preload("res://scripts/boss.gd")
 const REGIONE_CAMPAGNA := "terra_di_mezzo"
 const INTERVALLO_ATTIVITA := 0.4
 const SOGLIA_LIBERA := [0, 1, 2, 3]          # la soglia di una porta e le 3 caselle sotto (_casa_piu_vicina)
@@ -376,7 +404,7 @@ func popola() -> void:
 ## ogni casella occupata, cosi' resta l'insieme da evitare per i nemici.
 func _popola_da(rid_eventi: String, rid: String, layout: Dictionary, occupate: Dictionary, vietate: Dictionary) -> void:
 	var dietro: Array = (_zone_dei_varchi().get(rid, {}) as Dictionary).values()   # quelle stanno negli interni
-	var nemici: Array = (layout.get("nemici", []) as Array).filter(func(n): return not _in_rect(n, dietro))
+	var nemici: Array = (layout.get("nemici", []) as Array).filter(func(n): return not _in_rect(n, dietro) and not Boss.vinto(n))
 	var drop: Dictionary = layout.get("drop", {})
 	_nemici_vivi[rid_eventi] = nemici.size()
 	_senza_abilita[rid_eventi] = true
@@ -384,6 +412,8 @@ func _popola_da(rid_eventi: String, rid: String, layout: Dictionary, occupate: D
 		var spec: Dictionary = n
 		var posto: Dictionary = posto_dal_layout(rid, layout, int(spec.get("x", 0)), int(spec.get("y", 0)), vietate)
 		var c: Vector2i = posto["cella"]
+		if spec.has("boss") and posto["livello"] == "superficie":   # US-1505: il boss si vede, mai sotto le chiome
+			c = _radura(c)
 		occupate[c] = true
 		vietate[c] = true
 		var sequenza: int = int(spec.get("sequenza", 9))
@@ -392,6 +422,7 @@ func _popola_da(rid_eventi: String, rid: String, layout: Dictionary, occupate: D
 			override["oggetti_a_morte"] = drop[str(sequenza)]
 		var e: Node2D = preload("res://scenes/enemy.tscn").instantiate()
 		e.set("override", override)
+		e.set("tipo", str(spec.get("tipo", "")))          # US-1501
 		e.scale = Vector2.ONE * float(spec.get("scala", 1.0))
 		e.position = Vector2((c.x + 0.5) * tile, (c.y + 0.5) * tile)
 		e.set_meta("regione_layout", rid_eventi)
@@ -400,6 +431,7 @@ func _popola_da(rid_eventi: String, rid: String, layout: Dictionary, occupate: D
 		_mostra(e, posto["livello"] == livello)
 		e.set("sequenza", sequenza)
 		e.get_node("StatsComponent").call("configure_from_balance", sequenza)
+		Boss.monta(e, spec)                              # US-1505: fasi, gregari, arena e barra (balance.json boss)
 		e.connect("morto", _su_nemico_morto.bind(rid_eventi))
 	var ws: Node = Engine.get_main_loop().root.get_node_or_null("WorldState")
 	var oggetti: Array = layout.get("oggetti", [])
@@ -491,7 +523,7 @@ func _su_nemico_morto(chi: Node, rid: String) -> void:
 
 
 ## Nemici e NPC lontani dal giocatore fermi (balance.json mondo.raggio_attivo_entita),
-## come in world_scene.gd: qui serve anche perche' lontano dal giocatore le collisioni
+## qui serve anche perche' lontano dal giocatore le collisioni
 ## del terreno non sono costruite (si costruiscono solo i blocchi vicini).
 func _aggiorna_attivita() -> void:
 	_aggiorna_varchi()
@@ -651,6 +683,17 @@ func entra(porta: Area2D) -> bool:
 	p.reparent(interno)                            # dentro la stanza: ordinato con gli arredi (y_sort)
 	interno.connect("uscita", func() -> void: esci.call_deferred())
 	_interno = interno
+	# US-1305c: dentro si e' nella zona dell'interno (quella del varco, o "zona" nei dati dell'interno): i rituali
+	# che chiedono una cripta o un teatro si compiono qui.
+	var ws: Node = get_node_or_null("/root/WorldState")
+	var gd: Node = get_node_or_null("/root/GameData")
+	var zona: String = str(((porta.get_meta("gate", {}) as Dictionary).get("varco", {}) as Dictionary).get("zona", ""))
+	if zona.is_empty() and gd != null:
+		zona = str((gd.call("get_interno", str(porta.get_meta("interno_id"))) as Dictionary).get("zona", ""))
+	if ws != null and not zona.is_empty():
+		if porta.has_meta("regione") and str(ws.call("regione_corrente")) != str(porta.get_meta("regione")):
+			ws.call("entra_regione", str(porta.get_meta("regione")))
+		ws.call("imposta_zona", zona)
 	p.global_position = interno.call("punto_spawn")
 	for cam in p.find_children("*", "Camera2D", true, false):
 		if cam.has_method("inquadra_stanza"):
@@ -674,6 +717,7 @@ func esci() -> void:
 			if cam.has_method("apply_zone_limits"):
 				cam.call("apply_zone_limits", Rect2(Vector2.ZERO, Vector2(larghezza, altezza) * tile))
 		colloca(p, _ritorno)
+		_cella_regione = Vector2i(-9999, -9999)          # fuori: la zona torna quella della mappa
 
 
 func in_un_interno() -> bool:
@@ -1012,6 +1056,26 @@ func crea_barca() -> void:
 	metti_barca(_ormeggio_iniziale)
 
 
+## 2026-11-14: la barca ha tre disegni (di fianco, di prua "barca_su", di poppa "barca_giu"): segue lo sguardo di
+## chi rema. Di fianco il disegno guarda a sinistra e si specchia verso destra.
+func _gira_barca(f: Vector2) -> void:
+	var spr: Sprite2D = _barca.get_node("Disegno")
+	var nome: String = "barca"
+	if absf(f.y) > absf(f.x):
+		nome = "barca_su" if f.y < 0.0 else "barca_giu"
+	if not (dati["sprite"] as Dictionary).has(nome):
+		nome = "barca"
+	if nome == "barca" and f.x != 0.0:
+		spr.flip_h = f.x > 0.0
+	if str(spr.get_meta("disegno", "barca")) == nome:
+		return
+	var meta: Dictionary = dati["sprite"][nome]
+	spr.set_meta("disegno", nome)
+	spr.texture = _texture_oggetto(nome)
+	spr.flip_h = spr.flip_h and nome == "barca"
+	spr.offset = Vector2(-float(meta.get("ax", 0)), -float(meta.get("ay", 0)) + tile * 0.25)
+
+
 ## US-8B20d: la nave della base (mezzi.json "nave"), ormeggiata e ferma: nell'acqua vicina al luogo un tratto largo
 ## quanto lei (NAVE_CASELLE x 2 caselle) con terra libera accanto, a sud (davanti, si vede) o se no a nord, collegata
 ## a piedi al resto della terra (_a_terra); su quella terra la passerella e' la porta verso il suo interno.
@@ -1173,8 +1237,7 @@ func _aggiorna_barca(p: Node2D) -> void:
 	if in_barca():
 		_barca.position = p.position - Vector2(0, 0.5)
 		var f: Vector2 = p.call("get_facing") if p.has_method("get_facing") else Vector2.LEFT
-		if f.x != 0.0:
-			(_barca.get_node("Disegno") as Sprite2D).flip_h = f.x > 0.0
+		_gira_barca(f)
 		var c := Vector2i(floori(p.position.x / tile), floori(p.position.y / tile))
 		prompt.visible = _costa_vicina(c).x >= 0
 		prompt.text = tr("HUD_PROMPT_SCENDI_BARCA").format({"tasto": _tasto_interagisci()})
@@ -1196,6 +1259,8 @@ var _avviso: Label = null
 
 
 func puo_volare() -> bool:
+	if volo_innato():
+		return true
 	var root: Node = Engine.get_main_loop().root
 	var gd: Node = root.get_node_or_null("GameData")
 	var inv: Node = root.get_node_or_null("Inventory")
@@ -1212,8 +1277,54 @@ func decolla() -> bool:
 	var p: Node2D = get_tree().get_first_node_in_group("player") as Node2D if is_inside_tree() else null
 	if p == null or in_volo() or in_barca() or _interno != null or livello != "superficie" or not puo_volare():
 		return false
+	if not volo_innato():                              # con la piuma alzarsi costa (mezzi.json volo.costo_decollo)
+		var st: Node = p.get_node_or_null("StatsComponent")
+		if st != null and not bool(st.call("spend_spiritualita", float(_cfg_volo().get("costo_decollo", 0.0)))):
+			_mostra_avviso(p, tr("HUD_VOLO_SENZA_FORZE"))
+			return false
+	_volo_esausto = false
+	_volo_debito = 0.0
 	p.call("imposta_volo", true, _nella_mappa)
 	return true
+
+
+func _cfg_volo() -> Dictionary:
+	var gd: Node = Engine.get_main_loop().root.get_node_or_null("GameData")
+	return gd.call("get_mezzo", "volo") if gd != null else {}
+
+
+## Il Pathway del giocatore vola per natura (mezzi.json volo.innato): senza chiave, senza costi, senza limiti.
+func volo_innato() -> bool:
+	var pr: Node = Engine.get_main_loop().root.get_node_or_null("Progression")
+	return pr != null and str(pr.call("pathway")) in (_cfg_volo().get("innato", []) as Array)
+
+
+## In aria con la piuma la spiritualita' cala (costo_al_secondo). Finita, si plana piano e si atterra da soli sul
+## primo punto dove si puo'.
+func _aggiorna_volo(p: Node2D, delta: float) -> void:
+	if not in_volo() or volo_innato():
+		return
+	var st: Node = p.get_node_or_null("StatsComponent")
+	if st == null:
+		return
+	if not _volo_esausto:
+		_volo_debito += float(_cfg_volo().get("costo_al_secondo", 0.0)) * delta
+		if _volo_debito >= 1.0:
+			if bool(st.call("spend_spiritualita", _volo_debito)):
+				_volo_debito = 0.0
+			else:
+				_volo_esausto = true
+				_mostra_avviso(p, tr("HUD_VOLO_SENZA_FORZE"))
+	if _volo_esausto:
+		var c := Vector2i(floori(p.position.x / tile), floori(p.position.y / tile))
+		if not bloccata(c.x, c.y) and _si_arriva(c, "volo"):
+			p.call("imposta_volo", false)
+			_volo_esausto = false
+
+
+## Moltiplicatore della velocita' in volo: piu' piano quando le forze sono finite.
+func velocita_volo() -> float:
+	return float(_cfg_volo().get("velocita_esausto", 1.0)) if _volo_esausto else 1.0
 
 
 func atterra() -> bool:
@@ -1238,16 +1349,16 @@ func _mostra_avviso(p: Node2D, testo: String) -> void:
 	if _avviso == null:
 		_avviso = Label.new()
 		_avviso.add_theme_font_size_override("font_size", 10)
-		_avviso.size = Vector2(tile * 6, tile * 0.5)
+		_avviso.size = Vector2(tile * 10, tile * 0.5)
 		_avviso.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_avviso.z_index = 10
 		_avviso.add_theme_constant_override("outline_size", 4)
 		_avviso.add_theme_color_override("font_outline_color", Color("#181425"))
 		add_child(_avviso)
 	_avviso.text = testo
-	_avviso.position = p.position + Vector2(-tile * 3, tile * 0.5)
+	_avviso.position = p.position + Vector2(-tile * 5, tile * 0.5)
 	_avviso.show()
-	get_tree().create_timer(1.5).timeout.connect(func() -> void: if is_instance_valid(_avviso): _avviso.hide())
+	get_tree().create_timer(2.5).timeout.connect(func() -> void: if is_instance_valid(_avviso): _avviso.hide())
 
 
 # --- Cannocchiali (US-8B24) -------------------------------------------------------
@@ -1506,6 +1617,20 @@ func cella_libera(c: Vector2i, occupate: Dictionary = {}, chiave: String = "", r
 	return scelta
 
 
+## La casella libera piu' vicina a c che nessun oggetto di scena copre, lei e quella sopra (la testa di un boss).
+func _radura(c: Vector2i, raggio_max: int = 16) -> Vector2i:
+	for r in range(0, raggio_max):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				if maxi(absi(dx), absi(dy)) != r:
+					continue
+				var q := Vector2i(c.x + dx, c.y + dy)
+				if not bloccata(q.x, q.y) and not coperto((Vector2(q) + Vector2(0.5, 0.5)) * tile) \
+						and not coperto((Vector2(q) + Vector2(0.5, -0.5)) * tile):
+					return q
+	return c
+
+
 func _vicino_occupato(q: Vector2i, occupate: Dictionary) -> bool:
 	for dy in range(-1, 2):
 		for dx in range(-1, 2):
@@ -1572,8 +1697,7 @@ func crea_npc() -> void:
 				continue
 			var q: Vector2i = cella_libera(c, occupate, str(id))
 			occupate[q] = true
-			var asp: Variant = gd.call("get_npc", str(id)).get("aspetto", {})
-			var aspetto: String = str((asp as Dictionary).get("sprite", "")) if asp is Dictionary else ""
+			var aspetto: String = str(gd.call("aspetto_npc", str(id)))      # US-8B60b: la Soglia ha il volto del suo Pathway
 			add_child(_npc(str(id), Vector2((q.x + 0.5) * tile, (q.y + 0.5) * tile), aspetto))
 
 

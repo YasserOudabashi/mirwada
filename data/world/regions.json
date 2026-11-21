@@ -1,5 +1,6 @@
 {
   "schema_version": 1,
+  "_comment_zone_anche": "US-1305c: stare in una zona vale anche come gli altri luoghi elencati, per i rituali (un tempio abbandonato e' anche un luogo in decadenza). La zona viene dalla posizione sulla mappa o dall'interno in cui si e' (varco.zona, o \"zona\" dell'interno).",
   "_comment": "Le 5 regioni del mondo (design-world.md cap. 2, US-601). Una per gruppo di Pathway + la citta' neutra: e' il terzo canale dell'identita' di Pathway dopo primitive e audio. I nomi vivono solo qui e nelle chiavi i18n 'region.*' (FR-1: nessun nome hardcoded). Le scene placeholder giocabili nascono in US-602/603; il gating si applica in US-611. world_offset (US-1001, fase 10): posizione in celle di ogni regione dentro l'unica griglia di mondo condivisa. Topologia scelta con l'utente (2026-09-11): un anello attorno a Mirwada, non un hub-and-spoke puro - Mirwada al centro [220,180], le 4 regioni esterne ai quattro angoli (Marche NO [0,0], Archivio NE [440,0], Frontiera SE [440,360], Valle SO [0,360]), cosi' ogni coppia di regioni esterne adiacenti nell'anello (Marche-Archivio, Archivio-Frontiera, Frontiera-Valle, Valle-Marche) e' vicina quanto Mirwada a ognuna: i corridoi di raccordo di US-1002 collegano sia i 4 raggi verso il centro sia i 4 lati dell'anello, non solo i raggi. Le distanze (220/180/440/360 celle) sono ampie apposta: i layout di oggi sono 48x36, ma US-1005..1009 li fanno crescere a dimensione libera - questa disposizione lascia margine senza dover ritoccare gli offset quando succede.",
   "regions": [
     {
@@ -42,6 +43,7 @@
         "soglia_del_crepuscolo"
       ],
       "luoghi_mondo": {"campo_di_battaglia": "luogo_di_battaglia", "passo_tra_rupi": "altura", "boss_catacombe": "cripta"},
+      "zone_anche": {"trono_del_gigante": ["vetta"], "luogo_di_battaglia": ["luogo_di_massacro"], "tempio_abbandonato": ["luogo_in_decadenza", "rovina"], "cripta": ["luogo_in_decadenza"]},
       "music_zone": "marche",
       "gating": [
         {
@@ -75,6 +77,7 @@
         "radice_del_mondo"
       ],
       "luoghi_mondo": {"galleria_di_alberi": "bosco_antico", "grotte_di_marea": "grotta_di_marea"},
+      "zone_anche": {"altare_di_radici": ["radura_lunare"], "radice_del_mondo": ["sorgente"]},
       "music_zone": "valle",
       "gating": [
         {
@@ -108,6 +111,7 @@
         "biblioteca_di_tutto"
       ],
       "luoghi_mondo": {"torre_osservazione": "torre_di_osservazione", "scalinata_archivio": "biblioteca"},
+      "zone_anche": {"sala_dei_sigilli": ["biblioteca_di_tutto"], "torre_di_osservazione": ["studio"], "officina": ["studio"]},
       "music_zone": "archivio",
       "gating": [
         {
@@ -135,6 +139,7 @@
         "porta_senza_stanza"
       ],
       "luoghi_mondo": {"approdo_frontiera": "soglia"},
+      "zone_anche": {"soglia": ["crocevia"], "nebbia_grigia": ["porta_senza_stanza"], "teatro": ["palco"]},
       "music_zone": "frontiera",
       "gating": [
         {
@@ -148,6 +153,13 @@
           "primitiva": "teleport",
           "area": "isole_nebbia", "name_i18n": "area.isole_nebbia",
           "varco": {"luogo": "approdo_frontiera", "scostamento": [0, 0], "interno": "frontiera_isola_nebbia", "aspetto": "soglia_nebbia", "zona": "nebbia_grigia"}
+        },
+        {
+          "_comment": "US-1305c: il teatro abbandonato, luogo dei rituali (teatro, palco). Sempre aperto a chi e' gia' nella Frontiera.",
+          "tipo": "sequenza",
+          "valore": 9,
+          "area": "teatro", "name_i18n": "area.teatro",
+          "varco": {"luogo": "approdo_frontiera", "scostamento": [14, 6], "interno": "frontiera_teatro", "aspetto": "teatro"}
         }
       ],
       "palette_visiva": "fool"

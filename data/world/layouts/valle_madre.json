@@ -97,56 +97,55 @@
   },
   "nemici": [
     {
+      "tipo": "lupo_della_luna",
       "x": 9,
       "y": 9,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": {}
+      "scala": 1.0
     },
     {
+      "tipo": "lupo_della_luna",
       "x": 25,
       "y": 10,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": {}
+      "scala": 1.0
     },
     {
+      "tipo": "lupo_della_luna",
       "x": 45,
       "y": 10,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": {}
+      "scala": 1.0
     },
     {
+      "tipo": "guardiana_delle_radici",
       "x": 10,
       "y": 32,
       "sequenza": 8,
-      "scala": 1.0,
-      "override": {}
+      "scala": 1.0
     },
     {
+      "tipo": "guardiana_delle_radici",
       "x": 28,
       "y": 32,
       "sequenza": 8,
-      "scala": 1.0,
-      "override": {}
+      "scala": 1.0
     },
     {
+      "tipo": "guardiana_delle_radici",
       "x": 50,
       "y": 32,
       "sequenza": 8,
-      "scala": 1.0,
-      "override": {}
+      "scala": 1.0
     },
     {
+      "tipo": "guardiana_delle_radici",
       "x": 44,
       "y": 31,
       "sequenza": 7,
       "scala": 1.5,
+      "boss": "madre_delle_radici",
       "override": {
-        "danno_attacco": 15,
-        "raggio_aggro": 200,
-        "tag": "bestia",
         "caratteristica": {
           "pathway_id": "mother",
           "sequence": 7,
@@ -304,27 +303,32 @@
     {
       "x": 5,
       "y": 42,
-      "interno_id": "valle_avamposto_vedetta", "villaggio": "capanna_base_valle"
+      "interno_id": "valle_avamposto_vedetta",
+      "villaggio": "capanna_base_valle"
     },
     {
       "x": 13,
       "y": 42,
-      "interno_id": "valle_avamposto_deposito", "villaggio": "capanna_base_valle"
+      "interno_id": "valle_avamposto_deposito",
+      "villaggio": "capanna_base_valle"
     },
     {
       "x": 5,
       "y": 48,
-      "interno_id": "valle_avamposto_focolare", "villaggio": "capanna_base_valle"
+      "interno_id": "valle_avamposto_focolare",
+      "villaggio": "capanna_base_valle"
     },
     {
       "x": 13,
       "y": 48,
-      "interno_id": "valle_avamposto_erborista", "villaggio": "capanna_base_valle"
+      "interno_id": "valle_avamposto_erborista",
+      "villaggio": "capanna_base_valle"
     },
     {
       "x": 8,
       "y": 45,
-      "interno_id": "base_capanna", "villaggio": "capanna_base_valle"
+      "interno_id": "base_capanna",
+      "villaggio": "capanna_base_valle"
     }
   ]
 }

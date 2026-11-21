@@ -244,6 +244,10 @@ func _rendi(pagina: String) -> void:
 		if verso is Control:
 			_destra.add_child(verso)      # prima di entrare nell'albero: la pagina sa che e' gia' a posto
 		_contenuto.add_child(inst)
+		# US-1303b: una pagina dei dati puo' aprire il suo tipo su una sezione (Diario e Sinergie sono sezioni
+		# della pagina inventario: prima erano due pagine bianche).
+		if p.has("sezione") and inst.has_method("apri_sezione"):
+			inst.call("apri_sezione", str(p["sezione"]))
 		if inst.has_method("aggiorna"):
 			inst.call("aggiorna")
 	else:

@@ -26,7 +26,14 @@ static func a_capo(b: Button) -> void:
 			return
 		b.set_meta("largo", b.size.x)
 		b.autowrap_mode = TextServer.AUTOWRAP_OFF       # rifa' l'impaginazione del testo con la larghezza vera
-		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART)
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		# 2026-11-16: e l'altezza. Un bottone non chiede piu' altezza quando il testo va su due righe: la riga
+		# sotto gli finiva sopra (le scelte lunghe del dialogo). L'altezza si calcola dal testo a capo.
+		var stile: StyleBox = b.get_theme_stylebox("normal")
+		var margini: Vector2 = stile.get_minimum_size() if stile != null else Vector2(8, 8)
+		var testo: Vector2 = b.get_theme_font("font").get_multiline_string_size(b.text, HORIZONTAL_ALIGNMENT_CENTER,
+				maxf(b.size.x - margini.x, 8.0), b.get_theme_font_size("font_size"))
+		b.custom_minimum_size.y = ceilf(testo.y + margini.y))
 
 
 ## Toglie subito (non solo in coda) tutto quello che la pagina aveva scritto, sulle due facciate.

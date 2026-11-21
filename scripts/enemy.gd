@@ -44,6 +44,8 @@ var sequenza: int = 9
 ## gia' legge con _cfg.get(...) diventa sovrascrivibile per-istanza senza
 ## altre righe. {} = comportamento di sempre (il nemico da banco di prova).
 var override: Dictionary = {}
+## US-1501: il tipo di nemico (balance.json nemici_tipi): sta fra nemico_base e l'override dell'istanza. "" = nemico_base.
+var tipo: String = ""
 
 ## US-804: dal momento in cui il nemico entra in INSEGUIMENTO (l'inizio
 ## dello scontro) fino alla morte, se il player ha lanciato un'abilita' o
@@ -61,8 +63,18 @@ func _ready() -> void:
 		# non una copia (US-806) — mergiare l'override lì dentro corromperebbe
 		# nemico_base per ogni altro nemico dell'intera partita.
 		_cfg = (gd.call("get_balance", "nemico_base") as Dictionary).duplicate(true)
+	if gd != null and not tipo.is_empty():
+		var tipi: Dictionary = gd.call("get_balance", "nemici_tipi")
+		_cfg.merge((tipi.get(tipo, {}) as Dictionary).duplicate(true), true)
 	_cfg.merge(override, true)
 	_attesa_left = float(_cfg.get("attesa_iniziale_s", 0.0))
+	if str(_cfg.get("comportamento", "")) == "volo":    # US-1503: sopra i dislivelli, non sopra l'acqua
+		var vo: Dictionary = _cfg.get("volo", {})
+		collision_mask = int(vo.get("maschera", 1))
+		_anim.position.y -= float(vo.get("quota", 8.0))
+		var t := create_tween().set_loops()
+		t.tween_property(_anim, "position:y", _anim.position.y - float(vo.get("ondeggio", 1.5)), 0.6).set_trans(Tween.TRANS_SINE)
+		t.tween_property(_anim, "position:y", _anim.position.y, 0.6).set_trans(Tween.TRANS_SINE)
 
 	_postura.call("configura",
 		float(_cfg.get("postura_massimo", 60.0)), 3.0, 15.0)
@@ -70,7 +82,9 @@ func _ready() -> void:
 		float(_cfg.get("angolo_arco", 90.0)), float(_cfg.get("raggio_arco", 24.0)))
 	_hitbox.collision_mask = 4  # colpisce le hurtbox (layer 3)
 
-	_anim.call("configura", CATEGORIA_ANIM)
+	# US-1504: l'aspetto del tipo sceglie i fogli nemico_base_<aspetto>_<anim> (build_nemici.py); senza, il foglio base
+	var aspetto: String = str(_cfg.get("aspetto", CATEGORIA_ANIM))
+	_anim.call("configura", CATEGORIA_ANIM, "" if aspetto == CATEGORIA_ANIM else aspetto)
 	_anim.evento_frame.connect(_su_evento_anim)
 	_anim.animazione_finita.connect(_su_anim_finita)
 	_hitbox.ha_colpito.connect(_su_colpo_inflitto)
@@ -89,6 +103,7 @@ func _ready() -> void:
 		if _stato == Stato.STAGGER:
 			_vai(Stato.IDLE))
 
+	_monta_nome()
 	_bersaglio = get_tree().get_first_node_in_group("player")
 	_vai(Stato.IDLE)
 
@@ -109,7 +124,9 @@ func _physics_process(delta: float) -> void:
 			if _attesa_left <= 0.0 and dist <= float(_cfg.get("raggio_aggro", 140.0)):
 				_vai(Stato.INSEGUIMENTO)
 		Stato.INSEGUIMENTO:
-			if dist <= float(_cfg.get("raggio_attacco", 26.0)):
+			if _a_distanza():
+				_insegui_a_distanza(dist, delta)
+			elif dist <= (float((_cfg.get("carica", {}) as Dictionary).get("da", 110.0)) if _carica() else float(_cfg.get("raggio_attacco", 26.0))):
 				_vai(Stato.ANTICIPO)
 			elif dist > float(_cfg.get("raggio_aggro", 140.0)) * 1.3:
 				_vai(Stato.IDLE)
@@ -121,7 +138,13 @@ func _physics_process(delta: float) -> void:
 			_anticipo_left -= delta
 			if _anticipo_left <= 0.0:
 				_vai(Stato.ATTACCO)
-		Stato.ATTACCO, Stato.STAGGER:
+		Stato.ATTACCO:
+			if _carica():                           # US-1503: lo scatto in linea
+				velocity = _carica_dir * float((_cfg.get("carica", {}) as Dictionary).get("velocita", 340.0))
+				_carica_left -= delta
+			else:
+				velocity = Vector2.ZERO
+		Stato.STAGGER:
 			velocity = Vector2.ZERO
 		Stato.RECUPERO:
 			velocity = Vector2.ZERO
@@ -129,7 +152,10 @@ func _physics_process(delta: float) -> void:
 			if _recupero_left <= 0.0:
 				_vai(Stato.IDLE)
 
+	_aggiorna_nome(delta)
 	move_and_slide()
+	if _stato == Stato.ATTACCO and _carica() and (_carica_left <= 0.0 or get_slide_collision_count() > 0):
+		_vai(Stato.RECUPERO)                         # US-1503: fine della carica (tempo, muro o giocatore)
 	_aggiorna_anim_locomozione()
 
 
@@ -146,13 +172,27 @@ func _vai(nuovo: int) -> void:
 			_anticipo_left = _fai_partire_tell()
 		Stato.ATTACCO:
 			_anim.modulate = Color.WHITE
+			if _a_distanza():                       # US-1502: tira invece di colpire con l'arco
+				_tira()
+				_anim.call("riproduci", "attack", _dir_sguardo)
+				return
+			if _carica():                           # US-1503: scatta in linea con l'arco attivo davanti
+				_carica_dir = global_position.direction_to(_bersaglio.global_position) if is_instance_valid(_bersaglio) else _vettore_sguardo()
+				_carica_left = float((_cfg.get("carica", {}) as Dictionary).get("durata_s", 0.6))
+				_hitbox.position = _carica_dir * 6.0
+				_hitbox.rotation = _carica_dir.angle()
+				_hitbox.call("attiva", float(_cfg.get("danno_attacco", 10.0)), float(_cfg.get("stagger_attacco", 8.0)), self,
+					str(_cfg.get("tag_danno_attacco", "fisico")))
+				_anim.call("riproduci", "attack", _dir_sguardo)
+				return
 			var facing: Vector2 = _vettore_sguardo()
 			_hitbox.position = facing * 6.0
 			_hitbox.rotation = facing.angle()
 			_anim.call("riproduci", "attack", _dir_sguardo)
 		Stato.RECUPERO:
 			_hitbox.call("disattiva")
-			_recupero_left = float(_cfg.get("recupero_s", 0.6))
+			_recupero_left = float((_cfg.get("carica", {}) as Dictionary).get("recupero_s", 1.4)) if _carica() \
+				else float(_cfg.get("recupero_s", 0.6))
 		Stato.STAGGER:
 			_anim.modulate = Color(0.7, 0.7, 1.0)
 			_hitbox.call("disattiva")
@@ -162,6 +202,8 @@ func _vai(nuovo: int) -> void:
 
 
 func _su_evento_anim(nome: String) -> void:
+	if _a_distanza() or _carica():
+		return                                      # chi tira non colpisce con l'arco di mischia
 	match nome:
 		"hitbox_on":
 			_hitbox.call("attiva",
@@ -170,6 +212,61 @@ func _su_evento_anim(nome: String) -> void:
 				str(_cfg.get("tag_danno_attacco", "fisico")))
 		"hitbox_off":
 			_hitbox.call("disattiva")
+
+
+# --- US-1503: il comportamento "carica" (dati: blocco "carica" di nemico_base) ---
+
+var _carica_dir: Vector2 = Vector2.ZERO
+var _carica_left: float = 0.0
+
+
+func _carica() -> bool:
+	return str(_cfg.get("comportamento", "mischia")) == "carica"
+
+
+# --- US-1502: il comportamento "distanza" (dati: comportamento del tipo e blocco "distanza" di nemico_base) ---
+
+var _ritirata: float = 0.0
+
+
+## La palette dei suoi tiri (balance.json nemici_tipi.<tipo>.palette): la usa Vfx per colorare il proiettile.
+func palette_vfx() -> String:
+	return str(_cfg.get("palette", ""))
+
+
+func _a_distanza() -> bool:
+	return str(_cfg.get("comportamento", "mischia")) == "distanza"
+
+
+## Si tiene a distanza: si avvicina fino a tiro, indietreggia sotto "tiene"; da li' (o dopo ritirata_s di ritirata
+## che non basta, in un angolo) comincia il tell e tira.
+func _insegui_a_distanza(dist: float, delta: float) -> void:
+	var d: Dictionary = _cfg.get("distanza", {})
+	var v: float = _stats.get_stat("velocita")
+	var verso: Vector2 = global_position.direction_to(_bersaglio.global_position) if is_instance_valid(_bersaglio) else Vector2.ZERO
+	if dist > float(_cfg.get("raggio_aggro", 140.0)) * 1.3:
+		_vai(Stato.IDLE)
+	elif dist > float(d.get("tiro", 170.0)):
+		velocity = verso * v
+		_ritirata = 0.0
+	elif dist < float(d.get("tiene", 80.0)) and _ritirata < float(d.get("ritirata_s", 1.2)):
+		velocity = -verso * v
+		_ritirata += delta
+	else:
+		velocity = Vector2.ZERO
+		_ritirata = 0.0
+		_vai(Stato.ANTICIPO)
+
+
+## Il proiettile verso il giocatore (lo stesso delle abilita': si para e si schiva come gli altri colpi).
+func _tira() -> void:
+	var d: Dictionary = _cfg.get("distanza", {})
+	var p := preload("res://scripts/projectile.gd").new()
+	var verso: Vector2 = global_position.direction_to(_bersaglio.global_position) if is_instance_valid(_bersaglio) else _vettore_sguardo()
+	p.setup({"danno": float(_cfg.get("danno_attacco", 10.0)), "velocita": float(d.get("velocita_proiettile", 170.0)),
+		"gittata": float(d.get("gittata", 240.0)), "tag_danno": str(d.get("tag_danno", "fisico")), "origine": "nemico"},
+		global_position + verso * 8.0, verso, self)
+	get_parent().add_child(p)
 
 
 ## Fa partire il tell sonoro dell'attacco e restituisce la durata della fase
@@ -190,7 +287,7 @@ func _su_anim_finita(stato_anim: String) -> void:
 	# L'anticipo NON e' piu' guidato dall'animazione: la sua durata la fissa
 	# anticipo_ms del tell (US-020). L'anim 'anticipo' e' solo cosmetica e puo'
 	# finire prima o dopo la fase reale.
-	if stato_anim == "attack":
+	if stato_anim == "attack" and not _carica():     # la carica finisce quando si ferma, non con l'animazione
 		_vai(Stato.RECUPERO)
 
 
@@ -311,7 +408,7 @@ func _lascia_caratteristica() -> void:
 
 ## US-809a: alla morte, con probabilita' drop_probabilita, lascia a terra
 ## UN item scelto fra quelli di override.oggetti_a_morte (dal layout.drop
-## della regione, via world_scene.gd::_crea_nemici). Vuoto o assente (il
+## della regione, via mondo.gd::_popola_da). Vuoto o assente (il
 ## nemico da banco di prova, ogni regione senza layout) -> no-op.
 func _lascia_oggetto() -> void:
 	var oggetti: Array = _cfg.get("oggetti_a_morte", [])
@@ -383,3 +480,59 @@ func _aggiorna_anim_locomozione() -> void:
 		_anim.call("riproduci", "idle", _dir_sguardo)
 	elif _stato == Stato.INSEGUIMENTO:
 		_anim.call("riproduci", "walk", _dir_sguardo)
+
+
+## 2026-11-11: il nome del nemico sopra la testa (override.name_i18n nei dati del layout), nello stile del nome del
+## giocatore. Senza nome nei dati non c'e' scritta. La scala del nodo (i boss) non ingrandisce la scritta.
+func nome() -> String:
+	var k: String = str(_cfg.get("name_i18n", ""))
+	var gd: Node = get_node_or_null("/root/GameData")
+	return str(gd.call("tr_data", k)) if gd != null and not k.is_empty() else ""
+
+
+## 2026-11-18: il nome si vede solo sul nemico che ti sta affrontando e, fra questi, sul piu' vicino: prima i nomi di
+## nemici vicini si accavallavano. Si controlla 5 volte al secondo.
+var _nome_t: float = 0.0
+
+
+func _aggiorna_nome(delta: float) -> void:
+	var l: Node = get_node_or_null("Nome")
+	_nome_t -= delta
+	if l == null or _nome_t > 0.0:
+		return
+	_nome_t = 0.2
+	(l as CanvasItem).visible = _nome_visibile()
+
+
+func _ingaggiato() -> bool:
+	return _stato != Stato.IDLE and _stato != Stato.MORTO and is_instance_valid(_bersaglio)
+
+
+func _nome_visibile() -> bool:
+	if not _ingaggiato():
+		return false
+	var mia: float = global_position.distance_squared_to(_bersaglio.global_position)
+	for n in get_tree().get_nodes_in_group("nemici"):
+		if n != self and n.has_method("_ingaggiato") and bool(n.call("_ingaggiato")) \
+				and (n as Node2D).global_position.distance_squared_to(_bersaglio.global_position) < mia:
+			return false
+	return true
+
+
+func _monta_nome() -> void:
+	if nome().is_empty():
+		return
+	var l := Label.new()
+	l.name = "Nome"
+	l.text = nome()
+	l.add_theme_font_size_override("font_size", 9)
+	l.add_theme_constant_override("outline_size", 4)
+	l.add_theme_color_override("font_outline_color", Color("#181425"))
+	l.add_theme_color_override("font_color", Color("#f7d9d0"))
+	l.custom_minimum_size = Vector2(120, 0)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.scale = Vector2.ONE / maxf(scale.x, 0.01)
+	l.position = Vector2(-60, -40) / maxf(scale.x, 0.01)
+	l.visible = false
+	add_child(l)
+	_stats.died.connect(l.hide)

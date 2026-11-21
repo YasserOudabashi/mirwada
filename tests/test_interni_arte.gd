@@ -15,7 +15,7 @@ func _interni() -> Array:
 
 func test_ogni_interno_ha_la_sua_immagine_nelle_due_modalita() -> void:
 	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
-	assert_eq(_interni().size(), 24, "24 interni: 14 delle case, 6 delle sotto-aree (US-8B21a), 4 delle basi (US-8B20)")
+	assert_eq(_interni().size(), 25, "25 interni: 14 delle case, 7 delle sotto-aree (US-8B21a, e il teatro di US-1305c), 4 delle basi (US-8B20)")
 	for iid in _interni():
 		var mappa: Array = (gd.call("get_interno", iid) as Dictionary).get("mappa", [])
 		for tema in ["luminoso", "cupo"]:

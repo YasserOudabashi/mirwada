@@ -178,6 +178,8 @@ func test_la_frontiera_si_apre_dalla_sequenza_4() -> void:
 	assert_false(m.call("aggiorna_regione", Vector2((float(f[0]) + 0.5) * m.tile, (float(f[1]) + 0.5) * m.tile)),
 		"entrare nella Frontiera e' respinto")
 	assert_false(m.call("viaggia_a", "frontiera_porte"), "nemmeno col viaggio veloce")
+	assert_true(str(m.call("motivo_respinto", "frontiera_porte")).contains("4"), "e la scritta dice a quale Sequenza tornare")
+	assert_eq(str(m.call("motivo_respinto", "mirwada")), "", "dove si entra non c'e' scritta")
 	_pr().call("configura", "twilight_giant", 4)
 	assert_true(m.call("ingresso_aperto", "frontiera_porte"), "alla Sequenza 4 si entra")
 	_pr().call("configura", "twilight_giant", 1)
@@ -690,7 +692,7 @@ func test_ogni_varco_e_un_ingresso_nella_sua_regione() -> void:
 				if o is Sprite2D:
 					var co: Vector2i = _cella(m, (o as Sprite2D).position)
 					assert_false(Rect2i(c.x - 3, c.y - 2, 7, 7).has_point(co), "spiazzo sgombro davanti a %s" % g["area"])
-	assert_eq(visti, 6, "sei sotto-aree con un varco")
+	assert_eq(visti, 7, "sette sotto-aree con un varco (la settima e' il teatro della Frontiera, US-1305c)")
 	m.free()
 
 
@@ -914,6 +916,47 @@ func test_si_vola_solo_con_la_piuma_e_si_atterra_sulla_terra() -> void:
 	main.free()
 
 
+## 2026-11-11 (richiesta dell'utente): volare con la piuma costa spiritualita' (decollo e ogni secondo in aria);
+## finita, si plana piano e si atterra da soli sul primo punto buono. I Pathway di mezzi.json volo.innato non pagano.
+func test_il_volo_con_la_piuma_costa_e_a_forze_finite_si_atterra() -> void:
+	var root: Node = Engine.get_main_loop().root
+	var inv: Node = root.get_node("Inventory")
+	var gd: Node = root.get_node("GameData")
+	inv.call("pulisci")
+	var cfg: Dictionary = gd.call("get_mezzo", "volo")
+	assert_gt(float(cfg.get("costo_decollo", 0)), 0.0, "il decollo ha un costo nei dati")
+	assert_gt(float(cfg.get("costo_al_secondo", 0)), 0.0, "e il volo un costo al secondo")
+	var main := Node2D.new()
+	var m: Node2D = _mondo()
+	main.add_child(m)
+	var p: CharacterBody2D = load("res://scenes/player.tscn").instantiate()
+	m.add_child(p)
+	root.add_child(main)
+	p.position = m.call("partenza")
+	inv.call("aggiungi", "piuma_dei_venti", 1)
+	var st: Node = p.get_node("StatsComponent")
+	st.set("spiritualita", 2.0)
+	assert_false(m.call("decolla"), "senza forze per il decollo non ci si alza")
+	st.set("spiritualita", 20.0)
+	assert_true(m.call("decolla"), "con le forze si decolla")
+	assert_almost_eq(float(st.get("spiritualita")), 20.0 - float(cfg["costo_decollo"]), "il decollo costa")
+	var prima: float = float(st.get("spiritualita"))
+	m.call("_aggiorna_volo", p, 2.0)
+	assert_almost_eq(float(st.get("spiritualita")), prima - 2.0 * float(cfg["costo_al_secondo"]), "due secondi in aria costano")
+	var piena: float = float(p.call("velocita_massima"))
+	var mare: Vector2i = _cella(m, (m.get_node("Barca") as Node2D).position)
+	p.position = (Vector2(mare) + Vector2(0.5, 0.5)) * m.tile
+	st.set("spiritualita", 0.0)
+	m.call("_aggiorna_volo", p, 2.0)
+	assert_true(p.call("in_volo"), "sull'acqua a forze finite si resta in aria")
+	assert_true(float(p.call("velocita_massima")) < piena, "ma si plana piu' piano")
+	p.position = (Vector2(m.call("_costa_vicina", mare) as Vector2i) + Vector2(0.5, 0.5)) * m.tile
+	m.call("_aggiorna_volo", p, 0.1)
+	assert_false(p.call("in_volo"), "sul primo punto buono si atterra da soli")
+	inv.call("pulisci")
+	main.free()
+
+
 func test_la_piuma_sta_nell_osservatorio() -> void:
 	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
 	var chiave: String = str((gd.call("get_mezzo", "volo") as Dictionary).get("chiave", ""))
@@ -1015,3 +1058,52 @@ func test_dal_porto_si_arriva_in_punta_a_ogni_pontile() -> void:
 			raggiunta = raggiunta or visto.has(Vector2i(x, p.z))
 		assert_true(raggiunta, "la punta (%d..%d, %d) si raggiunge a piedi dal porto" % [p.x, p.y, p.z])
 	m.free()
+
+
+## 2026-11-14: la barca ha il disegno di fianco, di prua e di poppa, e segue lo sguardo di chi rema.
+func test_la_barca_si_gira_con_chi_rema() -> void:
+	var m: Node2D = _mondo()
+	m.call("crea_barca")
+	for nome in ["barca", "barca_su", "barca_giu"]:
+		assert_true((m.dati["sprite"] as Dictionary).has(nome), "il disegno %s e' nel mondo" % nome)
+		for tema in ["luminoso", "cupo"]:
+			assert_true(FileAccess.file_exists("res://assets/world/%s/oggetti/%s.png" % [tema, nome]), "%s/%s.png" % [tema, nome])
+	var spr: Sprite2D = m.get_node("Barca/Disegno")
+	m.call("_gira_barca", Vector2.UP)
+	assert_eq(str(spr.get_meta("disegno")), "barca_su", "verso nord: di prua")
+	m.call("_gira_barca", Vector2.DOWN)
+	assert_eq(str(spr.get_meta("disegno")), "barca_giu", "verso sud: di poppa")
+	m.call("_gira_barca", Vector2.RIGHT)
+	assert_eq(str(spr.get_meta("disegno")), "barca", "di lato: di fianco")
+	assert_true(spr.flip_h, "specchiata verso destra")
+	m.call("_gira_barca", Vector2.UP)
+	assert_false(spr.flip_h, "di prua non e' specchiata")
+	m.free()
+
+
+## US-8B60b: ogni antagonista ha la sua figura e il suo ritratto; la Soglia prende quelli del Pathway del giocatore.
+func test_la_soglia_ha_il_volto_dell_antagonista_del_pathway() -> void:
+	var prima: Dictionary = _pr().call("per_salvataggio")
+	var gd: Node = Engine.get_main_loop().root.get_node("GameData")
+	var ts: Node = Engine.get_main_loop().root.get_node("TimeSystem")
+	var visti: Dictionary = {}
+	for pid in gd.call("pathway_ids"):
+		_pr().call("configura", str(pid), 1)
+		var asp: String = str(gd.call("aspetto_npc", "npc_antagonista"))
+		assert_eq(asp, str(gd.call("get_antagonista", str(pid)).get("aspetto", "")), "%s: l'aspetto dei dati" % pid)
+		assert_false(visti.has(asp), "%s: un aspetto solo suo (%s)" % [pid, asp])
+		visti[asp] = true
+		assert_false(asp.contains(str(pid)), "il nome dell'aspetto non contiene il nome del Pathway")
+		assert_true(FileAccess.file_exists("res://assets/placeholder/personaggio_%s_idle.png" % asp), "%s: fogli" % asp)
+		assert_true(gd.call("ritratto", "npc_antagonista") != null, "%s: ritratto" % asp)
+	assert_eq(str(gd.call("aspetto_npc", "npc_mirco")), str(gd.call("get_npc", "npc_mirco")["aspetto"]["sprite"]),
+		"gli altri NPC tengono il loro aspetto")
+	_pr().call("configura", "death", 1)
+	ts.call("forza_momento", "notte_fonda")
+	var m: Node2D = _mondo()
+	m.call("crea_npc")
+	var a: Node2D = m.get_node_or_null("Npc_npc_antagonista")
+	assert_true(a != null and a.get_node("AnimationMachine").sprite_frames != null, "nel mondo, col suo disegno")
+	m.free()
+	ts.call("libera_momento")
+	_pr().call("da_salvataggio", prima)

@@ -79,6 +79,78 @@
       "valore": 0,
       "rarita": "leggendario",
       "vendibile": false
+    },
+    {
+      "id": "arma_spezzata",
+      "categoria": "materiale",
+      "name_i18n": "item.arma_spezzata",
+      "descrizione_i18n": "item.arma_spezzata.desc",
+      "tag": [
+        "guerra"
+      ],
+      "impilabile": true,
+      "valore": 30,
+      "rarita": "non_comune"
+    },
+    {
+      "id": "sigillo_del_guardiano",
+      "categoria": "materiale",
+      "name_i18n": "item.sigillo_del_guardiano",
+      "descrizione_i18n": "item.sigillo_del_guardiano.desc",
+      "tag": [
+        "occulto"
+      ],
+      "impilabile": true,
+      "valore": 60,
+      "rarita": "non_comune"
+    },
+    {
+      "id": "sigillo_argenteo",
+      "categoria": "materiale",
+      "name_i18n": "item.sigillo_argenteo",
+      "descrizione_i18n": "item.sigillo_argenteo.desc",
+      "tag": [
+        "occulto"
+      ],
+      "impilabile": true,
+      "valore": 120,
+      "rarita": "raro"
+    },
+    {
+      "id": "sigillo_del_declino",
+      "categoria": "materiale",
+      "name_i18n": "item.sigillo_del_declino",
+      "descrizione_i18n": "item.sigillo_del_declino.desc",
+      "tag": [
+        "occulto"
+      ],
+      "impilabile": true,
+      "valore": 200,
+      "rarita": "raro"
+    },
+    {
+      "id": "sigillo_della_mano",
+      "categoria": "materiale",
+      "name_i18n": "item.sigillo_della_mano",
+      "descrizione_i18n": "item.sigillo_della_mano.desc",
+      "tag": [
+        "occulto"
+      ],
+      "impilabile": true,
+      "valore": 350,
+      "rarita": "raro"
+    },
+    {
+      "id": "sigillo_dell_autorita",
+      "categoria": "materiale",
+      "name_i18n": "item.sigillo_dell_autorita",
+      "descrizione_i18n": "item.sigillo_dell_autorita.desc",
+      "tag": [
+        "occulto"
+      ],
+      "impilabile": true,
+      "valore": 600,
+      "rarita": "leggendario"
     }
   ]
 }

@@ -45,19 +45,30 @@ func test_hud_aggancia_le_barre_ai_segnali() -> void:
 	var hud: CanvasLayer = HudScene.instantiate()
 	Engine.get_main_loop().root.add_child(hud)
 
-	var barra: ProgressBar = hud.get_node("Root/VBox/HP/Barra")
-	assert_almost_eq(barra.value, float(stats.get("hp")), "barra hp inizializzata")
+	var barra: Control = hud.get_node("Root/Vitali/HP/Barra")
+	var hp_max: float = stats.get_stat("hp_max")
+	assert_almost_eq(float(barra.get("obiettivo")), float(stats.get("hp")) / hp_max, "barra hp inizializzata")
+	assert_almost_eq(float(barra.get("pieno")), float(barra.get("obiettivo")), "la prima volta senza scia")
 
 	stats.set("hp", float(stats.get("hp")) - 25.0)
-	assert_almost_eq(barra.value, float(stats.get("hp")), "barra hp segue il segnale")
+	assert_almost_eq(float(barra.get("obiettivo")), float(stats.get("hp")) / hp_max, "barra hp segue il segnale")
+	assert_almost_eq(float(barra.get("pieno")), float(barra.get("obiettivo")), "un colpo: il pieno scende subito")
+	assert_gt(float(barra.get("scia")), float(barra.get("pieno")), "e la scia del danno resta dietro (US-8B75d)")
+	var numero: Label = hud.get_node("Root/Vitali/HP/Numero")
+	assert_true(numero.text.contains(str(roundi(float(stats.get("hp"))))), "il numero dice la vita nuova")
+	hud.call("_process", 0.1)
+	assert_gt(numero.modulate.a, 0.5, "e si vede appena cambia")
+	hud.call("_process", 5.0)
+	hud.call("_process", 0.1)
+	assert_almost_eq(numero.modulate.a, 0.0, "poi sparisce: i numeri solo quando servono")
 
 	hud.free()
 	host.free()
 
 
-## US-802: la hotbar non deve mai mostrare un id grezzo o un testo fisso —
-## solo tr()/GameData.tr_data() sui dati dell'abilita'.
-func test_hotbar_non_ha_testo_hardcoded() -> void:
+## US-8B75d (richiesta dell'utente): mentre si gioca la hotbar mostra solo il simbolo dell'abilita', mai il nome
+## (il nome sta nel libro); lo slot sa quale abilita' ha e lo slot vuoto non ha glifo.
+func test_la_hotbar_mostra_solo_simboli() -> void:
 	var host := Node.new()
 	host.add_to_group("player")
 	var stats: Node = StatsComponent.new()
@@ -65,31 +76,18 @@ func test_hotbar_non_ha_testo_hardcoded() -> void:
 	stats.configure_from_balance(9)
 	host.add_child(stats)
 	Engine.get_main_loop().root.add_child(host)
-
 	var root: Node = Engine.get_main_loop().root
 	root.get_node("Progression").call("configura", "twilight_giant", 9)
-	var gd: Node = root.get_node("GameData")
-	var owned: Array = root.get_node("AbilityEngine").call("owned_abilities", host)
-	assert_true(owned.size() >= 1, "il Twilight Giant a Sequenza 9 possiede almeno un'abilita'")
-
+	var owned: Array = root.get_node("AbilityEngine").call("hotbar", host)
+	assert_true(owned.size() >= 1, "il Twilight Giant a Sequenza 9 ha almeno un'abilita' nei tasti")
 	var hud: CanvasLayer = HudScene.instantiate()
 	root.add_child(hud)
-
-	# Confronto diretto con l'output di tr_data (non con un fallback nel
-	# codice): passa sia che la voce it.json sia tradotta sia che sia
-	# ancora uno stub "TODO <chiave>" (42 note, debito di traduzione
-	# preesistente, non di questa story) — quello che conta e' che il testo
-	# mostrato SEGUA il catalogo dati, non un valore scritto in hud.gd.
-	var slot0: Label = hud.get_node("Root/VBox/Hotbar/Slot0")
-	var ab0: Dictionary = gd.call("get_ability", str(owned[0]))
-	var nome0: String = str(gd.call("tr_data", ab0.get("name_i18n", "")))
-	assert_true(slot0.text.contains(nome0),
-		"slot 0 mostra esattamente l'output di GameData.tr_data, non un nome scritto in hud.gd")
-
-	var slot3: Label = hud.get_node("Root/VBox/Hotbar/Slot3")
-	assert_true(slot3.text.contains(tr("HUD_HOTBAR_VUOTO")),
-		"lo slot senza abilita' mostra la chiave tradotta, non un placeholder fisso")
-
+	var slot0: Control = hud.get_node("Root/Hotbar/Slot0")
+	assert_eq(str(slot0.get("abilita")), str(owned[0]), "lo slot 0 ha l'abilita' del tasto 1")
+	assert_eq(slot0.find_children("*", "Label", true, false).size(), 0, "e nessuna scritta")
+	assert_eq(hud.get_node("Root/Hotbar").find_children("*", "Label", true, false).size(), 0, "nessun nome nella hotbar")
+	if owned.size() < 4:
+		assert_false((hud.get_node("Root/Hotbar/Slot3/Glifo") as CanvasItem).visible, "lo slot vuoto non ha glifo")
 	hud.free()
 	host.free()
 
@@ -111,27 +109,29 @@ func test_hotbar_lampeggia_quando_parte_l_abilita() -> void:
 
 	var hud: CanvasLayer = HudScene.instantiate()
 	root.add_child(hud)
-	var slot0: Label = hud.get_node("Root/VBox/Hotbar/Slot0")
-	slot0.modulate = Color.WHITE
+	var slot0: Control = hud.get_node("Root/Hotbar/Slot0")
+	assert_eq(float(slot0.get("lampo")), 0.0, "fermo")
 
-	root.get_node("AbilityEngine").call("execute", str(owned[0]), host)
-	assert_ne(slot0.modulate, Color.WHITE, "lo slot che ha lanciato l'abilita' lampeggia")
+	root.get_node("AbilityEngine").call("execute", str(hud.get_node("Root/Hotbar/Slot0").get("abilita")), host)
+	assert_gt(float(slot0.get("lampo")), 0.0, "lo slot che ha lanciato l'abilita' lampeggia")
+	assert_gt(float(slot0.get("ricarica")), 0.0, "e si vela per la ricarica")
 
 	hud.free()
 	host.free()
 
 
-## 2026-10-29: le scritte dell'HUD hanno il contorno scuro dei prompt e le barre un colore pieno (bianche senza contorno non si leggevano sui
-## fondi chiari: marmo, neve, sabbia).
+## 2026-10-29 / US-8B75d: le poche scritte dell'HUD (i numeri) hanno il contorno scuro, e le barre i colori dei dati.
 func test_le_scritte_dell_hud_hanno_il_contorno() -> void:
 	var hud: CanvasLayer = HudScene.instantiate()
 	Engine.get_main_loop().root.add_child(hud)
 	var etichette: Array = hud.find_children("*", "Label", true, false)
-	assert_gt(etichette.size(), 6, "vita, spirito, recitazione, hotbar, avanzamento")
+	assert_eq(etichette.size(), 2, "solo i numeri di vita e spirito")
 	for l in etichette:
-		assert_eq((l as Label).get_theme_constant("outline_size"), 4, "%s col contorno" % l.name)
+		assert_gt(float((l as Label).get_theme_constant("outline_size")), 0.0, "%s col contorno" % l.name)
 		assert_eq((l as Label).get_theme_color("font_outline_color"), Color("#181425"), "%s del colore del contorno" % l.name)
-	for nome in ["HP", "SP", "Acting"]:
-		var pieno: StyleBoxFlat = (hud.get_node("Root/VBox/%s/Barra" % nome) as ProgressBar).get_theme_stylebox("fill")
-		assert_eq(pieno.bg_color, Color(hud.get("COLORI_BARRE")[nome]), "la barra %s piena del suo colore" % nome)
+	var cfg: Dictionary = Engine.get_main_loop().root.get_node("GameData").call("get_ui_hud")
+	for coppia in [["HP", "vita"], ["SP", "spirito"], ["Acting", "recitazione"]]:
+		var b: Control = hud.get_node("Root/Vitali/%s/Barra" % coppia[0])
+		assert_eq(b.get("cfg"), cfg["barre"][coppia[1]], "la barra %s coi colori dei dati" % coppia[0])
+		assert_true((hud.get_node("Root/Vitali/%s/Emblema" % coppia[0]) as TextureRect).texture != null, "e il suo emblema")
 	hud.free()

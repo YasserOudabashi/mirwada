@@ -88,32 +88,6 @@ func test_nuova_partita_senza_pathway_usa_il_default() -> void:
 	_fine()
 
 
-## US-1002B (fase 10, mondo continuo): il mondo non si ricarica piu' su
-## partita_iniziata - resta lo stesso nodo, solo il giocatore viene
-## riposizionato a Mirwada (world_scene.gd::viaggia_a).
-func test_su_partita_iniziata_riposiziona_senza_ricaricare() -> void:
-	var cont := Node2D.new()
-	cont.set_script(load("res://scripts/main.gd"))
-	_root().add_child(cont)
-
-	var mondo: Node = load("res://scenes/world_scene.tscn").instantiate()
-	cont.add_child(mondo)
-	var player := Node2D.new()
-	player.name = "Player"
-	player.add_to_group("player")
-	cont.add_child(player)
-	player.global_position = Vector2(-999, -999)
-
-	cont.call("_su_partita_iniziata", "Tester")
-
-	assert_false(mondo.is_queued_for_deletion(), "il mondo NON viene ricaricato: stesso nodo di prima")
-	assert_eq(player.global_position, mondo.call("punto_spawn", "mirwada"),
-		"il player e' riposizionato alla cella di spawn di Mirwada")
-
-	cont.free()
-	_fine()
-
-
 ## Controllo del 2026-11-10: il mondo nasce all'avvio con le immagini luminose; una partita difficile (nuova o
 ## caricata) lo rifa' con quelle cupe, e una partita caricata resta dove si era salvato.
 func _main_col_mondo() -> Node:

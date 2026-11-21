@@ -138,3 +138,27 @@ func test_l_illusione_solida_ferisce_il_nemico() -> void:
 	assert_almost_eq(float(p.get_node("StatsComponent").get("hp")), hp_p, "chi la crea no")
 	p.free()
 	e.free()
+
+
+## 2026-11-11 (richiesta dell'utente): un'abilita' d'area (tag_sinergia "area") cade su tutti i nemici attorno al
+## bersaglio, entro balance.json combattimento.bersaglio.raggio_area; una non d'area resta su uno solo.
+func test_un_abilita_d_area_cade_su_tutti_i_nemici_vicini() -> void:
+	var p := _giocatore("twilight_giant", 2)
+	var area: float = float(_n("/root/GameData").call("get_balance", "combattimento")["bersaglio"]["raggio_area"])
+	var primo := _nemico(Vector2(0, 60))
+	var accanto := _nemico(Vector2(area * 0.6, 60))
+	var lontano := _nemico(Vector2(area * 1.6, 60))
+	var mod := func(n: Node) -> int: return (n.get_node("StatsComponent").get("_modifiers") as Dictionary).size()
+	var prima: Array = [mod.call(primo), mod.call(accanto), mod.call(lontano)]
+	var r: Dictionary = _n("/root/AbilityEngine").call("execute", "tg_crepuscolo", p)
+	assert_true(bool(r["ok"]), "parte: %s" % r["reason"])
+	assert_eq((r.get("bersagli", []) as Array).size(), 2, "due nemici nel raggio d'area")
+	assert_true(mod.call(primo) > prima[0], "il debuff e' sul bersaglio")
+	assert_true(mod.call(accanto) > prima[1], "e anche sul nemico accanto")
+	assert_eq(mod.call(lontano), prima[2], "quello fuori dal raggio no")
+	var sui_nemici: Array = (r["effects"] as Array).filter(func(e): return e.has("nodo"))
+	assert_eq(sui_nemici.size(), 2, "un effetto per nemico colpito (il VFX va su ognuno)")
+	p.free()
+	primo.free()
+	accanto.free()
+	lontano.free()

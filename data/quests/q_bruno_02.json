@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "q_bruno_02",
+  "name": "Carte che restano",
+  "name_i18n": "quest.q_bruno_02.name",
+  "_comment": "US-1303: l'altro lato di q_ottavia_02. Si avvia dal dialogo di Bruno quando si lasciano le carte al porto; non parte se q_ottavia_02 e' gia' completata.",
+  "giver": "npc_bruno",
+  "atto": 2,
+  "fallibile": true,
+  "exclusive_with": [
+    "q_ottavia_02"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "desc": "Lascia le carte al porto.",
+      "desc_i18n": "quest.q_bruno_02.s1",
+      "completamento": {
+        "tipo": "flag",
+        "id": "carte_al_porto"
+      },
+      "on_complete": []
+    }
+  ],
+  "ricompense": [
+    {
+      "tipo": "reputazione",
+      "faction_id": "porto",
+      "delta": 25
+    },
+    {
+      "tipo": "reputazione",
+      "faction_id": "ordine_minore",
+      "delta": -15
+    },
+    {
+      "tipo": "flag",
+      "id": "q_bruno_02_done",
+      "valore": true
+    }
+  ]
+}

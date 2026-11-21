@@ -1,0 +1,174 @@
+{
+ "prova:carica": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "eb7fbcc805b0"
+ },
+ "prova:cervo": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "951bdf0327dc"
+ },
+ "prova:cervo_fuga": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "50ced4f3bd1d"
+ },
+ "prova:cervo_idle": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "5ec94f22df0c"
+ },
+ "prova:edificio_casa_antica": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "74092ec0ef29"
+ },
+ "prova:edificio_casa_antica_loggia": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "415d84ae32ee"
+ },
+ "prova:edificio_casa_antica_pergola": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "3ec99ecd175a"
+ },
+ "prova:edificio_museo": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "421ab7feac20"
+ },
+ "prova:enel": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "1ba8981c31f4"
+ },
+ "prova:enel_attack_heavy": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "7aa00208ac22"
+ },
+ "prova:enel_attack_light": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "30edf4b47021"
+ },
+ "prova:enel_cast": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "0e2c4b429bae"
+ },
+ "prova:enel_dash": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "4a13b346fb29"
+ },
+ "prova:enel_death": {
+  "dal": "2026-11-19T14:43:08Z",
+  "v": "bd96f15d4613"
+ },
+ "prova:enel_drink": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "0131bb3323ad"
+ },
+ "prova:enel_fly": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "74aa6aacc78c"
+ },
+ "prova:enel_hurt": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "cfc6d1e4027e"
+ },
+ "prova:enel_idle": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "9f03c2235873"
+ },
+ "prova:enel_interact": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "af5342eba5d1"
+ },
+ "prova:enel_meditate": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "657c6f5cf4a4"
+ },
+ "prova:enel_parry": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "ff2da31bc537"
+ },
+ "prova:enel_pickup": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "d544fb81ddb1"
+ },
+ "prova:enel_ritual": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "1adbc23c69ff"
+ },
+ "prova:enel_sail": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "c855d92f7e1f"
+ },
+ "prova:enel_walk": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "bc28827320df"
+ },
+ "prova:fendente_pesante": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "83883e65ac2d"
+ },
+ "prova:incantesimo": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "fd33da056117"
+ },
+ "prova:incantesimo_scoppio": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "aac06e0799c2"
+ },
+ "prova:lupo": {
+  "dal": "2026-11-19T14:43:08Z",
+  "v": "862781fa3bbe"
+ },
+ "prova:lupo_anticipo": {
+  "dal": "2026-11-19T14:43:08Z",
+  "v": "569dad6accd7"
+ },
+ "prova:lupo_attack": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "2d3d549114d3"
+ },
+ "prova:lupo_death": {
+  "dal": "2026-11-19T14:43:08Z",
+  "v": "493c68b4aa99"
+ },
+ "prova:lupo_idle": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "6209dc07bd92"
+ },
+ "prova:lupo_stagger": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "01c1ffa0bf93"
+ },
+ "prova:lupo_walk": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "e0fba0ad3b12"
+ },
+ "prova:mercante": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "20133cdb7ad8"
+ },
+ "prova:mercante_idle": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "d8254db7eb2a"
+ },
+ "prova:mercante_walk": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "34da0c22419f"
+ },
+ "prova:schivata_affondo": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "be01449173ff"
+ },
+ "prova:schivata_capriola": {
+  "dal": "2026-11-21T13:02:32Z",
+  "v": "32abe74be326"
+ },
+ "prova:schivata_ombra": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "743e9ae1a604"
+ },
+ "prova:schivata_scivolata": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "d67353a7b0e7"
+ },
+ "prova:stretta_ferrea": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "889362bd4c04"
+ }
+}

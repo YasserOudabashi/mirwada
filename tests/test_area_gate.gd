@@ -113,27 +113,3 @@ func test_terrain_modify_permanente_apre_per_sempre() -> void:
 	assert_true(ag.call("e_aperto"), "dopo il reload il gate e' ancora aperto")
 	assert_true(_ws().call("gate_e_aperto", ag.call("id")), "l'id del gate e' fra i gate_aperti")
 	ag.free()
-
-
-## US-1002B (fase 10, mondo continuo): un solo world_scene.gd dipinge tutte
-## le regioni; le AreaGate di ognuna si distinguono dal nome del nodo
-## ("Gate_<region_id>_<area>", world_scene.gd::_crea_gate), non serve piu'
-## isolare una regione in una scena a se'.
-func test_world_scene_crea_una_areagate_per_gating() -> void:
-	var cont := Node2D.new()
-	_root().add_child(cont)
-	var mondo: Node = load("res://scenes/world_scene.tscn").instantiate()
-	cont.add_child(mondo)
-
-	var n_gate_marche := 0
-	var n_gate_mirwada := 0
-	for c in mondo.get_children():
-		if c.get_script() != AreaGate:
-			continue
-		if str(c.name).begins_with("Gate_marche_crepuscolo_"):
-			n_gate_marche += 1
-		elif str(c.name).begins_with("Gate_mirwada_"):
-			n_gate_mirwada += 1
-	assert_eq(n_gate_marche, 2, "le Marche del Crepuscolo hanno 2 voci di gating -> 2 AreaGate")
-	assert_eq(n_gate_mirwada, 0, "la citta' neutra non ha gating")
-	cont.free()

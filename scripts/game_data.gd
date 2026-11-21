@@ -51,6 +51,8 @@ const PATH_STATUS := "res://data/status_effects.json"
 const PATH_I18N_IT := "res://data/i18n/it.json"
 const PATH_I18N_EN := "res://data/i18n/en.json"
 const PATH_UI_BOOK := "res://data/ui/book.json"
+const PATH_UI_HUD := "res://data/ui/hud.json"
+const PATH_UI_TITOLI := "res://data/ui/titoli.json"
 const PATH_PAGE_TYPES := "res://data/schema/page_types.json"
 const PATH_VFX := "res://data/vfx.json"
 const PATH_MODALITA := "res://data/modalita.json"
@@ -113,6 +115,8 @@ var _statuses: Dictionary = {}
 var _i18n_it: Dictionary = {}
 var _i18n_en: Dictionary = {}
 var _ui_book: Dictionary = {}
+var _ui_hud: Dictionary = {}
+var _ui_titoli: Dictionary = {}
 var _page_types: Dictionary = {}
 var _vfx: Dictionary = {}
 var _modalita: Dictionary = {}
@@ -217,6 +221,8 @@ func load_all() -> void:
 	_load_flat(PATH_I18N_IT, _i18n_it)
 	_load_flat(PATH_I18N_EN, _i18n_en)
 	_load_single(PATH_UI_BOOK, "pages", _ui_book, TYPE_ARRAY)
+	_load_single(PATH_UI_HUD, "barre", _ui_hud, TYPE_DICTIONARY)
+	_load_single(PATH_UI_TITOLI, "crediti", _ui_titoli, TYPE_ARRAY)
 	_load_single(PATH_PAGE_TYPES, "page_types", _page_types, TYPE_ARRAY)
 	_load_single(PATH_VFX, "pathway_palette_visiva", _vfx, TYPE_DICTIONARY)
 	_load_single(PATH_MODALITA, "modalita", _modalita, TYPE_DICTIONARY)
@@ -572,6 +578,16 @@ func get_ui_book() -> Dictionary:
 	return _ui_book
 
 
+## US-8B75d: misure e colori dell'HUD di gioco (data/ui/hud.json).
+func get_ui_hud() -> Dictionary:
+	return _ui_hud
+
+
+## I titoli di coda (data/ui/titoli.json).
+func get_ui_titoli() -> Dictionary:
+	return _ui_titoli
+
+
 ## Vocabolario chiuso degli 8 tipi di pagina (data/schema/page_types.json).
 func page_types() -> Array:
 	return _array_or_empty(_page_types.get("page_types"))
@@ -773,8 +789,22 @@ func icona_primitiva(tipo: String) -> Texture2D:
 ## US-8B35: il ritratto di un NPC, dal suo aspetto (roster aspetto.sprite -> assets/ritratti/<aspetto>.png,
 ## tools/art/build_ritratti.py). null se l'NPC non ha aspetto o il ritratto non c'e'.
 func ritratto(npc_id: String) -> Texture2D:
-	var aspetto: String = str((get_npc(npc_id).get("aspetto", {}) as Dictionary).get("sprite", ""))
+	var aspetto: String = aspetto_npc(npc_id)
 	return null if aspetto.is_empty() else _icona_png("res://assets/ritratti/%s.png" % aspetto)
+
+
+## L'aspetto (sprite e ritratto) di un NPC: quello dei suoi dati, oppure, se l'aspetto ha "da_antagonista" (US-8B60b:
+## la Soglia), quello dell'antagonista del Pathway del giocatore (data/lore/antagonisti.json "aspetto"). "" se manca.
+func aspetto_npc(npc_id: String) -> String:
+	var asp: Variant = get_npc(npc_id).get("aspetto", {})
+	if not (asp is Dictionary):
+		return ""
+	if bool((asp as Dictionary).get("da_antagonista", false)):
+		var pr: Node = get_node_or_null("/root/Progression")
+		var suo: String = str(get_antagonista(str(pr.call("pathway")) if pr != null else "").get("aspetto", ""))
+		if not suo.is_empty():
+			return suo
+	return str((asp as Dictionary).get("sprite", ""))
 
 
 ## Ogni PNG delle icone si legge dal disco una volta sola (senza l'import dell'editor).

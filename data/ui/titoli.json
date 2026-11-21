@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "_comment": "Titoli di coda (2026-11-17, chiesti dall'utente): dopo il finale, su fondo nero, il nome del finale e il suo epilogo, il viaggio del giocatore (Pathway, Ancore rimaste, le scelte fatte: un flag scritto = una riga) e i crediti; poi il libro sul colophon. Testi in data/i18n (titoli.*); gli autori dei suoni vengono da data/audio_fonti.json.",
+  "velocita": 18,
+  "pausa_iniziale_s": 1.5,
+  "dissolvenza_s": 1.2,
+  "fondo": "#181425",
+  "colori": {
+    "titolo": "#feae34",
+    "testo": "#ead4aa",
+    "tenue": "#8b9bb4"
+  },
+  "corpo": {
+    "titolo": 28,
+    "sezione": 16,
+    "testo": 12
+  },
+  "scelte": [
+    {
+      "flag": "aldo_duello_vinto",
+      "testo_i18n": "titoli.scelta.aldo_duello_vinto"
+    },
+    {
+      "flag": "aldo_duello_perso",
+      "testo_i18n": "titoli.scelta.aldo_duello_perso"
+    },
+    {
+      "flag": "aldo_rispetto",
+      "testo_i18n": "titoli.scelta.aldo_rispetto"
+    },
+    {
+      "flag": "carte_all_ordine",
+      "testo_i18n": "titoli.scelta.carte_all_ordine"
+    },
+    {
+      "flag": "carte_al_porto",
+      "testo_i18n": "titoli.scelta.carte_al_porto"
+    },
+    {
+      "flag": "doran_patto",
+      "testo_i18n": "titoli.scelta.doran_patto"
+    },
+    {
+      "flag": "doran_nemico",
+      "testo_i18n": "titoli.scelta.doran_nemico"
+    },
+    {
+      "flag": "lena_ha_capito",
+      "testo_i18n": "titoli.scelta.lena_ha_capito"
+    },
+    {
+      "flag": "lena_ha_paura",
+      "testo_i18n": "titoli.scelta.lena_ha_paura"
+    },
+    {
+      "flag": "vesna_resta",
+      "testo_i18n": "titoli.scelta.vesna_resta"
+    },
+    {
+      "flag": "vesna_se_ne_va",
+      "testo_i18n": "titoli.scelta.vesna_se_ne_va"
+    }
+  ],
+  "crediti": [
+    {
+      "ruolo_i18n": "titoli.ruolo.ideazione",
+      "nomi": [
+        "Asso"
+      ]
+    },
+    {
+      "ruolo_i18n": "titoli.ruolo.realizzazione",
+      "nomi": [
+        "Asso, con Claude Code"
+      ]
+    },
+    {
+      "ruolo_i18n": "titoli.ruolo.motore",
+      "nomi": [
+        "Godot Engine (MIT)"
+      ]
+    },
+    {
+      "ruolo_i18n": "titoli.ruolo.font",
+      "nomi": [
+        "Alegreya e Alegreya SC, The Alegreya Project Authors (SIL Open Font License)"
+      ]
+    },
+    {
+      "ruolo_i18n": "titoli.ruolo.suoni",
+      "dai_suoni": true
+    }
+  ],
+  "testi": {
+    "mirwada_i18n": "titoli.mirwada",
+    "viaggio_i18n": "titoli.viaggio",
+    "pathway_i18n": "titoli.pathway",
+    "ancore_rimaste_i18n": "titoli.ancore_rimaste",
+    "nessuna_ancora_i18n": "titoli.nessuna_ancora",
+    "crediti_i18n": "titoli.crediti",
+    "grazie_i18n": "titoli.grazie"
+  }
+}

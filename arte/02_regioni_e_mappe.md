@@ -69,10 +69,8 @@ Aggiornato il 2026-10-14: niente piu' tileset a 4 tile disegnati a mano.
 
 - **Terreni:** `tools/art/forge3d/terrain.py`, tecnica *dual grid* a livelli: 16 tile per
   terreno, un terreno nuovo e' una riga in `TERRAINS` (rampa Endesga 32, motivo, livello).
-  Tavola dei campioni: `python tools/art/campioni_terreni.py` -> `arte/terreni/`.
 - **Pareti (dislivelli):** `tools/art/forge3d/pareti.py`. Ogni casella ha un'altezza intera;
   dove scende verso sud c'e' una parete alta 1 casella per livello (arenaria, roccia, mura),
-  con scalini `S` e rampe `R`. Tavola: `python tools/art/campioni_pareti.py` -> `arte/pareti/`.
 - **Mappa del mondo:** `python tools/art/build_world.py` (seed 6) -> `arte/mondo/`
   (`world_prova.json` con terreni, altezze, pareti e passaggi; anteprime e ritagli).
 - Niente contorno su pavimento e acqua (si ripetono). Luce da alto-sinistra. Le correzioni si

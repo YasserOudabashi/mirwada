@@ -80,7 +80,7 @@ func _al_punto_di_partenza() -> void:
 		player.global_position = pos
 
 
-## Il nodo mondo (mondo.gd o world_scene.gd) si riconosce dal suo contratto
+## Il nodo mondo (mondo.gd) si riconosce dal suo contratto
 ## pubblico (viaggia_a), non dal nome del nodo.
 func _trova_regione() -> Node:
 	for c in get_children():

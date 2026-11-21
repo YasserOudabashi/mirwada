@@ -119,7 +119,43 @@
   "rituale": {
     "_comment": "Rituale di avanzamento delle Sequenze alte (US-217). La durata di build vive in audio.json.music.rituale.durata_build_secondi (45). Qui la penalita' di un rituale interrotto: follia + fondamenta.",
     "penalita_follia_interruzione": 15,
-    "malus_fondamenta_interruzione": -8
+    "malus_fondamenta_interruzione": -8,
+    "_comment_sacrifici": "US-1305d (decisione dell'utente, 2026-11-16): come si paga ogni sacrificio di un rituale. Costo vero dove il gioco ne ha uno: ancora (un'Ancora attiva, distrutta), flag (una cosa gia' fatta), oggetto (tolto dallo zaino; 'tutti' = tutti quelli che hai, almeno uno), equip (cio' che indossi in quello slot, distrutto), struttura (una struttura costruita, distrutta), salute (una frazione della salute di adesso). Gli altri sono una scelta scritta che il giocatore conferma nel libro e che pesa su follia o fondamenta.",
+    "sacrifici": {
+      "ancora_del_giocatore": {"tipo": "ancora"},
+      "il_detentore_precedente_della_sequenza_0": {"tipo": "flag", "id": "tribolazione_soglia_varcata"},
+      "arma_spezzata_di_un_nemico_ucciso": {"tipo": "oggetto", "item_id": "arma_spezzata"},
+      "armatura_indossata_per_100_battaglie": {"tipo": "equip", "slot": "armatura"},
+      "il_tuo_strumento_migliore_distrutto_di_tua_mano": {"tipo": "equip", "slot": "arma"},
+      "struttura_costruita_dal_giocatore": {"tipo": "struttura"},
+      "sangue_del_giocatore": {"tipo": "salute", "frazione": 0.5},
+      "tutta_la_fortuna_che_ti_restava": {"tipo": "oggetto", "item_id": "moneta_comune", "tutti": true},
+      "dieci_anni_della_propria_eta": {"tipo": "fondamenta", "delta": -10},
+      "il_posto_che_chiamavi_casa": {"tipo": "fondamenta", "delta": -8},
+      "la_forza_vitale_di_un_bosco_che_hai_fatto_crescere": {"tipo": "fondamenta", "delta": -6},
+      "un_incantesimo_che_avevi_inventato_tu_bruciato_davanti_a_un_maestro": {"tipo": "fondamenta", "delta": -6},
+      "una_teoria_a_cui_tenevi_dimostrata_falsa_da_te_stesso": {"tipo": "fondamenta", "delta": -6},
+      "dieci_libri_che_avevi_amato_letti_e_poi_bruciati": {"tipo": "follia", "quantita": 10},
+      "il_nome_di_un_morto_che_amavi": {"tipo": "follia", "quantita": 12},
+      "il_proprio_nome_sussurrato_a_un_morto": {"tipo": "follia", "quantita": 10},
+      "il_richiamo_di_un_amico_che_non_verra_piu": {"tipo": "follia", "quantita": 12},
+      "il_ricordo_del_proprio_volto": {"tipo": "follia", "quantita": 15},
+      "il_ricordo_del_volto_di_una_persona_a_cui_volevi_bene": {"tipo": "follia", "quantita": 12},
+      "la_certezza_di_sapere_chi_sei": {"tipo": "follia", "quantita": 15},
+      "la_possibilita_di_restare_fermo": {"tipo": "follia", "quantita": 10},
+      "la_tua_faccia_vera_per_un_giorno": {"tipo": "follia", "quantita": 10},
+      "la_voce_di_un_coro": {"tipo": "follia", "quantita": 8},
+      "un_alleato_evocato_a_cui_ti_eri_affezionato": {"tipo": "follia", "quantita": 12},
+      "un_organo_donato_da_un_alleato_consenziente": {"tipo": "follia", "quantita": 10},
+      "un_pelo_del_tuo_pet": {"tipo": "follia", "quantita": 4},
+      "un_piano_a_cui_tenevi_davvero": {"tipo": "follia", "quantita": 10},
+      "un_ricordo_a_cui_tenevi": {"tipo": "follia", "quantita": 10},
+      "un_segreto_che_ti_definiva": {"tipo": "follia", "quantita": 10},
+      "una_creatura_che_avevi_evocato_e_amato": {"tipo": "follia", "quantita": 12},
+      "una_delle_tue_chimere_persistenti": {"tipo": "follia", "quantita": 12},
+      "una_pagina_del_tuo_passato": {"tipo": "follia", "quantita": 10},
+      "il_primo_costrutto_che_avevi_creato_e_a_cui_ti_eri_affezionato": {"tipo": "follia", "quantita": 12}
+    }
   },
   "foundation": {
     "_comment": "Qualita' della progressione 0-100. Avanzare in fretta la abbassa. Fondamenta basse = tetto di potenza piu' basso e follia piu' rapida. E' la meccanica che punisce chi corre.",
@@ -145,6 +181,18 @@
       "raggio": 22,
       "tag_danno": "fisico"
     },
+    "attacco_pesante": {
+      "_comment": "US-8C02 (richiesta dell'utente, 2026-11-18): tenendo premuto il tasto il colpo si carica. Il TIMING e' in animations.json personaggio.attack_heavy; frame_carica e' il frame tenuto fermo mentre si carica. Piu' a lungo (fino a carica_max_s secondi) = piu' danno e area piu' grande, fino a danno_x e area_x volte.",
+      "danno": 24,
+      "stagger": 18,
+      "angolo": 140,
+      "raggio": 26,
+      "tag_danno": "fisico",
+      "frame_carica": 5,
+      "carica_max_s": 1.5,
+      "danno_x": 2.5,
+      "area_x": 1.8
+    },
     "cap_schivata": 0.85,
     "schivata": {
       "_comment": "La finestra di invulnerabilita' NON e' qui: sono i frame iframe_da/iframe_a di animations.json personaggio.dash. Qui distanza, durata e cooldown.",
@@ -163,14 +211,507 @@
       "durata_vulnerabile": 3.0,
       "recupero_al_secondo": 15
     },
-    "bersaglio": {
+    "bersaglio": {"raggio_area": 72, 
       "_comment": "US-8B44a: su chi cadono le primitive col bersaglio 'nemico' (data/schema/primitives.json): il nemico vivo piu' vicino entro raggio (unita', 32 = una casella) dentro un cono di angolo gradi attorno allo sguardo. Nessuno: l'abilita' non parte e non costa.",
       "raggio": 160,
       "angolo": 120
     }
   },
+  "boss": {
+    "_comment": "US-1505: un boss e' un dato. Nel layout un nemico con 'boss': <id> prende questo (scripts/boss.gd): vita_x moltiplica la sua vita; 'fasi' a soglie di vita ('da' = frazione da cui comincia, la prima 1.0): entrando in una fase la sua 'cfg' (chiavi di nemico_base, piu' 'comportamento' tranne volo) si somma al nemico e arrivano i 'gregari' (un tipo di nemici_tipi, quanti) in cerchio a gregari_distanza unita'. 'arena': quando il boss ti affronta si chiude un cerchio di 'raggio' unita' (colore Endesga 32) che non si lascia; si riapre alla sua morte, alla tua, o se finisci piu' lontano di raggio x fuga_x (una porta, un teletrasporto). Tre fasi i primi boss, quattro i finali (bestiario dell'utente). La figura propria e' US-1506: per ora quella del tipo del layout. Numeri plausibili, non bilanciati.",
+    "re_dei_ratti": {"name_i18n": "boss.re_dei_ratti", "vita_x": 5, "gregari_distanza": 40,
+      "arena": {"raggio": 150, "colore": "#b86f50"},
+      "fasi": [
+        {"da": 1.0},
+        {"da": 0.66, "cfg": {"recupero_s": 0.45}, "gregari": {"tipo": "ratto_delle_fogne", "quanti": 3}},
+        {"da": 0.33, "cfg": {"danno_attacco": 18, "telegraph": "wind_up_light", "recupero_s": 0.3}, "gregari": {"tipo": "ratto_delle_fogne", "quanti": 4}}
+      ]},
+    "madre_delle_radici": {"name_i18n": "boss.madre_delle_radici", "vita_x": 6, "gregari_distanza": 48,
+      "arena": {"raggio": 170, "colore": "#fee761"},
+      "fasi": [
+        {"da": 1.0},
+        {"da": 0.66, "cfg": {"danno_attacco": 11}, "gregari": {"tipo": "germoglio_spinoso", "quanti": 2}},
+        {"da": 0.33, "cfg": {"comportamento": "mischia", "danno_attacco": 16, "recupero_s": 0.4}, "gregari": {"tipo": "germoglio_spinoso", "quanti": 3}}
+      ]},
+    "archivista_capo": {"name_i18n": "boss.archivista_capo", "vita_x": 6, "gregari_distanza": 44,
+      "arena": {"raggio": 160, "colore": "#b55088"},
+      "fasi": [
+        {"da": 1.0},
+        {"da": 0.66, "cfg": {"comportamento": "distanza"}, "gregari": {"tipo": "scrivano_di_carta", "quanti": 2}},
+        {"da": 0.33, "cfg": {"comportamento": "mischia", "danno_attacco": 20, "recupero_s": 0.35}, "gregari": {"tipo": "glifo_vivente", "quanti": 2}}
+      ]},
+    "custode_senza_nome": {"name_i18n": "boss.custode_senza_nome", "vita_x": 7, "gregari_distanza": 44,
+      "arena": {"raggio": 150, "colore": "#8b9bb4"},
+      "fasi": [
+        {"da": 1.0, "cfg": {"postura_massimo": 260}},
+        {"da": 0.66, "cfg": {"postura_massimo": 200}, "gregari": {"tipo": "scheletro_catacombe", "quanti": 3}},
+        {"da": 0.33, "cfg": {"postura_massimo": 140, "danno_attacco": 24, "recupero_s": 0.5}, "gregari": {"tipo": "scheletro_catacombe", "quanti": 2}}
+      ]},
+    "gigante_sul_trono": {"name_i18n": "boss.gigante_sul_trono", "vita_x": 9, "gregari_distanza": 56,
+      "arena": {"raggio": 200, "colore": "#feae34"},
+      "fasi": [
+        {"da": 1.0, "cfg": {"comportamento": "mischia"}},
+        {"da": 0.75, "cfg": {"comportamento": "carica"}, "gregari": {"tipo": "soldato_caduto", "quanti": 2}},
+        {"da": 0.5, "cfg": {"comportamento": "mischia", "danno_attacco": 26}, "gregari": {"tipo": "alfiere_spettrale", "quanti": 2}},
+        {"da": 0.25, "cfg": {"comportamento": "carica", "danno_attacco": 30, "recupero_s": 0.35}}
+      ]},
+    "burattinaio": {"name_i18n": "boss.burattinaio", "vita_x": 9, "gregari_distanza": 52,
+      "arena": {"raggio": 190, "colore": "#68386c"},
+      "fasi": [
+        {"da": 1.0, "gregari": {"tipo": "marionetta_del_teatro", "quanti": 2}},
+        {"da": 0.75, "gregari": {"tipo": "maschera_senza_volto", "quanti": 2}},
+        {"da": 0.5, "cfg": {"danno_attacco": 20}, "gregari": {"tipo": "il_doppio", "quanti": 1}},
+        {"da": 0.25, "cfg": {"comportamento": "mischia", "danno_attacco": 24, "recupero_s": 0.3}, "gregari": {"tipo": "marionetta_del_teatro", "quanti": 3}}
+      ]}
+  },
+  "nemici_tipi": {
+    "_comment": "US-1501: un tipo di nemico e' un dato. enemy.gd parte da nemico_base, ci mette sopra il tipo e poi l'override dell'istanza (posto del layout). 'rarita': comune (tell lungo, leggibile: wind_up_heavy), raro ed elite (tell corto, teso: wind_up_light), come ha deciso l'utente nel bestiario. 'comportamento' (vocabolario chiuso: mischia, distanza, carica, volo): fino a US-1502/1503 tutti combattono in mischia. 'aspetto': i fogli nemico_base_<aspetto>_<anim> di tools/art/build_nemici.py (US-1504), 'nemico_base' = il foglio di base. Numeri plausibili, non bilanciati.",
+    "tagliaborse": {
+      "name_i18n": "enemy.tagliaborse",
+      "rarita": "comune",
+      "comportamento": "mischia",
+      "aspetto": "tagliaborse",
+      "telegraph": "wind_up_heavy",
+      "tag": "",
+      "danno_attacco": 7,
+      "recupero_s": 0.45,
+      "raggio_aggro": 150
+    },
+    "scaricatore_ubriaco": {
+      "name_i18n": "enemy.scaricatore_ubriaco",
+      "rarita": "comune",
+      "comportamento": "carica",
+      "aspetto": "scaricatore_ubriaco",
+      "telegraph": "wind_up_heavy",
+      "tag": "",
+      "danno_attacco": 14,
+      "recupero_s": 1.1,
+      "postura_massimo": 80
+    },
+    "guardia_corrotta": {
+      "name_i18n": "enemy.guardia_corrotta",
+      "rarita": "comune",
+      "comportamento": "mischia",
+      "aspetto": "guardia_corrotta",
+      "telegraph": "wind_up_heavy",
+      "tag": "",
+      "danno_attacco": 11,
+      "postura_massimo": 110,
+      "recupero_s": 0.8
+    },
+    "devoto_fuori_controllo": {
+      "name_i18n": "enemy.devoto_fuori_controllo",
+      "rarita": "raro",
+      "comportamento": "distanza",
+      "palette": "error",
+      "aspetto": "devoto_fuori_controllo",
+      "telegraph": "wind_up_light",
+      "tag": "spirito",
+      "danno_attacco": 13
+    },
+    "contrabbandiere_balestra": {
+      "name_i18n": "enemy.contrabbandiere_balestra",
+      "rarita": "comune",
+      "comportamento": "distanza",
+      "palette": "paragon",
+      "aspetto": "contrabbandiere_balestra",
+      "telegraph": "wind_up_heavy",
+      "tag": "",
+      "danno_attacco": 9,
+      "raggio_aggro": 180
+    },
+    "belva_dei_moli": {
+      "name_i18n": "enemy.belva_dei_moli",
+      "rarita": "elite",
+      "comportamento": "mischia",
+      "aspetto": "belva_dei_moli",
+      "telegraph": "wind_up_light",
+      "tag": "bestia",
+      "danno_attacco": 15,
+      "raggio_aggro": 200,
+      "postura_massimo": 120
+    },
+    "soldato_caduto": {
+      "name_i18n": "enemy.soldato_caduto",
+      "rarita": "comune",
+      "comportamento": "mischia",
+      "aspetto": "soldato_caduto",
+      "telegraph": "wind_up_heavy",
+      "tag": "non_morto",
+      "danno_attacco": 10,
+      "postura_massimo": 70
+    },
+    "alfiere_spettrale": {
+      "name_i18n": "enemy.alfiere_spettrale",
+      "rarita": "raro",
+      "comportamento": "mischia",
+      "aspetto": "alfiere_spettrale",
+      "telegraph": "wind_up_light",
+      "tag": "non_morto",
+      "danno_attacco": 8,
+      "raggio_aggro": 170
+    },
+    "corvo_della_battaglia": {
+      "name_i18n": "enemy.corvo_della_battaglia",
+      "rarita": "comune",
+      "comportamento": "volo",
+      "aspetto": "corvo_della_battaglia",
+      "telegraph": "wind_up_heavy",
+      "tag": "bestia",
+      "danno_attacco": 7,
+      "recupero_s": 0.5
+    },
+    "ombra_strisciante": {
+      "name_i18n": "enemy.ombra_strisciante",
+      "rarita": "raro",
+      "comportamento": "mischia",
+      "aspetto": "ombra_strisciante",
+      "telegraph": "wind_up_light",
+      "tag": "ombra",
+      "danno_attacco": 13,
+      "raggio_aggro": 110
+    },
+    "colosso_arrugginito": {
+      "name_i18n": "enemy.colosso_arrugginito",
+      "rarita": "raro",
+      "comportamento": "carica",
+      "aspetto": "colosso_arrugginito",
+      "telegraph": "wind_up_light",
+      "tag": "",
+      "danno_attacco": 20,
+      "recupero_s": 1.4,
+      "postura_massimo": 160,
+      "raggio_attacco": 32,
+      "raggio_arco": 30
+    },
+    "capitano_senza_riposo": {
+      "name_i18n": "enemy.capitano_senza_riposo",
+      "rarita": "elite",
+      "comportamento": "mischia",
+      "aspetto": "capitano_senza_riposo",
+      "telegraph": "wind_up_light",
+      "tag": "non_morto",
+      "danno_attacco": 15,
+      "raggio_aggro": 200,
+      "postura_massimo": 130
+    },
+    "lupo_della_luna": {
+      "name_i18n": "enemy.lupo_della_luna",
+      "rarita": "comune",
+      "comportamento": "mischia",
+      "aspetto": "lupo_della_luna",
+      "telegraph": "wind_up_heavy",
+      "tag": "bestia",
+      "danno_attacco": 9,
+      "recupero_s": 0.5,
+      "raggio_aggro": 170
+    },
+    "germoglio_spinoso": {
+      "name_i18n": "enemy.germoglio_spinoso",
+      "rarita": "comune",
+      "comportamento": "distanza",
+      "palette": "mother",
+      "aspetto": "germoglio_spinoso",
+      "telegraph": "wind_up_heavy",
+      "tag": "crescita",
+      "danno_attacco": 6,
+      "raggio_aggro": 150
+    },
+    "guardiana_delle_radici": {
+      "name_i18n": "enemy.guardiana_delle_radici",
+      "rarita": "raro",
+      "comportamento": "distanza",
+      "palette": "mother",
+      "aspetto": "guardiana_delle_radici",
+      "telegraph": "wind_up_light",
+      "tag": "crescita",
+      "danno_attacco": 8
+    },
+    "sciame_di_spore": {
+      "name_i18n": "enemy.sciame_di_spore",
+      "rarita": "comune",
+      "comportamento": "volo",
+      "aspetto": "sciame_di_spore",
+      "telegraph": "wind_up_heavy",
+      "tag": "decadimento",
+      "danno_attacco": 5,
+      "postura_massimo": 30
+    },
+    "cervo_corna_rosse": {
+      "name_i18n": "enemy.cervo_corna_rosse",
+      "rarita": "comune",
+      "comportamento": "carica",
+      "aspetto": "cervo_corna_rosse",
+      "telegraph": "wind_up_heavy",
+      "tag": "bestia",
+      "danno_attacco": 13,
+      "recupero_s": 1.0
+    },
+    "madre_dei_lupi": {
+      "name_i18n": "enemy.madre_dei_lupi",
+      "rarita": "elite",
+      "comportamento": "mischia",
+      "aspetto": "madre_dei_lupi",
+      "telegraph": "wind_up_light",
+      "tag": "bestia",
+      "danno_attacco": 15,
+      "raggio_aggro": 200,
+      "postura_massimo": 120
+    },
+    "scrivano_di_carta": {
+      "name_i18n": "enemy.scrivano_di_carta",
+      "rarita": "comune",
+      "comportamento": "distanza",
+      "palette": "hermit",
+      "aspetto": "scrivano_di_carta",
+      "telegraph": "wind_up_heavy",
+      "tag": "spirito",
+      "danno_attacco": 8,
+      "raggio_aggro": 170
+    },
+    "automa_custode": {
+      "name_i18n": "enemy.automa_custode",
+      "rarita": "comune",
+      "comportamento": "mischia",
+      "aspetto": "automa_custode",
+      "telegraph": "wind_up_heavy",
+      "tag": "",
+      "danno_attacco": 12,
+      "postura_massimo": 100,
+      "recupero_s": 0.9
+    },
+    "lettore_proibito": {
+      "name_i18n": "enemy.lettore_proibito",
+      "rarita": "raro",
+      "comportamento": "distanza",
+      "palette": "door",
+      "aspetto": "lettore_proibito",
+      "telegraph": "wind_up_light",
+      "tag": "spirito",
+      "danno_attacco": 12
+    },
+    "glifo_vivente": {
+      "name_i18n": "enemy.glifo_vivente",
+      "rarita": "comune",
+      "comportamento": "mischia",
+      "aspetto": "glifo_vivente",
+      "telegraph": "wind_up_heavy",
+      "tag": "spirito",
+      "danno_attacco": 16,
+      "recupero_s": 1.5,
+      "raggio_aggro": 90
+    },
+    "bibliotecario_muto": {
+      "name_i18n": "enemy.bibliotecario_muto",
+      "rarita": "raro",
+      "comportamento": "mischia",
+      "aspetto": "bibliotecario_muto",
+      "telegraph": "wind_up_light",
+      "tag": "spirito",
+      "danno_attacco": 9
+    },
+    "custode_del_sapere": {
+      "name_i18n": "enemy.custode_del_sapere",
+      "rarita": "elite",
+      "comportamento": "mischia",
+      "aspetto": "custode_del_sapere",
+      "telegraph": "wind_up_light",
+      "tag": "spirito",
+      "danno_attacco": 15,
+      "raggio_aggro": 200,
+      "postura_massimo": 120
+    },
+    "maschera_senza_volto": {
+      "name_i18n": "enemy.maschera_senza_volto",
+      "rarita": "comune",
+      "comportamento": "mischia",
+      "aspetto": "maschera_senza_volto",
+      "telegraph": "wind_up_heavy",
+      "tag": "ombra",
+      "danno_attacco": 11,
+      "raggio_aggro": 90
+    },
+    "viandante_delle_porte": {
+      "name_i18n": "enemy.viandante_delle_porte",
+      "rarita": "raro",
+      "comportamento": "mischia",
+      "aspetto": "viandante_delle_porte",
+      "telegraph": "wind_up_light",
+      "tag": "ombra",
+      "danno_attacco": 12
+    },
+    "marionetta_del_teatro": {
+      "name_i18n": "enemy.marionetta_del_teatro",
+      "rarita": "comune",
+      "comportamento": "mischia",
+      "aspetto": "marionetta_del_teatro",
+      "telegraph": "wind_up_heavy",
+      "tag": "",
+      "danno_attacco": 9,
+      "postura_massimo": 200
+    },
+    "ladro_di_tempo": {
+      "name_i18n": "enemy.ladro_di_tempo",
+      "rarita": "raro",
+      "comportamento": "distanza",
+      "palette": "fool",
+      "aspetto": "ladro_di_tempo",
+      "telegraph": "wind_up_light",
+      "tag": "spirito",
+      "danno_attacco": 7
+    },
+    "il_doppio": {
+      "name_i18n": "enemy.il_doppio",
+      "rarita": "raro",
+      "comportamento": "mischia",
+      "aspetto": "il_doppio",
+      "telegraph": "wind_up_light",
+      "tag": "ombra",
+      "danno_attacco": 14,
+      "raggio_aggro": 180
+    },
+    "burattinaio": {
+      "name_i18n": "enemy.burattinaio",
+      "rarita": "elite",
+      "comportamento": "distanza",
+      "palette": "fool",
+      "aspetto": "burattinaio",
+      "telegraph": "wind_up_light",
+      "tag": "ombra",
+      "danno_attacco": 15,
+      "raggio_aggro": 200,
+      "postura_massimo": 120
+    },
+    "ratto_delle_fogne": {
+      "name_i18n": "enemy.ratto_delle_fogne",
+      "rarita": "comune",
+      "comportamento": "mischia",
+      "aspetto": "ratto_delle_fogne",
+      "telegraph": "wind_up_heavy",
+      "tag": "bestia",
+      "danno_attacco": 5,
+      "recupero_s": 0.4,
+      "postura_massimo": 30
+    },
+    "melma": {
+      "name_i18n": "enemy.melma",
+      "rarita": "comune",
+      "comportamento": "mischia",
+      "aspetto": "melma",
+      "telegraph": "wind_up_heavy",
+      "tag": "",
+      "danno_attacco": 7,
+      "recupero_s": 0.9,
+      "postura_massimo": 50
+    },
+    "scheletro_catacombe": {
+      "name_i18n": "enemy.scheletro_catacombe",
+      "rarita": "comune",
+      "comportamento": "mischia",
+      "aspetto": "scheletro_catacombe",
+      "telegraph": "wind_up_heavy",
+      "tag": "non_morto",
+      "danno_attacco": 9
+    },
+    "pipistrello_cieco": {
+      "name_i18n": "enemy.pipistrello_cieco",
+      "rarita": "comune",
+      "comportamento": "volo",
+      "aspetto": "pipistrello_cieco",
+      "telegraph": "wind_up_heavy",
+      "tag": "bestia",
+      "danno_attacco": 5,
+      "raggio_aggro": 80
+    },
+    "custode_della_cripta": {
+      "name_i18n": "enemy.custode_della_cripta",
+      "rarita": "raro",
+      "comportamento": "mischia",
+      "aspetto": "custode_della_cripta",
+      "telegraph": "wind_up_light",
+      "tag": "non_morto",
+      "danno_attacco": 17,
+      "postura_massimo": 160,
+      "recupero_s": 1.2
+    },
+    "granchio_corazzato": {
+      "name_i18n": "enemy.granchio_corazzato",
+      "rarita": "comune",
+      "comportamento": "mischia",
+      "aspetto": "granchio_corazzato",
+      "telegraph": "wind_up_heavy",
+      "tag": "bestia",
+      "danno_attacco": 10,
+      "postura_massimo": 140
+    },
+    "pirata_naufrago": {
+      "name_i18n": "enemy.pirata_naufrago",
+      "rarita": "comune",
+      "comportamento": "mischia",
+      "aspetto": "pirata_naufrago",
+      "telegraph": "wind_up_heavy",
+      "tag": "",
+      "danno_attacco": 11
+    },
+    "gabbiano_ladro": {
+      "name_i18n": "enemy.gabbiano_ladro",
+      "rarita": "comune",
+      "comportamento": "volo",
+      "aspetto": "gabbiano_ladro",
+      "telegraph": "wind_up_heavy",
+      "tag": "bestia",
+      "danno_attacco": 4
+    },
+    "voce_dell_acqua": {
+      "name_i18n": "enemy.voce_dell_acqua",
+      "rarita": "raro",
+      "comportamento": "distanza",
+      "palette": "moon",
+      "aspetto": "voce_dell_acqua",
+      "telegraph": "wind_up_light",
+      "tag": "spirito",
+      "danno_attacco": 9,
+      "raggio_aggro": 200
+    },
+    "barca_fantasma": {
+      "name_i18n": "enemy.barca_fantasma",
+      "rarita": "raro",
+      "comportamento": "distanza",
+      "palette": "death",
+      "aspetto": "barca_fantasma",
+      "telegraph": "wind_up_light",
+      "tag": "",
+      "danno_attacco": 16,
+      "raggio_aggro": 220,
+      "postura_massimo": 200
+    },
+    "coccodrillo_rapper": {
+      "name_i18n": "enemy.coccodrillo_rapper",
+      "rarita": "elite",
+      "comportamento": "distanza",
+      "palette": "twilight_giant",
+      "aspetto": "coccodrillo_rapper",
+      "telegraph": "wind_up_light",
+      "tag": "bestia",
+      "danno_attacco": 12,
+      "raggio_aggro": 200
+    },
+    "brigante": {
+      "name_i18n": "enemy.brigante",
+      "rarita": "comune",
+      "comportamento": "mischia",
+      "aspetto": "nemico_base",
+      "telegraph": "wind_up_heavy",
+      "tag": "",
+      "danno_attacco": 9
+    }
+  },
   "nemico_base": {
     "_comment": "Nemico da banco di prova. La DURATA della fase di anticipo la fissa il tell in data/audio.json.telegraph[telegraph].anticipo_ms (US-020): l'animazione 'anticipo' e' solo cosmetica. Qui raggi, danno, recupero e quale tell usa. PLAUSIBILI, non bilanciati. 'tag' (US-806) e' vuoto di default: un nemico dei layout lo sovrascrive per-istanza via override.tag e finisce in enemy_defeated.tag_nemico. 'drop_probabilita' (US-809a): probabilita' di lasciare un item da override.oggetti_a_morte alla morte (enemy.gd::_lascia_oggetto); un boss la sovrascrive a 1.0 per-istanza via override.",
+    "palette": "",
+    "carica": {"_comment": "US-1503: il comportamento 'carica': dentro 'da' unita' fa il tell e poi scatta in linea verso dove stava il giocatore a 'velocita' per al massimo 'durata_s'; si ferma contro un muro o addosso al giocatore; dopo resta scoperto 'recupero_s' (si punisce).", "da": 110, "velocita": 340, "durata_s": 0.6, "recupero_s": 1.4},
+    "volo": {"_comment": "US-1503: il comportamento 'volo': passa sopra i dislivelli ma non sopra l'acqua profonda (maschera delle collisioni: solo lo strato 1), la figura sta 'quota' unita' piu' in alto e ondeggia.", "maschera": 1, "quota": 8, "ondeggio": 1.5},
+    "distanza": {"_comment": "US-1502: il comportamento 'distanza' (tipi con comportamento distanza): si tiene a 'tiene' unita' dal giocatore, tira da 'tiro' in giu' un proiettile (danno = danno_attacco) dopo il suo tell; se resta troppo vicino per 'ritirata_s' secondi tira lo stesso.", "tiene": 80, "tiro": 170, "ritirata_s": 1.2, "velocita_proiettile": 170, "gittata": 240, "tag_danno": "fisico"},
     "telegraph": "wind_up_light",
     "raggio_aggro": 140,
     "raggio_attacco": 26,

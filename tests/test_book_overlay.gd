@@ -59,10 +59,32 @@ func test_navigazione_cambia_pagina() -> void:
 func test_pagina_bianca_mostra_l_appunto() -> void:
 	var ov: CanvasLayer = _monta()
 	_book().call("apri")
-	_book().call("vai_a", "journal")   # sbloccata_da fase 6, oggi bianca
+	# US-1303b: oggi nessuna pagina e' bianca; la regola resta e si prova chiudendo il Diario a una fase lontana
+	var pagina: Dictionary = _book().call("pagina", "journal")
+	pagina["sbloccata_da"] = {"fase": 99}
+	_book().call("vai_a", "journal")
 	_completa_voltata(ov)
 	assert_true(ov.call("corpo").to_lower().contains("appunto a matita"),
 		"una pagina non ancora sbloccata mostra l'appunto a matita, non e' assente")
+	pagina.erase("sbloccata_da")
+	_book().call("chiudi")
+	ov.free()
+
+
+func test_il_diario_apre_le_quest() -> void:
+	var qs: Node = Engine.get_main_loop().root.get_node("QuestSystem")
+	qs.call("pulisci")
+	qs.call("avvia", "q_sidon_01")
+	var ov: CanvasLayer = _monta()
+	_book().call("apri")
+	_book().call("vai_a", "journal")
+	_completa_voltata(ov)
+	var nome: String = str(Engine.get_main_loop().root.get_node("GameData").call("tr_data", "quest.q_sidon_01.name"))
+	var trovato := false
+	for l in ov.find_children("*", "Label", true, false):
+		trovato = trovato or (l as Label).text.contains(nome)
+	assert_true(trovato, "il segnalibro del Diario porta alle quest in corso, non a una pagina bianca")
+	qs.call("pulisci")
 	_book().call("chiudi")
 	ov.free()
 

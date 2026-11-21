@@ -4,23 +4,24 @@ extends TileMapLayer
 ## quella complessita' e' solo per il mondo esterno continuo, US-1002). Un
 ## interno e' sempre indipendente, mai parte della griglia condivisa:
 ## entrarci e uscirne resta un caricamento di scena locale
-## (world_scene.gd::_su_porta_edificio/_su_uscita_edificio), esattamente
-## come funzionavano i passaggi fra regioni PRIMA di US-1002. world_scene.gd
+## (mondo.gd::entra/esci), esattamente
+## come funzionavano i passaggi fra regioni PRIMA di US-1002. il vecchio world_scene.gd (tolto il 2026-11-18)
 ## non viene MAI liberato mentre si e' dentro (resta lo stesso nodo
 ## persistente di US-1002B): si nasconde e ferma, poi torna.
 ##
 ## Painting/nemici/oggetti riusano lo stesso linguaggio dati di
-## world_scene.gd (stessa legenda di caratteri, stesso formato nemici/
+## il vecchio world_scene.gd (tolto il 2026-11-18) (stessa legenda di caratteri, stesso formato nemici/
 ## oggetti) ma sono una copia minima apposta: un interno non ha bisogno di
 ## _crea_zone/_crea_gate/_crea_npc/_crea_confine/_riempi_campagna (nessuna
 ## di quelle nozioni si applica a una stanza), quindi non vale la pena
-## condividere codice con world_scene.gd oltre alla legenda.
+## condividere codice con il vecchio world_scene.gd (tolto il 2026-11-18) oltre alla legenda.
 ##
 ## NIENTE class_name: coerente col resto del progetto.
 
 signal uscita
 
 const TILE := 32
+const Boss := preload("res://scripts/boss.gd")
 const SORGENTE := 0
 const _COLONNA_PER_CARATTERE := {
 	".": 0, "#": 1, "o": 2, "~": 3, ",": 4, "=": 5, "t": 6, "+": 7,
@@ -28,7 +29,7 @@ const _COLONNA_PER_CARATTERE := {
 const _COLONNA_PAVIMENTO := 0
 const CALPESTABILI := [".", ",", "=", "+"]
 
-## Impostato da chi istanzia questa scena (world_scene.gd) PRIMA di
+## Impostato da chi istanzia questa scena (mondo.gd) PRIMA di
 ## aggiungerla all'albero, cosi' _ready() lo trova gia' pronto.
 var interno_id: String = ""
 ## US-8B21b: il contenuto della zona del layout dietro un varco (mondo.gd ospiti_del_varco),
@@ -36,7 +37,7 @@ var interno_id: String = ""
 var ospiti: Dictionary = {}
 
 ## US-1108 (fase 11): l'npc_id vicino al giocatore ("" = nessuno) - stesso
-## principio di world_scene.gd::_npc_vicino, per _unhandled_input.
+## principio di mondo.gd::_npc_vicino, per _unhandled_input.
 var _npc_vicino: String = ""
 
 
@@ -366,7 +367,7 @@ func _crea_uscita(layout: Dictionary) -> void:
 	# Il player appare GIA' su questa cella entrando (e' anche lo spawn):
 	# il primo body_entered che l'Area2D vede, appena aggiunta all'albero,
 	# e' quel corpo gia' presente - non un vero ritorno alla porta. Stesso
-	# problema (e stessa soluzione) della porta esterna, world_scene.gd::
+	# problema (e stessa soluzione) della porta esterna, il vecchio world_scene.gd (tolto il 2026-11-18)::
 	# _su_porta_edificio/ignora_prossimo_ingresso.
 	area.set_meta("ignora_primo_ingresso", true)
 	area.body_entered.connect(_su_ingresso_uscita.bind(area))
@@ -385,18 +386,22 @@ func _su_ingresso_uscita(body: Node, area: Area2D) -> void:
 func _crea_nemici(layout: Dictionary) -> void:
 	for n in (layout.get("nemici", []) as Array):
 		var spec: Dictionary = n as Dictionary
+		if Boss.vinto(spec):                              # US-1505: un boss battuto non torna
+			continue
 		var sequenza: int = int(spec.get("sequenza", 9))
 		var e: Node = preload("res://scenes/enemy.tscn").instantiate()
 		var ov: Dictionary = (spec.get("override", {}) as Dictionary).duplicate(true)
 		if not ov.has("attesa_iniziale_s"):           # US-8B21d: chi entra ha un attimo per guardarsi attorno
 			ov["attesa_iniziale_s"] = _balance_interni("interni_attesa_nemici_s", 0.0)
 		e.set("override", ov)
+		e.set("tipo", str(spec.get("tipo", "")))          # US-1501
 		e.set("scale", Vector2.ONE * float(spec.get("scala", 1.0)))
 		add_child(e)
 		e.set("global_position", to_global(map_to_local(
 			Vector2i(int(spec.get("x", 0)), int(spec.get("y", 0))))))
 		e.set("sequenza", sequenza)
 		e.get_node("StatsComponent").call("configure_from_balance", sequenza)
+		Boss.monta(e, spec)
 
 
 ## Gli oggetti a terra dei dati; uno preso non ricompare (WorldState.presi, chiave "<interno>@<i>", per gli ospiti del
@@ -427,7 +432,7 @@ func _crea_oggetti(layout: Dictionary, gruppo: String = "") -> void:
 
 # --- NPC (US-1108, fase 11) -------------------------------------------
 ## Un fabbro/alchimista dentro la sua bottega. Stessa forma minima di
-## world_scene.gd::_crea_un_npc MA senza schedule/orario: un NPC dentro una
+## mondo.gd::crea_npc MA senza schedule/orario: un NPC dentro una
 ## stanza e' sempre li', non gira fra location_tag per momento del giorno -
 ## duplicata apposta, non condivisa (stessa scelta gia' fatta per
 ## _crea_nemici/_crea_oggetti, vedi il commento di testa del file).
@@ -457,6 +462,9 @@ func _crea_un_npc(id: String, gd: Node, posizione: Vector2) -> void:
 
 	var npc_dati: Dictionary = gd.call("get_npc", id)
 	var aspetto: Dictionary = npc_dati.get("aspetto", {})
+	if aspetto.has("sprite"):                           # US-8B60b: l'aspetto risolto (la Soglia cambia col Pathway)
+		aspetto = aspetto.duplicate()
+		aspetto["sprite"] = str(gd.call("aspetto_npc", id))
 	var foglio: String = "res://assets/placeholder/personaggio_%s_idle.png" % str(aspetto.get("sprite", ""))
 	if aspetto.has("sprite") and FileAccess.file_exists(foglio):
 		# l'aspetto sprite-forge dell'NPC (tools/art/build_npc.py), come nel mondo generato

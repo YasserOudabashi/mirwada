@@ -1,0 +1,1218 @@
+<title>Officina di Mirwada</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Officina: la pergamena del libro di Mirwada in chiaro, l'inchiostro #181425 di Endesga 32 in scuro.
+   Barra in alto con le schede; il dettaglio di ogni cosa si apre grande al centro e si sfoglia con le frecce. */
+:root {
+  --bg: #eef0f4; --pannello: #ffffff; --fondo2: #e3e7ef; --linea: #c0cbdc; --testo: #262b44; --tenue: #5a6988;
+  --accento: #be4a2f; --ok: #3e8948; --no: #e43b44; --attesa: #c26a12; --scacco1: #dfe4ec; --scacco2: #c9d1de; --velo: rgba(24,20,37,.6);
+  --f-titolo: "Alegreya SC", Georgia, serif; --f-testo: "Inter", system-ui, sans-serif; --f-dati: "JetBrains Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #181425; --pannello: #262b44; --fondo2: #1f1d33; --linea: #3a4466; --testo: #e3e7ef; --tenue: #8b9bb4;
+  --accento: #feae34; --ok: #63c74d; --no: #f6757a; --attesa: #feae34; --scacco1: #2c3150; --scacco2: #232741; --velo: rgba(10,8,18,.75); color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #181425; --pannello: #262b44; --fondo2: #1f1d33; --linea: #3a4466; --testo: #e3e7ef; --tenue: #8b9bb4;
+  --accento: #feae34; --ok: #63c74d; --no: #f6757a; --attesa: #feae34; --scacco1: #2c3150; --scacco2: #232741; --velo: rgba(10,8,18,.75); color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--testo); font: 14px/1.45 var(--f-testo); margin: 0 }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--pannello) }
+.gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+header.alto { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--pannello); border-bottom: 1px solid var(--linea) }
+.testata { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-block: 10px 4px }
+.testata h1 { font: 700 22px/1.1 var(--f-titolo); margin: 0; letter-spacing: .02em }
+.testata .meta { color: var(--tenue); font: 12px var(--f-dati) }
+nav { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; padding-block: 4px 0 }
+nav a { color: var(--tenue); text-decoration: none; padding: 6px 10px 8px; border-bottom: 2px solid transparent; white-space: nowrap; font-weight: 500 }
+nav a:hover { color: var(--testo) }
+nav a[aria-current="page"] { color: var(--testo); border-color: var(--accento) }
+main { padding-block: 16px 64px; max-width: 1400px; margin: 0 auto }
+h2 { font: 700 20px var(--f-titolo); margin: 0 0 4px; text-wrap: balance }
+h3 { font: 600 12px var(--f-testo); text-transform: uppercase; letter-spacing: .07em; color: var(--tenue); margin: 18px 0 8px }
+p.intro { color: var(--tenue); margin: 0 0 14px; max-width: 75ch }
+.sezione { display: flex; flex-direction: column; gap: 8px }
+.scorri { max-height: 68vh; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--linea); border-radius: 6px; padding: 10px; background: var(--fondo2) }
+.scorri.basso { max-height: 42vh }
+.griglia { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px }
+.griglia.larga { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) }
+.scheda { background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px; padding: 8px; display: flex; flex-direction: column; gap: 6px; min-width: 0; cursor: pointer; position: relative }
+.scheda:hover { border-color: var(--tenue) }
+.scheda.st-ok { box-shadow: inset 3px 0 0 var(--ok) } .scheda.st-no { box-shadow: inset 3px 0 0 var(--no) }
+:focus-visible { outline: 2px solid var(--accento); outline-offset: 2px }
+.nome { font-weight: 600; overflow-wrap: anywhere }
+.sotto { color: var(--tenue); font-size: 12px }
+.vetrina { background-color: var(--scacco1); background-image: conic-gradient(var(--scacco2) 25%, transparent 0 50%, var(--scacco2) 0 75%, transparent 0); background-size: 16px 16px; border-radius: 4px; display: grid; place-items: center; min-height: 128px; overflow: hidden }
+.vetrina.chiaro { --scacco1: #f4f4f4; --scacco2: #dcdcdc } .vetrina.scuro { --scacco1: #181425; --scacco2: #262b44 } .vetrina.erba { --scacco1: #3e8948; --scacco2: #3a8244 }
+canvas.px, img.px { image-rendering: pixelated; image-rendering: crisp-edges; display: block; max-width: none }
+img.foto { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 4px; background: var(--fondo2); display: block }
+.chips { display: flex; flex-wrap: wrap; gap: 4px }
+.chip { font-size: 11px; padding: 1px 6px; border-radius: 999px; background: var(--fondo2); color: var(--tenue); border: 1px solid var(--linea) }
+.chip.ok { color: var(--ok); border-color: var(--ok) } .chip.no { color: var(--no); border-color: var(--no) } .chip.att { color: var(--attesa); border-color: var(--attesa) }
+.giudizio { display: flex; gap: 4px }
+.giudizio button { flex: 1; white-space: nowrap; border: 1px solid var(--linea); background: var(--fondo2); color: var(--testo); border-radius: 4px; padding: 4px 0; cursor: pointer; font: 600 12px var(--f-testo) }
+.giudizio button[aria-pressed="true"].si { background: var(--ok); border-color: var(--ok); color: #fff }
+.giudizio button[aria-pressed="true"].no { background: var(--no); border-color: var(--no); color: #fff }
+.giudizio button:disabled { opacity: .45; cursor: default }
+.nota-card { font-size: 12px; color: var(--no); overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden }
+.nota-card:empty { display: none }
+.filtri { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px }
+.filtri input[type=search], .filtri select { font: inherit; padding: 5px 8px; border: 1px solid var(--linea); border-radius: 4px; background: var(--pannello); color: var(--testo); min-width: 0 }
+.filtri input[type=search] { flex: 1 1 220px }
+.conta { color: var(--tenue); font: 12px var(--f-dati); white-space: nowrap }
+.seg { display: inline-flex; border: 1px solid var(--linea); border-radius: 4px; overflow: hidden; flex-wrap: wrap }
+.seg button { border: 0; background: var(--pannello); color: var(--tenue); padding: 5px 9px; cursor: pointer; font: 500 12px var(--f-testo) }
+.seg button[aria-pressed="true"] { background: var(--testo); color: var(--pannello) }
+.btn { font: 500 12px var(--f-testo); padding: 5px 10px; border: 1px solid var(--linea); border-radius: 4px; background: var(--fondo2); color: var(--testo); cursor: pointer }
+.btn:hover { border-color: var(--tenue) }
+.numeri { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 8px }
+.numero { background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px; padding: 10px 12px }
+.numero b { display: block; font: 600 24px var(--f-dati); font-variant-numeric: tabular-nums }
+.numero span { color: var(--tenue); font-size: 12px }
+.lista { background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px }
+.lista > div { padding: 8px 12px; border-top: 1px solid var(--linea); display: flex; gap: 10px; align-items: baseline; min-width: 0 }
+.lista > div:first-child { border-top: 0 }
+.lista > div.cliccabile { cursor: pointer } .lista > div.cliccabile:hover { background: var(--fondo2) }
+.lista .id { font: 600 12px var(--f-dati); color: var(--accento); white-space: nowrap }
+.lista .tx { min-width: 0; overflow-wrap: anywhere; flex: 1 }
+.lista .dx { color: var(--tenue); font: 12px var(--f-dati); white-space: nowrap }
+.due { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px }
+@media (max-width: 860px) { .due { grid-template-columns: 1fr } }
+.barra { height: 8px; background: var(--fondo2); border-radius: 4px; overflow: hidden } .barra i { display: block; height: 100%; background: var(--accento) }
+.grafico { background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px; padding: 10px; overflow-x: auto }
+.grafico svg { display: block; width: 100%; height: auto; min-width: 420px }
+.grafico text { fill: var(--tenue); font: 10px var(--f-dati) }
+.mappa-wrap { position: relative; overflow: auto; background: #124e89; border: 1px solid var(--linea); border-radius: 6px; max-height: 72vh }
+.mappa-wrap .tela { position: relative; transform-origin: 0 0 }
+.mappa-wrap img { display: block; image-rendering: pixelated; max-width: none }
+.segno { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; border: 2px solid #181425; cursor: pointer; padding: 0 }
+.segno.luogo { background: #fee761 } .segno.villaggio { background: #feae34; border-radius: 2px } .segno.ingresso { background: #8b9bb4; width: 9px; height: 9px; margin: -4px 0 0 -4px }
+.segno.bosssotto { background: #e43b44 } .segno.partenza { background: #fff; width: 14px; height: 14px; margin: -7px 0 0 -7px }
+.segno.ok { box-shadow: 0 0 0 2px #63c74d } .segno.no { box-shadow: 0 0 0 2px #e43b44 }
+.riquadro { position: absolute; border: 1px dashed rgba(255,255,255,.55); pointer-events: none; font: 11px var(--f-dati); color: #fff; text-shadow: 0 1px 2px #000; padding: 2px 4px }
+.legenda { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 12px; color: var(--tenue) }
+.legenda label { display: inline-flex; gap: 4px; align-items: center; cursor: pointer }
+.pw { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px }
+.pw button { border: 1px solid var(--linea); background: var(--pannello); color: var(--testo); border-radius: 999px; padding: 4px 10px; cursor: pointer; font: 500 12px var(--f-testo); display: inline-flex; gap: 6px; align-items: center }
+.pw button[aria-pressed="true"] { border-color: var(--testo); background: var(--testo); color: var(--pannello) }
+.pallino { width: 10px; height: 10px; border-radius: 50%; display: inline-block; border: 1px solid #181425 }
+.seq { background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px; padding: 12px; display: flex; flex-direction: column; gap: 8px }
+.seq .testa { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap }
+.seq .num { font: 700 18px var(--f-dati); color: var(--accento) }
+.seq .titolo { font: 700 17px var(--f-titolo) }
+.glifi { display: flex; gap: 4px; flex-wrap: wrap }
+/* la finestra di dettaglio, al centro */
+.modale { position: fixed; z-index: 20; inset: 0; background: var(--velo); display: grid; place-items: center; padding: calc(12px + env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)) }
+.modale[hidden] { display: none !important }
+.finestra { background: var(--pannello); border: 1px solid var(--linea); border-radius: 8px; width: min(1240px, 100%); height: min(94vh, 100%); display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden }
+.barra-alta { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--linea); min-width: 0 }
+.barra-alta h2 { margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.corpo { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); min-height: 0 }
+.corpo > div { overflow-y: auto; padding: 14px; min-width: 0 }
+.corpo .info { border-left: 1px solid var(--linea); display: flex; flex-direction: column; gap: 12px }
+@media (max-width: 820px) { .corpo { grid-template-columns: 1fr; overflow-y: auto } .corpo > div { overflow: visible } .corpo .info { border-left: 0; border-top: 1px solid var(--linea) } }
+.info textarea { font: inherit; width: 100%; min-height: 84px; padding: 8px; border: 1px solid var(--linea); border-radius: 4px; background: var(--fondo2); color: var(--testo); resize: vertical }
+.salvato { font: 11px var(--f-dati); color: var(--tenue); min-height: 14px }
+.blocco h4 { margin: 0 0 4px; font: 600 12px var(--f-testo); text-transform: uppercase; letter-spacing: .06em; color: var(--tenue) }
+.blocco ul { margin: 0; padding-left: 18px } .blocco li { margin: 2px 0; overflow-wrap: anywhere }
+.dati table { border-collapse: collapse; width: 100%; font-size: 13px }
+.dati td { border-top: 1px solid var(--linea); padding: 5px 4px; vertical-align: top; overflow-wrap: anywhere }
+.dati td:first-child { color: var(--tenue); width: 40% }
+.visore { overflow: auto; background: var(--fondo2); border-radius: 6px; max-height: 70vh; display: grid; place-items: center }
+.visore img { image-rendering: pixelated; max-width: none; cursor: zoom-in }
+.visore.adatta img { max-width: 100%; max-height: 68vh }
+.controlli { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0 }
+.controlli label { font-size: 12px; color: var(--tenue); display: inline-flex; gap: 6px; align-items: center }
+.controlli input[type=range] { width: 140px }
+.mini { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px }
+.mini button { border: 1px solid var(--linea); background: var(--fondo2); border-radius: 4px; padding: 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--testo); font: 11px var(--f-testo) }
+.mini button[aria-pressed="true"] { border-color: var(--accento); box-shadow: 0 0 0 1px var(--accento) }
+.cartella { border: 1px solid var(--linea, #ccc); border-radius: 8px; padding: 6px 10px; margin: 8px 0 } .cartella > summary { cursor: pointer; font-size: 1.05em }
+.sottocartella { margin: 6px 0 6px 14px } .sottocartella > summary { cursor: pointer; font-weight: 600 }
+.chip.domanda { background: #feae34; color: #181425 } .chip.risposta { background: #0099db; color: #fff }
+.fotogrammi { display: grid; gap: 6px } .fg-riga { display: flex; gap: 6px; align-items: flex-end } .fg-dir { width: 64px; font-size: 12px; flex: none }
+.fotogrammi figure { margin: 0; text-align: center; background: var(--sfondo2, #c8d0ba); border-radius: 4px; padding: 2px } .fotogrammi figcaption { font-size: 11px } .msg { border-left: 3px solid #feae34; padding: 4px 8px; margin: 6px 0 } .msg.spiegazione { border-color: #0099db }
+.storia { margin-top: 10px; border-top: 1px solid var(--bordo, #ccc); padding-top: 6px } .storia ul { margin: 4px 0 0; padding-left: 18px }
+.campo { display: block; width: 100%; border-radius: 6px; image-rendering: pixelated; background: #3e8948; outline: none; cursor: pointer }
+.campo:focus { box-shadow: 0 0 0 3px var(--accento) }
+.arena-box.grande { position: fixed; inset: 0; z-index: 50; background: #181425; padding: 12px; overflow: auto; display: flex; flex-direction: column; gap: 8px }
+.arena-box.grande .campo, .arena-box:fullscreen .campo { width: auto; height: calc(100vh - 140px); max-width: 100%; margin: 0 auto; aspect-ratio: 9 / 5 }
+.arena-box:fullscreen { background: #181425; padding: 12px; overflow: auto }
+.tasti { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: var(--tenue) }
+.tasti kbd { font: 600 11px var(--f-dati); border: 1px solid var(--linea); border-bottom-width: 2px; border-radius: 3px; padding: 0 4px; background: var(--fondo2); color: var(--testo) }
+.sfoglia { display: grid; gap: 8px; margin: 0 auto }
+.sfoglia .pagina { background: var(--fondo2); border-radius: 6px; overflow: hidden; cursor: zoom-in }
+.sfoglia .pagina img { width: 100%; display: block }
+.striscia { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px }
+.striscia button { flex: 0 0 140px; border: 2px solid transparent; padding: 0; border-radius: 4px; cursor: pointer; background: none }
+.striscia button[aria-current="true"] { border-color: var(--accento) }
+.striscia img { width: 100%; display: block; border-radius: 2px }
+.tab-tbl { overflow-x: auto; background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px }
+.tab-tbl table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 520px }
+.tab-tbl th, .tab-tbl td { padding: 6px 10px; border-top: 1px solid var(--linea); text-align: left; vertical-align: top }
+.tab-tbl th { color: var(--tenue); font-weight: 600; font-size: 12px; border-top: 0 }
+.tab-tbl th.n { text-align: right }
+.tab-tbl td, .tab-tbl th { white-space: nowrap }
+.tab-tbl td.n { font-family: var(--f-dati); text-align: right; font-variant-numeric: tabular-nums }
+.chip.r-comune { color: #8b9bb4; border-color: #8b9bb4 } .chip.r-non_comune { color: #3e8948; border-color: #3e8948; background: rgba(99,199,77,.12) }
+.chip.r-raro { color: #0099db; border-color: #0099db; background: rgba(0,153,219,.12) } .chip.r-leggendario { color: #f77622; border-color: #f77622; background: rgba(254,174,52,.16); font-weight: 600 }
+.chip.r-elite { color: #b55088; border-color: #b55088; background: rgba(181,80,136,.14) }
+.chip.c-mischia { color: #e43b44; border-color: #e43b44 } .chip.c-distanza { color: #0099db; border-color: #0099db } .chip.c-carica { color: #f77622; border-color: #f77622 } .chip.c-volo { color: #2ce8f5; border-color: #2ce8f5 }
+.chip.inc { color: #fff; background: #b55088; border-color: #b55088; font-weight: 700; letter-spacing: .04em }
+.scheda.incompleta { border-style: dashed; opacity: .85 }
+.prim { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 10px; align-items: start; border-top: 1px solid var(--linea); padding-top: 8px }
+.prim .vetrina { min-height: 72px }
+.mappa-canvas { width: 100%; height: 72vh; display: block; border-radius: 6px; border: 1px solid var(--linea); background: #124e89; cursor: grab; touch-action: none }
+.mappa-canvas:active { cursor: grabbing }
+.sfoglia { max-width: 760px }
+.striscia button { flex: 0 0 96px }
+.avviso { background: var(--fondo2); border: 1px solid var(--linea); border-radius: 6px; padding: 10px 12px; color: var(--tenue) }
+.vuoto { color: var(--tenue); padding: 20px; text-align: center }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important } }
+</style>
+
+<header class="alto gutter">
+  <div class="testata"><h1>Officina di Mirwada</h1><span class="meta" id="meta">caricamento…</span></div>
+  <nav id="nav" aria-label="Sezioni"></nav>
+</header>
+<main class="gutter" id="main"><p class="vuoto">Carico i dati del progetto…</p></main>
+<div class="modale" id="modale" hidden><div class="finestra" role="dialog" aria-modal="true" aria-labelledby="mod-titolo">
+  <div class="barra-alta">
+    <button class="btn" type="button" id="mod-prima" title="Precedente (← o A)">◀</button>
+    <button class="btn" type="button" id="mod-dopo" title="Successivo (→ o D)">▶</button>
+    <h2 id="mod-titolo"></h2><span class="conta" id="mod-conta"></span>
+    <button class="btn" type="button" id="mod-chiudi" title="Chiudi (Esc)">Chiudi</button>
+  </div>
+  <div class="corpo"><div id="mod-media"></div><div class="info" id="mod-info"></div></div>
+</div></div>
+
+<script>
+"use strict";
+const SEZIONI = [["oggi", "Oggi"], ["provare", "Da testare"], ["note", "Note e testate"], ["avanzamento", "Avanzamento"], ["mondo", "Mondo"], ["paesi", "Paesi e case"], ["personaggi", "Personaggi"],
+  ["bestiario", "Bestiario"], ["tecniche", "Tecniche"], ["oggetti", "Oggetti"], ["libro", "Libro e HUD"], ["consumo", "Consumo"]];
+const DIREZ = ["giù", "su", "sinistra", "destra"];
+let D = null;
+const GIU = new Map();
+let CONSUMO = [], db = null, posso = false, dbStato = "attesa";
+
+// ---------- aiuti ----------
+function h(tag, att, ...figli) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(att || {})) {
+    if (v === null || v === undefined || v === false) continue;
+    if (k === "class") e.className = v; else if (k === "text") e.textContent = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? "" : v);
+  }
+  for (const f of figli.flat(Infinity)) if (f !== null && f !== undefined && f !== false) e.append(f instanceof Node ? f : document.createTextNode(String(f)));
+  return e;
+}
+const nf = new Intl.NumberFormat("it-IT");
+const euro = n => (n === null || n === undefined) ? "—" : "$" + Number(n).toLocaleString("it-IT", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const mil = n => (n / 1e6).toLocaleString("it-IT", {maximumFractionDigits: 2}) + " M";
+const bello = s => String(s ?? "").replace(/_/g, " ");
+const data = s => s ? new Date(s).toLocaleString("it-IT", {day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit"}) : "";
+const chip = (t, cls) => h("span", {class: "chip" + (cls ? " " + cls : ""), text: t});
+function segmento(voci, attiva, scegli) {
+  const s = h("div", {class: "seg"}, voci.map(([v, t]) => h("button", {type: "button", "aria-pressed": String(v === attiva), onclick: ev => {
+    for (const b of s.children) b.setAttribute("aria-pressed", String(b === ev.currentTarget)); scegli(v); }}, t)));
+  return s;
+}
+
+// ---------- immagini, animazioni ----------
+const IMMAGINI = new Map();
+const immagine = src => { if (!IMMAGINI.has(src)) IMMAGINI.set(src, new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; })); return IMMAGINI.get(src); };
+const ATTIVI = new Set();
+let ultimo = performance.now();
+(function ciclo(t) { const dt = Math.min(t - ultimo, 200); ultimo = t; for (const l of ATTIVI) l.passo(dt); requestAnimationFrame(ciclo); })(performance.now());
+const visibili = new IntersectionObserver(es => { for (const e of es) if (e.target._lett) e.isIntersecting ? ATTIVI.add(e.target._lett) : ATTIVI.delete(e.target._lett); });
+function guarda(el, lett) { el._lett = lett; visibili.observe(el); return el; }
+
+class Lettore {
+  constructor(fid, o = {}) {
+    this.f = D.figure[fid]; this.scala = o.scala || 2; this.dir = o.dir ?? 0; this.giro = o.giro ?? true; this.velocita = 1; this.pausa = false;
+    this.anim = 0; this.frame = 0; this.t = 0; this.giri = 0; this.alFinire = null;
+    const W = Math.max(...this.f.anims.map(a => a.w)), H = Math.max(...this.f.anims.map(a => a.h));
+    this.c = h("canvas", {class: "px", width: W, height: H}); this.c.style.width = W * this.scala + "px";
+    if (o.anim) this.scegli(o.anim);
+    immagine(this.f.file).then(i => { this.img = i; this.disegna(); });
+  }
+  get a() { return this.f.anims[this.anim]; }
+  scegli(nome, alFinire = null) { const i = typeof nome === "number" ? nome : this.f.anims.findIndex(a => a.nome === nome); if (i >= 0) { this.anim = i; this.frame = 0; this.t = 0; this.alFinire = alFinire; this.fermo = false; this.finePausa = false; this.disegna(); this.cambiato?.(); } }
+  ha(nome) { return this.f.anims.some(a => a.nome === nome); }
+  ingrandisci(s) { this.scala = s; this.c.style.width = this.c.width * s + "px"; }
+  avanza(n) { const a = this.a; this.frame = (this.frame + n + a.frames) % a.frames; this.t = 0; this.disegna(); this.cambiato?.(); }
+  passo(dt) {
+    if (!this.img || this.pausa) return;
+    this.t += dt * this.velocita;
+    const dur = this.a.durate[this.frame] || 120;
+    if (this.t < dur) return;
+    this.t -= dur; this.frame++;
+    if (this.frame >= this.a.frames) {
+      if (this.alFinire) { const f = this.alFinire; this.alFinire = null; this.frame = this.a.frames - 1; f(); return; }
+      if (this.fermo) { this.frame = this.a.frames - 1; return; }
+      if (!this.a.loop && !this.giro && !this.finePausa) { this.frame = this.a.frames - 1; this.t = -800; this.finePausa = true; return; }
+      this.finePausa = false;
+      this.frame = 0;
+      if (this.giro && (!this.a.loop || ++this.giri > 2)) { this.giri = 0; this.anim = (this.anim + 1) % this.f.anims.length; }
+    }
+    this.disegna(); this.cambiato?.();
+  }
+  disegna() {
+    if (!this.img) return;
+    const a = this.a, g = this.c.getContext("2d"); g.imageSmoothingEnabled = false; g.clearRect(0, 0, this.c.width, this.c.height);
+    g.drawImage(this.img, this.frame * a.w, a.y + (a.righe > 1 ? this.dir : 0) * a.h, a.w, a.h, (this.c.width - a.w) / 2, this.c.height - a.h, a.w, a.h);
+  }
+}
+function lettore(fid, o) { if (!D.figure[fid]) return h("div", {class: "sotto", text: "senza figura"}); const l = new Lettore(fid, o); return guarda(l.c, l); }
+
+function daAtlante(nome, id, scala = 1) {
+  const a = D.atlanti[nome]; const c = h("canvas", {class: "px", width: a ? a.w : 1, height: a ? a.h : 1});
+  if (!a || a.indice[id] === undefined) return c;
+  c.style.width = a.w * scala + "px";
+  immagine(a.file).then(i => { if (!i) return; const n = a.indice[id], g = c.getContext("2d"); g.imageSmoothingEnabled = false;
+    g.drawImage(i, (n % a.cols) * a.w, Math.floor(n / a.cols) * a.h, a.w, a.h, 0, 0, a.w, a.h); c.dispatchEvent(new Event("pronto")); });
+  return c;
+}
+const hex = s => { const n = parseInt(String(s || "#888888").slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+function rampa(p) { const ink = hex(p.inchiostro || "#181425"), pri = hex(p.primario || "#8b9bb4"), acc = hex(p.accento || "#ffffff");
+  return [ink, pri.map((v, i) => Math.round(v + (ink[i] - v) * .45)), pri, acc]; }
+function ricolora(g, w, hh, pal) { const r = rampa(pal), px = g.getImageData(0, 0, w, hh), d = px.data;
+  for (let i = 0; i < d.length; i += 4) { if (!d[i + 3]) continue; const l = d[i] / 255 * 3, k = l < .5 ? 0 : l < 1.5 ? 1 : l < 2.5 ? 2 : 3; d[i] = r[k][0]; d[i + 1] = r[k][1]; d[i + 2] = r[k][2]; }
+  g.putImageData(px, 0, 0); }
+function glifo(prim, pal, scala = 1) { const c = daAtlante("primitive", prim, scala); c.addEventListener("pronto", () => ricolora(c.getContext("2d"), c.width, c.height, pal)); c.title = bello(prim); return c; }
+function effetto(e, pal, scala = 2, ctrl = null) {
+  const c = h("canvas", {class: "px"}); let img = null, w = 0, hh = 0;
+  const l = {f: 0, t: 0, velocita: 1, passo(dt) { if (!img) return; this.t += dt * this.velocita; if (this.t > 90) { this.t = 0; this.f = (this.f + 1) % e.frames; dis(); } }};
+  function dis() { const g = c.getContext("2d"); g.imageSmoothingEnabled = false; g.clearRect(0, 0, w, hh); g.drawImage(img, l.f * w, 0, w, hh, 0, 0, w, hh); ricolora(g, w, hh, pal); }
+  immagine(e.file).then(i => { if (!i) return; img = i; w = i.width / e.frames; hh = i.height; c.width = w; c.height = hh; c.style.width = w * scala + "px"; dis(); });
+  if (ctrl) ctrl.l = l;
+  return guarda(c, l);
+}
+
+// ---------- giudizi ----------
+// Versioni (build.py versioni): un giudizio vale solo per la versione che hai visto. Se la cosa e' stata rifatta dopo,
+// torna "da testare" e la nota scende fra quelle gia' sistemate (storia); ne puoi scrivere una nuova.
+const VER = k => (D && D.versioni || {})[k];
+const attuale = (g, V) => !V || (g.versione ? g.versione === V.v : (g.quando || "") >= V.dal);
+const statoDi = k => { const g = GIU.get(k) || {}; return attuale(g, VER(k)) ? g.stato || null : null; };
+const notaDi = k => { const g = GIU.get(k) || {}; return attuale(g, VER(k)) ? g.nota || "" : ""; };
+const storiaDi = k => { const g = GIU.get(k) || {}, st = [...(g.storia || [])];
+  if (!attuale(g, VER(k)) && g.nota) st.push({nota: g.nota, quando: g.quando}); return st; };
+async function salva(k, campi) {
+  if (!db || !posso) return false;
+  let prima = GIU.get(k) || {}; const V = VER(k);
+  if (V && !attuale(prima, V)) prima = {storia: storiaDi(k)};          // versione nuova: si riparte, la nota scende
+  const nuovo = {...prima, ...campi, quando: new Date().toISOString(), ...(V ? {versione: V.v} : {})};
+  GIU.set(k, nuovo); aggiornaGiudizi();
+  try { await db.doc("giudizi/" + k).set(nuovo); return true; } catch (e) { GIU.set(k, prima); aggiornaGiudizi(); avviso("Non salvato: " + (e.code || "errore")); return false; }
+}
+function avviso(t) { document.getElementById("meta").textContent = t; }
+function bottoniGiudizio(k, perCarta = true) {
+  const st = statoDi(k);
+  const si = h("button", {class: "si", type: "button", "aria-pressed": String(st === "ok"), disabled: !posso, title: posso ? "Va bene" : "Solo il proprietario può giudicare",
+    onclick: ev => { ev.stopPropagation(); salva(k, {stato: statoDi(k) === "ok" ? null : "ok"}); }}, "✓ Va bene");
+  const no = h("button", {class: "no", type: "button", "aria-pressed": String(st === "no"), disabled: !posso, title: posso ? "Da rifare: si apre la nota" : "Solo il proprietario può giudicare",
+    onclick: ev => { ev.stopPropagation(); if (statoDi(k) !== "no") salva(k, {stato: "no"});
+      if (perCarta) { const c = ev.currentTarget.closest("[data-i]"); apriElemento(c ? +c.dataset.i : 0, true); }
+      else document.getElementById("nota")?.focus(); }}, "✎ Nota da sistemare");
+  return h("div", {class: "giudizio", "data-g": k}, si, no);
+}
+function aggiornaGiudizi() {
+  for (const g of document.querySelectorAll("[data-g]")) {
+    const k = g.dataset.g, st = statoDi(k), [si, no] = g.querySelectorAll("button");
+    si.setAttribute("aria-pressed", String(st === "ok")); no.setAttribute("aria-pressed", String(st === "no"));
+    const s = g.closest(".scheda"); if (s) { s.classList.toggle("st-ok", st === "ok"); s.classList.toggle("st-no", st === "no");
+      const n = s.querySelector(".nota-card"); if (n) n.textContent = st === "no" ? notaDi(k) : ""; }
+  }
+  for (const m of document.querySelectorAll(".segno[data-k]")) { const st = statoDi(m.dataset.k); m.classList.toggle("ok", st === "ok"); m.classList.toggle("no", st === "no"); }
+  if ((VISTA === "provare" || VISTA === "note") && MOD.hidden) rendi();               // le schede passano da una sezione all'altra
+}
+
+// ---------- elenco della vista e carte ----------
+// Ogni vista mette i suoi elementi in ELENCO: il dettaglio si sfoglia con le frecce in quell'ordine.
+let ELENCO = [];
+function carta(el, ...contenuto) {
+  let i = ELENCO.indexOf(el); if (i < 0) i = ELENCO.push(el) - 1;
+  const st = statoDi(el.k);
+  return h("div", {class: "scheda" + (st === "ok" ? " st-ok" : st === "no" ? " st-no" : ""), tabindex: "0", role: "button", "data-i": i,
+    onclick: () => apriElemento(i), onkeydown: e => { if (e.key === "Enter") apriElemento(i); }},
+    ...contenuto, el.k ? h("div", {class: "nota-card", text: st === "no" ? notaDi(el.k) : ""}) : null, el.k ? bottoniGiudizio(el.k) : null);
+}
+function filtroG(st, k) { const g = st.g || "tutti"; return g === "tutti" || (g === "da_vedere" ? !statoDi(k) : statoDi(k) === g); }
+function barraFiltri(st, opzioni, aggiorna) {
+  const q = h("input", {type: "search", id: "cerca-" + VISTA, placeholder: "Filtra per nome…", value: st.q || ""});
+  q.addEventListener("input", () => { st.q = q.value.toLowerCase(); aggiorna(); });
+  const sel = (opzioni || []).map(([chiave, etichetta, valori]) => {
+    const s = h("select", {id: "f-" + VISTA + "-" + chiave, "aria-label": etichetta}, h("option", {value: "", text: etichetta + ": tutti"}), valori.map(v => h("option", {value: v, text: bello(v)})));
+    s.value = st[chiave] || ""; s.addEventListener("change", () => { st[chiave] = s.value; aggiorna(); }); return s; });
+  const conta = h("span", {class: "conta"}); st._conta = conta;
+  return h("div", {class: "filtri"}, q, ...sel, segmento([["tutti", "Tutti"], ["da_vedere", "Da vedere"], ["ok", "Vanno bene"], ["no", "Da rifare"]], st.g || "tutti", v => { st.g = v; aggiorna(); }), conta);
+}
+const STATI = {};
+const stato = v => STATI[v] || (STATI[v] = {});
+const cerca = (st, ...testi) => !st.q || testi.join(" ").toLowerCase().includes(st.q);
+function riempi(contenitore, st, elementi) { contenitore.replaceChildren(...(elementi.length ? elementi : [h("div", {class: "vuoto", text: "Niente con questi filtri."})])); if (st._conta) st._conta.textContent = elementi.length + " elementi"; }
+
+// ---------- finestra di dettaglio ----------
+const MOD = document.getElementById("modale"), MMEDIA = document.getElementById("mod-media"), MINFO = document.getElementById("mod-info");
+let IDX = -1, ESCI = [];
+function apriElemento(i, focusNota = false) {
+  if (i < 0 || i >= ELENCO.length) return;
+  for (const f of ESCI) f(); ESCI = [];
+  IDX = i; const el = ELENCO[i];
+  document.getElementById("mod-titolo").textContent = el.titolo;
+  document.getElementById("mod-conta").textContent = (i + 1) + " / " + ELENCO.length;
+  MMEDIA.replaceChildren(...[el.media ? el.media() : null, el.descr ? el.descr() : null, schedeInfo(el.k)].flat().filter(Boolean));
+  MINFO.replaceChildren(...[pannelloGiudizio(el.k), el.inc ? h("div", {class: "blocco"}, chip("INCOMPLETO", "inc"), h("p", {class: "sotto", style: "margin:4px 0 0", text: el.inc})) : null,
+    el.extra ? el.extra() : null, el.dati ? tabella(el.dati()) : null].flat().filter(Boolean));
+  MMEDIA.scrollTop = 0; MINFO.scrollTop = 0;
+  const era = MOD.hidden; MOD.hidden = false;
+  if (focusNota) document.getElementById("nota")?.focus(); else if (era) document.getElementById("mod-dopo").focus();
+}
+function chiudi() { for (const f of ESCI) f(); ESCI = []; MOD.hidden = true; if (VISTA === "provare" || VISTA === "note") rendi(); document.querySelector(`[data-i="${IDX}"]`)?.focus(); }
+document.getElementById("mod-chiudi").onclick = chiudi;
+document.getElementById("mod-prima").onclick = () => apriElemento((IDX - 1 + ELENCO.length) % ELENCO.length);
+document.getElementById("mod-dopo").onclick = () => apriElemento((IDX + 1) % ELENCO.length);
+MOD.addEventListener("click", e => { if (e.target === MOD) chiudi(); });
+let TASTI_CAMPO = false;     // mentre si prova un personaggio i tasti vanno a lui
+document.addEventListener("keydown", e => {
+  const scrivo = /^(TEXTAREA|INPUT|SELECT)$/.test(document.activeElement?.tagName || "");
+  const sx = e.key === "ArrowLeft" || e.key === "a" || e.key === "A", dx = e.key === "ArrowRight" || e.key === "d" || e.key === "D";
+  if (!MOD.hidden) {
+    if (e.key === "Escape") { chiudi(); return; }
+    if (scrivo || TASTI_CAMPO) return;
+    if (sx) { e.preventDefault(); document.getElementById("mod-prima").click(); }
+    if (dx) { e.preventDefault(); document.getElementById("mod-dopo").click(); }
+  } else if (!scrivo && SFOGLIA) { if (sx) SFOGLIA(-1); if (dx) SFOGLIA(1); }
+});
+function pannelloGiudizio(k) {
+  if (!k) return null;
+  const ta = h("textarea", {id: "nota", placeholder: posso ? "Scrivi cosa non va: si salva da sola e diventa una nota mandata" : "Solo il proprietario scrive le note", disabled: !posso});
+  ta.value = notaDi(k);
+  const info = h("div", {class: "salvato", text: GIU.get(k)?.quando ? "Ultimo cambio: " + data(GIU.get(k).quando) : ""});
+  let timer = null;
+  const scrivi = async () => { timer = null; const v = ta.value.trim(); if (v === notaDi(k)) return; const ok = await salva(k, v ? {nota: v, stato: "no"} : {nota: ""}); info.textContent = ok ? (v ? "Nota mandata: la sistemo e torna da testare" : "Nota tolta") : "Non salvata"; };
+  ta.addEventListener("input", () => { info.textContent = "…"; clearTimeout(timer); timer = setTimeout(scrivi, 700); });
+  ESCI.push(() => { if (timer) { clearTimeout(timer); scrivi(); } });
+  const vecchie = storiaDi(k);
+  return h("div", {}, pannelloDomande(k), h("div", {class: "blocco"}, h("h4", {text: "Il tuo giudizio"}), bottoniGiudizio(k, false), h("div", {style: "height:6px"}), ta, info,
+    vecchie.length ? h("div", {class: "storia"}, h("h4", {text: "Note già sistemate"}), h("ul", {}, vecchie.slice().reverse().map(n =>
+      h("li", {}, h("span", {class: "sotto", text: data(n.quando) + " · sistemata · "}), n.nota))) ) : null));
+}
+function tabella(righe) { const r = righe.filter(x => x && x[1] !== undefined && x[1] !== null && x[1] !== ""); if (!r.length) return null;
+  return h("div", {class: "blocco dati"}, h("h4", {text: "Dati"}), h("table", {}, h("tbody", {}, r.map(([a, b]) => h("tr", {}, h("td", {text: a}), h("td", {}, valoreColorato(a, b))))))); }
+function schedeInfo(k) {
+  const I = (D.info || {})[k]; if (!I) return null;
+  return h("div", {class: "sezione", style: "margin-top:12px"}, I.map(([t, righe]) => h("div", {class: "blocco"}, h("h4", {text: t}),
+    righe.length === 1 ? h("p", {style: "margin:0", text: righe[0]}) : h("ul", {}, righe.map(r => h("li", {text: r}))))));
+}
+// colori delle specifiche: rarita', comportamento
+const ORDINE_RARITA = ["leggendario", "elite", "raro", "non_comune", "comune"];
+const chipR = r => r ? chip(bello(r), "r-" + r) : null;
+const chipC = c => c ? chip(bello(c), "c-" + c) : null;
+const valoreColorato = (k, v) => k === "Rarità" ? chipR(v) : k === "Comportamento" ? chipC(v) : v;
+const INC = () => chip("INCOMPLETO", "inc");
+
+// visore di immagini con zoom
+function visore(src, alt) {
+  const img = h("img", {src, alt: alt || ""}), v = h("div", {class: "visore adatta"}, img);
+  const zoom = z => { if (!z) { v.classList.add("adatta"); img.style.width = ""; } else { v.classList.remove("adatta"); img.style.width = img.naturalWidth * z + "px"; } };
+  let z = 0; img.addEventListener("click", () => { z = z ? 0 : 2; zoom(z); });
+  return [h("div", {class: "controlli"}, h("span", {class: "sotto", text: "Zoom:"}), segmento([[0, "Adatta"], [1, "100%"], [2, "200%"], [3, "300%"]], 0, x => { z = x; zoom(x); }),
+    h("span", {class: "sotto", text: "Clic sull'immagine per ingrandire, poi scorri."})), v];
+}
+function icona(fn) { const v = h("div", {class: "vetrina", style: "min-height:260px"}, fn());
+  return [v, h("div", {class: "controlli"}, h("span", {class: "sotto", text: "Sfondo:"}), segmento([["", "Scacchi"], ["chiaro", "Chiaro"], ["scuro", "Scuro"]], "", s => { v.className = "vetrina " + s; }))]; }
+
+// lettore grande: tutte le animazioni, frecce, direzioni, velocita', frame per frame, prova coi tasti
+function studioFigura(fid, scala = 4) {
+  const l = new Lettore(fid, {scala, giro: false});
+  const v = h("div", {class: "vetrina", style: "min-height:300px"}, guarda(l.c, l));
+  const nome = h("b", {style: "min-width:120px;text-align:center"}), info = h("span", {class: "sotto"});
+  const mini = h("div", {class: "mini"});
+  l.cambiato = () => { const a = l.a; nome.textContent = bello(a.nome); info.textContent = `frame ${l.frame + 1}/${a.frames} · ${a.durate[l.frame]} ms · ${a.loop ? "ciclo" : "una volta"}`;
+    for (const b of mini.children) b.setAttribute("aria-pressed", String(b.dataset.a === a.nome)); };
+  const vel = h("input", {type: "range", min: "0.1", max: "2", step: "0.05", value: "1", id: "vel-fig"}), velT = h("span", {text: "100%"});
+  vel.addEventListener("input", () => { l.velocita = +vel.value; velT.textContent = Math.round(vel.value * 100) + "%"; for (const b of mini.children) { const c = b.querySelector("canvas"); if (c?._lett) c._lett.velocita = +vel.value; } });
+  const play = h("button", {class: "btn", type: "button", onclick: () => { l.pausa = !l.pausa; play.textContent = l.pausa ? "▶ Avvia" : "❚❚ Pausa"; }}, "❚❚ Pausa");
+  const ferma = () => { l.pausa = true; play.textContent = "▶ Avvia"; };
+  mini.append(...l.f.anims.map((a, i) => { const m = new Lettore(fid, {scala: 1, giro: false, anim: a.nome});
+    return h("button", {type: "button", "data-a": a.nome, title: "Mostra " + bello(a.nome), onclick: () => l.scegli(i)}, guarda(m.c, m), h("span", {text: bello(a.nome)})); }));
+  const dir = segmento(DIREZ.map((d, i) => [i, d]), 0, i => { l.dir = i; l.disegna(); for (const b of mini.children) { const c = b.querySelector("canvas"); if (c?._lett) { c._lett.dir = i; c._lett.disegna(); } } });
+  l.cambiato();
+  return [v,
+    h("div", {class: "controlli"}, h("button", {class: "btn", type: "button", title: "Animazione precedente", onclick: () => l.scegli((l.anim - 1 + l.f.anims.length) % l.f.anims.length)}, "◀"), nome,
+      h("button", {class: "btn", type: "button", title: "Animazione successiva", onclick: () => l.scegli((l.anim + 1) % l.f.anims.length)}, "▶"), dir),
+    h("div", {class: "controlli"}, play, h("button", {class: "btn", type: "button", onclick: () => { ferma(); l.avanza(-1); }}, "⏮ frame"), h("button", {class: "btn", type: "button", onclick: () => { ferma(); l.avanza(1); }}, "frame ⏭"),
+      h("label", {for: "vel-fig"}, "Velocità", vel, velT), info),
+    h("div", {class: "controlli"}, h("span", {class: "sotto", text: "Sfondo:"}), segmento([["", "Scacchi"], ["chiaro", "Chiaro"], ["scuro", "Scuro"], ["erba", "Erba"]], "", s => { v.className = "vetrina " + s; }),
+      h("span", {class: "sotto", text: "Zoom:"}), segmento([[2, "2×"], [3, "3×"], [4, "4×"], [6, "6×"]], scala, s => l.ingrandisci(s))),
+    h("h3", {text: "Tutte le animazioni (clic per vederla grande)"}), mini, h("h3", {text: "Provalo coi tasti"}), provaFigura(fid)];
+}
+// Campo di prova: la figura si muove e fa le sue animazioni coi tasti, coi tempi veri di animations.json.
+const TASTI = [["j", "attack_light", "attacco"], ["j", "attack", "attacco"], ["k", "attack_heavy", "pesante"], [" ", "dash", "scatto"], ["l", "parry", "parata"],
+  ["h", "hurt", "colpito"], ["h", "stagger", "barcolla"], ["c", "cast", "lancia"], ["m", "meditate", "medita"], ["e", "interact", "interagisci"], ["p", "pickup", "raccogli"],
+  ["b", "drink", "bevi"], ["r", "ritual", "rituale"], ["f", "fuga", "fuga"], ["x", "death", "morte"]];
+function provaFigura(fid) {
+  const f = D.figure[fid], W = 320, H = 180;
+  const c = h("canvas", {class: "campo", width: W, height: H, tabindex: "0", "aria-label": "Campo di prova: clicca e usa i tasti"});
+  const l = new Lettore(fid, {scala: 1, giro: false, anim: "idle"});
+  const p = {x: W / 2, y: H / 2 + 20, dir: 0, azione: null, vivo: true}, giu = new Set();
+  const vel = h("input", {type: "range", min: "0.1", max: "2", step: "0.05", value: "1", id: "pvel"});
+  vel.addEventListener("input", () => { l.velocita = +vel.value; });
+  const azioni = TASTI.filter(([, a]) => f.anims.some(x => x.nome === a)).filter((t, i, ar) => ar.findIndex(x => x[0] === t[0]) === i);
+  const cammina = f.anims.some(a => a.nome === "walk") ? "walk" : (f.anims.some(a => a.nome === "fuga") ? "fuga" : "idle");
+  function fai(nome) {
+    if (!p.vivo) return;
+    if (nome === "attack" && l.ha("anticipo")) { p.azione = "anticipo"; l.scegli("anticipo", () => { p.azione = "attack"; l.scegli("attack", () => { p.azione = null; l.scegli("idle"); }); }); return; }
+    const a = f.anims.find(x => x.nome === nome); if (!a) return;
+    if (nome === "death") { p.vivo = false; p.azione = "death"; l.scegli("death", () => { l.fermo = true; }); return; }
+    if (a.loop) { p.azione = p.azione === nome ? null : nome; l.scegli(p.azione || "idle"); return; }
+    p.azione = nome; l.scegli(nome, () => { p.azione = null; l.scegli("idle"); });
+  }
+  const DT = {w: [0, -1, 1], arrowup: [0, -1, 1], s: [0, 1, 0], arrowdown: [0, 1, 0], a: [-1, 0, 2], arrowleft: [-1, 0, 2], d: [1, 0, 3], arrowright: [1, 0, 3]};
+  c.addEventListener("keydown", e => { const k = e.key.toLowerCase(); if (DT[k] || azioni.some(t => t[0] === k) || k === "enter") e.preventDefault();
+    if (DT[k]) giu.add(k); const t = azioni.find(t => t[0] === k); if (t && !e.repeat) fai(t[1]);
+    if (k === "enter") { p.vivo = true; p.azione = null; l.scegli("idle"); } });
+  c.addEventListener("keyup", e => giu.delete(e.key.toLowerCase()));
+  c.addEventListener("focus", () => { TASTI_CAMPO = true; }); c.addEventListener("blur", () => { TASTI_CAMPO = false; giu.clear(); });
+  c.addEventListener("click", () => c.focus());
+  ESCI.push(() => { TASTI_CAMPO = false; });
+  const g = c.getContext("2d");
+  const muovi = (dx, dy, v, dt) => { const n = Math.hypot(dx, dy); p.x = Math.max(20, Math.min(W - 20, p.x + dx / n * v * dt / 1000 * l.velocita)); p.y = Math.max(40, Math.min(H - 6, p.y + dy / n * v * dt / 1000 * l.velocita)); };
+  guarda(c, {passo(dt) {
+    let dx = 0, dy = 0; for (const k of giu) { const d = DT[k]; dx += d[0]; dy += d[1]; p.dir = d[2]; }
+    if (!p.azione && p.vivo) { const voluto = dx || dy ? cammina : "idle"; if (l.a.nome !== voluto) l.scegli(voluto); if (dx || dy) muovi(dx, dy, 45, dt); }
+    else if (p.azione === "dash" && (dx || dy)) muovi(dx, dy, 160, dt);
+    else if (p.vivo && (dx || dy) && !["meditate", "ritual"].includes(p.azione)) muovi(dx, dy, 30, dt);    // attacca e cammina
+    l.dir = p.dir; l.passo(dt);
+    g.imageSmoothingEnabled = false; g.fillStyle = "#3e8948"; g.fillRect(0, 0, W, H); g.fillStyle = "#3a8244";
+    for (let y = 0; y < H; y += 16) for (let x = (y / 16 % 2) * 16; x < W; x += 32) g.fillRect(x, y, 16, 16);
+    g.fillStyle = "rgba(24,20,37,.35)"; g.beginPath(); g.ellipse(p.x, p.y, 9, 3, 0, 0, Math.PI * 2); g.fill();
+    if (l.img) { const a = l.a; g.drawImage(l.img, l.frame * a.w, a.y + (a.righe > 1 ? l.dir : 0) * a.h, a.w, a.h, Math.round(p.x - a.w / 2), Math.round(p.y - a.h * 54 / 64), a.w, a.h); }
+    g.fillStyle = "#fff"; g.font = "8px monospace"; g.fillText(bello(l.a.nome) + " " + (l.frame + 1) + "/" + l.a.frames + (document.activeElement === c ? "" : "  (clicca qui per usare i tasti)"), 4, 10);
+  }});
+  return h("div", {class: "sezione"}, c,
+    h("div", {class: "tasti"}, h("span", {}, h("kbd", {text: "W A S D"}), " o frecce: muovi"),
+      azioni.map(([k, , t]) => h("span", {}, h("kbd", {text: k === " " ? "Spazio" : k.toUpperCase()}), " " + t)), h("span", {}, h("kbd", {text: "Invio"}), " rialzati"), h("span", {}, h("kbd", {text: "Esc"}), " esci")),
+    h("div", {class: "controlli"}, h("label", {for: "pvel"}, "Velocità della prova", vel)));
+}
+
+// ---------- arena di prova: abilita' e boss ----------
+// Un campo dove Enel si muove e combatte coi tempi veri delle animazioni; le abilita' lanciano i loro effetti (fogli
+// veri, ricolorati col Pathway) e il boss combatte con le sue fasi dei dati. E' una simulazione per vedere e sentire,
+// non il gioco: i numeri di danno sono quelli dei dati, la fisica e' semplice.
+const RICOLORATI = new Map();
+function foglioColorato(e, pal) {
+  const k = e.file + JSON.stringify(pal); if (RICOLORATI.has(k)) return RICOLORATI.get(k);
+  const pr = immagine(e.file).then(i => { if (!i) return null; const c = document.createElement("canvas"); c.width = i.width; c.height = i.height;
+    const g = c.getContext("2d"); g.drawImage(i, 0, 0); ricolora(g, c.width, c.height, pal); return c; });
+  RICOLORATI.set(k, pr); return pr;
+}
+// Il terreno vero del gioco sotto l'arena: le tessere del mondo attorno a un luogo, a 64 px per casella (la stessa
+// grana delle figure a 64: nel gioco una casella e' 32 unita' e la figura e' a mezza grandezza).
+let TERRENO = null;
+async function terrenoArena(W, H, cx, cy) {
+  const M = D.mondo; if (!M || !M.dettaglio) return null;
+  if (!TERRENO) TERRENO = (async () => { const j = MONDO_DETT.sopra || (MONDO_DETT.sopra = await (await fetch(M.dettaglio)).json());
+    const tessere = await Promise.all(j.tessere.map(immagine)), ii = await immagine(j.indici);
+    const cc = document.createElement("canvas"); cc.width = ii.width; cc.height = ii.height; const gg = cc.getContext("2d"); gg.drawImage(ii, 0, 0);
+    return {j, tessere, ind: gg.getImageData(0, 0, ii.width, ii.height).data}; })();
+  const {j, tessere, ind} = await TERRENO, Z = 64, T = j.tile, cols = j.colonne, per = cols * j.righe;
+  const c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d"); g.imageSmoothingEnabled = false;
+  const nx = Math.ceil(W / Z) + 1, ny = Math.ceil(H / Z) + 1, x0 = Math.round(cx - nx / 2), y0 = Math.round(cy - ny / 2);
+  for (let y = 0; y < ny; y++) for (let x = 0; x < nx; x++) { const X = x0 + x, Y = y0 + y; if (X < 0 || Y < 0 || X >= M.w || Y >= M.h) continue;
+    const o = (Y * M.w + X) * 4, n = ind[o] + 256 * ind[o + 1], f = Math.floor(n / per), l = n % per; if (!tessere[f]) continue;
+    g.drawImage(tessere[f], (l % cols) * T, Math.floor(l / cols) * T, T, T, x * Z - Z / 2, y * Z - Z / 2, Z, Z); }
+  return c;
+}
+
+function arena(opz) {
+  const W = 360, H = 200, T = D.tecniche;
+  const c = h("canvas", {class: "campo", width: W, height: H, tabindex: "0", "aria-label": "Arena di prova: clicca e usa i tasti"});
+  const g = c.getContext("2d"), giu = new Set();
+  const eroe = new Lettore("enel", {scala: 1, giro: false, anim: "idle"});
+  const P = {x: 80, y: 130, dir: 3, azione: null, vita: 100, spirito: 100, vivo: true};
+  const effetti = [], cd = {}, testo = [];
+  let sfondo = null;
+  const luoghi = (D.mondo && D.mondo.luoghi) || [], scegliLuogo = id => { const l = luoghi.find(x => x.id === id) || {x: D.mondo.partenza[0], y: D.mondo.partenza[1]};
+    terrenoArena(W, H, l.x, l.y).then(cv => { sfondo = cv; }).catch(() => {}); };
+  if (D.mondo) scegliLuogo(opz.luogo || "porto");
+  let nemico = null, gregari = [], fase = 0, velocita = 1;
+  const B = opz.boss;
+  if (B || opz.bersaglio) {
+    const tipo = B ? D.nemici.find(n => n.id === B.posato.tipo) : null;
+    const fid = B ? B.figura : typeof opz.bersaglio === "string" ? opz.bersaglio : "nemico_base";
+    nemico = {l: new Lettore(fid, {scala: 1, giro: false, anim: "idle"}), x: 260, y: 130, dir: 2, vita: 1, max: 1, azione: null, attesa: 1200,
+      cfg: {...(tipo ? tipo.numeri : {}), comportamento: tipo ? tipo.comportamento : "mischia"}, scala: B ? 1.5 : 1, fermo: !B};
+  }
+  function entraFase(i) {
+    fase = i; const f = B.fasi[i]; Object.assign(nemico.cfg, f.cfg || {});
+    testo.unshift(`Fase ${i + 1}: ` + (fasiAParole(B)[i].replace(/^Fase \d+, /, "")));
+    if (f.gregari) { const t = D.nemici.find(n => n.id === f.gregari.tipo);
+      for (let k = 0; k < f.gregari.quanti; k++) { const a = Math.PI * 2 * k / f.gregari.quanti;
+        gregari.push({l: new Lettore(t ? t.figura : "nemico_base", {scala: 1, giro: false, anim: "walk"}), x: nemico.x + Math.cos(a) * 40, y: nemico.y + Math.sin(a) * 20, dir: 2}); } }
+  }
+  if (B) entraFase(0);
+  function lancia(ab, pal) {
+    if (!P.vivo || (cd[ab.id] || 0) > 0) return;
+    if (ab.costo && P.spirito < ab.costo) { testo.unshift("Spiritualità insufficiente per " + ab.nome); return; }
+    P.spirito -= ab.costo || 0; cd[ab.id] = (ab.cd || 1) * 1000;
+    const mischia = ab.prim.includes("melee_arc");
+    P.azione = mischia ? "attack_light" : "cast"; eroe.scegli(eroe.ha(P.azione) ? P.azione : "attack_light", () => { P.azione = null; eroe.scegli("idle"); });
+    (ab.effetto ? [ab.effetto] : ab.prim).forEach((pr, i) => {
+      const e = ab.effetto ? T.effetti.find(x => x.sprite === pr) : T.effetti.find(x => x.primitiva === pr && !x.scoppio_di) || T.effetti.find(x => x.primitiva === pr); if (!e) return;
+      const fx = P.dir === 2 ? -1 : P.dir === 3 ? 1 : 0, fy = P.dir === 0 ? 1 : P.dir === 1 ? -1 : 0;
+      const sulNemico = e.su && e.su !== "chi_lancia" && nemico;
+      const cen = e.centro ? 0 : 1;
+      foglioColorato(e, pal).then(img => img && effetti.push({img, e, f: 0, t: -i * 120, x: sulNemico ? nemico.x : P.x + fx * 18 * cen, y: (sulNemico ? nemico.y : P.y) - (e.centro ? 22 : 14) + fy * 10 * cen,
+        vx: e.vola ? fx * 160 : 0, vy: e.vola ? fy * 160 : 0, gira: e.gira && P.dir === 2, vita: e.vola ? 1400 : e.frames * 90, danno: ab.danno, pal}));
+    });
+    if (nemico && ab.danno) colpisci(ab.danno);
+    testo.unshift(ab.nome + ": " + (ab.cosa[0] ? ab.cosa[0][0] : ""));
+  }
+  const schizzi = (x, y) => { for (let i = 0; i < 9; i++) { const a = Math.random() * Math.PI * 2, v = 40 + Math.random() * 70;
+    effetti.push({sangue: true, x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 40, t: 0, vita: 420 + Math.random() * 200}); } };
+  function colpisci(d) {
+    if (!nemico || nemico.vita <= 0) return;
+    schizzi(nemico.x, nemico.y - 16);
+    nemico.vita = Math.max(0, nemico.vita - d / (B ? 600 * B.vita_x / 5 : 200));
+    if (B) { const ok = B.fasi.reduce((a, f, i) => nemico.vita <= f.da + 1e-6 ? i : a, 0); while (fase < ok) entraFase(fase + 1); }
+    if (nemico.vita <= 0) { nemico.azione = "death"; nemico.l.scegli("death", () => { nemico.l.fermo = true; }); testo.unshift((B ? B.nome : "Il bersaglio") + " è a terra."); }
+    else if (!nemico.azione && nemico.l.ha("stagger") && Math.random() < .3) { nemico.azione = "stagger"; nemico.l.scegli("stagger", () => { nemico.azione = null; nemico.l.scegli("idle"); }); }
+  }
+  const DT = {w: [0, -1, 1], arrowup: [0, -1, 1], s: [0, 1, 0], arrowdown: [0, 1, 0], a: [-1, 0, 2], arrowleft: [-1, 0, 2], d: [1, 0, 3], arrowright: [1, 0, 3]};
+  c.addEventListener("keydown", e => { const k = e.key.toLowerCase(); e.preventDefault();
+    if (DT[k]) giu.add(k);
+    if (e.repeat) return;
+    if (k === "j" && P.vivo) { P.azione = "attack_light"; eroe.scegli("attack_light", () => { P.azione = null; eroe.scegli("idle"); });
+      if (nemico && Math.hypot(nemico.x - P.x, nemico.y - P.y) < 46) colpisci(16); }
+    if (k === "k" && P.vivo && !P.azione && eroe.ha("attack_heavy")) {   // tieni premuto: carica (come nel gioco)
+      P.azione = "attack_heavy"; P.carica = 0; P.tenuto = true; P.colpito = false;
+      eroe.scegli("attack_heavy", () => { P.azione = null; P.carica = 0; eroe.scegli("idle"); }); }
+    if (k === " " && P.vivo) { P.azione = "dash"; eroe.scegli("dash", () => { P.azione = null; eroe.scegli("idle"); }); }
+    if (k === "q" && nemico) colpisci(9999 * 0.1 * (B ? 600 * B.vita_x / 5 : 200) / 9999);
+    if (k === "enter") { P.vivo = true; P.vita = 100; P.azione = null; eroe.scegli("idle"); if (nemico) { nemico.vita = 1; nemico.azione = null; nemico.l.scegli("idle"); gregari = []; if (B) { Object.assign(nemico.cfg, (D.nemici.find(n => n.id === B.posato.tipo) || {}).numeri || {}); entraFase(0); } } }
+    const n = +k; if (opz.abilita && n >= 1 && n <= opz.abilita.length) lancia(opz.abilita[n - 1], opz.abilita[n - 1].palette || opz.palette);
+  });
+  c.addEventListener("keyup", e => { const k = e.key.toLowerCase(); giu.delete(k); if (k === "k") P.tenuto = false; });
+  c.addEventListener("focus", () => { TASTI_CAMPO = true; }); c.addEventListener("blur", () => { TASTI_CAMPO = false; giu.clear(); });
+  c.addEventListener("click", () => c.focus()); ESCI.push(() => { TASTI_CAMPO = false; });
+  function figura(l, x, y, dir, scala = 1) { if (!l.img) return; const a = l.a; l.dir = dir;
+    g.fillStyle = "rgba(24,20,37,.35)"; g.beginPath(); g.ellipse(x, y, 9 * scala, 3 * scala, 0, 0, Math.PI * 2); g.fill();
+    g.drawImage(l.img, l.frame * a.w, a.y + (a.righe > 1 ? dir : 0) * a.h, a.w, a.h, Math.round(x - a.w * scala / 2), Math.round(y - a.h * 54 / 64 * scala), a.w * scala, a.h * scala); }
+  function ai(n, dt) {
+    if (n.vita <= 0 || n.fermo) { n.l.passo(dt * velocita); return; }
+    const dx = P.x - n.x, dy = P.y - n.y, d = Math.hypot(dx, dy), comp = n.cfg.comportamento;
+    n.dir = Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 2 : 3) : (dy < 0 ? 1 : 0);
+    n.attesa -= dt * velocita;
+    if (!n.azione) {
+      const vicino = comp === "distanza" ? 110 : comp === "carica" ? 120 : 34;
+      if (d > vicino) { if (n.l.a.nome !== "walk") n.l.scegli("walk"); n.x += dx / d * 28 * dt / 1000 * velocita; n.y += dy / d * 28 * dt / 1000 * velocita; }
+      else if (comp === "distanza" && d < 70) { if (n.l.a.nome !== "walk") n.l.scegli("walk"); n.x -= dx / d * 26 * dt / 1000 * velocita; n.y -= dy / d * 26 * dt / 1000 * velocita; }
+      else if (n.attesa <= 0) {
+        n.azione = "anticipo"; n.l.scegli(n.l.ha("anticipo") ? "anticipo" : "idle", () => {
+          n.azione = "attack"; const lx = dx / d, ly = dy / d;
+          if (comp === "carica") n.carica = {vx: lx * 220, vy: ly * 220, t: 450};
+          if (comp === "distanza") effetti.push({colpo: true, x: n.x, y: n.y - 14, vx: lx * 150, vy: ly * 150, vita: 1600});
+          n.l.scegli("attack", () => { n.azione = null; n.carica = null; n.attesa = (n.cfg.recupero_s || .6) * 1000; n.l.scegli("idle");
+            if (comp === "mischia" && Math.hypot(P.x - n.x, P.y - n.y) < 40 && P.azione !== "dash") ferisci(n.cfg.danno_attacco || 10); });
+        });
+      } else if (n.l.a.nome !== "idle") n.l.scegli("idle");
+    }
+    if (n.carica) { n.x += n.carica.vx * dt / 1000 * velocita; n.y += n.carica.vy * dt / 1000 * velocita; if (Math.hypot(P.x - n.x, P.y - n.y) < 20 && P.azione !== "dash") { ferisci(n.cfg.danno_attacco || 10); n.carica = null; } }
+    n.x = Math.max(16, Math.min(W - 16, n.x)); n.y = Math.max(40, Math.min(H - 6, n.y));
+    n.l.passo(dt * velocita);
+  }
+  function ferisci(d) { if (!P.vivo) return; P.vita = Math.max(0, P.vita - d); schizzi(P.x, P.y - 18); if (P.vita <= 0) { P.vivo = false; P.azione = "death"; eroe.scegli("death", () => { eroe.fermo = true; }); testo.unshift("Enel è a terra. Invio per ricominciare."); }
+    else if (eroe.ha("hurt") && !P.azione) { P.azione = "hurt"; eroe.scegli("hurt", () => { P.azione = null; eroe.scegli("idle"); }); } }
+  guarda(c, {passo(dt) {
+    let dx = 0, dy = 0; for (const k of giu) { const d = DT[k]; dx += d[0]; dy += d[1]; P.dir = d[2]; }
+    const v = P.azione === "dash" ? 160 : P.azione ? 30 : 45;
+    if (P.vivo && (dx || dy) && !["meditate", "ritual"].includes(P.azione)) { const n = Math.hypot(dx, dy); P.x = Math.max(16, Math.min(W - 16, P.x + dx / n * v * dt / 1000 * velocita)); P.y = Math.max(40, Math.min(H - 6, P.y + dy / n * v * dt / 1000 * velocita)); }
+    if (!P.azione && P.vivo) { const want = dx || dy ? "walk" : "idle"; if (eroe.a.nome !== want) eroe.scegli(want); }
+    const CARICA = (D.combattimento || {}).attacco_pesante || {frame_carica: 5, carica_max_s: 1.5, danno: 24, danno_x: 2.5, raggio: 26, area_x: 1.8};
+    // si carica solo tenendo premuto K (anche nella preparazione); lasciato prima, il colpo parte subito
+    if (P.azione === "attack_heavy" && !P.tenuto && eroe.frame < CARICA.frame_carica) { eroe.frame = CARICA.frame_carica + 1; eroe.t = 0; }
+    if (P.azione === "attack_heavy" && P.tenuto && eroe.frame < CARICA.frame_carica) P.carica = Math.min(CARICA.carica_max_s * 1000, P.carica + dt * velocita);
+    if (P.azione === "attack_heavy" && P.tenuto && eroe.frame >= CARICA.frame_carica && P.carica < CARICA.carica_max_s * 1000) P.carica = Math.min(CARICA.carica_max_s * 1000, P.carica + dt * velocita);
+    else eroe.passo(dt * velocita);
+    if (P.azione === "attack_heavy" && !P.colpito && eroe.frame >= CARICA.frame_carica + 1) { P.colpito = true;
+      const kk = P.carica / (CARICA.carica_max_s * 1000), scala = 1 + (CARICA.area_x - 1) * kk;
+      const e = T.effetti.find(x => x.sprite === "vfx_fendente_pesante");
+      const fx = P.dir === 2 ? -1 : P.dir === 3 ? 1 : 0, fy = P.dir === 0 ? 1 : P.dir === 1 ? -1 : 0;
+      if (e) foglioColorato(e, opz.palette || {}).then(img => img && effetti.push({img, e, f: 0, t: 0, x: P.x + fx * 20 * scala, y: P.y - 18 + fy * 12 * scala, gira: P.dir === 2, vita: e.frames * 90, scala}));
+      const danno = CARICA.danno * (1 + (CARICA.danno_x - 1) * kk);
+      if (nemico && Math.hypot(nemico.x - P.x, nemico.y - P.y) < 30 + CARICA.raggio * scala) colpisci(danno);
+      testo.unshift(`Colpo pesante: carica ${Math.round(kk * 100)}%, danno ${Math.round(danno)}, area x${scala.toFixed(2)}`); }
+    P.spirito = Math.min(100, P.spirito + dt / 1000 * 4 * velocita);
+    for (const k in cd) cd[k] = Math.max(0, cd[k] - dt * velocita);
+    if (nemico) ai(nemico, dt);
+    for (const gg of gregari) { const ddx = P.x - gg.x, ddy = P.y - gg.y, dd = Math.hypot(ddx, ddy); if (dd > 24) { gg.x += ddx / dd * 24 * dt / 1000 * velocita; gg.y += ddy / dd * 24 * dt / 1000 * velocita; }
+      gg.dir = Math.abs(ddx) > Math.abs(ddy) ? (ddx < 0 ? 2 : 3) : (ddy < 0 ? 1 : 0); gg.l.passo(dt * velocita); }
+    for (const e of effetti) { e.t += dt * velocita; e.x += (e.vx || 0) * dt / 1000 * velocita; e.y += (e.vy || 0) * dt / 1000 * velocita;
+      if (e.colpo && Math.hypot(P.x - e.x, P.y - 14 - e.y) < 12 && P.azione !== "dash") { ferisci(nemico.cfg.danno_attacco || 8); e.vita = 0; } }
+    for (const e of effetti) if (e.e && e.e.vola && e.e.scoppio && !e.finito && e.t > 0 && (e.t > e.vita - 20 || (nemico && nemico.vita > 0 && Math.hypot(nemico.x - e.x, nemico.y - 14 - e.y) < 14))) {
+      e.finito = true; e.vita = 0; const s2 = T.effetti.find(x => x.sprite === e.e.scoppio);
+      if (s2) foglioColorato(s2, e.pal).then(img => img && effetti.push({img, e: s2, f: 0, t: 0, x: e.x, y: e.y, vita: s2.frames * 90})); }
+    for (let i = effetti.length - 1; i >= 0; i--) if (effetti[i].t > effetti[i].vita) effetti.splice(i, 1);
+    // disegno
+    g.imageSmoothingEnabled = false;
+    if (sfondo) g.drawImage(sfondo, 0, 0);
+    else { g.fillStyle = "#3e8948"; g.fillRect(0, 0, W, H); g.fillStyle = "#3a8244"; for (let y = 0; y < H; y += 16) for (let x = (y / 16 % 2) * 16; x < W; x += 32) g.fillRect(x, y, 16, 16); }
+    const cose = [{y: P.y, d: () => figura(eroe, P.x, P.y, P.dir)}];
+    if (nemico) cose.push({y: nemico.y, d: () => figura(nemico.l, nemico.x, nemico.y, nemico.dir, nemico.scala)});
+    for (const gg of gregari) cose.push({y: gg.y, d: () => figura(gg.l, gg.x, gg.y, gg.dir)});
+    cose.sort((a, b) => a.y - b.y).forEach(x => x.d());
+    for (const e of effetti) { if (e.t < 0) continue;
+      if (e.colpo) { g.fillStyle = "#e43b44"; g.fillRect(Math.round(e.x) - 2, Math.round(e.y) - 2, 4, 4); continue; }
+      if (e.sangue) { e.vy += 260 * 0.016; g.fillStyle = e.t > e.vita * 0.6 ? "#a22633" : "#e43b44"; g.fillRect(Math.round(e.x), Math.round(e.y), 2, 2); continue; }
+      const w = e.img.width / e.e.frames, hh = e.img.height, f = e.e.vola ? Math.floor(e.t / 90) % e.e.frames : Math.min(e.e.frames - 1, Math.floor(e.t / 90));
+      g.save(); g.translate(Math.round(e.x), Math.round(e.y)); if (e.gira) g.scale(-1, 1); if (e.scala) g.scale(e.scala, e.scala); g.drawImage(e.img, f * w, 0, w, hh, -w / 2, -hh / 2, w, hh); g.restore(); }
+    if (P.azione === "attack_heavy" && P.carica > 0) { const CARICA = (D.combattimento || {}).attacco_pesante || {carica_max_s: 1.5}, kk = P.carica / (CARICA.carica_max_s * 1000);
+      g.strokeStyle = kk >= 1 ? "#fee761" : "#feae34"; g.lineWidth = 2; g.beginPath(); g.ellipse(P.x, P.y, 10 + 16 * kk, 4 + 6 * kk, 0, 0, Math.PI * 2); g.stroke();
+      g.fillStyle = "#181425"; g.fillRect(P.x - 13, P.y - 46, 26, 5); g.fillStyle = kk >= 1 ? "#fee761" : "#feae34"; g.fillRect(P.x - 12, P.y - 45, 24 * kk, 3); }
+    // barre
+    const barra = (x, y, w, v, col) => { g.fillStyle = "#181425"; g.fillRect(x - 1, y - 1, w + 2, 5); g.fillStyle = col; g.fillRect(x, y, w * v, 3); };
+    barra(6, 6, 80, P.vita / 100, "#e43b44"); barra(6, 13, 80, P.spirito / 100, "#0099db");
+    if (nemico && !nemico.fermo) { barra(W - 126, 6, 120, nemico.vita, "#b55088"); if (B) for (const f of B.fasi) { g.fillStyle = "#fff"; g.fillRect(W - 126 + 120 * f.da, 5, 1, 5); }
+      g.fillStyle = "#fff"; g.font = "8px monospace"; if (B) g.fillText(B.nome + " · fase " + (fase + 1), W - 126, 22); }
+    g.fillStyle = "#fff"; g.font = "8px monospace";
+    if (opz.abilita) opz.abilita.forEach((ab, i) => { const r = (cd[ab.id] || 0) / ((ab.cd || 1) * 1000); g.fillStyle = r > 0 ? "#5a6988" : "#ead4aa"; g.fillText(`${i + 1} ${ab.nome.slice(0, 14)}${r > 0 ? " " + Math.ceil(cd[ab.id] / 1000) + "s" : ""}`, 6, H - 8 - (opz.abilita.length - 1 - i) * 10); });
+    if (document.activeElement !== c) { g.fillStyle = "rgba(24,20,37,.6)"; g.fillRect(0, H / 2 - 10, W, 18); g.fillStyle = "#fff"; g.fillText("Clicca qui per usare i tasti", W / 2 - 60, H / 2 + 2); }
+    log.textContent = testo.slice(0, 4).join("\n");
+  }});
+  const log = h("pre", {class: "sotto", style: "white-space:pre-wrap;margin:0;min-height:3em"});
+  const vel = h("input", {type: "range", min: "0.1", max: "2", step: "0.05", value: "1", id: "avel"}); vel.addEventListener("input", () => { velocita = +vel.value; });
+  const box = h("div", {class: "sezione arena-box"});
+  const grande = h("button", {class: "chip", onclick: () => {
+    if (box.classList.contains("grande") || document.fullscreenElement) { if (document.fullscreenElement) document.exitFullscreen(); box.classList.remove("grande"); grande.textContent = "Schermo intero"; }
+    else { (box.requestFullscreen ? box.requestFullscreen() : Promise.reject()).catch(() => box.classList.add("grande")); box.classList.add("grande"); grande.textContent = "Esci dallo schermo intero"; }
+    c.focus(); }}, "Schermo intero");
+  ESCI.push(() => { box.classList.remove("grande"); if (document.fullscreenElement) document.exitFullscreen(); });
+  const selL = h("select", {"aria-label": "Terreno"}, luoghi.map(l => h("option", {value: l.id, text: "Terreno: " + bello(l.id)})));
+  selL.value = opz.luogo || "porto"; selL.addEventListener("change", () => { scegliLuogo(selL.value); c.focus(); });
+  box.append(h("div", {class: "filtri"}, grande, luoghi.length ? selL : null), c, log,
+    h("div", {class: "tasti"}, h("span", {}, h("kbd", {text: "W A S D"}), " muovi"), h("span", {}, h("kbd", {text: "J"}), " attacca"), h("span", {}, h("kbd", {text: "K"}), " attacco pesante (tieni premuto: più carica, più danno e area)"), h("span", {}, h("kbd", {text: "Spazio"}), " scatto (schiva)"),
+      opz.abilita ? h("span", {}, h("kbd", {text: "1–" + opz.abilita.length}), " abilità") : null, nemico ? h("span", {}, h("kbd", {text: "Q"}), " -10% di vita al nemico") : null,
+      h("span", {}, h("kbd", {text: "Invio"}), " ricomincia"), h("span", {}, h("kbd", {text: "Esc"}), " esci")),
+    h("div", {class: "controlli"}, h("label", {for: "avel"}, "Velocità", vel)));
+  return box;
+}
+
+// ---------- mappa navigabile: dall'intero mondo alle caselle vere ----------
+const MONDO_DETT = {};
+function mappaNavigabile(M, st, onSegno) {
+  const sotto = st.livello === "sotto" && M.sotto, LIV = sotto ? M.sotto : M, chiave = sotto ? "sotto" : "sopra";
+  const c = h("canvas", {class: "mappa-canvas", "aria-label": "Mappa del mondo: trascina per muoverti, rotella o + e − per ingrandire"});
+  const g = c.getContext("2d");
+  const vista = st.vista || (st.vista = {x: M.partenza[0], y: M.partenza[1], z: 2});       // z = pixel per casella
+  const mini = new Image(); mini.src = LIV.mappa.file;
+  let tessere = null, ogg = null, atl = null, ind = null, pronto = false, strati = st.strati;
+  (MONDO_DETT[chiave] ? Promise.resolve(MONDO_DETT[chiave]) : fetch(LIV.dettaglio).then(r => r.json()).then(j => MONDO_DETT[chiave] = j)).then(async j => {
+    tessere = await Promise.all(j.tessere.map(immagine)); atl = await Promise.all(j.atlanti.map(immagine));
+    const ii = await immagine(j.indici); const cc = document.createElement("canvas"); cc.width = ii.width; cc.height = ii.height;
+    const gg = cc.getContext("2d"); gg.drawImage(ii, 0, 0); ind = gg.getImageData(0, 0, ii.width, ii.height).data; ogg = j; pronto = true; disegna(); });
+  function dimensiona() { const r = c.getBoundingClientRect(); c.width = Math.round(r.width); c.height = Math.round(r.height); }
+  function disegna() {
+    if (!c.isConnected) return; if (c.width !== Math.round(c.getBoundingClientRect().width)) dimensiona();
+    const Wc = c.width, Hc = c.height, z = vista.z, x0 = vista.x - Wc / 2 / z, y0 = vista.y - Hc / 2 / z;
+    g.imageSmoothingEnabled = false; g.fillStyle = sotto ? "#181425" : "#124e89"; g.fillRect(0, 0, Wc, Hc);
+    if (!pronto || z < 8) { g.drawImage(mini, x0 * 2, y0 * 2, Wc / z * 2, Hc / z * 2, 0, 0, Wc, Hc); }
+    else {
+      const T = ogg.tile, cols = ogg.colonne, per = cols * ogg.righe, s = z / T;
+      const cx0 = Math.max(0, Math.floor(x0)), cy0 = Math.max(0, Math.floor(y0)), cx1 = Math.min(M.w, Math.ceil(x0 + Wc / z)), cy1 = Math.min(M.h, Math.ceil(y0 + Hc / z));
+      for (let y = cy0; y < cy1; y++) for (let x = cx0; x < cx1; x++) {
+        const o = (y * M.w + x) * 4, n = ind[o] + 256 * ind[o + 1], f = Math.floor(n / per), l = n % per;
+        if (!tessere[f]) continue;
+        g.drawImage(tessere[f], (l % cols) * T, Math.floor(l / cols) * T, T, T, Math.floor((x - x0) * z), Math.floor((y - y0) * z), Math.ceil(z), Math.ceil(z));
+      }
+      if (z >= 12) { const lista = ogg.oggetti; let lo = 0, hi = lista.length;           // oggetti ordinati per y: si cerca la fascia
+        while (lo < hi) { const m = (lo + hi) >> 1; if (lista[m][2] < y0) lo = m + 1; else hi = m; }
+        for (let i = lo; i < lista.length && lista[i][2] < y0 + Hc / z + 12; i++) { const [k, ox, oy] = lista[i]; if (ox < x0 - 10 || ox > x0 + Wc / z + 10) continue;
+          const [a, sx, sy, sw, sh, ax, ay] = ogg.sprite[k]; g.drawImage(atl[a], sx, sy, sw, sh, Math.round((ox * T - ax - x0 * T) * s), Math.round((oy * T - ay - y0 * T) * s), Math.round(sw * s), Math.round(sh * s)); } }
+    }
+    // segni
+    for (const sg of SEGNI) { if (!strati[sg.strato] && sg.strato !== "partenza") continue; const px = (sg.x - x0) * z, py = (sg.y - y0) * z; if (px < -10 || py < -10 || px > Wc + 10 || py > Hc + 10) continue;
+      const stt = sg.k ? statoDi(sg.k) : null; g.fillStyle = stt === "no" ? "#e43b44" : stt === "ok" ? "#63c74d" : sg.col; g.strokeStyle = "#181425"; g.lineWidth = 2;
+      g.beginPath(); if (sg.strato === "villaggio") g.rect(px - 6, py - 6, 12, 12); else g.arc(px, py, sg.strato === "ingresso" ? 4 : 6, 0, Math.PI * 2); g.fill(); g.stroke();
+      if (z >= 6 && sg.nome) { g.font = "11px Inter, sans-serif"; g.lineWidth = 3; g.strokeStyle = "#181425"; g.strokeText(sg.nome, px + 9, py + 4); g.fillStyle = "#fff"; g.fillText(sg.nome, px + 9, py + 4); } }
+    if (strati.riquadri) for (const [rid, r] of Object.entries(M.riquadri)) { const reg = M.regioni[rid]; if (!reg) continue; g.strokeStyle = "rgba(255,255,255,.6)"; g.setLineDash([4, 4]); g.lineWidth = 1;
+      g.strokeRect((r[0] - x0) * z, (r[1] - y0) * z, (r[2] - r[0]) * z, (r[3] - r[1]) * z); g.setLineDash([]); g.fillStyle = "#fff"; g.font = "11px Inter, sans-serif"; g.fillText(reg.nome, (r[0] - x0) * z + 4, (r[1] - y0) * z + 14); }
+    info.textContent = `${Math.round(vista.x)}, ${Math.round(vista.y)} · ${z >= 8 ? (z / 32 * 100).toFixed(0) + "% del gioco" : "vista d'insieme"} · ${z.toFixed(1)} px per casella`;
+  }
+  const SEGNI = sotto ? [...M.ingressi.map(i => ({...i, strato: "ingresso", col: "#8b9bb4", nome: bello(i.id)})), ...M.boss_sotto.map(b => ({...b, strato: "bosssotto", col: "#e43b44", nome: bello(b.id)}))] : [...M.luoghi.map(l => ({...l, strato: "luogo", k: "luogo:" + l.id, nome: bello(l.id), col: "#fee761"})), ...M.villaggi.map(v => ({...v, strato: "villaggio", k: "villaggio:" + v.id, nome: bello(v.id), col: "#feae34"})),
+    ...M.ingressi.map(i => ({...i, strato: "ingresso", col: "#8b9bb4", nome: ""})), ...M.boss_sotto.map(b => ({...b, strato: "bosssotto", col: "#e43b44", nome: bello(b.id)})), {x: M.partenza[0], y: M.partenza[1], strato: "partenza", col: "#fff", nome: "partenza"}];
+  const zoom = (f, cxp, cyp) => { const r = c.getBoundingClientRect(); const mx = cxp ?? r.width / 2, my = cyp ?? r.height / 2;
+    const wx = vista.x + (mx - c.width / 2) / vista.z, wy = vista.y + (my - c.height / 2) / vista.z; vista.z = Math.max(.5, Math.min(96, vista.z * f));
+    vista.x = wx - (mx - c.width / 2) / vista.z; vista.y = wy - (my - c.height / 2) / vista.z; disegna(); };
+  c.addEventListener("wheel", e => { e.preventDefault(); const r = c.getBoundingClientRect(); zoom(e.deltaY < 0 ? 1.25 : 0.8, e.clientX - r.left, e.clientY - r.top); }, {passive: false});
+  let trascina = null, mosso = 0;
+  c.addEventListener("pointerdown", e => { trascina = {x: e.clientX, y: e.clientY}; mosso = 0; c.setPointerCapture(e.pointerId); });
+  c.addEventListener("pointermove", e => { if (!trascina) return; const dx = e.clientX - trascina.x, dy = e.clientY - trascina.y; mosso += Math.abs(dx) + Math.abs(dy);
+    vista.x -= dx / vista.z; vista.y -= dy / vista.z; trascina = {x: e.clientX, y: e.clientY}; disegna(); });
+  c.addEventListener("pointerup", e => { trascina = null; if (mosso > 4) return; const r = c.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+    const x0 = vista.x - c.width / 2 / vista.z, y0 = vista.y - c.height / 2 / vista.z;
+    const t = SEGNI.filter(s => s.k && strati[s.strato]).find(s => Math.hypot((s.x - x0) * vista.z - mx, (s.y - y0) * vista.z - my) < 9); if (t) onSegno(t.k); });
+  c.addEventListener("dblclick", e => { const r = c.getBoundingClientRect(); zoom(2, e.clientX - r.left, e.clientY - r.top); });
+  const info = h("span", {class: "conta"});
+  new ResizeObserver(() => { dimensiona(); disegna(); }).observe(c);
+  mini.onload = disegna;
+  return {el: c, info, zoom, disegna, vai: (x, y, z) => { vista.x = x; vista.y = y; if (z) vista.z = z; disegna(); }};
+}
+
+// ---------- viste ----------
+const VISTE = {};
+let VISTA = "oggi", SFOGLIA = null;
+
+function gruppi() {
+  const P = D.personaggi, M = D.mondo;
+  return {"Nemici": D.nemici.map(n => "nemico:" + n.id), "Boss": D.boss.map(b => "boss:" + b.id), "Enel e le forme": ["enel", ...P.forme.map(f => "forma:" + f.id)],
+    "Personaggi": [...P.npc.map(n => "npc:" + n.id), ...P.antagonisti.map(a => "npc:" + a.id)], "Pet e fauna": [...P.pet.map(p => "pet:" + p.id), ...P.fauna.map(f => "fauna:" + f.id)],
+    "Luoghi": M.luoghi.map(l => "luogo:" + l.id), "Villaggi": M.villaggi.map(v => "villaggio:" + v.id), "Interni": M.interni.map(i => "interno:" + i.id),
+    "Abilità": D.tecniche.pathway.flatMap(p => p.sequenze.flatMap(s => s.abilita.map(a => "abilita:" + a.id))), "Effetti": D.tecniche.effetti.map(e => "effetto:" + e.sprite),
+    "Oggetti": D.oggetti.map(o => "oggetto:" + o.id), "Stati": Object.keys(D.stati).map(s => "stato:" + s), "Libro e HUD": M.libro.map(l => "libro:" + l.id)};
+}
+
+VISTE.oggi = () => {
+  const av = D.avanzamento, aperte = av.storie.filter(s => !s.fatta).sort((a, b) => a.priorita - b.priorita);
+  const G = gruppi(), tutti = Object.values(G).flat(), visti = tutti.filter(k => statoDi(k)).length;
+  const dr = [...GIU.entries()].filter(([k]) => statoDi(k) === "no").sort((a, b) => String(b[1].quando).localeCompare(String(a[1].quando)));
+  const st = stato("oggi"), listaDr = h("div", {class: "lista"});
+  const q = h("input", {type: "search", id: "cerca-dr", placeholder: "Filtra le note…", value: st.q || ""});
+  const popDr = () => { const r = dr.filter(([k, g]) => cerca(st, k, g.nota || "")).map(([k, g]) => h("div", {}, h("span", {class: "id", text: k}), h("span", {class: "tx", text: g.nota || "senza nota"}), h("span", {class: "dx", text: data(g.quando)})));
+    listaDr.replaceChildren(...(r.length ? r : [h("div", {class: "vuoto", text: dbStato === "ok" ? "Nessun elemento da rifare." : "Giudizi non leggibili (" + dbStato + ")."})])); };
+  q.addEventListener("input", () => { st.q = q.value.toLowerCase(); popDr(); }); popDr();
+  return [h("h2", {text: "Oggi"}), h("p", {class: "intro", text: "Cosa viene dopo, cosa hai segnato da rifare, e quanto manca da guardare."}),
+    h("div", {class: "numeri"},
+      h("div", {class: "numero"}, h("b", {text: av.storie.filter(s => s.fatta).length + " / " + av.storie.length}), h("span", {text: "story fatte"})),
+      h("div", {class: "numero"}, h("b", {text: nf.format(av.test)}), h("span", {text: "test"})),
+      h("div", {class: "numero"}, h("b", {text: av.validator_ok ? "0 errori" : "errori", style: "color:" + (av.validator_ok ? "var(--ok)" : "var(--no)")}), h("span", {text: "validator"})),
+      h("div", {class: "numero"}, h("b", {text: visti + " / " + tutti.length}), h("span", {text: "elementi giudicati"})),
+      h("div", {class: "numero"}, h("b", {text: dr.length, style: dr.length ? "color:var(--no)" : ""}), h("span", {text: "da rifare"})),
+      h("div", {class: "numero"}, h("b", {text: euro(CONSUMO.reduce((a, s) => a + (s.costo || 0), 0))}), h("span", {text: "costo API stimato"}))),
+    h("div", {class: "due"},
+      h("div", {}, h("h3", {text: "Note mandate (le sto sistemando)"}), h("div", {class: "filtri"}, q), h("div", {class: "scorri basso"}, listaDr)),
+      h("div", {}, h("h3", {text: "Prossime story"}), h("div", {class: "scorri basso"}, h("div", {class: "lista"}, aperte.slice(0, 25).map(s =>
+        h("div", {class: "cliccabile", onclick: () => apriStoria(s)}, h("span", {class: "id", text: s.id}), h("span", {class: "tx", text: s.titolo}), h("span", {class: "dx", text: "fase " + s.fase}))))))),
+    h("div", {class: "avviso"}, "Le cose nuove da provare e approvare una per una sono nella pagina ", h("a", {href: "#provare", text: "Da testare"}), "."),
+    h("h3", {text: "Previsti, non ancora fatti (INCOMPLETO)"}), h("div", {class: "scorri basso"}, h("div", {class: "lista"}, D.previsti.map(x => h("div", {}, INC(), h("span", {class: "tx", text: x.nome + " — " + x.cosa}), h("span", {class: "dx", text: x.story}))))),
+    h("h3", {text: "Quanto hai guardato, per sezione"}), h("div", {class: "lista"}, Object.entries(G).map(([nome, ks]) => { const v = ks.filter(k => statoDi(k)).length, no = ks.filter(k => statoDi(k) === "no").length;
+      return h("div", {}, h("span", {class: "tx", text: nome}), h("span", {style: "flex:2"}, h("div", {class: "barra"}, h("i", {style: "width:" + (ks.length ? v / ks.length * 100 : 0) + "%"}))),
+        h("span", {class: "dx", text: v + " / " + ks.length + (no ? " · " + no + " da rifare" : "")})); }))];
+};
+
+// ---------- Da testare: ogni cosa nuova, da provare e approvare una per una ----------
+// Le chiavi dei giudizi sono "prova:<id>" (stesso archivio delle altre pagine). Le versioni da scegliere (la schivata)
+// sono una scheda per versione: "va bene" su quella che vuoi, "rifare" sulle altre.
+function effettoVivo(e, pal, scala = 4) {
+  const c = h("canvas", {class: "px"}); let img = null, f = 0, t = 0;
+  foglioColorato(e, pal).then(i => { if (!i) return; img = i; c.width = i.width / e.frames; c.height = i.height; c.style.width = c.width * scala + "px"; });
+  return guarda(c, {passo(dt) { if (!img) return; t += dt; if (t < 110) return; t = 0; f = (f + 1) % (e.frames + 3);
+    const g = c.getContext("2d"); g.imageSmoothingEnabled = false; g.clearRect(0, 0, c.width, c.height); if (f < e.frames) g.drawImage(img, f * c.width, 0, c.width, c.height, 0, 0, c.width, c.height); }});
+}
+function figuraAnim(fid, nome, scala = 5) {
+  const l = new Lettore(fid, {scala, giro: false, anim: nome}); const dir = segmento([[0, "Giù"], [1, "Su"], [2, "Sinistra"], [3, "Destra"]], 0, v => { l.dir = +v; l.disegna(); });
+  const vel = h("input", {type: "range", min: "0.05", max: "1.5", step: "0.05", value: "1", id: "vel-prova"}), testo = h("span", {class: "sotto", text: "100%"});
+  vel.addEventListener("input", () => { l.velocita = +vel.value; testo.textContent = Math.round(vel.value * 100) + "%"; });
+  const passo = h("button", {class: "chip", onclick: () => { l.pausa = true; l.avanza(1); }}, "Fotogramma dopo"), gioca = h("button", {class: "chip", onclick: () => { l.pausa = false; }}, "Riprendi");
+  return [guarda(l.c, l), l.a.righe > 1 ? dir : null, h("div", {class: "controlli"}, h("label", {for: "vel-prova"}, "Velocità", vel), testo, passo, gioca)];
+}
+// tutti i fotogrammi di un'animazione, numerati, una riga per direzione: per dire "il frame 5 a sinistra"
+function fotogrammi(fid, nome, scala = 3) {
+  const f = D.figure[fid], a = f && f.anims.find(x => x.nome === nome); if (!a) return null;
+  const DIR = ["Giù", "Su", "Sinistra", "Destra"], griglia = h("div", {class: "fotogrammi"});
+  immagine(f.file).then(im => { if (!im) return;
+    for (let r = 0; r < a.righe; r++) {
+      const riga = h("div", {class: "fg-riga"}, h("span", {class: "fg-dir", text: a.righe > 1 ? DIR[r] : ""}));
+      for (let i = 0; i < a.frames; i++) {
+        const c = h("canvas", {class: "px", width: a.w, height: a.h}); c.style.width = a.w * scala + "px";
+        const g = c.getContext("2d"); g.imageSmoothingEnabled = false; g.drawImage(im, i * a.w, a.y + r * a.h, a.w, a.h, 0, 0, a.w, a.h);
+        riga.append(h("figure", {}, c, h("figcaption", {text: (i + 1) + " · " + a.durate[i] + " ms"})));
+      }
+      griglia.append(riga);
+    } });
+  return h("details", {class: "blocco"}, h("summary", {text: "Tutti i fotogrammi, numerati (per dirmi il fotogramma preciso)"}), h("div", {style: "overflow:auto"}, griglia));
+}
+const NOMI_ANIM = {idle: "Fermo", walk: "Camminata", dash: "Schivata", attack_light: "Attacco leggero", attack_heavy: "Attacco pesante", parry: "Parata",
+  hurt: "Colpito", death: "Morte", cast: "Magia", meditate: "Meditazione", interact: "Interagire", pickup: "Raccogliere", drink: "Bere", ritual: "Rituale",
+  fly: "Volo", sail: "In barca", anticipo: "Segnale prima dell'attacco", attack: "Attacco", stagger: "Barcolla", fuga: "Fuga"};
+const SPIEGA_ANIM = {idle: "Fermo: respira.", walk: "Cammina (8 fotogrammi).", dash: "Schivata in uso nel gioco.", attack_light: "Attacco leggero (tasto J).",
+  attack_heavy: "Attacco pesante (tasto K): si carica in avanti, spadone alto dietro la spalla; tenendo premuto resta sulla carica.", parry: "Parata: la lama davanti a lui, di traverso, incontro al colpo; la scintilla dove arriva.", hurt: "Colpito: si piega, faccia del dolore, sangue.",
+  death: "Morte: cade all'indietro e resta a terra.", cast: "Lancia un'abilità.", meditate: "Medita seduto.", interact: "Tocca porte, leve, persone.", pickup: "Raccoglie da terra.",
+  drink: "Beve una fiala.", ritual: "Rituale, braccia alzate.", fly: "In volo.", sail: "In barca.", anticipo: "Il segnale prima dell'attacco: si abbassa, bocca aperta, coda dritta.",
+  attack: "Morso in salto.", stagger: "Colpito, barcolla."};
+function elementiProva() {
+  const T = D.tecniche, inc = T.effetti.find(x => x.sprite === "vfx_incantesimo");
+  let pw = null, ab = null;
+  for (const p of T.pathway) for (const s of p.sequenze) for (const a of s.abilita) if (a.id === "hermit_incantesimo_tradizionale") { pw = p; ab = a; }
+  const pal = pw ? pw.palette : {}, palTG = (T.pathway.find(p => p.id === "twilight_giant") || {}).palette || pal;
+  const abil = ab && inc ? [{...ab, prim: ab.primitive, effetto: "vfx_incantesimo", danno: 18, cosa: ab.cosa || []}] : [];
+  let abSF = null; for (const p of T.pathway) for (const s of p.sequenze) for (const a of s.abilita) if (a.id === "tg_stretta_ferrea") abSF = a;
+  if (abSF && T.effetti.some(x => x.sprite === "vfx_stretta_ferrea")) abil.push({...abSF, prim: abSF.primitive, effetto: "vfx_stretta_ferrea", danno: 0, cosa: abSF.cosa || [], palette: (T.pathway.find(p => p.id === "twilight_giant") || {}).palette});
+  const tutti = [];
+  const gruppo = (titolo, intro, elementi) => { for (const el of elementi) tutti.push({...el, gruppo: titolo}); };
+  const anim = (fid, chiave, nome) => ({k: `prova:${chiave}_${nome}`, titolo: NOMI_ANIM[nome] || bello(nome), breve: SPIEGA_ANIM[nome] || "",
+    anteprima: () => lettore(fid, {scala: 2, giro: false, anim: nome}),
+    media: () => [h("p", {text: SPIEGA_ANIM[nome] || ""}), ...figuraAnim(fid, nome, 5), fotogrammi(fid, nome)]});
+  if (D.figure.enel) {
+    const tutto = {k: "prova:enel", titolo: "Enel: proporzioni e aspetto", breve: "Gambe corte, busto e spalle larghi, sciarpa sul petto, fiale alla cintura, spadone sulla schiena.",
+      anteprima: () => lettore("enel", {scala: 2, giro: false, anim: "idle"}), media: () => studioFigura("enel", 5)};
+    gruppo("Enel", "Ogni animazione è una scheda: aprila, guarda le 4 direzioni, poi Va bene o Rifare con la nota.",
+      [tutto, ...D.figure.enel.anims.map(a => anim("enel", "enel", a.nome))]);
+  }
+  const varianti = Object.keys(D.figure).filter(f => f.startsWith("dash_"));
+  if (varianti.length) gruppo("Schivata: scegli la versione", "Quattro versioni. Metti Va bene su quella che vuoi nel gioco (Rifare sulle altre, o una nota per cambiarla).",
+    varianti.map(fid => ({k: "prova:schivata_" + fid.slice(5), titolo: (D.figure[fid].nome || fid.slice(5)), breve: "4 fotogrammi, invulnerabile nei primi 3.",
+      anteprima: () => lettore(fid, {scala: 2, giro: false, anim: "dash"}), media: () => [...figuraAnim(fid, "dash", 6), fotogrammi(fid, "dash")]})));
+  if (D.figure.nem_lupo_della_luna) gruppo("Lupo della luna", "Gobbo da predatore, criniera a punte scure, sella sul dorso, falce di luna gialla, zanne, coda folta.",
+    [{k: "prova:lupo", titolo: "Lupo: aspetto", breve: "La figura intera in tutte le animazioni.", anteprima: () => lettore("nem_lupo_della_luna", {scala: 2, giro: false, anim: "idle"}), media: () => studioFigura("nem_lupo_della_luna", 5)},
+     ...D.figure.nem_lupo_della_luna.anims.map(a => anim("nem_lupo_della_luna", "lupo", a.nome))]);
+  // giro del 2026-11-21: un edificio, un personaggio, un animale, un'abilita' alla volta
+  const imgEdificio = (e, scala) => { const i = h("img", {src: e.file, alt: e.id, class: "px"}); i.style.width = e.w * scala + "px"; i.style.imageRendering = "pixelated"; return i; };
+  const SPIEGA_EDIFICI = {edificio_casa_antica: "Centro antico: casa di arenaria di un'antica civiltà. Terrazza con l'angolo crollato e le macerie, botola ad arco, colonna spezzata, grande arco con la chiave scolpita, mezze colonne, fregio di glifi, finestre ad arco, crepe, muschio ed edera.",
+    edificio_casa_antica_pergola: "Centro antico, seconda casa (più piccola, abitata): terrazza con la pergola e la vite, anfore di cotto, scala esterna che sale alla terrazza, porta squadrata di lato, finestrelle con gli scuri, fascia dipinta.",
+    edificio_casa_antica_loggia: "Centro antico, terza casa (lunga e bassa): tetto di coppi sfondato in un punto con le travi, loggia di tre archi con la porta in mezzo, occhio tondo, colonna spezzata, fontana a vasca.",
+    edificio_museo: "Museo: un tempio di marmo bianco. Tetto a quattro falde con i lucernari appoggiati sulle falde, frontone con l'anfora e le statue, sei colonne, due affreschi incorniciati d'oro (colline e nave), due nicchie con le statue sotto gli stendardi, fascia a mosaico, portone di bronzo."};
+  if ((D.edifici_prova || []).length) gruppo("Edifici (stile delle case)", "Lo stile nuovo delle case: ogni edificio ha il suo disegno. 64 pixel per casella, come i personaggi.",
+    D.edifici_prova.map(e => ({k: "prova:" + e.id, titolo: ({edificio_casa_antica: "Casa del centro antico (1)", edificio_casa_antica_pergola: "Casa del centro antico (2): pergola", edificio_casa_antica_loggia: "Casa del centro antico (3): loggia", edificio_museo: "Museo"})[e.id] || bello(e.id.replace("edificio_", "")), breve: SPIEGA_EDIFICI[e.id] || "",
+      anteprima: () => imgEdificio(e, 0.5), media: () => [h("p", {text: SPIEGA_EDIFICI[e.id] || ""}), h("div", {style: "overflow:auto;max-height:70vh"}, imgEdificio(e, 2))]})));
+  for (const [fid, chiave, titolo, breve] of [["npc_mercante", "mercante", "Mercante", "Tarchiato con la pancia, turbante viola con la gemma, baffi a manubrio, panciotto verde, grembiule con la borsa delle monete, pantaloni a sbuffo, babbucce gialle. Da fermo si sfrega le mani; cammina dondolando."],
+                                           ["fauna_cervo", "cervo", "Cervo", "Zampe lunghe, collo lungo, corna ramificate, manto bruno con macchie chiare, coda col fiocco bianco. Da fermo bruca e alza la testa; in fuga salta."]]) {
+    if (!D.figure[fid]) continue;
+    gruppo(titolo, breve, [{k: "prova:" + chiave, titolo: titolo + ": aspetto", breve, anteprima: () => lettore(fid, {scala: 2, giro: false, anim: D.figure[fid].anims[0].nome}), media: () => studioFigura(fid, 5)},
+      ...D.figure[fid].anims.map(a => anim(fid, chiave, a.nome))]);
+  }
+  const effetto = (sprite, k, titolo, breve, p) => { const e = T.effetti.find(x => x.sprite === sprite); return e ? {k, titolo, breve, anteprima: () => effettoVivo(e, p, 1.5), media: () => [h("p", {text: breve}), effettoVivo(e, p, 5)]} : null; };
+  gruppo("Effetti con un disegno tutto loro", "Colorati col Pathway (qui Twilight Giant per il fendente, Eremita per l'incantesimo).", [
+    effetto("vfx_fendente_pesante", "prova:fendente_pesante", "Fendente pesante", "Mezzaluna che cala dall'alto e spacca il terreno; con la carica diventa più grande.", palTG),
+    {k: "prova:carica", titolo: "Carica dell'attacco pesante", breve: "Tieni premuto K: Enel resta sulla posa di carica, l'anello e la barra crescono; al rilascio colpisce più forte e più largo (fino a 2,5 volte il danno e 1,8 volte l'area in 1,5 secondi). C'è anche nel gioco vero.",
+     anteprima: () => lettore("enel", {scala: 2, giro: false, anim: "attack_heavy"}), media: () => [h("p", {text: "Provala nell'arena qui sotto la pagina (tasto K tenuto premuto)."}), ...figuraAnim("enel", "attack_heavy", 5)]},
+    effetto("vfx_incantesimo", "prova:incantesimo", "Incantesimo tradizionale (in volo)", "Sigillo con 4 rune che gira, scia di scintille.", pal),
+    effetto("vfx_incantesimo_scoppio", "prova:incantesimo_scoppio", "Incantesimo tradizionale (scoppio)", "Il sigillo si apre in un cerchio di rune e si spezza in schegge.", pal),
+    effetto("vfx_stretta_ferrea", "prova:stretta_ferrea", "Stretta ferrea (Gigante, Sequenza 9)", "Difesa +25% per 5 secondi: quattro piastre di ferro arrivano ai lati, si chiudono a guscio con un clang di scintille, il guscio brilla e un riflesso scorre e si spegne. Provala nell'arena col tasto 2.", palTG)].filter(Boolean));
+  return {tutti, abil, pal};
+}
+const rispostaClaude = k => (D.domande || []).some(d => d.k === k && d.tipo === "spiegazione" && (d.quando || "") >= "2026-11-21");
+const domandaAperta = k => (D.domande || []).some(d => d.k === k && d.tipo === "domanda" && !RISPOSTE.has(d.id));
+const schedaProva = el => carta(el, el.anteprima(), h("b", {text: el.titolo}), h("span", {class: "sotto", text: el.gruppo + (el.breve ? " · " + el.breve : "")}),
+  storiaDi(el.k).length && !statoDi(el.k) ? h("span", {class: "chip", text: "rifatta: riprovala"}) : null,
+  domandaAperta(el.k) ? h("span", {class: "chip domanda", text: "❓ ti ho fatto una domanda"}) : null,
+  rispostaClaude(el.k) ? h("span", {class: "chip risposta", text: "💬 Claude ti ha risposto"}) : null);
+VISTE.provare = () => {
+  ELENCO = [];
+  const {tutti, abil, pal} = elementiProva(), da = tutti.filter(e => !statoDi(e.k));
+  return [h("h2", {text: "Da testare"}), h("p", {class: "intro", text: "Solo le cose da provare. Va bene le manda in «Note e testate» fra le approvate; una nota le manda fra le note mandate. Quando le sistemo tornano qui."}),
+    (D.domande || []).some(d => d.tipo === "domanda" && !RISPOSTE.has(d.id)) ? h("div", {class: "avviso"}, "❓ Ti ho fatto delle domande: le trovi nelle schede segnate e nella pagina ", h("a", {href: "#note", text: "Note e testate"}), ".") : null,
+    h("h3", {text: "Arena di prova"}), arena({abilita: abil, palette: pal, bersaglio: D.figure.nem_lupo_della_luna ? "nem_lupo_della_luna" : true}),
+    h("h3", {text: `Da testare (${da.length})`}), da.length ? h("div", {class: "griglia"}, da.map(schedaProva)) : h("div", {class: "vuoto", text: "Niente da testare: tutto approvato o in attesa delle mie correzioni."})];
+};
+
+// ---------- Note e testate: cartelle per argomento, dentro le note mandate e le approvate ----------
+const CARTELLE = [["prova:enel", "Enel"], ["prova:schivata", "Schivate"], ["prova:lupo", "Lupo della luna"], ["prova:edificio", "Edifici"], ["prova:mercante", "Mercante"], ["prova:cervo", "Cervo"], ["prova:", "Effetti e combattimento"],
+  ["boss:", "Boss"], ["nemico:", "Nemici"], ["personaggio:", "Personaggi"], ["luogo:", "Luoghi"], ["villaggio:", "Paesi e case"], ["interno:", "Interni"],
+  ["libro:", "Libro e HUD"], ["oggetto:", "Oggetti"], ["", "Altro"]];
+const cartellaDi = k => CARTELLE.find(([p]) => k.startsWith(p))[1];
+VISTE.note = () => {
+  ELENCO = [];
+  const prove = elementiProva().tutti, perK = new Map(prove.map(e => [e.k, e]));
+  const chiavi = new Set([...GIU.keys(), ...(D.domande || []).map(d => d.k).filter(Boolean)]);
+  const cart = new Map();
+  for (const k of chiavi) { const st = statoDi(k), dom = (D.domande || []).some(d => d.k === k); if (!st && !dom) continue;
+    const c = cartellaDi(k); if (!cart.has(c)) cart.set(c, {no: [], ok: [], dom: [], msg: []});
+    const x = cart.get(c); if (st === "no") x.no.push(k); else if (st === "ok") x.ok.push(k);
+    if ((D.domande || []).some(d => d.k === k && d.tipo === "domanda")) x.dom.push(k); else if (dom) x.msg.push(k); }
+  const riga = k => { const el = perK.get(k), g = GIU.get(k) || {}, st = statoDi(k);
+    const i = el ? (ELENCO.indexOf(el) >= 0 ? ELENCO.indexOf(el) : ELENCO.push(el) - 1) : -1;
+    return h("div", {class: i >= 0 ? "cliccabile" : "", onclick: i >= 0 ? () => apriElemento(i) : null},
+      h("span", {class: "id", text: el ? el.titolo : bello(k.split(":").pop())}),
+      h("span", {class: "tx", text: st === "no" ? notaDi(k) : (storiaDi(k).length === 1 ? "1 nota sistemata" : storiaDi(k).length ? storiaDi(k).length + " note sistemate" : "")}),
+      domandaAperta(k) ? h("span", {class: "chip domanda", text: "❓ domanda"}) : null,
+      rispostaClaude(k) ? h("span", {class: "chip risposta", text: "💬 risposta"}) : null,
+      h("span", {class: "dx", text: g.quando ? data(g.quando) : ""})); };
+  const sotto = (titolo, ks) => ks.length ? h("details", {class: "sottocartella", open: ""}, h("summary", {text: `${titolo} (${ks.length})`}), h("div", {class: "lista"}, ks.map(riga))) : null;
+  const ordine = CARTELLE.map(c => c[1]).filter(c => cart.has(c));
+  return [h("h2", {text: "Note e testate"}), h("p", {class: "intro", text: "Una cartella per argomento. Dentro: le tue note mandate (le sto sistemando), le domande che ti ho fatto, e le cose approvate. Clicca una riga della prova per riaprirla."}),
+    ...(ordine.length ? ordine.map(c => { const x = cart.get(c);
+      return h("details", {class: "cartella", open: ""}, h("summary", {}, h("b", {text: "📁 " + c}), h("span", {class: "sotto", text: `  ${x.no.length} note · ${x.dom.length} domande · ${x.msg.length} messaggi · ${x.ok.length} approvate`})),
+        sotto("❓ Domande per te", x.dom), sotto("💬 Messaggi di Claude", x.msg), sotto("✎ Note mandate", x.no), sotto("✓ Testate", x.ok)); })
+      : [h("div", {class: "vuoto", text: dbStato === "ok" ? "Ancora niente." : "Giudizi non leggibili (" + dbStato + ")."})])];
+};
+
+// ---------- domande e spiegazioni di Claude, sulle schede ----------
+// D.domande da tools/dashboard/domande.json: {id, k, tipo: domanda|spiegazione, testo, opzioni}; le risposte stanno
+// nell'archivio della pagina, risposte/<id> = {scelta, testo, quando}.
+const RISPOSTE = new Map();
+function pannelloDomande(k) {
+  const ds = (D.domande || []).filter(d => d.k === k); if (!ds.length) return null;
+  return h("div", {class: "blocco"}, h("h4", {text: "Claude ti scrive"}), ...ds.map(d => {
+    const r = RISPOSTE.get(d.id) || {}, box = h("div", {class: "msg " + d.tipo}, h("p", {style: "margin:0 0 6px", text: (d.tipo === "domanda" ? "❓ " : "💬 ") + d.testo}));
+    if (d.tipo === "domanda") {
+      const stato = h("span", {class: "sotto", text: r.quando ? "Risposta mandata " + data(r.quando) : "Aspetto la tua risposta"});
+      const manda = async campi => { if (!db || !posso) return; const nuovo = {...(RISPOSTE.get(d.id) || {}), ...campi, k, quando: new Date().toISOString()};
+        RISPOSTE.set(d.id, nuovo); try { await db.doc("risposte/" + d.id).set(nuovo); stato.textContent = "Risposta mandata"; } catch (e) { stato.textContent = "Non salvata: " + (e.code || "errore"); } };
+      const opz = (d.opzioni || []).map(o => h("button", {class: "chip", "aria-pressed": String(r.scelta === o), disabled: !posso, onclick: ev => { manda({scelta: o});
+        for (const b of ev.currentTarget.parentNode.querySelectorAll("button")) b.setAttribute("aria-pressed", String(b === ev.currentTarget)); }}, o));
+      const ta = h("textarea", {placeholder: "Oppure scrivi la tua risposta (si salva da sola)", disabled: !posso}); ta.value = r.testo || "";
+      let t = null; ta.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => manda({testo: ta.value.trim()}), 700); });
+      box.append(h("div", {class: "filtri"}, ...opz), ta, stato);
+    }
+    return box; }));
+}
+
+VISTE.avanzamento = () => {
+  const av = D.avanzamento, st = stato("avanzamento"); st.fatte = st.fatte || "aperte";
+  const fasi = {}; for (const s of av.storie) { const f = fasi[s.fase] || (fasi[s.fase] = {tot: 0, fatte: 0}); f.tot++; if (s.fatta) f.fatte++; }
+  const ord = Object.entries(fasi).sort((a, b) => String(a[0]).localeCompare(String(b[0]), "it", {numeric: true}));
+  const giorni = {}; for (const c of av.commit) { const d = c.data.slice(0, 10); giorni[d] = (giorni[d] || 0) + 1; }
+  const oggi = new Date(D.generato), serie = []; for (let i = 41; i >= 0; i--) { const d = new Date(oggi - i * 864e5).toISOString().slice(0, 10); serie.push([d, giorni[d] || 0]); }
+  const max = Math.max(1, ...serie.map(s => s[1])), W = 840, H = 160, bw = W / serie.length;
+  const graf = h("div", {class: "grafico"}); graf.innerHTML = `<svg viewBox="0 0 ${W} ${H + 24}" role="img" aria-label="Commit al giorno">` +
+    [0, .5, 1].map(f => `<line x1="0" x2="${W}" y1="${H - f * H}" y2="${H - f * H}" stroke="var(--linea)"/>`).join("") +
+    serie.map(([d, n], i) => `<rect x="${i * bw + 2}" y="${H - n / max * H}" width="${bw - 4}" height="${n / max * H}" fill="var(--accento)"><title>${d}: ${n} commit</title></rect>`).join("") +
+    serie.filter((_, i) => i % 7 === 0).map(([d], k) => `<text x="${k * 7 * bw + 2}" y="${H + 16}">${d.slice(5)}</text>`).join("") + `<text x="${W - 4}" y="12" text-anchor="end">max ${max}</text></svg>`;
+  const lista = h("div", {class: "lista"}), conta = h("span", {class: "conta"});
+  const pop = () => { const sel = av.storie.filter(s => st.fatte === "tutte" || st.fatte === (s.fatta ? "fatte" : "aperte")).filter(s => !st.fase || s.fase === st.fase).filter(s => cerca(st, s.id, s.titolo)).sort((a, b) => a.priorita - b.priorita);
+    lista.replaceChildren(...(sel.length ? sel.map(s => h("div", {class: "cliccabile", tabindex: "0", onclick: () => apriStoria(s)}, h("span", {class: "id", text: s.id}), h("span", {class: "tx", text: s.titolo}),
+      chip(s.fatta ? "fatta" : "aperta", s.fatta ? "ok" : "att"), h("span", {class: "dx", text: "fase " + s.fase}))) : [h("div", {class: "vuoto", text: "Nessuna story."})])); conta.textContent = sel.length + " story"; };
+  const q = h("input", {type: "search", id: "cerca-storie", placeholder: "Filtra le story…"}); q.addEventListener("input", () => { st.q = q.value.toLowerCase(); pop(); });
+  const sf = h("select", {id: "f-fase", "aria-label": "Fase"}, h("option", {value: "", text: "Fase: tutte"}), ord.map(([f]) => h("option", {value: f, text: "Fase " + f})));
+  sf.addEventListener("change", () => { st.fase = sf.value; pop(); }); pop();
+  return [h("h2", {text: "Avanzamento"}), h("p", {class: "intro", text: `prd.json, git e la suite al commit ${D.commit} (${D.ramo}).`}),
+    h("div", {class: "due"}, h("div", {}, h("h3", {text: "Story per fase"}), h("div", {class: "scorri basso"}, h("div", {class: "lista"}, ord.map(([f, v]) =>
+      h("div", {}, h("span", {style: "width:70px", text: "Fase " + f}), h("span", {style: "flex:1"}, h("div", {class: "barra"}, h("i", {style: "width:" + v.fatte / v.tot * 100 + "%"}))), h("span", {class: "dx", text: v.fatte + "/" + v.tot})))))),
+      h("div", {}, h("h3", {text: "Commit al giorno"}), graf)),
+    h("h3", {text: "Story"}), h("div", {class: "filtri"}, q, sf, segmento([["aperte", "Aperte"], ["fatte", "Fatte"], ["tutte", "Tutte"]], st.fatte, v => { st.fatte = v; pop(); }), conta), h("div", {class: "scorri"}, lista),
+    h("h3", {text: "Ultimi commit"}), h("div", {class: "scorri basso"}, h("div", {class: "lista"}, av.commit.slice(0, 80).map(c => h("div", {}, h("span", {class: "id", text: c.sha}), h("span", {class: "tx", text: c.msg}), h("span", {class: "dx", text: data(c.data)})))))];
+};
+function apriStoria(s) {
+  ELENCO = [{k: null, titolo: s.id + " · " + s.titolo, media: () => [h("p", {text: s.descrizione}), s.criteri.length ? h("ul", {}, s.criteri.map(c => h("li", {text: c}))) : null, s.note ? h("div", {class: "avviso", text: s.note}) : null],
+    dati: () => [["Fase", s.fase], ["Priorità", s.priorita], ["Stato", s.fatta ? "fatta" : "aperta"]]}];
+  apriElemento(0);
+}
+
+function elLuogo(l, tipo) { return {k: tipo + ":" + l.id, titolo: bello(l.id), inc: l.foto ? null : "Nessuna foto dal gioco.", media: () => l.foto ? visore(l.foto, bello(l.id)) : h("div", {class: "avviso", text: "Nessuna foto."}),
+  dati: () => [["Tipo", tipo], ["Casella", l.x + ", " + l.y]]}; }
+VISTE.mondo = () => {
+  const M = D.mondo, st = stato("mondo"); st.strati = st.strati || {luogo: true, villaggio: true, ingresso: false, bosssotto: true, riquadri: false};
+  const tutti = [...M.luoghi.map(l => elLuogo(l, "luogo")), ...M.villaggi.map(v => elLuogo(v, "villaggio"))];
+  const apriK = k => { ELENCO = tutti; apriElemento(tutti.findIndex(e => e.k === k)); };
+  const mp = mappaNavigabile(M, st, apriK);
+  const livello = M.sotto ? segmento([["sopra", "Sopra"], ["sotto", "Sottosuolo"]], st.livello || "sopra", v => { st.livello = v; if (v === "sotto") st.strati.ingresso = true; rendi(); }) : null;
+  const strati = h("div", {class: "legenda"}, [["luogo", "Luoghi"], ["villaggio", "Villaggi"], ["ingresso", "Ingressi del sottosuolo"], ["bosssotto", "Boss sotto"], ["riquadri", "Regioni"]].map(([k, t]) => {
+    const c = h("input", {type: "checkbox", id: "strato-" + k}); c.checked = !!st.strati[k]; c.addEventListener("change", () => { st.strati[k] = c.checked; mp.disegna(); });
+    return h("label", {for: "strato-" + k}, c, t); }));
+  const vai = h("select", {id: "vai-luogo", "aria-label": "Vai a un luogo"}, h("option", {value: "", text: "Vai a…"}), [...M.luoghi, ...M.villaggi].sort((a, b) => a.id.localeCompare(b.id)).map(l => h("option", {value: l.x + "," + l.y, text: bello(l.id)})));
+  vai.addEventListener("change", () => { if (!vai.value) return; const [x, y] = vai.value.split(",").map(Number); mp.vai(x, y, 32); });
+  const grigliaL = h("div", {class: "griglia larga"});
+  const pop = () => { ELENCO = tutti; riempi(grigliaL, st, M.luoghi.filter(l => cerca(st, l.id) && filtroG(st, "luogo:" + l.id)).map(l => carta(tutti.find(e => e.k === "luogo:" + l.id),
+    l.foto ? h("img", {class: "foto", src: l.foto, alt: bello(l.id), loading: "lazy"}) : h("div", {class: "vetrina"}, INC()), h("div", {class: "nome", text: bello(l.id)})))); };
+  const filtri = barraFiltri(st, [], pop); pop();
+  return [h("h2", {text: "Mondo"}), h("p", {class: "intro", text: `${M.w} × ${M.h} caselle, ${nf.format(M.edifici)} edifici, ${nf.format(M.oggetti_scena)} oggetti di scena. Trascina per muoverti, rotella o doppio clic per ingrandire fino alle caselle vere del gioco (alberi e case compaiono da vicino). Clic su un segno per la sua scheda.`}),
+    h("div", {class: "filtri"}, livello, h("button", {class: "btn", type: "button", onclick: () => mp.zoom(1.6)}, "+"), h("button", {class: "btn", type: "button", onclick: () => mp.zoom(1 / 1.6)}, "−"),
+      h("button", {class: "btn", type: "button", onclick: () => mp.vai(600, 500, 0.9)}, "Tutto il mondo"), h("button", {class: "btn", type: "button", onclick: () => mp.vai(M.partenza[0], M.partenza[1], 32)}, "Partenza 1:1"), vai, mp.info),
+    strati, mp.el, h("h3", {text: "Luoghi, con la foto dal gioco"}), filtri, h("div", {class: "scorri"}, grigliaL)];
+};
+
+VISTE.paesi = () => {
+  const M = D.mondo, st = stato("paesi"), gv = h("div", {class: "griglia larga"}), gi = h("div", {class: "griglia larga"});
+  const pop = () => { ELENCO = [];
+    riempi(gv, {}, M.villaggi.filter(v => cerca(st, v.id) && filtroG(st, "villaggio:" + v.id)).map(v => carta(elLuogo(v, "villaggio"),
+      v.foto ? h("img", {class: "foto", src: v.foto, alt: bello(v.id), loading: "lazy"}) : null, h("div", {class: "nome", text: bello(v.id)}), h("div", {class: "chips"}, Object.entries(v.edifici).map(([t, n]) => chip(n + " " + bello(t)))))));
+    riempi(gi, {}, M.interni.filter(i => cerca(st, i.id, i.nome) && filtroG(st, "interno:" + i.id)).map(i => carta({k: "interno:" + i.id, titolo: bello(i.nome),
+      media: () => i.foto ? visore(i.foto, i.nome) : h("div", {class: "avviso", text: "Questo interno non ha una porta nel mondo: niente foto."}), dati: () => [["Id", i.id]]},
+      i.foto ? h("img", {class: "foto", src: i.foto, alt: bello(i.nome), loading: "lazy"}) : h("div", {class: "vetrina", text: "senza porta nel mondo"}), h("div", {class: "nome", text: bello(i.nome)}),
+      h("div", {class: "chips"}, i.nemici ? chip(i.nemici + " nemici") : null, i.oggetti ? chip(i.oggetti + " oggetti") : null, i.forzieri ? chip(i.forzieri + " forzieri") : null)))); };
+  const f = barraFiltri(st, [], pop); pop();
+  return [h("h2", {text: "Paesi e case"}), h("p", {class: "intro", text: `${M.villaggi.length} villaggi e ${M.interni.length} interni, fotografati dal gioco vero a mezzogiorno (modalità luminosa).`}), f,
+    h("h3", {text: "Villaggi"}), h("div", {class: "scorri"}, gv), h("h3", {text: "Interni"}), h("div", {class: "scorri"}, gi)];
+};
+
+function elFigura(k, titolo, fid, dati, extra) { return {k, titolo, media: () => D.figure[fid] ? studioFigura(fid) : h("div", {class: "avviso", text: "Nessuna figura."}), dati, extra}; }
+VISTE.personaggi = () => {
+  const P = D.personaggi, st = stato("personaggi"), gn = h("div", {class: "griglia"});
+  const rit = (id, s = 1.5) => id && D.atlanti.ritratti?.indice[id] !== undefined ? daAtlante("ritratti", id, s) : null;
+  const ritBlocco = id => rit(id) ? h("div", {class: "blocco"}, h("h4", {text: "Ritratto"}), h("div", {class: "vetrina", style: "min-height:0;padding:10px;justify-items:start"}, rit(id, 3))) : null;
+  const regioni = [...new Set(P.npc.map(n => n.regione).filter(Boolean))];
+  const tuttiNpc = [...P.npc.map(n => ({...n, tipo: "NPC"})), ...P.antagonisti.map(a => ({...a, tipo: "antagonista", ruolo: "Antagonista di " + bello(a.pathway)}))];
+  ELENCO = [];
+  const fissi = [carta(elFigura("enel", "Enel", "enel", () => [["Animazioni", D.figure.enel.anims.length]], () => ritBlocco("personaggio")), h("div", {class: "vetrina"}, lettore("enel")), h("div", {class: "nome", text: "Enel"})),
+    ...P.forme.map(f => carta(elFigura("forma:" + f.id, f.nome, f.figura, () => [["Forma", f.id]]), h("div", {class: "vetrina"}, lettore(f.figura)), h("div", {class: "nome", text: f.nome}), h("div", {class: "sotto", text: "forma"}))),
+    ...P.pet.map(p => carta(elFigura("pet:" + p.id, p.nome, p.figura, () => [["Tag", p.tag.join(", ")], ["Domabilità", p.domabilita]]), h("div", {class: "vetrina"}, lettore(p.figura)), h("div", {class: "nome", text: p.nome}), h("div", {class: "sotto", text: "pet"}))),
+    ...P.fauna.map(f => carta(elFigura("fauna:" + f.id, bello(f.id), f.figura), h("div", {class: "vetrina"}, lettore(f.figura)), h("div", {class: "nome", text: bello(f.id)}), h("div", {class: "sotto", text: "fauna"})))];
+  const quanti = ELENCO.length;
+  const pop = () => { ELENCO = ELENCO.slice(0, quanti);
+    riempi(gn, st, tuttiNpc.filter(n => cerca(st, n.nome, n.ruolo) && (!st.regione || n.regione === st.regione) && filtroG(st, "npc:" + n.id)).map(n =>
+      carta(elFigura("npc:" + n.id, n.nome, n.figura, () => [["Tipo", n.tipo], ["Regione", bello(n.regione)], ["Fazione", bello(n.fazione)], ["Negozio", n.negozio ? "sì" : ""], ["Dialogo", n.dialogo]], () => ritBlocco(n.ritratto)),
+        h("div", {class: "vetrina"}, n.figura ? lettore(n.figura) : rit(n.ritratto)), h("div", {class: "nome", text: n.nome}), h("div", {class: "sotto", text: n.ruolo})))); };
+  const f = barraFiltri(st, [["regione", "Regione", regioni]], pop); pop();
+  return [h("h2", {text: "Personaggi"}), h("p", {class: "intro", text: "Clicca un personaggio: lo vedi grande con tutte le animazioni, cambi velocità, vai frame per frame e lo provi coi tasti per sentire i tempi."}),
+    h("h3", {text: "Enel, forme, pet e fauna"}), h("div", {class: "griglia"}, fissi), h("h3", {text: "NPC e antagonisti"}), f, h("div", {class: "scorri"}, gn)];
+};
+
+// i boss: le fasi spiegate a parole
+const SPIEGA_CFG = {danno_attacco: v => `colpisce più forte (danno ${v})`, recupero_s: v => `si riprende più in fretta dopo un colpo (${v} s scoperto)`,
+  telegraph: v => v === "wind_up_light" ? "prepara i colpi più in fretta (tell corto)" : "prepara i colpi con calma (tell lungo)", postura_massimo: v => `postura ${v}: ${v > 200 ? "quasi impossibile sbilanciarlo" : "si sbilancia più facilmente"}`,
+  comportamento: v => ({mischia: "combatte da vicino", distanza: "si allontana e tira da lontano", carica: "prende la rincorsa e carica"})[v] || v, raggio_aggro: v => `ti vede da ${v} unità`};
+function fasiAParole(b) { return b.fasi.map((f, i) => { const cose = Object.entries(f.cfg || {}).map(([k, v]) => (SPIEGA_CFG[k] || (x => bello(k) + " " + x))(v));
+  if (f.gregari) cose.push(`chiama ${f.gregari.quanti} ${bello(f.gregari.tipo)}`);
+  return `Fase ${i + 1}, da ${Math.round(f.da * 100)}% di vita: ` + (cose.length ? cose.join("; ") : "combatte come il suo tipo") + "."; }); }
+VISTE.bestiario = () => {
+  const st = stato("bestiario"), g = h("div", {class: "griglia"});
+  const regioni = [...new Set(D.nemici.flatMap(n => Object.keys(n.dove)).filter(r => !r.startsWith("interno:")))].sort();
+  ELENCO = [];
+  const boss = D.boss.map(b => carta({k: "boss:" + b.id, titolo: b.nome, inc: "Figura provvisoria: quella del suo tipo. La figura grande del boss è la story US-1506.",
+    media: () => [h("h3", {text: "Combattilo: il boss usa le sue fasi dei dati"}), arena({boss: b}), h("h3", {text: "La figura e le animazioni"}), ...studioFigura(b.figura, 5)],
+    dati: () => [["Vita", "×" + b.vita_x], ["Arena", b.arena.raggio + " unità"], ["Posato", b.posato.regione ? bello(b.posato.regione) + ", Sequenza " + b.posato.sequenza : "no"], ["Figura", "provvisoria: quella del " + bello(b.posato.tipo)]],
+    extra: () => h("div", {class: "blocco"}, h("h4", {text: "Cosa fa, fase per fase"}), h("ul", {}, fasiAParole(b).map(t => h("li", {text: t}))))},
+    h("div", {class: "vetrina"}, lettore(b.figura, {scala: 3})), h("div", {class: "nome", text: b.nome}), h("div", {class: "chips"}, chip(b.fasi.length + " fasi"), chip("vita ×" + b.vita_x), chip("figura provvisoria", "att")),
+    h("ul", {class: "sotto", style: "margin:0;padding-left:16px"}, fasiAParole(b).map(t => h("li", {text: t})))));
+  const quanti = ELENCO.length;
+  const pop = () => { ELENCO = ELENCO.slice(0, quanti);
+    riempi(g, st, D.nemici.filter(n => cerca(st, n.nome) && (!st.rarita || n.rarita === st.rarita) && (!st.comportamento || n.comportamento === st.comportamento) && (!st.regione || n.dove[st.regione]) && filtroG(st, "nemico:" + n.id))
+      .map(n => carta({k: "nemico:" + n.id, titolo: n.nome, media: () => studioFigura(n.figura),
+        inc: n.figura === "nemico_base" ? "Senza figura propria: usa quella di base." : null,
+        dati: () => [["Rarità", n.rarita], ["Comportamento", n.comportamento], ["Tag", n.tag], ["Tell", bello(n.numeri.telegraph)], ["Danno", n.numeri.danno_attacco], ["Vista", n.numeri.raggio_aggro], ["Postura", n.numeri.postura_massimo], ["Recupero (s)", n.numeri.recupero_s]]},
+        h("div", {class: "vetrina"}, lettore(n.figura)), h("div", {class: "nome", text: n.nome}), h("div", {class: "chips"}, chipR(n.rarita), chipC(n.comportamento), n.figura === "nemico_base" ? INC() : null)))); };
+  const f = barraFiltri(st, [["rarita", "Rarità", ["comune", "raro", "elite"]], ["comportamento", "Comportamento", ["mischia", "distanza", "carica", "volo"]], ["regione", "Regione", regioni]], pop); pop();
+  return [h("h2", {text: "Bestiario"}), h("p", {class: "intro", text: `${D.boss.length} boss e ${D.nemici.length} tipi di nemico. Clicca per vederli grandi, a velocità scelta, e provarli coi tasti.`}),
+    h("h3", {text: "Boss: cosa fanno (nel dettaglio li combatti)"}), h("div", {class: "griglia larga"}, boss),
+    h("h3", {text: "Previsti, non ancora fatti"}), h("div", {class: "griglia larga"}, D.previsti.filter(x => x.sezione === "bestiario").map(x => h("div", {class: "scheda incompleta"},
+      h("div", {class: "chips"}, INC(), chip(x.tipo)), h("div", {class: "nome", text: x.nome}), h("div", {class: "sotto", text: x.cosa}), h("div", {class: "sotto", text: "Story: " + x.story})))),
+    h("h3", {text: "Nemici"}), f, h("div", {class: "scorri"}, g)];
+};
+
+VISTE.tecniche = () => {
+  const st = stato("tecniche"), T = D.tecniche; st.pw = st.pw || T.pathway[0].id;
+  const corpo = h("div", {class: "sezione"}), eff = h("div", {class: "griglia"});
+  const pal = () => (T.pathway.find(x => x.id === st.pw) || {}).palette || {};
+  const effDi = pr => T.effetti.find(x => x.primitiva === pr);
+  const mediaEffetto = e => { const ctrl = {}; const big = effetto(e, pal(), 6, ctrl); const vel = h("input", {type: "range", min: "0.1", max: "2", step: "0.05", value: "1", id: "evel"});
+    vel.addEventListener("input", () => { ctrl.l.velocita = +vel.value; });
+    return [h("div", {class: "vetrina scuro", style: "min-height:300px"}, big), h("div", {class: "controlli"}, h("label", {for: "evel"}, "Velocità", vel)),
+      h("h3", {text: "Nei colori di ogni Pathway"}), h("div", {class: "griglia"}, T.pathway.map(p => h("div", {class: "sezione"}, h("div", {class: "vetrina scuro", style: "min-height:96px"}, effetto(e, p.palette, 2)), h("span", {class: "sotto", text: p.nome}))))]; };
+  const perArena = (p, s) => s.abilita.map(a => ({...a, prim: a.primitive, danno: a.primitive.some(x => ["projectile", "melee_arc", "dot", "decay", "soul_detach"].includes(x)) ? 18 : 0}));
+  const pop = () => { ELENCO = []; const p = T.pathway.find(x => x.id === st.pw);
+    corpo.replaceChildren(h("p", {class: "intro", text: `Gruppo ${bello(p.gruppo)} · ${p.verbo}`}), ...p.sequenze.map(s => h("div", {class: "seq"},
+      h("div", {class: "testa"}, h("span", {class: "num", text: "S" + s.n}), h("span", {class: "titolo", text: s.nome}), chip(s.tier || "")), h("div", {class: "sotto", text: s.concetto}),
+      h("div", {class: "griglia larga"}, s.abilita.filter(a => cerca(st, a.nome, a.primitive.join(" ")) && filtroG(st, "abilita:" + a.id)).map(a => carta({k: "abilita:" + a.id, titolo: a.nome,
+        media: () => [h("h3", {text: "Cosa si vede: un disegno per ogni pezzo dell'abilità"}), ...a.primitive.map((pr, i) => { const e = effDi(pr);
+            return h("div", {class: "prim"}, h("div", {class: "vetrina scuro"}, e ? effetto(e, p.palette, 1) : glifo(pr, p.palette, 2)),
+              h("div", {}, h("div", {class: "chips"}, glifo(pr, p.palette, 1), chip(bello(pr)), e ? chip("effetto " + e.sprite) : chip("senza effetto proprio", "no")),
+                h("p", {style: "margin:4px 0 0", text: (a.cosa[i] || [])[0] || ""}), h("p", {class: "sotto", style: "margin:2px 0 0", text: (a.cosa[i] || [])[1] || ""}))); }),
+          h("h3", {text: "Provala (tasti 1–" + s.abilita.length + " per le abilità di questa Sequenza)"}), arena({abilita: perArena(p, s), palette: p.palette, bersaglio: true})],
+        dati: () => [["Pathway", p.nome], ["Sequenza", s.n + " · " + s.nome], ["Costo (spiritualità)", a.costo], ["Ricarica (s)", a.cd], ["Tag", a.tag.join(", ")]]},
+        h("div", {class: "glifi"}, a.primitive.map(pr => glifo(pr, p.palette))), h("div", {class: "nome", text: a.nome}),
+        h("div", {class: "chips"}, a.costo != null ? chip(a.costo + " spirito") : null, a.cd ? chip(a.cd + " s") : null),
+        h("ul", {class: "sotto", style: "margin:0;padding-left:16px"}, a.cosa.map(c => h("li", {text: c[0]})))))))));
+    eff.replaceChildren(...T.effetti.map(e => carta({k: "effetto:" + e.sprite, titolo: bello(e.primitiva), media: () => mediaEffetto(e), dati: () => [["Foglio", e.sprite], ["Frame", e.frames], ["Lampo d'impatto", e.lampo ? "sì" : "no"], ["Dove appare", bello(e.su)]]},
+      h("div", {class: "vetrina scuro"}, effetto(e, pal())), h("div", {class: "nome", text: bello(e.primitiva)})))); };
+  const scelta = h("div", {class: "pw"}, T.pathway.map(p => h("button", {type: "button", "aria-pressed": String(st.pw === p.id), onclick: ev => { st.pw = p.id; for (const b of scelta.children) b.setAttribute("aria-pressed", String(b === ev.currentTarget)); pop(); }},
+    h("span", {class: "pallino", style: "background:" + (p.palette.primario || "#888")}), p.nome)));
+  const f = barraFiltri(st, [], pop); pop();
+  const inc = D.previsti.filter(x => x.sezione === "tecniche");
+  return [h("h2", {text: "Tecniche"}), h("p", {class: "intro", text: "Ogni Pathway dalla Sequenza 9 alla 0. Ogni abilità è fatta di pezzi (primitive): per ognuno il suo disegno, cosa fa coi numeri veri e in parole semplici. Nel dettaglio la provi con Enel."}),
+    inc.length ? h("div", {class: "lista", style: "margin-bottom:10px"}, inc.map(x => h("div", {}, INC(), h("span", {class: "tx", text: x.nome + ": " + x.cosa})))) : null,
+    scelta, f, h("div", {class: "scorri"}, corpo), h("h3", {text: "Effetti delle primitive (colori del Pathway scelto)"}), h("div", {class: "scorri basso"}, eff)];
+};
+
+VISTE.oggetti = () => {
+  const st = stato("oggetti"), g = h("div", {class: "griglia"});
+  const cat = [...new Set(D.oggetti.map(o => o.categoria).filter(Boolean))].sort(), rar = ORDINE_RARITA.filter(r => D.oggetti.some(o => o.rarita === r));
+  const senzaFonti = new Set(D.oggetti.filter(o => (((D.info || {})["oggetto:" + o.id] || []).find(x => x[0] === "Dove si trova") || [, [""]])[1][0].startsWith("in nessun posto")).map(o => o.id));
+  const uso = {}; for (const o of D.oggetti) uso[o.icona] = (uso[o.icona] || 0) + 1;
+  ELENCO = [];
+  const sg = h("div", {class: "griglia"}, Object.entries(D.stati).map(([id, s]) => carta({k: "stato:" + id, titolo: s.nome, media: () => icona(() => daAtlante("stati", id, 12)), dati: () => [["Tipo", s.negativo ? "negativo" : "vantaggio"]]},
+    h("div", {class: "vetrina", style: "min-height:64px"}, daAtlante("stati", id, 3)), h("div", {class: "nome", text: s.nome}), h("div", {class: "chips"}, chip(s.negativo ? "negativo" : "vantaggio", s.negativo ? "no" : "ok")))));
+  const quanti = ELENCO.length;
+  const pop = () => { ELENCO = ELENCO.slice(0, quanti);
+    const ord = {nome: (a, b) => a.nome.localeCompare(b.nome), "prezzo-su": (a, b) => (a.valore || 0) - (b.valore || 0), "prezzo-giu": (a, b) => (b.valore || 0) - (a.valore || 0),
+      rarita: (a, b) => ORDINE_RARITA.indexOf(a.rarita) - ORDINE_RARITA.indexOf(b.rarita)}[st.ordina || "rarita"];
+    riempi(g, st, D.oggetti.filter(o => cerca(st, o.nome, o.id) && (!st.categoria || o.categoria === st.categoria) && (!st.rarita || o.rarita === st.rarita) && (!st.doppie || uso[o.icona] > 1) && filtroG(st, "oggetto:" + o.id)
+      && (o.valore || 0) >= (st.min || 0) && (o.valore || 0) <= (st.max ?? 1e9)).sort(ord)
+      .map(o => carta({k: "oggetto:" + o.id, titolo: o.nome, media: () => icona(() => daAtlante("oggetti", o.icona, 8)), inc: senzaFonti.has(o.id) ? "Non si trova ancora da nessuna parte nel gioco." : null,
+        dati: () => [["Id", o.id], ["Categoria", bello(o.categoria)], ["Rarità", o.rarita], ["Valore", o.valore], ["Tag", o.tag.join(", ")], ["File", "data/items/" + o.file + ".json"]]},
+        h("div", {class: "vetrina", style: "min-height:80px"}, daAtlante("oggetti", o.icona, 2)), h("div", {class: "nome", text: o.nome}),
+        h("div", {class: "chips"}, chipR(o.rarita), chip(bello(o.categoria)), chip(nf.format(o.valore || 0) + " monete"), uso[o.icona] > 1 ? chip("icona uguale ad altri " + (uso[o.icona] - 1), "no") : null, senzaFonti.has(o.id) ? INC() : null)))); };
+  const cb = h("input", {type: "checkbox", id: "f-doppie"}); cb.checked = !!st.doppie; cb.addEventListener("change", () => { st.doppie = cb.checked; pop(); });
+  const f = barraFiltri(st, [["categoria", "Categoria", cat], ["rarita", "Rarità", rar]], pop);
+  const num = (id, ph, chiave) => { const i = h("input", {type: "number", id, min: "0", placeholder: ph, style: "width:96px", value: st[chiave] ?? ""}); i.addEventListener("input", () => { st[chiave] = i.value === "" ? undefined : +i.value; pop(); }); return i; };
+  const ordina = h("select", {id: "f-ordina", "aria-label": "Ordina"}, [["rarita", "Ordina: rarità"], ["prezzo-giu", "Prezzo: dal più caro"], ["prezzo-su", "Prezzo: dal meno caro"], ["nome", "Nome"]].map(([v, t]) => h("option", {value: v, text: t})));
+  ordina.value = st.ordina || "rarita"; ordina.addEventListener("change", () => { st.ordina = ordina.value; pop(); });
+  f.append(h("label", {class: "sotto", style: "display:inline-flex;gap:4px;align-items:center"}, "Prezzo da", num("f-min", "0", "min"), "a", num("f-max", "600", "max")), ordina,
+    h("label", {for: "f-doppie", class: "sotto", style: "display:inline-flex;gap:4px;align-items:center"}, cb, "solo icone uguali ad altre")); pop();
+  return [h("h2", {text: "Oggetti"}), h("p", {class: "intro", text: `${D.oggetti.length} oggetti. In rosso le icone uguali per oggetti diversi: da distinguere. Ogni dettaglio dice dove si trova l'oggetto e a cosa serve.`}), f, h("div", {class: "scorri"}, g),
+    h("h3", {text: "Stati"}), h("div", {class: "scorri basso"}, sg)];
+};
+
+VISTE.libro = () => {
+  const L = D.mondo.libro; let i = 0; ELENCO = L.map(l => ({k: "libro:" + l.id, titolo: bello(l.id), media: () => visore(l.foto, bello(l.id))}));
+  const img = h("img", {alt: ""}), titolo = h("b"), conta = h("span", {class: "conta"}), giud = h("div", {style: "max-width:320px"});
+  const pagina = h("div", {class: "pagina", title: "Clic per vederla grande", onclick: () => apriElemento(i)}, img);
+  const striscia = h("div", {class: "striscia"}, L.map((l, k) => h("button", {type: "button", title: bello(l.id), onclick: () => vai(k - i)}, h("img", {src: l.foto, alt: bello(l.id), loading: "lazy"}))));
+  function vai(d) { i = (i + d + L.length) % L.length; img.src = L[i].foto; titolo.textContent = bello(L[i].id); conta.textContent = (i + 1) + " / " + L.length;
+    giud.replaceChildren(bottoniGiudizio("libro:" + L[i].id, false));
+    [...striscia.children].forEach((b, k) => b.setAttribute("aria-current", String(k === i))); striscia.children[i].scrollIntoView({block: "nearest", inline: "center"}); }
+  SFOGLIA = vai; setTimeout(() => vai(0), 0);
+  return [h("h2", {text: "Libro e HUD"}), h("p", {class: "intro", text: "Sfoglia il libro come nel gioco: frecce o A/D. Clic sulla pagina per vederla grande con lo zoom e scrivere la nota."}),
+    h("div", {class: "controlli"}, h("button", {class: "btn", type: "button", onclick: () => vai(-1)}, "◀ Pagina prima"), titolo, conta, h("button", {class: "btn", type: "button", onclick: () => vai(1)}, "Pagina dopo ▶")),
+    h("div", {class: "sfoglia"}, pagina, h("div", {class: "controlli", style: "justify-content:center"}, giud), striscia)];
+};
+
+VISTE.consumo = () => {
+  if (!CONSUMO.length) return [h("h2", {text: "Consumo"}), h("div", {class: "avviso", text: dbStato === "ok" ? "Ancora nessuna sessione registrata." : "Il consumo si legge dall'archivio della pagina, che ora non risponde (" + dbStato + ")."})];
+  const tot = {}; let costo = 0; const giorni = {}, storie = {};
+  for (const s of CONSUMO) { costo += s.costo || 0;
+    for (const [m, t] of Object.entries(s.modelli || {})) { const x = tot[m] || (tot[m] = {chiamate: 0, input: 0, output: 0, cache_letta: 0, cache_1h: 0, cache_5m: 0, costo: 0}); for (const k in x) x[k] += t[k] || 0; }
+    for (const [d, c] of Object.entries(s.giorni || {})) giorni[d] = (giorni[d] || 0) + c;
+    for (const [x, c] of Object.entries(s.storie || {})) storie[x] = (storie[x] || 0) + c; }
+  const serie = Object.entries(giorni).sort(), max = Math.max(1, ...serie.map(s => s[1])), W = 840, H = 160, bw = W / Math.max(serie.length, 1);
+  const graf = h("div", {class: "grafico"}); graf.innerHTML = `<svg viewBox="0 0 ${W} ${H + 24}" role="img" aria-label="Costo stimato al giorno">` + [0, .5, 1].map(f => `<line x1="0" x2="${W}" y1="${H - f * H}" y2="${H - f * H}" stroke="var(--linea)"/>`).join("") +
+    serie.map(([d, c], i) => `<rect x="${i * bw + 3}" y="${H - c / max * H}" width="${Math.max(bw - 6, 2)}" height="${c / max * H}" fill="var(--accento)"><title>${d}: $${c.toFixed(2)}</title></rect><text x="${i * bw + bw / 2}" y="${H + 16}" text-anchor="middle">${d.slice(5)}</text>`).join("") +
+    `<text x="${W - 4}" y="12" text-anchor="end">max $${max.toFixed(0)}</text></svg>`;
+  const tok = Object.values(tot).reduce((a, t) => a + t.input + t.output + t.cache_letta + t.cache_1h + t.cache_5m, 0);
+  const st = stato("consumo"), lst = h("div", {class: "lista"});
+  const titoloDi = s => (D.avanzamento.storie.find(x => x.id === s) || {}).titolo || "";
+  const pop = () => lst.replaceChildren(...Object.entries(storie).sort((a, b) => b[1] - a[1]).filter(([s]) => cerca(st, s, titoloDi(s))).map(([s, c]) =>
+    h("div", {}, h("span", {class: "id", text: s}), h("span", {class: "tx", text: titoloDi(s)}), h("span", {class: "dx", text: euro(c)}))));
+  const q = h("input", {type: "search", id: "cerca-consumo", placeholder: "Filtra le story…"}); q.addEventListener("input", () => { st.q = q.value.toLowerCase(); pop(); }); pop();
+  return [h("h2", {text: "Consumo"}), h("p", {class: "intro", text: `Token delle sessioni di Claude Code su questo progetto e quanto costerebbero all'API (${(CONSUMO[0] || {}).listino || ""}). Con l'abbonamento non si paga questa cifra. Una risposta conta per la prima story chiusa dopo di lei.`}),
+    h("div", {class: "numeri"}, h("div", {class: "numero"}, h("b", {text: euro(costo)}), h("span", {text: "costo API stimato"})), h("div", {class: "numero"}, h("b", {text: CONSUMO.length}), h("span", {text: "sessioni"})),
+      h("div", {class: "numero"}, h("b", {text: mil(tok)}), h("span", {text: "token (con la cache)"})), h("div", {class: "numero"}, h("b", {text: mil(Object.values(tot).reduce((a, t) => a + t.output, 0))}), h("span", {text: "token scritti da Claude"}))),
+    h("h3", {text: "Per modello"}), h("div", {class: "tab-tbl"}, h("table", {}, h("thead", {}, h("tr", {}, ["Modello", "Risposte", "Entrata", "Cache scritta", "Cache letta", "Uscita", "Costo"].map((t, i) => h("th", {text: t, class: i ? "n" : null})))),
+      h("tbody", {}, Object.entries(tot).map(([m, t]) => h("tr", {}, h("td", {text: m}), h("td", {class: "n", text: nf.format(t.chiamate)}), h("td", {class: "n", text: nf.format(t.input)}), h("td", {class: "n", text: mil(t.cache_1h + t.cache_5m)}),
+        h("td", {class: "n", text: mil(t.cache_letta)}), h("td", {class: "n", text: mil(t.output)}), h("td", {class: "n", text: euro(t.costo)})))))),
+    h("div", {class: "due"}, h("div", {}, h("h3", {text: "Costo stimato al giorno"}), graf), h("div", {}, h("h3", {text: "Costo per story"}), h("div", {class: "filtri"}, q), h("div", {class: "scorri basso"}, lst))),
+    h("h3", {text: "Sessioni"}), h("div", {class: "scorri basso"}, h("div", {class: "lista"}, CONSUMO.slice().sort((a, b) => String(b.fine).localeCompare(String(a.fine))).map(s =>
+      h("div", {}, h("span", {class: "id", text: String(s.id).slice(0, 8)}), h("span", {class: "tx", text: data(s.inizio) + " → " + data(s.fine) + " · " + Object.keys(s.modelli || {}).join(", ")}), h("span", {class: "dx", text: euro(s.costo)})))))];
+};
+
+// ---------- navigazione ----------
+const NAV = document.getElementById("nav"), MAIN = document.getElementById("main");
+for (const [id, t] of SEZIONI) NAV.append(h("a", {href: "#" + id, text: t, "data-v": id}));
+function rendi() {
+  if (!D) return;
+  ATTIVI.clear(); ELENCO = []; SFOGLIA = null;
+  for (const a of NAV.children) { if (a.dataset.v === VISTA) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }
+  try { MAIN.replaceChildren(...[VISTE[VISTA]()].flat()); } catch (e) { MAIN.replaceChildren(h("div", {class: "avviso", text: "Questa sezione non si è aperta: " + e.message})); console.error(e); }
+}
+function daHash() { const v = location.hash.slice(1); VISTA = SEZIONI.some(s => s[0] === v) ? v : "oggi"; if (!MOD.hidden) chiudi(); rendi(); window.scrollTo(0, 0); }
+window.addEventListener("hashchange", daHash);
+fetch("dati.json").then(r => r.json()).then(d => { D = d; avviso(`commit ${d.commit} · ${d.ramo} · aggiornata ${data(d.generato)}`); daHash(); })
+  .catch(e => MAIN.replaceChildren(h("div", {class: "avviso", text: "I dati del progetto (dati.json) non si sono caricati: " + e.message})));
+(async () => {
+  if (!window.claude?.use) { dbStato = "fuori da claude.ai"; return; }
+  const timer = setTimeout(() => { if (dbStato === "attesa") { dbStato = "l'archivio non risponde"; if ((VISTA === "oggi" || VISTA === "consumo") && MOD.hidden) rendi(); } }, 10000);
+  try {
+    const [d, user] = await Promise.all([claude.use("db"), claude.use("user")]); db = d;
+    posso = !!(user && await user.isOwner());
+    if (!db) { dbStato = "archivio non disponibile"; clearTimeout(timer); if (MOD.hidden) rendi(); return; }
+    let primo = true;
+    db.collection("giudizi").onSnapshot(snap => { clearTimeout(timer); dbStato = "ok"; GIU.clear(); for (const x of snap.docs) GIU.set(x.id, x.data());
+      if ((primo || VISTA === "oggi") && MOD.hidden) rendi(); primo = false; aggiornaGiudizi(); }, e => { dbStato = "errore " + e.code; });
+    db.collection("risposte").onSnapshot(snap => { RISPOSTE.clear(); for (const x of snap.docs) RISPOSTE.set(x.id, x.data()); if ((VISTA === "provare" || VISTA === "note") && MOD.hidden) rendi(); }, () => {});
+    db.collection("consumo").onSnapshot(snap => { CONSUMO = snap.docs.map(x => x.data()); if ((VISTA === "consumo" || VISTA === "oggi") && MOD.hidden) rendi(); }, () => {});
+  } catch (e) { dbStato = "errore"; clearTimeout(timer); }
+})();
+</script>

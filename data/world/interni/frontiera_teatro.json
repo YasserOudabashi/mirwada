@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "interno_id": "frontiera_teatro",
+  "stile": "torre",
+  "zona": "teatro",
+  "_comment": "US-1305c: il teatro abbandonato della Frontiera. In fondo il palco (i tappeti), davanti le panche vuote. Luogo dei rituali 'teatro' e 'palco'.",
+  "mappa": [
+    "############",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "############"
+  ],
+  "spawn": [
+    6,
+    7
+  ],
+  "arredi": [
+    {
+      "id": "tappeto",
+      "x": 4,
+      "y": 1
+    },
+    {
+      "id": "tappeto",
+      "x": 6,
+      "y": 1
+    },
+    {
+      "id": "vaso",
+      "x": 1,
+      "y": 1
+    },
+    {
+      "id": "vaso",
+      "x": 10,
+      "y": 1
+    },
+    {
+      "id": "panca",
+      "x": 2,
+      "y": 4
+    },
+    {
+      "id": "panca",
+      "x": 5,
+      "y": 4
+    },
+    {
+      "id": "panca",
+      "x": 8,
+      "y": 4
+    },
+    {
+      "id": "panca",
+      "x": 2,
+      "y": 6
+    },
+    {
+      "id": "panca",
+      "x": 8,
+      "y": 6
+    }
+  ],
+  "nemici": [],
+  "oggetti": []
+}

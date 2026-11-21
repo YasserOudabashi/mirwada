@@ -650,13 +650,13 @@
       },
       "advancement_ritual": {
         "location_tags": [
-          "nebbia_grigia",
-          "soglia"
+          "porta_senza_stanza"
         ],
         "momento": "notte_fonda",
         "fase_lunare": "eclissi",
         "sacrifices": [
-          "ancora_del_giocatore"
+          "ancora_del_giocatore",
+          "il_detentore_precedente_della_sequenza_0"
         ],
         "sigils": []
       },
@@ -725,17 +725,7 @@
         ],
         "formula_id": "formula_fool_0"
       },
-      "advancement_ritual": {
-        "location_tags": [
-          "porta_senza_stanza"
-        ],
-        "momento": "notte_fonda",
-        "fase_lunare": "eclissi",
-        "sacrifices": [
-          "il_detentore_precedente_della_sequenza_0"
-        ],
-        "sigils": []
-      },
+      "advancement_ritual": null,
       "madness_on_force": 14.0,
       "notes": "",
       "stub": false
