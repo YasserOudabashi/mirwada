@@ -1,12 +1,117 @@
 [
- {"id": "d1-lupo-sangue", "k": "prova:lupo_stagger", "tipo": "domanda", "quando": "2026-11-19",
+ {
+  "id": "d1-lupo-sangue",
+  "k": "prova:lupo_stagger",
+  "tipo": "domanda",
+  "quando": "2026-11-19",
   "testo": "I punti rossi sono gocce di sangue: quando il lupo viene colpito schizzano dal fianco (avevi chiesto il sangue su tutti). Come li vuoi?",
-  "opzioni": ["Vanno bene così", "Più grandi e più rossi", "Che colino fino a terra", "Toglili"]},
- {"id": "d2-schivata-quale", "k": "prova:enel_dash", "tipo": "domanda", "quando": "2026-11-19",
+  "opzioni": [
+   "Vanno bene così",
+   "Più grandi e più rossi",
+   "Che colino fino a terra",
+   "Toglili"
+  ]
+ },
+ {
+  "id": "d2-schivata-quale",
+  "k": "prova:enel_dash",
+  "tipo": "domanda",
+  "quando": "2026-11-19",
   "testo": "Hai approvato la schivata attuale e anche le quattro versioni. Quale va nel gioco?",
-  "opzioni": ["Quella attuale (chinato in avanti)", "Scivolata", "Capriola", "Affondo", "Passo d'ombra", "Diversa per ogni Pathway"]},
- {"id": "s1-tell-occhi", "k": "boss:re_dei_ratti", "tipo": "spiegazione", "quando": "2026-11-19",
-  "testo": "Fatto: il segnale prima dell'attacco ora è il lampo negli occhi (bianco e giallo), senza la linea rossa. Lo vedi già sul lupo; il Re dei Ratti e gli altri nemici lo avranno quando li rifaccio nel nuovo stile."},
- {"id": "s2-pesante-due-mani", "k": "prova:enel_attack_heavy", "tipo": "spiegazione", "quando": "2026-11-19",
-  "testo": "Ora lo spadone è tenuto a due mani in tutto l'attacco pesante: la mano sinistra va sull'elsa sotto la destra."}
+  "opzioni": [
+   "Quella attuale (chinato in avanti)",
+   "Scivolata",
+   "Capriola",
+   "Affondo",
+   "Passo d'ombra",
+   "Diversa per ogni Pathway"
+  ]
+ },
+ {
+  "id": "s1-tell-occhi",
+  "k": "boss:re_dei_ratti",
+  "tipo": "spiegazione",
+  "quando": "2026-11-19",
+  "testo": "Fatto: il segnale prima dell'attacco ora è il lampo negli occhi (bianco e giallo), senza la linea rossa. Lo vedi già sul lupo; il Re dei Ratti e gli altri nemici lo avranno quando li rifaccio nel nuovo stile."
+ },
+ {
+  "id": "s2-pesante-due-mani",
+  "k": "prova:enel_attack_heavy",
+  "tipo": "spiegazione",
+  "quando": "2026-11-19",
+  "testo": "Ora lo spadone è tenuto a due mani in tutto l'attacco pesante: la mano sinistra va sull'elsa sotto la destra."
+ },
+ {
+  "id": "s3-cervo-zampe",
+  "k": "prova:cervo",
+  "tipo": "spiegazione",
+  "quando": "2026-11-21",
+  "testo": "Sistemato: ora le quattro zampe toccano terra alla stessa altezza (le anche e le spalle si mettono all'altezza giusta da sole) e il collo arriva fino alla testa, anche mentre bruca."
+ },
+ {
+  "id": "s4-case-antiche",
+  "k": "prova:edificio_casa_antica",
+  "tipo": "spiegazione",
+  "quando": "2026-11-21",
+  "testo": "No, non sarà la stessa casa ripetuta: ogni casa del centro antico avrà il suo disegno. Intanto ne ho fatte altre due diverse da giudicare (con la pergola e la scala esterna; lunga con la loggia di tre archi e il tetto sfondato). Le altre verranno con lo stesso stile ma ognuna diversa."
+ },
+ {
+  "id": "s5-museo",
+  "k": "prova:edificio_museo",
+  "tipo": "spiegazione",
+  "quando": "2026-11-21",
+  "testo": "Rifatto: il tetto ora è a quattro falde (non sembra più un muro alto), i lucernari sono pochi, sparsi e appoggiati ognuno sulla sua falda (niente più finestrone sul colmo), e sui muri ci sono due affreschi incorniciati d'oro, due nicchie con le statue e una fascia a mosaico."
+ },
+ {
+  "id": "s6-capriola",
+  "k": "prova:schivata_capriola",
+  "tipo": "spiegazione",
+  "quando": "2026-11-21",
+  "testo": "La capriola è una delle versioni della schivata da scegliere (mi avevi chiesto più versioni). Ho sistemato la testa storta a destra e sinistra (ora gira insieme al corpo a quarti di giro) e il corpo non esce più dal fondo del riquadro. Sotto l'animazione ora c'è «Tutti i fotogrammi, numerati»: puoi scrivermi per esempio «Sinistra, fotogramma 4»."
+ },
+ {
+  "id": "s7-pesante-mano",
+  "k": "prova:enel_attack_heavy",
+  "tipo": "spiegazione",
+  "quando": "2026-11-21",
+  "testo": "Sistemato: guardando a sinistra la mano non sparisce più dietro la testa (il braccio dal lato di chi guarda ora si disegna sempre davanti)."
+ },
+ {
+  "id": "s8-gambe-camminata",
+  "k": "prova:enel_walk",
+  "tipo": "spiegazione",
+  "quando": "2026-11-21",
+  "testo": "Ora quando cammina il ginocchio della gamba che passa sale molto di più e il piede si stacca da terra, e il busto dondola un poco: il passo si capisce anche guardando su e giù, non solo dalle braccia."
+ },
+ {
+  "id": "s9-spada",
+  "k": "prova:enel",
+  "tipo": "spiegazione",
+  "quando": "2026-11-21",
+  "testo": "Oggi nel gioco Enel ha sempre lo spadone, sulla schiena: l'equipaggiamento (armi, armature, sigilli) cambia solo i numeri (danno, difesa...), non il disegno. Quando beve, raccoglie o usa qualcosa si vede l'oggetto in mano solo per quel gesto. Sotto ti faccio una domanda su come lo vuoi."
+ },
+ {
+  "id": "d3-arma-visibile",
+  "k": "prova:enel",
+  "tipo": "domanda",
+  "quando": "2026-11-21",
+  "testo": "Vuoi che l'arma o l'oggetto che indossi si veda su Enel?",
+  "opzioni": [
+   "Sì: ogni arma il suo disegno (spadone, spada, lancia, bastone...) e cambia quando la cambio",
+   "Sì l'arma, e anche l'armatura e il mantello",
+   "No, lo spadone resta sempre: i cambi si vedono solo nel libro"
+  ]
+ },
+ {
+  "id": "d4-schivata-pathway",
+  "k": "prova:enel_dash",
+  "tipo": "domanda",
+  "quando": "2026-11-21",
+  "testo": "Hai scelto una schivata diversa per ogni Pathway. Proposta: Gigante = affondo in avanti; Oscurità = passo d'ombra (le sagome viola); Morte = scivola come fumo; Porta = sparisce e ricompare un passo più in là; Errore = si sdoppia e sfarfalla; Matto = capriola; Eremita = scivolata con un sigillo sotto i piedi; Luna = salto da bestia a quattro zampe; Madre = rotolata tra le foglie; Paragone = scatto con una molla/ingranaggio. Quelle nuove le disegno e le metto qui da provare.",
+  "opzioni": [
+   "Va bene così",
+   "Va bene, ma ne cambio qualcuna (scrivo sotto quali)",
+   "Rifai la proposta"
+  ]
+ }
 ]

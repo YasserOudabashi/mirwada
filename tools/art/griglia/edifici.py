@@ -240,6 +240,8 @@ R = {
     "legno": Rampa("brown_dd", "brown_d", "brown"),
     "muschio": Rampa("green_d", "green_m", "green"),
     "rosso": Rampa("red_d", "red", "pink"),
+    "cotto": Rampa("red_d", "rust", "orange_d"),
+    "coppi": Rampa("brown_dd", "red_d", "rust"),
 }
 BUIO = colore("brown_dd")
 VETRO = colore("navy")
@@ -296,23 +298,52 @@ def museo():
     """Museo: tempio di marmo bianco. Scalinata larga, sei colonne scanalate, frontone triangolare con un rilievo
     (anfora e rami), tetto di ardesia a due falde visto dall'alto, portone di bronzo, due stendardi rossi con l'anfora
     (il simbolo del museo, senza scritte). 6 x 4 caselle."""
-    d = Disegno(6, 4, muro=150, sopra=10, seme=23)
+    d = Disegno(6, 4, muro=132, sopra=10, seme=23)
     x0, x1 = d.x0, d.x1
     cx = (x0 + x1) // 2
-    colmo = d.tetto_y + (d.gronda_y - d.tetto_y) // 3      # il colmo: la falda davanti (in luce) e' piu' grande
-    d.tegole(x0 + 6, d.tetto_y, x1 - x0 - 12, colmo - d.tetto_y, R["ardesia"], "falda_n")
-    d.t.col[d.tetto_y:colmo, x0 + 6:x1 - 6] = np.where(d.t.a[d.tetto_y:colmo, x0 + 6:x1 - 6, None],
-                                                       (d.t.col[d.tetto_y:colmo, x0 + 6:x1 - 6].astype(int)
-                                                        * 0.72).astype(np.uint8),
-                                                       d.t.col[d.tetto_y:colmo, x0 + 6:x1 - 6])
-    d.tegole(x0 + 6, colmo, x1 - x0 - 12, d.gronda_y - colmo, R["ardesia"], "falda_s")
-    d.rett(x0 + 6, colmo - 2, x1 - x0 - 12, 3, R["marmo"].toni[1], "colmo", separa=True)
-    for i in range(5):                              # lucernario: lastre di vetro col telaio, lungo il colmo
-        lx = x0 + 60 + i * 56
-        d.rett(lx, colmo + 8, 40, 22, R["marmo"].toni[0], f"luc{i}", separa=True)
-        d.rett(lx + 2, colmo + 10, 36, 18, VETRO, f"luc{i}v", separa=False)
-        d.rett(lx + 19, colmo + 10, 2, 18, R["marmo"].toni[1], f"luc{i}t", separa=False)
-        d.pixel([(lx + 4 + k, colmo + 12 + k // 2) for k in range(8)], colore("grey_l"), f"luc{i}r")
+    # tetto a padiglione visto dall'alto: quattro falde (nord in ombra, ovest in luce, est mezza ombra, sud davanti) con
+    # le creste chiare; cosi' il sedime si legge come un tetto e non come un muro alto
+    ty, gy = d.tetto_y, d.gronda_y
+    d.tegole(x0 + 6, ty, x1 - x0 - 12, gy - ty, R["ardesia"], "tetto")
+    colmo = ty + (gy - ty) * 2 // 5
+    ys, xs = np.mgrid[0:d.h, 0:d.w]
+    dn, ds = (ys - ty) / (colmo - ty), (gy - ys) / (gy - colmo)
+    dw, de = (xs - x0 - 6) / 110.0, (x1 - 6 - xs) / 110.0
+    falda = np.argmin(np.stack([dn, ds, dw, de]), axis=0)          # 0 nord, 1 sud, 2 ovest, 3 est
+    tetto = (ys >= ty) & (ys < gy) & (xs >= x0 + 6) & (xs < x1 - 6) & d.t.a
+    luce = np.array([0.7, 1.0, 1.15, 0.84])[falda]
+    d.t.col[tetto] = np.clip(d.t.col[tetto].astype(float) * luce[tetto, None], 0, 255).astype(np.uint8)
+    bordo = np.zeros_like(tetto)                                   # le creste fra due falde
+    bordo[1:, :] |= falda[1:, :] != falda[:-1, :]
+    bordo[:, 1:] |= falda[:, 1:] != falda[:, :-1]
+    bordo &= tetto & (ys > ty + 2) & (ys < gy - 2) & (xs > x0 + 8) & (xs < x1 - 8)
+    c = np.zeros((d.h, d.w, 3), np.uint8)
+    c[bordo] = R["marmo"].toni[1]
+    d.t.metti(bordo, c, "creste", separa=False)
+    # lucernari appoggiati sulle falde (mai a cavallo del colmo): ognuno sta dentro una falda sola, prende la luce
+    # di quella falda e ha il bordo spesso dal lato dove la falda scende (sud: sotto, nord: sopra, ovest/est: di lato),
+    # cosi' si legge che e' inclinato come il tetto. Pochi e sparsi.
+    def lucernario(i, lx, ly, w, h, verso):
+        f = {"n": 0, "s": 1, "o": 2, "e": 3}[verso]
+        assert (falda[ly:ly + h, lx:lx + w] == f).all(), f"lucernario {i} fuori dalla sua falda"
+        k = luce[ly + h // 2, lx + w // 2]
+        tono = lambda c: tuple(int(min(255, v * k)) for v in c)
+        d.rett(lx - 2, ly - 2, w + 4, h + 4, tono(R["marmo"].toni[1]), f"luc{i}", separa=True)
+        d.rett(lx, ly, w, h, tono(VETRO), f"luc{i}v", separa=False)
+        bx, by, bw, bh = {"s": (lx - 2, ly + h, w + 4, 3), "n": (lx - 2, ly - 4, w + 4, 3),
+                          "o": (lx - 4, ly - 2, 3, h + 4), "e": (lx + w + 1, ly - 2, 3, h + 4)}[verso]
+        d.rett(bx, by, bw, bh, tono(R["marmo"].toni[0]), f"luc{i}b", separa=False)   # lo spessore verso valle
+        if verso in "sn":
+            d.rett(lx + w // 2 - 1, ly, 2, h, tono(R["marmo"].toni[1]), f"luc{i}t", separa=False)
+        else:
+            d.rett(lx, ly + h // 2 - 1, w, 2, tono(R["marmo"].toni[1]), f"luc{i}t", separa=False)
+        d.pixel([(lx + 2 + q, ly + 2 + q // 2) for q in range(min(5, w - 4))], tono(colore("grey_l")), f"luc{i}r")
+    for i, (lx, ly, w, h, verso) in enumerate(((x0 + 108, colmo + 44, 30, 22, "s"), (x0 + 236, colmo + 70, 22, 16, "s"),
+                                               (x0 + 40, colmo + 6, 12, 26, "o"), (x0 + 250, ty + 30, 24, 12, "n"))):
+        lucernario(i, lx, ly, w, h, verso)
+    for sx in (x0 + 12, x1 - 18):                                  # acroteri sugli spigoli del tetto
+        d.pixel([(sx + i, ty + 6 + j) for j in range(6) for i in range(6) if (i - 2.5) ** 2 + (j - 2.5) ** 2 < 8],
+                R["marmo"].toni[2], f"acro{sx}")
     d.rett(x0 + 6, d.gronda_y - 5, x1 - x0 - 12, 5, R["marmo"].toni[0], "gronda", separa=True)
     fy = d.gronda_y
     # trabeazione e frontone
@@ -352,12 +383,56 @@ def museo():
     d.porta_legno(vano, R["bronzo"], "portone_p", borchie=colore("yellow"))
     for sx in (-1, 1):                                  # stendardi rossi con l'anfora
         bx = cx + sx * 64 - 10
-        d.rett(bx, fy + 26, 20, 50, R["rosso"].toni[1], f"stend{sx}", separa=True)
-        d.rett(bx, fy + 26, 4, 50, R["rosso"].toni[2], f"stend{sx}l", separa=False)
-        d.rett(bx + 16, fy + 26, 4, 50, R["rosso"].toni[0], f"stend{sx}o", separa=False)
-        d.pixel([(bx + 6 + i, fy + 40 + j) for j, r in enumerate(anfora[::2]) for i, ch in enumerate(r[3:11])
+        d.rett(bx, fy + 26, 20, 40, R["rosso"].toni[1], f"stend{sx}", separa=True)
+        d.rett(bx, fy + 26, 4, 40, R["rosso"].toni[2], f"stend{sx}l", separa=False)
+        d.rett(bx + 16, fy + 26, 4, 40, R["rosso"].toni[0], f"stend{sx}o", separa=False)
+        d.pixel([(bx + 6 + i, fy + 36 + j) for j, r in enumerate(anfora[::2]) for i, ch in enumerate(r[3:11])
                  if ch == "#"], colore("amber"), f"stend{sx}a")
-        d.pixel([(bx + k, fy + 76 + (k % 4 == 0)) for k in range(20)], R["rosso"].toni[0], f"stend{sx}f")
+        d.pixel([(bx + k, fy + 66 + (k % 4 == 0)) for k in range(20)], R["rosso"].toni[0], f"stend{sx}f")
+    # arte sulla parete della cella: due affreschi incorniciati d'oro nelle campate esterne (un paesaggio e una nave),
+    # due nicchie con una statua sotto gli stendardi, una fascia a mosaico in basso
+    passo = (x1 - x0 - 60) / 5
+    for k, scena in ((0, "colline"), (4, "nave")):
+        fx = int(x0 + 30 + passo * (k + 0.5)) - 16
+        fy2 = fy + 40
+        d.rett(fx - 2, fy2 - 2, 36, 46, colore("amber"), f"cornice{k}", separa=True)
+        d.rett(fx - 2, fy2 - 2, 36, 2, colore("yellow"), f"cornice{k}l", separa=False)
+        d.rett(fx, fy2, 32, 42, colore("cyan"), f"aff{k}", separa=False)
+        d.rett(fx, fy2 + 14, 32, 28, colore("blue"), f"aff{k}b", separa=False)
+        if scena == "colline":
+            d.pixel([(fx + i, fy2 + j) for i in range(32) for j in range(42)
+                     if j > 22 + 6 * np.sin(i / 5.0)], colore("green_m"), f"aff{k}c")
+            d.pixel([(fx + i, fy2 + j) for i in range(32) for j in range(42) if j > 32 + 3 * np.sin(i / 3.0 + 1)],
+                    colore("green_d"), f"aff{k}c2")
+            d.pixel([(fx + 22 + i, fy2 + 6 + j) for i in range(5) for j in range(5) if (i - 2) ** 2 + (j - 2) ** 2 < 6],
+                    colore("yellow"), f"aff{k}s")
+        else:
+            d.pixel([(fx + 6 + i, fy2 + 28 + j) for j in range(5) for i in range(20 - j * 2) if i >= j],
+                    colore("brown_d"), f"aff{k}n")
+            d.pixel([(fx + 15, fy2 + 12 + j) for j in range(16)], colore("brown_dd"), f"aff{k}a")
+            d.pixel([(fx + 16 + i, fy2 + 13 + j) for j in range(12) for i in range(8 - abs(j - 6) // 1) if i < 8],
+                    colore("white"), f"aff{k}v")
+            d.pixel([(fx + i, fy2 + 36 + (i % 5 == 0)) for i in range(32)], colore("white"), f"aff{k}o")
+    statua = ["..##...", ".####..", "..##...", ".####..", "######.", "#.###.#", "#.###.#", "..###..", "..###..",
+              ".##.##.", ".#...#.", ".#...#.", "#######"]
+    for sx in (-1, 1):
+        nx = cx + sx * 64
+        d.arco(nx, fy + 105, 24, 30, colore("slate_d"), f"nicchia{sx}", cornice=R["marmo"])
+        pts = [(nx - 3 + i, fy + 100 - len(statua) + j) for j, r in enumerate(statua) for i, ch in enumerate(r)
+               if ch == "#"]
+        d.pixel([p for p in pts if p[0] <= nx], R["marmo"].toni[2], f"nst{sx}l")
+        d.pixel([p for p in pts if p[0] > nx], R["marmo"].toni[1], f"nst{sx}o")
+        d.rett(nx - 6, fy + 100, 12, 5, R["marmo"].toni[1], f"nst{sx}p", separa=True)      # il piedistallo
+    # fascia a mosaico (rombi rossi su fondo crema, bordo verde-acqua), interrotta dal portale
+    my = d.terra_y - 26
+    for x in range(x0 + 20, x1 - 20):
+        if abs(x - cx) < 26:
+            continue
+        d.pixel([(x, my), (x, my + 8)], colore("teal_d"), "mos_b")
+        d.pixel([(x, my + j) for j in range(1, 8)], colore("cream"), "mos_f")
+        q = (x - x0) % 8
+        d.pixel([(x, my + 4 + dy) for dy in range(-min(q, 8 - q) + 1, min(q, 8 - q)) if min(q, 8 - q) > 0],
+                colore("red_d"), "mos_r")
     # sei colonne
     n = 6
     for i in range(n):
@@ -367,4 +442,104 @@ def museo():
     return d.fine()
 
 
-EDIFICI = {"casa_antica": casa_antica, "museo": museo}
+def casa_antica_pergola():
+    """Centro antico, seconda casa: piu' piccola e abitata. Terrazza con la pergola di travi e la vite, anfore di cotto
+    nell'angolo, scala esterna che sale lungo la facciata, porta squadrata di lato con l'architrave, finestrelle con
+    gli scuri, fascia dipinta color cotto sotto la terrazza. 3 x 3 caselle."""
+    d = Disegno(3, 3, muro=96, seme=31)
+    x0, x1 = d.x0, d.x1
+    ty, gy = d.tetto_y, d.gronda_y
+    d.lastre(x0, ty + 6, x1 - x0, gy - ty - 6, R["arenaria"], "terrazza", lw=16, lh=12)
+    d.blocchi(x0, ty, x1 - x0, 8, R["arenaria_scura"], "parapetto", bw=12, bh=8)
+    d.blocchi(x0, ty, 8, gy - ty, R["arenaria_scura"], "parapetto_o", bw=8, bh=12)
+    d.blocchi(x1 - 8, ty, 8, gy - ty - 40, R["arenaria_scura"], "parapetto_e", bw=8, bh=12)
+    for k in range(4):                                  # pergola: quattro travi e due longheroni, la vite sopra
+        d.rett(x0 + 16, ty + 20 + k * 22, 110, 4, R["legno"].toni[1], f"trave{k}", separa=True)
+    for xx in (x0 + 20, x0 + 118):
+        d.rett(xx, ty + 16, 5, 90, R["legno"].toni[2], f"long{xx}", separa=True)
+    d.muschio(x0 + 18, ty + 14, 104, 84, 34, R["muschio"], "vite")
+    d.pixel([(x0 + 30 + k * 17, ty + 40 + (k * 13) % 50) for k in range(6)], colore("purple"), "uva")
+    for i, (ax, ay) in enumerate(((x1 - 34, ty + 18), (x1 - 22, ty + 30), (x1 - 36, ty + 42))):
+        d.pixel([(ax + u, ay + v) for u in range(-5, 6) for v in range(-5, 6) if u * u + v * v <= 22],
+                R["cotto"].toni[1], f"anfora{i}")
+        d.pixel([(ax + u, ay + v) for u in range(-4, 1) for v in range(-4, 0) if u * u + v * v <= 10],
+                R["cotto"].toni[2], f"anfora{i}l")
+        d.pixel([(ax + u, ay + v) for u in range(-1, 2) for v in range(-1, 2)], BUIO, f"anfora{i}b")
+    d.rett(x0 + 40, ty + 140, 30, 20, R["legno"].toni[1], "panca", separa=True)
+    # facciata: blocchi piu' grandi e scuri, fascia dipinta, porta a sinistra, scala a destra
+    fy = gy
+    d.blocchi(x0, fy, x1 - x0, d.terra_y - fy, R["arenaria_scura"], "facciata", bw=20, bh=12, varia=0.3)
+    d.rett(x0, fy + 4, x1 - x0, 6, R["cotto"].toni[1], "fascia", separa=True)
+    d.pixel([(x, fy + 6 + (x // 4) % 2) for x in range(x0, x1, 2)], R["cotto"].toni[2], "fascia_m")
+    px = x0 + 26
+    d.rett(px - 4, d.terra_y - 62, 40, 6, R["arenaria"].toni[2], "architrave", separa=True)
+    vano = d.rett(px, d.terra_y - 56, 32, 56, BUIO, "vano", separa=True)
+    d.porta_legno(vano, R["legno"], "porta", borchie=colore("amber"))
+    for i, wx in enumerate((x0 + 82, x0 + 126)):
+        d.finestra(wx, fy + 30, 14, 16, VETRO, R["arenaria"], f"fin{i}", davanzale=R["arenaria"])
+        for sx in (-6, 14):
+            d.rett(wx + sx, fy + 30, 6, 16, R["legno"].toni[1], f"scuro{i}{sx}", separa=True)
+    for k in range(8):                                  # scala esterna che sale verso la terrazza
+        sx, sy = x1 - 52 + k * 5, d.terra_y - 8 - k * 11
+        d.rett(sx, sy, 52 - k * 5, 8, R["arenaria"].toni[1], f"scala{k}", separa=True)
+        d.rett(sx, sy, 52 - k * 5, 2, R["arenaria"].toni[2], f"scala{k}l", separa=False)
+    d.crepe(x0 + 6, fy + 14, x1 - x0 - 60, 60, 4, R["arenaria_scura"].toni[0], "crepe")
+    d.muschio(x0, fy + 6, 28, 50, 4, R["muschio"], "edera")
+    return d.fine()
+
+
+def casa_antica_loggia():
+    """Centro antico, terza casa: lunga e bassa, col tetto di coppi di cotto sfondato in un punto (si vedono le travi),
+    una loggia di tre archi al piano terra (in quello di mezzo la porta), l'occhio tondo sopra, una colonna spezzata e
+    una fontana a vasca davanti. 5 x 3 caselle."""
+    d = Disegno(5, 3, muro=104, seme=47)
+    x0, x1 = d.x0, d.x1
+    ty, gy = d.tetto_y, d.gronda_y
+    cx = (x0 + x1) // 2
+    colmo = ty + (gy - ty) // 3
+    d.tegole(x0 + 4, ty, x1 - x0 - 8, colmo - ty, R["coppi"], "falda_n")
+    d.t.col[ty:colmo, x0 + 4:x1 - 4] = (d.t.col[ty:colmo, x0 + 4:x1 - 4].astype(int) * 0.74).astype(np.uint8)
+    d.tegole(x0 + 4, colmo, x1 - x0 - 8, gy - colmo, R["coppi"], "falda_s")
+    d.rett(x0 + 4, colmo - 2, x1 - x0 - 8, 4, R["coppi"].toni[2], "colmo", separa=True)
+    ys, xs = np.mgrid[0:d.h, 0:d.w]                     # il buco nel tetto: travi annerite e coppi rotti sull'orlo
+    ang = np.arctan2(ys - colmo - 50, xs - x1 + 90)
+    buco = np.hypot((xs - (x1 - 90)) / 1.3, ys - (colmo + 50)) < 19 + 2 * np.sin(ang * 3) + 1.5 * np.cos(ang * 7)
+    c = np.zeros((d.h, d.w, 3), np.uint8)
+    c[buco] = BUIO
+    d.t.metti(buco, c, "buco", separa=True)
+    for k in range(4):
+        d.rett(x1 - 112 + k * 14, colmo + 32, 4, 38, R["legno"].toni[k % 2], f"trave{k}", separa=False)
+    d.muschio(x0 + 20, ty + 10, x1 - x0 - 60, 40, 6, R["muschio"], "muschio_t")
+    fy = gy
+    d.blocchi(x0, fy, x1 - x0, d.terra_y - fy, R["arenaria"], "facciata", bw=14, bh=9, varia=0.3, rotti=0.0)
+    d.fregio(x0, fy + 2, x1 - x0, R["arenaria_scura"], "fregio", motivo=("#.#.#.", ".#.#.#"), passo=6)
+    for i, ax in enumerate((cx - 92, cx, cx + 92)):     # loggia di tre archi
+        vano = d.arco(ax, d.terra_y, 46, 64, BUIO, f"loggia{i}", chiave=R["arenaria"].toni[2],
+                      cornice=R["arenaria_scura"])
+        if i == 1:
+            d.porta_legno(vano & (ys > d.terra_y - 44), R["legno"], "porta", borchie=colore("amber"))
+        else:
+            d.rett(ax - 14, d.terra_y - 14, 28, 6, R["arenaria"].toni[0], f"panca{i}", separa=True)
+    for ax in (cx - 46, cx + 46):                       # pilastri fra gli archi
+        d.colonna(ax, fy + 40, d.terra_y, 5, R["arenaria"], f"pil{ax}")
+    d.pixel([(cx + u, fy + 22 + v) for u in range(-11, 12) for v in range(-11, 12) if 64 < u * u + v * v <= 121],
+            R["arenaria_scura"].toni[1], "occhio_c")
+    d.pixel([(cx + u, fy + 22 + v) for u in range(-8, 9) for v in range(-8, 9) if u * u + v * v <= 64], VETRO, "occhio")
+    d.pixel([(cx + u, fy + 22) for u in range(-8, 9)] + [(cx, fy + 22 + v) for v in range(-8, 9)],
+            R["arenaria_scura"].toni[1], "occhio_t")
+    d.colonna(x0 + 18, d.terra_y - 40, d.terra_y, 7, R["arenaria"], "spezzata", rotta=10)
+    d.blocchi(x0 + 30, d.terra_y - 7, 22, 7, R["arenaria"], "rocchio", bw=11, bh=7)
+    bx = x1 - 34                                        # fontana a vasca con l'acqua
+    d.rett(bx - 18, d.terra_y - 16, 36, 16, R["arenaria"].toni[1], "vasca", separa=True)
+    d.rett(bx - 18, d.terra_y - 16, 36, 2, R["arenaria"].toni[2], "vasca_l", separa=False)
+    d.rett(bx - 15, d.terra_y - 14, 30, 4, colore("blue"), "acqua", separa=False)
+    d.rett(bx - 3, d.terra_y - 34, 6, 18, R["arenaria"].toni[1], "getto_p", separa=True)
+    d.pixel([(bx + u, d.terra_y - 36 + abs(u) // 2 + v) for u in range(-6, 7) for v in range(2)], colore("cyan"),
+            "getto")
+    d.crepe(x0 + 6, fy + 12, x1 - x0 - 12, 40, 6, R["arenaria"].toni[0], "crepe")
+    d.muschio(x0 + 60, d.terra_y - 8, x1 - x0 - 120, 5, 5, R["muschio"], "erba")
+    return d.fine()
+
+
+EDIFICI = {"casa_antica": casa_antica, "casa_antica_pergola": casa_antica_pergola,
+           "casa_antica_loggia": casa_antica_loggia, "museo": museo}

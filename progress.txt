@@ -1747,3 +1747,23 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Guardati ingranditi; sito verificato con Playwright (nessun errore); 1103 test, validator 0 errori.
 - Aperto: il cervo da davanti e' sottile; nel gioco l'effetto unico dell'abilita' non e' ancora collegato (va fatto
   quando ce ne saranno di piu': vfx.json per abilita').
+
+## 2026-11-21 — US-8C07: note dell'utente del 21/11
+- Cervo: Quadrupede(piedi_pari=True) mette anche e spalle all'altezza giusta (le 4 zampe a terra); il collo va fino
+  alla testa, la griglia della testa attaccata al collo.
+- Attacco pesante a sinistra: il braccio dal lato di chi guarda ha +2.6 di profondita' (non sparisce dietro la testa).
+- Capriola: la rotazione (cade) a quarti di giro esatti, perno 15 (19 sul fotogramma a -90): il corpo resta nella
+  cella in tutte e 4 le direzioni (misurato: nessun pixel sulla riga 63), la testa gira col corpo.
+- Camminata: ginocchio della gamba che passa fino a 90 gradi e busto che dondola (inclina +-3): le gambe si vedono
+  muovere anche da davanti e da dietro.
+- Museo: tetto a padiglione (4 falde con le creste, luce per falda), lucernari pochi e sparsi appoggiati ognuno su una
+  falda (il bordo spesso verso valle; un assert vieta quelli a cavallo di due falde), niente lanterna sul colmo
+  (l'utente: "non ha senso"); muro 132; affreschi (colline, nave) in cornice d'oro, nicchie con statue sotto gli
+  stendardi accorciati, fascia a mosaico interrotta dal portale.
+- Centro antico: due case nuove, casa_antica_pergola (3x3, pergola e vite, anfore, scala esterna, porta squadrata,
+  scuri) e casa_antica_loggia (5x3, coppi con il buco e le travi, loggia di tre archi, occhio, fontana). Rampe nuove
+  `cotto` e `coppi`. Comando: `python tools/art/build_griglia.py --edifici`.
+- Sito: chip "Claude ti ha risposto" sulle schede con una spiegazione del 21/11, visore "Tutti i fotogrammi, numerati"
+  sotto ogni animazione e schivata; risposte e domande in domande.json (spada sempre visibile? schivata per Pathway).
+- 1103 test, validator 0 errori; tutto guardato ingrandito.
+- Aperto: risposte a d3 (arma visibile) e d4 (schivata per Pathway); le schivate nuove per Pathway da disegnare.

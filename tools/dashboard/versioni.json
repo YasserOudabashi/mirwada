@@ -1,43 +1,51 @@
 {
  "prova:carica": {
-  "dal": "2026-11-19T14:43:08Z",
-  "v": "2fe72bfb262e"
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "eb7fbcc805b0"
  },
  "prova:cervo": {
-  "dal": "2026-11-21T12:17:06Z",
-  "v": "4eeb9b8d1cb0"
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "951bdf0327dc"
  },
  "prova:cervo_fuga": {
-  "dal": "2026-11-21T12:17:06Z",
-  "v": "17f812583703"
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "50ced4f3bd1d"
  },
  "prova:cervo_idle": {
-  "dal": "2026-11-21T12:17:06Z",
-  "v": "3b024933e254"
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "5ec94f22df0c"
  },
  "prova:edificio_casa_antica": {
   "dal": "2026-11-21T12:17:06Z",
   "v": "74092ec0ef29"
  },
+ "prova:edificio_casa_antica_loggia": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "415d84ae32ee"
+ },
+ "prova:edificio_casa_antica_pergola": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "3ec99ecd175a"
+ },
  "prova:edificio_museo": {
-  "dal": "2026-11-21T12:17:06Z",
-  "v": "ca258a719ae6"
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "421ab7feac20"
  },
  "prova:enel": {
-  "dal": "2026-11-19T14:43:08Z",
-  "v": "213e631add86"
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "1ba8981c31f4"
  },
  "prova:enel_attack_heavy": {
-  "dal": "2026-11-19T14:43:08Z",
-  "v": "2143771d4259"
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "7aa00208ac22"
  },
  "prova:enel_attack_light": {
-  "dal": "2026-11-19T14:14:58Z",
-  "v": "63ef625076a3"
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "30edf4b47021"
  },
  "prova:enel_cast": {
-  "dal": "2026-11-19T14:14:58Z",
-  "v": "495f0aba2c1b"
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "0e2c4b429bae"
  },
  "prova:enel_dash": {
   "dal": "2026-11-19T14:14:58Z",
@@ -88,8 +96,8 @@
   "v": "c855d92f7e1f"
  },
  "prova:enel_walk": {
-  "dal": "2026-11-19T14:14:58Z",
-  "v": "358af96200d1"
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "bc28827320df"
  },
  "prova:fendente_pesante": {
   "dal": "2026-11-18T00:00:00Z",
@@ -148,8 +156,8 @@
   "v": "be01449173ff"
  },
  "prova:schivata_capriola": {
-  "dal": "2026-11-19T14:43:08Z",
-  "v": "fd35c41446a1"
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "e44ad226db3f"
  },
  "prova:schivata_ombra": {
   "dal": "2026-11-19T14:14:58Z",

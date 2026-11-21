@@ -2199,6 +2199,23 @@
       "fase": "8c",
       "passes": true,
       "notes": "Fatta il 2026-11-21; dettagli in progress.txt. Aspetta il giudizio."
+    },
+    {
+      "id": "US-8C07",
+      "title": "Note del 2026-11-21: cervo, capriola, camminata, pesante, museo, case antiche, sito",
+      "description": "Le note dell'utente sulla pagina Da testare, sistemate.",
+      "acceptanceCriteria": [
+        "cervo con le zampe a terra e la testa attaccata",
+        "capriola dentro la cella con la testa dritta",
+        "gambe che si vedono muovere in tutte le direzioni",
+        "museo con lucernari sulle falde e arte sui muri",
+        "altre case del centro antico",
+        "risposte di Claude e fotogrammi numerati sul sito"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-21; dettagli in progress.txt."
     }
   ]
 }

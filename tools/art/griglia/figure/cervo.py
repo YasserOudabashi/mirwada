@@ -7,7 +7,7 @@ import numpy as np
 from ..corpo import Quadrupede
 from ..pixel import Rampa, colore, griglia, segmento
 
-CORPO = Quadrupede(lungo=15.0, anca=15.0, spalla=16.0, largo=2.6, zampa=(8.0, 7.6), collo=7.5)
+CORPO = Quadrupede(lungo=15.0, anca=15.0, spalla=16.0, largo=2.6, zampa=(8.0, 7.6), collo=7.5, piedi_pari=True)
 
 R = {
     "manto": Rampa("brown_d", "brown", "tan"),
@@ -92,7 +92,7 @@ def disegna(tela, v, g, posa):
                     np.array([(k % 2 - 0.5) * 1.6, 0, 0])
                 x, y = v.xy(p)
                 griglia(tela, ["c"], {"c": colore("cream")}, int(round(x)), int(round(y)), f"macchia{k}", separa=False)
-        c = v.xy(g["collo"])                                # collo lungo, gola crema
+        c = v.xy(g["testa"])                                # collo lungo fino alla testa, gola crema
         segmento(tela, s, c, 3.4, 2.6, R["manto"], "collo", uniti=("corpo",))
         if v.dir != "up":
             segmento(tela, (s[0], s[1] + 1), (c[0], c[1] + 1), 1.4, 1.0, R["crema"], "gola", uniti=("collo", "corpo"),
@@ -104,7 +104,7 @@ def disegna(tela, v, g, posa):
         x, y = v.xy(g["testa"])
         w, h = len(righe[0]), len(righe)
         dx = {"left": -2, "right": 2}.get(v.dir, 0)
-        griglia(tela, righe, M, int(round(x - w / 2 + dx)), int(round(y - h + 3)), "testa", specchia=spec,
+        griglia(tela, righe, M, int(round(x - w / 2 + dx)), int(round(y - h + 5)), "testa", specchia=spec,
                 uniti=("collo",))
     parti.append((v.prof(g["testa"]) + (8.0 if v.dir == "up" else 2.0), 3, testa))
 

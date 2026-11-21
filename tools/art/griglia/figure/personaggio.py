@@ -141,7 +141,8 @@ def disegna(tela, v, g, posa):
             segmento(tela, e, m, 1.8, 1.6, R["bende"], f"braccio_{lato}")
             segmento(tela, m, m, 1.9, 1.9, R["pelle"], f"braccio_{lato}")
         dp = v.prof(g[f"gomito_{lato}"]) * 0.5 + v.prof(g[f"mano_{lato}"]) * 0.5
-        parti.append((dp + (0.6 if vis == lato else 0) + 0.2, 2, braccio))
+        # di profilo il braccio dalla parte di chi guarda sta davanti anche alla testa (le mani alzate si vedono)
+        parti.append((dp + (2.6 if vis == lato else 0) + 0.2, 2, braccio))
 
     def falde():
         b = g["bacino"] - g["su"] * 0.5
@@ -297,18 +298,20 @@ PRONTO = dict(braccio_r=(42, 22, 60), braccio_l=(52, -12, 52), arma=(22, 40), ga
               gamba_r=(-10, 4, 8), piega=6)
 
 
-def _cam(t0, sx, dx, bob=0.0, ginocchio=(6, 6)):
+def _cam(t0, sx, dx, bob=0.0, ginocchio=(6, 6), incl=0.0):
     return (t0, dict(SCH, gamba_l=(sx, 2, ginocchio[0]), gamba_r=(dx, 2, ginocchio[1]),
-                     braccio_l=(-sx * 0.9, 12, 18), braccio_r=(-dx * 0.9, 12, 18), bob=bob, piega=4))
+                     braccio_l=(-sx * 0.9, 14, 18), braccio_r=(-dx * 0.9, 14, 18), bob=bob, piega=4, inclina=incl))
 
 
 ANIM = {
     "idle": {"chiavi": [(0.0, dict(FERMO)), (0.5, dict(FERMO, respiro=1.0, braccio_l=(4, 13, 18),
                                                          braccio_r=(4, 13, 18)))]},
-    "walk": {"chiavi": [_cam(0.0, 28, -24, 0, (4, 14)), _cam(0.125, 18, -16, -0.8, (18, 30)),
-                        _cam(0.25, 6, 14, 0.6, (6, 75)), _cam(0.375, -12, 24, 0.9, (8, 40)),
-                        _cam(0.5, -24, 28, 0, (14, 4)), _cam(0.625, -16, 18, -0.8, (30, 18)),
-                        _cam(0.75, 14, 6, 0.6, (75, 6)), _cam(0.875, 24, -12, 0.9, (40, 8))]},
+    # la gamba che passa sale col ginocchio alto (il piede si stacca da terra): il passo si legge anche da davanti e da
+    # dietro; il busto dondola un poco verso la gamba d'appoggio
+    "walk": {"chiavi": [_cam(0.0, 28, -24, 0, (4, 14), 0), _cam(0.125, 18, -16, -0.8, (18, 34), 2),
+                        _cam(0.25, 4, 38, 0.6, (6, 90), 3), _cam(0.375, -12, 28, 0.9, (8, 46), 2),
+                        _cam(0.5, -24, 28, 0, (14, 4), 0), _cam(0.625, -16, 18, -0.8, (34, 18), -2),
+                        _cam(0.75, 38, 4, 0.6, (90, 6), -3), _cam(0.875, 28, -12, 0.9, (46, 8), -2)]},
     "dash": {"chiavi": [
         (0.0, dict(SCH, piega=18, gamba_l=(30, 4, 50), gamba_r=(-10, 4, 50), braccio_l=(-20, 20, 30),
                    braccio_r=(-20, 20, 30))),
@@ -427,7 +430,7 @@ ANIM = {
 # Capriola (ricerca: abbassarsi, tuffo con le braccia avanti, palla raccolta che rotola sulle spalle, piedi a terra,
 # rialzarsi; 7-8 fotogrammi): la rotazione e' sul bacino (`perno`), il corpo raccolto e' una palla.
 _TUCK = dict(SCH, gamba_l=(110, 6, 150), gamba_r=(110, 6, 150), braccio_l=(80, 10, 110), braccio_r=(80, 10, 110),
-             piega=50, perno=6.0, a_terra=False, bob=-2.5)
+             piega=50, perno=15.0, a_terra=False, bob=2.0)
 VARIANTI = {
     "dash": {
         "scivolata": {"nome": "Scivolata bassa (su un ginocchio)", "chiavi": [
@@ -444,10 +447,10 @@ VARIANTI = {
                        braccio_r=(40, 14, 40))),
             (1 / 7, dict(SCH, piega=60, gamba_l=(30, 6, 40), gamba_r=(-20, 6, 30), braccio_l=(120, 10, 10),
                          braccio_r=(120, 10, 10), avanti=2, vento=2)),
-            (2 / 7, dict(_TUCK, cade=-70, avanti=3)),
-            (3 / 7, dict(_TUCK, cade=-150, avanti=4)),
-            (4 / 7, dict(_TUCK, cade=-230, avanti=5)),
-            (5 / 7, dict(_TUCK, cade=-310, avanti=6)),
+            (2 / 7, dict(_TUCK, cade=-90, avanti=0, perno=19.0)),
+            (3 / 7, dict(_TUCK, cade=-180, avanti=4)),
+            (4 / 7, dict(_TUCK, cade=-270, avanti=5, bob=3.0)),
+            (5 / 7, dict(_TUCK, cade=-360, avanti=6)),
             (6 / 7, dict(SCH, piega=34, gamba_l=(60, 6, 110), gamba_r=(50, 6, 110), braccio_l=(50, 20, 40),
                          braccio_r=(50, 20, 40), avanti=6)),
             (1.0, dict(SCH, piega=10, gamba_l=(20, 6, 30), gamba_r=(10, 6, 30), braccio_l=(10, 16, 20),

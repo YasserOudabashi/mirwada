@@ -144,7 +144,13 @@ class Quadrupede:
     collo. Posa: bob, avanti, piega (in avanti = il davanti scende), testa (giu', girata), ant_l/ant_r/post_l/post_r
     (avanti, fuori, piega), coda (alzata, di lato), cade (sul fianco, gradi), a_terra."""
 
-    def __init__(self, lungo=18.0, anca=13.0, spalla=14.0, largo=3.2, zampa=(6.8, 6.6), collo=4.0):
+    def __init__(self, lungo=18.0, anca=13.0, spalla=14.0, largo=3.2, zampa=(6.8, 6.6), collo=4.0, piedi_pari=False):
+        # piedi_pari: anche e spalle all'altezza giusta perche' da fermo tutte e quattro le zampe tocchino terra (la
+        # posteriore e' a zig-zag e arriva piu' in basso della anteriore dritta)
+        if piedi_pari:
+            a, b = zampa
+            spalla = a + b + 1.5
+            anca = a * math.cos(math.radians(12)) + b * math.cos(math.radians(18)) + 2.5
         self.m = dict(lungo=lungo, anca=anca, spalla=spalla, largo=largo, zampa=zampa, collo=collo)
 
     def giunture(self, posa):
