@@ -547,6 +547,9 @@ audio, Mondo vivo, fusioni, rilascio (qui il gioco e' finito in italiano), poi r
     due dello stesso stile), un personaggio, un animale e un'abilita', tutti sulla pagina "Da testare"; si va avanti
     cosi' finche' l'utente non li ha confermati tutti. Primo giro: casa del centro antico, museo, mercante, cervo,
     Stretta ferrea. Gli edifici restano in `arte/prova/` finche' non sono approvati (poi vanno nel mondo).
+  - **"Prepara i prossimi disegni test"** (2026-11-21, regola dell'utente, sostituisce il giro "uno per tipo"): ogni
+    volta che l'utente lo chiede si prepara un giro con **1 personaggio completo** (tutte le mosse della sua categoria),
+    **5 edifici, 5 animali, 5 nemici, 1 boss, 10 abilita' e 10 oggetti**, tutti sulla pagina "Da testare".
   - **Equipaggiamento visibile** (2026-11-21, scelta dell'utente): quello che il giocatore indossa o tiene si vede
     sulla figura (arma, armatura, oggetto in mano), non cambia solo i numeri. Il legame oggetto -> disegno e' un dato (US-8C08).
 

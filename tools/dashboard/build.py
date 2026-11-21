@@ -209,13 +209,15 @@ def atlante(nome, files, lato=None):
 
 
 # --- mappa ------------------------------------------------------------------------------------------------------
-def mappa(mondo, tema="luminoso"):
-    """2 px per casella: ogni tessera ridotta a 2x2 col suo colore medio, poi gli oggetti di scena col loro."""
-    cart = os.path.join(ROOT, "assets", "world", tema)
+def mappa(mondo, tema="luminoso", sotto=False):
+    """2 px per casella: ogni tessera ridotta a 2x2 col suo colore medio, poi gli oggetti di scena col loro.
+    sotto=True: il sottosuolo (secondo livello sulla stessa griglia, senza oggetti di scena)."""
+    cart = os.path.join(ROOT, "assets", "world", tema, *(["sotto"] if sotto else []))
+    nfogli = int((mondo["sottosuolo"]["fogli"] if sotto else mondo["fogli"])[tema])
     cols, righe = int(mondo["colonne_foglio"]), int(mondo["righe_foglio"])
     t = int(mondo["tile"])
     medie = []
-    for k in range(int(mondo["fogli"][tema])):
+    for k in range(nfogli):
         a = np.asarray(Image.open(os.path.join(cart, f"tessere_{k}.png")).convert("RGB"), dtype=np.float32)
         r_k = a.shape[0] // t                                                  # l'ultimo foglio e' piu' corto
         a = a[:r_k * t].reshape(r_k, t, cols, t, 3).transpose(0, 2, 1, 3, 4)  # (r, c, t, t, 3)
@@ -231,7 +233,7 @@ def mappa(mondo, tema="luminoso"):
     # oggetti di scena (alberi, rocce, case): il loro colore medio, alla base
     colori = {}
     ogg_dir = os.path.join(cart, "oggetti")
-    for nome, x, y in ((o[0], o[1], o[2]) for o in mondo["oggetti"]):
+    for nome, x, y in ((o[0], o[1], o[2]) for o in ([] if sotto else mondo["oggetti"])):
         if nome not in colori:
             p = os.path.join(ogg_dir, nome + ".png")
             if os.path.isfile(p):
@@ -246,22 +248,24 @@ def mappa(mondo, tema="luminoso"):
         px, py = int(x * 2), int(y * 2) - 2
         if 0 <= px < W * 2 - 1 and 0 <= py < H * 2 - 1:
             img[py:py + 2, px:px + 2] = c * 0.85
-    Image.fromarray(np.clip(img, 0, 255).astype(np.uint8)).save(os.path.join(OUT, "img/mappa.png"), optimize=True)
-    return {"file": "img/mappa.png", "w": W, "h": H, "scala": 2}
+    nome = "img/mappa_sotto.png" if sotto else "img/mappa.png"
+    Image.fromarray(np.clip(img, 0, 255).astype(np.uint8)).save(os.path.join(OUT, nome), optimize=True)
+    return {"file": nome, "w": W, "h": H, "scala": 2}
 
 
-def mappa_dettaglio(mondo, tema="luminoso"):
+def mappa_dettaglio(mondo, tema="luminoso", sotto=False):
     """La mappa da ingrandire fino alle caselle vere: le tessere del gioco e gli indici (la pagina compone solo il
     pezzo che si vede), e gli oggetti di scena impacchettati in pochi atlanti con la loro ancora (come mondo.gd)."""
-    cart = os.path.join(ROOT, "assets", "world", tema)
-    dest = os.path.join(OUT, "img", "mondo")
+    cart = os.path.join(ROOT, "assets", "world", tema, *(["sotto"] if sotto else []))
+    cartella = "mondo_sotto" if sotto else "mondo"
+    dest = os.path.join(OUT, "img", cartella)
     os.makedirs(dest, exist_ok=True)
     tessere = []
-    for k in range(int(mondo["fogli"][tema])):
+    for k in range(int((mondo["sottosuolo"]["fogli"] if sotto else mondo["fogli"])[tema])):
         shutil.copy(os.path.join(cart, f"tessere_{k}.png"), os.path.join(dest, f"tessere_{k}.png"))
-        tessere.append(f"img/mondo/tessere_{k}.png")
+        tessere.append(f"img/{cartella}/tessere_{k}.png")
     shutil.copy(os.path.join(cart, "indici.png"), os.path.join(dest, "indici.png"))
-    nomi = sorted({o[0] for o in mondo["oggetti"]})
+    nomi = sorted({o[0] for o in ([] if sotto else mondo["oggetti"])})
     ims = {n: Image.open(os.path.join(cart, "oggetti", n + ".png")).convert("RGBA") for n in nomi
            if os.path.isfile(os.path.join(cart, "oggetti", n + ".png"))}
     LARGO, atlanti, sprite = 2048, [], {}
@@ -280,16 +284,16 @@ def mappa_dettaglio(mondo, tema="luminoso"):
         riga = max(riga, im.height)
     for i, f in enumerate(fogli):
         f.save(os.path.join(dest, f"oggetti_{i}.png"), optimize=True)
-        atlanti.append(f"img/mondo/oggetti_{i}.png")
+        atlanti.append(f"img/{cartella}/oggetti_{i}.png")
     nomi_ok = [n for n in nomi if n in sprite]
     idx = {n: i for i, n in enumerate(nomi_ok)}
-    ogg = [[idx[o[0]], round(o[1], 2), round(o[2], 2)] for o in mondo["oggetti"] if o[0] in idx]
+    ogg = [[idx[o[0]], round(o[1], 2), round(o[2], 2)] for o in ([] if sotto else mondo["oggetti"]) if o[0] in idx]
     ogg.sort(key=lambda o: o[2])
-    with open(os.path.join(OUT, "mondo.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(OUT, cartella + ".json"), "w", encoding="utf-8") as f:
         json.dump({"tile": mondo["tile"], "colonne": mondo["colonne_foglio"], "righe": mondo["righe_foglio"],
-                   "tessere": tessere, "indici": "img/mondo/indici.png", "atlanti": atlanti,
+                   "tessere": tessere, "indici": f"img/{cartella}/indici.png", "atlanti": atlanti,
                    "sprite": [sprite[n] for n in nomi_ok], "nomi": nomi_ok, "oggetti": ogg}, f, separators=(",", ":"))
-    return "mondo.json"
+    return cartella + ".json"
 
 
 # --- avanzamento ------------------------------------------------------------------------------------------------
@@ -513,6 +517,7 @@ def mondo():
             edifici_per_villaggio[vic[0]][tipo] += 1
     return {"w": m["larghezza"], "h": m["altezza"], "partenza": m["partenza"], "regioni": reg,
             "riquadri": m["riquadri"], "mappa": mappa(m), "dettaglio": mappa_dettaglio(m),
+            "sotto": {"mappa": mappa(m, sotto=True), "dettaglio": mappa_dettaglio(m, sotto=True)},
             "luoghi": [{"id": k, "x": v[0], "y": v[1], "foto": foto.get("luogo:" + k)} for k, v in m["luoghi"].items()],
             "villaggi": [{"id": k, "x": v[0], "y": v[1], "foto": foto.get("villaggio:" + k),
                           "edifici": edifici_per_villaggio.get(k, {}), "porte": porte.get(k, [])} for k, v in m["villaggi"].items()],

@@ -1773,3 +1773,8 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   cervo, museo, case pergola e loggia, Stretta ferrea, carica) tranne la capriola: da davanti ora il mento va sul petto
   e si vedono i capelli (TESTA["up"], capovolta a testa in giu'). Sul sito d3 risposta "No, lo spadone resta" (12:56),
   in chat poco dopo "si vorrei vedere": vale la chat (US-8C08), da confermare con l'utente.
+- Regola nuova dell'utente (CLAUDE.md): "prepara i prossimi disegni test" = 1 personaggio completo, 5 edifici,
+  5 animali, 5 nemici, 1 boss, 10 abilita', 10 oggetti sulla pagina Da testare.
+- Dashboard: mappa del Mondo con il pulsante Sopra/Sottosuolo (build.py mappa/mappa_dettaglio con sotto=True ->
+  img/mappa_sotto.png, mondo_sotto.json, img/mondo_sotto/); da sotto si vedono ingressi e boss del sottosuolo.
+  Verificato con Playwright, nessun errore in console.

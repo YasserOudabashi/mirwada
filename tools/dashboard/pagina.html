@@ -515,7 +515,7 @@ function foglioColorato(e, pal) {
 let TERRENO = null;
 async function terrenoArena(W, H, cx, cy) {
   const M = D.mondo; if (!M || !M.dettaglio) return null;
-  if (!TERRENO) TERRENO = (async () => { const j = MONDO_DETT || (MONDO_DETT = await (await fetch(M.dettaglio)).json());
+  if (!TERRENO) TERRENO = (async () => { const j = MONDO_DETT.sopra || (MONDO_DETT.sopra = await (await fetch(M.dettaglio)).json());
     const tessere = await Promise.all(j.tessere.map(immagine)), ii = await immagine(j.indici);
     const cc = document.createElement("canvas"); cc.width = ii.width; cc.height = ii.height; const gg = cc.getContext("2d"); gg.drawImage(ii, 0, 0);
     return {j, tessere, ind: gg.getImageData(0, 0, ii.width, ii.height).data}; })();
@@ -702,14 +702,15 @@ function arena(opz) {
 }
 
 // ---------- mappa navigabile: dall'intero mondo alle caselle vere ----------
-let MONDO_DETT = null;
+const MONDO_DETT = {};
 function mappaNavigabile(M, st, onSegno) {
+  const sotto = st.livello === "sotto" && M.sotto, LIV = sotto ? M.sotto : M, chiave = sotto ? "sotto" : "sopra";
   const c = h("canvas", {class: "mappa-canvas", "aria-label": "Mappa del mondo: trascina per muoverti, rotella o + e − per ingrandire"});
   const g = c.getContext("2d");
   const vista = st.vista || (st.vista = {x: M.partenza[0], y: M.partenza[1], z: 2});       // z = pixel per casella
-  const mini = new Image(); mini.src = M.mappa.file;
+  const mini = new Image(); mini.src = LIV.mappa.file;
   let tessere = null, ogg = null, atl = null, ind = null, pronto = false, strati = st.strati;
-  (MONDO_DETT ? Promise.resolve(MONDO_DETT) : fetch(M.dettaglio).then(r => r.json()).then(j => MONDO_DETT = j)).then(async j => {
+  (MONDO_DETT[chiave] ? Promise.resolve(MONDO_DETT[chiave]) : fetch(LIV.dettaglio).then(r => r.json()).then(j => MONDO_DETT[chiave] = j)).then(async j => {
     tessere = await Promise.all(j.tessere.map(immagine)); atl = await Promise.all(j.atlanti.map(immagine));
     const ii = await immagine(j.indici); const cc = document.createElement("canvas"); cc.width = ii.width; cc.height = ii.height;
     const gg = cc.getContext("2d"); gg.drawImage(ii, 0, 0); ind = gg.getImageData(0, 0, ii.width, ii.height).data; ogg = j; pronto = true; disegna(); });
@@ -717,7 +718,7 @@ function mappaNavigabile(M, st, onSegno) {
   function disegna() {
     if (!c.isConnected) return; if (c.width !== Math.round(c.getBoundingClientRect().width)) dimensiona();
     const Wc = c.width, Hc = c.height, z = vista.z, x0 = vista.x - Wc / 2 / z, y0 = vista.y - Hc / 2 / z;
-    g.imageSmoothingEnabled = false; g.fillStyle = "#124e89"; g.fillRect(0, 0, Wc, Hc);
+    g.imageSmoothingEnabled = false; g.fillStyle = sotto ? "#181425" : "#124e89"; g.fillRect(0, 0, Wc, Hc);
     if (!pronto || z < 8) { g.drawImage(mini, x0 * 2, y0 * 2, Wc / z * 2, Hc / z * 2, 0, 0, Wc, Hc); }
     else {
       const T = ogg.tile, cols = ogg.colonne, per = cols * ogg.righe, s = z / T;
@@ -741,7 +742,7 @@ function mappaNavigabile(M, st, onSegno) {
       g.strokeRect((r[0] - x0) * z, (r[1] - y0) * z, (r[2] - r[0]) * z, (r[3] - r[1]) * z); g.setLineDash([]); g.fillStyle = "#fff"; g.font = "11px Inter, sans-serif"; g.fillText(reg.nome, (r[0] - x0) * z + 4, (r[1] - y0) * z + 14); }
     info.textContent = `${Math.round(vista.x)}, ${Math.round(vista.y)} · ${z >= 8 ? (z / 32 * 100).toFixed(0) + "% del gioco" : "vista d'insieme"} · ${z.toFixed(1)} px per casella`;
   }
-  const SEGNI = [...M.luoghi.map(l => ({...l, strato: "luogo", k: "luogo:" + l.id, nome: bello(l.id), col: "#fee761"})), ...M.villaggi.map(v => ({...v, strato: "villaggio", k: "villaggio:" + v.id, nome: bello(v.id), col: "#feae34"})),
+  const SEGNI = sotto ? [...M.ingressi.map(i => ({...i, strato: "ingresso", col: "#8b9bb4", nome: bello(i.id)})), ...M.boss_sotto.map(b => ({...b, strato: "bosssotto", col: "#e43b44", nome: bello(b.id)}))] : [...M.luoghi.map(l => ({...l, strato: "luogo", k: "luogo:" + l.id, nome: bello(l.id), col: "#fee761"})), ...M.villaggi.map(v => ({...v, strato: "villaggio", k: "villaggio:" + v.id, nome: bello(v.id), col: "#feae34"})),
     ...M.ingressi.map(i => ({...i, strato: "ingresso", col: "#8b9bb4", nome: ""})), ...M.boss_sotto.map(b => ({...b, strato: "bosssotto", col: "#e43b44", nome: bello(b.id)})), {x: M.partenza[0], y: M.partenza[1], strato: "partenza", col: "#fff", nome: "partenza"}];
   const zoom = (f, cxp, cyp) => { const r = c.getBoundingClientRect(); const mx = cxp ?? r.width / 2, my = cyp ?? r.height / 2;
     const wx = vista.x + (mx - c.width / 2) / vista.z, wy = vista.y + (my - c.height / 2) / vista.z; vista.z = Math.max(.5, Math.min(96, vista.z * f));
@@ -998,6 +999,7 @@ VISTE.mondo = () => {
   const tutti = [...M.luoghi.map(l => elLuogo(l, "luogo")), ...M.villaggi.map(v => elLuogo(v, "villaggio"))];
   const apriK = k => { ELENCO = tutti; apriElemento(tutti.findIndex(e => e.k === k)); };
   const mp = mappaNavigabile(M, st, apriK);
+  const livello = M.sotto ? segmento([["sopra", "Sopra"], ["sotto", "Sottosuolo"]], st.livello || "sopra", v => { st.livello = v; if (v === "sotto") st.strati.ingresso = true; rendi(); }) : null;
   const strati = h("div", {class: "legenda"}, [["luogo", "Luoghi"], ["villaggio", "Villaggi"], ["ingresso", "Ingressi del sottosuolo"], ["bosssotto", "Boss sotto"], ["riquadri", "Regioni"]].map(([k, t]) => {
     const c = h("input", {type: "checkbox", id: "strato-" + k}); c.checked = !!st.strati[k]; c.addEventListener("change", () => { st.strati[k] = c.checked; mp.disegna(); });
     return h("label", {for: "strato-" + k}, c, t); }));
@@ -1008,7 +1010,7 @@ VISTE.mondo = () => {
     l.foto ? h("img", {class: "foto", src: l.foto, alt: bello(l.id), loading: "lazy"}) : h("div", {class: "vetrina"}, INC()), h("div", {class: "nome", text: bello(l.id)})))); };
   const filtri = barraFiltri(st, [], pop); pop();
   return [h("h2", {text: "Mondo"}), h("p", {class: "intro", text: `${M.w} × ${M.h} caselle, ${nf.format(M.edifici)} edifici, ${nf.format(M.oggetti_scena)} oggetti di scena. Trascina per muoverti, rotella o doppio clic per ingrandire fino alle caselle vere del gioco (alberi e case compaiono da vicino). Clic su un segno per la sua scheda.`}),
-    h("div", {class: "filtri"}, h("button", {class: "btn", type: "button", onclick: () => mp.zoom(1.6)}, "+"), h("button", {class: "btn", type: "button", onclick: () => mp.zoom(1 / 1.6)}, "−"),
+    h("div", {class: "filtri"}, livello, h("button", {class: "btn", type: "button", onclick: () => mp.zoom(1.6)}, "+"), h("button", {class: "btn", type: "button", onclick: () => mp.zoom(1 / 1.6)}, "−"),
       h("button", {class: "btn", type: "button", onclick: () => mp.vai(600, 500, 0.9)}, "Tutto il mondo"), h("button", {class: "btn", type: "button", onclick: () => mp.vai(M.partenza[0], M.partenza[1], 32)}, "Partenza 1:1"), vai, mp.info),
     strati, mp.el, h("h3", {text: "Luoghi, con la foto dal gioco"}), filtri, h("div", {class: "scorri"}, grigliaL)];
 };
