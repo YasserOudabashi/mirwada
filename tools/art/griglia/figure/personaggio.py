@@ -191,6 +191,12 @@ def disegna(tela, v, g, posa):
         # faccia (dritto), da dietro a testa in giu'
         q = int(-round(posa.get("cade", 0) / 90.0)) % 4
         gira = q if v.dir == "left" else (-q) % 4 if v.dir == "right" else (0 if v.dir == "down" else (2 * q) % 4)
+        # capriola in avanti vista da davanti: il mento va sul petto e si vedono i capelli, non la faccia (giudizio
+        # dell'utente del 2026-11-21); a testa in giu' i capelli sono capovolti
+        if v.dir == "down" and (posa.get("piega", 0) >= 48 or posa.get("cade", 0) < -45) and q != 0:
+            righe, gira = TESTA["up"], (2 if q == 2 else 0)
+        elif v.dir == "down" and posa.get("piega", 0) >= 48:
+            righe, gira = TESTA["up"], 0
         w, h = len(righe[0]), len(righe)
         if gira:
             w, h = h, w

@@ -1769,3 +1769,7 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Aperto: risposte a d3 (arma visibile) e d4 (schivata per Pathway); le schivate nuove per Pathway da disegnare.
 - Decisione dell'utente (21/11, risposta a d3 in chat): l'equipaggiamento deve vedersi su Enel -> US-8C08 aperta,
   CLAUDE.md "Decisioni prese". La risposta sulla schivata per Pathway (d4) arrivera' dopo, sul sito.
+- Note del 21/11 (secondo giro): tutto approvato (Enel, camminata, pesante, leggero, magia, morte, lupo, mercante,
+  cervo, museo, case pergola e loggia, Stretta ferrea, carica) tranne la capriola: da davanti ora il mento va sul petto
+  e si vedono i capelli (TESTA["up"], capovolta a testa in giu'). Sul sito d3 risposta "No, lo spadone resta" (12:56),
+  in chat poco dopo "si vorrei vedere": vale la chat (US-8C08), da confermare con l'utente.
