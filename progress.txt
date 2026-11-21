@@ -1767,3 +1767,5 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
   sotto ogni animazione e schivata; risposte e domande in domande.json (spada sempre visibile? schivata per Pathway).
 - 1103 test, validator 0 errori; tutto guardato ingrandito.
 - Aperto: risposte a d3 (arma visibile) e d4 (schivata per Pathway); le schivate nuove per Pathway da disegnare.
+- Decisione dell'utente (21/11, risposta a d3 in chat): l'equipaggiamento deve vedersi su Enel -> US-8C08 aperta,
+  CLAUDE.md "Decisioni prese". La risposta sulla schivata per Pathway (d4) arrivera' dopo, sul sito.

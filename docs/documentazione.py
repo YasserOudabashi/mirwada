@@ -13,7 +13,7 @@ from docx import Document
 from docx.shared import Pt, RGBColor
 
 PROGETTO = "Mirwada"
-AGGIORNATO_AL = "29.10.2026"  # data ultimo aggiornamento, formato GG.MM.AAAA
+AGGIORNATO_AL = "21.11.2026"  # data ultimo aggiornamento, formato GG.MM.AAAA
 
 # Le 5 sezioni fisse della documentazione. Testo discorsivo, righe "- " = bullet.
 SEZIONI = {
@@ -27,10 +27,13 @@ Il principio architetturale e' uno: il codice implementa primitive parametriche 
 - Contenuto: NPC con aspetto e ritratto, nemici e boss dei layout portati sul mondo, forzieri con tabelle di bottino, oggetti nelle case; ogni oggetto fisso si prende una volta sola (nel salvataggio).
 - Base del giocatore: quattro basi (casa al porto, capanna nella Valle, rifugio nelle Marche, nave al cantiere navale) con tre stanze che si arredano col livello; la sede si sposta; fuori ci sono l'orto con le piante che crescono e le strutture costruite dalla pagina Base.
 - Arte: personaggi a 64 px con tutte le animazioni (anche gesti, volo, barca e due forme di Enel), VFX di tutte le primitive colorati dalla palette del Pathway, icone di oggetti, stati e primitive, ritratti, panorama all'avvio.
+- Arte nuova (dal 18.11): stile a griglia su scheletro 2D (tools/art/griglia/, tools/art/build_griglia.py): ogni figura ha i suoi pezzi disegnati in griglia, lo scheletro e' l'unica cosa comune. Fatti Enel, lupo della luna, mercante, cervo, gli effetti unici di fendente pesante, incantesimo tradizionale e Stretta ferrea, e lo stile delle case (tre case del centro antico e il museo, ancora in arte/prova/). Si rifa' un giro alla volta, giudicato dall'utente sulla dashboard.
+- Combattimento: l'attacco pesante si carica tenendo premuto K (fino a 2,5 volte il danno e 1,8 volte l'area).
 - Il libro e' tutta l'interfaccia (scaffale, frontespizio, diagramma, inventario con la Base, mappa, dialoghi, negozio, colophon), sulle due facciate e senza scrivere sulla piega.
 - data/: pathways, abilities, synergies, schema/ (registri), animations.json, vfx.json, audio.json, balance.json, world/ (regioni, layout, interni, bottino, fauna, mezzi, luce, cannocchiali), base/, structures/, ui/.
 - tools/: validate_data.py (esce 0/1), run_tests.sh (suite + controllo degli errori nascosti), art/ (generatori rilanciabili).
-- tests/: 1076 test headless.""",
+- tests/: 1103 test headless.
+- Dashboard (Officina di Mirwada, pagina privata su claude.ai): tools/dashboard/build.py; pagine Da testare e Note e testate, giudizi, domande e risposte, consumo di token.""",
     "Perché funziona così": """Tutto e' data-driven perche' il progetto e' enorme per una persona: aggiungere contenuto deve costare una riga di JSON e mai una classe. La prova: dieci Pathway completi con zero righe di codice che ne nominino uno.
 
 - I nomi (opera di riferimento protetta) vivono solo nei dati e nelle chiavi i18n: il flag SERIAL_NUMBERS_FILED_OFF permette la rinominazione completa.
@@ -47,22 +50,20 @@ Il principio architetturale e' uno: il codice implementa primitive parametriche 
 - CI: GitHub Actions su push a main e sulle pull request (validator + suite con il controllo degli errori nascosti). Dal 29.10 tutto il lavoro e' su main; i controlli della CI si guardano solo quando li chiede l'utente.
 - Rigenerare l'arte: tools/art/build_*.py; il mondo con tools/art/esporta_mondo.py (circa 1 ora per tutto; --edifici, --barca, --varchi, --sottosuolo, --solo-blocchi per le parti).
 - Repo: https://github.com/YasserOudabashi/mirwada. Nota IP nel CLAUDE.md: non distribuibile ne' monetizzabile coi nomi attuali.""",
-    "Cosa migliorare": """Dal controllo completo del 29.10.2026 (tutto segnato in prd.json):
+    "Cosa migliorare": """Dal giro di prova dello stile nuovo (21.11.2026):
 
-- La storia dell'Atto II e III manca: 4 quest in tutto il gioco, le tribolazioni hanno solo contatori, e la prova finale (trib_1_0) non ha nessuna fonte che la segni superata: oggi il gioco non si puo' finire.
-- Gli effetti delle primitive che colpiscono un altro stanno su chi lancia; alcuni durano troppo poco per vedersi.
-- Il negozio e la pagina Indosso non mostrano le icone; le icone hanno una serie sola anche nella modalita' cupa; i sigilli incastonati non si vedono.
-- La barca va alla velocita' a piedi; i pontili stretti del porto non si raggiungono a piedi; nelle stanze piccole i nemici arrivano subito addosso.
-- Mancano le luci di notte (finestre, lampioni, faro), i panorami per regione, le creature (evocazioni, antagonisti), nuoto e arrampicata, il cannocchiale da tasca.
-- 7 percorsi di fusione su 8 sono stub; l'inglese manca per 1496 testi su 1784.
-- Da provare giocando: i tempi d'attacco nuovi, la durata dei tragitti, il caricamento del mondo su Windows.""",
-    "Prossimi punti": """In ordine di priorita' (prd.json, 57 story aperte):
+- Quasi tutta l'arte e' ancora nello stile vecchio (forge3d 3D): va rifatta a griglia, un giro alla volta.
+- Ogni nemico e' ancora nemico_base ingrandito; non c'e' nessun file audio.
+- L'equipaggiamento cambia solo i numeri: Enel ha sempre lo spadone. Deve vedersi quello che indossa e tiene (decisione del 21.11).
+- Gli effetti unici delle abilita' non sono ancora collegati nel gioco (vfx.json per abilita').
+- Le case nuove sono in arte/prova/: vanno nel mondo quando sono approvate.
+- 7 percorsi di fusione su 8 sono stub; l'inglese manca per gran parte dei testi.""",
+    "Prossimi punti": """In ordine (prd.json, 47 story aperte):
 
-- Miglioramenti rapidi: effetti sul bersaglio, icone nel negozio e in Indosso, barca piu' veloce, pontili, cannocchiale, gesti, nemici nelle stanze, sigilli (US-8B44..US-8B73e).
-- Arte rimasta: cannocchiale da tasca, luci di notte, panorami per regione, evocazioni e antagonisti, nuoto, arrampicata (US-8B26..US-8B92).
-- Fase 13 Atto II e III (US-1301..US-1313): quello che serve per arrivare alla fine.
-- Fase 12 Mondo vivo: prima riscrivere il PRD sul mondo generato (US-1200), poi US-1201..US-1216.
-- Fusioni (US-7B01..07) e traduzione inglese (US-EN01..05).""",
+- Giri di arte a griglia uno per tipo (edificio, personaggio, animale, abilita'), fino all'approvazione di tutto; in attesa la risposta sulla schivata per Pathway.
+- Equipaggiamento visibile su Enel: arma, armatura e oggetti in mano disegnati e cambiati col gioco (US-8C08).
+- Fasi 15-17: nemici e boss col bestiario deciso, audio, rilascio (US-1501..US-1704).
+- Fase 12 Mondo vivo (US-1200 poi US-1201..), fusioni (US-7B01..07), inglese (US-EN01..05).""",
 }
 
 BLU = RGBColor(0x1A, 0x23, 0x7E)

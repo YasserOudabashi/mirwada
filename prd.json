@@ -2216,6 +2216,22 @@
       "fase": "8c",
       "passes": true,
       "notes": "Fatta il 2026-11-21; dettagli in progress.txt."
+    },
+    {
+      "id": "US-8C08",
+      "title": "Equipaggiamento visibile su Enel: arma, armatura e oggetti in mano",
+      "description": "Decisione dell'utente del 2026-11-21: quello che il giocatore indossa o tiene deve vedersi sulla figura, non cambiare solo i numeri. Ogni tipo d'arma il suo disegno (spadone, spada, lancia, bastone...) e le animazioni d'attacco che lo usano; armatura e mantello come pezzi a griglia sopra lo scheletro; i fogli scelti dai dati dell'oggetto (id, mai nomi) e cambiati da Equipment.equip_cambiato.",
+      "acceptanceCriteria": [
+        "il disegno dell'arma cambia quando cambia l'arma equipaggiata",
+        "armatura/mantello visibili",
+        "il legame oggetto -> disegno e' un dato",
+        "test: equip_cambiato aggiorna i fogli del player",
+        "giudicato sulla pagina Da testare"
+      ],
+      "priority": 2,
+      "fase": "8c",
+      "passes": false,
+      "notes": ""
     }
   ]
 }
