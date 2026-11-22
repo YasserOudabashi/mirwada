@@ -2232,6 +2232,24 @@
       "fase": "8c",
       "passes": false,
       "notes": ""
+    },
+    {
+      "id": "US-8C09",
+      "title": "Giro di disegni test 1: Aldo completo, 5 edifici, 5 animali, 5 nemici, il Re dei Ratti, 10 abilita', 10 oggetti",
+      "description": "Regola dell'utente del 2026-11-21 (prepara i prossimi disegni test). Tutto sulla pagina Da testare.",
+      "acceptanceCriteria": [
+        "Aldo con tutte le 16 mosse di Enel, pezzi suoi",
+        "cattedrale, faro, bottega, dogana, casa del pescatore",
+        "lepre, volpe, cinghiale, capra, orso",
+        "scheletro, pirata, soldato caduto, ratto, granchio con le 6 animazioni dei nemici",
+        "Re dei Ratti a cella 160",
+        "10 effetti unici, uno per Pathway",
+        "10 icone 32x32 di oggetti veri"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-22; dettagli in progress.txt. Da giudicare dall'utente."
     }
   ]
 }

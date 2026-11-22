@@ -35,7 +35,8 @@ ROSSO_TELL = (0xE4, 0x3B, 0x44, 255)      # Endesga 32
 STATI_TELL = {"nemico_base": ["anticipo"]}
 # il tell delle figure a griglia e' il lampo negli occhi, disegnato nella figura (scelta dell'utente, 2026-11-19): niente
 # contorno rosso. Le altre lo tengono finche' non sono rifatte.
-GRIGLIA = {"lupo_della_luna"}
+GRIGLIA = {"lupo_della_luna", "scheletro_catacombe", "pirata_naufrago", "soldato_caduto", "ratto_delle_fogne",
+           "granchio_corazzato"}
 
 
 def contorno_tell(im, cella):

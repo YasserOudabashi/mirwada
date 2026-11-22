@@ -120,5 +120,26 @@
   "tipo": "spiegazione",
   "quando": "2026-11-21",
   "testo": "Rifatta: vista da davanti, appena si china e per tutta la capriola il mento va sul petto e si vedono i capelli (a testa in giù capovolti), non più la faccia. La faccia torna solo quando si rialza."
+ },
+ {
+  "id": "s11-dogana",
+  "k": "prova:edificio_dogana",
+  "tipo": "spiegazione",
+  "quando": "2026-11-22",
+  "testo": "Mi avevi chiesto «dogana de che? a che serve?». È il posto dove chi porta merci dal mare paga una tassa (il dazio) per farle entrare in città. Per questo ha lo stemma con la bilancia, la bilancia per pesare le merci, la garitta della guardia e la sbarra. Nel gioco può diventare un luogo dove le guardie controllano e si paga per far passare le merci; se vuoi, lo aggiungo come idea di gioco."
+ },
+ {
+  "id": "s12-bottega",
+  "k": "prova:edificio_bottega",
+  "tipo": "spiegazione",
+  "quando": "2026-11-22",
+  "testo": "Il mercato avrà una bottega per ogni mestiere, ognuna con la sua insegna a forma di quello che vende (qui il fornaio con la pagnotta), il banco aperto con la merce e la gente davanti. Questa è la prima: dimmi se lo stile ti va e faccio le altre."
+ },
+ {
+  "id": "s13-boss",
+  "k": "prova:re_dei_ratti",
+  "tipo": "spiegazione",
+  "quando": "2026-11-22",
+  "testo": "Il Re dei Ratti è il primo boss grande (cella 160 pixel, più del doppio di Enel). Per ora è solo da guardare qui: nel gioco i boss avranno il loro posto quando li fai tutti (fase dei nemici e boss)."
  }
 ]

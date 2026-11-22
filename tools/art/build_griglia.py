@@ -5,6 +5,7 @@
     python tools/art/build_griglia.py --only personaggio
     python tools/art/build_griglia.py --effetti             # effetti unici -> assets/vfx/
     python tools/art/build_griglia.py --edifici             # edifici a griglia -> arte/prova/ (da giudicare)
+    python tools/art/build_griglia.py --oggetti             # icone degli oggetti a griglia -> arte/prova/
     python tools/art/generate_all.py --only personaggio     # poi in assets/ (con il tell del nemico)
 
 Scrive arte/sprite/<categoria>[_<aspetto>]_<anim>.png (frame in colonne, direzioni in righe down, up, left, right)
@@ -36,6 +37,18 @@ FIGURE = {
     "lupo_della_luna": ("lupo_della_luna", "nemico_base", "lupo_della_luna"),
     "mercante": ("mercante", "personaggio", "mercante"),
     "cervo": ("cervo", "fauna", "cervo"),
+    "rivale": ("rivale", "personaggio", "rivale"),
+    "lepre": ("lepre", "fauna", "lepre"),
+    "volpe": ("volpe", "fauna", "volpe"),
+    "cinghiale": ("cinghiale", "fauna", "cinghiale"),
+    "capra": ("capra", "fauna", "capra"),
+    "orso": ("orso", "fauna", "orso"),
+    "scheletro_catacombe": ("scheletro_catacombe", "nemico_base", "scheletro_catacombe"),
+    "pirata_naufrago": ("pirata_naufrago", "nemico_base", "pirata_naufrago"),
+    "soldato_caduto": ("soldato_caduto", "nemico_base", "soldato_caduto"),
+    "ratto_delle_fogne": ("ratto_delle_fogne", "nemico_base", "ratto_delle_fogne"),
+    "granchio_corazzato": ("granchio_corazzato", "nemico_base", "granchio_corazzato"),
+    "re_dei_ratti": ("re_dei_ratti", "nemico_base", "re_dei_ratti"),
 }
 
 
@@ -79,9 +92,10 @@ def costruisci(fid, spec):
         pose = frame(an["chiavi"], n, bool(a.get("loop")), base)
         righe = DIREZIONI if a.get("direzionale") else (an.get("vista", "down"),)
         im = foglio([[rendi(mod, p, d, lato) for p in pose] for d in righe], n)
-        os.makedirs(OUT, exist_ok=True)
-        im.save(os.path.join(OUT, f"{pre}{nome}.png"))
-        if hasattr(mod, "SOLO") or cat == "fauna":       # NPC e fauna: come build_npc/build_fauna, dritti nel gioco
+        dove = PROVA if getattr(mod, "PROVA", False) else OUT      # i boss (celle grandi) restano in prova
+        os.makedirs(dove, exist_ok=True)
+        im.save(os.path.join(dove, f"{pre}{nome}.png"))
+        if hasattr(mod, "SOLO") or cat == "fauna" or getattr(mod, "NEL_GIOCO", False):       # NPC e fauna: come build_npc/build_fauna, dritti nel gioco
             im.save(os.path.join(ROOT, "assets", "placeholder", f"{pre}{nome}.png"))
         fogli.append((nome, im))
         print(f"  {pre}{nome}.png  {n} frame x {len(righe)}")
@@ -149,17 +163,37 @@ def edifici():
     out.resize((w * 2, h * 2), Image.NEAREST).save(os.path.join(REV, "griglia_edifici.png"))
 
 
+def oggetti():
+    """Le icone degli oggetti a griglia (griglia/oggetti.py) -> arte/prova/oggetto_<id>.png (32x32)."""
+    from griglia.oggetti import OGGETTI, disegna
+    os.makedirs(PROVA, exist_ok=True)
+    ims = []
+    for nome in OGGETTI:
+        im = disegna(nome)
+        im.save(os.path.join(PROVA, f"oggetto_{nome}.png"))
+        ims.append(im)
+        print(f"  prova: oggetto_{nome}.png")
+    out = Image.new("RGBA", (len(ims) * 36, 36), (200, 208, 186, 255))
+    for i, im in enumerate(ims):
+        out.alpha_composite(im, (i * 36 + 2, 2))
+    out.resize((out.width * 4, out.height * 4), Image.NEAREST).save(os.path.join(REV, "griglia_oggetti.png"))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--only", choices=sorted(FIGURE))
     ap.add_argument("--effetti", action="store_true", help="solo gli effetti (griglia/effetti.py)")
     ap.add_argument("--edifici", action="store_true", help="solo gli edifici (griglia/edifici.py) -> arte/prova/")
+    ap.add_argument("--oggetti", action="store_true", help="solo le icone (griglia/oggetti.py) -> arte/prova/")
     a = ap.parse_args()
     if a.effetti:
         effetti()
         return
     if a.edifici:
         edifici()
+        return
+    if a.oggetti:
+        oggetti()
         return
     with open(os.path.join(ROOT, "data", "animations.json"), encoding="utf-8") as fh:
         spec = json.load(fh)

@@ -1778,3 +1778,26 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Dashboard: mappa del Mondo con il pulsante Sopra/Sottosuolo (build.py mappa/mappa_dettaglio con sotto=True ->
   img/mappa_sotto.png, mondo_sotto.json, img/mondo_sotto/); da sotto si vedono ingressi e boss del sottosuolo.
   Verificato con Playwright, nessun errore in console.
+
+## 2026-11-22 — US-8C09: primo giro "prepara i prossimi disegni test"
+- Motore: personaggio.disegna(st=modulo) e lo stile S (falde, sciarpa, fiale, rampe di busto/braccia/gambe, spessore,
+  arma con le sue misure, fodero al fianco, testa_su, EXTRA, lampo negli occhi): ogni umano ha i suoi pezzi sullo
+  scheletro di Enel. Enel identico (fogli confrontati). _bestia.py: disegno comune dei quadrupedi (B, EXTRA, pose fauna);
+  _umano_nemico.py: pose dei nemici umani dalle mosse di Enel (anticipo = carica col lampo, attack = il colpo).
+- Personaggio completo: Aldo il rivale (rivale.py), 16 mosse, stocco a una mano, mantellina; va anche in
+  assets/placeholder (l'NPC Aldo).
+- Animali: lepre, volpe, cinghiale (setole), capra (corna), orso. Nemici: scheletro_catacombe (costole, spessore 0.55),
+  pirata_naufrago (righe), soldato_caduto (scudo), ratto_delle_fogne (ciuffi), granchio_corazzato (chele che si aprono
+  nel tell e nel morso); in generate_all GRIGLIA (niente contorno rosso). Boss: re_dei_ratti, cella 160 (PROVA: resta in
+  arte/prova/), testa grande a pezzi tondi, corona, cuciture, ratti sulle spalle, mannaia a due mani.
+- Edifici: cattedrale (gotica, campanili con guglie, rosone, ogive), faro (alto 330 px), bottega del fornaio (insegna a
+  pagnotta), dogana (bilancia, garitta con la sbarra), casa del pescatore (pali, reti).
+- Effetti (effetti.py, `_frame`): incubo, tocco_gelido, passo_breve, pugnalata_furtiva, velo_illusorio, sigillo_su_arma,
+  richiamo_compagno, germoglio_rapido, analisi, contrattacco -> assets/vfx/vfx_<nome>.png (non ancora collegati nel gioco).
+- Oggetti (griglia/oggetti.py, `--oggetti`): 10 icone 32x32 in arte/prova/oggetto_<id>.png.
+- Comandi: build_griglia.py (--only <id>, --edifici, --effetti, --oggetti), generate_all.py --only nemico_base.
+- Dashboard: GIRO2 in build.py, gruppi nuovi in Da testare (142 schede), fotogrammi numerati anche per gli effetti,
+  cartelle Aldo/Animali/Nemici/Boss/Oggetti in Note e testate; verificato con Playwright, nessun errore.
+- test_fauna: la lepre ora ha la cella 64. 1103 test, validator 0 errori.
+- Aperto: il boss ha il busto squadrato e la mannaia sembra una clava; l'idle della lepre di profilo e' piccolo; gli
+  effetti nuovi e le icone vanno collegati nel gioco quando approvati.

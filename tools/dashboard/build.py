@@ -89,12 +89,49 @@ def _file_prova():
     out["prova:stretta_ferrea"] = ["assets/vfx/vfx_stretta_ferrea.png"]
     for f in glob.glob(os.path.join(ROOT, "arte", "prova", "edificio_*.png")):          # edifici a griglia
         out["prova:" + os.path.basename(f)[:-4]] = [os.path.relpath(f, ROOT)]
+    giro = [(GIRO2["personaggio"], "personaggio", tuple(pers), "assets/placeholder")]
+    giro += [(sp, "fauna", ("idle", "fuga"), "assets/placeholder") for sp in GIRO2["animali"]]
+    giro += [(asp, "nemico_base", tuple(lupo), "assets/placeholder") for asp in GIRO2["nemici"]]
+    giro += [(GIRO2["boss"], "nemico_base", tuple(lupo), "arte/prova")]
+    for asp, cat, anims, cart in giro:
+        fs = [f"{cart}/{cat}_{asp}_{n}.png" for n in anims]
+        out[f"prova:{asp}"] = fs
+        for n, f in zip(anims, fs):
+            out[f"prova:{asp}_{n}"] = [f]
+    for nome in GIRO2["abilita"]:
+        out[f"prova:{nome}"] = [f"assets/vfx/vfx_{nome}.png"]
+    for f in glob.glob(os.path.join(ROOT, "arte", "prova", "oggetto_*.png")):
+        out["prova:" + os.path.basename(f)[:-4]] = [os.path.relpath(f, ROOT)]
     for asp, cat, anims in (("mercante", "personaggio", ("idle", "walk")), ("cervo", "fauna", ("idle", "fuga"))):
         fs = [f"assets/placeholder/{cat}_{asp}_{n}.png" for n in anims]
         out[f"prova:{asp}"] = fs
         for n, f in zip(anims, fs):
             out[f"prova:{asp}_{n}"] = [f]
     return out
+
+
+# Il giro di disegni da testare del 2026-11-22 (regola dell'utente: 1 personaggio completo, 5 edifici, 5 animali,
+# 5 nemici, 1 boss, 10 abilita', 10 oggetti). Gli edifici si prendono tutti da arte/prova/edificio_*.png.
+GIRO2 = {
+    "personaggio": "rivale",
+    "animali": ("lepre", "volpe", "cinghiale", "capra", "orso"),
+    "nemici": ("scheletro_catacombe", "pirata_naufrago", "soldato_caduto", "ratto_delle_fogne", "granchio_corazzato"),
+    "boss": "re_dei_ratti",
+    # effetto -> (abilita', frame, dove: chi_lancia | corpo | nemico)
+    "abilita": {"incubo": ("darkness_incubo", 8, "nemico"), "tocco_gelido": ("death_tocco_gelido", 7, "chi_lancia"),
+                "passo_breve": ("door_passo_breve", 7, "corpo"),
+                "pugnalata_furtiva": ("error_pugnalata_furtiva", 6, "chi_lancia"),
+                "velo_illusorio": ("fool_velo_illusorio", 8, "corpo"),
+                "sigillo_su_arma": ("hermit_sigillo_su_arma", 8, "corpo"),
+                "richiamo_compagno": ("moon_richiamo_compagno", 8, "chi_lancia"),
+                "germoglio_rapido": ("mother_germoglio_rapido", 8, "chi_lancia"),
+                "analisi": ("paragon_analisi", 7, "nemico"), "contrattacco": ("tg_contrattacco", 7, "chi_lancia")},
+}
+PROVA_DIR = os.path.join(ROOT, "arte", "prova")
+
+
+def _anims(cat):
+    return [n for n, a in senza_commenti(ANIM[cat]).items() if isinstance(a, dict) and "frames" in a]
 
 
 def versioni():
@@ -117,6 +154,32 @@ def versioni():
         out[k] = reg[k]
     with open(REGISTRO, "w", encoding="utf-8") as fh:
         json.dump(reg, fh, ensure_ascii=False, indent=1, sort_keys=True)
+    return out
+
+
+def giro2():
+    """Le figure e le icone del giro del 2026-11-22 per la pagina Da testare."""
+    out = {"personaggio": None, "animali": [], "nemici": [], "boss": None, "oggetti": []}
+    if figura("npc_" + GIRO2["personaggio"], "personaggio", GIRO2["personaggio"]):
+        out["personaggio"] = "npc_" + GIRO2["personaggio"]
+    for sp in GIRO2["animali"]:
+        if figura("fauna_" + sp, "fauna", sp):
+            out["animali"].append({"id": sp, "figura": "fauna_" + sp})
+    for asp in GIRO2["nemici"]:
+        if figura("nem_" + asp, "nemico_base", asp):
+            out["nemici"].append({"id": asp, "figura": "nem_" + asp})
+    if figura("boss_" + GIRO2["boss"], "nemico_base", GIRO2["boss"], cartella=PROVA_DIR):
+        out["boss"] = {"id": GIRO2["boss"], "figura": "boss_" + GIRO2["boss"]}
+    nomi = {}
+    for f in glob.glob(os.path.join(DATA, "items", "*.json")):
+        for it in json.load(open(f, encoding="utf-8")).get("items", []):
+            nomi[it["id"]] = (tr(it.get("name_i18n"), it.get("name", it["id"])),
+                              tr(it.get("descrizione_i18n"), it.get("descrizione", "")))
+    for f in sorted(glob.glob(os.path.join(PROVA_DIR, "oggetto_*.png"))):
+        iid = os.path.basename(f)[len("oggetto_"):-4]
+        shutil.copy(f, os.path.join(IMG, f"oggetto_{iid}.png"))
+        out["oggetti"].append({"id": iid, "file": f"img/oggetto_{iid}.png", "nome": nomi.get(iid, (iid, ""))[0],
+                               "descrizione": nomi.get(iid, ("", ""))[1]})
     return out
 
 
@@ -150,7 +213,7 @@ def varianti_schivata():
             "durate": [int(1000 / float(a.get("fps", 20)))] * n, "loop": True}]}
 
 
-def figura(fid, categoria, aspetto="", spec_cat=None):
+def figura(fid, categoria, aspetto="", spec_cat=None, cartella=None):
     """Un foglio unico con tutte le animazioni di <categoria>[_<aspetto>]_<anim>.png una sotto l'altra."""
     spec = senza_commenti(ANIM[spec_cat or categoria])
     pezzi, meta, y, larg = [], [], 0, 0
@@ -158,7 +221,7 @@ def figura(fid, categoria, aspetto="", spec_cat=None):
         if not isinstance(a, dict) or "frames" not in a:
             continue
         pre = f"{categoria}_{aspetto}_" if aspetto else f"{categoria}_"
-        f = os.path.join(PH, f"{pre}{nome}.png")
+        f = os.path.join(cartella or PH, f"{pre}{nome}.png")
         if not os.path.isfile(f):
             continue
         im = Image.open(f).convert("RGBA")
@@ -455,13 +518,16 @@ def tecniche():
                                         ("vfx_incantesimo", 4, "hermit_incantesimo_tradizionale", True,
                                          "vfx_incantesimo_scoppio"),
                                         ("vfx_incantesimo_scoppio", 7, "hermit_incantesimo_tradizionale", False, None),
-                                        ("vfx_stretta_ferrea", 8, "tg_stretta_ferrea", False, None)):
+                                        ("vfx_stretta_ferrea", 8, "tg_stretta_ferrea", False, None),
+                                        *[(f"vfx_{k}", v[1], v[0], False, None) for k, v in GIRO2["abilita"].items()]):
         src = os.path.join(ROOT, "assets", "vfx", nome + ".png")
         if os.path.isfile(src):
             shutil.copy(src, os.path.join(IMG, nome + ".png"))
             effetti.append({"primitiva": None, "abilita": ab, "sprite": nome, "file": f"img/{nome}.png", "frames": fr,
                             "lampo": True, "su": "chi_lancia", "gira": not vola, "vola": vola, "scoppio": scoppio,
-                            "unico": True, "centro": nome == "vfx_stretta_ferrea"})
+                            "unico": True, "centro": nome == "vfx_stretta_ferrea" or
+                            GIRO2["abilita"].get(nome[4:], ("", 0, ""))[2] == "corpo",
+                            "sul_nemico": GIRO2["abilita"].get(nome[4:], ("", 0, ""))[2] == "nemico"})
     return {"pathway": pw, "effetti": effetti}
 
 
@@ -545,6 +611,7 @@ def main():
     dati["personaggi"] = personaggi()
     dati["tecniche"] = tecniche()
     dati["edifici_prova"] = edifici_prova()
+    dati["giro2"] = giro2()
     dati["versioni"] = versioni()
     dati["domande"] = json.load(open(os.path.join(ROOT, "tools", "dashboard", "domande.json"), encoding="utf-8"))
     dati["combattimento"] = senza_commenti(json.load(open(os.path.join(DATA, "balance.json"), encoding="utf-8"))["combattimento"])

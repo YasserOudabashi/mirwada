@@ -1,4 +1,20 @@
 {
+ "prova:analisi": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "e1ad1d1dc3d9"
+ },
+ "prova:capra": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "27ed6f0b8753"
+ },
+ "prova:capra_fuga": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "1217906087f0"
+ },
+ "prova:capra_idle": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "f59ddf89e055"
+ },
  "prova:carica": {
   "dal": "2026-11-21T12:52:47Z",
   "v": "eb7fbcc805b0"
@@ -15,6 +31,26 @@
   "dal": "2026-11-21T12:52:47Z",
   "v": "5ec94f22df0c"
  },
+ "prova:cinghiale": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "c47ec813a411"
+ },
+ "prova:cinghiale_fuga": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "3edaf0139905"
+ },
+ "prova:cinghiale_idle": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "8c1228679642"
+ },
+ "prova:contrattacco": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "d7f4280839dd"
+ },
+ "prova:edificio_bottega": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "8b8fb8d83ed1"
+ },
  "prova:edificio_casa_antica": {
   "dal": "2026-11-21T12:17:06Z",
   "v": "74092ec0ef29"
@@ -26,6 +62,22 @@
  "prova:edificio_casa_antica_pergola": {
   "dal": "2026-11-21T12:52:47Z",
   "v": "3ec99ecd175a"
+ },
+ "prova:edificio_casa_pescatore": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "14d91d80980b"
+ },
+ "prova:edificio_cattedrale": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "0dd92967bad7"
+ },
+ "prova:edificio_dogana": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "a7d755f19a46"
+ },
+ "prova:edificio_faro": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "42fef8e3b836"
  },
  "prova:edificio_museo": {
   "dal": "2026-11-21T12:52:47Z",
@@ -103,6 +155,38 @@
   "dal": "2026-11-18T00:00:00Z",
   "v": "83883e65ac2d"
  },
+ "prova:germoglio_rapido": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "4aacadb36a47"
+ },
+ "prova:granchio_corazzato": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "84dff1e21766"
+ },
+ "prova:granchio_corazzato_anticipo": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "d03427cdaf3b"
+ },
+ "prova:granchio_corazzato_attack": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "c1bdf25eac3c"
+ },
+ "prova:granchio_corazzato_death": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "b732d4031f73"
+ },
+ "prova:granchio_corazzato_idle": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "94328d4b8f81"
+ },
+ "prova:granchio_corazzato_stagger": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "095c372a1f65"
+ },
+ "prova:granchio_corazzato_walk": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "c29372d0586c"
+ },
  "prova:incantesimo": {
   "dal": "2026-11-18T00:00:00Z",
   "v": "fd33da056117"
@@ -110,6 +194,22 @@
  "prova:incantesimo_scoppio": {
   "dal": "2026-11-18T00:00:00Z",
   "v": "aac06e0799c2"
+ },
+ "prova:incubo": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "ffcc18dbf8d7"
+ },
+ "prova:lepre": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "1995701c37dc"
+ },
+ "prova:lepre_fuga": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "dbb0ce0519f7"
+ },
+ "prova:lepre_idle": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "2495188b92a0"
  },
  "prova:lupo": {
   "dal": "2026-11-19T14:43:08Z",
@@ -151,6 +251,250 @@
   "dal": "2026-11-21T12:17:06Z",
   "v": "34da0c22419f"
  },
+ "prova:oggetto_amuleto_lunare": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "cb46ba4a7cfc"
+ },
+ "prova:oggetto_corazza_cuoio": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "6da02a82ce9b"
+ },
+ "prova:oggetto_cristallo_grezzo": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "e497441750e1"
+ },
+ "prova:oggetto_elisir_del_vigore": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "864853de6b15"
+ },
+ "prova:oggetto_lingotto_ferro": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "fc130a8b9d3d"
+ },
+ "prova:oggetto_moneta_comune": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "b91ac02e6665"
+ },
+ "prova:oggetto_pergamena_vigore": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "68aa92535174"
+ },
+ "prova:oggetto_pozione_cura_maggiore": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "67d2d4809d01"
+ },
+ "prova:oggetto_pozione_cura_minore": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "d955f85fd928"
+ },
+ "prova:oggetto_spada_ferrea": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "a13821a28173"
+ },
+ "prova:orso": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "80f6dbaeef77"
+ },
+ "prova:orso_fuga": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "f39de236da26"
+ },
+ "prova:orso_idle": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "1a76d453365d"
+ },
+ "prova:passo_breve": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "738928f22ae0"
+ },
+ "prova:pirata_naufrago": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "5ad6389ad2b6"
+ },
+ "prova:pirata_naufrago_anticipo": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "42cce1bcd095"
+ },
+ "prova:pirata_naufrago_attack": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "1565d96b0a49"
+ },
+ "prova:pirata_naufrago_death": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "febf060be39f"
+ },
+ "prova:pirata_naufrago_idle": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "981a6a31bd51"
+ },
+ "prova:pirata_naufrago_stagger": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "019e7b54b6ad"
+ },
+ "prova:pirata_naufrago_walk": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "df4153c8fda0"
+ },
+ "prova:pugnalata_furtiva": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "70c00e3ae9de"
+ },
+ "prova:ratto_delle_fogne": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "a3910b7860a8"
+ },
+ "prova:ratto_delle_fogne_anticipo": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "528bdb28ea4f"
+ },
+ "prova:ratto_delle_fogne_attack": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "e82f2e0e8040"
+ },
+ "prova:ratto_delle_fogne_death": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "14adfbebe100"
+ },
+ "prova:ratto_delle_fogne_idle": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "a69688ac29f0"
+ },
+ "prova:ratto_delle_fogne_stagger": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "1cd879261ea4"
+ },
+ "prova:ratto_delle_fogne_walk": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "5dd1bf3c34ec"
+ },
+ "prova:re_dei_ratti": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "ad5baa9d201b"
+ },
+ "prova:re_dei_ratti_anticipo": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "b06c409d6fa7"
+ },
+ "prova:re_dei_ratti_attack": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "fee81d436406"
+ },
+ "prova:re_dei_ratti_death": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "3e2d0f38127a"
+ },
+ "prova:re_dei_ratti_idle": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "2548be67c30f"
+ },
+ "prova:re_dei_ratti_stagger": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "04c3f6494ce3"
+ },
+ "prova:re_dei_ratti_walk": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "d0a18d6c8020"
+ },
+ "prova:richiamo_compagno": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "cdf82b627bde"
+ },
+ "prova:rivale": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "9e9a4fe926c8"
+ },
+ "prova:rivale_attack_heavy": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "254129af625f"
+ },
+ "prova:rivale_attack_light": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "fe4137d7c1f5"
+ },
+ "prova:rivale_cast": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "705394d39b00"
+ },
+ "prova:rivale_dash": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "fc161ea8dbef"
+ },
+ "prova:rivale_death": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "596991153fce"
+ },
+ "prova:rivale_drink": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "4db1b006e9c2"
+ },
+ "prova:rivale_fly": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "f0cf8d42ccd1"
+ },
+ "prova:rivale_hurt": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "8569a15c9243"
+ },
+ "prova:rivale_idle": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "88d6099e52bd"
+ },
+ "prova:rivale_interact": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "d2ac8b0051c2"
+ },
+ "prova:rivale_meditate": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "37bd9bc6413e"
+ },
+ "prova:rivale_parry": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "e50f7b5df199"
+ },
+ "prova:rivale_pickup": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "0a08fc96b79b"
+ },
+ "prova:rivale_ritual": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "992c82853a06"
+ },
+ "prova:rivale_sail": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "ad654501d9b6"
+ },
+ "prova:rivale_walk": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "ad49243e7865"
+ },
+ "prova:scheletro_catacombe": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "d02a054da087"
+ },
+ "prova:scheletro_catacombe_anticipo": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "94d74cd16d79"
+ },
+ "prova:scheletro_catacombe_attack": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "82933002b9c9"
+ },
+ "prova:scheletro_catacombe_death": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "0fef2f2e9795"
+ },
+ "prova:scheletro_catacombe_idle": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "48e96564ed28"
+ },
+ "prova:scheletro_catacombe_stagger": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "4eec68452ef2"
+ },
+ "prova:scheletro_catacombe_walk": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "e5d8584f876b"
+ },
  "prova:schivata_affondo": {
   "dal": "2026-11-19T14:14:58Z",
   "v": "be01449173ff"
@@ -167,8 +511,60 @@
   "dal": "2026-11-19T14:14:58Z",
   "v": "d67353a7b0e7"
  },
+ "prova:sigillo_su_arma": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "eb09dc2620e1"
+ },
+ "prova:soldato_caduto": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "96612e7fde65"
+ },
+ "prova:soldato_caduto_anticipo": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "bb978df1e071"
+ },
+ "prova:soldato_caduto_attack": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "20ba51629ee5"
+ },
+ "prova:soldato_caduto_death": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "04696845269a"
+ },
+ "prova:soldato_caduto_idle": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "485e1cd1624e"
+ },
+ "prova:soldato_caduto_stagger": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "d36f3df87f7e"
+ },
+ "prova:soldato_caduto_walk": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "1a7f7ee309c8"
+ },
  "prova:stretta_ferrea": {
   "dal": "2026-11-21T12:17:06Z",
   "v": "889362bd4c04"
+ },
+ "prova:tocco_gelido": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "86c54751cb50"
+ },
+ "prova:velo_illusorio": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "e1a3a57544be"
+ },
+ "prova:volpe": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "96104114caa1"
+ },
+ "prova:volpe_fuga": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "bb32ca8cfb07"
+ },
+ "prova:volpe_idle": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "bdfbe588ff16"
  }
 }

@@ -4,6 +4,8 @@ Coppola marrone, capelli neri corti, pelle chiara e stanca, occhi freddi azzurri
 sulla guancia, cappotto lungo blu-ardesia aperto davanti, sciarpa rossa, bende bianche sugli avambracci, stivali,
 spadone a due mani portato in spalla.
 """
+import sys
+
 import numpy as np
 
 from ..corpo import Umano
@@ -97,13 +99,29 @@ def _p(v, g):
     return v.xy(g)
 
 
-def _due_mani(g):
+# Lo stile di Enel: le altre figure umane (rivale, nemici, boss) passano il loro modulo a disegna() con R, M, TESTA,
+# DOLORE, CORPO e S; lo scheletro e le pose sono le stesse, i pezzi e i colori sono loro.
+S = {
+    "falde": 6.0,            # lunghezza delle falde del cappotto (0: niente falde)
+    "sciarpa": True,
+    "fiale": True,           # le due fiale alla cintura
+    "busto": "cappotto", "braccio": "cappotto", "avambraccio": "bende", "gamba": "pantaloni", "piede": "stivali",
+    "camicia": "camicia",
+    "larghezza": (5.6, 6.6), # busto: ai fianchi, alle spalle
+    # arma: impugnatura, guardia (mezza larghezza), lama (lunghezza, spessore alla base e in punta), punta
+    "arma": dict(manico=4.8, guardia=2.8, lama=19.6, spessa=(1.45, 1.1), punta=2.0, rampa="lama", elsa="cuoio",
+                 metallo="oro"),
+    "schiena": True,         # da ferma l'arma sta sulla schiena (l'idle con "arma_su": "schiena")
+}
+
+
+def _due_mani(g, corpo=None):
     """La mano sinistra sull'elsa, sotto la destra (spadone a due mani): il gomito si trova dalle due lunghezze del
     braccio (due ossa), piegato verso il basso e in fuori."""
     d = g["arma_dir"]
     meta = g["mano_r"] - d * 2.0
     s = g["spalla_l"]
-    a, b = CORPO.m["braccio"], CORPO.m["avambraccio"]
+    a, b = (corpo or CORPO).m["braccio"], (corpo or CORPO).m["avambraccio"]
     v = meta - s
     dist = min(np.linalg.norm(v), a + b - 0.01)
     v = v / max(np.linalg.norm(v), 1e-6)
@@ -117,10 +135,12 @@ def _due_mani(g):
     g["mano_l"] = meta
 
 
-def disegna(tela, v, g, posa):
-    """Ordina le parti per profondita' e le posa sulla tela."""
+def disegna(tela, v, g, posa, st=None):
+    """Ordina le parti per profondita' e le posa sulla tela. `st`: il modulo della figura (default Enel)."""
+    st = st or sys.modules[__name__]
+    R, M, TESTA, DOLORE, S = st.R, st.M, st.TESTA, getattr(st, "DOLORE", st.TESTA), st.S
     if posa.get("due_mani") and posa.get("arma_su", "mano") != "schiena":
-        _due_mani(g)
+        _due_mani(g, st.CORPO)
     parti = []
     vis = v.lato_visibile()
     dietro = v.prof(g["bacino"] - np.array([0, 1.5, 0]))
@@ -128,17 +148,19 @@ def disegna(tela, v, g, posa):
     for lato in "lr":
         def gamba(lato=lato):
             a, k, c, t = (v.xy(g[f"{n}_{lato}"]) for n in ("anca", "ginocchio", "caviglia", "punta"))
-            segmento(tela, a, k, 2.5, 2.2, R["pantaloni"], f"gamba_{lato}")
-            segmento(tela, k, c, 2.2, 2.0, R["pantaloni"], f"gamba_{lato}")
+            f = S.get("spessore", 1.0)              # gli arti piu' sottili (lo scheletro)
+            segmento(tela, a, k, 2.5 * f, 2.2 * f, R[S["gamba"]], f"gamba_{lato}")
+            segmento(tela, k, c, 2.2 * f, 2.0 * f, R[S["gamba"]], f"gamba_{lato}")
             cs = (c[0], c[1] - 1.2)
-            segmento(tela, cs, c, 2.0, 2.0, R["stivali"], f"gamba_{lato}", uniti=(f"gamba_{lato}",))
-            segmento(tela, c, t, 1.9, 1.5, R["stivali"], f"gamba_{lato}")
+            segmento(tela, cs, c, 2.0 * f, 2.0 * f, R[S["piede"]], f"gamba_{lato}", uniti=(f"gamba_{lato}",))
+            segmento(tela, c, t, 1.9 * f, 1.5 * f, R[S["piede"]], f"gamba_{lato}")
         parti.append((v.prof(g[f"ginocchio_{lato}"]) + (0.3 if vis == lato else 0), 0, gamba))
 
         def braccio(lato=lato):
             s, e, m = (v.xy(g[f"{n}_{lato}"]) for n in ("spalla", "gomito", "mano"))
-            segmento(tela, s, e, 2.3, 2.0, R["cappotto"], f"braccio_{lato}")
-            segmento(tela, e, m, 1.8, 1.6, R["bende"], f"braccio_{lato}")
+            f = S.get("spessore", 1.0)
+            segmento(tela, s, e, 2.3 * f, 2.0 * f, R[S["braccio"]], f"braccio_{lato}")
+            segmento(tela, e, m, 1.8 * f, 1.6 * f, R[S["avambraccio"]], f"braccio_{lato}")
             segmento(tela, m, m, 1.9, 1.9, R["pelle"], f"braccio_{lato}")
         dp = v.prof(g[f"gomito_{lato}"]) * 0.5 + v.prof(g[f"mano_{lato}"]) * 0.5
         # di profilo il braccio dalla parte di chi guarda sta davanti anche alla testa (le mani alzate si vedono)
@@ -148,23 +170,27 @@ def disegna(tela, v, g, posa):
         b = g["bacino"] - g["su"] * 0.5
         dietro_v = -np.array([0, 1.0, 0])
         a = v.xy(b + dietro_v * 0.8)
-        z = v.xy(b - np.array([0, 0, 6.0]) + dietro_v * (1.6 + posa.get("vento", 0.0) * 0.8))
-        segmento(tela, a, z, 5.4, 6.4, R["cappotto"], "falde", tappi=False, piatto=0.5)
-    parti.append((dietro - 0.5, -1, falde))
+        z = v.xy(b - np.array([0, 0, S["falde"]]) + dietro_v * (1.6 + posa.get("vento", 0.0) * 0.8))
+        segmento(tela, a, z, 5.4, 6.4, R[S["busto"]], "falde", tappi=False, piatto=0.5)
+    if S["falde"]:
+        parti.append((dietro - 0.5, -1, falde))
 
     def busto():
         a, b = v.xy(g["bacino"] + g["su"] * 0.5), v.xy(g["collo"])
-        segmento(tela, a, b, 5.6, 6.6, R["cappotto"], "busto", tappi=False, piatto=0.35)
+        segmento(tela, a, b, S["larghezza"][0], S["larghezza"][1], R[S["busto"]], "busto", tappi=False, piatto=0.35)
         if v.dir == "down":                      # cappotto aperto: camicia scura, cintura con due fiale
-            segmento(tela, (a[0], a[1] - 1), (b[0], b[1] + 1), 1.8, 2.0, R["camicia"], "camicia", tappi=False)
+            if S["camicia"]:
+                segmento(tela, (a[0], a[1] - 1), (b[0], b[1] + 1), 1.8, 2.0, R[S["camicia"]], "camicia", tappi=False)
             segmento(tela, (a[0] - 4.6, a[1] - 0.5), (a[0] + 4.6, a[1] - 0.5), 0.9, 0.9, R["cuoio"], "cintura",
                      tappi=False, separa=False)
-            for dx, liq in (((-3.4, "red"), (-1.6, "cyan")) if abs(posa.get("cade", 0)) < 30 else ()):
+            for dx, liq in (((-3.4, "red"), (-1.6, "cyan")) if abs(posa.get("cade", 0)) < 30 and S["fiale"] else ()):
                 griglia(tela, [".K.", "lLl", "LLL"], {"K": colore("brown_d"), "L": colore(liq), "l": colore("white")},
                         int(round(a[0] + dx * (1 if v.dir == "down" else -1) - 1)), int(round(a[1] - 1)), "fiale")
-        elif v.dir in ("left", "right"):
-            segmento(tela, (a[0], a[1] - 0.5), (b[0], b[1] + 1), 0.7, 0.7, R["camicia"], "camicia",
+        elif v.dir in ("left", "right") and S["camicia"]:
+            segmento(tela, (a[0], a[1] - 0.5), (b[0], b[1] + 1), 0.7, 0.7, R[S["camicia"]], "camicia",
                      tappi=False, separa=False)
+        if not S["sciarpa"]:
+            return
         # sciarpa intorno al collo
         c = v.xy(g["collo"] - g["su"] * 0.8)
         segmento(tela, (c[0] - 4.8, c[1]), (c[0] + 4.8, c[1]), 1.9, 1.9, R["sciarpa"], "sciarpa")
@@ -173,7 +199,7 @@ def disegna(tela, v, g, posa):
                      R["sciarpa"], "sciarpa", uniti=("sciarpa",))
     parti.append((v.prof(g["bacino"]), 1, busto))
 
-    if v.dir != "down":                          # coda della sciarpa sulla schiena
+    if v.dir != "down" and S["sciarpa"]:         # coda della sciarpa sulla schiena
         def coda():
             c = g["collo"] - g["su"] * 1.0 - np.array([0, 1.8, 0])
             z = c - g["su"] * 5.5 - np.array([0, 1.5 + posa.get("vento", 0.0), 0])
@@ -181,7 +207,7 @@ def disegna(tela, v, g, posa):
         parti.append((v.prof(g["bacino"]) + 0.3, 1.5, coda))
 
     def testa():
-        x, y = v.xy(g["testa"] + g["su"] * 4.5)
+        x, y = v.xy(g["testa"] + g["su"] * S.get("testa_su", 4.5))
         facce = DOLORE if posa.get("faccia") == "dolore" else TESTA
         if v.dir in ("left", "right"):
             righe, spec = facce["left"], v.dir == "right"
@@ -204,7 +230,12 @@ def disegna(tela, v, g, posa):
     parti.append((v.prof(g["testa"]) + 1.2, 3, testa))
 
     schiena = posa.get("arma_su", "mano") == "schiena"
-    if schiena:                                  # sulla schiena: elsa sopra la spalla destra, punta al fianco sinistro
+    if schiena and S.get("fodero") == "fianco":  # al fianco sinistro, punta in giu' e indietro (stocco, sciabola)
+        avanti = np.cross(g["su"], g["destra"])
+        d = -g["su"] * 0.7 - avanti * 0.75
+        d /= np.linalg.norm(d)
+        pomo = g["bacino"] - g["destra"] * 3.6 + g["su"] * 2.0 + avanti * 1.4
+    elif schiena:                                # sulla schiena: elsa sopra la spalla destra, punta al fianco sinistro
         avanti = np.cross(g["su"], g["destra"])
         d = -g["su"] * 1.0 - g["destra"] * 0.75 - avanti * 0.55
         d /= np.linalg.norm(d)
@@ -213,19 +244,42 @@ def disegna(tela, v, g, posa):
         d = g["arma_dir"]
         pomo = g["mano_r"] - d * 2.6
 
+    A = S["arma"]
+
     def arma():
         perp = np.cross(d, np.array([0, 0, 1.0]))
         if np.linalg.norm(perp) < 0.2:
             perp = np.cross(d, np.array([0, 1.0, 0]))
         perp /= np.linalg.norm(perp)
-        segmento(tela, v.xy(pomo + d * 0.6), v.xy(pomo + d * 4.8), 0.9, 0.9, R["cuoio"], "arma")
-        segmento(tela, v.xy(pomo), v.xy(pomo), 1.2, 1.2, R["oro"], "arma", uniti=("arma",))
-        gu = pomo + d * 5.2
-        segmento(tela, v.xy(gu - perp * 2.8), v.xy(gu + perp * 2.8), 0.9, 0.9, R["oro"], "arma", uniti=("arma",))
-        segmento(tela, v.xy(pomo + d * 5.8), v.xy(pomo + d * 19.6), 1.45, 1.1, R["lama"], "arma", uniti=("arma",))
-        segmento(tela, v.xy(pomo + d * 19.6), v.xy(pomo + d * 21.6), 1.1, 0.35, R["lama"], "arma", uniti=("arma",))
-    lama_c = pomo + d * 11
-    parti.append((v.prof(lama_c) - (1.5 if schiena else 0), 2.5, arma))
+        mn, lm = A["manico"], A["lama"]
+        segmento(tela, v.xy(pomo + d * 0.6), v.xy(pomo + d * mn), 0.9, 0.9, R[A["elsa"]], "arma")
+        segmento(tela, v.xy(pomo), v.xy(pomo), 1.2, 1.2, R[A["metallo"]], "arma", uniti=("arma",))
+        gu = pomo + d * (mn + 0.4)
+        if A["guardia"]:
+            segmento(tela, v.xy(gu - perp * A["guardia"]), v.xy(gu + perp * A["guardia"]), 0.9, 0.9, R[A["metallo"]],
+                     "arma", uniti=("arma",))
+        segmento(tela, v.xy(pomo + d * (mn + 1.0)), v.xy(pomo + d * lm), A["spessa"][0], A["spessa"][1], R[A["rampa"]],
+                 "arma", uniti=("arma",))
+        if A["punta"]:
+            segmento(tela, v.xy(pomo + d * lm), v.xy(pomo + d * (lm + A["punta"])), A["spessa"][1], 0.35,
+                     R[A["rampa"]], "arma", uniti=("arma",))
+    lama_c = pomo + d * (A["lama"] * 11 / 19.6)
+    if A["lama"]:
+        parti.append((v.prof(lama_c) - (1.5 if schiena else 0), 2.5, arma))
+
+    for extra in getattr(st, "EXTRA", ()):      # i pezzi propri della figura (cappello, mantella, scudo...)
+        parti.append(extra(tela, v, g, posa))
+
+    if posa.get("lampo"):                        # il tell dei nemici: lampo bianco-giallo negli occhi
+        def lampo_occhi():
+            x, y = v.xy(g["testa"] + g["su"] * S.get("testa_su", 4.5))
+            if v.dir == "up":
+                return
+            dxs = (-3, 3) if v.dir == "down" else ((-4,) if v.dir == "left" else (4,))
+            for dx in dxs:
+                griglia(tela, ["..Y..", ".YWY.", "YWWWY", ".YWY.", "..Y.."], {"Y": colore("yellow"),
+                        "W": colore("white")}, int(round(x + dx - 2)), int(round(y - 2)), "lampo", separa=False)
+        parti.append((99, 8, lampo_occhi))
 
     fiala = posa.get("fiala")                   # drink: chiusa -> stappata -> inclinata alla bocca
     if fiala:
