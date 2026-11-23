@@ -819,6 +819,33 @@ function figuraAnim(fid, nome, scala = 5) {
   const passo = h("button", {class: "chip", onclick: () => { l.pausa = true; l.avanza(1); }}, "Fotogramma dopo"), gioca = h("button", {class: "chip", onclick: () => { l.pausa = false; }}, "Riprendi");
   return [guarda(l.c, l), l.a.righe > 1 ? dir : null, h("div", {class: "controlli"}, h("label", {for: "vel-prova"}, "Velocità", vel), testo, passo, gioca)];
 }
+// l'abilita' in scena: Enel (a sinistra, guarda a destra) fa il gesto e l'effetto parte al momento giusto, su di lui,
+// davanti a lui o sul nemico (un lupo fermo a destra). Richiesta dell'utente del 2026-11-22: non solo l'effetto.
+const MISCHIA = {tocco_gelido: "attack_light", pugnalata_furtiva: "attack_light", contrattacco: "parry", fendente_pesante: "attack_heavy",
+  carica_spalla: "dash", turbine: "attack_heavy", scavo: "attack_heavy", acrobazia: "dash", scasso: "interact", disinnesco: "interact",
+  distillato_curativo: "drink", sutura: "interact", percezione_mistica: "meditate", passo_breve: "dash", scambio_di_posto: "cast"};
+function abilitaInScena(e, pal, scala = 4, chi = "enel") {
+  const W = 176, H = 96, c = h("canvas", {class: "px", width: W, height: H}); c.style.width = W * scala + "px";
+  const nome = e.sprite.slice(4), F = D.figure[chi], an = F && (F.anims.find(a => a.nome === (MISCHIA[nome] || "cast")) || F.anims[0]);
+  const bers = D.figure.nem_lupo_della_luna, bi = bers && bers.anims.find(a => a.nome === "idle");
+  let fx = null, fig = null, bimg = null, T = 0;
+  foglioColorato(e, pal).then(i => fx = i); immagine(F.file).then(i => fig = i); if (bers) immagine(bers.file).then(i => bimg = i);
+  const durA = an.durate.reduce((a, b) => a + b, 0), via = durA * 0.45, passoFx = 100, giro = Math.max(durA, via + e.frames * passoFx) + 700;
+  const dove = e.centro ? "corpo" : e.sul_nemico ? "nemico" : "davanti";
+  return guarda(c, {passo(dt) {
+    if (!fig) return; T = (T + dt) % giro;
+    const g = c.getContext("2d"); g.imageSmoothingEnabled = false; g.fillStyle = "#c8d0ba"; g.fillRect(0, 0, W, H);
+    let k = 0, acc = 0; while (k < an.frames - 1 && acc + an.durate[k] <= T) { acc += an.durate[k]; k++; }
+    const riga = an.righe > 1 ? 3 : 0;
+    if (bimg && bi) g.drawImage(bimg, 0, bi.y + (bi.righe > 1 ? 2 : 0) * bi.h, bi.w, bi.h, 104, H - bi.h - 4, bi.w, bi.h);
+    g.drawImage(fig, k * an.w, an.y + riga * an.h, an.w, an.h, 8, H - an.h - 4, an.w, an.h);
+    const f = Math.floor((T - via) / passoFx);
+    if (fx && f >= 0 && f < e.frames) { const w = fx.width / e.frames, hh = fx.height;
+      const x = dove === "corpo" ? 8 + an.w / 2 - w / 2 : dove === "nemico" ? 104 + 32 - w / 2 : 8 + an.w * 0.55;
+      const y = dove === "davanti" ? H - 4 - 40 - hh / 2 : H - 4 - 30 - hh / 2;
+      g.drawImage(fx, f * w, 0, w, hh, Math.round(x), Math.round(y), w, hh); }
+  }});
+}
 // i fotogrammi di un effetto, numerati
 function fotogrammiEffetto(e, scala = 3) {
   const riga = h("div", {class: "fg-riga"});
@@ -890,8 +917,8 @@ function elementiProva() {
     edificio_casa_pescatore: "Casa del pescatore: assi di legno su pali sopra l'acqua bassa, porta blu, reti stese coi galleggianti rossi, remi incrociati, barile e lanterna.",
     edificio_museo: "Museo: un tempio di marmo bianco. Tetto a quattro falde con i lucernari appoggiati sulle falde, frontone con l'anfora e le statue, sei colonne, due affreschi incorniciati d'oro (colline e nave), due nicchie con le statue sotto gli stendardi, fascia a mosaico, portone di bronzo."};
   if ((D.edifici_prova || []).length) gruppo("Edifici (stile delle case)", "Lo stile nuovo delle case: ogni edificio ha il suo disegno. 64 pixel per casella, come i personaggi.",
-    D.edifici_prova.map(e => ({k: "prova:" + e.id, titolo: ({edificio_casa_antica: "Casa del centro antico (1)", edificio_casa_antica_pergola: "Casa del centro antico (2): pergola", edificio_casa_antica_loggia: "Casa del centro antico (3): loggia", edificio_museo: "Museo", edificio_cattedrale: "Cattedrale", edificio_faro: "Faro", edificio_bottega: "Bottega del fornaio (mercato)", edificio_dogana: "Dogana del porto", edificio_casa_pescatore: "Casa del pescatore"})[e.id] || bello(e.id.replace("edificio_", "")), breve: SPIEGA_EDIFICI[e.id] || "",
-      anteprima: () => imgEdificio(e, 0.5), media: () => [h("p", {text: SPIEGA_EDIFICI[e.id] || ""}), h("div", {style: "overflow:auto;max-height:70vh"}, imgEdificio(e, 2))]})));
+    D.edifici_prova.map(e => ({k: "prova:" + e.id, titolo: ({edificio_casa_antica: "Casa del centro antico (1)", edificio_casa_antica_pergola: "Casa del centro antico (2): pergola", edificio_casa_antica_loggia: "Casa del centro antico (3): loggia", edificio_museo: "Museo", edificio_cattedrale: "Cattedrale", edificio_faro: "Faro", edificio_bottega: "Bottega del fornaio (mercato)", edificio_dogana: "Dogana del porto", edificio_casa_pescatore: "Casa del pescatore", edificio_bottega_pesce: "Bottega del pescivendolo", edificio_bottega_speziale: "Bottega dello speziale (pozioni)", edificio_bottega_armaiolo: "Bottega dell'armaiolo", edificio_bottega_sarta: "Bottega della sarta", edificio_taverna: "Taverna del porto", edificio_casa_operaia: "Casa del quartiere operaio", edificio_cantiere_navale: "Cantiere navale", edificio_mulino: "Mulino a vento", edificio_capanna_paglia: "Capanna di paglia (Valle)", edificio_torre_guardia: "Torre di guardia (Marche)"})[e.id] || bello(e.id.replace("edificio_", "")), breve: SPIEGA_EDIFICI[e.id] || (D.giro2 && D.giro2.descr["prova:" + e.id]) || "",
+      anteprima: () => imgEdificio(e, 0.5), media: () => [h("p", {text: SPIEGA_EDIFICI[e.id] || (D.giro2 && D.giro2.descr["prova:" + e.id]) || ""}), h("div", {style: "overflow:auto;max-height:70vh"}, imgEdificio(e, 2))]})));
   for (const [fid, chiave, titolo, breve] of [["npc_mercante", "mercante", "Mercante", "Tarchiato con la pancia, turbante viola con la gemma, baffi a manubrio, panciotto verde, grembiule con la borsa delle monete, pantaloni a sbuffo, babbucce gialle. Da fermo si sfrega le mani; cammina dondolando."],
                                            ["fauna_cervo", "cervo", "Cervo", "Zampe lunghe, collo lungo, corna ramificate, manto bruno con macchie chiare, coda col fiocco bianco. Da fermo bruca e alza la testa; in fuga salta."]]) {
     if (!D.figure[fid]) continue;
@@ -924,26 +951,29 @@ function elementiProva() {
     analisi: "Analisi (Paragone): una lente con la croce di mira e un ingranaggio che gira scende sul nemico, la scansione passa e segna i punti deboli.",
     contrattacco: "Contrattacco (Gigante): uno scudo di luce si alza, il colpo ci sbatte con le scintille, poi lo scudo diventa un fendente largo in avanti.",
   };
+  for (const [k, t] of Object.entries(G2.descr || {})) if (!DESCR[k.slice(6)]) DESCR[k.slice(6)] = t;
   const giroFig = (fid, chiave, titolo, gruppoNome) => {
     if (!D.figure[fid]) return;
     gruppo(gruppoNome, DESCR[chiave] || "", [{k: "prova:" + chiave, titolo: titolo + ": aspetto", breve: DESCR[chiave] || "",
-      anteprima: () => lettore(fid, {scala: 2, giro: false, anim: D.figure[fid].anims[0].nome}), media: () => [h("p", {text: DESCR[chiave] || ""}), studioFigura(fid, 5)]},
+      anteprima: () => lettore(fid, {scala: 2, giro: false, anim: D.figure[fid].anims[0].nome}), media: () => [h("p", {text: DESCR[chiave] || ""}), ...studioFigura(fid, 5)]},
       ...D.figure[fid].anims.map(a => anim(fid, chiave, a.nome))]);
   };
-  if (G2.personaggio) giroFig(G2.personaggio, "rivale", "Aldo, il rivale", "Personaggio completo: Aldo");
+  const NOMI_PG = {rivale: "Aldo, il rivale", investigatore: "Doran, l'investigatore", guaritrice: "Vesna, la guaritrice"};
+  for (const p of G2.personaggi || []) giroFig(p.figura, p.id, NOMI_PG[p.id] || bello(p.id), "Personaggi completi (tutte le mosse)");
   for (const a of G2.animali || []) giroFig(a.figura, a.id, bello(a.id), "Animali");
   for (const n of G2.nemici || []) giroFig(n.figura, n.id, bello(n.id), "Nemici");
-  if (G2.boss) giroFig(G2.boss.figura, G2.boss.id, "Re dei Ratti", "Boss");
+  for (const b of G2.boss || []) giroFig(b.figura, b.id, bello(b.id), "Boss");
   const palDi = abId => (T.pathway.find(p => p.sequenze.some(sq => sq.abilita.some(a => a.id === abId))) || {}).palette || pal;
   const nomeAb = abId => { for (const p of T.pathway) for (const sq of p.sequenze) for (const a of sq.abilita) if (a.id === abId) return a.nome || bello(abId); return bello(abId); };
-  const effetti2 = T.effetti.filter(e => e.unico && DESCR[e.sprite.slice(4)]).map(e => {
+  const VECCHI = ["vfx_fendente_pesante", "vfx_incantesimo", "vfx_incantesimo_scoppio", "vfx_stretta_ferrea"];
+  const effetti2 = T.effetti.filter(e => e.unico && DESCR[e.sprite.slice(4)] && !VECCHI.includes(e.sprite)).map(e => {
     const k = e.sprite.slice(4), t = nomeAb(e.abilita);
-    return {k: "prova:" + k, titolo: t, breve: DESCR[k], anteprima: () => effettoVivo(e, palDi(e.abilita), 1.5), media: () => [h("p", {text: DESCR[k]}), effettoVivo(e, palDi(e.abilita), 5), fotogrammiEffetto(e)]}; });
+    return {k: "prova:" + k, titolo: t, breve: DESCR[k], anteprima: () => effettoVivo(e, palDi(e.abilita), 1.5), media: () => [h("p", {text: DESCR[k]}), h("h4", {text: "Enel la lancia"}), abilitaInScena(e, palDi(e.abilita), 4), h("h4", {text: "Solo l'effetto"}), effettoVivo(e, palDi(e.abilita), 4), fotogrammiEffetto(e)]}; });
   if (effetti2.length) gruppo("Abilità (un disegno per abilità)", "", effetti2);
   const imgOgg = (o, sc) => { const i = h("img", {src: o.file, alt: o.nome, class: "px"}); i.style.width = 32 * sc + "px"; i.style.imageRendering = "pixelated"; return i; };
   if ((G2.oggetti || []).length) gruppo("Oggetti (ogni oggetto il suo disegno)", "", G2.oggetti.map(o => ({k: "prova:oggetto_" + o.id, titolo: o.nome, breve: o.descrizione,
     anteprima: () => imgOgg(o, 3), media: () => [h("p", {text: o.descrizione}), h("div", {class: "vetrina chiaro", style: "display:flex;gap:24px;align-items:end;padding:16px"}, imgOgg(o, 1), imgOgg(o, 2), imgOgg(o, 4), imgOgg(o, 8))]})));
-  const effetto = (sprite, k, titolo, breve, p) => { const e = T.effetti.find(x => x.sprite === sprite); return e ? {k, titolo, breve, anteprima: () => effettoVivo(e, p, 1.5), media: () => [h("p", {text: breve}), effettoVivo(e, p, 5)]} : null; };
+  const effetto = (sprite, k, titolo, breve, p) => { const e = T.effetti.find(x => x.sprite === sprite); return e ? {k, titolo, breve, anteprima: () => effettoVivo(e, p, 1.5), media: () => [h("p", {text: breve}), h("h4", {text: "Enel la lancia"}), abilitaInScena(e, p, 4), h("h4", {text: "Solo l'effetto"}), effettoVivo(e, p, 5)]} : null; };
   gruppo("Effetti con un disegno tutto loro", "Colorati col Pathway (qui Twilight Giant per il fendente, Eremita per l'incantesimo).", [
     effetto("vfx_fendente_pesante", "prova:fendente_pesante", "Fendente pesante", "Mezzaluna che cala dall'alto e spacca il terreno; con la carica diventa più grande.", palTG),
     {k: "prova:carica", titolo: "Carica dell'attacco pesante", breve: "Tieni premuto K: Enel resta sulla posa di carica, l'anello e la barra crescono; al rilascio colpisce più forte e più largo (fino a 2,5 volte il danno e 1,8 volte l'area in 1,5 secondi). C'è anche nel gioco vero.",
@@ -969,12 +999,12 @@ VISTE.provare = () => {
 };
 
 // ---------- Note e testate: cartelle per argomento, dentro le note mandate e le approvate ----------
-const CARTELLE = [["prova:enel", "Enel"], ["prova:schivata", "Schivate"], ["prova:lupo", "Lupo della luna"], ["prova:edificio", "Edifici"], ["prova:mercante", "Mercante"], ["prova:cervo", "Cervo"], ["prova:rivale", "Aldo"], ["prova:oggetto", "Oggetti"],
-  ["prova:re_dei_ratti", "Boss"], ...["scheletro_catacombe", "pirata_naufrago", "soldato_caduto", "ratto_delle_fogne", "granchio_corazzato"].map(n => ["prova:" + n, "Nemici"]),
-  ...["lepre", "volpe", "cinghiale", "capra", "orso"].map(n => ["prova:" + n, "Animali"]), ["prova:", "Effetti e combattimento"],
+const CARTELLE_F = () => [["prova:enel", "Enel"], ["prova:schivata", "Schivate"], ["prova:lupo", "Lupo della luna"], ["prova:edificio", "Edifici"], ["prova:mercante", "Mercante"], ["prova:cervo", "Cervo"], ["prova:rivale", "Aldo"], ["prova:investigatore", "Doran"], ["prova:guaritrice", "Vesna"], ["prova:madre_delle_radici", "Boss"], ["prova:archivista_capo", "Boss"], ["prova:oggetto", "Oggetti"],
+  ["prova:re_dei_ratti", "Boss"], ...((D.giro2 || {}).nemici || []).map(n => ["prova:" + n.id, "Nemici"]),
+  ...((D.giro2 || {}).animali || []).map(n => ["prova:" + n.id, "Animali"]), ["prova:", "Effetti e combattimento"],
   ["boss:", "Boss"], ["nemico:", "Nemici"], ["personaggio:", "Personaggi"], ["luogo:", "Luoghi"], ["villaggio:", "Paesi e case"], ["interno:", "Interni"],
   ["libro:", "Libro e HUD"], ["oggetto:", "Oggetti"], ["", "Altro"]];
-const cartellaDi = k => CARTELLE.find(([p]) => k.startsWith(p))[1];
+const cartellaDi = k => CARTELLE_F().find(([p]) => k.startsWith(p))[1];
 VISTE.note = () => {
   ELENCO = [];
   const prove = elementiProva().tutti, perK = new Map(prove.map(e => [e.k, e]));
@@ -993,7 +1023,7 @@ VISTE.note = () => {
       rispostaClaude(k) ? h("span", {class: "chip risposta", text: "💬 risposta"}) : null,
       h("span", {class: "dx", text: g.quando ? data(g.quando) : ""})); };
   const sotto = (titolo, ks) => ks.length ? h("details", {class: "sottocartella", open: ""}, h("summary", {text: `${titolo} (${ks.length})`}), h("div", {class: "lista"}, ks.map(riga))) : null;
-  const ordine = CARTELLE.map(c => c[1]).filter(c => cart.has(c));
+  const ordine = CARTELLE_F().map(c => c[1]).filter(c => cart.has(c));
   return [h("h2", {text: "Note e testate"}), h("p", {class: "intro", text: "Una cartella per argomento. Dentro: le tue note mandate (le sto sistemando), le domande che ti ho fatto, e le cose approvate. Clicca una riga della prova per riaprirla."}),
     ...(ordine.length ? ordine.map(c => { const x = cart.get(c);
       return h("details", {class: "cartella", open: ""}, h("summary", {}, h("b", {text: "📁 " + c}), h("span", {class: "sotto", text: `  ${x.no.length} note · ${x.dom.length} domande · ${x.msg.length} messaggi · ${x.ok.length} approvate`})),

@@ -839,6 +839,373 @@ def casa_pescatore():
     return d.fine()
 
 
+# --- Giro 3 (2026-11-23): botteghe tutte diverse e altri edifici della citta' e della campagna ------------------------
+def _tetto(d, x0, x1, ty, gy, rampa, gruppo, scuro=0.75):
+    """Tetto a due falde visto dall'alto: la falda nord piu' scura, il colmo chiaro."""
+    colmo = ty + (gy - ty) // 3
+    d.tegole(x0, ty, x1 - x0, colmo - ty, rampa, gruppo + "_n")
+    d.t.col[ty:colmo, x0:x1] = (d.t.col[ty:colmo, x0:x1].astype(int) * scuro).astype(np.uint8)
+    d.tegole(x0, colmo, x1 - x0, gy - colmo, rampa, gruppo + "_s")
+    d.rett(x0, colmo - 2, x1 - x0, 3, rampa.toni[2], gruppo + "_c", separa=True)
+    return colmo
+
+
+def _insegna(d, cx, y, forma, gruppo):
+    """Insegna appesa a un braccio di ferro, con la forma di quello che si vende (niente scritte), a 2 px per punto
+    perche' si legga da lontano."""
+    pts, col = forma
+    w = max(len(r) for r in pts) * 2 + 6
+    h = len(pts) * 2 + 6
+    d.rett(cx - w // 2 - 4, y - 4, w + 8, 3, colore("ink"), gruppo + "_b", separa=False)
+    for dx in (-w // 2 + 4, w // 2 - 6):
+        d.rett(cx + dx, y - 1, 2, 6, colore("ink"), gruppo + f"_cat{dx}", separa=False)
+    d.rett(cx - w // 2, y + 5, w, h, R["intonaco"].toni[2], gruppo, separa=True)
+    d.rett(cx - w // 2, y + 5, w, 2, R["legno"].toni[1], gruppo + "_cornice", separa=False)
+    d.rett(cx - w // 2, y + 5 + h - 2, w, 2, R["legno"].toni[0], gruppo + "_cornice2", separa=False)
+    d.pixel([(cx - w // 2 + 3 + x * 2 + a, y + 8 + yy * 2 + b) for yy, r in enumerate(pts) for x, ch in enumerate(r)
+             if ch == "#" for a in (0, 1) for b in (0, 1)], col, gruppo + "_f")
+
+
+PESCE = ([".........................", "..........................", "....#####............#....", "..#########.........##....",
+          ".############......###....", "##.##########....####.....", "##############.######.....", ".############......###....",
+          "..#########.........##....", "....#####............#....."], colore("blue"))
+FIALA = ([".", "...........###...........", "...........#.#...........", "..........#####..........", ".........#######.........",
+          "........#########........", "........#########........", "........#########........", ".........#######.........",
+          "..........#####.........."], colore("purple"))
+SPADA = ([".", "..........#...............", ".........###..............", "..........#...............", "..........#...............",
+          "..........#...............", "........#####.............", ".........###..............", "..........#...............",
+          "..........#..............."], colore("slate_d"))
+FORBICI = ([".", "....##.........##........", "...#..#.......#..#.......", "....##.........##........", "......#.......#..........",
+            ".......#.....#...........", "........#...#............", ".........#.#.............", "..........#..............",
+            ".........#.#............."], colore("red"))
+
+
+def _bottega(merce, larg, muro, seme, muro_r, tetto_r, tenda, forma, banco):
+    """Una bottega: muro, tetto, vano aperto, tenda o sportelli, banco con la merce, insegna. Ogni mestiere passa
+    pezzi suoi (non solo un colore): la tenda, la merce sul banco e l'insegna cambiano forma."""
+    d = Disegno(larg, 2, muro=muro, seme=seme)
+    x0, x1 = d.x0, d.x1
+    _tetto(d, x0 + 2, x1 - 2, d.tetto_y, d.gronda_y, tetto_r, "tetto")
+    fy = d.gronda_y
+    muro_r(d, x0, fy, x1 - x0, d.terra_y - fy)
+    vx, vw = x0 + 12, (x1 - x0) * 2 // 3
+    d.rett(vx, fy + 30, vw, d.terra_y - fy - 30, BUIO, "vano", separa=True)
+    tenda(d, vx - 4, fy + 16, vw + 8)
+    d.rett(vx - 2, d.terra_y - 30, vw + 4, 30, R["legno"].toni[1], "banco", separa=True)
+    d.rett(vx - 2, d.terra_y - 30, vw + 4, 4, R["legno"].toni[2], "banco_l", separa=False)
+    banco(d, vx, d.terra_y - 36, vw)
+    px = vx + vw + 10
+    vano = d.rett(px, d.terra_y - 62, 26, 62, R["legno"].toni[1], "porta", separa=True)
+    d.porta_legno(vano, R["legno"], "porta_l", borchie=colore("amber"))
+    _insegna(d, vx + vw // 2, fy - 2, forma, "insegna")
+    return d.fine()
+
+
+def _muro_assi(d, x, y, w, h):
+    d.blocchi(x, y, w, h, R["assi"], "muro", bw=10, bh=h, varia=0.35)
+
+
+def _muro_pietra(d, x, y, w, h):
+    d.blocchi(x, y, w, h, R["pietra"], "muro", bw=18, bh=10, varia=0.25)
+
+
+def _muro_mattoni(d, x, y, w, h):
+    d.blocchi(x, y, w, h, R["cotto"], "muro", bw=10, bh=5, varia=0.2)
+
+
+def _muro_intonaco_blu(d, x, y, w, h):
+    d.blocchi(x, y, w, h, R["intonaco"], "muro", bw=24, bh=12, varia=0.15)
+    d.rett(x, y + h - 14, w, 14, R["blu"].toni[1], "zoccolo", separa=True)
+
+
+def _tenda_strisce(colori):
+    def t(d, x, y, w):
+        n = w // 14
+        for k in range(n):
+            col = colori[k % len(colori)]
+            d.rett(x + k * 14, y, 14, 20, col.toni[1], f"tenda{k}", separa=False)
+            d.rett(x + k * 14, y, 14, 3, col.toni[2], f"tenda{k}l", separa=False)
+            d.pixel([(x + k * 14 + i, y + 20) for i in range(3, 11)], col.toni[1], f"tenda{k}b")
+    return t
+
+
+def _sportelli(d, x, y, w):
+    """Sportelli di legno aperti in su sopra il banco (niente tenda), retti da due bastoni."""
+    d.rett(x, y - 4, w, 14, R["assi"].toni[1], "sportello", separa=True)
+    d.rett(x, y - 4, w, 3, R["assi"].toni[2], "sportello_l", separa=False)
+    for dx in (4, w - 6):
+        d.rett(x + dx, y + 10, 2, 20, R["assi"].toni[0], f"bastone{dx}", separa=False)
+
+
+def _pergolato(d, x, y, w):
+    """Tettoia di tegole su due travi, sporge sopra il banco."""
+    d.tegole(x, y - 2, w, 16, R["coppi"], "tettoia")
+    for dx in (2, w - 6):
+        d.rett(x + dx, y + 14, 4, 30, R["legno"].toni[1], f"trave{dx}", separa=True)
+
+
+def _banco_pesce(d, x, y, w):
+    d.rett(x, y + 2, w, 4, colore("cyan"), "ghiaccio", separa=False)
+    for k in range(w // 16):
+        cx = x + 8 + k * 16
+        d.pixel([(cx + i, y + j) for i in range(-6, 7) for j in range(-2, 3) if i * i / 36 + j * j / 4 <= 1],
+                colore("blue" if k % 2 else "grey_l"), f"pesce{k}")
+        d.pixel([(cx + 7, y - 2 + j) for j in range(5)], colore("blue_d"), f"coda{k}")
+    d.rett(x + w - 18, y - 22, 14, 18, R["assi"].toni[1], "cassetta", separa=True)
+
+
+def _banco_fiale(d, x, y, w):
+    for k in range(w // 10):
+        cx = x + 6 + k * 10
+        col = ("red", "green", "purple", "cyan", "amber")[k % 5]
+        d.pixel([(cx + i, y + j) for i in range(-3, 4) for j in range(-3, 4) if i * i + j * j <= 9], colore(col),
+                f"fiala{k}")
+        d.rett(cx - 1, y - 7, 3, 4, colore("grey_l"), f"collo{k}", separa=False)
+    for k in range(3):                               # mazzi di erbe appesi
+        d.pixel([(x + 14 + k * 30 + i, y - 40 + j) for i in range(-3, 4) for j in range(10) if abs(i) <= j // 3],
+                colore("green_m"), f"erbe{k}")
+
+
+def _banco_armi(d, x, y, w):
+    for k in range(w // 18):
+        cx = x + 10 + k * 18
+        d.rett(cx, y - 30, 2, 30, colore("grey_l"), f"lama{k}", separa=True)
+        d.rett(cx - 3, y - 4, 8, 2, colore("amber"), f"guardia{k}", separa=False)
+    d.pixel([(x + w - 14 + i, y - 12 + j) for i in range(-9, 10) for j in range(-9, 10) if i * i + j * j <= 81],
+            colore("slate"), "scudo")
+    d.pixel([(x + w - 14 + i, y - 12 + j) for i in range(-3, 4) for j in range(-3, 4) if i * i + j * j <= 9],
+            colore("amber"), "umbone")
+
+
+def _banco_stoffe(d, x, y, w):
+    for k in range(w // 14):
+        cx = x + 4 + k * 14
+        col = ("red", "blue", "green_m", "amber", "purple")[k % 5]
+        d.rett(cx, y - 8, 12, 10, colore(col), f"rotolo{k}", separa=True)
+        d.rett(cx, y - 8, 12, 2, colore("white"), f"rotolo{k}l", separa=False)
+    d.rett(x + w // 2 - 6, y - 46, 12, 30, colore("red_d"), "abito", separa=True)       # un abito appeso
+    d.rett(x + w // 2 - 1, y - 50, 2, 6, colore("ink"), "gruccia", separa=False)
+
+
+def bottega_pesce():
+    """Pescivendolo del porto: casa di assi, tetto di coppi, tenda a strisce bianche e blu, pesci sul ghiaccio e la
+    cassetta, insegna a forma di pesce."""
+    return _bottega("pesce", 3, 104, 111, _muro_assi, R["coppi"], _tenda_strisce((R["bianco"], R["blu"])), PESCE,
+                    _banco_pesce)
+
+
+def bottega_speziale():
+    """Speziale (pozioni): muro di pietra, tetto d'ardesia, tettoia di tegole sui pali, fiale colorate sul banco e
+    mazzi d'erbe appesi, insegna a forma di fiala."""
+    return _bottega("fiale", 3, 110, 121, _muro_pietra, R["ardesia"], _pergolato, FIALA, _banco_fiale)
+
+
+def bottega_armaiolo():
+    """Armaiolo: muro di mattoni, tetto d'ardesia, sportelli di legno alzati, spade in fila e lo scudo tondo, insegna
+    a forma di spada."""
+    return _bottega("armi", 3, 108, 131, _muro_mattoni, R["ardesia"], _sportelli, SPADA, _banco_armi)
+
+
+def bottega_sarta():
+    """Sarta: intonaco crema col basamento blu, tetto di coppi, tenda a strisce rosse e gialle, rotoli di stoffa e un
+    abito rosso appeso, insegna a forma di forbici."""
+    return _bottega("stoffe", 3, 104, 141, _muro_intonaco_blu, R["coppi"], _tenda_strisce((R["rosso"], R["giallo"])),
+                    FORBICI, _banco_stoffe)
+
+
+def taverna():
+    """Taverna del porto (la bettola): due piani, sotto pietra e sopra travi a vista con l'intonaco, balconcino di
+    legno, botti accatastate fuori, lanterne accese, insegna a forma di boccale, panca con i tavolini. 4 x 3."""
+    d = Disegno(4, 3, muro=140, seme=151)
+    x0, x1 = d.x0, d.x1
+    _tetto(d, x0 + 2, x1 - 2, d.tetto_y, d.gronda_y, R["coppi"], "tetto")
+    d.rett(x0 + 160, d.tetto_y + 20, 16, 30, R["pietra"].toni[1], "camino", separa=True)
+    fy = d.gronda_y
+    mezzo = fy + 64
+    d.blocchi(x0, fy, x1 - x0, mezzo - fy, R["intonaco"], "piano1", bw=30, bh=16, varia=0.1)
+    for k in range(6):                               # travi a vista
+        d.rett(x0 + k * 50, fy, 6, mezzo - fy, R["assi"].toni[0], f"trave_v{k}", separa=False)
+    d.rett(x0, fy + 30, x1 - x0, 5, R["assi"].toni[0], "trave_o", separa=False)
+    for k in range(3):
+        d.finestra(x0 + 24 + k * 90, fy + 10, 18, 18, colore("yellow"), R["assi"], f"fin_su{k}")
+    d.rett(x0 + 100, mezzo - 6, 90, 6, R["assi"].toni[1], "balcone", separa=True)
+    for k in range(10):
+        d.rett(x0 + 102 + k * 9, mezzo - 18, 2, 12, R["assi"].toni[0], f"ringhiera{k}", separa=False)
+    d.blocchi(x0, mezzo, x1 - x0, d.terra_y - mezzo, R["pietra"], "piano0", bw=18, bh=10, varia=0.25)
+    vano = d.arco(x0 + 130, d.terra_y, 36, 56, BUIO, "porta", cornice=R["pietra_chiara"])
+    d.porta_legno(vano, R["legno"], "porta_l", borchie=colore("amber"))
+    d.finestra(x0 + 40, mezzo + 18, 28, 22, colore("amber"), R["assi"], "vetrina1")
+    d.finestra(x0 + 196, mezzo + 18, 28, 22, colore("amber"), R["assi"], "vetrina2")
+    for k, (bx, by) in enumerate(((x1 - 40, d.terra_y - 22), (x1 - 18, d.terra_y - 22), (x1 - 29, d.terra_y - 42))):
+        d.rett(bx - 10, by, 20, 20, R["assi"].toni[1], f"botte{k}", separa=True)
+        d.rett(bx - 10, by + 4, 20, 2, colore("slate_d"), f"botte{k}a", separa=False)
+        d.rett(bx - 10, by + 14, 20, 2, colore("slate_d"), f"botte{k}b", separa=False)
+    for lx in (x0 + 100, x0 + 160):                  # lanterne accese
+        d.rett(lx - 3, mezzo + 4, 7, 9, colore("yellow"), f"lanterna{lx}", separa=True)
+    boccale = ([".", "......######.......", "......#....#.##....", "......#....#..#....", "......#....#..#....",
+                "......#....#.##....", "......######.......", "......######......."], colore("amber"))
+    _insegna(d, x0 + 70, fy + 70, boccale, "insegna")
+    return d.fine()
+
+
+def casa_operaia():
+    """Casa del quartiere operaio: stretta e alta, tre piani di mattoni anneriti, finestre piccole tutte uguali,
+    panni stesi su una corda fra le finestre, scala esterna di ferro, una porta bassa, secchi e una carriola. 2 x 2."""
+    d = Disegno(2, 2, muro=170, seme=161)
+    x0, x1 = d.x0, d.x1
+    _tetto(d, x0, x1, d.tetto_y, d.gronda_y, R["ardesia"], "tetto")
+    d.rett(x0 + 90, d.tetto_y + 4, 12, 26, R["cotto"].toni[0], "camino", separa=True)
+    fy = d.gronda_y
+    d.blocchi(x0, fy, x1 - x0, d.terra_y - fy, R["coppi"], "muro", bw=10, bh=5, varia=0.3)
+    for p in range(3):
+        for k in range(2):
+            d.finestra(x0 + 20 + k * 60, fy + 14 + p * 50, 16, 20, VETRO, R["pietra"], f"fin{p}{k}")
+    d.rett(x0 + 10, fy + 44, 110, 1, colore("ink"), "corda", separa=False)
+    for k, col in enumerate(("white", "red", "blue", "white")):
+        d.rett(x0 + 16 + k * 26, fy + 45, 14, 14 - (k % 2) * 4, colore(col), f"panno{k}", separa=True)
+    for k in range(7):                               # scala esterna di ferro
+        d.rett(x1 - 18, d.terra_y - 14 - k * 18, 16, 2, colore("slate_d"), f"gradino{k}", separa=False)
+    d.rett(x1 - 18, d.terra_y - 130, 2, 130, colore("slate_d"), "scala_s", separa=False)
+    vano = d.rett(x0 + 50, d.terra_y - 44, 24, 44, R["legno"].toni[1], "porta", separa=True)
+    d.porta_legno(vano, R["legno"], "porta_l")
+    d.rett(x0 + 10, d.terra_y - 14, 12, 14, colore("slate"), "secchio", separa=True)
+    d.crepe(x0 + 4, fy + 10, x1 - x0 - 8, 120, 5, colore("brown_dd"), "fuliggine")
+    return d.fine()
+
+
+def cantiere_navale():
+    """Cantiere navale: lo scheletro di una nave in costruzione sullo scalo (chiglia e costole di legno chiaro),
+    impalcature, una gru di legno con la carrucola, cataste di assi, la tettoia degli attrezzi. 6 x 3."""
+    d = Disegno(6, 3, muro=120, sopra=40, seme=171)
+    x0, x1 = d.x0, d.x1
+    d.rett(x0, d.tetto_y + 40, x1 - x0, d.gronda_y - d.tetto_y - 40, R["assi"].toni[1], "scalo", separa=True)
+    for k in range(0, x1 - x0, 12):
+        d.rett(x0 + k, d.tetto_y + 40, 2, d.gronda_y - d.tetto_y - 40, R["assi"].toni[0], f"asse{k}", separa=False)
+    cx, cy = x0 + 170, d.terra_y - 60
+    d.rett(cx - 130, cy + 30, 260, 8, R["legno"].toni[1], "chiglia", separa=True)
+    ys, xs = np.mgrid[0:d.h, 0:d.w]
+    for k in range(11):                              # le costole curve
+        rx = cx - 110 + k * 22
+        alta = 70 - abs(k - 5) * 6
+        cost = (np.abs(np.hypot((xs - rx) / 0.25, ys - (cy + 30)) - alta) <= 2.5) & (ys <= cy + 30)
+        _maschera(d, cost, R["assi"].toni[2], f"costola{k}", separa=True)
+    for k in range(3):                               # impalcature
+        d.rett(cx - 140 + k * 140, cy - 60, 4, 98, R["legno"].toni[0], f"palo{k}", separa=True)
+    d.rett(cx - 140, cy - 40, 284, 4, R["legno"].toni[0], "ponteggio", separa=True)
+    gx = x1 - 50                                     # la gru
+    d.rett(gx, d.terra_y - 170, 6, 170, R["legno"].toni[1], "gru", separa=True)
+    d.rett(gx - 70, d.terra_y - 170, 76, 5, R["legno"].toni[1], "braccio", separa=True)
+    d.rett(gx - 66, d.terra_y - 165, 1, 60, colore("ink"), "fune", separa=False)
+    d.rett(gx - 72, d.terra_y - 106, 12, 10, R["assi"].toni[2], "carico", separa=True)
+    for k in range(4):                               # catasta di assi
+        d.rett(x0 + 6, d.terra_y - 8 - k * 8, 60, 7, R["assi"].toni[1 + (k % 2)], f"catasta{k}", separa=True)
+    return d.fine()
+
+
+def mulino():
+    """Mulino a vento della campagna: torre tonda di pietra bianca che si stringe, tetto a cono di assi, quattro pale
+    a croce con la tela, porticina, sacchi di farina davanti. 3 x 3."""
+    d = Disegno(3, 3, muro=190, seme=181)
+    x0, x1 = d.x0, d.x1
+    cx = (x0 + x1) // 2
+    ys, xs = np.mgrid[0:d.h, 0:d.w]
+    base, cima = d.terra_y, d.terra_y - 170
+    t = np.clip((base - ys) / (base - cima), 0, 1)
+    meta = 40 - t * 12
+    torre = (np.abs(xs + 0.5 - cx) <= meta) & (ys >= cima) & (ys < base)
+    u = (xs + 0.5 - cx) / np.maximum(meta, 1)
+    col = np.zeros((d.h, d.w, 3), np.uint8)
+    col[torre] = R["intonaco"].toni[1]
+    col[torre & (u < -0.4)] = R["intonaco"].toni[2]
+    col[torre & (u > 0.5)] = R["intonaco"].toni[0]
+    d.t.metti(torre, col, "torre", separa=True)
+    cono = (np.abs(xs + 0.5 - cx) <= (ys - (cima - 50)) * 30 / 50) & (ys >= cima - 50) & (ys < cima + 2)
+    col2 = np.zeros((d.h, d.w, 3), np.uint8)
+    col2[cono] = R["assi"].toni[1]
+    col2[cono & (xs < cx)] = R["assi"].toni[2]
+    d.t.metti(cono, col2, "cono", separa=True)
+    hx, hy = cx, cima - 4                            # pale a croce (un po' girate)
+    for a in (0.4, 0.4 + np.pi / 2, 0.4 + np.pi, 0.4 + 3 * np.pi / 2):
+        for k in range(70):
+            px, py = hx + np.cos(a) * k, hy + np.sin(a) * k
+            d.pixel([(int(px), int(py)), (int(px) + 1, int(py))], R["legno"].toni[0], f"pala{a:.1f}")
+            if 20 < k < 68 and k % 2 == 0:
+                for w in range(1, 10):
+                    qx, qy = px - np.sin(a) * w, py + np.cos(a) * w
+                    d.pixel([(int(qx), int(qy))], R["bianco"].toni[1 if w % 3 else 0], f"tela{a:.1f}")
+    d.pixel([(hx + i, hy + j) for i in range(-4, 5) for j in range(-4, 5) if i * i + j * j <= 16], colore("slate_d"),
+            "mozzo")
+    vano = d.arco(cx, d.terra_y, 22, 40, BUIO, "porta", cornice=R["pietra"])
+    d.porta_legno(vano, R["legno"], "porta_l")
+    for k in range(3):
+        d.rett(x0 + 20 + k * 16, d.terra_y - 16, 14, 16, R["bianco"].toni[1], f"sacco{k}", separa=True)
+    d.finestra(cx - 6, cima + 40, 12, 14, VETRO, R["legno"], "fin")
+    return d.fine()
+
+
+def capanna_paglia():
+    """Capanna del villaggio della Valle: muri d'argilla chiara con le travi, tetto spesso di paglia che arriva quasi a
+    terra, porta di vimini, orticello con lo steccato, legna accatastata. 3 x 2."""
+    d = Disegno(3, 2, muro=80, seme=191)
+    x0, x1 = d.x0, d.x1
+    ty, gy = d.tetto_y, d.gronda_y + 20
+    paglia = Rampa("orange_d", "amber", "yellow")
+    ys, xs = np.mgrid[0:d.h, 0:d.w]
+    tetto = (ys >= ty) & (ys < gy) & (xs >= x0) & (xs < x1)
+    col = np.zeros((d.h, d.w, 3), np.uint8)
+    col[tetto] = paglia.toni[1]
+    righe = ((ys - ty) % 6 < 2) & ((xs + (ys // 6) * 3) % 5 == 0)
+    col[tetto & righe] = paglia.toni[0]
+    col[tetto & (ys < ty + (gy - ty) // 3)] = (col[tetto & (ys < ty + (gy - ty) // 3)].astype(int) * 0.75).astype(np.uint8)
+    d.t.metti(tetto, col, "paglia", separa=True)
+    d.pixel([(x + (x * 7) % 3, gy + (x * 13) % 4) for x in range(x0, x1)], paglia.toni[0], "frangia")
+    d.blocchi(x0 + 10, gy, x1 - x0 - 20, d.terra_y - gy, R["intonaco"], "argilla", bw=30, bh=60, varia=0.2)
+    for dx in (10, (x1 - x0) // 2, x1 - x0 - 16):
+        d.rett(x0 + dx, gy, 6, d.terra_y - gy, R["assi"].toni[0], f"trave{dx}", separa=False)
+    vano = d.rett(x0 + 70, d.terra_y - 50, 26, 50, R["paglia"].toni[0] if "paglia" in R else colore("brown"), "porta",
+                  separa=True)
+    d.pixel([(x0 + 70 + i, d.terra_y - 50 + j) for i in range(26) for j in range(50) if (i + j) % 4 == 0],
+            colore("brown_d"), "vimini")
+    d.finestra(x0 + 24, gy + 10, 14, 14, VETRO, R["assi"], "fin")
+    for k in range(4):                               # steccato e legna
+        d.rett(x1 - 50 + k * 12, d.terra_y - 22, 4, 22, R["assi"].toni[1], f"paletto{k}", separa=True)
+    d.rett(x1 - 52, d.terra_y - 16, 46, 3, R["assi"].toni[1], "traversa", separa=True)
+    for k in range(3):
+        d.rett(x0 + 10, d.terra_y - 8 - k * 7, 30, 6, R["legno"].toni[1 + (k % 2)], f"legna{k}", separa=True)
+    return d.fine()
+
+
+def torre_guardia():
+    """Torre di guardia delle Marche: quadrata di pietra scura, merli in cima, feritoie strette, stendardo rosso che
+    pende, una scala di legno appoggiata, un braciere acceso sulla cima. 2 x 2, alta."""
+    d = Disegno(2, 2, muro=240, sopra=20, seme=201)
+    x0, x1 = d.x0, d.x1
+    cx = (x0 + x1) // 2
+    d.lastre(x0 + 4, d.tetto_y, x1 - x0 - 8, d.gronda_y - d.tetto_y, R["pietra"], "cima", lw=16, lh=12)
+    fy = d.gronda_y
+    d.blocchi(x0 + 4, fy, x1 - x0 - 8, d.terra_y - fy, R["pietra"], "torre", bw=16, bh=10, varia=0.3)
+    for k in range(6):                               # merli
+        d.blocchi(x0 + 4 + k * 22, fy - 14, 12, 14, R["pietra"], f"merlo{k}", bw=12, bh=7)
+    for k in range(4):
+        d.rett(cx - 2 - 30 + (k % 2) * 60, fy + 30 + k * 44, 4, 16, BUIO, f"feritoia{k}", separa=True)
+    d.rett(cx - 14, fy + 20, 28, 70, R["rosso"].toni[1], "stendardo", separa=True)
+    d.rett(cx - 14, fy + 20, 4, 70, R["rosso"].toni[2], "stendardo_l", separa=False)
+    d.pixel([(cx - 4 + i, fy + 40 + j) for i in range(9) for j in range(9) if abs(i - 4) + abs(j - 4) <= 4],
+            colore("yellow"), "stemma")
+    d.pixel([(cx - 14 + k, fy + 90 + (k % 6 < 3)) for k in range(28)], R["rosso"].toni[0], "frange")
+    vano = d.arco(cx, d.terra_y, 26, 44, BUIO, "porta", cornice=R["pietra_chiara"])
+    d.porta_legno(vano, R["legno"], "porta_l", borchie=colore("grey_l"))
+    for k in range(12):                              # scala di legno appoggiata
+        d.rett(x1 - 24 + k, d.terra_y - 10 - k * 14, 14, 2, R["legno"].toni[2], f"piolo{k}", separa=False)
+    d.rett(cx + 20, d.tetto_y + 30, 16, 12, colore("slate_d"), "braciere", separa=True)
+    d.pixel([(cx + 22 + i, d.tetto_y + 20 + j) for i in range(12) for j in range(10) if (i * 3 + j) % 4 != 0],
+            colore("orange"), "fuoco")
+    return d.fine()
+
+
 EDIFICI = {"casa_antica": casa_antica, "casa_antica_pergola": casa_antica_pergola,
            "casa_antica_loggia": casa_antica_loggia, "museo": museo, "cattedrale": cattedrale, "faro": faro,
-           "bottega": bottega, "dogana": dogana, "casa_pescatore": casa_pescatore}
+           "bottega": bottega, "dogana": dogana, "casa_pescatore": casa_pescatore, "bottega_pesce": bottega_pesce,
+           "bottega_speziale": bottega_speziale, "bottega_armaiolo": bottega_armaiolo, "bottega_sarta": bottega_sarta,
+           "taverna": taverna, "casa_operaia": casa_operaia, "cantiere_navale": cantiere_navale, "mulino": mulino,
+           "capanna_paglia": capanna_paglia, "torre_guardia": torre_guardia}

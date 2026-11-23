@@ -89,10 +89,10 @@ def _file_prova():
     out["prova:stretta_ferrea"] = ["assets/vfx/vfx_stretta_ferrea.png"]
     for f in glob.glob(os.path.join(ROOT, "arte", "prova", "edificio_*.png")):          # edifici a griglia
         out["prova:" + os.path.basename(f)[:-4]] = [os.path.relpath(f, ROOT)]
-    giro = [(GIRO2["personaggio"], "personaggio", tuple(pers), "assets/placeholder")]
+    giro = [(asp, "personaggio", tuple(pers), "assets/placeholder") for asp in GIRO2["personaggi"]]
     giro += [(sp, "fauna", ("idle", "fuga"), "assets/placeholder") for sp in GIRO2["animali"]]
     giro += [(asp, "nemico_base", tuple(lupo), "assets/placeholder") for asp in GIRO2["nemici"]]
-    giro += [(GIRO2["boss"], "nemico_base", tuple(lupo), "arte/prova")]
+    giro += [(b, "nemico_base", tuple(lupo), "arte/prova") for b in GIRO2["boss"]]
     for asp, cat, anims, cart in giro:
         fs = [f"{cart}/{cat}_{asp}_{n}.png" for n in anims]
         out[f"prova:{asp}"] = fs
@@ -113,10 +113,14 @@ def _file_prova():
 # Il giro di disegni da testare del 2026-11-22 (regola dell'utente: 1 personaggio completo, 5 edifici, 5 animali,
 # 5 nemici, 1 boss, 10 abilita', 10 oggetti). Gli edifici si prendono tutti da arte/prova/edificio_*.png.
 GIRO2 = {
-    "personaggio": "rivale",
-    "animali": ("lepre", "volpe", "cinghiale", "capra", "orso"),
-    "nemici": ("scheletro_catacombe", "pirata_naufrago", "soldato_caduto", "ratto_delle_fogne", "granchio_corazzato"),
-    "boss": "re_dei_ratti",
+    "personaggi": ("rivale", "investigatore", "guaritrice"),
+    "animali": ("lepre", "volpe", "cinghiale", "capra", "orso", "cavallo", "mucca", "pecora", "maiale", "cane", "gatto",
+                "tasso", "riccio", "scoiattolo", "lontra"),
+    "nemici": ("scheletro_catacombe", "pirata_naufrago", "soldato_caduto", "ratto_delle_fogne", "granchio_corazzato",
+               "tagliaborse", "scaricatore_ubriaco", "guardia_corrotta", "devoto_fuori_controllo",
+               "contrabbandiere_balestra", "alfiere_spettrale", "custode_della_cripta", "lettore_proibito",
+               "cervo_corna_rosse", "belva_dei_moli"),
+    "boss": ("re_dei_ratti", "madre_delle_radici", "archivista_capo"),
     # effetto -> (abilita', frame, dove: chi_lancia | corpo | nemico)
     "abilita": {"incubo": ("darkness_incubo", 8, "nemico"), "tocco_gelido": ("death_tocco_gelido", 7, "chi_lancia"),
                 "passo_breve": ("door_passo_breve", 7, "corpo"),
@@ -125,7 +129,22 @@ GIRO2 = {
                 "sigillo_su_arma": ("hermit_sigillo_su_arma", 8, "corpo"),
                 "richiamo_compagno": ("moon_richiamo_compagno", 8, "chi_lancia"),
                 "germoglio_rapido": ("mother_germoglio_rapido", 8, "chi_lancia"),
-                "analisi": ("paragon_analisi", 7, "nemico"), "contrattacco": ("tg_contrattacco", 7, "chi_lancia")},
+                "analisi": ("paragon_analisi", 7, "nemico"), "contrattacco": ("tg_contrattacco", 7, "chi_lancia"),
+                "terrore_notturno": ("darkness_terrore_notturno", 8, "nemico"),
+                "poesia_amara": ("darkness_poesia_amara", 8, "nemico"),
+                "rianima_servo": ("death_rianima_servo", 8, "chi_lancia"),
+                "lamento_funebre": ("death_lamento_funebre", 8, "chi_lancia"),
+                "scambio_di_posto": ("door_scambio_di_posto", 7, "corpo"),
+                "occhio_nell_ombra": ("door_occhio_nell_ombra", 8, "chi_lancia"),
+                "scasso": ("error_scasso", 7, "chi_lancia"), "lettura_rubata": ("error_lettura_rubata", 7, "nemico"),
+                "acrobazia": ("fool_acrobazia", 7, "corpo"), "oggetto_dal_nulla": ("fool_oggetto_dal_nulla", 8, "chi_lancia"),
+                "percezione_mistica": ("hermit_percezione_mistica", 8, "corpo"),
+                "evocazione_minore": ("hermit_evocazione_minore", 8, "chi_lancia"),
+                "distillato_curativo": ("moon_distillato_curativo", 8, "corpo"),
+                "legame_bestiale": ("moon_legame_bestiale", 7, "corpo"), "sutura": ("mother_sutura", 8, "corpo"),
+                "mano_verde": ("mother_mano_verde", 8, "chi_lancia"), "scavo": ("paragon_scavo", 7, "chi_lancia"),
+                "disinnesco": ("paragon_disinnesco", 8, "chi_lancia"),
+                "carica_spalla": ("tg_carica_spalla", 7, "chi_lancia"), "turbine": ("tg_turbine", 8, "corpo")},
 }
 PROVA_DIR = os.path.join(ROOT, "arte", "prova")
 
@@ -157,19 +176,40 @@ def versioni():
     return out
 
 
+def _descrizioni():
+    """Le descrizioni stanno nel codice dei disegni (docstring): chiave della prova -> testo."""
+    import importlib
+    sys.path.insert(0, os.path.join(ROOT, "tools", "art"))
+    out = {}
+    pulisci = lambda d: " ".join((d or "").split("\n\n")[0].split())
+    for mod in os.listdir(os.path.join(ROOT, "tools", "art", "griglia", "figure")):
+        if mod.endswith(".py") and not mod.startswith("_"):
+            m = importlib.import_module("griglia.figure." + mod[:-3])
+            out["prova:" + getattr(m, "ASPETTO", mod[:-3])] = pulisci(m.__doc__)
+    from griglia.edifici import EDIFICI
+    from griglia.effetti import EFFETTI
+    from griglia.oggetti import OGGETTI
+    out.update({"prova:edificio_" + k: pulisci(f.__doc__) for k, f in EDIFICI.items()})
+    out.update({"prova:" + k[4:]: pulisci(f.__doc__) for k, (f, _) in EFFETTI.items()})
+    out.update({"prova:oggetto_" + k: pulisci(f.__doc__) for k, f in OGGETTI.items()})
+    return out
+
+
 def giro2():
-    """Le figure e le icone del giro del 2026-11-22 per la pagina Da testare."""
-    out = {"personaggio": None, "animali": [], "nemici": [], "boss": None, "oggetti": []}
-    if figura("npc_" + GIRO2["personaggio"], "personaggio", GIRO2["personaggio"]):
-        out["personaggio"] = "npc_" + GIRO2["personaggio"]
+    """Le figure e le icone dei giri di disegni da testare per la pagina Da testare."""
+    out = {"personaggi": [], "animali": [], "nemici": [], "boss": [], "oggetti": [], "descr": _descrizioni()}
+    for asp in GIRO2["personaggi"]:
+        if figura("npc_" + asp, "personaggio", asp):
+            out["personaggi"].append({"id": asp, "figura": "npc_" + asp})
     for sp in GIRO2["animali"]:
         if figura("fauna_" + sp, "fauna", sp):
             out["animali"].append({"id": sp, "figura": "fauna_" + sp})
     for asp in GIRO2["nemici"]:
         if figura("nem_" + asp, "nemico_base", asp):
             out["nemici"].append({"id": asp, "figura": "nem_" + asp})
-    if figura("boss_" + GIRO2["boss"], "nemico_base", GIRO2["boss"], cartella=PROVA_DIR):
-        out["boss"] = {"id": GIRO2["boss"], "figura": "boss_" + GIRO2["boss"]}
+    for b in GIRO2["boss"]:
+        if figura("boss_" + b, "nemico_base", b, cartella=PROVA_DIR):
+            out["boss"].append({"id": b, "figura": "boss_" + b})
     nomi = {}
     for f in glob.glob(os.path.join(DATA, "items", "*.json")):
         for it in json.load(open(f, encoding="utf-8")).get("items", []):

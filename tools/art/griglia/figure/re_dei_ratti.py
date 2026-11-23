@@ -64,7 +64,7 @@ def _testa(tela, v, g, posa):
 
 S = dict(P.S, falde=16.0, sciarpa=False, fiale=False, busto="pelli", braccio="pelle", avambraccio="pelle",
          gamba="stracci", piede="stracci", camicia=None, larghezza=(12.5, 16.0), spessore=2.4, testa_su=9.0,
-         arma=dict(manico=8.0, guardia=0, lama=24.0, spessa=(5.0, 5.6), punta=0, rampa="mannaia", elsa="cuoio",
+         arma=dict(manico=8.0, guardia=0, lama=24.0, spessa=(1.4, 1.4), punta=0, rampa="mannaia", elsa="cuoio",
                    metallo="ruggine"))
 
 
@@ -97,7 +97,43 @@ def _cuciture(tela, v, g, posa):
     return (99, 1, f)
 
 
-EXTRA = (_testa, _ratti, _cuciture)
+def _pancia_mannaia(tela, v, g, posa):
+    """La pancia nuda cucita che sporge dal manto, e la lama larga e piatta della mannaia (non una clava)."""
+    avanti = np.cross(g["su"], g["destra"])
+    pc = g["bacino"] + g["su"] * 6.5 + avanti * 2.5
+    d = g["arma_dir"]
+    pomo = g["mano_r"] - d * 2.6
+    perp = np.cross(d, np.array([0, 0, 1.0]))
+    if np.linalg.norm(perp) < 0.2:
+        perp = np.cross(d, np.array([0, 1.0, 0]))
+    perp /= np.linalg.norm(perp)
+
+    def pancia():
+        if v.dir == "up":
+            return
+        x, y = v.xy(pc)
+        segmento(tela, (x, y), (x, y + 2), 8.0, 8.5, R["pelle"], "pancia")
+        for k in range(3):
+            segmento(tela, (x - 4 + k * 3, y - 2 + k * 3), (x - 2 + k * 3, y - 1 + k * 3), 0.4, 0.4, R["sangue"],
+                     "pancia_c", separa=False)
+
+    def lama():
+        a, b = pomo + d * 9.0 + perp * 3.0, pomo + d * 24.0 + perp * 3.0
+        segmento(tela, v.xy(a), v.xy(b), 3.6, 4.2, R["mannaia"], "lama_m", tappi=False, piatto=0.7, uniti=("arma",))
+        segmento(tela, v.xy(a + perp * 3.4), v.xy(b + perp * 3.8), 0.7, 0.7, R["ruggine"], "lama_m_filo",
+                 separa=False)
+    return [(v.prof(pc) + 0.4, 1.2, pancia), (v.prof(pomo + d * 15) + 0.1, 2.6, lama)]
+
+
+def _pancia(tela, v, g, posa):
+    return _pancia_mannaia(tela, v, g, posa)[0]
+
+
+def _lama(tela, v, g, posa):
+    return _pancia_mannaia(tela, v, g, posa)[1]
+
+
+EXTRA = (_testa, _ratti, _cuciture, _pancia, _lama)
 ANIM = _umano_nemico.anim_nemico(due_mani=True)
 
 

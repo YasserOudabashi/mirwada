@@ -2250,6 +2250,23 @@
       "fase": "8c",
       "passes": true,
       "notes": "Fatta il 2026-11-22; dettagli in progress.txt. Da giudicare dall'utente."
+    },
+    {
+      "id": "US-8C10",
+      "title": "Giro di disegni test 2 (doppio): Doran e Vesna completi, 10 edifici, 10 animali, 10 nemici, 2 boss, 20 abilita', 20 oggetti; note del giro 1",
+      "description": "Richiesta dell'utente del 2026-11-22: il doppio del giro e sistemare tutto quello che c'e' da sistemare.",
+      "acceptanceCriteria": [
+        "schede aspetto del giro che mostrano la figura (bug: boss e granchio non si vedevano)",
+        "abilita' mostrate con Enel che le lancia",
+        "lupo del Richiamo che sembra un lupo",
+        "botteghe tutte diverse con l'insegna di quello che vendono",
+        "Re dei Ratti con la pancia e la mannaia vera",
+        "tutto il giro sulla pagina Da testare"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-23; dettagli in progress.txt. Da giudicare dall'utente."
     }
   ]
 }

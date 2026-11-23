@@ -1801,3 +1801,22 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - test_fauna: la lepre ora ha la cella 64. 1103 test, validator 0 errori.
 - Aperto: il boss ha il busto squadrato e la mannaia sembra una clava; l'idle della lepre di profilo e' piccolo; gli
   effetti nuovi e le icone vanno collegati nel gioco quando approvati.
+
+## 2026-11-23 — US-8C10: giro doppio di disegni test e note del giro 1
+- Note del giro 1 sistemate: le schede "aspetto" del giro non disegnavano la figura (studioFigura in un array: per
+  questo boss e granchio "non si vedevano"); abilita' ora mostrate con Enel che le lancia (`abilitaInScena`: gesto da
+  MISCHIA o cast, l'effetto parte a meta' gesto, su di lui, davanti o su un lupo bersaglio); lupo del Richiamo rifatto
+  di profilo che ulula; botteghe tutte diverse (`_bottega` con muro, tetto, tenda/sportelli/tettoia, merce e insegna
+  propri, insegna a 2 px per punto sopra il banco); Re dei Ratti con la pancia cucita e la lama piatta della mannaia.
+- Nuovo: Doran (investigatore) e Vesna (guaritrice) con le 16 mosse; nemici tagliaborse, scaricatore_ubriaco,
+  guardia_corrotta (alabarda), devoto_fuori_controllo (turibolo), contrabbandiere_balestra, alfiere_spettrale
+  (stendardo), custode_della_cripta (mazza a due mani), lettore_proibito (libro), cervo_corna_rosse, belva_dei_moli;
+  animali cavallo, mucca, pecora, maiale, cane, gatto, tasso, riccio, scoiattolo, lontra; boss madre_delle_radici e
+  archivista_capo (cella 160, arte/prova/); edifici bottega_pesce/speziale/armaiolo/sarta, taverna, casa_operaia,
+  cantiere_navale, mulino, capanna_paglia, torre_guardia; 20 effetti (due per Pathway); 20 icone.
+- Il sito prende le descrizioni dalle docstring dei disegni (build.py `_descrizioni`); GIRO2 elenca tutto il giro.
+- Comandi: build_griglia.py --only <id> / --edifici / --effetti / --oggetti; generate_all.py --only nemico_base.
+- 1103 test, validator 0 errori; sito controllato con Playwright (340 schede, nessun errore).
+- Aperto: nelle viste di profilo i libri dell'Archivista passano davanti alla faccia; le corna del cervo rosso di
+  profilo si vedono da un lato solo; la piuma dei venti sembra una scaletta; il sito d3 dice "spadone sempre", la chat
+  "equipaggiamento visibile" (vale la chat, da confermare).

@@ -17,6 +17,12 @@ R = {
     "blu": Rampa("navy", "blue", "cyan"), "ferro": Rampa("slate_d", "slate", "grey"),
     "viola": Rampa("purple_d", "purple", "pink"), "pietra": Rampa("slate_d", "slate", "grey"),
     "carta": Rampa("tan", "cream", "white"),
+    "ombra": Rampa("ink", "purple_d", "purple"), "fumo": Rampa("slate", "grey", "grey_l"),
+    "oro_l": Rampa("amber", "yellow", "white", riflesso="white"), "ciano": Rampa("blue", "cyan", "white"),
+    "rosa": Rampa("red", "pink", "white"), "sacco": Rampa("brown_d", "brown", "tan"),
+    "legno": Rampa("brown_dd", "brown_d", "brown"), "corda": Rampa("brown", "tan", "cream"),
+    "piuma": Rampa("grey_l", "white", "white"), "ruggine": Rampa("brown_dd", "rust", "orange_d"),
+    "cera": Rampa("red_d", "red", "pink"), "verde_s": Rampa("teal_d", "green_d", "green_m"),
 }
 
 
@@ -157,9 +163,242 @@ def moneta_comune(t):
     griglia(t, ["y.y.y", "yyyyy", "yyyyy"], {"y": colore("yellow")}, 19, 16, "corona", separa=False)
 
 
+# --- Giro 3 (2026-11-23): venti oggetti in piu' ------------------------------------------------------------------------
+def elisir_ombra(t):
+    """Fiala alta e stretta di vetro fumé col liquido viola scuro, il fumo nero che esce dal tappo forato."""
+    segmento(t, (16, 9), (16, 27), 4.2, 4.6, R["vetro"], "fiala")
+    segmento(t, (16, 13), (16, 26.5), 3.0, 3.4, R["ombra"], "liquido", uniti=("fiala",), separa=False)
+    segmento(t, (16, 6), (16, 7.5), 2.4, 2.4, R["ferro"], "tappo")
+    for k, (x, y, r) in enumerate(((17, 3, 1.6), (20, 2, 1.2), (14, 1.5, 1.0))):
+        segmento(t, (x, y), (x, y), r, r, R["ombra"], f"fumo{k}", separa=False)
+
+
+def ambrosia(t):
+    """Bottiglia d'oro a goccia col liquido dorato che brilla, due alette d'oro ai lati del collo, gemma bianca."""
+    segmento(t, (16, 21), (16, 21), 7.5, 7.5, R["oro"], "corpo")
+    segmento(t, (16, 22), (16, 22), 5.6, 5.6, R["oro_l"], "liquido", uniti=("corpo",), separa=False)
+    segmento(t, (16, 9), (16, 14), 2.2, 2.6, R["oro"], "collo")
+    segmento(t, (16, 6.5), (16, 6.5), 2.4, 2.4, R["argento"], "tappo")
+    for sx in (-1, 1):
+        segmento(t, (16 + sx * 3, 12), (16 + sx * 10, 8), 1.6, 0.8, R["piuma"], f"ala{sx}")
+        segmento(t, (16 + sx * 3, 14), (16 + sx * 9, 12), 1.2, 0.6, R["piuma"], f"ala{sx}b")
+    griglia(t, ["W"], {"W": colore("white")}, 13, 18, "brillio", separa=False)
+
+
+def tonico_di_forza(t):
+    """Bottiglia tozza e larga di coccio col liquido rosso scuro, il tappo di sughero legato e l'etichetta col pugno."""
+    segmento(t, (16, 18), (16, 25), 7.0, 7.4, R["cuoio_chiaro"], "coccio")
+    segmento(t, (16, 10), (16, 13), 3.0, 3.4, R["cuoio_chiaro"], "collo")
+    segmento(t, (16, 7.5), (16, 8.5), 2.6, 2.6, R["sughero"], "tappo")
+    _poligono(t, [(11, 18), (21, 18), (21, 26), (11, 26)], R["carta"], "etichetta")
+    griglia(t, [".RRR.", "RRRRR", "RRRRR", ".RRR."], {"R": colore("red")}, 14, 20, "pugno", separa=False)
+
+
+def filtro_di_chiarezza(t):
+    """Fiaschetta tonda di vetro limpido col liquido azzurro, dentro galleggia un occhio di luce; collo lungo sottile."""
+    segmento(t, (16, 21), (16, 21), 8.0, 8.0, R["vetro"], "fiasca")
+    segmento(t, (16, 22), (16, 22), 6.2, 6.2, R["ciano"], "liquido", uniti=("fiasca",), separa=False)
+    segmento(t, (16, 5), (16, 13), 1.8, 2.0, R["vetro"], "collo")
+    griglia(t, [".www.", "wwKww", ".www."], {"w": colore("white"), "K": colore("navy")}, 14, 20, "occhio", separa=False)
+
+
+def essenza_rara_di_guarigione(t):
+    """Fiala minuscola di cristallo sfaccettato in una gabbietta d'oro, la goccia rosa che brilla dentro: rara."""
+    _poligono(t, [(16, 6), (22, 12), (22, 22), (16, 28), (10, 22), (10, 12)], R["vetro"], "cristallo")
+    segmento(t, (16, 18), (16, 21), 2.6, 3.0, R["rosa"], "goccia", separa=False)
+    for x in (10, 16, 22):
+        segmento(t, (x, 6 if x == 16 else 12), (x, 28 if x == 16 else 22), 0.6, 0.6, R["oro"], f"gabbia{x}",
+                 separa=False)
+    segmento(t, (16, 3.5), (16, 3.5), 1.8, 1.8, R["oro"], "anello")
+
+
+def pastura_spirituale(t):
+    """Sacchetto di tela legato con lo spago, aperto in cima, chicchi chiari che brillano e due stelline sopra."""
+    segmento(t, (16, 20), (16, 22), 8.0, 8.5, R["sacco"], "sacco")
+    segmento(t, (11, 14), (21, 14), 1.0, 1.0, R["corda"], "spago")
+    for k, (x, y) in enumerate(((13, 12), (16, 11), (19, 12), (15, 9))):
+        griglia(t, ["c"], {"c": colore("cream")}, x, y, f"chicco{k}", separa=False)
+    for x, y in ((8, 5), (24, 7)):
+        griglia(t, [".y.", "yWy", ".y."], {"y": colore("yellow"), "W": colore("white")}, x, y, f"stella{x}",
+                separa=False)
+
+
+def lama_del_pentimento(t):
+    """Spada lunga con la lama nera solcata da una vena rossa che brilla, guardia a croce di ferro con le spine."""
+    segmento(t, (10, 22), (27, 4), 2.0, 1.2, R["ombra"], "lama")
+    segmento(t, (11.5, 20.5), (25, 6), 0.5, 0.4, R["rosso"], "vena", separa=False)
+    segmento(t, (6, 18), (14, 26), 1.3, 1.3, R["ferro"], "guardia")
+    for x, y in ((6, 18), (14, 26)):
+        segmento(t, (x, y), (x - 1.5 if x == 6 else x + 1.5, y - 1.5 if x == 6 else y + 1.5), 0.9, 0.3, R["ferro"],
+                 f"spina{x}")
+    segmento(t, (8, 24), (4.5, 27.5), 1.4, 1.4, R["cuoio"], "impugnatura")
+    segmento(t, (3.5, 28.5), (3.5, 28.5), 1.8, 1.8, R["rosso"], "pomolo")
+
+
+def corazza_espiazione(t):
+    """Corazza di ferro scuro a piastre con una catena incrociata sul petto e un lucchetto: si porta come una pena."""
+    _poligono(t, [(8, 9), (24, 9), (26, 14), (24, 28), (8, 28), (6, 14)], R["ferro"], "busto")
+    for y in (15, 20, 25):
+        segmento(t, (8, y), (24, y), 0.5, 0.5, R["pietra"], f"piastra{y}", separa=False)
+    for k in range(6):
+        segmento(t, (9 + k * 2.6, 11 + k * 2.6), (9 + k * 2.6, 11 + k * 2.6), 1.1, 1.1, R["argento"], f"catena_a{k}",
+                 separa=False)
+        segmento(t, (23 - k * 2.6, 11 + k * 2.6), (23 - k * 2.6, 11 + k * 2.6), 1.1, 1.1, R["argento"], f"catena_b{k}",
+                 separa=False)
+    segmento(t, (16, 20), (16, 22), 2.4, 2.4, R["oro"], "lucchetto")
+    for x in (7, 25):
+        segmento(t, (x, 11), (x, 11), 3.4, 3.4, R["ferro"], f"spalla{x}")
+
+
+def anello_del_richiamo(t):
+    """Anello d'argento grosso visto di tre quarti con incisa una spirale, una pietra verde come un occhio di gatto."""
+    ys, xs = np.mgrid[0:L, 0:L]
+    rr = np.hypot((xs + 0.5 - 16) / 1.0, (ys + 0.5 - 19) / 0.7)
+    anello = (rr <= 10) & (rr >= 6.5)
+    c = np.zeros((L, L, 3), np.uint8)
+    c[anello] = R["argento"].toni[1]
+    c[anello & (ys < 17)] = R["argento"].toni[2]
+    c[anello & (ys > 23)] = R["argento"].toni[0]
+    t.metti(anello, c, "anello")
+    segmento(t, (16, 9), (16, 9), 4.0, 4.0, R["argento"], "castone")
+    segmento(t, (16, 9), (16, 9), 2.8, 2.8, R["verde_s"], "pietra", uniti=("castone",), separa=False)
+    griglia(t, ["K", "K", "K"], {"K": colore("ink")}, 16, 8, "pupilla", separa=False)
+
+
+def ascia_da_guerra(t):
+    """Ascia da guerra a una mano: manico lungo di legno fasciato, testa larga a mezzaluna di ferro con il filo chiaro."""
+    segmento(t, (8, 28), (20, 6), 1.3, 1.3, R["legno"], "manico")
+    segmento(t, (9, 26), (11, 22), 1.5, 1.5, R["cuoio"], "fascia")
+    ys, xs = np.mgrid[0:L, 0:L]
+    testa = (np.hypot(xs + 0.5 - 17, ys + 0.5 - 10) <= 9) & (xs + 0.5 > 19) & (np.abs(ys + 0.5 - 10) <= 8)
+    c = np.zeros((L, L, 3), np.uint8)
+    c[testa] = R["lama"].toni[1]
+    c[testa & (np.hypot(xs + 0.5 - 17, ys + 0.5 - 10) > 7.5)] = R["lama"].toni[2]
+    t.metti(testa, c, "testa")
+    segmento(t, (18, 8), (21, 12), 1.6, 1.6, R["ferro"], "occhio")
+
+
+def scudo_rinforzato(t):
+    """Scudo a goccia di legno con le fasce di ferro chiodate e l'umbone tondo al centro, bordo di ferro."""
+    _poligono(t, [(6, 5), (26, 5), (26, 16), (16, 29), (6, 16)], R["ferro"], "bordo")
+    _poligono(t, [(8, 7), (24, 7), (24, 15), (16, 26), (8, 15)], R["legno"], "legno")
+    for y in (11, 18):
+        segmento(t, (8, y), (24, y), 0.8, 0.8, R["ferro"], f"fascia{y}", separa=False)
+        for x in (9, 23):
+            griglia(t, ["w"], {"w": colore("grey_l")}, x, y, f"chiodo{x}{y}", separa=False)
+    segmento(t, (16, 14), (16, 14), 3.2, 3.2, R["argento"], "umbone")
+
+
+def anello_di_cristallo(t):
+    """Anello sottile d'oro con un grande cristallo azzurro sfaccettato in cima, i riflessi bianchi."""
+    ys, xs = np.mgrid[0:L, 0:L]
+    rr = np.hypot((xs + 0.5 - 16), (ys + 0.5 - 21) / 0.7)
+    anello = (rr <= 8) & (rr >= 6)
+    c = np.zeros((L, L, 3), np.uint8)
+    c[anello] = R["oro"].toni[1]
+    c[anello & (xs < 13)] = R["oro"].toni[2]
+    t.metti(anello, c, "anello")
+    _poligono(t, [(16, 3), (22, 9), (19, 15), (13, 15), (10, 9)], R["ciano"], "cristallo")
+    griglia(t, ["W.", ".W"], {"W": colore("white")}, 13, 7, "riflesso", separa=False)
+
+
+def cuoio_conciato(t):
+    """Pelle conciata arrotolata e legata con due lacci, il bordo irregolare della pelle che si vede di lato."""
+    segmento(t, (6, 18), (26, 14), 5.6, 5.6, R["cuoio_chiaro"], "rotolo")
+    for x, y in ((6, 18), (26, 14)):
+        segmento(t, (x, y), (x, y), 5.0, 5.0, R["cuoio"], f"capo{x}", uniti=("rotolo",))
+        segmento(t, (x, y), (x, y), 2.0, 2.0, R["cuoio_chiaro"], f"spirale{x}", uniti=("rotolo",), separa=False)
+    for x in (11, 20):
+        segmento(t, (x, 11), (x + 1, 22), 0.7, 0.7, R["legno"], f"laccio{x}", separa=False)
+
+
+def piuma_dei_venti(t):
+    """Piuma lunga e chiara col fusto curvo, le barbe che si aprono come in un soffio, tre filetti di vento azzurri."""
+    segmento(t, (6, 28), (25, 4), 0.6, 0.4, R["corda"], "fusto")
+    for k in range(9):
+        x, y = 8 + k * 2.0, 25 - k * 2.6
+        segmento(t, (x, y), (x - 4 + k * 0.2, y - 2), 1.2, 0.5, R["piuma"], f"barba_s{k}")
+        segmento(t, (x, y), (x + 3, y + 2.5 - k * 0.1), 1.2, 0.5, R["piuma"], f"barba_d{k}")
+    for k, y in enumerate((8, 14, 20)):
+        griglia(t, ["cc..", "..cc"], {"c": colore("cyan")}, 22 + (k % 2) * 2, y, f"vento{k}", separa=False)
+
+
+def chiave_del_faro(t):
+    """Chiave grande di bronzo con l'anello a forma di faro (torre e lanterna), i denti larghi."""
+    segmento(t, (16, 14), (16, 29), 1.4, 1.4, R["oro"], "fusto")
+    _poligono(t, [(16, 29), (22, 29), (22, 26), (19, 26), (19, 24), (16, 24)], R["oro"], "denti")
+    _poligono(t, [(12, 14), (20, 14), (18, 5), (14, 5)], R["oro"], "torre")
+    griglia(t, ["yyy", "yWy"], {"y": colore("yellow"), "W": colore("white")}, 15, 2, "lanterna", separa=False)
+    for y in (8, 11):
+        segmento(t, (14, y), (18, y), 0.4, 0.4, R["rosso"], f"fascia{y}", separa=False)
+
+
+def arma_spezzata(t):
+    """Una spada rotta in due: l'elsa con un moncone di lama e la punta staccata piu' in la', i bordi seghettati."""
+    segmento(t, (6, 26), (15, 15), 1.8, 1.6, R["lama"], "moncone")
+    griglia(t, ["l.", ".l", "l."], {"l": colore("grey_l")}, 15, 13, "rottura", separa=False)
+    segmento(t, (3, 23), (9, 29), 1.2, 1.2, R["ferro"], "guardia")
+    segmento(t, (5, 27), (2.5, 29.5), 1.2, 1.2, R["cuoio"], "impugnatura")
+    segmento(t, (19, 11), (27, 3), 1.6, 0.4, R["lama"], "punta")
+
+
+def pergamena_alba(t):
+    """Pergamena aperta srotolata a meta', con un sole che sorge disegnato in oro e i raggi, il sigillo arancio."""
+    _poligono(t, [(6, 7), (26, 7), (26, 24), (6, 24)], R["carta"], "foglio")
+    segmento(t, (6, 26), (26, 26), 2.6, 2.6, R["carta"], "rotolo")
+    ys, xs = np.mgrid[0:L, 0:L]
+    sole = (np.hypot(xs + 0.5 - 16, ys + 0.5 - 19) <= 5) & (ys + 0.5 <= 19)
+    c = np.zeros((L, L, 3), np.uint8)
+    c[sole] = colore("amber")
+    t.metti(sole, c, "sole", separa=False)
+    for k in range(5):
+        a = np.pi * (0.1 + 0.2 * k)
+        segmento(t, (16 + np.cos(a) * 7, 19 - np.sin(a) * 7), (16 + np.cos(a) * 9, 19 - np.sin(a) * 9), 0.5, 0.5,
+                 R["giallo" if False else "oro"], f"raggio{k}", separa=False)
+    segmento(t, (22, 26), (22, 26), 2.4, 2.4, R["ambra"], "sigillo")
+
+
+def libro_ordine_minore(t):
+    """Libro rilegato in cuoio rosso scuro, borchie d'oro agli angoli, sulla copertina lo stemma dell'ordine (un occhio
+    in un cerchio), il segnalibro di stoffa che pende."""
+    _poligono(t, [(7, 5), (25, 5), (25, 27), (7, 27)], R["cera"], "copertina")
+    _poligono(t, [(25, 6), (27, 7), (27, 28), (25, 27)], R["carta"], "pagine")
+    for x, y in ((8, 6), (23, 6), (8, 25), (23, 25)):
+        griglia(t, ["YY", "YY"], {"Y": colore("yellow")}, x, y, f"borchia{x}{y}", separa=False)
+    ys, xs = np.mgrid[0:L, 0:L]
+    cer = np.abs(np.hypot(xs + 0.5 - 16, ys + 0.5 - 16) - 5) <= 0.8
+    c = np.zeros((L, L, 3), np.uint8)
+    c[cer] = colore("amber")
+    t.metti(cer, c, "stemma", separa=False)
+    griglia(t, [".YYY.", "YYKYY", ".YYY."], {"Y": colore("amber"), "K": colore("ink")}, 14, 15, "occhio", separa=False)
+    segmento(t, (12, 27), (11, 31), 0.8, 0.8, R["verde_s"], "segnalibro")
+
+
+def sigillo_forza_minore(t):
+    """Sigillo da incastonare: un disco di pietra rossa con il bordo d'argento e inciso un pugno chiuso."""
+    segmento(t, (16, 16), (16, 16), 11.0, 11.0, R["argento"], "bordo")
+    segmento(t, (16, 16), (16, 16), 9.0, 9.0, R["cera"], "pietra", uniti=("bordo",), separa=False)
+    griglia(t, [".KKKK.", "KKKKKK", "KKKKKK", "KKKKK.", ".KKK..", ".KKK.."], {"K": colore("red_d")}, 13, 12, "pugno",
+            separa=False)
+    griglia(t, ["W"], {"W": colore("white")}, 10, 10, "riflesso", separa=False)
+
+
+def sigillo_reale(t):
+    """Il sigillo reale (moneta pregiata): grande medaglione d'oro con la corona in rilievo e il nastro blu e bianco."""
+    segmento(t, (12, 4), (14, 12), 1.8, 1.8, R["ciano"], "nastro_a")
+    segmento(t, (20, 4), (18, 12), 1.8, 1.8, R["bianco"] if "bianco" in R else R["piuma"], "nastro_b")
+    segmento(t, (16, 19), (16, 19), 10.0, 10.0, R["oro"], "medaglione")
+    segmento(t, (16, 19), (16, 19), 7.5, 7.5, R["ambra"], "campo", uniti=("medaglione",), separa=False)
+    griglia(t, ["Y.Y.Y", "YYYYY", "YYYYY", "YYYYY"], {"Y": colore("yellow")}, 14, 16, "corona", separa=False)
+
+
 OGGETTI = {f.__name__: f for f in (pozione_cura_minore, pozione_cura_maggiore, elisir_del_vigore, spada_ferrea,
                                    corazza_cuoio, amuleto_lunare, lingotto_ferro, cristallo_grezzo, pergamena_vigore,
-                                   moneta_comune)}
+                                   moneta_comune, elisir_ombra, ambrosia, tonico_di_forza, filtro_di_chiarezza,
+                                   essenza_rara_di_guarigione, pastura_spirituale, lama_del_pentimento,
+                                   corazza_espiazione, anello_del_richiamo, ascia_da_guerra, scudo_rinforzato,
+                                   anello_di_cristallo, cuoio_conciato, piuma_dei_venti, chiave_del_faro, arma_spezzata,
+                                   pergamena_alba, libro_ordine_minore, sigillo_forza_minore, sigillo_reale)}
 
 
 def disegna(nome):

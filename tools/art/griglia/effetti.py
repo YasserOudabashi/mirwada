@@ -395,9 +395,10 @@ def richiamo_compagno(n, S=64):
     """moon_richiamo_compagno (evoca la bestia compagna): una luna piena si accende a terra come cerchio, dal cerchio
     sale la sagoma di un lupo che ulula verso l'alto, poi la luce si spegne e resta la bestia (il gioco la crea)."""
     cx = S / 2
-    lupo = ["....##......", "...###......", "..#####.....", ".######.....", "########....", ".#######....",
-            "..########..", "..#########.", "..##########", "..##.##..##.", "..##.##..##."]
-
+    # lupo di profilo che ulula: muso alzato, orecchie a punta, petto, quattro zampe, coda folta (2 px per casella)
+    lupo = ["...............#..", "..............##..", "...........#.###..", "...........######.", "..........#######.",
+            ".........######...", "........######....", "#......#######....", "##.###########....", ".##############...",
+            "..##############..", "...#############..", "...##.##...##.##..", "...##.##...##.##..", "...#...#...#...#.."]
     def d(liv, X, Y, t):
         r = min(t / 0.3, 1) * 20
         _metti(liv, np.abs(np.hypot(X - cx, (Y - 54) * 3) - r) <= 1.4, PRIMARIO)
@@ -408,14 +409,18 @@ def richiamo_compagno(n, S=64):
             for j, riga in enumerate(lupo):
                 for i, ch in enumerate(riga):
                     if ch == "#":
-                        y = 52 - (h - j) * 3 * su
-                        x = cx - 18 + i * 3
-                        if y < 52:
-                            _metti(liv, (np.abs(X - x) <= 1.5) & (np.abs(Y - y) <= 1.5), ACCENTO if j < 3 else PRIMARIO)
+                        y = 54 - (h - j) * 2 * su
+                        x = cx - 18 + i * 2
+                        if y < 54:
+                            liv_l = ACCENTO if (j < 5 or (j == 8 and i < 3)) else PRIMARIO
+                            _metti(liv, (X >= x) & (X < x + 2) & (Y >= y) & (Y < y + 2), liv_l)
+            if su >= 1:                                      # l'occhio
+                _metti(liv, (X >= cx - 18 + 26) & (X < cx - 18 + 28) & (Y >= 54 - (h - 3) * 2) &
+                       (Y < 54 - (h - 3) * 2 + 2), SCURO)
         if t > 0.7:
             for j in range(3):                                # l'ululato: archi che salgono
                 rr = 4 + (t - 0.7) * 40 + j * 5
-                _metti(liv, (np.abs(np.hypot(X - cx + 8, Y - 14) - rr) <= 0.7) & (Y < 14), ACCENTO)
+                _metti(liv, (np.abs(np.hypot(X - cx - 6, Y - 22) - rr) <= 0.7) & (Y < 22) & (X > cx - 2), ACCENTO)
     return _frame(n, S, d, lampo=lambda X, Y: np.hypot(X - cx, (Y - 54) * 3) <= 14)
 
 
@@ -495,6 +500,398 @@ def contrattacco(n, S=64):
     return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 22, 34, 6, 14))
 
 
+# --- Giro 3 (2026-11-23): altre venti abilita', due per Pathway -------------------------------------------------------
+def _cerchio(X, Y, cx, cy, r, sp=1.0):
+    return np.abs(np.hypot(X - cx, Y - cy) - r) <= sp
+
+
+def _sagoma(liv, X, Y, righe, x0, y0, px, livello, dal_basso=1.0):
+    """Una sagoma da griglia (# pieno, o accento) a `px` pixel per casella; `dal_basso` 0..1 la fa salire da terra."""
+    h = len(righe)
+    for j, r in enumerate(righe):
+        if j < h * (1 - dal_basso):
+            continue
+        for i, ch in enumerate(r):
+            if ch in "#o":
+                x, y = x0 + i * px, y0 + j * px
+                _metti(liv, (X >= x) & (X < x + px) & (Y >= y) & (Y < y + px), ACCENTO if ch == "o" else livello)
+
+
+def terrore_notturno(n, S=64):
+    """darkness_terrore_notturno (sul nemico): dietro il bersaglio si alza un'ombra con le corna e le braccia lunghe a
+    artiglio, la bocca si spalanca in un urlo (cerchi che escono), poi si sfalda in fumo."""
+    ombra = ["..#........#..", "..##......##..", "...########...", "..##o####o##..", "..##########..", "...###..###...",
+             "#...######...#", "##..######..##", ".##.######.##.", "..##########..", "....######....",
+             "....######....", "...########..."]
+
+    def d(liv, X, Y, t):
+        su = min(t / 0.4, 1)
+        if t < 0.85:
+            _sagoma(liv, X, Y, ombra, 18, 6, 2, SCURO if t < 0.7 else PRIMARIO, su)
+        if 0.4 <= t <= 0.85:
+            for k in range(3):
+                _metti(liv, _cerchio(X, Y, 32, 20, 4 + (t - 0.4) * 50 + k * 6, 0.6) & (Y > 10), ACCENTO)
+    return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 32, 26, 10, 14))
+
+
+def poesia_amara(n, S=64):
+    """darkness_poesia_amara (sul nemico): versi scuri (righe di segni) escono dalla bocca di chi lancia come un nastro
+    che gira tre volte attorno al bersaglio e lo stringe; le lettere si staccano e cadono."""
+    def d(liv, X, Y, t):
+        giri = t * 3 * math.pi
+        for k in range(18):
+            a = giri - k * 0.35
+            r = 20 - t * 8
+            x, y = 32 + math.cos(a) * r, 34 + math.sin(a) * r * 0.45 - k * 0.3
+            if t > 0.75 and k % 3 == 0:
+                y += (t - 0.75) * 60
+            _metti(liv, (np.abs(X - x) <= 1) & (np.abs(Y - y) <= (1.5 if k % 2 else 0.6)), ACCENTO if k % 4 == 0 else PRIMARIO)
+    return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 32, 34, 14, 6))
+
+
+def rianima_servo(n, S=64):
+    """death_rianima_servo (evoca un servo): si apre una fossa con le croci storte, una mano scheletrica esce dalla
+    terra, poi braccio e teschio; una nebbia verde sale dalla fossa."""
+    mano = ["..#.#.#..", "..#.#.#..", "..#.#.#.#", "..#######", "...#####.", "....###..", "....###..", "....###..",
+            "....###..", "....###.."]
+
+    def d(liv, X, Y, t):
+        _metti(liv, _ell(X, Y, 32, 54, 18 * min(t / 0.2, 1) + 1, 4), SCURO)
+        for cx in (14, 50):
+            _metti(liv, (np.abs(X - cx) <= 0.8) & (Y > 38) & (Y < 52), PRIMARIO)
+            _metti(liv, (np.abs(Y - 42) <= 0.8) & (np.abs(X - cx) <= 3), PRIMARIO)
+        if t > 0.2:
+            _sagoma(liv, X, Y, mano, 23, 26, 2, PRIMARIO, min((t - 0.2) / 0.5, 1))
+        if t > 0.5:
+            for k in range(5):
+                _metti(liv, np.hypot(X - (22 + k * 5), Y - (50 - (t - 0.5) * 40 - (k % 2) * 4)) <= 1.6, ACCENTO)
+    return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 32, 54, 18, 5))
+
+
+def lamento_funebre(n, S=64):
+    """death_lamento_funebre (davanti): un volto di fantasma a bocca spalancata appare davanti e urla: onde a ventaglio
+    che si allargano verso il nemico, il volto si allunga e svanisce."""
+    def d(liv, X, Y, t):
+        allunga = 1 + max(t - 0.5, 0) * 1.5
+        if t < 0.85:
+            _metti(liv, _ell(X, Y, 18, 30, 8, 10 * allunga), PRIMARIO)
+            _metti(liv, _ell(X, Y, 15, 27, 1.6, 2), SCURO)
+            _metti(liv, _ell(X, Y, 21, 27, 1.6, 2), SCURO)
+            _metti(liv, _ell(X, Y, 18, 35, 3, 4 * allunga), SCURO)
+        for k in range(4):
+            r = 10 + t * 50 - k * 7
+            if r > 10:
+                ang = np.arctan2(Y - 32, X - 18)
+                _metti(liv, _cerchio(X, Y, 18, 32, r, 0.8) & (np.abs(ang) < 0.6), ACCENTO if k == 0 else PRIMARIO)
+    return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 18, 30, 8, 10))
+
+
+def scambio_di_posto(n, S=64):
+    """door_scambio_di_posto (sul corpo): due vortici, uno su chi lancia e uno sul nemico, legati da un arco di luce
+    con le frecce che corrono nei due sensi; un lampo e i due vortici si chiudono."""
+    def d(liv, X, Y, t):
+        for cx, verso in ((12, 1), (52, -1)):
+            ang = np.arctan2(Y - 40, X - cx) * verso + t * 10
+            r = np.hypot(X - cx, (Y - 40) * 1.6)
+            _metti(liv, (r <= 9 * (1 - max(t - 0.75, 0) * 4)) & ((ang + r * 0.5) % 2.0 < 0.8), PRIMARIO)
+        arco = _cerchio(X, Y * 1.0, 32, 52, 24, 0.8) & (Y < 40)
+        _metti(liv, arco, SCURO)
+        for k in range(2):
+            a = math.pi * (0.2 + ((t * 2 + k * 0.5) % 1) * 0.6)
+            x, y = 32 - math.cos(a) * 24, 52 - math.sin(a) * 24
+            _metti(liv, np.hypot(X - x, Y - y) <= 2, ACCENTO)
+    return _frame(n, S, d, lampo=lambda X, Y: _cerchio(X, Y, 32, 52, 24, 1.5) & (Y < 40))
+
+
+def occhio_nell_ombra(n, S=64):
+    """door_occhio_nell_ombra (davanti): nell'aria si apre il buco di una serratura nera, dentro si apre un occhio
+    che guarda di qua e di la', poi la serratura si richiude."""
+    def d(liv, X, Y, t):
+        ap = math.sin(min(t / 0.85, 1) * math.pi)
+        buco = (np.hypot(X - 32, Y - 26) <= 9 * ap + 0.5) | ((np.abs(X - 32) <= (Y - 26) * 0.35 * ap + 1) & (Y >= 26) &
+                                                            (Y <= 26 + 20 * ap))
+        _metti(liv, _dilata(_dilata(buco)) & ~buco, PRIMARIO)
+        _metti(liv, buco, SCURO)
+        if ap > 0.5:
+            px = 32 + math.sin(t * 9) * 3
+            _metti(liv, _ell(X, Y, 32, 26, 7, 3.5 * ap), PRIMARIO)
+            _metti(liv, np.hypot(X - px, Y - 26) <= 2, ACCENTO)
+    return _frame(n, S, d, lampo=lambda X, Y: np.hypot(X - 32, Y - 26) <= 8)
+
+
+def scasso(n, S=64):
+    """error_scasso (davanti): un lucchetto appare, una crepa a zig-zag lo attraversa, salta in due pezzi con gli
+    ingranaggi e le molle che schizzano fuori."""
+    def d(liv, X, Y, t):
+        sp = max(t - 0.45, 0) * 40
+        for verso in (-1, 1):
+            corpo = (np.abs(X - 32 - verso * sp * 0.5) <= 9) & (np.abs(Y - 36 - sp * 0.3) <= 7) & ((X - 32) * verso >= 0)
+            _metti(liv, corpo, PRIMARIO)
+        if t < 0.45:
+            _metti(liv, _cerchio(X, Y, 32, 28, 6, 1.2) & (Y < 30), SCURO)
+            if t > 0.2:
+                for k in range(5):
+                    _metti(liv, _lin(X, Y, 32 + (k % 2) * 3 - 1, 29 + k * 3, 32 + ((k + 1) % 2) * 3 - 1, 32 + k * 3, 0.6),
+                           ACCENTO)
+        else:
+            for k in range(6):
+                a = k * math.pi / 3 + 0.3
+                x, y = 32 + math.cos(a) * sp, 36 + math.sin(a) * sp * 0.8
+                _metti(liv, _cerchio(X, Y, x, y, 2, 0.8), ACCENTO)
+    return _frame(n, S, d, lampo=lambda X, Y: (np.abs(X - 32) <= 9) & (np.abs(Y - 36) <= 7))
+
+
+def lettura_rubata(n, S=64):
+    """error_lettura_rubata (sul nemico): dal petto del bersaglio si strappa una pagina scritta, vola a zig-zag verso
+    chi lancia (a sinistra) lasciando lettere che cadono."""
+    def d(liv, X, Y, t):
+        x = 40 - t * 34
+        y = 30 + math.sin(t * 12) * 4
+        foglio = (np.abs(X - x) <= 6) & (np.abs(Y - y) <= 8)
+        _metti(liv, foglio, PRIMARIO)
+        for k in range(4):
+            _metti(liv, foglio & (np.abs(Y - (y - 5 + k * 3)) <= 0.5) & (np.abs(X - x) <= 4), SCURO)
+        for k in range(int(t * 6)):
+            _metti(liv, (np.abs(X - (40 - k * 6)) <= 0.8) & (np.abs(Y - (40 + k * 2 + t * 8)) <= 0.8), ACCENTO)
+    return _frame(n, S, d, lampo=lambda X, Y: (np.abs(X - 40) <= 7) & (np.abs(Y - 30) <= 9))
+
+
+def acrobazia(n, S=64):
+    """fool_acrobazia (sul corpo): un salto mortale lascia dietro di se' un arco di scia a nastro con le stelline, e
+    all'atterraggio due sbuffi di polvere ai piedi."""
+    def d(liv, X, Y, t):
+        fine = min(t / 0.7, 1) * math.pi
+        for k in range(30):
+            a = math.pi + fine * k / 30
+            x, y = 32 + math.cos(a) * 18, 40 + math.sin(a) * 22
+            _metti(liv, np.hypot(X - x, Y - y) <= 2.0 - k / 30, PRIMARIO if k % 6 else ACCENTO)
+        for k in range(3):
+            a = math.pi + fine * (0.3 + k * 0.25)
+            x, y = 32 + math.cos(a) * 24, 40 + math.sin(a) * 28
+            _metti(liv, (np.abs(X - x) + np.abs(Y - y)) <= 2.5, ACCENTO)
+        if t > 0.7:
+            for sx in (-1, 1):
+                _metti(liv, _ell(X, Y, 32 + sx * (8 + (t - 0.7) * 20), 58, 4, 2), SCURO)
+    return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 32, 40, 8, 12))
+
+
+def oggetto_dal_nulla(n, S=64):
+    """fool_oggetto_dal_nulla (davanti): un cilindro da prestigiatore compare a mezz'aria, sbuffo di fumo e ne salta
+    fuori un oggetto che gira (una carta) con le stelline."""
+    def d(liv, X, Y, t):
+        cap = (np.abs(X - 32) <= 8) & (Y >= 34) & (Y <= 46)
+        _metti(liv, cap, SCURO)
+        _metti(liv, (np.abs(X - 32) <= 12) & (np.abs(Y - 46) <= 1.5), SCURO)
+        _metti(liv, cap & (np.abs(Y - 42) <= 1), PRIMARIO)
+        if t > 0.3:
+            r = (t - 0.3) * 30
+            for k in range(5):
+                a = -math.pi / 2 + (k - 2) * 0.5
+                _metti(liv, np.hypot(X - (32 + math.cos(a) * r), Y - (34 + math.sin(a) * r)) <= 3 - r / 15, PRIMARIO)
+        if t > 0.45:
+            cy = 30 - (t - 0.45) * 30
+            w = abs(math.cos(t * 14)) * 4 + 0.6
+            _metti(liv, (np.abs(X - 32) <= w) & (np.abs(Y - cy) <= 5), ACCENTO)
+    return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 32, 40, 10, 6))
+
+
+def percezione_mistica(n, S=64):
+    """hermit_percezione_mistica (sul corpo): sopra la testa si apre un terzo occhio dentro un triangolo, raggi sottili
+    escono tutto intorno e un'onda a cerchio rivela le cose nascoste."""
+    def d(liv, X, Y, t):
+        tri = (Y >= 6) & (Y <= 20) & (np.abs(X - 32) <= (Y - 6) * 0.6)
+        _metti(liv, _dilata(tri) & ~tri, PRIMARIO)
+        ap = min(t / 0.3, 1)
+        _metti(liv, _ell(X, Y, 32, 15, 4, 2 * ap + 0.3), ACCENTO)
+        _metti(liv, np.hypot(X - 32, Y - 15) <= 1 * ap, SCURO)
+        for k in range(8):
+            a = k * math.pi / 4 + t
+            r0 = 10 + t * 10
+            _metti(liv, _lin(X, Y, 32 + math.cos(a) * r0, 15 + math.sin(a) * r0, 32 + math.cos(a) * (r0 + 4),
+                             15 + math.sin(a) * (r0 + 4), 0.6), PRIMARIO)
+        if t > 0.4:
+            _metti(liv, _cerchio(X, Y, 32, 40, (t - 0.4) * 50, 0.8), SCURO)
+    return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 32, 15, 6, 4))
+
+
+def evocazione_minore(n, S=64):
+    """hermit_evocazione_minore (davanti): a terra si disegna un cerchio con la stella a cinque punte, dal centro sale
+    uno spiritello a fiammella con due occhi che si guarda intorno."""
+    def d(liv, X, Y, t):
+        g = min(t / 0.4, 1)
+        _metti(liv, _cerchio(X, Y * 2.5 - 80, 32, 54 * 2.5 - 80, 16 * g, 1.2), PRIMARIO)
+        for k in range(5):
+            a1, a2 = -math.pi / 2 + k * 4 * math.pi / 5, -math.pi / 2 + (k + 1) * 4 * math.pi / 5
+            if k / 5 < g:
+                _metti(liv, _lin(X, Y, 32 + math.cos(a1) * 15, 54 + math.sin(a1) * 6, 32 + math.cos(a2) * 15,
+                                 54 + math.sin(a2) * 6, 0.6), SCURO)
+        if t > 0.4:
+            su = min((t - 0.4) / 0.4, 1)
+            cy = 50 - su * 22
+            fiamma = _ell(X, Y, 32, cy, 6, 8) | ((np.abs(X - 32) <= (cy - Y + 2) * 0.4) & (Y < cy) & (Y > cy - 14))
+            _metti(liv, fiamma, PRIMARIO)
+            gx = math.sin(t * 10) * 1.5
+            for ox in (-2, 2):
+                _metti(liv, np.hypot(X - (32 + ox + gx), Y - cy) <= 1, ACCENTO)
+    return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 32, 54, 16, 6))
+
+
+def distillato_curativo(n, S=64):
+    """moon_distillato_curativo (sul corpo): una fiala si inclina sopra la testa, gocce lucenti cadono, a contatto si
+    apre una mezzaluna di luce che sale e lascia piccole croci di cura."""
+    def d(liv, X, Y, t):
+        inc = min(t / 0.3, 1) * 0.9
+        fx, fy = 36, 8
+        fiala = _ell(X, Y, fx, fy, 4, 3) | _lin(X, Y, fx, fy, fx - 6 * math.sin(inc) - 1, fy + 5 * math.cos(inc) - 6, 1.2)
+        if t < 0.7:
+            _metti(liv, fiala, PRIMARIO)
+        for k in range(4):
+            gy = 14 + ((t * 60 + k * 9) % 30)
+            if t > 0.2:
+                _metti(liv, _ell(X, Y, 32 + (k % 2) * 2, gy, 1.2, 1.8), ACCENTO)
+        if t > 0.45:
+            r = (t - 0.45) * 40
+            luna = _cerchio(X, Y, 32, 46, 14, 3) & ~(np.hypot(X - 36, Y - 42) <= 12)
+            _metti(liv, luna & (Y > 46 - r), PRIMARIO)
+            for k in range(3):
+                cx, cy = 22 + k * 10, 44 - r * 0.6 - k * 3
+                _metti(liv, ((np.abs(X - cx) <= 2) & (np.abs(Y - cy) <= 0.6)) | ((np.abs(Y - cy) <= 2) & (np.abs(X - cx) <= 0.6)),
+                       ACCENTO)
+    return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 32, 40, 10, 14))
+
+
+def legame_bestiale(n, S=64):
+    """moon_legame_bestiale (sul corpo): un'impronta di zampa luminosa si accende sul petto, ne parte una catena di
+    luce a maglie che va verso destra (verso la bestia) e si tende."""
+    def d(liv, X, Y, t):
+        _metti(liv, _ell(X, Y, 32, 38, 5, 4), PRIMARIO)
+        for k, (ox, oy) in enumerate(((-6, -5), (-2, -8), (2, -8), (6, -5))):
+            _metti(liv, _ell(X, Y, 32 + ox, 38 + oy, 1.8, 2.2), ACCENTO if t > 0.2 else PRIMARIO)
+        if t > 0.3:
+            lun = min((t - 0.3) / 0.4, 1) * 26
+            for k in range(int(lun // 5)):
+                x = 38 + k * 5
+                _metti(liv, _ell(X, Y, x + 2, 38 + math.sin(k + t * 6) * (1 - t), 2.6, 1.6) &
+                       ~_ell(X, Y, x + 2, 38 + math.sin(k + t * 6) * (1 - t), 1.4, 0.6), PRIMARIO if k % 2 else ACCENTO)
+    return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 32, 36, 8, 8))
+
+
+def sutura(n, S=64):
+    """mother_sutura (sul corpo): un ago di luce cuce una ferita a zig-zag sul petto, punto dopo punto, poi i punti
+    brillano e spariscono lasciando la pelle sana."""
+    def d(liv, X, Y, t):
+        ferita = _lin(X, Y, 24, 30, 40, 46, 1.0)
+        _metti(liv, ferita, SCURO if t < 0.8 else VUOTO)
+        k_max = int(min(t / 0.7, 1) * 6)
+        for k in range(k_max):
+            cx, cy = 25 + k * 3, 31 + k * 3
+            _metti(liv, _lin(X, Y, cx - 3, cy + 3, cx + 3, cy - 3, 0.5), ACCENTO if t > 0.7 else PRIMARIO)
+        if t < 0.75:
+            ax, ay = 25 + k_max * 3, 31 + k_max * 3
+            _metti(liv, _lin(X, Y, ax, ay, ax + 6, ay - 6, 0.7), ACCENTO)
+    return _frame(n, S, d, lampo=lambda X, Y: _lin(X, Y, 24, 30, 40, 46, 3))
+
+
+def mano_verde(n, S=64):
+    """mother_mano_verde (davanti): una mano fatta di foglie si apre nell'aria, le foglie si staccano a spirale e
+    cadono a terra dove spuntano fili d'erba."""
+    def d(liv, X, Y, t):
+        if t < 0.5:
+            _metti(liv, _ell(X, Y, 32, 32, 6, 7), PRIMARIO)
+            for k in range(5):
+                a = -math.pi / 2 + (k - 2) * 0.45
+                _metti(liv, _lin(X, Y, 32, 30, 32 + math.cos(a) * 12, 30 + math.sin(a) * 12, 2.0), PRIMARIO)
+                _metti(liv, _lin(X, Y, 32 + math.cos(a) * 9, 30 + math.sin(a) * 9, 32 + math.cos(a) * 12,
+                                 30 + math.sin(a) * 12, 0.8), ACCENTO)
+        else:
+            u = (t - 0.5) / 0.5
+            for k in range(8):
+                a = k * math.pi / 4 + u * 5
+                r = 6 + u * 12
+                x, y = 32 + math.cos(a) * r, 30 + math.sin(a) * r * 0.5 + u * 22
+                _metti(liv, _ell(X, Y, x, y, 2.4, 1.2), PRIMARIO if k % 2 else ACCENTO)
+            for k in range(6):
+                _metti(liv, (np.abs(X - (20 + k * 5)) <= 0.6) & (Y >= 58 - u * 6) & (Y <= 58), PRIMARIO)
+    return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 32, 30, 10, 10))
+
+
+def scavo(n, S=64):
+    """paragon_scavo (colpo a terra davanti): un piccone di luce cala, colpisce il suolo, la terra si spacca e sassi e
+    zolle schizzano in alto, poi ricadono."""
+    def d(liv, X, Y, t):
+        a = min(t / 0.3, 1)
+        if t < 0.45:
+            hx, hy = 14 + a * 20, 20 + a * 26
+            _metti(liv, _lin(X, Y, 10, 14, hx, hy, 1.2), SCURO)
+            _metti(liv, _lin(X, Y, hx - 6, hy - 3, hx + 6, hy + 2, 1.6), PRIMARIO)
+        if t >= 0.3:
+            u = (t - 0.3) / 0.7
+            for k in range(4):
+                _metti(liv, _lin(X, Y, 34, 54, 34 + (k - 1.5) * 8, 58 + (k % 2) * 2, 0.6), SCURO)
+            for k in range(7):
+                vx = (k - 3) * 7
+                x, y = 34 + vx * u, 52 - 40 * u + 50 * u * u
+                if y < 60:
+                    _metti(liv, (np.abs(X - x) <= 1.5) & (np.abs(Y - y) <= 1.5), ACCENTO if k % 3 == 0 else PRIMARIO)
+    return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 34, 54, 10, 3))
+
+
+def disinnesco(n, S=64):
+    """paragon_disinnesco (davanti): sopra la trappola compare lo schema con le linee e gli ingranaggi, un filo
+    acceso viene tagliato da due lame a forbice, le scintille si spengono."""
+    def d(liv, X, Y, t):
+        _metti(liv, (np.abs(X - 32) <= 10) & (np.abs(Y - 36) <= 8), SCURO)
+        for k in range(3):
+            _metti(liv, (np.abs(Y - (30 + k * 6)) <= 0.4) & (np.abs(X - 32) <= 9), PRIMARIO)
+        ang = np.arctan2(Y - 36, X - 22)
+        _metti(liv, (np.hypot(X - 22, Y - 36) <= 5) & (np.cos((ang - t * 6) * 6) > 0), PRIMARIO)
+        taglio = t > 0.5
+        _metti(liv, _lin(X, Y, 32, 28, 44, 18, 0.8) & ~(taglio & (np.abs(X - 38) <= 1.5)), ACCENTO)
+        if not taglio:
+            for k in range(5):
+                a = k * 1.3 + t * 20
+                _metti(liv, np.hypot(X - (44 + math.cos(a) * 3), Y - (18 + math.sin(a) * 3)) <= 0.8, ACCENTO)
+        cl = min(max(t - 0.35, 0) / 0.15, 1)
+        for verso in (-1, 1):
+            _metti(liv, _lin(X, Y, 38 - 6, 23 + verso * 6 * (1 - cl), 38 + 2, 23, 0.8), PRIMARIO)
+    return _frame(n, S, d, lampo=lambda X, Y: (np.abs(X - 32) <= 10) & (np.abs(Y - 36) <= 8))
+
+
+def carica_spalla(n, S=64):
+    """tg_carica_spalla (davanti): linee di velocita' dietro, poi l'urto: un'onda d'urto a semicerchio davanti con
+    le schegge, e la terra che si solleva."""
+    def d(liv, X, Y, t):
+        if t < 0.4:
+            for k in range(5):
+                y = 20 + k * 7
+                _metti(liv, (np.abs(Y - y) <= 0.6) & (X >= 4 + t * 30) & (X <= 16 + t * 40), PRIMARIO)
+        else:
+            u = (t - 0.4) / 0.6
+            r = 8 + u * 22
+            ang = np.arctan2(Y - 36, X - 26)
+            _metti(liv, (np.abs(np.hypot(X - 26, Y - 36) - r) <= 3 * (1 - u) + 1) & (np.abs(ang) < 1.2), PRIMARIO)
+            _metti(liv, (np.abs(np.hypot(X - 26, Y - 36) - r) <= 0.8) & (np.abs(ang) < 1.2), ACCENTO)
+            for k in range(5):
+                a = (k - 2) * 0.45
+                _metti(liv, np.hypot(X - (26 + math.cos(a) * (r + 6)), Y - (36 + math.sin(a) * (r + 6))) <= 1.2,
+                       ACCENTO)
+    return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 26, 36, 6, 10))
+
+
+def turbine(n, S=64):
+    """tg_turbine (sul corpo): l'arma gira tutt'intorno a chi lancia: un anello di tagli che ruota, piu' veloce e
+    piu' largo, con le scie, poi si apre e si spegne."""
+    def d(liv, X, Y, t):
+        rr = np.hypot(X - 32, (Y - 40) * 1.8)
+        ang = np.arctan2((Y - 40) * 1.8, X - 32)
+        r = 14 + t * 10
+        giro = t * 14
+        banda = (np.abs(rr - r) <= 3 * (1 - max(t - 0.7, 0) * 3))
+        _metti(liv, banda & (np.cos(ang * 3 - giro) > 0.2), PRIMARIO)
+        _metti(liv, banda & (np.cos(ang * 3 - giro) > 0.85), ACCENTO)
+    return _frame(n, S, d, lampo=lambda X, Y: _ell(X, Y, 32, 40, 16, 9))
+
+
 EFFETTI = {
     # nome del foglio -> (funzione, frame, dimensione di una cella)
     "vfx_fendente_pesante": (fendente_pesante, 8),
@@ -511,4 +908,14 @@ EFFETTI = {
     "vfx_germoglio_rapido": (germoglio_rapido, 8),
     "vfx_analisi": (analisi, 7),
     "vfx_contrattacco": (contrattacco, 7),
+    "vfx_terrore_notturno": (terrore_notturno, 8), "vfx_poesia_amara": (poesia_amara, 8),
+    "vfx_rianima_servo": (rianima_servo, 8), "vfx_lamento_funebre": (lamento_funebre, 8),
+    "vfx_scambio_di_posto": (scambio_di_posto, 7), "vfx_occhio_nell_ombra": (occhio_nell_ombra, 8),
+    "vfx_scasso": (scasso, 7), "vfx_lettura_rubata": (lettura_rubata, 7),
+    "vfx_acrobazia": (acrobazia, 7), "vfx_oggetto_dal_nulla": (oggetto_dal_nulla, 8),
+    "vfx_percezione_mistica": (percezione_mistica, 8), "vfx_evocazione_minore": (evocazione_minore, 8),
+    "vfx_distillato_curativo": (distillato_curativo, 8), "vfx_legame_bestiale": (legame_bestiale, 7),
+    "vfx_sutura": (sutura, 8), "vfx_mano_verde": (mano_verde, 8),
+    "vfx_scavo": (scavo, 7), "vfx_disinnesco": (disinnesco, 8),
+    "vfx_carica_spalla": (carica_spalla, 7), "vfx_turbine": (turbine, 8),
 }
