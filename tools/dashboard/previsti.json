@@ -1,0 +1,17 @@
+{
+  "_comment": "Cose decise ma non ancora fatte: la dashboard le mostra come INCOMPLETO col loro nome. Si tolgono da qui quando esistono nei dati. Fonte: 006_PRD/prd-fasi-15-17-gioco-completo.md e prd.json.",
+  "voci": [
+    {"sezione": "bestiario", "nome": "Figura nera che si moltiplica", "tipo": "boss segreto", "cosa": "Appare a caso, di notte, davanti al giocatore; colpita si divide in tante copie e le rifonde in una piu' grande.", "story": "US-1506"},
+    {"sezione": "bestiario", "nome": "Barca fantasma ammiraglia", "tipo": "boss segreto", "cosa": "Su un'isola lontana: la nave dei morti col cannone grande.", "story": "US-1506"},
+    {"sezione": "bestiario", "nome": "Colosso arrugginito anziano", "tipo": "mini-boss", "cosa": "Gira per le Marche: piu' grosso e lento, carica con tell lungo.", "story": "US-1507"},
+    {"sezione": "bestiario", "nome": "Lupo alfa", "tipo": "mini-boss", "cosa": "Gira per la Valle col suo branco.", "story": "US-1507"},
+    {"sezione": "bestiario", "nome": "Coccodrillo rapper (mini-boss)", "tipo": "mini-boss", "cosa": "Spara note musicali e lascia il foglietto con la canzoncina per il fortepiano.", "story": "US-1507"},
+    {"sezione": "bestiario", "nome": "Varianti rare di notte", "tipo": "sistema", "cosa": "Lo stesso nemico con un altro colore, piu' frequente di notte; e nemici che escono solo di notte.", "story": "US-1507"},
+    {"sezione": "bestiario", "nome": "Pagina Bestiario nel libro", "tipo": "pagina", "cosa": "Nome, punti deboli dopo averne battuti abbastanza, cosa lascia.", "story": "US-1507"},
+    {"sezione": "personaggi", "nome": "Evocazioni nel mondo", "tipo": "figure", "cosa": "La primitiva summon mette una figura vera che combatte.", "story": "US-8B60a"},
+    {"sezione": "oggi", "nome": "Audio: effetti, musica, ambienti", "tipo": "audio", "cosa": "Nessun file audio: bip di prova e musiche mute.", "story": "US-1601..1605"},
+    {"sezione": "paesi", "nome": "Mondo vivo: punti d'interesse, villaggi, dungeon", "tipo": "mondo", "cosa": "Fase 12 da riscrivere sul mondo generato.", "story": "US-1200"},
+    {"sezione": "paesi", "nome": "Monumenti di Mirwada (cattedrale, museo, mercato, dogana, cantiere)", "tipo": "arte", "cosa": "Ogni edificio speciale col suo disegno (note dell'utente, skill arte-architettura).", "story": "da scrivere"},
+    {"sezione": "tecniche", "nome": "Effetti unici per abilita'", "tipo": "arte", "cosa": "Oggi un effetto per primitiva ricolorato per Pathway: da decidere con l'utente (skill arte-effetti).", "story": "da scrivere"}
+  ]
+}

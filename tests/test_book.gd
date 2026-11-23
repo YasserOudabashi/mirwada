@@ -36,12 +36,11 @@ func test_pagine_bianche_vs_sbloccate() -> void:
 	var b: Node = _book()
 	# data/balance.json gioco.fase = 3: queste sono navigabili (la mappa non ha
 	# gating di fase: e' contenuto diegetico del libro, come il diagramma).
-	for pid in ["copertina", "frontespizio", "diagramma", "colophon", "inventario", "mappa"]:
+	for pid in ["copertina", "frontespizio", "diagramma", "colophon", "inventario", "mappa", "sinergie", "journal"]:
 		assert_true(b.call("pagina_sbloccata", pid), "%s sbloccata alla fase corrente" % pid)
-	# Queste esistono ma sono bianche finche' la fase non le raggiunge.
+	# US-1303b: Diario e Sinergie non sono piu' bianche: aprono la pagina inventario sulla loro sezione.
 	for pid in ["sinergie", "journal"]:
-		assert_false(b.call("pagina_sbloccata", pid), "%s ancora bianca (fase > 3)" % pid)
-		assert_false(b.call("pagina", pid).is_empty(), "%s esiste comunque nei dati" % pid)
+		assert_eq(str(b.call("pagina", pid).get("sezione", "")), pid, "%s apre la sua sezione" % pid)
 
 
 func test_apri_ferma_il_mondo_chiudi_lo_riavvia() -> void:

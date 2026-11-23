@@ -68,3 +68,42 @@ func test_le_lucciole_stanno_sopra_il_buio() -> void:
 	assert_true((lucciole[0].get_parent() as CanvasLayer).follow_viewport_enabled, "che segue la telecamera")
 	f.free()
 	m.free()
+
+
+## US-8B27: di notte finestre e faro accesi, di giorno spenti; le case accese sono sempre le stesse.
+func test_di_notte_finestre_e_faro_sono_accesi() -> void:
+	var ts: Node = _root().get_node("TimeSystem")
+	var main := Node2D.new()
+	var m: Node2D = Mondo.new()
+	main.add_child(m)
+	_root().add_child(main)
+	var luci: Node = m.get_node("LuciNotte")
+	ts.call("forza_momento", "mezzogiorno")
+	assert_eq(float(luci.call("forza_voluta")), 0.0, "di giorno le luci sono spente")
+	ts.call("forza_momento", "notte_fonda")
+	assert_eq(float(luci.call("forza_voluta")), 1.0, "di notte piene")
+	var accese := 0
+	var tot := 0
+	for e in (m.get("dati") as Dictionary)["edifici"]:
+		tot += 1
+		if luci.call("accesa", int(e[0]), int(e[1])):
+			accese += 1
+		assert_eq(luci.call("accesa", int(e[0]), int(e[1])), luci.call("accesa", int(e[0]), int(e[1])), "sempre la stessa risposta")
+	assert_true(accese > tot / 4 and accese < tot, "una parte delle case e' accesa (%d su %d)" % [accese, tot])
+	var p: Vector2 = m.call("partenza")
+	m.call("segui", p)
+	var nel_mondo := 0
+	for b in luci.get("_per_blocco"):
+		nel_mondo += (luci.call("luci_del_blocco", b) as Array).size()
+	assert_gt(float(nel_mondo), 0.0, "attorno alla casa al porto ci sono finestre accese")
+	luci.call("_monta_faro")
+	var faro: Node2D = luci.call("faro")
+	assert_true(faro != null, "il faro ha la sua luce")
+	if faro != null:
+		var soglia: Node2D = m.get_node("Soglia_faro")
+		assert_true(faro.position.y < soglia.position.y - 60.0, "in alto, alla lanterna")
+		var prima: float = (faro.get_node("Fascio") as Node2D).rotation
+		luci.call("_process", 1.0)
+		assert_true((faro.get_node("Fascio") as Node2D).rotation > prima, "il fascio gira")
+	ts.call("libera_momento")
+	main.free()

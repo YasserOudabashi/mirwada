@@ -1,0 +1,578 @@
+{
+  "schema_version": 1,
+  "_comment": "Da dove viene ogni suono di data/audio.json (ricerca del 2026-11-14, richiesta dell'utente: 'se ci sono gratis prendili senno' mettili da generare'). stato: scaricato (il file e' in assets/audio/<id>.<ext>, AudioManager lo usa al posto del bip di prova), da_scegliere (ci sono candidati gratuiti ma vanno ascoltati e scelti), da_generare (niente di gratuito adatto: va generato). I file scaricati sono stati scelti DAL NOME, senza ascoltarli: vanno ascoltati nel gioco e cambiati qui se non vanno. Tutti CC0 (nessun obbligo di citare). 'riserva': altri suoni CC0 gia' individuati negli stessi pacchetti per la story US-1604 (gesti e libro).",
+  "suoni": {
+    "amb_archivio_giorno": {
+      "stato": "da_scegliere",
+      "perche": "ambiente di regione: nessun CC0 sicuro trovato per mare, foresta, neve, nebbia",
+      "candidati": [
+        "https://opengameart.org/content/loopable-dungeon-ambience (CC0, vento e gocce: sottosuolo)",
+        "https://opengameart.org/node/180349 (Nature Ambient Pack, CC-BY 4.0: foresta di notte, onde: va citato l'autore)"
+      ]
+    },
+    "amb_archivio_notte": {
+      "stato": "da_scegliere",
+      "perche": "ambiente di regione: nessun CC0 sicuro trovato per mare, foresta, neve, nebbia",
+      "candidati": [
+        "https://opengameart.org/content/loopable-dungeon-ambience (CC0, vento e gocce: sottosuolo)",
+        "https://opengameart.org/node/180349 (Nature Ambient Pack, CC-BY 4.0: foresta di notte, onde: va citato l'autore)"
+      ]
+    },
+    "amb_beyond": {
+      "stato": "scaricato",
+      "file": "assets/audio/amb_beyond.ogg",
+      "originale": "Insistent.ogg",
+      "autore": "yd",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/insistent-background-loop",
+      "pacchetto": "https://opengameart.org/sites/default/files/Insistent.ogg"
+    },
+    "amb_citta_giorno": {
+      "stato": "da_scegliere",
+      "perche": "ambiente di regione: nessun CC0 sicuro trovato per mare, foresta, neve, nebbia",
+      "candidati": [
+        "https://opengameart.org/content/loopable-dungeon-ambience (CC0, vento e gocce: sottosuolo)",
+        "https://opengameart.org/node/180349 (Nature Ambient Pack, CC-BY 4.0: foresta di notte, onde: va citato l'autore)"
+      ]
+    },
+    "amb_citta_notte": {
+      "stato": "da_scegliere",
+      "perche": "ambiente di regione: nessun CC0 sicuro trovato per mare, foresta, neve, nebbia",
+      "candidati": [
+        "https://opengameart.org/content/loopable-dungeon-ambience (CC0, vento e gocce: sottosuolo)",
+        "https://opengameart.org/node/180349 (Nature Ambient Pack, CC-BY 4.0: foresta di notte, onde: va citato l'autore)"
+      ]
+    },
+    "amb_frontiera_giorno": {
+      "stato": "da_scegliere",
+      "perche": "ambiente di regione: nessun CC0 sicuro trovato per mare, foresta, neve, nebbia",
+      "candidati": [
+        "https://opengameart.org/content/loopable-dungeon-ambience (CC0, vento e gocce: sottosuolo)",
+        "https://opengameart.org/node/180349 (Nature Ambient Pack, CC-BY 4.0: foresta di notte, onde: va citato l'autore)"
+      ]
+    },
+    "amb_frontiera_notte": {
+      "stato": "da_scegliere",
+      "perche": "ambiente di regione: nessun CC0 sicuro trovato per mare, foresta, neve, nebbia",
+      "candidati": [
+        "https://opengameart.org/content/loopable-dungeon-ambience (CC0, vento e gocce: sottosuolo)",
+        "https://opengameart.org/node/180349 (Nature Ambient Pack, CC-BY 4.0: foresta di notte, onde: va citato l'autore)"
+      ]
+    },
+    "amb_ley_hum": {
+      "stato": "scaricato",
+      "file": "assets/audio/amb_ley_hum.ogg",
+      "originale": "dungeon_ambient_1.ogg",
+      "autore": "Paul Wortmann",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/loopable-dungeon-ambience",
+      "pacchetto": "https://opengameart.org/sites/default/files/dungeon_ambient_1.ogg"
+    },
+    "amb_marche_giorno": {
+      "stato": "da_scegliere",
+      "perche": "ambiente di regione: nessun CC0 sicuro trovato per mare, foresta, neve, nebbia",
+      "candidati": [
+        "https://opengameart.org/content/loopable-dungeon-ambience (CC0, vento e gocce: sottosuolo)",
+        "https://opengameart.org/node/180349 (Nature Ambient Pack, CC-BY 4.0: foresta di notte, onde: va citato l'autore)"
+      ]
+    },
+    "amb_marche_notte": {
+      "stato": "da_scegliere",
+      "perche": "ambiente di regione: nessun CC0 sicuro trovato per mare, foresta, neve, nebbia",
+      "candidati": [
+        "https://opengameart.org/content/loopable-dungeon-ambience (CC0, vento e gocce: sottosuolo)",
+        "https://opengameart.org/node/180349 (Nature Ambient Pack, CC-BY 4.0: foresta di notte, onde: va citato l'autore)"
+      ]
+    },
+    "amb_outer_drone": {
+      "stato": "scaricato",
+      "file": "assets/audio/amb_outer_drone.ogg",
+      "originale": "freezer.ogg",
+      "autore": "congusbongus",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/abandoned-passages-horror-ambience-loop",
+      "pacchetto": "https://opengameart.org/sites/default/files/freezer.ogg"
+    },
+    "amb_spirit_faint": {
+      "stato": "scaricato",
+      "file": "assets/audio/amb_spirit_faint.wav",
+      "originale": "shade7.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    },
+    "amb_valle_giorno": {
+      "stato": "da_scegliere",
+      "perche": "ambiente di regione: nessun CC0 sicuro trovato per mare, foresta, neve, nebbia",
+      "candidati": [
+        "https://opengameart.org/content/loopable-dungeon-ambience (CC0, vento e gocce: sottosuolo)",
+        "https://opengameart.org/node/180349 (Nature Ambient Pack, CC-BY 4.0: foresta di notte, onde: va citato l'autore)"
+      ]
+    },
+    "amb_valle_notte": {
+      "stato": "da_scegliere",
+      "perche": "ambiente di regione: nessun CC0 sicuro trovato per mare, foresta, neve, nebbia",
+      "candidati": [
+        "https://opengameart.org/content/loopable-dungeon-ambience (CC0, vento e gocce: sottosuolo)",
+        "https://opengameart.org/node/180349 (Nature Ambient Pack, CC-BY 4.0: foresta di notte, onde: va citato l'autore)"
+      ]
+    },
+    "amb_whisper_chorus": {
+      "stato": "scaricato",
+      "file": "assets/audio/amb_whisper_chorus.wav",
+      "originale": "shade12.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    },
+    "amb_whisper_faint": {
+      "stato": "scaricato",
+      "file": "assets/audio/amb_whisper_faint.wav",
+      "originale": "shade1.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    },
+    "amb_whisper_names": {
+      "stato": "scaricato",
+      "file": "assets/audio/amb_whisper_names.wav",
+      "originale": "shade9.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    },
+    "amb_whisper_words": {
+      "stato": "scaricato",
+      "file": "assets/audio/amb_whisper_words.wav",
+      "originale": "shade5.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    },
+    "mus_archivio_base": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_archivio_boss": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_archivio_combat": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_archivio_tension": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_base_calma": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_citta_base": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_citta_boss": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_citta_combat": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_citta_tension": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_dungeon_base": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_dungeon_boss": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_dungeon_combat": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_dungeon_tension": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_frontiera_base": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_frontiera_boss": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_frontiera_combat": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_frontiera_tension": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_marche_base": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_marche_boss": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_marche_combat": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_marche_tension": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_ritual_drone": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_valle_base": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_valle_boss": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_valle_combat": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "mus_valle_tension": {
+      "stato": "da_scegliere",
+      "perche": "la musica va ascoltata e scelta dall'utente",
+      "candidati": [
+        "https://opengameart.org/content/cc0-music-1 (raccolta CC0: TownTheme, battleThemeA, Boss, ObservingTheStar...)",
+        "https://opengameart.org/node/144972 (15 chiptune in loop CC0: citta', dungeon, battaglia)",
+        "https://opengameart.org/content/paranoid-truth (dark ambient CC0, per la Frontiera o il rituale)"
+      ]
+    },
+    "sfx_breath": {
+      "stato": "da_generare",
+      "perche": "respiro affannoso a salute bassa: nessun file adatto nei pacchetti CC0 trovati"
+    },
+    "sfx_dash": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_dash.wav",
+      "originale": "swing.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    },
+    "sfx_death": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_death.wav",
+      "originale": "mnstr4.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    },
+    "sfx_door_close": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_door_close.ogg",
+      "originale": "doorClose_1.ogg",
+      "autore": "Kenney (kenney.nl)",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/50-rpg-sound-effects",
+      "pacchetto": "https://opengameart.org/sites/default/files/RPGsounds_Kenney.zip"
+    },
+    "sfx_hit_crit": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_hit_crit.ogg",
+      "originale": "knifeSlice2.ogg",
+      "autore": "Kenney (kenney.nl)",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/50-rpg-sound-effects",
+      "pacchetto": "https://opengameart.org/sites/default/files/RPGsounds_Kenney.zip"
+    },
+    "sfx_hit_heavy": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_hit_heavy.ogg",
+      "originale": "chop.ogg",
+      "autore": "Kenney (kenney.nl)",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/50-rpg-sound-effects",
+      "pacchetto": "https://opengameart.org/sites/default/files/RPGsounds_Kenney.zip"
+    },
+    "sfx_hit_light": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_hit_light.ogg",
+      "originale": "knifeSlice.ogg",
+      "autore": "Kenney (kenney.nl)",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/50-rpg-sound-effects",
+      "pacchetto": "https://opengameart.org/sites/default/files/RPGsounds_Kenney.zip"
+    },
+    "sfx_hurt": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_hurt.wav",
+      "originale": "cloth-heavy.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    },
+    "sfx_parry": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_parry.ogg",
+      "originale": "metalClick.ogg",
+      "autore": "Kenney (kenney.nl)",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/50-rpg-sound-effects",
+      "pacchetto": "https://opengameart.org/sites/default/files/RPGsounds_Kenney.zip"
+    },
+    "sfx_parry_perf": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_parry_perf.wav",
+      "originale": "metal-ringing.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    },
+    "sfx_posture_break": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_posture_break.ogg",
+      "originale": "metalPot1.ogg",
+      "autore": "Kenney (kenney.nl)",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/50-rpg-sound-effects",
+      "pacchetto": "https://opengameart.org/sites/default/files/RPGsounds_Kenney.zip"
+    },
+    "sfx_step_behind": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_step_behind.ogg",
+      "originale": "footstep00.ogg",
+      "autore": "Kenney (kenney.nl)",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/50-rpg-sound-effects",
+      "pacchetto": "https://opengameart.org/sites/default/files/RPGsounds_Kenney.zip"
+    },
+    "sfx_tell_heavy": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_tell_heavy.wav",
+      "originale": "ogre2.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    },
+    "sfx_tell_light": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_tell_light.wav",
+      "originale": "sword-unsheathe.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    },
+    "sfx_tell_ranged": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_tell_ranged.wav",
+      "originale": "magic1.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    },
+    "sfx_tell_ritual": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_tell_ritual.wav",
+      "originale": "spell.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    },
+    "sfx_tell_unblock": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_tell_unblock.wav",
+      "originale": "giant1.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    },
+    "sfx_ui_book_open": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_ui_book_open.ogg",
+      "originale": "bookOpen.ogg",
+      "autore": "Kenney (kenney.nl)",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/50-rpg-sound-effects",
+      "pacchetto": "https://opengameart.org/sites/default/files/RPGsounds_Kenney.zip"
+    },
+    "sfx_ui_page": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_ui_page.ogg",
+      "originale": "bookFlip1.ogg",
+      "autore": "Kenney (kenney.nl)",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/50-rpg-sound-effects",
+      "pacchetto": "https://opengameart.org/sites/default/files/RPGsounds_Kenney.zip"
+    },
+    "sfx_whisper_name": {
+      "stato": "scaricato",
+      "file": "assets/audio/sfx_whisper_name.wav",
+      "originale": "shade3.wav",
+      "autore": "artisticdude",
+      "licenza": "CC0",
+      "pagina": "https://opengameart.org/content/rpg-sound-pack",
+      "pacchetto": "https://opengameart.org/sites/default/files/rpg_sound_pack.zip"
+    }
+  },
+  "riserva": {
+    "passi": "Kenney RPG footstep00..09.ogg",
+    "monete": "Kenney handleCoins.ogg, rpg_sound_pack inventory/coin.wav",
+    "bere": "rpg_sound_pack inventory/bottle.wav, bubble.wav",
+    "porta_apre": "Kenney doorOpen_1.ogg",
+    "stoffa_zaino": "Kenney cloth1..4.ogg, handleSmallLeather.ogg",
+    "libro_chiude": "Kenney bookClose.ogg",
+    "spada_sguaina": "rpg_sound_pack battle/sword-unsheathe2..5.wav",
+    "versi_mostri": "rpg_sound_pack NPC/ (beetle, giant, ogre, slime, shade, gutteral beast: 60 file) per i nemici della fase 15",
+    "interfaccia": "Kenney Interface Sounds (100 file: click, select, confirmation, error) per i bottoni del libro"
+  }
+}

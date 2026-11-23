@@ -119,56 +119,76 @@
   },
   "nemici": [
     {
+      "tipo": "custode_della_cripta",
+      "x": 36,
+      "y": 34,
+      "sequenza": 6,
+      "scala": 1.5,
+      "boss": "custode_senza_nome",
+      "override": {
+        "drop_probabilita": 1.0
+      }
+    },
+    {
+      "tipo": "colosso_arrugginito",
+      "x": 50,
+      "y": 34,
+      "sequenza": 5,
+      "scala": 1.5,
+      "boss": "gigante_sul_trono",
+      "override": {
+        "drop_probabilita": 1.0
+      }
+    },
+    {
+      "tipo": "soldato_caduto",
       "x": 7,
       "y": 8,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": {}
+      "scala": 1.0
     },
     {
+      "tipo": "soldato_caduto",
       "x": 20,
       "y": 10,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": {}
+      "scala": 1.0
     },
     {
+      "tipo": "soldato_caduto",
       "x": 63,
       "y": 30,
       "sequenza": 9,
-      "scala": 1.0,
-      "override": {}
+      "scala": 1.0
     },
     {
+      "tipo": "alfiere_spettrale",
       "x": 16,
       "y": 30,
       "sequenza": 8,
-      "scala": 1.0,
-      "override": {}
+      "scala": 1.0
     },
     {
+      "tipo": "alfiere_spettrale",
       "x": 48,
       "y": 12,
       "sequenza": 8,
-      "scala": 1.0,
-      "override": {}
+      "scala": 1.0
     },
     {
+      "tipo": "alfiere_spettrale",
       "x": 59,
       "y": 14,
       "sequenza": 8,
-      "scala": 1.0,
-      "override": {}
+      "scala": 1.0
     },
     {
+      "tipo": "capitano_senza_riposo",
       "x": 37,
       "y": 12,
       "sequenza": 7,
       "scala": 1.5,
       "override": {
-        "danno_attacco": 15,
-        "raggio_aggro": 200,
-        "tag": "non_morto",
         "caratteristica": {
           "pathway_id": "twilight_giant",
           "sequence": 7,
@@ -325,7 +345,7 @@
       "oro_bianco"
     ],
     "7": [
-      "acciaio_stellare",
+      "arma_spezzata", "acciaio_stellare",
       "ectoplasma",
       "moneta_del_traghettatore",
       "piuma_di_civetta_nera",
@@ -336,7 +356,7 @@
       "tendine_di_lupo"
     ],
     "8": [
-      "cera_di_veglia",
+      "arma_spezzata", "cera_di_veglia",
       "chiodo_di_bara",
       "corda_di_impiccato",
       "estratto_di_muscolo",
@@ -347,7 +367,7 @@
       "sale_di_roccia"
     ],
     "9": [
-      "cenere_di_stella_morta",
+      "arma_spezzata", "cenere_di_stella_morta",
       "dente_di_teschio",
       "ferro_temperato",
       "muffa_sepolcrale",
@@ -362,7 +382,8 @@
     {
       "x": 5,
       "y": 44,
-      "interno_id": "base_rifugio", "villaggio": "rifugio_base_marche"
+      "interno_id": "base_rifugio",
+      "villaggio": "rifugio_base_marche"
     }
   ]
 }

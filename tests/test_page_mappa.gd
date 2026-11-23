@@ -87,9 +87,7 @@ func test_un_varco_permanente_del_tg_abilita_il_viaggio() -> void:
 	p.free()
 
 
-## US-1002B (fase 10, mondo continuo): un solo world_scene.gd, viaggia_a
-## riposiziona invece di ricaricare - il gating d'ingresso (US-611) resta
-## lo stesso controllo di prima, solo senza una scena da (ri)caricare.
+## US-1002B / 2026-11-18: il viaggio dalla mappa (mondo.gd viaggia_a) rispetta il gating d'ingresso (US-611).
 func test_viaggia_a_rispetta_il_gating_d_ingresso() -> void:
 	var cont := Node2D.new()
 	_root().add_child(cont)
@@ -97,7 +95,7 @@ func test_viaggia_a_rispetta_il_gating_d_ingresso() -> void:
 	player.name = "Player"
 	player.add_to_group("player")
 	cont.add_child(player)
-	var mondo: Node = load("res://scenes/world_scene.tscn").instantiate()
+	var mondo: Node = preload("res://scripts/world/mondo.gd").new()
 	cont.add_child(mondo)
 
 	_pr().call("configura", "twilight_giant", 9)

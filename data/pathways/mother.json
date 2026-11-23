@@ -631,13 +631,13 @@
       },
       "advancement_ritual": {
         "location_tags": [
-          "bosco_antico",
-          "sorgente"
+          "radice_del_mondo"
         ],
         "momento": "alba",
-        "fase_lunare": null,
+        "fase_lunare": "eclissi",
         "sacrifices": [
-          "ancora_del_giocatore"
+          "ancora_del_giocatore",
+          "il_detentore_precedente_della_sequenza_0"
         ],
         "sigils": []
       },
@@ -706,17 +706,7 @@
         ],
         "formula_id": "formula_mother_0"
       },
-      "advancement_ritual": {
-        "location_tags": [
-          "radice_del_mondo"
-        ],
-        "momento": "alba",
-        "fase_lunare": "eclissi",
-        "sacrifices": [
-          "il_detentore_precedente_della_sequenza_0"
-        ],
-        "sigils": []
-      },
+      "advancement_ritual": null,
       "madness_on_force": 14.0,
       "notes": "",
       "stub": false

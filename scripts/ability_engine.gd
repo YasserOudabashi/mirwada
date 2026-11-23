@@ -231,6 +231,9 @@ func _esegui_primitive(ability: Dictionary, caster: Node, stats: Node, ability_i
 		bersaglio: Node = null) -> void:
 	if bersaglio != null:
 		result["bersaglio"] = bersaglio
+	var bersagli: Array = bersagli_attorno(caster, bersaglio, ability)
+	if bersaglio != null:
+		result["bersagli"] = bersagli
 	var prim_list: Variant = ability.get("primitive", [])
 	if typeof(prim_list) != TYPE_ARRAY:
 		push_error("[AbilityEngine] %s: 'primitive' non e' una lista, abilita' senza effetti" % ability_id)
@@ -262,15 +265,40 @@ func _esegui_primitive(ability: Dictionary, caster: Node, stats: Node, ability_i
 			continue
 
 		var handler: Callable = _handlers[tipo]
-		var su: Node = find_stats(bersaglio) if bersaglio != null and _sul_nemico(prim) else stats
-		var effect: Dictionary = handler.call(prim, caster, su, ability_id)
-		if su != stats:
-			effect["su_bersaglio"] = true      # US-8B44b: il VFX va sul bersaglio (data/vfx.json su)
+		if bersaglio != null and _sul_nemico(prim):
+			# 2026-11-11: un'abilita' d'area (tag_sinergia "area") cade su tutti i nemici attorno al bersaglio.
+			for nodo in bersagli:
+				var eff: Dictionary = handler.call(prim, caster, find_stats(nodo), ability_id)
+				eff["su_bersaglio"] = true      # US-8B44b: il VFX va sul bersaglio (data/vfx.json su)
+				eff["nodo"] = nodo
+				(result["effects"] as Array).append(eff)
+			continue
+		var effect: Dictionary = handler.call(prim, caster, stats, ability_id)
 		(result["effects"] as Array).append(effect)
 
 
 ## US-8B44a: le primitive che colpiscono un altro hanno "bersaglio": "nemico" nel registro (primitives.json);
 ## l'abilita' puo' cambiarlo nei suoi dati ("self" per un costo voluto su di se', come il patto di sangue).
+## I nemici su cui cadono le primitive "sul nemico" di un'abilita': il bersaglio e, se l'abilita' e' d'area
+## (tag_sinergia "area"), tutti gli avversari vivi entro balance.json combattimento.bersaglio.raggio_area da lui.
+func bersagli_attorno(caster: Node, bersaglio: Node, ability: Dictionary) -> Array:
+	if bersaglio == null:
+		return []
+	var out: Array = [bersaglio]
+	if not ("area" in (ability.get("tag_sinergia", []) as Array)) or not (bersaglio is Node2D):
+		return out
+	var c: Variant = (_game_data().call("get_balance", "combattimento") as Dictionary).get("bersaglio")
+	var raggio: float = _num((c as Dictionary).get("raggio_area") if c is Dictionary else null, 72.0)
+	for n in bersaglio.get_tree().get_nodes_in_group(_gruppo_avversario(caster)):
+		if n == bersaglio or n == caster or not (n is Node2D) or not (n as Node2D).is_visible_in_tree():
+			continue
+		var s: Node = find_stats(n)
+		if s != null and float(s.get("hp")) > 0.0 \
+				and (n as Node2D).global_position.distance_to((bersaglio as Node2D).global_position) <= raggio:
+			out.append(n)
+	return out
+
+
 func _sul_nemico(prim: Dictionary) -> bool:
 	var di_base: String = str((_game_data().call("get_primitive", str(prim.get("tipo", ""))) as Dictionary).get("bersaglio", "self"))
 	return str(prim.get("bersaglio", di_base)) == "nemico"

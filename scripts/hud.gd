@@ -1,55 +1,48 @@
 extends CanvasLayer
-## HUD minimo: barra salute e barra spiritualita' agganciate ai segnali di
-## StatsComponent del giocatore. Nessun testo hardcoded: tutto da tr().
+## HUD di gioco (US-8B75d, ridisegnato su richiesta dell'utente): pulito e piccolo, per non stancare l'occhio.
+## In alto a sinistra le barre (vita, spiritualita', recitazione) con il loro emblema, gli status a sole icone e la
+## fiala quando l'avanzamento e' pronto; in basso al centro la hotbar a soli simboli (il nome sta nel libro).
+## I numeri compaiono solo quando un valore cambia. Misure e colori in data/ui/hud.json; barre e slot li disegnano
+## scripts/hud_barra.gd e hud_slot.gd; le icone sono di tools/art/build_hud.py. Nessun testo hardcoded.
 ##
 ## NIENTE class_name: coerente col progetto.
 
-@onready var _barra_hp: ProgressBar = $Root/VBox/HP/Barra
-@onready var _label_hp: Label = $Root/VBox/HP/Etichetta
-@onready var _barra_sp: ProgressBar = $Root/VBox/SP/Barra
-@onready var _label_sp: Label = $Root/VBox/SP/Etichetta
-@onready var _barra_acting: ProgressBar = $Root/VBox/Acting/Barra
-@onready var _label_acting: Label = $Root/VBox/Acting/Etichetta
-@onready var _hotbar: Array = [
-	$Root/VBox/Hotbar/Slot0, $Root/VBox/Hotbar/Slot1,
-	$Root/VBox/Hotbar/Slot2, $Root/VBox/Hotbar/Slot3,
-]
-@onready var _label_avanz: Label = $Root/VBox/Avanzamento
+const Barra := preload("res://scripts/hud_barra.gd")
+const Slot := preload("res://scripts/hud_slot.gd")
+const RIGHE := {"vita": "HP", "spirito": "SP", "recitazione": "Acting"}   # id dei dati -> nome del nodo
 
-## US-802: il cooldown scorre col tempo, non con un segnale — si ridisegna
-## la hotbar ogni 0.1s invece che ogni frame (60 volte al secondo sarebbe
-## sprecato per un numero che cambia percettibilmente una volta ogni tanto).
-var _cd_accum: float = 0.0
-## Il colore del pieno di ogni barra (Endesga 32): vita rossa, spirito blu, recitazione gialla.
-const COLORI_BARRE := {"HP": "#e43b44", "SP": "#0099db", "Acting": "#feae34"}
-## US-8B72: davanti a ogni slot il glifo della prima primitiva dell'abilita', colorato dalla palette del Pathway
-## (shaders/rampa_pathway.gdshader, data/vfx.json): un materiale per tutti, si aggiorna se cambia il Pathway.
-var _icone: Array = []
+var _cfg: Dictionary = {}
+var _barre: Dictionary = {}          # id -> barra
+var _numeri: Dictionary = {}         # id -> Label (solo vita e spirito)
+var _numeri_t: Dictionary = {}       # id -> secondi che restano a vista
+var _slot: Array = []
 var _rampa := ShaderMaterial.new()
 var _rampa_di: String = "?"
-
-
-## US-8B75b: corpo dei nomi della hotbar. Piu' piccolo delle barre: la hotbar e' una griglia 2x2 (icona + nome) e col
-## nome piu' lungo dei dati due slot affiancati stanno nello schermo (lo controlla un test).
-const CORPO_HOTBAR := 12
+var _avanzamento: TextureRect = null
+var _stats: Node = null
+var _stati: HBoxContainer = null
+var _cd_accum: float = 0.0
+var _tempo: float = 0.0
+var _durate: Dictionary = {}       # status -> durata vista quando e' comparso (per la linea del tempo)
+var _boss: VBoxContainer = null    # US-1505: nome e barra del boss in alto al centro, solo ad arena chiusa
+var _boss_stats: Node = null
 
 
 func _ready() -> void:
 	add_to_group("hud")                                # US-8B24b: il cannocchiale lo nasconde mentre si guarda
-	for l in find_children("*", "Label", true, false):  # contorno scuro come i prompt: si legge su ogni fondo
-		(l as Label).add_theme_constant_override("outline_size", 4)
-		(l as Label).add_theme_color_override("font_outline_color", Color("#181425"))
-	for nome in COLORI_BARRE:                          # barre piene di colore su fondo scuro (Endesga 32)
-		var fondo := StyleBoxFlat.new()
-		fondo.bg_color = Color("#181425")
-		fondo.border_color = Color("#3a4466")
-		fondo.set_border_width_all(1)
-		var pieno := StyleBoxFlat.new()
-		pieno.bg_color = Color(COLORI_BARRE[nome])
-		var barra: ProgressBar = get_node("Root/VBox/%s/Barra" % nome)
-		barra.add_theme_stylebox_override("background", fondo)
-		barra.add_theme_stylebox_override("fill", pieno)
-		barra.size_flags_vertical = Control.SIZE_SHRINK_CENTER    # in mezzo alla scritta, non in cima
+	var gd: Node = get_node_or_null("/root/GameData")
+	_cfg = gd.call("get_ui_hud") if gd != null else {}
+	var angolo: Array = _cfg.get("angolo", [10, 9])
+	$Root/Vitali.position = Vector2(float(angolo[0]), float(angolo[1]))
+	for id in ["vita", "spirito", "recitazione"]:
+		_monta_riga(id)
+	_stati = HBoxContainer.new()                       # status del giocatore: solo icone, con il tempo sotto
+	_stati.name = "Stati"
+	_stati.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stati.add_theme_constant_override("separation", 3)
+	$Root/Vitali.add_child(_stati)
+	_monta_hotbar()
+
 	var acting: Node = get_node_or_null("/root/Acting")
 	if acting != null:
 		acting.acting_progress_changed.connect(_su_acting)
@@ -59,8 +52,6 @@ func _ready() -> void:
 		pozioni.pozione_creata.connect(func(_s: int, _p: bool) -> void: _aggiorna_avanzamento())
 		pozioni.pozione_bevuta.connect(func(_a: bool, _f: bool) -> void: _aggiorna_avanzamento())
 	_aggiorna_avanzamento()
-	_monta_icone()
-
 	var ae: Node = get_node_or_null("/root/AbilityEngine")
 	if ae != null:
 		ae.ability_executed.connect(_su_abilita_eseguita)
@@ -75,100 +66,207 @@ func _ready() -> void:
 	if stats == null:
 		push_warning("[HUD] nessun giocatore con StatsComponent in scena")
 		return
-
+	_stats = stats
+	stats.status_cambiati.connect(_aggiorna_stati)
 	stats.hp_changed.connect(_su_hp)
 	stats.spiritualita_changed.connect(_su_sp)
-	_su_hp(float(stats.get("hp")), stats.get_stat("hp_max"))
-	_su_sp(float(stats.get("spiritualita")), stats.get_stat("spiritualita_max"))
+	_su_hp(float(stats.get("hp")), stats.get_stat("hp_max"), true)
+	_su_sp(float(stats.get("spiritualita")), stats.get_stat("spiritualita_max"), true)
+	_aggiorna_stati()
 
 
-func _su_hp(hp: float, hp_max: float) -> void:
-	_barra_hp.max_value = hp_max
-	_barra_hp.value = hp
-	_label_hp.text = "%s  %s" % [
-		tr("HUD_HP"),
-		tr("HUD_HP_VALORE").format([roundi(hp), roundi(hp_max)]),
-	]
+## Una riga: l'emblema (12x12 pixel a 1:1), la barra e, per vita e spirito, il numero che appare quando cambia.
+func _monta_riga(id: String) -> void:
+	var dati: Dictionary = (_cfg.get("barre", {}) as Dictionary).get(id, {})
+	var riga := HBoxContainer.new()
+	riga.name = RIGHE[id]
+	riga.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	riga.add_theme_constant_override("separation", 3)
+	$Root/Vitali.add_child(riga)
+	var em := _icona(str(dati.get("emblema", "")), 6.0)
+	em.name = "Emblema"
+	riga.add_child(em)
+	var b: Control = Barra.new()
+	b.name = "Barra"
+	b.call("configura", dati, _cfg, id == "vita")
+	riga.add_child(b)
+	_barre[id] = b
+	if id == "recitazione":
+		_avanzamento = _icona(str((_cfg.get("avanzamento", {}) as Dictionary).get("icona", "fiala")), 6.0)
+		_avanzamento.name = "Avanzamento"
+		riga.add_child(_avanzamento)
+		return
+	var n := Label.new()
+	n.name = "Numero"
+	n.add_theme_font_size_override("font_size", int((_cfg.get("numeri", {}) as Dictionary).get("corpo", 8)))
+	n.add_theme_constant_override("outline_size", 3)
+	n.add_theme_color_override("font_outline_color", Color(str(_cfg.get("contorno", "#181425"))))
+	n.modulate.a = 0.0
+	n.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	riga.add_child(n)
+	_numeri[id] = n
 
 
-func _su_sp(sp: float, sp_max: float) -> void:
-	_barra_sp.max_value = sp_max
-	_barra_sp.value = sp
-	_label_sp.text = "%s  %s" % [
-		tr("HUD_SPIRITUALITA"),
-		tr("HUD_HP_VALORE").format([roundi(sp), roundi(sp_max)]),
-	]
+func _icona(nome: String, lato: float) -> TextureRect:
+	var ic := TextureRect.new()
+	ic.texture = load("res://assets/ui/hud/%s.png" % nome) as Texture2D if not nome.is_empty() else null
+	ic.custom_minimum_size = Vector2(lato, lato)
+	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	ic.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return ic
+
+
+func _monta_hotbar() -> void:
+	_rampa.shader = preload("res://shaders/rampa_pathway.gdshader")
+	var h: Dictionary = _cfg.get("hotbar", {})
+	var bar: HBoxContainer = $Root/Hotbar
+	bar.add_theme_constant_override("separation", int(h.get("spazio", 4)))
+	var lato: float = float(h.get("lato", 22))
+	var n: int = 4
+	var larg: float = n * lato + (n - 1) * float(h.get("spazio", 4))
+	bar.offset_left = -larg / 2.0
+	bar.offset_right = larg / 2.0
+	bar.offset_bottom = -float(h.get("dal_basso", 8))
+	bar.offset_top = bar.offset_bottom - lato
+	for i in n:
+		var s: Control = Slot.new()
+		s.name = "Slot%d" % i
+		s.call("configura", h, _cfg, i + 1, _rampa)
+		bar.add_child(s)
+		_slot.append(s)
+
+
+func _su_hp(hp: float, hp_max: float, subito: bool = false) -> void:
+	_valore("vita", hp, hp_max, subito)
+
+
+func _su_sp(sp: float, sp_max: float, subito: bool = false) -> void:
+	_valore("spirito", sp, sp_max, subito)
+	_aggiorna_hotbar()
+
+
+func _valore(id: String, v: float, v_max: float, subito: bool) -> void:
+	(_barre[id] as Control).call("imposta", v / maxf(v_max, 1.0), subito)
+	var n: Label = _numeri.get(id)
+	n.text = tr("HUD_HP_VALORE").format([roundi(v), roundi(v_max)])
+	if not subito:
+		_numeri_t[id] = float((_cfg.get("numeri", {}) as Dictionary).get("mostra_s", 1.6))
 
 
 func _su_acting(valore: float) -> void:
-	_barra_acting.value = valore
-	_label_acting.text = tr("HUD_RECITAZIONE")
+	(_barre["recitazione"] as Control).call("imposta", valore)
 	_aggiorna_avanzamento()
 
 
-## US-212: mostra se l'avanzamento e' PRONTO (recitazione completa) o solo
-## FORZABILE (pozione pronta ma recitazione incompleta). Nascosto se non c'e'
-## una pozione.
+## US-212: la fiala accanto alla recitazione quando c'e' una pozione pronta: piena e che batte se l'avanzamento e'
+## pronto, spenta se si potrebbe solo forzare. Niente scritte.
 func _aggiorna_avanzamento() -> void:
 	var pozioni: Node = get_node_or_null("/root/PotionSystem")
-	if pozioni == null or pozioni.call("pozione_pronta").is_empty():
-		_label_avanz.hide()
+	if _avanzamento == null:
 		return
-	_label_avanz.show()
-	if pozioni.call("avanzamento_disponibile"):
-		_label_avanz.text = tr("HUD_AVANZAMENTO_PRONTO")
-	else:
-		_label_avanz.text = tr("HUD_AVANZAMENTO_FORZATO")
+	_avanzamento.visible = pozioni != null and not (pozioni.call("pozione_pronta") as Dictionary).is_empty()
+	_avanzamento.set_meta("pronto", _avanzamento.visible and bool(pozioni.call("avanzamento_disponibile")))
+	_avanzamento.modulate = Color.WHITE if bool(_avanzamento.get_meta("pronto")) else Color(1, 1, 1, 0.45)
 
 
 func _process(delta: float) -> void:
+	_tempo += delta
+	for id in _numeri_t.keys():                     # i numeri: a vista un attimo, poi sfumano
+		_numeri_t[id] = float(_numeri_t[id]) - delta
+		var dis: float = float((_cfg.get("numeri", {}) as Dictionary).get("dissolvenza_s", 0.5))
+		(_numeri[id] as Label).modulate.a = clampf((float(_numeri_t[id]) + dis) / maxf(dis, 0.01), 0.0, 1.0)
+		if float(_numeri_t[id]) <= -dis:
+			_numeri_t.erase(id)
+	if _avanzamento != null and _avanzamento.visible and bool(_avanzamento.get_meta("pronto", false)):
+		var b: float = float((_cfg.get("avanzamento", {}) as Dictionary).get("battito_s", 1.4))
+		_avanzamento.modulate.a = 0.7 + 0.3 * sin(_tempo * TAU / maxf(b, 0.1))
 	_cd_accum += delta
-	if _cd_accum >= 0.1:
+	if _cd_accum >= 0.05:
 		_cd_accum = 0.0
 		_aggiorna_hotbar()
+		_aggiorna_tempi_stati()
 
 
-## US-802: quando parte un'abilita' del giocatore, lo slot che l'ha lanciata
-## lampeggia - cosi' si vede A COLPO D'OCCHIO che si e' usata un'abilita' (e
-## quale), non solo dal numero di spiritualita' che cala.
+## US-802: lo slot che ha lanciato l'abilita' lampeggia.
 func _su_abilita_eseguita(ability_id: String, caster: Node, result: Dictionary) -> void:
 	_aggiorna_hotbar()
 	if caster == null or not caster.is_in_group("player") or not bool(result.get("ok", false)):
 		return
 	var ae: Node = get_node_or_null("/root/AbilityEngine")
-	var owned: Array = ae.call("hotbar", caster) if ae != null else []
-	var idx: int = owned.find(ability_id)
-	if idx < 0 or idx >= _hotbar.size():
-		return
-	var lbl: Label = _hotbar[idx]
-	lbl.modulate = Color(1.7, 1.7, 0.5)
-	create_tween().tween_property(lbl, "modulate", Color.WHITE, 0.45)
+	var idx: int = (ae.call("hotbar", caster) as Array).find(ability_id) if ae != null else -1
+	if idx >= 0 and idx < _slot.size():
+		(_slot[idx] as Control).call("lampeggia")
 
 
 ## US-8B75b: unita' di schermo occupate dall'HUD dall'alto (la camera degli interni le lascia libere).
 func altezza() -> float:
-	var v: Control = $Root/VBox
-	return ($Root as Control).position.y + v.get_combined_minimum_size().y
+	var v: Control = $Root/Vitali
+	return v.position.y + v.get_combined_minimum_size().y
 
 
-func _monta_icone() -> void:
-	_rampa.shader = preload("res://shaders/rampa_pathway.gdshader")
-	for lbl in _hotbar:
-		(lbl as Label).add_theme_font_size_override("font_size", CORPO_HOTBAR)   # US-8B75b: due slot per riga
+## US-8B75d: e dal basso (la hotbar).
+func altezza_sotto() -> float:
+	var h: Dictionary = _cfg.get("hotbar", {})
+	return float(h.get("lato", 22)) + float(h.get("dal_basso", 8))
+
+
+## Gli status: un'icona per status (10 unita'), con sotto una linea che si accorcia col tempo che resta e che
+## lampeggia negli ultimi secondi. Il nome sta nel libro.
+func _aggiorna_stati() -> void:
+	for c in _stati.get_children():
+		_stati.remove_child(c)
+		c.queue_free()
+	var gd: Node = get_node_or_null("/root/GameData")
+	var ids: Array = _stats.call("status_attivi") if _stats != null else []
+	ids.sort()
+	for k in _durate.keys():
+		if not ids.has(k):
+			_durate.erase(k)
+	var lato: float = float((_cfg.get("stati", {}) as Dictionary).get("lato", 10))
+	for id in ids:
+		var box := VBoxContainer.new()                # l'icona e sotto la linea del tempo che resta
+		box.name = str(id)
+		box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_theme_constant_override("separation", 1)
 		var ic := TextureRect.new()
-		ic.name = "Icona" + str((lbl as Node).name).trim_prefix("Slot")
-		ic.custom_minimum_size = Vector2(16, 16)
+		ic.name = "Icona"
+		ic.texture = gd.call("icona_stato", id) if gd != null else null
+		ic.custom_minimum_size = Vector2(lato, lato)
 		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		ic.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		ic.material = _rampa
-		(lbl as Node).get_parent().add_child(ic)
-		(lbl as Node).get_parent().move_child(ic, (lbl as Node).get_index())
-		_icone.append(ic)
+		ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(ic)
+		var linea := ColorRect.new()
+		linea.name = "Tempo"
+		linea.color = Color(str((_cfg.get("stati", {}) as Dictionary).get("tempo", "#c0cbdc")))
+		linea.custom_minimum_size = Vector2(lato, 0.5)
+		linea.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		linea.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(linea)
+		_stati.add_child(box)
+	_stati.visible = not ids.is_empty()
 
 
-## La palette del Pathway del giocatore nella rampa: scuro = primario verso l'inchiostro.
+func _aggiorna_tempi_stati() -> void:
+	if _stati == null or not _stati.visible:
+		return
+	var st: Dictionary = _cfg.get("stati", {})
+	var ultimi: float = float(st.get("lampeggio_ultimi_s", 2.0))
+	for box in _stati.get_children():
+		var resta: float = float(_stats.call("status_rimasto", str(box.name))) if _stats != null else -1.0
+		var durata: float = maxf(float(_durate.get(str(box.name), resta)), resta)     # quanto durava quando e' comparso
+		_durate[str(box.name)] = durata
+		var linea: ColorRect = box.get_node("Tempo")
+		linea.visible = resta >= 0.0
+		linea.custom_minimum_size.x = roundf(float(st.get("lato", 10)) * clampf(resta / maxf(durata, 0.01), 0.0, 1.0) * 2.0) / 2.0
+		(box as CanvasItem).modulate.a = (0.35 if fmod(_tempo, 0.4) < 0.2 else 1.0) if resta >= 0.0 and resta < ultimi else 1.0
+
+
+## La palette del Pathway del giocatore nella rampa dei glifi: scuro = primario verso l'inchiostro.
 func _aggiorna_rampa(gd: Node) -> void:
 	var prog: Node = get_node_or_null("/root/Progression")
 	var pw: String = str(prog.call("pathway")) if prog != null else ""
@@ -194,33 +292,68 @@ func _icona_abilita(gd: Node, ab: Dictionary) -> Texture2D:
 	return null
 
 
-## US-802: una riga per slot 1-4, dalle abilita' possedute
-## (AbilityEngine.owned_abilities del giocatore, stesso ordine dei tasti
-## abilita_1..4 in player.gd). Nessun nome hardcoded: il testo viene da
-## GameData.tr_data sul name_i18n dell'abilita'.
+## US-802 / US-8B75d: gli slot 1-4 dalle abilita' nei tasti (AbilityEngine.hotbar), solo il simbolo.
 func _aggiorna_hotbar() -> void:
 	var ae: Node = get_node_or_null("/root/AbilityEngine")
 	var gd: Node = get_node_or_null("/root/GameData")
 	var p: Node = get_tree().get_first_node_in_group("player")
 	var owned: Array = ae.call("hotbar", p) if ae != null and p != null else []
 	_aggiorna_rampa(gd)
-	for i in _hotbar.size():
-		var lbl: Label = _hotbar[i]
-		var ic: TextureRect = _icone[i] if i < _icone.size() else null
-		if i >= owned.size() or str(owned[i]).is_empty():
-			lbl.text = "%d  %s" % [i + 1, tr("HUD_HOTBAR_VUOTO")]
-			if ic != null:
-				ic.visible = false
+	var sp: float = float(_stats.get("spiritualita")) if _stats != null else INF
+	for i in _slot.size():
+		var s: Control = _slot[i]
+		if i >= owned.size() or str(owned[i]).is_empty() or gd == null:
+			s.call("imposta", "", null, 0.0, false)
 			continue
 		var aid: String = str(owned[i])
-		var ab: Dictionary = gd.call("get_ability", aid) if gd != null else {}
-		if ic != null:
-			ic.texture = _icona_abilita(gd, ab) if gd != null else null
-			ic.visible = ic.texture != null
-			ic.modulate.a = 0.45 if ae != null and float(ae.call("cooldown_left", p, aid)) > 0.0 else 1.0
-		var nome: String = str(gd.call("tr_data", ab.get("name_i18n", aid))) if gd != null else aid
+		var ab: Dictionary = gd.call("get_ability", aid)
 		var cd: float = float(ae.call("cooldown_left", p, aid)) if ae != null else 0.0
-		if cd > 0.0:
-			lbl.text = "%d  %s  %.1fs" % [i + 1, nome, cd]
-		else:
-			lbl.text = "%d  %s" % [i + 1, nome]
+		var cd_tot: float = maxf(float(ab.get("cooldown", 0.0)), cd)
+		s.call("imposta", aid, _icona_abilita(gd, ab), cd / cd_tot if cd_tot > 0.0 else 0.0,
+			float(ab.get("costo_spiritualita", 0.0)) > sp)
+
+
+## US-1505: la barra del boss (hud.json barre.boss) col suo nome, in alto al centro. La chiama scripts/boss.gd quando
+## l'arena si chiude; nascondi_boss quando si riapre.
+func mostra_boss(nome: String, stats: Node) -> void:
+	nascondi_boss()
+	_boss = VBoxContainer.new()
+	_boss.name = "Boss"
+	_boss.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_boss.add_theme_constant_override("separation", 1)
+	var dati: Dictionary = (_cfg.get("barre", {}) as Dictionary).get("boss", {})
+	var larg: float = float(dati.get("larghezza", 200))
+	_boss.anchor_left = 0.5
+	_boss.anchor_right = 0.5
+	_boss.offset_left = -larg / 2.0
+	_boss.offset_right = larg / 2.0
+	_boss.offset_top = float(dati.get("dall_alto", 10))
+	var l := Label.new()
+	l.text = nome
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.add_theme_font_size_override("font_size", int((_cfg.get("numeri", {}) as Dictionary).get("corpo", 8)))
+	l.add_theme_constant_override("outline_size", 3)
+	l.add_theme_color_override("font_outline_color", Color(str(_cfg.get("contorno", "#181425"))))
+	_boss.add_child(l)
+	var b: Control = Barra.new()
+	b.name = "Barra"
+	b.call("configura", dati, _cfg)
+	_boss.add_child(b)
+	$Root.add_child(_boss)
+	_boss_stats = stats
+	b.call("imposta", float(stats.get("hp")) / maxf(stats.get_stat("hp_max"), 1.0), true)
+	stats.hp_changed.connect(_su_hp_boss)
+
+
+func nascondi_boss() -> void:
+	if _boss_stats != null and is_instance_valid(_boss_stats) and _boss_stats.hp_changed.is_connected(_su_hp_boss):
+		_boss_stats.hp_changed.disconnect(_su_hp_boss)
+	_boss_stats = null
+	if _boss != null and is_instance_valid(_boss):
+		_boss.queue_free()
+	_boss = null
+
+
+func _su_hp_boss(hp: float, hp_max: float) -> void:
+	if _boss != null and is_instance_valid(_boss):
+		_boss.get_node("Barra").call("imposta", hp / maxf(hp_max, 1.0))

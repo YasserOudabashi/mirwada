@@ -46,11 +46,14 @@ func stato(quest_id: String) -> String:
 	return "non_iniziata"
 
 
-## Avvia una quest. No-op se non e' 'non_iniziata' o se il dato non esiste.
+## Avvia una quest. No-op se non e' 'non_iniziata', se il dato non esiste o se una exclusive_with e' completata.
 ## Le quest di exclusive_with ancora attive e fallibili diventano 'fallite'.
 func avvia(quest_id: String) -> bool:
 	if stato(quest_id) != "non_iniziata" or _quest(quest_id).is_empty():
 		return false
+	for altra in _quest(quest_id).get("exclusive_with", []):
+		if stato(str(altra)) == "completata":
+			return false   # US-1303: il lato e' gia' scelto, l'altra quest non parte piu'
 	for altra in _quest(quest_id).get("exclusive_with", []):
 		if stato(str(altra)) == "attiva" and bool(_quest(str(altra)).get("fallibile", false)):
 			_fallisci_interno(str(altra))
@@ -160,7 +163,9 @@ func _applica_effetto(eff: Variant) -> void:
 				fs.call("modifica", str(e.get("faction_id", "")), float(e.get("delta", 0.0)), "quest")
 		"ancora":
 			var ns: Node = get_node_or_null("/root/NpcSystem")
-			if ns != null:
+			if ns != null and e.has("forza"):       # US-1308: regola la forza di un'Ancora gia' attiva, non ne crea una
+				ns.call("forza_ancora", str(e.get("npc_id", "")), float(e.get("forza", 0.0)))
+			elif ns != null:
 				ns.call("promuovi_ancora", str(e.get("npc_id", "")))
 		"apri_vendita":
 			apri_vendita.emit(str(e.get("npc_id", "")))

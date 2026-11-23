@@ -977,7 +977,7 @@
       "title": "Cannocchiale da tasca",
       "description": "Un oggetto cannocchiale nello zaino: usandolo la vista si allunga nella direzione dello sguardo, con la lente di US-8B24b.",
       "acceptanceCriteria": [
-        "oggetto nei dati (non vendibile o da negozio: decisione dell'utente)",
+        "oggetto nei dati, in vendita da un mercante di Mirwada (decisione dell'utente 2026-11-11)",
         "riusa scripts/cannocchiale.gd con bersaglio davanti al giocatore",
         "Verifica a schermo documentata in progress.txt",
         "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
@@ -985,7 +985,7 @@
       "priority": 115,
       "fase": "8b",
       "passes": false,
-      "notes": ""
+      "notes": "Decisione dell'utente (2026-11-11): il cannocchiale da tasca si compra a Mirwada."
     },
     {
       "id": "US-8B27",
@@ -999,8 +999,8 @@
       ],
       "priority": 116,
       "fase": "8b",
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "2026-11-14 (richiesta dell'utente: 'metti faro e finestre accesi'). scripts/world/luci_notte.gd, dati in luce.json 'luci': aloni a gradini additivi sopra il buio; una casa su due con le finestre accese (sempre le stesse), la lanterna del faro con l'alone e il fascio che gira. Forza per momento del giorno. Aperto: i lampioni (il mondo generato non ne ha)."
     },
     {
       "id": "US-8B74b",
@@ -1045,8 +1045,8 @@
       ],
       "priority": 52,
       "fase": "13",
-      "passes": false,
-      "notes": "Spostata nell'Atto II/III (2026-11-10): l'antagonista compare alla soglia della Frontiera (US-1302)."
+      "passes": true,
+      "notes": "FATTA 2026-11-16. Dieci aspetti soglia_01..10 in build_npc.ASPETTI (uno per Pathway, id neutri), fogli idle/walk e ritratti; antagonisti.json 'aspetto', roster npc_antagonista 'da_antagonista': GameData.aspetto_npc() sceglie quello del Pathway del giocatore (mondo, interni, ritratto). Validator: fogli e ritratto per ogni antagonista. Corretto anche l'altezza dei bottoni a capo (pagina_libro.a_capo). Schermo: arte/revisione/soglia_antagonisti.png. 1112 test."
     },
     {
       "id": "US-8B90",
@@ -1089,7 +1089,7 @@
       "priority": 50,
       "fase": "13",
       "passes": true,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1201). 2026-11-10: gia' presente in tutti e 10 (darkness, death, door, error, fool, hermit, moon, mother, paragon, twilight_giant); un test lo tiene fermo (tests/test_ritual.gd)."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md. 2026-11-10: gia' presente in tutti e 10 (darkness, death, door, error, fool, hermit, moon, mother, paragon, twilight_giant); un test lo tiene fermo (tests/test_ritual.gd)."
     },
     {
       "id": "US-1302",
@@ -1103,7 +1103,7 @@
       "priority": 51,
       "fase": "13",
       "passes": true,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1202). 2026-11-11: il nodo del dialogo c'era gia'; il blocco vero era il gate della Frontiera al contrario (aperta alle Sequenze 9-4, chiusa dalla 3). Decisioni dell'utente: si entra dalla Sequenza 4; Fool, Error e Door (gruppo di casa) entrano sempre. Test: di notte l'antagonista e' alla soglia e ci si arriva a piedi dall'arrivo della soglia del faro."
+      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md. 2026-11-11: il nodo del dialogo c'era gia'; il blocco vero era il gate della Frontiera al contrario (aperta alle Sequenze 9-4, chiusa dalla 3). Decisioni dell'utente: si entra dalla Sequenza 4; Fool, Error e Door (gruppo di casa) entrano sempre. Test: di notte l'antagonista e' alla soglia e ci si arriva a piedi dall'arrivo della soglia del faro."
     },
     {
       "id": "US-1303",
@@ -1115,8 +1115,24 @@
       ],
       "priority": 53,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1203)."
+      "passes": true,
+      "notes": "FATTA 2026-11-16. q_ottavia_02 'Carte che camminano' (Ottavia la offre da tier mid, col lasciapassare) e q_bruno_02 'Carte che restano', exclusive_with fra loro: passo 1 evento npc_influenced modo aiutato (una mano a Bruno di notte), poi nel dialogo di Bruno si sceglie Ordine (+25/-15) o porto (+25/-15). La reputazione sta nelle ricompense: una volta sola. QuestSystem.avvia non parte se una exclusive_with e' completata. tests/test_quest_fazione.gd (4). Schermo: arte/revisione/quest_fazione.png. Trovato: la pagina Diario e' vuota (US-1303b)."
+    },
+    {
+      "id": "US-1303b",
+      "title": "Il Diario mostra le quest",
+      "description": "La pagina Diario del libro (tipo journal_quest, gia' nel vocabolario) e' un appunto a matita: il giocatore non vede le quest che ha. Mostra le quest in corso col passo corrente e quelle concluse o fallite.",
+      "acceptanceCriteria": [
+        "a sinistra le quest in corso: nome, passo corrente, conteggio per i passi a evento",
+        "a destra le concluse e le fallite",
+        "niente testo sulla piega",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 53,
+      "fase": "13",
+      "passes": true,
+      "notes": "FATTA 2026-11-16. Il Diario c'era gia' come sezione della pagina inventario (US-616b); le pagine Diario e Sinergie del libro erano due appunti a matita. Ora in book.json sono tipo inventario con 'sezione': book_overlay la passa a apri_sezione(). Il segnalibro del Diario porta alle quest. tests/test_book.gd, test_book_overlay.gd (+1). Schermo: arte/revisione/diario_quest.png. 1117 test."
     },
     {
       "id": "US-1304",
@@ -1128,8 +1144,8 @@
       ],
       "priority": 54,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1204)."
+      "passes": true,
+      "notes": "FATTA 2026-11-16. Prima accettare il duello scriveva solo un flag. Ora roster npc_aldo 'duello' (flag_inizio, flag_offerta, dialogo_vinto, dialogo_perso, override, pausa_s) e scripts/world/duelli.gd (figlio del mondo): finito il dialogo che ha scritto il flag, Aldo lascia il posto a un nemico con la sua Sequenza e il suo nome; battuto lui o caduto il giocatore, Aldo torna e parte dlg_aldo_vinto o dlg_aldo_perso, che scrivono aldo_duello_vinto/perso (e aldo_rispetto). L'offerta si spende e torna al prossimo salto di tier. Nessuna regola di combattimento nuova. tests/test_duelli.gd (3). Schermo: arte/revisione/duello_aldo.png. Aperto: in combattimento Aldo ha la figura di nemico_base (fase 15)."
     },
     {
       "id": "US-1305",
@@ -1141,8 +1157,8 @@
       ],
       "priority": 55,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1205)."
+      "passes": true,
+      "notes": "FATTA come controllo 2026-11-16. Nell'Atto II (Sequenze 6 -> 4) non c'e' nessun rituale: si avanza con la pozione, e la partita di US-1306 lo prova. I rituali cominciano dalla Sequenza 4 in giu' (50: 5 per Pathway) e li' il controllo ha trovato tre buchi veri, che sono story nuove: nel gioco nessuno avvia un rituale (US-1305b), 19 luoghi chiesti dai rituali non sono sulla mappa (US-1305c), i 33 sacrifici sono frasi e non cose che il giocatore puo' dare (US-1305d)."
     },
     {
       "id": "US-1306",
@@ -1154,8 +1170,53 @@
       ],
       "priority": 56,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1206)."
+      "passes": true,
+      "notes": "FATTA 2026-11-16. tests/manual/qa_atto_2.gd (Xvfb): Sequenza 7 -> 6 con la pozione (salto di tier, Aldo offre il duello), duello vinto e dialogo, quest di fazione con Ottavia e Bruno (carte all'Ordine), 6 -> 5, tribolazione del salto 5 -> 4 superata, 5 -> 4. 26 controlli, tutti ok. Scorciatoie dichiarate nel file. Foto: arte/revisione/qa_atto_2.png. Corretto un errore nei log: la pagina del dialogo voltata via rispondeva ancora ai segnali."
+    },
+    {
+      "id": "US-1305b",
+      "title": "Il rituale si compie nel mondo",
+      "description": "Dalla Sequenza 4 l'avanzamento e' un rituale (RitualSystem, US-217), ma nel gioco nessuno lo avvia: il mondo non dice al rituale dove e quando si e', e nel libro non c'e' il gesto. Oggi si avanza solo con la pozione, e il finale dell'Apoteosi (flag rituale_sequenza_0_completato) non si puo' raggiungere.",
+      "acceptanceCriteria": [
+        "il mondo passa a RitualSystem il luogo (zona) e il tempo (TimeSystem)",
+        "nella pagina del diagramma si vede cosa chiede il rituale e cosa manca, e si puo' compierlo",
+        "regole decise dall'utente: pozione e rituale, luogo (uno dei due o tutti e due)",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 56,
+      "fase": "13",
+      "passes": true,
+      "notes": "FATTA 2026-11-16 con le decisioni dell'utente. RitualSystem prende luogo e tempo dal mondo (WorldState.zona_corrente, TimeSystem), dei luoghi ne basta uno, richieste() elenca cosa chiede e cosa c'e', compi() lo avvia con la pozione pronta e alla fine la beve (PotionSystem.bevi_nel_rituale). Fuori dal rituale, dove la Sequenza ne ha uno, la pozione non si beve (serve_il_rituale). Un colpo subito lo interrompe. Pagina del diagramma: sezione del rituale con i segni e il bottone 'Compi il rituale' (chiude il libro). Nomi di luoghi, ore, lune, sigilli e sacrifici in book.json etichette. tests/test_ritual.gd (+5). Schermo: arte/revisione/rituale_nel_mondo.png. Aperto per US-1305c/d: luoghi mancanti (e il passo tra le rupi sta sul bordo della regione), sacrifici e sigilli ancora dati a mano nei test."
+    },
+    {
+      "id": "US-1305c",
+      "title": "I luoghi dei rituali sulla mappa",
+      "description": "19 location_tags chiesti dai rituali non hanno un posto sul mondo generato (marche: cripta, luogo_di_massacro, luogo_in_decadenza, rovina, tempio_abbandonato, vetta; valle: altare_di_radici, radura_lunare, sorgente; archivio: biblioteca_di_tutto, officina, sala_dei_sigilli, studio; frontiera: crocevia, nebbia_grigia, palco, porta_senza_stanza, teatro; mirwada: sotterraneo). Gli interni dei varchi (cripta, tempio, radura, sala dei sigilli) non dicono al mondo la loro zona.",
+      "acceptanceCriteria": [
+        "ogni luogo di un rituale non-stub e' un posto dove il giocatore puo' stare: un luogo della mappa (luoghi_mondo) o un interno che dichiara la sua zona",
+        "la mappa approvata non si rigenera",
+        "un test lo controlla per tutti i 50 rituali",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 56,
+      "fase": "13",
+      "passes": true,
+      "notes": "FATTA 2026-11-16. Dentro un interno si e' nella sua zona (varco.zona, o 'zona' nei dati dell'interno: sotterraneo, archivio, officina, torre di osservazione, teatro); regions.json 'zone_anche' fa valere una zona anche come altri luoghi (Trono del Gigante = vetta, campo di battaglia = luogo di massacro, tempio = luogo in decadenza e rovina, altare di radici = radura lunare, Radice del Mondo = sorgente, sala dei sigilli = Biblioteca di Tutto, soglia = crocevia, nebbia = porta senza stanza, teatro = palco). Nuovo: il teatro abbandonato della Frontiera (interno frontiera_teatro, varco sempre aperto vicino all'approdo). Il validator vuole un posto per ogni luogo di ogni rituale. tests/test_luoghi_rituali.gd (2). Foto: arte/revisione/teatro_frontiera.png. Resta: il punto 'passo_tra_rupi' e' sul bordo della regione."
+    },
+    {
+      "id": "US-1305d",
+      "title": "I sacrifici dei rituali",
+      "description": "I 33 sacrifici dei rituali sono frasi ('un ricordo a cui tenevi', 'dieci anni della propria eta''): solo l'Ancora e' modellata. Vanno resi cose che il giocatore puo' dare, come deciso dall'utente.",
+      "acceptanceCriteria": [
+        "ogni sacrificio ha un modo dichiarato nei dati di essere dato (costo vero dove esiste, altrimenti scelta narrata)",
+        "i 5 sigilli dei rituali si possono avere nel gioco",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 56,
+      "fase": "13",
+      "passes": true,
+      "notes": "FATTA 2026-11-16 con la decisione dell'utente (costo vero dove c'e'). balance.json rituale.sacrifici: per ognuno dei 33 il tipo di costo (ancora, flag, oggetto, equip, struttura, salute, follia, fondamenta). RitualSystem: costo(), pagabile(), offri(), _paga() a fine rituale; i sacrifici scelti dal giocatore si offrono dal libro (bottone Offri, spento se non hai di che pagare). I sigilli dei rituali sono oggetti dello zaino che non si consumano: 5 nuovi + l'arma spezzata in data/items/materiali.json, venduti da Greta (Marche) e Dario (Archivio). Equipment.distruggi_slot. tests/test_ritual.gd (+3). Schermo: arte/revisione/rituale_sacrifici.png. Aperto: il pet non si puo' ancora avere nel gioco, quindi i sacrifici che parlano di creature pesano sulla follia; i sigilli si comprano soltanto."
     },
     {
       "id": "US-1307",
@@ -1166,8 +1227,8 @@
       ],
       "priority": 57,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1207)."
+      "passes": true,
+      "notes": "FATTA 2026-11-16. dlg_doran: affrontarlo a tier saint porta al nodo n4 (Doran ha un fascicolo e chiede: devo venire io a fermarti?), con due rami: patto (doran_patto, giustizia +20) o sfida (doran_nemico, giustizia -20). Il flag della tribolazione resta quello di prima. Condizione nuova dei dialoghi 'flag_assente' (conditions.gd): la scena si fa una volta. tests/test_atto_3_dialoghi.gd."
     },
     {
       "id": "US-1308",
@@ -1178,8 +1239,8 @@
       ],
       "priority": 58,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1208)."
+      "passes": true,
+      "notes": "FATTA 2026-11-16. dlg_lena a tier saint: 'Mi riconosci ancora?' -> due rami che avviano q_lena_02 (forza dell'Ancora a 10) o q_lena_03 (a 2), exclusive fra loro. L'effetto 'ancora' delle quest con 'forza' regola un'Ancora gia' attiva. Trovato e corretto: le Ancore-persona (Mirco, Vesna, Lena) erano solo un nome in NpcSystem, non entravano in AnchorSystem: non fermavano la follia e non si potevano sacrificare. Ora promuovi_ancora le registra (anchors.json: aggiunte anchor_vesna e anchor_lena)."
     },
     {
       "id": "US-1309",
@@ -1191,8 +1252,8 @@
       ],
       "priority": 59,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1209)."
+      "passes": true,
+      "notes": "FATTA 2026-11-16. dlg_vesna a tier saint: il bivio, resta (vesna_resta, quartiere +15) o se ne va (vesna_se_ne_va, quartiere -10), una volta sola. Che cosa cambi nel finale Rinuncia resta la domanda aperta del PRD. Foto delle tre scene: arte/revisione/atto_3_scene.png."
     },
     {
       "id": "US-1310",
@@ -1204,8 +1265,8 @@
       ],
       "priority": 60,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1210)."
+      "passes": true,
+      "notes": "FATTA 2026-11-17 dentro qa_atto_3.gd (passo 5): alla Sequenza 1 il rituale si compie sul campo di battaglia (luogo di massacro) durante l'eclissi; l'Ancora (Lena, diventata Ancora giocandoci) e' sacrificata: sparisce dalle Ancore e la follia sale. Si vede nel libro (riga 'una tua Ancora va perduta') e a schermo. arte/revisione/qa_atto_3.png."
     },
     {
       "id": "US-1311",
@@ -1217,8 +1278,8 @@
       ],
       "priority": 61,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1211)."
+      "passes": true,
+      "notes": "FATTA 2026-11-17. tests/manual/qa_atto_3.gd (Xvfb): Sequenza 4 -> 0 col Twilight Giant: campo di battaglia all'alba (arma spezzata), Doran affrontato (tribolazione 3->2), altura all'alba (armatura), palizzata costruita e cripta al crepuscolo (struttura), l'antagonista alla soglia della Frontiera di notte (tribolazione 1->0), campo di battaglia durante l'eclissi (Ancora). Finale: Apoteosi. 46 controlli ok. Scorciatoie dichiarate nel file."
     },
     {
       "id": "US-1312",
@@ -1229,8 +1290,8 @@
       ],
       "priority": 62,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1212)."
+      "passes": true,
+      "notes": "FATTA 2026-11-17. tests/test_fase_13_checkpoint.gd (4): le 4 quest dell'Atto II/III e le 7 scene esistono e puntano a id validi (giver, eventi, flag scritti da qualcuno, goto, quest avviate, dialoghi del duello); nessun id di Pathway, NPC, quest o flag della storia nel codice (scripts, pages, world; world_scene.gd escluso, va tolto); le due partite manuali ci sono."
     },
     {
       "id": "US-1313",
@@ -1241,8 +1302,54 @@
       ],
       "priority": 63,
       "fase": "13",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fase-13-atto-2-3.md (vi si chiamano US-1213)."
+      "passes": true,
+      "notes": "FATTA 2026-11-17. Fase 13 chiusa: progress.txt, CLAUDE.md (fasi e lavoro corrente), 006_PRD/prossimi-passi.md."
+    },
+    {
+      "id": "US-1314",
+      "title": "Il rituale finale sulla Sequenza 1",
+      "description": "Il rituale scritto sulla Sequenza 0 non si usava mai (i dati della Sequenza N dicono come si lascia la N). Spostato sulla Sequenza 1: e' il rituale dell'apoteosi.",
+      "acceptanceCriteria": [
+        "la Sequenza 0 non ha rituale (il validator lo vuole)",
+        "il rituale della 1 chiede l'Ancora e il detentore precedente, nel luogo dell'apoteosi",
+        "dalla 0 non si beve piu' niente",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 63,
+      "fase": "13",
+      "passes": true,
+      "notes": "FATTA 2026-11-17 (chiesta dall'utente). Per ognuno dei 10 Pathway il rituale della Sequenza 1 prende luogo, ora, luna e sigilli del vecchio rituale della 0 e somma i sacrifici (Ancora + detentore precedente); la 0 ha advancement_ritual null. PotionSystem.bevi rifiuta alla Sequenza 0, il libro dice 'non c'e' un gradino oltre'. Test aggiornati (test_regions, test_darkness). qa_atto_3: l'ultimo rituale alla Soglia del Crepuscolo."
+    },
+    {
+      "id": "US-1315",
+      "title": "Titoli di coda",
+      "description": "Dopo il finale scorrono su fondo nero il nome del finale e l'epilogo, il viaggio del giocatore (Pathway, Ancore rimaste, scelte fatte) e i crediti; poi il libro sul colophon.",
+      "acceptanceCriteria": [
+        "tutto dai dati (data/ui/titoli.json, endings.json, audio_fonti.json)",
+        "si saltano con Esc o interagisci",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 63,
+      "fase": "13",
+      "passes": true,
+      "notes": "FATTA 2026-11-17 (chiesta dall'utente). scripts/titoli_coda.gd (CanvasLayer, gira anche col mondo fermo), lanciato da EndingSystem._raggiungi; alla fine apre il colophon (le scelte dell'eredita'). tests/test_titoli_coda.gd, test_ending_system aggiornato. Schermo: arte/revisione/titoli_di_coda.png."
+    },
+    {
+      "id": "US-8B75d",
+      "title": "HUD nuovo: barre belle e abilita' solo a simboli",
+      "description": "Richiesta dell'utente (2026-11-17): l'interfaccia di gioco ridisegnata, molto piu' bella e pulita, che non stanchi l'occhio e stia bene col mondo. Barra della vita piu' bella (come si riempie e come si vede), barra della spiritualita' (mana) uguale; mentre si gioca le abilita' non hanno piu' il nome, solo il simbolo (il nome resta nel libro).",
+      "acceptanceCriteria": [
+        "barre di vita e spiritualita' disegnate con forge3d/build_libro (cornice, rampa di colore, perdita che scende piano dietro, numeri solo se servono)",
+        "hotbar a sole icone (glifo della primitiva, tasto, ricarica), niente nomi a schermo",
+        "HUD compatto in un angolo, poca carta e poco contrasto, leggibile su ogni regione e di notte",
+        "Verifica a schermo documentata in progress.txt (luminosa e cupa, giorno e notte, interno)",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 63,
+      "fase": "8b",
+      "passes": true,
+      "notes": "FATTA 2026-11-17. HUD nuovo: in alto a sinistra tre barre a pixel (vita, spiritualita', recitazione) con emblema, contorno di 1 px, pieno in tre toni, tacche ogni quarto, la scia del danno che resta e scende piano, la cura che sale morbida, la vita bassa che batte; i numeri solo quando il valore cambia (poi sfumano). Status a sole icone con la linea del tempo che resta. La fiala al posto della scritta 'Avanzamento pronto'. In basso al centro la hotbar a soli simboli: cornice a pixel, glifo colorato dal Pathway, cifra del tasto, velo della ricarica, velo blu se manca la spiritualita', lampo al lancio. Nessun nome a schermo. data/ui/hud.json (misure e colori), scripts/hud_barra.gd, hud_slot.gd, tools/art/build_hud.py. La camera degli interni lascia libero anche il basso. Schermo: arte/revisione/hud_nuovo.png."
     },
     {
       "id": "US-1200",
@@ -1630,8 +1737,8 @@
       ],
       "priority": 65,
       "fase": "15",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+      "passes": true,
+      "notes": "FATTA 2026-11-17. balance.json nemici_tipi: 42 tipi (i 36 del bestiario dell'utente, il coccodrillo, la barca senza nessuno, i 5 capi gia' nel mondo e il brigante) con nome, rarita' (comune: tell lungo wind_up_heavy; raro ed elite: tell corto wind_up_light, come ha deciso l'utente), comportamento (mischia/distanza/carica/volo: per ora tutti in mischia, US-1502/1503), aspetto (nemico_base finche' non c'e' l'arte, US-1504), tag e numeri. enemy.gd: nemico_base + tipo + override. I 72 nemici posati (layout, campagna, interni) hanno 'tipo', il nome e' passato dall'override al tipo. Validator: tipo esistente per ogni nemico, chiavi e vocabolari dei tipi. tests/test_nemici_tipi.gd (3). Schermo: arte/revisione/nemici_tipi.png."
     },
     {
       "id": "US-1502",
@@ -1645,8 +1752,8 @@
       ],
       "priority": 66,
       "fase": "15",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+      "passes": true,
+      "notes": "FATTA 2026-11-17. Comportamento 'distanza' (i tipi con comportamento distanza: balestriere, devoto, germoglio, guardiana, scrivano, lettore, ladro di tempo, voce dell'acqua, barca, burattinaio, coccodrillo): si avvicina fino a tiro, indietreggia sotto 'tiene', dopo il tell del suo tipo tira il proiettile delle abilita' (scripts/projectile.gd: si para e si schiva come ogni colpo); chiuso in un angolo tira lo stesso dopo ritirata_s. Numeri in balance.json nemico_base.distanza. Il tiro di un nemico non colpisce gli altri nemici. tests/test_nemico_distanza.gd (4). Schermo: arte/revisione/nemico_distanza.png."
     },
     {
       "id": "US-1503",
@@ -1660,8 +1767,24 @@
       ],
       "priority": 67,
       "fase": "15",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+      "passes": true,
+      "notes": "FATTA 2026-11-17. 'carica' (scaricatore, colosso, cervo): dentro 'da' fa il tell, scatta in linea verso il giocatore con l'arco attivo davanti, si ferma contro un muro, addosso al giocatore o a fine durata, poi resta scoperto recupero_s (1,4 s). 'volo' (corvo, sciame, pipistrello, gabbiano): maschera delle collisioni senza lo strato dei dislivelli (l'acqua ferma ancora), figura piu' in alto che ondeggia. Numeri in balance.json nemico_base.carica e .volo. tests/test_nemico_carica_volo.gd (2). Schermo: arte/revisione/nemico_carica_volo.png."
+    },
+    {
+      "id": "US-1503b",
+      "title": "Il pet si doma nel mondo",
+      "description": "Il compagno animale c'era nei sistemi (PetSystem) ma nel gioco non si poteva avere. Decisione dell'utente (2026-11-18): si doma nel mondo.",
+      "acceptanceCriteria": [
+        "ogni specie vive in un luogo dei dati (data/pets selvatico)",
+        "con il suo nutrimento nello zaino interagisci prova a domarla (domabilita' dei dati); se va male scappa fino al prossimo momento",
+        "domata ti segue con la sua figura ed e' un'Ancora",
+        "Verifica a schermo documentata in progress.txt",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 67,
+      "fase": "15",
+      "passes": true,
+      "notes": "FATTA 2026-11-18. data/pets/core.json 'selvatico' (lupo cinereo alla galleria di alberi della Valle, corvo veggente al cimitero di Mirwada, capra lunare alla scalinata dell'Archivio); pastura spirituale in vendita da Sidon e Vesna. scripts/world/pet_mondo.gd (figlio del mondo): i selvatici, prova_a_domare, il compagno che segue. tests/test_pet_mondo.gd (4). Schermo: arte/revisione/pet_nel_mondo.png. Il pet non combatte ancora (i comportamenti 'difendi' ecc. dei dati restano da fare con i nemici)."
     },
     {
       "id": "US-1504",
@@ -1675,8 +1798,53 @@
       ],
       "priority": 68,
       "fase": "15",
-      "passes": false,
-      "notes": "Story d'arte: i PNG non contano nel limite dei file. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+      "passes": true,
+      "notes": "Story d'arte: i PNG non contano nel limite dei file. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md. Spezzata il 2026-11-18 in US-1504a (figure umane), US-1504b (bestie a quattro zampe e volatili), US-1504c (forme strane: melma, germoglio, glifo, sciame, barca, coccodrillo): si chiude con l'ultima. Chiusa il 2026-11-18 con US-1504a/b/c: 41 tipi su 42 hanno la loro figura."
+    },
+    {
+      "id": "US-1504a",
+      "title": "Figure dei nemici umani",
+      "description": "Un aspetto per ogni tipo umano di balance.json nemici_tipi (26 su 42), con le animazioni e i tempi di nemico_base, a 64 px.",
+      "acceptanceCriteria": [
+        "tools/art/build_nemici.py rilanciabile, fogli nemico_base_<aspetto>_<anim>.png",
+        "aspetto del tipo nei dati, enemy.gd lo passa all'AnimationMachine",
+        "tell rosso come nemico_base (generate_all.py)",
+        "asset guardati ingranditi, verifica a schermo",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 68,
+      "fase": "15",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18. 26 aspetti (forge3d humanoid, nessun seme casuale), il Doppio e' Enel con occhi rossi e lama viola. Il brigante resta il foglio base. Test test_nemici_tipi.test_ogni_tipo_ha_la_sua_figura."
+    },
+    {
+      "id": "US-1504b",
+      "title": "Figure delle bestie",
+      "description": "Aspetti per le bestie di nemici_tipi (lupo, cervo, ratto, granchio, belva dei moli, madre dei lupi; corvo, pipistrello, gabbiano) con le animazioni di nemico_base: quadrupedi e volatili di forge3d.",
+      "acceptanceCriteria": [
+        "fogli nemico_base_<aspetto>_<anim>.png, stessa cella",
+        "tell leggibile in un frame fermo",
+        "asset guardati ingranditi",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 68,
+      "fase": "15",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18. 8 bestie in build_nemici.py BESTIE: lupo della luna, madre dei lupi, belva dei moli, cervo dalle corna rosse, ratto (quadrupedi, clip dei pet con un anticipo acquattato piu' marcato), corvo della battaglia, pipistrello, gabbiano (volatili, anticipo = ali alzate, barcollo = colpito). Il granchio va in US-1504c (non e' un quadrupede)."
+    },
+    {
+      "id": "US-1504c",
+      "title": "Figure delle forme strane",
+      "description": "Aspetti per granchio corazzato, melma, germoglio spinoso, sciame di spore, glifo vivente, barca fantasma e coccodrillo rapper: forme nuove in forge3d dove servono (una story per forma se il diff cresce).",
+      "acceptanceCriteria": [
+        "fogli nemico_base_<aspetto>_<anim>.png, stessa cella",
+        "asset guardati ingranditi",
+        "Tests pass (bash tools/run_tests.sh), python tools/validate_data.py esce 0"
+      ],
+      "priority": 68,
+      "fase": "15",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18. 7 forme in build_nemici.py: melma (forge3d slime), granchio corazzato (chele che si alzano nel tell), germoglio spinoso, sciame di spore (spore che girano), glifo vivente (pietra col segno sulle 4 facce, frammenti in orbita), barca fantasma (la barca di forge3d marcia, col cannone), coccodrillo rapper (umano col muso, coda, berretto e catena). Clip comuni clip_corpo(); forge3d rig.py: voce di posa '~<giunto>' per schiacciare (melma e germoglio muoiono afflosciandosi). Solo il brigante resta il foglio base."
     },
     {
       "id": "US-1505",
@@ -1691,8 +1859,8 @@
       ],
       "priority": 69,
       "fase": "15",
-      "passes": false,
-      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+      "passes": true,
+      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md. Fatta il 2026-11-18: balance.json boss (6 boss, 3 fasi i primi e 4 i finali), scripts/boss.gd (vita_x, fasi con cfg e gregari, arena, un boss battuto non torna: WorldState 'boss:<id>'), scripts/boss_arena.gd, barra nell'HUD (hud.json barre.boss). Nei layout 'boss': <id> su 6 nemici (due nuovi nelle Marche: cripta e trono). Le figure proprie sono US-1506. Diff sopra le 200 righe (sistema + dati + test), tenuto insieme perche' le parti non si provano separate."
     },
     {
       "id": "US-1506",
@@ -1738,7 +1906,7 @@
       "priority": 75,
       "fase": "16",
       "passes": false,
-      "notes": "Da decidere con l'utente prima di cominciare: suoni generati da Claude con uno script (come gli sprite) oppure presi da librerie libere CC0. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+      "notes": "Decisione dell'utente (2026-11-11): tutte e due le strade, i suoni gratuiti dove ci sono e il resto da generare. 2026-11-14: ricerca fatta, 17 effetti su 18 scaricati (CC0: Kenney RPG sounds, rpg-sound-pack) e collegati (assets/audio/, data/audio_fonti.json, AudioManager li usa al posto dei bip). Scelti dal nome del file, senza ascoltarli: restano da ascoltare nel gioco e da sistemare; sfx_breath da generare. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
     },
     {
       "id": "US-1602",
@@ -1754,7 +1922,7 @@
       "priority": 76,
       "fase": "16",
       "passes": false,
-      "notes": "Stessa decisione di US-1601. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+      "notes": "2026-11-14: nessuna traccia scaricata. In data/audio_fonti.json i candidati CC0 (raccolta cc0-music-1 e 15 chiptune in loop su OpenGameArt): la musica va ascoltata e scelta dall'utente, poi si scarica. Il gioco oggi sceglie la traccia ma non ha un lettore per la musica: va scritto qui. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
     },
     {
       "id": "US-1603",
@@ -1768,7 +1936,7 @@
       "priority": 77,
       "fase": "16",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+      "notes": "2026-11-14: scaricati 8 ambienti su 18 (sussurri della follia, spirito, ronzio, drone, oltre: CC0). Mancano i 10 ambienti di regione giorno/notte (mare, foresta, neve, nebbia): nessun CC0 sicuro trovato, candidati in data/audio_fonti.json. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
     },
     {
       "id": "US-1604",
@@ -1782,7 +1950,7 @@
       "priority": 78,
       "fase": "16",
       "passes": false,
-      "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+      "notes": "2026-11-14: i suoni ci sono gia' nei pacchetti scaricati (data/audio_fonti.json 'riserva': passi, monete, bere, porta, stoffa, libro, versi dei mostri, 100 suoni d'interfaccia); pagina e apertura del libro gia' collegate. PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
     },
     {
       "id": "US-1605",
@@ -1857,6 +2025,248 @@
       "fase": "17",
       "passes": false,
       "notes": "PRD 006_PRD/prd-fasi-15-17-gioco-completo.md."
+    },
+    {
+      "id": "US-D01",
+      "title": "Dashboard: base, avanzamento, consumo e pubblicazione",
+      "description": "Pagina privata su claude.ai con le schede Oggi, Avanzamento e Consumo; build.py e consumo.py rilanciabili.",
+      "acceptanceCriteria": [
+        "si vede nella pagina pubblicata",
+        "verificata in chiaro, scuro e a 400 px di larghezza"
+      ],
+      "priority": 60,
+      "fase": "strumenti",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18 (richiesta dell'utente: una dashboard per vedere tutto e dire se va bene). Pagina https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3, script in tools/dashboard/."
+    },
+    {
+      "id": "US-D02",
+      "title": "Dashboard: giudizi dell'utente",
+      "description": "Bottoni va bene / rifare e una nota su ogni elemento, salvati nell'archivio della pagina; Claude li legge a inizio sessione.",
+      "acceptanceCriteria": [
+        "si vede nella pagina pubblicata",
+        "verificata in chiaro, scuro e a 400 px di larghezza"
+      ],
+      "priority": 60,
+      "fase": "strumenti",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18 (richiesta dell'utente: una dashboard per vedere tutto e dire se va bene). Pagina https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3, script in tools/dashboard/."
+    },
+    {
+      "id": "US-D03",
+      "title": "Dashboard: bestiario, personaggi, oggetti",
+      "description": "Figure animate di nemici, boss, Enel e forme, NPC con ritratto, antagonisti, pet, fauna; icone di oggetti e stati.",
+      "acceptanceCriteria": [
+        "si vede nella pagina pubblicata",
+        "verificata in chiaro, scuro e a 400 px di larghezza"
+      ],
+      "priority": 60,
+      "fase": "strumenti",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18 (richiesta dell'utente: una dashboard per vedere tutto e dire se va bene). Pagina https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3, script in tools/dashboard/."
+    },
+    {
+      "id": "US-D04",
+      "title": "Dashboard: mondo, paesi e case",
+      "description": "Mappa coi colori veri delle tessere e i segni dei luoghi; foto dal gioco di ogni luogo, villaggio e interno.",
+      "acceptanceCriteria": [
+        "si vede nella pagina pubblicata",
+        "verificata in chiaro, scuro e a 400 px di larghezza"
+      ],
+      "priority": 60,
+      "fase": "strumenti",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18 (richiesta dell'utente: una dashboard per vedere tutto e dire se va bene). Pagina https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3, script in tools/dashboard/."
+    },
+    {
+      "id": "US-D05",
+      "title": "Dashboard: tecniche",
+      "description": "Ogni Pathway dalla Sequenza 9 alla 0 con abilita', primitive coi glifi nei colori del Pathway ed effetti animati.",
+      "acceptanceCriteria": [
+        "si vede nella pagina pubblicata",
+        "verificata in chiaro, scuro e a 400 px di larghezza"
+      ],
+      "priority": 60,
+      "fase": "strumenti",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18 (richiesta dell'utente: una dashboard per vedere tutto e dire se va bene). Pagina https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3, script in tools/dashboard/."
+    },
+    {
+      "id": "US-D06",
+      "title": "Dashboard: libro e HUD",
+      "description": "Foto di ogni pagina del libro e dell'HUD in combattimento dal gioco vero.",
+      "acceptanceCriteria": [
+        "si vede nella pagina pubblicata",
+        "verificata in chiaro, scuro e a 400 px di larghezza"
+      ],
+      "priority": 60,
+      "fase": "strumenti",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18 (richiesta dell'utente: una dashboard per vedere tutto e dire se va bene). Pagina https://claude.ai/artifact/TMhEqBhDqBWDnaux6EPWb3, script in tools/dashboard/."
+    },
+    {
+      "id": "US-8C01",
+      "title": "Nuovo stile: prova con Enel, lupo della luna, fendente pesante e una magia",
+      "description": "Prima prova delle scelte artistiche del 2026-11-18 (pixel art a griglia su scheletro, 3 teste, contorno nero, 3 toni, fotogrammi ricchi, effetti unici), da far giudicare all'utente nella dashboard prima di rifare il resto.",
+      "acceptanceCriteria": [
+        "Enel con tutte le animazioni a griglia, frame da data/animations.json",
+        "il lupo della luna a quattro zampe con il tell estremo",
+        "fendente pesante e Incantesimo tradizionale con un disegno proprio",
+        "provabili nell'arena della dashboard",
+        "test e validator verdi"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18: tools/art/griglia/ e tools/art/build_griglia.py; dettagli e cosa non convince in progress.txt. Prossimo passo: giudizio dell'utente."
+    },
+    {
+      "id": "US-8C02",
+      "title": "Prova di stile, giro 2: carica dell'attacco pesante, Enel piu' compatto, 4 schivate, lupo, pagina Da testare",
+      "description": "Note dell'utente sul primo giro della prova di stile.",
+      "acceptanceCriteria": [
+        "nel gioco tenendo premuto K il colpo si carica (danno e area crescono)",
+        "Enel con gambe corte e busto largo, la carica in avanti",
+        "4 versioni della schivata da scegliere",
+        "pagina Da testare con ogni cosa nuova da approvare e l'arena a schermo intero",
+        "test e validator verdi"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18; dettagli in progress.txt. Aspetta il giudizio dell'utente e la scelta della schivata."
+    },
+    {
+      "id": "US-8C03",
+      "title": "Prova di stile, giro 3: note dell'utente sulle schede",
+      "description": "Correzioni dalle note sulla pagina Da testare.",
+      "acceptanceCriteria": [
+        "nessuno si china all'indietro",
+        "carica solo tenendo premuto",
+        "morte in 4 direzioni col sangue",
+        "gesti chiari (bere, raccogliere, magia, parata)",
+        "arena sul terreno vero",
+        "test e validator verdi"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-18; dettagli in progress.txt."
+    },
+    {
+      "id": "US-8C04",
+      "title": "Parata con la lama davanti; note mandate che tornano da testare quando la cosa e' rifatta",
+      "description": "Note dell'utente del 2026-11-19.",
+      "acceptanceCriteria": [
+        "la lama della parata sta davanti a Enel",
+        "una nota diventa nota mandata",
+        "rifatta la cosa, torna da testare con la nota fra le sistemate",
+        "le approvate in Testate"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-19; dettagli in progress.txt."
+    },
+    {
+      "id": "US-8C05",
+      "title": "Due mani nel pesante, morte del lupo a terra, lampo negli occhi, domande e Note e testate sul sito",
+      "description": "Note dell'utente del 2026-11-19.",
+      "acceptanceCriteria": [
+        "spadone a due mani",
+        "morte: testa giusta in tutte le viste, luna nascosta",
+        "tell = lampo negli occhi",
+        "domande sul sito con risposte",
+        "pagina Note e testate a cartelle"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-19; dettagli in progress.txt."
+    },
+    {
+      "id": "US-8C06",
+      "title": "Giro 1 uno per tipo: casa del centro antico e museo, mercante, cervo, Stretta ferrea",
+      "description": "Metodo dell'utente: un edificio, un personaggio, un animale e un'abilita' alla volta.",
+      "acceptanceCriteria": [
+        "case con il loro disegno a griglia",
+        "mercante unico",
+        "cervo",
+        "effetto unico di Stretta ferrea",
+        "tutto sulla pagina Da testare"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-21; dettagli in progress.txt. Aspetta il giudizio."
+    },
+    {
+      "id": "US-8C07",
+      "title": "Note del 2026-11-21: cervo, capriola, camminata, pesante, museo, case antiche, sito",
+      "description": "Le note dell'utente sulla pagina Da testare, sistemate.",
+      "acceptanceCriteria": [
+        "cervo con le zampe a terra e la testa attaccata",
+        "capriola dentro la cella con la testa dritta",
+        "gambe che si vedono muovere in tutte le direzioni",
+        "museo con lucernari sulle falde e arte sui muri",
+        "altre case del centro antico",
+        "risposte di Claude e fotogrammi numerati sul sito"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-21; dettagli in progress.txt."
+    },
+    {
+      "id": "US-8C08",
+      "title": "Equipaggiamento visibile su Enel: arma, armatura e oggetti in mano",
+      "description": "Decisione dell'utente del 2026-11-21: quello che il giocatore indossa o tiene deve vedersi sulla figura, non cambiare solo i numeri. Ogni tipo d'arma il suo disegno (spadone, spada, lancia, bastone...) e le animazioni d'attacco che lo usano; armatura e mantello come pezzi a griglia sopra lo scheletro; i fogli scelti dai dati dell'oggetto (id, mai nomi) e cambiati da Equipment.equip_cambiato.",
+      "acceptanceCriteria": [
+        "il disegno dell'arma cambia quando cambia l'arma equipaggiata",
+        "armatura/mantello visibili",
+        "il legame oggetto -> disegno e' un dato",
+        "test: equip_cambiato aggiorna i fogli del player",
+        "giudicato sulla pagina Da testare"
+      ],
+      "priority": 2,
+      "fase": "8c",
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-8C09",
+      "title": "Giro di disegni test 1: Aldo completo, 5 edifici, 5 animali, 5 nemici, il Re dei Ratti, 10 abilita', 10 oggetti",
+      "description": "Regola dell'utente del 2026-11-21 (prepara i prossimi disegni test). Tutto sulla pagina Da testare.",
+      "acceptanceCriteria": [
+        "Aldo con tutte le 16 mosse di Enel, pezzi suoi",
+        "cattedrale, faro, bottega, dogana, casa del pescatore",
+        "lepre, volpe, cinghiale, capra, orso",
+        "scheletro, pirata, soldato caduto, ratto, granchio con le 6 animazioni dei nemici",
+        "Re dei Ratti a cella 160",
+        "10 effetti unici, uno per Pathway",
+        "10 icone 32x32 di oggetti veri"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-22; dettagli in progress.txt. Da giudicare dall'utente."
+    },
+    {
+      "id": "US-8C10",
+      "title": "Giro di disegni test 2 (doppio): Doran e Vesna completi, 10 edifici, 10 animali, 10 nemici, 2 boss, 20 abilita', 20 oggetti; note del giro 1",
+      "description": "Richiesta dell'utente del 2026-11-22: il doppio del giro e sistemare tutto quello che c'e' da sistemare.",
+      "acceptanceCriteria": [
+        "schede aspetto del giro che mostrano la figura (bug: boss e granchio non si vedevano)",
+        "abilita' mostrate con Enel che le lancia",
+        "lupo del Richiamo che sembra un lupo",
+        "botteghe tutte diverse con l'insegna di quello che vendono",
+        "Re dei Ratti con la pancia e la mannaia vera",
+        "tutto il giro sulla pagina Da testare"
+      ],
+      "priority": 1,
+      "fase": "8c",
+      "passes": true,
+      "notes": "Fatta il 2026-11-23; dettagli in progress.txt. Da giudicare dall'utente."
     }
   ]
 }

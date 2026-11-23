@@ -1,0 +1,1362 @@
+{
+ "prova:acrobazia": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "a04ddd462090"
+ },
+ "prova:alfiere_spettrale": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "43f632758731"
+ },
+ "prova:alfiere_spettrale_anticipo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "3c8cc767e20b"
+ },
+ "prova:alfiere_spettrale_attack": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "409025ffcaa5"
+ },
+ "prova:alfiere_spettrale_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "f320201e7a4f"
+ },
+ "prova:alfiere_spettrale_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "1caf99d24d76"
+ },
+ "prova:alfiere_spettrale_stagger": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "0315901729cf"
+ },
+ "prova:alfiere_spettrale_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "dc4d517a047c"
+ },
+ "prova:analisi": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "e1ad1d1dc3d9"
+ },
+ "prova:archivista_capo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "076c7defac96"
+ },
+ "prova:archivista_capo_anticipo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "279adf7ae35b"
+ },
+ "prova:archivista_capo_attack": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "9624a67e59a1"
+ },
+ "prova:archivista_capo_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "3f7c7a9c65e1"
+ },
+ "prova:archivista_capo_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "dc52b7963da6"
+ },
+ "prova:archivista_capo_stagger": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "029ce5cb623c"
+ },
+ "prova:archivista_capo_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "9e1579232bb9"
+ },
+ "prova:belva_dei_moli": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "110924b58a6e"
+ },
+ "prova:belva_dei_moli_anticipo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "df406f5e6e44"
+ },
+ "prova:belva_dei_moli_attack": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "50d0c1271d7a"
+ },
+ "prova:belva_dei_moli_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "acc826001aff"
+ },
+ "prova:belva_dei_moli_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "80b056c1fdeb"
+ },
+ "prova:belva_dei_moli_stagger": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "b76406485bdb"
+ },
+ "prova:belva_dei_moli_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "96a77c053314"
+ },
+ "prova:cane": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "41e42df8e5e3"
+ },
+ "prova:cane_fuga": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "cc3f6d106c0d"
+ },
+ "prova:cane_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "79da95f16690"
+ },
+ "prova:capra": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "27ed6f0b8753"
+ },
+ "prova:capra_fuga": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "1217906087f0"
+ },
+ "prova:capra_idle": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "f59ddf89e055"
+ },
+ "prova:carica": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "eb7fbcc805b0"
+ },
+ "prova:carica_spalla": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "d583b94e99ca"
+ },
+ "prova:cavallo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "556a9de87544"
+ },
+ "prova:cavallo_fuga": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "8c27f484d10f"
+ },
+ "prova:cavallo_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "b9144bdf71f7"
+ },
+ "prova:cervo": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "951bdf0327dc"
+ },
+ "prova:cervo_corna_rosse": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "a68e61041bad"
+ },
+ "prova:cervo_corna_rosse_anticipo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "297c9d5fb430"
+ },
+ "prova:cervo_corna_rosse_attack": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "abaa17cf9c71"
+ },
+ "prova:cervo_corna_rosse_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "43cf35d3821f"
+ },
+ "prova:cervo_corna_rosse_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "1ebf5fb4cf57"
+ },
+ "prova:cervo_corna_rosse_stagger": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "b621932de1b0"
+ },
+ "prova:cervo_corna_rosse_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "6a2949e4ca4b"
+ },
+ "prova:cervo_fuga": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "50ced4f3bd1d"
+ },
+ "prova:cervo_idle": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "5ec94f22df0c"
+ },
+ "prova:cinghiale": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "c47ec813a411"
+ },
+ "prova:cinghiale_fuga": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "3edaf0139905"
+ },
+ "prova:cinghiale_idle": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "8c1228679642"
+ },
+ "prova:contrabbandiere_balestra": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "f82c387270fa"
+ },
+ "prova:contrabbandiere_balestra_anticipo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "b2179c1e2fe5"
+ },
+ "prova:contrabbandiere_balestra_attack": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "cb37b94516f5"
+ },
+ "prova:contrabbandiere_balestra_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "8b94ce56db33"
+ },
+ "prova:contrabbandiere_balestra_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "ddabbdcf3dab"
+ },
+ "prova:contrabbandiere_balestra_stagger": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "8fcc4d150c91"
+ },
+ "prova:contrabbandiere_balestra_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "151849025ddb"
+ },
+ "prova:contrattacco": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "d7f4280839dd"
+ },
+ "prova:custode_della_cripta": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "ab5846256815"
+ },
+ "prova:custode_della_cripta_anticipo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "d2c89a4ce805"
+ },
+ "prova:custode_della_cripta_attack": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "d7a16294477c"
+ },
+ "prova:custode_della_cripta_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "00f818ab5e67"
+ },
+ "prova:custode_della_cripta_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "5418d1c9feb7"
+ },
+ "prova:custode_della_cripta_stagger": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "91899e22527a"
+ },
+ "prova:custode_della_cripta_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "fa72ae9ac266"
+ },
+ "prova:devoto_fuori_controllo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "ba5f17351022"
+ },
+ "prova:devoto_fuori_controllo_anticipo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "aaecb53cbd0a"
+ },
+ "prova:devoto_fuori_controllo_attack": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "069fa3a4e153"
+ },
+ "prova:devoto_fuori_controllo_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "6835ab4814c4"
+ },
+ "prova:devoto_fuori_controllo_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "fb7a2fc04ed0"
+ },
+ "prova:devoto_fuori_controllo_stagger": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "97989294c778"
+ },
+ "prova:devoto_fuori_controllo_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "f0ba198b041e"
+ },
+ "prova:disinnesco": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "8fa18190e4e5"
+ },
+ "prova:distillato_curativo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "b0a62e828738"
+ },
+ "prova:edificio_bottega": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "8b8fb8d83ed1"
+ },
+ "prova:edificio_bottega_armaiolo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "afee7380d00c"
+ },
+ "prova:edificio_bottega_pesce": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "ee064e8e594c"
+ },
+ "prova:edificio_bottega_sarta": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "6c9a5830e43a"
+ },
+ "prova:edificio_bottega_speziale": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "ee77f8a84569"
+ },
+ "prova:edificio_cantiere_navale": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "aa96daee1fd6"
+ },
+ "prova:edificio_capanna_paglia": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "c9e1b46e6eab"
+ },
+ "prova:edificio_casa_antica": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "74092ec0ef29"
+ },
+ "prova:edificio_casa_antica_loggia": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "415d84ae32ee"
+ },
+ "prova:edificio_casa_antica_pergola": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "3ec99ecd175a"
+ },
+ "prova:edificio_casa_operaia": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "0f816b90ac0b"
+ },
+ "prova:edificio_casa_pescatore": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "14d91d80980b"
+ },
+ "prova:edificio_cattedrale": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "0dd92967bad7"
+ },
+ "prova:edificio_dogana": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "a7d755f19a46"
+ },
+ "prova:edificio_faro": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "42fef8e3b836"
+ },
+ "prova:edificio_mulino": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "f2270a9ba67f"
+ },
+ "prova:edificio_museo": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "421ab7feac20"
+ },
+ "prova:edificio_taverna": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "f5fcb59dd73d"
+ },
+ "prova:edificio_torre_guardia": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "cf70d8f92b7a"
+ },
+ "prova:enel": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "1ba8981c31f4"
+ },
+ "prova:enel_attack_heavy": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "7aa00208ac22"
+ },
+ "prova:enel_attack_light": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "30edf4b47021"
+ },
+ "prova:enel_cast": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "0e2c4b429bae"
+ },
+ "prova:enel_dash": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "4a13b346fb29"
+ },
+ "prova:enel_death": {
+  "dal": "2026-11-19T14:43:08Z",
+  "v": "bd96f15d4613"
+ },
+ "prova:enel_drink": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "0131bb3323ad"
+ },
+ "prova:enel_fly": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "74aa6aacc78c"
+ },
+ "prova:enel_hurt": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "cfc6d1e4027e"
+ },
+ "prova:enel_idle": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "9f03c2235873"
+ },
+ "prova:enel_interact": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "af5342eba5d1"
+ },
+ "prova:enel_meditate": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "657c6f5cf4a4"
+ },
+ "prova:enel_parry": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "ff2da31bc537"
+ },
+ "prova:enel_pickup": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "d544fb81ddb1"
+ },
+ "prova:enel_ritual": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "1adbc23c69ff"
+ },
+ "prova:enel_sail": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "c855d92f7e1f"
+ },
+ "prova:enel_walk": {
+  "dal": "2026-11-21T12:52:47Z",
+  "v": "bc28827320df"
+ },
+ "prova:evocazione_minore": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "b0cf0b945a64"
+ },
+ "prova:fendente_pesante": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "83883e65ac2d"
+ },
+ "prova:gatto": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "71dc07da0933"
+ },
+ "prova:gatto_fuga": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "aa3fa314257a"
+ },
+ "prova:gatto_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "515ebf6e89a0"
+ },
+ "prova:germoglio_rapido": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "4aacadb36a47"
+ },
+ "prova:granchio_corazzato": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "84dff1e21766"
+ },
+ "prova:granchio_corazzato_anticipo": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "d03427cdaf3b"
+ },
+ "prova:granchio_corazzato_attack": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "c1bdf25eac3c"
+ },
+ "prova:granchio_corazzato_death": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "b732d4031f73"
+ },
+ "prova:granchio_corazzato_idle": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "94328d4b8f81"
+ },
+ "prova:granchio_corazzato_stagger": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "095c372a1f65"
+ },
+ "prova:granchio_corazzato_walk": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "c29372d0586c"
+ },
+ "prova:guardia_corrotta": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "ac520f89c97d"
+ },
+ "prova:guardia_corrotta_anticipo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "aec59089daf1"
+ },
+ "prova:guardia_corrotta_attack": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "d27d07445870"
+ },
+ "prova:guardia_corrotta_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "f72054415c7c"
+ },
+ "prova:guardia_corrotta_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "8759305a94ab"
+ },
+ "prova:guardia_corrotta_stagger": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "f6c2ed560a88"
+ },
+ "prova:guardia_corrotta_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "62893b9cb6c4"
+ },
+ "prova:guaritrice": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "bb9745ef4d0e"
+ },
+ "prova:guaritrice_attack_heavy": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "b47f47932637"
+ },
+ "prova:guaritrice_attack_light": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "5c80e1043aed"
+ },
+ "prova:guaritrice_cast": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "f44fc4296593"
+ },
+ "prova:guaritrice_dash": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "949efa1e9219"
+ },
+ "prova:guaritrice_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "7f9827a50d52"
+ },
+ "prova:guaritrice_drink": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "492c0cdca578"
+ },
+ "prova:guaritrice_fly": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "e4bf74da29c7"
+ },
+ "prova:guaritrice_hurt": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "fd01bf129308"
+ },
+ "prova:guaritrice_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "0a790266a6cc"
+ },
+ "prova:guaritrice_interact": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "e96bd0e88e31"
+ },
+ "prova:guaritrice_meditate": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "2fc2315749a3"
+ },
+ "prova:guaritrice_parry": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "c06b90e70937"
+ },
+ "prova:guaritrice_pickup": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "0ef3130d5eec"
+ },
+ "prova:guaritrice_ritual": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "61465dac2266"
+ },
+ "prova:guaritrice_sail": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "d917fd988a48"
+ },
+ "prova:guaritrice_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "19551d1ac4a9"
+ },
+ "prova:incantesimo": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "fd33da056117"
+ },
+ "prova:incantesimo_scoppio": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "aac06e0799c2"
+ },
+ "prova:incubo": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "ffcc18dbf8d7"
+ },
+ "prova:investigatore": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "518934d4a0e3"
+ },
+ "prova:investigatore_attack_heavy": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "e97e512a964d"
+ },
+ "prova:investigatore_attack_light": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "2f90697e6991"
+ },
+ "prova:investigatore_cast": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "06aef96c09b3"
+ },
+ "prova:investigatore_dash": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "60a7922d3400"
+ },
+ "prova:investigatore_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "c522033e9534"
+ },
+ "prova:investigatore_drink": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "1a28cebcc03b"
+ },
+ "prova:investigatore_fly": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "7c998ad1c33f"
+ },
+ "prova:investigatore_hurt": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "4419b4314ffd"
+ },
+ "prova:investigatore_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "6c3c3acb3151"
+ },
+ "prova:investigatore_interact": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "79f91850a07f"
+ },
+ "prova:investigatore_meditate": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "c840b7231aa4"
+ },
+ "prova:investigatore_parry": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "21fb32c4bbdb"
+ },
+ "prova:investigatore_pickup": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "c1b8e76ab02a"
+ },
+ "prova:investigatore_ritual": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "28a22c50d091"
+ },
+ "prova:investigatore_sail": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "1409b194ba2a"
+ },
+ "prova:investigatore_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "14c999897acc"
+ },
+ "prova:lamento_funebre": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "bcc46512fc20"
+ },
+ "prova:legame_bestiale": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "7bfe65687ca2"
+ },
+ "prova:lepre": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "1995701c37dc"
+ },
+ "prova:lepre_fuga": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "dbb0ce0519f7"
+ },
+ "prova:lepre_idle": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "2495188b92a0"
+ },
+ "prova:lettore_proibito": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "5c2f02230610"
+ },
+ "prova:lettore_proibito_anticipo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "fcfde1bd58ae"
+ },
+ "prova:lettore_proibito_attack": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "fdb1c90126b3"
+ },
+ "prova:lettore_proibito_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "013707fcd0bd"
+ },
+ "prova:lettore_proibito_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "a681e13cb15b"
+ },
+ "prova:lettore_proibito_stagger": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "d0187aea0ad8"
+ },
+ "prova:lettore_proibito_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "84c0ad4100f8"
+ },
+ "prova:lettura_rubata": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "87c2cdca9cc5"
+ },
+ "prova:lontra": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "1dbdac0ba835"
+ },
+ "prova:lontra_fuga": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "187c7e19db16"
+ },
+ "prova:lontra_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "30cd7cf79483"
+ },
+ "prova:lupo": {
+  "dal": "2026-11-19T14:43:08Z",
+  "v": "862781fa3bbe"
+ },
+ "prova:lupo_anticipo": {
+  "dal": "2026-11-19T14:43:08Z",
+  "v": "569dad6accd7"
+ },
+ "prova:lupo_attack": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "2d3d549114d3"
+ },
+ "prova:lupo_death": {
+  "dal": "2026-11-19T14:43:08Z",
+  "v": "493c68b4aa99"
+ },
+ "prova:lupo_idle": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "6209dc07bd92"
+ },
+ "prova:lupo_stagger": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "01c1ffa0bf93"
+ },
+ "prova:lupo_walk": {
+  "dal": "2026-11-18T00:00:00Z",
+  "v": "e0fba0ad3b12"
+ },
+ "prova:madre_delle_radici": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "3d24a4cb7c61"
+ },
+ "prova:madre_delle_radici_anticipo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "c92a79c38498"
+ },
+ "prova:madre_delle_radici_attack": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "ecf307a27f10"
+ },
+ "prova:madre_delle_radici_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "3060151db334"
+ },
+ "prova:madre_delle_radici_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "6963eb897f0c"
+ },
+ "prova:madre_delle_radici_stagger": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "b05350846a51"
+ },
+ "prova:madre_delle_radici_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "a1f710e17b10"
+ },
+ "prova:maiale": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "e66da51d1894"
+ },
+ "prova:maiale_fuga": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "ac5215cdfbe3"
+ },
+ "prova:maiale_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "7344f5ed938b"
+ },
+ "prova:mano_verde": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "953f5ed4f3c4"
+ },
+ "prova:mercante": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "20133cdb7ad8"
+ },
+ "prova:mercante_idle": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "d8254db7eb2a"
+ },
+ "prova:mercante_walk": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "34da0c22419f"
+ },
+ "prova:mucca": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "5ecfe39b1f64"
+ },
+ "prova:mucca_fuga": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "9d78f39dab0f"
+ },
+ "prova:mucca_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "a5a9c524fd9f"
+ },
+ "prova:occhio_nell_ombra": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "a49a4049e56d"
+ },
+ "prova:oggetto_ambrosia": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "8442f78610f2"
+ },
+ "prova:oggetto_amuleto_lunare": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "cb46ba4a7cfc"
+ },
+ "prova:oggetto_anello_del_richiamo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "3656c90dff4c"
+ },
+ "prova:oggetto_anello_di_cristallo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "b0768e7076be"
+ },
+ "prova:oggetto_arma_spezzata": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "24a60676388b"
+ },
+ "prova:oggetto_ascia_da_guerra": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "65014321625a"
+ },
+ "prova:oggetto_chiave_del_faro": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "765d46260c02"
+ },
+ "prova:oggetto_corazza_cuoio": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "6da02a82ce9b"
+ },
+ "prova:oggetto_corazza_espiazione": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "ba871433ecd1"
+ },
+ "prova:oggetto_cristallo_grezzo": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "e497441750e1"
+ },
+ "prova:oggetto_cuoio_conciato": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "086dc6caf66e"
+ },
+ "prova:oggetto_dal_nulla": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "919a75f0b202"
+ },
+ "prova:oggetto_elisir_del_vigore": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "864853de6b15"
+ },
+ "prova:oggetto_elisir_ombra": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "778d85c9d7b7"
+ },
+ "prova:oggetto_essenza_rara_di_guarigione": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "8244080f800a"
+ },
+ "prova:oggetto_filtro_di_chiarezza": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "8b0c49573a5d"
+ },
+ "prova:oggetto_lama_del_pentimento": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "49cc5326b566"
+ },
+ "prova:oggetto_libro_ordine_minore": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "dcd372954ffb"
+ },
+ "prova:oggetto_lingotto_ferro": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "fc130a8b9d3d"
+ },
+ "prova:oggetto_moneta_comune": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "b91ac02e6665"
+ },
+ "prova:oggetto_pastura_spirituale": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "f9a33418437d"
+ },
+ "prova:oggetto_pergamena_alba": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "4b9cc5b55003"
+ },
+ "prova:oggetto_pergamena_vigore": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "68aa92535174"
+ },
+ "prova:oggetto_piuma_dei_venti": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "0b3250e9eb8e"
+ },
+ "prova:oggetto_pozione_cura_maggiore": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "67d2d4809d01"
+ },
+ "prova:oggetto_pozione_cura_minore": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "d955f85fd928"
+ },
+ "prova:oggetto_scudo_rinforzato": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "42eb4fcabdee"
+ },
+ "prova:oggetto_sigillo_forza_minore": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "7abcdf51088f"
+ },
+ "prova:oggetto_sigillo_reale": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "9319c061fb62"
+ },
+ "prova:oggetto_spada_ferrea": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "a13821a28173"
+ },
+ "prova:oggetto_tonico_di_forza": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "fe2106c44c32"
+ },
+ "prova:orso": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "80f6dbaeef77"
+ },
+ "prova:orso_fuga": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "f39de236da26"
+ },
+ "prova:orso_idle": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "1a76d453365d"
+ },
+ "prova:passo_breve": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "738928f22ae0"
+ },
+ "prova:pecora": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "a44a8e7530c9"
+ },
+ "prova:pecora_fuga": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "6c6b3aed421f"
+ },
+ "prova:pecora_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "0d42d996d062"
+ },
+ "prova:percezione_mistica": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "a2664cab4832"
+ },
+ "prova:pirata_naufrago": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "5ad6389ad2b6"
+ },
+ "prova:pirata_naufrago_anticipo": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "42cce1bcd095"
+ },
+ "prova:pirata_naufrago_attack": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "1565d96b0a49"
+ },
+ "prova:pirata_naufrago_death": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "febf060be39f"
+ },
+ "prova:pirata_naufrago_idle": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "981a6a31bd51"
+ },
+ "prova:pirata_naufrago_stagger": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "019e7b54b6ad"
+ },
+ "prova:pirata_naufrago_walk": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "df4153c8fda0"
+ },
+ "prova:poesia_amara": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "a8a1a4e0a453"
+ },
+ "prova:pugnalata_furtiva": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "70c00e3ae9de"
+ },
+ "prova:ratto_delle_fogne": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "a3910b7860a8"
+ },
+ "prova:ratto_delle_fogne_anticipo": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "528bdb28ea4f"
+ },
+ "prova:ratto_delle_fogne_attack": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "e82f2e0e8040"
+ },
+ "prova:ratto_delle_fogne_death": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "14adfbebe100"
+ },
+ "prova:ratto_delle_fogne_idle": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "a69688ac29f0"
+ },
+ "prova:ratto_delle_fogne_stagger": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "1cd879261ea4"
+ },
+ "prova:ratto_delle_fogne_walk": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "5dd1bf3c34ec"
+ },
+ "prova:re_dei_ratti": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "e6fe6bb72fa5"
+ },
+ "prova:re_dei_ratti_anticipo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "92b841aa4296"
+ },
+ "prova:re_dei_ratti_attack": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "c6143e85baad"
+ },
+ "prova:re_dei_ratti_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "77f9609c5512"
+ },
+ "prova:re_dei_ratti_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "2801a2c70863"
+ },
+ "prova:re_dei_ratti_stagger": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "a0a320fea033"
+ },
+ "prova:re_dei_ratti_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "0c87f44d7895"
+ },
+ "prova:rianima_servo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "8e3c502a48bb"
+ },
+ "prova:riccio": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "6d855ff96651"
+ },
+ "prova:riccio_fuga": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "3b176815081c"
+ },
+ "prova:riccio_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "612064ab6721"
+ },
+ "prova:richiamo_compagno": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "e83257ae7ab8"
+ },
+ "prova:rivale": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "9e9a4fe926c8"
+ },
+ "prova:rivale_attack_heavy": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "254129af625f"
+ },
+ "prova:rivale_attack_light": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "fe4137d7c1f5"
+ },
+ "prova:rivale_cast": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "705394d39b00"
+ },
+ "prova:rivale_dash": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "fc161ea8dbef"
+ },
+ "prova:rivale_death": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "596991153fce"
+ },
+ "prova:rivale_drink": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "4db1b006e9c2"
+ },
+ "prova:rivale_fly": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "f0cf8d42ccd1"
+ },
+ "prova:rivale_hurt": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "8569a15c9243"
+ },
+ "prova:rivale_idle": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "88d6099e52bd"
+ },
+ "prova:rivale_interact": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "d2ac8b0051c2"
+ },
+ "prova:rivale_meditate": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "37bd9bc6413e"
+ },
+ "prova:rivale_parry": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "e50f7b5df199"
+ },
+ "prova:rivale_pickup": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "0a08fc96b79b"
+ },
+ "prova:rivale_ritual": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "992c82853a06"
+ },
+ "prova:rivale_sail": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "ad654501d9b6"
+ },
+ "prova:rivale_walk": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "ad49243e7865"
+ },
+ "prova:scambio_di_posto": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "f171624e46dc"
+ },
+ "prova:scaricatore_ubriaco": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "ed8425936567"
+ },
+ "prova:scaricatore_ubriaco_anticipo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "e36e913ef4c1"
+ },
+ "prova:scaricatore_ubriaco_attack": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "b755f8de9176"
+ },
+ "prova:scaricatore_ubriaco_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "1afe973d234d"
+ },
+ "prova:scaricatore_ubriaco_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "341c9b42f94c"
+ },
+ "prova:scaricatore_ubriaco_stagger": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "3bd818eba220"
+ },
+ "prova:scaricatore_ubriaco_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "383628f59b05"
+ },
+ "prova:scasso": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "5678d492ef36"
+ },
+ "prova:scavo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "c22fce3652b5"
+ },
+ "prova:scheletro_catacombe": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "d02a054da087"
+ },
+ "prova:scheletro_catacombe_anticipo": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "94d74cd16d79"
+ },
+ "prova:scheletro_catacombe_attack": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "82933002b9c9"
+ },
+ "prova:scheletro_catacombe_death": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "0fef2f2e9795"
+ },
+ "prova:scheletro_catacombe_idle": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "48e96564ed28"
+ },
+ "prova:scheletro_catacombe_stagger": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "4eec68452ef2"
+ },
+ "prova:scheletro_catacombe_walk": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "e5d8584f876b"
+ },
+ "prova:schivata_affondo": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "be01449173ff"
+ },
+ "prova:schivata_capriola": {
+  "dal": "2026-11-21T13:02:32Z",
+  "v": "32abe74be326"
+ },
+ "prova:schivata_ombra": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "743e9ae1a604"
+ },
+ "prova:schivata_scivolata": {
+  "dal": "2026-11-19T14:14:58Z",
+  "v": "d67353a7b0e7"
+ },
+ "prova:scoiattolo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "97d75b73cd60"
+ },
+ "prova:scoiattolo_fuga": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "12adeff1682f"
+ },
+ "prova:scoiattolo_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "9904297d8531"
+ },
+ "prova:sigillo_su_arma": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "eb09dc2620e1"
+ },
+ "prova:soldato_caduto": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "96612e7fde65"
+ },
+ "prova:soldato_caduto_anticipo": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "bb978df1e071"
+ },
+ "prova:soldato_caduto_attack": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "20ba51629ee5"
+ },
+ "prova:soldato_caduto_death": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "04696845269a"
+ },
+ "prova:soldato_caduto_idle": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "485e1cd1624e"
+ },
+ "prova:soldato_caduto_stagger": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "d36f3df87f7e"
+ },
+ "prova:soldato_caduto_walk": {
+  "dal": "2026-11-22T00:18:08Z",
+  "v": "1a7f7ee309c8"
+ },
+ "prova:stretta_ferrea": {
+  "dal": "2026-11-21T12:17:06Z",
+  "v": "889362bd4c04"
+ },
+ "prova:sutura": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "a73ca1c4f8d8"
+ },
+ "prova:tagliaborse": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "bfbcc2919be4"
+ },
+ "prova:tagliaborse_anticipo": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "0c6e45408460"
+ },
+ "prova:tagliaborse_attack": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "1f2979632f7c"
+ },
+ "prova:tagliaborse_death": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "4f6c9274dd50"
+ },
+ "prova:tagliaborse_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "63321ea59018"
+ },
+ "prova:tagliaborse_stagger": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "778d233b2663"
+ },
+ "prova:tagliaborse_walk": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "3636a2d1c6fe"
+ },
+ "prova:tasso": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "692905cd6782"
+ },
+ "prova:tasso_fuga": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "c203c5822cbe"
+ },
+ "prova:tasso_idle": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "654f9f1e6e75"
+ },
+ "prova:terrore_notturno": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "a32432460294"
+ },
+ "prova:tocco_gelido": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "86c54751cb50"
+ },
+ "prova:turbine": {
+  "dal": "2026-11-23T12:02:34Z",
+  "v": "dac3edaec95e"
+ },
+ "prova:velo_illusorio": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "e1a3a57544be"
+ },
+ "prova:volpe": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "96104114caa1"
+ },
+ "prova:volpe_fuga": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "bb32ca8cfb07"
+ },
+ "prova:volpe_idle": {
+  "dal": "2026-11-22T00:16:30Z",
+  "v": "bdfbe588ff16"
+ }
+}

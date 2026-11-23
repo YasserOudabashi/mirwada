@@ -42,6 +42,9 @@ func _collega_narrativa() -> void:
 	var rs: Node = get_node_or_null("/root/RitualSystem")
 	if rs != null and rs.has_signal("rituale_completato") and not rs.rituale_completato.is_connected(_su_rituale):
 		rs.rituale_completato.connect(_su_rituale)
+	var anc: Node = get_node_or_null("/root/AnchorSystem")     # US-1308: un'Ancora-persona persa non e' piu' fra le Ancore
+	if anc != null and not anc.anchor_lost.is_connected(_su_ancora_persa):
+		anc.anchor_lost.connect(_su_ancora_persa)
 	var prog: Node = get_node_or_null("/root/Progression")
 	if prog != null and prog.has_signal("sequence_changed") \
 			and not prog.sequence_changed.is_connected(_su_sequenza_giocatore):
@@ -165,8 +168,38 @@ func promuovi_ancora(id: String) -> bool:
 	if id in _ancore or not bool(_npc(id).get("anchor_candidate", false)):
 		return false
 	_ancore.append(id)
+	# US-1308: l'Ancora-persona entra anche in AnchorSystem (anchors.json "anchor_<nome>"): prima era solo un nome
+	# nei sussurri, non fermava la follia e non si poteva sacrificare al rituale.
+	var anc: Node = get_node_or_null("/root/AnchorSystem")
+	if anc != null:
+		anc.call("register", _id_ancora(id))
 	_aggiorna_sussurri()
 	return true
+
+
+func _su_ancora_persa(anchor_id: String) -> void:
+	_ancore.erase("npc_" + anchor_id.trim_prefix("anchor_"))
+	_aggiorna_sussurri()
+
+
+## Le Ancore-persona di un salvataggio fatto prima del 2026-11-16 non erano in AnchorSystem: si registrano ora.
+func riallinea_ancore() -> void:
+	var anc: Node = get_node_or_null("/root/AnchorSystem")
+	if anc == null:
+		return
+	for id in _ancore:
+		if not ((anc.call("active") as Array).has(_id_ancora(str(id)))):
+			anc.call("register", _id_ancora(str(id)))
+
+
+func _id_ancora(npc_id: String) -> String:
+	return "anchor_" + npc_id.trim_prefix("npc_")
+
+
+## US-1308: cambia la forza dell'Ancora di un NPC, solo se e' attiva. false se non lo e'.
+func forza_ancora(npc_id: String, forza: float) -> bool:
+	var anc: Node = get_node_or_null("/root/AnchorSystem")
+	return anc != null and bool(anc.call("imposta_forza", _id_ancora(npc_id), forza))
 
 
 func ancore_attive() -> Array:

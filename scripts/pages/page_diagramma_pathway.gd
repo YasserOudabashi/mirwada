@@ -221,6 +221,9 @@ func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, s
 		return
 
 	_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_TITOLO")))
+	if int(_prog.call("sequence")) <= 0:              # 2026-11-17: dalla Sequenza 0 non si va oltre
+		_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_FINE")))
+		return
 	var potion: Dictionary = sd.get("potion", {})
 	if potion.is_empty():
 		_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_AVANZAMENTO_NIENTE")))
@@ -267,7 +270,11 @@ func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, s
 	_vbox.add_child(b_prepara)
 
 	var pronta: Dictionary = ps.call("pozione_pronta") if ps != null else {}
-	if not pronta.is_empty():
+	var rs: Node = _n("/root/RitualSystem")
+	var rituale: Dictionary = rs.call("rituale_corrente") if rs != null else {}
+	if not rituale.is_empty():
+		_sezione_rituale(gd, rs, rituale, not pronta.is_empty())
+	elif not pronta.is_empty():
 		var disponibile: bool = ps != null and bool(ps.call("avanzamento_disponibile"))
 		var forzabile: bool = ps != null and bool(ps.call("avanzamento_forzabile"))
 		var b_bevi := Button.new()
@@ -295,6 +302,62 @@ func _sezione_avanzamento(gd: Node, _prog: Node, mio: String, _pw: Dictionary, s
 		"recitazione": recitazione,
 		"prepara_attivo": not b_prepara.disabled,
 	}
+
+
+## US-1305b: dove la Sequenza ha un rituale la pozione si beve li' dentro. Una riga per richiesta (luogo, momento,
+## luna, sigilli, sacrifici) con il segno di cosa c'e' gia', e il bottone che lo compie.
+func _sezione_rituale(gd: Node, rs: Node, rituale: Dictionary, pozione_pronta: bool) -> void:
+	_vbox.add_child(_riga(tr("BOOK_DIAGRAMMA_RITUALE_TITOLO")))
+	var tutto: bool = pozione_pronta
+	_vbox.add_child(_riga("%s %s" % ["✓" if pozione_pronta else "·", tr("BOOK_DIAGRAMMA_RITUALE_POZIONE")]))
+	for r in rs.call("richieste", rituale):
+		var ids: Array = (r as Dictionary).get("ids", [r["id"]])
+		var nomi: Array = []
+		for id in ids:
+			nomi.append(_etichetta(str(r["tipo"]), str(id)))
+		var testo: String = "%s %s: %s" % ["✓" if bool(r["ok"]) else "·",
+			tr("BOOK_DIAGRAMMA_RITUALE_" + str(r["tipo"]).to_upper()), (" " + tr("BOOK_DIAGRAMMA_RITUALE_O") + " ").join(nomi)]
+		var costo: String = _etichetta("costo", str((r as Dictionary).get("costo", "")))
+		if (r as Dictionary).has("costo") and costo != str(r["costo"]):
+			testo += " (%s)" % costo                           # US-1305d: che cosa costa
+		_vbox.add_child(_riga(testo))
+		if bool((r as Dictionary).get("da_offrire", false)) and not bool(r["ok"]):
+			var b_offri := Button.new()                        # la scelta scritta che il giocatore conferma
+			b_offri.name = "Offri_" + str(r["id"])
+			b_offri.text = tr("BOOK_DIAGRAMMA_RITUALE_OFFRI") if bool(r["pagabile"]) else tr("BOOK_DIAGRAMMA_RITUALE_NON_HAI")
+			b_offri.disabled = not bool(r["pagabile"])
+			b_offri.pressed.connect(offri_sacrificio.bind(str(r["id"])))
+			_vbox.add_child(b_offri)
+		tutto = tutto and bool(r["ok"])
+	var acting: Node = _n("/root/Acting")
+	tutto = tutto and acting != null and bool(acting.call("e_completo"))
+	var b := Button.new()
+	PaginaLibro.a_capo(b)
+	b.name = "CompiRituale"
+	b.text = tr("BOOK_DIAGRAMMA_RITUALE_IN_CORSO") if bool(rs.call("in_corso")) else tr("BOOK_DIAGRAMMA_RITUALE_COMPI")
+	b.disabled = not tutto or bool(rs.call("in_corso"))
+	b.pressed.connect(compi_rituale)
+	_vbox.add_child(b)
+
+
+func offri_sacrificio(id: String) -> bool:
+	var rs: Node = _n("/root/RitualSystem")
+	var ok: bool = rs != null and bool(rs.call("offri", id))
+	aggiorna()
+	return ok
+
+
+## Compie il rituale e chiude il libro: il rituale dura, e intanto Enel si vede (e si puo' colpire).
+func compi_rituale() -> Dictionary:
+	var rs: Node = _n("/root/RitualSystem")
+	var res: Dictionary = rs.call("compi") if rs != null else {"ok": false, "reason": "no_ritual_system"}
+	_pozione_stato = res
+	var book: Node = _n("/root/Book")
+	if bool(res.get("ok", false)) and book != null:
+		book.call("chiudi")
+	else:
+		aggiorna()
+	return res
 
 
 # --- sezione "il Dono": Ricevi il Dono per i Pathway non_standard (US-906) --
@@ -414,6 +477,11 @@ func _esito_testo(stato: Dictionary) -> String:
 		"ingredienti_insufficienti": "BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_INGREDIENTI_INSUFFICIENTI",
 		"formula_inesistente": "BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_FORMULA_INESISTENTE",
 		"nessuna_pozione": "BOOK_DIAGRAMMA_AVANZAMENTO_ESITO_NESSUNA_POZIONE",
+		"serve_il_rituale": "BOOK_DIAGRAMMA_RITUALE_ESITO_SERVE",
+		"manca_la_pozione": "BOOK_DIAGRAMMA_RITUALE_ESITO_POZIONE",
+		"prerequisiti_mancanti": "BOOK_DIAGRAMMA_RITUALE_ESITO_MANCA",
+		"recitazione_incompleta": "BOOK_DIAGRAMMA_RITUALE_ESITO_RECITAZIONE",
+		"tribolazione_in_corso": "BOOK_DIAGRAMMA_RITUALE_ESITO_TRIBOLAZIONE",
 	}
 	var chiave: String = str(chiavi.get(str(stato.get("reason", "")), ""))
 	return tr(chiave) if not chiave.is_empty() else str(stato.get("reason", ""))

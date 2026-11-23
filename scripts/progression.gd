@@ -126,9 +126,17 @@ func _applica_modificatori(vecchia: int, nuova: int) -> void:
 	var stats: Node = _stats_giocatore()
 	if stats == null:
 		return
-	if vecchia >= 0 and vecchia != nuova:
+	# 2026-11-18: salendo di Sequenza il massimo cresce e vita e spiritualita' restano alla stessa frazione (prima
+	# restavano ferme: 90/100 diventava 90/180).
+	var avanza: bool = vecchia >= 0 and vecchia != nuova
+	var f_hp: float = float(stats.get("hp")) / maxf(float(stats.call("get_stat", "hp_max")), 1.0)
+	var f_sp: float = float(stats.get("spiritualita")) / maxf(float(stats.call("get_stat", "spiritualita_max")), 1.0)
+	if avanza:
 		stats.call("remove_modifier", _mod_id(vecchia))
 	stats.call("apply_modifier", _mod_id(nuova), stat_modifiers())
+	if avanza:
+		stats.set("hp", f_hp * float(stats.call("get_stat", "hp_max")))
+		stats.set("spiritualita", f_sp * float(stats.call("get_stat", "spiritualita_max")))
 
 
 func _mod_id(seq: int) -> String:

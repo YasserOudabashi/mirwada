@@ -112,7 +112,9 @@ func test_death_dalla_sequenza_8_alla_2() -> void:
 
 		# 4. bere -> avanzamento NORMALE (recitazione completa = zero follia da forzatura)
 		var follia_prima: float = _madness().call("valore")
-		var e: Dictionary = _ps().call("bevi", false)
+		# dalla Sequenza 4 in giu' la pozione si beve dentro il rituale (US-1305b; il rituale ha i suoi test)
+		var nel_rituale: bool = not (Engine.get_main_loop().root.get_node("RitualSystem").call("rituale_corrente") as Dictionary).is_empty()
+		var e: Dictionary = _ps().call("bevi_nel_rituale") if nel_rituale else _ps().call("bevi", false)
 		assert_true(e["avanzato"], "avanzato dalla Sequenza %d" % seq)
 		assert_false(e["forzato"], "avanzamento NORMALE alla Sequenza %d" % seq)
 		assert_almost_eq(_madness().call("valore"), follia_prima,

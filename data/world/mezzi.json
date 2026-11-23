@@ -16,6 +16,11 @@
     "interno": "base_nave"
   },
   "volo": {
+    "_comment": "2026-11-11 (richiesta dell'utente): volare con la piuma costa. costo_decollo di spiritualita' per alzarsi, poi costo_al_secondo finche' si resta in aria; a spiritualita' finita si plana (velocita_esausto) e si atterra da soli sul primo punto buono. I Pathway di 'innato' volano senza chiave e senza costi: per loro non ci sono limiti. Oggi la lista e' vuota: nessun Pathway ha il volo tra le sue abilita'.",
+    "costo_decollo": 6,
+    "costo_al_secondo": 1.5,
+    "velocita_esausto": 0.5,
+    "innato": [],
     "chiave": "piuma_dei_venti"
   },
   "soglia_faro": {

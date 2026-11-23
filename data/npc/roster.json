@@ -129,7 +129,8 @@
           "terra_di_cimitero",
           "terriccio_di_prima_luna",
           "velo_di_mezzanotte",
-          "zanna_di_latte"
+          "zanna_di_latte",
+          "pastura_spirituale"
         ]
       },
       "dialogue_id": "dlg_sidon",
@@ -193,7 +194,8 @@
           "seme_dell_albero_madre",
           "seme_di_stella_cadente",
           "seme_dormiente",
-          "voto_infranto_alla_radice"
+          "voto_infranto_alla_radice",
+          "pastura_spirituale"
         ]
       },
       "dialogue_id": "dlg_vesna",
@@ -242,6 +244,18 @@
       "aspetto": {
         "variante": 3,
         "sprite": "rivale"
+      },
+      "duello": {
+        "_comment": "US-1304: accettato il duello nel dialogo (flag_inizio), Aldo si batte come un nemico con la sua Sequenza (scripts/world/duelli.gd). Dopo, il dialogo della vittoria o della sconfitta.",
+        "flag_inizio": "aldo_duello_accettato",
+        "flag_offerta": "aldo_duello_disponibile",
+        "dialogo_vinto": "dlg_aldo_vinto",
+        "dialogo_perso": "dlg_aldo_perso",
+        "pausa_s": 1.5,
+        "override": {
+          "name_i18n": "npc.aldo.name",
+          "attesa_iniziale_s": 1.0
+        }
       }
     },
     {
@@ -786,7 +800,8 @@
       "memoria": {},
       "aspetto": {
         "variante": 0,
-        "sprite": "soglia"
+        "sprite": "soglia",
+        "da_antagonista": true
       }
     },
     {
@@ -876,7 +891,10 @@
           "acqua_sorgiva",
           "filo_di_lana_rossa",
           "gesso_consacrato",
-          "pergamena_vigore"
+          "pergamena_vigore",
+          "arma_spezzata",
+          "sigillo_del_guardiano",
+          "sigillo_del_declino"
         ]
       },
       "dialogue_id": "dlg_greta",
@@ -924,7 +942,10 @@
         "listino": [
           "acqua_sorgiva",
           "pergamena_hermit",
-          "ambrosia"
+          "ambrosia",
+          "sigillo_argenteo",
+          "sigillo_della_mano",
+          "sigillo_dell_autorita"
         ]
       },
       "dialogue_id": "dlg_dario",

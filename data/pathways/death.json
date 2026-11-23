@@ -630,13 +630,13 @@
       },
       "advancement_ritual": {
         "location_tags": [
-          "cripta",
-          "tempio_abbandonato"
+          "soglia_del_crepuscolo"
         ],
         "momento": "notte_fonda",
-        "fase_lunare": null,
+        "fase_lunare": "eclissi",
         "sacrifices": [
-          "ancora_del_giocatore"
+          "ancora_del_giocatore",
+          "il_detentore_precedente_della_sequenza_0"
         ],
         "sigils": []
       },
@@ -705,17 +705,7 @@
         ],
         "formula_id": "formula_death_0"
       },
-      "advancement_ritual": {
-        "location_tags": [
-          "soglia_del_crepuscolo"
-        ],
-        "momento": "notte_fonda",
-        "fase_lunare": "eclissi",
-        "sacrifices": [
-          "il_detentore_precedente_della_sequenza_0"
-        ],
-        "sigils": []
-      },
+      "advancement_ritual": null,
       "madness_on_force": 14.0,
       "notes": "",
       "stub": false

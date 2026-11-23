@@ -56,6 +56,8 @@ func _su_area_entrata(area: Area2D) -> void:
 		return
 	if _caster != null and area.get_parent() == _caster:
 		return  # non colpisce la hurtbox di chi l'ha lanciato
+	if is_instance_valid(_caster) and _caster.is_in_group("nemici") and area.get_parent().is_in_group("nemici"):
+		return  # US-1502: il tiro di un nemico non colpisce gli altri nemici
 	if not registra_colpo(area):
 		return
 	area.call("subisci", danno, 0.0, _caster, {"tag_danno": tag_danno})

@@ -4,7 +4,7 @@
   "antagonisti": [
     {
       "id": "ant_twilight_giant",
-      "pathway_id": "twilight_giant",
+      "pathway_id": "twilight_giant", "aspetto": "soglia_01",
       "name": "Il Gigante Caduto",
       "name_i18n": "antagonist.twilight_giant.name",
       "indizi": [
@@ -24,7 +24,7 @@
     },
     {
       "id": "ant_death",
-      "pathway_id": "death",
+      "pathway_id": "death", "aspetto": "soglia_02",
       "name": "Il Primo Necroforo",
       "name_i18n": "antagonist.death.name",
       "indizi": [
@@ -44,7 +44,7 @@
     },
     {
       "id": "ant_darkness",
-      "pathway_id": "darkness",
+      "pathway_id": "darkness", "aspetto": "soglia_03",
       "name": "La Notte Che Fu",
       "name_i18n": "antagonist.darkness.name",
       "indizi": [
@@ -64,7 +64,7 @@
     },
     {
       "id": "ant_moon",
-      "pathway_id": "moon",
+      "pathway_id": "moon", "aspetto": "soglia_04",
       "name": "La Luna Spenta",
       "name_i18n": "antagonist.moon.name",
       "indizi": [
@@ -84,7 +84,7 @@
     },
     {
       "id": "ant_mother",
-      "pathway_id": "mother",
+      "pathway_id": "mother", "aspetto": "soglia_05",
       "name": "La Radice Marcita",
       "name_i18n": "antagonist.mother.name",
       "indizi": [
@@ -104,7 +104,7 @@
     },
     {
       "id": "ant_hermit",
-      "pathway_id": "hermit",
+      "pathway_id": "hermit", "aspetto": "soglia_06",
       "name": "L'Ultimo Studioso",
       "name_i18n": "antagonist.hermit.name",
       "indizi": [
@@ -124,7 +124,7 @@
     },
     {
       "id": "ant_paragon",
-      "pathway_id": "paragon",
+      "pathway_id": "paragon", "aspetto": "soglia_07",
       "name": "Il Modello Infranto",
       "name_i18n": "antagonist.paragon.name",
       "indizi": [
@@ -144,7 +144,7 @@
     },
     {
       "id": "ant_door",
-      "pathway_id": "door",
+      "pathway_id": "door", "aspetto": "soglia_08",
       "name": "Il Portinaio Perduto",
       "name_i18n": "antagonist.door.name",
       "indizi": [
@@ -164,7 +164,7 @@
     },
     {
       "id": "ant_error",
-      "pathway_id": "error",
+      "pathway_id": "error", "aspetto": "soglia_09",
       "name": "Il Difetto Originale",
       "name_i18n": "antagonist.error.name",
       "indizi": [
@@ -184,7 +184,7 @@
     },
     {
       "id": "ant_fool",
-      "pathway_id": "fool",
+      "pathway_id": "fool", "aspetto": "soglia_10",
       "name": "Il Buffone Silente",
       "name_i18n": "antagonist.fool.name",
       "indizi": [

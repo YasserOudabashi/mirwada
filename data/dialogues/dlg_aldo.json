@@ -2,7 +2,7 @@
   "schema_version": 1,
   "id": "dlg_aldo",
   "start": "n1",
-  "_comment": "Ex collega, ora rivale. Il duello si sblocca ai passaggi di tier (US-620 scrive aldo_duello_disponibile).",
+  "_comment": "Ex collega, ora rivale. Il duello si sblocca ai passaggi di tier (US-620 scrive aldo_duello_disponibile); accettarlo (aldo_duello_accettato) lo fa cominciare davvero (US-1304, roster 'duello').",
   "nodes": {
     "n1": {
       "speaker": "npc_aldo",
@@ -56,12 +56,12 @@
     },
     "n2": {
       "speaker": "npc_aldo",
-      "text": "Finalmente. Non deludermi.",
+      "text": "Finalmente. Qui, adesso, davanti a tutti. Non deludermi.",
       "text_i18n": "dialogue.aldo.n2",
       "choices": [
         {
-          "text": "Devo andare.",
-          "text_i18n": "dialogue.aldo.n2.congedo",
+          "text": "In guardia.",
+          "text_i18n": "dialogue.aldo.n2.inizia",
           "condizioni": [],
           "effetti": [],
           "goto": null

@@ -31,7 +31,7 @@ Tutto in `prd.json` (`passes: false`), la priorita' e' il numero tra parentesi.
 | # | Blocco | Story | Perche' |
 |---|---|---|---|
 | 1 | Ritocchi rapidi (41-46) | **fatti** il 2026-11-10: US-8B80c, 8B21d, 8B73e, 8B75b, 8B75c | bere dallo zaino, nemici delle stanze, sigilli, hotbar su due righe e a scelta |
-| 2 | **Atto II e III** (50-63), fase 13 | US-8B60b, US-1303..1313 (fatte US-1301 e US-1302: la Frontiera si apre dalla Sequenza 4, Fool/Error/Door sempre) | **senza, il gioco non si finisce**: la prova finale `trib_1_0` non si supera nel mondo vero; solo 4 quest in tutto il gioco, tutte dell'Atto I |
+| 2 | **Atto II e III**, fase 13 | **CHIUSA il 2026-11-17** | si gioca dalla Sequenza 4 alla 0 fino al finale (`qa_atto_2.gd`, `qa_atto_3.gd`); prossimo: HUD nuovo (US-8B75d), poi nemici e boss |
 | 3 | **Nemici e boss** (65-72), fase 15 | US-1501..1507 + US-8B60a | i 72 nemici e i 6 boss sono tutti `nemico_base` ingrandito; le evocazioni non si vedono |
 | 4 | **Audio** (75-79), fase 16 | US-1601..1605 | nessun file audio: bip di prova e musiche mute |
 | 5 | Mondo vivo (80-96), fase 12 | US-1200..1216 | punti d'interesse, villaggi, dungeon tra le regioni; prima US-1200 riscrive il PRD sul mondo generato |
@@ -42,7 +42,7 @@ Tutto in `prd.json` (`passes: false`), la priorita' e' il numero tra parentesi.
 | — | Facoltativa | fase 14 | altri Pathway Non-Standard |
 
 Il **gioco e' finito e giocabile al 100% in italiano** alla fine del blocco 7. PRD dei blocchi:
-`prd-fase-13-atto-2-3.md` (vi si chiamano ancora US-1201..1213), `prd-fasi-15-17-gioco-completo.md` (nemici, audio,
+`prd-fase-13-atto-2-3.md`, `prd-fasi-15-17-gioco-completo.md` (nemici, audio,
 rilascio), `prd-fase-12-mondo-vivo.md` (da riscrivere con US-1200).
 
 **Decisioni che spettano all'utente** prima di cominciare il blocco:

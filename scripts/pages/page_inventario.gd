@@ -17,6 +17,11 @@ static var prossima_sezione: String = ""
 var _appena_attivate: Array = []
 
 
+## US-1303b: la pagina del libro che la contiene dice su quale sezione aprirla (book.json "sezione").
+func apri_sezione(sezione: String) -> void:
+	prossima_sezione = sezione
+
+
 func aggiorna() -> void:
 	if prossima_sezione in SEZIONI:
 		_sezione = prossima_sezione

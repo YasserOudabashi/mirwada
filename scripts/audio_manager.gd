@@ -393,6 +393,20 @@ func _suona(sfx: String, pitch_var: float) -> void:
 func _stream_per(sfx: String) -> AudioStream:
 	if _sfx_cache.has(sfx):
 		return _sfx_cache[sfx]
+	# 2026-11-14: un file vero in assets/audio/<id>.ogg|.wav (data/audio_fonti.json dice da dove viene) prende il
+	# posto del bip di prova. Gli ambienti (amb_*) girano in ciclo.
+	for est in ["ogg", "wav"]:
+		var path: String = "res://assets/audio/%s.%s" % [sfx, est]
+		if ResourceLoader.exists(path):
+			var s: AudioStream = (load(path) as AudioStream).duplicate()
+			if sfx.begins_with("amb_"):
+				if s is AudioStreamOggVorbis:
+					(s as AudioStreamOggVorbis).loop = true
+				elif s is AudioStreamWAV:
+					(s as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
+					(s as AudioStreamWAV).loop_end = int((s as AudioStreamWAV).get_length() * (s as AudioStreamWAV).mix_rate)
+			_sfx_cache[sfx] = s
+			return s
 	var spec: Array = SFX_SPEC.get(sfx, [300.0, 0.1, 0.3])
 	var w: AudioStreamWAV = _sintetizza(spec[0], spec[1], spec[2])
 	_sfx_cache[sfx] = w

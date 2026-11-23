@@ -49,13 +49,28 @@
           "text": "Sai gia' tutto, Doran. Diciamolo ad alta voce.",
           "text_i18n": "dialogue.doran.n1.affronta",
           "condizioni": [
-            { "tipo": "tier_min", "valore": "saint" }
+            {
+              "tipo": "tier_min",
+              "valore": "saint"
+            },
+            {
+              "tipo": "flag_assente",
+              "valore": "doran_sa"
+            }
           ],
           "effetti": [
-            { "tipo": "emit_event", "evento": "npc_influenced", "modo": "intimidito" },
-            { "tipo": "flag", "id": "tribolazione_doran_affrontato", "valore": true }
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "intimidito"
+            },
+            {
+              "tipo": "flag",
+              "id": "tribolazione_doran_affrontato",
+              "valore": true
+            }
           ],
-          "goto": "n3"
+          "goto": "n4"
         },
         {
           "text": "Devo andare.",
@@ -88,6 +103,97 @@
         {
           "text": "Devo andare.",
           "text_i18n": "dialogue.doran.n3.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n4": {
+      "speaker": "npc_doran",
+      "text": "Lo so da mesi. Ho un fascicolo col tuo nome e dentro non c'e' un reato, solo cose che un uomo non dovrebbe saper fare. Non l'ho consegnato. Dimmi una cosa sola: il giorno che di te non resta niente, devo venire io a fermarti?",
+      "text_i18n": "dialogue.doran.n4",
+      "choices": [
+        {
+          "text": "Si'. Se arrivo a quel punto, vieni tu.",
+          "text_i18n": "dialogue.doran.n4.patto",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "doran_sa",
+              "valore": true
+            },
+            {
+              "tipo": "flag",
+              "id": "doran_patto",
+              "valore": true
+            },
+            {
+              "tipo": "reputazione",
+              "faction_id": "giustizia",
+              "delta": 20
+            },
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "persuaso"
+            }
+          ],
+          "goto": "n5"
+        },
+        {
+          "text": "Non ci riusciresti, Doran.",
+          "text_i18n": "dialogue.doran.n4.sfida",
+          "condizioni": [],
+          "effetti": [
+            {
+              "tipo": "flag",
+              "id": "doran_sa",
+              "valore": true
+            },
+            {
+              "tipo": "flag",
+              "id": "doran_nemico",
+              "valore": true
+            },
+            {
+              "tipo": "reputazione",
+              "faction_id": "giustizia",
+              "delta": -20
+            },
+            {
+              "tipo": "emit_event",
+              "evento": "npc_influenced",
+              "modo": "intimidito"
+            }
+          ],
+          "goto": "n6"
+        }
+      ]
+    },
+    "n5": {
+      "speaker": "npc_doran",
+      "text": "Allora il fascicolo resta nel cassetto. E io resto sveglio.",
+      "text_i18n": "dialogue.doran.n5",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.doran.n5.congedo",
+          "condizioni": [],
+          "effetti": [],
+          "goto": null
+        }
+      ]
+    },
+    "n6": {
+      "speaker": "npc_doran",
+      "text": "Forse no. Ma qualcuno deve provarci, e il mio nome e' il primo della lista.",
+      "text_i18n": "dialogue.doran.n6",
+      "choices": [
+        {
+          "text": "Devo andare.",
+          "text_i18n": "dialogue.doran.n6.congedo",
           "condizioni": [],
           "effetti": [],
           "goto": null

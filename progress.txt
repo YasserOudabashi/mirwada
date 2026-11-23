@@ -1141,3 +1141,682 @@ Alleggerito il 2026-11-10 (era 15.088 righe). Le voci delle fasi chiuse sono in 
 - Conseguenze aperte: i nemici della Frontiera sono di Sequenza 7-5 (troppo deboli per chi entra dalla 4: fase 15,
   US-1507); un Twilight Giant alla Sequenza 9 che ci arriva in barca viene respinto (giusto, ma senza una scritta che
   dica perche': da vedere in US-1703); CLAUDE.md e design-world.md aggiornati.
+
+## Difetti piccoli dal controllo, 2026-11-11/13 (richieste dell'utente)
+- Frontiera: chi viene respinto legge perche' (mondo.gd motivo_respinto, strings.csv MONDO_RESPINTO_<TIPO>: "La nebbia
+  ti respinge: torna alla Sequenza 4").
+- Libro: nessun testo sulla piega. La mappa non e' piu' una doppia pagina (regioni e viaggio a sinistra, varchi a
+  destra); test_libro_facciate controlla ogni pagina.
+- Abilita' d'area (tag_sinergia "area"): le primitive "sul nemico" cadono su tutti gli avversari vivi entro
+  balance.json combattimento.bersaglio.raggio_area (72) dal bersaglio (AbilityEngine.bersagli_attorno); ogni effetto
+  porta il suo nemico ("nodo") e il VFX va su ognuno.
+- Effetti: non stanno piu' sopra tutto (z_index 1) ma nell'ordine di profondita' del mondo, un albero davanti li copre;
+  i segni a terra (vfx.json "a_terra": aura, terrain_modify, plant_growth, decay, summon) stanno sotto i piedi.
+- Status: nome tradotto per i 14 status (status_effects.json name_i18n) e riga nell'HUD con icona, nome e secondi.
+- Nemici: ogni nemico di layout, campagna e interni ha un nome (override.name_i18n, enemy.*) sopra la testa. Nomi
+  provvisori scelti da Claude, in attesa delle risposte dell'utente sul bestiario (artifact "Bestiario di Mirwada").
+- Pulizia: via 117 foto di verifica vecchie e prove del mondo (arte/), 3 script usati una volta.
+- Persi e rifatti: il container e' ripartito prima del push. Da ora si fa push a ogni commit.
+- 1107 test, validate 0. Verifica a schermo di questi punti: da fare col giro di screenshot (qa_screenshot.gd).
+
+## Volo con costi, HUD basso, US-8B27 luci di notte — 2026-11-13/14
+- Volo (richiesta dell'utente): mezzi.json volo costo_decollo 6, costo_al_secondo 1.5, velocita_esausto 0.5, innato []
+  (Pathway che volano senza chiave e senza costi: oggi nessuno, nessun Pathway ha il volo tra le abilita').
+  mondo.gd decolla/_aggiorna_volo/velocita_volo: a spiritualita' finita si plana a meta' velocita' e si atterra da soli
+  sul primo punto buono. tests/test_mondo.gd (+1).
+- HUD: tutte le scritte col corpo 12 e righe strette: da 123 a ~97 unita' (114 con la riga degli status). Nella casa
+  del porto la stanza si vede intera sotto l'HUD. arte/revisione/difetti_piccoli_2026_11.png (nome del nemico, status
+  nell'HUD, interno, mappa su due facciate, scritta della Frontiera).
+- US-8B27: scripts/world/luci_notte.gd (figlio del mondo), dati luce.json "luci" (forza per momento, finestre, faro).
+  Aloni tondi a 4 gradini netti e fascio a cuneo, disegnati in codice (1 texel = 2 unita'), additivi su uno strato
+  sopra il buio e sotto l'HUD. Finestre: hash della casella della casa < probabilita' 0.55, davanti alla facciata.
+  Faro: sopra il nodo Soglia_faro, 92 unita' piu' su, fascio a 5 giri al minuto. tests/test_luce.gd (+1).
+- Verifica nel gioco (Xvfb, notte_fonda, facile e difficile): il faro col suo alone e il fascio, in piazza due case
+  con l'alone caldo alla porta. arte/revisione/luci_di_notte.png. 1109 test, validate 0.
+- Ambiente: il container nuovo aveva Pillow rotto per Python 3.11: `python3 -m pip install --ignore-installed pillow`
+  (Pillow 13; numpy c'e'). Da ricordare prima di rigenerare arte: confrontare un foglio prima/dopo.
+
+## Barca ridisegnata e nelle tre direzioni, 2026-11-14 (richiesta dell'utente: "disegna meglio la barca")
+- tools/art/forge3d/creatures.py barca(): scafo panciuto (ellissoide), prua a punta con l'asta, specchio di poppa,
+  falchetta chiara, due panche, due remi a riposo. worldrender: kind "su"/"giu" la gira (yaw 90/270) in una cella alta.
+- Comando: python tools/art/esporta_mondo.py --barca (seed 1, pochi secondi): barca.png, barca_su.png, barca_giu.png
+  in assets/world/<tema>/oggetti/ e le ancore in mondo.json "sprite". nave.png e' uscita identica a prima.
+- scripts/world/mondo.gd _gira_barca(): il disegno segue lo sguardo di chi rema (di fianco specchiata, di prua, di
+  poppa). tests/test_mondo.gd (+1).
+- Guardata ingrandita x6 su fondo acqua e su fondo chiaro; nel gioco (Xvfb) remando a sinistra, in su e in giu':
+  arte/revisione/barca_tre_direzioni.png. Non mi convince ancora: di prua e di poppa la barca e' corta (schiacciata
+  dall'inclinazione della vista) e Enel in ginocchio la copre quasi tutta.
+
+## Audio: ricerca e primi suoni veri, 2026-11-14 (decisione dell'utente: gratis dove ci sono, il resto da generare)
+- Rete: kenney.nl e opengameart.org aggiunti agli host dell'ambiente "Ivan" (approvato dall'utente). kenney.nl da'
+  la pagina ma lo zip sta dietro uno script: gli stessi pacchetti si prendono da opengameart.org/sites/default/files/.
+- Pacchetti CC0 scaricati (fuori dal repo): RPGsounds_Kenney.zip (50 suoni), kenney_interfaceSounds.zip (100),
+  rpg_sound_pack.zip di artisticdude (95 wav: battaglia, inventario, versi di mostri), piu' tre ambienti singoli.
+- Nel repo: assets/audio/<id>.ogg|.wav (27 file, 7,8 MB) e data/audio_fonti.json: per ognuno dei 62 suoni di
+  audio.json (+2 del libro) lo stato: 27 scaricati (autore, licenza, pagina, file originale), 36 da_scegliere (26
+  musiche e 10 ambienti di regione, con i candidati), 1 da_generare (sfx_breath). "riserva": cosa c'e' gia' nei
+  pacchetti per US-1604 e per i versi dei nemici.
+- scripts/audio_manager.gd _stream_per: se esiste assets/audio/<id>.ogg|.wav lo usa (gli amb_* in ciclo), altrimenti
+  il bip di prova. Il validator vuole una voce per ogni suono e file + licenza per gli scaricati. tests/test_audio.gd (+1).
+- NON ascoltati: qui non c'e' modo di sentire l'audio, i file sono scelti dal nome (knifeSlice = colpo leggero, chop =
+  colpo pesante, shade = sussurri...). Vanno ascoltati nel gioco dall'utente; per cambiarne uno basta sostituire il
+  file e la voce in audio_fonti.json. La musica non suona ancora: manca il lettore (US-1602).
+- 1111 test, validate 0.
+
+## US-8B60b: gli antagonisti hanno la loro figura, 2026-11-16
+- Brief: 10 figure umane a 64 px come gli NPC, una per Pathway, id neutri soglia_01..10 (ordine di antagonisti.json:
+  twilight_giant, death, darkness, moon, mother, hermit, paragon, door, error, fool); idle e walk; ritratto 64x80.
+- Comandi: python tools/art/build_npc.py ; python tools/art/build_ritratti.py (stesso seed degli altri aspetti; i
+  fogli degli aspetti di prima sono usciti identici). build_ritratti: i cappelli alti possono uscire dall'alto del
+  ritratto (l'assert ora vuole solo che la testa ci stia).
+- Dati: data/lore/antagonisti.json "aspetto" per antagonista; data/npc/roster.json npc_antagonista
+  "da_antagonista": true. Codice: GameData.aspetto_npc(npc_id) (l'aspetto dell'antagonista del Pathway del
+  giocatore), usato da mondo.crea_npc, interior_scene e GameData.ritratto. Nessun nome di Pathway nel codice.
+- Validator: ogni antagonista ha aspetto, fogli idle/walk e ritratto. tests/test_mondo.gd (+1).
+- Trovato guardando il dialogo: una scelta su due righe finiva sopra quella sotto. pagina_libro.gd a_capo() ora da'
+  al bottone l'altezza del testo a capo (vale per tutte le pagine del libro).
+- Schermo (Xvfb, Sequenza 1, notte fonda, Pathway twilight_giant / darkness / fool): alla soglia della Frontiera la
+  figura e il ritratto cambiano col Pathway, le tre scelte stanno una sotto l'altra. arte/revisione/soglia_antagonisti.png,
+  arte/revisione/ritratti.png.
+- Non mi convince ancora: soglia_02 col cappuccio ha il viso che e' una macchia scura; soglia_02 e soglia_03 si
+  somigliano (tutte e due scure e incappucciate). 1112 test, validate 0.
+
+## US-1303: la posizione di fazione dell'Atto II, 2026-11-16
+- Storia: delle carte escono dall'Archivio di notte e finiscono al porto. Ottavia (Ordine Minore) chiede di
+  riportarle; Bruno (porto) le ha e ci campa mezzo molo. Si sceglie nel dialogo di Bruno.
+- Dati: data/quests/q_ottavia_02.json (atto 2; passo 1 evento npc_influenced filtro modo=aiutato, che mette il flag
+  carte_porto_si_fida; passo 2 flag carte_all_ordine; ricompense Ordine +25, porto -15) e q_bruno_02.json (flag
+  carte_al_porto; porto +25, Ordine -15), exclusive_with l'una dell'altra. dlg_ottavia: scelta nuova con tier_min mid
+  e il lasciapassare, nodo n3; dlg_bruno: scelta "cerco delle carte" (flag carte_porto_si_fida), nodi n3-n5. Testi in it.json.
+- Codice (una riga di regola): QuestSystem.avvia non parte se una quest di exclusive_with e' gia' completata. Cosi'
+  il lato scelto resta quello e la reputazione, che sta nelle ricompense, si prende una volta sola.
+- tests/test_quest_fazione.gd (4): solo da tier mid; Bruno ne parla solo dopo l'aiuto; i due lati con la loro
+  reputazione; ripensarci non cambia niente. 1116 test, validate 0.
+- Schermo (Xvfb, Sequenza 6, notte fonda): Ottavia offre e si accetta, Bruno mette davanti alla scelta, scelto il
+  porto: reputazione porto 25, Ordine -15. arte/revisione/quest_fazione.png.
+- Trovato: la pagina Diario del libro e' ancora l'appunto a matita ("si aprira' piu' avanti"): le quest non si
+  vedono da nessuna parte. Story nuova US-1303b. Anche il registro delle sinergie e' bianco (da decidere quando).
+
+## US-1303b: il Diario e le Sinergie del libro non sono piu' pagine bianche, 2026-11-16
+- Il Diario delle quest e il registro delle sinergie esistevano gia' come sezioni della pagina inventario; le due
+  pagine del libro con quel nome (e il segnalibro "Diario") portavano all'appunto a matita.
+- data/ui/book.json: le due pagine sono tipo "inventario" con "sezione"; scripts/book_overlay.gd la passa alla
+  pagina (apri_sezione) prima di disegnarla; page_inventario.gd apri_sezione(). Nessun tipo di pagina nuovo.
+- tests: test_book (le due pagine sono aperte e dicono la sezione), test_book_overlay (+1: il Diario mostra la quest
+  in corso; la regola della pagina bianca si prova chiudendo una pagina a una fase lontana). 1117 test, validate 0.
+- Schermo (Xvfb): Diario con "Carte che camminano" in corso e i suoi due passi; dopo la scelta "Carte che restano"
+  completata e "Carte che camminano" fallita. arte/revisione/diario_quest.png.
+
+## US-1304: il duello con Aldo e' una scena, 2026-11-16
+- Letto dal codice: npc_system scrive <npc>_duello_disponibile ai salti di tier per gli NPC sfida_ai_tier; dlg_aldo
+  "Battiamoci" scriveva aldo_duello_accettato e basta: non succedeva niente.
+- Dati: data/npc/roster.json npc_aldo "duello" {flag_inizio, flag_offerta, dialogo_vinto, dialogo_perso, pausa_s,
+  override (nome e attesa iniziale)}. Dialoghi nuovi dlg_aldo_vinto.json e dlg_aldo_perso.json (i rami: scrivono
+  aldo_duello_vinto / aldo_duello_perso, e aldo_rispetto se gli si tende la mano); dlg_aldo n2 "In guardia.".
+- Codice: scripts/world/duelli.gd (nodo "Duelli" del mondo, 90 righe, vale per ogni NPC con "duello"): a dialogo
+  finito, se il flag_inizio c'e', l'NPC si nasconde e al suo posto nasce un nemico (enemy.tscn, override dei dati,
+  Sequenza da NpcSystem.sequenza_npc); "morto" = vinto, StatsComponent.died del giocatore = perso; poi l'NPC torna e
+  dopo pausa_s parte il dialogo. I due flag dell'offerta si spengono all'inizio. Nessuna regola di combattimento nuova.
+- Validator: i due dialoghi e i due flag del duello ci sono. tests/test_duelli.gd (3). 1120 test, validate 0.
+- Schermo (Xvfb, mezzogiorno, piazza di Mirwada): Aldo in piazza, accettato il duello compare l'avversario col nome
+  "Aldo" e attacca (Enel perde salute), battuto torna Aldo e si apre "Basta, hai vinto" con le due risposte.
+  arte/revisione/duello_aldo.png.
+- Non mi convince ancora: l'avversario ha la figura di nemico_base (verde), non quella di Aldo: si sistema con i
+  nemici veri della fase 15. All'inizio della partita Aldo e' Sequenza 9 (sale col tempo fino alla 4).
+
+## US-1305: controllo dei rituali, 2026-11-16 (con tre buchi trovati)
+- Atto II (Sequenze 6 -> 4): nessun rituale, si avanza con la pozione. Niente da aggiungere per l'Atto II.
+- I rituali (advancement_ritual) stanno sulle Sequenze 4..0: 50 in tutto. Controllati contro il mondo generato:
+  1. Nel gioco nessuno chiama RitualSystem.imposta_luogo / imposta_tempo / avvia: il rituale non si puo' compiere.
+     Si avanza solo con la pozione, a ogni Sequenza. Il finale dell'Apoteosi chiede rituale_sequenza_0_completato,
+     che scrive solo il rituale: oggi non si raggiunge. -> US-1305b
+  2. Ogni rituale chiede due luoghi e RitualSystem li vuole tutti e due insieme; il mondo da' una zona alla volta.
+     E 19 luoghi non sono sulla mappa (elenco nella story). Gli interni dei varchi non impostano la zona. -> US-1305c
+  3. I sacrifici sono 33 frasi, non oggetti; i 5 sigilli dei rituali non sono oggetti. Solo l'Ancora e' modellata.
+     -> US-1305d
+- Sono scelte di gioco (pozione e rituale insieme? un luogo o due? come si paga un sacrificio?): chieste all'utente.
+
+## US-1306: l'Atto II giocato per intero, 2026-11-16
+- tests/manual/qa_atto_2.gd, comando nel file (Xvfb). Cammino: Sequenza 7 -> 6 con Prepara e Bevi della pagina del
+  diagramma (salto di tier: Aldo offre il duello); a mezzogiorno in piazza duello accettato, avversario battuto,
+  dialogo della vittoria; Ottavia da' il lasciapassare e la quest; di notte una mano a Bruno, le carte, scelta
+  "tornano all'Archivio" (quest completata, Ordine > porto); 6 -> 5; la tribolazione del salto 5 -> 4 (smuovere tre
+  persone) risulta superata; 5 -> 4, tier saint. 26 controlli ok, esce 0.
+- Scorciatoie dichiarate: partenza alla Sequenza 7, ingredienti e Caratteristiche concessi, recitazione riempita con
+  gli eventi, colpo finale del duello dato azzerando la salute dell'avversario.
+- Corretto: "Can't use get_node() with absolute paths" a ogni dialogo: la pagina del dialogo voltata via sentiva
+  ancora i segnali (page_dialogo.gd aggiorna() esce se non e' nell'albero).
+- Foto: arte/revisione/qa_atto_2.png. Visto: dopo l'avanzamento la salute resta 90/180 (non si riempie col nuovo
+  massimo) e la hotbar tiene le quattro abilita' scelte prima. 1120 test, validate 0.
+
+## US-1307, US-1308, US-1309: Doran sa, Lena capisce, Vesna sceglie, 2026-11-16
+- Tre story di soli dialoghi fatte insieme (stessa forma, stessi file di testo): scene a tier saint, due rami l'una.
+- Codice comune: condizione 'flag_assente' in scripts/conditions.gd (il contrario di 'flag', ammessa nei dialoghi dal
+  validator): una scena sparisce quando ha scritto il suo flag. Usata anche su Bruno (la domanda sulle carte non
+  resta dopo la scelta).
+- Doran (dlg_doran n4-n6): patto o sfida, flag doran_sa + doran_patto / doran_nemico, giustizia +20 / -20.
+- Lena (dlg_lena n4-n6, q_lena_02 / q_lena_03): riconosciuta, la sua Ancora va a forza 10; allontanata, a 2. Effetto
+  "ancora" delle quest con "forza" = regola un'Ancora attiva (QuestSystem -> NpcSystem.forza_ancora ->
+  AnchorSystem.imposta_forza). Chi non ha Lena come Ancora ha la scena ma nessun effetto.
+- Vesna (dlg_vesna n4-n6): resta (quartiere +15) o se ne va (quartiere -10).
+- Trovato e corretto: diventare l'Ancora di un NPC (quest con effetto "ancora") non registrava niente in
+  AnchorSystem: nessun riparo dalla follia e niente da sacrificare al rituale di Sequenza 1. Ora
+  NpcSystem.promuovi_ancora registra "anchor_<nome>" (aggiunte anchor_vesna forza 9 e anchor_lena forza 5 in
+  data/anchors.json) e un'Ancora persa esce dalle Ancore dell'NPC. I salvataggi vecchi non si aggiornano da soli.
+- tests/test_atto_3_dialoghi.gd (8). 1128 test, validate 0. Schermo: i tre nodi lunghi stanno nella facciata, le
+  risposte su tre righe non si sovrappongono. arte/revisione/atto_3_scene.png.
+
+## Bestiario e rituali: decisioni dell'utente, 2026-11-16
+- Le 20 risposte del questionario (11 novembre) sono in 006_PRD/prd-fasi-15-17-gioco-completo.md 2.1: regole, i 36
+  tipi per regione, la proposta dei 6 boss e dei 2 segreti (da confermare). Due idee cambiate per la Nota IP.
+- Rituali (chiesto oggi): pozione dentro il rituale; basta uno dei luoghi; sacrifici a costo vero dove esiste.
+  Scritto in CLAUDE.md "Decisioni prese". CLAUDE.md e prossimi-passi.md aggiornati. Disiscritto dalla PR #11.
+
+## US-1305b: il rituale si compie nel mondo, 2026-11-16
+- Regole dell'utente: pozione dentro il rituale, basta uno dei luoghi.
+- scripts/ritual_system.gd: luogo e tempo dal mondo (zona di WorldState, momento e fase di TimeSystem; quelli messi a
+  mano restano per i test); richieste(rituale) = [{tipo, id, ids, ok}]; rituale_corrente(); compi() (vuole la pozione
+  pronta) e alla fine bevi_nel_rituale. scripts/potion_system.gd: bevi() fuori dal rituale risponde serve_il_rituale
+  dove la Sequenza ha un rituale (la pozione non si spreca). scripts/player.gd: un colpo subito interrompe il rituale.
+- Libro: page_diagramma_pathway.gd _sezione_rituale (una riga per richiesta col segno, bottone "Compi il rituale" che
+  chiude il libro). Testi: strings.csv BOOK_DIAGRAMMA_RITUALE_*; nomi in data/ui/book.json libro.etichette (luogo,
+  momento, fase_lunare, sigillo, sacrificio) e it.json ritual.*.
+- Test: tests/test_ritual.gd (+5); i tre test di slice dalla 9 alla 0 bevono nel rituale dalla 4 in giu'. 1133 test.
+- Schermo (Xvfb, Sequenza 4): in citta' la riga del luogo non ha il segno e il bottone e' spento; sul campo di
+  battaglia delle Marche all'alba tutto ha il segno, "Compi il rituale" chiude il libro, Enel fa il gesto, a fine
+  rituale Sequenza 3 e compare la tribolazione successiva. arte/revisione/rituale_nel_mondo.png.
+- Scorciatoia della prova: sigillo e sacrificio dati a mano (US-1305d). Da sapere: 15 rituali su 50 chiedono
+  un'eclissi, che nel gioco capita di rado (ogni 8 cicli di luna): va deciso se resta cosi'.
+
+## US-1305c: i luoghi dei rituali sono posti veri, 2026-11-16
+- La mappa non e' stata rigenerata. Tre modi, tutti nei dati:
+  1. dentro un interno si e' nella sua zona: mondo.gd entra() mette in WorldState la zona del varco (gating.varco.zona:
+     cripta, tempio abbandonato, altare di radici, grotta di marea, sala dei sigilli, nebbia grigia) o la "zona" del
+     file dell'interno (aggiunta a mirwada_sotterraneo, mirwada_archivio_ottavia, archivio_villaggio_alchimista =
+     officina, archivio_torre_osservazione); uscendo torna quella della mappa.
+  2. data/world/regions.json "zone_anche" per regione: una zona vale anche come altri luoghi (RitualSystem._luoghi_ora).
+  3. un posto nuovo: il teatro abbandonato della Frontiera. data/world/interni/frontiera_teatro.json (stile torre,
+     palco di tappeti, panche), varco "teatro" nel gating della Frontiera (sempre aperto, 14 caselle dall'approdo,
+     disegno porta_glifi gia' esistente). Comando: python tools/art/build_interni.py (gli altri interni identici).
+- Validator: ogni luogo di ogni rituale deve essere un posto del mondo; zone_anche solo fra location_tags della regione.
+- tests/test_luoghi_rituali.gd (2); aggiornati i conteggi di interni (25) e varchi (7). 1135 test, validate 0.
+- Schermo (Xvfb, Fool alla Sequenza 4): la porta del teatro sulla mappa, dentro la zona e' "teatro" e la riga del
+  luogo del rituale ha il segno. arte/revisione/teatro_frontiera.png. Non mi convince: da fuori il teatro e' solo una
+  porta di pietra, non un edificio; il passo tra le rupi resta sul bordo della regione.
+
+## US-1305d: i sacrifici e i sigilli dei rituali, 2026-11-16
+- Decisione dell'utente: costo vero dove il gioco ne ha uno, gli altri una scelta scritta che si conferma.
+- Dati: data/balance.json rituale.sacrifici, una voce per ognuno dei 33 sacrifici. Costi veri: una tua Ancora
+  (distrutta), il detentore della Sequenza 0 (flag tribolazione_soglia_varcata), l'arma spezzata (oggetto nuovo),
+  l'armatura e lo strumento migliore (cio' che indossi, distrutto), una struttura costruita (distrutta), il sangue
+  (meta' della salute di adesso), tutta la fortuna (tutte le monete). Gli altri pesano su follia (4-15) o fondamenta
+  (-6..-10).
+- Oggetti nuovi in data/items/materiali.json: arma_spezzata e i 5 sigilli dei rituali (guardiano, argenteo, declino,
+  mano, autorita'); venduti da Greta e Dario (roster.json). Icone: python tools/art/build_icone.py (sigillo_viola,
+  spada_ferro: forme gia' esistenti, nessun disegno nuovo).
+- Codice: scripts/ritual_system.gd costo(), pagabile(), offri(), _paga() (alla fine del rituale; un sacrificio dato
+  va offerto di nuovo la volta dopo); un sigillo c'e' se e' nello zaino. scripts/equipment.gd distruggi_slot().
+  Libro: accanto a ogni sacrificio che cosa costa, e il bottone "Offri" (spento, "Non hai di che offrirlo").
+- tests/test_ritual.gd (+3): ogni sacrificio dei 50 rituali ha il suo costo; uno scritto pesa sulla follia solo se
+  offerto; l'armatura sacrificata sparisce. 1138 test, validate 0.
+- Schermo (Xvfb, Sequenza 4): senza oggetti il bottone e' spento; con sigillo e arma nello zaino si offre; sul campo
+  di battaglia all'alba il rituale si compie: Sequenza 3, arma spezzata consumata, sigillo rimasto.
+  arte/revisione/rituale_sacrifici.png.
+- Non mi convince: i sigilli e l'arma spezzata si comprano e basta (meglio trovarli: forzieri, nemici della fase 15);
+  i sacrifici "di creature" sono solo follia perche' il pet non si puo' ancora avere nel gioco.
+
+## US-1310, US-1311, US-1312, US-1313: l'Atto III giocato fino al finale, fase 13 chiusa, 2026-11-17
+- tests/manual/qa_atto_3.gd (comando nel file, Xvfb), Pathway di default (Twilight Giant), dalla Sequenza 4:
+  0. giocando con Lena diventa un'Ancora (ora vera, in AnchorSystem);
+  1. 4 -> 3: campo di battaglia all'alba, si offre l'arma spezzata dal libro, rituale compiuto;
+  2. Doran affrontato (patto): la tribolazione 3 -> 2 e' superata; 3 -> 2 sull'altura (vicino al passo tra le rupi,
+     dentro la regione) all'alba, l'armatura indossata se ne va;
+  3. palizzata costruita dalla pagina Base; a notte fonda si entra nella cripta, al crepuscolo il rituale: 2 -> 1,
+     la palizzata se ne va;
+  4. alla soglia della Frontiera, di notte, l'antagonista del Pathway: "Sono venuto a prendere..." chiude la prova 1 -> 0;
+  5. 1 -> 0 sul campo di battaglia (luogo di massacro) durante l'eclissi, si sacrifica l'Ancora: Lena se ne va, la
+     follia sale, rituale_sequenza_0_completato, finale Apoteosi nel colophon del libro.
+  46 controlli ok. Foto: arte/revisione/qa_atto_3.png (Doran, rituale nella cripta, la soglia, l'antagonista, il
+  rituale dell'Ancora nel libro, il finale).
+- tests/test_fase_13_checkpoint.gd (4). 1142 test, validate 0.
+- Da sapere (non corretto, da decidere):
+  - il rituale scritto sulla Sequenza 0 nei dati (soglia del crepuscolo, il detentore precedente) non si usa mai: nel
+    progetto i dati della Sequenza N dicono come si lascia la N, e dalla 0 non si va oltre. Il "detentore" e' gia'
+    la prova 1 -> 0 (l'antagonista). Si puo' togliere o spostare.
+  - due rituali su cinque del Twilight Giant chiedono un'eclissi (rara nel gioco): chiesto all'utente.
+  - il finale sta in cima al colophon, sopra le impostazioni: meriterebbe una pagina sua (titoli di coda).
+  - durante il rituale (45 secondi) i nemici attorno possono interromperlo: sul campo di battaglia ce ne sono.
+
+## US-8B75d: HUD nuovo, pulito, abilita' a soli simboli, 2026-11-17 (richiesta dell'utente)
+- Brief: HUD piccolo e calmo che stia col mondo pixel art. In alto a sinistra le barre, in basso al centro la hotbar.
+  Mai nomi di abilita' o di status a schermo (stanno nel libro). Numeri solo quando servono.
+- Arte: python tools/art/build_hud.py (nessun seed: griglie) -> assets/ui/hud/{cuore,goccia,maschera,fiala}.png 12x12 e
+  cifra_1..4.png 6x8; foglio arte/revisione/hud_icone.png guardato x8 su fondo chiaro e scuro. Palette Endesga 32,
+  contorno #181425, alpha 0/255.
+- Dati: data/ui/hud.json (angolo, colori e misure delle tre barre, tempi della scia, soglia e battito della vita bassa,
+  numeri, avanzamento, stati, hotbar); GameData.get_ui_hud(); il validator controlla icone e colori.
+- Codice: scripts/hud_barra.gd (la barra disegnata a pixel di 0.5 unita': contorno, fondo, scia, pieno in 3 toni,
+  bordo acceso, tacche; scia che aspetta 0.45 s e scende; cura che sale in 0.25 s; battito sotto il 30%),
+  scripts/hud_slot.gd (cornice con luce in alto a sinistra, glifo con la rampa del Pathway, cifra, velo della ricarica
+  che si apre dall'alto, velo blu senza spiritualita', lampo al lancio), scripts/hud.gd e scenes/hud.tscn riscritti.
+  game_camera.inquadra_stanza lascia libero anche il basso (hud.altezza_sotto).
+- Test aggiornati (test_i18n_hud, test_icone_primitive): scia e numeri che spariscono, hotbar senza scritte, in basso al
+  centro, HUD in cima sotto un quinto dello schermo, status senza nomi. 1142 test, validate 0.
+- Schermo (Xvfb): luminosa e cupa, giorno e notte, dopo un colpo (scia) e in un interno (la stanza sta fra le barre e
+  la hotbar). arte/revisione/hud_nuovo.png.
+- Da guardare insieme all'utente: grandezza degli emblemi (12 px), posizione della hotbar, se i numeri devono restare
+  sempre visibili (oggi spariscono dopo 1,6 s).
+
+## US-1314 e US-1315: il rituale finale sulla Sequenza 1, i titoli di coda, 2026-11-17 (richiesta dell'utente)
+- Rituale della Sequenza 0: non si usava mai (nel progetto i dati della Sequenza N dicono come si LASCIA la N). Per i
+  10 Pathway il rituale della Sequenza 1 ora ha luogo, ora, luna e sigilli del vecchio rituale della 0 (il luogo
+  dell'apoteosi: Soglia del Crepuscolo, porta senza stanza, Biblioteca di Tutto, Radice del Mondo) e chiede insieme
+  l'Ancora e il detentore precedente (= la prova dell'antagonista). La Sequenza 0 ha advancement_ritual null e il
+  validator lo vuole cosi'; alla 0 PotionSystem.bevi rifiuta e il libro scrive "non c'e' un gradino oltre".
+  Script dei dati fatto a mano una volta (merge 1+0, ordine dei sacrifici: Ancora, detentore).
+- Titoli di coda: data/ui/titoli.json (velocita', colori, corpi, testi, scelte {flag, testo_i18n}, crediti),
+  scripts/titoli_coda.gd, testi titoli.* in it.json. EndingSystem: al finale partono i titoli, alla fine (o con Esc /
+  interagisci) il libro si apre sul colophon come prima. Crediti: ideazione Asso; codice, arte e testi Asso con Claude
+  Code; Godot; Alegreya (OFL); autori dei suoni CC0 letti da audio_fonti.json.
+- tests/test_titoli_coda.gd (1), test_ending_system, test_regions, test_darkness aggiornati. 1143 test, validate 0.
+- Schermo: qa_atto_3 rilanciato fino in fondo (tutti ok): l'ultimo rituale alla Soglia del Crepuscolo con Ancora e
+  detentore, poi Apoteosi, il viaggio, i crediti, "Grazie per aver giocato", il colophon. arte/revisione/titoli_di_coda.png.
+- Da fare piu' avanti: la musica dei titoli (manca il lettore, US-1602); i titoli in inglese con il resto (US-EN).
+
+## US-1501: i tipi di nemico sono dati, 2026-11-17 (fase 15 cominciata)
+- data/balance.json "nemici_tipi": 42 tipi. I 36 del bestiario deciso dall'utente (6 Mirwada, 5+1 Marche, 5+1 Valle,
+  5+1 Archivio, 5+1 Frontiera, 5 sottosuolo, 4+1 mare con la barca senza nessuno), il coccodrillo che rima, i 5 capi
+  gia' posati nel mondo (belva dei moli, capitano senza riposo, madre dei lupi, custode del sapere, burattinaio) e il
+  brigante della campagna. Ognuno: name_i18n, rarita (comune/raro/elite), comportamento (mischia/distanza/carica/volo),
+  aspetto, telegraph (comune: wind_up_heavy 700 ms, leggibile; raro/elite: wind_up_light 300 ms, teso: decisione
+  dell'utente nel bestiario), tag e i numeri che cambiano. Nomi in it.json (enemy.*). Numeri plausibili, non bilanciati.
+- scripts/enemy.gd: var tipo; _cfg = nemico_base, poi il tipo, poi l'override. mondo.gd, interior_scene.gd e
+  world_scene.gd passano spec.tipo. I nemici posati (layout, campagna, interni: 72) hanno "tipo" al posto di
+  override.name_i18n (script fatto una volta; campagna.json riformattata con un campo per riga).
+- Validator: ogni nemico posato ha un tipo esistente; i tipi solo con chiavi di nemico_base + name_i18n, rarita,
+  comportamento, aspetto; vocabolari di rarita' e comportamento; tag del vocabolario; foglio dell'aspetto esistente.
+- tests/test_nemici_tipi.gd (3), test_enemy aggiornato. 1146 test, validate 0.
+- Schermo (Xvfb): nel mondo 14 tipi diversi posati (gli altri entrano con US-1507); il lupo della luna ha il suo nome,
+  i suoi numeri e il tell lungo, e attacca. arte/revisione/nemici_tipi.png. Tutti hanno ancora la figura di nemico_base
+  (US-1504) e combattono in mischia (US-1502/1503).
+
+## US-1502: il nemico che colpisce da lontano, 2026-11-17
+- Dati: balance.json nemico_base.distanza {tiene 80, tiro 170, ritirata_s 1.2, velocita_proiettile 170, gittata 240,
+  tag_danno}; vale per i tipi con comportamento "distanza" (11 tipi), il danno e' danno_attacco del tipo.
+- scripts/enemy.gd: _a_distanza(), _insegui_a_distanza() (si avvicina fino a tiro, indietreggia sotto tiene, poi il
+  tell), _tira() (scripts/projectile.gd, lo stesso delle abilita': parata e schivata come gli altri colpi); niente
+  arco di mischia per chi tira. scripts/projectile.gd: il tiro di un nemico non colpisce un altro nemico.
+- tests/test_nemico_distanza.gd (4). 1150 test, validate 0.
+- Schermo (Xvfb, Mirwada): un contrabbandiere con la balestra a 50 unita' da Enel indietreggia a 80, fa il tell
+  (cerchio azzurro), tira, il colpo arriva su Enel; tre tiri in 4 secondi. arte/revisione/nemico_distanza.png.
+- Non mi convince: il proiettile ha la palette neutra (bianco) e i nomi lunghi sopra la testa ("Contrabbandiere con
+  la balestra") sono larghi: da guardare con l'arte dei nemici (US-1504).
+
+## US-1503: il nemico che carica e quello che vola, 2026-11-17
+- Dati: balance.json nemico_base.carica {da 110, velocita 340, durata_s 0.6, recupero_s 1.4} e .volo {maschera 1,
+  quota 8, ondeggio 1.5}; valgono per i tipi con comportamento carica (3) e volo (4).
+- scripts/enemy.gd: la carica comincia il tell a portata "da", in ATTACCO scatta in linea con la hitbox attiva davanti
+  e finisce al muro / addosso al giocatore / a tempo, poi il recupero lungo (l'animazione non la chiude); chi vola ha
+  collision_mask senza lo strato dei dislivelli (16) e la figura alzata che ondeggia.
+- tests/test_nemico_carica_volo.gd (2): la carica si ferma contro un muro e resta scoperta; il volante passa i
+  dislivelli ma non l'acqua. 1152 test, validate 0.
+- Schermo (Xvfb, Mirwada): lo scaricatore ubriaco fa il tell a 100 unita', in un attimo e' addosso a Enel (colpo),
+  poi resta fermo un secondo e mezzo; il corvo vola alto e colpisce. arte/revisione/nemico_carica_volo.png.
+- Non mi convince: i nomi sopra la testa di nemici vicini si accavallano (da sistemare con l'arte dei nemici, US-1504,
+  o mostrando il nome solo del nemico ingaggiato).
+
+## Cose aperte messe a posto (1), 2026-11-18 (richiesta dell'utente: "metti a posto le cose da mettere a posto")
+- Decisioni dell'utente: l'eclissi resta rara (non cambia niente); i boss proposti sono confermati (CLAUDE.md, PRD).
+- Nomi dei nemici: si vedono solo sul nemico che ti affronta e, fra questi, sul piu' vicino (enemy.gd _nome_visibile,
+  5 volte al secondo); prima si accavallavano. Foto: arte/revisione/nomi_nemici.png.
+- Tiri dei nemici: colorati dalla palette del tipo (balance.json nemici_tipi.<tipo>.palette, id di vfx.json; Vfx
+  la chiede a enemy.palette_vfx()). Il validator controlla la palette.
+- Vita e spiritualita' salendo di Sequenza restano alla stessa frazione (Progression._applica_modificatori): prima
+  90/100 diventava 90/180.
+- Salvataggi di prima del 2026-11-16: le Ancore-persona entrano in AnchorSystem al caricamento (NpcSystem.riallinea_ancore).
+- Sigilli dei rituali e arma spezzata anche nei forzieri (bottino.json cripta, miniera, grotta, fogne, peso basso) e
+  l'arma spezzata dai nemici delle Marche di Sequenza 9-7 (drop del layout).
+- tests/test_cose_a_posto.gd (4). 1156 test, validate 0.
+- Controllato e lasciato: il punto "passo tra le rupi" sta al bordo della regione, ma la zona "altura" si prende da
+  tutte le caselle vicine dentro la regione (qa_atto_3 ci fa il rituale): non e' un problema.
+
+## Cose aperte messe a posto (2): via il mondo a layout, 2026-11-18
+- Tolti scripts/world_scene.gd, scenes/world_scene.tscn, tests/test_world_scene.gd (28 test) e
+  tests/manual/qa_mondo_continuo.gd: il mondo a layout della fase 10, che il gioco non usa piu' dal merge (la scena e'
+  il mondo generato). I layout restano come dati (fonte di nemici, oggetti, zone, edifici per mondo.gd popola()).
+- tests/test_layouts.gd ridotto ai test sui dati (2) piu' uno nuovo sul mondo vero: area_cleared alla morte
+  dell'ultimo nemico di una regione. Tolti i test che istanziavano world_scene in test_regions (2), test_area_gate (1),
+  test_main_boot (1) e il controllo di qa_mondo_continuo in test_fase_10_checkpoint; test_page_mappa: il viaggio con
+  il gating d'ingresso ora sul mondo vero (mondo.gd viaggia_a). Gli stessi comportamenti sul mondo generato sono gia'
+  in tests/test_mondo.gd (regione dalla posizione, varchi, nemici e oggetti dei layout, viaggio, NPC).
+- Commenti aggiornati (main.gd, mondo.gd, page_mappa.gd, enemy.gd, interior_scene.gd, CLAUDE.md).
+- 1090 test (66 tolti col vecchio mondo, 1 nuovo), tutti passati; validate 0.
+
+## Cose aperte messe a posto (3): arte, 2026-11-18
+- Antagonisti: soglia_02 (prima un cappuccio nero che copriva tutto il volto) ora ha capelli bianchi lunghi, saio
+  grigio cenere e sciarpa d'osso; soglia_03 la veste e i capelli viola sotto il mantello nero: i due non si somigliano
+  piu'. Comandi: python tools/art/build_npc.py ; python tools/art/build_ritratti.py (gli altri aspetti identici).
+  Foglio prima/dopo: arte/revisione/soglie_02_03.png. Visto: lo stile "hood" di forge3d mette il cappuccio davanti al
+  volto (va bene per una figura senza faccia, non per un personaggio che parla).
+- Teatro della Frontiera: aspetto di varco nuovo "teatro" in forge3d/creatures.py varco() (facciata rosa, colonne,
+  frontone, arco d'oro del proscenio, sipario rosso chiuso o aperto sul buio). Comando: python tools/art/esporta_mondo.py
+  --varchi (pochi secondi; gli altri varchi identici). regions.json: il varco del teatro usa "teatro". Guardato x4 nelle
+  due modalita' e nel gioco: arte/revisione/teatro_fuori.png.
+- Lasciato e scritto fra i limiti del generatore in CLAUDE.md: la barca di prua e di poppa resta corta (la vista la
+  schiaccia).
+- 1090 test, validate 0.
+
+## Cose aperte messe a posto (4): il pet si doma nel mondo, 2026-11-18 (decisione dell'utente)
+- Prima PetSystem.doma non lo chiamava nessuno: il compagno, l'Ancora del pet e i sacrifici "di creature" erano
+  irraggiungibili. Ora (US-1503b): data/pets/core.json "selvatico" {luogo, scostamento} per specie: lupo cinereo
+  (galleria di alberi, Valle), corvo veggente (cimitero, Mirwada), capra lunare (scalinata dell'Archivio). Pastura
+  spirituale in vendita da Sidon e Vesna.
+- scripts/world/pet_mondo.gd (nodo "Pet" del mondo): i selvatici con la loro figura e il prompt "Avvicinati piano";
+  interagisci: senza pastura "Ti serve: ...", altrimenti se ne consuma una e PetSystem.doma (domabilita' dei dati);
+  se va male "Si e' spaventato" e la specie torna al prossimo momento del giorno; se va bene il compagno segue Enel
+  (aspetta fuori dagli interni, raggiunge dopo un viaggio) ed e' un'Ancora. Testi in strings.csv HUD_DOMA_*.
+- Validator: il luogo esiste e la figura c'e'. tests/test_pet_mondo.gd (4). 1094 test, validate 0.
+- Schermo (Xvfb, Moon, cimitero di Mirwada): il corvo selvatico col prompt, domato al primo tentativo, poi segue Enel.
+  arte/revisione/pet_nel_mondo.png. Resta: il pet non combatte (con i nemici, fase 15).
+
+## US-1504a — Figure dei nemici umani, 2026-11-18
+- US-1504 spezzata in a (umani), b (bestie), c (forme strane). Qui i 26 tipi umani di `balance.json nemici_tipi`:
+  `tools/art/build_nemici.py` (ASPETTI: argomenti di forge3d `humanoid` per tipo, nessun numero casuale: stessi
+  parametri = stessi PNG), stesse clip e ppu 1.4 di nemico_base in `build_personaggi.py`, esporta in una cartella
+  temporanea (export_spec scrive `nemico_base_<anim>.png`, che in arte/sprite e' il foglio base: la prima prova lo
+  aveva spostato, ripristinato da git) e rinomina in `arte/sprite/nemico_base_<aspetto>_<anim>.png`.
+- Comandi: `python tools/art/build_nemici.py` (~80 s), poi `python tools/art/generate_all.py --only nemico_base`
+  (ora copia anche un aspetto per ogni "aspetto" dei tipi, col contorno rosso del tell sull'anticipo).
+- Dati: `aspetto` dei 26 tipi = id del tipo; il brigante e le bestie/forme restano "nemico_base". `enemy.gd` passa
+  l'aspetto all'AnimationMachine (`configura(categoria, aspetto)`); il validator vuole
+  `assets/placeholder/nemico_base_<aspetto>_idle.png`.
+- Scelte: colori diversi da Enel (nessuno col cappotto nero e la sciarpa rossa) tranne il Doppio, che e' Enel con
+  occhi rossi e lama viola; corazze con scudo tondo (guardia, custode della cripta) o a goccia (soldato caduto);
+  colosso e custode della cripta piu' grossi (`build`, `scale`).
+- Guardati: idle di tutti a x4 su fondo scuro e chiaro, attack/anticipo/walk di guardia, Doppio, pirata. A schermo
+  (Xvfb, 27 nemici posati sulla piazza di partenza, 3 foto): si leggono, ognuno diverso, la cella e i piedi uguali.
+- Test: `test_nemici_tipi.test_ogni_tipo_ha_la_sua_figura`. 1095 test verdi, validator 0 errori.
+- Aperto: come per Enel e gli NPC i fogli sono gli stessi nelle due modalita' (luminosa e cupa); nell'anticipo l'arma
+  a volte resta dietro la testa (limite noto del generatore). Bestie e forme strane: US-1504b/c.
+
+## US-1504b — Figure delle bestie, 2026-11-18
+- `tools/art/build_nemici.py` BESTIE (aspetto -> rig, pixel per unita', clip): lupo della luna (manto argento,
+  falce ciano in fronte), madre dei lupi (nera, grande, criniera), belva dei moli (grigia, larga, zanne e collare),
+  cervo dalle corna rosse (palco rosso), ratto delle fogne (bruno, coda nuda) a 1.75-1.6 come i pet; corvo della
+  battaglia (straccio rosso), pipistrello cieco (orecchie), gabbiano ladro a 2.3 come il corvo del pet.
+- Clip: quelle dei pet di forge3d piu' due nuove nel file: `_quad_anticipo` (acquattato, testa bassa, groppa alta:
+  quello di forge3d non si leggeva da fermo) e per i volatili anticipo = ali alzate della picchiata, barcollo =
+  `bird_hurt`. Morte di lato come i pet.
+- Comandi: `python tools/art/build_nemici.py --solo <aspetti>` (~14 s le 8 bestie), poi
+  `python tools/art/generate_all.py --only nemico_base`. `aspetto` degli 8 tipi in balance.json.
+- Guardati: idle nelle 4 direzioni a x3, attack/anticipo/walk/death/stagger di lato su fondo chiaro; corretti la
+  belva (era arancio come il cervo: ora grigia), il ratto (troppo piccolo: size 0.9), l'anticipo dei lupi. A schermo
+  (Xvfb, piazza di partenza): lupi, cervo e uccelli in volo con l'ombra a terra si leggono.
+- 1095 test verdi, validator 0 errori. Aperto: granchio e forme strane in US-1504c.
+
+## US-1504c — Figure delle forme strane (e chiusura di US-1504), 2026-11-18
+- `tools/art/build_nemici.py`: melma (slime di forge3d con bolle), granchio corazzato (carapace rosso, chele su giunti
+  propri: nel tell si alzano, nel colpo scattano), germoglio spinoso (bulbo con spine e corolla), sciame di spore
+  (8 spore su giunti propri che girano), glifo vivente (pietra col segno su tutte e 4 le facce, cosi' si legge da ogni
+  lato: il primo disco in piedi di lato era una linea; 6 frammenti in orbita, ciclo chiuso a 60 gradi), barca fantasma
+  (`creatures.barca` con legno ardesia e fosforescente, cannone a prua, lanterna; prua verso +y), coccodrillo rapper
+  (humanoid con muso lungo, denti, coda, berretto, catena d'oro; clip degli umani).
+- Clip comuni `clip_corpo(j, extra, volo, morte, a_terra)` su un giunto solo: respiro, saltelli, indietro (tell),
+  affondo, barcollo, morte di lato o "pozza".
+- forge3d `rig.py` (annotato in ORIGINE.md): voce di posa `"~<giunto>": (dx, dy, dz)` che scala le forme del
+  giunto; senza la voce i fogli restano identici. Serve alla melma (si schiaccia saltando e nel tell, muore a
+  pozzanghera) e al germoglio (appassisce).
+- Comandi: `python tools/art/build_nemici.py --solo melma granchio_corazzato germoglio_spinoso sciame_di_spore
+  glifo_vivente barca_fantasma coccodrillo_rapper` (~12 s), `python tools/art/generate_all.py --only nemico_base`.
+- Guardati a x3 (idle/attack/anticipo/walk/death, giu' e di lato): ingranditi germoglio, sciame e glifo (erano 12 px),
+  barca a 0.95, frammenti del glifo piu' viola, morte del glifo che si posa nella cella. A schermo (Xvfb): si leggono.
+- 41 tipi su 42 con la loro figura (resta il brigante, che e' il foglio base). 1095 test verdi, validator 0 errori.
+- Aperto: la barca vista di prua e' corta (limite noto); morendo affonda e il fondo della cella la taglia (si legge
+  come l'acqua). Le figure dei boss sono US-1506.
+
+## US-1505 — Boss con le fasi, 2026-11-18
+- Dati: `balance.json boss` coi 6 boss confermati dall'utente (Re dei Ratti, Madre delle Radici, Archivista Capo,
+  Custode senza Nome, Gigante sul Trono, Burattinaio): `vita_x`, `fasi` (3 i primi, 4 Gigante e Burattinaio) con
+  `cfg` (danno, tell, recupero, postura, comportamento che cambia: il Gigante alterna mischia e carica) e `gregari`
+  (ratti, germogli, scrivani e glifi, scheletri, soldati e alfieri, marionette, maschere e il Doppio), `arena`.
+  Nomi `boss.<id>` in it/en. Layout: `"boss"` su belva->scaricatore (fogne), madre dei lupi->guardiana (Valle),
+  custode del sapere (Archivio), burattinaio (Frontiera); due nuovi nelle Marche: custode della cripta alla cripta
+  (finisce nell'interno del varco: per questo `Boss.monta` anche in interior_scene.gd) e colosso al trono.
+- Codice: `scripts/boss.gd` (nodo dentro il nemico): vita moltiplicata, fase 0 all'ingaggio, poi a ogni soglia la
+  cfg si somma alla cfg del nemico e arrivano i gregari in cerchio (un colpo grosso fa tutte le fasi saltate);
+  arena: si chiude all'ingaggio, il bordo non si passa, si riapre alla morte del boss o del giocatore o se si finisce
+  oltre raggio x fuga_x (porta, teletrasporto); battuto non torna. `scripts/boss_arena.gd`: cerchio a trattini con
+  contorno scuro (il primo, sottile e verde, sul bosco non si vedeva), z -4 (sopra il terreno, sotto le figure).
+  `hud.gd mostra_boss/nascondi_boss`: nome e barra in alto al centro (hud.json barre.boss). `mondo.gd _radura`: il
+  boss va nella casella libera piu' vicina non coperta da chiome (la Madre stava sotto gli alberi e non si vedeva).
+- Validator: fasi (>=3, da 1.0 a scendere), chiavi della cfg, comportamento (mai volo), tipo dei gregari, arena;
+  `boss` dei layout esiste. Barra boss nei colori dell'HUD.
+- Verifica: `tests/test_boss.gd` (5 test). A schermo `tests/manual/qa_boss.gd` (Xvfb): Madre delle Radici e Archivista
+  Capo: nome e barra in alto, arena tratteggiata, scrivani alla seconda fase, giocatore portato a 400 unita' tenuto a
+  170 (il raggio), alla morte arena aperta e boss segnato come battuto. 1100 test verdi, validator 0 errori.
+- Note: il Burattinaio e l'Archivista non si raggiungono a Sequenza 9 (gating delle regioni: la prova a schermo li ha
+  fatti tornare alla partenza, corretto cosi'). Aperto: figure grandi dei boss (US-1506); i boss di zona del
+  sottosuolo (fogne) si vedono solo scendendo, da provare giocando.
+
+## US-D01..D06 — Dashboard del progetto (Officina di Mirwada), 2026-11-18
+- Richiesta dell'utente: una dashboard per vedere ogni cosa del gioco e dire se va bene, col consumo di token e il
+  costo API. Scelte dell'utente: pagina privata su claude.ai, tutte le parti di fila, poi fermarsi e aspettare le note.
+- `tools/dashboard/build.py` -> `build/dashboard/` (fuori dal repo): dati.json (prd, git, test, validator, nemici e
+  boss, personaggi, Pathway e abilita', oggetti, stati, mondo), 79 figure animate (ogni aspetto in un foglio unico con
+  tutte le animazioni e i tempi di animations.json), atlanti (ritratti, oggetti, stati, glifi), i fogli VFX, la mappa
+  2 px per casella coi colori medi delle tessere vere e degli oggetti di scena.
+- `tests/manual/qa_dashboard_foto.gd` (Xvfb, ~4 minuti): 113 foto 1280x720 dal gioco vero (49 luoghi, 34 villaggi,
+  19 interni con porta, 11 pagine del libro, HUD in combattimento), giocatore a Sequenza 0 perche' nessuna regione
+  lo respinga. Solo l'atollo arriva a 14 caselle dal punto (la cella libera piu' vicina).
+- `tools/dashboard/consumo.py`: token dai file di sessione di Claude Code (una risposta una volta, per id), cache a
+  5 minuti e a 1 ora separate, listino API (Opus 5.5 4/20 $, Fable 5.2 8/40 $ per milione, cache letta 0,20 $),
+  per giorno e per story (la prima story chiusa dopo la risposta). Questa sessione (3-18 novembre): circa 219 $.
+- `tools/dashboard/pagina.html`: dieci schede, figure animate a 2x (scegli animazione, direzione e sfondo nel
+  dettaglio), glifi ed effetti ricolorati come fa lo shader del Pathway, giudizi va bene / rifare con nota
+  nell'archivio della pagina (`giudizi/<tipo>:<id>`, scrive solo il proprietario), consumo da `consumo/<sessione>`.
+- Verifica: Playwright sulle dieci schede in chiaro e in scuro, nessun errore di script, a 400 px niente scorrimento
+  orizzontale; pubblicata, consumo scritto e riletto, una scrittura da Contributor rifiutata come voluto.
+- Regola nuova in CLAUDE.md: a fine sessione consumo.py, scrittura nell'archivio, build.py e ripubblicazione.
+- Aperto: le foto sono della modalita' luminosa e a mezzogiorno; mancano foto della cupa e del sottosuolo; gli
+  oggetti mostrano le prime 400 dopo i filtri.
+
+## Dashboard rifatta e skill dell'arte divise, 2026-11-18
+- Dashboard (US-D07): dettaglio grande al centro, frecce e A/D per passare all'elemento accanto, zoom delle foto,
+  "Rifare" apre la nota, la nota si salva da sola e segna "da rifare", liste e griglie in riquadri scorrevoli con
+  filtro, schede informative per ogni cosa (tools/dashboard/info.py: dove si trova, chi c'e', cosa lascia, a cosa
+  serve, icone uguali), personaggi con tutte le animazioni, velocita', frame per frame e campo di prova coi tasti,
+  boss con le fasi spiegate a parole, libro da sfogliare. Pubblicata allo stesso link (versione 3).
+- Giudizi letti dall'archivio: 10 "rifare" sui luoghi di Mirwada (case tutte uguali, cattedrale, museo, mercato,
+  dogana, faro, cantiere, centro antico, campo di battaglia) e 6 "va bene". Poi l'utente: "e' tutto da rifare dove non
+  ho cliccato"; boss poco chiari; effetti delle abilita' tutti uguali tranne il colore.
+- Skill: sprite-forge divisa in sei skill di progetto (.claude/skills/arte-personaggi, arte-architettura, arte-mondo,
+  arte-effetti, arte-icone, arte-revisione) con le note dell'utente, le regole trovate (SLYNYRD, Lospec, guida VFX di
+  LoL) e i controlli. Motore: group_lines e stacco (spenti di default).
+- La prova con stacco e group_lines all'utente sembra peggio di prima: la testa diventa una palla e la faccia
+  sparisce. Conclusione: ritoccare i parametri del 3D non basta; serve una scelta di stile con l'utente prima di
+  rifare (prossimo passo, non iniziato per sua richiesta).
+
+## Scelte artistiche e prima prova del nuovo stile, 2026-11-18 (US-8C01)
+- Scelte dell'utente (CLAUDE.md "Decisioni prese"): 3 teste, pixel art a griglia su scheletro, contorno nero 1 px,
+  3 toni, fotogrammi ricchi, un effetto unico per ogni abilita', boss fino a 192 px, mondo a griglia, cupa con
+  disegni propri, icone uniche. Chiarito con l'utente: in comune c'e' SOLO lo scheletro (giunture e pose); testa,
+  faccia, corpo, vestiti, arma e animazioni sono di ogni personaggio.
+- Motore nuovo `tools/art/griglia/` (pixel.py tela/rampe/segmenti/griglie/contorno anche fra le parti, corpo.py
+  scheletro umano e a quattro zampe con proiezione 3/4, pose.py chiavi a tempo normalizzato, effetti.py) e
+  `tools/art/build_griglia.py`. Figure: `griglia/figure/personaggio.py` (Enel: coppola, crepa di luce, sciarpa,
+  bende, spadone sulla schiena che impugna solo negli attacchi), `griglia/figure/lupo_della_luna.py`.
+- Comandi (niente caso, nessun seme): `python tools/art/build_griglia.py` (figure -> arte/sprite/, controllo in
+  arte/revisione/griglia_<id>.png), `python tools/art/build_griglia.py --effetti` (vfx_fendente_pesante,
+  vfx_incantesimo, vfx_incantesimo_scoppio -> assets/vfx/), poi `python tools/art/generate_all.py`.
+- Fotogrammi ricchi in data/animations.json: personaggio idle 6, walk 8 (contatti 0 e 4), attack_light 8 (colpo 3),
+  attack_heavy 12 (anticipo 0-5, colpo 6-7), death 10; nemico_base idle 6, walk 8, attack 6 (colpo 2), death 10.
+  Gli altri fogli (NPC, forme, 40 nemici) rigenerati col 3D di prima solo per i nuovi numeri: si rifanno dopo.
+- Guardato a x3-x5 su chiaro e scuro: Enel in tutte le 16 animazioni e 4 viste, lupo in 6, effetti ricolorati
+  (Twilight Giant, Eremita). Corretti: crepa che sembrava una lacrima, coppola troppo tonda, spadone davanti alla
+  faccia (ora sulla schiena), caduta della morte in avanti (ora all'indietro e dentro la cella), lupo stretto di
+  fronte, coda bianca enorme da dietro, lampo del fendente vuoto.
+- Dashboard: in "Oggi" la prova del nuovo stile (arena con Enel, il lupo come bersaglio, K fendente pesante,
+  1 Incantesimo tradizionale con lo scoppio), e il dettaglio delle due figure da giudicare.
+- Non mi convince ancora: il lupo da dietro e' un ovale con le orecchie; raccogliere di profilo sembra un inchino;
+  le rune dell'incantesimo a 1x sono puntini; nel gioco il fendente pesante e l'incantesimo non sono ancora
+  collegati (servono i dati per abilita' in vfx.json: dopo il giudizio).
+
+## Giro 2 della prova di stile, 2026-11-18 (US-8C02)
+- Note dell'utente: si piegava indietro per caricare il colpo (non ha senso); vuole la carica tenendo premuto
+  (piu' tieni, piu' forte e piu' largo) sul sito e nel gioco; Enel poco unico, gambe troppo lunghe, busto piccolo;
+  la schivata "fa pena" (piu' versioni, sceglie lui); lupo piu' unico; una pagina nuova con ogni cosa da approvare;
+  la prova a schermo intero.
+- Enel: anca 10.5, busto 12.5, spalle 6.8, arti piu' spessi, falde piu' corte; capo della sciarpa sul petto, due
+  fiale (rossa e azzurra) alla cintura. Attacco pesante rifatto: carica raccolta in avanti (piega +10/+12, piedi
+  larghi, spadone alto dietro la spalla destra), mai indietro.
+- Schivata: 4 versioni in griglia/figure/personaggio.py VARIANTI (scivolata, capriola con `perno`, affondo, ombra
+  con le copie scure `scia`) -> arte/prova/personaggio_dash_<id>.png. Nel gioco resta "dash" finche' non sceglie.
+- Lupo: gobbo (spalle 7.6, anche 4.6), sella scura sul dorso, criniera a punte scure, falce di luna gialla su fronte
+  e fianco, zanne, coda folta. Da dietro resta debole.
+- Gioco: azione `attacco_pesante` (K), player.gd inizia_pesante/_tieni_carica/carica_pesante/_fine_pesante: sul
+  frame_carica l'animazione si ferma finche' si tiene premuto, Enel si schiarisce; al rilascio danno e raggio
+  crescono con la carica (balance.json combattimento.attacco_pesante: danno 24, x2.5 e area x1.8 in 1.5 s).
+  Test tests/test_attacco_pesante.gd (2). 1102 test verdi, validator 0 errori.
+- Dashboard: pagina "Da testare" (#provare) con l'arena (K tenuto = carica con anello e barra, Schermo intero) e
+  una scheda da approvare per ogni cosa nuova (Enel e ognuna delle 16 animazioni, le 4 schivate, il lupo e le sue 6,
+  fendente, carica, incantesimo, scoppio): chiavi `prova:<id>`. Verificata con Playwright, nessun errore.
+- Aperto: nel gioco il fendente pesante usa ancora l'effetto melee_arc (non il disegno nuovo) finche' non e' approvato.
+
+## Giro 3 della prova: le note dell'utente sulle schede, 2026-11-18 (US-8C03)
+- Lette tutte le note (giudizi/prova:*, enel, boss:re_dei_ratti, nemico:barca_fantasma). Causa del "si china
+  all'indietro dappertutto": segno sbagliato in corpo.py (su = _rx(up, +piega) portava il busto indietro); ora -piega,
+  e le braccia seguono il busto. Carica del pesante rifatta col peso sulla gamba davanti (destra e sinistra guardate).
+- Carica: si carica SOLO tenendo premuto (anche durante la preparazione); lasciato prima del frame della carica il
+  colpo parte subito (player.gd _tieni_carica, arena del sito uguale). Test nuovo: un tocco non carica.
+- Enel: schivata a 8 frame chinata in avanti (animations.json dash 8 frame a 32 fps, i-frame 0-5); hurt piegato in
+  avanti con la faccia del dolore e il sangue; death in 4 direzioni (animations.json direzionale) con sangue e pozza;
+  cast con una mano e la luce che si forma; drink stappa e porta alla bocca; parry con la lama dritta avanti e la
+  scintilla; pickup accucciato col sacchetto a terra; walk con le ginocchia alte nel passaggio.
+- Schivate: 8 frame; capriola rifatta dopo una ricerca (abbassarsi, tuffo, palla che rotola sul bacino, piedi a
+  terra, rialzarsi); scivolata su un ginocchio; ombra con copie viola e blu ben visibili.
+- Lupo: la falce gira col corpo (regola nuova: ogni disegno sul corpo gira col corpo), morte in 4 direzioni col
+  sangue, sangue nello stagger. nemico_base death direzionale: rigenerati i 41 tipi (3D vecchio) e le forme.
+- Sito: arena sul terreno vero del gioco (tessere del mondo a 64 px per casella, scelta del luogo), schizzi di sangue
+  sui colpi, velocita' e fotogramma per fotogramma nelle schede. Due modifiche erano finite per errore nel campo di
+  prova dei personaggi (stesso codice): spostate nell'arena.
+- Regole nuove nella skill arte-personaggi. 1103 test verdi, validator 0 errori, Playwright senza errori.
+- Aperto (per il rifacimento di tutti): il contorno rosso del tell (Re dei Ratti) - va spiegato o tolto; la barca
+  fantasma deve avere un cannone che spara; nel gioco il fendente pesante usa ancora il disegno melee_arc.
+
+## Parata davanti e note che tornano da testare, 2026-11-19 (US-8C04)
+- Parata: la lama di traverso DAVANTI a Enel (mani avanti al petto, lama in diagonale verso la sua sinistra), la
+  scintilla alla profondita' della lama (da dietro non copre piu' la testa). Guardata nelle 4 viste.
+- Sito, richiesta dell'utente: una nota scritta e' una "nota mandata"; quando la cosa e' rifatta torna "da testare",
+  la nota scende fra quelle "gia' sistemate" e se ne scrive una nuova; le approvate stanno in "Testate".
+  Come: build.py versioni() fa un'impronta (sha) dei file di ogni scheda; il registro tools/dashboard/versioni.json
+  (nel repo) ricorda da quando ogni versione c'e'; un giudizio vale per la sua versione (campo `versione`, o per i
+  giudizi vecchi la data contro `dal`). La pagina Da testare ha tre parti: Da testare, Note mandate, Testate.
+  Il registro e' partito confrontando col commit giudicato (e501670): le cose non cambiate tengono il giudizio.
+- Verificato con Playwright (giudizi finti nella pagina): la parata torna da testare con la nota sistemata, l'idle
+  approvato resta in Testate, una nota nuova resta in Note mandate. Nessun errore.
+
+## Note del 2026-11-19 e domande sul sito (US-8C05)
+- Lette le note nuove: pesante a due mani; morte di Enel vista da destra con la testa in giu'; lupo morto con la luna
+  ancora visibile e la testa dritta di profilo; "cosa sono i punti rossi" (sangue) sul lupo che barcolla.
+- Fatto: `_due_mani` (IK a due ossa della mano sinistra sull'elsa) in tutto attack_heavy; testa da sdraiato a destra
+  ruotata al contrario (lo specchio inverte il verso); morte del lupo rifatta (zampe che cedono, corpo a terra, muso
+  al suolo, occhi spenti e falce nascosta); tell = lampo negli occhi (scelta dell'utente) col bagliore, niente contorno
+  rosso per le figure a griglia (generate_all GRIGLIA).
+- Sito: domande e messaggi di Claude sulle schede (tools/dashboard/domande.json, risposte in risposte/<id>, scheda
+  segnata "❓"); "Da testare" mostra solo quello da provare; pagina nuova "Note e testate" a cartelle (Enel, Schivate,
+  Lupo, Effetti, Boss, Nemici, Luoghi, Libro...) con domande, messaggi, note mandate e approvate; nomi italiani delle
+  animazioni. Domande aperte: sangue del lupo, quale schivata va nel gioco.
+- 1103 test verdi, validator 0 errori, Playwright senza errori.
+
+## Primo giro "uno per tipo": case, mercante, cervo, Stretta ferrea, 2026-11-21 (US-8C06)
+- Metodo deciso dall'utente: a ogni giro un edificio (o due dello stesso stile), un personaggio, un animale e
+  un'abilita', finche' non li ha confermati tutti.
+- Edifici a griglia: tools/art/griglia/edifici.py (64 px per casella come le figure; tessiture blocchi, marmo,
+  tegole, lastre; pezzi colonna, arco, porta di legno o bronzo, finestra, gradini, fregio, crepe, muschio). Casa del
+  centro antico (4x3: arenaria, terrazza con l'angolo crollato e le macerie, botola, colonna spezzata, arco con la
+  chiave, mezze colonne, fregio di glifi, edera) e museo (6x4: tempio di marmo, scalinata, sei colonne, frontone con
+  l'anfora e le statue, lucernario, portone di bronzo, stendardi con l'anfora). Comando:
+  `python tools/art/build_griglia.py --edifici` -> arte/prova/edificio_<id>.png (non ancora nel mondo).
+- Mercante a griglia (griglia/figure/mercante.py, SOLO idle e walk come gli NPC): turbante viola con la gemma, baffi,
+  pancia col panciotto verde, grembiule con la borsa, pantaloni rossi a sbuffo, babbucce; si sfrega le mani, cammina
+  dondolando. Prima versione tutta arancione: ricolorata. Va dritto nel gioco (assets/placeholder).
+- Cervo a griglia (griglia/figure/cervo.py, fauna idle 4 e fuga 6): bruca e alza la testa, salta in fuga.
+- Stretta ferrea (tg_stretta_ferrea, difesa +25% per 5 s): effetti.py stretta_ferrea (piastre ai lati, clang,
+  guscio, riflesso) -> assets/vfx/vfx_stretta_ferrea.png; nell'arena tasto 2, centrata su Enel. Prima versione con le
+  piastre che coprivano Enel e uscivano dalla cella: rimpicciolite e messe ai lati.
+- Guardati ingranditi; sito verificato con Playwright (nessun errore); 1103 test, validator 0 errori.
+- Aperto: il cervo da davanti e' sottile; nel gioco l'effetto unico dell'abilita' non e' ancora collegato (va fatto
+  quando ce ne saranno di piu': vfx.json per abilita').
+
+## 2026-11-21 — US-8C07: note dell'utente del 21/11
+- Cervo: Quadrupede(piedi_pari=True) mette anche e spalle all'altezza giusta (le 4 zampe a terra); il collo va fino
+  alla testa, la griglia della testa attaccata al collo.
+- Attacco pesante a sinistra: il braccio dal lato di chi guarda ha +2.6 di profondita' (non sparisce dietro la testa).
+- Capriola: la rotazione (cade) a quarti di giro esatti, perno 15 (19 sul fotogramma a -90): il corpo resta nella
+  cella in tutte e 4 le direzioni (misurato: nessun pixel sulla riga 63), la testa gira col corpo.
+- Camminata: ginocchio della gamba che passa fino a 90 gradi e busto che dondola (inclina +-3): le gambe si vedono
+  muovere anche da davanti e da dietro.
+- Museo: tetto a padiglione (4 falde con le creste, luce per falda), lucernari pochi e sparsi appoggiati ognuno su una
+  falda (il bordo spesso verso valle; un assert vieta quelli a cavallo di due falde), niente lanterna sul colmo
+  (l'utente: "non ha senso"); muro 132; affreschi (colline, nave) in cornice d'oro, nicchie con statue sotto gli
+  stendardi accorciati, fascia a mosaico interrotta dal portale.
+- Centro antico: due case nuove, casa_antica_pergola (3x3, pergola e vite, anfore, scala esterna, porta squadrata,
+  scuri) e casa_antica_loggia (5x3, coppi con il buco e le travi, loggia di tre archi, occhio, fontana). Rampe nuove
+  `cotto` e `coppi`. Comando: `python tools/art/build_griglia.py --edifici`.
+- Sito: chip "Claude ti ha risposto" sulle schede con una spiegazione del 21/11, visore "Tutti i fotogrammi, numerati"
+  sotto ogni animazione e schivata; risposte e domande in domande.json (spada sempre visibile? schivata per Pathway).
+- 1103 test, validator 0 errori; tutto guardato ingrandito.
+- Aperto: risposte a d3 (arma visibile) e d4 (schivata per Pathway); le schivate nuove per Pathway da disegnare.
+- Decisione dell'utente (21/11, risposta a d3 in chat): l'equipaggiamento deve vedersi su Enel -> US-8C08 aperta,
+  CLAUDE.md "Decisioni prese". La risposta sulla schivata per Pathway (d4) arrivera' dopo, sul sito.
+- Note del 21/11 (secondo giro): tutto approvato (Enel, camminata, pesante, leggero, magia, morte, lupo, mercante,
+  cervo, museo, case pergola e loggia, Stretta ferrea, carica) tranne la capriola: da davanti ora il mento va sul petto
+  e si vedono i capelli (TESTA["up"], capovolta a testa in giu'). Sul sito d3 risposta "No, lo spadone resta" (12:56),
+  in chat poco dopo "si vorrei vedere": vale la chat (US-8C08), da confermare con l'utente.
+- Regola nuova dell'utente (CLAUDE.md): "prepara i prossimi disegni test" = 1 personaggio completo, 5 edifici,
+  5 animali, 5 nemici, 1 boss, 10 abilita', 10 oggetti sulla pagina Da testare.
+- Dashboard: mappa del Mondo con il pulsante Sopra/Sottosuolo (build.py mappa/mappa_dettaglio con sotto=True ->
+  img/mappa_sotto.png, mondo_sotto.json, img/mondo_sotto/); da sotto si vedono ingressi e boss del sottosuolo.
+  Verificato con Playwright, nessun errore in console.
+
+## 2026-11-22 — US-8C09: primo giro "prepara i prossimi disegni test"
+- Motore: personaggio.disegna(st=modulo) e lo stile S (falde, sciarpa, fiale, rampe di busto/braccia/gambe, spessore,
+  arma con le sue misure, fodero al fianco, testa_su, EXTRA, lampo negli occhi): ogni umano ha i suoi pezzi sullo
+  scheletro di Enel. Enel identico (fogli confrontati). _bestia.py: disegno comune dei quadrupedi (B, EXTRA, pose fauna);
+  _umano_nemico.py: pose dei nemici umani dalle mosse di Enel (anticipo = carica col lampo, attack = il colpo).
+- Personaggio completo: Aldo il rivale (rivale.py), 16 mosse, stocco a una mano, mantellina; va anche in
+  assets/placeholder (l'NPC Aldo).
+- Animali: lepre, volpe, cinghiale (setole), capra (corna), orso. Nemici: scheletro_catacombe (costole, spessore 0.55),
+  pirata_naufrago (righe), soldato_caduto (scudo), ratto_delle_fogne (ciuffi), granchio_corazzato (chele che si aprono
+  nel tell e nel morso); in generate_all GRIGLIA (niente contorno rosso). Boss: re_dei_ratti, cella 160 (PROVA: resta in
+  arte/prova/), testa grande a pezzi tondi, corona, cuciture, ratti sulle spalle, mannaia a due mani.
+- Edifici: cattedrale (gotica, campanili con guglie, rosone, ogive), faro (alto 330 px), bottega del fornaio (insegna a
+  pagnotta), dogana (bilancia, garitta con la sbarra), casa del pescatore (pali, reti).
+- Effetti (effetti.py, `_frame`): incubo, tocco_gelido, passo_breve, pugnalata_furtiva, velo_illusorio, sigillo_su_arma,
+  richiamo_compagno, germoglio_rapido, analisi, contrattacco -> assets/vfx/vfx_<nome>.png (non ancora collegati nel gioco).
+- Oggetti (griglia/oggetti.py, `--oggetti`): 10 icone 32x32 in arte/prova/oggetto_<id>.png.
+- Comandi: build_griglia.py (--only <id>, --edifici, --effetti, --oggetti), generate_all.py --only nemico_base.
+- Dashboard: GIRO2 in build.py, gruppi nuovi in Da testare (142 schede), fotogrammi numerati anche per gli effetti,
+  cartelle Aldo/Animali/Nemici/Boss/Oggetti in Note e testate; verificato con Playwright, nessun errore.
+- test_fauna: la lepre ora ha la cella 64. 1103 test, validator 0 errori.
+- Aperto: il boss ha il busto squadrato e la mannaia sembra una clava; l'idle della lepre di profilo e' piccolo; gli
+  effetti nuovi e le icone vanno collegati nel gioco quando approvati.
+
+## 2026-11-23 — US-8C10: giro doppio di disegni test e note del giro 1
+- Note del giro 1 sistemate: le schede "aspetto" del giro non disegnavano la figura (studioFigura in un array: per
+  questo boss e granchio "non si vedevano"); abilita' ora mostrate con Enel che le lancia (`abilitaInScena`: gesto da
+  MISCHIA o cast, l'effetto parte a meta' gesto, su di lui, davanti o su un lupo bersaglio); lupo del Richiamo rifatto
+  di profilo che ulula; botteghe tutte diverse (`_bottega` con muro, tetto, tenda/sportelli/tettoia, merce e insegna
+  propri, insegna a 2 px per punto sopra il banco); Re dei Ratti con la pancia cucita e la lama piatta della mannaia.
+- Nuovo: Doran (investigatore) e Vesna (guaritrice) con le 16 mosse; nemici tagliaborse, scaricatore_ubriaco,
+  guardia_corrotta (alabarda), devoto_fuori_controllo (turibolo), contrabbandiere_balestra, alfiere_spettrale
+  (stendardo), custode_della_cripta (mazza a due mani), lettore_proibito (libro), cervo_corna_rosse, belva_dei_moli;
+  animali cavallo, mucca, pecora, maiale, cane, gatto, tasso, riccio, scoiattolo, lontra; boss madre_delle_radici e
+  archivista_capo (cella 160, arte/prova/); edifici bottega_pesce/speziale/armaiolo/sarta, taverna, casa_operaia,
+  cantiere_navale, mulino, capanna_paglia, torre_guardia; 20 effetti (due per Pathway); 20 icone.
+- Il sito prende le descrizioni dalle docstring dei disegni (build.py `_descrizioni`); GIRO2 elenca tutto il giro.
+- Comandi: build_griglia.py --only <id> / --edifici / --effetti / --oggetti; generate_all.py --only nemico_base.
+- 1103 test, validator 0 errori; sito controllato con Playwright (340 schede, nessun errore).
+- Aperto: nelle viste di profilo i libri dell'Archivista passano davanti alla faccia; le corna del cervo rosso di
+  profilo si vedono da un lato solo; la piuma dei venti sembra una scaletta; il sito d3 dice "spadone sempre", la chat
+  "equipaggiamento visibile" (vale la chat, da confermare).

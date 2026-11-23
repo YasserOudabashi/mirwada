@@ -3,7 +3,7 @@ extends RefCounted
 ## { tipo, valore } valutata contro lo stato globale di gioco. Un solo posto
 ## in cui vive la semantica di e_notte / fase_lunare / in_zona_tag /
 ## foundation_min / tier_min / madness_min / madness_max / acting_progress_min
-## (+ follia_min / reputazione_min / flag per i dialoghi, US-613).
+## (+ follia_min / reputazione_min / flag / flag_assente per i dialoghi, US-613 e US-1307).
 ##
 ## AbilityEngine.execute la chiama prima di pagare il costo; DialogueEngine
 ## (US-613) per nascondere le scelte non disponibili. Il CHIAMANTE decide se
@@ -75,6 +75,10 @@ static func soddisfatta(tipo: String, valore: Variant) -> bool:
 			# US-613: FlagStore/KnowledgeStore.
 			var ks: Node = root.get_node_or_null("KnowledgeStore")
 			return ks == null or bool(ks.call("conosce", str(valore)))
+		"flag_assente":
+			# US-1307: il contrario di 'flag'. Una scena che si fa una volta sola sparisce quando ha scritto il suo flag.
+			var ks2: Node = root.get_node_or_null("KnowledgeStore")
+			return ks2 == null or not bool(ks2.call("conosce", str(valore)))
 	return true
 
 

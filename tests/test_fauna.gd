@@ -1,9 +1,9 @@
 extends "res://tests/test_case.gd"
 ## US-8B23 — fauna d'atmosfera: una specie = un aspetto della categoria "fauna" (data/animations.json), fogli di
-## tools/art/build_fauna.py con la cella letta dal foglio (32 i piccoli, 64 il cervo) e la stessa grana degli altri.
+## tools/art/build_fauna.py con la cella letta dal foglio (32 i piccoli, 64 il cervo e la lepre a griglia) e la stessa grana.
 
 const AnimMachine := preload("res://scripts/animation_machine.gd")
-const SPECIE := {"cervo": 64, "lepre": 32, "uccello": 32, "farfalla": 32, "lucciola": 32}
+const SPECIE := {"cervo": 64, "lepre": 64, "uccello": 32, "farfalla": 32, "lucciola": 32}
 
 
 func _root() -> Node:

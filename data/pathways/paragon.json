@@ -629,13 +629,13 @@
       },
       "advancement_ritual": {
         "location_tags": [
-          "torre_di_osservazione",
-          "sala_dei_sigilli"
+          "biblioteca_di_tutto"
         ],
         "momento": "mezzogiorno",
-        "fase_lunare": null,
+        "fase_lunare": "eclissi",
         "sacrifices": [
-          "ancora_del_giocatore"
+          "ancora_del_giocatore",
+          "il_detentore_precedente_della_sequenza_0"
         ],
         "sigils": []
       },
@@ -704,17 +704,7 @@
         ],
         "formula_id": "formula_paragon_0"
       },
-      "advancement_ritual": {
-        "location_tags": [
-          "biblioteca_di_tutto"
-        ],
-        "momento": "mezzogiorno",
-        "fase_lunare": "eclissi",
-        "sacrifices": [
-          "il_detentore_precedente_della_sequenza_0"
-        ],
-        "sigils": []
-      },
+      "advancement_ritual": null,
       "madness_on_force": 14.0,
       "notes": "",
       "stub": false

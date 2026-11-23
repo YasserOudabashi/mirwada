@@ -56,3 +56,27 @@ func test_voce_di_feedback_ignota_non_esplode() -> void:
 	am.call("feedback", "voce_inventata")
 	Engine.time_scale = 1.0
 	assert_true(true, "nessun crash su voce ignota")
+
+
+## 2026-11-14: i suoni scaricati (data/audio_fonti.json) prendono il posto dei bip di prova; gli ambienti girano in
+## ciclo; un suono senza file resta il bip di sempre.
+func test_i_suoni_scaricati_si_usano_al_posto_dei_bip() -> void:
+	var am: Node = Engine.get_main_loop().root.get_node("AudioManager")
+	var doc: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/audio_fonti.json"))
+	var scaricati := 0
+	for id in doc["suoni"]:
+		var v: Dictionary = doc["suoni"][id]
+		if str(v.get("stato", "")) != "scaricato":
+			continue
+		scaricati += 1
+		assert_true(FileAccess.file_exists("res://" + str(v["file"])), "%s: il file c'e'" % id)
+		assert_eq(str(v.get("licenza", "")), "CC0", "%s: licenza libera" % id)
+		(am.get("_sfx_cache") as Dictionary).erase(id)
+		var s: AudioStream = am.call("_stream_per", id)
+		assert_true(s != null and s.get_length() > 0.05, "%s: si carica e dura qualcosa" % id)
+		if str(id).begins_with("amb_"):
+			assert_true((s is AudioStreamOggVorbis and (s as AudioStreamOggVorbis).loop) \
+				or (s is AudioStreamWAV and (s as AudioStreamWAV).loop_mode == AudioStreamWAV.LOOP_FORWARD), "%s: in ciclo" % id)
+	assert_gt(float(scaricati), 20.0, "piu' di venti suoni veri")
+	(am.get("_sfx_cache") as Dictionary).erase("sfx_breath")
+	assert_true(am.call("_stream_per", "sfx_breath") is AudioStreamWAV, "senza file resta il suono di prova")

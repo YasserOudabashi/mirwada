@@ -83,6 +83,15 @@ func rimuovi_slot(mount: String) -> bool:
 	return true
 
 
+## US-1305d: distrugge cio' che e' indossato in quello slot (il sacrificio di un rituale): i sigilli incastonati
+## tornano nello zaino, l'oggetto no. false se lo slot e' vuoto.
+func distruggi_slot(mount: String) -> bool:
+	if not _slot.has(mount):
+		return false
+	var iid: String = str(_slot[mount].get("instance_id", ""))
+	return rimuovi_slot(mount) and _inv() != null and bool(_inv().call("rimuovi_istanza", iid))
+
+
 ## Incastona un sigillo (istanza di zaino, categoria:sigillo) nello slot equip
 ## occupato da 'mount'. Fallisce se il mount e' vuoto, se non ci sono
 ## slot_sigilli liberi, o se l'istanza non e' un sigillo che risolve (US-317).

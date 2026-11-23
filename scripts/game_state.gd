@@ -433,6 +433,8 @@ func applica(dati: Dictionary) -> void:
 		_fondamenta().da_salvataggio(dati.get("fondamenta", {}))
 	if _ancore() != null:
 		_ancore().da_salvataggio(dati.get("ancore", []))
+	if _npc() != null:                     # 2026-11-18: salvataggi di prima: le Ancore-persona entrano in AnchorSystem
+		_npc().call("riallinea_ancore")
 	if _rituale() != null:
 		_rituale().da_salvataggio(dati.get("rituale", {}))
 	if _strutture() != null:

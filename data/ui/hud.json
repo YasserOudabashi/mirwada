@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "_comment": "HUD di gioco (US-8B75d, chiesto dall'utente il 2026-11-17: pulito, che non stanchi l'occhio). Misure in unita' (1 unita' = 2 pixel; mezza unita' = 1 pixel). Colori Endesga 32: per ogni barra tre toni [ombra, pieno, luce] e la scia (il danno appena preso, che resta e scende piano). Le icone sono di tools/art/build_hud.py (assets/ui/hud/). I numeri compaiono solo quando il valore cambia, poi spariscono.",
+  "angolo": [10, 9],
+  "contorno": "#181425",
+  "fondo": "#262b44",
+  "fondo_alpha": 0.78,
+  "tacche_alpha": 0.3,
+  "barre": {
+    "vita":        {"larghezza": 100, "altezza": 6, "toni": ["#a22633", "#e43b44", "#f6757a"], "scia": "#ead4aa", "emblema": "cuore"},
+    "spirito":     {"larghezza": 84, "altezza": 4, "toni": ["#124e89", "#0099db", "#2ce8f5"], "scia": "#c0cbdc", "emblema": "goccia"},
+    "recitazione": {"larghezza": 84, "altezza": 2, "toni": ["#be4a2f", "#feae34", "#fee761"], "scia": "#feae34", "emblema": "maschera"},
+    "boss":        {"larghezza": 200, "altezza": 5, "toni": ["#68386c", "#b55088", "#f6757a"], "scia": "#ead4aa", "dall_alto": 8}
+  },
+  "scia": {"attesa_s": 0.45, "discesa_per_s": 0.55, "salita_s": 0.25},
+  "poca_vita": {"soglia": 0.3, "battito_s": 0.9},
+  "numeri": {"corpo": 8, "mostra_s": 1.6, "dissolvenza_s": 0.5},
+  "avanzamento": {"icona": "fiala", "battito_s": 1.4},
+  "stati": {"lato": 10, "lampeggio_ultimi_s": 2.0, "tempo": "#c0cbdc"},
+  "hotbar": {
+    "lato": 22,
+    "spazio": 4,
+    "dal_basso": 8,
+    "fondo_alpha": 0.55,
+    "bordo": "#3a4466",
+    "luce": "#5a6988",
+    "ricarica_alpha": 0.72,
+    "senza_spirito": "#124e89",
+    "lampo_s": 0.35
+  }
+}

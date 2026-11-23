@@ -36,6 +36,11 @@ const Hurtbox := preload("res://scripts/hurtbox.gd")
 var _dir_sguardo: String = "down"
 var _attaccando: bool = false
 var _combat: Dictionary = {}
+## US-8C02: attacco pesante caricato. Tenendo premuto il tasto l'animazione si ferma su frame_carica e la carica
+## (0..carica_max_s secondi) cresce; al rilascio parte il colpo, con danno e area che crescono con la carica.
+## I numeri sono in balance.json combattimento.attacco_pesante.
+var _pesante: bool = false
+var _carica: float = 0.0
 
 var _dashing: bool = false
 var _dash_vel: Vector2 = Vector2.ZERO
@@ -94,6 +99,10 @@ func _ready() -> void:
 		rs.rituale_avviato.connect(func(_s: int) -> void: gesto("ritual"))
 		rs.rituale_completato.connect(func(_s: int) -> void: fine_gesto("ritual"))
 		rs.rituale_interrotto.connect(func(_m: String) -> void: fine_gesto("ritual"))
+		# US-1305b: un colpo subito spezza il rituale (follia e fondamenta: RitualSystem.interrompi)
+		_hurtbox.colpito.connect(func(_d: float, _s: float, _da: Node, _t: String) -> void:
+			if bool(rs.call("in_corso")):
+				rs.call("interrompi", "danno"))
 
 	# Bonus di Sequenza del Pathway corrente (US-201): il giocatore entra in
 	# scena dopo gli autoload, quindi li richiede lui una volta pronto.
@@ -184,6 +193,10 @@ func _physics_process(delta: float) -> void:
 
 	if Input.is_action_just_pressed("attacco") and not _attaccando and not _parando:
 		_inizia_attacco()
+	if Input.is_action_just_pressed("attacco_pesante") and not _attaccando and not _parando:
+		inizia_pesante()
+	if _pesante:
+		_tieni_carica(delta, Input.is_action_pressed("attacco_pesante"))
 
 	_gestisci_input_abilita()
 
@@ -261,7 +274,10 @@ func in_barca() -> bool:
 
 ## La velocita' di chi cammina (StatsComponent), per il moltiplicatore del mezzo su cui si sta.
 func velocita_massima() -> float:
-	return float(_stats.get_stat("velocita")) * _passo_mezzo
+	var planata: float = 1.0                    # in volo a forze finite si va piu' piano (mondo.gd velocita_volo)
+	if _mezzo == "volo" and get_parent() != null and get_parent().has_method("velocita_volo"):
+		planata = float(get_parent().call("velocita_volo"))
+	return float(_stats.get_stat("velocita")) * _passo_mezzo * planata
 
 
 func _imposta_mezzo(mezzo: String, vincolo: Callable) -> void:
@@ -354,6 +370,47 @@ func _inizia_attacco() -> void:
 	_anim.call("riproduci", STATO_ATTACCO, _dir_sguardo)
 
 
+func inizia_pesante() -> void:
+	_attaccando = true
+	_pesante = true
+	_carica = 0.0
+	var facing: Vector2 = get_facing()
+	_hitbox.position = Vector2(0, -4) + facing * 5.0
+	_hitbox.rotation = facing.angle()
+	_anim.call("riproduci", "attack_heavy", _dir_sguardo)
+
+
+## Pubblico per i test: `tenuto` = il tasto e' ancora premuto. La carica cresce solo tenendo premuto (anche durante
+## la preparazione); sul frame della carica l'animazione resta ferma finche' si tiene premuto (fino al massimo); Enel
+## si schiarisce man mano. Lasciato prima, il colpo parte subito.
+func _tieni_carica(delta: float, tenuto: bool) -> void:
+	var pz: Dictionary = _combat.get("attacco_pesante", {})
+	var massimo: float = float(pz.get("carica_max_s", 1.5))
+	var frame_carica: int = int(pz.get("frame_carica", 5))
+	# si carica SOLO finche' si tiene premuto (giudizio dell'utente, 2026-11-18): lasciato prima del frame della
+	# carica, il colpo parte subito con la carica che c'e', senza finire da solo la preparazione
+	if not tenuto and _anim.frame < frame_carica:
+		_anim.frame = frame_carica + 1
+		if not _anim.is_playing():
+			_anim.play()
+		return
+	if tenuto and _anim.frame < frame_carica:
+		_carica = minf(_carica + delta, massimo)
+	if _anim.frame == frame_carica and tenuto and _carica < massimo:
+		_anim.pause()
+		_carica = minf(_carica + delta, massimo)
+		var k: float = _carica / massimo
+		_anim.self_modulate = Color(1.0 + 0.5 * k, 1.0 + 0.4 * k, 1.0 + 0.2 * k)
+	elif not _anim.is_playing():
+		_anim.play()
+
+
+## 0..1: quanto e' carico il colpo pesante.
+func carica_pesante() -> float:
+	var massimo: float = float(_combat.get("attacco_pesante", {}).get("carica_max_s", 1.5))
+	return clampf(_carica / maxf(massimo, 0.001), 0.0, 1.0)
+
+
 ## Hotbar (US-802): abilita_1..4 lanciano la N-esima abilita' posseduta
 ## (AbilityEngine.owned_abilities, stesso ordine che mostra l'HUD). Stessi
 ## guard di _inizia_attacco (non durante un attacco/parata/cast gia' in
@@ -421,9 +478,15 @@ func _avvisa(motivo: String) -> void:
 func _su_evento_anim(nome: String) -> void:
 	match nome:
 		"hitbox_on":
-			var arco: Dictionary = _combat.get("attacco_leggero", {})
+			var arco: Dictionary = _combat.get("attacco_pesante" if _pesante else "attacco_leggero", {})
+			var danno: float = float(arco.get("danno", 12.0))
+			if _pesante:                                  # la carica fa crescere danno e area
+				var k: float = carica_pesante()
+				danno *= lerpf(1.0, float(arco.get("danno_x", 1.0)), k)
+				_hitbox.call("configura", float(arco.get("angolo", 140.0)),
+					float(arco.get("raggio", 26.0)) * lerpf(1.0, float(arco.get("area_x", 1.0)), k))
 			_hitbox.call("attiva",
-				float(arco.get("danno", 12.0)), float(arco.get("stagger", 6.0)), self,
+				danno, float(arco.get("stagger", 6.0)), self,
 				str(arco.get("tag_danno", "")))
 			var vfx: Node = get_node_or_null("/root/Vfx")       # US-8B40: il fendente dell'attacco base
 			if vfx != null:
@@ -443,10 +506,22 @@ func _su_anim_finita(stato: String) -> void:
 	if stato == STATO_ATTACCO:
 		_attaccando = false
 		_hitbox.call("disattiva")
+	elif stato == "attack_heavy":
+		_fine_pesante()
 	elif stato == "cast":
 		_castando = false
 	elif stato == _gesto:
 		_gesto = ""
+
+
+func _fine_pesante() -> void:
+	_attaccando = false
+	_pesante = false
+	_carica = 0.0
+	_anim.self_modulate = Color.WHITE
+	_hitbox.call("disattiva")
+	var arco: Dictionary = _combat.get("attacco_leggero", {})          # torna l'arco dell'attacco leggero
+	_hitbox.call("configura", float(arco.get("angolo", 100.0)), float(arco.get("raggio", 22.0)))
 
 
 ## StatsComponent.died: hp a 0. Ferma il giocatore e riproduce "death"
@@ -454,6 +529,8 @@ func _su_anim_finita(stato: String) -> void:
 ## arriva a fine animazione via _su_anim_finita.
 func _su_morte() -> void:
 	_morto = true
+	if _pesante:
+		_fine_pesante()
 	_attaccando = false
 	_dashing = false
 	_parando = false
